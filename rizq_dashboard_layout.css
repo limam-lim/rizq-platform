@@ -1,0 +1,169 @@
+/**
+ * Rizq Dashboard — RTL/LTR layout (sidebar flip + fixed topbar controls on physical left)
+ * Link from every rizq_dashboard*.html after page-specific styles.
+ * Each page may define --sidebar-w in its own :root (240px or 260px).
+ */
+
+/* ── Sidebar position ── */
+html[dir="rtl"] .sidebar {
+  right: 0;
+  left: auto;
+}
+
+html[dir="ltr"] .sidebar {
+  left: 0;
+  right: auto;
+}
+
+html[dir="rtl"] .main,
+html[dir="rtl"] .main-content {
+  margin-right: var(--sidebar-w, 260px);
+  margin-left: 0;
+}
+
+html[dir="ltr"] .main,
+html[dir="ltr"] .main-content {
+  margin-left: var(--sidebar-w, 260px);
+  margin-right: 0;
+}
+
+/* rizq_dashboard.html sidebar border */
+html[dir="rtl"] .sidebar {
+  border-left: 1px solid rgba(201, 168, 76, 0.1);
+  border-right: none;
+}
+
+html[dir="ltr"] .sidebar {
+  border-right: 1px solid rgba(201, 168, 76, 0.1);
+  border-left: none;
+}
+
+/* Nav item accent */
+html[dir="rtl"] .sb-item,
+html[dir="rtl"] .nav-item {
+  border-right: 3px solid transparent;
+  border-left: none;
+}
+
+html[dir="ltr"] .sb-item,
+html[dir="ltr"] .nav-item {
+  border-left: 3px solid transparent;
+  border-right: none;
+}
+
+html[dir="rtl"] .sb-item.active,
+html[dir="rtl"] .nav-item.active {
+  border-right-color: var(--gold, #C9A84C);
+}
+
+html[dir="ltr"] .sb-item.active,
+html[dir="ltr"] .nav-item.active {
+  border-left-color: var(--gold, #C9A84C);
+}
+
+html[dir="rtl"] .sb-badge,
+html[dir="rtl"] .nav-badge {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+html[dir="ltr"] .sb-badge,
+html[dir="ltr"] .nav-badge {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Card accent borders */
+html[dir="rtl"] .stat-card {
+  border-right-width: 4px;
+  border-left-width: 1px;
+}
+
+html[dir="ltr"] .stat-card {
+  border-left-width: 4px;
+  border-right-width: 1px;
+}
+
+html[dir="ltr"] .inq-item {
+  border-left: 3px solid var(--rc, var(--royal, #1B3A6B));
+  border-right: 1px solid rgba(27, 58, 107, 0.08);
+}
+
+html[dir="ltr"] .img-thumb-del {
+  left: auto;
+  right: 2px;
+}
+
+/* Upgrade lock badge on service cards */
+html[dir="ltr"] #services-showcase [style*="position:absolute"][style*="top:-1px"] {
+  right: auto !important;
+  left: -1px !important;
+  border-radius: 12px 0 0 10px !important;
+}
+
+/* ── Topbar / mobile bar: controls always on physical LEFT ── */
+.topbar,
+.mobile-bar {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topbar-controls,
+.topbar-actions,
+.mobile-bar-controls {
+  order: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.topbar-title,
+.mobile-bar-title {
+  order: 2;
+  flex: 1;
+  min-width: 0;
+}
+
+html[dir="rtl"] .topbar-title,
+html[dir="rtl"] .mobile-bar-title {
+  text-align: right;
+  direction: rtl;
+}
+
+html[dir="ltr"] .topbar-title,
+html[dir="ltr"] .mobile-bar-title {
+  text-align: left;
+  direction: ltr;
+}
+
+.topbar .mobile-menu-btn {
+  order: 0;
+}
+
+/* ── Mobile sidebar slide direction ── */
+@media (max-width: 768px) {
+  html[dir="rtl"] .sidebar {
+    transform: translateX(100%);
+  }
+
+  html[dir="ltr"] .sidebar {
+    transform: translateX(-100%);
+  }
+
+  html[dir="rtl"] .sidebar.open,
+  html[dir="ltr"] .sidebar.open {
+    transform: none;
+  }
+
+  html[dir="rtl"] .main,
+  html[dir="ltr"] .main,
+  html[dir="rtl"] .main-content,
+  html[dir="ltr"] .main-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}

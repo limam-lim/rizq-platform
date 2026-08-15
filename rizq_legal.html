@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>الشروط القانونية — منصة رزق | Conditions légales — Rizq</title>
+<style>
+:root{--royal:#1B3A6B;--gold:#C9A84C;--dark:#0f2347}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f8faff;color:#1a2535;}
+.header{background:linear-gradient(135deg,var(--dark),var(--royal));color:#fff;padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.logo-mark{width:36px;height:36px;background:var(--royal,#1B3A6B);border:2px solid var(--gold,#C9A84C);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold,#C9A84C);box-shadow:0 0 0 1px rgba(201,168,76,.3),0 4px 16px rgba(27,58,107,.4);flex-shrink:0}
+.logo-text{display:flex;flex-direction:column;justify-content:center}
+.logo-text .logo-ar{font-size:19px;font-weight:900;color:var(--gold);line-height:1;display:block}
+.logo-text .logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;text-transform:uppercase;font-style:italic;margin-top:2px;white-space:nowrap}
+.lang-btns{display:flex;gap:8px}
+.lang-btn{padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.lang-btn.active,.lang-btn:hover{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.container{max-width:860px;margin:0 auto;padding:40px 24px}
+.toc{background:#fff;border:1px solid rgba(27,58,107,.1);border-right:4px solid var(--gold);border-radius:12px;padding:20px 24px;margin-bottom:32px}
+.toc-title{font-size:14px;font-weight:700;color:var(--royal);margin-bottom:12px}
+.toc a{display:block;font-size:13px;color:#4a6090;padding:3px 0;text-decoration:none}
+.toc a:hover{color:var(--royal)}
+.section{background:#fff;border:1px solid rgba(27,58,107,.08);border-radius:14px;padding:28px;margin-bottom:20px}
+.section-num{display:inline-block;background:var(--royal);color:#fff;border-radius:8px;padding:3px 11px;font-size:12px;font-weight:800;margin-bottom:10px}
+h2{font-size:17px;font-weight:800;color:var(--royal);margin-bottom:14px}
+h3{font-size:14px;font-weight:700;color:var(--royal);margin:16px 0 8px}
+p{font-size:13.5px;line-height:1.85;color:#3a4a60;margin-bottom:10px}
+ul{padding-right:20px;margin-bottom:10px}
+li{font-size:13.5px;line-height:1.85;color:#3a4a60;margin-bottom:4px}
+.violation-table{width:100%;border-collapse:collapse;margin-top:12px;display:block;overflow-x:auto;white-space:nowrap}
+.violation-table tr{display:table-row}
+@media(min-width:701px){.violation-table{display:table;white-space:normal}}
+.violation-table th{background:var(--royal);color:#fff;padding:10px 14px;font-size:13px;text-align:right}
+.violation-table td{padding:9px 14px;font-size:13px;border-bottom:1px solid #eef0f6;color:#3a4a60}
+.violation-table tr:nth-child(even) td{background:#f8faff}
+.badge-r{display:inline-block;background:#fef2f2;color:#dc2626;border:1px solid #fee2e2;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700}
+.badge-h{display:inline-block;background:#fff8e8;color:#a07820;border:1px solid #fde68a;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700}
+.badge-ok{display:inline-block;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700}
+.warning-box{background:#fff8e8;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13px;color:#7a5c00}
+.legal-note{background:#fef2f2;border:1px solid #fee2e2;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13px;color:#7f1d1d}
+.footer{background:var(--dark);color:rgba(255,255,255,.5);text-align:center;padding:20px;font-size:12px;margin-top:40px}
+.lang-ar{display:block}.lang-fr{display:none}
+body.fr .lang-ar{display:none}.body.fr .lang-fr{display:block}
+[data-ar],[data-fr]{display:none}
+body:not(.fr) [data-ar]{display:block}
+body.fr [data-fr]{display:block}
+@media(max-width:600px){.container{padding:16px}.section{padding:18px}.header{padding:20px}}
+
+  /* Phone numbers always LTR */
+  input[type="tel"],
+  input[name*="phone"],
+  input[id*="phone"],
+  input[id*="Phone"],
+  input[placeholder*="هاتف"],
+  input[placeholder*="جوال"],
+  .phone-num, .phone-display, .contact-phone, [data-phone] {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: isolate;
+  }
+
+/* phone LTR */
+[href^="tel"],[dir="ltr"]{direction:ltr!important;unicode-bidi:isolate!important}
+/* ══ LOGO GOLD UNIVERSAL ══ */
+.logo-ar,.rizq-logo-text .logo-ar,.logo-text .logo-ar{font-size:21px!important;
+  color:#C9A84C!important;
+  font-family:Georgia,'Times New Roman',serif!important;
+  font-weight:700!important;
+  text-shadow:0 0 16px rgba(201,168,76,.35)
+}
+.logo-sub,.rizq-logo-text .logo-sub,.logo-text .logo-sub{
+  color:rgba(201,168,76,.7)!important;
+  font-size:8.5px!important;
+  letter-spacing:2.2px!important;
+  text-transform:uppercase!important;
+  font-style:italic
+}
+</style>
+
+  <script src="rizq_i18n_data.js"></script>
+  <script src="rizq_i18n.js"></script>
+<script src="rizq_pwa.js" defer></script>
+<script src="rizq_footer_toggle.js" defer></script>
+</head>
+<body id="body">
+<button class="btn-lang" id="lang-btn">FR</button>
+<div class="header">
+  <a href="rizq_landing_v8.html" class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 40 40" width="34" height="34" style="display:block" aria-hidden="true"><text x="26" y="29" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="22" font-weight="900" fill="#C9A84C">ر</text><text x="13" y="28" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="17" font-weight="900" font-style="italic" fill="#C9A84C">R</text></svg></div>
+    <div class="logo-text">
+      <span class="logo-ar">رزق</span>
+      <span class="logo-sub">Rizq Platform · MR</span>
+    </div>
+  </a>
+  <div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px;text-align:center">الشروط والسياسات القانونية<br><small>Conditions et Politiques Légales</small></div>
+  </div>
+</div>
+
+<!-- ══ ARABIC ══ -->
+<div data-ar>
+<div class="container">
+  <div class="toc">
+    <div class="toc-title">📋 فهرس المحتوى</div>
+    <a href="#s1">١. تعريف المنصة ونطاق الخدمة</a>
+    <a href="#s2">٢. شروط استخدام المنصة</a>
+    <a href="#s3">٣. التحقق من الهوية وحماية البيانات</a>
+    <a href="#s4">٤. سياسة المحتوى المحظور — المخالفات R01–R14</a>
+    <a href="#s5">٥. المراجعة البشرية — حالات H01–H08</a>
+    <a href="#s6">٦. إخلاء مسؤولية المنصة</a>
+    <a href="#s7">٧. حقوق الملكية الفكرية</a>
+    <a href="#s8">٨. التوافق مع القانون الموريتاني</a>
+    <a href="#s9">٩. تعديل الشروط والإشعارات</a>
+    <a href="#s10">١٠. التواصل والشكاوى</a>
+    <a href="#s11">١١. الإلغاء والاسترجاع، حدود المسؤولية، التحكيم</a>
+  </div>
+
+  <div class="legal-note">⚖️ <strong>إشعار قانوني:</strong> تسري هذه الشروط وفق القوانين الموريتانية النافذة. أي بند يتعارض مع نص قانوني صريح يخضع لذلك النص. للاستفسار القانوني: <strong>legal@rizq.mr</strong></div>
+
+  <div class="section" id="s1">
+    <span class="section-num">١</span>
+    <h2>تعريف المنصة ونطاق الخدمة</h2>
+    <p>منصة <strong>رزق (rizq.mr)</strong> هي خدمة إعلانات مبوبة إلكترونية تُتيح للأفراد والشركات نشر إعلانات البيع والشراء والإيجار والخدمات في موريتانيا. المنصة <strong>وسيط نشر فقط</strong> وليست طرفاً في أي معاملة تجارية.</p>
+    <p>تشمل الخدمة: نشر الإعلانات، التصفح والبحث، التواصل بين الأطراف عبر المنصة، ولوحات تحكم لأصحاب المحلات والمكاتب والشركات.</p>
+  </div>
+
+  <div class="section" id="s2">
+    <span class="section-num">٢</span>
+    <h2>شروط استخدام المنصة</h2>
+    <h3>أ) الأهلية</h3>
+    <ul>
+      <li>يجب أن يكون المستخدم <strong>بالغاً (18 سنة فأكثر)</strong> وفق القانون الموريتاني.</li>
+      <li>يجب تقديم هوية حقيقية وقابلة للتحقق.</li>
+      <li>حساب واحد لكل شخص طبيعي — الحسابات المتعددة تُحذف.</li>
+    </ul>
+    <h3>ب) التزامات المستخدم</h3>
+    <ul>
+      <li>المستخدم مسؤول قانونياً عن كل محتوى ينشره أمام القانون الموريتاني.</li>
+      <li>الإعلانات يجب أن تعكس بضائع أو خدمات حقيقية متاحة للبيع.</li>
+      <li>يُمنع التلاعب بنظام التقييم أو الترويج المصطنع.</li>
+      <li>يُمنع استخدام المنصة لحصاد بيانات المستخدمين أو النشر التلقائي.</li>
+    </ul>
+    <h3>ج) الحساب والأمان</h3>
+    <p>المستخدم مسؤول عن سرية كلمة مروره. يجب الإبلاغ فوراً عن أي اختراق مشتبه به عبر: <strong>direction@rizq.mr</strong></p>
+  </div>
+
+  <div class="section" id="s3">
+    <span class="section-num">٣</span>
+    <h2>التحقق من الهوية وحماية البيانات</h2>
+    <!-- LEGAL-INTERNAL: verify decree numbers with counsel before launch -->
+    <p>تلتزم منصة رزق بمبادئ حماية البيانات الشخصية المعمول بها في الجمهورية الإسلامية الموريتانية، وتعالج بيانات الهوية بصرامة بما يتوافق مع اللوائح الوطنية للمعاملات الإلكترونية وحماية المعطيات ذات الطابع الشخصي.</p>
+    <h3>أ) إجراء التحقق الإلزامي</h3>
+    <p>حرصاً على سلامة المجتمع ومكافحة الحسابات الوهمية، يُطلب من كل مستخدم رفع صورة من بطاقة هويته الوطنية أو جواز سفره عند التسجيل.</p>
+    <h3>ب) التزامات المنصة بالخصوصية</h3>
+    <ul>
+      <li>صور البطاقات <strong>لا تظهر</strong> لأي مستخدم أو طرف ثالث.</li>
+      <li>تُخزَّن مشفّرة في مسار معزول عن المحتوى العام.</li>
+      <li><strong>تُحذف تلقائياً</strong> بعد اكتمال التحقق — يُحتفظ فقط بعلامة <code>id_verified: true</code> وتاريخها.</li>
+      <li>الوصول إليها مقصور على المسؤولين الإداريين مع تسجيل كل عملية اطّلاع.</li>
+    </ul>
+    <h3>ج) البيانات المجمَّعة</h3>
+    <ul>
+      <li>لا تُباع بيانات المستخدمين لأي طرف تجاري.</li>
+      <li>بيانات الاستخدام المجهولة قد تُستخدم لتحسين الخدمة.</li>
+      <li>يحق للمستخدم طلب حذف حسابه وبياناته الشخصية بالكامل.</li>
+    </ul>
+    <h3>د) حالة الحساب المعلَّق</h3>
+    <p>المستخدم الذي لم يرفع بطاقة هويته يبقى حسابه بحالة <strong>"معلَّق — بانتظار التحقق"</strong>: يستطيع التصفح لكن لا يستطيع نشر إعلانات أو مراسلة الآخرين حتى إتمام التحقق.</p>
+  </div>
+
+  <div class="section" id="s4">
+    <span class="section-num">٤</span>
+    <h2>سياسة المحتوى المحظور</h2>
+    <p>أي إعلان لا يخالف اللائحة التالية يُنشر مباشرة. <strong>الأصل هو القبول.</strong></p>
+    <table class="violation-table">
+      <tr><th>الكود</th><th>المخالفة</th><th>النتيجة</th></tr>
+      <tr><td><span class="badge-r">R01</span></td><td>محتوى جنسي أو إيحاء جنسي في النص أو الصور أو الفيديو</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R02</span></td><td>الكحول والمخدرات والمواد المسكرة بجميع أشكالها</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R03</span></td><td>الأسلحة النارية والبيضاء الهجومية والذخيرة والمتفجرات</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R04</span></td><td>القمار واليانصيب والرهانات والمخططات الهرمية</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R05</span></td><td>الوثائق المزورة والشهادات وجوازات السفر وبطاقات الهوية للبيع</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R06</span></td><td>الاحتيال الواضح: سعر غير منطقي + إلحاح على تحويل مالي مسبق دون معاينة</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R07</span></td><td>خطاب الكراهية والعنف والتحريض والمحتوى الصادم</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R08</span></td><td>بيع أعضاء بشرية أو الاتجار بالبشر</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R09</span></td><td>المنتجات المقلدة مع ادعاء صريح أنها أصلية للخداع</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R10</span></td><td>بيانات شخصية لطرف ثالث بدون موافقة</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R11</span></td><td>الحيوانات المحمية أو المهددة بالانقراض</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R12</span></td><td>الأدوية المشروطة بوصفة طبية والمواد الخاضعة للرقابة</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R13</span></td><td>مخالفة معايير الاحتشام: صور على أجساد لملابس داخلية أو مكشوفة</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R14</span></td><td>روابط خارجية (URLs) في نص الإعلان — بدون استثناءات</td><td>رفض فوري</td></tr>
+    </table>
+    <div class="warning-box">💡 <strong>ملاحظة:</strong> ذكر طرق الدفع (نقداً، Bankily، Sedad، تحويل بنكي) مسموح تماماً — المعاملات تتم خارج المنصة وهذا طبيعي. بيع الملابس الداخلية مسموح إذا كانت الصور للمنتج وحده بدون أجساد.</div>
+  </div>
+
+  <div class="section" id="s5">
+    <span class="section-num">٥</span>
+    <h2>حالات المراجعة البشرية</h2>
+    <p>عند الشك يُحوَّل الإعلان للمراجعة البشرية بدلاً من الرفض المباشر.</p>
+    <table class="violation-table">
+      <tr><th>الكود</th><th>الحالة</th></tr>
+      <tr><td><span class="badge-h">H01</span></td><td>حالة قانونية غامضة لا يمكن حسمها آلياً</td></tr>
+      <tr><td><span class="badge-h">H02</span></td><td>عقارات بمبالغ ضخمة مع وثائق ملكية غير واضحة</td></tr>
+      <tr><td><span class="badge-h">H03</span></td><td>أدوية أو مكملات غذائية غير واضحة التصنيف</td></tr>
+      <tr><td><span class="badge-h">H04</span></td><td>حيوانات حية يصعب تحديد ما إذا كانت محمية</td></tr>
+      <tr><td><span class="badge-h">H05</span></td><td>مركبات بأسعار أقل بكثير من السوق (شبهة سرقة)</td></tr>
+      <tr><td><span class="badge-h">H06</span></td><td>محتوى ديني أو سياسي حساس</td></tr>
+      <tr><td><span class="badge-h">H07</span></td><td>صور منخفضة الجودة جداً أو غير مطابقة للوصف</td></tr>
+      <tr><td><span class="badge-h">H08</span></td><td>إعلانات توظيف بشروط مريبة (رسوم مسبقة أو وعود غير واقعية)</td></tr>
+    </table>
+    <p style="margin-top:12px"><strong>لا يُرفض الإعلان</strong> بسبب: أخطاء إملائية، لهجة حسانية، خلط عربي/فرنسي، جودة صور متواضعة، سعر مرتفع، أو تنسيق سيئ.</p>
+  </div>
+
+  <div class="section" id="s6">
+    <span class="section-num">٦</span>
+    <h2>إخلاء مسؤولية المنصة</h2>
+    <ul>
+      <li>المنصة <strong>لا تتحمل</strong> مسؤولية المعاملات بين البائع والمشتري: جودة المنتج، الدفع، التسليم، أو أي نزاع.</li>
+      <li>المعاينة قبل الدفع <strong>مسؤولية المشتري</strong> — تنصح المنصة دائماً بعدم تحويل أي مبلغ قبل معاينة السلعة.</li>
+      <li>اجتياز المراجعة الآلية <strong>ليس ضماناً</strong> من المنصة لصحة محتوى الإعلان أو قانونية السلعة.</li>
+      <li>شارة <strong>"✅ موثّق"</strong> تعني فقط أن صاحب الحساب اجتاز التحقق من الهوية، ولا تعني ضمان المنصة لتعاملاته.</li>
+      <li>المستخدم وحده مسؤول قانونياً عن محتوى إعلاناته أمام القانون الموريتاني.</li>
+      <li>المنصة تتعاون مع السلطات عند وجود طلب قانوني رسمي.</li>
+    </ul>
+  </div>
+
+  <div class="section" id="s7">
+    <span class="section-num">٧</span>
+    <h2>حقوق الملكية الفكرية</h2>
+    <p>المستخدم يحتفظ بملكية الصور والمحتوى الذي يرفعه، ويمنح المنصة رخصة غير حصرية لعرضه ضمن الخدمة.</p>
+    <p><strong>إقرار وضمان من المستخدم:</strong> بنشر أي إعلان أو محتوى (نص، صورة، فيديو) على المنصة، يُقرّ المستخدم بأنه المالك القانوني لهذا المحتوى أو حاصل على ترخيص صحيح ونافذ لاستخدامه، وأنه لا ينتهك أي حق ملكية فكرية لطرف ثالث (حق نشر، علامة تجارية، براءة اختراع، أو غيرها). يتحمّل المستخدم المسؤولية الكاملة والمنفردة عن أي مطالبة أو ضرر ينتج عن مخالفة هذا الإقرار، ويتعهّد بتعويض المنصة عن أي خسارة قانونية تنتج عن ذلك.</p>
+    <div class="warning-box" style="border-color:#C9A84C"><strong>📜 الإقرار الإلزامي (نص حرفي ملزم — يُعرض أيضاً كخانة تأكيد إلزامية عند التسجيل وكتذكير أسفل زر النشر):</strong><br><br>
+    "بتسجيله على منصة رزق ونشره لأي إعلان أو مادة مرئية أو مسموعة أو نصية، يُقرّ المستخدم (المعلن) صراحةً بأنه يمتلك كافة الحقوق والتراخيص القانونية اللازمة على جميع المواد التي يرفعها أو ينشرها على المنصة، سواء أكانت صوراً أم فيديوهات إعلانية أم شعارات أم نصوصاً أم مقاطع صوتية أم أي محتوى آخر، وأن نشر هذه المواد لا ينتهك حقوق الملكية الفكرية لأي طرف ثالث. المنصة غير مسؤولة بأي شكل عن المحتوى الذي يرفعه المستخدمون، وفي حال ثبوت أي انتهاك تقع المسؤولية القانونية والمالية الكاملة على عاتق المستخدم وحده."</div>
+    <p>يُمنع نسخ قواعد بيانات المنصة أو محتواها آلياً. علامة "رزق" التجارية وشعارها وتصميم الموقع وبرمجياته محمية بحقوق الملكية الفكرية لصالح <strong>ADMINIA SARL</strong>، ولا يجوز استخدامها دون إذن خطي مسبق.</p>
+  </div>
+
+  <div class="section" id="s8">
+    <span class="section-num">٨</span>
+    <h2>التوافق مع القانون الموريتاني</h2>
+    <!-- LEGAL-INTERNAL: add official decree/law numbers with counsel before launch -->
+    <p>تلتزم المنصة بالأطر القانونية التالية وفق آخر تحديثاتها:</p>
+    <ul>
+      <li>قانون المعاملات الإلكترونية الموريتاني</li>
+      <li>قانون مكافحة الجرائم الإلكترونية</li>
+      <li>اللوائح المتعلقة بحماية المستهلك</li>
+      <li>قانون حماية البيانات الشخصية <em>(يُستحسن التأكد من وجود نص صريح في موريتانيا)</em></li>
+      <li>قوانين الاستيراد والتجارة لبعض الفئات (السيارات، العقارات)</li>
+    </ul>
+    <p>أي بند في هذه الشروط يتعارض مع القانون الموريتاني النافذ <strong>يخضع للقانون الموريتاني</strong>.</p>
+  </div>
+
+  <div class="section" id="s9">
+    <span class="section-num">٩</span>
+    <h2>تعديل الشروط</h2>
+    <p>تحتفظ المنصة بحق تعديل هذه الشروط. يُشعر المستخدمون بأي تغيير جوهري بإشعار داخل المنصة قبل 14 يوماً من التفعيل. الاستمرار في استخدام المنصة بعد التعديل يُعدّ قبولاً.</p>
+    <p>آخر تحديث: <strong id="update-date"></strong></p>
+  </div>
+
+  <div class="section" id="s10">
+    <span class="section-num">١٠</span>
+    <h2>التواصل والشكاوى</h2>
+    <ul>
+      <li>الدعم العام: <strong>direction@rizq.mr</strong></li>
+      <li>الشكاوى القانونية: <strong>legal@rizq.mr</strong></li>
+      <li>الإبلاغ عن إعلان مخالف: زر "الإبلاغ عن الإعلان" في كل صفحة إعلان</li>
+    </ul>
+  </div>
+
+  <div class="section" id="s11">
+    <span class="section-num">١١</span>
+    <h2>سياسات إضافية: الإلغاء، حدود المسؤولية، التحكيم، والإشعارات</h2>
+    <h3>أ) سياسة الإلغاء والاسترجاع</h3>
+    <p>يحق للمشترك في أي باقة مدفوعة (إعلان فردي مميز، متجر افتراضي، مكتب افتراضي، Rizq ADS) طلب استرجاع المبلغ المدفوع خلال <strong>48 ساعة</strong> من الدفع وقبل تفعيل الباقة فعلياً أو نشر أي محتوى ضمنها. بعد التفعيل أو النشر، يُنظر في طلبات الاسترجاع حالة بحالة وفق الأسباب المبررة فقط (مثل: خطأ تقني من المنصة، ازدواج دفع، أو عدم تفعيل الخدمة المدفوعة خلال 72 ساعة من الإشعار بالدفع). <strong>لا يحق الاسترجاع</strong> في حالات: تغيّر رأي المشترك بعد الاستخدام الفعلي للخدمة، أو مخالفة المحتوى المنشور لقواعد النشر (R01–R14) المؤدية لحذفه.</p>
+    <h3>ب) حدود المسؤولية القصوى</h3>
+    <p>في أقصى الحالات وأياً كان سبب المطالبة، <strong>لا تتجاوز مسؤولية منصة رزق المالية تجاه أي مشترك القيمة الإجمالية لرسوم الاشتراك التي دفعها ذلك المشترك خلال آخر 12 شهراً</strong>. لا تتحمّل المنصة بأي حال أضراراً غير مباشرة أو أرباحاً فائتة أو خسائر تجارية ناتجة عن استخدام أو تعذّر استخدام الخدمة.</p>
+    <h3>ج) التحكيم والقانون المطبَّق</h3>
+    <p>يُحل أي نزاع بين المستخدم والمنصة ودياً أولاً عبر <strong>legal@rizq.mr</strong>. وفي حال تعذّر الحل الودي خلال 30 يوماً، يُحل النزاع عبر <strong>التحكيم</strong> وفق القانون الموريتاني النافذ، بدلاً من التقاضي المباشر أمام المحاكم، إلا في الحالات التي يفرض فيها القانون الموريتاني صراحةً اختصاصاً قضائياً حصرياً. <strong>القانون الموريتاني هو المرجع الوحيد</strong> لتفسير وتطبيق جميع بنود هذه الشروط ولأي نزاع ينشأ عنها.</p>
+    <h3>د) الإشعارات القانونية</h3>
+    <p>البريد الإلكتروني المسجَّل على حساب المستخدم هو <strong>العنوان الرسمي الوحيد</strong> لتلقي كل الإشعارات القانونية المتعلقة بحسابه أو بهذه الشروط، بما فيها إشعار تعديل الشروط المذكور في القسم 9. يتحمّل المستخدم مسؤولية تحديث بريده الإلكتروني للحفاظ على صحة هذا التواصل.</p>
+  </div>
+</div>
+</div><!-- /data-ar -->
+
+<!-- ══ FRENCH ══ -->
+<div data-fr>
+<div class="container" dir="ltr" style="direction:ltr;text-align:left">
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <a href="#f1">1. Définition de la plateforme</a>
+    <a href="#f2">2. Conditions d'utilisation</a>
+    <a href="#f3">3. Vérification d'identité et protection des données</a>
+    <a href="#f4">4. Politique de contenu interdit — R01–R14</a>
+    <a href="#f5">5. Révision humaine — H01–H08</a>
+    <a href="#f6">6. Limitation de responsabilité</a>
+    <a href="#f7">7. Propriété intellectuelle</a>
+    <a href="#f8">8. Conformité légale mauritanienne</a>
+    <a href="#f9">9. Modification des conditions</a>
+    <a href="#f10">10. Contact et réclamations</a>
+    <a href="#f11">11. Annulation, remboursement, responsabilité, arbitrage</a>
+  </div>
+
+  <div class="legal-note">⚖️ <strong>Avis juridique :</strong> Les présentes conditions sont régies par le droit mauritanien en vigueur. Toute clause incompatible avec une disposition légale explicite est soumise à cette disposition. Contact : <strong>legal@rizq.mr</strong></div>
+
+  <div class="section" id="f1">
+    <span class="section-num">1</span>
+    <h2>Définition de la plateforme et portée du service</h2>
+    <p><strong>Rizq (rizq.mr)</strong> est un service de petites annonces en ligne permettant aux particuliers et aux entreprises de publier des annonces de vente, d'achat, de location et de services en Mauritanie. La plateforme est <strong>uniquement un intermédiaire de publication</strong> et n'est partie à aucune transaction commerciale.</p>
+  </div>
+
+  <div class="section" id="f2">
+    <span class="section-num">2</span>
+    <h2>Conditions d'utilisation</h2>
+    <h3>a) Éligibilité</h3>
+    <ul>
+      <li>L'utilisateur doit être <strong>majeur (18 ans ou plus)</strong> selon la loi mauritanienne.</li>
+      <li>Un seul compte par personne physique — les comptes multiples seront supprimés.</li>
+    </ul>
+    <h3>b) Obligations de l'utilisateur</h3>
+    <ul>
+      <li>L'utilisateur est légalement responsable de tout contenu publié.</li>
+      <li>Les annonces doivent refléter des biens ou services réels disponibles.</li>
+      <li>Toute manipulation du système d'évaluation est interdite.</li>
+    </ul>
+  </div>
+
+  <div class="section" id="f3">
+    <span class="section-num">3</span>
+    <h2>Vérification d'identité et protection des données</h2>
+    <!-- LEGAL-INTERNAL: verify decree numbers with counsel before launch -->
+    <p>La plateforme Rizq s'engage à traiter les données d'identité dans le strict respect des principes de protection des données à caractère personnel applicables en République Islamique de Mauritanie, conformément aux réglementations nationales relatives aux transactions électroniques et à la protection des données personnelles.</p>
+    <h3>a) Procédure de vérification obligatoire</h3>
+    <p>Pour garantir la sécurité de la communauté et lutter contre les faux comptes, chaque utilisateur doit télécharger une photo de sa carte d'identité nationale ou de son passeport lors de l'inscription.</p>
+    <h3>b) Engagements de confidentialité</h3>
+    <ul>
+      <li>Les photos de pièces d'identité <strong>ne sont visibles</strong> par aucun utilisateur ni tiers.</li>
+      <li>Elles sont stockées chiffrées dans un espace isolé.</li>
+      <li><strong>Suppression automatique</strong> après vérification — seul le statut <code>id_verified: true</code> est conservé.</li>
+      <li>Accès réservé aux administrateurs avec journalisation de chaque consultation.</li>
+    </ul>
+    <h3>c) Compte en attente de vérification</h3>
+    <p>Un compte sans pièce d'identité reste en statut <strong>"Suspendu — En attente de vérification"</strong> : navigation autorisée, publication et messagerie bloquées jusqu'à la vérification.</p>
+  </div>
+
+  <div class="section" id="f4">
+    <span class="section-num">4</span>
+    <h2>Politique de contenu interdit</h2>
+    <p>Toute annonce ne violant pas cette liste est <strong>publiée directement</strong>.</p>
+    <table class="violation-table">
+      <tr><th>Code</th><th>Violation</th><th>Résultat</th></tr>
+      <tr><td><span class="badge-r">R01</span></td><td>Contenu sexuel ou suggestif dans le texte, les images ou la vidéo</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R02</span></td><td>Alcool, drogues et stupéfiants sous toutes leurs formes</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R03</span></td><td>Armes à feu, armes blanches offensives, munitions, explosifs</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R04</span></td><td>Jeux de hasard, loteries, schémas pyramidaux</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R05</span></td><td>Documents falsifiés, diplômes, passeports, cartes d'identité à vendre</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R06</span></td><td>Fraude manifeste : prix irréaliste + pression au virement avant inspection</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R07</span></td><td>Discours haineux, violence, incitation, contenu choquant</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R08</span></td><td>Vente d'organes humains ou traite des êtres humains</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R09</span></td><td>Produits contrefaits présentés explicitement comme authentiques</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R10</span></td><td>Données personnelles de tiers sans consentement</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R11</span></td><td>Animaux protégés ou en voie d'extinction</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R12</span></td><td>Médicaments sur ordonnance ou substances contrôlées</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R13</span></td><td>Non-respect des normes de pudeur : photos de lingerie sur corps</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R14</span></td><td>Liens externes (URLs) dans le texte de l'annonce — sans exception</td><td>Rejet immédiat</td></tr>
+    </table>
+    <div class="warning-box">💡 <strong>Note :</strong> Mentionner des moyens de paiement (espèces, Bankily, Sedad, virement) est autorisé. La vente de lingerie est permise si les photos montrent uniquement le produit, sans modèle.</div>
+  </div>
+
+  <div class="section" id="f5">
+    <span class="section-num">5</span>
+    <h2>Cas de révision humaine</h2>
+    <table class="violation-table">
+      <tr><th>Code</th><th>Situation</th></tr>
+      <tr><td><span class="badge-h">H01</span></td><td>Situation juridique ambiguë non tranchable automatiquement</td></tr>
+      <tr><td><span class="badge-h">H02</span></td><td>Immobilier de grande valeur avec documents de propriété suspects</td></tr>
+      <tr><td><span class="badge-h">H03</span></td><td>Médicaments ou compléments alimentaires de classification incertaine</td></tr>
+      <tr><td><span class="badge-h">H04</span></td><td>Animaux vivants dont le statut de protection est incertain</td></tr>
+      <tr><td><span class="badge-h">H05</span></td><td>Véhicules à prix bien inférieur au marché (suspicion de vol)</td></tr>
+      <tr><td><span class="badge-h">H06</span></td><td>Contenu religieux ou politique sensible</td></tr>
+      <tr><td><span class="badge-h">H07</span></td><td>Photos de très mauvaise qualité ou incohérentes avec la description</td></tr>
+      <tr><td><span class="badge-h">H08</span></td><td>Offres d'emploi aux conditions suspectes</td></tr>
+    </table>
+    <p style="margin-top:12px"><strong>Une annonce n'est jamais rejetée</strong> pour : fautes d'orthographe, dialecte hassaniya, mélange arabe/français, qualité d'image modeste ou prix élevé.</p>
+  </div>
+
+  <div class="section" id="f6">
+    <span class="section-num">6</span>
+    <h2>Limitation de responsabilité</h2>
+    <ul>
+      <li>La plateforme <strong>n'est pas responsable</strong> des transactions entre vendeurs et acheteurs.</li>
+      <li>L'inspection avant paiement est <strong>la responsabilité de l'acheteur</strong>.</li>
+      <li>Le passage de la modération automatique <strong>ne constitue pas une garantie</strong> de la légalité du bien.</li>
+      <li>Le badge <strong>"✅ Vérifié"</strong> signifie uniquement que l'identité du compte a été vérifiée.</li>
+      <li>L'utilisateur est seul responsable légalement du contenu de ses annonces.</li>
+    </ul>
+  </div>
+
+  <div class="section" id="f7">
+    <span class="section-num">7</span>
+    <h2>Propriété intellectuelle</h2>
+    <p>L'utilisateur conserve la propriété de ses images et contenus, et accorde à Rizq une licence non exclusive pour les afficher dans le cadre du service.</p>
+    <p><strong>Déclaration et garantie de l'utilisateur :</strong> en publiant tout contenu (texte, image, vidéo) sur la plateforme, l'utilisateur déclare en être le propriétaire légal ou disposer d'une licence valide pour son utilisation, et qu'il ne viole aucun droit de propriété intellectuelle d'un tiers (droit d'auteur, marque, brevet, etc.). L'utilisateur assume l'entière et seule responsabilité de toute réclamation ou dommage résultant d'une violation de cette déclaration, et s'engage à indemniser la plateforme de toute perte juridique en résultant.</p>
+    <div class="warning-box" style="border-color:#C9A84C"><strong>📜 Déclaration obligatoire (texte contractuel — également affichée comme case à cocher obligatoire à l'inscription et en rappel sous le bouton de publication) :</strong><br><br>
+    « En s'inscrivant sur la plateforme Rizq et en publiant tout contenu, l'utilisateur déclare détenir tous les droits et licences nécessaires sur les contenus publiés, et que leur publication ne viole les droits d'aucun tiers. La plateforme n'est en aucun cas responsable du contenu publié par les utilisateurs. En cas de violation avérée, l'entière responsabilité juridique et financière incombe exclusivement à l'utilisateur. »</div>
+    <p>La copie automatique de la base de données est interdite. La marque « Rizq », son logo, le design du site et ses logiciels sont protégés par des droits de propriété intellectuelle au profit d'<strong>ADMINIA SARL</strong>, et ne peuvent être utilisés sans autorisation écrite préalable.</p>
+  </div>
+
+  <div class="section" id="f8">
+    <span class="section-num">8</span>
+    <h2>Conformité légale mauritanienne</h2>
+    <!-- LEGAL-INTERNAL: add official decree/law numbers with counsel before launch -->
+    <p>La plateforme s'engage à respecter les cadres légaux suivants : loi sur les transactions électroniques, loi sur la cybercriminalité, réglementations sur la protection des consommateurs, et loi sur la protection des données personnelles.</p>
+  </div>
+
+  <div class="section" id="f9">
+    <span class="section-num">9</span>
+    <h2>Modification des conditions</h2>
+    <p>Rizq se réserve le droit de modifier ces conditions. Les utilisateurs seront informés de tout changement majeur 14 jours avant son entrée en vigueur. La poursuite de l'utilisation vaut acceptation.</p>
+    <p>Dernière mise à jour : <strong id="update-date-fr"></strong></p>
+  </div>
+
+  <div class="section" id="f10">
+    <span class="section-num">10</span>
+    <h2>Contact et réclamations</h2>
+    <ul>
+      <li>Support général : <strong>direction@rizq.mr</strong></li>
+      <li>Questions juridiques : <strong>legal@rizq.mr</strong></li>
+      <li>Signaler une annonce : bouton "Signaler l'annonce" sur chaque page d'annonce</li>
+    </ul>
+  </div>
+
+  <div class="section" id="f11">
+    <span class="section-num">11</span>
+    <h2>Politiques complémentaires : annulation, responsabilité, arbitrage et notifications</h2>
+    <h3>a) Politique d'annulation et de remboursement</h3>
+    <p>Tout abonné à une offre payante (annonce individuelle premium, boutique virtuelle, bureau virtuel, Rizq ADS) peut demander un remboursement dans les <strong>48 heures</strong> suivant le paiement, avant l'activation effective de l'offre ou la publication de tout contenu associé. Après activation ou publication, les demandes sont examinées au cas par cas, uniquement pour des motifs justifiés (erreur technique de la plateforme, double paiement, service payé non activé dans les 72 heures). <strong>Aucun remboursement</strong> n'est dû en cas de changement d'avis après utilisation effective du service, ou de suppression du contenu pour violation des règles de publication (R01–R14).</p>
+    <h3>b) Limitation maximale de responsabilité</h3>
+    <p>En tout état de cause, <strong>la responsabilité financière de Rizq envers un abonné ne dépasse jamais le montant total des frais d'abonnement payés par cet abonné au cours des 12 derniers mois</strong>. La plateforme n'est en aucun cas responsable des dommages indirects, pertes de profit ou pertes commerciales liés à l'utilisation ou à l'impossibilité d'utiliser le service.</p>
+    <h3>c) Arbitrage et droit applicable</h3>
+    <p>Tout litige entre l'utilisateur et la plateforme est d'abord résolu à l'amiable via <strong>legal@rizq.mr</strong>. À défaut de résolution amiable dans un délai de 30 jours, le litige est soumis à <strong>l'arbitrage</strong> conformément au droit mauritanien en vigueur, plutôt qu'à une action judiciaire directe, sauf disposition légale mauritanienne imposant expressément une compétence judiciaire exclusive. <strong>Le droit mauritanien est la seule référence</strong> pour l'interprétation et l'application de toutes les clauses des présentes conditions.</p>
+    <h3>d) Notifications légales</h3>
+    <p>L'adresse e-mail enregistrée sur le compte de l'utilisateur est <strong>la seule adresse officielle</strong> pour recevoir toute notification juridique relative à son compte ou aux présentes conditions, y compris l'avis de modification mentionné à la section 9. L'utilisateur est responsable de la mise à jour de son e-mail.</p>
+  </div>
+</div>
+</div><!-- /data-fr -->
+
+
+<!-- ══ FOOTER RIZQ ══ -->
+<footer class="rizq-footer">
+  <div class="footer-grid">
+    <div>
+      <a href="rizq_landing_v8.html" style="margin-bottom:14px;display:inline-flex;gap:11px;text-decoration:none;align-items:center;direction:ltr">
+        <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">Rizq Platform · MR</span></div>
+      </a>
+      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
+        <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
+        <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
+      </div>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="rzq-ft-quick">روابط سريعة</h4>
+      <ul class="footer-links">
+        <li><a href="rizq_landing_v8.html" id="rzq-ft-l1">الرئيسية</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-l2">تصفّح الإعلانات</a></li>
+        <li><a href="rizq_post.html" id="rzq-ft-l3">انشر إعلانك</a></li>
+        <li><a href="rizq_landing_v8.html#pricing" id="rzq-ft-l4">الأسعار</a></li>
+        <li><a href="rizq_landing_v8.html#about" id="rzq-ft-l5">من نحن</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="rzq-ft-topcats">أبرز الأقسام</h4>
+      <ul class="footer-links">
+        <li><a href="rizq_browse.html">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html">🐄 ماشية وحيوانات</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="rzq-ft-help">المساعدة</h4>
+      <ul class="footer-links">
+        <li><a href="rizq_legal.html" id="rzq-ft-h1">مركز المساعدة</a></li>
+        <li><a href="rizq_legal.html#s3" id="rzq-ft-h2">سياسة الخصوصية</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h3">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html#s10" id="rzq-ft-h4">الإبلاغ عن إعلان</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h5">تواصل معنا</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="rzq-ft-contact">تواصل معنا</h4>
+      <ul class="footer-links" style="gap:14px">
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-1">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-2">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-3">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
+        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy" id="rzq-ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px">
+      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>
+      </div>
+    </div>
+    <p class="footer-copy" id="rzq-ft-sig" style="display:flex;align-items:center;gap:4px"><span id="rzq-sig-pre">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>
+  </div>
+</footer>
+<script>
+(function(){
+  var FR={
+    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    netlabel:"Réseaux pris en charge :",
+    quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
+    l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
+    h1:"Centre d'aide",h2:"Politique de confidentialité",h3:"Conditions d'utilisation",h4:"Signaler une annonce",h5:"Contactez-nous",
+    cn1:"Mauritel :",cn2:"Mattel :",cn3:"Chinguitel :",
+    copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
+  };
+  var AR={
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    netlabel:"شبكات مدعومة:",
+    quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
+    l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",
+    h1:"مركز المساعدة",h2:"سياسة الخصوصية",h3:"شروط الاستخدام",h4:"الإبلاغ عن إعلان",h5:"تواصل معنا",
+    cn1:"موريتل:",cn2:"ماتيل:",cn3:"شينقيتل:",
+    copy:"© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷",sig:"بتوقيع"
+  };
+  function applyFt(){
+    var isFr=(localStorage.getItem('rizq_lang')||'ar')==='fr';
+    var d=isFr?FR:AR;
+    var m={
+      'rzq-ft-desc':'desc','rzq-ft-netlabel':'netlabel',
+      'rzq-ft-quick':'quick','rzq-ft-topcats':'topcats','rzq-ft-help':'help','rzq-ft-contact':'contact',
+      'rzq-ft-l1':'l1','rzq-ft-l2':'l2','rzq-ft-l3':'l3','rzq-ft-l4':'l4','rzq-ft-l5':'l5',
+      'rzq-ft-h1':'h1','rzq-ft-h2':'h2','rzq-ft-h3':'h3','rzq-ft-h4':'h4','rzq-ft-h5':'h5',
+      'rzq-cn-1':'cn1','rzq-cn-2':'cn2','rzq-cn-3':'cn3',
+      'rzq-ft-copy':'copy','rzq-sig-pre':'sig'
+    };
+    for(var id in m){var el=document.getElementById(id);if(el)el.textContent=d[m[id]];}
+  }
+  document.addEventListener('DOMContentLoaded',applyFt);
+  window.addEventListener('storage',function(e){if(e.key==='rizq_lang')applyFt();});
+  window._rzqApplyFt = applyFt;
+})();
+</script>
+
+
+
+
+
+<script>
+function setLang(l){
+  try{ localStorage.setItem('rizq_lang', l); }catch(e){}
+  document.querySelectorAll('[data-ar],[data-fr]').forEach(function(el){el.style.display='none';});
+  document.querySelectorAll('[data-'+l+']').forEach(function(el){el.style.display='block';});
+  document.documentElement.lang = l;
+  document.documentElement.dir  = l==='ar'?'rtl':'ltr';
+  /* إصلاح: الفوتر (rzq-ft-*) كان لا يترجَم إلا عند تحميل الصفحة، ويبقى بالعربية
+     بعد الضغط على زر تبديل اللغة في نفس الصفحة. الآن يُحدَّث فوراً هنا أيضاً. */
+  if(window._rzqApplyFt) window._rzqApplyFt();
+}
+var d = new Date().toLocaleDateString('ar-SA-u-nu-latn',{year:'numeric',month:'long',day:'numeric'});
+var df = new Date().toLocaleDateString('fr-FR',{year:'numeric',month:'long',day:'numeric'});
+var el1=document.getElementById('update-date'); if(el1)el1.textContent=d;
+var el2=document.getElementById('update-date-fr'); if(el2)el2.textContent=df;
+// تطبيق اللغة المحفوظة من باقي المنصة عند تحميل الصفحة
+var _legalLang = (function(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } })();
+setLang(_legalLang);
+// زر اللغة الموحّد (class="btn-lang" — أُضيف في هذه الصفحة لأول مرة) يُشغَّل
+// تلقائياً عبر RizqI18n — نربط setLang() المحلي بحدثه الموحّد.
+document.addEventListener('rizq:langchange', function (e) { setLang(e.detail.lang); });
+</script>
+
+<script>
+// ══ تعديلات القانون من لوحة الأدمن — قراءة عامة حقيقية من rizq-backend ══
+// إن عدّل المالك أي قسم (s1-s10 عربي / f1-f10 فرنسي) من لوحة الأدمن، يُستبدَل
+// محتوى القسم المطابق هنا بنفس النص لكل زائر فوراً. لا يوجد override محفوظ
+// = يبقى النص الافتراضي المكتوب في هذا الملف كما هو (تدهور سلس بلا أعطال).
+</script>
+<!-- إصلاح: عنوان الخادم أصبح مضبوطاً من ملف مشترك واحد (rizq_backend_config.js)
+     بدل تكراره داخل كل صفحة على حدة — راجع تعليقات ذلك الملف للتفاصيل. -->
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_disclaimer.js"></script>
+<script>
+(function applyLegalOverrides(){
+  if (!window.RIZQ_BACKEND_BASE) return;
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      var lo = (data && data.config && data.config.legalOverrides) || null;
+      if (!lo) return; // لا تعديلات محفوظة — يبقى النص الافتراضي
+      var ar = lo.ar || {}, fr = lo.fr || {};
+      Object.keys(ar).forEach(function(key){
+        var el = document.getElementById(key);
+        if (el && ar[key]) el.innerHTML = ar[key];
+      });
+      Object.keys(fr).forEach(function(key){
+        var el = document.getElementById(key);
+        if (el && fr[key]) el.innerHTML = fr[key];
+      });
+      if (lo.updatedAt) {
+        var realDate = new Date(lo.updatedAt);
+        var elAr = document.getElementById('update-date'); if (elAr) elAr.textContent = realDate.toLocaleDateString('ar-SA-u-nu-latn',{year:'numeric',month:'long',day:'numeric'});
+        var elFr = document.getElementById('update-date-fr'); if (elFr) elFr.textContent = realDate.toLocaleDateString('fr-FR',{year:'numeric',month:'long',day:'numeric'});
+      }
+    })
+    .catch(function(){ /* الخادم غير متاح — يبقى النص الافتراضي بلا كسر للصفحة */ });
+})();
+</script>
+<style id="rzq-footer-css">
+footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;border-top:1px solid rgba(201,168,76,.1)!important;padding:60px 5% 0!important;color:rgba(255,255,255,.72)!important;margin:0!important;padding-bottom:0!important}
+footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:1200px!important;margin:0 auto!important;padding-bottom:50px!important}
+footer.rizq-footer .footer-col-title{font-size:12px!important;font-weight:700!important;color:#C9A84C!important;letter-spacing:2px!important;text-transform:uppercase!important;margin-bottom:18px!important;font-family:Georgia,serif!important}
+footer.rizq-footer .footer-desc{font-size:13px!important;color:rgba(255,255,255,.85)!important;line-height:1.85!important;margin-top:14px!important;max-width:280px!important}
+footer.rizq-footer .footer-links{list-style:none!important;display:flex!important;flex-direction:column!important;padding:0!important;margin:0!important}
+footer.rizq-footer .footer-links li{padding:0!important;line-height:1.6!important}
+footer.rizq-footer .footer-links li a{font-size:13px!important;color:#e0e0e0!important;text-decoration:none!important;transition:color .3s!important}
+footer.rizq-footer .footer-links li a:hover{color:#C9A84C!important}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
+footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important}
+.telecom-tag{display:inline-block!important;background:rgba(201,168,76,.14)!important;border:1px solid rgba(201,168,76,.4)!important;color:rgba(201,168,76,.95)!important;font-size:10px!important;padding:4px 12px!important;border-radius:20px!important;font-weight:700!important;letter-spacing:.3px!important}
+@media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}
+@media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
+html{background:#071020!important}
+
+/* ══ FIXED RIZQ LOGO (right) ══ */
+.fixed-rizq-logo{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:10px 0 0 10px;
+  padding:14px 7px;cursor:pointer;
+  z-index:998;transition:all .25s;
+  box-shadow:-3px 0 18px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;
+}
+.fixed-rizq-logo:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  box-shadow:-4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ FIXED DISC PILL (left) ══ */
+.fixed-disc-pill{
+  position:fixed;left:0;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:0 10px 10px 0;
+  color:#C9A84C;font-size:10px;font-weight:700;
+  padding:16px 7px;cursor:pointer;
+  letter-spacing:1.5px;white-space:nowrap;
+  z-index:999;transition:all .25s;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+  font-family:Georgia,'Amiri',serif;
+}
+.fixed-disc-pill:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  color:#E8C96A;box-shadow:4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ DISCLAIMER MODAL ══ */
+.disc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.disc-overlay.open{display:flex}
+.disc-modal{background:linear-gradient(160deg,#0a1628,#122040);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;max-width:640px;width:100%;padding:36px 32px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);font-family:Georgia,'Amiri','Times New Roman',serif}
+.disc-modal-close{position:absolute;top:16px;left:16px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#C9A84C;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s}
+.disc-modal-close:hover{background:rgba(201,168,76,.35)}
+.disc-modal[dir="ltr"] .disc-modal-close{left:auto;right:16px}
+.disc-modal h2{color:#C9A84C;font-size:20px;font-weight:800;margin:0 0 24px;text-align:center;letter-spacing:.5px;line-height:1.4;text-shadow:0 0 20px rgba(201,168,76,.3)}
+.disc-modal .disc-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(201,168,76,.12)}
+.disc-modal .disc-section:last-of-type{border-bottom:none}
+.disc-modal .disc-section h3{color:#E8C96A;font-size:13px;font-weight:700;letter-spacing:.8px;margin:0 0 8px}
+.disc-modal .disc-section p{color:rgba(255,255,255,.92);font-size:14px;line-height:1.85;margin:0}
+.disc-modal .disc-footer{margin-top:22px;padding-top:16px;border-top:1px solid rgba(201,168,76,.25);font-size:12px;color:rgba(201,168,76,.7);text-align:center;line-height:1.7}
+.disc-close-btn{display:inline-block;margin-top:12px;padding:9px 24px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700;transition:background .2s}
+.disc-close-btn:hover{background:rgba(201,168,76,.28)}
+</style>
+
+<!-- FIXED RIZQ LOGO (right) -->
+<a class="fixed-rizq-logo" href="rizq_landing_v8.html" title="رزق — Accueil / الرئيسية">
+  <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
+    <text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text>
+    <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
+  </svg>
+</a>
+
+<!-- FIXED DISC PILL (left) -->
+<div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
+
+<!-- DISCLAIMER MODAL -->
+<div class="disc-overlay" id="discOverlay" onclick="if(event.target===this)closeDisc()">
+  <div class="disc-modal">
+    <button class="disc-modal-close" onclick="closeDisc()">&#x2715;</button>
+    <h2 id="disc-title">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; &#x647;&#x627;&#x645;<br><small style="font-size:13px;font-weight:500;opacity:.75" id="disc-sub">&#x645;&#x646;&#x635;&#x629; &#x631;&#x632;&#x642; &#x2014; &#x645;&#x648;&#x631;&#x64A;&#x62A;&#x627;&#x646;&#x64A;&#x627;</small></h2>
+    <div class="disc-section"><h3 id="disc-h1">&#x1F4E2; &#x631;&#x632;&#x642; &#x648;&#x633;&#x64A;&#x637; &#x646;&#x634;&#x631; &#x641;&#x642;&#x637;</h3><p id="disc-p1"></p></div>
+    <div class="disc-section"><h3 id="disc-h2">&#x1F91D; &#x645;&#x633;&#x624;&#x648;&#x644;&#x64A;&#x629; &#x627;&#x644;&#x623;&#x637;&#x631;&#x627;&#x641;</h3><p id="disc-p2"></p></div>
+    <div class="disc-section"><h3 id="disc-h3">&#x1F50D; &#x62A;&#x62D;&#x630;&#x64A;&#x631; &#x627;&#x644;&#x645;&#x634;&#x62A;&#x631;&#x64A;</h3><p id="disc-p3"></p></div>
+    <div class="disc-section"><h3 id="disc-h4">&#x1F5D1;&#xFE0F; &#x62D;&#x642; &#x62D;&#x630;&#x641; &#x627;&#x644;&#x645;&#x62D;&#x62A;&#x648;&#x649;</h3><p id="disc-p4"></p></div>
+    <div class="disc-section"><h3 id="disc-h5">&#x1F512; &#x627;&#x644;&#x628;&#x64A;&#x627;&#x646;&#x627;&#x62A; &#x648;&#x627;&#x644;&#x62E;&#x635;&#x648;&#x635;&#x64A;&#x629;</h3><p id="disc-p5"></p></div>
+    <div class="disc-footer">
+      <div id="disc-footer-main" style="font-size:12.5px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.8"></div>
+      <div style="font-size:11px;color:rgba(201,168,76,.6)">Rizq Platform &middot; &#x645;&#x648;&#x631;&#x64A;&#x62A;&#x627;&#x646;&#x64A;&#x627; &copy;</div>
+      <br><span class="disc-close-btn" id="disc-close-lbl" onclick="closeDisc()">&#x641;&#x647;&#x645;&#x62A; &#x2014; &#x623;&#x63A;&#x644;&#x642;</span>
+    </div>
+  </div>
+</div>
+<script src="rizq_video_ads.js"></script>
+  <script src="rizq_navbar.js"></script>
+</body>
+</html>

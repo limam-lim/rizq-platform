@@ -1,0 +1,315 @@
+/* ================================================================
+   RIZQ — THÈME OFFICIEL v2.1
+   Mohamed Limam | ADMINIA SARL | contact@adminia.mr
+   ================================================================
+   RÈGLE: Ce fichier applique UNIQUEMENT les règles universelles
+   (navbar, footer, boutons gold, ADMINIA) sans écraser le style
+   sombre de la landing page.
+   ================================================================ */
+
+:root {
+  --bd:      #0f1f3d;
+  --bd2:     #1B2B4B;
+  --bd3:     #1a3055;
+  --gold:    #C9A84C;
+  --gold-l:  #e8c96a;
+  --gold-dk: #a07820;
+  --white:   #ffffff;
+  --light:   #f8faff;
+  --light2:  #eef2fb;
+  --dark-txt:#1a2535;
+  --muted:   #2C3A4F;
+  --green:   #16a34a;
+  --border:  #e2e8f5;
+  --shadow:  0 2px 12px rgba(0,0,0,0.07);
+  --shadow-h:0 16px 40px rgba(0,0,0,0.12);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-thumb { background:linear-gradient(var(--gold),var(--gold-l)); border-radius:2px; }
+
+/* ══════════════════════════════════
+   RIZQ SKELETON LOADER — بألوان المنصة (كحلي + shimmer ذهبي خفيف)
+   الاستخدام: لفّ أي <img> بـ<div class="rizq-img-wrap"> وأضف
+   onload="this.closest('.rizq-img-wrap').classList.add('loaded')"
+   على وسم <img> نفسه — لا يحتاج أي JS خارجي إضافي.
+══════════════════════════════════ */
+.rizq-img-wrap { position:relative; overflow:hidden; background:var(--bd2); }
+.rizq-img-wrap::before {
+  content:'';
+  position:absolute; inset:0; z-index:0;
+  background:linear-gradient(90deg, transparent, rgba(201,168,76,.28), transparent);
+  background-size:200% 100%;
+  animation:rizqShimmer 1.4s ease-in-out infinite;
+}
+.rizq-img-wrap.loaded::before { display:none; }
+.rizq-img-wrap > img { position:relative; z-index:1; opacity:0; transition:opacity .35s ease; }
+.rizq-img-wrap.loaded > img { opacity:1; }
+@keyframes rizqShimmer {
+  0%   { background-position:200% 0; }
+  100% { background-position:-200% 0; }
+}
+
+/* ══════════════════════════════════
+   1. NAVBAR — كحلي داكن موحد
+══════════════════════════════════ */
+.topnav {
+  background: linear-gradient(135deg, var(--bd) 0%, var(--bd2) 100%) !important;
+  border-bottom: 1px solid rgba(201,168,76,0.2) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35) !important;
+}
+/* Landing nav est sticky — pas de class topnav */
+nav.scrolled {
+  background: rgba(8,15,30,0.96) !important;
+  border-bottom: 1px solid rgba(201,168,76,0.15) !important;
+}
+
+/* ── LOGO ── */
+.rizq-logo-text { color: var(--gold) !important; }
+
+/* ── LANGUE AR/FR ──────────────────────────────────────────────────
+   زر لغة واحد موحّد الموضع في كل صفحات المنصة (2026-08-04): بغضّ النظر
+   عن مكانه داخل DOM كل صفحة، position:fixed يضعه دائماً في نفس البقعة
+   الفعلية أعلى يسار الشاشة — بلا حاجة لنقل أي عنصر أو تكرار الترميز. ── */
+.btn-lang, .rizq-lang-btn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 99999 !important;
+  background: rgba(13,10,4,0.72) !important;
+  backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(201,168,76,0.5) !important;
+  color: var(--gold) !important;
+  padding: 7px 15px !important;
+  border-radius: 20px !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.25s !important;
+  font-family: inherit !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+}
+.btn-lang:hover, .btn-lang.active, .rizq-lang-btn:hover {
+  border-color: var(--gold) !important;
+  background: rgba(13,10,4,0.9) !important;
+  transform: scale(1.05) !important;
+}
+@media (max-width:768px) {
+  .btn-lang, .rizq-lang-btn { top: auto !important; bottom: 14px !important; left: 14px !important; }
+}
+
+/* ══════════════════════════════════
+   2. BOUTONS GOLD
+══════════════════════════════════ */
+.btn-post, .btn-register, .btn-store,
+.btn-new-ad, .btn-h1 {
+  background: linear-gradient(135deg, var(--gold), var(--gold-l)) !important;
+  color: var(--bd) !important;
+  font-weight: 800 !important;
+  border: none !important;
+  transition: all 0.3s !important;
+}
+.btn-post:hover, .btn-register:hover,
+.btn-store:hover, .btn-h1:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(201,168,76,0.4) !important;
+}
+
+/* ══════════════════════════════════
+   3. PAGES CLAIRES (store/products/cart/search/listing/profile)
+   Appliqué via class="page-light" sur <body>
+══════════════════════════════════ */
+body.page-light {
+  background: var(--light);
+  color: var(--dark-txt);
+}
+
+/* Cards blanches — UNIQUEMENT sur pages claires */
+body.page-light .cat-card,
+body.page-light .product-card {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow) !important;
+  transition: all 0.3s !important;
+}
+body.page-light .cat-card:hover,
+body.page-light .product-card:hover {
+  border-color: var(--gold) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(201,168,76,0.18) !important;
+}
+body.page-light .cat-card:hover .cat-name { color: var(--gold) !important; }
+body.page-light .cat-icon  { font-size:40px !important; display:block; }
+body.page-light .cat-name  { font-size:14px !important; font-weight:700 !important; color:var(--dark-txt) !important; }
+body.page-light .cat-count { font-size:12px !important; color:var(--gold-dk) !important; font-weight:800 !important; }
+
+/* Ad cards blanches */
+body.page-light .ad-card {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow) !important;
+  overflow: hidden !important;
+}
+body.page-light .ad-card:hover {
+  border-color: var(--gold) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-h) !important;
+}
+body.page-light .ad-title { color: var(--dark-txt) !important; font-weight:700 !important; }
+body.page-light .ad-price { color: var(--gold) !important; font-weight:900 !important; }
+
+/* صور افتراضية بهوية رزق — خلفية بيضاء وأيقونات أزرق داكن، موحّدة على جميع الصفحات */
+.ad-img, .card-img, .ad-card-img, .product-img, .hc-img {
+  background: #ffffff !important;
+  color: var(--bd) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.ad-img svg, .card-img svg, .ad-card-img svg, .product-img svg, .hc-img svg {
+  width: 46px !important; height: 46px !important; stroke-width: 1.4 !important;
+  stroke: currentColor !important; display: block !important; opacity: .88 !important;
+}
+.ad-img::before, .card-img::before, .ad-card-img::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 60% at 30% 30%, rgba(201,168,76,0.07), transparent 60%);
+  z-index:1; pointer-events:none;
+}
+
+/* Product cards (store/products) */
+body.page-light .product-name  { font-weight:700; color:var(--dark-txt) !important; }
+body.page-light .product-price { color:var(--gold) !important; font-weight:900 !important; }
+
+/* Inputs sur pages claires */
+body.page-light input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+body.page-light select,
+body.page-light textarea {
+  border: 1px solid var(--border) !important;
+  background: var(--white) !important;
+  color: var(--dark-txt) !important;
+}
+body.page-light input:focus,
+body.page-light select:focus,
+body.page-light textarea:focus {
+  border-color: var(--gold) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12) !important;
+}
+
+/* Sidebar filtres */
+body.page-light .filters-sidebar {
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* Breadcrumb */
+body.page-light .breadcrumb,
+body.page-light .bc-inner {
+  background: var(--light2) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+body.page-light .bc-inner a      { color: var(--bd2) !important; }
+body.page-light .bc-inner a:hover { color: var(--gold) !important; }
+
+/* Steps */
+body.page-light .steps-bar { background: var(--light2) !important; border-bottom:1px solid var(--border) !important; }
+
+/* ══════════════════════════════════
+   4. FOOTER — moiod sur toutes les pages
+══════════════════════════════════ */
+footer {
+  background: linear-gradient(180deg, var(--bd2) 0%, var(--bd) 100%) !important;
+  border-top: 1px solid rgba(201,168,76,0.15) !important;
+}
+footer a, footer button { color:rgba(255,255,255,0.38) !important; transition:color 0.2s; }
+footer a:hover, footer button:hover { color:rgba(255,255,255,0.8) !important; }
+.ft-title, .footer-col-title { color:var(--gold) !important; font-size:11px !important; letter-spacing:1.5px !important; }
+
+/* ADMINIA block */
+.adminia-ft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 22px !important;
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(201,168,76,0.16) !important;
+  border-radius: 12px !important;
+}
+.adminia-ico {
+  width:36px !important; height:36px !important;
+  border-radius:9px !important;
+  border:1.5px solid rgba(201,168,76,0.5) !important;
+  background:#0d0a04 !important;
+  display:flex !important; align-items:center; justify-content:center;
+  flex-shrink:0 !important;
+  font-size:9px !important; font-weight:700;
+  color:var(--gold) !important;
+  letter-spacing:2px;
+}
+.adminia-n {
+  font-size:14px !important; font-weight:700 !important;
+  color:#fff !important; letter-spacing:2px;
+  font-family:Georgia,serif !important; line-height:1;
+}
+.adminia-n span { color:var(--gold) !important; }
+.adminia-s { font-size:8px !important; letter-spacing:5px; color:rgba(201,168,76,0.55) !important; margin-top:2px; }
+.adminia-p { font-size:8px !important; color:rgba(255,255,255,0.2) !important; letter-spacing:1.5px; margin-top:3px; }
+.adminia-p strong { color:rgba(201,168,76,0.6) !important; }
+.ft-bottom {
+  padding:18px 0 !important;
+  display:flex !important; flex-direction:row !important;
+  justify-content:space-between !important; align-items:center !important;
+  flex-wrap:wrap !important; gap:14px !important;
+  border-top:1px solid rgba(255,255,255,0.06);
+  margin-top:8px;
+}
+@media(max-width:768px){
+  .ft-bottom { flex-direction:column !important; }
+}
+.ft-copy { font-size:12px !important; color:rgba(255,255,255,0.22) !important; text-align:center; }
+
+/* ══════════════════════════════════
+   5. PRIX & CONTACT
+══════════════════════════════════ */
+.price-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(27,43,75,0.06)) !important;
+  border: 1px solid rgba(201,168,76,0.2) !important;
+  border-radius:14px !important;
+}
+.btn-call {
+  background: linear-gradient(135deg,var(--gold),var(--gold-l)) !important;
+  color: var(--bd) !important; font-weight:800 !important;
+}
+
+/* ══════════════════════════════════
+   6. MOBILE
+══════════════════════════════════ */
+@media(max-width:768px) {
+  .hero-visual { display:none !important; }
+  body.page-light .filters-sidebar { display:none !important; }
+  body.page-light .page-wrap,
+  body.page-light .content-grid { grid-template-columns:1fr !important; }
+}
+
+/* ══════════════════════════════════
+   7. RTL / LTR — محاذاة موحّدة
+══════════════════════════════════ */
+html[dir="rtl"] body { direction: rtl; }
+html[dir="ltr"] body { direction: ltr; }
+html[dir="rtl"] .form-group label,
+html[dir="rtl"] .form-label,
+html[dir="rtl"] .section-title { text-align: right; }
+html[dir="ltr"] .form-group label,
+html[dir="ltr"] .form-label,
+html[dir="ltr"] .section-title { text-align: left; }
+html[dir="ltr"] .mobile-drawer { right: auto; left: 0; }
+html[dir="ltr"] .fixed-rizq-logo { right: auto; left: 0; border-radius: 0 10px 10px 0; }
+[dir="ltr"] input[type="tel"],
+[dir="ltr"] input[type="email"],
+[href^="tel"] { direction: ltr !important; unicode-bidi: isolate; text-align: left; }
+html[dir="rtl"] select { text-align: right; }
+html[dir="ltr"] select { text-align: left; }

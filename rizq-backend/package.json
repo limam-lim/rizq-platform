@@ -1,0 +1,37 @@
+{
+  "name": "rizq-backend",
+  "version": "1.0.0",
+  "description": "خادم خلفي آمن لمنصة رزق — يحمل مفاتيح API على السيرفر فقط (لا تصل أبداً لكود الواجهة الأمامية الثابت)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "backup": "node scripts/run-backup.js",
+    "test:backup": "node scripts/test-backup-restore.js",
+    "test:lifecycle": "node scripts/test-ad-lifecycle.js",
+    "test:images": "node scripts/test-image-pipeline.js",
+    "test:widget-lang": "node scripts/test-widget-lang.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.15",
+    "sharp": "^0.33.5",
+    "tar": "^7.4.3",
+    "twilio": "^5.3.0"
+  },
+  "optionalDependencies": {
+    "@aws-sdk/client-s3": "^3.679.0",
+    "ssh2-sftp-client": "^11.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

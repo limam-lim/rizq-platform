@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدير رزق — ويدجت الشات</title>
+<style>
+/* ===== CSS Variables — Rizq Brand ===== */
+:root {
+  --royal:      #1B3A6B;
+  --royal-light:#234d8f;
+  --royal-dark: #0f2347;
+  --gold:       #C9A84C;
+  --gold-light: #e8c96a;
+  --gold-dk:    #a07820;
+  --white:      #ffffff;
+  --gray-100:   #f5f5f5;
+  --gray-200:   #e8e8e8;
+  --gray-500:   #888;
+  --success:    #22c55e;
+  --danger:     #ef4444;
+  --shadow:     0 8px 32px rgba(27,58,107,0.22);
+  --shadow-sm:  0 2px 12px rgba(27,58,107,0.15);
+  --radius:     16px;
+  --radius-sm:  8px;
+  --font-ar:    'Segoe UI', Tahoma, Arial, sans-serif;
+  --widget-w:   380px;
+  --widget-h:   520px;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== FLOATING BUTTON ===== */
+#rizq-chat-toggle {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--royal) 0%, var(--royal-light) 100%);
+  border: 3px solid var(--gold);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+  overflow: hidden;
+}
+#rizq-chat-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px rgba(27,58,107,0.35);
+}
+#rizq-chat-toggle.open {
+  transform: rotate(0deg) scale(1);
+}
+
+/* Notification badge */
+#rizq-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+
+/* ===== MAURITANIAN AVATAR SVG ===== */
+.rizq-avatar-icon { width: 44px; height: 44px; }
+
+/* ===== CHAT WINDOW ===== */
+#rizq-chat-window {
+  position: fixed;
+  bottom: 104px;
+  right: 28px;
+  width: var(--widget-w);
+  max-height: var(--widget-h);
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  z-index: 99998;
+  overflow: hidden;
+  transform: scale(0.8) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+  font-family: var(--font-ar);
+  border: 1.5px solid rgba(201,168,76,0.25);
+}
+#rizq-chat-window.visible {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===== HEADER ===== */
+.rw-header {
+  background: linear-gradient(135deg, var(--royal-dark) 0%, var(--royal) 60%, var(--royal-light) 100%);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  flex-shrink: 0;
+}
+.rw-header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2.5px solid var(--gold);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--royal-dark);
+}
+.rw-header-info { flex: 1; }
+.rw-header-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold-light);
+  line-height: 1.2;
+}
+.rw-header-status {
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s infinite;
+}
+.rw-header-close {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.rw-header-close:hover { background: rgba(255,255,255,0.25); }
+
+/* Gold accent line */
+.rw-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ===== QUICK ACTIONS ===== */
+.rw-quick-actions {
+  padding: 10px 14px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: var(--gray-100);
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+.rw-quick-btn {
+  background: white;
+  border: 1.5px solid var(--royal);
+  color: var(--royal);
+  font-size: 11px;
+  font-family: var(--font-ar);
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.rw-quick-btn:hover {
+  background: var(--royal);
+  color: white;
+}
+
+/* ===== MESSAGES AREA ===== */
+.rw-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 180px;
+  scroll-behavior: smooth;
+}
+.rw-messages::-webkit-scrollbar { width: 4px; }
+.rw-messages::-webkit-scrollbar-track { background: transparent; }
+.rw-messages::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+
+/* Message bubbles */
+.rw-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  animation: msgIn 0.3s ease-out;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rw-msg.agent  { flex-direction: row; }
+.rw-msg.user   { flex-direction: row-reverse; }
+
+.rw-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--royal-dark);
+}
+
+.rw-bubble {
+  max-width: 75%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rw-msg.agent .rw-bubble {
+  background: var(--gray-100);
+  color: #222;
+  border-bottom-right-radius: 4px;
+  border: 1px solid var(--gray-200);
+}
+.rw-msg.user .rw-bubble {
+  background: linear-gradient(135deg, var(--royal), var(--royal-light));
+  color: white;
+  border-bottom-left-radius: 4px;
+}
+
+/* Typing indicator */
+.rw-typing .rw-bubble {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  padding: 12px 16px;
+}
+.typing-dots { display: flex; gap: 4px; }
+.typing-dots span {
+  width: 7px; height: 7px;
+  background: var(--gray-500);
+  border-radius: 50%;
+  animation: typingDot 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.5; }
+  30%          { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Timestamp */
+.rw-ts {
+  font-size: 10px;
+  color: var(--gray-500);
+  margin-top: 3px;
+  text-align: center;
+}
+
+/* ===== INPUT AREA ===== */
+.rw-input-area {
+  padding: 12px 14px;
+  border-top: 1px solid var(--gray-200);
+  background: white;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.rw-input {
+  flex: 1;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-family: var(--font-ar);
+  resize: none;
+  outline: none;
+  max-height: 100px;
+  overflow-y: auto;
+  line-height: 1.4;
+  transition: border-color 0.2s;
+
+  text-align: right;
+}
+.rw-input:focus { border-color: var(--royal); }
+.rw-input::placeholder { color: var(--gray-500); }
+
+.rw-send-btn {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--royal), var(--royal-light));
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.rw-send-btn:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, var(--gold-dk), var(--gold));
+}
+.rw-send-btn:active { transform: scale(0.95); }
+.rw-send-btn svg { width: 18px; height: 18px; }
+
+/* ===== FOOTER ===== */
+.rw-footer {
+  text-align: center;
+  font-size: 10px;
+  color: var(--gray-500);
+  padding: 6px;
+  background: var(--gray-100);
+  border-top: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+.rw-footer a { color: var(--royal); text-decoration: none; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 440px) {
+  #rizq-chat-window {
+    width: calc(100vw - 20px);
+    right: 10px;
+    bottom: 90px;
+    --widget-h: 75vh;
+    max-height: 75vh;
+  }
+  #rizq-chat-toggle { right: 16px; bottom: 16px; }
+}
+
+  /* Phone numbers always LTR */
+  input[type="tel"],
+  input[name*="phone"],
+  input[id*="phone"],
+  input[id*="Phone"],
+  input[placeholder*="هاتف"],
+  input[placeholder*="جوال"],
+  .phone-num, .phone-display, .contact-phone, [data-phone] {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: isolate;
+  }
+
+/* phone LTR */
+[href^="tel"],[dir="ltr"]{direction:ltr!important;unicode-bidi:isolate!important}
+
+/* ══ FIXED RIZQ LOGO (right) ══ */
+.fixed-rizq-logo{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:10px 0 0 10px;
+  padding:14px 7px;cursor:pointer;
+  z-index:998;transition:all .25s;
+  box-shadow:-3px 0 18px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;
+}
+.fixed-rizq-logo:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  box-shadow:-4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ FIXED DISC PILL (left) ══ */
+.fixed-disc-pill{
+  position:fixed;left:0;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:0 10px 10px 0;
+  color:#C9A84C;font-size:10px;font-weight:700;
+  padding:16px 7px;cursor:pointer;
+  letter-spacing:1.5px;white-space:nowrap;
+  z-index:999;transition:all .25s;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+  font-family:Georgia,'Amiri',serif;
+}
+.fixed-disc-pill:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  color:#E8C96A;box-shadow:4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ DISCLAIMER MODAL ══ */
+.disc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.disc-overlay.open{display:flex}
+.disc-modal{background:linear-gradient(160deg,#0a1628,#122040);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;max-width:640px;width:100%;padding:36px 32px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);font-family:Georgia,'Amiri','Times New Roman',serif}
+.disc-modal-close{position:absolute;top:16px;left:16px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#C9A84C;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s}
+.disc-modal-close:hover{background:rgba(201,168,76,.35)}
+.disc-modal[dir="ltr"] .disc-modal-close{left:auto;right:16px}
+.disc-modal h2{color:#C9A84C;font-size:20px;font-weight:800;margin:0 0 24px;text-align:center;letter-spacing:.5px;line-height:1.4;text-shadow:0 0 20px rgba(201,168,76,.3)}
+.disc-modal .disc-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(201,168,76,.12)}
+.disc-modal .disc-section:last-of-type{border-bottom:none}
+.disc-modal .disc-section h3{color:#E8C96A;font-size:13px;font-weight:700;letter-spacing:.8px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.disc-modal .disc-section p{color:rgba(255,255,255,.92);font-size:14px;line-height:1.85;margin:0;font-weight:400}
+.disc-modal .disc-footer{margin-top:22px;padding-top:16px;border-top:1px solid rgba(201,168,76,.25);font-size:12px;color:rgba(201,168,76,.7);text-align:center;line-height:1.7}
+.disc-close-btn{display:inline-block;margin-top:12px;padding:9px 24px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700;transition:background .2s}
+.disc-close-btn:hover{background:rgba(201,168,76,.28)}
+</style>
+<script src="rizq_pwa.js" defer></script>
+</head>
+<body>
+
+<!-- ===== FLOATING TOGGLE BUTTON ===== -->
+<button id="rizq-chat-toggle" onclick="RizqWidget.toggle()" aria-label="مدير رزق - الدعم الذكي">
+  <span id="rizq-badge" style="display:none">1</span>
+  <picture class="rizq-avatar-icon" style="width:44px;height:44px;display:inline-block">
+    <source srcset="rizq_manager_avatar_illustrated.webp" type="image/webp">
+    <img src="rizq_manager_avatar_illustrated.png" alt="مدير رزق" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+  </picture>
+</button>
+
+<!-- ===== CHAT WINDOW ===== -->
+<div id="rizq-chat-window" role="dialog" aria-label="مدير رزق — الدعم الذكي">
+
+  <!-- Header -->
+  <div class="rw-header">
+    <div class="rw-header-avatar"><picture>
+      <source srcset="rizq_manager_avatar_illustrated.webp" type="image/webp">
+      <img src="rizq_manager_avatar_illustrated.png" alt="مدير رزق" style="width:100%;height:100%;object-fit:cover;">
+    </picture>
+    </div>
+    <div class="rw-header-info">
+      <div class="rw-header-name" id="rw-header-name">مدير رزق الذكي</div>
+      <div class="rw-header-status">
+        <span class="status-dot"></span>
+        <span id="rw-header-status-text">متاح الآن · يرد خلال ثوانٍ</span>
+      </div>
+    </div>
+    <button class="rw-header-close" onclick="RizqWidget.close()" aria-label="إغلاق">✕</button>
+  </div>
+
+  <!-- Quick Action Chips -->
+  <div class="rw-quick-actions" id="rw-quick-actions">
+    <button class="rw-quick-btn" id="rw-q1" onclick="RizqWidget.quickSend('كيف أنشر إعلاناً؟')">نشر إعلان</button>
+    <button class="rw-quick-btn" id="rw-q2" onclick="RizqWidget.quickSend('أريد الاشتراك')">الاشتراكات</button>
+    <button class="rw-quick-btn" id="rw-q3" onclick="RizqWidget.quickSend('توثيق الهوية')">التوثيق</button>
+    <button class="rw-quick-btn" id="rw-q4" onclick="RizqWidget.quickSend('عندي شكوى')">شكوى</button>
+    <button class="rw-quick-btn" id="rw-q5" onclick="RizqWidget.quickSend('طرق الدفع')">الدفع</button>
+  </div>
+
+  <!-- Messages -->
+  <div class="rw-messages" id="rw-messages"></div>
+
+  <!-- Input Area -->
+  <div class="rw-input-area">
+    <textarea
+      id="rw-input"
+      class="rw-input"
+      placeholder="اكتب رسالتك هنا..."
+      rows="1"
+      onkeydown="RizqWidget.handleKey(event)"
+      oninput="RizqWidget.autoResize(this)"
+      dir="rtl"
+    ></textarea>
+    <button class="rw-send-btn" onclick="RizqWidget.send()" aria-label="إرسال">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="rw-footer" id="rw-footer-text">
+    مدعوم بـ <strong style="color:var(--royal)">رزق AI</strong> · منصة رزق للتجارة الإلكترونية
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+// ---- Load RizqManager config if not already loaded ----
+// In production: <script src="rizq_manager_agent_config.js"><\/script>
+// Inline fallback for standalone demo:
+if (typeof window.RizqManager === 'undefined') {
+  window.RizqManager = {
+    processMessage: function(msg, ctx) {
+      var text  = (msg||"").trim();
+      var lower = text.toLowerCase().replace(/[\u064B-\u0652]/g,"").replace(/[\u0623\u0625\u0622]/g,"\u0627").replace(/\u0629/g,"\u0647");
+      var profile = (ctx && ctx.profile) || {};
+      var bizName = profile.businessName || "\u0631\u0632\u0642";
+      var ch = profile.channels || {};
+      var lang = "ar";
+      if (/[\u0600-\u06FF]/.test(text)) lang = "ar";
+      if (/\u0643\u064A\u0641\u0627\u0634|\u0634\u0646\u0647\u0648|\u0634\u0646\u0648 \u0647\u0648|\u0627\u0644\u0632\u064A\u0646|\u0646\u0639\u0627\u0648\u0646\u0643|\u0628\u063A\u064A\u062A|\u0634\u062D\u0627\u0644|\u0645\u0627\u0643\u0648|\u0643\u0627\u064A\u0646/.test(lower)) lang = "hs";
+      else if (!/[\u0600-\u06FF]/.test(text)) {
+        if (/bonjour|merci|comment|salut|acheter|vendre/.test(lower)) lang = "fr";
+        else if (/hola|como|buenos|gracias|quiero/.test(lower)) lang = "es";
+        else if (/[a-z]/.test(lower)) lang = "en";
+      }
+
+      var socialGreet = /^(\u0643\u064A\u0641 \u0627\u0644\u062D\u0627\u0644|\u0643\u064A\u0641\u0643|\u0643\u064A\u0641 \u062D\u0627\u0644\u0643|\u0643\u064A\u0641\u0627\u0634|\u0634\u0644\u0648\u0646\u0643)/.test(lower);
+      var isSalam=/\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064A\u0643\u0645|\u0633\u0644\u0627\u0645\u0648 \u0639\u0644\u064A\u0643\u0645/.test(lower);
+    var isMorning=/^\u0635\u0628\u0627\u062D/.test(lower);
+    var isEvening=/^\u0645\u0633\u0627\u0621/.test(lower);
+    var directGreet=isSalam||isMorning||isEvening||/^(\u0647\u0644\u0627|\u0633\u0644\u0627\u0645|\u0645\u0631\u062D\u0628|\u0627\u0647\u0644\u0627|\u0645\u0631\u062D\u0628\u0627|hi |hi$|hello|hey|hola|buenos|bonjour|bonsoir|salut|ciao)/.test(lower);
+      var isBye = /\u0634\u0643\u0631\u0627|\u0645\u0634\u0643\u0648\u0631|\u064A\u0639\u0637\u064A\u0643|\u0645\u0639 \u0627\u0644\u0633\u0644\u0627\u0645|thanks|merci|gracias|bye/.test(lower);
+
+      if (socialGreet) {
+        var gr = {"ar":"\u0628\u062E\u064A\u0631 \u0648\u0627\u0644\u062D\u0645\u062F \u0644\u0644\u0647! \uD83D\uDE0A \u0648\u0623\u0646\u062A\u061F\n\u0643\u064A\u0641 \u0623\u0642\u062F\u0631 \u0623\u062E\u062F\u0645\u0643 \u0641\u064A "+bizName+"\u061F","hs":"\u0644\u0628\u0627\u0633 \u0648\u0627\u0644\u062D\u0645\u062F \u0644\u0644\u0647! \uD83D\uDE0A \u0648\u0623\u0646\u062A\u061F\n\u0634\u0646\u0648 \u062A\u0628\u063A\u064A\u061F","fr":"Je vais bien! \uD83D\uDE0A Et vous? Comment puis-je vous aider?","en":"Doing well! \uD83D\uDE0A How can I help today?"};
+        return { reply: gr[lang] || gr.ar, lang: lang };
+      }
+
+      if (directGreet) {
+        var dg = {"ar":"\u0623\u0647\u0644\u0627\u064B \u0648\u0633\u0647\u0644\u0627\u064B! \uD83D\uDE0A\n\u0623\u0646\u0627 \u0645\u0633\u0627\u0639\u062F "+bizName+" \u0627\u0644\u0630\u0643\u064A.\n\u0643\u064A\u0641 \u0623\u0642\u062F\u0631 \u0623\u0633\u0627\u0639\u062F\u0643 \u0627\u0644\u064A\u0648\u0645\u061F","hs":"\u0645\u0631\u062D\u0628\u0627 \u0628\u064A\u0643 \u0641\u064A "+bizName+"! \uD83D\uDE0A\n\u0643\u064A\u0641\u0627\u0634 \u0646\u0639\u0627\u0648\u0646\u0643\u061F","fr":"Bienvenue chez "+bizName+"! \uD83D\uDE0A Comment puis-je vous aider?","en":"Welcome to "+bizName+"! \uD83D\uDE0A How can I help you today?","es":"\u00A1Bienvenido a "+bizName+"! \uD83D\uDE0A \u00BFEn qu\u00E9 puedo ayudarte?"};
+        return { reply: dg[lang] || dg.ar, lang: lang };
+      }
+
+      if (isBye) {
+        var by = {"ar":"\u0628\u0643\u0644 \u0633\u0631\u0648\u0631! \uD83C\uDF1F "+bizName+" \u0641\u064A \u062E\u062F\u0645\u062A\u0643 \u062F\u0627\u0626\u0645\u064B\u0627.","hs":"\u0627\u0644\u0644\u0647 \u064A\u062E\u0644\u064A\u0643! \uD83C\uDF1F","fr":"Avec plaisir! \uD83C\uDF1F A bientot!","en":"My pleasure! \uD83C\uDF1F See you soon!"};
+        return { reply: by[lang] || by.ar, lang: lang };
+      }
+
+      if (/\u0628\u064A\u0639|\u0633\u0639\u0631|\u0628\u0643\u0645|\u0643\u0645 \u062B\u0645\u0646|produit|prix|sell|price/.test(lower)) {
+        if (profile.products && profile.products.length) {
+          var list = profile.products.slice(0,4).map(function(p){return "\u2022 "+p.name+": "+p.price+" MRU";}).join("\n");
+          return { reply: "\u0628\u0627\u0644\u062A\u0623\u0643\u064A\u062F! \uD83D\uDE0A \u0625\u0644\u064A\u0643 \u0628\u0639\u0636 \u0645\u0646\u062A\u062C\u0627\u062A\u0646\u0627:\n\n"+list+"\n\n\u062A\u0631\u064A\u062F \u062A\u0641\u0627\u0635\u064A\u0644 \u0623\u0643\u062B\u0631\u061F", lang: lang };
+        }
+        return { reply: "\u062A\u0641\u0636\u0644 \u0648\u0633\u0623\u0644\u0646\u064A \u0639\u0646 \u0623\u064A \u0645\u0646\u062A\u062C \u064A\u0647\u0645\u0643! \uD83D\uDE0A", lang: lang };
+      }
+
+      if (/\u062A\u0648\u0635\u064A\u0644|\u062F\u064A\u0644\u0641\u0631\u064A|livraison|delivery/.test(lower)) {
+        var delv = (profile.policies && profile.policies.delivery) || "";
+        return { reply: delv ? "\uD83D\uDE9A "+delv : "\u0646\u0639\u0645 \u0646\u0648\u0635\u0651\u0644! \uD83D\uDE9A \u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627 \u0639\u0644\u0649 "+(ch.whatsapp||ch.phone||"\u0648\u0627\u062A\u0633\u0627\u0628")+" \u0644\u062A\u0623\u0643\u064A\u062F \u0637\u0644\u0628\u0643.", lang: lang };
+      }
+
+      if (/\u0645\u0648\u0642\u0639|\u0639\u0646\u0648\u0627\u0646|\u0648\u064A\u0646|\u0623\u064A\u0646|location|adresse/.test(lower)) {
+        var loc = ch.location || "";
+        return { reply: loc ? "\uD83D\uDCCD "+loc : "\u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627 \u0648\u0633\u0646\u0631\u0633\u0644 \u0644\u0643 \u0627\u0644\u0645\u0648\u0642\u0639! \uD83D\uDCCD\n"+(ch.whatsapp||ch.phone||""), lang: lang };
+      }
+
+      if (/\u0633\u0627\u0639\u0629|\u0645\u0648\u0627\u0639\u064A\u062F|horaire|hours/.test(lower)) {
+        return { reply: "\u23F0 "+(profile.workingHours || "\u064A\u0648\u0645\u064A\u064B\u0627 8\u0635 \u2013 10\u0645")+"\n\n\u0647\u0644 \u062A\u0631\u064A\u062F \u062D\u062C\u0632 \u0645\u0648\u0639\u062F\u061F", lang: lang };
+      }
+
+      if (/\u0648\u0627\u062A\u0633\u0627\u0628|\u0627\u062A\u0635\u0644|\u062A\u0648\u0627\u0635\u0644|\u0647\u0627\u062A\u0641|whatsapp|contact|phone/.test(lower)) {
+        var cl = [ch.phone?"\uD83D\uDCDE "+ch.phone:"",ch.whatsapp?"\uD83D\uDCAC "+ch.whatsapp:"",ch.email?"\uD83D\uDCE7 "+ch.email:""].filter(Boolean);
+        return { reply: cl.length ? cl.join("\n")+"\n\n\u0646\u062D\u0646 \u0647\u0646\u0627 \u0644\u0645\u0633\u0627\u0639\u062F\u062A\u0643! \uD83D\uDE0A" : "\u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627 \u0648\u0633\u0646\u0631\u062F \u0639\u0644\u064A\u0643 \u0641\u064A \u0623\u0642\u0631\u0628 \u0648\u0642\u062A! \uD83D\uDE0A", lang: lang };
+      }
+
+      if (/\u0625\u0631\u062C\u0627\u0639|\u062A\u0628\u062F\u064A\u0644|\u0636\u0645\u0627\u0646|retour|return|warranty/.test(lower)) {
+        var ret = (profile.policies && profile.policies.return) || "";
+        return { reply: ret ? "\u21A9\uFE0F "+ret : "\u062A\u0641\u0636\u0644 \u0623\u062E\u0628\u0631\u0646\u064A \u0628\u0627\u0644\u062A\u0641\u0627\u0635\u064A\u0644 \u0648\u0633\u0623\u0633\u0627\u0639\u062F\u0643. \uD83D\uDE0A \u0645\u0627 \u0627\u0644\u0645\u0634\u0643\u0644\u0629 \u0641\u064A \u0627\u0644\u0645\u0646\u062A\u062C\u061F", lang: lang };
+      }
+
+      if (/\u0645\u062F\u064A\u0631|\u0645\u0633\u0624\u0648\u0644|\u0635\u0627\u062D\u0628|responsable|manager/.test(lower)) {
+        return { reply: "\u0628\u0627\u0644\u062A\u0623\u0643\u064A\u062F! \uD83D\uDE0A\n\u0623\u0639\u0637\u0646\u064A \u0627\u0633\u0645\u0643 \u0648\u0631\u0642\u0645 \u0647\u0627\u062A\u0641\u0643 \u0648\u0633\u064A\u062A\u0648\u0627\u0635\u0644 \u0645\u0633\u0624\u0648\u0644\u0646\u0627 \u0642\u0631\u064A\u0628\u064B\u0627.", lang: lang };
+      }
+
+      if (/\u0639\u0631\u0641\u0646\u064A|\u0639\u0631\u0651\u0641\u0646\u064A|\u062A\u0639\u0631\u064A\u0641|\u0634\u0646\u0648.*\u0631\u0632\u0642|\u0645\u0627.*\u0647\u064A.*\u0631\u0632\u0642|\u0643\u064A\u0641.*\u062A\u0639\u0645\u0644|\u0643\u064A\u0641.*\u062A\u0634\u062A\u063A\u0644|\u0645\u0639\u0644\u0648\u0645\u0627\u062A|\u0646\u0628\u0630\u0629|introduce|qu.est.*rizq|c.est.*quoi/.test(lower)) {
+        return { reply: "\uD83D\uDED2 "+bizName+" \u0647\u064A \u0645\u0646\u0635\u0629 \u0627\u0644\u062A\u062C\u0627\u0631\u0629 \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A\u0629 \u0627\u0644\u0623\u0648\u0644\u0649 \u0641\u064A \u0645\u0648\u0631\u064A\u062A\u0627\u0646\u064A\u0627.\n\n\u062A\u062A\u064A\u062D \u0644\u0643:\n\u2022 \u0628\u064A\u0639 \u0648\u0634\u0631\u0627\u0621 \u0623\u064A \u0645\u0646\u062A\u062C \u0623\u0648 \u062E\u062F\u0645\u0629\n\u2022 \u0641\u062A\u062D \u0645\u062A\u062C\u0631 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0627\u062D\u062A\u0631\u0627\u0641\u064A\n\u2022 \u062A\u0642\u062F\u064A\u0645 \u062E\u062F\u0645\u0627\u062A\u0643 \u0639\u0628\u0631 \u0645\u0643\u062A\u0628 \u0627\u0641\u062A\u0631\u0627\u0636\u064A\n\n\u0643\u064A\u0641 \u0623\u0642\u062F\u0631 \u0623\u0633\u0627\u0639\u062F\u0643 \u0627\u0644\u064A\u0648\u0645\u061F", lang: lang };
+      }
+
+      if (/\u062A\u0633\u062C\u064A\u0644|\u0627\u0634\u062A\u0631\u0643|\u062D\u0633\u0627\u0628|register|signup|inscrire|cr[eé]er compte/.test(lower)) {
+        return { reply: "\uD83D\uDE0A \u0627\u0644\u062A\u0633\u062C\u064A\u0644 \u0633\u0647\u0644 \u062C\u062F\u064B\u0627!\n\u0623\u0648\u0644\u0627\u064B \u2014 \u0645\u0627 \u0646\u0648\u0639 \u0627\u0644\u062D\u0633\u0627\u0628 \u0627\u0644\u0630\u064A \u062A\u0631\u064A\u062F\u0647\u061F\n\n\uD83E\uDDD1 \u0641\u0631\u062F \u2014 \u0644\u0644\u0628\u064A\u0639 \u0648\u0627\u0644\u0634\u0631\u0627\u0621\n\uD83C\uDFEA \u0645\u062A\u062C\u0631 \u2014 \u0644\u0623\u0635\u062D\u0627\u0628 \u0627\u0644\u0645\u062D\u0644\u0627\u062A\n\uD83D\uDCBB \u0645\u0643\u062A\u0628 \u2014 \u0644\u0644\u0645\u0647\u0646\u064A\u064A\u0646 \u0648\u0627\u0644\u062E\u062F\u0645\u0627\u062A\n\uD83C\uDFE2 \u0634\u0631\u0643\u0629 \u2014 \u0644\u0644\u0645\u0624\u0633\u0633\u0627\u062A", lang: lang };
+      }
+
+      if (/\u0628\u0627\u0642\u0629|\u0627\u0634\u062A\u0631\u0627\u0643|\u062F\u0641\u0639|\u0633\u0639\u0631 \u0627\u0644\u0628\u0627\u0642\u0629|abonnement|plan|subscri|forfait/.test(lower)) {
+        return { reply: "\uD83C\uDF1F \u0628\u0627\u0642\u0627\u062A \u0631\u0632\u0642:\n\n\uD83C\uDD93 \u062A\u062C\u0631\u064A\u0628\u064A\u0629 \u2014 \u0645\u062C\u0627\u0646\u064B\u0627 (3 \u0623\u064A\u0627\u0645)\n\uD83D\uDCE6 \u0623\u0633\u0627\u0633\u064A \u2014 \u0645\u0646 1,500 MRU/\u0634\u0647\u0631\n\uD83D\uDE80 Pro \u2014 \u0645\u0646 4,000 MRU/\u0634\u0647\u0631\n\uD83D\uDC8E \u0646\u0627\u0633\u064A \u2014 \u0645\u0646 8,000 MRU (\u0623\u0648 30,000 MRU \u0633\u0646\u0648\u064A\u0627)\n\n\u0623\u064A\u0651 \u0628\u0627\u0642\u0629 \u062A\u0646\u0627\u0633\u0628\u0643 \u0623\u0643\u062B\u0631\u061F", lang: lang };
+      }
+
+      if (/\u0643\u064A\u0641.*\u0646\u0634\u0631|\u0643\u064A\u0641.*\u0628\u064A\u0639|\u062E\u0637\u0648\u0627\u062A.*\u0646\u0634\u0631|comment.*vendre|comment.*publier|how.*post|how.*sell/.test(lower)) {
+        return { reply: "\uD83D\uDE0A \u0644\u0646\u0634\u0631 \u0625\u0639\u0644\u0627\u0646:\n\n1\uFE0F\u20E3 \u0627\u0636\u063A\u0637 \"\u0646\u0634\u0631 \u0625\u0639\u0644\u0627\u0646\"\n2\uFE0F\u20E3 \u0627\u062E\u062A\u0631 \u0627\u0644\u0641\u0626\u0629\n3\uFE0F\u20E3 \u0623\u0636\u0641 \u0635\u0648\u0631 + \u0648\u0635\u0641 + \u0633\u0639\u0631\n4\uFE0F\u20E3 \u0623\u0631\u0633\u0644 \u0644\u0644\u0645\u0631\u0627\u062C\u0639\u0629\n\n\u0647\u0644 \u0633\u062C\u0651\u0644\u062A \u0628\u0639\u062F\u061F \uD83D\uDE0A", lang: lang };
+      }
+
+      if (/bankily|sedad|\u062F\u0641\u0639|\u0637\u0631\u0642 \u0627\u0644\u062F\u0641\u0639|paiement|payment/.test(lower)) {
+        return { reply: "\uD83D\uDCB3 \u0637\u0631\u0642 \u0627\u0644\u062F\u0641\u0639 \u0641\u064A \u0631\u0632\u0642:\n\n\uD83D\uDD37 Bankily\n\uD83D\uDFE2 Sedad\n\uD83D\uDCB5 \u0646\u0642\u062F\u064B\u0627 \u0645\u0639 \u0627\u0644\u0628\u0627\u0626\u0639\n\n\u0623\u064A \u0637\u0631\u064A\u0642\u0629 \u062A\u0631\u064A\u062F\u061F", lang: lang };
+      }
+
+      return { reply: {"ar":"\u0645\u0627 \u0641\u0647\u0645\u062A \u062A\u0645\u0627\u0645\u064B\u0627 \uD83D\uDE0A\n\u0645\u0645\u0643\u0646 \u062A\u0648\u0636\u062D\u061F \u0633\u0639\u0631\u060C \u062A\u0648\u0635\u064A\u0644\u060C \u0645\u0648\u0642\u0639\u060C \u0645\u0648\u0627\u0639\u064A\u062F\u060C \u0623\u0648 \u0648\u0627\u062A\u0633\u0627\u0628\u061F","hs":"\u0645\u0627 \u0641\u0647\u0645\u062A\u0634 \uD83D\uDE0A \u0648\u0636\u062D \u0634\u0648 \u062A\u0628\u063A\u064A.","fr":"Pas bien compris \uD83D\uDE0A Prix, livraison, localisation, ou contact?","en":"Could you clarify? \uD83D\uDE0A Price, delivery, location, or contact?","es":"\u00BFPuede aclarar? \uD83D\uDE0A Precio, entrega, ubicaci\u00F3n, o contacto?"}[lang]||"\u0645\u0627 \u0641\u0647\u0645\u062A \uD83D\uDE0A", lang: lang };
+    },
+    IDENTITY: { greeting: { ar: 'أهلاً وسهلاً بك في رزق! 👋✨\nأنا مدير رزق الذكي، كيف أخدمك اليوم؟' } }
+  };
+}
+
+// ---- Widget Engine ----
+var RizqWidget = (function() {
+  var _open = false;
+  var _typing = false;
+  var _history = [];
+  var _pageLang = (function(){ try{ return localStorage.getItem('rizq_lang') || 'ar'; }catch(e){ return 'ar'; } })();
+  var _ctx = { tier: 'free', lang: _pageLang };
+
+  var _widgetDictFr = {
+    'rw-header-name': 'Gestionnaire Rizq IA',
+    'rw-header-status-text': 'Disponible maintenant · répond en quelques secondes',
+    'rw-q1': 'Publier une annonce',
+    'rw-q2': 'Abonnements',
+    'rw-q3': 'Vérification',
+    'rw-q4': 'Réclamation',
+    'rw-q5': 'Paiement',
+    'rw-footer-text': 'Propulsé par <strong style="color:var(--royal)">Rizq AI</strong> · plateforme Rizq e-commerce'
+  };
+  var _widgetDictAr = null;
+
+  function _applyWidgetLang() {
+    var isFr = _pageLang === 'fr';
+    document.documentElement.lang = isFr ? 'fr' : 'ar';
+    document.documentElement.dir = isFr ? 'ltr' : 'rtl';
+    var input0 = document.getElementById('rw-input');
+    if (input0) input0.setAttribute('dir', isFr ? 'ltr' : 'rtl');
+    var toggleBtn = document.getElementById('rizq-chat-toggle');
+    if (toggleBtn) toggleBtn.setAttribute('aria-label', isFr ? 'Gestionnaire Rizq - Support intelligent' : 'مدير رزق - الدعم الذكي');
+    var win = document.getElementById('rizq-chat-window');
+    if (win) win.setAttribute('aria-label', isFr ? 'Gestionnaire Rizq — Support intelligent' : 'مدير رزق — الدعم الذكي');
+    var closeBtn = document.querySelector('.rw-header-close');
+    if (closeBtn) closeBtn.setAttribute('aria-label', isFr ? 'Fermer' : 'إغلاق');
+    var sendBtn = document.querySelector('.rw-send-btn');
+    if (sendBtn) sendBtn.setAttribute('aria-label', isFr ? 'Envoyer' : 'إرسال');
+    var input = document.getElementById('rw-input');
+    if (input) input.setAttribute('placeholder', isFr ? 'Écrivez votre message ici...' : 'اكتب رسالتك هنا...');
+
+    if (!_widgetDictAr) {
+      _widgetDictAr = {};
+      Object.keys(_widgetDictFr).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) _widgetDictAr[id] = el.innerHTML;
+      });
+    }
+
+    var dict = isFr ? _widgetDictFr : _widgetDictAr;
+    if (dict) {
+      Object.keys(dict).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = dict[id];
+      });
+    }
+  }
+
+  function _ts() {
+    var d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  function _escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  function _scrollBottom() {
+    var el = document.getElementById('rw-messages');
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  // Avatar SVG (inline, tiny, for message bubbles)
+  var _agentAvatarSvg = '<img src="rizq_manager_avatar_illustrated.webp" width="32" height="32" style="border-radius:50%;width:100%;height:100%;object-fit:cover;" alt="رزق" loading="lazy">';
+
+  function _addMessage(text, role) {
+    var msgs = document.getElementById('rw-messages');
+    if (!msgs) return;
+
+    var div = document.createElement('div');
+    div.className = 'rw-msg ' + role;
+
+    var avatarHtml = '';
+    if (role === 'agent') {
+      avatarHtml = '<div class="rw-msg-avatar">' + _agentAvatarSvg + '</div>';
+    }
+
+    div.innerHTML = avatarHtml +
+      '<div>' +
+        '<div class="rw-bubble">' + _escHtml(text) + '</div>' +
+        '<div class="rw-ts">' + _ts() + '</div>' +
+      '</div>';
+
+    msgs.appendChild(div);
+    _scrollBottom();
+    _history.push({ role: role, text: text, ts: _ts() });
+  }
+
+  function _showTyping() {
+    var msgs = document.getElementById('rw-messages');
+    if (!msgs || _typing) return;
+    _typing = true;
+    var div = document.createElement('div');
+    div.className = 'rw-msg agent rw-typing';
+    div.id = 'rw-typing-indicator';
+    div.innerHTML = '<div class="rw-msg-avatar">' + _agentAvatarSvg + '</div>' +
+      '<div class="rw-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+    msgs.appendChild(div);
+    _scrollBottom();
+  }
+
+  function _hideTyping() {
+    _typing = false;
+    var el = document.getElementById('rw-typing-indicator');
+    if (el) el.parentNode.removeChild(el);
+  }
+
+  function _detectMessageLang(userText) {
+    var t = String(userText || '').trim();
+    var lower = t.toLowerCase();
+    if (!t) return _pageLang || 'ar';
+    if (/كيفاش|شنهو|شنو\s*هو|نعاونك|بغيت|شحال|ماكو|كاين|واش\s*راك/.test(t)) return 'hs';
+    if (/[\u0600-\u06FF]/.test(t)) return 'ar';
+    if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je/.test(lower)) return 'fr';
+    if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
+    if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package/.test(lower)) return 'en';
+    if (/[a-z]/i.test(t)) return 'en';
+    return _pageLang || 'ar';
+  }
+
+  function _agentReply(userText) {
+    _showTyping();
+    // Simulate realistic response delay (600-1400ms)
+    var delay = 600 + Math.floor(Math.random() * 800);
+    setTimeout(function() {
+      _hideTyping();
+      var msgLang = _detectMessageLang(userText);
+      var result = window.RizqManager.processMessage(userText, Object.assign({}, _ctx, { uiLang: _pageLang, lang: msgLang }));
+      _addMessage(result.reply, 'agent');
+    }, delay);
+  }
+
+  function toggle() {
+    _open ? close() : open();
+  }
+
+  function open() {
+    _open = true;
+    var win = document.getElementById('rizq-chat-window');
+    var badge = document.getElementById('rizq-badge');
+    if (win) win.classList.add('visible');
+    if (badge) badge.style.display = 'none';
+
+    // Welcome message on first open
+    var msgs = document.getElementById('rw-messages');
+    if (msgs && msgs.children.length === 0) {
+      setTimeout(function() {
+        var gr = window.RizqManager.IDENTITY && window.RizqManager.IDENTITY.greeting;
+        var greeting = gr
+          ? (gr[_pageLang] || gr.ar)
+          : (_pageLang === 'fr' ? "Bonjour ! Je suis le gestionnaire Rizq IA, comment puis-je vous aider ?" : 'السلام عليكم! أنا مدير رزق الذكي، كيف أخدمك؟');
+        _addMessage(greeting, 'agent');
+      }, 400);
+    }
+
+    var input = document.getElementById('rw-input');
+    if (input) setTimeout(function(){ input.focus(); }, 350);
+  }
+
+  function close() {
+    _open = false;
+    var win = document.getElementById('rizq-chat-window');
+    if (win) win.classList.remove('visible');
+  }
+
+  function send() {
+    var input = document.getElementById('rw-input');
+    if (!input) return;
+    var text = input.value.trim();
+    if (!text || _typing) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    _addMessage(text, 'user');
+    _agentReply(text);
+
+    // Hide quick actions after first message
+    var qa = document.getElementById('rw-quick-actions');
+    if (qa) qa.style.display = 'none';
+  }
+
+  function quickSend(text) {
+    var input = document.getElementById('rw-input');
+    if (input) input.value = text;
+    send();
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  // Show badge after 3 seconds (welcome nudge)
+  setTimeout(function() {
+    if (!_open) {
+      var badge = document.getElementById('rizq-badge');
+      if (badge) badge.style.display = 'flex';
+    }
+  }, 3000);
+
+  // Passive load-time language sync (no visible toggle on this widget)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _applyWidgetLang);
+  } else {
+    _applyWidgetLang();
+  }
+  /* إصلاح: إن بقيت نافذة الودجت مفتوحة وتغيّرت لغة الصفحة الأم (نادر لكن ممكن)،
+     كانت واجهة الودجت لا تتحدّث. الآن مُتاحة عالمياً ليستدعيها مستمع rizq_lang أدناه. */
+  window._rzqApplyWidgetLang = function(){ _pageLang = (function(){try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}})(); _applyWidgetLang(); };
+
+  return { toggle: toggle, open: open, close: close, send: send, quickSend: quickSend, handleKey: handleKey, autoResize: autoResize };
+})();
+</script>
+
+
+<!-- FIXED RIZQ LOGO (right) -->
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_disclaimer.js"></script>
+<a class="fixed-rizq-logo" href="rizq_landing_v8.html" title="رزق — Accueil / الرئيسية">
+  <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
+    <text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text>
+    <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text>
+  </svg>
+</a>
+
+<!-- FIXED DISC PILL (left) -->
+<div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="إشعار قانوني / Avis juridique">⚖️ إشعار قانوني</div>
+
+<!-- DISCLAIMER MODAL -->
+<div class="disc-overlay" id="discOverlay" onclick="if(event.target===this)closeDisc()">
+  <div class="disc-modal">
+    <button class="disc-modal-close" onclick="closeDisc()" title="إغلاق / Fermer">✕</button>
+    <h2 id="disc-title">⚖️ إشعار قانوني هام<br><small style="font-size:13px;font-weight:500;opacity:.75;letter-spacing:.5px" id="disc-sub">منصة رزق — موريتانيا</small></h2>
+    <div class="disc-section"><h3 id="disc-h1">📢 رزق وسيط نشر إلكتروني فقط</h3><p id="disc-p1">رزق منصة إلكترونية مخصصة لنشر الإعلانات فقط. <strong style="color:#E8C96A" id="disc-p1b">ليست طرفاً في أي عقد</strong> بين البائع والمشتري.</p></div>
+    <div class="disc-section"><h3 id="disc-h2">🤝 مسؤولية الأطراف المتعاقدة</h3><p id="disc-p2">جميع الاتفاقيات والمدفوعات تتم <strong style="color:#E8C96A" id="disc-p2b">مباشرة بين البائع والمشتري</strong>. رزق لا تضمن جودة المنتجات.</p></div>
+    <div class="disc-section"><h3 id="disc-h3">🔍 تحذير المشتري — عاين قبل الدفع</h3><p id="disc-p3">يُنصح بشدة <strong style="color:#E8C96A" id="disc-p3b">بمعاينة البضاعة قبل أي دفع</strong>. رزق غير مسؤولة عن أي خسارة مالية.</p></div>
+    <div class="disc-section"><h3 id="disc-h4">🗑️ حق حذف المحتوى المخالف</h3><p id="disc-p4">تحتفظ رزق بالحق في <strong style="color:#E8C96A" id="disc-p4b">حذف أي إعلان مخالف</strong> <strong style="color:#E8C96A" id="disc-p4c">دون إخطار مسبق</strong>.</p></div>
+    <div class="disc-section"><h3 id="disc-h5">🔒 البيانات الشخصية والخصوصية</h3><p id="disc-p5">البيانات تُستخدم <strong style="color:#E8C96A" id="disc-p5b">فقط لأغراض التواصل والنشر</strong>. لا تُباع لأطراف ثالثة.</p></div>
+    <div class="disc-footer">
+      <div id="disc-footer-main" style="font-size:12.5px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.8">باستخدامك لمنصة رزق، فإنك تقرّ بقراءة هذا الإشعار والموافقة الضمنية.</div>
+      <div style="font-size:11px;color:rgba(201,168,76,.6)">Rizq Platform · موريتانيا · جميع الحقوق محفوظة ©</div>
+      <br><span class="disc-close-btn" id="disc-close-lbl" onclick="closeDisc()">فهمت — أغلق</span>
+    </div>
+  </div>
+</div>
+<script>
+/* ══ DISC LEGAL SYSTEM ══ */
+
+</script>
+</body>
+</html>

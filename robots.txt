@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# لا داعي لفهرسة لوحات التحكم والصفحات الإدارية — لا محتوى عام فيها للزوار
+Disallow: /rizq_admin.html
+Disallow: /rizq_dashboard.html
+Disallow: /rizq_dashboard_store.html
+Disallow: /rizq_dashboard_office.html
+Disallow: /rizq_dashboard_corp.html
+Disallow: /rizq_ads_panel.html
+Disallow: /rizq-backend/
+Disallow: /_archive/
+
+Sitemap: https://rizq.mr/sitemap.xml

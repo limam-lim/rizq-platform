@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
+<!-- إصلاح: كانت connect-src 'none' تمنع أي fetch() من هذه الصفحة بالكامل —
+     ما جعل ربطها بحسابات الخادم الحقيقية (dليل المعارض ← معرض تاجر حقيقي)
+     مستحيلاً تقنياً. أُزيل القيد ليطابق بقية صفحات الموقع التي تتصل فعلاً
+     بـ rizq-backend (لا يوجد CSP مقيِّد لـ connect-src في أي منها). -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="stylesheet" href="rizq-theme.css"/>
+<title>معرض رزق | Showroom Rizq</title>
+<style>
+:root{
+  --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
+  --dark:#0D1B2A;--dark2:#06111C;--white:#FFFFFF;
+  --text:#E8EDF5;--muted:#2C3A4F;--green:#2ECC71;--red:#E84040;
+  --border:rgba(201,168,76,0.2);--radius:14px;
+  --shadow:0 6px 24px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#FBF8F2;color:#26303F;min-height:100vh}
+
+/* ── TOPNAV ── */
+.topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+/* إصلاح 24/07: التعليق القديم هنا كان يفترض أن انقلاب الاتجاه مع تبديل اللغة "✓" مقبول —
+   لكن Limam أكّد أنه غير مقبول (الشعار يجب أن يبقى في مكانه الثابت دائماً). نفس إصلاح
+   rizq_landing_v8.html: اتجاه ثابت + order صريح يحفظ نفس ترتيب وضع AR الحالي دائماً. */
+.topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px;direction:ltr}
+.topnav-inner>.nav-brand{order:4}
+.topnav-inner>.nav-links{order:3}
+.topnav-inner>.nav-disclaimer{order:2}
+.topnav-inner>.nav-lang-btn{order:1}
+/* brand أول في DOM → يسار في LTR (FR) ← يمين في RTL (AR) ✓ */
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
+.logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
+.logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-style:italic;margin-top:2px;white-space:nowrap}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{padding:8px 14px;border-radius:8px;color:var(--text);font-size:13px;text-decoration:none;transition:all .25s;cursor:pointer;border:none;background:none;font-family:inherit}
+.nav-link:hover{background:rgba(201,168,76,.12);color:var(--gold2)}
+.nav-lang-btn{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);color:var(--gold2);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all .25s}
+.nav-lang-btn:hover{background:rgba(201,168,76,.28)}
+.nav-disclaimer{font-size:11px;font-weight:700;color:#C9A84C;cursor:pointer;transition:background .2s,color .2s;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:4px 12px;flex-shrink:0;line-height:1.3;letter-spacing:.2px}
+.nav-disclaimer:hover{background:rgba(201,168,76,.22);color:#E8C96A;opacity:1}
+@media(max-width:900px){.nav-disclaimer{max-width:180px;font-size:10px}}
+@media(max-width:768px){.nav-disclaimer{display:none}}
+
+/* ── HERO: واجهة درامية "افتتاح معرض" — الأكثر اختلافاً عن صفحات المحلات ── */
+.showroom-hero{position:relative;min-height:auto;overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+.hero-beams{position:absolute;inset:0;background:
+  conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.16) 8deg,transparent 20deg,transparent 340deg,rgba(201,168,76,.1) 352deg,transparent 360deg);
+  mix-blend-mode:screen;pointer-events:none}
+.hero-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 30%,rgba(201,168,76,0.14) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(232,201,106,0.12) 0%,transparent 45%)}
+.hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#E8C96A;box-shadow:0 0 8px 2px rgba(232,201,106,.8);animation:rzGlint 3.4s ease-in-out infinite}
+.hero-glints span:nth-child(1){top:18%;left:12%;animation-delay:.2s}
+.hero-glints span:nth-child(2){top:30%;left:82%;animation-delay:1.1s}
+.hero-glints span:nth-child(3){top:65%;left:22%;animation-delay:2s}
+.hero-glints span:nth-child(4){top:55%;left:70%;animation-delay:.7s}
+.hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
+@keyframes rzGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
+.hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;
+  background-image:linear-gradient(rgba(201,168,76,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.16) 1px,transparent 1px);
+  background-size:64px 40px;
+  -webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);
+  transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:42px 20px 28px}
+.showroom-profile{display:flex;align-items:center;gap:32px;max-width:920px;width:100%}
+.showroom-logo{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.35),rgba(27,58,107,.5) 70%);border:2px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5);animation:rzPulseRing 3s ease-in-out infinite}
+@keyframes rzPulseRing{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.14),0 0 40px rgba(201,168,76,.5),0 8px 20px rgba(0,0,0,.5)}}
+.showroom-info{flex:1}
+.showroom-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:8px;display:block}
+.showroom-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;
+  background:linear-gradient(100deg,#fff 30%,#F5DFA0 45%,#C9A84C 50%,#F5DFA0 55%,#fff 70%);
+  background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 2px 24px rgba(0,0,0,.35);animation:rzShimmer 5s linear infinite}
+@keyframes rzShimmer{0%{background-position:0% center}100%{background-position:-220% center}}
+.showroom-tagline{font-size:14.5px;color:rgba(255,255,255,.68);margin-top:10px;padding-top:12px;border-top:1px solid rgba(201,168,76,.3);display:inline-block}
+.showroom-meta{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.6)}
+.showroom-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.badge{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(6px)}
+.badge-verified{background:rgba(46,204,113,.15);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
+.badge-showroom{background:rgba(201,168,76,.15);color:#C9A84C;border:1px solid rgba(201,168,76,.3)}
+.badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
+.hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzBounce 2s ease-in-out infinite}
+@keyframes rzBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+@media(max-width:640px){.showroom-hero{min-height:auto}.hero-floor{display:none}}
+
+/* ── ACTIONS BAR ── */
+.actions-bar{background:linear-gradient(135deg,var(--navy2),var(--dark));border-bottom:1px solid var(--border);padding:14px 20px}
+.actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.action-btns{display:flex;gap:10px;flex-wrap:wrap}
+.action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .25s}
+.btn-msg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark)}
+.btn-msg:hover{box-shadow:0 6px 20px rgba(201,168,76,.4);transform:translateY(-1px)}
+.btn-wa{background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.3)}
+.btn-wa:hover{background:rgba(37,211,102,.25)}
+.btn-share{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.15)}
+.btn-share:hover{background:rgba(255,255,255,.14)}
+.showroom-rating{display:flex;align-items:center;gap:8px}
+.stars{color:#F5A623;font-size:14px}
+.rating-val{font-size:20px;font-weight:900;color:#fff}
+.rating-cnt{font-size:11px;color:rgba(255,255,255,.5)}
+
+/* ── LAYOUT ── */
+.main-wrap{max-width:1180px;margin:0 auto;padding:0 20px 28px}
+@media(max-width:900px){.showroom-profile{flex-direction:column;text-align:center}.showroom-badges{justify-content:center}}
+
+/* ── VISIT STRIP: شريط أفقي بدل الشريط الجانبي (هوية "زوروا المعرض") ── */
+.visit-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 30px;position:relative;z-index:5}
+@media(max-width:900px){.visit-strip{grid-template-columns:1fr;margin-top:16px}}
+.info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
+.info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
+.info-row{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+.info-label{font-size:11px;color:#9a9484;margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.info-value{font-size:13.5px;color:#26303F;font-weight:500}
+.hours-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f2ede1;font-size:12.5px}
+.hours-day{color:#5a6472;font-weight:600}
+.hours-time{color:var(--navy);font-weight:700}
+.hours-closed{color:var(--red)}
+.map-placeholder{background:#faf6ec;border-radius:10px;padding:14px;text-align:center;cursor:pointer;border:1px solid #ece3d1;transition:background .2s}
+.map-placeholder:hover{background:#f5eddb}
+.map-icon{font-size:28px;margin-bottom:6px}
+.map-text{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.map-addr{font-size:11px;color:#8a8474}
+
+/* ── CATALOG (light boutique, medallion items) ── */
+.cat-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;flex-wrap:wrap}
+.cat-tab{padding:8px 18px;border-radius:20px;border:1.5px solid #ece3d1;background:#fff;color:#5a6472;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.cat-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cat-tab:hover:not(.active){border-color:var(--gold);color:var(--navy)}
+
+.catalog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:18px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:inline-block;width:4px;height:20px;background:var(--gold);border-radius:2px}
+.item-count{font-size:12px;color:#9a9484;font-weight:600}
+
+.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
+.item-card{background:#fff;border-radius:2px;overflow:hidden;border:1px solid #ece3d1;box-shadow:0 4px 16px rgba(27,58,107,.06);transition:all .3s;cursor:pointer;position:relative}
+.item-card:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(27,58,107,.16)}
+.item-index{position:absolute;top:12px;left:12px;font-family:Georgia,serif;font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:#fff;border:1px solid var(--gold);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2}
+.item-img{height:190px;background:linear-gradient(160deg,#faf6ec,#f3ecda);display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #ece3d1}
+.item-medallion{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f3ecda 70%);border:2px solid var(--gold);box-shadow:0 6px 18px rgba(201,168,76,.25),inset 0 0 0 4px #fff;display:flex;align-items:center;justify-content:center;font-size:44px}
+.item-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);font-size:10px;font-weight:800;padding:3px 9px;border-radius:3px;letter-spacing:.5px}
+.item-info{padding:16px 16px 18px}
+.item-cat-label{font-size:9.5px;font-weight:800;color:var(--gold-dk,#a3822f);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;display:block}
+.item-name{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:700;color:#1a2a3a;margin-bottom:6px;line-height:1.3}
+.item-specs{font-size:11px;color:#8a8474;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed #ece3d1}
+.item-price{font-size:18px;font-weight:900;color:var(--navy);margin-bottom:12px}
+.item-price small{font-size:11px;font-weight:600;color:#9a9484}
+.btn-inquire{width:100%;padding:10px;background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:2px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;letter-spacing:.4px;text-transform:uppercase}
+.btn-inquire:hover{background:var(--navy);color:#fff}
+
+/* ── REVIEWS (light boutique) ── */
+.review-card{background:#faf6ec;border-radius:10px;padding:16px;border:1px solid #ece3d1;margin-bottom:12px}
+.review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.review-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--navy2),var(--navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
+.review-name{font-size:13px;font-weight:700;color:#1a2a3a}
+.review-stars{color:#F5A623;font-size:12px}
+.review-date{font-size:11px;color:#9a9484}
+.review-text{font-size:13px;color:#4a5364;line-height:1.7}
+
+/* ── PACKAGES ── */
+.pkg-section{padding:70px 5%;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3}
+.pkg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.pkg-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.pkg-grid{grid-template-columns:1fr}}
+.pkg-card{border-radius:18px;padding:26px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;cursor:pointer}
+.pkg-card:hover{transform:translateY(-7px)}
+.pkg-name{font-size:15px;font-weight:800;margin-bottom:4px}
+.pkg-price{font-size:26px;font-weight:900;margin-bottom:2px}
+.pkg-period{font-size:11px;font-weight:600;margin-bottom:16px}
+.pkg-feat{font-size:12px;margin-bottom:7px;text-align:start}
+.pkg-cta{margin-top:16px;width:100%;padding:10px;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .25s}
+
+/* ── TOAST ── */
+.rizq-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1B3A6B;color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.rizq-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FIXED LOGO ── */
+.fixed-rizq-logo{position:fixed;right:0;top:50%;transform:translateY(-50%);background:linear-gradient(180deg,#0d1e3a,#162d52);border:1.5px solid rgba(201,168,76,.5);border-radius:10px 0 0 10px;padding:14px 7px;cursor:pointer;z-index:998;transition:all .25s;box-shadow:-3px 0 18px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;text-decoration:none}
+.fixed-rizq-logo:hover{background:linear-gradient(180deg,#162d52,#1a3560);border-color:rgba(201,168,76,.8);box-shadow:-4px 0 24px rgba(201,168,76,.2)}
+
+/* ── DISC PILL ── */
+.fixed-disc-pill{position:fixed;left:0;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;text-orientation:mixed;background:linear-gradient(180deg,#0d1e3a,#162d52);border:1.5px solid rgba(201,168,76,.5);border-radius:0 10px 10px 0;color:#C9A84C;font-size:10px;font-weight:700;padding:16px 7px;cursor:pointer;letter-spacing:1.5px;white-space:nowrap;z-index:999;transition:all .25s;box-shadow:3px 0 18px rgba(0,0,0,.35);font-family:Georgia,'Amiri',serif}
+.fixed-disc-pill:hover{background:linear-gradient(180deg,#162d52,#1a3560);border-color:rgba(201,168,76,.8);color:#E8C96A}
+
+/* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
+</style>
+<script src="rizq_pwa.js" defer></script>
+<script src="rizq_footer_toggle.js" defer></script>
+</head>
+<body>
+
+<!-- ══ TOPNAV ══ -->
+<nav class="topnav" id="main-nav">
+  <div class="topnav-inner">
+    <!-- brand: مربّع يسار، نص يمين (موحّد مع باقي الصفحات) -->
+    <a class="nav-brand" href="rizq_landing_v8.html" style="direction:ltr">
+      <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg viewBox="0 0 40 40" width="24" height="24" aria-hidden="true">
+          <text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text>
+          <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;text-align:right">
+        <span class="logo-ar">رزق</span>
+        <span class="logo-sub">Rizq Platform · MR</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <button class="nav-link" onclick="rizqScroll('catalog-section')" id="nav-catalog-lbl">🚗 الكتالوج</button>
+      <button class="nav-link" onclick="rizqScroll('about-section')" id="nav-about-lbl">من نحن</button>
+      <button class="nav-link" onclick="rizqScroll('reviews-section')" id="nav-reviews-lbl">التقييمات</button>
+      <button class="nav-link" onclick="rizqScroll('info-section')" id="nav-info-lbl">معلومات المعرض</button>
+    </div>
+    <!-- disclaimer ثالث → يمين LTR (FR) / يسار RTL (AR) ✓ -->
+    <div class="nav-disclaimer" onclick="openDisc()" id="nav-disc-txt">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</div>
+    <button class="btn-lang" id="lang-btn">FR</button>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="showroom-hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-beams"></div>
+  <div class="hero-floor"></div>
+  <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="hero-cover">
+    <div class="showroom-profile">
+      <div class="showroom-logo" id="showroom-logo">🚗</div>
+      <div class="showroom-info">
+        <span class="showroom-eyebrow" id="showroom-eyebrow">✨ RIZQ SHOWROOMS</span>
+        <div class="showroom-name" id="showroom-name">معرض الريادة</div>
+        <div class="showroom-tagline" id="showroom-tagline">Al-Riyada Showroom — سيارات ومعدات متميزة</div>
+        <div class="showroom-meta">
+          <span class="meta-item">📍 <span id="showroom-city">نواكشوط، موريتانيا</span></span>
+          <span class="meta-item">📅 <span id="showroom-since">عضو منذ 2024</span></span>
+          <span class="meta-item">📦 <span id="showroom-items-count">0</span> <span id="items-lbl-meta">عرض</span></span>
+        </div>
+        <div class="showroom-badges">
+          <span class="badge badge-verified" id="badge-verified-lbl">✅ موثّق رزق</span>
+          <span class="badge" id="premium-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none">🏅 معرض مميّز برزق</span>
+          <span class="badge badge-showroom" id="badge-type-lbl">🏪 معرض رسمي</span>
+          <span class="badge badge-rated" id="badge-rating-lbl">⭐ 4.9 تقييم</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-cue">⌄</div>
+</div>
+
+<!-- ══ ACTIONS BAR ══ -->
+<div class="actions-bar">
+  <div class="actions-bar-inner">
+    <div class="action-btns">
+      <button class="action-btn btn-msg" onclick="openShowroomChat()" id="msg-btn-lbl">✉️ مراسلة آمنة</button>
+      <a class="action-btn btn-wa" id="wa-btn" href="https://wa.me/22244000000" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span id="wa-btn-lbl">واتساب</span>
+      </a>
+      <button class="action-btn btn-share" onclick="shareShowroom()" id="share-btn-lbl">📤 مشاركة</button>
+    </div>
+    <div class="showroom-rating">
+      <div class="stars">★★★★★</div>
+      <div class="rating-val" id="rating-val">4.9</div>
+      <div class="rating-cnt" id="rating-count">(87 تقييم)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main-wrap">
+
+  <!-- VISIT STRIP — بديل الشريط الجانبي التقليدي: شريط أفقي بهوية "زيارة المعرض" -->
+  <div class="visit-strip" id="info-section">
+
+      <!-- Contact Info -->
+      <div class="info-card">
+        <div class="info-card-title" id="info-card-title1">📍 الموقع والتواصل</div>
+        <div class="info-row">
+          <span class="info-icon">🏠</span>
+          <div>
+            <div class="info-label" id="info-label-addr">العنوان</div>
+            <div class="info-value" id="info-address">حي التوجين، شارع الاستقلال — نواكشوط</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📞</span>
+          <div>
+            <div class="info-label" id="info-label-phone">الهاتف وواتساب</div>
+            <div class="info-value"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block" id="info-phone">+222 44 00 00 00</span></div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📧</span>
+          <div>
+            <div class="info-label" id="info-label-email">البريد الإلكتروني</div>
+            <div class="info-value" id="info-email">showroom@rizq.mr</div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="map-placeholder" onclick="openMaps()">
+            <div class="map-icon">🗺️</div>
+            <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
+            <div class="map-addr" id="info-city-lbl">نواكشوط، موريتانيا</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hours -->
+      <div class="info-card">
+        <div class="info-card-title" id="info-title-hours">🕐 ساعات العمل</div>
+        <div class="hours-row"><span class="hours-day" id="day-sun">الأحد</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-mon">الإثنين</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-tue">الثلاثاء</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-wed">الأربعاء</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-thu">الخميس</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-fri">الجمعة</span><span class="hours-closed" id="hours-closed-lbl">مغلق</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-sat">السبت</span><span class="hours-time">10:00 — 18:00</span></div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f0fbf4;border-radius:8px;border:1px solid rgba(46,204,113,0.3)">
+          <span style="color:#16a34a;font-size:12.5px;font-weight:600" id="open-now-txt">🟢 مفتوح الآن</span>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="info-card" id="about-section">
+        <div class="info-card-title" id="about-title-lbl">📖 عن المعرض</div>
+        <div style="font-size:13px;color:#4a5364;line-height:1.75" id="about-text">
+          معرض متخصص في بيع وعرض السيارات والمعدات والإلكترونيات — جميع المعروضات موثّقة ومفحوصة ومصحوبة بضمان.
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" id="tags-container">
+          <span style="background:#eef2ff;color:#3730a3;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🚗 سيارات</span>
+          <span style="background:#fff7ed;color:#c2410c;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">💻 إلكترونيات</span>
+          <span style="background:#f0fdf4;color:#15803d;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🛋️ أثاث</span>
+          <span style="background:#fdf4ff;color:#7e22ce;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">⚙️ معدات</span>
+        </div>
+      </div>
+
+  </div>
+
+  <!-- EXHIBITION FLOOR — قاعة العرض الرئيسية -->
+  <main class="exhibit-floor">
+
+      <!-- Category Tabs -->
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" onclick="filterCat(this,'all')" id="cat-all">الكل</button>
+        <button class="cat-tab" onclick="filterCat(this,'سيارات')" id="cat-cars">🚗 سيارات</button>
+        <button class="cat-tab" onclick="filterCat(this,'إلكترونيات')" id="cat-elec">💻 إلكترونيات</button>
+        <button class="cat-tab" onclick="filterCat(this,'أثاث')" id="cat-furn">🛋️ أثاث</button>
+        <button class="cat-tab" onclick="filterCat(this,'معدات')" id="cat-equip">⚙️ معدات</button>
+        <button class="cat-tab" onclick="filterCat(this,'مجوهرات')" id="cat-jewel">💎 مجوهرات</button>
+      </div>
+
+      <!-- Catalog -->
+      <div id="catalog-section">
+        <div class="catalog-header">
+          <div class="section-title" id="catalog-title-lbl">الكتالوج</div>
+          <span class="item-count" id="items-shown-count"></span>
+        </div>
+        <div class="catalog-grid" id="catalog-grid">
+          <!-- items rendered by JS -->
+        </div>
+        <div id="catalog-empty" style="display:none;text-align:center;padding:48px 20px;color:#9a9484">
+          <div style="font-size:48px;margin-bottom:12px">📦</div>
+          <div style="font-size:15px;font-weight:700" id="empty-title-lbl">لا يوجد عروض في هذا القسم</div>
+          <div style="font-size:13px;margin-top:6px" id="empty-sub-lbl">جرّب قسماً آخر أو تواصل مع المعرض مباشرة</div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div style="margin-top:36px" id="reviews-section">
+        <div class="section-title" style="margin-bottom:16px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
+        <div style="background:#fff;border-radius:var(--radius);border:1px solid #ece3d1;border-top:3px solid var(--gold);padding:20px;box-shadow:0 8px 24px rgba(27,58,107,.06)">
+          <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;flex-wrap:wrap">
+            <div style="text-align:center">
+              <div style="font-size:52px;font-weight:900;color:var(--navy);line-height:1" id="rev-score">4.9</div>
+              <div style="color:#F5A623;font-size:20px;margin:4px 0">★★★★★</div>
+              <div style="font-size:12px;color:#8a8474" id="rev-count-txt">87 تقييم</div>
+            </div>
+            <div style="flex:1;min-width:160px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:85%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">85%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:10%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">10%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:5%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">5%</span>
+              </div>
+            </div>
+          </div>
+          <div id="reviews-list">
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">م</div>
+                <div>
+                  <div class="review-name">محمد ولد أحمد</div>
+                  <div class="review-stars">★★★★★</div>
+                </div>
+                <div class="review-date" id="rev1-date" style="margin-right:auto;margin-left:0">منذ أسبوع</div>
+              </div>
+              <div class="review-text" id="rev1-text">معرض ممتاز وأمين، السيارة كانت بالضبط كما وُصفت. تواصل سريع ومحترم. أنصح بالتعامل معهم.</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">ف</div>
+                <div>
+                  <div class="review-name">فاطمة بنت سيدي</div>
+                  <div class="review-stars">★★★★★</div>
+                </div>
+                <div class="review-date" id="rev2-date" style="margin-right:auto;margin-left:0">منذ شهر</div>
+              </div>
+              <div class="review-text" id="rev2-text">اشتريت جهاز إلكتروني وكان في حالة ممتازة. الخدمة احترافية والأسعار معقولة جداً.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </main>
+</div>
+
+<!-- ══ PACKAGES ══ -->
+<section class="pkg-section" id="pkg-section">
+  <div style="text-align:center;margin-bottom:40px">
+    <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-eyebrow">Rizq Showrooms — الباقات</p>
+    <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:#16263d;margin-bottom:10px">
+      <span id="pkg-title-pre">افتح معرضك بالباقة</span>
+      <span style="color:var(--gold)" id="pkg-title-gold"> المناسبة لك</span>
+    </h2>
+    <p style="color:#6a7a8a;font-size:14px" id="pkg-desc">جرّب مجاناً، ثم اختر الباقة التي تناسب نشاطك</p>
+    <p style="font-size:12px;color:#3a5080;margin-top:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap">
+      <span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px">MRU</span>
+      <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
+    </p>
+  </div>
+  <div class="pkg-grid" id="pkg-grid">
+    <!-- Packages rendered by JS -->
+    <!-- ترتيب: تجريبية ← أعمال ← Pro ← ماسية (تصاعدي من الأرخص للأغلى) -->
+    <div class="pkg-card" style="background:linear-gradient(160deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;box-shadow:0 6px 22px rgba(16,185,129,.12)">
+      <div style="font-size:36px;margin-bottom:10px">⏱</div>
+      <div class="pkg-name" style="color:#15803d" id="pkg-trial-name">تجريبية</div>
+      <div class="pkg-price" style="color:#16a34a" id="pkg-trial-price">مجاناً</div>
+      <div class="pkg-period" style="color:#4ade80" id="pkg-trial-period">لمدة 3 أيام</div>
+      <div style="height:1px;background:rgba(22,163,74,.15);margin:12px 0"></div>
+      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t1">5 عروض</span></div>
+      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t2">صور للمعروضات</span></div>
+      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t3">بطاقة تعريفية</span></div>
+      <button class="pkg-cta" style="background:#16a34a;color:#fff" onclick="startPkg('trial')" id="pkg-trial-cta">ابدأ مجاناً</button>
+    </div>
+    <div class="pkg-card" style="background:linear-gradient(160deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;box-shadow:0 6px 22px rgba(59,130,246,.12)">
+      <div style="font-size:36px;margin-bottom:10px">🏢</div>
+      <div class="pkg-name" style="color:#1e3a8a" id="pkg-biz-name">أعمال</div>
+      <div class="pkg-price" style="color:#1d4ed8"><span id="pkg-biz-price-val">2,000</span> <span style="font-size:14px">MRU</span></div>
+      <div class="pkg-period" style="color:#2563eb" id="pkg-biz-period">/شهر</div>
+      <div style="height:1px;background:rgba(30,58,138,.12);margin:12px 0"></div>
+      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b1">15 عرض</span></div>
+      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b2">مراسلة آمنة</span></div>
+      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b3">وسم موثّق</span></div>
+      <button class="pkg-cta" style="background:#1d4ed8;color:#fff" onclick="startPkg('biz')" id="pkg-biz-cta">اشترك الآن</button>
+    </div>
+    <div class="pkg-card" style="background:linear-gradient(160deg,#fefce8,#fef9c3);border:2px solid #fde047;box-shadow:0 6px 22px rgba(234,179,8,.18)">
+      <div style="font-size:36px;margin-bottom:10px">🚀</div>
+      <div class="pkg-name" style="color:#713f12" id="pkg-pro-name">Pro</div>
+      <div class="pkg-price" style="color:#854d0e"><span id="pkg-pro-price-val">5,000</span> <span style="font-size:14px">MRU</span></div>
+      <div class="pkg-period" style="color:#a16207" id="pkg-pro-period">/شهر</div>
+      <div style="height:1px;background:rgba(161,98,7,.15);margin:12px 0"></div>
+      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p1">30 عرض</span></div>
+      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p2">مراسلة آمنة</span></div>
+      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p3">دعم 24/7</span></div>
+      <button class="pkg-cta" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#1a2a3a" onclick="startPkg('pro')" id="pkg-pro-cta">اشترك الآن</button>
+    </div>
+    <div class="pkg-card" style="background:linear-gradient(160deg,#1a1030,#2d1a60);border:1.5px solid rgba(139,92,246,.5);box-shadow:0 6px 22px rgba(139,92,246,.2)">
+      <div style="font-size:36px;margin-bottom:10px">💎</div>
+      <div class="pkg-name" style="color:#c4b5fd" id="pkg-diamond-name">ماسية</div>
+      <div class="pkg-price" style="color:#a78bfa"><span id="pkg-dia-price-val">8,000</span> <span style="font-size:14px">MRU</span></div>
+      <div class="pkg-period" style="color:#c4b5fd" id="pkg-dia-period">/شهر</div>
+      <div style="height:1px;background:rgba(139,92,246,.2);margin:12px 0"></div>
+      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d1">عروض غير محدودة</span></div>
+      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d2">وكيل ذكي 24/7</span></div>
+      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d3">أولوية في النتائج</span></div>
+      <button class="pkg-cta" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff" onclick="startPkg('diamond')" id="pkg-dia-cta">اشترك الآن</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER RIZQ (موحّد مع باقي الصفحات) ══ -->
+<footer class="rizq-footer">
+  <div class="footer-grid">
+    <div>
+      <a href="rizq_landing_v8.html" style="margin-bottom:14px;display:inline-flex;gap:11px;text-decoration:none;align-items:center;direction:ltr">
+        <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">Rizq Platform · MR</span></div>
+      </a>
+      <p class="footer-desc" id="ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. نربط المعارض الراقية بالمشترين بسهولة وأمان.</p>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
+        <span id="ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
+        <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
+      </div>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="ft-quick">روابط سريعة</h4>
+      <ul class="footer-links">
+        <li><a href="rizq_landing_v8.html" id="ft-l1">الرئيسية</a></li>
+        <li><a href="rizq_browse.html" id="ft-l2">تصفّح الإعلانات</a></li>
+        <li><a href="javascript:void(0)" onclick="rizqScroll('catalog-section')" id="ft-l3">كتالوج المعرض</a></li>
+        <li><a href="rizq_landing_v8.html#pricing" id="ft-l4">الأسعار</a></li>
+        <li><a href="javascript:void(0)" onclick="rizqScroll('about-section')" id="ft-l5">من نحن</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="ft-topcats">أبرز الأقسام</h4>
+      <ul class="footer-links">
+        <li><a href="javascript:void(0)" onclick="filterCat(document.getElementById('cat-cars'),'سيارات')" id="ft-c1">🚗 سيارات</a></li>
+        <li><a href="javascript:void(0)" onclick="filterCat(document.getElementById('cat-elec'),'إلكترونيات')" id="ft-c2">💻 إلكترونيات</a></li>
+        <li><a href="javascript:void(0)" onclick="filterCat(document.getElementById('cat-furn'),'أثاث')" id="ft-c3">🛋️ أثاث</a></li>
+        <li><a href="javascript:void(0)" onclick="filterCat(document.getElementById('cat-equip'),'معدات')" id="ft-c4">⚙️ معدات</a></li>
+        <li><a href="javascript:void(0)" onclick="filterCat(document.getElementById('cat-jewel'),'مجوهرات')" id="ft-c5">💎 مجوهرات</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="ft-help">المساعدة</h4>
+      <ul class="footer-links">
+        <li><a href="rizq_legal.html" id="ft-h1">مركز المساعدة</a></li>
+        <li><a href="rizq_legal.html#s3" id="ft-h2">سياسة الخصوصية</a></li>
+        <li><a href="rizq_legal.html" id="ft-h3">شروط الاستخدام</a></li>
+        <li><a href="javascript:void(0)" onclick="openDisc()" id="ft-h4">الإشعار القانوني</a></li>
+        <li><a href="javascript:void(0)" onclick="openShowroomChat()" id="ft-h5">تواصل مع المعرض</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title" id="ft-contact">تواصل معنا</h4>
+      <ul class="footer-links" style="gap:14px">
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="ft-cn-1">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="ft-cn-2">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
+        <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="ft-cn-3">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
+        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy" id="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px">
+      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>
+      </div>
+    </div>
+    <p class="footer-copy" id="ft-sig" style="display:flex;align-items:center;gap:4px"><span id="ft-sig-pre">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>
+  </div>
+</footer>
+
+<!-- ══ TOAST ══ -->
+<div class="rizq-toast" id="rizq-toast"></div>
+
+<!-- ══ FIXED RIZQ LOGO ══ -->
+<a class="fixed-rizq-logo" href="rizq_landing_v8.html" title="رزق — Accueil / الرئيسية">
+  <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
+    <text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text>
+    <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
+  </svg>
+</a>
+
+<!-- ══ DISCLAIMER PILL ══ -->
+<div class="fixed-disc-pill" onclick="openDisc()" id="disc-pill-txt">⚖️ إشعار قانوني</div>
+
+<!-- DISCLAIMER MODAL -->
+<div id="disc-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto">
+  <div style="background:linear-gradient(160deg,#0a1628,#122040);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;max-width:600px;width:100%;padding:36px 32px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);font-family:inherit">
+    <button onclick="closeDisc()" style="position:absolute;top:16px;left:16px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#C9A84C;display:flex;align-items:center;justify-content:center">×</button>
+    <h2 style="color:#C9A84C;font-size:18px;font-weight:800;margin:0 0 20px;text-align:center">📢 إشعار قانوني | Avis légal</h2>
+    <p style="color:rgba(255,255,255,.85);font-size:13px;line-height:1.85;margin-bottom:16px" id="disc-p1">رزق منصة إلكترونية مخصصة لنشر الإعلانات فقط. <strong style="color:#E8C96A">ليست طرفاً في أي عقد</strong> بين المعرض والمشتري. جميع الاتفاقيات والمدفوعات تتم مباشرة بين الطرفين.</p>
+    <p style="color:rgba(255,255,255,.65);font-size:12px;line-height:1.75" id="disc-p2">Rizq est une plateforme de publication d'annonces uniquement. Elle n'est pas partie à un contrat entre le showroom et l'acheteur.</p>
+    <button onclick="closeDisc()" style="display:block;margin:20px auto 0;padding:10px 28px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700;font-family:inherit" id="disc-close-btn">فهمت — أغلق | J'ai compris</button>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ══ -->
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_i18n_data.js"></script>
+<script src="rizq_i18n.js"></script>
+<script src="rizq_announcements.js"></script>
+<!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
+<script src="rizq_subscription_engine.js"></script>
+<script>
+// إصلاح جوهري: هذه الصفحة كانت تستخدم نظام إشعار قانوني محلي منفصل تماماً
+// (openDisc/closeDisc خاصة بها، بلا أي دعم لنص الأدمن المخصص rizq_disc_nav_ar/fr
+// ولا مزامنة عبر الخادم) — بخلاف كل صفحات الموقع الأخرى. لا نستبدل تصميم
+// نافذتها (ثنائية اللغة معاً، مختلفة عن نظام disc-title/disc-p1..p5 الموحّد)
+// حتى لا نُحدث تغييراً بصرياً غير مطلوب، لكن نجعل شارة التنبيه هنا أيضاً
+// تحترم نص الأدمن المخصص وتتزامن عبر الأجهزة مثل بقية الموقع تماماً.
+(function _rizqShowroomDiscSync(){
+  function apply(text){
+    if(!text) return;
+    var a=document.getElementById('nav-disc-txt'); if(a) a.textContent=text;
+    var b=document.getElementById('disc-pill-txt'); if(b) b.textContent=text;
+  }
+  function getCustom(lang){
+    try{
+      var ar=localStorage.getItem('rizq_disc_nav_ar');
+      var fr=localStorage.getItem('rizq_disc_nav_fr');
+      if(lang==='fr'&&fr) return fr;
+      if(lang==='ar'&&ar) return ar;
+    }catch(e){}
+    return null;
+  }
+  function lang(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } }
+  try{ apply(getCustom(lang())); }catch(e){}
+  if(window.RIZQ_BACKEND_BASE){
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        var dn = data && data.ok && data.config && data.config.discNav;
+        if(!dn) return;
+        if(dn.ar) localStorage.setItem('rizq_disc_nav_ar', dn.ar);
+        if(dn.fr) localStorage.setItem('rizq_disc_nav_fr', dn.fr);
+        var l = lang();
+        apply(l==='fr' ? (dn.fr||dn.ar) : (dn.ar||dn.fr));
+      }).catch(function(){});
+  }
+  try{
+    var _o = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(k,v){
+      _o.call(this,k,v);
+      if(k==='rizq_lang') apply(getCustom(v==='fr'?'fr':'ar'));
+    };
+  }catch(e){}
+})();
+</script>
+
+<script>
+/* ════════════════════════════════════════
+   rizq_showroom.html — منطق الصفحة
+   ════════════════════════════════════════ */
+
+/* ── Language ── */
+var _lang = (function(){ try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';} })();
+/* _t() تفوّض لـ RizqI18n.t2() الموحّد (مع fallback محلي إن لم يُحمَّل بعد) */
+function _t(ar,fr){ return (window.RizqI18n ? RizqI18n.t2(ar,fr) : (_lang==='fr' ? fr : ar)); }
+function toggleLang(){
+  _lang = _lang==='ar' ? 'fr' : 'ar';
+  try{ localStorage.setItem('rizq_lang', _lang); }catch(e){}
+  /* تحديث dir/lang مركزياً عبر RizqI18n ثم المحلي */
+  if(window.RizqI18n) RizqI18n.apply(_lang);
+  document.getElementById('lang-btn').textContent = _lang==='ar' ? 'FR' : 'ع';
+  document.documentElement.lang = _lang==='ar' ? 'ar' : 'fr';
+  document.documentElement.dir  = _lang==='ar' ? 'rtl' : 'ltr';
+  applyLang();
+  renderCatalog();
+}
+// زر اللغة الموحّد (class="btn-lang") يُشغَّل تلقائياً عبر RizqI18n بدل
+// toggleLang() اليدوي — نربط محتوى هذه الصفحة الخاص (applyLang/renderCatalog)
+// بحدث RizqI18n الموحّد بدل استدعاء toggleLang() مباشرة.
+document.addEventListener('rizq:langchange', function (e) {
+  _lang = e.detail.lang;
+  var btn = document.getElementById('lang-btn');
+  if (btn) btn.textContent = _lang === 'ar' ? 'FR' : 'ع';
+  applyLang();
+  renderCatalog();
+});
+
+/* ── URL Params ── */
+var _params = new URLSearchParams(location.search);
+var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || 'demo';
+
+/* ── Data ── */
+var _acc = null;
+var _allItems = [];
+var _catFilter = 'all';
+
+function loadData(){
+  /* Load showroom account */
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    _acc = accs.find(function(a){ return a.id === _showroomId; }) || null;
+  }catch(e){}
+
+  /* Load products/items from corp storage */
+  try{
+    _allItems = JSON.parse(localStorage.getItem('rizq_corp_prods_'+_showroomId)||'[]');
+  }catch(e){ _allItems = []; }
+
+  /* Demo items if none */
+  if(!_allItems.length){
+    _allItems = [
+      {id:'d1',name:'تويوتا لاند كروزر 2022',nameFr:'Toyota Land Cruiser 2022',cat:'سيارات',emoji:'🚙',price:'4,500,000 MRU',specs:'2022 · 45,000 كلم · فل أوبشن',specsFr:'2022 · 45 000 km · Plein options',featured:true},
+      {id:'d2',name:'هيونداي توسان 2021',nameFr:'Hyundai Tucson 2021',cat:'سيارات',emoji:'🚗',price:'1,800,000 MRU',specs:'2021 · 68,000 كلم · تكييف مركزي',specsFr:'2021 · 68 000 km · Clim centralisée'},
+      {id:'d3',name:'لابتوب Dell XPS 15',nameFr:'Laptop Dell XPS 15',cat:'إلكترونيات',emoji:'💻',price:'280,000 MRU',specs:'Core i7 · 32GB RAM · 1TB SSD',specsFr:'Core i7 · 32Go RAM · 1To SSD'},
+      {id:'d4',name:'آيفون 14 Pro Max',nameFr:'iPhone 14 Pro Max',cat:'إلكترونيات',emoji:'📱',price:'180,000 MRU',specs:'256GB · بحالة ممتازة · مع الكرتون',specsFr:'256Go · Excellent état · Avec boîte'},
+      {id:'d5',name:'غرفة نوم كاملة',nameFr:'Chambre à coucher complète',cat:'أثاث',emoji:'🛏️',price:'320,000 MRU',specs:'خشب طبيعي · 6 قطع · تركيب مجاني',specsFr:'Bois naturel · 6 pièces · Montage gratuit'},
+      {id:'d6',name:'طقم صالون فاخر',nameFr:'Salon de luxe',cat:'أثاث',emoji:'🛋️',price:'450,000 MRU',specs:'جلد طبيعي · 7 مقاعد · ألوان متعددة',specsFr:'Cuir naturel · 7 places · Multicolore'},
+    ];
+  }
+
+  /* إصلاح جوهري: _acc كان يُقرأ من rizq_pending_accounts في localStorage
+     فقط — يعمل فقط إن كان هذا بالضبط متصفح التاجر نفسه. أي زائر عادي
+     (قادم مثلاً من دليل المعارض rizq_showroom_directory.html) لن يجد شيئاً
+     هنا أبداً فتظهر له بيانات تجريبية عامة بدل اسم/مدينة التاجر الحقيقي.
+     نكمّل الآن بجلب الحساب من GET /api/accounts/public (نفس المصدر الذي
+     يعرض عليه دليل المعارض) إن لم يوجد محلياً، ثم نُعيد ملء الواجهة. */
+  if(!_acc && _showroomId!=='demo' && window.RIZQ_BACKEND_BASE){
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/public')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        var list = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
+        var found = list.find(function(a){ return a.id === _showroomId; });
+        if(found){ _acc = found; applyAccountData(); }
+      }).catch(function(){});
+  }
+}
+
+/* ── Render Catalog ── */
+function renderCatalog(){
+  var filtered = _catFilter==='all'
+    ? _allItems
+    : _allItems.filter(function(item){ return item.cat === _catFilter; });
+
+  var grid = document.getElementById('catalog-grid');
+  var empty = document.getElementById('catalog-empty');
+  var count = document.getElementById('items-shown-count');
+
+  if(!filtered.length){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    if(count) count.textContent = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  if(count) count.textContent = filtered.length + ' ' + _t('عرض','articles');
+
+  grid.innerHTML = filtered.map(function(item,idx){
+    var name  = (_lang==='fr' && item.nameFr)  ? item.nameFr  : (item.name  || '');
+    var specs = (_lang==='fr' && item.specsFr) ? item.specsFr : (item.specs || '');
+    var num = String(idx+1).padStart(2,'0');
+    return '<div class="item-card" data-cat="'+esc(item.cat||'')+'" onclick="openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
+      +'<div class="item-index">'+num+'</div>'
+      +'<div class="item-img">'
+      +(item.image ? '<img src="'+esc(item.image)+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">' : '<div class="item-medallion">'+esc(item.emoji||'📦')+'</div>')
+      +(item.featured ? '<span class="item-badge">'+_t('مميز','Vedette')+'</span>' : '')
+      +'</div>'
+      +'<div class="item-info">'
+      +'<span class="item-cat-label">'+esc(item.cat||'')+'</span>'
+      +'<div class="item-name">'+esc(name)+'</div>'
+      +(specs ? '<div class="item-specs">'+esc(specs)+'</div>' : '')
+      +'<div class="item-price">'+esc(item.price||'')+(item.priceNote ? ' <small>'+esc(item.priceNote)+'</small>' : '')+'</div>'
+      +'<button class="btn-inquire" onclick="event.stopPropagation();openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
+      +'✉️ '+_t('استفسار آمن','Demande sécurisée')
+      +'</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function filterCat(el, cat){
+  document.querySelectorAll('.cat-tab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  _catFilter = cat;
+  renderCatalog();
+}
+
+/* ── Populate Page with Account Data ── */
+function applyAccountData(){
+  /* Always update items count regardless of _acc */
+  document.getElementById('showroom-items-count').textContent = _allItems.length;
+
+  // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
+  // كانت #badge-verified-lbl ثابتة دائماً بلا أي شرط (كل معرض، حقيقي أو
+  // تجريبي، يظهر له "موثّق رزق" دائماً). الآن تُحسبان حياً من حساب المعرض
+  // الفعلي عبر RizqSub.getBadges — تعمل حتى مع الحساب المُجلَب من الباك-إند
+  // (fetch fallback أعلاه) لأنها تعتمد فقط على _showroomId لا على _acc.
+  if(typeof RizqSub !== 'undefined' && _showroomId && _showroomId !== 'demo'){
+    var _srBadges = RizqSub.getBadges(_showroomId);
+    var _srVerifiedEl = document.getElementById('badge-verified-lbl');
+    if(_srVerifiedEl) _srVerifiedEl.style.display = _srBadges.verified ? '' : 'none';
+    var _srPremiumEl = document.getElementById('premium-badge-lbl');
+    if(_srPremiumEl) _srPremiumEl.style.display = _srBadges.premium ? '' : 'none';
+  } else {
+    var _dvEl = document.getElementById('badge-verified-lbl'); if(_dvEl) _dvEl.style.display = 'none';
+    var _dpEl = document.getElementById('premium-badge-lbl'); if(_dpEl) _dpEl.style.display = 'none';
+  }
+
+  if(!_acc) return;
+  if(_acc.name){
+    var _snEl = document.getElementById('showroom-name');
+    _snEl.textContent = _acc.name;
+    _snEl.setAttribute('data-acc','1');
+    document.title = _acc.name + ' — رزق | Rizq';
+  }
+  if(_acc.tagline||_acc.desc){
+    var _stEl = document.getElementById('showroom-tagline');
+    _stEl.textContent = _acc.tagline||_acc.desc;
+    _stEl.setAttribute('data-acc','1');
+  }
+  if(_acc.city||_acc.address){
+    var _scEl = document.getElementById('showroom-city');
+    _scEl.textContent = _acc.city||_acc.address;
+    _scEl.setAttribute('data-acc','1');
+  }
+  if(_acc.phone){
+    document.getElementById('info-phone').textContent = _acc.phone;
+    var waEl = document.getElementById('wa-btn');
+    if(waEl) waEl.href = 'https://wa.me/'+(_acc.phone.replace(/\D/g,''));
+  }
+  if(_acc.email)
+    document.getElementById('info-email').textContent = _acc.email;
+  if(_acc.address){
+    var _iaEl = document.getElementById('info-address');
+    _iaEl.textContent = _acc.address;
+    _iaEl.setAttribute('data-acc','1');
+  }
+  if(_acc.logo_emoji || _acc.logo)
+    document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏪';
+  if(_acc.desc || _acc.about){
+    var _atEl = document.getElementById('about-text');
+    _atEl.textContent = _acc.desc || _acc.about;
+    _atEl.setAttribute('data-acc','1');
+  }
+}
+
+/* ── Load Packages — dynamic from localStorage or keep static defaults ── */
+function loadPackages(){
+  var pkgs = [];
+  try{ pkgs = JSON.parse(localStorage.getItem('rizq_corp_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){}
+  if(!pkgs.length) return; /* keep static HTML defaults */
+
+  var isFr = _lang === 'fr';
+  var grid  = document.getElementById('pkg-grid');
+  if(!grid) return;
+
+  var THEMES = {
+    trial:   { bg:'linear-gradient(160deg,#f0fdf4,#dcfce7)', border:'#86efac', shadow:'rgba(16,185,129,.12)', icon:'⏱', nameClr:'#15803d', priceClr:'#16a34a', periodClr:'#4ade80', divClr:'rgba(22,163,74,.15)', featClr:'#166534', ctaBg:'#16a34a', ctaClr:'#fff' },
+    biz:     { bg:'linear-gradient(160deg,#eff6ff,#dbeafe)', border:'#93c5fd', shadow:'rgba(59,130,246,.12)',  icon:'🏢', nameClr:'#1e3a8a', priceClr:'#1d4ed8', periodClr:'#2563eb', divClr:'rgba(30,58,138,.12)',  featClr:'#1e3a8a', ctaBg:'#1d4ed8', ctaClr:'#fff' },
+    pro:     { bg:'linear-gradient(160deg,#fefce8,#fef9c3)', border:'#fde047', shadow:'rgba(234,179,8,.18)',   icon:'🚀', nameClr:'#713f12', priceClr:'#854d0e', periodClr:'#a16207', divClr:'rgba(161,98,7,.15)',  featClr:'#713f12', ctaBg:'linear-gradient(135deg,#C9A84C,#e8c96a)', ctaClr:'#1a2a3a' },
+    diamond: { bg:'linear-gradient(160deg,#1a1030,#2d1a60)', border:'rgba(139,92,246,.5)', shadow:'rgba(139,92,246,.2)', icon:'💎', nameClr:'#c4b5fd', priceClr:'#a78bfa', periodClr:'#c4b5fd', divClr:'rgba(139,92,246,.2)', featClr:'#ddd6fe', ctaBg:'linear-gradient(135deg,#7c3aed,#a855f7)', ctaClr:'#fff' }
+  };
+
+  var html = pkgs.map(function(p){
+    var t = THEMES[p.id] || THEMES['biz'];
+    var name  = isFr ? (p.nameFr||p.name) : (p.name||p.nameFr);
+    var price = p.price === 0 ? (isFr?'Gratuit':'مجاناً') : ((p.price||'').toLocaleString()+' <span style="font-size:14px">MRU</span>');
+    var period= p.price === 0 ? (isFr?'3 jours':'لمدة 3 أيام') : (isFr?'/mois':'/شهر');
+    var feats = (p.features||[]).slice(0,4).map(function(f){
+      var ftxt = isFr ? (f.fr||f.ar||f) : (f.ar||f.fr||f);
+      return '<div class="pkg-feat" style="color:'+t.featClr+'">✅ '+ftxt+'</div>';
+    }).join('');
+    var ctaLbl = p.price===0 ? (isFr?'Commencer gratuitement':'ابدأ مجاناً') : (isFr?"S'abonner":'اشترك الآن');
+    return '<div class="pkg-card" style="background:'+t.bg+';border:1.5px solid '+t.border+';box-shadow:0 6px 22px '+t.shadow+'">'
+      +'<div style="font-size:36px;margin-bottom:10px">'+t.icon+'</div>'
+      +'<div class="pkg-name" style="color:'+t.nameClr+'">'+name+'</div>'
+      +'<div class="pkg-price" style="color:'+t.priceClr+'">'+price+'</div>'
+      +'<div class="pkg-period" style="color:'+t.periodClr+'">'+period+'</div>'
+      +'<div style="height:1px;background:'+t.divClr+';margin:12px 0"></div>'
+      +feats
+      +'<button class="pkg-cta" style="background:'+t.ctaBg+';color:'+t.ctaClr+'" onclick="startPkg(\''+p.id+'\')">'+ctaLbl+'</button>'
+      +'</div>';
+  }).join('');
+
+  grid.innerHTML = html;
+}
+
+/* ── Chat ── */
+function openShowroomChat(){
+  if(!window.RizqMessenger) return showToast(_t('⚠️ خدمة الرسائل غير متوفرة','⚠️ Service de messagerie indisponible'));
+  var name = _acc ? _acc.name : document.getElementById('showroom-name').textContent;
+  RizqMessenger.open({
+    sellerKey : _showroomId,
+    sellerName: name,
+    adTitle   : _t('رسالة للمعرض','Message au showroom'),
+    adId      : _showroomId,
+    adEmoji   : '🚗'
+  });
+}
+
+function openItemChat(itemId, itemName){
+  if(!window.RizqMessenger) return showToast(_t('⚠️ خدمة الرسائل غير متوفرة','⚠️ Service de messagerie indisponible'));
+  var name = _acc ? _acc.name : document.getElementById('showroom-name').textContent;
+  RizqMessenger.open({
+    sellerKey : _showroomId,
+    sellerName: name,
+    adTitle   : itemName || _t('استفسار عن عرض','Demande sur article'),
+    adId      : itemId || _showroomId,
+    adEmoji   : '🚗'
+  });
+}
+
+/* ── Share ── */
+function shareShowroom(){
+  var name = document.getElementById('showroom-name').textContent;
+  var url  = location.href;
+
+  /* 1. Web Share API (mobile / modern) */
+  if(navigator.share){
+    navigator.share({ title: name, text: name, url: url }).catch(function(){});
+    return;
+  }
+
+  /* 2. Clipboard API (HTTPS/localhost) */
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(url).then(function(){
+      showToast(_t('✅ تم نسخ رابط المعرض','✅ Lien copié !'));
+    }).catch(function(){ _copyFallback(url); });
+    return;
+  }
+
+  /* 3. execCommand fallback (file:// and older browsers) */
+  _copyFallback(url);
+}
+
+function _copyFallback(text){
+  try{
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(_t('✅ تم نسخ الرابط','✅ Lien copié !'));
+  }catch(e){
+    showToast(_t('⚠️ انسخ الرابط يدوياً من شريط العنوان','⚠️ Copiez le lien manuellement'));
+  }
+}
+
+/* ── Maps ── */
+function openMaps(){
+  var city = document.getElementById('showroom-city').textContent || 'Nouakchott Mauritanie';
+  window.open('https://maps.google.com/?q='+encodeURIComponent(city),'_blank');
+}
+
+/* ── Pkg CTA ── */
+function startPkg(type){
+  showToast(_t('🚀 سيتم التواصل معك لإتمام الاشتراك','🚀 Nous vous contacterons pour finaliser l\'abonnement'));
+}
+
+/* ── Scroll helper — يحسب ارتفاع الـ sticky navbar تلقائياً ── */
+function rizqScroll(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var navH = (document.querySelector('.topnav')||{offsetHeight:64}).offsetHeight || 64;
+  var top  = el.getBoundingClientRect().top + window.pageYOffset - navH - 10;
+  window.scrollTo({ top: top, behavior: 'smooth' });
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  var t = document.getElementById('rizq-toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+/* ── Escape ── */
+function esc(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ── Disclaimer ── */
+function openDisc(){ document.getElementById('disc-overlay').style.display='flex'; }
+function closeDisc(){ document.getElementById('disc-overlay').style.display='none'; }
+
+/* ── Apply Lang ── */
+function applyLang(){
+  var isFr = _lang==='fr';
+  /* ── اتجاه الصفحة ولغتها — يجب أن يكون أوّل شيء ── */
+  document.documentElement.dir  = isFr ? 'ltr' : 'rtl';
+  document.documentElement.lang = isFr ? 'fr'  : 'ar';
+  document.getElementById('lang-btn').textContent = isFr ? 'ع' : 'FR';
+  // Nav
+  document.getElementById('nav-catalog-lbl').textContent = isFr ? '🚗 Catalogue' : '🚗 الكتالوج';
+  document.getElementById('nav-about-lbl').textContent   = isFr ? 'À propos' : 'من نحن';
+  document.getElementById('nav-reviews-lbl').textContent = isFr ? 'Avis' : 'التقييمات';
+  document.getElementById('nav-info-lbl').textContent    = isFr ? 'Infos showroom' : 'معلومات المعرض';
+  document.getElementById('nav-disc-txt').textContent    = isFr ? '⚖️ Rizq — intermédiaire uniquement' : '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
+  // Hero badges + rating
+  document.getElementById('badge-verified-lbl').textContent = isFr ? '✅ Vérifié Rizq' : '✅ موثّق رزق';
+  document.getElementById('badge-type-lbl').textContent     = isFr ? '🏪 Showroom officiel' : '🏪 معرض رسمي';
+  document.getElementById('badge-rating-lbl').textContent   = isFr ? '⭐ 4.9 / 5' : '⭐ 4.9 تقييم';
+  document.getElementById('items-lbl-meta').textContent     = isFr ? 'articles' : 'عرض';
+  document.getElementById('rating-count').textContent       = isFr ? '(87 avis)' : '(87 تقييم)';
+  // Actions
+  document.getElementById('msg-btn-lbl').innerHTML  = isFr ? '✉️ Message sécurisé' : '✉️ مراسلة آمنة';
+  document.getElementById('wa-btn-lbl').textContent = isFr ? 'WhatsApp' : 'واتساب';
+  document.getElementById('share-btn-lbl').textContent = isFr ? '📤 Partager' : '📤 مشاركة';
+  // Sidebar
+  document.getElementById('info-card-title1').textContent = isFr ? '📍 Localisation & contact' : '📍 الموقع والتواصل';
+  document.getElementById('info-label-addr').textContent  = isFr ? 'Adresse' : 'العنوان';
+  document.getElementById('info-label-phone').textContent = isFr ? 'Tél / WhatsApp' : 'الهاتف وواتساب';
+  document.getElementById('info-label-email').textContent = isFr ? 'Email' : 'البريد الإلكتروني';
+  document.getElementById('map-text-lbl').textContent     = isFr ? 'Voir sur la carte' : 'عرض على الخريطة';
+  document.getElementById('info-title-hours').textContent = isFr ? '🕐 Heures d\'ouverture' : '🕐 ساعات العمل';
+  document.getElementById('day-sun').textContent = isFr ? 'Dim' : 'الأحد';
+  document.getElementById('day-mon').textContent = isFr ? 'Lun' : 'الإثنين';
+  document.getElementById('day-tue').textContent = isFr ? 'Mar' : 'الثلاثاء';
+  document.getElementById('day-wed').textContent = isFr ? 'Mer' : 'الأربعاء';
+  document.getElementById('day-thu').textContent = isFr ? 'Jeu' : 'الخميس';
+  document.getElementById('day-fri').textContent = isFr ? 'Ven' : 'الجمعة';
+  document.getElementById('day-sat').textContent = isFr ? 'Sam' : 'السبت';
+  document.getElementById('hours-closed-lbl').textContent = isFr ? 'Fermé' : 'مغلق';
+  document.getElementById('open-now-txt').textContent     = isFr ? '🟢 Ouvert maintenant' : '🟢 مفتوح الآن';
+  document.getElementById('about-title-lbl').textContent  = isFr ? '📖 À propos du showroom' : '📖 عن المعرض';
+  // Catalog
+  document.getElementById('catalog-title-lbl').innerHTML  = '<span></span>'+( isFr ? 'Catalogue' : 'الكتالوج' );
+  document.getElementById('cat-all').textContent   = isFr ? 'Tout' : 'الكل';
+  document.getElementById('cat-cars').textContent  = isFr ? '🚗 Voitures' : '🚗 سيارات';
+  document.getElementById('cat-elec').textContent  = isFr ? '💻 Électronique' : '💻 إلكترونيات';
+  document.getElementById('cat-furn').textContent  = isFr ? '🛋️ Meubles' : '🛋️ أثاث';
+  document.getElementById('cat-equip').textContent = isFr ? '⚙️ Équipements' : '⚙️ معدات';
+  document.getElementById('cat-jewel').textContent = isFr ? '💎 Bijoux' : '💎 مجوهرات';
+  document.getElementById('empty-title-lbl').textContent = isFr ? 'Aucun article dans cette catégorie' : 'لا يوجد عروض في هذا القسم';
+  document.getElementById('empty-sub-lbl').textContent   = isFr ? 'Essayez une autre catégorie ou contactez le showroom' : 'جرّب قسماً آخر أو تواصل مع المعرض مباشرة';
+  // Reviews
+  document.getElementById('reviews-title-lbl').textContent = isFr ? '⭐ Avis clients' : '⭐ تقييمات الزبائن';
+  document.getElementById('rev-count-txt').textContent     = isFr ? '87 avis' : '87 تقييم';
+  document.getElementById('rev-score').textContent         = '4.9';
+  document.getElementById('rev1-text').textContent = isFr ? 'Excellent showroom, honnête. La voiture était exactement comme décrite. Communication rapide et respectueuse.' : 'معرض ممتاز وأمين، السيارة كانت بالضبط كما وُصفت. تواصل سريع ومحترم. أنصح بالتعامل معهم.';
+  document.getElementById('rev2-text').textContent = isFr ? 'J\'ai acheté un appareil électronique en excellent état. Service professionnel et prix raisonnables.' : 'اشتريت جهاز إلكتروني وكان في حالة ممتازة. الخدمة احترافية والأسعار معقولة جداً.';
+  // ── Missing translations (added carefully) ──
+  document.querySelectorAll('.review-date').forEach(function(el,i){
+    el.textContent = isFr ? (i===0?'il y a une semaine':'il y a un mois') : (i===0?'منذ أسبوع':'منذ شهر');
+  });
+  var _ss=document.getElementById('showroom-since'); if(_ss) _ss.textContent=isFr?'Membre depuis 2024':'عضو منذ 2024';
+  var _sc2=document.getElementById('showroom-city'); if(_sc2&&!_sc2.hasAttribute('data-acc')) _sc2.textContent=isFr?'Nouakchott, Mauritanie':'نواكشوط، موريتانيا';
+  var _stag=document.getElementById('showroom-tagline'); if(_stag&&!_stag.hasAttribute('data-acc')) _stag.textContent=isFr?'Al-Riyada Showroom — Voitures & équipements':'Al-Riyada Showroom — سيارات ومعدات متميزة';
+  // ── Demo showroom name / address / about / tags (were never translated — real AR leak) ──
+  var _snm=document.getElementById('showroom-name'); if(_snm&&!_snm.hasAttribute('data-acc')) _snm.textContent=isFr?'Showroom Al-Riyada':'معرض الريادة';
+  var _iad=document.getElementById('info-address'); if(_iad&&!_iad.hasAttribute('data-acc')) _iad.textContent=isFr?"Quartier Toujounine, Rue de l'Indépendance — Nouakchott":'حي التوجين، شارع الاستقلال — نواكشوط';
+  var _abt=document.getElementById('about-text'); if(_abt&&!_abt.hasAttribute('data-acc')) _abt.textContent=isFr?"Showroom spécialisé dans la vente et l'exposition de voitures, équipements et appareils électroniques — tous les articles sont vérifiés, inspectés et garantis.":'معرض متخصص في بيع وعرض السيارات والمعدات والإلكترونيات — جميع المعروضات موثّقة ومفحوصة ومصحوبة بضمان.';
+  var _tagsWrap=document.getElementById('tags-container');
+  if(_tagsWrap){
+    var _tagSpans=_tagsWrap.querySelectorAll('span');
+    var _tagsAR=['🚗 سيارات','💻 إلكترونيات','🛋️ أثاث','⚙️ معدات'];
+    var _tagsFR=['🚗 Voitures','💻 Électronique','🛋️ Meubles','⚙️ Équipements'];
+    _tagSpans.forEach(function(el,i){ el.textContent = isFr ? (_tagsFR[i]||el.textContent) : (_tagsAR[i]||el.textContent); });
+  }
+    // Package MRU note & features
+  document.getElementById('mru-note').textContent  = isFr ? 'Prix en Ouguiya (MRU) · ' : 'الأسعار بالأوقية الجديدة · ';
+  document.getElementById('pf-t1').textContent = isFr ? '5 articles' : '5 عروض';
+  document.getElementById('pf-t2').textContent = isFr ? 'Photos des articles' : 'صور للمعروضات';
+  document.getElementById('pf-t3').textContent = isFr ? 'Fiche de présentation' : 'بطاقة تعريفية';
+  document.getElementById('pf-b1').textContent = isFr ? '15 articles' : '15 عرض';
+  document.getElementById('pf-b2').textContent = isFr ? 'Messagerie sécurisée' : 'مراسلة آمنة';
+  document.getElementById('pf-b3').textContent = isFr ? 'Badge vérifié' : 'وسم موثّق';
+  document.getElementById('pf-p1').textContent = isFr ? '30 articles' : '30 عرض';
+  document.getElementById('pf-p2').textContent = isFr ? 'Messagerie sécurisée' : 'مراسلة آمنة';
+  document.getElementById('pf-p3').textContent = isFr ? 'Support 24/7' : 'دعم 24/7';
+  document.getElementById('pf-d1').textContent = isFr ? 'Articles illimités' : 'عروض غير محدودة';
+  document.getElementById('pf-d2').textContent = isFr ? 'Agent IA 24/7' : 'وكيل ذكي 24/7';
+  document.getElementById('pf-d3').textContent = isFr ? 'Priorité dans les résultats' : 'أولوية في النتائج';
+  // ── Packages section — titres, noms, prix, périodes et CTA (كانت مفقودة، تسبب بقاء نص عربي في واجهة FR) ──
+  document.getElementById('pkg-eyebrow').textContent    = isFr ? 'Rizq Showrooms — Les forfaits' : 'Rizq Showrooms — الباقات';
+  document.getElementById('pkg-title-pre').textContent  = isFr ? 'Ouvrez votre showroom avec le forfait' : 'افتح معرضك بالباقة';
+  document.getElementById('pkg-title-gold').textContent = isFr ? ' qui vous convient' : ' المناسبة لك';
+  document.getElementById('pkg-desc').textContent       = isFr ? 'Essayez gratuitement, puis choisissez le forfait adapté à votre activité' : 'جرّب مجاناً، ثم اختر الباقة التي تناسب نشاطك';
+  document.getElementById('pkg-trial-name').textContent   = isFr ? 'Essai' : 'تجريبية';
+  document.getElementById('pkg-trial-price').textContent  = isFr ? 'Gratuit' : 'مجاناً';
+  document.getElementById('pkg-trial-period').textContent = isFr ? 'Pendant 3 jours' : 'لمدة 3 أيام';
+  document.getElementById('pkg-trial-cta').textContent    = isFr ? 'Commencer gratuitement' : 'ابدأ مجاناً';
+  document.getElementById('pkg-biz-name').textContent   = isFr ? 'Business' : 'أعمال';
+  document.getElementById('pkg-biz-period').textContent = isFr ? '/mois' : '/شهر';
+  document.getElementById('pkg-biz-cta').textContent    = isFr ? "S'abonner maintenant" : 'اشترك الآن';
+  document.getElementById('pkg-pro-name').textContent   = isFr ? 'Pro' : 'Pro';
+  document.getElementById('pkg-pro-period').textContent = isFr ? '/mois' : '/شهر';
+  document.getElementById('pkg-pro-cta').textContent    = isFr ? "S'abonner maintenant" : 'اشترك الآن';
+  document.getElementById('pkg-diamond-name').textContent = isFr ? '💎 Diamant' : 'ماسية';
+  document.getElementById('pkg-dia-period').textContent   = isFr ? '/mois' : '/شهر';
+  document.getElementById('pkg-dia-cta').textContent      = isFr ? "S'abonner maintenant" : 'اشترك الآن';
+  // ── Footer (موحّد) ──
+  var _ftMap = {
+    'ft-desc':[isFr?"La première plateforme d'annonces classées en Mauritanie. Nous connectons les showrooms haut de gamme aux acheteurs facilement et en toute sécurité.":'منصة الإعلانات المبوبة الأولى في موريتانيا. نربط المعارض الراقية بالمشترين بسهولة وأمان.'],
+    'ft-netlabel':[isFr?'Réseaux pris en charge :':'شبكات مدعومة:'],
+    'ft-quick':[isFr?'Liens rapides':'روابط سريعة'],
+    'ft-l1':[isFr?'Accueil':'الرئيسية'],'ft-l2':[isFr?'Parcourir les annonces':'تصفّح الإعلانات'],
+    'ft-l3':[isFr?'Catalogue du showroom':'كتالوج المعرض'],'ft-l4':[isFr?'Tarifs':'الأسعار'],'ft-l5':[isFr?'À propos':'من نحن'],
+    'ft-topcats':[isFr?'Meilleures catégories':'أبرز الأقسام'],
+    'ft-c1':[isFr?'🚗 Voitures':'🚗 سيارات'],'ft-c2':[isFr?'💻 Électronique':'💻 إلكترونيات'],
+    'ft-c3':[isFr?'🛋️ Meubles':'🛋️ أثاث'],'ft-c4':[isFr?'⚙️ Équipements':'⚙️ معدات'],'ft-c5':[isFr?'💎 Bijoux':'💎 مجوهرات'],
+    'ft-help':[isFr?'Aide':'المساعدة'],
+    'ft-h1':[isFr?"Centre d'aide":'مركز المساعدة'],'ft-h2':[isFr?'Politique de confidentialité':'سياسة الخصوصية'],
+    'ft-h3':[isFr?"Conditions d'utilisation":'شروط الاستخدام'],'ft-h4':[isFr?'Avis légal':'الإشعار القانوني'],'ft-h5':[isFr?'Contacter le showroom':'تواصل مع المعرض'],
+    'ft-contact':[isFr?'Contactez-nous':'تواصل معنا'],
+    'ft-cn-1':[isFr?'Mauritel : ':'موريتل: '],'ft-cn-2':[isFr?'Mattel : ':'ماتيل: '],'ft-cn-3':[isFr?'Chinguitel : ':'شينقيتل: '],
+    'ft-copy':[isFr?'© 2026 رزق | Rizq — Tous droits réservés 🇲🇷':'© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷'],
+    'ft-sig-pre':[isFr?'Signé par':'بتوقيع']
+  };
+  Object.keys(_ftMap).forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=_ftMap[id][0]; });
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', function(){
+  loadData();
+  applyAccountData();
+  applyLang();
+  renderCatalog();
+  loadPackages();
+  /* sync lang button */
+  document.getElementById('lang-btn').textContent = _lang==='ar' ? 'FR' : 'ع';
+  /* listen for lang changes from i18n system */
+  try{
+    var _orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(k,v){
+      _orig.call(this,k,v);
+      if(k==='rizq_lang'){ _lang=v==='fr'?'fr':'ar'; applyLang(); renderCatalog(); loadPackages(); }
+    };
+  }catch(e){}
+});
+</script>
+
+<style id="rzq-footer-css">
+footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;border-top:1px solid rgba(201,168,76,.1)!important;padding:60px 5% 0!important;color:rgba(255,255,255,.72)!important;margin:0!important;padding-bottom:0!important}
+footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:1200px!important;margin:0 auto!important;padding-bottom:50px!important}
+footer.rizq-footer .footer-col-title{font-size:12px!important;font-weight:700!important;color:#C9A84C!important;letter-spacing:2px!important;text-transform:uppercase!important;margin-bottom:18px!important;font-family:Georgia,serif!important}
+footer.rizq-footer .footer-desc{font-size:13px!important;color:rgba(255,255,255,.85)!important;line-height:1.85!important;margin-top:14px!important;max-width:280px!important}
+footer.rizq-footer .footer-links{list-style:none!important;display:flex!important;flex-direction:column!important;padding:0!important;margin:0!important}
+footer.rizq-footer .footer-links li{padding:0!important;line-height:1.6!important}
+footer.rizq-footer .footer-links li a{font-size:13px!important;color:#e0e0e0!important;text-decoration:none!important;transition:color .3s!important;cursor:pointer}
+footer.rizq-footer .footer-links li a:hover{color:#C9A84C!important}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
+footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important}
+.telecom-tag{display:inline-block!important;background:rgba(201,168,76,.14)!important;border:1px solid rgba(201,168,76,.4)!important;color:rgba(201,168,76,.95)!important;font-size:10px!important;padding:4px 12px!important;border-radius:20px!important;font-weight:700!important;letter-spacing:.3px!important}
+@media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}
+@media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
+</style>
+</body>
+</html>

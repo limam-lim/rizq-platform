@@ -1,0 +1,22 @@
+{
+  "name": "rizq-agents",
+  "version": "1.0.0",
+  "description": "خوادم وكلاء رزق (مكالمات Twilio، واتساب Meta Cloud API، وكيل دورة حياة الباقات) — منفصلة عن rizq-backend/ الذي له package.json خاص به",
+  "main": "rizq_call_handler.js",
+  "type": "commonjs",
+  "scripts": {
+    "start:call": "node rizq_call_handler.js",
+    "start:whatsapp": "node rizq_whatsapp_handler.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "twilio": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

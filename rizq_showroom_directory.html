@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="stylesheet" href="rizq-theme.css"/>
+<title data-t-ar="دليل المعارض — رزق" data-t-fr="Annuaire des showrooms — Rizq">دليل المعارض — رزق</title>
+<style>
+:root{
+  --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
+  --dark:#0D1B2A;--dark2:#06111C;--white:#FFFFFF;
+  --text:#E8EDF5;--muted:#2C3A4F;--border:rgba(201,168,76,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#F7F9FC;color:#26303F;min-height:100vh}
+
+.topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+.topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
+.rizq-promo-mark{width:38px;height:38px;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
+.logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
+.logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-style:italic;margin-top:2px;white-space:nowrap}
+.nav-lang-btn{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);color:var(--gold2);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all .25s}
+.nav-lang-btn:hover{background:rgba(201,168,76,.28)}
+.nav-home-link{padding:8px 16px;border-radius:9px;color:var(--text);font-size:13px;text-decoration:none;border:1px solid rgba(201,168,76,.3);transition:all .2s}
+.nav-home-link:hover{background:rgba(201,168,76,.1);color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px}
+
+.dir-hero{padding:44px 5% 30px;text-align:center;background:linear-gradient(135deg,#101d33,#1B3A6B 65%,#0d1b2a)}
+.dir-hero h1{font-family:Georgia,'Amiri',serif;color:#fff;font-size:clamp(22px,3.6vw,32px);font-weight:700;margin-bottom:10px}
+.dir-hero h1 span{color:var(--gold)}
+.dir-hero p{color:rgba(255,255,255,.75);font-size:13.5px;max-width:560px;margin:0 auto}
+
+.dir-wrap{max-width:1100px;margin:0 auto;padding:30px 5% 60px}
+.dir-count{font-size:13px;color:#5b6b85;margin-bottom:18px;font-weight:600}
+.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.dir-card{background:#fff;border:1.5px solid #e7ecf5;border-radius:16px;padding:20px;text-decoration:none;color:inherit;transition:all .25s;display:flex;flex-direction:column;gap:8px}
+.dir-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(27,58,107,.14);border-color:rgba(201,168,76,.5)}
+.dir-card-top{display:flex;align-items:center;gap:12px}
+.dir-thumb{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--navy),var(--navy2));display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);flex-shrink:0;overflow:hidden}
+.dir-thumb img{width:100%;height:100%;object-fit:cover}
+.dir-name{font-size:15px;font-weight:800;color:#16263d;line-height:1.3}
+.dir-type{font-size:11px;color:var(--gold-dk,#a07820);font-weight:700}
+.dir-badges-inline{display:inline-flex;gap:4px;margin-inline-start:6px;vertical-align:middle}
+.dir-badge{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:6px;white-space:nowrap}
+.dir-badge-verified{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.25)}
+.dir-badge-premium{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d}
+.dir-city{font-size:12.5px;color:#5b6b85;display:flex;align-items:center;gap:5px}
+.dir-tagline{font-size:12px;color:#7a8aa0;line-height:1.6;margin-top:2px}
+.dir-cta{margin-top:6px;font-size:12.5px;font-weight:700;color:var(--navy)}
+
+.dir-empty{text-align:center;padding:60px 20px;background:#fff;border-radius:16px;border:1.5px dashed #d7dfec}
+.dir-empty .emo{font-size:40px;margin-bottom:14px}
+.dir-empty p{color:#5b6b85;font-size:14px;margin-bottom:18px}
+.dir-empty a{display:inline-block;padding:12px 26px;border-radius:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;font-weight:800;font-size:13.5px;text-decoration:none}
+
+.dir-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.dir-cat-chip{padding:6px 14px;border-radius:20px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);color:var(--gold2);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s}
+.dir-cat-chip:hover,.dir-cat-chip.active{background:rgba(201,168,76,.28)}
+
+@media(max-width:600px){.nav-home-link{display:none}}
+</style>
+<script src="rizq_pwa.js" defer></script>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="nav-brand">
+      <button class="rizq-promo-mark" title="Rizq Platform" onclick="location.href='rizq_landing_v8.html'"><svg viewBox="0 0 40 40" width="24" height="24" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></button>
+      <a href="rizq_landing_v8.html" style="text-decoration:none"><span class="logo-ar">رزق</span><br><span class="logo-sub">Rizq Platform · MR</span></a>
+    </div>
+    <div class="nav-right">
+      <a class="nav-home-link" href="rizq_landing_v8.html" data-t-fr="← Accueil">← الرئيسية</a>
+      <button class="btn-lang" id="lang-btn">FR</button>
+    </div>
+  </div>
+</nav>
+
+<section class="dir-hero">
+  <h1 id="dir-title">دليل <span>المعارض</span></h1>
+  <p id="dir-sub" data-t-fr="Découvrez tous les commerces et showrooms réels de Rizq par catégorie.">اكتشف كل المحلات والمعارض الحقيقية على منصة رزق حسب الفئة.</p>
+  <div class="dir-cats" id="dir-cats"></div>
+</section>
+
+<div class="dir-wrap">
+  <div class="dir-count" id="dir-count"></div>
+  <div class="dir-grid" id="dir-grid"></div>
+</div>
+
+<!-- ══ FIXED RIZQ LOGO ══ -->
+<a class="fixed-rizq-logo" id="fixed-rizq-logo" href="rizq_landing_v8.html" title="رزق — Accueil / الرئيسية">
+  <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
+    <text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text>
+    <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
+  </svg>
+</a>
+<style>
+.fixed-rizq-logo{position:fixed;right:0;top:50%;transform:translateY(-50%);background:linear-gradient(180deg,#0d1e3a,#162d52);border:1.5px solid rgba(201,168,76,.5);border-radius:10px 0 0 10px;padding:14px 7px;cursor:pointer;z-index:998;transition:all .25s;box-shadow:-3px 0 18px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;text-decoration:none}
+.fixed-rizq-logo:hover{background:linear-gradient(180deg,#162d52,#1a3560);border-color:rgba(201,168,76,.8)}
+</style>
+
+<!-- DISCLAIMER MODAL (نظام موحّد عبر rizq_disclaimer.js) -->
+<div class="disc-overlay" id="discOverlay" onclick="if(event.target===this)closeDisc()">
+  <div class="disc-modal">
+    <button class="disc-modal-close" onclick="closeDisc()">✕</button>
+    <h2 id="disc-title">⚖️ إشعار قانوني هام<br><small style="font-size:13px;font-weight:500;opacity:.75" id="disc-sub">منصة رزق — موريتانيا</small></h2>
+    <div class="disc-section"><h3 id="disc-h1">📢 رزق وسيط نشر إلكتروني فقط</h3><p id="disc-p1"></p></div>
+    <div class="disc-section"><h3 id="disc-h2">🤝 مسؤولية الأطراف المتعاقدة</h3><p id="disc-p2"></p></div>
+    <div class="disc-section"><h3 id="disc-h3">🔍 تحذير المشتري — عاين قبل الدفع</h3><p id="disc-p3"></p></div>
+    <div class="disc-section"><h3 id="disc-h4">🗑️ حق حذف المحتوى</h3><p id="disc-p4"></p></div>
+    <div class="disc-section"><h3 id="disc-h5">🔒 البيانات والخصوصية</h3><p id="disc-p5"></p></div>
+    <div class="disc-footer">
+      <div id="disc-footer-main" style="font-size:12.5px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.8"></div>
+      <div style="font-size:11px;color:rgba(201,168,76,.6)">Rizq Platform · موريتانيا ©</div>
+      <br><span class="disc-close-btn" id="disc-close-lbl" onclick="closeDisc()">فهمت — أغلق</span>
+    </div>
+  </div>
+</div>
+<div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="إشعار قانوني / Avis juridique">⚖️ إشعار قانوني</div>
+<style>
+.disc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.disc-overlay.open{display:flex}
+.disc-modal{background:linear-gradient(160deg,#0a1628,#122040);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;max-width:640px;width:100%;padding:36px 32px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);font-family:Georgia,'Amiri','Times New Roman',serif}
+.disc-modal-close{position:absolute;top:16px;left:16px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#C9A84C;display:flex;align-items:center;justify-content:center;line-height:1}
+.disc-modal[dir="ltr"] .disc-modal-close{left:auto;right:16px}
+.disc-modal h2{color:#C9A84C;font-size:20px;font-weight:800;margin:0 0 24px;text-align:center;line-height:1.4}
+.disc-modal .disc-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(201,168,76,.12)}
+.disc-modal .disc-section:last-of-type{border-bottom:none}
+.disc-modal .disc-section h3{color:#E8C96A;font-size:13px;font-weight:700;margin:0 0 8px}
+.disc-modal .disc-section p{color:rgba(255,255,255,.92);font-size:14px;line-height:1.85;margin:0}
+.disc-modal .disc-footer{margin-top:22px;padding-top:16px;border-top:1px solid rgba(201,168,76,.25);font-size:12px;color:rgba(201,168,76,.7);text-align:center;line-height:1.7}
+.disc-close-btn{display:inline-block;margin-top:12px;padding:9px 24px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700}
+.disc-close-btn:hover{background:rgba(201,168,76,.28)}
+.fixed-disc-pill{position:fixed;left:0;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;text-orientation:mixed;background:linear-gradient(180deg,#0d1e3a,#162d52);border:1.5px solid rgba(201,168,76,.5);border-radius:0 10px 10px 0;color:#C9A84C;font-size:10px;font-weight:700;padding:16px 7px;cursor:pointer;letter-spacing:1.5px;white-space:nowrap;z-index:999;transition:all .25s;box-shadow:3px 0 18px rgba(0,0,0,.35);font-family:Georgia,'Amiri',serif}
+.fixed-disc-pill:hover{background:linear-gradient(180deg,#162d52,#1a3560);color:#E8C96A}
+</style>
+
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_disclaimer.js"></script>
+<!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل بطاقة معرض (RizqSub.getBadges) -->
+<script src="rizq_subscription_engine.js"></script>
+<script src="rizq_i18n_data.js"></script>
+<script src="rizq_i18n.js"></script>
+<script>
+/* ════════════════════════════════════════
+   rizq_showroom_directory.html — دليل المعارض حسب الفئة
+   ════════════════════════════════════════
+   إصلاح جوهري: كانت وسوم "أنواع المعارض" بالصفحة الرئيسية تذهب لصفحة
+   تصفّح الإعلانات العامة (rizq_browse.html) بدل عرض المعارض/المحلات
+   الحقيقية التي تبيع هذه الفئة — حسب طلب Limam صراحة. هذه الصفحة الجديدة
+   تجلب الحسابات التجارية الموافَق عليها فعلياً من الخادم (GET
+   /api/accounts/public، يتضمن الآن حقل category المُضاف حديثاً) وتعرض
+   فقط من صرّح عند التسجيل أنه يبيع هذه الفئة، مع رابط مباشر لمعرضه
+   (rizq_showroom.html?id=...). الحسابات المسجَّلة قبل هذا التحديث لن
+   يكون لها category محفوظ بعد — ستظهر فقط ضمن "الكل" لا ضمن فئة محددة،
+   حتى يحدّثوا ملفهم من لوحة تحكمهم.
+*/
+function _rizqLang(){
+  try{
+    if(window.RizqI18n && typeof RizqI18n.getLang==='function') return RizqI18n.getLang();
+    return localStorage.getItem('rizq_lang')||'ar';
+  }catch(e){ return 'ar'; }
+}
+
+var CAT_LABELS = {
+  'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
+  'إلكترونيات':{ar:'📱 إلكترونيات',fr:'📱 Électronique'},
+  'أثاث':{ar:'🛋️ أثاث ومفروشات',fr:'🛋️ Meubles & ameublement'},
+  'معدات':{ar:'⚙️ معدات ومكائن',fr:'⚙️ Équipements & machines'},
+  'بناء':{ar:'🏗️ مواد بناء',fr:'🏗️ Matériaux de construction'},
+  'ذهب':{ar:'💎 مجوهرات',fr:'💎 Bijoux'},
+  'أخرى':{ar:'🏷️ أخرى',fr:'🏷️ Autre'}
+};
+var TYPE_LABELS = {
+  store:{ar:'🏪 محل',fr:'🏪 Boutique'},
+  office:{ar:'🏢 مكتب',fr:'🏢 Bureau'},
+  corp:{ar:'🏭 شركة / معرض',fr:'🏭 Société / showroom'}
+};
+
+var _params = new URLSearchParams(location.search);
+var _catFilter = _params.get('cat') || '';
+var _accounts = [];
+var _loaded = false; // إصلاح: قبل وصول رد /api/accounts/public كانت الصفحة تعرض
+                      // "0 نتيجة" وحالة "لا توجد معارض" لمدة لحظة مضلِّلة (تبدو
+                      // كأن الفئة فارغة فعلاً بينما البيانات لا تزال قيد التحميل).
+
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function _backendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
+
+function renderCatChips(){
+  var fr = _rizqLang()==='fr';
+  var wrap = document.getElementById('dir-cats');
+  var order=['سيارات','إلكترونيات','أثاث','معدات','بناء','ذهب'];
+  var allChip = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="rizq_showroom_directory.html">'+(fr?'📋 Toutes':'📋 الكل')+'</a>';
+  wrap.innerHTML = allChip + order.map(function(c){
+    var lab = CAT_LABELS[c];
+    var active = _catFilter===c ? ' active' : '';
+    return '<a class="dir-cat-chip'+active+'" href="rizq_showroom_directory.html?cat='+encodeURIComponent(c)+'">'+(fr?lab.fr:lab.ar)+'</a>';
+  }).join('');
+}
+
+function renderHero(){
+  var fr = _rizqLang()==='fr';
+  var t = document.getElementById('dir-title');
+  if(_catFilter && CAT_LABELS[_catFilter]){
+    var lab = CAT_LABELS[_catFilter];
+    t.innerHTML = fr ? ('Showrooms — <span>'+lab.fr.replace(/^[^\s]+\s/,'')+'</span>') : ('دليل المعارض — <span>'+lab.ar.replace(/^[^\s]+\s/,'')+'</span>');
+  } else {
+    t.innerHTML = fr ? 'Annuaire des <span>showrooms</span>' : 'دليل <span>المعارض</span>';
+  }
+}
+
+function renderDirectory(){
+  var fr = _rizqLang()==='fr';
+  renderHero();
+  renderCatChips();
+  var list = _accounts.filter(function(a){ return !_catFilter || a.category===_catFilter; });
+  var grid = document.getElementById('dir-grid');
+  var countEl = document.getElementById('dir-count');
+
+  if(!_loaded){
+    // إصلاح: طالما لم يصل رد الخادم بعد، نعرض "جاري التحميل" بدل "0 نتيجة"
+    // المضللة (كانت تومض للحظة قبل وصول البيانات الحقيقية وتوحي بعدم وجود معارض).
+    countEl.textContent = fr ? 'Chargement…' : 'جاري التحميل…';
+    grid.innerHTML = '<div class="dir-empty" style="grid-column:1/-1"><div class="emo">⏳</div><p>'
+      + (fr ? 'Chargement des showrooms…' : 'جاري تحميل المعارض…') + '</p></div>';
+    return;
+  }
+
+  countEl.textContent = fr
+    ? (list.length + (list.length===1?' commerce trouvé':' commerces trouvés'))
+    : (list.length + ' نتيجة موجودة');
+
+  if(!list.length){
+    var emptyMsg = fr ? 'Aucun showroom dans cette catégorie pour le moment.' : 'لا توجد معارض في هذه الفئة بعد.';
+    var emptyCta = fr ? '🚀 Inscrivez votre commerce' : '🚀 سجّل معرضك الآن';
+    grid.innerHTML = '<div class="dir-empty" style="grid-column:1/-1"><div class="emo">🏬</div><p>'+emptyMsg+'</p>'
+      + '<a href="rizq_landing_v8.html?openRegister=1">'+emptyCta+'</a></div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(function(a){
+    var typeLab = TYPE_LABELS[a.type] || {ar:'🏬 نشاط تجاري',fr:'🏬 Commerce'};
+    var thumb = a.thumb ? ('<img src="'+escapeHtml(a.thumb)+'" alt="">') : (a.type==='corp'?'🏭':a.type==='office'?'🏢':'🏪');
+    // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026: كانت البطاقات
+    // لا تعرض أي مؤشر توثيق/تمييز إطلاقاً رغم توفّر a.id لكل معرض. ──
+    var _badges = (typeof RizqSub!=='undefined') ? RizqSub.getBadges(a.id) : {verified:false,premium:false};
+    var badgeHTML = (_badges.verified?'<span class="dir-badge dir-badge-verified">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
+      + (_badges.premium?'<span class="dir-badge dir-badge-premium">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
+    return '<a class="dir-card" href="rizq_showroom.html?id='+encodeURIComponent(a.id)+'">'
+      + '<div class="dir-card-top"><div class="dir-thumb">'+thumb+'</div><div>'
+      + '<div class="dir-name">'+escapeHtml(a.name||'')+(badgeHTML?'<span class="dir-badges-inline">'+badgeHTML+'</span>':'')+'</div>'
+      + '<div class="dir-type">'+(fr?typeLab.fr:typeLab.ar)+'</div>'
+      + '</div></div>'
+      + (a.city ? '<div class="dir-city">📍 '+escapeHtml(a.city)+'</div>' : '')
+      + (a.tagline ? '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>' : '')
+      + '<div class="dir-cta">'+(fr?'Voir le showroom →':'زيارة المعرض ←')+'</div>'
+      + '</a>';
+  }).join('');
+}
+
+function loadAccounts(){
+  fetch(_backendBase().replace(/\/$/,'') + '/api/accounts/public')
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      _accounts = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
+      _loaded = true;
+      renderDirectory();
+    })
+    .catch(function(){ _accounts=[]; _loaded=true; renderDirectory(); });
+}
+
+// زر اللغة الموحّد (class="btn-lang") يُشغَّل تلقائياً عبر RizqI18n —
+// نربط محتوى هذه الصفحة الخاص (applyLang/renderDirectory) بحدثه الموحّد
+// rizq:langchange بدل onclick محلي مكرر (كان يسبب تنفيذاً مزدوجاً وتضارباً
+// في نص الزر مع كل نقرة — أُصلح 06/08/2026).
+document.addEventListener('rizq:langchange', function(){ applyLang(); });
+function applyLang(){
+  renderHero();
+  renderCatChips();
+  if(typeof window._discApply==='function') window._discApply(_rizqLang());
+  if(_loaded) renderDirectory();
+}
+loadAccounts();
+</script>
+</body>
+</html>

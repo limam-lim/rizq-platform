@@ -1,0 +1,194 @@
+/**
+ * Rizq Corp Dashboard — fixed RTL/LTR layout (260px sidebar)
+ */
+:root {
+  --sidebar-w: 260px;
+}
+
+/* ── Sidebar: fixed full-height column ── */
+html[dir="ltr"] .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: auto;
+  width: 260px;
+  height: auto;
+}
+
+html[dir="rtl"] .sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 260px;
+  height: auto;
+}
+
+/* ── Main content: fill remaining width ── */
+html[dir="ltr"] .main {
+  margin-left: 260px;
+  margin-right: 0;
+  width: calc(100% - 260px);
+}
+
+html[dir="rtl"] .main {
+  margin-right: 260px;
+  margin-left: 0;
+  width: calc(100% - 260px);
+}
+
+.main {
+  min-width: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ── Topbar: full width of main, no shrink ── */
+.topbar {
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* ── Nav accents ── */
+html[dir="rtl"] .sb-item {
+  border-right: 3px solid transparent;
+  border-left: none;
+}
+
+html[dir="ltr"] .sb-item {
+  border-left: 3px solid transparent;
+  border-right: none;
+}
+
+html[dir="rtl"] .sb-item.active {
+  border-right-color: var(--gold, #C9A84C);
+}
+
+html[dir="ltr"] .sb-item.active {
+  border-left-color: var(--gold, #C9A84C);
+}
+
+html[dir="rtl"] .sb-badge {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+html[dir="ltr"] .sb-badge {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+html[dir="rtl"] .stat-card {
+  border-right-width: 4px;
+  border-left-width: 1px;
+}
+
+html[dir="ltr"] .stat-card {
+  border-left-width: 4px;
+  border-right-width: 1px;
+}
+
+html[dir="ltr"] .inq-item {
+  border-left: 3px solid var(--rc, var(--royal, #1B3A6B));
+  border-right: 1px solid rgba(27, 58, 107, 0.08);
+}
+
+html[dir="ltr"] .img-thumb-del {
+  left: auto;
+  right: 2px;
+}
+
+html[dir="ltr"] .rpkg-feat {
+  text-align: left;
+}
+
+html[dir="rtl"] .rpkg-feat {
+  text-align: right;
+}
+
+html[dir="ltr"] #services-showcase [style*="position:absolute"][style*="top:-1px"] {
+  right: auto !important;
+  left: -1px !important;
+  border-radius: 12px 0 0 10px !important;
+}
+
+.hero-rating-pane {
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: none;
+  border-left: none;
+}
+
+.topbar,
+.mobile-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbar-actions,
+.mobile-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Remove broken floating chrome (overlaps sidebar in LTR) ── */
+.fixed-rizq-logo {
+  display: none !important;
+}
+
+/* Disc pill: keep on content edge only, never over sidebar */
+html[dir="rtl"] .fixed-disc-pill {
+  left: auto;
+  right: 0;
+  border-radius: 10px 0 0 10px;
+  box-shadow: -3px 0 18px rgba(0, 0, 0, 0.35);
+}
+
+html[dir="ltr"] .fixed-disc-pill {
+  right: auto;
+  left: 260px;
+  border-radius: 0 10px 10px 0;
+  box-shadow: 3px 0 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Desktop: no mobile hamburger bar */
+@media (min-width: 769px) {
+  .mobile-bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  html[dir="rtl"] .sidebar {
+    transform: translateX(100%);
+  }
+
+  html[dir="ltr"] .sidebar {
+    transform: translateX(-100%);
+  }
+
+  html[dir="rtl"] .sidebar.open,
+  html[dir="ltr"] .sidebar.open {
+    transform: none;
+  }
+
+  html[dir="rtl"] .main,
+  html[dir="ltr"] .main {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  html[dir="ltr"] .fixed-disc-pill,
+  html[dir="rtl"] .fixed-disc-pill {
+    left: auto;
+    right: 0;
+  }
+}

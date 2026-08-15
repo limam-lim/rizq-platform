@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ملاحظة صادقة: هذا الملف يغطي فقط الصفحات العامة الثابتة (الرئيسية، التصفح،
+  البحث، الصفحة القانونية...). صفحات الإعلانات الفردية ومحلات/مكاتب/مؤسسات
+  محددة (rizq_store.html?id=..، rizq_profile.html?id=..) لا يمكن إدراجها هنا
+  لأنها تُعرض بالكامل عبر JavaScript من بيانات محلية (localStorage) دون خادم
+  مركزي يفهرسها — لن تظهر لمحركات البحث أصلاً حتى تُبنى قاعدة بيانات حقيقية
+  للإعلانات (انظر ملاحظة الأولوية الأولى في مراجعة المنصة).
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://rizq.mr/rizq_landing_v8.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_browse.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_search.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_showroom.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_legal.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
