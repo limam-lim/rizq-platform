@@ -912,66 +912,10 @@ function buildMapHTML(ad){
 }
 
 // ══════════ DEMO_ADS ══════════
-const DEMO_ADS = [
-  {id:1,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appart. luxueux 3 ch. — Nouakchott Ouest',desc:'تشطيب عالي الجودة، تكييف مركزي، إطلالة بانورامية، موقف سيارات، حراسة 24/7',descFr:'Finition haut de gamme, clim. centrale, vue panoramique, parking, gardiennage 24/24',price:'150,000 MRU/شهر',priceNum:150000,rooms:3,verified:true,pin:true,emoji:'🏠',loc:'📍 نواكشوط الغربية',seller:'محمد الأمين',date:'منذ ساعتين'},
-  {id:2,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الشمالية',title:'شقة 2 غرف — حي تفرغ زينة',titleFr:'Appart. 2 ch. — Quartier Tevragh-Zeina',desc:'قريبة من المدارس والمستشفيات، هادئة، مفروشة بالكامل',descFr:'Proche écoles et hôpitaux, calme, entièrement meublé',price:'80,000 MRU/شهر',priceNum:80000,rooms:2,verified:true,pin:false,emoji:'🏠',loc:'📍 نواكشوط الشمالية',seller:'فاطمة بنت احمد',date:'منذ 4 ساعات'},
-  {id:3,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الجنوبية',title:'شقة راقية مع حديقة — حي الصداقة',titleFr:'Appart. haut de gamme avec jardin — Hay Sadaqa',desc:'الطابق الأرضي، حديقة خاصة، مطبخ مجهز، 3 حمامات',descFr:'Rez-de-chaussée, jardin privé, cuisine équipée, 3 salles de bain',price:'220,000 MRU/شهر',priceNum:220000,rooms:4,verified:false,pin:true,emoji:'🏡',loc:'📍 نواكشوط الجنوبية',seller:'شركة العقارات الذهبية',date:'أمس'},
-  {id:4,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط',title:'استوديو مؤثث — وسط المدينة',titleFr:'Studio meublé — Centre-ville',desc:'مثالي للطلاب والعزاب، قريب من الجامعة، إنترنت مجاني',descFr:'Idéal pour étudiants et célibataires, proche université, internet gratuit',price:'35,000 MRU/شهر',priceNum:35000,rooms:0,verified:true,pin:false,emoji:'🛏️',loc:'📍 نواكشوط',seller:'خديجة منت محمد',date:'منذ يومين'},
-  {id:5,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواذيبو',title:'شقة 4 غرف فاخرة — حي الميناء',titleFr:'Appart. luxueux 4 ch. — Quartier du Port',desc:'مساحة واسعة، إطلالة على البحر، تشطيب أوروبي راقٍ',descFr:'Grande superficie, vue sur mer, finition européenne haut de gamme',price:'380,000 MRU/شهر',priceNum:380000,rooms:4,verified:true,pin:false,emoji:'🌊',loc:'📍 نواذيبو',seller:'عقارات نواذيبو',date:'منذ 3 أيام'},
-  {id:6,subcat:'غرف للكراء',cat:'عقارات',wilaya:'نواكشوط',title:'غرفة مستقلة مع مدخل خاص',titleFr:'Chambre indépendante avec entrée privée',desc:'هادئة، حمام خاص، إنترنت واي فاي، مطبخ مشترك نظيف',descFr:'Calme, salle de bain privée, Wi-Fi, cuisine commune propre',price:'25,000 MRU/شهر',priceNum:25000,rooms:1,verified:false,pin:false,emoji:'🚪',loc:'📍 نواكشوط',seller:'أحمد ولد سيدي',date:'منذ أسبوع'},
-  {id:7,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة جديدة 3 غرف — حي السبخة',titleFr:'Appart. neuf 3 ch. — Quartier Sebkha',desc:'لم تُسكن من قبل، تشطيب ممتاز، بناء 2025',descFr:'Jamais habité, excellente finition, construction 2025',price:'120,000 MRU/شهر',priceNum:120000,rooms:3,verified:true,pin:false,emoji:'🏗️',loc:'📍 نواكشوط الغربية',seller:'مجموعة الإعمار',date:'منذ أسبوع'},
-  {id:8,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط',title:'شقة 2 غرف — حي كيبه',titleFr:'Appart. 2 ch. — Quartier Kébé',desc:'سعر مناسب، قريبة من السوق، حراسة ليلية',descFr:'Prix raisonnable, proche du marché, gardiennage nocturne',price:'65,000 MRU/شهر',priceNum:65000,rooms:2,verified:false,pin:false,emoji:'🏠',loc:'📍 نواكشوط',seller:'محمد محمود',date:'منذ أسبوعين'},
-  {id:9,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'بنتهاوس فاخر 5 غرف — أعلى برج',titleFr:'Penthouse luxueux 5 ch. — Plus haute tour',desc:'المنظر الأجمل في نواكشوط، مسبح خاص، جراج ثلاثي',descFr:'La plus belle vue de Nouakchott, piscine privée, garage triple',price:'650,000 MRU/شهر',priceNum:650000,rooms:5,verified:true,pin:true,emoji:'🌇',loc:'📍 نواكشوط الغربية',seller:'شركة الفخامة العقارية',date:'منذ 3 أسابيع'},
-  {id:10,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط الغربية',title:'تويوتا كامري 2021 — فل أوبشن',titleFr:'Toyota Camry 2021 — Full option',desc:'حالة الوكالة، صيانة دورية، فتحة سقف، جلد طبيعي',descFr:'État concessionnaire, entretien régulier, toit ouvrant, cuir naturel',price:'1,850,000 MRU',priceNum:1850000,rooms:0,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط الغربية',seller:'محمد سالم',date:'منذ 5 ساعات'},
-  {id:11,subcat:'سيارات للكراء',cat:'سيارات',wilaya:'نواكشوط',title:'هيونداي توسان 2022 — كراء يومي وأسبوعي',titleFr:'Hyundai Tucson 2022 — Location journalière & hebdomadaire',desc:'تكييف، نظيفة جداً، تسليم بالمدينة',descFr:'Climatisé, très propre, livraison en ville',price:'12,000 MRU/يوم',priceNum:12000,rooms:0,verified:true,pin:false,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة النجمة لتأجير السيارات',date:'منذ يوم'},
-  {id:12,subcat:'شاحنات للبيع',cat:'شاحنات',wilaya:'نواذيبو',title:'شاحنة مرسيدس أكتروس — حمولة 20 طن',titleFr:'Camion Mercedes Actros — Charge 20 tonnes',desc:'محرك بحالة ممتازة، فحص كامل متاح',descFr:'Moteur en excellent état, inspection complète disponible',price:'9,500,000 MRU',priceNum:9500000,rooms:0,verified:true,pin:false,emoji:'🚛',loc:'📍 نواذيبو',seller:'شركة النقل الثقيل',date:'منذ يومين'},
-  {id:13,subcat:'معدات بناء',cat:'شاحنات',wilaya:'نواكشوط',title:'حفارة كاتربيلر مستعملة — حالة جيدة',titleFr:'Excavatrice Caterpillar occasion — Bon état',desc:'جاهزة للعمل فوراً، صيانة موثقة',descFr:'Prête à travailler immédiatement, entretien documenté',price:'4,200,000 MRU',priceNum:4200000,rooms:0,verified:false,pin:false,emoji:'🏗️',loc:'📍 نواكشوط',seller:'معدات الإعمار',date:'منذ 3 أيام'},
-  {id:14,subcat:'هواتف ذكية',cat:'إلكترونيات',wilaya:'نواكشوط',title:'آيفون 15 برو ماكس — جديد بالكرتون',titleFr:'iPhone 15 Pro Max — Neuf en boîte',desc:'256GB، ضمان وكيل، لم يُستخدم',descFr:'256Go, garantie agréé, jamais utilisé',price:'620,000 MRU',priceNum:620000,rooms:0,verified:true,pin:true,emoji:'📱',loc:'📍 نواكشوط',seller:'متجر التقنية الحديثة',date:'منذ 3 ساعات'},
-  {id:15,subcat:'لابتوب وحاسوب',cat:'إلكترونيات',wilaya:'نواكشوط الشمالية',title:'لابتوب Dell XPS 15 — استخدام خفيف',titleFr:'Laptop Dell XPS 15 — Légèrement utilisé',desc:'معالج i7، رام 16GB، شاشة 4K',descFr:'Processeur i7, RAM 16Go, écran 4K',price:'480,000 MRU',priceNum:480000,rooms:0,verified:false,pin:false,emoji:'💻',loc:'📍 نواكشوط الشمالية',seller:'سيدي محمد',date:'منذ 6 أيام'},
-  {id:16,subcat:'دراعة رجالية',cat:'أزياء',wilaya:'نواكشوط',title:'دراعة موريتانية فاخرة — تطريز يدوي',titleFr:'Boubou mauritanien de luxe — Broderie artisanale',desc:'قماش فاخر، خياطة تقليدية أصلية',descFr:'Tissu de luxe, couture traditionnelle authentique',price:'45,000 MRU',priceNum:45000,rooms:0,verified:true,pin:false,emoji:'👗',loc:'📍 نواكشوط',seller:'بوتيك التراث',date:'منذ يوم'},
-  {id:17,subcat:'ملحفة نسائية',cat:'أزياء',wilaya:'نواكشوط الجنوبية',title:'ملحفة حرير صناعي — ألوان متعددة',titleFr:'Melhfa en soie artificielle — Plusieurs couleurs',desc:'خامة فاخرة، تشكيلة واسعة من الألوان',descFr:'Tissu luxueux, large gamme de couleurs',price:'18,000 MRU',priceNum:18000,rooms:0,verified:true,pin:true,emoji:'👗',loc:'📍 نواكشوط الجنوبية',seller:'خديجة منت إبراهيم',date:'منذ 4 أيام'},
-  {id:18,subcat:'ذهب عيار 24',cat:'ذهب',wilaya:'نواكشوط',title:'سبيكة ذهب عيار 24 — 50 غرام',titleFr:'Lingot d\'or 24 carats — 50 grammes',desc:'مضمونة بشهادة وزن وعيار رسمية',descFr:'Certifié par attestation officielle de poids et pureté',price:'2,650,000 MRU',priceNum:2650000,rooms:0,verified:true,pin:true,emoji:'💰',loc:'📍 نواكشوط',seller:'صائغ الأمانة',date:'منذ ساعة'},
-  {id:19,subcat:'أساور وخلاخيل',cat:'ذهب',wilaya:'نواكشوط الغربية',title:'طقم أساور ذهب تقليدي موريتاني',titleFr:'Parure bracelets en or mauritanienne',desc:'صناعة يدوية، عيار 21، تصميم أصيل',descFr:'Artisanat fait main, titre 21 carats, design authentique',price:'890,000 MRU',priceNum:890000,rooms:0,verified:true,pin:false,emoji:'💍',loc:'📍 نواكشوط الغربية',seller:'دار الذهب الموريتاني',date:'منذ يومين'},
-  {id:20,subcat:'إبل',cat:'ماشية',wilaya:'أطار',title:'ناقة حلوب — إنتاج وفير',titleFr:'Chamelle laitière — Production abondante',desc:'صحة جيدة، تدر حليباً يومياً بكميات وفيرة',descFr:'Bonne santé, production laitière quotidienne abondante',price:'650,000 MRU',priceNum:650000,rooms:0,verified:true,pin:false,emoji:'🐪',loc:'📍 أطار',seller:'سيداتي ولد الشيخ',date:'منذ 5 أيام'},
-  {id:21,subcat:'غنم وماعز',cat:'ماشية',wilaya:'كيفة',title:'قطيع أغنام للبيع — 15 رأس',titleFr:'Troupeau de moutons — 15 têtes',desc:'سلالة محلية قوية، جاهزة للعيد والذبح',descFr:'Race locale robuste, prête pour la fête et l\'abattage',price:'1,200,000 MRU',priceNum:1200000,rooms:0,verified:false,pin:false,emoji:'🐑',loc:'📍 كيفة',seller:'أحمدو ولد محمد',date:'منذ أسبوع'},
-  {id:22,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع وتطبيقات — مطور محترف',titleFr:'Création sites & applis — Dev. professionnel',desc:'تطوير متكامل، تصميم عصري، أسعار تنافسية',descFr:'Développement complet, design moderne, prix compétitifs',price:'تفاوض',priceNum:0,rooms:0,verified:true,pin:true,emoji:'🔧',loc:'📍 نواكشوط',seller:'استوديو الإبداع التقني',date:'منذ 3 ساعات'},
-  {id:23,subcat:'بناء ودهان وسباكة',cat:'خدمات',wilaya:'نواكشوط الشمالية',title:'فريق بناء ومقاولات — خبرة 10 سنوات',titleFr:'Équipe BTP — 10 ans d\'expérience',desc:'بناء، دهان، سباكة، تشطيبات بجودة عالية',descFr:'Maçonnerie, peinture, plomberie, finitions haute qualité',price:'تفاوض',priceNum:0,rooms:0,verified:true,pin:false,emoji:'🧱',loc:'📍 نواكشوط الشمالية',seller:'مؤسسة البنيان',date:'منذ يومين'},
-  {id:24,subcat:'هندسة وتقنية',cat:'وظائف',wilaya:'نواكشوط',title:'مطلوب مهندس صيانة — شركة صناعية',titleFr:'Ingénieur Maintenance recherché — Société industrielle',desc:'خبرة لا تقل عن 3 سنوات، راتب مجزٍ + تأمين',descFr:'Min. 3 ans d\'expérience, salaire attractif + assurance',price:'راتب يحدد عند المقابلة',priceNum:0,rooms:0,verified:true,pin:false,emoji:'💼',loc:'📍 نواكشوط',seller:'مجموعة الصناعات الموريتانية',date:'منذ يوم'},
-  {id:25,subcat:'إدارة وتسويق',cat:'وظائف',wilaya:'نواكشوط الغربية',title:'مطلوب مسؤول تسويق رقمي',titleFr:'Responsable Marketing Digital recherché',desc:'إدارة حملات إعلانية ووسائل التواصل الاجتماعي',descFr:'Gestion campagnes publicitaires et réseaux sociaux',price:'راتب يحدد عند المقابلة',priceNum:0,rooms:0,verified:false,pin:false,emoji:'💼',loc:'📍 نواكشوط الغربية',seller:'شركة التسويق الرقمي',date:'منذ 4 أيام'},
-  {id:26,subcat:'أسمنت وحديد',cat:'بناء',wilaya:'نواكشوط',title:'حديد تسليح وأسمنت — أسعار الجملة',titleFr:'Fer à béton & ciment — Prix de gros',desc:'توريد مباشر من المصنع، جودة مضمونة',descFr:'Fourniture directe d\'usine, qualité garantie',price:'يبدأ من 4,500 MRU/طن',priceNum:4500,rooms:0,verified:true,pin:false,emoji:'🧱',loc:'📍 نواكشوط',seller:'مواد البناء الحديثة',date:'منذ 6 أيام'},
-  {id:27,subcat:'ألواح شمسية',cat:'بناء',wilaya:'نواذيبو',title:'ألواح طاقة شمسية — تركيب وصيانة',titleFr:'Panneaux solaires — Installation & maintenance',desc:'حلول طاقة متكاملة للمنازل والشركات',descFr:'Solutions énergétiques complètes pour maisons et entreprises',price:'تفاوض',priceNum:0,rooms:0,verified:true,pin:true,emoji:'🔆',loc:'📍 نواذيبو',seller:'الطاقة الخضراء موريتانيا',date:'منذ 3 أيام'},
-];
+const DEMO_ADS = [];
 
 // ══════════ ALL_ADS_DATA (phone numbers) ══════════
-const ALL_ADS_DATA = [
-  {id:1,phone:'+22234567800',desc:'شقة فاخرة للكراء في أرقى أحياء نواكشوط الغربية. تشطيب عالي الجودة، تكييف مركزي، إطلالة بانورامية، موقف سيارات، حراسة 24/7. مساحة 120م²، الطابق الخامس.'},
-  {id:2,phone:'+22234567801',desc:'شقة مريحة في حي هادئ، قريبة من المدارس والمستشفيات، مفروشة بالكامل.'},
-  {id:3,phone:'+22234567802',desc:'الطابق الأرضي، حديقة خاصة، مطبخ مجهز، 3 حمامات، مساحة 200م².'},
-  {id:4,phone:'+22234567803',desc:'مثالي للطلاب والعزاب، قريب من الجامعة، إنترنت مجاني، مجهز بالكامل.'},
-  {id:5,phone:'+22234567804',desc:'مساحة واسعة، إطلالة على البحر، تشطيب أوروبي راقٍ.'},
-  {id:6,phone:'+22234567805',desc:'هادئة، حمام خاص، إنترنت واي فاي، مطبخ مشترك نظيف.'},
-  {id:7,phone:'+22234567806',desc:'لم تُسكن من قبل، تشطيب ممتاز، بناء 2025.'},
-  {id:8,phone:'+22234567807',desc:'سعر مناسب، قريبة من السوق، حراسة ليلية.'},
-  {id:9,phone:'+22234567808',desc:'المنظر الأجمل في نواكشوط، مسبح خاص، جراج ثلاثي.'},
-  {id:10,phone:'+22234567809',desc:'حالة الوكالة، صيانة دورية، فتحة سقف، جلد طبيعي.'},
-  {id:11,phone:'+22234567810',desc:'تكييف، نظيفة جداً، تسليم بالمدينة.'},
-  {id:12,phone:'+22234567811',desc:'محرك بحالة ممتازة، فحص كامل متاح.'},
-  {id:13,phone:'+22234567812',desc:'جاهزة للعمل فوراً، صيانة موثقة.'},
-  {id:14,phone:'+22234567813',desc:'256GB، ضمان وكيل، لم يُستخدم.'},
-  {id:15,phone:'+22234567814',desc:'معالج i7، رام 16GB، شاشة 4K.'},
-  {id:16,phone:'+22234567815',desc:'قماش فاخر، خياطة تقليدية أصلية.'},
-  {id:17,phone:'+22234567816',desc:'خامة فاخرة، تشكيلة واسعة من الألوان.'},
-  {id:18,phone:'+22234567817',desc:'مضمونة بشهادة وزن وعيار رسمية.'},
-  {id:19,phone:'+22234567818',desc:'صناعة يدوية، عيار 21، تصميم أصيل.'},
-  {id:20,phone:'+22234567819',desc:'صحة جيدة، تدر حليباً يومياً بكميات وفيرة.'},
-  {id:21,phone:'+22234567820',desc:'سلالة محلية قوية، جاهزة للعيد والذبح.'},
-  {id:22,phone:'+22234567821',desc:'تطوير متكامل، تصميم عصري، أسعار تنافسية.'},
-  {id:23,phone:'+22234567822',desc:'بناء، دهان، سباكة، تشطيبات بجودة عالية.'},
-  {id:24,phone:'+22234567823',desc:'خبرة لا تقل عن 3 سنوات، راتب مجزٍ + تأمين.'},
-  {id:25,phone:'+22234567824',desc:'إدارة حملات إعلانية ووسائل التواصل الاجتماعي.'},
-  {id:26,phone:'+22234567825',desc:'توريد مباشر من المصنع، جودة مضمونة.'},
-  {id:27,phone:'+22234567826',desc:'حلول طاقة متكاملة للمنازل والشركات.'},
-];
+const ALL_ADS_DATA = [];
 
 // GALLERY ICONS EXTRA
 const GALLERY_ICONS_EXTRA = {
@@ -1076,7 +1020,7 @@ function _rizqMergeBackendAds(){
       .catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة */ });
   }catch(e){}
 }
-const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
+const ALL_ADS = loadRealSearchAds();
 
 // getAdById — merges DEMO_ADS + ALL_ADS_DATA + localStorage['rizq_active_ad']
 function getAdById(id){
@@ -1086,9 +1030,8 @@ function getAdById(id){
     const s=JSON.parse(localStorage.getItem('rizq_active_ad')||'null');
     if(s&&String(s.id)===String(id)) stored=s;
   }catch(e){}
-  const demo=DEMO_ADS.find(d=>String(d.id)===String(id))||ALL_ADS.find(d=>String(d.id)===String(id))||{};
-  const data=ALL_ADS_DATA.find(a=>String(a.id)===String(id))||{};
-  return Object.assign({},demo,data,stored); // stored آخرها = أعلى أولوية
+  const ad=ALL_ADS.find(d=>String(d.id)===String(id))||{};
+  return Object.assign({}, ad, stored); // stored آخرها = أعلى أولوية
 }
 
 // SHARED STATE

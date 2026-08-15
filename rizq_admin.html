@@ -2246,37 +2246,13 @@ const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', moderator:'�
 const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
 
 // ══ SAMPLE DATA ══
-const USERS_DATA = [
-  {id:1,name:'محمد الأمين',phone:'+222 22 34 56 78',wilaya:'نواكشوط الغربية',ads:23,date:'12/03/2023',status:'active',verified:true},
-  {id:2,name:'فاطمة بنت احمد',phone:'+222 36 12 34 56',wilaya:'نواكشوط الشمالية',ads:5,date:'15/04/2024',status:'active',verified:true},
-  {id:3,name:'خديجة منت محمد',phone:'+222 46 78 90 12',wilaya:'نواكشوط',ads:2,date:'01/06/2025',status:'pending',verified:false},
-  {id:4,name:'أحمد ولد سيدي',phone:'+222 22 11 22 33',wilaya:'نواذيبو',ads:8,date:'20/07/2024',status:'active',verified:true},
-  {id:5,name:'مريم بنت داود',phone:'+222 36 55 44 33',wilaya:'ترارزة',ads:0,date:'05/01/2026',status:'banned',verified:false},
-  {id:6,name:'شركة المستقبل',phone:'+222 22 99 88 77',wilaya:'نواكشوط الجنوبية',ads:67,date:'10/02/2023',status:'active',verified:true},
-];
+const USERS_DATA = [];
 
-const ADS_DATA_ADMIN = [
-  {id:1,title:'شقة فاخرة 3 غرف — نواكشوط الغربية',seller:'محمد الأمين',cat:'🏠 عقارات',price:'150,000 MRU',views:1247,date:'01/06/2026',status:'active'},
-  {id:2,title:'Toyota Hilux 2022 بحالة ممتازة',seller:'أحمد ولد سيدي',cat:'🚗 سيارات',price:'8,000,000 MRU',views:892,date:'28/05/2026',status:'active'},
-  {id:3,title:'iPhone 15 Pro Max 256GB جديد',seller:'فاطمة بنت احمد',cat:'📱 إلكترونيات',price:'380,000 MRU',views:234,date:'25/05/2026',status:'pending'},
-  {id:4,title:'إبل للبيع — 10 رؤوس أصيلة',seller:'مريم بنت داود',cat:'🐄 ماشية',price:'2,400,000 MRU',views:45,date:'20/05/2026',status:'rejected'},
-  {id:5,title:'دراعة موريتانية فاخرة مطرزة',seller:'خديجة منت محمد',cat:'👗 أزياء',price:'45,000 MRU',views:112,date:'15/05/2026',status:'active'},
-];
+const ADS_DATA_ADMIN = [];
 
-const REPORTS_DATA = [
-  {id:1,ad:'إبل للبيع — صور مضللة',type:'صور مزيفة',reporter:'أحمد ولد سيدي',date:'02/06/2026',priority:'high'},
-  {id:2,ad:'هاتف iPhone مسروق',type:'منتج مشبوه',reporter:'فاطمة بنت احمد',date:'01/06/2026',priority:'high'},
-  {id:3,ad:'شقة غير موجودة',type:'احتيال',reporter:'مريم بنت داود',date:'01/06/2026',priority:'critical'},
-  {id:4,ad:'أدوية غير مرخصة',type:'محتوى محظور',reporter:'محمد الأمين',date:'31/05/2026',priority:'critical'},
-  {id:5,ad:'سيارة بسعر مشبوه',type:'سعر مضلل',reporter:'أحمد ولد سيدي',date:'30/05/2026',priority:'low'},
-];
+const REPORTS_DATA = [];
 
-const PAYMENTS_DATA = [
-  {user:'شركة المستقبل',plan:'🏢 Business',amount:'2,000 MRU',method:'تحويل بنكي',date:'01/06/2026',status:'active'},
-  {user:'محمد الأمين',plan:'🚀 Pro',amount:'500 MRU',method:'Masrvi',date:'28/05/2026',status:'active'},
-  {user:'فاطمة بنت احمد',plan:'🚀 Pro',amount:'500 MRU',method:'Masrvi',date:'15/05/2026',status:'active'},
-  {user:'أحمد ولد سيدي',plan:'🏢 Business',amount:'2,000 MRU',method:'تحويل بنكي',date:'10/05/2026',status:'expired'},
-];
+const PAYMENTS_DATA = [];
 
 // ══ LOGIN — مصادقة حقيقية عبر rizq-backend/server.js (/api/admin/*) ══
 // بدل مقارنة كلمة السر محلياً بمصفوفة JS (كانت ثغرة إفشاء بيانات اعتماد)،
@@ -3588,14 +3564,7 @@ function renderCatDist(){
 }
 
 function renderActivity(){
-  const acts=[
-    {icon:'📋',bg:'rgba(96,165,250,.1)',text:'<strong>محمد الأمين</strong> نشر إعلاناً جديداً: "شقة فاخرة 3 غرف"',time:'منذ 5 دقائق'},
-    {icon:'🚨',bg:'rgba(248,113,113,.1)',text:'<strong>بلاغ جديد</strong> على إعلان: "هاتف iPhone مسروق"',time:'منذ 12 دقيقة'},
-    {icon:'✅',bg:'rgba(74,222,128,.1)',text:'تم التحقق من حساب <strong>شركة المستقبل</strong>',time:'منذ 28 دقيقة'},
-    {icon:'💳',bg:'rgba(201,168,76,.1)',text:'<strong>أحمد ولد سيدي</strong> اشترك في باقة Pro',time:'منذ ساعة'},
-    {icon:'👤',bg:'rgba(167,139,250,.1)',text:'مستخدم جديد: <strong>فاطمة بنت إبراهيم</strong> سجّلت من نواذيبو',time:'منذ ساعتين'},
-    {icon:'🗑️',bg:'rgba(248,113,113,.1)',text:'تم حذف إعلان مخالف: "أدوية غير مرخصة"',time:'منذ 3 ساعات'},
-  ];
+  const acts=[];
   document.getElementById('activity-feed').innerHTML=acts.map(a=>`
     <div class="activity-item">
       <div class="act-icon" style="background:${a.bg}">${a.icon}</div>

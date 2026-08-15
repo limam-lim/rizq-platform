@@ -399,7 +399,7 @@ main, .page-content.active, .main-content, .results-area,
     <div style="display:flex;align-items:center;gap:10px">
       <div class="user-av">🧑‍💼</div>
       <div class="user-info">
-        <div class="user-name">محمد الأمين ولد باب</div>
+        <div class="user-name">—</div>
         <div class="user-badge">✅ موثّق</div>
         <div class="user-plan">خطة: مجانية</div>
       </div>
@@ -409,10 +409,10 @@ main, .page-content.active, .main-content, .results-area,
   <nav class="sidebar-nav">
     <div class="nav-section-title" data-t="nav-section-main">الرئيسية</div>
     <div class="nav-item active" onclick="showPanel('overview',this)"><span class="nav-icon">📊</span><span class="nav-label" data-t="overview">نظرة عامة</span></div>
-    <div class="nav-item" onclick="showPanel('my-ads',this)"><span class="nav-icon">📋</span><span class="nav-label" data-t="my-ads">إعلاناتي</span><span class="nav-badge">5</span></div>
+    <div class="nav-item" onclick="showPanel('my-ads',this)"><span class="nav-icon">📋</span><span class="nav-label" data-t="my-ads">إعلاناتي</span><span class="nav-badge" style="display:none">0</span></div>
     <div class="nav-item" onclick="showPanel('tenders',this)"><span class="nav-icon">📋</span><span class="nav-label" data-t="tenders">المناقصات</span></div>
-    <div class="nav-item" onclick="showPanel('messages',this)"><span class="nav-icon">💬</span><span class="nav-label" data-t="messages">الرسائل</span><span class="nav-badge red">3</span></div>
-    <div class="nav-item" onclick="showPanel('notifications',this)"><span class="nav-icon">🔔</span><span class="nav-label" data-t="notifications">الإشعارات</span><span class="nav-badge">7</span></div>
+    <div class="nav-item" onclick="showPanel('messages',this)"><span class="nav-icon">💬</span><span class="nav-label" data-t="messages">الرسائل</span><span class="nav-badge red" style="display:none">0</span></div>
+    <div class="nav-item" onclick="showPanel('notifications',this)"><span class="nav-icon">🔔</span><span class="nav-label" data-t="notifications">الإشعارات</span><span class="nav-badge" style="display:none">0</span></div>
     <div class="nav-item" onclick="showPanel('favorites',this)"><span class="nav-icon">♥</span><span class="nav-label" data-t="saved">المفضلة</span></div>
 
     <div class="nav-section-title" data-t="nav-section-account">الحساب</div>
@@ -604,7 +604,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="settings-grid">
         <div class="settings-card">
           <div class="settings-card-title" data-t="profile-personal-data">👤 البيانات الشخصية</div>
-          <div class="form-group"><label class="form-label" data-t="label-fullname">الاسم الكامل</label><input class="form-input-s" id="pf-name" value="محمد الأمين ولد باب"/></div>
+          <div class="form-group"><label class="form-label" data-t="label-fullname">الاسم الكامل</label><input class="form-input-s" id="pf-name" value=""/></div>
           <div class="form-group"><label class="form-label" data-t="label-email">البريد الإلكتروني</label><input class="form-input-s" id="pf-email" value="m.amin@email.com" type="email" dir="ltr"/></div>
           <div class="form-group"><label class="form-label" data-t="label-phone">رقم الهاتف</label><input class="form-input-s" id="pf-phone" value="22 34 56 78" dir="ltr"/></div>
           <div class="form-group"><label class="form-label" data-t="label-city">المدينة / الولاية</label><input class="form-input-s" id="pf-city" value="نواكشوط الغربية"/></div>
@@ -781,13 +781,7 @@ const ICON_SVG = {
 function iconHTML(emoji){ return ICON_SVG[emoji] || emoji; }
 
 // ── DATA ──
-const DEMO_ADS = [
-  {id:1,emoji:'🏠',cat:'🏠 عقارات',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',price:'150,000 MRU/شهر',status:'active',views:1247,contacts:48,date:'01/06/2026'},
-  {id:2,emoji:'🚗',cat:'🚗 سيارات',title:'Toyota Hilux 2022 بحالة ممتازة',price:'8,000,000 MRU',status:'active',views:892,contacts:31,date:'28/05/2026'},
-  {id:3,emoji:'📱',cat:'📱 إلكترونيات',title:'iPhone 15 Pro Max 256GB جديد',price:'380,000 MRU',status:'pending',views:234,contacts:12,date:'25/05/2026'},
-  {id:4,emoji:'🐪',cat:'🐄 ماشية',title:'إبل للبيع — 5 رؤوس أصيلة',price:'1,200,000 MRU',status:'expired',views:678,contacts:22,date:'01/05/2026'},
-  {id:5,emoji:'👗',cat:'👗 أزياء',title:'دراعة موريتانية فاخرة مطرزة',price:'45,000 MRU',status:'active',views:445,contacts:18,date:'20/05/2026'},
-];
+const DEMO_ADS = [];
 
 // ── تحويل إعلان خام (محلي أو من الخادم) لشكل عرض لوحة "إعلاناتي" ──
 function _mapRawAdToDashboard(a){
@@ -1526,7 +1520,7 @@ function confirmDeleteAccount(){
 const params = new URLSearchParams(window.location.search);
 const SESSION_ID = params.get('id') || '';
 const SESSION_TOKEN = params.get('token') || '';
-const IS_DEMO = params.get('demo') === '1' || !params.toString();
+const IS_DEMO = params.get('demo') === '1';
 
 function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -1621,11 +1615,7 @@ function renderMyTenders(){
 }
 function escapeAttr(s){ if(!s) return ''; return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-const DEMO_ACCOUNT = {
-  id:'DEMO_001', token:'DEMO', status:'approved', type:'individual',
-  name:'محمد الأمين ولد باب', phone:'+222 22 34 56 78', email:'m.amin@email.com',
-  city:'نواكشوط الغربية', trial_ends: new Date(Date.now()+2*86400000).toISOString()
-};
+const DEMO_ACCOUNT = { id: "demo", name: "", phone: "", email: "", wilaya: "" };
 
 let USER_ACC = null;
 

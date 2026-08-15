@@ -645,12 +645,7 @@ Conditions de location :
     <!-- Similar ads -->
     <div class="section-block">
       <div class="section-block-title" data-fr="🔍 Annonces similaires">🔍 إعلانات مشابهة</div>
-      <div class="similar-grid">
-        <a href="rizq_listing.html" class="sim-card"><div class="sim-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></div><div class="sim-body"><div class="sim-title" data-fr="Appartement 2 chambres — quartier Tevragh Zeina">شقة 2 غرف — حي تفرغ زينة</div><div class="sim-price" data-fr="80 000 MRU/mois">80,000 MRU/شهر</div><div class="sim-loc" data-fr="📍 Nouakchott Nord">📍 نواكشوط الشمالية</div></div></a>
-        <a href="rizq_listing.html" class="sim-card"><div class="sim-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-9"/><circle cx="18.5" cy="6.5" r="1.6"/></svg></div><div class="sim-body"><div class="sim-title" data-fr="Appartement chic avec jardin — quartier Sadia">شقة راقية مع حديقة — حي الصداقة</div><div class="sim-price" data-fr="220 000 MRU/mois">220,000 MRU/شهر</div><div class="sim-loc" data-fr="📍 Nouakchott Sud">📍 نواكشوط الجنوبية</div></div></a>
-        <a href="rizq_listing.html" class="sim-card"><div class="sim-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7"/><path d="M3 15h18"/><path d="M7 11V8a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3"/><path d="M3 18v2M21 18v2"/></svg></div><div class="sim-body"><div class="sim-title" data-fr="Studio meublé — centre-ville">استوديو مؤثث — وسط المدينة</div><div class="sim-price" data-fr="35 000 MRU/mois">35,000 MRU/شهر</div><div class="sim-loc" data-fr="📍 Nouakchott">📍 نواكشوط</div></div></a>
-        <a href="rizq_listing.html" class="sim-card"><div class="sim-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M3 11c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/></svg></div><div class="sim-body"><div class="sim-title" data-fr="Appartement 4 chambres — quartier du Port">شقة 4 غرف — حي الميناء</div><div class="sim-price" data-fr="380 000 MRU/mois">380,000 MRU/شهر</div><div class="sim-loc" data-fr="📍 Nouadhibou">📍 نواذيبو</div></div></a>
-      </div>
+      <div class="similar-grid"></div>
     </div>
 
   </div><!-- end col-main -->
@@ -667,7 +662,7 @@ Conditions de location :
           <div class="seller-av">🏠</div>
           <div style="flex:1">
             <a href="rizq_profile.html" style="text-decoration:none">
-              <div class="seller-name">محمد الأمين ولد باب</div>
+              <div class="seller-name">—</div>
             </a>
             <div class="seller-badge" data-fr="✅ Vendeur vérifié">✅ بائع موثّق</div>
             <div class="stars">
@@ -787,35 +782,7 @@ const ICON_SVG = {
 function iconHTML(emoji){ return ICON_SVG[emoji] || emoji; }
 
 // ══ URL PARAMS — تحميل بيانات الإعلان من الـ URL ══
-const ALL_ADS_DATA = [
-  {id:1, title:'شقة فاخرة 3 غرف — نواكشوط الغربية', price:'150,000 MRU/شهر', loc:'نواكشوط الغربية', seller:'محمد الأمين', phone:'+22234567800', emoji:'🏠', desc:'شقة فاخرة للكراء في أرقى أحياء نواكشوط الغربية. تشطيب عالي الجودة، تكييف مركزي، إطلالة بانورامية، موقف سيارات، حراسة 24/7. مساحة 120م²، الطابق الخامس.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:2, title:'شقة 2 غرف — حي تفرغ زينة', price:'80,000 MRU/شهر', loc:'نواكشوط الشمالية', seller:'فاطمة بنت احمد', phone:'+22234567801', emoji:'🏠', desc:'شقة مريحة في حي هادئ، قريبة من المدارس والمستشفيات، مفروشة بالكامل.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:3, title:'شقة راقية مع حديقة — حي الصداقة', price:'220,000 MRU/شهر', loc:'نواكشوط الجنوبية', seller:'شركة العقارات الذهبية', phone:'+22234567802', emoji:'🏡', desc:'الطابق الأرضي، حديقة خاصة، مطبخ مجهز، 3 حمامات، مساحة 200م².', cat:'عقارات', subcat:'شقق للكراء', verified:false},
-  {id:4, title:'استوديو مؤثث — وسط المدينة', price:'35,000 MRU/شهر', loc:'نواكشوط', seller:'خديجة منت محمد', phone:'+22234567803', emoji:'🛏️', desc:'مثالي للطلاب والعزاب، قريب من الجامعة، إنترنت مجاني، مجهز بالكامل.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:5, title:'شقة 4 غرف فاخرة — حي الميناء', price:'380,000 MRU/شهر', loc:'نواذيبو', seller:'عقارات نواذيبو', phone:'+22234567804', emoji:'🌊', desc:'مساحة واسعة، إطلالة على البحر، تشطيب أوروبي راقٍ.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:6, title:'غرفة مستقلة مع مدخل خاص', price:'25,000 MRU/شهر', loc:'نواكشوط', seller:'أحمد ولد سيدي', phone:'+22234567805', emoji:'🚪', desc:'هادئة، حمام خاص، إنترنت واي فاي، مطبخ مشترك نظيف.', cat:'عقارات', subcat:'غرف للكراء', verified:false},
-  {id:7, title:'شقة جديدة 3 غرف — حي السبخة', price:'120,000 MRU/شهر', loc:'نواكشوط الغربية', seller:'مجموعة الإعمار', phone:'+22234567806', emoji:'🏗️', desc:'لم تُسكن من قبل، تشطيب ممتاز، بناء 2025.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:8, title:'شقة 2 غرف — حي كيبه', price:'65,000 MRU/شهر', loc:'نواكشوط', seller:'محمد محمود', phone:'+22234567807', emoji:'🏠', desc:'سعر مناسب، قريبة من السوق، حراسة ليلية.', cat:'عقارات', subcat:'شقق للكراء', verified:false},
-  {id:9, title:'بنتهاوس فاخر 5 غرف — أعلى برج', price:'650,000 MRU/شهر', loc:'نواكشوط الغربية', seller:'شركة الفخامة العقارية', phone:'+22234567808', emoji:'🌇', desc:'المنظر الأجمل في نواكشوط، مسبح خاص، جراج ثلاثي.', cat:'عقارات', subcat:'شقق للكراء', verified:true},
-  {id:10, title:'تويوتا كامري 2021 — فل أوبشن', price:'1,850,000 MRU', loc:'نواكشوط الغربية', seller:'محمد سالم', phone:'+22234567809', emoji:'🚗', desc:'حالة الوكالة، صيانة دورية، فتحة سقف، جلد طبيعي.', cat:'سيارات', subcat:'سيارات للبيع', verified:true},
-  {id:11, title:'هيونداي توسان 2022 — كراء يومي وأسبوعي', price:'12,000 MRU/يوم', loc:'نواكشوط', seller:'وكالة النجمة لتأجير السيارات', phone:'+22234567810', emoji:'🚗', desc:'تكييف، نظيفة جداً، تسليم بالمدينة.', cat:'سيارات', subcat:'سيارات للكراء', verified:true},
-  {id:12, title:'شاحنة مرسيدس أكتروس — حمولة 20 طن', price:'9,500,000 MRU', loc:'نواذيبو', seller:'شركة النقل الثقيل', phone:'+22234567811', emoji:'🚛', desc:'محرك بحالة ممتازة، فحص كامل متاح.', cat:'شاحنات', subcat:'شاحنات للبيع', verified:true},
-  {id:13, title:'حفارة كاتربيلر مستعملة — حالة جيدة', price:'4,200,000 MRU', loc:'نواكشوط', seller:'معدات الإعمار', phone:'+22234567812', emoji:'🏗️', desc:'جاهزة للعمل فوراً، صيانة موثقة.', cat:'شاحنات', subcat:'معدات بناء', verified:false},
-  {id:14, title:'آيفون 15 برو ماكس — جديد بالكرتون', price:'620,000 MRU', loc:'نواكشوط', seller:'متجر التقنية الحديثة', phone:'+22234567813', emoji:'📱', desc:'256GB، ضمان وكيل، لم يُستخدم.', cat:'إلكترونيات', subcat:'هواتف ذكية', verified:true},
-  {id:15, title:'لابتوب Dell XPS 15 — استخدام خفيف', price:'480,000 MRU', loc:'نواكشوط الشمالية', seller:'سيدي محمد', phone:'+22234567814', emoji:'💻', desc:'معالج i7، رام 16GB، شاشة 4K.', cat:'إلكترونيات', subcat:'لابتوب وحاسوب', verified:false},
-  {id:16, title:'دراعة موريتانية فاخرة — تطريز يدوي', price:'45,000 MRU', loc:'نواكشوط', seller:'بوتيك التراث', phone:'+22234567815', emoji:'👗', desc:'قماش فاخر، خياطة تقليدية أصلية.', cat:'أزياء', subcat:'دراعة رجالية', verified:true},
-  {id:17, title:'ملحفة حرير صناعي — ألوان متعددة', price:'18,000 MRU', loc:'نواكشوط الجنوبية', seller:'خديجة منت إبراهيم', phone:'+22234567816', emoji:'👗', desc:'خامة فاخرة، تشكيلة واسعة من الألوان.', cat:'أزياء', subcat:'ملحفة نسائية', verified:true},
-  {id:18, title:'سبيكة ذهب عيار 24 — 50 غرام', price:'2,650,000 MRU', loc:'نواكشوط', seller:'صائغ الأمانة', phone:'+22234567817', emoji:'💰', desc:'مضمونة بشهادة وزن وعيار رسمية.', cat:'ذهب', subcat:'ذهب عيار 24', verified:true},
-  {id:19, title:'طقم أساور ذهب تقليدي موريتاني', price:'890,000 MRU', loc:'نواكشوط الغربية', seller:'دار الذهب الموريتاني', phone:'+22234567818', emoji:'💍', desc:'صناعة يدوية، عيار 21، تصميم أصيل.', cat:'ذهب', subcat:'أساور وخلاخيل', verified:true},
-  {id:20, title:'ناقة حلوب — إنتاج وفير', price:'650,000 MRU', loc:'أطار', seller:'سيداتي ولد الشيخ', phone:'+22234567819', emoji:'🐪', desc:'صحة جيدة، تدر حليباً يومياً بكميات وفيرة.', cat:'ماشية', subcat:'إبل', verified:true},
-  {id:21, title:'قطيع أغنام للبيع — 15 رأس', price:'1,200,000 MRU', loc:'كيفة', seller:'أحمدو ولد محمد', phone:'+22234567820', emoji:'🐑', desc:'سلالة محلية قوية، جاهزة للعيد والذبح.', cat:'ماشية', subcat:'غنم وماعز', verified:false},
-  {id:22, title:'تصميم مواقع وتطبيقات — مطور محترف', price:'تفاوض', loc:'نواكشوط', seller:'استوديو الإبداع التقني', phone:'+22234567821', emoji:'🔧', desc:'تطوير متكامل، تصميم عصري، أسعار تنافسية.', cat:'خدمات', subcat:'تصميم وبرمجة', verified:true},
-  {id:23, title:'فريق بناء ومقاولات — خبرة 10 سنوات', price:'تفاوض', loc:'نواكشوط الشمالية', seller:'مؤسسة البنيان', phone:'+22234567822', emoji:'🧱', desc:'بناء، دهان، سباكة، تشطيبات بجودة عالية.', cat:'خدمات', subcat:'بناء ودهان وسباكة', verified:true},
-  {id:24, title:'مطلوب مهندس صيانة — شركة صناعية', price:'راتب يحدد عند المقابلة', loc:'نواكشوط', seller:'مجموعة الصناعات الموريتانية', phone:'+22234567823', emoji:'💼', desc:'خبرة لا تقل عن 3 سنوات، راتب مجزٍ + تأمين.', cat:'وظائف', subcat:'هندسة وتقنية', verified:true},
-  {id:25, title:'مطلوب مسؤول تسويق رقمي', price:'راتب يحدد عند المقابلة', loc:'نواكشوط الغربية', seller:'شركة التسويق الرقمي', phone:'+22234567824', emoji:'💼', desc:'إدارة حملات إعلانية ووسائل التواصل الاجتماعي.', cat:'وظائف', subcat:'إدارة وتسويق', verified:false},
-  {id:26, title:'حديد تسليح وأسمنت — أسعار الجملة', price:'يبدأ من 4,500 MRU/طن', loc:'نواكشوط', seller:'مواد البناء الحديثة', phone:'+22234567825', emoji:'🧱', desc:'توريد مباشر من المصنع، جودة مضمونة.', cat:'بناء', subcat:'أسمنت وحديد', verified:true},
-  {id:27, title:'ألواح طاقة شمسية — تركيب وصيانة', price:'تفاوض', loc:'نواذيبو', seller:'الطاقة الخضراء موريتانيا', phone:'+22234567826', emoji:'🔆', desc:'حلول طاقة متكاملة للمنازل والشركات.', cat:'بناء', subcat:'ألواح شمسية', verified:true},
-];
+const ALL_ADS_DATA = [];
 
 // ── تحويل إعلان خام (محلي أو من الخادم) لشكل عرض صفحة التفاصيل ──
 // استُخرجت لدالة مشتركة حتى تُستخدَم أيضاً مع الإعلان القادم من
@@ -1074,7 +1041,12 @@ function renderLocAndStats(ad){
 (async function loadAdFromURL(){
   const params = new URLSearchParams(window.location.search);
   const rawId = params.get('id');
-  if(!rawId) return;
+  if(!rawId){
+    document.title = (_rizqLang()==='fr' ? 'Annonce | Rizq' : 'إعلان | رزق');
+    const grid = document.querySelector('.similar-grid');
+    if(grid) grid.innerHTML='';
+    return;
+  }
   const numId = parseInt(rawId);
   let ad = loadActiveAdFromHandoff(numId) || ALL_ADS_DATA.find(a => a.id === numId) || loadRealAdById(rawId);
   // لم يُعثَر عليه محلياً إطلاقاً — قد يكون الزائر فتح رابط إعلان نُشر من
@@ -1336,19 +1308,19 @@ function revealPhone(){
   const reveal = document.getElementById('phone-reveal');
   const num = document.getElementById('phone-num');
   reveal.classList.add('shown');
-  var phone = (window._currentAd && window._currentAd.phone) || '+22234567800';
+  var phone = (window._currentAd && window._currentAd.phone) || '';
   num.textContent = phone.replace('+222','').trim();
   document.querySelector('.phone-hint').textContent = _rizqLang()==='fr' ? '📞 Appuyer pour appeler' : '📞 اضغط للاتصال';
   reveal.onclick = ()=>{ window.location='tel:'+phone; };
 }
 
 function callNow(){
-  var phone = (window._currentAd && window._currentAd.phone) || '+22234567800';
+  var phone = (window._currentAd && window._currentAd.phone) || '';
   window.location = 'tel:' + phone;
 }
 
 function openWhatsApp(){
-  var phone = (window._currentAd && window._currentAd.phone) || '+22234567800';
+  var phone = (window._currentAd && window._currentAd.phone) || '';
   var clean = phone.replace(/[^0-9]/g,'');
   if(!clean.startsWith('222')) clean = '222' + clean;
   window.open('https://wa.me/' + clean + '?text=' + encodeURIComponent('مرحباً، رأيت إعلانك على منصة رزق وأود الاستفسار'), '_blank');

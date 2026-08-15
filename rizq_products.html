@@ -513,16 +513,7 @@ main, .page-content.active, .main-content, .results-area,
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 const CAT_FR={'ملابس':'Vêtements','أحذية':'Chaussures','إكسسوار':'Accessoires','أطفال':'Enfants'};
 
-const allProducts = [
-  {id:1,name:'قميص كتان فاخر',nameF:'Chemise en lin premium',cat:'ملابس',emoji:'👕',price:2800,oldPrice:3500,discount:true,isNew:false,desc:'قميص مصنوع من أفخر أنواع الكتان الطبيعي. مريح ومناسب للمناسبات الرسمية وغير الرسمية.',descF:'Chemise confectionnée dans le lin naturel le plus fin. Confortable et adaptée aux occasions formelles comme informelles.'},
-  {id:2,name:'فستان عباية فضي',nameF:'Abaya argentée élégante',cat:'ملابس',emoji:'👗',price:4200,oldPrice:null,discount:false,isNew:true,desc:'عباية راقية بتصميم عصري وقماش عالي الجودة. متوفرة بعدة مقاسات.',descF:'Abaya élégante au design moderne et au tissu haut de gamme. Disponible en plusieurs tailles.'},
-  {id:3,name:'حذاء جلدي كلاسيك',nameF:'Chaussures cuir classiques',cat:'أحذية',emoji:'👞',price:3500,oldPrice:4200,discount:true,isNew:false,desc:'حذاء مصنوع من الجلد الطبيعي الأصيل. ملمس ناعم ومتانة عالية.',descF:'Chaussures fabriquées en cuir véritable. Toucher doux et grande durabilité.'},
-  {id:4,name:'سنادل صيفية راقية',nameF:'Sandales d\'été élégantes',cat:'أحذية',emoji:'👡',price:1800,oldPrice:null,discount:false,isNew:true,desc:'سنادل خفيفة وأنيقة مناسبة لفصل الصيف. مريحة للاستخدام اليومي.',descF:'Sandales légères et élégantes, idéales pour l\'été. Confortables pour un usage quotidien.'},
-  {id:5,name:'ساعة ذهبية أناقة',nameF:'Montre dorée de luxe',cat:'إكسسوار',emoji:'⌚',price:8500,oldPrice:null,discount:false,isNew:true,desc:'ساعة فاخرة بإطار ذهبي اللون. عقارب دقيقة وزجاج مقاوم للخدش.',descF:'Montre de luxe au cadran doré. Aiguilles précises et verre résistant aux rayures.'},
-  {id:6,name:'حقيبة يد نسائية',nameF:'Sac à main femme',cat:'إكسسوار',emoji:'👜',price:5200,oldPrice:6000,discount:true,isNew:false,desc:'حقيبة يد أنيقة بتصميم عصري. مصنوعة من الجلد الصناعي عالي الجودة.',descF:'Sac à main élégant au design moderne. Fabriqué en similicuir haut de gamme.'},
-  {id:7,name:'بدلة أطفال رسمية',nameF:'Costume enfant formel',cat:'أطفال',emoji:'🧒',price:2200,oldPrice:null,discount:false,isNew:true,desc:'بدلة رسمية للأطفال من سن 3-10 سنوات. قماش ناعم وتصميم أنيق.',descF:'Costume formel pour enfants de 3 à 10 ans. Tissu doux et design élégant.'},
-  {id:8,name:'لعبة خشبية تعليمية',nameF:'Jouet éducatif en bois',cat:'أطفال',emoji:'🧸',price:1500,oldPrice:null,discount:false,isNew:false,desc:'لعبة تعليمية خشبية آمنة للأطفال. تنمي مهارات التفكير والإبداع.',descF:'Jouet éducatif en bois, sûr pour les enfants. Développe la réflexion et la créativité.'},
-];
+const allProducts = [];
 
 // السلة تُحفظ فعلياً في localStorage (مفتاح rizq_cart) لتبقى متزامنة مع rizq_cart.html
 function loadCart(){
@@ -714,7 +705,7 @@ function openModal(id) {
       </div>
       <button class="modal-add-btn" onclick="addModalToCart(${p.id})">🛒 ${ar?'أضف للسلة':'Ajouter au panier'}</button>
       <div style="margin-top:10px;text-align:center">
-        <a href="https://wa.me/22244556677?text=${ar?encodeURIComponent('أريد الاستفسار عن '+p.name):encodeURIComponent('Je voudrais des renseignements sur '+(p.nameF||p.name))}"
+        <a href="#"
            target="_blank" rel="noopener"
            onclick="return rizqGateLink(this,event,'reasonWhatsapp')"
            style="font-size:13px;color:#25D366;font-weight:600;text-decoration:none">

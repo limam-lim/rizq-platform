@@ -951,32 +951,16 @@ textarea.form-input{resize:vertical;min-height:90px}
 const params = new URLSearchParams(window.location.search);
 const SESSION_ID = params.get('id') || '';
 const SESSION_TOKEN = params.get('token') || '';
-const IS_DEMO = params.get('demo') === '1' || !params.toString();
+const IS_DEMO = params.get('demo') === '1';
 
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escapeAttr(s){if(!s)return'';return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-const DEMO_ACCOUNT = {
-  id:'DEMO_001', token:'DEMO', status:'approved', type:'store',
-  name:'محل الأمانة للإلكترونيات', owner:'محمد ولد أحمد',
-  phone:'+222 22 11 33 44', email:'amanah@gmail.com', city:'نواكشوط',
-  address:'حي تفرغ زينة، بجانب سوق العصر', whatsapp:'https://wa.me/22222113344',
-  desc:'نقدم أحدث الأجهزة الإلكترونية بأسعار تنافسية — موبايلات، لابتوبات، إكسسوارات',
-  trial_ends: new Date(Date.now()+2*86400000).toISOString()
-};
+const DEMO_ACCOUNT = { id: "demo", name: "", phone: "", email: "", wilaya: "", type: "store" };
 
-const DEMO_PRODUCTS = [
-  {name:'آيفون 15 برو',price:185000,desc:'128GB جديد مضمون',stock:3,status:'available',emoji:'📱'},
-  {name:'لابتوب لينوفو',price:120000,desc:'Core i5 - 8GB RAM',stock:1,status:'limited',emoji:'💻'},
-  {name:'سماعة JBL',price:18000,desc:'بلوتوث ضد الماء',stock:8,status:'available',emoji:'🎧'},
-  {name:'شاشة سامسونج 27"',price:65000,desc:'4K Full HD',stock:0,status:'out',emoji:'🖥️'},
-];
+const DEMO_PRODUCTS = [];
 
-const DEMO_MESSAGES = [
-  {name:'أحمد سالم',text:'هل لديكم آيفون 14 بالأسود؟',phone:'22233445566',time:'منذ ساعتين',read:false},
-  {name:'فاطمة',text:'ما هو سعر اللابتوب الأخير؟',phone:'22244556677',time:'أمس',read:true},
-  {name:'محمد',text:'أريد الاستفسار عن الضمان',phone:'',time:'منذ 3 أيام',read:true},
-];
+const DEMO_MESSAGES = [];
 
 function verifyAccess(){
   if(IS_DEMO) return DEMO_ACCOUNT;
@@ -3002,10 +2986,7 @@ document.getElementById('pay-modal') && document.getElementById('pay-modal').add
 // ══ MY PAYMENT METHODS ══
 function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof OFFICE_ACC!=='undefined'&&OFFICE_ACC)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{}; return 'rizq_my_payments_'+(acc.id||'demo'); }
 
-var DEMO_PAYMENTS=[
-  {type:'bankily',bank:'بنكيلي',code:'22 XX XX XX XX',note:'أرسل المبلغ ثم أرسل لنا صورة التأكيد'},
-  {type:'sedad',bank:'سداد',code:'MR12345678',note:'استخدم رمز المعاملة عند التأكيد'}
-];
+var DEMO_PAYMENTS=[];
 function getMyPayments(){
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }

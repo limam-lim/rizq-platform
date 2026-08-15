@@ -12,14 +12,14 @@
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
 <meta charset="UTF-8"/>
-<meta name="description" content="صفحة البائع محمد الأمين — 23 إعلان، تقييم 4.0/5، موثّق على منصة رزق"/>
-<meta property="og:title" content="محمد الأمين — بائع موثّق | رزق"/>
-<meta property="og:description" content="صفحة البائع محمد الأمين — 23 إعلان، تقييم 4.0/5، موثّق على منصة رزق"/>
+<meta name="description" content="صفحة البائع على منصة رزق"/>
+<meta property="og:title" content="صفحة البائع | رزق"/>
+<meta property="og:description" content="صفحة البائع على منصة رزق"/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>محمد الأمين — بائع موثّق | رزق</title><style>
+<title>صفحة البائع | رزق</title><style>
 :root{--royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--gold:#C9A84C;--gold-light:#e8c96a;--gold-dk:#a07820;--white:#fff;--dark:#0D1B2A;--dark-2:#111d2e;--dark-3:#162235;--text-muted:#2C3A4F;--text-soft:#243044;--green:#16a34a;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI','Arial',sans-serif;background:#f8faff;color:#1a2535;overflow-x:hidden}
@@ -354,7 +354,7 @@ main, .page-content.active, .main-content, .results-area,
   <div class="hero-inner">
     <div class="profile-av">🧑‍💼</div>
     <div class="profile-info">
-      <h1 class="profile-name" id="pf-name" data-fr="Mohamed El Amine Ould Babou">محمد الأمين ولد باب</h1>
+      <h1 class="profile-name" id="pf-name" data-fr="Seller profile">—</h1>
       <div class="profile-badges">
         <span class="pb pb-verified" id="pf-badge-verified" data-fr="✅ Vendeur vérifié">✅ بائع موثّق</span>
         <span class="pb pb-top" id="pf-badge-premium" data-fr="⭐ Vendeur premium">⭐ بائع مميز</span>
@@ -367,10 +367,10 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
     <div class="profile-stats">
-      <div class="ps"><div class="ps-num" id="pf-stat-ads">23</div><div class="ps-lbl" data-fr="Annonce">إعلان</div></div>
-      <div class="ps"><div class="ps-num" id="pf-stat-reviews">48</div><div class="ps-lbl" data-fr="Avis">تقييم</div></div>
-      <div class="ps"><div class="ps-num" id="pf-stat-rating">4.0</div><div class="ps-lbl" data-fr="Note">التقييم</div></div>
-      <div class="ps"><div class="ps-num" id="pf-stat-views">12K+</div><div class="ps-lbl" data-fr="Vues">مشاهدة</div></div>
+      <div class="ps"><div class="ps-num" id="pf-stat-ads">0</div><div class="ps-lbl" data-fr="Annonce">إعلان</div></div>
+      <div class="ps"><div class="ps-num" id="pf-stat-reviews">0</div><div class="ps-lbl" data-fr="Avis">تقييم</div></div>
+      <div class="ps"><div class="ps-num" id="pf-stat-rating">—</div><div class="ps-lbl" data-fr="Note">التقييم</div></div>
+      <div class="ps"><div class="ps-num" id="pf-stat-views">0</div><div class="ps-lbl" data-fr="Vues">مشاهدة</div></div>
     </div>
   </div>
 </div>
@@ -381,20 +381,14 @@ main, .page-content.active, .main-content, .results-area,
   <!-- LEFT: ADS -->
   <div>
     <div class="sec-header">
-      <div class="sec-title" id="pf-sec-title" data-fr="Annonces du vendeur (23)">إعلانات البائع (23)</div>
+      <div class="sec-title" id="pf-sec-title" data-fr="Seller listings (0)">إعلانات البائع (0)</div>
       <select class="sort-sel">
         <option data-fr="Plus récent">الأحدث</option>
         <option data-fr="Prix : croissant">السعر: الأرخص</option>
         <option data-fr="Plus consulté">الأكثر مشاهدة</option>
       </select>
     </div>
-    <div class="cat-filters" id="pf-cat-filters">
-      <button class="cf-btn active" onclick="filterCat('all',this)" data-fr="Tout (23)">الكل (23)</button>
-      <button class="cf-btn" onclick="filterCat('عقارات',this)" data-fr="🏠 Immobilier (8)">🏠 عقارات (8)</button>
-      <button class="cf-btn" onclick="filterCat('سيارات',this)" data-fr="🚗 Véhicules (5)">🚗 سيارات (5)</button>
-      <button class="cf-btn" onclick="filterCat('إلكترونيات',this)" data-fr="📱 Électronique (4)">📱 إلكترونيات (4)</button>
-      <button class="cf-btn" onclick="filterCat('أخرى',this)" data-fr="Autre (6)">أخرى (6)</button>
-    </div>
+    <div class="cat-filters" id="pf-cat-filters" style="display:none"></div>
     <div class="ads-grid" id="ads-grid"></div>
     <div style="text-align:center;margin-top:24px">
       <button onclick="showToast(window._tFr?'📋 Toutes les annonces sont affichées':'📋 جميع الإعلانات معروضة')" style="padding:12px 32px;background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--gold);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s" onmouseover="this.style.background='rgba(201,168,76,.08)'" onmouseout="this.style.background='transparent'" data-fr="Charger plus ↓">تحميل المزيد ↓</button>
@@ -408,7 +402,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="contact-card" style="margin-bottom:16px">
       <div style="text-align:center;margin-bottom:16px">
         <div style="font-size:40px;margin-bottom:8px">🧑‍💼</div>
-        <div style="font-size:15px;font-weight:700" id="pf-sidebar-name" data-fr="Mohamed El Amine Ould Babou">محمد الأمين ولد باب</div>
+        <div style="font-size:15px;font-weight:700" id="pf-sidebar-name" data-fr="Seller profile">—</div>
         <div style="font-size:12px;color:var(--green);margin-top:3px" data-fr="✅ Vérifié — répond rapidement">✅ موثّق — يرد سريعاً</div>
       </div>
       <button class="btn-contact" id="btn-rizq-msg" onclick="openRizqProfileChat()" data-fr="✉️ Message sécurisé Rizq">✉️ مراسلة آمنة عبر رزق</button>
@@ -424,42 +418,13 @@ main, .page-content.active, .main-content, .results-area,
     <!-- Ratings -->
     <div class="side-card" id="pf-ratings-card">
       <div class="side-title" data-fr="⭐ Évaluations">⭐ التقييمات</div>
-      <div class="stars-row">
-        <div class="rating-num">4.0</div>
-        <div>
-          <div style="display:flex;gap:3px">
-            <span class="star on">★</span><span class="star on">★</span><span class="star on">★</span><span class="star on">★</span><span class="star">★</span>
-          </div>
-          <div class="rating-count" data-fr="48 avis">من 48 تقييم</div>
-        </div>
-      </div>
-      <div>
-        <div class="rating-bar-row"><span class="rating-label">5</span><div class="rating-bar"><div class="rating-fill" style="width:65%"></div></div><span class="rating-cnt">31</span></div>
-        <div class="rating-bar-row"><span class="rating-label">4</span><div class="rating-bar"><div class="rating-fill" style="width:20%"></div></div><span class="rating-cnt">10</span></div>
-        <div class="rating-bar-row"><span class="rating-label">3</span><div class="rating-bar"><div class="rating-fill" style="width:8%"></div></div><span class="rating-cnt">4</span></div>
-        <div class="rating-bar-row"><span class="rating-label">2</span><div class="rating-bar"><div class="rating-fill" style="width:4%"></div></div><span class="rating-cnt">2</span></div>
-        <div class="rating-bar-row"><span class="rating-label">1</span><div class="rating-bar"><div class="rating-fill" style="width:2%"></div></div><span class="rating-cnt">1</span></div>
-      </div>
+      <p style="font-size:13px;color:var(--text-muted);padding:8px 0">لا توجد تقييمات بعد</p>
     </div>
 
     <!-- Reviews -->
     <div class="side-card" id="pf-reviews-card">
       <div class="side-title" data-fr="💬 Avis des acheteurs">💬 آراء المشترين</div>
-      <div class="review">
-        <div class="review-header"><div class="review-av">👩</div><div><div class="review-name" data-fr="Khadija Mint Mohamed">خديجة منت محمد</div><div style="display:flex;gap:2px;margin-top:2px"><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span></div></div><div style="margin-right:auto"><div class="review-date" data-fr="Il y a une semaine">منذ أسبوع</div></div></div>
-        <div class="review-text" data-fr="Excellent vendeur, honnête. L'appartement était exactement comme décrit. Communication rapide et respectueuse. Je recommande.">بائع ممتاز وأمين، الشقة كما وُصفت تماماً. تواصل سريع ومحترم. أنصح بالتعامل معه.</div>
-      </div>
-      <div class="review">
-        <div class="review-header"><div class="review-av">👨</div><div><div class="review-name" data-fr="Ahmed Ould Sidi">أحمد ولد سيدي</div><div style="display:flex;gap:2px;margin-top:2px"><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star">★</span></div></div><div style="margin-right:auto"><div class="review-date" data-fr="Il y a un mois">منذ شهر</div></div></div>
-        <div class="review-text" data-fr="Voiture en excellent état comme il l'avait dit. Le prix était raisonnable. Merci.">سيارة بحالة ممتازة كما قال. السعر كان منطقياً. شكراً لك.</div>
-      </div>
-      <div class="review">
-        <div class="review-header"><div class="review-av">🧔</div><div><div class="review-name" data-fr="Mahmoud Ould Cheikh">محمود ولد الشيخ</div><div style="display:flex;gap:2px;margin-top:2px"><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span><span class="review-star on">★</span></div></div><div style="margin-right:auto"><div class="review-date" data-fr="Il y a deux mois">منذ شهرين</div></div></div>
-        <div class="review-text" data-fr="Échange de qualité, produit conforme à la description. Une personne de confiance.">تعامل راقٍ، منتج كما هو موصوف. شخص يُوثق به.</div>
-      </div>
-      <div style="text-align:center;margin-top:14px">
-        <button onclick="showToast(window._tFr?'⭐ Tous les avis sont affichés ci-dessous':'⭐ جميع التقييمات معروضة أدناه')" style="font-size:12.5px;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif" data-fr="Voir tous les avis (48) ←">عرض جميع التقييمات (48) ←</button>
-      </div>
+      <p style="font-size:13px;color:var(--text-muted);padding:8px 0">لا توجد مراجعات بعد</p>
     </div>
 
   </div>
@@ -477,14 +442,7 @@ const ICON_SVG = {
 };
 function iconHTML(emoji){ return ICON_SVG[emoji] || emoji; }
 
-const ADS=[
-  {emoji:'🏠',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🏠 عقارات',catFr:'🏠 Immobilier',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appartement de luxe 3 pièces — Nouakchott Ouest',price:'150,000 MRU/شهر',priceFr:'150 000 MRU/mois',loc:'📍 نواكشوط',locFr:'📍 Nouakchott',pin:true},
-  {emoji:'🚗',bg:'linear-gradient(135deg,#234d8f,#1B3A6B)',cat:'🚗 سيارات',catFr:'🚗 Véhicules',title:'Toyota Hilux 2022 بحالة ممتازة',titleFr:'Toyota Hilux 2022 en excellent état',price:'8,000,000 MRU',priceFr:'8 000 000 MRU',loc:'📍 نواذيبو',locFr:'📍 Nouadhibou'},
-  {emoji:'📱',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'📱 إلكترونيات',catFr:'📱 Électronique',title:'iPhone 15 Pro Max 256GB جديد',titleFr:'iPhone 15 Pro Max 256 Go neuf',price:'380,000 MRU',priceFr:'380 000 MRU',loc:'📍 نواكشوط',locFr:'📍 Nouakchott'},
-  {emoji:'🏠',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'🏠 عقارات',catFr:'🏠 Immobilier',title:'أرض للبيع — نواذيبو',titleFr:'Terrain à vendre — Nouadhibou',price:'4,500,000 MRU',priceFr:'4 500 000 MRU',loc:'📍 نواذيبو',locFr:'📍 Nouadhibou'},
-  {emoji:'👗',bg:'linear-gradient(135deg,#1B3A6B,#162235)',cat:'👗 أزياء',catFr:'👗 Mode',title:'دراعة موريتانية فاخرة مطرزة',titleFr:'Daraa mauritanienne de luxe brodée',price:'45,000 MRU',priceFr:'45 000 MRU',loc:'📍 نواكشوط',locFr:'📍 Nouakchott'},
-  {emoji:'🚗',bg:'linear-gradient(135deg,#0f2347,#1B3A6B)',cat:'🚗 سيارات',catFr:'🚗 Véhicules',title:'نيسان باترول 2019 للبيع',titleFr:'Nissan Patrol 2019 à vendre',price:'12,000,000 MRU',priceFr:'12 000 000 MRU',loc:'📍 نواكشوط',locFr:'📍 Nouakchott'},
-];
+const ADS=[];
 
 function renderAds(list){
   const grid=document.getElementById('ads-grid');
@@ -1233,7 +1191,7 @@ html{background:#071020!important}
 function openRizqProfileChat() {
   if (!window.RizqMessenger) return;
   // يعيد استخدام sellerId المحسوب مرة واحدة أعلى الملف (RIZQ_PROFILE_SELLER_ID) بدل إعادة قراءة الرابط هنا
-  var sellerId = (typeof RIZQ_PROFILE_SELLER_ID !== 'undefined' && RIZQ_PROFILE_SELLER_ID) || 'profile_demo';
+  var sellerId = (typeof RIZQ_PROFILE_SELLER_ID !== 'undefined' && RIZQ_PROFILE_SELLER_ID) || '';
   // نعتمد id ثابت (pf-name) بدل مطابقة data-fr الهشة — ينكسر الاسم النصي متى ما تغيّر (حساب حقيقي)
   var nameEl   = document.getElementById('pf-name');
   var _pFr     = (localStorage.getItem('rizq_lang') === 'fr');

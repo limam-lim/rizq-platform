@@ -382,52 +382,7 @@ function _registerDemoIfMissing(id, profile) {
   registerSubscriber(id, profile);
 }
 
-function loadDemoSubscribers() {
-  // محامٍ موريتاني — باقة ماسية
-  _registerDemoIfMissing('+222111001', {
-    plan        : 'diamond',
-    businessType: 'law_office',
-    businessName: 'مكتب الأستاذ محمد للمحاماة',
-    ownerName   : 'محمد ولد إبراهيم',
-    ownerTitle  : 'الأستاذ المحامي',
-    location    : 'نواكشوط — حي التوجنين',
-    specialties : ['قانون الأسرة', 'العقارات', 'الشركات التجارية'],
-    consultationFee: '5000 MRU للجلسة الأولى',
-    workHours   : { start: 8, end: 17 },
-    tone        : 'رسمي ومطمئن',
-    customInstructions: 'في حالات الطوارئ القانونية أعطِ رقم الهاتف الشخصي: +222333444'
-  });
-
-  // محل ملابس — باقة ماسية
-  _registerDemoIfMissing('+222111002', {
-    plan        : 'diamond',
-    businessType: 'store',
-    businessName: 'متجر رغد للأزياء',
-    ownerName   : 'فاطمة ولد سيدي',
-    location    : 'نواكشوط — السوق الحضاري',
-    products    : ['ملابس نسائية', 'عبايات', 'أزياء تقليدية', 'إكسسوارات'],
-    delivery    : 'متاح خلال نواكشوط — 24 ساعة',
-    paymentMethods: ['نقد', 'بنكيلي', 'مصرف موريتانيا الإسلامي'],
-    workHours   : { start: 9, end: 21 },
-    tone        : 'ودود وأنيق'
-  });
-
-  // عيادة طبية — باقة ماسية
-  _registerDemoIfMissing('+222111003', {
-    plan        : 'diamond',
-    businessType: 'medical',
-    businessName: 'عيادة النور الطبية',
-    ownerName   : 'د. أحمد ولد محمد',
-    location    : 'نواكشوط — كيبه',
-    specialties : ['طب الأطفال', 'طب عام'],
-    waitTime    : '20-40 دقيقة',
-    workHours   : { start: 8, end: 20 },
-    tone        : 'هادئ ومطمئن',
-    customInstructions: 'للحالات الطارئة: وجّه للمستعجلات في المستشفى الوطني'
-  });
-
-  console.log('🎭 تم تحميل 3 مشتركين تجريبيين (محامٍ + متجر + عيادة)');
-}
+function loadDemoSubscribers() { /* mock subscribers removed — register real accounts via API */ }
 
 // ── التصدير ─────────────────────────────────────────────────
 module.exports = {
@@ -439,48 +394,4 @@ module.exports = {
   loadDemoSubscribers
 };
 
-// ── اختبار مباشر ────────────────────────────────────────────
-if(require.main === module) {
-  require('dotenv').config();
-  loadDemoSubscribers();
-
-  console.log('\n🧪 اختبار الشخصيات المتعددة...\n');
-
-  const tests = [
-    {
-      subscriberId: '+222111001',
-      channel: 'whatsapp',
-      message: 'السلام عليكم، عندي قضية طلاق أريد استشارة',
-      context: { name: 'أمينة' }
-    },
-    {
-      subscriberId: '+222111002',
-      channel: 'whatsapp',
-      message: 'هل عندكم عبايات للعيد؟ وكم أسعارها؟',
-      context: { name: 'خديجة' }
-    },
-    {
-      subscriberId: '+222111003',
-      channel: 'call',
-      message: 'أريد موعد لطفلي عنده حمى',
-      context: { name: 'والد مريض' }
-    }
-  ];
-
-  async function runTests() {
-    for(const test of tests) {
-      const profile = require('./rizq_subscriber_agent').getSubscriberProfile(test.subscriberId);
-      console.log(`\n📍 اختبار: ${profile?.businessName || test.subscriberId}`);
-      console.log(`   السؤال: ${test.message}`);
-
-      try {
-        const result = await askSubscriberAgent(test);
-        console.log(`   الرد: ${result.text}`);
-      } catch(e) {
-        console.error(`   ❌ خطأ: ${e.message}`);
-      }
-    }
-  }
-
-  runTests();
-}
+// CLI tests removed — register real subscribers via API

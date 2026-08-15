@@ -1166,19 +1166,11 @@ function loadActivatedPackage(acc) {
 var CORP_ACC = null;
 var IS_DEMO = false;
 
-var DEMO_ACC = {
-  id:'demo-corp-001', name:'معرض النجمة للسيارات', type:'corp',
-  token:'demo-token', email:'demo@rizq.mr', phone:'+222 44 00 11 22',
-  city:'نواكشوط', address:'حي عرفات، شارع الاستقلال',
-  activity:'معرض سيارات', desc:'معرض متخصص في بيع وشراء السيارات الجديدة والمستعملة بأفضل الأسعار في موريتانيا.',
-  year:2015, website:'',
-  plan:'pro', planName:'Pro', planExpiry:'2025-12-31',
-  dashLink:'rizq_dashboard_corp.html'
-};
+var DEMO_ACC = { id: "demo-corp-001", name: "", phone: "", email: "", wilaya: "", type: "corp" };
 
 function initCorpAccess(){
   var p = new URLSearchParams(location.search);
-  var isDemoParam = p.get('demo') === '1' || !p.toString();
+  var isDemoParam = p.get('demo') === '1';
   if(isDemoParam){IS_DEMO=true;CORP_ACC=DEMO_ACC;initDashboard();return;}
   var id = p.get('id'), tok = p.get('token');
   if(!id||!tok){showAccessDenied();return;}
@@ -2507,10 +2499,7 @@ document.getElementById('pay-modal') && document.getElementById('pay-modal').add
 // ══ MY PAYMENT METHODS ══
 function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof OFFICE_ACC!=='undefined'&&OFFICE_ACC)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{}; return 'rizq_my_payments_'+(acc.id||'demo'); }
 
-var DEMO_PAYMENTS=[
-  {type:'bankily',bank:'بنكيلي',code:'22 XX XX XX XX',note:'أرسل المبلغ ثم أرسل لنا صورة التأكيد'},
-  {type:'sedad',bank:'سداد',code:'MR12345678',note:'استخدم رمز المعاملة عند التأكيد'}
-];
+var DEMO_PAYMENTS=[];
 function getMyPayments(){
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }

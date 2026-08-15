@@ -686,7 +686,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 const params=new URLSearchParams(window.location.search);
 const SESSION_ID=params.get('id')||'';
 const SESSION_TOKEN=params.get('token')||'';
-const IS_DEMO=params.get('demo')==='1' || !params.toString();
+const IS_DEMO=params.get('demo')==='1';
 
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escapeAttr(s){if(!s)return'';return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -698,16 +698,9 @@ const DEMO_ACC={id:'DEMO_OFF',token:'DEMO',status:'approved',type:'office',
   desc:'نقدم خدمات إدارية متكاملة: استخراج وثائق، تسجيل شركات، استشارات قانونية',
   trial_ends:new Date(Date.now()+2*86400000).toISOString()};
 
-const DEMO_SERVICES=[
-  {name:'استخراج وثيقة رسمية',price:3000,duration:'24 ساعة',emoji:'📄',desc:'استخراج أي وثيقة إدارية رسمية بسرعة وبدون تعقيد'},
-  {name:'تسجيل شركة',price:25000,duration:'أسبوعان',emoji:'🏢',desc:'إجراءات تأسيس الشركة كاملة من البداية للنهاية'},
-  {name:'استشارة قانونية',price:5000,duration:'ساعة واحدة',emoji:'⚖️',desc:'استشارة مع مختص قانوني لحل إشكالياتك'},
-];
+const DEMO_SERVICES=[];
 
-const DEMO_REQS=[
-  {name:'سالم أحمد',service:'استخراج وثيقة رسمية',phone:'+222 44 55 66 77',msg:'أحتاج استخراج شهادة تقاعد',time:'منذ ساعة',read:false},
-  {name:'مريم',service:'استشارة قانونية',phone:'+222 55 66 77 88',msg:'أريد استشارة بخصوص عقد عمل',time:'أمس',read:true},
-];
+const DEMO_REQS=[];
 
 let OFFICE=null, services=[], renewalFile=null;
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -2255,10 +2248,7 @@ document.getElementById('pay-modal') && document.getElementById('pay-modal').add
 // ══ MY PAYMENT METHODS ══
 function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof OFFICE_ACC!=='undefined'&&OFFICE_ACC)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{}; return 'rizq_my_payments_'+(acc.id||'demo'); }
 
-var DEMO_PAYMENTS=[
-  {type:'bankily',bank:'بنكيلي',code:'22 XX XX XX XX',note:'أرسل المبلغ ثم أرسل لنا صورة التأكيد'},
-  {type:'sedad',bank:'سداد',code:'MR12345678',note:'استخدم رمز المعاملة عند التأكيد'}
-];
+var DEMO_PAYMENTS=[];
 function getMyPayments(){
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }

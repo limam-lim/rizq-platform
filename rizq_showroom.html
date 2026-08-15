@@ -403,30 +403,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#FBF8F2;
               </div>
             </div>
           </div>
-          <div id="reviews-list">
-            <div class="review-card">
-              <div class="review-header">
-                <div class="review-avatar">م</div>
-                <div>
-                  <div class="review-name">محمد ولد أحمد</div>
-                  <div class="review-stars">★★★★★</div>
-                </div>
-                <div class="review-date" id="rev1-date" style="margin-right:auto;margin-left:0">منذ أسبوع</div>
-              </div>
-              <div class="review-text" id="rev1-text">معرض ممتاز وأمين، السيارة كانت بالضبط كما وُصفت. تواصل سريع ومحترم. أنصح بالتعامل معهم.</div>
-            </div>
-            <div class="review-card">
-              <div class="review-header">
-                <div class="review-avatar">ف</div>
-                <div>
-                  <div class="review-name">فاطمة بنت سيدي</div>
-                  <div class="review-stars">★★★★★</div>
-                </div>
-                <div class="review-date" id="rev2-date" style="margin-right:auto;margin-left:0">منذ شهر</div>
-              </div>
-              <div class="review-text" id="rev2-text">اشتريت جهاز إلكتروني وكان في حالة ممتازة. الخدمة احترافية والأسعار معقولة جداً.</div>
-            </div>
-          </div>
+          <div id="reviews-list"></div>
         </div>
       </div>
 
@@ -694,17 +671,8 @@ function loadData(){
     _allItems = JSON.parse(localStorage.getItem('rizq_corp_prods_'+_showroomId)||'[]');
   }catch(e){ _allItems = []; }
 
-  /* Demo items if none */
-  if(!_allItems.length){
-    _allItems = [
-      {id:'d1',name:'تويوتا لاند كروزر 2022',nameFr:'Toyota Land Cruiser 2022',cat:'سيارات',emoji:'🚙',price:'4,500,000 MRU',specs:'2022 · 45,000 كلم · فل أوبشن',specsFr:'2022 · 45 000 km · Plein options',featured:true},
-      {id:'d2',name:'هيونداي توسان 2021',nameFr:'Hyundai Tucson 2021',cat:'سيارات',emoji:'🚗',price:'1,800,000 MRU',specs:'2021 · 68,000 كلم · تكييف مركزي',specsFr:'2021 · 68 000 km · Clim centralisée'},
-      {id:'d3',name:'لابتوب Dell XPS 15',nameFr:'Laptop Dell XPS 15',cat:'إلكترونيات',emoji:'💻',price:'280,000 MRU',specs:'Core i7 · 32GB RAM · 1TB SSD',specsFr:'Core i7 · 32Go RAM · 1To SSD'},
-      {id:'d4',name:'آيفون 14 Pro Max',nameFr:'iPhone 14 Pro Max',cat:'إلكترونيات',emoji:'📱',price:'180,000 MRU',specs:'256GB · بحالة ممتازة · مع الكرتون',specsFr:'256Go · Excellent état · Avec boîte'},
-      {id:'d5',name:'غرفة نوم كاملة',nameFr:'Chambre à coucher complète',cat:'أثاث',emoji:'🛏️',price:'320,000 MRU',specs:'خشب طبيعي · 6 قطع · تركيب مجاني',specsFr:'Bois naturel · 6 pièces · Montage gratuit'},
-      {id:'d6',name:'طقم صالون فاخر',nameFr:'Salon de luxe',cat:'أثاث',emoji:'🛋️',price:'450,000 MRU',specs:'جلد طبيعي · 7 مقاعد · ألوان متعددة',specsFr:'Cuir naturel · 7 places · Multicolore'},
-    ];
-  }
+  /* No demo catalog — show empty state until real products load */
+  if(!_allItems.length){ _allItems = []; }
 
   /* إصلاح جوهري: _acc كان يُقرأ من rizq_pending_accounts في localStorage
      فقط — يعمل فقط إن كان هذا بالضبط متصفح التاجر نفسه. أي زائر عادي
@@ -1024,14 +992,12 @@ function applyLang(){
   document.getElementById('empty-sub-lbl').textContent   = isFr ? 'Essayez une autre catégorie ou contactez le showroom' : 'جرّب قسماً آخر أو تواصل مع المعرض مباشرة';
   // Reviews
   document.getElementById('reviews-title-lbl').textContent = isFr ? '⭐ Avis clients' : '⭐ تقييمات الزبائن';
-  document.getElementById('rev-count-txt').textContent     = isFr ? '87 avis' : '87 تقييم';
-  document.getElementById('rev-score').textContent         = '4.9';
-  document.getElementById('rev1-text').textContent = isFr ? 'Excellent showroom, honnête. La voiture était exactement comme décrite. Communication rapide et respectueuse.' : 'معرض ممتاز وأمين، السيارة كانت بالضبط كما وُصفت. تواصل سريع ومحترم. أنصح بالتعامل معهم.';
-  document.getElementById('rev2-text').textContent = isFr ? 'J\'ai acheté un appareil électronique en excellent état. Service professionnel et prix raisonnables.' : 'اشتريت جهاز إلكتروني وكان في حالة ممتازة. الخدمة احترافية والأسعار معقولة جداً.';
-  // ── Missing translations (added carefully) ──
-  document.querySelectorAll('.review-date').forEach(function(el,i){
-    el.textContent = isFr ? (i===0?'il y a une semaine':'il y a un mois') : (i===0?'منذ أسبوع':'منذ شهر');
-  });
+  document.getElementById('rev-count-txt').textContent     = isFr ? '0 avis' : '0 تقييم';
+  document.getElementById('rev-score').textContent         = '—';
+  var _revList = document.getElementById('reviews-list');
+  if (_revList && !_revList.children.length) {
+    _revList.innerHTML = '<p style="color:#8a8474;font-size:13px;padding:12px 0">' + (isFr ? 'Aucun avis pour le moment.' : 'لا توجد تقييمات بعد.') + '</p>';
+  }
   var _ss=document.getElementById('showroom-since'); if(_ss) _ss.textContent=isFr?'Membre depuis 2024':'عضو منذ 2024';
   var _sc2=document.getElementById('showroom-city'); if(_sc2&&!_sc2.hasAttribute('data-acc')) _sc2.textContent=isFr?'Nouakchott, Mauritanie':'نواكشوط، موريتانيا';
   var _stag=document.getElementById('showroom-tagline'); if(_stag&&!_stag.hasAttribute('data-acc')) _stag.textContent=isFr?'Al-Riyada Showroom — Voitures & équipements':'Al-Riyada Showroom — سيارات ومعدات متميزة';

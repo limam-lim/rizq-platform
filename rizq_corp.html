@@ -418,12 +418,12 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   <div class="actions-bar-inner">
     <div class="action-btns">
       <a class="action-btn btn-whatsapp" id="wa-btn"
-         href="https://wa.me/22244556677?text=السلام%20عليكم،%20أريد%20الاستفسار%20عن%20خدماتكم"
+         href="#"
          target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         <span id="wa-btn-lbl">واتساب</span>
       </a>
-      <a class="action-btn btn-call" id="call-btn" href="tel:+22244556677" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')"><span id="call-btn-lbl">📞 اتصال</span></a>
+      <a class="action-btn btn-call" id="call-btn" href="#" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')"><span id="call-btn-lbl">📞 اتصال</span></a>
       <button class="action-btn btn-share" onclick="shareCorp()" id="share-btn-lbl">📤 مشاركة</button>
       <button class="action-btn" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border-color:transparent" data-t="btn-chat">💬 مراسلة آمنة</button>
     </div>
@@ -490,13 +490,13 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
         <div class="info-card-title" style="color:var(--gold);border-color:rgba(201,168,76,0.3)" id="visit-cta-title">🤝 احجز زيارة</div>
         <p style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:14px" id="visit-cta-desc">هل أنت مهتم بمنتجاتنا؟ تواصل معنا لتحديد موعد زيارة أو مشاهدة افتراضية.</p>
         <a class="action-btn btn-whatsapp" id="visit-wa-btn"
-           href="https://wa.me/22244556677?text=السلام%20عليكم،%20أرغب%20في%20تحديد%20موعد%20زيارة%20لمعرضكم"
+           href="#"
            target="_blank" rel="noopener"
            style="display:flex;justify-content:center;margin-bottom:8px"
            onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
           <span id="visit-wa-btn-lbl">📅 احجز زيارة عبر واتساب</span>
         </a>
-        <a class="action-btn btn-call" id="visit-call-btn" href="tel:+22244556677" style="display:flex;justify-content:center" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')"><span id="visit-call-btn-lbl">📞 اتصل بنا الآن</span></a>
+        <a class="action-btn btn-call" id="visit-call-btn" href="#" style="display:flex;justify-content:center" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')"><span id="visit-call-btn-lbl">📞 اتصل بنا الآن</span></a>
       </div>
     </aside>
 
@@ -1171,14 +1171,7 @@ window._corpSubmitReview = function(){
    يملأه، لا ببيانات تجريبية ولا حقيقية. الآن: نموذج معرض تجريبي معروض
    افتراضياً (مثل ما هو معمول به في rizq_store.html/rizq_office.html)، ويُستبدل
    ببيانات حقيقية من rizq_corp_prods_<id> إن وُجد حساب معتمد مطابق. ═══ */
-var CORP_DEMO_ITEMS = [
-  {name:'Toyota Hilux 2022', cat:'سيارات', price:'8,500,000', desc:'دبل كابين، ديزل، فحص شامل — حالة ممتازة', tag:'hot'},
-  {name:'شقة سكنية 3 غرف — حي الكفاح', cat:'عقارات', price:'25,000,000', desc:'طابق أول، مطبخ مجهز، موقف سيارة'},
-  {name:'حفارة كاتربيلر 320D', cat:'معدات', price:'قابل للتفاوض', desc:'صيانة دورية منتظمة، جاهزة للعمل'},
-  {name:'مولد كهربائي 50KVA', cat:'معدات', price:'1,200,000', desc:'صامت، استخدام صناعي وتجاري', tag:'new'},
-  {name:'صيانة دورية شاملة', cat:'خدمات', price:'حسب الطلب', desc:'فحص وصيانة للمركبات والمعدات الثقيلة'},
-  {name:'أرض تجارية 500م²', cat:'عقارات', price:'15,000,000', desc:'على الطريق الرئيسي — رخصة بناء تجاري'}
-];
+var CORP_DEMO_ITEMS = [];
 function corpCatIcon(cat){
   var map = {'سيارات':'🚗','عقارات':'🏠','معدات':'⚙️','خدمات':'💼','أثاث':'🛋️','مفروشات':'🛋️','إلكترونيات':'📱','مجوهرات':'💎','مواد بناء':'🏗️','شاحنات':'🚛'};
   return map[cat] || '📦';
@@ -1187,7 +1180,7 @@ function contactAboutItem(name){
   var waBtn = document.getElementById('wa-btn');
   var href = waBtn ? (waBtn.getAttribute('href')||'') : '';
   var numMatch = href.match(/wa\.me\/(\d+)/);
-  var num = numMatch ? numMatch[1] : '22244556677';
+  var num = numMatch ? numMatch[1] : '';
   var isFr = (localStorage.getItem('rizq_lang')==='fr');
   var text = isFr ? ('Bonjour, je suis intéressé par : ' + name) : ('السلام عليكم، أنا مهتم بـ: ' + name);
   window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
@@ -1757,7 +1750,7 @@ window._rizqProfile = (function() {
   window.openChat = function(ad) {
     if (!window.RizqMessenger) return;
     var params  = new URLSearchParams(location.search);
-    var corpId  = params.get('id') || params.get('corp') || 'demo';
+    var corpId  = params.get('id') || params.get('corp') || '';
     var nameEl  = document.querySelector('.corp-name, .biz-name, h1');
     var _ocFr2  = (localStorage.getItem('rizq_lang') === 'fr');
     var name    = nameEl ? nameEl.textContent.trim() : (_ocFr2 ? 'La galerie' : 'المعرض');

@@ -247,99 +247,7 @@ function buildSystemPrompt(profile) {
 // 5. نماذج بيانات تجريبية (تُستبدل ببيانات قاعدة البيانات)
 // ═══════════════════════════════════════════════════════
 
-const DEMO_PROFILES = {
-
-  // ── محل نسائي ──────────────────────────────────────
-  women_store_demo: {
-    businessName:   'فاطمة للعبايات والأزياء',
-    agentName:      'نورة',
-    businessType:   'women_store',
-    wilaya:         'نواكشوط الشمالية',
-    neighborhood:   'حي تفرغ زينة، بجانب سوبرماركت الأمل',
-    workingHours:   'السبت – الخميس: 9ص – 10م | الجمعة: 3م – 10م',
-    greeting:       'أهلاً بك في فاطمة للأزياء ✨ كيف أقدر أساعدك اليوم؟',
-    products: [
-      { name: 'عباية خليجية فاخرة',  price: '2500 – 4500', desc: 'أقمشة إيطالية، متوفرة بـ 12 لون' },
-      { name: 'حجاب شيفون',           price: '150 – 350',   desc: 'متوفر بـ 25 لون' },
-      { name: 'عطر نسائي (50ml)',     price: '800 – 2000',  desc: 'ماركات خليجية وأوروبية' },
-      { name: 'إكسسوارات ذهب مطلي', price: '500 – 1500',  desc: '' },
-      { name: 'بشت موريتاني فاخر',   price: '3000 – 6000', desc: 'للمناسبات والأعراس' }
-    ],
-    faqs: [
-      { q: 'هل يوجد توصيل؟',          a: 'نعم، توصيل داخل نواكشوط بـ 200 MRU، يصلك خلال 24 ساعة' },
-      { q: 'هل يوجد إرجاع؟',          a: 'نعم، خلال 3 أيام من الشراء مع الفاتورة، بشرط عدم الاستخدام' },
-      { q: 'هل تقبلون الدفع بـ Bankily؟', a: 'نعم، نقبل Bankily وMasrvi والدفع نقداً' },
-      { q: 'هل يوجد مقاسات كبيرة؟',  a: 'نعم، من مقاس S حتى XXXL لجميع المنتجات' }
-    ],
-    policies: {
-      return:   '3 أيام مع الفاتورة، المنتج غير مستخدم',
-      delivery: 'داخل نواكشوط: 200 MRU / خارجها بالاتفاق',
-      payment:  'نقد، Bankily، Masrvi'
-    },
-    channels: {
-      phone:    '+222 22 XX XX XX',
-      whatsapp: '+222 22 XX XX XX',
-      email:    'fatima.store@rizq.mr',
-      location: 'نواكشوط الشمالية، حي تفرغ زينة'
-    }
-  },
-
-  // ── معرض سيارات ─────────────────────────────────────
-  car_showroom_demo: {
-    businessName:   'معرض النجمة للسيارات',
-    agentName:      'خالد',
-    businessType:   'car_showroom',
-    wilaya:         'نواكشوط الغربية',
-    neighborhood:   'شارع جمال عبد الناصر',
-    workingHours:   'يومياً 8ص – 8م (عدا الجمعة: 3م – 8م)',
-    greeting:       'أهلاً بك في معرض النجمة 🚗 كيف أقدر أساعدك؟',
-    products: [
-      { name: 'تويوتا هايلكس 2023',  price: '8,500,000',  desc: 'أوتوماتيك، 4×4، فضي وأبيض' },
-      { name: 'تويوتا لاندكروزر 2022', price: '14,000,000', desc: 'GXR، رمادي، ورقي نظيفة' },
-      { name: 'ميتسوبيشي L200 2024', price: '7,800,000',  desc: 'جديد، ضمان وكيل سنة' },
-      { name: 'نيسان باترول 2021',   price: '11,500,000', desc: 'LE، أسود، خرج الجمارك' }
-    ],
-    faqs: [
-      { q: 'هل يوجد ضمان؟',          a: 'السيارات الجديدة: ضمان سنة. المستعملة: ضمان 3 أشهر على المحرك' },
-      { q: 'هل يوجد تمويل؟',         a: 'نعم، بالتنسيق مع بنك موريتانيا الإسلامية — تواصل معنا للتفاصيل' },
-      { q: 'كيف أحجز موعد معاينة؟',  a: 'أعطني اسمك ورقم هاتفك وأي سيارة تريد وسنتصل بك خلال ساعة' }
-    ],
-    policies: {
-      payment:  'تحويل بنكي، Bankily، نقد',
-      warranty: 'جديد: سنة. مستعمل: 3 أشهر محرك'
-    },
-    channels: {
-      phone:    '+222 36 XX XX XX',
-      whatsapp: '+222 36 XX XX XX',
-      location: 'نواكشوط الغربية، شارع جمال عبد الناصر'
-    }
-  },
-
-  // ── مكتب افتراضي ─────────────────────────────────────
-  virtual_office_demo: {
-    businessName:   'مكتب رزق الافتراضي',
-    agentName:      'سلمى',
-    businessType:   'virtual_office',
-    wilaya:         'نواكشوط',
-    neighborhood:   'حي الكابة',
-    workingHours:   'الأحد – الخميس: 8ص – 6م',
-    greeting:       'أهلاً بك في مكتب رزق الافتراضي 🏢 كيف نخدمك؟',
-    products: [
-      { name: 'باقة العنوان التجاري', price: '5,000/شهر',   desc: 'عنوان رسمي + تلقي البريد' },
-      { name: 'باقة الاجتماعات',      price: '2,000/جلسة',  desc: 'قاعة مجهزة لـ 10 أشخاص' },
-      { name: 'خدمة الترجمة',         price: '500/صفحة',    desc: 'عربي-فرنسي-إنجليزي' },
-      { name: 'التوثيق والتصديق',     price: 'يبدأ من 1,500', desc: 'جميع أنواع الوثائق' }
-    ],
-    policies: {
-      payment:  'Bankily، تحويل بنكي، نقد'
-    },
-    channels: {
-      phone:    '+222 45 XX XX XX',
-      email:    'office@rizq.mr',
-      location: 'نواكشوط، حي الكابة'
-    }
-  }
-};
+const DEMO_PROFILES = {};
 
 // ═══════════════════════════════════════════════════════
 // 6. ربط البيانات الحية من localStorage
@@ -350,7 +258,7 @@ function loadBusinessProfile(businessId) {
     var stored = localStorage.getItem('rizq_business_' + businessId);
     if (stored) return JSON.parse(stored);
   } catch(e) {}
-  return DEMO_PROFILES[businessId] || DEMO_PROFILES.women_store_demo;
+  return DEMO_PROFILES[businessId] || null;
 }
 
 function saveBusinessProfile(businessId, profile) {
@@ -368,6 +276,7 @@ var RizqPrompts = {
   build: function(profile) { return buildSystemPrompt(profile); },
   buildById: function(businessId) {
     var profile = loadBusinessProfile(businessId);
+    if (!profile) profile = { businessName: 'Rizq', businessType: 'default', agentName: 'مساعد رزق' };
     return buildSystemPrompt(profile);
   },
   getBusinessTypes: function() {
