@@ -329,6 +329,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_packages_config.js"></script>
   <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -373,7 +374,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold">50,842</span></div>
     <div class="sb-item" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge">23</span></div>
     <div class="sb-item" id="sb-moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('analytics',this)"><span class="sb-icon">📈</span><span class="sb-label" data-t="sb-analytics">الإحصائيات</span></div>
     <div class="sb-section" data-t="sb-section-admin">الإدارة</div>
@@ -383,15 +384,16 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
     <div class="sb-item" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
     <div class="sb-item" onclick="showPanel('siteconfig',this)"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-siteconfig">إعدادات الموقع</span></div>
-    <div class="sb-item" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label">إدارة الأقسام</span></div>
+    <div class="sb-item" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label" data-t="sb-modules">إدارة الأقسام</span></div>
     <div class="sb-item" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-settings">الإعدادات</span></div>
     <div class="sb-item" onclick="showPanel('legal',this)"><span class="sb-icon">📜</span><span class="sb-label" data-t="sb-legal">القانوني</span></div>
     <div class="sb-item" onclick="showPanel('legal-editor',this)"><span class="sb-icon">✏️</span><span class="sb-label" data-t="sb-legal-editor">تعديل نصوص القانون</span></div>
     <div class="sb-section" data-t="sb-section-channels">قنوات التواصل</div>
     <div class="sb-item" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
-    <div class="sb-item" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
+    <div class="sb-item" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
-    <div class="sb-item" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label">وكلاء الباقة الماسية 💎</span></div>
+    <div class="sb-item" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
+    <div class="sb-item" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
@@ -782,17 +784,17 @@ main, .page-content.active, .main-content, .results-area,
             <div style="padding:18px">
               <div class="settings-section">
                 <div class="settings-section-title" data-t="set-platform">🌐 المنصة</div>
-                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-platform-open">المنصة مفتوحة</div><div class="toggle-desc" data-t="set-platform-open-sub">تعطيل لأعمال الصيانة</div></div><button class="toggle-sw on" onclick="this.classList.toggle('on');showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'))"></button></div>
-                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-reg-open">التسجيل مفتوح</div><div class="toggle-desc" data-t="set-reg-open-sub">السماح للمستخدمين الجدد بالتسجيل</div></div><button class="toggle-sw on" onclick="this.classList.toggle('on');showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'))"></button></div>
-                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-ads-open">نشر الإعلانات مفتوح</div><div class="toggle-desc" data-t="set-ads-open-sub">السماح بنشر إعلانات جديدة</div></div><button class="toggle-sw on" onclick="this.classList.toggle('on');showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'))"></button></div>
-                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-mod-required">مراجعة إلزامية</div><div class="toggle-desc" data-t="set-mod-required-sub">كل إعلان يمر بمراجعة يدوية قبل النشر</div></div><button class="toggle-sw" onclick="this.classList.toggle('on');showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'))"></button></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-platform-open">المنصة مفتوحة</div><div class="toggle-desc" data-t="set-platform-open-sub">تعطيل لأعمال الصيانة</div></div><button class="toggle-sw on" id="set-platform-open" onclick="persistPlatformFlag(this,'platformOpen')"></button></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-reg-open">التسجيل مفتوح</div><div class="toggle-desc" data-t="set-reg-open-sub">السماح للمستخدمين الجدد بالتسجيل</div></div><button class="toggle-sw on" id="set-reg-open" onclick="persistPlatformFlag(this,'registrationOpen')"></button></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-ads-open">نشر الإعلانات مفتوح</div><div class="toggle-desc" data-t="set-ads-open-sub">السماح بنشر إعلانات جديدة</div></div><button class="toggle-sw on" id="set-ads-open" onclick="persistPlatformFlag(this,'adsOpen')"></button></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-mod-required">مراجعة إلزامية</div><div class="toggle-desc" data-t="set-mod-required-sub">كل إعلان يمر بمراجعة يدوية قبل النشر</div></div><button class="toggle-sw" id="set-mod-required" onclick="persistPlatformFlag(this,'moderationRequired')"></button></div>
               </div>
               <div class="settings-section">
                 <div class="settings-section-title" data-t="set-contact">📱 التواصل</div>
-                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" value="+222 XX XX XX XX" dir="ltr"/></div>
-                <div class="form-group"><label class="form-label" data-t="set-support-email">بريد الدعم</label><input class="form-input" value="direction@rizq.mr" dir="ltr"/></div>
-                <div class="form-group"><label class="form-label" data-t="set-reports-email">بريد البلاغات</label><input class="form-input" value="report@rizq.mr" dir="ltr"/></div>
-                <button class="btn-sm btn-primary" data-t="set-save-contact" onclick="showToast(RizqI18n.t2('✅ تم حفظ إعدادات التواصل','✅ Paramètres de contact enregistrés'))">💾 حفظ</button>
+                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" id="set-whatsapp" value="+222 XX XX XX XX" dir="ltr"/></div>
+                <div class="form-group"><label class="form-label" data-t="set-support-email">بريد الدعم</label><input class="form-input" id="set-support-email" value="direction@rizq.mr" dir="ltr"/></div>
+                <div class="form-group"><label class="form-label" data-t="set-reports-email">بريد البلاغات</label><input class="form-input" id="set-reports-email" value="report@rizq.mr" dir="ltr"/></div>
+                <button class="btn-sm btn-primary" data-t="set-save-contact" onclick="saveSettingsContact()">💾 حفظ</button>
               </div>
             </div>
           </div>
@@ -812,10 +814,10 @@ main, .page-content.active, .main-content, .results-area,
           <div class="card" style="margin-top:16px">
             <div class="card-header"><div class="card-title" data-t="set-security-title">🔒 الأمان</div></div>
             <div style="padding:18px">
-              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-otp">التحقق بـ OTP إلزامي</div><div class="toggle-desc" data-t="set-otp-sub">عند كل تسجيل دخول</div></div><button class="toggle-sw on" onclick="this.classList.toggle('on')"></button></div>
-              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-vpn-block">حظر VPN</div><div class="toggle-desc" data-t="set-vpn-block-sub">منع الدخول عبر VPN</div></div><button class="toggle-sw" onclick="this.classList.toggle('on')"></button></div>
-              <div class="form-group" style="margin-top:14px"><label class="form-label" data-t="set-session-timeout">جلسة الجلسة تنتهي بعد (دقيقة)</label><input class="form-input" type="number" value="60" dir="ltr"/></div>
-              <button class="btn-sm btn-primary" data-t="set-save-security" onclick="showToast(RizqI18n.t2('✅ تم حفظ إعدادات الأمان','✅ Paramètres de sécurité enregistrés'))">💾 حفظ</button>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-otp">التحقق بـ OTP إلزامي</div><div class="toggle-desc" data-t="set-otp-sub">عند كل تسجيل دخول</div></div><button class="toggle-sw on" id="set-otp" onclick="persistPlatformFlag(this,'otpRequired')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-vpn-block">حظر VPN</div><div class="toggle-desc" data-t="set-vpn-block-sub">منع الدخول عبر VPN</div></div><button class="toggle-sw" id="set-vpn-block" onclick="persistPlatformFlag(this,'vpnBlock')"></button></div>
+              <div class="form-group" style="margin-top:14px"><label class="form-label" data-t="set-session-timeout">جلسة الجلسة تنتهي بعد (دقيقة)</label><input class="form-input" type="number" id="set-session-timeout" value="60" dir="ltr"/></div>
+              <button class="btn-sm btn-primary" data-t="set-save-security" onclick="saveSettingsSecurity()">💾 حفظ</button>
             </div>
           </div>
         </div>
@@ -1452,6 +1454,22 @@ main, .page-content.active, .main-content, .results-area,
         <div id="sa-list" style="display:flex;flex-direction:column;gap:12px">
           <div style="text-align:center;color:#9ca3af;padding:30px;font-size:13px">لا يوجد وكلاء مسجّلون بعد</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ QUOTA GUARD — مراقبة استهلاك الباقة الماسية ══ -->
+    <div class="panel" id="panel-quota-guard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)">📊 مراقبة استهلاك الباقة الماسية</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px">الحصة العادلة لكل مشترك ماسي — عند 80% تنبيه، عند 100% تحويل تلقائي إلى الوضع الاقتصادي مع خيار حزمة إضافية</p>
+        </div>
+        <button onclick="loadQuotaGuardPanel()" style="padding:9px 20px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔄 تحديث</button>
+      </div>
+      <div id="quota-guard-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px"></div>
+      <div id="quota-guard-pending" style="margin-bottom:22px"></div>
+      <div id="quota-guard-list">
+        <div style="text-align:center;color:#9ca3af;padding:30px;font-size:13px">جارٍ التحميل...</div>
       </div>
     </div>
 
@@ -2389,6 +2407,8 @@ function showPanel(id, navEl){
   if(id==='ai-manager'){ renderAiManagerPanel(); syncMgrCfgFromBackend().then(function(changed){ if(changed) renderAiManagerPanel(); }); }
   if(id==='moderator-config'){ renderModeratorConfigPanel(); syncModCfgFromBackend().then(function(changed){ if(changed) renderModeratorConfigPanel(); }); }
   if(id==='subscriber-agents'){ renderSubscriberAgents(); populateSaAccountOptions(); }
+  if(id==='settings'){ loadSettingsPanel(); }
+  if(id==='quota-guard'){ loadQuotaGuardPanel(); }
   if(window.innerWidth<900)closeSidebar();
 }
 
@@ -2413,7 +2433,7 @@ const PKG_DEFAULTS = {
     // rizq_email_handler.js يرد فقط على بريد دعم رزق العام). نفس الإصلاح
     // طُبِّق على DEF_STO/DEF_OFF في rizq_landing_v8.html. انظر التعليق المفصَّل
     // عند TIER_FEATURES في rizq_subscription_engine.js.
-    {id:'diamond', name:'💎 ماسي',  price:5000,  period:'MRU / شهر', durationDays:30, features:['إعلانات غير محدودة','الصدارة الدائمة في النتائج','🏅 شارة "مميّز برزق" (أعلى مستوى)','لوحة تحليلات كاملة','مدير حساب شخصي','النائب الذكي — دعم VIP 24/7','📞 الرد التلقائي على المكالمات الغائبة','أولوية قصوى في مراجعة الإعلانات','تقارير أداء شهرية'], active:true},
+    {id:'diamond', name:'الماسية 💎 (النائب الذكي الشامل)', name_fr:'Diamant 💎 (Adjoint intelligent complet)', price:5000,  period:'MRU / شهر', durationDays:30, description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', description_fr:'Un adjoint commercial intégré qui gère votre boutique ou institution avec une précision humaine, 24h/24.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', featuredBadge_fr:'Le plus choisi par les entreprises', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', roi_fr:'Économisez le salaire d\'un agent d\'accueil — pour seulement 5 000 MRU par mois.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], features_fr:['🤖 Un adjoint exclusif qui parle au nom de votre établissement, avec une précision humaine.','🎙️ Réponse vocale et écrite immédiate via WhatsApp, le chat du site et les appels.','🛡️ Identité indépendante complète — sans aucune mention de la plateforme Rizq.','📊 Suivi en temps réel de toutes les conversations et des ventes.','⚡ Usage équitable : 120 minutes d\'appels + 500 conversations avancées par mois.'], active:true},
   ],
   individual: [
     {id:'ind-free',   name:'مجانية',     price:0,    period:'مجاناً — 7 أيام عرض', durationDays:7,  features:['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'], active:true},
@@ -2430,14 +2450,14 @@ const PKG_DEFAULTS = {
     {id:'st-month', name:'شهرية',   price:2000,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "محل مميّز برزق"','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'st-quart', name:'ربعية',   price:5500,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'], active:true},
     {id:'st-year',  name:'سنوية',   price:15000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'], active:true},
-    {id:'st-diam',  name:'ماسية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['منتجات + إعلانات غير محدودة','وكيل ذكي AI 24/7','رد تلقائي على المكالمات','صدارة دائمة في البحث','مدير حساب VIP شخصي'], active:true},
+    {id:'st-diam',  name:'الماسية 💎 (النائب الذكي الشامل)',   price:3500,  period:'MRU / شهر',        durationDays:30,  description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
   ],
   corp: [
     {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
     {id:'cp-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "شركة مميّزة برزق"','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'cp-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'], active:true},
     {id:'cp-year',  name:'سنوية',   price:25000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'], active:true},
-    {id:'cp-diam',  name:'ماسية',   price:6000,  period:'MRU / شهر',        durationDays:30,  features:['إعلانات غير محدودة','وكيل ذكي AI 24/7','رد تلقائي على المكالمات','صدارة دائمة في النتائج','مدير حساب VIP شخصي'], active:true},
+    {id:'cp-diam',  name:'الماسية 💎 (النائب الذكي الشامل)',   price:6000,  period:'MRU / شهر',        durationDays:30,  description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
   ],
   video: [
     {id:'vid-basic',    name:'أساسي (فيديو)',      price:5000,  period:'MRU / شهر', durationDays:30, features:['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'], active:true},
@@ -2517,15 +2537,26 @@ function switchPkgCat(key){
 }
 
 function _syncPkgCatToBackend(key, pkgs){
-  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
-  if(!cfg.backendUrl) return;
   var body = { packages: {} };
   body.packages[key] = pkgs;
+  _adminPostSiteConfig(body);
+}
+
+function _adminPostSiteConfig(body, onOk, onFail){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl){
+    if(typeof onFail==='function') onFail('no-backend');
+    return;
+  }
   fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/site-config', {
     method: 'POST',
     headers: { 'Content-Type':'application/json', 'x-rizq-secret': cfg.backendSecret || '' },
     body: JSON.stringify(body)
-  }).catch(function(){ /* صامت — ستُعاد المزامنة عند فتح فئة الباقات التالية */ });
+  }).then(function(res){
+    if(!res.ok) throw new Error('http_'+res.status);
+    return res.json();
+  }).then(function(data){ if(typeof onOk==='function') onOk(data); })
+    .catch(function(){ if(typeof onFail==='function') onFail('fail'); });
 }
 
 function syncPkgCatFromBackend(key){
@@ -2724,12 +2755,14 @@ function savePrices(){
     });
   });
   localStorage.setItem('rizq_prices', JSON.stringify(data));
+  _adminPostSiteConfig({ prices: data });
   showToast(t('price-toast-saved','✅ تم حفظ لوحة الأسعار — التغييرات مُطبَّقة الآن على الموقع'));
 }
 
 function resetPricesPanel(){
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   localStorage.setItem('rizq_prices', JSON.stringify(DEFAULT_PRICES_ADMIN));
+  _adminPostSiteConfig({ prices: DEFAULT_PRICES_ADMIN });
   renderPricesAdmin();
   showToast(t('price-toast-reset','↺ أُعيدت الأسعار الافتراضية'));
 }
@@ -2843,6 +2876,7 @@ function saveExtraCategories(){
     cats[d.i].subs = d.subs; cats[d.i].subs_fr = d.subs_fr;
   });
   localStorage.setItem('rizq_extra_categories', JSON.stringify(cats));
+  _adminPostSiteConfig({ extraCategories: cats });
   renderExtraCategories();
   showToast(t('excat-toast-saved','✅ تم حفظ الأقسام الجديدة — ستظهر الآن في الصفحة الرئيسية'));
 }
@@ -2850,6 +2884,7 @@ function saveExtraCategories(){
 function resetExtraCategories(){
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   localStorage.setItem('rizq_extra_categories', JSON.stringify([]));
+  _adminPostSiteConfig({ extraCategories: [] });
   renderExtraCategories();
   showToast(t('excat-toast-reset','↺ تم حذف كل الأقسام الإضافية'));
 }
@@ -2907,19 +2942,113 @@ function saveSiteConfig(){
     bannerText: get('cfg-banner-text')
   };
   localStorage.setItem('rizq_site_config', JSON.stringify(cfg));
-  showToast(RizqI18n.t2('✅ تم حفظ إعدادات الموقع — التغييرات مُطبَّقة الآن على الموقع','✅ Paramètres du site enregistrés — les changements sont appliqués dès maintenant sur le site'));
+  _adminPostSiteConfig({ site: cfg }, function(){
+    showToast(RizqI18n.t2('✅ تم حفظ إعدادات الموقع — التغييرات مُطبَّقة الآن على الموقع','✅ Paramètres du site enregistrés — les changements sont appliqués dès maintenant sur le site'));
+  }, function(){
+    showToast(RizqI18n.t2('✅ حُفظ محلياً — تعذّرت مزامنة الخادم','✅ Enregistré localement — synchronisation serveur impossible'));
+  });
+}
+
+function persistPlatformFlag(btn, key){
+  btn.classList.toggle('on');
+  var body = { platformFlags: {} };
+  body.platformFlags[key] = btn.classList.contains('on');
+  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign(_readPlatformFlags(), body.platformFlags)));
+  _adminPostSiteConfig(body, function(){
+    showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'));
+  }, function(){
+    showToast(RizqI18n.t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+  });
+}
+
+function _readPlatformFlags(){
+  try{ return JSON.parse(localStorage.getItem('rizq_platform_flags')||'{}')||{}; }catch(e){ return {}; }
+}
+
+function loadSettingsPanel(){
+  var map = {
+    platformOpen:'set-platform-open',
+    registrationOpen:'set-reg-open',
+    adsOpen:'set-ads-open',
+    moderationRequired:'set-mod-required',
+    otpRequired:'set-otp',
+    vpnBlock:'set-vpn-block'
+  };
+  function apply(flags){
+    var defaults = {platformOpen:true,registrationOpen:true,adsOpen:true,otpRequired:true,moderationRequired:false,vpnBlock:false};
+    flags = Object.assign({}, defaults, flags||{});
+    Object.keys(map).forEach(function(k){
+      var el = document.getElementById(map[k]);
+      if(el) el.classList.toggle('on', !!flags[k]);
+    });
+    var to = document.getElementById('set-session-timeout');
+    if(to && flags.sessionTimeoutMin) to.value = flags.sessionTimeoutMin;
+  }
+  var local = _readPlatformFlags();
+  if(Object.keys(local).length) apply(Object.assign({platformOpen:true,registrationOpen:true,adsOpen:true,otpRequired:true}, local));
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/site-config')
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      var flags = data && data.config && data.config.platformFlags;
+      if(flags){
+        localStorage.setItem('rizq_platform_flags', JSON.stringify(flags));
+        apply(flags);
+      }
+      var site = data && data.config && data.config.site;
+      if(site){
+        var wa = document.getElementById('set-whatsapp'); if(wa && site.whatsapp) wa.value = site.whatsapp;
+        var em = document.getElementById('set-support-email'); if(em && site.email) em.value = site.email;
+        var re = document.getElementById('set-reports-email'); if(re && site.reportEmail) re.value = site.reportEmail;
+      }
+    }).catch(function(){});
+}
+
+function saveSettingsContact(){
+  var site = loadSiteConfigData();
+  var wa = document.getElementById('set-whatsapp');
+  var em = document.getElementById('set-support-email');
+  var re = document.getElementById('set-reports-email');
+  if(wa) site.whatsapp = wa.value.trim();
+  if(em) site.email = em.value.trim();
+  if(re) site.reportEmail = re.value.trim();
+  localStorage.setItem('rizq_site_config', JSON.stringify(site));
+  var cfgWa = document.getElementById('cfg-whatsapp'); if(cfgWa) cfgWa.value = site.whatsapp;
+  var cfgEm = document.getElementById('cfg-email'); if(cfgEm) cfgEm.value = site.email;
+  var cfgRe = document.getElementById('cfg-report-email'); if(cfgRe) cfgRe.value = site.reportEmail;
+  _adminPostSiteConfig({ site: site }, function(){
+    showToast(RizqI18n.t2('✅ تم حفظ إعدادات التواصل','✅ Paramètres de contact enregistrés'));
+  }, function(){
+    showToast(RizqI18n.t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+  });
+}
+
+function saveSettingsSecurity(){
+  var to = document.getElementById('set-session-timeout');
+  var body = { platformFlags: {
+    otpRequired: !!(document.getElementById('set-otp') && document.getElementById('set-otp').classList.contains('on')),
+    vpnBlock: !!(document.getElementById('set-vpn-block') && document.getElementById('set-vpn-block').classList.contains('on')),
+    sessionTimeoutMin: to ? (+to.value || 60) : 60
+  } };
+  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign(_readPlatformFlags(), body.platformFlags)));
+  _adminPostSiteConfig(body, function(){
+    showToast(RizqI18n.t2('✅ تم حفظ إعدادات الأمان','✅ Paramètres de sécurité enregistrés'));
+  }, function(){
+    showToast(RizqI18n.t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+  });
 }
 
 // ══ إدارة الأقسام (الإطلاق التدريجي) — مهمة 03/08/2026 ══
 // كل الحقيقة هنا على الخادم (site-config.json → moduleFlags)، لا localStorage
 // إطلاقاً — نفس مبدأ كل الإعدادات الأخرى المُصلَحة سابقاً في هذه اللوحة.
 var MODULE_DEFS = [
-  {key:'individual', icon:'👤', name:'الأفراد', desc:'تسجيل ونشر إعلانات الحسابات الفردية'},
-  {key:'store',      icon:'🏪', name:'المحلات', desc:'تسجيل المحلات وكتالوج المنتجات'},
-  {key:'office',     icon:'📒', name:'المكاتب', desc:'تسجيل المكاتب (تأمين، خدمات مهنية...)'},
-  {key:'corp',       icon:'🏢', name:'الشركات', desc:'تسجيل الشركات والمعارض'},
-  {key:'tenders',    icon:'📋', name:'غرفة المناقصات', desc:'باقة المناقصات المدفوعة'},
-  {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني'},
+  {key:'individual', icon:'👤', name:'الأفراد', name_fr:'Particuliers', desc:'تسجيل ونشر إعلانات الحسابات الفردية', desc_fr:'Inscription et publication d\'annonces individuelles'},
+  {key:'store',      icon:'🏪', name:'المحلات', name_fr:'Boutiques', desc:'تسجيل المحلات وكتالوج المنتجات', desc_fr:'Inscription des boutiques et catalogue produits'},
+  {key:'office',     icon:'📒', name:'المكاتب', name_fr:'Bureaux', desc:'تسجيل المكاتب (تأمين، خدمات مهنية...)', desc_fr:'Inscription des bureaux (assurance, services...)'},
+  {key:'corp',       icon:'🏢', name:'الشركات', name_fr:'Entreprises', desc:'تسجيل الشركات والمعارض', desc_fr:'Inscription des entreprises et showrooms'},
+  {key:'tenders',    icon:'📋', name:'غرفة المناقصات', name_fr:'Appels d\'offres', desc:'باقة المناقصات المدفوعة', desc_fr:'Forfait appels d\'offres payant'},
+  {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
 var _moduleFlagsCache = null;
 
@@ -2928,8 +3057,11 @@ function renderModulesToggleList(flags){
   if(!list) return;
   list.innerHTML = MODULE_DEFS.map(function(m){
     var on = flags[m.key] !== false && flags[m.key] !== undefined ? !!flags[m.key] : false;
+    var fr = (window.RizqI18n && RizqI18n.getLang && RizqI18n.getLang()==='fr');
+    var label = fr ? (m.name_fr||m.name) : m.name;
+    var desc = fr ? (m.desc_fr||m.desc) : m.desc;
     return '<div class="toggle-row">'
-      + '<div class="toggle-info"><div class="toggle-name">'+m.icon+' '+m.name+'</div><div class="toggle-desc">'+m.desc+'</div></div>'
+      + '<div class="toggle-info"><div class="toggle-name">'+m.icon+' '+label+'</div><div class="toggle-desc">'+desc+'</div></div>'
       + '<button class="toggle-sw'+(on?' on':'')+'" onclick="toggleModuleFlag(\''+m.key+'\', this)"></button>'
       + '</div>';
   }).join('');
@@ -6143,7 +6275,7 @@ function renderMissedQuestions(){
   // "الأسئلة الفائتة" العادية دون أي تمييز؛ الآن نُبرز الحالات العاجلة أولاً بلون تحذيري
   var urgentLabel = {
     urgent_fraud: RizqI18n.t2('⚠️ بلاغ احتيال/مشكلة','⚠️ Signalement fraude/problème'),
-    urgent_vip:   RizqI18n.t2('💎 طلب VIP (ناسي)','💎 Demande VIP (Nasi)'),
+    urgent_vip:   RizqI18n.t2('💎 طلب VIP (الماسية)','💎 Demande VIP (Diamant)'),
     blocked:      RizqI18n.t2('🚫 محتوى محظور/محاولة اختراق','🚫 Contenu bloqué/tentative')
   };
   var sorted = list.slice().sort(function(a,b){
@@ -6390,7 +6522,26 @@ function saveChannelsConfig(){
     if(el) cfg[id] = el.value;
   });
   localStorage.setItem(CHANNELS_CFG_KEY, JSON.stringify(cfg));
-  if(typeof showToast==='function') showToast(RizqI18n.t2('✅ تم حفظ إعدادات قنوات التواصل','✅ Paramètres des canaux enregistrés'),'success');
+  _adminPostSiteConfig({
+    channelsPublic: {
+      phoneNumber: cfg['ch-phone-number'] || '',
+      webhookUrl: cfg['ch-webhook-url'] || '',
+      callGreeting: cfg['ch-call-greeting'] || '',
+      ivr1: cfg['ch-ivr-1'] || '',
+      ivr2: cfg['ch-ivr-2'] || '',
+      ivr3: cfg['ch-ivr-3'] || '',
+      callClosing: cfg['ch-call-closing'] || '',
+      emailFrom: cfg['ch-email-from'] || '',
+      emailSubjInquiry: cfg['ch-email-subj-inquiry'] || '',
+      emailBodyInquiry: cfg['ch-email-body-inquiry'] || '',
+      emailBodySupport: cfg['ch-email-body-support'] || '',
+      emailBodyPartner: cfg['ch-email-body-partner'] || ''
+    }
+  }, function(){
+    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ تم حفظ إعدادات قنوات التواصل','✅ Paramètres des canaux enregistrés'),'success');
+  }, function(){
+    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ حُفظ محلياً (أسرار Twilio تبقى على هذا الجهاز)','✅ Enregistré localement (les secrets Twilio restent sur cet appareil)'),'success');
+  });
 }
 
 // معاينة صوتية لنص الرد على المكالمة — عبر Web Speech API (بدون أي خادم)
@@ -6564,6 +6715,100 @@ function renderSubscriberAgents(){
       '<button class="btn-sm btn-danger" onclick="deleteSubscriberAgent(\''+a.id+'\')">'+RizqI18n.t2('حذف','Supprimer')+'</button>'+
       '</div></div>';
   }).join('');
+}
+
+function _quotaBar(pct, label){
+  var p = Math.max(0, Math.min(100, Number(pct)||0));
+  var col = p>=100?'#dc2626':p>=80?'#d97706':'#16a34a';
+  return '<div style="margin-top:6px">'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px"><span>'+label+'</span><span style="font-weight:700;color:'+col+'">'+p+'%</span></div>'+
+    '<div style="height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';border-radius:99px"></div></div>'+
+    '</div>';
+}
+
+function loadQuotaGuardPanel(){
+  var stats = document.getElementById('quota-guard-stats');
+  var list = document.getElementById('quota-guard-list');
+  var pendingEl = document.getElementById('quota-guard-pending');
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl){
+    if(list) list.innerHTML = '<div style="text-align:center;color:#b45309;padding:30px;font-size:13px">⚠️ اضبط رابط الخادم من تبويب وكيل الباقات أولاً</div>';
+    return;
+  }
+  if(list) list.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px;font-size:13px">جارٍ التحميل...</div>';
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/quota/admin', {
+    headers: { 'x-rizq-secret': cfg.backendSecret || '' }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if(!data || !data.ok) throw new Error('bad');
+    var badge = document.getElementById('quota-over-badge');
+    if(badge){
+      var n = (data.over80||0);
+      badge.textContent = n;
+      badge.style.display = n>0 ? 'inline-block' : 'none';
+    }
+    if(stats){
+      var card = function(v,l,c){ return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:12px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:'+c+'">'+v+'</div><div style="font-size:12px;color:#64748b;margin-top:4px">'+l+'</div></div>'; };
+      stats.innerHTML =
+        card(data.count||0, 'مشتركون ماسيون', '#1B3A6B')+
+        card(data.over80||0, 'تجاوزوا 80%', '#d97706')+
+        card(data.over100||0, 'على Haiku (100%)', '#dc2626')+
+        card('$'+(data.totalCostUsd||0).toFixed(4), 'تكلفة API هذا الشهر', '#7c3aed');
+    }
+    var pending = data.pendingAddons || [];
+    if(pendingEl){
+      if(!pending.length) pendingEl.innerHTML = '';
+      else pendingEl.innerHTML = '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:14px;margin-bottom:8px"><div style="font-weight:800;color:#9a3412;margin-bottom:8px">طلبات حزم إضافية ('+pending.length+')</div>'+
+        pending.map(function(a){
+          return '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid rgba(154,52,18,.12)">'+
+            '<div><div style="font-weight:700">'+(a.businessName||a.subscriberId)+'</div><div style="font-size:12px;color:#9a3412">'+a.priceMru+' أوقية · '+a.period+'</div></div>'+
+            '<div style="display:flex;gap:8px">'+
+            '<button class="btn-sm btn-outline" onclick="resolveQuotaAddon(\''+a.id+'\',\'approved\')">✅ موافقة</button>'+
+            '<button class="btn-sm btn-danger" onclick="resolveQuotaAddon(\''+a.id+'\',\'rejected\')">رفض</button>'+
+            '</div></div>';
+        }).join('')+'</div>';
+    }
+    var rows = data.subscribers || [];
+    if(!list) return;
+    if(!rows.length){
+      list.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px;font-size:13px">لا يوجد مشتركون ماسيون مسجَّلون بعد</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(s){
+      var st = s.forceFast
+        ? '<span style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">Haiku — الحصة نفدت</span>'
+        : (s.pct>=80
+          ? '<span style="background:#ffedd5;color:#9a3412;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">تنبيه 80%</span>'
+          : '<span style="background:#dcfce7;color:#166534;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">Sonnet نشط</span>');
+      return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:14px;padding:16px;margin-bottom:12px">'+
+        '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">'+
+          '<div><div style="font-weight:800;color:#1B3A6B">'+(s.businessName||s.subscriberId||'—')+'</div>'+
+          '<div style="font-size:12px;color:#64748b;margin-top:2px;direction:ltr;text-align:right">'+(s.subscriberId||'')+(s.accountId?' · '+s.accountId:'')+'</div></div>'+
+          '<div style="text-align:left">'+st+'<div style="font-size:12px;font-weight:700;color:#7c3aed;margin-top:6px">API: $'+(s.costUsd||0).toFixed(4)+' · حزم +: '+(s.addons||0)+'</div></div>'+
+        '</div>'+
+        _quotaBar(s.pct, 'الإجمالي ('+(s.period||'')+')')+
+        _quotaBar((s.ratios&&s.ratios.messages)||0, 'رسائل '+(s.messages||0)+'/'+(s.limits&&s.limits.messages||0))+
+        _quotaBar((s.ratios&&s.ratios.minutes)||0, 'دقائق '+(s.minutes||0)+'/'+(s.limits&&s.limits.minutes||0))+
+        _quotaBar((s.ratios&&s.ratios.tokens)||0, 'توكنز '+(s.tokens||0)+'/'+(s.limits&&s.limits.tokens||0))+
+      '</div>';
+    }).join('');
+  }).catch(function(){
+    if(list) list.innerHTML = '<div style="text-align:center;color:#dc2626;padding:30px;font-size:13px">تعذّر تحميل بيانات الاستهلاك — تحقق من الخادم والسرّ المشترك</div>';
+  });
+}
+
+function resolveQuotaAddon(id, status){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/quota/admin/addons/' + encodeURIComponent(id) + '/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-rizq-secret': cfg.backendSecret || '' },
+    body: JSON.stringify({ status: status })
+  }).then(function(r){ return r.json(); }).then(function(){
+    if(typeof showToast==='function') showToast(status==='approved'?'✅ تمت الموافقة على الحزمة الإضافية':'تم الرفض','success');
+    loadQuotaGuardPanel();
+  }).catch(function(){
+    if(typeof showToast==='function') showToast('تعذّر تحديث الطلب','error');
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════

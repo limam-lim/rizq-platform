@@ -267,8 +267,15 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     return askAgent({ channel, message, context });
   }
 
-  // لو الباقة ليست ماسية → رفض الخدمة
-  if(profile.plan !== 'diamond') {
+  const {
+    getFastModel,
+    getAdvancedModel,
+    isDiamondProfile,
+    createCachedMessage,
+  } = require('./rizq-backend/config/anthropic');
+
+  // لو الباقة ليست ماسية → رفض الخدمة (الوكيل المتخصص للماسي فقط)
+  if (!isDiamondProfile(profile)) {
     return {
       text   : 'خدمة الوكيل الذكي متاحة فقط لمشتركي الباقة الماسية.',
       channel: channel,
@@ -279,11 +286,11 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   // ── بناء System Prompt خاص بالمشترك ──────────────────────
   const systemPrompt = buildSubscriberSystemPrompt(profile);
 
-  // ── استدعاء Claude مع System Prompt مخصص ─────────────────
-  // نمرّر systemPrompt عبر overrideSystem (موجود في النسخة الممتدة)
   const Anthropic = require('@anthropic-ai/sdk');
+  const { shouldForceFast, recordUsage } = require('./rizq_quota_guard_agent');
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const MODEL  = process.env.RIZQ_AGENT_MODEL || 'claude-haiku-4-5-20251001';
+  const forceFast = shouldForceFast(subscriberId, profile.accountId);
+  const MODEL = forceFast ? getFastModel() : getAdvancedModel();
 
   const channelInstructions = {
     call    : '\n\n[القناة: مكالمة] جمل قصيرة جداً لا تتجاوز 15 ثانية. بدون قوائم.',
@@ -301,21 +308,46 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 
   messages.push({ role: 'user', content: userContent });
 
-  const response = await client.messages.create({
+  const created = await createCachedMessage(client, {
     model     : MODEL,
     max_tokens: channel === 'call' ? 250 : 800,
     system    : fullSystem,
     messages  : messages
-  });
+  }, { fallbackToFast: true });
+  const response = created.response;
 
   const textBlock = response.content.find(b => b.type === 'text');
   const replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سيُتواصل معكم قريباً.';
 
+  if (forceFast) {
+    console.warn(`🎭 [${profile.businessName}] الحصة استُنفدت — Haiku بدل Sonnet`);
+  } else if (created.fallback) {
+    console.warn(`🎭 [${profile.businessName}] تحويل احتياطي من ${getAdvancedModel()} إلى ${getFastModel()}`);
+  }
   console.log(`🎭 [${profile.businessName}] رد على ${context.sender || 'مجهول'}: ${replyText.substring(0,60)}...`);
+
+  let quota = null;
+  try {
+    quota = await recordUsage({
+      subscriberId,
+      accountId: profile.accountId || '',
+      businessName: profile.businessName,
+      phone: subscriberId,
+      channel,
+      model: created.model,
+      usage: response.usage,
+      replyText,
+    });
+  } catch (qErr) {
+    console.warn('[quota-guard] record failed:', qErr && qErr.message);
+  }
 
   return {
     text      : replyText,
-    model     : MODEL,
+    model     : created.model,
+    fallback  : created.fallback || forceFast,
+    forceFast : !!(quota && quota.forceFast) || forceFast,
+    quotaPct  : quota ? quota.pct : null,
     channel   : channel,
     business  : profile.businessName,
     businessType: profile.businessType,

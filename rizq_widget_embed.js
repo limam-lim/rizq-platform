@@ -1,6 +1,7 @@
 /**
  * rizq_widget_embed.js — مدير رزق الذكي (embed + drag)
  * يُحقن في أي صفحة بسطرين:
+ *   <script src="rizq_packages_config.js"><\/script>
  *   <script src="rizq_manager_agent_config.js"><\/script>
  *   <script src="rizq_widget_embed.js"><\/script>
  */
@@ -226,7 +227,7 @@
         var acc  = accs.find(function(a) {
           return a.status === 'approved' && (a.type === 'store' || a.type === 'corp' || a.type === 'office');
         });
-        if (acc && typeof RizqSub !== 'undefined' && RizqSub.hasFeature(acc.id, 'ai_agent_full')) {
+        if (acc && typeof RizqSub !== 'undefined' && (RizqSub.hasFeature(acc.id, 'ai_agent_full') || RizqSub.hasFeature(acc.id, 'widget_channel'))) {
           var prods = [];
           try { prods = JSON.parse(localStorage.getItem('store_products_' + acc.id) || '[]'); } catch(e2){}
           return {
@@ -258,7 +259,7 @@
       try {
         var _domParams = new URLSearchParams(location.search);
         var _domAccId  = _domParams.get('id') || _domParams.get('store') || _domParams.get('office') || _domParams.get('corp');
-        if (_domAccId && typeof RizqSub !== 'undefined' && !RizqSub.hasFeature(_domAccId, 'ai_agent_full')) {
+        if (_domAccId && typeof RizqSub !== 'undefined' && !RizqSub.hasFeature(_domAccId, 'ai_agent_full') && !RizqSub.hasFeature(_domAccId, 'widget_channel')) {
           return null; // حساب حقيقي معروف لكن بلا باقة ماسية — لا تخصيص
         }
 

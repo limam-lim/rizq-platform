@@ -35,6 +35,7 @@ const express    = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const { askAgent } = require('./rizq_agent_brain');
+const { getFastModel } = require('./rizq-backend/config/anthropic');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -212,7 +213,7 @@ app.get('/api/status', (req, res) => {
     status      : 'running',
     port        : PORT,
     emails_total: emailLog.length,
-    claude_model: process.env.RIZQ_AGENT_MODEL || 'claude-haiku-4-5-20251001',
+    claude_model: getFastModel(),
     api_key_set : !!(process.env.ANTHROPIC_API_KEY)
   });
 });
@@ -223,7 +224,7 @@ app.get('/', (req, res) => {
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">
     <h1>📧 مدير رزق الذكي v2 — خادم البريد</h1>
     <p>✅ الخادم يعمل على المنفذ <strong>${PORT}</strong></p>
-    <p>🧠 العقل: <strong>${process.env.RIZQ_AGENT_MODEL || 'claude-haiku-4-5-20251001'}</strong></p>
+    <p>🧠 العقل: <strong>${getFastModel()}</strong></p>
     <p>🔑 API Key: <strong>${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود'}</strong></p>
     <p>📊 إيميلات معالجة: <strong>${emailLog.length}</strong></p>
     <hr>

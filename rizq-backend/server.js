@@ -14,7 +14,7 @@
  * ══════════════════════════════════════════════════════════════════
  */
 require('dotenv').config();
-const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured } = require('./config/anthropic');
+const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getFastModel, getAdvancedModel } = require('./config/anthropic');
 ensureAnthropicEnv();
 // ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
@@ -30,7 +30,8 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { registerSubscriber, getSubscriberProfile } = require('../rizq_subscriber_agent');
+const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles } = require('../rizq_subscriber_agent');
+const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 
 const app = express();
 
@@ -66,6 +67,20 @@ const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: false, cor
 function getModuleFlags() {
   const cfg = readJson(SITE_CONFIG_FILE, {});
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
+}
+
+const DEFAULT_PLATFORM_FLAGS = {
+  platformOpen: true,
+  registrationOpen: true,
+  adsOpen: true,
+  moderationRequired: false,
+  otpRequired: true,
+  vpnBlock: false,
+  sessionTimeoutMin: 60,
+};
+function getPlatformFlags() {
+  const cfg = readJson(SITE_CONFIG_FILE, {});
+  return Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
 }
 
 // ── محرك القواعد المشترك لكل قسم (وكيل واحد + قواعد منفصلة لكل قسم بدل
@@ -241,7 +256,13 @@ app.post('/api/subscriber/register', requireSharedSecret, (req, res) => {
     return res.status(400).json({ error: 'subscriberId + businessName مطلوبان' });
   }
   try {
-    registerSubscriber(String(subscriberId).slice(0, 40), profile);
+    registerSubscriber(String(subscriberId).slice(0, 40), Object.assign({
+      plan: 'diamond',
+      tier: 'diamond',
+      widget_enabled: true,
+      whatsapp_enabled: true,
+      calls_enabled: true,
+    }, profile));
     res.json({ ok: true, message: 'تم تسجيل ' + profile.businessName });
   } catch (err) {
     console.error('[subscriber/register] error:', err.message);
@@ -332,7 +353,7 @@ app.post('/api/verify-receipt', requireSharedSecret, async (req, res) => {
       '{"date":"","amount":"","reference":"","bankOrOperator":"","plausibilityLevel":"clear|low|medium|high","notes":["..."]}';
 
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: getAdvancedModel(),
       max_tokens: 500,
       messages: [{
         role: 'user',
@@ -403,7 +424,7 @@ app.post('/api/translate', requireSharedSecret, async (req, res) => {
       'النصوص:\n' + JSON.stringify(clean.map((it) => ({ key: it.key, text: it.text })));
 
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: getAdvancedModel(),
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -482,7 +503,9 @@ app.get('/api/ai/status', (req, res) => {
   res.json({
     ok: true,
     configured: isAnthropicConfigured(),
-    model: process.env.RIZQ_WIDGET_MODEL || 'claude-haiku-4-5-20251001',
+    model: getFastModel(),
+    fastModel: getFastModel(),
+    advancedModel: getAdvancedModel(),
   });
 });
 
@@ -522,6 +545,19 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
       history: Array.isArray(b.history) ? b.history : [],
       pageContext: b.pageContext || { page: 'dashboard' },
     });
+    try {
+      await recordUsage({
+        subscriberId: acc.phone || acc.whatsapp || accountId,
+        accountId,
+        businessName: acc.name || '',
+        phone: acc.phone || acc.whatsapp || '',
+        channel: 'dashboard',
+        model: result.model,
+        usage: result.usage,
+      });
+    } catch (qErr) {
+      console.warn('[quota-guard] subscriber/chat:', qErr && qErr.message);
+    }
     res.json(result);
   } catch (err) {
     console.error('[subscriber/chat] error:', err.message);
@@ -770,6 +806,84 @@ app.post('/api/site-config', requireSharedSecret, (req, res) => {
     next.sectionRules = existingRules;
   }
 
+  if (body.prices && typeof body.prices === 'object') {
+    const sanitizePriceList = (list) => (Array.isArray(list) ? list : []).slice(0, 40).map((it) => ({
+      icon: String(it.icon || '').slice(0, 8),
+      name: String(it.name || '').slice(0, 80),
+      price: Number(it.price) || 0,
+      unit: String(it.unit || '').slice(0, 40),
+      trend: ['up', 'down', 'flat'].includes(it.trend) ? it.trend : 'flat',
+    }));
+    next.prices = {
+      food: sanitizePriceList(body.prices.food),
+      fuel: sanitizePriceList(body.prices.fuel),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  if (body.site && typeof body.site === 'object') {
+    const s = body.site;
+    next.site = {
+      sitename: String(s.sitename || '').slice(0, 80),
+      tagline: String(s.tagline || '').slice(0, 200),
+      phone: String(s.phone || '').slice(0, 40),
+      whatsapp: String(s.whatsapp || '').slice(0, 40),
+      email: String(s.email || '').slice(0, 120),
+      reportEmail: String(s.reportEmail || '').slice(0, 120),
+      address: String(s.address || '').slice(0, 200),
+      adsCount: Math.max(0, Number(s.adsCount) || 0),
+      usersCount: Math.max(0, Number(s.usersCount) || 0),
+      wilayasCount: Math.max(0, Number(s.wilayasCount) || 0),
+      bannerActive: !!s.bannerActive,
+      bannerText: String(s.bannerText || '').slice(0, 300),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  if (body.platformFlags && typeof body.platformFlags === 'object') {
+    const f = body.platformFlags;
+    const existing = Object.assign({}, DEFAULT_PLATFORM_FLAGS, current.platformFlags || {});
+    ['platformOpen', 'registrationOpen', 'adsOpen', 'moderationRequired', 'otpRequired', 'vpnBlock'].forEach((k) => {
+      if (k in f) existing[k] = f[k] === true;
+    });
+    if (f.sessionTimeoutMin != null) {
+      existing.sessionTimeoutMin = Math.max(5, Math.min(1440, Number(f.sessionTimeoutMin) || 60));
+    }
+    existing.updatedAt = new Date().toISOString();
+    next.platformFlags = existing;
+  }
+
+  if (Array.isArray(body.extraCategories)) {
+    next.extraCategories = body.extraCategories.slice(0, 20).map((c) => ({
+      icon: String(c.icon || '').slice(0, 8),
+      name: String(c.name || '').slice(0, 80),
+      name_fr: String(c.name_fr || '').slice(0, 80),
+      count: String(c.count || '').slice(0, 40),
+      count_fr: String(c.count_fr || '').slice(0, 40),
+      subs: Array.isArray(c.subs) ? c.subs.slice(0, 30).map((x) => String(x).slice(0, 80)) : [],
+      subs_fr: Array.isArray(c.subs_fr) ? c.subs_fr.slice(0, 30).map((x) => String(x).slice(0, 80)) : [],
+    }));
+  }
+
+  if (body.channelsPublic && typeof body.channelsPublic === 'object') {
+    const c = body.channelsPublic;
+    next.channelsPublic = {
+      phoneNumber: String(c.phoneNumber || '').slice(0, 40),
+      webhookUrl: String(c.webhookUrl || '').slice(0, 300),
+      callGreeting: String(c.callGreeting || '').slice(0, 2000),
+      ivr1: String(c.ivr1 || '').slice(0, 500),
+      ivr2: String(c.ivr2 || '').slice(0, 500),
+      ivr3: String(c.ivr3 || '').slice(0, 500),
+      callClosing: String(c.callClosing || '').slice(0, 500),
+      emailFrom: String(c.emailFrom || '').slice(0, 120),
+      emailSubjInquiry: String(c.emailSubjInquiry || '').slice(0, 200),
+      emailBodyInquiry: String(c.emailBodyInquiry || '').slice(0, 2000),
+      emailBodySupport: String(c.emailBodySupport || '').slice(0, 2000),
+      emailBodyPartner: String(c.emailBodyPartner || '').slice(0, 2000),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
   writeJson(SITE_CONFIG_FILE, next);
   res.json({ ok: true, config: next });
 });
@@ -866,6 +980,9 @@ const accountsRegisterLimiter = rateLimit({
  */
 app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const b = req.body || {};
+  const pFlags = getPlatformFlags();
+  if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
+  if (pFlags.registrationOpen === false) return res.status(403).json({ error: 'التسجيل مغلق حالياً' });
   if (!b.name || !b.type) return res.status(400).json({ error: 'name و type مطلوبان' });
   // ── بوابة "الإطلاق التدريجي" — رفض تسجيل أي نوع حساب قسمه مغلق حالياً
   // (moduleFlags)، حتى لو تجاوز طالب التسجيل واجهة الموقع وأرسل الطلب
@@ -1005,6 +1122,9 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
   // الأدمن بتاتاً (قرار خصوصية سابق) — هذا الحقل يُخزَّن فقط ليُستخدم
   // لاحقاً (مثلاً في نظام الرسائل) بدل أن يُفقَد كما كان الحال سابقاً.
   if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone;
+  if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
+  if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
+  if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
   acc.updatedAt = new Date().toISOString();
   list[idx] = acc;
   writeAccounts(list);
@@ -1197,6 +1317,9 @@ app.use('/api/wishlist', wishlistRouter);
 /** @deprecated � استخد�& POST /api/auth/register */
 app.post('/api/buyers/register', buyersRegisterLimiter, (req, res, next) => {
   try {
+    const pFlags = getPlatformFlags();
+    if (pFlags.platformOpen === false) return res.status(503).json({ ok: false, error: 'المنصة مغلقة للصيانة حالياً' });
+    if (pFlags.registrationOpen === false) return res.status(403).json({ ok: false, error: 'التسجيل مغلق حالياً' });
     const result = BuyerModel.registerOrLogin(req.body || {});
     res.status(result.created ? 201 : 200).json({ ok: true, buyer: result.buyer, token: result.token });
   } catch (err) { next(err); }
@@ -1563,6 +1686,26 @@ function verifyAccountOwner(accountId, token) {
   return (acc && acc.accessToken === token && !acc.suspended) ? acc : null;
 }
 
+setupQuotaGuardAPI(app, requireSharedSecret, {
+  verifyAccountOwner,
+  getAccountRecord,
+  loadProfiles: () => {
+    try {
+      return getAllSubscriberProfiles().map((p) => {
+        const prof = getSubscriberProfile(p.subscriberId) || {};
+        return {
+          subscriberId: p.subscriberId,
+          accountId: p.accountId,
+          businessName: prof.businessName || '',
+          phone: p.subscriberId,
+        };
+      });
+    } catch (e) {
+      return [];
+    }
+  },
+});
+
 // نسخة عامة آمنة من المناقصة — بلا عروض وبلا هوية صاحبها الدقيقة (فقط اسمه)
 function toPublicTender(t) {
   const now = Date.now();
@@ -1913,6 +2056,9 @@ const adsPublishLimiter = rateLimit({
  */
 app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) => {
   try {
+  const pFlags = getPlatformFlags();
+  if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
+  if (pFlags.adsOpen === false) return res.status(403).json({ error: 'نشر الإعلانات مغلق حالياً' });
   const b = req.body || {};
   if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'العنوان مطلوب' });
   if (!b.category) return res.status(400).json({ error: 'الفئة مطلوبة' });

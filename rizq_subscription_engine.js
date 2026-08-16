@@ -18,6 +18,7 @@
     'سنوية'          : 365,
     'ماسية'          : 30,
     '💎 ماسية'       : 30,
+    'الماسية 💎 (النائب الذكي الشامل)' : 30,
     // باقة المناقصة — عمداً بلا أي بديل باسم "تجريبي/مجاني": الميزة الوحيدة
     // في المنصة بلا فترة تجربة (تصحيح Limam 23/07/2026). القيمة هنا مجرد
     // شبكة أمان احتياطية؛ المصدر الفعلي هو حقل durationDays في كتالوج
@@ -79,6 +80,12 @@
   function resolvePlanType(pkgName, accountType) {
     var name = String(pkgName || '').replace(/💎\s*/g, '').trim().toLowerCase();
     var type = String(accountType || 'individual').toLowerCase();
+    if (isDiamondName(pkgName)) {
+      if (type === 'store' || type === 'shop') return 'store_diamond';
+      if (type === 'office') return 'office_diamond';
+      if (type === 'corp') return 'corp_diamond';
+      return 'store_diamond';
+    }
     if (/business|🏢|أعمال/.test(name)) return 'business';
     if (/^pro$|pro\b|باقة\s*pro/.test(name)) return 'pro';
     if (type === 'individual') {
@@ -86,7 +93,7 @@
       if (/شهر|month|pro/.test(name)) return 'pro';
       return 'free';
     }
-    return null; // store/office/corp — يستخدم POST_LIMITS التقليدي
+    return null;
   }
 
   function getPlanLimits(accId) {
@@ -220,9 +227,9 @@
       'Pro': Infinity, 'pro': Infinity, 'PRO': Infinity, 'باقة شهرية': Infinity,
       'Business': Infinity, 'business': Infinity, '🏢 Business': Infinity,
     },
-    store      : { 'تجريبية':Infinity, 'شهرية':50, 'ربعية':200, 'سنوية':Infinity, 'ماسية':Infinity },
-    corp       : { 'تجريبية':Infinity, 'شهرية':30, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity },
-    office     : { 'أساسية':5, 'احترافية':Infinity, 'شركات التأمين':Infinity },
+    store      : { 'تجريبية':Infinity, 'شهرية':50, 'ربعية':200, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
+    corp       : { 'تجريبية':Infinity, 'شهرية':30, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
+    office     : { 'أساسية':5, 'احترافية':Infinity, 'شركات التأمين':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
   };
   // فئة غير معروفة بالجدول أو اسم باقة غير مطابق تماماً → القيمة الافتراضية.
   // للفرد فقط نفترض الأدنى (1) تحوطاً؛ لبقية الفئات نفترض "غير محدود" تفادياً
@@ -230,11 +237,16 @@
   // من حجب زبون دفع فعلاً بالخطأ).
   var POST_LIMIT_FALLBACK = { individual: 5 };
 
+  function isDiamondName(name) {
+    return /ماس|diamond|diamant/i.test(String(name || ''));
+  }
+
   function getPostLimit(accId, category) {
     var sub = checkSubscription(accId);
     var table = POST_LIMITS[category];
     if(!table) return Infinity;
     var name = String(sub.pkg||'').replace('💎 ','').trim();
+    if (isDiamondName(name)) return Infinity;
     if(Object.prototype.hasOwnProperty.call(table, name)) return table[name];
     return Object.prototype.hasOwnProperty.call(POST_LIMIT_FALLBACK, category) ? POST_LIMIT_FALLBACK[category] : Infinity;
   }
@@ -314,7 +326,7 @@
     // من "سنوية" مثلاً، تُصنَّف خطأً في المستوى 2 ولا تمنح مزايا الذكاء
     // الاصطناعي رغم أنها الباقة المُعلَنة والمُسوَّقة لهذه المزايا تحديداً —
     // هذا بالضبط اللبس الذي كان يظهر في واجهة "الخدمات المتاحة" بالداشبورد.
-    if(name.indexOf('ماسي')!==-1) return 3;
+    if(isDiamondName(name)) return 3;
     var def = _findPackageDef(name);
     if(!def) {
       // اسم غير موجود في أي قائمة (بيانات قديمة) → رجوع لمطابقة الكلمات القديمة
@@ -349,7 +361,7 @@
   var TIER_FEATURES = {
     1: ['unlimited_products','intro_video','analytics','extra_photos'],
     2: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge'],
-    3: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge','auto_reply_calls','vip_manager','ai_agent_full'],
+    3: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge','auto_reply_calls','vip_manager','ai_agent_full','widget_channel','whatsapp_channel','calls_channel','quota_dashboard'],
   };
 
   // ── تفعيل الباقة (يُستدعى من الأدمن أو مدير رزق الذكي) ─────────
@@ -374,6 +386,7 @@
     history.push({ pkg: pkgName, activatedAt: now.toISOString(), endsAt: ends.toISOString(), days: days, by: activatedBy || 'admin' });
 
     var accExisting = accounts[accId] || {};
+    var diamondOn = isDiamondName(pkgName);
     accounts[accId] = Object.assign(accExisting, {
       id          : accId,
       package     : pkgName,
@@ -382,12 +395,22 @@
       pkg_days    : days,
       pkg_activated_at : now.toISOString(),
       pkg_ends_at : ends.toISOString(),
-      planType    : resolvePlanType(pkgName, accExisting.type) || 'free',
+      planType    : resolvePlanType(pkgName, accExisting.type) || (diamondOn ? 'store_diamond' : 'free'),
       subscriptionStatus: 'active',
       activated_by: activatedBy || 'admin',
       reminder_sent: false,
       pkg_history : history,
       pkg_count   : history.length,
+      plan        : diamondOn ? 'diamond' : (accExisting.plan || pkgName),
+      planName    : pkgName,
+      tier        : diamondOn ? 'diamond' : (accExisting.tier || ''),
+      diamond     : diamondOn,
+      widget_enabled : diamondOn ? true : !!accExisting.widget_enabled,
+      whatsapp_enabled : diamondOn ? true : !!accExisting.whatsapp_enabled,
+      calls_enabled : diamondOn ? true : !!accExisting.calls_enabled,
+      quota_guard : diamondOn ? true : !!accExisting.quota_guard,
+      ai_model    : diamondOn ? 'advanced' : (accExisting.ai_model || ''),
+      channels    : diamondOn ? { widget: true, whatsapp: true, calls: true } : (accExisting.channels || {})
     });
     saveAccounts(accounts);
 
@@ -467,6 +490,25 @@
                 saveAccounts(freshAccounts);
               }
             }catch(e){}
+          }
+          if (diamondOn && _accInfo2.phone) {
+            fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/subscriber/register', {
+              method: 'POST',
+              headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+              body: JSON.stringify({
+                subscriberId: String(_accInfo2.phone).replace(/[^0-9+]/g,'').slice(0, 40),
+                businessName: _accInfo2.name || accId,
+                accountId: accId,
+                plan: 'diamond',
+                tier: 'diamond',
+                package: pkgName,
+                pkgName: pkgName,
+                widget_enabled: true,
+                whatsapp_enabled: true,
+                calls_enabled: true,
+                channels: { widget: true, whatsapp: true, calls: true }
+              })
+            }).catch(function(){});
           }
         }).catch(function(){ /* صامت — لا يوجد خادم أو انقطاع شبكة، التفعيل المحلي يبقى سارياً */ });
       }
@@ -707,6 +749,14 @@
 
   // ── باقات للتجديد (تعمل مع جميع الفئات الست) ─────────────────────
   function getAvailablePackages(accType) {
+    var TYPE_TO_CATALOG = {
+      general   : 'general',
+      individual: 'individual',
+      office    : 'office',
+      store     : 'store',
+      corp      : 'corp',
+      video     : 'video',
+    };
     var TYPE_TO_LS = {
       general   : 'rizq_packages',
       individual: 'rizq_individual_packages',
@@ -715,12 +765,18 @@
       corp      : 'rizq_corp_packages',
       video     : 'rizq_video_packages',
     };
+    if (typeof global.RizqPackagesConfig !== 'undefined' && typeof global.RizqPackagesConfig.getCatalog === 'function') {
+      try {
+        var fromCfg = global.RizqPackagesConfig.getCatalog(TYPE_TO_CATALOG[accType] || 'general');
+        if (fromCfg && fromCfg.length) return fromCfg;
+      } catch (e) { /* fall through */ }
+    }
     var lsKey = TYPE_TO_LS[accType] || 'rizq_packages';
     var defs = [
       {name:'شهرية',    price:accType==='office'?3500:3000, days:30, highlight:true},
       {name:'ربعية',    price:accType==='office'?9000:7500, days:90},
       {name:'سنوية',    price:accType==='office'?28000:22000,days:365},
-      {name:'💎 ماسية', price:5000, days:30, diamond:true},
+      {name:'الماسية 💎 (النائب الذكي الشامل)', price:5000, days:30, diamond:true},
     ];
     try{ var r=JSON.parse(localStorage.getItem(lsKey)||'null'); return(r&&r.length)?r:defs; }
     catch(e){return defs;}
@@ -740,7 +796,7 @@
     // ترجمة أسماء/مدد الباقات الافتراضية المعروفة (الباقات المخصّصة التي يضيفها
     // الأدمين بأسماء حرة تبقى بلغتها الأصلية، كبقية المحتوى الذي يُدخله المستخدم
     // عبر المنصة — نفس المنطق المعتمد في باقي الصفحات).
-    var NAME_FR = {'تجريبية':'Essai','شهرية':'Mensuel','ربعية':'Trimestriel','سنوية':'Annuel','ماسية':'Diamant','💎 ماسية':'💎 Diamant','مجانية':'Gratuite','مميزة':'Boost','باقة شهرية':'Mensuel'};
+    var NAME_FR = {'تجريبية':'Essai','شهرية':'Mensuel','ربعية':'Trimestriel','سنوية':'Annuel','ماسية':'Diamant','💎 ماسية':'💎 Diamant','الماسية 💎 (النائب الذكي الشامل)':'Diamant 💎 (Adjoint intelligent complet)','مجانية':'Gratuite','مميزة':'Boost','باقة شهرية':'Mensuel'};
     var DUR_FR = {'3 أيام':'3 jours','شهر':'mois','شهرياً':'Mensuel','3 أشهر':'3 mois','12 شهر':'12 mois','7 أيام':'7 jours','لكل إعلان':'par annonce'};
     function trName(n){ if(lang!=='fr') return n; var k=(n||'').trim(); return NAME_FR[k]!==undefined?NAME_FR[k]:n; }
     function trDur(d){ if(lang!=='fr') return d; var k=(d||'').trim(); return DUR_FR[k]!==undefined?DUR_FR[k]:d; }
@@ -751,10 +807,13 @@
       +'.rpkg-feat{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;text-align:right;padding:3px 0;line-height:1.4}'
       +'</style>';
     var html=(list||[]).map(function(p){
+      if (typeof global.RizqPackagesConfig !== 'undefined' && typeof global.RizqPackagesConfig.enrichForDisplay === 'function') {
+        p = global.RizqPackagesConfig.enrichForDisplay(p, lang);
+      }
       var isFree=p.price===0||p.price==='0';
       var isYear=p.name==='سنوية';
       var isTrial=p.name==='تجريبية';
-      var isDiamondPkg=p.name==='ماسية'||p.isDiamond;
+      var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1);
       var bg=isDiamondPkg?'linear-gradient(145deg,#3b0764 0%,#6b21a8 100%)':isYear?'linear-gradient(145deg,#1B3A6B 0%,#0f2347 100%)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':p.highlight?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
       var border=isDiamondPkg?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':p.highlight?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
       var shadow=isDiamondPkg?'0 8px 28px rgba(107,33,168,.5)':isYear?'0 8px 28px rgba(15,35,71,.35)':p.highlight?'0 8px 28px rgba(201,168,76,.2)':'0 4px 16px rgba(27,58,107,.08)';
@@ -765,17 +824,22 @@
       var checkCol=isDiamondPkg?'#c084fc':isYear?'#fde68a':isTrial?'#22c55e':'#10b981';
       var btnBg=isDiamondPkg?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':p.highlight?'linear-gradient(135deg,#C9A84C,#e8c96a)':'linear-gradient(135deg,#3b82f6,#1d4ed8)';
       var btnCol=isDiamondPkg?'#fff':isYear?'#0f2347':isTrial?'#fff':'#0f2347';
-      var feats=FEATS[p.name]||[];
+      var feats=(p.features&&p.features.length)?p.features:(FEATS[p.name]||FEATS['ماسية']||[]);
+      var badge = isDiamondPkg
+        ? (p.featuredBadge || _t2('الأكثر اختياراً للشركات','Le plus choisi par les entreprises'))
+        : '';
       return '<div class="rpkg-card" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
-        +(p.highlight?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(201,168,76,.45);letter-spacing:.5px">⭐ '+_t2('الأكثر طلباً','Le plus demandé')+'</div>':'')
-        +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+_t2('الباقة الماسية','Forfait Diamant')+'</div>':'')
+        +(p.highlight&&!isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(201,168,76,.45);letter-spacing:.5px">⭐ '+_t2('الأكثر طلباً','Le plus demandé')+'</div>':'')
+        +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+esc(badge)+'</div>':'')
         +(isYear?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(124,58,237,.4)">💎 '+_t2('الأفضل قيمة','Meilleur rapport qualité-prix')+'</div>':'')
-        +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||'📦')+'</div>'
+        +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||(isDiamondPkg?'💎':'📦'))+'</div>'
         +'<div style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(trName(p.name))+'</div>'
+        +(p.description?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc(p.description)+'</div>':'')
         +'<div style="font-size:11px;color:'+mutedCol+';margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">'+esc(trDur(p.duration||''))+'</div>'
         +'<div style="height:1px;background:'+(isYear?'rgba(255,255,255,.12)':'rgba(27,58,107,.08)')+';margin-bottom:14px"></div>'
         +'<div style="margin-bottom:16px"><span style="font-size:30px;font-weight:900;color:'+priceCol+';line-height:1">'+(isFree?_t2('مجاناً','Gratuit'):Number(p.price).toLocaleString())+'</span>'
         +(!isFree?'<div style="font-size:10px;color:'+mutedCol+';margin-top:1px;font-weight:600">MRU / '+esc(trDur(p.duration||''))+'</div>':'')+'</div>'
+        +(isDiamondPkg && p.roi ? '<div style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:11.5px;line-height:1.55;color:#fde68a;text-align:'+(lang==='fr'?'left':'right')+'">💼 '+esc(p.roi)+'</div>' : '')
         +'<div style="margin-bottom:18px;padding:0 4px;text-align:right">'+feats.map(function(f){return '<div class="rpkg-feat"><span style="color:'+checkCol+';font-size:14px;flex-shrink:0;margin-top:1px">✓</span><span style="color:'+featCol+'">'+f+'</span></div>';}).join('')+'</div>'
         +(isFree
           ?'<div style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46">✓ '+_t2('الباقة الحالية','Forfait actuel')+'</div>'
@@ -1053,6 +1117,7 @@
     renderPackageCardsHTML: renderPackageCardsHTML,
     getDurationDays      : getDurationDays,
     getPackageTier       : getPackageTier,
+    isDiamondName        : isDiamondName,
     FREE_FEATURES        : FREE_FEATURES,
     TIER_FEATURES        : TIER_FEATURES,
     PAID_FEATURES        : PAID_FEATURES, // محفوظة للتوافق الخلفي — غير مستخدمة داخلياً بعد الآن

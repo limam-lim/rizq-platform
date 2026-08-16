@@ -366,6 +366,7 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
 <script src="rizq_disclaimer.js"></script>
+  <script src="rizq_packages_config.js"></script>
   <script src="rizq_subscription_engine.js"></script>
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
@@ -1861,7 +1862,15 @@ function _paintInvoices(invs, isLocalSource){
 }
 
 function renderPackagesDisplay(){
-  var pkgs=[]; try{ pkgs=JSON.parse(localStorage.getItem('rizq_individual_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; }
+  var pkgs=[];
+  try{
+    if(window.RizqPackagesConfig && typeof RizqPackagesConfig.getCatalog==='function'){
+      pkgs=RizqPackagesConfig.getCatalog('individual', _rizqLang()).filter(function(p){return p.active!==false;});
+    }
+  }catch(e){ pkgs=[]; }
+  if(!pkgs.length){
+    try{ pkgs=JSON.parse(localStorage.getItem('rizq_individual_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; }
+  }
   var el=document.getElementById('packages-display'); if(!el) return;
 
   // إصلاح جوهري 24/07/2026: هذا الكتالوج الاحتياطي (وأسماؤه/ميزاته) كان مختلفاً

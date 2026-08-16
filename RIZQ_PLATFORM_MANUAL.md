@@ -229,9 +229,10 @@ suspended + إيقاف الميزات
 ### 4.3 Model & Tools
 
 ```
-Model:  claude-haiku-4-5-20251001  (قابل للتغيير عبر RIZQ_WIDGET_MODEL)
-Tools:  get_ad_details · search_ads · get_seller_profile · get_packages_info · create_support_ticket
-Langs:  العربية · الحسانية · الفرنسية · الإنجليزية · الإسبانية
+Fast:     claude-haiku-4-5-20251001   (RIZQ_FAST_MODEL)
+Advanced: claude-sonnet-4-5-20251001  (RIZQ_ADVANCED_MODEL — ترجمة / وصول دفع)
+Tools:    get_ad_details · search_ads · get_seller_profile · get_packages_info · create_support_ticket
+Langs:    العربية · الحسانية · الفرنسية · الإنجليزية · الإسبانية
 ```
 
 ### 4.4 شروط تفعيل الوكيل

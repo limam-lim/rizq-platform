@@ -330,6 +330,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 }
 </style>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_packages_config.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
@@ -2275,16 +2276,21 @@ function _paintInvoices(invs, isLocalSource){
 function renderPackagesDisplay(){
   var pkgs=JSON.parse(localStorage.getItem('rizq_store_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;});
   var el=document.getElementById('packages-display'); if(!el) return;
+  var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
 
-  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'],'شهرية':['صفحة محل موثقة','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'],'ماسية':['منتجات + إعلانات غير محدودة','وكيل ذكي AI 24/7','رد تلقائي على المكالمات','صدارة دائمة في البحث','مدير حساب VIP شخصي']};
-  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des produits','Support technique de base'],'شهرية':['Page boutique vérifiée','50 produits affichés','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','200 produits affichés','Gestionnaire de compte dédié'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Produits illimités','Support VIP 24/7','Rapports annuels'],'ماسية':['Produits + annonces illimités','Agent IA intelligent 24/7','Réponse automatique aux appels','Tête de recherche permanente','Gestionnaire de compte VIP personnel']};
-  var FEATS=(typeof _storeLang!=='undefined'&&_storeLang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎'};
+  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'],'شهرية':['صفحة محل موثقة','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية']};
+  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des produits','Support technique de base'],'شهرية':['Page boutique vérifiée','50 produits affichés','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','200 produits affichés','Gestionnaire de compte dédié'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Produits illimités','Support VIP 24/7','Rapports annuels']};
+  var FEATS=lang==='fr'?FEATS_FR:FEATS_AR;
+  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
   var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:2000},{name:'ربعية',duration:'3 أشهر',price:5500,highlight:true},{name:'سنوية',duration:'12 شهر',price:15000},{name:'ماسية',duration:'شهر',price:3500,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    var cat=RizqPackagesConfig.getCatalog('store');
+    if(cat && cat.length) list=cat;
+  }
 
-  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,(typeof _storeLang!=='undefined'?_storeLang:'ar'));
+  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang);
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;
@@ -2544,7 +2550,7 @@ function _renderAgentToggle(){
   return '<div id="agent-toggle-card" style="margin-top:14px;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);border-radius:14px;padding:18px;color:#fff">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
       '<div>'+
-        '<div style="font-size:14px;font-weight:700;color:#fbbf24">🤖 '+_t2('وكيل رزق الذكي (Claude)','Agent Rizq IA (Claude)')+'</div>'+
+        '<div style="font-size:14px;font-weight:700;color:#fbbf24">🤖 '+_t2('وكيل رزق الذكي','Agent intelligent Rizq')+'</div>'+
         '<div style="font-size:11.5px;color:#94a3b8;margin-top:3px">'+_t2('يرد على مكالماتك وواتساب بشخصيتك التجارية','Répond à vos appels et WhatsApp avec votre identité commerciale')+'</div>'+
       '</div>'+
       '<label class="rizq-toggle-switch" title="'+_t2('تفعيل/إيقاف الوكيل','Activer/Désactiver l\'agent')+'">'+
@@ -2566,6 +2572,7 @@ function _renderAgentToggle(){
       (active ? _t2('● الوكيل مفعّل — يرد على مكالماتك الآن','● Agent actif — répond à vos appels maintenant') :
                 _t2('○ الوكيل موقوف — لن يرد على المكالمات','○ Agent désactivé — n\'accepte pas les appels'))+
     '</div>'+
+    _renderChannelToggles()+
   '</div>'+
   '<style>'+
   '.rizq-toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer}'+
@@ -2575,6 +2582,54 @@ function _renderAgentToggle(){
   '.rizq-toggle-switch input:checked+.rizq-toggle-slider{background:#16a34a}'+
   '.rizq-toggle-switch input:checked+.rizq-toggle-slider:before{transform:translateX(24px)}'+
   '</style>';
+}
+
+function _getChannelFlags(){
+  var def = { widget_enabled:true, whatsapp_enabled:true, calls_enabled:true };
+  try{
+    var raw = localStorage.getItem('rizq_channel_flags_'+(SESSION_ID||''));
+    if(raw) def = Object.assign(def, JSON.parse(raw));
+  }catch(e){}
+  if(typeof STORE!=='undefined' && STORE){
+    if(STORE.widget_enabled!=null) def.widget_enabled=!!STORE.widget_enabled;
+    if(STORE.whatsapp_enabled!=null) def.whatsapp_enabled=!!STORE.whatsapp_enabled;
+    if(STORE.calls_enabled!=null) def.calls_enabled=!!STORE.calls_enabled;
+  }
+  return def;
+}
+function _renderChannelToggles(){
+  var f = _getChannelFlags();
+  function row(key, ar, fr){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.06);border-radius:8px">'+
+      '<span style="font-size:12px">'+_t2(ar,fr)+'</span>'+
+      '<label class="rizq-toggle-switch"><input type="checkbox" '+(f[key]?'checked':'')+' onchange="toggleAccountChannel(\''+key+'\',this.checked)"><span class="rizq-toggle-slider"></span></label></div>';
+  }
+  return '<div style="margin-top:12px;font-size:11px;color:#94a3b8;font-weight:700">'+_t2('قنوات الربط','Canaux')+'</div>'+
+    row('widget_enabled','ويدجت الموقع','Widget du site')+
+    row('whatsapp_enabled','واتساب','WhatsApp')+
+    row('calls_enabled','المكالمات','Appels');
+}
+function toggleAccountChannel(key, on){
+  var flags = _getChannelFlags();
+  flags[key] = !!on;
+  try{ localStorage.setItem('rizq_channel_flags_'+(SESSION_ID||''), JSON.stringify(flags)); }catch(e){}
+  if(typeof STORE!=='undefined' && STORE) STORE[key] = !!on;
+  var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
+  if(!base || !SESSION_ID){
+    showToast(_t2('✅ تم حفظ حالة القناة','✅ État du canal enregistré'));
+    return;
+  }
+  var body = {};
+  body[key] = !!on;
+  fetch(base+'/api/accounts/mine/'+encodeURIComponent(SESSION_ID), {
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','x-account-token': window.REAL_ACCESS_TOKEN||SESSION_TOKEN||''},
+    body: JSON.stringify(body)
+  }).then(function(r){ return r.json(); }).then(function(){
+    showToast(_t2('✅ تم تحديث حالة الحساب','✅ Compte mis à jour'));
+  }).catch(function(){
+    showToast(_t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+  });
 }
 
 function toggleRizqAgent(active){
@@ -2625,7 +2680,8 @@ function renderAgents(){
   var el2=document.getElementById('mod-pending');  if(el2) el2.textContent=pending;
 
   // Diamond check
-  var isDiamond = STORE && (STORE.plan==='diamond'||STORE.plan==='ماسي'||STORE.plan==='ماسية'||STORE.plan==='الماسية'||STORE.planName&&STORE.planName.includes('ماس'));
+  var isDiamond = (typeof RizqSub !== 'undefined' && STORE && STORE.id && RizqSub.hasFeature(STORE.id, 'ai_agent_full'))
+    || (STORE && (STORE.plan==='diamond'||STORE.diamond||(STORE.planName&&STORE.planName.includes('ماس'))||/ماس|diamond/i.test(STORE.package||STORE.plan||'')));
   var badge  = document.getElementById('auto-reply-badge');
   var content= document.getElementById('auto-reply-content');
   if(!badge||!content) return;
@@ -3186,7 +3242,7 @@ function saveMyPayment(){
       {icon:'📤',label:_t2('مشاركة الصفحة','Partage de la page'),feature:null,tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
       {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs et leurs interactions')},
       {icon:'🥇',label:_t2('صدارة النتائج','Mise en avant dans les résultats'),feature:'priority_listing',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {icon:'🤖',label:_t2('وكيل ذكي (AI)','Agent IA intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
+      {icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
       {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse automatique aux appels'),feature:'auto_reply_calls',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne manquez aucun appel — l\'IA répond pour vous')},
       {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnel de l\'équipe Rizq 24h/24')},
     ];

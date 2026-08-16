@@ -9,7 +9,8 @@
  *
  * متغيرات البيئة المطلوبة (.env):
  *   ANTHROPIC_API_KEY=sk-ant-...
- *   RIZQ_AGENT_MODEL=claude-haiku-4-5-20251001   (أو claude-sonnet-4-6)
+ *   RIZQ_FAST_MODEL=claude-haiku-4-5-20251001
+ *   RIZQ_ADVANCED_MODEL=claude-sonnet-4-5-20251001
  * ═══════════════════════════════════════════════════════
  */
 
@@ -20,16 +21,21 @@ if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
 }
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { getFastModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
+const {
+  getPackagesForTool,
+  buildPackagesPromptBlock,
+} = require('./rizq_packages_config');
 
 // ── إعداد العميل ──────────────────────────────────────
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || ''
 });
 
-const MODEL = process.env.RIZQ_AGENT_MODEL || 'claude-haiku-4-5-20251001';
+const MODEL = getFastModel();
 
-// ── System Prompt: شخصية مدير رزق الذكي ───────────────
-const SYSTEM_PROMPT = `أنت "مدير رزق الذكي"، الوكيل الرسمي لمنصة رزق للتجارة الإلكترونية في موريتانيا.
+function buildSystemPrompt() {
+  return `أنت "مدير رزق الذكي"، الوكيل الرسمي لمنصة رزق للتجارة الإلكترونية في موريتانيا.
 تعمل بالنيابة عن M. LIMAM — المدير العام لـ ADMINIA SARL.
 
 📋 معلوماتك الأساسية:
@@ -47,11 +53,8 @@ const SYSTEM_PROMPT = `أنت "مدير رزق الذكي"، الوكيل الر
 5. توجيه الزوار لأقسام المنصة الصحيحة
 6. حماية المنصة: لا تكشف معلومات المشتركين الخاصة
 
-📦 الباقات المتاحة:
-- مجانية: 3 إعلانات، صورة واحدة لكل إعلان، بدون مدة
-- فضية: 10 إعلانات، 3 صور، 30 يوماً — 500 MRU/شهر
-- ذهبية: 30 إعلاناً، 5 صور، 60 يوماً — 1200 MRU/شهر
-- ماسية: 100 إعلان، 10 صور، 365 يوماً — 3500 MRU/سنة
+${buildPackagesPromptBlock()}
+عند سؤال عن الأسعار استدعِ أداة get_packages_info ولا تخترع أرقاماً.
 
 🎭 أسلوبك:
 - محترف، ودود، موجز
@@ -65,6 +68,7 @@ const SYSTEM_PROMPT = `أنت "مدير رزق الذكي"، الوكيل الر
 - لا تتحدث عن مشاكل تقنية داخلية
 - إذا كان الطلب خارج صلاحياتك: سجّله وأحِله للإدارة
 - الأمان أولاً: لا تقبل روابط خارجية من العملاء`;
+}
 
 // ── أدوات الوكيل (Tools) ───────────────────────────────
 const AGENT_TOOLS = [
@@ -159,24 +163,9 @@ function executeTool(toolName, toolInput) {
       };
 
     case 'get_packages_info':
-      const lang = toolInput?.lang || 'ar';
-      if(lang === 'fr') {
-        return {
-          packages: [
-            { name: 'Gratuit', ads: 3, photos: 1, duration: '∞', price: 0 },
-            { name: 'Argent', ads: 10, photos: 3, duration: '30j', price: '500 MRU/mois' },
-            { name: 'Or', ads: 30, photos: 5, duration: '60j', price: '1200 MRU/mois' },
-            { name: 'Diamant', ads: 100, photos: 10, duration: '365j', price: '3500 MRU/an' }
-          ]
-        };
-      }
       return {
-        packages: [
-          { name: 'مجانية', ads: 3, photos: 1, duration: 'دائمة', price: 0 },
-          { name: 'فضية', ads: 10, photos: 3, duration: '30 يوم', price: '500 MRU/شهر' },
-          { name: 'ذهبية', ads: 30, photos: 5, duration: '60 يوم', price: '1200 MRU/شهر' },
-          { name: 'ماسية', ads: 100, photos: 10, duration: '365 يوم', price: '3500 MRU/سنة' }
-        ]
+        source: 'rizq_packages_config',
+        packages: getPackagesForTool(toolInput && toolInput.lang)
       };
 
     case 'escalate_to_human':
@@ -209,7 +198,7 @@ async function askAgent({ channel, message, context = {} }) {
     email: '\n\n[القناة: بريد إلكتروني] رد رسمي كامل مع تحية وختام مهني. يمكن استخدام فقرات منظّمة.'
   };
 
-  const systemPrompt = SYSTEM_PROMPT + (channelInstructions[channel] || '');
+  const systemPrompt = buildSystemPrompt() + (channelInstructions[channel] || '');
 
   // بناء رسائل المحادثة
   const messages = [];
@@ -230,14 +219,17 @@ async function askAgent({ channel, message, context = {} }) {
   let response;
   let currentMessages = [...messages];
 
-  while(true) {
-    response = await client.messages.create({
-      model    : MODEL,
+  let loops = 0;
+  while (loops < 5) {
+    loops++;
+    const created = await createCachedMessage(client, {
+      model     : MODEL,
       max_tokens: channel === 'call' ? 300 : 1024,
-      system   : systemPrompt,
-      tools    : AGENT_TOOLS,
-      messages : currentMessages
+      system    : systemPrompt,
+      tools     : AGENT_TOOLS,
+      messages  : currentMessages
     });
+    response = created.response;
 
     // لو انتهى بنص → رجّعه
     if(response.stop_reason === 'end_turn') {

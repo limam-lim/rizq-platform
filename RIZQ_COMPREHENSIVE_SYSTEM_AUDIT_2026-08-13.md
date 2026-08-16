@@ -57,12 +57,12 @@
 - ✅ **rizq_dashboard_corp.html payment flow** — openPayModal/submitPayment or sub-requests present
 - ✅ **Landing OTP** — backend /api/otp/send + /api/otp/verify
 - ✅ **OTP service** — production guard + random OTP
-- ✅ **audit-agents.js** — 27/27 checks passed
+- ✅ **audit-agents.js** — 53/53 checks passed
 - ✅ **test-widget-tools.js** — widget tools OK
 
 ## Warnings (P1 — post-launch or next sprint)
 
-- ⚠️ **href="#" without obvious handler** — rizq_search.html:472
+- ⚠️ **href="#" without obvious handler** — rizq_corp.html:421, rizq_corp.html:493, rizq_products.html:708, rizq_search.html:472, rizq_store.html:664
 
 ## Failures (P0)
 

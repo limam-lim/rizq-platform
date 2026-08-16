@@ -6,6 +6,7 @@ const { handleWidgetChat } = require('./widgetChat');
 const { isActive } = require('./agentStatus');
 const { isAnthropicConfigured } = require('../config/anthropic');
 const { getEntitlements } = require('./entitlements');
+const { recordUsage } = require('../../rizq_quota_guard_agent');
 
 function accountHasAiAgent(acc) {
   if (!acc || acc.status !== 'approved' || acc.suspended) return false;
@@ -66,6 +67,20 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
   });
 
   if (!result || !result.reply) return null;
+
+  try {
+    await recordUsage({
+      subscriberId: sellerAccount.phone || sellerAccount.whatsapp || sellerAccount.id,
+      accountId: sellerAccount.id,
+      businessName: sellerAccount.name || '',
+      phone: sellerAccount.phone || sellerAccount.whatsapp || '',
+      channel: 'inquiry',
+      model: result.model,
+      usage: result.usage,
+    });
+  } catch (qErr) {
+    console.warn('[quota-guard] inquiry:', qErr && qErr.message);
+  }
 
   const rec = {
     id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),

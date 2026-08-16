@@ -67,12 +67,13 @@ const STORE_PLANS = {
   store_monthly: { planType: 'store_monthly', maxCatalogItems: 50, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos'] },
   store_quarterly: { planType: 'store_quarterly', maxCatalogItems: 200, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
   store_yearly: { planType: 'store_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
-  store_diamond: { planType: 'store_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full'] },
+  store_diamond: { planType: 'store_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
 };
 
 const OFFICE_PLANS = {
   office_basic: { planType: 'office_basic', maxCatalogItems: 5, maxPhotosPerItem: 5, videoMaxSec: 30, videoMaxMb: 20, videoWatermark: true, features: ['dashboard_access'] },
   office_pro: { planType: 'office_pro', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing'] },
+  office_diamond: { planType: 'office_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
 };
 
 const CORP_PLANS = {
@@ -80,7 +81,7 @@ const CORP_PLANS = {
   corp_monthly: { planType: 'corp_monthly', maxCatalogItems: 30, maxPhotosPerItem: 8, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics'] },
   corp_quarterly: { planType: 'corp_quarterly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing'] },
   corp_yearly: { planType: 'corp_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing', 'vip_badge'] },
-  corp_diamond: { planType: 'corp_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full'] },
+  corp_diamond: { planType: 'corp_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
 };
 
 const FREE_FALLBACK = INDIVIDUAL_PLANS.free;
@@ -102,6 +103,7 @@ function mapPackageNameToPlanType(pkgName, accountType) {
     return 'store_monthly';
   }
   if (type === 'office') {
+    if (/ماس|diamond|diamant/.test(name)) return 'office_diamond';
     if (/احتراف|pro|premium/.test(name)) return 'office_pro';
     if (/أساس|basic/.test(name)) return 'office_basic';
     if (/تأمين|insurance/.test(name)) return 'office_pro';
@@ -197,6 +199,10 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
       advancedAnalytics: isPaidActive && !!plan.advancedAnalytics,
       accountManager: isPaidActive && !!plan.accountManager,
       aiAgent: isPaidActive && (plan.features || []).includes('ai_agent_full'),
+      widgetChannel: isPaidActive && (plan.features || []).includes('widget_channel'),
+      whatsappChannel: isPaidActive && (plan.features || []).includes('whatsapp_channel'),
+      callsChannel: isPaidActive && (plan.features || []).includes('calls_channel'),
+      quotaDashboard: isPaidActive && (plan.features || []).includes('quota_dashboard'),
     },
   };
 }
@@ -284,6 +290,8 @@ function buildDowngradePatch() {
 module.exports = {
   INDIVIDUAL_PLANS,
   STORE_PLANS,
+  OFFICE_PLANS,
+  CORP_PLANS,
   mapPackageNameToPlanType,
   getEntitlements,
   getSubscriptionStatus,

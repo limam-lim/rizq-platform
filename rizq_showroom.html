@@ -462,8 +462,8 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#FBF8F2;
     </div>
     <div class="pkg-card" style="background:linear-gradient(160deg,#1a1030,#2d1a60);border:1.5px solid rgba(139,92,246,.5);box-shadow:0 6px 22px rgba(139,92,246,.2)">
       <div style="font-size:36px;margin-bottom:10px">💎</div>
-      <div class="pkg-name" style="color:#c4b5fd" id="pkg-diamond-name">ماسية</div>
-      <div class="pkg-price" style="color:#a78bfa"><span id="pkg-dia-price-val">8,000</span> <span style="font-size:14px">MRU</span></div>
+      <div class="pkg-name" style="color:#c4b5fd" id="pkg-diamond-name">الماسية 💎</div>
+      <div class="pkg-price" style="color:#a78bfa"><span id="pkg-dia-price-val">6,000</span> <span style="font-size:14px">MRU</span></div>
       <div class="pkg-period" style="color:#c4b5fd" id="pkg-dia-period">/شهر</div>
       <div style="height:1px;background:rgba(139,92,246,.2);margin:12px 0"></div>
       <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d1">عروض غير محدودة</span></div>
@@ -559,7 +559,7 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#FBF8F2;
 <div id="disc-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto">
   <div style="background:linear-gradient(160deg,#0a1628,#122040);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;max-width:600px;width:100%;padding:36px 32px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);font-family:inherit">
     <button onclick="closeDisc()" style="position:absolute;top:16px;left:16px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:#C9A84C;display:flex;align-items:center;justify-content:center">×</button>
-    <h2 style="color:#C9A84C;font-size:18px;font-weight:800;margin:0 0 20px;text-align:center">📢 إشعار قانوني | Avis légal</h2>
+    <h2 style="color:#C9A84C;font-size:18px;font-weight:800;margin:0 0 20px;text-align:center" data-t-fr="Avis légal">📢 إشعار قانوني</h2>
     <p style="color:rgba(255,255,255,.85);font-size:13px;line-height:1.85;margin-bottom:16px" id="disc-p1">رزق منصة إلكترونية مخصصة لنشر الإعلانات فقط. <strong style="color:#E8C96A">ليست طرفاً في أي عقد</strong> بين المعرض والمشتري. جميع الاتفاقيات والمدفوعات تتم مباشرة بين الطرفين.</p>
     <p style="color:rgba(255,255,255,.65);font-size:12px;line-height:1.75" id="disc-p2">Rizq est une plateforme de publication d'annonces uniquement. Elle n'est pas partie à un contrat entre le showroom et l'acheteur.</p>
     <button onclick="closeDisc()" style="display:block;margin:20px auto 0;padding:10px 28px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700;font-family:inherit" id="disc-close-btn">فهمت — أغلق | J'ai compris</button>
@@ -1041,7 +1041,7 @@ function applyLang(){
   document.getElementById('pkg-pro-name').textContent   = isFr ? 'Pro' : 'Pro';
   document.getElementById('pkg-pro-period').textContent = isFr ? '/mois' : '/شهر';
   document.getElementById('pkg-pro-cta').textContent    = isFr ? "S'abonner maintenant" : 'اشترك الآن';
-  document.getElementById('pkg-diamond-name').textContent = isFr ? '💎 Diamant' : 'ماسية';
+  document.getElementById('pkg-diamond-name').textContent = isFr ? 'Diamant 💎' : 'الماسية 💎';
   document.getElementById('pkg-dia-period').textContent   = isFr ? '/mois' : '/شهر';
   document.getElementById('pkg-dia-cta').textContent      = isFr ? "S'abonner maintenant" : 'اشترك الآن';
   // ── Footer (موحّد) ──

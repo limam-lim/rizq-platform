@@ -290,7 +290,7 @@ function isDiamondActive(accountId) {
   if (!accountId) return false;
   const rec = getAccountRecord(accountId);
   if (!rec) return false;
-  const isDiamondPkg = /(ماسية|diamond)/i.test(rec.pkgName || '');
+  const isDiamondPkg = /(ماس|diamond|diamant)/i.test(rec.pkgName || rec.planType || '');
   return isDiamondPkg && DIAMOND_ACTIVE_STATUSES.includes(rec.status);
 }
 

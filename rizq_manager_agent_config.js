@@ -152,27 +152,41 @@ var SELLING_GUIDE = {
 // ═══════════════════════════════════════════════════════════════
 // BLOCK 6 — SUBSCRIPTIONS (الباقات)
 // ═══════════════════════════════════════════════════════════════
+function _pkgCfg() {
+  if (typeof require === 'function') {
+    try { return require('./rizq_packages_config'); } catch (e) {}
+  }
+  if (typeof window !== 'undefined' && window.RizqPackagesConfig) return window.RizqPackagesConfig;
+  if (typeof globalThis !== 'undefined' && globalThis.RizqPackagesConfig) return globalThis.RizqPackagesConfig;
+  return null;
+}
+
 var SUBSCRIPTIONS_GUIDE = {
-  overview_ar:
-    '🎯 باقات رزق — اختر ما يناسبك:\n\n🆓 تجريبية — مجاناً (3 أيام):\nاستكشف المنصة بحرية، تواصل مباشر، إعلانات أساسية\n\n📦 أساسي — من 1,500 MRU/شهر:\nعدد أكبر من الإعلانات، شارة "موثّق"، إحصائيات أساسية\n\n🚀 Pro — من 4,000 MRU/شهر:\n• إعلانات غير محدودة\n• أولوية في نتائج البحث\n• دعم مخصص 24/7\n• شارة Pro مميزة\n\n💎 ناسي — من 8,000 MRU/شهر (أو 30,000 MRU/سنة وفّر 37%):\n• كل مزايا Pro\n• صفحة باور حصرية\n• تقارير متقدمة\n• النائب الذكي VIP 🤖\n• شارة 💎 ناسية حصرية',
-  overview_fr:
-    '🎯 Forfaits Rizq — choisissez celui qui vous convient:\n\n🆓 Essai — Gratuit (3 jours):\nExplorez librement la plateforme, contact direct, annonces de base\n\n📦 Basique — à partir de 1 500 MRU/mois:\nPlus d\'annonces, badge "vérifié", statistiques de base\n\n🚀 Pro — à partir de 4 000 MRU/mois:\n• Annonces illimitées\n• Priorité dans les résultats de recherche\n• Support dédié 24/7\n• Badge Pro distinctif\n\n💎 Nasi — à partir de 8 000 MRU/mois (ou 30 000 MRU/an, économisez 37%):\n• Tous les avantages Pro\n• Page Power exclusive\n• Rapports avancés\n• Assistant VIP intelligent 🤖\n• Badge 💎 Nasi exclusif',
+  overview_ar: '',
+  overview_fr: '',
 
   how_to_upgrade_ar:
     '⬆️ كيف أرقّي باقتي؟\n1. سجّل الدخول → الملف الشخصي\n2. اضغط "ترقية الباقة"\n3. اختر الخطة المناسبة\n4. ادفع عبر Bankily أو Sedad\n5. التفعيل فوري بعد تأكيد الدفع ✅',
   how_to_upgrade_fr:
     '⬆️ Comment mettre à niveau mon forfait?\n1. Connectez-vous → Profil\n2. Cliquez sur "Mettre à niveau le forfait"\n3. Choisissez le plan qui vous convient\n4. Payez via Bankily ou Sedad\n5. Activation immédiate après confirmation du paiement ✅',
 
-  vip_deputy_ar:
-    '🤖 النائب الذكي (حصري لباقة ناسي):\n• يحلل أداء حسابك وإعلاناتك\n• يقترح تحسينات للأسعار والوصف\n• يصعّد المشاكل فوراً للإدارة\n• متاح 24/7\n• رد خلال دقيقتين فقط',
-  vip_deputy_fr:
-    '🤖 Assistant VIP (exclusif au forfait Nasi):\n• Analyse la performance de votre compte et de vos annonces\n• Suggère des améliorations de prix et de description\n• Fait remonter les problèmes immédiatement à l\'administration\n• Disponible 24/7\n• Réponse en 2 minutes seulement',
+  vip_deputy_ar: '',
+  vip_deputy_fr: '',
 
-  max_discount_ar:
-    'أقصى خصم متاح على خدمات المنصة هو 5% وفق باقة ناسي (Diamond) — لا استثناءات.',
-  max_discount_fr:
-    'La réduction maximale disponible sur les services de la plateforme est de 5% avec le forfait Nasi (Diamond) — sans exception.'
+  max_discount_ar: '',
+  max_discount_fr: ''
 };
+
+(function _fillSubscriptionsFromCanonicalPackages() {
+  var cfg = _pkgCfg();
+  if (!cfg) return;
+  SUBSCRIPTIONS_GUIDE.overview_ar = cfg.buildPublicOverview('ar');
+  SUBSCRIPTIONS_GUIDE.overview_fr = cfg.buildPublicOverview('fr');
+  SUBSCRIPTIONS_GUIDE.vip_deputy_ar = cfg.buildVipDeputyText('ar');
+  SUBSCRIPTIONS_GUIDE.vip_deputy_fr = cfg.buildVipDeputyText('fr');
+  SUBSCRIPTIONS_GUIDE.max_discount_ar = cfg.buildMaxDiscountLine('ar');
+  SUBSCRIPTIONS_GUIDE.max_discount_fr = cfg.buildMaxDiscountLine('fr');
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // BLOCK 7 — PAYMENT METHODS (طرق الدفع)
@@ -389,10 +403,7 @@ var FAQ = [
   },
   {
     q: ['خصم','discount','réduction','تخفيض'],
-    a: {
-      ar: '🏷️ الخصومات في رزق:\n• الباقة الفضية: حتى 2% على الخدمات\n• الباقة الذهبية: حتى 3%\n• الباقة الماسية: حتى 5% (الحد الأقصى المطلق)\n\nالخصم على خدمات المنصة فقط — ليس على أسعار الإعلانات بين البائع والمشتري.',
-      fr: '🏷️ Réductions sur Rizq:\n• Forfait Argent: jusqu\'à 2% sur les services\n• Forfait Or: jusqu\'à 3%\n• Forfait Diamant: jusqu\'à 5% (maximum absolu)\n\nLa réduction s\'applique uniquement aux services de la plateforme — pas aux prix des annonces entre vendeur et acheteur.'
-    }
+    a: '__DYNAMIC_DISCOUNTS_SUMMARY__'
   },
   {
     q: ['الإعلان رُفض','رُفض إعلاني','سبب الرفض','rejected'],
@@ -447,32 +458,22 @@ function _isBlocked(text) {
   return false;
 }
 
-// يبني ملخص الباقات الحيّ من لوحة التحكم (rizq_packages) بدل نص ثابت قديم
 function _getPackagesSummary(lang) {
-  var isFr = lang === 'fr';
-  var FALLBACK = isFr
-    ? 'Nous avons 4 forfaits:\n\n🆓 Essai — Gratuit (3 jours)\n📦 Basique — à partir de 1 500 MRU/mois\n🚀 Pro — à partir de 4 000 MRU/mois\n💎 Nasi — à partir de 8 000 MRU/mois (ou 30 000 MRU/an)\n\nLequel vous convient le mieux?'
-    : 'لدينا 4 باقات:\n\n🆓 تجريبية — مجاناً (3 أيام)\n📦 أساسي — من 1,500 MRU/شهر\n🚀 Pro — من 4,000 MRU/شهر\n💎 ناسي — من 8,000 MRU/شهر (أو 30,000 MRU سنوياً)\n\nأيّ باقة تناسبك أكثر؟';
-  try {
-    if (typeof localStorage === 'undefined') return FALLBACK;
-    var raw = localStorage.getItem('rizq_packages');
-    if (!raw) return FALLBACK;
-    var pkgs = JSON.parse(raw);
-    if (!Array.isArray(pkgs) || !pkgs.length) return FALLBACK;
-    var active = pkgs.filter(function(p){ return p && p.active !== false; });
-    if (!active.length) return FALLBACK;
-    var lines = active.map(function(p){
-      var priceLabel = (!p.price || p.price === 0)
-        ? (isFr ? 'Gratuit' : 'مجاني')
-        : (p.price + ' MRU' + (p.period ? (' / ' + p.period) : ''));
-      return '• ' + (p.name || (isFr ? 'Forfait' : 'باقة')) + ' — ' + priceLabel;
-    });
-    var header = isFr ? ('Nous avons ' + active.length + ' forfaits:\n\n') : ('لدينا ' + active.length + ' باقات:\n\n');
-    var footer = isFr ? '\n\nLequel vous convient?' : '\n\nأيهم يناسبك؟';
-    return header + lines.join('\n') + footer;
-  } catch (e) {
-    return FALLBACK;
+  var cfg = _pkgCfg();
+  if (cfg && typeof cfg.buildPublicSummary === 'function') {
+    return cfg.buildPublicSummary(lang);
   }
+  return lang === 'fr' ? 'Consultez les forfaits sur rizq.mr' : 'راجع الباقات على rizq.mr';
+}
+
+function _getDiscountsSummary(lang) {
+  var cfg = _pkgCfg();
+  if (cfg && typeof cfg.buildDiscountSummary === 'function') {
+    return cfg.buildDiscountSummary(lang);
+  }
+  return lang === 'fr'
+    ? 'La réduction maximale sur les services de la plateforme est de 5%.'
+    : 'أقصى خصم على خدمات المنصة هو 5%.';
 }
 function _norm(s) {
   return s.toLowerCase()
@@ -601,6 +602,9 @@ function processMessage(userMessage, context) {
     // حرفياً كنص "__DYNAMIC_PACKAGES_SUMMARY__" دون استبدال فعلي.
     if (faqMatch === '__DYNAMIC_PACKAGES_SUMMARY__') {
       return { reply: _getPackagesSummary(lang), lang: lang };
+    }
+    if (faqMatch === '__DYNAMIC_DISCOUNTS_SUMMARY__') {
+      return { reply: _getDiscountsSummary(lang), lang: lang };
     }
     return { reply: faqMatch, lang: lang };
   }

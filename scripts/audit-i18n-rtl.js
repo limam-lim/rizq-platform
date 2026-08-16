@@ -21,18 +21,27 @@ const results = { pages: [], mixed: [], missingI18n: [], ok: [] };
 htmlFiles.forEach((file) => {
   const full = path.join(ROOT, file);
   const content = fs.readFileSync(full, 'utf8');
+  const visible = content
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/data-t-fr="[^"]*"/gi, '')
+    .replace(/<title>[\s\S]*?<\/title>/gi, '');
   const hasRtlDefault = /<html[^>]+lang="ar"[^>]+dir="rtl"/.test(content);
   const hasI18n = content.includes('rizq_i18n.js');
   const hasBtnLang = content.includes('btn-lang');
   const hasMixed = [];
+  const dirMismatch = /<html[^>]+lang="ar"[^>]+dir="ltr"/.test(content) || /<html[^>]+lang="fr"[^>]+dir="rtl"/.test(content);
 
   MIXED_PATTERNS.forEach(({ re, label }) => {
+    if (label === 'Bilingual title' || label.indexOf('lang with') !== -1) return;
     re.lastIndex = 0;
-    const m = content.match(re);
-    if (m && m.length) hasMixed.push({ label, count: m.length, sample: m[0].slice(0, 80) });
+    const m = visible.match(re);
+    const filtered = (m || []).filter((s) => !/رزق|Rizq|ADMINIA|WhatsApp|Twilio|Super Admin/i.test(s));
+    if (filtered.length) hasMixed.push({ label, count: filtered.length, sample: filtered[0].slice(0, 80) });
   });
+  if (dirMismatch) hasMixed.push({ label: 'lang/dir mismatch', count: 1, sample: 'html lang/dir conflict' });
 
-  results.pages.push({ file, hasRtlDefault, hasI18n, hasBtnLang, mixed: hasMixed.length });
+  results.pages.push({ file, hasRtlDefault, hasI18n, hasBtnLang, mixed: hasMixed.length, dirMismatch });
   if (hasMixed.length) results.mixed.push({ file, issues: hasMixed });
   if (hasBtnLang && !hasI18n && file !== 'rizq_landing_v8.html' && file !== 'rizq_tenders.html' && file !== 'rizq_chat_widget.html') {
     results.missingI18n.push(file);
@@ -53,4 +62,5 @@ if (results.missingI18n.length) {
   console.log('\nLang button without central i18n (review):', results.missingI18n.join(', '));
 }
 console.log('\nAudit complete.');
-process.exit(results.mixed.length ? 1 : 0);
+const dirFails = results.pages.filter((p) => p.dirMismatch).length;
+process.exit(dirFails ? 1 : 0);

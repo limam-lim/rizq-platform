@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { saveTicket } = require('./agentTickets');
+const { getPackagesForTool } = require('../../rizq_packages_config');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
@@ -188,49 +189,11 @@ function executeWidgetTool(toolName, input) {
       return { ok: true, account_id: accId, reviews: stats, seller_trust_score: trust };
     }
     case 'get_packages_info': {
-      const raw = (input && input.lang) ? String(input.lang).toLowerCase() : 'ar';
-      const lang = raw === 'fr' ? 'fr' : raw === 'en' ? 'en' : raw === 'es' ? 'es' : 'ar';
-      if (lang === 'fr') {
-        return {
-          ok: true,
-          packages: [
-            { name: 'Gratuit', ads: 3, photos: 1, duration: '∞', price: '0 MRU' },
-            { name: 'Argent', ads: 10, photos: 3, duration: '30j', price: '500 MRU/mois' },
-            { name: 'Or', ads: 30, photos: 5, duration: '60j', price: '1200 MRU/mois' },
-            { name: 'Diamant', ads: 100, photos: 10, duration: '365j', price: '3500 MRU/an' },
-          ],
-        };
-      }
-      if (lang === 'en') {
-        return {
-          ok: true,
-          packages: [
-            { name: 'Free', ads: 3, photos: 1, duration: '∞', price: '0 MRU' },
-            { name: 'Silver', ads: 10, photos: 3, duration: '30 days', price: '500 MRU/month' },
-            { name: 'Gold', ads: 30, photos: 5, duration: '60 days', price: '1200 MRU/month' },
-            { name: 'Diamond', ads: 100, photos: 10, duration: '365 days', price: '3500 MRU/year' },
-          ],
-        };
-      }
-      if (lang === 'es') {
-        return {
-          ok: true,
-          packages: [
-            { name: 'Gratis', ads: 3, photos: 1, duration: '∞', price: '0 MRU' },
-            { name: 'Plata', ads: 10, photos: 3, duration: '30 días', price: '500 MRU/mes' },
-            { name: 'Oro', ads: 30, photos: 5, duration: '60 días', price: '1200 MRU/mes' },
-            { name: 'Diamante', ads: 100, photos: 10, duration: '365 días', price: '3500 MRU/año' },
-          ],
-        };
-      }
+      const lang = (input && input.lang) ? String(input.lang).toLowerCase() : 'ar';
       return {
         ok: true,
-        packages: [
-          { name: 'مجانية', ads: 3, photos: 1, duration: 'دائمة', price: '0 MRU' },
-          { name: 'فضية', ads: 10, photos: 3, duration: '30 يوم', price: '500 MRU/شهر' },
-          { name: 'ذهبية', ads: 30, photos: 5, duration: '60 يوم', price: '1200 MRU/شهر' },
-          { name: 'ماسية', ads: 100, photos: 10, duration: '365 يوم', price: '3500 MRU/سنة' },
-        ],
+        source: 'rizq_packages_config',
+        packages: getPackagesForTool(lang),
       };
     }
     case 'create_support_ticket': {

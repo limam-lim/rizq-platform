@@ -278,6 +278,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 </style>
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_packages_config.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
@@ -808,7 +809,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="panel" id="panel-agents">
       <div class="card" id="auto-reply-card">
         <div class="card-header">
-          <div class="card-title">🤖 الوكيل الذكي (Claude AI)</div>
+          <div class="card-title" data-t="ag-card-title">🤖 الوكيل الذكي</div>
           <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px"></span>
         </div>
         <div id="auto-reply-content"></div>
@@ -1563,7 +1564,7 @@ function handleServiceCardClick(svcId){
 
 function openAgentUpgradeModal(){
   openSvcUpgradeModal({
-    serviceLabel: _t2('وكيل ذكي (AI)','Agent IA intelligent'),
+    serviceLabel: _t2('وكيل ذكي','Agent intelligent'),
     feature: 'ai_agent_full',
     requiredPkg: _corpRequiredPkg('ai_agent_full'),
     currentPkg: _corpCurrentPkgLabel()
@@ -2282,13 +2283,17 @@ function renderPackagesDisplay(){
   var pkgs=JSON.parse(localStorage.getItem('rizq_corp_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;});
   var el=document.getElementById('packages-display'); if(!el) return;
 
-  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'],'شهرية':['صفحة شركة موثقة','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'],'ماسية':['إعلانات غير محدودة','وكيل ذكي AI 24/7','رد تلقائي على المكالمات','صدارة دائمة في النتائج','مدير حساب VIP شخصي']};
-  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des annonces','Support technique de base'],'شهرية':['Page entreprise vérifiée','30 annonces affichées','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','Annonces illimitées','Gestionnaire de compte'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Fonctionnalités VIP exclusives','Support 24/7','Rapports annuels complets'],'ماسية':['Annonces illimitées','Agent IA intelligent 24/7','Réponse automatique aux appels','Tête des résultats permanente','Gestionnaire de compte VIP personnel']};
+  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'],'شهرية':['صفحة شركة موثقة','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة']};
+  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des annonces','Support technique de base'],'شهرية':['Page entreprise vérifiée','30 annonces affichées','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','Annonces illimitées','Gestionnaire de compte'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Fonctionnalités VIP exclusives','Support 24/7','Rapports annuels complets']};
   var FEATS=(typeof _corpLang!=='undefined'&&_corpLang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎'};
+  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
   var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'ماسية',duration:'شهر',price:6000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    var cat=RizqPackagesConfig.getCatalog('corp');
+    if(cat && cat.length) list=cat;
+  }
 
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,(typeof _corpLang!=='undefined'?_corpLang:'ar'));
   el.innerHTML=r.grid;
@@ -3385,7 +3390,7 @@ function saveMyPayment(){
       content.innerHTML='<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">'+_t2('وكيل ذكي يرد على المكالمات وواتساب بشخصية شركتك — حصرياً للباقة الماسية.','Agent IA qui répond aux appels et WhatsApp avec l\'identité de votre entreprise — exclusif au forfait Diamant.')+'</p>'+
         '<div id="agent-toggle-card" style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);border-radius:14px;padding:18px;color:#fff">'+
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
-          '<div><div style="font-size:14px;font-weight:700;color:#fbbf24">🤖 '+_t2('وكيل رزق الذكي (Claude)','Agent Rizq IA (Claude)')+'</div>'+
+          '<div><div style="font-size:14px;font-weight:700;color:#fbbf24">🤖 '+_t2('وكيل رزق الذكي','Agent intelligent Rizq')+'</div>'+
           '<div style="font-size:11.5px;color:#94a3b8;margin-top:3px">'+_t2('يرد على مكالماتك وواتساب بشخصية شركتك','Répond à vos appels et WhatsApp avec l\'identité de votre entreprise')+'</div></div>'+
           '<label class="rizq-toggle-switch"><input type="checkbox" id="agent-toggle-chk" '+(active?'checked':'')+' onchange="toggleRizqAgentCorp(this.checked)"><span class="rizq-toggle-slider"></span></label>'+
         '</div>'+
@@ -3396,7 +3401,7 @@ function saveMyPayment(){
         '</div>'+
         '<div id="agent-toggle-status" style="margin-top:10px;font-size:11px;text-align:center;color:'+(active?'#4ade80':'#f87171')+'">'+
           (active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé'))+
-        '</div></div>'+
+        '</div>'+_renderCorpChannelToggles()+'</div>'+
         '<div id="agent-chat-test"></div>'+
         '<style>.rizq-toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer}.rizq-toggle-switch input{opacity:0;width:0;height:0}.rizq-toggle-slider{position:absolute;inset:0;background:#475569;border-radius:28px;transition:.3s}.rizq-toggle-slider:before{content:"";position:absolute;width:20px;height:20px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.3s}.rizq-toggle-switch input:checked+.rizq-toggle-slider{background:#16a34a}.rizq-toggle-switch input:checked+.rizq-toggle-slider:before{transform:translateX(24px)}</style>';
       window._corpAgentPhone=phone;
@@ -3411,6 +3416,34 @@ function saveMyPayment(){
         '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">'+_t2('ميزة حصرية للباقة الماسية','Fonctionnalité exclusive au forfait Diamant')+'</p>'+
         '<button onclick="openAgentUpgradeModal()" class="btn btn-gold">'+_t2('📦 الترقية للماسية','📦 Passer au forfait Diamant')+'</button></div>';
     }
+  }
+  function _renderCorpChannelToggles(){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    var accId=acc.id||'';
+    var def={widget_enabled:true,whatsapp_enabled:true,calls_enabled:true};
+    try{ var raw=localStorage.getItem('rizq_channel_flags_'+accId); if(raw) def=Object.assign(def,JSON.parse(raw)); }catch(e){}
+    if(acc.widget_enabled!=null) def.widget_enabled=!!acc.widget_enabled;
+    if(acc.whatsapp_enabled!=null) def.whatsapp_enabled=!!acc.whatsapp_enabled;
+    if(acc.calls_enabled!=null) def.calls_enabled=!!acc.calls_enabled;
+    function row(key,ar,fr){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.06);border-radius:8px"><span style="font-size:12px">'+_t2(ar,fr)+'</span><label class="rizq-toggle-switch"><input type="checkbox" '+(def[key]?'checked':'')+' onchange="toggleAccountChannel(\''+key+'\',this.checked)"><span class="rizq-toggle-slider"></span></label></div>';
+    }
+    return '<div style="margin-top:12px;font-size:11px;color:#94a3b8;font-weight:700">'+_t2('قنوات الربط','Canaux')+'</div>'+row('widget_enabled','ويدجت الموقع','Widget du site')+row('whatsapp_enabled','واتساب','WhatsApp')+row('calls_enabled','المكالمات','Appels');
+  }
+  function toggleAccountChannel(key,on){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    var accId=acc.id||'';
+    var flags={widget_enabled:true,whatsapp_enabled:true,calls_enabled:true};
+    try{ flags=Object.assign(flags,JSON.parse(localStorage.getItem('rizq_channel_flags_'+accId)||'{}')); }catch(e){}
+    flags[key]=!!on;
+    try{ localStorage.setItem('rizq_channel_flags_'+accId, JSON.stringify(flags)); }catch(e){}
+    if(acc) acc[key]=!!on;
+    var base=(window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
+    if(!base||!accId){ showToast(_t2('✅ تم حفظ حالة القناة','✅ État du canal enregistré')); return; }
+    var body={}; body[key]=!!on;
+    fetch(base+'/api/accounts/mine/'+encodeURIComponent(accId),{method:'PATCH',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||acc.token||''},body:JSON.stringify(body)})
+      .then(function(r){return r.json();}).then(function(){ showToast(_t2('✅ تم تحديث حالة الحساب','✅ Compte mis à jour')); })
+      .catch(function(){ showToast(_t2('✅ حُفظ محلياً','✅ Enregistré localement')); });
   }
   function toggleRizqAgentCorp(active){
     var phone=window._corpAgentPhone||'';
@@ -3445,7 +3478,7 @@ function saveMyPayment(){
       {id:'share',icon:'📤',label:_t2('مشاركة الصفحة','Partager la page'),feature:null,action:'share',tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
       {id:'analytics',icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',panel:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs de votre page et leurs interactions')},
       {id:'priority',icon:'🥇',label:_t2('صدارة النتائج','Tête des résultats'),feature:'priority_listing',panel:'products',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {id:'ai_agent',icon:'🤖',label:_t2('وكيل ذكي (AI)','Agent IA intelligent'),feature:'ai_agent_full',panel:'agents',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
+      {id:'ai_agent',icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',panel:'agents',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
       {id:'auto_calls',icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto aux appels'),feature:'auto_reply_calls',panel:'agents',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne manquez aucun appel — l\'IA répond pour vous')},
       {id:'vip',icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',panel:'subscription',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnalisé de l\'équipe Rizq 24h/24')},
     ];

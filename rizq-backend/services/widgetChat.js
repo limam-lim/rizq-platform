@@ -4,10 +4,10 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./widgetAgentTools');
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
-const { getAnthropicApiKey, isAnthropicConfigured } = require('../config/anthropic');
+const { getAnthropicApiKey, isAnthropicConfigured, getFastModel, createCachedMessage } = require('../config/anthropic');
+const { buildPackagesPromptBlock } = require('../../rizq_packages_config');
 
 const client = new Anthropic({ apiKey: getAnthropicApiKey() });
-const MODEL = process.env.RIZQ_WIDGET_MODEL || 'claude-haiku-4-5-20251001';
 
 function buildLanguageInstructions(detectedLang, uiLang) {
   const label = getLangLabel(detectedLang);
@@ -58,6 +58,8 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free at rizq.mr.\n` +
       `Keep replies short (2-4 sentences).\n`;
   }
+
+  prompt += `\n${buildPackagesPromptBlock()}\nCall get_packages_info before quoting any Rizq plan price.\n`;
 
   const openAdId = pageContext && (pageContext.urlAdId || (pageContext.ad && pageContext.ad.id));
   if (pageContext && pageContext.page) {
@@ -276,6 +278,7 @@ async function handleWidgetChat(body) {
   const pageFacts = resolvePageContextFacts(pageContext);
   const systemPrompt = buildSystemPrompt({ lang: uiLang, detectedLang, profile, pageContext, pageFacts });
   const adFlow = isAdFlowQuery(text, pageContext);
+  const preferredModel = getFastModel();
 
   const messages = [];
   if (Array.isArray(history)) {
@@ -291,11 +294,13 @@ async function handleWidgetChat(body) {
   let response;
   let currentMessages = [...messages];
   let loops = 0;
+  let lastModel = preferredModel;
+  const usageAcc = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
 
   while (loops < 5) {
     loops++;
     const createParams = {
-      model: MODEL,
+      model: preferredModel,
       max_tokens: 500,
       system: systemPrompt,
       tools: WIDGET_TOOLS,
@@ -305,7 +310,14 @@ async function handleWidgetChat(body) {
       createParams.tool_choice = { type: 'tool', name: 'get_ad_details' };
     }
 
-    response = await client.messages.create(createParams);
+    const created = await createCachedMessage(client, createParams);
+    response = created.response;
+    lastModel = created.model || lastModel;
+    const u = response.usage || {};
+    usageAcc.input_tokens += u.input_tokens || 0;
+    usageAcc.output_tokens += u.output_tokens || 0;
+    usageAcc.cache_creation_input_tokens += u.cache_creation_input_tokens || 0;
+    usageAcc.cache_read_input_tokens += u.cache_read_input_tokens || 0;
 
     if (response.stop_reason === 'end_turn') break;
 
@@ -370,6 +382,8 @@ async function handleWidgetChat(body) {
     grounded: validated.grounded,
     reviewed: validated.reviewed,
     toolsUsed: toolResultsRaw.length,
+    model: lastModel,
+    usage: usageAcc,
   };
 }
 
