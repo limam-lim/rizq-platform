@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
 
-<meta charset="UTF-8"/>
-<meta name="description" content="رزق — منصة الإعلانات المبوبة الأولى في موريتانيا. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر. 18 قسماً، 135+ فرعاً، مجاناً."/>
+<meta name="description" content="رزق — منصة الإعلانات المبوبة الأولى في موريتانيا. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر."/>
 <meta property="og:title" content="رزق | Rizq — سوقك الموريتاني"/>
-<meta property="og:description" content="منصة الإعلانات المبوبة الأولى في موريتانيا — 50,000+ إعلان نشط"/>
+<meta property="og:description" content="منصة الإعلانات المبوبة الأولى في موريتانيا"/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary"/>
@@ -22,8 +22,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;900&family=Alexandria:wght@500;600;700;900&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css"/>
-<script src="rizq_packages_config.js?v=diamond-roi-1"></script>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=8.1"/>
+<script src="rizq_packages_config.js?v=8.1"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -219,6 +219,7 @@ nav>.nav-right{order:-1;flex-shrink:0} /* FIRST item — لا يتحرك أبد�
 
 /* ── TICKER (شريط إعلانات متحرك) ── */
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:absolute;top:66px}
+.ticker-wrap.is-empty{display:none}
 .ticker-inner{display:flex;gap:0;width:max-content;animation:ticker 35s linear infinite}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
@@ -241,13 +242,13 @@ nav>.nav-right{order:-1;flex-shrink:0} /* FIRST item — لا يتحرك أبد�
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
   border:1.5px solid rgba(201,168,76,.4);
   border-radius:28px;
-  padding:28px 64px;
+  padding:clamp(16px,3vw,28px) clamp(28px,6vw,64px);
   box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 32px rgba(201,168,76,.12);
   animation:fadeUp .8s .1s ease both;
   position:relative;
   overflow:hidden; /* يحصر أي توهج/لمعة داخل حدود البطاقة المستديرة فقط */
 }
-.hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(60px,8.5vw,84px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px}
+.hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(36px,8.5vw,84px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px}
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
 @keyframes shine{to{background-position:200%}}
 
@@ -497,7 +498,7 @@ nav>.nav-right{order:-1;flex-shrink:0} /* FIRST item — لا يتحرك أبد�
 }
 
 /* ── SEARCH BAR (Amazon style) ── */
-.hero-search{max-width:780px;margin:0 auto 40px;position:relative;animation:fadeUp .8s .3s ease both;z-index:60;isolation:isolate}
+.hero-search{max-width:780px;margin:0 auto 18px;position:relative;animation:fadeUp .8s .3s ease both;z-index:60;isolation:isolate}
 .search-bar{display:flex;align-items:center;background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(15,35,65,.14),0 0 0 1px rgba(201,168,76,.3);position:relative;z-index:2}
 .search-cat-select{background:#f0f4f8;border:none;border-right:1px solid #dde3ea;padding:0 16px;height:58px;font-size:13px;font-family:'Segoe UI','Arial',sans-serif;color:#333;cursor:pointer;min-width:140px;font-weight:600;outline:none;border-radius:0 14px 14px 0}
 .search-input-wrap{flex:1;display:flex;align-items:center;gap:10px;padding:0 18px}
@@ -512,8 +513,80 @@ nav>.nav-right{order:-1;flex-shrink:0} /* FIRST item — لا يتحرك أبد�
 .btn-search-main{background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;padding:0 26px;height:58px;cursor:pointer;font-size:17px;transition:all .3s;flex-shrink:0}
 .btn-search-main:hover{background:linear-gradient(135deg,var(--gold-light),var(--gold));filter:brightness(1.1)}
 
+/* ── HERO BIZ NAV — محلات / مكاتب / معارض (زجاج + توهج حدود) ── */
+.hero-biz-nav{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;
+  gap:12px;max-width:780px;margin:0 auto 16px;
+  animation:fadeUp .8s .28s ease both;z-index:61;position:relative;
+}
+.hero-biz-btn{
+  position:relative;flex:1 1 180px;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 20px;border-radius:16px;text-decoration:none;
+  font-weight:800;font-size:clamp(13px,1.55vw,15px);line-height:1.25;
+  color:#fff;font-family:'Cairo','Segoe UI','Arial',sans-serif;
+  background:linear-gradient(145deg,rgba(13,27,42,.78),rgba(27,58,107,.52));
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1.5px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 24px rgba(15,35,65,.16);
+  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease,filter .28s ease;
+}
+.hero-biz-btn:hover{transform:translateY(-4px);filter:brightness(1.06)}
+.hero-biz-ico{font-size:1.25em;line-height:1}
+.hero-biz-label{white-space:nowrap}
+.hero-biz-gold{border-color:rgba(201,168,76,.55);box-shadow:0 8px 24px rgba(15,35,65,.16),0 0 18px rgba(201,168,76,.28)}
+.hero-biz-gold:hover{border-color:var(--gold);box-shadow:0 12px 32px rgba(201,168,76,.38),0 0 28px rgba(201,168,76,.4)}
+.hero-biz-royal{border-color:rgba(35,77,143,.7);box-shadow:0 8px 24px rgba(15,35,65,.16),0 0 16px rgba(27,58,107,.35)}
+.hero-biz-royal:hover{border-color:var(--royal-light);box-shadow:0 12px 32px rgba(27,58,107,.4),0 0 26px rgba(35,77,143,.45)}
+.hero-biz-diamond{
+  border-color:rgba(196,181,253,.55);
+  box-shadow:0 8px 24px rgba(15,35,65,.16),0 0 16px rgba(196,181,253,.28),0 0 22px rgba(201,168,76,.18);
+}
+.hero-biz-diamond:hover{
+  border-color:#c4b5fd;
+  box-shadow:0 12px 32px rgba(139,92,246,.32),0 0 28px rgba(196,181,253,.45),0 0 18px rgba(201,168,76,.28);
+}
+.hero-biz-badge{
+  position:absolute;top:-8px;inset-inline-end:10px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--royal-dark);font-size:9px;font-weight:900;
+  padding:3px 8px;border-radius:100px;letter-spacing:.3px;
+  box-shadow:0 2px 10px rgba(201,168,76,.45);
+}
+
+/* ── HERO PRIMARY CTA (تحويل: متجر أو إعلان مجاني) ── */
+.hero-cta-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  max-width:780px;margin:0 auto 36px;
+  animation:fadeUp .8s .34s ease both;z-index:55;position:relative;
+}
+.hero-cta-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;max-width:640px;padding:15px 28px;border:none;border-radius:14px;
+  cursor:pointer;font-family:'Cairo','Segoe UI','Arial',sans-serif;
+  font-size:clamp(14px,2vw,17px);font-weight:900;line-height:1.35;
+  color:var(--royal-dark);
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 45%,#fbbf24 100%);
+  box-shadow:0 8px 28px rgba(201,168,76,.48),0 0 22px rgba(251,191,36,.28);
+  transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;
+  animation:heroCtaGlow 2.8s ease-in-out infinite;
+}
+.hero-cta-primary:hover{
+  transform:translateY(-3px);filter:brightness(1.08);
+  box-shadow:0 14px 36px rgba(201,168,76,.58),0 0 32px rgba(251,191,36,.42);
+}
+.hero-biz-btn:focus-visible,.hero-cta-primary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.hero-cta-micro{
+  margin:0;font-size:clamp(11.5px,1.5vw,13px);font-weight:700;
+  color:var(--royal);letter-spacing:.2px;line-height:1.5;opacity:.9;
+}
+@keyframes heroCtaGlow{
+  0%,100%{box-shadow:0 8px 28px rgba(201,168,76,.45),0 0 18px rgba(251,191,36,.22)}
+  50%{box-shadow:0 10px 34px rgba(201,168,76,.6),0 0 28px rgba(251,191,36,.38)}
+}
+
 /* ── QUICK CATS (أيقونات سريعة) ── */
-.quick-cats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:44px;animation:fadeUp .8s .4s ease both;position:relative;z-index:20;overflow:visible}
+.quick-cats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;animation:fadeUp .8s .4s ease both;position:relative;z-index:20;overflow:visible}
 .qcat{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 16px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border:1px solid rgba(201,168,76,.18);border-radius:14px;cursor:pointer;transition:all .35s;text-decoration:none;min-width:72px;position:relative;box-shadow:0 2px 8px rgba(15,35,65,.12);z-index:1}
 .qcat.qcat-open{z-index:120}
 .qcat:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:rgba(201,168,76,.5);transform:translateY(-4px);box-shadow:0 8px 24px rgba(201,168,76,.3)}
@@ -891,6 +964,16 @@ nav>.nav-right{order:-1;flex-shrink:0} /* FIRST item — لا يتحرك أبد�
   .listings-grid{grid-template-columns:repeat(2,1fr)}
   .footer-grid{grid-template-columns:1fr}
   .hero-stats-bar{flex-wrap:wrap}
+  .hero-content{padding-top:44px;width:94%}
+  .hero-headline{font-size:clamp(36px,12vw,52px)}
+  .hero-title-card{padding:14px 24px;border-radius:20px;margin-bottom:12px}
+  .hero-vid-wrap{width:min(100%,94%);margin-bottom:20px}
+  .hero-vid-badge{font-size:9.5px;padding:4px 14px}
+  .hero-biz-nav{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:14px}
+  .hero-biz-btn{flex:1 1 auto;width:100%;padding:13px 16px;justify-content:center}
+  .hero-biz-label{white-space:normal;text-align:center}
+  .hero-cta-wrap{margin:0 auto 28px}
+  .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
   .quick-cats{gap:8px}
   .qcat{min-width:60px;padding:10px 12px}
   .search-bar{flex-wrap:wrap}
@@ -1340,7 +1423,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 .fade-in.visible{opacity:1;transform:none;filter:blur(0)}
 
 @media (prefers-reduced-motion:reduce){
-  .hero-headline::after,.hero-orb1,.hero-orb2,.hero-orb3,.hero-title-card,.hero-vid-wrap{animation:none!important}
+  .hero-headline::after,.hero-orb1,.hero-orb2,.hero-orb3,.hero-title-card,.hero-vid-wrap,.hero-cta-primary{animation:none!important}
   .fade-in{transition:opacity .3s ease!important;filter:none!important}
 }
 
@@ -1528,34 +1611,18 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </svg>
   </div>
 
-  <!-- Ticker شريط أخبار -->
-  <div class="ticker-wrap">
-    <div class="ticker-inner" id="ticker">
-      <!-- repeated twice for infinite loop -->
-      <div class="ticker-item"><div class="ticker-dot"></div>🏠 شقة للكراء — نواكشوط <strong>150,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🚗 Toyota Hilux 2022 <strong>8,000,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🐪 إبل للبيع — أدرار <strong>1,200,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>📱 iPhone 15 Pro Max <strong>380,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🚛 حفارة Caterpillar 320D <strong>35,000,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🏠 أرض للبيع — نواذيبو <strong>4,500,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>👗 دراعة موريتانية فاخرة <strong>45,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🔧 مهندس كهرباء متاح — نواكشوط <strong>تواصل معه</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🏠 شقة للكراء — نواكشوط <strong>150,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🚗 Toyota Hilux 2022 <strong>8,000,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🐪 إبل للبيع — أدرار <strong>1,200,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>📱 iPhone 15 Pro Max <strong>380,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🚛 حفارة Caterpillar 320D <strong>35,000,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🏠 أرض للبيع — نواذيبو <strong>4,500,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>👗 دراعة موريتانية فاخرة <strong>45,000 MRU</strong></div>
-      <div class="ticker-item"><div class="ticker-dot"></div>🔧 مهندس كهرباء متاح — نواكشوط <strong>تواصل معه</strong></div>
-    </div>
+  <!-- Ticker — filled from live ads; hidden when empty -->
+  <div class="ticker-wrap is-empty" id="ticker-wrap">
+    <div class="ticker-inner" id="ticker"></div>
   </div>
 
   <!-- Hero Content -->
   <div class="hero-content">
+    <!-- DEV cache-bust: v8.1 — remove after confirming Edge loaded this file -->
+    <span id="hero-build-v81" style="position:absolute;top:8px;inset-inline-start:8px;font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--gold);opacity:.55;pointer-events:none;z-index:8">v8.1</span>
     <div class="hero-eyebrow">
       <div class="pulse"></div>
-      <span data-t="hero-badge">المنصة الأولى في موريتانيا — 50,000+ إعلان نشط</span>
+      <span data-t="hero-badge">المنصة الأولى في موريتانيا</span>
     </div>
     <div class="hero-title-card">
       <h1 class="hero-headline" id="hero-hl">رزق</h1>
@@ -1596,11 +1663,6 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
           <!-- المحتوى -->
           <div class="hero-vid-ph-body">
             <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري · Premium Spot</div>
-            <div class="hero-vid-ph-stat-row">
-              <div class="hero-vid-ph-stat"><div class="hero-vid-ph-stat-num">50K+</div><div class="hero-vid-ph-stat-lbl">زائر / يوم</div></div>
-              <div class="hero-vid-ph-stat"><div class="hero-vid-ph-stat-num">#1</div><div class="hero-vid-ph-stat-lbl">الموضع الأول</div></div>
-              <div class="hero-vid-ph-stat"><div class="hero-vid-ph-stat-num">100%</div><div class="hero-vid-ph-stat-lbl">مشاهدة مضمونة</div></div>
-            </div>
             <div class="hero-vid-ph-h1">إعلانك هنا<em>أول ما يراه كل زائر</em></div>
             <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS Premium Placement</div>
             <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع الآن</a>
@@ -1622,6 +1684,23 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <a href="rizq_ads_info.html" class="hero-vid-cta-link">تعرف على Rizq ADS</a>
       </div>
     </div>
+
+    <!-- Business hubs: stores / offices / showrooms — above the search box -->
+    <nav class="hero-biz-nav" aria-label="أقسام الأعمال">
+      <a href="rizq_store.html" class="hero-biz-btn hero-biz-gold">
+        <span class="hero-biz-badge" data-t="hbiz-new">جديد</span>
+        <span class="hero-biz-ico" aria-hidden="true">🏪</span>
+        <span class="hero-biz-label" data-t="hbiz-stores">المحلات التجارية</span>
+      </a>
+      <a href="rizq_office.html" class="hero-biz-btn hero-biz-royal">
+        <span class="hero-biz-ico" aria-hidden="true">💼</span>
+        <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
+      </a>
+      <a href="rizq_showroom.html" class="hero-biz-btn hero-biz-diamond">
+        <span class="hero-biz-ico" aria-hidden="true">🏬</span>
+        <span class="hero-biz-label" data-t="hbiz-showrooms">معارض الشو روم</span>
+      </a>
+    </nav>
 
     <!-- Search Amazon-style -->
     <div class="hero-search">
@@ -1645,7 +1724,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <div class="search-suggestions" id="suggestions"></div>
     </div>
 
-    <!-- Quick Categories -->
+    <!-- Quick Categories — directly under search for continuous browsing -->
     <div class="quick-cats">
       <div class="qcat" data-qcat="عقارات" onmouseenter="openQcatPortal(this)" onmouseleave="scheduleQcatClose()"><div class="qcat-icon">🏠</div><div class="qcat-name" data-t="qc0">عقارات</div></div>
       <div class="qcat" data-qcat="سيارات" onmouseenter="openQcatPortal(this)" onmouseleave="scheduleQcatClose()"><div class="qcat-icon">🚗</div><div class="qcat-name" data-t="qc1">سيارات</div></div>
@@ -1656,6 +1735,14 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <div class="qcat" data-qcat="صحة وجمال" onmouseenter="openQcatPortal(this)" onmouseleave="scheduleQcatClose()"><div class="qcat-icon">🌿</div><div class="qcat-name" data-t="qc5">صحة وجمال</div></div>
       <div class="qcat" data-qcat="وظائف" onmouseenter="openQcatPortal(this)" onmouseleave="scheduleQcatClose()"><div class="qcat-icon">💼</div><div class="qcat-name" data-t="qc6">وظائف</div></div>
       <div class="qcat" data-qcat="ماشية" onmouseenter="openQcatPortal(this)" onmouseleave="scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
+    </div>
+
+    <!-- Primary conversion CTA — after browse path -->
+    <div class="hero-cta-wrap">
+      <button type="button" class="hero-cta-primary" onclick="openModal('register')">
+        <span data-t="hbiz-cta">افتح متجرك أو أضف إعلانك مجاناً</span>
+      </button>
+      <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
     </div>
   </div>
 
@@ -1697,41 +1784,41 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
   <div class="section-header fade-in">
     <p class="section-tag">All Categories</p>
     <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
-    <p class="section-desc" data-t="s-cats-desc">18 قسماً رئيسياً و135+ فرعاً — السوق الموريتاني الأشمل والأدق</p>
+    <p class="section-desc" data-t="s-cats-desc">أقسام منظمة تغطي السوق الموريتاني</p>
   </div>
   <div class="cats-grid">
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🏠</div><span class="cat-name">منازل وعقارات</span><span class="cat-count">12,400+ إعلان</span>
+      <div class="cat-icon-box">🏠</div><span class="cat-name">منازل وعقارات</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">للبيع</div><a class="drop-link" href="#">شقق للبيع</a><a class="drop-link" href="#">منازل وفيلات</a><a class="drop-link" href="#">أراضي</a><a class="drop-link" href="#">محلات تجارية</a><a class="drop-link" href="#">مكاتب ومستودعات</a></div><div class="drop-group"><div class="drop-group-title">للكراء</div><a class="drop-link" href="#">غرف للكراء</a><a class="drop-link" href="#">شقق للكراء</a><a class="drop-link" href="#">منازل للكراء</a><a class="drop-link" href="#">محلات للكراء</a><a class="drop-link" href="#">إيجار يومي / سياحي</a></div></div>
     </div>
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🚗</div><span class="cat-name">سيارات وقطع غيار</span><span class="cat-count">8,200+ إعلان</span>
+      <div class="cat-icon-box">🚗</div><span class="cat-name">سيارات وقطع غيار</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">سيارات</div><a class="drop-link" href="#">سيارات للبيع</a><a class="drop-link" href="#">سيارات للكراء</a><a class="drop-link" href="#">دراجات نارية</a></div><div class="drop-group"><div class="drop-group-title">ملحقات</div><a class="drop-link" href="#">قطع غيار</a><a class="drop-link" href="#">إطارات وبطاريات</a><a class="drop-link" href="#">زيوت ومستلزمات</a><a class="drop-link" href="#">تجهيز وتزيين</a></div></div>
     </div>
     <!-- 5: وكالات تأمين المركبات — بعد السيارات مباشرة -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🛡️</div><span class="cat-name">وكالات تأمين المركبات</span><span class="cat-count">620+ إعلان</span>
+      <div class="cat-icon-box">🛡️</div><span class="cat-name">وكالات تأمين المركبات</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">أنواع التأمين</div><a class="drop-link" href="#">تأمين سيارات خاصة</a><a class="drop-link" href="#">تأمين شاحنات ونقل</a><a class="drop-link" href="#">تأمين آلات ومعدات ثقيلة</a><a class="drop-link" href="#">تأمين دراجات نارية</a></div><div class="drop-group"><div class="drop-group-title">خدمات الوكالات</div><a class="drop-link" href="#">تجديد رخص وتأمين</a><a class="drop-link" href="#">تقييم أضرار وحوادث</a><a class="drop-link" href="#">استشارات ووساطة تأمين</a></div></div>
     </div>
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🚛</div><span class="cat-name">شاحنات ومعدات ثقيلة</span><span class="cat-count">2,100+ إعلان</span>
+      <div class="cat-icon-box">🚛</div><span class="cat-name">شاحنات ومعدات ثقيلة</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">مركبات</div><a class="drop-link" href="#">شاحنات للبيع</a><a class="drop-link" href="#">شاحنات للكراء</a><a class="drop-link" href="#">حافلات وباصات</a><a class="drop-link" href="#">مقطورات وصهاريج</a></div><div class="drop-group"><div class="drop-group-title">معدات</div><a class="drop-link" href="#">معدات بناء للبيع</a><a class="drop-link" href="#">معدات بناء للكراء</a><a class="drop-link" href="#">معدات زراعية</a><a class="drop-link" href="#">قطع غيار ثقيلة</a></div></div>
     </div>
     <!-- 4: هواتف -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">📱</div><span class="cat-name">هواتف وإلكترونيات</span><span class="cat-count">15,600+ إعلان</span>
+      <div class="cat-icon-box">📱</div><span class="cat-name">هواتف وإلكترونيات</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">أجهزة</div><a class="drop-link" href="#">هواتف ذكية</a><a class="drop-link" href="#">لابتوب وحاسوب</a><a class="drop-link" href="#">شاشات وتلفزيون</a><a class="drop-link" href="#">أجهزة منزلية</a></div><div class="drop-group"><div class="drop-group-title">ملحقات</div><a class="drop-link" href="#">كاميرات ودرونز</a><a class="drop-link" href="#">سماعات وصوتيات</a><a class="drop-link" href="#">شواحن وإكسسوارات</a></div></div>
     </div>
     <!-- 5: موضة وأزياء — بعد الهواتف مباشرة -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">👗</div><span class="cat-name">موضة وأزياء</span><span class="cat-count">9,800+ إعلان</span>
+      <div class="cat-icon-box">👗</div><span class="cat-name">موضة وأزياء</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">ملابس تقليدية 🇲🇷</div><a class="drop-link" href="#">دراعة رجالية</a><a class="drop-link" href="#">ملحفة نسائية</a><a class="drop-link" href="#">طرح وأغطية رأس</a></div><div class="drop-group"><div class="drop-group-title">ملابس وإكسسوارات</div><a class="drop-link" href="#">ملابس رجالية</a><a class="drop-link" href="#">ملابس نسائية وأطفال</a><a class="drop-link" href="#">أحذية وحقائب</a><a class="drop-link" href="#">مجوهرات وذهب</a><a class="drop-link" href="#">عطور ومستحضرات</a></div></div>
     </div>
     <!-- 6: ذهب ومجوهرات ★ NEW -->
     <div class="cat-card cat-gold fade-in" style="position:relative;cursor:pointer">
       <div class="cat-icon-box" style="background:linear-gradient(135deg,#b8860b,#FFD700);border-color:rgba(255,215,0,.4)">💰</div>
       <span class="cat-name">ذهب ومجوهرات</span>
-      <span class="cat-count">5,200+ إعلان</span>
+      <span class="cat-count">—</span>
       <div class="cat-drop">
         <div class="drop-group">
           <div class="drop-group-title">🥇 ذهب للبيع</div>
@@ -1775,57 +1862,57 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <!-- 7: صحة وجمال — بعد الذهب مباشرة -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🌿</div><span class="cat-name">صحة وجمال</span><span class="cat-count">2,400+ إعلان</span>
+      <div class="cat-icon-box">🌿</div><span class="cat-name">صحة وجمال</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">صحة</div><a class="drop-link" href="#">أدوية ومكملات</a><a class="drop-link" href="#">أجهزة طبية</a></div><div class="drop-group"><div class="drop-group-title">جمال</div><a class="drop-link" href="#">مستحضرات طبيعية</a><a class="drop-link" href="#">عطور ومنتجات عناية</a><a class="drop-link" href="#">أجهزة عناية شخصية</a></div></div>
     </div>
     <!-- 7: وظائف -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">💼</div><span class="cat-name">وظائف وفرص عمل</span><span class="cat-count">3,400+ إعلان</span>
+      <div class="cat-icon-box">💼</div><span class="cat-name">وظائف وفرص عمل</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">وظائف متاحة</div><a class="drop-link" href="#">إدارة وتسويق</a><a class="drop-link" href="#">هندسة وتقنية</a><a class="drop-link" href="#">صحة وطب</a><a class="drop-link" href="#">تعليم وتدريب</a><a class="drop-link" href="#">نقل وسياقة</a></div><div class="drop-group"><div class="drop-group-title">أخرى</div><a class="drop-link" href="#">أبحث عن عمل</a><a class="drop-link" href="#">فريلانس وعمل حر</a><a class="drop-link" href="#">تدريب وتربص</a></div></div>
     </div>
     <!-- 8: خدمات -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🔧</div><span class="cat-name">خدمات ومهن</span><span class="cat-count">6,700+ إعلان</span>
+      <div class="cat-icon-box">🔧</div><span class="cat-name">خدمات ومهن</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">خدمات منزلية</div><a class="drop-link" href="#">نقل وشحن</a><a class="drop-link" href="#">تنظيف ومكافحة حشرات</a><a class="drop-link" href="#">بناء ودهان وسباكة</a><a class="drop-link" href="#">صيانة وإصلاح</a></div><div class="drop-group"><div class="drop-group-title">خدمات متخصصة</div><a class="drop-link" href="#">دروس خصوصية</a><a class="drop-link" href="#">تصميم وبرمجة</a><a class="drop-link" href="#">تصوير وإعلام</a><a class="drop-link" href="#">حلاقة وتجميل</a></div></div>
     </div>
     <!-- 9: أثاث -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🛋️</div><span class="cat-name">أثاث وديكور</span><span class="cat-count">7,300+ إعلان</span>
+      <div class="cat-icon-box">🛋️</div><span class="cat-name">أثاث وديكور</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">أثاث</div><a class="drop-link" href="#">أثاث غرف نوم</a><a class="drop-link" href="#">أثاث صالون</a><a class="drop-link" href="#">أثاث مطبخ</a><a class="drop-link" href="#">أثاث حمام</a><a class="drop-link" href="#">أثاث مكتبي وأطفال</a></div><div class="drop-group"><div class="drop-group-title">ديكور</div><a class="drop-link" href="#">ستائر وسجاد</a><a class="drop-link" href="#">إضاءة وديكور</a><a class="drop-link" href="#">أجهزة مطبخ</a></div></div>
     </div>
     <!-- 10: بناء -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🧱</div><span class="cat-name">بناء ومقاولات</span><span class="cat-count">3,800+ إعلان</span>
+      <div class="cat-icon-box">🧱</div><span class="cat-name">بناء ومقاولات</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">مواد بناء</div><a class="drop-link" href="#">أسمنت وحديد</a><a class="drop-link" href="#">طوب وسيراميك</a><a class="drop-link" href="#">أخشاب وأبواب</a></div><div class="drop-group"><div class="drop-group-title">تجهيزات</div><a class="drop-link" href="#">سباكة وكهرباء</a><a class="drop-link" href="#">دهانات وعزل مائي</a><a class="drop-link" href="#">ألواح شمسية</a><a class="drop-link" href="#">أدوات بناء</a></div></div>
     </div>
     <!-- 11: تجارة -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🏭</div><span class="cat-name">تجارة وصناعة</span><span class="cat-count">2,600+ إعلان</span>
+      <div class="cat-icon-box">🏭</div><span class="cat-name">تجارة وصناعة</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">تجارة</div><a class="drop-link" href="#">معدات تجارية</a><a class="drop-link" href="#">بضائع بالجملة</a><a class="drop-link" href="#">استيراد وتصدير</a></div><div class="drop-group"><div class="drop-group-title">استثمار</div><a class="drop-link" href="#">معدات صناعية</a><a class="drop-link" href="#">شراكات تجارية</a><a class="drop-link" href="#">فرص استثمارية</a></div></div>
     </div>
     <!-- 12: رياضة -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">⚽</div><span class="cat-name">رياضة وهوايات</span><span class="cat-count">2,900+ إعلان</span>
+      <div class="cat-icon-box">⚽</div><span class="cat-name">رياضة وهوايات</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">رياضة</div><a class="drop-link" href="#">معدات رياضية</a><a class="drop-link" href="#">دراجات هوائية</a><a class="drop-link" href="#">صيد وغوص</a></div><div class="drop-group"><div class="drop-group-title">ترفيه</div><a class="drop-link" href="#">ألعاب فيديو</a><a class="drop-link" href="#">موسيقى وآلات</a><a class="drop-link" href="#">هوايات وتحف</a></div></div>
     </div>
     <!-- 13: تعليم -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">📚</div><span class="cat-name">تعليم وثقافة</span><span class="cat-count">1,800+ إعلان</span>
+      <div class="cat-icon-box">📚</div><span class="cat-name">تعليم وثقافة</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">كتب</div><a class="drop-link" href="#">كتب مدرسية وجامعية</a><a class="drop-link" href="#">كتب دينية وعامة</a></div><div class="drop-group"><div class="drop-group-title">أخرى</div><a class="drop-link" href="#">أدوات مدرسية</a><a class="drop-link" href="#">دورات تدريبية</a><a class="drop-link" href="#">قرطاسية ومكتبية</a></div></div>
     </div>
     <!-- 14: أغذية -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🍽️</div><span class="cat-name">أغذية ومطاعم</span><span class="cat-count">3,200+ إعلان</span>
+      <div class="cat-icon-box">🍽️</div><span class="cat-name">أغذية ومطاعم</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">مواد غذائية</div><a class="drop-link" href="#">تمر وحبوب وأرز</a><a class="drop-link" href="#">لحوم وأسماك</a><a class="drop-link" href="#">خضروات وفواكه</a><a class="drop-link" href="#">ألبان ومنتجات</a></div><div class="drop-group"><div class="drop-group-title">مطاعم</div><a class="drop-link" href="#">حلويات ومخبوزات</a><a class="drop-link" href="#">مشروبات وعصائر</a><a class="drop-link" href="#">مطاعم وكافيهات</a></div></div>
     </div>
     <!-- 15: فنون -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🎨</div><span class="cat-name">فنون وحرف يدوية</span><span class="cat-count">1,200+ إعلان</span>
+      <div class="cat-icon-box">🎨</div><span class="cat-name">فنون وحرف يدوية</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">فنون</div><a class="drop-link" href="#">لوحات وخط عربي</a><a class="drop-link" href="#">تصوير فوتوغرافي</a></div><div class="drop-group"><div class="drop-group-title">حرف موريتانية</div><a class="drop-link" href="#">صناعة تقليدية</a><a class="drop-link" href="#">مجوهرات يدوية</a><a class="drop-link" href="#">نسيج وخياطة يدوية</a></div></div>
     </div>
     <!-- 16: ماشية ودواجن — الأخير -->
     <div class="cat-card fade-in" style="position:relative;cursor:pointer">
-      <div class="cat-icon-box">🐄</div><span class="cat-name">ماشية ودواجن وبيطرة</span><span class="cat-count">4,100+ إعلان</span>
+      <div class="cat-icon-box">🐄</div><span class="cat-name">ماشية ودواجن وبيطرة</span><span class="cat-count">—</span>
       <div class="cat-drop"><div class="drop-group"><div class="drop-group-title">ماشية</div><a class="drop-link" href="#">إبل</a><a class="drop-link" href="#">بقر</a><a class="drop-link" href="#">غنم وماعز</a></div><div class="drop-group"><div class="drop-group-title">منتجات حيوانية</div><a class="drop-link" href="#">لبن طازج (ناقة وبقرة)</a><a class="drop-link" href="#">بيض طازج</a><a class="drop-link" href="#">أعلاف ومستلزمات</a></div><div class="drop-group"><div class="drop-group-title">دواجن</div><a class="drop-link" href="#">دواجن وطيور</a><a class="drop-link" href="#">بيض دواجن</a></div><div class="drop-group"><div class="drop-group-title">بيطرة</div><a class="drop-link" href="#">عيادات بيطرية</a><a class="drop-link" href="#">أدوية وعلاجات حيوانات</a><a class="drop-link" href="#">تطعيمات وفحوصات</a><a class="drop-link" href="#">مستلزمات ومعدات بيطرية</a></div></div>
     </div>
     <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
@@ -3465,7 +3552,7 @@ function closeAdModal() {
 }
 
 // ── ALL ADS MODAL ──
-const ALL_ADS_DATA = [...ADS, ...FEATURED_ADS.map(a=>({...a, catKey:a.cat.split(' ')[1]||'عقارات'}))];
+const ALL_ADS_DATA = [];
 // ترحيل لمرة واحدة: rizq_favs (بالعنوان) → rizq_wishlist (بمعرّف الإعلان)
 (function _migrateLegacyFavs(){
   try{
@@ -3541,30 +3628,124 @@ function quickToggleFavorite(adId, btn) {
   if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
 }
 
-// ── SEARCH SUGGESTIONS ──
-const SUGGESTIONS=[
-  {icon:'🏠',text:'شقة للكراء في نواكشوط',price:'150,000+ MRU'},
-  {icon:'🚗',text:'سيارات Toyota للبيع',price:'5M+ MRU'},
-  {icon:'🐪',text:'إبل للبيع — أدرار',price:'1.2M MRU'},
-  {icon:'📱',text:'هواتف iPhone مستعملة',price:'200K+ MRU'},
-  {icon:'🚛',text:'شاحنات للكراء',price:'تفاوض'},
-  {icon:'👗',text:'دراعة موريتانية فاخرة',price:'30K+ MRU'},
-];
-
+// ── SEARCH SUGGESTIONS — from live ADS, not dummy queries ──
 function showSugg(v){
   const box=document.getElementById('suggestions');
+  if(!box) return;
   if(!v||v.length<1){box.style.display='none';return;}
-  const res=SUGGESTIONS.filter(s=>s.text.includes(v)).slice(0,5);
-  if(res.length===0){
-    // Show all if no match (min 1 char typed)
-    const all=SUGGESTIONS.slice(0,5);
-    box.innerHTML=all.map(s=>`<div class="sugg-item" onclick="document.getElementById('hero-search').value='${s.text}';doMainSearch()"><span class="sugg-icon">${s.icon}</span><span>${s.text}</span><span class="sugg-price">${s.price}</span></div>`).join('');
+  const q=v.toLowerCase();
+  const res=(ADS||[]).filter(function(s){
+    return String(s.title||'').toLowerCase().indexOf(q)>=0 || String(s.cat||'').toLowerCase().indexOf(q)>=0;
+  }).slice(0,5);
+  if(!res.length){
+    box.innerHTML='<div class="sugg-item" style="cursor:default;color:#6a7a8a">'+(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج')+'</div>';
   } else {
-    box.innerHTML=res.map(s=>`<div class="sugg-item" onclick="document.getElementById('hero-search').value='${s.text}';doMainSearch()"><span class="sugg-icon">${s.icon}</span><span>${s.text}</span><span class="sugg-price">${s.price}</span></div>`).join('');
+    box.innerHTML=res.map(function(s){
+      var t=(s.title||'').replace(/'/g,'\\\'');
+      return '<div class="sugg-item" onclick="document.getElementById(\'hero-search\').value=\''+t+'\';doMainSearch()"><span class="sugg-icon">'+(s.emoji||'📦')+'</span><span>'+(s.title||'')+'</span><span class="sugg-price">'+(s.price||'')+'</span></div>';
+    }).join('');
   }
   box.style.display='block';
 }
-function hideSugg(){document.getElementById('suggestions').style.display='none';}
+function hideSugg(){var box=document.getElementById('suggestions'); if(box) box.style.display='none';}
+
+function mapApiAdToHero(a){
+  var raw = String(a.price||'').replace(/[^\d]/g,'');
+  var price = raw ? (Number(raw).toLocaleString('en-US')+' MRU') : (a.price||'');
+  return {
+    id: a.id,
+    title: a.title || '',
+    titleFR: a.titleFr || a.title || '',
+    desc: a.desc || '',
+    descFR: a.descFr || a.desc || '',
+    cat: a.categoryLabel || a.category || '',
+    catKey: a.category || '',
+    loc: a.wilaya ? ('📍 '+a.wilaya) : '',
+    locFR: a.wilaya || '',
+    price: price,
+    priceFR: price,
+    emoji: a.emoji || '📦',
+    bg: 'linear-gradient(135deg,#1B3A6B,#0f2347)',
+    pin: !!a.boosted,
+    seller: a.seller || '',
+    status: a.status || ''
+  };
+}
+function refreshAllAdsIndex(){
+  ALL_ADS_DATA.length = 0;
+  ADS.forEach(function(a){ ALL_ADS_DATA.push(a); });
+  FEATURED_ADS.forEach(function(a){
+    ALL_ADS_DATA.push(Object.assign({}, a, { catKey: a.catKey || (a.cat||'').split(' ')[1] || '' }));
+  });
+}
+function renderTickerFromAds(){
+  var wrap = document.getElementById('ticker-wrap');
+  var inner = document.getElementById('ticker');
+  if(!wrap || !inner) return;
+  var items = ADS.slice(0, 12);
+  if(!items.length){ wrap.classList.add('is-empty'); inner.innerHTML=''; return; }
+  function row(a){
+    return '<div class="ticker-item"><div class="ticker-dot"></div>'+(a.emoji||'📦')+' '+(a.title||'')+' <strong>'+(a.price||'')+'</strong></div>';
+  }
+  var html = items.map(row).join('');
+  inner.innerHTML = html + html;
+  wrap.classList.remove('is-empty');
+}
+function applyCatCountsFromAds(){
+  var counts = {};
+  ADS.forEach(function(a){
+    var k = a.catKey || a.cat || '';
+    if(!k) return;
+    counts[k] = (counts[k]||0)+1;
+  });
+  document.querySelectorAll('.cat-count').forEach(function(el){
+    var card = el.closest('.cat-card');
+    if(card && (card.getAttribute('data-extra')==='1' || card.getAttribute('data-suggest')==='1')) return;
+    var name = card && card.querySelector('.cat-name') ? card.querySelector('.cat-name').textContent.trim() : '';
+    var n = 0;
+    Object.keys(counts).forEach(function(k){ if(name && (k===name || name.indexOf(k)>=0 || k.indexOf(name)>=0)) n += counts[k]; });
+    var fr = (typeof isAr!=='undefined' && !isAr);
+    el.textContent = n ? (n.toLocaleString('en-US')+(fr?' annonces':' إعلان')) : '—';
+  });
+}
+function hydrateLiveAds(){
+  document.querySelectorAll('.cat-count').forEach(function(el){
+    var card = el.closest('.cat-card');
+    if(card && (card.getAttribute('data-extra')==='1' || card.getAttribute('data-suggest')==='1')) return;
+    el.textContent='—';
+  });
+  function applyList(list){
+    ADS.length = 0;
+    (list||[]).forEach(function(a){
+      if(a && (a.status==='active' || !a.status)) ADS.push(mapApiAdToHero(a));
+    });
+    refreshAllAdsIndex();
+    if(typeof buildCards==='function') buildCards();
+    if(typeof clearStaticFeaturedIfEmpty==='function') {}
+    renderTickerFromAds();
+    applyCatCountsFromAds();
+    var adStat = document.querySelector('#platform-stats .h-stat-num');
+    if(adStat){
+      adStat.dataset.target = String(ADS.length);
+      adStat.textContent = ADS.length.toLocaleString('en-US');
+    }
+    var grid=document.querySelector('#listings .listings-grid');
+    if(grid && !FEATURED_ADS.length){
+      grid.innerHTML='<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'No featured listings yet.':'لا توجد إعلانات مميزة بعد.')+'</p>';
+    }
+  }
+  try{
+    var local = JSON.parse(localStorage.getItem('rizq_ads')||'[]');
+    if(Array.isArray(local) && local.length) applyList(local);
+    else applyList([]);
+  }catch(e){ applyList([]); }
+  var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
+  if(!base) return;
+  fetch(base+'/api/ads?limit=40').then(function(r){ return r.ok?r.json():null; }).then(function(data){
+    if(data && data.ok && Array.isArray(data.ads)) applyList(data.ads);
+  }).catch(function(){});
+}
+hydrateLiveAds();
 
 // ── HERO SEARCH SUBMIT — يحوّل المستخدم لصفحة النتائج مع القسم المختار ونص البحث ──
 const HERO_CAT_KEYS = ['', 'عقارات','سيارات','شاحنات','إلكترونيات','وظائف','ماشية','أزياء','بناء'];
@@ -3804,11 +3985,17 @@ const LANG = {
     'vs-card1-title': 'واجهة كاملة لمحلك', 'vs-card1-desc': 'شعار، اسم تجاري، وصف، ساعات العمل، وموقعك على الخريطة — كل ما يحتاجه الزبون ليثق بك',
     'vs-card2-title': 'عرض المنتجات والصور', 'vs-card2-desc': 'كتالوج منتجاتك بالصور والأسعار في مكان واحد — يتصفحه الزبون بسهولة قبل أن يتواصل معك',
     'vs-card3-title': 'إحصائيات بسيطة', 'vs-card3-desc': 'تابع عدد الزيارات والتواصل مع محلك، واعرف كيف يتفاعل الزبائن مع منتجاتك',
-    'hero-badge': 'المنصة الأولى في موريتانيا — 50,000+ إعلان نشط',
+    'hero-badge': 'المنصة الأولى في موريتانيا',
     'search-ph': 'البحث في رزق...',
+    'hbiz-stores': 'المحلات التجارية',
+    'hbiz-offices': 'المكاتب والخدمات',
+    'hbiz-showrooms': 'معارض الشو روم',
+    'hbiz-new': 'جديد',
+    'hbiz-cta': 'افتح متجرك أو أضف إعلانك مجاناً',
+    'hbiz-cta-micro': '⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
-    's-cats-desc': '17 قسماً رئيسياً و130+ فرعاً — السوق الموريتاني الأشمل والأدق',
+    's-cats-desc': 'أقسام منظمة تغطي السوق الموريتاني',
     's-lst-title': 'إعلانات <span>مميزة ومختارة</span>',
     's-lst-desc': 'أفضل الإعلانات المنشورة الآن على رزق',
     'view-all': 'عرض جميع الإعلانات ←',
@@ -3858,11 +4045,17 @@ const LANG = {
     'vs-card1-title': 'Une vitrine complète pour votre boutique', 'vs-card1-desc': "Logo, nom commercial, description, horaires et emplacement sur la carte — tout ce qu'il faut pour gagner la confiance du client",
     'vs-card2-title': 'Présentation des produits & photos', 'vs-card2-desc': 'Catalogue de vos produits avec photos et prix au même endroit — le client le consulte facilement avant de vous contacter',
     'vs-card3-title': 'Statistiques simples', 'vs-card3-desc': 'Suivez le nombre de visites et de contacts de votre boutique, et découvrez comment les clients interagissent avec vos produits',
-    'hero-badge': 'N°1 en Mauritanie — +50 000 annonces actives',
+    'hero-badge': 'N°1 en Mauritanie',
     'search-ph': 'Rechercher sur Rizq...',
+    'hbiz-stores': 'Boutiques',
+    'hbiz-offices': 'Bureaux &amp; services',
+    'hbiz-showrooms': 'Showrooms',
+    'hbiz-new': 'Nouveau',
+    'hbiz-cta': 'Ouvrez votre boutique ou publiez une annonce — gratuit',
+    'hbiz-cta-micro': '⚡ Aucune carte requise — inscription en 30 secondes',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
-    's-cats-desc': '17 catégories et +130 sous-catégories — le marché mauritanien le plus complet',
+    's-cats-desc': 'Des catégories organisées pour le marché mauritanien',
     's-lst-title': 'Annonces <span>sélectionnées</span>',
     's-lst-desc': 'Les meilleures annonces publiées sur Rizq',
     'view-all': 'Voir toutes les annonces →',
@@ -4266,22 +4459,8 @@ function toggleLang() {
   const allAdsTitle = document.getElementById('all-ads-title');
   if(allAdsTitle) allAdsTitle.innerHTML = RizqI18n.t2('كل <span>الإعلانات</span>','Toutes les <span>annonces</span>');
 
-  // Ticker items — bidirectional replace
-  const _tickerPairs = [
-    ['شقة للكراء — نواكشوط','Appartement à louer — Nouakchott'],
-    ['إبل للبيع — أدرار','Chameaux à vendre — Adrar'],
-    ['حفارة Caterpillar 320D','Pelleteuse Caterpillar 320D'],
-    ['أرض للبيع — نواذيبو','Terrain à vendre — Nouadhibou'],
-    ['دراعة موريتانية فاخرة','Daraa mauritanienne de luxe'],
-    ['مهندس كهرباء متاح — نواكشوط','Électricien disponible — Nouakchott'],
-    ['تواصل مع البائع','Contacter le vendeur'],
-    ['تواصل معه','Contactez-le']
-  ];
-  document.querySelectorAll('.ticker-item').forEach(el => {
-    _tickerPairs.forEach(([ar,fr])=>{
-      el.innerHTML = el.innerHTML.replace(isAr ? fr : ar, isAr ? ar : fr);
-    });
-  });
+  // Ticker is rebuilt from live ADS — no hardcoded dummy pairs
+  if(typeof renderTickerFromAds==='function') renderTickerFromAds();
 
   // Virtual Offices section — unified
   const voSec = document.getElementById('virtual-offices');
@@ -4358,25 +4537,8 @@ function toggleLang() {
   const viewAllBtn = document.querySelector('[data-t="view-all"]');
   if(viewAllBtn) viewAllBtn.textContent = isAr ? 'عرض جميع الإعلانات ←' : 'Voir toutes les annonces →';
 
-  // Translate featured listing cards hover content
-  const lhTitles = document.querySelectorAll('.lc-hover-title');
-  const lhDescs = document.querySelectorAll('.lc-hover-desc');
-  const lhPrices = document.querySelectorAll('.lc-hover-price');
-  const frTitles=['Appartement luxueux 3 pièces — Nouakchott','Pelle Caterpillar 320D — Excellent état','Chameaux à vendre — 10 têtes de race'];
-  const frDescs=["Finitions haut de gamme, vue panoramique, climatisation centrale, gardiennage 24/7, parking privé. Proche des grands centres commerciaux.","Heures de travail très faibles, prêt pour livraison immédiate avec 6 mois de garantie. Importation directe, documents complets.","De la région d'Adrar, race pure et en excellente santé, prêts pour inspection vétérinaire. Prix négociable."];
-  const frPrices=['150 000 MRU/mois','35 000 000 MRU','2 400 000 MRU'];
-  if(!isAr){
-    lhTitles.forEach((el,i)=>{ if(frTitles[i]) el.textContent=frTitles[i]; });
-    lhDescs.forEach((el,i)=>{ if(frDescs[i]) el.textContent=frDescs[i]; });
-    lhPrices.forEach((el,i)=>{ if(frPrices[i]) el.textContent=frPrices[i]; });
-    document.querySelectorAll('.lc-hover-btn-open').forEach(b=>b.textContent='📋 Voir tout');
-  } else {
-    const arTitles=['شقة فاخرة 3 غرف — نواكشوط الغربية','حفارة Caterpillar 320D — بحالة ممتازة','إبل للبيع — 10 رؤوس أصيلة من أدرار'];
-    const arDescs=["تشطيب عالي الجودة، إطلالة بانورامية، تكييف مركزي، حراسة 24/7، موقف سيارات خاص.","ساعات عمل منخفضة جداً، جاهزة للتسليم الفوري مع ضمان ستة أشهر. وثائق كاملة.","من منطقة أدرار الشهيرة بجودة إبلها. أصيلة وبصحة ممتازة، مستعدة للفحص البيطري."];
-    lhTitles.forEach((el,i)=>{ if(arTitles[i]) el.textContent=arTitles[i]; });
-    lhDescs.forEach((el,i)=>{ if(arDescs[i]) el.textContent=arDescs[i]; });
-    lhPrices.forEach((el,i)=>{ if(frPrices[i]){ const arP=['150,000 MRU/شهر','35,000,000 MRU','2,400,000 MRU']; el.textContent=arP[i]||el.textContent; }});
-  }
+  // Featured listing hover copy — only translate nodes that exist from live data
+  document.querySelectorAll('.lc-hover-btn-open').forEach(b=>b.textContent = isAr ? '📋 عرض الإعلان' : '📋 Voir tout');
 
   // Apply full translation to ALL hardcoded elements
   applyFullTranslation(lang);
@@ -5790,25 +5952,7 @@ function trPriceName(n){ return (!isAr && PRICE_NAME_FR[n]) ? PRICE_NAME_FR[n] :
 function trPriceUnit(u){ return (!isAr && PRICE_UNIT_FR[u]) ? PRICE_UNIT_FR[u] : u; }
 
 // ══ Prices board ══
-const DEFAULT_PRICES = [
-  {name:'أرز (الكيس 25كغ)',unit:'MRU / كيس',price:3800,trend:'up',cat:'food'},
-  {name:'دقيق (الكيس 50كغ)',unit:'MRU / كيس',price:4200,trend:'flat',cat:'food'},
-  {name:'زيت طعام (5 لتر)',unit:'MRU / عبوة',price:1200,trend:'up',cat:'food'},
-  {name:'سكر (الكيس 50كغ)',unit:'MRU / كيس',price:3500,trend:'flat',cat:'food'},
-  {name:'حليب مجفف (علبة 2.5كغ)',unit:'MRU / علبة',price:2800,trend:'up',cat:'food'},
-  {name:'لحم بقر (1كغ)',unit:'MRU / كغ',price:1800,trend:'flat',cat:'food'},
-  {name:'لحم إبل (1كغ)',unit:'MRU / كغ',price:2200,trend:'up',cat:'food'},
-  {name:'دجاج (1كغ)',unit:'MRU / كغ',price:950,trend:'down',cat:'food'},
-  {name:'طماطم (1كغ)',unit:'MRU / كغ',price:300,trend:'flat',cat:'food'},
-  {name:'بصل (1كغ)',unit:'MRU / كغ',price:250,trend:'up',cat:'food'},
-  {name:'بطاطس (1كغ)',unit:'MRU / كغ',price:350,trend:'flat',cat:'food'},
-  {name:'خبز (الرغيف)',unit:'MRU / رغيف',price:50,trend:'flat',cat:'food'},
-  {name:'بنزين (سوبر)',unit:'MRU / لتر',price:345,trend:'flat',cat:'fuel'},
-  {name:'مازوت (غازوال)',unit:'MRU / لتر',price:295,trend:'flat',cat:'fuel'},
-  {name:'غاز بوتان (قارورة 6كغ)',unit:'MRU / قارورة',price:1050,trend:'up',cat:'fuel'},
-  {name:'غاز بوتان (قارورة 12.5كغ)',unit:'MRU / قارورة',price:2200,trend:'up',cat:'fuel'},
-  {name:'زيت محرك (4 لتر)',unit:'MRU / لتر',price:1400,trend:'flat',cat:'fuel'}
-];
+const DEFAULT_PRICES = [];
 let _pricesData = [];
 let _priceTab = 'food';
 function priceTrendHTML(t){
@@ -5821,6 +5965,11 @@ function renderPrices(){
   const grid = document.getElementById('prices-grid');
   if(!grid) return;
   const items = _pricesData.filter(it=>it.cat===_priceTab);
+  if(!items.length){
+    grid.innerHTML = '<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:28px 16px;font-size:14px">'+(isAr?'لا توجد أسعار سوق بعد.':'Aucun prix de marché pour le moment.')+'</p>';
+    updatePriceTimestamp();
+    return;
+  }
   grid.innerHTML = items.map(it=>`
     <div class="price-card">
       <div class="price-name">${escapeHtml(trPriceName(it.name))}</div>
@@ -5832,6 +5981,7 @@ function renderPrices(){
 function renderPriceTicker(){
   const track = document.getElementById('price-ticker');
   if(!track) return;
+  if(!_pricesData.length){ track.innerHTML=''; return; }
   const items = [..._pricesData,..._pricesData];
   track.innerHTML = items.map(it=>`<span class="ticker-item">${escapeHtml(trPriceName(it.name))} <strong>${it.price.toLocaleString()}</strong> ${escapeHtml(trPriceUnit(it.unit))} ${priceTrendHTML(it.trend)}</span>`).join('');
 }
@@ -5864,9 +6014,9 @@ function switchPriceTab(tab, btn){
 function loadPrices(){
   try{
     const raw = localStorage.getItem('rizq_prices');
-    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length) _pricesData=p; else _pricesData=DEFAULT_PRICES; }
-    else _pricesData=DEFAULT_PRICES;
-  }catch(e){ _pricesData=DEFAULT_PRICES; }
+    if(raw){ const p=JSON.parse(raw); _pricesData = (Array.isArray(p)&&p.length) ? p : []; }
+    else _pricesData=[];
+  }catch(e){ _pricesData=[]; }
   renderPrices();
   renderPriceTicker();
 }
@@ -6693,7 +6843,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=diamond-roi-1"></script>
+<script src="rizq_packages_config.js?v=8.1"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_widget_embed.js"></script>
