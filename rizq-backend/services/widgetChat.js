@@ -29,10 +29,27 @@ function buildLanguageInstructions(detectedLang, uiLang) {
   );
 }
 
-function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts }) {
+function buildDiamondSystemBlock() {
+  return (
+    'System Role: You are the Official Rizq Smart Manager (مدير رزق الذكي), powered by advanced AI. ' +
+    'You possess full contextual knowledge of the Rizq platform (stores, ads, tenders, offices, subscription tiers, and navigation).\n' +
+    'Language & Tone Rules:\n' +
+    '1. Detect and reply strictly in the user\'s input language (Arabic, French, Spanish, English, Hassaniya, etc.).\n' +
+    '2. Understand intent, typos, slang, and context naturally like a human advisor.\n' +
+    '3. Provide direct, helpful, and polite answers matching the Diamond Tier agent capabilities.\n'
+  );
+}
+
+function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
   let prompt = buildLanguageInstructions(replyLang, uiLang);
+  if (agentTier === 'diamond' || !profile || !profile.businessName) {
+    prompt += '\n' + buildDiamondSystemBlock();
+  }
+  if (extraInstruction) {
+    prompt += `\n## Extra language instruction\n${String(extraInstruction).slice(0, 1200)}\n`;
+  }
 
   if (profile && profile.businessName) {
     const agentTitle = (profile.persona && profile.persona.agentTitle) || pickLang({
@@ -276,7 +293,18 @@ async function handleWidgetChat(body) {
   const uiLang = normalizeUiLang(body.uiLang || lang);
   const detectedLang = detectUserLanguage(text, uiLang);
   const pageFacts = resolvePageContextFacts(pageContext);
-  const systemPrompt = buildSystemPrompt({ lang: uiLang, detectedLang, profile, pageContext, pageFacts });
+  const extraInstruction = (body.autoLang === true || body.systemInstruction)
+    ? (body.systemInstruction || 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, or English) and reply only in that language.')
+    : '';
+  const systemPrompt = buildSystemPrompt({
+    lang: uiLang,
+    detectedLang,
+    profile,
+    pageContext,
+    pageFacts,
+    extraInstruction,
+    agentTier: body.agentTier || 'diamond',
+  });
   const adFlow = isAdFlowQuery(text, pageContext);
   const preferredModel = getFastModel();
 
@@ -390,6 +418,7 @@ async function handleWidgetChat(body) {
 module.exports = {
   handleWidgetChat,
   buildSystemPrompt,
+  buildDiamondSystemBlock,
   validateReply,
   detectUserLanguage,
 };

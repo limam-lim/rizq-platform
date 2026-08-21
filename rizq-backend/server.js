@@ -498,6 +498,18 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   }
 });
 
+/** POST /api/ai/chat — alias for Diamond widget agent (same engine as /api/widget/chat) */
+app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
+  try {
+    const result = await handleWidgetChat(Object.assign({ agentTier: 'diamond' }, req.body || {}));
+    res.json(result);
+  } catch (err) {
+    console.error('[ai/chat] error:', err.message);
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي' });
+  }
+});
+
 /** GET /api/ai/status — هل مفتاح Claude مضبوط على الخادم؟ (بدون كشف المفتاح) */
 app.get('/api/ai/status', (req, res) => {
   res.json({
@@ -3120,6 +3132,20 @@ app.get('/api/discovery/top-sellers', (req, res) => {
 
   res.json({ ok: true, sellers: ranked });
 });
+
+// ── تطوير محلي: صفحات HTML + API على نفس المنفذ (localhost:3000) ──
+const FRONTEND_ROOT = path.join(__dirname, '..');
+if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '0') {
+  app.get('/', (_req, res) => {
+    res.sendFile(path.join(FRONTEND_ROOT, 'rizq_landing_v8.html'));
+  });
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
+    next();
+  });
+  app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore' }));
+  console.log('[rizq-backend] dev static files → ' + FRONTEND_ROOT);
+}
 
 const PORT = process.env.PORT || 3000;
 app.use(notFoundHandler);

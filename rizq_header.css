@@ -1,0 +1,1036 @@
+/* rizq_header.css — mobile two-tier ONLY below 768px; desktop uses original page nav */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
+:root{
+  --rizq-header-navy:#0f172a;
+  --rizq-header-h:70px;
+}
+
+html.rizq-app-nav,
+html.rizq-app-nav body,
+html.rizq-app-nav *:not(.logo-ar):not(.logo-sub):not(.logo-text):not(.rizq-hdr-brand-ar):not(.rizq-hdr-brand-sub):not(.logo-mark):not(.logo-mark-img):not(.rizq-hdr-brand-mark):not(.rizq-splash-brand):not(.rn-logo-ar):not(.rn-logo-sub):not(.sb-logo-ar):not(.sb-logo-sub){
+  font-family:'Cairo',sans-serif !important;
+}
+html.rizq-app-nav .logo-ar,
+html.rizq-app-nav .logo-sub,
+html.rizq-app-nav .logo-text,
+html.rizq-app-nav .rizq-hdr-brand-ar,
+html.rizq-app-nav .rizq-hdr-brand-sub,
+html.rizq-app-nav .logo-mark,
+html.rizq-app-nav .logo-mark-img,
+html.rizq-app-nav .rizq-hdr-brand-mark,
+html.rizq-app-nav .rizq-splash-brand,
+html.rizq-app-nav .rn-logo-ar,
+html.rizq-app-nav .rn-logo-sub,
+html.rizq-app-nav .sb-logo-text,
+html.rizq-app-nav .sb-logo-sub{
+  font-family:Georgia,'Times New Roman',serif !important;
+}
+html.rizq-app-nav .logo,
+html.rizq-app-nav .rizq-hdr-brand{
+  direction:ltr !important;
+}
+html.rizq-app-nav .logo-ar,
+html.rizq-app-nav .rizq-hdr-brand-ar,
+html.rizq-app-nav .rn-logo-ar{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-size:22px !important;
+  font-weight:700 !important;
+  color:#C9A84C !important;
+  line-height:1 !important;
+  text-shadow:0 0 16px rgba(201,168,76,.4) !important;
+}
+html.rizq-app-nav .logo-text,
+html.rizq-app-nav .rizq-logo-text,
+html.rizq-app-nav .rn-logo-text,
+html.rizq-app-nav .rizq-hdr-brand .logo-text{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-end !important;
+  justify-content:center !important;
+  text-align:right !important;
+  direction:ltr !important;
+  line-height:1.05 !important;
+}
+html.rizq-app-nav .logo-ar,
+html.rizq-app-nav .rizq-hdr-brand-ar,
+html.rizq-app-nav .rn-logo-ar{
+  direction:rtl !important;
+  unicode-bidi:isolate !important;
+  display:block !important;
+}
+html.rizq-app-nav .logo-sub,
+html.rizq-app-nav .rizq-hdr-brand-sub,
+html.rizq-app-nav .rn-logo-sub,
+html.rizq-app-nav .sb-logo-sub{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-size:8px !important;
+  font-weight:700 !important;
+  letter-spacing:1.6px !important;
+  text-transform:uppercase !important;
+  color:rgba(201,168,76,.65) !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  display:block !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+}
+html.rizq-app-nav .logo-mark,
+html.rizq-app-nav .rizq-promo-mark,
+html.rizq-app-nav .sb-logo-icon,
+html.rizq-app-nav .sb-logo-mark,
+html.rizq-app-nav .nav-logo-ring,
+html.rizq-app-nav .rn-logo-btn,
+html.rizq-app-nav .login-logo{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  width:auto !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+html.rizq-app-nav .logo-mark-img,
+html.rizq-app-nav .rizq-hdr-brand-mark{
+  width:42px !important;
+  height:42px !important;
+  background:#0f172a !important;
+  border:none !important;
+  border-radius:10px !important;
+  box-shadow:0 0 0 1px rgba(201,168,76,.28) !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  object-fit:contain !important;
+}
+html.rizq-app-nav .logo-mark:not(:has(img)),
+html.rizq-app-nav .rizq-promo-mark:not(:has(img)),
+html.rizq-app-nav .sb-logo-icon:not(:has(img)),
+html.rizq-app-nav .sb-logo-mark:not(:has(img)),
+html.rizq-app-nav .nav-logo-ring:not(:has(img)),
+html.rizq-app-nav .login-logo:not(:has(img)),
+html.rizq-app-nav .rn-logo-btn:not(:has(img)){
+  width:42px !important;
+  height:42px !important;
+  background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  border:none !important;
+  border-radius:10px !important;
+  box-shadow:0 0 0 1px rgba(201,168,76,.28) !important;
+  overflow:hidden !important;
+  padding:0 !important;
+}
+html.rizq-app-nav .logo-mark svg,
+html.rizq-app-nav .sb-logo-icon svg,
+html.rizq-app-nav .sb-logo-mark svg,
+html.rizq-app-nav .rizq-promo-mark svg,
+html.rizq-app-nav .nav-logo-ring svg,
+html.rizq-app-nav .rn-logo-btn svg,
+html.rizq-app-nav .login-logo svg,
+html.rizq-app-nav .fixed-rizq-logo svg,
+html.rizq-app-nav .rizq-splash-mark svg{
+  display:none !important;
+}
+html.rizq-app-nav .fixed-rizq-logo img{
+  width:26px !important;height:26px !important;
+  min-width:26px !important;min-height:26px !important;
+}
+html.rizq-app-nav .fixed-rizq-logo:not(:has(img))::before{
+  content:'';display:block;width:26px;height:26px;border-radius:6px;
+  background:#0f172a url('rizq-mark-512.png') center / contain no-repeat;
+}
+
+/* ── GREY DOT / CUSTOM CURSOR ── */
+html,body{cursor:auto !important}
+#cur,#cur-ring,#cursor-dot,.cursor-dot,.mouse-follower,.cursor-follower,
+[id="cursor"],[id="cursor-dot"],[id*="cursor-"],[class*="cursor-dot"],[class*="cursor-follower"],[class*="mouse-follower"]{
+  display:none !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  width:0 !important;height:0 !important;
+}
+
+html.rizq-app-nav{--rizq-header-h:70px}
+
+/* Keep position:fixed headers/menus viewport-relative (RTL + overflow-x:hidden
+   otherwise clips حسابي / اللغة on the left and throws the المزيد menu off-screen). */
+html.rizq-app-nav{overflow-x:clip}
+
+body > .nav-dropdown-menu:not(.rizq-more-menu-open){
+  display:none;
+  position:fixed !important;
+  top:auto;left:auto;right:auto;bottom:auto;
+  inset:auto !important;
+  transform:none !important;
+  min-width:240px;
+  max-width:min(280px, calc(100vw - 32px));
+  max-height:min(70vh, 480px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:8px;
+  background:#0f172a !important;
+  border:1px solid rgba(201,168,76,.38) !important;
+  border-radius:14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+  z-index:10050 !important;
+}
+body > .nav-dropdown-menu.rizq-more-menu-open,
+.nav-dropdown-menu.rizq-more-menu-open{
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  transform:none !important;
+}
+
+#rizq-lang-btn{
+  position:static !important;
+  display:inline-flex !important;
+  align-items:center;justify-content:center;
+  background:#0f172a !important;
+  backdrop-filter:none !important;
+  border:1.5px solid #C9A84C !important;
+  color:#E8C96A !important;
+  font-family:'Cairo',system-ui,sans-serif !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  padding:6px 14px !important;
+  border-radius:999px !important;
+  white-space:nowrap !important;
+  pointer-events:auto !important;
+}
+#rizq-lang-btn:hover{background:#1e293b !important;color:#fff !important}
+#rizq-lang-btn:active,
+.rizq-hdr-account:active,
+.rizq-hdr-item:active,
+.rizq-hdr-post:active{opacity:.8 !important}
+
+.rizq-hdr-account{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:#1e293b;border:1px solid rgba(255,255,255,.14);
+  color:#fff;font-size:18px;text-decoration:none;pointer-events:auto !important;
+}
+.rizq-hdr-item{
+  display:flex;align-items:center;justify-content:center;
+  min-width:0;background:none;border:none;
+  color:rgba(255,255,255,.9);text-decoration:none;
+  font-family:inherit;font-weight:700;
+  pointer-events:auto !important;
+}
+.rizq-hdr-item.is-active{color:#E8C96A}
+.rizq-hdr-post{
+  display:flex;align-items:center;justify-content:center;
+  background:#C9A84C;color:#0f172a;border:none;
+  font-weight:800;text-decoration:none;
+  pointer-events:auto !important;
+}
+.rizq-hdr-post-plus{line-height:1}
+.rizq-hdr-more-wrap{position:relative;overflow:visible}
+.rizq-hdr-more-menu,
+.more-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  min-width:220px;background:rgba(15,23,42,.92);
+  border:1px solid rgba(201,168,76,.38);border-radius:14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.45),0 0 0 1px rgba(201,168,76,.12);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:8px;z-index:9999;text-align:start;
+  pointer-events:auto !important;
+}
+html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
+.rizq-hdr-more-wrap.open .rizq-hdr-more-menu{display:block}
+.rizq-hdr-more-menu a{
+  display:block;color:rgba(255,255,255,.92);text-decoration:none;
+  padding:11px 12px;border-radius:10px;font-size:13.5px;font-weight:700;
+  pointer-events:auto !important;
+}
+.rizq-hdr-more-menu a:hover,
+.rizq-hdr-more-menu a:active{background:rgba(201,168,76,.16);color:#E8C96A}
+
+/* Default: never show injected header until a mobile query turns it on */
+#rizq-app-header{display:none !important}
+
+/* ════════════ DESKTOP ≥769px — original page header ════════════ */
+@media (min-width:769px){
+  #rizq-app-header,
+  #rizq-app-header .rizq-hdr-row1,
+  #rizq-app-header .rizq-hdr-row2,
+  #rizq-app-header *,
+  #rizq-lang-btn{
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+    position:absolute !important;
+    left:-9999px !important;
+    top:-9999px !important;
+    width:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+    z-index:-1 !important;
+    opacity:0 !important;
+  }
+
+  html.rizq-app-nav body{
+    padding-top:0 !important;
+    padding-bottom:0 !important;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav body{
+    padding-top:70px !important;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .topnav,
+  html.rizq-app-nav.has-rizq-desk-nav body > .btn-lang,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav) .logo,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-actions,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-disclaimer,
+  html.rizq-app-nav.has-rizq-desk-nav #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn){
+    display:none !important;
+  }
+
+  html.rizq-app-nav #nav,
+  html.rizq-app-nav #rizq-desk-nav,
+  html.rizq-app-nav #rizq-desk-nav{
+    display:grid !important;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center !important;
+    direction:ltr !important;
+    z-index:10000 !important;
+    height:70px !important;
+    max-height:70px !important;
+    bottom:auto !important;
+    inset:0 0 auto 0 !important;
+    pointer-events:auto !important;
+    background:#0f172a !important;
+    overflow:visible !important;
+    box-sizing:border-box !important;
+    width:auto !important;
+    max-width:100% !important;
+    left:0 !important;
+    right:0 !important;
+    padding-block:0 !important;
+    padding-inline:max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) !important;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  html.rizq-app-nav #rizq-desk-nav{
+    position:fixed !important;
+    left:0;right:0;top:0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  html.rizq-app-nav #nav .nav-hamburger,
+  html.rizq-app-nav #rizq-desk-nav .nav-hamburger{display:none !important}
+  html.rizq-app-nav #nav > .nav-start,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start{
+    grid-column:1;
+    justify-self:start;
+    display:grid !important;
+    grid-auto-flow:column;
+    grid-template-columns:auto auto;
+    direction:ltr !important;
+    align-items:center;
+    gap:8px;
+    padding-inline-start:8px;
+    min-width:max-content;
+    overflow:visible !important;
+    flex-shrink:0;
+  }
+  /* اللغة أقصى اليسار، وحسابي عن يمينها مباشرة */
+  html.rizq-app-nav #nav-lang-btn,
+  html.rizq-app-nav #rizq-desk-lang-btn,
+  html.rizq-app-nav #nav > .nav-start .btn-lang,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start .btn-lang{
+    order:1 !important;
+    grid-column:1;
+  }
+  html.rizq-app-nav #nav .nav-account-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-account-btn,
+  html.rizq-app-nav #rizq-desk-account{
+    order:2 !important;
+    grid-column:2;
+  }
+  html.rizq-app-nav #nav .nav-hamburger{order:3}
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    grid-column:2;
+    justify-self:center;
+    overflow:visible !important;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    list-style:none;
+    direction:inherit;
+    margin:0;padding:0;
+  }
+  html.rizq-app-nav #nav > .logo,
+  html.rizq-app-nav #rizq-desk-nav > .logo{
+    grid-column:3;
+    justify-self:end;
+    margin:0 !important;
+    height:auto !important;
+    max-height:64px;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    pointer-events:auto !important;
+    flex-shrink:0;
+    white-space:nowrap;
+    direction:ltr;
+  }
+  html.rizq-app-nav #nav .logo-mark,
+  html.rizq-app-nav #nav .logo-mark-img,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark-img{
+    width:42px !important;
+    height:42px !important;
+    border:none !important;
+    box-shadow:0 0 0 1px rgba(201,168,76,.28) !important;
+    background:#0f172a !important;
+    border-radius:10px !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    object-fit:contain !important;
+  }
+  html.rizq-app-nav #nav .logo-mark:not(:has(img)),
+  html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
+    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  }
+  html.rizq-app-nav #nav .logo-mark svg,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark svg{display:none !important}
+  html.rizq-app-nav #nav .logo-mark::after,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark::after{display:none !important}
+  html.rizq-app-nav #nav .logo-ar,
+  html.rizq-app-nav #rizq-desk-nav .logo-ar{
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-weight:700 !important;
+    font-size:22px !important;
+    color:#C9A84C !important;
+    line-height:1 !important;
+    text-shadow:0 0 16px rgba(201,168,76,.4) !important;
+    white-space:nowrap;
+    direction:rtl !important;
+    unicode-bidi:isolate !important;
+    display:block !important;
+  }
+  html.rizq-app-nav #nav .logo-text,
+  html.rizq-app-nav #rizq-desk-nav .logo-text{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-end !important;
+    text-align:right !important;
+    direction:ltr !important;
+  }
+  html.rizq-app-nav #nav .logo-sub,
+  html.rizq-app-nav #rizq-desk-nav .logo-sub{
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-style:italic !important;
+    font-size:8px !important;
+    letter-spacing:1.6px !important;
+    color:rgba(201,168,76,.65) !important;
+    text-transform:uppercase;
+    white-space:nowrap;
+    direction:ltr !important;
+    unicode-bidi:isolate !important;
+    display:block !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav #nav > .nav-sticky-tools,
+  html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools{
+    grid-column:2;
+    justify-self:center;
+  }
+  html.rizq-app-nav #nav.nav-compact > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-center{display:none !important}
+
+  html.rizq-app-nav #nav .nav-center a,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    color:rgba(255,255,255,.9) !important;
+    font-weight:700 !important;
+    font-size:14px !important;
+    letter-spacing:.15px;
+    padding:8px 14px !important;
+    border-radius:10px;
+    text-decoration:none;
+    background:none;border:none;cursor:pointer;
+    font-family:inherit;
+    transition:color .18s,background .18s,transform .15s;
+  }
+  html.rizq-app-nav #nav .nav-center a:hover,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a:hover,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn:hover{
+    color:#E8C96A !important;
+    background:rgba(201,168,76,.14) !important;
+  }
+  html.rizq-app-nav #nav .nav-post-plus:hover,
+  html.rizq-app-nav #rizq-desk-nav .nav-post-plus:hover{
+    color:#0f172a !important;
+    background:linear-gradient(135deg,#C9A84C,#e8c96a) !important;
+    border-color:#C9A84C !important;
+  }
+  html.rizq-app-nav #nav-lang-btn,
+  html.rizq-app-nav #rizq-desk-lang-btn,
+  html.rizq-app-nav #nav .btn-lang-primary,
+  html.rizq-app-nav #rizq-desk-nav .btn-lang-primary{
+    display:inline-flex !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    position:static !important;
+    left:auto !important;top:auto !important;
+    width:auto !important;height:auto !important;
+    opacity:1 !important;
+    background:#0f172a !important;
+    border:1.5px solid #C9A84C !important;
+    color:#E8C96A !important;
+    font-weight:800 !important;
+    font-size:12px !important;
+    padding:7px 14px !important;
+    border-radius:999px !important;
+    cursor:pointer;
+  }
+  html.rizq-app-nav .nav-account-btn{
+    display:inline-flex !important;
+    align-items:center;gap:6px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(201,168,76,.4);
+    color:#E8C96A;padding:8px 14px;border-radius:22px;font-weight:800;font-size:13px;
+    cursor:pointer;font-family:'Cairo',system-ui,sans-serif;white-space:nowrap;
+  }
+  /* منع تسرب الاتجاه: القوائم المنسدلة تتبع لغة الصفحة */
+  html.rizq-app-nav[dir="ltr"] #nav .nav-dropdown-menu,
+  html.rizq-app-nav[dir="ltr"] #rizq-desk-nav .nav-dropdown-menu{
+    direction:ltr !important;
+    text-align:left;
+  }
+  html.rizq-app-nav[dir="ltr"] #nav .nav-center,
+  html.rizq-app-nav[dir="ltr"] #rizq-desk-nav .nav-center{
+    direction:ltr !important;
+  }
+  html.rizq-app-nav .nav-dropdown-li{
+    position:relative !important;
+    list-style:none;
+    overflow:visible !important;
+    direction:inherit !important;
+  }
+  html.rizq-app-nav #nav .nav-dropdown-menu,
+  html.rizq-app-nav #rizq-desk-nav .nav-dropdown-menu,
+  html.rizq-app-nav .nav-more-menu,
+  html.rizq-app-nav .more-menu{
+    display:none;
+    position:absolute !important;
+    top:calc(100% + 6px) !important;
+    left:50% !important;
+    right:auto !important;
+    bottom:auto !important;
+    transform:translateX(-50%) !important;
+    margin:0 !important;
+    min-width:240px;
+    max-width:min(280px, calc(100vw - 32px));
+    max-height:min(70vh, 480px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:8px;
+    background:rgba(15,23,42,.94) !important;
+    backdrop-filter:blur(12px) !important;
+    -webkit-backdrop-filter:blur(12px) !important;
+    opacity:1 !important;
+    border:1px solid rgba(201,168,76,.38) !important;
+    border-radius:14px;
+    box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(201,168,76,.12);
+    z-index:9999 !important;
+    pointer-events:auto !important;
+    visibility:visible !important;
+    direction:inherit;
+    isolation:isolate;
+  }
+  html.rizq-app-nav .nav-dropdown-li:hover > .nav-dropdown-menu,
+  html.rizq-app-nav .nav-dropdown-li.open > .nav-dropdown-menu{
+    display:block !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+  html.rizq-app-nav .nav-dd-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:10px;
+    color:rgba(255,255,255,.92);text-decoration:none;font-weight:700;
+  }
+  html.rizq-app-nav #nav .nav-dd-item:hover,
+  html.rizq-app-nav #nav .nav-dd-item:hover strong,
+  html.rizq-app-nav #rizq-desk-nav .nav-dd-item:hover,
+  html.rizq-app-nav #rizq-desk-nav .nav-dd-item:hover strong{
+    color:#E8C96A !important;
+    background:rgba(201,168,76,.14);
+  }
+
+  #cat-inline-panel{
+    grid-column:1 / -1 !important;
+    position:relative !important;
+    top:auto !important;left:auto !important;right:auto !important;
+    width:auto !important;
+    max-width:none !important;
+    z-index:4 !important;
+    margin:6px 0 !important;
+    transform:none !important;
+  }
+  #qcat-portal{
+    min-width:220px;
+    max-width:min(280px,calc(100vw - 32px));
+    z-index:800 !important;
+    pointer-events:auto !important;
+  }
+
+  .cats-grid{
+    gap:16px !important;
+    max-width:1200px;
+    overflow:visible !important;
+  }
+  @media (min-width:1280px){
+    .cats-grid{gap:18px !important;max-width:1440px}
+  }
+  .cat-card:hover:not(.open):not(.pinned){
+    transform:translateY(-4px) !important;
+    border-color:rgba(201,168,76,.55) !important;
+    box-shadow:0 14px 36px rgba(201,168,76,.28),0 8px 20px rgba(15,35,65,.12) !important;
+  }
+
+  .mobile-bottom-nav,
+  .mobile-drawer,
+  .mobile-drawer-overlay,
+  .nav-hamburger,
+  .mobile-bar,
+  .rzq-sheet,
+  .rzq-sheet-backdrop,
+  .rizq-splash{
+    display:none !important;
+    pointer-events:none !important;
+    visibility:hidden !important;
+    z-index:-1 !important;
+  }
+
+  html.rizq-app-nav .hero{
+    margin-top:0 !important;
+    padding-top:70px !important;
+    min-height:100vh !important;
+  }
+  html.rizq-app-nav .hero-content{
+    margin-top:0 !important;
+    padding-top:56px !important;
+  }
+  html.rizq-app-nav #categories,
+  html.rizq-app-nav .section{
+    margin-top:0 !important;
+  }
+  html.rizq-app-nav .ticker-wrap{top:70px}
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(:has(.nav-search)){
+    display:none !important;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search){
+    position:relative !important;
+    top:auto !important;
+    inset:auto !important;
+    height:56px !important;
+    max-height:56px !important;
+    z-index:20 !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    padding:8px 24px !important;
+    background:#fff !important;
+    border-bottom:1px solid #e2e8f5 !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    gap:12px;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .nav-search{
+    order:0 !important;
+    flex:1 1 auto !important;
+    max-width:720px !important;
+    margin:0 auto;
+    box-shadow:0 2px 10px rgba(15,35,65,.08);
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .breadcrumb{
+    position:relative;
+    z-index:1;
+    background:#fff;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .browse-wrap{
+    height:calc(100vh - 70px - 56px - 41px) !important;
+    max-width:100%;
+    isolation:isolate;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .browse-left,
+  html.rizq-app-nav.has-rizq-desk-nav .bs-sidebar,
+  html.rizq-app-nav.has-rizq-desk-nav #result-list-body{
+    min-width:0;
+    position:relative;
+    z-index:1;
+  }
+  html.rizq-app-nav.has-rizq-desk-nav .rl-header{z-index:2}
+  html.rizq-app-nav.has-rizq-desk-nav .mobile-tabs{top:126px}
+  html.rizq-app-nav .browse-wrap{height:calc(100vh - 72px - 41px) !important}
+  html.rizq-app-nav .sidebar,
+  html.rizq-app-nav aside.sidebar{
+    top:0 !important;
+    height:100% !important;
+  }
+}
+
+/* ════════════ MOBILE ≤768px — two-tier injected header ════════════ */
+@media (max-width:768px){
+  html.rizq-app-nav{--rizq-header-h:112px}
+  html.rizq-app-nav body{
+    padding-top:var(--rizq-header-h) !important;
+    padding-bottom:0 !important;
+  }
+
+  html.rizq-app-nav body > nav:not(.section-jump-bar):not(.hero-biz-nav),
+  html.rizq-app-nav .topnav,
+  html.rizq-app-nav #nav,
+  html.rizq-app-nav #rizq-desk-nav,
+  html.rizq-app-nav .mobile-bottom-nav,
+  html.rizq-app-nav .nav-hamburger,
+  html.rizq-app-nav .mobile-drawer,
+  html.rizq-app-nav .mobile-drawer-overlay,
+  html.rizq-app-nav .nav-sticky-tools,
+  html.rizq-app-nav .btn-lang:not(#rizq-lang-btn){
+    display:none !important;
+  }
+
+  html.rizq-app-nav .hero{padding-top:8px !important}
+  html.rizq-app-nav .hero-content{padding-top:12px !important}
+  html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
+  html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
+  html.rizq-app-nav .browse-wrap{height:calc(100vh - var(--rizq-header-h) - 41px) !important}
+  html.rizq-app-nav .sidebar,
+  html.rizq-app-nav aside.sidebar{
+    top:var(--rizq-header-h) !important;
+    height:calc(100% - var(--rizq-header-h)) !important;
+  }
+  html.rizq-app-nav .topbar .btn-lang,
+  html.rizq-app-nav .mobile-bar .btn-lang,
+  html.rizq-app-nav .topbar-actions .btn-lang{
+    display:none !important;
+  }
+
+  #rizq-app-header{
+    display:block !important;
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:1000;
+    height:112px;
+    background:#0f172a !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    font-family:'Cairo',system-ui,-apple-system,sans-serif;
+    color:#fff;
+  }
+  #rizq-app-header nav{
+    position:static !important;
+    inset:auto !important;
+    width:auto !important;
+    height:auto !important;
+    background:#0f172a !important;
+    backdrop-filter:none !important;
+    box-shadow:none !important;
+    transform:none !important;
+  }
+  .rizq-hdr-row1{
+    direction:ltr;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    height:56px;
+    padding:0 12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:#0f172a !important;
+    gap:8px;
+  }
+  .rizq-hdr-start{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+    direction:ltr;
+    flex-shrink:0;
+  }
+  .rizq-hdr-brand{
+    display:flex;align-items:center;gap:10px;
+    margin-inline-start:auto;
+    text-decoration:none;color:#C9A84C;
+    height:auto;
+    white-space:nowrap;
+    direction:ltr;
+  }
+  /* شعار أصغر قليلاً على الجوال */
+  .rizq-hdr-brand-mark,
+  #rizq-app-header .logo-mark-img{
+    width:34px !important;height:34px !important;display:block;flex-shrink:0;
+    border-radius:8px;
+    box-shadow:0 0 0 1px rgba(201,168,76,.28);
+    object-fit:contain;
+    background:#0f172a;
+  }
+  .rizq-hdr-brand{gap:8px}
+  .rizq-hdr-brand .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
+  .rizq-hdr-brand-ar,
+  #rizq-app-header .logo-ar{
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-weight:700 !important;font-size:18px !important;line-height:1 !important;
+    color:#C9A84C !important;
+    text-shadow:0 0 16px rgba(201,168,76,.4) !important;
+    direction:rtl !important;unicode-bidi:isolate !important;display:block !important;
+  }
+  .rizq-hdr-brand-sub,
+  #rizq-app-header .logo-sub{
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-style:italic !important;
+    font-size:7px !important;
+    letter-spacing:1.6px !important;
+    color:rgba(201,168,76,.65) !important;
+    text-transform:uppercase;
+    font-weight:700;
+    margin-top:2px;
+  }
+  /* اللغة أقصى اليسار، وحسابي عن يمينها مباشرة */
+  #rizq-app-header #rizq-lang-btn{order:1}
+  #rizq-app-header .rizq-hdr-account{order:2}
+  #rizq-app-header nav.rizq-hdr-row2,
+  #rizq-app-header .rizq-hdr-row2{
+    direction:rtl;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    justify-content:space-around;
+    gap:0;
+    height:56px !important;
+    padding:0 4px !important;
+    background:#0f172a !important;
+    backdrop-filter:none !important;
+    border:none !important;
+    position:static !important;
+    box-shadow:none !important;
+  }
+  .rizq-hdr-item{
+    flex:1;
+    min-width:0;
+    flex-direction:column;
+    gap:1px;
+    padding:4px 1px;
+    font-size:9px;
+    border-radius:8px;
+  }
+  .rizq-hdr-item .rizq-hdr-ico{font-size:15px;line-height:1}
+  .rizq-hdr-item .rizq-hdr-lbl{
+    font-size:9px !important;
+    line-height:1.15;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+  }
+  .rizq-hdr-post{
+    flex:0 0 34px !important;
+    width:34px !important;height:34px !important;
+    border-radius:50% !important;
+    margin:0 4px;
+    font-size:17px;
+    box-shadow:0 2px 10px rgba(201,168,76,.35);
+    align-self:center;
+    position:relative;
+    z-index:2;
+  }
+  .rizq-hdr-post-lbl{display:none !important}
+  .rizq-hdr-post-plus{display:block;font-size:17px}
+  .rizq-hdr-more-wrap{flex:1;min-width:0;display:flex}
+  .rizq-hdr-more-wrap > .rizq-hdr-item{flex:1;width:100%}
+  .rizq-hdr-account{
+    width:36px !important;height:36px !important;
+    font-size:16px !important;
+  }
+  #rizq-app-header #rizq-lang-btn{
+    font-size:11px !important;
+    padding:5px 10px !important;
+  }
+  .rizq-hdr-row1{min-width:0}
+  .rizq-hdr-brand{flex-shrink:1;min-width:0;overflow:hidden}
+  /* المزيد: fixed full-width opaque grid panel under the header */
+  .rizq-hdr-more-menu{
+    position:fixed !important;
+    top:calc(var(--rizq-header-h) + 6px) !important;
+    left:10px !important;
+    right:10px !important;
+    bottom:auto !important;
+    min-width:0 !important;
+    width:auto !important;
+    max-height:min(60vh, 420px);
+    overflow-y:auto;
+    grid-template-columns:repeat(2, 1fr);
+    gap:4px;
+    padding:10px;
+    background:rgba(15,23,42,.94) !important;
+    backdrop-filter:blur(12px) !important;
+    -webkit-backdrop-filter:blur(12px) !important;
+    opacity:1 !important;
+    border:1px solid rgba(201,168,76,.38) !important;
+    border-radius:14px;
+    box-shadow:0 20px 48px rgba(0,0,0,.6);
+    z-index:9999 !important;
+  }
+  .rizq-hdr-more-wrap.open .rizq-hdr-more-menu{display:grid !important}
+  .rizq-hdr-more-menu a{
+    text-align:center;
+    padding:12px 8px;
+    font-size:12.5px;
+    background:rgba(255,255,255,.04);
+  }
+  html.rizq-app-nav #rizq-chat-toggle{bottom:16px !important}
+  html.rizq-app-nav #rizq-chat-window{bottom:88px !important}
+  #rizq-app-header,#rizq-app-header *{pointer-events:auto !important}
+
+  /* زر العودة للأعلى: هوامش متناسقة، وفي الوضع الفرنسي ينتقل لليمين
+     بعيداً عن فقاعات المساعد التي تنتقل لليسار */
+  html.rizq-app-nav #back-to-top{
+    left:16px !important;
+    right:auto !important;
+    bottom:96px !important;
+    width:44px !important;
+    height:44px !important;
+    margin:0 !important;
+    z-index:900 !important;
+  }
+  html.rizq-app-nav[dir="ltr"] #back-to-top{
+    left:auto !important;
+    right:16px !important;
+  }
+  /* الفقاعات التلميحية: الغلاف لا يحجب النقر أبداً، والفقاعة نفسها فقط تفاعلية */
+  html.rizq-app-nav #rizq-prompt-bubbles{pointer-events:none !important}
+  html.rizq-app-nav #rizq-prompt-bubbles .rw-prompt-bubble{pointer-events:auto}
+
+  /* الفوتر على الجوال: عمودان، بلا قص، ومسافة سفلية تُبعد الشريط عن الأزرار العائمة */
+  html.rizq-app-nav .footer-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:24px 14px !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav .footer-grid > div:first-child{grid-column:1 / -1}
+  html.rizq-app-nav footer{padding-bottom:96px !important}
+  html.rizq-app-nav .footer-bottom{
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    text-align:center !important;
+    gap:10px !important;
+  }
+}
+
+/* Clickable categories / buttons */
+.cat-card,.cat-card *,.qcat,.qcat *,.cat-btn,.cat-icon-box,.hero-biz-btn,
+.drop-link,.iep-link,.iep-viewall{
+  pointer-events:auto !important;
+}
+.cat-card::before,.cat-card::after,
+#cat-inline-panel::before,#cat-inline-panel::after{pointer-events:none !important}
+.cat-card:active,.qcat:active,.cat-btn:active,.hero-biz-btn:active{opacity:.8}
+
+/* Decorative full-bleed layers must never steal clicks */
+.hero-bg,.hero-orb1,.hero-orb2,.hero-orb3,.hero-geo,.hero-geo svg,
+body::after,.rizq-splash,.rizq-splash.is-done{
+  pointer-events:none !important;
+}
+
+/* Closed overlays stay out of the hit-test tree */
+.mobile-drawer-overlay:not(.open),
+.mobile-drawer-overlay:not(.open) *,
+.mobile-drawer:not(.open),
+.mobile-drawer:not(.open) *,
+.modal-overlay:not(.open),
+.modal-overlay:not(.open) *,
+.disc-overlay:not(.open),
+.rizq-promo-overlay:not(.active),
+.rizq-promo-overlay:not(.active) *,
+.rzq-sheet-backdrop:not(.open),
+.rzq-sheet:not(.open),
+.cs-modal-overlay:not(.active),
+.cs-modal-overlay:not(.active) *{
+  pointer-events:none !important;
+}
+.rizq-promo-overlay:not(.active){
+  display:none !important;
+}
+
+/* Header stays above page content but only 72px tall — never a full-page shield */
+#nav,.topnav{
+  z-index:10000 !important;
+  pointer-events:auto !important;
+}
+
+/* FORCE INTERACTIVITY: language, category cards, search — not entire grids */
+#nav-lang-btn,.btn-lang,.btn-lang-primary,
+.cat-card,.qcat,.cat-btn,.cat-icon-box,
+.hero-search,.search-bar,.search-input,.search-cat-select,.btn-search-main{
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+.cat-card,.qcat,.cat-btn,.cat-icon-box,
+.hero-search,.search-bar{
+  position:relative;
+  z-index:5;
+}
+@media (max-width:768px){
+  #rizq-lang-btn{
+    pointer-events:auto !important;
+    z-index:9999 !important;
+    position:relative !important;
+    cursor:pointer !important;
+  }
+}
+
+/* Never leave homepage sections invisible */
+.fade-in,.fade-in.visible{
+  opacity:1 !important;
+  transform:none !important;
+  filter:none !important;
+  visibility:visible !important;
+}
+#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,
+#virtual-tenders,#about,#prices,#pricing,.listings-section,.why-section,
+.pricing-section,.cta-section,.section{
+  visibility:visible !important;
+  opacity:1 !important;
+  height:auto !important;
+  max-height:none !important;
+}
+
+/* Mediator / escrow side badge — always clickable, never covers the header */
+.fixed-disc-pill{
+  position:fixed !important;
+  left:8px !important;
+  top:58% !important;
+  transform:translateY(-50%) !important;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  background:#0f172a !important;
+  border:1.5px solid rgba(201,168,76,.5) !important;
+  border-radius:0 10px 10px 0;
+  color:#C9A84C !important;
+  font-size:10px;font-weight:700;
+  padding:14px 6px;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  letter-spacing:1.2px;white-space:nowrap;
+  z-index:1200 !important;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+}
+.fixed-disc-pill:hover{border-color:#C9A84C !important;color:#E8C96A !important}
+@media (max-width:768px){
+  .fixed-disc-pill{top:auto !important;bottom:96px !important;transform:none !important;max-height:38vh;overflow:hidden}
+}
+
+.nav-dd-ads strong{color:#E8C96A !important}

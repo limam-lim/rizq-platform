@@ -113,6 +113,9 @@
   }
   bindAssistantBtn('jump-assistant');
   bindAssistantBtn('mbn-assistant');
+  bindAssistantBtn('nav-assistant-btn');
+  bindAssistantBtn('hero-ai-diamond-btn');
+  bindAssistantBtn('drawer-assistant-btn');
 
   function updateJumpActive() {
     var y = window.scrollY + 140;
@@ -204,7 +207,7 @@
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
       '#pricing': fr ? 'Forfaits' : 'الباقات',
-      '#jump-assistant': fr ? 'Assistant' : 'المساعد الذكي'
+      '#jump-assistant': fr ? '💎 Assistant (Diamant)' : '💎 المساعد (الماس)'
     };
     Object.keys(jumpLabels).forEach(function (sel) {
       var el = sel === '#jump-assistant'
@@ -217,7 +220,7 @@
         'mbn-home': fr ? 'Accueil' : 'الرئيسية',
         'mbn-cats': fr ? 'Sections' : 'الأقسام',
         'mbn-post': fr ? 'Publier' : 'نشر',
-        'mbn-assistant': fr ? 'Assistant' : 'المساعد الذكي',
+        'mbn-assistant': fr ? '💎 Assistant' : '💎 المساعد',
         'mbn-account': fr ? 'Compte' : 'حسابي'
       };
       Object.keys(mbn).forEach(function (id) {
@@ -248,5 +251,114 @@
     var q = (catName ? catName + ' ' : '') + sub;
     a.href = 'rizq_search.html?q=' + encodeURIComponent(q.trim());
     a.removeAttribute('onclick');
+  });
+
+  /* ── Mobile bottom sheets for category / quick-cat menus ── */
+  function isMobileUx() {
+    return window.matchMedia('(max-width:768px)').matches;
+  }
+
+  function closeRizqSheet() {
+    var bd = document.getElementById('rzq-sheet-backdrop');
+    var sh = document.getElementById('rzq-sheet');
+    if (bd) bd.classList.remove('open');
+    if (sh) sh.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function ensureRizqSheet() {
+    if (document.getElementById('rzq-sheet')) return;
+    var bd = document.createElement('div');
+    bd.id = 'rzq-sheet-backdrop';
+    bd.className = 'rzq-sheet-backdrop';
+    bd.addEventListener('click', closeRizqSheet);
+    var sheet = document.createElement('div');
+    sheet.id = 'rzq-sheet';
+    sheet.className = 'rzq-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.innerHTML = '<div class="rzq-sheet-handle"></div>'
+      + '<div class="rzq-sheet-head"><div class="rzq-sheet-title" id="rzq-sheet-title"></div>'
+      + '<button type="button" class="rzq-sheet-close" id="rzq-sheet-close" aria-label="Close">✕</button></div>'
+      + '<div class="rzq-sheet-body" id="rzq-sheet-body"></div>';
+    document.body.appendChild(bd);
+    document.body.appendChild(sheet);
+    document.getElementById('rzq-sheet-close').addEventListener('click', closeRizqSheet);
+  }
+
+  function openRizqSheet(titleHtml, bodyHtml) {
+    ensureRizqSheet();
+    document.getElementById('rzq-sheet-title').innerHTML = titleHtml || '';
+    document.getElementById('rzq-sheet-body').innerHTML = bodyHtml || '';
+    document.getElementById('rzq-sheet-backdrop').classList.add('open');
+    document.getElementById('rzq-sheet').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  if (typeof window.openInlineExpand === 'function') {
+    var _openIE = window.openInlineExpand;
+    window.openInlineExpand = function (card) {
+      _openIE(card);
+      if (!isMobileUx() || !card) return;
+      var panel = document.getElementById('cat-inline-panel');
+      if (!panel) return;
+      var title = (panel.querySelector('.iep-title') || {}).innerHTML || '';
+      var actions = panel.querySelector('.iep-actions');
+      var actionsHtml = '';
+      if (actions) {
+        var actionsCopy = actions.cloneNode(true);
+        var xBtn = actionsCopy.querySelector('.iep-close');
+        if (xBtn) xBtn.remove();
+        actionsHtml = actionsCopy.outerHTML;
+      }
+      var groups = panel.querySelector('.iep-groups');
+      var html = actionsHtml + (groups ? groups.outerHTML : '');
+      panel.style.display = 'none';
+      openRizqSheet(title, html);
+      var catNameEl = card.querySelector('.cat-name');
+      var catName = catNameEl ? catNameEl.textContent.trim() : '';
+      document.querySelectorAll('#rzq-sheet-body .iep-link').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catName)
+            + '&sub=' + encodeURIComponent(link.getAttribute('data-ar') || link.textContent.trim());
+        });
+      });
+    };
+  }
+
+  if (typeof window.closeInlineExpand === 'function') {
+    var _closeIE = window.closeInlineExpand;
+    window.closeInlineExpand = function (force) {
+      _closeIE(force);
+      if (isMobileUx()) closeRizqSheet();
+    };
+  }
+
+  if (typeof window.openQcatPortal === 'function') {
+    var _openQp = window.openQcatPortal;
+    window.openQcatPortal = function (el) {
+      _openQp(el);
+      if (!isMobileUx() || !el) return;
+      var portal = document.getElementById('qcat-portal');
+      if (!portal) return;
+      var title = (portal.querySelector('.qp-title') || {}).innerHTML || '';
+      var links = document.getElementById('qp-links');
+      var actions = portal.querySelector('.qp-actions');
+      portal.style.display = 'none';
+      openRizqSheet(title, (links ? links.innerHTML : '') + (actions ? actions.outerHTML : ''));
+    };
+  }
+
+  document.querySelectorAll('.qcat').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      if (!isMobileUx()) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof window.openQcatPortal === 'function') window.openQcatPortal(el);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeRizqSheet();
   });
 })();

@@ -22,7 +22,7 @@
     '#rizq-chat-toggle{position:fixed;bottom:28px;right:28px;width:64px;height:64px;border-radius:50%;',
     'background:radial-gradient(circle at 35% 30%,#2a5aa8 0%,#1B3A6B 55%,#0F2347 100%);border:3px solid #C9A84C;',
     'cursor:grab;box-shadow:0 8px 32px rgba(27,58,107,.28),inset 0 0 14px rgba(201,168,76,.18);display:flex;align-items:center;',
-    'justify-content:center;z-index:99999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;}',
+    'justify-content:center;z-index:400;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;}',
     '#rizq-chat-toggle:hover{transform:scale(1.1);box-shadow:0 12px 40px rgba(27,58,107,.4),inset 0 0 18px rgba(201,168,76,.28);}',
     '#rizq-chat-toggle.rw-dragging{cursor:grabbing;transform:scale(1.08);transition:none;}',
     '#rizq-chat-toggle::before{content:"";position:absolute;inset:-6px;border-radius:50%;',
@@ -44,17 +44,20 @@
     '.rw-orbit-2{animation-delay:.7s}.rw-orbit-3{animation-delay:1.4s}',
     '@keyframes rwTwinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.35)}}',
     '#rizq-chat-window{position:fixed;bottom:104px;right:28px;width:380px;max-height:520px;',
-    'background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(27,58,107,.22);',
-    'display:flex;flex-direction:column;z-index:99998;overflow:hidden;',
+    'background:#fff;border-radius:16px;',
+    'box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);',
+    'display:flex;flex-direction:column;z-index:9999;overflow:hidden;',
     'transform:scale(.8) translateY(20px);opacity:0;pointer-events:none;',
     'transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s;',
-    "font-family:'Segoe UI',Tahoma,Arial,sans-serif;border:1.5px solid rgba(201,168,76,.25);}",
+    "font-family:'Cairo',system-ui,sans-serif;border:1.5px solid rgba(201,168,76,.25);}",
     '#rizq-chat-window.visible{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}',
+    '#rizq-chat-toggle.open{display:none!important;opacity:0!important;pointer-events:none!important;visibility:hidden!important;}',
     '#rizq-chat-window[dir="ltr"] .rw-header-info{text-align:left;}',
     '#rizq-chat-window[dir="rtl"] .rw-header-info{text-align:right;}',
-    '#rizq-chat-window[dir="ltr"] .rw-quick-actions{justify-content:flex-start;}',
     '#rizq-chat-window[dir="ltr"] .rw-input{direction:ltr;text-align:left;}',
     '#rizq-chat-window[dir="rtl"] .rw-input{direction:rtl;text-align:right;}',
+    'html[dir="ltr"] #rizq-chat-window{left:28px;right:auto;}',
+    'html[dir="ltr"] #rizq-chat-toggle{left:28px;right:auto;}',
     '.rw-header{background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 60%,#234d8f 100%);',
     'padding:16px 18px;display:flex;align-items:center;gap:12px;position:relative;flex-shrink:0;}',
     '.rw-header::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;',
@@ -70,24 +73,31 @@
     'border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;',
     'transition:background .2s;flex-shrink:0;}',
     '.rw-header-close:hover{background:rgba(255,255,255,.25);}',
-    '.rw-quick-actions{padding:10px 14px;display:flex;gap:6px;flex-wrap:wrap;',
-    'background:#f5f5f5;border-bottom:1px solid #e8e8e8;flex-shrink:0;}',
-    '.rw-quick-btn{background:#fff;border:1.5px solid #1B3A6B;color:#1B3A6B;font-size:11px;',
-    "font-family:'Segoe UI',Tahoma,Arial,sans-serif;padding:5px 10px;border-radius:20px;",
-    'cursor:pointer;transition:all .2s;white-space:nowrap;}',
-    '.rw-quick-btn:hover{background:#1B3A6B;color:#fff;}',
+    '.rw-quick-actions{padding:10px 16px;margin-bottom:8px;display:flex;gap:8px;overflow-x:auto;',
+    'flex-wrap:nowrap;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;',
+    'scrollbar-width:none;-ms-overflow-style:none;}',
+    '.rw-quick-actions::-webkit-scrollbar{display:none;}',
+    '#rizq-chat-window[dir="rtl"] .rw-quick-actions{direction:rtl;}',
+    '#rizq-chat-window[dir="ltr"] .rw-quick-actions{direction:ltr;justify-content:flex-start;}',
+    '.rw-quick-btn{background:#f1f5f9;border:1px solid #cbd5e1;color:#1e293b;font-size:.82rem;',
+    "font-weight:600;font-family:'Cairo',system-ui,sans-serif;padding:6px 14px;border-radius:20px;",
+    'cursor:pointer;transition:all .2s ease;white-space:nowrap;flex-shrink:0;}',
+    '.rw-quick-btn:hover{background:#1b3a6b;color:#fff;border-color:#1b3a6b;}',
     '.rw-messages{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;',
-    'gap:10px;min-height:180px;scroll-behavior:smooth;}',
+    'gap:10px;min-height:180px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}',
     '.rw-messages::-webkit-scrollbar{width:4px;}',
     '.rw-messages::-webkit-scrollbar-thumb{background:#e8e8e8;border-radius:2px;}',
-    '.rw-msg{display:flex;align-items:flex-end;gap:8px;animation:rwMsgIn .3s ease-out;}',
+    '.rw-msg{display:flex;align-items:flex-end;gap:8px;max-width:92%;animation:rwMsgIn .3s ease-out;}',
     '@keyframes rwMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}',
-    '.rw-msg.agent{flex-direction:row;}.rw-msg.user{flex-direction:row-reverse;}',
+    '.rw-msg.agent{align-self:flex-start;flex-direction:row;}',
+    '.rw-msg.user,.chat-msg.user{align-self:flex-end;flex-direction:row-reverse;max-width:80%!important;width:auto!important;flex-shrink:0;}',
     '.rw-msg-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid #C9A84C;',
     'overflow:hidden;flex-shrink:0;background:#0f2347;}',
     '.rw-msg-avatar img,.rw-msg-avatar svg{width:100%;height:100%;object-fit:cover;display:block;}',
     '.rw-bubble{max-width:75%;padding:10px 13px;border-radius:14px;font-size:13px;',
     'line-height:1.55;white-space:pre-wrap;word-break:break-word;}',
+    '.rw-msg.user .rw-bubble,.chat-msg.user{max-width:80%!important;width:auto!important;min-width:0;',
+    'word-break:normal!important;overflow-wrap:break-word!important;white-space:pre-wrap!important;}',
     '.rw-msg.agent .rw-bubble{background:#f5f5f5;color:#222;border-bottom-right-radius:4px;border:1px solid #e8e8e8;}',
     '.rw-msg.user .rw-bubble{background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border-bottom-left-radius:4px;}',
     '.rw-typing .rw-bubble{background:#f5f5f5;border:1px solid #e8e8e8;padding:12px 16px;}',
@@ -96,31 +106,33 @@
     '.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}',
     '@keyframes rwTyping{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}',
     '.rw-ts{font-size:10px;color:#888;margin-top:3px;text-align:center;}',
-    '.rw-input-area{padding:12px 14px;border-top:1px solid #e8e8e8;background:#fff;',
-    'display:flex;align-items:flex-end;gap:8px;flex-shrink:0;}',
-    '.rw-input{flex:1;border:1.5px solid #e8e8e8;border-radius:22px;padding:10px 16px;',
-    "font-size:13px;font-family:'Segoe UI',Tahoma,Arial,sans-serif;resize:none;outline:none;",
-    'max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color .2s;direction:rtl;text-align:right;}',
-    '.rw-input:focus{border-color:#1B3A6B;}',
-    '.rw-input::placeholder{color:#888;}',
-    '.rw-send-btn{width:40px;height:40px;background:linear-gradient(135deg,#1B3A6B,#234d8f);',
+    '.rw-input-area{padding:12px 16px;border-top:1px solid #e2e8f0;background:#fff;',
+    'display:flex;align-items:center;gap:10px;flex-shrink:0;}',
+    '.rw-input{flex:1;border:1px solid #cbd5e1;border-radius:24px;padding:10px 18px;',
+    "font-size:.9rem;font-family:'Cairo',sans-serif;resize:none;outline:none;background:#f8fafc;",
+    'max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color .2s,background .2s;direction:inherit;text-align:start;}',
+    '.rw-input:focus{border-color:#1B3A6B;background:#fff;}',
+    '.rw-input::placeholder{color:#94a3b8;}',
+    '.rw-send-btn{width:42px;height:42px;background:#1b3a6b;',
     'border:none;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;',
     'justify-content:center;transition:transform .2s,background .2s;flex-shrink:0;}',
-    '.rw-send-btn:hover{transform:scale(1.1);background:linear-gradient(135deg,#a07820,#C9A84C);}',
+    '.rw-send-btn:hover{transform:scale(1.06);background:#234d8f;}',
     '.rw-send-btn:active{transform:scale(.95);}',
     '.rw-send-btn svg{width:18px;height:18px;}',
     '.rw-footer{text-align:center;font-size:10px;color:#888;padding:6px;',
     'background:#f5f5f5;border-top:1px solid #e8e8e8;flex-shrink:0;}',
     '@media(max-width:440px){',
-    '#rizq-chat-window{width:calc(100vw - 20px);right:10px;bottom:90px;max-height:75vh;}',
-    '#rizq-chat-toggle{right:16px;bottom:16px;}}',
-    '#rizq-prompt-bubbles{position:fixed;bottom:100px;right:28px;z-index:99998;pointer-events:none}',
+    '#rizq-chat-window{width:calc(100vw - 20px);right:10px;bottom:calc(148px + env(safe-area-inset-bottom,0));max-height:65vh;}',
+    '#rizq-chat-toggle{right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0));}',
+    'html[dir="ltr"] #rizq-chat-window{left:10px;right:auto;}',
+    'html[dir="ltr"] #rizq-chat-toggle{left:12px;right:auto;}}',
+    '#rizq-prompt-bubbles{position:fixed;bottom:100px;right:28px;z-index:500;pointer-events:none}',
     'html[dir="ltr"] #rizq-prompt-bubbles{right:auto;left:28px}',
     '.rw-prompt-bubble{position:relative;background:#fff;border:1.5px solid rgba(201,168,76,.35);',
     'border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:12px;font-weight:700;color:#1B3A6B;',
     'box-shadow:0 8px 28px rgba(27,58,107,.18);opacity:0;transform:translateY(8px) scale(.95);',
     'transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:auto;cursor:pointer;',
-    'max-width:220px;line-height:1.45;font-family:\'Segoe UI\',Tahoma,Arial,sans-serif;direction:inherit;text-align:start}',
+    'max-width:220px;line-height:1.45;font-family:\'Cairo\',system-ui,sans-serif;direction:inherit;text-align:start}',
     '.rw-prompt-bubble.visible{opacity:1;transform:translateY(0) scale(1)}',
     '.rw-prompt-bubble::after{content:"";position:absolute;bottom:-6px;right:18px;width:10px;height:10px;',
     'background:#fff;border-right:1.5px solid rgba(201,168,76,.3);border-bottom:1.5px solid rgba(201,168,76,.3);transform:rotate(45deg)}',
@@ -144,11 +156,12 @@
       '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1">' +
       '<stop offset="0" stop-color="#F3DE9C"/><stop offset=".5" stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/>' +
       '</linearGradient></defs>' +
+      '<rect x="1" y="1" width="38" height="38" rx="9" fill="#0f172a"/>' +
       '<circle class="rw-orbit" cx="6" cy="9" r="1.1" fill="#F3DE9C"/>' +
       '<circle class="rw-orbit rw-orbit-2" cx="35" cy="14" r="1" fill="#F3DE9C"/>' +
       '<circle class="rw-orbit rw-orbit-3" cx="8" cy="33" r="0.9" fill="#F3DE9C"/>' +
-      '<text x="15" y="18" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-size="16" font-weight="900" fill="url(#' + gid + ')">R</text>' +
-      '<text x="27" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="700" fill="url(#' + gid + ')">ر</text>' +
+      '<text x="18" y="27" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-size="18" font-weight="700" fill="url(#' + gid + ')">R</text>' +
+      '<text x="30" y="29" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="url(#' + gid + ')">,</text>' +
       '<path class="rw-spark" d="M34 5l1.5 3.8 3.8 1.5-3.8 1.5-1.5 3.8-1.5-3.8-3.8-1.5 3.8-1.5z" fill="#fff"/>' +
       '</svg>';
   }
@@ -169,7 +182,7 @@
     '    <div class="rw-header-avatar">' + _rizqAvatarSvg(48) + '</div>',
     '    <div class="rw-header-info">',
     '      <div class="rw-header-name">مدير رزق الذكي</div>',
-    '      <div class="rw-header-status"><span class="rw-status-dot"></span><span>متاح الآن · يرد خلال ثوانٍ</span></div>',
+      '      <div class="rw-header-status"><span class="rw-status-dot"></span><span>متاح الآن · يرد خلال ثوانٍ</span></div>',
     '    </div>',
     '    <button class="rw-header-close" id="rw-header-close" aria-label="إغلاق">✕</button>',
     '  </div>',
@@ -182,7 +195,7 @@
     '  </div>',
     '  <div class="rw-messages" id="rw-messages"></div>',
     '  <div class="rw-input-area">',
-    '    <textarea id="rw-input" class="rw-input" placeholder="اكتب رسالتك هنا..." rows="1" dir="rtl"></textarea>',
+    '    <textarea id="rw-input" class="rw-input" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>',
     '    <button class="rw-send-btn" id="rw-send-btn" aria-label="إرسال">',
     '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">',
     '        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
@@ -314,7 +327,11 @@
         inputPh: 'اكتب رسالتك هنا...',
         footerHtml: 'مدعوم بـ <strong style="color:#1B3A6B">رزق AI</strong> · منصة رزق للتجارة الإلكترونية',
         greeting: 'أهلاً وسهلاً بك في رزق! 👋✨\nأنا مدير رزق الذكي، كيف أخدمك اليوم؟',
-        defaultReply: 'أهلاً بك في رزق! 😊 كيف أساعدك اليوم؟'
+        errNoBackend: '⚠️ خدمة الذكاء الاصطناعي غير متصلة بالخادم حالياً. حاول لاحقاً أو راسل direction@rizq.mr',
+        errNetwork: '⚠️ تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.',
+        errTimeout: '⚠️ استغرق الرد وقتاً طويلاً. أعد إرسال رسالتك من فضلك.',
+        errServer: '⚠️ حدث خطأ في الخادم. حاول بعد قليل أو تواصل مع direction@rizq.mr',
+        errEmpty: '⚠️ لم أتلقَّ رداً من المساعد. أعد صياغة سؤالك من فضلك.'
       },
       fr: {
         toggleAria: 'Gestionnaire Rizq - Support intelligent',
@@ -326,9 +343,21 @@
         inputPh: 'Écrivez votre message ici...',
         footerHtml: 'Propulsé par <strong style="color:#1B3A6B">Rizq AI</strong> · plateforme Rizq e-commerce',
         greeting: 'Bienvenue chez Rizq ! 👋✨\nJe suis le Gestionnaire Rizq IA, comment puis-je vous aider aujourd\'hui ?',
-        defaultReply: 'Bienvenue chez Rizq ! 😊 Comment puis-je vous aider aujourd\'hui ?'
+        errNoBackend: '⚠️ Le service IA n\'est pas connecté au serveur. Réessayez plus tard ou écrivez à direction@rizq.mr',
+        errNetwork: '⚠️ Connexion impossible. Vérifiez Internet et réessayez.',
+        errTimeout: '⚠️ La réponse a pris trop de temps. Renvoyez votre message.',
+        errServer: '⚠️ Erreur serveur. Réessayez bientôt ou contactez direction@rizq.mr',
+        errEmpty: '⚠️ Aucune réponse reçue. Reformulez votre question.'
       }
     };
+    var RIZQ_DIAMOND_SYSTEM_PROMPT =
+      'System Role: You are the Official Rizq Smart Manager (مدير رزق الذكي), powered by advanced AI. ' +
+      'You possess full contextual knowledge of the Rizq platform (stores, ads, tenders, offices, subscription tiers, and navigation).\n' +
+      'Language & Tone Rules:\n' +
+      '1. Detect and reply strictly in the user\'s input language (Arabic, French, Spanish, English, etc.).\n' +
+      '2. Understand intent, typos, slang, and context naturally like a human advisor.\n' +
+      '3. Provide direct, helpful, and polite answers matching the Diamond Tier agent capabilities.';
+    var AGENT_CHAT_PATHS = ['/api/ai/chat', '/api/widget/chat'];
     var _quickActions = [
       { ar: { label: 'نشر إعلان', action: 'nav:rizq_post.html' }, fr: { label: 'Publier une annonce', action: 'nav:rizq_post.html' } },
       { ar: { label: 'الاشتراكات', action: 'nav:rizq_landing_v8.html#pricing' }, fr: { label: 'Abonnements', action: 'nav:rizq_landing_v8.html#pricing' } },
@@ -337,7 +366,7 @@
       { ar: { label: 'الدفع', action: 'chat:طرق الدفع' }, fr: { label: 'Paiement', action: 'chat:Méthodes de paiement' } }
     ];
 
-    /** سياق الصفحة — إعلان مفتوح، URL، نوع الصفحة (للـ Backend + fallback محلي) */
+    /** سياق الصفحة — إعلان مفتوح، URL، نوع الصفحة (للـ Backend) */
     function _collectPageContext() {
       var ctx = {
         page: (location.pathname.split('/').pop() || 'index.html'),
@@ -478,14 +507,15 @@
     }
     function _scroll() {
       var el = document.getElementById('rw-messages');
-      if (el) el.scrollTop = el.scrollHeight;
+      if (!el) return;
+      requestAnimationFrame(function () { el.scrollTop = el.scrollHeight; });
     }
 
     function _addMessage(text, role) {
       var msgs = document.getElementById('rw-messages');
       if (!msgs) return;
       var div = document.createElement('div');
-      div.className = 'rw-msg ' + role;
+      div.className = 'rw-msg chat-msg ' + (role === 'user' ? 'user' : 'agent');
       var av = role === 'agent' ? '<div class="rw-msg-avatar">' + _AVATAR + '</div>' : '';
       div.innerHTML = av + '<div><div class="rw-bubble">' + _esc(text) + '</div><div class="rw-ts">' + _ts() + '</div></div>';
       msgs.appendChild(div);
@@ -498,7 +528,7 @@
       if (!msgs || _typing) return;
       _typing = true;
       var div = document.createElement('div');
-      div.className = 'rw-msg agent rw-typing';
+      div.className = 'rw-msg agent rw-typing typing-indicator';
       div.id = 'rw-typing-indicator';
       div.innerHTML = '<div class="rw-msg-avatar">' + _AVATAR + '</div>' +
         '<div class="rw-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
@@ -516,72 +546,227 @@
       var t = String(userText || '').trim();
       var lower = t.toLowerCase();
       if (!t) return _ctx.lang || 'ar';
-      if (/كيفاش|شنهو|شنو\s*هو|نعاونك|بغيت|شحال|ماكو|كاين|واش\s*راك/.test(t)) return 'hs';
+      if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|ما\s*كاين|دراري|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|حسانية|شنهي/.test(t)) return 'hs';
       if (/[\u0600-\u06FF]/.test(t)) return 'ar';
-      if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je/.test(lower)) return 'fr';
+      if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonjour/.test(lower)) return 'fr';
       if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
-      if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package/.test(lower)) return 'en';
+      if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package|hi\b|hey\b/.test(lower)) return 'en';
       if (/[a-z]/i.test(t)) return 'en';
       return _ctx.lang || 'ar';
     }
 
-    // ── ردّ محلي (محرك الكلمات المفتاحية الثابت) — يُستخدم كخط دفاع أخير ──
-    function _localReply(userText) {
-      var mgr = window.RizqManager;
-      var pageCtx = _collectPageContext();
-      var msgLang = _detectMessageLang(userText);
-      var result = (mgr && typeof mgr.processMessage === 'function')
-        ? mgr.processMessage(userText, Object.assign({}, _ctx, { uiLang: _ctx.lang, lang: msgLang, pageContext: pageCtx }))
-        : { reply: _WDICT[msgLang === 'fr' ? 'fr' : 'ar'].defaultReply };
-      return result.reply || result;
+    function _agentFetchUrls() {
+      var urls = [];
+      var paths = AGENT_CHAT_PATHS.slice();
+      paths.forEach(function (p) {
+        if (urls.indexOf(p) === -1) urls.push(p);
+      });
+      var base = (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE)
+        ? window.RIZQ_BACKEND_BASE.replace(/\/$/, '') : '';
+      if (base) {
+        paths.forEach(function (p) {
+          var full = base + p;
+          if (urls.indexOf(full) === -1) urls.push(full);
+        });
+      }
+      if (location.protocol === 'http:' || location.protocol === 'https:') {
+        var origin = location.origin.replace(/\/$/, '');
+        paths.forEach(function (p) {
+          var fromOrigin = origin + p;
+          if (urls.indexOf(fromOrigin) === -1) urls.push(fromOrigin);
+        });
+      }
+      return urls;
     }
 
-    /* ══════════════════════════════════════════════════════
-       _reply — إصلاح جوهري: كان الويدجت يعتمد حصرياً على محرك كلمات
-       مفتاحية ثابت محلياً (RizqManager.processMessage) — لا ذكاء اصطناعي
-       حقيقي إطلاقاً مهما كان السؤال. الآن يحاول أولاً خادم rizq-backend
-       (POST /api/widget/chat، مدعوم بـ Claude) الذي يرد بردود حقيقية
-       وواعية بالسياق (اسم المنشأة، ساعات الدوام، حالة خارج الدوام...)،
-       وإن تعذّر (لا رابط خادم مضبوط / انقطاع شبكة / تأخر أكثر من 7 ثوانٍ)
-       يعود فوراً وبصمت للمحرك المحلي — لا عطل ظاهر للزائر أبداً في أي حال.
-    ══════════════════════════════════════════════════════ */
+    function _offlineAgentReply(userText) {
+      var msgLang = _detectMessageLang(userText);
+      var pageCtx = _collectPageContext();
+      var mgr = window.RizqManager;
+      if (mgr && typeof mgr.processMessage === 'function') {
+        try {
+          var result = mgr.processMessage(userText, Object.assign({}, _ctx, {
+            uiLang: _ctx.lang,
+            lang: msgLang,
+            pageContext: pageCtx
+          }));
+          var reply = result && (result.reply != null ? result.reply : result);
+          if (reply) return String(reply);
+        } catch (eMgr) {
+          console.error('Widget Chat Error: offline RizqManager fallback failed', eMgr);
+        }
+      }
+      return _inlineOfflineReply(userText, msgLang);
+    }
+
+    function _inlineOfflineReply(text, lang) {
+      var lower = String(text || '').toLowerCase();
+      var L = lang === 'fr' ? 'fr' : lang === 'es' ? 'es' : lang === 'en' ? 'en' : 'ar';
+      var pick = function (map) {
+        return map[L] || map.ar || map.en;
+      };
+      if (/^(hi|hello|hey|hola|bonjour|salut|مرحب|اهلا|أهلا|السلام)/.test(lower)) {
+        return pick({
+          ar: 'أهلاً! 👋 أنا مدير رزق الذكي (وضع محلي — الخادم غير متصل). كيف أساعدك؟',
+          fr: 'Bonjour ! 👋 Je suis le Gestionnaire Rizq (mode local — serveur hors ligne). Comment puis-je vous aider ?',
+          es: '¡Hola! 👋 Soy el Gestor Inteligente de Rizq (modo local — servidor sin conexión). ¿En qué puedo ayudarte?',
+          en: 'Hello! 👋 I\'m the Rizq Smart Manager (local mode — server offline). How can I help?'
+        });
+      }
+      if (/نشر|إعلان|publier|annonce|post|publicar|sell|vender/.test(lower)) {
+        return pick({
+          ar: 'لنشر إعلان مجاني: افتح rizq_post.html ← اختر القسم ← أضف الصور والسعر ← انشر.\nالنشر الأساسي مجاني على رزق.',
+          fr: 'Pour publier: ouvrez rizq_post.html → choisissez la catégorie → ajoutez photos et prix → publiez.\nL\'annonce de base est gratuite sur Rizq.',
+          es: 'Para publicar: abra rizq_post.html → elija categoría → añada fotos y precio → publique.\nPublicar en Rizq es gratis.',
+          en: 'To post an ad: open rizq_post.html → pick a category → add photos & price → publish.\nBasic posting is free on Rizq.'
+        });
+      }
+      if (/باق|forfait|package|plan|abonn|precio|pricing|tarif/.test(lower)) {
+        return pick({
+          ar: 'باقات رزق: تجريبية مجانية، شهرية، ربع سنوية، سنوية، وماسية 💎 للشركات.\nالتفاصيل: rizq_landing_v8.html#pricing',
+          fr: 'Forfaits Rizq: essai gratuit, mensuel, trimestriel, annuel et Diamant 💎 pour les entreprises.\nDétails: rizq_landing_v8.html#pricing',
+          es: 'Planes Rizq: prueba gratis, mensual, trimestral, anual y Diamante 💎 para empresas.\nDetalles: rizq_landing_v8.html#pricing',
+          en: 'Rizq plans: free trial, monthly, quarterly, yearly, and Diamond 💎 for businesses.\nDetails: rizq_landing_v8.html#pricing'
+        });
+      }
+      if (/دفع|payment|paiement|bankily|sedad|pago|pay/.test(lower)) {
+        return pick({
+          ar: 'طرق الدفع على رزق: Bankily، Sedad، أو نقداً مع البائع بعد المعاينة. لا تدفع مقدماً قبل التحقق من المنتج.',
+          fr: 'Paiements sur Rizq: Bankily, Sedad ou espèces avec le vendeur après inspection. Ne payez pas avant de vérifier.',
+          es: 'Pagos en Rizq: Bankily, Sedad o efectivo con el vendedor tras inspeccionar. No pague antes de verificar.',
+          en: 'Payments on Rizq: Bankily, Sedad, or cash with the seller after inspection. Don\'t pay before verifying the item.'
+        });
+      }
+      if (/آمن|trust|sûr|segur|safe|موثوق|fiab/.test(lower)) {
+        return pick({
+          ar: 'رزق وسيط إلكتروني — عاين قبل الدفع. فضّل البائعين الموثّقين ✅ وتواصل عبر المنصة.',
+          fr: 'Rizq est un intermédiaire — inspectez avant paiement. Privilégiez les vendeurs vérifiés ✅.',
+          es: 'Rizq es intermediario — inspeccione antes de pagar. Prefiera vendedores verificados ✅.',
+          en: 'Rizq is a marketplace intermediary — inspect before paying. Prefer verified sellers ✅.'
+        });
+      }
+      if (/محل|store|boutique|مكتب|office|مناقص|tender|browse|تصفح|cherch|search|buscar/.test(lower)) {
+        return pick({
+          ar: 'تصفح: rizq_browse.html للإعلانات · rizq_store.html للمحلات · rizq_office.html للمكاتب · rizq_tenders.html للمناقصات.',
+          fr: 'Parcourir: rizq_browse.html (annonces) · rizq_store.html (boutiques) · rizq_office.html (bureaux) · rizq_tenders.html (appels d\'offres).',
+          es: 'Explorar: rizq_browse.html (anuncios) · rizq_store.html (tiendas) · rizq_office.html (oficinas) · rizq_tenders.html (licitaciones).',
+          en: 'Browse: rizq_browse.html (ads) · rizq_store.html (stores) · rizq_office.html (offices) · rizq_tenders.html (tenders).'
+        });
+      }
+      return pick({
+        ar: 'أنا في الوضع المحلي (الخادم غير متصل). اسأل عن: نشر إعلان، الباقات، الدفع، أو الأمان — أو راسل direction@rizq.mr',
+        fr: 'Je suis en mode local (serveur hors ligne). Demandez: publication, forfaits, paiement, sécurité — ou écrivez à direction@rizq.mr',
+        es: 'Estoy en modo local (servidor sin conexión). Pregunte: publicar, planes, pago, seguridad — o escriba a direction@rizq.mr',
+        en: 'I\'m in local mode (server offline). Ask about: posting, plans, payment, safety — or email direction@rizq.mr'
+      });
+    }
+
+    function _postAgentChat(url, payload, signal) {
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: signal
+      }).then(function (res) {
+        if (!res.ok) {
+          var err = new Error('http_' + res.status);
+          err.code = 'http_' + res.status;
+          err.url = url;
+          console.error('Widget Chat Error:', err, 'status:', res.status, 'url:', url);
+          throw err;
+        }
+        return res.json();
+      }).catch(function (err) {
+        if (!err.url) err.url = url;
+        console.error('Widget Chat Error:', err, 'url:', url);
+        throw err;
+      });
+    }
+
+    function _callDiamondAgent(userText) {
+      var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 45000) : null;
+      var payload = {
+        message: userText,
+        lang: _detectMessageLang(userText),
+        uiLang: _ctx.lang,
+        autoLang: true,
+        agentTier: 'diamond',
+        systemInstruction: RIZQ_DIAMOND_SYSTEM_PROMPT,
+        profile: _ctx.profile || null,
+        history: (_history || []).slice(-10),
+        pageContext: _collectPageContext()
+      };
+      var urls = _agentFetchUrls();
+      function tryUrl(idx) {
+        if (idx >= urls.length) {
+          var e1 = new Error('all_urls_failed');
+          e1.code = 'network';
+          return Promise.reject(e1);
+        }
+        return _postAgentChat(urls[idx], payload, controller ? controller.signal : undefined)
+          .then(function (data) {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (!data || !data.ok || !data.reply) {
+              var e2 = new Error('empty_reply');
+              e2.code = 'empty_reply';
+              throw e2;
+            }
+            return String(data.reply);
+          })
+          .catch(function (err) {
+            if (idx + 1 < urls.length) return tryUrl(idx + 1);
+            if (timeoutId) clearTimeout(timeoutId);
+            if (err && err.name === 'AbortError') {
+              var e3 = new Error('timeout');
+              e3.code = 'timeout';
+              throw e3;
+            }
+            throw err;
+          });
+      }
+      return tryUrl(0);
+    }
+
     function _reply(userText) {
       _showTyping();
-      var minDelay = new Promise(function (resolve) { setTimeout(resolve, 500); });
-
-      var smartReply = (function () {
-        if (!window.RIZQ_BACKEND_BASE) return Promise.reject(new Error('no_backend_configured'));
-        var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-        var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 7000) : null;
-        return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/widget/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: userText,
-            lang: _detectMessageLang(userText),
-            uiLang: _ctx.lang,
-            profile: _ctx.profile || null,
-            history: (_history || []).slice(-6),
-            pageContext: _collectPageContext()
-          }),
-          signal: controller ? controller.signal : undefined
-        }).then(function (res) {
-          if (timeoutId) clearTimeout(timeoutId);
-          if (!res.ok) throw new Error('http_' + res.status);
-          return res.json();
-        })        .then(function (data) {
-          if (!data || !data.ok || !data.reply) throw new Error('bad_response');
-          return { text: data.reply, grounded: !!data.grounded };
+      _callDiamondAgent(userText)
+        .then(function (replyText) {
+          _appendAgentMessageStream(replyText);
+        })
+        .catch(function (err) {
+          console.error('Widget Chat Error: API unavailable, using offline agent', err);
+          var fallback = _offlineAgentReply(userText);
+          _appendAgentMessageStream(fallback);
         });
-      })();
+    }
 
-      Promise.all([smartReply.catch(function () { return null; }), minDelay])
-        .then(function (r) {
-          var aiResult = r[0];
-          _hideTyping();
-          var replyText = aiResult && aiResult.text ? aiResult.text : _localReply(userText);
-          _addMessage(replyText, 'agent');
-        });
+    function _appendAgentMessageStream(text) {
+      _hideTyping();
+      var msgs = document.getElementById('rw-messages');
+      if (!msgs) return;
+      var div = document.createElement('div');
+      div.className = 'rw-msg agent chat-msg agent';
+      div.innerHTML = '<div class="rw-msg-avatar">' + _AVATAR + '</div>' +
+        '<div><div class="rw-bubble"></div><div class="rw-ts">' + _ts() + '</div></div>';
+      msgs.appendChild(div);
+      var bubble = div.querySelector('.rw-bubble');
+      if (!bubble) return;
+      var full = String(text || '');
+      if (!full) return;
+      var step = full.length > 400 ? 4 : full.length > 120 ? 3 : 2;
+      var i = 0;
+      function tick() {
+        i = Math.min(i + step, full.length);
+        bubble.textContent = full.slice(0, i);
+        _scroll();
+        if (i < full.length) {
+          requestAnimationFrame(tick);
+        } else {
+          _history.push({ role: 'agent', text: full, ts: _ts() });
+        }
+      }
+      requestAnimationFrame(tick);
     }
 
     function open() {
@@ -611,13 +796,12 @@
       var msgs = document.getElementById('rw-messages');
       if (msgs && msgs.children.length === 0) {
         var glang = _ctx.lang === 'fr' ? 'fr' : 'ar';
-        // تحية مُخصَّصة باسم المتجر الحقيقي
-        var bizName = (_ctx.profile && _ctx.profile.businessName) || 'رزق';
-        var greeting = (window.RizqManager && window.RizqManager.IDENTITY &&
-          window.RizqManager.IDENTITY.greeting && window.RizqManager.IDENTITY.greeting[glang]) ||
-          (glang === 'fr'
-            ? 'Bienvenue chez ' + bizName + '! 👋\nJe suis le Gestionnaire Rizq IA. Comment puis-je vous aider?'
-            : 'أهلاً بك في ' + bizName + '! 👋\nأنا مدير رزق الذكي، كيف أخدمك اليوم؟');
+        var d = glang === 'fr' ? _WDICT.fr : _WDICT.ar;
+        var bizName = (_ctx.profile && _ctx.profile.businessName) || (glang === 'fr' ? 'Rizq' : 'رزق');
+        var greeting = (glang === 'fr'
+          ? 'Bienvenue chez ' + bizName + ' ! 👋\nJe suis le Gestionnaire Rizq IA officiel. Comment puis-je vous aider ?'
+          : 'أهلاً بك في ' + bizName + ' ! 👋\nأنا مدير رزق الذكي الرسمي، كيف أخدمك اليوم؟');
+        if (!(_ctx.profile && _ctx.profile.businessName)) greeting = d.greeting;
         greeting += _contextGreetingSuffix();
         setTimeout(function () { _addMessage(greeting, 'agent'); }, 300);
       }
@@ -715,6 +899,19 @@
     /* ── Drag ── */
     (function () {
       if (!btn) return;
+
+      /* على شاشات اللمس: لا سحب إطلاقاً — الزر كان يلتصق بالإصبع أثناء
+         التمرير ويتحرك معه كأنه مؤشر ماوس أسود ثم يعلق في مكان عشوائي.
+         يبقى الزر مثبتاً في ركنه واللمسة تفتح/تغلق المحادثة فقط. */
+      var isTouchDevice = window.matchMedia('(pointer:coarse)').matches;
+      if (isTouchDevice) {
+        try { localStorage.removeItem('rizq_widget_pos'); } catch (e) {}
+        btn.style.left = ''; btn.style.top = '';
+        btn.style.right = ''; btn.style.bottom = '';
+        btn.addEventListener('click', function () { toggle(); });
+        return;
+      }
+
       var dragging = false, moved = false, startX, startY, origLeft, origTop;
 
       // استعادة الموضع المحفوظ
