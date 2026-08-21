@@ -732,6 +732,12 @@ html[dir="rtl"] .section-title { text-align: right; }
 html[dir="ltr"] .form-group label,
 html[dir="ltr"] .form-label,
 html[dir="ltr"] .section-title { text-align: left; }
+html[dir="rtl"] .section-header .section-title,
+html[dir="ltr"] .section-header .section-title,
+html[dir="rtl"] .section-header .section-tag,
+html[dir="ltr"] .section-header .section-tag,
+html[dir="rtl"] .section-header .section-desc,
+html[dir="ltr"] .section-header .section-desc { text-align: center; }
 html[dir="ltr"] .mobile-drawer { right: auto; left: 0; }
 /* .fixed-rizq-logo stays on the right in all languages — see rules above */
 [dir="ltr"] input[type="tel"],

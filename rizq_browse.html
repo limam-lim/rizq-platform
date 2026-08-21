@@ -587,6 +587,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 </style>
 
   <script src="rizq_backend_config.js"></script>
+<script src="rizq_module_flags.js?v=12.1"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -621,7 +622,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
       <option value="ماشية" data-ar="🐄 ماشية" data-fr="🐄 Bétail">🐄 ماشية</option>
       <option value="خدمات" data-ar="🔧 خدمات" data-fr="🔧 Services">🔧 خدمات</option>
     </select>
-    <input type="text" id="nav-search-input" placeholder="ابحث في رزق..." data-t-ph="nav-search-ph"/>
+    <input type="text" id="nav-search-input" placeholder="ابحث في رزق..." data-t-ph="nav-search-ph" data-ph="nav-search-ph"/>
     <button class="nav-search-btn" onclick="doSearch()">🔍</button>
   </div>
   <div class="nav-actions">
@@ -691,9 +692,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="filter-section">
           <div class="filter-title"><span data-t="filter-price">السعر (MRU)</span><button onclick="clearSection('price')" data-t="btn-clear-mini">مسح</button></div>
           <div class="price-inputs" style="margin-bottom:8px">
-            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" placeholder="الأدنى">
+            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" data-ph="price-min" placeholder="الأدنى">
             <span class="price-sep">—</span>
-            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" placeholder="الأقصى">
+            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى">
           </div>
           <input type="range" id="price-range" min="0" max="2000000" step="10000" value="2000000" oninput="updateRange(this.value)">
           <div class="range-labels"><span>0</span><span id="range-val">2,000,000+</span></div>
@@ -1067,7 +1068,10 @@ window._currentAd = null;
 let _phoneRevealed = false;
 
 // LANG
-function _rizqLang(){try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}}
+function _rizqLang(){
+  if(window.RizqI18n && typeof RizqI18n.getLang==='function') return RizqI18n.getLang();
+  try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}
+}
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // TRANSLATIONS
@@ -1103,7 +1107,7 @@ const TRANSLATIONS = {
     'browse-ads':'تصفح الإعلانات','promo-browse':'تصفح الإعلانات',
     'promo-title':'انضم إلى رزق اليوم','promo-sub':'المنصة الأولى للإعلانات المجانية في موريتانيا — ابدأ في ثوانٍ',
     'promo-post':'➕ انشر إعلانك مجاناً',
-    'price-min':'الأدنى','price-max':'الأقصى',
+    'price-min':'الأدنى','price-max':'الأقصى','no-subs':'لا توجد فروع',
   },
   fr:{
     'nav-post':'➕ Publier une annonce','nav-account':'Mon compte','nav-home':'Accueil','all-cats':'Toutes catégories',
@@ -1135,7 +1139,7 @@ const TRANSLATIONS = {
     'browse-ads':'Parcourir les annonces','promo-browse':'Parcourir',
     'promo-title':'Rejoignez Rizq aujourd\'hui','promo-sub':'La 1ère plateforme d\'annonces gratuites en Mauritanie — Commencez en secondes',
     'promo-post':'➕ Publiez votre annonce gratuitement',
-    'price-min':'Min','price-max':'Max',
+    'price-min':'Min','price-max':'Max','no-subs':'Aucune sous-catégorie',
   }
 };
 
@@ -1169,24 +1173,28 @@ function applyLang(){
      الآن يُحدَّث فوراً مع كل تبديل للغة في نفس الصفحة أيضاً. */
   if(window._rzqApplyFt) window._rzqApplyFt();
 }
-function toggleLangPage(){
-  const cur=_rizqLang();
-  const next=cur==='ar'?'fr':'ar';
-  localStorage.setItem('rizq_lang',next);
+function onBrowseLangChange(){
   applyLang();
-  // Re-render filter sidebar with current category
   try{
     const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat||'عقارات';
     renderCatSidebar(navCat);
   }catch(e){}
-  // Re-render detail panel if open (was discarding return value — fixed)
   if(window._currentAd){
     const dc=document.getElementById('detail-content');
     if(dc&&dc.style.display!=='none') dc.innerHTML=renderDetailPanel(window._currentAd);
   }
-  // Trigger footer IIFE update via StorageEvent (same-tab storage doesn't fire storage event)
+  if(typeof applyFilters==='function') applyFilters();
+}
+
+document.addEventListener('rizq:langchange', onBrowseLangChange);
+
+function toggleLangPage(){
+  if(window.RizqI18n&&typeof RizqI18n.toggle==='function'){ RizqI18n.toggle(); return; }
+  const cur=_rizqLang();
+  const next=cur==='ar'?'fr':'ar';
+  localStorage.setItem('rizq_lang',next);
+  onBrowseLangChange();
   try{window.dispatchEvent(new StorageEvent('storage',{key:'rizq_lang',newValue:next}));}catch(e){}
-  // Update disc pill + nav-disclaimer
   if(typeof _discApply==='function') _discApply(next==='fr'?'fr':'ar');
 }
 
@@ -1219,7 +1227,7 @@ function renderCatSidebar(effCat){
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='';
   } else {
     const subs=SUBCATS_BY_CAT[effCat]||[];
-    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?(AD_SUBCAT_FR[s]||s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${fr?'Aucune sous-catégorie':'لا توجد فروع'}</p>`;
+    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?(AD_SUBCAT_FR[s]||s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${_t('no-subs')}</p>`;
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='none';
   }
   if(urlSub){

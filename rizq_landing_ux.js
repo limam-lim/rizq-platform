@@ -207,7 +207,7 @@
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
       '#pricing': fr ? 'Forfaits' : 'الباقات',
-      '#jump-assistant': fr ? '💎 Assistant (Diamant)' : '💎 المساعد (الماس)'
+      '#jump-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي'
     };
     Object.keys(jumpLabels).forEach(function (sel) {
       var el = sel === '#jump-assistant'
@@ -220,7 +220,7 @@
         'mbn-home': fr ? 'Accueil' : 'الرئيسية',
         'mbn-cats': fr ? 'Sections' : 'الأقسام',
         'mbn-post': fr ? 'Publier' : 'نشر',
-        'mbn-assistant': fr ? '💎 Assistant' : '💎 المساعد',
+        'mbn-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي',
         'mbn-account': fr ? 'Compte' : 'حسابي'
       };
       Object.keys(mbn).forEach(function (id) {

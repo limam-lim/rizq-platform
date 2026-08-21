@@ -59,6 +59,9 @@
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
     }
+    if (!document.querySelector('script[src*="rizq_module_flags.js"]')) {
+      appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
+    }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
       var css = document.createElement('link');
       css.rel = 'stylesheet';

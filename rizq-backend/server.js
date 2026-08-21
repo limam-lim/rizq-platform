@@ -63,7 +63,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // والمحلات فقط، بينما تبقى بقية الأقسام (مكاتب/شركات/مناقصات/فيديوهات
 // إعلانية) مبنية وجاهزة لكن مخفية خلف علم تفعيل، تُفتح لاحقاً من لوحة
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
-const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: false, corp: false, tenders: false, videoAds: false };
+const DEFAULT_MODULE_FLAGS = { individual: true, store: false, office: false, corp: false, tenders: false, videoAds: false };
 function getModuleFlags() {
   const cfg = readJson(SITE_CONFIG_FILE, {});
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
@@ -1075,7 +1075,7 @@ app.get('/api/accounts/public', (req, res) => {
   // suspended: حساب عُلِّق من الأدمن (راجع POST /api/accounts/admin/:id/decision
   // action='suspend') — يُستبعَد من كل عرض عام فوراً رغم بقاء status='approved'،
   // فتختفي صفحته العامة (متجر/مكتب/معرض) وشريط "آخر المحلات" بالرئيسية.
-  const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended);
+  const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
   res.json({ ok: true, accounts: list.map(toPublicAccount) });
 });
 
@@ -2135,7 +2135,7 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
  */
 app.get('/api/ads', (req, res) => {
   const q = req.query || {};
-  let list = readAds().filter((a) => a.status === 'active');
+  let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
   if (q.category) list = list.filter((a) => a.category === q.category);
   if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
   if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);

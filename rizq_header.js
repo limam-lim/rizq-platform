@@ -88,7 +88,7 @@
             '<span class="rizq-hdr-lbl rizq-hdr-post-lbl" data-hdr="post">نشر (+)</span>' +
           '</a>' +
           '<button type="button" class="rizq-hdr-item" id="rizq-hdr-assistant" data-nav-order="4">' +
-            '<span class="rizq-hdr-ico">💎</span><span class="rizq-hdr-lbl" data-hdr="ai">المساعد الذكي (الماس)</span>' +
+            '<span class="rizq-hdr-ico">✨</span><span class="rizq-hdr-lbl" data-hdr="ai">رزق ذكي</span>' +
           '</button>' +
           '<div class="rizq-hdr-more-wrap" id="rizq-hdr-more-wrap" data-nav-order="5">' +
             '<button type="button" class="rizq-hdr-item" id="rizq-hdr-more" aria-haspopup="true" aria-expanded="false">' +
@@ -142,9 +142,9 @@
     }
     if (key === 'ai') {
       if (el && el.closest('#rizq-desk-nav')) {
-        return rizqT(['nav-assistant']) || t2('💎 المساعد (الماس)', '💎 Assistant (Diamant)');
+        return rizqT(['nav-assistant']) || t2('✨ رزق ذكي', '✨ Rizq IA');
       }
-      return rizqT(['hdr-ai', 'nav-assistant']) || t2('💎 المساعد الذكي (الماس)', '💎 Assistant IA (Diamant)');
+      return rizqT(['hdr-ai', 'nav-assistant']) || t2('✨ رزق ذكي', '✨ Rizq IA');
     }
     if (key === 'more' && el && (el.id === 'rizq-desk-more' || el.closest('#rizq-desk-more-li'))) {
       return rizqT(['hdr-more-dd', 'nav-more']) || t2('المزيد ▾', 'Plus ▾');
@@ -156,7 +156,7 @@
       home: t2('الرئيسية', 'Accueil'),
       cats: t2('الأقسام', 'Catégories'),
       post: t2('نشر (+)', 'Publier (+)'),
-      ai: t2('💎 المساعد الذكي (الماس)', '💎 Assistant IA (Diamant)'),
+      ai: t2('✨ رزق ذكي', '✨ Rizq IA'),
       more: t2('المزيد', 'Plus'),
       stores: t2('المحلات', 'Boutiques'),
       offices: t2('المكاتب', 'Bureaux'),
@@ -349,7 +349,7 @@
           '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +
           '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</a></li>' +
           '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</a></li>' +
-          '<li data-nav-order="4"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('💎 المساعد (الماس)', '💎 Assistant (Diamant)') + '</button></li>' +
+          '<li data-nav-order="4"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('✨ رزق ذكي', '✨ Rizq IA') + '</button></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="5">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu">' +
@@ -720,6 +720,9 @@
         applyLabels();
         initRLogoSidebar();
       }
+      if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
+        window.RizqModuleFlags.reapply();
+      }
       return;
     }
     removeDeskNav();
@@ -732,6 +735,9 @@
     ensureLangListener();
     ensureMediatorPill();
     initRLogoSidebar();
+    if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
+      window.RizqModuleFlags.reapply();
+    }
   }
 
   if (document.body) inject();
