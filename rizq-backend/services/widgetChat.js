@@ -6,6 +6,7 @@ const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
 const { getAnthropicApiKey, isAnthropicConfigured, getFastModel, createCachedMessage } = require('../config/anthropic');
 const { buildPackagesPromptBlock } = require('../../rizq_packages_config');
+const RizqAgent = require('../../rizq_agent');
 
 const client = new Anthropic({ apiKey: getAnthropicApiKey() });
 
@@ -30,23 +31,17 @@ function buildLanguageInstructions(detectedLang, uiLang) {
 }
 
 function buildDiamondSystemBlock() {
-  return (
-    'System Role: You are the Official Rizq Smart Manager (مدير رزق الذكي), powered by advanced AI. ' +
-    'You possess full contextual knowledge of the Rizq platform (stores, ads, tenders, offices, subscription tiers, and navigation).\n' +
-    'Language & Tone Rules:\n' +
-    '1. Detect and reply strictly in the user\'s input language (Arabic, French, Spanish, English, Hassaniya, etc.).\n' +
-    '2. Understand intent, typos, slang, and context naturally like a human advisor.\n' +
-    '3. Provide direct, helpful, and polite answers matching the Diamond Tier agent capabilities.\n'
-  );
+  return RizqAgent.buildMasterSystemPrompt({ agentTier: 'diamond' });
 }
 
 function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
   let prompt = buildLanguageInstructions(replyLang, uiLang);
-  if (agentTier === 'diamond' || !profile || !profile.businessName) {
-    prompt += '\n' + buildDiamondSystemBlock();
-  }
+  prompt += '\n' + RizqAgent.buildMasterSystemPrompt({
+    agentTier: agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
+    profile: profile || null
+  });
   if (extraInstruction) {
     prompt += `\n## Extra language instruction\n${String(extraInstruction).slice(0, 1200)}\n`;
   }
@@ -93,6 +88,7 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
 
   prompt +=
     '\n[Security]\n' +
+    RizqAgent.buildSecurityBlock() + '\n' +
     '- Do not expose seller phone numbers — point to "show number" on the page.\n' +
     '- Do not invent ad ids or account ids.\n' +
     '- For complaints: create_support_ticket or the report button.\n';
@@ -292,6 +288,17 @@ async function handleWidgetChat(body) {
 
   const uiLang = normalizeUiLang(body.uiLang || lang);
   const detectedLang = detectUserLanguage(text, uiLang);
+
+  if (RizqAgent.isBlockedRequest(text)) {
+    return {
+      ok: true,
+      reply: RizqAgent.resolveBlockedReply(text, detectedLang),
+      lang: detectedLang,
+      blocked: true,
+      model: 'policy-guard',
+    };
+  }
+
   const pageFacts = resolvePageContextFacts(pageContext);
   const extraInstruction = (body.autoLang === true || body.systemInstruction)
     ? (body.systemInstruction || 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, or English) and reply only in that language.')

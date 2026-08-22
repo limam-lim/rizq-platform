@@ -1664,6 +1664,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_dynamic_nav.js"></script>
+<script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
@@ -1693,19 +1695,11 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <li data-nav-order="1"><a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a></li>
     <li data-nav-order="2"><a href="#categories" data-t="nav-cats">الأقسام</a></li>
     <li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-t="nav-post">نشر (+)</a></li>
-    <li data-nav-order="4"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-t="nav-assistant">✨ رزق ذكي</button></li>
-    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="5">
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-t="nav-stores">المحلات</a></li>
+    <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-t="nav-assistant">✨ رزق ذكي</button></li>
+    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
       <a href="#" class="nav-dropdown-trigger" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
-      <div class="nav-dropdown-menu nav-more-menu" role="menu">
-        <a href="rizq_store.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏪</span><div><strong data-t="dd-stores">المحلات</strong></div></a>
-        <a href="rizq_office.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💼</span><div><strong data-t="dd-offices">المكاتب</strong></div></a>
-        <a href="rizq_ads_info.html" class="nav-dd-item nav-dd-ads" role="menuitem"><span class="nav-dd-icon">📹</span><div><strong data-t="dd-rizqads">Rizq ADS</strong></div></a>
-        <a href="#listings" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📢</span><div><strong data-t="dd-ads">الإعلانات</strong></div></a>
-        <a href="rizq_tenders.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📋</span><div><strong data-t="dd-tenders">المناقصات</strong></div></a>
-        <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
-        <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المادة القانونية</strong></div></a>
-        <a href="#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-t="dd-about">من نحن</strong></div></a>
-      </div>
+      <div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop"></div>
     </li>
   </ul>
   <div class="nav-sticky-tools" id="nav-sticky-tools">
@@ -7042,40 +7036,19 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
     }).catch(function(){});
 })();
 
-// ── الإطلاق التدريجي: إخفاء الأقسام المغلقة عن الزوار حسب moduleFlags ──
-// كل قسم (محلات/مكاتب/معارض/مناقصات) له علم تفعيل من لوحة تحكم الأدمن.
-// نخفي هنا: (1) قسم التسويق في الصفحة الرئيسية، (2) رابط التنقل، (3) خيار
-// نوع الحساب في نموذج التسجيل — دفاع متعدد الطبقات (الخادم أيضاً يرفض
-// أي POST /api/accounts من نوع مغلق حتى لو تم تجاوز هذا الإخفاء بالواجهة).
-(function applyModuleFlags(){
+// ── الإطلاق التدريجي: moduleFlags عبر RizqModuleFlags + RizqDynamicNav ──
+(function applyModuleFlagsLanding(){
+  if (window.RizqModuleFlags && typeof window.RizqModuleFlags.fetchAndApply === 'function') {
+    window.RizqModuleFlags.fetchAndApply();
+    return;
+  }
   if (!window.RIZQ_BACKEND_BASE) return;
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       var flags = data && data.ok && data.config && data.config.moduleFlags;
       if (!flags || typeof flags !== 'object') return;
-
-      // 1) أقسام التسويق في الصفحة الرئيسية
-      var SECTION_MAP = { store:'virtual-stores', office:'virtual-offices', corp:'virtual-showrooms', tenders:'virtual-tenders' };
-      Object.keys(SECTION_MAP).forEach(function(key){
-        if (flags[key] === false) {
-          var el = document.getElementById(SECTION_MAP[key]);
-          if (el) el.style.display = 'none';
-        }
-      });
-
-      // 2) روابط التنقل (الشريط العلوي + قائمة الجوال) — نفس href يتكرر مرتين
-      var NAV_MAP = { store:'rizq_store.html', office:'rizq_office.html', corp:'rizq_showroom.html', tenders:'rizq_tenders.html' };
-      Object.keys(NAV_MAP).forEach(function(key){
-        if (flags[key] === false) {
-          document.querySelectorAll('a[href="'+NAV_MAP[key]+'"]').forEach(function(a){
-            var li = a.closest('li');
-            if (li) li.style.display = 'none'; else a.style.display = 'none';
-          });
-        }
-      });
-
-      // 3) نموذج التسجيل — إخفاء أنواع الحسابات المغلقة
+      if (window.RizqDynamicNav) window.RizqDynamicNav.apply(flags);
       if (flags.individual === false) { var tp = document.getElementById('type-private'); if (tp) tp.style.display = 'none'; }
       if (flags.store === false)      { var bs = document.getElementById('biz-store');    if (bs) bs.style.display = 'none'; }
       if (flags.office === false)     { var bo = document.getElementById('biz-office');   if (bo) bo.style.display = 'none'; }
@@ -7083,11 +7056,9 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
       if (flags.store === false && flags.office === false && flags.corp === false) {
         var tc = document.getElementById('type-company'); if (tc) tc.style.display = 'none';
       }
-
-      // 4) شريط "قريباً" — إشارة اهتمام حقيقية بدل التخمين
       renderComingSoonStrip(flags);
     })
-    .catch(function(){ /* الخادم غير متاح حالياً — لا نخفي شيئاً، كل الأقسام تبقى ظاهرة افتراضياً */ });
+    .catch(function(){});
 })();
 
 // ── شريط "قريباً" + نافذة "أعلمني عند التفعيل" ─────────────────────────
@@ -7201,6 +7172,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
 <script src="rizq_packages_config.js?v=8.1"></script>
+<script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_widget_embed.js"></script>

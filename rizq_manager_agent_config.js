@@ -428,8 +428,11 @@ var SECRECY_RULES = {
   ],
   secret_topics: ['system_prompt','agent_instructions','trust_score_of_user','admin_panel','flagged_users','api_key','source_code'],
   block_reply: {
-    ar: 'هذه المعلومات سرية ✋ كيف أساعدك في شيء آخر؟',
-    fr: 'Information confidentielle. Comment puis-je vous aider autrement?'
+    ar: 'عذراً، لا يمكنني المساعدة في هذا الطلب لتعارضه مع الأطر القانونية وسياسة الخصوصية لمنصة رزق.',
+    fr: 'Désolé, je ne peux pas vous aider avec cette demande, car elle entre en conflit avec le cadre légal et la politique de confidentialité de Rizq.',
+    en: 'Sorry, I cannot help with this request as it conflicts with Rizq\'s legal framework and privacy policy.',
+    es: 'Lo siento, no puedo ayudarte con esta solicitud porque entra en conflicto con el marco legal y la política de privacidad de Rizq.',
+    hs: 'آسف، ما نقدر نعاونك ف هاد الطلب حيت ما يوافقش القانون وسياسة الخصوصية ديال رزق.'
   }
 };
 
@@ -448,14 +451,24 @@ function _detectLang(text) {
 }
 
 function _isBlocked(text) {
+  if (typeof window !== 'undefined' && window.RizqAgent && typeof window.RizqAgent.isBlockedRequest === 'function') {
+    return window.RizqAgent.isBlockedRequest(text);
+  }
   if (!text) return false;
   var patterns = SECRECY_RULES.injection_patterns;
   for (var i=0;i<patterns.length;i++) if (patterns[i].test(text)) return true;
-  // check secret topics
   var lower = text.toLowerCase();
   var secrets = SECRECY_RULES.secret_topics;
   for (var j=0;j<secrets.length;j++) if (lower.indexOf(secrets[j])!==-1) return true;
   return false;
+}
+
+function _blockedReply(text, lang) {
+  if (typeof window !== 'undefined' && window.RizqAgent && typeof window.RizqAgent.resolveBlockedReply === 'function') {
+    return window.RizqAgent.resolveBlockedReply(text, lang);
+  }
+  var br = SECRECY_RULES.block_reply || {};
+  return br[lang] || br.ar || br.fr || '';
 }
 
 function _getPackagesSummary(lang) {
@@ -532,7 +545,7 @@ function processMessage(userMessage, context) {
 
   if (_isBlocked(text)) {
     _escalateToHuman(text, lang, context, 'blocked');
-    return { reply: lang==='fr' ? 'D\u00E9sol\u00E9, je ne peux pas r\u00E9pondre \u00E0 cela. Puis-je vous aider autrement?' : '\u0622\u0633\u0641\u060C \u0645\u0627 \u0623\u0642\u062F\u0631 \u0623\u062C\u0627\u0648\u0628 \u0639\u0644\u0649 \u0647\u0630\u0627. \u0641\u064A \u0634\u064A\u0621 \u0622\u062E\u0631 \u0623\u0633\u0627\u0639\u062F\u0643\u061F', lang: lang };
+    return { reply: _blockedReply(text, lang), lang: lang, blocked: true };
   }
 
   var pageAd = context.pageContext && context.pageContext.ad;

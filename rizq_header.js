@@ -87,23 +87,17 @@
             '<span class="rizq-hdr-post-plus">+</span>' +
             '<span class="rizq-hdr-lbl rizq-hdr-post-lbl" data-hdr="post">نشر (+)</span>' +
           '</a>' +
-          '<button type="button" class="rizq-hdr-item" id="rizq-hdr-assistant" data-nav-order="4">' +
+          '<a class="rizq-hdr-item rizq-nav-module" href="rizq_store.html" data-rizq-module="store" data-nav-order="4">' +
+            '<span class="rizq-hdr-ico">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores">المحلات</span>' +
+          '</a>' +
+          '<button type="button" class="rizq-hdr-item" id="rizq-hdr-assistant" data-nav-order="8">' +
             '<span class="rizq-hdr-ico">✨</span><span class="rizq-hdr-lbl" data-hdr="ai">رزق ذكي</span>' +
           '</button>' +
-          '<div class="rizq-hdr-more-wrap" id="rizq-hdr-more-wrap" data-nav-order="5">' +
+          '<div class="rizq-hdr-more-wrap" id="rizq-hdr-more-wrap" data-nav-order="9">' +
             '<button type="button" class="rizq-hdr-item" id="rizq-hdr-more" aria-haspopup="true" aria-expanded="false">' +
               '<span class="rizq-hdr-ico">⋯</span><span class="rizq-hdr-lbl" data-hdr="more">المزيد</span>' +
             '</button>' +
-            '<div class="rizq-hdr-more-menu" id="rizq-hdr-more-menu" role="menu">' +
-              '<a href="rizq_store.html" role="menuitem" data-hdr="stores">المحلات</a>' +
-              '<a href="rizq_office.html" role="menuitem" data-hdr="offices">المكاتب</a>' +
-              '<a href="rizq_ads_info.html" role="menuitem" data-hdr="rizqads">📹 Rizq ADS</a>' +
-              '<a href="' + adsHref() + '" role="menuitem" data-hdr="ads">الإعلانات</a>' +
-              '<a href="rizq_tenders.html" role="menuitem" data-hdr="tenders">المناقصات</a>' +
-              '<a href="' + packagesHref() + '" role="menuitem" data-hdr="packs">الباقات</a>' +
-              '<a href="rizq_legal.html" role="menuitem" data-hdr="legal">المادة القانونية</a>' +
-              '<a href="' + aboutHref() + '" role="menuitem" data-hdr="about">من نحن</a>' +
-            '</div>' +
+            '<div class="rizq-hdr-more-menu" id="rizq-hdr-more-menu" role="menu" data-rizq-more-variant="mobile"></div>' +
           '</div>' +
         '</nav>' +
       '</header>';
@@ -115,8 +109,9 @@
     post: ['hdr-post', 'nav-post'],
     ai: ['hdr-ai', 'nav-assistant'],
     more: ['hdr-more', 'nav-more'],
-    stores: ['hdr-stores', 'dd-stores'],
-    offices: ['hdr-offices', 'dd-offices'],
+    stores: ['hdr-stores', 'dd-stores', 'nav-stores'],
+    offices: ['hdr-offices', 'dd-offices', 'nav-offices'],
+    showrooms: ['hdr-showrooms', 'dd-showrooms', 'nav-showrooms'],
     rizqads: ['dd-rizqads'],
     ads: ['hdr-ads', 'dd-ads'],
     tenders: ['hdr-tenders', 'dd-tenders'],
@@ -160,10 +155,11 @@
       more: t2('المزيد', 'Plus'),
       stores: t2('المحلات', 'Boutiques'),
       offices: t2('المكاتب', 'Bureaux'),
+      showrooms: t2('المعارض', 'Showrooms'),
       ads: t2('الإعلانات', 'Annonces'),
-      tenders: t2('المناقصات', 'Appels d\'offres'),
+      tenders: t2('غرفة المناقصات', 'Appels d\'offres'),
       packs: t2('الباقات', 'Forfaits'),
-      legal: t2('المادة القانونية', 'Mentions légales'),
+      legal: t2('المواد القانونية', 'Mentions légales'),
       about: t2('من نحن', 'À propos'),
       account: t2('حسابي', 'Compte')
     };
@@ -349,19 +345,11 @@
           '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +
           '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</a></li>' +
           '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</a></li>' +
-          '<li data-nav-order="4"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('✨ رزق ذكي', '✨ Rizq IA') + '</button></li>' +
-          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="5">' +
+          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + t2('المحلات', 'Boutiques') + '</a></li>' +
+          '<li data-nav-order="8"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('✨ رزق ذكي', '✨ Rizq IA') + '</button></li>' +
+          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
-            '<div class="nav-dropdown-menu nav-more-menu" role="menu">' +
-              '<a href="rizq_store.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏪</span><div><strong data-hdr="stores">المحلات</strong></div></a>' +
-              '<a href="rizq_office.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💼</span><div><strong data-hdr="offices">المكاتب</strong></div></a>' +
-              '<a href="rizq_ads_info.html" class="nav-dd-item nav-dd-ads" role="menuitem"><span class="nav-dd-icon">📹</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>' +
-              '<a href="' + adsHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📢</span><div><strong data-hdr="ads">الإعلانات</strong></div></a>' +
-              '<a href="rizq_tenders.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📋</span><div><strong data-hdr="tenders">المناقصات</strong></div></a>' +
-              '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">الباقات</strong></div></a>' +
-              '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">المادة القانونية</strong></div></a>' +
-              '<a href="' + aboutHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-hdr="about">من نحن</strong></div></a>' +
-            '</div>' +
+            '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop"></div>' +
           '</li>' +
         '</ul>' +
         '<a href="rizq_landing_v8.html" class="logo" id="rizq-desk-brand" aria-label="رزق">' +
@@ -611,6 +599,12 @@
     if (deskCenter) deskCenter.style.direction = dir;
     var landingCenter = document.querySelector('#nav .nav-center');
     if (landingCenter) landingCenter.style.direction = dir;
+    document.querySelectorAll(
+      '#nav .nav-center > li, #rizq-desk-nav .nav-center > li, #rizq-app-header .rizq-hdr-row2 > *'
+    ).forEach(function (el) {
+      var o = el.getAttribute('data-nav-order');
+      if (o) el.style.order = o;
+    });
     document.querySelectorAll('#nav .nav-center > li, #rizq-desk-nav .nav-center > li').forEach(function (li, i) {
       if (!li.getAttribute('data-nav-order')) li.setAttribute('data-nav-order', String(i + 1));
     });
@@ -739,6 +733,8 @@
       window.RizqModuleFlags.reapply();
     }
   }
+
+  window.RizqHeader = { applyLabels: applyLabels, applyNavMenuOrder: applyNavMenuOrder, inject: inject };
 
   if (document.body) inject();
   else document.addEventListener('DOMContentLoaded', inject);

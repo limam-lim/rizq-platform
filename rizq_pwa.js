@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '12.0';
+  var ASSET_V = '12.2';
 
   function isPublicShell() {
     var p = (location.pathname || '').toLowerCase();
@@ -60,6 +60,7 @@
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
     }
     if (!document.querySelector('script[src*="rizq_module_flags.js"]')) {
+      appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
@@ -69,6 +70,8 @@
       document.head.appendChild(css);
     }
     if (isPublicShell()) {
+      appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
+      appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="manifest"]')) {

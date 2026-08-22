@@ -369,6 +369,11 @@ html[dir="ltr"] .rizq-hdr-row2 {
 [data-nav-order="3"] { order: 3; }
 [data-nav-order="4"] { order: 4; }
 [data-nav-order="5"] { order: 5; }
+[data-nav-order="6"] { order: 6; }
+[data-nav-order="7"] { order: 7; }
+[data-nav-order="8"] { order: 8; }
+[data-nav-order="9"] { order: 9; }
+[data-nav-order="10"] { order: 10; }
 
 html[dir="rtl"] .nav-dropdown-menu,
 html[dir="rtl"] .rizq-hdr-more-menu {

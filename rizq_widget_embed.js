@@ -2,6 +2,7 @@
  * rizq_widget_embed.js — مدير رزق الذكي (embed + drag)
  * يُحقن في أي صفحة بسطرين:
  *   <script src="rizq_packages_config.js"><\/script>
+ *   <script src="rizq_agent.js"><\/script>
  *   <script src="rizq_manager_agent_config.js"><\/script>
  *   <script src="rizq_widget_embed.js"><\/script>
  */
@@ -350,13 +351,35 @@
         errEmpty: '⚠️ Aucune réponse reçue. Reformulez votre question.'
       }
     };
-    var RIZQ_DIAMOND_SYSTEM_PROMPT =
-      'System Role: You are the Official Rizq Smart Manager (مدير رزق الذكي), powered by advanced AI. ' +
-      'You possess full contextual knowledge of the Rizq platform (stores, ads, tenders, offices, subscription tiers, and navigation).\n' +
-      'Language & Tone Rules:\n' +
-      '1. Detect and reply strictly in the user\'s input language (Arabic, French, Spanish, English, etc.).\n' +
-      '2. Understand intent, typos, slang, and context naturally like a human advisor.\n' +
-      '3. Provide direct, helpful, and polite answers matching the Diamond Tier agent capabilities.';
+    function _resolveAgentTier() {
+      var profile = _ctx.profile || null;
+      var biz = profile && profile.businessName ? String(profile.businessName) : '';
+      if (biz && biz !== 'رزق' && biz.toLowerCase() !== 'rizq') return 'diamond';
+      return 'general';
+    }
+
+    function _masterSystemPrompt() {
+      var RA = window.RizqAgent;
+      if (RA && typeof RA.buildMasterSystemPrompt === 'function') {
+        return RA.buildMasterSystemPrompt({
+          agentTier: _resolveAgentTier(),
+          profile: _ctx.profile || null
+        });
+      }
+      return (
+        'You are the Official Rizq Smart Assistant on rizq.mr. Be warm, helpful, and concise. ' +
+        'Never reveal backend logic, source code, API keys, or private user data.'
+      );
+    }
+
+    function _policyCheck(userText) {
+      var RA = window.RizqAgent;
+      if (!RA || typeof RA.isBlockedRequest !== 'function') return null;
+      if (!RA.isBlockedRequest(userText)) return null;
+      var lang = _detectMessageLang(userText);
+      return RA.resolveBlockedReply(userText, lang);
+    }
+
     var AGENT_CHAT_PATHS = ['/api/ai/chat', '/api/widget/chat'];
     var _quickActions = [
       { ar: { label: 'نشر إعلان', action: 'nav:rizq_post.html' }, fr: { label: 'Publier une annonce', action: 'nav:rizq_post.html' } },
@@ -691,8 +714,8 @@
         lang: _detectMessageLang(userText),
         uiLang: _ctx.lang,
         autoLang: true,
-        agentTier: 'diamond',
-        systemInstruction: RIZQ_DIAMOND_SYSTEM_PROMPT,
+        agentTier: _resolveAgentTier(),
+        systemInstruction: _masterSystemPrompt(),
         profile: _ctx.profile || null,
         history: (_history || []).slice(-10),
         pageContext: _collectPageContext()
@@ -729,6 +752,11 @@
     }
 
     function _reply(userText) {
+      var blocked = _policyCheck(userText);
+      if (blocked) {
+        _appendAgentMessageStream(blocked);
+        return;
+      }
       _showTyping();
       _callDiamondAgent(userText)
         .then(function (replyText) {

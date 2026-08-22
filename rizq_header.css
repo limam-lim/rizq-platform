@@ -360,7 +360,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     align-items:center;
     gap:4px;
     list-style:none;
-    direction:inherit;
+    direction:rtl;
     margin:0;padding:0;
   }
   html.rizq-app-nav #nav > .logo,
