@@ -876,18 +876,7 @@
       return;
     }
     removeDeskNav();
-    if (isLanding()) {
-      removeHeader();
-      if (document.body) document.body.classList.add('landing-ux-mobile');
-      ensureLangListener();
-      applyLabels();
-      if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
-        window.RizqModuleFlags.reapply();
-      } else {
-        scheduleNavRefresh();
-      }
-      return;
-    }
+    if (document.body && isLanding()) document.body.classList.add('landing-ux-mobile');
     if (!document.getElementById('rizq-app-header')) {
       var host = document.body;
       if (!host) return;
@@ -897,6 +886,7 @@
     ensureLangListener();
     ensureMediatorPill();
     initRLogoSidebar();
+    applyLabels();
     if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
       window.RizqModuleFlags.reapply();
     } else {

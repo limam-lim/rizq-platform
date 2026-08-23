@@ -128,22 +128,6 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 @media(max-width:768px), (orientation:landscape) and (max-height:500px){
   .mobile-bottom-nav{display:block!important}
   body.landing-ux-mobile{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
-  body.landing-ux-mobile #nav > .nav-center,
-  body.landing-ux-mobile #nav .nav-center,
-  body.landing-ux-mobile #nav > .nav-sticky-tools{
-    display:none!important;
-    visibility:hidden!important;
-    pointer-events:none!important;
-  }
-  body.landing-ux-mobile #nav{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-    flex-wrap:nowrap!important;
-    overflow:hidden!important;
-    height:70px!important;
-    max-height:70px!important;
-  }
   nav.nav-compact .nav-sticky-tools{max-width:none;margin:0 8px}
   nav.nav-compact .nav-sticky-post{display:none}
   .section-jump-bar{display:none!important}
@@ -151,7 +135,6 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 
 @media(max-width:768px){
   nav.nav-compact .nav-center{display:none}
-  body.landing-ux-mobile #nav > .nav-center{display:none!important}
 }
 
 /* ── Section centering (clean — no glass overrides) ── */
