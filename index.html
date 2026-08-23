@@ -4608,6 +4608,7 @@ function applyLandingLang(toAr) {
   // Direction & lang
   document.documentElement.lang = lang;
   document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+  document.title = isAr ? 'رزق | Rizq — سوقك الموريتاني' : 'Rizq — Votre marketplace mauritanien';
   if (window.RizqI18n && typeof window.RizqI18n.stripLeakedDirs === 'function') {
     try { window.RizqI18n.stripLeakedDirs(); } catch (eD) {}
   }
@@ -4790,7 +4791,7 @@ function applyLandingLang(toAr) {
 
   // CTA section tagline
   const ctaTag = document.querySelector('.cta-section .section-tag');
-  if(ctaTag) ctaTag.textContent = isAr ? 'Join Rizq' : 'Rejoindre Rizq';
+  if(ctaTag) ctaTag.textContent = isAr ? 'انضم إلى رزق' : 'Rejoindre Rizq';
 
   // Rebuild carousel with translated button text
   const track = document.getElementById('cards-track');
@@ -6010,9 +6011,9 @@ function ppSelectPkg(el,i){
   // Extract name & price from rendered element text
   var nameEl=el.querySelector('span[style*="font-size:13px"]');
   var priceEl=el.querySelector('span[style*="font-weight:800"]');
-  _ppSelectedPkg.name = nameEl ? nameEl.textContent.trim() : 'شهرية';
+  _ppSelectedPkg.name = nameEl ? nameEl.textContent.trim() : (isAr ? 'شهرية' : 'Mensuelle');
   _ppSelectedPkg.price = priceEl ? priceEl.textContent.trim() : '0';
-  _ppSelectedPkg.isTrial = _ppSelectedPkg.price==='مجاني'||_ppSelectedPkg.price==='0'||parseInt(_ppSelectedPkg.price)===0;
+  _ppSelectedPkg.isTrial = _ppSelectedPkg.price==='مجاني'||_ppSelectedPkg.price==='Gratuit'||_ppSelectedPkg.price==='0'||parseInt(_ppSelectedPkg.price)===0;
 }
 
 function ppRenderPayMethods(){

@@ -360,6 +360,9 @@
     } else {
       var next = currentLang() === 'ar' ? 'fr' : 'ar';
       try { localStorage.setItem('rizq_lang', next); } catch (e) {}
+      try {
+        document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: next } }));
+      } catch (eEv) {}
     }
     var lang = currentLang();
     document.documentElement.lang = lang;

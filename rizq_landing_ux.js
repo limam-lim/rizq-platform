@@ -236,6 +236,20 @@
     if (heroSearch && heroSearch.dataset.t === 'search-ph') {
       heroSearch.placeholder = fr ? 'Rechercher sur Rizq...' : 'البحث في رزق...';
     }
+
+    var hamburger = document.getElementById('nav-hamburger');
+    if (hamburger) {
+      hamburger.setAttribute('aria-label', fr ? 'Menu' : 'القائمة');
+      hamburger.setAttribute('title', fr ? 'Menu' : 'القائمة');
+    }
+    var drawerClose = document.querySelector('.mobile-drawer-close');
+    if (drawerClose) drawerClose.setAttribute('aria-label', fr ? 'Fermer' : 'إغلاق');
+    var drawerAccount = document.querySelector('#mobile-drawer ul li:first-child button');
+    if (drawerAccount) drawerAccount.textContent = fr ? 'Mon compte' : 'حسابي';
+    var drawerPost = document.querySelector('#mobile-drawer ul a[href="rizq_post.html"]');
+    if (drawerPost) drawerPost.textContent = fr ? 'Publier (+)' : 'نشر (+)';
+    var drawerAssistant = document.getElementById('drawer-assistant-btn');
+    if (drawerAssistant) drawerAssistant.textContent = fr ? '✨ Rizq IA' : '✨ رزق ذكي';
   }
 
   document.addEventListener('rizq:langchange', applyUxLang);

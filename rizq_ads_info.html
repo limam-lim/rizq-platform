@@ -212,7 +212,7 @@ body{font-family:var(--font);background:#f4f6fb;color:#1a2a3a;min-height:100vh;-
     </div>
     <div class="trust-cta">
       <span data-t="existing-text">🔑 اشتركت بالفعل أو تريد تفعيل/تعديل إعلانك؟</span>
-      <a href="https://wa.me/22244882212?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20Rizq%20ADS%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%8A" class="trust-wa" data-t="existing-link">تواصل معنا واتساب لتفعيل إعلانك ←</a>
+      <a href="https://wa.me/22244882212?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20Rizq%20ADS%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%8A" class="trust-wa" id="ads-wa-link" data-t="existing-link">تواصل معنا واتساب لتفعيل إعلانك ←</a>
     </div>
   </div>
   <div class="footer-grid">
@@ -311,6 +311,18 @@ body{font-family:var(--font);background:#f4f6fb;color:#1a2a3a;min-height:100vh;-
   } else {
     document.querySelectorAll('.reveal-init').forEach(function (el) { el.classList.add('in-view'); });
   }
+
+  function syncAdsWaLink() {
+    var link = document.getElementById('ads-wa-link');
+    if (!link) return;
+    var fr = (window.RizqI18n && typeof RizqI18n.getLang === 'function' && RizqI18n.getLang() === 'fr')
+      || document.documentElement.lang === 'fr';
+    link.href = fr
+      ? 'https://wa.me/22244882212?text=' + encodeURIComponent('Je souhaite activer mon annonce Rizq ADS')
+      : 'https://wa.me/22244882212?text=' + encodeURIComponent('أرغب في تفعيل إعلان Rizq ADS الخاص بي');
+  }
+  document.addEventListener('rizq:langchange', syncAdsWaLink);
+  syncAdsWaLink();
 })();
 </script>
 

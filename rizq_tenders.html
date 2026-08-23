@@ -774,6 +774,7 @@ function applyLang(){
   var l = _rizqLang();
   document.documentElement.lang = l==='fr' ? 'fr' : 'ar';
   document.documentElement.dir  = l==='fr' ? 'ltr' : 'rtl';
+  document.title = l==='fr' ? "Appels d'offres | Rizq" : 'المناقصات | رزق';
   var btn = document.getElementById('lang-btn'); if(btn) btn.textContent = l==='fr' ? 'ع' : 'FR';
   document.querySelectorAll('[data-t-fr]').forEach(function(el){
     if(!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
@@ -782,6 +783,9 @@ function applyLang(){
   if(typeof window._discApply==='function') window._discApply(l);
   renderCatChips();
   renderTenders();
+  try {
+    document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: l } }));
+  } catch (eEv) {}
 }
 
 document.addEventListener('keydown', function(e){

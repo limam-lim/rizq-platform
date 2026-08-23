@@ -1228,7 +1228,7 @@ function renderCatSidebar(effCat){
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='';
   } else {
     const subs=SUBCATS_BY_CAT[effCat]||[];
-    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?(AD_SUBCAT_FR[s]||s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${_t('no-subs')}</p>`;
+    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?subcatFrOf(s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${_t('no-subs')}</p>`;
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='none';
   }
   if(urlSub){

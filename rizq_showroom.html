@@ -981,6 +981,20 @@ function applyLang(){
     'ft-sig-pre':[isFr?'Signé par':'بتوقيع']
   };
   Object.keys(_ftMap).forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=_ftMap[id][0]; });
+  var discP1 = document.getElementById('disc-p1');
+  var discP2 = document.getElementById('disc-p2');
+  var discClose = document.getElementById('disc-close-btn');
+  if (discP1) discP1.style.display = isFr ? 'none' : 'block';
+  if (discP2) discP2.style.display = isFr ? 'block' : 'none';
+  if (discClose) discClose.textContent = isFr ? "J'ai compris — Fermer" : 'فهمت — أغلق';
+  var discH2 = document.querySelector('#disc-overlay h2[data-t-fr]');
+  if (discH2) {
+    if (!discH2.hasAttribute('data-t-ar')) discH2.setAttribute('data-t-ar', discH2.innerHTML);
+    discH2.innerHTML = isFr ? discH2.getAttribute('data-t-fr') : discH2.getAttribute('data-t-ar');
+  }
+  try {
+    document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: isFr ? 'fr' : 'ar' } }));
+  } catch (eEv) {}
 }
 
 /* ══ INIT ══ */
