@@ -1,11 +1,12 @@
 /**
  * rizq_dynamic_nav.js — شريط أقسام ديناميكي + قوائم «المزيد» (Desktop vs Mobile)
+ * المصدر الوحيد للأقسام: MODULES — أي قسم جديد يُضاف هنا يظهر تلقائياً في «المزيد» على الجوال.
  */
 (function (global) {
   'use strict';
 
   var MODULES = [
-    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4, always: true },
+    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4 },
     { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5 },
     { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 6 },
     { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'غرفة المناقصات' }
@@ -17,12 +18,10 @@
     { href: 'rizq_landing_v8.html#about', hdr: 'about', key: 'about', ico: 'ℹ️', landingHref: '#about' }
   ];
 
-  var MOBILE_MORE = [
-    { module: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪' },
-    { module: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼' },
-    { module: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬' },
+  /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
+  var MOBILE_MORE_EXTRAS = [
     { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
-    { module: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', labelAr: 'غرفة المناقصات' },
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '📹' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
@@ -34,6 +33,7 @@
     showrooms: { ar: 'المعارض', fr: 'Showrooms' },
     tenders: { ar: 'غرفة المناقصات', fr: 'Appels d\'offres' },
     ads: { ar: 'الإعلانات', fr: 'Annonces' },
+    rizqads: { ar: 'Rizq ADS', fr: 'Rizq ADS' },
     packs: { ar: 'الباقات', fr: 'Forfaits' },
     legal: { ar: 'المواد القانونية', fr: 'Mentions légales' },
     about: { ar: 'من نحن', fr: 'À propos' }
@@ -43,6 +43,17 @@
     try {
       var k = (location.pathname || '').split('/').pop().toLowerCase().replace(/\.html$/, '');
       return !k || k === 'rizq_landing_v8' || k === 'index';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isPhoneNav() {
+    try {
+      if (global.RizqViewport && typeof global.RizqViewport.isPhone === 'function') {
+        return global.RizqViewport.isPhone();
+      }
+      return global.matchMedia('(max-width:768px), (orientation:landscape) and (max-height:500px)').matches;
     } catch (e) {
       return false;
     }
@@ -64,7 +75,7 @@
   }
 
   function labelFor(item) {
-    if (item.labelAr) return lang() === 'fr' ? (item.labelFr || LABELS[item.hdr] && LABELS[item.hdr].fr) : item.labelAr;
+    if (item.labelAr) return lang() === 'fr' ? (item.labelFr || (LABELS[item.hdr] && LABELS[item.hdr].fr)) : item.labelAr;
     var L = LABELS[item.hdr];
     if (L) return t(L.ar, L.fr);
     return item.hdr || '';
@@ -72,14 +83,28 @@
 
   function moduleOpen(flags, key) {
     if (!flags || typeof flags !== 'object') return key === 'store';
-    var mod = MODULES.filter(function (m) { return m.key === key; })[0];
-    if (mod && mod.always) return true;
     return flags[key] !== false;
   }
 
   function resolveHref(item, onLanding) {
     if (onLanding && item.landingHref) return item.landingHref;
     return item.href;
+  }
+
+  /** قائمة «المزيد» على الجوال = كل MODULES المفعّلة + عناصر ثابتة */
+  function getMobileMoreItems() {
+    var fromModules = MODULES.map(function (m) {
+      return {
+        module: m.key,
+        href: m.href,
+        hdr: m.hdr,
+        ico: m.ico,
+        labelAr: m.labelAr,
+        labelFr: m.labelFr,
+        landingHref: m.landingHref
+      };
+    });
+    return fromModules.concat(MOBILE_MORE_EXTRAS);
   }
 
   function ensureModuleSlots(container) {
@@ -121,13 +146,14 @@
   }
 
   function applyMainBar(flags) {
-    var onLanding = isLanding();
+    var phone = isPhoneNav();
     document.querySelectorAll('#nav .nav-center, #rizq-desk-nav .nav-center, #rizq-app-header .rizq-hdr-row2').forEach(function (container) {
       ensureModuleSlots(container);
       MODULES.forEach(function (mod) {
         var open = moduleOpen(flags, mod.key);
         container.querySelectorAll('[data-rizq-module="' + mod.key + '"]').forEach(function (el) {
-          el.style.display = open ? '' : 'none';
+          /* على الجوال: كل الأقسام في «المزيد» فقط — لا تبويب مباشر */
+          el.style.display = phone ? 'none' : (open ? '' : 'none');
         });
       });
       var aiOrder = 8;
@@ -169,22 +195,49 @@
     });
   }
 
+  function rebuildMobileDrawerList(flags) {
+    var list = document.getElementById('mobile-drawer-list');
+    if (!list) return;
+    list.innerHTML = '';
+    var onLanding = isLanding();
+    getMobileMoreItems().forEach(function (item) {
+      if (item.module && !moduleOpen(flags, item.module)) return;
+      var href = resolveHref(item, onLanding);
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = href;
+      a.setAttribute('data-hdr', item.hdr);
+      var label = labelFor(item);
+      a.textContent = (item.ico ? item.ico + ' ' : '') + label;
+      if (item.hdr === 'rizqads') {
+        a.style.color = 'var(--gold)';
+      }
+      a.addEventListener('click', function () {
+        if (typeof global.closeMobileNav === 'function') global.closeMobileNav();
+      });
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
+
   function applyMoreMenus(flags) {
     flags = flags && typeof flags === 'object' ? flags : {
       individual: true, store: false, office: false, corp: false, tenders: false, videoAds: false
     };
+    var mobileItems = getMobileMoreItems();
     document.querySelectorAll('#rizq-desk-more-li .nav-dropdown-menu, #nav-more-li .nav-dropdown-menu').forEach(function (menu) {
-      var isMobile = global.matchMedia && global.matchMedia('(max-width:768px)').matches;
+      var isMobile = isPhoneNav();
       var onLanding = isLanding();
       if (menu.closest('#nav-more-li') && isMobile) {
-        rebuildMoreMenu(menu, MOBILE_MORE, flags, 'mobile');
+        rebuildMoreMenu(menu, mobileItems, flags, 'mobile');
       } else {
         rebuildMoreMenu(menu, DESKTOP_MORE, flags, 'desktop');
       }
     });
     document.querySelectorAll('#rizq-hdr-more-menu').forEach(function (menu) {
-      rebuildMoreMenu(menu, MOBILE_MORE, flags, 'mobile');
+      rebuildMoreMenu(menu, mobileItems, flags, 'mobile');
     });
+    rebuildMobileDrawerList(flags);
   }
 
   function ensureMoreMenusFilled() {
@@ -193,6 +246,9 @@
         applyMoreMenus(_lastApplied);
       }
     });
+    if (document.getElementById('mobile-drawer-list') && !document.getElementById('mobile-drawer-list').children.length) {
+      applyMoreMenus(_lastApplied);
+    }
   }
 
   function applySectionHides(flags) {
@@ -217,11 +273,21 @@
     document.querySelectorAll('[data-hdr]').forEach(function (el) {
       var k = el.getAttribute('data-hdr');
       if (!k || !LABELS[k]) return;
-      var text = t(LABELS[k].ar, LABELS[k].fr);
+      var text = t(LABELS[k].ar, LABELS[k.fr);
       if (k === 'tenders' && el.closest('[data-rizq-module="tenders"]')) {
         text = t('غرفة المناقصات', 'Appels d\'offres');
       }
-      if (text) el.textContent = text;
+      if (!text) return;
+      if (el.closest('#mobile-drawer-list')) {
+        var ico = '';
+        getMobileMoreItems().some(function (it) {
+          if (it.hdr === k) { ico = it.ico || ''; return true; }
+          return false;
+        });
+        el.textContent = (ico ? ico + ' ' : '') + text;
+      } else {
+        el.textContent = text;
+      }
     });
   }
 
@@ -256,7 +322,8 @@
   global.RizqDynamicNav = {
     apply: apply,
     MODULES: MODULES,
-    moduleOpen: moduleOpen
+    moduleOpen: moduleOpen,
+    getMobileMoreItems: getMobileMoreItems
   };
 
   document.addEventListener('rizq:langchange', function () {
@@ -266,7 +333,7 @@
   try {
     var mq = global.matchMedia('(max-width:768px)');
     function onMq() {
-      if (_lastApplied) applyMoreMenus(_lastApplied);
+      if (_lastApplied) apply(_lastApplied);
     }
     if (mq.addEventListener) mq.addEventListener('change', onMq);
     else if (mq.addListener) mq.addListener(onMq);

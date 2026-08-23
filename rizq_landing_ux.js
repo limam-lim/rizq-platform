@@ -232,7 +232,6 @@
         'mbn-home': fr ? 'Accueil' : 'الرئيسية',
         'mbn-cats': fr ? 'Sections' : 'الأقسام',
         'mbn-post': fr ? 'Publier' : 'نشر',
-        'mbn-stores': fr ? 'Boutiques' : 'المحلات',
         'mbn-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي',
         'mbn-more': fr ? 'Plus' : 'المزيد'
       };

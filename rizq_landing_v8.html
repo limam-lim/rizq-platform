@@ -1827,9 +1827,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🏠</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>
     <a href="rizq_post.html" id="mbn-post" class="mbn-post"><span><span class="mbn-icon">+</span></span><span class="mbn-label">نشر</span></a>
-    <a href="rizq_store.html" id="mbn-stores" class="rizq-nav-module" data-rizq-module="store"><span class="mbn-icon">🏪</span><span class="mbn-label">المحلات</span></a>
     <button type="button" id="mbn-assistant"><span class="mbn-icon">✨</span><span class="mbn-label">رزق ذكي</span></button>
-    <button type="button" id="mbn-more" aria-haspopup="true"><span class="mbn-icon">⋯</span><span class="mbn-label">المزيد</span></button>
+    <button type="button" id="mbn-more" aria-haspopup="true" aria-controls="mobile-drawer"><span class="mbn-icon">⋯</span><span class="mbn-label">المزيد</span></button>
   </div>
 </nav>
 
@@ -1837,21 +1836,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeMobileNav()"></div>
 <div class="mobile-drawer" id="mobile-drawer">
   <button class="mobile-drawer-close" onclick="closeMobileNav()" aria-label="إغلاق">✕</button>
-  <ul>
-    <li><button type="button" onclick="openModal('login');closeMobileNav()">حسابي</button></li>
-    <li><a href="rizq_post.html">نشر (+)</a></li>
-    <li><button type="button" id="drawer-assistant-btn" onclick="closeMobileNav()">✨ رزق ذكي</button></li>
-    <li><a href="#categories" data-t="nav-cats" onclick="closeMobileNav()">الأقسام</a></li>
-    <li><a href="#listings" data-t="nav-ads" onclick="closeMobileNav()">الإعلانات</a></li>
-    <li><a href="rizq_ads_info.html" style="color:var(--gold)">📹 Rizq ADS</a></li>
-    <li><a href="rizq_store.html" data-t="nav-stores">🏪 المحلات</a></li>
-    <li><a href="rizq_office.html" data-t="nav-offices">💼 المكاتب</a></li>
-    <li><a href="rizq_showroom.html" data-t="nav-showrooms">🏬 المعارض</a></li>
-    <li><a href="rizq_tenders.html" data-t="nav-tenders">📋 المناقصات</a></li>
-    <li><a href="#pricing" data-t="nav-packages" onclick="closeMobileNav()">الباقات</a></li>
-    <li><a href="#about" data-t="nav-about" onclick="closeMobileNav()">من نحن</a></li>
-    <li><a href="#" onclick="openDisc();closeMobileNav();return false" data-t="nav-legal-mobile">⚖️ الإشعار القانوني</a></li>
-  </ul>
+  <ul id="mobile-drawer-list"></ul>
   <div class="mobile-drawer-actions">
     <!-- Language switcher lives in the header (FR / العربية). -->
     <button class="btn-login" onclick="openModal('login');closeMobileNav()">دخول</button>
