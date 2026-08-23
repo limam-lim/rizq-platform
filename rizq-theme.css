@@ -198,8 +198,18 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 
 /* Dropdown menus must sit above the gold/yellow announcement strip */
 .nav-dropdown-menu,
-.rizq-hdr-more-menu,
 .more-menu {
+  position: absolute !important;
+  z-index: 999999 !important;
+}
+.rizq-hdr-more-menu.is-portaled,
+.rizq-hdr-more-menu.is-portaled.open,
+.rizq-hdr-more-menu.is-positioned {
+  position: fixed !important;
+  right: auto !important;
+  z-index: 10049 !important;
+}
+.rizq-hdr-more-menu:not(.is-portaled):not(.is-positioned) {
   position: absolute !important;
   z-index: 999999 !important;
 }

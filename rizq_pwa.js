@@ -5,7 +5,22 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '12.2';
+  var ASSET_V = '13.5';
+
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function (msg, type) {
+      var el = document.getElementById('rizq-toast-global');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'rizq-toast-global';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg || '';
+      el.className = 'show' + (type ? ' toast-' + type : '');
+      clearTimeout(el._rizqToastT);
+      el._rizqToastT = setTimeout(function () { el.className = ''; }, 3200);
+    };
+  }
 
   function isPublicShell() {
     var p = (location.pathname || '').toLowerCase();
@@ -62,6 +77,10 @@
     if (!document.querySelector('script[src*="rizq_module_flags.js"]')) {
       appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
+    }
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_packages_config.js"]')) {
+      appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
+      appendScript('rizq_packages_ui.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
       var css = document.createElement('link');

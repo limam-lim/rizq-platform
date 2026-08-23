@@ -2442,9 +2442,11 @@ const PKG_DEFAULTS = {
     {id:'ind-monthly',name:'باقة شهرية', price:2000, period:'MRU / شهر',           durationDays:30, features:['حتى 10 إعلانات نشطة','حتى 5 صور لكل إعلان','تجديد تلقائي للإعلانات'], active:true},
   ],
   office: [
-    {id:'ins-basic', name:'أساسية', price:1500, period:'MRU / شهر', durationDays:30, features:['حتى 5 عروض تأمين نشطة','ظهور في قسم وكالات التأمين','شارة "وكالة مسجّلة"'], active:true},
-    {id:'ins-pro',   name:'احترافية', price:4000, period:'MRU / شهر', durationDays:30, features:['عروض غير محدودة','تثبيت أعلى نتائج القسم','🏅 شارة "وكالة مميّزة برزق"','إحصائيات مشاهدات أسبوعية'], active:true},
-    {id:'ins-corp',  name:'شركات التأمين', price:9000, period:'MRU / شهر', durationDays:30, features:['كل ما تشمله الاحترافية','بانر ترويجي في صفحة القسم','مدير حساب مخصص','تقارير أداء شهرية PDF'], active:true},
+    {id:'of-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['عرض الخدمات','صفحة المكتب','طلبات تواصل','دعم فني أساسي'], active:true},
+    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['جميع المزايا','🏅 شارة "موثّق ✅"','إحصائيات','🎬 فيديو تعريفي مشمول','دعم بالأولوية'], active:true},
+    {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['توفير 14%','جميع المزايا','🎬 فيديو مشمول','مدير حساب مخصص'], active:true},
+    {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, features:['توفير 33%','أفضل قيمة','🎬 فيديو مشمول + 1 إضافي مجاني','أولوية الدعم'], active:true},
+    {id:'of-diam',  name:'الماسية 💎 (النائب الذكي الشامل)', price:5000, period:'MRU / شهر', durationDays:30, description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
   ],
   store: [
     {id:'st-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'], active:true},
@@ -2496,7 +2498,7 @@ const PKG_DEFAULTS = {
 const PKG_CATS = [
   {key:'general',    label:'عام (الافتراضي)',  icon:'📦', ls:'rizq_packages'},
   {key:'individual',  label:'الأفراد',           icon:'🙋', ls:'rizq_individual_packages'},
-  {key:'office',      label:'مكاتب التأمين',      icon:'🛡️', ls:'rizq_office_packages'},
+  {key:'office',      label:'المكاتب الافتراضية', icon:'💼', ls:'rizq_office_packages'},
   {key:'store',       label:'المحلات',            icon:'🏬', ls:'rizq_store_packages'},
   {key:'corp',        label:'الشركات',            icon:'🏢', ls:'rizq_corp_packages'},
   {key:'video',       label:'الفيديو الإعلاني',   icon:'🎬', ls:'rizq_video_packages'},

@@ -171,7 +171,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 
 /* ── PACKAGES ── */
 .pkg-section{padding:70px 5%;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3}
-.pkg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:0 auto}
+.pkg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;max-width:1380px;margin:0 auto}
 @media(max-width:900px){.pkg-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){.pkg-grid{grid-template-columns:1fr}}
 .pkg-card{border-radius:18px;padding:26px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;cursor:pointer}
@@ -421,54 +421,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
       <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
     </p>
   </div>
-  <div class="pkg-grid" id="pkg-grid">
-    <!-- Packages rendered by JS -->
-    <!-- ترتيب: تجريبية ← أعمال ← Pro ← ماسية (تصاعدي من الأرخص للأغلى) -->
-    <div class="pkg-card" style="background:linear-gradient(160deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;box-shadow:0 6px 22px rgba(16,185,129,.12)">
-      <div style="font-size:36px;margin-bottom:10px">⏱</div>
-      <div class="pkg-name" style="color:#15803d" id="pkg-trial-name">تجريبية</div>
-      <div class="pkg-price" style="color:#16a34a" id="pkg-trial-price">مجاناً</div>
-      <div class="pkg-period" style="color:#4ade80" id="pkg-trial-period">لمدة 3 أيام</div>
-      <div style="height:1px;background:rgba(22,163,74,.15);margin:12px 0"></div>
-      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t1">5 عروض</span></div>
-      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t2">صور للمعروضات</span></div>
-      <div class="pkg-feat" style="color:#166534">✅ <span id="pf-t3">بطاقة تعريفية</span></div>
-      <button class="pkg-cta" style="background:#16a34a;color:#fff" onclick="startPkg('trial')" id="pkg-trial-cta">ابدأ مجاناً</button>
-    </div>
-    <div class="pkg-card" style="background:linear-gradient(160deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;box-shadow:0 6px 22px rgba(59,130,246,.12)">
-      <div style="font-size:36px;margin-bottom:10px">🏢</div>
-      <div class="pkg-name" style="color:#1e3a8a" id="pkg-biz-name">أعمال</div>
-      <div class="pkg-price" style="color:#1d4ed8"><span id="pkg-biz-price-val">2,000</span> <span style="font-size:14px">MRU</span></div>
-      <div class="pkg-period" style="color:#2563eb" id="pkg-biz-period">/شهر</div>
-      <div style="height:1px;background:rgba(30,58,138,.12);margin:12px 0"></div>
-      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b1">15 عرض</span></div>
-      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b2">مراسلة آمنة</span></div>
-      <div class="pkg-feat" style="color:#1e3a8a">✅ <span id="pf-b3">وسم موثّق</span></div>
-      <button class="pkg-cta" style="background:#1d4ed8;color:#fff" onclick="startPkg('biz')" id="pkg-biz-cta">اشترك الآن</button>
-    </div>
-    <div class="pkg-card" style="background:linear-gradient(160deg,#fefce8,#fef9c3);border:2px solid #fde047;box-shadow:0 6px 22px rgba(234,179,8,.18)">
-      <div style="font-size:36px;margin-bottom:10px">🚀</div>
-      <div class="pkg-name" style="color:#713f12" id="pkg-pro-name">Pro</div>
-      <div class="pkg-price" style="color:#854d0e"><span id="pkg-pro-price-val">5,000</span> <span style="font-size:14px">MRU</span></div>
-      <div class="pkg-period" style="color:#a16207" id="pkg-pro-period">/شهر</div>
-      <div style="height:1px;background:rgba(161,98,7,.15);margin:12px 0"></div>
-      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p1">30 عرض</span></div>
-      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p2">مراسلة آمنة</span></div>
-      <div class="pkg-feat" style="color:#713f12">✅ <span id="pf-p3">دعم 24/7</span></div>
-      <button class="pkg-cta" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#1a2a3a" onclick="startPkg('pro')" id="pkg-pro-cta">اشترك الآن</button>
-    </div>
-    <div class="pkg-card" style="background:linear-gradient(160deg,#1a1030,#2d1a60);border:1.5px solid rgba(139,92,246,.5);box-shadow:0 6px 22px rgba(139,92,246,.2)">
-      <div style="font-size:36px;margin-bottom:10px">💎</div>
-      <div class="pkg-name" style="color:#c4b5fd" id="pkg-diamond-name">الماسية 💎</div>
-      <div class="pkg-price" style="color:#a78bfa"><span id="pkg-dia-price-val">6,000</span> <span style="font-size:14px">MRU</span></div>
-      <div class="pkg-period" style="color:#c4b5fd" id="pkg-dia-period">/شهر</div>
-      <div style="height:1px;background:rgba(139,92,246,.2);margin:12px 0"></div>
-      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d1">عروض غير محدودة</span></div>
-      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d2">وكيل ذكي 24/7</span></div>
-      <div class="pkg-feat" style="color:#ddd6fe">✅ <span id="pf-d3">أولوية في النتائج</span></div>
-      <button class="pkg-cta" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff" onclick="startPkg('diamond')" id="pkg-dia-cta">اشترك الآن</button>
-    </div>
-  </div>
+  <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
 </section>
 
 <!-- ══ FOOTER RIZQ (موحّد مع باقي الصفحات) ══ -->
@@ -565,6 +518,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 
 <!-- ══ SCRIPTS ══ -->
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_packages_config.js"></script>
+<script src="rizq_packages_ui.js?v=12.5"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_announcements.js"></script>
@@ -798,43 +753,9 @@ function applyAccountData(){
 
 /* ── Load Packages — dynamic from localStorage or keep static defaults ── */
 function loadPackages(){
-  var pkgs = [];
-  try{ pkgs = JSON.parse(localStorage.getItem('rizq_corp_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){}
-  if(!pkgs.length) return; /* keep static HTML defaults */
-
-  var isFr = _lang === 'fr';
-  var grid  = document.getElementById('pkg-grid');
-  if(!grid) return;
-
-  var THEMES = {
-    trial:   { bg:'linear-gradient(160deg,#f0fdf4,#dcfce7)', border:'#86efac', shadow:'rgba(16,185,129,.12)', icon:'⏱', nameClr:'#15803d', priceClr:'#16a34a', periodClr:'#4ade80', divClr:'rgba(22,163,74,.15)', featClr:'#166534', ctaBg:'#16a34a', ctaClr:'#fff' },
-    biz:     { bg:'linear-gradient(160deg,#eff6ff,#dbeafe)', border:'#93c5fd', shadow:'rgba(59,130,246,.12)',  icon:'🏢', nameClr:'#1e3a8a', priceClr:'#1d4ed8', periodClr:'#2563eb', divClr:'rgba(30,58,138,.12)',  featClr:'#1e3a8a', ctaBg:'#1d4ed8', ctaClr:'#fff' },
-    pro:     { bg:'linear-gradient(160deg,#fefce8,#fef9c3)', border:'#fde047', shadow:'rgba(234,179,8,.18)',   icon:'🚀', nameClr:'#713f12', priceClr:'#854d0e', periodClr:'#a16207', divClr:'rgba(161,98,7,.15)',  featClr:'#713f12', ctaBg:'linear-gradient(135deg,#C9A84C,#e8c96a)', ctaClr:'#1a2a3a' },
-    diamond: { bg:'linear-gradient(160deg,#1a1030,#2d1a60)', border:'rgba(139,92,246,.5)', shadow:'rgba(139,92,246,.2)', icon:'💎', nameClr:'#c4b5fd', priceClr:'#a78bfa', periodClr:'#c4b5fd', divClr:'rgba(139,92,246,.2)', featClr:'#ddd6fe', ctaBg:'linear-gradient(135deg,#7c3aed,#a855f7)', ctaClr:'#fff' }
-  };
-
-  var html = pkgs.map(function(p){
-    var t = THEMES[p.id] || THEMES['biz'];
-    var name  = isFr ? (p.nameFr||p.name) : (p.name||p.nameFr);
-    var price = p.price === 0 ? (isFr?'Gratuit':'مجاناً') : ((p.price||'').toLocaleString()+' <span style="font-size:14px">MRU</span>');
-    var period= p.price === 0 ? (isFr?'3 jours':'لمدة 3 أيام') : (isFr?'/mois':'/شهر');
-    var feats = (p.features||[]).slice(0,4).map(function(f){
-      var ftxt = isFr ? (f.fr||f.ar||f) : (f.ar||f.fr||f);
-      return '<div class="pkg-feat" style="color:'+t.featClr+'">✅ '+ftxt+'</div>';
-    }).join('');
-    var ctaLbl = p.price===0 ? (isFr?'Commencer gratuitement':'ابدأ مجاناً') : (isFr?"S'abonner":'اشترك الآن');
-    return '<div class="pkg-card" style="background:'+t.bg+';border:1.5px solid '+t.border+';box-shadow:0 6px 22px '+t.shadow+'">'
-      +'<div style="font-size:36px;margin-bottom:10px">'+t.icon+'</div>'
-      +'<div class="pkg-name" style="color:'+t.nameClr+'">'+name+'</div>'
-      +'<div class="pkg-price" style="color:'+t.priceClr+'">'+price+'</div>'
-      +'<div class="pkg-period" style="color:'+t.periodClr+'">'+period+'</div>'
-      +'<div style="height:1px;background:'+t.divClr+';margin:12px 0"></div>'
-      +feats
-      +'<button class="pkg-cta" style="background:'+t.ctaBg+';color:'+t.ctaClr+'" onclick="startPkg(\''+p.id+'\')">'+ctaLbl+'</button>'
-      +'</div>';
-  }).join('');
-
-  grid.innerHTML = html;
+  if(window.RizqPackagesUI && typeof RizqPackagesUI.mount==='function'){
+    RizqPackagesUI.mount('pkg-grid','corp',{columns:4,ensureDiamond:true});
+  }
 }
 
 /* ── Chat ── */

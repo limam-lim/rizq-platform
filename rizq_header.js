@@ -48,6 +48,110 @@
     return 'rizq_landing_v8.html#about';
   }
 
+  function desktopMoreMenuHtml() {
+    return '' +
+      '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">' + t2('الباقات', 'Forfaits') + '</strong></div></a>' +
+      '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">' + t2('المواد القانونية', 'Mentions légales') + '</strong></div></a>' +
+      '<a href="' + aboutHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-hdr="about">' + t2('من نحن', 'À propos') + '</strong></div></a>';
+  }
+
+  function mobileMoreMenuHtml() {
+    function item(href, hdr, ico, ar, fr) {
+      var label = t2(ar, fr);
+      return '<a href="' + href + '" class="nav-dd-item rizq-more-mobile-item" role="menuitem" data-hdr="' + hdr + '">' +
+        '<span class="nav-dd-icon">' + ico + '</span><div><strong data-hdr="' + hdr + '">' + label + '</strong></div></a>';
+    }
+    return '' +
+      item('rizq_store.html', 'stores', '🏪', 'المحلات', 'Boutiques') +
+      item('rizq_office.html', 'offices', '💼', 'المكاتب', 'Bureaux') +
+      item('rizq_showroom.html', 'showrooms', '🏬', 'المعارض', 'Showrooms') +
+      item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
+      item('rizq_tenders.html', 'tenders', '📋', 'غرفة المناقصات', 'Appels d\'offres') +
+      item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
+      item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
+      item(aboutHref(), 'about', 'ℹ️', 'من نحن', 'À propos');
+  }
+
+  function positionMobileMoreMenu() {
+    var wrap = document.getElementById('rizq-hdr-more-wrap');
+    var menu = document.getElementById('rizq-hdr-more-menu');
+    var btn = document.getElementById('rizq-hdr-more');
+    if (!wrap || !menu || !btn || !wrap.classList.contains('open')) return;
+    if (!isMobileNav()) {
+      restoreMobileMoreMenu(wrap, menu);
+      return;
+    }
+
+    var anchor = btn.getBoundingClientRect();
+    var vw = window.innerWidth;
+    var margin = 8;
+    var menuW = Math.min(340, vw - margin * 2);
+    var gap = 4;
+    var top = anchor.bottom + gap;
+    var left;
+
+    if (anchor.left + anchor.width / 2 < vw / 2) {
+      left = anchor.left;
+    } else {
+      left = anchor.right - menuW;
+    }
+    left = Math.max(margin, Math.min(left, vw - menuW - margin));
+
+    menu.classList.add('is-positioned');
+    menu.style.cssText = ''
+      + 'position:fixed!important;'
+      + 'display:flex!important;flex-direction:column!important;'
+      + 'visibility:visible!important;'
+      + 'box-sizing:border-box!important;'
+      + 'top:' + top + 'px!important;'
+      + 'left:' + left + 'px!important;'
+      + 'right:auto!important;'
+      + 'bottom:auto!important;'
+      + 'width:' + menuW + 'px!important;'
+      + 'min-width:' + menuW + 'px!important;'
+      + 'max-width:' + menuW + 'px!important;'
+      + 'max-height:min(58vh,420px)!important;'
+      + 'overflow:visible!important;'
+      + 'overflow-y:auto!important;'
+      + '-webkit-overflow-scrolling:touch!important;'
+      + 'transform:none!important;'
+      + 'z-index:10049!important;'
+      + 'direction:inherit!important;';
+  }
+
+  function restoreMobileMoreMenu(wrap, menu) {
+    if (!menu) return;
+    menu.classList.remove('is-positioned', 'is-portaled');
+    menu.style.cssText = '';
+    if (menu.parentNode === document.body && menu.__rizqMoreHome) {
+      menu.__rizqMoreHome.appendChild(menu);
+    }
+  }
+
+  function closeMobileMoreMenu() {
+    var wrap = document.getElementById('rizq-hdr-more-wrap');
+    var menu = document.getElementById('rizq-hdr-more-menu');
+    var btn = document.getElementById('rizq-hdr-more');
+    if (wrap) wrap.classList.remove('open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (menu) restoreMobileMoreMenu(wrap, menu);
+  }
+
+  function scheduleNavRefresh() {
+    function run() {
+      if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
+        window.RizqModuleFlags.reapply();
+        return;
+      }
+      if (window.RizqDynamicNav && typeof window.RizqDynamicNav.apply === 'function') {
+        window.RizqDynamicNav.apply(null);
+        return;
+      }
+      setTimeout(run, 80);
+    }
+    run();
+  }
+
   function currentLang() {
     try {
       if (window.RizqI18n && typeof window.RizqI18n.getLang === 'function') {
@@ -68,6 +172,7 @@
       '<header id="rizq-app-header" role="banner">' +
         '<div class="rizq-hdr-row1">' +
           '<div class="rizq-hdr-start">' +
+            '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '" style="display:none">←</button>' +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
             '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" aria-label="' + LANG_LABEL + '">' + LANG_LABEL + '</button>' +
           '</div>' +
@@ -97,7 +202,7 @@
             '<button type="button" class="rizq-hdr-item" id="rizq-hdr-more" aria-haspopup="true" aria-expanded="false">' +
               '<span class="rizq-hdr-ico">⋯</span><span class="rizq-hdr-lbl" data-hdr="more">المزيد</span>' +
             '</button>' +
-            '<div class="rizq-hdr-more-menu" id="rizq-hdr-more-menu" role="menu" data-rizq-more-variant="mobile"></div>' +
+            '<div class="rizq-hdr-more-menu" id="rizq-hdr-more-menu" role="menu" data-rizq-more-variant="mobile">' + mobileMoreMenuHtml() + '</div>' +
           '</div>' +
         '</nav>' +
       '</header>';
@@ -265,7 +370,33 @@
     applyLabels();
   }
 
+  function goBackMobile() {
+    try {
+      if (window.history.length > 1 && document.referrer) {
+        window.history.back();
+        return;
+      }
+    } catch (eB) {}
+    location.href = 'rizq_landing_v8.html';
+  }
+
+  function updateMobileBackButton() {
+    var back = document.getElementById('rizq-hdr-back');
+    if (!back) return;
+    var show = isMobileNav() && !isLanding();
+    back.style.display = show ? 'inline-flex' : 'none';
+  }
+
   function bind() {
+    var back = document.getElementById('rizq-hdr-back');
+    if (back && !back.getAttribute('data-rizq-bound')) {
+      back.setAttribute('data-rizq-bound', '1');
+      back.addEventListener('click', function (e) {
+        e.preventDefault();
+        goBackMobile();
+      });
+    }
+    updateMobileBackButton();
     var lang = document.getElementById('rizq-lang-btn');
     if (lang && !lang.getAttribute('data-rizq-bound')) {
       lang.setAttribute('data-rizq-bound', '1');
@@ -293,20 +424,36 @@
       moreBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var open = wrap.classList.toggle('open');
-        moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        var willOpen = !wrap.classList.contains('open');
+        closeMobileMoreMenu();
+        if (willOpen) {
+          if (menu) menu.style.visibility = 'hidden';
+          wrap.classList.add('open');
+          moreBtn.setAttribute('aria-expanded', 'true');
+          positionMobileMoreMenu();
+          requestAnimationFrame(positionMobileMoreMenu);
+        }
       });
       if (menu) {
-        menu.addEventListener('click', function (e) { e.stopPropagation(); });
+        menu.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (e.target.closest('a[href]')) closeMobileMoreMenu();
+        });
       }
-      document.addEventListener('click', function () {
-        wrap.classList.remove('open');
-        moreBtn.setAttribute('aria-expanded', 'false');
+      if (!global.__rizqMoreMenuPosBound) {
+        global.__rizqMoreMenuPosBound = true;
+        global.addEventListener('resize', positionMobileMoreMenu);
+        global.addEventListener('scroll', positionMobileMoreMenu, { passive: true });
+      }
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('#rizq-hdr-more-wrap') || e.target.closest('#rizq-hdr-more-menu')) return;
+        closeMobileMoreMenu();
       });
     }
     ensureLangListener();
     applyLabels();
     markActive();
+    updateMobileBackButton();
   }
 
   function unifyDashLangPills() {
@@ -349,7 +496,7 @@
           '<li data-nav-order="8"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('✨ رزق ذكي', '✨ Rizq IA') + '</button></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
-            '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop"></div>' +
+            '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +
           '</li>' +
         '</ul>' +
         '<a href="rizq_landing_v8.html" class="logo" id="rizq-desk-brand" aria-label="رزق">' +
@@ -716,6 +863,8 @@
       }
       if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
         window.RizqModuleFlags.reapply();
+      } else {
+        scheduleNavRefresh();
       }
       return;
     }
@@ -731,10 +880,12 @@
     initRLogoSidebar();
     if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
       window.RizqModuleFlags.reapply();
+    } else {
+      scheduleNavRefresh();
     }
   }
 
-  window.RizqHeader = { applyLabels: applyLabels, applyNavMenuOrder: applyNavMenuOrder, inject: inject };
+  window.RizqHeader = { applyLabels: applyLabels, applyNavMenuOrder: applyNavMenuOrder, inject: inject, positionMobileMoreMenu: positionMobileMoreMenu, closeMobileMoreMenu: closeMobileMoreMenu };
 
   if (document.body) inject();
   else document.addEventListener('DOMContentLoaded', inject);

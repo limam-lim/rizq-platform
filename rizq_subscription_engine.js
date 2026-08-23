@@ -229,7 +229,7 @@
     },
     store      : { 'تجريبية':Infinity, 'شهرية':50, 'ربعية':200, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
     corp       : { 'تجريبية':Infinity, 'شهرية':30, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
-    office     : { 'أساسية':5, 'احترافية':Infinity, 'شركات التأمين':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
+    office     : { 'تجريبية':Infinity, 'شهرية':Infinity, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
   };
   // فئة غير معروفة بالجدول أو اسم باقة غير مطابق تماماً → القيمة الافتراضية.
   // للفرد فقط نفترض الأدنى (1) تحوطاً؛ لبقية الفئات نفترض "غير محدود" تفادياً
@@ -772,14 +772,16 @@
       } catch (e) { /* fall through */ }
     }
     var lsKey = TYPE_TO_LS[accType] || 'rizq_packages';
-    var defs = [
-      {name:'شهرية',    price:accType==='office'?3500:3000, days:30, highlight:true},
-      {name:'ربعية',    price:accType==='office'?9000:7500, days:90},
-      {name:'سنوية',    price:accType==='office'?28000:22000,days:365},
-      {name:'الماسية 💎 (النائب الذكي الشامل)', price:5000, days:30, diamond:true},
-    ];
-    try{ var r=JSON.parse(localStorage.getItem(lsKey)||'null'); return(r&&r.length)?r:defs; }
-    catch(e){return defs;}
+    try {
+      var fromLs = JSON.parse(localStorage.getItem(lsKey) || 'null');
+      if (fromLs && fromLs.length) return fromLs;
+    } catch (eLs) { /* fall through */ }
+    if (typeof global.RizqPackagesConfig !== 'undefined' && global.RizqPackagesConfig.CATALOGS) {
+      var catKey = TYPE_TO_CATALOG[accType] || 'general';
+      var defaults = global.RizqPackagesConfig.CATALOGS[catKey];
+      if (defaults && defaults.length) return JSON.parse(JSON.stringify(defaults));
+    }
+    return [];
   }
 
   // ── بناء بطاقات الباقات (HTML مشترك — يستخدمه store/corp/office) ──

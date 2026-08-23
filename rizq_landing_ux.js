@@ -114,7 +114,6 @@
   bindAssistantBtn('jump-assistant');
   bindAssistantBtn('mbn-assistant');
   bindAssistantBtn('nav-assistant-btn');
-  bindAssistantBtn('hero-ai-diamond-btn');
   bindAssistantBtn('drawer-assistant-btn');
 
   function updateJumpActive() {
@@ -287,10 +286,12 @@
 
   function openRizqSheet(titleHtml, bodyHtml) {
     ensureRizqSheet();
+    var sheet = document.getElementById('rzq-sheet');
     document.getElementById('rzq-sheet-title').innerHTML = titleHtml || '';
     document.getElementById('rzq-sheet-body').innerHTML = bodyHtml || '';
+    if (sheet) sheet.classList.toggle('rzq-sheet--compact', isMobileUx());
     document.getElementById('rzq-sheet-backdrop').classList.add('open');
-    document.getElementById('rzq-sheet').classList.add('open');
+    sheet.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 

@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=13.1"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -791,7 +791,7 @@ footer{
 
 <!-- ══ باقات المحلات ══ -->
 <section id="store-packages" style="padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
-  <div style="max-width:1140px;margin:0 auto">
+  <div style="max-width:1380px;margin:0 auto">
     <div style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Stores — الباقات</p>
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(24px,3vw,36px);font-weight:700;color:#16263d;margin-bottom:10px"><span data-t="pkg-title-pre">افتح محلك بالباقة</span> <span style="color:var(--gold)" data-t="pkg-title-gold">المناسبة لك</span></h2>
@@ -799,69 +799,7 @@ footer{
       <p id="mru-note-store" style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-store-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 
-    <div id="store-packages-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
-      <!-- 🆓 تجريبية -->
-      <div class="store-pkg-card" data-pkg="trial" style="background:linear-gradient(160deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:18px;padding:28px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;box-shadow:0 6px 22px rgba(16,185,129,.12)" onmouseover="this.style.transform='translateY(-7px)';this.style.boxShadow='0 16px 34px rgba(16,185,129,.22)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 22px rgba(16,185,129,.12)'">
-        <div style="margin-bottom:12px"><span style="display:inline-flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:13px;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:#0d9488;box-shadow:0 3px 10px rgba(16,185,129,.15)"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px"><circle cx="24" cy="26" r="14" stroke="currentColor" stroke-width="2"/><path d="M24 19v7l5 3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6h10M24 6v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
-        <div class="pkg-name" data-t="pkg-trial-name" style="font-size:15px;font-weight:800;color:#15803d;margin-bottom:4px">تجريبية</div>
-        <div class="pkg-price" data-t="pkg-trial-price" style="font-size:27px;font-weight:900;color:#16a34a">مجاناً</div>
-        <div class="pkg-period" data-t="pkg-trial-period" style="font-size:11px;color:#4ade80;font-weight:600;margin-bottom:16px">لمدة 3 أيام</div>
-        <div style="height:1px;background:rgba(22,163,74,.15);margin-bottom:16px"></div>
-        <ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:#166534;margin-bottom:20px">
-          <li data-t="pkg-trial-feat1">✓ 10 منتجات</li>
-          <li data-t="pkg-trial-feat2">✓ شارة محل</li>
-          <li data-t="pkg-trial-feat3">✓ تواصل مباشر</li>
-        </ul>
-        <button class="store-pkg-btn" data-t="pkg-trial-btn" onclick="window.location='rizq_landing_v8.html#register'" style="width:100%;padding:11px;border-radius:11px;border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08);font-weight:800;font-size:13px;cursor:pointer">ابدأ تجربتك المجانية — 3 أيام</button>
-      </div>
-
-      <!-- 🏪 أساسي -->
-      <div class="store-pkg-card" data-pkg="basic" style="background:linear-gradient(160deg,#f8faff,#eff3ff);border:1.5px solid #bfcfef;border-radius:18px;padding:28px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;box-shadow:0 6px 22px rgba(27,58,107,.08)" onmouseover="this.style.transform='translateY(-7px)';this.style.boxShadow='0 16px 34px rgba(27,58,107,.18)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 22px rgba(27,58,107,.08)'">
-        <div style="margin-bottom:12px"><span style="display:inline-flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:13px;background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.35);color:#2563eb;box-shadow:0 3px 10px rgba(37,99,235,.15)"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px"><path d="M9 19 11 8h26l2 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 19a3.6 3.6 0 0 0 7.2 0 3.6 3.6 0 0 0 7.2 0 3.6 3.6 0 0 0 7.2 0 3.6 3.6 0 0 0 7.2 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 22v17a2 2 0 0 0 2 2h22a2 2 0 0 0 2-2V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="20" y="30" width="8" height="11" rx="1.5" stroke="currentColor" stroke-width="2"/></svg></span></div>
-        <div class="pkg-name" data-t="pkg-basic-name" style="font-size:15px;font-weight:800;color:#1B3A6B;margin-bottom:4px">أساسي</div>
-        <div><span class="pkg-price" style="font-size:27px;font-weight:900;color:#1d4ed8">1,500</span> <span style="font-size:12px;color:#5b6b8a;font-weight:600">MRU</span></div>
-        <div class="pkg-period" data-t="pkg-period-monthly" style="font-size:11px;color:#5b6b8a;font-weight:600;margin-bottom:16px">شهرياً</div>
-        <div style="height:1px;background:rgba(27,58,107,.1);margin-bottom:16px"></div>
-        <ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:#3a4a63;margin-bottom:20px">
-          <li data-t="pkg-basic-feat1">✓ 30 منتج</li>
-          <li data-t="pkg-basic-feat2">✓ شارة "محل موثّق"</li>
-          <li data-t="pkg-basic-feat3">✓ إحصائيات</li>
-        </ul>
-        <button class="store-pkg-btn" data-t="pkg-btn-subscribe" onclick="window.location='rizq_landing_v8.html#pricing'" style="width:100%;padding:11px;border-radius:11px;border:none;color:#fff;background:linear-gradient(135deg,#3b82f6,#1d4ed8);font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(29,78,216,.3)">اشترك الآن</button>
-      </div>
-
-      <!-- 🚀 Pro -->
-      <div class="store-pkg-card" data-pkg="pro" style="background:linear-gradient(160deg,#16263d,#0D1B2A);border:2px solid var(--gold);border-radius:18px;padding:32px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;position:relative;box-shadow:0 14px 34px rgba(13,27,42,.32)" onmouseover="this.style.transform='translateY(-7px)';this.style.boxShadow='0 22px 46px rgba(13,27,42,.42)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 14px 34px rgba(13,27,42,.32)'">
-        <div data-t="pkg-pro-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;letter-spacing:1px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.45)">الأكثر اختياراً</div>
-        <div style="font-size:32px;margin-bottom:10px">🚀</div>
-        <div class="pkg-name" style="font-size:16px;font-weight:800;color:#fff;margin-bottom:4px">Pro</div>
-        <div><span class="pkg-price" style="font-size:27px;font-weight:900;color:var(--gold)">4,000</span> <span style="font-size:12px;color:#9fb0cc;font-weight:600">MRU</span></div>
-        <div class="pkg-period" data-t="pkg-period-monthly" style="font-size:11px;color:#9fb0cc;font-weight:600;margin-bottom:16px">شهرياً</div>
-        <div style="height:1px;background:rgba(255,255,255,.12);margin-bottom:16px"></div>
-        <ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:#cdd7e8;margin-bottom:20px">
-          <li data-t="pkg-pro-feat1">✓ منتجات غير محدودة</li>
-          <li data-t="pkg-pro-feat2">✓ أولوية في نتائج البحث</li>
-          <li data-t="pkg-pro-feat3">✓ دعم مخصص</li>
-        </ul>
-        <button class="store-pkg-btn" data-t="pkg-btn-subscribe" onclick="window.location='rizq_landing_v8.html#pricing'" style="width:100%;padding:12px;border-radius:11px;border:none;color:#16263d;background:linear-gradient(135deg,#e8c96a,var(--gold));font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.4)">اشترك الآن</button>
-      </div>
-
-      <!-- 🏢 سنوي -->
-      <div class="store-pkg-card" data-pkg="yearly" style="background:linear-gradient(160deg,#1B3A6B,#0f2347);border:2px solid rgba(201,168,76,.6);border-radius:18px;padding:32px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;position:relative;box-shadow:0 14px 34px rgba(15,35,71,.3)" onmouseover="this.style.transform='translateY(-7px)';this.style.boxShadow='0 22px 46px rgba(15,35,71,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 14px 34px rgba(15,35,71,.3)'">
-        <div data-t="pkg-yearly-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;letter-spacing:1px;white-space:nowrap;box-shadow:0 4px 14px rgba(124,58,237,.45)">🏆 الأفضل قيمة</div>
-        <div style="font-size:32px;margin-bottom:10px">👑</div>
-        <div class="pkg-name" data-t="pkg-yearly-name" style="font-size:16px;font-weight:800;color:#fde68a;margin-bottom:4px">سنوي</div>
-        <div><span class="pkg-price" style="font-size:27px;font-weight:900;color:#fbbf24">30,000</span> <span style="font-size:12px;color:rgba(255,255,255,.55);font-weight:600">MRU</span></div>
-        <div class="pkg-period" data-t="pkg-yearly-period" style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:16px">سنوياً — وفّر 37%</div>
-        <div style="height:1px;background:rgba(255,255,255,.12);margin-bottom:16px"></div>
-        <ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px">
-          <li data-t="pkg-yearly-feat1">✓ كل مزايا Pro</li>
-          <li data-t="pkg-yearly-feat2">✓ خصم 37% عن السعر الشهري</li>
-          <li data-t="pkg-yearly-feat3">✓ فوترة سنوية واحدة</li>
-        </ul>
-        <button class="store-pkg-btn" data-t="pkg-btn-subscribe" onclick="window.location='rizq_landing_v8.html#pricing'" style="width:100%;padding:12px;border-radius:11px;border:none;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 18px rgba(124,58,237,.4)">اشترك الآن</button>
-      </div>
-    </div>
+    <div id="store-packages-grid" data-rizq-pkg-catalog="store" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
   </div>
 </section>
   <!-- ═══ INTRO VIDEO SECTION ═══
@@ -888,36 +826,6 @@ footer{
       document.body.insertBefore(bar, document.body.firstChild);
     }
   }catch(e){}
-})();
-
-// ── مزامنة أسعار/مميزات الباقات من لوحة تحكم الأدمن (rizq_packages في localStorage) ──
-(function syncStorePackagesFromAdmin(){
-  try{
-    const raw = localStorage.getItem('rizq_packages');
-    if(!raw) return;
-    const pkgs = JSON.parse(raw);
-    if(!Array.isArray(pkgs)) return;
-    const order = ['trial','basic','pro','yearly'];
-    order.forEach((key, i) => {
-      const data = pkgs[i];
-      if(!data) return;
-      const card = document.querySelector('.store-pkg-card[data-pkg="'+key+'"]');
-      if(!card) return;
-      if(data.name) card.querySelector('.pkg-name').textContent = data.name;
-      if(data.price !== undefined){
-        const priceEl = card.querySelector('.pkg-price');
-        priceEl.textContent = (data.price === 0 || data.price === '0' || data.price === 'مجاناً') ? _t2('مجاناً','Gratuit') : data.price;
-      }
-      if(data.period){
-        const periodEl = card.querySelector('.pkg-period');
-        periodEl.textContent = data.period;
-      }
-      if(Array.isArray(data.features) && data.features.length){
-        const list = card.querySelector('.pkg-feats');
-        list.innerHTML = data.features.map(f => '<li>✓ '+f+'</li>').join('');
-      }
-    });
-  }catch(e){ /* تجاهل أي خطأ في القراءة — تبقى القيم الافتراضية */ }
 })();
 
 /* ── المفضّلة (Wishlist) — خدمة جديدة للزائر، تعمل بالكامل محلياً في
@@ -1750,6 +1658,7 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_packages_config.js"></script>
+<script src="rizq_packages_ui.js?v=12.8"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
   <script src="rizq_video_ads.js"></script>

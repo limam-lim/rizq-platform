@@ -72,7 +72,8 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 .rzq-sheet-backdrop.open{display:block}
 .rzq-sheet{
   position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;
-  max-height:min(88vh,640px);background:linear-gradient(180deg,#0d1b2a,#132844);
+  max-height:min(72vh,520px);height:auto;
+  background:linear-gradient(180deg,#0d1b2a,#132844);
   border-radius:20px 20px 0 0;border-top:1px solid rgba(201,168,76,.32);
   box-shadow:0 -12px 40px rgba(0,0,0,.35);
   transform:translateY(110%);transition:transform .35s cubic-bezier(.32,1,.23,1);
@@ -127,8 +128,52 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   color:#0f2347 !important;font-size:13px;font-weight:800;border:none;
   border-radius:10px;padding:11px 16px;margin:4px 4px 10px 0;
   text-decoration:none;cursor:pointer;min-height:44px;box-sizing:border-box;
+  white-space:normal;line-height:1.35;text-align:center;
 }
 .rzq-sheet-body .iep-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+
+@media(max-width:768px){
+  /* إخفاء اللوحة الموسّعة داخل الشبكة — الجوال يستخدم بطاقة عائمة فقط */
+  #cat-inline-panel{display:none!important;visibility:hidden!important}
+
+  /* نافذة الفروع — بطاقة عائمة مركزية مدمجة */
+  .rzq-sheet{
+    left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;
+    width:min(88vw,288px)!important;max-width:288px!important;
+    max-height:min(46vh,300px)!important;height:auto!important;
+    border-radius:16px;border:1px solid rgba(201,168,76,.35);
+    padding:8px 10px 10px;
+    box-shadow:0 18px 44px rgba(0,0,0,.48),0 0 0 1px rgba(201,168,76,.12);
+    transform:translate(-50%,-48%) scale(.94)!important;
+    opacity:0;
+    transition:transform .26s cubic-bezier(.32,1,.23,1),opacity .22s ease!important;
+  }
+  .rzq-sheet.open{
+    transform:translate(-50%,-50%) scale(1)!important;
+    opacity:1;
+  }
+  .rzq-sheet-handle{display:none!important}
+  .rzq-sheet-head{padding:0 0 5px;gap:6px}
+  .rzq-sheet-title{font-size:13.5px;line-height:1.25;flex:1;min-width:0}
+  .rzq-sheet-close{width:30px;height:30px;border-radius:8px;font-size:14px;padding:0}
+  .rzq-sheet-body{
+    padding-bottom:2px;
+    max-height:min(34vh,220px)!important;
+  }
+  .rzq-sheet-body a,.rzq-sheet-link,
+  .rzq-sheet-body .qp-link,.rzq-sheet-body .iep-link{
+    font-size:12.5px;padding:7px 8px;min-height:32px;border-radius:8px;
+  }
+  .rzq-sheet-body .iep-group-title{
+    font-size:10.5px;margin:5px 0 2px;padding:0 6px 3px;
+  }
+  .rzq-sheet-body .iep-viewall,.rzq-sheet-body .qp-btn{
+    display:block;width:100%;font-size:11.5px;padding:7px 8px;
+    min-height:32px;margin:0 0 5px;line-height:1.3;
+  }
+  .rzq-sheet-body .iep-actions{margin-bottom:3px;gap:4px}
+  .rzq-sheet-backdrop.open{background:rgba(6,12,24,.42)}
+}
 
 @media(max-width:768px){
   /* Hide vertical side banners */
@@ -210,11 +255,24 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 
   .listings-grid,.hero-biz-nav,.quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
   .pricing-grid,.similar-grid,.dp-similar-grid,.cta-btns,
-  .hero-pills,.store-badges,.store-meta{
+  .store-badges,.store-meta{
     display:flex!important;flex-direction:column!important;
     flex-wrap:nowrap!important;overflow-x:hidden!important;
     width:100%!important;max-width:100%!important;
     gap:12px!important;
+  }
+  /* بيع · اشتر · تميز — 3 أعمدة أفقية على سطر واحد */
+  .hero-pills{
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    justify-content:center!important;align-items:stretch!important;
+    gap:8px!important;width:100%!important;max-width:100%!important;
+    overflow:visible!important;padding:0 10px!important;box-sizing:border-box!important;
+    margin:16px 0 14px!important;
+  }
+  .hero-pill{
+    flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;
+    padding:10px 6px!important;font-size:clamp(12px,3.4vw,14px)!important;
+    text-align:center!important;white-space:nowrap!important;
   }
   .quick-cats{flex-direction:row!important;flex-wrap:wrap!important;justify-content:stretch}
   .quick-cats .qcat{
@@ -291,15 +349,30 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     border-radius:20px 20px 0 0!important;transform:none!important;
     z-index:var(--rzq-z-modal)!important;
   }
+  .rizq-hdr-more-menu,
+  .rizq-hdr-more-menu.is-positioned,
+  .rizq-hdr-more-menu.is-portaled{
+    position:fixed!important;
+    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    width:min(340px,calc(100vw - 16px))!important;
+    min-width:280px!important;
+    max-width:calc(100vw - 16px)!important;
+    border-radius:14px!important;
+    transform:none!important;
+    overflow:visible!important;
+  }
 
   #qcat-portal.rzq-sheet-mode,
   #cat-portal.rzq-sheet-mode{
-    position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
-    transform:none!important;width:100%!important;max-width:none!important;
-    min-width:0!important;max-height:min(88vh,640px)!important;
-    border-radius:20px 20px 0 0!important;margin:0!important;
+    position:fixed!important;left:50%!important;right:auto!important;
+    top:50%!important;bottom:auto!important;
+    transform:translate(-50%,-50%)!important;
+    width:min(88vw,288px)!important;max-width:288px!important;
+    min-width:0!important;max-height:min(46vh,300px)!important;
+    border-radius:16px!important;margin:0!important;
     overflow-y:auto!important;-webkit-overflow-scrolling:touch;
     z-index:var(--rzq-z-modal)!important;
+    padding:8px 10px!important;
   }
 
   .cat-card.open::after,
@@ -335,3 +408,30 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .quick-cats{flex-direction:row!important;flex-wrap:wrap!important}
   .mobile-bottom-nav{padding-bottom:calc(4px + env(safe-area-inset-bottom,0))}
 }
+
+@media(max-width:768px){
+  .rizq-hdr-start{gap:6px}
+}
+
+/* ── «قريباً» — نافذة وشريط (كل الصفحات العامة) ── */
+.cs-strip{background:linear-gradient(135deg,#0D1B2A,#1B3A6B);padding:18px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.cs-strip-title{width:100%;text-align:center;color:#fff;font-size:13px;font-weight:700;margin-bottom:2px}
+.cs-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);border-radius:30px;padding:7px 14px}
+.cs-item-label{font-size:12px;color:#fff;font-weight:600;white-space:nowrap}
+.cs-item-soon{font-size:10px;color:#c9a84c;background:rgba(201,168,76,.16);border-radius:20px;padding:2px 8px;font-weight:700}
+.cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:#c9a84c;border:none;border-radius:20px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.cs-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10050;align-items:center;justify-content:center;padding:16px}
+.cs-modal-overlay.active{display:flex!important;pointer-events:auto!important}
+.cs-modal-box{background:#fff;border-radius:16px;padding:20px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.cs-modal-title{font-size:15px;font-weight:700;color:#1B3A6B;margin-bottom:6px}
+.cs-modal-desc{font-size:12px;color:#5b6b85;margin-bottom:14px;line-height:1.6}
+.cs-modal-input{width:100%;padding:10px 12px;border:1.5px solid #e2e6ee;border-radius:10px;font-size:13px;margin-bottom:10px;box-sizing:border-box;font-family:inherit}
+.cs-modal-submit{width:100%;background:#c9a84c;color:#0D1B2A;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit}
+.cs-modal-cancel{background:none;border:none;color:#8a97ab;font-size:12px;cursor:pointer;font-family:inherit}
+#rizq-toast-global{
+  position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0));transform:translateX(-50%) translateY(12px);
+  background:#0f172a;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);border:1px solid rgba(201,168,76,.35);
+  z-index:10060;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;max-width:min(92vw,340px);text-align:center;
+}
+#rizq-toast-global.show{opacity:1;transform:translateX(-50%) translateY(0)}

@@ -147,29 +147,6 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
   align-items:center;
 }
 
-.hero-ai-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  width:fit-content;
-  margin:0 auto 18px;
-  padding:10px 22px;
-  border-radius:100px;
-  border:1px solid rgba(201,168,76,.35);
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
-  color:var(--gold-light,#e8c96a);
-  font-size:13px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer;
-  transition:transform .2s,box-shadow .2s;
-}
-.hero-ai-btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(27,58,107,.25);
-}
-
 .why-section > .section-header,
 #prices > .section-header,
 .pricing-section > .section-header,
