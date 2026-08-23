@@ -439,6 +439,31 @@ var SECRECY_RULES = {
 // ═══════════════════════════════════════════════════════════════
 // CORE ENGINE
 // ═══════════════════════════════════════════════════════════════
+function _detectLangSwitchRequest(text) {
+  if (!text) return null;
+  var lower = _norm(text);
+  var hasIntent = /اقصد|أقصد|قصدت|أريد|اريد|بدي|talk in|speak in|parle en|habla en|respond in|reply in|بال|تكلم|كلمني|حكي|meant|mean|quiero hablar|je veux|i want/.test(lower);
+  var hasLangWord = /espa|espagn|spanish|سبان|english|anglais|انجل|fran[cç]|french|فرنس|عربي|arabic|حسان|hassani|hassaniya/.test(lower);
+  if (!hasIntent && !hasLangWord) return null;
+  if (/espa[nñ]?ol|espagn|spanish|سبان|اسبان|بالاسبان|en español|habla espa|hablar español/.test(lower)) return 'es';
+  if (/fran[cç]ais|french|فرنس|الفرنس|بالفرنس|en français|parle fran|hablar franc/.test(lower)) return 'fr';
+  if (/english|anglais|إنجلiz|انجلiz|الإنجلiz|بالإنجلiz|speak english|in english/.test(lower)) return 'en';
+  if (/hassan|حسان|hs|بالحسانية/.test(lower)) return 'hs';
+  if (/عربي|arabic|العربية|بالعربية|تكلم عربي|in arabic/.test(lower)) return 'ar';
+  return null;
+}
+
+function _langSwitchReply(targetLang) {
+  var ls = {
+    ar: 'بكل سرور! 😊 اكتب سؤالك بالعربية — كيف أساعدك؟',
+    hs: 'واخا! 😊 شنو بغيتي؟',
+    fr: 'Bien sûr ! 😊 Comment puis-je vous aider ?',
+    en: 'Of course! 😊 What would you like to know?',
+    es: '¡Claro! 😊 ¿En qué puedo ayudarte?'
+  };
+  return ls[targetLang] || ls.ar;
+}
+
 function _detectLang(text) {
   if (!text) return 'ar';
   var lower = text.toLowerCase();
@@ -546,6 +571,11 @@ function processMessage(userMessage, context) {
   if (_isBlocked(text)) {
     _escalateToHuman(text, lang, context, 'blocked');
     return { reply: _blockedReply(text, lang), lang: lang, blocked: true };
+  }
+
+  var switchTo = _detectLangSwitchRequest(text);
+  if (switchTo) {
+    return { reply: _langSwitchReply(switchTo), lang: switchTo, langSwitch: true };
   }
 
   var pageAd = context.pageContext && context.pageContext.ad;
@@ -681,10 +711,13 @@ function processMessage(userMessage, context) {
     return { reply: lang==='fr' ? '\uD83D\uDC8E VIP! Votre gestionnaire de compte vous contactera dans 2 minutes.' : '\uD83D\uDC8E VIP! \u0645\u062F\u064A\u0631 \u062D\u0633\u0627\u0628\u0643 \u0633\u064A\u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0643 \u062E\u0644\u0627\u0644 \u062F\u0642\u064A\u0642\u062A\u064A\u0646.', lang: lang, vip: true };
   }
 
-  // Language switch
+  // Language switch (legacy phrases — kept for direct requests)
   if (/espa[n\u00f1]ol|habla espa|speak english|parle fran|\u062A\u0643\u0644\u0645 \u0639\u0631\u0628\u064A/.test(lower)) {
-    var ls={ar:'\u0628\u0643\u0644 \u0633\u0631\u0648\u0631! \u0627\u0643\u062A\u0628 \u0633\u0624\u0627\u0644\u0643 \u0628\u0627\u0644\u0639\u0631\u0628\u064A\u0629.',es:'\u00A1Claro! \uD83D\uDE0A \u00BFEn qu\u00E9 puedo ayudarte?',fr:'Bien s\u00FBr! \uD83D\uDE0A Comment puis-je vous aider?',en:'Of course! \uD83D\uDE0A What would you like to know?'};
-    return { reply: ls[lang]||ls.ar, lang: lang };
+    var legacyLang = /espa[n\u00f1]ol|habla espa/.test(lower) ? 'es'
+      : /speak english/.test(lower) ? 'en'
+      : /parle fran/.test(lower) ? 'fr'
+      : 'ar';
+    return { reply: _langSwitchReply(legacyLang), lang: legacyLang, langSwitch: true };
   }
   var cf = {ar:'\u0645\u0627 \u0641\u0647\u0645\u062A \uD83D\uDE0A \u0645\u0645\u0643\u0646 \u062A\u0648\u0636\u062D\u061F',es:'No entend\u00ED \uD83D\uDE0A \u00BFPuedes explicar m\u00E1s?',fr:'Je n ai pas compris \uD83D\uDE0A Pouvez-vous pr\u00E9ciser?',en:'Didn\'t catch that \uD83D\uDE0A Could you clarify?',hs:'\u0645\u0627 \u0641\u0647\u0645\u062A\u0634 \uD83D\uDE0A \u0648\u0636\u062D \u0644\u064A.'};
   _logMissedQuestion(userMessage, lang, context);
@@ -776,6 +809,7 @@ function _applyManagerConfigOverrides(cfg){
   var API = {
     processMessage: processMessage,
     detectLanguage: _detectLang,
+    detectLangSwitchRequest: _detectLangSwitchRequest,
     FAQ: FAQ,
     IDENTITY: RIZQ_IDENTITY,
     SUBSCRIPTIONS: SUBSCRIPTIONS_GUIDE,

@@ -213,7 +213,7 @@
     var _open = false;
     var _typing = false;
     var _history = [];
-    var _ctx = { tier: 'visitor', lang: 'ar' };
+    var _ctx = { tier: 'visitor', lang: 'ar', chatLang: null };
     var _AVATAR = _rizqAvatarSvg(32);
 
     /* ══════════════════════════════════════════════════════
@@ -568,14 +568,18 @@
     function _detectMessageLang(userText) {
       var t = String(userText || '').trim();
       var lower = t.toLowerCase();
-      if (!t) return _ctx.lang || 'ar';
+      if (!t) return _ctx.chatLang || _ctx.lang || 'ar';
+      if (window.RizqManager && typeof window.RizqManager.detectLangSwitchRequest === 'function') {
+        var sw = window.RizqManager.detectLangSwitchRequest(t);
+        if (sw) return sw;
+      }
       if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|ما\s*كاين|دراري|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|حسانية|شنهي/.test(t)) return 'hs';
-      if (/[\u0600-\u06FF]/.test(t)) return 'ar';
+      if (/[\u0600-\u06FF]/.test(t)) return _ctx.chatLang || _ctx.lang || 'ar';
       if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonjour/.test(lower)) return 'fr';
       if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
       if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package|hi\b|hey\b/.test(lower)) return 'en';
       if (/[a-z]/i.test(t)) return 'en';
-      return _ctx.lang || 'ar';
+      return _ctx.chatLang || _ctx.lang || 'ar';
     }
 
     function _agentFetchUrls() {
@@ -610,10 +614,11 @@
         try {
           var result = mgr.processMessage(userText, Object.assign({}, _ctx, {
             uiLang: _ctx.lang,
-            lang: msgLang,
+            lang: _ctx.chatLang || msgLang,
             pageContext: pageCtx
           }));
           var reply = result && (result.reply != null ? result.reply : result);
+          if (result && result.lang) _ctx.chatLang = result.lang;
           if (reply) return String(reply);
         } catch (eMgr) {
           console.error('Widget Chat Error: offline RizqManager fallback failed', eMgr);
@@ -628,6 +633,20 @@
       var pick = function (map) {
         return map[L] || map.ar || map.en;
       };
+      if (window.RizqManager && typeof window.RizqManager.detectLangSwitchRequest === 'function') {
+        var sw = window.RizqManager.detectLangSwitchRequest(text);
+        if (sw) {
+          _ctx.chatLang = sw;
+          var ls = {
+            ar: 'بكل سرور! 😊 اكتب سؤالك بالعربية — كيف أساعدك؟',
+            hs: 'واخا! 😊 شنو بغيتي؟',
+            fr: 'Bien sûr ! 😊 Comment puis-je vous aider ?',
+            en: 'Of course! 😊 What would you like to know?',
+            es: '¡Claro! 😊 ¿En qué puedo ayudarte?'
+          };
+          return ls[sw] || ls.ar;
+        }
+      }
       if (/^(hi|hello|hey|hola|bonjour|salut|مرحب|اهلا|أهلا|السلام)/.test(lower)) {
         return pick({
           ar: 'أهلاً! 👋 أنا مدير رزق الذكي (وضع محلي — الخادم غير متصل). كيف أساعدك؟',
@@ -711,7 +730,7 @@
       var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 45000) : null;
       var payload = {
         message: userText,
-        lang: _detectMessageLang(userText),
+        lang: _ctx.chatLang || _detectMessageLang(userText),
         uiLang: _ctx.lang,
         autoLang: true,
         agentTier: _resolveAgentTier(),
