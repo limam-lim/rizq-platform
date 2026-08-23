@@ -6,6 +6,7 @@ const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
 const { getAnthropicApiKey, isAnthropicConfigured, getFastModel, createCachedMessage } = require('../config/anthropic');
 const { buildPackagesPromptBlock } = require('../../rizq_packages_config');
+const RizqAgent = require('../../rizq_agent');
 
 const client = new Anthropic({ apiKey: getAnthropicApiKey() });
 
@@ -29,10 +30,21 @@ function buildLanguageInstructions(detectedLang, uiLang) {
   );
 }
 
-function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts }) {
+function buildDiamondSystemBlock() {
+  return RizqAgent.buildMasterSystemPrompt({ agentTier: 'diamond' });
+}
+
+function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
   let prompt = buildLanguageInstructions(replyLang, uiLang);
+  prompt += '\n' + RizqAgent.buildMasterSystemPrompt({
+    agentTier: agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
+    profile: profile || null
+  });
+  if (extraInstruction) {
+    prompt += `\n## Extra language instruction\n${String(extraInstruction).slice(0, 1200)}\n`;
+  }
 
   if (profile && profile.businessName) {
     const agentTitle = (profile.persona && profile.persona.agentTitle) || pickLang({
@@ -76,6 +88,7 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
 
   prompt +=
     '\n[Security]\n' +
+    RizqAgent.buildSecurityBlock() + '\n' +
     '- Do not expose seller phone numbers — point to "show number" on the page.\n' +
     '- Do not invent ad ids or account ids.\n' +
     '- For complaints: create_support_ticket or the report button.\n';
@@ -275,8 +288,30 @@ async function handleWidgetChat(body) {
 
   const uiLang = normalizeUiLang(body.uiLang || lang);
   const detectedLang = detectUserLanguage(text, uiLang);
+
+  if (RizqAgent.isBlockedRequest(text)) {
+    return {
+      ok: true,
+      reply: RizqAgent.resolveBlockedReply(text, detectedLang),
+      lang: detectedLang,
+      blocked: true,
+      model: 'policy-guard',
+    };
+  }
+
   const pageFacts = resolvePageContextFacts(pageContext);
-  const systemPrompt = buildSystemPrompt({ lang: uiLang, detectedLang, profile, pageContext, pageFacts });
+  const extraInstruction = (body.autoLang === true || body.systemInstruction)
+    ? (body.systemInstruction || 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, or English) and reply only in that language.')
+    : '';
+  const systemPrompt = buildSystemPrompt({
+    lang: uiLang,
+    detectedLang,
+    profile,
+    pageContext,
+    pageFacts,
+    extraInstruction,
+    agentTier: body.agentTier || 'diamond',
+  });
   const adFlow = isAdFlowQuery(text, pageContext);
   const preferredModel = getFastModel();
 
@@ -390,6 +425,7 @@ async function handleWidgetChat(body) {
 module.exports = {
   handleWidgetChat,
   buildSystemPrompt,
+  buildDiamondSystemBlock,
   validateReply,
   detectUserLanguage,
 };

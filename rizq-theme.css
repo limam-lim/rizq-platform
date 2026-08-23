@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
 /* ================================================================
    RIZQ — THÈME OFFICIEL v2.1
    Mohamed Limam | ADMINIA SARL | contact@adminia.mr
@@ -6,6 +8,468 @@
    (navbar, footer, boutons gold, ADMINIA) sans écraser le style
    sombre de la landing page.
    ================================================================ */
+
+*, *::before, *::after {
+  font-family: 'Cairo', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[dir="ltr"] .nav-center,
+html[dir="ltr"] .nav-dropdown-menu,
+html[dir="ltr"] .rizq-hdr-more-menu,
+html[dir="ltr"] .more-menu,
+html[dir="ltr"] .why-grid,
+html[dir="ltr"] .rizq-hdr-row2 {
+  direction: ltr;
+  text-align: start;
+}
+html[dir="rtl"] .nav-center,
+html[dir="rtl"] .nav-dropdown-menu,
+html[dir="rtl"] .rizq-hdr-more-menu,
+html[dir="rtl"] .more-menu,
+html[dir="rtl"] .why-grid,
+html[dir="rtl"] .rizq-hdr-row2 {
+  direction: rtl;
+  text-align: start;
+}
+/* Official lockup: R, mark + Georgia رزق + italic RIZQ PLATFORM */
+.logo,
+.rizq-hdr-brand {
+  direction: ltr !important;
+}
+.logo-ar,
+.logo-sub,
+.logo-text,
+.rizq-logo-text,
+.rizq-hdr-brand-ar,
+.rizq-hdr-brand-sub,
+.rn-logo-ar,
+.rn-logo-sub,
+.rn-logo-text,
+.sb-logo-ar,
+.sb-logo-sub {
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+html .logo-ar,
+html .rizq-logo-text .logo-ar,
+html .logo-text .logo-ar,
+html .rizq-hdr-brand-ar,
+html .rn-logo-ar {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #C9A84C !important;
+  line-height: 1 !important;
+  text-shadow: 0 0 16px rgba(201,168,76,.4) !important;
+  direction: rtl !important;
+  unicode-bidi: isolate !important;
+  display: block !important;
+}
+html .logo-text,
+html .rizq-logo-text,
+html .rn-logo-text,
+html .rizq-hdr-brand .logo-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  text-align: right !important;
+  direction: ltr !important;
+  line-height: 1.05 !important;
+}
+html .logo-sub,
+html .rizq-hdr-brand-sub,
+html .rn-logo-sub,
+html .sb-logo-sub {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-style: italic !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.6px !important;
+  text-transform: uppercase !important;
+  color: rgba(201,168,76,.65) !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+.logo-mark,
+.rizq-promo-mark,
+.nav-logo-ring,
+.sb-logo-icon,
+.sb-logo-mark,
+.footer-logo-mark,
+.login-logo,
+.rn-logo-btn,
+.modal-logo-r {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  color: transparent !important;
+}
+.logo-mark-img,
+.rizq-hdr-brand-mark {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  background: #0f172a !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 0 1px rgba(201,168,76,.28) !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+}
+.logo-mark:not(:has(img)),
+.rizq-promo-mark:not(:has(img)),
+.sb-logo-icon:not(:has(img)),
+.sb-logo-mark:not(:has(img)),
+.nav-logo-ring:not(:has(img)),
+.login-logo:not(:has(img)),
+.rn-logo-btn:not(:has(img)),
+.modal-logo-r:not(:has(img)) {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  background: #0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 0 1px rgba(201,168,76,.28) !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+.logo-mark svg,
+.sb-logo-mark svg,
+.sb-logo-icon svg,
+.footer-logo-mark svg,
+.login-logo svg,
+.nav-logo-ring svg,
+.rizq-promo-mark svg,
+.rn-logo-btn svg,
+.modal-logo svg,
+.modal-logo-r svg,
+.fixed-rizq-logo svg,
+.rizq-splash-mark svg {
+  display: none !important;
+}
+.fixed-rizq-logo img,
+.fixed-rizq-logo .logo-mark-img {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+.fixed-rizq-logo:not(:has(img))::before {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #0f172a url('rizq-mark-512.png') center / contain no-repeat;
+}
+div[style*="width:38px"][style*="border:2px"],
+.logo-mark[style*="border:2px"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav), .topnav {
+  background: #0f172a !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Dropdown menus must sit above the gold/yellow announcement strip */
+.nav-dropdown-menu,
+.more-menu {
+  position: absolute !important;
+  z-index: 999999 !important;
+}
+.rizq-hdr-more-menu.is-portaled,
+.rizq-hdr-more-menu.is-portaled.open,
+.rizq-hdr-more-menu.is-positioned {
+  position: fixed !important;
+  right: auto !important;
+  z-index: 10049 !important;
+}
+.rizq-hdr-more-menu:not(.is-portaled):not(.is-positioned) {
+  position: absolute !important;
+  z-index: 999999 !important;
+}
+
+#rizq-announce-bar,
+.ticker-wrap,
+.section-jump-bar {
+  z-index: 100 !important;
+}
+
+/* ══ Rizq legal sidebar (fixed-disc-pill) — hidden until edge hover ══ */
+#rizq-disc-edge {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  z-index: 1198;
+  pointer-events: auto;
+  background: transparent;
+}
+
+#rizq-disc-sidebar {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateX(-110%) translateY(-50%);
+  z-index: 1200;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#rizq-disc-sidebar.rizq-disc-visible {
+  display: block;
+  transform: translateX(0) translateY(-50%);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#rizq-disc-sidebar .fixed-disc-pill {
+  display: block !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0;
+  padding-top: 28px;
+  max-width: 52px;
+}
+
+.rizq-disc-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(201, 168, 76, 0.55);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.95);
+  color: #E8C96A;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: inherit;
+}
+
+.rizq-disc-close:hover {
+  background: rgba(201, 168, 76, 0.22);
+  border-color: #C9A84C;
+}
+
+/* Standalone pill hidden — only shown inside #rizq-disc-sidebar */
+.fixed-disc-pill {
+  display: none !important;
+}
+
+#rizq-disc-sidebar .fixed-disc-pill {
+  display: block !important;
+}
+
+body.rizq-disc-sidebar-dismissed #rizq-disc-edge,
+body.rizq-disc-sidebar-dismissed #rizq-disc-sidebar {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  #rizq-disc-edge,
+  #rizq-disc-sidebar {
+    display: none !important;
+  }
+}
+
+/* Interactive elements — enforce pointer cursor */
+a,
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+label.filter-option,
+select,
+summary,
+.clickable,
+.nav-center a,
+.nav-center li,
+.nav-center .nav-link-btn,
+.nav-dropdown-trigger,
+.nav-dropdown-menu a,
+.nav-dropdown-menu .nav-dd-item,
+.nav-dd-item,
+.rizq-hdr-item,
+.rizq-hdr-post,
+.rizq-hdr-more-menu a,
+.rizq-hdr-more-wrap > button,
+.filter-title,
+.filter-title button,
+.chip,
+.tag-link,
+.cat-card,
+.qcat,
+.mtab,
+.ed-cat-chip,
+.hero-biz-btn,
+.section-jump-bar a,
+.section-jump-bar button,
+.fixed-disc-pill,
+.btn-lang,
+.btn-post,
+.btn-ns,
+.nav-account-btn,
+.mobile-filter-btn,
+.rc-featured-banner,
+.pagination-btn,
+.pagination-num {
+  cursor: pointer !important;
+}
+
+/* ══ Main nav order: RTL → الرئيسية far right … المزيد far left; LTR mirrored ══ */
+html[dir="rtl"] .nav-center,
+html[dir="rtl"] #rizq-desk-nav .nav-center,
+html[dir="rtl"] .rizq-hdr-row2 {
+  direction: rtl;
+  display: flex;
+  flex-direction: row;
+}
+
+html[dir="ltr"] .nav-center,
+html[dir="ltr"] #rizq-desk-nav .nav-center,
+html[dir="ltr"] .rizq-hdr-row2 {
+  direction: ltr;
+  display: flex;
+  flex-direction: row;
+}
+
+[data-nav-order="1"] { order: 1; }
+[data-nav-order="2"] { order: 2; }
+[data-nav-order="3"] { order: 3; }
+[data-nav-order="4"] { order: 4; }
+[data-nav-order="5"] { order: 5; }
+[data-nav-order="6"] { order: 6; }
+[data-nav-order="7"] { order: 7; }
+[data-nav-order="8"] { order: 8; }
+[data-nav-order="9"] { order: 9; }
+[data-nav-order="10"] { order: 10; }
+
+html[dir="rtl"] .nav-dropdown-menu,
+html[dir="rtl"] .rizq-hdr-more-menu {
+  direction: rtl;
+  text-align: start;
+}
+
+html[dir="ltr"] .nav-dropdown-menu,
+html[dir="ltr"] .rizq-hdr-more-menu {
+  direction: ltr;
+  text-align: start;
+}
+
+/* ══ R sidebar widget (.fixed-rizq-logo) — always right, hover reveal ══ */
+.fixed-rizq-logo {
+  position: fixed !important;
+  right: 20px !important;
+  left: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 999999 !important;
+}
+
+.fixed-rizq-logo.rzq-rlogo-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#rizq-rlogo-edge {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: auto;
+  width: 24px;
+  z-index: 999998;
+  pointer-events: auto;
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  #rizq-rlogo-edge {
+    display: none !important;
+  }
+}
+
+/* REMOVE ALL FLOATING CURSOR ELEMENTS */
+html, body { cursor: auto !important; }
+input, textarea, select, [contenteditable="true"] { cursor: text !important; }
+#cur, #cur-ring, #cursor-dot, .cursor-dot, .mouse-follower, .cursor-follower,
+[id="cursor"], [id="cursor-dot"], [id*="cursor-"], [class*="cursor-dot"], [class*="cursor-follower"], [class*="mouse-follower"] {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+#rizq-lang-btn, .btn-lang-primary, nav .btn-lang, .topnav .btn-lang {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  background: #0f172a !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1.5px solid #C9A84C !important;
+  color: #E8C96A !important;
+  border-radius: 999px !important;
+  padding: 6px 14px !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  letter-spacing: .2px !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+}
+
+.btn-primary:active, .btn-register:active, .btn-next:active, .btn-post:active {
+  transform: scale(0.98) !important;
+  transition: transform 0.15s ease !important;
+}
 
 :root {
   --bd:      #0f1f3d;
@@ -61,43 +525,20 @@
 }
 /* Landing nav est sticky — pas de class topnav */
 nav.scrolled {
-  background: rgba(8,15,30,0.96) !important;
-  border-bottom: 1px solid rgba(201,168,76,0.15) !important;
+  background: #0f172a !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ── LOGO ── */
 .rizq-logo-text { color: var(--gold) !important; }
 
-/* ── LANGUE AR/FR ──────────────────────────────────────────────────
-   زر لغة واحد موحّد الموضع في كل صفحات المنصة (2026-08-04): بغضّ النظر
-   عن مكانه داخل DOM كل صفحة، position:fixed يضعه دائماً في نفس البقعة
-   الفعلية أعلى يسار الشاشة — بلا حاجة لنقل أي عنصر أو تكرار الترميز. ── */
-.btn-lang, .rizq-lang-btn {
-  position: fixed !important;
-  top: 14px !important;
-  left: 14px !important;
-  z-index: 99999 !important;
-  background: rgba(13,10,4,0.72) !important;
-  backdrop-filter: blur(6px) !important;
-  border: 1px solid rgba(201,168,76,0.5) !important;
-  color: var(--gold) !important;
-  padding: 7px 15px !important;
-  border-radius: 20px !important;
-  font-weight: 800 !important;
-  font-size: 12px !important;
-  cursor: pointer !important;
-  transition: all 0.25s !important;
-  font-family: inherit !important;
-  letter-spacing: 1px !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
-}
+/* ── LANGUE — pill lives in the unified header (rizq_header.css). Do not float. ── */
 .btn-lang:hover, .btn-lang.active, .rizq-lang-btn:hover {
-  border-color: var(--gold) !important;
-  background: rgba(13,10,4,0.9) !important;
-  transform: scale(1.05) !important;
-}
-@media (max-width:768px) {
-  .btn-lang, .rizq-lang-btn { top: auto !important; bottom: 14px !important; left: 14px !important; }
+  border-color: #E8C96A !important;
+  background: rgba(201,168,76,.18) !important;
+  transform: scale(0.98) !important;
 }
 
 /* ══════════════════════════════════
@@ -306,10 +747,60 @@ html[dir="rtl"] .section-title { text-align: right; }
 html[dir="ltr"] .form-group label,
 html[dir="ltr"] .form-label,
 html[dir="ltr"] .section-title { text-align: left; }
+html[dir="rtl"] .section-header .section-title,
+html[dir="ltr"] .section-header .section-title,
+html[dir="rtl"] .section-header .section-tag,
+html[dir="ltr"] .section-header .section-tag,
+html[dir="rtl"] .section-header .section-desc,
+html[dir="ltr"] .section-header .section-desc { text-align: center; }
 html[dir="ltr"] .mobile-drawer { right: auto; left: 0; }
-html[dir="ltr"] .fixed-rizq-logo { right: auto; left: 0; border-radius: 0 10px 10px 0; }
+/* .fixed-rizq-logo stays on the right in all languages — see rules above */
 [dir="ltr"] input[type="tel"],
 [dir="ltr"] input[type="email"],
 [href^="tel"] { direction: ltr !important; unicode-bidi: isolate; text-align: left; }
 html[dir="rtl"] select { text-align: right; }
 html[dir="ltr"] select { text-align: left; }
+
+.rzq-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px auto;
+  max-width: 420px;
+  padding: 28px 22px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  color: #6a7a8a;
+  font-size: 14px;
+  text-align: center;
+}
+.rzq-empty::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: linear-gradient(90deg, #1B3A6B, #C9A84C, #1B3A6B);
+}
+.rzq-empty::after {
+  content: '◇';
+  font-size: 22px;
+  color: #C9A84C;
+  opacity: 0.7;
+}
+
+.btn-primary:active,
+.btn-register:active,
+.btn-next:active,
+.btn-post:active,
+.cat-btn:active {
+  transform: scale(0.98) !important;
+  transition: transform 0.15s ease !important;
+}

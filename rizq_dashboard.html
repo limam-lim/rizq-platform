@@ -391,8 +391,8 @@ main, .page-content.active, .main-content, .results-area,
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-row">
-      <div class="logo-mark" onclick="location.href='rizq_landing_v8.html'" style="cursor:pointer" title="الصفحة الرئيسية"><svg viewBox="0 0 40 40" width="34" height="34" style="display:block" aria-hidden="true"><text x="26" y="28" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" font-weight="900" fill="currentColor">ر</text><text x="13" y="27" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="17" font-weight="900" fill="currentColor">R</text></svg></div>
-      <span class="logo-ar">رزق</span>
+      <div class="logo-mark" onclick="location.href='rizq_landing_v8.html'" style="cursor:pointer" title="الصفحة الرئيسية"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+      <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>
     </div>
   </div>
 
@@ -2172,7 +2172,7 @@ function rizqShare(title, url) {
     // [data-ph] تلقائياً من القاموس المركزي؛ هذه الدالة تبقى فقط للسلوك
     // الخاص بهذه الصفحة الذي لا يعرفه المحرك العام (أيام الرسم البياني،
     // حالة الإعلانات، الخط).
-    document.body.style.fontFamily = lang === 'ar' ? "'Cairo','Tajawal',sans-serif" : "'Cairo',sans-serif";
+    document.body.style.fontFamily = "'Cairo', sans-serif";
 
     // أيام الرسم البياني
     const days = lang === 'ar' ? DAYS_AR : DAYS_FR;

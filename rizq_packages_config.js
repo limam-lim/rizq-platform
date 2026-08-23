@@ -42,7 +42,19 @@ var NAMES = {
   'cp-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'cp-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'cp-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'cp-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' }
+  'cp-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  'of-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
+  'of-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
+  'of-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
+  'of-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
+  'of-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  'vid-basic':    { ar: 'أساسي (فيديو)', fr: 'Basique (vidéo)', en: 'Basic (video)', es: 'Básico (video)', hs: 'أساسي (فيديو)' },
+  'vid-pro':      { ar: 'احترافي (فيديو)', fr: 'Pro (vidéo)', en: 'Pro (video)', es: 'Pro (video)', hs: 'احترافي (فيديو)' },
+  'vid-business': { ar: 'أعمال ومعارض', fr: 'Business & showrooms', en: 'Business & showrooms', es: 'Negocios y showrooms', hs: 'أعمال ومعارض' },
+  'tnd-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
+  'tnd-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
+  'tnd-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
+  'vp-year':   { ar: 'موثّق⁺ سنوية', fr: 'Vérifié⁺ annuel', en: 'Verified+ yearly', es: 'Verificado⁺ anual', hs: 'موثّق⁺ سنوية' }
 };
 
 var DIAMOND_FEATURES = [
@@ -135,9 +147,11 @@ var CATALOGS = {
     Object.assign({ id: 'st-diam', price: 3500, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
   ],
   office: [
-    { id: 'ins-basic', price: 1500, durationDays: 30, discountPct: 2, features: ['حتى 5 عروض تأمين نشطة', 'ظهور في قسم وكالات التأمين', 'شارة وكالة مسجّلة'] },
-    { id: 'ins-pro',   price: 4000, durationDays: 30, discountPct: 3, features: ['عروض غير محدودة', 'تثبيت أعلى نتائج القسم', 'شارة وكالة مميّزة برزق', 'إحصائيات مشاهدات أسبوعية'] },
-    { id: 'ins-corp',  price: 9000, durationDays: 30, discountPct: 5, features: ['كل ما تشمله الاحترافية', 'بانر ترويجي في صفحة القسم', 'مدير حساب مخصص', 'تقارير أداء شهرية PDF'] }
+    { id: 'of-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['عرض الخدمات', 'صفحة المكتب', 'طلبات تواصل', 'دعم فني أساسي'] },
+    { id: 'of-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['جميع المزايا', 'شارة موثّق', 'إحصائيات', 'فيديو تعريفي مشمول', 'دعم بالأولوية'] },
+    { id: 'of-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['توفير 14%', 'جميع المزايا', 'فيديو تعريفي مشمول', 'مدير حساب مخصص'] },
+    { id: 'of-year',  price: 28000, durationDays: 365, discountPct: 3, features: ['توفير 33%', 'أفضل قيمة', 'فيديو مشمول + 1 إضافي مجاني', 'أولوية الدعم'] },
+    Object.assign({ id: 'of-diam', price: 5000, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
   ],
   corp: [
     { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'] },
@@ -327,14 +341,16 @@ function localizedName(pkg, lang) {
   if (isDiamondPackage(pkg)) return diamondCopy(lang).name;
   var map = NAMES[pkg.id];
   if (map && map[lang]) return map[lang];
-  if (pkg.name) return String(pkg.name).replace(/💎\s*/g, '').trim();
-  return pkg.id || '';
+  var raw = pkg.name ? String(pkg.name).replace(/💎\s*/g, '').trim() : '';
+  if (raw && raw !== String(pkg.id || '') && !/^[a-z]{2,}-[a-z0-9-]+$/i.test(raw)) return raw;
+  if (map && map.ar) return map.ar;
+  return raw || pkg.id || '';
 }
 
 function periodLabel(pkg, lang) {
   lang = _normLang(lang);
   var t = PERIODS[lang] || PERIODS.ar;
-  if (pkg.period) return pkg.period;
+  if (pkg.period && !/^MRU\s*\//i.test(String(pkg.period))) return pkg.period;
   if (!pkg.price) return t.freeDays.replace('{n}', String(pkg.durationDays || 3));
   if (pkg.durationDays >= 360) return t.year;
   if (pkg.durationDays >= 80) return t.quarter;

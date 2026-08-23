@@ -11,6 +11,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
+  <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+  <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
 <meta name="description" content="انشر إعلانك على رزق وصل لآلاف المشترين في موريتانيا — مجاناً وسريعاً"/>
 <meta property="og:title" content="انشر إعلانك مجاناً | رزق"/>
@@ -19,6 +21,8 @@
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>انشر إعلانك | رزق</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -28,11 +32,12 @@
   --s-gold:0 0 40px rgba(201,168,76,.15);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI','Arial',sans-serif;background:#f8faff;color:#1a2535;min-height:100vh;overflow-x:hidden}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;color:#1a2535;min-height:100vh;overflow-x:hidden}
+*,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 
 /* ══ NAVBAR ══ */
-nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(201,168,76,.12);height:60px;display:flex;align-items:center;padding:0 4%;gap:14px;direction:ltr}
+nav{position:sticky;top:0;z-index:1000;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.1);height:60px;display:flex;align-items:center;padding:0 4%;gap:14px;direction:ltr}
 .logo{display:flex;align-items:center;gap:8px;text-decoration:none;order:5}
 .nav-title{order:2}
 .btn-ns{order:3}
@@ -42,15 +47,34 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
 .logo-text .logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;white-space:nowrap}
 .nav-title{font-size:14px;font-weight:700;color:var(--white);margin-right:auto}
-.btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:#a0b4c8;padding:6px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s}
+.btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:#a0b4c8;padding:6px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Cairo',system-ui,sans-serif;transition:transform .15s ease,border-color .3s,color .3s}
+.btn-ns:active{transform:scale(0.98)}
 .btn-ns:hover{border-color:rgba(201,168,76,.4);color:var(--gold)}
 
 /* ══ PROGRESS ══ */
 .progress-bar{background:#fff;border-bottom:1px solid #e2e8f5;padding:16px 4%}
-.progress-steps{display:flex;align-items:center;gap:0;max-width:700px;margin:0 auto}
+.progress-steps{display:flex;align-items:center;gap:0;max-width:700px;margin:0 auto;position:relative}
 .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative}
-.step:not(:last-child)::after{content:'';position:absolute;top:17px;left:-50%;width:100%;height:2px;background:rgba(13,27,42,.08);z-index:0}
+.step:not(:last-child)::after{content:'';position:absolute;top:17px;height:2px;background:rgba(13,27,42,.08);z-index:0}
 .step.done:not(:last-child)::after{background:var(--gold)}
+/* RTL (Arabic): line runs right → left between step centers */
+html[dir="rtl"] .progress-steps{direction:rtl}
+html[dir="rtl"] .progress-steps .step:not(:last-child)::after{
+  left:-50% !important;
+  right:auto !important;
+  width:100% !important;
+  transform:none !important;
+  transform-origin:center !important;
+}
+/* LTR (French): line runs left → right from each step center to the next */
+html[dir="ltr"] .progress-steps{direction:ltr}
+html[dir="ltr"] .progress-steps .step:not(:last-child)::after{
+  left:50% !important;
+  right:auto !important;
+  width:100% !important;
+  transform:none !important;
+  transform-origin:left center !important;
+}
 .step-circle{width:34px;height:34px;border-radius:50%;background:#f8faff;border:2px solid rgba(13,27,42,.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--text-muted);transition:all .4s;position:relative;z-index:1}
 .step.done .step-circle{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);color:var(--royal-dark)}
 .step.active .step-circle{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.3)}
@@ -61,7 +85,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 /* ══ MAIN ══ */
 .post-wrap{max-width:800px;margin:0 auto;padding:32px 4% 80px}
 .post-panel{display:none;animation:fadeIn .4s ease}
-.post-panel.active{display:block}
+.post-panel.active{display:block;background:#fff;border:1px solid rgba(226,232,240,0.8);border-radius:18px;padding:24px;box-shadow:0 10px 30px -10px rgba(0,0,0,0.08)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 .panel-title{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:700;color:#1a2535;margin-bottom:6px}
@@ -71,7 +95,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .form-group{margin-bottom:20px}
 .form-label{font-size:13px;font-weight:700;color:var(--text-soft);margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .form-label .req{color:var(--gold)}
-.form-input,.form-select,.form-textarea{width:100%;background:#f8faff;border:1px solid rgba(13,27,42,.1);border-radius:12px;padding:13px 16px;color:#1a2535;font-size:14px;font-family:'Segoe UI','Arial',sans-serif;outline:none;transition:all .3s;}
+.form-input,.form-select,.form-textarea{width:100%;background:#f8faff;border:1px solid rgba(13,27,42,.1);border-radius:12px;padding:13px 16px;color:#1a2535;font-size:14px;font-family:'Cairo',system-ui,sans-serif;outline:none;transition:all .3s;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,168,76,.5);background:#fff;box-shadow:0 0 0 3px rgba(201,168,76,.12)}
 .form-input::placeholder,.form-textarea::placeholder{color:rgba(13,27,42,.3)}
 .form-textarea{min-height:140px;resize:vertical;line-height:1.8}
@@ -82,19 +106,76 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:600px){.form-row{grid-template-columns:1fr}}
 
-/* Cat grid */
-.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
-@media(max-width:580px){.cats-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:380px){.cats-grid{grid-template-columns:repeat(2,1fr)}}
-.cat-btn{padding:12px 8px;background:#fff;border:1.5px solid #e2e8f5;border-radius:12px;cursor:pointer;text-align:center;transition:all .3s;font-family:'Segoe UI','Arial',sans-serif;box-shadow:0 2px 10px rgba(15,35,65,.04)}
-.cat-btn:hover{border-color:rgba(201,168,76,.4);background:#fffdf6}
-.cat-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.06);box-shadow:0 0 16px rgba(201,168,76,.15)}
-.cat-btn .cat-emoji{font-size:26px;display:block;margin-bottom:5px}
-.cat-btn .cat-name{font-size:11px;color:var(--text-soft);font-weight:600;line-height:1.3}
-.cat-btn.selected .cat-name{color:var(--gold-dk,#a07820)}
-.cat-icon-badge{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#0f2347,#1B3A6B);border:1px solid rgba(201,168,76,.18);margin-bottom:8px;transition:all .3s cubic-bezier(.2,.7,.3,1);box-shadow:0 3px 10px rgba(13,27,42,.2);font-size:22px;line-height:1}
-.cat-btn:hover .cat-icon-badge{transform:translateY(-3px);box-shadow:0 8px 20px rgba(201,168,76,.28);border-color:rgba(201,168,76,.45);background:linear-gradient(135deg,#162d5c,#234d8f)}
-.cat-btn.selected .cat-icon-badge{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);box-shadow:0 4px 16px rgba(201,168,76,.4)}
+/* Cat grid — vertical icon + label, centered (RTL/LTR) */
+.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
+@media(max-width:768px){.cats-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
+.post-wrap .cats-grid .cat-btn,
+#panel-1 .cat-btn{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:16px 10px !important;
+  min-height:110px !important;
+  width:100%;
+  background:#fff;
+  border:1px solid rgba(226,232,240,0.8);
+  border-radius:12px;
+  cursor:pointer;
+  transition:transform .15s ease,box-shadow .3s,border-color .3s;
+  font-family:'Cairo',system-ui,sans-serif;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
+}
+.post-wrap .cats-grid .cat-btn:active,
+#panel-1 .cat-btn:active{transform:scale(0.98)}
+.post-wrap .cats-grid .cat-btn:hover,
+#panel-1 .cat-btn:hover{border-color:rgba(201,168,76,.4);background:#fffdf6}
+.post-wrap .cats-grid .cat-btn.selected,
+#panel-1 .cat-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.06);box-shadow:0 0 16px rgba(201,168,76,.15)}
+.post-wrap .cats-grid .cat-btn .cat-emoji,
+#panel-1 .cat-btn .cat-emoji{font-size:26px;display:block;margin-bottom:8px !important}
+.post-wrap .cats-grid .cat-btn .cat-icon-badge,
+#panel-1 .cat-btn .cat-icon-badge{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-shrink:0 !important;
+  width:44px;height:44px;border-radius:13px;
+  background:linear-gradient(135deg,#0f2347,#1B3A6B);
+  border:1px solid rgba(201,168,76,.18);
+  margin:0 0 8px 0 !important;
+  transition:all .3s cubic-bezier(.2,.7,.3,1);
+  box-shadow:0 3px 10px rgba(13,27,42,.2);
+  font-size:22px;line-height:1;
+}
+.post-wrap .cats-grid .cat-btn .cat-name,
+#panel-1 .cat-btn .cat-name{
+  display:block !important;
+  width:100% !important;
+  margin:0 !important;
+  color:#1B3A6B !important;
+  font-weight:600 !important;
+  line-height:1.3 !important;
+  font-size:0.9rem !important;
+  word-break:break-word;
+  overflow-wrap:break-word;
+  hyphens:auto;
+}
+.post-wrap .cats-grid .cat-btn.selected .cat-name,
+#panel-1 .cat-btn.selected .cat-name{color:var(--gold-dk,#a07820) !important}
+.post-wrap .cats-grid .cat-btn:hover .cat-icon-badge,
+#panel-1 .cat-btn:hover .cat-icon-badge{transform:translateY(-3px);box-shadow:0 8px 20px rgba(201,168,76,.28);border-color:rgba(201,168,76,.45);background:linear-gradient(135deg,#162d5c,#234d8f)}
+.post-wrap .cats-grid .cat-btn.selected .cat-icon-badge,
+#panel-1 .cat-btn.selected .cat-icon-badge{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);box-shadow:0 4px 16px rgba(201,168,76,.4)}
+html[dir="rtl"] .post-wrap .cats-grid .cat-btn,
+html[dir="ltr"] .post-wrap .cats-grid .cat-btn,
+html[dir="rtl"] #panel-1 .cat-btn,
+html[dir="ltr"] #panel-1 .cat-btn{
+  flex-direction:column !important;
+  align-items:center !important;
+  text-align:center !important;
+}
 
 /* Sub-cats */
 .subcats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;animation:fadeIn .3s ease}
@@ -141,9 +222,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 
 /* Navigation buttons */
 .nav-btns{display:flex;gap:12px;margin-top:32px;padding-top:24px;border-top:1px solid rgba(13,27,42,.07)}
-.btn-back{padding:13px 28px;background:transparent;color:var(--text-soft);border:1px solid rgba(13,27,42,.12);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s}
+.btn-back{padding:13px 28px;background:transparent;color:var(--text-soft);border:1px solid rgba(13,27,42,.12);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cairo',system-ui,sans-serif;transition:transform .15s ease,border-color .3s,color .3s}
+.btn-back:active{transform:scale(0.98)}
 .btn-back:hover{border-color:rgba(13,27,42,.25);color:#1a2535}
-.btn-next{flex:1;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s}
+.btn-next{flex:1;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',system-ui,sans-serif;transition:transform .15s ease,box-shadow .3s}
+.btn-next:active{transform:scale(0.98)}
 .btn-next:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(201,168,76,.4)}
 .btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
@@ -325,13 +408,13 @@ main, .page-content.active, .main-content, .results-area,
     
     <div class="logo-text">
       <span class="logo-ar">رزق</span>
-      <span class="logo-sub">Rizq Platform · MR</span>
+      <span class="logo-sub">RIZQ PLATFORM</span>
     </div>
-    <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
+    <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
   </a>
   <span class="nav-title" data-t-fr="Publier une nouvelle annonce">نشر إعلان جديد</span>
   <button class="btn-ns" data-t-fr="✕ Annuler" onclick="location.href='rizq_landing_v8.html'">✕ إلغاء</button>
-  <button class="btn-lang" id="lang-btn">FR</button>
+  <button class="btn-lang btn-lang-primary" id="lang-btn" type="button" aria-label="العربية / FR">العربية / FR</button>
 <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>
 </nav>
 
@@ -1505,8 +1588,8 @@ function rizqShare(title, url) {
   <div class="footer-grid">
     <div>
       <a href="rizq_landing_v8.html" style="margin-bottom:14px;display:inline-flex;gap:11px;text-decoration:none;align-items:center;direction:ltr">
-        <div style="width:38px;height:38px;background:#071020;border:2px solid rgba(201,168,76,.7);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
-        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">Rizq Platform · MR</span></div>
+        <div style="width:38px;height:38px;background:#071020;border:2px solid rgba(201,168,76,.7);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
       <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 16 sections, 120+ branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
@@ -1788,6 +1871,7 @@ html{background:#071020!important}
 <script src="rizq_video_ads.js"></script>
   
 <script src="rizq_packages_config.js"></script>
+<script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_widget_embed.js"></script>
 <script src="rizq_navbar.js"></script>

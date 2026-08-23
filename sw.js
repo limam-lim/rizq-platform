@@ -13,9 +13,15 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v1';
+var CACHE_NAME = 'rizq-cache-v12.6';
 var CORE_ASSETS = [
   'rizq-theme.css',
+  'rizq_header.css',
+  'rizq_header.js',
+  'rizq_agent.js',
+  'rizq_dynamic_nav.js',
+  'rizq_manager_agent_config.js',
+  'rizq_widget_embed.js',
   'rizq_i18n.js',
   'rizq_i18n_data.js',
   'favicon-192.png',
@@ -59,7 +65,7 @@ self.addEventListener('fetch', function (event) {
   // نداءات الـ API (تسجيل، دخول، بيانات حيّة) — تمر مباشرة، بلا كاش أبداً
   if (url.pathname.indexOf('/api/') !== -1) return;
 
-  var isStaticAsset = /\.(png|jpg|jpeg|webp|svg|ico|css|woff2?)$/i.test(url.pathname);
+  var isStaticAsset = /\.(png|jpg|jpeg|webp|svg|ico|woff2?)$/i.test(url.pathname);
 
   if (isStaticAsset) {
     // cache-first: يرجع من الكاش فوراً، ويحدّث الكاش في الخلفية

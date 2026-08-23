@@ -30,7 +30,7 @@ nav.nav-compact .nav-sticky-post{display:inline-flex;align-items:center;gap:4px}
 
 /* ── Section jump bar ── */
 .section-jump-bar{
-  position:fixed;top:72px;left:0;right:0;z-index:490;
+  position:fixed;top:72px;left:0;right:0;z-index:800;
   display:flex;justify-content:center;gap:6px;flex-wrap:nowrap;
   padding:8px 12px;background:rgba(7,13,30,.94);
   border-bottom:1px solid rgba(201,168,76,.15);
@@ -54,7 +54,7 @@ nav.nav-compact .nav-sticky-post{display:inline-flex;align-items:center;gap:4px}
 
 /* ── Back to top ── */
 #back-to-top{
-  position:fixed;bottom:100px;left:28px;z-index:99990;
+  position:fixed;bottom:100px;left:28px;z-index:500;
   width:46px;height:46px;border-radius:50%;
   background:linear-gradient(135deg,var(--royal,#1B3A6B),var(--royal-light,#234d8f));
   border:2px solid rgba(201,168,76,.55);color:var(--gold-light,#e8c96a);
@@ -97,7 +97,7 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 
 /* ── Mobile bottom navigation ── */
 .mobile-bottom-nav{
-  display:none;position:fixed;bottom:0;left:0;right:0;z-index:99985;
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;
   background:linear-gradient(180deg,rgba(10,20,44,.97),rgba(7,13,30,.99));
   border-top:1px solid rgba(201,168,76,.22);
   padding:6px 4px calc(6px + env(safe-area-inset-bottom,0));
@@ -125,41 +125,94 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 }
 .mobile-bottom-nav a.active,.mobile-bottom-nav button.active{color:var(--gold-light,#e8c96a)}
 
-/* ── Mobile horizontal swipe grids ── */
 @media(max-width:768px){
   .mobile-bottom-nav{display:block}
-  body.landing-ux-mobile{padding-bottom:72px}
-  #rizq-chat-toggle{bottom:82px!important}
-  #rizq-chat-window{bottom:158px!important}
-  #back-to-top{bottom:88px!important}
-
-  .cats-grid{
-    display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-    gap:12px!important;padding:4px 8px 12px!important;max-width:100%!important;
-    scrollbar-width:none;-ms-overflow-style:none;
-  }
-  .cats-grid::-webkit-scrollbar{display:none}
-  .cats-grid .cat-card{
-    flex:0 0 148px!important;scroll-snap-align:start;min-width:148px!important;
-  }
-
-  .listings-grid{
-    display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-    gap:14px!important;padding:4px 8px 16px!important;
-    scrollbar-width:none;
-  }
-  .listings-grid::-webkit-scrollbar{display:none}
-  .listings-grid .listing-card{
-    flex:0 0 78vw!important;max-width:300px!important;scroll-snap-align:start;
-  }
-
+  body.landing-ux-mobile{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
   nav.nav-compact .nav-sticky-tools{max-width:none;margin:0 8px}
   nav.nav-compact .nav-sticky-post{display:none}
-  .section-jump-bar{top:72px}
+  .section-jump-bar{display:none!important}
 }
 
 @media(max-width:768px){
   nav.nav-compact .nav-center{display:none}
+}
+
+/* ── Section centering (clean — no glass overrides) ── */
+.hero-content{
+  max-width:1200px;
+  margin:0 auto;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.why-section > .section-header,
+#prices > .section-header,
+.pricing-section > .section-header,
+#rizq-live-activity .section-header,
+#categories > .section-header{
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+}
+
+/* Banners: titles stay centered (rizq-theme aligns .section-title right/left in RTL/LTR) */
+.section-header .section-tag,
+.section-header .section-title,
+.section-header .section-desc{
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
+html[dir="rtl"] .section-header .section-title,
+html[dir="ltr"] .section-header .section-title,
+html[dir="rtl"] .section-header .section-tag,
+html[dir="ltr"] .section-header .section-tag,
+html[dir="rtl"] .section-header .section-desc,
+html[dir="ltr"] .section-header .section-desc{
+  text-align:center;
+}
+
+.why-section > .section-header .section-tag,
+.why-section > .section-header .section-title,
+.why-section > .section-header .section-desc,
+#prices > .section-header .section-tag,
+#prices > .section-header .section-title,
+#prices > .section-header .section-desc,
+.pricing-section > .section-header .section-tag,
+.pricing-section > .section-header .section-title,
+.pricing-section > .section-header .section-desc,
+#rizq-live-activity .section-header .section-tag,
+#rizq-live-activity h2,
+#rizq-live-activity .section-header p{
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#about.why-section,
+#prices.section,
+.pricing-section,
+#rizq-live-activity{
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.why-grid,
+.prices-board,
+.pricing-grid{
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#rizq-live-activity > div{
+  max-width:1200px;
+  margin:0 auto;
+  text-align:center;
 }

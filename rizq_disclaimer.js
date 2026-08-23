@@ -126,10 +126,22 @@
   function openDisc() {
     var l = _discLang();
     _discApply(l);
-    var ov = document.getElementById('discOverlay'); if (ov) ov.classList.add('open');
+    var ov = document.getElementById('discOverlay') || document.querySelector('.disc-overlay#discOverlay');
+    if (!ov) ov = document.getElementById('discOverlay');
+    if (ov) {
+      ov.classList.add('open');
+      ov.style.display = 'flex';
+      ov.style.pointerEvents = 'auto';
+      ov.style.zIndex = '4000';
+    }
   }
   function closeDisc() {
-    var ov = document.getElementById('discOverlay'); if (ov) ov.classList.remove('open');
+    var ov = document.getElementById('discOverlay');
+    if (ov) {
+      ov.classList.remove('open');
+      ov.style.display = 'none';
+      ov.style.pointerEvents = 'none';
+    }
   }
 
   // ── إصلاح جوهري: نص التنبيه القانوني المخصَّص من الأدمن كان محلياً 100% في

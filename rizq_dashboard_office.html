@@ -272,8 +272,8 @@ textarea.form-input{min-height:80px;resize:vertical}
 
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-icon"><svg viewBox="0 0 40 40" width="34" height="34" style="display:block" aria-hidden="true"><text x="26" y="28" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" font-weight="900" fill="currentColor">ر</text><text x="13" y="27" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="17" font-weight="900" fill="currentColor">R</text></svg></div>
-    <div><div class="sb-logo-text"><span style="color:#C9A84C;font-weight:900"><span style="color:#e8c96a;font-weight:900">رزق</span></span></div><div class="sb-logo-sub">Rizq Platform · MR</div></div>
+    <div class="sb-logo-icon"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div><div class="sb-logo-text"><span style="color:#C9A84C;font-weight:900"><span style="color:#e8c96a;font-weight:900">رزق</span></span></div><div class="sb-logo-sub">RIZQ PLATFORM</div></div>
   </div>
   <div class="sb-office-info">
     <div class="sb-office-name" id="sb-office-name">...</div>
@@ -2025,7 +2025,14 @@ function printQRCode(){var qr=document.getElementById('qr-container');if(!qr)ret
 <script src="rizq_moderator_agent.js"></script>
 <script>
 function renderPackagesDisplay(){
-  var pkgs=JSON.parse(localStorage.getItem('rizq_office_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;});
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('office', (typeof _officeLang!=='undefined'?_officeLang:'ar')).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_office_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.office){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.office));
+  }
   var el=document.getElementById('packages-display'); if(!el) return;
 
   var FEATS_AR={
@@ -2041,14 +2048,7 @@ function renderPackagesDisplay(){
   var FEATS=(typeof _officeLang!=='undefined'&&_officeLang==='fr')?FEATS_FR:FEATS_AR;
   var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
-  var DEF=[
-    {name:'تجريبية',duration:'3 أيام',price:0},
-    {name:'شهرية',duration:'شهر',price:2500},
-    {name:'ربعية',duration:'3 أشهر',price:6500,highlight:true},
-    {name:'سنوية',duration:'12 شهر',price:18000},
-    {name:'ماسية',duration:'شهر',price:4500,isDiamond:true}
-  ];
-  var list=pkgs.length?pkgs:DEF;
+  var list=pkgs;
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.withDiamond==='function'){
     list=RizqPackagesConfig.withDiamond(list, (typeof _officeLang!=='undefined'?_officeLang:'ar'));
   }
@@ -2063,13 +2063,15 @@ function renderPackagesDisplay(){
 function renderVideoPackagesDisplay(){
   var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
   var lang=(typeof _officeLang!=='undefined'?_officeLang:'ar');
-  var pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;});
-  var DEF=[
-    {name:'أساسي',duration:'شهر',price:5000},
-    {name:'احترافي',duration:'شهر',price:12000,highlight:true},
-    {name:'أعمال ومعارض',duration:'شهر',price:25000}
-  ];
-  var list=pkgs.length?pkgs:DEF;
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var list=pkgs;
   var FEATS_AR={'أساسي':['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'],'احترافي':['حتى 3 فيديوهات إعلانية نشطة','أولوية ظهور في النتائج','شارة "محتوى مرئي موثّق"','دعم تحرير أساسي'],'أعمال ومعارض':['فيديوهات إعلانية غير محدودة','ظهور في القسم المميز بالصفحة الرئيسية','تقارير أداء تفصيلية','مدير حساب مخصص']};
   var FEATS_FR={'أساسي':['Une vidéo publicitaire (max 30s)','Présence dans la section vidéo','Statistiques de vues de base'],'احترافي':['Jusqu\'à 3 vidéos actives','Priorité d\'affichage','Badge "Contenu vérifié"','Support montage de base'],'أعمال ومعارض':['Vidéos illimitées','Position premium en page d\'accueil','Rapports de performance détaillés','Gestionnaire de compte dédié']};
   var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;

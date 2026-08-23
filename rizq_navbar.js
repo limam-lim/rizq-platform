@@ -15,10 +15,7 @@
 // ══════════════════════════════════════════════
 // 1. ثوابت الهوية البصرية
 // ══════════════════════════════════════════════
-var LOGO_SVG = '<svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true">'
-  + '<text x="13" y="24" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-size="19" font-weight="900" fill="#C9A84C">R</text>'
-  + '<text x="28" y="31" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#C9A84C">ر</text>'
-  + '</svg>';
+var LOGO_SVG = '<img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/>';
 
 var DISCLAIMER_AR = '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
 var DISCLAIMER_FR = '⚖️ Rizq est un simple intermédiaire — Vérifiez avant de payer';
@@ -37,14 +34,13 @@ var TOPNAV_CSS = [
   'border-radius:20px;padding:4px 13px;transition:background .2s;flex-shrink:0}',
   '.rn-disc:hover{background:rgba(201,168,76,.16)}',
   '.rn-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}',
-  '.rn-logo-btn{background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;',
-  'width:38px;height:38px;display:flex;align-items:center;justify-content:center;',
-  'cursor:pointer;flex-shrink:0;transition:transform .2s,border-color .2s;padding:0;',
-  'outline:none}',
-  '.rn-logo-btn:hover{transform:scale(1.06);border-color:#C9A84C}',
+  '.rn-logo-btn{background:transparent;border:none;border-radius:10px;',
+  'width:42px;height:42px;display:flex;align-items:center;justify-content:center;',
+  'cursor:pointer;flex-shrink:0;padding:0;outline:none}',
+  '.rn-logo-btn:hover{opacity:.92}',
   '.rn-logo-text{display:flex;flex-direction:column;justify-content:center;text-align:right}',
-  '.rn-logo-ar{font-family:Georgia,serif;font-size:20px;font-weight:700;color:#C9A84C;line-height:1}',
-  '.rn-logo-sub{font-size:8px;color:rgba(201,168,76,.6);letter-spacing:2px;font-style:italic}',
+  '.rn-logo-ar{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1;text-shadow:0 0 16px rgba(201,168,76,.4)}',
+  '.rn-logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;font-style:italic;font-weight:700;text-transform:uppercase}',
   '.rn-links{display:flex;align-items:center;gap:4px}',
   '.rn-link{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.75);text-decoration:none;',
   'background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:8px;',
@@ -112,7 +108,7 @@ function _buildTopnav(cfg){
     + '<div class="rn-brand" style="direction:ltr">'
     + '<button class="rn-logo-btn" '+onPromo+' title="Rizq Platform">'+LOGO_SVG+'</button>'
     + '<a href="'+logoHref+'" style="text-decoration:none">'
-    + '<div class="rn-logo-text"><span class="rn-logo-ar">رزق</span><span class="rn-logo-sub">Rizq Platform · MR</span></div>'
+    + '<div class="rn-logo-text"><span class="rn-logo-ar">رزق</span><span class="rn-logo-sub">RIZQ PLATFORM</span></div>'
     + '</a>'
     + '</div>'
     + (links ? '<div class="rn-links">'+links+'</div>' : '')

@@ -8,6 +8,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="stylesheet" href="rizq-theme.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+  <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta name="description" content="تصفح الإعلانات — رزق | منصة الإعلانات الأولى في موريتانيا"/>
@@ -22,7 +27,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Segoe UI','Arial',sans-serif;background:#f8faff;color:#1a2535;overflow-x:hidden}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;color:#1a2535;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 a{text-decoration:none;color:inherit}
 select option{background:#fff!important;color:#1a2535!important}
@@ -72,7 +77,7 @@ nav .nav-disclaimer{flex-shrink:0}
 
 /* BROWSE LAYOUT */
 .browse-wrap{display:flex;height:calc(100vh - 62px - 41px);overflow:hidden}
-.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden}
+.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1}
 /* browse-right: hidden by default, shown only when an ad is selected */
 .browse-right{display:none;overflow-y:auto;background:#f8faff;min-width:0}
 .browse-wrap.has-detail .browse-left{flex:0 0 var(--left-w);overflow:hidden}
@@ -84,7 +89,7 @@ nav .nav-disclaimer{flex-shrink:0}
    بين الأقسام، عناصر تحكم مخصصة بدل عناصر المتصفح الافتراضية الصغيرة،
    مساحة أكبر للتنفّس. البنية/المعرّفات/الأصناف التي تعتمد عليها JS
    (applyFilters/renderCatSidebar/clearSection...) لم تُمس إطلاقاً. */
-.bs-sidebar{border-bottom:1px solid #e2e8f5}
+.bs-sidebar{border-bottom:1px solid #e2e8f5;flex-shrink:0;position:relative;z-index:2;background:#fff}
 .bs-sidebar .sidebar-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:linear-gradient(135deg,#0f1f3d,#1B2B4B);box-shadow:0 2px 10px rgba(15,31,61,.18)}
 .bs-sidebar .sidebar-header h3{font-size:13px;font-weight:800;color:var(--gold);margin:0;letter-spacing:.2px}
 #filters-body{overflow-y:auto;overflow-x:hidden;max-height:320px;background:linear-gradient(180deg,rgba(27,58,107,.03),rgba(27,58,107,.01))}
@@ -138,7 +143,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .rl-count{font-size:11.5px;color:var(--text-muted)}
 .rl-count strong{color:#1a2535;font-size:13px}
 .rl-sort select{background:#f8faff;border:1px solid #e2e8f5;border-radius:6px;padding:4px 8px;font-size:11px;color:#1a2535;outline:none;cursor:pointer;font-family:'Segoe UI',sans-serif}
-#result-list-body{overflow-y:auto;flex:1}
+#result-list-body{overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;background:#fff}
 #result-list-body::-webkit-scrollbar{width:3px}
 #result-list-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3)}
 
@@ -582,6 +587,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 </style>
 
   <script src="rizq_backend_config.js"></script>
+<script src="rizq_dynamic_nav.js?v=12.2"></script>
+<script src="rizq_module_flags.js?v=12.1"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -600,9 +607,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     
     <div class="logo-text">
       <span class="logo-ar">رزق</span>
-      <span class="logo-sub">Rizq Platform · MR</span>
+      <span class="logo-sub">RIZQ PLATFORM</span>
     </div>
-    <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
+    <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
   </a>
   <div class="nav-search">
     <select id="nav-cat-select" onchange="filterByCat(this.value);renderCatSidebar(normalizeCat(this.value))">
@@ -616,7 +623,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
       <option value="ماشية" data-ar="🐄 ماشية" data-fr="🐄 Bétail">🐄 ماشية</option>
       <option value="خدمات" data-ar="🔧 خدمات" data-fr="🔧 Services">🔧 خدمات</option>
     </select>
-    <input type="text" id="nav-search-input" placeholder="ابحث في رزق..." data-t-ph="nav-search-ph"/>
+    <input type="text" id="nav-search-input" placeholder="ابحث في رزق..." data-t-ph="nav-search-ph" data-ph="nav-search-ph"/>
     <button class="nav-search-btn" onclick="doSearch()">🔍</button>
   </div>
   <div class="nav-actions">
@@ -658,10 +665,10 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="filter-section">
           <div class="filter-title"><span data-t="filter-cat">القسم</span><button onclick="clearSection('cat')" data-t="btn-clear-mini">مسح</button></div>
           <div style="display:flex;flex-direction:column;gap:3px" id="cat-options">
-            <label class="filter-option"><input type="radio" name="rcat" value="شقق للكراء" class="filter-cb"><span class="filter-label" data-t="sc-apts-rent">شقق للكراء</span><span class="filter-count">1,240</span></label>
-            <label class="filter-option"><input type="radio" name="rcat" value="منازل للكراء" class="filter-cb"><span class="filter-label" data-t="sc-houses-rent">منازل للكراء</span><span class="filter-count">384</span></label>
-            <label class="filter-option"><input type="radio" name="rcat" value="شقق للبيع" class="filter-cb"><span class="filter-label" data-t="sc-apts-sale">شقق للبيع</span><span class="filter-count">567</span></label>
-            <label class="filter-option"><input type="radio" name="rcat" value="أراضي" class="filter-cb"><span class="filter-label" data-t="sc-land">أراضي</span><span class="filter-count">890</span></label>
+            <label class="filter-option"><input type="radio" name="rcat" value="شقق للكراء" class="filter-cb"><span class="filter-label" data-t="sc-apts-rent">شقق للكراء</span></label>
+            <label class="filter-option"><input type="radio" name="rcat" value="منازل للكراء" class="filter-cb"><span class="filter-label" data-t="sc-houses-rent">منازل للكراء</span></label>
+            <label class="filter-option"><input type="radio" name="rcat" value="شقق للبيع" class="filter-cb"><span class="filter-label" data-t="sc-apts-sale">شقق للبيع</span></label>
+            <label class="filter-option"><input type="radio" name="rcat" value="أراضي" class="filter-cb"><span class="filter-label" data-t="sc-land">أراضي</span></label>
           </div>
         </div>
 
@@ -686,9 +693,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="filter-section">
           <div class="filter-title"><span data-t="filter-price">السعر (MRU)</span><button onclick="clearSection('price')" data-t="btn-clear-mini">مسح</button></div>
           <div class="price-inputs" style="margin-bottom:8px">
-            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" placeholder="الأدنى">
+            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" data-ph="price-min" placeholder="الأدنى">
             <span class="price-sep">—</span>
-            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" placeholder="الأقصى">
+            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى">
           </div>
           <input type="range" id="price-range" min="0" max="2000000" step="10000" value="2000000" oninput="updateRange(this.value)">
           <div class="range-labels"><span>0</span><span id="range-val">2,000,000+</span></div>
@@ -1062,7 +1069,10 @@ window._currentAd = null;
 let _phoneRevealed = false;
 
 // LANG
-function _rizqLang(){try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}}
+function _rizqLang(){
+  if(window.RizqI18n && typeof RizqI18n.getLang==='function') return RizqI18n.getLang();
+  try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}
+}
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // TRANSLATIONS
@@ -1098,7 +1108,7 @@ const TRANSLATIONS = {
     'browse-ads':'تصفح الإعلانات','promo-browse':'تصفح الإعلانات',
     'promo-title':'انضم إلى رزق اليوم','promo-sub':'المنصة الأولى للإعلانات المجانية في موريتانيا — ابدأ في ثوانٍ',
     'promo-post':'➕ انشر إعلانك مجاناً',
-    'price-min':'الأدنى','price-max':'الأقصى',
+    'price-min':'الأدنى','price-max':'الأقصى','no-subs':'لا توجد فروع',
   },
   fr:{
     'nav-post':'➕ Publier une annonce','nav-account':'Mon compte','nav-home':'Accueil','all-cats':'Toutes catégories',
@@ -1130,7 +1140,7 @@ const TRANSLATIONS = {
     'browse-ads':'Parcourir les annonces','promo-browse':'Parcourir',
     'promo-title':'Rejoignez Rizq aujourd\'hui','promo-sub':'La 1ère plateforme d\'annonces gratuites en Mauritanie — Commencez en secondes',
     'promo-post':'➕ Publiez votre annonce gratuitement',
-    'price-min':'Min','price-max':'Max',
+    'price-min':'Min','price-max':'Max','no-subs':'Aucune sous-catégorie',
   }
 };
 
@@ -1164,24 +1174,28 @@ function applyLang(){
      الآن يُحدَّث فوراً مع كل تبديل للغة في نفس الصفحة أيضاً. */
   if(window._rzqApplyFt) window._rzqApplyFt();
 }
-function toggleLangPage(){
-  const cur=_rizqLang();
-  const next=cur==='ar'?'fr':'ar';
-  localStorage.setItem('rizq_lang',next);
+function onBrowseLangChange(){
   applyLang();
-  // Re-render filter sidebar with current category
   try{
     const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat||'عقارات';
     renderCatSidebar(navCat);
   }catch(e){}
-  // Re-render detail panel if open (was discarding return value — fixed)
   if(window._currentAd){
     const dc=document.getElementById('detail-content');
     if(dc&&dc.style.display!=='none') dc.innerHTML=renderDetailPanel(window._currentAd);
   }
-  // Trigger footer IIFE update via StorageEvent (same-tab storage doesn't fire storage event)
+  if(typeof applyFilters==='function') applyFilters();
+}
+
+document.addEventListener('rizq:langchange', onBrowseLangChange);
+
+function toggleLangPage(){
+  if(window.RizqI18n&&typeof RizqI18n.toggle==='function'){ RizqI18n.toggle(); return; }
+  const cur=_rizqLang();
+  const next=cur==='ar'?'fr':'ar';
+  localStorage.setItem('rizq_lang',next);
+  onBrowseLangChange();
   try{window.dispatchEvent(new StorageEvent('storage',{key:'rizq_lang',newValue:next}));}catch(e){}
-  // Update disc pill + nav-disclaimer
   if(typeof _discApply==='function') _discApply(next==='fr'?'fr':'ar');
 }
 
@@ -1202,7 +1216,6 @@ const SUBCATS_BY_CAT = {
   'وظائف':['إدارة وتسويق','هندسة وتقنية','صحة وطب','تعليم وتدريب','فريلانس'],
   'بناء':['أسمنت وحديد','طوب وسيراميك','سباكة وكهرباء','ألواح شمسية','أدوات بناء'],
 };
-function fakeCount(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%99999;return (h%900)+120;}
 function normalizeCat(r){return CAT_ALIAS[r]||r;}
 function renderCatSidebar(effCat){
   const wrap=document.getElementById('cat-options');
@@ -1210,12 +1223,12 @@ function renderCatSidebar(effCat){
   const fr=_rizqLang()==='fr';
   const SUBCAT_FR_MAP={'شقق للكراء':'Appart. à louer','منازل للكراء':'Maisons à louer','غرف للكراء':'Chambres à louer','شقق للبيع':'Appart. à vendre','أراضي':'Terrains','محلات تجارية':'Locaux comm.'};
   if(!effCat||effCat==='عقارات'){
-    wrap.innerHTML=[{v:'شقق للكراء',c:'1,240'},{v:'منازل للكراء',c:'384'},{v:'غرف للكراء',c:'218'},{v:'شقق للبيع',c:'567'},{v:'أراضي',c:'890'},{v:'محلات تجارية',c:'145'}]
-      .map(r=>`<label class="filter-option"><input type="radio" name="rcat" value="${r.v}" class="filter-cb"><span class="filter-label">${fr?(SUBCAT_FR_MAP[r.v]||r.v):r.v}</span><span class="filter-count">${r.c}</span></label>`).join('');
+    wrap.innerHTML=['شقق للكراء','منازل للكراء','غرف للكراء','شقق للبيع','أراضي','محلات تجارية']
+      .map(v=>`<label class="filter-option"><input type="radio" name="rcat" value="${v}" class="filter-cb"><span class="filter-label">${fr?(SUBCAT_FR_MAP[v]||v):v}</span></label>`).join('');
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='';
   } else {
     const subs=SUBCATS_BY_CAT[effCat]||[];
-    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?(AD_SUBCAT_FR[s]||s):s}</span><span class="filter-count">${fakeCount(s).toLocaleString()}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${fr?'Aucune sous-catégorie':'لا توجد فروع'}</p>`;
+    wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?(AD_SUBCAT_FR[s]||s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${_t('no-subs')}</p>`;
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='none';
   }
   if(urlSub){
@@ -2132,8 +2145,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="footer-grid">
     <div>
       <a href="rizq_landing_v8.html" style="margin-bottom:14px;display:inline-flex;gap:11px;text-decoration:none;align-items:center;direction:ltr">
-        <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><svg viewBox="0 0 40 40" width="30" height="30" style="display:block" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg></div>
-        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">Rizq Platform · MR</span></div>
+        <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
       <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 16 sections, 120+ branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
@@ -2354,6 +2367,7 @@ html{background:#071020!important}
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="إشعار قانوني / Avis juridique">⚖️ إشعار قانوني</div>
 
 <script src="rizq_packages_config.js"></script>
+<script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_widget_embed.js"></script>
 <script src="rizq_navbar.js"></script>

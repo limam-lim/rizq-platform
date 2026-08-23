@@ -3,7 +3,7 @@
  */
 const LANG_LABELS = {
   ar: 'Arabic',
-  hs: 'Hassaniya Arabic',
+  hs: 'Hassaniya/Darija Arabic',
   fr: 'French',
   en: 'English',
   es: 'Spanish',
@@ -27,7 +27,7 @@ function detectUserLanguage(text, uiLangHint) {
 
   const lower = t.toLowerCase();
 
-  if (/كيفاش|شنهو|شنو\s*هو|وش\s*راك|الزين|نعاونك|بغيت|شحال|ماكو|كاين|واش\s*راك|شنو/.test(t)) return 'hs';
+  if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|شنهي/.test(t)) return 'hs';
 
   if (/[\u0600-\u06FF]/.test(t)) return 'ar';
 
