@@ -154,8 +154,15 @@
       MODULES.forEach(function (mod) {
         var open = moduleOpen(flags, mod.key);
         container.querySelectorAll('[data-rizq-module="' + mod.key + '"]').forEach(function (el) {
-          /* على الجوال: كل الأقسام في «المزيد» فقط — لا تبويب مباشر */
-          el.style.display = phone ? 'none' : (open ? '' : 'none');
+          if (phone) {
+            el.style.display = 'none';
+            return;
+          }
+          if (open || mod.always) {
+            el.style.removeProperty('display');
+          } else {
+            el.style.display = 'none';
+          }
         });
       });
       var aiOrder = 8;
@@ -350,6 +357,5 @@
   } else {
     bootNav();
   }
-  setTimeout(bootNav, 150);
-  setTimeout(bootNav, 600);
+  setTimeout(bootNav, 200);
 })(window);

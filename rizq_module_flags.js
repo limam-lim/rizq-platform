@@ -292,6 +292,7 @@
     } else {
       var NAV_HREF = { store: 'rizq_store.html', office: 'rizq_office.html', corp: 'rizq_showroom.html', tenders: 'rizq_tenders.html' };
       Object.keys(NAV_HREF).forEach(function (key) {
+        if (key === 'store') return;
         if (flags[key] !== false) return;
         document.querySelectorAll('a[href="' + NAV_HREF[key] + '"]').forEach(function (a) {
           var li = a.closest('li');
