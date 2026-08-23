@@ -137,11 +137,13 @@
         el.classList.add('active');
       });
     });
-    var mbnAccount = document.getElementById('mbn-account');
-    if (mbnAccount) {
-      mbnAccount.addEventListener('click', function (e) {
+    var mbnMore = document.getElementById('mbn-more');
+    if (mbnMore) {
+      mbnMore.addEventListener('click', function (e) {
         e.preventDefault();
-        if (typeof window.openModal === 'function') window.openModal('login');
+        var hdrMore = document.getElementById('rizq-hdr-more');
+        if (hdrMore) hdrMore.click();
+        else if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
       });
     }
   }
@@ -219,8 +221,9 @@
         'mbn-home': fr ? 'Accueil' : 'الرئيسية',
         'mbn-cats': fr ? 'Sections' : 'الأقسام',
         'mbn-post': fr ? 'Publier' : 'نشر',
+        'mbn-stores': fr ? 'Boutiques' : 'المحلات',
         'mbn-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي',
-        'mbn-account': fr ? 'Compte' : 'حسابي'
+        'mbn-more': fr ? 'Plus' : 'المزيد'
       };
       Object.keys(mbn).forEach(function (id) {
         var node = document.getElementById(id);

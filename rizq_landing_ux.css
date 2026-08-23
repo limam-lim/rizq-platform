@@ -104,12 +104,13 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
   box-shadow:0 -4px 24px rgba(0,0,0,.35);
 }
 .mobile-bottom-nav-inner{
-  display:flex;justify-content:space-around;align-items:stretch;max-width:520px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:stretch;max-width:100%;margin:0 auto;
+  gap:2px;padding:0 4px;
 }
 .mobile-bottom-nav a,.mobile-bottom-nav button{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:2px;padding:6px 2px;text-decoration:none;color:rgba(255,255,255,.65);
-  font-size:9.5px;font-weight:700;border:none;background:none;cursor:pointer;
+  gap:2px;padding:6px 1px;text-decoration:none;color:rgba(255,255,255,.65);
+  font-size:8.5px;font-weight:700;border:none;background:none;cursor:pointer;
   font-family:inherit;transition:color .2s;min-width:0;
 }
 .mobile-bottom-nav .mbn-icon{font-size:18px;line-height:1}

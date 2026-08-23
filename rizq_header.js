@@ -172,7 +172,7 @@
       '<header id="rizq-app-header" role="banner">' +
         '<div class="rizq-hdr-row1">' +
           '<div class="rizq-hdr-start">' +
-            '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '" style="display:none">←</button>' +
+            '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
             '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" aria-label="' + LANG_LABEL + '">' + LANG_LABEL + '</button>' +
           '</div>' +
@@ -386,8 +386,7 @@
   function updateMobileBackButton() {
     var back = document.getElementById('rizq-hdr-back');
     if (!back) return;
-    var show = isMobileNav() && !isLanding();
-    back.style.display = show ? 'inline-flex' : 'none';
+    back.style.display = isMobileNav() ? 'inline-flex' : 'none';
   }
 
   function bind() {
