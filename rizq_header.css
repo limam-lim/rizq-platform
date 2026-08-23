@@ -877,13 +877,22 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{display:flex!important}
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li{position:static!important;overflow:visible!important}
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li .nav-dropdown-menu,
-  html.rizq-app-nav body.landing-ux-mobile #nav-more-menu-mobile{
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-menu-mobile,
+  html.rizq-app-nav body.landing-ux-mobile body > .nav-dropdown-menu.rizq-phone-more-panel{
     min-width:0 !important;
     padding:10px !important;
     border-radius:16px !important;
     background:rgba(10,18,36,.98) !important;
     border:1px solid rgba(201,168,76,.42) !important;
     box-shadow:0 16px 48px rgba(0,0,0,.55) !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li.open .nav-dropdown-menu,
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li.open #nav-more-menu-mobile,
+  html.rizq-app-nav body.landing-ux-mobile body > .nav-dropdown-menu.rizq-phone-more-panel.rizq-more-menu-open{
+    display:block !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li .nav-dd-item{
     display:flex !important;

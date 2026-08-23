@@ -3,6 +3,7 @@
  */
 (function () {
   'use strict';
+  var global = window;
   if (window.__rizqHeaderInit) return;
   window.__rizqHeaderInit = true;
 
@@ -532,7 +533,7 @@
       restoreMoreMenu(o);
     });
     document.querySelectorAll('.nav-dropdown-menu.rizq-more-menu-open').forEach(function (m) {
-      m.classList.remove('rizq-more-menu-open');
+      m.classList.remove('rizq-more-menu-open', 'rizq-phone-more-panel', 'is-positioned');
       m.style.display = '';
       m.style.visibility = '';
       m.style.opacity = '';
@@ -545,7 +546,7 @@
     var menu = moreMenuFor(li);
     if (!menu) return null;
     if (menu.parentNode !== li) li.appendChild(menu);
-    menu.classList.remove('rizq-more-menu-open');
+    menu.classList.remove('rizq-more-menu-open', 'rizq-phone-more-panel', 'is-positioned');
     menu.style.position = '';
     menu.style.left = '';
     menu.style.top = '';
@@ -557,14 +558,84 @@
     menu.style.opacity = '';
     menu.style.transform = '';
     menu.style.pointerEvents = '';
+    menu.style.maxHeight = '';
+    menu.style.width = '';
+    menu.style.zIndex = '';
     return menu;
+  }
+
+  /* Landing inline script defines positionNavDropdown before this file loads via PWA. */
+  var landingPositionNavDropdown = typeof window.positionNavDropdown === 'function'
+    ? window.positionNavDropdown
+    : null;
+
+  function positionLandingMobileMore(li) {
+    if (!li) return;
+    if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
+      window.RizqModuleFlags.reapply();
+    }
+    if (landingPositionNavDropdown) {
+      landingPositionNavDropdown(li);
+      return;
+    }
+    var menu = moreMenuFor(li);
+    if (!menu) return;
+    restoreMoreMenu(li);
+    li.classList.add('open');
+    var nav = document.getElementById('nav');
+    var top = 116;
+    if (nav) top = Math.round(nav.getBoundingClientRect().bottom + 4);
+    if (menu.parentNode !== document.body) {
+      menu.__rizqMoreHome = li;
+      menu.setAttribute('data-rizq-more-for', li.id || 'nav-more-li');
+      document.body.appendChild(menu);
+    }
+    menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
+    menu.style.cssText = ''
+      + 'position:fixed!important;top:' + top + 'px!important;'
+      + 'left:10px!important;right:10px!important;bottom:auto!important;'
+      + 'transform:none!important;width:auto!important;'
+      + 'max-height:min(calc(100vh - ' + (top + 12) + 'px),520px)!important;'
+      + 'overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;'
+      + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
+      + 'z-index:10052!important;display:block!important;';
   }
 
   function positionMoreDropdown(li) {
     if (!li) return;
+    if (isLanding() && isMobileNav() && li.id === 'nav-more-li') {
+      positionLandingMobileMore(li);
+      return;
+    }
     restoreMoreMenu(li);
     li.classList.add('open');
   }
+
+  function bindLandingMobileMore() {
+    var btn = document.getElementById('nav-more-mobile-btn');
+    var li = document.getElementById('nav-more-li');
+    if (!btn || !li || btn.getAttribute('data-rizq-landing-more-bound')) return;
+    btn.setAttribute('data-rizq-landing-more-bound', '1');
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var wasOpen = li.classList.contains('open');
+      closeMoreDropdowns();
+      closeMobileMoreMenu();
+      if (!wasOpen) positionLandingMobileMore(li);
+    }, true);
+    if (!window.__rizqLandingMoreCloseBound) {
+      window.__rizqLandingMoreCloseBound = true;
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('#nav-more-li') || e.target.closest('#nav-more-menu-mobile')
+          || e.target.closest('.nav-dropdown-menu[data-rizq-more-for="nav-more-li"]')) return;
+        if (document.getElementById('nav-more-li') && document.getElementById('nav-more-li').classList.contains('open')) {
+          closeMoreDropdowns();
+        }
+      });
+    }
+  }
+
   window.positionNavDropdown = positionMoreDropdown;
   window.rizqCloseMoreMenus = closeMoreDropdowns;
 
@@ -885,6 +956,7 @@
     if (isLanding()) {
       removeHeader();
       if (document.body) document.body.classList.add('landing-ux-mobile');
+      bindLandingMobileMore();
       ensureLangListener();
       applyLabels();
       if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {

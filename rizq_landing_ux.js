@@ -145,16 +145,24 @@
         if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
       });
     }
-    var navMoreMobile = document.getElementById('nav-more-mobile-btn');
-    if (navMoreMobile) {
-      navMoreMobile.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (typeof window.toggleNavDropdown === 'function') {
-          window.toggleNavDropdown(e, navMoreMobile);
-        }
-      });
-    }
+  }
+
+  var navMoreMobile = document.getElementById('nav-more-mobile-btn');
+  if (navMoreMobile && !navMoreMobile.getAttribute('data-rizq-more-bound')) {
+    navMoreMobile.setAttribute('data-rizq-more-bound', '1');
+    navMoreMobile.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
+        window.RizqModuleFlags.reapply();
+      }
+      if (typeof window.toggleNavDropdown === 'function') {
+        window.toggleNavDropdown(e, navMoreMobile);
+      } else if (typeof window.positionNavDropdown === 'function') {
+        var li = navMoreMobile.closest('.nav-dropdown-li');
+        if (li) window.positionNavDropdown(li);
+      }
+    });
   }
 
   /* ── Enhanced count-up (all numeric stats on scroll) ── */

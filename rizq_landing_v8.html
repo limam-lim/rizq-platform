@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=12.6"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=13.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=14.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=14.6"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -1794,7 +1794,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-t="nav-stores">المحلات</a></li>
     <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-t="nav-assistant">✨ رزق ذكي</button></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
-      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-t="nav-more">المزيد</span></button>
+      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false" onclick="toggleNavDropdown(event,this)"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-t="nav-more">المزيد</span></button>
       <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
@@ -5606,7 +5606,7 @@ const ALL_PANELS=['p-login','p-type','p-biz-type','p-individual-form','p-store-f
 function positionNavDropdown(li){
   if(!li) return;
   var menu=li.querySelector('.nav-dropdown-menu')||document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'landing-more')+'"]');
-  if(menu && menu.parentNode!==li) li.appendChild(menu);
+  if(menu && menu.parentNode!==li && menu.parentNode!==document.body) li.appendChild(menu);
   if(menu){
     menu.classList.remove('rizq-more-menu-open');
     menu.style.position=menu.style.left=menu.style.top=menu.style.right=menu.style.bottom=menu.style.transform=menu.style.inset='';
@@ -5617,8 +5617,19 @@ function positionNavDropdown(li){
   var isPhone=false;
   try{ isPhone=window.matchMedia('(max-width:768px)').matches; }catch(eP){}
   if(isPhone && document.body.classList.contains('landing-ux-mobile')){
+    if(window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply==='function') window.RizqModuleFlags.reapply();
+    if(menu.parentNode!==document.body){
+      menu.__rizqMoreHome=li;
+      menu.setAttribute('data-rizq-more-for',li.id||'nav-more-li');
+      document.body.appendChild(menu);
+    }
+    var navEl=document.getElementById('nav');
+    var panelTop=116;
+    if(navEl) panelTop=Math.round(navEl.getBoundingClientRect().bottom+4);
     menu.classList.add('rizq-more-menu-open','rizq-phone-more-panel');
-    menu.style.cssText='position:fixed!important;top:116px!important;left:10px!important;right:10px!important;bottom:auto!important;transform:none!important;width:auto!important;max-height:min(calc(100vh - 128px),520px)!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;';
+    menu.style.cssText='position:fixed!important;top:'+panelTop+'px!important;left:10px!important;right:10px!important;bottom:auto!important;transform:none!important;width:auto!important;max-height:min(calc(100vh - '+(panelTop+12)+'px),520px)!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;';
+    var btn=document.getElementById('nav-more-mobile-btn');
+    if(btn) btn.setAttribute('aria-expanded','true');
   }
 }
 function closeNavDropdowns(){
@@ -5633,6 +5644,8 @@ function closeNavDropdowns(){
       m.style.position=m.style.left=m.style.top=m.style.right=m.style.bottom=m.style.transform=m.style.maxHeight=m.style.width=m.style.zIndex='';
     }
   });
+  var moreBtn=document.getElementById('nav-more-mobile-btn');
+  if(moreBtn) moreBtn.setAttribute('aria-expanded','false');
 }
 function toggleNavDropdown(e,el){
   e.preventDefault();
@@ -5643,6 +5656,9 @@ function toggleNavDropdown(e,el){
   closeNavDropdowns();
   if(!wasOpen) positionNavDropdown(li);
 }
+window.toggleNavDropdown=toggleNavDropdown;
+window.positionNavDropdown=positionNavDropdown;
+window.closeNavDropdowns=closeNavDropdowns;
 (function bindDesktopMoreHover(){
   var li=document.querySelector('#nav .nav-dropdown-li');
   if(!li) return;

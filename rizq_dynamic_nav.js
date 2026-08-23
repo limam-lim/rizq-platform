@@ -281,7 +281,7 @@
     document.querySelectorAll('[data-hdr]').forEach(function (el) {
       var k = el.getAttribute('data-hdr');
       if (!k || !LABELS[k]) return;
-      var text = t(LABELS[k].ar, LABELS[k.fr);
+      var text = t(LABELS[k].ar, LABELS[k].fr);
       if (k === 'tenders' && el.closest('[data-rizq-module="tenders"]')) {
         text = t('غرفة المناقصات', 'Appels d\'offres');
       }
