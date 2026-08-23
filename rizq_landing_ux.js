@@ -149,20 +149,10 @@
     if (navMoreMobile) {
       navMoreMobile.addEventListener('click', function (e) {
         e.preventDefault();
-        if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
-      });
-    }
-    var navBack = document.getElementById('nav-back-btn');
-    if (navBack) {
-      navBack.addEventListener('click', function (e) {
-        e.preventDefault();
-        try {
-          if (window.history.length > 1 && document.referrer) {
-            window.history.back();
-            return;
-          }
-        } catch (eB) {}
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        e.stopPropagation();
+        if (typeof window.toggleNavDropdown === 'function') {
+          window.toggleNavDropdown(e, navMoreMobile);
+        }
       });
     }
   }

@@ -20,8 +20,6 @@
 
   /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
   var MOBILE_MORE_EXTRAS = [
-    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
-    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '📹' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
@@ -239,6 +237,7 @@
       var onLanding = isLanding();
       if (menu.closest('#nav-more-li') && isMobile) {
         rebuildMoreMenu(menu, mobileItems, flags, 'mobile');
+        menu.setAttribute('data-rizq-more-variant', 'mobile');
       } else {
         rebuildMoreMenu(menu, DESKTOP_MORE, flags, 'desktop');
       }
