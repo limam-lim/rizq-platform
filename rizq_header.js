@@ -882,6 +882,7 @@
       return;
     }
     removeDeskNav();
+    if (document.body && isLanding()) document.body.classList.add('landing-ux-mobile');
     if (!document.getElementById('rizq-app-header')) {
       var host = document.body;
       if (!host) return;
@@ -903,6 +904,9 @@
 
   if (document.body) inject();
   else document.addEventListener('DOMContentLoaded', inject);
+  window.addEventListener('load', function () {
+    if (isMobileNav() && !document.getElementById('rizq-app-header') && document.body) inject();
+  });
   try {
     var mq = window.matchMedia('(max-width: 768px)');
     var mqLand = window.matchMedia('(orientation: landscape) and (max-height: 520px)');

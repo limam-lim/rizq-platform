@@ -266,8 +266,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 .rizq-hdr-more-menu a:hover,
 .rizq-hdr-more-menu a:active{background:rgba(201,168,76,.16);color:#E8C96A}
 
-/* Default: never show injected header until a mobile query turns it on */
-#rizq-app-header{display:none !important}
+/* Default: hide injected header on desktop; mobile query below shows it */
+@media (min-width:769px) and (min-height:501px){
+  #rizq-app-header{display:none !important}
+}
 
 /* ════════════ DESKTOP ≥769px — original page header ════════════ */
 @media (min-width:769px) and (min-height:501px){
@@ -738,7 +740,27 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:none !important;
   }
 
-  /* Landing mobile uses the same two-tier #rizq-app-header as other phone pages */
+  /* Landing mobile: two-tier injected header only (hide legacy #nav) */
+  html.rizq-app-nav body.landing-ux-mobile > nav#nav,
+  html.rizq-app-nav.rizq-landing-mobile > body > nav#nav{
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+    height:0 !important;
+    overflow:hidden !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header,
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header .rizq-hdr-row1,
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header .rizq-hdr-row2{
+    display:flex !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    opacity:1 !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
+    display:block !important;
+    height:112px !important;
+  }
   html.rizq-app-nav body.landing-ux-mobile .section-jump-bar{
     display:none !important;
   }
