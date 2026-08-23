@@ -528,6 +528,10 @@
   }
 
   function closeMoreDropdowns() {
+    if (isLanding() && isMobileNav() && typeof window.closeNavDropdowns === 'function') {
+      window.closeNavDropdowns();
+      return;
+    }
     document.querySelectorAll('.nav-dropdown-li.open').forEach(function (o) {
       o.classList.remove('open');
       restoreMoreMenu(o);
@@ -612,28 +616,7 @@
   }
 
   function bindLandingMobileMore() {
-    var btn = document.getElementById('nav-more-mobile-btn');
-    var li = document.getElementById('nav-more-li');
-    if (!btn || !li || btn.getAttribute('data-rizq-landing-more-bound')) return;
-    btn.setAttribute('data-rizq-landing-more-bound', '1');
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var wasOpen = li.classList.contains('open');
-      closeMoreDropdowns();
-      closeMobileMoreMenu();
-      if (!wasOpen) positionLandingMobileMore(li);
-    }, true);
-    if (!window.__rizqLandingMoreCloseBound) {
-      window.__rizqLandingMoreCloseBound = true;
-      document.addEventListener('click', function (e) {
-        if (e.target.closest('#nav-more-li') || e.target.closest('#nav-more-menu-mobile')
-          || e.target.closest('.nav-dropdown-menu[data-rizq-more-for="nav-more-li"]')) return;
-        if (document.getElementById('nav-more-li') && document.getElementById('nav-more-li').classList.contains('open')) {
-          closeMoreDropdowns();
-        }
-      });
-    }
+    /* Click handled by rizq_landing_ux.js → toggleNavDropdown (single path, no double-toggle). */
   }
 
   window.positionNavDropdown = positionMoreDropdown;

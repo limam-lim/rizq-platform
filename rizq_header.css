@@ -876,6 +876,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{display:flex!important}
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li{position:static!important;overflow:visible!important}
+  html.rizq-app-nav body.landing-ux-mobile #rizq-more-backdrop{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:10051;
+    background:rgba(0,0,0,.52);
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #rizq-more-backdrop.open{
+    display:block !important;
+    pointer-events:auto !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile.rizq-more-open{
+    overflow:hidden !important;
+    touch-action:none;
+  }
+  html.rizq-app-nav body.landing-ux-mobile body > .nav-dropdown-menu.rizq-phone-more-panel,
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li .nav-dropdown-menu,
   html.rizq-app-nav body.landing-ux-mobile #nav-more-menu-mobile,
   html.rizq-app-nav body.landing-ux-mobile body > .nav-dropdown-menu.rizq-phone-more-panel{
@@ -893,6 +911,18 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     opacity:1 !important;
     visibility:visible !important;
     pointer-events:auto !important;
+    position:fixed !important;
+    transform:none !important;
+    inset:auto !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile body > .nav-dropdown-menu.rizq-phone-more-panel::before,
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li.open > .nav-dropdown-menu::before{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li .nav-dropdown-menu:not(.rizq-more-menu-open){
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li .nav-dd-item{
     display:flex !important;
