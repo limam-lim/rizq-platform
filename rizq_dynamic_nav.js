@@ -6,7 +6,7 @@
   'use strict';
 
   var MODULES = [
-    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4 },
+    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4, always: true },
     { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5 },
     { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 6 },
     { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'غرفة المناقصات' }
@@ -83,6 +83,8 @@
 
   function moduleOpen(flags, key) {
     if (!flags || typeof flags !== 'object') return key === 'store';
+    var mod = MODULES.filter(function (m) { return m.key === key; })[0];
+    if (mod && mod.always) return true;
     return flags[key] !== false;
   }
 
