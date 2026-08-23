@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=12.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=13.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=13.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=13.9"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -1770,11 +1770,12 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- ══ NAVBAR ══ -->
 <nav id="nav">
   <div class="nav-start">
+    <button type="button" class="rizq-hdr-back" id="nav-back-btn" aria-label="رجوع" title="رجوع">←</button>
+    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" aria-label="FR / العربية">FR / العربية</button>
     <button type="button" class="nav-account-btn" onclick="openModal('login')" aria-label="حسابي">
       <span class="nav-account-ico" aria-hidden="true">👤</span>
       <span data-t="nav-account">حسابي</span>
     </button>
-    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" aria-label="FR / العربية">FR / العربية</button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="القائمة" title="القائمة">
       <span></span><span></span><span></span>
     </button>
@@ -4627,7 +4628,7 @@ function applyLandingLang(toAr) {
   }
   document.querySelectorAll('.btn-lang').forEach(b => {
     if (b.classList.contains('btn-lang-primary') || b.id === 'rizq-lang-btn' || b.id === 'nav-lang-btn' || b.id === 'rizq-desk-lang-btn') {
-      b.textContent = 'FR / العربية';
+      b.textContent = isAr ? 'العربية / FR' : 'FR / العربية';
     } else {
       b.textContent = isAr ? 'FR' : 'AR';
     }

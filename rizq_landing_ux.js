@@ -141,9 +141,20 @@
     if (mbnMore) {
       mbnMore.addEventListener('click', function (e) {
         e.preventDefault();
-        var hdrMore = document.getElementById('rizq-hdr-more');
-        if (hdrMore) hdrMore.click();
-        else if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
+        if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
+      });
+    }
+    var navBack = document.getElementById('nav-back-btn');
+    if (navBack) {
+      navBack.addEventListener('click', function (e) {
+        e.preventDefault();
+        try {
+          if (window.history.length > 1 && document.referrer) {
+            window.history.back();
+            return;
+          }
+        } catch (eB) {}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
   }
