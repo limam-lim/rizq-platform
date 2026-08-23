@@ -72,21 +72,36 @@
     return map[key] || key;
   }
 
+  function refreshComingSoonModalLang() {
+    var desc = document.getElementById('cs-modal-desc');
+    var input = document.getElementById('cs-modal-input');
+    var submit = document.getElementById('cs-modal-submit');
+    var cancel = document.getElementById('cs-modal-cancel');
+    if (desc) {
+      desc.textContent = t(
+        'هذا القسم قيد الإطلاق — أدخل رقم هاتفك أو بريدك لنعلمك فور التفعيل.',
+        'Cette section arrive bientôt — laissez votre contact pour être prévenu.'
+      );
+    }
+    if (input) input.placeholder = t('+222 ... أو example@email.com', '+222 ... ou example@email.com');
+    if (submit) submit.textContent = '✅ ' + t('أعلمني', 'Prévenez-moi');
+    if (cancel) cancel.textContent = t('إغلاق', 'Fermer');
+  }
+
   function ensureComingSoonModal() {
-    if (document.getElementById('cs-modal-overlay')) return;
-    var fr = lang() === 'fr';
+    if (document.getElementById('cs-modal-overlay')) {
+      refreshComingSoonModalLang();
+      return;
+    }
     var modal = document.createElement('div');
     modal.id = 'cs-modal-overlay';
     modal.className = 'cs-modal-overlay';
     modal.innerHTML = '<div class="cs-modal-box">'
       + '<div class="cs-modal-title" id="cs-modal-title"></div>'
-      + '<div class="cs-modal-desc" id="cs-modal-desc">' + t(
-        'هذا القسم قيد الإطلاق — أدخل رقم هاتفك أو بريدك لنعلمك فور التفعيل.',
-        'Cette section arrive bientôt — laissez votre contact pour être prévenu.'
-      ) + '</div>'
-      + '<input type="text" id="cs-modal-input" class="cs-modal-input" placeholder="' + t('+222 ... أو example@email.com', '+222 ... ou example@email.com') + '">'
-      + '<button type="button" class="cs-modal-submit" id="cs-modal-submit">✅ ' + t('أعلمني', 'Prévenez-moi') + '</button>'
-      + '<button type="button" class="cs-modal-cancel" id="cs-modal-cancel">' + t('إغلاق', 'Fermer') + '</button>'
+      + '<div class="cs-modal-desc" id="cs-modal-desc"></div>'
+      + '<input type="text" id="cs-modal-input" class="cs-modal-input">'
+      + '<button type="button" class="cs-modal-submit" id="cs-modal-submit"></button>'
+      + '<button type="button" class="cs-modal-cancel" id="cs-modal-cancel"></button>'
       + '</div>';
     document.body.appendChild(modal);
     modal.addEventListener('click', function (e) {
@@ -94,6 +109,7 @@
     });
     document.getElementById('cs-modal-submit').addEventListener('click', submitComingSoonInterest);
     document.getElementById('cs-modal-cancel').addEventListener('click', closeComingSoonModal);
+    refreshComingSoonModalLang();
   }
 
   function openComingSoonModal(key, label) {
@@ -321,6 +337,11 @@
     defaultFlags: defaultFlags,
     moduleKeyFromHref: moduleKeyFromHref
   };
+
+  document.addEventListener('rizq:langchange', function () {
+    if (_lastFlags) renderComingSoonStrip(_lastFlags);
+    else refreshComingSoonModalLang();
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchAndApply);
