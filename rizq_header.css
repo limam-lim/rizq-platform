@@ -216,6 +216,9 @@ body > .nav-dropdown-menu.rizq-more-menu-open,
   background:#1e293b;border:1px solid rgba(255,255,255,.14);
   color:#fff;font-size:18px;text-decoration:none;pointer-events:auto !important;
 }
+#nav-back-btn{display:none}
+.nav-phone-more-only{display:none}
+.nav-desktop-more-only{display:inline}
 .rizq-hdr-back{
   display:inline-flex;align-items:center;justify-content:center;
   width:40px;height:40px;border-radius:50%;flex-shrink:0;
