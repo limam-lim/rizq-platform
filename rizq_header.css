@@ -268,16 +268,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* Default: hide injected header on desktop; mobile query below shows it */
 @media (min-width:769px) and (min-height:501px){
-  #nav .nav-m-ico,
-  #nav .nav-m-post-plus{display:none!important}
-  #nav-more-mobile-btn{display:none!important}
-  #nav .nav-m-desktop-only{display:inline!important}
-  #nav .nav-m-post{
-    width:auto!important;height:auto!important;min-height:0!important;
-    border-radius:8px!important;margin:0!important;
-    background:rgba(201,168,76,.12)!important;
-    box-shadow:none!important;
-  }
+  #nav-back-btn,
+  #nav .rizq-hdr-back{display:none!important}
+  #nav .nav-phone-more-only{display:none!important}
+  #nav .nav-desktop-more-only{display:inline!important}
   #rizq-app-header{display:none !important}
 }
 
@@ -830,38 +824,44 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-desktop-only{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-desktop-more-only{
     display:none !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"],
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-hide-stores{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"]{
     display:none !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
     flex:1;min-width:0;list-style:none;display:flex;justify-content:center;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-tab,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn{
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:1px;padding:4px 1px;background:none;border:none;cursor:pointer;
     color:rgba(255,255,255,.88);text-decoration:none;font-family:inherit;
     font-size:9px;font-weight:600;min-width:0;width:100%;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-ico{font-size:15px;line-height:1}
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-lbl{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center li[data-nav-order="1"] > a::before{content:'🏠';font-size:15px;line-height:1;display:block}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center li[data-nav-order="2"] > a::before{content:'📂';font-size:15px;line-height:1;display:block}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center li[data-nav-order="8"] > .nav-link-btn::before{content:'✨';font-size:15px;line-height:1;display:block}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-ico{font-size:15px;line-height:1;display:block}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-lbl,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn{
     font-size:9px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-li{flex:0 0 34px!important;width:34px!important}
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-post-li{flex:0 0 34px!important;width:34px!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-post-li > a{
     flex:0 0 34px!important;width:34px!important;height:34px!important;
     border-radius:50%!important;margin:0 4px;padding:0!important;
     background:linear-gradient(135deg,#C9A84C,#e8c96a)!important;
     color:#0f2347!important;border:none!important;
     box-shadow:0 2px 10px rgba(201,168,76,.35)!important;
-    display:flex!important;align-items:center!important;justify-content:center!important;
+    font-size:0!important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-plus{font-size:17px;font-weight:900;line-height:1}
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-lbl{display:none!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-post-li > a::before{
+    content:'+';font-size:17px;font-weight:900;line-height:1;display:block;color:#0f2347;
+  }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{display:flex!important}
   html.rizq-app-nav body.landing-ux-mobile .mobile-drawer,
   html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay{

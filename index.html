@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=12.6"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=13.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=14.2"/>
+<link rel="stylesheet" href="rizq_header.css?v=14.3"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -1788,15 +1788,15 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <span></span><span></span><span></span>
     </button>
   </div>
-  <ul class="nav-center" id="nav-center-main">
-    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-t="nav-home"><span class="nav-m-ico" aria-hidden="true">🏠</span><span class="nav-m-lbl">الرئيسية</span></a></li>
-    <li data-nav-order="2"><a href="#categories" data-t="nav-cats"><span class="nav-m-ico" aria-hidden="true">📂</span><span class="nav-m-lbl">الأقسام</span></a></li>
-    <li data-nav-order="3" class="nav-m-post-li"><a href="rizq_post.html" class="nav-post-plus nav-m-post" data-t="nav-post" aria-label="نشر"><span class="nav-m-post-plus">+</span><span class="nav-m-lbl nav-m-post-lbl">نشر (+)</span></a></li>
-    <li class="rizq-nav-module nav-m-hide-stores" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-t="nav-stores"><span class="nav-m-ico" aria-hidden="true">🏪</span><span class="nav-m-lbl">المحلات</span></a></li>
-    <li data-nav-order="8"><button type="button" class="nav-link-btn nav-m-tab" id="nav-assistant-btn" data-t="nav-assistant"><span class="nav-m-ico" aria-hidden="true">✨</span><span class="nav-m-lbl">رزق ذكي</span></button></li>
-    <li class="nav-dropdown-li nav-m-tab-li" id="nav-more-li" data-nav-order="9">
-      <button type="button" class="nav-link-btn nav-m-tab" id="nav-more-mobile-btn" data-t="nav-more" aria-haspopup="true" aria-controls="mobile-drawer"><span class="nav-m-ico" aria-hidden="true">⋯</span><span class="nav-m-lbl">المزيد</span></button>
-      <a href="#" class="nav-dropdown-trigger nav-m-desktop-only" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
+  <ul class="nav-center">
+    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a></li>
+    <li data-nav-order="2"><a href="#categories" data-t="nav-cats">الأقسام</a></li>
+    <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-t="nav-post">نشر (+)</a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-t="nav-stores">المحلات</a></li>
+    <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-t="nav-assistant">✨ رزق ذكي</button></li>
+    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
+      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="mobile-drawer"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-t="nav-more">المزيد</span></button>
+      <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
       <div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المواد القانونية</strong></div></a>
