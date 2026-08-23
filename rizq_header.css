@@ -738,6 +738,37 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:none !important;
   }
 
+  /* Landing page: keep native #nav + bottom bar (not the injected app header) */
+  html.rizq-app-nav body.landing-ux-mobile{
+    padding-top:0 !important;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom,0)) !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile > nav#nav{
+    display:flex !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .mobile-bottom-nav{
+    display:block !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .nav-hamburger{
+    display:flex !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer{
+    display:block !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay:not(.open){
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay.open{
+    display:block !important;
+    opacity:1 !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .hero{
+    padding-top:70px !important;
+  }
+
   #rizq-app-header{
     display:block !important;
     position:fixed;

@@ -125,8 +125,8 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 }
 .mobile-bottom-nav a.active,.mobile-bottom-nav button.active{color:var(--gold-light,#e8c96a)}
 
-@media(max-width:768px){
-  .mobile-bottom-nav{display:block}
+@media(max-width:768px), (orientation:landscape) and (max-height:500px){
+  .mobile-bottom-nav{display:block!important}
   body.landing-ux-mobile{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
   nav.nav-compact .nav-sticky-tools{max-width:none;margin:0 8px}
   nav.nav-compact .nav-sticky-post{display:none}
