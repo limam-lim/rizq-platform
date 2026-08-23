@@ -255,12 +255,63 @@ function _durationLabel(pkg, lang) {
   return lang === 'fr' ? 'mois' : 'شهر';
 }
 
+function _hasArabic(text) {
+  return /[\u0600-\u06FF]/.test(String(text || ''));
+}
+
+function _nameMapFor(pkg) {
+  var id = pkg && pkg.id;
+  if (id && NAMES[id]) return { id: id, map: NAMES[id] };
+  var raw = String((pkg && pkg.name) || '').replace(/💎\s*/g, '').trim();
+  if (!raw) return null;
+  for (var key in NAMES) {
+    if (!Object.prototype.hasOwnProperty.call(NAMES, key)) continue;
+    var map = NAMES[key];
+    if (map.ar === raw || map.fr === raw) return { id: key, map: map };
+  }
+  return null;
+}
+
+function _defaultCta(pkg, lang) {
+  lang = _normLang(lang);
+  if (!Number((pkg && pkg.price) || 0)) {
+    return lang === 'fr' ? 'Commencer gratuitement' : 'ابدأ مجاناً';
+  }
+  if (pkg && pkg.id && /-month$/.test(String(pkg.id))) {
+    return lang === 'fr' ? "S'abonner maintenant" : 'اشترك الآن';
+  }
+  return lang === 'fr' ? "S'abonner" : 'اشترك';
+}
+
+function _applyStandardNames(out, lang) {
+  var hit = _nameMapFor(out);
+  if (!hit) return out;
+  if (!out.id) out.id = hit.id;
+  out.name_ar = hit.map.ar;
+  out.name_fr = hit.map.fr || out.name_fr || hit.map.ar;
+  out.name = lang === 'fr' ? (out.name_fr || hit.map.fr || hit.map.ar) : (out.name_ar || hit.map.ar);
+  return out;
+}
+
 function enrichForDisplay(pkg, lang) {
+  lang = _normLang(lang);
   var out = Object.assign({}, pkg || {});
   if (!isDiamondPackage(out)) {
-    if (!out.name) out.name = localizedName(out, lang);
-    if (!out.duration) out.duration = _durationLabel(out, lang);
-    if (!out.period) out.period = periodLabel(out, lang);
+    _applyStandardNames(out, lang);
+    out.name = localizedName(out, lang);
+    out.name_fr = localizedName(out, 'fr');
+    out.name_ar = localizedName(out, 'ar');
+    out.duration = out.duration || _durationLabel(out, lang);
+    out.period = periodLabel(out, lang);
+    out.period_fr = periodLabel(out, 'fr');
+    out.features = Array.isArray(out.features) ? out.features.slice() : [];
+    if (Array.isArray(out.features_fr) && out.features_fr.length) {
+      out.features_fr = out.features_fr.slice();
+    } else {
+      out.features_fr = [];
+    }
+    out.cta_fr = out.cta_fr || _defaultCta(out, 'fr');
+    out.cta = lang === 'fr' ? out.cta_fr : (out.cta || _defaultCta(out, 'ar'));
     return out;
   }
   var copy = diamondCopy(lang);
@@ -292,20 +343,35 @@ function _mergeLive(defaults, live) {
   return live.filter(function (p) { return p && p.active !== false; }).map(function (livePkg) {
     var base = (livePkg.id && byId[livePkg.id]) ? byId[livePkg.id] : {};
     var diamond = isDiamondPackage(livePkg) || isDiamondPackage(base);
+    var pkgId = String(livePkg.id || base.id || '');
+    var nameHit = pkgId && NAMES[pkgId] ? NAMES[pkgId] : null;
     return {
-      id: String(livePkg.id || base.id || ''),
+      id: pkgId,
       price: livePkg.price != null ? Number(livePkg.price) : (base.price || 0),
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
       discountPct: livePkg.discountPct != null ? Number(livePkg.discountPct) : (base.discountPct || 0),
       features: diamond
         ? (base.features || DIAMOND_FEATURES).slice()
         : (Array.isArray(livePkg.features) && livePkg.features.length ? livePkg.features.slice() : (base.features || [])),
-      name: diamond ? (base.name || DIAMOND_MARKETING.name.ar) : (livePkg.name || base.name || ''),
+      features_fr: diamond
+        ? DIAMOND_FEATURES_FR.slice()
+        : (Array.isArray(livePkg.features_fr) && livePkg.features_fr.length ? livePkg.features_fr.slice() : (base.features_fr || [])),
+      name: diamond
+        ? (base.name || DIAMOND_MARKETING.name.ar)
+        : (livePkg.name || base.name || (nameHit && nameHit.ar) || ''),
+      name_fr: diamond
+        ? DIAMOND_MARKETING.name.fr
+        : (livePkg.name_fr || base.name_fr || (nameHit && nameHit.fr) || ''),
       description: diamond ? (base.description || DIAMOND_MARKETING.description.ar) : (livePkg.description || base.description || ''),
+      description_fr: diamond ? DIAMOND_MARKETING.description.fr : (livePkg.description_fr || base.description_fr || ''),
       featured: diamond ? true : !!livePkg.featured,
       featuredBadge: diamond ? (base.featuredBadge || DIAMOND_MARKETING.featuredBadge.ar) : (livePkg.featuredBadge || ''),
+      featuredBadge_fr: diamond ? DIAMOND_MARKETING.featuredBadge.fr : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
       roi: diamond ? (base.roi || DIAMOND_MARKETING.roi.ar) : (livePkg.roi || ''),
-      period: livePkg.period || base.period || ''
+      roi_fr: diamond ? DIAMOND_MARKETING.roi.fr : (livePkg.roi_fr || base.roi_fr || ''),
+      period: livePkg.period || base.period || '',
+      cta: livePkg.cta || base.cta || '',
+      cta_fr: livePkg.cta_fr || base.cta_fr || ''
     };
   });
 }
@@ -339,18 +405,29 @@ function getPublicPackages() {
 function localizedName(pkg, lang) {
   lang = _normLang(lang);
   if (isDiamondPackage(pkg)) return diamondCopy(lang).name;
-  var map = NAMES[pkg.id];
-  if (map && map[lang]) return map[lang];
+  var hit = _nameMapFor(pkg);
+  if (hit && hit.map[lang]) return hit.map[lang];
+  if (hit && lang === 'fr' && hit.map.fr) return hit.map.fr;
   var raw = pkg.name ? String(pkg.name).replace(/💎\s*/g, '').trim() : '';
+  if (lang === 'fr' && _hasArabic(raw)) {
+    if (pkg.name_fr && !_hasArabic(pkg.name_fr)) return String(pkg.name_fr);
+    return raw;
+  }
   if (raw && raw !== String(pkg.id || '') && !/^[a-z]{2,}-[a-z0-9-]+$/i.test(raw)) return raw;
-  if (map && map.ar) return map.ar;
-  return raw || pkg.id || '';
+  if (hit && hit.map.ar) return hit.map.ar;
+  return raw || (pkg && pkg.id) || '';
 }
 
 function periodLabel(pkg, lang) {
   lang = _normLang(lang);
   var t = PERIODS[lang] || PERIODS.ar;
-  if (pkg.period && !/^MRU\s*\//i.test(String(pkg.period))) return pkg.period;
+  if (pkg.period && !/^MRU\s*\//i.test(String(pkg.period))) {
+    if (lang === 'fr' && _hasArabic(pkg.period)) {
+      // Arabic period from admin/localStorage — recompute FR label from durationDays
+    } else {
+      return pkg.period;
+    }
+  }
   if (!pkg.price) return t.freeDays.replace('{n}', String(pkg.durationDays || 3));
   if (pkg.durationDays >= 360) return t.year;
   if (pkg.durationDays >= 80) return t.quarter;
@@ -374,18 +451,26 @@ function formatPackage(pkg, lang) {
   return {
     id: display.id,
     name: localizedName(display, lang),
+    name_fr: localizedName(display, 'fr'),
     description: display.description || '',
+    description_fr: display.description_fr || '',
     diamond: isDiamondPackage(display),
     isDiamond: isDiamondPackage(display),
     featured: !!display.featured || isDiamondPackage(display),
     featuredBadge: display.featuredBadge || '',
+    featuredBadge_fr: display.featuredBadge_fr || '',
     roi: display.roi || '',
+    roi_fr: display.roi_fr || '',
     price: display.price,
     priceLabel: priceLabel(display, lang),
     period: periodLabel(display, lang),
+    period_fr: periodLabel(display, 'fr'),
     durationDays: display.durationDays,
     duration: display.durationDays + (lang === 'fr' ? ' j' : lang === 'en' ? ' days' : lang === 'es' ? ' días' : ' يوم'),
     features: display.features || [],
+    features_fr: display.features_fr || [],
+    cta: display.cta || _defaultCta(display, lang),
+    cta_fr: display.cta_fr || _defaultCta(display, 'fr'),
     discountPct: display.discountPct || 0
   };
 }

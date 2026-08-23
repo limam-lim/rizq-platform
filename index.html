@@ -22,11 +22,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=12.3"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=12.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=13.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=13.5"/>
-<script>document.documentElement.classList.add('rizq-app-nav')</script>
-<script src="rizq_packages_config.js?v=12.7"></script>
+<link rel="stylesheet" href="rizq_header.css?v=13.6"/>
+<script>
+document.documentElement.classList.add('rizq-app-nav');
+(function(){
+  try{
+    var m=window.matchMedia('(max-width:768px), (orientation:landscape) and (max-height:500px)');
+    if(m.matches){
+      document.documentElement.classList.add('rizq-landing-mobile');
+      var mark=function(){ if(document.body) document.body.classList.add('landing-ux-mobile'); };
+      if(document.body) mark(); else document.addEventListener('DOMContentLoaded', mark);
+    }
+  }catch(e){}
+})();
+</script>
+<script src="rizq_packages_config.js?v=12.8"></script>
 <script src="rizq_packages_ui.js?v=12.7"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
@@ -5969,12 +5981,12 @@ function ppRenderPackages(btype){
     var border = isDia?'1px solid rgba(168,85,247,.5)':isHigh?'1px solid rgba(201,168,76,.4)':'1px solid rgba(255,255,255,.1)';
     var bg = isDia?'rgba(168,85,247,.08)':isHigh?'rgba(201,168,76,.08)':isTrial?'rgba(74,222,128,.05)':'rgba(255,255,255,.03)';
     var icon = isTrial?'🎁':isDia?'💎':isHigh?'📅':'👑';
-    var pName   = isFr ? (p.name_fr||p.name) : p.name;
-    var pPeriod = isFr ? (p.period_fr||p.period) : p.period;
+    var pName   = isFr ? trPkg(p.name_fr || p.name) : p.name;
+    var pPeriod = isFr ? trPkg(p.period_fr || p.period || '') : p.period;
     var freeLbl = isFr ? 'Gratuit' : 'مجاني';
     var priceStr = isTrial?'<span style="color:#4ade80;font-weight:700">'+freeLbl+'</span>':'<span style="font-weight:800;font-size:14px;color:'+(isDia?'#c084fc':isHigh?'var(--gold)':'var(--white)')+'">'+p.price.toLocaleString('en-US')+'</span> <span style="font-size:10px;color:var(--text-muted)">MRU/'+pPeriod+'</span>';
-    var featList = (isFr && p.features_fr) ? p.features_fr : (p.features||[]);
-    var feats = featList.slice(0,4).map(function(f){return '<span style="font-size:10px;color:var(--text-muted)">✓ '+f+'</span>';}).join(' · ');
+    var featList = (isFr && p.features_fr && p.features_fr.length) ? p.features_fr : (p.features||[]);
+    var feats = featList.slice(0,4).map(function(f){return '<span style="font-size:10px;color:var(--text-muted)">✓ '+ (isFr ? trPkg(f) : f) +'</span>';}).join(' · ');
     var bestLbl = isDia ? (isFr ? (p.featuredBadge_fr || p.featuredBadge || 'Le plus choisi par les entreprises') : (p.featuredBadge || 'الأكثر اختياراً للشركات')) : (isFr ? '💎 Meilleure offre' : '💎 الأفضل');
     var popularLbl = isFr ? '⭐ Le plus demandé' : '⭐ الأكثر طلباً';
     html+='<div data-pkgi="'+i+'" onclick="ppSelectPkg(this,'+i+')" style="cursor:pointer;border:'+border+';background:'+bg+';border-radius:12px;padding:12px 14px;transition:all .2s;position:relative" class="pp-pkg-card">'
@@ -6656,7 +6668,18 @@ var PKG_TR = {
   'توفير 14%':'Économisez 14%','توفير 33%':'Économisez 33%','خدمات غير محدودة':'Services illimités',
   '📞 الرد التلقائي على مكالماتك الغائبة':'📞 Réponse automatique à vos appels manqués',
   '📧 ردود ذكية على بريدك الإلكتروني':'📧 Réponses intelligentes à vos e-mails',
-  'أولوية قصوى — ظهور دائم في النتائج':'Priorité maximale — visibilité permanente dans les résultats'
+  'أولوية قصوى — ظهور دائم في النتائج':'Priorité maximale — visibilité permanente dans les résultats',
+  'باقة شهرية':'Mensuel','مجانية':'Gratuit','مميزة':'Mise en avant','أساسي':'Basique','سنوي':'Annuel',
+  'وصول كامل للمنصة':'Accès complet à la plateforme','استعراض المنتجات':'Présentation des produits','دعم فني أساسي':'Support technique de base',
+  'شارة محل مميّز برزق':'Badge boutique premium Rizq','عرض 50 منتج':'Affichage de 50 produits','إحصائيات شهرية':'Statistiques mensuelles','دعم بالأولوية':'Support prioritaire',
+  'كل مزايا الشهرية':'Tous les avantages mensuels','توفير 15% عن الشهري':'Économisez 15% vs mensuel','عرض 200 منتج':'Affichage de 200 produits','مدير حساب مخصص':'Gestionnaire de compte dédié',
+  'كل مزايا الربعية':'Tous les avantages trimestriels','توفير 35% عن الشهري':'Économisez 35% vs mensuel','منتجات غير محدودة':'Produits illimités','دعم VIP 24/7':'Support VIP 24/7','تقارير سنوية':'Rapports annuels',
+  'شارة موثّق':'Badge vérifié','فيديو تعريفي مشمول':'Vidéo de présentation incluse',
+  '🏅 شارة "موثّق ✅"':'Badge vérifié ✅','🏅 شارة "محل مميّز برزق"':'Badge boutique premium Rizq',
+  'إعلان واحد نشط':'1 annonce active','حتى 5 صور للإعلان':'Jusqu\'à 5 photos par annonce','ظهور في نتائج البحث العادية':'Visibilité dans les résultats standard',
+  'تثبيت أعلى النتائج لمدة 3 أيام':'Épinglage en tête des résultats pendant 3 jours','شارة "إعلان مميز"':'Badge « annonce mise en avant »',
+  'حتى 10 إعلانات نشطة':'Jusqu\'à 10 annonces actives','حتى 5 صور لكل إعلان':'Jusqu\'à 5 photos par annonce','تجديد تلقائي للإعلانات':'Renouvellement automatique des annonces',
+  'اشترك الآن':'S\'abonner maintenant','اشترك':'S\'abonner'
 };
 function trPkg(s){ return (typeof s==='string' && PKG_TR.hasOwnProperty(s)) ? PKG_TR[s] : s; }
 
@@ -6830,6 +6853,10 @@ function renderPricingSection(){
   }
 
   var _pkgLang = (typeof isAr!=='undefined' && !isAr)?'fr':'ar';
+  try {
+    var _savedPkgLang = localStorage.getItem('rizq_lang');
+    if (_savedPkgLang === 'fr' || _savedPkgLang === 'ar') _pkgLang = _savedPkgLang;
+  } catch (eLang) {}
 
   function catalogPackages(catalogKey, ensureDiamond) {
     var lang = _pkgLang;
@@ -6883,16 +6910,25 @@ function renderPricingSection(){
       period_fr: landingPeriodShort(p, 'fr'),
       durationDays: p.durationDays,
       features: p.features || [],
-      features_fr: p.features_fr || p.features || [],
+      features_fr: (p.features_fr && p.features_fr.length) ? p.features_fr : [],
       diamond: !!(p.diamond || p.isDiamond),
       featured: !!p.featured,
       featuredBadge: p.featuredBadge || '',
+      featuredBadge_fr: p.featuredBadge_fr || '',
       description: p.description || '',
+      description_fr: p.description_fr || '',
       roi: p.roi || '',
+      roi_fr: p.roi_fr || '',
       highlight: !!p.highlight || p.id === 'of-month' || p.id === 'st-month' || p.id === 'cp-month',
       cta: p.cta || '',
       cta_fr: p.cta_fr || ''
     };
+    if (lang === 'fr') {
+      out.name = out.name_fr || trPkg(out.name);
+      out.period = out.period_fr || trPkg(out.period || '');
+      if (!out.features_fr.length) out.features_fr = (out.features || []).map(trPkg);
+      out.cta = out.cta_fr || trPkg(out.cta || '') || "S'abonner →";
+    }
     return out;
   }
 
@@ -6918,7 +6954,7 @@ function renderPricingSection(){
         p.diamond = true; p.isDiamond = true; p.featured = true;
       }
       // أسماء/فترات/مزايا/زر — عربي افتراضياً، فرنسي إن وُجد حقل _fr (نفس نمط fallback المستخدم في renderExtraCategories)
-      var pName = _fr ? (p.name_fr || trPkg(p.name)) : p.name;
+      var pName = _fr ? trPkg(p.name_fr || p.name) : p.name;
       var pPeriod = _fr ? (p.period_fr || trPkg(p.period||'')) : (p.period||'');
       var pFeats = _fr ? ((p.features_fr && p.features_fr.length) ? p.features_fr : (p.features||[]).map(trPkg)) : (p.features||[]);
       var pCta = _fr ? (p.cta_fr || trPkg(p.cta||'') || "S'abonner →") : (p.cta||'اشترك الآن ←');
@@ -6987,8 +7023,15 @@ function renderPricingSection(){
   };
 }
 
-document.addEventListener('DOMContentLoaded', function(){ renderPricingSection(); });
-if(document.readyState!=='loading'){ renderPricingSection(); }
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    var saved = localStorage.getItem('rizq_lang');
+    if (saved === 'fr' && typeof applyLandingLang === 'function') applyLandingLang(false);
+    else if (typeof renderPricingSection === 'function') renderPricingSection();
+  } catch (e) {
+    if (typeof renderPricingSection === 'function') renderPricingSection();
+  }
+});
 </script>
 
 <!-- ══ Package Modal ══ -->
@@ -7012,7 +7055,7 @@ function openPkgModal(cardEl,origin){
   if(window.RizqPackagesConfig && typeof RizqPackagesConfig.enrichForDisplay==='function'){
     p=RizqPackagesConfig.enrichForDisplay(p, _fr?'fr':'ar');
   }
-  var pName=_fr?(p.name_fr||trPkg(p.name)):p.name;
+  var pName=_fr?trPkg(p.name_fr||p.name):p.name;
   var pPeriod=_fr?(p.period_fr||trPkg(p.period||'')):(p.period||'');
   var pFeats=_fr?((p.features_fr&&p.features_fr.length)?p.features_fr:(p.features||[]).map(trPkg)):(p.features||[]);
   var pCta=_fr?(p.cta_fr||trPkg(p.cta||'')||"S'abonner →"):(p.cta||'اشترك الآن ←');
@@ -7285,7 +7328,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=12.7"></script>
+<script src="rizq_packages_config.js?v=12.8"></script>
 <script src="rizq_packages_ui.js?v=12.7"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>

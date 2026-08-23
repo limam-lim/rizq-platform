@@ -743,11 +743,84 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-top:0 !important;
     padding-bottom:calc(72px + env(safe-area-inset-bottom,0)) !important;
   }
+  html.rizq-app-nav.rizq-landing-mobile #rizq-app-header,
   html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
     display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+    height:0 !important;
+    overflow:hidden !important;
   }
+  /* Landing (early class on html + body.landing-ux-mobile): compact top bar only */
+  html.rizq-app-nav.rizq-landing-mobile #nav > .nav-center,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center,
+  html.rizq-app-nav.rizq-landing-mobile #nav .nav-center,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center,
+  html.rizq-app-nav.rizq-landing-mobile #nav > .nav-sticky-tools,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
+  html.rizq-app-nav.rizq-landing-mobile #nav .nav-sticky-tools,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-sticky-tools{
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+    position:absolute !important;
+    left:-9999px !important;
+  }
+  html.rizq-app-nav.rizq-landing-mobile > body > nav#nav,
   html.rizq-app-nav body.landing-ux-mobile > nav#nav{
     display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    flex-wrap:nowrap !important;
+    height:70px !important;
+    max-height:70px !important;
+    min-height:70px !important;
+    padding:0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px)) !important;
+    gap:8px !important;
+    overflow:hidden !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-sticky-tools{
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+    position:absolute !important;
+    left:-9999px !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start{
+    order:1 !important;
+    flex:0 1 auto !important;
+    min-width:0 !important;
+    gap:6px !important;
+    grid-template-columns:auto auto auto !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .logo{
+    order:2 !important;
+    margin-inline-start:auto !important;
+    flex-shrink:0 !important;
+    max-width:min(46vw, 190px) !important;
+    min-width:0 !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .logo-text .logo-sub{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn span:not(.nav-account-ico){
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn{
+    padding:8px 10px !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .btn-lang-primary{
+    padding:6px 10px !important;
+    font-size:11px !important;
   }
   html.rizq-app-nav body.landing-ux-mobile .mobile-bottom-nav{
     display:block !important;
@@ -764,6 +837,22 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay.open{
     display:block !important;
     opacity:1 !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .section-jump-bar{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .fixed-disc-pill{
+    top:auto !important;
+    bottom:calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+    left:8px !important;
+    transform:none !important;
+    writing-mode:horizontal-tb !important;
+    text-orientation:mixed !important;
+    border-radius:10px !important;
+    padding:6px 10px !important;
+    font-size:9px !important;
+    letter-spacing:.5px !important;
+    z-index:998 !important;
   }
   html.rizq-app-nav body.landing-ux-mobile .hero{
     padding-top:70px !important;
