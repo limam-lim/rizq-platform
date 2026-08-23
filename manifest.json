@@ -6,7 +6,7 @@
   "scope": "./",
   "id": "/rizq_landing_v8.html",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "background_color": "#FFFFFF",
   "theme_color": "#0d1b2a",
   "lang": "ar",

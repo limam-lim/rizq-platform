@@ -58,7 +58,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 @media(display-mode:standalone){
   .rizq-splash{display:flex!important}
 }
-@media(max-width:768px){
+@media(max-width:768px), (orientation:landscape) and (max-height:500px){
   .rizq-splash{animation:rizqSplashAutoHide .45s 2.1s forwards}
 }
 @keyframes rizqSplashAutoHide{to{opacity:0;visibility:hidden;pointer-events:none}}
@@ -132,7 +132,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 }
 .rzq-sheet-body .iep-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
 
-@media(max-width:768px){
+@media(max-width:768px), (orientation:landscape) and (max-height:500px){
   /* إخفاء اللوحة الموسّعة داخل الشبكة — الجوال يستخدم بطاقة عائمة فقط */
   #cat-inline-panel{display:none!important;visibility:hidden!important}
 
@@ -175,7 +175,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .rzq-sheet-backdrop.open{background:rgba(6,12,24,.42)}
 }
 
-@media(max-width:768px){
+@media(max-width:768px), (orientation:landscape) and (max-height:500px){
   /* Hide vertical side banners */
   .fixed-rizq-logo,
   .fixed-disc-pill,
@@ -380,7 +380,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .cat-card.open,.cat-card.pinned{transform:none!important;z-index:1!important}
 }
 
-@media(orientation:landscape) and (max-width:768px){
+@media(orientation:landscape) and (max-height:520px){
   nav,.topnav{
     height:auto!important;min-height:48px;flex-wrap:wrap!important;
     padding:8px 12px!important;gap:8px!important;
@@ -409,7 +409,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .mobile-bottom-nav{padding-bottom:calc(4px + env(safe-area-inset-bottom,0))}
 }
 
-@media(max-width:768px){
+@media(max-width:768px), (orientation:landscape) and (max-height:500px){
   .rizq-hdr-start{gap:6px}
 }
 

@@ -250,7 +250,7 @@ body > .nav-dropdown-menu.rizq-more-menu-open,
   padding:8px;z-index:9999;text-align:start;
   pointer-events:auto !important;
 }
-@media(max-width:768px){
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
   .rizq-hdr-more-menu.is-positioned,
   .rizq-hdr-more-wrap.open .rizq-hdr-more-menu{
     right:auto!important;
@@ -270,7 +270,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 #rizq-app-header{display:none !important}
 
 /* ════════════ DESKTOP ≥769px — original page header ════════════ */
-@media (min-width:769px){
+@media (min-width:769px) and (min-height:501px){
   #rizq-app-header,
   #rizq-app-header .rizq-hdr-row1,
   #rizq-app-header .rizq-hdr-row2,
@@ -702,7 +702,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 }
 
 /* ════════════ MOBILE ≤768px — two-tier injected header ════════════ */
-@media (max-width:768px){
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
   html.rizq-app-nav{--rizq-header-h:112px}
   html.rizq-app-nav body{
     padding-top:var(--rizq-header-h) !important;

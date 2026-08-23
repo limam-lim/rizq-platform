@@ -469,8 +469,12 @@
   }
 
   function isMobileNav() {
+    if (global.RizqViewport && typeof global.RizqViewport.isPhone === 'function') {
+      return global.RizqViewport.isPhone();
+    }
     try {
-      return window.matchMedia('(max-width: 768px)').matches;
+      return window.matchMedia('(max-width: 768px)').matches
+        || window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches;
     } catch (e) {
       return false;
     }
@@ -586,7 +590,7 @@
       restoreMoreMenu(li);
       var closeT = null;
       function isDesk() {
-        try { return window.matchMedia('(min-width:769px)').matches; } catch (eH) { return true; }
+        try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
       }
       function keepOpen() {
         clearTimeout(closeT);
@@ -894,8 +898,17 @@
   else document.addEventListener('DOMContentLoaded', inject);
   try {
     var mq = window.matchMedia('(max-width: 768px)');
-    if (mq.addEventListener) mq.addEventListener('change', inject);
-    else if (mq.addListener) mq.addListener(inject);
+    var mqLand = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+    if (mq.addEventListener) {
+      mq.addEventListener('change', inject);
+      mqLand.addEventListener('change', inject);
+    } else if (mq.addListener) {
+      mq.addListener(inject);
+      mqLand.addListener(inject);
+    }
+    window.addEventListener('orientationchange', function () {
+      window.setTimeout(inject, 150);
+    });
   } catch (e2) {}
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeMoreDropdowns();

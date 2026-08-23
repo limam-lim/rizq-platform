@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '13.6';
+  var ASSET_V = '13.7';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -107,6 +107,30 @@
     }
     theme.content = '#0d1b2a';
   } catch (e) { /* keep page usable */ }
+
+  function isPhoneViewport() {
+    try {
+      if (window.matchMedia('(max-width:768px)').matches) return true;
+      if (window.matchMedia('(orientation:landscape) and (max-height:520px)').matches) return true;
+      return false;
+    } catch (eV) {
+      return window.innerWidth <= 768 || (window.innerHeight <= 520 && window.innerWidth > window.innerHeight);
+    }
+  }
+
+  global.RizqViewport = { isPhone: isPhoneViewport };
+
+  function onViewportChange() {
+    try { window.dispatchEvent(new Event('resize')); } catch (eR) {}
+    try {
+      if (window.RizqHeader && typeof window.RizqHeader.inject === 'function') {
+        window.RizqHeader.inject();
+      }
+    } catch (eH) {}
+  }
+  window.addEventListener('orientationchange', function () {
+    window.setTimeout(onViewportChange, 150);
+  });
 
   function isStandalone() {
     try {

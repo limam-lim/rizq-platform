@@ -268,7 +268,11 @@
 
   /* ── Mobile bottom sheets for category / quick-cat menus ── */
   function isMobileUx() {
-    return window.matchMedia('(max-width:768px)').matches;
+    if (window.RizqViewport && typeof window.RizqViewport.isPhone === 'function') {
+      return window.RizqViewport.isPhone();
+    }
+    return window.matchMedia('(max-width:768px)').matches
+      || window.matchMedia('(orientation:landscape) and (max-height:520px)').matches;
   }
 
   function closeRizqSheet() {
