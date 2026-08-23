@@ -2026,7 +2026,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="h-stat"><span class="h-stat-num" data-target="18">0</span><span class="h-stat-lbl" data-t="stat-cats">قسماً رئيسياً</span></div>
     <div class="h-stat"><span class="h-stat-num" data-target="130" data-suffix="+">0</span><span class="h-stat-lbl" data-t="stat-subs">فرعاً متخصصاً</span></div>
     <div class="h-stat"><span class="h-stat-num" data-target="15">0</span><span class="h-stat-lbl" data-t="stat-wilayas">ولاية موريتانية</span></div>
-    <div class="h-stat"><span class="h-stat-num" data-count-text="1">مجاني</span><span class="h-stat-lbl">النشر الأساسي</span></div>
+    <div class="h-stat"><span class="h-stat-num" data-count-text="1">مجاني</span><span class="h-stat-lbl" data-t="stat-free">النشر الأساسي</span></div>
   </div>
 </section>
 
@@ -4416,7 +4416,7 @@ const LANG = {
     'hbiz-new': 'جديد',
     'hbiz-cta': 'افتح متجرك أو أضف إعلانك مجاناً',
     'hbiz-cta-micro': '⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية',
-    'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية',
+    'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'أقسام منظمة تغطي السوق الموريتاني',
     's-lst-title': 'إعلانات <span>مميزة ومختارة</span>',
@@ -4484,7 +4484,7 @@ const LANG = {
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Ouvrez votre boutique ou publiez une annonce — gratuit',
     'hbiz-cta-micro': '⚡ Aucune carte requise — inscription en 30 secondes',
-    'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas',
+    'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'Des catégories organisées pour le marché mauritanien',
     's-lst-title': 'Annonces <span>sélectionnées</span>',
@@ -4735,6 +4735,18 @@ function applyLandingLang(toAr) {
   if(priceTag) priceTag.textContent = isAr ? 'خطط الاشتراك' : 'Nos Offres';
   const pulseTag = document.querySelector('#prices .section-tag');
   if(pulseTag) pulseTag.textContent = isAr ? '📊 نبضة السوق · Rizq Market Pulse' : '📊 Rizq Market Pulse';
+  const storesTag = document.querySelector('#virtual-stores .section-tag');
+  if(storesTag) storesTag.textContent = isAr ? 'محلات رزق' : 'Boutiques Rizq';
+  const officesTag = document.querySelector('#virtual-offices .section-tag');
+  if(officesTag) officesTag.textContent = isAr ? 'مكاتب رزق' : 'Bureaux Rizq';
+  const showroomsTag = document.querySelector('#virtual-showrooms .section-tag');
+  if(showroomsTag) showroomsTag.textContent = isAr ? 'معارض رزق' : 'Showrooms Rizq';
+  const tendersTag = document.querySelector('#virtual-tenders .section-tag');
+  if(tendersTag) tendersTag.textContent = isAr ? 'مناقصات رزق' : 'Appels d\'offres Rizq';
+  const liveTag = document.querySelector('#rizq-live-activity .section-tag');
+  if(liveTag) liveTag.textContent = isAr ? 'نشط على رزق' : 'Actif sur Rizq';
+  const allAdsTag = document.querySelector('#all-ads-modal .section-tag');
+  if(allAdsTag) allAdsTag.textContent = isAr ? 'جميع الإعلانات' : 'Toutes les annonces';
 
   // Footer carrier labels (brand names — Latin transliteration in FR)
   const carrierFR = ['Mauritel:','Mattel:','Chinguitel:'];
