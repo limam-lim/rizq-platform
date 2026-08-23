@@ -268,6 +268,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* Default: hide injected header on desktop; mobile query below shows it */
 @media (min-width:769px) and (min-height:501px){
+  #nav .nav-m-ico,
+  #nav .nav-m-post-plus{display:none!important}
+  #nav-more-mobile-btn{display:none!important}
+  #nav .nav-m-desktop-only{display:inline!important}
+  #nav .nav-m-post{
+    width:auto!important;height:auto!important;min-height:0!important;
+    border-radius:8px!important;margin:0!important;
+    background:rgba(201,168,76,.12)!important;
+    box-shadow:none!important;
+  }
   #rizq-app-header{display:none !important}
 }
 
@@ -740,29 +750,135 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:none !important;
   }
 
-  /* Landing mobile: two-tier injected header only (hide legacy #nav) */
-  html.rizq-app-nav body.landing-ux-mobile > nav#nav,
-  html.rizq-app-nav.rizq-landing-mobile > body > nav#nav{
+  /* Landing mobile: native #nav two-tier — always in HTML, no JS inject required */
+  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
     display:none !important;
     visibility:hidden !important;
     pointer-events:none !important;
     height:0 !important;
     overflow:hidden !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header,
-  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header .rizq-hdr-row1,
-  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header .rizq-hdr-row2{
+  html.rizq-app-nav body.landing-ux-mobile > nav#nav,
+  html.rizq-app-nav.rizq-landing-mobile > body > nav#nav{
     display:flex !important;
     visibility:visible !important;
     pointer-events:auto !important;
-    opacity:1 !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
-    display:block !important;
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    align-content:flex-start !important;
     height:112px !important;
+    min-height:112px !important;
+    max-height:112px !important;
+    position:fixed !important;
+    top:0;left:0;right:0;
+    z-index:1000 !important;
+    padding:0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px)) !important;
+    gap:0 !important;
+    overflow:visible !important;
+    background:#0f172a !important;
+    border-bottom:1px solid rgba(255,255,255,.08) !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start{
+    order:1 !important;
+    flex:1 1 auto !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    gap:8px !important;
+    direction:ltr !important;
+    height:56px !important;
+    min-width:0 !important;
+    grid-template-columns:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start .rizq-hdr-back,
+  html.rizq-app-nav body.landing-ux-mobile #nav-back-btn{
+    display:inline-flex !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn span:not(.nav-account-ico){
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn{
+    padding:8px 10px !important;
+    border-radius:50% !important;
+    min-width:40px !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .btn-lang-primary{
+    padding:6px 12px !important;
+    font-size:11px !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .logo{
+    order:2 !important;
+    height:56px !important;
+    margin-inline-start:auto !important;
+    flex-shrink:0 !important;
+    max-width:min(48vw,210px) !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
+    order:3 !important;
+    flex:0 0 100% !important;
+    width:100% !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-around !important;
+    height:56px !important;
+    padding:0 2px !important;
+    margin:0 !important;
+    gap:0 !important;
+    direction:rtl !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-desktop-only{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-hide-stores{
+    display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
+    flex:1;min-width:0;list-style:none;display:flex;justify-content:center;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-tab,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:1px;padding:4px 1px;background:none;border:none;cursor:pointer;
+    color:rgba(255,255,255,.88);text-decoration:none;font-family:inherit;
+    font-size:9px;font-weight:600;min-width:0;width:100%;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-ico{font-size:15px;line-height:1}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-lbl{
+    font-size:9px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-li{flex:0 0 34px!important;width:34px!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post{
+    flex:0 0 34px!important;width:34px!important;height:34px!important;
+    border-radius:50%!important;margin:0 4px;padding:0!important;
+    background:linear-gradient(135deg,#C9A84C,#e8c96a)!important;
+    color:#0f2347!important;border:none!important;
+    box-shadow:0 2px 10px rgba(201,168,76,.35)!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-plus{font-size:17px;font-weight:900;line-height:1}
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-m-post-lbl{display:none!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{display:flex!important}
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer,
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay{
+    display:block !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay:not(.open){
+    display:none !important;
+    opacity:0 !important;
   }
   html.rizq-app-nav body.landing-ux-mobile .section-jump-bar{
     display:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .hero{
+    padding-top:8px !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .hero-content{
+    padding-top:12px !important;
   }
 
   #rizq-app-header{

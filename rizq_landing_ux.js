@@ -145,6 +145,13 @@
         if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
       });
     }
+    var navMoreMobile = document.getElementById('nav-more-mobile-btn');
+    if (navMoreMobile) {
+      navMoreMobile.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
+      });
+    }
     var navBack = document.getElementById('nav-back-btn');
     if (navBack) {
       navBack.addEventListener('click', function (e) {
