@@ -127,8 +127,9 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 .mobile-bottom-nav a.active,.mobile-bottom-nav button.active{color:var(--gold-light,#e8c96a)}
 
 @media(max-width:768px), (orientation:landscape) and (max-height:500px){
+  html.rizq-app-nav .mobile-bottom-nav{display:none!important}
   .mobile-bottom-nav{display:block!important}
-  body.landing-ux-mobile{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
+  html.rizq-app-nav body.landing-ux-mobile{padding-bottom:0!important}
   nav.nav-compact .nav-sticky-tools{max-width:none;margin:0 8px}
   nav.nav-compact .nav-sticky-post{display:none}
   .section-jump-bar{display:none!important}

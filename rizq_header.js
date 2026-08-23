@@ -6,7 +6,9 @@
   if (window.__rizqHeaderInit) return;
   window.__rizqHeaderInit = true;
 
-  var LANG_LABEL = 'FR / العربية';
+  function langBtnLabel() {
+    return currentLang() === 'fr' ? 'FR / العربية' : 'العربية / FR';
+  }
 
   function pathName() {
     try {
@@ -174,7 +176,7 @@
           '<div class="rizq-hdr-start">' +
             '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
-            '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" aria-label="' + LANG_LABEL + '">' + LANG_LABEL + '</button>' +
+            '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" aria-label="' + langBtnLabel() + '">' + langBtnLabel() + '</button>' +
           '</div>' +
           '<a class="rizq-hdr-brand logo" href="rizq_landing_v8.html" aria-label="رزق">' +
             '<img class="rizq-hdr-brand-mark logo-mark-img" src="rizq-mark-512.png?v=10.3" width="42" height="42" alt=""/>' +
@@ -296,13 +298,18 @@
     }
     var lang = document.getElementById('rizq-lang-btn');
     if (lang) {
-      lang.textContent = LANG_LABEL;
-      lang.setAttribute('aria-label', LANG_LABEL);
+      lang.textContent = langBtnLabel();
+      lang.setAttribute('aria-label', langBtnLabel());
     }
     var deskLang = document.getElementById('rizq-desk-lang-btn');
     if (deskLang) {
-      deskLang.textContent = LANG_LABEL;
-      deskLang.setAttribute('aria-label', LANG_LABEL);
+      deskLang.textContent = langBtnLabel();
+      deskLang.setAttribute('aria-label', langBtnLabel());
+    }
+    var navLang = document.getElementById('nav-lang-btn');
+    if (navLang) {
+      navLang.textContent = langBtnLabel();
+      navLang.setAttribute('aria-label', langBtnLabel());
     }
     var pill = document.getElementById('fixed-disc-pill');
     if (pill) {
@@ -462,8 +469,8 @@
     document.documentElement.classList.add('rizq-dash-nav');
     document.querySelectorAll('.btn-lang, .btn-lang-store, .rizq-lang-btn').forEach(function (btn) {
       btn.classList.add('btn-lang-primary');
-      btn.textContent = LANG_LABEL;
-      btn.setAttribute('aria-label', LANG_LABEL);
+      btn.textContent = langBtnLabel();
+      btn.setAttribute('aria-label', langBtnLabel());
     });
   }
 
@@ -492,7 +499,7 @@
             '<span class="nav-account-ico" aria-hidden="true">👤</span>' +
             '<span data-hdr="account">' + t2('حسابي', 'Compte') + '</span>' +
           '</button>' +
-          '<button type="button" class="btn-lang btn-lang-primary" id="rizq-desk-lang-btn" aria-label="FR / العربية">FR / العربية</button>' +
+          '<button type="button" class="btn-lang btn-lang-primary" id="rizq-desk-lang-btn" aria-label="' + langBtnLabel() + '">' + langBtnLabel() + '</button>' +
         '</div>' +
         '<ul class="nav-center">' +
           '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +
@@ -569,7 +576,7 @@
         e.preventDefault();
         e.stopImmediatePropagation();
         toggleLang();
-        lang.textContent = LANG_LABEL;
+        lang.textContent = langBtnLabel();
       }, true);
     }
     var acc = document.getElementById('rizq-desk-account');
@@ -875,18 +882,6 @@
       return;
     }
     removeDeskNav();
-    if (isLanding()) {
-      removeHeader();
-      if (document.body) document.body.classList.add('landing-ux-mobile');
-      ensureLangListener();
-      applyLabels();
-      if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
-        window.RizqModuleFlags.reapply();
-      } else {
-        scheduleNavRefresh();
-      }
-      return;
-    }
     if (!document.getElementById('rizq-app-header')) {
       var host = document.body;
       if (!host) return;

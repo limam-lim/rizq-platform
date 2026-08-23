@@ -738,100 +738,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:none !important;
   }
 
-  /* Landing mobile: single top row (back+lang+account+logo) + bottom nav only — like original phone UX */
-  html.rizq-app-nav body.landing-ux-mobile{
-    --rizq-header-h:70px;
-    padding-top:var(--rizq-header-h) !important;
-    padding-bottom:calc(72px + env(safe-area-inset-bottom,0)) !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #rizq-app-header{
-    display:none !important;
-    visibility:hidden !important;
-    pointer-events:none !important;
-    height:0 !important;
-    overflow:hidden !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile > nav#nav,
-  html.rizq-app-nav.rizq-landing-mobile > body > nav#nav{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:space-between !important;
-    flex-wrap:nowrap !important;
-    height:70px !important;
-    max-height:70px !important;
-    min-height:70px !important;
-    padding:0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px)) !important;
-    gap:8px !important;
-    overflow:hidden !important;
-    position:fixed !important;
-    top:0;left:0;right:0;
-    z-index:1000 !important;
-    background:#0f172a !important;
-    border-bottom:1px solid rgba(255,255,255,.08) !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center,
-  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-sticky-tools,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger{
-    display:none !important;
-    visibility:hidden !important;
-    pointer-events:none !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start{
-    order:1 !important;
-    display:flex !important;
-    flex-direction:row !important;
-    align-items:center !important;
-    gap:8px !important;
-    direction:ltr !important;
-    flex:0 1 auto !important;
-    min-width:0 !important;
-    grid-template-columns:none !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start .rizq-hdr-back{
-    display:inline-flex !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn span:not(.nav-account-ico){
-    display:none !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn{
-    padding:8px 10px !important;
-    border-radius:50% !important;
-    min-width:40px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .btn-lang-primary{
-    padding:6px 12px !important;
-    font-size:11px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav > .logo{
-    order:2 !important;
-    margin-inline-start:auto !important;
-    flex-shrink:0 !important;
-    max-width:min(48vw, 210px) !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .mobile-bottom-nav{
-    display:block !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer,
-  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay{
-    display:block !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .mobile-drawer-overlay:not(.open){
-    display:none !important;
-    opacity:0 !important;
-  }
+  /* Landing mobile uses the same two-tier #rizq-app-header as other phone pages */
   html.rizq-app-nav body.landing-ux-mobile .section-jump-bar{
     display:none !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .hero{
-    padding-top:8px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .hero-content{
-    padding-top:12px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
-    top:70px !important;
   }
 
   #rizq-app-header{
@@ -967,6 +876,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   .rizq-hdr-post-lbl{display:none !important}
   .rizq-hdr-post-plus{display:block;font-size:17px}
   .rizq-hdr-more-wrap{flex:1;min-width:0;display:flex}
+  /* على الجوال: الأقسام (المحلات…) في «المزيد» فقط — لا تبويب في الصف الثاني */
+  html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > [data-rizq-module],
+  html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > .rizq-nav-module{
+    display:none !important;
+  }
   .rizq-hdr-more-wrap > .rizq-hdr-item{flex:1;width:100%}
   .rizq-hdr-account{
     width:36px !important;height:36px !important;

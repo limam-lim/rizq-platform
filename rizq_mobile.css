@@ -183,7 +183,8 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 
   html,body{overflow-x:hidden}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
-  body.landing-ux-mobile{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
+  html.rizq-app-nav body,
+  html.rizq-app-nav body.landing-ux-mobile{padding-bottom:0!important}
 
   .btn-lang,.rizq-lang-btn{
     top:10px!important;bottom:auto!important;left:10px!important;

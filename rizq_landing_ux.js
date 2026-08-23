@@ -114,6 +114,7 @@
   bindAssistantBtn('jump-assistant');
   bindAssistantBtn('mbn-assistant');
   bindAssistantBtn('nav-assistant-btn');
+  bindAssistantBtn('rizq-hdr-assistant');
   bindAssistantBtn('drawer-assistant-btn');
 
   function updateJumpActive() {
