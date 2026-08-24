@@ -14,6 +14,29 @@
   -webkit-font-smoothing: antialiased;
 }
 
+html,
+body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+.pricing-container,
+.container,
+.pricing-grid,
+main,
+section {
+  max-width: 100% !important;
+  width: 100%;
+  box-sizing: border-box !important;
+  overflow-x: clip;
+}
+
 html[dir="ltr"] .nav-center,
 html[dir="ltr"] .nav-dropdown-menu,
 html[dir="ltr"] .rizq-hdr-more-menu,

@@ -32,7 +32,7 @@ const bodyParser = require('body-parser');
 const axios      = require('axios');
 const { askAgent } = require('./rizq_agent_brain');
 const { askSubscriberAgent, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
-const { getFastModel } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
 
 // تحميل المشتركين (يُستبدل بـ DB عند الإنتاج) — تُقرأ أولاً من
 // rizq_subscribers_store.json (نفس الملف الذي يقرأه خادم المكالمات)
@@ -256,7 +256,7 @@ app.get('/api/status', (req, res) => {
     port           : PORT,
     messages_total : waLog.length,
     active_sessions: sessions.size,
-    claude_model   : getFastModel(),
+    claude_model   : getAdvancedModel(),
     api_key_set    : !!(process.env.ANTHROPIC_API_KEY),
     wa_token_set   : !!(WA_CONFIG.TOKEN),
     wa_phone_id_set: !!(WA_CONFIG.PHONE_ID)
@@ -269,7 +269,7 @@ app.get('/', (req, res) => {
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">
     <h1>📱 مدير رزق الذكي v1 — خادم واتساب</h1>
     <p>✅ الخادم يعمل على المنفذ <strong>${PORT}</strong></p>
-    <p>🧠 العقل: <strong>${getFastModel()}</strong></p>
+    <p>🧠 العقل: <strong>${getAdvancedModel()}</strong></p>
     <p>🔑 Anthropic Key: <strong>${process.env.ANTHROPIC_API_KEY ? '✅' : '❌ مفقود'}</strong></p>
     <p>📲 WhatsApp Token: <strong>${WA_CONFIG.TOKEN ? '✅' : '❌ مفقود'}</strong></p>
     <p>📊 رسائل مسجّلة: <strong>${waLog.length}</strong></p>

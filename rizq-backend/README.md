@@ -38,6 +38,51 @@ npm start
 إذا لم يُنشر الخادم بعد). الإرسال يتضمن `x-rizq-secret` في الهيدر، يجب أن يطابق
 `BACKEND_SHARED_SECRET` في `.env`.
 
+## بوت Telegram للأدمن (إشعار + تفعيل فوري)
+
+عند ضبط المتغيرات التالية في `.env`، يُرسَل إشعار فوري للأدمن عند كل `POST /api/sub-requests`
+(بعد تحليل الوصل عبر Claude Vision)، مع أزرار **تفعيل** / **رفض** مباشرة في Telegram:
+
+```env
+TELEGRAM_BOT_TOKEN=123456:ABC...        # من @BotFather
+TELEGRAM_ADMIN_CHAT_ID=-1001234567890   # معرّف محادثة الأدمن (شخصي أو مجموعة)
+PUBLIC_BASE_URL=https://your-domain.com # لرابط webhook
+# اختياري:
+TELEGRAM_WEBHOOK_SECRET=random_secret   # يُتحقق منه في مسار webhook
+```
+
+**تسجيل webhook** (مرة واحدة بعد النشر):
+
+```bash
+curl -X POST https://your-domain.com/api/telegram/setup-webhook \
+  -H "Content-Type: application/json" \
+  -H "x-rizq-secret: YOUR_BACKEND_SHARED_SECRET" \
+  -d '{"publicBaseUrl":"https://your-domain.com"}'
+```
+
+عند النقر على **✅ تفعيل الاشتراك**، ينفّذ الخادم `syncAccountPackage` مباشرة ويُرسل
+تأكيداً للزبون عبر واتساب/بريد — دون فتح `rizq_admin.html`.
+
+### التطوير المحلي (Polling — بدون نطاق عام)
+
+```env
+TELEGRAM_USE_POLLING=true
+```
+
+```bash
+npm run telegram:poll
+# أو: npm start  (مع TELEGRAM_USE_POLLING=true في .env)
+```
+
+### الإنتاج (Webhook — بعد ربط rizq.mr)
+
+```bash
+PUBLIC_BASE_URL=https://rizq.mr npm run telegram:webhook
+# أو: node scripts/setup-telegram-webhook.js https://rizq.mr
+```
+
+ثم عطّل `TELEGRAM_USE_POLLING` (أو اضبطه `false`).
+
 ## حدود مهمة يجب أن تعرفها
 
 - هذا تحليل **احتمالي** (plausibility) من نموذج رؤية — يقرأ التاريخ/المبلغ ويعلّق على

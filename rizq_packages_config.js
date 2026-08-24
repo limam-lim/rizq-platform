@@ -8,6 +8,8 @@
  * الاستخدام:
  *   Node:    const Pkg = require('./rizq_packages_config');
  *   متصفح:  <script src="rizq_packages_config.js"></script>  → window.RizqPackagesConfig
+ *
+ * إضافة قسم تجاري: أضف الكتالوج في CATALOGS — initCatalogRegistry يربط LS_KEYS و accType تلقائياً.
  */
 'use strict';
 
@@ -29,7 +31,9 @@ var NAMES = {
   basic:     { ar: 'أساسي', fr: 'Basique', en: 'Basic', es: 'Básico', hs: 'أساسي' },
   pro:       { ar: 'Pro', fr: 'Pro', en: 'Pro', es: 'Pro', hs: 'Pro' },
   yearly:    { ar: 'سنوي', fr: 'Annuel', en: 'Yearly', es: 'Anual', hs: 'سنوي' },
-  diamond:   { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  diamond:   { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  diamond_standard: { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  diamond_pro: { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
   'ind-free':    { ar: 'مجانية', fr: 'Gratuit', en: 'Free', es: 'Gratis', hs: 'مجانية' },
   'ind-boost':   { ar: 'مميزة', fr: 'Mise en avant', en: 'Boost', es: 'Destacado', hs: 'مميزة' },
   'ind-monthly': { ar: 'باقة شهرية', fr: 'Mensuel', en: 'Monthly', es: 'Mensual', hs: 'باقة شهرية' },
@@ -37,17 +41,23 @@ var NAMES = {
   'st-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'st-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'st-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'st-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  'st-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  'st-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
+  'st-diam':  { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
   'cp-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'cp-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'cp-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'cp-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'cp-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  'cp-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  'cp-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
+  'cp-diam':  { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
   'of-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'of-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'of-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'of-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'of-diam':  { ar: 'الماسية 💎 (النائب الذكي الشامل)', fr: 'Diamant 💎 (Adjoint intelligent complet)', en: 'Diamond 💎 (Full smart deputy)', es: 'Diamante 💎 (Adjunto inteligente)', hs: 'الماسية 💎 (النائب الذكي الشامل)' },
+  'of-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  'of-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
+  'of-diam':  { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
   'vid-basic':    { ar: 'أساسي (فيديو)', fr: 'Basique (vidéo)', en: 'Basic (video)', es: 'Básico (video)', hs: 'أساسي (فيديو)' },
   'vid-pro':      { ar: 'احترافي (فيديو)', fr: 'Pro (vidéo)', en: 'Pro (video)', es: 'Pro (video)', hs: 'احترافي (فيديو)' },
   'vid-business': { ar: 'أعمال ومعارض', fr: 'Business & showrooms', en: 'Business & showrooms', es: 'Negocios y showrooms', hs: 'أعمال ومعارض' },
@@ -57,21 +67,41 @@ var NAMES = {
   'vp-year':   { ar: 'موثّق⁺ سنوية', fr: 'Vérifié⁺ annuel', en: 'Verified+ yearly', es: 'Verificado⁺ anual', hs: 'موثّق⁺ سنوية' }
 };
 
-var DIAMOND_FEATURES = [
-  '🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.',
-  '🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.',
-  '🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.',
-  '📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.',
-  '⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'
+var DIAMOND_STANDARD_FEATURES = [
+  '🤖 نائب ذكي حصري باسم منشأتك',
+  '💬 ويدجت الموقع + واتساب (محادثات نصية)',
+  '🛡️ هوية خاصة ومخصصة بالكامل',
+  '📊 لوحة متابعة وتحليل الأداء لحظياً',
+  '⚡ 2,000 محادثة نصية شهرياً',
 ];
 
-var DIAMOND_FEATURES_FR = [
-  '🤖 Un adjoint exclusif qui parle au nom de votre établissement, avec une précision humaine.',
-  '🎙️ Réponse vocale et écrite immédiate via WhatsApp, le chat du site et les appels.',
-  '🛡️ Identité indépendante complète — sans aucune mention de la plateforme Rizq.',
-  '📊 Suivi en temps réel de toutes les conversations et des ventes.',
-  '⚡ Usage équitable : 120 minutes d\'appels + 500 conversations avancées par mois.'
+var DIAMOND_PRO_FEATURES = [
+  '🤖 نائب ذكي متقدم حصري باسم منشأتك',
+  '💬 ويدجت الموقع + واتساب + مكالمات صوتية تفاعلية',
+  '🛡️ هوية مخصصة كاملة ودعم تقني بأولوية',
+  '📊 لوحة متابعة وتحليل الأداء لحظياً',
+  '⚡ 4,000 محادثة نصية + 300 دقيقة صوتية شهرياً',
 ];
+
+var DIAMOND_STANDARD_FEATURES_FR = [
+  '🤖 Adjoint intelligent exclusif au nom de votre établissement',
+  '💬 Widget site + WhatsApp (conversations texte)',
+  '🛡️ Identité privée entièrement personnalisée',
+  '📊 Tableau de bord et analyse de performance en temps réel',
+  '⚡ 2 000 conversations texte / mois',
+];
+
+var DIAMOND_PRO_FEATURES_FR = [
+  '🤖 Adjoint intelligent avancé exclusif au nom de votre établissement',
+  '💬 Widget site + WhatsApp + appels vocaux interactifs',
+  '🛡️ Identité personnalisée complète et support technique prioritaire',
+  '📊 Tableau de bord et analyse de performance en temps réel',
+  '⚡ 4 000 conversations texte + 300 min voix / mois',
+];
+
+var DIAMOND_FEATURES = DIAMOND_STANDARD_FEATURES;
+
+var DIAMOND_FEATURES_FR = DIAMOND_STANDARD_FEATURES_FR;
 
 var DIAMOND_MARKETING = {
   name: {
@@ -106,15 +136,46 @@ var DIAMOND_MARKETING = {
   featuresFr: DIAMOND_FEATURES_FR
 };
 
-function _diamondCatalogFields() {
+function _diamondStandardFields(price) {
   return {
-    name: DIAMOND_MARKETING.name.ar,
-    description: DIAMOND_MARKETING.description.ar,
+    diamondTier: 'diamond_standard',
+    audioAccess: false,
+    quotaMessages: 2000,
+    quotaMinutes: 0,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية الأساسية 💎',
+    description: 'موظف استقبال واستفسارات آلي 24/7.',
     featured: true,
-    featuredBadge: DIAMOND_MARKETING.featuredBadge.ar,
-    roi: DIAMOND_MARKETING.roi.ar,
-    features: DIAMOND_FEATURES.slice()
+    featuredBadge: 'الأكثر اختياراً',
+    roi: 'وفر موظف استقبال — من 5,000 أوقية/شهر',
+    features: DIAMOND_STANDARD_FEATURES.slice(),
+    price: price != null ? price : 5000,
+    durationDays: 30,
+    discountPct: 5,
   };
+}
+
+function _diamondProFields(price) {
+  return {
+    diamondTier: 'diamond_pro',
+    audioAccess: true,
+    quotaMessages: 4000,
+    quotaMinutes: 300,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية المتقدمة 💎 Pro',
+    description: 'منظومة إدارة المبيعات وخدمة العملاء الشاملة.',
+    featured: true,
+    featuredBadge: 'Enterprise',
+    roi: 'حل متكامل للمؤسسات — من 10,000 أوقية/شهر',
+    features: DIAMOND_PRO_FEATURES.slice(),
+    price: price != null ? price : 10000,
+    durationDays: 30,
+    discountPct: 5,
+  };
+}
+
+function _diamondCatalogFields() {
+  return _diamondStandardFields(5000);
 }
 
 var PERIODS = {
@@ -132,7 +193,8 @@ var CATALOGS = {
     { id: 'basic',   price: 1500,  durationDays: 30,  discountPct: 2, features: ['30 منتج', 'شارة مميّز برزق', 'إحصائيات'] },
     { id: 'pro',     price: 4000,  durationDays: 30,  discountPct: 3, features: ['منتجات غير محدودة', 'أولوية في نتائج البحث', 'دعم مخصص'] },
     { id: 'yearly',  price: 30000, durationDays: 365, discountPct: 3, features: ['كل مزايا Pro', 'خصم 37% عن السعر الشهري', 'فوترة سنوية واحدة'] },
-    Object.assign({ id: 'diamond', price: 5000, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
+    Object.assign({ id: 'diamond_standard', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
+    Object.assign({ id: 'diamond_pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
   individual: [
     { id: 'ind-free',    price: 0,    durationDays: 7,  discountPct: 0, features: ['إعلان واحد نشط', 'حتى 5 صور للإعلان', 'ظهور في نتائج البحث العادية'] },
@@ -144,21 +206,24 @@ var CATALOGS = {
     { id: 'st-month', price: 2000,  durationDays: 30,  discountPct: 2, features: ['شارة محل مميّز برزق', 'عرض 50 منتج', 'إحصائيات شهرية', 'دعم بالأولوية'] },
     { id: 'st-quart', price: 5500,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'عرض 200 منتج', 'مدير حساب مخصص'] },
     { id: 'st-year',  price: 15000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'منتجات غير محدودة', 'دعم VIP 24/7', 'تقارير سنوية'] },
-    Object.assign({ id: 'st-diam', price: 3500, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
+    Object.assign({ id: 'st-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
+    Object.assign({ id: 'st-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
   office: [
     { id: 'of-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['عرض الخدمات', 'صفحة المكتب', 'طلبات تواصل', 'دعم فني أساسي'] },
     { id: 'of-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['جميع المزايا', 'شارة موثّق', 'إحصائيات', 'فيديو تعريفي مشمول', 'دعم بالأولوية'] },
     { id: 'of-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['توفير 14%', 'جميع المزايا', 'فيديو تعريفي مشمول', 'مدير حساب مخصص'] },
     { id: 'of-year',  price: 28000, durationDays: 365, discountPct: 3, features: ['توفير 33%', 'أفضل قيمة', 'فيديو مشمول + 1 إضافي مجاني', 'أولوية الدعم'] },
-    Object.assign({ id: 'of-diam', price: 5000, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
+    Object.assign({ id: 'of-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
+    Object.assign({ id: 'of-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
   corp: [
     { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'] },
     { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'] },
     { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'] },
     { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'] },
-    Object.assign({ id: 'cp-diam', price: 6000, durationDays: 30, discountPct: 5 }, _diamondCatalogFields())
+    Object.assign({ id: 'cp-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
+    Object.assign({ id: 'cp-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
   video: [
     { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, features: ['فيديو إعلاني واحد (حتى 30 ثانية)', 'ظهور في قسم الإعلانات المرئية', 'إحصائيات مشاهدات أساسية'] },
@@ -174,6 +239,75 @@ var CATALOGS = {
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }
   ]
 };
+
+/** سجل موحّد: يربط مفتاح الكتالوج ↔ localStorage ↔ نوع الحساب (accType) */
+var CATALOG_REGISTRY = {};
+
+function defaultLsKeyForCatalog(catalogKey) {
+  if (catalogKey === 'general') return 'rizq_packages';
+  return 'rizq_' + catalogKey + '_packages';
+}
+
+/**
+ * registerCatalogMapping — عند إضافة قسم في CATALOGS، استدعِ هذه الدالة (أو rely على initCatalogRegistry).
+ * meta: { lsKey?, accType?, label? }
+ */
+function registerCatalogMapping(catalogKey, meta) {
+  meta = meta || {};
+  var prev = CATALOG_REGISTRY[catalogKey] || {};
+  var entry = Object.assign({}, prev, meta, { catalogKey: catalogKey });
+  entry.lsKey = entry.lsKey || defaultLsKeyForCatalog(catalogKey);
+  entry.accType = entry.accType || catalogKey;
+  CATALOG_REGISTRY[catalogKey] = entry;
+  LS_KEYS[catalogKey] = entry.lsKey;
+  return entry;
+}
+
+function initCatalogRegistry() {
+  Object.keys(CATALOGS).forEach(function (k) {
+    registerCatalogMapping(k, CATALOG_REGISTRY[k] || {});
+  });
+}
+
+function getCatalogRegistry(catalogKey) {
+  if (catalogKey) return CATALOG_REGISTRY[catalogKey] ? Object.assign({}, CATALOG_REGISTRY[catalogKey]) : null;
+  var out = {};
+  Object.keys(CATALOG_REGISTRY).forEach(function (k) {
+    out[k] = Object.assign({}, CATALOG_REGISTRY[k]);
+  });
+  return out;
+}
+
+function getLsMap() {
+  var map = {};
+  Object.keys(CATALOG_REGISTRY).forEach(function (k) {
+    map[k] = CATALOG_REGISTRY[k].lsKey;
+  });
+  return map;
+}
+
+function getTypeToCatalog() {
+  var map = {};
+  Object.keys(CATALOG_REGISTRY).forEach(function (k) {
+    map[CATALOG_REGISTRY[k].accType] = k;
+  });
+  return map;
+}
+
+function getAccTypeToLsKey() {
+  var map = {};
+  Object.keys(CATALOG_REGISTRY).forEach(function (k) {
+    map[CATALOG_REGISTRY[k].accType] = CATALOG_REGISTRY[k].lsKey;
+  });
+  return map;
+}
+
+function getCatalogLsKey(catalogKey) {
+  if (CATALOG_REGISTRY[catalogKey]) return CATALOG_REGISTRY[catalogKey].lsKey;
+  return LS_KEYS[catalogKey] || defaultLsKeyForCatalog(catalogKey || PUBLIC_CATALOG);
+}
+
+initCatalogRegistry();
 
 function _normLang(lang) {
   var l = String(lang || 'ar').toLowerCase();
@@ -224,8 +358,19 @@ function _defaultsFor(catalogKey) {
 function isDiamondPackage(pkg) {
   if (!pkg) return false;
   if (pkg.diamond || pkg.isDiamond) return true;
+  if (pkg.diamondTier === 'diamond_standard' || pkg.diamondTier === 'diamond_pro') return true;
   var blob = [pkg.id, pkg.name, pkg.name_fr, pkg.cta, pkg.cta_fr].filter(Boolean).join(' ');
   return /(ماس|diamond|diamant)/i.test(blob);
+}
+
+function resolveDiamondTierFromPkg(pkg) {
+  if (!pkg) return null;
+  if (pkg.diamondTier === 'diamond_pro' || pkg.diamondTier === 'pro') return 'diamond_pro';
+  if (pkg.diamondTier === 'diamond_standard' || pkg.diamondTier === 'standard') return 'diamond_standard';
+  var id = String(pkg.id || '').toLowerCase();
+  if (/pro|diam-pro/.test(id)) return 'diamond_pro';
+  if (isDiamondPackage(pkg)) return 'diamond_standard';
+  return null;
 }
 
 function _pickCopy(map, lang) {
@@ -235,14 +380,23 @@ function _pickCopy(map, lang) {
   return map[lang] || map.ar || '';
 }
 
-function diamondCopy(lang) {
+function _diamondTierFields(tier, price) {
+  return tier === 'diamond_pro' ? _diamondProFields(price) : _diamondStandardFields(price);
+}
+
+function diamondCopy(lang, tier, price) {
   lang = _normLang(lang);
+  var isPro = tier === 'diamond_pro';
+  var base = _diamondTierFields(isPro ? 'diamond_pro' : 'diamond_standard', price);
+  var nameMap = isPro ? NAMES.diamond_pro : NAMES.diamond_standard;
   return {
-    name: _pickCopy(DIAMOND_MARKETING.name, lang),
-    description: _pickCopy(DIAMOND_MARKETING.description, lang),
-    featuredBadge: _pickCopy(DIAMOND_MARKETING.featuredBadge, lang),
-    roi: _pickCopy(DIAMOND_MARKETING.roi, lang),
-    features: lang === 'fr' ? DIAMOND_FEATURES_FR.slice() : DIAMOND_FEATURES.slice()
+    name: lang === 'fr' ? (nameMap.fr || base.name) : base.name,
+    description: base.description,
+    featuredBadge: base.featuredBadge,
+    roi: base.roi,
+    features: lang === 'fr'
+      ? (isPro ? DIAMOND_PRO_FEATURES_FR.slice() : DIAMOND_STANDARD_FEATURES_FR.slice())
+      : base.features.slice()
   };
 }
 
@@ -314,25 +468,33 @@ function enrichForDisplay(pkg, lang) {
     out.cta = lang === 'fr' ? out.cta_fr : (out.cta || _defaultCta(out, 'ar'));
     return out;
   }
-  var copy = diamondCopy(lang);
+  var tier = resolveDiamondTierFromPkg(out) || 'diamond_standard';
+  var isPro = tier === 'diamond_pro';
+  var copy = diamondCopy(lang, tier, out.price);
+  var copyFr = diamondCopy('fr', tier, out.price);
+  out.diamondTier = tier;
+  out.audioAccess = isPro;
   out.name = copy.name;
-  out.name_fr = DIAMOND_MARKETING.name.fr;
+  out.name_ar = isPro ? NAMES.diamond_pro.ar : NAMES.diamond_standard.ar;
+  out.name_fr = copyFr.name;
   out.description = copy.description;
-  out.description_fr = DIAMOND_MARKETING.description.fr;
+  out.description_fr = copyFr.description;
   out.featuredBadge = copy.featuredBadge;
-  out.featuredBadge_fr = DIAMOND_MARKETING.featuredBadge.fr;
+  out.featuredBadge_fr = copyFr.featuredBadge;
   out.roi = copy.roi;
-  out.roi_fr = DIAMOND_MARKETING.roi.fr;
+  out.roi_fr = copyFr.roi;
   out.features = copy.features;
-  out.features_fr = DIAMOND_FEATURES_FR.slice();
+  out.features_fr = copyFr.features;
   out.diamond = true;
   out.isDiamond = true;
   out.featured = true;
   out.duration = _durationLabel(out, lang);
   out.period = periodLabel({ price: out.price, durationDays: out.durationDays || 30 }, lang);
   out.period_fr = periodLabel({ price: out.price, durationDays: out.durationDays || 30 }, 'fr');
-  out.cta = lang === 'fr' ? 'Choisir le Diamant' : 'اشترك في الماسية';
-  out.cta_fr = 'Choisir le Diamant';
+  out.cta = lang === 'fr'
+    ? (isPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard')
+    : (isPro ? 'اشترك في الماسية Pro' : 'اشترك في الماسية الأساسية');
+  out.cta_fr = isPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard';
   return out;
 }
 
@@ -345,30 +507,34 @@ function _mergeLive(defaults, live) {
     var diamond = isDiamondPackage(livePkg) || isDiamondPackage(base);
     var pkgId = String(livePkg.id || base.id || '');
     var nameHit = pkgId && NAMES[pkgId] ? NAMES[pkgId] : null;
+    var tier = resolveDiamondTierFromPkg(livePkg) || resolveDiamondTierFromPkg(base);
+    var tierFields = diamond ? _diamondTierFields(tier || 'diamond_standard', livePkg.price != null ? livePkg.price : base.price) : null;
     return {
       id: pkgId,
       price: livePkg.price != null ? Number(livePkg.price) : (base.price || 0),
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
       discountPct: livePkg.discountPct != null ? Number(livePkg.discountPct) : (base.discountPct || 0),
+      diamondTier: tier || base.diamondTier,
+      audioAccess: diamond ? tier === 'diamond_pro' : base.audioAccess,
       features: diamond
-        ? (base.features || DIAMOND_FEATURES).slice()
+        ? (base.features || tierFields.features).slice()
         : (Array.isArray(livePkg.features) && livePkg.features.length ? livePkg.features.slice() : (base.features || [])),
       features_fr: diamond
-        ? DIAMOND_FEATURES_FR.slice()
+        ? ((base.features_fr && base.features_fr.length) ? base.features_fr.slice() : (tier === 'diamond_pro' ? DIAMOND_PRO_FEATURES_FR : DIAMOND_STANDARD_FEATURES_FR).slice())
         : (Array.isArray(livePkg.features_fr) && livePkg.features_fr.length ? livePkg.features_fr.slice() : (base.features_fr || [])),
       name: diamond
-        ? (base.name || DIAMOND_MARKETING.name.ar)
+        ? (base.name || tierFields.name)
         : (livePkg.name || base.name || (nameHit && nameHit.ar) || ''),
       name_fr: diamond
-        ? DIAMOND_MARKETING.name.fr
+        ? (base.name_fr || (tier === 'diamond_pro' ? NAMES.diamond_pro.fr : NAMES.diamond_standard.fr))
         : (livePkg.name_fr || base.name_fr || (nameHit && nameHit.fr) || ''),
-      description: diamond ? (base.description || DIAMOND_MARKETING.description.ar) : (livePkg.description || base.description || ''),
-      description_fr: diamond ? DIAMOND_MARKETING.description.fr : (livePkg.description_fr || base.description_fr || ''),
+      description: diamond ? (base.description || tierFields.description) : (livePkg.description || base.description || ''),
+      description_fr: diamond ? (base.description_fr || tierFields.description) : (livePkg.description_fr || base.description_fr || ''),
       featured: diamond ? true : !!livePkg.featured,
-      featuredBadge: diamond ? (base.featuredBadge || DIAMOND_MARKETING.featuredBadge.ar) : (livePkg.featuredBadge || ''),
-      featuredBadge_fr: diamond ? DIAMOND_MARKETING.featuredBadge.fr : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
-      roi: diamond ? (base.roi || DIAMOND_MARKETING.roi.ar) : (livePkg.roi || ''),
-      roi_fr: diamond ? DIAMOND_MARKETING.roi.fr : (livePkg.roi_fr || base.roi_fr || ''),
+      featuredBadge: diamond ? (base.featuredBadge || tierFields.featuredBadge) : (livePkg.featuredBadge || ''),
+      featuredBadge_fr: diamond ? (base.featuredBadge_fr || tierFields.featuredBadge) : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
+      roi: diamond ? (base.roi || tierFields.roi) : (livePkg.roi || ''),
+      roi_fr: diamond ? (base.roi_fr || tierFields.roi) : (livePkg.roi_fr || base.roi_fr || ''),
       period: livePkg.period || base.period || '',
       cta: livePkg.cta || base.cta || '',
       cta_fr: livePkg.cta_fr || base.cta_fr || ''
@@ -386,15 +552,29 @@ function getCatalog(catalogKey, lang) {
 }
 
 function getDiamondPackage(lang) {
-  var merged = getCatalog(PUBLIC_CATALOG);
-  var dia = merged.filter(function (p) { return p.id === 'diamond' || isDiamondPackage(p); })[0];
-  return enrichForDisplay(dia || Object.assign({ id: 'diamond', price: 5000, durationDays: 30 }, _diamondCatalogFields()), lang);
+  var merged = getCatalog(PUBLIC_CATALOG, lang);
+  var std = merged.filter(function (p) { return p.id === 'diamond_standard'; })[0];
+  return enrichForDisplay(std || Object.assign({ id: 'diamond_standard' }, _diamondStandardFields(5000)), lang);
 }
 
-function withDiamond(list, lang) {
+function _diamondDefaultsForCatalog(catalogKey) {
+  return _defaultsFor(catalogKey || PUBLIC_CATALOG).filter(isDiamondPackage);
+}
+
+function withDiamond(list, lang, catalogKey) {
+  lang = _normLang(lang);
+  catalogKey = catalogKey || PUBLIC_CATALOG;
   var out = (list || []).map(function (p) { return enrichForDisplay(p, lang); });
-  if (out.some(isDiamondPackage)) return out;
-  out.push(getDiamondPackage(lang));
+  _diamondDefaultsForCatalog(catalogKey).forEach(function (def) {
+    var tier = resolveDiamondTierFromPkg(def);
+    if (!tier) return;
+    var exists = out.some(function (p) {
+      return resolveDiamondTierFromPkg(p) === tier;
+    });
+    if (!exists) {
+      out.push(enrichForDisplay(Object.assign({}, def), lang));
+    }
+  });
   return out;
 }
 
@@ -404,7 +584,10 @@ function getPublicPackages() {
 
 function localizedName(pkg, lang) {
   lang = _normLang(lang);
-  if (isDiamondPackage(pkg)) return diamondCopy(lang).name;
+  if (isDiamondPackage(pkg)) {
+    var tier = resolveDiamondTierFromPkg(pkg) || 'diamond_standard';
+    return diamondCopy(lang, tier, pkg.price).name;
+  }
   var hit = _nameMapFor(pkg);
   if (hit && hit.map[lang]) return hit.map[lang];
   if (hit && lang === 'fr' && hit.map.fr) return hit.map.fr;
@@ -517,6 +700,34 @@ function buildPublicOverview(lang) {
   return title + '\n\n' + blocks.join('\n\n');
 }
 
+function buildDiamondTiersPromptBlock() {
+  return (
+    '=== تعليمات إجابة الوكيل الذكي للباقات الماسية (ثابت — لا ترتجل) ===\n' +
+    'عندما يسأل العميل عن الفرق بين الباقتين الماسيتين، اعتمد حصراً على البيانات التالية:\n\n' +
+    'الباقة الماسية الأساسية (5,000 أوقية/شهر):\n' +
+    '- الوصف: موظف استقبال واستفسارات آلي 24/7.\n' +
+    '- المزايا: نائب ذكي حصري باسم منشأتك | ويدجت الموقع + واتساب (محادثات نصية) | هوية خاصة ومخصصة بالكامل | لوحة متابعة وتحليل الأداء لحظياً | 2,000 محادثة نصية شهرياً.\n' +
+    '- **نصي فقط — بدون مكالمات صوتية.**\n\n' +
+    'الباقة الماسية المتقدمة — Pro (10,000 أوقية/شهر):\n' +
+    '- الوصف: منظومة إدارة المبيعات وخدمة العملاء الشاملة.\n' +
+    '- المزايا: نائب ذكي متقدم حصري باسم منشأتك | ويدجت الموقع + واتساب + مكالمات صوتية تفاعلية | هوية مخصصة كاملة ودعم تقني بأولوية | لوحة متابعة وتحليل الأداء لحظياً | 4,000 محادثة نصية + 300 دقيقة صوتية شهرياً.\n' +
+    '- **تشتمل حتماً على المكالمات الصوتية التفاعلية — ليست نصية فقط.**\n\n' +
+    'قواعد صارمة للرد:\n' +
+    '- يمنع ذكر: "قابل للتعديل من الأدمن"، "للمحلات الصغيرة"، "للفنادق والشركات الكبرى"، أو "حل ذكاء اصطناعي".\n' +
+    '- يمنع منعاً باتاً نفي وجود المكالمات الصوتية في الماسية Pro.\n' +
+    '- يمنع وصف الماسية Pro بأنه "نصي فقط".\n' +
+    '- يمنع قول إن الماسية الأساسية تدعم المكالمات الصوتية.\n' +
+    '- الفارق الرئيسي: المكالمات الصوتية التفاعلية (حصرية لـ Pro).\n' +
+    '- **إلزامي:** عند ذكر الماسية، اشرح **المستويين كاملين** (أساسية ثم Pro) — لا تتوقف عند الأولى.\n' +
+    '- **إلزامي:** أنهِ دائماً بجدول المقارنة أدناه أو بنقطتين واضحتين (أساسية vs Pro).\n' +
+    '- **إلزامي:** لا تترك ** أو قوائم ناقصة — أكمل الجملة حتى النهاية.\n' +
+    '- **إلزامي:** لا تستخدم رموز Unicode للاتجاه (⁦ ⁩) — اكتب الأرقام plain: 5000، 10000، 24/7.\n\n' +
+    '| المستوى | السعر | القنوات | صوت |\n' +
+    '| الماسية الأساسية | 5,000 MRU/شهر | ويدجت + واتساب | نصي فقط |\n' +
+    '| الماسية Pro | 10,000 MRU/شهر | ويدجت + واتساب + مكالمات | نص + صوت تفاعلي (300 د/شهر) |'
+  );
+}
+
 function buildPackagesPromptBlock() {
   var pkgs = getPackagesForTool('ar');
   var lines = pkgs.map(function (p) {
@@ -525,7 +736,8 @@ function buildPackagesPromptBlock() {
   return (
     '📦 الباقات المتاحة (المصدر الرسمي الوحيد — لا تخترع أسعاراً أخرى):\n' +
     lines.join('\n') +
-    '\nالنائب الذكي VIP حصري بالباقة الماسية. أقصى خصم على خدمات المنصة: 5% (ماسي).'
+    '\n\n' + buildDiamondTiersPromptBlock() +
+    '\n\nالنائب الذكي VIP حصري بالباقة الماسية. أقصى خصم على خدمات المنصة: 5% (ماسي).'
   );
 }
 
@@ -568,14 +780,26 @@ function buildMaxDiscountLine(lang) {
 
 function buildVipDeputyText(lang) {
   lang = _normLang(lang);
-  var copy = diamondCopy(lang);
-  return copy.name + '\n' + copy.description + '\n' + copy.features.map(function (f) { return '• ' + f; }).join('\n');
+  var std = diamondCopy(lang, 'diamond_standard', 5000);
+  var pro = diamondCopy(lang, 'diamond_pro', 10000);
+  function block(copy, price) {
+    return copy.name + ' — ' + price + ' MRU\n' + copy.description + '\n' + copy.features.map(function (f) { return '• ' + f; }).join('\n');
+  }
+  return block(std, '5,000') + '\n\n' + block(pro, '10,000');
 }
 
 var API = {
   PUBLIC_CATALOG: PUBLIC_CATALOG,
   CATALOGS: CATALOGS,
   LS_KEYS: LS_KEYS,
+  CATALOG_REGISTRY: CATALOG_REGISTRY,
+  registerCatalogMapping: registerCatalogMapping,
+  initCatalogRegistry: initCatalogRegistry,
+  getCatalogRegistry: getCatalogRegistry,
+  getLsMap: getLsMap,
+  getTypeToCatalog: getTypeToCatalog,
+  getAccTypeToLsKey: getAccTypeToLsKey,
+  getCatalogLsKey: getCatalogLsKey,
   getCatalog: getCatalog,
   getPublicPackages: getPublicPackages,
   getPackagesForTool: getPackagesForTool,
@@ -585,11 +809,13 @@ var API = {
   buildPublicSummary: buildPublicSummary,
   buildPublicOverview: buildPublicOverview,
   buildPackagesPromptBlock: buildPackagesPromptBlock,
+  buildDiamondTiersPromptBlock: buildDiamondTiersPromptBlock,
   buildDiscountSummary: buildDiscountSummary,
   buildMaxDiscountLine: buildMaxDiscountLine,
   buildVipDeputyText: buildVipDeputyText,
   maxDiscountPct: maxDiscountPct,
   isDiamondPackage: isDiamondPackage,
+  resolveDiamondTierFromPkg: resolveDiamondTierFromPkg,
   diamondCopy: diamondCopy,
   enrichForDisplay: enrichForDisplay,
   getDiamondPackage: getDiamondPackage,

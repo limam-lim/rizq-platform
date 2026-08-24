@@ -246,6 +246,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_invoice_engine.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
+<script src="rizq_dashboard_agent_knowledge.js"></script>
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -2050,7 +2051,7 @@ function renderPackagesDisplay(){
 
   var list=pkgs;
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.withDiamond==='function'){
-    list=RizqPackagesConfig.withDiamond(list, (typeof _officeLang!=='undefined'?_officeLang:'ar'));
+    list=RizqPackagesConfig.withDiamond(list, (typeof _officeLang!=='undefined'?_officeLang:'ar'), 'office');
   }
 
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,(typeof _officeLang!=='undefined'?_officeLang:'ar'));
@@ -2465,10 +2466,14 @@ function saveMyPayment(){
         '<div id="agent-toggle-status" style="margin-top:10px;font-size:11px;text-align:center;color:'+(active?'#4ade80':'#f87171')+'">'+
           (active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé'))+
         '</div>'+_renderOfficeChannelToggles()+'</div>'+
+        '<div id="agent-knowledge-upload"></div>'+
         '<div id="agent-chat-test"></div>'+
         '<style>.rizq-toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer}.rizq-toggle-switch input{opacity:0;width:0;height:0}.rizq-toggle-slider{position:absolute;inset:0;background:#475569;border-radius:28px;transition:.3s}.rizq-toggle-slider:before{content:"";position:absolute;width:20px;height:20px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.3s}.rizq-toggle-switch input:checked+.rizq-toggle-slider{background:#16a34a}.rizq-toggle-switch input:checked+.rizq-toggle-slider:before{transform:translateX(24px)}</style>';
       window._officeAgentPhone=phone;
       window._officeAgentToggleKey=toggleKey;
+      if(typeof RizqDashboardAgentKnowledge!=='undefined'){
+        RizqDashboardAgentKnowledge.renderKnowledgePanel({ mountId:'agent-knowledge-upload', accountId: acc.id || SESSION_ID || '' });
+      }
       if(typeof RizqDashboardAgentChat!=='undefined'){
         RizqDashboardAgentChat.renderAgentChatPanel({ mountId:'agent-chat-test', accountId: acc.id || '' });
       }

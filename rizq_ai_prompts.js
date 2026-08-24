@@ -102,6 +102,27 @@ const AGENT_PERSONAS = {
     expertise: ['توفر الأدوية', 'ساعات العمل', 'التوصيل', 'الأسعار التقديرية']
   },
 
+  company: {
+    ar: 'سكرتير ذكي للشركة / المؤسسة',
+    personality: 'منظم، رسمي، يوجّه الطلبات ويحجز مواعيد مع الإدارة',
+    tone: 'رسمي ومهني',
+    expertise: ['توجيه الاستفسارات', 'حجز المواعيد', 'الخدمات المؤسسية', 'التواصل مع الإدارة']
+  },
+
+  academy: {
+    ar: 'مساعد ذكي للأكاديمية / مركز التدريب',
+    personality: 'محفّز، يشرح البرامج والدورات، يسجّل الاهتمام ويحجز المقاعد',
+    tone: 'ودود ومحفّز',
+    expertise: ['الدورات والبرامج', 'الأسعار والمنح', 'جدول الحصص', 'التسجيل', 'الشهادات']
+  },
+
+  freelance: {
+    ar: 'مساعد ذكي للمستقل / مقدّم الخدمات',
+    personality: 'مرن، يجمع متطلبات المشاريع ويوعد بمتابعة من صاحب النشاط',
+    tone: 'ودود ومهني',
+    expertise: ['الخدمات المتاحة', 'العروض', 'المواعيد', 'نطاق العمل']
+  },
+
   default: {
     ar: 'مساعد ذكي لخدمة العملاء',
     personality: 'مفيد ومؤدب، يجيب على الأسئلة ويوجه الزبون',
@@ -142,28 +163,105 @@ function detectPersona(activityText) {
   if (/تامين|وكاله تامين/.test(t))                       return 'insurance_office';
   // ── مكتب خدمات عامة (افتراضي) ──
   if (/مكتب|خدمات|ترجمه|توثيق|استشاره/.test(t))         return 'virtual_office';
+  // ── أكاديمية / تدريب ──
+  if (/اكاديم|أكاديم|تدريب|دورات|تعليم|مدرسه|مدرسة|formation|cours/.test(t)) return 'academy';
+  // ── شركة / مؤسسة ──
+  if (/شركه|شركة|مؤسسه|مؤسسة|corp|entreprise|societe/.test(t)) return 'company';
+  // ── مستقل ──
+  if (/مستقل|freelance|خدمات حره|prestataire/.test(t)) return 'freelance';
   // ── محل عام ──
-  if (/محل|متجر|بقاله|سوبرماركت/.test(t))               return 'general_store';
+  if (/محل|متجر|بقاله|سوبرماركت|store|boutique/.test(t)) return 'general_store';
   return 'default';
+}
+
+/** توحيد businessType القديم مع مفاتيح الشخصيات */
+var LEGACY_TYPE_MAP = {
+  medical: 'clinic',
+  store: 'general_store',
+  corp: 'company',
+  office: 'virtual_office',
+};
+
+/**
+ * يحدّد personaKey من profile — لا يُرجع corp أبداً كافتراضي
+ * @param {object} profile
+ * @returns {string}
+ */
+function resolveBusinessType(profile) {
+  profile = profile || {};
+  var raw = String(profile.businessType || profile.personaKey || '').trim();
+  if (raw && LEGACY_TYPE_MAP[raw]) raw = LEGACY_TYPE_MAP[raw];
+  if (raw && AGENT_PERSONAS[raw]) return raw;
+  var activityText = [
+    profile.activity,
+    profile.businessType,
+    profile.description,
+    profile.businessName,
+    profile.persona && profile.persona.key,
+  ].filter(Boolean).join(' ');
+  var detected = detectPersona(activityText);
+  return AGENT_PERSONAS[detected] ? detected : 'default';
+}
+
+function getPersonaDef(personaKey) {
+  return AGENT_PERSONAS[personaKey] || AGENT_PERSONAS.default;
 }
 
 // ═══════════════════════════════════════════════════════
 // 3. قواعد سلوك ثابتة لجميع الوكلاء
 // ═══════════════════════════════════════════════════════
 
+const COMMERCIAL_LOYALTY_RULES = `
+## 🛡️ الولاء التجاري والحياد — إلزامي (Commercial Loyalty — NON-NEGOTIABLE)
+1. **الحصرية التامة:** أنت تمثّل "${'{BUSINESS_NAME}'}" فقط — ممنوع ذكر أو ترويج أو ترشيح أي منافس أو شركة أو فندق أو عيادة أو مكتب آخر.
+2. **أسئلة المنافسين:** إذا سُئلت عن منافس، أجب بدبلوماسية (مثلاً: «نحن نركّز على تقديم أفضل تجربة لدينا») ثم أعد المحادثة فوراً لمزايا وخدمات "${'{BUSINESS_NAME}'}".
+3. **نبرة القطاع:** التزم بنبرة "${'{PERSONA_TONE}'}" المناسبة لقطاع "${'{PERSONA_LABEL}'}" — مطمئنة للصحة، راقية للضيافة، رسمية للقانون والمحاسبة، ودودة للتجزئة.
+4. **حدود التخصص:** لا تقدّم استشارات طبية/قانونية/مالية ملزمة — حوّلها إلى **موعد رسمي** مع المختص في المنشأة.
+5. **لا معلومات عن منشآت أخرى:** لا تشارك بيانات أو أسعار أو توصيات لأي كيان غير "${'{BUSINESS_NAME}'}".
+`;
+
 const CORE_RULES = `
 ## قواعد السلوك الأساسية (لا تخرج عنها أبداً):
 1. رد دائماً بنفس لغة المستخدم (عربية، حسانية، فرنسية، إنجليزية، إسبانية) — كشف تلقائي من رسالته، لا من لغة الصفحة فقط
-2. افهم الطلبات المختصرة والعامية في سياق رزق (كم، prix، price، شنو، كيفاش...)
-3. لا تشارك معلومات خاصة بمحلات أخرى
+2. افهم الطلبات المختصرة والعامية في سياق النشاط (كم، prix، price، شنو، كيفاش...)
+3. لا تشارك معلومات خاصة بمنشآت أخرى
 4. إذا لم تعرف الإجابة قل: "سأتحقق وأعود إليك" ثم أعطِ رقم التواصل
 5. لا تعطِ وعوداً لا تستطيع الوفاء بها
 6. عند الطلب أو الشراء، اجمع: الاسم + رقم الهاتف + التفاصيل
 7. إذا كان الزبون غاضباً: أعتذر أولاً ثم حل المشكلة
-8. لا تُفصح عن أنك AI إلا إذا سُئلت مباشرة
+8. لا تُفصح عن أنك AI إلا إذا سُئلت مباشرة — ولا تذكر أبداً أسماء نماذج أو مزوّدين تقنيين (Sonnet, Claude, Anthropic…)؛ استخدم «النائب الذكي» فقط
 9. الردود مختصرة وواضحة — لا إطالة غير ضرورية
-10. عند انتهاء المحادثة: "شكراً لتواصلك مع [اسم المحل] 🌟"
+10. عند انتهاء المحادثة: "شكراً لتواصلك مع [اسم المنشأة] 🌟"
 `;
+
+function buildCommercialLoyaltyBlock(profile) {
+  var biz = (profile && profile.businessName) ? String(profile.businessName) : 'هذه المنشأة';
+  var personaKey = resolveBusinessType(profile);
+  var persona = getPersonaDef(personaKey);
+  return COMMERCIAL_LOYALTY_RULES
+    .replace(/\{BUSINESS_NAME\}/g, biz)
+    .replace('{PERSONA_TONE}', persona.tone || 'مهنية')
+    .replace('{PERSONA_LABEL}', persona.ar || 'خدمة العملاء');
+}
+
+function buildDynamicKnowledgeBlock(profile, formatFn) {
+  if (!profile || !profile.dynamicKnowledge) return '';
+  if (typeof formatFn === 'function') return formatFn(profile.dynamicKnowledge);
+  var dk = profile.dynamicKnowledge;
+  if (typeof dk === 'string') return '\n## بيانات محدّثة\n' + dk.slice(0, 48000) + '\n';
+  if (dk.text) {
+    return '\n## 📊 بيانات تشغيلية محدّثة\n' + String(dk.text).slice(0, 48000) + '\n';
+  }
+  return '';
+}
+
+function buildCustomInstructionsBlock(profile) {
+  var parts = [];
+  if (profile.customInstructions) parts.push(String(profile.customInstructions));
+  if (profile.specialInstructions) parts.push(String(profile.specialInstructions));
+  if (!parts.length) return '';
+  return '\n## 📌 تعليمات خاصة من صاحب المنشأة:\n' + parts.join('\n\n') + '\n';
+}
 
 // ═══════════════════════════════════════════════════════
 // 3. بناء معلومات المنتجات والخدمات
@@ -211,36 +309,69 @@ function buildChannelsSection(channels) {
 // 4. الدالة الرئيسية — بناء الـ System Prompt الكامل
 // ═══════════════════════════════════════════════════════
 
-function buildSystemPrompt(profile) {
-  const persona = AGENT_PERSONAS[profile.businessType] || AGENT_PERSONAS.default;
+function buildSystemPrompt(profile, opts) {
+  opts = opts || {};
+  profile = profile || {};
+  var personaKey = resolveBusinessType(profile);
+  var persona = getPersonaDef(personaKey);
+  profile.businessType = personaKey;
 
-  const header = `# هويتك
-أنت "${profile.agentName || 'مساعد ' + profile.businessName}"، ${persona.ar} يعمل لدى "${profile.businessName}".
-نبرتك: ${persona.tone}
-شخصيتك: ${persona.personality}
-`;
+  var agentTitle = (profile.persona && profile.persona.agentTitle)
+    || profile.agentTitle
+    || profile.agentName
+    || ('مساعد ' + (profile.businessName || ''));
 
-  const businessInfo = `
-# معلومات النشاط التجاري
-- الاسم: ${profile.businessName}
-- النوع: ${persona.ar}
-- الولاية/المنطقة: ${profile.wilaya || 'نواكشوط'}
-- الحي: ${profile.neighborhood || ''}
-- ساعات العمل: ${profile.workingHours || 'يومياً 8 صباحاً — 10 مساءً'}
-- رسالة الترحيب: "${profile.greeting || 'أهلاً وسهلاً! كيف أقدر أساعدك؟'}"
-`;
+  var header = '# هويتك\n' +
+    'أنت "' + agentTitle + '"، ' + persona.ar + ' يعمل لدى "' + (profile.businessName || 'المنشأة') + '".\n' +
+    'نبرتك: ' + persona.tone + '\n' +
+    'شخصيتك: ' + persona.personality + '\n' +
+    'خبراتك: ' + (persona.expertise || []).join('، ') + '\n';
 
-  const products   = buildProductsSection(profile.products);
-  const faqs       = buildFAQSection(profile.faqs);
-  const policies   = buildPoliciesSection(profile.policies);
-  const channels   = buildChannelsSection(profile.channels);
+  var businessInfo = '\n# معلومات النشاط التجاري\n' +
+    '- الاسم: ' + (profile.businessName || '') + '\n' +
+    '- النوع: ' + persona.ar + ' (' + personaKey + ')\n' +
+    '- الولاية/المنطقة: ' + (profile.wilaya || profile.city || 'موريتانيا') + '\n' +
+    '- الحي: ' + (profile.neighborhood || profile.address || '') + '\n' +
+    '- ساعات العمل: ' + (profile.workingHours || 'يومياً 8 صباحاً — 10 مساءً') + '\n' +
+    '- رسالة الترحيب: "' + (profile.greeting || 'أهلاً وسهلاً! كيف أقدر أساعدك؟') + '"\n';
 
-  const specialInstructions = profile.specialInstructions
-    ? `\n## تعليمات خاصة من صاحب النشاط:\n${profile.specialInstructions}\n`
-    : '';
+  if (opts.channelOnly && opts.channelOnly !== 'widget') {
+    header += '\n- تمثّل "' + (profile.businessName || 'المنشأة') + '" حصرياً — لا تذكر "رزق" أو أي منصة أخرى في محادثاتك.\n';
+  }
 
-  return [header, businessInfo, products, faqs, policies, channels, specialInstructions, CORE_RULES]
+  var products = buildProductsSection(profile.products || profile.services);
+  var faqs = buildFAQSection(profile.faqs);
+  var policies = buildPoliciesSection(profile.policies);
+  var channels = buildChannelsSection(profile.channels);
+  var dynamicBlock = buildDynamicKnowledgeBlock(profile, opts.formatDynamicKnowledge);
+  var customBlock = buildCustomInstructionsBlock(profile);
+  var loyalty = buildCommercialLoyaltyBlock(profile);
+
+  return [header, businessInfo, products, faqs, policies, channels, dynamicBlock, customBlock, loyalty, CORE_RULES]
     .filter(Boolean).join('\n');
+}
+
+/**
+ * System Prompt موحّد لمسارات الصوت/واتساب (بدون ذكر رزق)
+ */
+function buildChannelSystemPrompt(profile, opts) {
+  opts = Object.assign({ channelOnly: true }, opts || {});
+  var base = buildSystemPrompt(profile, opts);
+  var workStart = (profile.workHours && profile.workHours.start) || 8;
+  var workEnd = (profile.workHours && profile.workHours.end) || 18;
+  var hour = new Date().getHours();
+  var isWorkHours = hour >= workStart && hour < workEnd;
+  var channelSuffix = {
+    call: '\n\n[القناة: مكالمة] جمل قصيرة جداً (≤15 ثانية). بدون قوائم.',
+    whatsapp: '\n\n[القناة: واتساب] رسالة قصيرة ومباشرة. emoji باعتدال.',
+    email: '\n\n[القناة: بريد] رد رسمي كامل مع تحية وختام.',
+  };
+  var ch = opts.channel || '';
+  return base +
+    '\n\n## الحالة التشغيلية\n' +
+    '- الحالة الآن: ' + (isWorkHours ? 'داخل أوقات الدوام' : 'خارج الدوام — أنت تنوب عن الفريق') + '\n' +
+    '- لا تتعهد بموعد محدد بدون تأكيد بشري\n' +
+    (channelSuffix[ch] || '');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -273,12 +404,17 @@ function saveBusinessProfile(businessId, profile) {
 // ═══════════════════════════════════════════════════════
 
 var RizqPrompts = {
-  build: function(profile) { return buildSystemPrompt(profile); },
+  build: function(profile, opts) { return buildSystemPrompt(profile, opts); },
+  buildChannel: function(profile, opts) { return buildChannelSystemPrompt(profile, opts); },
   buildById: function(businessId) {
     var profile = loadBusinessProfile(businessId);
     if (!profile) profile = { businessName: 'Rizq', businessType: 'default', agentName: 'مساعد رزق' };
     return buildSystemPrompt(profile);
   },
+  buildCommercialLoyaltyBlock: buildCommercialLoyaltyBlock,
+  buildDynamicKnowledgeBlock: buildDynamicKnowledgeBlock,
+  resolveBusinessType: resolveBusinessType,
+  getPersonaDef: getPersonaDef,
   getBusinessTypes: function() {
     return Object.keys(AGENT_PERSONAS).filter(function(k){ return k !== 'default'; }).map(function(k){
       return { id: k, label: AGENT_PERSONAS[k].ar };
@@ -293,11 +429,14 @@ var RizqPrompts = {
       products: [], faqs: [],
       policies: { return: '', delivery: '', payment: '', warranty: '' },
       channels: { phone: '', whatsapp: '', email: '', location: '' },
-      specialInstructions: ''
+      specialInstructions: '',
+      customInstructions: '',
+      dynamicKnowledge: null,
     };
   },
   detectPersona: detectPersona,
   personas: AGENT_PERSONAS,
+  LEGACY_TYPE_MAP: LEGACY_TYPE_MAP,
   demos: DEMO_PROFILES,
   load: loadBusinessProfile,
   save: saveBusinessProfile
@@ -309,6 +448,10 @@ var RizqPrompts = {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = RizqPrompts;
+  module.exports.buildSystemPrompt = buildSystemPrompt;
+  module.exports.buildChannelSystemPrompt = buildChannelSystemPrompt;
+  module.exports.resolveBusinessType = resolveBusinessType;
+  module.exports.buildCommercialLoyaltyBlock = buildCommercialLoyaltyBlock;
 } else {
   window.RizqPrompts = RizqPrompts;
 }

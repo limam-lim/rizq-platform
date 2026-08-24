@@ -4,7 +4,7 @@
 (function (global) {
   'use strict';
 
-  var LS_MAP = {
+  var LS_MAP_FALLBACK = {
     general: 'rizq_packages',
     individual: 'rizq_individual_packages',
     office: 'rizq_office_packages',
@@ -14,6 +14,15 @@
     tender: 'rizq_tender_packages',
     verified_plus: 'rizq_verified_plus_packages'
   };
+
+  function resolveLsMap() {
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.getLsMap === 'function') {
+      return global.RizqPackagesConfig.getLsMap();
+    }
+    return LS_MAP_FALLBACK;
+  }
+
+  var LS_MAP = resolveLsMap();
 
   function getLang() {
     try {
@@ -106,8 +115,8 @@
           if (typeof cb === 'function') cb(false);
           return false;
         }
-        Object.keys(LS_MAP).forEach(function (k) {
-          if (Array.isArray(pkgs[k])) localStorage.setItem(LS_MAP[k], JSON.stringify(pkgs[k]));
+        Object.keys(resolveLsMap()).forEach(function (k) {
+          if (Array.isArray(pkgs[k])) localStorage.setItem(resolveLsMap()[k], JSON.stringify(pkgs[k]));
         });
         if (typeof cb === 'function') cb(true);
         return true;
@@ -201,7 +210,7 @@
     function draw() {
       var list = getPackages(catalogKey, opts.lang);
       if (opts.ensureDiamond && global.RizqPackagesConfig && typeof global.RizqPackagesConfig.withDiamond === 'function') {
-        list = global.RizqPackagesConfig.withDiamond(list, opts.lang || getLang()).map(function (p) {
+        list = global.RizqPackagesConfig.withDiamond(list, opts.lang || getLang(), catalogKey).map(function (p) {
           return enrich(p, opts.lang || getLang());
         });
       }
@@ -246,6 +255,7 @@
 
   global.RizqPackagesUI = {
     LS_MAP: LS_MAP,
+    resolveLsMap: resolveLsMap,
     getLang: getLang,
     getPackages: getPackages,
     syncAllFromBackend: syncAllFromBackend,

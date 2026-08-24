@@ -3,12 +3,17 @@
  */
 const Anthropic = require('@anthropic-ai/sdk');
 const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./widgetAgentTools');
+const { maybeAutoNotifyLead } = require('./leadEscalation');
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
-const { getAnthropicApiKey, isAnthropicConfigured, getFastModel, createCachedMessage } = require('../config/anthropic');
-const { buildPackagesPromptBlock } = require('../../rizq_packages_config');
+const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel, createCachedMessage } = require('../config/anthropic');
+const { buildPackagesPromptBlock, buildDiamondTiersPromptBlock } = require('../../rizq_packages_config');
 const RizqAgent = require('../../rizq_agent');
+const RizqPrompts = require('../../rizq_ai_prompts');
+const { formatDynamicKnowledgeForPrompt } = require('./dynamicKnowledge');
+const { sanitizeAgentText } = require('./widgetMarkdown');
 
 const client = new Anthropic({ apiKey: getAnthropicApiKey() });
+const WIDGET_MAX_TOKENS = Number(process.env.WIDGET_CHAT_MAX_TOKENS) || 1400;
 
 function buildLanguageInstructions(detectedLang, uiLang) {
   const label = getLangLabel(detectedLang);
@@ -37,9 +42,10 @@ function buildDiamondSystemBlock() {
 function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
+  const tier = agentTier || (profile && profile.businessName ? 'diamond' : 'general');
   let prompt = buildLanguageInstructions(replyLang, uiLang);
   prompt += '\n' + RizqAgent.buildMasterSystemPrompt({
-    agentTier: agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
+    agentTier: tier,
     profile: profile || null
   });
   if (extraInstruction) {
@@ -47,8 +53,10 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
   }
 
   if (profile && profile.businessName) {
+    const personaKey = RizqPrompts.resolveBusinessType(profile);
+    const personaDef = RizqPrompts.getPersonaDef(personaKey);
     const agentTitle = (profile.persona && profile.persona.agentTitle) || pickLang({
-      ar: 'المساعد الذكي',
+      ar: personaDef.ar || 'المساعد الذكي',
       fr: 'Assistant intelligent',
       en: 'Smart assistant',
       es: 'Asistente inteligente',
@@ -56,7 +64,13 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
     prompt +=
       `\n# Role\n` +
       `You are ${agentTitle} for "${profile.businessName}" on Rizq platform.\n` +
-      `Rules: never invent prices or details — use tools or direct to contact channels.\n`;
+      `Sector persona: ${personaKey} — tone: ${personaDef.tone || 'professional'}.\n` +
+      `Rules: never invent prices or details — use tools, dynamic knowledge, or direct to contact channels.\n`;
+    prompt += RizqPrompts.buildDynamicKnowledgeBlock(profile, formatDynamicKnowledgeForPrompt);
+    prompt += RizqPrompts.buildCommercialLoyaltyBlock(Object.assign({}, profile, { businessType: personaKey }));
+    if (profile.customInstructions) {
+      prompt += `\n## Owner instructions\n${String(profile.customInstructions).slice(0, 2000)}\n`;
+    }
   } else {
     prompt +=
       `\n# Role\n` +
@@ -67,11 +81,21 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `If an ad id is open: call get_ad_details with that id before stating price or trust.\n` +
       `For trust questions: call get_seller_reputation after you know account_id from the ad.\n` +
       `Never guess prices or trust scores — if no data, say so clearly.\n` +
+      `For Rizq subscription/package/pricing questions: call get_packages_info and explain from official data — ` +
+      `do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free at rizq.mr.\n` +
-      `Keep replies short (2-4 sentences).\n`;
+      `For general questions: keep replies concise (2-4 sentences).\n` +
+      `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE answer — ` +
+      `explain BOTH الماسية الأساسية (5,000 MRU, text only) AND الماسية Pro (10,000 MRU, with voice calls). ` +
+      `Never stop mid-sentence or mid-markdown (no dangling **). End with the diamond comparison table.\n` +
+      `Never use Unicode bidi control characters (U+2066–U+2069) — write plain digits like 5000, 10000, 24/7.\n`;
   }
 
-  prompt += `\n${buildPackagesPromptBlock()}\nCall get_packages_info before quoting any Rizq plan price.\n`;
+  prompt += `\n${buildPackagesPromptBlock()}\n${buildDiamondTiersPromptBlock()}\nCall get_packages_info before quoting any Rizq plan price.\n`;
+  prompt += 'When user asks about diamond / ماسية / packages: you MUST cover Standard AND Pro in full before ending.\n';
+  prompt += 'For serious subscription interest or admin requests: collect business name, WhatsApp, and package — then call register_interest or escalate_to_human.\n';
+  prompt += 'For off-topic questions: politely decline and redirect to Rizq services only.\n';
+  prompt += 'Understand Hassaniya/local Mauritanian terms but reply in simple fusaha Arabic (or French if user writes in French).\n';
 
   const openAdId = pageContext && (pageContext.urlAdId || (pageContext.ad && pageContext.ad.id));
   if (pageContext && pageContext.page) {
@@ -91,7 +115,8 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
     RizqAgent.buildSecurityBlock() + '\n' +
     '- Do not expose seller phone numbers — point to "show number" on the page.\n' +
     '- Do not invent ad ids or account ids.\n' +
-    '- For complaints: create_support_ticket or the report button.\n';
+    '- For complaints: create_support_ticket or the report button.\n' +
+    '- For subscription leads or admin escalation: register_interest / escalate_to_human after collecting business name, WhatsApp, package.\n';
 
   return prompt;
 }
@@ -200,7 +225,40 @@ function buildFactReply(mergedFacts, lang, message) {
   }, lang);
 }
 
-function validateReply(reply, mergedFacts, lang) {
+function isDiamondPackageQuery(message) {
+  return /(?:ماس|diamond|diamant|\bpro\b|5000|5[\s,]?000|10000|10[\s,]?000|باق)/i.test(String(message || ''));
+}
+
+function diamondCompletionFooter(lang) {
+  return pickLang({
+    ar: '\n\n**الماسية Pro (10,000 MRU/شهر):** نائب ذكي متقدم + ويدجت + واتساب + **مكالمات صوتية تفاعلية** + 4,000 محادثة نصية + 300 دقيقة صوت/شهر.\n\n| المستوى | السعر | صوت |\n| الماسية الأساسية | 5,000 MRU | نصي فقط |\n| الماسية Pro | 10,000 MRU | نص + صوت تفاعلي |',
+    fr: '\n\n**Diamant Pro (10 000 MRU/mois):** adjoint avancé + widget + WhatsApp + **appels vocaux interactifs** + 4 000 chats + 300 min voix/mois.\n\n| Niveau | Prix | Voix |\n| Diamant Standard | 5 000 MRU | Texte seul |\n| Diamant Pro | 10 000 MRU | Texte + voix |',
+    en: '\n\n**Diamond Pro (10,000 MRU/month):** advanced agent + widget + WhatsApp + **interactive voice calls** + 4,000 text chats + 300 voice min/month.\n\n| Tier | Price | Voice |\n| Diamond Standard | 5,000 MRU | Text only |\n| Diamond Pro | 10,000 MRU | Text + voice |',
+    es: '\n\n**Diamante Pro (10.000 MRU/mes):** agente avanzado + widget + WhatsApp + **llamadas de voz interactivas** + 4.000 chats + 300 min voz/mes.',
+  }, lang);
+}
+
+function ensureDiamondReplyComplete(reply, userMessage, lang, stopReason) {
+  let text = sanitizeAgentText(reply);
+  if (!isDiamondPackageQuery(userMessage) && !/(?:ماس|diamond|diamant)/i.test(text)) return text;
+  const hasPro = /(?:10[\s,]?000|10000|\bpro\b|صوت|voice|vocaux|مكالم)/i.test(text);
+  const truncated = stopReason === 'max_tokens' || /\*\*\s*$/.test(String(reply || '')) || (/(?:5[\s,]?000|5000|أساس)/i.test(text) && !hasPro);
+  if (truncated || !hasPro) {
+    text = text.replace(/\*\*\s*$/, '').trim();
+    if (!hasPro) text += diamondCompletionFooter(lang);
+  }
+  return text;
+}
+
+function isPlatformOrPackageQuery(message) {
+  return /(?:باق|اشتراك|تفعيل|package|forfait|diamond|ماس|pro\b|trial|تجرب|rizq|رزق|واتساب|telegram|دعم|support|direction@|bankily|sedad|نشر|post|register|تسجيل|متجر|محل|office|corp|landing|pricing|اشتراكات|abonnement)/i.test(String(message || ''));
+}
+
+function isAdSpecificQuery(message) {
+  return /(?:سعر\s*الإعلان|ثمن\s*الإعلان|موثوق|ثقة\s*البائع|بائع|إعلان|listing|annonce|seller|trust|vendeur|confian|vendeur|detalle\s*del\s*anuncio)/i.test(String(message || ''));
+}
+
+function validateReply(reply, mergedFacts, lang, userMessage) {
   if (!reply || !reply.trim()) {
     return {
       reply: pickLang({
@@ -216,8 +274,11 @@ function validateReply(reply, mergedFacts, lang) {
 
   const uncertain = /\b(ربما|أظن|قد يكون|I think|maybe|probably|je pense|quizás|tal vez)\b/i.test(reply);
   const hasGrounding = !!(mergedFacts.prices.length || mergedFacts.adIds.length || mergedFacts.trustScores.length || mergedFacts.reviewAverage);
+  const platformQuery = isPlatformOrPackageQuery(userMessage);
+  const adQuery = isAdSpecificQuery(userMessage);
+  const replyAboutPackages = /(?:باق|forfait|package|اشتراك|MRU|أوقية|ماس|diamond|pro\b|trial|get_packages)/i.test(reply);
 
-  if (uncertain && !hasGrounding) {
+  if (uncertain && !hasGrounding && adQuery && !platformQuery) {
     return {
       reply: pickLang({
         ar: 'لا تتوفر لدي بيانات مؤكدة في قاعدة البيانات. راجع بطاقة الإعلان أو تواصل مع direction@rizq.mr.',
@@ -230,7 +291,7 @@ function validateReply(reply, mergedFacts, lang) {
     };
   }
 
-  if (!hasGrounding && /سعر|price|prix|ثمن|combien|كم|precio|cu[aá]nto|how much|موثوق|trust|fiab|confian/i.test(reply)) {
+  if (!hasGrounding && !platformQuery && !replyAboutPackages && adQuery && /سعر|price|prix|ثمن|combien|كم|precio|cu[aá]nto|how much|موثوق|trust|fiab|confian/i.test(reply)) {
     return {
       reply: pickLang({
         ar: 'للسعر أو الموثوقية الدقيقة، افتح بطاقة الإعلان — لا أستطيع اختلاق أرقام.',
@@ -252,7 +313,7 @@ function validateReply(reply, mergedFacts, lang) {
       if (digits.length < 4) return false;
       return !knownSet.has(digits) && !known.some((p) => p.includes(digits) || digits.includes(p));
     });
-    if (suspicious) {
+    if (suspicious && adQuery && !platformQuery && !replyAboutPackages) {
       const mentionsKnown = known.some((p) => normalizeAmount(reply).includes(p));
       if (!mentionsKnown) {
         return {
@@ -310,10 +371,10 @@ async function handleWidgetChat(body) {
     pageContext,
     pageFacts,
     extraInstruction,
-    agentTier: body.agentTier || 'diamond',
+    agentTier: body.agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
   });
   const adFlow = isAdFlowQuery(text, pageContext);
-  const preferredModel = getFastModel();
+  const preferredModel = getAgentModel();
 
   const messages = [];
   if (Array.isArray(history)) {
@@ -336,7 +397,7 @@ async function handleWidgetChat(body) {
     loops++;
     const createParams = {
       model: preferredModel,
-      max_tokens: 500,
+      max_tokens: WIDGET_MAX_TOKENS,
       system: systemPrompt,
       tools: WIDGET_TOOLS,
       messages: currentMessages,
@@ -360,7 +421,7 @@ async function handleWidgetChat(body) {
       const toolUseBlocks = response.content.filter((b) => b.type === 'tool_use');
       currentMessages.push({ role: 'assistant', content: response.content });
 
-      const toolResults = toolUseBlocks.map((tool) => {
+      const toolResults = await Promise.all(toolUseBlocks.map(async (tool) => {
         const input = Object.assign({}, tool.input || {});
         if (tool.name === 'get_packages_info' && !input.lang) {
           input.lang = detectedLang;
@@ -370,14 +431,14 @@ async function handleWidgetChat(body) {
             input.ad_id = adFlow.adId;
           }
         }
-        const result = executeWidgetTool(tool.name, input);
+        const result = await executeWidgetTool(tool.name, input);
         toolResultsRaw.push(result);
         return {
           type: 'tool_result',
           tool_use_id: tool.id,
           content: JSON.stringify(result),
         };
-      });
+      }));
 
       currentMessages.push({ role: 'user', content: toolResults });
       continue;
@@ -387,6 +448,8 @@ async function handleWidgetChat(body) {
 
   const textBlock = (response.content || []).find((b) => b.type === 'text');
   let replyText = textBlock ? textBlock.text.trim() : '';
+  replyText = ensureDiamondReplyComplete(replyText, text, detectedLang, response.stop_reason);
+  replyText = sanitizeAgentText(replyText);
 
   const toolFacts = collectFactsFromTools(toolResultsRaw);
   const pageMerged = mergePageAndToolFacts(toolFacts, pageFacts);
@@ -401,12 +464,22 @@ async function handleWidgetChat(body) {
       }, detectedLang);
   }
 
-  let validated = validateReply(replyText, pageMerged, detectedLang);
+  let validated = validateReply(replyText, pageMerged, detectedLang, text);
   if (!validated.grounded && (pageMerged.prices.length || pageMerged.adIds.length || pageMerged.trustScores.length)) {
     const fromFacts = buildFactReply(pageMerged, detectedLang, text);
     if (fromFacts) {
       validated = { reply: fromFacts, grounded: true, reviewed: true };
     }
+  }
+
+  const autoLead = await maybeAutoNotifyLead({
+    userText: text,
+    history: body.history,
+    toolResultsRaw,
+    channel: 'widget',
+  });
+  if (autoLead && autoLead.lead_id) {
+    console.log('[widget-chat] lead persisted', autoLead.lead_id, 'telegram:', autoLead.telegram_sent);
   }
 
   return {
@@ -419,6 +492,11 @@ async function handleWidgetChat(body) {
     toolsUsed: toolResultsRaw.length,
     model: lastModel,
     usage: usageAcc,
+    lead: autoLead && autoLead.lead_id ? {
+      id: autoLead.lead_id,
+      telegram_sent: autoLead.telegram_sent,
+      duplicate: autoLead.duplicate || false,
+    } : undefined,
   };
 }
 

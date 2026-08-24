@@ -13,7 +13,7 @@
  * package/sync)، يولّد فاتورة حقيقية تصل فعلاً للمشترك (لوحة تحكمه +
  * واتساب + بريد)، ثم يفحص كل الحسابات كل ساعة عبر runLifecycleScan():
  *   - تذكير قبل 3 أيام وقبل يوم واحد من الانتهاء (واتساب + بريد)
- *   - عند الانتهاء: مهلة سماح 24 ساعة، ثم "إيقاف" حقيقي (status='suspended')
+ *   - عند تجاوز periodEnd: إيقاف فوري (status='expired') + تخفيض صلاحيات
  *     يمكن لأي داشبورد التحقق منه فعلياً بدل الاعتماد على تخزينه المحلي فقط.
  *
  * أمان: نقطة /api/account-package/:id (قراءة فواتير/حالة حساب) لا تستخدم
@@ -26,13 +26,13 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { resolveDiamondTier, isTrialPackage } = require('./services/catalogConfig');
 
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 const STORE_FILE = path.join(DATA_DIR, 'account-packages.json');
 
 const REMINDER_WINDOWS_DAYS = [3, 1]; // نُذكّر عند تبقّي 3 أيام ويوم واحد
-const GRACE_MS = 24 * 60 * 60 * 1000; // 24 ساعة مهلة بعد الانتهاء قبل الإيقاف الفعلي
 
 // ── تخزين على ملف JSON (نفس نمط rizq_subscribers_store.json الذي أثبت
 //    عمله عبر عمليات Node منفصلة) ──────────────────────────────────────
@@ -178,8 +178,15 @@ async function syncAccountPackage(opts) {
   const accessToken = existing.accessToken || _genToken();
   const accountType = opts.accountType || existing.accountType || 'individual';
   const planType = mapPackageNameToPlanType(opts.pkgName, accountType);
+  const diamondTier = resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
+  const isTrial = opts.isTrial === true || isTrialPackage(opts.pkgName, opts.price);
+  const paymentConfirmed = !isTrial && (
+    opts.paymentConfirmed === true
+    || !!opts.paidAt
+    || (opts.activatedBy === 'admin' && opts.paymentConfirmed !== false)
+  );
 
-  const invoice = {
+  const invoice = paymentConfirmed ? {
     id: 'INV_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
     number: _nextInvoiceNumber(store),
     accountId: opts.accountId,
@@ -189,43 +196,96 @@ async function syncAccountPackage(opts) {
     periodStart: opts.periodStart || new Date().toISOString(),
     periodEnd: opts.periodEnd || null,
     issuedAt: new Date().toISOString(),
-  };
+  } : null;
 
   const record = {
     accountId: opts.accountId,
     accountName: opts.accountName || opts.accountId,
-    accountPhone: opts.accountPhone || '',
-    accountEmail: opts.accountEmail || '',
+    accountPhone: opts.accountPhone || existing.accountPhone || '',
+    accountEmail: opts.accountEmail || existing.accountEmail || '',
     accountType,
     planType,
-    subscriptionStatus: 'active',
+    diamondTier: diamondTier || existing.diamondTier || null,
+    packageId: opts.packageId || existing.packageId || null,
+    isTrial,
+    subscriptionStatus: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
-    periodStart: invoice.periodStart,
-    periodEnd: invoice.periodEnd,
+    periodStart: paymentConfirmed ? (opts.periodStart || new Date().toISOString()) : (existing.periodStart || null),
+    periodEnd: paymentConfirmed ? (opts.periodEnd || null) : (existing.periodEnd || null),
     activatedBy: opts.activatedBy || 'admin',
-    status: 'active',
-    reminderSentAt: null,
+    status: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
+    paymentConfirmed: !!paymentConfirmed,
+    paidAt: paymentConfirmed ? (opts.paidAt || new Date().toISOString()) : null,
+    pendingSince: paymentConfirmed ? null : (existing.pendingSince || new Date().toISOString()),
+    reminderSentAt: paymentConfirmed ? null : existing.reminderSentAt,
     suspendedAt: null,
     downgradedAt: null,
     accessToken,
-    invoices: [invoice].concat(existing.invoices || []).slice(0, 50), // آخر 50 فاتورة كافية
+    invoices: invoice
+      ? [invoice].concat(existing.invoices || []).slice(0, 50)
+      : (existing.invoices || []),
   };
   store[opts.accountId] = record;
   _save(store);
 
-  // تسليم الفاتورة فوراً — واتساب وبريد، كلاهما بأفضل جهد (best-effort):
-  // فشل أحدهما لا يمنع الآخر ولا يفشل التفعيل نفسه.
   const results = { whatsapp: null, email: null };
-  if (record.accountPhone) {
-    results.whatsapp = await _sendWhatsApp(record.accountPhone,
-      `📞 رزق: تم تفعيل باقة "${record.pkgName}" بنجاح ✅\nرقم الإيصال: ${invoice.number}\nالمبلغ: ${invoice.price > 0 ? _fmtMoney(invoice.price) : 'مجاناً'}\nصالحة حتى: ${_fmtDate(invoice.periodEnd)}`);
-  }
-  if (record.accountEmail) {
-    results.email = await _sendEmail(record.accountEmail, `رزق — تأكيد تفعيل باقة ${record.pkgName} (${invoice.number})`, _invoiceEmailHTML(invoice));
+  if (paymentConfirmed && invoice) {
+    if (record.accountPhone) {
+      results.whatsapp = await _sendWhatsApp(record.accountPhone,
+        `📞 رزق: تم تفعيل باقة "${record.pkgName}" بنجاح ✅\nرقم الإيصال: ${invoice.number}\nالمبلغ: ${invoice.price > 0 ? _fmtMoney(invoice.price) : 'مجاناً'}\nصالحة حتى: ${_fmtDate(invoice.periodEnd)}`);
+    }
+    if (record.accountEmail) {
+      results.email = await _sendEmail(record.accountEmail, `رزق — تأكيد تفعيل باقة ${record.pkgName} (${invoice.number})`, _invoiceEmailHTML(invoice));
+    }
   }
 
-  return { ok: true, invoice, accessToken, delivery: results };
+  return {
+    ok: true,
+    invoice,
+    accessToken,
+    delivery: results,
+    status: record.status,
+    paymentConfirmed: record.paymentConfirmed,
+  };
+}
+
+/** طلب اشتراك جديد — pending حتى تأكيد الدفع من الأدمن */
+function createPendingPackageFromRequest(opts) {
+  opts = opts || {};
+  if (!opts.accountId || !opts.pkgName) return { ok: false, error: 'accountId + pkgName مطلوبان' };
+
+  const { mapPackageNameToPlanType } = require('./services/entitlements');
+  const store = _load();
+  const existing = store[opts.accountId] || {};
+  const endMs = existing.periodEnd ? new Date(existing.periodEnd).getTime() : NaN;
+  if (existing.paymentConfirmed && !Number.isNaN(endMs) && endMs > Date.now()
+      && ['active', 'expiring_soon'].includes(existing.status)) {
+    return { ok: true, skipped: true, reason: 'subscription_still_active' };
+  }
+
+  const accountType = opts.accountType || existing.accountType || 'individual';
+  const accessToken = existing.accessToken || _genToken();
+  const record = Object.assign({}, existing, {
+    accountId: opts.accountId,
+    accountName: opts.accountName || existing.accountName || opts.accountId,
+    accountPhone: opts.accountPhone || existing.accountPhone || '',
+    accountEmail: opts.accountEmail || existing.accountEmail || '',
+    accountType,
+    planType: mapPackageNameToPlanType(opts.pkgName, accountType),
+    pkgName: opts.pkgName,
+    price: Number(opts.price) || 0,
+    status: 'pending',
+    subscriptionStatus: 'pending',
+    paymentConfirmed: false,
+    paidAt: null,
+    pendingSince: new Date().toISOString(),
+    pendingRequestId: opts.requestId || null,
+    accessToken,
+  });
+  store[opts.accountId] = record;
+  _save(store);
+  return { ok: true, status: 'pending', accessToken: record.accessToken };
 }
 
 function getAccountRecord(accountId) {
@@ -286,12 +346,32 @@ function applyReferralBonusDays(referrerAccountId, bonusDays) {
 // rizq_call_handler.js (عبر /api/account-package/diamond-status-batch أدناه)
 // وتُبنى فوق نفس account-packages.json المُغذّى فعلياً من كل تفعيل حقيقي.
 const DIAMOND_ACTIVE_STATUSES = ['active', 'expiring_soon'];
-function isDiamondActive(accountId) {
+
+function isPackageAccessActive(accountId) {
   if (!accountId) return false;
   const rec = getAccountRecord(accountId);
   if (!rec) return false;
-  const isDiamondPkg = /(ماس|diamond|diamant)/i.test(rec.pkgName || rec.planType || '');
-  return isDiamondPkg && DIAMOND_ACTIVE_STATUSES.includes(rec.status);
+  const { getSubscriptionStatus, isPaymentConfirmed } = require('./services/entitlements');
+  const status = getSubscriptionStatus(rec);
+  if (status === 'pending' || status === 'expired' || status === 'suspended' || status === 'no_subscription') {
+    return false;
+  }
+  if (!isPaymentConfirmed(rec) && !rec.paidAt && !rec.isTrial) return false;
+  const endMs = rec.periodEnd ? new Date(rec.periodEnd).getTime() : NaN;
+  if (!rec.periodEnd || Number.isNaN(endMs) || endMs <= Date.now()) return false;
+  return DIAMOND_ACTIVE_STATUSES.includes(rec.status) || status === 'active' || status === 'expiring_soon';
+}
+
+function isDiamondActive(accountId) {
+  if (!isPackageAccessActive(accountId)) return false;
+  const rec = getAccountRecord(accountId);
+  if (!rec) return false;
+  if (rec.isTrial || isTrialPackage(rec.pkgName, rec.price)) return false;
+  const { isPaymentConfirmed } = require('./services/entitlements');
+  if (!isPaymentConfirmed(rec)) return false;
+  const isDiamondPkg = /(ماس|diamond|diamant)/i.test(rec.pkgName || rec.planType || '')
+    || rec.diamondTier === 'diamond_standard' || rec.diamondTier === 'diamond_pro';
+  return isDiamondPkg;
 }
 
 // ── لائحة كل المشتركين الذين لديهم رقم هاتف حقيقي مسجَّل — هذا هو المصدر
@@ -345,7 +425,7 @@ async function runLifecycleScan(accountsHelpers) {
   for (const accountId of Object.keys(store)) {
     if (accountId === '__invoiceSeq') continue;
     const rec = store[accountId];
-    if (!rec || !rec.periodEnd || rec.status === 'suspended') continue;
+    if (!rec || !rec.periodEnd || rec.status === 'suspended' || rec.status === 'expired') continue;
 
     const endMs = new Date(rec.periodEnd).getTime();
     if (Number.isNaN(endMs)) continue;
@@ -365,32 +445,18 @@ async function runLifecycleScan(accountsHelpers) {
         changed = true;
       }
     } else if (daysLeft <= 0) {
-      const graceAgeMs = now - endMs;
+      // إيقاف فوري — لا مهلة سماح (تكاليف AI/مكالمات مباشرة على المنصة)
       const downgradePatch = buildDowngradePatch();
-      if (graceAgeMs >= GRACE_MS) {
-        // انتهت مهلة السماح (24 ساعة) — إيقاف فعلي + تخفيض إلى مجاني
-        rec.status = 'suspended';
-        rec.subscriptionStatus = 'suspended';
-        rec.planType = downgradePatch.planType;
-        rec.downgradedAt = downgradePatch.downgradedAt;
-        rec.suspendedAt = new Date(now).toISOString();
-        const msg = `🔒 رزق: تم إيقاف باقة "${rec.pkgName}" مؤقتاً لعدم التجديد خلال 24 ساعة من الانتهاء. جدّد الآن لاستعادة كل الميزات.`;
-        if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
-        if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — تم إيقاف باقتك', `<p dir="rtl">${msg}</p>`);
-        _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'suspended');
-        changed = true;
-      } else if (rec.status !== 'expired') {
-        // انتهت الباقة اليوم، لا تزال ضمن مهلة الـ24 ساعة — تنبيه أخير + تخفيض صلاحيات
-        rec.status = 'expired';
-        rec.subscriptionStatus = 'expired';
-        rec.planType = downgradePatch.planType;
-        rec.downgradedAt = downgradePatch.downgradedAt;
-        const msg = `⚠️ رزق: انتهت باقة "${rec.pkgName}" اليوم. لديك 24 ساعة لتجديدها قبل إيقاف الميزات.`;
-        if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
-        if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — انتهت باقتك اليوم', `<p dir="rtl">${msg}</p>`);
-        _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
-        changed = true;
-      }
+      rec.status = 'expired';
+      rec.subscriptionStatus = 'expired';
+      rec.planType = downgradePatch.planType;
+      rec.downgradedAt = downgradePatch.downgradedAt;
+      rec.expiredAt = new Date(now).toISOString();
+      const msg = `🔒 رزق: انتهت باقة "${rec.pkgName}". تم إيقاف جميع الميزات فوراً. جدّد الآن لاستعادتها.`;
+      if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
+      if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — انتهت باقتك', `<p dir="rtl">${msg}</p>`);
+      _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
+      changed = true;
     }
   }
 
@@ -494,8 +560,10 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
 
 module.exports = {
   syncAccountPackage,
+  createPendingPackageFromRequest,
   getAccountRecord,
   getAllAccountPackageRecords,
+  isPackageAccessActive,
   isDiamondActive,
   getAllSubscribersWithPhone,
   broadcastSMS,

@@ -1,5 +1,26 @@
 /* rizq_mobile.css — unified mobile UX, z-index, splash, bottom sheets */
 
+/* ── منع التمرير الأفقي (جميع الشاشات) ── */
+html,
+body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+.pricing-container,
+.container,
+.pricing-grid {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 :root{
   --rzq-z-content:1;
   --rzq-z-fab:500;
@@ -133,8 +154,45 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 .rzq-sheet-body .iep-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
 
 @media(max-width:768px), (orientation:landscape) and (max-height:500px){
-  /* إخفاء اللوحة الموسّعة داخل الشبكة — الجوال يستخدم بطاقة عائمة فقط */
-  #cat-inline-panel{display:none!important;visibility:hidden!important}
+  /* لوحة الفروع inline — نفس تجربة سطح المكتب (بيج/ذهبي، تدفع المحتوى للأسفل) */
+  #cat-inline-panel,
+  #qcat-inline-panel{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin:8px 0 12px !important;
+    padding:18px 14px 16px !important;
+    position:relative !important;
+    top:auto !important;left:auto !important;right:auto !important;
+    transform:none !important;
+    z-index:4 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    box-sizing:border-box !important;
+  }
+  #cat-inline-panel .iep-groups{
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:12px 14px !important;
+  }
+  #qcat-inline-panel .iep-groups.qcat-iep-flat{
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:6px 10px !important;
+  }
+  #cat-inline-panel .iep-title,
+  #qcat-inline-panel .iep-title{font-size:16px !important}
+  #cat-inline-panel .iep-link,
+  #qcat-inline-panel .iep-link{
+    font-size:13px !important;
+    padding:9px 10px !important;
+    min-height:40px !important;
+    display:flex !important;
+    align-items:center !important;
+  }
+  #cat-inline-panel .iep-viewall,
+  #qcat-inline-panel .iep-viewall{font-size:11.5px !important;padding:8px 12px !important}
+  #cat-inline-panel .iep-header,
+  #qcat-inline-panel .iep-header{margin-bottom:16px !important;gap:8px !important}
+  #cat-inline-panel .iep-group-title{font-size:12.5px !important}
 
   /* نافذة الفروع — بطاقة عائمة مركزية مدمجة */
   .rzq-sheet{
@@ -181,7 +239,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .fixed-disc-pill,
   .fixed-disc-pill.disc-pill-short{display:none!important}
 
-  html,body{overflow-x:hidden}
+  html,body{overflow-x:hidden!important;max-width:100%!important}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0))}
   html.rizq-app-nav body,
   html.rizq-app-nav body.landing-ux-mobile{padding-bottom:0!important}
@@ -210,8 +268,9 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   }
   html[dir="ltr"] #rizq-chat-toggle{right:auto!important;left:12px!important}
   #rizq-chat-window{
-    bottom:calc(148px + env(safe-area-inset-bottom,0))!important;
-    max-height:calc(100vh - 220px)!important;
+    bottom:calc(100px + env(safe-area-inset-bottom,0))!important;
+    width:min(340px,calc(100vw - 24px))!important;
+    max-height:min(480px,calc(100vh - 220px))!important;
     z-index:var(--rzq-z-modal)!important;
   }
   .mobile-filter-btn{
@@ -255,12 +314,18 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   }
 
   .listings-grid,.hero-biz-nav,.quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
-  .pricing-grid,.similar-grid,.dp-similar-grid,.cta-btns,
+  .similar-grid,.dp-similar-grid,.cta-btns,
   .store-badges,.store-meta{
     display:flex!important;flex-direction:column!important;
     flex-wrap:nowrap!important;overflow-x:hidden!important;
     width:100%!important;max-width:100%!important;
     gap:12px!important;
+  }
+  .pricing-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+    width:100%!important;max-width:100%!important;
   }
   /* بيع · اشتر · تميز — 3 أعمدة أفقية على سطر واحد */
   .hero-pills{
@@ -287,6 +352,11 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     width:100%!important;max-width:100%!important;min-width:0!important;
     flex:none!important;height:auto!important;
     box-sizing:border-box;
+  }
+  #pricing .pricing-tabs{
+    grid-template-columns:repeat(2,1fr)!important;
+    max-width:100%!important;
+    gap:10px!important;
   }
   .listings-grid .listing-card,
   .ads-grid .ad-card,

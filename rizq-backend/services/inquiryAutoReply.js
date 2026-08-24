@@ -6,18 +6,36 @@ const { handleWidgetChat } = require('./widgetChat');
 const { isActive } = require('./agentStatus');
 const { isAnthropicConfigured } = require('../config/anthropic');
 const { getEntitlements } = require('./entitlements');
+const { accountHasAiAgentStrict } = require('./packageAccessGuard');
 const { recordUsage } = require('../../rizq_quota_guard_agent');
+const { getSubscriberProfileByAccountId } = require('../../rizq_subscriber_agent');
+const RizqPrompts = require('../../rizq_ai_prompts');
 
 function accountHasAiAgent(acc) {
-  if (!acc || acc.status !== 'approved' || acc.suspended) return false;
-  const ent = getEntitlements(acc.id, acc.type);
-  return ent.flags && ent.flags.aiAgent;
+  return accountHasAiAgentStrict(acc);
 }
 
 function buildProfileFromAccount(acc) {
+  const personaKey = RizqPrompts.resolveBusinessType({
+    businessName: acc.name,
+    businessType: acc.type,
+    activity: acc.activity || acc.desc,
+  });
+  const personaDef = RizqPrompts.getPersonaDef(personaKey);
+  const row = getSubscriberProfileByAccountId(acc.id);
+  const dynamicKnowledge = row && row.profile && row.profile.dynamicKnowledge
+    ? row.profile.dynamicKnowledge
+    : null;
+  const customInstructions = row && row.profile && row.profile.customInstructions
+    ? row.profile.customInstructions
+    : '';
+
   return {
     businessName: acc.name || 'المنشأة',
+    businessType: personaKey,
     tier: 'diamond',
+    customInstructions,
+    dynamicKnowledge,
     channels: {
       phone: acc.phone || '',
       whatsapp: acc.whatsapp || acc.phone || '',
@@ -25,11 +43,12 @@ function buildProfileFromAccount(acc) {
       location: [acc.city, acc.address].filter(Boolean).join(' — '),
     },
     persona: {
+      key: personaKey,
       agentTitle: acc.type === 'corp'
-        ? 'سكرتارية ' + (acc.name || '')
+        ? personaDef.ar || ('سكرتارية ' + (acc.name || ''))
         : acc.type === 'office'
-          ? 'مساعد المكتب'
-          : 'مساعد المحل',
+          ? personaDef.ar || 'مساعد المكتب'
+          : personaDef.ar || 'مساعد المحل',
     },
   };
 }

@@ -50,6 +50,9 @@
   ════════════════════════════════════════ */
   function _isDiamondActive(acc) {
     if (!acc) return false;
+    if (acc.pkg_status === 'pending' || acc.subscriptionStatus === 'pending') return false;
+    if (acc.pkg_status === 'expired' || acc.subscriptionStatus === 'expired') return false;
+    if (acc.pkg_status === 'suspended' || acc.subscriptionStatus === 'suspended') return false;
     if (typeof RizqSub !== 'undefined' && typeof RizqSub.hasFeature === 'function' && ACC_ID) {
       return RizqSub.hasFeature(ACC_ID, 'ai_agent_full');
     }
@@ -139,10 +142,13 @@
   ════════════════════════════════════════ */
   (function _applyPersona() {
     if (!window.RizqPrompts) return;
-    var activityText = (_acc.activity || '') + ' ' + (_acc.type || '');
-    var personaKey   = window.RizqPrompts.detectPersona(activityText);
+    var activityText = (_acc.activity || '') + ' ' + (_acc.type || '') + ' ' + (_acc.desc || '');
+    var personaKey   = window.RizqPrompts.resolveBusinessType
+      ? window.RizqPrompts.resolveBusinessType({ activity: activityText, businessType: _acc.type, businessName: _acc.name })
+      : window.RizqPrompts.detectPersona(activityText);
     var persona      = window.RizqPrompts.personas[personaKey] || window.RizqPrompts.personas['default'];
     _profile.personaKey      = personaKey;
+    _profile.businessType    = personaKey;
     _profile.personaLabel    = persona.ar;
     _profile.personaTone     = persona.tone;
     _profile.personaExpertise= persona.expertise || [];
@@ -160,6 +166,9 @@
       insurance_office: 'مستشار التأمين',
       virtual_office  : 'مساعد المكتب',
       general_store   : 'مساعد المحل',
+      company         : 'سكرتير الشركة',
+      academy         : 'مساعد الأكاديمية',
+      freelance       : 'مساعد الخدمات',
     };
     _profile.agentTitle = agentNames[personaKey] || 'المساعد الذكي';
   })();
@@ -177,7 +186,9 @@
   ════════════════════════════════════════ */
   window._rizqProfile = {
     businessName: _profile.businessName,
+    businessType: _profile.personaKey || _profile.businessType || 'default',
     tier: 'diamond',
+    accountId: ACC_ID,
     channels: {
       phone: _profile.phone || '',
       whatsapp: _profile.whatsapp || _profile.phone || '',
@@ -185,15 +196,15 @@
       location: [_profile.city, _profile.address].filter(Boolean).join(' — ')
     },
     workingHours: _profile.workingHours,
-    // إصلاح: كانت isOffHours تُحسَب أعلاه في _buildProfile() ثم لا تُستخدم
-    // في أي مكان — لا تصل للويدجت فلا يظهر أي فرق فعلي في سلوكه خارج الدوام،
-    // رغم أن هذا كان الغرض المُعلَن للملف بالكامل ("رد تلقائي مكالمات — يظهر
-    // رابط واتساب ذكي عند غياب الصاحب"). الآن تصل فعلاً لـ rizq_widget_embed.js.
     isOffHours: !!_profile.isOffHours,
     products: (_profile.products || []).slice(0, 8).map(function (p) {
       return { name: p.name || '', price: p.price || '' };
     }),
+    services: (_profile.services || []).slice(0, 8).map(function (s) {
+      return { name: s.name || s.title || '', price: s.price || '' };
+    }),
     policies: {},
+    dynamicKnowledge: null,
     persona: {
       key: _profile.personaKey || '',
       label: _profile.personaLabel || '',
@@ -201,5 +212,33 @@
       agentTitle: _profile.agentTitle || ''
     }
   };
+
+  /* جلب dynamicKnowledge من الخادم (معزول per accountId) */
+  (function _loadDynamicKnowledge() {
+    if (typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !ACC_ID) return;
+    var token = '';
+    try {
+      var accs = JSON.parse(localStorage.getItem('rizq_accounts') || '{}');
+      if (accs[ACC_ID] && accs[ACC_ID].accessToken) token = accs[ACC_ID].accessToken;
+      if (!token) {
+        var pending = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        var row = pending.find(function (a) { return a.id === ACC_ID; });
+        token = (row && (row.accessToken || row.backendAccessToken)) || '';
+      }
+    } catch (e) {}
+    if (!token) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/subscriber/knowledge/mine/' + encodeURIComponent(ACC_ID), {
+      headers: { 'x-account-token': token },
+    }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data.dynamicKnowledge && window._rizqProfile) {
+          window._rizqProfile.dynamicKnowledge = data.dynamicKnowledge;
+          if (data.personaKey) {
+            window._rizqProfile.businessType = data.personaKey;
+            if (window._rizqProfile.persona) window._rizqProfile.persona.key = data.personaKey;
+          }
+        }
+      }).catch(function () {});
+  })();
 
 })();

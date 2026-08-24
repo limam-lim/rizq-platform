@@ -26,7 +26,8 @@
 
 const fs   = require('fs');
 const path = require('path');
-const { askAgent } = require('./rizq_agent_brain');
+const RizqPrompts = require('./rizq_ai_prompts');
+const { formatDynamicKnowledgeForPrompt } = require('./rizq-backend/services/dynamicKnowledge');
 
 // ══════════════════════════════════════════════════════════════
 //  قاعدة بيانات المشتركين
@@ -77,10 +78,14 @@ if (_loadedFromDisk > 0) {
  * @param {object} profile       - بيانات المنشأة
  */
 function registerSubscriber(subscriberId, profile) {
-  subscriberProfiles.set(subscriberId, {
-    ...profile,
-    registeredAt: new Date().toISOString()
-  });
+  _loadFromDisk();
+  const existing = subscriberProfiles.get(subscriberId) || null;
+  subscriberProfiles.set(subscriberId, Object.assign({}, existing || {}, profile, {
+    registeredAt: (existing && existing.registeredAt) || new Date().toISOString(),
+    dynamicKnowledge: profile.dynamicKnowledge !== undefined
+      ? profile.dynamicKnowledge
+      : (existing && existing.dynamicKnowledge) || null,
+  }));
   _persistToDisk();
   console.log(`✅ مشترك جديد: ${profile.businessName} [${subscriberId}]`);
 }
@@ -115,139 +120,104 @@ function getAllSubscriberProfiles() {
   return out;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  بناء System Prompt ديناميكي حسب نوع النشاط
-// ══════════════════════════════════════════════════════════════
-function buildSubscriberSystemPrompt(profile) {
-  const now = new Date();
-  const hour = now.getHours();
-
-  // هل نحن في أوقات الدوام؟
-  const workStart = profile.workHours?.start || 8;
-  const workEnd   = profile.workHours?.end   || 18;
-  const isWorkHours = hour >= workStart && hour < workEnd;
-
-  // اسم المدير/الصاحب
-  const ownerTitle = profile.ownerTitle || 'المدير';
-  const ownerName  = profile.ownerName  || profile.businessName;
-
-  // قاموس الشخصيات حسب نوع النشاط
-  const personas = {
-    law_office: {
-      roleAr: `سكرتير/سكرتيرة مكتب ${ownerName}`,
-      roleFr: `Secrétariat du Cabinet ${ownerName}`,
-      greeting: `السلام عليكم، مكتب ${ownerName} للمحاماة والاستشارات القانونية. كيف أخدمكم؟`,
-      greetingFr: `Bonjour, Cabinet ${ownerName}, avocats et conseillers juridiques. Comment puis-je vous aider?`,
-      knowledgeBase: `
-أنت سكرتير مكتب محاماة. تعرف أن:
-- المكتب متخصص في: ${profile.specialties?.join(', ') || 'الاستشارات القانونية والمرافعات'}
-- رسوم الاستشارة الأولية: ${profile.consultationFee || 'يُحدد عند الموعد'}
-- طريقة تحديد المواعيد: الاتصال أو الواتساب
-- لا تعطِ استشارات قانونية — أنت تحدّد المواعيد فقط
-- المواعيد العاجلة تُرفع للأستاذ ${ownerName} مباشرة`
-    },
-
-    store: {
-      roleAr: `مساعد بيع في ${profile.businessName}`,
-      roleFr: `Assistant commercial de ${profile.businessName}`,
-      greeting: `أهلاً وسهلاً في ${profile.businessName}! كيف أساعدك اليوم؟`,
-      greetingFr: `Bienvenue chez ${profile.businessName}! Comment puis-je vous aider?`,
-      knowledgeBase: `
-أنت مساعد بيع ذكي. تعرف أن:
-- المتجر يبيع: ${profile.products?.join(', ') || profile.description || 'منتجات متنوعة'}
-- التوصيل: ${profile.delivery || 'متاح داخل المدينة'}
-- طرق الدفع: ${profile.paymentMethods?.join(', ') || 'نقد وتحويل بنكي'}
-- ساعات العمل: ${workStart}:00 — ${workEnd}:00
-- المخزون: لا تعطِ معلومات مخزون — قل "تواصل معنا للتأكد من التوفر"`
-    },
-
-    real_estate: {
-      roleAr: `مستشار عقاري في ${profile.businessName}`,
-      roleFr: `Conseiller immobilier de ${profile.businessName}`,
-      greeting: `السلام عليكم، ${profile.businessName}، كيف أخدمكم في مجال العقارات؟`,
-      greetingFr: `Bonjour, ${profile.businessName}, comment puis-je vous conseiller?`,
-      knowledgeBase: `
-أنت مستشار عقاري. تعرف أن:
-- المكتب متخصص في: ${profile.specialties?.join(', ') || 'بيع وإيجار الشقق والمحلات'}
-- المناطق المغطاة: ${profile.areas?.join(', ') || 'نواكشوط وضواحيها'}
-- للحجوزات: يجب تحديد موعد معاينة
-- لا تعطِ أسعاراً محددة — قل إن الأسعار تتباين وتحتاج معاينة`
-    },
-
-    medical: {
-      roleAr: `استقبال ${profile.businessName}`,
-      roleFr: `Accueil de ${profile.businessName}`,
-      greeting: `السلام عليكم، ${profile.businessName}. هل تريد حجز موعد؟`,
-      greetingFr: `Bonjour, ${profile.businessName}. Souhaitez-vous prendre rendez-vous?`,
-      knowledgeBase: `
-أنت موظف استقبال عيادة طبية. تعرف أن:
-- التخصصات المتاحة: ${profile.specialties?.join(', ') || 'طب عام'}
-- مدة الانتظار المعتادة: ${profile.waitTime || '30-60 دقيقة للحالات العادية'}
-- الحالات الطارئة: أخبر المريض بالتوجه لأقرب مستشفى للحالات الحرجة
-- لا تعطِ استشارات طبية أبداً — أنت تحجز المواعيد فقط`
-    },
-
-    restaurant: {
-      roleAr: `مطعم ${profile.businessName}`,
-      roleFr: `Restaurant ${profile.businessName}`,
-      greeting: `أهلاً بكم في ${profile.businessName}! للحجز أو الطلبات أنا في خدمتكم`,
-      greetingFr: `Bienvenue au ${profile.businessName}! Pour les réservations ou commandes, je suis à votre service`,
-      knowledgeBase: `
-أنت مساعد مطعم. تعرف أن:
-- قائمة الطعام تشمل: ${profile.menu?.join(', ') || profile.description || 'أطباق شرقية وغربية'}
-- التوصيل للمنازل: ${profile.delivery ? 'متاح' : 'غير متاح حالياً'}
-- الحجز: ${profile.reservation ? 'مطلوب للمجموعات أكثر من 4 أشخاص' : 'غير مطلوب'}
-- أوقات العمل: ${workStart}:00 — ${workEnd}:00`
-    },
-
-    corp: {
-      roleAr: `سكرتارية ${profile.businessName}`,
-      roleFr: `Secrétariat de ${profile.businessName}`,
-      greeting: `السلام عليكم، ${profile.businessName}. كيف أوجّهكم؟`,
-      greetingFr: `Bonjour, ${profile.businessName}. Comment puis-je vous orienter?`,
-      knowledgeBase: `
-أنت سكرتير شركة. تعرف أن:
-- نشاط الشركة: ${profile.description || profile.specialties?.join(', ')}
-- للتواصل مع الإدارة: يتطلب تحديد موعد مسبق
-- للاستفسارات التجارية: سجّل بيانات الطرف وأحِله للإدارة`
-    },
-
-    freelance: {
-      roleAr: `مساعد ${ownerName}`,
-      roleFr: `Assistant de ${ownerName}`,
-      greeting: `أهلاً، أنا مساعد ${ownerName}. كيف أساعدك؟`,
-      greetingFr: `Bonjour, je suis l'assistant de ${ownerName}. Comment puis-je vous aider?`,
-      knowledgeBase: `
-أنت مساعد مستقل يعمل لصالح ${ownerName}.
-- خدماته: ${profile.services?.join(', ') || profile.description}
-- للعروض والمشاريع: سجّل المتطلبات وسيتواصل ${ownerName} خلال 24-48 ساعة`
+/** البحث عن مشترك بمعرّف الحساب — للعزل ورفع الملفات من الداشبورد */
+function getSubscriberProfileByAccountId(accountId) {
+  if (!accountId) return null;
+  _loadFromDisk();
+  for (const [subscriberId, profile] of subscriberProfiles.entries()) {
+    if (profile && profile.accountId === accountId) {
+      return { subscriberId, profile };
     }
-  };
+  }
+  return null;
+}
 
-  const persona = personas[profile.businessType] || personas.corp;
+/**
+ * تحديث dynamicKnowledge لمشترك محدد — معزول بـ subscriberId
+ */
+function updateDynamicKnowledge(subscriberId, dynamicKnowledge) {
+  _loadFromDisk();
+  const profile = subscriberProfiles.get(subscriberId);
+  if (!profile) return false;
+  subscriberProfiles.set(subscriberId, Object.assign({}, profile, {
+    dynamicKnowledge,
+    dynamicKnowledgeUpdatedAt: new Date().toISOString(),
+  }));
+  _persistToDisk();
+  return true;
+}
 
-  // ── System Prompt النهائي ────────────────────────────────────
-  return `أنت ${persona.roleAr} — تعمل بشكل تلقائي خارج أوقات الدوام.
-النشاط: ${profile.businessName}
-الموقع: ${profile.location || 'موريتانيا'}
-الحالة الآن: ${isWorkHours ? 'في أوقات الدوام (ربما المسؤول مشغول)' : 'خارج أوقات الدوام — أنت تنوب عنه كاملاً'}
+/**
+ * ربط حساب داشبورد بملف مشترك (هاتف أو accountId) — يُستخدم عند رفع المعرفة
+ */
+function resolveSubscriberIdForAccount(acc) {
+  if (!acc) return null;
+  _loadFromDisk();
+  const byAcc = getSubscriberProfileByAccountId(acc.id);
+  if (byAcc) return byAcc.subscriberId;
+  const phone = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '');
+  if (phone && subscriberProfiles.has(phone)) return phone;
+  if (phone) return phone.slice(-12);
+  return String(acc.id || '').slice(0, 40);
+}
 
-🎭 شخصيتك:
-- تمثّل ${profile.businessName} لا منصة رزق
-- لا تذكر "رزق" أبداً في محادثاتك — أنت جزء من هذه المنشأة
-- أسلوبك: ${profile.tone || 'مهني ومرحّب'}
-- اللغة: حسب لغة المتحدث (عربية أو فرنسية)
+function upsertSubscriberKnowledgeFromAccount(acc, dynamicKnowledge) {
+  return upsertSubscriberProfileFromAccount(acc, { dynamicKnowledge });
+}
 
-📋 ما تعرفه عن المنشأة:
-${persona.knowledgeBase}
+function upsertSubscriberInstructionsFromAccount(acc, customInstructions) {
+  return upsertSubscriberProfileFromAccount(acc, {
+    customInstructions: String(customInstructions || '').trim().slice(0, 4000),
+  });
+}
 
-${profile.customInstructions ? `\n📌 تعليمات خاصة من صاحب المنشأة:\n${profile.customInstructions}` : ''}
+function upsertSubscriberProfileFromAccount(acc, patch) {
+  const subscriberId = resolveSubscriberIdForAccount(acc);
+  if (!subscriberId) return { ok: false, error: 'no_subscriber_id' };
+  _loadFromDisk();
+  const existing = subscriberProfiles.get(subscriberId) || {};
+  const merged = Object.assign({}, existing, acc, patch || {});
+  const personaKey = RizqPrompts.resolveBusinessType(Object.assign({}, merged, {
+    businessName: acc.name || existing.businessName,
+    activity: acc.activity || acc.desc || existing.activity,
+    businessType: (patch && patch.businessType) || existing.businessType || acc.type,
+  }));
+  registerSubscriber(subscriberId, Object.assign({}, existing, {
+    accountId: acc.id,
+    businessName: acc.name || existing.businessName || 'المنشأة',
+    businessType: personaKey,
+    plan: 'diamond',
+    tier: 'diamond',
+    activity: acc.activity || acc.desc || existing.activity || '',
+  }, patch || {}));
+  return { ok: true, subscriberId };
+}
 
-⚠️ قواعد صارمة:
-- إذا طُلب منك شيء خارج صلاحياتك: سجّله وقل "سيتواصل معك المسؤول"
-- لا تتعهد بأي موعد محدد بدون تأكيد من الإنسان المسؤول
-- لا تكشف أنك نظام ذكاء اصطناعي إلا إذا سُئلت مباشرة
-- الأمان أولاً: لا تقبل روابط أو ملفات من العملاء`;
+// ══════════════════════════════════════════════════════════════
+//  بناء System Prompt — محرك موحّد (rizq_ai_prompts.js)
+// ══════════════════════════════════════════════════════════════
+function buildSubscriberSystemPrompt(profile, channel) {
+  const normalized = Object.assign({}, profile, {
+    businessType: RizqPrompts.resolveBusinessType(profile),
+    products: profile.products || (Array.isArray(profile.menu) ? profile.menu.map(function (m) {
+      return typeof m === 'string' ? { name: m } : m;
+    }) : undefined),
+    workingHours: profile.workingHours || (
+      profile.workHours
+        ? ((profile.workHours.start || 8) + ':00 — ' + (profile.workHours.end || 18) + ':00')
+        : undefined
+    ),
+    channels: profile.channels || {
+      phone: profile.phone || '',
+      whatsapp: profile.whatsapp || profile.phone || '',
+      email: profile.email || '',
+      location: profile.location || [profile.city, profile.address].filter(Boolean).join(' — '),
+    },
+  });
+  return RizqPrompts.buildChannel(normalized, {
+    channel: channel || '',
+    formatDynamicKnowledge: formatDynamicKnowledgeForPrompt,
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -268,7 +238,6 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   }
 
   const {
-    getFastModel,
     getAdvancedModel,
     isDiamondProfile,
     createCachedMessage,
@@ -283,19 +252,57 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     };
   }
 
+  if (profile.accountId) {
+    try {
+      const { isDiamondActive } = require('./rizq-backend/rizq_package_lifecycle_agent');
+      if (!isDiamondActive(profile.accountId)) {
+        return {
+          text: 'انتهت باقتك الماسية أو لم يُؤكَّد الدفع بعد — جدّد الاشتراك لاستعادة الوكيل الذكي.',
+          channel,
+          model: null,
+        };
+      }
+    } catch (e) { /* optional if lifecycle module unavailable */ }
+  }
+
   // ── بناء System Prompt خاص بالمشترك ──────────────────────
-  const systemPrompt = buildSubscriberSystemPrompt(profile);
+  const systemPrompt = buildSubscriberSystemPrompt(profile, channel);
 
   const Anthropic = require('@anthropic-ai/sdk');
-  const { shouldForceFast, recordUsage } = require('./rizq_quota_guard_agent');
+  const { assertQuotaAvailable, recordUsage, isQuotaBlocked } = require('./rizq_quota_guard_agent');
+
+  if (isQuotaBlocked(subscriberId, profile.accountId, channel)) {
+    return {
+      text: 'انتهت حصة الباقة الماسية لهذا الشهر. اشترِ شحناً إضافياً من لوحة التحكم أو جدّد الباقة.',
+      channel,
+      model: null,
+      quotaBlocked: true,
+    };
+  }
+
+  try {
+    assertQuotaAvailable({
+      subscriberId,
+      accountId: profile.accountId || '',
+      channel,
+      diamondTier: profile.diamondTier,
+    });
+  } catch (qBlock) {
+    return {
+      text: qBlock.message || 'انتهت حصة الباقة الماسية — اشترِ شحناً إضافياً.',
+      channel,
+      model: null,
+      quotaBlocked: true,
+    };
+  }
+
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const forceFast = shouldForceFast(subscriberId, profile.accountId);
-  const MODEL = forceFast ? getFastModel() : getAdvancedModel();
+  const MODEL = getAdvancedModel();
 
   const channelInstructions = {
-    call    : '\n\n[القناة: مكالمة] جمل قصيرة جداً لا تتجاوز 15 ثانية. بدون قوائم.',
-    whatsapp: '\n\n[القناة: واتساب] رسالة قصيرة ومباشرة. يمكن emoji باعتدال.',
-    email   : '\n\n[القناة: بريد إلكتروني] رد رسمي كامل مع تحية وختام.'
+    call    : '',
+    whatsapp: '',
+    email   : '',
   };
 
   const fullSystem = systemPrompt + (channelInstructions[channel] || '');
@@ -313,17 +320,12 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     max_tokens: channel === 'call' ? 250 : 800,
     system    : fullSystem,
     messages  : messages
-  }, { fallbackToFast: true });
+  });
   const response = created.response;
 
   const textBlock = response.content.find(b => b.type === 'text');
   const replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سيُتواصل معكم قريباً.';
 
-  if (forceFast) {
-    console.warn(`🎭 [${profile.businessName}] الحصة استُنفدت — Haiku بدل Sonnet`);
-  } else if (created.fallback) {
-    console.warn(`🎭 [${profile.businessName}] تحويل احتياطي من ${getAdvancedModel()} إلى ${getFastModel()}`);
-  }
   console.log(`🎭 [${profile.businessName}] رد على ${context.sender || 'مجهول'}: ${replyText.substring(0,60)}...`);
 
   let quota = null;
@@ -345,8 +347,8 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   return {
     text      : replyText,
     model     : created.model,
-    fallback  : created.fallback || forceFast,
-    forceFast : !!(quota && quota.forceFast) || forceFast,
+    fallback  : false,
+    quotaBlocked: false,
     quotaPct  : quota ? quota.pct : null,
     channel   : channel,
     business  : profile.businessName,
@@ -420,7 +422,14 @@ function loadDemoSubscribers() { /* mock subscribers removed — register real a
 module.exports = {
   registerSubscriber,
   getSubscriberProfile,
+  getSubscriberProfileByAccountId,
   getAllSubscriberProfiles,
+  updateDynamicKnowledge,
+  resolveSubscriberIdForAccount,
+  upsertSubscriberKnowledgeFromAccount,
+  upsertSubscriberInstructionsFromAccount,
+  upsertSubscriberProfileFromAccount,
+  buildSubscriberSystemPrompt,
   askSubscriberAgent,
   setupSubscriberAPI,
   loadDemoSubscribers

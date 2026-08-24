@@ -49,7 +49,7 @@ const twilio     = require('twilio');
 const axios      = require('axios');
 const { askSubscriberAgent, getSubscriberProfile, getAllSubscriberProfiles, registerSubscriber, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
 const { askAgent } = require('./rizq_agent_brain');
-const { getFastModel } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -458,7 +458,7 @@ app.get('/', (req, res) => {
       <tr><td style="padding:8px;font-weight:bold">رقم Twilio</td><td><code>${RIZQ_NUMBER}</code></td></tr>
       <tr><td style="padding:8px;font-weight:bold">وكلاء نشطون</td><td>${activeCount}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">مكالمات مسجّلة</td><td>${callLog.length}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Claude Model</td><td>${getFastModel()}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Claude Model</td><td>${getAdvancedModel()}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">API Key</td><td>${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود'}</td></tr>
     </table>
     <hr>
@@ -473,5 +473,5 @@ app.listen(PORT, () => {
   console.log(`   رقم Twilio الموحّد: ${RIZQ_NUMBER}`);
   console.log(`   Webhook → Twilio: https://YOUR-DOMAIN/api/call`);
   console.log(`   المشتركون يُحوّلون مكالماتهم إلى هذا الرقم`);
-  console.log(`   العقل: ${getFastModel()}\n`);
+  console.log(`   العقل: ${getAdvancedModel()}\n`);
 });

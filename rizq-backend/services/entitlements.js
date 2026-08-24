@@ -6,13 +6,52 @@
  * ══════════════════════════════════════════════════════════════════
  */
 const { getAccountRecord } = require('../rizq_package_lifecycle_agent');
+const {
+  resolveDiamondTier,
+  isTrialPackage,
+  resolveQuotaLimitsForAccount,
+} = require('./catalogConfig');
 
-/** @typedef {'free'|'pro'|'business'|'store_trial'|'store_monthly'|'store_quarterly'|'store_yearly'|'store_diamond'|'office_basic'|'office_pro'|'corp_trial'|'corp_monthly'|'corp_diamond'} PlanType */
+/** @typedef {'free'|'pro'|'business'|'diamond_standard'|'diamond_pro'|'store_trial'|...} PlanType */
+
+const AI_PAID_FEATURES = [
+  'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel',
+  'auto_reply_calls', 'vip_manager', 'quota_dashboard',
+];
+const PRO_ONLY_FEATURES = ['calls_channel', 'auto_reply_calls'];
 
 const ACTIVE_STATUSES = ['active', 'expiring_soon'];
 const BLOCKED_STATUSES = ['suspended', 'expired'];
+const PENDING_STATUSES = ['pending', 'pending_payment', 'awaiting_payment'];
 
-/** مصفوفة الأفراد — مطابقة لصفحة الهبوط (DEF_IND) */
+function isPaymentConfirmed(rec) {
+  if (!rec) return false;
+  if (rec.paymentConfirmed === true || rec.paidAt) return true;
+  if (rec.paymentConfirmed === false) return false;
+  // سجلات قديمة قبل حقل paymentConfirmed — تُعتبر موثّقة إذا فُعّلت من الأدمن
+  return rec.activatedBy === 'admin' && ACTIVE_STATUSES.includes(rec.status);
+}
+
+function getSubscriptionStatus(rec) {
+  if (!rec) return 'no_subscription';
+  if (PENDING_STATUSES.includes(rec.status)) return 'pending';
+  if (!isPaymentConfirmed(rec) && rec.status !== 'suspended' && rec.status !== 'expired') {
+    return 'pending';
+  }
+  if (rec.status === 'suspended') return 'suspended';
+  const endMs = rec.periodEnd ? new Date(rec.periodEnd).getTime() : NaN;
+  if (!rec.periodEnd || Number.isNaN(endMs)) {
+    return rec.status === 'expired' ? 'expired' : 'no_subscription';
+  }
+  const now = Date.now();
+  if (endMs <= now) {
+    return rec.status === 'suspended' ? 'suspended' : 'expired';
+  }
+  if (rec.status === 'expiring_soon') return 'expiring_soon';
+  if (rec.status === 'expired') return 'expired';
+  if (ACTIVE_STATUSES.includes(rec.status)) return 'active';
+  return 'no_subscription';
+}
 const INDIVIDUAL_PLANS = {
   free: {
     planType: 'free',
@@ -67,13 +106,37 @@ const STORE_PLANS = {
   store_monthly: { planType: 'store_monthly', maxCatalogItems: 50, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos'] },
   store_quarterly: { planType: 'store_quarterly', maxCatalogItems: 200, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
   store_yearly: { planType: 'store_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
-  store_diamond: { planType: 'store_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
+  store_diamond: { planType: 'store_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false },
+};
+
+const DIAMOND_STANDARD_PLAN = {
+  planType: 'diamond_standard',
+  maxCatalogItems: Infinity,
+  maxPhotosPerItem: 10,
+  videoMaxSec: 90,
+  videoMaxMb: 50,
+  videoWatermark: false,
+  diamondTier: 'diamond_standard',
+  audioAccess: false,
+  features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'],
+};
+
+const DIAMOND_PRO_PLAN = {
+  planType: 'diamond_pro',
+  maxCatalogItems: Infinity,
+  maxPhotosPerItem: 10,
+  videoMaxSec: 90,
+  videoMaxMb: 50,
+  videoWatermark: false,
+  diamondTier: 'diamond_pro',
+  audioAccess: true,
+  features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'auto_reply_calls', 'quota_dashboard'],
 };
 
 const OFFICE_PLANS = {
   office_basic: { planType: 'office_basic', maxCatalogItems: 5, maxPhotosPerItem: 5, videoMaxSec: 30, videoMaxMb: 20, videoWatermark: true, features: ['dashboard_access'] },
   office_pro: { planType: 'office_pro', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing'] },
-  office_diamond: { planType: 'office_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
+  office_diamond: { planType: 'office_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false },
 };
 
 const CORP_PLANS = {
@@ -81,7 +144,7 @@ const CORP_PLANS = {
   corp_monthly: { planType: 'corp_monthly', maxCatalogItems: 30, maxPhotosPerItem: 8, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics'] },
   corp_quarterly: { planType: 'corp_quarterly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing'] },
   corp_yearly: { planType: 'corp_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing', 'vip_badge'] },
-  corp_diamond: { planType: 'corp_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'quota_dashboard'] },
+  corp_diamond: { planType: 'corp_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false },
 };
 
 const FREE_FALLBACK = INDIVIDUAL_PLANS.free;
@@ -94,16 +157,23 @@ function mapPackageNameToPlanType(pkgName, accountType) {
   if (/^(pro|باقة\s*pro)$/.test(name) || name === 'pro') return type === 'individual' ? 'pro' : null;
   if (/business|🏢|أعمال/.test(name)) return type === 'individual' ? 'business' : null;
 
+  if (/diamond_pro|diam-pro|_pro\b/.test(name) && /ماس|diamond|diamant/.test(name)) return 'diamond_pro';
+  if (/diamond_standard|diam-std|diamond_std/.test(name)) return 'diamond_standard';
+
   if (type === 'store' || type === 'shop') {
     if (/تجريب|trial|مجان/.test(name)) return 'store_trial';
-    if (/ماس|diamond/.test(name)) return 'store_diamond';
+    if (/ماس|diamond/.test(name)) {
+      return resolveDiamondTier({ pkgName: name, planType: name }) === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard';
+    }
     if (/سنو|year|annual/.test(name)) return 'store_yearly';
     if (/ربع|quarter/.test(name)) return 'store_quarterly';
     if (/شهر|month/.test(name)) return 'store_monthly';
     return 'store_monthly';
   }
   if (type === 'office') {
-    if (/ماس|diamond|diamant/.test(name)) return 'office_diamond';
+    if (/ماس|diamond|diamant/.test(name)) {
+      return resolveDiamondTier({ pkgName: name }) === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard';
+    }
     if (/احتراف|pro|premium/.test(name)) return 'office_pro';
     if (/أساس|basic/.test(name)) return 'office_basic';
     if (/تأمين|insurance/.test(name)) return 'office_pro';
@@ -111,7 +181,9 @@ function mapPackageNameToPlanType(pkgName, accountType) {
   }
   if (type === 'corp') {
     if (/تجريب|trial/.test(name)) return 'corp_trial';
-    if (/ماس|diamond/.test(name)) return 'corp_diamond';
+    if (/ماس|diamond/.test(name)) {
+      return resolveDiamondTier({ pkgName: name }) === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard';
+    }
     if (/سنو|year/.test(name)) return 'corp_yearly';
     if (/ربع|quarter/.test(name)) return 'corp_quarterly';
     if (/شهر|month/.test(name)) return 'corp_monthly';
@@ -127,6 +199,8 @@ function mapPackageNameToPlanType(pkgName, accountType) {
 
 function resolvePlanDefinition(planType, accountType) {
   const t = String(accountType || 'individual').toLowerCase();
+  if (planType === 'diamond_standard') return DIAMOND_STANDARD_PLAN;
+  if (planType === 'diamond_pro') return DIAMOND_PRO_PLAN;
   if (INDIVIDUAL_PLANS[planType]) return INDIVIDUAL_PLANS[planType];
   if (STORE_PLANS[planType]) return STORE_PLANS[planType];
   if (OFFICE_PLANS[planType]) return OFFICE_PLANS[planType];
@@ -135,20 +209,6 @@ function resolvePlanDefinition(planType, accountType) {
   if (t === 'office') return OFFICE_PLANS.office_basic;
   if (t === 'corp') return CORP_PLANS.corp_trial;
   return FREE_FALLBACK;
-}
-
-function getSubscriptionStatus(rec) {
-  if (!rec || !rec.periodEnd) return 'no_subscription';
-  if (rec.status === 'suspended') return 'suspended';
-  const endMs = new Date(rec.periodEnd).getTime();
-  if (Number.isNaN(endMs)) return 'no_subscription';
-  const now = Date.now();
-  if (endMs < now) {
-    return rec.status === 'suspended' ? 'suspended' : 'expired';
-  }
-  if (rec.status === 'expiring_soon') return 'expiring_soon';
-  if (rec.status === 'expired') return 'expired';
-  return 'active';
 }
 
 /**
@@ -166,14 +226,27 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
     planType = rec.planType;
   } else if (rec && ACTIVE_STATUSES.includes(subscriptionStatus)) {
     planType = mapPackageNameToPlanType(rec.pkgName, type);
-  } else if (rec && subscriptionStatus === 'expired') {
-    planType = 'free';
-  } else if (rec && subscriptionStatus === 'suspended') {
+  } else if (rec && (subscriptionStatus === 'expired' || subscriptionStatus === 'suspended' || subscriptionStatus === 'pending')) {
     planType = 'free';
   }
 
   const plan = resolvePlanDefinition(planType, type);
   const isPaidActive = ACTIVE_STATUSES.includes(subscriptionStatus);
+  const isTrial = !!(rec && (rec.isTrial || isTrialPackage(rec.pkgName, rec.price)));
+  const aiPaidActive = isPaidActive && !isTrial && isPaymentConfirmed(rec);
+
+  let features = isPaidActive ? (plan.features || []) : FREE_FALLBACK.features;
+  if (isTrial) {
+    features = features.filter((f) => !AI_PAID_FEATURES.includes(f));
+  }
+  if (aiPaidActive && (planType === 'diamond_standard' || plan.diamondTier === 'diamond_standard')) {
+    features = features.filter((f) => !PRO_ONLY_FEATURES.includes(f));
+  }
+  if (!aiPaidActive) {
+    features = features.filter((f) => !AI_PAID_FEATURES.includes(f));
+  }
+
+  const quotaLimits = aiPaidActive ? resolveQuotaLimitsForAccount(rec) : null;
 
   return {
     accountId,
@@ -191,20 +264,28 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
       videoMaxMb: plan.videoMaxMb != null ? plan.videoMaxMb : 20,
       videoWatermark: !!plan.videoWatermark,
     },
-    features: isPaidActive ? (plan.features || []) : FREE_FALLBACK.features,
+    features,
+    diamondTier: plan.diamondTier || (planType === 'diamond_pro' ? 'diamond_pro' : planType === 'diamond_standard' ? 'diamond_standard' : null),
+    audioAccess: aiPaidActive && !!(plan.audioAccess || planType === 'diamond_pro'),
+    isTrial,
+    quotaLimits,
     flags: {
       privateStore: isPaidActive && !!plan.privateStore,
       priorityListing: isPaidActive && !!plan.priorityListing,
       weeklyBoost: isPaidActive && !!plan.weeklyBoost,
       advancedAnalytics: isPaidActive && !!plan.advancedAnalytics,
       accountManager: isPaidActive && !!plan.accountManager,
-      aiAgent: isPaidActive && (plan.features || []).includes('ai_agent_full'),
-      widgetChannel: isPaidActive && (plan.features || []).includes('widget_channel'),
-      whatsappChannel: isPaidActive && (plan.features || []).includes('whatsapp_channel'),
-      callsChannel: isPaidActive && (plan.features || []).includes('calls_channel'),
-      quotaDashboard: isPaidActive && (plan.features || []).includes('quota_dashboard'),
+      aiAgent: aiPaidActive && features.includes('ai_agent_full'),
+      widgetChannel: aiPaidActive && features.includes('widget_channel'),
+      whatsappChannel: aiPaidActive && features.includes('whatsapp_channel'),
+      callsChannel: aiPaidActive && features.includes('calls_channel'),
+      quotaDashboard: aiPaidActive && features.includes('quota_dashboard'),
     },
   };
+}
+
+function isAiEligible(entitlements) {
+  return !!(entitlements && entitlements.flags && entitlements.flags.aiAgent);
 }
 
 function hasFeature(entitlements, featureName) {
@@ -221,8 +302,17 @@ function entitlementError(code, message, extra) {
 
 function assertSubscriptionActive(entitlements) {
   if (!entitlements) throw entitlementError('no_entitlements', 'لا يوجد سجل اشتراك');
+  if (entitlements.subscriptionStatus === 'pending') {
+    throw entitlementError('payment_pending', 'باقتك قيد انتظار تأكيد الدفع — لا يمكن استخدام الميزات قبل الموافقة على الوصل');
+  }
+  if (entitlements.subscriptionStatus === 'expired') {
+    throw entitlementError('subscription_expired', 'انتهت مدة باقتك — جدّد الاشتراك لاستعادة الميزات');
+  }
   if (entitlements.subscriptionStatus === 'suspended') {
     throw entitlementError('subscription_suspended', 'تم إيقاف اشتراكك — جدّد الباقة لاستعادة الميزات');
+  }
+  if (entitlements.subscriptionStatus === 'no_subscription') {
+    throw entitlementError('no_subscription', 'لا توجد باقة نشطة — اشترك للوصول لهذه الميزة');
   }
 }
 
@@ -273,8 +363,18 @@ function assertVideoPolicy(entitlements, opts) {
 
 function assertFeature(entitlements, featureName) {
   assertSubscriptionActive(entitlements);
+  if (entitlements.isTrial && AI_PAID_FEATURES.includes(featureName)) {
+    throw entitlementError('ai_not_in_trial', 'خدمات الذكاء الاصطناعي والوكيل الماسي غير متاحة في الباقات التجريبية — يتطلب اشتراكاً مدفوعاً ومؤكداً');
+  }
   if (!hasFeature(entitlements, featureName)) {
     throw entitlementError('feature_not_in_plan', `الميزة "${featureName}" غير مشمولة في باقتك الحالية`);
+  }
+}
+
+function assertCallsChannel(entitlements) {
+  assertFeature(entitlements, 'calls_channel');
+  if (!entitlements.audioAccess) {
+    throw entitlementError('audio_not_in_plan', 'المكالمات الصوتية متاحة في الباقة الماسية المتقدمة (Pro) فقط — قم بالترقية');
   }
 }
 
@@ -292,9 +392,17 @@ module.exports = {
   STORE_PLANS,
   OFFICE_PLANS,
   CORP_PLANS,
+  DIAMOND_STANDARD_PLAN,
+  DIAMOND_PRO_PLAN,
+  AI_PAID_FEATURES,
+  PRO_ONLY_FEATURES,
+  ACTIVE_STATUSES,
+  PENDING_STATUSES,
   mapPackageNameToPlanType,
   getEntitlements,
   getSubscriptionStatus,
+  isPaymentConfirmed,
+  isAiEligible,
   hasFeature,
   assertSubscriptionActive,
   assertCanPostAd,
@@ -302,6 +410,7 @@ module.exports = {
   assertPhotoCount,
   assertVideoPolicy,
   assertFeature,
+  assertCallsChannel,
   buildDowngradePatch,
   entitlementError,
 };

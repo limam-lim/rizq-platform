@@ -14,7 +14,8 @@
  * ══════════════════════════════════════════════════════════════════
  */
 require('dotenv').config();
-const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getFastModel, getAdvancedModel } = require('./config/anthropic');
+process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
+const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
 ensureAnthropicEnv();
 // ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
@@ -30,7 +31,8 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles } = require('../rizq_subscriber_agent');
+const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
+const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 
 const app = express();
@@ -336,40 +338,16 @@ app.get('/api/agent/status', requireSharedSecret, (req, res) => {
 app.post('/api/verify-receipt', requireSharedSecret, async (req, res) => {
   try {
     const { imageBase64, expectedPrice, pkgName } = req.body || {};
-    if (!imageBase64 || !imageBase64.startsWith('data:image')) {
-      return res.status(400).json({ error: 'imageBase64 مطلوب (data URL لصورة)' });
-    }
-    const match = imageBase64.match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
-    if (!match) return res.status(400).json({ error: 'صيغة صورة غير صالحة' });
-    const [, mediaType, b64] = match;
-
-    const prompt =
-      'هذه صورة وصل دفع لمنصة إعلانات موريتانية. استخرج منها فقط: التاريخ، المبلغ، ' +
-      'اسم البنك أو مشغل الدفع، رقم/مرجع العملية إن وجد. ثم أعطِ رأياً عاماً في معقولية ' +
-      'الوصل (وضوح، تناسق الخطوط، وجود علامات تحرير واضحة) — بدون الجزم بتزوير أو صحة. ' +
-      (pkgName ? 'الباقة المطلوبة: ' + pkgName + '. ' : '') +
-      (expectedPrice ? 'السعر المتوقع: ' + expectedPrice + ' أوقية. ' : '') +
-      'أجب بصيغة JSON فقط بهذا الشكل: ' +
-      '{"date":"","amount":"","reference":"","bankOrOperator":"","plausibilityLevel":"clear|low|medium|high","notes":["..."]}';
-
-    const msg = await anthropic.messages.create({
-      model: getAdvancedModel(),
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } },
-          { type: 'text', text: prompt },
-        ],
-      }],
+    const { analyzeReceiptImage } = require('./services/receiptVision');
+    const analysis = await analyzeReceiptImage(imageBase64, {
+      expectedPrice,
+      pkgName,
+      anthropic,
     });
-
-    const text = (msg.content || []).map((c) => c.text || '').join('');
-    let parsed;
-    try { parsed = JSON.parse(text); } catch (e) {
-      parsed = { date: '', amount: '', reference: '', bankOrOperator: '', plausibilityLevel: 'low', notes: ['تعذّر تحليل رد النموذج تلقائياً — راجع يدوياً'] };
+    if (!analysis.ok && !analysis.result) {
+      return res.status(400).json({ error: analysis.error || 'imageBase64 مطلوب (data URL لصورة)' });
     }
-    res.json({ ok: true, result: parsed });
+    res.json({ ok: true, result: analysis.result });
   } catch (err) {
     console.error('[verify-receipt] error:', err.message);
     res.status(500).json({ error: 'فشل التحليل — حاول مجدداً لاحقاً' });
@@ -467,6 +445,12 @@ const {
   maybeAutoReplyToInquiry,
 } = require('./services/inquiryAutoReply');
 const {
+  assertDiamondWidgetAccess,
+  resolveAccessDenialMessage,
+  getAccountEntitlements,
+  assertAiAgentAccess,
+} = require('./services/packageAccessGuard');
+const {
   getEntitlements,
   assertCanPostAd,
   assertCanAddCatalogItem,
@@ -487,26 +471,68 @@ const { readLatestBackupMeta } = require('./services/backupService');
  * POST /api/widget/chat � function calling + س�`ا� ا�صفحة + �&راجعة ا�رد
  * body: { message, lang, profile?, history?, pageContext? }
  */
+app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
+  try {
+    const { createLeadAndNotify } = require('./services/leadEscalation');
+    const body = req.body || {};
+    const result = await createLeadAndNotify(body, {
+      source: 'widget-api',
+      channel: body.channel || 'widget',
+      kind: body.kind || 'register_interest',
+    });
+    if (!result.ok) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    console.error('[widget/lead] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+  }
+});
+
+app.post('/api/leads', widgetChatLimiter, async (req, res) => {
+  try {
+    const { createLeadAndNotify } = require('./services/leadEscalation');
+    const body = req.body || {};
+    const result = await createLeadAndNotify(body, {
+      source: 'widget-api',
+      channel: body.channel || 'widget',
+      kind: body.kind || 'register_interest',
+    });
+    if (!result.ok) return res.status(400).json(result);
+    res.json(result);
+  } catch (err) {
+    console.error('[api/leads] error:', err.message);
+    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+  }
+});
+
 app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
-    const result = await handleWidgetChat(req.body || {});
+    const body = req.body || {};
+    if (body.profile && (body.profile.accountId || body.profile.businessName)) {
+      assertDiamondWidgetAccess(body, readAccounts);
+    }
+    const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[widget/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي' });
+    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
   }
 });
 
 /** POST /api/ai/chat — alias for Diamond widget agent (same engine as /api/widget/chat) */
 app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
   try {
-    const result = await handleWidgetChat(Object.assign({ agentTier: 'diamond' }, req.body || {}));
+    const body = Object.assign({ agentTier: 'diamond' }, req.body || {});
+    if (body.profile && (body.profile.accountId || body.profile.businessName)) {
+      assertDiamondWidgetAccess(body, readAccounts);
+    }
+    const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[ai/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي' });
+    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
   }
 });
 
@@ -515,9 +541,10 @@ app.get('/api/ai/status', (req, res) => {
   res.json({
     ok: true,
     configured: isAnthropicConfigured(),
-    model: getFastModel(),
-    fastModel: getFastModel(),
+    model: getAgentModel(),
+    agentModel: getAgentModel(),
     advancedModel: getAdvancedModel(),
+    haikuFallback: false,
   });
 });
 
@@ -546,8 +573,12 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     }
     const acc = readAccounts().find((a) => a.id === accountId);
     if (!acc) return res.status(404).json({ ok: false, error: 'account_not_found' });
-    if (!accountHasAiAgent(acc)) {
-      return res.status(403).json({ ok: false, error: 'الوكيل الذكي متاح للباقة الماسية فقط' });
+    try {
+      assertAiAgentAccess(acc, { channel: 'dashboard' });
+    } catch (e) {
+      const ent = getAccountEntitlements(acc);
+      const status = e.status && e.status >= 400 ? e.status : 403;
+      return res.status(status).json({ ok: false, error: e.message || resolveAccessDenialMessage(ent), code: e.code || ent.subscriptionStatus });
     }
     const result = await handleWidgetChat({
       message,
@@ -711,9 +742,32 @@ app.post('/api/site-config', requireSharedSecret, (req, res) => {
         durationDays: Math.max(1, Math.min(3650, Number(p.durationDays) || 30)),
         features: Array.isArray(p.features) ? p.features.slice(0, 20).map((f) => String(f).slice(0, 200)) : [],
         active: p.active !== false,
+        diamondTier: String(p.diamondTier || '').slice(0, 30),
+        audioAccess: p.audioAccess === true,
+        quotaMessages: Math.max(0, Math.min(100000, Number(p.quotaMessages) || 0)),
+        quotaMinutes: Math.max(0, Math.min(100000, Number(p.quotaMinutes) || 0)),
+        aiModel: String(p.aiModel || '').slice(0, 80),
       }));
     });
     next.packages = mergedPkgs;
+  }
+
+  if (body.quotaConfig && typeof body.quotaConfig === 'object') {
+    const existingQ = (current.quotaConfig && typeof current.quotaConfig === 'object') ? current.quotaConfig : {};
+    next.quotaConfig = {
+      diamond_standard: Object.assign({}, existingQ.diamond_standard || {}, body.quotaConfig.diamond_standard || {}),
+      diamond_pro: Object.assign({}, existingQ.diamond_pro || {}, body.quotaConfig.diamond_pro || {}),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  if (body.quotaTopups && typeof body.quotaTopups === 'object') {
+    const existingT = (current.quotaTopups && typeof current.quotaTopups === 'object') ? current.quotaTopups : {};
+    next.quotaTopups = {
+      text: Object.assign({}, existingT.text || {}, body.quotaTopups.text || {}),
+      voice: Object.assign({}, existingT.voice || {}, body.quotaTopups.voice || {}),
+      updatedAt: new Date().toISOString(),
+    };
   }
 
   if (body.discNav && typeof body.discNav === 'object') {
@@ -1411,7 +1465,40 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   };
   list.push(rec);
   writeSubRequests(list);
+  if (rec.category === 'package' && rec.accountId) {
+    try {
+      const accRow = readAccounts().find((a) => a.id === rec.accountId);
+      createPendingPackageFromRequest({
+        accountId: rec.accountId,
+        accountName: rec.account || accRow?.name || rec.accountId,
+        accountPhone: accRow?.phone || '',
+        accountEmail: accRow?.email || '',
+        accountType: accRow?.type || 'individual',
+        pkgName: rec.pkg,
+        price: rec.price,
+        requestId: rec.id,
+      });
+    } catch (pendingErr) {
+      console.warn('[sub-requests] pending package:', pendingErr.message);
+    }
+  }
   res.json({ ok: true, id });
+
+  // إشعار Telegram + تحليل Claude Vision — غير متزامن (لا يُبطئ رد العميل)
+  setImmediate(() => {
+    try {
+      const { getTelegramDeps } = require('./services/telegramDeps');
+      const { processNewSubRequest } = require('./services/telegramAdmin');
+      const deps = getTelegramDeps();
+      if (deps) {
+        processNewSubRequest(id, deps).catch((err) => {
+          console.warn('[sub-requests] telegram pipeline:', err.message);
+        });
+      }
+    } catch (pipeErr) {
+      console.warn('[sub-requests] telegram pipeline init:', pipeErr.message);
+    }
+  });
 });
 
 /**
@@ -1440,7 +1527,7 @@ app.post('/api/sub-requests/admin/:id/decision', requireSharedSecret, (req, res)
   res.json({ ok: true, request: list[idx] });
 });
 
-// ── وكيل دورة حياة الباقات (تذكير قبل الانتهاء + إيقاف بعد 24 ساعة سماح
+// ── وكيل دورة حياة الباقات (تذكير قبل الانتهاء + إيقاف فوري عند periodEnd
 //    + تسليم فاتورة فورية عبر واتساب/بريد عند كل تفعيل) — لم يكن موجوداً
 //    إطلاقاً قبل هذا الإصلاح؛ راجع rizq_package_lifecycle_agent.js للتفصيل. ──
 const {
@@ -1450,6 +1537,7 @@ const {
   getAccountRecord,
   getAllAccountPackageRecords,
   syncAccountPackage,
+  createPendingPackageFromRequest,
   REFERRAL_BONUS_DAYS,
 } = require('./rizq_package_lifecycle_agent');
 // نمرّر readAccounts/writeAccounts (مُعرَّفتان أعلاه في هذا الملف) حتى يقدر
@@ -1697,6 +1785,104 @@ function verifyAccountOwner(accountId, token) {
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
   return (acc && acc.accessToken === token && !acc.suspended) ? acc : null;
 }
+
+const RizqPromptsServer = require('../rizq_ai_prompts');
+
+/**
+ * GET /api/subscriber/knowledge/mine/:accountId — معرفة ديناميكية للمالك (Diamond)
+ * POST /api/subscriber/knowledge/upload — رفع Excel/CSV → dynamicKnowledge (معزول per subscriberId)
+ */
+app.get('/api/subscriber/knowledge/mine/:accountId', (req, res) => {
+  const accountId = String(req.params.accountId || '').trim();
+  const token = req.header('x-account-token') || req.query.token || '';
+  const acc = verifyAccountOwner(accountId, token);
+  if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  const ent = getAccountEntitlements(acc);
+  if (!accountHasAiAgent(acc)) {
+    return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
+  }
+  const row = getSubscriberProfileByAccountId(accountId);
+  const prof = row && row.profile ? row.profile : null;
+  const dk = prof && prof.dynamicKnowledge ? prof.dynamicKnowledge : null;
+  res.json({
+    ok: true,
+    accountId,
+    subscriberId: row ? row.subscriberId : null,
+    dynamicKnowledge: dk,
+    customInstructions: prof && prof.customInstructions ? prof.customInstructions : '',
+    personaKey: prof ? RizqPromptsServer.resolveBusinessType(prof) : null,
+    subscriptionStatus: ent.subscriptionStatus,
+  });
+});
+
+app.post('/api/subscriber/knowledge/instructions', (req, res) => {
+  const b = req.body || {};
+  const accountId = String(b.accountId || '').trim();
+  const token = req.header('x-account-token') || '';
+  const customInstructions = String(b.customInstructions || '').trim().slice(0, 4000);
+  if (!accountId) {
+    return res.status(400).json({ ok: false, error: 'accountId مطلوب' });
+  }
+  const acc = verifyAccountOwner(accountId, token);
+  if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  if (!accountHasAiAgent(acc)) {
+    const ent = getAccountEntitlements(acc);
+    return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
+  }
+
+  const upsert = upsertSubscriberInstructionsFromAccount(acc, customInstructions);
+  if (!upsert.ok) {
+    return res.status(500).json({ ok: false, error: upsert.error || 'save_failed' });
+  }
+  res.json({
+    ok: true,
+    subscriberId: upsert.subscriberId,
+    customInstructions,
+    message: 'تم حفظ التعليمات الخاصة — ستُطبَّق فوراً في المحادثات',
+  });
+});
+
+app.post('/api/subscriber/knowledge/upload', (req, res) => {
+  const b = req.body || {};
+  const accountId = String(b.accountId || '').trim();
+  const token = req.header('x-account-token') || '';
+  const fileName = String(b.fileName || '').trim();
+  const fileDataBase64 = String(b.fileDataBase64 || '').trim();
+  if (!accountId || !fileName || !fileDataBase64) {
+    return res.status(400).json({ ok: false, error: 'accountId, fileName, fileDataBase64 مطلوبة' });
+  }
+  const acc = verifyAccountOwner(accountId, token);
+  if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  const entUp = getAccountEntitlements(acc);
+  if (!accountHasAiAgent(acc)) {
+    return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(entUp), code: entUp.subscriptionStatus });
+  }
+
+  let buffer;
+  try {
+    buffer = Buffer.from(fileDataBase64, 'base64');
+  } catch (e) {
+    return res.status(400).json({ ok: false, error: 'invalid_base64' });
+  }
+
+  const parsed = parseKnowledgeFile(fileName, buffer);
+  if (!parsed.ok) {
+    return res.status(400).json({ ok: false, error: parsed.error || 'parse_failed', detail: parsed.detail });
+  }
+
+  const upsert = upsertSubscriberKnowledgeFromAccount(acc, parsed.dynamicKnowledge);
+  if (!upsert.ok) {
+    return res.status(500).json({ ok: false, error: upsert.error || 'save_failed' });
+  }
+
+  res.json({
+    ok: true,
+    subscriberId: upsert.subscriberId,
+    dynamicKnowledge: parsed.dynamicKnowledge,
+    preview: formatDynamicKnowledgeForPrompt(parsed.dynamicKnowledge).slice(0, 800),
+    message: 'تم تحديث معرفة الوكيل — ستنعكس فوراً في المحادثات القادمة',
+  });
+});
 
 setupQuotaGuardAPI(app, requireSharedSecret, {
   verifyAccountOwner,
@@ -3051,6 +3237,114 @@ app.get('/api/ad-boosts/:adId', (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════
+// Telegram Admin Bot — إشعار فوري + تفعيل/رفض مباشر من Inline Buttons
+// متغيرات البيئة: TELEGRAM_BOT_TOKEN, TELEGRAM_ADMIN_CHAT_ID
+// اختياري: TELEGRAM_WEBHOOK_SECRET, PUBLIC_BASE_URL (لتسجيل webhook)
+// ══════════════════════════════════════════════════════════════════
+const { setTelegramDeps } = require('./services/telegramDeps');
+const {
+  isBotConfigured: isTelegramBotConfigured,
+  isConfigured: isTelegramAdminConfigured,
+  verifyWebhookSecret,
+  handleWebhookUpdate,
+  registerWebhook: registerTelegramWebhook,
+  shouldUsePolling: shouldUseTelegramPolling,
+  startPolling: startTelegramPolling,
+  stopPolling: stopTelegramPolling,
+  getBotIdentity,
+} = require('./services/telegramAdmin');
+
+async function logTelegramEnvStatus() {
+  const token = String(process.env.TELEGRAM_BOT_TOKEN || '').trim();
+  const chatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
+  const placeholder = !token || token.includes('ضع_المفتاح') || token.includes('YOUR_');
+  const tokenShapeOk = /^[0-9]+:[A-Za-z0-9_-]{20,}$/.test(token);
+  if (placeholder || !tokenShapeOk) {
+    console.warn('[telegram] TELEGRAM_BOT_TOKEN: missing or placeholder — webhook disabled');
+  } else {
+    const botId = token.split(':')[0];
+    console.log('[telegram] TELEGRAM_BOT_TOKEN: loaded (bot ' + botId + ':***)');
+    try {
+      const me = await getBotIdentity();
+      if (me && me.username) {
+        console.log('[telegram] bot username: @' + me.username + ' — راسِل هذا البوت مباشرة (محادثة خاصة)');
+      }
+    } catch (e) { /* optional */ }
+  }
+  if (!chatId) {
+    console.warn('[telegram] TELEGRAM_ADMIN_CHAT_ID: not set — subscription alerts disabled');
+  } else {
+    console.log('[telegram] TELEGRAM_ADMIN_CHAT_ID: loaded (' + chatId + ')');
+  }
+  if (isTelegramBotConfigured()) {
+    if (shouldUseTelegramPolling()) {
+      console.log('[telegram] mode: POLLING (dev — TELEGRAM_USE_POLLING or no PUBLIC_BASE_URL)');
+    } else {
+      console.log('[telegram] mode: WEBHOOK → POST /api/telegram/webhook');
+    }
+  }
+}
+
+async function handleTelegramWebhook(req, res) {
+  if (!verifyWebhookSecret(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+  if (!isTelegramBotConfigured()) {
+    return res.status(503).json({ error: 'telegram_bot_not_configured' });
+  }
+  try {
+    const { getTelegramDeps } = require('./services/telegramDeps');
+    const result = await handleWebhookUpdate(req.body || {}, getTelegramDeps() || {});
+    res.json({ ok: true, result });
+  } catch (err) {
+    console.error('[telegram/webhook] error:', err.message);
+    res.status(500).json({ error: 'webhook_handler_failed' });
+  }
+}
+
+setTelegramDeps({
+  readSubRequests,
+  writeSubRequests,
+  anthropic,
+  readAccounts,
+  writeAccounts,
+  syncAccountPackage,
+  getAccountRecord,
+  readAdBoosts,
+  writeAdBoosts,
+  registerSubscriber,
+});
+
+/**
+ * POST /api/telegram/webhook — Telegram Bot API webhook (رسائل + أزرار الأدمن)
+ */
+app.post('/api/telegram/webhook', handleTelegramWebhook);
+
+/**
+ * POST /api/telegram/webhook/:secret — مسار قديم (توافق خلفي)
+ */
+app.post('/api/telegram/webhook/:secret', handleTelegramWebhook);
+
+/**
+ * POST /api/telegram/setup-webhook — أدمين فقط — يسجّل webhook لدى Telegram
+ * body: { publicBaseUrl?: "https://your-domain.com" }
+ */
+app.post('/api/telegram/setup-webhook', requireSharedSecret, async (req, res) => {
+  if (!isTelegramBotConfigured()) {
+    return res.status(503).json({ error: 'telegram_bot_not_configured', hint: 'TELEGRAM_BOT_TOKEN in .env' });
+  }
+  try {
+    const publicBaseUrl = (req.body && req.body.publicBaseUrl) || process.env.PUBLIC_BASE_URL || '';
+    const out = await registerTelegramWebhook(publicBaseUrl);
+    if (!out.ok) return res.status(400).json(out);
+    res.json(out);
+  } catch (err) {
+    console.error('[telegram/setup-webhook] error:', err.message);
+    res.status(500).json({ error: err.message || 'setup_failed' });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
 // اكتشاف الرئيسية (homepage discovery) — مهام #234/#235: نقطتا نهاية
 // عامتان بلا مصادقة، آمنتان تماماً (لا تكشفان بيانات حسّاسة قط):
 // - "ينتهي قريباً": إعلانات مثبَّتة قاربت مهلتها + عدد/فئات مناقصات مفتوحة
@@ -3161,4 +3455,22 @@ startMaintenanceScheduler({
   backendRoot: __dirname,
 });
 
-app.listen(PORT, () => console.log('[rizq-backend] running on port ' + PORT));
+app.listen(PORT, async () => {
+  console.log('[rizq-backend] running on port ' + PORT);
+  console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
+  await logTelegramEnvStatus();
+  if (isTelegramAdminConfigured()) {
+    console.log('[telegram-admin] subscription alerts enabled');
+  }
+  if (shouldUseTelegramPolling()) {
+    const { getTelegramDeps } = require('./services/telegramDeps');
+    startTelegramPolling(getTelegramDeps).then((out) => {
+      if (out && out.ok) console.log('[telegram-polling] listening for messages…');
+    }).catch((err) => {
+      console.error('[telegram-polling] start failed:', err.message);
+    });
+  }
+});
+
+process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });
+process.on('SIGTERM', () => { stopTelegramPolling(); process.exit(0); });

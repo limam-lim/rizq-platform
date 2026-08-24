@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { saveTicket } = require('./agentTickets');
 const { getPackagesForTool } = require('../../rizq_packages_config');
+const { handleLeadEscalation } = require('./leadEscalation');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
@@ -148,9 +149,39 @@ const WIDGET_TOOLS = [
       required: ['type', 'summary'],
     },
   },
+  {
+    name: 'register_interest',
+    description: 'تسجيل رغبة جادة في الاشتراك — اجمع أولاً: اسم المنشأة، واتساب، الباقة المطلوبة',
+    input_schema: {
+      type: 'object',
+      properties: {
+        business_name: { type: 'string', description: 'اسم المنشأة أو التاجر' },
+        whatsapp: { type: 'string', description: 'رقم الواتساب' },
+        package_requested: { type: 'string', description: 'الباقة المطلوبة' },
+        interest_type: { type: 'string', enum: ['subscription', 'partnership', 'ads', 'info'] },
+        notes: { type: 'string', description: 'ملاحظات' },
+      },
+      required: ['business_name', 'whatsapp', 'package_requested'],
+    },
+  },
+  {
+    name: 'escalate_to_human',
+    description: 'تصعيد للإدارة — اجمع: اسم المنشأة، واتساب، سبب التصعيد',
+    input_schema: {
+      type: 'object',
+      properties: {
+        business_name: { type: 'string', description: 'اسم المنشأة أو التاجر' },
+        whatsapp: { type: 'string', description: 'رقم الواتساب' },
+        package_requested: { type: 'string', description: 'الباقة إن وُجدت' },
+        reason: { type: 'string', description: 'سبب التصعيد' },
+        urgency: { type: 'string', enum: ['normal', 'urgent'] },
+      },
+      required: ['business_name', 'whatsapp', 'reason'],
+    },
+  },
 ];
 
-function executeWidgetTool(toolName, input) {
+function executeWidgetToolSync(toolName, input) {
   switch (toolName) {
     case 'get_ad_details': {
       const id = String((input || {}).ad_id || '').trim();
@@ -214,6 +245,16 @@ function executeWidgetTool(toolName, input) {
   }
 }
 
+async function executeWidgetTool(toolName, input) {
+  if (toolName === 'register_interest') {
+    return handleLeadEscalation('register_interest', input, { source: 'widget', channel: 'widget' });
+  }
+  if (toolName === 'escalate_to_human') {
+    return handleLeadEscalation('escalate_to_human', input, { source: 'widget', channel: 'widget' });
+  }
+  return executeWidgetToolSync(toolName, input);
+}
+
 /** تحميل سياق الصفحة من الخادم (تحقق من DB) */
 function resolvePageContextFacts(pageContext) {
   const facts = { ads: [], sellers: [] };
@@ -227,12 +268,12 @@ function resolvePageContextFacts(pageContext) {
   adIds.forEach((id) => {
     if (!id || seen.has(id)) return;
     seen.add(id);
-    const r = executeWidgetTool('get_ad_details', { ad_id: id });
+    const r = executeWidgetToolSync('get_ad_details', { ad_id: id });
     if (r.ok && r.ad) {
       facts.ads.push(r.ad);
       if (r.ad.accountId) {
-        const seller = executeWidgetTool('get_seller_profile', { account_id: r.ad.accountId });
-        const rep = executeWidgetTool('get_seller_reputation', { account_id: r.ad.accountId, ad_id: r.ad.id });
+        const seller = executeWidgetToolSync('get_seller_profile', { account_id: r.ad.accountId });
+        const rep = executeWidgetToolSync('get_seller_reputation', { account_id: r.ad.accountId, ad_id: r.ad.id });
         if (seller.ok) facts.sellers.push(Object.assign({}, seller.seller, { reputation: rep }));
       }
     }
@@ -243,6 +284,7 @@ function resolvePageContextFacts(pageContext) {
 module.exports = {
   WIDGET_TOOLS,
   executeWidgetTool,
+  executeWidgetToolSync,
   resolvePageContextFacts,
   publicAd,
 };

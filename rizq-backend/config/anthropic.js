@@ -2,12 +2,12 @@
  * مصدر موحّد لمفتاح Claude API وموديلَي رزق
  *
  *   RIZQ_FAST_MODEL=claude-haiku-4-5-20251001      ويدجت عام / عقل القنوات / باقات غير ماسية
- *   RIZQ_ADVANCED_MODEL=claude-sonnet-4-5-20251001  سكرتير الباقة الماسية + ترجمة / وصول
+ *   RIZQ_ADVANCED_MODEL=claude-sonnet-4-5-20250929  سكرتير الباقة الماسية + ترجمة / وصول
  *
  * التوافق الخلفي: RIZQ_WIDGET_MODEL و RIZQ_AGENT_MODEL ما زالا يُقرآن كبديل لـ FAST.
  */
 const DEFAULT_FAST = 'claude-haiku-4-5-20251001';
-const DEFAULT_ADVANCED = 'claude-sonnet-4-5-20251001';
+const DEFAULT_ADVANCED = 'claude-sonnet-4-5-20250929';
 
 function ensureAnthropicEnv() {
   if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
@@ -37,6 +37,11 @@ function getAdvancedModel() {
   return String(process.env.RIZQ_ADVANCED_MODEL || DEFAULT_ADVANCED).trim() || DEFAULT_ADVANCED;
 }
 
+/** نموذج جميع الوكلاء (ويدجت / واتساب / صوت / تيليغرام) — Sonnet حصراً */
+function getAgentModel() {
+  return getAdvancedModel();
+}
+
 function isDiamondProfile(profile) {
   if (!profile || typeof profile !== 'object') return false;
   var blob = [profile.plan, profile.tier, profile.package, profile.pkg, profile.pkgName, profile.planType]
@@ -47,8 +52,8 @@ function isDiamondProfile(profile) {
 
 function resolveChatModel(profile, opts) {
   if (opts && opts.useAdvancedModel) return getAdvancedModel();
-  if (isDiamondProfile(profile)) return getAdvancedModel();
-  return getFastModel();
+  // سياسة رزq: كل الوكلاء على Sonnet — لا Haiku في مسارات الوكيل
+  return getAgentModel();
 }
 
 function applyPromptCache(params) {
@@ -104,6 +109,7 @@ module.exports = {
   isAnthropicConfigured,
   getFastModel,
   getAdvancedModel,
+  getAgentModel,
   isDiamondProfile,
   resolveChatModel,
   applyPromptCache,

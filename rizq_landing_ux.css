@@ -194,27 +194,151 @@ html[dir="ltr"] .section-header .section-desc{
   margin-right:auto;
 }
 
-#about.why-section,
-#prices.section,
-.pricing-section,
-#rizq-live-activity{
-  max-width:1200px;
-  margin-left:auto;
-  margin-right:auto;
-  width:100%;
-  box-sizing:border-box;
-}
-
-.why-grid,
-.prices-board,
-.pricing-grid{
-  max-width:1200px;
-  margin-left:auto;
-  margin-right:auto;
-}
-
 #rizq-live-activity > div{
   max-width:1200px;
   margin:0 auto;
   text-align:center;
+}
+
+#about.why-section,
+#prices.section,
+#rizq-live-activity{
+  max-width:min(1140px,100%);
+  margin-left:auto;
+  margin-right:auto;
+  width:100%;
+  box-sizing:border-box;
+  overflow-x:clip;
+}
+
+/* pricing-section: خلفية كاملة — المحتوى الداخلي متمركز */
+.pricing-section{
+  max-width:100% !important;
+  width:100%;
+  overflow-x:clip;
+  overflow-y:visible;
+}
+
+.pricing-section > .section-header,
+.pricing-section > .pricing-container{
+  max-width:min(1140px,100%);
+  margin-left:auto;
+  margin-right:auto;
+  width:100%;
+  box-sizing:border-box;
+  overflow:visible;
+}
+
+.why-grid,
+.prices-board,
+.pricing-grid,
+.pricing-container,
+.cats-grid,
+.footer-grid,
+.footer-bottom{
+  max-width:min(1140px,100%);
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ── 6 تبويبات باقات ── */
+.pricing-tabs{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+  max-width:min(900px,100%) !important;
+  margin:0 auto 32px !important;
+  width:100% !important;
+  overflow:visible !important;
+}
+
+@media(min-width:960px){
+  .pricing-tabs{
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    max-width:min(1140px,100%) !important;
+  }
+}
+
+#diamond-pitch{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
+/* ══ تثبيت الصفحة — لا اهتزاز أفقي ══ */
+html,
+body{
+  overflow-x:clip !important;
+  overscroll-behavior-x:none;
+  max-width:100%;
+  width:100%;
+}
+
+.hero,
+.why-section,
+.ticker-wrap,
+.price-ticker-wrap,
+.cards-track-wrap,
+.listings-section,
+.pricing-section,
+#categories,
+#listings,
+#pricing,
+#about,
+#prices{
+  max-width:100%;
+  overflow-x:clip;
+  box-sizing:border-box;
+}
+
+.pricing-grid{
+  grid-template-columns:repeat(auto-fit,minmax(165px,1fr)) !important;
+  gap:16px !important;
+  width:100% !important;
+  min-width:0 !important;
+  padding-top:20px !important;
+  overflow:visible !important;
+}
+
+.pricing-card,
+.rpkg-card.pricing-card{
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:visible !important;
+}
+
+.pricing-card-badge{
+  position:absolute;
+  top:-12px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:9px;
+  font-weight:900;
+  padding:5px 11px;
+  border-radius:20px;
+  line-height:1.35;
+  text-align:center;
+  white-space:normal;
+  max-width:calc(100% - 10px);
+  z-index:2;
+  box-sizing:border-box;
+}
+
+.pricing-card.has-badge{
+  padding-top:30px !important;
+}
+
+.price-pane{
+  overflow:visible !important;
+  padding-top:4px;
+}
+
+.why-grid{
+  overscroll-behavior-x:contain;
+  max-width:min(1140px,100%);
+}
+
+.why-bg-text{
+  max-width:100%;
+  overflow:hidden;
 }

@@ -10,7 +10,7 @@
  * متغيرات البيئة المطلوبة (.env):
  *   ANTHROPIC_API_KEY=sk-ant-...
  *   RIZQ_FAST_MODEL=claude-haiku-4-5-20251001
- *   RIZQ_ADVANCED_MODEL=claude-sonnet-4-5-20251001
+ *   RIZQ_ADVANCED_MODEL=claude-sonnet-4-5-20250929
  * ═══════════════════════════════════════════════════════
  */
 
@@ -21,54 +21,42 @@ if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
 }
 
 const Anthropic = require('@anthropic-ai/sdk');
-const { getFastModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
 const {
   getPackagesForTool,
   buildPackagesPromptBlock,
+  buildDiamondTiersPromptBlock,
 } = require('./rizq_packages_config');
+const RizqAgent = require('./rizq_agent');
+
+function buildSystemPrompt() {
+  return `${RizqAgent.buildMasterSystemPrompt({ agentTier: 'general' })}
+
+${buildPackagesPromptBlock()}
+
+${buildDiamondTiersPromptBlock()}
+
+عند سؤال عن الأسعار استدعِ أداة get_packages_info ولا تخترع أرقاماً.
+
+📋 تواصل رزق: direction@rizq.mr · rizq.mr · +222 44 88 22 12
+
+🎭 أسلوب القناة:
+- مكالمة: جمل قصيرة (≤15 ثانية)، بدون قوائم.
+- واتساب/تيليغرام: ردود واضحة ومحفّزة، emoji باعتدال.
+- بريد: رد رسمي كامل مع تحية وختام.
+
+⚡ عند طلب تفعيل/اشتراك/تجربة/خصم/إدارة:
+① اجمع: اسم المنشأة، واتساب، الباقة.
+② استدعِ register_interest (يحفظ في DB + يرسل Telegram فوراً) — لا تختلق رقم مرجع.
+③ أكّد للزبون أن الإدارة ستتواصل فوراً.
+
+📋 عند سؤال الإدارة عن الطلبات المعلّقة: استدعِ get_pending_leads واقرأ من النتيجة فقط — لا تخترع.`;
+}
 
 // ── إعداد العميل ──────────────────────────────────────
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || ''
 });
-
-const MODEL = getFastModel();
-
-function buildSystemPrompt() {
-  return `أنت "مدير رزق الذكي"، الوكيل الرسمي لمنصة رزق للتجارة الإلكترونية في موريتانيا.
-تعمل بالنيابة عن M. LIMAM — المدير العام لـ ADMINIA SARL.
-
-📋 معلوماتك الأساسية:
-- المنصة: رزق (Rizq) — منصة تجارة إلكترونية موريتانية، تشمل محلات، مكاتب، شركات
-- البريد الرسمي: direction@rizq.mr
-- الموقع: rizq.mr
-- الهاتف: +222 44 88 22 12
-- اللغات: العربية (أساسية) والفرنسية
-
-🎯 مهامك:
-1. الرد على استفسارات العملاء والزوار
-2. تقديم معلومات عن الباقات والأسعار
-3. إنشاء تذاكر دعم تقني
-4. تسجيل اهتمام التجار والشركاء
-5. توجيه الزوار لأقسام المنصة الصحيحة
-6. حماية المنصة: لا تكشف معلومات المشتركين الخاصة
-
-${buildPackagesPromptBlock()}
-عند سؤال عن الأسعار استدعِ أداة get_packages_info ولا تخترع أرقاماً.
-
-🎭 أسلوبك:
-- محترف، ودود، موجز
-- عربية فصيحة سهلة أو فرنسية راقية حسب لغة المتحدث
-- في المكالمات: جمل قصيرة لا تتجاوز 15 ثانية قراءةً
-- في واتساب: ردود قصيرة مع emoji مناسب
-- في الإيميل: ردود رسمية كاملة مع التوقيع
-
-⚠️ قواعد صارمة:
-- لا تعطِ وعوداً بمواعيد لا تستطيع ضمانها
-- لا تتحدث عن مشاكل تقنية داخلية
-- إذا كان الطلب خارج صلاحياتك: سجّله وأحِله للإدارة
-- الأمان أولاً: لا تقبل روابط خارجية من العملاء`;
-}
 
 // ── أدوات الوكيل (Tools) ───────────────────────────────
 const AGENT_TOOLS = [
@@ -95,19 +83,21 @@ const AGENT_TOOLS = [
   },
   {
     name: 'register_interest',
-    description: 'تسجيل اهتمام تاجر أو شركة أو شريك بالمنصة للمتابعة',
+    description: 'تسجيل رغبة جادة في الاشتراك أو شراء باقة — اجمع أولاً: اسم المنشأة، واتساب، الباقة المطلوبة',
     input_schema: {
       type: 'object',
       properties: {
-        contact: { type: 'string', description: 'رقم الهاتف أو الإيميل' },
+        business_name: { type: 'string', description: 'اسم المنشأة أو التاجر' },
+        whatsapp: { type: 'string', description: 'رقم الواتساب للتواصل' },
+        package_requested: { type: 'string', description: 'الباقة المطلوبة (مثلاً: ماسية، سنوية، Pro)' },
         interest_type: {
           type: 'string',
           enum: ['subscription', 'partnership', 'ads', 'info'],
           description: 'نوع الاهتمام'
         },
-        notes: { type: 'string', description: 'ملاحظات إضافية' }
+        notes: { type: 'string', description: 'ملخص قصير لمحادثة الزبون / ملاحظات' }
       },
-      required: ['contact', 'interest_type']
+      required: ['business_name', 'whatsapp', 'package_requested']
     }
   },
   {
@@ -121,31 +111,43 @@ const AGENT_TOOLS = [
     }
   },
   {
+    name: 'get_pending_leads',
+    description: 'جلب طلبات Leads المعلّقة (pending) من قاعدة البيانات — استخدمها عند سؤال الإدارة عن الطلبات الجديدة',
+    input_schema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
     name: 'escalate_to_human',
-    description: 'تصعيد المكالمة أو الرسالة للمدير البشري عند الحاجة',
+    description: 'تصعيد للإدارة عند طلب التحدث مع مدير أو مشكلة تقنية معقدة — اجمع: اسم المنشأة، واتساب، الباقة إن وُجدت',
     input_schema: {
       type: 'object',
       properties: {
+        business_name: { type: 'string', description: 'اسم المنشأة أو التاجر' },
+        whatsapp: { type: 'string', description: 'رقم الواتساب' },
+        package_requested: { type: 'string', description: 'الباقة المعنية إن وُجدت' },
         reason: { type: 'string', description: 'سبب التصعيد' },
         urgency: { type: 'string', enum: ['normal', 'urgent'] }
       },
-      required: ['reason']
+      required: ['business_name', 'whatsapp', 'reason']
     }
   }
 ];
 
 // ── معالجة نتائج الأدوات ───────────────────────────────
-function executeTool(toolName, toolInput) {
+async function executeTool(toolName, toolInput, meta) {
+  meta = meta || {};
   let saveTicketFn;
   try { saveTicketFn = require('./rizq-backend/services/agentTickets').saveTicket; } catch (e) {
     saveTicketFn = (x) => { console.log('[ticket]', x); return { id: 'LOG-' + Date.now() }; };
   }
 
-  const ticketId = 'RZQ-' + Date.now().toString(36).toUpperCase();
+  const { handleLeadEscalation } = require('./rizq-backend/services/leadEscalation');
 
   switch(toolName) {
     case 'create_support_ticket':
-      const t1 = saveTicketFn({ source: 'brain', type: toolInput.type, summary: toolInput.summary });
+      const t1 = saveTicketFn({ source: meta.channel || 'brain', type: toolInput.type, summary: toolInput.summary });
       console.log(`🎫 تذكرة جديدة #${t1.id}: [${toolInput.type}] ${toolInput.summary}`);
       return {
         ticket_id: t1.id,
@@ -154,13 +156,8 @@ function executeTool(toolName, toolInput) {
       };
 
     case 'register_interest':
-      saveTicketFn({ source: 'brain', type: 'interest', summary: toolInput.interest_type + ': ' + toolInput.contact, contact: toolInput.contact, meta: { notes: toolInput.notes } });
-      console.log(`📋 اهتمام جديد: ${toolInput.interest_type} — ${toolInput.contact}`);
-      return {
-        ref: 'INT-' + Date.now().toString(36).toUpperCase(),
-        status: 'registered',
-        message: 'تم تسجيل اهتمامكم. ستتواصل معكم الإدارة قريباً'
-      };
+      console.log(`📋 اهتمام جديد: ${toolInput.package_requested || toolInput.interest_type} — ${toolInput.whatsapp || toolInput.contact}`);
+      return await handleLeadEscalation('register_interest', toolInput, { source: 'brain', channel: meta.channel || 'brain' });
 
     case 'get_packages_info':
       return {
@@ -168,12 +165,20 @@ function executeTool(toolName, toolInput) {
         packages: getPackagesForTool(toolInput && toolInput.lang)
       };
 
+    case 'get_pending_leads': {
+      const { getPendingLeads, formatPendingLeadsForAdmin } = require('./rizq-backend/services/leadEscalation');
+      const pending = getPendingLeads();
+      return {
+        source: 'leads.json',
+        count: pending.length,
+        leads: pending.slice(0, 20),
+        formatted: formatPendingLeadsForAdmin(pending),
+      };
+    }
+
     case 'escalate_to_human':
       console.log(`🔺 تصعيد للإنسان: ${toolInput.reason} [${toolInput.urgency || 'normal'}]`);
-      return {
-        escalated: true,
-        message: 'تم إبلاغ المدير. سيتواصل معك في أقرب وقت ممكن'
-      };
+      return await handleLeadEscalation('escalate_to_human', toolInput, { source: 'brain', channel: meta.channel || 'brain' });
 
     default:
       return { error: 'أداة غير معروفة' };
@@ -195,7 +200,8 @@ async function askAgent({ channel, message, context = {} }) {
   const channelInstructions = {
     call: '\n\n[القناة: مكالمة هاتفية] ردّك سيُقرأ بصوت عالٍ. استخدم جملاً قصيرة جداً (15 ثانية كحد أقصى). لا تستخدم تنسيقات أو قوائم.',
     whatsapp: '\n\n[القناة: واتساب] رسالة نصية قصيرة. يمكن استخدام emoji باعتدال. تجنب الإطالة.',
-    email: '\n\n[القناة: بريد إلكتروني] رد رسمي كامل مع تحية وختام مهني. يمكن استخدام فقرات منظّمة.'
+    email: '\n\n[القناة: بريد إلكتروني] رد رسمي كامل مع تحية وختام مهني. يمكن استخدام فقرات منظّمة.',
+    telegram: '\n\n[القناة: Telegram] رد نصي قصير وواضح. يمكن استخدام emoji باعتدال.',
   };
 
   const systemPrompt = buildSystemPrompt() + (channelInstructions[channel] || '');
@@ -220,10 +226,11 @@ async function askAgent({ channel, message, context = {} }) {
   let currentMessages = [...messages];
 
   let loops = 0;
+  const model = getAdvancedModel();
   while (loops < 5) {
     loops++;
     const created = await createCachedMessage(client, {
-      model     : MODEL,
+      model,
       max_tokens: channel === 'call' ? 300 : 1024,
       system    : systemPrompt,
       tools     : AGENT_TOOLS,
@@ -244,11 +251,11 @@ async function askAgent({ channel, message, context = {} }) {
       currentMessages.push({ role: 'assistant', content: response.content });
 
       // نفّذ كل أداة وأضف نتيجتها
-      const toolResults = toolUseBlocks.map(tool => ({
+      const toolResults = await Promise.all(toolUseBlocks.map(async (tool) => ({
         type      : 'tool_result',
         tool_use_id: tool.id,
-        content   : JSON.stringify(executeTool(tool.name, tool.input))
-      }));
+        content   : JSON.stringify(await executeTool(tool.name, tool.input, { channel }))
+      })));
 
       currentMessages.push({ role: 'user', content: toolResults });
       continue; // كمّل الحلقة
@@ -263,7 +270,7 @@ async function askAgent({ channel, message, context = {} }) {
 
   return {
     text     : replyText,
-    model    : MODEL,
+    model,
     channel  : channel,
     usage    : response.usage,
     stop_reason: response.stop_reason

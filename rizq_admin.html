@@ -1463,7 +1463,7 @@ main, .page-content.active, .main-content, .results-area,
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
         <div>
           <h2 style="font-size:22px;font-weight:700;color:var(--navy)">📊 مراقبة استهلاك الباقة الماسية</h2>
-          <p style="font-size:13px;color:#2C3A4F;margin-top:4px">الحصة العادلة لكل مشترك ماسي — عند 80% تنبيه، عند 100% تحويل تلقائي إلى الوضع الاقتصادي مع خيار حزمة إضافية</p>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px">حصص الماسية (Standard / Pro) — عند 80% تنبيه، عند 100% إيقاف فوري للوكيل حتى الشحن الإضافي</p>
         </div>
         <button onclick="loadQuotaGuardPanel()" style="padding:9px 20px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔄 تحديث</button>
       </div>
@@ -2434,7 +2434,8 @@ const PKG_DEFAULTS = {
     // rizq_email_handler.js يرد فقط على بريد دعم رزق العام). نفس الإصلاح
     // طُبِّق على DEF_STO/DEF_OFF في rizq_landing_v8.html. انظر التعليق المفصَّل
     // عند TIER_FEATURES في rizq_subscription_engine.js.
-    {id:'diamond', name:'الماسية 💎 (النائب الذكي الشامل)', name_fr:'Diamant 💎 (Adjoint intelligent complet)', price:5000,  period:'MRU / شهر', durationDays:30, description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', description_fr:'Un adjoint commercial intégré qui gère votre boutique ou institution avec une précision humaine, 24h/24.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', featuredBadge_fr:'Le plus choisi par les entreprises', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', roi_fr:'Économisez le salaire d\'un agent d\'accueil — pour seulement 5 000 MRU par mois.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], features_fr:['🤖 Un adjoint exclusif qui parle au nom de votre établissement, avec une précision humaine.','🎙️ Réponse vocale et écrite immédiate via WhatsApp, le chat du site et les appels.','🛡️ Identité indépendante complète — sans aucune mention de la plateforme Rizq.','📊 Suivi en temps réel de toutes les conversations et des ventes.','⚡ Usage équitable : 120 minutes d\'appels + 500 conversations avancées par mois.'], active:true},
+    {id:'diamond_standard', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, aiModel:'claude-3-5-sonnet', features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','📊 لوحة متابعة','⚡ 2,000 محادثة/شهر'], active:true},
+    {id:'diamond_pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, aiModel:'claude-3-5-sonnet', features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','📊 لوحة متابعة','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
   ],
   individual: [
     {id:'ind-free',   name:'مجانية',     price:0,    period:'مجاناً — 7 أيام عرض', durationDays:7,  features:['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'], active:true},
@@ -2446,21 +2447,24 @@ const PKG_DEFAULTS = {
     {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['جميع المزايا','🏅 شارة "موثّق ✅"','إحصائيات','🎬 فيديو تعريفي مشمول','دعم بالأولوية'], active:true},
     {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['توفير 14%','جميع المزايا','🎬 فيديو مشمول','مدير حساب مخصص'], active:true},
     {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, features:['توفير 33%','أفضل قيمة','🎬 فيديو مشمول + 1 إضافي مجاني','أولوية الدعم'], active:true},
-    {id:'of-diam',  name:'الماسية 💎 (النائب الذكي الشامل)', price:5000, period:'MRU / شهر', durationDays:30, description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
+    {id:'of-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
+    {id:'of-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
   ],
   store: [
     {id:'st-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'], active:true},
     {id:'st-month', name:'شهرية',   price:2000,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "محل مميّز برزق"','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'st-quart', name:'ربعية',   price:5500,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'], active:true},
     {id:'st-year',  name:'سنوية',   price:15000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'], active:true},
-    {id:'st-diam',  name:'الماسية 💎 (النائب الذكي الشامل)',   price:3500,  period:'MRU / شهر',        durationDays:30,  description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
+    {id:'st-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
+    {id:'st-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
   ],
   corp: [
     {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
     {id:'cp-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "شركة مميّزة برزق"','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'cp-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'], active:true},
     {id:'cp-year',  name:'سنوية',   price:25000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'], active:true},
-    {id:'cp-diam',  name:'الماسية 💎 (النائب الذكي الشامل)',   price:6000,  period:'MRU / شهر',        durationDays:30,  description:'وكيل أعمال متكامل يدير متجرك أو مؤسستك بدقة بشرية فائقة وعلى مدار 24 ساعة.', featured:true, featuredBadge:'الأكثر اختياراً للشركات', roi:'وفر راتب موظف استقبال — مقابل 5,000 أوقية شهرياً فقط.', features:['🤖 نائب ذكي حصري يتحدث باسم منشأتك وبكفاءة بشرية فائقة.','🎙️ استجابة صوتية ونصية فورية عبر الواتساب، الويدجت، والمكالمات.','🛡️ استقلالية وهوية خاصة كاملة دون إظهار أي إشارة لمنصة رزق.','📊 لوحة متابعة وتحليل لحظية لجميع المحادثات والمبيعات.','⚡ حزمة الاستخدام العادل: 120 دقيقة مكالمات + 500 محادثة متقدمة شهرياً.'], active:true},
+    {id:'cp-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
+    {id:'cp-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
   ],
   video: [
     {id:'vid-basic',    name:'أساسي (فيديو)',      price:5000,  period:'MRU / شهر', durationDays:30, features:['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'], active:true},
@@ -6754,16 +6758,17 @@ function loadQuotaGuardPanel(){
       stats.innerHTML =
         card(data.count||0, 'مشتركون ماسيون', '#1B3A6B')+
         card(data.over80||0, 'تجاوزوا 80%', '#d97706')+
-        card(data.over100||0, 'على Haiku (100%)', '#dc2626')+
+        card(data.blocked||data.over100||0, 'محظورون (100%)', '#dc2626')+
         card('$'+(data.totalCostUsd||0).toFixed(4), 'تكلفة API هذا الشهر', '#7c3aed');
     }
-    var pending = data.pendingAddons || [];
+    var pending = (data.pendingTopups || data.pendingAddons || []);
     if(pendingEl){
       if(!pending.length) pendingEl.innerHTML = '';
-      else pendingEl.innerHTML = '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:14px;margin-bottom:8px"><div style="font-weight:800;color:#9a3412;margin-bottom:8px">طلبات حزم إضافية ('+pending.length+')</div>'+
+      else pendingEl.innerHTML = '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:14px;margin-bottom:8px"><div style="font-weight:800;color:#9a3412;margin-bottom:8px">طلبات شحن إضافي ('+pending.length+')</div>'+
         pending.map(function(a){
+          var label = a.type==='voice' ? ('صوت · '+a.amount+' د') : ('نص · '+a.amount+' محادثة');
           return '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid rgba(154,52,18,.12)">'+
-            '<div><div style="font-weight:700">'+(a.businessName||a.subscriberId)+'</div><div style="font-size:12px;color:#9a3412">'+a.priceMru+' أوقية · '+a.period+'</div></div>'+
+            '<div><div style="font-weight:700">'+(a.businessName||a.subscriberId)+'</div><div style="font-size:12px;color:#9a3412">'+label+' · '+a.priceMru+' MRU · '+a.period+'</div></div>'+
             '<div style="display:flex;gap:8px">'+
             '<button class="btn-sm btn-outline" onclick="resolveQuotaAddon(\''+a.id+'\',\'approved\')">✅ موافقة</button>'+
             '<button class="btn-sm btn-danger" onclick="resolveQuotaAddon(\''+a.id+'\',\'rejected\')">رفض</button>'+
@@ -6777,8 +6782,8 @@ function loadQuotaGuardPanel(){
       return;
     }
     list.innerHTML = rows.map(function(s){
-      var st = s.forceFast
-        ? '<span style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">Haiku — الحصة نفدت</span>'
+      var st = s.quotaBlocked || s.forceFast
+        ? '<span style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">⛔ محظور — الحصة نفدت</span>'
         : (s.pct>=80
           ? '<span style="background:#ffedd5;color:#9a3412;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">تنبيه 80%</span>'
           : '<span style="background:#dcfce7;color:#166534;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">Sonnet نشط</span>');
@@ -6786,12 +6791,11 @@ function loadQuotaGuardPanel(){
         '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">'+
           '<div><div style="font-weight:800;color:#1B3A6B">'+(s.businessName||s.subscriberId||'—')+'</div>'+
           '<div style="font-size:12px;color:#64748b;margin-top:2px;direction:ltr;text-align:right">'+(s.subscriberId||'')+(s.accountId?' · '+s.accountId:'')+'</div></div>'+
-          '<div style="text-align:left">'+st+'<div style="font-size:12px;font-weight:700;color:#7c3aed;margin-top:6px">API: $'+(s.costUsd||0).toFixed(4)+' · حزم +: '+(s.addons||0)+'</div></div>'+
+          '<div style="text-align:left">'+st+'<div style="font-size:12px;font-weight:700;color:#7c3aed;margin-top:6px">'+(s.diamondTier||'—')+' · API: $'+(s.costUsd||0).toFixed(4)+'</div></div>'+
         '</div>'+
         _quotaBar(s.pct, 'الإجمالي ('+(s.period||'')+')')+
-        _quotaBar((s.ratios&&s.ratios.messages)||0, 'رسائل '+(s.messages||0)+'/'+(s.limits&&s.limits.messages||0))+
+        _quotaBar((s.ratios&&s.ratios.messages)||0, 'محادثات '+(s.messages||0)+'/'+(s.limits&&s.limits.messages||0))+
         _quotaBar((s.ratios&&s.ratios.minutes)||0, 'دقائق '+(s.minutes||0)+'/'+(s.limits&&s.limits.minutes||0))+
-        _quotaBar((s.ratios&&s.ratios.tokens)||0, 'توكنز '+(s.tokens||0)+'/'+(s.limits&&s.limits.tokens||0))+
       '</div>';
     }).join('');
   }).catch(function(){

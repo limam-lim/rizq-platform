@@ -4,6 +4,7 @@
  *   <script src="rizq_packages_config.js"><\/script>
  *   <script src="rizq_agent.js"><\/script>
  *   <script src="rizq_manager_agent_config.js"><\/script>
+ *   <script src="rizq_widget_markdown.js"><\/script>
  *   <script src="rizq_widget_embed.js"><\/script>
  */
 (function () {
@@ -44,7 +45,8 @@
     '.rw-orbit{transform-box:fill-box;transform-origin:center;animation:rwTwinkle 2.4s ease-in-out infinite;}',
     '.rw-orbit-2{animation-delay:.7s}.rw-orbit-3{animation-delay:1.4s}',
     '@keyframes rwTwinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.35)}}',
-    '#rizq-chat-window{position:fixed;bottom:104px;right:28px;width:380px;max-height:520px;',
+    '#rizq-chat-window{position:fixed;bottom:96px;right:24px;width:min(340px,calc(100vw - 32px));',
+    'max-height:min(520px,calc(100vh - 176px));',
     'background:#fff;border-radius:16px;',
     'box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);',
     'display:flex;flex-direction:column;z-index:9999;overflow:hidden;',
@@ -55,15 +57,13 @@
     '#rizq-chat-toggle.open{display:none!important;opacity:0!important;pointer-events:none!important;visibility:hidden!important;}',
     '#rizq-chat-window[dir="ltr"] .rw-header-info{text-align:left;}',
     '#rizq-chat-window[dir="rtl"] .rw-header-info{text-align:right;}',
-    '#rizq-chat-window[dir="ltr"] .rw-input{direction:ltr;text-align:left;}',
-    '#rizq-chat-window[dir="rtl"] .rw-input{direction:rtl;text-align:right;}',
     'html[dir="ltr"] #rizq-chat-window{left:28px;right:auto;}',
     'html[dir="ltr"] #rizq-chat-toggle{left:28px;right:auto;}',
     '.rw-header{background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 60%,#234d8f 100%);',
-    'padding:16px 18px;display:flex;align-items:center;gap:12px;position:relative;flex-shrink:0;}',
+    'padding:12px 14px;display:flex;align-items:center;gap:10px;position:relative;flex-shrink:0;}',
     '.rw-header::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;',
     'background:linear-gradient(90deg,transparent,#C9A84C,transparent);}',
-    '.rw-header-avatar{width:48px;height:48px;border-radius:50%;border:2.5px solid #C9A84C;',
+    '.rw-header-avatar{width:42px;height:42px;border-radius:50%;border:2.5px solid #C9A84C;',
     'overflow:hidden;flex-shrink:0;background:#0f2347;}',
     '.rw-header-avatar img,.rw-header-avatar svg{width:100%;height:100%;object-fit:cover;display:block;}',
     '.rw-header-info{flex:1;}',
@@ -74,31 +74,41 @@
     'border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;',
     'transition:background .2s;flex-shrink:0;}',
     '.rw-header-close:hover{background:rgba(255,255,255,.25);}',
-    '.rw-quick-actions{padding:10px 16px;margin-bottom:8px;display:flex;gap:8px;overflow-x:auto;',
-    'flex-wrap:nowrap;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;',
-    'scrollbar-width:none;-ms-overflow-style:none;}',
-    '.rw-quick-actions::-webkit-scrollbar{display:none;}',
+    '.rw-quick-actions{padding:8px 10px;display:flex;gap:5px;flex-wrap:wrap;align-content:flex-start;',
+    'overflow-x:visible;overflow-y:auto;max-height:118px;background:#fff;border-bottom:1px solid #e2e8f0;',
+    'flex-shrink:0;scrollbar-width:thin;}',
+    '.rw-quick-actions::-webkit-scrollbar{width:3px;height:3px;}',
+    '.rw-quick-actions::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px;}',
     '#rizq-chat-window[dir="rtl"] .rw-quick-actions{direction:rtl;}',
     '#rizq-chat-window[dir="ltr"] .rw-quick-actions{direction:ltr;justify-content:flex-start;}',
-    '.rw-quick-btn{background:#f1f5f9;border:1px solid #cbd5e1;color:#1e293b;font-size:.82rem;',
-    "font-weight:600;font-family:'Cairo',system-ui,sans-serif;padding:6px 14px;border-radius:20px;",
-    'cursor:pointer;transition:all .2s ease;white-space:nowrap;flex-shrink:0;}',
+    '.rw-quick-btn{background:#f1f5f9;border:1px solid #cbd5e1;color:#0c1220;font-size:.72rem;',
+    "font-weight:700;font-family:'Cairo',system-ui,sans-serif;padding:4px 10px;border-radius:18px;",
+    'cursor:pointer;transition:all .2s ease;white-space:nowrap;flex-shrink:0;line-height:1.35;}',
     '.rw-quick-btn:hover{background:#1b3a6b;color:#fff;border-color:#1b3a6b;}',
-    '.rw-messages{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;',
-    'gap:10px;min-height:180px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}',
+    '.rw-messages{flex:1;overflow-y:auto;padding:12px 12px;display:flex;flex-direction:column;',
+    'gap:8px;min-height:168px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}',
     '.rw-messages::-webkit-scrollbar{width:4px;}',
     '.rw-messages::-webkit-scrollbar-thumb{background:#e8e8e8;border-radius:2px;}',
-    '.rw-msg{display:flex;align-items:flex-end;gap:8px;max-width:92%;animation:rwMsgIn .3s ease-out;}',
+    '.rw-msg{display:flex;align-items:flex-end;gap:8px;max-width:88%;animation:rwMsgIn .3s ease-out;flex-shrink:0;}',
     '@keyframes rwMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}',
-    '.rw-msg.agent{align-self:flex-start;flex-direction:row;}',
-    '.rw-msg.user,.chat-msg.user{align-self:flex-end;flex-direction:row-reverse;max-width:80%!important;width:auto!important;flex-shrink:0;}',
+    '.rw-msg.agent{align-self:flex-start;flex-direction:row;max-width:88%!important;}',
+    '.rw-msg.user,.chat-msg.user{align-self:flex-end;flex-direction:row-reverse;max-width:80%!important;}',
+    '.rw-msg-body,.rw-msg>div:not(.rw-msg-avatar){flex:1;min-width:0;max-width:100%;display:flex;flex-direction:column;}',
+    '.rw-msg.user .rw-msg-body,.rw-msg.user>div:not(.rw-msg-avatar){align-items:flex-end;}',
+    '.rw-msg.agent .rw-msg-body,.rw-msg.agent>div:not(.rw-msg-avatar){align-items:flex-start;}',
     '.rw-msg-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid #C9A84C;',
     'overflow:hidden;flex-shrink:0;background:#0f2347;}',
     '.rw-msg-avatar img,.rw-msg-avatar svg{width:100%;height:100%;object-fit:cover;display:block;}',
-    '.rw-bubble{max-width:75%;padding:10px 13px;border-radius:14px;font-size:13px;',
-    'line-height:1.55;white-space:pre-wrap;word-break:break-word;}',
-    '.rw-msg.user .rw-bubble,.chat-msg.user{max-width:80%!important;width:auto!important;min-width:0;',
-    'word-break:normal!important;overflow-wrap:break-word!important;white-space:pre-wrap!important;}',
+    '.rw-bubble,.chat-bubble,.message-bubble{max-width:100%!important;min-width:60px!important;width:fit-content!important;',
+    'padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.55;',
+    'word-wrap:break-word!important;word-break:normal!important;overflow-wrap:break-word!important;white-space:pre-wrap!important;}',
+    '.rw-bubble strong{font-weight:700;}',
+    '.rw-bubble em{font-style:italic;}',
+    '.rw-bubble .rw-md-h{font-weight:700;font-size:14px;margin:6px 0 4px;color:#1B3A6B;}',
+    '.rw-bubble .rw-md-ul{margin:4px 0 6px;padding-right:18px;padding-left:0;list-style:disc;}',
+    '.rw-bubble .rw-md-li{margin:2px 0;line-height:1.5;}',
+    '.rw-bubble .rw-ltr{display:inline-block;direction:ltr;unicode-bidi:isolate;text-align:left;}',
+    '.rw-bubble .rw-md-ul,.rw-bubble .rw-md-li{word-break:normal!important;white-space:normal!important;}',
     '.rw-msg.agent .rw-bubble{background:#f5f5f5;color:#222;border-bottom-right-radius:4px;border:1px solid #e8e8e8;}',
     '.rw-msg.user .rw-bubble{background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border-bottom-left-radius:4px;}',
     '.rw-typing .rw-bubble{background:#f5f5f5;border:1px solid #e8e8e8;padding:12px 16px;}',
@@ -109,9 +119,10 @@
     '.rw-ts{font-size:10px;color:#888;margin-top:3px;text-align:center;}',
     '.rw-input-area{padding:12px 16px;border-top:1px solid #e2e8f0;background:#fff;',
     'display:flex;align-items:center;gap:10px;flex-shrink:0;}',
+    '.rw-input-area input,.rw-input-area textarea,.rw-input{direction:ltr!important;text-align:left!important;unicode-bidi:plaintext;font-variant-numeric:lining-nums;}',
     '.rw-input{flex:1;border:1px solid #cbd5e1;border-radius:24px;padding:10px 18px;',
     "font-size:.9rem;font-family:'Cairo',sans-serif;resize:none;outline:none;background:#f8fafc;",
-    'max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color .2s,background .2s;direction:inherit;text-align:start;}',
+    'max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color .2s,background .2s;}',
     '.rw-input:focus{border-color:#1B3A6B;background:#fff;}',
     '.rw-input::placeholder{color:#94a3b8;}',
     '.rw-send-btn{width:42px;height:42px;background:#1b3a6b;',
@@ -123,7 +134,8 @@
     '.rw-footer{text-align:center;font-size:10px;color:#888;padding:6px;',
     'background:#f5f5f5;border-top:1px solid #e8e8e8;flex-shrink:0;}',
     '@media(max-width:440px){',
-    '#rizq-chat-window{width:calc(100vw - 20px);right:10px;bottom:calc(148px + env(safe-area-inset-bottom,0));max-height:65vh;}',
+    '#rizq-chat-window{width:min(340px,calc(100vw - 24px));right:12px;',
+    'bottom:calc(100px + env(safe-area-inset-bottom,0));max-height:min(480px,calc(100vh - 220px));}',
     '#rizq-chat-toggle{right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0));}',
     'html[dir="ltr"] #rizq-chat-window{left:10px;right:auto;}',
     'html[dir="ltr"] #rizq-chat-toggle{left:12px;right:auto;}}',
@@ -187,16 +199,10 @@
     '    </div>',
     '    <button class="rw-header-close" id="rw-header-close" aria-label="إغلاق">✕</button>',
     '  </div>',
-    '  <div class="rw-quick-actions" id="rw-quick-actions">',
-    '    <button class="rw-quick-btn" data-action="nav:rizq_post.html">نشر إعلان</button>',
-    '    <button class="rw-quick-btn" data-action="nav:rizq_landing_v8.html#pricing">الاشتراكات</button>',
-    '    <button class="rw-quick-btn" data-action="nav:rizq_landing_v8.html">التوثيق</button>',
-    '    <button class="rw-quick-btn" data-action="report">شكوى</button>',
-    '    <button class="rw-quick-btn" data-action="chat:طرق الدفع">الدفع</button>',
-    '  </div>',
+    '  <div class="rw-quick-actions" id="rw-quick-actions"></div>',
     '  <div class="rw-messages" id="rw-messages"></div>',
     '  <div class="rw-input-area">',
-    '    <textarea id="rw-input" class="rw-input" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>',
+    '    <textarea id="rw-input" class="rw-input" dir="ltr" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>',
     '    <button class="rw-send-btn" id="rw-send-btn" aria-label="إرسال">',
     '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">',
     '        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
@@ -380,13 +386,95 @@
       return RA.resolveBlockedReply(userText, lang);
     }
 
+    function _leadApiUrls() {
+      var urls = [];
+      LEAD_API_PATHS.forEach(function (p) {
+        if (urls.indexOf(p) === -1) urls.push(p);
+      });
+      var base = (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE)
+        ? window.RIZQ_BACKEND_BASE.replace(/\/$/, '') : '';
+      if (base) {
+        LEAD_API_PATHS.forEach(function (p) {
+          var full = base + p;
+          if (urls.indexOf(full) === -1) urls.push(full);
+        });
+      }
+      if (location.protocol === 'http:' || location.protocol === 'https:') {
+        var origin = location.origin.replace(/\/$/, '');
+        LEAD_API_PATHS.forEach(function (p) {
+          var fromOrigin = origin + p;
+          if (urls.indexOf(fromOrigin) === -1) urls.push(fromOrigin);
+        });
+      }
+      return urls;
+    }
+
+    function _extractLeadPayload(text) {
+      var t = String(text || '');
+      if (!/(?:اشتراك|تفعيل|باق|ماس|سنو|تجرب|subscribe|forfait|diamond|pro|trial|register)/i.test(t)) return null;
+      var phoneMatch = t.match(/(?:\+222|00222)[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}|\+222[\d\s\-]{8,18}/);
+      if (!phoneMatch) return null;
+      var bizMatch = t.match(/(?:اسم|شركة|محل|منشأة|تاجر)[:\s]+([^\n،,]+)/i);
+      var pkg = 'غير محددة';
+      if (/ماس\s*pro|diamond\s*pro|الماسية\s*المتقدمة|pro\s*ماس/i.test(t)) pkg = 'الماسية Pro';
+      else if (/ماس|diamond/i.test(t)) pkg = 'الماسية الأساسية';
+      else if (/سنو|year|annuel/i.test(t)) pkg = 'السنوية';
+      else if (/\bpro\b/i.test(t)) pkg = 'Pro';
+      else if (/تجرب|trial/i.test(t)) pkg = 'التجريبية';
+      return {
+        business_name: bizMatch ? bizMatch[1].trim().slice(0, 120) : 'غير محدد',
+        whatsapp: phoneMatch[0].replace(/\s+/g, ' ').trim(),
+        package_requested: pkg,
+        notes: 'طلب من ويدجت الموقع',
+        channel: 'widget',
+      };
+    }
+
+    function _submitLeadToBackend(leadPayload) {
+      if (!leadPayload || !leadPayload.whatsapp) return Promise.resolve(null);
+      var urls = _leadApiUrls();
+      function tryLead(idx) {
+        if (idx >= urls.length) return Promise.resolve(null);
+        return fetch(urls[idx], {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(leadPayload),
+        }).then(function (res) {
+          if (!res.ok) throw new Error('http_' + res.status);
+          return res.json();
+        }).catch(function () {
+          return tryLead(idx + 1);
+        });
+      }
+      return tryLead(0).then(function (data) {
+        if (data && data.lead_id) {
+          console.log('[rizq-widget] lead saved', data.lead_id, 'telegram:', data.telegram_sent);
+        }
+        return data;
+      }).catch(function (e) {
+        console.error('[rizq-widget] lead API failed', e);
+        return null;
+      });
+    }
+
     var AGENT_CHAT_PATHS = ['/api/ai/chat', '/api/widget/chat'];
+    var LEAD_API_PATHS = ['/api/widget/lead', '/api/leads'];
     var _quickActions = [
-      { ar: { label: 'نشر إعلان', action: 'nav:rizq_post.html' }, fr: { label: 'Publier une annonce', action: 'nav:rizq_post.html' } },
-      { ar: { label: 'الاشتراكات', action: 'nav:rizq_landing_v8.html#pricing' }, fr: { label: 'Abonnements', action: 'nav:rizq_landing_v8.html#pricing' } },
-      { ar: { label: 'التوثيق', action: 'nav:rizq_landing_v8.html' }, fr: { label: 'Vérification', action: 'nav:rizq_landing_v8.html' } },
-      { ar: { label: 'شكوى', action: 'report' }, fr: { label: 'Réclamation', action: 'report' } },
-      { ar: { label: 'الدفع', action: 'chat:طرق الدفع' }, fr: { label: 'Paiement', action: 'chat:Méthodes de paiement' } }
+      { ar: { label: 'التسجيل', action: 'chat:كيف أسجل' }, fr: { label: 'Inscription', action: 'chat:comment creer un compte' } },
+      { ar: { label: 'أنواع الحسابات', action: 'chat:أنواع الحسابات' }, fr: { label: 'Types de comptes', action: 'chat:types de comptes' } },
+      { ar: { label: 'نشر إعلان', action: 'nav:rizq_post.html' }, fr: { label: 'Publier', action: 'nav:rizq_post.html' } },
+      { ar: { label: 'كيف أشتري', action: 'chat:كيف أشتري' }, fr: { label: 'Acheter', action: 'chat:comment acheter' } },
+      { ar: { label: 'الباقات', action: 'chat:الباقات' }, fr: { label: 'Abonnements', action: 'chat:abonnements' } },
+      { ar: { label: 'طرق الدفع', action: 'chat:طرق الدفع' }, fr: { label: 'Paiement', action: 'chat:méthodes de paiement' } },
+      { ar: { label: 'التوثيق', action: 'chat:توثيق الهوية' }, fr: { label: 'Vérification', action: 'chat:vérification identité' } },
+      { ar: { label: 'لوحة التحكم', action: 'chat:لوحة التحكم' }, fr: { label: 'Dashboard', action: 'chat:tableau de bord' } },
+      { ar: { label: 'المتجر', action: 'chat:متجر افتراضي' }, fr: { label: 'Boutique', action: 'chat:boutique virtuelle' } },
+      { ar: { label: 'المكتب', action: 'chat:مكتب افتراضي' }, fr: { label: 'Bureau', action: 'chat:bureau virtuel' } },
+      { ar: { label: 'RIZQ ADS', action: 'chat:rizq ads' }, fr: { label: 'RIZQ ADS', action: 'chat:rizq ads' } },
+      { ar: { label: 'الأقسام', action: 'chat:الفئات' }, fr: { label: 'Catégories', action: 'chat:catégories' } },
+      { ar: { label: 'عن رزق', action: 'chat:ما هي رزق' }, fr: { label: 'À propos', action: 'chat:qu est ce que rizq' } },
+      { ar: { label: 'تواصل', action: 'chat:تواصل' }, fr: { label: 'Contact', action: 'chat:contact support' } },
+      { ar: { label: 'شكوى', action: 'report' }, fr: { label: 'Réclamation', action: 'report' } }
     ];
 
     /** سياق الصفحة — إعلان مفتوح، URL، نوع الصفحة (للـ Backend) */
@@ -456,6 +544,22 @@
       try { return localStorage.getItem('rizq_lang') === 'fr' ? 'fr' : 'ar'; } catch (e) { return 'ar'; }
     }
 
+    function _renderQuickActions() {
+      var qaWrap = document.getElementById('rw-quick-actions');
+      if (!qaWrap) return;
+      var isFr = _ctx.lang === 'fr';
+      qaWrap.innerHTML = '';
+      _quickActions.forEach(function (qa) {
+        var item = isFr ? qa.fr : qa.ar;
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'rw-quick-btn';
+        b.textContent = item.label;
+        b.setAttribute('data-action', item.action);
+        qaWrap.appendChild(b);
+      });
+    }
+
     function _applyWidgetLang() {
       var lang = _detectLang();
       var isFr = lang === 'fr';
@@ -479,20 +583,13 @@
       var inputElLang = document.getElementById('rw-input');
       if (inputElLang) {
         inputElLang.setAttribute('placeholder', d.inputPh);
-        inputElLang.setAttribute('dir', isFr ? 'ltr' : 'rtl');
-        inputElLang.style.textAlign = isFr ? 'left' : 'right';
+        inputElLang.setAttribute('dir', 'ltr');
+        inputElLang.style.textAlign = 'left';
+        inputElLang.style.direction = 'ltr';
       }
       var footerEl = document.querySelector('.rw-footer');
       if (footerEl) footerEl.innerHTML = d.footerHtml;
-      var qaButtons = document.querySelectorAll('.rw-quick-btn');
-      qaButtons.forEach(function (b2, i) {
-        var qa = _quickActions[i];
-        if (!qa) return;
-        var item = isFr ? qa.fr : qa.ar;
-        b2.textContent = item.label;
-        b2.setAttribute('data-action', item.action);
-        b2.removeAttribute('data-q');
-      });
+      _renderQuickActions();
     }
 
     /* ── سطر الحالة الخاص بسياق المتجر (اسم النشاط التجاري) ──
@@ -522,11 +619,102 @@
     }
 
     function _ts() {
-      var d = new Date();
-      return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+      if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.formatLocalTime === 'function') {
+        return window.RizqWidgetMarkdown.formatLocalTime(new Date());
+      }
+      try {
+        return new Date().toLocaleTimeString('ar-MR', { timeZone: 'Africa/Nouakchott', hour: '2-digit', minute: '2-digit', hour12: false });
+      } catch (e) {
+        var d = new Date();
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+      }
     }
     function _esc(s) {
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    var _BIDI_CTRL_RE = /[\u200E\u200F\u2066\u2067\u2068\u2069\u202A-\u202E]/g;
+    var _NUM_RUN_RE = /(?:\+[\d\s\-().]+|[\d][\d\s\-.,()/]*[\d+]|\d+)/g;
+    function _westernizeDigits(s) {
+      return String(s || '')
+        .replace(/[\u0660-\u0669]/g, function (c) { return String(c.charCodeAt(0) - 0x0660); })
+        .replace(/[\u06F0-\u06F9]/g, function (c) { return String(c.charCodeAt(0) - 0x06F0); });
+    }
+    function _stripBidiControls(s) {
+      return String(s || '').replace(_BIDI_CTRL_RE, '');
+    }
+    function _cleanOutgoingText(s) {
+      return _westernizeDigits(_stripBidiControls(s)).trim();
+    }
+    function _isolateNumberRuns(text) {
+      return _westernizeDigits(_stripBidiControls(text));
+    }
+    function _wrapLtrNumbers(html) {
+      return html.replace(_NUM_RUN_RE, function (m) {
+        if (!/[+\d]/.test(m)) return m;
+        return '<bdi dir="ltr" class="rw-ltr">' + m + '</bdi>';
+      });
+    }
+    function _formatAgentHtml(text) {
+      if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.formatAgentMarkdown === 'function') {
+        return window.RizqWidgetMarkdown.formatAgentMarkdown(text);
+      }
+      return _esc(String(text || '')).replace(/\n/g, '<br>');
+    }
+    function _bubbleHtml(text, role) {
+      if (role === 'user') {
+        return _esc(_stripBidiControls(text));
+      }
+      if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.sanitizeAgentText === 'function') {
+        text = window.RizqWidgetMarkdown.sanitizeAgentText(text);
+      } else {
+        text = _stripBidiControls(text);
+      }
+      return _formatAgentHtml(text);
+    }
+    function _normalizeInputBidi(el) {
+      if (!el) return;
+      var v = el.value;
+      var sel = el.selectionStart;
+      var out = _isolateNumberRuns(v);
+      if (out !== v) {
+        var delta = out.length - v.length;
+        el.value = out;
+        try { el.setSelectionRange(sel + delta, sel + delta); } catch (e) {}
+      }
+      el.setAttribute('dir', 'ltr');
+      el.style.direction = 'ltr';
+      el.style.textAlign = 'left';
+    }
+    function _handleInputKeydown(e) {
+      var el = e.target;
+      if (!el || e.ctrlKey || e.metaKey || e.altKey) return;
+      var key = e.key;
+      if (/[\u0660-\u0669\u06F0-\u06F9]/.test(key)) {
+        e.preventDefault();
+        var western = _westernizeDigits(key);
+        var start = el.selectionStart;
+        var end = el.selectionEnd;
+        el.value = el.value.slice(0, start) + western + el.value.slice(end);
+        el.setSelectionRange(start + western.length, start + western.length);
+        _normalizeInputBidi(el);
+        autoResize(el);
+      }
+    }
+    function _handleInputPaste(e) {
+      var el = e.target;
+      if (!el) return;
+      var pasted = (e.clipboardData || window.clipboardData).getData('text');
+      if (!pasted) return;
+      e.preventDefault();
+      var start = el.selectionStart;
+      var end = el.selectionEnd;
+      var val = el.value;
+      var insert = _isolateNumberRuns(pasted);
+      el.value = val.slice(0, start) + insert + val.slice(end);
+      var pos = start + insert.length;
+      el.setSelectionRange(pos, pos);
+      _normalizeInputBidi(el);
+      autoResize(el);
     }
     function _scroll() {
       var el = document.getElementById('rw-messages');
@@ -540,7 +728,7 @@
       var div = document.createElement('div');
       div.className = 'rw-msg chat-msg ' + (role === 'user' ? 'user' : 'agent');
       var av = role === 'agent' ? '<div class="rw-msg-avatar">' + _AVATAR + '</div>' : '';
-      div.innerHTML = av + '<div><div class="rw-bubble">' + _esc(text) + '</div><div class="rw-ts">' + _ts() + '</div></div>';
+      div.innerHTML = av + '<div class="rw-msg-body"><div class="rw-bubble">' + _bubbleHtml(text, role) + '</div><div class="rw-ts">' + _ts() + '</div></div>';
       msgs.appendChild(div);
       _scroll();
       _history.push({ role: role, text: text, ts: _ts() });
@@ -554,7 +742,7 @@
       div.className = 'rw-msg agent rw-typing typing-indicator';
       div.id = 'rw-typing-indicator';
       div.innerHTML = '<div class="rw-msg-avatar">' + _AVATAR + '</div>' +
-        '<div class="rw-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+        '<div class="rw-msg-body"><div class="rw-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>';
       msgs.appendChild(div);
       _scroll();
     }
@@ -776,6 +964,10 @@
         _appendAgentMessageStream(blocked);
         return;
       }
+      var leadPayload = _extractLeadPayload(userText);
+      if (leadPayload) {
+        _submitLeadToBackend(leadPayload);
+      }
       _showTyping();
       _callDiamondAgent(userText)
         .then(function (replyText) {
@@ -792,28 +984,15 @@
       _hideTyping();
       var msgs = document.getElementById('rw-messages');
       if (!msgs) return;
+      var full = String(text || '');
+      if (!full) return;
       var div = document.createElement('div');
       div.className = 'rw-msg agent chat-msg agent';
       div.innerHTML = '<div class="rw-msg-avatar">' + _AVATAR + '</div>' +
-        '<div><div class="rw-bubble"></div><div class="rw-ts">' + _ts() + '</div></div>';
+        '<div class="rw-msg-body"><div class="rw-bubble">' + _formatAgentHtml(full) + '</div><div class="rw-ts">' + _ts() + '</div></div>';
       msgs.appendChild(div);
-      var bubble = div.querySelector('.rw-bubble');
-      if (!bubble) return;
-      var full = String(text || '');
-      if (!full) return;
-      var step = full.length > 400 ? 4 : full.length > 120 ? 3 : 2;
-      var i = 0;
-      function tick() {
-        i = Math.min(i + step, full.length);
-        bubble.textContent = full.slice(0, i);
-        _scroll();
-        if (i < full.length) {
-          requestAnimationFrame(tick);
-        } else {
-          _history.push({ role: 'agent', text: full, ts: _ts() });
-        }
-      }
-      requestAnimationFrame(tick);
+      _history.push({ role: 'agent', text: full, ts: _ts() });
+      _scroll();
     }
 
     function open() {
@@ -873,13 +1052,11 @@
     function send() {
       var input = document.getElementById('rw-input');
       if (!input) return;
-      var txt = input.value.trim();
+      var txt = _cleanOutgoingText(input.value);
       if (!txt) return;
       input.value = '';
       input.style.height = 'auto';
       _addMessage(txt, 'user');
-      var qa = document.getElementById('rw-quick-actions');
-      if (qa) qa.style.display = 'none';
       _reply(txt);
     }
 
@@ -907,8 +1084,6 @@
       var input = document.getElementById('rw-input');
       if (input) { input.value = ''; input.style.height = 'auto'; }
       _addMessage(txt, 'user');
-      var qa = document.getElementById('rw-quick-actions');
-      if (qa) qa.style.display = 'none';
       _reply(txt);
     }
 
@@ -926,22 +1101,34 @@
     var closeBtn = document.getElementById('rw-header-close');
     var sendBtn = document.getElementById('rw-send-btn');
     var inputEl = document.getElementById('rw-input');
-    var quickBtns = document.querySelectorAll('.rw-quick-btn');
+    var qaContainer = document.getElementById('rw-quick-actions');
 
     if (closeBtn) closeBtn.addEventListener('click', close);
     if (sendBtn) sendBtn.addEventListener('click', send);
     if (inputEl) {
-      inputEl.addEventListener('keydown', handleKey);
-      inputEl.addEventListener('input', function () { autoResize(this); });
+      inputEl.setAttribute('dir', 'ltr');
+      inputEl.style.direction = 'ltr';
+      inputEl.style.textAlign = 'left';
+      inputEl.addEventListener('keydown', function (e) {
+        _handleInputKeydown(e);
+        handleKey(e);
+      });
+      inputEl.addEventListener('input', function () {
+        _normalizeInputBidi(this);
+        autoResize(this);
+      });
+      inputEl.addEventListener('paste', _handleInputPaste);
     }
-    quickBtns.forEach(function (b2) {
-      b2.addEventListener('click', function () {
-        var act = this.getAttribute('data-action');
+    if (qaContainer) {
+      qaContainer.addEventListener('click', function (e) {
+        var b2 = e.target.closest('.rw-quick-btn');
+        if (!b2) return;
+        var act = b2.getAttribute('data-action');
         if (act) return _handleQuickAction(act);
-        var q = this.getAttribute('data-q');
+        var q = b2.getAttribute('data-q');
         if (q) quickSend(q);
       });
-    });
+    }
 
     /* ── Drag ── */
     (function () {

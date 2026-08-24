@@ -4,6 +4,16 @@
 (function () {
   'use strict';
 
+  /* ── تثبيت أفقي خفيف — عند التحميل فقط ── */
+  function lockPageX() {
+    document.documentElement.scrollLeft = 0;
+    if (document.body) document.body.scrollLeft = 0;
+    if (window.scrollX) window.scrollTo(0, window.scrollY || 0);
+  }
+  lockPageX();
+  window.addEventListener('load', lockPageX);
+  window.addEventListener('resize', lockPageX, { passive: true });
+
   function lang() {
     try {
       return localStorage.getItem('rizq_lang') === 'fr' ? 'fr' : 'ar';
@@ -324,37 +334,7 @@
     document.body.style.overflow = 'hidden';
   }
 
-  if (typeof window.openInlineExpand === 'function') {
-    var _openIE = window.openInlineExpand;
-    window.openInlineExpand = function (card) {
-      _openIE(card);
-      if (!isMobileUx() || !card) return;
-      var panel = document.getElementById('cat-inline-panel');
-      if (!panel) return;
-      var title = (panel.querySelector('.iep-title') || {}).innerHTML || '';
-      var actions = panel.querySelector('.iep-actions');
-      var actionsHtml = '';
-      if (actions) {
-        var actionsCopy = actions.cloneNode(true);
-        var xBtn = actionsCopy.querySelector('.iep-close');
-        if (xBtn) xBtn.remove();
-        actionsHtml = actionsCopy.outerHTML;
-      }
-      var groups = panel.querySelector('.iep-groups');
-      var html = actionsHtml + (groups ? groups.outerHTML : '');
-      panel.style.display = 'none';
-      openRizqSheet(title, html);
-      var catNameEl = card.querySelector('.cat-name');
-      var catName = catNameEl ? catNameEl.textContent.trim() : '';
-      document.querySelectorAll('#rzq-sheet-body .iep-link').forEach(function (link) {
-        link.addEventListener('click', function (e) {
-          e.preventDefault();
-          window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catName)
-            + '&sub=' + encodeURIComponent(link.getAttribute('data-ar') || link.textContent.trim());
-        });
-      });
-    };
-  }
+  /* openInlineExpand على الجوال يستخدم #cat-inline-panel inline (مثل سطح المكتب) */
 
   if (typeof window.closeInlineExpand === 'function') {
     var _closeIE = window.closeInlineExpand;
@@ -364,31 +344,10 @@
     };
   }
 
-  if (typeof window.openQcatPortal === 'function') {
-    var _openQp = window.openQcatPortal;
-    window.openQcatPortal = function (el) {
-      _openQp(el);
-      if (!isMobileUx() || !el) return;
-      var portal = document.getElementById('qcat-portal');
-      if (!portal) return;
-      var title = (portal.querySelector('.qp-title') || {}).innerHTML || '';
-      var links = document.getElementById('qp-links');
-      var actions = portal.querySelector('.qp-actions');
-      portal.style.display = 'none';
-      openRizqSheet(title, (links ? links.innerHTML : '') + (actions ? actions.outerHTML : ''));
-    };
-  }
-
-  document.querySelectorAll('.qcat').forEach(function (el) {
-    el.addEventListener('click', function (e) {
-      if (!isMobileUx()) return;
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof window.openQcatPortal === 'function') window.openQcatPortal(el);
-    });
-  });
-
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeRizqSheet();
+    if (e.key === 'Escape') {
+      closeRizqSheet();
+      if (typeof window.closeQcatPortal === 'function') window.closeQcatPortal(true);
+    }
   });
 })();

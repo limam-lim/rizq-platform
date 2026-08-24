@@ -80,11 +80,12 @@
   function resolvePlanType(pkgName, accountType) {
     var name = String(pkgName || '').replace(/💎\s*/g, '').trim().toLowerCase();
     var type = String(accountType || 'individual').toLowerCase();
+    var tier = resolveDiamondTierClient(pkgName);
+    if (tier === 'diamond_pro') return 'diamond_pro';
+    if (tier === 'diamond_standard') return 'diamond_standard';
     if (isDiamondName(pkgName)) {
-      if (type === 'store' || type === 'shop') return 'store_diamond';
-      if (type === 'office') return 'office_diamond';
-      if (type === 'corp') return 'corp_diamond';
-      return 'store_diamond';
+      if (type === 'corp' && /pro|متقدم/.test(name)) return 'diamond_pro';
+      return 'diamond_standard';
     }
     if (/business|🏢|أعمال/.test(name)) return 'business';
     if (/^pro$|pro\b|باقة\s*pro/.test(name)) return 'pro';
@@ -137,6 +138,8 @@
         if (ent.endDate) accs[accId].pkg_ends_at = ent.endDate;
         if (ent.subscriptionStatus === 'expired' || ent.subscriptionStatus === 'suspended') {
           accs[accId].pkg_status = ent.subscriptionStatus === 'suspended' ? 'suspended' : 'expired';
+        } else if (ent.subscriptionStatus === 'pending') {
+          accs[accId].pkg_status = 'pending';
         } else if (ent.subscriptionStatus === 'active' || ent.subscriptionStatus === 'expiring_soon') {
           accs[accId].pkg_status = ent.subscriptionStatus === 'expiring_soon' ? 'active' : 'active';
         }
@@ -237,8 +240,22 @@
   // من حجب زبون دفع فعلاً بالخطأ).
   var POST_LIMIT_FALLBACK = { individual: 5 };
 
+  var AI_FEATURES = [
+    'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel',
+    'whatsapp_channel', 'calls_channel', 'quota_dashboard',
+  ];
+  var AI_PRO_ONLY = ['auto_reply_calls', 'calls_channel'];
+
   function isDiamondName(name) {
     return /ماس|diamond|diamant/i.test(String(name || ''));
+  }
+
+  function resolveDiamondTierClient(pkgName, pkgId) {
+    var id = String(pkgId || '').toLowerCase();
+    var name = String(pkgName || '');
+    if (/diamond_pro|diam-pro|_pro\b/.test(id) || (/pro|متقدم/i.test(name) && isDiamondName(name))) return 'diamond_pro';
+    if (isDiamondName(name) || /diamond_standard|diam-std|st-diam|of-diam|cp-diam/.test(id)) return 'diamond_standard';
+    return null;
   }
 
   function getPostLimit(accId, category) {
@@ -361,8 +378,9 @@
   var TIER_FEATURES = {
     1: ['unlimited_products','intro_video','analytics','extra_photos'],
     2: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge'],
-    3: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge','auto_reply_calls','vip_manager','ai_agent_full','widget_channel','whatsapp_channel','calls_channel','quota_dashboard'],
+    3: ['unlimited_products','intro_video','analytics','extra_photos','priority_listing','vip_badge','vip_manager','ai_agent_full','widget_channel','whatsapp_channel','quota_dashboard'],
   };
+  var TIER_FEATURES_PRO_ONLY = ['auto_reply_calls','calls_channel'];
 
   // ── تفعيل الباقة (يُستدعى من الأدمن أو مدير رزق الذكي) ─────────
   function activatePackage(accId, pkgName, activatedBy, priceOverride) {
@@ -386,7 +404,8 @@
     history.push({ pkg: pkgName, activatedAt: now.toISOString(), endsAt: ends.toISOString(), days: days, by: activatedBy || 'admin' });
 
     var accExisting = accounts[accId] || {};
-    var diamondOn = isDiamondName(pkgName);
+    var diamondOn = isDiamondName(pkgName) && !isTrial;
+    var diamondTier = diamondOn ? resolveDiamondTierClient(pkgName) : null;
     accounts[accId] = Object.assign(accExisting, {
       id          : accId,
       package     : pkgName,
@@ -395,8 +414,9 @@
       pkg_days    : days,
       pkg_activated_at : now.toISOString(),
       pkg_ends_at : ends.toISOString(),
-      planType    : resolvePlanType(pkgName, accExisting.type) || (diamondOn ? 'store_diamond' : 'free'),
-      subscriptionStatus: 'active',
+      planType    : resolvePlanType(pkgName, accExisting.type) || (diamondOn ? (diamondTier === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard') : 'free'),
+      subscriptionStatus: isTrial ? 'active' : 'active',
+      paymentConfirmed: !isTrial && (activatedBy === 'admin' || (priceOverride != null && priceOverride !== '')),
       activated_by: activatedBy || 'admin',
       reminder_sent: false,
       pkg_history : history,
@@ -405,9 +425,11 @@
       planName    : pkgName,
       tier        : diamondOn ? 'diamond' : (accExisting.tier || ''),
       diamond     : diamondOn,
+      diamondTier : diamondTier,
       widget_enabled : diamondOn ? true : !!accExisting.widget_enabled,
       whatsapp_enabled : diamondOn ? true : !!accExisting.whatsapp_enabled,
-      calls_enabled : diamondOn ? true : !!accExisting.calls_enabled,
+      calls_enabled : (diamondTier === 'diamond_pro') ? true : !!accExisting.calls_enabled,
+      audioAccess : diamondTier === 'diamond_pro',
       quota_guard : diamondOn ? true : !!accExisting.quota_guard,
       ai_model    : diamondOn ? 'advanced' : (accExisting.ai_model || ''),
       channels    : diamondOn ? { widget: true, whatsapp: true, calls: true } : (accExisting.channels || {})
@@ -455,7 +477,7 @@
     // لا بريد. هذا يُزامن نفس بيانات التفعيل مع rizq_package_lifecycle_agent.js
     // (خادم rizq-backend) الذي يولّد فاتورة مستقلة على الخادم ويُسلّمها فوراً
     // عبر واتساب/بريد، ويُفعّل أيضاً متابعة دورة حياة الباقة (تذكير قبل
-    // الانتهاء + إيقاف حقيقي بعد 24 ساعة سماح) — بأفضل جهد، لا يُفشل التفعيل
+    // الانتهاء + إيقاف فوري عند periodEnd) — بأفضل جهد، لا يُفشل التفعيل
     // نفسه إن تعذّر الاتصال بالخادم (نفس مبدأ التدهور السلس المتبع في كل
     // اتصالات الخادم الأخرى بهذا المشروع).
     try{
@@ -476,7 +498,10 @@
             days        : days,
             periodStart : now.toISOString(),
             periodEnd   : ends.toISOString(),
-            activatedBy : activatedBy || 'admin'
+            activatedBy : activatedBy || 'admin',
+            paymentConfirmed: true,
+            paidAt: now.toISOString(),
+            isTrial: isTrial,
           })
         }).then(function(res){ return res.ok ? res.json() : null; }).then(function(data){
           // نحفظ accessToken الذي يُصدره الخادم لهذا الحساب تحديداً — يلزم
@@ -523,7 +548,11 @@
   function checkSubscription(accId) {
     var accounts = getAccounts();
     var acc = accounts[accId];
-    if(!acc || !acc.package) return { status:'no_subscription', daysLeft:0, pkg:null, features:FREE_FEATURES };
+    if(!acc || !acc.package) return { status:'no_subscription', daysLeft:0, pkg:null, features:FREE_FEATURES, acc: acc };
+
+    if (acc.pkg_status === 'pending' || acc.subscriptionStatus === 'pending') {
+      return { status: 'pending', daysLeft: 0, pkg: acc.package, features: FREE_FEATURES.slice(), acc: acc };
+    }
 
     var now = new Date();
     var endsAt = acc.pkg_ends_at ? new Date(acc.pkg_ends_at) : null;
@@ -547,12 +576,30 @@
     // FREE_FEATURES دائماً مشمولة (بما فيها verified_badge و keep_old_ads)
     var features = FREE_FEATURES.slice();
 
-    if(status !== 'expired') {
-      // باقة نشطة → أضف المزايا حسب مستوى الباقة (يعمل مع جميع الفئات الست — انظر getPackageTier)
-      var tier = getPackageTier(acc.package);
-      (TIER_FEATURES[tier]||[]).forEach(function(feat){
-        if(features.indexOf(feat)===-1) features.push(feat);
-      });
+    if(status !== 'expired' && status !== 'pending') {
+      // باقة نشطة — لا AI في التجربة المجانية أبداً
+      if(status === 'trial' || status === 'trial_expiring') {
+        var trialTier = getPackageTier(acc.package);
+        if(trialTier > 2) trialTier = 2;
+        (TIER_FEATURES[trialTier]||[]).forEach(function(feat){
+          if(AI_FEATURES.indexOf(feat)===-1 && features.indexOf(feat)===-1) features.push(feat);
+        });
+      } else {
+        var tier = getPackageTier(acc.package);
+        var tierFeats = (TIER_FEATURES[tier]||[]).slice();
+        var isPro = resolveDiamondTierClient(acc.package) === 'diamond_pro';
+        if(tier >= 3 && !isPro) {
+          tierFeats = tierFeats.filter(function(f){ return TIER_FEATURES_PRO_ONLY.indexOf(f)===-1; });
+        }
+        if(tier >= 3 && isPro) {
+          TIER_FEATURES_PRO_ONLY.forEach(function(f){
+            if(tierFeats.indexOf(f)===-1) tierFeats.push(f);
+          });
+        }
+        tierFeats.forEach(function(feat){
+          if(features.indexOf(feat)===-1) features.push(feat);
+        });
+      }
     }
     // عند الانتهاء: فقط FREE_FEATURES — verified_badge مشمولة فيها دائماً
 
@@ -748,23 +795,42 @@
   }
 
   // ── باقات للتجديد (تعمل مع جميع الفئات الست) ─────────────────────
+  function _packageCatalogMaps() {
+    var cfg = global.RizqPackagesConfig;
+    if (cfg && typeof cfg.getTypeToCatalog === 'function' && typeof cfg.getAccTypeToLsKey === 'function') {
+      return {
+        TYPE_TO_CATALOG: cfg.getTypeToCatalog(),
+        TYPE_TO_LS: cfg.getAccTypeToLsKey()
+      };
+    }
+    return {
+      TYPE_TO_CATALOG: {
+        general: 'general',
+        individual: 'individual',
+        office: 'office',
+        store: 'store',
+        corp: 'corp',
+        video: 'video',
+        tender: 'tender',
+        verified_plus: 'verified_plus'
+      },
+      TYPE_TO_LS: {
+        general: 'rizq_packages',
+        individual: 'rizq_individual_packages',
+        office: 'rizq_office_packages',
+        store: 'rizq_store_packages',
+        corp: 'rizq_corp_packages',
+        video: 'rizq_video_packages',
+        tender: 'rizq_tender_packages',
+        verified_plus: 'rizq_verified_plus_packages'
+      }
+    };
+  }
+
   function getAvailablePackages(accType) {
-    var TYPE_TO_CATALOG = {
-      general   : 'general',
-      individual: 'individual',
-      office    : 'office',
-      store     : 'store',
-      corp      : 'corp',
-      video     : 'video',
-    };
-    var TYPE_TO_LS = {
-      general   : 'rizq_packages',
-      individual: 'rizq_individual_packages',
-      office    : 'rizq_office_packages',
-      store     : 'rizq_store_packages',
-      corp      : 'rizq_corp_packages',
-      video     : 'rizq_video_packages',
-    };
+    var maps = _packageCatalogMaps();
+    var TYPE_TO_CATALOG = maps.TYPE_TO_CATALOG;
+    var TYPE_TO_LS = maps.TYPE_TO_LS;
     if (typeof global.RizqPackagesConfig !== 'undefined' && typeof global.RizqPackagesConfig.getCatalog === 'function') {
       try {
         var fromCfg = global.RizqPackagesConfig.getCatalog(TYPE_TO_CATALOG[accType] || 'general');
@@ -1032,6 +1098,17 @@
       base.flags = analysis.flags;
       requests.push(base);
       localStorage.setItem('rizq_sub_requests', JSON.stringify(requests));
+      if (opts.accountId && (opts.category || 'package') === 'package') {
+        try {
+          var accsPending = getAccounts();
+          if (accsPending[opts.accountId]) {
+            accsPending[opts.accountId].pkg_status = 'pending';
+            accsPending[opts.accountId].subscriptionStatus = 'pending';
+            accsPending[opts.accountId].package = opts.pkgName;
+            saveAccounts(accsPending);
+          }
+        } catch (pe) {}
+      }
       _syncSubRequestToBackend(base);
       return base;
     }
