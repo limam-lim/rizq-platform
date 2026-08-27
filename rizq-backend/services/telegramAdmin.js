@@ -425,11 +425,15 @@ async function handleIncomingMessage(message, deps) {
     replyText = '⚠️ عذراً، حدثت مشكلة مؤقتة. حاول مجدداً أو تواصل عبر direction@rizq.mr';
   }
 
-  await telegramApi('sendMessage', {
-    chat_id: chatId,
-    text: replyText.slice(0, 4096),
-  });
-  console.log('[telegram-bot] reply sent to chat', chatId, '(', replyText.slice(0, 60), '…)');
+  try {
+    await telegramApi('sendMessage', {
+      chat_id: chatId,
+      text: replyText.slice(0, 4096),
+    });
+    console.log('[telegram-bot] reply sent to chat', chatId, '(', replyText.slice(0, 60), '…)');
+  } catch (sendErr) {
+    console.error('[telegram-bot] sendMessage failed:', sendErr.message);
+  }
   return { ok: true, action: 'reply' };
 }
 

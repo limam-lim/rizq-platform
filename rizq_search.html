@@ -20,6 +20,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="description" content="نتائج البحث — رزق | منصة الإعلانات الأولى في موريتانيا"/>
@@ -425,6 +426,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js"></script>
@@ -502,7 +504,7 @@ main, .page-content.active, .main-content, .results-area,
         <option data-ar="نواكشوط الشمالية" data-fr="Nouakchott Nord">نواكشوط الشمالية</option>
         <option data-ar="نواكشوط الجنوبية" data-fr="Nouakchott Sud">نواكشوط الجنوبية</option>
         <option data-ar="نواذيبو" data-fr="Nouadhibou">نواذيبو</option>
-        <option data-ar="تيارت" data-fr="Tiaret">تيارت</option>
+        <option data-ar="تيرس زمور" data-fr="Tiris Zemmour">تيرس زمور</option>
         <option data-ar="ترارزة" data-fr="Trarza">ترارزة</option>
         <option data-ar="براكنة" data-fr="Brakna">براكنة</option>
         <option data-ar="كيفة" data-fr="Kiffa">كيفة</option>
@@ -732,7 +734,7 @@ const CAT_ALIAS = {
 // خريطة ترجمة الولايات/المدن AR→FR
   const WILAYA_MAP_FR = {
     'نواكشوط الغربية':'Nouakchott Ouest','نواكشوط الشمالية':'Nouakchott Nord',
-    'نواكشوط الجنوبية':'Nouakchott Sud','نواذيبو':'Nouadhibou','تيارت':'Tiaret',
+    'نواكشوط الجنوبية':'Nouakchott Sud','نواذيبو':'Nouadhibou','تيرس زمور':'Tiris Zemmour','تيارت':'Nouakchott Nord',
     'ترارزة':'Trarza','براكنة':'Brakna','كيفة':'Kiffa','سيلبابي':'Sélibabi',
     'العيون':'Aïoun el Atrouss','أطار':'Atar','تيجيكجة':'Tidjikdja',
     'ألاك':'Aleg','نعمة':'Néma','روصو':'Rosso'
@@ -1157,8 +1159,16 @@ function renderPage(){
 function _rizqLang(){ try{ return localStorage.getItem('rizq_lang') || 'ar'; }catch(e){ return 'ar'; } }
 // عنوان/وصف الإعلان بحسب اللغة الحالية — مع رجوع للعربية إن لم تتوفر نسخة فرنسية
 // (الإعلانات التجريبية القديمة وبعض الإعلانات الحقيقية المنشورة قبل هذا التحديث لا تحتوي نسخة فرنسية بعد)
-function adTitleLocalized(a){ return (_rizqLang()==='fr' && a.titleFr) ? a.titleFr : a.title; }
-function adDescLocalized(a){ return (_rizqLang()==='fr' && a.descFr) ? a.descFr : a.desc; }
+function adTitleLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.titleFr||a.title||''):(a.title||a.titleFr||'');
+}
+function adDescLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adDesc(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.descFr||a.desc||''):(a.desc||a.descFr||'');
+}
 
 // تعقيم النصوص الديناميكية (وصف/عنوان الإعلان قادم من إدخال المستخدم) قبل حقنها عبر innerHTML — يمنع XSS مخزّن
 function escapeHtml(s){
@@ -1378,6 +1388,8 @@ function rizqShare(title, url) {
       'nav-account': 'حسابي',
       'nav-home': 'الرئيسية',
       'nav-search-ph': 'ابحث في رزق...',
+      'nav-disclaimer': '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع',
+      'nav-disclaimer-title': 'اضغط للإشعار القانوني الكامل',
       // Search page
       'all-cats': 'كل الأقسام',
       'results-label': 'نتيجة',
@@ -1475,6 +1487,8 @@ function rizqShare(title, url) {
       'nav-account': 'Mon compte',
       'nav-home': 'Accueil',
       'nav-search-ph': 'Rechercher sur Rizq...',
+      'nav-disclaimer': '⚖️ Rizq = plateforme de diffusion uniquement — vérifiez avant paiement',
+      'nav-disclaimer-title': 'Cliquez pour l\'avis juridique complet',
       // Search page
       'all-cats': 'Toutes les catégories',
       'results-label': 'résultat(s)',
@@ -1595,6 +1609,12 @@ function rizqShare(title, url) {
       const key = el.dataset.ph;
       if (t[key]) el.placeholder = t[key];
     });
+
+    var nd = document.getElementById('nav-disclaimer-txt');
+    if (nd && t['nav-disclaimer']) {
+      nd.textContent = t['nav-disclaimer'];
+      nd.title = t['nav-disclaimer-title'] || '';
+    }
 
     // الأقسام في select — bidirectional بدون reload
     if (lang === 'fr') {

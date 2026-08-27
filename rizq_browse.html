@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -592,12 +593,14 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
 
@@ -686,6 +689,12 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
             <option value="كيفة" data-ar="كيفة" data-fr="Kiffa">كيفة</option>
             <option value="روصو" data-ar="روصو" data-fr="Rosso">روصو</option>
             <option value="ترارزة" data-ar="ترارزة" data-fr="Trarza">ترارزة</option>
+            <option value="تيرس زمور" data-ar="تيرس زمور" data-fr="Tiris Zemmour">تيرس زمور</option>
+            <option value="براكنة" data-ar="براكنة" data-fr="Brakna">براكنة</option>
+            <option value="سيلبابي" data-ar="سيلبابي" data-fr="Sélibabi">سيلبابي</option>
+            <option value="تيجيكجة" data-ar="تيجيكجة" data-fr="Tidjikja">تيجيكجة</option>
+            <option value="ألاك" data-ar="ألاك" data-fr="Aleg">ألاك</option>
+            <option value="نعمة" data-ar="نعمة" data-fr="Néma">نعمة</option>
           </select>
         </div>
 
@@ -903,6 +912,7 @@ const WILAYA_COORDS = {
   'كيفة':{lat:16.62,lon:-11.40},
   'روصو':{lat:16.51,lon:-15.80},
   'ترارزة':{lat:17.55,lon:-15.60},
+  'تيرس زمور':{lat:22.75,lon:-12.50},
   'براكنة':{lat:17.50,lon:-14.25},
   'العيون':{lat:16.69,lon:-9.61},
   'تيجيكجة':{lat:18.55,lon:-11.43},
@@ -944,7 +954,7 @@ const AD_CAT_FR = {'عقارات':'Immobilier','سيارات':'Voitures','شاح
 const AD_SUBCAT_FR = {'شقق للكراء':'Appartements à louer','غرف للكراء':'Chambres à louer','سيارات للبيع':'Voitures à vendre','سيارات للكراء':'Voitures à louer','سيارات كهربائية وهجينة':'Voitures électriques et hybrides','دراجات نارية':'Motos','قطع غيار':'Pièces détachées','إطارات وبطاريات':'Pneus & batteries','شاحنات للبيع':'Camions à vendre','شاحنات للكراء':'Camions à louer','حافلات وباصات':'Bus & autocars','معدات بناء':'Engins de construction','معدات زراعية':'Engins agricoles','هواتف ذكية':'Smartphones','لابتوب وحاسوب':'PC & Laptops','شاشات وتلفزيون':'Écrans & TV','أجهزة منزلية':'Électroménager','كاميرات ودرونز':'Caméras & drones','دراعة رجالية':"Boubou homme",'ملحفة نسائية':'Melhfa femme','ملابس رجالية':'Vêtements homme','ملابس نسائية وأطفال':'Vêtements femme & enfant','أحذية وحقائب':'Chaussures & sacs','ذهب عيار 24':'Or 24 carats','ذهب عيار 22':'Or 22 carats','ذهب عيار 21':'Or 21 carats','أساور وخلاخيل':'Bracelets','خواتم وحلقات':'Bagues & alliances','إبل':'Chameaux','بقر':'Bovins','غنم وماعز':'Moutons & chèvres','دواجن وطيور':'Volailles','أعلاف ومستلزمات':'Aliments & accessoires','نقل وشحن':'Transport & livraison','تنظيف':'Nettoyage','تصميم وبرمجة':'Design & dev','بناء ودهان وسباكة':'Maçonnerie','دروس خصوصية':'Cours particuliers','هندسة وتقنية':'Ingénierie','إدارة وتسويق':'Marketing','صحة وطب':'Santé & médecine','تعليم وتدريب':'Éducation & formation','فريلانس':'Freelance','أسمنت وحديد':'Ciment & fer','طوب وسيراميك':'Brique & céramique','سباكة وكهرباء':'Plomberie & électricité','ألواح شمسية':'Panneaux solaires','أدوات بناء':'Outils de construction'};
 function catFrOf(c){return AD_CAT_FR[c]||c;}
 function subcatFrOf(s){return AD_SUBCAT_FR[s]||s;}
-const WILAYA_FR={'نواكشوط الغربية':'Nouakchott Ouest','نواكشوط الشمالية':'Nouakchott Nord','نواكشوط الجنوبية':'Nouakchott Sud','نواكشوط':'Nouakchott','نواذيبو':'Nouadhibou','أطار':'Atar','كيفة':'Kiffa','روصو':'Rosso','كيهيدي':'Kaédi','سيلبابي':'Sélibaby','تجكجة':'Tidjikja','عيون العتروس':'Aïoun El-Atrouss','نعمة':'Néma','ازويرات':'Zouerate','ألاك':'Aleg'};
+const WILAYA_FR={'نواكشوط الغربية':'Nouakchott Ouest','نواكشوط الشمالية':'Nouakchott Nord','نواكشوط الجنوبية':'Nouakchott Sud','نواكشوط':'Nouakchott','نواذيبو':'Nouadhibou','أطار':'Atar','كيفة':'Kiffa','روصو':'Rosso','كيهيدي':'Kaédi','سيلبابي':'Sélibaby','تيجيكجة':'Tidjikja','تجكجة':'Tidjikja','تيرس زمور':'Tiris Zemmour','تيارت':'Nouakchott Nord','عيون العتروس':'Aïoun El-Atrouss','العيون':'Aïoun el Atrouss','نعمة':'Néma','ازويرات':'Zouerate','ألاك':'Aleg','براكنة':'Brakna','ترارزة':'Trarza'};
 function locFr(loc,wilaya){var w=wilaya||'';var fr=WILAYA_FR[w]||w;if(!loc)return fr||'';return '📍 '+fr;}
 function priceFr(p){if(!p)return '';return p.replace('/شهر','/mois').replace('/يوم','/jour').replace('/طن','/tonne').replace('يبدأ من','À partir de').replace('تفاوض','À négocier').replace('راتب يحدد عند المقابلة','Salaire à définir');}
 function dateFr(d){if(!d)return '';return d.replace('منذ ساعتين','il y a 2h').replace(/منذ (\d+) ساعات?/,'il y a $1h').replace('منذ ساعة','il y a 1h').replace('أمس','hier').replace('منذ يومين','il y a 2j').replace('منذ يوم','il y a 1j').replace(/منذ (\d+) أيام?/,'il y a $1j').replace('منذ أسبوعين','il y a 2 sem.').replace('منذ أسبوع','il y a 1 sem.').replace(/منذ (\d+) أسابيع?/,'il y a $1 sem.').replace(/منذ (\d+) أشهر?/,'il y a $1 mois');}
@@ -986,13 +996,19 @@ function _mapRawAdsToDisplay(rawList){
         : (typeof RizqSub!=='undefined' && typeof RizqSub.isAdBoosted==='function' && RizqSub.isAdBoosted(a.id));
       var _origP = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,''))||0;
       var _discountPct = (_origP>0 && p>0 && _origP>p) ? Math.round((1-(p/_origP))*100) : 0;
-      return {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
+      var item = {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
         title:a.title||noTitle,desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):negotiable,
         priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
         images:Array.isArray(a.images)?a.images:[],
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
-        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||''};
+        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
+        accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
+        sellerContact:a.sellerContact||null};
+      if(!item.contactsLocked && a.sellerContact){
+        item.phone = a.sellerContact.phone || a.sellerContact.whatsapp || '';
+      }
+      return item;
     });
 }
 
@@ -1074,6 +1090,20 @@ function _rizqLang(){
   try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}
 }
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function adTitleLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.titleFr||a.title||''):(a.title||a.titleFr||'');
+}
+function adDescLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adDesc(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.descFr||a.desc||''):(a.desc||a.descFr||'');
+}
+function _langFallbackNoteHtml(sourceLang, asBlock){
+  if(typeof RizqLocale==='undefined'||!sourceLang) return '';
+  return RizqLocale.fallbackNoteHtml(sourceLang, _rizqLang(), asBlock);
+}
 
 // TRANSLATIONS
 const TRANSLATIONS = {
@@ -1201,9 +1231,12 @@ function toggleLangPage(){
 
 // FILTER ENGINE
 const CAT_ALIAS = {
-  'منازل وعقارات':'عقارات','سيارات وقطع غيار':'سيارات','شاحنات ومعدات ثقيلة':'شاحنات',
-  'هواتف وإلكترونيات':'إلكترونيات','موضة وأزياء':'أزياء','ذهب ومجوهرات':'ذهب',
-  'ماشية ودواجن وبيطرة':'ماشية','ماشية ودواجن':'ماشية','خدمات ومهن':'خدمات','وظائف وفرص عمل':'وظائف','بناء ومقاولات':'بناء'
+  'منازل وعقارات':'عقارات','سيارات وقطع غيار':'سيارات','وكالات تأمين المركبات':'تأمين',
+  'شاحنات ومعدات ثقيلة':'شاحنات','هواتف وإلكترونيات':'إلكترونيات','موضة وأزياء':'أزياء',
+  'ذهب ومجوهرات':'ذهب','صحة وجمال':'صحة','وظائف وفرص عمل':'وظائف','خدمات ومهن':'خدمات',
+  'أثاث وديكور':'أثاث','بناء ومقاولات':'بناء','تجارة وصناعة':'تجارة','رياضة وهوايات':'رياضة',
+  'تعليم وثقافة':'تعليم','أغذية ومطاعم':'أغذية','فنون وحرف يدوية':'فنون','ماشية ودواجن وبيطرة':'ماشية',
+  'ماشية ودواجن':'ماشية'
 };
 const SUBCATS_BY_CAT = {
   'سيارات':['سيارات للبيع','سيارات للكراء','سيارات كهربائية وهجينة','دراجات نارية','قطع غيار','إطارات وبطاريات'],
@@ -1309,7 +1342,7 @@ function renderResultList(){
     const svgIcon=iconHTML(a.emoji);
     const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
     const catLabel=fr?catFrOf(a.cat):a.cat;
-    const _title=fr?(a.titleFr||a.title):a.title;
+    const _title=adTitleLocalized(a);
     const _price=fr?priceFr(a.price||''):(a.price||'');
     const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
     return `<div class="rc ${isActive}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
@@ -1381,7 +1414,11 @@ function renderDetailPanel(ad){
   const subcatLabel=fr?subcatFrOf(ad.subcat||''):(ad.subcat||'');
 
   // Description (declared first to avoid TDZ bug in image block)
-  const adTitle=fr?(ad.titleFr||ad.title):ad.title;
+  var titlePick=(typeof RizqLocale!=='undefined')?RizqLocale.adTitlePick(ad,lang):{text:fr?(ad.titleFr||ad.title||''):(ad.title||ad.titleFr||''),isFallback:false,sourceLang:null};
+  var descPick=(typeof RizqLocale!=='undefined')?RizqLocale.adDescPick(ad,lang):{text:fr?(ad.descFr||ad.desc||''):(ad.desc||ad.descFr||''),isFallback:false,sourceLang:null};
+  const adTitle=titlePick.text;
+  const titleFallbackNote=titlePick.isFallback?_langFallbackNoteHtml(titlePick.sourceLang,true):'';
+  const descFallbackNote=descPick.isFallback?_langFallbackNoteHtml(descPick.sourceLang,true):'';
 
   // Gallery icons
   const extraIcons=(GALLERY_ICONS_EXTRA[ad.cat]||GALLERY_ICONS_EXTRA['default']);
@@ -1408,7 +1445,7 @@ function renderDetailPanel(ad){
   const adPrice=fr?priceFr(ad.price||''):(ad.price||'');
   const adLoc=fr?locFr(ad.loc,ad.wilaya):(ad.loc||ad.wilaya||'');
   const adDate=fr?dateFr(ad.date||''):(ad.date||'');
-  const descText=escapeHtml(fr?(ad.descFr||ad.desc||''):(ad.desc||''));
+  const descText=escapeHtml(descPick.text);
 
   // Specs
   const specIcons=CAT_SPEC_ICONS[ad.cat]||CAT_SPEC_ICONS['default'];
@@ -1437,7 +1474,7 @@ function renderDetailPanel(ad){
 
   // Similar ads (3 from same category)
   const similar=ALL_ADS.filter(x=>x.cat===ad.cat&&String(x.id)!==String(ad.id)).slice(0,4);
-  const similarHTML=similar.length?similar.map(s=>`<div class="dp-sim-card" onclick="selectAd('${String(s.id).replace(/'/g,"\\'")}')"><div class="dp-sim-img">${iconHTML(s.emoji)}</div><div class="dp-sim-body"><div class="dp-sim-title">${escapeHtml(fr?(s.titleFr||s.title):s.title)}</div><div class="dp-sim-price">${escapeHtml(fr?priceFr(s.price||''):s.price)}</div><div class="dp-sim-loc">${escapeHtml(fr?locFr(s.loc,s.wilaya):s.loc)}</div></div></div>`).join(''):
+  const similarHTML=similar.length?similar.map(s=>`<div class="dp-sim-card" onclick="selectAd('${String(s.id).replace(/'/g,"\\'")}')"><div class="dp-sim-img">${iconHTML(s.emoji)}</div><div class="dp-sim-body"><div class="dp-sim-title">${escapeHtml(adTitleLocalized(s))}</div><div class="dp-sim-price">${escapeHtml(fr?priceFr(s.price||''):s.price)}</div><div class="dp-sim-loc">${escapeHtml(fr?locFr(s.loc,s.wilaya):s.loc)}</div></div></div>`).join(''):
     `<p style="font-size:12px;color:var(--text-muted)">${fr?'Aucune annonce similaire':'لا توجد إعلانات مشابهة'}</p>`;
 
   // Price period
@@ -1469,7 +1506,7 @@ function renderDetailPanel(ad){
     </div>
 
     <!-- Title -->
-    <h1 class="dp-title">${escapeHtml(adTitle)}</h1>
+    <h1 class="dp-title">${escapeHtml(adTitle)}${titleFallbackNote}</h1>
     <div class="dp-meta-row">
       <span class="dp-loc">${escapeHtml(adLoc)}</span>
       <span class="dp-date">${escapeHtml(adDate)}</span>
@@ -1488,7 +1525,7 @@ function renderDetailPanel(ad){
     <!-- Description -->
     <div class="section-block">
       <div class="section-block-title">${_t('dp-desc')}</div>
-      <div class="desc-text" id="dp-desc-text">${descText}</div>
+      <div class="desc-text" id="dp-desc-text">${descText}${descFallbackNote}</div>
       <button class="btn-read-more" id="dp-read-more-btn" onclick="dpToggleDesc()">${_t('dp-read-more')}</button>
     </div>
 
@@ -1582,6 +1619,13 @@ function renderDetailPanel(ad){
 // ══════════ DETAIL ACTIONS ══════════
 function dpRevealPhone(){
   if(!window._currentAd)return;
+  var ad = window._currentAd;
+  if(ad.contactsLocked || !ad.phone){
+    if(window.RizqContactGate && ad.accountId){
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+    }
+    return;
+  }
   const reveal=document.getElementById('dp-phone-reveal');
   const hint=document.getElementById('dp-phone-hint');
   if(!reveal)return;
@@ -1595,7 +1639,14 @@ function dpRevealPhone(){
 }
 function dpCallNow(){
   if(!window._currentAd)return;
-  const phone=window._currentAd.phone||'';
+  var ad = window._currentAd;
+  if(ad.contactsLocked || !ad.phone){
+    if(window.RizqContactGate && ad.accountId){
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+    }
+    return;
+  }
+  const phone=ad.phone||'';
   if(phone){window.location.href='tel:'+phone.replace(/\s/g,'');}
   else showToast(_rizqLang()==='fr'?'Pas de numéro disponible':'لا يوجد رقم هاتف');
 }

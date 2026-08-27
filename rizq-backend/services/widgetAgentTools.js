@@ -30,7 +30,7 @@ function readAdBoosts() { return readJson(AD_BOOSTS_FILE, {}); }
 
 const ACCOUNT_PUBLIC = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'category',
-  'whatsapp', 'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 
 function isBoosted(adId) {

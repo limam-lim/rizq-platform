@@ -457,12 +457,14 @@ function _trackAdListingVisit(ad){
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
 
@@ -534,7 +536,7 @@ function _trackAdListingVisit(ad){
       <h1 class="listing-title" data-fr="Appartement de luxe 3 chambres — Nouakchott Ouest">شقة فاخرة 3 غرف — نواكشوط الغربية</h1>
       <div class="listing-meta-row">
         <span class="badge badge-verified" data-fr="✅ Vérifié">✅ موثّق</span>
-        <span class="listing-loc" data-fr="📍 Nouakchott Ouest — quartier Tiyaret">📍 نواكشوط الغربية — حي تيارت</span>
+        <span class="listing-loc" data-fr="📍 Nouakchott Nord — quartier Teyaret">📍 نواكشوط الشمالية — حي تيارت</span>
         <span class="listing-date" data-fr="🕐 Il y a 2 heures">🕐 منذ ساعتين</span>
         <span class="listing-views" id="views-count" data-fr="👁 1 247 vues">👁 1,247 مشاهدة</span>
       </div>
@@ -629,7 +631,7 @@ Conditions de location :
     <!-- Location -->
     <div class="section-block">
       <div class="section-block-title" data-t="location">📍 الموقع</div>
-      <p id="loc-detail" style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-fr="Nouakchott Ouest — quartier Tiyaret, près de l'hôpital de l'Amitié">نواكشوط الغربية — حي تيارت، قرب مستشفى الصداقة</p>
+      <p id="loc-detail" style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-fr="Nouakchott Nord — quartier Teyaret, près de l'hôpital de l'Amitié">نواكشوط الشمالية — حي تيارت، قرب مستشفى الصداقة</p>
       <div style="border-radius:12px;overflow:hidden;height:200px;border:1px solid rgba(13,27,42,.08)">
         <iframe
           src="https://www.openstreetmap.org/export/embed.html?bbox=-16.02,-17.97,-15.92,-17.89&layer=mapnik&marker=-17.93,-15.97"
@@ -809,8 +811,17 @@ function _mapRawAdToListing(a){
     loc: a.wilaya||'غير محدد', seller: 'صاحب الإعلان', phone: '',
     emoji: a.emoji||'📦', desc: a.desc||'', descFr: a.descFr||'', cat: a.category||'', subcat: a.subcat||'',
     verified: _badges.verified, pin: (_badges.premium || _boosted), boosted: _boosted, images: Array.isArray(a.images) ? a.images : [],
-    stockQty: (a.stockQty!=null && Number.isFinite(Number(a.stockQty))) ? Number(a.stockQty) : null
+    stockQty: (a.stockQty!=null && Number.isFinite(Number(a.stockQty))) ? Number(a.stockQty) : null,
+    contactsLocked: !!a.contactsLocked,
+    contactAccess: a.contactAccess || null,
+    sellerContact: a.sellerContact || null
   };
+  if (!out.contactsLocked && a.sellerContact) {
+    out.phone = a.sellerContact.phone || a.sellerContact.whatsapp || '';
+    out.whatsapp = a.sellerContact.whatsapp || '';
+    out.email = a.sellerContact.email || '';
+  }
+  return out;
 }
 
 // ── تحميل إعلان حقيقي من localStorage['rizq_ads'] إذا لم يكن من القائمة التجريبية الثابتة ──
@@ -831,7 +842,8 @@ function loadRealAdById(id){
 async function _rizqFetchAdFromBackend(id){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE) return null;
-    const r = await fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads/' + encodeURIComponent(id));
+    const headers = (window.RizqContactGate && RizqContactGate.authHeaders) ? RizqContactGate.authHeaders() : {};
+    const r = await fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads/' + encodeURIComponent(id), { headers: headers });
     if(!r.ok) return null;
     const data = await r.json();
     return data && data.ad ? _mapRawAdToListing(data.ad) : null;
@@ -857,8 +869,16 @@ function _rizqTrackRecentlyViewed(adId){
 function _rizqLang(){ try{ return localStorage.getItem('rizq_lang') || 'ar'; }catch(e){ return 'ar'; } }
 // عنوان/وصف الإعلان بحسب اللغة الحالية — مع رجوع للعربية إن لم تتوفر نسخة فرنسية
 // (إعلانات القائمة التجريبية الثابتة ALL_ADS_DATA لا تحتوي حقول فرنسية أصلاً، فتُعرض بالعربية دوماً)
-function adTitleLocalized(a){ return (_rizqLang()==='fr' && a.titleFr) ? a.titleFr : a.title; }
-function adDescLocalized(a){ return (_rizqLang()==='fr' && a.descFr) ? a.descFr : a.desc; }
+function adTitleLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.titleFr||a.title||''):(a.title||a.titleFr||'');
+}
+function adDescLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adDesc(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.descFr||a.desc||''):(a.desc||a.descFr||'');
+}
 
 // ── استقبال إعلان مُسلَّم من صفحة أخرى (مثل rizq_landing_v8.html) عبر localStorage['rizq_active_ad'] ──
 // لماذا: إعلانات الصفحة الرئيسية (ADS/FEATURED_ADS) لها مخطط بيانات أغنى (tags/loc ثنائي اللغة) غير
@@ -1062,10 +1082,19 @@ function renderLocAndStats(ad){
   updateCategoryDisplay(ad);
   updatePricePeriod(ad);
 
-  // تحديث العنوان (بحسب اللغة الحالية — مع رجوع للعربية إن لم تتوفر نسخة فرنسية)
-  const adTitleL = adTitleLocalized(ad), adDescL = adDescLocalized(ad);
+  // تحديث العنوان (بحسب اللغة الحالية — مع رجوع للغة الأخرى + ملاحظة عند الحاجة)
+  var titlePick=(typeof RizqLocale!=='undefined')?RizqLocale.adTitlePick(ad):{text:adTitleLocalized(ad),isFallback:false,sourceLang:null};
+  var descPick=(typeof RizqLocale!=='undefined')?RizqLocale.adDescPick(ad):{text:adDescLocalized(ad),isFallback:false,sourceLang:null};
+  const adTitleL = titlePick.text, adDescL = descPick.text;
   const titleEl = document.querySelector('.listing-title, h1.title, .ad-title');
-  if(titleEl) titleEl.textContent = adTitleL;
+  if(titleEl){
+    titleEl.textContent = adTitleL;
+    var oldNote=titleEl.querySelector('.rizq-lang-fallback');
+    if(oldNote) oldNote.remove();
+    if(titlePick.isFallback&&typeof RizqLocale!=='undefined'){
+      titleEl.insertAdjacentHTML('beforeend', RizqLocale.fallbackNoteHtml(titlePick.sourceLang, _rizqLang(), true));
+    }
+  }
   document.title = adTitleL + ' | رزق';
 
   // تحديث الـ meta
@@ -1122,8 +1151,18 @@ function renderLocAndStats(ad){
   }
 
   // تحديث الوصف — textContent (لا innerHTML) لمنع XSS مخزّن عبر وصف إعلان مستخدم؛ الأسطر تُحفظ بصرياً عبر white-space:pre-line في CSS
-  const descEl = document.getElementById('desc-text');
-  if(descEl) descEl.textContent = adDescL;
+  var descEl = document.getElementById('desc-text');
+  if(descEl){
+    descEl.textContent = adDescL;
+    var descNoteEl = document.getElementById('desc-lang-fallback');
+    if(descNoteEl) descNoteEl.remove();
+    if(descPick.isFallback && typeof RizqLocale !== 'undefined'){
+      var note = document.createElement('div');
+      note.id = 'desc-lang-fallback';
+      note.innerHTML = RizqLocale.fallbackNoteHtml(descPick.sourceLang, _rizqLang(), true);
+      descEl.insertAdjacentElement('afterend', note);
+    }
+  }
 
   // تحديث breadcrumb
   const bcEl = document.getElementById('bc-ad-title');
@@ -1147,13 +1186,17 @@ function renderLocAndStats(ad){
   _trackAdListingVisit(ad);
   _initFavButton(ad);
   const revealBtn = document.getElementById('phone-reveal');
-  if(revealBtn && !ad.phone){
-    revealBtn.onclick = (e) => {
+  if(revealBtn && (ad.contactsLocked || !ad.phone)){
+    revealBtn.onclick = function(e){
       e.preventDefault();
-      alert(_rizqLang()==='fr' ? 'Le propriétaire de l\'annonce n\'a pas encore enregistré de numéro de contact.' : 'لم يسجّل صاحب الإعلان رقم تواصل بعد.');
+      if(window.RizqContactGate && ad.accountId){
+        RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+        return;
+      }
+      alert(_rizqLang()==='fr' ? 'Coordonnées masquées — abonnement actif requis.' : 'بيانات التواصل مخفية — يلزم اشتراك مدفوع نشط.');
     };
     const phoneEl = document.getElementById('phone-num');
-    if(phoneEl) phoneEl.textContent = '---';
+    if(phoneEl) phoneEl.textContent = ad.contactsLocked ? '••• ••• •••' : '---';
   }
   // إن وُجد رقم: revealPhone() تعمل تلقائياً من HTML — لا حاجة لأي override هنا ✓
 
@@ -1307,22 +1350,42 @@ function toggleDesc(){
 }
 
 function revealPhone(){
+  var ad = window._currentAd || {};
+  if(ad.contactsLocked || !ad.phone){
+    if(window.RizqContactGate && ad.accountId){
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+    }
+    return;
+  }
   const reveal = document.getElementById('phone-reveal');
   const num = document.getElementById('phone-num');
   reveal.classList.add('shown');
-  var phone = (window._currentAd && window._currentAd.phone) || '';
+  var phone = ad.phone || '';
   num.textContent = phone.replace('+222','').trim();
   document.querySelector('.phone-hint').textContent = _rizqLang()==='fr' ? '📞 Appuyer pour appeler' : '📞 اضغط للاتصال';
   reveal.onclick = ()=>{ window.location='tel:'+phone; };
 }
 
 function callNow(){
-  var phone = (window._currentAd && window._currentAd.phone) || '';
-  window.location = 'tel:' + phone;
+  var ad = window._currentAd || {};
+  if(ad.contactsLocked || !ad.phone){
+    if(window.RizqContactGate && ad.accountId){
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+    }
+    return;
+  }
+  window.location = 'tel:' + ad.phone;
 }
 
 function openWhatsApp(){
-  var phone = (window._currentAd && window._currentAd.phone) || '';
+  var ad = window._currentAd || {};
+  var phone = ad.whatsapp || ad.phone || '';
+  if(ad.contactsLocked || !phone){
+    if(window.RizqContactGate && ad.accountId){
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+    }
+    return;
+  }
   var clean = phone.replace(/[^0-9]/g,'');
   if(!clean.startsWith('222')) clean = '222' + clean;
   window.open('https://wa.me/' + clean + '?text=' + encodeURIComponent('مرحباً، رأيت إعلانك على منصة رزق وأود الاستفسار'), '_blank');

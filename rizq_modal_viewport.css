@@ -1,0 +1,120 @@
+/* rizq_modal_viewport.css — modal/popup clearance below fixed nav (all viewports) */
+
+:root {
+  --rzq-nav-clearance: 72px;
+  --rzq-z-modal: 10050;
+}
+
+html.rizq-app-nav body.landing-ux-mobile {
+  --rzq-nav-clearance: 120px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --rzq-nav-clearance: 64px;
+  }
+  html.rizq-app-nav body.landing-ux-mobile {
+    --rzq-nav-clearance: 120px;
+  }
+}
+
+body.rizq-dash {
+  --rzq-nav-clearance: 68px;
+}
+
+/* Unified stacking above fixed nav (1000) */
+.disc-overlay,
+#sub-modal-overlay,
+#suggest-cat-overlay,
+.rvid-overlay,
+.cs-modal-overlay,
+.rizq-modal-overlay,
+.modal-overlay,
+#pkg-modal,
+#pay-modal,
+#ad-boost-modal,
+#my-pay-modal,
+#svc-upgrade-modal,
+#ad-modal,
+#all-ads-modal,
+.modal-bg,
+#bank-modal-overlay,
+#rzv-preview-overlay {
+  z-index: var(--rzq-z-modal) !important;
+}
+
+#sub-modal,
+#suggest-cat-modal {
+  z-index: calc(var(--rzq-z-modal) + 1) !important;
+}
+
+/* Full-viewport shells — scrollable, start below sticky header */
+.modal-overlay.open,
+.disc-overlay.open,
+.disc-overlay[style*="flex"],
+.rvid-overlay.active,
+.cs-modal-overlay.active,
+.rizq-modal-overlay.open,
+#pkg-modal[style*="flex"],
+#pay-modal[style*="flex"],
+#ad-boost-modal[style*="flex"],
+#my-pay-modal[style*="flex"],
+#svc-upgrade-modal[style*="flex"],
+#sub-modal-overlay[style*="block"],
+#suggest-cat-overlay[style*="block"],
+#ad-modal[style*="flex"],
+#all-ads-modal[style*="flex"],
+.modal-bg[style*="flex"],
+#bank-modal-overlay[style*="flex"],
+#rzv-preview-overlay[style*="flex"] {
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding-top: calc(var(--rzq-nav-clearance) + env(safe-area-inset-top, 0px) + 12px) !important;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+  padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  z-index: var(--rzq-z-modal) !important;
+}
+
+/* Centered fixed dialogs repositioned below nav */
+#sub-modal[style*="block"],
+#suggest-cat-modal[style*="block"] {
+  left: 50% !important;
+  top: calc(var(--rzq-nav-clearance) + env(safe-area-inset-top, 0px) + 20px) !important;
+  transform: translateX(-50%) !important;
+  max-height: calc(100dvh - var(--rzq-nav-clearance) - env(safe-area-inset-top, 0px) - 40px) !important;
+  overflow-y: auto !important;
+  z-index: calc(var(--rzq-z-modal) + 1) !important;
+}
+
+#sub-modal-overlay[style*="block"],
+#suggest-cat-overlay[style*="block"] {
+  z-index: var(--rzq-z-modal) !important;
+}
+
+/* Inner panels — bounded height, close button stays reachable */
+#pkg-modal-box,
+#sub-modal,
+#suggest-cat-modal,
+.disc-modal,
+.rvid-modal,
+.cs-modal-box,
+.modal-overlay .modal-box,
+.rizq-modal-overlay .rizq-modal-box,
+#ad-modal-box,
+#all-ads-modal-box,
+#pay-modal > div[style*="border-radius"],
+#ad-boost-modal > div[style*="border-radius"],
+#my-pay-modal > div[style*="border-radius"],
+#svc-upgrade-modal > div[style*="border-radius"] {
+  max-height: calc(100dvh - var(--rzq-nav-clearance) - env(safe-area-inset-top, 0px) - 32px) !important;
+  overflow-y: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: auto !important;
+}
+
+#pkg-modal {
+  z-index: var(--rzq-z-modal) !important;
+}

@@ -1,5 +1,6 @@
 /**
  * rizq_packages_config.js
+ * © Rizq ADMINIA SARL — Proprietary & Confidential
  * المصدر الموحّد لأسعار ومزايا باقات رزق — يقرأه الوكلاء والأدوات فقط من هنا.
  *
  * المصدر المعتمد: PKG_DEFAULTS في rizq_admin.html (كتالوج الأدمن).
@@ -36,31 +37,34 @@ var NAMES = {
   diamond_pro: { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
   'ind-free':    { ar: 'مجانية', fr: 'Gratuit', en: 'Free', es: 'Gratis', hs: 'مجانية' },
   'ind-boost':   { ar: 'مميزة', fr: 'Mise en avant', en: 'Boost', es: 'Destacado', hs: 'مميزة' },
+  'ind-medium':  { ar: 'باقة متوسطة', fr: 'Forfait intermédiaire', en: 'Medium bundle', es: 'Paquete medio', hs: 'باقة متوسطة' },
   'ind-monthly': { ar: 'باقة شهرية', fr: 'Mensuel', en: 'Monthly', es: 'Mensual', hs: 'باقة شهرية' },
   'st-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'st-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'st-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'st-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'st-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
-  'st-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
-  'st-diam':  { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
+  'st-diam-std': { ar: 'الماسية الأساسية للمحلات', fr: 'Diamant Standard boutique', en: 'Store Diamond Standard', es: 'Diamante Standard tienda', hs: 'الماسية الأساسية للمحلات' },
+  'st-diam-pro': { ar: 'الماسية Pro للمحلات', fr: 'Diamant Pro boutique', en: 'Store Diamond Pro', es: 'Diamante Pro tienda', hs: 'الماسية Pro للمحلات' },
+  'st-diam':  { ar: 'الماسية الأساسية للمحلات', fr: 'Diamant Standard boutique', en: 'Store Diamond Standard', es: 'Diamante Standard tienda', hs: 'الماسية الأساسية للمحلات' },
   'cp-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'cp-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'cp-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'cp-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'cp-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
-  'cp-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
-  'cp-diam':  { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
+  'cp-diam-std': { ar: 'الماسية الأساسية للشركات', fr: 'Diamant Standard entreprise', en: 'Corp Diamond Standard', es: 'Diamante Standard empresa', hs: 'الماسية الأساسية للشركات' },
+  'cp-diam-pro': { ar: 'الماسية Pro للشركات', fr: 'Diamant Pro entreprise', en: 'Corp Diamond Pro', es: 'Diamante Pro empresa', hs: 'الماسية Pro للشركات' },
+  'cp-diam':  { ar: 'الماسية الأساسية للشركات', fr: 'Diamant Standard entreprise', en: 'Corp Diamond Standard', es: 'Diamante Standard empresa', hs: 'الماسية الأساسية للشركات' },
   'of-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'of-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'of-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'of-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
-  'of-diam-std': { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
-  'of-diam-pro': { ar: 'الماسية المتقدمة 💎 Pro', fr: 'Diamant Pro 💎', en: 'Diamond Pro 💎', es: 'Diamante Pro 💎', hs: 'الماسية المتقدمة 💎 Pro' },
-  'of-diam':  { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎', en: 'Diamond Standard 💎', es: 'Diamante Standard 💎', hs: 'الماسية الأساسية 💎' },
-  'vid-basic':    { ar: 'أساسي (فيديو)', fr: 'Basique (vidéo)', en: 'Basic (video)', es: 'Básico (video)', hs: 'أساسي (فيديو)' },
-  'vid-pro':      { ar: 'احترافي (فيديو)', fr: 'Pro (vidéo)', en: 'Pro (video)', es: 'Pro (video)', hs: 'احترافي (فيديو)' },
-  'vid-business': { ar: 'أعمال ومعارض', fr: 'Business & showrooms', en: 'Business & showrooms', es: 'Negocios y showrooms', hs: 'أعمال ومعارض' },
+  'of-diam-std': { ar: 'الماسية الأساسية للمكاتب', fr: 'Diamant Standard bureau', en: 'Office Diamond Standard', es: 'Diamante Standard oficina', hs: 'الماسية الأساسية للمكاتب' },
+  'of-diam-pro': { ar: 'الماسية Pro للمكاتب', fr: 'Diamant Pro bureau', en: 'Office Diamond Pro', es: 'Diamante Pro oficina', hs: 'الماسية Pro للمكاتب' },
+  'of-diam':  { ar: 'الماسية الأساسية للمكاتب', fr: 'Diamant Standard bureau', en: 'Office Diamond Standard', es: 'Diamante Standard oficina', hs: 'الماسية الأساسية للمكاتب' },
+  'vid-single':   { ar: 'إعلان فيديو واحد', fr: 'Vidéo unique', en: 'Single Video Ad', es: 'Vídeo único', hs: 'إعلان فيديو واحد' },
+  'vid-basic':    { ar: 'أساسي فيديو', fr: 'Basique vidéo', en: 'Basic Video', es: 'Vídeo básico', hs: 'أساسي فيديو' },
+  'vid-pro':      { ar: 'احترافي فيديو', fr: 'Pro vidéo', en: 'Pro Video', es: 'Vídeo Pro', hs: 'احترافي فيديو' },
+  'vid-business': { ar: 'أعمال ومعارض', fr: 'Entreprises & galeries', en: 'Corporate Media', es: 'Empresas y showrooms', hs: 'أعمال ومعارض' },
+  'tnd-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
   'tnd-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'tnd-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'tnd-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
@@ -178,12 +182,266 @@ function _diamondCatalogFields() {
   return _diamondStandardFields(5000);
 }
 
+var STORE_DIAMOND_STD_FEATURES = [
+  'منتجات غير محدودة للمتجر',
+  'نائب ذكي نصي للمحل (موقع + واتساب)',
+  '1,500 محادثة نصية شهرياً',
+  'لوحة متابعة وتحليل الأداء لحظياً',
+];
+
+var STORE_DIAMOND_STD_FEATURES_FR = [
+  'Produits illimités pour la boutique',
+  'Adjoint intelligent texte (site + WhatsApp)',
+  '1 500 conversations texte / mois',
+  'Tableau de bord et analyse en temps réel',
+];
+
+var STORE_DIAMOND_PRO_FEATURES = [
+  'منتجات غير محدودة للمتجر',
+  'نائب ذكي تفاعلي للمحل (نصي + صوتي)',
+  '2,500 محادثة نصية + 150 دقيقة صوتية شهرياً',
+  'ويدجت الموقع + واتساب + مكالمات آليّة',
+  'لوحة متابعة وتحليل الأداء لحظياً',
+];
+
+var STORE_DIAMOND_PRO_FEATURES_FR = [
+  'Produits illimités pour la boutique',
+  'Adjoint interactif (texte + voix)',
+  '2 500 conversations texte + 150 min voix / mois',
+  'Widget site + WhatsApp + appels automatiques',
+  'Tableau de bord et analyse en temps réel',
+];
+
+function _storeDiamondStandardFields() {
+  return {
+    diamondTier: 'diamond_standard',
+    audioAccess: false,
+    quotaMessages: 1500,
+    quotaMinutes: 0,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية الأساسية للمحلات',
+    name_ar: 'الماسية الأساسية للمحلات',
+    description: 'نائب ذكي نصي للمحل — ويدجت الموقع + الواتساب.',
+    description_fr: 'Adjoint intelligent texte pour boutique — widget site + WhatsApp.',
+    featured: true,
+    featuredBadge: 'الأكثر اختياراً للمحلات',
+    featuredBadge_fr: 'Le plus choisi pour les boutiques',
+    roi: 'من 3,500 أوقية/شهر',
+    roi_fr: 'Dès 3 500 MRU/mois',
+    features: STORE_DIAMOND_STD_FEATURES.slice(),
+    features_fr: STORE_DIAMOND_STD_FEATURES_FR.slice(),
+    price: 3500,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+function _storeDiamondProFields() {
+  return {
+    diamondTier: 'diamond_pro',
+    audioAccess: true,
+    quotaMessages: 2500,
+    quotaMinutes: 150,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية Pro للمحلات',
+    name_ar: 'الماسية Pro للمحلات',
+    description: 'نائب ذكي تفاعلي للمحل — نصي + صوتي + مكالمات آلية.',
+    description_fr: 'Adjoint interactif boutique — texte + voix + appels automatiques.',
+    featured: true,
+    featuredBadge: 'Enterprise',
+    featuredBadge_fr: 'Enterprise',
+    roi: 'من 6,000 أوقية/شهر',
+    roi_fr: 'Dès 6 000 MRU/mois',
+    features: STORE_DIAMOND_PRO_FEATURES.slice(),
+    features_fr: STORE_DIAMOND_PRO_FEATURES_FR.slice(),
+    price: 6000,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+var OFFICE_DIAMOND_STD_FEATURES = [
+  'موظف استقبال واستفسارات 24/7 (نصي)',
+  'تنظيم طلبات الخدمات والمواعيد',
+  '2,000 محادثة نصية شهرياً',
+  'ويدجت الموقع + واتساب',
+];
+
+var OFFICE_DIAMOND_STD_FEATURES_FR = [
+  'Agent d\'accueil et réponses 24h/24 (texte)',
+  'Organisation des demandes de services et rendez-vous',
+  '2 000 conversations texte / mois',
+  'Widget site + WhatsApp',
+];
+
+var OFFICE_DIAMOND_PRO_FEATURES = [
+  'موظف استقبال آلي مخصص (نصي + صوتي)',
+  'رد آلي على الاتصالات',
+  'إدارة المواعيد والاستشارات مع نموذج طلبات متقدم',
+  '3,500 محادثة نصية + 200 دقيقة صوتية شهرياً',
+];
+
+var OFFICE_DIAMOND_PRO_FEATURES_FR = [
+  'Agent d\'accueil automatique dédié (texte + voix)',
+  'Réponse automatique aux appels',
+  'Gestion des rendez-vous et consultations avec formulaire avancé',
+  '3 500 conversations texte + 200 min voix / mois',
+];
+
+function _officeDiamondStandardFields() {
+  return {
+    diamondTier: 'diamond_standard',
+    audioAccess: false,
+    quotaMessages: 2000,
+    quotaMinutes: 0,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية الأساسية للمكاتب',
+    name_ar: 'الماسية الأساسية للمكاتب',
+    description: 'موظف استقبال واستفسارات نصي — الموقع + الواتساب.',
+    description_fr: 'Agent d\'accueil texte — site + WhatsApp.',
+    featured: true,
+    featuredBadge: 'الأكثر اختياراً للمكاتب',
+    featuredBadge_fr: 'Le plus choisi pour les bureaux',
+    roi: 'من 4,000 أوقية/شهر',
+    roi_fr: 'Dès 4 000 MRU/mois',
+    features: OFFICE_DIAMOND_STD_FEATURES.slice(),
+    features_fr: OFFICE_DIAMOND_STD_FEATURES_FR.slice(),
+    price: 4000,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+function _officeDiamondProFields() {
+  return {
+    diamondTier: 'diamond_pro',
+    audioAccess: true,
+    quotaMessages: 3500,
+    quotaMinutes: 200,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية Pro للمكاتب',
+    name_ar: 'الماسية Pro للمكاتب',
+    description: 'موظف استقبال آلي — نصي + صوتي + مكالمات تفاعلية.',
+    description_fr: 'Agent d\'accueil automatique — texte + voix + appels interactifs.',
+    featured: true,
+    featuredBadge: 'Enterprise',
+    featuredBadge_fr: 'Enterprise',
+    roi: 'من 7,500 أوقية/شهر',
+    roi_fr: 'Dès 7 500 MRU/mois',
+    features: OFFICE_DIAMOND_PRO_FEATURES.slice(),
+    features_fr: OFFICE_DIAMOND_PRO_FEATURES_FR.slice(),
+    price: 7500,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+var CORP_DIAMOND_STD_FEATURES = [
+  'نائب ذكي نصي للشركة (موقع + واتساب)',
+  '4,000 محادثة نصية شهرياً',
+  'لوحة متابعة وتحليل الأداء لحظياً',
+  'هوية مخصصة باسم شركتك',
+];
+
+var CORP_DIAMOND_STD_FEATURES_FR = [
+  'Adjoint intelligent texte pour entreprise (site + WhatsApp)',
+  '4 000 conversations texte / mois',
+  'Tableau de bord et analyse en temps réel',
+  'Identité personnalisée au nom de votre entreprise',
+];
+
+var CORP_DIAMOND_PRO_FEATURES = [
+  'نائب ذكي تفاعلي للشركة (نصي + صوتي)',
+  '7,000 محادثة نصية + 600 دقيقة صوتية شهرياً',
+  'ويدجت الموقع + واتساب + مكالمات تفاعلية',
+  'تكامل API / ERP',
+  'لوحة متابعة وتحليل الأداء لحظياً',
+];
+
+var CORP_DIAMOND_PRO_FEATURES_FR = [
+  'Adjoint interactif entreprise (texte + voix)',
+  '7 000 conversations texte + 600 min voix / mois',
+  'Widget site + WhatsApp + appels interactifs',
+  'Intégration API / ERP',
+  'Tableau de bord et analyse en temps réel',
+];
+
+function _corpDiamondStandardFields() {
+  return {
+    diamondTier: 'diamond_standard',
+    audioAccess: false,
+    quotaMessages: 4000,
+    quotaMinutes: 0,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية الأساسية للشركات',
+    name_ar: 'الماسية الأساسية للشركات',
+    description: 'نائب ذكي نصي للشركة — الموقع + الواتساب.',
+    description_fr: 'Adjoint intelligent texte entreprise — site + WhatsApp.',
+    featured: true,
+    featuredBadge: 'الأكثر اختياراً للشركات',
+    featuredBadge_fr: 'Le plus choisi pour les entreprises',
+    roi: 'من 6,000 أوقية/شهر',
+    roi_fr: 'Dès 6 000 MRU/mois',
+    features: CORP_DIAMOND_STD_FEATURES.slice(),
+    features_fr: CORP_DIAMOND_STD_FEATURES_FR.slice(),
+    price: 6000,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+function _corpDiamondProFields() {
+  return {
+    diamondTier: 'diamond_pro',
+    audioAccess: true,
+    quotaMessages: 7000,
+    quotaMinutes: 600,
+    aiModel: 'claude-3-5-sonnet',
+    name: 'الماسية Pro للشركات',
+    name_ar: 'الماسية Pro للشركات',
+    description: 'نائب ذكي تفاعلي — نصي + صوتي + تكامل API/ERP.',
+    description_fr: 'Adjoint interactif — texte + voix + intégration API/ERP.',
+    featured: true,
+    featuredBadge: 'Enterprise',
+    featuredBadge_fr: 'Enterprise',
+    roi: 'من 15,000 أوقية/شهر',
+    roi_fr: 'Dès 15 000 MRU/mois',
+    features: CORP_DIAMOND_PRO_FEATURES.slice(),
+    features_fr: CORP_DIAMOND_PRO_FEATURES_FR.slice(),
+    price: 15000,
+    durationDays: 30,
+    discountPct: 5,
+    maxCatalogItems: Infinity,
+    diamond: true,
+    isDiamond: true,
+  };
+}
+
+function _isSegmentDiamond(pkg) {
+  return /^(st|of|cp)-diam-(std|pro)$/.test(String(pkg && pkg.id || ''));
+}
+
 var PERIODS = {
-  ar: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان' },
-  fr: { freeDays: 'Gratuit — {n} jours', month: 'MRU / mois', year: 'MRU / an', quarter: 'MRU / 3 mois', perAd: 'MRU / annonce' },
-  en: { freeDays: 'Free — {n} days', month: 'MRU / month', year: 'MRU / year', quarter: 'MRU / 3 months', perAd: 'MRU / ad' },
-  es: { freeDays: 'Gratis — {n} días', month: 'MRU / mes', year: 'MRU / año', quarter: 'MRU / 3 meses', perAd: 'MRU / anuncio' },
-  hs: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان' }
+  ar: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان', oneTime: 'دفعة واحدة' },
+  fr: { freeDays: 'Gratuit — {n} jours', month: 'MRU / mois', year: 'MRU / an', quarter: 'MRU / 3 mois', perAd: 'MRU / annonce', oneTime: 'Paiement unique' },
+  en: { freeDays: 'Free — {n} days', month: 'MRU / month', year: 'MRU / year', quarter: 'MRU / 3 months', perAd: 'MRU / ad', oneTime: 'One-time payment' },
+  es: { freeDays: 'Gratis — {n} días', month: 'MRU / mes', year: 'MRU / año', quarter: 'MRU / 3 meses', perAd: 'MRU / anuncio', oneTime: 'Pago único' },
+  hs: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان', oneTime: 'دفعة واحدة' }
 };
 
 /** الكتالوجات المعتمدة — مطابقة PKG_DEFAULTS في لوحة الأدمن */
@@ -197,48 +455,69 @@ var CATALOGS = {
     Object.assign({ id: 'diamond_pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
   individual: [
-    { id: 'ind-free',    price: 0,    durationDays: 7,  discountPct: 0, features: ['إعلان واحد نشط', 'حتى 5 صور للإعلان', 'ظهور في نتائج البحث العادية'] },
-    { id: 'ind-boost',   price: 500,  durationDays: 3,  discountPct: 0, features: ['تثبيت أعلى النتائج لمدة 3 أيام', 'حتى 5 صور للإعلان', 'شارة إعلان مميز'] },
-    { id: 'ind-monthly', price: 2000, durationDays: 30, discountPct: 2, features: ['حتى 10 إعلانات نشطة', 'حتى 5 صور لكل إعلان', 'تجديد تلقائي للإعلانات'] }
+    { id: 'ind-free',    price: 0,    durationDays: 10, discountPct: 0, features: ['إعلان واحد نشط', 'حتى 5 صور للإعلان', 'ظهور في نتائج البحث العادية'] },
+    { id: 'ind-boost',   price: 300,  durationDays: 30, boostDays: 3, discountPct: 0, period: 'MRU / لكل إعلان', features: ['تثبيت أعلى النتائج لمدة 3 أيام', 'حتى 5 صور للإعلان', 'شارة إعلان مميز'] },
+    { id: 'ind-medium',  price: 1000, durationDays: 30, discountPct: 0, features: ['حتى 5 إعلانات نشطة شهرياً', 'حتى 5 صور لكل إعلان', 'إمكانيات الإدارة والتعديل طوال الشهر'],
+      features_fr: ['Jusqu\'à 5 annonces actives par mois', 'Jusqu\'à 5 photos par annonce', 'Gestion et modification pendant tout le mois'] },
+    { id: 'ind-monthly', price: 2000, durationDays: 30, discountPct: 2, highlight: true, features: ['حتى 10 إعلانات نشطة شهرياً', 'حتى 5 صور لكل إعلان', 'تجديد تلقائي للإعلانات'],
+      features_fr: ['Jusqu\'à 10 annonces actives par mois', 'Jusqu\'à 5 photos par annonce', 'Renouvellement automatique des annonces'] }
   ],
   store: [
-    { id: 'st-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض المنتجات', 'دعم فني أساسي'] },
-    { id: 'st-month', price: 2000,  durationDays: 30,  discountPct: 2, features: ['شارة محل مميّز برزق', 'عرض 50 منتج', 'إحصائيات شهرية', 'دعم بالأولوية'] },
-    { id: 'st-quart', price: 5500,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'عرض 200 منتج', 'مدير حساب مخصص'] },
-    { id: 'st-year',  price: 15000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'منتجات غير محدودة', 'دعم VIP 24/7', 'تقارير سنوية'] },
-    Object.assign({ id: 'st-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
-    Object.assign({ id: 'st-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
+    { id: 'st-trial', price: 0, durationDays: 10, maxCatalogItems: 10, discountPct: 0, features: ['وصول كامل للمنصة', 'عرض 10 منتجات', 'دعم فني أساسي'],
+      features_fr: ['Accès complet à la plateforme', '10 produits affichés', 'Support technique de base'] },
+    { id: 'st-month', price: 2000, durationDays: 30, maxCatalogItems: 100, discountPct: 2, features: ['شارة محل مميّز برزق', 'عرض 100 منتج', 'إحصائيات شهرية', 'دعم بالأولوية'],
+      features_fr: ['Badge boutique premium Rizq', '100 produits affichés', 'Statistiques mensuelles', 'Support prioritaire'] },
+    { id: 'st-quart', price: 5500, durationDays: 90, maxCatalogItems: 500, discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'عرض 500 منتج', 'مدير حساب مخصص'],
+      features_fr: ['Tous les avantages mensuels', '15% d\'économie vs mensuel', '500 produits affichés', 'Gestionnaire de compte dédié'] },
+    { id: 'st-year', price: 15000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'منتجات غير محدودة', 'دعم VIP 24/7', 'تقارير سنوية'],
+      features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Produits illimités', 'Support VIP 24/7', 'Rapports annuels'] },
+    Object.assign({ id: 'st-diam-std' }, _storeDiamondStandardFields()),
+    Object.assign({ id: 'st-diam-pro' }, _storeDiamondProFields())
   ],
   office: [
-    { id: 'of-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['عرض الخدمات', 'صفحة المكتب', 'طلبات تواصل', 'دعم فني أساسي'] },
-    { id: 'of-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['جميع المزايا', 'شارة موثّق', 'إحصائيات', 'فيديو تعريفي مشمول', 'دعم بالأولوية'] },
-    { id: 'of-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['توفير 14%', 'جميع المزايا', 'فيديو تعريفي مشمول', 'مدير حساب مخصص'] },
-    { id: 'of-year',  price: 28000, durationDays: 365, discountPct: 3, features: ['توفير 33%', 'أفضل قيمة', 'فيديو مشمول + 1 إضافي مجاني', 'أولوية الدعم'] },
-    Object.assign({ id: 'of-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
-    Object.assign({ id: 'of-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
+    { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
+      features: ['عرض حتى 3 خدمات نشطة', 'صفحة المكتب', 'طلبات تواصل'],
+      features_fr: ['Jusqu\'à 3 services actifs', 'Page du bureau', 'Demandes de contact'] },
+    { id: 'of-month', price: 3500, durationDays: 30, discountPct: 2, highlight: true,
+      features: ['شارة مكتب موثوق', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
+      features_fr: ['Badge bureau vérifié', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
+    { id: 'of-quart', price: 9000, durationDays: 90, maxCatalogItems: Infinity, discountPct: 3,
+      features: ['توفير 14%', 'عرض خدمات غير محدود', 'مدير حساب مخصص'],
+      features_fr: ['Économisez 14%', 'Services illimités', 'Gestionnaire de compte dédié'] },
+    { id: 'of-year', price: 28000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3,
+      features: ['توفير 33%', 'فيديو تعريفي مشمول + 1 إضافي مجاناً', 'أولوية الدعم'],
+      features_fr: ['Économisez 33%', 'Vidéo incluse + 1 gratuite supplémentaire', 'Support prioritaire'] },
+    Object.assign({ id: 'of-diam-std' }, _officeDiamondStandardFields()),
+    Object.assign({ id: 'of-diam-pro' }, _officeDiamondProFields())
   ],
   corp: [
     { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'] },
     { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'] },
     { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'] },
     { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'] },
-    Object.assign({ id: 'cp-diam-std', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
-    Object.assign({ id: 'cp-diam-pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
+    Object.assign({ id: 'cp-diam-std' }, _corpDiamondStandardFields()),
+    Object.assign({ id: 'cp-diam-pro' }, _corpDiamondProFields())
   ],
   video: [
-    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, features: ['فيديو إعلاني واحد (حتى 30 ثانية)', 'ظهور في قسم الإعلانات المرئية', 'إحصائيات مشاهدات أساسية'] },
-    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, features: ['حتى 3 فيديوهات إعلانية', 'أولوية ظهور في النتائج', 'شارة محتوى مميّز برزق', 'دعم تحرير أساسي'] },
-    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, features: ['فيديوهات غير محدودة', 'ظهور في القسم المميز بالصفحة الرئيسية', 'تقارير أداء تفصيلية', 'مدير حساب مخصص'] }
+    { id: 'vid-single',   price: 1500,  durationDays: 10, discountPct: 0, maxVideosPerMonth: 1, payPerAd: true, period: 'MRU / إعلان · 10 أيام', period_fr: 'MRU / annonce · 10 jours', features: ['فيديو إعلاني واحد لمدة 10 أيام', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'دفع لكل إعلان — بلا اشتراك شهري'], features_fr: ['Une vidéo publicitaire pendant 10 jours', 'Section publicitaire page d\'accueil', 'Paiement par annonce — sans abonnement mensuel'], cta_fr: 'Acheter une annonce vidéo' },
+    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, maxVideosPerMonth: 3, features: ['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'إحصائيات أداء أساسية آلية'] },
+    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, maxVideosPerMonth: 10, features: ['حتى 10 فيديوهات إعلانية ترويجية شهرياً', 'أولوية الترتيب في نتائج البحث', 'شارة «محتوى مميّز برزق» الموثّقة'] },
+    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, maxVideosPerMonth: Infinity, features: ['فيديوهات وعروض غير محدودة', 'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية', 'تقارير تحليل أداء آلية مفصّلة', 'دعم VIP ذو أولوية + شارة VIP موثّقة'] }
   ],
   tender: [
-    { id: 'tnd-month', price: 2500,  durationDays: 30,  discountPct: 0, features: ['نشر مناقصات غير محدود', 'تقديم عروض على مناقصات الآخرين', 'استقبال عروض موردين حقيقيين مباشرة', 'بدون أي فترة تجربة مجانية'] },
-    { id: 'tnd-quart', price: 6300,  durationDays: 90,  discountPct: 0, features: ['كل مزايا الشهرية', 'توفير 16% عن الشهري', 'أولوية ظهور عروضك للموردين', 'دعم بالأولوية'] },
-    { id: 'tnd-year',  price: 19000, durationDays: 365, discountPct: 0, features: ['كل مزايا الربعية', 'توفير 37% عن الشهري', 'فوترة سنوية واحدة فقط', 'دعم VIP لغرفة المناقصات'] }
+    { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'] },
+    { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'] },
+    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'] },
+    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'] }
   ],
   verified_plus: [
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }
   ]
 };
+
+// aliases — نفس باقات الفيديو (Rizq ADS / Media)
+CATALOGS.ads = CATALOGS.video;
+CATALOGS.media = CATALOGS.video;
 
 /** سجل موحّد: يربط مفتاح الكتالوج ↔ localStorage ↔ نوع الحساب (accType) */
 var CATALOG_REGISTRY = {};
@@ -265,7 +544,11 @@ function registerCatalogMapping(catalogKey, meta) {
 
 function initCatalogRegistry() {
   Object.keys(CATALOGS).forEach(function (k) {
-    registerCatalogMapping(k, CATALOG_REGISTRY[k] || {});
+    var meta = CATALOG_REGISTRY[k] || {};
+    if ((k === 'ads' || k === 'media') && !meta.lsKey) {
+      meta = Object.assign({}, meta, { lsKey: 'rizq_video_packages', accType: 'video' });
+    }
+    registerCatalogMapping(k, meta);
   });
 }
 
@@ -403,9 +686,13 @@ function diamondCopy(lang, tier, price) {
 function _durationLabel(pkg, lang) {
   lang = _normLang(lang);
   var days = Number((pkg && pkg.durationDays) || 30);
+  var id = String((pkg && pkg.id) || '');
   if (days >= 360) return lang === 'fr' ? '12 mois' : '12 شهر';
   if (days >= 80) return lang === 'fr' ? '3 mois' : '3 أشهر';
-  if (days <= 7) return lang === 'fr' ? (days + ' jours') : (days + ' أيام');
+  if (days >= 30 && (id.indexOf('-month') !== -1 || id === 'ind-medium' || id === 'ind-monthly' || id.indexOf('-quart') !== -1)) {
+    return lang === 'fr' ? 'mois' : 'شهر';
+  }
+  if (days <= 31) return lang === 'fr' ? (days + ' jours') : (days + (days === 10 ? ' أيام' : ' يوماً'));
   return lang === 'fr' ? 'mois' : 'شهر';
 }
 
@@ -468,6 +755,29 @@ function enrichForDisplay(pkg, lang) {
     out.cta = lang === 'fr' ? out.cta_fr : (out.cta || _defaultCta(out, 'ar'));
     return out;
   }
+  if (_isSegmentDiamond(out)) {
+    var segTier = resolveDiamondTierFromPkg(out) || 'diamond_standard';
+    var segPro = segTier === 'diamond_pro';
+    var segName = NAMES[out.id] || {};
+    out.diamondTier = segTier;
+    out.audioAccess = segPro;
+    out.name = lang === 'fr' ? (out.name_fr || segName.fr || segName.ar || out.name) : (out.name_ar || segName.ar || out.name);
+    out.name_fr = out.name_fr || segName.fr || segName.ar || out.name;
+    out.name_ar = out.name_ar || segName.ar || out.name;
+    out.features = Array.isArray(out.features) && out.features.length ? out.features.slice() : [];
+    out.features_fr = Array.isArray(out.features_fr) && out.features_fr.length ? out.features_fr.slice() : [];
+    out.diamond = true;
+    out.isDiamond = true;
+    out.featured = true;
+    out.duration = out.duration || _durationLabel(out, lang);
+    out.period = periodLabel({ price: out.price, durationDays: out.durationDays || 30 }, lang);
+    out.period_fr = periodLabel({ price: out.price, durationDays: out.durationDays || 30 }, 'fr');
+    out.cta = lang === 'fr'
+      ? (out.cta_fr || (segPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard'))
+      : (out.cta || (segPro ? 'اشترك في الماسية Pro' : 'اشترك في الماسية الأساسية'));
+    out.cta_fr = out.cta_fr || (segPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard');
+    return out;
+  }
   var tier = resolveDiamondTierFromPkg(out) || 'diamond_standard';
   var isPro = tier === 'diamond_pro';
   var copy = diamondCopy(lang, tier, out.price);
@@ -498,51 +808,129 @@ function enrichForDisplay(pkg, lang) {
   return out;
 }
 
+/** Bump when code defaults change — triggers localStorage re-seed on next page load */
+var CATALOG_SYNC_REVISION = '2026-08-27-vid-single';
+var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
+var STALE_PKG_FEATURE_MARKERS = [
+  'فيديو إعلاني واحد',
+  'مدير حساب مخصص',
+  'دعم تحرير أساسي',
+  'محتوى مرئي موثّق',
+  '16% عن الشهري',
+  'إحصائيات مشاهdات أساسية',
+  'إحصائيات مشاهدات أساسية'
+];
+var STALE_TENDER_PRICES = { 'tnd-month': 2500, 'tnd-quart': 6300, 'tnd-year': 19000 };
+
+function _stampCatalogRev(pkg) {
+  var out = Object.assign({}, pkg);
+  out._catalogRev = CATALOG_SYNC_REVISION;
+  return out;
+}
+
+function _pkgNeedsDefaultRefresh(livePkg, base) {
+  if (!base || !base.id) return false;
+  if (livePkg._catalogRev === CATALOG_SYNC_REVISION) return false;
+  if (base.price != null && Number(livePkg.price) !== Number(base.price)) return true;
+  if (STALE_TENDER_PRICES[base.id] != null && Number(livePkg.price) === STALE_TENDER_PRICES[base.id]) return true;
+  if (/^vid-/.test(base.id) && base.maxVideosPerMonth != null) {
+    var liveMax = livePkg.maxVideosPerMonth;
+    if (liveMax == null || Number(liveMax) !== Number(base.maxVideosPerMonth)) return true;
+  }
+  var featStr = (Array.isArray(livePkg.features) ? livePkg.features : []).join(' ');
+  for (var i = 0; i < STALE_PKG_FEATURE_MARKERS.length; i++) {
+    if (featStr.indexOf(STALE_PKG_FEATURE_MARKERS[i]) !== -1) return true;
+  }
+  return false;
+}
+
 function _mergeLive(defaults, live) {
-  if (!Array.isArray(live) || !live.length) return defaults;
+  if (!Array.isArray(defaults) || !defaults.length) return [];
+  if (!Array.isArray(live) || !live.length) {
+    return defaults.map(function (p) { return _stampCatalogRev(p); });
+  }
   var byId = {};
   defaults.forEach(function (p) { byId[p.id] = p; });
-  return live.filter(function (p) { return p && p.active !== false; }).map(function (livePkg) {
+  var seenIds = {};
+  var merged = live.filter(function (p) { return p && p.active !== false; }).map(function (livePkg) {
     var base = (livePkg.id && byId[livePkg.id]) ? byId[livePkg.id] : {};
+    if (livePkg.id) seenIds[livePkg.id] = true;
+    var refresh = _pkgNeedsDefaultRefresh(livePkg, base);
     var diamond = isDiamondPackage(livePkg) || isDiamondPackage(base);
     var pkgId = String(livePkg.id || base.id || '');
     var nameHit = pkgId && NAMES[pkgId] ? NAMES[pkgId] : null;
     var tier = resolveDiamondTierFromPkg(livePkg) || resolveDiamondTierFromPkg(base);
     var tierFields = diamond ? _diamondTierFields(tier || 'diamond_standard', livePkg.price != null ? livePkg.price : base.price) : null;
-    return {
+    return _stampCatalogRev({
       id: pkgId,
-      price: livePkg.price != null ? Number(livePkg.price) : (base.price || 0),
+      price: refresh && base.price != null ? Number(base.price) : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
+      maxCatalogItems: refresh && base.maxCatalogItems != null ? base.maxCatalogItems : (livePkg.maxCatalogItems != null ? livePkg.maxCatalogItems : base.maxCatalogItems),
+      maxVideosPerMonth: refresh && base.maxVideosPerMonth != null ? base.maxVideosPerMonth : (livePkg.maxVideosPerMonth != null ? livePkg.maxVideosPerMonth : base.maxVideosPerMonth),
+      boostDays: livePkg.boostDays != null ? Number(livePkg.boostDays) : (base.boostDays || 0),
       discountPct: livePkg.discountPct != null ? Number(livePkg.discountPct) : (base.discountPct || 0),
       diamondTier: tier || base.diamondTier,
       audioAccess: diamond ? tier === 'diamond_pro' : base.audioAccess,
       features: diamond
         ? (base.features || tierFields.features).slice()
-        : (Array.isArray(livePkg.features) && livePkg.features.length ? livePkg.features.slice() : (base.features || [])),
+        : (refresh ? (base.features || []).slice() : (Array.isArray(livePkg.features) && livePkg.features.length ? livePkg.features.slice() : (base.features || []))),
       features_fr: diamond
         ? ((base.features_fr && base.features_fr.length) ? base.features_fr.slice() : (tier === 'diamond_pro' ? DIAMOND_PRO_FEATURES_FR : DIAMOND_STANDARD_FEATURES_FR).slice())
-        : (Array.isArray(livePkg.features_fr) && livePkg.features_fr.length ? livePkg.features_fr.slice() : (base.features_fr || [])),
+        : (refresh ? (base.features_fr || []).slice() : (Array.isArray(livePkg.features_fr) && livePkg.features_fr.length ? livePkg.features_fr.slice() : (base.features_fr || []))),
       name: diamond
         ? (base.name || tierFields.name)
-        : (livePkg.name || base.name || (nameHit && nameHit.ar) || ''),
+        : (refresh ? (base.name || (nameHit && nameHit.ar) || livePkg.name || '') : (livePkg.name || base.name || (nameHit && nameHit.ar) || '')),
       name_fr: diamond
         ? (base.name_fr || (tier === 'diamond_pro' ? NAMES.diamond_pro.fr : NAMES.diamond_standard.fr))
-        : (livePkg.name_fr || base.name_fr || (nameHit && nameHit.fr) || ''),
+        : (refresh ? (base.name_fr || (nameHit && nameHit.fr) || livePkg.name_fr || '') : (livePkg.name_fr || base.name_fr || (nameHit && nameHit.fr) || '')),
       description: diamond ? (base.description || tierFields.description) : (livePkg.description || base.description || ''),
       description_fr: diamond ? (base.description_fr || tierFields.description) : (livePkg.description_fr || base.description_fr || ''),
-      featured: diamond ? true : !!livePkg.featured,
+      featured: diamond ? true : !!(livePkg.featured || base.highlight),
+      highlight: !!(livePkg.highlight || base.highlight),
       featuredBadge: diamond ? (base.featuredBadge || tierFields.featuredBadge) : (livePkg.featuredBadge || ''),
       featuredBadge_fr: diamond ? (base.featuredBadge_fr || tierFields.featuredBadge) : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
       roi: diamond ? (base.roi || tierFields.roi) : (livePkg.roi || ''),
       roi_fr: diamond ? (base.roi_fr || tierFields.roi) : (livePkg.roi_fr || base.roi_fr || ''),
       period: livePkg.period || base.period || '',
       cta: livePkg.cta || base.cta || '',
-      cta_fr: livePkg.cta_fr || base.cta_fr || ''
-    };
+      cta_fr: livePkg.cta_fr || base.cta_fr || '',
+      active: livePkg.active !== false
+    });
   });
+  defaults.forEach(function (base) {
+    if (base.id && !seenIds[base.id] && base.active !== false) {
+      merged.push(_stampCatalogRev(base));
+    }
+  });
+  return merged;
 }
 
+function ensureCatalogStorageFresh(force) {
+  if (typeof localStorage === 'undefined') return false;
+  var storedRev = localStorage.getItem(CATALOG_SYNC_LS_KEY);
+  if (!force && storedRev === CATALOG_SYNC_REVISION) return false;
+  Object.keys(CATALOGS).forEach(function (catalogKey) {
+    if (catalogKey === 'ads' || catalogKey === 'media') return;
+    var lsKey = getCatalogLsKey(catalogKey);
+    if (!lsKey) return;
+    var merged = _mergeLive(_defaultsFor(catalogKey), _readBrowserCatalog(catalogKey) || []);
+    try {
+      localStorage.setItem(lsKey, JSON.stringify(merged));
+    } catch (e) { /* ignore quota */ }
+  });
+  try {
+    localStorage.setItem(CATALOG_SYNC_LS_KEY, CATALOG_SYNC_REVISION);
+  } catch (e) { /* ignore */ }
+  return true;
+}
+
+var _catalogFreshChecked = false;
+
 function getCatalog(catalogKey, lang) {
+  if (!_catalogFreshChecked && typeof localStorage !== 'undefined') {
+    _catalogFreshChecked = true;
+    ensureCatalogStorageFresh();
+  }
   var key = catalogKey || PUBLIC_CATALOG;
   var defaults = _defaultsFor(key);
   var live = _readSiteConfigCatalog(key) || _readBrowserCatalog(key);
@@ -592,14 +980,24 @@ function localizedName(pkg, lang) {
   if (hit && hit.map[lang]) return hit.map[lang];
   if (hit && lang === 'fr' && hit.map.fr) return hit.map.fr;
   var raw = pkg.name ? String(pkg.name).replace(/💎\s*/g, '').trim() : '';
-  if (lang === 'fr' && _hasArabic(raw)) {
-    if (pkg.name_fr && !_hasArabic(pkg.name_fr)) return String(pkg.name_fr);
-    return raw;
+  var rawFr = pkg.name_fr ? String(pkg.name_fr).trim() : '';
+  if (typeof global.RizqLocale !== 'undefined') {
+    return global.RizqLocale.pickBilingual({ ar: raw, fr: rawFr, lang: lang }).text;
+  }
+  if (lang === 'fr') {
+    if (rawFr && !_hasArabic(rawFr)) return rawFr;
+    if (raw && !isBlank(raw)) return raw;
+  }
+  if (lang === 'ar') {
+    if (raw && !isBlank(raw)) return raw;
+    if (rawFr && !_hasArabic(rawFr)) return rawFr;
   }
   if (raw && raw !== String(pkg.id || '') && !/^[a-z]{2,}-[a-z0-9-]+$/i.test(raw)) return raw;
   if (hit && hit.map.ar) return hit.map.ar;
-  return raw || (pkg && pkg.id) || '';
+  return raw || rawFr || (pkg && pkg.id) || '';
 }
+
+function isBlank(s) { return !String(s == null ? '' : s).trim(); }
 
 function periodLabel(pkg, lang) {
   lang = _normLang(lang);
@@ -614,7 +1012,7 @@ function periodLabel(pkg, lang) {
   if (!pkg.price) return t.freeDays.replace('{n}', String(pkg.durationDays || 3));
   if (pkg.durationDays >= 360) return t.year;
   if (pkg.durationDays >= 80) return t.quarter;
-  if (pkg.durationDays <= 7 && pkg.id && String(pkg.id).indexOf('boost') !== -1) return t.perAd;
+  if (pkg.id && String(pkg.id).indexOf('boost') !== -1) return t.perAd;
   return t.month;
 }
 
@@ -791,6 +1189,8 @@ function buildVipDeputyText(lang) {
 var API = {
   PUBLIC_CATALOG: PUBLIC_CATALOG,
   CATALOGS: CATALOGS,
+  CATALOG_SYNC_REVISION: CATALOG_SYNC_REVISION,
+  ensureCatalogStorageFresh: ensureCatalogStorageFresh,
   LS_KEYS: LS_KEYS,
   CATALOG_REGISTRY: CATALOG_REGISTRY,
   registerCatalogMapping: registerCatalogMapping,
@@ -830,4 +1230,7 @@ if (typeof globalThis !== 'undefined') {
   globalThis.RizqPackagesConfig = API;
 } else if (typeof window !== 'undefined') {
   window.RizqPackagesConfig = API;
+}
+if (typeof localStorage !== 'undefined') {
+  try { ensureCatalogStorageFresh(); } catch (e) { /* ignore */ }
 }

@@ -365,16 +365,19 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
+<script src="rizq_account_payments.js"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_packages_config.js"></script>
   <script src="rizq_subscription_engine.js"></script>
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
 <script src="rizq_pwa.js" defer></script>
 </head>
-<body data-t-ns="dashboard">
+<body data-t-ns="dashboard" class="rizq-dash">
 
 <!-- ACCESS DENIED -->
 <div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:20px">
@@ -420,6 +423,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="nav-item" onclick="showPanel('profile',this)"><span class="nav-icon">👤</span><span class="nav-label" data-t="profile">ملفي الشخصي</span></div>
     <div class="nav-item" onclick="showPanel('security',this)"><span class="nav-icon">🔒</span><span class="nav-label" data-t="security">الأمان</span></div>
     <div class="nav-item" onclick="showPanel('subscription',this)"><span class="nav-icon">💳</span><span class="nav-label" data-t="upgrade">باقتي</span></div>
+    <div class="nav-item" onclick="showPanel('video-ads',this)"><span class="nav-icon">🎬</span><span class="nav-label" data-t="nav-video-ad">إعلان فيديو</span></div>
     <div class="nav-item" onclick="showPanel('referral',this)"><span class="nav-icon">🎁</span><span class="nav-label" data-t="referral">إحالة الأصدقاء</span></div>
     <div class="nav-item" onclick="showPanel('verifiedplus',this)"><span class="nav-icon">🛡️</span><span class="nav-label" data-t="verifiedplus">شارة موثّق⁺</span></div>
 
@@ -448,6 +452,7 @@ main, .page-content.active, .main-content, .results-area,
         <button class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item:nth-child(4)'))" data-t-title="notif-title">🔔<span class="notif-dot"></span></button>
         <button class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item:nth-child(3)'))" data-t-title="messages-title">💬</button>
         <button class="btn-new-ad" onclick="openShareModal()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" data-t="topbar-share-btn">📤 مشاركة ملفي</button>
+        <button class="btn-new-ad" onclick="showPanel('video-ads',null)" data-t="topbar-video-ad-btn">🎬 إعلان فيديو</button>
         <button class="btn-new-ad" onclick="location.href='rizq_post.html'" data-t="topbar-new-ad-btn">➕ إعلان جديد</button>
       </div>
     </div>
@@ -473,11 +478,11 @@ main, .page-content.active, .main-content, .results-area,
       <!-- Chart -->
       <div class="chart-wrap">
         <div class="chart-header">
-          <div class="chart-title">📈 المشاهدات — آخر 7 أيام</div>
+          <div class="chart-title" data-t="chart-title">📈 المشاهدات — آخر 7 أيام</div>
           <div class="chart-tabs">
-            <button class="chart-tab active" onclick="setTab(this)">7 أيام</button>
-            <button class="chart-tab" onclick="setTab(this)">30 يوم</button>
-            <button class="chart-tab" onclick="setTab(this)">3 أشهر</button>
+            <button class="chart-tab active" onclick="setTab(this)" data-t="chart-tab-7d">7 أيام</button>
+            <button class="chart-tab" onclick="setTab(this)" data-t="chart-tab-30d">30 يوم</button>
+            <button class="chart-tab" onclick="setTab(this)" data-t="chart-tab-3m">3 أشهر</button>
           </div>
         </div>
         <div class="chart-bars" id="chart-bars"></div>
@@ -500,10 +505,10 @@ main, .page-content.active, .main-content, .results-area,
 
       <div class="ads-controls">
         <div class="status-filter">
-          <button class="sf-btn active" onclick="filterAds('all',this)">الكل (5)</button>
-          <button class="sf-btn" onclick="filterAds('active',this)">نشطة (3)</button>
-          <button class="sf-btn" onclick="filterAds('pending',this)">قيد المراجعة (1)</button>
-          <button class="sf-btn" onclick="filterAds('expired',this)">منتهية (1)</button>
+          <button class="sf-btn active" onclick="filterAds('all',this)"><span data-t="filter-all">الكل</span> (5)</button>
+          <button class="sf-btn" onclick="filterAds('active',this)"><span data-t="filter-active">نشطة</span> (3)</button>
+          <button class="sf-btn" onclick="filterAds('pending',this)"><span data-t="filter-pending">قيد المراجعة</span> (1)</button>
+          <button class="sf-btn" onclick="filterAds('expired',this)"><span data-t="filter-expired">منتهية</span> (1)</button>
         </div>
         <input class="search-mini" type="text" data-t="search-ads" placeholder="🔍 بحث في إعلاناتي..."/>
       </div>
@@ -513,12 +518,12 @@ main, .page-content.active, .main-content, .results-area,
           <thead>
             <tr>
               <th data-t="col-ad">الإعلان</th>
-              <th>السعر</th>
+              <th data-t="col-price">السعر</th>
               <th data-t="col-status">الحالة</th>
               <th data-t="col-views">المشاهدات</th>
               <th data-t="col-contacts">التواصل</th>
-              <th>تاريخ النشر</th>
-              <th>إجراءات</th>
+              <th data-t="col-date">تاريخ النشر</th>
+              <th data-t="col-actions">إجراءات</th>
             </tr>
           </thead>
           <tbody id="ads-tbody"></tbody>
@@ -703,6 +708,23 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <!-- ── Rizq ADS — إعلان فيديو ── -->
+    <div class="panel" id="panel-video-ads">
+      <div class="sec-title" data-t="rads-title">🎬 Rizq ADS — إعلان فيديو في الرئيسية</div>
+      <p class="sec-sub" data-t="rads-hint">أعلن بفيديو يظهر لكل زوار منصة رزق في الموضع المميز بالصفحة الرئيسية — اختر باقة، ادفع، وارفع رابط فيديوك، وسيتم تفعيله بعد مراجعة الإدارة.</p>
+      <div class="settings-card" style="margin-bottom:18px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid rgba(201,168,76,.45)">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px">
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#92400e;margin-bottom:4px" data-t="vid-single-cta-title">⚡ إعلان فيديو واحد — 1,500 MRU / 10 أيام</div>
+            <div style="font-size:12.5px;color:#78350f;line-height:1.6" data-t="vid-single-cta-desc">مثالي للأفراد: فيديو واحد في الصفحة الرئيسية لمدة 10 أيام — دفع لكل إعلان بلا اشتراك شهري.</div>
+          </div>
+          <button type="button" onclick="openVideoAdPayModal('vid-single')" style="padding:12px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap" data-t="vid-single-cta-btn">🎬 اشترِ إعلان فيديو الآن</button>
+        </div>
+      </div>
+      <div id="rizq-ads-status-mount" style="margin-bottom:14px"></div>
+      <div id="rizq-ads-packages-display"></div>
+    </div>
+
   </div><!-- page-content -->
 
   <footer style="background:linear-gradient(180deg,#1B2B4B,#0f1f3d);border-top:1px solid rgba(201,168,76,0.15);padding:32px 5% 0">
@@ -730,11 +752,11 @@ main, .page-content.active, .main-content, .results-area,
 <div id="ad-boost-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px">
   <div style="background:#fff;border-radius:20px;max-width:440px;width:100%;max-height:82vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3)">
     <div style="background:linear-gradient(135deg,#1B3A6B,#234d8f);padding:20px 24px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:16px;font-weight:800;color:#e8c96a">⭐ اختر إعلاناً لتثبيته</div>
+      <div style="font-size:16px;font-weight:800;color:#e8c96a" data-t="ad-boost-title">⭐ اختر إعلاناً لتثبيته</div>
       <button onclick="closeAdBoostModal()" style="background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div style="padding:18px 20px">
-      <p style="font-size:12.5px;color:#6b7280;margin-bottom:14px">التثبيت (3 أيام أعلى نتائج البحث + شارة "إعلان مميز") يُطبَّق على إعلان واحد محدَّد فقط تختاره الآن — لا يؤثر على باقتك الحالية ولا بقية إعلاناتك.</p>
+      <p style="font-size:12.5px;color:#6b7280;margin-bottom:14px" data-t="ad-boost-hint">التثبيت (3 أيام أعلى نتائج البحث + شارة "إعلان مميز") يُطبَّق على إعلان واحد محدَّد فقط تختاره الآن — لا يؤثر على باقتك الحالية ولا بقية إعلاناتك.</p>
       <div id="ad-boost-list"></div>
     </div>
   </div>
@@ -744,26 +766,39 @@ main, .page-content.active, .main-content, .results-area,
   <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3)">
     <div style="background:linear-gradient(135deg,#1B3A6B,#234d8f);padding:20px 24px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px">الاشتراك في باقة</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px" data-t="pay-modal-sub">الاشتراك في باقة</div>
         <div id="pay-pkg-name" style="font-size:18px;font-weight:800;color:#e8c96a"></div>
       </div>
       <button onclick="closePayModal()" style="background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div style="padding:22px 24px">
       <div style="background:#f0f4ff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:13px;color:#2C3A4F">المبلغ المطلوب</span>
+        <span style="font-size:13px;color:#2C3A4F" data-t="pay-amount-label">المبلغ المطلوب</span>
         <span id="pay-amount" style="font-size:22px;font-weight:800;color:#1B3A6B"></span>
       </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:10px;letter-spacing:.5px" data-t="pay-steps-title">خطوات الدفع:</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:#4a5568"><span style="background:#1B3A6B;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">1</span><span data-t="pay-step-1">اختر البنك المناسب وانسخ الرمز</span></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:#4a5568"><span style="background:#1B3A6B;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">2</span><span data-t="pay-step-2">افتح تطبيق بنكك → دفع/بيماه → أدخل الرمز والمبلغ</span></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:#4a5568"><span style="background:#1B3A6B;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">3</span><span data-t="pay-step-3">ارفع صورة الوصل هنا — سيتم تفعيل الباقة خلال ساعات</span></div>
+        </div>
+      </div>
       <div id="pay-banks" style="margin-bottom:18px"></div>
+      <div id="pay-video-url-wrap" style="display:none;margin-bottom:18px">
+        <label style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:block;font-size:12.5px">🎬 <span data-t="pay-video-url-label">رابط الفيديو الإعلاني</span></label>
+        <input id="pay-video-url" dir="ltr" data-ph="pay-video-url-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0e8ff;border-radius:10px"/>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المميز بالصفحة الرئيسية لكل زوار المنصة بعد موافقة الإدارة</div>
+      </div>
       <div style="border:2px dashed rgba(27,58,107,.2);border-radius:12px;padding:16px;text-align:center;cursor:pointer" onclick="document.getElementById('pay-receipt-file').click()" id="pay-upload-zone">
         <div style="font-size:28px;margin-bottom:6px">🧾</div>
-        <div style="font-size:13px;font-weight:600;color:#1B3A6B">انقر لرفع صورة الوصل</div>
-        <div style="font-size:11px;color:#9aa7bd;margin-top:3px">JPG / PNG / PDF</div>
+        <div style="font-size:13px;font-weight:600;color:#1B3A6B" data-t="pay-upload-cta">انقر لرفع صورة الوصل</div>
+        <div style="font-size:11px;color:#9aa7bd;margin-top:3px" data-t="pay-upload-hint">JPG / PNG / PDF</div>
         <input type="file" id="pay-receipt-file" accept="image/*,.pdf" style="display:none" onchange="handlePayReceipt(this)"/>
       </div>
       <div id="pay-receipt-name" style="display:none;margin-top:8px;font-size:12px;color:#059669;font-weight:600;text-align:center"></div>
-      <button id="pay-submit-btn" onclick="submitPayment()" style="margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;border-radius:12px;font-weight:800;font-size:14px;color:#0f2347;cursor:pointer">📤 إرسال طلب الاشتراك</button>
-      <p style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
+      <button id="pay-submit-btn" onclick="submitPayment()" style="margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;border-radius:12px;font-weight:800;font-size:14px;color:#0f2347;cursor:pointer" data-t="pay-submit-btn">📤 إرسال طلب الاشتراك</button>
+      <p id="pay-footer-note" style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px" data-t="pay-review-note">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
     </div>
   </div>
 </div>
@@ -886,7 +921,11 @@ let MY_ADS = [];
 function _rizqLang(){ try{ return localStorage.getItem('rizq_lang') || 'ar'; }catch(e){ return 'ar'; } }
 // عنوان الإعلان بحسب اللغة الحالية — مع رجوع للعربية إن لم تتوفر نسخة فرنسية
 // (إعلانات DEMO_ADS التجريبية لا تحتوي حقول فرنسية، فتُعرض بالعربية دوماً)
-function adTitleLocalized(a){ return (_rizqLang()==='fr' && a.titleFr) ? a.titleFr : a.title; }
+function adTitleLocalized(a){
+  if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
+  var fr=_rizqLang()==='fr';
+  return fr?(a.titleFr||a.title||''):(a.title||a.titleFr||'');
+}
 
 const MESSAGES = [
   {name:'خديجة منت محمد',emoji:'👩',ad:'شقة فاخرة 3 غرف',preview:'هل الشقة لا تزال متاحة؟',time:'منذ 10 دقائق',unread:true,active:true},
@@ -1103,10 +1142,11 @@ function showPanel(id, navEl){
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     navEl.classList.add('active');
   }
-  const titles={overview:'نظرة عامة','my-ads':'إعلاناتي',messages:'الرسائل',notifications:'الإشعارات',favorites:'المفضلة',profile:'ملفي الشخصي',security:'الأمان',subscription:'💳 باقتي',tenders:'📋 المناقصات',referral:'🎁 إحالة الأصدقاء',verifiedplus:'🛡️ شارة موثّق⁺'};
-  const titlesFr={overview:'Vue d\'ensemble','my-ads':'Mes annonces',messages:'Messages',notifications:'Notifications',favorites:'Favoris',profile:'Mon profil',security:'Sécurité',subscription:'💳 Mon forfait',tenders:'📋 Appels d\'offres',referral:'🎁 Parrainage',verifiedplus:'🛡️ Badge Vérifié+'};
+  const titles={overview:'نظرة عامة','my-ads':'إعلاناتي',messages:'الرسائل',notifications:'الإشعارات',favorites:'المفضلة',profile:'ملفي الشخصي',security:'الأمان',subscription:'💳 باقتي','video-ads':'🎬 إعلان فيديو',tenders:'📋 المناقصات',referral:'🎁 إحالة الأصدقاء',verifiedplus:'🛡️ شارة موثّق⁺'};
+  const titlesFr={overview:'Vue d\'ensemble','my-ads':'Mes annonces',messages:'Messages',notifications:'Notifications',favorites:'Favoris',profile:'Mon profil',security:'Sécurité',subscription:'💳 Mon forfait','video-ads':'🎬 Annonce vidéo',tenders:'📋 Appels d\'offres',referral:'🎁 Parrainage',verifiedplus:'🛡️ Badge Vérifié+'};
   document.getElementById('topbar-title').textContent=(_rizqLang()==='fr'?(titlesFr[id]||'Tableau de bord'):(titles[id]||'لوحة التحكم'));
   if(id==='subscription'){ renderSubscriptionPanel(); renderPackagesDisplay(); }
+  if(id==='video-ads'){ renderVideoPackagesDisplay(); if(USER_ACC) _rizqRenderAdsStatus(USER_ACC); }
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
   if(id==='referral'){ renderReferralPanel(); }
   if(id==='verifiedplus'){ renderVerifiedPlusPanel(); }
@@ -1534,9 +1574,10 @@ function _tenderPkgList(){
     if(Array.isArray(list) && list.length) return list;
   }catch(e){}
   return [
-    {name:'شهرية', price:2500,  duration:'شهر'},
-    {name:'ربعية', price:6300,  duration:'3 أشهر'},
-    {name:'سنوية', price:19000, duration:'12 شهر'}
+    {name:'تجريبية', price:0,     duration:'10 أيام'},
+    {name:'شهرية', price:5000,  duration:'شهر'},
+    {name:'ربعية', price:13500, duration:'3 أشهر'},
+    {name:'سنوية', price:45000, duration:'12 شهر'}
   ];
 }
 
@@ -1552,19 +1593,25 @@ function renderTenderSubStatus(){
     .then(function(data){
       if(data && data.ok && data.subscribed){
         var endsTxt = '';
-        try{ endsTxt = new Date(data.record.periodEnd).toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        try{ endsTxt = new Date((data.record && data.record.periodEnd) || '').toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        if(data.isTrial && !data.contactsUnlocked){
+          el.innerHTML = '<div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#92400e">'
+            + '🔍 '+(fr?('Essai actif jusqu\'au '+escapeHtml(endsTxt)+' — consultation uniquement (contacts masqués, soumission verrouillée).') : ('باقتك التجريبية فعّالة حتى '+escapeHtml(endsTxt)+' — للتصفّح فقط (التواصل مخفي والعروض مقفولة).'))
+            + '</div>';
+          return;
+        }
         el.innerHTML = '<div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#065f46">'
-          + '✅ '+(fr?('Vous êtes abonné à la formule Appels d\'offres — valable jusqu\'au '+escapeHtml(endsTxt)) : ('أنت مشترك في باقة المناقصة — سارية حتى '+escapeHtml(endsTxt)))
+          + '✅ '+(fr?('Abonnement Appels d\'offres actif — contacts débloqués — jusqu\'au '+escapeHtml(endsTxt)) : ('اشتراك المناقصة فعّال — بيانات التواصل مكشوفة — حتى '+escapeHtml(endsTxt)))
           + '</div>';
         return;
       }
-      var FEATS_AR = {'شهرية':['نشر مناقصات غير محدود','تقديم عروض على مناقصات الآخرين','بدون أي فترة تجربة'],'ربعية':['كل مزايا الشهرية','توفير 16% عن الشهري','أولوية ظهور عروضك'],'سنوية':['كل مزايا الربعية','توفير 37% عن الشهري','فوترة سنوية واحدة']};
-      var FEATS_FR = {'شهرية':['Publication illimitée','Soumission d\'offres','Sans période d\'essai'],'ربعية':['Tous les avantages du mensuel','16% d\'économie','Priorité d\'affichage des offres'],'سنوية':['Tous les avantages du trimestriel','37% d\'économie','Facturation annuelle unique']};
+      var FEATS_AR = {'تجريبية':['تصفّح وتصفية المناقصات','بيانات التواصل مخفية','تقديم العروض مقفول'],'شهرية':['كشف بيانات التواصل','تقديم عروض غير محدود','نشر مناقصات'],'ربعية':['كل مزايا الشهرية','توفير 10%','أولوية ظهور العروض'],'سنوية':['كل مزايا الربعية','توفير 25%','تنبيهات SMS/واتساب']};
+      var FEATS_FR = {'تجريبية':['Consultation et filtrage','Contacts masqués','Soumission verrouillée'],'شهرية':['Contacts débloqués','Offres illimitées','Publication d\'appels d\'offres'],'ربعية':['Tous les avantages mensuels','10% d\'économie','Priorité des offres'],'سنوية':['Tous les avantages trimestriels','25% d\'économie','Alertes SMS/WhatsApp']};
       var FEATS = fr ? FEATS_FR : FEATS_AR;
-      var ICONS = {'شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
+      var ICONS = {'تجريبية':'🔍','شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
       var lockMsg = fr
-        ? 'Un abonnement à la formule Appels d\'offres est requis pour publier ou soumissionner — sans aucune période d\'essai gratuite.'
-        : 'تحتاج اشتراكاً في باقة المناقصة للنشر وتقديم العروض — بدون أي فترة تجربة مجانية.';
+        ? 'Abonnez-vous à la formule Appels d\'offres (mensuelle ou plus) pour débloquer les contacts et soumettre des offres. L\'essai permet la consultation uniquement.'
+        : 'اشترك في باقة المناقصة (شهرية فأعلى) لكشف بيانات التواصل وتقديم العروض — الباقة التجريبية للتصفّح فقط.';
       var cardsHtml = (typeof RizqSub !== 'undefined' && typeof RizqSub.renderPackageCardsHTML === 'function')
         ? RizqSub.renderPackageCardsHTML(_tenderPkgList(), FEATS, ICONS, _rizqLang(), 'tender').grid
         : '';
@@ -1877,12 +1924,12 @@ function renderPackagesDisplay(){
   // تماماً عن الكتالوج الحقيقي الذي يديره الأدمن (PKG_DEFAULTS.individual في
   // rizq_admin.html: مجانية/مميزة/باقة شهرية) — يعني المشترك كان يرى ويشترك في
   // باقات بأسماء ومزايا لا تطابق ما يديره الأدمن فعلياً. تم توحيدهما الآن.
-  var FEATS_AR={'مجانية':['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'],'مميزة':['تثبيت أعلى النتائج لمدة 3 أيام','حتى 5 صور للإعلان','شارة "إعلان مميز"'],'باقة شهرية':['حتى 10 إعلانات نشطة','حتى 5 صور لكل إعلان','تجديد تلقائي للإعلانات']};
-  var FEATS_FR={'مجانية':['1 annonce active','Jusqu\'à 5 photos par annonce','Visibilité standard dans les résultats'],'مميزة':['Épinglage en tête des résultats pendant 3 jours','Jusqu\'à 5 photos par annonce','Badge "Annonce en vedette"'],'باقة شهرية':['Jusqu\'à 10 annonces actives','Jusqu\'à 5 photos par annonce','Renouvellement automatique des annonces']};
+  var FEATS_AR={'مجانية':['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'],'مميزة':['تثبيت أعلى النتائج لمدة 3 أيام','حتى 5 صور للإعلان','شارة "إعلان مميز"'],'باقة متوسطة':['حتى 5 إعلانات نشطة شهرياً','حتى 5 صور لكل إعلان','إمكانيات الإدارة والتعديل طوال الشهر'],'باقة شهرية':['حتى 10 إعلانات نشطة شهرياً','حتى 5 صور لكل إعلان','تجديد تلقائي للإعلانات']};
+  var FEATS_FR={'مجانية':['1 annonce active','Jusqu\'à 5 photos par annonce','Visibilité standard dans les résultats'],'مميزة':['Épinglage en tête des résultats pendant 3 jours','Jusqu\'à 5 photos par annonce','Badge "Annonce en vedette"'],'باقة متوسطة':['Jusqu\'à 5 annonces actives par mois','Jusqu\'à 5 photos par annonce','Gestion et modification pendant tout le mois'],'باقة شهرية':['Jusqu\'à 10 annonces actives par mois','Jusqu\'à 5 photos par annonce','Renouvellement automatique des annonces']};
   var FEATS=(_rizqLang()==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'مجانية':'🎁','مميزة':'⭐','باقة شهرية':'📅'};
+  var ICONS={'مجانية':'🎁','مميزة':'⭐','باقة متوسطة':'📦','باقة شهرية':'📅'};
 
-  var DEF=[{name:'مجانية',duration:'7 أيام',price:0},{name:'مميزة',duration:'3 أيام',price:500},{name:'باقة شهرية',duration:'شهر',price:2000,highlight:true}];
+  var DEF=[{name:'مجانية',duration:'10 أيام',price:0},{name:'مميزة',duration:'30 يوماً',price:300,period:'لكل إعلان'},{name:'باقة متوسطة',duration:'شهر',price:1000},{name:'باقة شهرية',duration:'شهر',price:2000,highlight:true}];
   var list=pkgs.length?pkgs:DEF;
 
   if(typeof RizqSub === 'undefined' || typeof RizqSub.renderPackageCardsHTML !== 'function'){ el.innerHTML=''; return; }
@@ -1890,6 +1937,75 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp) rp.innerHTML=r.renewal;
+}
+
+// ── Rizq ADS — باقات إعلان الفيديو (فئة video) ──
+function renderVideoPackagesDisplay(){
+  var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
+  var lang=_rizqLang();
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var FEATS_AR={
+    'إعلان فيديو واحد':['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'],
+    'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],
+    'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],
+    'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة']
+  };
+  var FEATS_FR={
+    'إعلان فيديو واحد':['Une vidéo publicitaire pendant 10 jours','Section publicitaire page d\'accueil','Paiement par annonce — sans abonnement mensuel'],
+    'Basique vidéo':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],
+    'Pro vidéo':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],
+    'Entreprises & galeries':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié']
+  };
+  var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
+  var ICONS={'إعلان فيديو واحد':'⚡','أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','Vidéo unique':'⚡','Basique vidéo':'🎬','Pro vidéo':'🥇'};
+  if(typeof RizqSub==='undefined' || typeof RizqSub.renderPackageCardsHTML!=='function'){ el.innerHTML=''; return; }
+  var r=RizqSub.renderPackageCardsHTML(pkgs, FEATS, ICONS, lang, 'video');
+  el.innerHTML=r.grid;
+}
+
+function openVideoAdPayModal(pkgId){
+  var lang=_rizqLang();
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang)||[]; }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]'); }catch(e){} }
+  var pkg = (pkgs||[]).find(function(p){ return p && (p.id===pkgId || String(p.name||'').indexOf('إعلان فيديو')!==-1); });
+  if(!pkg && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkg = RizqPackagesConfig.CATALOGS.video.find(function(p){ return p.id===pkgId; });
+  }
+  if(!pkg){ showToast(_t2('تعذّر تحميل الباقة','Impossible de charger le forfait')); return; }
+  openPayModal(pkg.name, Number(pkg.price)||1500, 'video');
+}
+
+function _rizqRenderAdsStatus(acc){
+  var mount=document.getElementById('rizq-ads-status-mount');
+  if(!mount || !window.RIZQ_BACKEND_BASE || !acc || !acc.id) return;
+  var fr=(_rizqLang()==='fr');
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/site-config').then(function(r){return r.ok?r.json():null;}).then(function(data){
+    var va = data && data.config && data.config.videoAds;
+    if(!va) return;
+    var inHero = (va.hero||[]).find(function(a){return a.accountId===acc.id;});
+    var inPopup = (va.popup||[]).find(function(a){return a.accountId===acc.id;});
+    if(!inHero && !inPopup) return;
+    var spots=[];
+    if(inHero) spots.push(_t2('🏠 الواجهة الرئيسية (Hero)','🏠 Page d\'accueil (Hero)'));
+    if(inPopup) spots.push(_t2('📌 الشريط العلوي (Popup)','📌 Bandeau supérieur (Popup)'));
+    var active = (inHero && inHero.active!==false) || (inPopup && inPopup.active!==false);
+    mount.innerHTML = '<div style="background:'+(active?'#ecfdf5':'#fff7ed')+';border:1.5px solid '+(active?'#6ee7b7':'#fdba74')+';border-radius:12px;padding:14px 16px;font-size:12.5px;color:'+(active?'#065f46':'#9a3412')+';display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:22px">'+(active?'🟢':'🟡')+'</span>'
+      + '<span>'+(active
+          ? ('✅ '+_t2('فيديوك الإعلاني نشط الآن في: ','Votre vidéo publicitaire est active sur : ')+spots.join(' + '))
+          : _t2('⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة','⏸️ Votre vidéo est ajoutée mais suspendue par l\'administration'))+'</span>'
+      + '</div>';
+  }).catch(function(){});
 }
 
 var renewalFile = null;
@@ -1960,22 +2076,28 @@ function openPayModal(pkgName, pkgPrice, category, adId, adTitle){
   document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
+  var vidWrap = document.getElementById('pay-video-url-wrap');
+  if(vidWrap){ vidWrap.style.display = (_payPkg.category === 'video') ? 'block' : 'none'; var vidInp = document.getElementById('pay-video-url'); if(vidInp) vidInp.value = ''; }
 
   var codes = [];
   try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active!==false;}); } catch(e){}
   var el = document.getElementById('pay-banks');
   if(!codes.length){
-    el.innerHTML = '<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:12.5px;color:#92400e;text-align:center">⚠️ '+_t2('لا توجد طرق دفع متاحة حالياً — تواصل مع الدعم','Aucun moyen de paiement disponible — contactez le support')+'</div>';
+    el.innerHTML = '<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:12.5px;color:#92400e;text-align:center">⚠️ '+((typeof RizqI18n!=='undefined'&&RizqI18n.t)?RizqI18n.t('pay-no-methods','dashboard'):_t2('لا توجد طرق دفع متاحة حالياً — تواصل مع الدعم','Aucun moyen de paiement disponible — contactez le support'))+'</div>';
   } else {
     el.innerHTML = codes.map(function(b){
       return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
         +'<div><div style="font-size:13px;font-weight:700;color:#1B3A6B">'+escapeHtml(b.bank||'')+'</div>'
-        +(b.note?'<div style="font-size:11px;color:#777;margin-top:2px">'+escapeHtml(b.note)+'</div>':'')+'</div>'
+        +(b.instruction || b.note ? '<div style="font-size:11px;color:#777;margin-top:2px">'+escapeHtml(b.instruction || b.note)+'</div>' : '')+'</div>'
         +'<span style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e0e8ff;padding:5px 10px;border-radius:7px;letter-spacing:.5px;direction:ltr">'+escapeHtml(b.code||'')+'</span>'
         +'</div>';
     }).join('');
   }
   var m = document.getElementById('pay-modal');
+  if(!m) return;
+  if(typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function'){
+    RizqSub.configurePayModalFreeMode(pkgPrice, _rizqLang());
+  }
   m.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -1999,6 +2121,15 @@ function submitPayment(){
     showToast(_t2('يرجى رفع صورة وصل الدفع أولاً','Veuillez d\'abord télécharger le reçu de paiement'));
     return;
   }
+  var isVideo = _payPkg.category === 'video';
+  var videoUrl = '';
+  if(isVideo){
+    videoUrl = (document.getElementById('pay-video-url')||{}).value?.trim() || '';
+    if(!videoUrl){
+      showToast(_t2('يرجى إدخال رابط الفيديو الإعلاني','Veuillez entrer le lien de la vidéo publicitaire'));
+      return;
+    }
+  }
   if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
     showToast(_t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'));
     return;
@@ -2016,10 +2147,13 @@ function submitPayment(){
     accountId: SESSION_ID,
     category: _payPkg.category || 'package',
     adId: _payPkg.adId || null,
-    adTitle: _payPkg.adTitle || ''
+    adTitle: _payPkg.adTitle || '',
+    videoUrl: isVideo ? videoUrl : null
   }).then(function(){
     closePayModal();
-    showToast(_t2('✅ تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','✅ Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'));
+    showToast(isVideo
+      ? _t2('✅ تم إرسال طلب Rizq ADS — سيتم مراجعته وتفعيل فيديوك في الرئيسية خلال 24 ساعة','✅ Votre demande Rizq ADS a été envoyée — elle sera examinée et votre vidéo activée en page d\'accueil sous 24h')
+      : _t2('✅ تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','✅ Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'));
   }).catch(function(err){
     showToast((err && err.msg) || _t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'));
   }).finally(function(){
@@ -2042,6 +2176,9 @@ function initDashboard(){
 
 function _initDashboardWithAccount(acc){
   USER_ACC = acc;
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
+    try{ RizqPackagesConfig.ensureCatalogStorageFresh(); }catch(e){}
+  }
   // ── حساب إعلاناتي الحقيقية بعد معرفة IS_DEMO/SESSION_ID بشكل نهائي ──
   // العرض التجريبي (demo) يعرض DEMO_ADS فقط (لا نخلط إعلانات زوّار حقيقيين في عرض تجريبي عام).
   // الحساب الحقيقي يعرض فقط الإعلانات التي تحمل accountId مطابق لهذا الحساب — بدون أي DEMO_ADS.
@@ -2097,15 +2234,21 @@ function _initDashboardWithAccount(acc){
       if(!data || !data.ok || !data.config) return;
       if(Array.isArray(data.config.bankCodes)){
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
+        if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.individual)) localStorage.setItem('rizq_individual_packages', JSON.stringify(data.config.packages.individual));
         if(Array.isArray(data.config.packages.general))     localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
+        if(Array.isArray(data.config.packages.video))       localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
+        if(Array.isArray(data.config.packages.tender))      localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
       }
-      // إصلاح: كان التخزين المحلي يُحدَّث لكن البطاقات المعروضة فعلاً لا
-      // تُعاد رسمها إلا عند تحميل الصفحة التالي — فيرى المستخدم الكتالوج
-      // الاحتياطي القديم رغم وصول البيانات الحقيقية من الخادم بنجاح.
+      if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
+        try{ RizqPackagesConfig.ensureCatalogStorageFresh(true); }catch(e){}
+      }
       if(typeof renderPackagesDisplay==='function') renderPackagesDisplay();
+      if(typeof renderVideoPackagesDisplay==='function') renderVideoPackagesDisplay();
+      if(typeof renderTenderSubStatus==='function') renderTenderSubStatus();
     }).catch(function(){});
 })();
 initDashboard();
@@ -2201,24 +2344,24 @@ function rizqShare(title, url) {
 <div class="modal-overlay" id="share-modal" onclick="closeShareModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-size:16px;font-weight:800;color:#1B3A6B;display:flex;align-items:center;gap:8px">📤 مشاركة ملفي الشخصي</div>
+      <div style="font-size:16px;font-weight:800;color:#1B3A6B;display:flex;align-items:center;gap:8px" data-t="share-profile-title">📤 مشاركة ملفي الشخصي</div>
       <button onclick="closeShareModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af">×</button>
     </div>
     <div class="share-link-row">
       <input class="share-link-input" id="share-link-input" readonly value=""/>
-      <button onclick="copyShareLink()" style="padding:9px 14px;background:#1B3A6B;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px">نسخ</button>
+      <button onclick="copyShareLink()" style="padding:9px 14px;background:#1B3A6B;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px" data-t="share-copy-btn">نسخ</button>
     </div>
     <div class="share-btns">
       <button class="share-btn share-btn-wa" onclick="shareWhatsAppLink()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        واتساب
+        <span data-t="share-whatsapp">واتساب</span>
       </button>
-      <button class="share-btn share-btn-copy" onclick="copyShareLink()">📋 نسخ الرابط</button>
+      <button class="share-btn share-btn-copy" onclick="copyShareLink()" data-t="share-copy-link">📋 نسخ الرابط</button>
     </div>
     <div class="qr-wrap">
-      <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:10px">📱 QR Code — اطبعه أو شاركه</div>
+      <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:10px" data-t="share-qr-title">📱 QR Code — اطبعه أو شاركه</div>
       <div id="qr-container" style="display:flex;justify-content:center"></div>
-      <button onclick="printQRCode()" style="margin-top:10px;background:none;border:1px solid rgba(27,58,107,.2);color:#1B3A6B;padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ طباعة QR</button>
+      <button onclick="printQRCode()" style="margin-top:10px;background:none;border:1px solid rgba(27,58,107,.2);color:#1B3A6B;padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" data-t="share-print-qr">🖨️ طباعة QR</button>
     </div>
   </div>
 </div>
@@ -2227,7 +2370,7 @@ function rizqShare(title, url) {
 // ══ Share & QR — ملفي الشخصي ══
 (function(){
   var sli=document.getElementById('share-link-input');
-  if(sli) sli.value=location.origin+location.pathname.replace(/rizq_dashboard\.html$/,'')+'rizq_profile.html?user=demo';
+  if(sli) sli.value=location.origin+'/rizq_profile.html?user='+encodeURIComponent(SESSION_ID||'demo');
 })();
 var _qrDone=false;
 function openShareModal(){
@@ -2236,7 +2379,7 @@ function openShareModal(){
     var c=document.getElementById('qr-container');
 
     if(c.innerHTML===''){
-      try{new QRCode(c,{text:location.href,width:180,height:180});}catch(err){}
+      try{new QRCode(c,{text:(document.getElementById('share-link-input')||{}).value||location.href,width:180,height:180});}catch(err){}
       _qrDone=true;
     }
   }
@@ -2250,13 +2393,13 @@ function copyShareLink(){
   if(!inp)return;
   var v=inp.value;
   if(navigator.clipboard&&window.isSecureContext){
-    navigator.clipboard.writeText(v).then(function(){showToast('✅ Lien copie / تم نسخ الرابط!');}).catch(function(){
+    navigator.clipboard.writeText(v).then(function(){showToast(_t2('✅ تم نسخ الرابط!','✅ Lien copié !'));}).catch(function(){
       inp.select();try{document.execCommand('copy');}catch(err){}
-      showToast('✅ تم نسخ الرابط!');
+      showToast(_t2('✅ تم نسخ الرابط!','✅ Lien copié !'));
     });
   } else {
     inp.select();try{document.execCommand('copy');}catch(err){}
-    showToast('✅ تم نسخ الرابط!');
+    showToast(_t2('✅ تم نسخ الرابط!','✅ Lien copié !'));
   }
 }
 function shareWhatsAppLink(){
@@ -2270,7 +2413,7 @@ function printQRCode(){
   var w=window.open('','_blank','width=400,height=500');
   var q=document.getElementById('qr-container');
   if(q&&w){
-    w.document.write('<html><body style="text-align:center;padding:40px;font-family:sans-serif">'+q.innerHTML+'<p style="font-size:13px;word-break:break-all">'+location.href+'</p></body></html>');
+    w.document.write('<html><body style="text-align:center;padding:40px;font-family:sans-serif">'+q.innerHTML+'<p style="font-size:13px;word-break:break-all">'+(document.getElementById('share-link-input')||{}).value+'</p></body></html>');
     w.document.close();w.print();
   }
 }

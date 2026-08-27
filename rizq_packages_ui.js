@@ -77,8 +77,9 @@
     if (!p.period || /^MRU\s*\//i.test(String(p.period))) {
       var days = Number(p.durationDays) || 30;
       var lng = lang || getLang();
-      if (!Number(p.price)) p.period = lng === 'fr' ? (days + ' jours') : (days + ' أيام');
-      else if (days >= 360) p.period = lng === 'fr' ? 'par an' : 'سنوياً';
+    if (!Number(p.price)) p.period = lng === 'fr' ? (days + ' jours') : (days + ' أيام');
+    else if (p.id && String(p.id).indexOf('boost') !== -1) p.period = lng === 'fr' ? 'par annonce' : 'لكل إعلان';
+    else if (days >= 360) p.period = lng === 'fr' ? 'par an' : 'سنوياً';
       else if (days >= 80) p.period = lng === 'fr' ? '3 mois' : '3 أشهر';
       else p.period = lng === 'fr' ? 'par mois' : 'شهرياً';
     }
@@ -86,6 +87,9 @@
   }
 
   function getPackages(catalogKey, lang) {
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.ensureCatalogStorageFresh === 'function') {
+      try { global.RizqPackagesConfig.ensureCatalogStorageFresh(); } catch (e) {}
+    }
     var key = catalogKey || 'general';
     lang = lang || getLang();
     var list = [];
@@ -118,6 +122,11 @@
         Object.keys(resolveLsMap()).forEach(function (k) {
           if (Array.isArray(pkgs[k])) localStorage.setItem(resolveLsMap()[k], JSON.stringify(pkgs[k]));
         });
+        try {
+          if (global.RizqPackagesConfig && global.RizqPackagesConfig.CATALOG_SYNC_REVISION) {
+            localStorage.setItem('rizq_catalog_sync_revision', global.RizqPackagesConfig.CATALOG_SYNC_REVISION);
+          }
+        } catch (e) {}
         if (typeof cb === 'function') cb(true);
         return true;
       })

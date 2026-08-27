@@ -172,12 +172,13 @@ async function syncAccountPackage(opts) {
   opts = opts || {};
   if (!opts.accountId || !opts.pkgName) return { ok: false, error: 'accountId + pkgName مطلوبان' };
 
-  const { mapPackageNameToPlanType } = require('./services/entitlements');
+  const { mapPackageIdToPlanType, mapPackageNameToPlanType } = require('./services/entitlements');
   const store = _load();
   const existing = store[opts.accountId] || {};
   const accessToken = existing.accessToken || _genToken();
   const accountType = opts.accountType || existing.accountType || 'individual';
-  const planType = mapPackageNameToPlanType(opts.pkgName, accountType);
+  const planType = mapPackageIdToPlanType(opts.packageId, accountType)
+    || mapPackageNameToPlanType(opts.pkgName, accountType, opts.packageId);
   const diamondTier = resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
   const isTrial = opts.isTrial === true || isTrialPackage(opts.pkgName, opts.price);
   const paymentConfirmed = !isTrial && (
@@ -255,7 +256,7 @@ function createPendingPackageFromRequest(opts) {
   opts = opts || {};
   if (!opts.accountId || !opts.pkgName) return { ok: false, error: 'accountId + pkgName مطلوبان' };
 
-  const { mapPackageNameToPlanType } = require('./services/entitlements');
+  const { mapPackageIdToPlanType, mapPackageNameToPlanType } = require('./services/entitlements');
   const store = _load();
   const existing = store[opts.accountId] || {};
   const endMs = existing.periodEnd ? new Date(existing.periodEnd).getTime() : NaN;
@@ -272,7 +273,8 @@ function createPendingPackageFromRequest(opts) {
     accountPhone: opts.accountPhone || existing.accountPhone || '',
     accountEmail: opts.accountEmail || existing.accountEmail || '',
     accountType,
-    planType: mapPackageNameToPlanType(opts.pkgName, accountType),
+    planType: mapPackageIdToPlanType(opts.packageId, accountType)
+      || mapPackageNameToPlanType(opts.pkgName, accountType, opts.packageId),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
     status: 'pending',
@@ -570,6 +572,7 @@ module.exports = {
   runLifecycleScan,
   setupPackageLifecycleAPI,
   sendSMS: _sendSMS,
+  sendWhatsApp: _sendWhatsApp,
   applyReferralBonusDays,
   REFERRAL_BONUS_DAYS,
 };

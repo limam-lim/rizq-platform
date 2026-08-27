@@ -12,7 +12,8 @@
   var PKG_DURATIONS = {
     'تجريبية مجانية' : 3,
     'تجريبية'        : 3,
-    'مجانية'         : 3,
+    'مجانية'         : 10,
+    'مميزة'          : 30,
     'شهرية'          : 30,
     'ربعية'          : 90,
     'سنوية'          : 365,
@@ -44,7 +45,7 @@
   var PLAN_MATRIX = {
     free: {
       planType: 'free',
-      maxActiveAds: 5,
+      maxActiveAds: 1,
       maxPhotosPerItem: 5,
       videoMaxSec: 30,
       videoMaxMb: 20,
@@ -52,10 +53,19 @@
       privateStore: false,
       priorityListing: false,
     },
+    medium: {
+      planType: 'medium',
+      maxActiveAds: 5,
+      maxPhotosPerItem: 5,
+      videoMaxSec: 30,
+      videoMaxMb: 20,
+      videoWatermark: true,
+      priorityListing: false,
+    },
     pro: {
       planType: 'pro',
-      maxActiveAds: Infinity,
-      maxPhotosPerItem: 10,
+      maxActiveAds: 10,
+      maxPhotosPerItem: 5,
       videoMaxSec: 60,
       videoMaxMb: 40,
       videoWatermark: false,
@@ -91,7 +101,8 @@
     if (/^pro$|pro\b|باقة\s*pro/.test(name)) return 'pro';
     if (type === 'individual') {
       if (/مجان|free/.test(name)) return 'free';
-      if (/شهر|month|pro/.test(name)) return 'pro';
+      if (/متوسط|medium|broker/.test(name)) return 'medium';
+      if (/باقة\s*شهرية|شهر|month|^pro$|pro\b/.test(name)) return 'pro';
       return 'free';
     }
     return null;
@@ -218,27 +229,29 @@
   // المشكلة التي عولجت هنا: canPostNewAd() وحدها كانت تمنح "غير محدود"
   // لأي حساب لديه باقة نشطة من أي مستوى، متجاهلةً الأرقام الدقيقة التي
   // تَعِد بها كل باقة فعلياً في PKG_DEFAULTS (rizq_admin.html) — مثال:
-  // "شهرية" للمحل تَعِد بـ50 منتجاً فقط، لا عدداً غير محدود. هذا الجدول
+  // "شهرية" للمحل تَعِد بـ100 منتجاً، "ربعية" بـ500 — لا عدداً غير محدود إلا السنوية/الماسية. هذا الجدول
   // هو المصدر الوحيد للحقيقة للأرقام الدقيقة، ويجب إبقاؤه مطابقاً تماماً
   // لأسماء وأرقام PKG_DEFAULTS عند أي تعديل مستقبلي على الباقات.
   // ملاحظة "مميزة" (فرد): سعرها لكل إعلان لا لكل حساب — عمداً غير مذكورة
   // هنا؛ تُعامَل عبر POST_LIMIT_FALLBACK.individual=1 (نفس حد المجانية)
   // كي لا تمنح طاقة نشر حساب كاملة مقابل شراء تثبيت إعلان واحد فقط.
+  // مفاتيح packageId القياسية (st-month، tnd-trial، vid-pro…) — المصدر الوحيد للحقيقة.
   var POST_LIMITS = {
     individual : {
-      'مجانية': 5, 'مجاني': 5, 'free': 5, 'Free': 5,
-      'Pro': Infinity, 'pro': Infinity, 'PRO': Infinity, 'باقة شهرية': Infinity,
-      'Business': Infinity, 'business': Infinity, '🏢 Business': Infinity,
+      'ind-free': 1, 'ind-boost': 1, 'ind-medium': 5, 'ind-monthly': 10,
     },
-    store      : { 'تجريبية':Infinity, 'شهرية':50, 'ربعية':200, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
-    corp       : { 'تجريبية':Infinity, 'شهرية':30, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
-    office     : { 'تجريبية':Infinity, 'شهرية':Infinity, 'ربعية':Infinity, 'سنوية':Infinity, 'ماسية':Infinity, 'الماسية 💎 (النائب الذكي الشامل)':Infinity },
+    store      : { 'st-trial': 10, 'st-month': 100, 'st-quart': 500, 'st-year': Infinity, 'st-diam-std': Infinity, 'st-diam-pro': Infinity },
+    corp       : { 'cp-trial': Infinity, 'cp-month': 30, 'cp-quart': Infinity, 'cp-year': Infinity, 'cp-diam-std': Infinity, 'cp-diam-pro': Infinity },
+    office     : { 'of-trial': 3, 'of-month': Infinity, 'of-quart': Infinity, 'of-year': Infinity, 'of-diam-std': Infinity, 'of-diam-pro': Infinity },
+    tender     : { 'tnd-trial': 0, 'tnd-month': Infinity, 'tnd-quart': Infinity, 'tnd-year': Infinity },
+    ads        : { 'vid-single': 1, 'vid-basic': 3, 'vid-pro': 10, 'vid-business': Infinity },
+    video      : { 'vid-single': 1, 'vid-basic': 3, 'vid-pro': 10, 'vid-business': Infinity },
   };
   // فئة غير معروفة بالجدول أو اسم باقة غير مطابق تماماً → القيمة الافتراضية.
   // للفرد فقط نفترض الأدنى (1) تحوطاً؛ لبقية الفئات نفترض "غير محدود" تفادياً
   // لحجب مشترك دافع فعلياً بسبب اختلاف بسيط في اسم الباقة (أكثر أماناً تجارياً
   // من حجب زبون دفع فعلاً بالخطأ).
-  var POST_LIMIT_FALLBACK = { individual: 5 };
+  var POST_LIMIT_FALLBACK = { individual: 1 };
 
   var AI_FEATURES = [
     'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel',
@@ -258,13 +271,23 @@
     return null;
   }
 
+  function resolveAccountPackageId(accId, sub) {
+    sub = sub || checkSubscription(accId);
+    var acc = sub.acc || getAccounts()[accId];
+    if (acc && (acc.packageId || acc.pkgId)) return String(acc.packageId || acc.pkgId).toLowerCase();
+    var def = _findPackageDef(sub.pkg);
+    if (def && def.id) return String(def.id).toLowerCase();
+    return '';
+  }
+
   function getPostLimit(accId, category) {
     var sub = checkSubscription(accId);
     var table = POST_LIMITS[category];
     if(!table) return Infinity;
-    var name = String(sub.pkg||'').replace('💎 ','').trim();
-    if (isDiamondName(name)) return Infinity;
-    if(Object.prototype.hasOwnProperty.call(table, name)) return table[name];
+    var pkgId = resolveAccountPackageId(accId, sub);
+    if (pkgId && Object.prototype.hasOwnProperty.call(table, pkgId)) return table[pkgId];
+    if (/diam-pro|diamond_pro/.test(pkgId)) return Infinity;
+    if (/diam|diamond/.test(pkgId)) return Infinity;
     return Object.prototype.hasOwnProperty.call(POST_LIMIT_FALLBACK, category) ? POST_LIMIT_FALLBACK[category] : Infinity;
   }
 
@@ -306,7 +329,7 @@
         var arr = JSON.parse(raw);
         if(!Array.isArray(arr)) continue;
         var found = arr.find(function(p){ return p && String(p.name||'').replace('💎 ','').trim()===name; });
-        if(found) return { price:Number(found.price)||0, durationDays:found.durationDays, active:found.active!==false, list:PKG_LISTS[i], siblings:arr };
+        if(found) return { id: found.id || null, price:Number(found.price)||0, durationDays:found.durationDays, active:found.active!==false, list:PKG_LISTS[i], siblings:arr };
       }catch(e){}
     }
     return null;
@@ -404,11 +427,15 @@
     history.push({ pkg: pkgName, activatedAt: now.toISOString(), endsAt: ends.toISOString(), days: days, by: activatedBy || 'admin' });
 
     var accExisting = accounts[accId] || {};
+    var pdefActivate = _findPackageDef(pkgName);
+    var activatedPkgId = (pdefActivate && pdefActivate.id) ? String(pdefActivate.id) : (accExisting.packageId || accExisting.pkgId || null);
     var diamondOn = isDiamondName(pkgName) && !isTrial;
-    var diamondTier = diamondOn ? resolveDiamondTierClient(pkgName) : null;
+    var diamondTier = diamondOn ? resolveDiamondTierClient(pkgName, activatedPkgId) : null;
     accounts[accId] = Object.assign(accExisting, {
       id          : accId,
       package     : pkgName,
+      packageId   : activatedPkgId,
+      pkgId       : activatedPkgId,
       pkg_status  : isTrial ? 'trial' : 'active',
       trial       : isTrial,
       pkg_days    : days,
@@ -562,6 +589,9 @@
     var status;
     if(!endsAt || daysLeft < 0) {
       status = 'expired';
+      if(acc && acc.pkg_status !== 'expired' && acc.package) {
+        try { expirePackage(accId); } catch(e){}
+      }
     } else if(daysLeft === 0) {
       status = 'expired'; // ينتهي اليوم = منتهٍ
     } else if(daysLeft <= 1) {
@@ -618,11 +648,47 @@
       endsAt              : endsAt ? endsAt.toISOString() : null,
       features            : features,
       isTrial             : isTrial,
+      isExpired           : status === 'expired',
+      contactsLocked      : status === 'expired' || status === 'pending' || status === 'no_subscription' || isTrial,
+      trialCountdownLabel : getTrialCountdownLabel({ status: status, daysLeft: Math.max(0, daysLeft), isTrial: isTrial, endsAt: endsAt }),
       acc                 : acc,
       monthlyAdsUsed      : monthlyAdsUsed,
       monthlyAdsRemaining : monthlyAdsRemaining,
       freeAdsLimit        : FREE_MONTHLY_ADS_LIMIT,
     };
+  }
+
+  /** Countdown label for trial/expiring subscriptions (dashboard + banners) */
+  function getTrialCountdownLabel(sub) {
+    sub = sub || {};
+    var fr = false;
+    try { fr = localStorage.getItem('rizq_lang') === 'fr'; } catch(e) {}
+    var days = Number(sub.daysLeft) || 0;
+    if (sub.status === 'expired') {
+      return fr ? 'Abonnement expiré' : 'انتهى الاشتراك';
+    }
+    if (sub.status === 'trial_expiring' || sub.status === 'expiring_soon') {
+      return fr ? ('Expire dans ' + days + ' jour(s)') : ('ينتهي خلال ' + days + ' يوم');
+    }
+    if (sub.isTrial || sub.status === 'trial') {
+      return fr ? ('Essai — ' + days + ' jour(s) restants') : ('تجربة — متبقٍ ' + days + ' يوم');
+    }
+    if (sub.endsAt) {
+      try {
+        var d = new Date(sub.endsAt);
+        return fr ? ('Valide jusqu\'au ' + d.toLocaleDateString('fr-FR')) : ('صالح حتى ' + d.toLocaleDateString('ar-EG'));
+      } catch(e) {}
+    }
+    return '';
+  }
+
+  /** Client-side hint only — server Contact Gate is authoritative */
+  function canViewContactsClient(accId, module) {
+    var sub = checkSubscription(accId);
+    if (module === 'tender') {
+      return !(sub.isTrial || sub.isExpired || sub.status === 'no_subscription' || sub.status === 'pending');
+    }
+    return !sub.contactsLocked;
   }
 
   // ── إيقاف الباقة (عند الانتهاء) ──────────────────────────────────
@@ -728,7 +794,7 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // "مميزة" — تثبيت إعلان واحد محدَّد لمدة 3 أيام (500 MRU) — إعادة تصميم
+  // "مميزة" — تثبيت إعلان واحد محدَّد لمدة 3 أيام (300 MRU — دفعة واحدة لكل إعلان)
   // جوهرية 27/07/2026 (طلب صريح من Limam، مهمة #219):
   // كانت "مميزة" تُعامَل تماماً كأي باقة حساب أخرى عبر activatePackage() —
   // أي شراءها كان (أ) يكتب فوق accounts[accId].package بالكامل، فلو كان
@@ -864,9 +930,28 @@
     // ترجمة أسماء/مدد الباقات الافتراضية المعروفة (الباقات المخصّصة التي يضيفها
     // الأدمين بأسماء حرة تبقى بلغتها الأصلية، كبقية المحتوى الذي يُدخله المستخدم
     // عبر المنصة — نفس المنطق المعتمد في باقي الصفحات).
-    var NAME_FR = {'تجريبية':'Essai','شهرية':'Mensuel','ربعية':'Trimestriel','سنوية':'Annuel','ماسية':'Diamant','💎 ماسية':'💎 Diamant','الماسية 💎 (النائب الذكي الشامل)':'Diamant 💎 (Adjoint intelligent complet)','مجانية':'Gratuite','مميزة':'Boost','باقة شهرية':'Mensuel'};
-    var DUR_FR = {'3 أيام':'3 jours','شهر':'mois','شهرياً':'Mensuel','3 أشهر':'3 mois','12 شهر':'12 mois','7 أيام':'7 jours','لكل إعلان':'par annonce'};
-    function trName(n){ if(lang!=='fr') return n; var k=(n||'').trim(); return NAME_FR[k]!==undefined?NAME_FR[k]:n; }
+    var NAME_FR = {'تجريبية':'Essai','شهرية':'Mensuel','ربعية':'Trimestriel','سنوية':'Annuel','ماسية':'Diamant','💎 ماسية':'💎 Diamant','الماسية 💎 (النائب الذكي الشامل)':'Diamant 💎 (Adjoint intelligent complet)','الماسية الأساسية للمحلات':'Diamant Standard boutique','الماسية Pro للمحلات':'Diamant Pro boutique','الماسية الأساسية للمكاتب':'Diamant Standard bureau','الماسية Pro للمكاتب':'Diamant Pro bureau','الماسية الأساسية للشركات':'Diamant Standard entreprise','الماسية Pro للشركات':'Diamant Pro entreprise','مجانية':'Gratuite','مميزة':'Boost','باقة متوسطة':'Forfait intermédiaire','باقة شهرية':'Mensuel','إعلان فيديو واحد':'Vidéo unique','أساسي فيديو':'Basique vidéo','احترافي فيديو':'Pro vidéo','أساسي (فيديو)':'Basique vidéo','احترافي (فيديو)':'Pro vidéo','أساسي':'Basique','احترافي':'Pro','أعمال ومعارض':'Entreprises & galeries'};
+    var DUR_FR = {'3 أيام':'3 jours','10 أيام':'10 jours','30 يوماً':'30 jours','شهر':'mois','شهرياً':'Mensuel','3 أشهر':'3 mois','12 شهر':'12 mois','7 أيام':'7 jours','لكل إعلان':'par annonce','دفعة واحدة':'paiement unique'};
+    function trName(n){
+      if(typeof global.RizqPackagesConfig!=='undefined'&&typeof global.RizqPackagesConfig.localizedName==='function'){
+        return global.RizqPackagesConfig.localizedName({name:n,name_fr:(NAME_FR[(n||'').trim()]!==undefined?NAME_FR[(n||'').trim()]:'')}, lang);
+      }
+      if(lang!=='fr') return n;
+      var k=(n||'').trim();
+      return NAME_FR[k]!==undefined?NAME_FR[k]:n;
+    }
+    function pkgNamePick(p){
+      if(typeof global.RizqLocale!=='undefined'){
+        return global.RizqLocale.pickBilingual({ar:String(p.name_ar||p.name||'').trim(), fr:String(p.name_fr||'').trim(), lang:lang});
+      }
+      return {text:trName(p.name), isFallback:false, sourceLang:null};
+    }
+    function pkgFeatsPick(p){
+      var arFeats=(p.features&&p.features.length)?p.features:(FEATS[p.name]||FEATS['ماسية']||[]);
+      var frFeats=p.features_fr||[];
+      if(typeof global.RizqLocale!=='undefined') return global.RizqLocale.pickListBilingual(arFeats, frFeats, lang);
+      return {items:arFeats, isFallback:false, sourceLang:null};
+    }
     function trDur(d){ if(lang!=='fr') return d; var k=(d||'').trim(); return DUR_FR[k]!==undefined?DUR_FR[k]:d; }
     function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     var CSS='<style>'
@@ -892,7 +977,11 @@
       var checkCol=isDiamondPkg?'#c084fc':isYear?'#fde68a':isTrial?'#22c55e':'#10b981';
       var btnBg=isDiamondPkg?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':p.highlight?'linear-gradient(135deg,#C9A84C,#e8c96a)':'linear-gradient(135deg,#3b82f6,#1d4ed8)';
       var btnCol=isDiamondPkg?'#fff':isYear?'#0f2347':isTrial?'#fff':'#0f2347';
-      var feats=(p.features&&p.features.length)?p.features:(FEATS[p.name]||FEATS['ماسية']||[]);
+      var namePick=pkgNamePick(p);
+      var featPick=pkgFeatsPick(p);
+      var feats=featPick.items||[];
+      var nameFallbackNote=(namePick.isFallback&&typeof global.RizqLocale!=='undefined')?global.RizqLocale.fallbackNoteHtml(namePick.sourceLang, lang, true):'';
+      var featFallbackNote=(featPick.isFallback&&typeof global.RizqLocale!=='undefined')?global.RizqLocale.fallbackNoteHtml(featPick.sourceLang, lang, true):'';
       var badge = isDiamondPkg
         ? (p.featuredBadge || _t2('الأكثر اختياراً للشركات','Le plus choisi par les entreprises'))
         : '';
@@ -901,30 +990,34 @@
         +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+esc(badge)+'</div>':'')
         +(isYear?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(124,58,237,.4)">💎 '+_t2('الأفضل قيمة','Meilleur rapport qualité-prix')+'</div>':'')
         +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||(isDiamondPkg?'💎':'📦'))+'</div>'
-        +'<div style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(trName(p.name))+'</div>'
-        +(p.description?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc(p.description)+'</div>':'')
+        +'<div style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(namePick.text||trName(p.name))+nameFallbackNote+'</div>'
+        +(p.description?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc((lang==='fr'&&(p.description_fr||p.descriptionFr))?(p.description_fr||p.descriptionFr):(p.description||''))+'</div>':'')
         +'<div style="font-size:11px;color:'+mutedCol+';margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">'+esc(trDur(p.duration||''))+'</div>'
         +'<div style="height:1px;background:'+(isYear?'rgba(255,255,255,.12)':'rgba(27,58,107,.08)')+';margin-bottom:14px"></div>'
         +'<div style="margin-bottom:16px"><span style="font-size:30px;font-weight:900;color:'+priceCol+';line-height:1">'+(isFree?_t2('مجاناً','Gratuit'):Number(p.price).toLocaleString())+'</span>'
-        +(!isFree?'<div style="font-size:10px;color:'+mutedCol+';margin-top:1px;font-weight:600">MRU / '+esc(trDur(p.duration||''))+'</div>':'')+'</div>'
+        +(!isFree?'<div style="font-size:10px;color:'+mutedCol+';margin-top:1px;font-weight:600">MRU / '+esc(trDur((p.period && !/^MRU\s*\//i.test(String(p.period))) ? p.period : (p.name==='مميزة' ? 'لكل إعلان' : (p.duration||''))))+'</div>':'')+'</div>'
         +(isDiamondPkg && p.roi ? '<div style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:11.5px;line-height:1.55;color:#fde68a;text-align:'+(lang==='fr'?'left':'right')+'">💼 '+esc(p.roi)+'</div>' : '')
-        +'<div style="margin-bottom:18px;padding:0 4px;text-align:right">'+feats.map(function(f){return '<div class="rpkg-feat"><span style="color:'+checkCol+';font-size:14px;flex-shrink:0;margin-top:1px">✓</span><span style="color:'+featCol+'">'+f+'</span></div>';}).join('')+'</div>'
-        +(isFree
+        +'<div style="margin-bottom:18px;padding:0 4px;text-align:right">'+feats.map(function(f){return '<div class="rpkg-feat"><span style="color:'+checkCol+';font-size:14px;flex-shrink:0;margin-top:1px">✓</span><span style="color:'+featCol+'">'+f+'</span></div>';}).join('')+(featFallbackNote||'')+'</div>'
+        +(isFree && category !== 'tender'
           ?'<div style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46">✓ '+_t2('الباقة الحالية','Forfait actuel')+'</div>'
-          // إصلاح جوهري 27/07/2026 (#219): "مميزة" ليست باقة حساب — هي تثبيت
-          // إعلان واحد محدَّد. زر خاص يفتح أولاً منتقي الإعلان (openAdBoostPicker،
-          // مُعرَّفة في rizq_dashboard.html فقط) بدل فتح نموذج الدفع العام مباشرة
-          // (الذي كان يربط الشراء بالحساب كله عبر activatePackage — الخطأ الأصلي).
-          : (p.name==='مميزة'
-              ? '<button onclick="if(typeof openAdBoostPicker===\'function\'){openAdBoostPicker(\''+esc(p.name)+'\','+p.price+')}else{openPayModal(\''+esc(p.name)+'\','+p.price+',\''+category+'\')}" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('اختر إعلاناً لتثبيته ←','Choisir une annonce à épingler →')+'</button>'
-              : '<button onclick="openPayModal(\''+esc(p.name)+'\','+p.price+',\''+category+'\')" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('اشترك الآن ←','S\'abonner →')+'</button>'
+          : (isFree && category === 'tender'
+              ? '<button onclick="openPayModal(\''+esc(p.name)+'\','+p.price+',\'tender\')" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('ابدأ التجربة المجانية ←','Commencer l\'essai gratuit →')+'</button>'
+              // إصلاح جوهري 27/07/2026 (#219): "مميزة" ليست باقة حساب — هي تثبيت
+              // إعلان واحد محدَّد. زر خاص يفتح أولاً منتقي الإعلان (openAdBoostPicker،
+              // مُعرَّفة في rizq_dashboard.html فقط) بدل فتح نموذج الدفع العام مباشرة
+              // (الذي كان يربط الشراء بالحساب كله عبر activatePackage — الخطأ الأصلي).
+              : (p.name==='مميزة'
+                  ? '<button onclick="if(typeof openAdBoostPicker===\'function\'){openAdBoostPicker(\''+esc(p.name)+'\','+p.price+')}else{openPayModal(\''+esc(p.name)+'\','+p.price+',\''+category+'\')}" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('اختر إعلاناً لتثبيته ←','Choisir une annonce à épingler →')+'</button>'
+                  : '<button onclick="openPayModal(\''+esc(p.name)+'\','+p.price+',\''+category+'\')" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('اشترك الآن ←','S\'abonner →')+'</button>'
+                )
             )
         )
         +'</div>';
     }).join('');
     var grid = CSS+'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:18px;padding-top:10px">'+html+'</div>';
-    var renewal = '<p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">'+_t2('اختر الباقة:','Choisissez le forfait :')+'</p><div style="display:flex;flex-wrap:wrap;gap:8px">'+(list||[]).filter(function(p){return p.price>0;}).map(function(p){
-      return '<label style="cursor:pointer;font-size:12.5px;padding:6px 10px;border:1px solid rgba(27,58,107,.15);border-radius:8px"><input type="radio" name="renewal-pkg" value="'+esc(p.name)+'" style="margin-left:5px"/>'+esc(trName(p.name))+' — '+Number(p.price).toLocaleString()+' MRU</label>';
+    var renewal = '<p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">'+_t2('اختر الباقة:','Choisissez le forfait :')+'</p><div style="display:flex;flex-wrap:wrap;gap:8px">'+(list||[]).filter(function(p){return p.price>0 && p.name!=='مميزة' && String(p.id||'').indexOf('boost')===-1;}).map(function(p){
+      var rnPick = (typeof global.RizqLocale!=='undefined') ? global.RizqLocale.pickBilingual({ar:String(p.name_ar||p.name||'').trim(), fr:String(p.name_fr||'').trim(), lang:lang}) : {text:trName(p.name)};
+      return '<label style="cursor:pointer;font-size:12.5px;padding:6px 10px;border:1px solid rgba(27,58,107,.15);border-radius:8px"><input type="radio" name="renewal-pkg" value="'+esc(p.name)+'" style="margin-left:5px"/>'+esc(rnPick.text||trName(p.name))+' — '+Number(p.price).toLocaleString()+' MRU</label>';
     }).join('')+'</div>';
     return { grid: grid, renewal: renewal };
   }
@@ -1096,6 +1189,7 @@
       var analysis = isAgentEnabled() ? analyzeReceipt(base, requests) : { riskLevel: 'unreviewed', flags: [], imgHash: base.receiptImageHash };
       base.riskLevel = analysis.riskLevel;
       base.flags = analysis.flags;
+      if (opts.accessToken) base.accessToken = opts.accessToken;
       requests.push(base);
       localStorage.setItem('rizq_sub_requests', JSON.stringify(requests));
       if (opts.accountId && (opts.category || 'package') === 'package') {
@@ -1117,7 +1211,9 @@
 
     if (opts.file.size > MAX_RECEIPT_BYTES) {
       // نضغط بالرفض اللطيف بدل تخزين ملف ضخم قد يكسر localStorage لكل المنصة
-      return Promise.reject({ code: 'file_too_large', msg: 'حجم صورة الوصل كبير جداً (الحد 1.5MB) — رجاءً صغّرها وأعد المحاولة' });
+      return Promise.reject({ code: 'file_too_large', msg: (typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t2)
+        ? global.RizqI18n.t2('حجم صورة الوصل كبير جداً (الحد 1.5MB) — رجاءً صغّرها وأعد المحاولة', 'Image du reçu trop volumineuse (max 1,5 Mo) — veuillez la réduire et réessayer')
+        : 'حجم صورة الوصل كبير جداً (الحد 1.5MB) — رجاءً صغّرها وأعد المحاولة' });
     }
 
     return _readFileAsDataURL(opts.file).then(finalize);
@@ -1133,12 +1229,40 @@
   function _syncSubRequestToBackend(req) {
     try {
       if (!global.RIZQ_BACKEND_BASE) return;
+      var headers = { 'Content-Type': 'application/json' };
+      var tok = req.accessToken || (typeof global.REAL_ACCESS_TOKEN !== 'undefined' ? global.REAL_ACCESS_TOKEN : null);
+      if (tok) headers['x-account-token'] = tok;
       fetch(global.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/sub-requests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify(req)
       }).catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة */ });
     } catch (e) {}
+  }
+
+  /** إخفاء طرق الدفع/رفع الوصل عند تفعيل باقة مجانية (مثل tnd-trial) */
+  function configurePayModalFreeMode(pkgPrice, lang) {
+    var isFree = Number(pkgPrice) === 0;
+    var t2 = function(ar, fr){ return (lang === 'fr') ? fr : ar; };
+    var banks = typeof document !== 'undefined' ? document.getElementById('pay-banks') : null;
+    var upload = typeof document !== 'undefined' ? document.getElementById('pay-upload-zone') : null;
+    var submit = typeof document !== 'undefined' ? document.getElementById('pay-submit-btn') : null;
+    var footer = typeof document !== 'undefined' ? document.getElementById('pay-footer-note') : null;
+    if (banks) banks.style.display = isFree ? 'none' : '';
+    if (upload) upload.style.display = isFree ? 'none' : '';
+    if (submit) {
+      if (!submit.dataset.defaultLabel) {
+        submit.dataset.defaultLabel = (typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t)
+          ? global.RizqI18n.t('pay-submit-btn', 'dashboard')
+          : t2('📤 إرسال طلب الاشتراك', '📤 Envoyer la demande d\'abonnement');
+      }
+      submit.textContent = isFree
+        ? ((typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t)
+            ? global.RizqI18n.t('pay-activate-trial', 'dashboard')
+            : t2('✓ تفعيل التجربة', '✓ Activer l\'essai'))
+        : submit.dataset.defaultLabel;
+    }
+    if (footer) footer.style.display = isFree ? 'none' : '';
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -1211,6 +1335,7 @@
     // ── الوصل: فحص احتيال إحصائي + إرسال موحّد ──
     analyzeReceipt       : analyzeReceipt,
     submitSubscriptionRequest: submitSubscriptionRequest,
+    configurePayModalFreeMode: configurePayModalFreeMode,
     verifyReceiptWithAI  : verifyReceiptWithAI,
     PLAN_MATRIX          : PLAN_MATRIX,
     resolvePlanType      : resolvePlanType,
@@ -1218,6 +1343,8 @@
     getPhotoLimit        : getPhotoLimit,
     getVideoPolicy       : getVideoPolicy,
     syncEntitlementsFromServer: syncEntitlementsFromServer,
+    getTrialCountdownLabel: getTrialCountdownLabel,
+    canViewContactsClient: canViewContactsClient,
   };
 
   console.log('[RIZQ-SUB] Subscription Engine v1.0 loaded ✅');

@@ -560,6 +560,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
   <!-- مطلوب لحساب شارة "موثّق"/"مميّز" الحقيقية (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
@@ -567,6 +568,8 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js" defer></script>
   <script src="rizq_backend_config.js"></script>
+  <script src="rizq_contact_gate.js"></script>
+  <script src="rizq_account_payments.js"></script>
 <script src="rizq_auth_gate.js" defer></script>
 </head>
 <body data-t-ns="office">
@@ -900,6 +903,8 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="contact-info-addr" data-t="contact-info-addr">📍 نواكشوط — حي تيارت، شارع الأمل</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="contact-info-phone">📞 +222 XX XX XX XX</div>
       <div style="font-size:13px;color:var(--muted)" id="contact-info-email">✉️ office@rizq.mr</div>
+
+      <div id="office-payment-methods" style="display:none;margin-top:14px"></div>
 
     </div>
 
@@ -1322,6 +1327,81 @@ function openMaps(){
   })();
   </script>
 
+  <!-- ═══ Contact Gate — بيانات التواصل من GET /api/accounts/public فقط ═══ -->
+  <script>
+  (function(){
+    function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+    function setText(id,val){ if(val==null||val==='') return; var el=document.getElementById(id); if(el) el.textContent=val; }
+    function setHref(id,val){ if(!val) return; var el=document.getElementById(id); if(el) el.setAttribute('href',val); }
+
+    function renderOfficePaymentMethods(acc){
+      var box = document.getElementById('office-payment-methods');
+      if(!box || typeof RizqAccountPayments === 'undefined') return;
+      RizqAccountPayments.renderPublic(box, acc && acc.paymentMethods, { fr: isFr() });
+    }
+
+    function applyGatedOfficeContacts(accountId, acc){
+      acc = acc || { contactsLocked: true };
+      renderOfficePaymentMethods(acc);
+      var locked = !!acc.contactsLocked;
+      var phone = acc.phone || '';
+      var email = acc.email || '';
+      var wa = acc.whatsapp || '';
+      var fr = isFr();
+      function maskClick(e){
+        e.preventDefault();
+        if(window.RizqContactGate && accountId){
+          RizqContactGate.onMaskedContactClick(accountId, 'office', { lang: fr ? 'fr' : 'ar' });
+        }
+      }
+      if(locked || (!phone && !email && !wa)){
+        setText('contact-info-phone', '📞 ••• ••• •••');
+        setText('contact-info-email', '✉️ •••@•••.•••');
+        ['sb-wa','act-wa-top','sb-call','act-call-top','sb-email'].forEach(function(btnId){
+          var el = document.getElementById(btnId);
+          if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
+        });
+        return;
+      }
+      var waSrc = wa || phone;
+      if(waSrc){
+        var waNum = String(waSrc).replace(/[^0-9]/g,'');
+        setHref('sb-wa', 'https://wa.me/' + waNum);
+        setHref('act-wa-top', 'https://wa.me/' + waNum);
+      }
+      if(phone){
+        var telNum = String(phone).replace(/\s/g,'');
+        setHref('sb-call', 'tel:' + telNum);
+        setHref('act-call-top', 'tel:' + telNum);
+        setText('contact-info-phone', '📞 ' + phone);
+      }
+      if(email){
+        setHref('sb-email', 'mailto:' + email);
+        setText('contact-info-email', '✉️ ' + email);
+      }
+    }
+
+    window._rizqLoadOfficeContacts = async function(accountId){
+      if(!accountId){ return; }
+      if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE){
+        applyGatedOfficeContacts(accountId, { contactsLocked: true });
+        return;
+      }
+      var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+      var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};
+      try{
+        var pr = await fetch(base + '/api/accounts/public', { headers: headers });
+        if(!pr.ok){ applyGatedOfficeContacts(accountId, { contactsLocked: true }); return; }
+        var pdata = await pr.json();
+        var acc = (pdata.accounts || []).find(function(a){ return a.id === accountId && a.type === 'office'; });
+        applyGatedOfficeContacts(accountId, acc || { contactsLocked: true });
+      }catch(e){
+        applyGatedOfficeContacts(accountId, { contactsLocked: true });
+      }
+    };
+  })();
+  </script>
+
   <!-- ═══ ربط هوية المكتب الحقيقية بالصفحة العامة ═══
        إصلاح حقيقي: كان اسم المكتب/التخصص/الوصف/الخدمات/ساعات العمل/بيانات
        التواصل ثابتة تماماً (بيانات تجريبية "مكتب الفجر") ولا تتغيّر أبداً
@@ -1384,23 +1464,7 @@ function openMaps(){
           setText('contact-info-addr', '📍 ' + addr);
         }
 
-        // ── بيانات التواصل ──
-        var waSrc = acc.whatsapp || acc.phone;
-        if(waSrc){
-          var waNum = String(waSrc).replace(/[^0-9]/g,'');
-          setHref('sb-wa', 'https://wa.me/' + waNum);
-          setHref('act-wa-top', 'https://wa.me/' + waNum);
-        }
-        if(acc.phone){
-          var telNum = String(acc.phone).replace(/\s/g,'');
-          setHref('sb-call', 'tel:' + telNum);
-          setHref('act-call-top', 'tel:' + telNum);
-          setText('contact-info-phone', '📞 ' + acc.phone);
-        }
-        if(acc.email){
-          setHref('sb-email', 'mailto:' + acc.email);
-          setText('contact-info-email', '✉️ ' + acc.email);
-        }
+        // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
 
         // ── الخدمات — إعادة بناء القائمة من بيانات حقيقية إن وُجدت ──
         try{
@@ -1468,6 +1532,8 @@ function openMaps(){
             }
           }
         }catch(e){}
+
+        if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
       }catch(e){}
     }
 
@@ -1516,10 +1582,6 @@ function openMaps(){
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr','📍 '+addr); }
-                if(acc.whatsapp){
-                  var waNum = String(acc.whatsapp).replace(/[^0-9]/g,'');
-                  setHref('sb-wa','https://wa.me/'+waNum); setHref('act-wa-top','https://wa.me/'+waNum);
-                }
                 if(typeof RizqSub!=='undefined'){
                   var b = RizqSub.getBadges(id);
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
@@ -1637,6 +1699,8 @@ function openMaps(){
             if(typeof window._rizqRenderOfficeReviews === 'function') window._rizqRenderOfficeReviews();
           }
         }catch(e){}
+
+        if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
       }catch(e){}
     }
 

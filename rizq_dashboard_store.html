@@ -330,19 +330,22 @@ textarea.form-input{resize:vertical;min-height:90px}
 }
 </style>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_packages_config.js"></script>
+<script src="rizq_packages_config.js?v=12.9"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_account_payments.js"></script>
 <script src="rizq_invoice_engine.js"></script>
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
 <script src="rizq_pwa.js" defer></script>
 </head>
-<body data-t-ns="dashboard_store"><!-- RIZQ-BUILD:202606131951 -->
+<body data-t-ns="dashboard_store" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
 
 <!-- ACCESS DENIED -->
 <div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:20px">
@@ -1261,7 +1264,14 @@ function _initWithAccount(acc){
   // إصلاح جوهري: _rizqMergeCatalogFromBackend تحتاج accessToken الحقيقي
   // (وليس dashToken) لينجح فعلياً مع verifyAccountOwner() بالخادم — تُستدعى
   // الآن بعد حل window.REAL_ACCESS_TOKEN بدل التوازي معه.
-  if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){ _rizqMergeCatalogFromBackend(); });
+  if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){
+    _rizqMergeCatalogFromBackend();
+    if(typeof RizqAccountPayments !== 'undefined' && acc.id){
+      RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || SESSION_TOKEN).then(function(methods){
+        if(Array.isArray(methods) && typeof renderMyPayments === 'function') renderMyPayments();
+      });
+    }
+  });
 
   // Fill sidebar
   document.getElementById('sb-store-name').textContent = STORE.name || _t2('محلي','Ma boutique');
@@ -1422,9 +1432,10 @@ function _tenderPkgList(){
     if(Array.isArray(list) && list.length) return list;
   }catch(e){}
   return [
-    {name:'شهرية', price:2500,  duration:'شهر'},
-    {name:'ربعية', price:6300,  duration:'3 أشهر'},
-    {name:'سنوية', price:19000, duration:'12 شهر'}
+    {name:'تجريبية', price:0,     duration:'10 أيام'},
+    {name:'شهرية', price:5000,  duration:'شهر'},
+    {name:'ربعية', price:13500, duration:'3 أشهر'},
+    {name:'سنوية', price:45000, duration:'12 شهر'}
   ];
 }
 
@@ -1446,19 +1457,25 @@ function renderTenderSubStatus(){
     .then(function(data){
       if(data && data.ok && data.subscribed){
         var endsTxt = '';
-        try{ endsTxt = new Date(data.record.periodEnd).toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        try{ endsTxt = new Date((data.record && data.record.periodEnd) || '').toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        if(data.isTrial && !data.contactsUnlocked){
+          el.innerHTML = '<div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#92400e">'
+            + '🔍 '+(fr?('Essai actif jusqu\'au '+escapeHtml(endsTxt)+' — consultation uniquement (contacts masqués, soumission verrouillée).') : ('باقتك التجريبية فعّالة حتى '+escapeHtml(endsTxt)+' — للتصفّح فقط (التواصل مخفي والعروض مقفولة).'))
+            + '</div>';
+          return;
+        }
         el.innerHTML = '<div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#065f46">'
-          + '✅ '+(fr?('Vous êtes abonné à la formule Appels d\'offres — valable jusqu\'au '+escapeHtml(endsTxt)) : ('أنت مشترك في باقة المناقصة — سارية حتى '+escapeHtml(endsTxt)))
+          + '✅ '+(fr?('Abonnement Appels d\'offres actif — contacts débloqués — jusqu\'au '+escapeHtml(endsTxt)) : ('اشتراك المناقصة فعّال — بيانات التواصل مكشوفة — حتى '+escapeHtml(endsTxt)))
           + '</div>';
         return;
       }
-      var FEATS_AR = {'شهرية':['نشر مناقصات غير محدود','تقديم عروض على مناقصات الآخرين','بدون أي فترة تجربة'],'ربعية':['كل مزايا الشهرية','توفير 16% عن الشهري','أولوية ظهور عروضك'],'سنوية':['كل مزايا الربعية','توفير 37% عن الشهري','فوترة سنوية واحدة']};
-      var FEATS_FR = {'شهرية':['Publication illimitée','Soumission d\'offres','Sans période d\'essai'],'ربعية':['Tous les avantages du mensuel','16% d\'économie','Priorité d\'affichage des offres'],'سنوية':['Tous les avantages du trimestriel','37% d\'économie','Facturation annuelle unique']};
+      var FEATS_AR = {'تجريبية':['تصفّح وتصفية المناقصات','بيانات التواصل مخفية','تقديم العروض مقفول'],'شهرية':['كشف بيانات التواصل','تقديم عروض غير محدود','نشر مناقصات'],'ربعية':['كل مزايا الشهرية','توفير 10%','أولوية ظهور العروض'],'سنوية':['كل مزايا الربعية','توفير 25%','تنبيهات SMS/واتساب']};
+      var FEATS_FR = {'تجريبية':['Consultation et filtrage','Contacts masqués','Soumission verrouillée'],'شهرية':['Contacts débloqués','Offres illimitées','Publication d\'appels d\'offres'],'ربعية':['Tous les avantages mensuels','10% d\'économie','Priorité des offres'],'سنوية':['Tous les avantages trimestriels','25% d\'économie','Alertes SMS/WhatsApp']};
       var FEATS = fr ? FEATS_FR : FEATS_AR;
-      var ICONS = {'شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
+      var ICONS = {'تجريبية':'🔍','شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
       var lockMsg = fr
-        ? 'Un abonnement à la formule Appels d\'offres est requis pour publier ou soumissionner — sans aucune période d\'essai gratuite.'
-        : 'تحتاج اشتراكاً في باقة المناقصة للنشر وتقديم العروض — بدون أي فترة تجربة مجانية.';
+        ? 'Abonnez-vous à la formule Appels d\'offres (mensuelle ou plus) pour débloquer les contacts et soumettre des offres. L\'essai permet la consultation uniquement.'
+        : 'اشترك في باقة المناقصة (شهرية فأعلى) لكشف بيانات التواصل وتقديم العروض — الباقة التجريبية للتصفّح فقط.';
       var cardsHtml = (typeof RizqSub !== 'undefined' && typeof RizqSub.renderPackageCardsHTML === 'function')
         ? RizqSub.renderPackageCardsHTML(_tenderPkgList(), FEATS, ICONS, (typeof _storeLang!=='undefined'?_storeLang:'ar'), 'tender').grid
         : '';
@@ -2279,12 +2296,12 @@ function renderPackagesDisplay(){
   var el=document.getElementById('packages-display'); if(!el) return;
   var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
 
-  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'],'شهرية':['صفحة محل موثقة','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية']};
-  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des produits','Support technique de base'],'شهرية':['Page boutique vérifiée','50 produits affichés','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','200 produits affichés','Gestionnaire de compte dédié'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Produits illimités','Support VIP 24/7','Rapports annuels']};
+  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','عرض 10 منتجات','دعم فني أساسي'],'شهرية':['صفحة محل موثقة','عرض 100 منتج','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 500 منتج','مدير حساب مخصص'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'],'الماسية الأساسية للمحلات':['منتجات غير محدودة للمتجر','نائب ذكي نصي للمحل (موقع + واتساب)','1,500 محادثة نصية شهرياً','لوحة متابعة وتحليل الأداء لحظياً'],'الماسية Pro للمحلات':['منتجات غير محدودة للمتجر','نائب ذكي تفاعلي للمحل (نصي + صوتي)','2,500 محادثة نصية + 150 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات آليّة','لوحة متابعة وتحليل الأداء لحظياً']};
+  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','10 produits affichés','Support technique de base'],'شهرية':['Page boutique vérifiée','100 produits affichés','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','500 produits affichés','Gestionnaire de compte dédié'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Produits illimités','Support VIP 24/7','Rapports annuels'],'الماسية الأساسية للمحلات':['Produits illimités pour la boutique','Adjoint intelligent texte (site + WhatsApp)','1 500 conversations texte / mois','Tableau de bord et analyse en temps réel'],'الماسية Pro للمحلات':['Produits illimités pour la boutique','Adjoint interactif (texte + voix)','2 500 conversations texte + 150 min voix / mois','Widget site + WhatsApp + appels automatiques','Tableau de bord et analyse en temps réel']};
   var FEATS=lang==='fr'?FEATS_FR:FEATS_AR;
-  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
+  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','الماسية الأساسية للمحلات':'💎','الماسية Pro للمحلات':'💎','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
-  var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:2000},{name:'ربعية',duration:'3 أشهر',price:5500,highlight:true},{name:'سنوية',duration:'12 شهر',price:15000},{name:'ماسية',duration:'شهر',price:3500,isDiamond:true}];
+  var DEF=[{name:'تجريبية',duration:'10 أيام',price:0},{name:'شهرية',duration:'شهر',price:2000},{name:'ربعية',duration:'3 أشهر',price:5500,highlight:true},{name:'سنوية',duration:'12 شهر',price:15000},{name:'الماسية الأساسية للمحلات',duration:'شهر',price:3500,isDiamond:true},{name:'الماسية Pro للمحلات',duration:'شهر',price:6000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
     var cat=RizqPackagesConfig.getCatalog('store');
@@ -2301,17 +2318,19 @@ function renderPackagesDisplay(){
 function renderVideoPackagesDisplay(){
   var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
   var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
-  var pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;});
-  var DEF=[
-    {name:'أساسي',duration:'شهر',price:5000},
-    {name:'احترافي',duration:'شهر',price:12000,highlight:true},
-    {name:'أعمال ومعارض',duration:'شهر',price:25000}
-  ];
-  var list=pkgs.length?pkgs:DEF;
-  var FEATS_AR={'أساسي':['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'],'احترافي':['حتى 3 فيديوهات إعلانية نشطة','أولوية ظهور في النتائج','شارة "محتوى مرئي موثّق"','دعم تحرير أساسي'],'أعمال ومعارض':['فيديوهات إعلانية غير محدودة','ظهور في القسم المميز بالصفحة الرئيسية','تقارير أداء تفصيلية','مدير حساب مخصص']};
-  var FEATS_FR={'أساسي':['Une vidéo publicitaire (max 30s)','Présence dans la section vidéo','Statistiques de vues de base'],'احترافي':['Jusqu\'à 3 vidéos actives','Priorité d\'affichage','Badge "Contenu vérifié"','Support montage de base'],'أعمال ومعارض':['Vidéos illimitées','Position premium en page d\'accueil','Rapports de performance détaillés','Gestionnaire de compte dédié']};
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var list=pkgs;
+  var FEATS_AR={'إعلان فيديو واحد':['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'],'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
+  var FEATS_FR={'إعلان فيديو واحد':['Une vidéo publicitaire pendant 10 jours','Section publicitaire page d\'accueil','Paiement par annonce — sans abonnement mensuel'],'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
   var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'أساسي':'🎬','احترافي':'🥇','أعمال ومعارض':'💎'};
+  var ICONS={'إعلان فيديو واحد':'⚡','أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
   el.innerHTML=r.grid;
 }
@@ -2333,14 +2352,14 @@ function _rizqRenderAdsStatus(acc){
     var inPopup = (va.popup||[]).find(function(a){return a.accountId===acc.id;});
     if(!inHero && !inPopup) return; // لا إعلان نشط حالياً — لا داعٍ لعرض شيء
     var spots=[];
-    if(inHero) spots.push(fr?'🏠 الواجهة الرئيسية (Hero)':'🏠 الواجهة الرئيسية (Hero)');
-    if(inPopup) spots.push(fr?'📌 الشريط العلوي (Popup)':'📌 الشريط العلوي (Popup)');
+    if(inHero) spots.push(_t2('🏠 الواجهة الرئيسية (Hero)','🏠 Page d\'accueil (Hero)'));
+    if(inPopup) spots.push(_t2('📌 الشريط العلوي (Popup)','📌 Bandeau supérieur (Popup)'));
     var active = (inHero && inHero.active!==false) || (inPopup && inPopup.active!==false);
     mount.innerHTML = '<div style="background:'+(active?'#ecfdf5':'#fff7ed')+';border:1.5px solid '+(active?'#6ee7b7':'#fdba74')+';border-radius:12px;padding:14px 16px;font-size:12.5px;color:'+(active?'#065f46':'#9a3412')+';display:flex;align-items:center;gap:10px">'
       + '<span style="font-size:22px">'+(active?'🟢':'🟡')+'</span>'
       + '<span>'+(active
-          ? (fr?('✅ فيديوك الإعلاني نشط الآن في: '+spots.join(' + ')) : ('✅ فيديوك الإعلاني نشط الآن في: '+spots.join(' + ')))
-          : (fr?'⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة':'⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة'))+'</span>'
+          ? ('✅ '+_t2('فيديوك الإعلاني نشط الآن في: ','Votre vidéo publicitaire est active sur : ')+spots.join(' + '))
+          : _t2('⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة','⏸️ Votre vidéo est ajoutée mais suspendue par l\'administration'))+'</span>'
       + '</div>';
   }).catch(function(){});
 }
@@ -2795,12 +2814,21 @@ if (_storeLang === 'fr') {
       if(!data || !data.ok || !data.config) return;
       if(Array.isArray(data.config.bankCodes)){
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
+        if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.store))   localStorage.setItem('rizq_store_packages', JSON.stringify(data.config.packages.store));
         if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
         if(Array.isArray(data.config.packages.general)) localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
+        if(Array.isArray(data.config.packages.tender))  localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
       }
+      if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
+        try{ RizqPackagesConfig.ensureCatalogStorageFresh(true); }catch(e){}
+      }
+      if(typeof renderPackagesDisplay==='function') renderPackagesDisplay();
+      if(typeof renderVideoPackagesDisplay==='function') renderVideoPackagesDisplay();
+      if(typeof renderTenderSubStatus==='function') renderTenderSubStatus();
     }).catch(function(){});
 })();
 init();
@@ -2911,7 +2939,7 @@ function openPayModal(pkgName, pkgPrice, category){
 
   // Load payment methods, grouped by type (bank transfer / mobile number / payment code)
   var codes = [];
-  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active;}); } catch(e){}
+  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active !== false;}); } catch(e){}
   var groups = {bank:[], mobile:[], code:[]};
   codes.forEach(function(b){ var t = (b.type && groups[b.type]) ? b.type : 'bank'; groups[t].push(b); });
   var PM_META = {
@@ -2945,6 +2973,9 @@ function openPayModal(pkgName, pkgPrice, category){
   }
 
   var m = document.getElementById('pay-modal');
+  if(typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function'){
+    RizqSub.configurePayModalFreeMode(pkgPrice, (typeof _storeLang !== 'undefined' ? _storeLang : 'ar'));
+  }
   m.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -3049,10 +3080,21 @@ function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof O
 
 var DEMO_PAYMENTS=[];
 function getMyPayments(){
+  var accId = (typeof STORE !== 'undefined' && STORE && STORE.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined') return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }
 }
-function saveMyPayments(arr){ localStorage.setItem(getMyStoreKey(), JSON.stringify(arr)); }
+function saveMyPayments(arr){
+  var accId = (typeof STORE !== 'undefined' && STORE && STORE.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined'){
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || SESSION_TOKEN, IS_DEMO).then(function(saved){
+      if(Array.isArray(saved)) localStorage.setItem(getMyStoreKey(), JSON.stringify(saved));
+    });
+  }
+  localStorage.setItem(getMyStoreKey(), JSON.stringify(arr));
+  return Promise.resolve();
+}
 
 function renderMyPayments(){
   var el = document.getElementById('my-payment-list');
@@ -3136,10 +3178,11 @@ function saveMyPayment(){
   var editIdx = document.getElementById('mypay-edit-idx').value;
   if(editIdx!=='') methods[parseInt(editIdx)] = entry;
   else methods.push(entry);
-  saveMyPayments(methods);
-  closeMyPayModal();
-  renderMyPayments();
-  showToast(_t2('✅ تم الحفظ','✅ Enregistré'),'success');
+  saveMyPayments(methods).then(function(){
+    closeMyPayModal();
+    renderMyPayments();
+    showToast(_t2('✅ تم الحفظ','✅ Enregistré'),'success');
+  });
 }
 
 // Render on panel open
@@ -3229,7 +3272,7 @@ function saveMyPayment(){
   }
 
   function renderServicesShowcase(){
-    var el=document.getElementById('services-showcase'); if(!el) return; console.log('RIZQ-SERVICES-NEW-v20:real-tiers');
+    var el=document.getElementById('services-showcase'); if(!el) return;
     var acc=(typeof STORE!=='undefined'&&STORE)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||(typeof OFFICE!=='undefined'&&OFFICE)||{};
     var accId=acc.id||'';
     var ACC_TYPE='store';
@@ -3331,7 +3374,7 @@ window.addEventListener('load', function(){
       <button id="pay-submit-btn" onclick="submitPayment()" style="margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;border-radius:12px;font-weight:800;font-size:14px;color:#0f2347;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" data-t="pay-submit-btn-text">
         📤 إرسال طلب الاشتراك
       </button>
-      <p style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px" data-t="pay-review-note">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
+      <p id="pay-footer-note" style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px" data-t="pay-review-note">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
     </div>
   </div>
 </div>

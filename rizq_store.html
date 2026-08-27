@@ -573,6 +573,7 @@ footer{
   
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
@@ -580,6 +581,8 @@ footer{
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js" defer></script>
   <script src="rizq_backend_config.js"></script>
+  <script src="rizq_contact_gate.js"></script>
+  <script src="rizq_account_payments.js"></script>
 <script src="rizq_auth_gate.js" defer></script>
 </head>
 <body data-t-ns="store">
@@ -743,9 +746,10 @@ footer{
             <div class="delivery-opt-desc" data-t="dopt-p-desc">من المحل مباشرة</div>
           </div>
         </div>
-        <div style="padding:10px;background:#f8f9fc;border-radius:8px;font-size:12.5px;color:#1B3A6B;font-weight:600">
+        <div style="padding:10px;background:#f8f9fc;border-radius:8px;font-size:12.5px;color:#1B3A6B;font-weight:600;margin-bottom:10px">
           <span data-t="payment-note">💰 الدفع عند التسليم فقط — نقداً أو عبر بنكك المحلي</span>
         </div>
+        <div id="store-payment-methods" style="display:none"></div>
       </div>
     </aside>
 
@@ -916,9 +920,27 @@ function openQuickView(id, name, price, emoji, cat){
   document.getElementById('qv-modal-price').textContent = price;
 
   var descEl = document.getElementById('qv-modal-desc');
-  var descTxt = fr ? (extra.descFr || extra.desc || '') : (extra.desc || '');
-  if(descTxt){ descEl.textContent = descTxt; descEl.style.display = 'block'; }
-  else { descEl.style.display = 'none'; }
+  var descPick = (typeof RizqLocale !== 'undefined')
+    ? RizqLocale.pickBilingual({ ar: extra.desc, fr: extra.descFr, lang: fr ? 'fr' : 'ar' })
+    : { text: fr ? (extra.descFr || extra.desc || '') : (extra.desc || ''), isFallback: false, sourceLang: null };
+  var descTxt = descPick.text;
+  if(descTxt){
+    descEl.textContent = descTxt;
+    descEl.style.display = 'block';
+    var qvNote = document.getElementById('qv-modal-desc-fallback');
+    if(qvNote) qvNote.remove();
+    if(descPick.isFallback && typeof RizqLocale !== 'undefined'){
+      var noteEl = document.createElement('div');
+      noteEl.id = 'qv-modal-desc-fallback';
+      noteEl.innerHTML = RizqLocale.fallbackNoteHtml(descPick.sourceLang, fr ? 'fr' : 'ar', true);
+      descEl.insertAdjacentElement('afterend', noteEl);
+    }
+  }
+  else {
+    descEl.style.display = 'none';
+    var qvNote2 = document.getElementById('qv-modal-desc-fallback');
+    if(qvNote2) qvNote2.remove();
+  }
 
   var stockEl = document.getElementById('qv-modal-stock');
   var stockRaw = extra.stock;
@@ -1298,6 +1320,82 @@ function rizqShare(title, url) {
   })();
   </script>
 
+  <!-- ═══ Contact Gate — بيانات التواصل من GET /api/accounts/public فقط ═══ -->
+  <script>
+  (function(){
+    function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+    function setText(id,val){ if(val==null||val==='') return; var el=document.getElementById(id); if(el) el.textContent=val; }
+    function setHref(id,val){ if(!val) return; var el=document.getElementById(id); if(el) el.setAttribute('href',val); }
+
+    function renderStorePaymentMethods(acc){
+      var box = document.getElementById('store-payment-methods');
+      if(!box || typeof RizqAccountPayments === 'undefined') return;
+      RizqAccountPayments.renderPublic(box, acc && acc.paymentMethods, { fr: isFr() });
+    }
+
+    function applyGatedStoreContacts(accountId, acc){
+      acc = acc || { contactsLocked: true };
+      var locked = !!acc.contactsLocked;
+      var phone = acc.phone || '';
+      var email = acc.email || '';
+      var wa = acc.whatsapp || '';
+      var fr = isFr();
+      function maskClick(e){
+        e.preventDefault();
+        if(window.RizqContactGate && accountId){
+          RizqContactGate.onMaskedContactClick(accountId, 'store', { lang: fr ? 'fr' : 'ar' });
+        }
+      }
+      renderStorePaymentMethods(acc);
+      if(locked || (!phone && !email && !wa)){
+        var phoneEl = document.getElementById('info-value-phone-el');
+        if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
+        var emailEl = document.getElementById('info-value-email-el');
+        if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
+        ['store-wa-top','store-call-top'].forEach(function(btnId){
+          var el = document.getElementById(btnId);
+          if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
+        });
+        return;
+      }
+      var waSrc = wa || phone;
+      if(waSrc){
+        var waNum = String(waSrc).replace(/[^0-9]/g,'');
+        setHref('store-wa-top', 'https://wa.me/' + waNum);
+      }
+      if(phone){
+        setHref('store-call-top', 'tel:' + String(phone).replace(/\s/g,''));
+        var phoneEl2 = document.getElementById('info-value-phone-el');
+        if(phoneEl2){ phoneEl2.textContent = phone; phoneEl2.classList.remove('rzq-contact-masked'); phoneEl2.onclick = null; }
+      }
+      if(email){
+        setText('info-value-email-el', email);
+        var emailEl2 = document.getElementById('info-value-email-el');
+        if(emailEl2){ emailEl2.classList.remove('rzq-contact-masked'); emailEl2.onclick = null; }
+      }
+    }
+
+    window._rizqLoadStoreContacts = async function(accountId){
+      if(!accountId){ return; }
+      if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE){
+        applyGatedStoreContacts(accountId, { contactsLocked: true });
+        return;
+      }
+      var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+      var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};
+      try{
+        var pr = await fetch(base + '/api/accounts/public', { headers: headers });
+        if(!pr.ok){ applyGatedStoreContacts(accountId, { contactsLocked: true }); return; }
+        var pdata = await pr.json();
+        var acc = (pdata.accounts || []).find(function(a){ return a.id === accountId && (a.type === 'store' || a.type === 'shop'); });
+        applyGatedStoreContacts(accountId, acc || { contactsLocked: true });
+      }catch(e){
+        applyGatedStoreContacts(accountId, { contactsLocked: true });
+      }
+    };
+  })();
+  </script>
+
   <!-- ═══ ربط هوية المحل الحقيقية بالصفحة العامة ═══
        تُملأ الهوية والمنتجات والساعات من الحساب الحقيقي عند وجود
        ?id= أو ?store= مطابق لحساب store معتمد (localStorage ثم API).
@@ -1333,18 +1431,7 @@ function rizqShare(title, url) {
           setText('map-addr-el', addr);
         }
 
-        // ── بيانات التواصل ──
-        var waSrc = acc.whatsapp || acc.phone;
-        if(waSrc){
-          var waNum = String(waSrc).replace(/[^0-9]/g,'');
-          setHref('store-wa-top', 'https://wa.me/' + waNum);
-        }
-        if(acc.phone){
-          setHref('store-call-top', 'tel:' + String(acc.phone).replace(/\s/g,''));
-          var phoneEl = document.getElementById('info-value-phone-el');
-          if(phoneEl) phoneEl.textContent = acc.phone;
-        }
-        if(acc.email) setText('info-value-email-el', acc.email);
+        // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
 
         // ── المنتجات — إعادة بناء الكتالوج وتبويبات التصنيف من بيانات حقيقية ──
         try{
@@ -1442,6 +1529,8 @@ function rizqShare(title, url) {
             }
           }
         }catch(e){}
+
+        if(window._rizqLoadStoreContacts) window._rizqLoadStoreContacts(id);
       }catch(e){}
     }
 
@@ -1488,15 +1577,14 @@ function rizqShare(title, url) {
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr); }
-                if(acc.whatsapp){
-                  var waNum = String(acc.whatsapp).replace(/[^0-9]/g,'');
-                  setHref('store-wa-top','https://wa.me/'+waNum);
-                }
                 if(typeof RizqSub!=='undefined'){
                   var b = RizqSub.getBadges(id);
                   var ve=document.getElementById('badge-verified-lbl'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
+                }
+                if(typeof RizqAccountPayments !== 'undefined'){
+                  RizqAccountPayments.renderPublic(document.getElementById('store-payment-methods'), acc.paymentMethods, { fr: isFr() });
                 }
               }
             }
@@ -1603,6 +1691,8 @@ function rizqShare(title, url) {
             if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
           }
         }catch(e){}
+
+        if(window._rizqLoadStoreContacts) window._rizqLoadStoreContacts(id);
       }catch(e){}
     }
 

@@ -278,18 +278,21 @@ textarea.form-input{min-height:80px;resize:vertical}
 </style>
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_packages_config.js"></script>
+<script src="rizq_packages_config.js?v=12.9"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_account_payments.js"></script>
 <script src="rizq_invoice_engine.js"></script>
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
 <script src="rizq_pwa.js" defer></script>
 </head>
-<body data-t-ns="dashboard_corp"><!-- RIZQ-BUILD:202606131951 -->
+<body data-t-ns="dashboard_corp" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
 
 <!-- ACCESS DENIED -->
 <div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:20px">
@@ -1220,12 +1223,21 @@ function verifyCorpAccessRemote(id, tok){
       if(!data || !data.ok || !data.config) return;
       if(Array.isArray(data.config.bankCodes)){
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
+        if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.corp))    localStorage.setItem('rizq_corp_packages', JSON.stringify(data.config.packages.corp));
         if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
         if(Array.isArray(data.config.packages.general)) localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
+        if(Array.isArray(data.config.packages.tender))  localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
       }
+      if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
+        try{ RizqPackagesConfig.ensureCatalogStorageFresh(true); }catch(e){}
+      }
+      if(typeof renderPackagesDisplay==='function') renderPackagesDisplay();
+      if(typeof renderVideoPackagesDisplay==='function') renderVideoPackagesDisplay();
+      if(typeof renderTenderSubStatus==='function') renderTenderSubStatus();
     }).catch(function(){});
 })();
 initCorpAccess();
@@ -1285,7 +1297,7 @@ function initDashboard(){
   if(!IS_DEMO && acc && acc.id) {
     initSubscriptionLifecycle(acc.id, 'corp');
     // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
-    try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: acc.token, type:'corp', name: acc.name||''})); }catch(e){}
+    try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: acc.token, type:'corp', name: acc.name||''})); localStorage.setItem('rizq_session_id', acc.id); }catch(e){}
   }
   // Sidebar + hero labels (respect FR demo translations)
   _refreshCorpAccountLabels();
@@ -1316,6 +1328,11 @@ function initDashboard(){
       _rizqMergeInqsFromBackend();
       _rizqMergeTeamFromBackend();
       _rizqRenderAdsStatus(acc);
+      if(typeof RizqAccountPayments !== 'undefined' && acc.id){
+        RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || (CORP_ACC && CORP_ACC.token)).then(function(methods){
+          if(Array.isArray(methods) && typeof renderMyPayments === 'function') renderMyPayments();
+        });
+      }
     });
   }
   _rizqMergeRatingFromBackend();
@@ -1488,7 +1505,7 @@ function _corpPkgPrice(pkgName){
   var norm = function(n){ return String(n || '').replace('💎 ', '').trim(); };
   var hit = list.find(function(p){ return norm(p.name) === norm(pkgName); });
   if(hit) return Number(hit.price) || 0;
-  var defaults = {'تجريبية':0,'شهرية':3500,'ربعية':9000,'سنوية':25000,'ماسية':6000,'💎 ماسية':6000};
+  var defaults = {'تجريبية':0,'شهرية':3500,'ربعية':9000,'سنوية':25000,'ماسية':6000,'💎 ماسية':6000,'الماسية الأساسية للشركات':6000,'الماسية Pro للشركات':15000};
   return defaults[pkgName] !== undefined ? defaults[pkgName] : 0;
 }
 
@@ -1667,9 +1684,10 @@ function _tenderPkgList(){
     if(Array.isArray(list) && list.length) return list;
   }catch(e){}
   return [
-    {name:'شهرية', price:2500,  duration:'شهر'},
-    {name:'ربعية', price:6300,  duration:'3 أشهر'},
-    {name:'سنوية', price:19000, duration:'12 شهر'}
+    {name:'تجريبية', price:0,     duration:'10 أيام'},
+    {name:'شهرية', price:5000,  duration:'شهر'},
+    {name:'ربعية', price:13500, duration:'3 أشهر'},
+    {name:'سنوية', price:45000, duration:'12 شهر'}
   ];
 }
 
@@ -1685,19 +1703,25 @@ function renderTenderSubStatus(){
     .then(function(data){
       if(data && data.ok && data.subscribed){
         var endsTxt = '';
-        try{ endsTxt = new Date(data.record.periodEnd).toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        try{ endsTxt = new Date((data.record && data.record.periodEnd) || '').toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        if(data.isTrial && !data.contactsUnlocked){
+          el.innerHTML = '<div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#92400e">'
+            + '🔍 '+(fr?('Essai actif jusqu\'au '+escapeHtml(endsTxt)+' — consultation uniquement (contacts masqués, soumission verrouillée).') : ('باقتك التجريبية فعّالة حتى '+escapeHtml(endsTxt)+' — للتصفّح فقط (التواصل مخفي والعروض مقفولة).'))
+            + '</div>';
+          return;
+        }
         el.innerHTML = '<div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#065f46">'
-          + '✅ '+(fr?('Vous êtes abonné à la formule Appels d\'offres — valable jusqu\'au '+escapeHtml(endsTxt)) : ('أنت مشترك في باقة المناقصة — سارية حتى '+escapeHtml(endsTxt)))
+          + '✅ '+(fr?('Abonnement Appels d\'offres actif — contacts débloqués — jusqu\'au '+escapeHtml(endsTxt)) : ('اشتراك المناقصة فعّال — بيانات التواصل مكشوفة — حتى '+escapeHtml(endsTxt)))
           + '</div>';
         return;
       }
-      var FEATS_AR = {'شهرية':['نشر مناقصات غير محدود','تقديم عروض على مناقصات الآخرين','بدون أي فترة تجربة'],'ربعية':['كل مزايا الشهرية','توفير 16% عن الشهري','أولوية ظهور عروضك'],'سنوية':['كل مزايا الربعية','توفير 37% عن الشهري','فوترة سنوية واحدة']};
-      var FEATS_FR = {'شهرية':['Publication illimitée','Soumission d\'offres','Sans période d\'essai'],'ربعية':['Tous les avantages du mensuel','16% d\'économie','Priorité d\'affichage des offres'],'سنوية':['Tous les avantages du trimestriel','37% d\'économie','Facturation annuelle unique']};
+      var FEATS_AR = {'تجريبية':['تصفّح وتصفية المناقصات','بيانات التواصل مخفية','تقديم العروض مقفول'],'شهرية':['كشف بيانات التواصل','تقديم عروض غير محدود','نشر مناقصات'],'ربعية':['كل مزايا الشهرية','توفير 10%','أولوية ظهور العروض'],'سنوية':['كل مزايا الربعية','توفير 25%','تنبيهات SMS/واتساب']};
+      var FEATS_FR = {'تجريبية':['Consultation et filtrage','Contacts masqués','Soumission verrouillée'],'شهرية':['Contacts débloqués','Offres illimitées','Publication d\'appels d\'offres'],'ربعية':['Tous les avantages mensuels','10% d\'économie','Priorité des offres'],'سنوية':['Tous les avantages trimestriels','25% d\'économie','Alertes SMS/WhatsApp']};
       var FEATS = fr ? FEATS_FR : FEATS_AR;
-      var ICONS = {'شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
+      var ICONS = {'تجريبية':'🔍','شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
       var lockMsg = fr
-        ? 'Un abonnement à la formule Appels d\'offres est requis pour publier ou soumissionner — sans aucune période d\'essai gratuite.'
-        : 'تحتاج اشتراكاً في باقة المناقصة للنشر وتقديم العروض — بدون أي فترة تجربة مجانية.';
+        ? 'Abonnez-vous à la formule Appels d\'offres (mensuelle ou plus) pour débloquer les contacts et soumettre des offres. L\'essai permet la consultation uniquement.'
+        : 'اشترك في باقة المناقصة (شهرية فأعلى) لكشف بيانات التواصل وتقديم العروض — الباقة التجريبية للتصفّح فقط.';
       var cardsHtml = (typeof RizqSub !== 'undefined' && typeof RizqSub.renderPackageCardsHTML === 'function')
         ? RizqSub.renderPackageCardsHTML(_tenderPkgList(), FEATS, ICONS, (typeof _corpLang!=='undefined'?_corpLang:'ar'), 'tender').grid
         : '';
@@ -2284,12 +2308,12 @@ function renderPackagesDisplay(){
   var pkgs=JSON.parse(localStorage.getItem('rizq_corp_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;});
   var el=document.getElementById('packages-display'); if(!el) return;
 
-  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'],'شهرية':['صفحة شركة موثقة','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة']};
-  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des annonces','Support technique de base'],'شهرية':['Page entreprise vérifiée','30 annonces affichées','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','Annonces illimitées','Gestionnaire de compte'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Fonctionnalités VIP exclusives','Support 24/7','Rapports annuels complets']};
+  var FEATS_AR={'تجريبية':['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'],'شهرية':['صفحة شركة موثقة','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'],'ربعية':['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'],'سنوية':['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'],'الماسية الأساسية للشركات':['نائب ذكي نصي للشركة (موقع + واتساب)','4,000 محادثة نصية شهرياً','لوحة متابعة وتحليل الأداء لحظياً','هوية مخصصة باسم شركتك'],'الماسية Pro للشركات':['نائب ذكي تفاعلي للشركة (نصي + صوتي)','7,000 محادثة نصية + 600 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات تفاعلية','تكامل API / ERP','لوحة متابعة وتحليل الأداء لحظياً']};
+  var FEATS_FR={'تجريبية':['Accès complet à la plateforme','Consultation des annonces','Support technique de base'],'شهرية':['Page entreprise vérifiée','30 annonces affichées','Statistiques mensuelles','Support prioritaire'],'ربعية':['Tous les avantages du mensuel','15% d\'économie vs mensuel','Annonces illimitées','Gestionnaire de compte'],'سنوية':['Tous les avantages du trimestriel','35% d\'économie vs mensuel','Fonctionnalités VIP exclusives','Support 24/7','Rapports annuels complets'],'الماسية الأساسية للشركات':['Adjoint intelligent texte (site + WhatsApp)','4 000 conversations texte / mois','Tableau de bord et analyse en temps réel','Identité personnalisée au nom de votre entreprise'],'الماسية Pro للشركات':['Adjoint interactif entreprise (texte + voix)','7 000 conversations texte + 600 min voix / mois','Widget site + WhatsApp + appels interactifs','Intégration API / ERP','Tableau de bord et analyse en temps réel']};
   var FEATS=(typeof _corpLang!=='undefined'&&_corpLang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
+  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','الماسية الأساسية للشركات':'💎','الماسية Pro للشركات':'💎','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
-  var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'ماسية',duration:'شهر',price:6000,isDiamond:true}];
+  var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'الماسية الأساسية للشركات',duration:'شهر',price:6000,isDiamond:true},{name:'الماسية Pro للشركات',duration:'شهر',price:15000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
     var cat=RizqPackagesConfig.getCatalog('corp');
@@ -2306,17 +2330,19 @@ function renderPackagesDisplay(){
 function renderVideoPackagesDisplay(){
   var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
   var lang=(typeof _corpLang!=='undefined'?_corpLang:'ar');
-  var pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;});
-  var DEF=[
-    {name:'أساسي',duration:'شهر',price:5000},
-    {name:'احترافي',duration:'شهر',price:12000,highlight:true},
-    {name:'أعمال ومعارض',duration:'شهر',price:25000}
-  ];
-  var list=pkgs.length?pkgs:DEF;
-  var FEATS_AR={'أساسي':['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'],'احترافي':['حتى 3 فيديوهات إعلانية نشطة','أولوية ظهور في النتائج','شارة "محتوى مرئي موثّق"','دعم تحرير أساسي'],'أعمال ومعارض':['فيديوهات إعلانية غير محدودة','ظهور في القسم المميز بالصفحة الرئيسية','تقارير أداء تفصيلية','مدير حساب مخصص']};
-  var FEATS_FR={'أساسي':['Une vidéo publicitaire (max 30s)','Présence dans la section vidéo','Statistiques de vues de base'],'احترافي':['Jusqu\'à 3 vidéos actives','Priorité d\'affichage','Badge "Contenu vérifié"','Support montage de base'],'أعمال ومعارض':['Vidéos illimitées','Position premium en page d\'accueil','Rapports de performance détaillés','Gestionnaire de compte dédié']};
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var list=pkgs;
+  var FEATS_AR={'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
+  var FEATS_FR={'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
   var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'أساسي':'🎬','احترافي':'🥇','أعمال ومعارض':'💎'};
+  var ICONS={'أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
   el.innerHTML=r.grid;
 }
@@ -2363,7 +2389,7 @@ function openPayModal(pkgName, pkgPrice, category){
 
   // Load payment methods, grouped by type (bank transfer / mobile number / payment code)
   var codes = [];
-  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active;}); } catch(e){}
+  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active !== false;}); } catch(e){}
   var groups = {bank:[], mobile:[], code:[]};
   codes.forEach(function(b){ var t = (b.type && groups[b.type]) ? b.type : 'bank'; groups[t].push(b); });
   var PM_META = {
@@ -2397,6 +2423,9 @@ function openPayModal(pkgName, pkgPrice, category){
   }
 
   var m = document.getElementById('pay-modal');
+  if(typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function'){
+    RizqSub.configurePayModalFreeMode(pkgPrice, (typeof _corpLang !== 'undefined' ? _corpLang : 'ar'));
+  }
   m.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -2507,10 +2536,21 @@ function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof O
 
 var DEMO_PAYMENTS=[];
 function getMyPayments(){
+  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined') return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }
 }
-function saveMyPayments(arr){ localStorage.setItem(getMyStoreKey(), JSON.stringify(arr)); }
+function saveMyPayments(arr){
+  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined'){
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || (CORP_ACC && CORP_ACC.token), IS_DEMO).then(function(saved){
+      if(Array.isArray(saved)) localStorage.setItem(getMyStoreKey(), JSON.stringify(saved));
+    });
+  }
+  localStorage.setItem(getMyStoreKey(), JSON.stringify(arr));
+  return Promise.resolve();
+}
 
 function renderMyPayments(){
   var el = document.getElementById('my-payment-list');
@@ -2594,10 +2634,11 @@ function saveMyPayment(){
   var editIdx = document.getElementById('mypay-edit-idx').value;
   if(editIdx!=='') methods[parseInt(editIdx)] = entry;
   else methods.push(entry);
-  saveMyPayments(methods);
-  closeMyPayModal();
-  renderMyPayments();
-  showToast('✅ '+_t2('تم الحفظ','Enregistré'),'success');
+  saveMyPayments(methods).then(function(){
+    closeMyPayModal();
+    renderMyPayments();
+    showToast('✅ '+_t2('تم الحفظ','Enregistré'),'success');
+  });
 }
 
 // Render on panel open
@@ -3026,10 +3067,10 @@ function saveMyPayment(){
     CORP_ACC=acc;
     showToast(_t2('✅ تم حفظ معلومات الشركة','✅ Informations de l\'entreprise enregistrées'),'success');
     _refreshCorpAccountLabels();
-    var pvElC=document.getElementById('p-promo-video'); if(pvElC){ var pvVal=pvElC.value.trim(); var accsC=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var SESSION_CORP_ID=localStorage.getItem('rizq_session_id'); var idxC=accsC.findIndex(function(a){return a.id===SESSION_CORP_ID;}); if(idxC>-1){ accsC[idxC].promo_video=pvVal; localStorage.setItem('rizq_pending_accounts',JSON.stringify(accsC)); } }
+    var pvElC=document.getElementById('p-promo-video'); if(pvElC){ var pvVal=pvElC.value.trim(); var accsC=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var SESSION_CORP_ID=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id'); var idxC=accsC.findIndex(function(a){return a.id===SESSION_CORP_ID;}); if(idxC>-1){ accsC[idxC].promo_video=pvVal; localStorage.setItem('rizq_pending_accounts',JSON.stringify(accsC)); } }
     var tlElC=document.getElementById('p-tagline');
     var accsT=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var SESSION_CORP_ID3=localStorage.getItem('rizq_session_id');
+    var SESSION_CORP_ID3=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id');
     var idxT=accsT.findIndex(function(a){return a.id===SESSION_CORP_ID3;});
     if(idxT>-1){
       if(tlElC) accsT[idxT].tagline = tlElC.value.trim().slice(0,50);
@@ -3132,9 +3173,9 @@ function saveMyPayment(){
       if(!matched){ actSel.value='other'; if(actOther){ actOther.value=acc.activity; actOther.style.display=''; } }
       else if(actOther){ actOther.style.display = actSel.value==='other' ? '' : 'none'; }
     }
-    var pvElL=document.getElementById('p-promo-video'); if(pvElL){ var SESSION_CORP_ID2=localStorage.getItem('rizq_session_id'); var accsL=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var aL=accsL.find(function(a){return a.id===SESSION_CORP_ID2;}); pvElL.value=aL&&aL.promo_video?aL.promo_video:''; }
+    var pvElL=document.getElementById('p-promo-video'); if(pvElL){ var SESSION_CORP_ID2=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id'); var accsL=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var aL=accsL.find(function(a){return a.id===SESSION_CORP_ID2;}); pvElL.value=aL&&aL.promo_video?aL.promo_video:''; }
     var tlElLoad=document.getElementById('p-tagline');
-    var SESSION_CORP_ID4=localStorage.getItem('rizq_session_id');
+    var SESSION_CORP_ID4=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id');
     var accsL2=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var aL2=accsL2.find(function(a){return a.id===SESSION_CORP_ID4;});
     if(tlElLoad) tlElLoad.value = aL2&&aL2.tagline?aL2.tagline:'';
@@ -3249,7 +3290,7 @@ function saveMyPayment(){
       <button id="pay-submit-btn" onclick="submitPayment()" style="margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;border-radius:12px;font-weight:800;font-size:14px;color:#0f2347;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" data-t="pay-submit-btn">
         📤 إرسال طلب الاشتراك
       </button>
-      <p style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px" data-t="pay-review-note">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
+      <p id="pay-footer-note" style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px" data-t="pay-review-note">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
     </div>
   </div>
 </div>

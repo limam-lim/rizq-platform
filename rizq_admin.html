@@ -11,6 +11,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="description" content="لوحة إدارة رزق — Super Admin | ADMINIA SARL"/>
@@ -329,12 +330,12 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
-  <script src="rizq_packages_config.js"></script>
+  <script src="rizq_packages_config.js?v=12.9"></script>
   <script src="rizq_agent.js"></script>
   <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_pwa.js" defer></script>
 </head>
-<body data-t-ns="admin">
+<body class="rizq-dash" data-t-ns="admin">
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -345,7 +346,7 @@ main, .page-content.active, .main-content, .results-area,
     <input class="login-input" type="text" id="login-user" data-ph="login-user-ph" placeholder="اسم المستخدم أو البريد الإلكتروني" autocomplete="username"/>
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/>
     <div class="login-err" id="login-err"></div>
-    <button class="login-btn" data-t="login-btn" onclick="doLogin()">🔐 دخول إلى لوحة التحكم</button>
+    <button class="login-btn" id="login-btn" data-t="login-btn" onclick="doLogin()">🔐 دخول إلى لوحة التحكم</button>
   </div>
 </div>
 
@@ -2205,7 +2206,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="form-group"><label class="form-label" data-t="au-wilaya-label">الولاية</label>
         <select class="form-select" id="au-wilaya">
           <option data-t="au-wilaya-nkc-w">نواكشوط الغربية</option><option data-t="au-wilaya-nkc-n">نواكشوط الشمالية</option><option data-t="au-wilaya-nkc-s">نواكشوط الجنوبية</option>
-          <option data-t="au-wilaya-ndb">نواذيبو</option><option data-t="au-wilaya-trz">تيارت</option><option data-t="au-wilaya-trz2">ترارزة</option><option data-t="au-wilaya-brk">براكنة</option>
+          <option data-t="au-wilaya-ndb">نواذيبو</option><option data-t="au-wilaya-trz">تيرس زمور</option><option data-t="au-wilaya-trz2">ترارزة</option><option data-t="au-wilaya-brk">براكنة</option>
           <option data-t="au-wilaya-kfa">كيفة</option><option data-t="au-wilaya-slb">سيلبابي</option><option data-t="au-wilaya-aln">العيون</option><option data-t="au-wilaya-atr">أطار</option>
           <option data-t="au-wilaya-tjk">تيجيكجة</option><option data-t="au-wilaya-alk">ألاك</option><option data-t="au-wilaya-nma">نعمة</option><option data-t="au-wilaya-rso">روصو</option>
         </select>
@@ -2438,43 +2439,43 @@ const PKG_DEFAULTS = {
     {id:'diamond_pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, aiModel:'claude-3-5-sonnet', features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','📊 لوحة متابعة','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
   ],
   individual: [
-    {id:'ind-free',   name:'مجانية',     price:0,    period:'مجاناً — 7 أيام عرض', durationDays:7,  features:['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'], active:true},
-    {id:'ind-boost',  name:'مميزة',      price:500,  period:'MRU / لكل إعلان',     durationDays:3,  features:['تثبيت أعلى النتائج لمدة 3 أيام','حتى 5 صور للإعلان','شارة "إعلان مميز"'], active:true},
-    {id:'ind-monthly',name:'باقة شهرية', price:2000, period:'MRU / شهر',           durationDays:30, features:['حتى 10 إعلانات نشطة','حتى 5 صور لكل إعلان','تجديد تلقائي للإعلانات'], active:true},
+    {id:'ind-free',   name:'مجانية',     price:0,    period:'مجاناً — 10 أيام', durationDays:10, features:['إعلان واحد نشط','حتى 5 صور للإعلان','ظهور في نتائج البحث العادية'], active:true},
+    {id:'ind-boost',  name:'مميزة',      price:300,  period:'MRU / لكل إعلان', durationDays:30, boostDays:3, features:['تثبيت أعلى النتائج لمدة 3 أيام','حتى 5 صور للإعلان','شارة "إعلان مميز"'], active:true},
+    {id:'ind-medium', name:'باقة متوسطة', price:1000, period:'MRU / شهر',       durationDays:30, features:['حتى 5 إعلانات نشطة شهرياً','حتى 5 صور لكل إعلان','إمكانيات الإدارة والتعديل طوال الشهر'], active:true},
+    {id:'ind-monthly',name:'باقة شهرية', price:2000, period:'MRU / شهر',       durationDays:30, features:['حتى 10 إعلانات نشطة شهرياً','حتى 5 صور لكل إعلان','تجديد تلقائي للإعلانات'], active:true},
   ],
   office: [
-    {id:'of-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['عرض الخدمات','صفحة المكتب','طلبات تواصل','دعم فني أساسي'], active:true},
-    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['جميع المزايا','🏅 شارة "موثّق ✅"','إحصائيات','🎬 فيديو تعريفي مشمول','دعم بالأولوية'], active:true},
-    {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['توفير 14%','جميع المزايا','🎬 فيديو مشمول','مدير حساب مخصص'], active:true},
-    {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, features:['توفير 33%','أفضل قيمة','🎬 فيديو مشمول + 1 إضافي مجاني','أولوية الدعم'], active:true},
-    {id:'of-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
-    {id:'of-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
+    {id:'of-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10, maxCatalogItems:3, features:['عرض حتى 3 خدمات نشطة','صفحة المكتب','طلبات تواصل'], active:true},
+    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['شارة مكتب موثوق','نظام حجز المواعيد','فيديو تعريفي مشمول'], active:true},
+    {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  maxCatalogItems:Infinity, features:['توفير 14%','عرض خدمات غير محدود','مدير حساب مخصص'], active:true},
+    {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, maxCatalogItems:Infinity, features:['توفير 33%','فيديو تعريفي مشمول + 1 إضافي مجاناً','أولوية الدعم'], active:true},
+    {id:'of-diam-std', name:'الماسية الأساسية للمكاتب', price:4000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, maxCatalogItems:Infinity, features:['موظف استقبال واستفسارات 24/7 (نصي)','تنظيم طلبات الخدمات والمواعيد','2,000 محادثة نصية شهرياً','ويدجت الموقع + واتساب'], active:true},
+    {id:'of-diam-pro', name:'الماسية Pro للمكاتب', price:7500, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:3500, quotaMinutes:200, maxCatalogItems:Infinity, features:['موظف استقبال آلي مخصص (نصي + صوتي)','رد آلي على الاتصالات','إدارة المواعيد والاستشارات مع نموذج طلبات متقدم','3,500 محادثة نصية + 200 دقيقة صوتية شهرياً'], active:true},
   ],
   store: [
-    {id:'st-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض المنتجات','دعم فني أساسي'], active:true},
-    {id:'st-month', name:'شهرية',   price:2000,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "محل مميّز برزق"','عرض 50 منتج','إحصائيات شهرية','دعم بالأولوية'], active:true},
-    {id:'st-quart', name:'ربعية',   price:5500,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 200 منتج','مدير حساب مخصص'], active:true},
-    {id:'st-year',  name:'سنوية',   price:15000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'], active:true},
-    {id:'st-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
-    {id:'st-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
+    {id:'st-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10,  maxCatalogItems:10, features:['وصول كامل للمنصة','عرض 10 منتجات','دعم فني أساسي'], active:true},
+    {id:'st-month', name:'شهرية',   price:2000,  period:'MRU / شهر',        durationDays:30,  maxCatalogItems:100, features:['🏅 شارة "محل مميّز برزق"','عرض 100 منتج','إحصائيات شهرية','دعم بالأولوية'], active:true},
+    {id:'st-quart', name:'ربعية',   price:5500,  period:'MRU / 3 أشهر',     durationDays:90,  maxCatalogItems:500, features:['كل مزايا الشهرية','توفير 15% عن الشهري','عرض 500 منتج','مدير حساب مخصص'], active:true},
+    {id:'st-year',  name:'سنوية',   price:15000, period:'MRU / 12 شهر',     durationDays:365, maxCatalogItems:Infinity, features:['كل مزايا الربعية','توفير 35% عن الشهري','منتجات غير محدودة','دعم VIP 24/7','تقارير سنوية'], active:true},
+    {id:'st-diam-std', name:'الماسية الأساسية للمحلات', price:3500, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:1500, quotaMinutes:0, maxCatalogItems:Infinity, features:['منتجات غير محدودة للمتجر','نائب ذكي نصي للمحل (موقع + واتساب)','1,500 محادثة نصية شهرياً','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
+    {id:'st-diam-pro', name:'الماسية Pro للمحلات', price:6000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:2500, quotaMinutes:150, maxCatalogItems:Infinity, features:['منتجات غير محدودة للمتجر','نائب ذكي تفاعلي للمحل (نصي + صوتي)','2,500 محادثة نصية + 150 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات آليّة','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
   ],
   corp: [
     {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
     {id:'cp-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "شركة مميّزة برزق"','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'cp-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'], active:true},
     {id:'cp-year',  name:'سنوية',   price:25000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'], active:true},
-    {id:'cp-diam-std', name:'الماسية الأساسية 💎', price:5000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب','⚡ 2,000 محادثة/شهر'], active:true},
-    {id:'cp-diam-pro', name:'الماسية المتقدمة 💎 Pro', price:10000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, features:['🤖 Claude 3.5 Sonnet','💬 ويدجت + واتساب + صوت','⚡ 4,000 محادثة + 300 دقيقة/شهر'], active:true},
+    {id:'cp-diam-std', name:'الماسية الأساسية للشركات', price:6000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:4000, quotaMinutes:0, maxCatalogItems:Infinity, features:['نائب ذكي نصي للشركة (موقع + واتساب)','4,000 محادثة نصية شهرياً','لوحة متابعة وتحليل الأداء لحظياً','هوية مخصصة باسم شركتك'], active:true},
+    {id:'cp-diam-pro', name:'الماسية Pro للشركات', price:15000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:7000, quotaMinutes:600, maxCatalogItems:Infinity, features:['نائب ذكي تفاعلي للشركة (نصي + صوتي)','7,000 محادثة نصية + 600 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات تفاعلية','تكامل API / ERP','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
   ],
   video: [
-    {id:'vid-basic',    name:'أساسي (فيديو)',      price:5000,  period:'MRU / شهر', durationDays:30, features:['فيديو إعلاني واحد (حتى 30 ثانية)','ظهور في قسم الإعلانات المرئية','إحصائيات مشاهدات أساسية'], active:true},
-    {id:'vid-pro',      name:'احترافي (فيديو)',    price:12000, period:'MRU / شهر', durationDays:30, features:['حتى 3 فيديوهات إعلانية','أولوية ظهور في النتائج','🏅 شارة "محتوى مميّز برزق"','دعم تحرير أساسي'], active:true},
-    {id:'vid-business', name:'أعمال ومعارض',       price:25000, period:'MRU / شهر', durationDays:30, features:['فيديوهات غير محدودة','ظهور في القسم المميز بالصفحة الرئيسية','تقارير أداء تفصيلية','مدير حساب مخصص'], active:true},
+    {id:'vid-single',   name:'إعلان فيديو واحد', price:1500,  period:'MRU / إعلان · 10 أيام', durationDays:10, maxVideosPerMonth:1, payPerAd:true, features:['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'], active:true},
+    {id:'vid-basic',    name:'أساسي فيديو',      price:5000,  period:'MRU / شهر', durationDays:30, maxVideosPerMonth:3, features:['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'], active:true},
+    {id:'vid-pro',      name:'احترافي فيديو',    price:12000, period:'MRU / شهر', durationDays:30, maxVideosPerMonth:10, features:['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'], active:true},
+    {id:'vid-business', name:'أعمال ومعارض',       price:25000, period:'MRU / شهر', durationDays:30, maxVideosPerMonth:Infinity, features:['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'], active:true},
   ],
-  // ── باقة المناقصة — عمداً بلا أي بند "تجريبية/مجانية" هنا (خلافاً لكل
-  // الفئات الأخرى أعلاه) — تصحيح صريح من Limam بتاريخ 23/07/2026: المناقصة
-  // هي الميزة الوحيدة التي لا تُمنح أي فترة تجربة أياً كانت.
-  // توسيع 24/07/2026 (طلب صريح من Limam): إضافة مستويين إضافيين (ربعية/سنوية)
+  // ── باقة المناقصة — tnd-trial متاحة (10 أيام، تصفّح فقط، تواصل/عروض مقفولان).
+  // المستويات المدفوعة (tnd-month / tnd-quart / tnd-year) تفتح كشف التواصل وتقديم العروض.
   // بخصم، بنفس نسب الخصم المعتمدة في بقية الفئات أعلاه (~15% ربعي، ~35-37%
   // سنوي). الأسماء 'شهرية'/'ربعية'/'سنوية' مقصودة بالضبط — renderPackageCardsHTML
   // في rizq_subscription_engine.js يترجمها تلقائياً للفرنسية ويمنح "سنوية"
@@ -2484,9 +2485,10 @@ const PKG_DEFAULTS = {
   // دائماً بغض النظر عن اسم المستوى المُشترى (راجع تعليق activateTenderPackageForAccount
   // أدناه) — فقط السعر والمدة (durationDays) يختلفان فعلياً بين المستويات.
   tender: [
-    {id:'tnd-month', name:'شهرية', price:2500,  period:'MRU / شهر',    durationDays:30,  features:['نشر مناقصات غير محدود','تقديم عروض على مناقصات الآخرين','استقبال عروض موردين حقيقيين مباشرة','بدون أي فترة تجربة مجانية'], active:true},
-    {id:'tnd-quart', name:'ربعية', price:6300,  period:'MRU / 3 أشهر', durationDays:90,  features:['كل مزايا الشهرية','توفير 16% عن الشهري','أولوية ظهور عروضك للموردين','دعم بالأولوية'], active:true},
-    {id:'tnd-year',  name:'سنوية', price:19000, period:'MRU / 12 شهر', durationDays:365, features:['كل مزايا الربعية','توفير 37% عن الشهري','فوترة سنوية واحدة فقط','دعم VIP لغرفة المناقصات'], active:true},
+    {id:'tnd-trial', name:'تجريبية', price:0,     period:'مجان / 10 أيام', durationDays:10,  features:['تصفّح وتصفية المناقصات المنشورة','بيانات التواصل مخفية/ضبابية','تقديم العروض مقفول'], active:true},
+    {id:'tnd-month', name:'شهرية', price:5000,  period:'MRU / شهر',    durationDays:30,  features:['كشف بيانات تواصل صاحب المناقصة','تقديم عروض غير محدود','نشر مناقصات'], active:true},
+    {id:'tnd-quart', name:'ربعية', price:13500, period:'MRU / 3 أشهر', durationDays:90,  features:['كل مزايا الشهرية','توفير 10% عن الشهري','أولوية ظهور عروضك لأصحاب المناقصات'], active:true},
+    {id:'tnd-year',  name:'سنوية', price:45000, period:'MRU / 12 شهر', durationDays:365, features:['كل مزايا الربعية','توفير 25% عن الشهري','دعم VIP','تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], active:true},
   ],
   // شارة "موثّق⁺" — ميزة جديدة #232 (28/07/2026): تحقق هوية مُعزَّز مدفوع،
   // منفصل تماماً عن شارة "موثّق" المجانية (acc.status==='approved') وعن
@@ -3715,7 +3717,7 @@ function renderActivity(){
 function renderWilayaStats(){
   const stats=[
     {w:'نواكشوط الغربية',n:412},{w:'نواكشوط الشمالية',n:289},{w:'نواكشوط الجنوبية',n:201},
-    {w:'نواذيبو',n:156},{w:'ترارزة',n:87},{w:'براكنة',n:43},{w:'كيفة',n:28},{w:'تيارت',n:21},{w:'أخرى',n:10},
+    {w:'نواذيبو',n:156},{w:'ترارزة',n:87},{w:'براكنة',n:43},{w:'كيفة',n:28},{w:'تيرس زمور',n:21},{w:'أخرى',n:10},
   ];
   const max=stats[0].n;
   document.getElementById('wilaya-stats').innerHTML=stats.map(s=>`
@@ -5823,7 +5825,7 @@ function _doReceiptAction(action, idx){
 function activateAdBoostForRequest(req){
   if(!req || !req.accountId || !req.adId) return false;
   if(typeof RizqSub === 'undefined' || typeof RizqSub.activateAdBoost !== 'function') return false;
-  var days = findPackageDurationDays(req.pkg) || 3;
+  var days = findPackageBoostDays(req.pkg) || 3;
   RizqSub.activateAdBoost(req.accountId, req.adId, days, req.price);
   // مزامنة حقيقية مع الخادم (مهمة #234) — بدونها يبقى التثبيت مرئياً فقط على
   // جهاز المتصفح الذي وافق منه الأدمن، ولا يظهر إطلاقاً في قسم "ينتهي قريباً"
@@ -5845,6 +5847,15 @@ function findPackageDurationDays(pkgName){
   PKG_CATS.forEach(function(c){ all = all.concat(loadPkgCategory(c.key)); });
   var match = all.find(function(p){ return p.name === pkgName; });
   return (match && match.durationDays) ? match.durationDays : 30; // افتراضي: شهر واحد
+}
+
+function findPackageBoostDays(pkgName){
+  var all = [];
+  PKG_CATS.forEach(function(c){ all = all.concat(loadPkgCategory(c.key)); });
+  var match = all.find(function(p){ return p.name === pkgName; });
+  if (match && match.boostDays) return match.boostDays;
+  if (match && match.id && String(match.id).indexOf('boost') !== -1) return 3;
+  return null;
 }
 
 function activateSubscriptionForAccount(accountId, pkgName, price){
@@ -5886,8 +5897,11 @@ function activateTenderPackageForAccount(accountId, pkgName, price){
       accountPhone: accInfo.phone || '',
       accountEmail: accInfo.email || '',
       accountType: accInfo.type || '',
+      pkgName: pkgName,
+      packageId: (pkgDef && pkgDef.id) || null,
       price: price,
       days: days,
+      isTrial: (Number(price)||0) === 0,
       activatedBy: 'admin',
     })
   }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
@@ -6036,7 +6050,7 @@ function activateVideoAdForRequest(req){
 
   var pkgs = [];
   try { pkgs = JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); } catch(e){}
-  if(!pkgs.length) pkgs = [{name:'أساسي',price:5000},{name:'احترافي',price:12000},{name:'أعمال ومعارض',price:25000}];
+  if(!pkgs.length) pkgs = (typeof PKG_DEFAULTS !== 'undefined' && PKG_DEFAULTS.video) ? PKG_DEFAULTS.video.slice() : [{id:'vid-basic',name:'أساسي فيديو',price:5000},{id:'vid-pro',name:'احترافي فيديو',price:12000},{id:'vid-business',name:'أعمال ومعارض',price:25000}];
   var maxPrice = Math.max.apply(null, pkgs.map(function(p){ return Number(p.price)||0; }));
   var target = (maxPrice>0 && Number(req.price) >= maxPrice) ? 'hero' : 'popup';
   var other  = target === 'hero' ? 'popup' : 'hero';

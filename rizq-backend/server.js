@@ -1,16 +1,8 @@
 /**
  * rizq-backend/server.js
  * ══════════════════════════════════════════════════════════════════
- * خادم خلفي صغير وآمن لمنصة رزق — الوظيفة الوحيدة حالياً:
- * تحليل صورة وصل دفع عبر Claude Vision واستخراج (تاريخ/مبلغ/جهة) +
- * ملاحظات معقولية (plausibility) — بدون أي ادعاء بأنه "يثبت" عدم التزوير.
- *
- * أمان:
- *   - مفتاح Claude API لا يخرج من هذا الملف أبداً (process.env فقط).
- *   - CORS مقيّد بأصل واحد فقط (ALLOWED_ORIGIN).
- *   - سرّ مشترك (BACKEND_SHARED_SECRET) مطلوب في الهيدر لمنع الاستهلاك العشوائي.
- *   - Rate limit لمنع إنهاك حصة الـ API.
- *   - لا يُخزَّن شيء على القرص — الصورة تُعالَج بالذاكرة وتُرمى فوراً.
+ * © Rizq ADMINIA SARL — Proprietary & Confidential
+ * خادم خلفي صغير وآمن لمنصة رزق
  * ══════════════════════════════════════════════════════════════════
  */
 require('dotenv').config();
@@ -43,6 +35,16 @@ const app = express();
 // (site-config, ads/requests) تُضغط قبل الإرسال بدون أي تغيير في الشكل
 // أو السلوك الظاهر للمستخدم.
 app.use(compression());
+
+// ── Security & IP protection headers (Contact Gate + platform copyright) ──
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-Frame-Options', 'DENY');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
+  res.set('X-Copyright', '© Rizq ADMINIA SARL — Proprietary. Unauthorized copying prohibited.');
+  next();
+});
 
 // إصلاح جوهري 29/07/2026: كان الحد 4mb كافياً فقط لصورة وصل دفع واحدة —
 // إعلان واحد قد يحمل حتى 6 صور مضغوطة (~1-1.5MB لكل صورة بعد ضغط العميل)
@@ -452,10 +454,19 @@ const {
 } = require('./services/packageAccessGuard');
 const {
   getEntitlements,
+  getTenderEntitlements,
   assertCanPostAd,
   assertCanAddCatalogItem,
   assertPhotoCount,
 } = require('./services/entitlements');
+const {
+  resolveContactGate,
+  toPublicAccountGated,
+  toPublicAdGated,
+  redactContactPatterns,
+  notifyContactAttemptFomo,
+  normalizeModule,
+} = require('./services/contactGate');
 const { sendOtp, verifyOtp, getPublicOtpConfig } = require('./services/otpService');
 const {
   saveAdImages,
@@ -508,7 +519,13 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
 app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = req.body || {};
-    if (body.profile && (body.profile.accountId || body.profile.businessName)) {
+    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
+    if (profileAccountId) {
+      const token = req.header('x-account-token') || '';
+      const acc = verifyAccountOwner(profileAccountId, token);
+      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      assertAiAgentAccess(acc, { channel: 'widget' });
+    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
       assertDiamondWidgetAccess(body, readAccounts);
     }
     const result = await handleWidgetChat(body);
@@ -524,7 +541,13 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
 app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = Object.assign({ agentTier: 'diamond' }, req.body || {});
-    if (body.profile && (body.profile.accountId || body.profile.businessName)) {
+    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
+    if (profileAccountId) {
+      const token = req.header('x-account-token') || '';
+      const acc = verifyAccountOwner(profileAccountId, token);
+      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      assertAiAgentAccess(acc, { channel: 'widget' });
+    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
       assertDiamondWidgetAccess(body, readAccounts);
     }
     const result = await handleWidgetChat(body);
@@ -573,6 +596,10 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     }
     const acc = readAccounts().find((a) => a.id === accountId);
     if (!acc) return res.status(404).json({ ok: false, error: 'account_not_found' });
+    const token = req.header('x-account-token') || '';
+    if (!verifyAccountOwner(accountId, token)) {
+      return res.status(401).json({ ok: false, error: 'unauthorized' });
+    }
     try {
       assertAiAgentAccess(acc, { channel: 'dashboard' });
     } catch (e) {
@@ -740,6 +767,8 @@ app.post('/api/site-config', requireSharedSecret, (req, res) => {
         price: Number(p.price) || 0,
         period: String(p.period || '').slice(0, 60),
         durationDays: Math.max(1, Math.min(3650, Number(p.durationDays) || 30)),
+        maxCatalogItems: p.maxCatalogItems != null ? Number(p.maxCatalogItems) : undefined,
+        boostDays: Math.max(0, Math.min(365, Number(p.boostDays) || 0)),
         features: Array.isArray(p.features) ? p.features.slice(0, 20).map((f) => String(f).slice(0, 200)) : [],
         active: p.active !== false,
         diamondTier: String(p.diamondTier || '').slice(0, 30),
@@ -1002,8 +1031,28 @@ app.get('/api/ads/requests', requireSharedSecret, (req, res) => {
 // حقيقية مشتركة على القرص (accounts.json) بنفس نمط site-config/ads.
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
 
+const ACCOUNT_PAYMENT_TYPES = ['bank', 'bankily', 'sedad', 'bimbam', 'mobile', 'cash', 'instore', 'custom'];
+function normalizeAccountPaymentMethods(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.slice(0, 10).map((m) => ({
+    type: ACCOUNT_PAYMENT_TYPES.includes(m && m.type) ? m.type : 'bank',
+    bank: String((m && m.bank) || '').slice(0, 120),
+    code: String((m && m.code) || '').slice(0, 120),
+    note: String((m && m.note) || '').slice(0, 300),
+    addedAt: String((m && m.addedAt) || new Date().toISOString()).slice(0, 30),
+  })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');
+}
+
 function readAccounts() { return readJson(ACCOUNTS_FILE, []); }
 function writeAccounts(list) { writeJson(ACCOUNTS_FILE, list); }
+
+function resolveOptionalAccountViewer(req) {
+  const accountId = req.header('x-account-id') || '';
+  const token = req.header('x-account-token') || '';
+  if (!accountId || !token) return null;
+  const acc = readAccounts().find((a) => a.id === accountId);
+  return (acc && acc.accessToken === token && !acc.suspended) ? accountId : null;
+}
 
 function genAccountId() {
   return 'acc_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
@@ -1012,17 +1061,19 @@ function genAccessToken() {
   return crypto.randomBytes(20).toString('hex');
 }
 
-// الحقول الآمنة للعرض العام (صفحات المحل/المكتب/الشركة العامة + شريط
-// "آخر المحلات" بالرئيسية) — لا نُخرج أبداً الهاتف/الإيميل لغير صاحب
-// الحساب أو الأدمن، حتى لو كان الحساب مُوافَقاً عليه.
+// الحقول الآمنة للعرض العام — بدون phone/email/whatsapp (Contact Gate يتحكم)
 const ACCOUNT_PUBLIC_FIELDS = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'category',
-  'whatsapp', 'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 function toPublicAccount(acc) {
-  const out = {};
-  ACCOUNT_PUBLIC_FIELDS.forEach((k) => { if (acc[k] !== undefined) out[k] = acc[k]; });
-  return out;
+  const viewerId = null;
+  const gate = resolveContactGate(viewerId, acc && acc.id, acc && acc.type);
+  return toPublicAccountGated(acc, gate);
+}
+function toPublicAccountForViewer(acc, viewerAccountId) {
+  const gate = resolveContactGate(viewerAccountId, acc && acc.id, acc && acc.type);
+  return toPublicAccountGated(acc, gate);
 }
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
@@ -1117,6 +1168,20 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   list.push(acc);
   writeAccounts(list);
   res.json({ ok: true, id, accessToken });
+
+  // إشعار الأدمن تلقائياً عند تسجيل حساب جديد (لا يُبطئ رد العميل)
+  setImmediate(() => {
+    try {
+      const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
+      sendTelegramAdminNotification({
+        businessName: acc.name,
+        whatsapp: acc.phone || acc.whatsapp || '',
+        package: acc.type,
+        reason: 'تسجيل حساب جديد — بانتظار الموافقة',
+        channel: 'registration',
+      }).catch((err) => console.warn('[accounts/register] telegram:', err && err.message));
+    } catch (e) { /* telegram optional */ }
+  });
 });
 
 /**
@@ -1126,11 +1191,13 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
  */
 app.get('/api/accounts/public', (req, res) => {
   res.set('Cache-Control', 'public, max-age=30');
-  // suspended: حساب عُلِّق من الأدمن (راجع POST /api/accounts/admin/:id/decision
-  // action='suspend') — يُستبعَد من كل عرض عام فوراً رغم بقاء status='approved'،
-  // فتختفي صفحته العامة (متجر/مكتب/معرض) وشريط "آخر المحلات" بالرئيسية.
+  const viewerId = resolveOptionalAccountViewer(req);
   const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
-  res.json({ ok: true, accounts: list.map(toPublicAccount) });
+  res.json({
+    ok: true,
+    accounts: list.map((acc) => toPublicAccountForViewer(acc, viewerId)),
+    viewerId: viewerId || null,
+  });
 });
 
 /**
@@ -1191,6 +1258,7 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
   if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
   if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
   if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
+  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
   acc.updatedAt = new Date().toISOString();
   list[idx] = acc;
   writeAccounts(list);
@@ -1220,6 +1288,7 @@ app.patch('/api/accounts/admin/:id', requireSharedSecret, (req, res) => {
   const b = req.body || {};
   EDITABLE.forEach((k) => { if (b[k] !== undefined) acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500); });
   if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
+  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
   acc.updatedAt = new Date().toISOString();
   list[idx] = acc;
   writeAccounts(list);
@@ -1328,8 +1397,10 @@ app.get('/api/accounts/verify-dash/:id', verifyDashLimiter, (req, res) => {
   // accessToken هناك). امتلاك dashToken الصحيح يُثبت أصلاً أنه صاحب
   // الحساب الشرعي — لذا نُعيد هنا accessToken الحقيقي أيضاً (استثناء
   // متعمَّد من stripToken المُستخدَمة في كل نقطة عامة أخرى) ليكون بمثابة
-  // تفويض ذاتي (bootstrap) لجلسة كتابة حقيقية تستخدمها كل الداشبوردات.
-  res.json({ ok: true, account: acc });
+  // تفويض ذاتي (bootstrap) لجلسة كتابة — نُعيد accessToken فقط دون dashToken
+  // أو وثائق الهوية حتى لا تتسرّب في سجل المتصفح/الشبكة.
+  const { accessToken, dashToken, idImage, licenseImage, ...safeFields } = acc;
+  res.json({ ok: true, account: Object.assign(safeFields, { accessToken }) });
 });
 
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
@@ -1430,6 +1501,9 @@ const subRequestsLimiter = rateLimit({
 app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const b = req.body || {};
   if (!b.pkg || !b.accountId) return res.status(400).json({ error: 'pkg و accountId مطلوبان' });
+  const token = req.header('x-account-token') || '';
+  const owner = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
+  if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
   const list = readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
@@ -1552,7 +1626,45 @@ app.get('/api/entitlements/:accountId', (req, res) => {
   const token = req.header('x-account-token') || req.query.token || '';
   const acc = verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  res.json({ ok: true, entitlements: getEntitlements(accountId, acc.type) });
+  const ent = getEntitlements(accountId, acc.type);
+  res.json({ ok: true, entitlements: ent });
+});
+
+const contactGateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'عدد كبير من محاولات التواصل — حاول لاحقاً' },
+});
+
+/** GET /api/contact-gate/status — حالة بوابة التواصل لحساب مستهدف */
+app.get('/api/contact-gate/status', (req, res) => {
+  const targetAccountId = String(req.query.targetAccountId || '').trim();
+  const module = normalizeModule(req.query.module || req.query.type || 'individual');
+  if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
+  const viewerId = resolveOptionalAccountViewer(req);
+  const gate = resolveContactGate(viewerId, targetAccountId, module);
+  res.json({ ok: true, access: gate });
+});
+
+/** POST /api/contact-gate/attempt — FOMO trigger when masked contact clicked */
+app.post('/api/contact-gate/attempt', contactGateLimiter, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const targetAccountId = String(body.targetAccountId || '').trim();
+    const module = normalizeModule(body.module || body.type || 'individual');
+    if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
+    const viewerId = resolveOptionalAccountViewer(req);
+    const gate = resolveContactGate(viewerId, targetAccountId, module);
+    let fomo = { ok: false, skipped: true };
+    if (gate.fomoEligible) {
+      fomo = await notifyContactAttemptFomo(targetAccountId, module, { lang: body.lang });
+    }
+    res.json({ ok: true, access: gate, fomo });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
 // ── عدّاد زيارات حقيقي لصفحات المشتركين العامة — لم يكن موجوداً إطلاقاً
@@ -1743,37 +1855,68 @@ if (!fs.existsSync(TENDER_UPLOADS_DIR)) fs.mkdirSync(TENDER_UPLOADS_DIR, { recur
 function genBidId() { return 'BID_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'); }
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
-// إصلاح/قرار عمل 23/07/2026 (تصحيح صريح من Limam يُلغي قرار 22/07 أدناه):
-// المناقصة هي الميزة الوحيدة على كامل المنصة التي لا تُمنح أي فترة تجربة
-// مجانية أياً كانت — الوصول يتطلب اشتراكاً حقيقياً فعّالاً من اليوم الأول.
-// لذلك 'trial' و'trial_expiring' مُستبعدتان عمداً من هذه القائمة (خلافاً
-// لبقية أنظمة الباقات في المنصة التي تشملهما) — حتى لو حصل أي حساب على
-// سجل بحالة trial بالخطأ لأي سبب، فهذا السجل لا يمنح وصولاً للمناقصات إطلاقاً.
 const TENDER_ACTIVE_STATUSES = ['active', 'expiring_soon'];
-
-// قرار 22/07/2026 (ملغى الآن): كانت الميزة مجانية مؤقتاً. تصحيح صريح من
-// Limam بتاريخ 23/07/2026: "لا العكس غير مجانية نهائيا بل هي الميزة الوحيدة
-// التي ليس فيها أي تجربة لأيام" — الحجب المدفوع مفعَّل الآن بشكل دائم.
 const TENDER_REQUIRES_PACKAGE = true;
 
-// هل لهذا الحساب وصول فعّال لغرفة المناقصات؟ (نشر + تقديم عروض)
-// ── ملاحظة معمارية مهمة: نقرأ/نكتب بمفتاح حساب معزول (accountId + '::tender')
-// بدل accountId مباشرة داخل مخزن account-packages.json المشترك مع نظام
-// الباقة العامة للحساب (rizq_subscription_engine.js عبر activatePackage).
-// لو استُخدم accountId مباشرة، فإن أي تجديد لاحق للباقة العامة لنفس الحساب
-// (شهرية/ربعية/سنوية...) كان سيطبَّق فوق سجل باقة المناقصة نفسه (المخزن
-// يحتفظ بسجل واحد فقط لكل مفتاح) ويُلغي وصول المناقصات بلا قصد، والعكس
-// صحيح أيضاً. هذا العزل يجعل اشتراك المناقصة مستقلاً تماماً — يمكن أن يملك
-// الحساب باقته العامة + باقة المناقصة معاً في آن واحد دون أن تطغى إحداهما
-// على الأخرى.
+function resolveOptionalTenderViewer(req) {
+  return resolveOptionalAccountViewer(req);
+}
+
+function getTenderAccessForViewer(accountId) {
+  return getTenderEntitlements(accountId || null);
+}
+
+function hasTenderPaidAccess(accountId) {
+  const ent = getTenderEntitlements(accountId);
+  return !!(ent && ent.canSubmitProposals && ent.subscribed);
+}
+
+/** توافق مع الاستدعاءات القديمة — يعني اشتراك مدفوع فعّال (ليس تجريبي) */
 function hasTenderAccess(accountId) {
-  if (!TENDER_REQUIRES_PACKAGE) {
-    const acc = readAccounts().find((a) => a.id === accountId);
-    return !!(acc && acc.status === 'approved');
-  }
-  const rec = getAccountRecord(accountId + '::tender');
-  if (!rec || rec.pkgName !== TENDER_PACKAGE_NAME) return false;
-  return TENDER_ACTIVE_STATUSES.includes(rec.status);
+  return hasTenderPaidAccess(accountId);
+}
+
+// redactContactPatterns imported from contactGate.js
+
+function resolveTenderOwnerContacts(t) {
+  const owner = readAccounts().find((a) => a.id === t.ownerId) || {};
+  const phone = String(t.ownerPhone || owner.phone || '').trim();
+  const email = String(t.ownerEmail || owner.email || '').trim();
+  const whatsapp = String(t.ownerWhatsApp || owner.whatsapp || phone || '').trim();
+  return { phone, email, whatsapp };
+}
+
+function toPublicTender(t, access) {
+  const now = Date.now();
+  const deadlineMs = new Date(t.deadline).getTime();
+  const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
+  const contactsUnlocked = !!ent.canUnlockContacts;
+  const contacts = resolveTenderOwnerContacts(t);
+  return {
+    id: t.id,
+    title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
+    desc: contactsUnlocked ? t.desc : redactContactPatterns(t.desc),
+    category: t.category,
+    city: t.city,
+    budgetMin: t.budgetMin,
+    budgetMax: t.budgetMax,
+    deadline: t.deadline,
+    images: Array.isArray(t.images) ? t.images : [],
+    ownerName: t.ownerName,
+    ownerId: t.ownerId || null,
+    createdAt: t.createdAt,
+    bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
+    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now,
+    contactsLocked: !contactsUnlocked,
+    ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
+    ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
+    ownerWhatsApp: contactsUnlocked ? (contacts.whatsapp || null) : null,
+    canSubmitBid: !!ent.canSubmitProposals,
+  };
+}
+
+function TENDER_PUBLIC_ACCESS_FALLBACK() {
+  return getTenderEntitlements(null);
 }
 
 // يثبت أن accountId + token يطابقان حساباً حقيقياً في accounts.json، ويُعيده
@@ -1904,27 +2047,6 @@ setupQuotaGuardAPI(app, requireSharedSecret, {
   },
 });
 
-// نسخة عامة آمنة من المناقصة — بلا عروض وبلا هوية صاحبها الدقيقة (فقط اسمه)
-function toPublicTender(t) {
-  const now = Date.now();
-  const deadlineMs = new Date(t.deadline).getTime();
-  return {
-    id: t.id,
-    title: t.title,
-    desc: t.desc,
-    category: t.category,
-    city: t.city,
-    budgetMin: t.budgetMin,
-    budgetMax: t.budgetMax,
-    deadline: t.deadline,
-    images: Array.isArray(t.images) ? t.images : [],
-    ownerName: t.ownerName,
-    createdAt: t.createdAt,
-    bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now,
-  };
-}
-
 const tenderPostLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -1950,8 +2072,8 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
   const token = req.header('x-account-token') || '';
   const acc = verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة "غرفة المناقصات" فعّالة لنشر مناقصة' });
+  if (!hasTenderPaidAccess(b.accountId)) {
+    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
   }
   if (!b.title || !b.deadline) return res.status(400).json({ error: 'title و deadline مطلوبان' });
   const deadlineMs = new Date(b.deadline).getTime();
@@ -1963,6 +2085,9 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     id: tenderId,
     ownerId: acc.id,
     ownerName: acc.name || '',
+    ownerPhone: String(acc.phone || '').slice(0, 40),
+    ownerEmail: String(acc.email || '').slice(0, 120),
+    ownerWhatsApp: String(acc.whatsapp || acc.phone || '').slice(0, 40),
     title: String(b.title).slice(0, 150),
     desc: String(b.desc || '').slice(0, 1500),
     category: String(b.category || '').slice(0, 40),
@@ -1979,47 +2104,16 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
   const list = readTenders();
   list.unshift(tender);
   writeTenders(list);
-  res.json({ ok: true, tender: toPublicTender(tender) });
+  res.json({ ok: true, tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId)) });
   } catch (err) {
     console.error('[tenders/post] image pipeline:', err.message);
     res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
   }
 });
 
-// تصحيح صريح من Limam بتاريخ 24/07/2026: كانت GET /api/tenders و GET
-// /api/tenders/:id عامّتين بالكامل (بلا أي مصادقة) — يعني أي زائر، حتى بدون
-// حساب، يقدر يتصفح كل تفاصيل المناقصة العامة (العنوان/الوصف/الميزانية/اسم
-// صاحبها). المشكلة: لو كتب صاحب المناقصة رقم هاتفه داخل title/desc (لا يوجد
-// أي فلترة محتوى على هذين الحقلين)، فأي زائر — حتى غير مشترك بباقة المناقصة
-// إطلاقاً — يقدر يتواصل معه مباشرة خارج المنصة ويتفادى بالكامل بوابة "قدّم
-// عرضك" المدفوعة. القرار: تحويل "غرفة المناقصات" بالكامل (حتى مجرد
-// التصفح/المشاهدة) إلى ميزة محجوبة خلف باقة المناقصة الفعّالة — لا يدخلها
-// إلا مشترك، فالمنصة تضمن دائماً أنها استفادت (اشتراك فعّال) قبل أن يرى أي
-// أحد أي محتوى قد يحتوي معلومات تواصل.
-function requireTenderRoomAccess(req, res) {
-  const accountId = req.header('x-account-id') || '';
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) {
-    res.status(401).json({ error: 'unauthorized', msg: 'سجّل دخولك أولاً للدخول إلى غرفة المناقصات' });
-    return null;
-  }
-  if (!hasTenderAccess(accountId)) {
-    res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة "غرفة المناقصات" فعّالة للدخول إلى غرفة المناقصات' });
-    return null;
-  }
-  return acc;
-}
-
 /**
- * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة (طلب صريح من Limam
- * بتاريخ 24/07/2026: قسم المناقصات على الرئيسية يجب أن يكون ديناميكياً —
- * يعرض عدد المناقصات المفتوحة فعلياً + فئة (تصنيف) آخر 3 مناقصات فقط، لإغراء
- * الزائر بدخول الغرفة). آمن تماماً رغم أنه بلا مصادقة: لا يُعاد أي حقل حسّاس
- * إطلاقاً (لا title، لا desc، لا budget، لا ownerName، لا city) — فقط رقم
- * إجمالي + مصفوفة فئات (تصنيف عام مسبق التعريف، مثل "سيارات"/"معدات"، وليس
- * نصاً حراً يدخله المستخدم) لأحدث 3 مناقصات مفتوحة. هذا لا يتعارض مع قرار
- * حجب الغرفة أعلاه لأن الفئة وحدها لا يمكن أن تحمل معلومات تواصل مطلقاً.
+ * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة.
+ * يعرض عدد المناقصات المفتوحة + فئات آخر 3 مناقصات فقط (بلا حقول حسّاسة).
  */
 app.get('/api/tenders/public-stats', (req, res) => {
   const now = Date.now();
@@ -2033,12 +2127,13 @@ app.get('/api/tenders/public-stats', (req, res) => {
 });
 
 /**
- * GET /api/tenders — محجوب خلف باقة "غرفة المناقصات" الفعّالة (راجع التعليق
- * أعلاه). المناقصات المفتوحة فقط (غير محذوفة ولم تنتهِ مهلتها)، بلا عروض
- * وبلا هوية دقيقة لصاحبها. يدعم تصفية ?cat=&city=
+ * GET /api/tenders — تصفّح عام للمناقصات المفتوحة مع حماية بيانات التواصل.
+ * الزائر/التجريبي يرى العنوان والوصف والمتطلبات؛ أرقام التواصل مخفية/مُشفّرة.
+ * المشترك المدفوع يكشف التواصل ويمكنه تقديم العروض. يدعم ?cat=&city=
  */
 app.get('/api/tenders', (req, res) => {
-  if (!requireTenderRoomAccess(req, res)) return;
+  const viewerId = resolveOptionalTenderViewer(req);
+  const access = getTenderAccessForViewer(viewerId);
   const { cat, city } = req.query || {};
   const now = Date.now();
   let list = readTenders().filter((t) => {
@@ -2048,7 +2143,18 @@ app.get('/api/tenders', (req, res) => {
   });
   if (cat) list = list.filter((t) => t.category === cat);
   if (city) list = list.filter((t) => t.city === city);
-  res.json({ ok: true, tenders: list.map(toPublicTender) });
+  res.json({
+    ok: true,
+    tenders: list.map((t) => toPublicTender(t, access)),
+    access: {
+      contactsUnlocked: !!access.canUnlockContacts,
+      canSubmitBid: !!access.canSubmitProposals,
+      canPost: !!access.canPostTenders,
+      isTrial: !!access.isTrial,
+      subscribed: !!access.subscribed,
+      planType: access.planType,
+    },
+  });
 });
 
 /**
@@ -2061,9 +2167,10 @@ app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
   const token = req.header('x-account-token') || '';
   const acc = verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة "غرفة المناقصات" فعّالة لتقديم عرض' });
+  if (!hasTenderPaidAccess(b.accountId)) {
+    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لتقديم عرض — الباقة التجريبية للتصفّح فقط' });
   }
+  const bidderAccess = getTenderAccessForViewer(b.accountId);
   const list = readTenders();
   const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
   if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
@@ -2081,10 +2188,17 @@ app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
     price: Number(b.price) || 0,
     deliveryDays: Number(b.deliveryDays) || 0,
     notes: String(b.notes || '').slice(0, 500),
+    priority: !!bidderAccess.priorityPlacement,
     createdAt: new Date().toISOString(),
   };
   if (!Array.isArray(t.bids)) t.bids = [];
   t.bids.push(bid);
+  if (bid.priority && t.bids.length > 1) {
+    t.bids.sort((a, b2) => {
+      if (!!a.priority !== !!b2.priority) return a.priority ? -1 : 1;
+      return new Date(a.createdAt).getTime() - new Date(b2.createdAt).getTime();
+    });
+  }
   list[idx] = t;
   writeTenders(list);
   res.json({ ok: true });
@@ -2125,10 +2239,22 @@ app.get('/api/tenders/admin', requireSharedSecret, (req, res) => {
  * مسار به معامل (:id) يجب أن يُسجَّل دائماً بعد كل المسارات الثابتة المشابهة.
  */
 app.get('/api/tenders/:id', (req, res) => {
-  if (!requireTenderRoomAccess(req, res)) return;
+  const viewerId = resolveOptionalTenderViewer(req);
+  const access = getTenderAccessForViewer(viewerId);
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
   if (!t) return res.status(404).json({ error: 'tender_not_found' });
-  res.json({ ok: true, tender: toPublicTender(t) });
+  res.json({
+    ok: true,
+    tender: toPublicTender(t, access),
+    access: {
+      contactsUnlocked: !!access.canUnlockContacts,
+      canSubmitBid: !!access.canSubmitProposals,
+      canPost: !!access.canPostTenders,
+      isTrial: !!access.isTrial,
+      subscribed: !!access.subscribed,
+      planType: access.planType,
+    },
+  });
 });
 
 /**
@@ -2151,12 +2277,17 @@ app.post('/api/tenders/admin/:id/remove', requireSharedSecret, (req, res) => {
  * (rizq_sub_requests بفئة category:'tender'). يُستخدَم مفتاح معزول
  * (accountId + '::tender') داخل مخزن account-packages.json حتى لا يتصادم
  * إطلاقاً مع سجل الباقة العامة لنفس الحساب (راجع تعليق hasTenderAccess أعلاه
- * لتفصيل سبب هذا العزل). لا فترة تجربة هنا أبداً — كل تفعيل هو دفع حقيقي.
+ * لتفصيل سبب هذا العزل). يدعم التجريبية (10 أيام) والباقات المدفوعة.
  */
 app.post('/api/tenders/package/activate', requireSharedSecret, async (req, res) => {
   const b = req.body || {};
   if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
-  const days = Number(b.days) || 30;
+  const { findCatalogPackage, isTrialPackage } = require('./services/catalogConfig');
+  const pkgName = b.pkgName || TENDER_PACKAGE_NAME;
+  const pkgDef = findCatalogPackage(b.packageId || pkgName);
+  const days = Number(b.days) || (pkgDef && pkgDef.durationDays) || 30;
+  const price = Number(b.price) || (pkgDef && pkgDef.price) || 0;
+  const isTrial = b.isTrial === true || isTrialPackage((pkgDef && pkgDef.name) || pkgName, price);
   const now = new Date();
   const periodEnd = new Date(now.getTime() + days * 86400000);
   try {
@@ -2166,11 +2297,16 @@ app.post('/api/tenders/package/activate', requireSharedSecret, async (req, res) 
       accountPhone: b.accountPhone || '',
       accountEmail: b.accountEmail || '',
       accountType: b.accountType || '',
-      pkgName: TENDER_PACKAGE_NAME,
-      price: Number(b.price) || 0,
+      pkgName: (pkgDef && pkgDef.name) || pkgName,
+      packageId: (pkgDef && pkgDef.id) || b.packageId || null,
+      price,
+      days,
       periodStart: now.toISOString(),
       periodEnd: periodEnd.toISOString(),
       activatedBy: b.activatedBy || 'admin',
+      isTrial,
+      paymentConfirmed: !isTrial,
+      paidAt: isTrial ? null : now.toISOString(),
     });
     if (!result.ok) return res.status(400).json(result);
     res.json({ ok: true, periodEnd: periodEnd.toISOString() });
@@ -2190,10 +2326,20 @@ app.get('/api/tenders/package/status/:id', (req, res) => {
   const token = req.header('x-account-token') || req.query.token || '';
   const acc = verifyAccountOwner(req.params.id, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
+  const ent = getTenderEntitlements(req.params.id);
   const rec = getAccountRecord(req.params.id + '::tender');
-  if (!rec) return res.json({ ok: true, subscribed: false });
-  const { accessToken, ...safe } = rec;
-  res.json({ ok: true, subscribed: TENDER_ACTIVE_STATUSES.includes(safe.status), record: safe });
+  const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
+  res.json({
+    ok: true,
+    subscribed: !!ent.subscribed,
+    isTrial: !!ent.isTrial,
+    contactsUnlocked: !!ent.canUnlockContacts,
+    canSubmitBid: !!ent.canSubmitProposals,
+    canPost: !!ent.canPostTenders,
+    planType: ent.planType,
+    pkgName: ent.pkgName || null,
+    record: safeRec,
+  });
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -2261,7 +2407,10 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
   if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'العنوان مطلوب' });
   if (!b.category) return res.status(400).json({ error: 'الفئة مطلوبة' });
   if (b.accountId) {
-    const acc = readAccounts().find((a) => a.id === b.accountId);
+    const token = req.header('x-account-token') || req.query.token || '';
+    const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
+    if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const acc = ownerAcc;
     const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
     const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
     try {
@@ -2321,6 +2470,7 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
  */
 app.get('/api/ads', (req, res) => {
   const q = req.query || {};
+  const viewerId = resolveOptionalAccountViewer(req);
   let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
   if (q.category) list = list.filter((a) => a.category === q.category);
   if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
@@ -2333,7 +2483,12 @@ app.get('/api/ads', (req, res) => {
   list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
   const offset = Math.max(0, Number(q.offset) || 0);
-  const page = list.slice(offset, offset + limit).map(withBoostFlag);
+  const accounts = readAccounts();
+  const page = list.slice(offset, offset + limit).map((ad) => {
+    const seller = accounts.find((a) => a.id === ad.accountId);
+    const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+    return toPublicAdGated(withBoostFlag(ad), gate, seller);
+  });
   res.json({ ok: true, total: list.length, ads: page });
 });
 
@@ -2346,11 +2501,17 @@ app.get('/api/ads/batch', (req, res) => {
   const idsParam = String(req.query.ids || '');
   const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 30);
   if (!ids.length) return res.json({ ok: true, ads: [] });
+  const viewerId = resolveOptionalAccountViewer(req);
   const all = readAds();
+  const accounts = readAccounts();
   const found = ids
     .map((id) => all.find((a) => a.id === id && a.status === 'active'))
     .filter(Boolean)
-    .map(withBoostFlag);
+    .map((ad) => {
+      const seller = accounts.find((a) => a.id === ad.accountId);
+      const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+      return toPublicAdGated(withBoostFlag(ad), gate, seller);
+    });
   res.json({ ok: true, ads: found });
 });
 
@@ -2373,7 +2534,17 @@ app.get('/api/ads/admin', requireSharedSecret, (req, res) => {
 app.get('/api/ads/:id', (req, res) => {
   const ad = readAds().find((a) => a.id === req.params.id);
   if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-  res.json({ ok: true, ad: withBoostFlag(ad) });
+  const secret = req.header('x-rizq-secret');
+  const isAdmin = !!(process.env.BACKEND_SHARED_SECRET && secret === process.env.BACKEND_SHARED_SECRET);
+  const token = req.header('x-account-token') || req.query.token || '';
+  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
+  if (ad.status !== 'active' && !isAdmin && !isOwner) {
+    return res.status(404).json({ error: 'ad_not_found' });
+  }
+  const viewerId = resolveOptionalAccountViewer(req);
+  const seller = readAccounts().find((a) => a.id === ad.accountId);
+  const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+  res.json({ ok: true, ad: toPublicAdGated(withBoostFlag(ad), gate, seller), access: gate });
 });
 
 /**

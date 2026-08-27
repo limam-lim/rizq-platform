@@ -6,6 +6,7 @@ const {
   isDiamondPackageRef,
   isTrialPackage,
   readSiteConfigRaw,
+  resolvePackageBoostDays,
   SITE_CONFIG_FILE,
 } = require('./catalogConfig');
 
@@ -78,6 +79,25 @@ function activateVideoAdOnServer(req) {
   return { ok: true, slot: target };
 }
 
+function maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts) {
+  try {
+    const price = Number(req.price) || 0;
+    if (price <= 0 || !accRow || !accRow.referredBy || accRow.referralBonusGranted) return;
+    if (typeof readAccounts !== 'function' || typeof writeAccounts !== 'function') return;
+    const { applyReferralBonusDays, REFERRAL_BONUS_DAYS } = require('../rizq_package_lifecycle_agent');
+    const bonus = applyReferralBonusDays(accRow.referredBy, REFERRAL_BONUS_DAYS || 15);
+    if (!bonus.ok) return;
+    const list = readAccounts();
+    const idx = list.findIndex((a) => a.id === req.accountId);
+    if (idx > -1) {
+      list[idx].referralBonusGranted = true;
+      writeAccounts(list);
+    }
+  } catch (refErr) {
+    console.warn('[subRequestActivation] referral bonus:', refErr.message);
+  }
+}
+
 /**
  * تفعيل طلب اشتراك من الخادم (Telegram / API) — يطابق منطق handleSubReq في rizq_admin.html
  */
@@ -110,6 +130,8 @@ async function activateSubRequest(req, deps) {
 
   try {
     if (category === 'tender') {
+      const pkgDef = findCatalogPackage(req.pkg);
+      const isTrial = isTrialPackage(req.pkg, req.price);
       const { periodStart, periodEnd, now } = computeActivationPeriod(days, getAccountRecord(req.accountId + '::tender'));
       const result = await syncAccountPackage({
         accountId: req.accountId + '::tender',
@@ -117,16 +139,19 @@ async function activateSubRequest(req, deps) {
         accountPhone,
         accountEmail,
         accountType,
-        pkgName: TENDER_PACKAGE_NAME,
+        pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية',
+        packageId: (pkgDef && pkgDef.id) || null,
         price: Number(req.price) || 0,
         days,
         periodStart,
         periodEnd,
         activatedBy: 'admin',
-        paymentConfirmed: true,
-        paidAt: now.toISOString(),
+        paymentConfirmed: !isTrial,
+        paidAt: isTrial ? null : now.toISOString(),
+        isTrial,
       });
       if (!result.ok) return result;
+      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
       return { ok: true, category, result, accountName };
     }
 
@@ -149,7 +174,7 @@ async function activateSubRequest(req, deps) {
       if (typeof readAdBoosts !== 'function' || typeof writeAdBoosts !== 'function') {
         return { ok: false, error: 'ad_boosts_io_missing' };
       }
-      const boostDays = resolvePackageDurationDays(req.pkg) || 3;
+      const boostDays = resolvePackageBoostDays(req.pkg) || 3;
       const now = new Date();
       const ends = new Date(now.getTime() + boostDays * 86400000);
       const all = readAdBoosts();
@@ -207,6 +232,8 @@ async function activateSubRequest(req, deps) {
         });
       } catch (e) { /* best-effort */ }
     }
+
+    maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
 
     return { ok: true, category, result, accountName };
   } catch (err) {

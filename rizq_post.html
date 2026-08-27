@@ -12,6 +12,7 @@
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
   <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
 <meta name="description" content="انشر إعلانك على رزق وصل لآلاف المشترين في موريتانيا — مجاناً وسريعاً"/>
@@ -391,6 +392,8 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+  <script src="rizq_locale_helpers.js"></script>
+  <script src="rizq_categories_config.js"></script>
   <!-- إصلاح جوهري 24/07/2026: هذا الملف كان الوحيد بين كل صفحات النشر (فردي/
        محل/مكتب/شركة) الذي لا يستدعي RizqSub.canPostNewAd/recordAdPost إطلاقاً
        — يعني حد "إعلان واحد نشط" (مجانية) أو "10 إعلانات" (باقة شهرية) لم يكن
@@ -436,24 +439,7 @@ main, .page-content.active, .main-content, .results-area,
   <div class="post-panel active" id="panel-1">
     <h2 class="panel-title" data-t-fr="Choisissez la section de votre annonce">اختر قسم إعلانك</h2>
     <p class="panel-sub" data-t-fr="Choisissez la section adaptée pour apparaître devant le bon public">اختر القسم المناسب لتظهر أمام الجمهور الصحيح</p>
-    <div class="cats-grid">
-      <button class="cat-btn" onclick="selectCat(this,'عقارات')"><span class="cat-icon-badge">🏠</span><span class="cat-name" data-t-fr="Maisons et immobilier">منازل وعقارات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'سيارات')"><span class="cat-icon-badge">🚗</span><span class="cat-name" data-t-fr="Voitures">سيارات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'شاحنات')"><span class="cat-icon-badge">🚛</span><span class="cat-name" data-t-fr="Camions et engins">شاحنات ومعدات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'إلكترونيات')"><span class="cat-icon-badge">📱</span><span class="cat-name" data-t-fr="Électronique">إلكترونيات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'أزياء')"><span class="cat-icon-badge">👗</span><span class="cat-name" data-t-fr="Mode et vêtements">موضة وأزياء</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'ذهب')"><span class="cat-icon-badge" style="background:linear-gradient(135deg,#b8860b,#C9A84C,#e8c96a);border-color:rgba(201,168,76,.6);box-shadow:0 4px 14px rgba(201,168,76,.35)">🪙</span><span class="cat-name" data-t-fr="Or et bijoux">ذهب ومجوهرات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'صحة')"><span class="cat-icon-badge">🌿</span><span class="cat-name" data-t-fr="Santé et beauté">صحة وجمال</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'وظائف')"><span class="cat-icon-badge">💼</span><span class="cat-name" data-t-fr="Emploi">وظائف</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'خدمات')"><span class="cat-icon-badge">🔧</span><span class="cat-name" data-t-fr="Services et métiers">خدمات ومهن</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'أثاث')"><span class="cat-icon-badge">🛋️</span><span class="cat-name" data-t-fr="Meubles et déco">أثاث وديكور</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'بناء')"><span class="cat-icon-badge">🏗️</span><span class="cat-name" data-t-fr="Construction">بناء ومقاولات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'ماشية')"><span class="cat-icon-badge">🐄</span><span class="cat-name" data-t-fr="Bétail, volaille et vétérinaire">ماشية ودواجن وبيطرة</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'رياضة')"><span class="cat-icon-badge">⚽</span><span class="cat-name" data-t-fr="Sport et loisirs">رياضة وهوايات</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'أغذية')"><span class="cat-icon-badge">🍽️</span><span class="cat-name" data-t-fr="Alimentation et restaurants">أغذية ومطاعم</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'تعليم')"><span class="cat-icon-badge">📚</span><span class="cat-name" data-t-fr="Éducation et culture">تعليم وثقافة</span></button>
-      <button class="cat-btn" onclick="selectCat(this,'فنون')"><span class="cat-icon-badge">🎨</span><span class="cat-name" data-t-fr="Arts et artisanat">فنون وحرف</span></button>
-    </div>
+    <div class="cats-grid" id="post-cats-grid"></div>
     <!-- Sub-cats -->
     <div id="subcats-wrap" style="display:none">
       <p data-t-fr="Sous-catégorie :" style="font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:8px">الفرع:</p>
@@ -469,29 +455,47 @@ main, .page-content.active, .main-content, .results-area,
     <h2 class="panel-title" data-t-fr="Détails de l'annonce">تفاصيل الإعلان</h2>
     <p class="panel-sub" data-t-fr="Plus les détails sont précis, plus l'annonce réussit">كلما كانت التفاصيل أدق، كان الإعلان أكثر نجاحاً</p>
 
-    <div class="form-group">
-      <label class="form-label" data-t-fr='Titre de l&#39;annonce (arabe) <span class="req">*</span>'>عنوان الإعلان (عربي) <span class="req">*</span></label>
+    <p class="panel-sub" id="lang-post-hint" data-t-fr="Publiez dans une seule langue — l'autre version est <strong>optionnelle</strong> et peut rester vide.">يمكنك النشر بلغة واحدة فقط — النسخة باللغة الأخرى <strong>اختيارية</strong> ويمكن تركها فارغة.</p>
+
+    <div class="form-group" id="ad-block-ar">
+      <label class="form-label" id="ad-title-label">
+        <span data-t-fr="Titre de l'annonce (arabe)">عنوان الإعلان (عربي)</span>
+        <span class="req" id="ad-title-req">*</span>
+        <span class="opt-tag" id="ad-title-opt" style="display:none;font-weight:600;color:var(--text-muted);font-size:11px" data-t-fr="(optionnel)">(اختياري)</span>
+      </label>
       <input class="form-input" type="text" id="ad-title" data-ph-fr="Ex : Appartement de luxe 3 pièces — Nouakchott Ouest" placeholder="مثال: شقة فاخرة 3 غرف — نواكشوط الغربية" maxlength="100" oninput="updateChar('ad-title','title-count',100)"/>
       <div class="char-count"><span id="title-count">0</span>/100 <span data-t-fr="caractères">حرف</span></div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label" data-t-fr='Description détaillée (arabe) <span class="req">*</span>'>الوصف التفصيلي (عربي) <span class="req">*</span></label>
+    <div class="form-group" id="ad-desc-block-ar">
+      <label class="form-label" id="ad-desc-label">
+        <span data-t-fr="Description détaillée (arabe)">الوصف التفصيلي (عربي)</span>
+        <span class="req" id="ad-desc-req">*</span>
+        <span class="opt-tag" id="ad-desc-opt" style="display:none;font-weight:600;color:var(--text-muted);font-size:11px" data-t-fr="(optionnel)">(اختياري)</span>
+      </label>
       <textarea class="form-textarea" id="ad-desc" data-ph-fr="Décrivez votre annonce en détail : état, caractéristiques, conditions de vente..." placeholder="صف إعلانك بالتفصيل: الحالة، المميزات، شروط البيع..." maxlength="2000" oninput="updateChar('ad-desc','desc-count',2000)"></textarea>
       <div class="char-count"><span id="desc-count">0</span>/2000 <span data-t-fr="caractères">حرف</span></div>
     </div>
 
-    <div class="form-group" style="border-top:1px dashed #e2e8f5;padding-top:16px;margin-top:4px">
-      <label class="form-label">Titre de l'annonce (Français) <span class="req">*</span></label>
+    <div class="form-group" style="border-top:1px dashed #e2e8f5;padding-top:16px;margin-top:4px" id="ad-block-fr">
+      <label class="form-label" id="ad-title-fr-label">
+        <span data-t-fr="Titre de l'annonce (Français)">Titre de l'annonce (Français)</span>
+        <span class="req" id="ad-title-fr-req" style="display:none">*</span>
+        <span class="opt-tag" id="ad-title-fr-opt" style="font-weight:600;color:var(--text-muted);font-size:11px" data-t-fr="(optionnel)">(optionnel)</span>
+      </label>
       <input class="form-input" type="text" id="ad-title-fr" dir="ltr" placeholder="Ex : Appartement de luxe 3 pièces — Nouakchott Ouest" maxlength="100" oninput="updateChar('ad-title-fr','title-fr-count',100)"/>
-      <div class="char-count"><span id="title-fr-count">0</span>/100 caractères</div>
+      <div class="char-count"><span id="title-fr-count">0</span>/100 <span data-t-fr="caractères">caractères</span></div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Description détaillée (Français) <span class="req">*</span></label>
+    <div class="form-group" id="ad-desc-block-fr">
+      <label class="form-label" id="ad-desc-fr-label">
+        <span data-t-fr="Description détaillée (Français)">Description détaillée (Français)</span>
+        <span class="req" id="ad-desc-fr-req" style="display:none">*</span>
+        <span class="opt-tag" id="ad-desc-fr-opt" style="font-weight:600;color:var(--text-muted);font-size:11px" data-t-fr="(optionnel)">(optionnel)</span>
+      </label>
       <textarea class="form-textarea" id="ad-desc-fr" dir="ltr" placeholder="Décrivez votre annonce en détail : état, caractéristiques, conditions de vente..." maxlength="2000" oninput="updateChar('ad-desc-fr','desc-fr-count',2000)"></textarea>
-      <div class="char-count"><span id="desc-fr-count">0</span>/2000 caractères</div>
-      <p data-t-fr="Les deux champs français sont obligatoires pour que votre annonce s'affiche correctement aux visiteurs francophones — pas besoin d'une traduction précise, une description compréhensible suffit." style="font-size:11.5px;color:var(--text-muted);margin-top:4px">الحقلان الفرنسيان إلزاميان حتى تظهر إعلانك بشكل صحيح للزوار الذين يستخدمون الموقع بالفرنسية — لا حاجة لترجمة دقيقة، يكفي وصف مفهوم.</p>
+      <div class="char-count"><span id="desc-fr-count">0</span>/2000 <span data-t-fr="caractères">caractères</span></div>
+      <p id="lang-secondary-hint" data-t-fr="La version dans l'autre langue est facultative — elle aide les visiteurs bilingues mais n'est jamais obligatoire pour publier." style="font-size:11.5px;color:var(--text-muted);margin-top:4px">النسخة باللغة الأخرى اختيارية — تساعد الزوار ثنائيي اللغة لكنها ليست شرطاً للنشر أبداً.</p>
     </div>
 
     <div class="form-row">
@@ -500,14 +504,26 @@ main, .page-content.active, .main-content, .results-area,
         <select class="form-select" id="ad-wilaya">
           <option value="" data-t-fr="Choisir la wilaya...">اختر الولاية...</option>
           <option data-t-fr="Nouakchott Ouest">نواكشوط الغربية</option><option data-t-fr="Nouakchott Nord">نواكشوط الشمالية</option><option data-t-fr="Nouakchott Sud">نواكشوط الجنوبية</option>
-          <option data-t-fr="Nouadhibou">نواذيبو</option><option data-t-fr="Tiris Zemmour">تيارت</option><option data-t-fr="Trarza">ترارزة</option><option data-t-fr="Brakna">براكنة</option>
-          <option data-t-fr="Hodh Ech Chargui">كيفة</option><option data-t-fr="Guidimaka">سيلبابي</option><option data-t-fr="Hodh El Gharbi">العيون</option><option data-t-fr="Adrar">أطار</option>
-          <option data-t-fr="Tagant">تيجيكجة</option><option data-t-fr="Assaba">ألاك</option><option data-t-fr="Inchiri">نعمة</option><option data-t-fr="Gorgol">روصو</option>
+          <option data-t-fr="Nouadhibou">نواذيبو</option><option data-t-fr="Tiris Zemmour">تيرس زمور</option><option data-t-fr="Trarza">ترارزة</option><option data-t-fr="Brakna">براكنة</option>
+          <option data-t-fr="Kiffa">كيفة</option><option data-t-fr="Sélibabi">سيلبابي</option><option data-t-fr="Aïoun el Atrouss">العيون</option><option data-t-fr="Atar">أطار</option>
+          <option data-t-fr="Tidjikja">تيجيكجة</option><option data-t-fr="Aleg">ألاك</option><option data-t-fr="Néma">نعمة</option><option data-t-fr="Rosso">روصو</option>
+        </select>
+      </div>
+      <div class="form-group" id="ad-moughataa-wrap" style="display:none">
+        <label class="form-label" data-t-fr="Moughataa / District">المقاطعة / الحي</label>
+        <select class="form-select" id="ad-moughataa">
+          <option value="" data-t-fr="Choose district...">اختر المقاطعة...</option>
+          <option data-t-fr="Teyaret">تيارت</option>
+          <option data-t-fr="Tevragh Zeina">تفرغ زينة</option>
+          <option data-t-fr="Dar Naim">دار النعيم</option>
+          <option data-t-fr="Toujounine">توجنين</option>
+          <option data-t-fr="Le Port">الميناء</option>
+          <option data-t-fr="Arafat">عرفات</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label" data-t-fr="Ville / Quartier">المدينة / الحي</label>
-        <input class="form-input" type="text" id="ad-city" data-ph-fr="Ex : Quartier Tevragh-Zeina" placeholder="مثال: حي تفرغ زينة"/>
+        <input class="form-input" type="text" id="ad-city" data-ph-fr="Ex : Hay Teyaret, Tevragh Zeina" placeholder="مثال: حي تيارت، تفرغ زينة"/>
       </div>
     </div>
 
@@ -716,59 +732,138 @@ main, .page-content.active, .main-content, .results-area,
 <div class="toast" id="toast"></div>
 
 <script>
-const SUBCATS = {
-  'عقارات':['شقق للكراء','شقق للبيع','منازل وفيلات','غرف للكراء','أراضي','محلات تجارية'],
-  'سيارات':['سيارات للبيع','سيارات للكراء','سيارات كهربائية وهجينة','قطع غيار','إطارات وبطاريات','دراجات نارية'],
-  'شاحنات':['شاحنات للبيع','للكراء','حافلات','معدات بناء','معدات زراعية'],
-  'إلكترونيات':['هواتف ذكية','لابتوب وحاسوب','شاشات وتلفزيون','أجهزة منزلية','كاميرات'],
-  'أزياء':['دراعة رجالية','ملحفة نسائية','ملابس رجالية','ملابس نسائية','أحذية وحقائب'],
-  'ذهب':['ذهب عيار 24','ذهب عيار 22','ذهب عيار 21','مجوهرات نسائية','لبس العروس','ذهب للمهر'],
-  'صحة':['أدوية ومكملات','مستحضرات طبيعية','عطور وعناية','أجهزة طبية'],
-  'وظائف':['إدارة وتسويق','هندسة وتقنية','صحة وطب','تعليم','فريلانس'],
-  'خدمات':['كهرباء وسباكة','نقل وشحن','تنظيف','صيانة','بناء وديكور'],
-  'أثاث':['أثاث غرفة نوم','أثاث صالة','مطبخ','ديكور','لوازم منزلية'],
-  'بناء':['مواد بناء','أدوات','سقالات','خرسانة','حديد'],
-  'ماشية':['إبل','بقر','غنم وماعز','دواجن وطيور','أعلاف'],
-  'رياضة':['كرة قدم','رياضات أخرى','أدوات رياضية','دراجات'],
-  'أغذية':['مواد غذائية','مطاعم وكافيه','حلويات','منتجات ريفية'],
-  'تعليم':['كتب ومراجع','دروس خصوصية','شهادات وتدريب'],
-  'فنون':['فنون تشكيلية','حرف موريتانية','خياطة وتطريز'],
-};
-const SUBCATS_FR = {
-  'عقارات':['Appartements à louer','Appartements à vendre','Maisons et villas','Chambres à louer','Terrains','Locaux commerciaux'],
-  'سيارات':['Voitures à vendre','Voitures à louer','Voitures électriques et hybrides','Pièces détachées','Pneus et batteries','Motos'],
-  'شاحنات':['Camions à vendre','À louer','Bus','Engins de construction','Engins agricoles'],
-  'إلكترونيات':['Smartphones','Ordinateurs portables','Écrans et téléviseurs','Appareils ménagers','Caméras'],
-  'أزياء':['Boubou homme','Melhfa femme','Vêtements homme','Vêtements femme','Chaussures et sacs'],
-  'ذهب':['Or 24 carats','Or 22 carats','Or 21 carats','Bijoux femme','Tenue de mariée','Or pour dot'],
-  'صحة':['Médicaments et compléments','Produits naturels','Parfums et soins','Appareils médicaux'],
-  'وظائف':['Gestion et marketing','Ingénierie et technique','Santé et médecine','Éducation','Freelance'],
-  'خدمات':['Électricité et plomberie','Transport et livraison','Nettoyage','Maintenance','Construction et déco'],
-  'أثاث':['Meubles de chambre','Meubles de salon','Cuisine','Décoration','Articles ménagers'],
-  'بناء':['Matériaux de construction','Outils','Échafaudages','Béton','Fer'],
-  'ماشية':['Chameaux','Bovins','Moutons et chèvres','Volaille et oiseaux','Aliments pour bétail'],
-  'رياضة':['Football','Autres sports','Équipements sportifs','Vélos'],
-  'أغذية':['Produits alimentaires','Restaurants et cafés','Pâtisseries','Produits du terroir'],
-  'تعليم':['Livres et références','Cours particuliers','Certificats et formations'],
-  'فنون':['Arts plastiques','Artisanat mauritanien','Couture et broderie'],
-};
+const SUBCATS = {};
+const SUBCATS_FR = {};
 let selCat='', selSubcat='', selCondition='جديد', selPlan='مجاني';
-let photosData=new Array(10).fill(null); // صور حقيقية مضغوطة (base64 JPEG) — موازية لخانات photo-grid
+let photosData=new Array(10).fill(null);
 const emojis=['📷','🛋️','🍳','🛁','🌇','🅿️','📸','🖼️','🏠','✨'];
 let currentStep=1;
+
+function _postLangFr(){
+  return (typeof isAr !== 'undefined' && !isAr) || localStorage.getItem('rizq_lang') === 'fr';
+}
+
+function _escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+function renderPostCategories(){
+  var grid = document.getElementById('post-cats-grid');
+  if(!grid || typeof RizqCategories === 'undefined') return;
+  var fr = _postLangFr();
+  var prev = selCat;
+  var prevSub = selSubcat;
+  var cats = RizqCategories.list(fr ? 'fr' : 'ar');
+  grid.innerHTML = cats.map(function(c){
+    var goldStyle = c.gold ? ' style="background:linear-gradient(135deg,#b8860b,#FFD700,#e8c96a);border-color:rgba(201,168,76,.6);box-shadow:0 4px 14px rgba(201,168,76,.35)"' : '';
+    var sel = (c.key === prev) ? ' selected' : '';
+    return '<button type="button" class="cat-btn'+sel+'" data-cat-key="'+_escHtml(c.key)+'"><span class="cat-icon-badge"'+goldStyle+'>'+c.icon+'</span><span class="cat-name">'+_escHtml(c.name)+'</span></button>';
+  }).join('');
+  grid.querySelectorAll('.cat-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ selectCat(btn, btn.getAttribute('data-cat-key')); });
+  });
+  if(prev){
+    var match = null;
+    grid.querySelectorAll('.cat-btn').forEach(function(b){
+      if(b.getAttribute('data-cat-key') === prev) match = b;
+    });
+    if(match){ selectCat(match, prev); if(prevSub) selectSubcatByKey(prevSub); }
+  }
+}
+
+function selectSubcatByKey(subKey){
+  selSubcat = subKey;
+  document.querySelectorAll('#subcats-list .subcat-btn').forEach(function(b){
+    b.classList.toggle('selected', b.getAttribute('data-sub-key') === subKey);
+  });
+}
+
+function updateLangFieldRequirements(){
+  var fr = _postLangFr();
+  var arReq = !fr;
+  var frReq = fr;
+  [['ad-title-req','ad-title-opt'], ['ad-desc-req','ad-desc-opt']].forEach(function(p){
+    var req = document.getElementById(p[0]); var opt = document.getElementById(p[1]);
+    if(req) req.style.display = arReq ? '' : 'none';
+    if(opt) opt.style.display = arReq ? 'none' : '';
+  });
+  [['ad-title-fr-req','ad-title-fr-opt'], ['ad-desc-fr-req','ad-desc-fr-opt']].forEach(function(p){
+    var req = document.getElementById(p[0]); var opt = document.getElementById(p[1]);
+    if(req) req.style.display = frReq ? '' : 'none';
+    if(opt) opt.style.display = frReq ? 'none' : '';
+  });
+}
+
+function collectAdTextFields(){
+  return {
+    title: (document.getElementById('ad-title') || {}).value ? document.getElementById('ad-title').value.trim() : '',
+    desc: (document.getElementById('ad-desc') || {}).value ? document.getElementById('ad-desc').value.trim() : '',
+    titleFr: (document.getElementById('ad-title-fr') || {}).value ? document.getElementById('ad-title-fr').value.trim() : '',
+    descFr: (document.getElementById('ad-desc-fr') || {}).value ? document.getElementById('ad-desc-fr').value.trim() : ''
+  };
+}
+
+function validateAdTextFields(showErrors, allowEitherLang){
+  var fr = _postLangFr();
+  var f = collectAdTextFields();
+  if(allowEitherLang){
+    var arOk = !!f.title && f.desc.length >= 20;
+    var frOk = !!f.titleFr && f.descFr.length >= 20;
+    if(arOk || frOk) return true;
+    if(showErrors) showToast(fr ? '⚠️ Saisissez au moins un titre et une description (20 caractères min.) dans une langue' : '⚠️ أدخل عنواناً ووصفاً (20 حرفاً على الأقل) بلغة واحدة على الأقل');
+    return false;
+  }
+  if(fr){
+    if(!f.titleFr){
+      if(showErrors) showToast('⚠️ Veuillez saisir le titre de l\'annonce (français)');
+      return false;
+    }
+    if(f.descFr.length < 20){
+      if(showErrors) showToast('⚠️ Veuillez saisir une description plus détaillée en français (20 caractères min.)');
+      return false;
+    }
+  } else {
+    if(!f.title){
+      if(showErrors) showToast('⚠️ يرجى كتابة عنوان الإعلان (عربي)');
+      return false;
+    }
+    if(f.desc.length < 20){
+      if(showErrors) showToast('⚠️ يرجى كتابة وصف أكثر تفصيلاً بالعربية (20 حرف على الأقل)');
+      return false;
+    }
+  }
+  return true;
+}
+
+/** نسخ المحتوى للحقل الفارغ عند الحفظ فقط — دون إجبار المستخدم على الكتابة بلغتين */
+function finalizeAdTextFields(f){
+  var out = { title: f.title, desc: f.desc, titleFr: f.titleFr, descFr: f.descFr };
+  if(!out.title && out.titleFr) out.title = out.titleFr;
+  if(!out.desc && out.descFr) out.desc = out.descFr;
+  if(!out.titleFr && out.title) out.titleFr = out.title;
+  if(!out.descFr && out.desc) out.descFr = out.desc;
+  return out;
+}
 
 function selectCat(btn, cat){
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   selCat=cat;
-  // Show subcats
-  const wrap=document.getElementById('subcats-wrap');
-  const list=document.getElementById('subcats-list');
-  if(SUBCATS[cat]){
-    const curLang = (localStorage.getItem('rizq_lang') === 'fr') ? 'fr' : 'ar';
-    const labels = (curLang === 'fr' && SUBCATS_FR[cat]) ? SUBCATS_FR[cat] : SUBCATS[cat];
-    list.innerHTML = SUBCATS[cat].map((s,i)=>`<button class="subcat-btn" onclick="selectSub(this,'${s}')">${labels[i] || s}</button>`).join('');
+  selSubcat='';
+  var wrap=document.getElementById('subcats-wrap');
+  var list=document.getElementById('subcats-list');
+  var sc = (typeof RizqCategories !== 'undefined') ? RizqCategories.subcatsFor(cat, _postLangFr() ? 'fr' : 'ar') : null;
+  if(sc && sc.keys && sc.keys.length){
+    list.innerHTML = sc.keys.map(function(s,i){
+      return '<button type="button" class="subcat-btn" data-sub-key="'+_escHtml(s)+'">'+_escHtml(sc.labels[i] || s)+'</button>';
+    }).join('');
+    list.querySelectorAll('.subcat-btn').forEach(function(b){
+      b.addEventListener('click', function(){ selectSub(b, b.getAttribute('data-sub-key')); });
+    });
     wrap.style.display='block';
+  } else {
+    list.innerHTML='';
+    wrap.style.display='none';
   }
   document.getElementById('btn-next-1').disabled=false;
 }
@@ -788,6 +883,35 @@ function selectPlan(card){
   selPlan=card.querySelector('.plan-name').textContent;
 }
 
+function normalizeWilaya(w){
+  if(!w) return w;
+  if(w==='تيارت') return 'نواكشوط الشمالية';
+  return w;
+}
+function toggleMoughataaField(){
+  var sel=document.getElementById('ad-wilaya');
+  var wrap=document.getElementById('ad-moughataa-wrap');
+  if(!sel||!wrap) return;
+  var w=normalizeWilaya(sel.value||sel.options[sel.selectedIndex]?.textContent||'');
+  wrap.style.display=(w==='نواكشوط الشمالية')?'block':'none';
+}
+function resolveCityField(){
+  var cityEl=document.getElementById('ad-city');
+  var mSel=document.getElementById('ad-moughataa');
+  var city=(cityEl&&cityEl.value||'').trim();
+  var mough=(mSel&&mSel.value||'').trim();
+  if(!mough) return city;
+  if(city&&city.indexOf(mough)!==-1) return city;
+  return city ? (mough+' — '+city) : mough;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var wSel=document.getElementById('ad-wilaya');
+  if(wSel){
+    wSel.addEventListener('change',toggleMoughataaField);
+    toggleMoughataaField();
+  }
+});
+
 function goStep(n){
   currentStep=n;
   document.querySelectorAll('.post-panel').forEach(p=>p.classList.remove('active'));
@@ -806,16 +930,9 @@ function goStep(n){
 }
 
 function nextFromDetails(){
-  const title=document.getElementById('ad-title').value.trim();
-  const desc=document.getElementById('ad-desc').value.trim();
-  const titleFr=document.getElementById('ad-title-fr').value.trim();
-  const descFr=document.getElementById('ad-desc-fr').value.trim();
-  const wilaya=document.getElementById('ad-wilaya').value;
-  const _fr = (typeof isAr !== 'undefined' && !isAr);
-  if(!title){showToast(_fr ? '⚠️ Veuillez saisir le titre de l\'annonce (arabe)' : '⚠️ يرجى كتابة عنوان الإعلان (عربي)');return;}
-  if(desc.length<20){showToast(_fr ? '⚠️ Veuillez saisir une description plus détaillée en arabe (20 caractères min.)' : '⚠️ يرجى كتابة وصف أكثر تفصيلاً بالعربية (20 حرف على الأقل)');return;}
-  if(!titleFr){showToast('⚠️ Veuillez saisir le titre en français');return;}
-  if(descFr.length<20){showToast('⚠️ Veuillez saisir une description plus détaillée en français (20 caractères min.)');return;}
+  if(!validateAdTextFields(true)) return;
+  const wilaya=normalizeWilaya(document.getElementById('ad-wilaya').value);
+  const _fr = _postLangFr();
   if(!wilaya){showToast(_fr ? '⚠️ Veuillez choisir la wilaya' : '⚠️ يرجى اختيار الولاية');return;}
   goStep(3);
 }
@@ -948,16 +1065,20 @@ function handleFiles(input){
 }
 
 function updatePreview(){
-  const _frP=(localStorage.getItem('rizq_lang')==='fr');
-  const title=document.getElementById('ad-title').value||(_frP?'(Titre non saisi)':'(لم يُكتب العنوان بعد)');
-  const desc=document.getElementById('ad-desc').value||(_frP?'(Pas de description)':'(لا يوجد وصف)');
+  const _frP=_postLangFr();
+  const f=collectAdTextFields();
+  const title=(_frP ? (f.titleFr || f.title) : (f.title || f.titleFr)) || (_frP?'(Titre non saisi)':'(لم يُكتب العنوان بعد)');
+  const desc=(_frP ? (f.descFr || f.desc) : (f.desc || f.descFr)) || (_frP?'(Pas de description)':'(لا يوجد وصف)');
   const price=document.getElementById('ad-price').value||'0';
-  const wilaya=document.getElementById('ad-wilaya').value||(_frP?'Non défini':'غير محدد');
-  document.getElementById('prev-cat').textContent=(selCat?'📋 '+selCat:'')+' '+(selSubcat?'› '+selSubcat:'');
+  const wilaya=normalizeWilaya(document.getElementById('ad-wilaya').value)||(_frP?'Non défini':'غير محدد');
+  const cityLine=resolveCityField();
+  var catMeta = (typeof RizqCategories !== 'undefined' && selCat) ? RizqCategories.getByKey(selCat) : null;
+  var catLabel = catMeta ? (_frP ? catMeta.nameFr : catMeta.nameAr) : selCat;
+  document.getElementById('prev-cat').textContent=(catLabel?'📋 '+catLabel:'')+' '+(selSubcat?'› '+selSubcat:'');
   document.getElementById('prev-title').textContent=title;
   document.getElementById('prev-desc').textContent=desc.substring(0,120)+(desc.length>120?'...':'');
   document.getElementById('prev-price').textContent=parseInt(price).toLocaleString()+' MRU';
-  document.getElementById('prev-loc').textContent='📍 '+wilaya;
+  document.getElementById('prev-loc').textContent='📍 '+(cityLine ? wilaya+' — '+cityLine : wilaya);
 }
 
 function togglePublish(){
@@ -996,10 +1117,12 @@ function publishAd(){
     return;
   }
   // ══ تجميع بيانات الإعلان ══
-  var title    = document.getElementById('ad-title')  ? document.getElementById('ad-title').value.trim()  : '';
-  var desc     = document.getElementById('ad-desc')   ? document.getElementById('ad-desc').value.trim()   : '';
-  var titleFr  = document.getElementById('ad-title-fr') ? document.getElementById('ad-title-fr').value.trim() : '';
-  var descFr   = document.getElementById('ad-desc-fr')  ? document.getElementById('ad-desc-fr').value.trim()  : '';
+  if(!validateAdTextFields(true)) return;
+  var f = finalizeAdTextFields(collectAdTextFields());
+  var title    = f.title;
+  var desc     = f.desc;
+  var titleFr  = f.titleFr;
+  var descFr   = f.descFr;
   var price    = document.getElementById('ad-price')  ? document.getElementById('ad-price').value.trim()  : '';
   var priceOriginal = document.getElementById('ad-price-original') ? document.getElementById('ad-price-original').value.trim() : '';
   // الشارة تُعرض فقط إن كان السعر الأصلي أعلى فعلاً من سعر البيع — وإلا نتجاهله بصمت (لا نمنع النشر)
@@ -1007,10 +1130,12 @@ function publishAd(){
   var stockQtyRaw = document.getElementById('ad-stock-qty') ? document.getElementById('ad-stock-qty').value.trim() : '';
   var stockQty = (stockQtyRaw !== '' && Number.isFinite(Number(stockQtyRaw)) && Number(stockQtyRaw) >= 0) ? Math.floor(Number(stockQtyRaw)) : null;
   var selCatBtn   = document.querySelector('.cat-btn.selected');
-  var categoryLabel = selCatBtn ? selCatBtn.querySelector('.cat-name').textContent : '';
+  var catMeta = (typeof RizqCategories !== 'undefined' && selCat) ? RizqCategories.getByKey(selCat) : null;
+  var categoryLabel = catMeta ? catMeta.nameAr : (selCatBtn ? selCatBtn.querySelector('.cat-name').textContent : '');
   var catEmoji = selCatBtn ? (selCatBtn.querySelector('.cat-icon-badge') ? selCatBtn.querySelector('.cat-icon-badge').textContent.trim() : '📦') : '📦';
-  var wilaya   = document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '';
+  var wilaya   = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '');
 
+  var cityLine = resolveCityField();
   var adData = {
     id:       'RZQ-2026-' + Math.floor(10000 + Math.random() * 90000),
     title:    title,
@@ -1020,11 +1145,13 @@ function publishAd(){
     price:    price,
     originalPrice: priceOriginal,
     stockQty: stockQty,
-    category: selCat || categoryLabel,  // الكود المختصر (selCat العام) ليتوافق مع فلاتر rizq_browse.html، مع احتياط من النص الكامل
+    category: (typeof RizqCategories !== 'undefined' ? RizqCategories.normalize(selCat) : selCat) || categoryLabel,
     categoryLabel: categoryLabel,
     subcat:   selSubcat || '',
     emoji:    catEmoji,
     wilaya:   wilaya,
+    loc:      cityLine ? (wilaya+' — '+cityLine) : wilaya,
+    city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
     seller_trust_score: 60, // افتراضي — يُحدَّث عند توفر نظام الثقة
     accountType: 'individual', // هذه الصفحة تخص الأفراد فقط — يُستخدم في rizq_moderator_agent.js لتطبيق قواعد قسم "الأفراد" تحديداً (راجع RIZQ_SECTION_MANAGEMENT_RULES.md)
@@ -1220,8 +1347,9 @@ var _editAdId = null;
           var opt = Array.from(wilayaSel.options).find(function(o){ return o.textContent.trim()===ad.wilaya || o.value===ad.wilaya; });
           if(opt) wilayaSel.value = opt.value || opt.textContent;
         }
-        selCat = ad.category || selCat;
+        selCat = (typeof RizqCategories !== 'undefined') ? RizqCategories.normalize(ad.category || '') : (ad.category || selCat);
         selSubcat = ad.subcat || selSubcat;
+        if(typeof renderPostCategories === 'function') renderPostCategories();
 
         // صور حقيقية موجودة (روابط خادم فعلية /uploads/ads/...، لا base64) —
         // تُرسَل كما هي عند الحفظ دون إعادة رفع (saveAdImages بالخادم يتعرّف
@@ -1261,19 +1389,22 @@ function saveAdEdit(){
     showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
     return;
   }
-  var title    = document.getElementById('ad-title')  ? document.getElementById('ad-title').value.trim()  : '';
-  var desc     = document.getElementById('ad-desc')   ? document.getElementById('ad-desc').value.trim()   : '';
-  var titleFr  = document.getElementById('ad-title-fr') ? document.getElementById('ad-title-fr').value.trim() : '';
-  var descFr   = document.getElementById('ad-desc-fr')  ? document.getElementById('ad-desc-fr').value.trim()  : '';
+  var f = collectAdTextFields();
+  if(!f.title && !f.titleFr){ showToast(_postLangFr() ? '⚠️ Titre requis' : '⚠️ العنوان مطلوب'); return; }
+  if(!validateAdTextFields(true, true)) return;
+  f = finalizeAdTextFields(f);
+  var title    = f.title;
+  var desc     = f.desc;
+  var titleFr  = f.titleFr;
+  var descFr   = f.descFr;
   var price    = document.getElementById('ad-price')  ? document.getElementById('ad-price').value.trim()  : '';
   var priceOriginal = document.getElementById('ad-price-original') ? document.getElementById('ad-price-original').value.trim() : '';
   if(priceOriginal && price && Number(priceOriginal) <= Number(price)) priceOriginal = '';
   var stockQtyRaw = document.getElementById('ad-stock-qty') ? document.getElementById('ad-stock-qty').value.trim() : '';
   var stockQty = (stockQtyRaw !== '' && Number.isFinite(Number(stockQtyRaw)) && Number(stockQtyRaw) >= 0) ? Math.floor(Number(stockQtyRaw)) : null;
-  var wilaya   = document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '';
+  var wilaya   = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '');
 
-  if(!title){ showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Titre requis' : '⚠️ العنوان مطلوب'); return; }
-  if(!wilaya){ showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Wilaya requise' : '⚠️ الولاية مطلوبة'); return; }
+  if(!wilaya){ showToast(_postLangFr() ? '⚠️ Wilaya requise' : '⚠️ الولاية مطلوبة'); return; }
 
   var body = {
     title: title, desc: desc, titleFr: titleFr, descFr: descFr,
@@ -1534,6 +1665,9 @@ function rizqShare(title, url) {
       el.placeholder = isArNow ? el.getAttribute('data-ph-ar') : el.getAttribute('data-ph-fr');
     });
 
+    if (typeof updateLangFieldRequirements === 'function') updateLangFieldRequirements();
+    if (typeof renderPostCategories === 'function') renderPostCategories();
+
     // الأقسام في select — bidirectional (no reload)
     if (lang === 'fr') {
       document.querySelectorAll('[data-cat-idx]').forEach(el => {
@@ -1572,11 +1706,16 @@ function rizqShare(title, url) {
 
   // تطبيق اللغة المحفوظة عند التحميل
   window.addEventListener('DOMContentLoaded', function() {
+    if(typeof renderPostCategories === 'function') renderPostCategories();
+    if(typeof updateLangFieldRequirements === 'function') updateLangFieldRequirements();
     const saved = localStorage.getItem('rizq_lang');
     if (saved === 'fr') {
       isAr = false;
       applyLang('fr');
     }
+  });
+  window.addEventListener('storage', function(e){
+    if(e.key === 'rizq_extra_categories' && typeof renderPostCategories === 'function') renderPostCategories();
   });
 })();
 </script>

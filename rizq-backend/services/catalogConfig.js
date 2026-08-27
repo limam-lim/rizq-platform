@@ -7,6 +7,14 @@ const path = require('path');
 
 const SITE_CONFIG_FILE = path.join(__dirname, '..', 'data', 'site-config.json');
 
+/** افتراضيات باقات الأفراد — تُستخدم عند غياب site-config.json */
+const DEFAULT_INDIVIDUAL_PACKAGES = [
+  { id: 'ind-free', name: 'مجانية', price: 0, durationDays: 10, active: true },
+  { id: 'ind-boost', name: 'مميزة', price: 300, durationDays: 30, boostDays: 3, active: true },
+  { id: 'ind-medium', name: 'باقة متوسطة', price: 1000, durationDays: 30, active: true },
+  { id: 'ind-monthly', name: 'باقة شهرية', price: 2000, durationDays: 30, active: true },
+];
+
 const DEFAULT_QUOTA_CONFIG = {
   diamond_standard: {
     messages: 2000,
@@ -76,7 +84,21 @@ function getAllCatalogPackages() {
       if (p && p.active !== false) out.push(Object.assign({ _catalog: cat }, p));
     });
   });
+  if (!out.length) {
+    DEFAULT_INDIVIDUAL_PACKAGES.forEach((p) => {
+      out.push(Object.assign({ _catalog: 'individual' }, p));
+    });
+  }
   return out;
+}
+
+function resolvePackageBoostDays(ref) {
+  const pkg = findCatalogPackage(ref);
+  if (pkg && pkg.boostDays) return Math.max(1, Number(pkg.boostDays) || 3);
+  if (pkg && pkg.id && String(pkg.id).indexOf('boost') !== -1) return 3;
+  const name = typeof ref === 'string' ? ref : String((ref && ref.pkgName) || (ref && ref.name) || '');
+  if (/مميز|boost|mise en avant/i.test(name)) return 3;
+  return null;
 }
 
 function findCatalogPackage(ref) {
@@ -173,6 +195,7 @@ module.exports = {
   resolveDiamondTier,
   isDiamondPackageRef,
   getTierQuotaLimits,
+  resolvePackageBoostDays,
   resolveQuotaLimitsForAccount,
   isTrialPackage,
 };

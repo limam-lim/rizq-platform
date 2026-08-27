@@ -137,7 +137,14 @@ body{
 .t-btn.primary{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;box-shadow:0 6px 16px rgba(27,58,107,.22)}
 .t-btn.primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(27,58,107,.3)}
 .t-btn.primary:active{transform:translateY(0)}
-
+.t-btn.locked{background:#e8ecf2;color:#6b7280;cursor:not-allowed;box-shadow:none}
+.t-contacts{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f8f6f0;border:1px solid var(--line);font-size:12px}
+.t-contacts.locked .t-contact-val{filter:blur(5px);user-select:none;pointer-events:none;color:transparent;text-shadow:0 0 8px rgba(80,80,80,.55)}
+.t-contacts-label{font-weight:800;color:var(--navy);margin-bottom:6px;font-size:11.5px}
+.t-contact-row{display:flex;align-items:center;gap:6px;margin-top:4px;color:var(--ink-soft)}
+.t-access-banner{margin:0 0 16px;padding:12px 16px;border-radius:12px;font-size:12.5px;line-height:1.65;font-weight:600}
+.t-access-banner.info{background:#eff6ff;border:1.5px solid #bfdbfe;color:#1e40af}
+.t-access-banner.warn{background:#fffbeb;border:1.5px solid #fcd34d;color:#92400e}
 .t-empty{text-align:center;padding:70px 20px;background:#fff;border-radius:18px;border:1.5px dashed var(--line);grid-column:1/-1}
 .t-empty .emo-ring{width:74px;height:74px;border-radius:50%;border:1.5px dashed rgba(201,168,76,.55);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;background:rgba(201,168,76,.06)}
 .t-empty .emo{font-size:30px}
@@ -202,6 +209,7 @@ body{
 <div class="wrap">
   <div class="cats" id="t-cats"></div>
   <div class="list-head"><div class="t-count" id="t-count"></div></div>
+  <div id="t-access-banner"></div>
   <div class="t-grid" id="t-grid"></div>
 </div>
 
@@ -363,6 +371,7 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#16263d;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:3000;max-width:90vw;text-align:center"></div>
 
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_contact_gate.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script>
 /* ════════════════════════════════════════
@@ -409,7 +418,8 @@ var _params = new URLSearchParams(location.search);
 var _catFilter = _params.get('cat') || '';
 var _tenders = [];
 var _loaded = false;
-var _gateState = null; // null | 'login' | 'package' — غرفة المناقصات محجوبة خلف باقة فعّالة
+var _gateState = null;
+var _tenderAccess = { contactsUnlocked: false, canSubmitBid: false, canPost: false, isTrial: false, subscribed: false };
 
 // ── من المسجَّل دخوله الآن؟ (أي نوع حساب) ──
 function _getSession(){
@@ -473,7 +483,7 @@ function _fmtDeadline(iso, fr){
     var d = new Date(iso);
     var days = Math.ceil((d.getTime()-Date.now())/(24*60*60*1000));
     var dateStr = d.toLocaleDateString(fr?'fr-FR':'ar-EG-u-nu-latn');
-    if(days<=0) return fr?('انتهت — '+dateStr):('Clôturé — '+dateStr);
+    if(days<=0) return fr?('Clôturé — '+dateStr):('انتهت — '+dateStr);
     var lbl = fr ? (days+' j restant(s)') : (days+' يوم متبقٍ');
     return '⏳ '+lbl+' ('+dateStr+')';
   }catch(e){ return ''; }
@@ -487,33 +497,63 @@ function _deadlineClass(iso){
   }catch(e){ return ''; }
 }
 
+function _renderContactBlock(t, fr){
+  if(t.contactsLocked && !t.ownerPhone && !t.ownerEmail && !t.ownerWhatsApp){
+    return '<div class="t-contacts locked">'
+      + '<div class="t-contacts-label">'+(fr?'Coordonnées du donneur d\'ordre':'بيانات تواصل صاحب المناقصة')+' 🔒</div>'
+      + '<div class="t-contact-row"><span>📞</span><span class="t-contact-val">'+(fr?'Abonnement requis':'يلزم اشتراك مدفوع')+'</span></div>'
+      + '<div class="t-contact-row"><span>✉️</span><span class="t-contact-val">•••@•••.•••</span></div>'
+      + '</div>';
+  }
+  var phone = t.ownerPhone || '';
+  var email = t.ownerEmail || '';
+  var wa = t.ownerWhatsApp || phone;
+  var locked = !!t.contactsLocked;
+  var cls = locked ? 't-contacts locked' : 't-contacts';
+  var phoneDisp = locked ? (phone ? '••• ••• •••' : (fr?'Masqué':'مخفي')) : escapeHtml(phone || '—');
+  var emailDisp = locked ? '•••@•••.•••' : escapeHtml(email || '—');
+  var waDisp = locked ? (fr?'Masqué':'مخفي') : (wa ? escapeHtml(wa) : '—');
+  return '<div class="'+cls+'"'+(locked && t.ownerId ? ' data-contact-gate="1" data-owner-id="'+escapeHtml(t.ownerId||'')+'" style="cursor:pointer"' : '')+'>'
+    + '<div class="t-contacts-label">'+(fr?'Coordonnées du donneur d\'ordre':'بيانات تواصل صاحب المناقصة')+(locked?' 🔒':'')+'</div>'
+    + '<div class="t-contact-row"><span>📞</span><span class="t-contact-val">'+phoneDisp+'</span></div>'
+    + (email ? '<div class="t-contact-row"><span>✉️</span><span class="t-contact-val">'+emailDisp+'</span></div>' : '')
+    + (wa ? '<div class="t-contact-row"><span>💬</span><span class="t-contact-val">'+waDisp+'</span></div>' : '')
+    + (locked ? '<p style="margin-top:8px;font-size:11px;color:#92400e">'+(fr?'Abonnez-vous pour débloquer les contacts et soumettre une offre.':'اشترك في باقة شهرية فأعلى لكشف التواصل وتقديم العروض.')+'</p>' : '')
+    + '</div>';
+}
+
 function renderTenders(){
   var fr = _rizqLang()==='fr';
   var grid = document.getElementById('t-grid');
   var countEl = document.getElementById('t-count');
   var catsEl = document.getElementById('t-cats');
+  var bannerEl = document.getElementById('t-access-banner');
 
-  if(_gateState){
+  if(_gateState === 'login'){
     if(catsEl) catsEl.style.display='none';
     countEl.textContent='';
-    var isLogin = _gateState==='login';
-    var title = isLogin ? (fr?'Connexion requise':'يلزم تسجيل الدخول') : (fr?'Abonnement requis':'يلزم الاشتراك');
-    var desc = isLogin
-      ? (fr
-          ? 'La salle des appels d\'offres est réservée aux abonnés de la « Salle des appels d\'offres ». Connectez-vous depuis votre tableau de bord (particulier, magasin, bureau ou société).'
-          : 'غرفة المناقصات مخصّصة لمشتركي "باقة المناقصة" فقط. سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة).')
-      : (fr
-          ? 'Vous êtes connecté, mais votre abonnement à la « Salle des appels d\'offres » n\'est pas actif. Activez-le depuis votre tableau de bord pour consulter les appels d\'offres et soumettre des offres.'
-          : 'أنت مسجّل الدخول، لكن اشتراكك في "باقة المناقصة" غير فعّال. فعّله من لوحة تحكمك حتى تقدر تشوف المناقصات وتقدّم عروضاً.');
     grid.innerHTML = '<div class="t-empty">'
       + '<div class="emo-ring"><div class="emo">🔒</div></div>'
-      + '<h3 style="color:#151f30;margin:0 0 8px;font-size:19px">'+title+'</h3>'
-      + '<p style="color:#5b6472;max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.7">'+desc+'</p>'
+      + '<h3 style="color:#151f30;margin:0 0 8px;font-size:19px">'+(fr?'Connexion requise':'يلزم تسجيل الدخول')+'</h3>'
+      + '<p style="color:#5b6472;max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.7">'+(fr?'Connectez-vous pour publier ou soumettre une offre.':'سجّل دخولك لنشر مناقصة أو تقديم عرض.')+'</p>'
       + '<a href="rizq_landing_v8.html" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;text-decoration:none">'+(fr?'Aller au tableau de bord':'الذهاب إلى لوحة التحكم')+'</a>'
       + '</div>';
+    if(bannerEl) bannerEl.innerHTML='';
     return;
   }
   if(catsEl) catsEl.style.display='';
+
+  if(bannerEl){
+    if(_tenderAccess.contactsUnlocked){
+      bannerEl.innerHTML = '<div class="t-access-banner info">✅ '+(fr?'Votre abonnement est actif — contacts débloqués et soumission d\'offres activée.':'اشتراكك فعّال — بيانات التواصل مكشوفة ويمكنك تقديم العروض.')+'</div>';
+    } else if(_tenderAccess.isTrial){
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. Les contacts restent masqués et la soumission est verrouillée.':'باقتك التجريبية فعّالة — للتصفّح فقط. التواصل مخفي وتقديم العروض مقفول.')+'</div>';
+    } else if(!_getSession()){
+      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — abonnez-vous pour débloquer les contacts et soumettre des offres.':'تصفّح مجاني — اشترك لكشف التواصل وتقديم العروض.')+'</div>';
+    } else {
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis pour débloquer les contacts et soumettre des offres.':'يلزم اشتراك مدفوع لكشف التواصل وتقديم العروض.')+'</div>';
+    }
+  }
 
   if(!_loaded){
     countEl.textContent = fr ? 'Chargement…' : 'جاري التحميل…';
@@ -530,6 +570,7 @@ function renderTenders(){
     return;
   }
 
+  var canBid = !!(_tenderAccess.canSubmitBid);
   grid.innerHTML = _tenders.map(function(t){
     var lab = CAT_LABELS[t.category] || {ar:'🏷️ أخرى',fr:'🏷️ Autre'};
     var budget = (t.budgetMax>0)
@@ -537,6 +578,9 @@ function renderTenders(){
       : '';
     var bidsLbl = fr ? (t.bidsCount+' offre(s) reçue(s)') : (t.bidsCount+' عرض مُقدَّم');
     var thumb = (t.images && t.images.length) ? '<img class="t-card-thumb" src="'+t.images[0]+'"/>' : '';
+    var bidBtn = canBid
+      ? '<button class="t-btn primary" onclick="openBidModal(\''+t.id+'\')">'+(fr?'Soumettre une offre':'قدّم عرضك')+'</button>'
+      : '<button class="t-btn locked" onclick="openBidModal(\''+t.id+'\')" title="'+(fr?'Abonnement requis':'يلزم اشتراك')+'">🔒 '+(fr?'Offre (abonnement)':'عرض (اشتراك)')+'</button>';
     return '<div class="t-card">'
       + '<span class="t-cat-tag">'+(fr?lab.fr:lab.ar)+'</span>'
       + '<div class="t-title-row">'
@@ -544,6 +588,7 @@ function renderTenders(){
       + '<div class="t-title" style="flex:1">'+escapeHtml(t.title)+'</div>'
       + '</div>'
       + (t.desc ? '<div class="t-desc">'+escapeHtml(t.desc)+'</div>' : '')
+      + _renderContactBlock(t, fr)
       + '<div class="t-meta">'
       + (t.city ? '<span>📍 '+escapeHtml(t.city)+'</span>' : '')
       + '<span>🏢 '+escapeHtml(t.ownerName||'')+'</span>'
@@ -551,31 +596,40 @@ function renderTenders(){
       + '</div>'
       + (budget ? '<div class="t-budget">'+budget+'</div>' : '')
       + '<div class="t-deadline '+_deadlineClass(t.deadline)+'">'+_fmtDeadline(t.deadline, fr)+'</div>'
-      + '<div class="t-actions"><button class="t-btn primary" onclick="openBidModal(\''+t.id+'\')">'+(fr?'Soumettre une offre':'قدّم عرضك')+'</button></div>'
+      + '<div class="t-actions">'+bidBtn+'</div>'
       + '</div>';
   }).join('');
+  grid.querySelectorAll('[data-contact-gate="1"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var ownerId = el.getAttribute('data-owner-id');
+      if(!ownerId || !window.RizqContactGate) return;
+      RizqContactGate.onMaskedContactClick(ownerId, 'tender', { lang: _rizqLang() });
+    });
+  });
 }
 
 function loadTenders(){
-  // غرفة المناقصات محجوبة خلف باقة فعّالة — لا تصفّح بلا اشتراك (راجع تعليق
-  // requireTenderRoomAccess في server.js لسبب هذا القرار).
+  _gateState = null;
   var session = _getSession();
-  if(!session){ _gateState='login'; _loaded=true; renderTenders(); return; }
-  _resolveRealAccessToken(session).then(function(realTok){
-    var url = _backendBase().replace(/\/$/,'') + '/api/tenders' + (_catFilter ? ('?cat='+encodeURIComponent(_catFilter)) : '');
-    fetch(url, { headers: { 'x-account-id': session.id, 'x-account-token': (realTok || session.token) } })
+  var url = _backendBase().replace(/\/$/,'') + '/api/tenders' + (_catFilter ? ('?cat='+encodeURIComponent(_catFilter)) : '');
+  function doFetch(headers){
+    fetch(url, { headers: headers || {} })
       .then(function(res){
         return res.json().catch(function(){ return null; }).then(function(data){ return {status:res.status, ok:res.ok, data:data}; });
       })
       .then(function(r){
-        if(r.status===401){ _gateState='login'; _loaded=true; renderTenders(); return; }
-        if(r.status===403){ _gateState='package'; _loaded=true; renderTenders(); return; }
-        _gateState=null;
+        if(r.status===401 && session){ _gateState='login'; _loaded=true; renderTenders(); return; }
+        _gateState = null;
+        if(r.data && r.data.access) _tenderAccess = r.data.access;
         _tenders = (r.data && r.data.ok && Array.isArray(r.data.tenders)) ? r.data.tenders : [];
         _loaded = true;
         renderTenders();
       })
       .catch(function(){ _gateState=null; _tenders=[]; _loaded=true; renderTenders(); });
+  }
+  if(!session){ doFetch({}); return; }
+  _resolveRealAccessToken(session).then(function(realTok){
+    doFetch({ 'x-account-id': session.id, 'x-account-token': (realTok || session.token) });
   });
 }
 
@@ -714,6 +768,15 @@ function openBidModal(tenderId){
         ? 'Connectez-vous d\'abord depuis votre tableau de bord pour soumettre une offre.'
         : 'سجّل دخولك أولاً من لوحة تحكمك حتى تقدر تقدّم عرضاً.')
       + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
+    document.getElementById('bid-modal').classList.add('open');
+    return;
+  }
+  if(!_tenderAccess.canSubmitBid){
+    body.innerHTML = '<h3>'+(fr?'Soumettre une offre':'قدّم عرضك')+'</h3>'
+      + '<div class="login-notice">'+(fr
+        ? 'Un abonnement payant (mensuel ou plus) est requis pour soumettre une offre. L\'essai permet la consultation uniquement.'
+        : 'يلزم اشتراك مدفوع (شهرية فأعلى) لتقديم العروض — الباقة التجريبية للتصفّح فقط.')
+      + '<br><a href="rizq_landing_v8.html">'+(fr?'Voir les forfaits':'عرض الباقات')+'</a></div>';
     document.getElementById('bid-modal').classList.add('open');
     return;
   }
