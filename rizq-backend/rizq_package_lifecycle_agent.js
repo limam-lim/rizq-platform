@@ -230,6 +230,17 @@ async function syncAccountPackage(opts) {
   store[opts.accountId] = record;
   _save(store);
 
+  try {
+    const { onSubscriptionActivated, onSubscriptionExpired } = require('./services/apiIntegration');
+    if (paymentConfirmed && planType === 'corp_diamond_pro' && accountType === 'corp') {
+      onSubscriptionActivated(opts.accountId, accountType, planType);
+    } else if (!paymentConfirmed || planType !== 'corp_diamond_pro' || accountType !== 'corp') {
+      onSubscriptionExpired(opts.accountId);
+    }
+  } catch (apiErr) {
+    console.warn('[syncAccountPackage] api integration:', apiErr.message);
+  }
+
   const results = { whatsapp: null, email: null };
   if (paymentConfirmed && invoice) {
     if (record.accountPhone) {
@@ -458,6 +469,12 @@ async function runLifecycleScan(accountsHelpers) {
       if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
       if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — انتهت باقتك', `<p dir="rtl">${msg}</p>`);
       _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
+      try {
+        const { onSubscriptionExpired } = require('./services/apiIntegration');
+        onSubscriptionExpired(accountId);
+      } catch (apiErr) {
+        console.warn('[lifecycle] api key suspend:', apiErr.message);
+      }
       changed = true;
     }
   }

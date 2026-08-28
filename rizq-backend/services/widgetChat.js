@@ -6,11 +6,31 @@ const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./
 const { maybeAutoNotifyLead } = require('./leadEscalation');
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
 const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel, createCachedMessage } = require('../config/anthropic');
-const { buildPackagesPromptBlock, buildDiamondTiersPromptBlock } = require('../../rizq_packages_config');
+const { buildLiveCatalogPolicyBlock, buildDiamondTiersPromptBlock } = require('../../rizq_packages_config');
+const {
+  buildDiamondCompletionFooter,
+  getDiamondTierPackages,
+  getLivePackagesForAI,
+  inferCatalogHint,
+  inferCatalogFromRef,
+  inferCatalogFromMessage,
+  buildLivePackagesChatSummary,
+  buildCategoryDiamondChatSummary,
+  isDiamondPricingQuery,
+  replyUsesUnknownPackagePrice,
+} = require('./packageCatalogLive');
+const { localizedName, priceLabel } = require('../../rizq_packages_config');
 const RizqAgent = require('../../rizq_agent');
 const RizqPrompts = require('../../rizq_ai_prompts');
 const { formatDynamicKnowledgeForPrompt } = require('./dynamicKnowledge');
-const { sanitizeAgentText } = require('./widgetMarkdown');
+const { formatPlainChatText, sanitizeAgentText } = require('./widgetMarkdown');
+const {
+  normalizeAttachment,
+  extractBase64FromAttachment,
+  dispatchWidgetMediaToTelegram,
+  mediaAckFallback,
+  attachmentPromptHint,
+} = require('./widgetMedia');
 
 const client = new Anthropic({ apiKey: getAnthropicApiKey() });
 const WIDGET_MAX_TOKENS = Number(process.env.WIDGET_CHAT_MAX_TOKENS) || 1400;
@@ -20,8 +40,8 @@ function buildLanguageInstructions(detectedLang, uiLang) {
   const ui = normalizeUiLang(uiLang);
   return (
     `\n## اللغة — إلزامي (Language — CRITICAL)\n` +
-    `- كشف تلقائي: ردّ **حصرياً** بنفس لغة رسالة المستخدم الأخيرة.\n` +
-    `- لغة هذه الرسالة المكتشفة: **${label}** (${detectedLang}).\n` +
+    `- كشف تلقائي: ردّ حصرياً بنفس لغة رسالة المستخدم الأخيرة.\n` +
+    `- لغة هذه الرسالة المكتشفة: ${label} (${detectedLang}).\n` +
     `- مدعوم: العربية، الحسانية، الفرنسية، الإنجليزية، الإسبانية — طابق المستخدم حرفياً.\n` +
     `- إذا خلط لغات، استخدم اللغة السائدة في رسالته.\n` +
     `- لغة واجهة الصفحة الافتراضية: ${getLangLabel(ui)} — استخدمها فقط إن كانت الرسالة غامضة (؟ أو emoji فقط).\n` +
@@ -39,7 +59,30 @@ function buildDiamondSystemBlock() {
   return RizqAgent.buildMasterSystemPrompt({ agentTier: 'diamond' });
 }
 
-function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier }) {
+function buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) {
+  if (!liveCatalog || !Array.isArray(liveCatalog.packages)) return '';
+  let pkgs = liveCatalog.packages;
+  if (catalogHint) {
+    pkgs = pkgs.filter((p) => p.catalog === catalogHint);
+  }
+  const rows = pkgs.map((p) => ({
+    id: p.id,
+    catalog: p.catalog,
+    name: p.name,
+    price: p.price,
+    priceLabel: p.priceLabel,
+  }));
+  const hintLine = catalogHint
+    ? ('STRICT catalog: ' + catalogHint + ' — quote ONLY these prices, never mix with other categories\n')
+    : '';
+  return (
+    hintLine +
+    '[LIVE CATALOG SNAPSHOT — fetched ' + liveCatalog.fetchedAt + ' — quote ONLY these prices]\n' +
+    JSON.stringify(rows).slice(0, 12000)
+  );
+}
+
+function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier, liveCatalog, catalogHint }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
   const tier = agentTier || (profile && profile.businessName ? 'diamond' : 'general');
@@ -85,16 +128,20 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free at rizq.mr.\n` +
       `For general questions: keep replies concise (2-4 sentences).\n` +
-      `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE answer — ` +
-      `explain BOTH الماسية الأساسية (5,000 MRU, text only) AND الماسية Pro (10,000 MRU, with voice calls). ` +
-      `Never stop mid-sentence or mid-markdown (no dangling **). End with the diamond comparison table.\n` +
-      `Never use Unicode bidi control characters (U+2066–U+2069) — write plain digits like 5000, 10000, 24/7.\n`;
+      `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE plain-text answer — ` +
+      `call get_packages_info first and explain BOTH diamond tiers from live data — never invent prices. ` +
+      `Finish with a plain comparison (Standard vs Pro: price, channels, voice) — no Markdown, no tables, no bullet symbols.\n` +
+      `Never use Unicode bidi control characters — quote prices only from get_packages_info, Western digits 0-9 only.\n`;
   }
 
-  prompt += `\n${buildPackagesPromptBlock()}\n${buildDiamondTiersPromptBlock()}\nCall get_packages_info before quoting any Rizq plan price.\n`;
-  prompt += 'When user asks about diamond / ماسية / packages: you MUST cover Standard AND Pro in full before ending.\n';
+  prompt += `\n${buildLiveCatalogPolicyBlock()}\n${buildDiamondTiersPromptBlock()}\n`;
+  if (liveCatalog) {
+    prompt += buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) + '\n';
+  }
+  prompt += 'You MUST call get_packages_info before quoting any Rizq plan price if snapshot is stale or user asks for another catalog.\n';
+  prompt += 'When user asks about diamond / ماسية / packages: you MUST cover Standard AND Pro in full before ending (plain text only).\n';
   prompt += 'For serious subscription interest or admin requests: collect business name, WhatsApp, and package — then call register_interest or escalate_to_human.\n';
-  prompt += 'For off-topic questions: politely decline and redirect to Rizq services only.\n';
+  prompt += 'When user attaches image/receipt/screenshot: acknowledge professionally, confirm it was forwarded to management for verification — never claim payment is verified.\n';
   prompt += 'Understand Hassaniya/local Mauritanian terms but reply in simple fusaha Arabic (or French if user writes in French).\n';
 
   const openAdId = pageContext && (pageContext.urlAdId || (pageContext.ad && pageContext.ad.id));
@@ -122,10 +169,16 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
 }
 
 function collectFactsFromTools(toolResults) {
-  const facts = { prices: [], trustScores: [], adIds: [], ads: [] };
+  const facts = { prices: [], packagePrices: [], trustScores: [], adIds: [], ads: [] };
   toolResults.forEach((raw) => {
     try {
       const r = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (r.source === 'live_catalog' && Array.isArray(r.packages)) {
+        r.packages.forEach((p) => {
+          if (p && p.price != null) facts.packagePrices.push(String(Number(p.price)));
+          if (p && p.priceLabel) facts.prices.push(String(p.priceLabel));
+        });
+      }
       if (r.ad && r.ad.price) facts.prices.push(String(r.ad.price));
       if (r.ad && r.ad.id) facts.adIds.push(r.ad.id);
       if (r.ad && r.ad.seller_trust_score != null) facts.trustScores.push(String(r.ad.seller_trust_score));
@@ -147,6 +200,10 @@ function collectFactsFromTools(toolResults) {
 
 function normalizeAmount(value) {
   return String(value || '').replace(/\D/g, '');
+}
+
+function isPackagePricingQuery(message) {
+  return /(?:باق|باقة|اشتراك|سعر|ثمن|كم|كلف|تكلف|تجرب|trial|forfait|package|plan|abonn|pricing|price|cost|buy|subscribe|achat|acheter|comprar|cu[aá]nto|how much|mru|أوقية|ouguiya|ماس|diamond|diamant)/i.test(String(message || ''));
 }
 
 function isAdFlowQuery(message, pageContext) {
@@ -182,6 +239,7 @@ function mergePageAndToolFacts(toolFacts, pageFacts) {
   });
   return {
     prices: toolFacts.prices.concat((pageFacts.ads || []).map((a) => String(a.price || '')).filter(Boolean)),
+    packagePrices: toolFacts.packagePrices.slice(),
     adIds: toolFacts.adIds.concat((pageFacts.ads || []).map((a) => a.id).filter(Boolean)),
     trustScores: toolFacts.trustScores
       .concat((pageFacts.ads || []).map((a) => String(a.seller_trust_score)).filter((x) => x !== 'undefined' && x !== 'null'))
@@ -226,28 +284,74 @@ function buildFactReply(mergedFacts, lang, message) {
 }
 
 function isDiamondPackageQuery(message) {
-  return /(?:ماس|diamond|diamant|\bpro\b|5000|5[\s,]?000|10000|10[\s,]?000|باق)/i.test(String(message || ''));
+  return /(?:ماس|diamond|diamant|\bpro\b|باق|forfait|package|plan|abonn)/i.test(String(message || ''));
 }
 
-function diamondCompletionFooter(lang) {
-  return pickLang({
-    ar: '\n\n**الماسية Pro (10,000 MRU/شهر):** نائب ذكي متقدم + ويدجت + واتساب + **مكالمات صوتية تفاعلية** + 4,000 محادثة نصية + 300 دقيقة صوت/شهر.\n\n| المستوى | السعر | صوت |\n| الماسية الأساسية | 5,000 MRU | نصي فقط |\n| الماسية Pro | 10,000 MRU | نص + صوت تفاعلي |',
-    fr: '\n\n**Diamant Pro (10 000 MRU/mois):** adjoint avancé + widget + WhatsApp + **appels vocaux interactifs** + 4 000 chats + 300 min voix/mois.\n\n| Niveau | Prix | Voix |\n| Diamant Standard | 5 000 MRU | Texte seul |\n| Diamant Pro | 10 000 MRU | Texte + voix |',
-    en: '\n\n**Diamond Pro (10,000 MRU/month):** advanced agent + widget + WhatsApp + **interactive voice calls** + 4,000 text chats + 300 voice min/month.\n\n| Tier | Price | Voice |\n| Diamond Standard | 5,000 MRU | Text only |\n| Diamond Pro | 10,000 MRU | Text + voice |',
-    es: '\n\n**Diamante Pro (10.000 MRU/mes):** agente avanzado + widget + WhatsApp + **llamadas de voz interactivas** + 4.000 chats + 300 min voz/mes.',
-  }, lang);
+function diamondCompletionFooter(lang, catalogHint) {
+  return buildDiamondCompletionFooter(lang, catalogHint);
 }
 
-function ensureDiamondReplyComplete(reply, userMessage, lang, stopReason) {
+function replyMentionsDiamondTier(text, tier, lang) {
+  if (!tier || !text) return false;
+  const blob = String(text);
+  const name = localizedName(tier, lang);
+  if (name && blob.includes(name)) return true;
+  const label = priceLabel(tier, lang);
+  if (label && blob.includes(label)) return true;
+  const digits = String(tier.price != null ? tier.price : '');
+  if (digits && digits !== '0' && blob.includes(digits)) return true;
+  return false;
+}
+
+function ensureDiamondReplyComplete(reply, userMessage, lang, stopReason, catalogHint) {
   let text = sanitizeAgentText(reply);
   if (!isDiamondPackageQuery(userMessage) && !/(?:ماس|diamond|diamant)/i.test(text)) return text;
-  const hasPro = /(?:10[\s,]?000|10000|\bpro\b|صوت|voice|vocaux|مكالم)/i.test(text);
-  const truncated = stopReason === 'max_tokens' || /\*\*\s*$/.test(String(reply || '')) || (/(?:5[\s,]?000|5000|أساس)/i.test(text) && !hasPro);
+  const tiers = getDiamondTierPackages(lang, catalogHint);
+  const hasPro = replyMentionsDiamondTier(text, tiers.pro, lang)
+    || /(?:\bpro\b|صوت|voice|vocaux|مكالم)/i.test(text);
+  const hasStd = replyMentionsDiamondTier(text, tiers.std, lang);
+  const truncated = stopReason === 'max_tokens' || /\*\*\s*$/.test(String(reply || '')) || (hasStd && !hasPro);
   if (truncated || !hasPro) {
     text = text.replace(/\*\*\s*$/, '').trim();
-    if (!hasPro) text += diamondCompletionFooter(lang);
+    if (!hasPro) text += diamondCompletionFooter(lang, catalogHint);
   }
   return text;
+}
+
+function inferCatalogFromConversation(text, history, pageContext, bodyCatalogHint) {
+  const parts = [String(text || '')];
+  if (Array.isArray(history)) {
+    history.slice(-6).forEach((h) => {
+      if (h && h.text) parts.push(String(h.text));
+    });
+  }
+  const blob = parts.join('\n');
+  return inferCatalogFromMessage(blob, { pageContext, catalogHint: bodyCatalogHint })
+    || inferCatalogFromRef(blob)
+    || null;
+}
+
+function catalogUsedLiveTool(toolResultsRaw) {
+  return (toolResultsRaw || []).some((r) => r && r.source === 'live_catalog' && Array.isArray(r.packages));
+}
+
+function enforceLivePackageReply(reply, userMessage, lang, toolResultsRaw, pageContext, catalogHint) {
+  if (!isPackagePricingQuery(userMessage)) return reply;
+  const hint = catalogHint || inferCatalogFromMessage(userMessage, { pageContext }) || inferCatalogFromRef(userMessage) || null;
+  const usedTool = catalogUsedLiveTool(toolResultsRaw);
+  const badPrice = replyUsesUnknownPackagePrice(reply, lang, hint, userMessage);
+  if (!usedTool || badPrice) {
+    console.warn('[widget-chat] live catalog enforcement — replacing reply', {
+      usedTool,
+      badPrice,
+      catalogHint: hint,
+    });
+    if (hint && (isDiamondPricingQuery(userMessage) || isDiamondPackageQuery(userMessage))) {
+      return buildCategoryDiamondChatSummary(lang, hint);
+    }
+    return buildLivePackagesChatSummary(lang, { catalogHint: hint });
+  }
+  return reply;
 }
 
 function isPlatformOrPackageQuery(message) {
@@ -273,7 +377,13 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
   }
 
   const uncertain = /\b(ربما|أظن|قد يكون|I think|maybe|probably|je pense|quizás|tal vez)\b/i.test(reply);
-  const hasGrounding = !!(mergedFacts.prices.length || mergedFacts.adIds.length || mergedFacts.trustScores.length || mergedFacts.reviewAverage);
+  const hasGrounding = !!(
+    mergedFacts.prices.length
+    || mergedFacts.packagePrices.length
+    || mergedFacts.adIds.length
+    || mergedFacts.trustScores.length
+    || mergedFacts.reviewAverage
+  );
   const platformQuery = isPlatformOrPackageQuery(userMessage);
   const adQuery = isAdSpecificQuery(userMessage);
   const replyAboutPackages = /(?:باق|forfait|package|اشتراك|MRU|أوقية|ماس|diamond|pro\b|trial|get_packages)/i.test(reply);
@@ -333,11 +443,35 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
   return { reply: reply.trim(), grounded: hasGrounding, reviewed: true };
 }
 
+function applyOfficialLeadConfirmation(replyText, toolResultsRaw, lang) {
+  const leadResult = (toolResultsRaw || []).find((r) => r && r.lead_id && r.confirmation_message);
+  if (!leadResult) return replyText;
+  return leadResult.confirmation_message || replyText;
+}
+
 async function handleWidgetChat(body) {
-  const { message, lang, profile, history, pageContext } = body || {};
-  const text = String(message || '').trim().slice(0, 1000);
-  if (!text) {
-    const err = new Error('message مطلوب');
+  const { message, lang, profile, history, pageContext, attachment: attachmentRaw } = body || {};
+  let attachment = attachmentRaw ? normalizeAttachment(attachmentRaw) : null;
+  if (attachment && attachment.error) {
+    const err = new Error('مرفق غير صالح — ' + attachment.error);
+    err.status = 400;
+    throw err;
+  }
+
+  const uiLang = normalizeUiLang(body.uiLang || lang);
+  const textRaw = String(message || '').trim().slice(0, 1000);
+  const detectedLang = detectUserLanguage(textRaw || 'مرفق', uiLang);
+  const defaultAttachText = pickLang({
+    ar: 'مرفق صورة / إيصال دفع',
+    fr: 'Pièce jointe — image / reçu de paiement',
+    en: 'Attachment — image / payment receipt',
+    es: 'Adjunto — imagen / recibo de pago',
+    hs: 'صورة / وصل دفع مرفق',
+  }, detectedLang);
+  const text = textRaw || (attachment && attachment.ok ? defaultAttachText : '');
+
+  if (!text && !(attachment && attachment.ok)) {
+    const err = new Error('message أو attachment مطلوب');
     err.status = 400;
     throw err;
   }
@@ -347,8 +481,9 @@ async function handleWidgetChat(body) {
     throw err;
   }
 
-  const uiLang = normalizeUiLang(body.uiLang || lang);
-  const detectedLang = detectUserLanguage(text, uiLang);
+  if (attachment && attachment.ok) {
+    dispatchWidgetMediaToTelegram(body, attachment, text);
+  }
 
   if (RizqAgent.isBlockedRequest(text)) {
     return {
@@ -361,6 +496,14 @@ async function handleWidgetChat(body) {
   }
 
   const pageFacts = resolvePageContextFacts(pageContext);
+  const catalogHint = inferCatalogFromConversation(text, body.history, pageContext, body.catalogHint);
+  const packageFlow = isPackagePricingQuery(text);
+  let liveCatalogPrefetch = null;
+  if (packageFlow) {
+    liveCatalogPrefetch = catalogHint
+      ? getLivePackagesForAI(detectedLang, { catalog: catalogHint })
+      : getLivePackagesForAI(detectedLang);
+  }
   const extraInstruction = (body.autoLang === true || body.systemInstruction)
     ? (body.systemInstruction || 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, or English) and reply only in that language.')
     : '';
@@ -372,6 +515,8 @@ async function handleWidgetChat(body) {
     pageFacts,
     extraInstruction,
     agentTier: body.agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
+    liveCatalog: liveCatalogPrefetch,
+    catalogHint,
   });
   const adFlow = isAdFlowQuery(text, pageContext);
   const preferredModel = getAgentModel();
@@ -384,9 +529,24 @@ async function handleWidgetChat(body) {
       }
     });
   }
-  messages.push({ role: 'user', content: text });
+
+  if (attachment && attachment.ok) {
+    const b64 = extractBase64FromAttachment(attachment);
+    const userContent = b64
+      ? [
+        { type: 'image', source: { type: 'base64', media_type: attachment.mediaType, data: b64 } },
+        { type: 'text', text: text + attachmentPromptHint(detectedLang) },
+      ]
+      : text + attachmentPromptHint(detectedLang);
+    messages.push({ role: 'user', content: userContent });
+  } else {
+    messages.push({ role: 'user', content: text });
+  }
 
   const toolResultsRaw = [];
+  if (liveCatalogPrefetch) {
+    toolResultsRaw.push(liveCatalogPrefetch);
+  }
   let response;
   let currentMessages = [...messages];
   let loops = 0;
@@ -404,6 +564,8 @@ async function handleWidgetChat(body) {
     };
     if (loops === 1 && adFlow.active) {
       createParams.tool_choice = { type: 'tool', name: 'get_ad_details' };
+    } else if (loops === 1 && packageFlow && !adFlow.active) {
+      createParams.tool_choice = { type: 'tool', name: 'get_packages_info' };
     }
 
     const created = await createCachedMessage(client, createParams);
@@ -423,15 +585,20 @@ async function handleWidgetChat(body) {
 
       const toolResults = await Promise.all(toolUseBlocks.map(async (tool) => {
         const input = Object.assign({}, tool.input || {});
-        if (tool.name === 'get_packages_info' && !input.lang) {
-          input.lang = detectedLang;
+        if (tool.name === 'get_packages_info') {
+          if (!input.lang) input.lang = detectedLang;
+          if (!input.catalog && catalogHint) input.catalog = catalogHint;
         }
         if (adFlow.adId && (tool.name === 'get_ad_details' || tool.name === 'get_seller_reputation')) {
           if (tool.name === 'get_ad_details' || !String(input.ad_id || '').trim()) {
             input.ad_id = adFlow.adId;
           }
         }
-        const result = await executeWidgetTool(tool.name, input);
+        const result = await executeWidgetTool(tool.name, input, {
+          lang: detectedLang,
+          pageContext,
+          catalogHint,
+        });
         toolResultsRaw.push(result);
         return {
           type: 'tool_result',
@@ -448,7 +615,10 @@ async function handleWidgetChat(body) {
 
   const textBlock = (response.content || []).find((b) => b.type === 'text');
   let replyText = textBlock ? textBlock.text.trim() : '';
-  replyText = ensureDiamondReplyComplete(replyText, text, detectedLang, response.stop_reason);
+  if (!replyText && attachment && attachment.ok) {
+    replyText = mediaAckFallback(detectedLang);
+  }
+  replyText = ensureDiamondReplyComplete(replyText, text, detectedLang, response.stop_reason, catalogHint);
   replyText = sanitizeAgentText(replyText);
 
   const toolFacts = collectFactsFromTools(toolResultsRaw);
@@ -465,12 +635,22 @@ async function handleWidgetChat(body) {
   }
 
   let validated = validateReply(replyText, pageMerged, detectedLang, text);
-  if (!validated.grounded && (pageMerged.prices.length || pageMerged.adIds.length || pageMerged.trustScores.length)) {
+  if (!validated.grounded && (pageMerged.prices.length || pageMerged.packagePrices.length || pageMerged.adIds.length || pageMerged.trustScores.length)) {
     const fromFacts = buildFactReply(pageMerged, detectedLang, text);
     if (fromFacts) {
       validated = { reply: fromFacts, grounded: true, reviewed: true };
     }
   }
+
+  validated.reply = enforceLivePackageReply(
+    validated.reply,
+    text,
+    detectedLang,
+    toolResultsRaw,
+    pageContext,
+    catalogHint
+  );
+  validated.reply = formatPlainChatText(applyOfficialLeadConfirmation(validated.reply, toolResultsRaw, detectedLang));
 
   const autoLead = await maybeAutoNotifyLead({
     userText: text,
@@ -492,6 +672,7 @@ async function handleWidgetChat(body) {
     toolsUsed: toolResultsRaw.length,
     model: lastModel,
     usage: usageAcc,
+    media_forwarded: !!(attachment && attachment.ok),
     lead: autoLead && autoLead.lead_id ? {
       id: autoLead.lead_id,
       telegram_sent: autoLead.telegram_sent,

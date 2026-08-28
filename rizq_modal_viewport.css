@@ -1,8 +1,11 @@
-/* rizq_modal_viewport.css — modal/popup clearance below fixed nav (all viewports) */
+/* rizq_modal_viewport.css — modal/popup clearance + imports unified design system */
+@import url('rizq_modals.css?v=1.4');
 
 :root {
   --rzq-nav-clearance: 72px;
   --rzq-z-modal: 10050;
+  --rzq-modal-gutter: 16px;
+  --rzq-modal-gutter-max: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
 }
 
 html.rizq-app-nav body.landing-ux-mobile {
@@ -12,6 +15,7 @@ html.rizq-app-nav body.landing-ux-mobile {
 @media (max-width: 768px) {
   :root {
     --rzq-nav-clearance: 64px;
+    --rzq-modal-gutter: 16px;
   }
   html.rizq-app-nav body.landing-ux-mobile {
     --rzq-nav-clearance: 120px;
@@ -71,11 +75,189 @@ body.rizq-dash {
   justify-content: center !important;
   padding-top: calc(var(--rzq-nav-clearance) + env(safe-area-inset-top, 0px) + 12px) !important;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
-  padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  padding-left: max(var(--rzq-modal-gutter), env(safe-area-inset-left, 0px)) !important;
+  padding-right: max(var(--rzq-modal-gutter), env(safe-area-inset-right, 0px)) !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch;
   z-index: var(--rzq-z-modal) !important;
+  box-sizing: border-box !important;
+}
+
+/* Merchant registration modal — balanced gutters + true horizontal centering on mobile */
+#modal.modal-overlay {
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
+#modal.modal-overlay.open {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding-left: max(var(--rzq-modal-gutter), env(safe-area-inset-left, 0px)) !important;
+  padding-right: max(var(--rzq-modal-gutter), env(safe-area-inset-right, 0px)) !important;
+}
+
+#modal .modal-box {
+  width: 100% !important;
+  max-width: min(440px, calc(100vw - (2 * var(--rzq-modal-gutter)) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))) !important;
+  margin-inline: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+#modal .modal-box .m-input,
+#modal .modal-box select.m-input,
+#modal .modal-box textarea.m-input,
+#modal .modal-box .m-pw-wrap,
+#modal .modal-box .ph-row,
+#modal .modal-box [style*="display:flex"] {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#modal .modal-box [style*="flex:1"] {
+  min-width: 0 !important;
+}
+
+/* ── قائمة النشاط التجاري المخصصة (تسجيل التاجر) ── */
+.rizq-act-select {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.rizq-act-select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.rizq-act-select-trigger {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+  text-align: start;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.rizq-act-select-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rizq-act-select-caret {
+  flex-shrink: 0;
+  opacity: 0.65;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.rizq-act-select-menu {
+  z-index: calc(var(--rzq-z-modal) + 25) !important;
+  max-height: 250px;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(160deg, #0d1f3c 0%, #102040 100%) !important;
+  border: 1px solid rgba(201, 168, 76, 0.35) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55) !important;
+  padding: 6px 0 !important;
+  box-sizing: border-box;
+}
+
+.rizq-act-select-group {
+  padding: 8px 14px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(201, 168, 76, 0.85);
+}
+
+.rizq-act-select-option {
+  display: block;
+  width: 100%;
+  text-align: start;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.rizq-act-select-option:hover,
+.rizq-act-select-option:focus {
+  background: rgba(201, 168, 76, 0.12);
+  outline: none;
+}
+
+.rizq-act-select-option.is-selected {
+  background: rgba(201, 168, 76, 0.18);
+  color: #ffe279;
+  font-weight: 700;
+}
+
+.rizq-act-select-open .rizq-act-select-trigger {
+  border-color: rgba(201, 168, 76, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08);
+}
+
+@media (max-width: 768px) {
+  #modal.modal-overlay.open {
+    padding-left: max(var(--rzq-modal-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(var(--rzq-modal-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  #modal .modal-box {
+    padding: 28px 20px !important;
+    border-radius: 20px !important;
+    max-width: min(440px, calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))) !important;
+  }
+
+  #modal .modal-logo {
+    margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  #modal .modal-box {
+    max-width: min(480px, calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))) !important;
+    padding: 20px 16px !important;
+  }
+
+  #modal.modal-overlay.open {
+    padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+  }
 }
 
 /* Centered fixed dialogs repositioned below nav */

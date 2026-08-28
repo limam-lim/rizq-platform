@@ -242,6 +242,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 </style>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_account_payments.js"></script>
@@ -253,7 +254,7 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
-  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard_office" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
@@ -491,13 +492,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         <div class="form-grid">
           <div class="form-group"><label class="form-label" data-t="prof-name-label">اسم المكتب *</label><input class="form-input" id="p-name" placeholder="اسم مكتبك" data-ph="prof-name-ph"/></div>
           <div class="form-group"><label class="form-label" data-t="prof-activity-label">نوع النشاط</label>
-            <select class="form-input" id="p-activity" onchange="toggleActivityOther()">
-              <option data-t="prof-act-insurance">وكالة تأمين</option><option data-t="prof-act-realestate">مكتب عقاري</option><option data-t="prof-act-law">مكتب محاماة</option>
-              <option data-t="prof-act-admin">خدمات إدارية</option><option data-t="prof-act-consulting">استشارات أعمال</option><option data-t="prof-act-notary">الموثقون القانونيون</option>
-              <option data-t="prof-act-travel">وكالة سفريات وسياحة</option><option data-t="prof-act-clinic">عيادة طبية</option><option data-t="prof-act-general">مكتب استقبال / خدمات عامة</option>
-              <option value="other" data-t="prof-act-other">أخرى (اكتب بنفسك)</option>
+            <select class="form-input" id="p-activity" onchange="onDashboardActivityChange('office')">
+              <option value="">— اختر نشاط المكتب —</option>
             </select>
-            <input class="form-input" id="p-activity-other" placeholder="اكتب نوع نشاط مكتبك..." data-ph="prof-act-other-ph" style="display:none;margin-top:8px"/>
           </div>
         </div>
         <div class="form-grid">
@@ -510,16 +507,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         </div>
         <div class="form-group">
           <!-- إصلاح: لا واجهة سابقاً لضبط "category" (المستخدم في دليل المعارض) بعد التسجيل -->
-          <label class="form-label" data-t="prof-cat-label">فئة النشاط التجاري (تظهر في دليل المعارض)</label>
-          <select class="form-input" id="p-category">
-            <option value="" data-t="prof-cat-opt-none">— اختر —</option>
-            <option value="سيارات" data-t="prof-cat-opt-cars">🚗 سيارات</option>
-            <option value="إلكترونيات" data-t="prof-cat-opt-elec">📱 إلكترونيات</option>
-            <option value="أثاث" data-t="prof-cat-opt-furn">🛋️ أثاث</option>
-            <option value="معدات" data-t="prof-cat-opt-equip">⚙️ معدات</option>
-            <option value="بناء" data-t="prof-cat-opt-build">🏗️ مواد بناء</option>
-            <option value="ذهب" data-t="prof-cat-opt-gold">💎 مجوهرات</option>
-            <option value="أخرى" data-t="prof-cat-opt-other">🏷️ أخرى</option>
+          <label class="form-label" data-t="prof-cat-label">فئة الدليل (تُحدَّث تلقائياً)</label>
+          <select class="form-input" id="p-category" disabled style="opacity:.85">
+            <option value="">—</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label" data-t="prof-address-label">العنوان</label><input class="form-input" id="p-address" placeholder="الحي، المبنى، أقرب معلم..." data-ph="prof-address-ph"/></div>
@@ -1590,15 +1580,40 @@ function _rizqMergeCatalogFromBackend(){
   }catch(e){}
 }
 
-function toggleActivityOther(){
-  const act=document.getElementById('p-activity');
-  const other=document.getElementById('p-activity-other');
-  if(!act||!other) return;
-  other.style.display = act.value==='other' ? '' : 'none';
+function _dashboardLang(){ return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar'; }
+function renderDashboardActivities(accountType, acc){
+  if(!window.RizqMerchantActivities) return;
+  var pkgId = acc && (acc.packageId || acc.package_id) ? (acc.packageId || acc.package_id) : null;
+  var actEl = document.getElementById('p-activity');
+  var catEl = document.getElementById('p-category');
+  var selected = (acc && acc.activityId) || '';
+  if(actEl){
+    RizqMerchantActivities.renderSelect(actEl, { accountType: accountType, packageId: pkgId, lang: _dashboardLang(), selected: selected });
+    if(!selected && acc && acc.activity){
+      for(var i=0;i<actEl.options.length;i++){
+        if(actEl.options[i].text.indexOf(acc.activity)!==-1){ actEl.selectedIndex=i; selected=actEl.value; break; }
+      }
+    }
+  }
+  if(catEl && selected){
+    var legacy = RizqMerchantActivities.legacyCategoryFromActivity(selected);
+    catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+    catEl.value = legacy;
+  }
 }
+function onDashboardActivityChange(accountType){
+  var actEl = document.getElementById('p-activity');
+  var catEl = document.getElementById('p-category');
+  if(!actEl || !catEl || !window.RizqMerchantActivities) return;
+  var legacy = RizqMerchantActivities.legacyCategoryFromActivity(actEl.value);
+  catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+  catEl.value = legacy;
+}
+function toggleActivityOther(){ onDashboardActivityChange('office'); }
 window._pThumbData = null;
 function fillProfile(){
   if(!OFFICE)return;
+  renderDashboardActivities('office', OFFICE);
   ['name','phone','email','city','category','ninea','address','desc','whatsapp','facebook','tagline'].forEach(k=>{const el=document.getElementById('p-'+k);if(el)el.value=OFFICE[k]||'';});
   const pvFill=document.getElementById('p-promo-video'); if(pvFill) pvFill.value=OFFICE.promo_video||'';
   updateTaglineCount();
@@ -1608,18 +1623,11 @@ function fillProfile(){
     if(inner) inner.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
   }
   const act=document.getElementById('p-activity');
-  const actOther=document.getElementById('p-activity-other');
-  if(act&&OFFICE.activity){
-    let matched=false;
-    for(let o of act.options){ if(o.value===OFFICE.activity || o.textContent.trim()===OFFICE.activity){ o.selected=true; matched=true; break; } }
-    if(!matched){
-      // نشاط حر كتبه صاحب المكتب بنفسه ولا يطابق أياً من الخيارات الجاهزة
-      act.value='other';
-      if(actOther){ actOther.value=OFFICE.activity; actOther.style.display=''; }
-    } else if(actOther){
-      actOther.style.display = act.value==='other' ? '' : 'none';
-    }
+  if(act && OFFICE.activityId) act.value = OFFICE.activityId;
+  else if(act&&OFFICE.activity){
+    for(let o of act.options){ if(o.value===OFFICE.activity || o.textContent.trim()===OFFICE.activity){ o.selected=true; break; } }
   }
+  onDashboardActivityChange('office');
 }
 function saveProfile(){
   const accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
@@ -1629,9 +1637,10 @@ function saveProfile(){
   fields.forEach(k=>{const el=document.getElementById('p-'+k);if(el&&idx!==-1)accs[idx][k]=el.value.trim();});
   if(idx!==-1){
     const act=document.getElementById('p-activity');
-    const actOther=document.getElementById('p-activity-other');
-    if(act){
-      accs[idx].activity = (act.value==='other' && actOther && actOther.value.trim()) ? actOther.value.trim() : act.value;
+    if(act && act.value){
+      accs[idx].activityId = act.value;
+      accs[idx].activity = window.RizqMerchantActivities ? RizqMerchantActivities.displayName(act.value, _dashboardLang()) : act.options[act.selectedIndex].text;
+      accs[idx].category = window.RizqMerchantActivities ? RizqMerchantActivities.legacyCategoryFromActivity(act.value) : accs[idx].category;
     }
     const tlEl=document.getElementById('p-tagline');
     if(tlEl) accs[idx].tagline = tlEl.value.trim().slice(0,50);
@@ -1654,7 +1663,8 @@ function _syncProfileToBackend(acc){
     headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
     body: JSON.stringify({
       name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
-      category: acc.category||'', address: acc.address||'', desc: acc.desc||'',
+      category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
+      address: acc.address||'', desc: acc.desc||'',
       promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
       tagline: acc.tagline||'', thumb: acc.thumb||''
     })

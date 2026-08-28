@@ -1,7 +1,9 @@
 /**
- * widgetMarkdown.js — تحويل Markdown آمن لردود الويدجت (بدون XSS)
+ * widgetMarkdown.js — تنسيق ردود الويدجت: نصّ عادي فقط (بدون Markdown) + أرقام غربية
  */
 'use strict';
+
+const { toWesternDigits } = require('./localTime');
 
 function escapeHtml(s) {
   return String(s)
@@ -11,20 +13,56 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-const LTR_NUM_PLAIN_RE = /(?:\+[\d\s\-().]+|\b\d[\d\s\-.,()/]{1,}\d|\b\d{2,}\b)/g;
+const LTR_NUM_PLAIN_RE = /(?:\+222[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}[\s\-]?\d{2}|\+[\d\s\-().]{8,24}|\b\d[\d\s\-.,()/]{1,}\d|\b\d{2,}\b)/g;
 const BIDI_CTRL_RE = /[\u200E\u200F\u2066\u2067\u2068\u2069\u202A-\u202E\u061C]/g;
 
-/** إزالة رموز اتجاه Unicode المخفية (⁦ ⁩ وغيرها) وتنظيف ** المقطوعة */
-function sanitizeAgentText(text) {
+function stripMarkdownTableLine(line) {
+  const trimmed = String(line || '').trim();
+  if (!/^\|/.test(trimmed)) return line;
+  const cells = trimmed.split('|').map((c) => c.trim()).filter(Boolean);
+  if (!cells.length) return '';
+  if (cells.every((c) => /^[-:\s|]+$/.test(c))) return '';
+  return cells.join(' — ');
+}
+
+function stripLineBullet(line) {
+  return String(line || '').replace(/^[\s]*[\-\*•·▪◦‣➤►→]\s*/, '');
+}
+
+/** نصّ محادثة نظيف: بدون Markdown، أرقام غربية 0-9 فقط */
+function formatPlainChatText(text) {
   let s = String(text || '').replace(BIDI_CTRL_RE, '');
+  s = toWesternDigits(s);
+
+  s = s.replace(/```[\s\S]*?```/g, (block) => block.replace(/```/g, '').trim());
+  s = s.replace(/`([^`\n]+)`/g, '$1');
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, '$1');
+  s = s.replace(/\*([^*\n]+)\*/g, '$1');
+  s = s.replace(/__([^_\n]+)__/g, '$1');
+  s = s.replace(/_([^_\n]+)_/g, '$1');
+  s = s.replace(/^#{1,6}\s+/gm, '');
+
+  s = s.split('\n').map((line) => {
+    const tableLine = stripMarkdownTableLine(line);
+    return stripLineBullet(tableLine);
+  }).join('\n');
+
   s = s.replace(/\*\*\s*$/g, '');
   s = s.replace(/\*\*([^*\n]{0,300})$/g, '$1');
   s = s.replace(/\*\s*$/g, '');
+  s = s.replace(/\n{3,}/g, '\n\n');
+
   return s.trim();
 }
 
+/** @deprecated alias — use formatPlainChatText */
+function sanitizeAgentText(text) {
+  return formatPlainChatText(text);
+}
+
 function wrapLtrNumbersPlain(text) {
-  return String(text || '').replace(LTR_NUM_PLAIN_RE, (m) => {
+  const plain = formatPlainChatText(text);
+  return plain.replace(LTR_NUM_PLAIN_RE, (m) => {
     if (!/[+\d]/.test(m)) return m;
     return `<span dir="ltr" class="rw-num">${m}</span>`;
   });
@@ -41,11 +79,7 @@ function stripRawHtml(s) {
 }
 
 function parseMarkdownHeadings(s) {
-  return String(s || '').replace(/^(#{1,6})\s+(.+)$/gm, (_, hashes, title) => {
-    const level = Math.min(Math.max(hashes.length, 2), 4);
-    const safeTitle = wrapLtrNumbersPlain(escapeHtml(String(title || '').trim()));
-    return `<h${level} class="rw-md-h">${safeTitle}</h${level}>`;
-  });
+  return formatPlainChatText(s);
 }
 
 function cleanupBrokenTags(s) {
@@ -58,34 +92,12 @@ function cleanupBrokenTags(s) {
     .replace(/(?<!<\/?h[2-4])\s*class="rw-md-h">/g, '');
 }
 
+/** عرض HTML للويدجت — فقرات نصّية + أرقام/هواتف LTR معزولة */
 function formatAgentMarkdown(text) {
-  const lines = sanitizeAgentText(text).split('\n');
-  const processed = lines.map((line) => {
-    const heading = line.match(/^(#{1,6})\s+(.+)$/);
-    if (heading) {
-      const level = Math.min(Math.max(heading[1].length, 2), 4);
-      const safeTitle = wrapLtrNumbersPlain(escapeHtml(heading[2].trim()));
-      return `<h${level} class="rw-md-h">${safeTitle}</h${level}>`;
-    }
-
-    let row = escapeHtml(stripRawHtml(line));
-    row = wrapLtrNumbersPlain(row);
-    row = row.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-    row = row.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-
-    const bullet = row.match(/^[\-\*•]\s+(.+)$/);
-    if (bullet) return `<li class="rw-md-li">${bullet[1]}</li>`;
-    return row;
-  });
-
-  let s = processed.join('\n');
-  s = s.replace(/((?:<li class="rw-md-li">[\s\S]*?<\/li>\s*)+)/g, (block) => (
-    '<ul class="rw-md-ul">' + block.trim() + '</ul>'
-  ));
-  s = s.replace(/\n{2,}/g, '<br><br>');
-  s = s.replace(/\n/g, '<br>');
-  s = cleanupBrokenTags(s);
-  return s;
+  const plain = formatPlainChatText(text);
+  let escaped = escapeHtml(stripRawHtml(plain));
+  escaped = wrapLtrNumbersPlain(escaped);
+  return escaped.replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
 }
 
 function wrapLtrNumbers(html) {
@@ -99,6 +111,8 @@ function wrapLtrPhones(html) {
 module.exports = {
   escapeHtml,
   stripRawHtml,
+  toWesternDigits,
+  formatPlainChatText,
   sanitizeAgentText,
   wrapLtrNumbersPlain,
   parseMarkdownHeadings,

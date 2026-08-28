@@ -279,6 +279,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -289,7 +290,7 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
-  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard_corp" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
@@ -622,13 +623,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         <div class="form-grid">
           <div class="form-group"><label class="form-label" data-t="pf-name-label">اسم الشركة / المعرض *</label><input class="form-input" id="p-name" placeholder="اسم شركتك" data-ph="pf-name-ph"/></div>
           <div class="form-group"><label class="form-label" data-t="pf-activity-label">نوع النشاط</label>
-            <select class="form-input" id="p-activity" onchange="toggleCorpActivityOther()">
-              <option data-t="pf-act-opt-cardealer">معرض سيارات</option><option data-t="pf-act-opt-construction">شركة مقاولات</option><option data-t="pf-act-opt-realestate">وكالة عقارية</option>
-              <option data-t="pf-act-opt-importexport">شركة استيراد وتصدير</option><option data-t="pf-act-opt-electronics">معرض إلكترونيات</option><option data-t="pf-act-opt-shipping">شركة نقل وشحن</option>
-              <option data-t="pf-act-opt-furniture">معرض أثاث ومفروشات</option>
-              <option value="other" data-t="pf-act-opt-other">أخرى (اكتب بنفسك)</option>
+            <select class="form-input" id="p-activity" onchange="onCorpDashboardActivityChange()">
+              <option value="">— اختر نشاط الشركة —</option>
             </select>
-            <input class="form-input" id="p-activity-other" placeholder="اكتب نوع نشاط شركتك..." data-ph="pf-act-other-ph" style="display:none;margin-top:8px"/>
           </div>
         </div>
         <div class="form-grid">
@@ -641,16 +638,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         </div>
         <div class="form-group">
           <!-- إصلاح: لا واجهة سابقاً لضبط "category" (المستخدم في دليل المعارض) بعد التسجيل -->
-          <label class="form-label" data-t="pf-cat-label">فئة النشاط التجاري (تظهر في دليل المعارض)</label>
-          <select class="form-input" id="p-category">
-            <option value="" data-t="pf-cat-opt-none">— اختر —</option>
-            <option value="سيارات" data-t="pf-cat-opt-cars">🚗 سيارات</option>
-            <option value="إلكترونيات" data-t="pf-cat-opt-elec">📱 إلكترونيات</option>
-            <option value="أثاث" data-t="pf-cat-opt-furn">🛋️ أثاث</option>
-            <option value="معدات" data-t="pf-cat-opt-equip">⚙️ معدات</option>
-            <option value="بناء" data-t="pf-cat-opt-build">🏗️ مواد بناء</option>
-            <option value="ذهب" data-t="pf-cat-opt-gold">💎 مجوهرات</option>
-            <option value="أخرى" data-t="pf-cat-opt-other">🏷️ أخرى</option>
+          <label class="form-label" data-t="pf-cat-label">فئة الدليل (تُحدَّث تلقائياً)</label>
+          <select class="form-input" id="p-category" disabled style="opacity:.85">
+            <option value="">—</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label" data-t="pf-desc-label">وصف الشركة</label><textarea class="form-input" id="p-desc" placeholder="اكتب وصفاً مختصراً عن شركتك ونشاطها..." data-ph="pf-desc-ph"></textarea></div>
@@ -817,6 +807,13 @@ textarea.form-input{min-height:80px;resize:vertical}
           <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px"></span>
         </div>
         <div id="auto-reply-content"></div>
+      </div>
+      <div class="card" id="api-integration-card" style="margin-top:18px;display:none">
+        <div class="card-header">
+          <div class="card-title">🔌 تكامل API / ERP</div>
+          <span id="api-integration-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px"></span>
+        </div>
+        <div id="api-integration-content"></div>
       </div>
     </div>
 
@@ -1436,7 +1433,7 @@ function showPanel(id, btn){
   if(window.innerWidth<=768) closeSidebar();
   if(id==='inquiries'){ _rizqMergeInqsFromBackend(); renderInquiries(); }
   if(id==='ads') renderAds();
-  if(id==='agents') renderAgentsCorp();
+  if(id==='agents'){ renderAgentsCorp(); renderApiIntegrationCorp(); }
   if(id==='analytics') renderAnalyticsChart();
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
   if(id==='referral'){ renderReferralPanel(); }
@@ -3037,12 +3034,26 @@ function saveMyPayment(){
   }
 
   // ── حفظ معلومات الشركة ─────────────────────────────────────────────
-  function toggleCorpActivityOther(){
-    var act=document.getElementById('p-activity');
-    var other=document.getElementById('p-activity-other');
-    if(!act||!other) return;
-    other.style.display = act.value==='other' ? '' : 'none';
+  function _corpDashboardLang(){ return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar'; }
+  function renderCorpDashboardActivities(acc){
+    if(!window.RizqMerchantActivities) return;
+    var pkgId = acc && (acc.packageId || acc.package_id) ? (acc.packageId || acc.package_id) : null;
+    var actEl = document.getElementById('p-activity');
+    var selected = (acc && acc.activityId) || '';
+    if(actEl){
+      RizqMerchantActivities.renderSelect(actEl, { accountType: 'corp', packageId: pkgId, lang: _corpDashboardLang(), selected: selected });
+    }
+    onCorpDashboardActivityChange();
   }
+  function onCorpDashboardActivityChange(){
+    var actEl = document.getElementById('p-activity');
+    var catEl = document.getElementById('p-category');
+    if(!actEl || !catEl || !window.RizqMerchantActivities || !actEl.value) return;
+    var legacy = RizqMerchantActivities.legacyCategoryFromActivity(actEl.value);
+    catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+    catEl.value = legacy;
+  }
+  function toggleCorpActivityOther(){ onCorpDashboardActivityChange(); }
   function saveProfile(){
     var acc = CORP_ACC||{};
     var fields = ['p-name','p-activity','p-phone','p-email','p-city','p-category','p-address','p-desc','p-year','p-website'];
@@ -3052,14 +3063,17 @@ function saveMyPayment(){
       if(el&&el.value.trim()) acc[keys[i]]=el.value.trim();
     });
     var actEl=document.getElementById('p-activity');
-    var actOtherEl=document.getElementById('p-activity-other');
-    if(actEl&&actEl.value==='other'&&actOtherEl&&actOtherEl.value.trim()) acc.activity=actOtherEl.value.trim();
+    if(actEl && actEl.value){
+      acc.activityId = actEl.value;
+      acc.activity = window.RizqMerchantActivities ? RizqMerchantActivities.displayName(actEl.value, _corpDashboardLang()) : actEl.options[actEl.selectedIndex].text;
+      acc.category = window.RizqMerchantActivities ? RizqMerchantActivities.legacyCategoryFromActivity(actEl.value) : acc.category;
+    }
     // حفظ في pending_accounts أيضاً — كل الحقول (كانت فقط name/phone/email/city
     // تُزامَن، فتبقى الصفحة العامة (rizq_corp.html) التي تقرأ فقط من
     // pending_accounts بلا نشاط/عنوان/وصف/موقع حقيقي مهما عدّله صاحب المعرض)
     var pending=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var idx=pending.findIndex(function(a){return a.id===acc.id;});
-    if(idx>-1){ Object.assign(pending[idx],{name:acc.name,phone:acc.phone,email:acc.email,city:acc.city,category:acc.category,activity:acc.activity,address:acc.address,desc:acc.desc,year:acc.year,website:acc.website}); localStorage.setItem('rizq_pending_accounts',JSON.stringify(pending)); }
+    if(idx>-1){ Object.assign(pending[idx],{name:acc.name,phone:acc.phone,email:acc.email,city:acc.city,category:acc.category,activity:acc.activity,activityId:acc.activityId,address:acc.address,desc:acc.desc,year:acc.year,website:acc.website}); localStorage.setItem('rizq_pending_accounts',JSON.stringify(pending)); }
     // حفظ في rizq_accounts
     var accts=JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
     if(accts[acc.id]) Object.assign(accts[acc.id],acc);
@@ -3092,7 +3106,8 @@ function saveMyPayment(){
       headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || acc.token) },
       body: JSON.stringify({
         name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
-        category: acc.category||'', address: acc.address||'', desc: acc.desc||'',
+        category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
+        address: acc.address||'', desc: acc.desc||'',
         promo_video: (document.getElementById('p-promo-video')||{}).value||'',
         tagline: (document.getElementById('p-tagline')||{}).value||'',
         thumb: window._pThumbData||''
@@ -3152,27 +3167,23 @@ function saveMyPayment(){
   }
 
   function loadProfile(){
-    // إصلاح حقيقي: كانت المعرّفات هنا prof-* بينما عناصر النموذج الفعلية
-    // p-* (لا تطابق أبداً) — فكان نموذج معلومات الشركة يظهر فارغاً دائماً
-    // عند إعادة فتح الداشبورد رغم وجود بيانات محفوظة فعلاً.
     var acc=CORP_ACC||{};
+    renderCorpDashboardActivities(acc);
     var fields={
       'p-name':acc.name,'p-phone':acc.phone,
-      'p-email':acc.email,'p-city':acc.city,'p-category':acc.category,'p-address':acc.address,
-      'p-activity':acc.activity,'p-desc':acc.desc,'p-year':acc.year,'p-website':acc.website
+      'p-email':acc.email,'p-city':acc.city,'p-address':acc.address,
+      'p-desc':acc.desc,'p-year':acc.year,'p-website':acc.website
     };
     Object.keys(fields).forEach(function(id){
       var el=document.getElementById(id);
       if(el&&fields[id]) el.value=fields[id];
     });
     var actSel=document.getElementById('p-activity');
-    var actOther=document.getElementById('p-activity-other');
-    if(actSel&&acc.activity){
-      var matched=false;
-      for(var i=0;i<actSel.options.length;i++){ if(actSel.options[i].value===acc.activity||actSel.options[i].textContent.trim()===acc.activity){ actSel.selectedIndex=i; matched=true; break; } }
-      if(!matched){ actSel.value='other'; if(actOther){ actOther.value=acc.activity; actOther.style.display=''; } }
-      else if(actOther){ actOther.style.display = actSel.value==='other' ? '' : 'none'; }
+    if(actSel && acc.activityId) actSel.value = acc.activityId;
+    else if(actSel&&acc.activity){
+      for(var i=0;i<actSel.options.length;i++){ if(actSel.options[i].value===acc.activity||actSel.options[i].textContent.trim()===acc.activity){ actSel.selectedIndex=i; break; } }
     }
+    onCorpDashboardActivityChange();
     var pvElL=document.getElementById('p-promo-video'); if(pvElL){ var SESSION_CORP_ID2=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id'); var accsL=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var aL=accsL.find(function(a){return a.id===SESSION_CORP_ID2;}); pvElL.value=aL&&aL.promo_video?aL.promo_video:''; }
     var tlElLoad=document.getElementById('p-tagline');
     var SESSION_CORP_ID4=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id');
@@ -3512,6 +3523,114 @@ function saveMyPayment(){
         var el=document.getElementById('agent-toggle-status');
         if(el){el.style.color=active?'#4ade80':'#f87171';el.textContent=active?_t2('● مفعّل محلياً','● Activé localement'):_t2('○ موقوف محلياً','○ Désactivé localement');}
       });
+  }
+
+  function renderApiIntegrationCorp(){
+    var card=document.getElementById('api-integration-card');
+    var badge=document.getElementById('api-integration-badge');
+    var content=document.getElementById('api-integration-content');
+    if(!card||!content) return;
+    card.style.display='block';
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    if(IS_DEMO||!window.RIZQ_BACKEND_BASE||!acc.id||!acc.token){
+      badge.textContent=_t2('🔒 تجريبي','🔒 Démo');
+      badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+      content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('تكامل API متاح بعد تفعيل باقة الماسية Pro للشركات.','Intégration API disponible après activation du forfait Diamant Pro entreprise.')+'</p>';
+      return;
+    }
+    content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('جاري تحميل مفتاح API…','Chargement de la clé API…')+'</p>';
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/status/'+encodeURIComponent(acc.id),{
+      headers:{'x-account-token':acc.token}
+    }).then(function(r){return r.json();}).then(function(data){
+      if(!data.ok){
+        content.innerHTML='<p style="font-size:13px;color:#dc2626">'+_t2('تعذّر تحميل إعدادات API','Impossible de charger les paramètres API')+'</p>';
+        return;
+      }
+      if(!data.entitled){
+        badge.textContent=_t2('🔒 الماسية Pro','🔒 Diamant Pro');
+        badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+        content.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:32px;margin-bottom:10px">🔌</div>'+
+          '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:8px">'+_t2('تكامل API / ERP — حصري للماسية Pro','Intégration API / ERP — exclusif Diamant Pro')+'</p>'+
+          '<button onclick="openAgentUpgradeModal()" class="btn btn-gold btn-sm">'+_t2('📦 الترقية للماسية Pro','📦 Passer au Diamant Pro')+'</button></div>';
+        return;
+      }
+      if(!data.hasKey){
+        badge.textContent=_t2('⏳ بانتظار التفعيل','⏳ En attente');
+        badge.style.cssText='background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+        content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('سيُولَّد مفتاح API تلقائياً عند تأكيد اشتراك الماسية Pro.','La clé API sera générée automatiquement après confirmation de l\'abonnement Diamant Pro.')+'</p>';
+        return;
+      }
+      var ig=data.integration||{};
+      var active=ig.apiStatus==='active';
+      badge.textContent=active?_t2('✅ نشط','✅ Actif'):_t2('⏸ موقوف','⏸ Suspendu');
+      badge.style.cssText=active?'background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px':'background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+      var keyBlock='';
+      if(ig.apiKey){
+        keyBlock='<div style="margin-top:12px;background:#0f172a;border-radius:10px;padding:14px"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px">'+_t2('⚠️ انسخ المفتاح الآن — لن يُعرض مرة أخرى','⚠️ Copiez la clé maintenant — elle ne sera plus affichée')+'</div><code id="corp-api-key-val" style="display:block;word-break:break-all;font-size:12px;color:#fbbf24;background:rgba(0,0,0,.25);padding:10px;border-radius:8px">'+escapeHtml(ig.apiKey)+'</code><button type="button" class="btn btn-gold btn-sm" style="margin-top:10px" onclick="copyCorpApiKey()">📋 '+_t2('نسخ المفتاح','Copier la clé')+'</button></div>';
+      }else if(ig.keyPrefix){
+        keyBlock='<div style="margin-top:12px;font-size:12px;color:var(--text-muted)">'+_t2('المفتاح:','Clé:')+' <code style="background:#f3f4f6;padding:4px 8px;border-radius:6px">'+escapeHtml(ig.keyPrefix)+'</code></div>';
+      }
+      content.innerHTML=
+        '<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">'+_t2('اربط نظام PMS/ERP (مثل Atomae) بمنصة رزق — كل الطلبات معزولة لبيانات شركتك فقط.','Connectez votre PMS/ERP (ex. Atomae) à Rizq — toutes les requêtes sont isolées à vos données.')+'</p>'+
+        keyBlock+
+        '<div style="margin-top:16px;display:grid;gap:10px">'+
+          '<label style="font-size:12px;font-weight:700;color:var(--navy)">'+_t2('IP مسموحة (اختياري — فارغ = الكل)','IP autorisées (optionnel — vide = toutes)')+'</label>'+
+          '<input id="corp-api-ip" type="text" value="'+escapeHtml(ig.allowedOriginIp||'')+'" placeholder="203.0.113.10, 203.0.113.11" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.15);border-radius:10px;font-size:13px;font-family:inherit"/>'+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<button type="button" class="btn btn-primary btn-sm" onclick="saveCorpApiIp()">💾 '+_t2('حفظ IP','Enregistrer IP')+'</button>'+
+            '<button type="button" class="btn btn-outline btn-sm" onclick="regenerateCorpApiKey()">🔄 '+_t2('تجديد المفتاح','Régénérer la clé')+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="margin-top:16px;background:#f8faff;border:1px solid rgba(27,58,107,.08);border-radius:10px;padding:14px;font-size:11.5px;line-height:1.8;color:#4b5563">'+
+          '<strong>'+_t2('نقاط النهاية:','Points de terminaison:')+'</strong><br>'+
+          '<code>GET /api/v1/integration/health</code><br>'+
+          '<code>GET /api/v1/integration/catalog</code><br>'+
+          '<code>POST /api/v1/integration/inquiries</code><br>'+
+          _t2('المصادقة:','Auth:')+' <code>Authorization: Bearer rizq_live_…</code>'+
+          (ig.lastUsedAt?('<br><span style="color:#9ca3af">'+_t2('آخر استخدام:','Dernière utilisation:')+' '+escapeHtml(ig.lastUsedAt)+'</span>'):'')+
+        '</div>';
+    }).catch(function(){
+      content.innerHTML='<p style="font-size:13px;color:#dc2626">'+_t2('تعذّر تحميل إعدادات API','Impossible de charger les paramètres API')+'</p>';
+    });
+  }
+
+  function copyCorpApiKey(){
+    var el=document.getElementById('corp-api-key-val');
+    if(!el) return;
+    var text=el.textContent||'';
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){showToast(_t2('✅ تم نسخ المفتاح','✅ Clé copiée'));});
+    }else{
+      var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      showToast(_t2('✅ تم نسخ المفتاح','✅ Clé copiée'));
+    }
+  }
+
+  function saveCorpApiIp(){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    var ipEl=document.getElementById('corp-api-ip');
+    if(!acc.id||!acc.token||!ipEl||!window.RIZQ_BACKEND_BASE) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id),{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','x-account-token':acc.token},
+      body:JSON.stringify({allowedOriginIp:ipEl.value.trim()})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.ok){showToast(_t2('✅ تم حفظ IP','✅ IP enregistrée'));renderApiIntegrationCorp();}
+      else showToast(data.error||_t2('فشل الحفظ','Échec'),'error');
+    }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
+  }
+
+  function regenerateCorpApiKey(){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    if(!acc.id||!acc.token||!window.RIZQ_BACKEND_BASE) return;
+    if(!confirm(_t2('تجديد المفتاح يلغي المفتاح الحالي فوراً. متابعة؟','Régénérer la clé invalide l\'ancienne immédiatement. Continuer ?'))) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id)+'/regenerate',{
+      method:'POST',
+      headers:{'x-account-token':acc.token}
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.ok){showToast(_t2('✅ تم تجديد المفتاح','✅ Clé régénérée'));renderApiIntegrationCorp();}
+      else showToast(data.error||_t2('فشل التجديد','Échec'),'error');
+    }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
   }
 
   function renderServicesShowcase(){

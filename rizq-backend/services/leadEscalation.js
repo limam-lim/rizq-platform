@@ -11,6 +11,10 @@ const {
   getPendingLeads,
   formatPendingLeadsForAdmin,
 } = require('./leadsStore');
+const { resolveLivePackageQuote, formatPriceForTelegram, inferCatalogHint } = require('./packageCatalogLive');
+const { pickLang } = require('./widgetLang');
+const { cleanField } = require('./telegramNotifyFormat');
+const { formatPlainChatText } = require('./widgetMarkdown');
 
 const SUPPORT_CONTACT = {
   email: 'direction@rizq.mr',
@@ -32,11 +36,69 @@ function normalizeLeadInput(toolInput) {
   };
 }
 
+function enrichLeadWithLivePricing(lead, lang, meta) {
+  const catalogHint = inferCatalogHint(meta || {}, lead.package);
+  const quote = resolveLivePackageQuote(lead.package, lang || 'ar', { catalogHint });
+  if (!quote) return lead;
+  return Object.assign({}, lead, {
+    packageId: quote.id,
+    packagePrice: quote.price,
+    packagePriceLabel: quote.priceLabel,
+    packageCatalog: quote.catalog,
+    package: quote.name || lead.package,
+  });
+}
+
+function buildLeadConfirmationMessage(lead, leadId, lang, opts) {
+  lang = lang || 'ar';
+  opts = opts || {};
+  const priceLine = cleanField(lead.packagePriceLabel || formatPriceForTelegram({ price: lead.packagePrice }));
+  const pkgName = cleanField(lead.package);
+  const contactHint = cleanField(SUPPORT_CONTACT.phone) + ' · ' + SUPPORT_CONTACT.email;
+  let msg;
+
+  if (opts.duplicate) {
+    msg = pickLang({
+      ar: 'طلبكم مسجّل مسبقاً (مرجع ' + cleanField(leadId) + ').\n\nالباقة: ' + pkgName + '\nالسعر الفعلي: ' + priceLine + '\n\nستتواصل الإدارة معكم قريباً.',
+      fr: 'Demande déjà enregistrée (réf. ' + leadId + ').\n\nForfait : ' + pkgName + '\nPrix actuel : ' + priceLine + '\n\nNotre équipe vous contactera bientôt.',
+      en: 'Your request is already on file (ref ' + leadId + ').\n\nPlan: ' + pkgName + '\nLive price: ' + priceLine + '\n\nOur team will contact you soon.',
+      es: 'Su solicitud ya está registrada (ref. ' + leadId + ').\n\nPlan: ' + pkgName + '\nPrecio actual: ' + priceLine + '\n\nLe contactaremos pronto.',
+    }, lang);
+  } else {
+    msg = pickLang({
+      ar: 'تم تسجيل طلبكم (مرجع ' + cleanField(leadId) + ').\n\nالباقة: ' + pkgName + '\nالسعر الفعلي: ' + priceLine + '\n\nستتواصل الإدارة معكم فوراً لتفعيل الحساب. ' + contactHint,
+      fr: 'Demande enregistrée (réf. ' + leadId + ').\n\nForfait : ' + pkgName + '\nPrix actuel : ' + priceLine + '\n\nNotre équipe vous contactera pour activation. ' + contactHint,
+      en: 'Request registered (ref ' + leadId + ').\n\nPlan: ' + pkgName + '\nLive price: ' + priceLine + '\n\nOur team will contact you to activate. ' + contactHint,
+      es: 'Solicitud registrada (ref. ' + leadId + ').\n\nPlan: ' + pkgName + '\nPrecio actual: ' + priceLine + '\n\nLe contactaremos para activar. ' + contactHint,
+    }, lang);
+  }
+  return formatPlainChatText(msg);
+}
+
+function buildLeadToolResult(lead, leadId, lang, meta, extra) {
+  extra = extra || {};
+  const confirmation = buildLeadConfirmationMessage(lead, leadId, lang, extra);
+  return Object.assign({
+    ok: true,
+    lead_id: leadId,
+    ref: leadId,
+    package: lead.package,
+    package_id: lead.packageId || null,
+    package_price: lead.packagePrice,
+    package_price_label: lead.packagePriceLabel || formatPriceForTelegram({ price: lead.packagePrice }),
+    package_catalog: lead.packageCatalog || null,
+    confirmation_message: confirmation,
+    official_price_only: true,
+    message: confirmation,
+  }, extra);
+}
+
 function buildLeadSummary(kind, lead) {
   const parts = [kind];
   if (lead.businessName) parts.push('منشأة: ' + lead.businessName);
   if (lead.whatsapp) parts.push('واتساب: ' + lead.whatsapp);
   if (lead.package) parts.push('باقة: ' + lead.package);
+  if (lead.packagePriceLabel) parts.push('سعر: ' + lead.packagePriceLabel);
   if (lead.reason) parts.push('سبب: ' + lead.reason);
   return parts.join(' | ').slice(0, 500);
 }
@@ -46,20 +108,28 @@ async function sendTelegramLeadAlert(lead, meta) {
     sendLeadEscalationAlert,
     sendTelegramAdminNotification,
     isConfigured,
+    getTelegramDiagnostics,
   } = require('./telegramAdmin');
   const notify = sendTelegramAdminNotification || sendLeadEscalationAlert;
 
   if (!isConfigured()) {
-    const err = 'TELEGRAM_BOT_TOKEN or TELEGRAM_ADMIN_CHAT_ID missing in .env';
-    console.error('[lead-escalation] Telegram NOT configured — alert skipped:', err, {
+    const diag = typeof getTelegramDiagnostics === 'function' ? getTelegramDiagnostics() : {};
+    const err = 'TELEGRAM_BOT_TOKEN or TELEGRAM_ADMIN_CHAT_ID/TELEGRAM_CHAT_ID missing in .env';
+    console.error('[lead-escalation] Telegram NOT configured — alert skipped:', err, Object.assign({
       ticketId: meta && meta.ticketId,
       leadId: meta && meta.leadId,
-    });
-    return { sent: false, error: err };
+    }, diag));
+    return { sent: false, error: err, diagnostics: diag };
   }
 
   try {
     const payload = Object.assign({}, lead, meta);
+    console.log('[lead-escalation] Telegram dispatch start', {
+      leadId: meta && meta.leadId,
+      package: payload.package,
+      packagePriceLabel: payload.packagePriceLabel,
+      chatConfigured: true,
+    });
     const result = await notify(payload);
     console.log('[lead-escalation] Telegram alert SENT', {
       leadId: meta && meta.leadId,
@@ -67,12 +137,55 @@ async function sendTelegramLeadAlert(lead, meta) {
     });
     return { sent: true, messageId: result && result.message_id };
   } catch (e) {
-    console.error('[lead-escalation] Telegram send FAILED:', e && e.message, {
+    console.error('[lead-escalation] Telegram send FAILED:', e && e.message);
+    console.error('[lead-escalation] Telegram API full response:', JSON.stringify({
       leadId: meta && meta.leadId,
+      message: e && e.message,
+      httpStatus: e && e.httpStatus,
       telegram: e && e.telegram,
-    });
-    return { sent: false, error: (e && e.message) || 'telegram_send_failed' };
+      code: e && e.code,
+    }, null, 2));
+    return { sent: false, error: (e && e.message) || 'telegram_send_failed', telegram: e && e.telegram };
   }
+}
+
+async function dispatchTelegramLeadAlert(leadPayload, meta, leadId) {
+  let telegram = { sent: false, error: null, messageId: null };
+  try {
+    telegram = await sendTelegramLeadAlert(leadPayload, meta);
+    if (telegram.sent) {
+      console.log('[lead-escalation] ✅ Telegram notification delivered', {
+        leadId,
+        messageId: telegram.messageId,
+      });
+    } else {
+      console.error('[lead-escalation] ❌ Telegram notification NOT delivered', {
+        leadId,
+        error: telegram.error,
+        diagnostics: telegram.diagnostics,
+      });
+    }
+  } catch (e) {
+    console.error('[lead-escalation] ❌ Telegram EXCEPTION', {
+      leadId,
+      message: e && e.message,
+      telegram: e && e.telegram,
+      stack: e && e.stack,
+    });
+    telegram = {
+      sent: false,
+      error: (e && e.message) || 'telegram_exception',
+      telegram: e && e.telegram,
+    };
+  }
+  if (leadId) {
+    patchLead(leadId, {
+      telegramSent: telegram.sent,
+      telegramMessageId: telegram.messageId || null,
+      telegramError: telegram.error || null,
+    });
+  }
+  return telegram;
 }
 
 /**
@@ -80,61 +193,67 @@ async function sendTelegramLeadAlert(lead, meta) {
  */
 async function createLeadAndNotify(input, meta) {
   meta = meta || {};
-  const lead = normalizeLeadInput(input);
+  let lead = normalizeLeadInput(input);
   if (!lead.whatsapp) {
     return { ok: false, error: 'whatsapp_required' };
   }
 
+  lead = enrichLeadWithLivePricing(lead, meta.lang || 'ar', meta);
+
   const dup = findRecentDuplicate(lead.whatsapp, 3600000);
   if (dup) {
     console.log('[lead-escalation] duplicate pending lead', dup.id, 'telegramSent:', !!dup.telegramSent);
+    const dupQuote = resolveLivePackageQuote(
+      dup.package,
+      meta.lang || 'ar',
+      { catalogHint: inferCatalogHint(meta, dup.package) }
+    );
+    const dupLead = Object.assign({}, lead, {
+      package: dupQuote ? dupQuote.name : dup.package,
+      packageId: dup.packageId || (dupQuote && dupQuote.id),
+      packagePrice: dup.packagePrice != null ? dup.packagePrice : (dupQuote && dupQuote.price),
+      packagePriceLabel: dup.packagePriceLabel || formatPriceForTelegram(dupQuote),
+      packageCatalog: dupQuote && dupQuote.catalog,
+    });
     if (!dup.telegramSent) {
       console.log('[lead-escalation] retrying Telegram for duplicate lead', dup.id);
-      let retry = { sent: false, error: null };
-      try {
-        retry = await sendTelegramLeadAlert(lead, {
-          kind: meta.kind || 'register_interest',
-          channel: meta.channel || 'widget',
-          leadId: dup.id,
-          ticketId: dup.id,
-          reason: lead.reason || buildLeadSummary(meta.kind || 'lead', lead),
-        });
-        patchLead(dup.id, {
-          telegramSent: retry.sent,
-          telegramMessageId: retry.messageId || null,
-          telegramError: retry.error || null,
-        });
-      } catch (e) {
-        console.error('[lead-escalation] ❌ Telegram retry EXCEPTION', {
-          leadId: dup.id,
-          message: e && e.message,
-          telegram: e && e.telegram,
-        });
-      }
-      return {
-        ok: true,
-        duplicate: true,
-        lead_id: dup.id,
-        telegram_sent: retry.sent,
-        telegram_error: retry.error || null,
-        message: retry.sent
-          ? ('✅ طلبكم مسجّل (مرجع ' + dup.id + ') — تم إرسال التنبيه للإدارة.')
-          : ('طلبكم مسجّل مسبقاً (مرجع ' + dup.id + '). ستتواصل الإدارة معكم قريباً.'),
+      const dupPayload = {
+        businessName: dup.businessName,
+        whatsapp: dup.whatsapp,
+        package: dupLead.package,
+        packageId: dupLead.packageId,
+        packagePrice: dupLead.packagePrice,
+        packagePriceLabel: dupLead.packagePriceLabel,
+        notes: dup.notes,
+        reason: lead.reason || buildLeadSummary(meta.kind || 'lead', dupLead),
+        createdAtLocal: dup.createdAtLocal,
       };
+      const dupTelegram = await dispatchTelegramLeadAlert(dupPayload, {
+        kind: meta.kind || 'register_interest',
+        channel: meta.channel || 'widget',
+        leadId: dup.id,
+        ticketId: dup.id,
+        reason: lead.reason || buildLeadSummary(meta.kind || 'lead', dupLead),
+      }, dup.id);
+      return buildLeadToolResult(dupLead, dup.id, meta.lang || 'ar', meta, {
+        duplicate: true,
+        telegram_sent: !!dupTelegram.sent,
+        telegram_error: dupTelegram.error || null,
+      });
     }
-    return {
-      ok: true,
+    return buildLeadToolResult(dupLead, dup.id, meta.lang || 'ar', meta, {
       duplicate: true,
-      lead_id: dup.id,
       telegram_sent: !!dup.telegramSent,
-      message: 'طلبكم مسجّل مسبقاً (مرجع ' + dup.id + '). ستتواصل الإدارة معكم قريباً.',
-    };
+    });
   }
 
   const saved = saveLead({
     businessName: lead.businessName || 'غير محدد',
     whatsapp: lead.whatsapp,
     package: lead.package || 'غير محددة',
+    packageId: lead.packageId || null,
+    packagePrice: lead.packagePrice != null ? lead.packagePrice : null,
+    packagePriceLabel: lead.packagePriceLabel || null,
     notes: lead.reason || '',
     source: meta.source || 'api',
     channel: meta.channel || 'widget',
@@ -142,11 +261,11 @@ async function createLeadAndNotify(input, meta) {
     status: 'pending',
   });
 
-  // ── إشعار Telegram فوري مباشرة بعد إسناد LEAD-XXXX (بدون انتظار) ──
-  console.log('[lead-escalation] Lead saved — immediate Telegram push', {
+  console.log('[lead-escalation] Lead saved — dispatching Telegram alert', {
     leadId: saved.id,
     whatsapp: lead.whatsapp,
-    package: lead.package,
+    package: saved.package,
+    packagePrice: saved.packagePriceLabel,
     localTime: saved.createdAtLocal,
   });
 
@@ -156,75 +275,40 @@ async function createLeadAndNotify(input, meta) {
     type: meta.kind || 'subscription',
     summary,
     contact: lead.whatsapp,
-    meta: { leadId: saved.id, businessName: saved.businessName, package: saved.package },
-  });
-
-  console.log('[lead-escalation] Lead saved — triggering Telegram', {
-    leadId: saved.id,
-    whatsapp: lead.whatsapp,
-    package: lead.package,
-    localTime: saved.createdAtLocal,
-  });
-
-  let telegram = { sent: false, error: null };
-  try {
-    telegram = await sendTelegramLeadAlert({
+    meta: {
+      leadId: saved.id,
       businessName: saved.businessName,
-      whatsapp: saved.whatsapp,
       package: saved.package,
-      notes: saved.notes,
-      reason: lead.reason || summary,
-      createdAtLocal: saved.createdAtLocal,
-    }, {
-      kind: meta.kind || 'register_interest',
-      channel: meta.channel || 'widget',
-      leadId: saved.id,
-      ticketId: saved.id,
-      reason: lead.reason || summary,
-      createdAtLocal: saved.createdAtLocal,
-    });
-    if (telegram.sent) {
-      console.log('[lead-escalation] ✅ Telegram notification delivered', {
-        leadId: saved.id,
-        messageId: telegram.messageId,
-      });
-    } else {
-      console.error('[lead-escalation] ❌ Telegram notification NOT delivered', {
-        leadId: saved.id,
-        error: telegram.error,
-        hint: 'Check TELEGRAM_ADMIN_CHAT_ID in .env — send /start to @RizqOficial_bot',
-      });
-    }
-  } catch (e) {
-    console.error('[lead-escalation] ❌ Telegram EXCEPTION', {
-      leadId: saved.id,
-      message: e && e.message,
-      stack: e && e.stack,
-      telegram: e && e.telegram,
-    });
-    telegram = { sent: false, error: (e && e.message) || 'telegram_exception' };
-  }
-
-  patchLead(saved.id, {
-    telegramSent: telegram.sent,
-    telegramMessageId: telegram.messageId || null,
-    telegramError: telegram.error || null,
+      packagePrice: saved.packagePriceLabel,
+    },
   });
 
-  const contactHint = 'ستتواصل الإدارة معكم فوراً لتفعيل الحساب. ' +
-    SUPPORT_CONTACT.phone + ' · ' + SUPPORT_CONTACT.email;
-
-  return {
-    ok: true,
-    lead_id: saved.id,
-    ref: saved.id,
-    status: 'pending',
-    telegram_sent: telegram.sent,
-    telegram_error: telegram.error || null,
-    message: telegram.sent
-      ? ('✅ تم تسجيل طلبكم (مرجع ' + saved.id + '). ' + contactHint)
-      : ('تم حفظ طلبكم (مرجع ' + saved.id + ') لكن تعذّر Telegram — ' + SUPPORT_CONTACT.phone),
+  const telegramPayload = {
+    businessName: saved.businessName,
+    whatsapp: saved.whatsapp,
+    package: saved.package,
+    packageId: saved.packageId,
+    packagePrice: saved.packagePrice,
+    packagePriceLabel: saved.packagePriceLabel,
+    notes: saved.notes,
+    reason: lead.reason || summary,
+    createdAtLocal: saved.createdAtLocal,
   };
+
+  const telegram = await dispatchTelegramLeadAlert(telegramPayload, {
+    kind: meta.kind || 'register_interest',
+    channel: meta.channel || 'widget',
+    leadId: saved.id,
+    ticketId: saved.id,
+    reason: lead.reason || summary,
+    createdAtLocal: saved.createdAtLocal,
+  }, saved.id);
+
+  return buildLeadToolResult(lead, saved.id, meta.lang || 'ar', meta, {
+    status: 'pending',
+    telegram_sent: !!telegram.sent,
+    telegram_error: telegram.error || null,
+  });
 }
 
 async function handleLeadEscalation(kind, toolInput, meta) {
@@ -233,7 +317,10 @@ async function handleLeadEscalation(kind, toolInput, meta) {
 }
 
 function leadToolWasUsed(toolResultsRaw) {
-  return (toolResultsRaw || []).some((r) => r && (r.lead_id || r.telegram_sent === true || r.ref || r.escalated));
+  return (toolResultsRaw || []).some((r) => r && (
+    r.lead_id || r.ref || r.escalated
+    || r.telegram_sent === true || r.telegram_sent === 'dispatched'
+  ));
 }
 
 async function maybeAutoNotifyLead({ userText, history, toolResultsRaw, channel }) {
@@ -252,8 +339,9 @@ async function maybeAutoNotifyLead({ userText, history, toolResultsRaw, channel 
 
   const bizMatch = combined.match(/(?:اسم|شركة|محل|منشأة|تاجر)[:\s]+([^\n،,]+)/i);
   let pkg = 'غير محددة';
-  if (/ماس\s*pro|diamond\s*pro|الماسية\s*المتقدمة|pro\s*ماس/i.test(combined)) pkg = 'الماسية Pro';
-  else if (/ماس|diamond/i.test(combined)) pkg = 'الماسية الأساسية';
+  if (/ماس\s*pro|diamond\s*pro|الماسية\s*pro\s*للمحلات|pro\s*للمحلات|pro\s*ماس/i.test(combined)) pkg = 'الماسية Pro للمحلات';
+  else if (/ماس\s*pro|diamond\s*pro|الماسية\s*المتقدمة|pro\s*ماس/i.test(combined)) pkg = 'الماسية Pro';
+  else if (/ماس.*محلات|diamond.*store|st-diam/i.test(combined)) pkg = 'الماسية الأساسية للمحلات';
   else if (/سنو|annuel|year/i.test(combined)) pkg = 'السنوية';
   else if (/\bpro\b/i.test(combined)) pkg = 'Pro';
   else if (/تجرب|trial|essai/i.test(combined)) pkg = 'التجريبية';
@@ -267,7 +355,7 @@ async function maybeAutoNotifyLead({ userText, history, toolResultsRaw, channel 
     package_requested: pkg,
     notes: 'تصعيد تلقائي من محادثة الويدجت',
     interest_type: 'subscription',
-  }, { source: 'widget-auto', channel: channel || 'widget', kind: 'register_interest' });
+  }, { source: 'widget-auto', channel: channel || 'widget', kind: 'register_interest', lang: 'ar' });
 }
 
 module.exports = {
@@ -275,6 +363,9 @@ module.exports = {
   createLeadAndNotify,
   maybeAutoNotifyLead,
   normalizeLeadInput,
+  enrichLeadWithLivePricing,
+  buildLeadConfirmationMessage,
+  buildLeadToolResult,
   sendTelegramLeadAlert,
   getPendingLeads,
   formatPendingLeadsForAdmin,

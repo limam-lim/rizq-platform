@@ -331,6 +331,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 </style>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -342,7 +343,7 @@ textarea.form-input{resize:vertical;min-height:90px}
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
-  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard_store" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
@@ -648,16 +649,9 @@ textarea.form-input{resize:vertical;min-height:90px}
           <!-- إصلاح: الحسابات المسجَّلة قبل إضافة دليل المعارض (أو أي حساب يريد تغيير
                فئته لاحقاً) لم يكن لديها أي طريقة لضبط "category" — الخادم كان يدعم
                تعديله عبر PATCH /api/accounts/mine/:id لكن لا واجهة تستدعيه. -->
-          <label class="form-label" data-t="p-cat-label">فئة النشاط التجاري (تظهر في دليل المعارض)</label>
-          <select class="form-input" id="p-cat">
-            <option value="" data-t="p-cat-opt-none">— اختر —</option>
-            <option value="سيارات" data-t="p-cat-opt-cars">🚗 سيارات</option>
-            <option value="إلكترونيات" data-t="p-cat-opt-elec">📱 إلكترونيات</option>
-            <option value="أثاث" data-t="p-cat-opt-furn">🛋️ أثاث</option>
-            <option value="معدات" data-t="p-cat-opt-equip">⚙️ معدات</option>
-            <option value="بناء" data-t="p-cat-opt-build">🏗️ مواد بناء</option>
-            <option value="ذهب" data-t="p-cat-opt-gold">💎 مجوهرات</option>
-            <option value="أخرى" data-t="p-cat-opt-other">🏷️ أخرى</option>
+          <label class="form-label" data-t="p-cat-label">النشاط التجاري (حسب باقتك)</label>
+          <select class="form-input" id="p-cat" onchange="onStoreActivityChange()">
+            <option value="">— اختر نشاط المحل —</option>
           </select>
         </div>
         <div class="form-group">
@@ -2005,13 +1999,26 @@ function deleteProduct(i){
 
 // ══ PROFILE ══
 window._pThumbData = null;
+function _storeDashLang(){ return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar'; }
+function renderStoreDashboardActivities(acc){
+  if(!window.RizqMerchantActivities) return;
+  var pkgId = acc && (acc.packageId || acc.package_id) ? (acc.packageId || acc.package_id) : null;
+  var el = document.getElementById('p-cat');
+  if(!el) return;
+  RizqMerchantActivities.renderSelect(el, { accountType: 'store', packageId: pkgId, lang: _storeDashLang(), selected: (acc && acc.activityId) || '' });
+  if(acc && acc.activityId) el.value = acc.activityId;
+}
+function onStoreActivityChange(){}
 function fillProfileForm(){
   if(!STORE) return;
+  renderStoreDashboardActivities(STORE);
   document.getElementById('p-store-name').value = STORE.name||'';
   document.getElementById('p-phone').value = STORE.phone||'';
   document.getElementById('p-email').value = STORE.email||'';
   document.getElementById('p-city').value = STORE.city||'';
-  var pCatEl = document.getElementById('p-cat'); if(pCatEl) pCatEl.value = STORE.category||'';
+  var pCatEl = document.getElementById('p-cat');
+  if(pCatEl && STORE.activityId) pCatEl.value = STORE.activityId;
+  else if(pCatEl && STORE.category && !STORE.activityId) pCatEl.value = STORE.category;
   document.getElementById('p-address').value = STORE.address||'';
   document.getElementById('p-desc').value = STORE.desc||'';
   var pvEl = document.getElementById('p-promo-video'); if(pvEl) pvEl.value = STORE.promo_video||'';
@@ -2060,7 +2067,12 @@ function saveProfile(){
   accs[idx].phone = document.getElementById('p-phone').value.trim();
   accs[idx].email = document.getElementById('p-email').value.trim();
   accs[idx].city = document.getElementById('p-city').value.trim();
-  var _pCatEl = document.getElementById('p-cat'); if(_pCatEl) accs[idx].category = _pCatEl.value;
+  var _pCatEl = document.getElementById('p-cat');
+  if(_pCatEl && _pCatEl.value){
+    accs[idx].activityId = _pCatEl.value;
+    accs[idx].activity = window.RizqMerchantActivities ? RizqMerchantActivities.displayName(_pCatEl.value, _storeDashLang()) : _pCatEl.options[_pCatEl.selectedIndex].text;
+    accs[idx].category = window.RizqMerchantActivities ? RizqMerchantActivities.legacyCategoryFromActivity(_pCatEl.value) : _pCatEl.value;
+  }
   accs[idx].address = document.getElementById('p-address').value.trim();
   accs[idx].desc = document.getElementById('p-desc').value.trim();
   accs[idx].promo_video = (document.getElementById('p-promo-video')||{}).value?.trim()||'';
@@ -2087,7 +2099,8 @@ function _syncProfileToBackend(acc){
     headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
     body: JSON.stringify({
       name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
-      category: acc.category||'', address: acc.address||'', desc: acc.desc||'',
+      category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
+      address: acc.address||'', desc: acc.desc||'',
       promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
       tagline: acc.tagline||'', thumb: acc.thumb||''
     })

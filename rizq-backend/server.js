@@ -5,7 +5,7 @@
  * خادم خلفي صغير وآمن لمنصة رزق
  * ══════════════════════════════════════════════════════════════════
  */
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
 ensureAnthropicEnv();
@@ -24,6 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
+const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 
@@ -42,7 +43,7 @@ app.use((req, res, next) => {
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
-  res.set('X-Copyright', '© Rizq ADMINIA SARL — Proprietary. Unauthorized copying prohibited.');
+  res.set('X-Copyright', '(c) Rizq ADMINIA SARL - Proprietary. Unauthorized copying prohibited.');
   next();
 });
 
@@ -188,7 +189,7 @@ const ADMIN_ACCOUNTS = [
   // إصلاح 22/07/2026: كلمات السر أُعيد توليدها لأن النسخة الأصلية (plaintext) لم تكن
   // محفوظة في أي مكان قابل للاسترجاع (bcrypt هاش لا يُفَكّ عكسياً). القيم الجديدة
   // أُرسلت لـ Limam مرة واحدة في المحادثة — احفظها فوراً في مدير كلمات سر.
-  { user: 'admin', passHash: '$2a$10$JUT..bIXLxVY6u8DTGmfQenjIl5StdaCgy3/Z5dRYy1UEa8EJDe7q', name: 'M. LIMAM', role: 'super' },
+  { user: 'admin', passHash: '$2a$10$P9STsJ2wU2iWUvL7IrtHl.KgOqcdRnUxCv7yOubuksk4zGbxo69Ki', name: 'M. LIMAM', role: 'super' },
   { user: 'mod1', passHash: '$2a$10$Pz58idNGtWx5zJh6D.wwtOlKDZaZm23h6XQivYWhSyDA43pApWriG', name: 'المشرف الأول', role: 'moderator' },
   { user: 'mod2', passHash: '$2a$10$j1o0c2FMvWxLsFJn5B5IMuCQ8GfJc46rsWwVz3Ho/Z8hkU/eRUfgW', name: 'المشرف الثاني', role: 'moderator' },
   // { user: 'mod3', passHash: '...', name: 'الاسم', role: 'moderator' },
@@ -513,6 +514,69 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
   } catch (err) {
     console.error('[api/leads] error:', err.message);
     res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+  }
+});
+
+/** GET /api/telegram/status — diagnostic (requires X-Copyright admin secret) */
+app.get('/api/telegram/status', requireSharedSecret, async (req, res) => {
+  try {
+    const {
+      getTelegramDiagnostics,
+      fetchRecentPrivateChatIds,
+      validateAdminChatAtStartup,
+    } = require('./services/telegramAdmin');
+    const { readPersistedAdminChat } = require('./services/telegramChatStore');
+    const diag = getTelegramDiagnostics();
+    const persisted = readPersistedAdminChat();
+    const discovered = await fetchRecentPrivateChatIds(15);
+    const validation = diag.hasToken ? await validateAdminChatAtStartup() : { ok: false, reason: 'no_token' };
+    res.json({
+      ok: validation.ok,
+      diagnostics: diag,
+      persistedAdminChat: persisted,
+      discoveredChats: discovered,
+      validation,
+      hint: validation.ok
+        ? 'Telegram admin chat is valid.'
+        : 'Message @RizqOficial_bot on Telegram and press Start — chat_id auto-saves to .env.',
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err && err.message });
+  }
+});
+
+/** POST /api/telegram/test-lead-alert — diagnostic (requires X-Copyright admin secret) */
+app.post('/api/telegram/test-lead-alert', requireSharedSecret, async (req, res) => {
+  try {
+    const { getTelegramDiagnostics, sendLeadEscalationAlert } = require('./services/telegramAdmin');
+    const diag = getTelegramDiagnostics();
+    if (!diag.configured) {
+      return res.status(503).json({
+        ok: false,
+        error: 'telegram_not_configured',
+        diagnostics: diag,
+        hint: 'Set TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID (or TELEGRAM_CHAT_ID) in rizq-backend/.env',
+      });
+    }
+    const result = await sendLeadEscalationAlert({
+      businessName: 'Test Rizq',
+      whatsapp: '+22200000000',
+      package: 'Test package',
+      packagePriceLabel: '0 MRU',
+      reason: 'Diagnostic ping from /api/telegram/test-lead-alert',
+      leadId: 'TEST-' + Date.now(),
+    });
+    res.json({ ok: true, messageId: result && result.message_id, diagnostics: diag });
+  } catch (err) {
+    console.error('[telegram/test-lead-alert] FAILED:', err && err.message, {
+      telegram: err && err.telegram,
+      stack: err && err.stack,
+    });
+    res.status(500).json({
+      ok: false,
+      error: err && err.message,
+      telegram: err && err.telegram,
+    });
   }
 });
 
@@ -1109,6 +1173,15 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   if (Object.prototype.hasOwnProperty.call(flags, reqType) && !flags[reqType]) {
     return res.status(403).json({ error: 'هذا القسم غير مفتوح للتسجيل حالياً' });
   }
+
+  let activityFields = { ok: true, activityId: null, activity: null, category: String(b.category || '').slice(0, 40) };
+  if (['store', 'office', 'corp'].includes(reqType)) {
+    activityFields = normalizeAccountActivityFields(b, reqType);
+    if (!activityFields.ok) {
+      return res.status(400).json({ ok: false, error: activityFields.error, code: activityFields.code });
+    }
+  }
+
   const list = readAccounts();
   // نقبل معرّفاً يُرسله العميل (نفس ACC_<timestamp> المُولَّد محلياً في
   // rizq_landing_v8.html) حتى يبقى معرّف الحساب موحّداً بين localStorage
@@ -1125,7 +1198,10 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     phone: String(b.phone || '').slice(0, 30),
     email: String(b.email || '').slice(0, 120),
     city: String(b.city || '').slice(0, 60),
-    category: String(b.category || '').slice(0, 40),
+    category: activityFields.category || String(b.category || '').slice(0, 40),
+    activityId: activityFields.activityId || String(b.activityId || '').slice(0, 80) || null,
+    activity: activityFields.activity || String(b.activity || '').slice(0, 120) || null,
+    packageId: String(b.packageId || b.package_id || '').slice(0, 40) || null,
     address: String(b.address || '').slice(0, 200),
     desc: String(b.desc || '').slice(0, 1000),
     promo_video: String(b.promo_video || '').slice(0, 500),
@@ -1182,6 +1258,37 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
       }).catch((err) => console.warn('[accounts/register] telegram:', err && err.message));
     } catch (e) { /* telegram optional */ }
   });
+});
+
+/**
+ * GET /api/merchant-activities — قائمة الأنشطة التجارية حسب نوع الحساب/الباقة
+ * (مصدر واحد قابل للتوسيع — للواجهات التي تفضّل الجلب الديناميكي بدل ملف JS).
+ */
+app.get('/api/merchant-activities', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=300');
+  const cat = loadCatalog();
+  const accountType = String(req.query.accountType || req.query.type || '').toLowerCase();
+  const packageId = req.query.packageId || req.query.package || null;
+  const lang = String(req.query.lang || 'ar').toLowerCase() === 'fr' ? 'fr' : 'ar';
+  if (!accountType) {
+    return res.json({
+      ok: true,
+      activities: (cat.ACTIVITIES || []).map((a) => ({
+        id: a.id,
+        name: lang === 'fr' ? (a.nameFr || a.nameAr) : (a.nameAr || a.nameFr),
+        sectorId: a.sectorId,
+        accountTypes: a.accountTypes,
+      })),
+      directoryCategories: typeof cat.listDirectoryFilterCategories === 'function'
+        ? cat.listDirectoryFilterCategories()
+        : [],
+    });
+  }
+  const activities = typeof cat.listForPackage === 'function'
+    ? cat.listForPackage(accountType, packageId, lang)
+    : [];
+  const sectors = typeof cat.getSectors === 'function' ? cat.getSectors(accountType, lang) : [];
+  return res.json({ ok: true, accountType, packageId, activities, sectors });
 });
 
 /**
@@ -1246,9 +1353,22 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
   // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
   if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
   const b = req.body || {};
-  EDITABLE.forEach((k) => { if (b[k] !== undefined) acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500); });
+  if (b.activityId !== undefined || b.activity !== undefined) {
+    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
+    if (!normalized.ok) {
+      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
+    }
+    acc.activityId = normalized.activityId;
+    acc.activity = normalized.activity;
+    acc.category = normalized.category;
+  }
+  EDITABLE.forEach((k) => {
+    if (b[k] === undefined) return;
+    if (k === 'activityId' || k === 'activity') return;
+    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+  });
   // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
   // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
   // فعلي: ACCOUNT_PUBLIC_FIELDS أصلاً لا يُخرج phone لغير صاحب الحساب أو
@@ -1284,9 +1404,22 @@ app.patch('/api/accounts/admin/:id', requireSharedSecret, (req, res) => {
   const idx = list.findIndex((a) => a.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
   const acc = list[idx];
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
   const b = req.body || {};
-  EDITABLE.forEach((k) => { if (b[k] !== undefined) acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500); });
+  if (b.activityId !== undefined || b.activity !== undefined) {
+    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
+    if (!normalized.ok) {
+      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
+    }
+    acc.activityId = normalized.activityId;
+    acc.activity = normalized.activity;
+    acc.category = normalized.category;
+  }
+  EDITABLE.forEach((k) => {
+    if (b[k] === undefined) return;
+    if (k === 'activityId' || k === 'activity') return;
+    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+  });
   if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
   if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
   acc.updatedAt = new Date().toISOString();
@@ -3423,11 +3556,14 @@ const {
   startPolling: startTelegramPolling,
   stopPolling: stopTelegramPolling,
   getBotIdentity,
+  getTelegramDiagnostics,
+  sendLeadEscalationAlert,
+  validateAdminChatAtStartup,
 } = require('./services/telegramAdmin');
 
 async function logTelegramEnvStatus() {
+  const diag = getTelegramDiagnostics();
   const token = String(process.env.TELEGRAM_BOT_TOKEN || '').trim();
-  const chatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
   const placeholder = !token || token.includes('ضع_المفتاح') || token.includes('YOUR_');
   const tokenShapeOk = /^[0-9]+:[A-Za-z0-9_-]{20,}$/.test(token);
   if (placeholder || !tokenShapeOk) {
@@ -3442,10 +3578,15 @@ async function logTelegramEnvStatus() {
       }
     } catch (e) { /* optional */ }
   }
-  if (!chatId) {
-    console.warn('[telegram] TELEGRAM_ADMIN_CHAT_ID: not set — subscription alerts disabled');
+  if (!diag.adminChatId || diag.adminChatId === '(empty)') {
+    console.warn('[telegram] admin chat id not set — set TELEGRAM_ADMIN_CHAT_ID or TELEGRAM_CHAT_ID for lead alerts');
   } else {
-    console.log('[telegram] TELEGRAM_ADMIN_CHAT_ID: loaded (' + chatId + ')');
+    console.log('[telegram] admin chat id: ' + diag.adminChatId + ' (from ' + diag.adminChatIdSource + ')');
+  }
+  if (!isTelegramAdminConfigured()) {
+    console.warn('[telegram] lead/subscription alerts NOT fully configured:', diag);
+  } else {
+    await validateAdminChatAtStartup();
   }
   if (isTelegramBotConfigured()) {
     if (shouldUseTelegramPolling()) {
@@ -3596,6 +3737,17 @@ app.get('/api/discovery/top-sellers', (req, res) => {
     .slice(0, limit);
 
   res.json({ ok: true, sellers: ranked });
+});
+
+// ── Corp Diamond Pro API integration (ERP/PMS) — rizq_live_* keys ─────────
+const { setupIntegrationAPI } = require('./routes/integration');
+setupIntegrationAPI(app, {
+  verifyAccountOwner,
+  readAccounts,
+  readCatalog,
+  readMessages,
+  writeMessages,
+  requireSharedSecret,
 });
 
 // ── تطوير محلي: صفحات HTML + API على نفس المنفذ (localhost:3000) ──

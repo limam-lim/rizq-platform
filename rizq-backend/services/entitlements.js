@@ -599,6 +599,7 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
       whatsappChannel: aiPaidActive && features.includes('whatsapp_channel'),
       callsChannel: aiPaidActive && features.includes('calls_channel'),
       quotaDashboard: aiPaidActive && features.includes('quota_dashboard'),
+      apiErpIntegration: aiPaidActive && features.includes('api_erp_integration'),
       canExposeContacts: isPaidActive && !isTrial && !!(rec && isPaymentConfirmed(rec)),
       canUnlockContacts: isPaidActive && !isTrial && !!(rec && isPaymentConfirmed(rec)),
     },

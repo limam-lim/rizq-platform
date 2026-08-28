@@ -37,6 +37,20 @@ db.exec(`
     FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE CASCADE
   );
   CREATE INDEX IF NOT EXISTS idx_wishlist_buyer ON wishlist_items(buyer_id);
+
+  CREATE TABLE IF NOT EXISTS corp_api_integrations (
+    company_id        TEXT PRIMARY KEY,
+    api_key_hash      TEXT NOT NULL,
+    api_key_prefix    TEXT NOT NULL,
+    api_status        TEXT NOT NULL DEFAULT 'active'
+                      CHECK (api_status IN ('active', 'suspended')),
+    allowed_origin_ip TEXT,
+    last_used_at      TEXT,
+    created_at        TEXT NOT NULL,
+    updated_at        TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_corp_api_prefix ON corp_api_integrations(api_key_prefix);
+  CREATE INDEX IF NOT EXISTS idx_corp_api_status ON corp_api_integrations(api_status);
 `);
 
 function migrateLegacyBuyersJson() {

@@ -11,7 +11,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css"/>
-  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="description" content="لوحة إدارة رزق — Super Admin | ADMINIA SARL"/>
@@ -1457,6 +1457,20 @@ main, .page-content.active, .main-content, .results-area,
           <div style="text-align:center;color:#9ca3af;padding:30px;font-size:13px">لا يوجد وكلاء مسجّلون بعد</div>
         </div>
       </div>
+
+      <!-- Corp Diamond Pro — API keys (admin read-only overview) -->
+      <div style="background:#fff;border:1.5px solid rgba(27,58,107,.12);border-radius:14px;padding:20px;margin-top:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-weight:700;color:var(--navy);font-size:15px">🔌 مفاتيح API — الماسية Pro للشركات</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px">عرض آمن (بدون المفتاح الكامل) — للتسليم للعميل من لوحة الشركة</div>
+          </div>
+          <button onclick="loadAdminApiIntegrations()" style="padding:8px 16px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔄 تحديث</button>
+        </div>
+        <div id="admin-api-integration-list">
+          <div style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">اضغط تحديث لتحميل قائمة مفاتيح API</div>
+        </div>
+      </div>
     </div>
 
     <!-- ══ QUOTA GUARD — مراقبة استهلاك الباقة الماسية ══ -->
@@ -2408,7 +2422,7 @@ function showPanel(id, navEl){
   if(id==='channels'){ renderChannelsPanel(); }
   if(id==='ai-manager'){ renderAiManagerPanel(); syncMgrCfgFromBackend().then(function(changed){ if(changed) renderAiManagerPanel(); }); }
   if(id==='moderator-config'){ renderModeratorConfigPanel(); syncModCfgFromBackend().then(function(changed){ if(changed) renderModeratorConfigPanel(); }); }
-  if(id==='subscriber-agents'){ renderSubscriberAgents(); populateSaAccountOptions(); }
+  if(id==='subscriber-agents'){ renderSubscriberAgents(); populateSaAccountOptions(); loadAdminApiIntegrations(); }
   if(id==='settings'){ loadSettingsPanel(); }
   if(id==='quota-guard'){ loadQuotaGuardPanel(); }
   if(window.innerWidth<900)closeSidebar();
@@ -6736,6 +6750,47 @@ function renderSubscriberAgents(){
       '<button class="btn-sm btn-danger" onclick="deleteSubscriberAgent(\''+a.id+'\')">'+RizqI18n.t2('حذف','Supprimer')+'</button>'+
       '</div></div>';
   }).join('');
+}
+
+function loadAdminApiIntegrations(){
+  var el = document.getElementById('admin-api-integration-list');
+  if(!el) return;
+  var cfg = (typeof RizqSub !== 'undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl || !cfg.backendSecret){
+    el.innerHTML = '<div style="text-align:center;color:#b45309;padding:24px;font-size:13px">⚠️ '+RizqI18n.t2('اضبط رابط الخادم والسر من تبويب وكيل الباقات','Configurez l\'URL et le secret backend depuis l\'onglet agents')+'</div>';
+    return;
+  }
+  el.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">'+RizqI18n.t2('جارٍ التحميل…','Chargement…')+'</div>';
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/integration/admin/list', {
+    headers: { 'x-rizq-secret': cfg.backendSecret || '' }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if(!data || !data.ok) throw new Error('bad');
+    var rows = data.integrations || [];
+    if(!rows.length){
+      el.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:24px;font-size:13px">'+RizqI18n.t2('لا توجد مفاتيح API بعد','Aucune clé API pour le moment')+'</div>';
+      return;
+    }
+    el.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+      '<thead><tr style="background:#f8faff;text-align:right">'+
+      '<th style="padding:10px;border-bottom:1px solid #e2e8f0">'+RizqI18n.t2('الشركة','Entreprise')+'</th>'+
+      '<th style="padding:10px;border-bottom:1px solid #e2e8f0">'+RizqI18n.t2('المفتاح','Clé')+'</th>'+
+      '<th style="padding:10px;border-bottom:1px solid #e2e8f0">'+RizqI18n.t2('الحالة','Statut')+'</th>'+
+      '<th style="padding:10px;border-bottom:1px solid #e2e8f0">IP</th>'+
+      '<th style="padding:10px;border-bottom:1px solid #e2e8f0">'+RizqI18n.t2('آخر استخدام','Dernière utilisation')+'</th>'+
+      '</tr></thead><tbody>'+
+      rows.map(function(row){
+        var st = row.apiStatus === 'active' ? '<span style="color:#16a34a;font-weight:700">✅ '+RizqI18n.t2('نشط','Actif')+'</span>' : '<span style="color:#dc2626;font-weight:700">⏸ '+RizqI18n.t2('موقوف','Suspendu')+'</span>';
+        if(!row.entitled) st += ' <span style="color:#b45309">('+RizqI18n.t2('باقة غير نشطة','Forfait inactif')+')</span>';
+        return '<tr><td style="padding:10px;border-bottom:1px solid #f1f5f9"><div style="font-weight:700">'+escHtml(row.companyName||row.companyId)+'</div><div style="font-size:10px;color:#94a3b8;direction:ltr">'+escHtml(row.companyId)+'</div></td>'+
+          '<td style="padding:10px;border-bottom:1px solid #f1f5f9;direction:ltr"><code>'+escHtml(row.keyPrefix||'—')+'</code></td>'+
+          '<td style="padding:10px;border-bottom:1px solid #f1f5f9">'+st+'</td>'+
+          '<td style="padding:10px;border-bottom:1px solid #f1f5f9;direction:ltr;font-size:11px">'+escHtml(row.allowedOriginIp||'—')+'</td>'+
+          '<td style="padding:10px;border-bottom:1px solid #f1f5f9;font-size:11px;color:#64748b">'+escHtml(row.lastUsedAt||'—')+'</td></tr>';
+      }).join('')+
+      '</tbody></table></div>';
+  }).catch(function(){
+    el.innerHTML = '<div style="text-align:center;color:#dc2626;padding:24px;font-size:13px">'+RizqI18n.t2('فشل تحميل مفاتيح API','Échec du chargement des clés API')+'</div>';
+  });
 }
 
 function _quotaBar(pct, label){

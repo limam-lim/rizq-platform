@@ -117,6 +117,14 @@ function assertDiamondWidgetAccess(body, readAccountsFn, channel) {
   return acc;
 }
 
+function assertApiIntegrationAccess(acc) {
+  const ent = assertAccountFeature(acc, 'api_erp_integration');
+  if (acc.type !== 'corp') {
+    throw entitlementError('corp_only', 'تكامل API متاح لحسابات الشركات (الماسية Pro) فقط');
+  }
+  return ent;
+}
+
 module.exports = {
   getAccountEntitlements,
   assertAccountFeature,
@@ -125,4 +133,5 @@ module.exports = {
   assertAiAgentAccess,
   resolveAccessDenialMessage,
   assertDiamondWidgetAccess,
+  assertApiIntegrationAccess,
 };

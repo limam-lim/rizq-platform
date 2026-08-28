@@ -24,19 +24,43 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { getAdvancedModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
 const {
   getPackagesForTool,
-  buildPackagesPromptBlock,
+  buildLiveCatalogPolicyBlock,
   buildDiamondTiersPromptBlock,
 } = require('./rizq_packages_config');
 const RizqAgent = require('./rizq_agent');
+const {
+  inferCatalogFromMessage,
+  inferCatalogFromRef,
+  getLivePackagesForAI,
+  replyUsesUnknownPackagePrice,
+  buildCategoryDiamondChatSummary,
+  buildLivePackagesChatSummary,
+} = require('./rizq-backend/services/packageCatalogLive');
 
-function buildSystemPrompt() {
-  return `${RizqAgent.buildMasterSystemPrompt({ agentTier: 'general' })}
+function isPackagePricingQuery(message) {
+  return /(?:باق|باقة|اشتراك|سعر|ثمن|كم|forfait|package|plan|abonn|pricing|price|cost|mru|أوقية|ouguiya|ماس|diamond|diamant)/i.test(String(message || ''));
+}
 
-${buildPackagesPromptBlock()}
+function isDiamondPackageQuery(message) {
+  return /(?:ماس|diamond|diamant|\bpro\b|باق|forfait|package|plan|abonn)/i.test(String(message || ''));
+}
+
+function buildSystemPrompt(liveCatalog, catalogHint) {
+  let prompt = `${RizqAgent.buildMasterSystemPrompt({ agentTier: 'general' })}
+
+${buildLiveCatalogPolicyBlock()}
 
 ${buildDiamondTiersPromptBlock()}
 
-عند سؤال عن الأسعار استدعِ أداة get_packages_info ولا تخترع أرقاماً.
+عند سؤال عن الأسعار استدعِ get_packages_info أولاً مع catalog=store|office|corp عند ذكر الفئة — ممنوع تخمين أي رقم MRU.`;
+  if (liveCatalog && Array.isArray(liveCatalog.packages)) {
+    const rows = liveCatalog.packages.map((p) => ({
+      id: p.id, catalog: p.catalog, name: p.name, price: p.price, priceLabel: p.priceLabel,
+    }));
+    const hintLine = catalogHint ? ('STRICT catalog: ' + catalogHint + '\n') : '';
+    prompt += '\n' + hintLine + '[LIVE CATALOG — quote ONLY these prices]\n' + JSON.stringify(rows).slice(0, 8000);
+  }
+  return prompt + `
 
 📋 تواصل رزق: direction@rizq.mr · rizq.mr · +222 44 88 22 12
 
@@ -102,12 +126,17 @@ const AGENT_TOOLS = [
   },
   {
     name: 'get_packages_info',
-    description: 'جلب معلومات الباقات المحدّثة والأسعار',
+    description: 'جلب معلومات الباقات المحدّثة والأسعار — مرّر catalog عند تحديد نوع النشاط',
     input_schema: {
       type: 'object',
       properties: {
-        lang: { type: 'string', enum: ['ar', 'fr'], description: 'اللغة المطلوبة' }
-      }
+        lang: { type: 'string', enum: ['ar', 'fr'], description: 'اللغة المطلوبة' },
+        catalog: {
+          type: 'string',
+          enum: ['store', 'office', 'corp', 'general', 'individual'],
+          description: 'فئة النشاط: store=محل، office=مكتب، corp=شركة — إلزامي عند ذكر الفئة',
+        },
+      },
     }
   },
   {
@@ -159,11 +188,14 @@ async function executeTool(toolName, toolInput, meta) {
       console.log(`📋 اهتمام جديد: ${toolInput.package_requested || toolInput.interest_type} — ${toolInput.whatsapp || toolInput.contact}`);
       return await handleLeadEscalation('register_interest', toolInput, { source: 'brain', channel: meta.channel || 'brain' });
 
-    case 'get_packages_info':
-      return {
-        source: 'rizq_packages_config',
-        packages: getPackagesForTool(toolInput && toolInput.lang)
-      };
+    case 'get_packages_info': {
+      const { getLivePackagesForAI, normalizeCatalogKey } = require('./rizq-backend/services/packageCatalogLive');
+      const lang = toolInput && toolInput.lang ? String(toolInput.lang).toLowerCase() : 'ar';
+      const catalog = normalizeCatalogKey(
+        (toolInput && toolInput.catalog) || (meta && meta.catalogHint)
+      );
+      return getLivePackagesForAI(lang, { catalog });
+    }
 
     case 'get_pending_leads': {
       const { getPendingLeads, formatPendingLeadsForAdmin } = require('./rizq-backend/services/leadEscalation');
@@ -196,6 +228,18 @@ async function askAgent({ channel, message, context = {} }) {
     throw new Error('ANTHROPIC_API_KEY غير موجود في .env');
   }
 
+  const catalogHint = inferCatalogFromMessage(message, {
+    pageContext: context.pageContext,
+    catalogHint: context.catalogHint,
+  }) || inferCatalogFromRef(message) || null;
+  const packageFlow = isPackagePricingQuery(message);
+  let liveCatalogPrefetch = null;
+  if (packageFlow) {
+    liveCatalogPrefetch = catalogHint
+      ? getLivePackagesForAI('ar', { catalog: catalogHint })
+      : getLivePackagesForAI('ar');
+  }
+
   // تعليمات خاصة بكل قناة
   const channelInstructions = {
     call: '\n\n[القناة: مكالمة هاتفية] ردّك سيُقرأ بصوت عالٍ. استخدم جملاً قصيرة جداً (15 ثانية كحد أقصى). لا تستخدم تنسيقات أو قوائم.',
@@ -204,10 +248,11 @@ async function askAgent({ channel, message, context = {} }) {
     telegram: '\n\n[القناة: Telegram] رد نصي قصير وواضح. يمكن استخدام emoji باعتدال.',
   };
 
-  const systemPrompt = buildSystemPrompt() + (channelInstructions[channel] || '');
+  const systemPrompt = buildSystemPrompt(liveCatalogPrefetch, catalogHint) + (channelInstructions[channel] || '');
 
   // بناء رسائل المحادثة
   const messages = [];
+  const toolResultsRaw = liveCatalogPrefetch ? [liveCatalogPrefetch] : [];
 
   // إضافة السياق إن وُجد
   if(context.history && context.history.length > 0) {
@@ -229,13 +274,17 @@ async function askAgent({ channel, message, context = {} }) {
   const model = getAdvancedModel();
   while (loops < 5) {
     loops++;
-    const created = await createCachedMessage(client, {
+    const createParams = {
       model,
       max_tokens: channel === 'call' ? 300 : 1024,
       system    : systemPrompt,
       tools     : AGENT_TOOLS,
       messages  : currentMessages
-    });
+    };
+    if (loops === 1 && packageFlow) {
+      createParams.tool_choice = { type: 'tool', name: 'get_packages_info' };
+    }
+    const created = await createCachedMessage(client, createParams);
     response = created.response;
 
     // لو انتهى بنص → رجّعه
@@ -251,11 +300,20 @@ async function askAgent({ channel, message, context = {} }) {
       currentMessages.push({ role: 'assistant', content: response.content });
 
       // نفّذ كل أداة وأضف نتيجتها
-      const toolResults = await Promise.all(toolUseBlocks.map(async (tool) => ({
-        type      : 'tool_result',
-        tool_use_id: tool.id,
-        content   : JSON.stringify(await executeTool(tool.name, tool.input, { channel }))
-      })));
+      const toolResults = await Promise.all(toolUseBlocks.map(async (tool) => {
+        const input = Object.assign({}, tool.input || {});
+        if (tool.name === 'get_packages_info') {
+          if (!input.lang) input.lang = 'ar';
+          if (!input.catalog && catalogHint) input.catalog = catalogHint;
+        }
+        const result = await executeTool(tool.name, input, { channel, catalogHint });
+        toolResultsRaw.push(result);
+        return {
+          type      : 'tool_result',
+          tool_use_id: tool.id,
+          content   : JSON.stringify(result),
+        };
+      }));
 
       currentMessages.push({ role: 'user', content: toolResults });
       continue; // كمّل الحلقة
@@ -266,7 +324,17 @@ async function askAgent({ channel, message, context = {} }) {
 
   // استخراج النص من آخر رد
   const textBlock = response.content.find(b => b.type === 'text');
-  const replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سنرد عليكم قريباً.';
+  let replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سنرد عليكم قريباً.';
+
+  if (packageFlow) {
+    const usedTool = toolResultsRaw.some((r) => r && r.source === 'live_catalog');
+    const badPrice = replyUsesUnknownPackagePrice(replyText, 'ar', catalogHint, message);
+    if (!usedTool || badPrice) {
+      replyText = (catalogHint && isDiamondPackageQuery(message))
+        ? buildCategoryDiamondChatSummary('ar', catalogHint)
+        : buildLivePackagesChatSummary('ar', { catalogHint });
+    }
+  }
 
   return {
     text     : replyText,

@@ -625,6 +625,9 @@
           TIER_FEATURES_PRO_ONLY.forEach(function(f){
             if(tierFeats.indexOf(f)===-1) tierFeats.push(f);
           });
+          if(acc.type === 'corp') {
+            if(tierFeats.indexOf('api_erp_integration')===-1) tierFeats.push('api_erp_integration');
+          }
         }
         tierFeats.forEach(function(feat){
           if(features.indexOf(feat)===-1) features.push(feat);

@@ -28,6 +28,22 @@
 (function (global) {
   'use strict';
 
+  /* Auto-load unified modal CSS on pages that only include rizq_disclaimer.js */
+  (function loadModalStyles() {
+    try {
+      if (typeof document === 'undefined') return;
+      var links = document.querySelectorAll('link[rel="stylesheet"]');
+      for (var i = 0; i < links.length; i += 1) {
+        var href = links[i].getAttribute('href') || '';
+        if (/rizq_modal_viewport\.css|rizq_modals\.css/i.test(href)) return;
+      }
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'rizq_modal_viewport.css?v=1.4';
+      document.head.appendChild(l);
+    } catch (e) { /* optional */ }
+  })();
+
   // ── النص القانوني الكامل (النسخة الموحَّدة المعتمدة — كانت متطابقة أصلاً في
   // 10 من أصل 15 ملفاً؛ النسخ الأخرى (profile/dashboard/dashboard_store كانت
   // مختصرة قليلاً، وdashboard_office/corp كانتا مختصرتين بشكل أكبر) تُوحَّد

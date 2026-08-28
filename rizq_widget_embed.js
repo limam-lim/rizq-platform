@@ -100,8 +100,9 @@
     'overflow:hidden;flex-shrink:0;background:#0f2347;}',
     '.rw-msg-avatar img,.rw-msg-avatar svg{width:100%;height:100%;object-fit:cover;display:block;}',
     '.rw-bubble,.chat-bubble,.message-bubble{max-width:100%!important;min-width:60px!important;width:fit-content!important;',
-    'padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.55;',
+    'padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.55;direction:rtl;unicode-bidi:plaintext;',
     'word-wrap:break-word!important;word-break:normal!important;overflow-wrap:break-word!important;white-space:pre-wrap!important;}',
+    '.rw-bubble .rw-num,.rw-bubble .rw-ltr{display:inline-block;direction:ltr;unicode-bidi:isolate;text-align:left;font-variant-numeric:lining-nums;}',
     '.rw-bubble strong{font-weight:700;}',
     '.rw-bubble em{font-style:italic;}',
     '.rw-bubble .rw-md-h{font-weight:700;font-size:14px;margin:6px 0 4px;color:#1B3A6B;}',
@@ -131,6 +132,18 @@
     '.rw-send-btn:hover{transform:scale(1.06);background:#234d8f;}',
     '.rw-send-btn:active{transform:scale(.95);}',
     '.rw-send-btn svg{width:18px;height:18px;}',
+    '.rw-attach-btn{width:38px;height:38px;background:#f1f5f9;border:1px solid #cbd5e1;',
+    'border-radius:50%;color:#475569;cursor:pointer;display:flex;align-items:center;',
+    'justify-content:center;transition:background .2s,border-color .2s;flex-shrink:0;}',
+    '.rw-attach-btn:hover{background:#e2e8f0;border-color:#94a3b8;}',
+    '.rw-attach-btn svg{width:18px;height:18px;}',
+    '.rw-attach-preview{display:none;padding:8px 16px 0;background:#fff;border-top:1px solid #f1f5f9;}',
+    '.rw-attach-preview.visible{display:flex;align-items:center;gap:10px;}',
+    '.rw-attach-preview img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;}',
+    '.rw-attach-preview span{flex:1;font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
+    '.rw-attach-remove{background:none;border:none;color:#ef4444;cursor:pointer;font-size:18px;line-height:1;padding:4px;}',
+    '.rw-msg-image{margin-bottom:8px;}',
+    '.rw-msg-image img{max-width:180px;max-height:140px;border-radius:10px;border:1px solid rgba(0,0,0,.08);display:block;}',
     '.rw-footer{text-align:center;font-size:10px;color:#888;padding:6px;',
     'background:#f5f5f5;border-top:1px solid #e8e8e8;flex-shrink:0;}',
     '@media(max-width:440px){',
@@ -201,7 +214,18 @@
     '  </div>',
     '  <div class="rw-quick-actions" id="rw-quick-actions"></div>',
     '  <div class="rw-messages" id="rw-messages"></div>',
+    '  <div class="rw-attach-preview" id="rw-attach-preview">',
+    '    <img id="rw-attach-thumb" alt="" />',
+    '    <span id="rw-attach-label"></span>',
+    '    <button type="button" class="rw-attach-remove" id="rw-attach-remove" aria-label="إزالة">×</button>',
+    '  </div>',
     '  <div class="rw-input-area">',
+    '    <input type="file" id="rw-attach-input" accept="image/jpeg,image/png,image/webp" hidden />',
+    '    <button type="button" class="rw-attach-btn" id="rw-attach-btn" aria-label="إرفاق صورة">',
+    '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">',
+    '        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+    '      </svg>',
+    '    </button>',
     '    <textarea id="rw-input" class="rw-input" dir="ltr" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>',
     '    <button class="rw-send-btn" id="rw-send-btn" aria-label="إرسال">',
     '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">',
@@ -219,6 +243,8 @@
     var _open = false;
     var _typing = false;
     var _history = [];
+    var _pendingAttachment = null;
+    var _MAX_ATTACH_BYTES = 3 * 1024 * 1024;
     var _ctx = { tier: 'visitor', lang: 'ar', chatLang: null };
     var _AVATAR = _rizqAvatarSvg(32);
 
@@ -331,6 +357,11 @@
         headerStatus: 'متاح الآن · يرد خلال ثوانٍ',
         closeAria: 'إغلاق',
         sendAria: 'إرسال',
+        attachAria: 'إرفاق صورة أو إيصال',
+        attachLabel: 'صورة مرفقة — جاهزة للإرسال',
+        attachOnly: '📎 صورة / إيصال مرفق',
+        attachTooLarge: '⚠️ حجم الصورة كبير (الحد 3 ميغابايت).',
+        attachInvalid: '⚠️ نوع الملف غير مدعوم. استخدم JPG أو PNG أو WebP.',
         inputPh: 'اكتب رسالتك هنا...',
         footerHtml: 'مدعوم بـ <strong style="color:#1B3A6B">رزق AI</strong> · منصة رزق للتجارة الإلكترونية',
         greeting: 'أهلاً! 👋\nأنا رزق ذكي — مساعدك على المنصة. كيف أساعدك؟',
@@ -347,6 +378,11 @@
         headerStatus: 'Disponible maintenant · répond en quelques secondes',
         closeAria: 'Fermer',
         sendAria: 'Envoyer',
+        attachAria: 'Joindre une image ou un reçu',
+        attachLabel: 'Image jointe — prête à envoyer',
+        attachOnly: '📎 Image / reçu joint',
+        attachTooLarge: '⚠️ Image trop volumineuse (max 3 Mo).',
+        attachInvalid: '⚠️ Type de fichier non pris en charge. Utilisez JPG, PNG ou WebP.',
         inputPh: 'Écrivez votre message ici...',
         footerHtml: 'Propulsé par <strong style="color:#1B3A6B">Rizq AI</strong> · plateforme Rizq e-commerce',
         greeting: 'Bonjour ! 👋\nJe suis Rizq IA — votre assistant sur la plateforme. Comment puis-je vous aider ?',
@@ -580,6 +616,10 @@
       if (closeBtnEl) closeBtnEl.setAttribute('aria-label', d.closeAria);
       var sendBtnEl = document.getElementById('rw-send-btn');
       if (sendBtnEl) sendBtnEl.setAttribute('aria-label', d.sendAria);
+      var attachBtnEl = document.getElementById('rw-attach-btn');
+      if (attachBtnEl) attachBtnEl.setAttribute('aria-label', d.attachAria);
+      var attachLabelEl = document.getElementById('rw-attach-label');
+      if (attachLabelEl && _pendingAttachment) attachLabelEl.textContent = d.attachLabel;
       var inputElLang = document.getElementById('rw-input');
       if (inputElLang) {
         inputElLang.setAttribute('placeholder', d.inputPh);
@@ -662,9 +702,11 @@
     }
     function _bubbleHtml(text, role) {
       if (role === 'user') {
-        return _esc(_stripBidiControls(text));
+        return _wrapLtrNumbers(_esc(_stripBidiControls(text)));
       }
-      if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.sanitizeAgentText === 'function') {
+      if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.formatPlainChatText === 'function') {
+        text = window.RizqWidgetMarkdown.formatPlainChatText(text);
+      } else if (window.RizqWidgetMarkdown && typeof window.RizqWidgetMarkdown.sanitizeAgentText === 'function') {
         text = window.RizqWidgetMarkdown.sanitizeAgentText(text);
       } else {
         text = _stripBidiControls(text);
@@ -722,16 +764,78 @@
       requestAnimationFrame(function () { el.scrollTop = el.scrollHeight; });
     }
 
-    function _addMessage(text, role) {
+    function _dict() {
+      return _ctx.lang === 'fr' ? _WDICT.fr : _WDICT.ar;
+    }
+
+    function _clearAttachPreview() {
+      var preview = document.getElementById('rw-attach-preview');
+      var thumb = document.getElementById('rw-attach-thumb');
+      var label = document.getElementById('rw-attach-label');
+      if (preview) preview.classList.remove('visible');
+      if (thumb) thumb.removeAttribute('src');
+      if (label) label.textContent = '';
+      var fileInput = document.getElementById('rw-attach-input');
+      if (fileInput) fileInput.value = '';
+    }
+
+    function _setPendingAttachment(dataUri, previewUrl, fileName) {
+      _pendingAttachment = { dataUri: dataUri, previewUrl: previewUrl, name: fileName || 'attachment.jpg' };
+      var preview = document.getElementById('rw-attach-preview');
+      var thumb = document.getElementById('rw-attach-thumb');
+      var label = document.getElementById('rw-attach-label');
+      var d = _dict();
+      if (preview) preview.classList.add('visible');
+      if (thumb) thumb.src = previewUrl;
+      if (label) label.textContent = (fileName || d.attachLabel);
+    }
+
+    function _removePendingAttachment() {
+      _pendingAttachment = null;
+      _clearAttachPreview();
+    }
+
+    function _readFileAsDataUri(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { resolve(String(reader.result || '')); };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function _handleAttachFile(file) {
+      if (!file) return;
+      var d = _dict();
+      if (!/^image\/(jpeg|png|webp)$/i.test(file.type || '')) {
+        _addMessage(d.attachInvalid, 'agent');
+        return;
+      }
+      if (file.size > _MAX_ATTACH_BYTES) {
+        _addMessage(d.attachTooLarge, 'agent');
+        return;
+      }
+      _readFileAsDataUri(file).then(function (dataUri) {
+        _setPendingAttachment(dataUri, dataUri, file.name);
+      }).catch(function () {
+        _addMessage(d.attachInvalid, 'agent');
+      });
+    }
+
+    function _addMessage(text, role, attachmentPreview) {
       var msgs = document.getElementById('rw-messages');
       if (!msgs) return;
       var div = document.createElement('div');
       div.className = 'rw-msg chat-msg ' + (role === 'user' ? 'user' : 'agent');
       var av = role === 'agent' ? '<div class="rw-msg-avatar">' + _AVATAR + '</div>' : '';
-      div.innerHTML = av + '<div class="rw-msg-body"><div class="rw-bubble">' + _bubbleHtml(text, role) + '</div><div class="rw-ts">' + _ts() + '</div></div>';
+      var imgHtml = attachmentPreview
+        ? '<div class="rw-msg-image"><img src="' + _esc(attachmentPreview) + '" alt="attachment" /></div>'
+        : '';
+      var bubbleText = text ? _bubbleHtml(text, role) : '';
+      div.innerHTML = av + '<div class="rw-msg-body"><div class="rw-bubble">' + imgHtml + bubbleText + '</div><div class="rw-ts">' + _ts() + '</div></div>';
       msgs.appendChild(div);
       _scroll();
-      _history.push({ role: role, text: text, ts: _ts() });
+      _history.push({ role: role, text: text || (attachmentPreview ? _dict().attachOnly : ''), ts: _ts() });
     }
 
     function _showTyping() {
@@ -852,11 +956,15 @@
         });
       }
       if (/باق|forfait|package|plan|abonn|precio|pricing|tarif/.test(lower)) {
+        var pkgCfg = window.RizqPackagesConfig;
+        if (pkgCfg && typeof pkgCfg.buildPublicSummary === 'function') {
+          return pkgCfg.buildPublicSummary(L);
+        }
         return pick({
-          ar: 'باقات رزق: تجريبية مجانية، شهرية، ربع سنوية، سنوية، وماسية 💎 للشركات.\nالتفاصيل: rizq_landing_v8.html#pricing',
-          fr: 'Forfaits Rizq: essai gratuit, mensuel, trimestriel, annuel et Diamant 💎 pour les entreprises.\nDétails: rizq_landing_v8.html#pricing',
-          es: 'Planes Rizq: prueba gratis, mensual, trimestral, anual y Diamante 💎 para empresas.\nDetalles: rizq_landing_v8.html#pricing',
-          en: 'Rizq plans: free trial, monthly, quarterly, yearly, and Diamond 💎 for businesses.\nDetails: rizq_landing_v8.html#pricing'
+          ar: '🌟 باقات رزق متعددة (تجريبية، شهرية، ربع سنوية، سنوية، وماسية 💎).\n\nللأسعار الحالية، افتح rizq_landing_v8.html#pricing أو أعد المحاولة عندما يكون الخادم متصلاً.',
+          fr: 'Forfaits Rizq : essai, mensuel, trimestriel, annuel et Diamant 💎.\n\nPour les prix actuels : rizq_landing_v8.html#pricing ou réessayez lorsque le serveur est en ligne.',
+          es: 'Planes Rizq: prueba, mensual, trimestral, anual y Diamante 💎.\n\nPrecios actuales: rizq_landing_v8.html#pricing o reintente cuando el servidor esté en línea.',
+          en: 'Rizq plans: trial, monthly, quarterly, yearly, and Diamond 💎.\n\nLive prices: rizq_landing_v8.html#pricing or retry when the server is online.'
         });
       }
       if (/دفع|payment|paiement|bankily|sedad|pago|pay/.test(lower)) {
@@ -913,12 +1021,12 @@
       });
     }
 
-    function _callDiamondAgent(userText) {
+    function _callDiamondAgent(userText, attachData) {
       var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
       var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 45000) : null;
       var payload = {
         message: userText,
-        lang: _ctx.chatLang || _detectMessageLang(userText),
+        lang: _ctx.chatLang || _detectMessageLang(userText || _dict().attachOnly),
         uiLang: _ctx.lang,
         autoLang: true,
         agentTier: _resolveAgentTier(),
@@ -927,6 +1035,13 @@
         history: (_history || []).slice(-10),
         pageContext: _collectPageContext()
       };
+      if (attachData && attachData.dataUri) {
+        payload.attachment = {
+          dataUri: attachData.dataUri,
+          fileName: attachData.name || 'attachment.jpg',
+          kind: 'receipt_or_screenshot'
+        };
+      }
       var urls = _agentFetchUrls();
       function tryUrl(idx) {
         if (idx >= urls.length) {
@@ -958,7 +1073,7 @@
       return tryUrl(0);
     }
 
-    function _reply(userText) {
+    function _reply(userText, attachData) {
       var blocked = _policyCheck(userText);
       if (blocked) {
         _appendAgentMessageStream(blocked);
@@ -969,12 +1084,18 @@
         _submitLeadToBackend(leadPayload);
       }
       _showTyping();
-      _callDiamondAgent(userText)
+      _callDiamondAgent(userText, attachData)
         .then(function (replyText) {
           _appendAgentMessageStream(replyText);
         })
         .catch(function (err) {
           console.error('Widget Chat Error: API unavailable, using offline agent', err);
+          if (attachData) {
+            _appendAgentMessageStream(_ctx.lang === 'fr'
+              ? '✅ Image/reçu reçu(e). En mode hors ligne — réessayez lorsque le serveur est connecté pour la transmission à l\'administration.'
+              : '✅ تم استلام المرفق. في الوضع المحلي — أعد الإرسال عند اتصال الخادم ليتم تحويله للإدارة.');
+            return;
+          }
           var fallback = _offlineAgentReply(userText);
           _appendAgentMessageStream(fallback);
         });
@@ -1053,11 +1174,15 @@
       var input = document.getElementById('rw-input');
       if (!input) return;
       var txt = _cleanOutgoingText(input.value);
-      if (!txt) return;
+      if (!txt && !_pendingAttachment) return;
+      var attachData = _pendingAttachment;
+      var attachPreview = attachData ? attachData.previewUrl : null;
+      var displayText = txt || (attachData ? _dict().attachOnly : '');
       input.value = '';
       input.style.height = 'auto';
-      _addMessage(txt, 'user');
-      _reply(txt);
+      _removePendingAttachment();
+      _addMessage(displayText, 'user', attachPreview);
+      _reply(txt, attachData);
     }
 
     function _handleQuickAction(action) {
@@ -1100,11 +1225,22 @@
     var btn = document.getElementById('rizq-chat-toggle');
     var closeBtn = document.getElementById('rw-header-close');
     var sendBtn = document.getElementById('rw-send-btn');
+    var attachBtn = document.getElementById('rw-attach-btn');
+    var attachInput = document.getElementById('rw-attach-input');
+    var attachRemove = document.getElementById('rw-attach-remove');
     var inputEl = document.getElementById('rw-input');
     var qaContainer = document.getElementById('rw-quick-actions');
 
     if (closeBtn) closeBtn.addEventListener('click', close);
     if (sendBtn) sendBtn.addEventListener('click', send);
+    if (attachBtn && attachInput) {
+      attachBtn.addEventListener('click', function () { attachInput.click(); });
+      attachInput.addEventListener('change', function () {
+        var file = attachInput.files && attachInput.files[0];
+        if (file) _handleAttachFile(file);
+      });
+    }
+    if (attachRemove) attachRemove.addEventListener('click', _removePendingAttachment);
     if (inputEl) {
       inputEl.setAttribute('dir', 'ltr');
       inputEl.style.direction = 'ltr';

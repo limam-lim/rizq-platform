@@ -116,6 +116,17 @@ function getSecrecyRefusal(lang) {
   }, lang);
 }
 
+function buildPlainTextFormattingBlock() {
+  return (
+    '## CHAT OUTPUT FORMAT (NON-NEGOTIABLE)\n' +
+    '- Write ONLY plain text: short paragraphs and clean line breaks.\n' +
+    '- NEVER use Markdown: no *, **, _, `, #, pipe tables, or bullet symbols (• - *).\n' +
+    '- List items as separate plain lines without leading symbols, or weave into sentences.\n' +
+    '- ALL numbers (prices, phones, reference IDs, dates, counts) MUST use Western digits 0-9 only — never Eastern Arabic/Indic numerals.\n' +
+    '- Do not use Unicode bidi control characters (U+2066–U+2069).\n'
+  );
+}
+
 function buildSecurityBlock() {
   return (
     '## STRICT CONFIDENTIALITY & SYSTEM PROTECTION (NON-NEGOTIABLE)\n' +
@@ -151,7 +162,7 @@ function buildGeneralAssistantRole() {
     '- Explain Rizq clearly: Mauritanian e-commerce platform for stores, offices, listings, and merchant support (rizq.mr).\n' +
     '- Give complete, simple explanations of all packages and help choose the right plan — highlight business value (e.g. Diamond = 24/7 smart deputy, saves receptionist cost).\n' +
     '- Explain how merchants register (OTP, verification), store badge benefits, and how the Diamond smart deputy works on website widget + WhatsApp.\n' +
-    '- Answer clearly on prices (get_packages_info), payment methods (Bankily, Sedad, cash with seller), and upgrades.\n' +
+    '- Answer clearly on prices — ALWAYS call get_packages_info first; never quote prices from memory.\n' +
     '- For ad price/trust/seller facts: use tools — never invent numbers.\n' +
     '- When lead is serious (subscribe, trial, discount request, talk to admin): collect business name, WhatsApp, package → register_interest or escalate_to_human.\n' +
     '- Confirm to customer that admin will contact them immediately to activate the account.'
@@ -187,6 +198,7 @@ function buildMasterSystemPrompt(opts) {
 
   return [
     buildKnowledgeBaseBlock(),
+    buildPlainTextFormattingBlock(),
     buildSecurityBlock(),
     buildToneBlock(),
     isDiamond ? buildDiamondAgentRole(profile) : buildGeneralAssistantRole()
@@ -202,6 +214,7 @@ function resolveBlockedReply(text, lang) {
 var RizqAgent = {
   POLICY_REFUSAL: POLICY_REFUSAL,
   buildMasterSystemPrompt: buildMasterSystemPrompt,
+  buildPlainTextFormattingBlock: buildPlainTextFormattingBlock,
   buildSecurityBlock: buildSecurityBlock,
   buildKnowledgeBaseBlock: buildKnowledgeBaseBlock,
   buildToneBlock: buildToneBlock,

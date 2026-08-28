@@ -3,11 +3,36 @@
 const crypto = require('crypto');
 const { analyzeReceiptImage } = require('./receiptVision');
 const { activateSubRequest, rejectSubRequest, formatPlausibility } = require('./subRequestActivation');
-const { formatLocalDateTime } = require('./localTime');
+const {
+  formatLeadAlertText,
+  formatWidgetMediaCaption,
+  formatSubRequestCaption,
+  cleanField,
+} = require('./telegramNotifyFormat');
+const {
+  readPersistedAdminChat,
+  registerAdminChatId,
+} = require('./telegramChatStore');
 
 const BOT_TOKEN = () => String(process.env.TELEGRAM_BOT_TOKEN || '').trim();
-const ADMIN_CHAT_ID = () => String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
+const ADMIN_CHAT_ID = () => String(
+  process.env.TELEGRAM_ADMIN_CHAT_ID || process.env.TELEGRAM_CHAT_ID || ''
+).trim();
 const SUBSCRIBER_ID = () => String(process.env.TELEGRAM_SUBSCRIBER_ID || '').trim();
+
+/** محادثات رُصدت عبر polling — getUpdates لا يعيدها أثناء تشغيل السيرفر */
+const _seenChatIds = new Map();
+
+function rememberSeenChat(chatId, chatMeta) {
+  const id = String(chatId || '').trim();
+  if (!id) return;
+  _seenChatIds.set(id, {
+    id,
+    type: (chatMeta && chatMeta.type) || 'private',
+    title: (chatMeta && (chatMeta.title || chatMeta.username || chatMeta.first_name)) || '',
+    seenAt: Date.now(),
+  });
+}
 
 /** توكن البوت فقط — يكفي لتشغيل webhook واستقبال الرسائل */
 function isBotConfigured() {
@@ -17,6 +42,193 @@ function isBotConfigured() {
 /** توكن + محادثة الأدمن — لإشعارات طلبات الاشتراك */
 function isConfigured() {
   return !!(BOT_TOKEN() && ADMIN_CHAT_ID());
+}
+
+function getTelegramDiagnostics() {
+  const token = BOT_TOKEN();
+  const chatId = ADMIN_CHAT_ID();
+  return {
+    hasToken: !!token,
+    tokenPrefix: token ? token.slice(0, 8) + '…' : '(empty)',
+    adminChatId: chatId || '(empty)',
+    adminChatIdSource: process.env.TELEGRAM_ADMIN_CHAT_ID
+      ? 'TELEGRAM_ADMIN_CHAT_ID'
+      : (process.env.TELEGRAM_CHAT_ID ? 'TELEGRAM_CHAT_ID' : '(none)'),
+    configured: !!(token && chatId),
+  };
+}
+
+function normalizeTelegramChatId(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return s;
+  return s;
+}
+
+function logTelegramSendFailure(method, chatId, err, extra) {
+  const payload = {
+    method,
+    chat_id: chatId,
+    message: err && err.message,
+    httpStatus: err && err.httpStatus,
+    error_code: err && err.telegram && err.telegram.error_code,
+    description: err && err.telegram && err.telegram.description,
+    telegram_response: err && err.telegram ? err.telegram : undefined,
+    diagnostics: getTelegramDiagnostics(),
+  };
+  if (extra) Object.assign(payload, extra);
+  console.error('[telegram-api] ❌ SEND REJECTED — full details:', JSON.stringify(payload, null, 2));
+}
+
+function buildAlertChatCandidates() {
+  const ids = [];
+  const seen = new Set();
+  const add = (raw) => {
+    const id = normalizeTelegramChatId(raw);
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    ids.push(id);
+  };
+  add(ADMIN_CHAT_ID());
+  add(readPersistedAdminChat());
+  add(SUBSCRIBER_ID());
+  _seenChatIds.forEach((meta) => add(meta.id));
+  return ids;
+}
+
+async function fetchRecentPrivateChatIds(limit) {
+  const token = BOT_TOKEN();
+  if (!token) return [];
+  limit = Math.min(Math.max(Number(limit) || 10, 1), 25);
+  try {
+    const url = 'https://api.telegram.org/bot' + token + '/getUpdates?limit=' + limit + '&timeout=0';
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    const data = await res.json().catch(() => ({}));
+    if (!data.ok || !Array.isArray(data.result)) {
+      console.error('[telegram-admin] getUpdates for chat discovery failed:', JSON.stringify(data));
+      return [];
+    }
+    const out = [];
+    const seen = new Set();
+    data.result.forEach((u) => {
+      const chat = (u.message && u.message.chat) || (u.callback_query && u.callback_query.message && u.callback_query.message.chat);
+      if (!chat || !chat.id) return;
+      const id = String(chat.id);
+      if (seen.has(id)) return;
+      seen.add(id);
+      out.push({
+        id,
+        type: chat.type,
+        title: chat.title || chat.username || chat.first_name || '',
+      });
+    });
+    _seenChatIds.forEach((meta) => {
+      if (seen.has(meta.id)) return;
+      seen.add(meta.id);
+      out.push({
+        id: meta.id,
+        type: meta.type,
+        title: meta.title,
+        source: 'polling_seen',
+      });
+    });
+    return out;
+  } catch (e) {
+    console.error('[telegram-admin] fetchRecentPrivateChatIds error:', e && e.message);
+    return [];
+  }
+}
+
+async function validateAdminChatAtStartup() {
+  if (!isBotConfigured()) return { ok: false, reason: 'not_configured' };
+  const candidates = buildAlertChatCandidates();
+  let lastErr = null;
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const chatId = candidates[i];
+    try {
+      await telegramApi('getChat', { chat_id: chatId });
+      const configured = normalizeTelegramChatId(ADMIN_CHAT_ID());
+      if (chatId !== configured) {
+        registerAdminChatId(chatId, { source: 'startup_auto_fix' });
+        console.log('[telegram] admin chat auto-fixed →', chatId, '(was invalid:', configured || '(empty)', ')');
+      } else {
+        console.log('[telegram] admin chat validated:', chatId);
+      }
+      return { ok: true, chatId, autoFixed: chatId !== configured };
+    } catch (e) {
+      lastErr = e;
+      if (chatId === normalizeTelegramChatId(ADMIN_CHAT_ID())) {
+        logTelegramSendFailure('getChat', chatId, e, { phase: 'startup_validation' });
+      }
+    }
+  }
+
+  const discovered = await fetchRecentPrivateChatIds(15);
+  for (let j = 0; j < discovered.length; j += 1) {
+    const chatId = String(discovered[j].id);
+    if (candidates.includes(chatId)) continue;
+    try {
+      await telegramApi('getChat', { chat_id: chatId });
+      registerAdminChatId(chatId, {
+        source: 'startup_discovered',
+        title: discovered[j].title,
+      });
+      console.log('[telegram] admin chat auto-registered from discovery →', chatId);
+      return { ok: true, chatId, autoFixed: true };
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  if (discovered.length) {
+    console.warn('[telegram] configured chat_id invalid — recent bot conversations (message bot + Start):');
+    discovered.forEach((c) => {
+      console.warn('  → chat_id=' + c.id + ' type=' + c.type + ' name=' + c.title);
+    });
+  } else {
+    console.warn('[telegram] no chats found — open Telegram, message @RizqOficial_bot, press Start (chat_id will auto-save to .env)');
+  }
+  return { ok: false, error: lastErr && lastErr.message, discovered };
+}
+
+async function sendMessageToAlertChats(text, meta) {
+  meta = meta || {};
+  const candidates = buildAlertChatCandidates();
+  let lastErr = null;
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const chatId = candidates[i];
+    try {
+      const result = await telegramApi('sendMessage', { chat_id: chatId, text });
+      return { result, chatId, via: 'configured' };
+    } catch (e) {
+      lastErr = e;
+      logTelegramSendFailure('sendMessage', chatId, e, meta);
+      const desc = (e && e.telegram && e.telegram.description) || '';
+      if (!/chat not found|bot was blocked|user is deactivated|peer_id_invalid/i.test(desc)) {
+        throw e;
+      }
+    }
+  }
+
+  const discovered = await fetchRecentPrivateChatIds(20);
+  for (let j = 0; j < discovered.length; j += 1) {
+    const chatId = String(discovered[j].id);
+    if (candidates.includes(chatId)) continue;
+    try {
+      const result = await telegramApi('sendMessage', { chat_id: chatId, text });
+      registerAdminChatId(chatId, { source: 'discovered_send', title: discovered[j].title });
+      console.warn('[telegram-admin] alert delivered via discovered chat_id ' + chatId + ' — TELEGRAM_ADMIN_CHAT_ID updated in .env');
+      return { result, chatId, via: 'discovered' };
+    } catch (e) {
+      lastErr = e;
+      logTelegramSendFailure('sendMessage', chatId, e, Object.assign({ via: 'discovered' }, meta));
+    }
+  }
+
+  const err = lastErr || new Error('telegram_all_chat_ids_failed');
+  err.code = 'telegram_all_chat_ids_failed';
+  throw err;
 }
 
 function webhookSecret() {
@@ -29,38 +241,68 @@ function webhookSecret() {
 
 async function telegramApi(method, payload, multipart) {
   const token = BOT_TOKEN();
-  if (!token) throw new Error('TELEGRAM_BOT_TOKEN missing');
+  if (!token) {
+    console.error('[telegram-api] TELEGRAM_BOT_TOKEN is undefined or empty');
+    throw new Error('TELEGRAM_BOT_TOKEN missing');
+  }
 
   const url = 'https://api.telegram.org/bot' + token + '/' + method;
   const isSend = /^send/i.test(method);
   const chatId = multipart ? '(multipart)' : (payload && payload.chat_id);
   if (isSend) {
-    console.log('[telegram-api] → send attempt', { method, chat_id: chatId });
+    console.log('[telegram-api] → send attempt', { method, chat_id: chatId, multipart: !!multipart });
   }
 
   let res;
-  if (multipart) {
-    res = await fetch(url, { method: 'POST', body: payload });
-  } else {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+  try {
+    if (multipart) {
+      res = await fetch(url, { method: 'POST', body: payload });
+    } else {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+  } catch (networkErr) {
+    console.error('[telegram-api] ❌ network/request error', {
+      method,
+      chat_id: chatId,
+      message: networkErr && networkErr.message,
+      stack: networkErr && networkErr.stack,
     });
+    throw networkErr;
   }
-  const data = await res.json().catch(() => ({}));
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (parseErr) {
+    console.error('[telegram-api] ❌ invalid JSON response', {
+      method,
+      chat_id: chatId,
+      status: res.status,
+      statusText: res.statusText,
+      message: parseErr && parseErr.message,
+    });
+    throw parseErr;
+  }
+
   if (!data.ok) {
     if (isSend) {
       console.error('[telegram-api] ❌ send FAILED', {
         method,
         chat_id: chatId,
+        httpStatus: res.status,
         error_code: data.error_code,
         description: data.description,
+        diagnostics: getTelegramDiagnostics(),
         response: data,
       });
     }
     const err = new Error(data.description || 'telegram_api_error');
     err.telegram = data;
+    err.httpStatus = res.status;
     throw err;
   }
   if (isSend) {
@@ -110,31 +352,7 @@ async function getBotIdentity() {
 }
 
 function buildSubRequestCaption(req, aiResult) {
-  const pl = formatPlausibility(aiResult && aiResult.plausibilityLevel);
-  const accRow = typeof req._accountPhone === 'string' ? req._accountPhone : '';
-  const phone = accRow || req._phone || '—';
-  const lines = [
-    '🧾 *طلب اشتراك جديد*',
-    '',
-    '👤 *العميل:* ' + escapeMarkdown(req.account || req.accountId || '—'),
-    '📱 *الهاتف:* `' + escapeMarkdown(String(phone)) + '`',
-    '📦 *الباقة:* ' + escapeMarkdown(req.pkg || '—'),
-    '💰 *المبلغ:* ' + (Number(req.price) || 0) + ' MRU',
-    '🔍 *الموثوقية:* ' + escapeMarkdown(pl),
-    '🏷 *الفئة:* `' + escapeMarkdown(req.category || 'package') + '`',
-    '🆔 `' + escapeMarkdown(req.id) + '`',
-  ];
-  if (aiResult && aiResult.amount) lines.push('💵 *مبلغ الوصل:* ' + escapeMarkdown(String(aiResult.amount)));
-  if (aiResult && aiResult.date) lines.push('📅 *التاريخ:* ' + escapeMarkdown(String(aiResult.date)));
-  if (aiResult && aiResult.bankOrOperator) lines.push('🏦 *الجهة:* ' + escapeMarkdown(String(aiResult.bankOrOperator)));
-  if (aiResult && Array.isArray(aiResult.notes) && aiResult.notes.length) {
-    lines.push('', '_ملاحظات:_ ' + escapeMarkdown(aiResult.notes.slice(0, 2).join(' · ')));
-  }
-  return lines.join('\n');
-}
-
-function escapeMarkdown(text) {
-  return String(text || '').replace(/([_*`\[])/g, '\\$1');
+  return formatSubRequestCaption(req, aiResult, formatPlausibility);
 }
 
 function inlineKeyboard(requestId) {
@@ -153,47 +371,63 @@ function parseDataUrl(receiptImage) {
 }
 
 async function sendLeadEscalationAlert(lead) {
+  const diag = getTelegramDiagnostics();
   if (!isConfigured()) {
-    const msg = '[telegram-admin] lead alert skipped — set TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID in .env';
-    console.error(msg, {
-      hasToken: !!BOT_TOKEN(),
-      adminChatId: ADMIN_CHAT_ID() || '(empty)',
+    const msg = '[telegram-admin] lead alert skipped — set TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID (or TELEGRAM_CHAT_ID) in .env';
+    console.error(msg, diag);
+    const err = new Error('telegram_admin_not_configured');
+    err.code = 'telegram_admin_not_configured';
+    err.diagnostics = diag;
+    throw err;
+  }
+
+  const leadId = lead.leadId || lead.ticketId || lead.id;
+  const text = formatLeadAlertText(lead);
+
+  console.log('[telegram-admin] lead alert dispatch (sync)', {
+    leadId,
+    chatCandidates: buildAlertChatCandidates(),
+    hasToken: diag.hasToken,
+  });
+
+  try {
+    const sent = await sendMessageToAlertChats(text, { leadId, kind: 'lead_alert' });
+    console.log('[telegram-admin] lead alert delivered', {
+      messageId: sent.result && sent.result.message_id,
+      leadId,
+      chatId: sent.chatId,
+      via: sent.via,
     });
+    return sent.result;
+  } catch (e) {
+    logTelegramSendFailure('sendLeadEscalationAlert', ADMIN_CHAT_ID(), e, { leadId });
+    throw e;
+  }
+}
+
+async function sendWidgetMediaAlert(payload) {
+  if (!isConfigured()) {
     const err = new Error('telegram_admin_not_configured');
     err.code = 'telegram_admin_not_configured';
     throw err;
   }
 
-  const summary = lead.reason || lead.notes || (lead.kind === 'register_interest' ? 'طلب اشتراك/تفعيل' : 'طلب تصعيد للإدارة');
-  const localWhen = lead.createdAtLocal || formatLocalDateTime(new Date());
-  const text = [
-    '🚨 *طلب تفعيل جديد / استفسار هام!*',
-    '',
-    '👤 *اسم التاجر:* ' + escapeMarkdown(lead.businessName || '—'),
-    '📱 *رقم الهاتف:* `' + escapeMarkdown(lead.whatsapp || lead.phone || '—') + '`',
-    '📦 *الباقة المطلوبة:* ' + escapeMarkdown(lead.package || '—'),
-    '💬 *ملخص الطلب:* ' + escapeMarkdown(summary),
-    '🕐 *التوقيت المحلي (نواكشوط):* ' + escapeMarkdown(localWhen),
-  ].join('\n');
-  const fullText = lead.ticketId
-    ? text + '\n🆔 `' + escapeMarkdown(lead.ticketId) + '` · 📡 ' + escapeMarkdown(lead.channel || '—')
-    : text + (lead.channel ? '\n📡 ' + escapeMarkdown(lead.channel) : '');
+  const caption = formatWidgetMediaCaption(payload);
 
-  try {
-    const result = await telegramApi('sendMessage', {
-      chat_id: ADMIN_CHAT_ID(),
-      text: fullText,
-      parse_mode: 'Markdown',
-    });
-    console.log('[telegram-admin] lead alert delivered', { messageId: result && result.message_id });
-    return result;
-  } catch (e) {
-    console.error('[telegram-admin] lead alert sendMessage FAILED:', e && e.message, {
-      adminChatId: ADMIN_CHAT_ID(),
-      telegram: e && e.telegram,
-    });
-    throw e;
-  }
+  const mediaType = payload.mediaType || 'image/jpeg';
+  const ext = mediaType.includes('png') ? 'png' : mediaType.includes('webp') ? 'webp' : 'jpg';
+  const fileName = String(payload.fileName || 'attachment').replace(/\.(png|jpe?g|webp)$/i, '') + '.' + ext;
+
+  const form = new FormData();
+  form.append('chat_id', ADMIN_CHAT_ID());
+  form.append('caption', caption);
+  form.append('photo', new Blob([payload.imageBuffer], { type: mediaType }), fileName);
+
+  const result = await telegramApi('sendPhoto', form, true);
+  console.log('[telegram-admin] widget media alert delivered', {
+    messageId: result && result.message_id,
+  });
+  return result;
 }
 
 /** alias — استدعاء موحّد لإشعارات الإدارة */
@@ -212,7 +446,6 @@ async function sendSubRequestNotification(req, aiResult) {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('caption', caption);
-    form.append('parse_mode', 'Markdown');
     form.append('reply_markup', markup);
     const ext = parsed.mediaType.includes('png') ? 'png' : 'jpg';
     form.append('photo', new Blob([parsed.buffer], { type: parsed.mediaType }), 'receipt.' + ext);
@@ -221,8 +454,7 @@ async function sendSubRequestNotification(req, aiResult) {
 
   return telegramApi('sendMessage', {
     chat_id: chatId,
-    text: caption + '\n\n⚠️ _لم تُرفق صورة وصل_',
-    parse_mode: 'Markdown',
+    text: caption + '\n\n⚠️ لم تُرفق صورة وصل',
     reply_markup: inlineKeyboard(req.id),
   });
 }
@@ -234,7 +466,6 @@ async function editSubRequestMessage(chatId, messageId, text) {
       chat_id: chatId,
       message_id: messageId,
       caption: text,
-      parse_mode: 'Markdown',
       reply_markup: { inline_keyboard: [] },
     });
   } catch (e) {
@@ -242,14 +473,13 @@ async function editSubRequestMessage(chatId, messageId, text) {
       chat_id: chatId,
       message_id: messageId,
       text,
-      parse_mode: 'Markdown',
       reply_markup: { inline_keyboard: [] },
     });
   }
 }
 
 function isAuthorizedChat(chatId) {
-  return String(chatId) === ADMIN_CHAT_ID();
+  return buildAlertChatCandidates().includes(String(chatId));
 }
 
 function findSubRequestById(readSubRequests, requestId) {
@@ -348,17 +578,25 @@ async function handleIncomingMessage(message, deps) {
   const text = String(message.text || message.caption || '').trim();
   const chatId = message.chat && message.chat.id;
   if (!chatId) return { ok: true, ignored: 'no_chat' };
+  rememberSeenChat(chatId, message.chat);
   if (!text) return { ok: true, ignored: 'no_text' };
 
   console.log('[telegram-bot] message from chat', chatId, ':', text.slice(0, 80));
 
   if (text === '/start') {
+    if (message.chat && message.chat.type === 'private') {
+      registerAdminChatId(chatId, {
+        source: '/start',
+        title: [message.from && message.from.first_name, message.from && message.from.username]
+          .filter(Boolean).join(' '),
+      });
+    }
     await telegramApi('sendMessage', {
       chat_id: chatId,
-      text: '👋 مرحباً!\nأنا وكيل رزق الذكي (@RizqOficial_bot).\nاكتب سؤالك وسأرد عليك فوراً.',
+      text: '👋 مرحباً!\nأنا وكيل رزق الذكي (@RizqOficial_bot).\nاكتب سؤالك وسأرد عليك فوراً.\n\n✅ تم تسجيل هذه المحادثة لإشعارات Leads (LEAD-…).',
     });
-    console.log('[telegram-bot] /start replied to chat', chatId);
-    return { ok: true, action: 'welcome' };
+    console.log('[telegram-bot] /start replied + admin chat registered:', chatId);
+    return { ok: true, action: 'welcome', chatIdRegistered: chatId };
   }
 
   if (isAuthorizedChat(chatId) && (
@@ -370,7 +608,6 @@ async function handleIncomingMessage(message, deps) {
     await telegramApi('sendMessage', {
       chat_id: chatId,
       text: adminReply.slice(0, 4096),
-      parse_mode: 'Markdown',
     });
     console.log('[telegram-bot] admin pending leads from DB', chatId);
     return { ok: true, action: 'admin_leads_list' };
@@ -485,7 +722,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
     }, writeSubRequests);
 
     const name = req.account || req.accountId;
-    await editSubRequestMessage(chatId, messageId, '❌ *تم رفض طلب* ' + escapeMarkdown(name) + '\n\n_بواسطة الأدمن عبر Telegram_');
+    await editSubRequestMessage(chatId, messageId, '❌ تم رفض طلب ' + cleanField(name) + '\n\nبواسطة الأدمن عبر Telegram');
     await telegramApi('answerCallbackQuery', { callback_query_id: callbackQuery.id, text: 'تم الرفض' });
     return { ok: true, action: 'reject' };
   }
@@ -511,7 +748,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
   await editSubRequestMessage(
     chatId,
     messageId,
-    '✅ *تم تفعيل باقة* ' + escapeMarkdown(clientName) + ' *بنجاح*\n\n_بواسطة الأدمن عبر Telegram_',
+    '✅ تم تفعيل باقة ' + cleanField(clientName) + ' بنجاح\n\nبواسطة الأدمن عبر Telegram',
   );
   await telegramApi('answerCallbackQuery', { callback_query_id: callbackQuery.id, text: '✅ تم التفعيل' });
   return { ok: true, action: 'approve', activation };
@@ -625,6 +862,7 @@ async function startPolling(getDeps) {
 module.exports = {
   isBotConfigured,
   isConfigured,
+  getTelegramDiagnostics,
   webhookSecret,
   verifyWebhookSecret,
   processNewSubRequest,
@@ -636,10 +874,14 @@ module.exports = {
   stopPolling,
   sendSubRequestNotification,
   sendLeadEscalationAlert,
+  sendWidgetMediaAlert,
   sendTelegramNotification,
   sendTelegramAdminNotification,
   formatPlausibility,
   telegramApi,
   getBotIdentity,
   getUpdatesLongPoll,
+  validateAdminChatAtStartup,
+  fetchRecentPrivateChatIds,
+  buildAlertChatCandidates,
 };

@@ -1,0 +1,510 @@
+/**
+ * rizq_modals.css — Unified modal / popup / dialog design system for Rizq
+ * Loaded via rizq_modal_viewport.css (@import) on all platform pages.
+ */
+
+:root {
+  --rzq-modal-radius: 20px;
+  --rzq-modal-radius-lg: 24px;
+  --rzq-modal-shadow: 0 15px 50px -10px rgba(0, 0, 0, 0.4);
+  --rzq-modal-shadow-dark:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 15px 50px -10px rgba(0, 0, 0, 0.45);
+  --rzq-modal-backdrop: rgba(5, 10, 22, 0.78);
+  --rzq-modal-backdrop-blur: 20px;
+  --rzq-modal-border-dark: 1px solid rgba(201, 168, 76, 0.22);
+  --rzq-modal-border-light: 1px solid rgba(27, 58, 107, 0.1);
+  --rzq-modal-gold: #c9a84c;
+  --rzq-modal-navy: #1b3a6b;
+}
+
+/* ── Remove rogue edge artifacts (::before bars, double borders) ── */
+#ad-modal-box::before,
+#all-ads-modal-box::before,
+#all-ads-box::before,
+.modal-box::before,
+.rizq-modal-box::before,
+.disc-modal::before,
+.cs-modal-box::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* ── Shared backdrop (overlays) ── */
+.modal-overlay,
+.disc-overlay,
+.rizq-modal-overlay,
+.cs-modal-overlay,
+.rvid-overlay,
+.rizq-promo-overlay,
+.modal-bg,
+#sub-modal-overlay,
+#suggest-cat-overlay,
+#pkg-modal,
+#pay-modal,
+#ad-boost-modal,
+#my-pay-modal,
+#svc-upgrade-modal,
+#ad-modal,
+#all-ads-modal,
+#bank-modal-overlay,
+#rzv-preview-overlay,
+.filter-overlay,
+.report-overlay,
+.promo-overlay,
+.item-modal-overlay,
+.rag-overlay {
+  background: var(--rzq-modal-backdrop) !important;
+  backdrop-filter: blur(var(--rzq-modal-backdrop-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--rzq-modal-backdrop-blur)) !important;
+  box-sizing: border-box !important;
+}
+
+/* ── Dark theme panel — glassmorphism ── */
+.modal-overlay .modal-box,
+.rizq-modal-overlay .rizq-modal-box,
+#modal .modal-box,
+#sub-modal,
+#suggest-cat-modal,
+#pkg-modal-box,
+.modal-bg .modal-box {
+  background: rgba(12, 26, 48, 0.88) !important;
+  backdrop-filter: blur(22px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  outline: none !important;
+  border-radius: var(--rzq-modal-radius-lg) !important;
+  box-shadow: var(--rzq-modal-shadow-dark) !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+  padding: clamp(32px, 4vw, 44px) clamp(24px, 4vw, 38px) !important;
+  padding-top: clamp(36px, 5vw, 48px) !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  font-family: 'Cairo', 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+}
+
+.modal-overlay .modal-box h1,
+.modal-overlay .modal-box h2,
+.modal-overlay .modal-box h3,
+.rizq-modal-box h1,
+.rizq-modal-box h2,
+.rizq-modal-box h3,
+#modal .modal-box h3 {
+  color: #fff !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em;
+  line-height: 1.35 !important;
+}
+
+.modal-overlay .modal-box p,
+.rizq-modal-box p,
+#modal .modal-box p {
+  color: rgba(255, 255, 255, 0.82) !important;
+  line-height: 1.65 !important;
+}
+
+/* ── Light theme panel (dashboards) ── */
+body.rizq-dash .modal-overlay .modal-box,
+.modal-overlay .modal-box.rizq-modal-light,
+#share-modal .modal-box,
+#pay-modal > div,
+#my-pay-modal > div,
+#ad-boost-modal > div,
+#svc-upgrade-modal > div {
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%) !important;
+  border: var(--rzq-modal-border-light) !important;
+  border-radius: var(--rzq-modal-radius) !important;
+  box-shadow: var(--rzq-modal-shadow) !important;
+  color: #1a2535 !important;
+}
+
+body.rizq-dash .modal-overlay .modal-box h3,
+#share-modal .modal-box h3 {
+  color: var(--rzq-modal-navy) !important;
+}
+
+/* ── Close — always top-right on auth modal ── */
+#modal .modal-close,
+.modal-overlay#modal .modal-close {
+  top: 16px !important;
+  left: auto !important;
+  right: 16px !important;
+  inset-inline-start: auto !important;
+  inset-inline-end: 16px !important;
+}
+
+.modal-close,
+.disc-modal-close,
+.rizq-modal-close,
+#ad-modal-close,
+#all-ads-close,
+.cs-modal-box button[class*="close"],
+.item-modal-close {
+  position: absolute !important;
+  top: 14px !important;
+  inset-inline-start: 14px !important;
+  inset-inline-end: auto !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 11px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 17px !important;
+  line-height: 1 !important;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease !important;
+  z-index: 2 !important;
+}
+
+html[dir="ltr"] .modal-close,
+html[dir="ltr"] .disc-modal-close,
+.disc-modal[dir="ltr"] .disc-modal-close {
+  inset-inline-start: auto !important;
+  inset-inline-end: 14px !important;
+}
+
+.modal-close:hover,
+.disc-modal-close:hover,
+#ad-modal-close:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+}
+
+body.rizq-dash .modal-close,
+.item-modal-close {
+  background: #f0f3f8 !important;
+  border-color: #e2e8f5 !important;
+  color: #64748b !important;
+}
+
+body.rizq-dash .modal-close:hover,
+.item-modal-close:hover {
+  background: #e8edf5 !important;
+  color: #1a2535 !important;
+}
+
+/* ── Disclaimer modal ── */
+.disc-modal {
+  background: linear-gradient(165deg, #0a1628 0%, #122040 55%, #0d1a30 100%) !important;
+  border: var(--rzq-modal-border-dark) !important;
+  border-radius: var(--rzq-modal-radius-lg) !important;
+  box-shadow: var(--rzq-modal-shadow-dark) !important;
+  padding: clamp(28px, 4vw, 36px) clamp(22px, 4vw, 32px) !important;
+  max-width: 640px !important;
+  width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.disc-modal h2 {
+  color: var(--rzq-modal-gold) !important;
+  font-size: clamp(18px, 2.5vw, 22px) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+.disc-modal .disc-section {
+  border-bottom-color: rgba(201, 168, 76, 0.14) !important;
+}
+
+.disc-modal .disc-section h3 {
+  color: #e8c96a !important;
+  font-weight: 700 !important;
+}
+
+.disc-modal .disc-section p {
+  color: rgba(255, 255, 255, 0.9) !important;
+  line-height: 1.85 !important;
+}
+
+/* ── CS / promo / auth modals ── */
+.cs-modal-box,
+.rag-modal {
+  background: #fff !important;
+  border: var(--rzq-modal-border-light) !important;
+  border-radius: var(--rzq-modal-radius) !important;
+  box-shadow: var(--rzq-modal-shadow) !important;
+  padding: clamp(20px, 3vw, 28px) !important;
+  max-width: 380px !important;
+  width: 100% !important;
+}
+
+.cs-modal-title,
+.rag-modal h2 {
+  color: var(--rzq-modal-navy) !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+}
+
+.cs-modal-desc {
+  color: #5b6b85 !important;
+  line-height: 1.65 !important;
+}
+
+/* ── Full-screen ad modals (no top artifact bar) ── */
+#ad-modal-box,
+#all-ads-modal-box {
+  border: none !important;
+  box-shadow: none !important;
+  background: linear-gradient(160deg, #ffffff 0%, #f8faff 55%, #f3f6fc 100%) !important;
+}
+
+/* ── Sub-modal / package modal fixes ── */
+#sub-modal,
+#suggest-cat-modal {
+  border: var(--rzq-modal-border-dark) !important;
+  border-radius: var(--rzq-modal-radius-lg) !important;
+  box-shadow: var(--rzq-modal-shadow-dark) !important;
+}
+
+#sub-modal-overlay,
+#suggest-cat-overlay {
+  background: var(--rzq-modal-backdrop) !important;
+  backdrop-filter: blur(var(--rzq-modal-backdrop-blur)) !important;
+}
+
+/* ── Corp item modal ── */
+.item-modal {
+  border-radius: var(--rzq-modal-radius-lg) !important;
+  box-shadow: var(--rzq-modal-shadow) !important;
+  border: var(--rzq-modal-border-light) !important;
+}
+
+/* ── Scrollbars (thin, consistent) ── */
+.modal-box,
+.rizq-modal-box,
+.disc-modal,
+#ad-modal-box,
+#pkg-modal-box,
+.cs-modal-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 168, 76, 0.35) transparent;
+}
+
+.modal-box::-webkit-scrollbar,
+.rizq-modal-box::-webkit-scrollbar,
+.disc-modal::-webkit-scrollbar,
+#ad-modal-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-box::-webkit-scrollbar-thumb,
+.rizq-modal-box::-webkit-scrollbar-thumb,
+.disc-modal::-webkit-scrollbar-thumb,
+#ad-modal-box::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.35);
+  border-radius: 4px;
+}
+
+/* ── Logo block — centered, enlarged, NO underline artifact ── */
+.modal-logo-r::after,
+.modal-logo::after,
+.modal-logo::before,
+#modal .modal-logo::after,
+#modal .modal-logo::before {
+  display: none !important;
+  content: none !important;
+}
+
+.modal-logo,
+#modal .modal-header .modal-logo {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 0 auto 12px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+.modal-logo .logo-mark-img,
+.modal-logo img,
+#modal .modal-logo img {
+  width: 84px !important;
+  height: 84px !important;
+  max-width: 84px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 10px 28px rgba(201, 168, 76, 0.38)) !important;
+}
+
+.modal-logo-r {
+  display: block !important;
+  text-align: center !important;
+  font-size: 72px !important;
+  font-weight: 900 !important;
+  color: var(--rzq-modal-gold) !important;
+  text-shadow: 0 0 32px rgba(201, 168, 76, 0.4) !important;
+  line-height: 1 !important;
+  margin: 0 auto 8px !important;
+}
+
+/* Header stack: logo → progress → title → subtitle */
+#modal .modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+#modal #sdots {
+  display: none;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 4px auto 18px !important;
+  width: 100% !important;
+}
+
+#modal .modal-box > div[id^="p-"] > h3,
+#modal .modal-box > div[id^="p-"] > p:first-of-type {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#modal .modal-box > div[id^="p-"] > h3 {
+  font-family: 'Cairo', 'Noto Naskh Arabic', 'Segoe UI', sans-serif !important;
+  font-size: clamp(20px, 2.8vw, 24px) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  margin-bottom: 8px !important;
+  border: none !important;
+  text-decoration: none !important;
+}
+
+#modal .modal-box > div[id^="p-"] > p:first-of-type {
+  font-size: 13px !important;
+  color: rgba(255, 255, 255, 0.62) !important;
+  margin-bottom: 22px !important;
+  max-width: 92% !important;
+  line-height: 1.6 !important;
+}
+
+/* Premium gold CTA inside modals */
+#modal .m-btn-main,
+.modal-overlay .modal-box .m-btn-main {
+  width: 100% !important;
+  padding: 15px 18px !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-family: 'Cairo', 'Segoe UI', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0a1628 !important;
+  background: linear-gradient(135deg, #a67c2e 0%, #d4b356 42%, #c9a84c 68%, #e8cc7a 100%) !important;
+  box-shadow: 0 6px 22px rgba(201, 168, 76, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+#modal .m-btn-main:hover,
+.modal-overlay .modal-box .m-btn-main:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 32px rgba(201, 168, 76, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+#modal .m-link-btn,
+.modal-overlay .modal-box .m-link-btn {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin-top: 14px !important;
+  font-size: 13px !important;
+  color: rgba(201, 168, 76, 0.9) !important;
+  text-decoration: none !important;
+}
+
+#modal .m-link-btn:hover {
+  color: #e8c96a !important;
+}
+
+/* Remove decorative lines above titles */
+#modal .modal-box h3::before,
+#modal .modal-box h3::after,
+.modal-logo-r::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* ── Logo block inside auth modal (legacy) ── */
+.modal-logo-r {
+  color: var(--rzq-modal-gold) !important;
+  text-shadow: 0 0 24px rgba(201, 168, 76, 0.35) !important;
+}
+
+/* REMOVED: modal-logo-r underline artifact */
+
+/* ── Dashboard modals (.rizq-modal-*) ── */
+.rizq-modal-overlay .rizq-modal-box h3,
+.rizq-modal-overlay .rizq-modal-box h2 {
+  text-align: center !important;
+  font-family: 'Cairo', 'Noto Naskh Arabic', 'Segoe UI', sans-serif !important;
+}
+
+.rizq-modal-overlay .rizq-modal-box > p:first-of-type,
+.rizq-modal-overlay .rizq-modal-box .modal-sub {
+  text-align: center !important;
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.rizq-modal-close {
+  inset-inline-start: auto !important;
+  inset-inline-end: 14px !important;
+}
+
+.rizq-modal-box .m-btn-main,
+.rizq-modal-box button[type="submit"].primary {
+  width: 100% !important;
+  padding: 15px 18px !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-family: 'Cairo', 'Segoe UI', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0a1628 !important;
+  background: linear-gradient(135deg, #a67c2e 0%, #d4b356 42%, #c9a84c 68%, #e8cc7a 100%) !important;
+  box-shadow: 0 6px 22px rgba(201, 168, 76, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.rizq-modal-box .m-btn-main:hover,
+.rizq-modal-box button[type="submit"].primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 32px rgba(201, 168, 76, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ── Pay / boost modals (inline-styled inner divs) ── */
+#pay-modal > div[style*="border-radius"],
+#my-pay-modal > div[style*="border-radius"],
+#ad-boost-modal > div[style*="border-radius"],
+#svc-upgrade-modal > div[style*="border-radius"] {
+  border-radius: var(--rzq-modal-radius) !important;
+  box-shadow: var(--rzq-modal-shadow) !important;
+  border: var(--rzq-modal-border-light) !important;
+}
+
+/* ── Bank modal (admin) ── */
+#bank-modal-overlay > div,
+.modal-bg .modal-box {
+  border-radius: var(--rzq-modal-radius) !important;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --rzq-modal-radius: 18px;
+    --rzq-modal-radius-lg: 20px;
+  }
+
+  .modal-overlay .modal-box,
+  .disc-modal,
+  .rizq-modal-box,
+  #modal .modal-box {
+    padding: 24px 18px !important;
+    border-radius: var(--rzq-modal-radius) !important;
+  }
+}

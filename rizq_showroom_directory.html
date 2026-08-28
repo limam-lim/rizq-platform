@@ -153,6 +153,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#F7F9FC;c
 <script src="rizq_disclaimer.js"></script>
 <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل بطاقة معرض (RizqSub.getBadges) -->
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script>
@@ -176,7 +177,7 @@ function _rizqLang(){
   }catch(e){ return 'ar'; }
 }
 
-var CAT_LABELS = {
+var CAT_LABELS = (window.RizqMerchantActivities && RizqMerchantActivities.LEGACY_DIR_LABELS) ? RizqMerchantActivities.LEGACY_DIR_LABELS : {
   'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
   'إلكترونيات':{ar:'📱 إلكترونيات',fr:'📱 Électronique'},
   'أثاث':{ar:'🛋️ أثاث ومفروشات',fr:'🛋️ Meubles & ameublement'},
@@ -185,6 +186,22 @@ var CAT_LABELS = {
   'ذهب':{ar:'💎 مجوهرات',fr:'💎 Bijoux'},
   'أخرى':{ar:'🏷️ أخرى',fr:'🏷️ Autre'}
 };
+
+function _dirCatLabel(cat, fr){
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.legacyCategoryLabel === 'function'){
+    return RizqMerchantActivities.legacyCategoryLabel(cat, fr ? 'fr' : 'ar');
+  }
+  var lab = CAT_LABELS[cat];
+  return lab ? (fr ? lab.fr : lab.ar) : (fr ? '🏷️ Autre' : '🏷️ أخرى');
+}
+
+function _dirCatOrder(){
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.listDirectoryFilterCategories === 'function'){
+    return RizqMerchantActivities.listDirectoryFilterCategories();
+  }
+  return ['سيارات','إلكترونيات','أثاث','معدات','بناء','ذهب'];
+}
+
 var TYPE_LABELS = {
   store:{ar:'🏪 محل',fr:'🏪 Boutique'},
   office:{ar:'🏢 مكتب',fr:'🏢 Bureau'},
@@ -205,21 +222,19 @@ function _backendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && w
 function renderCatChips(){
   var fr = _rizqLang()==='fr';
   var wrap = document.getElementById('dir-cats');
-  var order=['سيارات','إلكترونيات','أثاث','معدات','بناء','ذهب'];
+  var order = _dirCatOrder();
   var allChip = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="rizq_showroom_directory.html">'+(fr?'📋 Toutes':'📋 الكل')+'</a>';
   wrap.innerHTML = allChip + order.map(function(c){
-    var lab = CAT_LABELS[c];
     var active = _catFilter===c ? ' active' : '';
-    return '<a class="dir-cat-chip'+active+'" href="rizq_showroom_directory.html?cat='+encodeURIComponent(c)+'">'+(fr?lab.fr:lab.ar)+'</a>';
+    return '<a class="dir-cat-chip'+active+'" href="rizq_showroom_directory.html?cat='+encodeURIComponent(c)+'">'+_dirCatLabel(c, fr)+'</a>';
   }).join('');
 }
 
 function renderHero(){
   var fr = _rizqLang()==='fr';
   var t = document.getElementById('dir-title');
-  if(_catFilter && CAT_LABELS[_catFilter]){
-    var lab = CAT_LABELS[_catFilter];
-    t.innerHTML = fr ? ('Showrooms — <span>'+lab.fr.replace(/^[^\s]+\s/,'')+'</span>') : ('دليل المعارض — <span>'+lab.ar.replace(/^[^\s]+\s/,'')+'</span>');
+  if(_catFilter){
+    t.innerHTML = fr ? ('Showrooms — <span>'+_dirCatLabel(_catFilter, true).replace(/^[^\s]+\s/,'')+'</span>') : ('دليل المعارض — <span>'+_dirCatLabel(_catFilter, false).replace(/^[^\s]+\s/,'')+'</span>');
   } else {
     t.innerHTML = fr ? 'Annuaire des <span>showrooms</span>' : 'دليل <span>المعارض</span>';
   }
@@ -265,7 +280,7 @@ function renderDirectory(){
     return '<a class="dir-card" href="rizq_showroom.html?id='+encodeURIComponent(a.id)+'">'
       + '<div class="dir-card-top"><div class="dir-thumb">'+thumb+'</div><div>'
       + '<div class="dir-name">'+escapeHtml(a.name||'')+(badgeHTML?'<span class="dir-badges-inline">'+badgeHTML+'</span>':'')+'</div>'
-      + '<div class="dir-type">'+(fr?typeLab.fr:typeLab.ar)+'</div>'
+      + '<div class="dir-type">'+(fr?typeLab.fr:typeLab.ar)+(a.activity ? ' · '+escapeHtml(a.activity) : '')+'</div>'
       + '</div></div>'
       + (a.city ? '<div class="dir-city">📍 '+escapeHtml(a.city)+'</div>' : '')
       + (a.tagline ? '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>' : '')

@@ -1073,7 +1073,7 @@ function buildPublicSummary(lang) {
     es: 'Tenemos ' + pkgs.length + ' planes:'
   }[lang];
   var lines = pkgs.map(function (p) {
-    return '• ' + p.name + ' — ' + p.priceLabel;
+    return p.name + ' — ' + p.priceLabel;
   });
   var footer = {
     ar: 'أيهم يناسبك؟',
@@ -1092,51 +1092,39 @@ function buildPublicOverview(lang) {
     ? 'Forfaits Rizq — choisissez celui qui vous convient:'
     : (lang === 'en' ? 'Rizq plans — pick what fits you:' : 'باقات رزق — اختر ما يناسبك:');
   var blocks = pkgs.map(function (p) {
-    var feats = (p.features || []).map(function (f) { return '• ' + f; }).join('\n');
+    var feats = (p.features || []).map(function (f) { return f; }).join('\n');
     return p.name + ' — ' + p.priceLabel + (feats ? ':\n' + feats : '');
   });
   return title + '\n\n' + blocks.join('\n\n');
 }
 
-function buildDiamondTiersPromptBlock() {
+function buildDiamondTiersPromptBlock(lang) {
   return (
-    '=== تعليمات إجابة الوكيل الذكي للباقات الماسية (ثابت — لا ترتجل) ===\n' +
-    'عندما يسأل العميل عن الفرق بين الباقتين الماسيتين، اعتمد حصراً على البيانات التالية:\n\n' +
-    'الباقة الماسية الأساسية (5,000 أوقية/شهر):\n' +
-    '- الوصف: موظف استقبال واستفسارات آلي 24/7.\n' +
-    '- المزايا: نائب ذكي حصري باسم منشأتك | ويدجت الموقع + واتساب (محادثات نصية) | هوية خاصة ومخصصة بالكامل | لوحة متابعة وتحليل الأداء لحظياً | 2,000 محادثة نصية شهرياً.\n' +
-    '- **نصي فقط — بدون مكالمات صوتية.**\n\n' +
-    'الباقة الماسية المتقدمة — Pro (10,000 أوقية/شهر):\n' +
-    '- الوصف: منظومة إدارة المبيعات وخدمة العملاء الشاملة.\n' +
-    '- المزايا: نائب ذكي متقدم حصري باسم منشأتك | ويدجت الموقع + واتساب + مكالمات صوتية تفاعلية | هوية مخصصة كاملة ودعم تقني بأولوية | لوحة متابعة وتحليل الأداء لحظياً | 4,000 محادثة نصية + 300 دقيقة صوتية شهرياً.\n' +
-    '- **تشتمل حتماً على المكالمات الصوتية التفاعلية — ليست نصية فقط.**\n\n' +
-    'قواعد صارمة للرد:\n' +
-    '- يمنع ذكر: "قابل للتعديل من الأدمن"، "للمحلات الصغيرة"، "للفنادق والشركات الكبرى"، أو "حل ذكاء اصطناعي".\n' +
-    '- يمنع منعاً باتاً نفي وجود المكالمات الصوتية في الماسية Pro.\n' +
-    '- يمنع وصف الماسية Pro بأنه "نصي فقط".\n' +
-    '- يمنع قول إن الماسية الأساسية تدعم المكالمات الصوتية.\n' +
-    '- الفارق الرئيسي: المكالمات الصوتية التفاعلية (حصرية لـ Pro).\n' +
-    '- **إلزامي:** عند ذكر الماسية، اشرح **المستويين كاملين** (أساسية ثم Pro) — لا تتوقف عند الأولى.\n' +
-    '- **إلزامي:** أنهِ دائماً بجدول المقارنة أدناه أو بنقطتين واضحتين (أساسية vs Pro).\n' +
-    '- **إلزامي:** لا تترك ** أو قوائم ناقصة — أكمل الجملة حتى النهاية.\n' +
-    '- **إلزامي:** لا تستخدم رموز Unicode للاتجاه (⁦ ⁩) — اكتب الأرقام plain: 5000، 10000، 24/7.\n\n' +
-    '| المستوى | السعر | القنوات | صوت |\n' +
-    '| الماسية الأساسية | 5,000 MRU/شهر | ويدجت + واتساب | نصي فقط |\n' +
-    '| الماسية Pro | 10,000 MRU/شهر | ويدجت + واتساب + مكالمات | نص + صوت تفاعلي (300 د/شهر) |'
+    '=== DIAMOND TIERS — LIVE DATA ONLY ===\n' +
+    'When user asks about Diamond / الماسية / Pro vs Standard:\n' +
+    '- Call get_packages_info with lang AND catalog (store|office|corp) when user mentions محل/متجر, مكتب, or شركة.\n' +
+    '- Explain BOTH tiers from tool results for THAT catalog only — never quote store prices for office questions.\n' +
+    '- Key difference: Pro includes interactive voice calls; Standard is text-only.\n' +
+    '- Never quote 5000 or 10000 unless those exact values appear in get_packages_info for that catalog.\n' +
+    '- Finish with a plain-text comparison (name — price — channels — voice yes/no).\n'
+  );
+}
+
+function buildLiveCatalogPolicyBlock() {
+  return (
+    '=== LIVE CATALOG POLICY (MANDATORY — NO STATIC PRICES) ===\n' +
+    'You are STRICTLY FORBIDDEN from guessing or recalling package prices from memory or training data.\n' +
+    'For ANY question about packages, pricing, subscriptions, features, Diamond tiers, or "how much":\n' +
+    '1. You MUST call get_packages_info FIRST before stating any price, plan name, or feature list.\n' +
+    '2. Pass catalog=store when user says محل/متجر; catalog=office for مكتب/للمكاتب; catalog=corp for شركة.\n' +
+    '3. Quote ONLY prices returned by get_packages_info for the matched catalog (Western digits 0-9, plain text).\n' +
+    '4. Catalogs differ (general, store, office, corp) — NEVER mix or fallback store prices when office/corp was asked.\n' +
+    '5. If live tool data is missing in context, say you are fetching official data — NEVER invent MRU amounts.\n'
   );
 }
 
 function buildPackagesPromptBlock() {
-  var pkgs = getPackagesForTool('ar');
-  var lines = pkgs.map(function (p) {
-    return '- ' + p.name + ': ' + p.priceLabel + (p.features.length ? ' — ' + p.features.join('، ') : '');
-  });
-  return (
-    '📦 الباقات المتاحة (المصدر الرسمي الوحيد — لا تخترع أسعاراً أخرى):\n' +
-    lines.join('\n') +
-    '\n\n' + buildDiamondTiersPromptBlock() +
-    '\n\nالنائب الذكي VIP حصري بالباقة الماسية. أقصى خصم على خدمات المنصة: 5% (ماسي).'
-  );
+  return buildLiveCatalogPolicyBlock();
 }
 
 function buildDiscountSummary(lang) {
@@ -1153,7 +1141,7 @@ function buildDiscountSummary(lang) {
     var cap = p.discountPct === 5
       ? (lang === 'fr' ? ' (maximum absolu)' : lang === 'en' ? ' (absolute max)' : ' (الحد الأقصى المطلق)')
       : '';
-    return '• ' + p.name + ': ' + (lang === 'fr' || lang === 'en' || lang === 'es' ? 'up to ' : 'حتى ') + p.discountPct + '%' + cap;
+    return p.name + ': ' + (lang === 'fr' || lang === 'en' || lang === 'es' ? 'up to ' : 'حتى ') + p.discountPct + '%' + cap;
   });
   return intro + '\n' + lines.join('\n');
 }
@@ -1178,12 +1166,18 @@ function buildMaxDiscountLine(lang) {
 
 function buildVipDeputyText(lang) {
   lang = _normLang(lang);
-  var std = diamondCopy(lang, 'diamond_standard', 5000);
-  var pro = diamondCopy(lang, 'diamond_pro', 10000);
-  function block(copy, price) {
-    return copy.name + ' — ' + price + ' MRU\n' + copy.description + '\n' + copy.features.map(function (f) { return '• ' + f; }).join('\n');
+  var pkgs = getCatalog(PUBLIC_CATALOG, lang);
+  var stdPkg = pkgs.filter(function (p) { return p.id === 'diamond_standard'; })[0];
+  var proPkg = pkgs.filter(function (p) { return p.id === 'diamond_pro'; })[0];
+  var stdPrice = stdPkg ? stdPkg.price : 5000;
+  var proPrice = proPkg ? proPkg.price : 10000;
+  var std = diamondCopy(lang, 'diamond_standard', stdPrice);
+  var pro = diamondCopy(lang, 'diamond_pro', proPrice);
+  function block(copy, pkg) {
+    var label = pkg ? priceLabel(pkg, lang) : String(copy.price || '') + ' MRU';
+    return copy.name + ' — ' + label + '\n' + copy.description + '\n' + copy.features.map(function (f) { return f; }).join('\n');
   }
-  return block(std, '5,000') + '\n\n' + block(pro, '10,000');
+  return block(std, stdPkg) + '\n\n' + block(pro, proPkg);
 }
 
 var API = {
@@ -1208,6 +1202,7 @@ var API = {
   priceLabel: priceLabel,
   buildPublicSummary: buildPublicSummary,
   buildPublicOverview: buildPublicOverview,
+  buildLiveCatalogPolicyBlock: buildLiveCatalogPolicyBlock,
   buildPackagesPromptBlock: buildPackagesPromptBlock,
   buildDiamondTiersPromptBlock: buildDiamondTiersPromptBlock,
   buildDiscountSummary: buildDiscountSummary,

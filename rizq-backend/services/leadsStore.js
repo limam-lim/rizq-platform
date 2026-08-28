@@ -5,7 +5,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { formatLocalDateTime, nowIsoWithLocal } = require('./localTime');
+const { nowIsoWithLocal } = require('./localTime');
+const { formatPendingLeadsList, timestampLine } = require('./telegramNotifyFormat');
 
 const FILE = path.join(__dirname, '..', 'data', 'leads.json');
 
@@ -30,6 +31,9 @@ function saveLead({
   businessName,
   whatsapp,
   package: pkg,
+  packageId,
+  packagePrice,
+  packagePriceLabel,
   notes,
   source,
   channel,
@@ -43,6 +47,9 @@ function saveLead({
     businessName: String(businessName || 'غير محدد').slice(0, 200),
     whatsapp: String(whatsapp || '').slice(0, 120),
     package: String(pkg || 'غير محددة').slice(0, 120),
+    packageId: packageId ? String(packageId).slice(0, 80) : null,
+    packagePrice: packagePrice != null ? Number(packagePrice) : null,
+    packagePriceLabel: packagePriceLabel ? String(packagePriceLabel).slice(0, 120) : null,
     notes: String(notes || '').slice(0, 1000),
     source: String(source || 'unknown').slice(0, 40),
     channel: String(channel || 'unknown').slice(0, 40),
@@ -105,27 +112,9 @@ function findRecentDuplicate(whatsapp, withinMs) {
 
 function formatPendingLeadsForAdmin(leads) {
   const pending = leads || getPendingLeads();
-  if (!pending.length) {
-    return '📭 *لا توجد طلبات معلّقة (pending)* في سجل قاعدة البيانات حالياً.';
-  }
-  const lines = [
-    '📋 *طلبات Leads معلّقة (' + pending.length + '):*',
-    '',
-  ];
-  pending.slice(0, 15).forEach((l, i) => {
-    lines.push(
-      (i + 1) + '. *' + l.businessName + '*',
-      '   📱 `' + (l.whatsapp || '—') + '`',
-      '   📦 ' + (l.package || '—'),
-      '   🆔 `' + l.id + '` · 📡 ' + (l.channel || l.source || '—'),
-      '   🕐 ' + (l.createdAtLocal || formatLocalDateTime(l.createdAt)),
-      ''
-    );
+  return formatPendingLeadsList(pending, function (l) {
+    return timestampLine(l);
   });
-  if (pending.length > 15) {
-    lines.push('_… و' + (pending.length - 15) + ' طلبات أخرى_');
-  }
-  return lines.join('\n');
 }
 
 module.exports = {

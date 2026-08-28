@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=13.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=14.1"/>
-<link rel="stylesheet" href="rizq_modal_viewport.css?v=1.0"/>
+<link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
 <link rel="stylesheet" href="rizq_header.css?v=14.8"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -47,6 +47,8 @@ document.documentElement.classList.add('rizq-app-nav');
 }
 </style>
 <script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_activity_select.js?v=2"></script>
 <script src="rizq_packages_ui.js?v=12.7"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
@@ -1392,7 +1394,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(5,12,24,.7);backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:linear-gradient(160deg,#0d1b2e 0%,#102040 60%,#0a1628 100%);border:none;outline:none;border-radius:24px;width:100%;max-width:440px;padding:40px 36px;position:relative;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,.65);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;--text-muted:rgba(255,255,255,.55);--text-soft:rgba(255,255,255,.82)}
+.modal-box{background:linear-gradient(160deg,#0d1b2e 0%,#102040 60%,#0a1628 100%);border:none;outline:none;border-radius:24px;width:100%;max-width:440px;padding:40px 36px;position:relative;max-height:90vh;overflow-y:auto;overflow-x:hidden;box-shadow:0 40px 100px rgba(0,0,0,.65);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;--text-muted:rgba(255,255,255,.55);--text-soft:rgba(255,255,255,.82);box-sizing:border-box;margin-inline:auto}
 .modal-box::-webkit-scrollbar{width:3px}
 .modal-box::-webkit-scrollbar-track{background:transparent}
 .modal-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
@@ -1401,11 +1403,11 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 #ad-modal-box::-webkit-scrollbar-thumb{background:rgba(27,58,107,.3);border-radius:2px}
 .modal-box h3{color:#fff !important}
 .modal-box p{color:rgba(255,255,255,.82) !important}
-.modal-close{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:16px;transition:all .3s}
+.modal-close{position:absolute;top:14px;inset-inline-end:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:16px;transition:all .3s}
 .modal-close:hover{background:rgba(255,255,255,.12);color:#fff}
-.modal-logo{text-align:center;margin-bottom:28px}
-.modal-logo-r{display:inline-block;font-family:'Noto Naskh Arabic','Arial',serif;font-size:42px;font-weight:900;color:#C9A84C;line-height:1;text-shadow:0 0 30px rgba(201,168,76,.4);position:relative}
-.modal-logo-r::after{content:'';display:block;width:40px;height:2px;background:linear-gradient(90deg,transparent,#C9A84C,transparent);margin:4px auto 0}
+.modal-logo{text-align:center;margin-bottom:12px}
+.modal-logo-r{display:inline-block;font-family:'Noto Naskh Arabic','Arial',serif;font-size:72px;font-weight:900;color:#C9A84C;line-height:1;text-shadow:0 0 30px rgba(201,168,76,.4);position:relative}
+.modal-header{display:flex;flex-direction:column;align-items:center;text-align:center}
 .m-input{width:100%;padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:14px;font-family:'Segoe UI','Arial',sans-serif;outline:none;transition:all .3s}
 .m-input::placeholder{color:rgba(255,255,255,.35)}
 .m-input:focus{border-color:rgba(201,168,76,.5);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
@@ -3114,15 +3116,15 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
-
-    <!-- شريط الخطوات — يتكيف حسب عدد الخطوات -->
-    <div id="sdots" style="display:none;justify-content:center;align-items:center;gap:6px;margin-bottom:20px">
-      <div class="sdot active" id="sd1"></div><div class="sline" id="sl1"></div>
-      <div class="sdot" id="sd2"></div><div class="sline" id="sl2"></div>
-      <div class="sdot" id="sd3"></div><div class="sline" id="sl3"></div>
-      <div class="sdot" id="sd4"></div>
+    <button class="modal-close" onclick="closeModal()" aria-label="إغلاق">✕</button>
+    <div class="modal-header">
+      <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
+      <div id="sdots" style="display:none;justify-content:center;align-items:center;gap:6px;margin-bottom:20px">
+        <div class="sdot active" id="sd1"></div><div class="sline" id="sl1"></div>
+        <div class="sdot" id="sd2"></div><div class="sline" id="sl2"></div>
+        <div class="sdot" id="sd3"></div><div class="sline" id="sl3"></div>
+        <div class="sdot" id="sd4"></div>
+      </div>
     </div>
 
     <!-- ══ LOGIN ══ -->
@@ -3216,15 +3218,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <input class="m-input" id="st-owner" type="text" data-ph-fr="Nom du propriétaire" placeholder="اسم صاحب المحل"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="st-phone" type="tel" data-ph-fr="Numéro de téléphone (WhatsApp)" placeholder="رقم الهاتف (واتساب)"/>
       <input class="m-input" id="st-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
-      <select class="m-input" id="st-cat">
-        <option value="" data-t-fr="Catégorie de commerce (pour figurer dans l'annuaire des showrooms)">فئة النشاط التجاري (لتظهر في دليل المعارض)</option>
-        <option value="سيارات" data-t-fr="🚗 Voitures">🚗 سيارات</option>
-        <option value="إلكترونيات" data-t-fr="📱 Électronique">📱 إلكترونيات</option>
-        <option value="أثاث" data-t-fr="🛋️ Meubles">🛋️ أثاث</option>
-        <option value="معدات" data-t-fr="⚙️ Équipements">⚙️ معدات</option>
-        <option value="بناء" data-t-fr="🏗️ Matériaux de construction">🏗️ مواد بناء</option>
-        <option value="ذهب" data-t-fr="💎 Bijoux">💎 مجوهرات</option>
-        <option value="أخرى" data-t-fr="🏷️ Autre">🏷️ أخرى</option>
+      <select class="m-input merchant-activity-select" id="st-cat" data-account-type="store">
+        <option value="">— اختر نشاط المحل —</option>
       </select>
       <input class="m-input" id="st-email" type="email" data-ph-fr="E-mail (optionnel)" placeholder="البريد الإلكتروني (اختياري)"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="st-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale (NNI)" placeholder="الرقم الوطني للتعريف (NNI)"/>
@@ -3258,15 +3253,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="of-phone" type="tel" data-ph-fr="Numéro de téléphone (WhatsApp)" placeholder="رقم الهاتف (واتساب)"/>
       <input class="m-input" id="of-email" type="email" data-ph-fr="E-mail officiel" placeholder="البريد الإلكتروني الرسمي"/>
       <input class="m-input" id="of-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
-      <select class="m-input" id="of-cat">
-        <option value="" data-t-fr="Catégorie de commerce (pour figurer dans l'annuaire des showrooms)">فئة النشاط التجاري (لتظهر في دليل المعارض)</option>
-        <option value="سيارات" data-t-fr="🚗 Voitures">🚗 سيارات</option>
-        <option value="إلكترونيات" data-t-fr="📱 Électronique">📱 إلكترونيات</option>
-        <option value="أثاث" data-t-fr="🛋️ Meubles">🛋️ أثاث</option>
-        <option value="معدات" data-t-fr="⚙️ Équipements">⚙️ معدات</option>
-        <option value="بناء" data-t-fr="🏗️ Matériaux de construction">🏗️ مواد بناء</option>
-        <option value="ذهب" data-t-fr="💎 Bijoux">💎 مجوهرات</option>
-        <option value="أخرى" data-t-fr="🏷️ Autre">🏷️ أخرى</option>
+      <select class="m-input merchant-activity-select" id="of-cat" data-account-type="office">
+        <option value="">— اختر نشاط المكتب —</option>
       </select>
       <div class="m-pw-wrap"><input class="m-input" id="of-pw" type="password" data-ph-fr="Mot de passe (8 caractères+)" placeholder="كلمة المرور (8 أحرف+)"/><button class="m-eye" onclick="tp('of-pw')">👁</button></div>
       <div class="m-pw-wrap" style="margin-bottom:14px"><input class="m-input" id="of-pw2" type="password" data-ph-fr="Confirmer le mot de passe" placeholder="تأكيد كلمة المرور"/><button class="m-eye" onclick="tp('of-pw2')">👁</button></div>
@@ -3306,15 +3294,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="cr-phone" type="tel" data-ph-fr="Numéro de téléphone officiel" placeholder="رقم الهاتف الرسمي"/>
       <input class="m-input" id="cr-email" type="email" data-ph-fr="E-mail officiel" placeholder="البريد الإلكتروني الرسمي"/>
       <input class="m-input" id="cr-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
-      <select class="m-input" id="cr-cat">
-        <option value="" data-t-fr="Catégorie de commerce (pour figurer dans l'annuaire des showrooms)">فئة النشاط التجاري (لتظهر في دليل المعارض)</option>
-        <option value="سيارات" data-t-fr="🚗 Voitures">🚗 سيارات</option>
-        <option value="إلكترونيات" data-t-fr="📱 Électronique">📱 إلكترونيات</option>
-        <option value="أثاث" data-t-fr="🛋️ Meubles">🛋️ أثاث</option>
-        <option value="معدات" data-t-fr="⚙️ Équipements">⚙️ معدات</option>
-        <option value="بناء" data-t-fr="🏗️ Matériaux de construction">🏗️ مواد بناء</option>
-        <option value="ذهب" data-t-fr="💎 Bijoux">💎 مجوهرات</option>
-        <option value="أخرى" data-t-fr="🏷️ Autre">🏷️ أخرى</option>
+      <select class="m-input merchant-activity-select" id="cr-cat" data-account-type="corp">
+        <option value="">— اختر نشاط الشركة —</option>
       </select>
       <div class="m-pw-wrap"><input class="m-input" id="cr-pw" type="password" data-ph-fr="Mot de passe (8 caractères+)" placeholder="كلمة المرور (8 أحرف+)"/><button class="m-eye" onclick="tp('cr-pw')">👁</button></div>
       <div class="m-pw-wrap" style="margin-bottom:14px"><input class="m-input" id="cr-pw2" type="password" data-ph-fr="Confirmer le mot de passe" placeholder="تأكيد كلمة المرور"/><button class="m-eye" onclick="tp('cr-pw2')">👁</button></div>
@@ -3452,6 +3433,15 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
       <!-- Package cards -->
       <div id="pp-pkg-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:220px;overflow-y:auto;padding-right:4px"></div>
+
+      <!-- Activity — filtered dynamically by selected package -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px" data-t-fr="🏷️ Activité commerciale (selon votre forfait)">🏷️ النشاط التجاري (حسب باقتك)</label>
+        <select class="m-input" id="pp-activity-select" style="margin-bottom:0">
+          <option value="">— اختر النشاط —</option>
+        </select>
+        <p style="font-size:10px;color:var(--text-muted);margin-top:6px;line-height:1.6" data-t-fr="La liste se met à jour automatiquement selon le forfait choisi — secteurs non pertinents masqués.">تتحدّث القائمة تلقائياً عند اختيار الباقة — لا تظهر إلا الأنشطة المرتبطة بقطاعك.</p>
+      </div>
 
       <!-- Payment methods -->
       <div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:13px;padding:14px;margin-bottom:14px">
@@ -4940,7 +4930,7 @@ function applyLandingLang(toAr) {
 
   // Modal logo (always Arabic letter)
   document.querySelectorAll('.modal-logo').forEach(function (el) {
-    el.innerHTML = '<img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/>';
+    el.innerHTML = '<img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/>';
   });
 
   // Login panel
@@ -5910,9 +5900,62 @@ function selectBizType(t){
 
 function goFromBizType(){
   if(!bizType){alert(isAr?'يرجى اختيار نوع المؤسسة':'Veuillez choisir le type d\'établissement');return;}
+  renderRegActivitySelects(bizType);
   if(bizType==='store') showPanel('p-store-form',2,4);
   else if(bizType==='office') showPanel('p-office-form',2,4);
   else showPanel('p-corp-form',2,4);
+}
+
+function _regLang(){
+  return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar';
+}
+
+function renderRegActivitySelects(accountType, packageRef){
+  if(!window.RizqMerchantActivities) return;
+  var lang = _regLang();
+  var map = { store: 'st-cat', office: 'of-cat', corp: 'cr-cat' };
+  Object.keys(map).forEach(function(t){
+    var el = document.getElementById(map[t]);
+    if(!el) return;
+    if(accountType && t !== accountType) return;
+    RizqMerchantActivities.renderSelect(el, {
+      accountType: t,
+      packageId: packageRef || null,
+      lang: lang,
+      selected: el.value || '',
+    });
+  });
+  var ppEl = document.getElementById('pp-activity-select');
+  if(ppEl && accountType){
+    RizqMerchantActivities.renderSelect(ppEl, {
+      accountType: accountType,
+      packageId: packageRef || null,
+      lang: lang,
+      selected: ppEl.value || '',
+    });
+  }
+  if(window.RizqActivitySelect){
+    Object.keys(map).forEach(function(t){
+      if(accountType && t !== accountType) return;
+      var el = document.getElementById(map[t]);
+      if(el) RizqActivitySelect.enhance(el);
+    });
+    if(ppEl && accountType) RizqActivitySelect.enhance(ppEl);
+  }
+}
+
+function ppRenderActivitiesForSelectedPkg(){
+  if(!window.RizqMerchantActivities || !_ppSelectedPkg) return;
+  var accountType = (_ppPendingData && _ppPendingData.type) || bizType || 'store';
+  var pkg = _ppPkgCatalog && _ppPkgCatalog[_ppSelectedPkg.idx];
+  var pkgId = pkg && (pkg.id || pkg.packageId) ? (pkg.id || pkg.packageId) : null;
+  renderRegActivitySelects(accountType, pkgId);
+  var formMap = { store: 'st-cat', office: 'of-cat', corp: 'cr-cat' };
+  var formSel = document.getElementById(formMap[accountType]);
+  var ppSel = document.getElementById('pp-activity-select');
+  if(formSel && formSel.value && ppSel){
+    ppSel.value = formSel.value;
+  }
 }
 
 function handleUpload(inputId,zoneId,varName){
@@ -6011,6 +6054,9 @@ function _syncAccountToBackend(acc){
       email: acc.email || '',
       city: acc.city || '',
       category: acc.category || '',
+      activityId: acc.activityId || '',
+      activity: acc.activity || '',
+      packageId: acc.packageId || acc.package_id || '',
       referredBy: acc.referredBy || '',
       // إصلاح 13/08/2026: nni/id_image/license_image كانت تُجمَع بالواجهة (محل/
       // مكتب/شركة) لكن لا تُرسَل هنا إطلاقاً — تبقى حبيسة localStorage فقط
@@ -6097,6 +6143,7 @@ var _ppReceiptB64  = null;
 var _ppReceiptName = '';
 var _ppBackPanel   = 'p-store-form';
 var _ppBackDot     = 2;
+var _ppPkgCatalog  = [];
 
 function ppShowPanel(){
   var t = _ppPendingData ? _ppPendingData.type : 'store';
@@ -6110,8 +6157,8 @@ function ppRenderPackages(btype){
      بدون أي فحص للغة — تظهر بالعربية حتى في الواجهة الفرنسية. الآن تُترجَم
      الأسماء والمزايا والشارات حسب اللغة الحالية. */
   var isFr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
-  var lsKey = btype==='office' ? 'rizq_office_packages' : btype==='individual' ? 'rizq_individual_packages' : 'rizq_store_packages';
-  var catalogKey = btype==='office' ? 'office' : btype==='individual' ? 'individual' : 'store';
+  var lsKey = btype==='office' ? 'rizq_office_packages' : btype==='corp' ? 'rizq_corp_packages' : btype==='individual' ? 'rizq_individual_packages' : 'rizq_store_packages';
+  var catalogKey = btype==='office' ? 'office' : btype==='corp' ? 'corp' : btype==='individual' ? 'individual' : 'store';
   var pkgs=null;
   if(window.RizqPackagesConfig){
     try{
@@ -6166,10 +6213,12 @@ function ppRenderPackages(btype){
       +'</div>';
   });
   document.getElementById('pp-pkg-list').innerHTML=html;
+  _ppPkgCatalog = pkgs.slice();
   // auto-select highlight
   var cards=document.querySelectorAll('.pp-pkg-card');
   var defIdx=1; // monthly by default
   if(cards[defIdx]) ppSelectPkg(cards[defIdx],defIdx);
+  else renderRegActivitySelects(btype, pkgs[0] && pkgs[0].id);
 }
 
 function ppSelectPkg(el,i){
@@ -6192,6 +6241,9 @@ function ppSelectPkg(el,i){
   _ppSelectedPkg.name = nameEl ? nameEl.textContent.trim() : (isAr ? 'شهرية' : 'Mensuelle');
   _ppSelectedPkg.price = priceEl ? priceEl.textContent.trim() : '0';
   _ppSelectedPkg.isTrial = _ppSelectedPkg.price==='مجاني'||_ppSelectedPkg.price==='Gratuit'||_ppSelectedPkg.price==='0'||parseInt(_ppSelectedPkg.price)===0;
+  var pkg = _ppPkgCatalog && _ppPkgCatalog[i];
+  _ppSelectedPkg.id = pkg && pkg.id ? pkg.id : null;
+  ppRenderActivitiesForSelectedPkg();
 }
 
 function ppRenderPayMethods(){
@@ -6247,13 +6299,28 @@ function ppBack(){
 
 function ppFinalSubmit(){
   if(!_ppSelectedPkg){alert(isAr?'يرجى اختيار باقة':'Veuillez choisir un forfait');return;}
+  var accountType = (_ppPendingData && _ppPendingData.type) || bizType || 'store';
+  var activityId = (document.getElementById('pp-activity-select') && document.getElementById('pp-activity-select').value) || '';
+  if(!activityId){
+    var formMap = { store: 'st-cat', office: 'of-cat', corp: 'cr-cat' };
+    var formSel = document.getElementById(formMap[accountType]);
+    activityId = formSel ? formSel.value : '';
+  }
+  if(!activityId){alert(isAr?'يرجى اختيار النشاط التجاري المناسب لباقتك':'Veuillez choisir l\'activité commerciale correspondant à votre forfait');return;}
+  if(window.RizqMerchantActivities && !RizqMerchantActivities.isAllowed(activityId, accountType, _ppSelectedPkg.id)){
+    alert(isAr?'النشاط المختار غير متاح لهذه الباقة':'Cette activité n\'est pas disponible pour ce forfait');return;
+  }
   var isTrial=_ppSelectedPkg.isTrial;
   if(!isTrial && !_ppReceiptB64){
     if(!confirm(isAr?'لم ترفع وصل الدفع بعد. هل تريد المتابعة؟ (يمكنك رفعه لاحقاً من لوحة التحكم)':'Vous n\'avez pas encore téléchargé le reçu de paiement. Voulez-vous continuer ? (Vous pourrez le télécharger plus tard depuis votre tableau de bord)')) return;
   }
   var data = Object.assign({}, _ppPendingData||{});
   data.package      = _ppSelectedPkg.name;
+  data.packageId    = _ppSelectedPkg.id || null;
   data.package_price= _ppSelectedPkg.price;
+  data.activityId   = activityId;
+  data.activity     = window.RizqMerchantActivities ? RizqMerchantActivities.displayName(activityId, _regLang()) : activityId;
+  data.category     = window.RizqMerchantActivities ? RizqMerchantActivities.legacyCategoryFromActivity(activityId) : 'أخرى';
   data.package_paid = !isTrial;
   data.receipt_image= _ppReceiptB64||null;
   data.receipt_name = _ppReceiptName||null;
@@ -6287,7 +6354,7 @@ function submitStoreReg(){
   // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
   // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
   _fileToBase64(stFile).then(function(id_image){
-    _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,category:document.getElementById('st-cat').value,email:document.getElementById('st-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+    _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
     _ppBackPanel='p-store-form'; _ppBackDot=2;
     ppShowPanel();
   });
@@ -6311,7 +6378,7 @@ function submitOfficeReg(){
   // (license_image) — كلاهما كان يُفقَد تماماً بعد الرفع، لم يُقرآ أبداً.
   Promise.all([_fileToBase64(ofFile2), _fileToBase64(ofFile1)]).then(function(r){
     var id_image=r[0], license_image=r[1];
-    _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,category:document.getElementById('of-cat').value,ninea:document.getElementById('of-ninea').value.trim(),trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+    _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),trial_ends:new Date(Date.now()+10*86400000).toISOString()};
     _ppBackPanel='p-office-form'; _ppBackDot=2;
     ppShowPanel();
   });
@@ -6337,7 +6404,7 @@ function submitCorpReg(){
   // وختم/رخصة الشركة (crFile2) كـlicense_image.
   Promise.all([_fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
     var id_image=r[0], license_image=r[1];
-    _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,category:document.getElementById('cr-cat').value,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+    _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
     _ppBackPanel='p-corp-form'; _ppBackDot=2;
     ppShowPanel();
   });
@@ -7622,6 +7689,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
 <script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_activity_select.js?v=2"></script>
 <script src="rizq_packages_ui.js?v=12.7"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>

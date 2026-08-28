@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { saveTicket } = require('./agentTickets');
-const { getPackagesForTool } = require('../../rizq_packages_config');
+const { getLivePackagesForAI, normalizeCatalogKey } = require('./packageCatalogLive');
 const { handleLeadEscalation } = require('./leadEscalation');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -128,11 +128,16 @@ const WIDGET_TOOLS = [
   },
   {
     name: 'get_packages_info',
-    description: 'باقات الاشتراك وأسعارها الرسمية في رزق',
+    description: 'باقات الاشتراك وأسعارها الرسمية في رزق — يجب تمرير catalog عند تحديد نوع النشاط (store/office/corp)',
     input_schema: {
       type: 'object',
       properties: {
-        lang: { type: 'string', enum: ['ar', 'hs', 'fr', 'en', 'es'], description: 'Reply language for package names (auto-detected from user message)' },
+        lang: { type: 'string', enum: ['ar', 'hs', 'fr', 'en', 'es'], description: 'Reply language for package names' },
+        catalog: {
+          type: 'string',
+          enum: ['store', 'office', 'corp', 'general', 'individual'],
+          description: 'Business category catalog — REQUIRED when user mentions محل/متجر (store), مكتب (office), or شركة (corp). Returns ONLY that category live prices.',
+        },
       },
     },
   },
@@ -181,7 +186,8 @@ const WIDGET_TOOLS = [
   },
 ];
 
-function executeWidgetToolSync(toolName, input) {
+function executeWidgetToolSync(toolName, input, meta) {
+  meta = meta || {};
   switch (toolName) {
     case 'get_ad_details': {
       const id = String((input || {}).ad_id || '').trim();
@@ -221,11 +227,10 @@ function executeWidgetToolSync(toolName, input) {
     }
     case 'get_packages_info': {
       const lang = (input && input.lang) ? String(input.lang).toLowerCase() : 'ar';
-      return {
-        ok: true,
-        source: 'rizq_packages_config',
-        packages: getPackagesForTool(lang),
-      };
+      const catalog = normalizeCatalogKey(
+        (input && input.catalog) || (meta && meta.catalogHint)
+      );
+      return getLivePackagesForAI(lang, { catalog });
     }
     case 'create_support_ticket': {
       const rec = saveTicket({
@@ -245,14 +250,25 @@ function executeWidgetToolSync(toolName, input) {
   }
 }
 
-async function executeWidgetTool(toolName, input) {
+async function executeWidgetTool(toolName, input, meta) {
+  meta = meta || {};
   if (toolName === 'register_interest') {
-    return handleLeadEscalation('register_interest', input, { source: 'widget', channel: 'widget' });
+    return handleLeadEscalation('register_interest', input, {
+      source: 'widget',
+      channel: 'widget',
+      lang: meta.lang || 'ar',
+      pageContext: meta.pageContext || null,
+    });
   }
   if (toolName === 'escalate_to_human') {
-    return handleLeadEscalation('escalate_to_human', input, { source: 'widget', channel: 'widget' });
+    return handleLeadEscalation('escalate_to_human', input, {
+      source: 'widget',
+      channel: 'widget',
+      lang: meta.lang || 'ar',
+      pageContext: meta.pageContext || null,
+    });
   }
-  return executeWidgetToolSync(toolName, input);
+  return executeWidgetToolSync(toolName, input, meta);
 }
 
 /** تحميل سياق الصفحة من الخادم (تحقق من DB) */
