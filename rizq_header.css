@@ -1398,6 +1398,15 @@ body::after,.rizq-splash,.rizq-splash.is-done{
   max-height:none !important;
 }
 
+/* Footer ADMINIA powered-by — readable on navy (pages without rizq-theme.css) */
+html body footer .adminia-ft > div:last-child > div:last-child,
+html body footer div[style*="letter-spacing:1.5px"][style*="margin-top:3px"]{
+  color:rgba(255,255,255,.62)!important;
+}
+html body footer .adminia-ft span[style*="font-weight:700"]{
+  color:rgba(201,168,76,.85)!important;
+}
+
 /* Mediator / escrow side badge — always clickable, never covers the header */
 .fixed-disc-pill{
   position:fixed !important;

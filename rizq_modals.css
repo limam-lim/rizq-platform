@@ -258,7 +258,7 @@ body.rizq-dash .modal-close:hover,
 }
 
 .cs-modal-input::placeholder {
-  color: rgba(255, 255, 255, 0.38) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
 .cs-modal-input:focus {
@@ -411,7 +411,7 @@ body.rizq-dash .cs-modal-input {
 }
 
 .rag-modal .rag-input::placeholder {
-  color: rgba(255, 255, 255, 0.38) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
 .rag-modal .rag-input:focus {
@@ -442,7 +442,7 @@ body.rizq-dash .cs-modal-input {
 }
 
 .rag-modal .rag-privacy {
-  color: rgba(255, 255, 255, 0.45) !important;
+  color: rgba(255, 255, 255, 0.68) !important;
   font-size: 10.5px !important;
   text-align: center !important;
   margin-top: 14px !important;

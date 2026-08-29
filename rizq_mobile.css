@@ -509,7 +509,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 .cs-modal-title{font-size:15px;font-weight:700;color:#f3de9c;margin-bottom:6px}
 .cs-modal-desc{font-size:12px;color:rgba(255,255,255,.72);margin-bottom:14px;line-height:1.6}
 .cs-modal-input{width:100%;padding:10px 12px;border:1.5px solid rgba(201,168,76,.28);border-radius:10px;font-size:13px;margin-bottom:10px;box-sizing:border-box;font-family:inherit;background:rgba(255,255,255,.07);color:#fff}
-.cs-modal-input::placeholder{color:rgba(255,255,255,.38)}
+.cs-modal-input::placeholder{color:rgba(255,255,255,.55)}
 .cs-modal-submit{width:100%;background:linear-gradient(135deg,#a67c2e,#c9a84c,#e8cc7a);color:#0D1B2A;border:none;border-radius:10px;padding:10px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit}
 .cs-modal-cancel{background:none;border:none;color:rgba(255,255,255,.55);font-size:12px;cursor:pointer;font-family:inherit}
 #rizq-toast-global{

@@ -2,6 +2,11 @@
 
 :root {
   --rizq-navy-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
+  --text-on-navy: rgba(255, 255, 255, 0.88);
+  --text-on-navy-muted: rgba(255, 255, 255, 0.85);
+  --text-on-navy-soft: rgba(255, 255, 255, 0.72);
+  --text-on-light: #1a2535;
+  --text-muted-on-light: #5b6b85;
 }
 
 .section-header,
@@ -31,6 +36,17 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   background-size: auto, 60px 60px !important;
   background-repeat: no-repeat, repeat !important;
   background-blend-mode: overlay;
+}
+
+/* Navy section-header panels — keep copy readable on gradient bg above */
+.section-header .section-title {
+  color: var(--text-on-navy, rgba(255, 255, 255, 0.94)) !important;
+}
+.section-header .section-desc {
+  color: var(--text-on-navy-muted, rgba(255, 255, 255, 0.85)) !important;
+}
+.section-header .section-tag {
+  color: var(--gold, #C9A84C) !important;
 }
 
 html body footer,
@@ -900,8 +916,18 @@ footer a:hover, footer button:hover { color:#C9A84C !important; }
 }
 .adminia-n span { color:var(--gold) !important; }
 .adminia-s { font-size:8px !important; letter-spacing:5px; color:rgba(201,168,76,0.55) !important; margin-top:2px; }
-.adminia-p { font-size:8px !important; color:rgba(255,255,255,0.2) !important; letter-spacing:1.5px; margin-top:3px; }
-.adminia-p strong { color:rgba(201,168,76,0.6) !important; }
+.adminia-p,
+html body footer .adminia-ft > div:last-child > div:last-child,
+html body footer div[style*="letter-spacing:1.5px"][style*="margin-top:3px"] {
+  font-size: 8px !important;
+  color: rgba(255, 255, 255, 0.62) !important;
+  letter-spacing: 1.5px;
+  margin-top: 3px;
+}
+.adminia-p strong,
+html body footer .adminia-ft span[style*="font-weight:700"] {
+  color: rgba(201, 168, 76, 0.85) !important;
+}
 .ft-bottom {
   padding:18px 0 !important;
   display:flex !important; flex-direction:row !important;
@@ -913,7 +939,12 @@ footer a:hover, footer button:hover { color:#C9A84C !important; }
 @media(max-width:768px){
   .ft-bottom { flex-direction:column !important; }
 }
-.ft-copy { font-size:12px !important; color:rgba(255,255,255,0.22) !important; text-align:center; }
+.ft-copy,
+html body footer .footer-copy {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  text-align: center;
+}
 
 /* ══════════════════════════════════
    5. PRIX & CONTACT
