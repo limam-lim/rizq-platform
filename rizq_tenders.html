@@ -181,7 +181,7 @@ body{
 @media (prefers-reduced-motion: reduce){.hero-eyebrow,.hero h1,.hero p,.hero-cta,.t-card{animation:none;opacity:1}}
 </style>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 </head>
 <body>
 
@@ -320,7 +320,7 @@ body{
     <div class="disc-section"><h3 id="disc-h5">🔒 البيانات والخصوصية</h3><p id="disc-p5"></p></div>
     <div class="disc-footer">
       <div id="disc-footer-main" style="font-size:12.5px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.8"></div>
-      <div style="font-size:11px;color:rgba(201,168,76,.6)">Rizq Platform · موريتانيا ©</div>
+      <div style="font-size:11px;color:rgba(201,168,76,.6)" id="disc-footer-copy">Rizq Platform · موريتانيا ©</div>
       <br><span class="disc-close-btn" id="disc-close-lbl" onclick="closeDisc()">فهمت — أغلق</span>
     </div>
   </div>
@@ -844,6 +844,8 @@ function applyLang(){
     el.innerHTML = l==='fr' ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');
   });
   if(typeof window._discApply==='function') window._discApply(l);
+  var discCopy = document.getElementById('disc-footer-copy');
+  if (discCopy) discCopy.textContent = l === 'fr' ? 'Rizq Platform · Mauritanie ©' : 'Rizq Platform · موريتانيا ©';
   renderCatChips();
   renderTenders();
   try {

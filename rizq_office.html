@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<title>المكاتب — رزق أوفيس</title>
+<title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
 <style>
 :root{
   --navy:#1B3A6B; --navy2:#0F2347; --navy3:#06111C;
@@ -566,7 +566,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <!-- مطلوب لحساب شارة "موثّق"/"مميّز" الحقيقية (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
@@ -603,7 +603,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     <div class="hero-left">
       <div class="verified-badge" id="verified-badge" data-t="verified-badge">🛡️ مكتب موثَّق ومعتمد على منصة رزق</div>
       <div class="verified-badge" id="premium-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d" data-t="premium-badge-lbl">🏅 وكالة مميّزة برزق</div>
-      <div class="verified-badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;gap:6px;align-items:center;border:1px solid rgba(201,168,76,.5)"><svg viewBox="0 0 40 40" width="14" height="14" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</div>
+      <div class="verified-badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;gap:6px;align-items:center;border:1px solid rgba(201,168,76,.5)"><svg viewBox="0 0 40 40" width="14" height="14" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> <span data-t="verified-plus-badge-txt">موثّق⁺</span></div>
       <h1 class="hero-title">
         <span id="hero-office-name" data-t="hero-office-name">مكتب الفجر</span><br/>
         <span class="gold-txt" id="hero-office-spec" data-t="hero-office-spec">للتأمين والخدمات</span>
@@ -773,7 +773,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn">إرسال طلب ←</button>
         <div class="req-form" id="req-form">
           <input class="req-input" id="rf-name" placeholder="اسمك الكامل *" style="margin-top:14px"/ data-ph="rf-name">
-          <input dir="ltr" class="req-input" id="rf-phone" placeholder="+222 XX XX XX XX *"/>
+          <input dir="ltr" class="req-input" id="rf-phone" placeholder="+222 XX XX XX XX *" data-ph="rf-phone-ph"/>
           <select class="req-input" id="rf-service">
             <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
             <option id="rf-svc-opt1" data-t="rf-svc-opt1">تأمين السيارات الخاصة</option>
@@ -1053,14 +1053,13 @@ function calcEstimate(){
   var priceEl = document.getElementById('calc-price');
   var lblEl = document.getElementById('calc-result-lbl');
   if(svc.base == null){
-    // لا سعر رقمي معروض لهذه الخدمة — لا نختلق رقماً، نعرض ذلك بصدق
-    if(lblEl) lblEl.textContent = 'ℹ️ السعر';
-    if(priceEl) priceEl.textContent = 'يُحدَّد حسب التفاصيل — تواصل مباشرة';
+    if(lblEl) lblEl.textContent = _t2('ℹ️ السعر','ℹ️ Tarif');
+    if(priceEl) priceEl.textContent = _t2('يُحدَّد حسب التفاصيل — تواصل مباشرة','À définir selon les détails — contactez directement');
   } else {
     var base = svc.base, lo, hi;
     if(cov === 'full'){ lo = Math.round(base*1.4/500)*500; hi = Math.round(base*2.2/500)*500; }
     else { lo = base; hi = Math.round(base*1.5/500)*500; }
-    if(lblEl) lblEl.textContent = '💰 النطاق التقريبي';
+    if(lblEl) lblEl.textContent = _t2('💰 النطاق التقريبي','💰 Fourchette estimée');
     if(priceEl) priceEl.textContent = lo.toLocaleString('en-US') + ' — ' + hi.toLocaleString('en-US') + ' MRU';
   }
   resultBox.style.display = 'block';
@@ -1074,7 +1073,10 @@ function calcToRequest(){
   var msgEl = document.getElementById('rf-msg');
   var priceEl = document.getElementById('calc-price');
   if(msgEl && !msgEl.value.trim() && priceEl){
-    msgEl.value = 'مهتم بعد استخدام مقدّر التكلفة (' + priceEl.textContent + ') — أرجو تأكيد السعر النهائي.';
+    msgEl.value = _t2(
+      'مهتم بعد استخدام مقدّر التكلفة (' + priceEl.textContent + ') — أرجو تأكيد السعر النهائي.',
+      'Intéressé après l\'estimateur (' + priceEl.textContent + ') — merci de confirmer le tarif final.'
+    );
   }
   var nameEl = document.getElementById('rf-name');
   if(nameEl) nameEl.focus();
@@ -1757,7 +1759,7 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_packages_config.js?v=12.7"></script>
-<script src="rizq_packages_ui.js?v=12.7"></script>
+<script src="rizq_packages_ui.js?v=12.9"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
   <script src="rizq_video_ads.js"></script>

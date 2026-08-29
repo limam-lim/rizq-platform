@@ -579,7 +579,7 @@ footer{
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
@@ -2036,9 +2036,14 @@ if(typeof _t2 === 'undefined'){
     document.querySelectorAll('[data-t]').forEach(function(el){
       var key = el.getAttribute('data-t');
       if(!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
-      if(isFr && STORE_FR[key]){
-        el.innerHTML = STORE_FR[key];
-      } else if(!isFr){
+      if(isFr){
+        var frVal = STORE_FR[key];
+        if(!frVal && window.RizqI18n && typeof window.RizqI18n.t === 'function'){
+          try { frVal = window.RizqI18n.t(key); } catch(eT){ frVal = ''; }
+        }
+        if(frVal && /[\u0600-\u06FF]/.test(frVal)) frVal = '';
+        if(frVal) el.innerHTML = frVal;
+      } else {
         el.innerHTML = el.getAttribute('data-t-ar');
       }
     });

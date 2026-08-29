@@ -9,6 +9,7 @@ const {
   getCatalog,
   priceLabel,
   localizedName,
+  catalogPackageLabel,
 } = require('../../rizq_packages_config');
 
 const CATALOG_KEYS = ['general', 'store', 'office', 'corp', 'individual'];
@@ -48,6 +49,7 @@ const DIAMOND_PRO_IDS = ['diamond_pro', 'st-diam-pro', 'of-diam-pro', 'cp-diam-p
 function inferCatalogFromRef(refStr) {
   const r = String(refStr || '');
   if (/للمكاتب|المكاتب|للمكتب|المكتب|(?:^|\s)مكاتب|(?:^|\s)مكتب(?:\s|$|[؟?.!،,])|office|bureau|professionnel|of-diam/i.test(r)) return 'office';
+  if (/للمعارض|المعارض|(?:^|\s)معارض|(?:^|\s)معار[ي|ش|ض]|(?:^|\s)معرض(?:\s|$|[؟?.!،,])|showroom|showrooms|galerie|galeries|gallery|salon/i.test(r)) return 'corp';
   if (/للمحلات|المحلات|للمحل|المحل|للمتجر|المتجر|(?:^|\s)محل(?:\s|$|[؟?.!،,])|(?:^|\s)متجر|boutique|store|tienda|st-diam/i.test(r)) return 'store';
   if (/للشركات|الشركات|(?:^|\s)شركة|(?:^|\s)مؤسسة|corp|entreprise|enterprise|cp-diam/i.test(r)) return 'corp';
   if (/(?:^|\s)(?:فرد|individual|annonce|classified)/i.test(r)) return 'individual';
@@ -57,12 +59,52 @@ function inferCatalogFromRef(refStr) {
   return null;
 }
 
+/** يستنتج القسم التجاري من رسالة واحدة — نص الرسالة يتقدّم على catalogHint القديم */
+function inferCatalogFromMessageText(msg, catalogHint) {
+  const s = String(msg || '').trim();
+  if (!s) return normalizeCatalogKey(catalogHint) || null;
+
+  const negStore = /(?:لا|ليس|غير|مو|ليسة)\s*[\w\u0600-\u06FF\s،,.]{0,32}(?:محلات|محل|متجر|متاجر|store|boutique|tienda)/i.test(s);
+  const negOffice = /(?:لا|ليس|غير|مو|ليسة)\s*[\w\u0600-\u06FF\s،,.]{0,32}(?:مكاتب|مكتب|office|bureau)/i.test(s);
+  const negShowroom = /(?:لا|ليس|غير|مو|ليسة)\s*[\w\u0600-\u06FF\s،,.]{0,32}(?:معارض|معرض|showroom|galerie|gallery)/i.test(s);
+
+  const wantsShowroom = /(?:للمعارض|المعارض|(?:^|\s)معارض|(?:^|\s)معار[ي|ش|ض]|(?:^|\s)معرض(?:\s|$|[؟?.!،,])|showroom|showrooms|galerie|galeries|gallery|salon)/i.test(s);
+  const wantsOffice = /(?:للمكاتب|للمكتب|المكاتب|المكتب|office|bureau|of-diam)/i.test(s);
+  const wantsStore = /(?:للمحلات|للمحل|المحلات|المحل|للمتجر|store|boutique|st-diam)/i.test(s);
+  const wantsCorp = /(?:للشركات|الشركات|(?:^|\s)شركة|corp|entreprise|cp-diam)/i.test(s);
+
+  if (wantsShowroom && !negShowroom) return 'corp';
+  if (negStore && wantsShowroom) return 'corp';
+  if (negStore && /(?:قصدي|بل|أريد|اريد|ودي|بغيت)\s*[\w\u0600-\u06FF\s،,.]{0,24}(?:معارض|معرض|showroom)/i.test(s)) return 'corp';
+  if (wantsOffice && !negOffice) return 'office';
+  if (wantsStore && !negStore) return 'store';
+  if (wantsCorp && !negShowroom) return 'corp';
+
+  if (negStore && wantsOffice) return 'office';
+  if (negOffice && wantsShowroom) return 'corp';
+
+  return inferCatalogFromRef(s) || normalizeCatalogKey(catalogHint) || null;
+}
+
+function catalogFromPackageId(id) {
+  const s = String(id || '').toLowerCase();
+  if (s.startsWith('st-')) return 'store';
+  if (s.startsWith('of-')) return 'office';
+  if (s.startsWith('cp-')) return 'corp';
+  return null;
+}
+
+function mentionsShowroomSegment(text) {
+  return /(?:للمعارض|المعارض|(?:^|\s)معارض|(?:^|\s)معار[ي|ش|ض]|(?:^|\s)معرض(?:\s|$|[؟?.!،,])|showroom|showrooms|galerie|galeries|gallery|salon)/i.test(String(text || ''));
+}
+
 function normalizeCatalogKey(raw) {
   const key = String(raw || '').trim().toLowerCase();
   if (!key) return null;
   if (key === 'stores' || key === 'shop' || key === 'shops') return 'store';
   if (key === 'offices' || key === 'bureau') return 'office';
   if (key === 'corporate' || key === 'company' || key === 'companies') return 'corp';
+  if (key === 'showroom' || key === 'showrooms' || key === 'gallery' || key === 'galerie') return 'corp';
   if (CATALOG_KEYS.includes(key)) return key;
   return null;
 }
@@ -74,8 +116,66 @@ function inferCatalogFromMessage(text, meta) {
   const pageContext = meta.pageContext || {};
   const page = String(pageContext.page || pageContext.path || pageContext.url || '');
   if (/office|مكتب|bureau/i.test(page)) return 'office';
+  if (/showroom|معرض|gallery|galerie/i.test(page)) return 'corp';
   if (/store|محل|boutique|dashboard_store/i.test(page)) return 'store';
   if (/corp|company|شركة|dashboard_corp/i.test(page)) return 'corp';
+  return null;
+}
+
+/** يستنتج معرّف الباقة (of-diam-pro…) من رسالة واحدة + قسم تجاري */
+function inferPackageRefFromMessage(msg, catalogHint) {
+  const s = String(msg || '').trim();
+  if (!s) return null;
+
+  const idMatch = s.match(/\b(of|st|cp)-diam-(std|pro)\b/i);
+  if (idMatch) return `${idMatch[1].toLowerCase()}-diam-${idMatch[2].toLowerCase()}`;
+
+  let cat = inferCatalogFromMessageText(s, catalogHint);
+  if (!cat) return null;
+
+  const hasPro = /(?:\bpro\b|برو|متقد(?:مة)?|advanced|premium)/i.test(s);
+  const hasDiamond = /(?:ماس(?:ية)?|diamond|diamant)/i.test(s);
+  const wantsBasic = /(?:أساس(?:ية)?|standard|basic|basique)/i.test(s);
+  const negBasic = /(?:لا|ليس|غير|مو)\s*[\w\u0600-\u06FF\s،,.]{0,22}(?:أساس(?:ية)?|standard|basic)/i.test(s);
+  const affirmPro = /(?:بل|أريد|اريد|بغيت|ودي)\s*[\w\u0600-\u06FF\s،,.]{0,28}(?:pro|برو|متقد)/i.test(s);
+  const negPro = /(?:لا|ليس|غير)\s*[\w\u0600-\u06FF\s،,.]{0,18}(?:pro|برو|متقد)/i.test(s);
+
+  const tierPro = (hasPro || affirmPro || negBasic) && !negPro;
+  const tierStd = (wantsBasic && !hasPro && !affirmPro) || (negPro && !hasPro);
+
+  if (cat === 'office') {
+    if (tierPro || (/ماس\s*pro|pro\s*ماس|ماسية\s*pro|برو/i.test(s) && !tierStd)) return 'of-diam-pro';
+    if (hasDiamond || tierStd) return 'of-diam-std';
+  }
+  if (cat === 'store') {
+    if (tierPro || (/ماس\s*pro|pro\s*ماس|ماسية\s*pro|برو/i.test(s) && !tierStd)) return 'st-diam-pro';
+    if (hasDiamond || tierStd) return 'st-diam-std';
+  }
+  if (cat === 'corp') {
+    if (tierPro || (/ماس\s*pro|pro\s*ماس|ماسية\s*pro|برو/i.test(s) && !tierStd)) return 'cp-diam-pro';
+    if (hasDiamond || tierStd) return 'cp-diam-std';
+  }
+  return null;
+}
+
+/** الأحدث أولاً — يلتقط تصحيحات «لا الأساسية بل Pro للمكاتب» (رسائل المستخدم فقط) */
+function inferPackageRefFromConversation(meta, catalogHint) {
+  meta = meta || {};
+  const messages = [];
+  if (meta.userText) messages.push(String(meta.userText));
+  if (Array.isArray(meta.history)) {
+    meta.history.slice(-10).reverse().forEach((h) => {
+      if (!h || !h.text) return;
+      const role = String(h.role || h.sender || '').toLowerCase();
+      if (role === 'agent' || role === 'assistant' || role === 'bot') return;
+      messages.push(String(h.text));
+    });
+  }
+  for (let i = 0; i < messages.length; i += 1) {
+    const msgCat = inferCatalogFromMessageText(messages[i], i === 0 ? catalogHint : null);
+    const ref = inferPackageRefFromMessage(messages[i], msgCat);
+    if (ref) return ref;
+  }
   return null;
 }
 
@@ -83,6 +183,7 @@ function inferCatalogHint(meta, packageRef) {
   if (meta && meta.catalogHint) return normalizeCatalogKey(meta.catalogHint);
   const pageContext = (meta && meta.pageContext) || {};
   const page = String(pageContext.page || pageContext.path || pageContext.url || '');
+  if (/showroom|معرض|gallery|galerie|dashboard_corp/i.test(page)) return 'corp';
   if (/store|محل|boutique|dashboard_store/i.test(page)) return 'store';
   if (/office|مكتب|bureau|dashboard_office/i.test(page)) return 'office';
   if (/corp|company|شركة|dashboard_corp/i.test(page)) return 'corp';
@@ -91,7 +192,18 @@ function inferCatalogHint(meta, packageRef) {
     if (t) return t;
   }
   if (pageContext.store && pageContext.store.name) return 'store';
-  return inferCatalogFromRef(packageRef);
+  let contextBlob = [
+    packageRef,
+    meta && meta.userText,
+    meta && meta.notes,
+    meta && meta.reason,
+  ].filter(Boolean).join(' ');
+  if (meta && Array.isArray(meta.history)) {
+    meta.history.slice(-6).forEach((h) => {
+      if (h && h.text) contextBlob += ' ' + String(h.text);
+    });
+  }
+  return inferCatalogFromRef(contextBlob);
 }
 
 function findInCatalogByRef(ref, catalogKey, lang) {
@@ -147,6 +259,7 @@ function findInAllCatalogs(ref, lang, preferredCatalog) {
 function resolveLivePackageQuote(packageRef, lang, opts) {
   lang = String(lang || 'ar').toLowerCase();
   opts = opts || {};
+  const userContext = opts.userContext || opts.userText || '';
   const refStr = typeof packageRef === 'string'
     ? packageRef
     : String(
@@ -155,47 +268,53 @@ function resolveLivePackageQuote(packageRef, lang, opts) {
 
   if (!refStr) return null;
 
+  if (/^(of|st|cp)-diam-(std|pro)$/i.test(refStr)) {
+    const catFromId = refStr.startsWith('of-') ? 'office' : refStr.startsWith('st-') ? 'store' : 'corp';
+    const idHit = findInCatalogByRef(refStr, catFromId, lang);
+    if (idHit) return quoteFromHit(idHit, catFromId, lang, userContext);
+  }
+
   const catalogHint = normalizeCatalogKey(opts.catalogHint || opts.catalog) || inferCatalogFromRef(refStr);
   const strictCatalog = !!catalogHint;
 
   if (strictCatalog) {
     let hit = findInCatalogByRef(refStr, catalogHint, lang);
-    if (hit) return quoteFromHit(hit, catalogHint);
+    if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
 
     if (/pro|متقد|advanced|premium/i.test(refStr) && /(?:ماس|diamond|diamant)/i.test(refStr)) {
       hit = findDiamondByTier('diamond_pro', lang, catalogHint, true);
-      if (hit) return quoteFromHit(hit, catalogHint);
+      if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
     }
     if (/(?:ماس|diamond|diamant)/i.test(refStr) && !/pro|متقد|advanced|premium/i.test(refStr)) {
       hit = findDiamondByTier('diamond_standard', lang, catalogHint, true);
-      if (hit) return quoteFromHit(hit, catalogHint);
+      if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
     }
     if (/pro|متقد|advanced|premium/i.test(refStr)) {
       hit = findDiamondByTier('diamond_pro', lang, catalogHint, true);
-      if (hit) return quoteFromHit(hit, catalogHint);
+      if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
     }
     if (/(?:ماس|diamond|diamant|أساس|standard|باق)/i.test(refStr)) {
       hit = findDiamondByTier('diamond_standard', lang, catalogHint, true);
-      if (hit) return quoteFromHit(hit, catalogHint);
+      if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
     }
     return null;
   }
 
   let hit = findInAllCatalogs(refStr, lang, catalogHint);
-  if (hit) return quoteFromHit(hit, hit.catalog);
+  if (hit) return quoteFromHit(hit, hit.catalog, lang, userContext);
 
   if (catalogHint) {
     hit = findInCatalogByRef(refStr, catalogHint, lang);
-    if (hit) return quoteFromHit(hit, catalogHint);
+    if (hit) return quoteFromHit(hit, catalogHint, lang, userContext);
   }
 
   if (/pro|متقد|advanced|premium/i.test(refStr) && /(?:ماس|diamond|diamant)/i.test(refStr)) {
     hit = findDiamondByTier('diamond_pro', lang, catalogHint);
-    if (hit) return quoteFromHit(hit, hit.catalog);
+    if (hit) return quoteFromHit(hit, hit.catalog, lang, userContext);
   }
   if (/(?:ماس|diamond|diamant)/i.test(refStr) && !/pro|متقد|advanced|premium/i.test(refStr)) {
     hit = findDiamondByTier('diamond_standard', lang, catalogHint);
-    if (hit) return quoteFromHit(hit, hit.catalog);
+    if (hit) return quoteFromHit(hit, hit.catalog, lang, userContext);
   }
 
   if (!hit && /pro|متقد|advanced|premium/i.test(refStr)) {
@@ -205,18 +324,77 @@ function resolveLivePackageQuote(packageRef, lang, opts) {
   }
 
   if (!hit) return null;
-  return quoteFromHit(hit, hit.catalog || catalogHint || 'general');
+  return quoteFromHit(hit, hit.catalog || catalogHint || 'general', lang, userContext);
 }
 
-function quoteFromHit(hit, catalog) {
+function resolveCatalogSpecificHit(hit, catalog, lang) {
+  if (!hit) return hit;
+  const cat = normalizeCatalogKey(catalog);
+  if (!cat || cat === 'general' || cat === 'individual') return hit;
+  const id = String(hit.id || '');
+  if (/^(st|of|cp)-diam-(std|pro)$/i.test(id)) return hit;
+  if (/diamond|diam|pro|standard|cp-diam/i.test(id)) {
+    const tier = /pro|diamond_pro|cp-diam(?!-std)/i.test(id) ? 'diamond_pro' : 'diamond_standard';
+    const specific = findDiamondByTier(tier, lang, cat, true);
+    if (specific) return specific;
+  }
+  return hit;
+}
+
+function buildUserContextFromMeta(meta) {
+  meta = meta || {};
+  const parts = [];
+  if (meta.userText) parts.push(String(meta.userText));
+  if (Array.isArray(meta.history)) {
+    meta.history.slice(-8).forEach((h) => {
+      if (!h || !h.text) return;
+      const role = String(h.role || h.sender || '').toLowerCase();
+      if (role === 'agent' || role === 'assistant' || role === 'bot') return;
+      parts.push(String(h.text));
+    });
+  }
+  return parts.join('\n');
+}
+
+function quoteDisplayName(pkg, lang, userContext) {
+  if (!pkg) return '';
+  lang = String(lang || 'ar').toLowerCase();
+  const id = String(pkg.id || '');
+  const ctx = String(userContext || '');
+  if (mentionsShowroomSegment(ctx)) {
+    if (id === 'cp-diam-pro') {
+      return ({ ar: 'الماسية Pro للمعارض', fr: 'Diamant Pro showroom', en: 'Showroom Diamond Pro', es: 'Diamante Pro showroom' })[lang]
+        || 'الماسية Pro للمعارض';
+    }
+    if (id === 'cp-diam-std') {
+      return ({ ar: 'الماسية الأساسية للمعارض', fr: 'Diamant Standard showroom', en: 'Showroom Diamond Standard', es: 'Diamante Standard showroom' })[lang]
+        || 'الماسية الأساسية للمعارض';
+    }
+  }
+  const catalogLabel = catalogPackageLabel(id, lang);
+  if (catalogLabel) return catalogLabel;
+  if (/^(st|of|cp)-diam-(std|pro)$/i.test(id) && pkg.name) {
+    return String(pkg.name).replace(/💎\s*/g, '').trim();
+  }
+  if (pkg.name && /للمحلات|للمكاتب|للشركات|للمعارض|boutique|bureau|entreprise|showroom|tienda|oficina/i.test(String(pkg.name))) {
+    return String(pkg.name).replace(/💎\s*/g, '').trim();
+  }
+  return String(localizedName(pkg, lang) || pkg.name || '').replace(/💎\s*/g, '').trim();
+}
+
+function quoteFromHit(hit, catalog, lang, userContext) {
+  lang = String(lang || 'ar').toLowerCase();
+  const cat = normalizeCatalogKey(catalog) || hit.catalog || 'general';
+  const pkg = resolveCatalogSpecificHit(hit, cat, lang);
+  const name = quoteDisplayName(pkg, lang, userContext);
   return {
-    id: hit.id,
-    catalog: catalog || 'general',
-    name: hit.name,
-    price: Number(hit.price) || 0,
-    priceLabel: hit.priceLabel || String(hit.price) + ' MRU',
-    features: hit.features || [],
-    discountPct: hit.discountPct || 0,
+    id: pkg.id,
+    catalog: cat,
+    name,
+    price: Number(pkg.price) || 0,
+    priceLabel: pkg.priceLabel || priceLabel(pkg, lang),
+    features: pkg.features || [],
+    discountPct: pkg.discountPct || 0,
     source: 'live_catalog',
     fetchedAt: new Date().toISOString(),
   };
@@ -323,7 +501,7 @@ function buildCategoryDiamondChatSummary(lang, catalogHint) {
   const std = tiers.std;
   const pro = tiers.pro;
   const catLabels = {
-    ar: { store: 'المحلات', office: 'المكاتب', corp: 'الشركات', general: 'عام', individual: 'الأفراد' },
+    ar: { store: 'المحلات', office: 'المكاتب', corp: 'الشركات والمعارض', general: 'عام', individual: 'الأفراد' },
     fr: { store: 'boutiques', office: 'bureaux', corp: 'entreprises', general: 'général', individual: 'particuliers' },
     en: { store: 'stores', office: 'offices', corp: 'companies', general: 'general', individual: 'individuals' },
     es: { store: 'tiendas', office: 'oficinas', corp: 'empresas', general: 'general', individual: 'particulares' },
@@ -429,7 +607,13 @@ module.exports = {
   resolveLivePackageQuote,
   inferCatalogFromRef,
   inferCatalogFromMessage,
+  inferCatalogFromMessageText,
   inferCatalogHint,
+  inferPackageRefFromMessage,
+  inferPackageRefFromConversation,
+  catalogFromPackageId,
+  mentionsShowroomSegment,
+  buildUserContextFromMeta,
   getLivePackagesForAI,
   getDiamondTierPackages,
   collectLivePackagePrices,

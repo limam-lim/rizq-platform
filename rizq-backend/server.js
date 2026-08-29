@@ -491,6 +491,12 @@ app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
       source: 'widget-api',
       channel: body.channel || 'widget',
       kind: body.kind || 'register_interest',
+      lang: body.lang || 'ar',
+      pageContext: body.pageContext || null,
+      catalogHint: body.catalog_hint || body.catalogHint || null,
+      userText: body.user_message || body.message || null,
+      notes: body.notes || null,
+      history: body.history || null,
     });
     if (!result.ok) return res.status(400).json(result);
     res.json(result);
@@ -508,6 +514,12 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
       source: 'widget-api',
       channel: body.channel || 'widget',
       kind: body.kind || 'register_interest',
+      lang: body.lang || 'ar',
+      pageContext: body.pageContext || null,
+      catalogHint: body.catalog_hint || body.catalogHint || null,
+      userText: body.user_message || body.message || null,
+      notes: body.notes || null,
+      history: body.history || null,
     });
     if (!result.ok) return res.status(400).json(result);
     res.json(result);
@@ -1110,6 +1122,57 @@ function normalizeAccountPaymentMethods(arr) {
 function readAccounts() { return readJson(ACCOUNTS_FILE, []); }
 function writeAccounts(list) { writeJson(ACCOUNTS_FILE, list); }
 
+/**
+ * بعد موافقة الأدمن على التحقق: يُحذف أثر صورة الهوية من سجل الحساب
+ * (accounts.json) ويُثبَّت فقط مؤشر التوثيق + تاريخه — وفق الشروط القانونية.
+ * لا يُمسّ licenseImage (رخصة نشاط/سجل تجاري، ليست بطاقة هوية).
+ */
+function purgeAccountIdDocument(acc) {
+  if (!acc || typeof acc !== 'object') return acc;
+  delete acc.idImage;
+  delete acc.id_image;
+  acc.id_verified = true;
+  acc.id_verified_at = new Date().toISOString();
+  return acc;
+}
+
+/** رقم وطني: أرقام فقط، 6–15 خانة — يُحتفَظ به كمؤشر أمان فريد حتى بعد حذف الصورة. */
+const NNI_RE = /^\d{6,15}$/;
+function normalizeNni(raw) {
+  return String(raw || '').replace(/\D+/g, '').slice(0, 20);
+}
+function findAccountByNni(list, nni, excludeId) {
+  if (!nni) return null;
+  return list.find((a) => normalizeNni(a.nni) === nni && a.id !== excludeId) || null;
+}
+function nniDuplicatePayload() {
+  return {
+    ok: false,
+    code: 'nni_duplicate',
+    error: 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر',
+    error_fr: "Ce numéro d'identité (NNI) est déjà associé à un autre compte",
+  };
+}
+function assertNniAssignable(list, rawNni, excludeId, acc) {
+  const nni = normalizeNni(rawNni);
+  if (!nni) {
+    if (acc && normalizeNni(acc.nni)) {
+      return { ok: false, status: 403, body: { ok: false, code: 'nni_locked', error: 'لا يمكن حذف رقم الهوية بعد تسجيله', error_fr: "Le numéro d'identité ne peut pas être effacé une fois enregistré" } };
+    }
+    return { ok: true, nni: '' };
+  }
+  if (!NNI_RE.test(nni)) {
+    return { ok: false, status: 400, body: { ok: false, code: 'nni_invalid', error: 'رقم الهوية (NNI) غير صالح', error_fr: "Numéro d'identité (NNI) invalide" } };
+  }
+  if (acc && acc.id_verified && normalizeNni(acc.nni) && normalizeNni(acc.nni) !== nni) {
+    return { ok: false, status: 403, body: { ok: false, code: 'nni_locked', error: 'لا يمكن تغيير رقم الهوية بعد التوثيق', error_fr: "Le numéro d'identité ne peut pas être modifié après vérification" } };
+  }
+  if (findAccountByNni(list, nni, excludeId)) {
+    return { ok: false, status: 409, body: nniDuplicatePayload() };
+  }
+  return { ok: true, nni };
+}
+
 function resolveOptionalAccountViewer(req) {
   const accountId = req.header('x-account-id') || '';
   const token = req.header('x-account-token') || '';
@@ -1143,6 +1206,10 @@ function toPublicAccountForViewer(acc, viewerAccountId) {
 // عدا سرّ الوصول)
 function stripToken(acc) {
   const { accessToken, ...safe } = acc;
+  if (safe.id_verified) {
+    delete safe.idImage;
+    delete safe.id_image;
+  }
   return safe;
 }
 
@@ -1152,6 +1219,21 @@ const accountsRegisterLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'عدد كبير جداً من محاولات التسجيل — حاول مرة أخرى بعد قليل' },
+});
+
+/**
+ * GET /api/accounts/nni-available?nni= — عام، بلا سرّ —
+ * تحقق مبكر من فراغ رقم الهوية أثناء التسجيل/التوثيق. لا يُفصح عن صاحب الرقم.
+ */
+app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
+  const nniCheck = assertNniAssignable(readAccounts(), req.query.nni, null, null);
+  if (!nniCheck.ok) {
+    return res.status(nniCheck.status).json(Object.assign({ available: false }, nniCheck.body));
+  }
+  if (!nniCheck.nni) {
+    return res.status(400).json({ ok: false, available: false, code: 'nni_invalid', error: 'رقم الهوية (NNI) غير صالح', error_fr: "Numéro d'identité (NNI) invalide" });
+  }
+  res.json({ ok: true, available: true });
 });
 
 /**
@@ -1189,6 +1271,9 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   // مع نسخته على الخادم عند المزامنة. نتحقق من الصيغة لمنع أي قيمة غريبة.
   const clientId = typeof b.id === 'string' && /^ACC_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((a) => a.id === clientId) ? clientId : genAccountId();
+  const nniCheck = assertNniAssignable(list, b.nni, id, null);
+  if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
+  const nni = nniCheck.nni;
   const accessToken = genAccessToken();
   const acc = {
     id,
@@ -1216,7 +1301,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     // نفسها إن فُتحت من متصفح مختلف). الآن يصلان الخادم فعلياً ويُخزَّنان
     // هنا — idImage لا يظهر أبداً في ACCOUNT_PUBLIC_FIELDS (خاص بصاحب
     // الحساب + الأدمن فقط، مثل الهاتف/الإيميل تماماً).
-    nni: String(b.nni || '').slice(0, 20),
+    nni,
     // الحد 8 ملايين حرف (~5.8MB ثنائي بعد فك base64) لأن واجهة الرفع تعرض
     // "حجم أقصى 5MB" فعلياً — حد thumb (2M) أضيق بكثير وكان سيقصّ صورة
     // هوية حقيقية بحجمها الطبيعي فتفسدها (base64 يُضخّم الحجم ~37%).
@@ -1355,6 +1440,11 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
 
   const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
   const b = req.body || {};
+  if (b.nni !== undefined) {
+    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
+    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
+    b.nni = nniCheck.nni;
+  }
   if (b.activityId !== undefined || b.activity !== undefined) {
     const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
     if (!normalized.ok) {
@@ -1367,6 +1457,7 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
   EDITABLE.forEach((k) => {
     if (b[k] === undefined) return;
     if (k === 'activityId' || k === 'activity') return;
+    if (k === 'idImage' && acc.id_verified) return;
     acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
   });
   // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
@@ -1406,6 +1497,11 @@ app.patch('/api/accounts/admin/:id', requireSharedSecret, (req, res) => {
   const acc = list[idx];
   const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
   const b = req.body || {};
+  if (b.nni !== undefined) {
+    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
+    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
+    b.nni = nniCheck.nni;
+  }
   if (b.activityId !== undefined || b.activity !== undefined) {
     const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
     if (!normalized.ok) {
@@ -1418,6 +1514,7 @@ app.patch('/api/accounts/admin/:id', requireSharedSecret, (req, res) => {
   EDITABLE.forEach((k) => {
     if (b[k] === undefined) return;
     if (k === 'activityId' || k === 'activity') return;
+    if (k === 'idImage' && acc.id_verified) return;
     acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
   });
   if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
@@ -1433,6 +1530,7 @@ app.patch('/api/accounts/admin/:id', requireSharedSecret, (req, res) => {
  * يضبط status + approvedAt. هذا هو الفعل الذي يجعل الموافقة مرئية فعلياً
  * لصاحب الحساب من جهازه (عبر GET /api/accounts/mine/:id) وللزوار عبر
  * GET /api/accounts/public إن كانت موافقة.
+ * عند approve: تُحذف صورة الهوية فوراً من accounts.json ويُثبَّت id_verified فقط.
  */
 app.post('/api/accounts/admin/:id/decision', requireSharedSecret, (req, res) => {
   const body = req.body || {};
@@ -1455,6 +1553,11 @@ app.post('/api/accounts/admin/:id/decision', requireSharedSecret, (req, res) => 
     return res.json({ ok: true, account: stripToken(list[idx]) });
   }
 
+  if (action === 'approve') {
+    const nniCheck = assertNniAssignable(list, list[idx].nni, list[idx].id, list[idx]);
+    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
+  }
+
   list[idx].status = action === 'approve' ? 'approved' : 'rejected';
   list[idx].approvedAt = action === 'approve' ? new Date().toISOString() : null;
   list[idx].reviewedAt = new Date().toISOString();
@@ -1465,6 +1568,8 @@ app.post('/api/accounts/admin/:id/decision', requireSharedSecret, (req, res) => 
     if (body.dashToken) list[idx].dashToken = String(body.dashToken).slice(0, 100);
     if (body.package) list[idx].package = String(body.package).slice(0, 60);
     if (body.package_price !== undefined) list[idx].package_price = Number(body.package_price) || 0;
+    // التزام قانوني: بعد الموافقة تُحذف صورة الهوية من الخادم — ويبقى NNI + id_verified.
+    purgeAccountIdDocument(list[idx]);
   }
   writeAccounts(list);
   res.json({ ok: true, account: stripToken(list[idx]) });

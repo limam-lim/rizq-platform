@@ -96,7 +96,7 @@ body.fr [data-fr]{display:block}
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 </head>
 <body id="body">
 <button class="btn-lang" id="lang-btn">FR</button>
@@ -128,7 +128,7 @@ body.fr [data-fr]{display:block}
     <a href="#s8">٨. التوافق مع القانون الموريتاني</a>
     <a href="#s9">٩. تعديل الشروط والإشعارات</a>
     <a href="#s10">١٠. التواصل والشكاوى</a>
-    <a href="#s11">١١. الإلغاء والاسترجاع، حدود المسؤولية، التحكيم</a>
+    <a href="#s11">١١. الإلغاء والاسترجاع، Rizq ADS، حدود المسؤولية، التحكيم</a>
   </div>
 
   <div class="legal-note">⚖️ <strong>إشعار قانوني:</strong> تسري هذه الشروط وفق القوانين الموريتانية النافذة. أي بند يتعارض مع نص قانوني صريح يخضع لذلك النص. للاستفسار القانوني: <strong>legal@rizq.mr</strong></div>
@@ -171,7 +171,8 @@ body.fr [data-fr]{display:block}
     <ul>
       <li>صور البطاقات <strong>لا تظهر</strong> لأي مستخدم أو طرف ثالث.</li>
       <li>تُخزَّن مشفّرة في مسار معزول عن المحتوى العام.</li>
-      <li><strong>تُحذف تلقائياً</strong> بعد اكتمال التحقق — يُحتفظ فقط بعلامة <code>id_verified: true</code> وتاريخها.</li>
+      <li><strong>تُحذف تلقائياً وفوراً</strong> بعد اكتمال التحقق — يُحتفظ فقط بعلامة <code>id_verified: true</code> وتاريخها، دون الاحتفاظ بصورة الهوية.</li>
+      <li>أثناء المعالجة، تُطبَّق معايير تشفير عالية المستوى على صور الهوية وبيانات التحقق.</li>
       <li>الوصول إليها مقصور على المسؤولين الإداريين مع تسجيل كل عملية اطّلاع.</li>
     </ul>
     <h3>ج) البيانات المجمَّعة</h3>
@@ -182,6 +183,8 @@ body.fr [data-fr]{display:block}
     </ul>
     <h3>د) حالة الحساب المعلَّق</h3>
     <p>المستخدم الذي لم يرفع بطاقة هويته يبقى حسابه بحالة <strong>"معلَّق — بانتظار التحقق"</strong>: يستطيع التصفح لكن لا يستطيع نشر إعلانات أو مراسلة الآخرين حتى إتمام التحقق.</p>
+    <h3>هـ) حدود التحقق والقوة القاهرة</h3>
+    <p>رغم حذف صور الهوية فور اكتمال التحقق والاعتماد على تشفير عالي المعيار أثناء المعالجة، <strong>لا تتحمّل المنصة المسؤولية</strong> عن الاختراقات السيبرانية الاستثنائية الخارجة عن نطاق السيطرة التقنية المعقولة (<strong>القوة القاهرة</strong>)، بما في ذلك الهجمات أو الحوادث الأمنية التي تتجاوز التدابير التقنية المعتمدة بحسن نية.</p>
   </div>
 
   <div class="section" id="s4">
@@ -203,8 +206,9 @@ body.fr [data-fr]{display:block}
       <tr><td><span class="badge-r">R11</span></td><td>الحيوانات المحمية أو المهددة بالانقراض</td><td>رفض فوري</td></tr>
       <tr><td><span class="badge-r">R12</span></td><td>الأدوية المشروطة بوصفة طبية والمواد الخاضعة للرقابة</td><td>رفض فوري</td></tr>
       <tr><td><span class="badge-r">R13</span></td><td>مخالفة معايير الاحتشام: صور على أجساد لملابس داخلية أو مكشوفة</td><td>رفض فوري</td></tr>
-      <tr><td><span class="badge-r">R14</span></td><td>روابط خارجية (URLs) في نص الإعلان — بدون استثناءات</td><td>رفض فوري</td></tr>
+      <tr><td><span class="badge-r">R14</span></td><td>روابط خارجية خبيثة أو تحايلية، أو أي رابط يتجاوز بيئة المنصة الآمنة لإتمام المعاملة</td><td>رفض فوري</td></tr>
     </table>
+    <p><strong>توضيح R14:</strong> الروابط الخارجية الخبيثة أو التحايلية <strong>محظورة قطعاً</strong>. يُستثنى — بعد التحقق — رابط الحسابات الرسمية على وسائل التواصل أو كتالوج المنتجات المباشر للمحل/المكتب الموثّق، بشرط ألا يُستخدم لتجاوز بيئة المنصة الآمنة في إتمام المعاملات أو الدفع أو التواصل التجاري الأساسي.</p>
     <div class="warning-box">💡 <strong>ملاحظة:</strong> ذكر طرق الدفع (نقداً، Bankily، Sedad، تحويل بنكي) مسموح تماماً — المعاملات تتم خارج المنصة وهذا طبيعي. بيع الملابس الداخلية مسموح إذا كانت الصور للمنتج وحده بدون أجساد.</div>
   </div>
 
@@ -247,6 +251,8 @@ body.fr [data-fr]{display:block}
     <div class="warning-box" style="border-color:#C9A84C"><strong>📜 الإقرار الإلزامي (نص حرفي ملزم — يُعرض أيضاً كخانة تأكيد إلزامية عند التسجيل وكتذكير أسفل زر النشر):</strong><br><br>
     "بتسجيله على منصة رزق ونشره لأي إعلان أو مادة مرئية أو مسموعة أو نصية، يُقرّ المستخدم (المعلن) صراحةً بأنه يمتلك كافة الحقوق والتراخيص القانونية اللازمة على جميع المواد التي يرفعها أو ينشرها على المنصة، سواء أكانت صوراً أم فيديوهات إعلانية أم شعارات أم نصوصاً أم مقاطع صوتية أم أي محتوى آخر، وأن نشر هذه المواد لا ينتهك حقوق الملكية الفكرية لأي طرف ثالث. المنصة غير مسؤولة بأي شكل عن المحتوى الذي يرفعه المستخدمون، وفي حال ثبوت أي انتهاك تقع المسؤولية القانونية والمالية الكاملة على عاتق المستخدم وحده."</div>
     <p>يُمنع نسخ قواعد بيانات المنصة أو محتواها آلياً. علامة "رزق" التجارية وشعارها وتصميم الموقع وبرمجياته محمية بحقوق الملكية الفكرية لصالح <strong>ADMINIA SARL</strong>، ولا يجوز استخدامها دون إذن خطي مسبق.</p>
+    <h3>إجراء الإبلاغ والإزالة (Takedown)</h3>
+    <p>المنصة ناشر محايد للمحتوى الذي يرفعه المستخدمون. تُرسل شكاوى انتهاك حقوق النشر أو الملكية الفكرية إلى <strong>legal@rizq.mr</strong> مع <strong>إثبات الملكية أو الحق المعتدى عليه</strong> ورابط أو وصف المحتوى المخالف. تراجع المنصة البلاغ وتبادر <strong>بإزالة المحتوى المخالف على وجه السرعة</strong> عند ثبوت الانتهاك، دون أن يُعد ذلك إقراراً بمسؤوليتها عن المحتوى المنشور من الغير.</p>
   </div>
 
   <div class="section" id="s8">
@@ -283,14 +289,16 @@ body.fr [data-fr]{display:block}
 
   <div class="section" id="s11">
     <span class="section-num">١١</span>
-    <h2>سياسات إضافية: الإلغاء، حدود المسؤولية، التحكيم، والإشعارات</h2>
+    <h2>سياسات إضافية: الإلغاء، Rizq ADS، حدود المسؤولية، التحكيم، والإشعارات</h2>
     <h3>أ) سياسة الإلغاء والاسترجاع</h3>
     <p>يحق للمشترك في أي باقة مدفوعة (إعلان فردي مميز، متجر افتراضي، مكتب افتراضي، Rizq ADS) طلب استرجاع المبلغ المدفوع خلال <strong>48 ساعة</strong> من الدفع وقبل تفعيل الباقة فعلياً أو نشر أي محتوى ضمنها. بعد التفعيل أو النشر، يُنظر في طلبات الاسترجاع حالة بحالة وفق الأسباب المبررة فقط (مثل: خطأ تقني من المنصة، ازدواج دفع، أو عدم تفعيل الخدمة المدفوعة خلال 72 ساعة من الإشعار بالدفع). <strong>لا يحق الاسترجاع</strong> في حالات: تغيّر رأي المشترك بعد الاستخدام الفعلي للخدمة، أو مخالفة المحتوى المنشور لقواعد النشر (R01–R14) المؤدية لحذفه.</p>
-    <h3>ب) حدود المسؤولية القصوى</h3>
+    <h3>ب) قواعد Rizq ADS وسياسة الاسترجاع</h3>
+    <p>مدة حملات <strong>Rizq ADS</strong> <strong>ثابتة عند الشراء</strong> ولا تُختصر ولا تُسترد جزئياً بعد التفعيل. <strong>لا يُصدر أي استرجاع أو رصيد</strong> إذا حذف المستخدم إعلانه قبل انتهاء المدة المتفق عليها، أو إذا حُظر الإعلان لمخالفة قواعد المحتوى (R01–R14). تضمن المنصة <strong>الظهور للمدة المتعاقد عليها</strong>، ولا تضمن أي نتيجة بيع أو تحويل أو عائد استثماري محدد.</p>
+    <h3>ج) حدود المسؤولية القصوى</h3>
     <p>في أقصى الحالات وأياً كان سبب المطالبة، <strong>لا تتجاوز مسؤولية منصة رزق المالية تجاه أي مشترك القيمة الإجمالية لرسوم الاشتراك التي دفعها ذلك المشترك خلال آخر 12 شهراً</strong>. لا تتحمّل المنصة بأي حال أضراراً غير مباشرة أو أرباحاً فائتة أو خسائر تجارية ناتجة عن استخدام أو تعذّر استخدام الخدمة.</p>
-    <h3>ج) التحكيم والقانون المطبَّق</h3>
+    <h3>د) التحكيم والقانون المطبَّق</h3>
     <p>يُحل أي نزاع بين المستخدم والمنصة ودياً أولاً عبر <strong>legal@rizq.mr</strong>. وفي حال تعذّر الحل الودي خلال 30 يوماً، يُحل النزاع عبر <strong>التحكيم</strong> وفق القانون الموريتاني النافذ، بدلاً من التقاضي المباشر أمام المحاكم، إلا في الحالات التي يفرض فيها القانون الموريتاني صراحةً اختصاصاً قضائياً حصرياً. <strong>القانون الموريتاني هو المرجع الوحيد</strong> لتفسير وتطبيق جميع بنود هذه الشروط ولأي نزاع ينشأ عنها.</p>
-    <h3>د) الإشعارات القانونية</h3>
+    <h3>هـ) الإشعارات القانونية</h3>
     <p>البريد الإلكتروني المسجَّل على حساب المستخدم هو <strong>العنوان الرسمي الوحيد</strong> لتلقي كل الإشعارات القانونية المتعلقة بحسابه أو بهذه الشروط، بما فيها إشعار تعديل الشروط المذكور في القسم 9. يتحمّل المستخدم مسؤولية تحديث بريده الإلكتروني للحفاظ على صحة هذا التواصل.</p>
   </div>
 </div>
@@ -311,7 +319,7 @@ body.fr [data-fr]{display:block}
     <a href="#f8">8. Conformité légale mauritanienne</a>
     <a href="#f9">9. Modification des conditions</a>
     <a href="#f10">10. Contact et réclamations</a>
-    <a href="#f11">11. Annulation, remboursement, responsabilité, arbitrage</a>
+    <a href="#f11">11. Annulation, Rizq ADS, responsabilité, arbitrage</a>
   </div>
 
   <div class="legal-note">⚖️ <strong>Avis juridique :</strong> Les présentes conditions sont régies par le droit mauritanien en vigueur. Toute clause incompatible avec une disposition légale explicite est soumise à cette disposition. Contact : <strong>legal@rizq.mr</strong></div>
@@ -349,11 +357,14 @@ body.fr [data-fr]{display:block}
     <ul>
       <li>Les photos de pièces d'identité <strong>ne sont visibles</strong> par aucun utilisateur ni tiers.</li>
       <li>Elles sont stockées chiffrées dans un espace isolé.</li>
-      <li><strong>Suppression automatique</strong> après vérification — seul le statut <code>id_verified: true</code> est conservé.</li>
+      <li><strong>Suppression automatique et immédiate</strong> après vérification — seul le statut <code>id_verified: true</code> et sa date sont conservés, sans conservation de l'image d'identité.</li>
+      <li>Pendant le traitement, un chiffrement de haut standard est appliqué aux images d'identité et aux données de vérification.</li>
       <li>Accès réservé aux administrateurs avec journalisation de chaque consultation.</li>
     </ul>
     <h3>c) Compte en attente de vérification</h3>
     <p>Un compte sans pièce d'identité reste en statut <strong>"Suspendu — En attente de vérification"</strong> : navigation autorisée, publication et messagerie bloquées jusqu'à la vérification.</p>
+    <h3>d) Limite de la vérification et force majeure</h3>
+    <p>Bien que les images d'identité soient supprimées dès l'achèvement de la vérification et qu'un chiffrement de haut standard soit employé pendant le traitement, <strong>la plateforme n'est pas responsable</strong> des atteintes cybernétiques extraordinaires échappant à un contrôle technique raisonnable (<strong>force majeure</strong>), y compris les attaques ou incidents de sécurité dépassant les mesures techniques mises en œuvre de bonne foi.</p>
   </div>
 
   <div class="section" id="f4">
@@ -375,8 +386,9 @@ body.fr [data-fr]{display:block}
       <tr><td><span class="badge-r">R11</span></td><td>Animaux protégés ou en voie d'extinction</td><td>Rejet immédiat</td></tr>
       <tr><td><span class="badge-r">R12</span></td><td>Médicaments sur ordonnance ou substances contrôlées</td><td>Rejet immédiat</td></tr>
       <tr><td><span class="badge-r">R13</span></td><td>Non-respect des normes de pudeur : photos de lingerie sur corps</td><td>Rejet immédiat</td></tr>
-      <tr><td><span class="badge-r">R14</span></td><td>Liens externes (URLs) dans le texte de l'annonce — sans exception</td><td>Rejet immédiat</td></tr>
+      <tr><td><span class="badge-r">R14</span></td><td>Liens externes malveillants ou frauduleux, ou tout lien visant à contourner l'environnement sécurisé de la plateforme pour conclure la transaction</td><td>Rejet immédiat</td></tr>
     </table>
+    <p><strong>Précision R14 :</strong> les liens externes malveillants ou frauduleux sont <strong>strictement interdits</strong>. Une exception peut être admise — après vérification — pour les comptes officiels de réseaux sociaux ou le catalogue produits direct d'une boutique/d'un bureau vérifié, à condition qu'ils ne servent pas à contourner l'environnement sécurisé de la plateforme pour les transactions, le paiement ou l'échange commercial principal.</p>
     <div class="warning-box">💡 <strong>Note :</strong> Mentionner des moyens de paiement (espèces, Bankily, Sedad, virement) est autorisé. La vente de lingerie est permise si les photos montrent uniquement le produit, sans modèle.</div>
   </div>
 
@@ -417,6 +429,8 @@ body.fr [data-fr]{display:block}
     <div class="warning-box" style="border-color:#C9A84C"><strong>📜 Déclaration obligatoire (texte contractuel — également affichée comme case à cocher obligatoire à l'inscription et en rappel sous le bouton de publication) :</strong><br><br>
     « En s'inscrivant sur la plateforme Rizq et en publiant tout contenu, l'utilisateur déclare détenir tous les droits et licences nécessaires sur les contenus publiés, et que leur publication ne viole les droits d'aucun tiers. La plateforme n'est en aucun cas responsable du contenu publié par les utilisateurs. En cas de violation avérée, l'entière responsabilité juridique et financière incombe exclusivement à l'utilisateur. »</div>
     <p>La copie automatique de la base de données est interdite. La marque « Rizq », son logo, le design du site et ses logiciels sont protégés par des droits de propriété intellectuelle au profit d'<strong>ADMINIA SARL</strong>, et ne peuvent être utilisés sans autorisation écrite préalable.</p>
+    <h3>Procédure de signalement et de retrait (Takedown)</h3>
+    <p>La plateforme agit en intermédiaire de publication neutre du contenu publié par les utilisateurs. Les plaintes pour atteinte au droit d'auteur ou à la propriété intellectuelle sont à adresser à <strong>legal@rizq.mr</strong>, accompagnées d'une <strong>preuve de propriété ou du droit invoqué</strong> ainsi que du lien ou de la description du contenu litigieux. La plateforme examine le signalement et procède <strong>sans délai au retrait du contenu contrevenant</strong> lorsque l'atteinte est établie, sans que cela n'emporte reconnaissance de sa responsabilité quant au contenu publié par des tiers.</p>
   </div>
 
   <div class="section" id="f8">
@@ -445,14 +459,16 @@ body.fr [data-fr]{display:block}
 
   <div class="section" id="f11">
     <span class="section-num">11</span>
-    <h2>Politiques complémentaires : annulation, responsabilité, arbitrage et notifications</h2>
+    <h2>Politiques complémentaires : annulation, Rizq ADS, responsabilité, arbitrage et notifications</h2>
     <h3>a) Politique d'annulation et de remboursement</h3>
     <p>Tout abonné à une offre payante (annonce individuelle premium, boutique virtuelle, bureau virtuel, Rizq ADS) peut demander un remboursement dans les <strong>48 heures</strong> suivant le paiement, avant l'activation effective de l'offre ou la publication de tout contenu associé. Après activation ou publication, les demandes sont examinées au cas par cas, uniquement pour des motifs justifiés (erreur technique de la plateforme, double paiement, service payé non activé dans les 72 heures). <strong>Aucun remboursement</strong> n'est dû en cas de changement d'avis après utilisation effective du service, ou de suppression du contenu pour violation des règles de publication (R01–R14).</p>
-    <h3>b) Limitation maximale de responsabilité</h3>
+    <h3>b) Règles Rizq ADS et politique de remboursement</h3>
+    <p>La durée des campagnes <strong>Rizq ADS</strong> est <strong>fixe dès l'achat</strong> et n'est ni raccourcie ni remboursée partiellement après activation. <strong>Aucun remboursement ni crédit n'est accordé</strong> si l'utilisateur supprime son annonce avant la fin de la durée convenue, ou si l'annonce est bannie pour violation des règles de contenu (R01–R14). La plateforme garantit <strong>la visibilité pendant la durée convenue</strong>, sans garantir de ventes, de conversions ou de rendement spécifique.</p>
+    <h3>c) Limitation maximale de responsabilité</h3>
     <p>En tout état de cause, <strong>la responsabilité financière de Rizq envers un abonné ne dépasse jamais le montant total des frais d'abonnement payés par cet abonné au cours des 12 derniers mois</strong>. La plateforme n'est en aucun cas responsable des dommages indirects, pertes de profit ou pertes commerciales liés à l'utilisation ou à l'impossibilité d'utiliser le service.</p>
-    <h3>c) Arbitrage et droit applicable</h3>
+    <h3>d) Arbitrage et droit applicable</h3>
     <p>Tout litige entre l'utilisateur et la plateforme est d'abord résolu à l'amiable via <strong>legal@rizq.mr</strong>. À défaut de résolution amiable dans un délai de 30 jours, le litige est soumis à <strong>l'arbitrage</strong> conformément au droit mauritanien en vigueur, plutôt qu'à une action judiciaire directe, sauf disposition légale mauritanienne imposant expressément une compétence judiciaire exclusive. <strong>Le droit mauritanien est la seule référence</strong> pour l'interprétation et l'application de toutes les clauses des présentes conditions.</p>
-    <h3>d) Notifications légales</h3>
+    <h3>e) Notifications légales</h3>
     <p>L'adresse e-mail enregistrée sur le compte de l'utilisateur est <strong>la seule adresse officielle</strong> pour recevoir toute notification juridique relative à son compte ou aux présentes conditions, y compris l'avis de modification mentionné à la section 9. L'utilisateur est responsable de la mise à jour de son e-mail.</p>
   </div>
 </div>

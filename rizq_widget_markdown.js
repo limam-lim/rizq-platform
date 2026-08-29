@@ -110,7 +110,7 @@
   function formatLocalTime(date) {
     var d = date instanceof Date ? date : new Date(date || Date.now());
     try {
-      return toWesternDigits(d.toLocaleTimeString('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }));
+      return toWesternDigits(d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false }));
     } catch (e) {
       return toWesternDigits(d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0'));
     }

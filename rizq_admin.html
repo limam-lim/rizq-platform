@@ -330,7 +330,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
-  <script src="rizq_packages_config.js?v=12.9"></script>
+  <script src="rizq_packages_config.js?v=13"></script>
   <script src="rizq_agent.js"></script>
   <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_pwa.js" defer></script>
@@ -893,7 +893,7 @@ main, .page-content.active, .main-content, .results-area,
                 <option value="s8">8 — التوافق مع القانون الموريتاني</option>
                 <option value="s9">9 — تعديل الشروط</option>
                 <option value="s10">10 — التواصل والشكاوى</option>
-                <option value="s11">11 — الإلغاء/الاسترجاع، حدود المسؤولية، التحكيم</option>
+                <option value="s11">11 — الإلغاء/الاسترجاع، Rizq ADS، حدود المسؤولية، التحكيم</option>
               </optgroup>
               <optgroup label="🇫🇷 Français">
                 <option value="f1">1 — Définition de la plateforme et portée du service</option>
@@ -906,7 +906,7 @@ main, .page-content.active, .main-content, .results-area,
                 <option value="f8">8 — Conformité légale mauritanienne</option>
                 <option value="f9">9 — Modification des conditions</option>
                 <option value="f10">10 — Contact et réclamations</option>
-                <option value="f11">11 — Annulation, responsabilité, arbitrage</option>
+                <option value="f11">11 — Annulation, Rizq ADS, responsabilité, arbitrage</option>
               </optgroup>
             </select>
           </div>
@@ -4141,6 +4141,13 @@ function _syncAccountDecisionToBackend(id, action, extra){
     method: 'POST',
     headers: { 'Content-Type':'application/json', 'x-rizq-secret': cfg.backendSecret || '' },
     body: JSON.stringify(Object.assign({ action: action }, extra||{}))
+  }).then(function(res){
+    return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
+  }).then(function(out){
+    var data = out.data;
+    if(data && data.code === 'nni_duplicate'){
+      alert(RizqI18n.t2(data.error || 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر', data.error_fr || "Ce numéro d'identité (NNI) est déjà associé à un autre compte"));
+    }
   }).catch(function(){ /* صامت — رابط ادفع خادم قد لا يكون هذا الحساب مسجلاً به بعد */ });
 }
 
@@ -4156,6 +4163,9 @@ function approveAccount(id, customPkg){
   if(!acc)return;
   acc.status='approved';
   acc.approvedAt=new Date().toISOString();
+  acc.id_verified=true;
+  acc.id_verified_at=acc.approvedAt;
+  acc.id_image=null;
   acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
@@ -4623,6 +4633,7 @@ function loadModerationPanel(){
           '<div>' +
             '<div style="font-size:14px;font-weight:700;color:#1a2535">' + escHtml(acc.name || acc.owner || RizqI18n.t2('مستخدم','Utilisateur')) + '</div>' +
             '<div style="font-size:11px;color:#2C3A4F;margin-top:2px">' + typeLabel + ' · ' + escHtml(acc.phone||'') + ' · ' + submitted + '</div>' +
+            (acc.nni ? '<div style="font-size:11px;color:#1B3A6B;margin-top:4px;font-weight:700">NNI · ' + escHtml(String(acc.nni)) + '</div>' : '') +
           '</div>' +
           '<span style="background:#fff8e8;color:#a07820;border:1px solid #fde68a;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700">⏳ '+RizqI18n.t2('بانتظار التحقق','En attente de vérification')+'</span>' +
         '</div>' +
@@ -4738,11 +4749,13 @@ function approveId(accId){
   var acc = accounts.find(function(a){ return a.id === accId; });
   if(acc){
     acc.id_status = 'verified';
+    acc.id_verified = true;
     acc.id_verified_at = new Date().toISOString();
-    acc.id_image = null; // حذف الصورة بعد التحقق
+    acc.id_image = null; // حذف النسخة المحلية — الحذف الملزم يتم على الخادم عبر /decision
     acc.status = 'approved';
     acc.id_verified_by = currentAdmin ? currentAdmin.name : 'admin';
     localStorage.setItem('rizq_pending_accounts', JSON.stringify(accounts));
+    _syncAccountDecisionToBackend(accId, 'approve');
   }
   showToast(RizqI18n.t2('✅ تم التحقق من هوية ' + (acc ? (acc.name || acc.owner || 'المستخدم') : '') + ' وقبول الحساب','✅ Identité vérifiée pour ' + (acc ? (acc.name || acc.owner || 'l’utilisateur') : '') + ' — compte approuvé'));
   loadModerationPanel();
@@ -5395,11 +5408,11 @@ var LE_LABELS = {
   s1:'1 — تعريف المنصة ونطاق الخدمة', s2:'2 — شروط استخدام المنصة', s3:'3 — التحقق من الهوية وحماية البيانات',
   s4:'4 — سياسة المحتوى المحظور', s5:'5 — حالات المراجعة البشرية', s6:'6 — إخلاء مسؤولية المنصة',
   s7:'7 — حقوق الملكية الفكرية', s8:'8 — التوافق مع القانون الموريتاني', s9:'9 — تعديل الشروط', s10:'10 — التواصل والشكاوى',
-  s11:'11 — الإلغاء/الاسترجاع، حدود المسؤولية، التحكيم',
+  s11:'11 — الإلغاء/الاسترجاع، Rizq ADS، حدود المسؤولية، التحكيم',
   f1:"1 — Définition de la plateforme", f2:"2 — Conditions d'utilisation", f3:"3 — Vérification d'identité",
   f4:'4 — Politique de contenu interdit', f5:'5 — Cas de révision humaine', f6:'6 — Limitation de responsabilité',
   f7:'7 — Propriété intellectuelle', f8:'8 — Conformité légale mauritanienne', f9:'9 — Modification des conditions', f10:'10 — Contact et réclamations',
-  f11:'11 — Annulation, responsabilité, arbitrage'
+  f11:'11 — Annulation, Rizq ADS, responsabilité, arbitrage'
 };
 var LE_CACHE = { overrides: null, defaults: {} };
 

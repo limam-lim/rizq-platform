@@ -258,6 +258,10 @@ async function executeWidgetTool(toolName, input, meta) {
       channel: 'widget',
       lang: meta.lang || 'ar',
       pageContext: meta.pageContext || null,
+      catalogHint: meta.catalogHint || normalizeCatalogKey((input && (input.catalog || input.catalog_hint)) || null),
+      userText: meta.userText || null,
+      notes: (input && (input.notes || input.reason)) || null,
+      history: meta.history || null,
     });
   }
   if (toolName === 'escalate_to_human') {
@@ -266,6 +270,10 @@ async function executeWidgetTool(toolName, input, meta) {
       channel: 'widget',
       lang: meta.lang || 'ar',
       pageContext: meta.pageContext || null,
+      catalogHint: meta.catalogHint || normalizeCatalogKey((input && (input.catalog || input.catalog_hint)) || null),
+      userText: meta.userText || null,
+      notes: (input && (input.notes || input.reason)) || null,
+      history: meta.history || null,
     });
   }
   return executeWidgetToolSync(toolName, input, meta);

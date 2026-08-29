@@ -444,9 +444,10 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
 }
 
 function applyOfficialLeadConfirmation(replyText, toolResultsRaw, lang) {
-  const leadResult = (toolResultsRaw || []).find((r) => r && r.lead_id && r.confirmation_message);
-  if (!leadResult) return replyText;
-  return leadResult.confirmation_message || replyText;
+  const leadResults = (toolResultsRaw || []).filter((r) => r && r.lead_id && r.confirmation_message);
+  if (!leadResults.length) return replyText;
+  const preferred = leadResults.find((r) => r.updated) || leadResults[leadResults.length - 1];
+  return preferred.confirmation_message || replyText;
 }
 
 async function handleWidgetChat(body) {
@@ -589,6 +590,9 @@ async function handleWidgetChat(body) {
           if (!input.lang) input.lang = detectedLang;
           if (!input.catalog && catalogHint) input.catalog = catalogHint;
         }
+        if ((tool.name === 'register_interest' || tool.name === 'escalate_to_human') && catalogHint) {
+          if (!input.catalog && !input.catalog_hint) input.catalog_hint = catalogHint;
+        }
         if (adFlow.adId && (tool.name === 'get_ad_details' || tool.name === 'get_seller_reputation')) {
           if (tool.name === 'get_ad_details' || !String(input.ad_id || '').trim()) {
             input.ad_id = adFlow.adId;
@@ -598,6 +602,8 @@ async function handleWidgetChat(body) {
           lang: detectedLang,
           pageContext,
           catalogHint,
+          userText: text,
+          history: body.history,
         });
         toolResultsRaw.push(result);
         return {
@@ -650,7 +656,6 @@ async function handleWidgetChat(body) {
     pageContext,
     catalogHint
   );
-  validated.reply = formatPlainChatText(applyOfficialLeadConfirmation(validated.reply, toolResultsRaw, detectedLang));
 
   const autoLead = await maybeAutoNotifyLead({
     userText: text,
@@ -661,6 +666,11 @@ async function handleWidgetChat(body) {
   if (autoLead && autoLead.lead_id) {
     console.log('[widget-chat] lead persisted', autoLead.lead_id, 'telegram:', autoLead.telegram_sent);
   }
+
+  const leadResultsForReply = (autoLead && autoLead.lead_id && autoLead.confirmation_message)
+    ? toolResultsRaw.concat([autoLead])
+    : toolResultsRaw;
+  validated.reply = formatPlainChatText(applyOfficialLeadConfirmation(validated.reply, leadResultsForReply, detectedLang));
 
   return {
     ok: true,

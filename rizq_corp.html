@@ -369,7 +369,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
   <script src="rizq_backend_config.js"></script>
 <script src="rizq_auth_gate.js" defer></script>
 </head>
@@ -403,13 +403,13 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
         <div class="corp-name" id="corp-name">معرض الريادة</div>
         <div class="corp-tagline" id="corp-tagline">Al-Riyada Corp — سيارات وعقارات متميزة</div>
         <div class="corp-meta" id="corp-meta">
-          <span>📍 نواكشوط — حي الكفاح</span>
+          <span id="corp-meta-city">📍 نواكشوط — حي الكفاح</span>
           <span id="corp-hero-rating">⭐ 4.9 (87 تقييم)</span>
-          <span>💼 شركة موثّقة</span>
+          <span id="corp-meta-verified">💼 شركة موثّقة</span>
         </div>
         <div class="corp-badges" id="corp-badges">
           <span class="badge badge-verified" id="badge-verified-lbl">✅ موثّق رزق</span>
-          <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</span>
+          <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> <span id="verified-plus-badge-txt">موثّق⁺</span></span>
           <span class="badge badge-diamond" id="plan-badge" style="display:none">💎 ماسي</span>
           <span class="badge badge-corp" id="badge-corp-lbl">🏢 معرض / شركة</span>
         </div>
@@ -536,11 +536,11 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
             معرض الريادة — شركة موريتانية متخصصة في تقديم أفضل المنتجات والخدمات بجودة عالية وأسعار تنافسية. نعمل منذ سنوات على بناء ثقة عملائنا من خلال الشفافية والاحترافية في كل تعامل.
           </p>
           <div class="activity-tags" id="activity-tags">
-            <span class="activity-tag">🚗 سيارات جديدة ومستعملة</span>
-            <span class="activity-tag">🏠 عقارات</span>
-            <span class="activity-tag">🛡️ ضمان معتمد</span>
-            <span class="activity-tag">💳 دفع مرن</span>
-            <span class="activity-tag">🔧 صيانة</span>
+            <span class="activity-tag" id="act-tag1">🚗 سيارات جديدة ومستعملة</span>
+            <span class="activity-tag" id="act-tag2">🏠 عقارات</span>
+            <span class="activity-tag" id="act-tag3">🛡️ ضمان معتمد</span>
+            <span class="activity-tag" id="act-tag4">💳 دفع مرن</span>
+            <span class="activity-tag" id="act-tag5">🔧 صيانة</span>
           </div>
           <!-- Stats row -->
           <div style="display:flex;gap:16px;margin-top:20px;flex-wrap:wrap">
@@ -761,6 +761,16 @@ var _CORP_FR={
   // Hero
   'corp-name':'Showroom Al-Riyada',
   'corp-tagline':'Al-Riyada Corp — Voitures et immobilier de prestige',
+  'corp-meta-city':'📍 Nouakchott — quartier Al-Kifah',
+  'corp-hero-rating':'⭐ 4.9 (87 avis)',
+  'corp-meta-verified':'💼 Entreprise vérifiée',
+  'verified-plus-badge-txt':'Vérifié⁺',
+  'btn-chat':'💬 Messagerie sécurisée',
+  'act-tag1':'🚗 Voitures neuves et d\'occasion',
+  'act-tag2':'🏠 Immobilier',
+  'act-tag3':'🛡️ Garantie certifiée',
+  'act-tag4':'💳 Paiement flexible',
+  'act-tag5':'🔧 Maintenance',
   'badge-verified-lbl':'✅ Certifié Rizq',
   'plan-badge':'💎 Diamant',
   'badge-corp-lbl':'🏢 Showroom / Société',
@@ -860,6 +870,16 @@ var _CORP_AR={
   'nav-info-lbl':'معلومات المعرض',
   'corp-name':'معرض الريادة',
   'corp-tagline':'Al-Riyada Corp — سيارات وعقارات متميزة',
+  'corp-meta-city':'📍 نواكشوط — حي الكفاح',
+  'corp-hero-rating':'⭐ 4.9 (87 تقييم)',
+  'corp-meta-verified':'💼 شركة موثّقة',
+  'verified-plus-badge-txt':'موثّق⁺',
+  'btn-chat':'💬 مراسلة آمنة',
+  'act-tag1':'🚗 سيارات جديدة ومستعملة',
+  'act-tag2':'🏠 عقارات',
+  'act-tag3':'🛡️ ضمان معتمد',
+  'act-tag4':'💳 دفع مرن',
+  'act-tag5':'🔧 صيانة',
   'badge-verified-lbl':'✅ موثّق رزق',
   'plan-badge':'💎 ماسي',
   'badge-corp-lbl':'🏢 معرض / شركة',
@@ -959,6 +979,12 @@ function _applyCorpLang(lang){
   if(typeof _discApply==='function') _discApply(lang);
   // Render review cards
   _renderCorpReviews(lang);
+  if (window._corpCachedItems && typeof renderCorpItems === 'function') {
+    renderCorpItems(window._corpCachedItems);
+    if (window._corpCachedCats && typeof rebuildCorpCatTabs === 'function') {
+      rebuildCorpCatTabs(window._corpCachedCats);
+    }
+  }
 }
 
 function _renderCorpReviews(lang){
@@ -1113,6 +1139,16 @@ window._corpSubmitReview = function(){
    افتراضياً (مثل ما هو معمول به في rizq_store.html/rizq_office.html)، ويُستبدل
    ببيانات حقيقية من rizq_corp_prods_<id> إن وُجد حساب معتمد مطابق. ═══ */
 var CORP_DEMO_ITEMS = [];
+var _CORP_CAT_FR = {
+  'سيارات': 'Voitures', 'عقارات': 'Immobilier', 'معدات': 'Équipements', 'خدمات': 'Services',
+  'أثاث': 'Meubles', 'مفروشات': 'Meubles', 'إلكترونيات': 'Électronique', 'مجوهرات': 'Bijoux',
+  'مواد بناء': 'Matériaux de construction', 'شاحنات': 'Camions'
+};
+function _corpCatLabel(cat){
+  var isFr = (localStorage.getItem('rizq_lang')||'ar')==='fr';
+  if(!isFr||!cat) return cat||'';
+  return _CORP_CAT_FR[cat]||cat;
+}
 function corpCatIcon(cat){
   var map = {'سيارات':'🚗','عقارات':'🏠','معدات':'⚙️','خدمات':'💼','أثاث':'🛋️','مفروشات':'🛋️','إلكترونيات':'📱','مجوهرات':'💎','مواد بناء':'🏗️','شاحنات':'🚛'};
   return map[cat] || '📦';
@@ -1128,6 +1164,7 @@ function contactAboutItem(name){
 }
 function _corpEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderCorpItems(items){
+  window._corpCachedItems = items || [];
   var grid = document.getElementById('items-grid');
   if(!grid) return;
   var isFr = (localStorage.getItem('rizq_lang')==='fr');
@@ -1141,18 +1178,19 @@ function renderCorpItems(items){
       + '<div class="item-img">' + corpCatIcon(it.cat) + badge + '</div>'
       + '<div class="item-body">'
       + '<div class="item-name">' + _corpEsc(it.name) + '</div>'
-      + '<div class="item-cat">' + _corpEsc(it.cat) + '</div>'
+      + '<div class="item-cat">' + _corpEsc(_corpCatLabel(it.cat)) + '</div>'
       + '<div class="item-price-row"><span class="item-price">' + _corpEsc(priceTxt) + '</span>'
       + '<button class="contact-item-btn" onclick="contactAboutItem(\'' + _corpEsc(it.name).replace(/'/g,"\\'") + '\')">' + (isFr?'📩 Contact':'📩 تواصل') + '</button></div>'
       + '</div></div>';
   }).join('');
 }
 function rebuildCorpCatTabs(cats){
+  window._corpCachedCats = cats || [];
   var tabsEl = document.getElementById('cat-tabs');
   if(!tabsEl || !cats.length) return;
   var isFr = (localStorage.getItem('rizq_lang')==='fr');
   tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">' + (isFr?'Tout':'الكل') + '</button>'
-    + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\'' + _corpEsc(c).replace(/'/g,"\\'") + '\')">' + corpCatIcon(c) + ' ' + _corpEsc(c) + '</button>'; }).join('');
+    + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\'' + _corpEsc(c).replace(/'/g,"\\'") + '\')">' + corpCatIcon(c) + ' ' + _corpEsc(_corpCatLabel(c)) + '</button>'; }).join('');
 }
 (function initCorpItemsAndProfile(){
   function apply(){
@@ -1163,7 +1201,7 @@ function rebuildCorpCatTabs(cats){
       // ── الهوية الأساسية ──
       var nameEl = document.getElementById('corp-name'); if(nameEl && acc.name) nameEl.textContent = acc.name;
       if(acc.desc){ var tagEl = document.getElementById('corp-tagline'); if(tagEl) tagEl.textContent = acc.desc; var aboutEl=document.getElementById('about-text'); if(aboutEl) aboutEl.textContent = acc.desc; }
-      if(acc.name) document.title = acc.name + ' — رزق';
+      if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
 
       // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
       // كانتا ثابتتين دائماً (badge-verified-lbl) أو ميتة كلياً بلا أي كود
@@ -1283,7 +1321,7 @@ function rebuildCorpCatTabs(cats){
             if(acc){
               setText('corp-name', acc.name);
               if(acc.desc){ setText('corp-tagline', acc.desc); setText('about-text', acc.desc); }
-              if(acc.name) document.title = acc.name + ' — رزق';
+              if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
               var addr = acc.address || acc.city || '';
               if(addr){
                 var metaEl = document.getElementById('corp-meta');
@@ -1677,7 +1715,7 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_packages_config.js"></script>
-<script src="rizq_packages_ui.js?v=12.5"></script>
+<script src="rizq_packages_ui.js?v=12.9"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_widget_embed.js"></script>

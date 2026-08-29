@@ -39,12 +39,13 @@ function formatLeadAlertText(lead) {
   );
   const businessName = cleanField(lead.businessName);
   const phone = cleanField(lead.whatsapp || lead.phone);
+  const isUpdate = !!(lead.updated || lead.isUpdate);
 
   return [
-    '🚨 طلب اشتراك جديد (النائب الذكي)',
+    isUpdate ? '🔄 تحديث طلب اشتراك (النائب الذكي)' : '🚨 طلب اشتراك جديد (النائب الذكي)',
     '',
     '📌 رقم الطلب: ' + leadId,
-    '🏷️ الباقة المختارة: ' + packageName,
+    '🏷️ الباقة المطلوبة: ' + packageName,
     '💰 السعر الفعلي: ' + priceLine,
     '🏬 اسم المحل/المنشأة: ' + businessName,
     '📞 رقم الهاتف/واتساب: ' + phone,

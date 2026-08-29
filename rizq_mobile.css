@@ -47,7 +47,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 .mbn-post{
   z-index:var(--rzq-z-fab)!important;
 }
-#rizq-chat-toggle{z-index:400!important;}
+#rizq-chat-toggle{z-index:950!important;}
 #rizq-chat-window,
 #rizq-prompt-bubbles,
 .modal-overlay,.disc-overlay,.rizq-promo-overlay,.rizq-modal-overlay,
@@ -263,7 +263,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .cats-grid,.quick-cats,.hero-biz-nav,.cat-card,.qcat{
     position:relative;z-index:520;
   }
-  #rizq-chat-toggle{z-index:400!important}
+  #rizq-chat-toggle{z-index:950!important}
 
   #back-to-top{
     bottom:calc(84px + env(safe-area-inset-bottom,0))!important;
@@ -272,7 +272,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   html[dir="ltr"] #back-to-top{left:auto!important;right:12px!important}
   #rizq-chat-toggle{
     bottom:calc(84px + env(safe-area-inset-bottom,0))!important;
-    right:12px!important;z-index:400!important;
+    right:12px!important;z-index:950!important;
   }
   html[dir="ltr"] #rizq-chat-toggle{right:auto!important;left:12px!important}
   #rizq-chat-window{
@@ -557,3 +557,80 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 }
 html[dir="rtl"] .rizq-lang-fallback-block{ text-align:right; }
 html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
+
+/* ── تابلت: باقات في صف واحد أفقي (بعد قواعد الموبايل 1-عمود) ── */
+@media(min-width:769px){
+  .pricing-container{
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    scrollbar-width:thin;
+  }
+  .pricing-grid{
+    display:grid !important;
+    grid-auto-flow:column !important;
+    grid-auto-columns:minmax(148px,1fr) !important;
+    grid-template-columns:none !important;
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+    gap:12px !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .pricing-grid > .pricing-card,
+  .pricing-grid > .rpkg-card,
+  .pricing-grid > .rpkg-card.pricing-card{
+    min-width:148px !important;
+    max-width:none !important;
+    width:auto !important;
+  }
+}
+
+/* ── موبايل: مسافة أمان للبانر الإعلاني والعدادات وخلفية الأقسام ── */
+@media(max-width:768px){
+  .hero-vid-wrap{
+    width:92vw !important;
+    max-width:calc(100vw - 32px) !important;
+    margin-left:calc(50% - min(46vw, calc(50vw - 16px))) !important;
+    margin-right:calc(50% - min(46vw, calc(50vw - 16px))) !important;
+    box-sizing:border-box !important;
+  }
+  .hero-vid-inner{
+    width:100% !important;
+    max-width:100% !important;
+    min-height:0 !important;
+    height:auto !important;
+    aspect-ratio:16/9;
+  }
+  .hero-stats-bar{
+    width:92% !important;
+    max-width:92% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    max-height:none !important;
+    box-sizing:border-box !important;
+  }
+  .hero-stats-bar .h-stat{
+    padding:14px 10px !important;
+  }
+  .hero-stats-bar .h-stat-num{
+    font-size:26px !important;
+  }
+  .hero-stats-bar .h-stat-lbl{
+    font-size:12.5px !important;
+    margin-top:6px !important;
+  }
+  #categories{
+    padding-left:16px !important;
+    padding-right:16px !important;
+  }
+  #categories .section-header{
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    padding:32px 16px !important;
+    box-sizing:border-box !important;
+  }
+}

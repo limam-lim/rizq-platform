@@ -436,13 +436,67 @@ function _isSegmentDiamond(pkg) {
   return /^(st|of|cp)-diam-(std|pro)$/.test(String(pkg && pkg.id || ''));
 }
 
-var PERIODS = {
-  ar: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان', oneTime: 'دفعة واحدة' },
-  fr: { freeDays: 'Gratuit — {n} jours', month: 'MRU / mois', year: 'MRU / an', quarter: 'MRU / 3 mois', perAd: 'MRU / annonce', oneTime: 'Paiement unique' },
-  en: { freeDays: 'Free — {n} days', month: 'MRU / month', year: 'MRU / year', quarter: 'MRU / 3 months', perAd: 'MRU / ad', oneTime: 'One-time payment' },
-  es: { freeDays: 'Gratis — {n} días', month: 'MRU / mes', year: 'MRU / año', quarter: 'MRU / 3 meses', perAd: 'MRU / anuncio', oneTime: 'Pago único' },
-  hs: { freeDays: 'مجاناً — {n} أيام', month: 'MRU / شهر', year: 'MRU / سنة', quarter: 'MRU / 3 أشهر', perAd: 'MRU / لكل إعلان', oneTime: 'دفعة واحدة' }
+var FEATURE_FR = {
+  'وصول كامل للمنصة': 'Accès complet à la plateforme',
+  'استعراض الإعلانات': 'Parcourir les annonces',
+  'دعم فني أساسي': 'Support technique de base',
+  'شارة شركة مميّزة برزق': 'Badge entreprise premium Rizq',
+  'عرض 30 إعلان': '30 annonces affichées',
+  'إحصائيات شهرية': 'Statistiques mensuelles',
+  'دعم بالأولوية': 'Support prioritaire',
+  'كل مزايا الشهرية': 'Tous les avantages mensuels',
+  'توفير 15% عن الشهري': 'Économisez 15% vs mensuel',
+  'إعلانات غير محدودة': 'Annonces illimitées',
+  'مدير حساب': 'Gestionnaire de compte',
+  'كل مزايا الربعية': 'Tous les avantages trimestriels',
+  'توفير 35% عن الشهري': 'Économisez 35% vs mensuel',
+  'ميزات VIP حصرية': 'Avantages VIP exclusifs',
+  'دعم 24/7': 'Support 24/7',
+  'تقارير سنوية شاملة': 'Rapports annuels complets',
+  'تصفّح وتصفية المناقصات المنشورة': 'Parcourir et filtrer les appels d\'offres',
+  'بيانات التواصل مخفية/ضبابية': 'Coordonnées masquées / floutées',
+  'تقديم العروض مقفول': 'Dépôt d\'offres verrouillé',
+  'كشف بيانات تواصل صاحب المناقصة': 'Coordonnées de l\'émetteur révélées',
+  'تقديم عروض غير محدود': 'Dépôt d\'offres illimité',
+  'نشر مناقصات': 'Publier des appels d\'offres',
+  'توفير 10% عن الشهري': 'Économisez 10% vs mensuel',
+  'أولوية ظهور عروضك لأصحاب المناقصات': 'Priorité de vos offres auprès des émetteurs',
+  'توفير 25% عن الشهري': 'Économisez 25% vs mensuel',
+  'دعم VIP': 'Support VIP',
+  'تنبيهات فورية SMS/واتساب للمناقصات الجديدة': 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres',
+  'حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)': 'Jusqu\'à 3 vidéos pub / mois (plusieurs produits)',
+  'ظهور في قسم الإعلانات بالصفحة الرئيسية': 'Section publicitaire page d\'accueil',
+  'إحصائيات أداء أساسية آلية': 'Statistiques de performance automatiques',
+  'حتى 10 فيديوهات إعلانية ترويجية شهرياً': 'Jusqu\'à 10 vidéos pub / mois',
+  'أولوية الترتيب في نتائج البحث': 'Priorité dans les résultats de recherche',
+  'شارة «محتوى مميّز برزق» الموثّقة': 'Badge « contenu mis en avant Rizq »',
+  'فيديوهات وعروض غير محدودة': 'Vidéos et campagnes illimitées',
+  'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية': 'Mise en avant sur la page d\'accueil',
+  'تقارير تحليل أداء آلية مفصّلة': 'Rapports de performance détaillés',
+  'دعم VIP ذو أولوية + شارة VIP موثّقة': 'Support VIP prioritaire + badge VIP',
+  'شارة موثّق⁺ الرسمية بشعار رزق': 'Badge Vérifié⁺ officiel Rizq',
+  'أعلى درجة ثقة — تحقق هوية مُعزَّز': 'Niveau de confiance maximal — identité renforcée',
+  'تبرز فوق شارة التوثيق المجانية': 'Au-dessus du badge de vérification gratuit',
+  'صالحة لمدة سنة كاملة': 'Valable une année complète',
+  '10 منتجات': '10 produits',
+  'شارة محل': 'Badge boutique',
+  'تواصل مباشر': 'Contact direct',
+  '30 منتج': '30 produits',
+  'شارة مميّز برزق': 'Badge premium Rizq',
+  'إحصائيات': 'Statistiques',
+  'منتجات غير محدودة': 'Produits illimités',
+  'أولوية في نتائج البحث': 'Priorité dans les résultats',
+  'دعم مخصص': 'Support dédié',
+  'كل مزايا Pro': 'Tous les avantages Pro',
+  'خصم 37% عن السعر الشهري': '37% de réduction vs mensuel',
+  'فوترة سنوية واحدة': 'Une seule facture annuelle'
 };
+
+function translateFeatureList(list, lang) {
+  if (!Array.isArray(list)) return [];
+  if (_normLang(lang) !== 'fr') return list.slice();
+  return list.map(function (f) { return FEATURE_FR[f] || f; });
+}
 
 /** الكتالوجات المعتمدة — مطابقة PKG_DEFAULTS في لوحة الأدمن */
 var CATALOGS = {
@@ -651,7 +705,7 @@ function resolveDiamondTierFromPkg(pkg) {
   if (pkg.diamondTier === 'diamond_pro' || pkg.diamondTier === 'pro') return 'diamond_pro';
   if (pkg.diamondTier === 'diamond_standard' || pkg.diamondTier === 'standard') return 'diamond_standard';
   var id = String(pkg.id || '').toLowerCase();
-  if (/pro|diam-pro/.test(id)) return 'diamond_pro';
+  if (/diam-pro|diamond[_-]?pro/.test(id)) return 'diamond_pro';
   if (isDiamondPackage(pkg)) return 'diamond_standard';
   return null;
 }
@@ -747,9 +801,9 @@ function enrichForDisplay(pkg, lang) {
     out.period_fr = periodLabel(out, 'fr');
     out.features = Array.isArray(out.features) ? out.features.slice() : [];
     if (Array.isArray(out.features_fr) && out.features_fr.length) {
-      out.features_fr = out.features_fr.slice();
+      out.features_fr = translateFeatureList(out.features_fr, 'fr');
     } else {
-      out.features_fr = [];
+      out.features_fr = translateFeatureList(out.features, 'fr');
     }
     out.cta_fr = out.cta_fr || _defaultCta(out, 'fr');
     out.cta = lang === 'fr' ? out.cta_fr : (out.cta || _defaultCta(out, 'ar'));
@@ -925,6 +979,78 @@ function ensureCatalogStorageFresh(force) {
 }
 
 var _catalogFreshChecked = false;
+var _remoteCatalogCache = {};
+var _lastCatalogSyncMs = 0;
+var _catalogSyncPromise = null;
+var CATALOG_SYNC_TTL_MS = 45000;
+
+function _resolveBackendBase() {
+  var base = '';
+  if (typeof globalThis !== 'undefined' && typeof globalThis.RIZQ_BACKEND_BASE === 'string' && globalThis.RIZQ_BACKEND_BASE) {
+    base = globalThis.RIZQ_BACKEND_BASE;
+  } else if (typeof window !== 'undefined' && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
+    base = window.RIZQ_BACKEND_BASE;
+  }
+  if (!base && typeof location !== 'undefined' && /^https?:/.test(location.protocol || '')) {
+    base = location.origin;
+  }
+  return String(base || '').replace(/\/$/, '');
+}
+
+function _applyRemoteCatalogPackages(pkgs) {
+  if (!pkgs || typeof pkgs !== 'object') return false;
+  var now = Date.now();
+  var applied = false;
+  Object.keys(pkgs).forEach(function (catalogKey) {
+    var list = pkgs[catalogKey];
+    if (!Array.isArray(list) || !list.length) return;
+    _remoteCatalogCache[catalogKey] = { fetchedAt: now, packages: list.slice() };
+    if (typeof localStorage !== 'undefined') {
+      var lsKey = getCatalogLsKey(catalogKey);
+      if (lsKey) {
+        try { localStorage.setItem(lsKey, JSON.stringify(list)); } catch (e) { /* ignore quota */ }
+      }
+    }
+    applied = true;
+  });
+  if (applied) {
+    _lastCatalogSyncMs = now;
+    try {
+      localStorage.setItem(CATALOG_SYNC_LS_KEY, CATALOG_SYNC_REVISION);
+    } catch (e) { /* ignore */ }
+    if (typeof document !== 'undefined' && typeof CustomEvent === 'function') {
+      try {
+        document.dispatchEvent(new CustomEvent('rizq:catalogsync', { detail: { fetchedAt: now } }));
+      } catch (eEv) { /* ignore */ }
+    }
+  }
+  return applied;
+}
+
+/** مزامنة الباقات من GET /api/site-config — للويدجت وأي صفحة بلا rizq_packages_ui */
+function syncCatalogFromBackend(opts) {
+  opts = opts || {};
+  var force = !!opts.force;
+  if (typeof fetch === 'undefined') {
+    return Promise.resolve(false);
+  }
+  var base = _resolveBackendBase();
+  if (!base) return Promise.resolve(false);
+  var now = Date.now();
+  if (!force && _catalogSyncPromise) return _catalogSyncPromise;
+  if (!force && _lastCatalogSyncMs && (now - _lastCatalogSyncMs) < CATALOG_SYNC_TTL_MS) {
+    return Promise.resolve(true);
+  }
+  _catalogSyncPromise = fetch(base + '/api/site-config')
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .then(function (data) {
+      var pkgs = data && data.ok && data.config && data.config.packages;
+      return _applyRemoteCatalogPackages(pkgs);
+    })
+    .catch(function () { return false; })
+    .finally(function () { _catalogSyncPromise = null; });
+  return _catalogSyncPromise;
+}
 
 function getCatalog(catalogKey, lang) {
   if (!_catalogFreshChecked && typeof localStorage !== 'undefined') {
@@ -933,7 +1059,11 @@ function getCatalog(catalogKey, lang) {
   }
   var key = catalogKey || PUBLIC_CATALOG;
   var defaults = _defaultsFor(key);
-  var live = _readSiteConfigCatalog(key) || _readBrowserCatalog(key);
+  var live = null;
+  if (_remoteCatalogCache[key] && Array.isArray(_remoteCatalogCache[key].packages) && _remoteCatalogCache[key].packages.length) {
+    live = _remoteCatalogCache[key].packages;
+  }
+  if (!live) live = _readSiteConfigCatalog(key) || _readBrowserCatalog(key);
   return _mergeLive(defaults, live).map(function (p) {
     return enrichForDisplay(p, lang || 'ar');
   });
@@ -970,6 +1100,13 @@ function getPublicPackages() {
   return getCatalog(PUBLIC_CATALOG);
 }
 
+function catalogPackageLabel(id, lang) {
+  lang = _normLang(lang);
+  var hit = id && NAMES[id] ? NAMES[id] : null;
+  if (!hit) return '';
+  return hit[lang] || hit.ar || hit.fr || '';
+}
+
 function localizedName(pkg, lang) {
   lang = _normLang(lang);
   if (isDiamondPackage(pkg)) {
@@ -986,7 +1123,9 @@ function localizedName(pkg, lang) {
   }
   if (lang === 'fr') {
     if (rawFr && !_hasArabic(rawFr)) return rawFr;
-    if (raw && !isBlank(raw)) return raw;
+    if (hit && hit.map.fr) return hit.map.fr;
+    if (raw && !_hasArabic(raw)) return raw;
+    return (hit && hit.map.fr) || rawFr || raw;
   }
   if (lang === 'ar') {
     if (raw && !isBlank(raw)) return raw;
@@ -999,9 +1138,18 @@ function localizedName(pkg, lang) {
 
 function isBlank(s) { return !String(s == null ? '' : s).trim(); }
 
+var PERIODS = {
+  ar: { freeDays: '{n} أيام', month: 'شهرياً', quarter: '3 أشهر', year: 'سنوياً', perAd: 'لكل إعلان' },
+  fr: { freeDays: '{n} jours', month: 'par mois', quarter: '3 mois', year: 'par an', perAd: 'par annonce' },
+  en: { freeDays: '{n} days', month: 'per month', quarter: '3 months', year: 'per year', perAd: 'per listing' },
+  es: { freeDays: '{n} días', month: 'por mes', quarter: '3 meses', year: 'por año', perAd: 'por anuncio' },
+  hs: { freeDays: '{n} أيام', month: 'شهرياً', quarter: '3 أشهر', year: 'سنوياً', perAd: 'لكل إعلان' }
+};
+
 function periodLabel(pkg, lang) {
   lang = _normLang(lang);
-  var t = PERIODS[lang] || PERIODS.ar;
+  pkg = pkg || {};
+  var t = (PERIODS && (PERIODS[lang] || PERIODS.ar)) || { freeDays: '{n}', month: '', quarter: '', year: '', perAd: '' };
   if (pkg.period && !/^MRU\s*\//i.test(String(pkg.period))) {
     if (lang === 'fr' && _hasArabic(pkg.period)) {
       // Arabic period from admin/localStorage — recompute FR label from durationDays
@@ -1185,6 +1333,7 @@ var API = {
   CATALOGS: CATALOGS,
   CATALOG_SYNC_REVISION: CATALOG_SYNC_REVISION,
   ensureCatalogStorageFresh: ensureCatalogStorageFresh,
+  syncCatalogFromBackend: syncCatalogFromBackend,
   LS_KEYS: LS_KEYS,
   CATALOG_REGISTRY: CATALOG_REGISTRY,
   registerCatalogMapping: registerCatalogMapping,
@@ -1199,6 +1348,7 @@ var API = {
   getPackagesForTool: getPackagesForTool,
   formatPackage: formatPackage,
   localizedName: localizedName,
+  catalogPackageLabel: catalogPackageLabel,
   priceLabel: priceLabel,
   buildPublicSummary: buildPublicSummary,
   buildPublicOverview: buildPublicOverview,

@@ -22,8 +22,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=13.4"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=14.1"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=14.3"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=14.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
 <link rel="stylesheet" href="rizq_header.css?v=14.8"/>
 <script>
@@ -46,10 +46,10 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
 }
 </style>
-<script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_packages_config.js?v=13.2"></script>
+<script src="rizq_packages_ui.js?v=12.7"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
-<script src="rizq_packages_ui.js?v=12.7"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -1099,7 +1099,6 @@ html[dir="ltr"] .listings-section .section-desc{
   .cats-grid{grid-template-columns:repeat(3,1fr)}
   .listings-grid{grid-template-columns:repeat(3,1fr)}
   .why-grid{grid-template-columns:repeat(2,1fr)}
-  .pricing-grid{grid-template-columns:repeat(2,1fr);max-width:min(680px,100%)}
   .footer-grid{grid-template-columns:1fr 1fr 1fr}
   .hero-stats-bar .h-stat-num{font-size:20px}
 }
@@ -1131,7 +1130,7 @@ html[dir="ltr"] .listings-section .section-desc{
   body.landing-ux-mobile .nav-hamburger{display:none!important}
   .nav-right .btn-login,.nav-right .btn-register{display:none}
   .cats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:14px!important;overflow:visible!important;flex-direction:unset!important}
-  .why-grid{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;flex-direction:row!important;max-width:100%!important}
+  .why-grid{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;flex-direction:row!important;max-width:100%!important;justify-content:flex-start!important}
   .why-card{flex:0 0 82vw!important;max-width:82vw!important;width:82vw!important}
   .listings-grid{grid-template-columns:repeat(2,1fr)}
   .footer-grid{grid-template-columns:1fr}
@@ -1232,7 +1231,7 @@ main, .page-content.active, .main-content, .results-area,
   display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
   gap:16px;max-width:1080px;margin:0 auto;padding:4px 0 12px;direction:inherit;
-  scrollbar-width:thin;
+  justify-content:center;scrollbar-width:thin;
 }
 .why-card{
   flex:0 0 min(300px,82vw);scroll-snap-align:start;height:auto;
@@ -1814,7 +1813,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_dynamic_nav.js"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
 </head>
 <body>
@@ -1856,10 +1855,10 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
   </ul>
   <div class="nav-sticky-tools" id="nav-sticky-tools">
     <div class="nav-sticky-search-wrap">
-      <input type="search" id="nav-sticky-search-input" autocomplete="off" placeholder="البحث في رزق..." aria-label="البحث في رزق"/>
+      <input type="search" id="nav-sticky-search-input" autocomplete="off" placeholder="البحث في رزق..." aria-label="البحث في رزق" data-ph-fr="Rechercher sur Rizq..."/>
       <button type="button" onclick="doNavStickySearch()" aria-label="بحث">🔍</button>
     </div>
-    <button type="button" class="nav-sticky-post" id="nav-sticky-post" onclick="openModal('register')">+ نشر</button>
+    <button type="button" class="nav-sticky-post" id="nav-sticky-post" onclick="openModal('register')" data-t-fr="+ Publier">+ نشر</button>
   </div>
   <a href="rizq_landing_v8.html" class="logo" id="rizq-brand">
     <img class="logo-mark-img" src="rizq-mark-512.png?v=9.7" width="42" height="42" alt=""/>
@@ -2302,8 +2301,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <section id="virtual-offices" style="padding:48px 20px;background:var(--bg-section);position:relative;overflow:hidden">
 
   <!-- خلفية زخرفية -->
-  <div style="position:absolute;top:-40px;inset-inline-end:-40px;width:min(360px,72vw);height:min(360px,72vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:-30px;inset-inline-start:-30px;width:min(280px,65vw);height:min(280px,65vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-60px;left:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
 
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
@@ -2414,8 +2413,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <section id="virtual-showrooms" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
 
   <!-- خلفية زخرفية -->
-  <div style="position:absolute;top:-30px;inset-inline-start:-30px;width:min(320px,70vw);height:min(320px,70vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:-40px;inset-inline-end:-20px;width:min(260px,60vw);height:min(260px,60vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;top:-60px;left:-60px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-80px;right:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
 
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
@@ -2504,7 +2503,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
      مع حالة بديلة أنيقة إن كانت الغرفة فارغة أو الخادم غير متاح. ══ -->
 <section id="virtual-tenders" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
 
-  <div style="position:absolute;top:-30px;inset-inline-end:-30px;width:min(300px,68vw);height:min(300px,68vw);border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);pointer-events:none"></div>
 
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
@@ -2771,42 +2770,42 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e9d5ff;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:right">
         <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(233,213,255,.25)">
-          <div id="diamond-pitch-std-name" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية الأساسية 💎</div>
-          <div id="diamond-pitch-std-desc" style="font-size:12px;line-height:1.65;color:#e9d5ff">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
+          <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية الأساسية 💎</div>
+          <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#e9d5ff">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
         </div>
         <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(251,191,36,.35)">
-          <div id="diamond-pitch-pro-name" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية Pro 💎</div>
-          <div id="diamond-pitch-pro-desc" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
+          <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية Pro 💎</div>
+          <div id="diamond-pitch-pro-desc" data-t-fr="Système de vente et service client — texte + appels vocaux · 10 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
         </div>
       </div>
-      <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux intelligents en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:#e9d5ff">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية الذكية فوق كل مزايا الماسية الأساسية.</div>
+      <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:#e9d5ff">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
     </div>
   </div>
 
   <div class="pricing-container">
   <!-- Tabs -->
   <div class="pricing-tabs">
-    <button class="ptab-card" onclick="switchPriceTab('individual',this)">
+    <button class="ptab-card" data-ptab="individual" onclick="switchPriceTab('individual',this)">
       <span class="ptab-icon">👤</span>
       <span class="ptab-lbl">الأفراد</span>
     </button>
-    <button class="ptab-card" onclick="switchPriceTab('stores',this)">
+    <button class="ptab-card" data-ptab="stores" onclick="switchPriceTab('stores',this)">
       <span class="ptab-icon">🏪</span>
       <span class="ptab-lbl">المحلات التجارية</span>
     </button>
-    <button class="ptab-card active" onclick="switchPriceTab('offices',this)">
+    <button class="ptab-card active" data-ptab="offices" onclick="switchPriceTab('offices',this)">
       <span class="ptab-icon">🏢</span>
       <span class="ptab-lbl">المكاتب الافتراضية</span>
     </button>
-    <button class="ptab-card" onclick="switchPriceTab('corp',this)">
+    <button class="ptab-card" data-ptab="corp" onclick="switchPriceTab('corp',this)">
       <span class="ptab-icon">🏛️</span>
       <span class="ptab-lbl">الشركات والمعارض</span>
     </button>
-    <button class="ptab-card" onclick="switchPriceTab('tender',this)">
+    <button class="ptab-card" data-ptab="tender" onclick="switchPriceTab('tender',this)">
       <span class="ptab-icon">💼</span>
       <span class="ptab-lbl">غرفة المناقصة</span>
     </button>
-    <button class="ptab-card" onclick="switchPriceTab('ads',this)">
+    <button class="ptab-card" data-ptab="ads" onclick="switchPriceTab('ads',this)">
       <span class="ptab-icon">🎬</span>
       <span class="ptab-lbl">الإعلانات</span>
     </button>
@@ -2828,11 +2827,9 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
   <div class="price-pane" id="pane-corp">
     <div class="pricing-grid" id="grid-corp"></div>
   </div>
-  <!-- Tender -->
   <div class="price-pane" id="pane-tender">
     <div class="pricing-grid" id="grid-tender"></div>
   </div>
-  <!-- Ads / Rizq ADS -->
   <div class="price-pane" id="pane-ads">
     <div class="pricing-grid" id="grid-ads"></div>
   </div>
@@ -2854,9 +2851,9 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </defs>
         <rect width="100%" height="100%" fill="url(#cta-grid)"/>
       </svg>
-      <div style="position:absolute;width:min(420px,72vw);height:min(420px,72vw);border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.18),transparent 70%);top:-80px;inset-inline-end:-60px;pointer-events:none"></div>
-      <div style="position:absolute;width:min(360px,68vw);height:min(360px,68vw);border-radius:50%;background:radial-gradient(circle,rgba(52,211,153,.14),transparent 70%);top:20%;inset-inline-start:-60px;pointer-events:none"></div>
-      <div style="position:absolute;width:min(340px,65vw);height:min(340px,65vw);border-radius:50%;background:radial-gradient(circle,rgba(35,77,143,.55),transparent 70%);bottom:-60px;inset-inline-start:-50px;pointer-events:none"></div>
+      <div style="position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.18),transparent 70%);top:-140px;right:-120px"></div>
+      <div style="position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(52,211,153,.14),transparent 70%);top:20%;left:-130px"></div>
+      <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(35,77,143,.55),transparent 70%);bottom:-120px;left:-100px"></div>
       <div style="position:absolute;font-family:Georgia,'Times New Roman',serif;font-size:clamp(100px,16vw,200px);font-weight:900;color:rgba(201,168,76,.04);left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;letter-spacing:-6px">رزق</div>
     </div>
 
@@ -3332,6 +3329,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="ind-phone" type="tel" data-ph-fr="Numéro de téléphone (WhatsApp)" placeholder="رقم الهاتف (واتساب)"/>
       <input class="m-input" id="ind-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
       <input class="m-input" id="ind-email" type="email" data-ph-fr="E-mail (optionnel)" placeholder="البريد الإلكتروني (اختياري)"/>
+      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="ind-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale (NNI)" placeholder="الرقم الوطني للتعريف (NNI)"/>
       <div class="m-pw-wrap"><input class="m-input" id="ind-pw" type="password" data-ph-fr="Mot de passe (8 caractères+)" placeholder="كلمة المرور (8 أحرف+)"/><button class="m-eye" onclick="tp('ind-pw')">👁</button></div>
       <div class="m-pw-wrap" style="margin-bottom:14px"><input class="m-input" id="ind-pw2" type="password" data-ph-fr="Confirmer le mot de passe" placeholder="تأكيد كلمة المرور"/><button class="m-eye" onclick="tp('ind-pw2')">👁</button></div>
 
@@ -3381,7 +3379,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
       <label style="display:flex;align-items:flex-start;gap:9px;padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;cursor:pointer;margin-bottom:10px">
         <input type="checkbox" id="terms-co" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0" onchange="document.querySelector('#p-company .m-btn-main').style.opacity=this.checked?'1':'.4';document.querySelector('#p-company .m-btn-main').disabled=!this.checked"/>
-        <span style="font-size:12.5px;color:rgba(255,255,255,.85);font-weight:600;line-height:1.7">أوافق على <a href="rizq_legal.html" target="_blank" style="color:var(--gold)">شروط الاستخدام</a> و<a href="rizq_legal.html" target="_blank" style="color:var(--gold)">سياسة الخصوصية</a> لمنصة رزق. وبتسجيلي ونشري لأي إعلان أو مادة مرئية أو مسموعة أو نصية، أُقرّ صراحةً بأنني أمتلك كافة الحقوق والتراخيص القانونية اللازمة على جميع المواد التي أرفعها أو أنشرها على المنصة، وأن نشرها لا ينتهك حقوق الملكية الفكرية لأي طرف ثالث، وأتحمّل وحدي كامل المسؤولية القانونية والمالية في حال ثبوت أي انتهاك.</span>
+        <span data-t-fr="J'accepte les <a href=&quot;rizq_legal.html&quot; target=&quot;_blank&quot; style=&quot;color:var(--gold)&quot;>conditions d'utilisation</a> et la <a href=&quot;rizq_legal.html&quot; target=&quot;_blank&quot; style=&quot;color:var(--gold)&quot;>politique de confidentialité</a> de Rizq. En m'inscrivant et en publiant tout contenu, je déclare détenir les droits nécessaires et j'assume l'entière responsabilité en cas de violation." style="font-size:12.5px;color:rgba(255,255,255,.85);font-weight:600;line-height:1.7">أوافق على <a href="rizq_legal.html" target="_blank" style="color:var(--gold)">شروط الاستخدام</a> و<a href="rizq_legal.html" target="_blank" style="color:var(--gold)">سياسة الخصوصية</a> لمنصة رزق. وبتسجيلي ونشري لأي إعلان أو مادة مرئية أو مسموعة أو نصية، أُقرّ صراحةً بأنني أمتلك كافة الحقوق والتراخيص القانونية اللازمة على جميع المواد التي أرفعها أو أنشرها على المنصة، وأن نشرها لا ينتهك حقوق الملكية الفكرية لأي طرف ثالث، وأتحمّل وحدي كامل المسؤولية القانونية والمالية في حال ثبوت أي انتهاك.</span>
       </label>
       <button class="m-btn-main" onclick="goPhoneFromCompany()" disabled style="opacity:.4">التالي — تحقق الهاتف ←</button>
       <button class="m-link-btn" onclick="showPanel('p-type',0)">← عودة</button>
@@ -3391,7 +3389,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div id="p-phone" style="display:none">
       <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:21px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
       <p id="phone-step-label" style="color:var(--text-muted);font-size:11px;margin-bottom:4px">الخطوة الأخيرة</p>
-      <p style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">الرقم يجب أن يكون مسجلاً باسمك</p>
+      <p class="ph-note" style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">الرقم يجب أن يكون مسجلاً باسمك</p>
 
       <div class="ph-row">
         <span class="ph-prefix">🇲🇷 +222</span>
@@ -3540,7 +3538,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div id="p-phone" style="display:none">
       <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
       <p style="color:var(--text-muted);font-size:12px;margin-bottom:4px">الخطوة 3 من 3</p>
-      <p style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">رقم هاتف موريتاني مطلوب للتفعيل</p>
+      <p class="ph-note" style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">رقم هاتف موريتاني مطلوب للتفعيل</p>
       <div class="ph-row"><span class="ph-prefix">🇲🇷 +222</span><div class="ph-div"></div><input dir="ltr" style="direction:ltr;text-align:left;" class="ph-input" id="ph-in" type="tel" placeholder="XX XX XX XX" maxlength="8"/></div>
       <div style="display:flex;justify-content:center;gap:14px;margin-bottom:16px">
         <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mauritel</span>
@@ -3677,7 +3675,7 @@ buildCards();
   if(typeof FEATURED_ADS==='undefined'||FEATURED_ADS.length) return;
   var grid=document.querySelector('#listings .listings-grid');
   if(!grid) return;
-  grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'No featured listings yet.':'لا توجد إعلانات مميزة بعد.')+'</p>';
+  grid.innerHTML='<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'Aucune annonce en vedette pour le moment.':'لا توجد إعلانات مميزة بعد.')+'</p>';
 })();
 
 // ── QCAT PORTAL ──
@@ -4190,7 +4188,7 @@ function applyList(list){
     }
     var grid=document.querySelector('#listings .listings-grid');
     if(grid && !FEATURED_ADS.length){
-      grid.innerHTML='<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'No featured listings yet.':'لا توجد إعلانات مميزة بعد.')+'</p>';
+      grid.innerHTML='<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'Aucune annonce en vedette pour le moment.':'لا توجد إعلانات مميزة بعد.')+'</p>';
     }
   }
   applyList([]);
@@ -4710,6 +4708,34 @@ const SUB_FR = {
   'استشارات ووساطة تأمين':'Conseil & courtage en assurance'
 };
 
+function translateCatTaxonomy(toFr) {
+  document.querySelectorAll('.drop-link, .drop-group-title').forEach(function(el) {
+    if (el.closest('[data-extra="1"], [data-suggest="1"]')) return;
+    var current = (el.textContent || '').trim();
+    if (!el.hasAttribute('data-ar')) {
+      var arKey = current;
+      if (toFr && !SUB_FR[current]) {
+        Object.keys(SUB_FR).some(function(k){ if (SUB_FR[k] === current) { arKey = k; return true; } return false; });
+      }
+      el.setAttribute('data-ar', arKey);
+    }
+    var ar = el.getAttribute('data-ar');
+    el.textContent = toFr ? (SUB_FR[ar] || ar) : ar;
+  });
+  document.querySelectorAll('.cat-card:not([data-extra="1"]):not([data-suggest="1"]) .cat-name').forEach(function(el) {
+    var current = (el.textContent || '').trim();
+    if (!el.hasAttribute('data-ar')) {
+      var arKey = current;
+      var fi = CAT_NAMES.fr.indexOf(current);
+      if (fi >= 0) arKey = CAT_NAMES.ar[fi];
+      el.setAttribute('data-ar', arKey);
+    }
+    var ar = el.getAttribute('data-ar');
+    var ai = CAT_NAMES.ar.indexOf(ar);
+    el.textContent = toFr ? (ai >= 0 ? CAT_NAMES.fr[ai] : ar) : ar;
+  });
+}
+
 // ══════════════════════════════════════════════
 // MAIN TOGGLE FUNCTION
 // ══════════════════════════════════════════════
@@ -4772,6 +4798,28 @@ function applyLandingLang(toAr) {
     else if (el.querySelector('.cat-card, .cats-grid, .qcat')) return;
     else el.innerHTML = t[key];
   });
+
+  var accBtn = document.querySelector('.nav-account-btn');
+  if (accBtn) accBtn.setAttribute('aria-label', isAr ? 'حسابي' : 'Compte');
+  var stIn = document.getElementById('nav-sticky-search-input');
+  if (stIn) {
+    stIn.placeholder = isAr ? 'البحث في رزق...' : 'Rechercher sur Rizq...';
+    stIn.setAttribute('aria-label', isAr ? 'البحث في رزق' : 'Rechercher sur Rizq');
+  }
+  var stSearchBtn = document.querySelector('#nav-sticky-tools .nav-sticky-search-wrap button');
+  if (stSearchBtn) stSearchBtn.setAttribute('aria-label', isAr ? 'بحث' : 'Rechercher');
+  var jumpBar = document.getElementById('section-jump-bar');
+  if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
+  var hubs = document.querySelector('.cta-hubs');
+  if (hubs) hubs.setAttribute('aria-label', isAr ? 'أقسام رزق للأعمال' : 'Espaces professionnels Rizq');
+  var backTop = document.getElementById('back-to-top');
+  if (backTop) {
+    var upLbl = isAr ? 'العودة للأعلى' : 'Retour en haut';
+    backTop.setAttribute('aria-label', upLbl);
+    backTop.title = upLbl;
+  }
+  var mbn = document.getElementById('mobile-bottom-nav');
+  if (mbn) mbn.setAttribute('aria-label', isAr ? 'تنقل سفلي' : 'Navigation mobile');
 
   // Hero headline (single-word brand name only — size/weight handled by .hero-headline CSS)
   const hl = document.querySelector('#hero-hl');
@@ -4871,8 +4919,8 @@ function applyLandingLang(toAr) {
     el.textContent = isAr ? (carrierAR[i] || el.textContent) : (carrierFR[i] || el.textContent);
   });
 
-  // Category names
-  document.querySelectorAll('.cat-name').forEach((el, i) => {
+  // Category names — built-in cards only (skip extra/suggest so FR index never maps onto Arabic extras)
+  document.querySelectorAll('.cat-card:not([data-extra="1"]):not([data-suggest="1"]) .cat-name').forEach((el, i) => {
     if (CAT_NAMES[lang][i]) el.textContent = CAT_NAMES[lang][i];
   });
 
@@ -5008,9 +5056,9 @@ function applyLandingLang(toAr) {
   if(ctaTitle) ctaTitle.style.fontSize = isAr ? '' : 'clamp(20px,2.8vw,34px)';
 
   // Pricing tabs labels
-  const ptabLabels = document.querySelectorAll('.ptab-lbl');
-  const ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية'];
-  const ptabFR = ['Particuliers','Boutiques','Bureaux virtuels'];
+  const ptabLabels = document.querySelectorAll('#pricing .ptab-lbl');
+  const ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','الإعلانات'];
+  const ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Annonces'];
   ptabLabels.forEach((el,i)=>{ if(ptabAR[i]) el.textContent = isAr ? ptabAR[i] : ptabFR[i]; });
 
   // Navbar dropdown — same order as mobile (stores → about)
@@ -5103,8 +5151,16 @@ function applyLandingLang(toAr) {
 
   try { applyFullTranslation(lang); } catch (eTr) {}
   try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) {}
+  try { translateCatTaxonomy(!isAr); } catch (eTx) {}
   try { if (typeof renderPricingSection === 'function') renderPricingSection(); } catch (ePr) {}
   try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSg) {}
+  try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) {}
+  document.querySelectorAll('.rzq-empty, #listings .listings-grid > p').forEach(function(el){
+    var tx = (el.textContent || '').trim();
+    if (/إعلانات مميزة|featured listings|annonce en vedette/i.test(tx)) {
+      el.textContent = isAr ? 'لا توجد إعلانات مميزة بعد.' : 'Aucune annonce en vedette pour le moment.';
+    }
+  });
 
   document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: lang } }));
 }
@@ -5490,7 +5546,7 @@ function applyFullTranslation(lang) {
   qAll('#p-phone, [id="p-phone"]').forEach(panel => {
     const phTitle  = panel.querySelector('h3');
     const phSub    = panel.querySelector('#phone-step-label') || panel.querySelector('p:nth-child(2)');
-    const phNote   = panel.querySelector('p[style*="gold"]');
+    const phNote   = panel.querySelector('.ph-note') || panel.querySelector('p[style*="201,168,76"]');
     const phInput  = panel.querySelector('.ph-input');
     const phOtpLbl = panel.querySelector('#otp-wrap p:first-child');
     const phResend = panel.querySelector('#otp-wrap p:last-child');
@@ -5502,6 +5558,11 @@ function applyFullTranslation(lang) {
     if(phNote)   phNote.textContent  = t['ph-note'];
     if(phInput)  phInput.placeholder = t['ph-ph'];
     if(phOtpLbl) phOtpLbl.textContent= t['ph-otp-label'];
+    if(phResend){
+      var cdEl = phResend.querySelector('#cd');
+      var secs = cdEl ? cdEl.textContent : '60';
+      phResend.innerHTML = t['ph-resend'] + ' <span id="cd">' + secs + '</span>s';
+    }
     if(phSend)   phSend.textContent  = t['ph-send'];
     if(phVerify) phVerify.textContent= t['ph-verify'];
     if(phBack)   phBack.textContent  = t['ph-back'];
@@ -6031,7 +6092,46 @@ function saveAccountPending(data){
     log.push({accountId:data.id, name:data.name||data.owner||data.manager||'', termsVersion:RIZQ_TERMS_VERSION, agreedAt:data.legal_consent.agreedAt, ip:data.legal_consent.ip});
     localStorage.setItem('rizq_consent_log',JSON.stringify(log));
   }catch(e){}
-  _syncAccountToBackend(data);
+  return _syncAccountToBackend(data);
+}
+
+function _rollbackLocalAccount(accId){
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    accs = accs.filter(function(a){ return a.id !== accId; });
+    localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+  }catch(e){}
+  try{
+    if(localStorage.getItem('rizq_last_acc_id') === accId) localStorage.removeItem('rizq_last_acc_id');
+  }catch(e){}
+  try{
+    var log = JSON.parse(localStorage.getItem('rizq_consent_log')||'[]');
+    log = log.filter(function(e){ return e.accountId !== accId; });
+    localStorage.setItem('rizq_consent_log', JSON.stringify(log));
+  }catch(e){}
+}
+
+function nniRejectMessage(data){
+  return isAr
+    ? ((data && data.error) || 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر')
+    : ((data && data.error_fr) || 'Ce numéro d\'identité (NNI) est déjà associé à un autre compte');
+}
+
+function checkNniAvailable(nni){
+  if(!window.RIZQ_BACKEND_BASE || !nni) return Promise.resolve(true);
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/nni-available?nni=' + encodeURIComponent(nni))
+    .then(function(res){
+      return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
+    })
+    .then(function(out){
+      var data = out.data;
+      if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.available === false)){
+        alert(nniRejectMessage(data));
+        return false;
+      }
+      return true;
+    })
+    .catch(function(){ return true; });
 }
 
 // ── إصلاح جوهري: كان التسجيل محلياً 100% في localStorage — لا يرى الأدمن
@@ -6042,8 +6142,8 @@ function saveAccountPending(data){
 // (مُفعَّل بالفعل في rizq_admin.html). فشل الشبكة أو عدم نشر الخادم بعد لا
 // يكسر التسجيل المحلي إطلاقاً — يستمر العمل تماماً كما كان قبل هذا التعديل.
 function _syncAccountToBackend(acc){
-  if(!window.RIZQ_BACKEND_BASE) return;
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts', {
+  if(!window.RIZQ_BACKEND_BASE) return Promise.resolve({ ok: true, localOnly: true });
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts', {
     method: 'POST',
     headers: { 'Content-Type':'application/json' },
     body: JSON.stringify({
@@ -6065,16 +6165,24 @@ function _syncAccountToBackend(acc){
       idImage: acc.id_image || '',
       licenseImage: acc.license_image || ''
     })
-  }).then(function(res){ return res.ok ? res.json() : null; }).then(function(data){
-    if(!data || !data.ok || !data.accessToken) return;
+  }).then(function(res){
+    return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
+  }).then(function(out){
+    var data = out.data;
+    if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid')){
+      _rollbackLocalAccount(acc.id);
+      return { ok: false, blocked: true, code: data.code, message: nniRejectMessage(data) };
+    }
+    if(!data || !data.ok || !data.accessToken) return { ok: true };
     // نخزّن توكن الوصول الخاص بالحساب محلياً — سيُستخدم لاحقاً من داشبورد
     // المشترك نفسه للاستعلام عن حالة الموافقة الحقيقية عبر GET /api/accounts/mine/:id
     try{
-      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-      var rec = accs.find(function(a){ return a.id===acc.id; });
-      if(rec){ rec.backendAccessToken = data.accessToken; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
+      var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      var rec = accs2.find(function(a){ return a.id===acc.id; });
+      if(rec){ rec.backendAccessToken = data.accessToken; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
     }catch(e){}
-  }).catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة، لا يؤثر على التسجيل المحلي */ });
+    return { ok: true };
+  }).catch(function(){ return { ok: true, localOnly: true }; });
 }
 // ID upload handlers
 var _idCardB64 = null;
@@ -6116,10 +6224,19 @@ function submitIdUpload(){
       // المزامنة الأولى، نُرسِل الصورة مباشرة عبر PATCH — فشل الشبكة أو
       // عدم وجود توكن بعد لا يكسر التسجيل المحلي (نفس فلسفة _syncAccountToBackend).
       if(window.RIZQ_BACKEND_BASE && acc.backendAccessToken){
+        var patchBody = { idImage: _idCardB64 };
+        if(acc.nni) patchBody.nni = acc.nni;
         fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(accId), {
           method: 'PATCH',
           headers: { 'Content-Type':'application/json', 'x-account-token': acc.backendAccessToken },
-          body: JSON.stringify({ idImage: _idCardB64 })
+          body: JSON.stringify(patchBody)
+        }).then(function(res){
+          return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
+        }).then(function(out){
+          var data = out.data;
+          if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.code === 'nni_locked')){
+            alert(nniRejectMessage(data));
+          }
         }).catch(function(){ /* صامت — نفس فلسفة _syncAccountToBackend */ });
       }
     }
@@ -6325,15 +6442,19 @@ function ppFinalSubmit(){
   data.receipt_image= _ppReceiptB64||null;
   data.receipt_name = _ppReceiptName||null;
   data.pkg_status   = isTrial?'trial':((_ppReceiptB64)?'pending_payment_review':'pending_payment');
-  saveAccountPending(data);
-  // Show success with package info
-  var okEl=document.getElementById('p-ok');
-  if(okEl){
-    var h3=okEl.querySelector('h3');
-    if(h3&&isTrial) h3.textContent='🎉 مرحباً في رزق — ابدأ تجربتك المجانية!';
-    else if(h3) h3.textContent='🎉 طلبك قيد المراجعة!';
-  }
-  showPanel('p-ok', 4, 4);
+  Promise.resolve(saveAccountPending(data)).then(function(result){
+    if(result && result.blocked){
+      alert(result.message);
+      return;
+    }
+    var okEl=document.getElementById('p-ok');
+    if(okEl){
+      var h3=okEl.querySelector('h3');
+      if(h3&&isTrial) h3.textContent='🎉 مرحباً في رزق — ابدأ تجربتك المجانية!';
+      else if(h3) h3.textContent='🎉 طلبك قيد المراجعة!';
+    }
+    showPanel('p-ok', 4, 4);
+  });
 }
 
 
@@ -6350,13 +6471,16 @@ function submitStoreReg(){
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!stFile){alert(isAr?'يرجى رفع صورة البطاقة الوطنية':'Veuillez télécharger une photo de la carte d\'identité nationale');return;}
-  // إصلاح 13/08/2026: stFile كان يُتحقَّق من وجوده فقط لمنع المتابعة بلا رفع،
-  // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
-  // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
-  _fileToBase64(stFile).then(function(id_image){
-    _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
-    _ppBackPanel='p-store-form'; _ppBackDot=2;
-    ppShowPanel();
+  checkNniAvailable(nni).then(function(ok){
+    if(!ok) return;
+    // إصلاح 13/08/2026: stFile كان يُتحقَّق من وجوده فقط لمنع المتابعة بلا رفع،
+    // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
+    // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
+    _fileToBase64(stFile).then(function(id_image){
+      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppBackPanel='p-store-form'; _ppBackDot=2;
+      ppShowPanel();
+    });
   });
 }
 
@@ -6374,13 +6498,16 @@ function submitOfficeReg(){
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!ofFile1||!ofFile2){alert(isAr?'يرجى رفع رخصة النشاط والبطاقة الوطنية':'Veuillez télécharger la licence d\'activité et la carte d\'identité nationale');return;}
-  // ofFile2 = البطاقة الوطنية (id_image الحقيقي)، ofFile1 = رخصة النشاط
-  // (license_image) — كلاهما كان يُفقَد تماماً بعد الرفع، لم يُقرآ أبداً.
-  Promise.all([_fileToBase64(ofFile2), _fileToBase64(ofFile1)]).then(function(r){
-    var id_image=r[0], license_image=r[1];
-    _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),trial_ends:new Date(Date.now()+10*86400000).toISOString()};
-    _ppBackPanel='p-office-form'; _ppBackDot=2;
-    ppShowPanel();
+  checkNniAvailable(nni).then(function(ok){
+    if(!ok) return;
+    // ofFile2 = البطاقة الوطنية (id_image الحقيقي)، ofFile1 = رخصة النشاط
+    // (license_image) — كلاهما كان يُفقَد تماماً بعد الرفع، لم يُقرآ أبداً.
+    Promise.all([_fileToBase64(ofFile2), _fileToBase64(ofFile1)]).then(function(r){
+      var id_image=r[0], license_image=r[1];
+      _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+      _ppBackPanel='p-office-form'; _ppBackDot=2;
+      ppShowPanel();
+    });
   });
 }
 
@@ -6399,14 +6526,17 @@ function submitCorpReg(){
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!crFile1||!crFile2){alert(isAr?'يرجى رفع السجل التجاري ورخصة النشاط':'Veuillez télécharger le registre de commerce et la licence d\'activité');return;}
-  // لا يوجد حقل بطاقة تعريف شخصية منفصلة في نموذج الشركة حالياً — السجل
-  // التجاري الرسمي (crFile1) هو أقرب وثيقة تحقق متاحة فنُرسِله كـid_image،
-  // وختم/رخصة الشركة (crFile2) كـlicense_image.
-  Promise.all([_fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
-    var id_image=r[0], license_image=r[1];
-    _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
-    _ppBackPanel='p-corp-form'; _ppBackDot=2;
-    ppShowPanel();
+  checkNniAvailable(nni).then(function(ok){
+    if(!ok) return;
+    // لا يوجد حقل بطاقة تعريف شخصية منفصلة في نموذج الشركة حالياً — السجل
+    // التجاري الرسمي (crFile1) هو أقرب وثيقة تحقق متاحة فنُرسِله كـid_image،
+    // وختم/رخصة الشركة (crFile2) كـlicense_image.
+    Promise.all([_fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
+      var id_image=r[0], license_image=r[1];
+      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppBackPanel='p-corp-form'; _ppBackDot=2;
+      ppShowPanel();
+    });
   });
 }
 
@@ -6414,15 +6544,20 @@ function submitIndividualReg(){
   const name=document.getElementById('ind-name').value.trim();
   const phone=document.getElementById('ind-phone').value.trim();
   const city=document.getElementById('ind-city').value.trim();
+  const nni=document.getElementById('ind-nni').value.trim();
   const pw=document.getElementById('ind-pw').value;
   const pw2=document.getElementById('ind-pw2').value;
   if(!name||!phone||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  if(!NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!indFile){alert(isAr?'يرجى رفع صورة البطاقة الوطنية':'Veuillez télécharger une photo de la carte d\'identité nationale');return;}
-  _ppPendingData={type:'individual',name,owner:name,phone,city,email:document.getElementById('ind-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
-  _ppBackPanel='p-individual-form'; _ppBackDot=1;
-  ppShowPanel();
+  checkNniAvailable(nni).then(function(ok){
+    if(!ok) return;
+    _ppPendingData={type:'individual',name,owner:name,phone,city,nni,email:document.getElementById('ind-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+    _ppBackPanel='p-individual-form'; _ppBackDot=1;
+    ppShowPanel();
+  });
 }
 
 function selectType(t){
@@ -6714,6 +6849,15 @@ function goNavPackage(tab){
   if (pane) pane.classList.add('active');
 }
 function switchPriceTab(tab, btn){
+  if(tab==='individual'||tab==='stores'||tab==='offices'||tab==='corp'||tab==='tender'||tab==='ads'){
+    document.querySelectorAll('#pricing .ptab-card').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.price-pane').forEach(function(p){p.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    var pane=document.getElementById('pane-'+tab);
+    if(pane) pane.classList.add('active');
+    if(typeof window.updateDiamondPitch==='function') window.updateDiamondPitch(tab);
+    return;
+  }
   _priceTab = tab;
   // إصلاح: كان السلكتور '.price-tab-btn' لا يطابق أي عنصر فعلياً (الكلاس الحقيقي price-tab/ptab-card)،
   // فلم تُزَل حالة "active" عن التبويب القديم أبداً. الحل: تنظيف الإخوة المباشرين لمن نُقر عليه.
@@ -6845,9 +6989,30 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSu
 function refreshCatStatsText(){
   const grid = document.querySelector('.cats-grid');
   if(!grid) return;
-  const n = grid.querySelectorAll('.cat-card').length;
-  const m = grid.querySelectorAll('.cat-card .drop-link').length;
+  const n = grid.querySelectorAll('.cat-card:not([data-suggest="1"])').length;
+  const m = grid.querySelectorAll('.cat-card:not([data-suggest="1"]) .drop-link').length;
   if(!n) return;
+  var cats = [];
+  grid.querySelectorAll('.cat-card:not([data-suggest="1"])').forEach(function(card){
+    var nameEl = card.querySelector('.cat-name');
+    if(!nameEl) return;
+    var raw = (nameEl.textContent || '').trim();
+    var ar = nameEl.getAttribute('data-ar') || card.getAttribute('data-cat-ar') || '';
+    if(!ar){
+      var fi = (CAT_NAMES.fr || []).indexOf(raw);
+      ar = fi >= 0 ? CAT_NAMES.ar[fi] : raw;
+    }
+    var ai = (CAT_NAMES.ar || []).indexOf(ar);
+    var frName = ai >= 0 ? CAT_NAMES.fr[ai] : ar;
+    var iconEl = card.querySelector('.cat-icon-box');
+    cats.push({
+      ar: ar,
+      fr: frName,
+      emoji: iconEl ? (iconEl.textContent || '').trim() : '',
+      n: card.querySelectorAll('.drop-link').length
+    });
+  });
+  try { localStorage.setItem('rizq_cat_stats', JSON.stringify({n:n,m:m,cats:cats})); } catch(e){}
   LANG.ar['s-cats-desc'] = n+' قسماً رئيسياً و'+m+'+ فرعاً — السوق الموريتاني الأشمل والأدق';
   LANG.ar['why2-title']  = n+' قسماً و'+m+'+ فرعاً';
   LANG.ar['ft-desc']     = 'منصة الإعلانات المبوبة الأولى في موريتانيا. '+n+' قسماً، '+m+'+ فرعاً، ملايين الفرص.';
@@ -6858,8 +7023,13 @@ function refreshCatStatsText(){
   ['s-cats-desc','why2-title','ft-desc'].forEach(function(key){
     document.querySelectorAll('[data-t="'+key+'"]').forEach(function(el){ el.innerHTML = LANG[lang][key]; });
   });
+  const catNum = document.querySelector('#platform-stats .h-stat:nth-child(2) .h-stat-num');
+  if(catNum){ catNum.setAttribute('data-target', String(n)); if(!catNum.getAttribute('data-count-text')) catNum.textContent = String(n); }
+  const subNum = document.querySelector('#platform-stats .h-stat:nth-child(3) .h-stat-num');
+  if(subNum){ subNum.setAttribute('data-target', String(m)); }
   const metaDesc = document.querySelector('meta[name="description"]');
   if(metaDesc) metaDesc.setAttribute('content','رزق — منصة الإعلانات المبوبة الأولى في موريتانيا. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر. '+n+' قسماً، '+m+'+ فرعاً، مجاناً.');
+  if(typeof window._rizqApplyFooterStats === 'function') window._rizqApplyFooterStats();
 }
 refreshCatStatsText();
 window.addEventListener('storage',function(e){ if(e.key==='rizq_extra_categories'){ renderExtraCategories(); refreshCatStatsText(); } });
@@ -6906,6 +7076,7 @@ var PKG_TR = {
   'وصول كامل للمنصة':'Accès complet à la plateforme','استعراض المنتجات':'Présentation des produits','دعم فني أساسي':'Support technique de base',
   'شارة محل مميّز برزق':'Badge boutique premium Rizq','عرض 50 منتج':'Affichage de 50 produits','عرض 100 منتج':'Affichage de 100 produits','عرض 500 منتج':'Affichage de 500 produits','عرض 10 منتجات':'10 produits affichés','إحصائيات شهرية':'Statistiques mensuelles','دعم بالأولوية':'Support prioritaire',
   'كل مزايا الشهرية':'Tous les avantages mensuels','توفير 15% عن الشهري':'Économisez 15% vs mensuel','عرض 200 منتج':'Affichage de 200 produits','مدير حساب مخصص':'Gestionnaire de compte dédié',
+  'كل مزايا الربعية':'Tous les avantages trimestriels','توفير 35% عن الشهري':'Économisez 35% vs mensuel','منتجات غير محدودة':'Produits illimités','دعم VIP 24/7':'Support VIP 24/7','تقارير سنوية':'Rapports annuels',
   'منتجات غير محدودة للمتجر':'Produits illimités pour la boutique','نائب ذكي نصي للمحل (موقع + واتساب)':'Adjoint intelligent texte (site + WhatsApp)','1,500 محادثة نصية شهرياً':'1 500 conversations texte / mois',
   'نائب ذكي تفاعلي للمحل (نصي + صوتي)':'Adjoint interactif boutique (texte + voix)','2,500 محادثة نصية + 150 دقيقة صوتية شهرياً':'2 500 conversations texte + 150 min voix / mois','ويدجت الموقع + واتساب + مكالمات آليّة':'Widget site + WhatsApp + appels automatiques',
   'الماسية الأساسية للمحلات':'Diamant Standard boutique','الماسية Pro للمحلات':'Diamant Pro boutique','الأكثر اختياراً للمحلات':'Le plus choisi pour les boutiques',
@@ -6937,9 +7108,35 @@ var PKG_TR = {
   'دفع لكل إعلان — بلا اشتراك شهري':'Paiement par annonce — sans abonnement mensuel',
   'اشترِ إعلان فيديو الآن':'Acheter une annonce vidéo','🎬 اشترِ إعلان فيديو الآن':'🎬 Acheter une annonce vidéo',
   'إعلان واحد':'1 annonce','Pay-Per-Ad':'Paiement par annonce','دفع لكل إعلان':'Paiement par annonce',
-  '💎 ماسية':'💎 Diamant','الماسية الأساسية':'Diamant Standard','الماسية Pro':'Diamant Pro'
+  '💎 ماسية':'💎 Diamant','الماسية الأساسية':'Diamant Standard','الماسية Pro':'Diamant Pro',
+  'استعراض الإعلانات':'Parcourir les annonces','شارة شركة مميّزة برزق':'Badge entreprise premium Rizq',
+  'عرض 30 إعلان':'30 annonces affichées','ميزات VIP حصرية':'Avantages VIP exclusifs',
+  'دعم 24/7':'Support 24/7','تقارير سنوية شاملة':'Rapports annuels complets',
+  'تصفّح وتصفية المناقصات المنشورة':"Parcourir et filtrer les appels d'offres",
+  'بيانات التواصل مخفية/ضبابية':'Coordonnées masquées / floutées','تقديم العروض مقفول':"Dépôt d'offres verrouillé",
+  'كشف بيانات تواصل صاحب المناقصة':"Coordonnées de l'émetteur révélées",
+  'تقديم عروض غير محدود':"Dépôt d'offres illimité",'نشر مناقصات':"Publier des appels d'offres",
+  'توفير 10% عن الشهري':'Économisez 10% vs mensuel',
+  'أولوية ظهور عروضك لأصحاب المناقصات':'Priorité de vos offres auprès des émetteurs',
+  'توفير 25% عن الشهري':'Économisez 25% vs mensuel','دعم VIP':'Support VIP',
+  'تنبيهات فورية SMS/واتساب للمناقصات الجديدة':'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres',
+  'حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)':'Jusqu\'à 3 vidéos pub / mois (plusieurs produits)',
+  'إحصائيات أداء أساسية آلية':'Statistiques de performance automatiques',
+  'حتى 10 فيديوهات إعلانية ترويجية شهرياً':'Jusqu\'à 10 vidéos pub / mois',
+  'أولوية الترتيب في نتائج البحث':'Priorité dans les résultats de recherche',
+  'شارة «محتوى مميّز برزق» الموثّقة':'Badge « contenu mis en avant Rizq »',
+  'فيديوهات وعروض غير محدودة':'Vidéos et campagnes illimitées',
+  'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية':'Mise en avant sur la page d\'accueil',
+  'تقارير تحليل أداء آلية مفصّلة':'Rapports de performance détaillés',
+  'دعم VIP ذو أولوية + شارة VIP موثّقة':'Support VIP prioritaire + badge VIP'
 };
-function trPkg(s){ return (typeof s==='string' && PKG_TR.hasOwnProperty(s)) ? PKG_TR[s] : s; }
+function trPkg(s){
+  if (typeof s !== 'string') return s;
+  if (PKG_TR.hasOwnProperty(s)) return PKG_TR[s];
+  var t = s.replace(/\s+/g, ' ').trim();
+  if (PKG_TR.hasOwnProperty(t)) return PKG_TR[t];
+  return s;
+}
 
 function renderPricingSection(){
   var DEF_IND=[
@@ -7147,6 +7344,7 @@ function renderPricingSection(){
   } catch (eLang) {}
 
   function catalogPackages(catalogKey, ensureDiamond) {
+    try {
     var lang = _pkgLang;
     var list = [];
     if (window.RizqPackagesConfig) {
@@ -7170,6 +7368,9 @@ function renderPricingSection(){
       list = RizqPackagesConfig.withDiamond(list, lang, catalogKey).map(function (p) { return enrichPkgForLanding(p, lang); });
     }
     return list;
+    } catch (eCat) {
+      return [];
+    }
   }
 
   function landingPeriodShort(p, lang) {
@@ -7233,9 +7434,24 @@ function renderPricingSection(){
   var corp = catalogPackages('corp', true);
   var tender = catalogPackages('tender', false);
   var ads = catalogPackages('video', false);
+  if (!ind.length) ind = DEF_IND.slice();
+  if (!sto.length) sto = DEF_STO.slice();
+  if (!off.length) off = DEF_OFF.slice();
+  function rawCat(key) {
+    try {
+      if (window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS[key]) {
+        return JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS[key]));
+      }
+    } catch (eRaw) {}
+    return [];
+  }
+  if (!corp.length) corp = rawCat('corp');
+  if (!tender.length) tender = rawCat('tender');
+  if (!ads.length) ads = rawCat('video');
 
   function renderGrid(pkgs, gridId){
     var el=document.getElementById(gridId); if(!el)return;
+    pkgs = pkgs || [];
     var origin = gridId==='grid-individual'?'individual':gridId==='grid-stores'?'stores':gridId==='grid-offices'?'offices':gridId==='grid-corp'?'corp':gridId==='grid-tender'?'tender':gridId==='grid-ads'?'ads':'';
     var _fr = (typeof isAr!=='undefined' && !isAr);
     el.innerHTML=pkgs.map(function(p){
@@ -7249,7 +7465,6 @@ function renderPricingSection(){
         }
         p.diamond = true; p.isDiamond = true; p.featured = true;
       }
-      // أسماء/فترات/مزايا/زر — عربي افتراضياً، فرنسي إن وُجد حقل _fr (نفس نمط fallback المستخدم في renderExtraCategories)
       var pName = _fr ? trPkg(p.name_fr || p.name) : p.name;
       var pPeriod = _fr ? (p.period_fr || trPkg(p.period||'')) : (p.period||'');
       var pFeats = _fr ? ((p.features_fr && p.features_fr.length) ? p.features_fr : (p.features||[]).map(trPkg)) : (p.features||[]);
@@ -7257,6 +7472,15 @@ function renderPricingSection(){
       var pDesc = _fr ? (p.description_fr || p.description || '') : (p.description || '');
       var pRoi = _fr ? (p.roi_fr || p.roi || '') : (p.roi || '');
       var pBadge = _fr ? (p.featuredBadge_fr || p.featuredBadge || 'Le plus choisi par les entreprises') : (p.featuredBadge || 'الأكثر اختياراً للشركات');
+      if (_fr) {
+        pName = trPkg(pName);
+        pPeriod = trPkg(pPeriod);
+        pCta = trPkg(pCta);
+        pDesc = trPkg(pDesc);
+        pRoi = trPkg(pRoi);
+        pBadge = trPkg(pBadge);
+        pFeats = (pFeats || []).map(trPkg);
+      }
       var isFree=p.price===0||p.price==='0'||p.cta==='ابدأ مجاناً';
       var isDiamond=p.diamond||p.isDiamond||/ماس|diamond|diamant/i.test(String(p.name||'')+String(p.cta||''));
       var isYear=p.name==='سنوية'||p.name==='Annuelle';
@@ -7332,7 +7556,7 @@ function renderPricingSection(){
       head: { ar: '💎 النائب الذكي — باقتان ماسيتان', fr: '💎 Le plus choisi par les entreprises' },
       std: { name: { ar: 'الماسية الأساسية 💎', fr: 'Diamant Standard 💎' }, desc: { ar: 'موظف استقبال واستفسارات آلي 24/7', fr: 'Réceptionniste automatique 24h/24' } },
       pro: { name: { ar: 'الماسية Pro 💎', fr: 'Diamant Pro 💎' }, desc: { ar: 'نص + مكالمات صوتية تفاعلية', fr: 'Texte + appels vocaux interactifs' } },
-      foot: { ar: 'الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية الذكية فوق كل مزايا الماسية الأساسية.', fr: 'Le principal avantage de Pro : les appels vocaux intelligents en plus du texte.' }
+      foot: { ar: 'الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.', fr: 'Le principal avantage de Pro : les appels vocaux interactifs en plus du texte.' }
     }
   };
   function updateDiamondPitch(tab){
@@ -7352,6 +7576,7 @@ function renderPricingSection(){
     if(el('diamond-pitch-pro-desc')) el('diamond-pitch-pro-desc').textContent=cfg.pro.desc[lang];
     if(el('diamond-pitch-foot')) el('diamond-pitch-foot').textContent=cfg.foot[lang];
   }
+  window.updateDiamondPitch = updateDiamondPitch;
   var _origSPT = window.switchPriceTab;
   window.switchPriceTab = function(tab, btn){
     if(tab==='individual'||tab==='stores'||tab==='offices'||tab==='corp'||tab==='tender'||tab==='ads'){
@@ -7365,7 +7590,9 @@ function renderPricingSection(){
     }
     if(typeof _origSPT==='function') _origSPT(tab,btn);
   };
-  updateDiamondPitch('offices');
+  var activeBtn = document.querySelector('#pricing .ptab-card.active');
+  var activeTab = (activeBtn && activeBtn.getAttribute('data-ptab')) || 'offices';
+  updateDiamondPitch(activeTab);
 }
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -7688,15 +7915,15 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_packages_config.js?v=13.2"></script>
+<script src="rizq_packages_ui.js?v=12.7"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
-<script src="rizq_packages_ui.js?v=12.7"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_widget_embed.js?v=13.9"></script>
+<script src="rizq_widget_embed.js"></script>
 <script src="rizq_landing_ux.js?v=13.7"></script>
 <script src="rizq_disclaimer.js"></script>
 

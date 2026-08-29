@@ -1,3 +1,52 @@
+:root{
+  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.section-header,
+.cta-inner,
+.price-ticker-wrap,
+.price-card,
+.cs-strip,
+.rzq-disc-empty,
+.hero-stats-bar,
+.ticker-wrap,
+.hero-eyebrow,
+.hero-title-card,
+.hero-subtitle-card,
+.hero-vid-ph,
+.listings-label > span,
+.ad-card,
+.listing-card,
+#cat-portal,
+.why-card,
+.rvid-section,
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav),
+.rpkg-card[style*="#1B3A6B"],
+.pricing-card[style*="#1B3A6B"]{
+  background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),var(--rizq-navy-grid)!important;
+  background-size:auto,60px 60px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-blend-mode:overlay;
+}
+
+html body footer,
+html body footer.rizq-footer{
+  background:linear-gradient(180deg,#0D1B2A,#071020)!important;
+  background-blend-mode:normal!important;
+}
+html body footer .footer-desc,
+html body footer .footer-links a,
+html body footer .footer-copy,
+html body footer .logo-sub{
+  color:rgba(255,255,255,.82)!important;
+}
+html body footer .footer-links li a{
+  white-space:nowrap;
+}
+html body footer .footer-links a:hover{
+  color:#C9A84C!important;
+}
+
 /* rizq_landing_ux.css — تحسينات UX للصفحة الرئيسية */
 
 /* ── Sticky compact nav (بحث + CTA عند التمرير) ── */
@@ -259,10 +308,9 @@ html[dir="ltr"] .section-header .section-desc{
   }
 }
 
-#diamond-pitch{
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
+#diamond-pitch[style*="display: none"],
+#diamond-pitch[style*="display:none"]{
+  display:none !important;
 }
 
 /* ══ تثبيت الصفحة — لا اهتزاز أفقي ══ */
@@ -283,7 +331,6 @@ body{
 .pricing-section,
 #categories,
 #listings,
-#pricing,
 #about,
 #prices{
   max-width:100%;
@@ -292,18 +339,23 @@ body{
 }
 
 .pricing-grid{
+  display:grid !important;
   grid-template-columns:repeat(auto-fit,minmax(165px,1fr)) !important;
+  grid-auto-flow:row !important;
   gap:16px !important;
   width:100% !important;
   min-width:0 !important;
+  max-width:100% !important;
   padding-top:20px !important;
   overflow:visible !important;
 }
 
 .pricing-card,
+.rpkg-card,
 .rpkg-card.pricing-card{
   min-width:0 !important;
   max-width:100% !important;
+  width:auto !important;
   overflow:visible !important;
 }
 
@@ -336,6 +388,12 @@ body{
 .why-grid{
   overscroll-behavior-x:contain;
   max-width:min(1140px,100%);
+  margin-left:auto;
+  margin-right:auto;
+  justify-content:center;
+}
+@media(max-width:768px){
+  .why-grid{justify-content:flex-start}
 }
 
 .why-bg-text{

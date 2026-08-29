@@ -197,7 +197,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 /* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
 </style>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 </head>
 <body>
 
@@ -519,7 +519,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 <!-- ══ SCRIPTS ══ -->
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js"></script>
-<script src="rizq_packages_ui.js?v=12.5"></script>
+<script src="rizq_packages_ui.js?v=12.9"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_announcements.js"></script>
@@ -610,6 +610,15 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
 var _acc = null;
 var _allItems = [];
 var _catFilter = 'all';
+var _SR_CAT_FR = {
+  'سيارات': 'Voitures', 'إلكترونيات': 'Électronique', 'أثاث': 'Meubles',
+  'معدات': 'Équipements', 'مجوهرات': 'Bijoux', 'عقارات': 'Immobilier',
+  'خدمات': 'Services', 'مفروشات': 'Meubles', 'مواد بناء': 'Matériaux de construction', 'شاحنات': 'Camions'
+};
+function _srCatLabel(cat){
+  if(_lang!=='fr'||!cat) return cat||'';
+  return _SR_CAT_FR[cat]||cat;
+}
 
 function loadData(){
   /* Load showroom account */
@@ -674,7 +683,7 @@ function renderCatalog(){
       +(item.featured ? '<span class="item-badge">'+_t('مميز','Vedette')+'</span>' : '')
       +'</div>'
       +'<div class="item-info">'
-      +'<span class="item-cat-label">'+esc(item.cat||'')+'</span>'
+      +'<span class="item-cat-label">'+esc(_srCatLabel(item.cat||''))+'</span>'
       +'<div class="item-name">'+esc(name)+'</div>'
       +(specs ? '<div class="item-specs">'+esc(specs)+'</div>' : '')
       +'<div class="item-price">'+esc(item.price||'')+(item.priceNote ? ' <small>'+esc(item.priceNote)+'</small>' : '')+'</div>'
@@ -718,7 +727,7 @@ function applyAccountData(){
     var _snEl = document.getElementById('showroom-name');
     _snEl.textContent = _acc.name;
     _snEl.setAttribute('data-acc','1');
-    document.title = _acc.name + ' — رزق | Rizq';
+    document.title = _acc.name + ( _lang==='fr' ? ' | Rizq' : ' — رزق | Rizq');
   }
   if(_acc.tagline||_acc.desc){
     var _stEl = document.getElementById('showroom-tagline');
@@ -864,7 +873,20 @@ function applyLang(){
   /* ── اتجاه الصفحة ولغتها — يجب أن يكون أوّل شيء ── */
   document.documentElement.dir  = isFr ? 'ltr' : 'rtl';
   document.documentElement.lang = isFr ? 'fr'  : 'ar';
+  document.title = isFr ? 'Showroom Rizq | Rizq' : 'معرض رزق | Rizq';
   document.getElementById('lang-btn').textContent = isFr ? 'ع' : 'FR';
+  var _premBadge = document.getElementById('premium-badge-lbl');
+  if (_premBadge && _premBadge.style.display !== 'none') {
+    _premBadge.textContent = isFr ? '🏅 Showroom Premium Rizq' : '🏅 معرض مميّز برزق';
+  }
+  var _cityLbl = document.getElementById('info-city-lbl');
+  if (_cityLbl && !_cityLbl.hasAttribute('data-acc')) {
+    _cityLbl.textContent = isFr ? 'Nouakchott, Mauritanie' : 'نواكشوط، موريتانيا';
+  }
+  var _discPill = document.getElementById('disc-pill-txt');
+  if (_discPill && !_discPill.getAttribute('data-custom')) {
+    _discPill.textContent = isFr ? '⚖️ Avis juridique' : '⚖️ إشعار قانوني';
+  }
   // Nav
   document.getElementById('nav-catalog-lbl').textContent = isFr ? '🚗 Catalogue' : '🚗 الكتالوج';
   document.getElementById('nav-about-lbl').textContent   = isFr ? 'À propos' : 'من نحن';

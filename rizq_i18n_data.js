@@ -82,7 +82,8 @@ window.RIZQ_I18N_AR = {
     "footer-col-contact": "تواصل معنا",
     "footer-tel1": "موريتل: ",
     "footer-tel2": "ماتيل: ",
-    "footer-tel3": "شينقيتل: "
+    "footer-tel3": "شينقيتل: ",
+    "page-title": "Rizq ADS — إعلانك بالفيديو يصل لآلاف الزوار | رزق"
   },
   "dashboard": {
     "greeting": "مرحباً، محمد 👋",
@@ -1093,6 +1094,12 @@ window.RIZQ_I18N_AR = {
     "calc-cov-basic": "الخيار الأساسي",
     "calc-cov-full": "خيار موسّع / متابعة كاملة",
     "calc-result-lbl": "💰 النطاق التقريبي",
+    "calc-price-info-lbl": "ℹ️ السعر",
+    "calc-price-custom": "يُحدَّد حسب التفاصيل — تواصل مباشرة",
+    "calc-msg-prefill": "مهتم بعد استخدام مقدّر التكلفة ({price}) — أرجو تأكيد السعر النهائي.",
+    "rf-phone-ph": "+222 XX XX XX XX *",
+    "verified-plus-badge-txt": "موثّق⁺",
+    "page-title": "المكاتب — رزق أوفيس",
     "calc-note": "تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة",
     "calc-req-btn": "📤 اطلب عرض سعر دقيق لهذا الاختيار",
     "disc-footer-note": "Rizq Platform · موريتانيا · جميع الحقوق محفوظة ©"
@@ -1629,7 +1636,8 @@ window.RIZQ_I18N_FR = {
     "footer-col-contact": "Contactez-nous",
     "footer-tel1": "Mauritel : ",
     "footer-tel2": "Mattel : ",
-    "footer-tel3": "Chinguitel : "
+    "footer-tel3": "Chinguitel : ",
+    "page-title": "Rizq ADS — Votre vidéo atteint des milliers de visiteurs | Rizq"
   },
   "dashboard": {
     "greeting": "Bonjour, Mohamed 👋",
@@ -2640,6 +2648,12 @@ window.RIZQ_I18N_FR = {
     "calc-cov-basic": "Option de base",
     "calc-cov-full": "Option étendue / suivi complet",
     "calc-result-lbl": "💰 Fourchette estimée",
+    "calc-price-info-lbl": "ℹ️ Tarif",
+    "calc-price-custom": "À définir selon les détails — contactez directement",
+    "calc-msg-prefill": "Intéressé après l'estimateur ({price}) — merci de confirmer le tarif final.",
+    "rf-phone-ph": "+222 XX XX XX XX *",
+    "verified-plus-badge-txt": "Vérifié⁺",
+    "page-title": "Bureaux — Rizq Office",
     "calc-note": "Estimation préliminaire uniquement, non un devis final — la confirmation se fait directement auprès du bureau",
     "calc-req-btn": "📤 Demander un devis précis pour ce choix",
     "disc-footer-note": "Rizq Platform · Mauritanie · Tous droits réservés ©"

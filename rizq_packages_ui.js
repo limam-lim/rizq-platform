@@ -107,6 +107,13 @@
   }
 
   function syncAllFromBackend(cb) {
+    var cfg = global.RizqPackagesConfig;
+    if (cfg && typeof cfg.syncCatalogFromBackend === 'function') {
+      return cfg.syncCatalogFromBackend({ force: true }).then(function (ok) {
+        if (typeof cb === 'function') cb(!!ok);
+        return !!ok;
+      });
+    }
     if (!global.RIZQ_BACKEND_BASE) {
       if (typeof cb === 'function') cb(false);
       return Promise.resolve(false);
@@ -308,4 +315,7 @@
   } else {
     autoMount();
   }
+  document.addEventListener('rizq:langchange', function () {
+    autoMount();
+  });
 })(typeof window !== 'undefined' ? window : globalThis);

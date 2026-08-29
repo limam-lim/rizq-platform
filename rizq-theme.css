@@ -1,5 +1,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
+:root {
+  --rizq-navy-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.section-header,
+.sec-header,
+.cta-inner,
+.price-ticker-wrap,
+.price-card,
+.cs-strip,
+.rzq-disc-empty,
+.hero-stats-bar,
+.rn-topnav,
+.ticker-wrap,
+.hero-eyebrow,
+.hero-title-card,
+.hero-subtitle-card,
+.hero-vid-ph,
+.listings-label > span,
+.ad-card,
+.listing-card,
+#cat-portal,
+.why-card,
+.rvid-section,
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav),
+.rpkg-card[style*="#1B3A6B"],
+.pricing-card[style*="#1B3A6B"] {
+  background-image: linear-gradient(135deg, #0D1B2A, #1B3A6B), var(--rizq-navy-grid) !important;
+  background-size: auto, 60px 60px !important;
+  background-repeat: no-repeat, repeat !important;
+  background-blend-mode: overlay;
+}
+
+html body footer,
+html body footer.rizq-footer {
+  background: linear-gradient(180deg, #0D1B2A, #071020) !important;
+  background-blend-mode: normal !important;
+}
+html body footer .footer-desc,
+html body footer .footer-links a,
+html body footer .footer-copy,
+html body footer .logo-sub {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+html body footer .footer-links li a {
+  white-space: nowrap;
+}
+html body footer .footer-links a:hover {
+  color: #C9A84C !important;
+}
+
 /* ================================================================
    RIZQ — THÈME OFFICIEL v2.1
    Mohamed Limam | ADMINIA SARL | contact@adminia.mr
@@ -689,8 +740,8 @@ footer {
   background: linear-gradient(180deg, var(--bd2) 0%, var(--bd) 100%) !important;
   border-top: 1px solid rgba(201,168,76,0.15) !important;
 }
-footer a, footer button { color:rgba(255,255,255,0.38) !important; transition:color 0.2s; }
-footer a:hover, footer button:hover { color:rgba(255,255,255,0.8) !important; }
+footer a, footer button { color:rgba(255,255,255,0.82) !important; transition:color 0.2s; }
+footer a:hover, footer button:hover { color:#C9A84C !important; }
 .ft-title, .footer-col-title { color:var(--gold) !important; font-size:11px !important; letter-spacing:1.5px !important; }
 
 /* ADMINIA block */

@@ -300,11 +300,19 @@
 
   // _t('key')                -> يبحث في common فقط (أو في ns المحدد بـ data-t-ns على body)
   // _t('key', 'dashboard')   -> يبحث في قسم dashboard ثم common كحل احتياطي
+  function _hasArabic(s) {
+    return /[\u0600-\u06FF]/.test(String(s || ''));
+  }
+
   function _t(key, ns) {
     var D = dict();
     var primary = D[state.lang] || D.ar;
     var val = lookup(primary, ns, key);
-    if (val == null) val = lookup(D.ar, ns, key); // عودة للعربية إن كان المفتاح ناقصاً في الفرنسية
+    // لا نُرجع العربية كاحتياطي في الواجهة الفرنسية — هذا كان مصدر تسرب i18n
+    if (val == null && state.lang !== 'fr') {
+      val = lookup(D.ar, ns, key);
+    }
+    if (state.lang === 'fr' && val && _hasArabic(val)) return '';
     return val || '';
   }
 
@@ -368,6 +376,7 @@
       var ns = el.getAttribute('data-t-ns') || defaultNs;
       var val = _t(key, ns);
       if (!val) return;
+      if (state.lang === 'fr' && _hasArabic(val)) return;
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = val;
       else if (el.tagName === 'OPTION') el.textContent = val;
       else el.innerHTML = val;

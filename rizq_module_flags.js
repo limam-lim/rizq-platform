@@ -175,15 +175,29 @@
     openComingSoonModal(key, label);
   }
 
+  function hideComingSoonStrip(strip) {
+    if (!strip) return;
+    strip.innerHTML = '';
+    strip.style.display = 'none';
+    strip.style.background = 'none';
+    strip.style.minHeight = '0';
+    strip.style.padding = '0';
+    strip.style.margin = '0';
+    strip.setAttribute('hidden', '');
+    strip.setAttribute('aria-hidden', 'true');
+  }
+
   function renderComingSoonStrip(flags) {
     var strip = document.getElementById('coming-soon-strip');
     if (!strip) return;
     var closed = CS_SECTIONS.filter(function (s) { return flags[s.key] === false; });
     if (!closed.length) {
-      strip.style.display = 'none';
-      strip.innerHTML = '';
+      hideComingSoonStrip(strip);
       return;
     }
+    strip.removeAttribute('hidden');
+    strip.removeAttribute('aria-hidden');
+    var isFr = lang() === 'fr';
     var html = '<div class="cs-strip">'
       + '<div class="cs-strip-title">' + t('🔜 قريباً على رزق — أخبرنا بما يهمّك', '🔜 Bientôt sur Rizq — dites-nous ce qui vous intéresse') + '</div>'
       + closed.map(function (s) {
@@ -195,6 +209,7 @@
       + '</div>';
     strip.innerHTML = html;
     strip.style.display = 'block';
+    strip.setAttribute('dir', isFr ? 'ltr' : 'rtl');
     strip.querySelectorAll('.cs-item-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         openComingSoonModal(btn.getAttribute('data-cs-key'), btn.getAttribute('data-cs-label'));

@@ -177,7 +177,7 @@ var SUBSCRIPTIONS_GUIDE = {
   max_discount_fr: ''
 };
 
-(function _fillSubscriptionsFromCanonicalPackages() {
+function _fillSubscriptionsFromCanonicalPackages() {
   var cfg = _pkgCfg();
   if (!cfg) return;
   SUBSCRIPTIONS_GUIDE.overview_ar = cfg.buildPublicOverview('ar');
@@ -186,7 +186,12 @@ var SUBSCRIPTIONS_GUIDE = {
   SUBSCRIPTIONS_GUIDE.vip_deputy_fr = cfg.buildVipDeputyText('fr');
   SUBSCRIPTIONS_GUIDE.max_discount_ar = cfg.buildMaxDiscountLine('ar');
   SUBSCRIPTIONS_GUIDE.max_discount_fr = cfg.buildMaxDiscountLine('fr');
-})();
+}
+_fillSubscriptionsFromCanonicalPackages();
+
+function refreshSubscriptionsFromCatalog() {
+  _fillSubscriptionsFromCanonicalPackages();
+}
 
 // ═══════════════════════════════════════════════════════════════
 // BLOCK 7 — PAYMENT METHODS (طرق الدفع)
@@ -339,7 +344,7 @@ var FAQ = [
   },
   {
     q: ['النائب الذكي','vip','diamond vip','مدير حساب'],
-    a: { ar: SUBSCRIPTIONS_GUIDE.vip_deputy_ar, fr: SUBSCRIPTIONS_GUIDE.vip_deputy_fr }
+    a: '__DYNAMIC_VIP_DEPUTY__'
   },
   {
     q: ['الفئات','الأقسام','ما هي الأقسام','كم قسم','16 قسم','catégories'],
@@ -646,6 +651,14 @@ function processMessage(userMessage, context) {
     if (faqMatch === '__DYNAMIC_PACKAGES_SUMMARY__') {
       return { reply: _getPackagesSummary(lang), lang: lang };
     }
+    if (faqMatch === '__DYNAMIC_VIP_DEPUTY__') {
+      refreshSubscriptionsFromCatalog();
+      var cfgVip = _pkgCfg();
+      var vipText = cfgVip && typeof cfgVip.buildVipDeputyText === 'function'
+        ? cfgVip.buildVipDeputyText(lang)
+        : (lang === 'fr' ? SUBSCRIPTIONS_GUIDE.vip_deputy_fr : SUBSCRIPTIONS_GUIDE.vip_deputy_ar);
+      return { reply: vipText, lang: lang };
+    }
     if (faqMatch === '__DYNAMIC_DISCOUNTS_SUMMARY__') {
       return { reply: _getDiscountsSummary(lang), lang: lang };
     }
@@ -802,12 +815,19 @@ function _applyManagerConfigOverrides(cfg){
   } catch (e) {}
 })();
 
+if (typeof document !== 'undefined') {
+  document.addEventListener('rizq:catalogsync', function () {
+    try { refreshSubscriptionsFromCatalog(); } catch (e) { /* ignore */ }
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════
 // EXPORTS
 // ═══════════════════════════════════════════════════════════════
 (function(root){
   var API = {
     processMessage: processMessage,
+    refreshSubscriptionsFromCatalog: refreshSubscriptionsFromCatalog,
     detectLanguage: _detectLang,
     detectLangSwitchRequest: _detectLangSwitchRequest,
     FAQ: FAQ,
