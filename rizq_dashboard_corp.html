@@ -2312,12 +2312,13 @@ function renderPackagesDisplay(){
 
   var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'الماسية الأساسية للشركات',duration:'شهر',price:6000,isDiamond:true},{name:'الماسية Pro للشركات',duration:'شهر',price:15000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
+  var lang=(typeof _corpLang!=='undefined'?_corpLang:'ar');
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
-    var cat=RizqPackagesConfig.getCatalog('corp');
+    var cat=RizqPackagesConfig.getCatalog('corp', lang);
     if(cat && cat.length) list=cat;
   }
 
-  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,(typeof _corpLang!=='undefined'?_corpLang:'ar'));
+  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang);
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;

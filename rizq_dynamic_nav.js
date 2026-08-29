@@ -316,6 +316,9 @@
     } else {
       syncNavFlexOrder();
     }
+    if (global.RizqHeader && typeof global.RizqHeader.markActive === 'function') {
+      try { global.RizqHeader.markActive(); } catch (eA) {}
+    }
   }
 
   function syncNavFlexOrder() {

@@ -149,10 +149,14 @@ function _diamondStandardFields(price) {
     aiModel: 'claude-3-5-sonnet',
     name: 'الماسية الأساسية 💎',
     description: 'موظف استقبال واستفسارات آلي 24/7.',
+    description_fr: 'Réceptionniste et réponses automatiques 24h/24.',
     featured: true,
     featuredBadge: 'الأكثر اختياراً',
+    featuredBadge_fr: 'Le plus demandé',
     roi: 'وفر موظف استقبال — من 5,000 أوقية/شهر',
+    roi_fr: 'Économisez un agent d\'accueil — dès 5 000 MRU/mois',
     features: DIAMOND_STANDARD_FEATURES.slice(),
+    features_fr: DIAMOND_STANDARD_FEATURES_FR.slice(),
     price: price != null ? price : 5000,
     durationDays: 30,
     discountPct: 5,
@@ -168,10 +172,14 @@ function _diamondProFields(price) {
     aiModel: 'claude-3-5-sonnet',
     name: 'الماسية المتقدمة 💎 Pro',
     description: 'منظومة إدارة المبيعات وخدمة العملاء الشاملة.',
+    description_fr: 'Système complet de vente et de service client.',
     featured: true,
     featuredBadge: 'Enterprise',
+    featuredBadge_fr: 'Enterprise',
     roi: 'حل متكامل للمؤسسات — من 10,000 أوقية/شهر',
+    roi_fr: 'Solution intégrée pour entreprises — dès 10 000 MRU/mois',
     features: DIAMOND_PRO_FEATURES.slice(),
+    features_fr: DIAMOND_PRO_FEATURES_FR.slice(),
     price: price != null ? price : 10000,
     durationDays: 30,
     discountPct: 5,
@@ -440,6 +448,13 @@ var FEATURE_FR = {
   'وصول كامل للمنصة': 'Accès complet à la plateforme',
   'استعراض الإعلانات': 'Parcourir les annonces',
   'دعم فني أساسي': 'Support technique de base',
+  'عرض 10 منتجات': '10 produits affichés',
+  'شارة محل مميّز برزق': 'Badge boutique premium Rizq',
+  'عرض 100 منتج': '100 produits affichés',
+  'عرض 500 منتج': '500 produits affichés',
+  'مدير حساب مخصص': 'Gestionnaire de compte dédié',
+  'دعم VIP 24/7': 'Support VIP 24/7',
+  'تقارير سنوية': 'Rapports annuels',
   'شارة شركة مميّزة برزق': 'Badge entreprise premium Rizq',
   'عرض 30 إعلان': '30 annonces affichées',
   'إحصائيات شهرية': 'Statistiques mensuelles',
@@ -453,6 +468,17 @@ var FEATURE_FR = {
   'ميزات VIP حصرية': 'Avantages VIP exclusifs',
   'دعم 24/7': 'Support 24/7',
   'تقارير سنوية شاملة': 'Rapports annuels complets',
+  'عرض حتى 3 خدمات نشطة': 'Jusqu\'à 3 services actifs',
+  'صفحة المكتب': 'Page du bureau',
+  'طلبات تواصل': 'Demandes de contact',
+  'شارة مكتب موثوق': 'Badge bureau vérifié',
+  'نظام حجز المواعيد': 'Système de prise de rendez-vous',
+  'فيديو تعريفي مشمول': 'Vidéo de présentation incluse',
+  'توفير 14%': 'Économisez 14%',
+  'عرض خدمات غير محدود': 'Services illimités',
+  'توفير 33%': 'Économisez 33%',
+  'فيديو تعريفي مشمول + 1 إضافي مجاناً': 'Vidéo incluse + 1 gratuite supplémentaire',
+  'أولوية الدعم': 'Support prioritaire',
   'تصفّح وتصفية المناقصات المنشورة': 'Parcourir et filtrer les appels d\'offres',
   'بيانات التواصل مخفية/ضبابية': 'Coordonnées masquées / floutées',
   'تقديم العروض مقفول': 'Dépôt d\'offres verrouillé',
@@ -474,6 +500,8 @@ var FEATURE_FR = {
   'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية': 'Mise en avant sur la page d\'accueil',
   'تقارير تحليل أداء آلية مفصّلة': 'Rapports de performance détaillés',
   'دعم VIP ذو أولوية + شارة VIP موثّقة': 'Support VIP prioritaire + badge VIP',
+  'فيديو إعلاني واحد لمدة 10 أيام': 'Une vidéo publicitaire pendant 10 jours',
+  'دفع لكل إعلان — بلا اشتراك شهري': 'Paiement par annonce — sans abonnement mensuel',
   'شارة موثّق⁺ الرسمية بشعار رزق': 'Badge Vérifié⁺ officiel Rizq',
   'أعلى درجة ثقة — تحقق هوية مُعزَّز': 'Niveau de confiance maximal — identité renforcée',
   'تبرز فوق شارة التوثيق المجانية': 'Au-dessus du badge de vérification gratuit',
@@ -489,7 +517,39 @@ var FEATURE_FR = {
   'دعم مخصص': 'Support dédié',
   'كل مزايا Pro': 'Tous les avantages Pro',
   'خصم 37% عن السعر الشهري': '37% de réduction vs mensuel',
-  'فوترة سنوية واحدة': 'Une seule facture annuelle'
+  'فوترة سنوية واحدة': 'Une seule facture annuelle',
+  'إعلان واحد نشط': '1 annonce active',
+  'حتى 5 صور للإعلان': 'Jusqu\'à 5 photos par annonce',
+  'ظهور في نتائج البحث العادية': 'Apparition dans les résultats de recherche',
+  'تثبيت أعلى النتائج لمدة 3 أيام': 'Épinglage en tête des résultats pendant 3 jours',
+  'شارة إعلان مميز': 'Badge annonce mise en avant',
+  'حتى 5 إعلانات نشطة شهرياً': 'Jusqu\'à 5 annonces actives par mois',
+  'حتى 5 صور لكل إعلان': 'Jusqu\'à 5 photos par annonce',
+  'إمكانيات الإدارة والتعديل طوال الشهر': 'Gestion et modification pendant tout le mois',
+  'حتى 10 إعلانات نشطة شهرياً': 'Jusqu\'à 10 annonces actives par mois',
+  'تجديد تلقائي للإعلانات': 'Renouvellement automatique des annonces',
+  'منتجات غير محدودة للمتجر': 'Produits illimités pour la boutique',
+  'نائب ذكي نصي للمحل (موقع + واتساب)': 'Adjoint intelligent texte (site + WhatsApp)',
+  '1,500 محادثة نصية شهرياً': '1 500 conversations texte / mois',
+  'لوحة متابعة وتحليل الأداء لحظياً': 'Tableau de bord et analyse en temps réel',
+  'نائب ذكي تفاعلي للمحل (نصي + صوتي)': 'Adjoint interactif (texte + voix)',
+  '2,500 محادثة نصية + 150 دقيقة صوتية شهرياً': '2 500 conversations texte + 150 min voix / mois',
+  'ويدجت الموقع + واتساب + مكالمات آليّة': 'Widget site + WhatsApp + appels automatiques',
+  'موظف استقبال واستفسارات 24/7 (نصي)': 'Agent d\'accueil et réponses 24h/24 (texte)',
+  'تنظيم طلبات الخدمات والمواعيد': 'Organisation des demandes de services et rendez-vous',
+  '2,000 محادثة نصية شهرياً': '2 000 conversations texte / mois',
+  'ويدجت الموقع + واتساب': 'Widget site + WhatsApp',
+  'موظف استقبال آلي مخصص (نصي + صوتي)': 'Agent d\'accueil automatique dédié (texte + voix)',
+  'رد آلي على الاتصالات': 'Réponse automatique aux appels',
+  'إدارة المواعيد والاستشارات مع نموذج طلبات متقدم': 'Gestion des rendez-vous et consultations avec formulaire avancé',
+  '3,500 محادثة نصية + 200 دقيقة صوتية شهرياً': '3 500 conversations texte + 200 min voix / mois',
+  'نائب ذكي نصي للشركة (موقع + واتساب)': 'Adjoint intelligent texte pour entreprise (site + WhatsApp)',
+  '4,000 محادثة نصية شهرياً': '4 000 conversations texte / mois',
+  'هوية مخصصة باسم شركتك': 'Identité personnalisée au nom de votre entreprise',
+  'نائب ذكي تفاعلي للشركة (نصي + صوتي)': 'Adjoint interactif entreprise (texte + voix)',
+  '7,000 محادثة نصية + 600 دقيقة صوتية شهرياً': '7 000 conversations texte + 600 min voix / mois',
+  'ويدجت الموقع + واتساب + مكالمات تفاعلية': 'Widget site + WhatsApp + appels interactifs',
+  'تكامل API / ERP': 'Intégration API / ERP'
 };
 
 function translateFeatureList(list, lang) {
@@ -728,9 +788,9 @@ function diamondCopy(lang, tier, price) {
   var nameMap = isPro ? NAMES.diamond_pro : NAMES.diamond_standard;
   return {
     name: lang === 'fr' ? (nameMap.fr || base.name) : base.name,
-    description: base.description,
-    featuredBadge: base.featuredBadge,
-    roi: base.roi,
+    description: lang === 'fr' ? (base.description_fr || base.description) : base.description,
+    featuredBadge: lang === 'fr' ? (base.featuredBadge_fr || base.featuredBadge) : base.featuredBadge,
+    roi: lang === 'fr' ? (base.roi_fr || base.roi) : base.roi,
     features: lang === 'fr'
       ? (isPro ? DIAMOND_PRO_FEATURES_FR.slice() : DIAMOND_STANDARD_FEATURES_FR.slice())
       : base.features.slice()
@@ -788,6 +848,38 @@ function _applyStandardNames(out, lang) {
   return out;
 }
 
+/** Apply FR display fields onto the primary fields consumers read (features, description, badge, roi). */
+function _localizeDisplayFields(out, lang) {
+  lang = _normLang(lang);
+  var arFeatures = Array.isArray(out.features) ? out.features.slice() : [];
+  var frFeatures = Array.isArray(out.features_fr) && out.features_fr.length
+    ? out.features_fr.slice()
+    : translateFeatureList(arFeatures, 'fr');
+  // Keep parallel fields always populated for callers that pick *_fr themselves.
+  out.features_fr = frFeatures;
+  if (!out.description_fr && out.description && !_hasArabic(out.description)) {
+    out.description_fr = out.description;
+  }
+  if (!out.featuredBadge_fr && out.featuredBadge && !_hasArabic(out.featuredBadge)) {
+    out.featuredBadge_fr = out.featuredBadge;
+  }
+  if (!out.roi_fr && out.roi && !_hasArabic(out.roi)) {
+    out.roi_fr = out.roi;
+  }
+  if (lang === 'fr') {
+    out.features = frFeatures.length ? frFeatures.slice() : translateFeatureList(arFeatures, 'fr');
+    if (out.description_fr) out.description = out.description_fr;
+    else if (_hasArabic(out.description)) out.description = '';
+    if (out.featuredBadge_fr) out.featuredBadge = out.featuredBadge_fr;
+    else if (_hasArabic(out.featuredBadge)) out.featuredBadge = '';
+    if (out.roi_fr) out.roi = out.roi_fr;
+    else if (_hasArabic(out.roi)) out.roi = '';
+  } else {
+    out.features = arFeatures;
+  }
+  return out;
+}
+
 function enrichForDisplay(pkg, lang) {
   lang = _normLang(lang);
   var out = Object.assign({}, pkg || {});
@@ -800,14 +892,12 @@ function enrichForDisplay(pkg, lang) {
     out.period = periodLabel(out, lang);
     out.period_fr = periodLabel(out, 'fr');
     out.features = Array.isArray(out.features) ? out.features.slice() : [];
-    if (Array.isArray(out.features_fr) && out.features_fr.length) {
-      out.features_fr = translateFeatureList(out.features_fr, 'fr');
-    } else {
+    if (!(Array.isArray(out.features_fr) && out.features_fr.length)) {
       out.features_fr = translateFeatureList(out.features, 'fr');
     }
     out.cta_fr = out.cta_fr || _defaultCta(out, 'fr');
     out.cta = lang === 'fr' ? out.cta_fr : (out.cta || _defaultCta(out, 'ar'));
-    return out;
+    return _localizeDisplayFields(out, lang);
   }
   if (_isSegmentDiamond(out)) {
     var segTier = resolveDiamondTierFromPkg(out) || 'diamond_standard';
@@ -819,7 +909,9 @@ function enrichForDisplay(pkg, lang) {
     out.name_fr = out.name_fr || segName.fr || segName.ar || out.name;
     out.name_ar = out.name_ar || segName.ar || out.name;
     out.features = Array.isArray(out.features) && out.features.length ? out.features.slice() : [];
-    out.features_fr = Array.isArray(out.features_fr) && out.features_fr.length ? out.features_fr.slice() : [];
+    out.features_fr = Array.isArray(out.features_fr) && out.features_fr.length
+      ? out.features_fr.slice()
+      : translateFeatureList(out.features, 'fr');
     out.diamond = true;
     out.isDiamond = true;
     out.featured = true;
@@ -830,24 +922,25 @@ function enrichForDisplay(pkg, lang) {
       ? (out.cta_fr || (segPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard'))
       : (out.cta || (segPro ? 'اشترك في الماسية Pro' : 'اشترك في الماسية الأساسية'));
     out.cta_fr = out.cta_fr || (segPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard');
-    return out;
+    return _localizeDisplayFields(out, lang);
   }
   var tier = resolveDiamondTierFromPkg(out) || 'diamond_standard';
   var isPro = tier === 'diamond_pro';
   var copy = diamondCopy(lang, tier, out.price);
   var copyFr = diamondCopy('fr', tier, out.price);
+  var copyAr = diamondCopy('ar', tier, out.price);
   out.diamondTier = tier;
   out.audioAccess = isPro;
   out.name = copy.name;
   out.name_ar = isPro ? NAMES.diamond_pro.ar : NAMES.diamond_standard.ar;
   out.name_fr = copyFr.name;
-  out.description = copy.description;
+  out.description = copyAr.description;
   out.description_fr = copyFr.description;
-  out.featuredBadge = copy.featuredBadge;
+  out.featuredBadge = copyAr.featuredBadge;
   out.featuredBadge_fr = copyFr.featuredBadge;
-  out.roi = copy.roi;
+  out.roi = copyAr.roi;
   out.roi_fr = copyFr.roi;
-  out.features = copy.features;
+  out.features = copyAr.features;
   out.features_fr = copyFr.features;
   out.diamond = true;
   out.isDiamond = true;
@@ -859,11 +952,11 @@ function enrichForDisplay(pkg, lang) {
     ? (isPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard')
     : (isPro ? 'اشترك في الماسية Pro' : 'اشترك في الماسية الأساسية');
   out.cta_fr = isPro ? 'Choisir Diamant Pro' : 'Choisir Diamant Standard';
-  return out;
+  return _localizeDisplayFields(out, lang);
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-08-27-vid-single';
+var CATALOG_SYNC_REVISION = '2026-08-29-pkg-i18n-fr';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',
@@ -938,13 +1031,13 @@ function _mergeLive(defaults, live) {
         ? (base.name_fr || (tier === 'diamond_pro' ? NAMES.diamond_pro.fr : NAMES.diamond_standard.fr))
         : (refresh ? (base.name_fr || (nameHit && nameHit.fr) || livePkg.name_fr || '') : (livePkg.name_fr || base.name_fr || (nameHit && nameHit.fr) || '')),
       description: diamond ? (base.description || tierFields.description) : (livePkg.description || base.description || ''),
-      description_fr: diamond ? (base.description_fr || tierFields.description) : (livePkg.description_fr || base.description_fr || ''),
+      description_fr: diamond ? (base.description_fr || tierFields.description_fr || '') : (livePkg.description_fr || base.description_fr || ''),
       featured: diamond ? true : !!(livePkg.featured || base.highlight),
       highlight: !!(livePkg.highlight || base.highlight),
       featuredBadge: diamond ? (base.featuredBadge || tierFields.featuredBadge) : (livePkg.featuredBadge || ''),
-      featuredBadge_fr: diamond ? (base.featuredBadge_fr || tierFields.featuredBadge) : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
+      featuredBadge_fr: diamond ? (base.featuredBadge_fr || tierFields.featuredBadge_fr || '') : (livePkg.featuredBadge_fr || base.featuredBadge_fr || ''),
       roi: diamond ? (base.roi || tierFields.roi) : (livePkg.roi || ''),
-      roi_fr: diamond ? (base.roi_fr || tierFields.roi) : (livePkg.roi_fr || base.roi_fr || ''),
+      roi_fr: diamond ? (base.roi_fr || tierFields.roi_fr || '') : (livePkg.roi_fr || base.roi_fr || ''),
       period: livePkg.period || base.period || '',
       cta: livePkg.cta || base.cta || '',
       cta_fr: livePkg.cta_fr || base.cta_fr || '',
@@ -1110,6 +1203,9 @@ function catalogPackageLabel(id, lang) {
 function localizedName(pkg, lang) {
   lang = _normLang(lang);
   if (isDiamondPackage(pkg)) {
+    if (_isSegmentDiamond(pkg) && pkg.id && NAMES[pkg.id]) {
+      return NAMES[pkg.id][lang] || NAMES[pkg.id].ar || '';
+    }
     var tier = resolveDiamondTierFromPkg(pkg) || 'diamond_standard';
     return diamondCopy(lang, tier, pkg.price).name;
   }
@@ -1363,6 +1459,7 @@ var API = {
   resolveDiamondTierFromPkg: resolveDiamondTierFromPkg,
   diamondCopy: diamondCopy,
   enrichForDisplay: enrichForDisplay,
+  translateFeatureList: translateFeatureList,
   getDiamondPackage: getDiamondPackage,
   withDiamond: withDiamond,
   DIAMOND_MARKETING: DIAMOND_MARKETING

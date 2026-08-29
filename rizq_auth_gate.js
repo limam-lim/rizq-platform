@@ -182,38 +182,47 @@
   function injectStyle() {
     if (document.getElementById('rag-css')) return;
     var css = ''
-      + '.rag-overlay{position:fixed;inset:0;background:rgba(10,18,35,.72);backdrop-filter:blur(4px);' +
-        'z-index:999990;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;' +
-        'pointer-events:none;transition:opacity .25s ease}'
+      + '.rag-overlay{position:fixed;inset:0;background:rgba(5,10,22,.78);backdrop-filter:blur(20px);' +
+        '-webkit-backdrop-filter:blur(20px);z-index:999990;display:flex;align-items:center;justify-content:center;' +
+        'padding:16px;opacity:0;pointer-events:none;transition:opacity .25s ease;box-sizing:border-box}'
       + '.rag-overlay.open{opacity:1;pointer-events:all}'
-      + '.rag-modal{background:linear-gradient(160deg,#0f2347 0%,#152c52 100%);border:1px solid rgba(201,168,76,.3);' +
-        'border-radius:18px;max-width:380px;width:100%;padding:26px 24px 22px;box-shadow:0 20px 60px rgba(0,0,0,.5);' +
+      + '.rag-modal{background:linear-gradient(165deg,#0a1628 0%,#122040 55%,#0d1a30 100%);' +
+        'border:1px solid rgba(201,168,76,.22);border-radius:24px;max-width:400px;width:100%;' +
+        'padding:28px 24px 22px;box-shadow:0 8px 32px rgba(0,0,0,.28),0 15px 50px -10px rgba(0,0,0,.45);' +
         'transform:scale(.92) translateY(14px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);' +
-        "font-family:'Segoe UI',Tahoma,Arial,sans-serif;position:relative;max-height:92vh;overflow-y:auto}"
+        "font-family:'Cairo','Noto Naskh Arabic','Segoe UI',sans-serif;position:relative;max-height:92vh;" +
+        'overflow-y:auto;overflow-x:hidden;color:rgba(255,255,255,.94);box-sizing:border-box}'
       + '.rag-overlay.open .rag-modal{transform:scale(1) translateY(0)}'
-      + '.rag-close{position:absolute;top:12px;inset-inline-end:12px;background:rgba(255,255,255,.08);border:none;' +
-        'color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;' +
-        'align-items:center;justify-content:center;transition:background .2s}'
-      + '.rag-close:hover{background:rgba(255,255,255,.2)}'
-      + '.rag-icon{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a5aa8,#1B3A6B 60%);' +
-        'border:2px solid #C9A84C;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}'
-      + '.rag-title{color:#F3DE9C;font-size:17px;font-weight:800;text-align:center;margin-bottom:4px}'
-      + '.rag-sub{color:rgba(255,255,255,.65);font-size:12px;text-align:center;margin-bottom:18px;line-height:1.5}'
-      + '.rag-label{display:block;color:rgba(255,255,255,.85);font-size:12px;font-weight:700;margin:0 0 5px}'
-      + '.rag-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);' +
-        'border-radius:10px;padding:11px 13px;color:#fff;font-size:13.5px;font-family:inherit;margin-bottom:13px;' +
-        'transition:border-color .2s,background .2s}'
-      + '.rag-input::placeholder{color:rgba(255,255,255,.35)}'
-      + '.rag-input:focus{outline:none;border-color:#C9A84C;background:rgba(255,255,255,.09)}'
+      + '.rag-close{position:absolute;top:12px;inset-inline-end:12px;background:rgba(255,255,255,.08);' +
+        'border:1px solid rgba(201,168,76,.2);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;' +
+        'font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;z-index:2}'
+      + '.rag-close:hover{background:rgba(255,255,255,.16);border-color:rgba(201,168,76,.45)}'
+      + '.rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 14px}'
+      + '.rag-brand-mark{width:64px;height:64px;border-radius:14px;background:#071020;' +
+        'border:2px solid rgba(201,168,76,.75);display:flex;align-items:center;justify-content:center;padding:4px;' +
+        'box-shadow:0 0 24px rgba(201,168,76,.22)}'
+      + '.rag-brand-mark img{width:52px;height:52px;object-fit:contain;display:block}'
+      + ".rag-brand-name{font-family:'Noto Naskh Arabic','Cairo',serif;font-size:20px;font-weight:800;" +
+        'color:#C9A84C;letter-spacing:.02em;text-shadow:0 0 20px rgba(201,168,76,.35);line-height:1.2}'
+      + '.rag-title{color:#F3DE9C;font-size:17px;font-weight:800;text-align:center;margin:0 0 6px}'
+      + '.rag-sub{color:rgba(255,255,255,.68);font-size:12.5px;text-align:center;margin:0 0 18px;line-height:1.55}'
+      + '.rag-label{display:block;color:rgba(255,255,255,.88);font-size:12px;font-weight:700;margin:0 0 5px}'
+      + '.rag-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);' +
+        'border:1.5px solid rgba(201,168,76,.28);border-radius:12px;padding:11px 13px;color:#fff;' +
+        'font-size:13.5px;font-family:inherit;margin-bottom:13px;transition:border-color .2s,background .2s,box-shadow .2s}'
+      + '.rag-input::placeholder{color:rgba(255,255,255,.38)}'
+      + '.rag-input:focus{outline:none;border-color:#C9A84C;background:rgba(255,255,255,.1);' +
+        'box-shadow:0 0 0 3px rgba(201,168,76,.15)}'
       + '.rag-input.err{border-color:#ef4444}'
       + '.rag-errmsg{color:#f87171;font-size:11px;margin:-9px 0 10px;display:none}'
       + '.rag-errmsg.show{display:block}'
-      + '.rag-btn{width:100%;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0f2347;border:none;' +
-        'border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;transition:transform .15s,opacity .2s;' +
-        'font-family:inherit;margin-top:4px}'
-      + '.rag-btn:hover{transform:translateY(-1px)}'
+      + '.rag-btn{width:100%;background:linear-gradient(135deg,#a67c2e 0%,#d4b356 42%,#c9a84c 68%,#e8cc7a 100%);' +
+        'color:#0a1628;border:none;border-radius:12px;padding:13px;font-size:14.5px;font-weight:800;cursor:pointer;' +
+        'transition:transform .15s,opacity .2s,box-shadow .2s;font-family:inherit;margin-top:4px;' +
+        'box-shadow:0 6px 22px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.25)}'
+      + '.rag-btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(201,168,76,.45),inset 0 1px 0 rgba(255,255,255,.3)}'
       + '.rag-btn:disabled{opacity:.6;cursor:default;transform:none}'
-      + '.rag-privacy{color:rgba(255,255,255,.4);font-size:10px;text-align:center;margin-top:13px;line-height:1.6}'
+      + '.rag-privacy{color:rgba(255,255,255,.45);font-size:10.5px;text-align:center;margin-top:14px;line-height:1.65}'
       + '@media(max-width:420px){.rag-modal{padding:22px 18px 18px}}';
     var style = document.createElement('style');
     style.id = 'rag-css';
@@ -228,18 +237,21 @@
     var wrap = document.createElement('div');
     wrap.innerHTML = [
       '<div class="rag-overlay" id="rag-overlay">',
-      '  <div class="rag-modal" role="dialog" aria-modal="true">',
-      '    <button class="rag-close" id="rag-close-btn" type="button">✕</button>',
-      '    <div class="rag-icon">🔐</div>',
+      '  <div class="rag-modal" role="dialog" aria-modal="true" aria-labelledby="rag-title">',
+      '    <button class="rag-close" id="rag-close-btn" type="button" aria-label="close">✕</button>',
+      '    <div class="rag-brand">',
+      '      <div class="rag-brand-mark"><img src="rizq-mark-512.png" width="52" height="52" alt="رزق"/></div>',
+      '      <div class="rag-brand-name">رزق | Rizq</div>',
+      '    </div>',
       '    <div class="rag-title" id="rag-title"></div>',
       '    <div class="rag-sub" id="rag-sub"></div>',
-      '    <label class="rag-label" id="rag-name-label"></label>',
+      '    <label class="rag-label" id="rag-name-label" for="rag-name"></label>',
       '    <input class="rag-input" id="rag-name" type="text" autocomplete="name"/>',
       '    <div class="rag-errmsg" id="rag-name-err"></div>',
-      '    <label class="rag-label" id="rag-phone-label"></label>',
+      '    <label class="rag-label" id="rag-phone-label" for="rag-phone"></label>',
       '    <input class="rag-input" id="rag-phone" type="tel" dir="ltr" style="direction:ltr;text-align:left" autocomplete="tel" maxlength="8"/>',
       '    <div class="rag-errmsg" id="rag-phone-err"></div>',
-      '    <label class="rag-label" id="rag-email-label"></label>',
+      '    <label class="rag-label" id="rag-email-label" for="rag-email"></label>',
       '    <input class="rag-input" id="rag-email" type="email" dir="ltr" style="direction:ltr;text-align:left;margin-bottom:6px" autocomplete="email"/>',
       '    <button class="rag-btn" id="rag-submit-btn" type="button"></button>',
       '    <div class="rag-privacy" id="rag-privacy"></div>',

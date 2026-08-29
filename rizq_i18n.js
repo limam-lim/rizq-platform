@@ -411,12 +411,34 @@
   /** Drop leftover dir= on chrome that would leak RTL into FR (and vice versa).
       Keep phone numbers, tel links, the logo lockup, and the chat window. */
   function stripLeakedDirs() {
-    var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"]';
+    var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"],.btn-lang-primary,#rizq-lang-btn,#nav-lang-btn,#rizq-desk-lang-btn';
     document.querySelectorAll('nav, .nav-center, .nav-dropdown-li, .nav-dropdown-menu, .rizq-hdr-row2, .rizq-hdr-more-menu, .modal-overlay, .modal-box, #qcat-portal, #cat-inline-panel, .rzq-sheet, .why-grid, footer, .hero-pills').forEach(function (el) {
       if (el.closest && el.closest(keep)) return;
       if (el.hasAttribute('dir')) el.removeAttribute('dir');
       if (el.style && el.style.direction) el.style.direction = '';
     });
+  }
+
+  /* Primary lang pill: always visual [ FR ] / [ العربية ] — LTR inside button so RTL pages do not flip. */
+  var PRIMARY_LANG_BTN_HTML =
+    '<span class="lang-fr" dir="ltr">FR</span>' +
+    '<span class="lang-sep" aria-hidden="true"> / </span>' +
+    '<span class="lang-ar" dir="rtl">العربية</span>';
+
+  function isPrimaryLangBtn(btn) {
+    return !!(btn && (
+      btn.classList.contains('btn-lang-primary') ||
+      btn.id === 'rizq-lang-btn' ||
+      btn.id === 'rizq-desk-lang-btn' ||
+      btn.id === 'nav-lang-btn'
+    ));
+  }
+
+  function paintPrimaryLangBtn(btn) {
+    if (!btn) return;
+    btn.setAttribute('dir', 'ltr');
+    btn.innerHTML = PRIMARY_LANG_BTN_HTML;
+    btn.setAttribute('aria-label', 'FR / العربية');
   }
 
   function applyLang(lang) {
@@ -425,9 +447,8 @@
     applyRootDir(state.lang);
     stripLeakedDirs();
     document.querySelectorAll('.btn-lang').forEach(function (btn) {
-      if (btn.classList.contains('btn-lang-primary') || btn.id === 'rizq-lang-btn' || btn.id === 'rizq-desk-lang-btn' || btn.id === 'nav-lang-btn') {
-        btn.textContent = 'FR / العربية';
-        btn.setAttribute('aria-label', 'FR / العربية');
+      if (isPrimaryLangBtn(btn)) {
+        paintPrimaryLangBtn(btn);
         return;
       }
       btn.textContent = state.lang === 'ar' ? 'FR' : 'AR';
@@ -462,7 +483,9 @@
     getLang: function () { return state.lang; },
     applyStaticDom: applyStaticDom,
     applyRootDir: applyRootDir,
-    stripLeakedDirs: stripLeakedDirs
+    stripLeakedDirs: stripLeakedDirs,
+    paintPrimaryLangBtn: paintPrimaryLangBtn,
+    isPrimaryLangBtn: isPrimaryLangBtn
   };
 
   // توافق رجعي: أي onclick="toggleLangPage()" قديم متبقٍ في صفحة لم تُهاجَر بعد يستمر بالعمل

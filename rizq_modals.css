@@ -220,9 +220,8 @@ body.rizq-dash .modal-close:hover,
   line-height: 1.85 !important;
 }
 
-/* ── CS / promo / auth modals ── */
-.cs-modal-box,
-.rag-modal {
+/* ── CS / promo modals (light) ── */
+.cs-modal-box {
   background: #fff !important;
   border: var(--rzq-modal-border-light) !important;
   border-radius: var(--rzq-modal-radius) !important;
@@ -232,8 +231,7 @@ body.rizq-dash .modal-close:hover,
   width: 100% !important;
 }
 
-.cs-modal-title,
-.rag-modal h2 {
+.cs-modal-title {
   color: var(--rzq-modal-navy) !important;
   font-weight: 800 !important;
   font-size: 16px !important;
@@ -242,6 +240,145 @@ body.rizq-dash .modal-close:hover,
 .cs-modal-desc {
   color: #5b6b85 !important;
   line-height: 1.65 !important;
+}
+
+/* ── Guest / visitor auth gate (Rizq navy + gold identity) ── */
+.rag-modal {
+  background: linear-gradient(165deg, #0a1628 0%, #122040 55%, #0d1a30 100%) !important;
+  border: var(--rzq-modal-border-dark) !important;
+  border-radius: var(--rzq-modal-radius-lg) !important;
+  box-shadow: var(--rzq-modal-shadow-dark) !important;
+  padding: clamp(24px, 3.5vw, 30px) clamp(20px, 3vw, 26px) clamp(20px, 3vw, 24px) !important;
+  max-width: 400px !important;
+  width: 100% !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+  font-family: 'Cairo', 'Noto Naskh Arabic', 'Segoe UI', sans-serif !important;
+  overflow-x: hidden !important;
+}
+
+.rag-modal .rag-brand {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 0 14px !important;
+}
+
+.rag-modal .rag-brand-mark {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 14px !important;
+  background: #071020 !important;
+  border: 2px solid rgba(201, 168, 76, 0.75) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  box-shadow: 0 0 24px rgba(201, 168, 76, 0.22) !important;
+}
+
+.rag-modal .rag-brand-mark img {
+  width: 52px !important;
+  height: 52px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.rag-modal .rag-brand-name {
+  font-family: 'Noto Naskh Arabic', 'Cairo', serif !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--rzq-modal-gold) !important;
+  letter-spacing: 0.02em !important;
+  text-shadow: 0 0 20px rgba(201, 168, 76, 0.35) !important;
+  line-height: 1.2 !important;
+}
+
+.rag-modal .rag-title {
+  color: #f3de9c !important;
+  font-size: clamp(15px, 2.4vw, 17px) !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  margin: 0 0 6px !important;
+}
+
+.rag-modal .rag-sub {
+  color: rgba(255, 255, 255, 0.68) !important;
+  font-size: 12.5px !important;
+  text-align: center !important;
+  margin: 0 0 18px !important;
+  line-height: 1.55 !important;
+}
+
+.rag-modal .rag-label {
+  display: block !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin: 0 0 5px !important;
+}
+
+.rag-modal .rag-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1.5px solid rgba(201, 168, 76, 0.28) !important;
+  border-radius: 12px !important;
+  padding: 11px 13px !important;
+  color: #fff !important;
+  font-size: 13.5px !important;
+  font-family: inherit !important;
+  margin-bottom: 13px !important;
+}
+
+.rag-modal .rag-input::placeholder {
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.rag-modal .rag-input:focus {
+  outline: none !important;
+  border-color: var(--rzq-modal-gold) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15) !important;
+}
+
+.rag-modal .rag-btn {
+  width: 100% !important;
+  background: linear-gradient(135deg, #a67c2e 0%, #d4b356 42%, #c9a84c 68%, #e8cc7a 100%) !important;
+  color: #0a1628 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 13px !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  margin-top: 4px !important;
+  box-shadow: 0 6px 22px rgba(201, 168, 76, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.rag-modal .rag-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 28px rgba(201, 168, 76, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.rag-modal .rag-privacy {
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-size: 10.5px !important;
+  text-align: center !important;
+  margin-top: 14px !important;
+  line-height: 1.65 !important;
+}
+
+.rag-modal .rag-close {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border: 1px solid rgba(201, 168, 76, 0.2) !important;
+}
+
+.rag-modal .rag-close:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(201, 168, 76, 0.45) !important;
 }
 
 /* ── Full-screen ad modals (no top artifact bar) ── */
@@ -277,6 +414,7 @@ body.rizq-dash .modal-close:hover,
 .modal-box,
 .rizq-modal-box,
 .disc-modal,
+.rag-modal,
 #ad-modal-box,
 #pkg-modal-box,
 .cs-modal-box {

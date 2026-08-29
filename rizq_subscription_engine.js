@@ -950,10 +950,18 @@
       return {text:trName(p.name), isFallback:false, sourceLang:null};
     }
     function pkgFeatsPick(p){
-      var arFeats=(p.features&&p.features.length)?p.features:(FEATS[p.name]||FEATS['ماسية']||[]);
-      var frFeats=p.features_fr||[];
+      var arFeats=(p.features&&p.features.length)?p.features:(FEATS[p.name]||FEATS[p.name_ar]||FEATS['ماسية']||[]);
+      var frFeats=(p.features_fr&&p.features_fr.length)?p.features_fr:(FEATS[p.name_fr]||[]);
+      // When features were already localized to FR by enrichForDisplay, use them directly.
+      if(lang==='fr'){
+        if(frFeats.length) return {items:frFeats, isFallback:false, sourceLang:null};
+        if(arFeats.length && !/[\u0600-\u06FF]/.test(arFeats.join(' '))) return {items:arFeats, isFallback:false, sourceLang:null};
+        if(typeof global.RizqPackagesConfig!=='undefined' && typeof global.RizqPackagesConfig.translateFeatureList==='function'){
+          return {items:global.RizqPackagesConfig.translateFeatureList(arFeats,'fr'), isFallback:false, sourceLang:null};
+        }
+      }
       if(typeof global.RizqLocale!=='undefined') return global.RizqLocale.pickListBilingual(arFeats, frFeats, lang);
-      return {items:arFeats, isFallback:false, sourceLang:null};
+      return {items: lang==='fr' && frFeats.length ? frFeats : arFeats, isFallback:false, sourceLang:null};
     }
     function trDur(d){ if(lang!=='fr') return d; var k=(d||'').trim(); return DUR_FR[k]!==undefined?DUR_FR[k]:d; }
     function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -967,9 +975,9 @@
         p = global.RizqPackagesConfig.enrichForDisplay(p, lang);
       }
       var isFree=p.price===0||p.price==='0';
-      var isYear=p.name==='سنوية';
-      var isTrial=p.name==='تجريبية';
-      var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1);
+      var isYear=p.name==='سنوية'||p.name==='Annuelle'||Number(p.durationDays)>=360||/-year$/.test(String(p.id||''));
+      var isTrial=isFree||p.name==='تجريبية'||p.name==='Essai'||/trial|تجرب/.test(String(p.id||p.name||''));
+      var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1||/diamant|diamond/i.test(String(p.name||''))||/diam/.test(String(p.id||'')));
       var bg=isDiamondPkg?'linear-gradient(145deg,#3b0764 0%,#6b21a8 100%)':isYear?'linear-gradient(145deg,#1B3A6B 0%,#0f2347 100%)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':p.highlight?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
       var border=isDiamondPkg?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':p.highlight?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
       var shadow=isDiamondPkg?'0 8px 28px rgba(107,33,168,.5)':isYear?'0 8px 28px rgba(15,35,71,.35)':p.highlight?'0 8px 28px rgba(201,168,76,.2)':'0 4px 16px rgba(27,58,107,.08)';
@@ -986,20 +994,22 @@
       var nameFallbackNote=(namePick.isFallback&&typeof global.RizqLocale!=='undefined')?global.RizqLocale.fallbackNoteHtml(namePick.sourceLang, lang, true):'';
       var featFallbackNote=(featPick.isFallback&&typeof global.RizqLocale!=='undefined')?global.RizqLocale.fallbackNoteHtml(featPick.sourceLang, lang, true):'';
       var badge = isDiamondPkg
-        ? (p.featuredBadge || _t2('الأكثر اختياراً للشركات','Le plus choisi par les entreprises'))
+        ? ((lang==='fr' ? (p.featuredBadge_fr || p.featuredBadge) : p.featuredBadge) || _t2('الأكثر اختياراً للشركات','Le plus choisi par les entreprises'))
         : '';
+      var roiTxt = lang==='fr' ? (p.roi_fr || p.roi || '') : (p.roi || '');
+      var descTxt = lang==='fr' ? (p.description_fr || p.description || '') : (p.description || '');
       return '<div class="rpkg-card" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
         +(p.highlight&&!isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(201,168,76,.45);letter-spacing:.5px">⭐ '+_t2('الأكثر طلباً','Le plus demandé')+'</div>':'')
         +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+esc(badge)+'</div>':'')
         +(isYear?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(124,58,237,.4)">💎 '+_t2('الأفضل قيمة','Meilleur rapport qualité-prix')+'</div>':'')
-        +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||(isDiamondPkg?'💎':'📦'))+'</div>'
+        +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||ICONS[p.name_ar]||(isDiamondPkg?'💎':'📦'))+'</div>'
         +'<div style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(namePick.text||trName(p.name))+nameFallbackNote+'</div>'
-        +(p.description?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc((lang==='fr'&&(p.description_fr||p.descriptionFr))?(p.description_fr||p.descriptionFr):(p.description||''))+'</div>':'')
-        +'<div style="font-size:11px;color:'+mutedCol+';margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">'+esc(trDur(p.duration||''))+'</div>'
+        +(descTxt?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc(descTxt)+'</div>':'')
+        +'<div style="font-size:11px;color:'+mutedCol+';margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">'+esc(trDur(p.duration||p.period||''))+'</div>'
         +'<div style="height:1px;background:'+(isYear?'rgba(255,255,255,.12)':'rgba(27,58,107,.08)')+';margin-bottom:14px"></div>'
         +'<div style="margin-bottom:16px"><span style="font-size:30px;font-weight:900;color:'+priceCol+';line-height:1">'+(isFree?_t2('مجاناً','Gratuit'):Number(p.price).toLocaleString())+'</span>'
         +(!isFree?'<div style="font-size:10px;color:'+mutedCol+';margin-top:1px;font-weight:600">MRU / '+esc(trDur((p.period && !/^MRU\s*\//i.test(String(p.period))) ? p.period : (p.name==='مميزة' ? 'لكل إعلان' : (p.duration||''))))+'</div>':'')+'</div>'
-        +(isDiamondPkg && p.roi ? '<div style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:11.5px;line-height:1.55;color:#fde68a;text-align:'+(lang==='fr'?'left':'right')+'">💼 '+esc(p.roi)+'</div>' : '')
+        +(isDiamondPkg && roiTxt ? '<div style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:11.5px;line-height:1.55;color:#fde68a;text-align:'+(lang==='fr'?'left':'right')+'">💼 '+esc(roiTxt)+'</div>' : '')
         +'<div style="margin-bottom:18px;padding:0 4px;text-align:right">'+feats.map(function(f){return '<div class="rpkg-feat"><span style="color:'+checkCol+';font-size:14px;flex-shrink:0;margin-top:1px">✓</span><span style="color:'+featCol+'">'+f+'</span></div>';}).join('')+(featFallbackNote||'')+'</div>'
         +(isFree && category !== 'tender'
           ?'<div style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46">✓ '+_t2('الباقة الحالية','Forfait actuel')+'</div>'

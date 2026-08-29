@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=14.3"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=14.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
-<link rel="stylesheet" href="rizq_header.css?v=14.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=14.9"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -46,8 +46,8 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
 }
 </style>
-<script src="rizq_packages_config.js?v=13.2"></script>
-<script src="rizq_packages_ui.js?v=12.7"></script>
+<script src="rizq_packages_config.js?v=13.3"></script>
+<script src="rizq_packages_ui.js?v=13.0"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
@@ -155,7 +155,11 @@ nav .btn-lang,nav .btn-lang-primary{
   border:1.5px solid rgba(201,168,76,.55);color:#E8C96A;
   font-size:12.5px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:22px;
   cursor:pointer;transition:transform .15s ease,background .2s;white-space:nowrap;flex-shrink:0;z-index:auto!important;
+  direction:ltr!important;unicode-bidi:isolate;display:inline-flex!important;flex-direction:row!important;align-items:center;gap:.2em;
 }
+nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1}
+nav .btn-lang .lang-sep,nav .btn-lang-primary .lang-sep{order:2;opacity:.85}
+nav .btn-lang .lang-ar,nav .btn-lang-primary .lang-ar{order:3}
 nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#fff}
 nav .btn-lang:active,nav .btn-lang-primary:active{transform:scale(0.98)}
 .btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#C9A84C;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
@@ -1828,7 +1832,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- ══ NAVBAR ══ -->
 <nav id="nav">
   <div class="nav-start">
-    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" aria-label="العربية / FR">العربية / FR</button>
+    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" dir="ltr" aria-label="FR / العربية"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> / </span><span class="lang-ar" dir="rtl">العربية</span></button>
     <button type="button" class="nav-account-btn" onclick="openModal('login')" aria-label="حسابي">
       <span class="nav-account-ico" aria-hidden="true">👤</span>
       <span data-t="nav-account">حسابي</span>
@@ -1838,14 +1842,14 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </button>
   </div>
   <ul class="nav-center">
-    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a></li>
-    <li data-nav-order="2"><a href="#categories" data-t="nav-cats">الأقسام</a></li>
-    <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-t="nav-post">نشر (+)</a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-t="nav-stores">المحلات</a></li>
-    <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-t="nav-assistant">✨ رزق ذكي</button></li>
+    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home" data-t="nav-home">الرئيسية</a></li>
+    <li data-nav-order="2"><a href="#categories" data-hdr="cats" data-t="nav-cats">الأقسام</a></li>
+    <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" data-t="nav-post">نشر (+)</a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
+    <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-hdr="ai" data-t="nav-assistant">✨ رزق ذكي</button></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
-      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-t="nav-more">المزيد</span></button>
-      <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
+      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
+      <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المواد القانونية</strong></div></a>
@@ -4755,7 +4759,13 @@ function applyLandingLang(toAr) {
   }
   document.querySelectorAll('.btn-lang').forEach(b => {
     if (b.classList.contains('btn-lang-primary') || b.id === 'rizq-lang-btn' || b.id === 'nav-lang-btn' || b.id === 'rizq-desk-lang-btn') {
-      b.textContent = isAr ? 'العربية / FR' : 'FR / العربية';
+      if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
+        window.RizqI18n.paintPrimaryLangBtn(b);
+      } else {
+        b.setAttribute('dir', 'ltr');
+        b.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> / </span><span class="lang-ar" dir="rtl">العربية</span>';
+        b.setAttribute('aria-label', 'FR / العربية');
+      }
     } else {
       b.textContent = isAr ? 'FR' : 'AR';
     }
@@ -7915,8 +7925,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=13.2"></script>
-<script src="rizq_packages_ui.js?v=12.7"></script>
+<script src="rizq_packages_config.js?v=13.3"></script>
+<script src="rizq_packages_ui.js?v=13.0"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
 <script src="rizq_agent.js"></script>

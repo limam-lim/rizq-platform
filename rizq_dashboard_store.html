@@ -2317,7 +2317,7 @@ function renderPackagesDisplay(){
   var DEF=[{name:'تجريبية',duration:'10 أيام',price:0},{name:'شهرية',duration:'شهر',price:2000},{name:'ربعية',duration:'3 أشهر',price:5500,highlight:true},{name:'سنوية',duration:'12 شهر',price:15000},{name:'الماسية الأساسية للمحلات',duration:'شهر',price:3500,isDiamond:true},{name:'الماسية Pro للمحلات',duration:'شهر',price:6000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
-    var cat=RizqPackagesConfig.getCatalog('store');
+    var cat=RizqPackagesConfig.getCatalog('store', lang);
     if(cat && cat.length) list=cat;
   }
 

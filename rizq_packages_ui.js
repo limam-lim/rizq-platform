@@ -150,9 +150,19 @@
   }
 
   function ctaLabel(p) {
+    if (p && p.cta) return p.cta;
     if (isTrial(p)) return t2('ابدأ تجربتك المجانية', 'Commencer l\'essai');
     if (isDiamond(p)) return t2('اشترك في الماسية', 'Choisir le Diamant');
     return t2('اشترك الآن', 'S\'abonner');
+  }
+
+  function pickLocalized(p, field, frField) {
+    var lang = getLang();
+    if (lang === 'fr') {
+      var fr = p[frField];
+      if (fr != null && String(fr).trim() !== '') return fr;
+    }
+    return p[field];
   }
 
   function renderCard(p, opts) {
@@ -179,10 +189,16 @@
             ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
             : 'border:none;color:#fff;background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 4px 14px rgba(29,78,216,.3)';
     var priceTxt = trial ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
-    var feats = (p.features || []).slice(0, 6);
+    var feats = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length)
+      ? p.features_fr.slice(0, 6)
+      : (p.features || []).slice(0, 6);
+    var desc = pickLocalized(p, 'description', 'description_fr') || '';
+    var roi = pickLocalized(p, 'roi', 'roi_fr') || '';
+    var badgeTxt = pickLocalized(p, 'featuredBadge', 'featuredBadge_fr')
+      || (dia ? t2('الأكثر اختياراً للشركات', 'Le plus choisi') : '');
     var badge = '';
-    if (dia && (p.featuredBadge || true)) {
-      badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(168,85,247,.45)">💎 ' + esc(p.featuredBadge || t2('الأكثر اختياراً للشركات', 'Le plus choisi')) + '</div>';
+    if (dia && badgeTxt) {
+      badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(168,85,247,.45)">💎 ' + esc(badgeTxt) + '</div>';
     } else if (year) {
       badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap">🏆 ' + t2('الأفضل قيمة', 'Meilleur rapport') + '</div>';
     } else if (highlight) {
@@ -192,7 +208,7 @@
       + '<div class="store-pkg-card rizq-pkg-card" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:' + (highlight || year || dia ? '32px' : '28px') + ' 18px 22px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s">'
       + badge
       + '<div class="pkg-name" style="font-size:15px;font-weight:800;color:' + nameCol + ';margin-bottom:4px">' + esc(p.name || '') + '</div>'
-      + (p.description ? '<div style="font-size:11px;color:' + featCol + ';margin-bottom:8px;line-height:1.5">' + esc(p.description) + '</div>' : '')
+      + (desc ? '<div style="font-size:11px;color:' + featCol + ';margin-bottom:8px;line-height:1.5">' + esc(desc) + '</div>' : '')
       + '<div><span class="pkg-price" style="font-size:27px;font-weight:900;color:' + priceCol + '">' + priceTxt + '</span>'
       + (!trial ? ' <span style="font-size:12px;color:' + periodCol + ';font-weight:600">MRU</span>' : '')
       + '</div>'
@@ -201,7 +217,7 @@
       + '<ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:' + featCol + ';margin-bottom:20px;padding:0">'
       + feats.map(function (f) { return '<li>✓ ' + esc(f) + '</li>'; }).join('')
       + '</ul>'
-      + (p.roi ? '<div style="font-size:11px;color:#fde68a;margin:-8px 0 14px;line-height:1.5">💼 ' + esc(p.roi) + '</div>' : '')
+      + (roi ? '<div style="font-size:11px;color:#fde68a;margin:-8px 0 14px;line-height:1.5">💼 ' + esc(roi) + '</div>' : '')
       + '<button type="button" class="store-pkg-btn" onclick="window.location=\'' + esc(ctaHref(p, opts)) + '\'" style="width:100%;padding:11px;border-radius:11px;font-weight:800;font-size:13px;cursor:pointer;' + btnStyle + '">' + esc(ctaLabel(p)) + '</button>'
       + '</div>';
   }
@@ -239,11 +255,13 @@
 
   function renderAdsCard(p, idx, opts) {
     opts = opts || {};
+    var lang = opts.lang || getLang();
     var popular = p.id === 'vid-pro' || idx === 1;
     var cls = popular ? 'p-card popular reveal-init' : 'p-card reveal-init';
     var badge = popular ? '<div class="p-badge">' + t2('⭐ الأكثر شعبية', '⭐ Le plus populaire') + '</div>' : '';
     var price = Number(p.price) ? Number(p.price).toLocaleString() : t2('مجاناً', 'Gratuit');
-    var feats = (p.features || []).map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
+    var featSrc = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length) ? p.features_fr : (p.features || []);
+    var feats = featSrc.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
     return ''
       + '<div class="' + cls + '" data-pkg="' + esc(p.id || '') + '">'
       + badge
