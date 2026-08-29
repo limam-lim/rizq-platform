@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+  <link rel="stylesheet" href="rizq_header.css?v=16.3"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -163,8 +163,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .rc-price-orig{font-size:10px;font-weight:600;color:var(--text-muted);text-decoration:line-through}
 .rc-meta{display:flex;align-items:center;gap:6px}
 .rc-loc{font-size:10px;color:var(--text-muted)}
-.rc-pin{font-size:8.5px;background:var(--gold);color:var(--royal-dark);padding:1px 5px;border-radius:3px;font-weight:800}
-.rc-sponsored{font-size:8.5px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:1px 5px;border-radius:3px;font-weight:800}
+.rc-pin{font-size:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:var(--royal-dark);padding:3px 8px;border-radius:5px;font-weight:900;box-shadow:0 3px 10px rgba(201,168,76,.35);border:1px solid rgba(255,248,224,.5)}
+.rc-sponsored{font-size:10px;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#78350f;border:1px solid #f59e0b;padding:3px 8px;border-radius:5px;font-weight:900}
 .rc-verified{font-size:9px;color:var(--green)}
 .rc-empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
 .rc-empty .rei{font-size:40px;margin-bottom:12px}
@@ -588,18 +588,18 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 </style>
 
   <script src="rizq_backend_config.js"></script>
-<script src="rizq_dynamic_nav.js?v=12.2"></script>
+<script src="rizq_dynamic_nav.js?v=16.3"></script>
 <script src="rizq_module_flags.js?v=12.1"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
+  <script src="rizq_i18n.js?v=16.3"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_auth_gate.js?v=15.0" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
@@ -1029,18 +1029,32 @@ function loadRealSearchAds(){
 function _rizqMergeBackendAds(){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE) return;
+    var body = document.getElementById('result-list-body');
+    var showedSkel = false;
+    if(body && !ALL_ADS.length && typeof window.rizqSkeletonHtml === 'function'){
+      body.innerHTML = window.rizqSkeletonHtml(6);
+      showedSkel = true;
+    }
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=200')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        if(!data || !Array.isArray(data.ads) || !data.ads.length) return;
+        if(!data || !Array.isArray(data.ads) || !data.ads.length){
+          if(showedSkel && typeof applyFilters === 'function') applyFilters();
+          return;
+        }
         var existingIds = {};
         ALL_ADS.forEach(function(a){ existingIds[String(a.id)] = true; });
         var mapped = _mapRawAdsToDisplay(data.ads).filter(function(a){ return !existingIds[String(a.id)]; });
-        if(!mapped.length) return;
+        if(!mapped.length){
+          if(showedSkel && typeof applyFilters === 'function') applyFilters();
+          return;
+        }
         mapped.forEach(function(a){ ALL_ADS.push(a); });
         if(typeof applyFilters === 'function') applyFilters();
       })
-      .catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة */ });
+      .catch(function(){
+        if(showedSkel && typeof applyFilters === 'function') applyFilters();
+      });
   }catch(e){}
 }
 const ALL_ADS = loadRealSearchAds();
@@ -1352,7 +1366,7 @@ function renderResultList(){
         <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
         <div class="rc-meta">
           <span class="rc-loc">${escapeHtml(_loc)}</span>
-          ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">${fr?'Vedette':'مميّز'}</span>`:'')}
+          ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
           ${a.verified?`<span class="rc-verified">✓</span>`:''}
           ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
         </div>

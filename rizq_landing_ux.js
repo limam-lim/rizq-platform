@@ -14,6 +14,40 @@
   window.addEventListener('load', lockPageX);
   window.addEventListener('resize', lockPageX, { passive: true });
 
+  /* Hero entrance — visible polish on first paint */
+  function markHeroEnter() {
+    var hc = document.querySelector('.hero-content');
+    if (hc) hc.classList.add('rizq-hero-enter');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', markHeroEnter);
+  } else {
+    markHeroEnter();
+  }
+
+  /* Pricing skeletons early — prevent empty-grid flash before packages render */
+  function paintPricingSkels() {
+    try {
+      document.querySelectorAll('.pricing-grid[data-rizq-pkg-skel="1"]').forEach(function (el) {
+        if (el.children.length) return;
+        if (window.RizqPackagesUI && typeof RizqPackagesUI.pkgSkeletonHtml === 'function') {
+          el.innerHTML = RizqPackagesUI.pkgSkeletonHtml(4);
+          return;
+        }
+        var sk = '';
+        for (var i = 0; i < 4; i++) {
+          sk += '<div class="rpkg-card rizq-skel-card" style="border-radius:18px;padding:28px 18px;border:1.5px solid rgba(201,168,76,.2);background:linear-gradient(160deg,#0a1628,#122040);min-height:160px" aria-hidden="true"></div>';
+        }
+        el.innerHTML = sk;
+      });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', paintPricingSkels);
+  } else {
+    paintPricingSkels();
+  }
+
   function lang() {
     try {
       return localStorage.getItem('rizq_lang') === 'fr' ? 'fr' : 'ar';
@@ -257,6 +291,14 @@
     if (heroSearch && heroSearch.dataset.t === 'search-ph') {
       heroSearch.placeholder = fr ? 'Rechercher sur Rizq...' : 'البحث في رزق...';
     }
+    var liveWrap = document.querySelector('#hero-listings .listings-label > span');
+    if (liveWrap) {
+      liveWrap.innerHTML = '<span class="live-pulse-dot" aria-hidden="true"></span><strong>🔴 '
+        + (fr ? 'Live' : 'مباشر') + '</strong> '
+        + (fr
+          ? 'Dernières annonces publiées — mise à jour automatique'
+          : 'أحدث الإعلانات المنشورة — تتحدث تلقائياً');
+    }
 
     var hamburger = document.getElementById('nav-hamburger');
     if (hamburger) {
@@ -276,14 +318,19 @@
   document.addEventListener('rizq:langchange', applyUxLang);
   applyUxLang();
 
-  /* ── ربط روابط الأقسام الفرعية (كانت href="#") بالبحث ── */
+  /* ── ربط روابط الأقسام الفرعية (كانت href="#") بتصفّح الإعلانات ── */
   document.querySelectorAll('.drop-link[href="#"]').forEach(function (a) {
     var card = a.closest('.cat-card');
     var catNameEl = card ? card.querySelector('.cat-name') : null;
-    var catName = catNameEl ? catNameEl.textContent.trim() : '';
-    var sub = a.textContent.trim();
-    var q = (catName ? catName + ' ' : '') + sub;
-    a.href = 'rizq_search.html?q=' + encodeURIComponent(q.trim());
+    var catName = (card && card.getAttribute('data-cat-ar'))
+      || (catNameEl && catNameEl.getAttribute('data-ar'))
+      || (catNameEl ? catNameEl.textContent.trim() : '');
+    var sub = a.getAttribute('data-ar') || a.textContent.trim();
+    if (catName) {
+      a.href = 'rizq_browse.html?cat=' + encodeURIComponent(catName) + '&sub=' + encodeURIComponent(sub);
+    } else {
+      a.href = 'rizq_browse.html?q=' + encodeURIComponent(sub);
+    }
     a.removeAttribute('onclick');
   });
 
@@ -333,6 +380,43 @@
     sheet.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
+
+  /* ── Soft close helper for category / quick-cat inline panels ── */
+  window.rizqAnimatePanelClose = function (panel, afterHide) {
+    if (!panel) {
+      if (typeof afterHide === 'function') afterHide();
+      return;
+    }
+    var reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (eR) {}
+    var isOpen = panel.style.display === 'block' || panel.classList.contains('visible');
+    function finish() {
+      if (panel.classList.contains('visible')) {
+        /* Re-opened during close animation — do not hide or run cleanup */
+        panel.classList.remove('closing');
+        return;
+      }
+      panel.style.display = 'none';
+      panel.classList.remove('visible', 'closing', 'pinned');
+      if (typeof afterHide === 'function') afterHide();
+    }
+    if (reduce || !isOpen) {
+      panel.classList.remove('visible', 'closing');
+      panel.style.display = 'none';
+      if (typeof afterHide === 'function') afterHide();
+      return;
+    }
+    panel.classList.remove('visible');
+    panel.classList.add('closing');
+    var done = false;
+    function once() {
+      if (done) return;
+      done = true;
+      finish();
+    }
+    panel.addEventListener('animationend', once, { once: true });
+    setTimeout(once, 260);
+  };
 
   /* openInlineExpand على الجوال يستخدم #cat-inline-panel inline (مثل سطح المكتب) */
 

@@ -1,5 +1,5 @@
 /* rizq_modal_viewport.css — modal/popup clearance + imports unified design system */
-@import url('rizq_modals.css?v=1.4');
+@import url('rizq_modals.css?v=1.5');
 
 :root {
   --rzq-nav-clearance: 72px;

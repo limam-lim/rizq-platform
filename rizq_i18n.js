@@ -419,11 +419,11 @@
     });
   }
 
-  /* Primary lang pill: always visual [ FR ] / [ العربية ] — LTR inside button so RTL pages do not flip. */
+  /* Primary lang pill: compact [ FR | AR ] — LTR inside button so RTL pages do not flip. */
   var PRIMARY_LANG_BTN_HTML =
     '<span class="lang-fr" dir="ltr">FR</span>' +
-    '<span class="lang-sep" aria-hidden="true"> / </span>' +
-    '<span class="lang-ar" dir="rtl">العربية</span>';
+    '<span class="lang-sep" aria-hidden="true"> | </span>' +
+    '<span class="lang-ar" dir="ltr">AR</span>';
 
   function isPrimaryLangBtn(btn) {
     return !!(btn && (
@@ -438,7 +438,7 @@
     if (!btn) return;
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = PRIMARY_LANG_BTN_HTML;
-    btn.setAttribute('aria-label', 'FR / العربية');
+    btn.setAttribute('aria-label', 'FR | AR');
   }
 
   function applyLang(lang) {

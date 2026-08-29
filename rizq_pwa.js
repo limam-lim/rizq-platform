@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '14.9';
+  var ASSET_V = '16.3';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -18,9 +18,27 @@
       el.textContent = msg || '';
       el.className = 'show' + (type ? ' toast-' + type : '');
       clearTimeout(el._rizqToastT);
-      el._rizqToastT = setTimeout(function () { el.className = ''; }, 3200);
+      el._rizqToastT = setTimeout(function () { el.className = ''; }, type === 'success' ? 2800 : 3200);
     };
   }
+
+  /** Render navy/gold skeleton cards into a container (listing / store grids). */
+  window.rizqSkeletonHtml = function (count) {
+    count = Math.max(1, Math.min(count || 6, 12));
+    var i, html = '<div class="rizq-skel-grid" role="status" aria-busy="true">';
+    for (i = 0; i < count; i++) {
+      html += '<div class="rizq-skel-card">'
+        + '<div class="rizq-skel rizq-skel-media"></div>'
+        + '<div class="rizq-skel rizq-skel-line mid"></div>'
+        + '<div class="rizq-skel rizq-skel-line short"></div>'
+        + '</div>';
+    }
+    return html + '</div>';
+  };
+  window.rizqShowSkeleton = function (el, count) {
+    if (!el) return;
+    el.innerHTML = window.rizqSkeletonHtml(count);
+  };
 
   function isPublicShell() {
     var p = (location.pathname || '').toLowerCase();

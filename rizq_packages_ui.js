@@ -165,6 +165,23 @@
     return p[field];
   }
 
+  function pkgSkeletonHtml(count) {
+    count = Math.max(2, Math.min(count || 4, 6));
+    var i, html = '<div class="rizq-pkg-skel-grid" role="status" aria-busy="true" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px">';
+    for (i = 0; i < count; i++) {
+      html += '<div class="rizq-pkg-card rizq-skel-card" style="border-radius:18px;padding:28px 18px;border:1.5px solid rgba(201,168,76,.2);background:linear-gradient(160deg,#0a1628,#122040)">'
+        + '<div class="rizq-skel" style="height:14px;width:55%;margin:0 auto 16px;border-radius:8px"></div>'
+        + '<div class="rizq-skel" style="height:28px;width:40%;margin:0 auto 10px;border-radius:8px"></div>'
+        + '<div class="rizq-skel" style="height:10px;width:70%;margin:0 auto 18px;border-radius:6px"></div>'
+        + '<div class="rizq-skel" style="height:10px;width:90%;margin:0 auto 8px;border-radius:6px"></div>'
+        + '<div class="rizq-skel" style="height:10px;width:85%;margin:0 auto 8px;border-radius:6px"></div>'
+        + '<div class="rizq-skel" style="height:10px;width:80%;margin:0 auto 18px;border-radius:6px"></div>'
+        + '<div class="rizq-skel" style="height:40px;width:100%;border-radius:11px"></div>'
+        + '</div>';
+    }
+    return html + '</div>';
+  }
+
   function renderCard(p, opts) {
     opts = opts || {};
     var lang = opts.lang || getLang();
@@ -173,21 +190,21 @@
     var year = isYearly(p);
     var quarter = isQuarterly(p);
     var highlight = !!p.highlight || (!trial && !dia && !year && (p.id === 'st-month' || p.id === 'cp-month' || p.id === 'of-month' || p.id === 'vid-pro' || p.name === 'Pro' || p.name === 'احترافية'));
-    var bg = dia ? 'linear-gradient(160deg,#0a0a18,#1a1030)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : 'linear-gradient(160deg,#f8faff,#eff3ff)';
-    var border = dia ? '2px solid rgba(168,85,247,.45)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid #86efac' : '1.5px solid #bfcfef';
-    var nameCol = dia ? '#e0cfff' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#15803d' : '#1B3A6B';
-    var priceCol = dia ? '#a855f7' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#16a34a' : '#1d4ed8';
-    var featCol = dia ? '#c0b0e8' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? '#166534' : '#3a4a63';
-    var periodCol = dia ? '#9f8fcc' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? '#4ade80' : '#5b6b8a';
+    var bg = dia ? 'linear-gradient(160deg,#0a1628,#1B3A6B)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : 'linear-gradient(160deg,#f8faff,#eff3ff)';
+    var border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid #86efac' : '1.5px solid #bfcfef';
+    var nameCol = dia ? '#f3de9c' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#15803d' : '#1B3A6B';
+    var priceCol = dia ? '#e8c96a' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#16a34a' : '#1d4ed8';
+    var featCol = dia ? 'rgba(255,255,255,.85)' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? '#166534' : '#3a4a63';
+    var periodCol = dia ? 'rgba(243,222,156,.7)' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? '#4ade80' : '#5b6b8a';
     var btnStyle = dia
-      ? 'border:1.5px solid #a855f7;color:#a855f7;background:rgba(168,85,247,.08)'
+      ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
       : year
-        ? 'border:none;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 6px 18px rgba(124,58,237,.4)'
+        ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
         : highlight
           ? 'border:none;color:#16263d;background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));box-shadow:0 6px 18px rgba(201,168,76,.4)'
           : trial
             ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
-            : 'border:none;color:#fff;background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 4px 14px rgba(29,78,216,.3)';
+            : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.35)';
     var priceTxt = trial ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
     var feats = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length)
       ? p.features_fr.slice(0, 6)
@@ -198,11 +215,11 @@
       || (dia ? t2('الأكثر اختياراً للشركات', 'Le plus choisi') : '');
     var badge = '';
     if (dia && badgeTxt) {
-      badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(168,85,247,.45)">💎 ' + esc(badgeTxt) + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.45)">💎 ' + esc(badgeTxt) + '</div>';
     } else if (year) {
-      badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap">🏆 ' + t2('الأفضل قيمة', 'Meilleur rapport') + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏆 ' + t2('الأفضل قيمة', 'Meilleur rapport') + '</div>';
     } else if (highlight) {
-      badge = '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
     }
     return ''
       + '<div class="store-pkg-card rizq-pkg-card" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:' + (highlight || year || dia ? '32px' : '28px') + ' 18px 22px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s">'
@@ -238,6 +255,11 @@
     var el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     if (!el) return;
     opts = Object.assign({ catalogKey: catalogKey }, opts || {});
+    var skelCount = Number(opts.columns) || Number(el.getAttribute('data-rizq-pkg-cols')) || 4;
+    var shownAt = Date.now();
+    if (!el.getAttribute('data-rizq-pkg-ready')) {
+      el.innerHTML = pkgSkeletonHtml(skelCount);
+    }
 
     function draw() {
       var list = getPackages(catalogKey, opts.lang);
@@ -247,9 +269,15 @@
         });
       }
       el.innerHTML = renderGridHTML(list, opts);
+      el.setAttribute('data-rizq-pkg-ready', '1');
     }
 
-    draw();
+    function drawAfterMin() {
+      var wait = Math.max(0, 480 - (Date.now() - shownAt));
+      setTimeout(draw, wait);
+    }
+
+    drawAfterMin();
     syncAllFromBackend(function () { draw(); });
   }
 
@@ -276,14 +304,23 @@
   }
 
   function mountAds(containerId, opts) {
-    var el = document.getElementById(containerId);
+    var el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     if (!el) return;
     opts = opts || {};
+    var shownAt = Date.now();
+    if (!el.getAttribute('data-rizq-pkg-ready')) {
+      el.innerHTML = pkgSkeletonHtml(3);
+    }
     function draw() {
       var list = getPackages('video', opts.lang);
       el.innerHTML = list.map(function (p, i) { return renderAdsCard(p, i, opts); }).join('');
+      el.setAttribute('data-rizq-pkg-ready', '1');
     }
-    draw();
+    function drawAfterMin() {
+      var wait = Math.max(0, 480 - (Date.now() - shownAt));
+      setTimeout(draw, wait);
+    }
+    drawAfterMin();
     syncAllFromBackend(function () { draw(); });
   }
 
@@ -294,6 +331,7 @@
     getPackages: getPackages,
     syncAllFromBackend: syncAllFromBackend,
     renderGridHTML: renderGridHTML,
+    pkgSkeletonHtml: pkgSkeletonHtml,
     mount: mount,
     mountAds: mountAds
   };

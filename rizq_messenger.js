@@ -656,6 +656,30 @@
       // إرسال حقيقي للخادم — نظام الرسائل بين المشتري والبائع (مهمة #243/#247)
       _sendToBackend(text, name, phone);
 
+      // توست نجاح قصير بعد إرسال الرسالة
+      try {
+        var toastMsg = _t('✅ تم إرسال رسالتك', '✅ Message envoyé');
+        if (typeof global.showToast === 'function') {
+          global.showToast(toastMsg, 'success');
+        } else {
+          var tEl = document.getElementById('rizq-toast');
+          if (!tEl) {
+            tEl = document.createElement('div');
+            tEl.id = 'rizq-toast';
+            tEl.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#1a2f52,#0d1f3c);border:1px solid rgba(16,185,129,.55);color:#fff;padding:13px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 12px 32px rgba(0,0,0,.4);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:90vw;text-align:center';
+            document.body.appendChild(tEl);
+          }
+          tEl.textContent = toastMsg;
+          tEl.style.opacity = '1';
+          tEl.style.transform = 'translateX(-50%) translateY(0)';
+          clearTimeout(tEl._hideTimer);
+          tEl._hideTimer = setTimeout(function(){
+            tEl.style.opacity = '0';
+            tEl.style.transform = 'translateX(-50%) translateY(20px)';
+          }, 2600);
+        }
+      } catch (eToast) {}
+
       // رد المساعد الآلي (يبقى كتجربة فورية بينما ينتظر رد البائع الحقيقي)
       _autoReply();
     },

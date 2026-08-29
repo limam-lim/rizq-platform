@@ -22,10 +22,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=14.3"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=14.4"/>
-<link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4"/>
-<link rel="stylesheet" href="rizq_header.css?v=14.9"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=16.3"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=16.3"/>
+<link rel="stylesheet" href="rizq_modal_viewport.css?v=16.3"/>
+<link rel="stylesheet" href="rizq_header.css?v=16.3"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -46,8 +46,8 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
 }
 </style>
-<script src="rizq_packages_config.js?v=13.3"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
+<script src="rizq_packages_config.js?v=16.3"></script>
+<script src="rizq_packages_ui.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
@@ -677,6 +677,14 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
   transform:translateY(-4px)!important;
   box-shadow:0 8px 28px rgba(201,168,76,.38),0 0 0 3px rgba(201,168,76,.18)!important;
   z-index:10;
+  overflow:visible;
+}
+.qcat.qcat-open::after{
+  content:'';
+  position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);
+  width:2px;height:22px;
+  background:#C9A84C;
+  z-index:12;pointer-events:none;
 }
 .qcat.qcat-open .qcat-name{color:var(--royal-dark)!important;font-weight:800!important}
 #qcat-portal{display:none!important;visibility:hidden!important;pointer-events:none!important;height:0!important;overflow:hidden!important;position:absolute!important}
@@ -906,7 +914,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 /* cat-drop — مخزن بيانات فقط (القوائم المنبثقة الصغيرة مُلغاة) */
 .cat-drop{display:none!important;visibility:hidden;pointer-events:none;height:0;overflow:hidden;position:absolute}
 .cat-card.open,.cat-card.pinned{border:2px solid var(--gold)!important;transform:translateY(-3px) scale(1.04)!important;box-shadow:0 0 0 5px rgba(201,168,76,.14),0 16px 48px rgba(201,168,76,.26),0 4px 20px rgba(0,0,0,.18)!important;background:linear-gradient(155deg,rgba(201,168,76,.07) 0%,rgba(255,255,255,.99) 60%)!important;z-index:5}
-.cat-card.open::after,.cat-card.pinned::after{content:'';position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);width:3px;height:28px;background:linear-gradient(to bottom,var(--gold) 30%,rgba(201,168,76,0) 100%);border-radius:0 0 3px 3px;z-index:10;pointer-events:none}
+.cat-card.open::after,.cat-card.pinned::after{content:'';position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);width:2px;height:28px;background:#C9A84C;z-index:10;pointer-events:none}
 .cat-card.open .cat-icon-box,.cat-card.pinned .cat-icon-box{background:linear-gradient(135deg,var(--gold),var(--gold-light))!important;box-shadow:0 8px 30px rgba(201,168,76,.5)!important;transform:scale(1.12)!important}
 .cat-card.open .cat-name,.cat-card.pinned .cat-name{color:var(--text-strong)!important;font-weight:900!important}
 #cat-portal{position:fixed;z-index:999999;display:none;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:2px solid rgba(201,168,76,.3);border-radius:16px;padding:16px;box-shadow:0 30px 70px rgba(0,0,0,.45);text-align:start;min-width:240px;max-width:290px;max-height:65vh;overflow-y:auto}
@@ -925,10 +933,10 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   border:1.5px solid rgba(201,168,76,.20);border-radius:22px;
   padding:28px 32px 24px;
   box-shadow:0 18px 48px rgba(27,58,107,.07),0 0 0 1px rgba(201,168,76,.10);
-  position:relative;overflow:hidden;
+  position:relative;overflow:visible;
 }
 #cat-inline-panel{grid-column:1/-1;margin:6px 0}
-#qcat-inline-panel{width:100%;max-width:min(920px,100%);margin:4px auto 14px;box-sizing:border-box}
+#qcat-inline-panel{width:100%;max-width:100%;margin:4px auto 14px;box-sizing:border-box}
 #cat-inline-panel.pinned,
 #qcat-inline-panel.pinned{
   border-color:rgba(201,168,76,.42);
@@ -938,29 +946,27 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 #qcat-inline-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent 0%,rgba(201,168,76,.55) 25%,rgba(232,201,106,.65) 50%,rgba(201,168,76,.55) 75%,transparent 100%);border-radius:22px 22px 0 0}
 #cat-inline-panel::after,
 #qcat-inline-panel::after{content:'';position:absolute;top:-18px;left:0;right:0;height:18px;background:linear-gradient(to bottom,rgba(254,254,252,0) 0%,rgba(254,254,252,.85) 100%)}
+/* Triangle pointer removed — connector is only the gold line on .qcat-open / .cat-card.open */
 #cat-inline-panel .iep-arrow,
-#qcat-inline-panel .iep-arrow{position:absolute;top:-16px;width:32px;height:16px;transition:left .3s cubic-bezier(.23,1,.32,1)}
-#cat-inline-panel .iep-arrow::before,
-#qcat-inline-panel .iep-arrow::before{content:'';position:absolute;border-left:16px solid transparent;border-right:16px solid transparent;border-bottom:16px solid rgba(201,168,76,.38);top:0}
-#cat-inline-panel .iep-arrow::after,
-#qcat-inline-panel .iep-arrow::after{content:'';position:absolute;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:14px solid var(--beige-1);top:3px;left:2px}
+#qcat-inline-panel .iep-arrow{display:none!important}
 #cat-inline-panel .iep-header,
 #qcat-inline-panel .iep-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
 #cat-inline-panel .iep-title,
 #qcat-inline-panel .iep-title{font-size:18px;font-weight:900;color:var(--text-strong);display:flex;align-items:center;gap:10px}
 #cat-inline-panel .iep-actions,
-#qcat-inline-panel .iep-actions{display:flex;align-items:center;gap:8px}
+#qcat-inline-panel .iep-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 #cat-inline-panel .iep-viewall,
-#qcat-inline-panel .iep-viewall{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;font-size:12.5px;font-weight:800;border-radius:10px;padding:9px 18px;text-decoration:none;transition:all .25s;white-space:nowrap;border:none;cursor:pointer}
+#qcat-inline-panel .iep-viewall{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;font-size:12px;font-weight:800;border-radius:10px;padding:8px 14px;text-decoration:none;transition:all .25s;white-space:nowrap;border:none;cursor:pointer}
 #cat-inline-panel .iep-viewall:hover,
 #qcat-inline-panel .iep-viewall:hover{filter:brightness(1.08);transform:translateY(-1px)}
 #cat-inline-panel .iep-close,
 #qcat-inline-panel .iep-close{background:rgba(27,58,107,.05);border:1px solid rgba(27,58,107,.12);border-radius:9px;padding:7px 12px;cursor:pointer;color:var(--royal);font-size:15px;transition:all .2s;line-height:1}
 #cat-inline-panel .iep-close:hover,
 #qcat-inline-panel .iep-close:hover{background:rgba(27,58,107,.10);color:var(--royal-dark)}
-#cat-inline-panel .iep-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:18px 28px}
-#qcat-inline-panel .iep-groups.qcat-iep-flat{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:8px 16px}
-#cat-inline-panel .iep-group-title{font-size:13.5px;font-weight:800;color:var(--text-strong);letter-spacing:.3px;text-transform:none;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(201,168,76,.20);border-inline-start:3px solid rgba(201,168,76,.42);padding-inline-start:8px}
+#cat-inline-panel .iep-groups,
+#qcat-inline-panel .iep-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:18px 28px}
+#cat-inline-panel .iep-group-title,
+#qcat-inline-panel .iep-group-title{font-size:13.5px;font-weight:800;color:var(--text-strong);letter-spacing:.3px;text-transform:none;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(201,168,76,.20);border-inline-start:3px solid rgba(201,168,76,.42);padding-inline-start:8px}
 #cat-inline-panel .iep-link,
 #qcat-inline-panel .iep-link{display:block;font-size:13.5px;font-weight:700;color:var(--text-main);padding:7px 10px;border-radius:8px;text-decoration:none;transition:all .18s;border:1px solid transparent;cursor:pointer}
 #cat-inline-panel .iep-link:hover,
@@ -970,8 +976,8 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 #qcat-inline-panel.visible{animation:iep-slide-in .28s cubic-bezier(.23,1,.32,1) both}
 @media(max-width:640px){
   #cat-inline-panel,#qcat-inline-panel{padding:20px 16px 18px}
-  #cat-inline-panel .iep-groups{grid-template-columns:repeat(2,1fr);gap:14px 16px}
-  #qcat-inline-panel .iep-groups.qcat-iep-flat{grid-template-columns:repeat(2,1fr);gap:8px 12px}
+  #cat-inline-panel .iep-groups,
+  #qcat-inline-panel .iep-groups{grid-template-columns:repeat(2,1fr);gap:14px 16px}
 }
 
 /* Sub-action modal */
@@ -1378,13 +1384,37 @@ footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-t
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
 .footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
-.footer-links li a{font-size:13px;color:rgba(255,255,255,.82);text-decoration:none;transition:color .3s}
+.footer-links li a{font-size:13px;color:rgba(255,255,255,.82);text-decoration:none;transition:color .3s;white-space:nowrap}
 .footer-links li a:hover{color:var(--gold)}
+/* تواصل معنا: لا تقسم الاسم والرقم على سطرين */
+.footer-contact-list li,
+.footer-links li:has(a[href^="tel:"]),
+.footer-links li:has(a[href^="mailto:"]){
+  white-space:nowrap;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  color:rgba(255,255,255,.75);font-size:13px
+}
+.footer-contact-list li::-webkit-scrollbar,
+.footer-links li:has(a[href^="tel:"])::-webkit-scrollbar,
+.footer-links li:has(a[href^="mailto:"])::-webkit-scrollbar{display:none}
+.footer-contact-list a[href^="tel:"],
+.footer-contact-list a[href^="mailto:"]{
+  white-space:nowrap;direction:ltr;unicode-bidi:isolate
+}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding:22px 0;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .footer-copy{font-size:12px;color:rgba(255,255,255,.8)}
 footer .logo-sub{color:rgba(255,255,255,.75)}
 /* الجوال: عمودان بدل خمسة (القاعدة الأصلية تلغي قاعدة الجوال الأبكر في الملف)،
    وحشوة سفلية تُبعد شريط الحقوق عن أزرار المساعد العائمة */
+@media(max-width:1024px){
+  .footer-contact-list li,
+  .footer-links li:has(a[href^="tel:"]),
+  .footer-links li:has(a[href^="mailto:"]){font-size:11.5px}
+}
+@media(max-width:430px){
+  .footer-contact-list li,
+  .footer-links li:has(a[href^="tel:"]),
+  .footer-links li:has(a[href^="mailto:"]){font-size:11px}
+}
 @media(max-width:768px){
   .footer-grid{grid-template-columns:1fr 1fr !important;gap:24px 14px !important;padding-bottom:30px}
   .footer-grid > div:first-child{grid-column:1 / -1}
@@ -1726,6 +1756,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
 @media (prefers-reduced-motion:reduce){
   .hero-headline::after,.hero-orb1,.hero-orb2,.hero-orb3,.hero-title-card,.hero-vid-wrap,.hero-cta-primary{animation:none!important}
+  #cat-inline-panel.visible,#qcat-inline-panel.visible,
+  #cat-inline-panel.closing,#qcat-inline-panel.closing{animation:none!important}
 }
 
 /* Restore every landing block that fade-in had left invisible */
@@ -1814,11 +1846,11 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js"></script>
+<script src="rizq_dynamic_nav.js?v=16.3"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_auth_gate.js?v=16.3" defer></script>
 </head>
 <body>
 
@@ -1832,7 +1864,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- ══ NAVBAR ══ -->
 <nav id="nav">
   <div class="nav-start">
-    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" dir="ltr" aria-label="FR / العربية"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> / </span><span class="lang-ar" dir="rtl">العربية</span></button>
+    <button class="btn-lang btn-lang-primary" id="nav-lang-btn" onclick="toggleLang()" type="button" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button type="button" class="nav-account-btn" onclick="openModal('login')" aria-label="حسابي">
       <span class="nav-account-ico" aria-hidden="true">👤</span>
       <span data-t="nav-account">حسابي</span>
@@ -1900,7 +1932,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
   <button class="mobile-drawer-close" onclick="closeMobileNav()" aria-label="إغلاق">✕</button>
   <ul id="mobile-drawer-list"></ul>
   <div class="mobile-drawer-actions">
-    <!-- Language switcher lives in the header (FR / العربية). -->
+    <!-- Language switcher lives in the header (FR | AR). -->
     <button class="btn-login" onclick="openModal('login');closeMobileNav()">دخول</button>
     <button class="btn-register" onclick="openModal('register');closeMobileNav()">📱 حساب جديد</button>
   </div>
@@ -1936,8 +1968,6 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
   <!-- Hero Content -->
   <div class="hero-content">
-    <!-- DEV cache-bust: v8.1 — remove after confirming Edge loaded this file -->
-    <span id="hero-build-v81" style="position:absolute;top:8px;inset-inline-start:8px;font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--gold);opacity:.55;pointer-events:none;z-index:8">v8.1</span>
     <div class="hero-eyebrow">
       <div class="pulse"></div>
       <span data-t="hero-badge">المنصة الأولى في موريتانيا</span>
@@ -2079,7 +2109,11 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
-        <!-- Cards injected by JS -->
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
       </div>
     </div>
   </div>
@@ -2108,7 +2142,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- ══ CATEGORIES ══ -->
 <section class="section" id="categories" style="background:var(--bg-section)">
   <div class="section-header fade-in">
-    <p class="section-tag">All Categories</p>
+    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
     <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
     <p class="section-desc" data-t="s-cats-desc">أقسام منظمة تغطي السوق الموريتاني</p>
   </div>
@@ -2728,7 +2762,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
   </div>
   <div class="section-header fade-in">
-    <p class="section-tag">Why Rizq?</p>
+    <p class="section-tag">لماذا رزق؟</p>
     <h2 class="section-title" data-t="s-why-title">لماذا يختار الناس <span>رزق؟</span></h2>
     <p class="section-desc" data-t="s-why-desc">لسنا مجرد موقع إعلانات — منصة إعلانات ومعارض ومناقصات، مبنية على الثقة والقيم الموريتانية الأصيلة</p>
   </div>
@@ -2767,22 +2801,22 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- ══ PRICING ══ -->
 <section class="pricing-section" id="pricing">
   <div class="section-header fade-in">
-    <p class="section-tag">Pricing Plans</p>
+    <p class="section-tag" data-t="s-price-tag">خطط الأسعار</p>
     <h2 class="section-title" data-t="s-price-title">خطط <span>شفافة وبسيطة</span></h2>
     <p class="section-desc" data-t="s-price-desc">ابدأ مجاناً وطوّر تجربتك متى شئت</p>
-    <div id="diamond-pitch" style="max-width:920px;margin:18px auto 0;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#3b0764,#6b21a8);border:1px solid rgba(192,132,252,.55);color:#f5e9ff;text-align:center">
-      <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e9d5ff;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
+    <div id="diamond-pitch" style="max-width:920px;margin:18px auto 0;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#0a1628,#1B3A6B);border:1px solid rgba(201,168,76,.45);color:#f5f0e6;text-align:center">
+      <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e8c96a;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:right">
-        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(233,213,255,.25)">
-          <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية الأساسية 💎</div>
-          <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#e9d5ff">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
+        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28)">
+          <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية الأساسية 💎</div>
+          <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:rgba(255,255,255,.85)">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
         </div>
-        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(251,191,36,.35)">
-          <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px">الماسية Pro 💎</div>
+        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.4)">
+          <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية Pro 💎</div>
           <div id="diamond-pitch-pro-desc" data-t-fr="Système de vente et service client — texte + appels vocaux · 10 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
         </div>
       </div>
-      <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:#e9d5ff">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
+      <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.88)">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
     </div>
   </div>
 
@@ -2817,25 +2851,25 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
   <!-- Individual -->
   <div class="price-pane" id="pane-individual">
-    <div class="pricing-grid" id="grid-individual"></div>
+    <div class="pricing-grid" id="grid-individual" data-rizq-pkg-skel="1"></div>
   </div>
   <!-- Stores -->
   <div class="price-pane" id="pane-stores">
-    <div class="pricing-grid" id="grid-stores"></div>
+    <div class="pricing-grid" id="grid-stores" data-rizq-pkg-skel="1"></div>
   </div>
   <!-- Offices -->
   <div class="price-pane active" id="pane-offices">
-    <div class="pricing-grid" id="grid-offices"></div>
+    <div class="pricing-grid" id="grid-offices" data-rizq-pkg-skel="1"></div>
   </div>
   <!-- Corp -->
   <div class="price-pane" id="pane-corp">
-    <div class="pricing-grid" id="grid-corp"></div>
+    <div class="pricing-grid" id="grid-corp" data-rizq-pkg-skel="1"></div>
   </div>
   <div class="price-pane" id="pane-tender">
-    <div class="pricing-grid" id="grid-tender"></div>
+    <div class="pricing-grid" id="grid-tender" data-rizq-pkg-skel="1"></div>
   </div>
   <div class="price-pane" id="pane-ads">
-    <div class="pricing-grid" id="grid-ads"></div>
+    <div class="pricing-grid" id="grid-ads" data-rizq-pkg-skel="1"></div>
   </div>
 
   </div><!-- /.pricing-container -->
@@ -2940,23 +2974,23 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-quick">روابط سريعة</h4>
-      <ul class="footer-links"><li><a href="rizq_landing_v8.html">الرئيسية</a></li><li><a href="rizq_browse.html">تصفّح الإعلانات</a></li><li><a href="rizq_post.html">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing">الأسعار</a></li><li><a href="#about">من نحن</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="#about" data-t="ft-q5">من نحن</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-topcats">أبرز الأقسام</h4>
-      <ul class="footer-links"><li><a href="rizq_browse.html">🏠 منازل وعقارات</a></li><li><a href="rizq_browse.html">🚗 سيارات وقطع غيار</a></li><li><a href="rizq_browse.html">🚛 شاحنات ومعدات</a></li><li><a href="rizq_browse.html">📱 هواتف وإلكترونيات</a></li><li><a href="rizq_browse.html">🐄 ماشية وحيوانات</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" data-t="ft-tc1">🏠 منازل وعقارات</a></li><li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" data-t="ft-tc2">🚗 سيارات وقطع غيار</a></li><li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" data-t="ft-tc3">🚛 شاحنات ومعدات</a></li><li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" data-t="ft-tc4">📱 هواتف وإلكترونيات</a></li><li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" data-t="ft-tc5">🐄 ماشية وحيوانات</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-help">المساعدة</h4>
-      <ul class="footer-links"><li><a href="rizq_legal.html">مركز المساعدة</a></li><li><a href="rizq_legal.html#s3">سياسة الخصوصية</a></li><li><a href="rizq_legal.html">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html">تواصل معنا</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_legal.html" data-t="ft-h1">مركز المساعدة</a></li><li><a href="rizq_legal.html#s3" data-t="ft-h2">سياسة الخصوصية</a></li><li><a href="rizq_legal.html" data-t="ft-h3">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h4">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html" data-t="ft-h5">تواصل معنا</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-contact">تواصل معنا</h4>
-      <ul class="footer-links" style="gap:12px">
-        <li style="color:rgba(255,255,255,.75);font-size:13px">📱 <strong class="carrier-name" style="color:var(--gold)">Mauritel:</strong> <a href="tel:+22244882212" style="color:rgba(255,255,255,.75);text-decoration:none" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block">+222 44 88 22 12</span></a></li>
-        <li style="color:rgba(255,255,255,.75);font-size:13px">📱 <strong class="carrier-name" style="color:var(--gold)">Mattel:</strong> <a href="tel:+22236485784" style="color:rgba(255,255,255,.75);text-decoration:none" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block">+222 36 48 57 84</span></a></li>
-        <li style="color:rgba(255,255,255,.75);font-size:13px">📱 <strong class="carrier-name" style="color:var(--gold)">Chinguitel:</strong> <a href="tel:+22222708338" style="color:rgba(255,255,255,.75);text-decoration:none" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block">+222 22 70 83 38</span></a></li>
-        <li style="color:rgba(255,255,255,.75);font-size:13px">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>
+      <ul class="footer-links footer-contact-list" style="gap:12px">
+        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:var(--gold)">Mauritel:</strong> <a href="tel:+22244882212" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 44 88 22 12</a></li>
+        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:var(--gold)">Mattel:</strong> <a href="tel:+22236485784" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 36 48 57 84</a></li>
+        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:var(--gold)">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>
+        <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>
       </ul>
     </div>
   </div>
@@ -3652,7 +3686,7 @@ function buildCards(){
     c.className='ad-card';
     const d = trAd(a);
     c.innerHTML=`
-      <div class="ad-card-img" style="background:${d.bg}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميز':'Favori')+'</div>':''}
+      <div class="ad-card-img" style="background:${d.bg}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
         <span>${d.emoji}</span>
       </div>
       <div class="ad-card-body">
@@ -3710,6 +3744,19 @@ const QCAT_KEYS_FR = {
   'عقارات':'Immobilier','سيارات':'Voitures','شاحنات':'Camions','إلكترونيات':'Électronique','أزياء':'Mode','ذهب ومجوهرات':'Or & bijoux','صحة وجمال':'Santé & beauté','وظائف':'Emplois','ماشية':'Bétail','خدمات':'Services','بناء':'Construction'
 };
 
+/* Map quick-cat chips → «كل الأقسام» cards so both panels share the same branch layout */
+const QCAT_TO_CAT_CARD = {
+  'عقارات': 'منازل وعقارات',
+  'سيارات': 'سيارات وقطع غيار',
+  'شاحنات': 'شاحنات ومعدات ثقيلة',
+  'إلكترونيات': 'هواتف وإلكترونيات',
+  'أزياء': 'موضة وأزياء',
+  'ذهب ومجوهرات': 'ذهب ومجوهرات',
+  'صحة وجمال': 'صحة وجمال',
+  'وظائف': 'وظائف وفرص عمل',
+  'ماشية': 'ماشية ودواجن وبيطرة'
+};
+
 let qcatInlinePanel = null;
 let qcatTimer = null;
 let activeQcat = null;
@@ -3718,11 +3765,58 @@ let _qcatHoverOpenTimer = null;
 
 function positionQcatInlineArrow(el) {
   if (!qcatInlinePanel || !el) return;
+  var arrow = qcatInlinePanel.querySelector('#qcat-iep-arrow');
+  if (!arrow) return;
   var panelRect = qcatInlinePanel.getBoundingClientRect();
   var elRect = el.getBoundingClientRect();
+  if (!panelRect.width) return;
+  /* Center triangle under the active chip (physical left — works in RTL too) */
   var arrowLeft = (elRect.left - panelRect.left) + (elRect.width / 2) - 16;
-  var arrow = qcatInlinePanel.querySelector('#qcat-iep-arrow');
-  if (arrow) arrow.style.left = Math.max(8, Math.min(arrowLeft, panelRect.width - 40)) + 'px';
+  arrow.style.left = Math.max(8, Math.min(arrowLeft, panelRect.width - 40)) + 'px';
+}
+
+function _qcatFindCatCard(catKey) {
+  var want = QCAT_TO_CAT_CARD[catKey] || catKey;
+  var cards = document.querySelectorAll('.cats-grid .cat-card');
+  for (var i = 0; i < cards.length; i++) {
+    var card = cards[i];
+    var ar = card.getAttribute('data-cat-ar') || (card.querySelector('.cat-name') && card.querySelector('.cat-name').textContent.trim()) || '';
+    if (ar === want || ar === catKey) return card;
+  }
+  return null;
+}
+
+function _iepGroupsHtmlFromDrop(drop) {
+  if (!drop) return '';
+  var groups = drop.querySelectorAll('.drop-group');
+  var groupsHtml = '';
+  groups.forEach(function(g) {
+    var titleAr = (g.querySelector('.drop-group-title') && g.querySelector('.drop-group-title').textContent.trim()) || '';
+    var titleDisp = isAr ? titleAr : ((window._subFR && window._subFR[titleAr]) || titleAr);
+    var linksHtml = Array.prototype.map.call(g.querySelectorAll('.drop-link'), function(l) {
+      var ar = l.textContent.trim();
+      var fr = (window._subFR && window._subFR[ar]) || ar;
+      var disp = isAr ? ar : fr;
+      return '<a class="iep-link" href="#" data-ar="' + ar.replace(/"/g, '&quot;') + '" data-fr="' + String(fr).replace(/"/g, '&quot;') + '">' + disp + '</a>';
+    }).join('');
+    groupsHtml += '<div><div class="iep-group-title">' + titleDisp + '</div>' + linksHtml + '</div>';
+  });
+  return groupsHtml;
+}
+
+function _iepGroupsHtmlFromFlatSubs(subs, arSubs) {
+  /* Chunk flat sub lists into columns (~3 links) — same density as cat-inline groups */
+  var COL = 3;
+  var html = '';
+  for (var i = 0; i < subs.length; i += COL) {
+    var chunk = subs.slice(i, i + COL);
+    var links = chunk.map(function(s, j) {
+      var ar = arSubs[i + j] || s;
+      return '<a class="iep-link" href="#" data-ar="' + String(ar).replace(/"/g, '&quot;') + '">' + s + '</a>';
+    }).join('');
+    html += '<div>' + links + '</div>';
+  }
+  return html;
 }
 
 function openQcatPortal(el) {
@@ -3731,7 +3825,8 @@ function openQcatPortal(el) {
   clearTimeout(qcatTimer);
   var catKey = el.dataset.qcat;
   var data = isAr ? QCAT_DATA[catKey] : QCAT_DATA_FR[catKey];
-  if (!data) return;
+  if (!data && !QCAT_DATA[catKey]) return;
+  if (!data) data = QCAT_DATA[catKey];
 
   document.querySelectorAll('.qcat.qcat-open').forEach(function(q){ q.classList.remove('qcat-open'); });
   activeQcat = el;
@@ -3739,27 +3834,31 @@ function openQcatPortal(el) {
   el._qcatOpenedAt = Date.now();
 
   var title = isAr ? catKey : (QCAT_KEYS_FR[catKey] || catKey);
-  var arSubs = (QCAT_DATA[catKey] || data).subs;
+  var arSubs = (QCAT_DATA[catKey] || data).subs || [];
   var viewAllHref = 'rizq_browse.html?cat=' + encodeURIComponent(catKey);
-  var viewAllLabel = isAr
-    ? ('📂 كل إعلانات «' + catKey + '» ←')
-    : ('📂 Voir toutes les annonces « ' + title + ' » →');
+  /* Compact CTA — category already in .iep-title (same density as كل الأقسام) */
+  var viewAllLabel = isAr ? '📂 كل الإعلانات ←' : '📂 Toutes les annonces →';
 
-  var linksHtml = data.subs.map(function(s, i){
-    var ar = arSubs[i] || s;
-    return '<a class="iep-link" href="#" data-ar="' + ar.replace(/"/g,'&quot;') + '">' + s + '</a>';
-  }).join('');
+  var catCard = _qcatFindCatCard(catKey);
+  var groupsHtml = '';
+  if (catCard) {
+    groupsHtml = _iepGroupsHtmlFromDrop(catCard.querySelector('.cat-drop'));
+  }
+  if (!groupsHtml) {
+    var dispSubs = (isAr ? (QCAT_DATA[catKey] && QCAT_DATA[catKey].subs) : (data && data.subs)) || arSubs;
+    groupsHtml = _iepGroupsHtmlFromFlatSubs(dispSubs, arSubs);
+  }
 
   qcatInlinePanel.innerHTML =
     '<div class="iep-arrow" id="qcat-iep-arrow"></div>'
     + '<div class="iep-header">'
-    +   '<div class="iep-title">' + data.icon + ' ' + title + '</div>'
+    +   '<div class="iep-title">' + (data.icon || '') + ' ' + title + '</div>'
     +   '<div class="iep-actions">'
     +     '<a class="iep-viewall" href="' + viewAllHref + '">' + viewAllLabel + '</a>'
     +     '<button class="iep-close" onclick="closeQcatPortal(true)">✕</button>'
     +   '</div>'
     + '</div>'
-    + '<div class="iep-groups qcat-iep-flat">' + linksHtml + '</div>';
+    + '<div class="iep-groups">' + (groupsHtml || '<p class="iep-empty">—</p>') + '</div>';
 
   qcatInlinePanel.querySelectorAll('.iep-link').forEach(function(link){
     link.addEventListener('click', function(e){
@@ -3770,10 +3869,11 @@ function openQcatPortal(el) {
 
   qcatInlinePanel.classList.toggle('pinned', qcatPinned === el);
   qcatInlinePanel.style.display = 'block';
-  qcatInlinePanel.classList.remove('visible');
+  qcatInlinePanel.classList.remove('visible', 'closing');
   void qcatInlinePanel.offsetWidth;
   qcatInlinePanel.classList.add('visible');
   positionQcatInlineArrow(el);
+  requestAnimationFrame(function(){ positionQcatInlineArrow(el); });
 
   try {
     if (window.matchMedia('(max-width:768px)').matches) {
@@ -3801,14 +3901,28 @@ function clearQcatClose() { clearTimeout(qcatTimer); }
 function closeQcatPortal(force) {
   if (qcatPinned && !force) return;
   if (!qcatInlinePanel) qcatInlinePanel = document.getElementById('qcat-inline-panel');
-  if (qcatInlinePanel) {
-    qcatInlinePanel.style.display = 'none';
-    qcatInlinePanel.classList.remove('visible', 'pinned');
-    qcatInlinePanel.innerHTML = '';
+  var panel = qcatInlinePanel;
+  var closingFor = activeQcat;
+  function afterHide() {
+    if (panel && !panel.classList.contains('visible')) {
+      panel.innerHTML = '';
+    }
+    if (activeQcat === closingFor || !activeQcat) {
+      document.querySelectorAll('.qcat.qcat-open').forEach(function(q){ q.classList.remove('qcat-open'); });
+      activeQcat = null;
+      qcatPinned = null;
+    }
   }
-  document.querySelectorAll('.qcat.qcat-open').forEach(function(q){ q.classList.remove('qcat-open'); });
-  activeQcat = null;
-  qcatPinned = null;
+  if (panel && typeof window.rizqAnimatePanelClose === 'function') {
+    window.rizqAnimatePanelClose(panel, afterHide);
+  } else {
+    if (panel) {
+      panel.style.display = 'none';
+      panel.classList.remove('visible', 'pinned', 'closing');
+      panel.innerHTML = '';
+    }
+    afterHide();
+  }
 }
 
 document.addEventListener('click', function(e) {
@@ -3817,6 +3931,9 @@ document.addEventListener('click', function(e) {
 window.addEventListener('resize', function () {
   if (activeQcat && qcatInlinePanel && qcatInlinePanel.style.display === 'block') positionQcatInlineArrow(activeQcat);
 });
+window.addEventListener('scroll', function () {
+  if (activeQcat && qcatInlinePanel && qcatInlinePanel.style.display === 'block') positionQcatInlineArrow(activeQcat);
+}, { passive: true });
 function qcatBrowseAll() {
   var catKey = activeQcat ? activeQcat.dataset.qcat : '';
   closeQcatPortal(true);
@@ -3856,7 +3973,7 @@ function openCarouselAdModal(idx) {
 function populateAdModal(a) {
   const d = trAd(a);
   document.getElementById('amd-img').style.background = d.bg || '#1B3A6B';
-  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${d.emoji}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميز':'Favori')+'</div>':''}`;
+  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${d.emoji}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميّز':'Vedette')+'</div>':''}`;
   document.getElementById('amd-cat').textContent = d.cat;
   const locEl = document.getElementById('amd-loc');
   if (locEl) locEl.textContent = d.loc || '';
@@ -4061,7 +4178,7 @@ function filterAllAds(cat, btn) {
 function renderAllAds(cat) {
   const grid = document.getElementById('all-ads-grid');
   const filtered = cat==='all' ? ALL_ADS_DATA : ALL_ADS_DATA.filter(a=>a.catKey && a.catKey.includes(cat));
-  grid.innerHTML = filtered.map((a,i)=>{ const d=trAd(a); const gIdx=ALL_ADS_DATA.indexOf(a); const fav=isFavorited(a.id); return `\n    <div onclick="openAdByGlobalIndex(${gIdx})" style="background:linear-gradient(145deg,rgba(27,58,107,.14),rgba(8,15,30,.85));border:1px solid rgba(201,168,76,.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative" onmouseover="this.style.borderColor='rgba(201,168,76,.45)';this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='rgba(201,168,76,.1)';this.style.transform='translateY(0)'">\n      ${d.pin?`<div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px;z-index:1">⭐ ${isAr?'مميز':'Favori'}</div>`:''}
+  grid.innerHTML = filtered.map((a,i)=>{ const d=trAd(a); const gIdx=ALL_ADS_DATA.indexOf(a); const fav=isFavorited(a.id); return `\n    <div onclick="openAdByGlobalIndex(${gIdx})" style="background:linear-gradient(145deg,rgba(27,58,107,.14),rgba(8,15,30,.85));border:1px solid rgba(201,168,76,.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative" onmouseover="this.style.borderColor='rgba(201,168,76,.45)';this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='rgba(201,168,76,.1)';this.style.transform='translateY(0)'">\n      ${d.pin?`<div class="ad-badge" style="position:absolute;top:8px;right:8px;z-index:1">⭐ ${isAr?'مميّز':'Vedette'}</div>`:''}
       <button onclick="event.stopPropagation();quickToggleFavorite(${a.id},this)" style="position:absolute;top:8px;left:8px;z-index:1;width:28px;height:28px;border-radius:50%;border:none;background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">${fav?'❤️':'🤍'}</button>
       <div style="height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;background:${d.bg}">${d.emoji}</div>
       <div style="padding:12px">
@@ -4198,9 +4315,33 @@ function applyList(list){
   applyList([]);
   var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
   if(!base) return;
+  var track = document.getElementById('cards-track');
+  var heroSec = document.getElementById('hero-listings');
+  var skelShownAt = Date.now();
+  if(track && !ADS.length){
+    if(heroSec) heroSec.style.display = '';
+    var sk = '', si;
+    for(si = 0; si < 5; si++){
+      sk += '<div class="ad-card" style="pointer-events:none;min-width:200px">'
+        + '<div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div>'
+        + '<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'
+        + '<div class="rizq-skel rizq-skel-line mid" style="margin:0"></div>'
+        + '<div class="rizq-skel rizq-skel-line short" style="margin:0"></div>'
+        + '</div></div>';
+    }
+    track.innerHTML = sk;
+  }
+  function finishHydrate(listOrNull){
+    var wait = Math.max(0, 700 - (Date.now() - skelShownAt));
+    setTimeout(function(){
+      if(listOrNull) applyList(listOrNull);
+      else if(typeof buildCards==='function') buildCards();
+    }, wait);
+  }
   fetch(base+'/api/ads?limit=40').then(function(r){ return r.ok?r.json():null; }).then(function(data){
-    if(data && data.ok && Array.isArray(data.ads)) applyList(data.ads);
-  }).catch(function(){});
+    if(data && data.ok && Array.isArray(data.ads)) finishHydrate(data.ads);
+    else finishHydrate(null);
+  }).catch(function(){ finishHydrate(null); });
 }
 hydrateLiveAds();
 
@@ -4284,9 +4425,7 @@ function openInlineExpand(card) {
   const catIcon   = card.querySelector('.cat-icon-box')?.textContent?.trim() || '';
   const catNameDisp = isAr ? catNameAr : (window._subFR?.[catNameAr] || catNameAr);
   const viewAllHref  = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr);
-  const viewAllLabel = isAr
-    ? ('📂 كل إعلانات «' + catNameAr + '» ←')
-    : ('📂 Voir toutes les annonces « ' + catNameDisp + ' » →');
+  const viewAllLabel = isAr ? '📂 كل الإعلانات ←' : '📂 Toutes les annonces →';
 
   const drop = card.querySelector('.cat-drop');
   const groups = drop ? drop.querySelectorAll('.drop-group') : [];
@@ -4324,7 +4463,7 @@ function openInlineExpand(card) {
   });
 
   iepanel.style.display = 'block';
-  iepanel.classList.remove('visible');
+  iepanel.classList.remove('visible', 'closing');
   void iepanel.offsetWidth;
   iepanel.classList.add('visible');
   try {
@@ -4334,24 +4473,39 @@ function openInlineExpand(card) {
       }, 80);
     }
   } catch (eS) {}
-  if (catGrid) {
-    const gridRect = catGrid.getBoundingClientRect();
+  const arrow = iepanel.querySelector('#iep-arrow');
+  if (arrow) {
+    const panelRect = iepanel.getBoundingClientRect();
     const cardRect = card.getBoundingClientRect();
-    const arrowLeft = (cardRect.left - gridRect.left) + (cardRect.width / 2) - 16;
-    const arrow = iepanel.querySelector('#iep-arrow');
-    if (arrow) arrow.style.left = Math.max(8, arrowLeft) + 'px';
+    const arrowLeft = (cardRect.left - panelRect.left) + (cardRect.width / 2) - 16;
+    arrow.style.left = Math.max(8, Math.min(arrowLeft, panelRect.width - 40)) + 'px';
   }
 }
 
 function closeInlineExpand(force) {
   if (pinnedCard && !force) return;
-  if (iepanel) {
-    iepanel.style.display = 'none';
-    iepanel.classList.remove('visible', 'pinned');
-    resetCatPopupBox();
+  var panel = iepanel;
+  var card = activeCard;
+  function afterHide() {
+    if (panel && !panel.classList.contains('visible')) resetCatPopupBox();
+    if (card && activeCard === card) {
+      _setCardActive(card, false);
+      activeCard = null;
+      pinnedCard = null;
+    } else if (!activeCard) {
+      pinnedCard = null;
+    }
   }
-  if (activeCard) { _setCardActive(activeCard, false); activeCard = null; }
-  pinnedCard = null;
+  if (panel && typeof window.rizqAnimatePanelClose === 'function') {
+    window.rizqAnimatePanelClose(panel, afterHide);
+  } else {
+    if (panel) {
+      panel.style.display = 'none';
+      panel.classList.remove('visible', 'pinned', 'closing');
+      resetCatPopupBox();
+    }
+    afterHide();
+  }
 }
 
 // Backward-compat aliases (used by dynamically generated extra-categories cards)
@@ -4555,12 +4709,15 @@ const LANG = {
     'cta-note': '&nbsp;تسجيل آمن بالإيميل &nbsp;|&nbsp; مجاني تماماً',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
     'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5':'من نحن',
+    'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
     'ft-desc': 'منصة الإعلانات المبوبة الأولى في موريتانيا. 17 قسماً، 130+ فرعاً، ملايين الفرص.',
     'ft-net-label': 'شبكات مدعومة:',
     'ft-contact': 'تواصل معنا',
     'ft-copy': '© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷',
     'ft-sig': '<span>بتوقيع</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
+    's-cats-tag': 'كل الأقسام',
+    's-price-tag': 'خطط الأسعار',
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
@@ -4623,12 +4780,15 @@ const LANG = {
     'cta-note': '&nbsp;Inscription sécurisée &nbsp;|&nbsp; Totalement gratuit',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
     'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5':'À propos',
+    'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
     'ft-desc': 'La première plateforme d\'annonces classées en Mauritanie. 17 catégories, +130 sous-catégories.',
     'ft-net-label': 'Réseaux supportés :',
     'ft-contact': 'Contactez-nous',
     'ft-copy': '© 2026 رزق | Rizq — Tous droits réservés 🇲🇷',
     'ft-sig': '<span>Signé par</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
+    's-cats-tag': 'Toutes les catégories',
+    's-price-tag': 'Offres tarifaires',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services',
   }
@@ -4763,8 +4923,8 @@ function applyLandingLang(toAr) {
         window.RizqI18n.paintPrimaryLangBtn(b);
       } else {
         b.setAttribute('dir', 'ltr');
-        b.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> / </span><span class="lang-ar" dir="rtl">العربية</span>';
-        b.setAttribute('aria-label', 'FR / العربية');
+        b.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+        b.setAttribute('aria-label', 'FR | AR');
       }
     } else {
       b.textContent = isAr ? 'FR' : 'AR';
@@ -4820,6 +4980,21 @@ function applyLandingLang(toAr) {
   if (stSearchBtn) stSearchBtn.setAttribute('aria-label', isAr ? 'بحث' : 'Rechercher');
   var jumpBar = document.getElementById('section-jump-bar');
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
+  if (jumpBar) {
+    var jumpMap = isAr
+      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#pricing':'الباقات'}
+      : {'#categories':'Catégories','#hero-listings':'Annonces','#pricing':'Forfaits'};
+    jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
+      var k = a.getAttribute('data-jump');
+      if (jumpMap[k]) a.textContent = jumpMap[k];
+    });
+    var ja = document.getElementById('jump-assistant');
+    if (ja) ja.textContent = isAr ? '✨ رزق ذكي' : '✨ Rizq IA';
+  }
+  var mbnLabels = document.querySelectorAll('#mobile-bottom-nav .mbn-label');
+  var mbnAR = ['الرئيسية','الأقسام','نشر','رزق ذكي','المزيد'];
+  var mbnFR = ['Accueil','Catégories','Publier','Rizq IA','Plus'];
+  mbnLabels.forEach(function(el, i){ if (mbnAR[i]) el.textContent = isAr ? mbnAR[i] : mbnFR[i]; });
   var hubs = document.querySelector('.cta-hubs');
   if (hubs) hubs.setAttribute('aria-label', isAr ? 'أقسام رزق للأعمال' : 'Espaces professionnels Rizq');
   var backTop = document.getElementById('back-to-top');
@@ -6936,13 +7111,31 @@ function renderSuggestCard(){
 renderSuggestCard();
 
 // ══ نظام Toast بسيط مشترك (كان showToast() يُستدعى في doLogin() بدون أن يكون مُعرَّفاً — خطأ كان يُسقط إعادة التوجيه بعد تسجيل الدخول) ══
-function showToast(msg, duration){
+function showToast(msg, durationOrType){
   let toast = document.getElementById('rizq-toast');
   if(!toast){
     toast = document.createElement('div');
     toast.id = 'rizq-toast';
     toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#1a2f52,#0d1f3c);border:1px solid rgba(201,168,76,.4);color:#fff;padding:13px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 12px 32px rgba(0,0,0,.4);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:90vw;text-align:center';
     document.body.appendChild(toast);
+  }
+  var duration = 2600;
+  var type = '';
+  if (typeof durationOrType === 'number' && isFinite(durationOrType)) {
+    duration = durationOrType;
+  } else if (typeof durationOrType === 'string' && durationOrType) {
+    if (/^\d+$/.test(durationOrType)) duration = parseInt(durationOrType, 10);
+    else type = durationOrType;
+  }
+  if (type === 'success') {
+    toast.style.borderColor = 'rgba(16,185,129,.55)';
+    toast.style.boxShadow = '0 12px 32px rgba(0,0,0,.4),0 0 0 1px rgba(16,185,129,.25)';
+  } else if (type === 'error') {
+    toast.style.borderColor = 'rgba(248,113,113,.55)';
+    toast.style.boxShadow = '0 12px 32px rgba(0,0,0,.4),0 0 0 1px rgba(248,113,113,.25)';
+  } else {
+    toast.style.borderColor = 'rgba(201,168,76,.4)';
+    toast.style.boxShadow = '0 12px 32px rgba(0,0,0,.4)';
   }
   toast.textContent = msg;
   clearTimeout(toast._hideTimer);
@@ -6953,8 +7146,9 @@ function showToast(msg, duration){
   toast._hideTimer = setTimeout(function(){
     toast.style.opacity = '0';
     toast.style.transform = 'translateX(-50%) translateY(20px)';
-  }, duration || 2600);
+  }, duration);
 }
+window.showToast = showToast;
 
 // ══ منطق نافذة "اقترح قسماً جديداً" — يكتب في rizq_category_suggestions (يقرأه rizq_admin.html لعرض الأكثر طلباً) ══
 function openSuggestCatModal(){
@@ -7149,6 +7343,25 @@ function trPkg(s){
 }
 
 function renderPricingSection(){
+  /* Paint skeletons first so active pane never flashes empty while catalogs resolve */
+  try {
+    document.querySelectorAll('.pricing-grid[data-rizq-pkg-skel="1"]').forEach(function(el){
+      if (el.children.length) return;
+      if (window.RizqPackagesUI && typeof RizqPackagesUI.pkgSkeletonHtml === 'function') {
+        el.innerHTML = RizqPackagesUI.pkgSkeletonHtml(4);
+      } else {
+        var sk = '';
+        for (var i = 0; i < 4; i++) {
+          sk += '<div class="rpkg-card rizq-skel-card" style="border-radius:18px;padding:28px 18px;border:1.5px solid rgba(201,168,76,.2);background:linear-gradient(160deg,#0a1628,#122040);min-height:180px" aria-hidden="true">'
+            + '<div class="rizq-skel" style="height:14px;width:55%;margin:0 auto 16px;border-radius:8px;background:linear-gradient(90deg,rgba(201,168,76,.12),rgba(201,168,76,.28),rgba(201,168,76,.12));background-size:200% 100%;animation:rizqSkelShimmer 1.2s ease-in-out infinite"></div>'
+            + '<div class="rizq-skel" style="height:28px;width:40%;margin:0 auto 10px;border-radius:8px;background:linear-gradient(90deg,rgba(201,168,76,.12),rgba(201,168,76,.28),rgba(201,168,76,.12));background-size:200% 100%;animation:rizqSkelShimmer 1.2s ease-in-out infinite"></div>'
+            + '<div class="rizq-skel" style="height:10px;width:70%;margin:0 auto 18px;border-radius:6px;background:linear-gradient(90deg,rgba(201,168,76,.12),rgba(201,168,76,.28),rgba(201,168,76,.12));background-size:200% 100%;animation:rizqSkelShimmer 1.2s ease-in-out infinite"></div>'
+            + '</div>';
+        }
+        el.innerHTML = sk;
+      }
+    });
+  } catch (eSk) {}
   var DEF_IND=[
     {name:'مجاني',name_fr:'Gratuit',price:0,period:'للأبد',period_fr:'à vie',highlight:false,
       features:['5 إعلانات نشطة','5 صور/إعلان','تواصل مباشر','🎬 فيديو — علامة رزق.mr','30 ث | 20MB'],
@@ -7925,8 +8138,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=13.3"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
+<script src="rizq_packages_config.js?v=16.3"></script>
+<script src="rizq_packages_ui.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_activity_select.js?v=2"></script>
 <script src="rizq_agent.js"></script>
@@ -7934,7 +8147,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_widget_embed.js"></script>
-<script src="rizq_landing_ux.js?v=13.7"></script>
+<script src="rizq_landing_ux.js?v=16.3"></script>
 <script src="rizq_disclaimer.js"></script>
 
 

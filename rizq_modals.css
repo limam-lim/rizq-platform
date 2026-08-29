@@ -220,26 +220,105 @@ body.rizq-dash .modal-close:hover,
   line-height: 1.85 !important;
 }
 
-/* ── CS / promo modals (light) ── */
-.cs-modal-box {
-  background: #fff !important;
-  border: var(--rzq-modal-border-light) !important;
+/* ── CS / promo / sub-action modals — navy glass + gold (public pages) ── */
+.cs-modal-box,
+.promo-modal,
+.rizq-promo-modal,
+#sub-modal,
+#suggest-cat-modal {
+  background: linear-gradient(165deg, #0a1628 0%, #122040 55%, #0d1a30 100%) !important;
+  border: var(--rzq-modal-border-dark) !important;
   border-radius: var(--rzq-modal-radius) !important;
-  box-shadow: var(--rzq-modal-shadow) !important;
+  box-shadow: var(--rzq-modal-shadow-dark) !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.cs-modal-box {
   padding: clamp(20px, 3vw, 28px) !important;
   max-width: 380px !important;
   width: 100% !important;
 }
 
 .cs-modal-title {
-  color: var(--rzq-modal-navy) !important;
+  color: #f3de9c !important;
   font-weight: 800 !important;
   font-size: 16px !important;
 }
 
 .cs-modal-desc {
-  color: #5b6b85 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
   line-height: 1.65 !important;
+}
+
+.cs-modal-input {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1.5px solid rgba(201, 168, 76, 0.28) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+}
+
+.cs-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.cs-modal-input:focus {
+  outline: none !important;
+  border-color: var(--rzq-modal-gold) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15) !important;
+}
+
+.cs-modal-submit {
+  background: linear-gradient(135deg, #a67c2e 0%, #d4b356 42%, #c9a84c 68%, #e8cc7a 100%) !important;
+  color: #0a1628 !important;
+  font-weight: 800 !important;
+}
+
+.cs-modal-cancel {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+#sub-modal .sm-title,
+#suggest-cat-modal .sm-title {
+  color: var(--rzq-modal-gold) !important;
+}
+
+#sub-modal .sm-sub,
+#suggest-cat-modal .sm-sub {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
+
+#sub-modal .sm-close,
+#suggest-cat-modal .sm-close {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+#sub-modal .sm-close:hover,
+#suggest-cat-modal .sm-close:hover {
+  color: #fff !important;
+}
+
+/* Keep intentional light dashboard modals */
+body.rizq-dash .cs-modal-box,
+body.rizq-dash .promo-modal,
+body.rizq-dash .rizq-promo-modal {
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%) !important;
+  border: var(--rzq-modal-border-light) !important;
+  color: #1a2535 !important;
+  box-shadow: var(--rzq-modal-shadow) !important;
+}
+
+body.rizq-dash .cs-modal-title {
+  color: var(--rzq-modal-navy) !important;
+}
+
+body.rizq-dash .cs-modal-desc {
+  color: #5b6b85 !important;
+}
+
+body.rizq-dash .cs-modal-input {
+  background: #fff !important;
+  border: 1.5px solid #e2e6ee !important;
+  color: #1a2535 !important;
 }
 
 /* ── Guest / visitor auth gate (Rizq navy + gold identity) ── */

@@ -7,7 +7,10 @@
   "scripts": {
     "start:call": "node rizq_call_handler.js",
     "start:whatsapp": "node rizq_whatsapp_handler.js",
-    "sync-index": "node -e \"require('fs').copyFileSync('rizq_landing_v8.html','index.html')\""
+    "sync-index": "node -e \"require('fs').copyFileSync('rizq_landing_v8.html','index.html')\"",
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
+    "dev:front": "npx --yes serve -l 5500 .",
+    "dev:api": "npm --prefix rizq-backend run dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

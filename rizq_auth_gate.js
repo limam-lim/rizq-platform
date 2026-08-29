@@ -117,6 +117,7 @@
       errPhone: 'يرجى إدخال رقم هاتف موريتاني صالح (8 أرقام، يبدأ بـ2 أو3 أو4)',
       errNetwork: 'تعذّر الاتصال بالخادم — تحقق من اتصالك بالإنترنت وحاول مرة أخرى',
       welcome: 'أهلاً بك',
+      successToast: '✅ تم التسجيل بنجاح',
       reasonPhone: 'لعرض رقم الهاتف',
       reasonWhatsapp: 'للتواصل عبر واتساب',
       reasonMsg: 'لإرسال رسالة للبائع',
@@ -140,6 +141,7 @@
       errPhone: 'Veuillez saisir un numéro mauritanien valide (8 chiffres, commence par 2, 3 ou 4)',
       errNetwork: 'Connexion au serveur impossible — vérifiez votre connexion internet et réessayez',
       welcome: 'Bienvenue',
+      successToast: '✅ Inscription réussie',
       reasonPhone: 'pour afficher le numéro',
       reasonWhatsapp: 'pour contacter via WhatsApp',
       reasonMsg: 'pour envoyer un message au vendeur',
@@ -291,6 +293,14 @@
 
   var MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
 
+  function notifyRegisterSuccess() {
+    var d = DICT[lang() === 'fr' ? 'fr' : 'ar'];
+    var msg = d.successToast || d.welcome;
+    if (typeof window.showToast === 'function') {
+      window.showToast(msg, 'success');
+    }
+  }
+
   function submitForm() {
     var d = DICT[lang() === 'fr' ? 'fr' : 'ar'];
     var nameEl = document.getElementById('rag-name');
@@ -329,6 +339,7 @@
       setSession({ id: 'local_' + Date.now(), name: name, phone: phone, email: email, token: 'local' });
       btn.disabled = false;
       closeModal();
+      notifyRegisterSuccess();
       runPendingAction();
       return;
     }
@@ -355,6 +366,7 @@
         setSession(session);
         syncWishlistToServer(session).finally(function () {
           closeModal();
+          notifyRegisterSuccess();
           runPendingAction();
         });
       })

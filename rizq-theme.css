@@ -47,6 +47,42 @@ html body footer .logo-sub {
 html body footer .footer-links li a {
   white-space: nowrap;
 }
+/* تواصل معنا: الاسم + الرقم على سطر واحد (تابليت + هاتف + سطح المكتب) */
+html body footer .footer-contact-list li,
+html body footer .footer-links li:has(a[href^="tel:"]),
+html body footer .footer-links li:has(a[href^="mailto:"]) {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+html body footer .footer-contact-list li::-webkit-scrollbar,
+html body footer .footer-links li:has(a[href^="tel:"])::-webkit-scrollbar,
+html body footer .footer-links li:has(a[href^="mailto:"])::-webkit-scrollbar {
+  display: none;
+}
+html body footer .footer-contact-list a[href^="tel:"],
+html body footer .footer-contact-list a[href^="mailto:"],
+html body footer .footer-links a[href^="tel:"],
+html body footer .footer-links a[href^="mailto:"] {
+  white-space: nowrap;
+  unicode-bidi: isolate;
+}
+@media (max-width: 1024px) {
+  html body footer .footer-contact-list li,
+  html body footer .footer-links li:has(a[href^="tel:"]),
+  html body footer .footer-links li:has(a[href^="mailto:"]) {
+    font-size: 11.5px !important;
+  }
+}
+@media (max-width: 430px) {
+  html body footer .footer-contact-list li,
+  html body footer .footer-links li:has(a[href^="tel:"]),
+  html body footer .footer-links li:has(a[href^="mailto:"]) {
+    font-size: 11px !important;
+  }
+}
 html body footer .footer-links a:hover {
   color: #C9A84C !important;
 }
@@ -532,20 +568,22 @@ input, textarea, select, [contenteditable="true"] { cursor: text !important; }
   border: 1.5px solid #C9A84C !important;
   color: #E8C96A !important;
   border-radius: 999px !important;
-  padding: 6px 14px !important;
+  padding: 5px 10px !important;
   font-weight: 800 !important;
-  font-size: 12px !important;
-  letter-spacing: .2px !important;
+  font-size: 11px !important;
+  letter-spacing: .15px !important;
   white-space: nowrap !important;
   box-shadow: none !important;
-  /* Always [FR] left / [العربية] right, even on RTL pages */
+  /* Always [FR] left / [AR] right, even on RTL pages */
   direction: ltr !important;
   unicode-bidi: isolate;
   display: inline-flex !important;
   flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0.2em;
+  gap: 0.15em;
+  min-height: 32px;
+  min-width: 68px;
 }
 #rizq-lang-btn .lang-fr,
 .btn-lang-primary .lang-fr,
@@ -614,6 +652,66 @@ input, textarea, select, [contenteditable="true"] { cursor: text !important; }
 @keyframes rizqShimmer {
   0%   { background-position:200% 0; }
   100% { background-position:-200% 0; }
+}
+
+/* Skeleton placeholders — navy base + gold shimmer (grids / cards) */
+.rizq-skel {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a1628 0%, #122040 55%, #1B3A6B 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(201, 168, 76, 0.14);
+}
+.rizq-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.16) 45%,
+    rgba(232, 201, 106, 0.22) 50%,
+    rgba(201, 168, 76, 0.16) 55%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: rizqShimmer 1.5s ease-in-out infinite;
+}
+.rizq-skel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+.rizq-skel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+.rizq-skel-card .rizq-skel-media {
+  height: 110px;
+  border-radius: 14px 14px 0 0;
+}
+.rizq-skel-card .rizq-skel-line {
+  height: 12px;
+  margin: 0 12px;
+  border-radius: 6px;
+}
+.rizq-skel-card .rizq-skel-line.short {
+  width: 42%;
+  margin-bottom: 12px;
+}
+.rizq-skel-card .rizq-skel-line.mid {
+  width: 72%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rizq-skel::after,
+  .rizq-img-wrap::before {
+    animation: none !important;
+  }
 }
 
 /* ══════════════════════════════════
@@ -696,10 +794,13 @@ body.page-light .ad-card {
   box-shadow: var(--shadow) !important;
   overflow: hidden !important;
 }
-body.page-light .ad-card:hover {
-  border-color: var(--gold) !important;
-  transform: translateY(-5px) !important;
-  box-shadow: var(--shadow-h) !important;
+body.page-light .ad-card:hover,
+body.page-light .product-card:hover,
+body.page-light .store-card:hover,
+body.page-light .listing-card:hover {
+  border-color: rgba(201, 168, 76, 0.45) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 28px rgba(201, 168, 76, 0.18), 0 6px 16px rgba(27, 58, 107, 0.08) !important;
 }
 body.page-light .ad-title { color: var(--dark-txt) !important; font-weight:700 !important; }
 body.page-light .ad-price { color: var(--gold) !important; font-weight:900 !important; }

@@ -7,11 +7,11 @@
   if (window.__rizqHeaderInit) return;
   window.__rizqHeaderInit = true;
 
-  /* Always FR left / Arabic right inside the pill (ignore page dir). */
+  /* Always FR left / AR right inside the pill (ignore page dir). */
   function langBtnHtml() {
     return '<span class="lang-fr" dir="ltr">FR</span>' +
-      '<span class="lang-sep" aria-hidden="true"> / </span>' +
-      '<span class="lang-ar" dir="rtl">العربية</span>';
+      '<span class="lang-sep" aria-hidden="true"> | </span>' +
+      '<span class="lang-ar" dir="ltr">AR</span>';
   }
 
   function paintLangBtn(btn) {
@@ -22,7 +22,7 @@
     }
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = langBtnHtml();
-    btn.setAttribute('aria-label', 'FR / العربية');
+    btn.setAttribute('aria-label', 'FR | AR');
   }
 
   function pathName() {
@@ -191,7 +191,7 @@
           '<div class="rizq-hdr-start">' +
             '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
-            '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" dir="ltr" aria-label="FR / العربية">' + langBtnHtml() + '</button>' +
+            '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
           '</div>' +
           '<a class="rizq-hdr-brand logo" href="rizq_landing_v8.html" aria-label="رزق">' +
             '<img class="rizq-hdr-brand-mark logo-mark-img" src="rizq-mark-512.png?v=10.3" width="42" height="42" alt=""/>' +
@@ -330,6 +330,7 @@
     rizq_landing_v8: 'home',
     rizq_browse: 'cats',
     rizq_search: 'cats',
+    rizq_listing: 'cats',
     rizq_post: 'post',
     rizq_store: 'stores',
     rizq_products: 'stores',
@@ -655,7 +656,7 @@
             '<span class="nav-account-ico" aria-hidden="true">👤</span>' +
             '<span data-hdr="account">' + t2('حسابي', 'Compte') + '</span>' +
           '</button>' +
-          '<button type="button" class="btn-lang btn-lang-primary" id="rizq-desk-lang-btn" dir="ltr" aria-label="FR / العربية">' + langBtnHtml() + '</button>' +
+          '<button type="button" class="btn-lang btn-lang-primary" id="rizq-desk-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
         '</div>' +
         '<ul class="nav-center">' +
           '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +

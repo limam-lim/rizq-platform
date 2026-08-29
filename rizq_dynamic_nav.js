@@ -20,6 +20,7 @@
 
   /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
   var MOBILE_MORE_EXTRAS = [
+    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }

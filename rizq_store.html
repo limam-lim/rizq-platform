@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=14.9"/>
+<link rel="stylesheet" href="rizq_header.css?v=16.3"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -240,7 +240,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
   transition:all .3s;cursor:pointer;
   box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
-.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#c0d0e0}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(201,168,76,.18),0 6px 16px rgba(27,58,107,.08);border-color:rgba(201,168,76,.38)}
 .product-img{
   height:160px;
   background:linear-gradient(135deg,#e8eef8,#f5f8ff);
@@ -572,7 +572,7 @@ footer{
 </style>
   
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
+  <script src="rizq_i18n.js?v=16.3"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
@@ -652,8 +652,8 @@ footer{
           <span class="badge badge-open" data-t="badge-open" style="display:none">🟢 مفتوح الآن</span>
           <span class="badge badge-delivery" data-t="badge-delivery" style="display:none">🚚 توصيل</span>
           <span class="badge badge-pickup" data-t="badge-pickup" style="display:none">🏪 استلام من المحل</span>
-          <span class="badge" id="badge-verified-lbl" style="display:none;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#16a34a">✅ محل موثّق</span>
-          <span class="badge" id="premium-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none">🏅 مميّز برزق</span>
+          <span class="badge" id="badge-verified-lbl" data-t="badge-verified" style="display:none;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#16a34a">✅ محل موثّق</span>
+          <span class="badge rizq-feat-badge" id="premium-badge-lbl" data-t="badge-premium" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none;font-weight:900;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏅 محل مميّز</span>
           <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</span>
         </div>
       </div>
@@ -1748,7 +1748,7 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_packages_config.js?v=13.3"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
+<script src="rizq_packages_ui.js?v=16.1"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
   <script src="rizq_video_ads.js"></script>
@@ -1949,6 +1949,8 @@ if(typeof _t2 === 'undefined'){
     'meta-delivery-badge':'🚚 Livraison disponible',
     'badge-open':'🟢 Ouvert',
     'badge-delivery':'🚚 Livraison','badge-pickup':'🏪 Retrait',
+    'badge-verified':'✅ Boutique vérifiée',
+    'badge-premium':'🏅 Boutique premium',
     'btn-whatsapp':'📲 WhatsApp','meta-location':'📍 —',
     'btn-call':'📞 Appeler','btn-share':'📤 Partager','rating-count':'',
     /* Info */
@@ -2139,7 +2141,7 @@ if(typeof _t2 === 'undefined'){
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
 
   <script src="rizq_navbar.js"></script>
-<script src="rizq_messenger.js"></script>
+<script src="rizq_messenger.js?v=16.2"></script>
 
 <script>
 /* ── ربط زر المراسلة الآمنة بـ RizqMessenger ── */
