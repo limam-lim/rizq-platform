@@ -1,0 +1,208 @@
+{
+  "pass": [
+    {
+      "name": "Landing LANG key parity",
+      "detail": "140 keys in AR and FR"
+    },
+    {
+      "name": "rizq_i18n_data.js key parity",
+      "detail": "1529 keys AR+FR"
+    },
+    {
+      "name": "i18n FR dictionary no Arabic",
+      "detail": "clean"
+    },
+    {
+      "name": "diamondCopy(fr) no Arabic",
+      "detail": "Diamant Standard 💎"
+    },
+    {
+      "name": "Landing nav packages",
+      "detail": "no stale silver/gold/ماسي labels"
+    },
+    {
+      "name": "Footer contact heading",
+      "detail": "translated via data-t or JS"
+    },
+    {
+      "name": "Corp public pricing",
+      "detail": "diamond name/price not stale"
+    },
+    {
+      "name": "Empty onclick handlers",
+      "detail": "none in admin/subscriber dashboards"
+    },
+    {
+      "name": "Dashboard onclick targets",
+      "detail": "all named handlers defined"
+    },
+    {
+      "name": "Broken file links",
+      "detail": "header/footer/landing/dashboards OK"
+    },
+    {
+      "name": "Landing hash targets",
+      "detail": "#pricing #about present"
+    },
+    {
+      "name": "rizq_admin.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "rizq_landing_v8.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "rizq_dashboard_store.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "rizq_dashboard_office.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "rizq_dashboard_corp.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "rizq_dashboard.html loads rizq_packages_config.js",
+      "detail": "present"
+    },
+    {
+      "name": "getCatalog(general)",
+      "detail": "6 SKUs, diamond=true"
+    },
+    {
+      "name": "getCatalog(individual)",
+      "detail": "4 SKUs, diamond=false"
+    },
+    {
+      "name": "getCatalog(store)",
+      "detail": "6 SKUs, diamond=true"
+    },
+    {
+      "name": "getCatalog(corp)",
+      "detail": "6 SKUs, diamond=true"
+    },
+    {
+      "name": "Individual dashboard catalog",
+      "detail": "getCatalog(individual)"
+    },
+    {
+      "name": "Admin POST site-config helper",
+      "detail": "present"
+    },
+    {
+      "name": "Admin platform flags persist",
+      "detail": "present"
+    },
+    {
+      "name": "Admin savePrices → API",
+      "detail": "posts prices overlay"
+    },
+    {
+      "name": "Admin saveChannelsConfig public fields",
+      "detail": "no Twilio secrets in GET overlay"
+    },
+    {
+      "name": "Admin extraCategories → API",
+      "detail": "posted"
+    },
+    {
+      "name": "Admin site identity → API",
+      "detail": "posted"
+    },
+    {
+      "name": "PATCH /api/accounts/mine channel flags",
+      "detail": "widget/whatsapp/calls"
+    },
+    {
+      "name": "POST /api/site-config overlay fields",
+      "detail": "prices + flags + channelsPublic"
+    },
+    {
+      "name": "Landing live price overlay",
+      "detail": "syncPackageCatalogsOnLoad writes rizq_prices"
+    },
+    {
+      "name": "store channel toggles",
+      "detail": "PATCH + LS"
+    },
+    {
+      "name": "store no Claude in subscriber UI",
+      "detail": "labels use Agent intelligent"
+    },
+    {
+      "name": "office channel toggles",
+      "detail": "PATCH + LS"
+    },
+    {
+      "name": "office no Claude in subscriber UI",
+      "detail": "labels use Agent intelligent"
+    },
+    {
+      "name": "corp channel toggles",
+      "detail": "PATCH + LS"
+    },
+    {
+      "name": "corp no Claude in subscriber UI",
+      "detail": "labels use Agent intelligent"
+    },
+    {
+      "name": "Diamond agent channel rows",
+      "detail": "store/office/corp render channel toggles"
+    },
+    {
+      "name": "syntax rizq_packages_config.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq_subscription_engine.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq_i18n.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq_i18n_data.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq_quota_guard_agent.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq_subscriber_agent.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax scripts/audit-ui-static.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq-backend/server.js",
+      "detail": "OK"
+    },
+    {
+      "name": "syntax rizq-backend/config/anthropic.js",
+      "detail": "OK"
+    },
+    {
+      "name": "node scripts/comprehensive-system-audit.js",
+      "detail": "86/100 (exit 1)"
+    }
+  ],
+  "warn": [
+    {
+      "name": "site-config.json",
+      "detail": "file not present — live admin prices fall back to PKG defaults"
+    }
+  ],
+  "fail": [
+    {
+      "name": "node scripts/audit-agents.js",
+      "detail": "t..js (node:internal/modules/cjs/loader:1985:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1577:32)\r\n    at Module._load (node:internal/modules/cjs/loader:1379:12)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\r\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\r\n    at node:internal/main/run_main_module:33:47\r\n\r\nNode.js v24.16.0\r\n"
+    }
+  ]
+}

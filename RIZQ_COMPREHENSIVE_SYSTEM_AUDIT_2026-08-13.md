@@ -7,10 +7,10 @@
 
 | Metric | Value |
 |--------|-------|
-| **Readiness score** | **97/100** — GO-LIVE READY (with minor warnings) |
-| Passed checks | 34 |
-| Warnings (P1) | 1 |
-| Failures (P0) | 0 |
+| **Readiness score** | **86/100** — BETA — fix warnings before launch |
+| Passed checks | 32 |
+| Warnings (P1) | 2 |
+| Failures (P0) | 1 |
 | Fixes applied | 7 |
 
 ## Fixes Applied This Audit
@@ -25,13 +25,13 @@
 
 ## Passed
 
-- ✅ **HTML files scanned** — 22 pages
+- ✅ **HTML files scanned** — 23 pages
 - ✅ **Landing category drop-links** — wired at runtime via rizq_landing_ux.js → rizq_search.html?q=
-- ✅ **Landing static href="#" count** — 162 total (148 drop-links → search at runtime)
+- ✅ **Landing static href="#" count** — 160 total (148 drop-links → search at runtime)
 - ✅ **rizq_store secretary stack** — prompts + profile + secretary_agent
 - ✅ **rizq_office secretary stack** — prompts + profile + secretary_agent
 - ✅ **rizq_corp secretary stack** — prompts + profile + secretary_agent
-- ✅ **Widget embed pages** — rizq_browse.html, rizq_corp.html, rizq_landing_v8.html, rizq_listing.html, rizq_office.html, rizq_post.html, rizq_profile.html, rizq_search.html, rizq_store.html
+- ✅ **Widget embed pages** — index.html, rizq_browse.html, rizq_corp.html, rizq_landing_v8.html, rizq_listing.html, rizq_office.html, rizq_post.html, rizq_profile.html, rizq_search.html, rizq_store.html
 - ✅ **Dashboard rizq_dashboard_store.html** — /api/messages/reply, /api/agent/toggle
 - ✅ **Dashboard rizq_dashboard_office.html** — /api/messages/reply, /api/agent/toggle, openPayModal, _rizqMergeRequestsFromBackend
 - ✅ **Dashboard rizq_dashboard_corp.html** — /api/messages/reply, /api/messages/threads, /api/agent/toggle, openPayModal, _rizqSendCorpThreadReply
@@ -57,16 +57,32 @@
 - ✅ **rizq_dashboard_corp.html payment flow** — openPayModal/submitPayment or sub-requests present
 - ✅ **Landing OTP** — backend /api/otp/send + /api/otp/verify
 - ✅ **OTP service** — production guard + random OTP
-- ✅ **audit-agents.js** — 53/53 checks passed
-- ✅ **test-widget-tools.js** — widget tools OK
 
 ## Warnings (P1 — post-launch or next sprint)
 
-- ⚠️ **href="#" without obvious handler** — rizq_corp.html:421, rizq_corp.html:493, rizq_products.html:708, rizq_search.html:472, rizq_store.html:664
+- ⚠️ **href="#" without obvious handler** — index.html:2959, index.html:3800, index.html:3815, index.html:4440, rizq_corp.html:426, rizq_corp.html:498, rizq_products.html:713, rizq_search.html:474, rizq_store.html:672
+- ⚠️ **test-widget-tools.js** — er:1577:32)
+    at Module._load (node:internal/modules/cjs/loader:1379:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.16.0
+
 
 ## Failures (P0)
 
-_None — all P0 items addressed_
+- ❌ **audit-agents.js** — it-agents.js:64:54)
+    at Module._compile (node:internal/modules/cjs/loader:1854:14)
+    at Object..js (node:internal/modules/cjs/loader:1985:10)
+    at Module.load (node:internal/modules/cjs/loader:1577:32)
+    at Module._load (node:internal/modules/cjs/loader:1379:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.16.0
+
 
 ## Dashboard Backend Matrix
 
