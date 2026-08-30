@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+  <link rel="stylesheet" href="rizq_header.css?v=16.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -445,20 +445,123 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 @media(max-width:580px){.footer-top{grid-template-columns:1fr}}
 
 /* RESPONSIVE */
-@media(max-width:1080px){
-  .browse-left{width:300px}
-}
-@media(max-width:900px){
-  .browse-wrap{flex-direction:column;height:auto;overflow:visible}
-  .browse-left{width:100%;height:auto;border-left:none;border-bottom:1px solid #e2e8f5;display:none}
-  .browse-left.tab-active{display:flex;flex-direction:column;max-height:calc(100vh - 62px - 44px)}
-  .browse-right{height:auto;min-height:50vh}
+/* Tablet / desktop: filters as a real sidebar beside results (not stacked full-width) */
+@media(min-width:901px){
+  .browse-left{
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+  }
+  .bs-sidebar{
+    width:280px;
+    flex:0 0 280px;
+    border-bottom:none;
+    border-inline-end:1px solid #e2e8f5;
+    display:flex;
+    flex-direction:column;
+    max-height:100%;
+    overflow:hidden;
+  }
+  .bs-sidebar .sidebar-header{flex-shrink:0}
+  #filters-body{
+    max-height:none;
+    flex:1;
+    min-height:0;
+  }
+  .browse-results-col{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .browse-wrap.has-detail .browse-left{
+    flex:0 0 min(520px, 48vw);
+  }
+  .browse-wrap.has-detail .bs-sidebar{
+    width:220px;
+    flex:0 0 220px;
+  }
+  .mobile-filter-btn{display:none!important}
   .browse-wrap.has-detail .browse-right{display:block}
-  .browse-right.tab-hidden{display:none}
-  .mobile-tabs{display:flex}
-  .mobile-filter-btn{display:none}
-  #result-list-body{max-height:50vh}
+  .browse-right{min-height:0}
+  .empty-detail{min-height:100%}
 }
+
+@media(max-width:1080px) and (min-width:901px){
+  .bs-sidebar{width:240px;flex-basis:240px}
+  .browse-wrap.has-detail .browse-left{flex:0 0 min(460px,52vw)}
+}
+
+@media(max-width:900px){
+  .browse-wrap,
+  html.rizq-app-nav .browse-wrap,
+  html.rizq-app-nav.has-rizq-desk-nav .browse-wrap{
+    flex-direction:column;
+    height:auto!important;
+    min-height:calc(100vh - var(--rizq-header-h,112px) - 44px)!important;
+    overflow:visible!important;
+  }
+  .browse-left{
+    width:100%;
+    height:auto;
+    border-left:none;
+    border-bottom:1px solid #e2e8f5;
+    display:none;
+    flex-direction:column!important;
+  }
+  .browse-left.tab-active{
+    display:flex!important;
+    flex-direction:column!important;
+    max-height:none;
+    min-height:calc(100vh - var(--rizq-header-h,112px) - 88px);
+  }
+  /* الفلاتر تنتقل للدرج — أخفِ الشريط الجانبي الفارغ */
+  .bs-sidebar{display:none!important}
+  .browse-right{
+    height:auto;
+    min-height:calc(100vh - var(--rizq-header-h,112px) - 88px);
+    display:none;
+  }
+  .browse-right.tab-active,
+  .browse-wrap.has-detail .browse-right.tab-active{
+    display:block!important;
+  }
+  .browse-right.tab-hidden{display:none!important}
+  .browse-left.tab-hidden{display:none!important}
+  .mobile-tabs{display:flex;position:sticky;z-index:100}
+  /* زر الفلاتر يظهر على الموبايل عندما تكون الفلاتر في الدرج */
+  .mobile-filter-btn{
+    display:flex!important;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    bottom:calc(20px + env(safe-area-inset-bottom,0));
+  }
+  .browse-results-col{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  #result-list-body{
+    max-height:none;
+    flex:1;
+    min-height:42vh;
+  }
+  .rc-empty{padding:48px 20px;min-height:36vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .stats-strip{flex-shrink:0}
+  .stat-item{padding:8px 6px;gap:5px}
+  .stat-item .si-num{font-size:13px}
+  .stat-item .si-label{font-size:9.5px}
+  .empty-detail{min-height:50vh;padding:28px 16px}
+  #rizq-prompt-bubbles{
+    bottom:calc(100px + env(safe-area-inset-bottom,0))!important;
+    right:12px!important;
+  }
+  html[dir="ltr"] #rizq-prompt-bubbles{left:12px!important;right:auto!important}
+}
+
 @media(max-width:768px){
   nav{padding:0 3%;gap:10px}
   .nav-search select{display:none}
@@ -466,9 +569,16 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .dp-title{font-size:18px}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
+  .mobile-filter-btn{
+    bottom:calc(18px + env(safe-area-inset-bottom,0));
+    padding:11px 22px;
+    font-size:13px;
+  }
+  .breadcrumb{padding:8px 3%;font-size:11px;flex-wrap:wrap}
 }
+
 @media(min-width:901px){
-  .browse-left{display:flex;flex-direction:column}
+  .browse-left{display:flex}
 }
 
 /* scrollbar modal override */
@@ -743,34 +853,37 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
       </div><!-- end filters-body -->
     </div><!-- end bs-sidebar -->
 
-    <!-- STATS STRIP -->
-    <div class="stats-strip">
-      <div class="stat-item"><span class="si-num">27+</span><span class="si-label" data-t="stat-ads">إعلاناً</span></div>
-      <div class="stat-item"><span class="si-num">10</span><span class="si-label" data-t="stat-cats">قسماً</span></div>
-      <div class="stat-item"><span class="si-num">8+</span><span class="si-label" data-t="stat-wilayas">ولاية</span></div>
-    </div>
-
-    <!-- RESULT LIST -->
-    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-      <div class="rl-header">
-        <div class="rl-count"><strong id="rl-count-num">27</strong> <span data-t="result-count-label">إعلان</span></div>
-        <div class="rl-sort">
-          <select id="sort-select" onchange="applyFilters()">
-            <option value="default" data-t="sort-default">الأحدث</option>
-            <option value="price-asc" data-t="sort-price-asc">السعر: الأقل</option>
-            <option value="price-desc" data-t="sort-price-desc">السعر: الأعلى</option>
-            <option value="pin" data-t="sort-pin">المميّزة أولاً</option>
-          </select>
-        </div>
+    <!-- RESULTS COLUMN (stats + list) — جنب الفلاتر على التابلت/الكمبيوتر -->
+    <div class="browse-results-col">
+      <!-- STATS STRIP -->
+      <div class="stats-strip">
+        <div class="stat-item"><span class="si-num" id="stat-ads-num">0</span><span class="si-label" data-t="stat-ads">إعلاناً</span></div>
+        <div class="stat-item"><span class="si-num" id="stat-cats-num">10</span><span class="si-label" data-t="stat-cats">قسماً</span></div>
+        <div class="stat-item"><span class="si-num" id="stat-wilayas-num">8+</span><span class="si-label" data-t="stat-wilayas">ولاية</span></div>
       </div>
-      <div id="result-list-body"></div>
-      <div id="result-pagination" class="rc-pagination"></div>
-    </div>
+
+      <!-- RESULT LIST -->
+      <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+        <div class="rl-header">
+          <div class="rl-count"><strong id="rl-count-num">0</strong> <span data-t="result-count-label">إعلان</span></div>
+          <div class="rl-sort">
+            <select id="sort-select" onchange="applyFilters()">
+              <option value="default" data-t="sort-default">الأحدث</option>
+              <option value="price-asc" data-t="sort-price-asc">السعر: الأقل</option>
+              <option value="price-desc" data-t="sort-price-desc">السعر: الأعلى</option>
+              <option value="pin" data-t="sort-pin">المميّزة أولاً</option>
+            </select>
+          </div>
+        </div>
+        <div id="result-list-body"></div>
+        <div id="result-pagination" class="rc-pagination"></div>
+      </div>
+    </div><!-- end browse-results-col -->
 
   </div><!-- end browse-left -->
 
   <!-- RIGHT: Detail Panel -->
-  <div class="browse-right tab-active" id="browse-right">
+  <div class="browse-right tab-hidden" id="browse-right">
     <div class="empty-detail" id="empty-detail">
       <div class="ed-hero">
         <div class="ed-orb"><div class="ed-orb-inner">🏠</div></div>
@@ -1342,6 +1455,12 @@ function renderResultList(){
   const pagEl=document.getElementById('result-pagination');
   const countEl=document.getElementById('rl-count-num');
   if(countEl)countEl.textContent=filtered.length;
+  // مزامنة شريط الإحصاءات مع العدد الحقيقي (تجنّب 27+ مقابل 0)
+  const statAds=document.getElementById('stat-ads-num');
+  if(statAds){
+    const total=typeof ALL_ADS!=='undefined'?ALL_ADS.length:filtered.length;
+    statAds.textContent=total>0?(total>=27?total+'+':String(total)):'0';
+  }
   const start=(page-1)*PER_PAGE;
   const items=filtered.slice(start,start+PER_PAGE);
   const fr=_rizqLang()==='fr';
@@ -1747,6 +1866,7 @@ function chatOpenWA(){
   else showToast(fr?'Pas de numéro WhatsApp':'لا يوجد رقم واتساب');
 }
 function openDrawer(){
+  if(typeof relocateFiltersForViewport==='function') relocateFiltersForViewport();
   document.getElementById('filter-overlay').classList.add('open');
   document.getElementById('filter-drawer').classList.add('open');
   // إخفاء وسم "إشعار قانوني" الثابت (يسار الشاشة) أثناء فتح درج الفلاتر —
@@ -1914,18 +2034,24 @@ function switchTab(tab){
   const right=document.querySelector('.browse-right');
   const btnList=document.getElementById('tab-list-btn');
   const btnDetail=document.getElementById('tab-detail-btn');
+  const wrap=document.querySelector('.browse-wrap');
   if(!left||!right)return;
   if(tab==='list'){
     left.classList.remove('tab-hidden');left.classList.add('tab-active');
     right.classList.add('tab-hidden');right.classList.remove('tab-active');
+    if(window.innerWidth<=900 && wrap && !window._currentAd){
+      wrap.classList.remove('has-detail');
+    }
     if(btnList){btnList.classList.add('active');}
     if(btnDetail){btnDetail.classList.remove('active');}
   } else {
     right.classList.remove('tab-hidden');right.classList.add('tab-active');
     left.classList.add('tab-hidden');left.classList.remove('tab-active');
+    if(window.innerWidth<=900 && wrap) wrap.classList.add('has-detail');
     if(btnDetail){btnDetail.classList.add('active');}
     if(btnList){btnList.classList.remove('active');}
   }
+  if(typeof relocateFiltersForViewport==='function') relocateFiltersForViewport();
 }
 function showToast(msg,type='info'){
   let t=document.getElementById('rizq-toast');
@@ -1943,9 +2069,31 @@ function relocateFiltersForViewport(){
   const sidebar=document.querySelector('.bs-sidebar');
   const drawer=document.getElementById('drawer-scroll');
   const fb=document.getElementById('filters-body');
+  const fab=document.querySelector('.mobile-filter-btn');
   if(!fb)return;
   if(window.innerWidth<=900&&drawer&&!drawer.contains(fb)){drawer.appendChild(fb);}
   else if(window.innerWidth>900&&sidebar&&!sidebar.contains(fb)){sidebar.appendChild(fb);}
+  if(fab){
+    if(window.innerWidth<=900){
+      fab.style.display='flex';
+      // على تاب الموبايل «النتائج» فقط — أخفِ الزر عند عرض التفاصيل
+      const onDetail=document.getElementById('browse-right')?.classList.contains('tab-active');
+      fab.style.visibility=onDetail?'hidden':'visible';
+    }else{
+      fab.style.display='none';
+      fab.style.visibility='';
+    }
+  }
+  // سطح المكتب: لوحة التفاصيل تظهر فقط مع has-detail
+  if(window.innerWidth>900){
+    const wrap=document.querySelector('.browse-wrap');
+    const left=document.getElementById('browse-left');
+    const right=document.getElementById('browse-right');
+    if(left){left.classList.add('tab-active');left.classList.remove('tab-hidden');}
+    if(right&&wrap&&!wrap.classList.contains('has-detail')){
+      right.classList.add('tab-hidden');right.classList.remove('tab-active');
+    }
+  }
 }
 // ══════════ HELPERS ══════════
 function resetAllFilters(){
@@ -2173,6 +2321,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   applyFilters();
   _rizqMergeBackendAds();
   relocateFiltersForViewport();
+  if(window.innerWidth<=900) switchTab('list');
 
   // إذا كان ?id= → فتح الإعلان مباشرة بعد الرندر
   if(_pId){

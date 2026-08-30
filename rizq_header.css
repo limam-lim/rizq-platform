@@ -814,7 +814,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav .hero-content{padding-top:12px !important}
   html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
-  html.rizq-app-nav .browse-wrap{height:calc(100vh - var(--rizq-header-h) - 41px) !important}
+  html.rizq-app-nav .browse-wrap{
+    height:auto !important;
+    min-height:calc(100vh - var(--rizq-header-h) - 44px) !important;
+    overflow:visible !important;
+  }
   html.rizq-app-nav .sidebar,
   html.rizq-app-nav aside.sidebar{
     top:var(--rizq-header-h) !important;

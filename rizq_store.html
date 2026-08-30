@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=16.6"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -392,15 +392,91 @@ footer{
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ====== RESPONSIVE ====== */
+/* Tablet: keep 2-col when space allows, tighten hero */
+@media(max-width:1100px) and (min-width:801px){
+  .content-grid{grid-template-columns:240px 1fr;gap:18px}
+  .main-wrap{padding:20px 14px}
+  .store-name{font-size:26px}
+  .action-btn{padding:9px 14px;font-size:12.5px}
+}
+
 @media(max-width:800px){
-  .content-grid{grid-template-columns:1fr}
-  .store-hero{height:auto;padding:24px 0}
-  .store-profile{flex-direction:column;text-align:center}
+  .content-grid{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+  /* المنتجات أولاً على الهاتف — المعلومات أسفل */
+  .content-grid > aside#info-section{order:2}
+  .content-grid > main{order:1}
+  .store-hero{height:auto;min-height:0;padding:20px 0 16px}
+  .store-logo-wrap{width:84px;height:84px;font-size:36px;border-radius:16px}
+  .store-name{font-size:22px}
+  .store-tagline{font-size:13px}
+  .store-profile{flex-direction:column;text-align:center;gap:14px;padding:12px 16px}
   .store-info{text-align:center}
   .store-meta{justify-content:center}
   .store-badges{justify-content:center}
   .nav-links{display:none}
-  .products-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .main-wrap{padding:16px 12px 96px}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .product-img{height:130px;font-size:44px}
+  .products-header{padding:12px 14px;border-radius:12px}
+  .section-title{font-size:15px}
+  .view-all-btn{padding:6px 10px;font-size:12px}
+  .info-card{padding:16px;margin-bottom:12px}
+  .map-placeholder{height:130px}
+  /* أزرار الإجراءات: شبكة 2×2 واضحة */
+  .actions-bar{
+    position:sticky;top:var(--rizq-header-h,0);z-index:40;
+    padding:0 12px;
+    box-shadow:0 4px 16px rgba(15,35,65,.06);
+  }
+  .actions-bar-inner{
+    flex-direction:column;align-items:stretch;
+    padding:10px 0 12px;gap:10px;
+  }
+  .action-btns{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    width:100%;
+  }
+  .action-btn{
+    justify-content:center;
+    width:100%;
+    min-height:46px;
+    padding:10px 8px;
+    font-size:12.5px;
+    border-radius:12px;
+    box-sizing:border-box;
+  }
+  .store-rating{
+    justify-content:center;
+    width:100%;
+    padding-top:2px;
+  }
+  /* لمس: إظهار زر العرض السريع دون الاعتماد على hover */
+  .product-quickview{opacity:1;pointer-events:auto;background:rgba(13,27,42,.28)}
+  .product-card:hover .product-img{transform:none}
+}
+
+@media(max-width:480px){
+  .action-btn{font-size:12px;gap:4px;padding:9px 6px}
+  .products-grid{gap:10px}
+  .product-body{padding:10px}
+  .product-name{font-size:13px}
+  .product-price{font-size:14px}
+}
+
+/* إبعاد فقاعات المساعدة عن بطاقة التواصل على الهاتف */
+@media(max-width:768px){
+  #rizq-prompt-bubbles{
+    bottom:calc(168px + env(safe-area-inset-bottom,0))!important;
+    right:12px!important;
+    max-width:min(160px,42vw);
+  }
+  html[dir="ltr"] #rizq-prompt-bubbles{right:auto!important;left:12px!important}
+  .rw-prompt-bubble{font-size:10.5px!important;padding:7px 10px!important;max-width:160px!important}
 }
 
 
@@ -635,7 +711,7 @@ footer{
 </div>
 
 <!-- STORE HERO -->
-<div class="store-hero">
+<div class="store-hero" id="store-hero">
   <div class="hero-pattern"></div>
   <div class="hero-cover">
     <div class="store-profile">
@@ -684,6 +760,13 @@ footer{
       <div class="rating-count" id="store-ab-rating-count"></div>
     </div>
   </div>
+</div>
+
+<!-- تنبيه عند فتح صفحة المحل بدون معرف محل -->
+<div id="store-empty-banner" style="display:none;margin:12px 16px 0;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid rgba(201,168,76,.35);color:#1a2a3a;font-size:13.5px;line-height:1.55;text-align:center">
+  <strong style="color:#1B3A6B" data-t="store-empty-title">لم يُحدَّد محل بعد</strong>
+  <div style="margin-top:6px;color:#5a6a7a" data-t="store-empty-desc">اختر محلاً من قائمة المحلات أو افتح رابط المحل المباشر لعرض المنتجات ومعلومات التواصل.</div>
+  <a href="rizq_landing_v8.html#virtual-stores" style="display:inline-block;margin-top:10px;padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0D1B2A;font-weight:800;text-decoration:none;font-size:13px" data-t="store-empty-cta">تصفّح المحلات</a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -1411,10 +1494,28 @@ function rizqShare(title, url) {
       try{
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('store') || '';
-        if(!id) return;
+        var emptyBanner = document.getElementById('store-empty-banner');
+        if(!id){
+          if(emptyBanner) emptyBanner.style.display = 'block';
+          var nameEl = document.getElementById('store-name-el');
+          if(nameEl && (!nameEl.textContent || nameEl.textContent === '—')){
+            nameEl.textContent = isFr() ? 'Boutique Rizq' : 'محل رزق';
+          }
+          return;
+        }
+        if(emptyBanner) emptyBanner.style.display = 'none';
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'store'; });
-        if(!acc) return; // لا حساب حقيقي مطابق — تبقى الحالة الفارغة
+        if(!acc){
+          if(emptyBanner){
+            emptyBanner.style.display = 'block';
+            var desc = emptyBanner.querySelector('[data-t="store-empty-desc"]');
+            if(desc) desc.textContent = isFr()
+              ? 'Cette boutique n’est pas encore disponible ou n’est pas approuvée.'
+              : 'هذا المحل غير متاح حالياً أو لم يُعتمد بعد.';
+          }
+          return; // لا حساب حقيقي مطابق — تبقى الحالة الفارغة
+        }
 
         // ── الهوية الأساسية ──
         setText('store-name-el', acc.name);
@@ -1953,6 +2054,9 @@ if(typeof _t2 === 'undefined'){
     'badge-premium':'🏅 Boutique premium',
     'btn-whatsapp':'📲 WhatsApp','meta-location':'📍 —',
     'btn-call':'📞 Appeler','btn-share':'📤 Partager','rating-count':'',
+    'store-empty-title':'Aucune boutique sélectionnée',
+    'store-empty-desc':'Choisissez une boutique dans la liste ou ouvrez le lien direct pour voir les produits et les contacts.',
+    'store-empty-cta':'Parcourir les boutiques',
     /* Info */
     'info-title-location':'📍 Localisation',
     'info-label-address':'Adresse :','info-label-phone':'Téléphone :','info-label-email':'E-mail :',
