@@ -7,15 +7,16 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="stylesheet" href="rizq-theme.css?v=16.5"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=16.8"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=16.6"/>
+  <link rel="stylesheet" href="rizq_header.css?v=16.9"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta name="description" content="تصفح الإعلانات — رزق | منصة الإعلانات الأولى في موريتانيا"/>
   <title>رزق | تصفح الإعلانات</title>
 <style>
@@ -69,7 +70,8 @@ nav .nav-disclaimer{flex-shrink:0}
 .breadcrumb a{color:var(--text-muted);transition:color .2s}
 .breadcrumb a:hover{color:var(--gold)}
 .breadcrumb .sep{color:rgba(13,27,42,.2)}
-.breadcrumb .cur{color:#1a2535;font-weight:600}
+.breadcrumb .cur{color:#1a2535;font-weight:600;text-decoration:none}
+.breadcrumb a.cur:hover{color:var(--gold)}
 
 /* MOBILE TABS */
 .mobile-tabs{display:none;background:#fff;border-bottom:2px solid #e2e8f5;position:sticky;top:62px;z-index:100}
@@ -334,11 +336,39 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 /* FILTER DRAWER */
 .filter-overlay{display:none;position:fixed;inset:0;background:rgba(6,12,24,.78);z-index:9990;backdrop-filter:blur(6px)}
 .filter-overlay.open{display:block}
-.filter-drawer{position:fixed;right:-100%;top:0;bottom:0;width:min(86vw,320px);background:#fff;z-index:9991;display:flex;flex-direction:column;overflow-x:hidden;transition:right .35s cubic-bezier(.23,1,.32,1);border-left:1px solid rgba(201,168,76,.18);box-shadow:-8px 0 30px rgba(15,35,65,.18)}
+.filter-drawer{
+  position:fixed;right:-100%;top:0;bottom:0;
+  width:min(92vw,360px);max-width:100%;
+  height:100%;height:100dvh;
+  background:#fff;z-index:9991;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:right .35s cubic-bezier(.23,1,.32,1);
+  border-left:1px solid rgba(201,168,76,.18);
+  box-shadow:-8px 0 30px rgba(15,35,65,.18);
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
 .filter-drawer.open{right:0}
-.drawer-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;flex-shrink:0;background:linear-gradient(135deg,#0f1f3d,#1B2B4B)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;flex-shrink:0;background:linear-gradient(135deg,#0f1f3d,#1B2B4B)}
 .drawer-header h3{font-size:15px;font-weight:800;color:var(--gold);margin:0}
-.drawer-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 18px;min-width:0}
+.drawer-scroll{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:0;overscroll-behavior:contain;
+}
+/* داخل الدرج: ألغِ حدّ 320px حتى تظهر كل الفلاتر مع التمرير */
+#drawer-scroll #filters-body{
+  max-height:none!important;
+  height:auto!important;
+  overflow:visible!important;
+  padding:12px 14px 28px;
+}
+#drawer-scroll .filters-actions{
+  position:sticky;bottom:0;z-index:2;
+  background:linear-gradient(180deg,rgba(255,255,255,.92),#fff 40%);
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0));
+}
 .drawer-close{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;flex-shrink:0}
 
 /* TOAST */
@@ -376,11 +406,12 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 .browse-wrap{animation:rizqIn .45s ease both}
 
 /* STATS STRIP */
-.stats-strip{display:flex;align-items:center;gap:0;background:linear-gradient(135deg,#0f1f3d,#1B3A6B);border-bottom:1px solid rgba(201,168,76,.15);overflow:hidden;flex-shrink:0}
-.stat-item{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 10px;border-left:1px solid rgba(201,168,76,.1)}
+.stats-strip{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:0;background:linear-gradient(135deg,#0f1f3d,#1B3A6B);border-bottom:1px solid rgba(201,168,76,.15);overflow:visible;flex-shrink:0;min-height:48px;height:48px;padding:0;box-sizing:border-box;width:100%}
+.mobile-stats-slot{display:none}
+.stat-item{flex:1 1 0;min-width:0;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:center;gap:6px;padding:10px 6px;border-left:1px solid rgba(201,168,76,.1);line-height:1.2;height:48px;box-sizing:border-box;white-space:nowrap}
 .stat-item:last-child{border-left:none}
-.stat-item .si-num{font-size:14px;font-weight:900;color:var(--gold);font-family:'Segoe UI',sans-serif}
-.stat-item .si-label{font-size:10px;color:rgba(255,255,255,.55)}
+.stat-item .si-num{font-size:14px;font-weight:900;color:var(--gold);font-family:'Segoe UI',sans-serif;line-height:1.2;flex-shrink:0;white-space:nowrap}
+.stat-item .si-label{font-size:10px;color:rgba(255,255,255,.55);line-height:1.2;flex-shrink:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* FEATURED BANNER in result list */
 .rc-featured-banner{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(27,58,107,.1));border:1px solid rgba(201,168,76,.25);border-radius:10px;margin:8px 10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
@@ -499,7 +530,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   html.rizq-app-nav.has-rizq-desk-nav .browse-wrap{
     flex-direction:column;
     height:auto!important;
-    min-height:calc(100vh - var(--rizq-header-h,112px) - 44px)!important;
+    min-height:calc(100dvh - var(--rizq-header-h,112px) - 90px)!important;
     overflow:visible!important;
   }
   .browse-left{
@@ -509,19 +540,21 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     border-bottom:1px solid #e2e8f5;
     display:none;
     flex-direction:column!important;
+    overflow:visible!important;
   }
   .browse-left.tab-active{
     display:flex!important;
     flex-direction:column!important;
-    max-height:none;
-    min-height:calc(100vh - var(--rizq-header-h,112px) - 88px);
+    max-height:none!important;
+    min-height:calc(100dvh - var(--rizq-header-h,112px) - 130px);
+    overflow:visible!important;
   }
-  /* الفلاتر تنتقل للدرج — أخفِ الشريط الجانبي الفارغ */
   .bs-sidebar{display:none!important}
   .browse-right{
     height:auto;
-    min-height:calc(100vh - var(--rizq-header-h,112px) - 88px);
+    min-height:calc(100dvh - var(--rizq-header-h,112px) - 130px);
     display:none;
+    overflow:visible!important;
   }
   .browse-right.tab-active,
   .browse-wrap.has-detail .browse-right.tab-active{
@@ -529,34 +562,115 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   }
   .browse-right.tab-hidden{display:none!important}
   .browse-left.tab-hidden{display:none!important}
-  .mobile-tabs{display:flex;position:sticky;z-index:100}
-  /* زر الفلاتر يظهر على الموبايل عندما تكون الفلاتر في الدرج */
+  /* مهم: إلغاء top من rizq_header.css — كان يزيح التبويبات بـ 112px ويسبب قص الأرقام */
+  .mobile-tabs,
+  html.rizq-app-nav .mobile-tabs,
+  html.rizq-app-nav.has-rizq-desk-nav .mobile-tabs{
+    display:flex!important;
+    position:relative!important;
+    top:0!important;
+    inset:auto!important;
+    z-index:5;
+    background:#fff;
+    box-shadow:none;
+    border-bottom:2px solid #e2e8f5;
+    min-height:48px;
+    flex-shrink:0;
+    overflow:visible!important;
+    margin:0!important;
+    transform:none!important;
+  }
+  .mobile-tabs .mtab{
+    flex:1;
+    padding:12px 8px!important;
+    font-size:13px!important;
+    line-height:1.35!important;
+    white-space:nowrap;
+    overflow:visible!important;
+  }
+  .mobile-stats-slot,
+  html.rizq-app-nav .mobile-stats-slot{
+    display:block!important;
+    flex-shrink:0;
+    width:100%;
+    background:linear-gradient(135deg,#0f1f3d,#1B3A6B);
+    z-index:4;
+    position:relative!important;
+    top:0!important;
+    margin:0!important;
+    transform:none!important;
+    overflow:visible!important;
+  }
+  .mobile-stats-slot:empty{display:none!important}
   .mobile-filter-btn{
     display:flex!important;
     align-items:center;
     justify-content:center;
     gap:6px;
     bottom:calc(20px + env(safe-area-inset-bottom,0));
+    z-index:400!important;
   }
   .browse-results-col{
     flex:1;
     min-height:0;
     display:flex;
     flex-direction:column;
+    overflow:visible!important;
   }
+  /* شريط الإحصاء: العناصر الثلاثة في سطر واحد كامل الوضوح */
+  .mobile-stats-slot .stats-strip,
+  .stats-strip{
+    flex-shrink:0;
+    width:100%;
+    min-height:48px;
+    height:48px!important;
+    overflow:hidden!important;
+    position:relative;
+    z-index:1;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    box-sizing:border-box;
+  }
+  .stat-item{
+    flex:1 1 0!important;
+    min-width:0!important;
+    height:48px!important;
+    padding:0 4px!important;
+    gap:4px!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+  .stat-item .si-num{
+    font-size:13px!important;
+    line-height:1.2!important;
+    flex-shrink:0!important;
+    white-space:nowrap!important;
+  }
+  .stat-item .si-label{
+    font-size:9.5px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .browse-wrap{animation:none!important}
   #result-list-body{
-    max-height:none;
+    max-height:none!important;
     flex:1;
-    min-height:42vh;
+    min-height:45vh;
+    overflow:visible!important;
   }
-  .rc-empty{padding:48px 20px;min-height:36vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .stats-strip{flex-shrink:0}
-  .stat-item{padding:8px 6px;gap:5px}
-  .stat-item .si-num{font-size:13px}
-  .stat-item .si-label{font-size:9.5px}
+  .rc-empty{padding:48px 20px;min-height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
   .empty-detail{min-height:50vh;padding:28px 16px}
+  .breadcrumb{position:relative;z-index:2;flex-shrink:0}
   #rizq-prompt-bubbles{
-    bottom:calc(100px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(110px + env(safe-area-inset-bottom,0))!important;
     right:12px!important;
   }
   html[dir="ltr"] #rizq-prompt-bubbles{left:12px!important;right:auto!important}
@@ -750,15 +864,16 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a><span class="sep">›</span>
-  <a href="#" id="bc-cat" data-t="all-cats" onclick="filterByCat('');return false;">كل الأقسام</a><span class="sep">›</span>
-  <span class="cur" id="bc-current" data-t="browse-ads">تصفح الإعلانات</span>
+  <a href="rizq_browse.html" id="bc-cat" data-t="all-cats" onclick="filterByCat('');return false;">كل الأقسام</a><span class="sep">›</span>
+  <a class="cur" id="bc-current" href="rizq_browse.html" data-t="browse-ads">تصفح الإعلانات</a>
 </div>
 
-<!-- MOBILE TABS -->
+<!-- MOBILE TABS + STATS (على الموبايل تُنقل الإحصاءات هنا لتفادي القص) -->
 <div class="mobile-tabs" id="mobile-tabs">
   <button class="mtab active" id="tab-list-btn" onclick="switchTab('list')" data-t="tab-list">📋 النتائج</button>
   <button class="mtab" id="tab-detail-btn" onclick="switchTab('detail')" data-t="tab-detail">📄 التفاصيل</button>
 </div>
+<div id="mobile-stats-slot" class="mobile-stats-slot" aria-hidden="true"></div>
 
 <!-- BROWSE WRAP -->
 <div class="browse-wrap">
@@ -855,12 +970,23 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 
     <!-- RESULTS COLUMN (stats + list) — جنب الفلاتر على التابلت/الكمبيوتر -->
     <div class="browse-results-col">
-      <!-- STATS STRIP -->
-      <div class="stats-strip">
-        <div class="stat-item"><span class="si-num" id="stat-ads-num">0</span><span class="si-label" data-t="stat-ads">إعلاناً</span></div>
-        <div class="stat-item"><span class="si-num" id="stat-cats-num">10</span><span class="si-label" data-t="stat-cats">قسماً</span></div>
-        <div class="stat-item"><span class="si-num" id="stat-wilayas-num">8+</span><span class="si-label" data-t="stat-wilayas">ولاية</span></div>
+      <div id="desk-stats-slot">
+        <!-- STATS STRIP -->
+        <div class="stats-strip" id="stats-strip">
+          <div class="stat-item"><span class="si-num" id="stat-ads-num">0</span><span class="si-label" data-t="stat-ads">إعلاناً</span></div>
+          <div class="stat-item"><span class="si-num" id="stat-cats-num">10</span><span class="si-label" data-t="stat-cats">قسماً</span></div>
+          <div class="stat-item"><span class="si-num" id="stat-wilayas-num">8+</span><span class="si-label" data-t="stat-wilayas">ولاية</span></div>
+        </div>
       </div>
+      <script>
+      (function(){try{
+        if(window.innerWidth<=900){
+          var s=document.getElementById('stats-strip');
+          var m=document.getElementById('mobile-stats-slot');
+          if(s&&m){m.appendChild(s);m.setAttribute('aria-hidden','false');}
+        }
+      }catch(e){}})();
+      </script>
 
       <!-- RESULT LIST -->
       <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
@@ -977,7 +1103,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <div class="rizq-promo-body">
       <a href="rizq_post.html" class="rizq-promo-cta-main" data-t="promo-post">➕ انشر إعلانك مجاناً</a>
-      <button class="rizq-promo-cta-sec" onclick="closeRizqPromo()" data-t="promo-browse">تصفح الإعلانات</button>
+      <a href="rizq_browse.html" class="rizq-promo-cta-sec" onclick="closeRizqPromo()" data-t="promo-browse">تصفح الإعلانات</a>
     </div>
   </div>
 </div>
@@ -2093,6 +2219,21 @@ function relocateFiltersForViewport(){
     if(right&&wrap&&!wrap.classList.contains('has-detail')){
       right.classList.add('tab-hidden');right.classList.remove('tab-active');
     }
+  }
+  relocateStatsForViewport();
+}
+/** على الموبايل: نقل شريط الإحصاءات خارج browse-wrap لتفادي القص تحت التبويبات/المسار */
+function relocateStatsForViewport(){
+  const stats=document.getElementById('stats-strip');
+  const mobileSlot=document.getElementById('mobile-stats-slot');
+  const deskSlot=document.getElementById('desk-stats-slot');
+  if(!stats||!mobileSlot||!deskSlot)return;
+  if(window.innerWidth<=900){
+    if(!mobileSlot.contains(stats))mobileSlot.appendChild(stats);
+    mobileSlot.setAttribute('aria-hidden','false');
+  }else{
+    if(!deskSlot.contains(stats))deskSlot.appendChild(stats);
+    mobileSlot.setAttribute('aria-hidden','true');
   }
 }
 // ══════════ HELPERS ══════════

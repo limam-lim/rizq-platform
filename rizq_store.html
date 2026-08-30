@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=16.5"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=16.8"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=16.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=16.9"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -40,7 +40,7 @@
   --shadow: 0 6px 24px rgba(0,0,0,0.4);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;color:#1a2a3a;min-height:100vh}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#eef2f7 0%,#f5f7fb 40%,#f0f3f8 100%);color:#1a2a3a;min-height:100vh}
 
 /* ====== TOPNAV ====== */
 .topnav{
@@ -82,19 +82,23 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 
 /* ====== HERO / STORE COVER ====== */
 .store-hero{
-  position:relative;height:320px;overflow:hidden;
+  position:relative;height:auto;min-height:0;overflow:visible;
   background:linear-gradient(135deg,var(--navy2) 0%,var(--dark) 50%,var(--navy) 100%);
+  padding:0;
 }
 .hero-cover{
-  position:absolute;inset:0;
+  position:relative;inset:auto;
   background:linear-gradient(135deg,
     rgba(27,58,107,0.8) 0%,
     rgba(201,168,76,0.15) 50%,
     rgba(13,27,42,0.9) 100%);
   display:flex;align-items:center;justify-content:center;
+  padding:28px 0 24px;
+  width:100%;
+  box-sizing:border-box;
 }
 .hero-pattern{
-  position:absolute;inset:0;
+  position:absolute;inset:0;pointer-events:none;z-index:0;
   background-image:
     radial-gradient(circle at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
     radial-gradient(circle at 80% 20%, rgba(27,58,107,0.3) 0%, transparent 50%);
@@ -132,63 +136,122 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 
 /* ====== STORE ACTIONS BAR ====== */
 .actions-bar{
-  background:var(--white);
-  border-bottom:1px solid #e0e8f0;
-  padding:0 20px;
+  background:linear-gradient(180deg,#ffffff 0%,#f7f9fc 100%);
+  border-bottom:1px solid rgba(27,58,107,.08);
+  padding:0 24px;
+  box-shadow:0 8px 24px rgba(15,35,65,.04);
 }
 .actions-bar-inner{
-  max-width:1100px;margin:0 auto;
+  max-width:1280px;margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;gap:12px;flex-wrap:wrap;
+  padding:14px 0;gap:16px;flex-wrap:wrap;
 }
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .action-btn{
-  display:flex;align-items:center;gap:6px;
-  padding:10px 18px;border-radius:10px;
-  font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:7px;
+  padding:11px 18px;border-radius:12px;
+  font-size:13px;font-weight:700;cursor:pointer;
   transition:all .25s;text-decoration:none;font-family:inherit;border:none;
+  box-shadow:0 2px 10px rgba(15,35,65,.06);
 }
 .btn-whatsapp{background:#25D366;color:#fff}
-.btn-whatsapp:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 4px 15px rgba(37,211,102,0.4)}
-.btn-call{background:var(--navy);color:var(--white)}
-.btn-call:hover{background:var(--navy2)}
-.btn-share{background:#f0f3f8;color:var(--navy);border:1px solid #d0d8e8}
-.btn-share:hover{background:#e0e8f0}
-.store-rating{display:flex;align-items:center;gap:8px}
-.stars{color:#F5A623;font-size:18px;letter-spacing:2px}
+.btn-whatsapp:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,0.35)}
+.btn-call{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0D1B2A}
+.btn-call:hover{filter:brightness(1.05);transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.35)}
+.btn-share{background:#fff;color:var(--navy);border:1px solid #d0d8e8}
+.btn-share:hover{background:#f0f3f8;border-color:rgba(201,168,76,.45)}
+.store-rating{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);
+}
+.stars{color:#F5A623;font-size:17px;letter-spacing:2px}
 .rating-text{font-size:14px;font-weight:700;color:#1a2a3a}
 .rating-count{font-size:12px;color:#6a7a8a}
 
 /* ====== MAIN CONTENT ====== */
-.main-wrap{max-width:1100px;margin:0 auto;padding:24px 16px}
-.content-grid{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start}
+.main-wrap{
+  max-width:1280px;margin:0 auto;padding:28px 20px 64px;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(201,168,76,.07), transparent 42%),
+    radial-gradient(ellipse at 10% 30%, rgba(27,58,107,.05), transparent 45%);
+  overflow:visible;
+}
+.content-grid{
+  display:grid;
+  /* يمين = الموقع والتواصل | يسار = المنتجات (RTL) */
+  grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+  grid-template-areas:"side main";
+  gap:28px;
+  align-items:start;
+}
+.content-grid > main{
+  grid-area:main;
+  min-width:0;
+  background:#fff;
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+.content-grid > aside#info-section{
+  grid-area:side;
+  position:sticky;top:calc(var(--rizq-header-h,72px) + 12px);
+}
 
 /* ====== SIDEBAR INFO ====== */
 .info-sidebar{}
 .info-card{
-  background:var(--white);border-radius:var(--radius);
-  border:1px solid #e0e8f0;padding:20px;margin-bottom:16px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  background:linear-gradient(165deg,#ffffff 0%,#fbfcfe 100%);
+  border-radius:16px;
+  border:1px solid rgba(27,58,107,.1);
+  padding:18px 18px 16px;margin-bottom:14px;
+  box-shadow:0 8px 28px rgba(15,35,65,.05);
 }
 .info-card-title{
-  font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;
-  padding-bottom:10px;border-bottom:2px solid var(--gold);
-  display:flex;align-items:center;gap:6px;
+  font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1.5px solid rgba(201,168,76,.35);
+  display:flex;align-items:center;justify-content:flex-start;gap:6px;letter-spacing:.2px;
+  text-align:start;
 }
 .info-row{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:9px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
+  display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
+  padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
+  text-align:start!important;direction:rtl!important;
 }
 .info-row:last-child{border-bottom:none}
-.info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-.info-row .info-label{color:#6a7a8a;font-size:11px;margin-bottom:2px}
-.info-row .info-value{color:#1a2a3a;font-weight:500}
-/* Hours */
-.hours-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #f0f3f8}
+.info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px;order:0}
+.info-row > div{flex:0 1 auto!important;min-width:0;max-width:100%;text-align:start!important;margin-inline-start:0!important;margin-inline-end:auto!important;order:0}
+.info-row .info-label{color:#6a7a8a;font-size:11px;margin-bottom:3px;text-align:start!important}
+.info-row .info-value{
+  color:#1a2a3a;font-weight:600;text-align:start!important;
+  display:block!important;width:fit-content!important;max-width:100%;
+  margin-inline-start:0!important;margin-inline-end:0!important;
+}
+/* أرقام الهاتف LTR لكن الصندوق يبقى على اليمين تحت التسمية */
+.info-row .info-value [dir="ltr"],
+.info-row .info-value .rzq-contact-masked,
+.info-row .info-value .rizq-phone-ltr{
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+  display:inline-block!important;
+  text-align:left!important;
+  white-space:nowrap;
+  margin-inline-start:0!important;
+  float:none!important;
+}
+/* ساعات العمل: اليوم والوقت ملتصقان يميناً */
+.hours-row{
+  display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
+  gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
+  text-align:start!important;direction:rtl!important;
+}
 .hours-row:last-child{border-bottom:none}
-.hours-day{color:#6a7a8a}
-.hours-time{font-weight:600;color:var(--navy)}
-.hours-closed{color:var(--red);font-weight:600}
+.hours-day{color:#6a7a8a;min-width:4.8em;flex:0 0 auto!important;text-align:start!important}
+.hours-time,.hours-closed{font-weight:700;flex:0 0 auto!important;margin-inline-start:0!important;margin-inline-end:auto!important}
+.hours-time{color:var(--navy)}
+.hours-closed{color:var(--red)}
+#info-section,#info-section .info-card{text-align:start!important;direction:rtl!important}
 /* Reviews */
 .review-item{padding:14px 0;border-bottom:1px solid #f0f3f8}
 .review-item:last-child{border-bottom:none}
@@ -197,50 +260,86 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .review-stars{color:#F5A623;font-size:13px}
 .review-date{font-size:11px;color:#9aa}
 .review-text{font-size:13px;color:#4a5a6a;line-height:1.5}
+#reviews-section .section-title{color:var(--navy)!important}
+#reviews-section .section-title::before{background:var(--gold)}
 
 /* ====== PRODUCTS SECTION ====== */
 .products-section{}
 .products-header{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:16px;flex-wrap:wrap;gap:10px;
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:14px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18);
+  background:linear-gradient(135deg,#0D1B2A 0%,#1B3A6B 55%,#234d8f 100%);
+  border:1px solid rgba(201,168,76,.28);border-radius:14px;
+  padding:14px 18px;box-shadow:0 10px 28px rgba(13,27,42,.22);
 }
 .section-title{
-  font-size:18px;font-weight:800;color:#fff;
+  font-size:17px;font-weight:800;color:#fff;
   display:flex;align-items:center;gap:8px;
 }
 .section-title::before{
   content:'';display:inline-block;
-  width:4px;height:20px;background:var(--gold);
+  width:4px;height:18px;background:linear-gradient(180deg,var(--gold2),var(--gold));
   border-radius:2px;
 }
 .view-all-btn{
-  color:var(--gold);font-size:13px;font-weight:600;
-  text-decoration:none;background:none;border:1px solid var(--gold);
-  padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;
+  color:var(--gold);font-size:12.5px;font-weight:700;
+  text-decoration:none;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.55);
+  padding:7px 14px;border-radius:9px;cursor:pointer;font-family:inherit;
   transition:all .25s;
 }
-.view-all-btn:hover{background:var(--navy);color:var(--white)}
+.view-all-btn:hover{background:var(--gold);color:#0D1B2A}
 /* Category tabs */
-.cat-tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.cat-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .cat-tab{
-  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;
+  padding:8px 16px;border-radius:20px;font-size:12.5px;font-weight:700;
   cursor:pointer;white-space:nowrap;transition:all .25s;
-  background:#f0f3f8;color:#4a5a6a;border:none;font-family:inherit;
+  background:#f0f3f8;color:#4a5a6a;border:1px solid transparent;font-family:inherit;
 }
-.cat-tab.active,.cat-tab:hover{background:var(--navy);color:var(--white)}
+.cat-tab.active,.cat-tab:hover{
+  background:linear-gradient(135deg,var(--navy),#234d8f);color:#fff;
+  box-shadow:0 4px 14px rgba(27,58,107,.25);
+}
 /* Products grid */
 .products-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:16px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:16px;min-height:180px;
 }
 .product-card{
-  background:var(--white);border-radius:var(--radius);
-  border:1px solid #e0e8f0;overflow:hidden;position:relative;
+  background:var(--white);border-radius:14px;
+  border:1px solid rgba(27,58,107,.08);overflow:hidden;position:relative;
   transition:all .3s;cursor:pointer;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  box-shadow:0 4px 14px rgba(15,35,65,.04);
 }
-.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(201,168,76,.18),0 6px 16px rgba(27,58,107,.08);border-color:rgba(201,168,76,.38)}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(201,168,76,.16),0 8px 18px rgba(27,58,107,.08);border-color:rgba(201,168,76,.38)}
+.rzq-empty,.products-grid > .rzq-empty{
+  grid-column:1/-1!important;
+  width:100%!important;
+  min-height:220px;
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;text-align:center;
+  padding:40px 24px!important;
+  border-radius:16px;
+  background:
+    linear-gradient(160deg,rgba(27,58,107,.04),rgba(201,168,76,.06)),
+    #f8faff;
+  border:1.5px dashed rgba(201,168,76,.35);
+  color:#4a5a6a!important;font-size:14.5px!important;font-weight:600;
+  box-sizing:border-box;
+}
+.rzq-empty::before{
+  content:'✦';
+  display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
+}
+#reviews-section > div{
+  background:linear-gradient(165deg,#fff,#fbfcfe)!important;
+  border:1px solid rgba(27,58,107,.08)!important;
+  border-radius:16px!important;
+  box-shadow:0 8px 28px rgba(15,35,65,.05)!important;
+}
+#reviews-section .view-all-btn{
+  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;
+}
+#reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 .product-img{
   height:160px;
   background:linear-gradient(135deg,#e8eef8,#f5f8ff);
@@ -314,33 +413,36 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 }
 .add-btn:hover{background:var(--gold);color:#0D1B2A;transform:scale(1.1)}
 
+/* ====== MAP PLACEHOLDER ====== */
+.map-placeholder{
+  height:148px;border-radius:12px;
+  background:
+    linear-gradient(145deg,rgba(27,58,107,.08),rgba(201,168,76,.1)),
+    linear-gradient(135deg,#e8eef8,#dce6f2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;cursor:pointer;border:1px solid rgba(27,58,107,.12);
+  transition:all .3s;
+}
+.map-placeholder:hover{border-color:rgba(201,168,76,.45);transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,.1)}
+.map-placeholder .map-icon{font-size:34px}
+.map-placeholder .map-text{font-size:13px;font-weight:700;color:var(--navy)}
+.map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 /* ====== DELIVERY SECTION ====== */
-.delivery-opts{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.delivery-opts{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .delivery-opt{
-  flex:1;min-width:140px;
-  padding:16px;border-radius:12px;
-  border:2px solid #e0e8f0;background:#fff;
+  flex:1;min-width:120px;
+  padding:14px 10px;border-radius:12px;
+  border:1.5px solid rgba(27,58,107,.1);background:#fff;
   cursor:pointer;transition:all .3s;text-align:center;
 }
 .delivery-opt.selected,.delivery-opt:hover{
-  border-color:var(--gold);background:rgba(201,168,76,0.04);
+  border-color:rgba(201,168,76,.55);background:rgba(201,168,76,0.06);
+  box-shadow:0 6px 16px rgba(201,168,76,.12);
 }
-.delivery-opt-icon{font-size:28px;margin-bottom:6px}
-.delivery-opt-name{font-size:14px;font-weight:700;color:var(--navy)}
+.delivery-opt-icon{font-size:26px;margin-bottom:5px}
+.delivery-opt-name{font-size:13.5px;font-weight:800;color:var(--navy)}
 .delivery-opt-desc{font-size:11px;color:#6a7a8a;margin-top:3px}
-
-/* ====== MAP PLACEHOLDER ====== */
-.map-placeholder{
-  height:160px;border-radius:12px;
-  background:linear-gradient(135deg,#e8eef8,#d0dce8);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;cursor:pointer;border:1px solid #c0d0e0;
-  transition:all .3s;
-}
-.map-placeholder:hover{border-color:var(--navy);background:#d8e4f0}
-.map-placeholder .map-icon{font-size:40px}
-.map-placeholder .map-text{font-size:13px;font-weight:600;color:var(--navy)}
-.map-placeholder .map-addr{font-size:12px;color:#6a7a8a}
 
 /* ====== FOOTER ====== */
 footer{
@@ -394,8 +496,9 @@ footer{
 /* ====== RESPONSIVE ====== */
 /* Tablet: keep 2-col when space allows, tighten hero */
 @media(max-width:1100px) and (min-width:801px){
-  .content-grid{grid-template-columns:240px 1fr;gap:18px}
-  .main-wrap{padding:20px 14px}
+  .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
+  .main-wrap{padding:22px 16px 40px}
+  .content-grid > main{padding:16px}
   .store-name{font-size:26px}
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
@@ -403,12 +506,16 @@ footer{
 @media(max-width:800px){
   .content-grid{
     grid-template-columns:1fr;
+    /* على الهاتف: المنتجات أولاً ثم الموقع */
+    grid-template-areas:"main" "side";
     gap:18px;
   }
-  /* المنتجات أولاً على الهاتف — المعلومات أسفل */
-  .content-grid > aside#info-section{order:2}
-  .content-grid > main{order:1}
-  .store-hero{height:auto;min-height:0;padding:20px 0 16px}
+  .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
+  .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  #store-packages{padding:40px 4%!important;overflow:visible}
+  #store-packages-grid{overflow:visible!important}
+  .store-hero{height:auto;min-height:0;padding:0;overflow:visible}
+  .hero-cover{padding:20px 0 16px}
   .store-logo-wrap{width:84px;height:84px;font-size:36px;border-radius:16px}
   .store-name{font-size:22px}
   .store-tagline{font-size:13px}
@@ -417,7 +524,7 @@ footer{
   .store-meta{justify-content:center}
   .store-badges{justify-content:center}
   .nav-links{display:none}
-  .main-wrap{padding:16px 12px 96px}
+  .main-wrap{padding:16px 12px 96px;background:none}
   .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .product-img{height:130px;font-size:44px}
   .products-header{padding:12px 14px;border-radius:12px}
@@ -425,7 +532,7 @@ footer{
   .view-all-btn{padding:6px 10px;font-size:12px}
   .info-card{padding:16px;margin-bottom:12px}
   .map-placeholder{height:130px}
-  /* أزرار الإجراءات: شبكة 2×2 واضحة */
+  .rzq-empty,.products-grid > .rzq-empty{min-height:160px;padding:28px 16px!important}
   .actions-bar{
     position:sticky;top:var(--rizq-header-h,0);z-index:40;
     padding:0 12px;
@@ -455,7 +562,6 @@ footer{
     width:100%;
     padding-top:2px;
   }
-  /* لمس: إظهار زر العرض السريع دون الاعتماد على hover */
   .product-quickview{opacity:1;pointer-events:auto;background:rgba(13,27,42,.28)}
   .product-card:hover .product-img{transform:none}
 }
@@ -763,7 +869,7 @@ footer{
 </div>
 
 <!-- تنبيه عند فتح صفحة المحل بدون معرف محل -->
-<div id="store-empty-banner" style="display:none;margin:12px 16px 0;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid rgba(201,168,76,.35);color:#1a2a3a;font-size:13.5px;line-height:1.55;text-align:center">
+<div id="store-empty-banner" style="display:none;max-width:1280px;margin:12px auto 0;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid rgba(201,168,76,.35);color:#1a2a3a;font-size:13.5px;line-height:1.55;text-align:center">
   <strong style="color:#1B3A6B" data-t="store-empty-title">لم يُحدَّد محل بعد</strong>
   <div style="margin-top:6px;color:#5a6a7a" data-t="store-empty-desc">اختر محلاً من قائمة المحلات أو افتح رابط المحل المباشر لعرض المنتجات ومعلومات التواصل.</div>
   <a href="rizq_landing_v8.html#virtual-stores" style="display:inline-block;margin-top:10px;padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0D1B2A;font-weight:800;text-decoration:none;font-size:13px" data-t="store-empty-cta">تصفّح المحلات</a>
@@ -784,7 +890,7 @@ footer{
         </div>
         <div class="info-row">
           <span class="info-icon">📱</span>
-          <div><div class="info-label" data-t="info-label-phone">الهاتف وواتساب</div><div class="info-value"><span id="info-value-phone-el" class="rzq-contact-masked" dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block;white-space:nowrap" onclick="rizqRequireAuth(function(){document.getElementById('info-value-phone-el').classList.add('shown')},'reasonPhone')">—</span></div></div>
+          <div><div class="info-label" data-t="info-label-phone">الهاتف وواتساب</div><div class="info-value"><span id="info-value-phone-el" class="rzq-contact-masked rizq-phone-ltr" onclick="rizqRequireAuth(function(){document.getElementById('info-value-phone-el').classList.add('shown')},'reasonPhone')">—</span></div></div>
         </div>
         <div class="info-row">
           <span class="info-icon">📧</span>
@@ -851,25 +957,25 @@ footer{
         <a class="view-all-btn" href="rizq_products.html" data-t="view-all-products">عرض الكل ←</a>
       </div>
       <div class="products-grid" id="products-grid">
-        <div class="rzq-empty" id="products-empty" data-t="products-empty" style="grid-column:1/-1;text-align:center;padding:36px 16px;color:#6a7a8a;font-size:14px">
+        <div class="rzq-empty" id="products-empty" data-t="products-empty">
           لا توجد منتجات بعد
         </div>
       </div>
 
       <!-- Reviews -->
-      <div style="margin-top:32px" id="reviews-section">
-        <div class="section-title" style="margin-bottom:16px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-        <div style="background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
-          <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;flex-wrap:wrap">
-            <div style="text-align:center">
-              <div style="font-size:52px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
-              <div style="color:#F5A623;font-size:20px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
+      <div style="margin-top:28px" id="reviews-section">
+        <div class="section-title" style="margin-bottom:14px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+        <div style="padding:22px 20px">
+          <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;flex-wrap:wrap">
+            <div style="text-align:center;min-width:110px">
+              <div style="font-size:44px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
+              <div style="color:#F5A623;font-size:18px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
               <div style="font-size:12px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
             </div>
             <div style="flex:1;min-width:160px" id="store-rating-breakdown"></div>
           </div>
           <div id="reviews-list"></div>
-          <button class="view-all-btn" style="margin-top:12px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+          <button class="view-all-btn" style="margin-top:14px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
         </div>
       </div>
     </main>

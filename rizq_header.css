@@ -780,7 +780,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     z-index:1;
   }
   html.rizq-app-nav.has-rizq-desk-nav .rl-header{z-index:2}
-  html.rizq-app-nav.has-rizq-desk-nav .mobile-tabs{top:126px}
+  html.rizq-app-nav.has-rizq-desk-nav .mobile-tabs{top:0}
   html.rizq-app-nav .browse-wrap{height:calc(100vh - 72px - 41px) !important}
   html.rizq-app-nav .sidebar,
   html.rizq-app-nav aside.sidebar{
@@ -814,6 +814,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav .hero-content{padding-top:12px !important}
   html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
+  /* على الموبايل التبويبات ليست sticky — لا تُزح top (كان يقص شريط الإحصاءات) */
+  html.rizq-app-nav body .mobile-tabs{
+    position:relative !important;
+    top:0 !important;
+  }
   html.rizq-app-nav .browse-wrap{
     height:auto !important;
     min-height:calc(100vh - var(--rizq-header-h) - 44px) !important;

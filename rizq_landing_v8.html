@@ -4629,11 +4629,14 @@ function closeSubModal() {
 }
 
 function browseSubCat() {
-  closeSubModal();
-  const params = new URLSearchParams();
-  if (currentCat) params.set('cat', currentCat);
-  if (currentSubCat) params.set('sub', currentSubCat);
-  window.location.href = 'rizq_browse.html' + (params.toString() ? '?' + params.toString() : '');
+  try { closeSubModal(); } catch (e) {}
+  var params = new URLSearchParams();
+  var cat = (typeof currentCat !== 'undefined' && currentCat) ? currentCat : '';
+  var sub = (typeof currentSubCat !== 'undefined' && currentSubCat) ? currentSubCat : '';
+  if (cat) params.set('cat', cat);
+  if (sub) params.set('sub', sub);
+  var url = 'rizq_browse.html' + (params.toString() ? '?' + params.toString() : '');
+  window.location.assign(url);
 }
 
 function postInSubCat() {
