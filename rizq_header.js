@@ -184,13 +184,66 @@
     return currentLang() === 'fr' ? fr : ar;
   }
 
+  function isStorePage() {
+    try {
+      var path = String(location.pathname || location.href || '').toLowerCase();
+      if (path.indexOf('rizq_store') >= 0) return true;
+      return !!(document.body && document.body.getAttribute('data-t-ns') === 'store');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isCommercePage() {
+    try {
+      var path = String(location.pathname || location.href || '').toLowerCase();
+      if (path.indexOf('rizq_store') >= 0 || path.indexOf('rizq_products') >= 0 || path.indexOf('rizq_cart') >= 0) return true;
+      var ns = document.body && document.body.getAttribute('data-t-ns');
+      return ns === 'store' || ns === 'products';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function commerceToolbarHtml() {
+    if (isStorePage()) {
+      return '';
+    }
+    if (!isCommercePage()) {
+      return '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+    }
+    var html = '';
+    if (isStorePage()) {
+      html +=
+        '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
+        t2('مفضلة المحل', 'Favoris boutique') +
+        '" title="' +
+        t2('مفضلة المحل', 'Favoris boutique') +
+        '">❤<span class="rizq-hdr-fav-count" data-rizq-store-wish-count hidden>0</span></button>';
+    } else {
+      html +=
+        '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' +
+        t2('المفضلة', 'Favoris') +
+        '" title="' +
+        t2('المفضلة', 'Favoris') +
+        '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+    }
+    html +=
+      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
+      t2('السلة', 'Panier') +
+      '" title="' +
+      t2('السلة', 'Panier') +
+      '">🛒<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
+    return html;
+  }
+
   function headerHtml() {
     return '' +
       '<header id="rizq-app-header" role="banner">' +
         '<div class="rizq-hdr-row1">' +
           '<div class="rizq-hdr-start">' +
             '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
-            '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>' +
+            commerceToolbarHtml() +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
             '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
           '</div>' +
@@ -1125,8 +1178,14 @@
       scheduleNavRefresh();
     }
     markActive();
-    if (window.RizqUx && typeof window.RizqUx.updateFavBadges === 'function') {
+    if (window.RizqUx && typeof window.RizqUx.updateCommerceBadges === 'function') {
+      window.RizqUx.updateCommerceBadges();
+    } else if (window.RizqUx && typeof window.RizqUx.updateFavBadges === 'function') {
       window.RizqUx.updateFavBadges();
+    }
+    if (isStorePage() && window.RizqUx && typeof window.RizqUx.updateStoreWishBadge === 'function') {
+      var wc = document.getElementById('nav-wish-count');
+      window.RizqUx.updateStoreWishBadge(wc ? parseInt(wc.textContent, 10) || 0 : 0);
     }
   }
 

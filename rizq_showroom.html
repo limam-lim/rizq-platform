@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css"/>
-<link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
 <style>
@@ -97,6 +97,29 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 /* ── ACTIONS BAR ── */
 .actions-bar{background:linear-gradient(135deg,var(--navy2),var(--dark));border-bottom:1px solid var(--border);padding:14px 20px}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* روابط أقسام الصفحة — تبقى ظاهرة عند إخفاء topnav على الجوال */
+.page-sec-strip{
+  position:sticky;top:var(--rizq-header-h,0);z-index:44;
+  background:linear-gradient(180deg,#0a1628,#122040);
+  border-bottom:1px solid rgba(201,168,76,.28);
+  box-shadow:0 6px 18px rgba(0,0,0,.2);
+}
+.page-sec-strip-inner{
+  max-width:1100px;margin:0 auto;padding:8px 12px;
+  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.page-sec-strip-inner::-webkit-scrollbar{display:none}
+.page-sec-btn{
+  flex:0 0 auto;padding:8px 14px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28);
+  color:#E8C96A;font-size:12.5px;font-weight:700;font-family:inherit;
+  cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s;
+}
+.page-sec-btn:hover{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.5)}
+@media(max-width:800px){
+  .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
+}
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .25s}
 .btn-msg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark)}
@@ -252,6 +275,16 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
+</div>
+
+<!-- روابط أقسام المعرض — لا تُخفى مع topnav على الجوال -->
+<div class="page-sec-strip" role="navigation" aria-label="أقسام المعرض">
+  <div class="page-sec-strip-inner">
+    <button type="button" class="page-sec-btn" onclick="rizqScroll('catalog-section')" id="sec-catalog-lbl">🚗 الكتالوج</button>
+    <button type="button" class="page-sec-btn" onclick="rizqScroll('about-section')" id="sec-about-lbl">من نحن</button>
+    <button type="button" class="page-sec-btn" onclick="rizqScroll('reviews-section')" id="sec-reviews-lbl">التقييمات</button>
+    <button type="button" class="page-sec-btn" onclick="rizqScroll('info-section')" id="sec-info-lbl">معلومات المعرض</button>
+  </div>
 </div>
 
 <!-- ══ ACTIONS BAR ══ -->
@@ -892,6 +925,14 @@ function applyLang(){
   document.getElementById('nav-about-lbl').textContent   = isFr ? 'À propos' : 'من نحن';
   document.getElementById('nav-reviews-lbl').textContent = isFr ? 'Avis' : 'التقييمات';
   document.getElementById('nav-info-lbl').textContent    = isFr ? 'Infos showroom' : 'معلومات المعرض';
+  var secCat = document.getElementById('sec-catalog-lbl');
+  var secAbout = document.getElementById('sec-about-lbl');
+  var secRev = document.getElementById('sec-reviews-lbl');
+  var secInfo = document.getElementById('sec-info-lbl');
+  if (secCat) secCat.textContent = isFr ? '🚗 Catalogue' : '🚗 الكتالوج';
+  if (secAbout) secAbout.textContent = isFr ? 'À propos' : 'من نحن';
+  if (secRev) secRev.textContent = isFr ? 'Avis' : 'التقييمات';
+  if (secInfo) secInfo.textContent = isFr ? 'Infos showroom' : 'معلومات المعرض';
   document.getElementById('nav-disc-txt').textContent    = isFr ? '⚖️ Rizq — intermédiaire uniquement' : '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
   // Hero badges + rating
   document.getElementById('badge-verified-lbl').textContent = isFr ? '✅ Vérifié Rizq' : '✅ موثّق رزق';

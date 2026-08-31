@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
@@ -216,6 +216,9 @@ a{text-decoration:none;color:inherit}
 /* ════════ ACTIONS BAR ════════ */
 .actions-bar{background:#fff;border-bottom:1px solid #e0e8f0;padding:0 20px;box-shadow:var(--shadow-sm)}
 .actions-bar-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:11px 0;gap:12px;flex-wrap:wrap}
+@media(max-width:820px){
+  .actions-bar{position:sticky;top:var(--rizq-header-h,0);z-index:43}
+}
 .action-btns{display:flex;gap:9px;flex-wrap:wrap}
 .act-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;text-decoration:none;font-family:inherit;border:none}
 .act-wa{background:#25D366;color:#fff}
@@ -1359,7 +1362,7 @@ function openMaps(){
       if(locked || (!phone && !email && !wa)){
         setText('contact-info-phone', '📞 ••• ••• •••');
         setText('contact-info-email', '✉️ •••@•••.•••');
-        ['sb-wa','act-wa-top','sb-call','act-call-top','sb-email'].forEach(function(btnId){
+        ['sb-wa','act-wa-top','sticky-wa','sb-call','act-call-top','sticky-call','sb-email'].forEach(function(btnId){
           var el = document.getElementById(btnId);
           if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
         });
@@ -1370,11 +1373,13 @@ function openMaps(){
         var waNum = String(waSrc).replace(/[^0-9]/g,'');
         setHref('sb-wa', 'https://wa.me/' + waNum);
         setHref('act-wa-top', 'https://wa.me/' + waNum);
+        setHref('sticky-wa', 'https://wa.me/' + waNum);
       }
       if(phone){
         var telNum = String(phone).replace(/\s/g,'');
         setHref('sb-call', 'tel:' + telNum);
         setHref('act-call-top', 'tel:' + telNum);
+        setHref('sticky-call', 'tel:' + telNum);
         setText('contact-info-phone', '📞 ' + phone);
       }
       if(email){
@@ -1993,6 +1998,13 @@ html{background:#071020!important}
   color:#E8C96A;box-shadow:4px 0 24px rgba(201,168,76,.2);
 }
 </style>
+
+<!-- شريط تواصل ثابت على الجوال — يمنع اختفاء واتساب/اتصال عند التمرير -->
+<div class="sticky-cta" aria-label="تواصل سريع">
+  <a class="s-btn s-wa" id="sticky-wa" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">📲 واتساب</a>
+  <a class="s-btn s-call" id="sticky-call" href="tel:#" dir="ltr" onclick="return rizqGateLink(this,event,'reasonPhone')">📞 اتصال</a>
+  <button type="button" class="s-btn s-mail" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">💬 مراسلة</button>
+</div>
 
 <!-- FIXED RIZQ LOGO (right) -->
 <a class="fixed-rizq-logo" href="rizq_landing_v8.html" title="رزق — Accueil / الرئيسية">

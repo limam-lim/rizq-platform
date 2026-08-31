@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=11.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>واجهة المعرض — رزق</title>
 <style>
@@ -73,6 +73,27 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 /* ──── ACTIONS BAR ──── */
 .actions-bar{background:var(--white);border-bottom:1px solid #e0e8f0;padding:0 20px}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:12px;flex-wrap:wrap}
+.page-sec-strip{
+  position:sticky;top:var(--rizq-header-h,0);z-index:44;
+  background:#fff;border-top:3px solid #C9A84C;border-bottom:1px solid rgba(27,58,107,.1);
+  box-shadow:0 6px 18px rgba(15,35,65,.06);
+}
+.page-sec-strip-inner{
+  max-width:1100px;margin:0 auto;padding:8px 12px;
+  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.page-sec-strip-inner::-webkit-scrollbar{display:none}
+.page-sec-btn{
+  flex:0 0 auto;padding:8px 14px;border-radius:999px;
+  background:rgba(27,58,107,.05);border:1px solid rgba(27,58,107,.12);
+  color:#1B3A6B;font-size:12.5px;font-weight:700;font-family:inherit;
+  cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s;
+}
+.page-sec-btn:hover{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.45);color:#8a6a18}
+@media(max-width:800px){
+  .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
+  .nav-links{display:none}
+}
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .action-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;text-decoration:none;font-family:inherit;border:none}
 .btn-whatsapp{background:#25D366;color:#fff}
@@ -418,6 +439,16 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   </div>
 </div>
 
+<!-- روابط أقسام الصفحة — تبقى ظاهرة عند إخفاء topnav على الجوال -->
+<div class="page-sec-strip" role="navigation" aria-label="أقسام المعرض">
+  <div class="page-sec-strip-inner">
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('items-section').scrollIntoView({behavior:'smooth'})" id="sec-items-lbl">المعروضات</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('about-section').scrollIntoView({behavior:'smooth'})" id="sec-about-lbl">من نحن</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})" id="sec-reviews-lbl">التقييمات</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('info-section').scrollIntoView({behavior:'smooth'})" id="sec-info-lbl">معلومات المعرض</button>
+  </div>
+</div>
+
 <!-- ACTIONS BAR -->
 <div class="actions-bar">
   <div class="actions-bar-inner">
@@ -758,6 +789,10 @@ var _CORP_FR={
   'nav-about-lbl':'À propos',
   'nav-reviews-lbl':'Avis',
   'nav-info-lbl':'Infos showroom',
+  'sec-items-lbl':'Produits',
+  'sec-about-lbl':'À propos',
+  'sec-reviews-lbl':'Avis',
+  'sec-info-lbl':'Infos showroom',
   // Hero
   'corp-name':'Showroom Al-Riyada',
   'corp-tagline':'Al-Riyada Corp — Voitures et immobilier de prestige',
@@ -868,6 +903,10 @@ var _CORP_AR={
   'nav-about-lbl':'من نحن',
   'nav-reviews-lbl':'التقييمات',
   'nav-info-lbl':'معلومات المعرض',
+  'sec-items-lbl':'المعروضات',
+  'sec-about-lbl':'من نحن',
+  'sec-reviews-lbl':'التقييمات',
+  'sec-info-lbl':'معلومات المعرض',
   'corp-name':'معرض الريادة',
   'corp-tagline':'Al-Riyada Corp — سيارات وعقارات متميزة',
   'corp-meta-city':'📍 نواكشوط — حي الكفاح',

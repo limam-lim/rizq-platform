@@ -113,6 +113,52 @@
     });
   }
 
+  function cartItems() {
+    try {
+      var v = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
+      return Array.isArray(v) ? v : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function cartCount() {
+    return cartItems().reduce(function (s, c) {
+      return s + (Number(c.qty) || 1);
+    }, 0);
+  }
+
+  function updateCartBadges() {
+    var n = cartCount();
+    document.querySelectorAll('[data-rizq-cart-count], #nav-cart-count').forEach(function (el) {
+      el.textContent = n > 99 ? '99+' : String(n);
+      if (el.hasAttribute('hidden')) el.hidden = n < 1;
+      el.classList.toggle('is-empty', n < 1);
+    });
+    document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart').forEach(function (el) {
+      el.classList.toggle('has-items', n > 0);
+      el.setAttribute('aria-label', t('السلة (' + n + ')', 'Panier (' + n + ')'));
+    });
+  }
+
+  function updateStoreWishBadge(count) {
+    if (count == null) return;
+    var n = Number(count) || 0;
+    document.querySelectorAll('[data-rizq-store-wish-count], #nav-wish-count, #ab-wish-count').forEach(function (el) {
+      el.textContent = n > 99 ? '99+' : String(n);
+      if (el.hasAttribute('hidden')) el.hidden = n < 1;
+      el.classList.toggle('is-empty', n < 1);
+    });
+    document.querySelectorAll('#rizq-hdr-store-wish').forEach(function (el) {
+      el.classList.toggle('has-favs', n > 0);
+    });
+  }
+
+  function updateCommerceBadges() {
+    updateCartBadges();
+    updateFavBadges();
+  }
+
   var CONDITION_OPTS = [
     { v: 'جديد', ar: '✨ جديد', fr: '✨ Neuf' },
     { v: 'مستعمل — ممتاز', ar: '⭐ مستعمل — ممتاز', fr: '⭐ Occasion — excellent' },
@@ -397,11 +443,17 @@
 
   function boot() {
     updateFavBadges();
+    updateCartBadges();
     document.addEventListener('rizq_wishlist', updateFavBadges);
+    document.addEventListener('rizq_cart', updateCartBadges);
     window.addEventListener('storage', function (e) {
       if (e.key === 'rizq_wishlist') updateFavBadges();
+      if (e.key === 'rizq_cart') updateCartBadges();
     });
-    document.addEventListener('rizq:langchange', updateFavBadges);
+    document.addEventListener('rizq:langchange', function () {
+      updateFavBadges();
+      updateCartBadges();
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
@@ -417,6 +469,10 @@
     showToast: showToast,
     toastFav: toastFav,
     updateFavBadges: updateFavBadges,
+    cartCount: cartCount,
+    updateCartBadges: updateCartBadges,
+    updateStoreWishBadge: updateStoreWishBadge,
+    updateCommerceBadges: updateCommerceBadges,
     CONDITION_OPTS: CONDITION_OPTS,
     conditionLabel: conditionLabel,
     conditionFilterHtml: conditionFilterHtml,

@@ -686,7 +686,10 @@ function addToCart(id) {
 
 function updateCartCount() {
   const t = cart.reduce((s,c) => s+c.qty, 0);
-  document.getElementById('nav-cart-count').textContent = t;
+  const el = document.getElementById('nav-cart-count');
+  if (el) el.textContent = t;
+  if (window.RizqUx && typeof RizqUx.updateCartBadges === 'function') RizqUx.updateCartBadges();
+  try { document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); } catch (e) {}
 }
 
 // Modal

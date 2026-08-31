@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=17.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -74,10 +74,51 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
   text-decoration:none;order:2;
 }
 .cart-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,0.4)}
-.cart-count{
-  background:#0D1B2A;color:var(--gold);
-  border-radius:50%;width:20px;height:20px;
-  font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;
+/* شريط تسوق ثابت — بين الهيرو وأزرار التواصل، يلتصق بالهيدر عند التمرير */
+.store-shop-strip{
+  position:sticky;
+  top:var(--rizq-header-h,0);
+  z-index:45;
+  background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
+  border-top:3px solid var(--gold);
+  border-bottom:1px solid rgba(27,58,107,.1);
+  box-shadow:0 6px 20px rgba(15,35,65,.08);
+}
+.store-shop-strip-inner{
+  max-width:1280px;margin:0 auto;padding:12px 20px;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.sss-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:12px 16px;border-radius:12px;
+  font-family:inherit;font-size:14px;font-weight:800;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:transform .2s,box-shadow .2s,filter .2s;
+}
+.sss-btn:active{transform:scale(.98)}
+.sss-ico{font-size:18px;line-height:1}
+.sss-count{
+  min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+  font-size:11px;font-weight:900;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.sss-wish{
+  background:#fff;color:#1B3A6B;
+  border:2px solid rgba(27,58,107,.15);
+}
+.sss-wish:hover{border-color:rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(27,58,107,.08)}
+.sss-wish .sss-count{background:rgba(27,58,107,.08);color:#1B3A6B}
+.sss-cart{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0D1B2A;border:none;
+  box-shadow:0 6px 18px rgba(201,168,76,.3);
+}
+.sss-cart:hover{filter:brightness(1.03);box-shadow:0 8px 22px rgba(201,168,76,.4)}
+.sss-cart .sss-count{background:#0D1B2A;color:#E8C96A}
+.sss-count[hidden],.sss-count.is-empty{display:none!important}
+@media(max-width:800px){
+  .store-shop-strip-inner{padding:10px 12px;gap:8px}
+  .sss-btn{font-size:13px;padding:11px 10px}
 }
 
 /* ====== HERO / STORE COVER ====== */
@@ -766,7 +807,7 @@ footer{
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
 <script src="rizq_auth_gate.js" defer></script>
-<script src="rizq_ux_polish.js?v=17.0"></script>
+<script src="rizq_ux_polish.js?v=17.4"></script>
 </head>
 <body data-t-ns="store">
 <button class="btn-lang" id="lang-btn">FR</button>
@@ -841,6 +882,22 @@ footer{
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- شريط السلة والمفضلة — ثابت تحت الهيرو -->
+<div class="store-shop-strip" role="navigation" aria-label="السلة والمفضلة">
+  <div class="store-shop-strip-inner">
+    <button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="المفضلة" data-t="nav-wish">
+      <span class="sss-ico" aria-hidden="true">❤</span>
+      <span data-t="nav-wish-label">المفضلة</span>
+      <span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>
+    </button>
+    <a class="sss-btn sss-cart" href="rizq_cart.html" title="السلة" data-t="cart-label">
+      <span class="sss-ico" aria-hidden="true">🛒</span>
+      <span data-t="cart-label-text">السلة</span>
+      <span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>
+    </a>
   </div>
 </div>
 
@@ -1061,6 +1118,7 @@ function _renderWishUI(){
   });
   var countEl = document.getElementById('nav-wish-count');
   if(countEl) countEl.textContent = list.length;
+  if(window.RizqUx && typeof RizqUx.updateStoreWishBadge === 'function') RizqUx.updateStoreWishBadge(list.length);
   var panel = document.getElementById('wish-panel-list');
   if(panel){
     panel.innerHTML = list.length ? list.map(function(p){
@@ -2062,6 +2120,12 @@ function updateCartCount(){
   var t = cart.reduce(function(s,c){ return s + (c.qty||0); }, 0);
   var el = document.getElementById('nav-cart-count');
   if (el) el.textContent = t;
+  if(window.RizqUx && typeof RizqUx.updateCartBadges === 'function') RizqUx.updateCartBadges();
+  else {
+    var ab = document.getElementById('ab-cart-count');
+    if(ab){ ab.textContent = t; ab.hidden = t < 1; }
+  }
+  try{ document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); }catch(e){}
 }
 function addToCartStore(id){
   var p = (window.STORE_FEATURED_PRODUCTS || STORE_FEATURED_PRODUCTS)[id];
@@ -2151,6 +2215,9 @@ if(typeof _t2 === 'undefined'){
     /* Navbar */
     'nav-home':'Accueil','nav-products':'Produits','nav-reviews':'Avis','nav-store-info':'Infos boutique',
     'cart-label':'Panier',
+    'cart-label-text':'Panier',
+    'nav-wish':'❤ Favoris',
+    'nav-wish-label':'Favoris',
     /* Hero */
     'store-name':'Boutique','store-tagline':'',
     'store-rating-meta':'⭐ —',
@@ -2188,7 +2255,6 @@ if(typeof _t2 === 'undefined'){
     'prod5-name':'Chemise homme','prod6-name':'Sac à main',
     'add-cart':'🛒 Ajouter',
     'tag-hot':'🔥 Meilleure vente','tag-new':'✨ Nouveau','qv-text':'👁 Aperçu rapide',
-    'nav-wish':'❤ Favoris',
     /* Reviews */
     'reviews-title':'⭐ Avis clients','review-count-txt':'Note globale','view-all-reviews':'Voir tous les avis',
     /* Packages */
