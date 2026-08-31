@@ -190,6 +190,7 @@
         '<div class="rizq-hdr-row1">' +
           '<div class="rizq-hdr-start">' +
             '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
+            '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>' +
             '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
             '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
           '</div>' +
@@ -1124,6 +1125,9 @@
       scheduleNavRefresh();
     }
     markActive();
+    if (window.RizqUx && typeof window.RizqUx.updateFavBadges === 'function') {
+      window.RizqUx.updateFavBadges();
+    }
   }
 
   window.RizqHeader = {

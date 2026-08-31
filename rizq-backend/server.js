@@ -2677,6 +2677,7 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
     subcat: String(b.subcat || '').slice(0, 80),
     emoji: String(b.emoji || '').slice(0, 8),
     wilaya: String(b.wilaya || '').slice(0, 60),
+    condition: String(b.condition || '').slice(0, 40),
     images,
     seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
     accountId: b.accountId ? String(b.accountId).slice(0, 60) : null,
@@ -2802,7 +2803,7 @@ app.patch('/api/ads/:id', async (req, res) => {
   const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
   if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
   const b = req.body || {};
-  const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya'];
+  const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition'];
   editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
   if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
     ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)

@@ -19,8 +19,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="rizq-theme.css?v=16.5"/>
-  <link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+<link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
+  <link rel="stylesheet" href="rizq_header.css?v=17.0"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
 <meta name="description" content="شقة فاخرة 3 غرف للكراء في نواكشوط الغربية — 150,000 MRU/شهر. تكييف مركزي، موقف سيارات، حراسة 24/7"/>
@@ -464,6 +464,7 @@ function _trackAdListingVisit(ad){
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
@@ -805,13 +806,15 @@ function _mapRawAdToListing(a){
   var _priceNum = parseInt(String(a.price||'0').replace(/[^\d]/g,'')) || 0;
   var _origP = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,'')) || 0;
   var _discountPct = (_origP>0 && _priceNum>0 && _origP>_priceNum) ? Math.round((1-(_priceNum/_origP))*100) : 0;
-  return {
+  var out = {
     id: a.id, accountId: a.accountId||'', title: a.title||'(بدون عنوان)', titleFr: a.titleFr||'', price: a.price?(a.price+' MRU'):'تفاوض',
     originalPriceNum: _origP, discountPct: _discountPct,
     loc: a.wilaya||'غير محدد', seller: 'صاحب الإعلان', phone: '',
     emoji: a.emoji||'📦', desc: a.desc||'', descFr: a.descFr||'', cat: a.category||'', subcat: a.subcat||'',
     verified: _badges.verified, pin: (_badges.premium || _boosted), boosted: _boosted, images: Array.isArray(a.images) ? a.images : [],
     stockQty: (a.stockQty!=null && Number.isFinite(Number(a.stockQty))) ? Number(a.stockQty) : null,
+    condition: a.condition || '',
+    seller_trust_score: (a.seller_trust_score != null) ? Number(a.seller_trust_score) : undefined,
     contactsLocked: !!a.contactsLocked,
     contactAccess: a.contactAccess || null,
     sellerContact: a.sellerContact || null
@@ -1168,13 +1171,18 @@ function renderLocAndStats(ad){
   const bcEl = document.getElementById('bc-ad-title');
   if(bcEl) bcEl.textContent = adTitleL.substring(0, 30) + '...';
 
-  // تحديث بطاقة البائع (الاسم + الأفاتار) حسب الإعلان الفعلي
-  const sellerNameEl = document.querySelector('.seller-name');
-  if(sellerNameEl) sellerNameEl.textContent = ad.seller;
-  const sellerAvEl = document.querySelector('.seller-av');
-  if(sellerAvEl) sellerAvEl.innerHTML = iconHTML(ad.emoji);
-  const sellerBadgeEl = document.querySelector('.seller-badge');
-  if(sellerBadgeEl) sellerBadgeEl.textContent = _rizqLang()==='fr' ? (ad.verified ? '✅ Vendeur vérifié' : '⏳ En cours de vérification') : (ad.verified ? '✅ بائع موثّق' : '⏳ قيد المراجعة');
+  // تحديث بطاقة البائع (اسم + ثقة) حسب الإعلان الفعلي
+  const sellerRowEl = document.querySelector('.contact-card .seller-row');
+  if(sellerRowEl && window.RizqUx && typeof RizqUx.trustCardHtml === 'function'){
+    sellerRowEl.outerHTML = RizqUx.trustCardHtml(ad);
+  } else {
+    const sellerNameEl = document.querySelector('.seller-name');
+    if(sellerNameEl) sellerNameEl.textContent = ad.seller;
+    const sellerAvEl = document.querySelector('.seller-av');
+    if(sellerAvEl) sellerAvEl.innerHTML = iconHTML(ad.emoji);
+    const sellerBadgeEl = document.querySelector('.seller-badge');
+    if(sellerBadgeEl) sellerBadgeEl.textContent = _rizqLang()==='fr' ? (ad.verified ? '✅ Vendeur vérifié' : '⏳ En cours de vérification') : (ad.verified ? '✅ بائع موثّق' : '⏳ قيد المراجعة');
+  }
 
   // ربط زر كشف الرقم:
   // — إن وُجد رقم: يبقى onclick="rizqRequireAuth(function(){revealPhone()},...)" من

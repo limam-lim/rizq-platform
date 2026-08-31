@@ -116,8 +116,10 @@ nav.nav-compact .nav-sticky-tools{display:flex}
 nav.nav-compact .nav-center{display:none}
 .nav-sticky-search-wrap{
   display:flex;flex:1;align-items:center;background:rgba(255,255,255,.08);
-  border:1px solid rgba(201,168,76,.28);border-radius:10px;overflow:hidden;min-width:0;
+  border:1px solid rgba(201,168,76,.28);border-radius:10px;overflow:visible;min-width:0;
+  position:relative;
 }
+.nav-sticky-search-wrap.rizq-sugg-host{position:relative;overflow:visible;}
 .nav-sticky-search-wrap input{
   flex:1;border:none;background:transparent;color:#fff;font-size:13px;padding:8px 12px;
   font-family:inherit;outline:none;min-width:0;

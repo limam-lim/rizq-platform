@@ -10,8 +10,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="rizq-theme.css?v=16.5"/>
-  <link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+<link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
+  <link rel="stylesheet" href="rizq_header.css?v=17.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
@@ -402,6 +402,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
+<script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
 <body>
 
@@ -687,6 +688,7 @@ main, .page-content.active, .main-content, .results-area,
           <span style="font-size:20px;font-weight:900;color:var(--gold-dk,#a07820)" id="prev-price">0 MRU</span>
           <span style="font-size:12px;color:var(--text-muted)" id="prev-loc" data-t-fr="📍 Emplacement">📍 الموقع</span>
         </div>
+        <div style="font-size:12px;color:var(--text-soft);margin-top:10px" id="prev-condition"></div>
       </div>
     </div>
 
@@ -719,6 +721,7 @@ main, .page-content.active, .main-content, .results-area,
       <h2 class="success-title" data-t-fr="Votre annonce a été publiée avec succès !">تم نشر إعلانك بنجاح!</h2>
       <p class="success-sub" data-t-fr="Votre annonce est maintenant visible par des milliers de visiteurs sur Rizq.<br/>Vous recevrez des notifications dès qu'on vous contacte.">إعلانك الآن مرئي لآلاف الزوار على رزق.<br/>ستصلك إشعارات عند تواصل أحد معك.</p>
       <div class="success-id" data-t-fr='Numéro de l&#39;annonce : <strong id="success-id">RZQ-2026-XXXXX</strong>'>رقم الإعلان: <strong id="success-id">RZQ-2026-XXXXX</strong></div>
+      <div id="success-condition" style="font-size:13px;color:var(--text-soft);margin:-12px 0 20px"></div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <button onclick="location.href='rizq_browse.html'" data-t-fr="👁 Voir mon annonce" style="padding:12px 24px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">👁 عرض إعلاني</button>
         <button onclick="location.href='rizq_dashboard.html'" data-t-fr="📊 Tableau de bord" style="padding:12px 24px;background:transparent;color:var(--gold);border:1.5px solid rgba(201,168,76,.3);border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">📊 لوحة التحكم</button>
@@ -1064,6 +1067,14 @@ function handleFiles(input){
   input.value=''; // يسمح بإعادة اختيار نفس الملف مجدداً لو أُزيل
 }
 
+function _showSuccessCondition(ad){
+  var el=document.getElementById('success-condition');
+  if(!el) return;
+  var cond=(ad&&ad.condition)||selCondition||'جديد';
+  var fr=_postLangFr();
+  var lbl=(window.RizqUx&&typeof RizqUx.conditionLabel==='function')?RizqUx.conditionLabel(cond):cond;
+  el.textContent=(fr?'État : ':'الحالة: ')+lbl;
+}
 function updatePreview(){
   const _frP=_postLangFr();
   const f=collectAdTextFields();
@@ -1079,6 +1090,11 @@ function updatePreview(){
   document.getElementById('prev-desc').textContent=desc.substring(0,120)+(desc.length>120?'...':'');
   document.getElementById('prev-price').textContent=parseInt(price).toLocaleString()+' MRU';
   document.getElementById('prev-loc').textContent='📍 '+(cityLine ? wilaya+' — '+cityLine : wilaya);
+  var prevCond=document.getElementById('prev-condition');
+  if(prevCond){
+    var condLbl=(window.RizqUx&&typeof RizqUx.conditionLabel==='function')?RizqUx.conditionLabel(selCondition||'جديد'):(selCondition||'جديد');
+    prevCond.textContent=(_frP?'État : ':'الحالة: ')+condLbl;
+  }
 }
 
 function togglePublish(){
@@ -1154,6 +1170,7 @@ function publishAd(){
     city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
     seller_trust_score: 60, // افتراضي — يُحدَّث عند توفر نظام الثقة
+    condition: selCondition || 'جديد',
     accountType: 'individual', // هذه الصفحة تخص الأفراد فقط — يُستخدم في rizq_moderator_agent.js لتطبيق قواعد قسم "الأفراد" تحديداً (راجع RIZQ_SECTION_MANAGEMENT_RULES.md)
   };
 
@@ -1228,6 +1245,7 @@ function publishAd(){
 
         _visualStep.then(function(){
           document.getElementById('success-id').textContent = data.id;
+          _showSuccessCondition(data);
           document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
           document.getElementById('panel-success').classList.add('active');
           document.querySelectorAll('.progress-steps .step').forEach(function(s){
@@ -1279,6 +1297,7 @@ function publishAd(){
       onReview: function(result, data){
         // يُعامَل كنشر ناجح لكن بحالة pending
         document.getElementById('success-id').textContent = data.id;
+        _showSuccessCondition(data);
         document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
         document.getElementById('panel-success').classList.add('active');
         document.querySelectorAll('.progress-steps .step').forEach(function(s){
@@ -1291,6 +1310,7 @@ function publishAd(){
   } else {
     // fallback إذا لم يُحمَّل الوكيل
     document.getElementById('success-id').textContent = adData.id;
+    _showSuccessCondition(adData);
     document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
     document.getElementById('panel-success').classList.add('active');
     document.querySelectorAll('.progress-steps .step').forEach(function(s){

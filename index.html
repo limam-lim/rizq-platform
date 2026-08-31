@@ -22,10 +22,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=16.5"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=16.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.0"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -1851,6 +1851,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js?v=16.3" defer></script>
+<script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
 <body>
 
@@ -1869,6 +1870,10 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <span class="nav-account-ico" aria-hidden="true">👤</span>
       <span data-t="nav-account">حسابي</span>
     </button>
+    <a href="#wishlist-block" class="nav-account-btn" data-rizq-fav-wrap aria-label="المفضلة" title="المفضلة" style="text-decoration:none;gap:4px">
+      <span aria-hidden="true">❤️</span>
+      <span data-rizq-fav-count hidden>0</span>
+    </a>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="القائمة" title="القائمة">
       <span></span><span></span><span></span>
     </button>
@@ -1890,7 +1895,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </li>
   </ul>
   <div class="nav-sticky-tools" id="nav-sticky-tools">
-    <div class="nav-sticky-search-wrap">
+    <div class="nav-sticky-search-wrap rizq-sugg-host">
       <input type="search" id="nav-sticky-search-input" autocomplete="off" placeholder="البحث في رزق..." aria-label="البحث في رزق" data-ph-fr="Rechercher sur Rizq..."/>
       <button type="button" onclick="doNavStickySearch()" aria-label="بحث">🔍</button>
     </div>
@@ -1977,7 +1982,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <div class="hero-subtitle-card">
       <p class="hero-subtitle-primary" id="hero-sub-primary">خيارك الأول لفتح آفاق جديدة لأعمالك</p>
-      <p class="hero-subtitle-secondary" id="hero-sub-secondary">هنا يلتقي كل الموريتانيين</p>
+      <p class="hero-subtitle-secondary" id="hero-sub-secondary">حيث يلتقي كل الموريتانيين</p>
     </div>
     <div class="hero-pills">
       <span class="hero-pill">بيع 🛍️</span>
@@ -2736,7 +2741,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       </div>
 
       <!-- Main description — translated by data-t engine -->
-      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif">رزق هي منصة موريتانيا الشاملة للإعلانات والأعمال، طوّرتها <strong style="color:var(--royal)">ADMINIA SARL</strong> لتجمع الإعلانات المبوبة الفردية، والمعارض التجارية الموثّقة، وغرفة المناقصات الخاصة بين الشركات — نقطة لقاء آمنة وموثوقة بين البائعين والمشترين والتجار في كل الولايات، كل ذلك في مكان واحد، بثقة وبساطة.</p>
+      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال، الأولى في موريتانيا بوكلاء أذكياء يعملون على مدار الساعة. من الإعلانات المبوبة الفردية، إلى المعارض التجارية الموثّقة، إلى غرفة المناقصات الخاصة بين الشركات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em></p>
 
       <!-- Divider -->
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);margin-bottom:28px"></div>
@@ -2921,8 +2926,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       </a>
     </nav>
 
-    <h2 class="cta-title" data-t="cta-title">تبيع، تناقص، أو تدير مكتبك؟<br/><span>رزقك في انتظارك</span></h2>
-    <p class="cta-desc" data-t="cta-desc">رزق ليس سوقاً فقط — بيع فردي، محل تجاري، معرض سيارات، مكتب خدمات، أو <strong style="color:#a7f3d0">غرفة مناقصات</strong> تستقبل عروض أسعار حقيقية.<br/>سجّل الآن وانشر إعلانك أو مناقصتك الأولى مجاناً.</p>
+    <h2 class="cta-title" data-t="cta-title">تبيع، تناقص، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span></h2>
+    <p class="cta-desc" data-t="cta-desc">رزق منصة إلكترونية متكاملة بوكلاء أذكياء يعملون على مدار الساعة؛ يفتح لك ولأعمالك آفاقاً جديدة، فهو ليس سوقاً عادياً — بل مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، و<strong style="color:#a7f3d0">غرف المناقصات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.</p>
 
     <div class="cta-btns">
       <button class="btn-primary" onclick="openModal('register')" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
@@ -4045,8 +4050,10 @@ function getFavorites(){ return _wishlistIds(); }
 function isFavorited(id){ return _wishlistHas(id); }
 function toggleFavoriteAd(){
   if(!currentAdRef || currentAdRef.id==null) return;
-  _wishlistToggle(currentAdRef.id);
+  var added = _wishlistToggle(currentAdRef.id);
   updateFavBtnUI();
+  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
+  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
 }
 function updateFavBtnUI(){
   if(!currentAdRef) return;
@@ -4189,7 +4196,17 @@ function renderAllAds(cat) {
           <span style="font-size:10px;color:rgba(255,255,255,.6)">${d.loc}</span>
         </div>
       </div>\n    </div>`; }).join('');
-  if(filtered.length===0) grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">${isAr?'لا توجد إعلانات في هذا القسم':'Aucune annonce dans cette catégorie'}</div>`;
+  if(filtered.length===0){
+    if(window.RizqUx&&typeof RizqUx.emptyStateHtml==='function'){
+      grid.innerHTML=RizqUx.emptyStateHtml({
+        title: isAr?'لا توجد إعلانات في هذا القسم':'Aucune annonce dans cette catégorie',
+        primaryHref:'rizq_post.html',
+        secondaryOnclick:"document.getElementById('all-ads-grid')&&(document.getElementById('all-ads-grid').scrollIntoView({behavior:'smooth'}))"
+      });
+    } else {
+      grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">${isAr?'لا توجد إعلانات في هذا القسم':'Aucune annonce dans cette catégorie'}</div>`;
+    }
+  }
   const countEl = document.getElementById('all-ads-count');
   if(countEl) countEl.textContent = isAr ? (filtered.length+' إعلان') : (filtered.length+(filtered.length===1?' annonce':' annonces'));
 }
@@ -4197,6 +4214,8 @@ function quickToggleFavorite(adId, btn) {
   var added = _wishlistToggle(adId);
   if (btn) btn.textContent = added ? '❤️' : '🤍';
   if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
+  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
+  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
 }
 
 // ── SEARCH SUGGESTIONS — from live ADS, not dummy queries ──
@@ -4655,7 +4674,7 @@ const LANG = {
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
     'nav-account': 'حسابي', 'nav-post': 'نشر (+)', 'nav-assistant': '✨ رزق ذكي', 'nav-home': 'الرئيسية',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
-    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال. من الإعلانات المبوبة الفردية، إلى المعارض التجارية الموثّقة، إلى غرفة المناقصات الخاصة بين الشركات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em>',
+    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال، الأولى في موريتانيا بوكلاء أذكياء يعملون على مدار الساعة. من الإعلانات المبوبة الفردية، إلى المعارض التجارية الموثّقة، إلى غرفة المناقصات الخاصة بين الشركات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em>',
     'nav-stores': '🏪 المحلات', 'nav-offices': '💼 المكاتب', 'nav-showrooms': '🏬 المعارض', 'nav-tenders': '📋 المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن',
     'vsh-title': 'افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">معرضك الافتراضي</span> على رزق',
@@ -4706,8 +4725,8 @@ const LANG = {
     'why3-desc': 'صوّر، اكتب السعر، اختر الفئة والولاية، اضغط نشر. إعلانك يصل فوراً لآلاف المهتمين في موريتانيا وما حولها.',
     's-price-title': 'خطط <span>شفافة وبسيطة</span>',
     's-price-desc': 'ابدأ مجاناً وطوّر تجربتك متى شئت',
-    'cta-title': 'تبيع، تناقص، أو تدير مكتبك؟<br/><span>رزقك في انتظارك</span>',
-    'cta-desc': 'رزق ليس سوقاً فقط — بيع فردي، محل تجاري، معرض سيارات، مكتب خدمات، أو <strong style="color:#a7f3d0">غرفة مناقصات</strong> تستقبل عروض أسعار حقيقية.<br/>سجّل الآن وانشر إعلانك أو مناقصتك الأولى مجاناً.',
+    'cta-title': 'تبيع، تناقص، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span>',
+    'cta-desc': 'رزق منصة إلكترونية متكاملة بوكلاء أذكياء يعملون على مدار الساعة؛ يفتح لك ولأعمالك آفاقاً جديدة، فهو ليس سوقاً عادياً — بل مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، و<strong style="color:#a7f3d0">غرف المناقصات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.',
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً',
     'cta-note': '&nbsp;تسجيل آمن بالإيميل &nbsp;|&nbsp; مجاني تماماً',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
@@ -5021,7 +5040,7 @@ function applyLandingLang(toAr) {
 
   const heroSubSecondary = document.querySelector('#hero-sub-secondary');
   if (heroSubSecondary) heroSubSecondary.textContent = isAr
-    ? 'هنا يلتقي كل الموريتانيين'
+    ? 'حيث يلتقي كل الموريتانيين'
     : 'Là où tous les Mauritaniens se retrouvent';
 
   // Cat-name & qcat-name font size — smaller in FR
@@ -8150,7 +8169,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_widget_embed.js"></script>
-<script src="rizq_landing_ux.js?v=16.3"></script>
+<script src="rizq_landing_ux.js?v=17.0"></script>
 <script src="rizq_disclaimer.js"></script>
 
 

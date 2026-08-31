@@ -7,11 +7,11 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="stylesheet" href="rizq-theme.css?v=16.8"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=16.9"/>
+  <link rel="stylesheet" href="rizq_header.css?v=17.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -41,8 +41,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .logo-text{display:flex;flex-direction:column;justify-content:center}
 .logo-text .logo-ar{font-family:Georgia,serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
 .logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,serif;font-style:italic;margin-top:2px;white-space:nowrap}
-.nav-search{flex:1;max-width:600px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.nav-search{flex:1;max-width:600px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative}
+.nav-search.rizq-sugg-host{overflow:visible;position:relative}
 .nav-search:focus-within{border-color:var(--gold)}
+.rc-thumb .rizq-img-wrap,.rc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .nav-search select{background:#f0f4f8;border:none;border-left:1px solid #dde3ea;padding:0 12px;height:42px;font-size:12.5px;font-family:'Segoe UI',sans-serif;color:#333;cursor:pointer;min-width:120px;outline:none;font-weight:600}
 .nav-search input{flex:1;border:none;outline:none;font-size:14px;color:#1a2535;background:transparent;padding:0 14px}
 .nav-search input::placeholder{color:#aab4c0}
@@ -824,6 +826,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js?v=15.0" defer></script>
+<script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
@@ -838,7 +841,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     </div>
     <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
   </a>
-  <div class="nav-search">
+  <div class="nav-search rizq-sugg-host">
     <select id="nav-cat-select" onchange="filterByCat(this.value);renderCatSidebar(normalizeCat(this.value))">
       <option value="" data-t="all-cats">كل الأقسام</option>
       <option value="عقارات" data-ar="🏠 عقارات" data-fr="🏠 Immobilier">🏠 عقارات</option>
@@ -921,6 +924,17 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
             <option value="ألاك" data-ar="ألاك" data-fr="Aleg">ألاك</option>
             <option value="نعمة" data-ar="نعمة" data-fr="Néma">نعمة</option>
           </select>
+        </div>
+
+        <!-- حالة المنتج -->
+        <div class="filter-section" id="condition-filter-section">
+          <div class="filter-title"><span data-t="filter-condition">حالة المنتج</span><button type="button" onclick="clearSection('condition')" data-t="btn-clear-mini">مسح</button></div>
+          <div class="chips" id="condition-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="جديد" class="filter-cb"><span class="filter-label" data-t="cond-new">✨ جديد</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — ممتاز" class="filter-cb"><span class="filter-label" data-t="cond-exc">⭐ مستعمل — ممتاز</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — جيد" class="filter-cb"><span class="filter-label" data-t="cond-good">👍 مستعمل — جيد</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="للتصليح" class="filter-cb"><span class="filter-label" data-t="cond-fix">🔧 للتصليح</span></label>
+          </div>
         </div>
 
         <!-- السعر -->
@@ -1240,6 +1254,8 @@ function _mapRawAdsToDisplay(rawList){
         priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
         images:Array.isArray(a.images)?a.images:[],
+        condition:a.condition||'',
+        seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
         loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
         accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
@@ -1363,6 +1379,7 @@ const TRANSLATIONS = {
   ar:{
     'nav-post':'➕ انشر إعلان','nav-account':'حسابي','nav-home':'الرئيسية','all-cats':'كل الأقسام',
     'filter-title':'تصفية النتائج','filter-cat':'القسم','filter-wilaya':'الولاية','filter-price':'السعر (MRU)',
+    'filter-condition':'حالة المنتج','cond-new':'✨ جديد','cond-exc':'⭐ مستعمل — ممتاز','cond-good':'👍 مستعمل — جيد','cond-fix':'🔧 للتصليح',
     'filter-rooms':'عدد الغرف','filter-opts':'خيارات أخرى','btn-clear-mini':'مسح',
     'btn-apply':'تطبيق الفلاتر','btn-reset':'مسح الكل','all-wilayas':'كل الولايات',
     'f-verified':'موثّق فقط','f-pinned':'مميّز فقط',
@@ -1396,6 +1413,7 @@ const TRANSLATIONS = {
   fr:{
     'nav-post':'➕ Publier une annonce','nav-account':'Mon compte','nav-home':'Accueil','all-cats':'Toutes catégories',
     'filter-title':'Filtrer les résultats','filter-cat':'Catégorie','filter-wilaya':'Wilaya','filter-price':'Prix (MRU)',
+    'filter-condition':'État','cond-new':'✨ Neuf','cond-exc':'⭐ Occasion — excellent','cond-good':'👍 Occasion — bon','cond-fix':'🔧 À réparer',
     'filter-rooms':'Nb. de chambres','filter-opts':'Autres options','btn-clear-mini':'Effacer',
     'btn-apply':'Appliquer','btn-reset':'Tout effacer','all-wilayas':'Toutes les wilayas',
     'f-verified':'Vérifiés seulement','f-pinned':'En vedette seulement',
@@ -1544,6 +1562,8 @@ function applyFilters(){
   document.querySelectorAll('#rooms-chips .chip.on').forEach(c=>selRooms.push(parseInt(c.dataset.rooms)));
   const onlyVerified=document.getElementById('cb-verified').checked;
   const onlyPinned=document.getElementById('cb-pinned').checked;
+  const condR=document.querySelector('input[name="rcond"]:checked');
+  const selCond=condR?condR.value:'';
   const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat;
   const sortBy=document.getElementById('sort-select').value;
 
@@ -1553,6 +1573,7 @@ function applyFilters(){
     if(selCat&&a.subcat!==selCat&&!a.cat.includes(selCat))return false;
     if(selSeller&&a.seller!==selSeller)return false;
     if(selWilaya&&a.wilaya!==selWilaya)return false;
+    if(selCond&&a.condition!==selCond)return false;
     if(onlyVerified&&!a.verified)return false;
     if(onlyPinned&&!a.pin)return false;
     if(selRooms.length){const ok=selRooms.some(r=>r>=4?a.rooms>=4:a.rooms===r);if(!ok)return false;}
@@ -1592,7 +1613,11 @@ function renderResultList(){
   const fr=_rizqLang()==='fr';
 
   if(!items.length){
-    body.innerHTML=`<div class="rc-empty"><div class="rei">🔍</div><p>${fr?'Aucune annonce trouvée':'لا توجد إعلانات مطابقة'}</p></div>`;
+    if(window.RizqUx && typeof RizqUx.emptyStateHtml==='function'){
+      body.innerHTML=RizqUx.emptyStateHtml({ secondaryOnclick:'resetAllFilters()' });
+    } else {
+      body.innerHTML=`<div class="rc-empty"><div class="rei">🔍</div><p>${fr?'Aucune annonce trouvée':'لا توجد إعلانات مطابقة'}</p></div>`;
+    }
     pagEl.innerHTML='';
     return;
   }
@@ -1604,8 +1629,19 @@ function renderResultList(){
     const _title=adTitleLocalized(a);
     const _price=fr?priceFr(a.price||''):(a.price||'');
     const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
+    const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
+    let thumbInner;
+    if(a.images&&a.images[0]){
+      if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
+        thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
+      } else {
+        thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
+      }
+    } else {
+      thumbInner=svgIcon;
+    }
     return `<div class="rc ${isActive}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
-      <div class="rc-thumb">${svgIcon}${a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:''}</div>
+      <div class="rc-thumb">${thumbInner}${_disc}</div>
       <div class="rc-body">
         <div class="rc-title">${escapeHtml(_title)}</div>
         <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
@@ -1810,17 +1846,19 @@ function renderDetailPanel(ad){
 
     <!-- Contact Card -->
     <div class="dp-contact">
-      <div class="dp-seller-row">
+      ${window.RizqUx&&typeof RizqUx.trustCardHtml==='function'
+        ? RizqUx.trustCardHtml(ad)
+        : `<div class="dp-seller-row">
         <div class="dp-seller-av">${ad.emoji||'🏠'}</div>
         <div style="flex:1">
-          <div class="dp-seller-name">${escapeHtml(ad.seller||fr?'Vendeur':'البائع')}</div>
+          <div class="dp-seller-name">${escapeHtml(ad.seller||(fr?'Vendeur':'البائع'))}</div>
           ${ad.verified?`<div class="dp-seller-badge">${_t('dp-seller-verified')}</div>`:''}
           <div class="dp-stars">
             <span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star">★</span>
             <span style="font-size:10px;color:var(--text-muted);margin-right:4px">4.0</span>
           </div>
         </div>
-      </div>
+      </div>`}
 
       <!-- Phone reveal -->
       <!-- بوابة تسجيل (طلب Limam 13/08/2026): كشف الرقم/اتصال/واتساب/رسالة/
@@ -2240,6 +2278,7 @@ function relocateStatsForViewport(){
 function resetAllFilters(){
   document.querySelectorAll('input[name="rcat"]').forEach(r=>r.checked=false);
   document.querySelectorAll('input[name="rprice"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);
   document.querySelectorAll('#rooms-chips .chip').forEach(c=>c.classList.remove('on'));
   const wilaya=document.getElementById('wilaya-select');if(wilaya)wilaya.value='';
   const pmin=document.getElementById('pmin');if(pmin)pmin.value='';
@@ -2258,6 +2297,7 @@ function clearSection(sec){
     const pmax=document.getElementById('pmax');if(pmax)pmax.value='';
     const pr=document.getElementById('price-range');if(pr){pr.value=2000000;updateRange(2000000);}
   }
+  if(sec==='condition'){document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);}
   applyFilters();
 }
 function toggleRoomChip(el){
@@ -2318,6 +2358,9 @@ function dpToggleFav(btn){
     btn.classList.toggle('on', added);
     btn.textContent = added ? (_rizqLang()==='fr'?'❤️ Sauvegardé':'❤️ محفوظ') : _t('dp-save');
   }
+  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
+  else if(typeof showToast==='function') showToast(added?(_rizqLang()==='fr'?'❤️ Ajouté aux favoris':'❤️ أُضيف إلى المفضلة'):(_rizqLang()==='fr'?'Retiré des favoris':'أُزيل من المفضلة'));
+  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
 }
 // ── إبلاغ حقيقي — إصلاح 11/08/2026 ──
 // كانت dpReport() (وقبلها زر .dp-report مباشرة) تعرض رسالة نجاح وهمية
@@ -2463,6 +2506,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   _rizqMergeBackendAds();
   relocateFiltersForViewport();
   if(window.innerWidth<=900) switchTab('list');
+
+  if(window.RizqUx&&typeof RizqUx.attachSearchSuggestions==='function'){
+    RizqUx.attachSearchSuggestions({
+      input:'nav-search-input',
+      getAds:function(){return ALL_ADS||[];},
+      onPickExpr:'doSearch()'
+    });
+  }
 
   // إذا كان ?id= → فتح الإعلان مباشرة بعد الرندر
   if(_pId){

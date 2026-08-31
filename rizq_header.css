@@ -225,6 +225,24 @@ body > .nav-dropdown-menu.rizq-more-menu-open,
   background:#1e293b;border:1px solid rgba(255,255,255,.14);
   color:#fff;font-size:18px;text-decoration:none;pointer-events:auto !important;
 }
+.rizq-hdr-fav{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:#1e293b;border:1px solid rgba(255,255,255,.14);
+  color:#E8C96A;font-size:17px;text-decoration:none;pointer-events:auto !important;
+  flex-shrink:0;
+}
+.rizq-hdr-fav.has-favs{border-color:rgba(201,168,76,.55)}
+.rizq-hdr-fav-count{
+  position:absolute;top:-3px;inset-inline-end:-3px;
+  min-width:16px;height:16px;padding:0 4px;
+  border-radius:999px;background:linear-gradient(135deg,#C9A84C,#E8C96A);
+  color:#0f2347;font-size:9px;font-weight:900;line-height:16px;text-align:center;
+  border:1px solid rgba(15,35,71,.25);
+}
+.rizq-hdr-fav-count.is-empty,
+.rizq-hdr-fav-count[hidden]{display:none !important}
 #nav-back-btn{display:none}
 .nav-phone-more-only{display:none}
 .nav-desktop-more-only{display:inline}

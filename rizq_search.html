@@ -19,7 +19,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="rizq-theme.css?v=16.5"/>
+<link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -46,7 +46,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .logo-text{display:flex;flex-direction:column;justify-content:center}
 .logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
 .logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;white-space:nowrap}
-.nav-search{flex:1;max-width:680px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);order:2}
+.nav-search{flex:1;max-width:680px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);order:2;position:relative}
+.nav-search.rizq-sugg-host{overflow:visible;position:relative}
 .nav-search:focus-within{border-color:var(--gold)}
 .nav-search select{background:#f0f4f8;border:none;border-left:1px solid #dde3ea;padding:0 12px;height:42px;font-size:12.5px;font-family:'Segoe UI','Arial',sans-serif;color:#333;cursor:pointer;min-width:130px;outline:none;font-weight:600}
 .nav-search select option{background:#fff;color:#333}
@@ -433,6 +434,7 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
 <body>
 
@@ -446,7 +448,7 @@ main, .page-content.active, .main-content, .results-area,
           </div>
     <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
   </a>
-  <div class="nav-search">
+  <div class="nav-search rizq-sugg-host">
     <select id="nav-cat-select">
       <option value="" data-t="all-cats">كل الأقسام</option>
       <option value="عقارات" data-cat-idx="0" data-emoji="🏠">🏠 عقارات</option>
@@ -516,6 +518,17 @@ main, .page-content.active, .main-content, .results-area,
         <option data-ar="نعمة" data-fr="Néma">نعمة</option>
         <option data-ar="روصو" data-fr="Rosso">روصو</option>
       </select>
+    </div>
+
+    <!-- حالة المنتج -->
+    <div class="filter-section" id="condition-filter-section">
+      <div class="filter-title"><span data-t="filter-condition">حالة المنتج</span> <button type="button" onclick="clearSection('condition')" data-t="btn-clear-mini">مسح</button></div>
+      <div class="chips" id="condition-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+        <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="جديد" class="filter-cb"> <span class="filter-label">✨ جديد</span></label>
+        <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — ممتاز" class="filter-cb"> <span class="filter-label">⭐ مستعمل — ممتاز</span></label>
+        <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — جيد" class="filter-cb"> <span class="filter-label">👍 مستعمل — جيد</span></label>
+        <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="للتصليح" class="filter-cb"> <span class="filter-label">🔧 للتصليح</span></label>
+      </div>
     </div>
 
     <!-- السعر -->
@@ -684,6 +697,8 @@ function _mapRawAdsToDisplay(raw){
         emoji: a.emoji || '📦',
         stockQty: (a.stockQty != null && Number.isFinite(Number(a.stockQty))) ? Number(a.stockQty) : null,
         images: Array.isArray(a.images) ? a.images : [], // صور حقيقية مضغوطة فعلياً (إصلاح #86)
+        condition: a.condition || '',
+        seller_trust_score: (a.seller_trust_score != null) ? Number(a.seller_trust_score) : undefined,
         color: 'linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#0a1a35 100%)',
         loc: a.wilaya ? ('📍 ' + a.wilaya) : '📍 غير محدد',
         seller: 'صاحب الإعلان',
@@ -966,6 +981,8 @@ function applyFilters(){
   // 5. checkboxes
   const onlyVerified = document.getElementById('cb-verified').checked;
   const onlyPinned  = document.getElementById('cb-pinned').checked;
+  const condRadio = document.querySelector('input[name="rcond"]:checked');
+  const selCond = condRadio ? condRadio.value : '';
 
   // 6. nav category (مع دعم القسم/الفرع القادمين من رابط الصفحة الرئيسية)
   const navCatRaw = document.getElementById('nav-cat-select').value;
@@ -996,6 +1013,8 @@ function applyFilters(){
     }
     // wilaya
     if(selWilaya && !a.wilaya.includes(selWilaya)) return false;
+    // condition
+    if(selCond && a.condition !== selCond) return false;
     // price
     if(a.priceNum < priceMin) return false;
     if(priceMax < Infinity && a.priceNum > priceMax) return false;
@@ -1216,6 +1235,7 @@ function doSearch(){
 function resetAllFilters(){
   document.querySelectorAll('input[name="rcat"]').forEach(r=>r.checked=false);
   document.querySelectorAll('input[name="rprice"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);
   document.getElementById('wilaya-select').value='';
   document.getElementById('pmin').value='';
   document.getElementById('pmax').value='';
@@ -1262,6 +1282,7 @@ function clearSection(sec){
     document.getElementById('range-val').textContent=_rizqLang()==='fr'?'Tout':'الكل';
   }
   if(sec==='rooms') document.querySelectorAll('#rooms-chips .chip').forEach(c=>c.classList.remove('on'));
+  if(sec==='condition') document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);
   applyFilters();
 }
 
@@ -1287,7 +1308,9 @@ function toggleFav(e,id){
   const fr=_rizqLang()==='fr';
   e.currentTarget.textContent = added ? '♥' : '♡';
   e.currentTarget.classList.toggle('on', added);
-  showToast(added ? (fr?'♥ Ajouté aux favoris':'♥ تم الحفظ في المفضلة') : (fr?'♡ Retiré des favoris':'♡ تم إزالة من المفضلة'));
+  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
+  else showToast(added ? (fr?'♥ Ajouté aux favoris':'♥ تم الحفظ في المفضلة') : (fr?'♡ Retiré des favoris':'♡ تم إزالة من المفضلة'));
+  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
 }
 
 // ══ DRAWER ══
@@ -1320,6 +1343,13 @@ function showToast(msg){
 
 // ══ NAV SEARCH EVENTS ══
 document.getElementById('nav-search-input').addEventListener('keypress', e=>{ if(e.key==='Enter') doSearch(); });
+if(window.RizqUx&&typeof RizqUx.attachSearchSuggestions==='function'){
+  RizqUx.attachSearchSuggestions({
+    input:'nav-search-input',
+    getAds:function(){return ALL_ADS||[];},
+    onPickExpr:'doSearch()'
+  });
+}
 document.getElementById('nav-cat-select').addEventListener('change', function(){
   // عند تغيير القسم من القائمة العلوية يدوياً، نُلغي تحديد القسم/الفرع القادم من الرابط ونعيد بناء الفلاتر الجانبية لتطابق القسم الجديد
   urlCat=''; urlSub='';

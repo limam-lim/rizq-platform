@@ -353,6 +353,22 @@
       if (!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.textContent);
       el.textContent = isFr ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');
     });
+    /* جسر data-fr / data-ar المستخدم في listing وغيرها */
+    root.querySelectorAll('[data-fr]').forEach(function (el) {
+      if (el.hasAttribute('data-t-fr')) return;
+      if (!el.hasAttribute('data-ar')) el.setAttribute('data-ar', el.innerHTML);
+      var val = isFr ? el.getAttribute('data-fr') : el.getAttribute('data-ar');
+      if (val != null) el.innerHTML = val;
+    });
+    root.querySelectorAll('option[data-fr]').forEach(function (el) {
+      if (el.hasAttribute('data-t-fr')) return;
+      if (!el.hasAttribute('data-ar')) el.setAttribute('data-ar', el.textContent);
+      el.textContent = isFr ? el.getAttribute('data-fr') : el.getAttribute('data-ar');
+    });
+    root.querySelectorAll('[data-fr-title]').forEach(function (el) {
+      if (!el.hasAttribute('data-ar-title')) el.setAttribute('data-ar-title', el.getAttribute('title') || '');
+      el.setAttribute('title', isFr ? el.getAttribute('data-fr-title') : el.getAttribute('data-ar-title'));
+    });
   }
 
   function applyDocumentTitle() {

@@ -100,6 +100,22 @@
         window.doNavStickySearch();
       }
     });
+    function bindStickySugg() {
+      if (!window.RizqUx || typeof window.RizqUx.attachSearchSuggestions !== 'function') return false;
+      window.RizqUx.attachSearchSuggestions({
+        input: stickyInput,
+        getAds: function () { return window.ADS || []; },
+        onPickExpr: 'doNavStickySearch()'
+      });
+      return true;
+    }
+    if (!bindStickySugg()) {
+      var _suggTries = 0;
+      var _suggTimer = setInterval(function () {
+        _suggTries++;
+        if (bindStickySugg() || _suggTries > 40) clearInterval(_suggTimer);
+      }, 150);
+    }
   }
 
   /* ── فتح ويدجت المساعد — scroll سلس ثم open() ── */
