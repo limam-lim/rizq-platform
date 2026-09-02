@@ -1,0 +1,281 @@
+/**
+ * rizq_register_wizard.css — تسجيل من الصفحة الرئيسية بنفس أسلوب نشر الإعلان
+ * (خلفية فاتحة، بطاقة بيضاء، شريط خطوات واضح)
+ */
+#modal.reg-wizard-mode {
+  background: #f8faff !important;
+  backdrop-filter: none !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
+
+#modal.reg-wizard-mode .modal-box {
+  background: #fff !important;
+  max-width: 820px !important;
+  width: 100% !important;
+  min-height: 100vh;
+  border-radius: 0 !important;
+  padding: 0 0 48px !important;
+  box-shadow: none !important;
+  --text-muted: #64748b;
+  --text-soft: #334155;
+}
+
+@media (min-width: 769px) {
+  #modal.reg-wizard-mode {
+    padding: 24px 16px 40px !important;
+  }
+  #modal.reg-wizard-mode .modal-box {
+    min-height: auto;
+    border-radius: 18px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
+    padding: 0 0 32px !important;
+  }
+}
+
+#modal.reg-wizard-mode .modal-close {
+  top: 12px;
+  inset-inline-end: 12px;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
+  z-index: 5;
+}
+
+#modal.reg-wizard-mode .modal-close:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+#modal.reg-wizard-mode .modal-header {
+  padding: 20px 20px 0;
+  border-bottom: 1px solid #e2e8f5;
+  margin-bottom: 0;
+}
+
+#modal.reg-wizard-mode .modal-logo {
+  margin-bottom: 8px;
+}
+
+#modal.reg-wizard-mode .modal-logo img {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+#modal.reg-wizard-mode #sdots {
+  display: none !important;
+}
+
+/* ── شريط الخطوات (مثل rizq_post) ── */
+.reg-progress-bar {
+  display: none;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f5;
+  padding: 14px 16px 16px;
+}
+
+#modal.reg-wizard-mode .reg-progress-bar {
+  display: block;
+}
+
+.reg-progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.reg-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  position: relative;
+}
+
+.reg-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 17px;
+  height: 2px;
+  background: rgba(13, 27, 42, 0.08);
+  z-index: 0;
+  width: 100%;
+}
+
+html[dir='rtl'] .reg-progress-steps { direction: rtl; }
+html[dir='rtl'] .reg-step:not(:last-child)::after { left: -50%; right: auto; }
+html[dir='ltr'] .reg-progress-steps { direction: ltr; }
+html[dir='ltr'] .reg-step:not(:last-child)::after { left: 50%; right: auto; }
+
+.reg-step.done:not(:last-child)::after { background: #c9a84c; }
+
+.reg-step-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f8faff;
+  border: 2px solid rgba(13, 27, 42, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+  position: relative;
+  z-index: 1;
+  transition: all 0.35s;
+}
+
+.reg-step.done .reg-step-circle {
+  background: linear-gradient(135deg, #c9a84c, #e8c96a);
+  border-color: #c9a84c;
+  color: #0f2347;
+}
+
+.reg-step.active .reg-step-circle {
+  background: rgba(201, 168, 76, 0.15);
+  border-color: #c9a84c;
+  color: #a07820;
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
+}
+
+.reg-step-label {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.reg-step.active .reg-step-label { color: #a07820; }
+.reg-step.done .reg-step-label { color: #475569; }
+
+/* ── لوحات التسجيل ── */
+#modal.reg-wizard-mode [id^='p-'] {
+  padding: 22px 20px 8px;
+  animation: regFadeIn 0.35s ease;
+}
+
+@keyframes regFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+#modal.reg-wizard-mode [id^='p-'] h3 {
+  font-family: 'Cairo', 'Segoe UI', sans-serif !important;
+  font-size: 1.45rem !important;
+  font-weight: 800 !important;
+  color: #1a2535 !important;
+  margin-bottom: 6px !important;
+}
+
+#modal.reg-wizard-mode [id^='p-'] > p:first-of-type,
+#modal.reg-wizard-mode .reg-panel-sub {
+  color: #64748b !important;
+  font-size: 13px !important;
+  margin-bottom: 20px !important;
+  line-height: 1.6;
+}
+
+/* بطاقات الاختيار */
+#modal.reg-wizard-mode [id^='type-'],
+#modal.reg-wizard-mode [id^='nat-'],
+#modal.reg-wizard-mode [id^='biz-'] {
+  background: #fff !important;
+  border: 1.5px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06) !important;
+  padding: 16px 14px !important;
+}
+
+#modal.reg-wizard-mode [id^='type-']:hover,
+#modal.reg-wizard-mode [id^='nat-']:hover,
+#modal.reg-wizard-mode [id^='biz-']:hover {
+  border-color: rgba(201, 168, 76, 0.45) !important;
+  background: #fffdf6 !important;
+}
+
+#modal.reg-wizard-mode [id^='type-'] div[style*='font-weight:700'],
+#modal.reg-wizard-mode [id^='nat-'] div[style*='font-weight:700'],
+#modal.reg-wizard-mode [id^='biz-'] div[style*='font-weight:700'] {
+  color: #1b3a6b !important;
+}
+
+#modal.reg-wizard-mode .cat-icon-box,
+#modal.reg-wizard-mode [id^='biz-'] > div:first-child {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg, #0f2347, #1b3a6b) !important;
+  border: 1px solid rgba(201, 168, 76, 0.2) !important;
+  font-size: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* حقول الإدخال */
+#modal.reg-wizard-mode .m-input {
+  background: #f8faff !important;
+  border: 1px solid rgba(13, 27, 42, 0.1) !important;
+  color: #1a2535 !important;
+  border-radius: 12px !important;
+  margin-bottom: 12px;
+}
+
+#modal.reg-wizard-mode .m-input::placeholder {
+  color: rgba(13, 27, 42, 0.35) !important;
+}
+
+#modal.reg-wizard-mode .m-input:focus {
+  border-color: rgba(201, 168, 76, 0.5) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12) !important;
+}
+
+#modal.reg-wizard-mode .m-eye {
+  color: #94a3b8 !important;
+}
+
+#modal.reg-wizard-mode .m-btn-main {
+  margin-top: 8px;
+  border-radius: 12px;
+  font-family: 'Cairo', 'Segoe UI', sans-serif;
+}
+
+#modal.reg-wizard-mode .m-link-btn {
+  color: #1b3a6b !important;
+  margin-top: 12px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+#modal.reg-wizard-mode .modal-auth-tabs {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+#modal.reg-wizard-mode .modal-auth-tab {
+  color: #64748b !important;
+}
+
+#modal.reg-wizard-mode .modal-auth-tab.active {
+  color: #0f2347 !important;
+}
+
+/* مناطق الرفع */
+#modal.reg-wizard-mode [id^='uz-'] {
+  border-color: rgba(201, 168, 76, 0.35) !important;
+  background: #f8faff !important;
+}
+
+#modal.reg-wizard-mode [id^='uz-'] p {
+  color: #475569 !important;
+}

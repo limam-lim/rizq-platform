@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=1.0"/>
 <link rel="stylesheet" href="rizq_header.css?v=17.1"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -3080,6 +3081,14 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="sdot" id="sd2"></div><div class="sline" id="sl2"></div>
         <div class="sdot" id="sd3"></div><div class="sline" id="sl3"></div>
         <div class="sdot" id="sd4"></div>
+      </div>
+    </div>
+    <div class="reg-progress-bar" id="reg-progress" aria-hidden="true">
+      <div class="reg-progress-steps">
+        <div class="reg-step active" id="rstep-1"><div class="reg-step-circle">1</div><div class="reg-step-label" data-t="reg-s1">نوع الحساب</div></div>
+        <div class="reg-step" id="rstep-2"><div class="reg-step-circle">2</div><div class="reg-step-label" data-t="reg-s2">البيانات</div></div>
+        <div class="reg-step" id="rstep-3"><div class="reg-step-circle">3</div><div class="reg-step-label" data-t="reg-s3">التحقق</div></div>
+        <div class="reg-step" id="rstep-4"><div class="reg-step-circle">4</div><div class="reg-step-label" data-t="reg-s4">تم</div></div>
       </div>
     </div>
 
@@ -6243,6 +6252,8 @@ function openModal(mode){
   const modal=document.getElementById('modal');
   modal.classList.add('open');
   modal.style.display='flex';
+  if(mode==='register') modal.classList.add('reg-wizard-mode');
+  else modal.classList.remove('reg-wizard-mode');
   /* unlockRizqPage() قد وضعت pointer-events:none كستايل مباشر عندما كانت
      النافذة مغلقة — يجب مسحه عند الفتح وإلا اخترقت النقرات النافذة بالكامل */
   modal.style.pointerEvents='auto';
@@ -6265,6 +6276,7 @@ function openModal(mode){
 function closeModal(){
   if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
   const modal=document.getElementById('modal');
+  modal.classList.remove('reg-wizard-mode');
   modal.classList.remove('open');
   modal.style.display='none';
   document.body.style.overflow='';
@@ -6292,6 +6304,15 @@ function setDot(active,total){
       d.className='sdot'+(i<active+1?' done':i===active+1?' active':'');
     } else { d.style.display='none'; }
     if(l) l.style.display=i<total?'block':'none';
+  }
+  var prog=document.getElementById('reg-progress');
+  if(prog){
+    for(var j=1;j<=4;j++){
+      var rs=document.getElementById('rstep-'+j);
+      if(!rs) continue;
+      rs.style.display=(j<=total)?'flex':'none';
+      rs.className='reg-step'+(j<active+1?' done':j===active+1?' active':'');
+    }
   }
 }
 
