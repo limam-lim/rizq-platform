@@ -1,0 +1,20 @@
+# نشر خادم رزق (rizq-backend) على Render — مرة واحدة من لوحة Render:
+# Dashboard → New → Blueprint → اختر مستودع rizq-platform
+services:
+  - type: web
+    name: rizq-platform-api
+    runtime: node
+    rootDir: rizq-backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGIN
+        value: https://limam-lim.github.io,https://rizq.mr,https://www.rizq.mr
+      - key: OTP_ALLOW_DEMO
+        value: "false"
+      # أضف يدوياً من لوحة Render → Environment:
+      # EMAIL_USER, EMAIL_PASS, OTP_PEPPER, BACKEND_SHARED_SECRET

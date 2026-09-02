@@ -82,6 +82,7 @@
       errEmail: 'البريد الإلكتروني مطلوب وصالح',
       errOtp: 'أدخل رمز التحقق كاملاً (6 أرقام)',
       errNetwork: 'تعذّر الاتصال بالخادم — تحقق من الإنترنت وحاول مرة أخرى',
+      errBackendDown: 'الخادم الخلفي غير منشور بعد — يجب نشر rizq-backend على Render (راجع render.yaml في المستودع). أول طلب قد يستغرق دقيقة.',
       successToast: '✅ تم تفعيل حسابك بنجاح',
       welcomeBack: '👋 أهلاً بعودتك',
       logout: 'تسجيل الخروج',
@@ -135,6 +136,7 @@
       errEmail: 'E-mail requis et valide',
       errOtp: 'Saisissez le code complet (6 chiffres)',
       errNetwork: 'Connexion impossible — vérifiez internet et réessayez',
+      errBackendDown: 'Le serveur backend n\'est pas encore déployé — publiez rizq-backend sur Render (voir render.yaml). La première requête peut prendre une minute.',
       successToast: '✅ Compte activé avec succès',
       welcomeBack: '👋 Bon retour',
       logout: 'Déconnexion',
@@ -151,6 +153,10 @@
   };
 
   function d() { return DICT[lang() === 'fr' ? 'fr' : 'ar']; }
+
+  function networkErrorMsg(dict) {
+    return isLocalDevHost() ? dict.errNetwork : (dict.errBackendDown || dict.errNetwork);
+  }
 
   function normalizeIntl(raw) {
     var s = String(raw || '').trim();
@@ -614,7 +620,7 @@
       if (!isLocalDevHost()) {
         btn.disabled = false;
         btn.textContent = dict.sendOtp;
-        alert(dict.errNetwork);
+        alert(networkErrorMsg(dict));
         return;
       }
       btn.disabled = false;
@@ -644,7 +650,7 @@
         btn.disabled = false;
         btn.textContent = dict.sendOtp;
         if (!r.ok || !r.body || !r.body.ok) {
-          alert((r.body && r.body.message) || dict.errNetwork);
+          alert((r.body && r.body.message) || networkErrorMsg(dict));
           return;
         }
         document.getElementById('rag-title').textContent = dict.titleOtp;
@@ -663,7 +669,7 @@
       }).catch(function () {
         btn.disabled = false;
         btn.textContent = dict.sendOtp;
-        alert(dict.errNetwork);
+        alert(networkErrorMsg(dict));
       });
   }
 
@@ -702,7 +708,7 @@
       if (!isLocalDevHost()) {
         btn.disabled = false;
         btn.textContent = dict.verifyBtn;
-        alert(dict.errNetwork);
+        alert(networkErrorMsg(dict));
         return;
       }
       btn.disabled = false;
@@ -757,7 +763,7 @@
         btn.textContent = dict.verifyBtn;
         if (!reg) return;
         if (!reg.ok || !reg.body || !reg.body.ok || !reg.body.token) {
-          alert((reg.body && (reg.body.error || reg.body.message)) || dict.errNetwork);
+          alert((reg.body && (reg.body.error || reg.body.message)) || networkErrorMsg(dict));
           return;
         }
         finishRegister({
@@ -772,7 +778,7 @@
       }).catch(function () {
         btn.disabled = false;
         btn.textContent = dict.verifyBtn;
-        alert(dict.errNetwork);
+        alert(networkErrorMsg(dict));
       });
   }
 
