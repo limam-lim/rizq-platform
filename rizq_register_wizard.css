@@ -5,7 +5,8 @@
 #modal.reg-wizard-mode {
   background: #f8faff !important;
   backdrop-filter: none !important;
-  align-items: flex-start !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
   padding: 0 !important;
   overflow-y: auto !important;
 }
@@ -15,6 +16,8 @@
   max-width: 820px !important;
   width: 100% !important;
   min-height: 100vh;
+  min-height: 100dvh;
+  margin-inline: auto !important;
   border-radius: 0 !important;
   padding: 0 0 48px !important;
   box-shadow: none !important;

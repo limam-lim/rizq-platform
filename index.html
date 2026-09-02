@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=1.0"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=1.1"/>
 <link rel="stylesheet" href="rizq_header.css?v=17.1"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -1875,6 +1875,11 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         if (hdr && hdr.parentNode) hdr.parentNode.removeChild(hdr);
       }
     } catch (e) {}
+    var regModal = document.getElementById('modal');
+    if (regModal && regModal.classList.contains('open')) {
+      regModal.style.pointerEvents = 'auto';
+      regModal.style.display = 'flex';
+    }
     document.querySelectorAll('.modal-overlay:not(.open),.mobile-drawer-overlay,.disc-overlay,.cs-modal-overlay:not(.active),.rzq-sheet-backdrop:not(.open)').forEach(function(el){
       el.style.pointerEvents = 'none';
       el.style.display = 'none';
@@ -1987,7 +1992,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
   <div class="mobile-drawer-actions">
     <!-- Language switcher lives in the header (FR | AR). -->
     <button class="btn-login" onclick="openModal('login');closeMobileNav()">دخول</button>
-    <button class="btn-register" onclick="openModal('register');closeMobileNav()">📱 حساب جديد</button>
+    <button class="btn-register" onclick="rizqOpenRegister(event)">📱 حساب جديد</button>
   </div>
 </div>
 
@@ -2843,7 +2848,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <p class="cta-desc" data-t="cta-desc">رزق منصة إلكترونية متكاملة بوكلاء أذكياء يعملون على مدار الساعة؛ يفتح لك ولأعمالك آفاقاً جديدة، فهو ليس سوقاً عادياً — بل مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، و<strong style="color:#a7f3d0">غرف المناقصات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.</p>
 
     <div class="cta-btns">
-      <button class="btn-primary" onclick="openModal('register')" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
+      <button class="btn-primary" onclick="rizqOpenRegister(event)" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
       <a href="rizq_tenders.html" class="btn-tender" data-t="cta-btn4">📋 غرفة المناقصات</a>
       <a href="#" onclick="openModal('register');setTimeout(()=>{selectType('company');goFromType();},200);return false" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
       <button class="btn-outline" style="padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn2">📲 التطبيق قريباً</button>
@@ -5254,17 +5259,6 @@ function applyLandingLang(toAr) {
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
 
-  // ── Auto-open register modal from URL param ──
-(function(){
-  const p = new URLSearchParams(window.location.search);
-  if(p.get('openRegister')==='1'){
-    setTimeout(()=>openModal('register'), 400);
-  }
-  if(p.get('openLogin')==='1'){
-    setTimeout(()=>openModal('login'), 400);
-  }
-})();
-
 // ── Translate all remaining static text blocks — unified RizqI18n.t2() ──
   // Pop tag
   const popTag = document.querySelector('.pop-tag');
@@ -6096,7 +6090,10 @@ function closeMobileNav(){
   if(drawer) drawer.classList.remove('open');
   if(overlay) overlay.classList.remove('open');
   if(btn) btn.classList.remove('open');
-  document.body.style.overflow = '';
+  const regModal = document.getElementById('modal');
+  if (!regModal || !regModal.classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeMobileNav(); });
 
@@ -6245,8 +6242,19 @@ function syncModalAuthTabs(mode){
   }
 }
 
+function rizqOpenRegister(ev){
+  if(ev){
+    ev.preventDefault();
+    if(ev.stopPropagation) ev.stopPropagation();
+  }
+  closeMobileNav();
+  openModal('register');
+}
+window.rizqOpenRegister = rizqOpenRegister;
+
 function openModal(mode){
   const modal=document.getElementById('modal');
+  window._rizqModalOpenedAt=Date.now();
   modal.classList.add('open');
   modal.style.display='flex';
   if(mode==='register') modal.classList.add('reg-wizard-mode');
@@ -6278,7 +6286,34 @@ function closeModal(){
   modal.style.display='none';
   document.body.style.overflow='';
 }
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+document.getElementById('modal').addEventListener('click',function(e){
+  const modal=document.getElementById('modal');
+  if(e.target!==modal) return;
+  if(modal.classList.contains('reg-wizard-mode')) return;
+  if(Date.now()-(window._rizqModalOpenedAt||0)<450) return;
+  closeModal();
+});
+
+(function initAuthModalFromUrl(){
+  var openedRegister=false;
+  var openedLogin=false;
+  function tryOpen(){
+    try{
+      var p=new URLSearchParams(window.location.search);
+      if(p.get('openRegister')==='1' && !openedRegister && typeof openModal==='function'){
+        openedRegister=true;
+        openModal('register');
+      } else if(p.get('openLogin')==='1' && !openedLogin && typeof openModal==='function'){
+        openedLogin=true;
+        openModal('login');
+      }
+    }catch(e){}
+  }
+  function schedule(){ setTimeout(tryOpen, 400); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', schedule);
+  else schedule();
+  window.addEventListener('load', function(){ setTimeout(tryOpen, 120); });
+})();
 
 function showPanel(id,dot,total){
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
