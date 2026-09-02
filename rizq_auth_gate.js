@@ -271,53 +271,72 @@
   }
 
   function injectStyle() {
-    if (document.getElementById('rag-css')) return;
-    var css = ''
-      + '.rag-overlay{position:fixed;inset:0;background:rgba(5,10,22,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:999990;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}'
-      + '.rag-overlay.open{opacity:1;pointer-events:all}'
-      + '.rag-modal{background:linear-gradient(165deg,#0a1628,#122040 55%,#0d1a30);border:1px solid rgba(201,168,76,.25);border-radius:24px;max-width:420px;width:100%;padding:26px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.45);transform:scale(.94) translateY(12px);transition:transform .3s cubic-bezier(.34,1.4,.64,1);font-family:Cairo,"Noto Naskh Arabic",Segoe UI,sans-serif;position:relative;max-height:92vh;overflow-y:auto;color:#fff;box-sizing:border-box}'
-      + '.rag-overlay.open .rag-modal{transform:scale(1) translateY(0)}'
-      + '.rag-close{position:absolute;top:12px;inset-inline-end:12px;background:rgba(255,255,255,.08);border:1px solid rgba(201,168,76,.25);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;z-index:2}'
-      + '.rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 12px}'
-      + '.rag-brand-mark{width:60px;height:60px;border-radius:14px;background:#071020;border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(201,168,76,.2)}'
-      + '.rag-brand-mark img{width:48px;height:48px}'
-      + '.rag-brand-name{font-size:18px;font-weight:800;color:#C9A84C}'
-      + '.rag-title{color:#F3DE9C;font-size:17px;font-weight:800;text-align:center;margin:0 0 5px}'
-      + '.rag-sub{color:rgba(255,255,255,.65);font-size:12px;text-align:center;margin:0 0 16px;line-height:1.55}'
-      + '.rag-returning{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 12px;font-size:12px;color:#F3DE9C;text-align:center;margin:-6px 0 14px;display:none}'
-      + '.rag-returning.show{display:block}'
-      + '.rag-label{display:block;color:rgba(255,255,255,.88);font-size:11.5px;font-weight:700;margin:0 0 4px}'
-      + '.rag-hint{font-size:10px;color:rgba(255,255,255,.45);margin:-6px 0 8px;line-height:1.5}'
-      + '.rag-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1.5px solid rgba(201,168,76,.28);border-radius:11px;padding:11px 12px;color:#fff;font-size:13.5px;font-family:inherit;margin-bottom:10px}'
-      + '.rag-input:focus{outline:none;border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,.12)}'
-      + '.rag-input.err{border-color:#ef4444}'
-      + '.rag-check{display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(255,255,255,.7);margin:-4px 0 10px;cursor:pointer}'
-      + '.rag-check input{accent-color:#C9A84C}'
-      + '.rag-errmsg{color:#f87171;font-size:11px;margin:-6px 0 8px;display:none}'
-      + '.rag-errmsg.show{display:block}'
-      + '.rag-btn{width:100%;background:linear-gradient(135deg,#a67c2e,#d4b356,#c9a84c);color:#0a1628;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px;box-shadow:0 6px 20px rgba(201,168,76,.35)}'
-      + '.rag-btn:disabled{opacity:.55;cursor:default}'
-      + '.rag-btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);box-shadow:none;margin-top:8px}'
-      + '.rag-choice{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}'
-      + '.rag-choice-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1.5px solid rgba(201,168,76,.22);border-radius:14px;padding:14px;cursor:pointer;text-align:right;transition:border-color .2s,background .2s}'
-      + '.rag-choice-card:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.08)}'
-      + '.rag-choice-icon{font-size:26px;flex-shrink:0}'
-      + '.rag-choice-title{font-size:14px;font-weight:800;color:#F3DE9C}'
-      + '.rag-choice-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}'
-      + '.rag-otp-row{display:flex;gap:8px;justify-content:center;margin:14px 0 10px}'
-      + '.rag-otp-box{width:44px;height:50px;background:rgba(255,255,255,.07);border:1.5px solid rgba(201,168,76,.35);border-radius:10px;text-align:center;font-size:20px;font-weight:800;color:#fff;font-family:inherit}'
-      + '.rag-otp-box:focus{outline:none;border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,.15)}'
-      + '.rag-otp-meta{text-align:center;font-size:11.5px;color:rgba(255,255,255,.5);margin-bottom:10px}'
-      + '.rag-otp-meta button{background:none;border:none;color:#E8C96A;font-weight:700;cursor:pointer;font-family:inherit;font-size:11.5px;text-decoration:underline}'
-      + '.rag-devhint{background:rgba(255,255,255,.06);border:1px dashed rgba(201,168,76,.4);border-radius:10px;padding:8px 10px;font-size:11px;color:#F3DE9C;text-align:center;margin-bottom:10px;display:none}'
-      + '.rag-devhint.show{display:block}'
-      + '.rag-privacy{color:rgba(255,255,255,.42);font-size:10.5px;text-align:center;margin-top:12px;line-height:1.6}'
-      + '.rag-account-card{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.22);border-radius:14px;padding:14px;margin-bottom:12px}'
-      + '.rag-account-name{font-size:16px;font-weight:800;color:#F3DE9C;margin-bottom:4px}'
-      + '.rag-account-meta{font-size:12px;color:rgba(255,255,255,.6);line-height:1.7}'
-      + '.rag-seller-link{display:block;text-align:center;margin-top:10px;color:#E8C96A;font-size:12.5px;font-weight:700;text-decoration:none}'
-      + '.rag-step{display:none}'
-      + '.rag-step.active{display:block}';
+    var old = document.getElementById('rag-css');
+    if (old) old.parentNode.removeChild(old);
+    var css = [
+      /* شاشة تسجيل المشتري بنفس أسلوب نشر الإعلان / معالج البائع الفاتح */
+      '#rag-overlay.rag-overlay{position:fixed;inset:0;background:#f8faff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:1000001!important;display:none;align-items:stretch;justify-content:flex-start;padding:0;opacity:1;pointer-events:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '#rag-overlay.rag-overlay.open{display:flex!important;pointer-events:auto}',
+      '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
+      '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
+      '#rag-overlay .rag-close{position:absolute;top:12px;inset-inline-end:12px;background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:16px;z-index:5}',
+      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 20px 8px;border-bottom:1px solid #e2e8f5}',
+      '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
+      '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
+      '#rag-overlay .rag-brand-name{font-size:16px;font-weight:800;color:#1b3a6b}',
+      '#rag-overlay .rag-progress{display:none;background:#fff;border-bottom:1px solid #e2e8f5;padding:14px 16px 16px}',
+      '#rag-overlay.open .rag-progress{display:block}',
+      '#rag-overlay .rag-progress-steps{display:flex;align-items:center;max-width:640px;margin:0 auto}',
+      '#rag-overlay .rag-pstep{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative}',
+      '#rag-overlay .rag-pstep:not(:last-child)::after{content:\"\";position:absolute;top:17px;height:2px;background:rgba(13,27,42,.08);width:100%;z-index:0}',
+      'html[dir=rtl] #rag-overlay .rag-pstep:not(:last-child)::after{left:-50%;right:auto}',
+      'html[dir=ltr] #rag-overlay .rag-pstep:not(:last-child)::after{left:50%;right:auto}',
+      '#rag-overlay .rag-pstep.done:not(:last-child)::after{background:#c9a84c}',
+      '#rag-overlay .rag-pstep-circle{width:34px;height:34px;border-radius:50%;background:#f8faff;border:2px solid rgba(13,27,42,.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#64748b;position:relative;z-index:1}',
+      '#rag-overlay .rag-pstep.active .rag-pstep-circle{background:rgba(201,168,76,.15);border-color:#c9a84c;color:#a07820}',
+      '#rag-overlay .rag-pstep.done .rag-pstep-circle{background:linear-gradient(135deg,#c9a84c,#e8c96a);border-color:#c9a84c;color:#0f2347}',
+      '#rag-overlay .rag-pstep-label{font-size:10.5px;color:#64748b;font-weight:600;text-align:center}',
+      '#rag-overlay .rag-pstep.active .rag-pstep-label{color:#a07820}',
+      '#rag-overlay .rag-body{padding:22px 20px 8px}',
+      '#rag-overlay .rag-title{color:#1a2535!important;font-size:1.35rem;font-weight:800;text-align:center;margin:0 0 6px}',
+      '#rag-overlay .rag-sub{color:#64748b!important;font-size:13px;text-align:center;margin:0 0 18px;line-height:1.6}',
+      '#rag-overlay .rag-returning{background:#fff8e8;border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 12px;font-size:12px;color:#92400e;text-align:center;margin:0 0 14px;display:none}',
+      '#rag-overlay .rag-returning.show{display:block}',
+      '#rag-overlay .rag-label{display:block;color:#334155;font-size:12.5px;font-weight:700;margin:0 0 6px}',
+      '#rag-overlay .rag-hint{font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5}',
+      '#rag-overlay .rag-input{width:100%;box-sizing:border-box;background:#f8faff!important;border:1px solid rgba(13,27,42,.1)!important;border-radius:12px;padding:12px 14px;color:#1a2535!important;font-size:14px;font-family:inherit;margin-bottom:10px}',
+      '#rag-overlay .rag-input:focus{outline:none;border-color:rgba(201,168,76,.5)!important;background:#fff!important;box-shadow:0 0 0 3px rgba(201,168,76,.12)}',
+      '#rag-overlay .rag-input.err{border-color:#ef4444!important}',
+      '#rag-overlay .rag-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;margin:-2px 0 10px;cursor:pointer}',
+      '#rag-overlay .rag-check input{accent-color:#c9a84c}',
+      '#rag-overlay .rag-errmsg{color:#dc2626;font-size:11px;margin:-6px 0 8px;display:none}',
+      '#rag-overlay .rag-errmsg.show{display:block}',
+      '#rag-overlay .rag-btn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a)!important;color:#0f2347!important;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:8px;box-shadow:0 6px 18px rgba(201,168,76,.28)}',
+      '#rag-overlay .rag-btn:disabled{opacity:.55;cursor:default}',
+      '#rag-overlay .rag-btn-ghost{background:transparent!important;border:1px solid #e2e8f0!important;color:#475569!important;box-shadow:none;margin-top:8px}',
+      '#rag-overlay .rag-choice{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}',
+      '#rag-overlay .rag-choice-card{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px 14px;cursor:pointer;text-align:inherit;box-shadow:0 10px 30px -10px rgba(0,0,0,.06);transition:border-color .2s,background .2s}',
+      '#rag-overlay .rag-choice-card:hover{border-color:rgba(201,168,76,.45);background:#fffdf6}',
+      '#rag-overlay .rag-choice-icon{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0f2347,#1b3a6b);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}',
+      '#rag-overlay .rag-choice-title{font-size:15px;font-weight:800;color:#1b3a6b}',
+      '#rag-overlay .rag-choice-sub{font-size:12px;color:#64748b;margin-top:2px}',
+      '#rag-overlay .rag-otp-row{display:flex;gap:8px;justify-content:center;margin:14px 0 10px}',
+      '#rag-overlay .rag-otp-box{width:44px;height:50px;background:#f8faff;border:1.5px solid rgba(13,27,42,.12);border-radius:10px;text-align:center;font-size:20px;font-weight:800;color:#1a2535;font-family:inherit}',
+      '#rag-overlay .rag-otp-box:focus{outline:none;border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.15)}',
+      '#rag-overlay .rag-otp-meta{text-align:center;font-size:12px;color:#64748b;margin-bottom:10px}',
+      '#rag-overlay .rag-otp-meta button{background:none;border:none;color:#1b3a6b;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;text-decoration:underline}',
+      '#rag-overlay .rag-devhint{background:#fff8e8;border:1px dashed rgba(201,168,76,.45);border-radius:10px;padding:8px 10px;font-size:11px;color:#92400e;text-align:center;margin-bottom:10px;display:none}',
+      '#rag-overlay .rag-devhint.show{display:block}',
+      '#rag-overlay .rag-privacy{color:#64748b;font-size:11px;text-align:center;margin-top:14px;line-height:1.6}',
+      '#rag-overlay .rag-account-card{background:#f8faff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}',
+      '#rag-overlay .rag-account-name{font-size:16px;font-weight:800;color:#1b3a6b;margin-bottom:4px}',
+      '#rag-overlay .rag-account-meta{font-size:12px;color:#64748b;line-height:1.7}',
+      '#rag-overlay .rag-seller-link{display:block;text-align:center;margin-top:10px;color:#1b3a6b;font-size:13px;font-weight:700;text-decoration:none}',
+      '#rag-overlay .rag-step{display:none}',
+      '#rag-overlay .rag-step.active{display:block}',
+      'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav,body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
+      '#rizq-terms-modal.rizq-terms-overlay{z-index:1000010!important;background:rgba(15,35,65,.45)!important}'
+    ].join('');
     var style = document.createElement('style');
     style.id = 'rag-css';
     style.textContent = css;
@@ -332,6 +351,14 @@
       '  <div class="rag-modal" role="dialog" aria-modal="true">',
       '    <button class="rag-close" id="rag-close-btn" type="button">✕</button>',
       '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
+      '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
+      '      <div class="rag-progress-steps">',
+      '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">الحساب</div></div>',
+      '        <div class="rag-pstep" id="rag-pstep-2"><div class="rag-pstep-circle">2</div><div class="rag-pstep-label" id="rag-pstep-2-label">التحقق</div></div>',
+      '        <div class="rag-pstep" id="rag-pstep-3"><div class="rag-pstep-circle">3</div><div class="rag-pstep-label" id="rag-pstep-3-label">تم</div></div>',
+      '      </div>',
+      '    </div>',
+      '    <div class="rag-body">',
       '    <div class="rag-title" id="rag-title"></div>',
       '    <div class="rag-sub" id="rag-sub"></div>',
       '    <div class="rag-returning" id="rag-returning"></div>',
@@ -382,6 +409,7 @@
       '      </div>',
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
+      '    </div>',
       '    </div>',
       '  </div>',
       '</div>'
@@ -467,6 +495,23 @@
       var el = document.getElementById('rag-step-' + s);
       if (el) el.classList.toggle('active', s === step);
     });
+    var activeIdx = step === 'choice' || step === 'form' ? 1 : (step === 'otp' ? 2 : 3);
+    for (var i = 1; i <= 3; i++) {
+      var ps = document.getElementById('rag-pstep-' + i);
+      if (!ps) continue;
+      ps.className = 'rag-pstep' + (i < activeIdx ? ' done' : (i === activeIdx ? ' active' : ''));
+    }
+  }
+
+  function openRagShell() {
+    ensureModal();
+    injectStyle(); /* إعادة حقن CSS الفاتح دائماً لتجاوز rizq_modals.css والكاش */
+    var ov = document.getElementById('rag-overlay');
+    ov.classList.add('open');
+    ov.style.display = 'flex';
+    ov.style.pointerEvents = 'auto';
+    document.body.classList.add('rizq-reg-open');
+    document.body.style.overflow = 'hidden';
   }
 
   function syncWhatsappFromPhones() {
@@ -484,7 +529,13 @@
     var reason = dict[reasonKey] || dict.reasonGeneric;
     document.getElementById('rag-title').textContent = _modalMode === 'account' ? dict.titleAccount : dict.titleGate;
     document.getElementById('rag-sub').textContent = (_modalMode === 'account' ? dict.subAccount : dict.subGate)
-      + (reason !== dict.reasonGeneric && _modalMode !== 'account' ? ' — ' + reason : '');
+      + (reasonKey && reasonKey !== 'reasonGeneric' ? ' — ' + reason : '');
+    var l1 = document.getElementById('rag-pstep-1-label');
+    var l2 = document.getElementById('rag-pstep-2-label');
+    var l3 = document.getElementById('rag-pstep-3-label');
+    if (l1) l1.textContent = t('البيانات', 'Infos');
+    if (l2) l2.textContent = t('التحقق', 'OTP');
+    if (l3) l3.textContent = t('تم', 'OK');
     document.getElementById('rag-choice-buyer-title').textContent = dict.choiceBuyer;
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
@@ -659,6 +710,11 @@
     fetch(apiBase() + '/api/otp/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: (typeof AbortController !== 'undefined' ? (function () {
+        var c = new AbortController();
+        setTimeout(function () { try { c.abort(); } catch (eA) {} }, 15000);
+        return c.signal;
+      })() : undefined),
       body: JSON.stringify({
         channel: 'buyer',
         email: data.email,
@@ -667,7 +723,11 @@
         phoneIntl: data.phoneIntl,
         whatsapp: data.whatsapp
       })
-    }).then(function (res) { return res.json().then(function (j) { return { ok: res.ok, body: j }; }); })
+    }).then(function (res) {
+      return res.json().then(function (j) { return { ok: res.ok, body: j }; }).catch(function () {
+        return { ok: false, body: { message: networkErrorMsg(dict) } };
+      });
+    })
       .then(function (r) {
         btn.disabled = false;
         btn.textContent = dict.sendOtp;
@@ -837,18 +897,17 @@
   }
 
   function openModal(reasonKey) {
-    ensureModal();
+    openRagShell();
     _modalMode = 'gate';
     _sellerOtpCallback = null;
     applyTexts(reasonKey || 'reasonGeneric');
     prefillDraft();
     showStep('form');
-    document.getElementById('rag-overlay').classList.add('open');
     setTimeout(function () { document.getElementById('rag-name').focus(); }, 250);
   }
 
   function openAccountChoice() {
-    ensureModal();
+    openRagShell();
     var dict = d();
     document.getElementById('rag-title').textContent = dict.titleChoice;
     document.getElementById('rag-sub').textContent = dict.subChoice;
@@ -856,12 +915,17 @@
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
     document.getElementById('rag-choice-seller-sub').textContent = dict.choiceSellerSub;
+    var l1 = document.getElementById('rag-pstep-1-label');
+    var l2 = document.getElementById('rag-pstep-2-label');
+    var l3 = document.getElementById('rag-pstep-3-label');
+    if (l1) l1.textContent = t('النوع', 'Type');
+    if (l2) l2.textContent = t('البيانات', 'Infos');
+    if (l3) l3.textContent = t('تم', 'OK');
     showStep('choice');
-    document.getElementById('rag-overlay').classList.add('open');
   }
 
   function openAccountModal() {
-    ensureModal();
+    openRagShell();
     _modalMode = 'account';
     _sellerOtpCallback = null;
     applyTexts('reasonGeneric');
@@ -871,7 +935,6 @@
       prefillDraft();
       showStep('form');
     }
-    document.getElementById('rag-overlay').classList.add('open');
   }
 
   function ensureEmailOtpVerified(data, onSuccess) {
@@ -883,7 +946,7 @@
       if (typeof onSuccess === 'function') onSuccess();
       return;
     }
-    ensureModal();
+    openRagShell();
     _modalMode = 'gate';
     _sellerOtpCallback = onSuccess;
     applyTexts('reasonGeneric');
@@ -897,12 +960,17 @@
     document.getElementById('rag-title').textContent = d().titleOtp;
     document.getElementById('rag-sub').textContent = t('أكّد بريدك قبل إتمام التسجيل كبائع', 'Confirmez votre e-mail avant de finaliser l\'inscription vendeur');
     showStep('form');
-    document.getElementById('rag-overlay').classList.add('open');
   }
 
   function closeModal() {
     var ov = document.getElementById('rag-overlay');
-    if (ov) ov.classList.remove('open');
+    if (ov) {
+      ov.classList.remove('open');
+      ov.style.display = 'none';
+    }
+    document.body.classList.remove('rizq-reg-open');
+    var sellerOpen = document.getElementById('modal') && document.getElementById('modal').classList.contains('open');
+    if (!sellerOpen) document.body.style.overflow = '';
     clearInterval(_otpTimer);
     _pendingAction = null;
     _sellerOtpCallback = null;

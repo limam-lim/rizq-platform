@@ -55,18 +55,19 @@
     if (document.getElementById('rizq-terms-modal')) return;
     var ov = document.createElement('div');
     ov.id = 'rizq-terms-modal';
-    ov.className = 'modal-overlay';
+    ov.className = 'modal-overlay rizq-terms-overlay';
+    ov.style.cssText = 'z-index:1000010!important;';
     ov.innerHTML =
-      '<div class="modal-box" style="max-width:420px;padding:22px 20px 18px" role="dialog" aria-modal="true" aria-labelledby="rizq-terms-modal-title">' +
-      '  <h3 id="rizq-terms-modal-title" style="font-family:\'Noto Naskh Arabic\',serif;font-size:18px;font-weight:800;margin:0 0 8px;color:#fff"></h3>' +
-      '  <p id="rizq-terms-modal-lead" style="font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.65;margin:0 0 12px"></p>' +
-      '  <p id="rizq-terms-modal-body" style="font-size:12px;color:rgba(255,255,255,.82);line-height:1.75;margin:0 0 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px"></p>' +
+      '<div class="modal-box rizq-terms-box" style="max-width:420px;padding:22px 20px 18px;background:#fff!important;color:#1a2535!important;border:1px solid #e2e8f0!important;box-shadow:0 20px 50px rgba(15,35,65,.18)!important" role="dialog" aria-modal="true" aria-labelledby="rizq-terms-modal-title">' +
+      '  <h3 id="rizq-terms-modal-title" style="font-family:Cairo,sans-serif;font-size:18px;font-weight:800;margin:0 0 8px;color:#1a2535"></h3>' +
+      '  <p id="rizq-terms-modal-lead" style="font-size:12.5px;color:#64748b;line-height:1.65;margin:0 0 12px"></p>' +
+      '  <p id="rizq-terms-modal-body" style="font-size:12px;color:#334155;line-height:1.75;margin:0 0 14px;background:#f8faff;border:1px solid #e2e8f0;border-radius:10px;padding:12px"></p>' +
       '  <label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;margin-bottom:16px">' +
-      '    <input type="checkbox" id="rizq-terms-modal-cb" style="width:17px;height:17px;margin-top:2px;accent-color:var(--gold);flex-shrink:0"/>' +
-      '    <span id="rizq-terms-modal-cb-label" style="font-size:12.5px;color:rgba(255,255,255,.9);font-weight:600;line-height:1.6"></span>' +
+      '    <input type="checkbox" id="rizq-terms-modal-cb" style="width:17px;height:17px;margin-top:2px;accent-color:#c9a84c;flex-shrink:0"/>' +
+      '    <span id="rizq-terms-modal-cb-label" style="font-size:12.5px;color:#1e293b;font-weight:600;line-height:1.6"></span>' +
       '  </label>' +
       '  <div style="display:flex;gap:10px;justify-content:flex-end">' +
-      '    <button type="button" id="rizq-terms-modal-cancel" class="m-link-btn" style="margin:0;padding:10px 14px"></button>' +
+      '    <button type="button" id="rizq-terms-modal-cancel" class="m-link-btn" style="margin:0;padding:10px 14px;color:#64748b"></button>' +
       '    <button type="button" id="rizq-terms-modal-ok" class="m-btn-main" style="width:auto;min-width:140px;padding:11px 16px;margin:0;opacity:.45" disabled></button>' +
       '  </div>' +
       '</div>';
@@ -102,14 +103,25 @@
       btn.disabled = true;
       btn.style.opacity = '.45';
     }
-    document.getElementById('rizq-terms-modal').classList.add('open');
+    var ov = document.getElementById('rizq-terms-modal');
+    ov.classList.add('open');
+    ov.style.display = 'flex';
+    ov.style.zIndex = '1000010';
+    ov.style.pointerEvents = 'auto';
     try { document.body.style.overflow = 'hidden'; } catch (e) {}
   }
 
   function close() {
     var ov = document.getElementById('rizq-terms-modal');
-    if (ov) ov.classList.remove('open');
-    try { document.body.style.overflow = ''; } catch (e) {}
+    if (ov) {
+      ov.classList.remove('open');
+      ov.style.display = 'none';
+    }
+    try {
+      var regOpen = document.getElementById('modal') && document.getElementById('modal').classList.contains('open');
+      var ragOpen = document.getElementById('rag-overlay') && document.getElementById('rag-overlay').classList.contains('open');
+      if (!regOpen && !ragOpen) document.body.style.overflow = '';
+    } catch (e) {}
     _pending = null;
   }
 
