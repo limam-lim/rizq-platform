@@ -1887,6 +1887,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_input_bidi.js"></script>
+<script src="rizq_terms_gate.js"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=16.3"></script>
@@ -3216,7 +3217,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="submitStoreReg()">إرسال الطلب ←</button>
+      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="RizqTermsGate.require(submitStoreReg)">إرسال الطلب ←</button>
       <button class="m-link-btn" data-t-fr="← Retour" onclick="showPanel('p-biz-type',1,4)">← عودة</button>
     </div>
 
@@ -3257,7 +3258,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="submitOfficeReg()">إرسال الطلب ←</button>
+      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="RizqTermsGate.require(submitOfficeReg)">إرسال الطلب ←</button>
       <button class="m-link-btn" data-t-fr="← Retour" onclick="showPanel('p-biz-type',1,4)">← عودة</button>
     </div>
 
@@ -3307,7 +3308,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="submitCorpReg()">إرسال الطلب ←</button>
+      <button class="m-btn-main" data-t-fr="Envoyer la demande →" onclick="RizqTermsGate.require(submitCorpReg)">إرسال الطلب ←</button>
       <button class="m-link-btn" data-t-fr="← Retour" onclick="showPanel('p-biz-type',1,4)">← عودة</button>
     </div>
 
@@ -3342,7 +3343,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <button class="m-btn-main" data-t-fr="Envoyer la demande →" data-t="pmr-next" onclick="submitIndividualReg()">إرسال الطلب ←</button>
+      <button class="m-btn-main" data-t-fr="Envoyer la demande →" data-t="pmr-next" onclick="RizqTermsGate.require(submitIndividualReg)">إرسال الطلب ←</button>
       <button class="m-link-btn" data-t-fr="← Retour" data-t="pmr-back" onclick="showPanel('p-nat-type',1,5)">← عودة</button>
     </div>
 
@@ -3375,11 +3376,10 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <label style="display:flex;align-items:flex-start;gap:9px;padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;cursor:pointer;margin-bottom:10px">
-        <input type="checkbox" id="terms-co" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0" onchange="document.querySelector('#p-company .m-btn-main').style.opacity=this.checked?'1':'.4';document.querySelector('#p-company .m-btn-main').disabled=!this.checked"/>
-        <span data-t-fr="J'accepte les <a href=&quot;rizq_legal.html&quot; target=&quot;_blank&quot; style=&quot;color:var(--gold)&quot;>conditions d'utilisation</a> et la <a href=&quot;rizq_legal.html&quot; target=&quot;_blank&quot; style=&quot;color:var(--gold)&quot;>politique de confidentialité</a> de Rizq. En m'inscrivant et en publiant tout contenu, je déclare détenir les droits nécessaires et j'assume l'entière responsabilité en cas de violation." style="font-size:12.5px;color:rgba(255,255,255,.85);font-weight:600;line-height:1.7">أوافق على <a href="rizq_legal.html" target="_blank" style="color:var(--gold)">شروط الاستخدام</a> و<a href="rizq_legal.html" target="_blank" style="color:var(--gold)">سياسة الخصوصية</a> لمنصة رزق. وبتسجيلي ونشري لأي إعلان أو مادة مرئية أو مسموعة أو نصية، أُقرّ صراحةً بأنني أمتلك كافة الحقوق والتراخيص القانونية اللازمة على جميع المواد التي أرفعها أو أنشرها على المنصة، وأن نشرها لا ينتهك حقوق الملكية الفكرية لأي طرف ثالث، وأتحمّل وحدي كامل المسؤولية القانونية والمالية في حال ثبوت أي انتهاك.</span>
+      <label style="display:none">
+        <input type="checkbox" id="terms-co"/>
       </label>
-      <button class="m-btn-main" onclick="goPhoneFromCompany()" disabled style="opacity:.4">التالي — تحقق الهاتف ←</button>
+      <button class="m-btn-main" onclick="RizqTermsGate.require(goPhoneFromCompany)">التالي — تحقق الهاتف ←</button>
       <button class="m-link-btn" onclick="showPanel('p-type',0)">← عودة</button>
     </div>
 
@@ -6260,6 +6260,7 @@ function openModal(mode){
 }
 
 function closeModal(){
+  if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
   const modal=document.getElementById('modal');
   modal.classList.remove('open');
   modal.style.display='none';

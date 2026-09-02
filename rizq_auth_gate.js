@@ -611,6 +611,16 @@
     var data = validateForm();
     if (!data) return;
     saveDraft(data);
+    if (global.RizqTermsGate && typeof global.RizqTermsGate.require === 'function') {
+      global.RizqTermsGate.require(_sendOtpAfterTerms);
+      return;
+    }
+    _sendOtpAfterTerms();
+  }
+
+  function _sendOtpAfterTerms() {
+    var data = validateForm() || loadDraft();
+    if (!data) return;
     var dict = d();
     var btn = document.getElementById('rag-send-otp-btn');
     btn.disabled = true;
@@ -884,6 +894,9 @@
     clearInterval(_otpTimer);
     _pendingAction = null;
     _sellerOtpCallback = null;
+    if (global.RizqTermsGate && typeof global.RizqTermsGate.resetSession === 'function') {
+      global.RizqTermsGate.resetSession();
+    }
     var waEl = document.getElementById('rag-whatsapp');
     if (waEl) waEl.disabled = false;
   }
