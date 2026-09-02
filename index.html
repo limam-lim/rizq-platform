@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=1.1"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=1.2"/>
 <link rel="stylesheet" href="rizq_header.css?v=17.1"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -1900,7 +1900,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_auth_gate.js?v=18.0" defer></script>
+<script src="rizq_auth_gate.js?v=18.1" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
@@ -3074,7 +3074,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()" aria-label="إغلاق">✕</button>
+    <button class="modal-close" onclick="if(!this.closest('#modal').classList.contains('reg-wizard-arming'))closeModal(true)" aria-label="إغلاق">✕</button>
     <div class="modal-header">
       <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
       <div id="modal-auth-tabs" class="modal-auth-tabs" style="display:none" role="tablist" aria-label="تسجيل الدخول أو إنشاء حساب">
@@ -6246,52 +6246,89 @@ function rizqOpenRegister(ev){
   if(ev){
     ev.preventDefault();
     if(ev.stopPropagation) ev.stopPropagation();
+    if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
   }
   closeMobileNav();
-  openModal('register');
+  /* تأخير بسيط حتى تنتهي اللمسة الأصلية ولا تقع على زر الإغلاق بعد فتح النافذة */
+  setTimeout(function(){ openModal('register'); }, 60);
 }
 window.rizqOpenRegister = rizqOpenRegister;
 
 function openModal(mode){
   const modal=document.getElementById('modal');
+  if(!modal) return;
   window._rizqModalOpenedAt=Date.now();
   modal.classList.add('open');
   modal.style.display='flex';
-  if(mode==='register') modal.classList.add('reg-wizard-mode');
-  else modal.classList.remove('reg-wizard-mode');
+  modal.style.pointerEvents='auto';
+  modal.style.zIndex = (mode==='register') ? '1000001' : '';
+  if(mode==='register'){
+    modal.classList.add('reg-wizard-mode');
+    modal.classList.add('reg-wizard-arming');
+    document.body.classList.add('rizq-reg-open');
+    clearTimeout(window._rizqRegArmTimer);
+    window._rizqRegArmTimer=setTimeout(function(){
+      modal.classList.remove('reg-wizard-arming');
+    }, 900);
+    try{
+      var u=new URL(window.location.href);
+      if(u.searchParams.get('openRegister')!=='1'){
+        u.searchParams.set('openRegister','1');
+        history.replaceState(null,'',u.pathname+u.search+u.hash);
+      }
+    }catch(eUrl){}
+  } else {
+    modal.classList.remove('reg-wizard-mode');
+    modal.classList.remove('reg-wizard-arming');
+    document.body.classList.remove('rizq-reg-open');
+  }
   /* unlockRizqPage() قد وضعت pointer-events:none كستايل مباشر عندما كانت
      النافذة مغلقة — يجب مسحه عند الفتح وإلا اخترقت النقرات النافذة بالكامل */
-  modal.style.pointerEvents='auto';
   document.body.style.overflow='hidden';
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
   const dots=document.getElementById('sdots');
   if(mode==='login'){
     document.getElementById('p-login').style.display='block';
-    dots.style.display='none';
+    if(dots) dots.style.display='none';
     syncModalAuthTabs('login');
   } else {
     acctType=''; natType=''; bizType='';
     document.getElementById('p-type').style.display='block';
-    dots.style.display='flex';
+    if(dots) dots.style.display='flex';
     setDot(0,5);
     syncModalAuthTabs('register');
   }
 }
 
-function closeModal(){
-  if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
+function closeModal(force){
   const modal=document.getElementById('modal');
-  modal.classList.remove('reg-wizard-mode');
-  modal.classList.remove('open');
-  modal.style.display='none';
+  if(modal && modal.classList.contains('reg-wizard-mode') && !force && Date.now()-(window._rizqModalOpenedAt||0)<900){
+    return;
+  }
+  if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
+  if(modal){
+    modal.classList.remove('reg-wizard-mode');
+    modal.classList.remove('reg-wizard-arming');
+    modal.classList.remove('open');
+    modal.style.display='none';
+    modal.style.zIndex='';
+  }
+  document.body.classList.remove('rizq-reg-open');
   document.body.style.overflow='';
+  try{
+    var u=new URL(window.location.href);
+    if(u.searchParams.has('openRegister')){
+      u.searchParams.delete('openRegister');
+      history.replaceState(null,'',u.pathname+u.search+u.hash);
+    }
+  }catch(eUrl2){}
 }
 document.getElementById('modal').addEventListener('click',function(e){
   const modal=document.getElementById('modal');
   if(e.target!==modal) return;
   if(modal.classList.contains('reg-wizard-mode')) return;
   if(Date.now()-(window._rizqModalOpenedAt||0)<450) return;
-  closeModal();
+  closeModal(true);
 });
 
 (function initAuthModalFromUrl(){
@@ -7252,7 +7289,11 @@ function goPhoneFromCompany(){
 // Escape key closes all modals
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    closeModal();
+    var regModal=document.getElementById('modal');
+    if(regModal && regModal.classList.contains('open') && regModal.classList.contains('reg-wizard-mode')){
+      return;
+    }
+    closeModal(true);
     closeSubModal();
     closeDrop();
     closeAdModal();
@@ -8446,8 +8487,8 @@ function pkgModalCTA(){
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-fr="Vos clients vous contactent directement">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-fr="WhatsApp, téléphone et e-mail — en un clic">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-fr="Prêt en quelques minutes — 3 jours gratuits">جاهز في دقائق — مجاناً 3 أيام</div><div class="rizq-pf-sub" data-t-fr="Aucun site web ni expérience technique requis">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
-      <a href="rizq_landing_v8.html?openRegister=1" class="rizq-promo-cta-main" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>
-      <a href="rizq_landing_v8.html" class="rizq-promo-cta-sec" data-t-fr="Explorer la plateforme d'abord →">تصفح المنصة أولاً ←</a>
+      <a href="?openRegister=1" class="rizq-promo-cta-main" onclick="if(typeof rizqOpenRegister==='function'){rizqOpenRegister(event);return false;}" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>
+      <a href="./" class="rizq-promo-cta-sec" data-t-fr="Explorer la plateforme d'abord →">تصفح المنصة أولاً ←</a>
       <div class="rizq-promo-note" data-t-fr="Aucune carte bancaire requise · 3 jours d'essai gratuit">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
     </div>
   </div>

@@ -381,7 +381,7 @@
       '        <div class="rag-account-meta" id="rag-acc-meta"></div>',
       '      </div>',
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
-      '      <a class="rag-seller-link" id="rag-seller-link" href="rizq_landing_v8.html?openRegister=1"></a>',
+      '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
       '  </div>',
       '</div>'
@@ -428,8 +428,20 @@
     });
     document.getElementById('rag-choice-seller').addEventListener('click', function () {
       closeModal();
-      if (typeof window.openModal === 'function') window.openModal('register');
-      else location.href = 'rizq_landing_v8.html?openRegister=1';
+      setTimeout(function () {
+        if (typeof window.rizqOpenRegister === 'function') window.rizqOpenRegister();
+        else if (typeof window.openModal === 'function') window.openModal('register');
+        else location.href = '?openRegister=1';
+      }, 60);
+    });
+    document.getElementById('rag-seller-link').addEventListener('click', function (e) {
+      e.preventDefault();
+      closeModal();
+      setTimeout(function () {
+        if (typeof window.rizqOpenRegister === 'function') window.rizqOpenRegister();
+        else if (typeof window.openModal === 'function') window.openModal('register');
+        else location.href = '?openRegister=1';
+      }, 60);
     });
 
     row.querySelectorAll('.rag-otp-box').forEach(function (box, idx, boxes) {

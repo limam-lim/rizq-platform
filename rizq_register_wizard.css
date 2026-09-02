@@ -9,6 +9,24 @@
   justify-content: flex-start !important;
   padding: 0 !important;
   overflow-y: auto !important;
+  z-index: 1000001 !important;
+}
+
+/* منع إغلاق عرضي بزر ✕ بسبب نقرة/لمسة شبحية فور الفتح */
+#modal.reg-wizard-arming .modal-close {
+  pointer-events: none !important;
+  opacity: 0.35 !important;
+}
+
+body.rizq-reg-open #rizq-chat-toggle,
+body.rizq-reg-open .mobile-bottom-nav,
+body.rizq-reg-open #nav,
+body.rizq-reg-open .fixed-rizq-logo,
+body.rizq-reg-open #rizq-rlogo-edge,
+body.rizq-reg-open .section-jump-bar,
+body.rizq-reg-open #back-to-top {
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 #modal.reg-wizard-mode .modal-box {
