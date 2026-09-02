@@ -343,7 +343,7 @@
       '    </div>',
       '    <div class="rag-step" id="rag-step-form">',
       '      <label class="rag-label" id="rag-name-label" for="rag-name"></label>',
-      '      <input class="rag-input" id="rag-name" type="text" autocomplete="name"/>',
+      '      <input class="rag-input" id="rag-name" type="text" dir="auto" autocomplete="name"/>',
       '      <div class="rag-errmsg" id="rag-name-err"></div>',
       '      <label class="rag-label" id="rag-email-label" for="rag-email"></label>',
       '      <input class="rag-input" id="rag-email" type="email" dir="ltr" autocomplete="email"/>',

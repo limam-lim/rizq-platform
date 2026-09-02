@@ -1557,15 +1557,30 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
   /* Phone numbers always LTR */
   input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
   input[name*="phone"],
   input[id*="phone"],
   input[id*="Phone"],
+  input[id*="email"],
+  input[id*="Email"],
+  input[id*="pw"],
+  input[id*="nni"],
   input[placeholder*="هاتف"],
   input[placeholder*="جوال"],
   .phone-num, .phone-display, .contact-phone, [data-phone] {
     direction: ltr !important;
     text-align: left !important;
     unicode-bidi: isolate;
+  }
+
+  /* اسم/مدينة/وصف — اتجاه تلقائي حسب لغة المحتوى */
+  input[type="text"].m-input,
+  textarea.m-input {
+    direction: auto;
+    unicode-bidi: plaintext;
+    text-align: start;
   }
 
 /* ═══ RIZQ PROMO POPUP ═══ */
@@ -1871,6 +1886,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_input_bidi.js"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=16.3"></script>
@@ -6367,6 +6383,19 @@ function ppRenderActivitiesForSelectedPkg(){
   }
 }
 
+function _setRegUploadFile(varName,file){
+  switch(varName){
+    case 'stFile': stFile=file; break;
+    case 'ofFile1': ofFile1=file; break;
+    case 'ofFile2': ofFile2=file; break;
+    case 'crFile1': crFile1=file; break;
+    case 'crFile2': crFile2=file; break;
+    case 'crFile3': crFile3=file; break;
+    case 'indFile': indFile=file; break;
+    default: window[varName]=file;
+  }
+}
+
 function handleUpload(inputId,zoneId,varName){
   const file=document.getElementById(inputId).files[0];
   if(!file) return;
@@ -6379,9 +6408,18 @@ function handleUpload(inputId,zoneId,varName){
     document.getElementById(inputId).value='';
     return;
   }
-  window[varName]=file;
+  // إصلاح 02/09/2026: كان يُعيَّن window.indFile بينما التحقق يقرأ let indFile —
+  // فيظهر ✅ للمستخدم لكن submitIndividualReg يرفض بـ "يرجى رفع صورة البطاقة".
+  _setRegUploadFile(varName,file);
   const zone=document.getElementById(zoneId);
-  zone.innerHTML='<div style="font-size:22px;margin-bottom:4px">✅</div><p style="color:#4ade80;font-size:12px;font-weight:700">'+escapeHtml(file.name)+'</p><p style="color:var(--text-muted);font-size:10px">'+Math.round(file.size/1024)+' KB</p>';
+  const isImg=file.type&&file.type.indexOf('image/')===0;
+  const thumb=isImg
+    ? '<img src="'+URL.createObjectURL(file)+'" alt="" style="width:100%;max-height:130px;object-fit:contain;border-radius:8px;margin-bottom:8px;border:1px solid rgba(74,222,128,.35);background:rgba(0,0,0,.15)"/>'
+    : '<div style="font-size:28px;margin-bottom:6px">📄</div>';
+  zone.innerHTML=thumb
+    +'<div style="font-size:18px;margin-bottom:4px">✅</div>'
+    +'<p style="color:#4ade80;font-size:12px;font-weight:700">'+escapeHtml(file.name)+'</p>'
+    +'<p style="color:var(--text-muted);font-size:10px">'+Math.round(file.size/1024)+' KB · '+(isAr?'تم الرفع بنجاح':'Téléchargé avec succès')+'</p>';
   zone.style.borderColor='rgba(74,222,128,.5)';
   zone.style.background='rgba(74,222,128,.05)';
 }

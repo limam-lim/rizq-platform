@@ -16,6 +16,13 @@
  * يضبط ALLOWED_ORIGIN في rizq-backend/.env لاسم نطاق الواجهة).
  *
  * إنتاج: https://rizq.mr  |  تطوير محلي: http://localhost:3000
+ * يُكتشف تلقائياً: localhost → :3000 ، أي نطاق آخر → Render API
  * ═══════════════════════════════════════════════════════════════════
  */
-window.RIZQ_BACKEND_BASE = window.RIZQ_BACKEND_BASE || 'http://localhost:3000';
+(function () {
+  if (window.RIZQ_BACKEND_BASE) return;
+  var host = '';
+  try { host = window.location.hostname || ''; } catch (e) {}
+  var isLocal = !host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+  window.RIZQ_BACKEND_BASE = isLocal ? 'http://localhost:3000' : 'https://rizq-backend.onrender.com';
+})();
