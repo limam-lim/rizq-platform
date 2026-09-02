@@ -86,4 +86,20 @@ function migrateLegacyBuyersJson() {
 
 migrateLegacyBuyersJson();
 
+function migrateBuyerColumns() {
+  try {
+    const cols = db.prepare('PRAGMA table_info(buyers)').all();
+    const names = cols.map((c) => c.name);
+    if (!names.includes('phone_intl')) {
+      db.exec("ALTER TABLE buyers ADD COLUMN phone_intl TEXT NOT NULL DEFAULT ''");
+    }
+    if (!names.includes('whatsapp')) {
+      db.exec("ALTER TABLE buyers ADD COLUMN whatsapp TEXT NOT NULL DEFAULT ''");
+    }
+  } catch (e) {
+    console.warn('[rizq-db] buyer column migration:', e.message);
+  }
+}
+migrateBuyerColumns();
+
 module.exports = { db, DB_FILE, DATA_DIR };

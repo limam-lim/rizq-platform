@@ -89,6 +89,9 @@
       hdrCss.href = 'rizq_header.css?v=' + ASSET_V;
       document.head.appendChild(hdrCss);
     }
+    if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
+      appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
+    }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
     }
@@ -110,6 +113,7 @@
       appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+      appendScript('rizq_productivity.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="manifest"]')) {
       var link = document.createElement('link');

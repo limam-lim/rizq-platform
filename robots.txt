@@ -3,6 +3,11 @@ Allow: /
 
 # لا داعي لفهرسة لوحات التحكم والصفحات الإدارية — لا محتوى عام فيها للزوار
 Disallow: /rizq_admin.html
+Disallow: /rizq_cp_panel.html
+Disallow: /dev-cp-local
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /wp-admin
 Disallow: /rizq_dashboard.html
 Disallow: /rizq_dashboard_store.html
 Disallow: /rizq_dashboard_office.html

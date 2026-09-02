@@ -43,6 +43,9 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .section-header .section-title {
   color: var(--text-on-navy, rgba(255, 255, 255, 0.94)) !important;
 }
+.section-header h2 {
+  color: var(--text-on-navy, rgba(255, 255, 255, 0.96)) !important;
+}
 .section-header .section-desc {
   color: var(--text-on-navy-muted, rgba(255, 255, 255, 0.88)) !important;
 }

@@ -344,6 +344,8 @@ textarea.form-input{resize:vertical;min-height:90px}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
+<script src="rizq_account_route.js"></script>
+<script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard_store" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
@@ -977,7 +979,7 @@ function verifyAccess(){
 function verifyAccessRemote(){
   return new Promise(function(resolve){
     if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
         if(!data || !data.ok || !data.account || data.account.type!=='store'){ resolve(null); return; }
@@ -1021,7 +1023,7 @@ function _resolveRealAccessToken(acc){
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
@@ -2679,8 +2681,8 @@ function toggleRizqAgent(active){
   var BACKEND = _cfg.backendUrl.replace(/\/$/,'') + '/api/agent/toggle';
   fetch(BACKEND, {
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ subscriberPhone: phone, active: active, secret: _cfg.backendSecret||'' })
+    headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||''},
+    body:JSON.stringify({ subscriberPhone: phone, active: active, accountId: SESSION_ID })
   }).then(function(r){ return r.json(); }).then(function(d){
     var statusEl = document.getElementById('agent-toggle-status');
     if(statusEl){

@@ -255,6 +255,8 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
+<script src="rizq_account_route.js"></script>
+<script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard_office" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
@@ -715,7 +717,7 @@ function verifyAccess(){
 function verifyAccessRemote(){
   return new Promise(function(resolve){
     if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
         if(!data || !data.ok || !data.account || data.account.type!=='office'){ resolve(null); return; }
@@ -751,7 +753,7 @@ function _resolveRealAccessToken(acc){
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
@@ -2579,7 +2581,7 @@ function saveMyPayment(){
     // محمد مرة واحدة من تبويب "وكيل الباقات" بلوحة الأدمن.
     var _cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
     if(!_cfg.backendUrl){showToast(_t2('⚠️ لم يُضبط رابط الخادم الخلفي بعد من لوحة الأدمن','⚠️ URL du serveur backend non configurée depuis l\'admin'),'warn');return;}
-    fetch(_cfg.backendUrl.replace(/\/$/,'')+'/api/agent/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscriberPhone:phone,active:active,secret:_cfg.backendSecret||''})})
+    fetch(_cfg.backendUrl.replace(/\/$/,'')+'/api/agent/toggle',{method:'POST',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||''},body:JSON.stringify({subscriberPhone:phone,active:active,accountId:SESSION_ID})})
       .then(function(r){return r.json();}).then(function(){
         var el=document.getElementById('agent-toggle-status');
         if(el){el.style.color=active?'#4ade80':'#f87171';el.textContent=active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé');}

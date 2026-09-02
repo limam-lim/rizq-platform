@@ -827,6 +827,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_auth_gate.js?v=15.0" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
+<script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
@@ -859,8 +860,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <div class="nav-actions">
     <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>
     <a href="rizq_post.html" class="btn-post" data-t="nav-post">➕ انشر إعلان</a>
-    <a href="rizq_dashboard.html" class="btn-ns" data-t="nav-account">حسابي</a>
-    <button class="btn-lang" id="lang-btn">FR</button>
+    <a href="#" class="btn-ns" data-t="nav-account" onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)">حسابي</a>
+    <button class="btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()">FR</button>
   </div>
 </nav>
 
@@ -1502,12 +1503,15 @@ function toggleLangPage(){
 
 // FILTER ENGINE
 const CAT_ALIAS = {
-  'منازل وعقارات':'عقارات','سيارات وقطع غيار':'سيارات','وكالات تأمين المركبات':'تأمين',
+  'منازل وعقارات':'عقارات','معدات المنازل':'معدات-منزل','طاقة ومستلزمات':'طاقة',
+  'مكائن ومعدات صناعية':'مكائن-صناعية','مكائن-صناعية':'مكائن-صناعية','معدات صناعية':'مكائن-صناعية',
+  'سيارات وقطع غيار':'سيارات','وكالات تأمين المركبات':'تأمين',
   'شاحنات ومعدات ثقيلة':'شاحنات','هواتف وإلكترونيات':'إلكترونيات','موضة وأزياء':'أزياء',
-  'ذهب ومجوهرات':'ذهب','صحة وجمال':'صحة','وظائف وفرص عمل':'وظائف','خدمات ومهن':'خدمات',
+  'ذهب ومجوهرات':'ذهب','صحة وجمال':'صحة','رحلات وسفر':'رحلات','وظائف وفرص عمل':'وظائف','خدمات ومهن':'خدمات',
   'أثاث وديكور':'أثاث','بناء ومقاولات':'بناء','تجارة وصناعة':'تجارة','رياضة وهوايات':'رياضة',
   'تعليم وثقافة':'تعليم','أغذية ومطاعم':'أغذية','فنون وحرف يدوية':'فنون','ماشية ودواجن وبيطرة':'ماشية',
-  'ماشية ودواجن':'ماشية'
+  'ماشية ودواجن':'ماشية','أجهزة منزلية':'معدات-منزل','أجهزة مطبخ':'معدات-منزل',
+  'ألواح شمسية':'طاقة','طاقة شمسية ومستلزمات':'طاقة','طاقة-شمسية':'طاقة','انفرترات ومحولات':'طاقة','مولدات كهربائية':'طاقة'
 };
 const SUBCATS_BY_CAT = {
   'سيارات':['سيارات للبيع','سيارات للكراء','سيارات كهربائية وهجينة','دراجات نارية','قطع غيار','إطارات وبطاريات'],
@@ -1520,11 +1524,33 @@ const SUBCATS_BY_CAT = {
   'وظائف':['إدارة وتسويق','هندسة وتقنية','صحة وطب','تعليم وتدريب','فريلانس'],
   'بناء':['أسمنت وحديد','طوب وسيراميك','سباكة وكهرباء','ألواح شمسية','أدوات بناء'],
 };
-function normalizeCat(r){return CAT_ALIAS[r]||r;}
+function normalizeCat(r){
+  if (typeof RizqCategories !== 'undefined') {
+    var n = RizqCategories.normalize(r);
+    if (n) return n;
+  }
+  return CAT_ALIAS[r]||r;
+}
 function renderCatSidebar(effCat){
   const wrap=document.getElementById('cat-options');
   if(!wrap)return;
   const fr=_rizqLang()==='fr';
+  const lang = fr ? 'fr' : 'ar';
+  if (typeof RizqCategories !== 'undefined' && effCat) {
+    var sc = RizqCategories.subcatsFor(effCat, lang);
+    if (sc.keys && sc.keys.length) {
+      wrap.innerHTML = sc.keys.map(function(v, i){
+        return '<label class="filter-option"><input type="radio" name="rcat" value="'+v+'" class="filter-cb"><span class="filter-label">'+(sc.labels[i]||v)+'</span></label>';
+      }).join('');
+      const rs=document.getElementById('rooms-filter-section');
+      if(rs) rs.style.display = (effCat==='عقارات') ? '' : 'none';
+      if(urlSub){
+        const m=[...wrap.querySelectorAll('input[name="rcat"]')].find(r=>r.value===urlSub||urlSub.includes(r.value));
+        if(m)m.checked=true;
+      }
+      return;
+    }
+  }
   const SUBCAT_FR_MAP={'شقق للكراء':'Appart. à louer','منازل للكراء':'Maisons à louer','غرف للكراء':'Chambres à louer','شقق للبيع':'Appart. à vendre','أراضي':'Terrains','محلات تجارية':'Locaux comm.'};
   if(!effCat||effCat==='عقارات'){
     wrap.innerHTML=['شقق للكراء','منازل للكراء','غرف للكراء','شقق للبيع','أراضي','محلات تجارية']

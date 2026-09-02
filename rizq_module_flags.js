@@ -25,7 +25,7 @@
   ];
 
   function defaultFlags() {
-    return { individual: true, store: false, office: false, corp: false, tenders: false, videoAds: false };
+    return { individual: true, store: true, office: false, corp: false, tenders: false, videoAds: false };
   }
 
   function lang() {

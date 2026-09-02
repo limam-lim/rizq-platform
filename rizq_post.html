@@ -393,7 +393,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js?v=16.3"></script>
   <script src="rizq_locale_helpers.js"></script>
-  <script src="rizq_categories_config.js"></script>
+  <script src="rizq_categories_config.js?v=20"></script>
   <!-- إصلاح جوهري 24/07/2026: هذا الملف كان الوحيد بين كل صفحات النشر (فردي/
        محل/مكتب/شركة) الذي لا يستدعي RizqSub.canPostNewAd/recordAdPost إطلاقاً
        — يعني حد "إعلان واحد نشط" (مجانية) أو "10 إعلانات" (باقة شهرية) لم يكن
@@ -724,7 +724,7 @@ main, .page-content.active, .main-content, .results-area,
       <div id="success-condition" style="font-size:13px;color:var(--text-soft);margin:-12px 0 20px"></div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <button onclick="location.href='rizq_browse.html'" data-t-fr="👁 Voir mon annonce" style="padding:12px 24px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">👁 عرض إعلاني</button>
-        <button onclick="location.href='rizq_dashboard.html'" data-t-fr="📊 Tableau de bord" style="padding:12px 24px;background:transparent;color:var(--gold);border:1.5px solid rgba(201,168,76,.3);border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">📊 لوحة التحكم</button>
+        <button onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)" data-t-fr="📊 Tableau de bord" style="padding:12px 24px;background:transparent;color:var(--gold);border:1.5px solid rgba(201,168,76,.3);border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">📊 لوحة التحكم</button>
         <button onclick="shareSuccess()" data-t-fr="↗ Partager" style="padding:12px 24px;background:transparent;color:var(--text-soft);border:1px solid rgba(13,27,42,.12);border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">↗ مشاركة</button>
       </div>
     </div>
@@ -1248,6 +1248,7 @@ function publishAd(){
           _showSuccessCondition(data);
           document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
           document.getElementById('panel-success').classList.add('active');
+          try{ document.dispatchEvent(new CustomEvent('rizq:ad-published')); if(window.RizqProductivity) window.RizqProductivity.clearPostDraft(); }catch(_ePd){}
           document.querySelectorAll('.progress-steps .step').forEach(function(s){
             s.classList.remove('active'); s.classList.add('done');
             s.querySelector('.step-circle').textContent = '✓';
@@ -1300,6 +1301,7 @@ function publishAd(){
         _showSuccessCondition(data);
         document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
         document.getElementById('panel-success').classList.add('active');
+        try{ document.dispatchEvent(new CustomEvent('rizq:ad-published')); if(window.RizqProductivity) window.RizqProductivity.clearPostDraft(); }catch(_ePd){}
         document.querySelectorAll('.progress-steps .step').forEach(function(s){
           s.classList.remove('active'); s.classList.add('done');
           s.querySelector('.step-circle').textContent = '✓';
@@ -1313,6 +1315,7 @@ function publishAd(){
     _showSuccessCondition(adData);
     document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
     document.getElementById('panel-success').classList.add('active');
+    try{ document.dispatchEvent(new CustomEvent('rizq:ad-published')); if(window.RizqProductivity) window.RizqProductivity.clearPostDraft(); }catch(_ePd){}
     document.querySelectorAll('.progress-steps .step').forEach(function(s){
       s.classList.remove('active'); s.classList.add('done');
       s.querySelector('.step-circle').textContent = '✓';
@@ -1449,7 +1452,12 @@ function saveAdEdit(){
         if(idx > -1){ Object.assign(ads[idx], body); localStorage.setItem('rizq_ads', JSON.stringify(ads)); }
       }catch(e){}
       showToast((typeof isAr !== 'undefined' && !isAr) ? '✅ Annonce mise à jour' : '✅ تم حفظ التعديلات');
-      setTimeout(function(){ location.href = 'rizq_dashboard.html'; }, 900);
+      setTimeout(function(){
+        var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
+          ? window.RizqAccount.resolveDashboardUrl()
+          : '';
+        location.href = dashUrl || 'rizq_landing_v8.html?openLogin=1';
+      }, 900);
     }).catch(function(){
       showToast((typeof isAr !== 'undefined' && !isAr) ? '❌ Échec de la sauvegarde — réessayez' : '❌ تعذّر الحفظ — حاول مرة أخرى','error');
       if(btn){ btn.disabled = false; btn.textContent = prevLabel; }

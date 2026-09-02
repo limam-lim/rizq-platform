@@ -465,7 +465,7 @@ main, .page-content.active, .main-content, .results-area,
   </div>
   <div class="nav-actions">
     <a href="rizq_post.html" class="btn-post" data-t="nav-post">➕ انشر إعلان</a>
-    <a href="rizq_dashboard.html" class="btn-ns" data-t="nav-account">حسابي</a>
+    <a href="#" class="btn-ns" data-t="nav-account" onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)">حسابي</a>
     <button class="btn-lang" id="lang-btn">FR</button>
   </div>
 <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>

@@ -32,7 +32,7 @@
     '#rizq-chat-toggle::after{content:"";position:absolute;inset:-6px;border-radius:50%;',
     'border:2px solid rgba(201,168,76,.35);pointer-events:none;animation:rwRing 2.6s ease-out infinite 1.3s;z-index:-1;}',
     '@keyframes rwRing{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.45);opacity:0}}',
-    '#rizq-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:10px;',
+    '#rizq-badge{position:absolute;top:-4px;right:-4px;background:#C9A84C;color:#0f2347;font-size:10px;',
     'font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;',
     'justify-content:center;border:2px solid #fff;animation:rwPulse 2s infinite;}',
     '@keyframes rwPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}',
@@ -168,7 +168,9 @@
     '.rw-prompt-bubble::after{content:"";position:absolute;bottom:-6px;right:18px;width:10px;height:10px;',
     'background:#fff;border-right:1.5px solid rgba(201,168,76,.3);border-bottom:1.5px solid rgba(201,168,76,.3);transform:rotate(45deg)}',
     'html[dir="ltr"] .rw-prompt-bubble::after{right:auto;left:18px}',
-    '@media(max-width:768px){#rizq-prompt-bubbles{bottom:150px;right:16px}.rw-prompt-bubble{font-size:11px;padding:8px 12px;max-width:180px}}'
+    '@media(max-width:768px){#rizq-chat-toggle{width:52px;height:52px;bottom:calc(88px + env(safe-area-inset-bottom,0))!important;right:12px!important}',
+    '#rizq-prompt-bubbles{bottom:calc(148px + env(safe-area-inset-bottom,0));right:12px;max-width:calc(100vw - 80px)}',
+    '.rw-prompt-bubble{font-size:11px;padding:8px 12px;max-width:min(200px,calc(100vw - 96px));pointer-events:auto}}'
   ].join('');
   document.head.appendChild(styleEl);
 
@@ -1563,7 +1565,7 @@
         .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
     } catch (e) {}
 
-    /* ── Prompt bubbles فوق أيقونة الشات — تشجيع على بدء المحادثة ── */
+    /* ── Prompt bubbles فوق أيقونة الشات — تظهر 5 ثوانٍ ثم تختفي؛ تعود عند لمس/تحريك الماوس ── */
     (function initPromptBubbles() {
       var bubble = document.getElementById('rw-prompt-bubble');
       var wrap = document.getElementById('rizq-prompt-bubbles');
@@ -1573,9 +1575,26 @@
         fr: ['💡 Comment publier ?', '🛡️ Rizq est-il sûr ?', '💳 Modes de paiement ?', '🔍 Chercher une voiture', '📦 Quels forfaits ?']
       };
       var idx = 0;
+      var hideTimer = null;
+      var showDebounce = null;
+      var lastShownAt = 0;
+      var VISIBLE_MS = 5000;
+      var MIN_GAP_MS = 22000;
+
       function langNow() { return _ctx.lang === 'fr' ? 'fr' : 'ar'; }
-      function showPrompt() {
-        if (_open) { wrap.style.display = 'none'; return; }
+
+      function hidePrompt() {
+        bubble.classList.remove('visible');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function () { wrap.style.display = 'none'; }, 280);
+      }
+
+      function showPrompt(force) {
+        if (_open || document.hidden) return;
+        var now = Date.now();
+        if (!force && now - lastShownAt < MIN_GAP_MS && idx > 0) return;
+        lastShownAt = now;
+        clearTimeout(hideTimer);
         wrap.style.display = 'block';
         var list = prompts[langNow()] || prompts.ar;
         bubble.classList.remove('visible');
@@ -1583,17 +1602,41 @@
           bubble.textContent = list[idx % list.length];
           idx++;
           bubble.classList.add('visible');
+          hideTimer = setTimeout(hidePrompt, VISIBLE_MS);
         }, 120);
       }
+
+      function scheduleShowFromActivity() {
+        if (_open) return;
+        clearTimeout(showDebounce);
+        showDebounce = setTimeout(function () { showPrompt(false); }, 500);
+      }
+
       bubble.addEventListener('click', function () {
         var txt = bubble.textContent.replace(/^[^\s]+\s*/, '').trim();
+        hidePrompt();
         open();
         if (txt) setTimeout(function () { quickSend(txt); }, 450);
       });
-      setTimeout(showPrompt, 3500);
-      setInterval(function () {
-        if (!_open) showPrompt();
-      }, 7000);
+
+      document.addEventListener('rizq:langchange', function () {
+        if (bubble.classList.contains('visible')) {
+          var list = prompts[langNow()] || prompts.ar;
+          bubble.textContent = list[(idx - 1 + list.length) % list.length];
+        }
+      });
+
+      var scrollTimer;
+      window.addEventListener('scroll', function () {
+        if (bubble.classList.contains('visible')) hidePrompt();
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(scheduleShowFromActivity, 1200);
+      }, { passive: true });
+
+      document.addEventListener('pointermove', scheduleShowFromActivity, { passive: true });
+      document.addEventListener('touchstart', scheduleShowFromActivity, { passive: true });
+
+      setTimeout(function () { showPrompt(true); }, 3500);
     })();
 
     return { toggle: toggle, open: open, close: close, send: send, quickSend: quickSend, handleKey: handleKey, autoResize: autoResize };

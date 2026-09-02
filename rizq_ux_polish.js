@@ -102,15 +102,73 @@
 
   function updateFavBadges() {
     var n = wishlistIds().length;
+    var heart = n > 0 ? '♥' : '♡';
+    var wlBlock = document.getElementById('wishlist-block');
+    if (wlBlock) wlBlock.classList.toggle('has-favs', n > 0);
     document.querySelectorAll('[data-rizq-fav-count]').forEach(function (el) {
       el.textContent = n > 99 ? '99+' : String(n);
       el.hidden = n < 1;
       el.classList.toggle('is-empty', n < 1);
     });
+    document.querySelectorAll('[data-rizq-fav-heart], .rizq-hdr-fav-ico').forEach(function (el) {
+      el.textContent = heart;
+    });
     document.querySelectorAll('[data-rizq-fav-wrap]').forEach(function (el) {
       el.classList.toggle('has-favs', n > 0);
-      el.setAttribute('aria-label', t('المفضلة (' + n + ')', 'Favoris (' + n + ')'));
+      var lbl = n > 0 ? t('المفضلة (' + n + ')', 'Favoris (' + n + ')') : t('المفضلة', 'Favoris');
+      el.setAttribute('aria-label', lbl);
+      el.setAttribute('title', lbl);
     });
+  }
+
+  function wishlistEmptyHtml() {
+    var fr = lang() === 'fr';
+    return '<div class="rzq-wishlist-empty" style="text-align:center;padding:36px 22px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(27,58,107,.05));border:2px solid rgba(201,168,76,.35);border-radius:20px;max-width:540px;margin:0 auto;box-shadow:0 8px 28px rgba(27,58,107,.08)">'
+      + '<div class="rizq-gold-heart" style="font-size:42px;display:block;margin:0 auto 16px">♡</div>'
+      + '<p style="font-size:18px;font-weight:900;color:#0f2347!important;margin:0 0 12px;line-height:1.55">'
+      + (fr ? 'Aucune annonce en favori' : 'لا توجد إعلانات في المفضلة بعد')
+      + '</p>'
+      + '<p style="font-size:15px;font-weight:700;color:#1B3A6B!important;margin:0;line-height:1.85">'
+      + (fr
+        ? 'Parcourez les annonces et touchez le cœur doré <span class="rizq-gold-heart" style="font-size:18px">♡</span> pour sauvegarder.'
+        : 'تصفّح الإعلانات واضغط على القلب الذهبي <span class="rizq-gold-heart" style="font-size:18px">♡</span> لحفظ الإعلان.')
+      + '</p>'
+      + '<div style="margin-top:20px"><a href="rizq_browse.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#C9A84C,#FFD700);color:#0f2347;font-weight:900;font-size:15px;padding:12px 22px;border-radius:14px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,.35)">'
+      + (fr ? 'Parcourir les annonces →' : 'تصفح الإعلانات ←') + '</a></div></div>';
+  }
+
+  function openWishlist(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    var block = document.getElementById('wishlist-block');
+    if (!block) {
+      window.location.href = 'rizq_landing_v8.html#wishlist-block';
+      return;
+    }
+    var section = document.getElementById('rizq-live-activity');
+    if (section) section.style.display = '';
+    block.style.display = '';
+    var wlTitle = document.getElementById('wishlist-block-title');
+    if (wlTitle) {
+      var fr = lang() === 'fr';
+      if (!wlTitle.hasAttribute('data-t-ar')) wlTitle.setAttribute('data-t-ar', wlTitle.textContent.trim());
+      wlTitle.textContent = fr ? (wlTitle.getAttribute('data-t-fr') || 'Vos favoris') : wlTitle.getAttribute('data-t-ar');
+    }
+    var done = function () {
+      setTimeout(function () {
+        block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try { history.replaceState(null, '', '#wishlist-block'); } catch (eH) { location.hash = 'wishlist-block'; }
+      }, 100);
+    };
+    if (typeof window.RizqRenderWishlist === 'function') {
+      window.RizqRenderWishlist(true).then(done);
+      return;
+    }
+    var mount = document.getElementById('wishlist-mount');
+    if (mount) mount.innerHTML = wishlistEmptyHtml();
+    done();
   }
 
   function cartItems() {
@@ -441,7 +499,19 @@
     return { show: show, hide: hide, box: box };
   }
 
+  function injectFavStyles() {
+    if (document.getElementById('rizq-fav-gold-css')) return;
+    var st = document.createElement('style');
+    st.id = 'rizq-fav-gold-css';
+    st.textContent =
+      '.nav-fav-ico,.rizq-gold-heart,.rizq-hdr-fav-ico{color:#E8C96A;font-weight:800;-webkit-text-fill-color:#E8C96A;text-shadow:0 0 10px rgba(201,168,76,.55)}' +
+      '.nav-fav-btn.has-favs .nav-fav-ico,.rizq-hdr-fav.has-favs .rizq-hdr-fav-ico,#wishlist-block.has-favs [data-rizq-fav-heart]{color:#FFD700;-webkit-text-fill-color:#FFD700;text-shadow:0 0 14px rgba(255,215,0,.6)}' +
+      '.rzq-wishlist-empty .rizq-gold-heart{font-size:42px;line-height:1}';
+    document.head.appendChild(st);
+  }
+
   function boot() {
+    injectFavStyles();
     updateFavBadges();
     updateCartBadges();
     document.addEventListener('rizq_wishlist', updateFavBadges);
@@ -453,6 +523,19 @@
     document.addEventListener('rizq:langchange', function () {
       updateFavBadges();
       updateCartBadges();
+    });
+
+    document.addEventListener('click', function (ev) {
+      var wrap = ev.target.closest('[data-rizq-fav-wrap]');
+      if (!wrap) return;
+      openWishlist(ev);
+    }, true);
+
+    if (location.hash === '#wishlist-block') {
+      setTimeout(function () { openWishlist(); }, 500);
+    }
+    window.addEventListener('hashchange', function () {
+      if (location.hash === '#wishlist-block') openWishlist();
     });
   }
 
@@ -473,6 +556,8 @@
     updateCartBadges: updateCartBadges,
     updateStoreWishBadge: updateStoreWishBadge,
     updateCommerceBadges: updateCommerceBadges,
+    openWishlist: openWishlist,
+    wishlistEmptyHtml: wishlistEmptyHtml,
     CONDITION_OPTS: CONDITION_OPTS,
     conditionLabel: conditionLabel,
     conditionFilterHtml: conditionFilterHtml,

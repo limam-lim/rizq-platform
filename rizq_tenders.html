@@ -469,7 +469,7 @@ function _resolveRealAccessToken(session){
     }
   }catch(e){}
   if(!_backendBase() || !session || !session.token) return Promise.resolve(null);
-  return fetch(_backendBase() + '/api/accounts/verify-dash/' + encodeURIComponent(session.id) + '?token=' + encodeURIComponent(session.token))
+  return fetch(_backendBase() + '/api/accounts/verify-dash/' + encodeURIComponent(session.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':session.token}, body:JSON.stringify({dashToken:session.token}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       if(!data || !data.ok || !data.account || !data.account.accessToken) return null;

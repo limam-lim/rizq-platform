@@ -209,32 +209,34 @@
     if (isStorePage()) {
       return '';
     }
+    var inner = '';
     if (!isCommercePage()) {
-      return '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-    }
-    var html = '';
-    if (isStorePage()) {
-      html +=
-        '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
-        t2('مفضلة المحل', 'Favoris boutique') +
-        '" title="' +
-        t2('مفضلة المحل', 'Favoris boutique') +
-        '">❤<span class="rizq-hdr-fav-count" data-rizq-store-wish-count hidden>0</span></button>';
+      inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
     } else {
-      html +=
-        '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' +
-        t2('المفضلة', 'Favoris') +
+      if (isStorePage()) {
+        inner +=
+          '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
+          t2('مفضلة المحل', 'Favoris boutique') +
+          '" title="' +
+          t2('مفضلة المحل', 'Favoris boutique') +
+          '">❤<span class="rizq-hdr-fav-count" data-rizq-store-wish-count hidden>0</span></button>';
+      } else {
+        inner +=
+          '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' +
+          t2('المفضلة', 'Favoris') +
+          '" title="' +
+          t2('المفضلة', 'Favoris') +
+          '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+      }
+      inner +=
+        '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
+        t2('السلة', 'Panier') +
         '" title="' +
-        t2('المفضلة', 'Favoris') +
-        '">❤️<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+        t2('السلة', 'Panier') +
+        '">🛒<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
     }
-    html +=
-      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
-      t2('السلة', 'Panier') +
-      '" title="' +
-      t2('السلة', 'Panier') +
-      '">🛒<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
-    return html;
+    if (!inner) return '';
+    return '<span class="rizq-toolbar-tools rizq-hdr-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' + inner + '</span>';
   }
 
   function headerHtml() {
@@ -242,10 +244,10 @@
       '<header id="rizq-app-header" role="banner">' +
         '<div class="rizq-hdr-row1">' +
           '<div class="rizq-hdr-start">' +
-            '<button type="button" class="rizq-hdr-back" id="rizq-hdr-back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
+            '<button type="button" class="rizq-hdr-back rizq-toolbar-back" id="rizq-hdr-back" data-rizq-toolbar="back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
+            '<button type="button" class="btn-lang btn-lang-primary rizq-toolbar-lang" id="rizq-lang-btn" data-rizq-toolbar="lang" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
+            '<button type="button" class="rizq-hdr-account rizq-toolbar-account" id="rizq-hdr-account" data-rizq-toolbar="account" aria-label="حسابي" title="حسابي">👤</button>' +
             commerceToolbarHtml() +
-            '<button type="button" class="rizq-hdr-account" id="rizq-hdr-account" aria-label="حسابي" title="حسابي">👤</button>' +
-            '<button type="button" class="btn-lang btn-lang-primary" id="rizq-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
           '</div>' +
           '<a class="rizq-hdr-brand logo" href="rizq_landing_v8.html" aria-label="رزق">' +
             '<img class="rizq-hdr-brand-mark logo-mark-img" src="rizq-mark-512.png?v=10.3" width="42" height="42" alt=""/>' +
@@ -337,7 +339,8 @@
       packs: t2('الباقات', 'Forfaits'),
       legal: t2('المواد القانونية', 'Mentions légales'),
       about: t2('من نحن', 'À propos'),
-      account: t2('حسابي', 'Compte')
+      account: t2('حسابي', 'Compte'),
+      fav: t2('المفضلة', 'Favoris')
     };
     return fallback[key] || '';
   }
@@ -533,12 +536,13 @@
     });
   }
 
-  function openAccount() {
-    if (typeof window.openModal === 'function') {
-      window.openModal('login');
+  function openAccount(e) {
+    if (window.RizqAccount && typeof window.RizqAccount.open === 'function') {
+      window.RizqAccount.open(e);
       return;
     }
-    location.href = 'rizq_dashboard.html';
+    if (e && e.preventDefault) e.preventDefault();
+    location.href = 'rizq_landing_v8.html?openLogin=1';
   }
 
   function openAssistant() {
@@ -702,15 +706,25 @@
     if (hdr && hdr.parentNode) hdr.parentNode.removeChild(hdr);
   }
 
+  function deskFavHtml() {
+    return '<span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' +
+      '<a href="rizq_landing_v8.html#wishlist-block" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
+      t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +
+      '<span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>' +
+      '<span class="nav-fav-lbl" data-hdr="fav">' + t2('المفضلة', 'Favoris') + '</span>' +
+      '<span data-rizq-fav-count hidden>0</span></a></span>';
+  }
+
   function deskNavHtml() {
     return '' +
       '<nav id="rizq-desk-nav" aria-label="التنقل الرئيسي">' +
         '<div class="nav-start">' +
-          '<button type="button" class="nav-account-btn" id="rizq-desk-account" aria-label="حسابي">' +
+          '<button type="button" class="btn-lang btn-lang-primary rizq-toolbar-lang" id="rizq-desk-lang-btn" data-rizq-toolbar="lang" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
+          '<button type="button" class="nav-account-btn rizq-toolbar-account" id="rizq-desk-account" data-rizq-toolbar="account" aria-label="حسابي">' +
             '<span class="nav-account-ico" aria-hidden="true">👤</span>' +
             '<span data-hdr="account">' + t2('حسابي', 'Compte') + '</span>' +
           '</button>' +
-          '<button type="button" class="btn-lang btn-lang-primary" id="rizq-desk-lang-btn" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
+          deskFavHtml() +
         '</div>' +
         '<ul class="nav-center">' +
           '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +

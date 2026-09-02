@@ -375,6 +375,8 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
+<script src="rizq_account_route.js"></script>
+<script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body data-t-ns="dashboard" class="rizq-dash">
@@ -1690,7 +1692,7 @@ function _resolveRealAccessToken(acc){
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
@@ -1717,7 +1719,7 @@ function verifyAccess(){
 function verifyAccessRemote(){
   return new Promise(function(resolve){
     if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID) + '?token=' + encodeURIComponent(SESSION_TOKEN))
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
         if(!data || !data.ok || !data.account || data.account.type!=='individual'){ resolve(null); return; }
@@ -1732,6 +1734,20 @@ function verifyAccessRemote(){
 }
 
 function showAccessDenied(){
+  var el = document.getElementById('access-denied');
+  if(el && !SESSION_ID && !SESSION_TOKEN){
+    var h2 = el.querySelector('h2');
+    var p = el.querySelector('p');
+    if(h2) h2.textContent = (_rizqLang()==='fr') ? 'Connexion requise' : 'يجب تسجيل الدخول';
+    if(p) p.innerHTML = (_rizqLang()==='fr')
+      ? 'Connectez-vous ou créez un compte pour accéder à votre tableau de bord sur <span style="color:var(--gold);font-weight:900">Rizq</span>.'
+      : 'سجّل الدخول أو أنشئ حساباً للوصول إلى لوحة التحكم على <span style="color:var(--gold);font-weight:900">رزق</span>.';
+    var home = el.querySelector('a[href*="rizq_landing"]');
+    if(home){
+      home.textContent = (_rizqLang()==='fr') ? 'Se connecter' : 'تسجيل الدخول';
+      home.href = 'rizq_landing_v8.html?openLogin=1';
+    }
+  }
   document.getElementById('access-denied').style.display='flex';
   document.getElementById('sidebar').style.display='none';
   document.querySelector('.main-content').style.display='none';

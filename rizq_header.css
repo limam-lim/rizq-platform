@@ -188,6 +188,37 @@ body > .nav-dropdown-menu.rizq-more-menu-open,
   transform:none !important;
 }
 
+/* Toolbar slots — مرن: اللغة → حسابي → أدوات (مفضلة/سلة…) دون عدد أعمدة ثابت */
+.rizq-hdr-start,
+.nav-start,
+html.rizq-app-nav #nav > .nav-start,
+html.rizq-app-nav #rizq-desk-nav > .nav-start{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  gap:8px;
+  direction:ltr !important;
+}
+.rizq-toolbar-back,
+[data-rizq-toolbar="back"]{order:0;flex-shrink:0}
+.rizq-toolbar-lang,
+[data-rizq-toolbar="lang"]{order:10;flex-shrink:0}
+.rizq-toolbar-account,
+[data-rizq-toolbar="account"]{order:20;flex-shrink:0}
+.rizq-toolbar-tools,
+[data-rizq-toolbar="tools"]{
+  order:30;
+  display:inline-flex;
+  flex-direction:row;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.rizq-toolbar-tools > *,
+[data-rizq-toolbar="tools"] > *{flex-shrink:0}
+
 #rizq-lang-btn{
   position:static !important;
   display:inline-flex !important;
@@ -234,6 +265,11 @@ body > .nav-dropdown-menu.rizq-more-menu-open,
   flex-shrink:0;
 }
 .rizq-hdr-fav.has-favs{border-color:rgba(201,168,76,.55)}
+.rizq-hdr-fav-ico{
+  color:#E8C96A;font-size:19px;line-height:1;font-weight:800;
+  text-shadow:0 0 10px rgba(201,168,76,.45);-webkit-text-fill-color:#E8C96A;
+}
+.rizq-hdr-fav.has-favs .rizq-hdr-fav-ico{color:#FFD700;-webkit-text-fill-color:#FFD700}
 .rizq-hdr-fav-count{
   position:absolute;top:-3px;inset-inline-end:-3px;
   min-width:16px;height:16px;padding:0 4px;
@@ -424,32 +460,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav > .nav-start{
     grid-column:1;
     justify-self:start;
-    display:grid !important;
-    grid-auto-flow:column;
-    grid-template-columns:auto auto;
-    direction:ltr !important;
-    align-items:center;
-    gap:8px;
     padding-inline-start:8px;
     min-width:max-content;
     overflow:visible !important;
     flex-shrink:0;
   }
-  /* اللغة أقصى اليسار، وحسابي عن يمينها مباشرة */
-  html.rizq-app-nav #nav-lang-btn,
-  html.rizq-app-nav #rizq-desk-lang-btn,
-  html.rizq-app-nav #nav > .nav-start .btn-lang,
-  html.rizq-app-nav #rizq-desk-nav > .nav-start .btn-lang{
-    order:1 !important;
-    grid-column:1;
-  }
-  html.rizq-app-nav #nav .nav-account-btn,
-  html.rizq-app-nav #rizq-desk-nav .nav-account-btn,
-  html.rizq-app-nav #rizq-desk-account{
-    order:2 !important;
-    grid-column:2;
-  }
-  html.rizq-app-nav #nav .nav-hamburger{order:3}
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
     grid-column:2;
@@ -651,6 +666,28 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     background:rgba(255,255,255,.07);border:1px solid rgba(201,168,76,.4);
     color:#E8C96A;padding:8px 14px;border-radius:22px;font-weight:800;font-size:13px;
     cursor:pointer;font-family:'Cairo',system-ui,sans-serif;white-space:nowrap;
+  }
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-btn,
+  html.rizq-app-nav #nav .nav-fav-btn{
+    display:inline-flex !important;
+    align-items:center;gap:5px;
+    min-width:auto;justify-content:center;
+    text-decoration:none !important;
+  }
+  html.rizq-app-nav .nav-fav-ico,
+  html.rizq-app-nav .rizq-hdr-fav-ico{
+    color:#E8C96A;font-weight:800;-webkit-text-fill-color:#E8C96A;
+    text-shadow:0 0 10px rgba(201,168,76,.55);
+  }
+  html.rizq-app-nav .nav-fav-btn.has-favs .nav-fav-ico,
+  html.rizq-app-nav .rizq-hdr-fav.has-favs .rizq-hdr-fav-ico{
+    color:#FFD700;-webkit-text-fill-color:#FFD700;
+    text-shadow:0 0 14px rgba(255,215,0,.6);
+  }
+  html.rizq-app-nav .nav-fav-lbl{font-size:13px;font-weight:800;color:#E8C96A}
+  @media (max-width:520px){
+    html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{display:none}
+    html.rizq-app-nav #rizq-desk-nav .nav-fav-btn{padding:8px 11px;min-width:38px}
   }
   /* منع تسرب الاتجاه: القوائم المنسدلة تتبع لغة الصفحة */
   html.rizq-app-nav[dir="ltr"] #nav .nav-dropdown-menu,
@@ -854,7 +891,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav .mobile-drawer,
   html.rizq-app-nav .mobile-drawer-overlay,
   html.rizq-app-nav .nav-sticky-tools,
-  html.rizq-app-nav .btn-lang:not(#rizq-lang-btn){
+  html.rizq-app-nav .btn-lang:not(#rizq-lang-btn):not(#nav-lang-btn):not(#rizq-desk-lang-btn){
     display:none !important;
   }
 
@@ -981,32 +1018,26 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start{
     order:1 !important;
     flex:1 1 auto !important;
-    display:flex !important;
-    flex-direction:row !important;
-    align-items:center !important;
-    gap:8px !important;
-    direction:ltr !important;
     height:56px !important;
     min-width:0 !important;
-    grid-template-columns:none !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-start .rizq-hdr-back,
-  html.rizq-app-nav body.landing-ux-mobile #nav-back-btn{
+  html.rizq-app-nav body.landing-ux-mobile #nav-back-btn,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger{
     display:none !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav #nav-lang-btn{
-    order:0 !important;
-    display:inline-flex !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn span:not(.nav-account-ico){
+  html.rizq-app-nav body.landing-ux-mobile #nav #nav-account-btn span:not(.nav-account-ico),
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn:not(.nav-fav-btn) span:not(.nav-account-ico){
     display:none !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn{
+  html.rizq-app-nav body.landing-ux-mobile #nav #nav-account-btn,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-account-btn:not(.nav-fav-btn){
     padding:8px 10px !important;
     border-radius:50% !important;
     min-width:40px !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .btn-lang-primary{
+    display:inline-flex !important;
     padding:6px 12px !important;
     font-size:11px !important;
   }
@@ -1248,9 +1279,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     font-weight:700;
     margin-top:2px;
   }
-  /* اللغة أقصى اليسار، وحسابي عن يمينها مباشرة */
-  #rizq-app-header #rizq-lang-btn{order:1}
-  #rizq-app-header .rizq-hdr-account{order:2}
+  /* ترتيب الأدوات عبر فتحات rizq-toolbar-* — الصف الثاني (nav-center) يبقى ديناميكياً بـ moduleFlags */
+  #rizq-app-header .rizq-hdr-back{order:0}
+  #rizq-app-header #rizq-lang-btn{order:10}
+  #rizq-app-header .rizq-hdr-account{order:20}
+  #rizq-app-header .rizq-toolbar-tools,
+  #rizq-app-header .rizq-hdr-tools{order:30}
   #rizq-app-header nav.rizq-hdr-row2,
   #rizq-app-header .rizq-hdr-row2{
     direction:rtl;

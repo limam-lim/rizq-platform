@@ -1,0 +1,3 @@
+# حظر الملف الحقيقي للوحة الأدمن على الاستضافة الثابتة (Netlify / Cloudflare Pages)
+/rizq_cp_panel.html  /rizq_admin.html  404
+/rizq_cp_panel  /rizq_admin.html  404
