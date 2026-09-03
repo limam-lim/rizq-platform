@@ -2558,8 +2558,13 @@ function toggleSidebar(){
 }
 
 function logout(){
-  if(confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?')))
-    window.location.href='rizq_landing_v8.html';
+  if(!confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?'))) return;
+  if(window.RizqAccount && typeof window.RizqAccount.clearSession === 'function'){
+    window.RizqAccount.clearSession();
+  } else {
+    try{ localStorage.removeItem('rizq_active_session'); }catch(e){}
+  }
+  window.location.href='rizq_landing_v8.html';
 }
 
 function showToast(msg, type=''){

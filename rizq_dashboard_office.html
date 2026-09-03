@@ -1897,7 +1897,15 @@ function deactivateAccount(){
 // الكواليس — نجاح وهمي بالكامل (نفس علّة rizq_dashboard_store.html).
 function changePw(){const pw=document.getElementById('s-pw-new').value;const c2=document.getElementById('s-pw2').value;if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}showToast(_t2('⚠️ نظام مصادقة حقيقي قيد التطوير — هذا النموذج للعرض فقط حالياً','⚠️ Le système d\'authentification réel est en cours de développement — indicatif uniquement pour l\'instant'),'error');}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');}
-function logout(){if(confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?')))window.location.href='rizq_landing_v8.html';}
+function logout(){
+  if(!confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?'))) return;
+  if(window.RizqAccount && typeof window.RizqAccount.clearSession === 'function'){
+    window.RizqAccount.clearSession();
+  } else {
+    try{ localStorage.removeItem('rizq_active_session'); }catch(e){}
+  }
+  window.location.href='rizq_landing_v8.html';
+}
 function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 
 // ── ترجمات AR / FR — داشبورد المكتب ─────────────────────────

@@ -542,7 +542,7 @@
       return;
     }
     if (e && e.preventDefault) e.preventDefault();
-    location.href = 'rizq_landing_v8.html?openLogin=1';
+    location.href = 'index.html';
   }
 
   function openAssistant() {

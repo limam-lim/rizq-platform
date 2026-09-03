@@ -12,6 +12,23 @@
     corp: 'rizq_dashboard_corp.html'
   };
 
+  var SESSION_KEYS = [
+    'rizq_active_session',
+    'rizq_individual_session',
+    'rizq_corp_session',
+    'rizq_session',
+    'rizq_session_id'
+  ];
+
+  function readPendingAccounts() {
+    try {
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      return Array.isArray(accs) ? accs : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   function readStoredSession() {
     var sess = null;
     try { sess = JSON.parse(localStorage.getItem('rizq_active_session') || 'null'); } catch (e) {}
@@ -23,14 +40,9 @@
 
   function findApprovedAccount(sess) {
     if (!sess || !sess.id || !sess.token) return null;
-    try {
-      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-      return accs.find(function (a) {
-        return a.id === sess.id && a.token === sess.token && a.status === 'approved';
-      }) || null;
-    } catch (e) {
-      return null;
-    }
+    return readPendingAccounts().find(function (a) {
+      return a && a.id === sess.id && a.token === sess.token && a.status === 'approved';
+    }) || null;
   }
 
   function buildDashboardUrl(acc) {
@@ -48,9 +60,81 @@
     return buildDashboardUrl(acc);
   }
 
-  function isLandingPage() {
-    var p = (location.pathname || '').split('/').pop() || '';
-    return p === '' || p === 'index.html' || p === 'rizq_landing_v8.html';
+  function setActiveSession(acc) {
+    if (!acc || !acc.id || !acc.token) return;
+    try {
+      localStorage.setItem('rizq_active_session', JSON.stringify({
+        id: acc.id,
+        token: acc.token,
+        type: acc.type || 'individual',
+        name: acc.name || acc.owner || acc.manager || ''
+      }));
+    } catch (e) {}
+    if ((acc.type || '') === 'individual') {
+      try {
+        localStorage.setItem('rizq_individual_session', JSON.stringify({
+          id: acc.id,
+          token: acc.token,
+          name: acc.name || ''
+        }));
+      } catch (e2) {}
+    }
+  }
+
+  function clearSession() {
+    SESSION_KEYS.forEach(function (k) {
+      try { localStorage.removeItem(k); } catch (e) {}
+    });
+  }
+
+  function findSellerByLogin(email, password) {
+    var em = String(email || '').trim().toLowerCase();
+    var pw = String(password || '');
+    if (!em || !pw) return null;
+    return readPendingAccounts().find(function (a) {
+      if (!a || a.status !== 'approved') return false;
+      if (!a.token) return false;
+      if (String(a.email || '').trim().toLowerCase() !== em) return false;
+      if (a.password == null || a.password === '') return false;
+      return String(a.password) === pw;
+    }) || null;
+  }
+
+  function loginSeller(email, password) {
+    var acc = findSellerByLogin(email, password);
+    if (!acc) return { ok: false, code: 'invalid' };
+    setActiveSession(acc);
+    var url = buildDashboardUrl(acc);
+    return { ok: true, account: acc, url: url };
+  }
+
+  function goAfterRegistration(acc) {
+    if (!acc) return false;
+    if (acc.status === 'approved' && acc.token) {
+      setActiveSession(acc);
+      var url = buildDashboardUrl(acc);
+      if (url) {
+        location.href = url;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function openGuestChoice() {
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return true;
+    }
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
+      window.RizqAuthGate.openAccount();
+      return true;
+    }
+    if (typeof window.openModal === 'function') {
+      window.openModal('login');
+      return true;
+    }
+    return false;
   }
 
   function openAccount(e) {
@@ -60,23 +144,8 @@
       location.href = url;
       return false;
     }
-    if (window.goToAccount) {
-      window.goToAccount(e);
-      return false;
-    }
-    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
-      window.RizqAuthGate.openAccountChoice();
-      return false;
-    }
-    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
-      window.RizqAuthGate.openAccount();
-      return false;
-    }
-    if (isLandingPage() && typeof window.openModal === 'function') {
-      window.openModal('login');
-      return false;
-    }
-    location.href = 'index.html';
+    if (openGuestChoice()) return false;
+    location.href = 'rizq_register.html';
     return false;
   }
 
@@ -96,6 +165,11 @@
     open: openAccount,
     resolveDashboardUrl: resolveDashboardUrl,
     buildDashboardUrl: buildDashboardUrl,
-    bootstrapDashboard: bootstrapDashboard
+    bootstrapDashboard: bootstrapDashboard,
+    clearSession: clearSession,
+    setActiveSession: setActiveSession,
+    loginSeller: loginSeller,
+    goAfterRegistration: goAfterRegistration,
+    findSellerByLogin: findSellerByLogin
   };
 })();

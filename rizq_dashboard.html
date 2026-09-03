@@ -2271,7 +2271,12 @@ initDashboard();
 
 // تسجيل الخروج — يمسح جلسة الحساب الفردي المحفوظة محلياً (المستخدمة من rizq_post.html لإسناد الإعلانات)
 function logout(){
-  try{ localStorage.removeItem('rizq_individual_session'); }catch(e){}
+  if(window.RizqAccount && typeof window.RizqAccount.clearSession === 'function'){
+    window.RizqAccount.clearSession();
+  } else {
+    try{ localStorage.removeItem('rizq_individual_session'); }catch(e){}
+    try{ localStorage.removeItem('rizq_active_session'); }catch(e2){}
+  }
   showToast(_t2('👋 تم تسجيل الخروج','👋 Déconnexion réussie'));
   setTimeout(function(){ location.href='rizq_landing_v8.html'; }, 1500);
 }

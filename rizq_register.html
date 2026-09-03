@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_input_bidi.js"></script>
+  <script src="rizq_account_route.js?v=2"></script>
   <title>الحساب | رزق</title>
   <style>
     :root{
@@ -630,20 +631,15 @@
       return;
     }
 
-    /* محاولة حسابات البائع المحلية إن وُجدت */
-    try {
-      var accounts = JSON.parse(localStorage.getItem('rizq_accounts') || '[]');
-      if (!Array.isArray(accounts)) accounts = [];
-      var found = accounts.find(function (a) {
-        return a && String(a.email || '').toLowerCase() === email && String(a.password || '') === pw;
-      });
-      if (found) {
-        saveSession({ id: found.id || 'seller', token: found.token || 'local', email: email, name: found.name || email });
+    /* دخول بائع مفعّل عبر التوجيه الموحّد (محل/مكتب/شركة/فرد) */
+    if (window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function') {
+      var seller = window.RizqAccount.loginSeller(email, pw);
+      if (seller && seller.ok && seller.url) {
         setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = 'index.html'; }, 400);
+        setTimeout(function () { location.href = seller.url; }, 400);
         return;
       }
-    } catch (e) {}
+    }
 
     setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');
   }

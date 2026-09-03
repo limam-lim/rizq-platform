@@ -1910,7 +1910,8 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_auth_gate.js?v=18.6" defer></script>
+<script src="rizq_account_route.js?v=2"></script>
+<script src="rizq_auth_gate.js?v=18.7" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
@@ -7068,6 +7069,9 @@ function ppFinalSubmit(){
       }
     }
     showPanel('p-ok', 4, 4);
+    if (data.status === 'approved' && data.token && window.RizqAccount && typeof window.RizqAccount.goAfterRegistration === 'function') {
+      setTimeout(function () { window.RizqAccount.goAfterRegistration(data); }, 1400);
+    }
   });
 }
 
@@ -7091,7 +7095,7 @@ function submitStoreReg(){
     // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
     // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
     _fileToBase64(stFile).then(function(id_image){
-      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),password:pw,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
       _ppBackPanel='p-store-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -7118,7 +7122,7 @@ function submitOfficeReg(){
     // (license_image) — كلاهما كان يُفقَد تماماً بعد الرفع، لم يُقرآ أبداً.
     Promise.all([_fileToBase64(ofFile2), _fileToBase64(ofFile1)]).then(function(r){
       var id_image=r[0], license_image=r[1];
-      _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+      _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-office-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -7144,7 +7148,7 @@ function submitCorpReg(){
     if(!ok) return;
     Promise.all([_fileToBase64(crFile3), _fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
       var id_image=r[0], license_image=r[1], activity_image2=r[2];
-      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,activity_image2,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,activity_image2,password:pw,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
       _ppBackPanel='p-corp-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -7187,6 +7191,7 @@ function submitIndividualReg(){
       city,
       nni: isMr ? nni : '',
       email: email,
+      password: pw,
       id_image: id_image,
       trial_ends:new Date(Date.now()+3*86400000).toISOString()
     };
@@ -7467,11 +7472,10 @@ document.addEventListener('keydown',function(e){
   }
 });
 
-function goToAccount(){
-  var url = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
-    ? window.RizqAccount.resolveDashboardUrl()
-    : '';
-  if(url){ location.href = url; return; }
+function goToAccount(e){
+  if(window.RizqAccount && typeof window.RizqAccount.open === 'function'){
+    return window.RizqAccount.open(e);
+  }
   if(window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function'){
     window.RizqAuthGate.openAccountChoice();
     return;
@@ -7489,14 +7493,25 @@ function doLogin(){
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-  closeModal();
+  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
+    var res = window.RizqAccount.loginSeller(e, p);
+    if(res && res.ok && res.url){
+      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
+      closeModal();
+      setTimeout(function(){ location.href = res.url; }, 400);
+      return;
+    }
+  }
   var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
     ? window.RizqAccount.resolveDashboardUrl()
     : '';
-  setTimeout(function(){
-    location.href = dashUrl || 'rizq_landing_v8.html?openLogin=1';
-  }, 900);
+  if(dashUrl){
+    showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
+    closeModal();
+    setTimeout(function(){ location.href = dashUrl; }, 400);
+    return;
+  }
+  alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
 }
 
 // ══ XSS helpers ══
