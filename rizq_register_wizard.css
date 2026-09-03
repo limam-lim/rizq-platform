@@ -29,6 +29,111 @@ body.rizq-reg-open #back-to-top {
   pointer-events: none !important;
 }
 
+/* وضع صفحة التسجيل الكاملة (ليست نافذة فوق الرئيسية) */
+html.rizq-reg-page,
+html.rizq-reg-page body {
+  background: #f8faff !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+}
+html.rizq-reg-page body > *:not(#modal):not(#rizq-terms-modal):not(#rag-overlay):not(.rizq-act-select-menu):not(script):not(style):not(link) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+/* نوافذ الشروط وOTP وقائمة النشاط يجب أن تبقى فوق صفحة التسجيل */
+html.rizq-reg-page #rizq-terms-modal,
+html.rizq-reg-page #rag-overlay {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000010 !important;
+}
+html.rizq-reg-page #rizq-terms-modal:not(.open),
+html.rizq-reg-page #rag-overlay:not(.open) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+html.rizq-reg-page .rizq-act-select-menu {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 1000020 !important;
+  background: #fff !important;
+  color: #1a2535 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 18px 40px rgba(15, 35, 65, 0.18) !important;
+  border-radius: 12px !important;
+  padding: 6px !important;
+}
+html.rizq-reg-page .rizq-act-select-menu[hidden] {
+  display: none !important;
+}
+html.rizq-reg-page .rizq-act-select-option {
+  color: #0f2347 !important;
+  background: transparent !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  font-weight: 600 !important;
+}
+html.rizq-reg-page .rizq-act-select-option:hover,
+html.rizq-reg-page .rizq-act-select-option.is-selected {
+  background: #f8faff !important;
+  color: #0f2347 !important;
+}
+html.rizq-reg-page .rizq-act-select-group {
+  color: #a07820 !important;
+  font-weight: 800 !important;
+}
+html.rizq-reg-page #modal.modal-overlay,
+html.rizq-reg-page #modal.modal-overlay.open,
+html.rizq-reg-page #modal.reg-wizard-mode {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  background: #f8faff !important;
+  backdrop-filter: none !important;
+  z-index: 1 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+html.rizq-reg-page #modal .modal-box {
+  max-width: 820px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #fff !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  padding-bottom: 96px !important;
+}
+html.rizq-reg-page #modal .modal-close {
+  position: fixed !important;
+  top: 12px;
+  inset-inline-end: 12px;
+}
+
 #modal.reg-wizard-mode .modal-box {
   background: #fff !important;
   max-width: 820px !important;
@@ -179,8 +284,16 @@ html[dir='ltr'] .reg-step:not(:last-child)::after { left: 50%; right: auto; }
 
 /* ── لوحات التسجيل ── */
 #modal.reg-wizard-mode [id^='p-'] {
-  padding: 22px 20px 8px;
+  padding: 22px 20px 28px;
   animation: regFadeIn 0.35s ease;
+}
+
+/* إبقاء زر الإرسال ظاهرًا أثناء التمرير داخل النموذج الطويل */
+#modal.reg-wizard-mode [id^='p-'] > .m-btn-main {
+  position: sticky;
+  bottom: 12px;
+  z-index: 6;
+  box-shadow: 0 8px 28px rgba(15, 35, 65, 0.18) !important;
 }
 
 @keyframes regFadeIn {
@@ -299,4 +412,108 @@ html[dir='ltr'] .reg-step:not(:last-child)::after { left: 50%; right: auto; }
 
 #modal.reg-wizard-mode [id^='uz-'] p {
   color: #475569 !important;
+}
+
+/* ── لوحة الباقة والدفع — وضوح عالي على الخلفية الفاتحة ── */
+#modal.reg-wizard-mode #p-pkg-payment {
+  padding-bottom: 36px !important;
+}
+#modal.reg-wizard-mode #pp-pkg-list {
+  max-height: none !important;
+  gap: 12px !important;
+  margin-bottom: 18px !important;
+  overflow: visible !important;
+}
+#modal.reg-wizard-mode .pp-pkg-card {
+  background: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 10px 28px -14px rgba(15, 35, 65, 0.14) !important;
+  color: #1a2535 !important;
+}
+#modal.reg-wizard-mode .pp-pkg-card.is-selected {
+  border-color: rgba(201, 168, 76, 0.7) !important;
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.35), 0 14px 32px -12px rgba(15, 35, 65, 0.18) !important;
+  background: linear-gradient(180deg, #fffef8 0%, #fff 100%) !important;
+}
+#modal.reg-wizard-mode .pp-pkg-title {
+  color: #0f2347 !important;
+  font-weight: 800 !important;
+}
+#modal.reg-wizard-mode .pp-pkg-feat {
+  color: #475569 !important;
+  font-size: 11.5px !important;
+}
+#modal.reg-wizard-mode .pp-pkg-price {
+  color: #0f2347 !important;
+}
+#modal.reg-wizard-mode .pp-pkg-price-free {
+  color: #15803d !important;
+}
+#modal.reg-wizard-mode .pp-pkg-period {
+  color: #64748b !important;
+}
+#modal.reg-wizard-mode .pp-chk {
+  border-color: #cbd5e1 !important;
+  background: #fff !important;
+}
+#modal.reg-wizard-mode .pp-section {
+  background: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  margin-bottom: 14px !important;
+  box-shadow: 0 8px 24px -16px rgba(15, 35, 65, 0.12) !important;
+}
+#modal.reg-wizard-mode .pp-section-title {
+  color: #a07820 !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  margin-bottom: 10px !important;
+}
+#modal.reg-wizard-mode .pp-section-hint {
+  color: #64748b !important;
+}
+#modal.reg-wizard-mode .pp-pay-row {
+  background: #f8faff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 11px !important;
+  padding: 11px 12px !important;
+}
+#modal.reg-wizard-mode .pp-pay-bank {
+  color: #0f2347 !important;
+  font-weight: 800 !important;
+}
+#modal.reg-wizard-mode .pp-pay-code {
+  color: #1b3a6b !important;
+  font-weight: 700 !important;
+}
+#modal.reg-wizard-mode .pp-pay-note {
+  color: #64748b !important;
+}
+#modal.reg-wizard-mode #pp-receipt-zone {
+  background: #f8faff !important;
+  border-color: rgba(201, 168, 76, 0.45) !important;
+}
+#modal.reg-wizard-mode #pp-receipt-zone p {
+  color: #334155 !important;
+}
+#modal.reg-wizard-mode .rizq-act-select-trigger {
+  background: #f8faff !important;
+  border: 1.5px solid #dbe3ef !important;
+  color: #0f2347 !important;
+  border-radius: 12px !important;
+  padding: 13px 14px !important;
+  font-weight: 700 !important;
+  min-height: 48px;
+}
+#modal.reg-wizard-mode .rizq-act-select-label {
+  color: #0f2347 !important;
+}
+#modal.reg-wizard-mode #p-ok [style*='color:var(--white)'],
+#modal.reg-wizard-mode #p-ok [style*='color: var(--white)'] {
+  color: #0f2347 !important;
+}
+#modal.reg-wizard-mode #p-ok > div[style*='linear-gradient'] {
+  background: linear-gradient(135deg, #f8faff, #eef2fb) !important;
+  border-color: #e2e8f0 !important;
 }

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="rizq_backend_config.js"></script>
+  <script src="rizq_input_bidi.js"></script>
+  <title>الحساب | رزق</title>
+  <style>
+    :root{
+      --royal:#1B3A6B;--royal-dark:#0f2347;
+      --gold:#C9A84C;--gold-light:#e8c96a;
+      --muted:#64748b;--soft:#334155;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Cairo',system-ui,sans-serif;background:#f8faff;color:#1a2535;min-height:100vh}
+
+    nav{
+      position:sticky;top:0;z-index:100;
+      height:60px;display:flex;align-items:center;gap:10px;padding:0 4%;
+      background:rgba(15,23,42,.92);backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.1);direction:ltr;
+    }
+    .logo{display:flex;align-items:center;gap:8px;text-decoration:none;margin-inline-start:auto;order:9}
+    .logo-text{display:flex;flex-direction:column}
+    .logo-ar{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--gold);line-height:1;text-shadow:0 0 16px rgba(201,168,76,.35)}
+    .logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;text-transform:uppercase;font-style:italic;margin-top:2px}
+    .logo-mark{
+      width:38px;height:38px;border-radius:10px;background:#071020;
+      border:2px solid rgba(201,168,76,.75);display:flex;align-items:center;justify-content:center;overflow:hidden;
+    }
+    .logo-mark img{width:42px;height:42px;display:block}
+    .nav-title{color:#fff;font-size:14px;font-weight:700;margin-inline-end:auto;order:2}
+    .btn-ns,.btn-lang{
+      background:transparent;border:1px solid rgba(255,255,255,.15);color:#cbd5e1;
+      padding:7px 12px;border-radius:8px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;
+    }
+    .btn-ns:hover,.btn-lang:hover{border-color:rgba(201,168,76,.45);color:var(--gold)}
+    .btn-ns.on{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border-color:transparent}
+    .btn-lang{border-color:rgba(201,168,76,.4);color:var(--gold);direction:ltr;order:4}
+    #btn-cancel{order:3} #nav-terms{order:3} #nav-contact{order:3} #nav-login{order:3}
+
+    .progress-bar{background:#fff;border-bottom:1px solid #e2e8f5;padding:14px 4%}
+    .progress-steps{display:flex;max-width:700px;margin:0 auto}
+    .step{flex:1;text-align:center;position:relative}
+    .step:not(:last-child)::after{content:'';position:absolute;top:15px;inset-inline-start:50%;width:100%;height:2px;background:#e8eef7;z-index:0}
+    .step.done:not(:last-child)::after{background:var(--gold)}
+    .dot{
+      width:30px;height:30px;margin:0 auto 5px;border-radius:50%;position:relative;z-index:1;
+      display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+      background:#f8faff;border:2px solid #dbe3ef;color:var(--muted);
+    }
+    .step.active .dot{border-color:var(--gold);color:#a07820;background:#fff8e8}
+    .step.done .dot{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);color:var(--royal-dark)}
+    .step span{font-size:11px;font-weight:600;color:var(--muted)}
+    .step.active span{color:#a07820}
+
+    .wrap{max-width:720px;margin:0 auto;padding:22px 4% 60px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .tab{
+      border:1px solid #e2e8f0;background:#fff;border-radius:12px;padding:12px;
+      font:inherit;font-size:14px;font-weight:800;color:var(--muted);cursor:pointer;
+    }
+    .tab.active{border-color:rgba(201,168,76,.55);background:#fffdf6;color:var(--royal-dark)}
+
+    .panel{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:22px;box-shadow:0 10px 28px -14px rgba(0,0,0,.1)}
+    .panel.active{display:block}
+    h1{font-family:Georgia,serif;font-size:1.4rem;margin-bottom:6px}
+    .lead{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:16px}
+    .card{
+      display:flex;gap:12px;align-items:center;padding:14px;border:1.5px solid #e2e8f0;border-radius:14px;
+      cursor:pointer;margin-bottom:10px;text-align:inherit;background:#fff;
+    }
+    .card:hover{border-color:rgba(201,168,76,.5);background:#fffdf6}
+    .ico{width:48px;height:48px;border-radius:12px;background:linear-gradient(145deg,#0f2347,#1b3a6b);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .card b{display:block;font-size:15px;color:var(--royal)}
+    .card small{display:block;margin-top:3px;font-size:12.5px;color:var(--muted)}
+
+    label.lbl{display:block;font-size:13px;font-weight:700;color:var(--soft);margin:0 0 6px}
+    input.inp{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(13,27,42,.1);
+      background:#f8faff;font:inherit;font-size:14px;margin-bottom:11px;color:#1a2535;
+    }
+    input.inp:focus{outline:none;border-color:rgba(201,168,76,.5);background:#fff;box-shadow:0 0 0 3px rgba(201,168,76,.12)}
+    .hint{font-size:11.5px;color:var(--muted);margin:-2px 0 10px}
+    .check{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--soft);margin:0 0 12px;cursor:pointer;line-height:1.55}
+    .check input{margin-top:3px;accent-color:var(--gold);width:17px;height:17px;flex-shrink:0}
+    .check a{color:var(--royal);font-weight:700}
+    .terms{background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:6px 0 14px}
+    .err{display:none;color:#dc2626;font-size:12px;margin:-4px 0 8px}
+    .err.show{display:block}
+    .status{display:none;border-radius:10px;padding:10px;font-size:12.5px;margin-bottom:12px;line-height:1.5}
+    .status.show{display:block;background:#fff8e8;border:1px solid rgba(201,168,76,.35);color:#92400e}
+    .status.ok{background:#ecfdf5;border-color:#86efac;color:#166534}
+    .status.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+
+    .btn{
+      width:100%;padding:13px;border:none;border-radius:12px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;
+      background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);
+    }
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .btn-ghost{width:100%;padding:12px;margin-top:8px;border-radius:12px;border:1px solid #e2e8f0;background:transparent;font:inherit;font-weight:700;color:var(--soft);cursor:pointer}
+    .otp{display:flex;gap:8px;justify-content:center;margin:14px 0}
+    .otp input{width:42px;height:48px;text-align:center;font-size:18px;font-weight:800;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8faff;font:inherit}
+    .switch{text-align:center;font-size:13px;color:var(--muted);margin-top:14px}
+    .switch button{border:none;background:none;color:var(--royal);font:inherit;font-weight:800;cursor:pointer;text-decoration:underline}
+    .acc-card{background:#f8faff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:0 0 14px}
+    .acc-name{font-size:17px;font-weight:800;color:var(--royal);margin:0 0 6px}
+    .acc-meta{font-size:13px;color:var(--muted);line-height:1.7}
+    .acc-meta div{margin:2px 0}
+    .seller-link{display:block;text-align:center;margin-top:12px;color:var(--royal);font-size:13px;font-weight:800;text-decoration:none}
+    .foot{margin-top:20px;padding-top:14px;border-top:1px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:12px;color:var(--muted)}
+    .foot a{color:var(--royal);font-weight:700;text-decoration:none}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="btn-ns" href="index.html" id="btn-cancel">✕ إلغاء</a>
+  <a class="btn-ns" href="rizq_legal.html#s2" target="_blank" rel="noopener" id="nav-terms">شروط القبول</a>
+  <a class="btn-ns" href="mailto:direction@rizq.mr" id="nav-contact">تواصل</a>
+  <button type="button" class="btn-ns" id="nav-login">دخول</button>
+  <button type="button" class="btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR">FR | AR</button>
+  <span class="nav-title" id="nav-title">الحساب</span>
+  <a class="logo" href="index.html" aria-label="رزق">
+    <div class="logo-text">
+      <span class="logo-ar">رزق</span>
+      <span class="logo-sub">RIZQ PLATFORM</span>
+    </div>
+    <div class="logo-mark"><img src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+  </a>
+</nav>
+
+<div class="progress-bar" id="progress-wrap">
+  <div class="progress-steps" id="progress-steps">
+    <div class="step active" data-step="1"><div class="dot">1</div><span id="sl1">النوع</span></div>
+    <div class="step" data-step="2"><div class="dot">2</div><span id="sl2">البيانات</span></div>
+    <div class="step" data-step="3"><div class="dot">3</div><span id="sl3">التفعيل</span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tabs">
+    <button type="button" class="tab" id="tab-login">دخول المشتركين</button>
+    <button type="button" class="tab active" id="tab-register">إنشاء حساب</button>
+  </div>
+  <div class="status" id="status"></div>
+
+  <!-- دخول: بريد + كلمة مرور — بدون OTP وبدون شروط -->
+  <section class="panel" id="panel-login">
+    <h1 id="t-login">دخول المشتركين</h1>
+    <p class="lead" id="t-login-sub">أدخل بريدك وكلمة المرور. رمز التحقق يُطلب مرة واحدة فقط عند إنشاء الحساب.</p>
+    <label class="lbl" for="li-email" id="l-li-email">البريد الإلكتروني *</label>
+    <input class="inp" id="li-email" type="email" dir="ltr" autocomplete="username"/>
+    <div class="err" id="e-li-email"></div>
+    <label class="lbl" for="li-pw" id="l-li-pw">كلمة المرور *</label>
+    <input class="inp" id="li-pw" type="password" autocomplete="current-password"/>
+    <div class="err" id="e-li-pw"></div>
+    <button type="button" class="btn" id="btn-do-login">دخول ←</button>
+    <p class="switch">ليس لديك حساب؟ <button type="button" id="goto-register">أنشئ حساباً مجاناً</button></p>
+  </section>
+
+  <section class="panel active" id="panel-choice">
+    <h1 id="t-choice">كيف تريد استخدام رزق؟</h1>
+    <p class="lead" id="t-choice-sub">اختر نوع الحساب للمتابعة.</p>
+    <div class="card" id="card-buyer" role="button" tabindex="0">
+      <div class="ico">🛒</div>
+      <div><b id="t-buyer">أشتري — حساب سريع</b><small id="t-buyer-sub">تصفّح ومفضلة وتواصل</small></div>
+    </div>
+    <div class="card" id="card-seller" role="button" tabindex="0">
+      <div class="ico">🏪</div>
+      <div><b id="t-seller">أبيع — حساب بائع</b><small id="t-seller-sub">محل · مكتب · معرض · فرد</small></div>
+    </div>
+    <p class="switch">لديك حساب؟ <button type="button" id="goto-login">سجّل دخولك هنا</button></p>
+  </section>
+
+  <section class="panel" id="panel-buyer">
+    <h1 id="t-buyer-title">حساب مشتري جديد</h1>
+    <p class="lead" id="t-buyer-lead">فعّل حسابك مرة واحدة برمز البريد، ثم ادخل لاحقاً بكلمة المرور فقط.</p>
+
+    <label class="lbl" for="b-name" id="l-name">الاسم الكامل *</label>
+    <input class="inp" id="b-name" type="text" dir="auto" autocomplete="name"/>
+    <div class="err" id="e-name"></div>
+
+    <label class="lbl" for="b-email" id="l-email">البريد الإلكتروني *</label>
+    <input class="inp" id="b-email" type="email" dir="ltr" autocomplete="email"/>
+    <div class="err" id="e-email"></div>
+
+    <label class="lbl" for="b-pw" id="l-pw">كلمة المرور * <span style="font-weight:600;color:var(--muted)">(للدخول لاحقاً)</span></label>
+    <input class="inp" id="b-pw" type="password" autocomplete="new-password" minlength="6"/>
+    <div class="err" id="e-pw"></div>
+
+    <label class="lbl" for="b-pw2" id="l-pw2">تأكيد كلمة المرور *</label>
+    <input class="inp" id="b-pw2" type="password" autocomplete="new-password"/>
+    <div class="err" id="e-pw2"></div>
+
+    <label class="lbl" for="b-phone-mr" id="l-phone-mr">هاتف موريتاني (اختياري)</label>
+    <input class="inp" id="b-phone-mr" type="tel" dir="ltr" maxlength="8" placeholder="2XXXXXXX"/>
+
+    <label class="lbl" for="b-phone-intl" id="l-phone-intl">هاتف دولي (اختياري)</label>
+    <input class="inp" id="b-phone-intl" type="tel" dir="ltr" placeholder="+34..."/>
+    <p class="hint" id="t-phone-hint">رقم موريتاني أو دولي — واحد على الأقل.</p>
+    <div class="err" id="e-phone"></div>
+
+    <label class="check"><input type="checkbox" id="b-wa-same" checked/> <span id="t-wa-same">نفس الرقم للواتساب</span></label>
+    <label class="lbl" for="b-whatsapp" id="l-whatsapp">واتساب *</label>
+    <input class="inp" id="b-whatsapp" type="tel" dir="ltr"/>
+    <div class="err" id="e-whatsapp"></div>
+
+    <div class="terms">
+      <label class="check">
+        <input type="checkbox" id="b-terms"/>
+        <span id="b-terms-label">أوافق على <a href="rizq_legal.html#s2" target="_blank" rel="noopener">شروط منصة رزق</a> و<a href="rizq_legal.html#s3" target="_blank" rel="noopener">سياسة الخصوصية</a></span>
+      </label>
+      <div class="err" id="e-b-terms"></div>
+    </div>
+
+    <button type="button" class="btn" id="btn-send-otp" disabled>إرسال رمز التفعيل</button>
+    <button type="button" class="btn-ghost" id="btn-back-choice">← رجوع</button>
+  </section>
+
+  <section class="panel" id="panel-otp">
+    <h1 id="t-otp-title">تفعيل الحساب</h1>
+    <p class="lead" id="t-otp-sub">أدخل الرمز المكوّن من 6 أرقام. هذه الخطوة مرة واحدة فقط.</p>
+    <div class="otp" id="otp-row"></div>
+    <div class="err" id="e-otp"></div>
+    <button type="button" class="btn" id="btn-verify">تأكيد وتفعيل</button>
+    <button type="button" class="btn-ghost" id="btn-back-form">← رجوع</button>
+  </section>
+
+  <section class="panel" id="panel-ok">
+    <h1 id="t-ok">✅ تم تفعيل حسابك</h1>
+    <p class="lead" id="t-ok-sub">يمكنك الآن الدخول ببريدك وكلمة المرور في أي وقت.</p>
+    <button type="button" class="btn" id="btn-home">العودة للرئيسية</button>
+  </section>
+
+  <section class="panel" id="panel-account">
+    <h1 id="t-acc">حسابي</h1>
+    <p class="lead" id="t-acc-sub">حسابك على رزق — للتصفح والتواصل والمفضلة</p>
+    <div class="acc-card">
+      <div class="acc-name" id="acc-name">—</div>
+      <div class="acc-meta" id="acc-meta"></div>
+    </div>
+    <button type="button" class="btn" id="btn-acc-home">العودة للرئيسية</button>
+    <button type="button" class="btn-ghost" id="btn-logout">تسجيل الخروج</button>
+    <a class="seller-link" id="acc-seller-link" href="index.html?openRegister=1&regPage=1">🏪 أنا بائع — فتح حساب بائع</a>
+  </section>
+
+  <footer class="foot">
+    <div>© رزق · <a href="mailto:direction@rizq.mr">direction@rizq.mr</a></div>
+    <div><a href="index.html">الرئيسية</a> · <a href="rizq_legal.html#s2" target="_blank" rel="noopener">شروط القبول</a></div>
+  </footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var MR = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var DRAFT_KEY = 'rizq_buyer_draft';
+  var SESSION_KEY = 'rizq_buyer_session';
+  var CREDS_KEY = 'rizq_buyer_creds';
+  var pending = null;
+  var busy = false;
+
+  var params = new URLSearchParams(location.search);
+  var startMode = params.get('mode') || '';
+  if (!startMode) {
+    var hash = String(location.hash || '').replace(/^#/, '').toLowerCase();
+    if (hash === 'account' || hash === 'me' || hash === 'login' || hash === 'signin' || hash === 'buyer' || hash === 'seller') {
+      startMode = hash;
+    }
+  }
+  if (!startMode && /login/i.test(location.hash || '')) startMode = 'login';
+
+  var fr = false;
+  try { fr = localStorage.getItem('rizq_lang') === 'fr'; } catch (e) {}
+  function applyDir() {
+    document.documentElement.lang = fr ? 'fr' : 'ar';
+    document.documentElement.dir = fr ? 'ltr' : 'rtl';
+    document.getElementById('lang-btn').textContent = fr ? 'AR' : 'FR';
+  }
+  applyDir();
+  function t(a, b) { return fr ? b : a; }
+  function api() { return String(window.RIZQ_BACKEND_BASE || '').replace(/\/$/, ''); }
+  function isLocal() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
+
+  function setStatus(msg, kind) {
+    var el = document.getElementById('status');
+    if (!msg) { el.className = 'status'; el.textContent = ''; return; }
+    el.className = 'status show' + (kind ? ' ' + kind : '');
+    el.textContent = msg;
+  }
+
+  function getSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function isLoggedIn() {
+    var s = getSession();
+    return !!(s && s.id && s.token);
+  }
+
+  function show(id) {
+    ['panel-login','panel-choice','panel-buyer','panel-otp','panel-ok','panel-account'].forEach(function (p) {
+      var el = document.getElementById(p);
+      if (el) el.classList.toggle('active', p === id);
+    });
+    var login = id === 'panel-login';
+    var account = id === 'panel-account';
+    document.getElementById('tab-login').classList.toggle('active', login);
+    document.getElementById('tab-register').classList.toggle('active', !login && !account);
+    document.getElementById('nav-login').classList.toggle('on', login);
+    document.querySelector('.tabs').style.display = account ? 'none' : '';
+    if (account) document.getElementById('nav-title').textContent = t('حسابي', 'Mon compte');
+    else document.getElementById('nav-title').textContent = login ? t('دخول', 'Connexion') : t('حساب جديد', 'Nouveau compte');
+    document.getElementById('progress-wrap').style.display = (login || account || id === 'panel-ok') ? 'none' : '';
+    var step = id === 'panel-choice' ? 1 : (id === 'panel-buyer' ? 2 : 3);
+    document.querySelectorAll('#progress-steps .step').forEach(function (el) {
+      var n = parseInt(el.getAttribute('data-step'), 10);
+      el.className = 'step' + (n < step ? ' done' : (n === step ? ' active' : ''));
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function goLogin() { setStatus(''); show('panel-login'); }
+  function goRegister() { setStatus(''); show('panel-choice'); }
+  function goAccount() {
+    var s = getSession();
+    if (!s || !s.id || !s.token) { goLogin(); return; }
+    setStatus('');
+    document.getElementById('acc-name').textContent = s.name || s.email || '—';
+    var lines = ['<div>' + t('مسجّل كمشتري', 'Connecté comme acheteur') + '</div>'];
+    if (s.phone) lines.push('<div>📱 +222 ' + s.phone + '</div>');
+    if (s.phoneIntl) lines.push('<div>🌍 ' + s.phoneIntl + '</div>');
+    if (s.whatsapp) lines.push('<div>💬 ' + s.whatsapp + '</div>');
+    lines.push('<div>✉️ ' + (s.email || '—') + '</div>');
+    document.getElementById('acc-meta').innerHTML = lines.join('');
+    show('panel-account');
+  }
+  function doLogout() {
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    setStatus(t('تم تسجيل الخروج', 'Déconnecté'), 'ok');
+    goLogin();
+  }
+  function goBuyer() {
+    show('panel-buyer');
+    try {
+      var d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+      if (d) {
+        document.getElementById('b-name').value = d.name || '';
+        document.getElementById('b-email').value = d.email || '';
+        document.getElementById('b-phone-mr').value = d.phoneMr || d.phone || '';
+        document.getElementById('b-phone-intl').value = d.phoneIntl || '';
+        document.getElementById('b-whatsapp').value = d.whatsapp || '';
+      }
+    } catch (e) {}
+    syncWa();
+    syncBuyerBtn();
+  }
+  /* استخدم اسم الملف صراحةً حتى لا يمسح خادم static معاملات ?openRegister */
+  function goSeller() { location.href = 'index.html?openRegister=1&regPage=1'; }
+
+  function normalizeIntl(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return '';
+    var digits = s.replace(/[^\d+]/g, '');
+    if (digits.indexOf('00') === 0) digits = '+' + digits.slice(2);
+    if (digits.indexOf('+') !== 0) {
+      digits = digits.replace(/\D/g, '');
+      if (digits.length >= 8) digits = '+' + digits; else return '';
+    }
+    var num = digits.replace(/\D/g, '');
+    return (num.length >= 8 && num.length <= 15) ? ('+' + num) : '';
+  }
+  function syncWa() {
+    var same = document.getElementById('b-wa-same').checked;
+    var wa = document.getElementById('b-whatsapp');
+    wa.disabled = same;
+    if (!same) return;
+    var mr = document.getElementById('b-phone-mr').value.replace(/\D/g, '');
+    var intl = normalizeIntl(document.getElementById('b-phone-intl').value);
+    if (MR.test(mr)) wa.value = '+222' + mr;
+    else if (intl) wa.value = intl;
+  }
+  function syncBuyerBtn() {
+    var btn = document.getElementById('btn-send-otp');
+    if (!busy) btn.disabled = !document.getElementById('b-terms').checked;
+  }
+
+  function clearErr() {
+    ['e-name','e-email','e-pw','e-pw2','e-phone','e-whatsapp','e-otp','e-li-email','e-li-pw','e-b-terms'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) el.classList.remove('show');
+    });
+  }
+
+  function loadCreds() {
+    try { return JSON.parse(localStorage.getItem(CREDS_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function saveCreds(email, password, session) {
+    var all = loadCreds();
+    all[String(email).toLowerCase()] = { password: String(password), session: session || null, activated: true };
+    try { localStorage.setItem(CREDS_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  function saveSession(session) {
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (e) {}
+  }
+
+  function fetchJson(url, opts, ms) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, ms || 3500);
+    var o = Object.assign({}, opts || {});
+    if (ctrl) o.signal = ctrl.signal;
+    return fetch(url, o).then(function (res) {
+      return res.json().then(function (body) { return { ok: res.ok, body: body }; }).catch(function () {
+        return { ok: false, body: null };
+      });
+    }).finally(function () { clearTimeout(timer); });
+  }
+
+  function readBuyer() {
+    clearErr();
+    var name = document.getElementById('b-name').value.trim();
+    var email = document.getElementById('b-email').value.trim().toLowerCase();
+    var pw = document.getElementById('b-pw').value;
+    var pw2 = document.getElementById('b-pw2').value;
+    var phoneMr = document.getElementById('b-phone-mr').value.replace(/\D/g, '');
+    var phoneIntl = normalizeIntl(document.getElementById('b-phone-intl').value);
+    var waEl = document.getElementById('b-whatsapp');
+    var whatsapp = normalizeIntl(waEl.value) || String(waEl.value || '').trim();
+    var ok = true;
+    if (!document.getElementById('b-terms').checked) {
+      document.getElementById('e-b-terms').textContent = t('يجب الموافقة على الشروط', 'Acceptez les conditions');
+      document.getElementById('e-b-terms').classList.add('show'); ok = false;
+    }
+    if (!name || name.split(/\s+/).length < 2) { document.getElementById('e-name').classList.add('show'); ok = false; }
+    if (!EMAIL.test(email)) { document.getElementById('e-email').classList.add('show'); ok = false; }
+    if (!pw || pw.length < 6) { document.getElementById('e-pw').classList.add('show'); ok = false; }
+    if (pw !== pw2) { document.getElementById('e-pw2').classList.add('show'); ok = false; }
+    if (!MR.test(phoneMr) && !phoneIntl) { document.getElementById('e-phone').classList.add('show'); ok = false; }
+    if (!whatsapp) { document.getElementById('e-whatsapp').classList.add('show'); ok = false; }
+    if (!ok) return null;
+    return {
+      name: name, email: email, password: pw,
+      phoneMr: MR.test(phoneMr) ? phoneMr : '', phoneIntl: phoneIntl,
+      whatsapp: whatsapp, phone: MR.test(phoneMr) ? phoneMr : '',
+      termsAccepted: true
+    };
+  }
+
+  function finishOk(data, session) {
+    var s = session || {
+      id: 'local_' + Date.now(), token: 'local',
+      name: data.name, email: data.email,
+      phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
+    };
+    saveCreds(data.email, data.password, s);
+    saveSession(s);
+    setStatus(t('تم التفعيل بنجاح. استخدم بريدك وكلمة المرور للدخول لاحقاً.', 'Compte activé.'), 'ok');
+    show('panel-ok');
+    busy = false;
+  }
+
+  function sendOtp() {
+    if (busy) return;
+    var data = readBuyer();
+    if (!data) return;
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
+    pending = { data: data };
+    busy = true;
+    var btn = document.getElementById('btn-send-otp');
+    btn.disabled = true;
+    btn.textContent = t('جارٍ الإرسال...', 'Envoi...');
+    setStatus(t('جارٍ إرسال رمز التفعيل...', 'Envoi du code...'));
+
+    function localOtp() {
+      pending.local = true;
+      busy = false;
+      btn.disabled = !document.getElementById('b-terms').checked;
+      btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
+      setStatus(t('وضع تجريبي: أدخل أي 6 أرقام للتفعيل.', 'Mode test: 6 chiffres.'), 'ok');
+      show('panel-otp');
+    }
+
+    var base = api();
+    if (!base || isLocal()) {
+      /* محلي: فحص سريع ثم تجريبي */
+      if (!base) return localOtp();
+      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
+        if (!h.ok) return localOtp();
+        fetchJson(base + '/api/otp/send', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel: 'buyer', email: data.email, name: data.name, phoneMr: data.phoneMr, phoneIntl: data.phoneIntl, whatsapp: data.whatsapp })
+        }, 4000).then(function (r) {
+          busy = false;
+          btn.disabled = !document.getElementById('b-terms').checked;
+          btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
+          if (!r.ok || !r.body || !r.body.ok) return localOtp();
+          var msg = t('تم إرسال الرمز إلى بريدك.', 'Code envoyé.');
+          if (r.body.devHint) msg += ' ' + t('رمز التطوير:', 'Code:') + ' ' + r.body.devHint;
+          setStatus(msg, 'ok');
+          show('panel-otp');
+        }).catch(localOtp);
+      }).catch(localOtp);
+      return;
+    }
+
+    fetchJson(base + '/api/otp/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel: 'buyer', email: data.email, name: data.name, phoneMr: data.phoneMr, phoneIntl: data.phoneIntl, whatsapp: data.whatsapp })
+    }, 5000).then(function (r) {
+      busy = false;
+      btn.disabled = !document.getElementById('b-terms').checked;
+      btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
+      if (!r.ok || !r.body || !r.body.ok) {
+        setStatus((r.body && (r.body.message || r.body.error)) || t('تعذّر إرسال الرمز', 'Échec envoi'), 'bad');
+        return;
+      }
+      var msg = t('تم إرسال الرمز إلى بريدك.', 'Code envoyé.');
+      if (r.body.devHint) msg += ' ' + t('رمز التطوير:', 'Code:') + ' ' + r.body.devHint;
+      setStatus(msg, 'ok');
+      show('panel-otp');
+    }).catch(function () {
+      busy = false;
+      btn.disabled = !document.getElementById('b-terms').checked;
+      btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
+      setStatus(t('تعذّر الاتصال بالخادم', 'Connexion impossible'), 'bad');
+    });
+  }
+
+  function verifyOtp() {
+    if (busy) return;
+    clearErr();
+    var code = Array.prototype.map.call(document.querySelectorAll('#otp-row input'), function (el) {
+      return el.value.replace(/\D/g, '');
+    }).join('');
+    if (code.length !== 6) { document.getElementById('e-otp').classList.add('show'); return; }
+    if (!pending || !pending.data) { goBuyer(); return; }
+    var data = pending.data;
+    busy = true;
+    var btn = document.getElementById('btn-verify');
+    btn.disabled = true;
+    btn.textContent = t('جارٍ التفعيل...', 'Activation...');
+
+    function doneLocal() {
+      btn.disabled = false;
+      btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
+      finishOk(data);
+    }
+
+    if (pending.local || !api() || isLocal()) {
+      var base = api();
+      if (!base || pending.local) return doneLocal();
+      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
+        if (!h.ok) return doneLocal();
+        fetchJson(base + '/api/otp/verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
+        }, 4000).then(function (r) {
+          if (!r.ok || !r.body || !r.body.ok) return doneLocal();
+          return fetchJson(base + '/api/auth/register', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          }, 4000).then(function (r2) {
+            btn.disabled = false;
+            btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
+            if (!r2.ok || !r2.body || !r2.body.ok) return finishOk(data);
+            finishOk(data, {
+              id: (r2.body.buyer && r2.body.buyer.id) || r2.body.id,
+              token: r2.body.token,
+              name: (r2.body.buyer && r2.body.buyer.name) || data.name,
+              email: data.email,
+              phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
+            });
+          }).catch(doneLocal);
+        }).catch(doneLocal);
+      }).catch(doneLocal);
+      return;
+    }
+
+    var base = api();
+    fetchJson(base + '/api/otp/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
+    }, 5000).then(function (r) {
+      if (!r.ok || !r.body || !r.body.ok) {
+        busy = false; btn.disabled = false; btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
+        setStatus((r.body && (r.body.message || r.body.error)) || t('رمز غير صحيح', 'Code invalide'), 'bad');
+        return;
+      }
+      return fetchJson(base + '/api/auth/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+      }, 5000).then(function (r2) {
+        busy = false; btn.disabled = false; btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
+        if (!r2.ok || !r2.body || !r2.body.ok) {
+          setStatus((r2.body && (r2.body.message || r2.body.error)) || t('فشل التفعيل', 'Échec'), 'bad');
+          return;
+        }
+        finishOk(data, {
+          id: (r2.body.buyer && r2.body.buyer.id) || r2.body.id,
+          token: r2.body.token,
+          name: (r2.body.buyer && r2.body.buyer.name) || data.name,
+          email: data.email,
+          phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
+        });
+      });
+    }).catch(function () {
+      busy = false; btn.disabled = false; btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
+      setStatus(t('تعذّر الاتصال', 'Connexion impossible'), 'bad');
+    });
+  }
+
+  function doLogin() {
+    clearErr();
+    var email = document.getElementById('li-email').value.trim().toLowerCase();
+    var pw = document.getElementById('li-pw').value;
+    var ok = true;
+    if (!EMAIL.test(email)) { document.getElementById('e-li-email').classList.add('show'); ok = false; }
+    if (!pw) { document.getElementById('e-li-pw').classList.add('show'); ok = false; }
+    if (!ok) return;
+
+    var creds = loadCreds()[email];
+    if (creds && String(creds.password) === String(pw)) {
+      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
+      saveSession(session);
+      setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+      setTimeout(function () { location.href = 'index.html'; }, 400);
+      return;
+    }
+
+    /* محاولة حسابات البائع المحلية إن وُجدت */
+    try {
+      var accounts = JSON.parse(localStorage.getItem('rizq_accounts') || '[]');
+      if (!Array.isArray(accounts)) accounts = [];
+      var found = accounts.find(function (a) {
+        return a && String(a.email || '').toLowerCase() === email && String(a.password || '') === pw;
+      });
+      if (found) {
+        saveSession({ id: found.id || 'seller', token: found.token || 'local', email: email, name: found.name || email });
+        setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+        setTimeout(function () { location.href = 'index.html'; }, 400);
+        return;
+      }
+    } catch (e) {}
+
+    setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');
+  }
+
+  function applyLangTexts() {
+    document.getElementById('btn-cancel').textContent = t('✕ إلغاء', '✕ Annuler');
+    document.getElementById('nav-terms').textContent = t('شروط القبول', 'Conditions');
+    document.getElementById('nav-contact').textContent = t('تواصل', 'Contact');
+    document.getElementById('nav-login').textContent = t('دخول', 'Connexion');
+    document.getElementById('tab-login').textContent = t('دخول المشتركين', 'Connexion');
+    document.getElementById('tab-register').textContent = t('إنشاء حساب', 'Créer un compte');
+    document.getElementById('t-login').textContent = t('دخول المشتركين', 'Connexion membres');
+    document.getElementById('t-login-sub').textContent = t('أدخل بريدك وكلمة المرور. رمز التحقق يُطلب مرة واحدة فقط عند إنشاء الحساب.', 'E-mail et mot de passe. OTP une seule fois à l\'inscription.');
+    document.getElementById('l-li-email').textContent = t('البريد الإلكتروني *', 'E-mail *');
+    document.getElementById('l-li-pw').textContent = t('كلمة المرور *', 'Mot de passe *');
+    document.getElementById('btn-do-login').textContent = t('دخول ←', 'Connexion ←');
+    document.getElementById('t-choice').textContent = t('كيف تريد استخدام رزق؟', 'Comment utiliser Rizq ?');
+    document.getElementById('t-choice-sub').textContent = t('اختر نوع الحساب للمتابعة.', 'Choisissez le type de compte.');
+    document.getElementById('t-buyer').textContent = t('أشتري — حساب سريع', 'J\'achète — compte rapide');
+    document.getElementById('t-buyer-sub').textContent = t('تصفّح ومفضلة وتواصل', 'Parcourir et contacter');
+    document.getElementById('t-seller').textContent = t('أبيع — حساب بائع', 'Je vends — compte vendeur');
+    document.getElementById('t-seller-sub').textContent = t('محل · مكتب · معرض · فرد', 'Boutique · Bureau · Showroom');
+    document.getElementById('t-buyer-title').textContent = t('حساب مشتري جديد', 'Nouveau compte acheteur');
+    document.getElementById('t-buyer-lead').textContent = t('فعّل حسابك مرة واحدة برمز البريد، ثم ادخل لاحقاً بكلمة المرور فقط.', 'Activez une fois par e-mail, puis connectez-vous par mot de passe.');
+    document.getElementById('l-name').textContent = t('الاسم الكامل *', 'Nom complet *');
+    document.getElementById('l-email').textContent = t('البريد الإلكتروني *', 'E-mail *');
+    document.getElementById('l-pw').innerHTML = t('كلمة المرور * <span style="font-weight:600;color:var(--muted)">(للدخول لاحقاً)</span>', 'Mot de passe * <span style="font-weight:600;color:var(--muted)">(pour plus tard)</span>');
+    document.getElementById('l-pw2').textContent = t('تأكيد كلمة المرور *', 'Confirmer le mot de passe *');
+    document.getElementById('l-phone-mr').textContent = t('هاتف موريتاني (اختياري)', 'Tél. mauritanien');
+    document.getElementById('l-phone-intl').textContent = t('هاتف دولي (اختياري)', 'Tél. international');
+    document.getElementById('t-phone-hint').textContent = t('رقم موريتاني أو دولي — واحد على الأقل.', 'Au moins un numéro.');
+    document.getElementById('t-wa-same').textContent = t('نفس الرقم للواتساب', 'Même numéro WhatsApp');
+    document.getElementById('l-whatsapp').textContent = t('واتساب *', 'WhatsApp *');
+    document.getElementById('b-terms-label').innerHTML = t('أوافق على <a href="rizq_legal.html#s2" target="_blank" rel="noopener">شروط منصة رزق</a> و<a href="rizq_legal.html#s3" target="_blank" rel="noopener">سياسة الخصوصية</a>', 'J\'accepte les <a href="rizq_legal.html#s2" target="_blank" rel="noopener">conditions</a> et la <a href="rizq_legal.html#s3" target="_blank" rel="noopener">confidentialité</a>');
+    document.getElementById('btn-send-otp').textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
+    document.getElementById('btn-back-choice').textContent = t('← رجوع', '← Retour');
+    document.getElementById('t-otp-title').textContent = t('تفعيل الحساب', 'Activation');
+    document.getElementById('t-otp-sub').textContent = t('أدخل الرمز المكوّن من 6 أرقام. هذه الخطوة مرة واحدة فقط.', 'Code à 6 chiffres. Une seule fois.');
+    document.getElementById('btn-verify').textContent = t('تأكيد وتفعيل', 'Confirmer');
+    document.getElementById('btn-back-form').textContent = t('← رجوع', '← Retour');
+    document.getElementById('t-ok').textContent = t('✅ تم تفعيل حسابك', '✅ Compte activé');
+    document.getElementById('t-ok-sub').textContent = t('يمكنك الآن الدخول ببريدك وكلمة المرور في أي وقت.', 'Connectez-vous ensuite avec e-mail et mot de passe.');
+    document.getElementById('btn-home').textContent = t('العودة للرئيسية', 'Retour');
+    document.getElementById('t-acc').textContent = t('حسابي', 'Mon compte');
+    document.getElementById('t-acc-sub').textContent = t('حسابك على رزق — للتصفح والتواصل والمفضلة', 'Votre compte Rizq — navigation, contact et favoris');
+    document.getElementById('btn-acc-home').textContent = t('العودة للرئيسية', 'Retour à l\'accueil');
+    document.getElementById('btn-logout').textContent = t('تسجيل الخروج', 'Se déconnecter');
+    document.getElementById('acc-seller-link').textContent = t('🏪 أنا بائع — فتح حساب بائع', '🏪 Je suis vendeur — ouvrir un compte');
+    document.getElementById('sl1').textContent = t('النوع', 'Type');
+    document.getElementById('sl2').textContent = t('البيانات', 'Infos');
+    document.getElementById('sl3').textContent = t('التفعيل', 'Activation');
+    document.getElementById('e-name').textContent = t('أدخل الاسم الكامل', 'Nom requis');
+    document.getElementById('e-email').textContent = t('بريد صالح مطلوب', 'E-mail requis');
+    document.getElementById('e-pw').textContent = t('كلمة مرور من 6 أحرف على الأقل', '6 caractères minimum');
+    document.getElementById('e-pw2').textContent = t('كلمتا المرور غير متطابقتين', 'Mots de passe différents');
+    document.getElementById('e-phone').textContent = t('أدخل هاتفاً موريتانياً أو دولياً', 'Numéro requis');
+    document.getElementById('e-whatsapp').textContent = t('واتساب مطلوب', 'WhatsApp requis');
+    document.getElementById('e-otp').textContent = t('أدخل الرمز كاملاً (6 أرقام)', 'Code à 6 chiffres');
+    document.getElementById('e-li-email').textContent = t('بريد صالح مطلوب', 'E-mail requis');
+    document.getElementById('e-li-pw').textContent = t('كلمة المرور مطلوبة', 'Mot de passe requis');
+  }
+
+  /* OTP boxes */
+  var row = document.getElementById('otp-row');
+  for (var i = 0; i < 6; i++) {
+    var inp = document.createElement('input');
+    inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 1;
+    row.appendChild(inp);
+  }
+  row.querySelectorAll('input').forEach(function (box, idx, boxes) {
+    box.addEventListener('input', function () {
+      box.value = box.value.replace(/\D/g, '').slice(0, 1);
+      if (box.value && idx < boxes.length - 1) boxes[idx + 1].focus();
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !box.value && idx > 0) boxes[idx - 1].focus();
+    });
+  });
+
+  document.getElementById('lang-btn').onclick = function () {
+    fr = !fr;
+    try { localStorage.setItem('rizq_lang', fr ? 'fr' : 'ar'); } catch (e) {}
+    applyDir();
+    applyLangTexts();
+  };
+  document.getElementById('nav-login').onclick = goLogin;
+  document.getElementById('tab-login').onclick = goLogin;
+  document.getElementById('tab-register').onclick = goRegister;
+  document.getElementById('goto-login').onclick = goLogin;
+  document.getElementById('goto-register').onclick = goRegister;
+  document.getElementById('card-buyer').onclick = goBuyer;
+  document.getElementById('card-seller').onclick = goSeller;
+  document.getElementById('btn-back-choice').onclick = goRegister;
+  document.getElementById('btn-back-form').onclick = goBuyer;
+  document.getElementById('btn-home').onclick = function () { location.href = 'index.html'; };
+  document.getElementById('btn-acc-home').onclick = function () { location.href = 'index.html'; };
+  document.getElementById('btn-logout').onclick = doLogout;
+  document.getElementById('acc-seller-link').onclick = function (e) {
+    e.preventDefault();
+    goSeller();
+  };
+  document.getElementById('btn-send-otp').onclick = sendOtp;
+  document.getElementById('btn-verify').onclick = verifyOtp;
+  document.getElementById('btn-do-login').onclick = doLogin;
+  document.getElementById('li-pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('b-terms').onchange = syncBuyerBtn;
+  document.getElementById('b-wa-same').onchange = function () {
+    document.getElementById('b-whatsapp').disabled = this.checked; syncWa();
+  };
+  document.getElementById('b-phone-mr').oninput = syncWa;
+  document.getElementById('b-phone-intl').oninput = syncWa;
+
+  applyLangTexts();
+  syncBuyerBtn();
+
+  /* مهم: لا نُحوّل mode=seller تلقائياً للرئيسية — ذلك كان يُرجع زر «حساب جديد» فوراً */
+  if (startMode === 'login' || startMode === 'signin') goLogin();
+  else if (startMode === 'buyer') goBuyer();
+  else if (startMode === 'seller') {
+    goRegister();
+  } else {
+    goRegister();
+  }
+})();
+</script>
+</body>
+</html>

@@ -25,7 +25,18 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=1.2"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=1.6"/>
+<script>
+/* تفعيل وضع صفحة التسجيل قبل الرسم حتى لا تظهر الرئيسية خلف النافذة */
+(function () {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('regPage') === '1' || p.get('openRegister') === '1') {
+      document.documentElement.classList.add('rizq-reg-page');
+    }
+  } catch (e) {}
+})();
+</script>
 <link rel="stylesheet" href="rizq_header.css?v=17.1"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -1881,6 +1892,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       regModal.style.display = 'flex';
     }
     document.querySelectorAll('.modal-overlay:not(.open),.mobile-drawer-overlay,.disc-overlay,.cs-modal-overlay:not(.active),.rzq-sheet-backdrop:not(.open)').forEach(function(el){
+      if(el.id === 'rag-overlay') return;
       el.style.pointerEvents = 'none';
       el.style.display = 'none';
     });
@@ -1900,7 +1912,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_auth_gate.js?v=18.2" defer></script>
+<script src="rizq_auth_gate.js?v=18.6" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
@@ -2251,7 +2263,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="#" onclick="openModal('register');setTimeout(()=>{selectType('company');goFromType();setTimeout(()=>{selectBizType('store');},200);},200);return false" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">🏪 افتح محلك الآن</a>
+        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=store" onclick="openRegisterAs('company','store');return false" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">🏪 افتح محلك الآن</a>
         <a href="rizq_store.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn2">👁 عرض نموذج محل</a>
       </div>
     </div>
@@ -2361,7 +2373,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
       <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <button id="vo-create-btn" onclick="openModal('register');setTimeout(()=>{selectType('company');goFromType();setTimeout(()=>{selectBizType('office');},200);},200)" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700">📒 أنشئ مكتبك الآن</button>
+        <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700">📒 أنشئ مكتبك الآن</button>
         <a id="vo-view-btn" href="rizq_office.html" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px">👁 عرض نموذج مكتب</a>
       </div>
     </div>
@@ -2443,7 +2455,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="#" onclick="openModal('register');setTimeout(()=>{selectType('company');goFromType();setTimeout(()=>{selectBizType('corp');},200);},200);return false"
+        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
            class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
         <a href="rizq_showroom.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
       </div>
@@ -2715,7 +2727,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <button class="price-tab" data-cat="currencies" data-t="prices-tab-currencies" onclick="switchPriceTab('currencies',this)">💱 عملات</button>
     </div>
     <div class="prices-grid" id="prices-grid"></div>
-    <p class="prices-note" id="prices-note" data-t="prices-note">الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · هل تبيع هذه المواد؟ <a href="#" onclick="openModal('register');return false" style="color:var(--royal);font-weight:700;text-decoration:none">انشر منتجاتك على رزق الآن ←</a></p>
+    <p class="prices-note" id="prices-note" data-t="prices-note">الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · هل تبيع هذه المواد؟ <a href="rizq_register.html?mode=seller" style="color:var(--royal);font-weight:700;text-decoration:none">انشر منتجاتك على رزق الآن ←</a></p>
   </div>
 </section>
 
@@ -2850,7 +2862,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="cta-btns">
       <button class="btn-primary" onclick="rizqOpenRegister(event)" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
       <a href="rizq_tenders.html" class="btn-tender" data-t="cta-btn4">📋 غرفة المناقصات</a>
-      <a href="#" onclick="openModal('register');setTimeout(()=>{selectType('company');goFromType();},200);return false" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
+      <a href="./?openRegister=1&regPage=1&preType=company" onclick="openRegisterAs('company');return false" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
       <button class="btn-outline" style="padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn2">📲 التطبيق قريباً</button>
     </div>
 
@@ -3357,8 +3369,13 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         </div>
       </div>
 
-      <button class="m-btn-main" data-t-fr="Envoyer la demande →" data-t="pmr-next" onclick="RizqTermsGate.require(submitIndividualReg)">إرسال الطلب ←</button>
-      <button class="m-link-btn" data-t-fr="← Retour" data-t="pmr-back" onclick="showPanel('p-nat-type',1,5)">← عودة</button>
+      <label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;margin:0 0 14px;padding:12px;background:#f8faff;border:1px solid #e2e8f0;border-radius:11px">
+        <input type="checkbox" id="ind-terms" style="width:17px;height:17px;margin-top:2px;accent-color:#c9a84c;flex-shrink:0"/>
+        <span style="font-size:12.5px;color:#1e293b;font-weight:600;line-height:1.55">أوافق على <a href="rizq_legal.html#s2" target="_blank" rel="noopener" style="color:#a07820">شروط منصة رزق</a> و<a href="rizq_legal.html#s3" target="_blank" rel="noopener" style="color:#a07820">سياسة الخصوصية</a></span>
+      </label>
+
+      <button type="button" class="m-btn-main" data-t-fr="Envoyer la demande →" data-t="pmr-next" id="btn-ind-submit" onclick="submitIndividualReg()">إرسال الطلب ←</button>
+      <button type="button" class="m-link-btn" data-t-fr="← Retour" data-t="pmr-back" onclick="showPanel('p-nat-type',1,5)">← عودة</button>
     </div>
 
 <!-- ══ STEP 2C (شركة): بياناتها ══ -->
@@ -3442,40 +3459,40 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <p data-t-fr="Après le paiement, téléchargez la photo du reçu — votre compte sera activé en 24h" style="color:var(--text-muted);font-size:11.5px;margin-bottom:16px">بعد الدفع ارفع صورة الوصل — يُفعَّل حسابك خلال 24 ساعة</p>
 
       <!-- Package cards -->
-      <div id="pp-pkg-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:220px;overflow-y:auto;padding-right:4px"></div>
+      <div id="pp-pkg-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
 
       <!-- Activity — filtered dynamically by selected package -->
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px" data-t-fr="🏷️ Activité commerciale (selon votre forfait)">🏷️ النشاط التجاري (حسب باقتك)</label>
+      <div class="pp-section" id="pp-activity-wrap">
+        <label class="pp-section-title" style="display:block" data-t-fr="🏷️ Activité commerciale (selon votre forfait)">🏷️ النشاط التجاري (حسب باقتك)</label>
         <select class="m-input" id="pp-activity-select" style="margin-bottom:0">
-          <option value="">— اختر النشاط —</option>
+          <option value="">— اختر نشاطك التجاري —</option>
         </select>
-        <p style="font-size:10px;color:var(--text-muted);margin-top:6px;line-height:1.6" data-t-fr="La liste se met à jour automatiquement selon le forfait choisi — secteurs non pertinents masqués.">تتحدّث القائمة تلقائياً عند اختيار الباقة — لا تظهر إلا الأنشطة المرتبطة بقطاعك.</p>
+        <p class="pp-section-hint" style="font-size:10.5px;margin-top:8px;line-height:1.6" data-t-fr="La liste se met à jour automatiquement selon le forfait choisi.">تتحدّث القائمة تلقائياً عند اختيار الباقة — اختر ما يصف نشاطك بدقة.</p>
       </div>
 
       <!-- Payment methods -->
-      <div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:13px;padding:14px;margin-bottom:14px">
-        <p data-t-fr="💳 Moyens de paiement disponibles" style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">💳 طرق الدفع المتاحة</p>
+      <div class="pp-section">
+        <p class="pp-section-title" data-t-fr="💳 Moyens de paiement disponibles">💳 طرق الدفع المتاحة</p>
         <div id="pp-pay-methods" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
 
       <!-- Receipt upload -->
       <div id="pp-receipt-zone" onclick="document.getElementById('pp-receipt-input').click()"
-           style="border:2px dashed rgba(201,168,76,.35);border-radius:13px;padding:16px;text-align:center;cursor:pointer;background:rgba(201,168,76,.04);margin-bottom:14px;transition:all .25s">
+           style="border:2px dashed rgba(201,168,76,.45);border-radius:13px;padding:16px;text-align:center;cursor:pointer;background:#f8faff;margin-bottom:14px;transition:all .25s">
         <div style="font-size:28px;margin-bottom:6px">📄</div>
-        <p data-t-fr="Téléchargez la photo du reçu de paiement" style="font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:2px">ارفع صورة وصل الدفع</p>
-        <p data-t-fr="Cliquez pour choisir ou déposez le fichier ici · JPG/PNG/PDF · jusqu'à 5 Mo" style="font-size:10px;color:var(--text-muted)">اضغط للاختيار أو اسحب الملف هنا · JPG/PNG/PDF · حتى 5MB</p>
+        <p data-t-fr="Téléchargez la photo du reçu de paiement" style="font-size:12px;font-weight:700;color:#334155;margin-bottom:2px">ارفع صورة وصل الدفع</p>
+        <p data-t-fr="Cliquez pour choisir ou déposez le fichier ici · JPG/PNG/PDF · jusqu'à 5 Mo" style="font-size:10px;color:#64748b">اضغط للاختيار أو اسحب الملف هنا · JPG/PNG/PDF · حتى 5MB</p>
         <input type="file" id="pp-receipt-input" accept="image/*,application/pdf" style="display:none" onchange="ppHandleReceipt(this)"/>
       </div>
       <div id="pp-receipt-preview" style="display:none;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:11px;padding:10px;margin-bottom:14px;text-align:center">
         <img id="pp-receipt-img" style="max-width:100%;max-height:120px;border-radius:8px;margin-bottom:6px" src="" alt=""/>
-        <p id="pp-receipt-name" style="font-size:11px;color:#4ade80;font-weight:700"></p>
-        <button onclick="ppClearReceipt()" data-t-fr="✕ Retirer" style="font-size:10px;color:var(--text-muted);background:none;border:none;cursor:pointer;margin-top:4px">✕ إزالة</button>
+        <p id="pp-receipt-name" style="font-size:11px;color:#15803d;font-weight:700"></p>
+        <button onclick="ppClearReceipt()" data-t-fr="✕ Retirer" style="font-size:10px;color:#64748b;background:none;border:none;cursor:pointer;margin-top:4px">✕ إزالة</button>
       </div>
 
       <!-- بدون دفع (تجريبي) -->
-      <div data-t-fr='<span style="color:var(--gold)">💡</span> Vous pouvez commencer avec l&#39;essai gratuit (3 jours) sans paiement' style="font-size:11px;color:var(--text-muted);margin-bottom:12px;text-align:center">
-        <span style="color:var(--gold)">💡</span> يمكنك البدء بالفترة التجريبية المجانية (3 أيام) بدون دفع
+      <div data-t-fr='<span style="color:#a07820">💡</span> Vous pouvez commencer avec l&#39;essai gratuit (3 jours) sans paiement' style="font-size:11.5px;color:#475569;margin-bottom:12px;text-align:center;line-height:1.6">
+        <span style="color:#a07820">💡</span> يمكنك البدء بالفترة التجريبية المجانية (3 أيام) بدون دفع
       </div>
 
       <button class="m-btn-main" data-t-fr="✅ Finaliser l'inscription" onclick="ppFinalSubmit()">✅ إتمام التسجيل</button>
@@ -6242,6 +6259,13 @@ function syncModalAuthTabs(mode){
   }
 }
 
+function rizqIsRegPageMode(){
+  try{
+    var p=new URLSearchParams(window.location.search);
+    return p.get('regPage')==='1' || document.documentElement.classList.contains('rizq-reg-page');
+  }catch(e){ return document.documentElement.classList.contains('rizq-reg-page'); }
+}
+
 function rizqOpenRegister(ev){
   if(ev){
     ev.preventDefault();
@@ -6305,6 +6329,11 @@ function closeModal(force){
   if(modal && modal.classList.contains('reg-wizard-mode') && !force && Date.now()-(window._rizqModalOpenedAt||0)<900){
     return;
   }
+  /* في وضع صفحة التسجيل: العودة للرئيسية بدل إغلاق النافذة فوق محتوى مخفي */
+  if(rizqIsRegPageMode() && modal && modal.classList.contains('reg-wizard-mode')){
+    location.href = './';
+    return;
+  }
   if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
   if(modal){
     modal.classList.remove('reg-wizard-mode');
@@ -6339,17 +6368,34 @@ document.getElementById('modal').addEventListener('click',function(e){
       var p=new URLSearchParams(window.location.search);
       if(p.get('openRegister')==='1' && !openedRegister && typeof openModal==='function'){
         openedRegister=true;
+        if(p.get('regPage')!=='1'){
+          document.documentElement.classList.add('rizq-reg-page');
+          try{
+            var u=new URL(window.location.href);
+            u.searchParams.set('regPage','1');
+            history.replaceState(null,'',u.pathname+u.search+u.hash);
+          }catch(eR){}
+        }
         openModal('register');
+        var preType=p.get('preType')||p.get('type')||'';
+        var preBiz=p.get('preBiz')||p.get('biz')||'';
+        if(preType){
+          setTimeout(function(){
+            if(typeof selectType==='function') selectType(preType);
+            if(typeof goFromType==='function') goFromType();
+            if(preBiz) setTimeout(function(){ if(typeof selectBizType==='function') selectBizType(preBiz); }, 250);
+          }, 220);
+        }
       } else if(p.get('openLogin')==='1' && !openedLogin && typeof openModal==='function'){
         openedLogin=true;
         openModal('login');
       }
     }catch(e){}
   }
-  function schedule(){ setTimeout(tryOpen, 400); }
+  function schedule(){ setTimeout(tryOpen, 200); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', schedule);
   else schedule();
-  window.addEventListener('load', function(){ setTimeout(tryOpen, 120); });
+  window.addEventListener('load', function(){ setTimeout(tryOpen, 80); });
 })();
 
 function showPanel(id,dot,total){
@@ -6385,15 +6431,14 @@ function setDot(active,total){
   }
 }
 
-// نوع الحساب
+// نوع الحساب — صفحة تسجيل كاملة مع اختيار مسبق
 function openRegisterAs(type, biz){
-  openModal('register');
-  setTimeout(()=>{
-    selectType(type);
-    goFromType();
-    if(biz) setTimeout(()=>selectBizType(biz), 250);
-  }, 200);
+  var q='./?openRegister=1&regPage=1';
+  if(type) q+='&preType='+encodeURIComponent(type);
+  if(biz) q+='&preBiz='+encodeURIComponent(biz);
+  location.href=q;
 }
+window.openRegisterAs=openRegisterAs;
 
 function selectBizType(t){
   bizType=t;
@@ -6426,14 +6471,37 @@ function _regLang(){
   return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar';
 }
 
+function renderIndividualActivitySelect(ppEl, lang){
+  if(!ppEl) return;
+  var isFr = lang === 'fr';
+  var prev = ppEl.value || '';
+  var cats = [
+    { id: 'ind_vehicles', ar: '🚗 سيارات ومركبات', fr: '🚗 Voitures & véhicules' },
+    { id: 'ind_phones', ar: '📱 هواتف وإلكترونيات', fr: '📱 Téléphones & électronique' },
+    { id: 'ind_home', ar: '🛋️ أثاث ومنزل', fr: '🛋️ Maison & meubles' },
+    { id: 'ind_fashion', ar: '👗 أزياء وملابس', fr: '👗 Mode & vêtements' },
+    { id: 'ind_realty', ar: '🏠 عقارات', fr: '🏠 Immobilier' },
+    { id: 'ind_jobs', ar: '💼 وظائف وخدمات', fr: '💼 Emplois & services' },
+    { id: 'ind_animals', ar: '🐪 ماشية وحيوانات', fr: '🐪 Bétail & animaux' },
+    { id: 'ind_other', ar: '🏷️ أخرى', fr: '🏷️ Autre' }
+  ];
+  var html = '<option value="">' + (isFr ? '— Choisissez votre activité —' : '— اختر نشاطك التجاري —') + '</option>';
+  cats.forEach(function(c){
+    html += '<option value="'+c.id+'"'+(c.id===prev?' selected':'')+'>'+(isFr?c.fr:c.ar)+'</option>';
+  });
+  ppEl.innerHTML = html;
+  if(window.RizqActivitySelect) RizqActivitySelect.enhance(ppEl);
+}
+
 function renderRegActivitySelects(accountType, packageRef){
-  if(!window.RizqMerchantActivities) return;
+  if(!window.RizqMerchantActivities && accountType !== 'individual') return;
   var lang = _regLang();
   var map = { store: 'st-cat', office: 'of-cat', corp: 'cr-cat' };
   Object.keys(map).forEach(function(t){
     var el = document.getElementById(map[t]);
     if(!el) return;
     if(accountType && t !== accountType) return;
+    if(!window.RizqMerchantActivities) return;
     RizqMerchantActivities.renderSelect(el, {
       accountType: t,
       packageId: packageRef || null,
@@ -6442,7 +6510,11 @@ function renderRegActivitySelects(accountType, packageRef){
     });
   });
   var ppEl = document.getElementById('pp-activity-select');
-  if(ppEl && accountType){
+  if(ppEl && accountType === 'individual'){
+    renderIndividualActivitySelect(ppEl, lang);
+    return;
+  }
+  if(ppEl && accountType && window.RizqMerchantActivities){
     RizqMerchantActivities.renderSelect(ppEl, {
       accountType: accountType,
       packageId: packageRef || null,
@@ -6679,11 +6751,14 @@ function nniRejectMessage(data){
 
 function checkNniAvailable(nni){
   if(!window.RIZQ_BACKEND_BASE || !nni) return Promise.resolve(true);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/nni-available?nni=' + encodeURIComponent(nni))
+  var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var timer = setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 2500);
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/nni-available?nni=' + encodeURIComponent(nni), ctrl ? { signal: ctrl.signal } : undefined)
     .then(function(res){
       return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
     })
     .then(function(out){
+      clearTimeout(timer);
       var data = out.data;
       if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.available === false)){
         alert(nniRejectMessage(data));
@@ -6691,7 +6766,7 @@ function checkNniAvailable(nni){
       }
       return true;
     })
-    .catch(function(){ return true; });
+    .catch(function(){ clearTimeout(timer); return true; });
 }
 
 // ── إصلاح جوهري: كان التسجيل محلياً 100% في localStorage — لا يرى الأدمن
@@ -6872,53 +6947,57 @@ function ppRenderPackages(btype){
     var isDia = p.diamond||p.isDiamond||String(p.name).indexOf('ماسي')!==-1;
     var isTrial = p.trial||p.price===0;
     var isHigh = p.highlight;
-    var border = isDia?'1px solid rgba(168,85,247,.5)':isHigh?'1px solid rgba(201,168,76,.4)':'1px solid rgba(255,255,255,.1)';
-    var bg = isDia?'rgba(168,85,247,.08)':isHigh?'rgba(201,168,76,.08)':isTrial?'rgba(74,222,128,.05)':'rgba(255,255,255,.03)';
-    var icon = isTrial?'🎁':isDia?'💎':isHigh?'📅':'👑';
+    var border = isDia?'1.5px solid rgba(168,85,247,.45)':isHigh?'1.5px solid rgba(201,168,76,.55)':'1.5px solid #e2e8f0';
+    var bg = isDia?'#faf5ff':isHigh?'#fffef8':isTrial?'#f0fdf4':'#ffffff';
+    var icon = isTrial?'🎁':isDia?'💎':isHigh?'⭐':'👑';
     var pName   = isFr ? trPkg(p.name_fr || p.name) : p.name;
-    var pPeriod = isFr ? trPkg(p.period_fr || p.period || '') : p.period;
+    var pPeriod = isFr ? trPkg(p.period_fr || p.period || '') : (p.period || '');
     var freeLbl = isFr ? 'Gratuit' : 'مجاني';
-    var priceStr = isTrial?'<span style="color:#4ade80;font-weight:700">'+freeLbl+'</span>':'<span style="font-weight:800;font-size:14px;color:'+(isDia?'#c084fc':isHigh?'var(--gold)':'var(--white)')+'">'+p.price.toLocaleString('en-US')+'</span> <span style="font-size:10px;color:var(--text-muted)">MRU/'+pPeriod+'</span>';
+    var priceStr = isTrial
+      ? '<span class="pp-pkg-price-free" style="font-weight:800;font-size:15px">'+freeLbl+'</span>'
+      : '<span class="pp-pkg-price" style="font-weight:800;font-size:15px;color:'+(isDia?'#7c3aed':'#0f2347')+'">'+(p.price||0).toLocaleString('en-US')+'</span> <span class="pp-pkg-period" style="font-size:11px;color:#64748b">MRU'+(pPeriod?('/'+pPeriod):'')+'</span>';
     var featList = (isFr && p.features_fr && p.features_fr.length) ? p.features_fr : (p.features||[]);
-    var feats = featList.slice(0,4).map(function(f){return '<span style="font-size:10px;color:var(--text-muted)">✓ '+ (isFr ? trPkg(f) : f) +'</span>';}).join(' · ');
+    var feats = featList.slice(0,4).map(function(f){return '<span class="pp-pkg-feat" style="font-size:11.5px;color:#475569;background:#f8faff;border:1px solid #eef2f7;border-radius:999px;padding:3px 8px">✓ '+ (isFr ? trPkg(f) : f) +'</span>';}).join('');
     var bestLbl = isDia ? (isFr ? (p.featuredBadge_fr || p.featuredBadge || 'Le plus choisi par les entreprises') : (p.featuredBadge || 'الأكثر اختياراً للشركات')) : (isFr ? '💎 Meilleure offre' : '💎 الأفضل');
     var popularLbl = isFr ? '⭐ Le plus demandé' : '⭐ الأكثر طلباً';
-    html+='<div data-pkgi="'+i+'" onclick="ppSelectPkg(this,'+i+')" style="cursor:pointer;border:'+border+';background:'+bg+';border-radius:12px;padding:12px 14px;transition:all .2s;position:relative" class="pp-pkg-card">'
-      +(isDia?'<div style="position:absolute;top:-10px;right:14px;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+bestLbl+'</div>':'')
-      +(isHigh&&!isDia?'<div style="position:absolute;top:-10px;right:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0d1b2a;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+popularLbl+'</div>':'')
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-      +'<div style="display:flex;align-items:center;gap:8px"><div id="pp-chk-'+i+'" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;transition:all .2s"></div>'
-      +'<span style="font-size:13px;font-weight:700;color:var(--white)">'+icon+' '+pName+'</span></div>'
-      +priceStr+'</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:4px">'+feats+'</div>'
+    html+='<div data-pkgi="'+i+'" onclick="ppSelectPkg(this,'+i+')" style="cursor:pointer;border:'+border+';background:'+bg+';border-radius:14px;padding:14px 15px;transition:all .2s;position:relative" class="pp-pkg-card">'
+      +(isDia?'<div style="position:absolute;top:-10px;inset-inline-end:14px;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+bestLbl+'</div>':'')
+      +(isHigh&&!isDia?'<div style="position:absolute;top:-10px;inset-inline-end:14px;background:linear-gradient(135deg,#c9a84c,#d4bc72);color:#0d1b2a;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+popularLbl+'</div>':'')
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px">'
+      +'<div style="display:flex;align-items:center;gap:10px;min-width:0"><div id="pp-chk-'+i+'" class="pp-chk" style="width:20px;height:20px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;transition:all .2s;background:#fff"></div>'
+      +'<span class="pp-pkg-title" style="font-size:14px;font-weight:800;color:#0f2347;line-height:1.35">'+icon+' '+pName+'</span></div>'
+      +'<div style="flex-shrink:0;text-align:end">'+priceStr+'</div></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+feats+'</div>'
       +'</div>';
   });
   document.getElementById('pp-pkg-list').innerHTML=html;
   _ppPkgCatalog = pkgs.slice();
   // auto-select highlight
   var cards=document.querySelectorAll('.pp-pkg-card');
-  var defIdx=1; // monthly by default
+  var defIdx=0;
+  for(var di=0; di<pkgs.length; di++){ if(pkgs[di] && (pkgs[di].highlight || pkgs[di].trial || pkgs[di].price===0)){ defIdx=di; break; } }
   if(cards[defIdx]) ppSelectPkg(cards[defIdx],defIdx);
   else renderRegActivitySelects(btype, pkgs[0] && pkgs[0].id);
 }
 
 function ppSelectPkg(el,i){
   document.querySelectorAll('.pp-pkg-card').forEach(function(c,ci){
-    c.style.boxShadow='none';
+    c.classList.remove('is-selected');
+    c.style.boxShadow='';
     c.style.transform='scale(1)';
     var chk=document.getElementById('pp-chk-'+ci);
-    if(chk){chk.style.background='';chk.style.borderColor='rgba(255,255,255,.25)';chk.innerHTML='';}
+    if(chk){chk.style.background='#fff';chk.style.borderColor='#cbd5e1';chk.innerHTML='';}
   });
-  el.style.boxShadow='0 0 0 2px var(--gold)';
+  el.classList.add('is-selected');
   el.style.transform='scale(1.01)';
   var chk=document.getElementById('pp-chk-'+i);
-  if(chk){chk.style.background='var(--gold)';chk.style.borderColor='var(--gold)';chk.innerHTML='<svg viewBox="0 0 10 8" fill="none" style="width:8px;height:7px;margin:2px auto;display:block"><path d="M1 4l2.5 2.5 5.5-5.5" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/></svg>';}
+  if(chk){chk.style.background='var(--gold)';chk.style.borderColor='var(--gold)';chk.innerHTML='<svg viewBox="0 0 10 8" fill="none" style="width:8px;height:7px;margin:3px auto;display:block"><path d="M1 4l2.5 2.5 5.5-5.5" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/></svg>';}
   // Read package data
   var cards=document.querySelectorAll('.pp-pkg-card');
   _ppSelectedPkg = {idx:i, el:el};
   // Extract name & price from rendered element text
-  var nameEl=el.querySelector('span[style*="font-size:13px"]');
-  var priceEl=el.querySelector('span[style*="font-weight:800"]');
+  var nameEl=el.querySelector('.pp-pkg-title');
+  var priceEl=el.querySelector('.pp-pkg-price, .pp-pkg-price-free');
   _ppSelectedPkg.name = nameEl ? nameEl.textContent.trim() : (isAr ? 'شهرية' : 'Mensuelle');
   _ppSelectedPkg.price = priceEl ? priceEl.textContent.trim() : '0';
   _ppSelectedPkg.isTrial = _ppSelectedPkg.price==='مجاني'||_ppSelectedPkg.price==='Gratuit'||_ppSelectedPkg.price==='0'||parseInt(_ppSelectedPkg.price)===0;
@@ -6940,11 +7019,11 @@ function ppRenderPayMethods(){
   var html=codes.map(function(c){
     var icon='💳';
     Object.keys(icons).forEach(function(k){if(c.bank.toLowerCase().includes(k)||String(c.type||'').toLowerCase().includes(k))icon=icons[k];});
-    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:rgba(255,255,255,.04);border-radius:9px;border:1px solid rgba(255,255,255,.07)">'
-      +'<span style="font-size:18px;flex-shrink:0">'+icon+'</span>'
-      +'<div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px">'+c.bank+'</div>'
-      +'<div dir="ltr" style="font-family:monospace;font-size:11px;color:var(--gold);margin-bottom:2px;letter-spacing:.5px">'+c.code+'</div>'
-      +(c.note?'<div style="font-size:10px;color:var(--text-muted)">'+c.note+'</div>':'')
+    return '<div class="pp-pay-row" style="display:flex;align-items:flex-start;gap:10px">'
+      +'<span style="font-size:20px;flex-shrink:0;line-height:1">'+icon+'</span>'
+      +'<div style="flex:1;min-width:0"><div class="pp-pay-bank" style="font-size:13px;margin-bottom:3px">'+c.bank+'</div>'
+      +'<div class="pp-pay-code" dir="ltr" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;margin-bottom:3px;letter-spacing:.4px">'+c.code+'</div>'
+      +(c.note?'<div class="pp-pay-note" style="font-size:11px;line-height:1.5">'+c.note+'</div>':'')
       +'</div></div>';
   }).join('');
   document.getElementById('pp-pay-methods').innerHTML=html;
@@ -6988,7 +7067,7 @@ function ppFinalSubmit(){
     activityId = formSel ? formSel.value : '';
   }
   if(!activityId){alert(isAr?'يرجى اختيار النشاط التجاري المناسب لباقتك':'Veuillez choisir l\'activité commerciale correspondant à votre forfait');return;}
-  if(window.RizqMerchantActivities && !RizqMerchantActivities.isAllowed(activityId, accountType, _ppSelectedPkg.id)){
+  if(accountType !== 'individual' && window.RizqMerchantActivities && !RizqMerchantActivities.isAllowed(activityId, accountType, _ppSelectedPkg.id)){
     alert(isAr?'النشاط المختار غير متاح لهذه الباقة':'Cette activité n\'est pas disponible pour ce forfait');return;
   }
   var isTrial=_ppSelectedPkg.isTrial;
@@ -7130,6 +7209,8 @@ function submitIndividualReg(){
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!indFile){alert(isAr?(isMr?'يرجى رفع صورة البطاقة الوطنية':'يرجى رفع جواز السفر أو بطاقة الإقامة/الجنسية'):(isMr?'Veuillez télécharger une photo de la carte d\'identité nationale':'Veuillez télécharger votre passeport ou carte de séjour/nationalité'));return;}
+  var termsEl=document.getElementById('ind-terms');
+  if(termsEl && !termsEl.checked){alert(isAr?'يجب الموافقة على شروط المنصة لإرسال الطلب':'Veuillez accepter les conditions pour envoyer la demande');return;}
   var primaryPhone = mrRx.test(phoneMr) ? phoneMr : whatsapp.replace(/\D/g,'').slice(-15);
   function finishIndividualReg(){
     _fileToBase64(indFile).then(function(id_image){
@@ -7161,10 +7242,7 @@ function submitIndividualReg(){
     finishIndividualReg();
   }
   var otpData={ name:name, email:email, phoneMr:phoneMr, phoneIntl:phoneIntl, whatsapp:whatsapp };
-  if(window.RizqAuthGate && typeof RizqAuthGate.ensureEmailOtpVerified==='function'){
-    RizqAuthGate.ensureEmailOtpVerified(otpData, runAfterOtp);
-    return;
-  }
+  /* لا نفتح طبقة OTP فوق صفحة التسجيل — كانت تُخفى بـ CSS فتبدو الواجهة جامدة */
   runAfterOtp();
 }
 
@@ -8459,16 +8537,11 @@ function pkgModalCTA(){
     window.location.href = 'rizq_ads_info.html';
     return;
   }
-  openModal('register');
-  if(origin==='individual'){
-    setTimeout(function(){ selectType('private'); goFromType(); }, 200);
-  } else if(origin==='stores'){
-    setTimeout(function(){ selectType('company'); goFromType(); setTimeout(function(){ selectBizType('store'); }, 200); }, 200);
-  } else if(origin==='offices'){
-    setTimeout(function(){ selectType('company'); goFromType(); setTimeout(function(){ selectBizType('office'); }, 200); }, 200);
-  } else if(origin==='corp'){
-    setTimeout(function(){ selectType('company'); goFromType(); setTimeout(function(){ selectBizType('corp'); }, 200); }, 200);
-  }
+  if(origin==='individual') openRegisterAs('private');
+  else if(origin==='stores') openRegisterAs('company','store');
+  else if(origin==='offices') openRegisterAs('company','office');
+  else if(origin==='corp') openRegisterAs('company','corp');
+  else location.href='rizq_register.html?mode=seller';
 }
 </script>
 
@@ -8487,7 +8560,7 @@ function pkgModalCTA(){
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-fr="Vos clients vous contactent directement">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-fr="WhatsApp, téléphone et e-mail — en un clic">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-fr="Prêt en quelques minutes — 3 jours gratuits">جاهز في دقائق — مجاناً 3 أيام</div><div class="rizq-pf-sub" data-t-fr="Aucun site web ni expérience technique requis">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
-      <a href="?openRegister=1" class="rizq-promo-cta-main" onclick="if(typeof rizqOpenRegister==='function'){rizqOpenRegister(event);return false;}" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>
+      <a href="rizq_register.html" class="rizq-promo-cta-main" onclick="closeRizqPromo();location.href='rizq_register.html';return false;" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>
       <a href="./" class="rizq-promo-cta-sec" data-t-fr="Explorer la plateforme d'abord →">تصفح المنصة أولاً ←</a>
       <div class="rizq-promo-note" data-t-fr="Aucune carte bancaire requise · 3 jours d'essai gratuit">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
     </div>

@@ -15,6 +15,7 @@
   var _sellerOtpCallback = null;
   var _otpTimer = null;
   var _otpConfig = { devHintEnabled: false, production: false };
+  var _ragOpenedAt = 0;
 
   var MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -427,8 +428,16 @@
       row.appendChild(inp);
     }
 
-    document.getElementById('rag-close-btn').addEventListener('click', closeModal);
+    document.getElementById('rag-close-btn').addEventListener('click', function (e) {
+      if (Date.now() - (_ragOpenedAt || 0) < 800) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      closeModal();
+    });
     document.getElementById('rag-overlay').addEventListener('click', function (e) {
+      if (Date.now() - (_ragOpenedAt || 0) < 800) return;
       if (e.target === this) closeModal();
     });
     document.getElementById('rag-send-otp-btn').addEventListener('click', sendOtpStep);
@@ -505,13 +514,18 @@
 
   function openRagShell() {
     ensureModal();
-    injectStyle(); /* إعادة حقن CSS الفاتح دائماً لتجاوز rizq_modals.css والكاش */
+    injectStyle();
+    _ragOpenedAt = Date.now();
     var ov = document.getElementById('rag-overlay');
     ov.classList.add('open');
     ov.style.display = 'flex';
-    ov.style.pointerEvents = 'auto';
+    ov.style.zIndex = '1000001';
+    ov.style.pointerEvents = 'none';
     document.body.classList.add('rizq-reg-open');
     document.body.style.overflow = 'hidden';
+    setTimeout(function () {
+      if (ov.classList.contains('open')) ov.style.pointerEvents = 'auto';
+    }, 500);
   }
 
   function syncWhatsappFromPhones() {
@@ -963,6 +977,7 @@
   }
 
   function closeModal() {
+    if (Date.now() - (_ragOpenedAt || 0) < 800) return;
     var ov = document.getElementById('rag-overlay');
     if (ov) {
       ov.classList.remove('open');

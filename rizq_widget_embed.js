@@ -410,7 +410,7 @@
     }
 
     function _masterSystemPrompt() {
-      var RA = window.RizqAgent;
+      var RA = window.RizqChatAgent || window.RizqAgent;
       if (RA && typeof RA.buildMasterSystemPrompt === 'function') {
         return RA.buildMasterSystemPrompt({
           agentTier: _resolveAgentTier(),
@@ -424,7 +424,7 @@
     }
 
     function _policyCheck(userText) {
-      var RA = window.RizqAgent;
+      var RA = window.RizqChatAgent || window.RizqAgent;
       if (!RA || typeof RA.isBlockedRequest !== 'function') return null;
       if (!RA.isBlockedRequest(userText)) return null;
       var lang = _detectMessageLang(userText);

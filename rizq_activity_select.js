@@ -94,7 +94,7 @@
     menu.style.right = 'auto';
     menu.style.overflowY = 'auto';
     menu.style.maxHeight = maxH + 'px';
-    menu.style.zIndex = '10075';
+    menu.style.zIndex = '1000020';
 
     if (openDown) {
       menu.style.top = (rect.bottom + 4) + 'px';

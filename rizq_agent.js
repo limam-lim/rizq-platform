@@ -235,5 +235,8 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = RizqAgent;
 }
 if (typeof window !== 'undefined') {
-  window.RizqAgent = RizqAgent;
+  window.RizqChatAgent = RizqAgent;
+  if (!window.RizqAgent) {
+    window.RizqAgent = RizqAgent;
+  }
 }

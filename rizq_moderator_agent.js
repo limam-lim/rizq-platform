@@ -486,8 +486,8 @@
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = RizqAgent;
-  } else {
-    global.RizqAgent = RizqAgent;
   }
+  global.RizqModeratorAgent = RizqAgent;
+  global.RizqAgent = RizqAgent;
 
 }(typeof window !== 'undefined' ? window : this));

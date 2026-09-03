@@ -60,6 +60,14 @@
       location.href = url;
       return false;
     }
+    if (window.goToAccount) {
+      window.goToAccount(e);
+      return false;
+    }
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return false;
+    }
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
       window.RizqAuthGate.openAccount();
       return false;
@@ -68,7 +76,7 @@
       window.openModal('login');
       return false;
     }
-    location.href = 'rizq_landing_v8.html?openLogin=1';
+    location.href = 'index.html';
     return false;
   }
 

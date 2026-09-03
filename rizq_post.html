@@ -1230,8 +1230,10 @@ function publishAd(){
 
   // ══ تشغيل الوكيل ══
   var feedbackEl = document.getElementById('mod-feedback') || null;
-  if (typeof RizqAgent !== 'undefined') {
-    RizqAgent.handleSubmit(adData, {
+  var _modAgent = (typeof RizqModeratorAgent !== 'undefined') ? RizqModeratorAgent
+    : ((typeof RizqAgent !== 'undefined' && typeof RizqAgent.handleSubmit === 'function') ? RizqAgent : null);
+  if (_modAgent) {
+    _modAgent.handleSubmit(adData, {
       feedbackEl: feedbackEl,
       onApprove: function(data){
         // ── تفعيل وكيل التحسين البصري (كان مبنياً بالكامل وجاهزاً منذ فترة
@@ -1312,6 +1314,14 @@ function publishAd(){
     });
   } else {
     // fallback إذا لم يُحمَّل الوكيل
+    adData.status = 'active';
+    adData.date = new Date().toLocaleDateString('ar-MR-u-nu-latn');
+    try{
+      var adsFb = JSON.parse(localStorage.getItem('rizq_ads') || '[]');
+      adsFb.unshift(adData);
+      localStorage.setItem('rizq_ads', JSON.stringify(adsFb));
+      _rizqRecordPostTimestamp();
+    }catch(e){}
     document.getElementById('success-id').textContent = adData.id;
     _showSuccessCondition(adData);
     document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
@@ -1881,7 +1891,7 @@ function rizqShare(title, url) {
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-promo="f2t">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-promo="f2s">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-promo="f3t">جاهز في دقائق — مجاناً 3 أيام</div><div class="rizq-pf-sub" data-t-promo="f3s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
-      <a href="rizq_landing_v8.html?openRegister=1" class="rizq-promo-cta-main" data-t-promo="ctaMain">🚀 ابدأ مجاناً الآن</a>
+      <a href="rizq_register.html" class="rizq-promo-cta-main" data-t-promo="ctaMain">🚀 ابدأ مجاناً الآن</a>
       <a href="rizq_landing_v8.html" class="rizq-promo-cta-sec" data-t-promo="ctaSec">تصفح المنصة أولاً ←</a>
       <div class="rizq-promo-note" data-t-promo="note">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
     </div>
