@@ -291,7 +291,7 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js"></script>
+<script src="rizq_account_route.js?v=5"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -1177,6 +1177,10 @@ function initCorpAccess(){
   var isDemoParam = p.get('demo') === '1';
   if(isDemoParam){IS_DEMO=true;CORP_ACC=DEMO_ACC;initDashboard();return;}
   var id = p.get('id'), tok = p.get('token');
+  if((!id||!tok) && window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+    var rec = window.RizqAccount.recoverSessionParams('corp');
+    if(rec){ id = rec.id; tok = rec.token; }
+  }
   if(!id||!tok){showAccessDenied();return;}
   try{
     // إصلاح جوهري: كان هذا الكود يقرأ rizq_accounts كأنه مصفوفة (accs.find)
@@ -1187,8 +1191,8 @@ function initCorpAccess(){
     var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var acc = accs.find(function(a){return a.id===id && a.token===tok && a.status==='approved' && a.type==='corp';});
     if(acc){ CORP_ACC = loadActivatedPackage(acc); initDashboard(); return; }
-    // لا سجل محلي — متوقّع تماماً عندما يفتح صاحب الشركة الرابط من جهازه
-    // الخاص (وليس نفس متصفح الأدمن). نحاول التحقق من الخادم قبل الرفض النهائي.
+  // لا سجل محلي — متوقّع تماماً عندما يفتح صاحب الشركة الرابط من جهازه
+  // الخاص (وليس نفس متصفح الأدمن). نحاول التحقق من الخادم قبل الرفض النهائي.
     verifyCorpAccessRemote(id, tok);
   }catch(e){showAccessDenied();}
 }

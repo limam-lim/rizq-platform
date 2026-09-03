@@ -45,11 +45,26 @@
     }) || null;
   }
 
+  /* Live Server / serve يحوّلان غالباً *.html → مسار بلا امتداد وقد يُسقطان
+     ?id=&token= أثناء التحويل، فيدخل bootstrap في حلقة إعادة تحميل بيضاء.
+     نفضّل المسارات النظيفة ونقارن الأسماء بلا .html. */
+  function dashFileName(type) {
+    return DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
+  }
+
+  function cleanDashPath(file) {
+    return String(file || '').replace(/\.html$/i, '');
+  }
+
+  function normalizeDashName(name) {
+    return cleanDashPath(String(name || '').split('?')[0]).toLowerCase();
+  }
+
   function buildDashboardUrl(acc) {
     if (!acc || !acc.id || !acc.token) return '';
     var type = acc.type || 'individual';
-    var file = DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
-    return file + '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
+    var path = cleanDashPath(dashFileName(type));
+    return path + '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
   }
 
   function resolveDashboardUrl() {
@@ -159,14 +174,53 @@
 
   function bootstrapDashboard() {
     var p = new URLSearchParams(location.search);
-    if (p.get('id') && p.get('token')) return;
     if (p.get('demo') === '1') return;
+    if (p.get('id') && p.get('token')) {
+      try {
+        sessionStorage.removeItem('rizq_dash_boot_guard');
+        sessionStorage.removeItem('rizq_dash_boot_ts');
+      } catch (eClear) {}
+      return;
+    }
     var url = resolveDashboardUrl();
     if (!url) return;
-    var target = url.split('?')[0];
-    var current = (location.pathname || '').split('/').pop() || '';
-    if (current === target && p.get('id') && p.get('token')) return;
-    location.replace(url);
+    var targetFile = url.split('?')[0];
+    var query = url.indexOf('?') >= 0 ? url.slice(url.indexOf('?')) : '';
+    var currentFile = (location.pathname || '').split('/').pop() || '';
+    var now = Date.now();
+    var last = 0;
+    try { last = parseInt(sessionStorage.getItem('rizq_dash_boot_ts') || '0', 10) || 0; } catch (eTs) {}
+    /* منع حلقة سريعة فقط (أقل من ثانية) — لا قفل دائم يمنع فتح اللوحة */
+    if (last && (now - last) < 900) return;
+    try { sessionStorage.setItem('rizq_dash_boot_ts', String(now)); } catch (eTs2) {}
+
+    if (normalizeDashName(currentFile) === normalizeDashName(targetFile)) {
+      if (!query) return;
+      location.replace(currentFile + query);
+      return;
+    }
+    location.replace(cleanDashPath(targetFile) + query);
+  }
+
+  /* إن فُقدت ?id=&token= من الرابط (تحويل السيرفر)، نستعيدها من الجلسة المحلية
+     بدون إعادة تحميل لتجنّب الشاشة البيضاء و«يجب تسجيل الدخول». */
+  function recoverSessionParams(expectedType) {
+    var p = new URLSearchParams(location.search);
+    if (p.get('id') && p.get('token')) {
+      return { id: p.get('id'), token: p.get('token'), fromUrl: true };
+    }
+    var sess = readStoredSession();
+    if (!sess) return null;
+    var acc = findApprovedAccount(sess);
+    if (!acc) return null;
+    var type = acc.type || 'individual';
+    if (expectedType && type !== expectedType) return null;
+    try {
+      var path = cleanDashPath(dashFileName(type));
+      var q = '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
+      history.replaceState(null, '', path + q);
+    } catch (eHist) {}
+    return { id: acc.id, token: acc.token, account: acc, fromUrl: false };
   }
 
   window.RizqAccount = {
@@ -174,6 +228,7 @@
     resolveDashboardUrl: resolveDashboardUrl,
     buildDashboardUrl: buildDashboardUrl,
     bootstrapDashboard: bootstrapDashboard,
+    recoverSessionParams: recoverSessionParams,
     clearSession: clearSession,
     setActiveSession: setActiveSession,
     loginSeller: loginSeller,

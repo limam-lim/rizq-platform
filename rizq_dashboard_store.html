@@ -344,7 +344,7 @@ textarea.form-input{resize:vertical;min-height:90px}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js"></script>
+<script src="rizq_account_route.js?v=5"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -950,9 +950,18 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script>
 // ══ TOKEN VERIFICATION ══
 const params = new URLSearchParams(window.location.search);
-const SESSION_ID = params.get('id') || '';
-const SESSION_TOKEN = params.get('token') || '';
+var SESSION_ID = params.get('id') || '';
+var SESSION_TOKEN = params.get('token') || '';
 const IS_DEMO = params.get('demo') === '1';
+(function rizqHydrateDashSession(){
+  if(SESSION_ID && SESSION_TOKEN) return;
+  if(IS_DEMO) return;
+  if(!window.RizqAccount || typeof window.RizqAccount.recoverSessionParams !== 'function') return;
+  var rec = window.RizqAccount.recoverSessionParams('store');
+  if(!rec) return;
+  SESSION_ID = rec.id || '';
+  SESSION_TOKEN = rec.token || '';
+})();
 
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escapeAttr(s){if(!s)return'';return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
