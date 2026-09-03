@@ -1,7 +1,7 @@
 /**
- * rizq_register_wizard.css  v5.0
+ * rizq_register_wizard.css  v5.4
  * ─────────────────────────────────────────────────────────────
- * هاتف  (≤768px) : نافذة تملأ الشاشة (تصرف قديم محفوظ)
+ * هاتف  (≤768px) : نافذة تملأ الشاشة — بدون شريط علوي داكن
  * كمبيوتر/تابلت (≥769px) : صفحة كاملة واسعة فاتحة بشريط علوي داكن
  *   شعار رزق مطابق لـ #nav في الصفحة الرئيسية
  * ─────────────────────────────────────────────────────────────
@@ -330,8 +330,20 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     justify-content:flex-start !important; padding:0 !important;
     overflow-y:auto !important; z-index:1000001 !important;
   }
+  /* هاتف: لا شريط علوي داكن — يمنع تداخل FR|AR مع الأمان/الروابط */
   #modal.reg-wizard-mode > .rizq-reg-chrome,
-  #modal.reg-wizard-mode > .rizq-reg-footer { display:none !important; }
+  #modal.reg-wizard-mode > .rizq-reg-footer,
+  body.rizq-reg-open #rizq-reg-chrome,
+  body.rizq-reg-open #rizq-reg-footer,
+  #rizq-reg-chrome,
+  #rizq-reg-footer {
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+    height:0 !important;
+    overflow:hidden !important;
+    opacity:0 !important;
+  }
   #modal.reg-wizard-mode .modal-box {
     background:#fff !important; width:100% !important;
     min-height:100vh; min-height:100dvh;
@@ -348,7 +360,13 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
 
   html.rizq-reg-page, html.rizq-reg-page body { background:#f8faff !important; }
   html.rizq-reg-page #modal > .rizq-reg-chrome,
-  html.rizq-reg-page #modal > .rizq-reg-footer { display:none !important; }
+  html.rizq-reg-page #modal > .rizq-reg-footer,
+  html.rizq-reg-page #rizq-reg-chrome,
+  html.rizq-reg-page #rizq-reg-footer {
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
   html.rizq-reg-page #modal.modal-overlay,
   html.rizq-reg-page #modal.reg-wizard-mode    { background:#f8faff !important; }
   html.rizq-reg-page #modal .modal-box {
@@ -450,6 +468,29 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     pointer-events: auto !important;
     box-shadow: none;
     box-sizing: border-box;
+  }
+
+  /* تابلت / شاشات ضيقة: منع تداخل FR|AR مع الروابط */
+  @media (max-width: 1100px) {
+    #modal.reg-wizard-mode > .rizq-reg-chrome,
+    body.rizq-reg-open #rizq-reg-chrome {
+      gap: 8px;
+      padding: 0 2.5%;
+    }
+    .rizq-reg-chrome-links { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .rizq-reg-chrome-links a {
+      font-size: 12px;
+      padding: 6px 8px;
+    }
+    .rizq-reg-chrome-links a:first-child { display: none; } /* إخفاء الرئيسية */
+    .rizq-reg-chrome-lang {
+      font-size: 11px;
+      padding: 6px 10px;
+      z-index: 2;
+    }
+    #modal .rizq-reg-chrome .logo-sub { display: none !important; }
+    #modal .rizq-reg-chrome .logo-mark-img { width: 34px !important; height: 34px !important; }
+    #modal .rizq-reg-chrome .logo-ar { font-size: 18px !important; }
   }
 
   /* مساحة للشريط العلوي الثابت */

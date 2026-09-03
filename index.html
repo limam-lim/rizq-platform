@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=5.3"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=5.4"/>
 <script>
 /* تفعيل وضع صفحة التسجيل قبل الرسم حتى لا تظهر الرئيسية خلف النافذة */
 (function () {
@@ -6359,7 +6359,15 @@ function rizqMountAccountBars(modal){
   }
   var desk=false;
   try{ desk=window.matchMedia('(min-width:769px)').matches; }catch(e){}
-  if(!desk) return;
+  if(!desk){
+    /* هاتف: إخفاء الشريط الداكن حتى لا يتداخل FR|AR مع الروابط */
+    if(chrome){
+      chrome.style.display='none';
+      chrome.style.visibility='hidden';
+      chrome.style.pointerEvents='none';
+    }
+    return;
+  }
   if(chrome){
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
