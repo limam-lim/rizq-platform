@@ -122,6 +122,14 @@
   }
 
   function openGuestChoice() {
+    /* على الكمبيوتر/التابلت: نفتح صفحة الحساب الكاملة مباشرة */
+    var isDesktop = false;
+    try { isDesktop = window.matchMedia('(min-width: 769px)').matches; } catch (e) {}
+    if (isDesktop && typeof window.openModal === 'function') {
+      window.openModal('account');
+      return true;
+    }
+    /* على الهاتف: نستخدم نافذة AuthGate العادية */
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
       window.RizqAuthGate.openAccountChoice();
       return true;
@@ -131,7 +139,7 @@
       return true;
     }
     if (typeof window.openModal === 'function') {
-      window.openModal('login');
+      window.openModal('account');
       return true;
     }
     return false;
