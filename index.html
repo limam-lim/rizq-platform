@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=5.4"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=5.5"/>
 <script>
 /* تفعيل وضع صفحة التسجيل قبل الرسم حتى لا تظهر الرئيسية خلف النافذة */
 (function () {
@@ -3092,7 +3092,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
       <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
       <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
-      <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">🔒 الأمان</span><span class="fr-only">🔒 Sécurité</span></a>
+      <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
     </div>
     <a href="./" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="closeModal(true)">
       <img class="logo-mark-img" src="rizq-mark-512.png?v=9.7" width="42" height="42" alt="رزق"/>
@@ -6357,18 +6357,8 @@ function rizqMountAccountBars(modal){
     fakeFooter.style.display='none';
     fakeFooter.style.pointerEvents='none';
   }
-  var desk=false;
-  try{ desk=window.matchMedia('(min-width:769px)').matches; }catch(e){}
-  if(!desk){
-    /* هاتف: إخفاء الشريط الداكن حتى لا يتداخل FR|AR مع الروابط */
-    if(chrome){
-      chrome.style.display='none';
-      chrome.style.visibility='hidden';
-      chrome.style.pointerEvents='none';
-    }
-    return;
-  }
   if(chrome){
+    /* يظهر دائماً في حسابي — التخطيط المضغوط على الهاتف عبر CSS */
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
