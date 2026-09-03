@@ -134,6 +134,12 @@ html.rizq-reg-page #modal .modal-close {
   inset-inline-end: 12px;
 }
 
+.rizq-reg-chrome,
+.rizq-reg-trust,
+.fr-only {
+  display: none;
+}
+
 #modal.reg-wizard-mode .modal-box {
   background: #fff !important;
   max-width: 820px !important;
@@ -179,6 +185,10 @@ html.rizq-reg-page #modal .modal-close {
   padding: 20px 20px 0;
   border-bottom: 1px solid #e2e8f5;
   margin-bottom: 0;
+}
+
+#modal.reg-wizard-mode .rizq-reg-chrome {
+  display: none;
 }
 
 #modal.reg-wizard-mode .modal-logo {
@@ -404,6 +414,34 @@ html[dir='ltr'] .reg-step:not(:last-child)::after { left: 50%; right: auto; }
   color: #0f2347 !important;
 }
 
+#modal.reg-wizard-mode .rizq-reg-trust {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+#modal.reg-wizard-mode .rizq-reg-trust-card {
+  background: linear-gradient(180deg, #fff, #f8faff);
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 10px 24px -18px rgba(15, 35, 65, 0.2);
+}
+
+#modal.reg-wizard-mode .rizq-reg-trust-card b {
+  display: block;
+  color: #1b3a6b;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+#modal.reg-wizard-mode .rizq-reg-trust-card p {
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+}
+
 /* مناطق الرفع */
 #modal.reg-wizard-mode [id^='uz-'] {
   border-color: rgba(201, 168, 76, 0.35) !important;
@@ -516,4 +554,60 @@ html[dir='ltr'] .reg-step:not(:last-child)::after { left: 50%; right: auto; }
 #modal.reg-wizard-mode #p-ok > div[style*='linear-gradient'] {
   background: linear-gradient(135deg, #f8faff, #eef2fb) !important;
   border-color: #e2e8f0 !important;
+}
+
+@media (min-width: 769px) {
+  html[dir='rtl'] .ar-only,
+  html[dir='ltr'] .fr-only {
+    display: inline;
+  }
+
+  html[dir='rtl'] .fr-only,
+  html[dir='ltr'] .ar-only {
+    display: none;
+  }
+
+  #modal.reg-wizard-mode .rizq-reg-chrome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e2e8f5;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 7;
+  }
+
+  #modal.reg-wizard-mode .rizq-reg-chrome-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  #modal.reg-wizard-mode .rizq-reg-chrome-links a {
+    color: #1b3a6b;
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+
+  #modal.reg-wizard-mode .rizq-reg-chrome-links a:hover {
+    background: #f8faff;
+  }
+
+  #modal.reg-wizard-mode .rizq-reg-chrome-lang {
+    background: #f8faff;
+    border: 1px solid #e2e8f0;
+    color: #1b3a6b;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
 }

@@ -328,6 +328,9 @@
     opts = opts || {};
     var accountType = normType(opts.accountType);
     var activities = listForPackage(accountType, opts.packageId || opts.package, opts.lang);
+    if (!activities.length) {
+      activities = listForAccountType(accountType, opts.lang);
+    }
     var groups = groupActivities(activities, accountType, opts.lang);
     var isFr = resolveLang(opts.lang) === 'fr';
     var prev = opts.selected || selectEl.value || '';

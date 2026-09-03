@@ -59,7 +59,16 @@
     return null;
   }
 
+  function shouldPortalMenu() {
+    try {
+      if (root.document.documentElement.classList.contains('rizq-reg-page')) return false;
+      if (root.document.querySelector('#modal.reg-wizard-mode')) return false;
+    } catch (e) {}
+    return true;
+  }
+
   function portalMenu(wrap, menu) {
+    if (!shouldPortalMenu()) return;
     if (!menu || menu.parentNode === root.document.body) return;
     menu._rizqActWrap = wrap;
     root.document.body.appendChild(menu);
@@ -78,6 +87,21 @@
     var trigger = wrap.querySelector('.rizq-act-select-trigger');
     var menu = getMenu(wrap);
     if (!trigger || !menu || menu.hidden) return;
+
+    if (!shouldPortalMenu()) {
+      restoreMenu(wrap, menu);
+      menu.style.position = 'absolute';
+      menu.style.left = '0';
+      menu.style.right = '0';
+      menu.style.top = 'calc(100% + 4px)';
+      menu.style.bottom = 'auto';
+      menu.style.width = '100%';
+      menu.style.maxHeight = '250px';
+      menu.style.zIndex = '80';
+      menu.style.overflowY = 'auto';
+      wrap.classList.remove('rizq-act-select-flip-up');
+      return;
+    }
 
     portalMenu(wrap, menu);
 

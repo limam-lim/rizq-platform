@@ -3086,6 +3086,15 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
     <button class="modal-close" onclick="if(!this.closest('#modal').classList.contains('reg-wizard-arming'))closeModal(true)" aria-label="إغلاق">✕</button>
+    <nav class="rizq-reg-chrome" id="rizq-reg-chrome" aria-label="شريط التسجيل">
+      <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR">FR | AR</button>
+      <div class="rizq-reg-chrome-links">
+        <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+        <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
+        <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
+        <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
+      </div>
+    </nav>
     <div class="modal-header">
       <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
       <div id="modal-auth-tabs" class="modal-auth-tabs" style="display:none" role="tablist" aria-label="تسجيل الدخول أو إنشاء حساب">
@@ -3116,6 +3125,20 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <div style="text-align:left;margin-bottom:18px"><a href="#" onclick="event.preventDefault();alert(isAr?'لاستعادة كلمة المرور، تواصل معنا على direction@rizq.mr وسنساعدك فوراً.':'Pour récupérer votre mot de passe, contactez-nous à direction@rizq.mr et nous vous aiderons immédiatement.');" style="color:var(--gold);font-size:12px;text-decoration:none">نسيت كلمة المرور؟</a></div>
       <button class="m-btn-main" onclick="doLogin()">دخول ←</button>
       <p class="modal-auth-switch"><span data-t="auth-no-account">ليس لديك حساب؟</span> <button type="button" class="m-link-btn" onclick="openModal('register')" data-t="auth-create-free">أنشئ حسابك مجاناً</button></p>
+      <div class="rizq-reg-trust">
+        <div class="rizq-reg-trust-card">
+          <b><span class="ar-only">كيف أفتح حساباً؟</span><span class="fr-only">Comment ouvrir un compte ?</span></b>
+          <p><span class="ar-only">اختر «حساب بائع جديد»، حدّد نوع النشاط، ثم أكمل البيانات والتحقق. بعد الموافقة تُفتح لوحة تحكم نشاطك مباشرة.</span><span class="fr-only">Choisissez « Nouveau compte vendeur », sélectionnez votre activité, puis validez vos données. Après activation, votre tableau de bord s’ouvre.</span></p>
+        </div>
+        <div class="rizq-reg-trust-card">
+          <b><span class="ar-only">استعادة كلمة المرور</span><span class="fr-only">Récupérer le mot de passe</span></b>
+          <p><span class="ar-only">اكتب لـ direction@rizq.mr من بريد الحساب المسجّل. لا نطلب أبداً كلمة المرور أو رمز الدفع عبر رسالة.</span><span class="fr-only">Écrivez à direction@rizq.mr depuis l’e-mail du compte. Rizq ne demande jamais votre mot de passe ou un code de paiement par message.</span></p>
+        </div>
+        <div class="rizq-reg-trust-card">
+          <b><span class="ar-only">أمان المشتركين</span><span class="fr-only">Sécurité des membres</span></b>
+          <p><span class="ar-only">بيانات الدفع والهوية تُعالج في مسار معزول، وصورة الهوية تُحذف بعد التوثيق. جلسة الدخول تبقى على جهازك فقط.</span><span class="fr-only">Paiements et pièces d’identité sont traités à part ; la photo d’identité est supprimée après vérification. La session reste sur votre appareil.</span></p>
+        </div>
+      </div>
     </div>
 
     <!-- ══ STEP 0: نوع الحساب (خاص / شركة) ══ -->
@@ -3147,6 +3170,16 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
       <button class="m-btn-main" onclick="goFromType()">التالي ←</button>
       <button class="m-link-btn" onclick="openModal('login')">← عودة لتسجيل الدخول</button>
+      <div class="rizq-reg-trust">
+        <div class="rizq-reg-trust-card">
+          <b><span class="ar-only">خطوات فتح الحساب</span><span class="fr-only">Étapes d’ouverture</span></b>
+          <p><span class="ar-only">١) نوع الحساب ٢) النشاط التجاري ٣) البيانات والتحقق. اختيار النشاط إلزامي قبل إتمام التسجيل.</span><span class="fr-only">1) Type de compte 2) Activité 3) Données et vérification. L’activité est obligatoire pour finaliser.</span></p>
+        </div>
+        <div class="rizq-reg-trust-card">
+          <b><span class="ar-only">حماية الدفع والخصوصية</span><span class="fr-only">Paiement et confidentialité</span></b>
+          <p><span class="ar-only">إيصالات الدفع تُراجع يدوياً. صورة الهوية تُحذف بعد التوثيق ويبقى رقم الهوية فقط داخل ملفك.</span><span class="fr-only">Les reçus sont vérifiés manuellement. La photo d’identité est effacée après contrôle ; seul le NNI reste au dossier.</span></p>
+        </div>
+      </div>
     </div>
 
     <!-- ══ STEP 1 (حساب خاص): الجنسية ══ -->
@@ -6288,6 +6321,7 @@ function openModal(mode){
   modal.style.pointerEvents='auto';
   modal.style.zIndex = (mode==='register') ? '1000001' : '';
   if(mode==='register'){
+    try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
     modal.classList.add('reg-wizard-arming');
     document.body.classList.add('rizq-reg-open');
@@ -6303,9 +6337,19 @@ function openModal(mode){
       }
     }catch(eUrl){}
   } else {
-    modal.classList.remove('reg-wizard-mode');
-    modal.classList.remove('reg-wizard-arming');
-    document.body.classList.remove('rizq-reg-open');
+    var keepLight = false;
+    try {
+      keepLight = document.documentElement.classList.contains('rizq-reg-page') || window.matchMedia('(min-width: 769px)').matches;
+    } catch (eKeep) {}
+    if (keepLight) {
+      try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (ePage) {}
+      modal.classList.add('reg-wizard-mode');
+      document.body.classList.add('rizq-reg-open');
+    } else {
+      modal.classList.remove('reg-wizard-mode');
+      modal.classList.remove('reg-wizard-arming');
+      document.body.classList.remove('rizq-reg-open');
+    }
   }
   document.body.style.overflow='hidden';
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
