@@ -24,6 +24,7 @@
   var host = '';
   try { host = window.location.hostname || ''; } catch (e) {}
   var isLocal = !host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+  window.RIZQ_IS_LOCAL = isLocal;
   // rizq-backend.onrender.com = مشروع قديم (Jobs API) — ليس خادم منصة رزق.
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
   window.RIZQ_BACKEND_BASE = isLocal ? 'http://localhost:3000' : 'https://rizq-platform-api.onrender.com';

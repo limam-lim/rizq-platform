@@ -29,6 +29,11 @@ a{text-decoration:none;color:inherit}
 .sb-logo-text{font-size:17px;font-weight:800;color:var(--white);text-align:right}
 .sb-logo-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;text-align:right}
 .sb-corp-info{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-av-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sb-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);border:2px solid rgba(201,168,76,.45);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-av img{width:100%;height:100%;object-fit:cover;display:block}
+.sb-av .av-letter{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:#C9A84C;font-size:18px;line-height:1}
+.sb-av .av-svg{width:70%;height:70%;display:block}
 .sb-corp-name{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-type-badge{font-size:11px;color:var(--gold);background:rgba(201,168,76,.15);padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px}
 .sb-sub-row{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.5)}
@@ -293,6 +298,8 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_profile_photo.js?v=2"></script>
+<script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -322,7 +329,10 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div><div class="sb-logo-text"><span style="color:#C9A84C;font-weight:900"><span style="color:#e8c96a;font-weight:900">رزق</span></span></div><div class="sb-logo-sub">RIZQ PLATFORM</div></div>
   </div>
   <div class="sb-corp-info">
-    <div class="sb-corp-name" id="sb-corp-name">...</div>
+    <div class="sb-av-row">
+      <div class="sb-av" id="sb-av"></div>
+      <div class="sb-corp-name" id="sb-corp-name">...</div>
+    </div>
     <span class="sb-type-badge" id="sb-type-badge" data-t="sb-type-badge">🏭 شركة / معرض</span>
     <div class="sb-sub-row"><div class="sub-dot" id="sb-sub-dot"></div><span id="sb-sub-text">...</span></div>
   </div>
@@ -663,7 +673,8 @@ textarea.form-input{min-height:80px;resize:vertical}
           <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px">
             <span data-t="p-strip-label">🏠 بطاقتك في شريط "آخر المعارض" على الرئيسية</span>
           </label>
-          <p style="font-size:11px;color:#94a3b8;margin-bottom:10px" data-t="p-strip-hint">صورة واحدة + جملة قصيرة تظهر للزوار في الصفحة الرئيسية — تشجعهم على النقر وزيارة معرضك</p>
+          <p style="font-size:11px;color:#94a3b8;margin-bottom:8px" data-t="p-strip-hint">صورة واحدة + جملة قصيرة تظهر للزوار في الصفحة الرئيسية — تشجعهم على النقر وزيارة معرضك</p>
+          <p style="font-size:12.5px;color:#1B3A6B;font-weight:600;line-height:1.65;margin-bottom:10px" data-t="photo-cred-hint">رفع صورة معرضك يعطيك أكثر مصداقية عند الزوار — تظهر على صفحتك العامة.</p>
           <div id="p-thumb-zone" onclick="document.getElementById('p-thumb-input').click()" style="border:2px dashed rgba(201,168,76,.35);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:12px" onmouseover="this.style.borderColor='rgba(201,168,76,.7)'" onmouseout="this.style.borderColor='rgba(201,168,76,.35)'">
             <div id="p-thumb-inner">
               <div style="font-size:26px;margin-bottom:4px">📷</div>
@@ -3209,8 +3220,15 @@ function saveMyPayment(){
       var innerL=document.getElementById('p-thumb-inner');
       if(innerL) innerL.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
     }
+    applySbThumb();
   }
 
+  function applySbThumb(){
+    if(!window.RizqProfilePhoto) return;
+    var photo = window._pThumbData || (CORP_ACC && CORP_ACC.thumb) || '';
+    var name = (CORP_ACC && CORP_ACC.name) || '';
+    RizqProfilePhoto.paint(document.getElementById('sb-av'), { photo: photo, name: name });
+  }
   function updateTaglineCount(){
     var el=document.getElementById('p-tagline'); var c=document.getElementById('p-tagline-count');
     if(el&&c) c.textContent=(el.value||'').length+'/50';
@@ -3228,6 +3246,7 @@ function saveMyPayment(){
         window._pThumbData=canvas.toDataURL('image/jpeg',0.82);
         var inner=document.getElementById('p-thumb-inner');
         if(inner) inner.innerHTML='<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
+        applySbThumb();
       };
       img.src=e.target.result;
     };

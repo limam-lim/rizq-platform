@@ -625,7 +625,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="panel" id="panel-profile">
       <div class="sec-title" data-t="profile">ملفي الشخصي</div>
       <p class="sec-sub" data-t="profile-sub">تحديث بياناتك الشخصية</p>
-      <p style="font-size:11.5px;color:var(--text-muted);margin-top:-6px;margin-bottom:10px">ℹ️ تُحفظ بياناتك على هذا الجهاز/المتصفح فقط — لا يوجد خادم مركزي يزامنها بين أجهزتك بعد.</p>
+      <p id="pf-local-note" hidden data-t="profile-note" style="font-size:11.5px;color:var(--text-muted);margin-top:-6px;margin-bottom:10px">ℹ️ تُحفظ بياناتك على هذا الجهاز/المتصفح فقط — لا يوجد خادم مركزي يزامنها بين أجهزتك بعد.</p>
       <div class="settings-grid">
         <div class="settings-card">
           <div class="settings-card-title" data-t="profile-personal-data">👤 البيانات الشخصية</div>
@@ -1533,6 +1533,15 @@ function loadProfile(){
   }catch(e){}
   applyDashAvatars();
 }
+function _profileSyncsToServer(){
+  return !IS_DEMO && window.RIZQ_BACKEND_BASE && SESSION_ID;
+}
+function applyProfileLocalNote(){
+  var el = document.getElementById('pf-local-note');
+  if(!el) return;
+  var localHost = window.RIZQ_IS_LOCAL === true;
+  el.hidden = !localHost || _profileSyncsToServer();
+}
 function saveProfile(){
   var profile = {
     name:  (document.getElementById('pf-name')||{}).value || '',
@@ -1547,7 +1556,7 @@ function saveProfile(){
   }
   localStorage.setItem('rizq_user_profile', JSON.stringify(profile));
   applyDashAvatars();
-  if(!IS_DEMO && window.RIZQ_BACKEND_BASE && SESSION_ID){
+  if(_profileSyncsToServer()){
     var body = { name: profile.name, email: profile.email, phone: profile.phone, city: profile.city, desc: profile.bio };
     if(window.RizqProfilePhoto) body.thumb = RizqProfilePhoto.get(_dashPhotoId()) || '';
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
@@ -1556,7 +1565,10 @@ function saveProfile(){
       body: JSON.stringify(body)
     }).catch(function(){});
   }
-  showToast((_rizqLang()==='ar')?'✅ تم حفظ التغييرات على هذا الجهاز':'✅ Modifications enregistrées sur cet appareil');
+  var synced = _profileSyncsToServer();
+  showToast(synced
+    ? ((_rizqLang()==='ar')?'✅ تم حفظ التغييرات':'✅ Modifications enregistrées')
+    : ((_rizqLang()==='ar')?'✅ تم حفظ التغييرات على هذا الجهاز':'✅ Modifications enregistrées sur cet appareil'));
 }
 (function wireDashPhotoUpload(){
   var pick = document.getElementById('pf-photo-pick');
@@ -2388,6 +2400,7 @@ function _initDashboardWithAccount(acc){
   renderNotifs();
   renderFavs();
   loadProfile();
+  applyProfileLocalNote();
   if(typeof _applyDashGreeting === 'function') _applyDashGreeting();
   else {
     var greet=document.querySelector('[data-t="greeting"]');
