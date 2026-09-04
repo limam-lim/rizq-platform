@@ -323,8 +323,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="topbar-title" id="topbar-title" data-t="sb-overview">📊 نظرة عامة</div>
   </div>
   <div class="content">
-
-    <!-- OVERVIEW -->
+    <div id="rizq-sub-slot"></div>
     <div class="panel active" id="panel-overview">
                   <!-- ══ Hero Banner ══ -->
       <div id="hero-banner" style="background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#1a3a8f 100%);border-radius:20px;padding:0;overflow:hidden;position:relative;margin-bottom:20px;min-height:180px;display:flex">
@@ -1037,10 +1036,9 @@ function _showSubBanner(opts) {
   var banner = document.createElement('div');
   banner.id = 'rizq-sub-banner';
   var urgent = opts.urgent ? 'animation:pulse 1.5s infinite;' : '';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:8888;'
-    +'min-width:320px;max-width:94vw;padding:14px 18px;border-radius:14px;background:#fff;'
-    +'box-shadow:0 8px 32px rgba(0,0,0,.18);border-right:5px solid '+opts.color+';'
-    +'display:flex;align-items:center;gap:12px;'+urgent;
+  banner.style.cssText = 'position:relative;z-index:2;width:100%;margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#fff;'
+    +'box-shadow:0 2px 14px rgba(15,35,65,.1);border-right:5px solid '+opts.color+';'
+    +'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'+urgent;
   banner.innerHTML =
     '<span style="font-size:26px;flex-shrink:0">'+opts.icon+'</span>'
     +'<div style="flex:1">'
@@ -1051,7 +1049,9 @@ function _showSubBanner(opts) {
     +'<button onclick="'+opts.ctaFn+'" style="white-space:nowrap;padding:8px 14px;background:'+opts.color+';color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">'+opts.cta+'</button>'
     +(opts.persistent?'':'<button onclick="document.getElementById(\"rizq-sub-banner\").remove()" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer">'+_t2('تذكيرني لاحقاً','Me rappeler plus tard')+'</button>')
     +'</div>';
-  document.body.appendChild(banner);
+  var slot = document.getElementById('rizq-sub-slot') || document.querySelector('.content');
+  if(slot) slot.insertBefore(banner, slot.firstChild);
+  else document.body.appendChild(banner);
   // أضف animation pulse إذا urgent
   if(opts.urgent && !document.getElementById('sub-pulse-style')) {
     var st = document.createElement('style');

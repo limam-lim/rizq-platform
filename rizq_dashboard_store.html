@@ -66,6 +66,11 @@ a{text-decoration:none;color:inherit}
 .topbar-btn:hover{background:var(--royal);color:#fff;border-color:var(--royal)}
 .topbar-btn.gold{background:var(--gold);color:var(--royal-dark);border-color:var(--gold)}
 .topbar-btn.gold:hover{background:var(--gold-light)}
+.topbar .btn-lang-primary,.mobile-bar .btn-lang-primary{
+  background:rgba(201,168,76,.16)!important;border:1px solid rgba(201,168,76,.55)!important;color:#C9A84C!important;
+  border-radius:20px;padding:5px 14px;font-size:11px;font-weight:800;letter-spacing:1px;height:auto
+}
+.topbar .btn-lang-primary:hover,.mobile-bar .btn-lang-primary:hover{background:rgba(201,168,76,.3)!important;color:#E8C96A!important}
 
 .content{padding:28px;flex:1}
 
@@ -173,8 +178,8 @@ textarea.form-input{resize:vertical;min-height:90px}
 }
 
 /* NOTIFICATION BELL */
-.notif-bell{position:relative;width:36px;height:36px;border-radius:10px;background:#f0f4ff;border:1px solid rgba(27,58,107,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s;flex-shrink:0}
-.notif-bell:hover{background:#e5ecff;border-color:var(--royal,#1B3A6B)}
+.notif-bell{position:relative;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid #fff;color:#1B3A6B;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.notif-bell:hover{background:#f3f6fb;border-color:#fff;color:#0f2347}
 .notif-count{position:absolute;top:-5px;left:-5px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:9px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;display:none}
 /* QUICK ACTIONS */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
@@ -361,7 +366,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <!-- MOBILE BAR -->
 <div class="mobile-bar">
   <div class="mobile-bar-controls">
-    <button class="topbar-btn btn-lang-store btn-lang" onclick="toggleLangStore()" style="font-size:11px;padding:4px 10px">FR</button>
+    <button type="button" class="topbar-btn btn-lang-store btn-lang btn-lang-primary" onclick="toggleLangStore()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:22px" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-bar-title" style="font-size:16px;font-weight:800;color:var(--navy)" data-t="mobile-title">🏪 داشبورد المحل</div>
@@ -425,19 +430,18 @@ textarea.form-input{resize:vertical;min-height:90px}
 <div class="main">
   <div class="topbar" style="background:#1B3A6B">
     <div class="topbar-actions topbar-controls">
-      <div class="notif-bell" onclick="showPanel('messages',null)" data-t-title="topbar-notif-title" title="رسائل جديدة">🔔<span class="notif-count" id="notif-count">0</span></div>
+      <div class="notif-bell" onclick="showPanel('messages',null)" data-t-title="topbar-notif-title" title="رسائل جديدة">🔔<span class="notif-count" id="notif-count" hidden>0</span></div>
       <button type="button" class="topbar-btn" onclick="openShareModal()" data-t="topbar-share">📤 مشاركة</button>
       <button type="button" class="topbar-btn" onclick="openAddProduct()" data-t="topbar-new-product">➕ منتج جديد</button>
       <button type="button" class="topbar-btn" onclick="previewMyPage()" data-t="topbar-preview">👁️ معاينة</button>
       <button type="button" class="topbar-btn gold" onclick="showPanel('subscription',null)" data-t="topbar-my-sub">💳 اشتراكي</button>
-      <button type="button" class="topbar-btn btn-lang-store btn-lang" id="store-lang-btn" onclick="toggleLangStore()">FR</button>
+      <button type="button" class="topbar-btn btn-lang-store btn-lang btn-lang-primary" id="store-lang-btn" onclick="toggleLangStore()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     </div>
     <div class="topbar-title" id="topbar-title" data-t="topbar-overview">📊 نظرة عامة</div>
   </div>
 
   <div class="content">
-
-    <!-- ══ OVERVIEW ══ -->
+    <div id="rizq-sub-slot"></div>
     <div class="panel active" id="panel-overview">
             <!-- Welcome Hero -->
       <div class="welcome-banner" style="padding:0;overflow:hidden;border-radius:20px;min-height:unset">
@@ -1123,10 +1127,9 @@ function _showSubBanner(opts) {
   var banner = document.createElement('div');
   banner.id = 'rizq-sub-banner';
   var urgent = opts.urgent ? 'animation:pulse 1.5s infinite;' : '';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:8888;'
-    +'min-width:320px;max-width:94vw;padding:14px 18px;border-radius:14px;background:#fff;'
-    +'box-shadow:0 8px 32px rgba(0,0,0,.18);border-right:5px solid '+opts.color+';'
-    +'display:flex;align-items:center;gap:12px;'+urgent;
+  banner.style.cssText = 'position:relative;z-index:2;width:100%;margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#fff;'
+    +'box-shadow:0 2px 14px rgba(15,35,65,.1);border-right:5px solid '+opts.color+';'
+    +'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'+urgent;
   banner.innerHTML =
     '<span style="font-size:26px;flex-shrink:0">'+opts.icon+'</span>'
     +'<div style="flex:1">'
@@ -1137,7 +1140,9 @@ function _showSubBanner(opts) {
     +'<button onclick="'+opts.ctaFn+'" style="white-space:nowrap;padding:8px 14px;background:'+opts.color+';color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">'+opts.cta+'</button>'
     +(opts.persistent?'':'<button onclick="document.getElementById(\"rizq-sub-banner\").remove()" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer">'+_t2('تذكيرني لاحقاً','Me rappeler plus tard')+'</button>')
     +'</div>';
-  document.body.appendChild(banner);
+  var slot = document.getElementById('rizq-sub-slot') || document.querySelector('.content');
+  if(slot) slot.insertBefore(banner, slot.firstChild);
+  else document.body.appendChild(banner);
   // أضف animation pulse إذا urgent
   if(opts.urgent && !document.getElementById('sub-pulse-style')) {
     var st = document.createElement('style');
@@ -2793,6 +2798,10 @@ function _applyStoreLang(lang, silent){
   // update lang button label (show OTHER language)
   var label = isAr ? 'FR' : 'AR';
   document.querySelectorAll('.btn-lang-store, .rizq-lang-btn').forEach(function(btn){
+    if (btn.classList.contains('btn-lang-primary') && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
+      window.RizqI18n.paintPrimaryLangBtn(btn);
+      return;
+    }
     btn.textContent = label;
   });
   // re-apply topbar title for current panel (not a data-t element — set dynamically by showPanel)

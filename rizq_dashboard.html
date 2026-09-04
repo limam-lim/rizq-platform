@@ -75,9 +75,15 @@ a{text-decoration:none;color:inherit}
 .topbar-actions{display:flex;align-items:center;gap:10px;margin-right:auto}
 .btn-new-ad{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:8px 18px;border-radius:9px;font-weight:800;font-size:12.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:flex;align-items:center;gap:6px}
 .btn-new-ad:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
-.btn-icon{width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .3s;border:none;color:var(--white);position:relative}
-.btn-icon:hover{background:rgba(255,255,255,.1)}
-.notif-dot{position:absolute;top:6px;left:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--dark-2)}
+.topbar .btn-lang,.topbar .btn-lang-primary{
+  background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.55);color:#C9A84C;
+  font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;
+  cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;height:auto;width:auto;line-height:1.2
+}
+.topbar .btn-lang:hover,.topbar .btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#E8C96A}
+.btn-icon{width:36px;height:36px;background:#fff;border:1px solid #fff;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .3s;color:#1B3A6B;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.btn-icon:hover{background:#f3f6fb;color:#0f2347}
+.notif-dot{position:absolute;top:4px;left:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff}
 
 /* Page content */
 .page-content{padding:28px;flex:1}
@@ -218,6 +224,8 @@ a{text-decoration:none;color:inherit}
   .page-content{padding:16px}
 }
 .mobile-menu-btn{display:none;background:rgba(255,255,255,.06);border:none;color:var(--white);width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:18px;align-items:center;justify-content:center}
+.ft-copy, footer .ft-copy strong{color:#fff!important}
+footer .ft-copy{flex-wrap:wrap;max-width:100%}
 
 /* ══ TOAST ══ */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(27,58,107,.95);border:1px solid rgba(201,168,76,.3);color:#fff;padding:12px 24px;border-radius:12px;font-size:13.5px;z-index:9999;transition:transform .4s;backdrop-filter:blur(16px)}
@@ -450,9 +458,9 @@ main, .page-content.active, .main-content, .results-area,
     <div class="topbar-controls">
       <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
       <div class="topbar-actions">
-        <button class="btn-lang" id="lang-btn">FR</button>
-        <button class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item:nth-child(4)'))" data-t-title="notif-title">🔔<span class="notif-dot"></span></button>
-        <button class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item:nth-child(3)'))" data-t-title="messages-title">💬</button>
+        <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+        <button type="button" class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item[onclick*=notifications]'))" data-t-title="notif-title" aria-label="الإشعارات">🔔<span class="notif-dot" id="notif-dot" hidden></span></button>
+        <button type="button" class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item[onclick*=messages]'))" data-t-title="messages-title" aria-label="الرسائل">💬</button>
         <button class="btn-new-ad" onclick="openShareModal()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" data-t="topbar-share-btn">📤 مشاركة ملفي</button>
         <button class="btn-new-ad" onclick="showPanel('video-ads',null)" data-t="topbar-video-ad-btn">🎬 إعلان فيديو</button>
         <button class="btn-new-ad" onclick="location.href='rizq_post.html'" data-t="topbar-new-ad-btn">➕ إعلان جديد</button>
@@ -463,18 +471,19 @@ main, .page-content.active, .main-content, .results-area,
 
   <!-- ══ PAGE CONTENT ══ -->
   <div class="page-content">
+    <div id="rizq-sub-slot"></div>
 
     <!-- ── OVERVIEW ── -->
     <div class="panel active" id="panel-overview">
-      <div class="sec-title" data-t="greeting">مرحباً، محمد 👋</div>
-      <p class="sec-sub" data-t="updated">آخر تحديث: اليوم 10:30 صباحاً</p>
+      <div class="sec-title" data-t="greeting">مرحباً 👋</div>
+      <p class="sec-sub" data-t="updated">إدارة حسابك على منصة رزق</p>
 
       <!-- Stats -->
       <div class="stats-grid">
-        <div class="stat-card views"><div class="stat-icon">👁</div><div class="stat-num">12,450</div><div class="stat-label" data-t="stat-views">إجمالي المشاهدات</div><div class="stat-change up">▲ 18% هذا الأسبوع</div></div>
-        <div class="stat-card contacts"><div class="stat-icon">📞</div><div class="stat-num">248</div><div class="stat-label" data-t="stat-contacts">تواصل مع إعلاناتك</div><div class="stat-change up">▲ 12% هذا الأسبوع</div></div>
-        <div class="stat-card favs"><div class="stat-icon">♥</div><div class="stat-num">89</div><div class="stat-label" data-t="stat-saved">حفظ في المفضلة</div><div class="stat-change up">▲ 5% هذا الأسبوع</div></div>
-        <div class="stat-card balance"><div class="stat-icon">⭐</div><div class="stat-num">5</div><div class="stat-label" data-t="stat-ads">إعلانات نشطة</div><div class="stat-change down">▼ 1 انتهى هذا الأسبوع</div></div>
+        <div class="stat-card views"><div class="stat-icon">👁</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-views">إجمالي المشاهدات</div><div class="stat-change">—</div></div>
+        <div class="stat-card contacts"><div class="stat-icon">📞</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-contacts">تواصل مع إعلاناتك</div><div class="stat-change">—</div></div>
+        <div class="stat-card favs"><div class="stat-icon">♥</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-saved">حفظ في المفضلة</div><div class="stat-change">—</div></div>
+        <div class="stat-card balance"><div class="stat-icon">⭐</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-ads">إعلانات نشطة</div><div class="stat-change">—</div></div>
       </div>
 
       <!-- Chart -->
@@ -507,10 +516,10 @@ main, .page-content.active, .main-content, .results-area,
 
       <div class="ads-controls">
         <div class="status-filter">
-          <button class="sf-btn active" onclick="filterAds('all',this)"><span data-t="filter-all">الكل</span> (5)</button>
-          <button class="sf-btn" onclick="filterAds('active',this)"><span data-t="filter-active">نشطة</span> (3)</button>
-          <button class="sf-btn" onclick="filterAds('pending',this)"><span data-t="filter-pending">قيد المراجعة</span> (1)</button>
-          <button class="sf-btn" onclick="filterAds('expired',this)"><span data-t="filter-expired">منتهية</span> (1)</button>
+          <button class="sf-btn active" onclick="filterAds('all',this)"><span data-t="filter-all">الكل</span> <span id="sf-n-all">(0)</span></button>
+          <button class="sf-btn" onclick="filterAds('active',this)"><span data-t="filter-active">نشطة</span> <span id="sf-n-active">(0)</span></button>
+          <button class="sf-btn" onclick="filterAds('pending',this)"><span data-t="filter-pending">قيد المراجعة</span> <span id="sf-n-pending">(0)</span></button>
+          <button class="sf-btn" onclick="filterAds('expired',this)"><span data-t="filter-expired">منتهية</span> <span id="sf-n-expired">(0)</span></button>
         </div>
         <input class="search-mini" type="text" data-t="search-ads" placeholder="🔍 بحث في إعلاناتي..."/>
       </div>
@@ -567,19 +576,14 @@ main, .page-content.active, .main-content, .results-area,
     <div class="panel" id="panel-messages">
       <div class="sec-title" data-t="messages">الرسائل</div>
       <p class="sec-sub" data-t="messages-sub">تواصل مع المشترين والبائعين</p>
-      <p style="font-size:11.5px;color:var(--text-muted);margin-top:-6px;margin-bottom:10px" data-t="messages-demo-note">⚠️ محادثات تجريبية لعرض شكل الواجهة — نظام المراسلة الحقيقي بين المستخدمين قيد التطوير ويتطلب خادماً مركزياً.</p>
       <div class="msgs-wrap">
         <!-- Contacts list -->
         <div class="msgs-list" id="msgs-list"></div>
         <!-- Chat area -->
         <div class="chat-wrap">
           <div class="chat-header">
-            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;font-size:16px">🧑</div>
-            <div><div style="font-size:13.5px;font-weight:700" id="chat-name">خديجة منت محمد</div><div style="font-size:11px;color:var(--text-muted)" id="chat-sub">بخصوص: شقة فاخرة 3 غرف</div></div>
-            <div style="margin-right:auto;display:flex;gap:8px">
-              <button style="background:#eef2fb;border:1px solid #e2e8f5;color:var(--text-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;font-size:12px" onclick="window.location='tel:+22244882212'">📞</button>
-              <button style="background:#eef2fb;border:1px solid #e2e8f5;color:var(--text-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;font-size:12px" onclick="window.open('mailto:direction@rizq.mr?subject=بلاغ عن مستخدم','_blank')">🚨</button>
-            </div>
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;font-size:16px">💬</div>
+            <div><div style="font-size:13.5px;font-weight:700" id="chat-name" data-t="messages-empty-title">لا رسائل بعد</div><div style="font-size:11px;color:var(--text-muted)" id="chat-sub" data-t="messages-empty-sub">ستظهر هنا محادثاتك الحقيقية مع المشترين</div></div>
           </div>
           <div class="chat-messages" id="chat-msgs"></div>
           <div class="chat-input-wrap">
@@ -732,16 +736,16 @@ main, .page-content.active, .main-content, .results-area,
   <footer style="background:linear-gradient(180deg,#1B2B4B,#0f1f3d);border-top:1px solid rgba(201,168,76,0.15);padding:32px 5% 0">
     <div style="max-width:1200px;margin:0 auto">
       <div class="ft-bottom">
-        <div class="ft-copy" style="font-size:12px;color:rgba(255,255,255,0.18);text-align:center">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</div>
+        <div class="ft-copy" style="font-size:12px;color:rgba(255,255,255,0.82);text-align:center">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</div>
         <div class="adminia-ft" style="display:flex;align-items:center;gap:12px;padding:12px 22px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.14);border-radius:12px">
           <div style="width:36px;height:36px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
           <div>
             <div style="font-size:14px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
-            <div style="font-size:8px;letter-spacing:5px;color:rgba(201,168,76,0.55);margin-top:2px">S · A · R · L</div>
-            <div style="font-size:8px;color:rgba(255,255,255,0.18);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.55);font-weight:700">M. LIMAM</span></div>
+            <div style="font-size:8px;letter-spacing:5px;color:rgba(201,168,76,0.7);margin-top:2px">S · A · R · L</div>
+            <div style="font-size:8px;color:rgba(255,255,255,0.72);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:#C9A84C;font-weight:700">M. LIMAM</span></div>
           </div>
         </div>
-        <div class="ft-copy" style="font-size:12px;color:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;gap:4px"><span>بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600;color:rgba(255,255,255,0.18)">ADMINIA SARL — Powered by M. LIMAM</strong></div>
+        <div class="ft-copy" style="font-size:12px;color:rgba(255,255,255,0.88);display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap"><span>بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600;color:#fff">ADMINIA SARL — Powered by M. LIMAM</strong></div>
       </div>
     </div>
   </footer>
@@ -918,6 +922,13 @@ function _loadRealDashboardStats(acc){
 // يُحسب فعلياً داخل initDashboard() بعد التحقق من IS_DEMO/SESSION_ID (انظر أسفل الملف).
 // حساب مؤقت هنا فقط لتفادي أخطاء المرجع قبل التشغيل — يُستبدل قبل أي عرض فعلي.
 let MY_ADS = [];
+function _applyDashGreeting(){
+  var greet=document.querySelector('[data-t="greeting"]');
+  if(!greet) return;
+  var acc = typeof USER_ACC !== 'undefined' ? USER_ACC : null;
+  var nm=(acc && acc.name)?String(acc.name).trim():'';
+  greet.textContent = nm ? _t2('مرحباً، '+nm+' 👋','Bonjour, '+nm+' 👋') : _t2('مرحباً 👋','Bonjour 👋');
+}
 
 // لغة الموقع الحالية المحفوظة (مشتركة بين كل الصفحات عبر localStorage['rizq_lang'])
 function _rizqLang(){ try{ return localStorage.getItem('rizq_lang') || 'ar'; }catch(e){ return 'ar'; } }
@@ -929,38 +940,21 @@ function adTitleLocalized(a){
   return fr?(a.titleFr||a.title||''):(a.title||a.titleFr||'');
 }
 
-const MESSAGES = [
-  {name:'خديجة منت محمد',emoji:'👩',ad:'شقة فاخرة 3 غرف',preview:'هل الشقة لا تزال متاحة؟',time:'منذ 10 دقائق',unread:true,active:true},
-  {name:'أحمد ولد سيدي',emoji:'👨',ad:'Toyota Hilux 2022',preview:'ما هو السعر النهائي للسيارة؟',time:'منذ ساعة',unread:true,active:false},
-  {name:'فاطمة بنت احمد',emoji:'👩',ad:'iPhone 15 Pro',preview:'هل الهاتف ما زال جديداً؟',time:'منذ 3 ساعات',unread:true,active:false},
-  {name:'محمود ولد الشيخ',emoji:'🧔',ad:'شقة فاخرة 3 غرف',preview:'شكراً على سرعة الرد',time:'أمس',unread:false,active:false},
-  {name:'مريم بنت داود',emoji:'👩',ad:'دراعة مطرزة',preview:'هل يمكن تعديل المقاس؟',time:'أمس',unread:false,active:false},
-];
-
-const NOTIFS = [
-  {icon:'📞',bg:'rgba(96,165,250,.1)',title:'تواصل جديد مع إعلانك',text:'خديجة منت محمد تواصلت بشأن "شقة فاخرة 3 غرف"',time:'منذ 10 دقائق',unread:true},
-  {icon:'👁',bg:'rgba(74,222,128,.1)',title:'100 مشاهدة جديدة',text:'إعلانك "Toyota Hilux 2022" وصل إلى 892 مشاهدة',time:'منذ ساعتين',unread:true},
-  {icon:'✅',bg:'rgba(74,222,128,.1)',title:'تم قبول إعلانك',text:'إعلان "شقة فاخرة 3 غرف" تم نشره وهو الآن مرئي',time:'أمس',unread:false},
-  {icon:'⭐',bg:'rgba(201,168,76,.1)',title:'تقييم جديد',text:'أحمد ولد سيدي أعطاك تقييم ★★★★★',time:'منذ يومين',unread:false},
-  {icon:'⚠️',bg:'rgba(251,191,36,.1)',title:'إعلانك على وشك الانتهاء',text:'إعلان "إبل للبيع" ينتهي خلال 3 أيام — جدد اشتراكه',time:'منذ 3 أيام',unread:false},
-  {icon:'🔔',bg:'rgba(201,168,76,.1)',title:'مرحباً بك في رزق!',text:'تم تفعيل حسابك بنجاح. ابدأ بنشر إعلانك الأول',time:'مارس 2023',unread:false},
-];
-
-const CHART_DATA = [320,480,390,720,560,890,1247];
-const CHART_DAYS = ['الجمعة','السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','اليوم'];
-
-const CHAT_MSGS = [
-  {text:'السلام عليكم، هل الشقة لا تزال متاحة للكراء؟',sent:false,time:'10:12'},
-  {text:'وعليكم السلام، نعم متاحة. هل تريد معاينتها؟',sent:true,time:'10:15'},
-  {text:'نعم، ممتاز! متى يمكنني الزيارة؟',sent:false,time:'10:16'},
-  {text:'يمكنك الزيارة اليوم بعد الساعة 4 مساءً أو غداً صباحاً',sent:true,time:'10:18'},
-  {text:'اليوم الساعة 5 مساءً يناسبني. شكراً جزيلاً!',sent:false,time:'10:20'},
-];
+const MESSAGES = [];
+const NOTIFS = [];
+const CHART_DATA = [];
+const CHART_DAYS = [];
+const CHAT_MSGS = [];
 
 // ── RENDER FUNCTIONS ──
 function renderChart(){
-  const max=Math.max(...CHART_DATA);
   const bars=document.getElementById('chart-bars');
+  if(!bars) return;
+  if(!CHART_DATA.length){
+    bars.innerHTML='<div style="width:100%;text-align:center;color:var(--text-muted);font-size:12.5px;padding:28px 0">'+_t2('لا توجد مشاهدات بعد','Aucune vue pour le moment')+'</div>';
+    return;
+  }
+  const max=Math.max.apply(null, CHART_DATA.concat([1]));
   bars.innerHTML=CHART_DATA.map((v,i)=>`
     <div class="bar-wrap">
       <div class="bar" data-val="${v.toLocaleString()} مشاهدة" style="height:${(v/max)*100}%;background:${i===CHART_DATA.length-1?'linear-gradient(180deg,var(--gold),var(--gold-light))':'linear-gradient(180deg,#6b8cc4,#9bb0d8)'}"></div>
@@ -1010,10 +1004,30 @@ function _renderChartFromDays(days, tabDays){
 
 function renderAdsTable(){
   renderAdsTableData(MY_ADS);
+  _updateAdFilterCounts();
+}
+
+function _updateAdFilterCounts(){
+  var all = MY_ADS.length;
+  var n = function(st){ return MY_ADS.filter(function(a){ return a.status===st; }).length; };
+  var set = function(id, v){ var el=document.getElementById(id); if(el) el.textContent='('+v+')'; };
+  set('sf-n-all', all);
+  set('sf-n-active', n('active'));
+  set('sf-n-pending', n('pending'));
+  set('sf-n-expired', n('expired'));
+  var adsNum = document.querySelector('.stat-card.balance .stat-num');
+  if(adsNum) adsNum.textContent = String(n('active') || all);
+  var adsChange = document.querySelector('.stat-card.balance .stat-change');
+  if(adsChange){ adsChange.className='stat-change'; adsChange.textContent = all ? (all+' '+_t2('إعلان','annonce(s)')) : _t2('لا إعلانات بعد','aucune annonce'); }
 }
 
 function renderQuickAds(){
   const el=document.getElementById('quick-ads');
+  if(!el) return;
+  if(!MY_ADS.length){
+    el.innerHTML='<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:12px 0">'+_t2('لا توجد إعلانات بعد — انشر إعلانك الأول','Aucune annonce pour le moment — publiez votre première annonce')+'</p>';
+    return;
+  }
   el.innerHTML=MY_ADS.slice(0,3).map(a=>`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eef2fb">
       <div style="width:40px;height:36px;border-radius:8px;background:linear-gradient(145deg,#eef2fb,#f8faff);border:1px solid #e2e8f5;display:flex;align-items:center;justify-content:center;color:var(--royal);flex-shrink:0"><span style="display:flex;width:18px;height:18px">${iconHTML(a.emoji).replace('<svg ', '<svg style="width:18px;height:18px;stroke-width:1.6" ')}</span></div>
@@ -1027,6 +1041,15 @@ function renderQuickAds(){
 
 function renderMessages(){
   const list=document.getElementById('msgs-list');
+  if(!list) return;
+  if(!MESSAGES.length){
+    list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل بعد','Aucun message pour le moment')+'</div>';
+    const msgs=document.getElementById('chat-msgs');
+    if(msgs) msgs.innerHTML='';
+    var dot=document.getElementById('notif-dot');
+    if(dot) dot.hidden=true;
+    return;
+  }
   list.innerHTML=MESSAGES.map((m,i)=>`
     <div class="msg-item${m.active?' active':''}${m.unread?' unread':''}" onclick="openChat(${i})">
       <div style="display:flex;align-items:center;gap:9px">
@@ -1055,6 +1078,7 @@ function renderMessages(){
 
 function openChat(idx){
   const m=MESSAGES[idx];
+  if(!m) return;
   document.getElementById('chat-name').textContent=m.name;
   const sub=document.getElementById('chat-sub');
   if(sub) sub.textContent=(_rizqLang()==='fr'?'Concernant : ':'بخصوص: ')+m.ad;
@@ -1066,12 +1090,16 @@ function sendMsg(){
   const input=document.getElementById('chat-input');
   const text=input.value.trim();
   if(!text)return;
+  if(!MESSAGES.length){
+    if(typeof showToast==='function') showToast(_t2('لا توجد محادثة محددة بعد','Aucune conversation sélectionnée pour le moment'));
+    return;
+  }
   const msgs=document.getElementById('chat-msgs');
   const now=new Date();
   const time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
   const div=document.createElement('div');
   div.style.cssText='display:flex;flex-direction:column;align-items:flex-end';
-  div.innerHTML=`<div class="chat-msg sent">${text}</div><div class="chat-time">${time} · <span style="color:var(--text-muted)">✓ ${_rizqLang()==='fr'?"Envoyé (démo — aucun destinataire réel pour l'instant)":'تم الإرسال (تجريبي — لا يوجد طرف حقيقي يستقبل هذه الرسالة بعد)'}</span></div>`;
+  div.innerHTML=`<div class="chat-msg sent">${text}</div><div class="chat-time">${time}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop=msgs.scrollHeight;
   input.value='';
@@ -1079,6 +1107,14 @@ function sendMsg(){
 
 function renderNotifs(){
   const list=document.getElementById('notifs-list');
+  if(!list) return;
+  var unread = NOTIFS.filter(function(n){ return n.unread; }).length;
+  var dot=document.getElementById('notif-dot');
+  if(dot) dot.hidden = unread===0;
+  if(!NOTIFS.length){
+    list.innerHTML='<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:24px 0">'+_t2('لا إشعارات بعد','Aucune notification pour le moment')+'</p>';
+    return;
+  }
   list.innerHTML=NOTIFS.map(n=>`
     <div class="notif-item${n.unread?' unread':''}">
       <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
@@ -1805,10 +1841,9 @@ function _showSubBanner(opts){
   var banner = document.createElement('div');
   banner.id = 'rizq-sub-banner';
   var urgent = opts.urgent ? 'animation:pulse 1.5s infinite;' : '';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:8888;'
-    +'min-width:320px;max-width:94vw;padding:14px 18px;border-radius:14px;background:#fff;'
-    +'box-shadow:0 8px 32px rgba(0,0,0,.18);border-right:5px solid '+opts.color+';'
-    +'display:flex;align-items:center;gap:12px;'+urgent;
+  banner.style.cssText = 'position:relative;z-index:2;width:100%;margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#fff;'
+    +'box-shadow:0 2px 14px rgba(15,35,65,.1);border-right:5px solid '+opts.color+';'
+    +'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'+urgent;
   banner.innerHTML =
     '<span style="font-size:26px;flex-shrink:0">'+opts.icon+'</span>'
     +'<div style="flex:1">'
@@ -1819,7 +1854,9 @@ function _showSubBanner(opts){
     +'<button onclick="'+opts.ctaFn+'" style="white-space:nowrap;padding:8px 14px;background:'+opts.color+';color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">'+opts.cta+'</button>'
     +(opts.persistent?'':'<button onclick="document.getElementById(\'rizq-sub-banner\').remove()" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer">'+_t2('تذكيرني لاحقاً','Me rappeler plus tard')+'</button>')
     +'</div>';
-  document.body.appendChild(banner);
+  var slot = document.getElementById('rizq-sub-slot') || document.querySelector('.page-content');
+  if(slot) slot.insertBefore(banner, slot.firstChild);
+  else document.body.appendChild(banner);
   if(opts.urgent && !document.getElementById('sub-pulse-style')){
     var st = document.createElement('style');
     st.id = 'sub-pulse-style';
@@ -2243,6 +2280,19 @@ function _initDashboardWithAccount(acc){
   renderNotifs();
   renderFavs();
   loadProfile();
+  if(typeof _applyDashGreeting === 'function') _applyDashGreeting();
+  else {
+    var greet=document.querySelector('[data-t="greeting"]');
+    if(greet){
+      var nm=(acc && acc.name)?String(acc.name).trim():'';
+      greet.textContent = nm ? _t2('مرحباً، '+nm+' 👋','Bonjour, '+nm+' 👋') : _t2('مرحباً 👋','Bonjour 👋');
+    }
+  }
+  try{
+    var wish=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]');
+    var favNum=document.querySelector('.stat-card.favs .stat-num');
+    if(favNum && Array.isArray(wish)) favNum.textContent=String(wish.length);
+  }catch(eFav){}
   if(!IS_DEMO){
     var un=document.querySelector('.user-name'); if(un && acc.name) un.textContent=acc.name;
   }
@@ -2346,6 +2396,8 @@ function rizqShare(title, url) {
     // الخاص بهذه الصفحة الذي لا يعرفه المحرك العام (أيام الرسم البياني،
     // حالة الإعلانات، الخط).
     document.body.style.fontFamily = "'Cairo', sans-serif";
+
+    if(typeof _applyDashGreeting === 'function') _applyDashGreeting();
 
     // أيام الرسم البياني
     const days = lang === 'ar' ? DAYS_AR : DAYS_FR;

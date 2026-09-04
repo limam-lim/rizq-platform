@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '17.5';
+  var ASSET_V = '17.6';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -68,7 +68,7 @@
       document.documentElement.lang = bootLang === 'fr' ? 'fr' : 'ar';
       document.documentElement.setAttribute('dir', bootLang === 'fr' ? 'ltr' : 'rtl');
     } catch (eBoot) {}
-    if (!/chat_widget/i.test(location.pathname || '')) {
+    if (!/dashboard|admin\.html|chat_widget/i.test(location.pathname || '')) {
       document.documentElement.classList.add('rizq-app-nav');
     }
     if (!document.querySelector('link[href*="fonts.googleapis.com"][href*="Cairo"]')) {

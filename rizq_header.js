@@ -41,7 +41,7 @@
 
   function isDashShell() {
     var p = pathName().toLowerCase();
-    return /chat_widget/.test(p);
+    return /dashboard|admin\.html|chat_widget/.test(p);
   }
 
   function isLanding() {
@@ -1133,6 +1133,10 @@
 
   function inject() {
     if (isDashShell()) {
+      removeHeader();
+      removeDeskNav();
+      document.documentElement.classList.remove('rizq-app-nav', 'has-rizq-desk-nav');
+      if (document.body) document.body.classList.remove('landing-ux-mobile');
       unifyDashLangPills();
       return;
     }

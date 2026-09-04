@@ -427,7 +427,7 @@
   /** Drop leftover dir= on chrome that would leak RTL into FR (and vice versa).
       Keep phone numbers, tel links, the logo lockup, and the chat window. */
   function stripLeakedDirs() {
-    var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"],.btn-lang-primary,#rizq-lang-btn,#nav-lang-btn,#rizq-desk-lang-btn';
+    var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"],.btn-lang-primary,#rizq-lang-btn,#nav-lang-btn,#rizq-desk-lang-btn,#lang-btn,#store-lang-btn';
     document.querySelectorAll('nav, .nav-center, .nav-dropdown-li, .nav-dropdown-menu, .rizq-hdr-row2, .rizq-hdr-more-menu, .modal-overlay, .modal-box, #qcat-portal, #cat-inline-panel, .rzq-sheet, .why-grid, footer, .hero-pills').forEach(function (el) {
       if (el.closest && el.closest(keep)) return;
       if (el.hasAttribute('dir')) el.removeAttribute('dir');
@@ -446,7 +446,11 @@
       btn.classList.contains('btn-lang-primary') ||
       btn.id === 'rizq-lang-btn' ||
       btn.id === 'rizq-desk-lang-btn' ||
-      btn.id === 'nav-lang-btn'
+      btn.id === 'nav-lang-btn' ||
+      btn.id === 'lang-btn' ||
+      btn.id === 'store-lang-btn' ||
+      btn.id === 'office-lang-btn' ||
+      btn.id === 'corp-lang-btn'
     ));
   }
 
@@ -486,6 +490,7 @@
       var btn = e.target.closest && e.target.closest('.btn-lang');
       if (!btn) return;
       if (btn.id === 'rizq-lang-btn') return;
+      if (btn.getAttribute('onclick') && /toggleLang/.test(btn.getAttribute('onclick'))) return;
       toggle();
     });
   }
