@@ -589,6 +589,12 @@
 
   function goBackMobile() {
     try {
+      if (/rizq_profile/.test(pathName().toLowerCase()) && window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function') {
+        var dash = window.RizqAccount.resolveDashboardUrl();
+        if (dash) { location.href = dash; return; }
+      }
+    } catch (eP) {}
+    try {
       if (window.history.length > 1 && document.referrer) {
         window.history.back();
         return;

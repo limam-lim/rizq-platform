@@ -121,8 +121,9 @@ textarea.form-input{min-height:80px;resize:vertical}
 .chart-label{font-size:10px;color:var(--text-muted);white-space:nowrap}
 /* TOAST */
 /* NOTIFICATION BELL */
-.notif-bell{position:relative;width:36px;height:36px;border-radius:10px;background:#f0f4ff;border:1px solid rgba(27,58,107,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s}
-.notif-bell:hover{background:#e5ecff;border-color:var(--royal)}
+.notif-bell{position:relative;width:38px;height:38px;border-radius:11px;background:linear-gradient(160deg,#163056,#0c1c38);border:1.5px solid #C9A84C;color:#e8c96a;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;box-shadow:0 0 0 1px rgba(201,168,76,.2),0 6px 16px rgba(201,168,76,.22)}
+.notif-bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.notif-bell:hover{background:linear-gradient(145deg,#e8c96a,#C9A84C);color:#0f2347;border-color:#e8c96a;box-shadow:0 8px 22px rgba(201,168,76,.5);transform:translateY(-1px)}
 .notif-count{position:absolute;top:-5px;left:-5px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:9px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;display:none}
 /* QUICK ACTIONS */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
@@ -357,7 +358,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="topbar-title" id="topbar-title" data-t="ov-panel-title">📊 نظرة عامة</div>
     <div class="topbar-actions">
       <div class="notif-bell" onclick="showPanel('inquiries',null)" data-t-title="tb-notif-title" title="الاستفسارات الجديدة">
-        🔔<span class="notif-count" id="notif-count">0</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notif-count">0</span>
       </div>
       <button class="btn btn-outline btn-sm" onclick="openShareModal()" data-t="tb-share">📤 مشاركة صفحتي</button>
       <a class="btn btn-outline btn-sm" id="topbar-view-btn" href="#" onclick="previewMyPage();return false;" target="_blank" data-t="tb-preview">👁️ معاينة</a>

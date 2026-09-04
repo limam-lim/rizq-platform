@@ -1487,6 +1487,20 @@ app.get('/api/accounts/public', (req, res) => {
 });
 
 /**
+ * GET /api/accounts/public/:id — حساب موافَق واحد بحقول عامة فقط
+ * (منها thumb) لصفحة الملف الشخصي، دون تنزيل قائمة الحسابات كلها.
+ */
+app.get('/api/accounts/public/:id', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=30');
+  const viewerId = resolveOptionalAccountViewer(req);
+  const acc = readAccounts().find((a) => a && a.id === req.params.id);
+  if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
+    return res.status(404).json({ ok: false, error: 'account_not_found' });
+  }
+  res.json({ ok: true, account: toPublicAccountForViewer(acc, viewerId) });
+});
+
+/**
  * GET /api/accounts/mine/:id — يتطلب x-account-token مطابقاً — يقرأ
  * صاحب الحساب حالة طلبه (pending/approved/rejected) + كل بياناته لملء
  * لوحة تحكمه، من أي جهاز يملك فيه هذا التوكن (وليس فقط الجهاز الذي سجّل منه).

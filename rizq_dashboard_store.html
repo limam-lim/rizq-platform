@@ -178,8 +178,9 @@ textarea.form-input{resize:vertical;min-height:90px}
 }
 
 /* NOTIFICATION BELL */
-.notif-bell{position:relative;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid #fff;color:#1B3A6B;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.18)}
-.notif-bell:hover{background:#f3f6fb;border-color:#fff;color:#0f2347}
+.notif-bell{position:relative;width:38px;height:38px;border-radius:11px;background:linear-gradient(160deg,#163056,#0c1c38);border:1.5px solid #C9A84C;color:#e8c96a;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;flex-shrink:0;box-shadow:0 0 0 1px rgba(201,168,76,.2),0 6px 16px rgba(201,168,76,.22)}
+.notif-bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.notif-bell:hover{background:linear-gradient(145deg,#e8c96a,#C9A84C);color:#0f2347;border-color:#e8c96a;box-shadow:0 8px 22px rgba(201,168,76,.5);transform:translateY(-1px)}
 .notif-count{position:absolute;top:-5px;left:-5px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:9px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;display:none}
 /* QUICK ACTIONS */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
@@ -430,7 +431,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <div class="main">
   <div class="topbar" style="background:#1B3A6B">
     <div class="topbar-actions topbar-controls">
-      <div class="notif-bell" onclick="showPanel('messages',null)" data-t-title="topbar-notif-title" title="رسائل جديدة">🔔<span class="notif-count" id="notif-count" hidden>0</span></div>
+      <div class="notif-bell" onclick="showPanel('messages',null)" data-t-title="topbar-notif-title" title="رسائل جديدة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notif-count" hidden>0</span></div>
       <button type="button" class="topbar-btn" onclick="openShareModal()" data-t="topbar-share">📤 مشاركة</button>
       <button type="button" class="topbar-btn" onclick="openAddProduct()" data-t="topbar-new-product">➕ منتج جديد</button>
       <button type="button" class="topbar-btn" onclick="previewMyPage()" data-t="topbar-preview">👁️ معاينة</button>

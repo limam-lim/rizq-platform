@@ -41,28 +41,81 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,15,30,.97);backdrop-filt
 .btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.78);padding:6px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s}
 .btn-ns:hover{border-color:rgba(201,168,76,.4);color:var(--gold)}
 
-/* HERO BANNER */
-.profile-hero{background:linear-gradient(135deg,#eef2fb 0%,#f8faff 60%,#eef2fb 100%);padding:50px 4% 0;position:relative;overflow:hidden;border-bottom:1px solid #e2e8f5}
-.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,168,76,.08),transparent 60%)}
+/* HERO BANNER — هوية رزق (كحلي + ذهب) */
+.profile-hero{
+  background:
+    radial-gradient(ellipse 70% 90% at 92% -10%, rgba(201,168,76,.28), transparent 52%),
+    radial-gradient(ellipse 50% 70% at 0% 110%, rgba(35,77,143,.5), transparent 55%),
+    linear-gradient(135deg,#080f1e 0%,#0f2347 46%,#1B3A6B 100%);
+  padding:42px 4% 0;position:relative;overflow:hidden;
+  border-bottom:1px solid rgba(201,168,76,.32)
+}
+.profile-hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.07) 1px, transparent 1px);
+  background-size:32px 32px;opacity:.7
+}
+.hero-brand-mark{
+  position:absolute;left:3%;top:50%;transform:translateY(-52%);
+  width:220px;height:220px;opacity:.1;pointer-events:none;
+  background:url('rizq-mark-512.png') center/contain no-repeat
+}
 .hero-inner{max-width:1200px;margin:0 auto;display:flex;align-items:flex-end;gap:28px;position:relative;z-index:1}
-.profile-av{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--royal-light),var(--royal));border:4px solid rgba(201,168,76,.5);display:flex;align-items:center;justify-content:center;font-size:48px;flex-shrink:0;box-shadow:0 6px 30px rgba(15,35,65,.18);margin-bottom:-28px}
-.profile-info{flex:1;padding-bottom:30px}
-.profile-name{font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#1a2535;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn-dash-back{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-bottom:14px;padding:8px 16px;border-radius:999px;
+  background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;
+  font-size:13px;font-weight:800;text-decoration:none;border:none;cursor:pointer;
+  box-shadow:0 6px 18px rgba(201,168,76,.35);font-family:inherit;transition:transform .2s,box-shadow .2s
+}
+.btn-dash-back:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(201,168,76,.48)}
+.btn-dash-back[hidden]{display:none!important}
+.hero-kicker span{color:#fff}
+.profile-av{width:110px;height:110px;border-radius:50%;background:linear-gradient(145deg,#1B3A6B,#0f2347);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:48px;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 6px rgba(201,168,76,.18);margin-bottom:-22px;overflow:hidden}
+.profile-av img,.pf-side-av img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-av .av-letter{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:var(--gold);font-size:42px;line-height:1}
+.profile-av .av-svg{width:58%;height:58%;display:block}
+.profile-info{flex:1;padding-bottom:28px}
+.profile-name{font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;text-shadow:0 2px 18px rgba(0,0,0,.35)}
 .profile-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .pb{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:700}
-.pb-verified{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.25);color:var(--green)}
-.pb-member{background:rgba(13,27,42,.05);border:1px solid rgba(13,27,42,.1);color:var(--text-soft)}
-.pb-top{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold-dk)}
+.pb-verified{background:rgba(22,163,74,.16);border:1px solid rgba(74,222,128,.35);color:#86efac}
+.pb-member{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.82)}
+.pb-top{background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.45);color:#e8c96a}
 .profile-meta{display:flex;gap:18px;flex-wrap:wrap}
-.pm{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:5px}
-.profile-stats{display:flex;gap:20px;flex-wrap:wrap;padding-bottom:30px}
-.ps{text-align:center}
-.ps-num{font-size:24px;font-weight:900;color:var(--gold-dk);font-family:'Segoe UI','Arial',sans-serif}
-.ps-lbl{font-size:11px;color:var(--text-muted);margin-top:2px}
+.pm{font-size:13px;color:rgba(255,255,255,.72);display:flex;align-items:center;gap:5px}
+.profile-stats{display:flex;gap:12px;flex-wrap:wrap;padding-bottom:28px}
+.ps{text-align:center;min-width:78px;padding:10px 14px;border-radius:14px;background:rgba(8,15,30,.35);border:1px solid rgba(201,168,76,.28);backdrop-filter:blur(8px)}
+.ps-num{font-size:24px;font-weight:900;color:#e8c96a;font-family:'Segoe UI','Arial',sans-serif;line-height:1}
+.ps-lbl{font-size:11px;color:rgba(255,255,255,.55);margin-top:4px}
+.hero-identity-bar{
+  max-width:1200px;margin:0 auto;position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  padding:12px 0 16px;color:rgba(232,201,106,.88);
+  font-size:11px;font-weight:800;letter-spacing:2.2px
+}
+.hero-identity-bar .sep{opacity:.45;color:#fff}
 
 /* MAIN LAYOUT */
+body{background:#eef2f8}
 .profile-wrap{max-width:1200px;margin:0 auto;padding:36px 4% 60px;display:grid;grid-template-columns:1fr 310px;gap:28px}
-@media(max-width:900px){.profile-wrap{grid-template-columns:1fr}}
+.ads-panel{
+  background:#fff;border:1px solid rgba(201,168,76,.18);border-radius:18px;overflow:hidden;
+  box-shadow:0 10px 32px rgba(15,35,65,.07)
+}
+.ads-panel .sec-header{margin:0;border-radius:0;border:none;border-bottom:1px solid rgba(201,168,76,.22)}
+.ads-panel .ads-grid,.ads-panel .cat-filters{padding:16px 16px 0}
+.ads-panel .ads-more{padding:8px 16px 20px}
+.ads-empty{
+  grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:48px 20px;text-align:center
+}
+.ads-empty img{width:64px;height:64px;opacity:.9;filter:drop-shadow(0 6px 16px rgba(27,58,107,.2))}
+.ads-empty-title{font-size:16px;font-weight:800;color:#1B3A6B}
+.ads-empty p{font-size:13px;color:var(--text-muted);max-width:280px;line-height:1.7}
+@media(max-width:900px){.profile-wrap{grid-template-columns:1fr}.profile-side{order:-1}}
 
 /* ADS GRID */
 .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:16px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
@@ -86,8 +139,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,15,30,.97);backdrop-filt
 .ac-loc{font-size:10.5px;color:var(--text-muted)}
 
 /* SIDEBAR */
-.side-card{background:#fff;border:1px solid #e2e8f5;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(15,35,65,.04)}
-.side-title{font-size:13px;font-weight:700;color:var(--gold-dk);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.8px}
+.side-card{background:#fff;border:1px solid rgba(201,168,76,.18);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 8px 24px rgba(15,35,65,.06);position:relative;overflow:hidden}
+.side-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C9A84C,#e8c96a,#C9A84C)}
+.side-title{font-size:13px;font-weight:700;color:var(--royal);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.8px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.14)}
 
 /* Rating stars */
 .stars-row{display:flex;align-items:center;gap:4px;margin-bottom:14px}
@@ -113,13 +167,27 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,15,30,.97);backdrop-filt
 .review-text{font-size:12.5px;color:var(--text-muted);line-height:1.7}
 
 /* Contact card */
-.contact-card{background:#fff;border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:20px;box-shadow:0 4px 24px rgba(201,168,76,.1)}
-.btn-contact{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:7px}
-.btn-contact:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.4)}
-.btn-contact-sec{width:100%;padding:11px;background:transparent;color:var(--text-soft);border:1px solid rgba(13,27,42,.12);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:7px}
-.btn-contact-sec:hover{border-color:rgba(201,168,76,.35);color:var(--gold-dk)}
-.btn-report{width:100%;background:none;border:none;color:rgba(220,38,38,.55);font-size:12px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;margin-top:10px;transition:color .2s;text-align:center;display:block}
-.btn-report:hover{color:#dc2626}
+.contact-card{background:#fff;border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:22px 20px 18px;box-shadow:0 4px 24px rgba(201,168,76,.1);position:relative;overflow:hidden}
+.contact-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C9A84C,#e8c96a,#C9A84C)}
+.pf-contact-head{text-align:center;margin-bottom:16px}
+.pf-side-av{width:92px;height:92px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(145deg,#1B3A6B,#0f2347);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 22px rgba(15,35,65,.16),0 0 0 5px rgba(201,168,76,.16)}
+.pf-side-av .av-letter{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:var(--gold);font-size:34px;line-height:1}
+.pf-side-av .av-svg{width:58%;height:58%;display:block}
+.pf-contact-name{font-size:15px;font-weight:800;color:#0f2347;line-height:1.35}
+.pf-contact-verified{font-size:12px;color:var(--green);margin-top:4px;font-weight:700}
+.btn-contact{width:100%;padding:13px 14px;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .2s,box-shadow .2s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:9px}
+.btn-contact svg{width:18px;height:18px;flex-shrink:0}
+.btn-contact:hover{transform:translateY(-1px)}
+.btn-rizq{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;box-shadow:0 6px 16px rgba(201,168,76,.32)}
+.btn-rizq:hover{box-shadow:0 10px 22px rgba(201,168,76,.45)}
+.btn-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;box-shadow:0 6px 16px rgba(15,35,71,.22)}
+.btn-call:hover{box-shadow:0 10px 22px rgba(15,35,71,.32)}
+.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 6px 16px rgba(18,140,126,.28)}
+.btn-wa:hover{box-shadow:0 10px 22px rgba(18,140,126,.4)}
+.btn-mail{background:#E8F4FF;color:#0369a1;border:1.5px solid #7dd3fc;box-shadow:0 4px 12px rgba(3,105,161,.1)}
+.btn-mail:hover{background:#dbeafe;box-shadow:0 8px 18px rgba(3,105,161,.16)}
+.btn-report{width:100%;background:none;border:none;color:#dc2626;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;padding:8px 0;transition:color .2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-report:hover{color:#991b1b}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .ad-card{animation:fadeUp .4s ease both}
@@ -337,7 +405,10 @@ main, .page-content.active, .main-content, .results-area,
 }
 </style>
   
-  <script src="rizq_i18n_data.js"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_profile_photo.js?v=2"></script>
+<script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
   <script src="rizq_reviews_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
@@ -348,7 +419,8 @@ main, .page-content.active, .main-content, .results-area,
 <nav>
   <a href="rizq_landing_v8.html" class="logo"><div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer" title="انضم لرزق"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div><div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div></a>
   <div class="nav-actions">
-    <a href="rizq_browse.html" class="btn-ns" data-fr="← Résultats de recherche">← نتائج البحث</a>
+    <a href="rizq_dashboard.html" class="btn-ns" id="nav-dash-back" hidden>← لوحة التحكم</a>
+    <a href="rizq_browse.html" class="btn-ns" id="nav-browse-back" data-fr="← Résultats de recherche">← نتائج البحث</a>
     <button class="btn-ns" onclick="location.href='rizq_post.html'" data-t="nav-post">➕ انشر إعلان</button>
     <button class="btn-lang" id="lang-btn">FR</button>
   </div>
@@ -357,8 +429,9 @@ main, .page-content.active, .main-content, .results-area,
 <!-- HERO -->
 <div class="profile-hero">
   <div class="hero-inner">
-    <div class="profile-av">🧑‍💼</div>
+    <div class="profile-av" id="pf-hero-av"></div>
     <div class="profile-info">
+      <a href="rizq_dashboard.html" class="btn-dash-back" id="pf-dash-back" hidden>← لوحة التحكم</a>
       <h1 class="profile-name" id="pf-name" data-fr="Seller profile">—</h1>
       <div class="profile-badges">
         <span class="pb pb-verified" id="pf-badge-verified" data-fr="✅ Vendeur vérifié">✅ بائع موثّق</span>
@@ -401,23 +474,32 @@ main, .page-content.active, .main-content, .results-area,
   </div>
 
   <!-- RIGHT: SIDEBAR -->
-  <div>
+  <div class="profile-side">
 
     <!-- Contact -->
     <div class="contact-card" style="margin-bottom:16px">
-      <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:40px;margin-bottom:8px">🧑‍💼</div>
-        <div style="font-size:15px;font-weight:700" id="pf-sidebar-name" data-fr="Seller profile">—</div>
-        <div style="font-size:12px;color:var(--green);margin-top:3px" data-fr="✅ Vérifié — répond rapidement">✅ موثّق — يرد سريعاً</div>
+      <div class="pf-contact-head">
+        <div class="pf-side-av" id="pf-sidebar-av"></div>
+        <div class="pf-contact-name" id="pf-sidebar-name" data-fr="Seller profile">—</div>
+        <div class="pf-contact-verified" data-fr="✅ Vérifié — répond rapidement">✅ موثّق — يرد سريعاً</div>
       </div>
-      <button class="btn-contact" id="btn-rizq-msg" onclick="openRizqProfileChat()" data-fr="✉️ Message sécurisé Rizq">✉️ مراسلة آمنة عبر رزق</button>
-      <button class="btn-contact" id="pf-call-btn" onclick="window.location='tel:+22244882212'" data-fr="📞 Appel direct">📞 اتصال مباشر</button>
-      <button class="btn-contact-sec" id="pf-wa-btn" onclick="window.open('https://wa.me/22244882212?text='+encodeURIComponent(window._tFr?'Bonjour, j\'ai vu votre profil sur Rizq et je souhaite vous contacter':'السلام عليكم، رأيت ملفك على منصة رزق وأود التواصل معك'),'_blank')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        <span data-fr="Contacter via WhatsApp">تواصل عبر واتساب</span>
+      <button class="btn-contact btn-rizq" id="btn-rizq-msg" onclick="openRizqProfileChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        <span data-fr="Discussion sur Rizq">محادثة على رزق</span>
       </button>
-      <button class="btn-contact-sec" style="margin-top:8px" onclick="window.location='mailto:direction@rizq.mr?subject='+encodeURIComponent(window._tFr?'Question depuis Rizq':'استفسار من رزق')" data-fr="✉️ Envoyer un message">✉️ إرسال رسالة</button>
-      <button class="btn-report" onclick="showToast(window._tFr?'🚨 Votre signalement a été reçu':'🚨 تم استلام بلاغك')" data-fr="🚨 Signaler cet utilisateur">🚨 الإبلاغ عن هذا المستخدم</button>
+      <button class="btn-contact btn-call" id="pf-call-btn" onclick="window.location='tel:+22244882212'">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
+        <span data-fr="Appel direct">اتصال مباشر</span>
+      </button>
+      <button class="btn-contact btn-wa" id="pf-wa-btn" onclick="window.open('https://wa.me/22244882212?text='+encodeURIComponent(window._tFr?'Bonjour, j\'ai vu votre profil sur Rizq et je souhaite vous contacter':'السلام عليكم، رأيت ملفك على منصة رزق وأود التواصل معك'),'_blank')">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.14-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.8h-.01a9.87 9.87 0 01-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37A9.86 9.86 0 012.54 11.9C2.54 6.45 6.98 2.02 12.43 2.02a9.82 9.82 0 016.99 2.9 9.83 9.83 0 012.89 6.99c0 5.45-4.44 9.88-9.89 9.88zm8.41-18.3A11.82 11.82 0 0012.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 005.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.49-8.41z"/></svg>
+        <span data-fr="WhatsApp">واتساب</span>
+      </button>
+      <button class="btn-contact btn-mail" id="pf-mail-btn" onclick="window.location='mailto:direction@rizq.mr?subject='+encodeURIComponent(window._tFr?'Question depuis Rizq':'استفسار من رزق')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+        <span data-fr="Envoyer un message">إرسال رسالة</span>
+      </button>
+      <button class="btn-report" onclick="showToast(window._tFr?'Votre signalement a été reçu':'تم استلام بلاغك')" data-fr="Signaler cet utilisateur">الإبلاغ عن هذا المستخدم</button>
     </div>
 
     <!-- Ratings -->
@@ -489,6 +571,50 @@ function showToast(msg){
 
 renderAds(ADS);
 
+function _dashboardBackUrl(){
+  try{
+    if(window.RizqAccount && typeof RizqAccount.resolveDashboardUrl === 'function'){
+      var resolved = RizqAccount.resolveDashboardUrl();
+      if(resolved) return resolved;
+    }
+  }catch(e0){}
+  try{
+    var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
+    if(s && s.id && s.token){
+      var files = {individual:'rizq_dashboard.html',store:'rizq_dashboard_store.html',office:'rizq_dashboard_office.html',corp:'rizq_dashboard_corp.html'};
+      return (files[s.type] || 'rizq_dashboard.html') + '?id=' + encodeURIComponent(s.id) + '&token=' + encodeURIComponent(s.token);
+    }
+  }catch(e1){}
+  try{
+    var p = new URLSearchParams(location.search);
+    if(p.get('demo') === '1' || p.get('user') === 'demo') return 'rizq_dashboard.html?demo=1';
+  }catch(e2){}
+  try{
+    if(document.referrer && /rizq_dashboard/.test(document.referrer)) return document.referrer;
+  }catch(e3){}
+  return '';
+}
+
+function mountDashBack(){
+  var url = _dashboardBackUrl();
+  var fr = false;
+  try{ fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; }catch(eL){}
+  var label = fr ? '← Tableau de bord' : '← لوحة التحكم';
+  ['pf-dash-back','nav-dash-back'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(!url){ el.hidden = true; return; }
+    el.href = url;
+    el.textContent = label;
+    el.hidden = false;
+  });
+  var browse = document.getElementById('nav-browse-back');
+  if(browse && url) browse.hidden = true;
+}
+
+mountDashBack();
+window.addEventListener('load', mountDashBack);
+
 // ═══════════════════════════════════════════════════════════════
 // ملف تعريف حقيقي — إن كان sellerId في الرابط يطابق حساباً فردياً
 // معتمداً فعلياً في rizq_pending_accounts، نستبدل كل محتوى العرض
@@ -513,9 +639,25 @@ var RIZQ_PROFILE_ACCOUNT = (function(){
   }catch(e){ return null; }
 })();
 
+function applyProfileAvatars(acc){
+  acc = acc || RIZQ_PROFILE_ACCOUNT || {};
+  var name = acc.name || '';
+  if(!name){
+    var nameEl = document.getElementById('pf-name');
+    if(nameEl) name = String(nameEl.textContent || '').trim();
+  }
+  var photo = (acc && acc.thumb) || (window.RizqProfilePhoto ? RizqProfilePhoto.get(acc.id || RIZQ_PROFILE_SELLER_ID) : '') || '';
+  if(!window.RizqProfilePhoto) return;
+  RizqProfilePhoto.paint(document.getElementById('pf-hero-av'), { photo: photo, name: name });
+  RizqProfilePhoto.paint(document.getElementById('pf-sidebar-av'), { photo: photo, name: name });
+}
+
 function applyRealProfile(){
   var acc = RIZQ_PROFILE_ACCOUNT;
-  if(!acc) return; // لا يوجد حساب حقيقي مطابق — يبقى العرض التجريبي كما هو
+  if(!acc){
+    applyProfileAvatars(null);
+    return;
+  }
   var fr = !!window._tFr;
 
   // ── الاسم والمدينة (لا توجد ترجمة فرنسية فعلية لاسم/مدينة الحساب — نعرض نفس القيمة بصدق في اللغتين) ──
@@ -620,8 +762,28 @@ function applyRealProfile(){
   renderProfileReviewsUI(acc.id);
 
   renderAds(ADS);
+  applyProfileAvatars(acc);
 }
 applyRealProfile();
+
+(function fetchPublicSellerProfile(){
+  var id = RIZQ_PROFILE_SELLER_ID;
+  if(!id || id === 'demo') return;
+  if(!window.RIZQ_BACKEND_BASE) return;
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/public/' + encodeURIComponent(id))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      var pub = data && data.ok ? data.account : null;
+      if(!pub || (pub.type && pub.type !== 'individual')) return;
+      if(!RIZQ_PROFILE_ACCOUNT){
+        RIZQ_PROFILE_ACCOUNT = pub;
+        applyRealProfile();
+        return;
+      }
+      if(pub.thumb) RIZQ_PROFILE_ACCOUNT.thumb = pub.thumb;
+      applyProfileAvatars(RIZQ_PROFILE_ACCOUNT);
+    }).catch(function(){});
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // عرض/إضافة التقييمات الحقيقية — يُستدعى فقط من applyRealProfile()
@@ -1206,11 +1368,10 @@ function openRizqProfileChat() {
     sellerName: sellerName,
     adTitle   : window._tFr ? 'Message depuis profil Rizq' : 'رسالة من الملف الشخصي',
     adId      : sellerId,
-    adEmoji   : '🧑‍💼'
+    adEmoji   : '👤'
   });
 }
 </script>
-<script src="rizq_backend_config.js"></script>
 <script>
 // ══ عدّاد زيارات حقيقي لصفحة الملف الشخصي — نفس نمط rizq_store.html/
 // rizq_office.html/rizq_corp.html. يُرسل فقط عند وجود حساب فردي حقيقي
