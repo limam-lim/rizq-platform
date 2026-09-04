@@ -28,6 +28,8 @@
       { id: 'food', nameAr: 'أغذية ومطاعم', nameFr: 'Alimentation & restauration' },
       { id: 'equipment', nameAr: 'معدات وتجارة', nameFr: 'Équipements & commerce' },
       { id: 'agriculture', nameAr: 'ماشية وزراعة', nameFr: 'Bétail & agriculture' },
+      { id: 'realty_retail', nameAr: 'عقارات وأراضي', nameFr: 'Immobilier & terrains' },
+      { id: 'pro_retail', nameAr: 'مهن متخصصة بالتجزئة', nameFr: 'Métiers spécialisés' },
       { id: 'services_retail', nameAr: 'خدمات تجارية', nameFr: 'Services commerciaux' },
     ],
     office: [
@@ -40,6 +42,7 @@
       { id: 'consulting', nameAr: 'استشارات وإدارة', nameFr: 'Conseil & gestion' },
       { id: 'health', nameAr: 'صحة وطب', nameFr: 'Santé & médecine' },
       { id: 'education', nameAr: 'تعليم وتدريب', nameFr: 'Éducation & formation' },
+      { id: 'media', nameAr: 'إعلام وإنتاج', nameFr: 'Médias & production' },
       { id: 'travel', nameAr: 'سفر وسياحة', nameFr: 'Voyage & tourisme' },
       { id: 'it', nameAr: 'تقنية معلومات', nameFr: 'Informatique & digital' },
       { id: 'general_office', nameAr: 'استقبال وخدمات عامة', nameFr: 'Accueil & services généraux' },
@@ -51,6 +54,17 @@
       { id: 'logistics', nameAr: 'لوجistics ونقل', nameFr: 'Logistique & transport' },
       { id: 'enterprise_services', nameAr: 'خدمات مؤسسية', nameFr: 'Services entreprise' },
       { id: 'import_export', nameAr: 'استيراد وتصدير', nameFr: 'Import & export' },
+      { id: 'realestate', nameAr: 'عقارات وتطوير', nameFr: 'Immobilier & promotion' },
+    ],
+    individual: [
+      { id: 'ind_vehicles', nameAr: 'سيارات ومركبات', nameFr: 'Voitures & véhicules' },
+      { id: 'ind_tech', nameAr: 'هواتف وإلكترونيات', nameFr: 'Téléphones & électronique' },
+      { id: 'ind_home', nameAr: 'أثاث ومنزل', nameFr: 'Maison & meubles' },
+      { id: 'ind_fashion', nameAr: 'أزياء وملابس', nameFr: 'Mode & vêtements' },
+      { id: 'ind_realty', nameAr: 'عقارات وأراضي', nameFr: 'Immobilier & terrains' },
+      { id: 'ind_pro', nameAr: 'مهن حرّة متخصصة', nameFr: 'Professions libérales' },
+      { id: 'ind_services', nameAr: 'خدمات ووظائف', nameFr: 'Services & emplois' },
+      { id: 'ind_agri', nameAr: 'ماشية وزراعة', nameFr: 'Bétail & agriculture' },
     ],
   };
 
@@ -86,6 +100,13 @@
     { id: 'st_wholesale', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'بيع بالجملة', nameFr: 'Vente en gros', icon: '📦' },
     { id: 'st_livestock', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'ماشية ودواجن', nameFr: 'Bétail & volaille', icon: '🐄' },
     { id: 'st_feed', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'أعلاف ومستلزمات زراعية', nameFr: 'Aliments & fournitures agricoles', icon: '🌾' },
+    { id: 'st_realty_sale', sectorId: 'realty_retail', accountTypes: ['store', 'corp'], nameAr: 'بيع عقارات وأراضي', nameFr: 'Vente immobilière & terrains', icon: '🏠' },
+    { id: 'st_realty_rent', sectorId: 'realty_retail', accountTypes: ['store'], nameAr: 'إيجار عقارات وسكن', nameFr: 'Location immobilière', icon: '🔑' },
+    { id: 'st_realty_land', sectorId: 'realty_retail', accountTypes: ['store'], nameAr: 'أراضي وقطع سكنية', nameFr: 'Terrains & lots', icon: '🗺️' },
+    { id: 'st_pharmacy', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'صيدلية', nameFr: 'Pharmacie', icon: '💊' },
+    { id: 'st_optics', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'نظارات وسمعيات', nameFr: 'Optique & audiologie', icon: '👓' },
+    { id: 'st_books', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'مكتبة وقرطاسية', nameFr: 'Librairie & papeterie', icon: '📚' },
+    { id: 'st_sports', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'رياضة ولياقة', nameFr: 'Sport & fitness', icon: '🏋️' },
     { id: 'st_repair', sectorId: 'services_retail', accountTypes: ['store'], nameAr: 'صيانة وإصلاح', nameFr: 'Maintenance & réparation', icon: '🔧' },
     { id: 'st_other', sectorId: 'services_retail', accountTypes: ['store'], nameAr: 'نشاط تجاري آخر', nameFr: 'Autre activité commerciale', icon: '🏷️' },
 
@@ -116,6 +137,8 @@
     { id: 'of_realestate_agency', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'وساطة عقارية', nameFr: 'Agence immobilière', icon: '🏠' },
     { id: 'of_property_mgmt', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'إدارة عقارات', nameFr: 'Gestion immobilière', icon: '🔑' },
     { id: 'of_valuation', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'تقييم عقاري', nameFr: 'Évaluation immobilière', icon: '📊' },
+    { id: 'of_realestate_dev', sectorId: 'realestate', accountTypes: ['office', 'corp'], nameAr: 'تطوير عقاري', nameFr: 'Promotion immobilière', icon: '🏗️' },
+    { id: 'of_land_broker', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'وساطة أراضي ومزارع', nameFr: 'Courtage terrains & fermes', icon: '🌾' },
     { id: 'of_business_consult', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'استشارات أعمال', nameFr: 'Conseil en affaires', icon: '💡' },
     { id: 'of_hr_recruitment', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'موارد بشرية وتوظيف', nameFr: 'RH & recrutement', icon: '👥' },
     { id: 'of_marketing', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'تسويق وإعلان', nameFr: 'Marketing & publicité', icon: '📣' },
@@ -124,9 +147,16 @@
     { id: 'of_dental', sectorId: 'health', accountTypes: ['office'], nameAr: 'عيادة أسنان', nameFr: 'Cabinet dentaire', icon: '🦷' },
     { id: 'of_pharmacy', sectorId: 'health', accountTypes: ['office'], nameAr: 'صيدلية', nameFr: 'Pharmacie', icon: '💊' },
     { id: 'of_lab', sectorId: 'health', accountTypes: ['office'], nameAr: 'مختبر تحاليل', nameFr: 'Laboratoire d\'analyses', icon: '🔬' },
+    { id: 'of_veterinary', sectorId: 'health', accountTypes: ['office'], nameAr: 'عيادة بيطرية', nameFr: 'Clinique vétérinaire', icon: '🐾' },
+    { id: 'of_physio', sectorId: 'health', accountTypes: ['office'], nameAr: 'علاج طبيعي', nameFr: 'Kinésithérapie', icon: '🦴' },
+    { id: 'of_optics_clinic', sectorId: 'health', accountTypes: ['office'], nameAr: 'عيادة بصريات', nameFr: 'Cabinet d\'optique', icon: '👓' },
     { id: 'of_training_center', sectorId: 'education', accountTypes: ['office'], nameAr: 'مركز تدريب', nameFr: 'Centre de formation', icon: '🎓' },
     { id: 'of_tutoring', sectorId: 'education', accountTypes: ['office'], nameAr: 'دروس خصوصية', nameFr: 'Cours particuliers', icon: '📖' },
     { id: 'of_language', sectorId: 'education', accountTypes: ['office'], nameAr: 'تعليم لغات', nameFr: 'Enseignement des langues', icon: '🗣️' },
+    { id: 'of_driving_school', sectorId: 'education', accountTypes: ['office'], nameAr: 'تعليم قيادة', nameFr: 'Auto-école', icon: '🚗' },
+    { id: 'of_media_prod', sectorId: 'media', accountTypes: ['office'], nameAr: 'إنتاج إعلامي ومرئي', nameFr: 'Production média & vidéo', icon: '🎬' },
+    { id: 'of_photo_studio', sectorId: 'media', accountTypes: ['office'], nameAr: 'استوديو تصوير', nameFr: 'Studio photo', icon: '📷' },
+    { id: 'of_advertising', sectorId: 'media', accountTypes: ['office'], nameAr: 'إعلان وعلاقات عامة', nameFr: 'Publicité & RP', icon: '📣' },
     { id: 'of_travel_agency', sectorId: 'travel', accountTypes: ['office'], nameAr: 'وكالة سفريات', nameFr: 'Agence de voyages', icon: '🌍' },
     { id: 'of_tourism', sectorId: 'travel', accountTypes: ['office'], nameAr: 'سياحة وبرامج', nameFr: 'Tourisme & programmes', icon: '🏖️' },
     { id: 'of_hajj_umrah', sectorId: 'travel', accountTypes: ['office'], nameAr: 'حج وعمرة', nameFr: 'Hajj & Omra', icon: '🕋' },
@@ -154,10 +184,30 @@
     { id: 'cp_shipping', sectorId: 'logistics', accountTypes: ['corp'], nameAr: 'شحن ونقل', nameFr: 'Transport & fret', icon: '📦' },
     { id: 'cp_import_export', sectorId: 'import_export', accountTypes: ['corp'], nameAr: 'استيراد وتصدير', nameFr: 'Import & export', icon: '🌐' },
     { id: 'cp_trading', sectorId: 'import_export', accountTypes: ['corp'], nameAr: 'تجارة دولية', nameFr: 'Commerce international', icon: '🤝' },
+    { id: 'cp_realestate_dev', sectorId: 'realestate', accountTypes: ['corp'], nameAr: 'شركة تطوير عقاري', nameFr: 'Promotion immobilière', icon: '🏗️' },
+    { id: 'cp_construction_corp', sectorId: 'realestate', accountTypes: ['corp'], nameAr: 'شركة مقاولات', nameFr: 'Entreprise de BTP', icon: '🧱' },
     { id: 'cp_consulting_corp', sectorId: 'enterprise_services', accountTypes: ['corp'], nameAr: 'استشارات مؤسسية', nameFr: 'Conseil entreprise', icon: '💼' },
     { id: 'cp_facility_mgmt', sectorId: 'enterprise_services', accountTypes: ['corp'], nameAr: 'إدارة مرافق', nameFr: 'Gestion d\'installations', icon: '🏢' },
     { id: 'cp_security', sectorId: 'enterprise_services', accountTypes: ['corp'], nameAr: 'أمن وحراسة', nameFr: 'Sécurité & gardiennage', icon: '🛡️' },
     { id: 'cp_other', sectorId: 'enterprise_services', accountTypes: ['corp'], nameAr: 'نشاط مؤسسي آخر', nameFr: 'Autre activité entreprise', icon: '🏷️' },
+
+    // ── INDIVIDUAL / private ──
+    { id: 'ind_vehicles', sectorId: 'ind_vehicles', accountTypes: ['individual'], nameAr: 'سيارات ومركبات', nameFr: 'Voitures & véhicules', icon: '🚗' },
+    { id: 'ind_phones', sectorId: 'ind_tech', accountTypes: ['individual'], nameAr: 'هواتف وإلكترونيات', nameFr: 'Téléphones & électronique', icon: '📱' },
+    { id: 'ind_home', sectorId: 'ind_home', accountTypes: ['individual'], nameAr: 'أثاث ومنزل', nameFr: 'Maison & meubles', icon: '🛋️' },
+    { id: 'ind_fashion', sectorId: 'ind_fashion', accountTypes: ['individual'], nameAr: 'أزياء وملابس', nameFr: 'Mode & vêtements', icon: '👗' },
+    { id: 'ind_realty', sectorId: 'ind_realty', accountTypes: ['individual'], nameAr: 'عقارات — بيع وإيجار', nameFr: 'Immobilier — vente & location', icon: '🏠' },
+    { id: 'ind_land', sectorId: 'ind_realty', accountTypes: ['individual'], nameAr: 'أراضي وقطع سكنية', nameFr: 'Terrains & lots', icon: '🗺️' },
+    { id: 'ind_law', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'محاماة واستشارات قانونية', nameFr: 'Avocat & conseil juridique', icon: '⚖️' },
+    { id: 'ind_accounting', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'محاسبة ومالية', nameFr: 'Comptabilité & finance', icon: '🧮' },
+    { id: 'ind_engineering', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'هندسة ومساحة', nameFr: 'Ingénierie & topographie', icon: '📐' },
+    { id: 'ind_health', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'طب وصحة', nameFr: 'Santé & médecine', icon: '🩺' },
+    { id: 'ind_education', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'تعليم وتدريب', nameFr: 'Éducation & formation', icon: '🎓' },
+    { id: 'ind_it', sectorId: 'ind_pro', accountTypes: ['individual'], nameAr: 'تقنية ومعلومات', nameFr: 'Informatique & digital', icon: '💻' },
+    { id: 'ind_jobs', sectorId: 'ind_services', accountTypes: ['individual'], nameAr: 'وظائف وخدمات', nameFr: 'Emplois & services', icon: '💼' },
+    { id: 'ind_travel', sectorId: 'ind_services', accountTypes: ['individual'], nameAr: 'سفر وسياحة', nameFr: 'Voyage & tourisme', icon: '🌍' },
+    { id: 'ind_animals', sectorId: 'ind_agri', accountTypes: ['individual'], nameAr: 'ماشية وحيوانات', nameFr: 'Bétail & animaux', icon: '🐪' },
+    { id: 'ind_other', sectorId: 'ind_services', accountTypes: ['individual'], nameAr: 'نشاط آخر', nameFr: 'Autre activité', icon: '🏷️' },
   ];
 
   /** Optional per-package narrowing (empty = all activities for account type) */
@@ -170,6 +220,7 @@
   function normType(t) {
     var x = String(t || '').toLowerCase();
     if (x === 'shop') return 'store';
+    if (x === 'private' || x === 'personal') return 'individual';
     return x;
   }
 

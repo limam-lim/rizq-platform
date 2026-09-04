@@ -59,49 +59,46 @@
     return null;
   }
 
-  function shouldPortalMenu() {
+  function getPortalHost() {
     try {
-      if (root.document.documentElement.classList.contains('rizq-reg-page')) return false;
-      if (root.document.querySelector('#modal.reg-wizard-mode')) return false;
+      var modal = root.document.querySelector('#modal.reg-wizard-mode, #modal.open');
+      if (modal) return modal;
     } catch (e) {}
+    return root.document.body;
+  }
+
+  function shouldPortalMenu() {
     return true;
   }
 
   function portalMenu(wrap, menu) {
-    if (!shouldPortalMenu()) return;
-    if (!menu || menu.parentNode === root.document.body) return;
+    if (!menu) return;
+    var host = getPortalHost();
+    if (!host || menu.parentNode === host) return;
     menu._rizqActWrap = wrap;
-    root.document.body.appendChild(menu);
+    host.appendChild(menu);
   }
 
   function restoreMenu(wrap, menu) {
-    if (!menu || menu.parentNode !== root.document.body) return;
-    if (menu._rizqActWrap !== wrap) return;
+    if (!menu || !wrap) return;
+    if (menu.parentNode === wrap) return;
+    if (menu._rizqActWrap && menu._rizqActWrap !== wrap) return;
     var anchor = wrap.querySelector('.rizq-act-select-native') || wrap.lastElementChild;
     if (anchor) wrap.insertBefore(menu, anchor);
     else wrap.appendChild(menu);
     menu._rizqActWrap = null;
+    menu.style.position = '';
+    menu.style.left = '';
+    menu.style.right = '';
+    menu.style.top = '';
+    menu.style.bottom = '';
+    menu.style.width = '';
   }
 
   function positionMenu(wrap) {
     var trigger = wrap.querySelector('.rizq-act-select-trigger');
     var menu = getMenu(wrap);
     if (!trigger || !menu || menu.hidden) return;
-
-    if (!shouldPortalMenu()) {
-      restoreMenu(wrap, menu);
-      menu.style.position = 'absolute';
-      menu.style.left = '0';
-      menu.style.right = '0';
-      menu.style.top = 'calc(100% + 4px)';
-      menu.style.bottom = 'auto';
-      menu.style.width = '100%';
-      menu.style.maxHeight = '250px';
-      menu.style.zIndex = '80';
-      menu.style.overflowY = 'auto';
-      wrap.classList.remove('rizq-act-select-flip-up');
-      return;
-    }
 
     portalMenu(wrap, menu);
 

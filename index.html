@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=5.5"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.1"/>
 <script>
 /* تفعيل وضع صفحة التسجيل قبل الرسم حتى لا تظهر الرئيسية خلف النافذة */
 (function () {
@@ -60,8 +60,8 @@ document.documentElement.classList.add('rizq-app-nav');
 </style>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_packages_ui.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
-<script src="rizq_activity_select.js?v=2"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
+<script src="rizq_activity_select.js?v=3"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -1467,6 +1467,12 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 #ad-modal-box::-webkit-scrollbar-thumb{background:rgba(27,58,107,.3);border-radius:2px}
 .modal-box h3{color:#fff !important}
 .modal-box p{color:rgba(255,255,255,.82) !important}
+#modal.reg-wizard-mode .modal-box h3,
+html.rizq-reg-page #modal .modal-box h3,
+body.rizq-reg-open #modal .modal-box h3{color:#1a2535 !important}
+#modal.reg-wizard-mode .modal-box p,
+html.rizq-reg-page #modal .modal-box p,
+body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 .modal-close{position:absolute;top:14px;inset-inline-end:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:16px;transition:all .3s}
 .modal-close:hover{background:rgba(255,255,255,.12);color:#fff}
 .modal-logo{text-align:center;margin-bottom:12px}
@@ -3171,7 +3177,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="type-private" onclick="selectType('private')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🧑‍💼</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px">حساب خاص</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">حساب خاص</div>
             <div style="font-size:11.5px;color:var(--text-muted)">للأفراد — بع واشترِ بسهولة</div>
           </div>
           <div id="chk-private" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3181,7 +3187,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="type-company" onclick="selectType('company')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🏛️</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px">شركة أو مؤسسة</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">شركة أو مؤسسة</div>
             <div style="font-size:11.5px;color:var(--text-muted)">للتجار والشركات — حساب موثّق</div>
           </div>
           <div id="chk-company" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3210,7 +3216,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="nat-mr" onclick="selectNatType('mr')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🇲🇷</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px" data-t="nat-mr-title">موريتاني</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px" data-t="nat-mr-title">موريتاني</div>
             <div style="font-size:11.5px;color:var(--text-muted)" data-t="nat-mr-sub">بطاقة الهوية الوطنية مطلوبة</div>
           </div>
           <div id="chk-nat-mr" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3218,7 +3224,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="nat-int" onclick="selectNatType('int')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🌍</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px" data-t="nat-int-title">غير موريتاني</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px" data-t="nat-int-title">غير موريتاني</div>
             <div style="font-size:11.5px;color:var(--text-muted)" data-t="nat-int-sub">جواز سفر أو بطاقة إقامة / جنسية مطلوبة</div>
           </div>
           <div id="chk-nat-int" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3238,7 +3244,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-store" onclick="selectBizType('store')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏪</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Boutique" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">محل تجاري</div>
+            <div data-t-fr="Boutique" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">محل تجاري</div>
             <div data-t-fr="Magasin, épicerie, électronique, vêtements... — carte d'identité nationale uniquement" style="font-size:11px;color:var(--text-muted)">متجر، بقالة، إلكترونيات، ملابس... — بطاقة وطنية فقط</div>
           </div>
           <div id="chk-biz-store" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3247,7 +3253,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-office" onclick="selectBizType('office')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏢</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Bureau virtuel" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">مكتب افتراضي</div>
+            <div data-t-fr="Bureau virtuel" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">مكتب افتراضي</div>
             <div data-t-fr="Avocat, assurance, immobilier, services administratifs — licence d'activité requise" style="font-size:11px;color:var(--text-muted)">محامٍ، تأمين، عقار، خدمات إدارية — رخصة النشاط مطلوبة</div>
           </div>
           <div id="chk-biz-office" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3256,7 +3262,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-corp" onclick="selectBizType('corp')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏭</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Société ou showroom" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">شركة أو معرض</div>
+            <div data-t-fr="Société ou showroom" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">شركة أو معرض</div>
             <div data-t-fr="Grande entreprise, showroom auto, centre commercial — documents officiels" style="font-size:11px;color:var(--text-muted)">مؤسسة كبرى، معرض سيارات، مجمع تجاري — وثائق رسمية</div>
           </div>
           <div id="chk-biz-corp" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -6353,16 +6359,17 @@ function rizqMountAccountBars(modal){
   var chrome=document.getElementById('rizq-reg-chrome');
   var fakeFooter=document.getElementById('rizq-reg-footer');
   if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
-  if(fakeFooter){
-    fakeFooter.style.display='none';
-    fakeFooter.style.pointerEvents='none';
-  }
+  if(fakeFooter && fakeFooter.parentNode!==modal) modal.appendChild(fakeFooter);
   if(chrome){
-    /* يظهر دائماً في حسابي — التخطيط المضغوط على الهاتف عبر CSS */
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
     chrome.style.display='flex';
+  }
+  if(fakeFooter){
+    fakeFooter.style.display='flex';
+    fakeFooter.style.visibility='visible';
+    fakeFooter.style.pointerEvents='auto';
   }
 }
 
@@ -6577,6 +6584,15 @@ function _regLang(){
 
 function renderIndividualActivitySelect(ppEl, lang){
   if(!ppEl) return;
+  if(window.RizqMerchantActivities){
+    RizqMerchantActivities.renderSelect(ppEl, {
+      accountType: 'individual',
+      lang: lang,
+      selected: ppEl.value || '',
+    });
+    if(window.RizqActivitySelect) RizqActivitySelect.enhance(ppEl);
+    return;
+  }
   var isFr = lang === 'fr';
   var prev = ppEl.value || '';
   var cats = [
@@ -6584,7 +6600,14 @@ function renderIndividualActivitySelect(ppEl, lang){
     { id: 'ind_phones', ar: '📱 هواتف وإلكترونيات', fr: '📱 Téléphones & électronique' },
     { id: 'ind_home', ar: '🛋️ أثاث ومنزل', fr: '🛋️ Maison & meubles' },
     { id: 'ind_fashion', ar: '👗 أزياء وملابس', fr: '👗 Mode & vêtements' },
-    { id: 'ind_realty', ar: '🏠 عقارات', fr: '🏠 Immobilier' },
+    { id: 'ind_realty', ar: '🏠 عقارات — بيع وإيجار', fr: '🏠 Immobilier — vente & location' },
+    { id: 'ind_land', ar: '🗺️ أراضي وقطع سكنية', fr: '🗺️ Terrains & lots' },
+    { id: 'ind_law', ar: '⚖️ محاماة واستشارات قانونية', fr: '⚖️ Avocat & conseil juridique' },
+    { id: 'ind_accounting', ar: '🧮 محاسبة ومالية', fr: '🧮 Comptabilité & finance' },
+    { id: 'ind_engineering', ar: '📐 هندسة ومساحة', fr: '📐 Ingénierie & topographie' },
+    { id: 'ind_health', ar: '🩺 طب وصحة', fr: '🩺 Santé & médecine' },
+    { id: 'ind_education', ar: '🎓 تعليم وتدريب', fr: '🎓 Éducation & formation' },
+    { id: 'ind_it', ar: '💻 تقنية ومعلومات', fr: '💻 Informatique & digital' },
     { id: 'ind_jobs', ar: '💼 وظائف وخدمات', fr: '💼 Emplois & services' },
     { id: 'ind_animals', ar: '🐪 ماشية وحيوانات', fr: '🐪 Bétail & animaux' },
     { id: 'ind_other', ar: '🏷️ أخرى', fr: '🏷️ Autre' }
@@ -8870,8 +8893,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
      ═══════════════════════════════════════════════ -->
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_packages_ui.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
-<script src="rizq_activity_select.js?v=2"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
+<script src="rizq_activity_select.js?v=3"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_video_ads.js"></script>

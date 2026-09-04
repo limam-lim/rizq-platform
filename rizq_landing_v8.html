@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=1.5"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.1"/>
 <script>
 (function () {
   try {
@@ -59,8 +59,8 @@ document.documentElement.classList.add('rizq-app-nav');
 </style>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_packages_ui.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
-<script src="rizq_activity_select.js?v=2"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
+<script src="rizq_activity_select.js?v=3"></script>
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -1466,6 +1466,12 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 #ad-modal-box::-webkit-scrollbar-thumb{background:rgba(27,58,107,.3);border-radius:2px}
 .modal-box h3{color:#fff !important}
 .modal-box p{color:rgba(255,255,255,.82) !important}
+#modal.reg-wizard-mode .modal-box h3,
+html.rizq-reg-page #modal .modal-box h3,
+body.rizq-reg-open #modal .modal-box h3{color:#1a2535 !important}
+#modal.reg-wizard-mode .modal-box p,
+html.rizq-reg-page #modal .modal-box p,
+body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 .modal-close{position:absolute;top:14px;inset-inline-end:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:16px;transition:all .3s}
 .modal-close:hover{background:rgba(255,255,255,.12);color:#fff}
 .modal-logo{text-align:center;margin-bottom:12px}
@@ -3084,17 +3090,24 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 </div>
 
 <div class="modal-overlay" id="modal">
+  <nav class="rizq-reg-chrome" id="rizq-reg-chrome" aria-label="شريط التسجيل">
+    <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR"><span class="lang-fr">FR</span><span class="lang-sep"> | </span><span class="lang-ar">AR</span></button>
+    <div class="rizq-reg-chrome-links">
+      <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+      <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
+      <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
+      <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
+    </div>
+    <a href="./" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="closeModal(true)">
+      <img class="logo-mark-img" src="rizq-mark-512.png?v=9.7" width="42" height="42" alt="رزق"/>
+      <div class="logo-text">
+        <span class="logo-ar">رزق</span>
+        <span class="logo-sub">RIZQ PLATFORM</span>
+      </div>
+    </a>
+  </nav>
   <div class="modal-box">
     <button class="modal-close" onclick="if(!this.closest('#modal').classList.contains('reg-wizard-arming'))closeModal(true)" aria-label="إغلاق">✕</button>
-    <nav class="rizq-reg-chrome" id="rizq-reg-chrome" aria-label="شريط التسجيل">
-      <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR">FR | AR</button>
-      <div class="rizq-reg-chrome-links">
-        <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
-        <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
-        <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
-        <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
-      </div>
-    </nav>
     <div class="modal-header">
       <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
       <div id="modal-auth-tabs" class="modal-auth-tabs" style="display:none" role="tablist" aria-label="تسجيل الدخول أو إنشاء حساب">
@@ -3151,7 +3164,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="type-private" onclick="selectType('private')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🧑‍💼</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px">حساب خاص</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">حساب خاص</div>
             <div style="font-size:11.5px;color:var(--text-muted)">للأفراد — بع واشترِ بسهولة</div>
           </div>
           <div id="chk-private" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3161,7 +3174,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="type-company" onclick="selectType('company')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🏛️</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px">شركة أو مؤسسة</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">شركة أو مؤسسة</div>
             <div style="font-size:11.5px;color:var(--text-muted)">للتجار والشركات — حساب موثّق</div>
           </div>
           <div id="chk-company" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3190,7 +3203,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="nat-mr" onclick="selectNatType('mr')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🇲🇷</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px" data-t="nat-mr-title">موريتاني</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px" data-t="nat-mr-title">موريتاني</div>
             <div style="font-size:11.5px;color:var(--text-muted)" data-t="nat-mr-sub">بطاقة الهوية الوطنية مطلوبة</div>
           </div>
           <div id="chk-nat-mr" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3198,7 +3211,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="nat-int" onclick="selectNatType('int')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🌍</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px" data-t="nat-int-title">غير موريتاني</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px" data-t="nat-int-title">غير موريتاني</div>
             <div style="font-size:11.5px;color:var(--text-muted)" data-t="nat-int-sub">جواز سفر أو بطاقة إقامة / جنسية مطلوبة</div>
           </div>
           <div id="chk-nat-int" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3218,7 +3231,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-store" onclick="selectBizType('store')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏪</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Boutique" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">محل تجاري</div>
+            <div data-t-fr="Boutique" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">محل تجاري</div>
             <div data-t-fr="Magasin, épicerie, électronique, vêtements... — carte d'identité nationale uniquement" style="font-size:11px;color:var(--text-muted)">متجر، بقالة، إلكترونيات، ملابس... — بطاقة وطنية فقط</div>
           </div>
           <div id="chk-biz-store" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3227,7 +3240,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-office" onclick="selectBizType('office')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏢</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Bureau virtuel" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">مكتب افتراضي</div>
+            <div data-t-fr="Bureau virtuel" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">مكتب افتراضي</div>
             <div data-t-fr="Avocat, assurance, immobilier, services administratifs — licence d'activité requise" style="font-size:11px;color:var(--text-muted)">محامٍ، تأمين، عقار، خدمات إدارية — رخصة النشاط مطلوبة</div>
           </div>
           <div id="chk-biz-office" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3236,7 +3249,7 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
         <div id="biz-corp" onclick="selectBizType('corp')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:16px 14px;cursor:pointer;transition:all .35s">
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏭</div>
           <div style="flex:1;text-align:right">
-            <div data-t-fr="Société ou showroom" style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px">شركة أو معرض</div>
+            <div data-t-fr="Société ou showroom" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">شركة أو معرض</div>
             <div data-t-fr="Grande entreprise, showroom auto, centre commercial — documents officiels" style="font-size:11px;color:var(--text-muted)">مؤسسة كبرى، معرض سيارات، مجمع تجاري — وثائق رسمية</div>
           </div>
           <div id="chk-biz-corp" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
@@ -3595,10 +3608,6 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
 
       <button class="m-btn-main" data-t-fr="🚀 Commencer à parcourir et publier" onclick="closeModal()">🚀 ابدأ التصفح والنشر</button>
     </div>
-  </div>
-</div>
-
-
 
     <div id="p-phone" style="display:none">
       <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
@@ -3628,6 +3637,36 @@ footer .logo-sub{color:rgba(255,255,255,.75)}
       <button class="m-btn-main" onclick="closeModal();goToPost()">🚀 انشر إعلانك الأول</button>
     </div>
   </div>
+  <nav class="rizq-reg-footer" id="rizq-reg-footer" aria-label="تنقل سفلي">
+    <div class="rizq-reg-footer-inner">
+      <a href="./" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">🏠</span>
+        <span class="rizq-reg-footer-label ar-only">الرئيسية</span>
+        <span class="rizq-reg-footer-label fr-only">Accueil</span>
+      </a>
+      <a href="rizq_post.html" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">📢</span>
+        <span class="rizq-reg-footer-label ar-only">نشر إعلان</span>
+        <span class="rizq-reg-footer-label fr-only">Publier</span>
+      </a>
+      <a href="./#categories" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">📂</span>
+        <span class="rizq-reg-footer-label ar-only">الأقسام</span>
+        <span class="rizq-reg-footer-label fr-only">Catégories</span>
+      </a>
+      <a href="rizq_legal.html#s2" target="_blank" rel="noopener" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">📋</span>
+        <span class="rizq-reg-footer-label ar-only">شروط الاستخدام</span>
+        <span class="rizq-reg-footer-label fr-only">Conditions</span>
+      </a>
+      <a href="rizq_legal.html#s3" target="_blank" rel="noopener" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">🔒</span>
+        <span class="rizq-reg-footer-label ar-only">الخصوصية</span>
+        <span class="rizq-reg-footer-label fr-only">Confidentialité</span>
+      </a>
+    </div>
+  </nav>
+</div><!-- /#modal -->
 
 <script src="rizq_categories_config.js?v=20"></script>
 <script>
@@ -6301,6 +6340,25 @@ function rizqIsRegPageMode(){
   }catch(e){ return document.documentElement.classList.contains('rizq-reg-page'); }
 }
 
+function rizqMountAccountBars(modal){
+  if(!modal) return;
+  var chrome=document.getElementById('rizq-reg-chrome');
+  var fakeFooter=document.getElementById('rizq-reg-footer');
+  if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
+  if(fakeFooter && fakeFooter.parentNode!==modal) modal.appendChild(fakeFooter);
+  if(chrome){
+    chrome.style.visibility='visible';
+    chrome.style.opacity='1';
+    chrome.style.pointerEvents='auto';
+    chrome.style.display='flex';
+  }
+  if(fakeFooter){
+    fakeFooter.style.display='flex';
+    fakeFooter.style.visibility='visible';
+    fakeFooter.style.pointerEvents='auto';
+  }
+}
+
 function rizqOpenRegister(ev){
   if(ev){
     ev.preventDefault();
@@ -6329,6 +6387,7 @@ function openModal(mode){
     window._rizqRegArmTimer=setTimeout(function(){
       modal.classList.remove('reg-wizard-arming');
     }, 900);
+    rizqMountAccountBars(modal);
     try{
       var u=new URL(window.location.href);
       if(u.searchParams.get('openRegister')!=='1'){
@@ -6345,6 +6404,7 @@ function openModal(mode){
       try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (ePage) {}
       modal.classList.add('reg-wizard-mode');
       document.body.classList.add('rizq-reg-open');
+      rizqMountAccountBars(modal);
     } else {
       modal.classList.remove('reg-wizard-mode');
       modal.classList.remove('reg-wizard-arming');
@@ -6959,25 +7019,27 @@ function ppRenderPackages(btype){
     var isDia = p.diamond||p.isDiamond||String(p.name).indexOf('ماسي')!==-1;
     var isTrial = p.trial||p.price===0;
     var isHigh = p.highlight;
-    var border = isDia?'1px solid rgba(168,85,247,.5)':isHigh?'1px solid rgba(201,168,76,.4)':'1px solid rgba(255,255,255,.1)';
-    var bg = isDia?'rgba(168,85,247,.08)':isHigh?'rgba(201,168,76,.08)':isTrial?'rgba(74,222,128,.05)':'rgba(255,255,255,.03)';
-    var icon = isTrial?'🎁':isDia?'💎':isHigh?'📅':'👑';
+    var border = isDia?'1.5px solid rgba(168,85,247,.45)':isHigh?'1.5px solid rgba(201,168,76,.55)':'1.5px solid #e2e8f0';
+    var bg = isDia?'#faf5ff':isHigh?'#fffef8':isTrial?'#f0fdf4':'#ffffff';
+    var icon = isTrial?'🎁':isDia?'💎':isHigh?'⭐':'👑';
     var pName   = isFr ? trPkg(p.name_fr || p.name) : p.name;
-    var pPeriod = isFr ? trPkg(p.period_fr || p.period || '') : p.period;
+    var pPeriod = isFr ? trPkg(p.period_fr || p.period || '') : (p.period || '');
     var freeLbl = isFr ? 'Gratuit' : 'مجاني';
-    var priceStr = isTrial?'<span style="color:#4ade80;font-weight:700">'+freeLbl+'</span>':'<span style="font-weight:800;font-size:14px;color:'+(isDia?'#c084fc':isHigh?'var(--gold)':'var(--white)')+'">'+p.price.toLocaleString('en-US')+'</span> <span style="font-size:10px;color:var(--text-muted)">MRU/'+pPeriod+'</span>';
+    var priceStr = isTrial
+      ? '<span class="pp-pkg-price-free" style="font-weight:800;font-size:15px;color:#15803d">'+freeLbl+'</span>'
+      : '<span class="pp-pkg-price" style="font-weight:800;font-size:15px;color:'+(isDia?'#7c3aed':'#0f2347')+'">'+(p.price||0).toLocaleString('en-US')+'</span> <span class="pp-pkg-period" style="font-size:11px;color:#64748b">MRU'+(pPeriod?('/'+pPeriod):'')+'</span>';
     var featList = (isFr && p.features_fr && p.features_fr.length) ? p.features_fr : (p.features||[]);
-    var feats = featList.slice(0,4).map(function(f){return '<span style="font-size:10px;color:var(--text-muted)">✓ '+ (isFr ? trPkg(f) : f) +'</span>';}).join(' · ');
+    var feats = featList.slice(0,4).map(function(f){return '<span class="pp-pkg-feat" style="font-size:11.5px;color:#475569;background:#f8faff;border:1px solid #eef2f7;border-radius:999px;padding:3px 8px">✓ '+ (isFr ? trPkg(f) : f) +'</span>';}).join('');
     var bestLbl = isDia ? (isFr ? (p.featuredBadge_fr || p.featuredBadge || 'Le plus choisi par les entreprises') : (p.featuredBadge || 'الأكثر اختياراً للشركات')) : (isFr ? '💎 Meilleure offre' : '💎 الأفضل');
     var popularLbl = isFr ? '⭐ Le plus demandé' : '⭐ الأكثر طلباً';
-    html+='<div data-pkgi="'+i+'" onclick="ppSelectPkg(this,'+i+')" style="cursor:pointer;border:'+border+';background:'+bg+';border-radius:12px;padding:12px 14px;transition:all .2s;position:relative" class="pp-pkg-card">'
-      +(isDia?'<div style="position:absolute;top:-10px;right:14px;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+bestLbl+'</div>':'')
-      +(isHigh&&!isDia?'<div style="position:absolute;top:-10px;right:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0d1b2a;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+popularLbl+'</div>':'')
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-      +'<div style="display:flex;align-items:center;gap:8px"><div id="pp-chk-'+i+'" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;transition:all .2s"></div>'
-      +'<span style="font-size:13px;font-weight:700;color:var(--white)">'+icon+' '+pName+'</span></div>'
-      +priceStr+'</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:4px">'+feats+'</div>'
+    html+='<div data-pkgi="'+i+'" onclick="ppSelectPkg(this,'+i+')" style="cursor:pointer;border:'+border+';background:'+bg+';border-radius:14px;padding:14px 15px;transition:all .2s;position:relative" class="pp-pkg-card">'
+      +(isDia?'<div style="position:absolute;top:-10px;inset-inline-end:14px;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+bestLbl+'</div>':'')
+      +(isHigh&&!isDia?'<div style="position:absolute;top:-10px;inset-inline-end:14px;background:linear-gradient(135deg,#c9a84c,#d4bc72);color:#0d1b2a;font-size:9px;font-weight:900;padding:3px 12px;border-radius:20px">'+popularLbl+'</div>':'')
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px">'
+      +'<div style="display:flex;align-items:center;gap:10px;min-width:0"><div id="pp-chk-'+i+'" class="pp-chk" style="width:20px;height:20px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;transition:all .2s;background:#fff"></div>'
+      +'<span class="pp-pkg-title" style="font-size:14px;font-weight:800;color:#0f2347;line-height:1.35">'+icon+' '+pName+'</span></div>'
+      +'<div style="flex-shrink:0;text-align:end">'+priceStr+'</div></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+feats+'</div>'
       +'</div>';
   });
   document.getElementById('pp-pkg-list').innerHTML=html;
@@ -7027,11 +7089,11 @@ function ppRenderPayMethods(){
   var html=codes.map(function(c){
     var icon='💳';
     Object.keys(icons).forEach(function(k){if(c.bank.toLowerCase().includes(k)||String(c.type||'').toLowerCase().includes(k))icon=icons[k];});
-    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:rgba(255,255,255,.04);border-radius:9px;border:1px solid rgba(255,255,255,.07)">'
-      +'<span style="font-size:18px;flex-shrink:0">'+icon+'</span>'
-      +'<div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px">'+c.bank+'</div>'
-      +'<div dir="ltr" style="font-family:monospace;font-size:11px;color:var(--gold);margin-bottom:2px;letter-spacing:.5px">'+c.code+'</div>'
-      +(c.note?'<div style="font-size:10px;color:var(--text-muted)">'+c.note+'</div>':'')
+    return '<div class="pp-pay-row" style="display:flex;align-items:flex-start;gap:10px">'
+      +'<span style="font-size:20px;flex-shrink:0;line-height:1">'+icon+'</span>'
+      +'<div style="flex:1;min-width:0"><div class="pp-pay-bank" style="font-size:13px;margin-bottom:3px;color:#0f2347;font-weight:800">'+c.bank+'</div>'
+      +'<div class="pp-pay-code" dir="ltr" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;margin-bottom:3px;letter-spacing:.4px;color:#1b3a6b;font-weight:700">'+c.code+'</div>'
+      +(c.note?'<div class="pp-pay-note" style="font-size:11px;line-height:1.5;color:#64748b">'+c.note+'</div>':'')
       +'</div></div>';
   }).join('');
   document.getElementById('pp-pay-methods').innerHTML=html;
@@ -8774,8 +8836,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
      ═══════════════════════════════════════════════ -->
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_packages_ui.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
-<script src="rizq_activity_select.js?v=2"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
+<script src="rizq_activity_select.js?v=3"></script>
 <script src="rizq_agent.js"></script>
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_video_ads.js"></script>

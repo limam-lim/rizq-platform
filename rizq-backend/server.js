@@ -3945,7 +3945,7 @@ const FRONTEND_ROOT = path.join(__dirname, '..');
 installAdminPanelGate(app, FRONTEND_ROOT);
 if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '0') {
   app.get('/', (_req, res) => {
-    res.sendFile(path.join(FRONTEND_ROOT, 'rizq_landing_v8.html'));
+    res.sendFile(path.join(FRONTEND_ROOT, 'index.html'));
   });
   app.use((req, res, next) => {
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
