@@ -45,11 +45,18 @@
     }) || null;
   }
 
-  /* Live Server / serve يحوّلان غالباً *.html → مسار بلا امتداد وقد يُسقطان
-     ?id=&token= أثناء التحويل، فيدخل bootstrap في حلقة إعادة تحميل بيضاء.
-     نفضّل المسارات النظيفة ونقارن الأسماء بلا .html. */
+  /* Express على localhost:3000 لا يخدم الملفات بلا .html (يُرجع JSON 404).
+     نُبقي اسم الملف كاملاً في روابط اللوحات. المقارنة تتجاهل الامتداد
+     حتى لا تكسر Live Server إن حوّل *.html إلى مسار بلا امتداد. */
   function dashFileName(type) {
     return DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
+  }
+
+  function htmlDashPath(file) {
+    var name = String(file || '').split('?')[0].replace(/^\//, '');
+    if (!name) return dashFileName('individual');
+    if (/\.html$/i.test(name)) return name;
+    return name + '.html';
   }
 
   function cleanDashPath(file) {
@@ -63,7 +70,7 @@
   function buildDashboardUrl(acc) {
     if (!acc || !acc.id || !acc.token) return '';
     var type = acc.type || 'individual';
-    var path = cleanDashPath(dashFileName(type));
+    var path = htmlDashPath(dashFileName(type));
     return path + '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
   }
 
@@ -199,7 +206,7 @@
       location.replace(currentFile + query);
       return;
     }
-    location.replace(cleanDashPath(targetFile) + query);
+    location.replace(htmlDashPath(targetFile) + query);
   }
 
   /* إن فُقدت ?id=&token= من الرابط (تحويل السيرفر)، نستعيدها من الجلسة المحلية
@@ -216,7 +223,7 @@
     var type = acc.type || 'individual';
     if (expectedType && type !== expectedType) return null;
     try {
-      var path = cleanDashPath(dashFileName(type));
+      var path = htmlDashPath(dashFileName(type));
       var q = '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
       history.replaceState(null, '', path + q);
     } catch (eHist) {}

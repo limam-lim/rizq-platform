@@ -3951,7 +3951,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
     next();
   });
-  app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore' }));
+  app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore', extensions: ['html'] }));
   console.log('[rizq-backend] dev static files → ' + FRONTEND_ROOT);
 }
 
