@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.1"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.2"/>
 <script>
 (function () {
   try {
@@ -3609,26 +3609,6 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
       <button class="m-btn-main" data-t-fr="🚀 Commencer à parcourir et publier" onclick="closeModal()">🚀 ابدأ التصفح والنشر</button>
     </div>
 
-    <div id="p-phone" style="display:none">
-      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
-      <p style="color:var(--text-muted);font-size:12px;margin-bottom:4px">الخطوة 3 من 3</p>
-      <p class="ph-note" style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">رقم هاتف موريتاني مطلوب للتفعيل</p>
-      <div class="ph-row"><span class="ph-prefix">🇲🇷 +222</span><div class="ph-div"></div><input dir="ltr" style="direction:ltr;text-align:left;" class="ph-input" id="ph-in" type="tel" placeholder="XX XX XX XX" maxlength="8"/></div>
-      <div style="display:flex;justify-content:center;gap:14px;margin-bottom:16px">
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mauritel</span>
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mattel</span>
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Chinguitel</span>
-      </div>
-      <div id="otp-wrap" style="display:none;margin-bottom:16px">
-        <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">أدخل رمز التحقق (6 أرقام)</p>
-        <div class="otp-row"><input class="otp-box" maxlength="1" oninput="on(this,0)"/><input class="otp-box" maxlength="1" oninput="on(this,1)"/><input class="otp-box" maxlength="1" oninput="on(this,2)"/><input class="otp-box" maxlength="1" oninput="on(this,3)"/><input class="otp-box" maxlength="1" oninput="on(this,4)"/><input class="otp-box" maxlength="1" oninput="on(this,5)"/></div>
-        <p style="color:var(--text-muted);font-size:11px;margin-top:9px">إعادة الإرسال بعد <span id="cd">60</span>s</p>
-      </div>
-      <button id="btn-send" class="m-btn-main" onclick="sendOTP()">📲 إرسال رمز التحقق</button>
-      <button id="btn-verify" class="m-btn-main" style="display:none" onclick="verifyOTP()">✅ تأكيد وإنشاء الحساب</button>
-      <button class="m-link-btn" onclick="showPanel('p-id',2)">← عودة</button>
-    </div>
-
     <!-- SUCCESS -->
     <div id="p-ok" style="display:none">
       <div style="font-size:54px;margin-bottom:14px">🎉</div>
@@ -6196,7 +6176,7 @@ let bizType='';  // 'store' | 'office' | 'corp'
 let stFile=null,ofFile1=null,ofFile2=null,crFile1=null,crFile2=null,crFile3=null,indFile=null;
 let phoneBackPanel='';
 
-const ALL_PANELS=['p-login','p-type','p-nat-type','p-biz-type','p-individual-form','p-store-form','p-office-form','p-corp-form','p-company','p-phone','p-id-upload','p-pkg-payment','p-ok'];
+const ALL_PANELS=['p-login','p-type','p-nat-type','p-biz-type','p-individual-form','p-store-form','p-office-form','p-corp-form','p-company','p-phone','p-pkg-payment','p-ok'];
 
 /* ── إصلاح قائمة "الباقات ▾" في النافبار: كانت تعتمد على :hover فقط فتختفي
    أثناء تحريك الماوس نحوها قبل الوصول (فجوة بين الزر والقائمة). الآن تُفتح
@@ -7537,10 +7517,11 @@ function verifyOTP(){
       var okType = document.getElementById('p-ok').dataset.type || 'private';
       ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
       document.getElementById('sdots').style.display='none';
-      if(okType === 'private'){
-        document.getElementById('p-id-upload').style.display='block';
-      } else {
-        document.getElementById('p-ok').style.display='block';
+      /* بعد تحقق الهاتف: النجاح مباشرة (رفع الهوية داخل نموذج الفرد مسبقاً) */
+      var okPanel=document.getElementById('p-ok');
+      if(okPanel){
+        okPanel.style.display='block';
+        okPanel.dataset.type=okType;
       }
     }).catch(function(){
       alert(isAr?'تعذّر الاتصال بالخادم':'Échec de connexion au serveur');
