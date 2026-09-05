@@ -217,6 +217,7 @@
     updateFavBadges();
   }
 
+  /* حالة المنتج حسب نوع القسم — لا نعرض «مستعمل» لأغذية مثلاً */
   var CONDITION_OPTS = [
     { v: 'جديد', ar: '✨ جديد', fr: '✨ Neuf' },
     { v: 'مستعمل — ممتاز', ar: '⭐ مستعمل — ممتاز', fr: '⭐ Occasion — excellent' },
@@ -224,26 +225,130 @@
     { v: 'للتصليح', ar: '🔧 للتصليح', fr: '🔧 À réparer' }
   ];
 
+  var CONDITION_BY_PROFILE = {
+    durable: CONDITION_OPTS,
+    food: [
+      { v: 'جديد', ar: '🥗 طازج / جديد', fr: '🥗 Frais / neuf' },
+      { v: 'معبّأ', ar: '📦 معبّأ / معلّب', fr: '📦 Emballé' },
+      { v: 'مجمّد', ar: '❄️ مجمّد', fr: '❄️ Surgelé' },
+      { v: 'قريب الانتهاء', ar: '⏳ قريب الانتهاء', fr: '⏳ Bientôt périmé' }
+    ],
+    livestock: [
+      { v: 'سليم', ar: '✅ سليم / صحي', fr: '✅ Sain' },
+      { v: 'للتسمين', ar: '📈 للتسمين', fr: '📈 À engraisser' },
+      { v: 'للذبح', ar: '🔪 للذبح', fr: '🔪 Pour abattage' },
+      { v: 'جديد', ar: '🐣 صغير / حديث', fr: '🐣 Jeune' }
+    ],
+    none: []
+  };
+
+  var CAT_CONDITION_PROFILE = {
+    'أغذية': 'food',
+    'ماشية': 'livestock',
+    'خدمات': 'none',
+    'وظائف': 'none',
+    'تأمين': 'none',
+    'رحلات': 'none',
+    'عقارات': 'none',
+    'تجارة': 'durable',
+    'تعليم': 'durable',
+    'صحة': 'durable'
+  };
+
+  /* نطاقات سعر بالأوقية الجديدة (MRU) — 1 USD ≈ 37 MRU */
+  var PRICE_PRESETS = {
+    low: [
+      { v: '0-1000', ar: 'أقل من 1,000', fr: 'Moins de 1 000' },
+      { v: '1000-5000', ar: '1,000 — 5,000', fr: '1 000 — 5 000' },
+      { v: '5000-20000', ar: '5,000 — 20,000', fr: '5 000 — 20 000' },
+      { v: '20000-999999999', ar: 'أكثر من 20,000', fr: 'Plus de 20 000' }
+    ],
+    mid: [
+      { v: '0-5000', ar: 'أقل من 5,000', fr: 'Moins de 5 000' },
+      { v: '5000-25000', ar: '5,000 — 25,000', fr: '5 000 — 25 000' },
+      { v: '25000-100000', ar: '25,000 — 100,000', fr: '25 000 — 100 000' },
+      { v: '100000-999999999', ar: 'أكثر من 100,000', fr: 'Plus de 100 000' }
+    ],
+    high: [
+      { v: '0-100000', ar: 'أقل من 100,000', fr: 'Moins de 100 000' },
+      { v: '100000-500000', ar: '100,000 — 500,000', fr: '100 000 — 500 000' },
+      { v: '500000-2000000', ar: '500,000 — 2M', fr: '500 000 — 2 M' },
+      { v: '2000000-999999999', ar: 'أكثر من 2M', fr: 'Plus de 2 M' }
+    ]
+  };
+
+  var PRICE_SLIDER = {
+    low: { max: 50000, step: 500 },
+    mid: { max: 500000, step: 2500 },
+    high: { max: 5000000, step: 25000 }
+  };
+
+  var CAT_PRICE_TIER = {
+    'أغذية': 'low',
+    'أزياء': 'low',
+    'صحة': 'low',
+    'تعليم': 'low',
+    'رياضة': 'mid',
+    'إلكترونيات': 'mid',
+    'أثاث': 'mid',
+    'معدات-منزل': 'mid',
+    'ذهب': 'mid',
+    'طاقة': 'mid',
+    'بناء': 'mid',
+    'ماشية': 'mid',
+    'تجارة': 'mid',
+    'فنون': 'mid',
+    'خدمات': 'mid',
+    'وظائف': 'low',
+    'تأمين': 'mid',
+    'رحلات': 'mid',
+    'سيارات': 'high',
+    'شاحنات': 'high',
+    'عقارات': 'high',
+    'مكائن-صناعية': 'high'
+  };
+
+  function normalizeCatKey(cat) {
+    if (!cat) return '';
+    if (typeof global.RizqCategories !== 'undefined' && RizqCategories.normalize) {
+      return RizqCategories.normalize(cat) || cat;
+    }
+    return String(cat);
+  }
+
+  function conditionProfileForCat(cat) {
+    var key = normalizeCatKey(cat);
+    return CAT_CONDITION_PROFILE[key] || 'durable';
+  }
+
+  function priceTierForCat(cat) {
+    var key = normalizeCatKey(cat);
+    return CAT_PRICE_TIER[key] || 'mid';
+  }
+
+  function conditionsForCat(cat) {
+    var profile = conditionProfileForCat(cat);
+    return CONDITION_BY_PROFILE[profile] || CONDITION_OPTS;
+  }
+
   function conditionLabel(v) {
     var fr = lang() === 'fr';
-    for (var i = 0; i < CONDITION_OPTS.length; i++) {
-      if (CONDITION_OPTS[i].v === v) return fr ? CONDITION_OPTS[i].fr : CONDITION_OPTS[i].ar;
+    var pools = CONDITION_OPTS
+      .concat(CONDITION_BY_PROFILE.food || [])
+      .concat(CONDITION_BY_PROFILE.livestock || []);
+    for (var i = 0; i < pools.length; i++) {
+      if (pools[i].v === v) return fr ? pools[i].fr : pools[i].ar;
     }
     return v || '';
   }
 
-  function conditionFilterHtml(name) {
+  function conditionChipsHtml(name, cat) {
     name = name || 'rcond';
     var fr = lang() === 'fr';
-    var html =
-      '<div class="filter-section" id="condition-filter-section">' +
-      '<div class="filter-title"><span data-t="filter-condition">' +
-      (fr ? 'État' : 'حالة المنتج') +
-      '</span><button type="button" onclick="clearSection&&clearSection(\'condition\')" data-t="btn-clear-mini">' +
-      (fr ? 'Effacer' : 'مسح') +
-      '</button></div>' +
-      '<div class="chips" id="condition-chips" style="display:flex;flex-wrap:wrap;gap:6px">';
-    CONDITION_OPTS.forEach(function (o) {
+    var opts = conditionsForCat(cat);
+    if (!opts.length) return '';
+    var html = '';
+    opts.forEach(function (o) {
       html +=
         '<label class="filter-option" style="margin:0">' +
         '<input type="radio" name="' +
@@ -255,8 +360,134 @@
         escapeHtml(fr ? o.fr : o.ar) +
         '</span></label>';
     });
-    html += '</div></div>';
     return html;
+  }
+
+  function applyConditionFilters(cat) {
+    var section = document.getElementById('condition-filter-section');
+    var chips = document.getElementById('condition-chips');
+    if (!section || !chips) return;
+    var opts = conditionsForCat(cat);
+    if (!opts.length) {
+      section.style.display = 'none';
+      chips.innerHTML = '';
+      return;
+    }
+    section.style.display = '';
+    chips.innerHTML = conditionChipsHtml('rcond', cat);
+  }
+
+  function pricePresetsForCat(cat) {
+    var tier = priceTierForCat(cat);
+    return {
+      tier: tier,
+      presets: PRICE_PRESETS[tier] || PRICE_PRESETS.mid,
+      slider: PRICE_SLIDER[tier] || PRICE_SLIDER.mid
+    };
+  }
+
+  function applyPriceFilters(cat) {
+    var info = pricePresetsForCat(cat);
+    var fr = lang() === 'fr';
+    var radios = document.getElementById('price-radios');
+    if (!radios) {
+      /* search.html: radios بدون غلاف — نبني داخل قسم السعر */
+      var rangeEl = document.getElementById('price-range');
+      if (rangeEl && rangeEl.parentElement) {
+        var existing = rangeEl.parentElement.querySelectorAll('input[name="rprice"]');
+        if (existing.length) {
+          var wrap = existing[0].closest('div[style]') || existing[0].parentElement;
+          if (wrap && wrap !== rangeEl.parentElement) radios = wrap;
+        }
+      }
+    }
+    if (radios) {
+      radios.innerHTML = info.presets
+        .map(function (p) {
+          return (
+            '<label class="filter-option"><input type="radio" name="rprice" value="' +
+            escapeHtml(p.v) +
+            '" class="filter-cb"><span class="filter-label">' +
+            escapeHtml(fr ? p.fr : p.ar) +
+            '</span></label>'
+          );
+        })
+        .join('');
+    }
+    var slider = document.getElementById('price-range');
+    if (slider) {
+      var max = info.slider.max;
+      slider.max = String(max);
+      slider.step = String(info.slider.step);
+      slider.value = String(max);
+      slider.setAttribute('data-price-max', String(max));
+      var labels = slider.parentElement && slider.parentElement.querySelector('.range-labels');
+      if (labels) {
+        var last = labels.querySelector('span:last-child');
+        if (last && last.id !== 'range-val') {
+          last.textContent = max >= 1000000 ? max / 1000000 + 'M+' : max.toLocaleString('en-US') + '+';
+        }
+      }
+      var rv = document.getElementById('range-val');
+      if (rv) rv.textContent = fr ? 'Tout' : 'الكل';
+    }
+    return info;
+  }
+
+  function applyCategoryFilters(cat) {
+    applyConditionFilters(cat);
+    applyPriceFilters(cat);
+  }
+
+  function conditionFilterHtml(name, cat) {
+    name = name || 'rcond';
+    var fr = lang() === 'fr';
+    var opts = conditionsForCat(cat);
+    if (!opts.length) {
+      return '<div class="filter-section" id="condition-filter-section" style="display:none"></div>';
+    }
+    var html =
+      '<div class="filter-section" id="condition-filter-section">' +
+      '<div class="filter-title"><span data-t="filter-condition">' +
+      (fr ? 'État' : 'حالة المنتج') +
+      '</span><button type="button" onclick="clearSection&&clearSection(\'condition\')" data-t="btn-clear-mini">' +
+      (fr ? 'Effacer' : 'مسح') +
+      '</button></div>' +
+      '<div class="chips" id="condition-chips" style="display:flex;flex-wrap:wrap;gap:6px">' +
+      conditionChipsHtml(name, cat) +
+      '</div></div>';
+    return html;
+  }
+
+  function conditionButtonsHtml(cat) {
+    var fr = lang() === 'fr';
+    var opts = conditionsForCat(cat);
+    if (!opts.length) return '';
+    return opts
+      .map(function (o, i) {
+        return (
+          '<button type="button" class="subcat-btn' +
+          (i === 0 ? ' selected' : '') +
+          '" data-cond="' +
+          escapeHtml(o.v) +
+          '">' +
+          escapeHtml(fr ? o.fr : o.ar) +
+          '</button>'
+        );
+      })
+      .join('');
+  }
+
+  function priceBucketFor(priceNum, cat) {
+    var n = Number(priceNum) || 0;
+    var presets = pricePresetsForCat(cat).presets;
+    for (var i = 0; i < presets.length; i++) {
+      var parts = presets[i].v.split('-');
+      var a = parseInt(parts[0], 10);
+      var b = parseInt(parts[1], 10);
+      if (n >= a && n <= b) return presets[i].v;
+    }
+    return presets[presets.length - 1].v;
   }
 
   function emptyStateHtml(opts) {
@@ -559,8 +790,19 @@
     openWishlist: openWishlist,
     wishlistEmptyHtml: wishlistEmptyHtml,
     CONDITION_OPTS: CONDITION_OPTS,
+    CONDITION_BY_PROFILE: CONDITION_BY_PROFILE,
     conditionLabel: conditionLabel,
     conditionFilterHtml: conditionFilterHtml,
+    conditionChipsHtml: conditionChipsHtml,
+    conditionButtonsHtml: conditionButtonsHtml,
+    conditionsForCat: conditionsForCat,
+    conditionProfileForCat: conditionProfileForCat,
+    applyConditionFilters: applyConditionFilters,
+    applyPriceFilters: applyPriceFilters,
+    applyCategoryFilters: applyCategoryFilters,
+    pricePresetsForCat: pricePresetsForCat,
+    priceBucketFor: priceBucketFor,
+    priceTierForCat: priceTierForCat,
     emptyStateHtml: emptyStateHtml,
     trustCardHtml: trustCardHtml,
     imgHtml: imgHtml,

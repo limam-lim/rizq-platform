@@ -609,8 +609,57 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     align-items:center;
     justify-content:center;
     gap:6px;
-    bottom:calc(20px + env(safe-area-inset-bottom,0));
+    bottom:calc(18px + env(safe-area-inset-bottom,0));
+    left:50%;
+    transform:translateX(-50%);
     z-index:400!important;
+    max-width:calc(100vw - 32px);
+  }
+  /* منع تداخل فقاعات الوكيل وزر الفلاتر وأزرار الحالة الفارغة على الهاتف */
+  #rizq-prompt-bubbles{
+    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
+    right:12px!important;
+    max-width:min(220px, calc(100vw - 100px))!important;
+  }
+  html[dir="ltr"] #rizq-prompt-bubbles{left:12px!important;right:auto!important}
+  .rizq-empty-state .es-actions,
+  .empty-state .es-actions,
+  .rc-empty{
+    padding-bottom:calc(72px + env(safe-area-inset-bottom,0));
+    position:relative;
+    z-index:1;
+  }
+  .rizq-empty-state .es-actions,
+  .empty-state .es-actions{
+    flex-direction:column;
+    align-items:stretch;
+    max-width:280px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .rizq-empty-state .es-btn-primary,
+  .empty-state .es-btn-primary,
+  .rizq-empty-state .es-btn-secondary,
+  .empty-state .es-btn-secondary{
+    width:100%;
+    justify-content:center;
+    box-sizing:border-box;
+  }
+  /* على الموبايل: زر الفلاتر العائم يكفي — أخفِ زر «انشر» المكرر من الحالة الفارغة لتقليل التراكب */
+  .rizq-empty-state .es-btn-primary,
+  .empty-state .es-btn-primary{
+    display:none!important;
+  }
+  #result-list-body,
+  .results-area,
+  .browse-results-col{
+    padding-bottom:calc(88px + env(safe-area-inset-bottom,0));
+  }
+  #rizq-chat-toggle{
+    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
+  }
+  .fixed-rizq-logo{
+    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
   }
   .browse-results-col{
     flex:1;
@@ -686,11 +735,29 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
   .mobile-filter-btn{
-    bottom:calc(18px + env(safe-area-inset-bottom,0));
+    bottom:calc(16px + env(safe-area-inset-bottom,0));
     padding:11px 22px;
     font-size:13px;
   }
+  #rizq-prompt-bubbles{display:none!important}
   .breadcrumb{padding:8px 3%;font-size:11px;flex-wrap:wrap}
+  /* درج الفلاتر يملأ عرض الهاتف بالكامل */
+  .filter-drawer{
+    width:100vw!important;
+    max-width:100vw!important;
+    border-left:none!important;
+    border-radius:0!important;
+  }
+  .nav-search{
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .nav-search .btn-post,
+  .nav-search a.btn-post,
+  button.btn-post-nav{
+    width:100%;
+    justify-content:center;
+  }
 }
 
 @media(min-width:901px){
@@ -827,7 +894,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=15.0" defer></script>
-<script src="rizq_ux_polish.js?v=17.0"></script>
+<script src="rizq_ux_polish.js?v=17.1"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
@@ -947,14 +1014,14 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
             <span class="price-sep">—</span>
             <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى">
           </div>
-          <input type="range" id="price-range" min="0" max="2000000" step="10000" value="2000000" oninput="updateRange(this.value)">
-          <div class="range-labels"><span>0</span><span id="range-val">2,000,000+</span></div>
+          <input type="range" id="price-range" min="0" max="500000" step="2500" value="500000" data-price-max="500000" oninput="updateRange(this.value)">
+          <div class="range-labels"><span>0</span><span id="range-val">الكل</span><span>500,000+</span></div>
           <div class="price-divider" aria-hidden="true"></div>
           <div id="price-radios">
-            <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"><span class="filter-label" data-t="price-r1">أقل من 50,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="50000-150000" class="filter-cb"><span class="filter-label" data-t="price-r2">50,000 — 150,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="150000-500000" class="filter-cb"><span class="filter-label" data-t="price-r3">150,000 — 500,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="500000-99999999" class="filter-cb"><span class="filter-label" data-t="price-r4">أكثر من 500,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="0-5000" class="filter-cb"><span class="filter-label" data-t="price-r1">أقل من 5,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="5000-25000" class="filter-cb"><span class="filter-label" data-t="price-r2">5,000 — 25,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="25000-100000" class="filter-cb"><span class="filter-label" data-t="price-r3">25,000 — 100,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="100000-999999999" class="filter-cb"><span class="filter-label" data-t="price-r4">أكثر من 100,000</span></label>
           </div>
         </div>
 
@@ -1393,7 +1460,7 @@ const TRANSLATIONS = {
     'chat-seller-lbl':'البائع',
     'chat-online':'● متصل الآن','cs1':'هل ما زال متاحاً؟','cs2':'ما هو أقل سعر؟','cs3':'هل يمكن الزيارة؟',
     'chat-ph':'اكتب رسالة...','chat-send':'إرسال','chat-continue-wa':'متابعة المحادثة على واتساب',
-    'price-r1':'أقل من 50,000','price-r2':'50,000 — 150,000','price-r3':'150,000 — 500,000','price-r4':'أكثر من 500,000',
+    'price-r1':'أقل من 5,000','price-r2':'5,000 — 25,000','price-r3':'25,000 — 100,000','price-r4':'أكثر من 100,000',
     'save-ad':'♡ حفظ','share-ad':'↗ مشاركة','nav-search-ph':'ابحث في رزق...',
     'dp-phone-hint':'👆 انقر لإظهار الرقم','dp-phone-shown':'📞 انقر للاتصال','dp-call':'📞 اتصال الآن',
     'dp-whatsapp':'واتساب','dp-msg':'✉️ مراسلة البائع','dp-save':'♡ حفظ','dp-share':'↗ مشاركة','dp-print':'🖨️ طباعة',
@@ -1426,7 +1493,7 @@ const TRANSLATIONS = {
     'chat-seller-lbl':'Le vendeur',
     'chat-online':'● En ligne','cs1':'Est-ce encore disponible?','cs2':'Quel est le prix minimum?','cs3':'Puis-je visiter?',
     'chat-ph':'Écrire un message...','chat-send':'Envoyer','chat-continue-wa':'Continuer sur WhatsApp',
-    'price-r1':'Moins de 50 000','price-r2':'50 000 — 150 000','price-r3':'150 000 — 500 000','price-r4':'Plus de 500 000',
+    'price-r1':'Moins de 5 000','price-r2':'5 000 — 25 000','price-r3':'25 000 — 100 000','price-r4':'Plus de 100 000',
     'save-ad':'♡ Sauvegarder','share-ad':'↗ Partager','nav-search-ph':'Rechercher sur Rizq...',
     'dp-phone-hint':'👆 Cliquez pour afficher','dp-phone-shown':'📞 Cliquez pour appeler','dp-call':'📞 Appeler maintenant',
     'dp-whatsapp':'WhatsApp','dp-msg':'✉️ Messagerie Rizq','dp-save':'♡ Sauvegarder','dp-share':'↗ Partager','dp-print':'🖨️ Imprimer',
@@ -1545,6 +1612,7 @@ function renderCatSidebar(effCat){
       }).join('');
       const rs=document.getElementById('rooms-filter-section');
       if(rs) rs.style.display = (effCat==='عقارات') ? '' : 'none';
+      if(window.RizqUx && typeof RizqUx.applyCategoryFilters==='function') RizqUx.applyCategoryFilters(effCat);
       if(urlSub){
         const m=[...wrap.querySelectorAll('input[name="rcat"]')].find(r=>r.value===urlSub||urlSub.includes(r.value));
         if(m)m.checked=true;
@@ -1562,6 +1630,7 @@ function renderCatSidebar(effCat){
     wrap.innerHTML=subs.map(s=>`<label class="filter-option"><input type="radio" name="rcat" value="${s}" class="filter-cb"><span class="filter-label">${fr?subcatFrOf(s):s}</span></label>`).join('')||`<p style="font-size:11px;color:var(--text-muted);padding:4px 0">${_t('no-subs')}</p>`;
     const rs=document.getElementById('rooms-filter-section');if(rs)rs.style.display='none';
   }
+  if(window.RizqUx && typeof RizqUx.applyCategoryFilters==='function') RizqUx.applyCategoryFilters(effCat||'');
   if(urlSub){
     const m=[...wrap.querySelectorAll('input[name="rcat"]')].find(r=>r.value===urlSub||urlSub.includes(r.value));
     if(m)m.checked=true;
@@ -1582,8 +1651,10 @@ function applyFilters(){
     const pmaxV=document.getElementById('pmax').value;
     if(pminV)pMin=parseInt(pminV);
     if(pmaxV)pMax=parseInt(pmaxV);
-    const rv=parseInt(document.getElementById('price-range').value);
-    if(rv<2000000&&!pmaxV)pMax=rv;
+    const prEl=document.getElementById('price-range');
+    const rv=parseInt(prEl&&prEl.value);
+    const rMax=parseInt((prEl&&prEl.getAttribute('data-price-max'))||prEl.max||500000);
+    if(rv<rMax&&!pmaxV)pMax=rv;
   }
   const selRooms=[];
   document.querySelectorAll('#rooms-chips .chip.on').forEach(c=>selRooms.push(parseInt(c.dataset.rooms)));
@@ -2186,11 +2257,16 @@ function filterBySubcat(sub){
 // ── فلترة بنطاق السعر عند الضغط على وسم السعر
 function filterByPrice(priceNum){
   if(!priceNum) return;
+  const navCat=normalizeCat(document.getElementById('nav-cat-select')?.value||'')||urlCat||'';
   let range;
-  if(priceNum<50000) range='0-50000';
-  else if(priceNum<150000) range='50000-150000';
-  else if(priceNum<500000) range='150000-500000';
-  else range='500000-99999999';
+  if(window.RizqUx && typeof RizqUx.priceBucketFor==='function'){
+    range=RizqUx.priceBucketFor(priceNum, navCat);
+  } else {
+    if(priceNum<5000) range='0-5000';
+    else if(priceNum<25000) range='5000-25000';
+    else if(priceNum<100000) range='25000-100000';
+    else range='100000-999999999';
+  }
   document.querySelectorAll('input[name="rprice"]').forEach(r=>{r.checked=(r.value===range);});
   applyFilters();
   if(window.innerWidth<=900) switchTab('list');
@@ -2310,11 +2386,16 @@ function resetAllFilters(){
   const wilaya=document.getElementById('wilaya-select');if(wilaya)wilaya.value='';
   const pmin=document.getElementById('pmin');if(pmin)pmin.value='';
   const pmax=document.getElementById('pmax');if(pmax)pmax.value='';
-  const pr=document.getElementById('price-range');if(pr){pr.value=2000000;updateRange(2000000);}
+  const pr=document.getElementById('price-range');
+  if(pr){
+    const rMax=parseInt(pr.getAttribute('data-price-max')||pr.max||500000);
+    pr.value=rMax;updateRange(rMax);
+  }
   const cbv=document.getElementById('cb-verified');if(cbv)cbv.checked=false;
   const cbp=document.getElementById('cb-pinned');if(cbp)cbp.checked=false;
   const navCat=document.getElementById('nav-cat-select');if(navCat)navCat.value='';
   searchText='';urlCat='';urlSub='';_tagSubcatFilter='';_tagSellerFilter='';_tagWilayaFilter='';
+  if(window.RizqUx && typeof RizqUx.applyCategoryFilters==='function') RizqUx.applyCategoryFilters('');
   applyFilters();
 }
 function clearSection(sec){
@@ -2322,7 +2403,8 @@ function clearSection(sec){
   if(sec==='price'){document.querySelectorAll('input[name="rprice"]').forEach(r=>r.checked=false);
     const pmin=document.getElementById('pmin');if(pmin)pmin.value='';
     const pmax=document.getElementById('pmax');if(pmax)pmax.value='';
-    const pr=document.getElementById('price-range');if(pr){pr.value=2000000;updateRange(2000000);}
+    const pr=document.getElementById('price-range');
+    if(pr){const rMax=parseInt(pr.getAttribute('data-price-max')||pr.max||500000);pr.value=rMax;updateRange(rMax);}
   }
   if(sec==='condition'){document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);}
   applyFilters();
@@ -2333,7 +2415,13 @@ function toggleRoomChip(el){
 }
 function updateRange(val){
   const el=document.getElementById('range-val');
-  if(el){el.textContent=parseInt(val).toLocaleString()+(parseInt(val)>=2000000?'+':'');}
+  const pr=document.getElementById('price-range');
+  const rMax=parseInt((pr&&pr.getAttribute('data-price-max'))||(pr&&pr.max)||500000);
+  const n=parseInt(val);
+  if(el){
+    const fr=_rizqLang()==='fr';
+    el.textContent=(n>=rMax)?(fr?'Tout':'الكل'):(n.toLocaleString()+' MRU');
+  }
 }
 function doSearch(){
   const inp=document.getElementById('nav-search-input');

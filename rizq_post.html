@@ -529,13 +529,13 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="condition-form-group">
       <label class="form-label" data-t-fr='État du produit <span class="req">*</span>'>حالة المنتج <span class="req">*</span></label>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="subcat-btn selected" data-t-fr="✨ Neuf" onclick="selectCondition(this,'جديد')">✨ جديد</button>
-        <button class="subcat-btn" data-t-fr="⭐ Occasion — excellent" onclick="selectCondition(this,'مستعمل — ممتاز')">⭐ مستعمل — ممتاز</button>
-        <button class="subcat-btn" data-t-fr="👍 Occasion — bon état" onclick="selectCondition(this,'مستعمل — جيد')">👍 مستعمل — جيد</button>
-        <button class="subcat-btn" data-t-fr="🔧 À réparer" onclick="selectCondition(this,'للتصليح')">🔧 يحتاج تصليح</button>
+      <div id="condition-btns" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="subcat-btn selected" data-cond="جديد">✨ جديد</button>
+        <button type="button" class="subcat-btn" data-cond="مستعمل — ممتاز">⭐ مستعمل — ممتاز</button>
+        <button type="button" class="subcat-btn" data-cond="مستعمل — جيد">👍 مستعمل — جيد</button>
+        <button type="button" class="subcat-btn" data-cond="للتصليح">🔧 يحتاج تصليح</button>
       </div>
     </div>
 
@@ -869,7 +869,31 @@ function selectCat(btn, cat){
     list.innerHTML='';
     wrap.style.display='none';
   }
+  refreshConditionButtons(cat);
   document.getElementById('btn-next-1').disabled=false;
+}
+function refreshConditionButtons(cat){
+  var group=document.getElementById('condition-form-group');
+  var wrap=document.getElementById('condition-btns');
+  if(!wrap) return;
+  var html='';
+  if(window.RizqUx && typeof RizqUx.conditionButtonsHtml==='function'){
+    html=RizqUx.conditionButtonsHtml(cat||'');
+  }
+  if(!html){
+    /* أقسام بلا حالة منتج (خدمات/وظائف/عقارات…) */
+    if(group) group.style.display='none';
+    selCondition='';
+    wrap.innerHTML='';
+    return;
+  }
+  if(group) group.style.display='';
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('.subcat-btn').forEach(function(b){
+    b.addEventListener('click', function(){ selectCondition(b, b.getAttribute('data-cond')); });
+  });
+  var first=wrap.querySelector('.subcat-btn.selected')||wrap.querySelector('.subcat-btn');
+  selCondition=first ? (first.getAttribute('data-cond')||'جديد') : 'جديد';
 }
 function selectSub(btn,sub){
   document.querySelectorAll('#subcats-list .subcat-btn').forEach(b=>b.classList.remove('selected'));
@@ -877,7 +901,7 @@ function selectSub(btn,sub){
   selSubcat=sub;
 }
 function selectCondition(btn,cond){
-  document.querySelectorAll('#panel-2 .subcat-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('#condition-btns .subcat-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   selCondition=cond;
 }
@@ -913,6 +937,12 @@ document.addEventListener('DOMContentLoaded',function(){
   if(wSel){
     wSel.addEventListener('change',toggleMoughataaField);
     toggleMoughataaField();
+  }
+  var condWrap=document.getElementById('condition-btns');
+  if(condWrap){
+    condWrap.querySelectorAll('.subcat-btn').forEach(function(b){
+      b.addEventListener('click', function(){ selectCondition(b, b.getAttribute('data-cond')); });
+    });
   }
 });
 
@@ -1171,7 +1201,7 @@ function publishAd(){
     city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
     seller_trust_score: 60, // افتراضي — يُحدَّث عند توفر نظام الثقة
-    condition: selCondition || 'جديد',
+    condition: selCondition || '',
     accountType: 'individual', // هذه الصفحة تخص الأفراد فقط — يُستخدم في rizq_moderator_agent.js لتطبيق قواعد قسم "الأفراد" تحديداً (راجع RIZQ_SECTION_MANAGEMENT_RULES.md)
   };
 

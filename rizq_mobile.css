@@ -39,7 +39,7 @@ html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:120px}
   position:relative;z-index:var(--rzq-z-content);
 }
 #nav,.topnav,.mobile-bottom-nav,.mobile-bar,.section-jump-bar,
-nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
+nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-chrome){
   z-index:var(--rzq-z-header)!important;
 }
 #back-to-top,
