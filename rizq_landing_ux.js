@@ -173,7 +173,6 @@
   }
   bindAssistantBtn('jump-assistant');
   bindAssistantBtn('mbn-assistant');
-  bindAssistantBtn('reg-mbn-assistant');
   bindAssistantBtn('nav-assistant-btn');
   bindAssistantBtn('rizq-hdr-assistant');
   bindAssistantBtn('drawer-assistant-btn');
@@ -207,15 +206,6 @@
       });
     }
   }
-  var regMbnMore = document.getElementById('reg-mbn-more');
-  if (regMbnMore && !regMbnMore.getAttribute('data-rizq-more-bound')) {
-    regMbnMore.setAttribute('data-rizq-more-bound', '1');
-    regMbnMore.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (typeof window.toggleMobileNav === 'function') window.toggleMobileNav();
-    });
-  }
-
   var navMoreMobile = document.getElementById('nav-more-mobile-btn');
   if (navMoreMobile && !navMoreMobile.getAttribute('data-rizq-more-bound')) {
     navMoreMobile.setAttribute('data-rizq-more-bound', '1');
