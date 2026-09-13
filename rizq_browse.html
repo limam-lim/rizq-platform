@@ -885,7 +885,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_module_flags.js?v=12.1"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.4"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
@@ -894,7 +894,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=15.0" defer></script>
-<script src="rizq_ux_polish.js?v=17.1"></script>
+<script src="rizq_ux_polish.js?v=17.2"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
@@ -1018,10 +1018,10 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
           <div class="range-labels"><span>0</span><span id="range-val">الكل</span><span>500,000+</span></div>
           <div class="price-divider" aria-hidden="true"></div>
           <div id="price-radios">
-            <label class="filter-option"><input type="radio" name="rprice" value="0-5000" class="filter-cb"><span class="filter-label" data-t="price-r1">أقل من 5,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="5000-25000" class="filter-cb"><span class="filter-label" data-t="price-r2">5,000 — 25,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="25000-100000" class="filter-cb"><span class="filter-label" data-t="price-r3">25,000 — 100,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="100000-999999999" class="filter-cb"><span class="filter-label" data-t="price-r4">أكثر من 100,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="0-5000" class="filter-cb"><span class="filter-label">أقل من 5,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="5000-25000" class="filter-cb"><span class="filter-label">5,000 — 25,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="25000-100000" class="filter-cb"><span class="filter-label">25,000 — 100,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="100000-999999999" class="filter-cb"><span class="filter-label">أكثر من 100,000</span></label>
           </div>
         </div>
 
@@ -1547,7 +1547,7 @@ function applyLang(){
 function onBrowseLangChange(){
   applyLang();
   try{
-    const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat||'عقارات';
+    const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat||'';
     renderCatSidebar(navCat);
   }catch(e){}
   if(window._currentAd){
