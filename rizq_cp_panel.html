@@ -2323,7 +2323,14 @@ const PAYMENTS_DATA = [];
 // نتحقق منه عند كل إعادة تحميل عبر /api/admin/verify بدل الثقة بأي حالة
 // محلية بلا تحقق.
 let currentAdmin = null;
-function _adminBackendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
+function _adminBackendBase(){
+  if (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+  // نفس أصل الصفحة عند فتح اللوحة عبر المسار السري على الخادم (يتجنب فشل localhost≠127.0.0.1)
+  try {
+    if (location && /^https?:$/i.test(location.protocol) && location.host) return location.origin;
+  } catch (e) {}
+  return 'http://127.0.0.1:3000';
+}
 
 function _enterAdminUI(found){
   currentAdmin = found;
