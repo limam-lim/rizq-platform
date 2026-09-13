@@ -16,5 +16,6 @@ services:
         value: https://limam-lim.github.io,https://rizq.mr,https://www.rizq.mr
       - key: OTP_ALLOW_DEMO
         value: "false"
-      # أضف يدوياً من لوحة Render → Environment:
-      # EMAIL_USER, EMAIL_PASS, OTP_PEPPER, BACKEND_SHARED_SECRET
+      # أضف يدوياً من لوحة Render → Environment (مطلوبة للوكلاء):
+      # ANTHROPIC_API_KEY, BACKEND_SHARED_SECRET, RIZQ_API_SECRET
+      # EMAIL_USER, EMAIL_PASS, OTP_PEPPER

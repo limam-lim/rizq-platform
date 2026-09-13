@@ -4349,6 +4349,12 @@ startMaintenanceScheduler({
 app.listen(PORT, async () => {
   console.log('[rizq-backend] running on port ' + PORT);
   console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
+  if (isAnthropicConfigured()) {
+    const k = getAnthropicApiKey();
+    console.log('[rizq-backend] Claude key: READY (len=' + k.length + ', prefix=' + k.slice(0, 7) + '…)');
+  } else {
+    console.warn('[rizq-backend] Claude key: MISSING — set ANTHROPIC_API_KEY in rizq-backend/.env (uncommented) then restart');
+  }
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {
     console.log('[telegram-admin] subscription alerts enabled');
