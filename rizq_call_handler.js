@@ -397,9 +397,18 @@ app.post('/api/call/rizq-input', async (req, res) => {
 app.post('/api/agent/toggle', (req, res) => {
   const { subscriberPhone, active, secret } = req.body;
 
-  // تحقق بسيط من السر (يُحسَّن لاحقاً بـ JWT)
-  const expectedSecret = process.env.RIZQ_API_SECRET || 'rizq_secret_2025';
-  if(secret !== expectedSecret) {
+  // Require a non-default RIZQ_API_SECRET in production (no hardcoded fallback).
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  let expectedSecret = String(process.env.RIZQ_API_SECRET || '').trim();
+  if (!expectedSecret || expectedSecret === 'rizq_secret_2025') {
+    if (isProd) {
+      console.error('[call-handler] RIZQ_API_SECRET missing or insecure default — refusing toggle');
+      return res.status(503).json({ ok: false, error: 'server_misconfigured' });
+    }
+    expectedSecret = 'rizq_secret_2025';
+    console.warn('[call-handler] using insecure default RIZQ_API_SECRET — set env before production');
+  }
+  if (secret !== expectedSecret) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
 
