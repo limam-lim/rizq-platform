@@ -127,6 +127,12 @@ html[dir="ltr"] #services-showcase [style*="position:absolute"][style*="top:-1px
   flex-shrink: 0;
 }
 
+/* Lang + notif + inbox stay physically LEFT of gold CTAs in AR and FR */
+.topbar-actions {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
 /* Only the direct topbar child should be pushed to the end */
 .topbar > .topbar-controls,
 .topbar > .topbar-actions,
