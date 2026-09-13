@@ -36,8 +36,13 @@
     if (isAlwaysLtr(el)) {
       el.setAttribute('dir', 'ltr');
       el.style.direction = 'ltr';
-      el.style.textAlign = 'left';
       el.style.unicodeBidi = 'isolate';
+      // أرقام/هاتف تُكتب LTR، لكن placeholder العربي في واجهة RTL يُحاذى من اليمين
+      if (pageIsRtl() && !String(el.value || '').trim() && AR_RE.test(String(el.placeholder || ''))) {
+        el.style.textAlign = 'right';
+      } else {
+        el.style.textAlign = 'left';
+      }
       return;
     }
     if (isPassword(el)) {
@@ -63,7 +68,14 @@
   }
 
   function syncBidi(el) {
-    if (isAlwaysLtr(el)) return;
+    if (isAlwaysLtr(el)) {
+      if (pageIsRtl() && !String(el.value || '').trim() && AR_RE.test(String(el.placeholder || ''))) {
+        el.style.textAlign = 'right';
+      } else {
+        el.style.textAlign = 'left';
+      }
+      return;
+    }
     if (isPassword(el)) {
       el.style.textAlign = pageIsRtl() ? 'right' : 'left';
       return;

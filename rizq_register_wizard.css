@@ -192,6 +192,15 @@ html[lang="ar"] #modal.reg-wizard-mode input[dir="ltr"] {
   text-align: left !important;
   unicode-bidi: isolate !important;
 }
+/* placeholder عربي فارغ: من اليمين رغم أن الإدخال LTR */
+html[dir="rtl"] #modal.reg-wizard-mode input[type="tel"]:placeholder-shown,
+html[dir="rtl"] #modal.reg-wizard-mode input[type="email"]:placeholder-shown,
+html[dir="rtl"] #modal.reg-wizard-mode input[dir="ltr"][type="text"]:placeholder-shown,
+html[lang="ar"] #modal.reg-wizard-mode input[type="tel"]:placeholder-shown,
+html[lang="ar"] #modal.reg-wizard-mode input[type="email"]:placeholder-shown,
+html[lang="ar"] #modal.reg-wizard-mode input[dir="ltr"][type="text"]:placeholder-shown {
+  text-align: right !important;
+}
 html[dir="rtl"] #modal.reg-wizard-mode label,
 html[lang="ar"] #modal.reg-wizard-mode label {
   direction: rtl !important;
@@ -705,7 +714,17 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   #modal.reg-wizard-mode [id^='p-'] {
     max-width: 860px;
     margin: 0 auto;
-    padding: 36px 4% 48px !important;
+    /* مساحة كافية فوق الشريط السفلي sticky حتى لا يغطي رفع البطاقة */
+    padding: 36px 4% calc(72px + 56px) !important;
+  }
+  html[dir="rtl"] #modal.reg-wizard-mode .rizq-reg-trust-card,
+  html[lang="ar"] #modal.reg-wizard-mode .rizq-reg-trust-card {
+    text-align: right !important;
+    direction: rtl !important;
+  }
+  html[dir="rtl"] #modal.reg-wizard-mode [id^='p-'] > p,
+  html[lang="ar"] #modal.reg-wizard-mode [id^='p-'] > p {
+    text-align: right !important;
   }
 
   /* العناوين أكبر على الكمبيوتر */
@@ -817,7 +836,7 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   html.rizq-reg-page #modal [id^='p-'] {
     max-width: 860px; margin: 0 auto;
-    padding: 36px 4% 48px !important;
+    padding: 36px 4% calc(72px + 56px) !important;
   }
 }
 

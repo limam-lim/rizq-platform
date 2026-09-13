@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.6"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.7"/>
 <script>
 (function () {
   try {
@@ -1603,6 +1603,15 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     text-align: right !important;
     unicode-bidi: isolate !important;
   }
+  /* هاتف/بريد فارغ: placeholder عربي من اليمين */
+  html[dir="rtl"] input[type="tel"].m-input:placeholder-shown,
+  html[dir="rtl"] input[type="email"].m-input:placeholder-shown,
+  html[dir="rtl"] input[dir="ltr"][type="text"].m-input:placeholder-shown,
+  html[lang="ar"] input[type="tel"].m-input:placeholder-shown,
+  html[lang="ar"] input[type="email"].m-input:placeholder-shown,
+  html[lang="ar"] input[dir="ltr"][type="text"].m-input:placeholder-shown {
+    text-align: right !important;
+  }
   html[dir="ltr"] input[type="text"].m-input,
   html[dir="ltr"] textarea.m-input,
   html[dir="ltr"] input[type="password"].m-input {
@@ -1918,7 +1927,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_input_bidi.js?v=1.1"></script>
+<script src="rizq_input_bidi.js?v=1.2"></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
