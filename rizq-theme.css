@@ -1294,3 +1294,38 @@ a.rizq-trust-card:hover {
   .rizq-toast-global { transition: none; }
 }
 
+/* ═══ حارس اللغة — إخفاء اللسان غير النشط على مستوى المنصة ═══ */
+html[lang="fr"] .ar-only,
+html[lang="fr"] .lang-ar,
+html[lang="fr"] [data-lang="ar"] {
+  display: none !important;
+}
+html[lang="ar"] .fr-only,
+html[lang="ar"] .lang-fr,
+html[lang="ar"] [data-lang="fr"] {
+  display: none !important;
+}
+html[lang="ar"] .ar-only,
+html[lang="ar"] .lang-ar,
+html[lang="ar"] [data-lang="ar"] {
+  display: revert;
+}
+html[lang="fr"] .fr-only,
+html[lang="fr"] .lang-fr,
+html[lang="fr"] [data-lang="fr"] {
+  display: revert;
+}
+/* أزرار FR|AR تبقى ظاهرة دائماً */
+#rizq-lang-btn .lang-fr,
+#rizq-lang-btn .lang-ar,
+#rizq-lang-btn .lang-sep,
+.btn-lang .lang-fr,
+.btn-lang .lang-ar,
+.btn-lang .lang-sep,
+.btn-lang-primary .lang-fr,
+.btn-lang-primary .lang-ar,
+.btn-lang-primary .lang-sep {
+  display: inline !important;
+}
+
+

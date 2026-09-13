@@ -477,7 +477,22 @@
     });
     applyStaticDom(document);
     applyDocumentTitle();
+    try {
+      if (global.RizqLangGuard && typeof global.RizqLangGuard.sync === 'function') {
+        global.RizqLangGuard.sync(state.lang);
+      }
+    } catch (eGuard) {}
     document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: state.lang } }));
+  }
+
+  /** إعادة تطبيق الترجمة على جذر ديناميكي (بعد innerHTML) */
+  function refresh(root) {
+    applyStaticDom(root || document);
+    try {
+      if (global.RizqLangGuard && typeof global.RizqLangGuard.refresh === 'function') {
+        global.RizqLangGuard.refresh(root || document);
+      }
+    } catch (eR) {}
   }
 
   function toggle() {
@@ -502,6 +517,7 @@
     apply: applyLang,
     toggle: toggle,
     init: init,
+    refresh: refresh,
     getLang: function () { return state.lang; },
     applyStaticDom: applyStaticDom,
     applyRootDir: applyRootDir,

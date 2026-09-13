@@ -13,10 +13,17 @@
 .rizq-reg-chrome,
 .rizq-reg-footer { display: none; }
 
-/* fr-only مخفي بالأساس — يظهر عند dir=ltr */
+/* fr-only مخفي بالأساس — يظهر عند العربية عبر html[lang] (حارس اللغة) */
 .fr-only { display: none; }
-/* ar-only ظاهر دائماً بالأساس */
 .ar-only { display: inline; }
+html[lang="fr"] .fr-only,
+html[dir="ltr"] .fr-only { display: inline; }
+html[lang="fr"] .ar-only,
+html[dir="ltr"] .ar-only { display: none; }
+html[lang="ar"] .ar-only,
+html[dir="rtl"] .ar-only { display: inline; }
+html[lang="ar"] .fr-only,
+html[dir="rtl"] .fr-only { display: none; }
 
 /* ═══════════════════════════════════════════════════════════
    §1  إخفاء عناصر الرئيسية عند فتح التسجيل
@@ -492,8 +499,10 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
 ═══════════════════════════════════════════════════════════ */
 @media (min-width:769px) {
   /* اللغة */
-  html[dir='rtl'] .ar-only, html[dir='ltr'] .fr-only { display:inline; }
-  html[dir='rtl'] .fr-only, html[dir='ltr'] .ar-only { display:none; }
+  html[lang="ar"] .ar-only, html[dir="rtl"] .ar-only,
+  html[lang="fr"] .fr-only, html[dir="ltr"] .fr-only { display: inline; }
+  html[lang="ar"] .fr-only, html[dir="rtl"] .fr-only,
+  html[lang="fr"] .ar-only, html[dir="ltr"] .ar-only { display: none; }
 
   /* ── #modal: صفحة ضمن المستند — التمرير كالرئيسية لا طبقة تغطي الشاشة ── */
   body.rizq-reg-open {
