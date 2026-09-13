@@ -24,7 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
-const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
+const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount } = require('./middleware/accountAuth');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
@@ -143,7 +143,9 @@ const LOCAL_DEV_ORIGINS = [
   'http://localhost:8080',
   'http://127.0.0.1:8080',
 ];
-LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+if (!isProdEnv()) {
+  LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+}
 app.use(cors({
   origin: function (origin, cb) {
     if (!origin) {
@@ -153,8 +155,8 @@ app.use(cors({
       return cb(null, !isProdEnv());
     }
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // معاينة GitHub Pages (مثل limam-lim.github.io) — للاختبار قبل النطاق الرسمي
-    if (/^https:\/\/[a-z0-9-]+\.github\.io$/i.test(origin)) return cb(null, true);
+    // معاينة GitHub Pages — للتطوير فقط، ليست في الإنتاج
+    if (!isProdEnv() && /^https:\/\/[a-z0-9-]+\.github\.io$/i.test(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
 }));
@@ -612,14 +614,18 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = req.body || {};
     const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
+    const spoofProfile = !!(body.profile && (body.profile.accountId || body.profile.businessName || body.profile.agentTier === 'diamond'));
+    if (profileAccountId || spoofProfile) {
+      // أي ملف شخصي/الماسي يتطلب ملكية موثّقة — يمنع صرف Claude بهوية مزيفة.
+      if (!profileAccountId) {
+        return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required' });
+      }
       const token = req.header('x-account-token') || '';
       const acc = verifyAccountOwner(profileAccountId, token);
       if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
       assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
     }
+    // الزائر العام: فقط بدون profile مشترك/ماسي (ويدجت الموقع العام بمعدل محدود).
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
@@ -634,14 +640,14 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = Object.assign({ agentTier: 'diamond' }, req.body || {});
     const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
-      const token = req.header('x-account-token') || '';
-      const acc = verifyAccountOwner(profileAccountId, token);
-      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-      assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
+    // Diamond /api/ai/chat يتطلب حساباً موثّقاً دائماً — لا صرف Claude مجهول.
+    if (!profileAccountId) {
+      return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required' });
     }
+    const token = req.header('x-account-token') || '';
+    const acc = verifyAccountOwner(profileAccountId, token);
+    if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+    assertAiAgentAccess(acc, { channel: 'widget' });
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
@@ -1253,7 +1259,7 @@ function resolveOptionalAccountViewer(req) {
   const token = req.header('x-account-token') || '';
   if (!accountId || !token) return null;
   const acc = readAccounts().find((a) => a.id === accountId);
-  return (acc && acc.accessToken === token && !acc.suspended) ? accountId : null;
+  return (acc && tokenMatchesAccount(acc, token) && !acc.suspended) ? accountId : null;
 }
 
 function genAccountId() {
@@ -1510,7 +1516,7 @@ app.get('/api/accounts/mine/:id', (req, res) => {
   const acc = list.find((a) => a.id === req.params.id);
   if (!acc) return res.status(404).json({ error: 'account_not_found' });
   const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
+  if (!token || !tokenMatchesAccount(acc, token)) return res.status(401).json({ error: 'unauthorized' });
   res.json({ ok: true, account: stripToken(acc) });
 });
 
@@ -1525,7 +1531,7 @@ app.get('/api/accounts/mine/:id/referrals', (req, res) => {
   const acc = list.find((a) => a.id === req.params.id);
   if (!acc) return res.status(404).json({ error: 'account_not_found' });
   const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
+  if (!token || !tokenMatchesAccount(acc, token)) return res.status(401).json({ error: 'unauthorized' });
   const count = list.filter((a) => a.referredBy === req.params.id && a.referralBonusGranted).length;
   res.json({ ok: true, count, bonusDaysPerReferral: REFERRAL_BONUS_DAYS, bonusDaysTotal: count * REFERRAL_BONUS_DAYS });
 });
@@ -1541,7 +1547,7 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
   const acc = list[idx];
   const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
+  if (!token || !tokenMatchesAccount(acc, token)) return res.status(401).json({ error: 'unauthorized' });
   // حساب مُعلَّق من الأدمن (suspended) لا يستطيع تعديل ملفه الشخصي أيضاً —
   // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
   if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
@@ -1733,8 +1739,9 @@ function handleVerifyDash(req, res) {
   if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
     return res.status(401).json({ error: 'unauthorized' });
   }
+  // لا نُرجع accessToken أبداً — امتلاك dashToken كافٍ لمسارات المالك عبر tokenMatchesAccount.
   const { accessToken, dashToken, idImage, licenseImage, ...safeFields } = acc;
-  res.json({ ok: true, account: Object.assign(safeFields, { accessToken }) });
+  res.json({ ok: true, account: safeFields, ownerProof: 'dashToken' });
 }
 app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
 if (!isProdEnv()) {
@@ -1927,21 +1934,54 @@ app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
 });
 
 /**
- * POST /api/sub-requests/admin/:id/decision — أدمين فقط — يسجّل قرار
- * الموافقة/الرفض. منطق التفعيل الفعلي (تفعيل الباقة، وضع الفيديو الإعلاني)
- * يبقى محلياً في rizq_admin.html كما هو؛ هذا فقط يجعل الحالة النهائية
- * مرئية عبر كل الأجهزة بدل الاقتصار على جهاز الأدمن الذي وافق فعلياً.
+ * POST /api/sub-requests/admin/:id/decision — أدمين فقط —
+ * الموافقة تُفعّل الباقة على الخادم (نفس منطق Telegram)، لا تعتمد على متصفح الأدمن.
  */
-app.post('/api/sub-requests/admin/:id/decision', requireAdminAuth, (req, res) => {
+app.post('/api/sub-requests/admin/:id/decision', requireAdminAuth, async (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
   const list = readSubRequests();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'request_not_found' });
-  list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-  list[idx].reviewedAt = new Date().toISOString();
-  writeSubRequests(list);
-  res.json({ ok: true, request: list[idx] });
+  const row = list[idx];
+  if (row.status !== 'pending') {
+    return res.status(409).json({ error: 'already_processed', status: row.status });
+  }
+  const { activateSubRequest, rejectSubRequest } = require('./services/subRequestActivation');
+  if (action === 'reject') {
+    rejectSubRequest(row);
+    list[idx].status = 'rejected';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    writeSubRequests(list);
+    return res.json({ ok: true, request: list[idx] });
+  }
+  try {
+    // syncAccountPackage / getAccountRecord تُعرَّف لاحقاً عبر lifecycle agent —
+    // نؤجّل الاستدعاء حتى وقت الطلب (بعد اكتمال تحميل الوحدة).
+    const lifecycle = require('./rizq_package_lifecycle_agent');
+    const activation = await activateSubRequest(row, {
+      syncAccountPackage: lifecycle.syncAccountPackage,
+      getAccountRecord: lifecycle.getAccountRecord,
+      readAccounts,
+      writeAccounts,
+      readAdBoosts,
+      writeAdBoosts,
+      registerSubscriber,
+    });
+    if (!activation.ok) {
+      return res.status(500).json({ ok: false, error: activation.error || 'activation_failed' });
+    }
+    list[idx].status = 'approved';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    list[idx].paymentConfirmed = true;
+    writeSubRequests(list);
+    res.json({ ok: true, request: list[idx], activation });
+  } catch (err) {
+    console.error('[sub-requests/decision]', err.message);
+    res.status(500).json({ ok: false, error: err.message || 'activation_failed' });
+  }
 });
 
 // ── وكيل دورة حياة الباقات (تذكير قبل الانتهاء + إيقاف فوري عند periodEnd
@@ -2269,7 +2309,8 @@ function verifyAccountOwner(accountId, token) {
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
-  return (acc && acc.status === 'approved' && acc.accessToken === token && !acc.suspended) ? acc : null;
+  // نقبل accessToken أو dashToken (كلاهما يثبت الملكية دون تصعيد عبر verify-dash).
+  return (acc && acc.status === 'approved' && tokenMatchesAccount(acc, token) && !acc.suspended) ? acc : null;
 }
 
 const RizqPromptsServer = require('../rizq_ai_prompts');
