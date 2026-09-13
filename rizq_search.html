@@ -94,7 +94,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .wilaya-select:focus{border-color:rgba(201,168,76,.5)}
 .wilaya-select option{background:#fff;color:#1a2535}
 .price-inputs{display:flex;gap:8px;align-items:center}
-.price-input{flex:1;min-width:0;-webkit-appearance:none;-moz-appearance:textfield;appearance:none;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;padding:8px 6px;color:#1a2535;font-size:12.5px;font-family:'Segoe UI','Arial',sans-serif;outline:none;text-align:center;transition:border-color .3s}
+.price-input{flex:1;min-width:0;-webkit-appearance:none;-moz-appearance:textfield;appearance:none;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;padding:8px 6px;color:#0f172a;font-size:12.5px;font-weight:600;font-family:'Segoe UI','Arial',sans-serif;outline:none;text-align:center;transition:border-color .3s}
+.price-input::placeholder{color:#334155;opacity:1;font-weight:700}
+.price-input::-webkit-input-placeholder{color:#334155;opacity:1;font-weight:700}
+.price-input::-moz-placeholder{color:#334155;opacity:1;font-weight:700}
 .price-input:focus{border-color:rgba(201,168,76,.5)}
 .price-input::-webkit-outer-spin-button,.price-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .price-sep{color:var(--text-muted);font-size:12px}
@@ -451,7 +454,7 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.4"></script>
+  <script src="rizq_i18n.js?v=16.5"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
@@ -460,7 +463,7 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_auth_gate.js?v=18.8" defer></script>
-<script src="rizq_ux_polish.js?v=17.2"></script>
+<script src="rizq_ux_polish.js?v=17.3"></script>
 </head>
 <body>
 
@@ -565,13 +568,13 @@ main, .page-content.active, .main-content, .results-area,
         <span class="price-sep">—</span>
         <input class="price-input" type="number" placeholder="الأقصى" data-ph="price-max-ph" id="pmax"/>
       </div>
-      <input type="range" min="0" max="500000" step="2500" value="500000" data-price-max="500000" id="price-range" oninput="updateRange(this)"/>
-      <div class="range-labels"><span>0</span><span id="range-val" data-t="range-all">الكل</span><span>500,000+</span></div>
+      <input type="range" min="0" max="5000000" step="25000" value="5000000" data-price-max="5000000" id="price-range" oninput="updateRange(this)"/>
+      <div class="range-labels"><span>0</span><span id="range-val" data-t="range-all">الكل</span><span>5M+</span></div>
       <div id="price-radios" style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
-        <label class="filter-option"><input type="radio" name="rprice" value="0-5000" class="filter-cb"> <span class="filter-label">أقل من 5,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="5000-25000" class="filter-cb"> <span class="filter-label">5,000 — 25,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="25000-100000" class="filter-cb"> <span class="filter-label">25,000 — 100,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="100000-999999999" class="filter-cb"> <span class="filter-label">أكثر من 100,000</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"> <span class="filter-label">أقل من 50,000</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"> <span class="filter-label">50,000 — 250,000</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"> <span class="filter-label">250,000 — 1M</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"> <span class="filter-label">أكثر من 1M</span></label>
       </div>
     </div>
 
