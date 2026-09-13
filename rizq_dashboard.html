@@ -81,9 +81,10 @@ a{text-decoration:none;color:inherit}
 .main-content{margin-right:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden}
 
 /* Top bar */
-.topbar{background:rgba(8,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:0 28px;height:60px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50}
-.topbar-title{font-size:16px;font-weight:800;color:var(--white)}
-.topbar-actions{display:flex;align-items:center;gap:10px;margin-right:auto}
+.topbar{background:rgba(8,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:800;color:var(--white);flex-shrink:0;order:0}
+.topbar-controls{display:flex;align-items:center;gap:10px;margin-inline-start:auto;min-width:0}
+.topbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .btn-new-ad{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:8px 18px;border-radius:9px;font-weight:800;font-size:12.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:flex;align-items:center;gap:6px}
 .btn-new-ad:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
 .topbar .btn-lang,.topbar .btn-lang-primary{
@@ -467,12 +468,13 @@ main, .page-content.active, .main-content, .results-area,
 <!-- ══ MAIN CONTENT ══ -->
 <div class="main-content">
 
-  <!-- TOPBAR -->
+  <!-- TOPBAR: title at logical start, actions at end (LTR+RTL) -->
   <div class="topbar">
+    <span class="topbar-title" id="topbar-title" data-t="overview">نظرة عامة</span>
     <div class="topbar-controls">
       <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
       <div class="topbar-actions">
-        <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+        <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
         <button type="button" class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item[onclick*=notifications]'))" data-t-title="notif-title" aria-label="الإشعارات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-dot" id="notif-dot" hidden></span></button>
         <button type="button" class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item[onclick*=messages]'))" data-t-title="messages-title" aria-label="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12.2a7.5 7.5 0 0 1-7.2 7.5H8.2L4 22.5v-9.3a7.5 7.5 0 1 1 16.5-1"/></svg></button>
         <button class="btn-new-ad" onclick="openShareModal()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" data-t="topbar-share-btn">📤 مشاركة ملفي</button>
@@ -480,7 +482,6 @@ main, .page-content.active, .main-content, .results-area,
         <button class="btn-new-ad" onclick="location.href='rizq_post.html'" data-t="topbar-new-ad-btn">➕ إعلان جديد</button>
       </div>
     </div>
-    <span class="topbar-title" id="topbar-title" data-t="overview">نظرة عامة</span>
   </div>
 
   <!-- ══ PAGE CONTENT ══ -->

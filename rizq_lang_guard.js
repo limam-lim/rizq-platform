@@ -57,10 +57,21 @@
       'html[lang="ar"] .fr-only,html[lang="ar"] .lang-fr,html[lang="ar"] [data-lang="fr"],html[lang="ar"] [lang="fr"]:not(html):not([data-user-content]):not([data-bilingual-ok]){display:none!important}',
       'html[lang="ar"] .ar-only,html[lang="ar"] .lang-ar,html[lang="ar"] [data-lang="ar"]{display:revert}',
       'html[lang="fr"] .fr-only,html[lang="fr"] .lang-fr,html[lang="fr"] [data-lang="fr"]{display:revert}',
-      /* أزرار اللغة نفسها تبقى ظاهرة دائماً */
-      '#rizq-lang-btn .lang-fr,#rizq-lang-btn .lang-ar,#rizq-lang-btn .lang-sep,',
-      '.btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang .lang-sep,',
-      '.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar,.btn-lang-primary .lang-sep{display:inline!important}',
+      /* أزرار اللغة: استثناء أقوى من html[lang] .lang-ar/.lang-fr حتى يظهر FR | AR دائماً */
+      'html[lang="fr"] .btn-lang .lang-fr,html[lang="fr"] .btn-lang .lang-ar,html[lang="fr"] .btn-lang .lang-sep,',
+      'html[lang="ar"] .btn-lang .lang-fr,html[lang="ar"] .btn-lang .lang-ar,html[lang="ar"] .btn-lang .lang-sep,',
+      'html[lang="fr"] .btn-lang-primary .lang-fr,html[lang="fr"] .btn-lang-primary .lang-ar,html[lang="fr"] .btn-lang-primary .lang-sep,',
+      'html[lang="ar"] .btn-lang-primary .lang-fr,html[lang="ar"] .btn-lang-primary .lang-ar,html[lang="ar"] .btn-lang-primary .lang-sep,',
+      'html[lang="fr"] #lang-btn .lang-fr,html[lang="fr"] #lang-btn .lang-ar,html[lang="fr"] #lang-btn .lang-sep,',
+      'html[lang="ar"] #lang-btn .lang-fr,html[lang="ar"] #lang-btn .lang-ar,html[lang="ar"] #lang-btn .lang-sep,',
+      'html[lang="fr"] #rizq-lang-btn .lang-fr,html[lang="fr"] #rizq-lang-btn .lang-ar,html[lang="fr"] #rizq-lang-btn .lang-sep,',
+      'html[lang="ar"] #rizq-lang-btn .lang-fr,html[lang="ar"] #rizq-lang-btn .lang-ar,html[lang="ar"] #rizq-lang-btn .lang-sep,',
+      'html[lang="fr"] #nav-lang-btn .lang-fr,html[lang="fr"] #nav-lang-btn .lang-ar,html[lang="fr"] #nav-lang-btn .lang-sep,',
+      'html[lang="ar"] #nav-lang-btn .lang-fr,html[lang="ar"] #nav-lang-btn .lang-ar,html[lang="ar"] #nav-lang-btn .lang-sep,',
+      'html[lang="fr"] #store-lang-btn .lang-fr,html[lang="fr"] #store-lang-btn .lang-ar,html[lang="fr"] #store-lang-btn .lang-sep,',
+      'html[lang="ar"] #store-lang-btn .lang-fr,html[lang="ar"] #store-lang-btn .lang-ar,html[lang="ar"] #store-lang-btn .lang-sep,',
+      'html[lang="fr"] #office-lang-btn .lang-fr,html[lang="fr"] #office-lang-btn .lang-ar,html[lang="fr"] #office-lang-btn .lang-sep,',
+      'html[lang="ar"] #office-lang-btn .lang-fr,html[lang="ar"] #office-lang-btn .lang-ar,html[lang="ar"] #office-lang-btn .lang-sep{display:inline!important}',
       /* عناصر وُسمت كمسرّبة حتى تُترجم */
       '[data-rizq-lang-leak="1"]{visibility:hidden!important}',
       'html.rizq-lang-guard-ready [data-rizq-lang-leak="1"]{visibility:hidden!important}'
