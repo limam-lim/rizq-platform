@@ -306,6 +306,58 @@ function getAccountRecord(accountId) {
   return store[accountId] || null;
 }
 
+/**
+ * تحديث حالة اشتراك بأمان (إلغاء / إيقاف / إعادة تفعيل) دون إعادة تفعيل دفع.
+ * لا يحذف السجل — يحدّث status + subscriptionStatus فقط.
+ */
+function updatePackageStatus(accountId, status, meta) {
+  meta = meta || {};
+  const allowed = ['cancelled', 'suspended', 'active', 'expired', 'pending', 'expiring_soon'];
+  const next = String(status || '').toLowerCase();
+  if (!accountId || !allowed.includes(next)) {
+    return { ok: false, error: 'invalid_status' };
+  }
+  const store = _load();
+  const existing = store[accountId];
+  if (!existing) return { ok: false, error: 'no_package' };
+
+  const now = new Date().toISOString();
+  const patched = Object.assign({}, existing, {
+    status: next,
+    subscriptionStatus: next,
+    updatedAt: now,
+  });
+
+  if (next === 'cancelled' || next === 'suspended') {
+    patched.paymentConfirmed = false;
+    patched.suspendedAt = next === 'suspended' ? now : (existing.suspendedAt || null);
+    patched.cancelledAt = next === 'cancelled' ? now : (existing.cancelledAt || null);
+    patched.cancelReason = String(meta.reason || '').slice(0, 500) || existing.cancelReason || null;
+    patched.cancelRequestedBy = String(meta.requestedBy || 'system').slice(0, 40);
+    try {
+      const { onSubscriptionExpired } = require('./services/apiIntegration');
+      onSubscriptionExpired(accountId);
+    } catch (apiErr) {
+      console.warn('[updatePackageStatus] api integration:', apiErr.message);
+    }
+  }
+  if (next === 'active') {
+    patched.paymentConfirmed = existing.paymentConfirmed !== false;
+    patched.suspendedAt = null;
+    patched.adminAction = meta.action || 'reactivate';
+    patched.adminReason = String(meta.reason || '').slice(0, 500) || null;
+  }
+  if (meta.action) patched.adminAction = String(meta.action).slice(0, 40);
+  if (meta.reason != null && meta.requestedBy === 'admin') {
+    patched.adminReason = String(meta.reason).slice(0, 500);
+    patched.adminActionAt = now;
+  }
+
+  store[accountId] = patched;
+  _save(store);
+  return { ok: true, record: patched, status: next };
+}
+
 // ── يُستخدم فقط من نقطة الملخص اليومي (/api/admin/daily-digest) لعرض
 //    عدد الحسابات التي أوشكت باقتها على الانتهاء أو أُوقِفت فعلاً — لا
 //    تُستخدم في أي مسار عام (لا تُعيد accessToken الحساس، فقط الحالة). ──
@@ -581,6 +633,7 @@ module.exports = {
   syncAccountPackage,
   createPendingPackageFromRequest,
   getAccountRecord,
+  updatePackageStatus,
   getAllAccountPackageRecords,
   isPackageAccessActive,
   isDiamondActive,

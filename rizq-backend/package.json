@@ -13,7 +13,8 @@
     "test:images": "node scripts/test-image-pipeline.js",
     "test:widget-lang": "node scripts/test-widget-lang.js",
     "telegram:poll": "node scripts/telegram-polling-dev.js",
-    "telegram:webhook": "node scripts/setup-telegram-webhook.js"
+    "telegram:webhook": "node scripts/setup-telegram-webhook.js",
+    "test:hardening": "node scripts/test-prod-hardening.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
@@ -27,7 +28,7 @@
     "nodemailer": "^6.9.15",
     "sharp": "^0.33.5",
     "tar": "^7.4.3",
-    "twilio": "^5.3.0",
+    "twilio": "^5.13.1",
     "xlsx": "^0.18.5"
   },
   "optionalDependencies": {

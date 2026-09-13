@@ -6918,7 +6918,9 @@ function _syncAccountToBackend(acc){
       nni: acc.nni || '',
       idImage: acc.id_image || '',
       licenseImage: acc.license_image || '',
-      activityImage2: acc.activity_image2 || acc.activityImage2 || ''
+      activityImage2: acc.activity_image2 || acc.activityImage2 || '',
+      // كلمة المرور تُشفَّر على الخادم فقط (bcrypt) — لا تُعاد في الرد
+      password: acc.password || ''
     })
   }).then(function(res){
     return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
@@ -7650,25 +7652,26 @@ function doLogin(){
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
-    var res = window.RizqAccount.loginSeller(e, p);
-    if(res && res.ok && res.url){
-      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-      closeModal();
-      setTimeout(function(){ location.href = res.url; }, 400);
-      return;
-    }
-  }
-  var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
-    ? window.RizqAccount.resolveDashboardUrl()
-    : '';
-  if(dashUrl){
+  function _loginSuccess(url){
     showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
     closeModal();
-    setTimeout(function(){ location.href = dashUrl; }, 400);
+    setTimeout(function(){ location.href = url; }, 400);
+  }
+  function _loginFail(){
+    alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
+  }
+  var loginFn = (window.RizqAccount && (window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller));
+  if(loginFn){
+    Promise.resolve(loginFn.call(window.RizqAccount, e, p)).then(function(res){
+      if(res && res.ok && res.url){ _loginSuccess(res.url); return; }
+      var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
+        ? window.RizqAccount.resolveDashboardUrl() : '';
+      if(dashUrl){ _loginSuccess(dashUrl); return; }
+      _loginFail();
+    }).catch(_loginFail);
     return;
   }
-  alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
+  _loginFail();
 }
 
 // ══ XSS helpers ══

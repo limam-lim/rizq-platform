@@ -50,6 +50,8 @@ const axios      = require('axios');
 const { askSubscriberAgent, getSubscriberProfile, getAllSubscriberProfiles, registerSubscriber, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
 const { askAgent } = require('./rizq_agent_brain');
 const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
+const { validateTwilioSignature } = require('./rizq-backend/middleware/twilioWebhookAuth');
+
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -149,7 +151,7 @@ function twiGather(text, action, digits = '1', timeout = 10) {
 //    To            = رقم رزق Twilio
 //    ForwardedFrom = رقم المشترك الأصلي (المفتاح!)
 // ══════════════════════════════════════════════════════════
-app.post('/api/call', (req, res) => {
+app.post('/api/call', validateTwilioSignature, (req, res) => {
   const caller        = req.body.From          || '';
   const callSid       = req.body.CallSid       || '';
   const forwardedFrom = req.body.ForwardedFrom || ''; // رقم المشترك
@@ -267,7 +269,7 @@ function _buildSubscriberGreeting(profile) {
 // ══════════════════════════════════════════════════════════
 //  مدخلات الزائر لوكيل المشترك — هنا يعمل Claude
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/subscriber-input', async (req, res) => {
+app.post('/api/call/subscriber-input', validateTwilioSignature, async (req, res) => {
   const digit     = req.body.Digits || 'timeout';
   const callSid   = req.body.CallSid || '';
   const caller    = req.body.From || '';
@@ -344,7 +346,7 @@ app.post('/api/call/subscriber-input', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  مدخلات المتصل المباشر برزق
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/rizq-input', async (req, res) => {
+app.post('/api/call/rizq-input', validateTwilioSignature, async (req, res) => {
   const digit   = req.body.Digits || '';
   const callSid = req.body.CallSid || '';
   const caller  = req.body.From || '';

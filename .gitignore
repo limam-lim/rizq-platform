@@ -5,6 +5,8 @@ rizq-backend/node_modules/
 # متغيرات البيئة (أسرار: توكنات واتساب، بريد، Twilio، المفاتيح السرية)
 .env
 .env.*
+!.env.example
+!**/.env.example
 rizq-backend/.env
 
 # بيانات المستخدمين الفعلية وقت التشغيل (حسابات، إعلانات، رسائل، تقييمات...)
