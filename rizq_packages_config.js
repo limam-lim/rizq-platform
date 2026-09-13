@@ -1214,8 +1214,8 @@ function localizedName(pkg, lang) {
   if (hit && lang === 'fr' && hit.map.fr) return hit.map.fr;
   var raw = pkg.name ? String(pkg.name).replace(/💎\s*/g, '').trim() : '';
   var rawFr = pkg.name_fr ? String(pkg.name_fr).trim() : '';
-  if (typeof global.RizqLocale !== 'undefined') {
-    return global.RizqLocale.pickBilingual({ ar: raw, fr: rawFr, lang: lang }).text;
+  if (typeof globalThis !== 'undefined' && globalThis.RizqLocale) {
+    return globalThis.RizqLocale.pickBilingual({ ar: raw, fr: rawFr, lang: lang }).text;
   }
   if (lang === 'fr') {
     if (rawFr && !_hasArabic(rawFr)) return rawFr;

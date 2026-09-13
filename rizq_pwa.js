@@ -140,7 +140,7 @@
     }
   }
 
-  global.RizqViewport = { isPhone: isPhoneViewport };
+  (typeof window !== 'undefined' ? window : globalThis).RizqViewport = { isPhone: isPhoneViewport };
 
   function onViewportChange() {
     try { window.dispatchEvent(new Event('resize')); } catch (eR) {}

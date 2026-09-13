@@ -2785,27 +2785,27 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   <div class="pricing-tabs">
     <button class="ptab-card" data-ptab="individual" onclick="switchPriceTab('individual',this)">
       <span class="ptab-icon">👤</span>
-      <span class="ptab-lbl">الأفراد</span>
+      <span class="ptab-lbl" data-t-fr="Particuliers">الأفراد</span>
     </button>
     <button class="ptab-card" data-ptab="stores" onclick="switchPriceTab('stores',this)">
       <span class="ptab-icon">🏪</span>
-      <span class="ptab-lbl">المحلات التجارية</span>
+      <span class="ptab-lbl" data-t-fr="Boutiques">المحلات التجارية</span>
     </button>
     <button class="ptab-card active" data-ptab="offices" onclick="switchPriceTab('offices',this)">
       <span class="ptab-icon">🏢</span>
-      <span class="ptab-lbl">المكاتب الافتراضية</span>
+      <span class="ptab-lbl" data-t-fr="Bureaux virtuels">المكاتب الافتراضية</span>
     </button>
     <button class="ptab-card" data-ptab="corp" onclick="switchPriceTab('corp',this)">
       <span class="ptab-icon">🏛️</span>
-      <span class="ptab-lbl">الشركات والمعارض</span>
+      <span class="ptab-lbl" data-t-fr="Entreprises &amp; showrooms">الشركات والمعارض</span>
     </button>
     <button class="ptab-card" data-ptab="tender" onclick="switchPriceTab('tender',this)">
       <span class="ptab-icon">💼</span>
-      <span class="ptab-lbl">غرفة المناقصة</span>
+      <span class="ptab-lbl" data-t-fr="Appels d'offres">غرفة المناقصة</span>
     </button>
     <button class="ptab-card" data-ptab="ads" onclick="switchPriceTab('ads',this)">
       <span class="ptab-icon">🎬</span>
-      <span class="ptab-lbl">الإعلانات</span>
+      <span class="ptab-lbl" data-t-fr="Annonces">الإعلانات</span>
     </button>
   </div>
 
@@ -5153,6 +5153,16 @@ function applyLandingLang(toAr) {
     el.placeholder = isAr ? el.getAttribute('data-ph-ar') : el.getAttribute('data-ph-fr');
   });
 
+  // /* early pricing lang sync */ — قبل ترجمة النوافذ حتى لا يوقفها أي خطأ لاحق
+  try {
+    var _ptabLabelsEarly = document.querySelectorAll('#pricing .ptab-lbl, .pricing-tabs .ptab-lbl');
+    var _ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','الإعلانات'];
+    var _ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Annonces'];
+    _ptabLabelsEarly.forEach(function(el,i){ if(_ptabAR[i]) el.textContent = isAr ? _ptabAR[i] : _ptabFR[i]; });
+    if (typeof renderPricingSection === 'function') renderPricingSection();
+  } catch (eEarlyPkg) { console.warn('early pricing lang sync failed', eEarlyPkg); }
+
+
   // Navbar + mobile drawer Login / Register buttons
   document.querySelectorAll('.btn-login').forEach(b => b.textContent = isAr ? 'دخول' : 'Connexion');
   document.querySelectorAll('.btn-register').forEach(b => b.textContent = isAr ? '📱 حساب جديد' : '📱 S\'inscrire');
@@ -5361,7 +5371,8 @@ function applyLandingLang(toAr) {
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
 
-// ── Translate all remaining static text blocks — unified RizqI18n.t2() ──
+try { /* remaining-static-i18n */
+  // ── Translate all remaining static text blocks — unified RizqI18n.t2() ──
   // Pop tag
   const popTag = document.querySelector('.pop-tag');
   if(popTag) popTag.textContent = RizqI18n.t2('⭐ الأكثر شعبية','⭐ Le plus populaire');
@@ -5382,6 +5393,7 @@ function applyLandingLang(toAr) {
   if(liForgot) liForgot.textContent = RizqI18n.t2('نسيت كلمة المرور؟','Mot de passe oublié?');
   const liBtn = document.querySelector('#p-login .m-btn-main');
   if(liBtn) liBtn.textContent = RizqI18n.t2('دخول ←','Connexion →');
+  const authTabLogin = document.getElementById('modal-tab-login');
   if(authTabLogin) authTabLogin.textContent = RizqI18n.t2('دخول بائع','Connexion vendeur');
   const authTabRegister = document.getElementById('modal-tab-register');
   if(authTabRegister) authTabRegister.textContent = RizqI18n.t2('حساب بائع جديد','Nouveau compte vendeur');
@@ -5584,6 +5596,9 @@ function applyLandingLang(toAr) {
   try { applyFullTranslation(lang); } catch (eTr) {}
   try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) {}
   try { translateCatTaxonomy(!isAr); } catch (eTx) {}
+  
+  } catch (eRemI18n) { console.warn('remaining static i18n failed', eRemI18n); }
+
   try { if (typeof renderPricingSection === 'function') renderPricingSection(); } catch (ePr) {}
   try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSg) {}
   try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) {}
