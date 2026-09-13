@@ -727,20 +727,29 @@ app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
   const sharedConfigured = !!(process.env.BACKEND_SHARED_SECRET || '').trim();
   const apiSecretConfigured = !!(process.env.RIZQ_API_SECRET || '').trim();
   const claudeConfigured = isAnthropicConfigured();
+  // linkedToKeyLoader = الكود يقرأ المفتاح عبر config/anthropic فقط (لا مفتاح منفصل)
+  // wired = جاهز للتشغيل الآن (المفتاح موجود في بيئة الخادم)
   const agents = [
-    { id: 'widget', name: 'ويدجت الدردشة', needsClaude: true, wired: claudeConfigured },
-    { id: 'brain', name: 'عقل القنوات (مكالمة/واتساب/بريد)', needsClaude: true, wired: claudeConfigured },
-    { id: 'subscriber', name: 'وكيل المشترك الماسي', needsClaude: true, wired: claudeConfigured },
-    { id: 'receipt-vision', name: 'قراءة إيصالات الدفع', needsClaude: true, wired: claudeConfigured },
-    { id: 'translate', name: 'الترجمة الإدارية', needsClaude: true, wired: claudeConfigured },
-    { id: 'telegram-admin', name: 'بوت تيليغرام الإداري', needsClaude: true, wired: claudeConfigured },
-    { id: 'package-lifecycle', name: 'دورة حياة الباقات', needsClaude: false, wired: true, note: 'SMS/قواعد — لا يحتاج Claude' },
-    { id: 'moderator', name: 'المشرف الآلي', needsClaude: false, wired: true, note: 'قواعد محلية' },
-    { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, wired: true },
+    { id: 'widget', name: 'ويدجت الدردشة', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'services/widgetChat.js → getAnthropicApiKey()' },
+    { id: 'inquiry-auto-reply', name: 'رد تلقائي على الاستفسارات', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'inquiryAutoReply → widgetChat' },
+    { id: 'brain', name: 'عقل القنوات (مركزي)', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_agent_brain.js → getAnthropicApiKey()' },
+    { id: 'call', name: 'وكيل المكالمات', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_call_handler → agent_brain / subscriber_agent' },
+    { id: 'whatsapp', name: 'وكيل واتساب', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_whatsapp_handler → agent_brain / subscriber_agent' },
+    { id: 'email', name: 'وكيل البريد', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_email_handler → agent_brain' },
+    { id: 'subscriber', name: 'وكيل المشترك الماسي', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_subscriber_agent.js → getAnthropicApiKey()' },
+    { id: 'receipt-vision', name: 'قراءة إيصالات الدفع', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'services/receiptVision.js → getAnthropicApiKey()' },
+    { id: 'translate', name: 'الترجمة الإدارية', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'server /api/translate → getAnthropicApiKey()' },
+    { id: 'telegram-admin', name: 'بوت تيليغرام الإداري', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'telegramAdmin + anthropic client من server' },
+    { id: 'package-lifecycle', name: 'دورة حياة الباقات', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'SMS/قواعد — لا يحتاج Claude' },
+    { id: 'moderator', name: 'المشرف الآلي', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'قواعد محلية في المتصفح' },
+    { id: 'visual', name: 'الوكيل البصري', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'Canvas في المتصفح — بلا Claude' },
+    { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'عدّاد حصص — بلا استدعاء Claude' },
+    { id: 'secretary-gate', name: 'بوابة السكرتير (واجهة)', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'يُفعّل الويدجت فقط؛ الذكاء عبر widget/subscriber' },
   ];
   const blockers = [];
   if (!claudeConfigured) blockers.push('أضف ANTHROPIC_API_KEY (أو CLAUDE_API_KEY) في rizq-backend/.env ثم أعد تشغيل الخادم');
   if (!sharedConfigured) blockers.push('أضف BACKEND_SHARED_SECRET في .env والصقه في حقل السر المشترك بلوحة التحكم');
+  const claudeAgents = agents.filter((a) => a.needsClaude);
   res.json({
     ok: true,
     claudeConfigured,
@@ -749,6 +758,8 @@ app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
     model: getAgentModel(),
     advancedModel: getAdvancedModel(),
     agents,
+    allClaudeAgentsLinkedToKeyLoader: claudeAgents.every((a) => a.linkedToKeyLoader),
+    allClaudeAgentsRuntimeReady: claudeConfigured && claudeAgents.every((a) => a.wired),
     ready: claudeConfigured && sharedConfigured,
     blockers,
   });

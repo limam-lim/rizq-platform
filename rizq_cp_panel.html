@@ -5262,9 +5262,13 @@ async function checkSubAgentHealth(){
     if(health && health.ok){
       lines.push(health.sharedSecretConfigured ? '✅ BACKEND_SHARED_SECRET مضبوط على الخادم' : '❌ BACKEND_SHARED_SECRET ناقص في .env');
       lines.push(secret ? '✅ السر المشترك محفوظ في اللوحة' : '⚠️ حقل السر المشترك في اللوحة فارغ — الصقه بعد الحفظ');
+      if(health.allClaudeAgentsLinkedToKeyLoader){
+        lines.push('✅ كل وكلاء Claude مربوطون بمُحمّل المفتاح الموحّد (config/anthropic)');
+      }
       (health.agents||[]).forEach(function(a){
         if(!a.needsClaude) return;
-        lines.push((a.wired ? '✅ ' : '❌ ') + a.name);
+        var link = a.linkedToKeyLoader === false ? '⚠️ غير مربوط بالكود' : '';
+        lines.push((a.wired ? '✅ ' : '❌ ') + a.name + (a.wired ? '' : ' (بانتظار المفتاح على الخادم)') + (link ? ' ' + link : ''));
       });
       if(health.blockers && health.blockers.length){
         health.blockers.forEach(function(b){ lines.push('→ ' + b); });
