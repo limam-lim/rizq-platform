@@ -130,6 +130,65 @@
     return { ok: true, account: acc, url: url };
   }
 
+  /**
+   * دخول البائع عبر الخادم (bcrypt) مع سقوط آمن إلى التخزين المحلي.
+   * يُرجع Promise دائماً.
+   */
+  function loginSellerAsync(email, password) {
+    var local = loginSeller(email, password);
+    if (local && local.ok) return Promise.resolve(local);
+    var base = '';
+    try { base = String(window.RIZQ_BACKEND_BASE || window.RIZQ_BACKEND_URL || '').replace(/\/$/, ''); } catch (e) {}
+    if (!base) return Promise.resolve({ ok: false, code: 'invalid' });
+    return fetch(base + '/api/accounts/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function (res) {
+      return res.json().then(function (data) { return { res: res, data: data }; }).catch(function () {
+        return { res: res, data: null };
+      });
+    }).then(function (out) {
+      var data = out.data;
+      if (!data || !data.ok || !data.id) return { ok: false, code: data && data.error ? data.error : 'invalid' };
+      if (data.status && data.status !== 'approved') {
+        return { ok: false, code: 'account_pending', status: data.status };
+      }
+      var acc = {
+        id: data.id,
+        token: data.dashToken || data.token || data.accessToken || '',
+        dashToken: data.dashToken || data.token || '',
+        accessToken: data.accessToken || '',
+        email: String(email || '').trim().toLowerCase(),
+        password: password,
+        status: 'approved',
+        type: data.type || 'individual',
+        name: data.name || ''
+      };
+      // حدّث السجل المحلي إن وُجد
+      try {
+        var list = readPendingAccounts();
+        var idx = list.findIndex(function (a) { return a && a.id === acc.id; });
+        if (idx >= 0) {
+          list[idx].token = acc.token || list[idx].token;
+          list[idx].accessToken = acc.accessToken;
+          list[idx].backendAccessToken = acc.accessToken;
+          list[idx].status = 'approved';
+          list[idx].password = password;
+          acc = Object.assign({}, list[idx], acc);
+        } else {
+          list.push(acc);
+        }
+        localStorage.setItem('rizq_pending_accounts', JSON.stringify(list));
+      } catch (e) {}
+      setActiveSession(acc);
+      var url = buildDashboardUrl(acc);
+      return { ok: true, account: acc, url: url, source: 'server' };
+    }).catch(function () {
+      return { ok: false, code: 'network' };
+    });
+  }
+
   function goAfterRegistration(acc) {
     if (!acc) return false;
     if (acc.status === 'approved' && acc.token) {
@@ -239,6 +298,7 @@
     clearSession: clearSession,
     setActiveSession: setActiveSession,
     loginSeller: loginSeller,
+    loginSellerAsync: loginSellerAsync,
     goAfterRegistration: goAfterRegistration,
     findSellerByLogin: findSellerByLogin
   };

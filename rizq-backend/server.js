@@ -117,7 +117,17 @@ function getSectionRules() {
 
 // ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
 // (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// إيصالات الدفع في uploads/receipts محمية — لا تُعرَض عبر static أبداً.
+app.use('/uploads/receipts', (req, res) => {
+  res.status(403).json({ ok: false, error: 'forbidden' });
+});
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  dotfiles: 'deny',
+  index: false,
+  setHeaders(res) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  },
+}));
 
 function readJson(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
@@ -186,19 +196,15 @@ const adsSubmitLimiter = rateLimit({
 // وتسجيل الدخول يمر عبر /api/admin/login الذي يتحقق من الهاش ويُصدر
 // جلسة (token) عشوائية يتحقق منها الخادم في كل مرة عبر requireAdminSession.
 //
-// لإضافة حساب جديد أو تغيير كلمة سر موجودة، احسب الهاش بهذا الأمر ثم
-// ضع الناتج في passHash أدناه:
+// لإضافة حساب أدمن: ضع bcrypt hash في ADMIN_ACCOUNTS_JSON أو ADMIN_PASS_HASH_N
 //   node -e "console.log(require('bcryptjs').hashSync('كلمة_السر_الجديدة', 10))"
 const bcrypt = require('bcryptjs');
-const ADMIN_ACCOUNTS = [
-  // إصلاح 22/07/2026: كلمات السر أُعيد توليدها لأن النسخة الأصلية (plaintext) لم تكن
-  // محفوظة في أي مكان قابل للاسترجاع (bcrypt هاش لا يُفَكّ عكسياً). القيم الجديدة
-  // أُرسلت لـ Limam مرة واحدة في المحادثة — احفظها فوراً في مدير كلمات سر.
-  { user: 'admin', passHash: '$2a$10$P9STsJ2wU2iWUvL7IrtHl.KgOqcdRnUxCv7yOubuksk4zGbxo69Ki', name: 'M. LIMAM', role: 'super' },
-  { user: 'mod1', passHash: '$2a$10$Pz58idNGtWx5zJh6D.wwtOlKDZaZm23h6XQivYWhSyDA43pApWriG', name: 'المشرف الأول', role: 'moderator' },
-  { user: 'mod2', passHash: '$2a$10$j1o0c2FMvWxLsFJn5B5IMuCQ8GfJc46rsWwVz3Ho/Z8hkU/eRUfgW', name: 'المشرف الثاني', role: 'moderator' },
-  // { user: 'mod3', passHash: '...', name: 'الاسم', role: 'moderator' },
-];
+const { hashPassword, verifyPassword, validatePasswordStrength } = require('./services/passwordService');
+const { storeReceipt, resolveReceiptAbsolute, ensureReceiptsDir } = require('./services/receiptStorage');
+const { loadAdminAccounts } = require('./services/adminAccounts');
+ensureReceiptsDir();
+// حسابات الأدمن من البيئة فقط (ADMIN_ACCOUNTS_JSON أو ADMIN_USER_N / ADMIN_PASS_HASH_N)
+const ADMIN_ACCOUNTS = loadAdminAccounts();
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
 const { requireAdminSession, requireAdminAuth, requireSharedSecret } = createAdminAuth({ adminSessions });
@@ -1286,11 +1292,14 @@ function toPublicAccountForViewer(acc, viewerAccountId) {
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
 function stripToken(acc) {
-  const { accessToken, ...safe } = acc;
+  const { accessToken, password, passwordHash, passHash, ...safe } = acc;
   if (safe.id_verified) {
     delete safe.idImage;
     delete safe.id_image;
   }
+  delete safe.password;
+  delete safe.passwordHash;
+  delete safe.passHash;
   return safe;
 }
 
@@ -1322,7 +1331,7 @@ app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
  * شركة/فرد). يُعيد {id, accessToken} — الجهاز المسجِّل يحفظهما محلياً
  * ليتحقق لاحقاً من حالة الموافقة عبر GET /api/accounts/mine/:id.
  */
-app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
+app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const b = req.body || {};
   const pFlags = getPlatformFlags();
   if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
@@ -1365,9 +1374,22 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const dashToken = autoApproved
     ? (String(b.dashToken || '').slice(0, 100) || ('TK_' + crypto.randomBytes(6).toString('hex').toUpperCase()))
     : null;
+  // كلمة المرور — تُشفَّر على الخادم فقط (لا تُخزَّن plaintext ولا تُعاد في الرد)
+  let passwordHash = null;
+  const rawPassword = b.password != null ? String(b.password) : '';
+  if (rawPassword) {
+    const strength = validatePasswordStrength(rawPassword);
+    if (!strength.ok) return res.status(400).json({ ok: false, error: strength.error, message: strength.message });
+    try {
+      passwordHash = await hashPassword(rawPassword);
+    } catch (pwErr) {
+      return res.status(400).json({ ok: false, error: pwErr.code || 'password_invalid', message: pwErr.message });
+    }
+  }
   const acc = {
     id,
     accessToken,
+    passwordHash,
     type: String(b.type).slice(0, 30),
     name: String(b.name).slice(0, 120),
     phone: String(b.phone || '').slice(0, 30),
@@ -1541,7 +1563,7 @@ app.get('/api/accounts/mine/:id/referrals', (req, res) => {
  * يحدّث ملفه الشخصي (الوصف، الفيديو، الصورة، رقم واتساب...) من أي جهاز.
  * لا يمكن تعديل status/accessToken/id عبر هذا المسار أبداً.
  */
-app.patch('/api/accounts/mine/:id', (req, res) => {
+app.patch('/api/accounts/mine/:id', async (req, res) => {
   const list = readAccounts();
   const idx = list.findIndex((a) => a.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
@@ -1574,11 +1596,21 @@ app.patch('/api/accounts/mine/:id', (req, res) => {
     if (k === 'idImage' && acc.id_verified) return;
     acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
   });
-  // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
+    // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
   // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
   // فعلي: ACCOUNT_PUBLIC_FIELDS أصلاً لا يُخرج phone لغير صاحب الحساب أو
   // الأدمن بتاتاً (قرار خصوصية سابق) — هذا الحقل يُخزَّن فقط ليُستخدم
   // لاحقاً (مثلاً في نظام الرسائل) بدل أن يُفقَد كما كان الحال سابقاً.
+  // تغيير كلمة المرور — تُشفَّر على الخادم فقط (لا plaintext).
+  if (b.password !== undefined && String(b.password).length) {
+    const strength = validatePasswordStrength(String(b.password));
+    if (!strength.ok) return res.status(400).json({ ok: false, error: strength.error, message: strength.message });
+    try {
+      acc.passwordHash = await hashPassword(String(b.password));
+    } catch (pwErr) {
+      return res.status(400).json({ ok: false, error: pwErr.code || 'password_invalid', message: pwErr.message });
+    }
+  }
   if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone;
   if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
   if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
@@ -1744,6 +1776,78 @@ function handleVerifyDash(req, res) {
   res.json({ ok: true, account: safeFields, ownerProof: 'dashToken' });
 }
 app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
+
+/**
+ * POST /api/accounts/login — دخول البائع بالبريد/الهاتف + كلمة المرور (bcrypt على الخادم).
+ */
+const accountsLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'محاولات كثيرة جداً — حاول لاحقاً' },
+});
+app.post('/api/accounts/login', accountsLoginLimiter, async (req, res) => {
+  const b = req.body || {};
+  const login = String(b.email || b.phone || b.login || '').trim().toLowerCase();
+  const password = String(b.password || '');
+  if (!login || !password) return res.status(400).json({ ok: false, error: 'login_and_password_required' });
+  const list = readAccounts();
+  const digits = login.replace(/\D/g, '').slice(-8);
+  const acc = list.find((a) => {
+    const email = String(a.email || '').trim().toLowerCase();
+    const phone = String(a.phone || '').replace(/\D/g, '').slice(-8);
+    return (email && email === login) || (digits.length >= 8 && phone === digits);
+  });
+  if (!acc || !acc.passwordHash) {
+    return res.status(401).json({ ok: false, error: 'invalid_credentials' });
+  }
+  const okPw = await verifyPassword(password, acc.passwordHash);
+  if (!okPw) return res.status(401).json({ ok: false, error: 'invalid_credentials' });
+  if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
+  if (acc.status !== 'approved') return res.status(403).json({ ok: false, error: 'account_pending', status: acc.status });
+  res.json({
+    ok: true,
+    id: acc.id,
+    accessToken: acc.accessToken,
+    dashToken: acc.dashToken || null,
+    status: acc.status,
+    type: acc.type,
+    name: acc.name,
+  });
+});
+
+/** Alias متوافق مع مواصفات الإطلاق */
+app.post('/api/auth/vendor-login', accountsLoginLimiter, async (req, res) => {
+  req.url = '/__vendor_login_internal';
+  // إعادة استخدام نفس المنطق عبر استدعاء مباشر بسيط:
+  const b = req.body || {};
+  const login = String(b.email || b.phone || b.login || '').trim().toLowerCase();
+  const password = String(b.password || '');
+  if (!login || !password) return res.status(400).json({ ok: false, error: 'login_and_password_required' });
+  const list = readAccounts();
+  const digits = login.replace(/\D/g, '').slice(-8);
+  const acc = list.find((a) => {
+    const email = String(a.email || '').trim().toLowerCase();
+    const phone = String(a.phone || '').replace(/\D/g, '').slice(-8);
+    return (email && email === login) || (digits.length >= 8 && phone === digits);
+  });
+  if (!acc || !acc.passwordHash) return res.status(401).json({ ok: false, error: 'invalid_credentials' });
+  const okPw = await verifyPassword(password, acc.passwordHash);
+  if (!okPw) return res.status(401).json({ ok: false, error: 'invalid_credentials' });
+  if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
+  if (acc.status !== 'approved') return res.status(403).json({ ok: false, error: 'account_pending', status: acc.status });
+  res.json({
+    ok: true,
+    id: acc.id,
+    accessToken: acc.accessToken,
+    dashToken: acc.dashToken || null,
+    status: acc.status,
+    type: acc.type,
+    name: acc.name,
+  });
+});
+
 if (!isProdEnv()) {
   app.get('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
 }
@@ -1858,6 +1962,16 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
     ? clientId : ('sub_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex'));
+  let receiptPath = null;
+  let receiptMeta = null;
+  if (b.receiptImage) {
+    const stored = storeReceipt(b.receiptImage, { accountId: String(b.accountId || '').slice(0, 60), requestId: id });
+    if (!stored.ok) {
+      return res.status(stored.status || 400).json({ ok: false, error: stored.error, maxBytes: stored.maxBytes });
+    }
+    receiptPath = stored.relativePath;
+    receiptMeta = { mime: stored.mime, bytes: stored.bytes };
+  }
   const rec = {
     id,
     pkg: String(b.pkg).slice(0, 60),
@@ -1878,7 +1992,9 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     category: ['video', 'tender', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
-    receiptImage: b.receiptImage ? String(b.receiptImage).slice(0, 2_500_000) : null,
+    receiptImage: null, // لم يعد يُخزَّن base64 — انظر receiptPath
+    receiptPath,
+    receiptMeta,
     riskLevel: String(b.riskLevel || 'unreviewed').slice(0, 20),
     flags: Array.isArray(b.flags) ? b.flags.slice(0, 20) : [],
     // إصلاح مرافق: adId/adTitle (فئة 'ad_boost') لم تكونا تُخزَّنان إطلاقاً هنا،
@@ -1931,6 +2047,23 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
  */
 app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
   res.json({ ok: true, requests: readSubRequests().reverse() });
+});
+
+/**
+ * GET /api/sub-requests/admin/:id/receipt — أدمين فقط —
+ * يُرجع ملف الإيصال من المجلد المحمي (غير قابل للتصفح العام).
+ */
+app.get('/api/sub-requests/admin/:id/receipt', requireAdminAuth, (req, res) => {
+  const list = readSubRequests();
+  const row = list.find((r) => r.id === req.params.id);
+  if (!row) return res.status(404).json({ error: 'request_not_found' });
+  const abs = resolveReceiptAbsolute(row.receiptPath);
+  if (!abs) return res.status(404).json({ error: 'receipt_not_found' });
+  const mime = (row.receiptMeta && row.receiptMeta.mime) || 'application/octet-stream';
+  res.setHeader('Content-Type', mime);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.sendFile(abs);
 });
 
 /**
@@ -1993,6 +2126,7 @@ const {
   broadcastSMS,
   getAccountRecord,
   getAllAccountPackageRecords,
+  updatePackageStatus,
   syncAccountPackage,
   createPendingPackageFromRequest,
   REFERRAL_BONUS_DAYS,
@@ -2001,6 +2135,104 @@ const {
 // معالج /api/account-package/sync (داخل الملف الآخر) أن يقرأ/يكتب حقل
 // referredBy على accounts.json عند منح مكافأة إحالة — راجع rizq_package_
 // lifecycle_agent.js لتفاصيل آلية "جيب صاحبك واربح".
+
+/**
+ * POST /api/account-package/:id/cancel — صاحب الحساب يطلب إلغاء/إيقاف باقته.
+ * body: { action: 'cancel'|'suspend', reason? }
+ * لا يحذف السجل — يحدّث الحالة إلى cancelled/suspended ويُخفّض الصلاحيات.
+ */
+app.post('/api/account-package/:id/cancel', async (req, res) => {
+  try {
+    const accountId = String(req.params.id || '').trim();
+    const token = extractAccountToken(req) || '';
+    const acc = verifyAccountOwner(accountId, token);
+    if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const action = String((req.body || {}).action || 'cancel').toLowerCase();
+    if (action !== 'cancel' && action !== 'suspend') {
+      return res.status(400).json({ ok: false, error: "action يجب أن يكون 'cancel' أو 'suspend'" });
+    }
+    const lifecycle = require('./rizq_package_lifecycle_agent');
+    const rec = lifecycle.getAccountRecord(accountId);
+    if (!rec) return res.status(404).json({ ok: false, error: 'no_package' });
+    const nextStatus = action === 'suspend' ? 'suspended' : 'cancelled';
+    const reason = String((req.body || {}).reason || '').slice(0, 500);
+    const updated = lifecycle.updatePackageStatus(accountId, nextStatus, {
+      reason,
+      requestedBy: 'account',
+      action,
+    });
+    if (!updated.ok) {
+      return res.status(400).json({ ok: false, error: updated.error || 'cancel_failed' });
+    }
+    // Mirror on account row for entitlements / dashboards
+    const list = readAccounts();
+    const idx = list.findIndex((a) => a.id === accountId);
+    if (idx >= 0) {
+      list[idx].subscriptionStatus = nextStatus;
+      list[idx].pkg_status = nextStatus;
+      list[idx].packageCancelRequestedAt = new Date().toISOString();
+      writeAccounts(list);
+    }
+    res.json({ ok: true, status: nextStatus, record: updated.record });
+  } catch (err) {
+    console.error('[account-package/cancel]', err.message);
+    res.status(500).json({ ok: false, error: err.message || 'cancel_failed' });
+  }
+});
+
+/**
+ * POST /api/account-package/:id/admin-suspend — أدمين يوقف/يلغي باقة حساب.
+ * body: { action: 'suspend'|'cancel'|'reactivate', reason? }
+ */
+app.post('/api/account-package/:id/admin-suspend', requireAdminAuth, async (req, res) => {
+  try {
+    const accountId = String(req.params.id || '').trim();
+    const action = String((req.body || {}).action || 'suspend').toLowerCase();
+    if (!['suspend', 'cancel', 'reactivate'].includes(action)) {
+      return res.status(400).json({ ok: false, error: 'invalid_action' });
+    }
+    const lifecycle = require('./rizq_package_lifecycle_agent');
+    const rec = lifecycle.getAccountRecord(accountId);
+    if (!rec && action !== 'reactivate') return res.status(404).json({ ok: false, error: 'no_package' });
+    const nextStatus = action === 'reactivate' ? 'active' : (action === 'cancel' ? 'cancelled' : 'suspended');
+    const reason = String((req.body || {}).reason || '').slice(0, 500);
+    let updated;
+    if (!rec && action === 'reactivate') {
+      return res.status(404).json({ ok: false, error: 'no_package' });
+    }
+    updated = lifecycle.updatePackageStatus(accountId, nextStatus, {
+      reason,
+      requestedBy: 'admin',
+      action,
+    });
+    if (!updated.ok) {
+      return res.status(400).json({ ok: false, error: updated.error || 'admin_suspend_failed' });
+    }
+    const list = readAccounts();
+    const idx = list.findIndex((a) => a.id === accountId);
+    if (idx >= 0) {
+      list[idx].subscriptionStatus = nextStatus;
+      list[idx].pkg_status = nextStatus;
+      if (action === 'suspend') {
+        list[idx].suspended = true;
+        list[idx].suspendedAt = new Date().toISOString();
+      }
+      if (action === 'reactivate') {
+        list[idx].suspended = false;
+        list[idx].suspendedAt = null;
+      }
+      if (action === 'cancel') {
+        list[idx].packageCancelledAt = new Date().toISOString();
+      }
+      writeAccounts(list);
+    }
+    res.json({ ok: true, status: nextStatus, accountId, record: updated.record });
+  } catch (err) {
+    console.error('[account-package/admin-suspend]', err.message);
+    res.status(500).json({ ok: false, error: err.message || 'admin_suspend_failed' });
+  }
+});
+
 setupPackageLifecycleAPI(app, requireAdminAuth, { readAccounts, writeAccounts });
 
 /** GET /api/entitlements/:accountId — صلاحيات الحساب (محمي بـ x-account-token) */
