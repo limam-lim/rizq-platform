@@ -26,11 +26,25 @@
 
   function getLang() {
     try {
-      if (global.RizqI18n && typeof global.RizqI18n.getLang === 'function') return global.RizqI18n.getLang();
-      return localStorage.getItem('rizq_lang') || 'ar';
-    } catch (e) {
-      return 'ar';
-    }
+      if (typeof window !== 'undefined' && typeof window.isAr === 'boolean') {
+        return window.isAr ? 'ar' : 'fr';
+      }
+    } catch (e0) {}
+    try {
+      if (global.RizqI18n && typeof global.RizqI18n.getLang === 'function') {
+        var g = global.RizqI18n.getLang();
+        if (g === 'fr' || g === 'ar') return g;
+      }
+    } catch (e1) {}
+    try {
+      var ls = localStorage.getItem('rizq_lang');
+      if (ls === 'fr' || ls === 'ar') return ls;
+    } catch (e2) {}
+    try {
+      var hl = document.documentElement && document.documentElement.getAttribute('lang');
+      if (hl === 'fr' || hl === 'ar') return hl;
+    } catch (e3) {}
+    return 'ar';
   }
 
   function t2(ar, fr) {

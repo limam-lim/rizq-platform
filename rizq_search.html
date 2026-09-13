@@ -19,7 +19,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
+<link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -94,7 +94,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .wilaya-select:focus{border-color:rgba(201,168,76,.5)}
 .wilaya-select option{background:#fff;color:#1a2535}
 .price-inputs{display:flex;gap:8px;align-items:center}
-.price-input{flex:1;min-width:0;-webkit-appearance:none;-moz-appearance:textfield;appearance:none;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;padding:8px 6px;color:#1a2535;font-size:12.5px;font-family:'Segoe UI','Arial',sans-serif;outline:none;text-align:center;transition:border-color .3s}
+.price-input{flex:1;min-width:0;-webkit-appearance:none;-moz-appearance:textfield;appearance:none;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;padding:8px 6px;color:#0f172a;font-size:12.5px;font-weight:600;font-family:'Segoe UI','Arial',sans-serif;outline:none;text-align:center;transition:border-color .3s}
+.price-input::placeholder{color:#334155;opacity:1;font-weight:700}
+.price-input::-webkit-input-placeholder{color:#334155;opacity:1;font-weight:700}
+.price-input::-moz-placeholder{color:#334155;opacity:1;font-weight:700}
 .price-input:focus{border-color:rgba(201,168,76,.5)}
 .price-input::-webkit-outer-spin-button,.price-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .price-sep{color:var(--text-muted);font-size:12px}
@@ -214,7 +217,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 /* بدل تضييق الفلتر الجانبي على شاشات اللابتوب المتوسطة (وهو ما كان يجعله يبدو كبيراً/مزدحماً
    ويفرض تمريراً أفقياً)، نطويه بالكامل إلى الدُرج المنبثق الكامل الوظائف من 1080px فما دون —
    فلا يوجد "نطاق ضيق" تظهر فيه الفلاتر مقصوصة بعد الآن */
-@media(max-width:1080px){.sidebar{display:none}.mobile-filter-btn{display:block}.main-wrap{padding:0 3%}.results-area{padding-right:0}}
+@media(max-width:1080px){
+  .sidebar{display:none}
+  .mobile-filter-btn{display:flex;align-items:center;justify-content:center;gap:6px}
+  .main-wrap{padding:0 3%}
+  .results-area{padding-right:0;padding-bottom:calc(100px + env(safe-area-inset-bottom,0))}
+  #rizq-prompt-bubbles{
+    bottom:calc(96px + env(safe-area-inset-bottom,0))!important;
+    max-width:min(220px, calc(100vw - 100px))!important;
+  }
+  .empty-state{padding-bottom:calc(88px + env(safe-area-inset-bottom,0))}
+  .empty-state .es-actions{flex-direction:column;align-items:stretch;max-width:280px;margin:0 auto}
+  .empty-state .es-btn-primary{display:none!important}
+}
+@media(max-width:768px){
+  #rizq-prompt-bubbles{display:none!important}
+  .mobile-filter-btn{
+    bottom:calc(18px + env(safe-area-inset-bottom,0))!important;
+    max-width:calc(100vw - 32px);
+  }
+  .filter-drawer{
+    width:100vw!important;
+    max-width:100vw!important;
+    border-left:none!important;
+    border-radius:0!important;
+  }
+}
 @media(max-width:900px){.ads-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
 @media(max-width:768px){nav{padding:0 3%;gap:10px}.nav-search select{display:none}}
 @media(max-width:480px){.ads-grid{grid-template-columns:1fr}}
@@ -426,16 +454,17 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.7"></script>
+<script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_terms_gate.js"></script>
-<script src="rizq_auth_gate.js" defer></script>
-<script src="rizq_ux_polish.js?v=17.0"></script>
+<script src="rizq_terms_gate.js?v=18.3"></script>
+<script src="rizq_auth_gate.js?v=18.8" defer></script>
+<script src="rizq_ux_polish.js?v=17.4"></script>
 </head>
 <body>
 
@@ -540,13 +569,13 @@ main, .page-content.active, .main-content, .results-area,
         <span class="price-sep">—</span>
         <input class="price-input" type="number" placeholder="الأقصى" data-ph="price-max-ph" id="pmax"/>
       </div>
-      <input type="range" min="0" max="2000000" value="2000000" id="price-range" oninput="updateRange(this)"/>
-      <div class="range-labels"><span>0</span><span id="range-val" data-t="range-all">الكل</span><span>2M+</span></div>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
-        <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"> <span class="filter-label" data-t="price-lt50k">أقل من 50,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="50000-150000" class="filter-cb"> <span class="filter-label" data-t="price-50-150k">50,000 — 150,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="150000-500000" class="filter-cb"> <span class="filter-label" data-t="price-150-500k">150,000 — 500,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="500000-999999999" class="filter-cb"> <span class="filter-label" data-t="price-gt500k">أكثر من 500,000</span></label>
+      <input type="range" min="0" max="5000000" step="25000" value="5000000" data-price-max="5000000" id="price-range" oninput="updateRange(this)"/>
+      <div class="range-labels"><span>0</span><span id="range-val" data-t="range-all">الكل</span><span>50 مليون+</span></div>
+      <div id="price-radios" style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
+        <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"> <span class="filter-label">أقل من 500 ألف</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"> <span class="filter-label">500 ألف — 2.5 مليون</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"> <span class="filter-label">2.5 مليون — 10 مليون</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"> <span class="filter-label">أكثر من 10 مليون</span></label>
       </div>
     </div>
 
@@ -839,6 +868,9 @@ function renderCatSidebar(effCat){
       || `<p style="font-size:12px;color:var(--text-muted)">${_isFr?'Aucune sous-catégorie disponible':'لا توجد فروع فرعية مفصّلة لهذا القسم حالياً'}</p>`;
     if (roomsSection) roomsSection.style.display = 'none';
   }
+  if (window.RizqUx && typeof RizqUx.applyCategoryFilters === 'function') {
+    RizqUx.applyCategoryFilters(effCat || '');
+  }
   // تحديد الفرع المطلوب من الرابط تلقائياً إن وُجدت مطابقة
   if (urlSub) {
     const match = [...wrap.querySelectorAll('input[name="rcat"]')].find(r => r.value === urlSub || r.value.includes(urlSub) || urlSub.includes(r.value));
@@ -969,8 +1001,10 @@ function applyFilters(){
     if(pminV) priceMin = parseInt(pminV);
     if(pmaxV) priceMax = parseInt(pmaxV);
     // range slider
-    const rangeV = parseInt(document.getElementById('price-range').value);
-    if(rangeV < 2000000 && !pmaxV) priceMax = rangeV;
+    const prEl = document.getElementById('price-range');
+    const rangeV = parseInt(prEl.value);
+    const rMax = parseInt(prEl.getAttribute('data-price-max') || prEl.max || 500000);
+    if(rangeV < rMax && !pmaxV) priceMax = rangeV;
   }
 
   // 4. الغرف — chips
@@ -1240,7 +1274,9 @@ function resetAllFilters(){
   document.getElementById('wilaya-select').value='';
   document.getElementById('pmin').value='';
   document.getElementById('pmax').value='';
-  document.getElementById('price-range').value=2000000;
+  const pr=document.getElementById('price-range');
+  const rMax=parseInt(pr.getAttribute('data-price-max')||pr.max||500000);
+  pr.value=rMax;
   document.getElementById('range-val').textContent=_rizqLang()==='fr'?'Tout':'الكل';
   document.querySelectorAll('#rooms-chips .chip').forEach(c=>c.classList.remove('on'));
   document.getElementById('cb-verified').checked=false;
@@ -1279,7 +1315,9 @@ function clearSection(sec){
     document.querySelectorAll('input[name="rprice"]').forEach(r=>r.checked=false);
     document.getElementById('pmin').value='';
     document.getElementById('pmax').value='';
-    document.getElementById('price-range').value=2000000;
+    const pr=document.getElementById('price-range');
+    const rMax=parseInt(pr.getAttribute('data-price-max')||pr.max||500000);
+    pr.value=rMax;
     document.getElementById('range-val').textContent=_rizqLang()==='fr'?'Tout':'الكل';
   }
   if(sec==='rooms') document.querySelectorAll('#rooms-chips .chip').forEach(c=>c.classList.remove('on'));
@@ -1298,8 +1336,14 @@ document.querySelectorAll('#rooms-chips .chip').forEach(c=>{
 // ══ RANGE ══
 function updateRange(el){
   const v = parseInt(el.value);
-  document.getElementById('range-val').textContent = v>=2000000 ? (_rizqLang()==='fr'?'Tout':'الكل') : v.toLocaleString('en-US')+' MRU';
-  document.getElementById('pmax').value = v>=2000000 ? '' : v;
+  const rMax = parseInt(el.getAttribute('data-price-max') || el.max || 500000);
+  const fr = (_rizqLang()==='fr');
+  let label;
+  if (v>=rMax) label = fr?'Tout':'الكل';
+  else if (window.RizqUx && typeof RizqUx.formatPopularAmount==='function') label = RizqUx.formatPopularAmount(v, fr);
+  else label = ((v||0)*10).toLocaleString('en-US')+(fr?' UM':' أوقية');
+  document.getElementById('range-val').textContent = label;
+  document.getElementById('pmax').value = v>=rMax ? '' : v;
 }
 
 // ══ FAVS ══
@@ -1507,10 +1551,10 @@ function rizqShare(title, url) {
       'room-studio': 'استوديو',
       'mobile-filter-btn': '⚙️ فلاتر البحث',
       'drawer-filter-title': '🔍 فلاتر البحث',
-      'price-lt50k': 'أقل من 50,000',
-      'price-50-150k': '50,000 — 150,000',
-      'price-150-500k': '150,000 — 500,000',
-      'price-gt500k': 'أكثر من 500,000',
+      'price-lt50k': 'أقل من 5,000',
+      'price-50-150k': '5,000 — 25,000',
+      'price-150-500k': '25,000 — 100,000',
+      'price-gt500k': 'أكثر من 100,000',
     },
     fr: {
       // Navbar
