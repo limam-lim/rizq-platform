@@ -1,16 +1,23 @@
 'use strict';
 
+const { normalizeRole } = require('./adminRoles');
+
 /**
  * Load admin accounts from environment — never hardcode production credentials.
  *
  * Supported formats:
  * 1) ADMIN_ACCOUNTS_JSON='[{"user":"admin","passHash":"$2a$...","name":"...","role":"super"}]'
- * 2) Per-account:
- *    ADMIN_USER_1=admin
+ * 2) Per-account (حتى 20):
+ *    ADMIN_USER_1=m.limam
  *    ADMIN_PASS_HASH_1=$2a$...
  *    ADMIN_NAME_1=M. LIMAM
  *    ADMIN_ROLE_1=super
+ *    ADMIN_USER_2=finance.desk
+ *    ADMIN_ROLE_2=finance
+ *    ADMIN_USER_3=commercial.desk
+ *    ADMIN_ROLE_3=commercial
  *
+ * الأدوار: super | admin | commercial | finance | moderator | support
  * Optional DEV fallbacks (non-production only) via ADMIN_DEV_ACCOUNTS_JSON.
  */
 function parseJsonEnv(raw) {
@@ -32,7 +39,7 @@ function normalizeAccount(row) {
     user,
     passHash,
     name: String(row.name || user).trim().slice(0, 80),
-    role: String(row.role || 'moderator').trim().slice(0, 40),
+    role: normalizeRole(row.role || 'moderator'),
   };
 }
 

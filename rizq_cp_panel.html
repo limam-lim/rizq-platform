@@ -2204,9 +2204,10 @@ main, .page-content.active, .main-content, .results-area,
     <div class="form-group"><label class="form-label" data-t="am-role-label">الدور والصلاحيات *</label>
       <select class="form-select" id="am-role">
         <option value="moderator" data-t="am-role-moderator">🔵 مشرف (Moderator) — مراجعة الإعلانات والبلاغات</option>
-        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — كل صلاحيات المشرف + إدارة المستخدمين</option>
-        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — الاطلاع على المدفوعات والإيرادات</option>
-        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التواصل مع المستخدمين وحل المشاكل</option>
+        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — تشغيل واسع بدون أسرار الفريق</option>
+        <option value="commercial" data-t="am-role-commercial">📈 تجاري (Commercial) — حسابات وإعلانات وباقات وأسعار</option>
+        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — المدفوعات والإيرادات والإيصالات</option>
+        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التذاكر ودعم المستخدمين</option>
         <option value="super" data-t="am-role-super">👑 Super Admin — صلاحيات كاملة</option>
       </select>
     </div>
@@ -2303,8 +2304,8 @@ let TEAM = [
   {id:10,name:'المشرف التاسع',     role:'support',   emoji:'💬', phone:'',                email:'direction@rizq.mr',    notes:'دعم المستخدمين',                online:false},
 ];
 
-const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', moderator:'🔵 Moderator', finance:'🟡 Finance', support:'🟢 Support'};
-const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
+const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', commercial:'📈 تجاري', moderator:'🔵 Moderator', finance:'🟡 مالية', support:'🟢 Support'};
+const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', commercial:'pill-active', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
 
 // ══ SAMPLE DATA ══
 const USERS_DATA = [];
@@ -2331,20 +2332,29 @@ function _enterAdminUI(found){
   updatePendingBadge();
   updatePaymentsBadge();
   document.getElementById('sb-admin-name').textContent = found.name;
+  const roleMeta = found.roleMeta || {};
+  const roleLine = (roleMeta.emoji || '') + ' ' + (ROLE_LABELS[found.role] || found.role || '');
+  const roleEl = document.querySelector('.sb-admin-role');
+  if (roleEl) roleEl.textContent = roleLine.trim() || found.role;
   document.getElementById('welcome-name').textContent = found.name;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-MR-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  // Restrict if not super/admin
-  if(found.role==='moderator'){
-    document.querySelectorAll('.sb-item').forEach(i=>{
-      if(i.querySelector('.sb-label')?.textContent.includes('المدفوعات')||
-         i.querySelector('.sb-label')?.textContent.includes('الإعدادات')||
-         i.querySelector('.sb-label')?.textContent.includes('فريق الإدارة')){
-        i.style.display='none';
-      }
-    });
-  }
+  // إخفاء لوحات الشريط حسب صلاحيات الدور القادمة من الخادم
+  const allowed = Array.isArray(found.panels) && found.panels.length
+    ? new Set(found.panels)
+    : null;
+  document.querySelectorAll('.sb-item[onclick*="showPanel"]').forEach(i=>{
+    const m = String(i.getAttribute('onclick')||'').match(/showPanel\('([^']+)'/);
+    const panelId = m && m[1];
+    if (!panelId) return;
+    if (allowed && !allowed.has(panelId)) i.style.display = 'none';
+    else i.style.display = '';
+  });
   initDashboard();
-  showPanel('overview', document.querySelector('.sb-item[onclick*="overview"]'));
+  const first = allowed
+    ? (['overview','payments','ads','accounts','reports','users'].find(p => allowed.has(p)) || [...allowed][0])
+    : 'overview';
+  const firstItem = document.querySelector(`.sb-item[onclick*="showPanel('${first}'"]`) || document.querySelector('.sb-item[onclick*="overview"]');
+  showPanel(first || 'overview', firstItem);
   showToast(`✅ ${RizqI18n.t2('أهلاً','Bienvenue')} ${found.name} — ${ROLE_LABELS[found.role]||''}`);
 }
 
@@ -2366,8 +2376,8 @@ async function doLogin(){
       err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
       return;
     }
-    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role })); }catch(e){}
-    _enterAdminUI({ name:data.name, role:data.role });
+    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} })); }catch(e){}
+    _enterAdminUI({ name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} });
   }catch(e){
     err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
   }finally{
@@ -2385,7 +2395,15 @@ async function doLogin(){
     fetch(_adminBackendBase()+'/api/admin/verify', { headers:{ 'x-admin-token': saved.token } })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if(data && data.ok){ _enterAdminUI({ name:data.name, role:data.role }); }
+        if(data && data.ok){
+          _enterAdminUI({
+            name: data.name,
+            role: data.role,
+            panels: data.panels || [],
+            permissions: data.permissions || [],
+            roleMeta: data.roleMeta || {}
+          });
+        }
         else { try{ sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){} }
       })
       .catch(function(){ /* الخادم غير متاح الآن — تبقى شاشة الدخول اليدوي */ });
