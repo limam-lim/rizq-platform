@@ -1,5 +1,5 @@
 /**
- * Rizq Dashboard — RTL/LTR layout (sidebar flip + fixed topbar controls on physical left)
+ * Rizq Dashboard — RTL/LTR layout (sidebar flip + topbar title at start / actions at end)
  * Link from every rizq_dashboard*.html after page-specific styles.
  * Each page may define --sidebar-w in its own :root (240px or 260px).
  */
@@ -101,14 +101,20 @@ html[dir="ltr"] #services-showcase [style*="position:absolute"][style*="top:-1px
   border-radius: 12px 0 0 10px !important;
 }
 
-/* ── Topbar / mobile bar: controls always on physical LEFT ── */
+/* ── Topbar / mobile bar: title at logical START, actions at END (LTR+RTL) ── */
 .topbar,
 .mobile-bar {
-  direction: ltr;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.topbar-title,
+.mobile-bar-title {
+  order: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .topbar-controls,
@@ -121,27 +127,21 @@ html[dir="ltr"] #services-showcase [style*="position:absolute"][style*="top:-1px
   flex-shrink: 0;
 }
 
-.topbar-title,
-.mobile-bar-title {
-  order: 2;
-  flex: 1;
-  min-width: 0;
+/* Only the direct topbar child should be pushed to the end */
+.topbar > .topbar-controls,
+.topbar > .topbar-actions,
+.mobile-bar > .mobile-bar-controls {
+  margin-inline-start: auto;
 }
 
 html[dir="rtl"] .topbar-title,
 html[dir="rtl"] .mobile-bar-title {
   text-align: right;
-  direction: rtl;
 }
 
 html[dir="ltr"] .topbar-title,
 html[dir="ltr"] .mobile-bar-title {
   text-align: left;
-  direction: ltr;
-}
-
-.topbar .mobile-menu-btn {
-  order: 0;
 }
 
 /* ── Mobile sidebar slide direction ── */
