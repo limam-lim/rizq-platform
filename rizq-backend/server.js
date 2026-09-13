@@ -172,7 +172,20 @@ app.use(cors({
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
+// استثناء دخول الأدمن — له limiter خاص برسالة عربية واضحة (وإلا يظهر 429 العام
+// كنص إنجليزي فتظن الواجهة أن كلمة المرور خاطئة).
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    const p = String(req.path || '');
+    const u = String(req.originalUrl || '');
+    return p === '/admin/login' || u.startsWith('/api/admin/login');
+  },
+  message: { error: 'طلبات كثيرة — حاول مرة أخرى بعد قليل' },
+}));
 
 // ── Rate limit مخصص أشد على /api/ads/submit ─────────────────────────
 // هذا الـ endpoint عام بلا أي مصادقة (requireAdminAuth) لأنه مخصص
@@ -223,10 +236,10 @@ function cleanExpiredAdminSessions() {
 }
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'محاولات كثيرة جداً — حاول مرة أخرى بعد قليل' },
+  message: { error: 'محاولات دخول كثيرة — انتظر قليلاً ثم أعد المحاولة' },
 });
 app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   cleanExpiredAdminSessions();

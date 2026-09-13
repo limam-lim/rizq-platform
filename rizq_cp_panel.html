@@ -2380,6 +2380,10 @@ async function doLogin(){
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok || !data.ok){
+      if (res.status === 429) {
+        err.textContent = RizqI18n.t2(data.error||'محاولات كثيرة — انتظر دقيقة ثم أعد المحاولة','Trop de tentatives — attendez une minute puis réessayez');
+        return;
+      }
       err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
       return;
     }
