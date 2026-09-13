@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.9"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=7.0"/>
 <script>
 (function () {
   try {
@@ -6380,17 +6380,23 @@ function rizqMountAccountBars(modal){
   var chrome=document.getElementById('rizq-reg-chrome');
   var fakeFooter=document.getElementById('rizq-reg-footer');
   if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
-  if(fakeFooter && fakeFooter.parentNode!==modal) modal.appendChild(fakeFooter);
   if(chrome){
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
     chrome.style.display='flex';
   }
+  /* الشريط الرسمي = تذييل الموقع <footer> — لا نُظهر شريط الأيقونات القديم */
   if(fakeFooter){
-    fakeFooter.style.display='block';
-    fakeFooter.style.visibility='visible';
-    fakeFooter.style.pointerEvents='auto';
+    fakeFooter.style.display='none';
+    fakeFooter.style.visibility='hidden';
+    fakeFooter.style.pointerEvents='none';
+  }
+  var siteFooter=document.querySelector('body > footer');
+  if(siteFooter){
+    siteFooter.style.display='';
+    siteFooter.style.visibility='';
+    siteFooter.style.pointerEvents='';
   }
 }
 
@@ -6412,7 +6418,7 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register') ? '1000001' : '';
+  modal.style.zIndex = (mode==='register') ? '1' : '';
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
@@ -6446,8 +6452,11 @@ function openModal(mode){
       document.body.classList.remove('rizq-reg-open');
     }
   }
-  document.body.style.overflow='hidden';
-  ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
+  if(mode==='register' || document.body.classList.contains('rizq-reg-open')){
+    document.body.style.overflow='';
+  } else {
+    document.body.style.overflow='hidden';
+  }
   const dots=document.getElementById('sdots');
   if(mode==='login'){
     document.getElementById('p-login').style.display='block';
