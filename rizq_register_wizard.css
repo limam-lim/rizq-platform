@@ -714,8 +714,7 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   #modal.reg-wizard-mode [id^='p-'] {
     max-width: 860px;
     margin: 0 auto;
-    /* مساحة كافية فوق الشريط السفلي sticky حتى لا يغطي رفع البطاقة */
-    padding: 36px 4% calc(72px + 56px) !important;
+    padding: 36px 4% 48px !important;
   }
   html[dir="rtl"] #modal.reg-wizard-mode .rizq-reg-trust-card,
   html[lang="ar"] #modal.reg-wizard-mode .rizq-reg-trust-card {
@@ -738,11 +737,13 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     box-shadow: 0 2px 12px rgba(0,0,0,0.05) !important;
   }
 
-  /* شريط سفلي في تدفق الصفحة (لا يغطي الحقول في منتصف الشاشة) */
+  /* شريط سفلي في نهاية تدفق الصفحة (بدون sticky/fixed حتى لا يغطي الحقول) */
   #modal.reg-wizard-mode {
     display: flex !important;
     flex-direction: column !important;
     min-height: 100vh;
+    height: auto !important;
+    max-height: none !important;
   }
   #modal.reg-wizard-mode > .rizq-reg-footer,
   body.rizq-reg-open #rizq-reg-footer,
@@ -750,11 +751,12 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     display: flex !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    position: sticky !important;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
+    position: relative !important;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    z-index: 5;
     height: 56px;
     width: 100%;
     margin-top: auto;
@@ -765,7 +767,10 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   #modal.reg-wizard-mode .modal-box {
     padding-bottom: 24px !important;
-    flex: 1 1 auto;
+    flex: 0 0 auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   /* ══════════════════════════════════════════════════
@@ -803,8 +808,9 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     margin-left: 0 !important; margin-right: 0 !important;
     border-radius: 0 !important; border: none !important; box-shadow: none !important;
     background: #f8faff !important;
-    height: auto !important; min-height: auto !important;
-    overflow: visible !important; flex-shrink: 1 !important;
+    height: auto !important; min-height: auto !important; max-height: none !important;
+    overflow: visible !important;
+    flex: 0 0 auto !important;
     position: static !important; transform: none !important;
     padding: 0 !important;
   }
@@ -821,9 +827,9 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   html.rizq-reg-page #modal > .rizq-reg-footer {
     display: flex !important;
-    /* sticky في تدفق الصفحة — لا يغطي الحقول في المنتصف كما كان مع fixed */
-    position: sticky !important;
-    left: 0; right: 0; bottom: 0; z-index: 30;
+    /* relative في نهاية الصفحة — لا يغطي الحقول أو رفع البطاقة */
+    position: relative !important;
+    left: auto; right: auto; bottom: auto; top: auto; z-index: 5;
     height: 56px; width: 100%;
     background: rgba(15,23,42,0.95);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -836,7 +842,7 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   html.rizq-reg-page #modal [id^='p-'] {
     max-width: 860px; margin: 0 auto;
-    padding: 36px 4% calc(72px + 56px) !important;
+    padding: 36px 4% 48px !important;
   }
 }
 
