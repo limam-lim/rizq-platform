@@ -1,9 +1,10 @@
 /**
- * rizq_register_wizard.css  v6.0
+ * rizq_register_wizard.css  v6.1
  * ─────────────────────────────────────────────────────────────
- * هاتف  (≤768px) : شريط علوي (شعار + FR|AR) + شريط سفلي أيقونات
+ * هاتف  (≤768px) : شريط علوي (شعار + FR|AR) + الشريط السفلي الرسمي
+ *   (نفس mobile-bottom-nav في الصفحة الرئيسية: رئيسية/أقسام/نشر/رزق ذكي/المزيد)
  * كمبيوتر/تابلت (≥769px) : صفحة كاملة فاتحة — شريط علوي داكن كـ #nav
- *   وشريط سفلي ثابت (الرئيسية / نشر / الأقسام / الشروط / الخصوصية)
+ *   ونفس الشريط السفلي الرسمي في أسفل التدفق
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -380,29 +381,78 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
 .rizq-reg-chrome-lang {
   background:linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.08));
   border:1.5px solid rgba(201,168,76,0.55);
-  color:#E8C96A; font-size:12.5px; font-weight:800; letter-spacing:0.3px;
+  color:#fff; font-size:12.5px; font-weight:800; letter-spacing:0.3px;
   padding:8px 16px; border-radius:22px;
   cursor:pointer; transition:background 0.2s;
   white-space:nowrap; flex-shrink:0; font-family:inherit; direction:ltr;
+  display:inline-flex; align-items:center;
 }
-.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); color:#fff; }
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar { color:#fff; opacity:.8; }
+.rizq-reg-chrome-lang .lang-sep { color:rgba(255,255,255,.5); }
+html[lang="ar"] .rizq-reg-chrome-lang .lang-ar { color:#E8C96A; opacity:1; font-weight:900; }
+html[lang="fr"] .rizq-reg-chrome-lang .lang-fr { color:#E8C96A; opacity:1; font-weight:900; }
+.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); }
 
 /* ═══════════════════════════════════════════════════════════
-   §6  الشريط السفلي — مطابق لشريط rizq_post
+   §6  الشريط السفلي — نفس .mobile-bottom-nav الرسمي في الرئيسية
 ═══════════════════════════════════════════════════════════ */
-.rizq-reg-footer-inner {
-  display:flex; align-items:center; justify-content:center;
-  width:100%; max-width:900px; margin:0 auto;
+#rizq-reg-footer.mobile-bottom-nav,
+.rizq-reg-footer.mobile-bottom-nav {
+  display: none;
+  background: linear-gradient(180deg, rgba(10,20,44,.97), rgba(7,13,30,.99));
+  border-top: 1px solid rgba(201,168,76,.22);
+  box-shadow: 0 -4px 24px rgba(0,0,0,.35);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0));
 }
-.rizq-reg-footer-item {
-  display:flex; flex-direction:column; align-items:center; gap:4px;
-  padding:9px 20px; color:rgba(255,255,255,0.65); text-decoration:none;
-  font-weight:600; border-radius:10px; transition:color 0.2s, background 0.2s;
-  white-space:nowrap; flex:1; max-width:140px;
+#rizq-reg-footer .mobile-bottom-nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  gap: 2px;
+  padding: 0 4px;
 }
-.rizq-reg-footer-item:hover { color:#E8C96A; background:rgba(255,255,255,0.06); }
-.rizq-reg-footer-icon  { font-size:18px; line-height:1; }
-.rizq-reg-footer-label { font-size:11px; font-weight:600; }
+#rizq-reg-footer.mobile-bottom-nav a,
+#rizq-reg-footer.mobile-bottom-nav button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 1px;
+  text-decoration: none;
+  color: rgba(255,255,255,.65);
+  font-size: 8.5px;
+  font-weight: 700;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 0;
+}
+#rizq-reg-footer .mbn-icon { font-size: 18px; line-height: 1; }
+#rizq-reg-footer .mbn-post {
+  flex: 0 0 auto;
+  margin-top: -18px;
+}
+#rizq-reg-footer .mbn-post > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C9A84C, #e8c96a);
+  color: #0f2347;
+  font-size: 22px;
+  font-weight: 900;
+  box-shadow: 0 4px 18px rgba(201,168,76,.45);
+  border: 2px solid rgba(255,255,255,.15);
+}
 
 /* ═══════════════════════════════════════════════════════════
    §7  الهاتف (≤768px) — نافذة بيضاء تملأ الشاشة
@@ -439,8 +489,8 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   #modal.reg-wizard-mode > .rizq-reg-footer,
   body.rizq-reg-open #rizq-reg-footer,
-  #rizq-reg-footer {
-    display: flex !important;
+  #rizq-reg-footer.mobile-bottom-nav {
+    display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;
     position: fixed !important;
@@ -448,37 +498,19 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     right: 0 !important;
     top: auto !important;
     bottom: 0 !important;
-    z-index: 40 !important;
-    height: 56px !important;
+    z-index: 1000002 !important;
+    height: auto !important;
+    min-height: 56px !important;
     width: 100% !important;
-    background: #0f172a !important;
-    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    background: linear-gradient(180deg, rgba(10,20,44,.97), rgba(7,13,30,.99)) !important;
+    border-top: 1px solid rgba(201,168,76,.22) !important;
     border-bottom: none !important;
-    padding: 0 !important;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0)) !important;
     direction: rtl !important;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.35) !important;
   }
-  #rizq-reg-footer .rizq-reg-footer-inner {
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0 2px !important;
-    gap: 0 !important;
-  }
-  #rizq-reg-footer .rizq-reg-footer-item {
-    padding: 6px 2px !important;
-    max-width: none !important;
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-  }
-  #rizq-reg-footer .rizq-reg-footer-label {
-    font-size: 9.5px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-  }
-  #rizq-reg-footer .rizq-reg-footer-icon { font-size: 16px !important; }
   .rizq-reg-chrome-links {
-    display: none !important; /* الشروط/الخصوصية/الأمان في الشريط السفلي على الهاتف */
+    display: none !important; /* الشروط/الخصوصية عبر المزيد أو التذييل — الشريط السفلي رسمي */
   }
   .rizq-reg-chrome-lang {
     font-size: 11.5px !important;
@@ -747,8 +779,8 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   }
   #modal.reg-wizard-mode > .rizq-reg-footer,
   body.rizq-reg-open #rizq-reg-footer,
-  html.rizq-reg-page #rizq-reg-footer {
-    display: flex !important;
+  html.rizq-reg-page #rizq-reg-footer.mobile-bottom-nav {
+    display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;
     position: relative !important;
@@ -757,13 +789,15 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     bottom: auto;
     top: auto;
     z-index: 5;
-    height: 56px;
+    height: auto;
+    min-height: 64px;
     width: 100%;
     margin-top: auto;
-    background: #0f172a;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(10,20,44,.97), rgba(7,13,30,.99));
+    border-top: 1px solid rgba(201,168,76,.22);
     direction: rtl;
     flex-shrink: 0;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0));
   }
   #modal.reg-wizard-mode .modal-box {
     padding-bottom: 24px !important;
