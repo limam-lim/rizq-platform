@@ -5560,6 +5560,11 @@ function applyLandingLang(toAr) {
   });
 
   document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: lang } }));
+  try {
+    if (window.RizqLangGuard && typeof window.RizqLangGuard.sync === 'function') {
+      window.RizqLangGuard.sync(lang);
+    }
+  } catch (eG) {}
 }
 
 var _langBusy = false;
