@@ -722,6 +722,38 @@ app.get('/api/ai/status', (req, res) => {
   });
 });
 
+/** GET /api/admin/agents-health — حالة ربط كل الوكلاء بمفتاح Claude + السر المشترك */
+app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
+  const sharedConfigured = !!(process.env.BACKEND_SHARED_SECRET || '').trim();
+  const apiSecretConfigured = !!(process.env.RIZQ_API_SECRET || '').trim();
+  const claudeConfigured = isAnthropicConfigured();
+  const agents = [
+    { id: 'widget', name: 'ويدجت الدردشة', needsClaude: true, wired: claudeConfigured },
+    { id: 'brain', name: 'عقل القنوات (مكالمة/واتساب/بريد)', needsClaude: true, wired: claudeConfigured },
+    { id: 'subscriber', name: 'وكيل المشترك الماسي', needsClaude: true, wired: claudeConfigured },
+    { id: 'receipt-vision', name: 'قراءة إيصالات الدفع', needsClaude: true, wired: claudeConfigured },
+    { id: 'translate', name: 'الترجمة الإدارية', needsClaude: true, wired: claudeConfigured },
+    { id: 'telegram-admin', name: 'بوت تيليغرام الإداري', needsClaude: true, wired: claudeConfigured },
+    { id: 'package-lifecycle', name: 'دورة حياة الباقات', needsClaude: false, wired: true, note: 'SMS/قواعد — لا يحتاج Claude' },
+    { id: 'moderator', name: 'المشرف الآلي', needsClaude: false, wired: true, note: 'قواعد محلية' },
+    { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, wired: true },
+  ];
+  const blockers = [];
+  if (!claudeConfigured) blockers.push('أضف ANTHROPIC_API_KEY (أو CLAUDE_API_KEY) في rizq-backend/.env ثم أعد تشغيل الخادم');
+  if (!sharedConfigured) blockers.push('أضف BACKEND_SHARED_SECRET في .env والصقه في حقل السر المشترك بلوحة التحكم');
+  res.json({
+    ok: true,
+    claudeConfigured,
+    sharedSecretConfigured: sharedConfigured,
+    apiSecretConfigured,
+    model: getAgentModel(),
+    advancedModel: getAdvancedModel(),
+    agents,
+    ready: claudeConfigured && sharedConfigured,
+    blockers,
+  });
+});
+
 const subscriberChatLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 25,

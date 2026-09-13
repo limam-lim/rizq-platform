@@ -513,7 +513,7 @@
         var _accInfo2 = accounts[accId] || {};
         fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
           method: 'POST',
-          headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+          headers: (function(){ var h={'Content-Type':'application/json'}; if(_cfg.backendSecret) h['x-rizq-secret']=_cfg.backendSecret; try{ var s=JSON.parse(sessionStorage.getItem('rizq_admin_session')||'null'); if(s&&s.token) h['x-admin-token']=s.token; }catch(e){} return h; })(),
           body: JSON.stringify({
             accountId   : accId,
             accountName : _accInfo2.name || accId,
@@ -546,7 +546,7 @@
           if (diamondOn && _accInfo2.phone) {
             fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/subscriber/register', {
               method: 'POST',
-              headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+              headers: (function(){ var h={'Content-Type':'application/json'}; if(_cfg.backendSecret) h['x-rizq-secret']=_cfg.backendSecret; try{ var s=JSON.parse(sessionStorage.getItem('rizq_admin_session')||'null'); if(s&&s.token) h['x-admin-token']=s.token; }catch(e){} return h; })(),
               body: JSON.stringify({
                 subscriberId: String(_accInfo2.phone).replace(/[^0-9+]/g,'').slice(0, 40),
                 businessName: _accInfo2.name || accId,
@@ -1049,6 +1049,18 @@
   // ═══════════════════════════════════════════════════════════════════
   var AGENT_CFG_KEY = 'rizq_subagent_config';
   var DEFAULT_AGENT_CFG = { enabled: true, notes: '', officialAccounts: [], backendUrl: '', backendSecret: '' };
+
+  
+  function _agentAuthHeaders(extra) {
+    var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+    var cfg = getAgentConfig();
+    if (cfg.backendSecret) h['x-rizq-secret'] = cfg.backendSecret;
+    try {
+      var s = JSON.parse(sessionStorage.getItem('rizq_admin_session') || 'null');
+      if (s && s.token) h['x-admin-token'] = s.token;
+    } catch (e) {}
+    return h;
+  }
 
   function getAgentConfig() {
     try {

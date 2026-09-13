@@ -238,6 +238,8 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   }
 
   const {
+    getAnthropicApiKey,
+    isAnthropicConfigured,
     getAdvancedModel,
     isDiamondProfile,
     createCachedMessage,
@@ -270,6 +272,14 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 
   const Anthropic = require('@anthropic-ai/sdk');
   const { assertQuotaAvailable, recordUsage, isQuotaBlocked } = require('./rizq_quota_guard_agent');
+  if (!isAnthropicConfigured()) {
+    return {
+      text: 'الوكيل غير مفعّل حالياً — مفتاح Claude غير مضبوط على الخادم (ANTHROPIC_API_KEY).',
+      channel,
+      model: null,
+      aiUnconfigured: true,
+    };
+  }
 
   if (isQuotaBlocked(subscriberId, profile.accountId, channel)) {
     return {
@@ -296,7 +306,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     };
   }
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new Anthropic({ apiKey: getAnthropicApiKey() });
   const MODEL = getAdvancedModel();
 
   const channelInstructions = {

@@ -21,7 +21,7 @@ if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
 }
 
 const Anthropic = require('@anthropic-ai/sdk');
-const { getAdvancedModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
+const { getAnthropicApiKey, isAnthropicConfigured, getAdvancedModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
 const {
   getPackagesForTool,
   buildLiveCatalogPolicyBlock,
@@ -79,7 +79,7 @@ ${buildDiamondTiersPromptBlock()}
 
 // ── إعداد العميل ──────────────────────────────────────
 const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || ''
+  apiKey: getAnthropicApiKey()
 });
 
 // ── أدوات الوكيل (Tools) ───────────────────────────────
@@ -224,8 +224,8 @@ async function executeTool(toolName, toolInput, meta) {
 //  context: { sender, name, subject, history[] }
 // ══════════════════════════════════════════════════════
 async function askAgent({ channel, message, context = {} }) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY غير موجود في .env');
+  if (!isAnthropicConfigured()) {
+    throw new Error('ANTHROPIC_API_KEY / CLAUDE_API_KEY غير موجود في .env');
   }
 
   const catalogHint = inferCatalogFromMessage(message, {

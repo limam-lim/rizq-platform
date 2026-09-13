@@ -692,8 +692,12 @@ main, .page-content.active, .main-content, .results-area,
           </div>
         </div>
         <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. التفاصيل في rizq-backend/README.md</p>
-        <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
-        <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
+        <div id="subagent-health-box" style="display:none;margin:0 0 12px;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.6"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
+          <button type="button" onclick="checkSubAgentHealth()" style="padding:9px 18px;background:#0f766e;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔎 فحص ربط الوكلاء / Claude</button>
+          <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
+        </div>
       </div>
 
       <!-- ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (نفس رقم/حساب المكالمات)
@@ -5219,13 +5223,65 @@ function toggleSubAgent(checkbox){
 }
 function saveSubAgentConfig(){
   if(typeof RizqSub === 'undefined') return;
+  var url = document.getElementById('subagent-backend-url').value.trim();
+  var secret = document.getElementById('subagent-backend-secret').value.trim();
+  if(url && !secret){
+    showToast(RizqI18n.t2('⚠️ رابط الخادم مضبوط لكن السر المشترك فارغ — الصق BACKEND_SHARED_SECRET ثم احفظ','⚠️ URL backend défini mais le secret partagé est vide — collez BACKEND_SHARED_SECRET puis enregistrez'), 'error');
+  }
+  if(secret && (secret === 'BACKEND_SHARED_SECRET' || secret.indexOf('change-me') === 0)){
+    showToast(RizqI18n.t2('❌ لا تضع النص التوضيحي — ضع القيمة الحقيقية من .env','❌ Ne mettez pas le texte d’exemple — collez la vraie valeur depuis .env'), 'error');
+    return;
+  }
   RizqSub.setAgentConfig({
     notes: document.getElementById('subagent-notes').value,
-    backendUrl: document.getElementById('subagent-backend-url').value.trim(),
-    backendSecret: document.getElementById('subagent-backend-secret').value.trim(),
+    backendUrl: url,
+    backendSecret: secret,
   });
   var msg = document.getElementById('subagent-saved-msg');
   if(msg){ msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2000); }
+  checkSubAgentHealth();
+}
+
+async function checkSubAgentHealth(){
+  var box = document.getElementById('subagent-health-box');
+  if(box){ box.style.display='block'; box.style.background='#f8fafc'; box.style.border='1px solid #e2e8f0'; box.style.color='#334155'; box.textContent = RizqI18n.t2('...جارٍ الفحص','...Vérification'); }
+  var cfg = (typeof RizqSub !== 'undefined') ? RizqSub.getAgentConfig() : {};
+  var base = (cfg.backendUrl || _adminBackendBase() || '').replace(/\/$/,'');
+  var secret = (cfg.backendSecret || (document.getElementById('subagent-backend-secret')||{}).value || '').trim();
+  var lines = [];
+  try{
+    var ai = await fetch(base + '/api/ai/status').then(function(r){ return r.json(); });
+    lines.push(ai.configured
+      ? ('✅ Claude مربوط على الخادم — النموذج: ' + (ai.agentModel || ai.model || ''))
+      : '❌ مفتاح Claude غير مضبوط على الخادم (ANTHROPIC_API_KEY)');
+  }catch(e){
+    lines.push('❌ تعذّر الوصول لـ /api/ai/status — تحقق من رابط الخادم');
+  }
+  try{
+    var health = await fetch(base + '/api/admin/agents-health', { headers: _adminAuthHeaders() }).then(function(r){ return r.json(); });
+    if(health && health.ok){
+      lines.push(health.sharedSecretConfigured ? '✅ BACKEND_SHARED_SECRET مضبوط على الخادم' : '❌ BACKEND_SHARED_SECRET ناقص في .env');
+      lines.push(secret ? '✅ السر المشترك محفوظ في اللوحة' : '⚠️ حقل السر المشترك في اللوحة فارغ — الصقه بعد الحفظ');
+      (health.agents||[]).forEach(function(a){
+        if(!a.needsClaude) return;
+        lines.push((a.wired ? '✅ ' : '❌ ') + a.name);
+      });
+      if(health.blockers && health.blockers.length){
+        health.blockers.forEach(function(b){ lines.push('→ ' + b); });
+      }
+    } else if(health && health.error === 'session_expired'){
+      lines.push('⚠️ أعد تسجيل دخول الأدمن لعرض تفاصيل الوكلاء');
+    }
+  }catch(e2){
+    lines.push('⚠️ تعذّر /api/admin/agents-health (قد تحتاج جلسة أدمن)');
+  }
+  if(box){
+    var ready = lines.every(function(l){ return l.indexOf('❌') === -1; });
+    box.style.background = ready ? '#ecfdf5' : '#fff7ed';
+    box.style.border = '1px solid ' + (ready ? '#6ee7b7' : '#fdba74');
+    box.style.color = ready ? '#065f46' : '#9a3412';
+    box.innerHTML = lines.map(function(l){ return '<div>'+l+'</div>'; }).join('');
+  }
 }
 
 // ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (rizq-backend /api/broadcast-sms) ══
