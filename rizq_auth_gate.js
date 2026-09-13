@@ -57,6 +57,7 @@
       choiceBuyerSub: 'للتصفح والتواصل والمفضلة',
       choiceSeller: '🏪 أبيع — حساب بائع',
       choiceSellerSub: 'لنشر الإعلانات وإدارة متجرك',
+      backHome: 'رجوع',
       nameLabel: 'الاسم الكامل *',
       namePh: 'مثال: محمد أحمد ولد سيدي',
       phoneMrLabel: 'هاتف موريتاني (اختياري)',
@@ -111,6 +112,7 @@
       choiceBuyerSub: 'Parcourir, contacter et favoris',
       choiceSeller: '🏪 Je vends — compte vendeur',
       choiceSellerSub: 'Publier des annonces et gérer votre activité',
+      backHome: 'Retour',
       nameLabel: 'Nom complet *',
       namePh: 'Ex : Mohamed Ahmed Ould Sidi',
       phoneMrLabel: 'Tél. mauritanien (optionnel)',
@@ -281,10 +283,13 @@
       '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
       '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
       '#rag-overlay .rag-close{position:absolute;top:12px;inset-inline-end:12px;background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:16px;z-index:5}',
-      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 20px 8px;border-bottom:1px solid #e2e8f5}',
+      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 20px 10px;border-bottom:1px solid #e2e8f5;text-decoration:none;color:inherit;cursor:pointer;background:transparent;border-top:none;border-left:none;border-right:none;width:100%;font:inherit;-webkit-tap-highlight-color:transparent}',
+      '#rag-overlay .rag-brand:hover .rag-brand-name,#rag-overlay .rag-brand:focus-visible .rag-brand-name{color:#a07820}',
+      '#rag-overlay .rag-brand:focus-visible{outline:2px solid rgba(201,168,76,.55);outline-offset:2px}',
       '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
       '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
       '#rag-overlay .rag-brand-name{font-size:16px;font-weight:800;color:#1b3a6b}',
+      '#rag-overlay .rag-brand-back{font-size:12px;font-weight:700;color:#a07820;letter-spacing:.2px}',
       '#rag-overlay .rag-progress{display:none;background:#fff;border-bottom:1px solid #e2e8f5;padding:14px 16px 16px}',
       '#rag-overlay.open .rag-progress{display:block}',
       '#rag-overlay .rag-progress-steps{display:flex;align-items:center;max-width:640px;margin:0 auto}',
@@ -303,9 +308,9 @@
       '#rag-overlay .rag-sub{color:#64748b!important;font-size:13px;text-align:center;margin:0 0 18px;line-height:1.6}',
       '#rag-overlay .rag-returning{background:#fff8e8;border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 12px;font-size:12px;color:#92400e;text-align:center;margin:0 0 14px;display:none}',
       '#rag-overlay .rag-returning.show{display:block}',
-      '#rag-overlay .rag-label{display:block;color:#334155;font-size:12.5px;font-weight:700;margin:0 0 6px}',
-      '#rag-overlay .rag-hint{font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5}',
-      '#rag-overlay .rag-input{width:100%;box-sizing:border-box;background:#f8faff!important;border:1px solid rgba(13,27,42,.1)!important;border-radius:12px;padding:12px 14px;color:#1a2535!important;font-size:14px;font-family:inherit;margin-bottom:10px}',
+      '#rag-overlay .rag-label{display:block!important;color:#0f172a!important;font-size:13px!important;font-weight:800!important;margin:0 0 6px!important;opacity:1!important}',
+      '#rag-overlay .rag-hint{font-size:12px!important;color:#475569!important;margin:-4px 0 10px;line-height:1.5}',
+      '#rag-overlay .rag-input{width:100%;box-sizing:border-box;background:#f8faff!important;border:1px solid rgba(13,27,42,.1)!important;border-radius:12px;padding:12px 14px;color:#0f172a!important;font-size:14px;font-family:inherit;margin-bottom:10px}',
       '#rag-overlay .rag-input:focus{outline:none;border-color:rgba(201,168,76,.5)!important;background:#fff!important;box-shadow:0 0 0 3px rgba(201,168,76,.12)}',
       '#rag-overlay .rag-input.err{border-color:#ef4444!important}',
       '#rag-overlay .rag-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;margin:-2px 0 10px;cursor:pointer}',
@@ -351,7 +356,11 @@
       '<div class="rag-overlay" id="rag-overlay">',
       '  <div class="rag-modal" role="dialog" aria-modal="true">',
       '    <button class="rag-close" id="rag-close-btn" type="button">✕</button>',
-      '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
+      '    <button type="button" class="rag-brand" id="rag-brand-home" aria-label="رجوع">',
+      '      <div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div>',
+      '      <div class="rag-brand-name">رزق | Rizq</div>',
+      '      <span class="rag-brand-back" id="rag-brand-back">رجوع</span>',
+      '    </button>',
       '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
       '      <div class="rag-progress-steps">',
       '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">الحساب</div></div>',
@@ -436,6 +445,22 @@
       }
       closeModal();
     });
+    var brandHome = document.getElementById('rag-brand-home');
+    if (brandHome) {
+      brandHome.addEventListener('click', function () {
+        _ragOpenedAt = 0;
+        closeModal();
+        try {
+          if (window.RizqNav && typeof window.RizqNav.goOfficial === 'function') {
+            window.RizqNav.goOfficial('home');
+          } else {
+            window.location.href = './';
+          }
+        } catch (_navErr) {
+          window.location.href = './';
+        }
+      });
+    }
     document.getElementById('rag-overlay').addEventListener('click', function (e) {
       if (Date.now() - (_ragOpenedAt || 0) < 800) return;
       if (e.target === this) closeModal();
@@ -554,6 +579,10 @@
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
     document.getElementById('rag-choice-seller-sub').textContent = dict.choiceSellerSub;
+    var brandBack = document.getElementById('rag-brand-back');
+    var brandHomeBtn = document.getElementById('rag-brand-home');
+    if (brandBack) brandBack.textContent = dict.backHome;
+    if (brandHomeBtn) brandHomeBtn.setAttribute('aria-label', dict.backHome);
     document.getElementById('rag-name-label').textContent = dict.nameLabel;
     document.getElementById('rag-name').placeholder = dict.namePh;
     document.getElementById('rag-phone-mr-label').textContent = dict.phoneMrLabel;

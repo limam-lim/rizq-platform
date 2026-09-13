@@ -206,7 +206,6 @@
       });
     }
   }
-
   var navMoreMobile = document.getElementById('nav-more-mobile-btn');
   if (navMoreMobile && !navMoreMobile.getAttribute('data-rizq-more-bound')) {
     navMoreMobile.setAttribute('data-rizq-more-bound', '1');

@@ -389,6 +389,25 @@ app.post('/api/call/rizq-input', async (req, res) => {
   res.send(twiml.toString());
 });
 
+
+function _requireCallApiSecret(req, res) {
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  let expected = String(process.env.RIZQ_API_SECRET || '').trim();
+  if (!expected || expected === 'rizq_secret_2025') {
+    if (isProd) {
+      res.status(503).json({ ok: false, error: 'server_misconfigured' });
+      return null;
+    }
+    expected = 'rizq_secret_2025';
+  }
+  const provided = String(req.header('x-rizq-secret') || req.query.secret || '').trim();
+  if (provided !== expected) {
+    res.status(403).json({ ok: false, error: 'غير مصرّح' });
+    return null;
+  }
+  return expected;
+}
+
 // ══════════════════════════════════════════════════════════
 //  API: تفعيل / إيقاف الوكيل (من لوحة المشترك)
 //  POST /api/agent/toggle
@@ -397,9 +416,18 @@ app.post('/api/call/rizq-input', async (req, res) => {
 app.post('/api/agent/toggle', (req, res) => {
   const { subscriberPhone, active, secret } = req.body;
 
-  // تحقق بسيط من السر (يُحسَّن لاحقاً بـ JWT)
-  const expectedSecret = process.env.RIZQ_API_SECRET || 'rizq_secret_2025';
-  if(secret !== expectedSecret) {
+  // Require a non-default RIZQ_API_SECRET in production (no hardcoded fallback).
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  let expectedSecret = String(process.env.RIZQ_API_SECRET || '').trim();
+  if (!expectedSecret || expectedSecret === 'rizq_secret_2025') {
+    if (isProd) {
+      console.error('[call-handler] RIZQ_API_SECRET missing or insecure default — refusing toggle');
+      return res.status(503).json({ ok: false, error: 'server_misconfigured' });
+    }
+    expectedSecret = 'rizq_secret_2025';
+    console.warn('[call-handler] using insecure default RIZQ_API_SECRET — set env before production');
+  }
+  if (secret !== expectedSecret) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
 
@@ -424,6 +452,7 @@ app.post('/api/agent/toggle', (req, res) => {
 
 // ── API: حالة وكيل مشترك ────────────────────────────────
 app.get('/api/agent/status/:phone', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   const phone   = req.params.phone;
   const profile = getSubscriberProfile(phone);
   const active  = agentStatus.get(phone) !== false;
@@ -437,11 +466,13 @@ app.get('/api/agent/status/:phone', (req, res) => {
 
 // ── API: سجل المكالمات ───────────────────────────────────
 app.get('/api/call-log', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   res.json({ calls: callLog.slice(0, 50), total: callLog.length });
 });
 
 // ── API: سجل مكالمات مشترك بعينه ────────────────────────
 app.get('/api/call-log/:phone', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   const phone = req.params.phone;
   const calls = callLog.filter(c => c.subscriberNum === phone);
   res.json({ calls: calls.slice(0, 50), total: calls.length });

@@ -295,6 +295,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+<script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_account_route.js?v=6"></script>
@@ -1295,8 +1296,9 @@ function _resolveRealAccessToken(acc){
   return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':dashTok}, body:JSON.stringify({dashToken:dashTok}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.account) return null;
+      // accessToken لم يعد يُعاد من verify-dash — dashToken (SESSION_TOKEN) يكفي للملكية.
+      window.REAL_ACCESS_TOKEN = data.account.accessToken || SESSION_TOKEN;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });

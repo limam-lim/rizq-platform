@@ -1294,3 +1294,85 @@ a.rizq-trust-card:hover {
   .rizq-toast-global { transition: none; }
 }
 
+/* ═══ حارس اللغة — إخفاء المحتوى غير النشط (وليس تسميات زر FR|AR) ═══ */
+html[lang="fr"] .ar-only,
+html[lang="fr"] [data-lang="ar"] {
+  display: none !important;
+}
+html[lang="ar"] .fr-only,
+html[lang="ar"] [data-lang="fr"] {
+  display: none !important;
+}
+html[lang="ar"] .ar-only,
+html[lang="ar"] [data-lang="ar"] {
+  display: revert;
+}
+html[lang="fr"] .fr-only,
+html[lang="fr"] [data-lang="fr"] {
+  display: revert;
+}
+/* أزرار FR|AR: كلاهما ظاهر دائماً — النشط أصفر والآخر أبيض */
+.btn-lang .lang-fr,
+.btn-lang .lang-ar,
+.btn-lang .lang-sep,
+.btn-lang-primary .lang-fr,
+.btn-lang-primary .lang-ar,
+.btn-lang-primary .lang-sep,
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar,
+.rizq-reg-chrome-lang .lang-sep,
+#rizq-lang-btn .lang-fr,
+#rizq-lang-btn .lang-ar,
+#rizq-lang-btn .lang-sep,
+#nav-lang-btn .lang-fr,
+#nav-lang-btn .lang-ar,
+#nav-lang-btn .lang-sep,
+#lang-btn .lang-fr,
+#lang-btn .lang-ar,
+#lang-btn .lang-sep {
+  display: inline !important;
+}
+.btn-lang .lang-fr,
+.btn-lang .lang-ar,
+.btn-lang-primary .lang-fr,
+.btn-lang-primary .lang-ar,
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar,
+#rizq-lang-btn .lang-fr,
+#rizq-lang-btn .lang-ar,
+#nav-lang-btn .lang-fr,
+#nav-lang-btn .lang-ar,
+#lang-btn .lang-fr,
+#lang-btn .lang-ar {
+  color: #fff !important;
+  opacity: 0.8;
+  font-weight: 700;
+}
+.btn-lang .lang-sep,
+.btn-lang-primary .lang-sep,
+.rizq-reg-chrome-lang .lang-sep {
+  color: rgba(255,255,255,0.5) !important;
+  opacity: 1;
+}
+html[lang="ar"] .btn-lang .lang-ar,
+html[lang="ar"] .btn-lang-primary .lang-ar,
+html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,
+html[lang="ar"] #rizq-lang-btn .lang-ar,
+html[lang="ar"] #nav-lang-btn .lang-ar,
+html[lang="ar"] #lang-btn .lang-ar {
+  color: #E8C96A !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+}
+html[lang="fr"] .btn-lang .lang-fr,
+html[lang="fr"] .btn-lang-primary .lang-fr,
+html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,
+html[lang="fr"] #rizq-lang-btn .lang-fr,
+html[lang="fr"] #nav-lang-btn .lang-fr,
+html[lang="fr"] #lang-btn .lang-fr {
+  color: #E8C96A !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+}
+
+

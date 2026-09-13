@@ -51,7 +51,17 @@ setupSubscriberAPI(app);
 const WA_CONFIG = {
   TOKEN      : process.env.WHATSAPP_TOKEN       || '',
   PHONE_ID   : process.env.WHATSAPP_PHONE_ID    || '',
-  VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN || 'rizq_secret_2025',
+  VERIFY_TOKEN: (function(){
+    const v = String(process.env.WHATSAPP_VERIFY_TOKEN || '').trim();
+    const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+    if (v && v !== 'rizq_secret_2025') return v;
+    if (isProd) {
+      console.error('[whatsapp] WHATSAPP_VERIFY_TOKEN missing or insecure — set env before production');
+      return '';
+    }
+    console.warn('[whatsapp] using insecure default WHATSAPP_VERIFY_TOKEN');
+    return 'rizq_secret_2025';
+  })(),
   API_VERSION: 'v20.0',
 
   // رسالة ترحيب تلقائية لأول رسالة
