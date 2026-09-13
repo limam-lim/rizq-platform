@@ -888,7 +888,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_module_flags.js?v=12.1"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.6"></script>
+  <script src="rizq_i18n.js?v=16.7"></script>
 <script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
@@ -898,7 +898,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_auth_gate.js?v=18.8" defer></script>
-<script src="rizq_ux_polish.js?v=17.3"></script>
+<script src="rizq_ux_polish.js?v=17.4"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 </head>
@@ -1019,13 +1019,13 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
             <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى">
           </div>
           <input type="range" id="price-range" min="0" max="5000000" step="25000" value="5000000" data-price-max="5000000" oninput="updateRange(this.value)">
-          <div class="range-labels"><span>0</span><span id="range-val">الكل</span><span>5M+</span></div>
+          <div class="range-labels"><span>0</span><span id="range-val">الكل</span><span>50 مليون+</span></div>
           <div class="price-divider" aria-hidden="true"></div>
           <div id="price-radios">
-            <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"><span class="filter-label">أقل من 50,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"><span class="filter-label">50,000 — 250,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"><span class="filter-label">250,000 — 1M</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"><span class="filter-label">أكثر من 1M</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"><span class="filter-label">أقل من 500 ألف</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"><span class="filter-label">500 ألف — 2.5 مليون</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"><span class="filter-label">2.5 مليون — 10 مليون</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"><span class="filter-label">أكثر من 10 مليون</span></label>
           </div>
         </div>
 
@@ -1464,7 +1464,7 @@ const TRANSLATIONS = {
     'chat-seller-lbl':'البائع',
     'chat-online':'● متصل الآن','cs1':'هل ما زال متاحاً؟','cs2':'ما هو أقل سعر؟','cs3':'هل يمكن الزيارة؟',
     'chat-ph':'اكتب رسالة...','chat-send':'إرسال','chat-continue-wa':'متابعة المحادثة على واتساب',
-    'price-r1':'أقل من 50,000','price-r2':'50,000 — 250,000','price-r3':'250,000 — 1M','price-r4':'أكثر من 1M',
+    'price-r1':'أقل من 500 ألف','price-r2':'500 ألف — 2.5 مليون','price-r3':'2.5 مليون — 10 مليون','price-r4':'أكثر من 10 مليون',
     'save-ad':'♡ حفظ','share-ad':'↗ مشاركة','nav-search-ph':'ابحث في رزق...',
     'dp-phone-hint':'👆 انقر لإظهار الرقم','dp-phone-shown':'📞 انقر للاتصال','dp-call':'📞 اتصال الآن',
     'dp-whatsapp':'واتساب','dp-msg':'✉️ مراسلة البائع','dp-save':'♡ حفظ','dp-share':'↗ مشاركة','dp-print':'🖨️ طباعة',
@@ -1497,7 +1497,7 @@ const TRANSLATIONS = {
     'chat-seller-lbl':'Le vendeur',
     'chat-online':'● En ligne','cs1':'Est-ce encore disponible?','cs2':'Quel est le prix minimum?','cs3':'Puis-je visiter?',
     'chat-ph':'Écrire un message...','chat-send':'Envoyer','chat-continue-wa':'Continuer sur WhatsApp',
-    'price-r1':'Moins de 50 000','price-r2':'50 000 — 250 000','price-r3':'250 000 — 1 M','price-r4':'Plus de 1 M',
+    'price-r1':'Moins de 500 mille','price-r2':'500 mille — 2,5 millions','price-r3':'2,5 — 10 millions','price-r4':'Plus de 10 millions',
     'save-ad':'♡ Sauvegarder','share-ad':'↗ Partager','nav-search-ph':'Rechercher sur Rizq...',
     'dp-phone-hint':'👆 Cliquez pour afficher','dp-phone-shown':'📞 Cliquez pour appeler','dp-call':'📞 Appeler maintenant',
     'dp-whatsapp':'WhatsApp','dp-msg':'✉️ Messagerie Rizq','dp-save':'♡ Sauvegarder','dp-share':'↗ Partager','dp-print':'🖨️ Imprimer',
@@ -2424,7 +2424,12 @@ function updateRange(val){
   const n=parseInt(val);
   if(el){
     const fr=_rizqLang()==='fr';
-    el.textContent=(n>=rMax)?(fr?'Tout':'الكل'):(n.toLocaleString()+' MRU');
+    if(n>=rMax){ el.textContent=fr?'Tout':'الكل'; }
+    else if(window.RizqUx&&typeof RizqUx.formatPopularAmount==='function'){
+      el.textContent=RizqUx.formatPopularAmount(n, fr);
+    }else{
+      el.textContent=((n||0)*10).toLocaleString()+(fr?' UM':' أوقية');
+    }
   }
 }
 function doSearch(){

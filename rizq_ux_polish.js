@@ -265,25 +265,57 @@
     'صحة': 'durable'
   };
 
-  /* نطاقات سعر بالأوقية (MRU) — الأرقام ×10 لتطابق الواقع (1 المعروض = 10 أوقية) */
+  /* قيم التصفية = أوقية جديدة (MRU).
+     التسمية = الحساب الموريتاني الشائع (×10): مليون ≈ 100,000 MRU. */
+  function formatPopularAmount(mru, fr) {
+    var n = Number(mru) || 0;
+    var p = n * 10; /* ما يقوله الناس */
+    if (p >= 1000000) {
+      var m = p / 1000000;
+      var ms = Math.abs(m - Math.round(m)) < 1e-9 ? String(Math.round(m)) : String(Math.round(m * 10) / 10);
+      return fr ? ms + ' million' + (Math.abs(m) > 1.0001 ? 's' : '') : ms + ' مليون';
+    }
+    if (p >= 1000) {
+      var k = p / 1000;
+      var ks = Math.abs(k - Math.round(k)) < 1e-9 ? String(Math.round(k)) : String(Math.round(k * 10) / 10);
+      return fr ? ks + ' mille' : ks + ' ألف';
+    }
+    return fr ? String(p) : String(p);
+  }
+
+  function pricePresetLabel(minV, maxV, fr, kind) {
+    /* kind: under | range | over */
+    if (kind === 'under') {
+      return fr
+        ? 'Moins de ' + formatPopularAmount(maxV, true)
+        : 'أقل من ' + formatPopularAmount(maxV, false);
+    }
+    if (kind === 'over') {
+      return fr
+        ? 'Plus de ' + formatPopularAmount(minV, true)
+        : 'أكثر من ' + formatPopularAmount(minV, false);
+    }
+    return formatPopularAmount(minV, fr) + ' — ' + formatPopularAmount(maxV, fr);
+  }
+
   var PRICE_PRESETS = {
     low: [
-      { v: '0-10000', ar: 'أقل من 10,000', fr: 'Moins de 10 000' },
-      { v: '10000-50000', ar: '10,000 — 50,000', fr: '10 000 — 50 000' },
-      { v: '50000-200000', ar: '50,000 — 200,000', fr: '50 000 — 200 000' },
-      { v: '200000-999999999', ar: 'أكثر من 200,000', fr: 'Plus de 200 000' }
+      { v: '0-10000', ar: 'أقل من مائة ألف', fr: 'Moins de 100 mille' },
+      { v: '10000-50000', ar: 'مائة ألف — 500 ألف', fr: '100 mille — 500 mille' },
+      { v: '50000-200000', ar: '500 ألف — 2 مليون', fr: '500 mille — 2 millions' },
+      { v: '200000-999999999', ar: 'أكثر من 2 مليون', fr: 'Plus de 2 millions' }
     ],
     mid: [
-      { v: '0-50000', ar: 'أقل من 50,000', fr: 'Moins de 50 000' },
-      { v: '50000-250000', ar: '50,000 — 250,000', fr: '50 000 — 250 000' },
-      { v: '250000-1000000', ar: '250,000 — 1M', fr: '250 000 — 1 M' },
-      { v: '1000000-999999999', ar: 'أكثر من 1M', fr: 'Plus de 1 M' }
+      { v: '0-50000', ar: 'أقل من 500 ألف', fr: 'Moins de 500 mille' },
+      { v: '50000-250000', ar: '500 ألف — 2.5 مليون', fr: '500 mille — 2,5 millions' },
+      { v: '250000-1000000', ar: '2.5 مليون — 10 مليون', fr: '2,5 — 10 millions' },
+      { v: '1000000-999999999', ar: 'أكثر من 10 مليون', fr: 'Plus de 10 millions' }
     ],
     high: [
-      { v: '0-1000000', ar: 'أقل من 1M', fr: 'Moins de 1 M' },
-      { v: '1000000-5000000', ar: '1M — 5M', fr: '1 M — 5 M' },
-      { v: '5000000-20000000', ar: '5M — 20M', fr: '5 M — 20 M' },
-      { v: '20000000-999999999', ar: 'أكثر من 20M', fr: 'Plus de 20 M' }
+      { v: '0-1000000', ar: 'أقل من 10 مليون', fr: 'Moins de 10 millions' },
+      { v: '1000000-5000000', ar: '10 مليون — 50 مليون', fr: '10 — 50 millions' },
+      { v: '5000000-20000000', ar: '50 مليون — 200 مليون', fr: '50 — 200 millions' },
+      { v: '20000000-999999999', ar: 'أكثر من 200 مليون', fr: 'Plus de 200 millions' }
     ]
   };
 
@@ -442,7 +474,7 @@
       if (labels) {
         var last = labels.querySelector('span:last-child');
         if (last && last.id !== 'range-val') {
-          last.textContent = max >= 1000000 ? max / 1000000 + 'M+' : max.toLocaleString('en-US') + '+';
+          last.textContent = formatPopularAmount(max, fr) + '+';
         }
       }
       var rv = document.getElementById('range-val');
@@ -820,6 +852,7 @@
     pricePresetsForCat: pricePresetsForCat,
     priceBucketFor: priceBucketFor,
     priceTierForCat: priceTierForCat,
+    formatPopularAmount: formatPopularAmount,
     emptyStateHtml: emptyStateHtml,
     trustCardHtml: trustCardHtml,
     imgHtml: imgHtml,
