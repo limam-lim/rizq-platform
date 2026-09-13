@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.3"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.6"/>
 <script>
 (function () {
   try {
@@ -1572,32 +1572,42 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 
 
-  /* Phone numbers always LTR */
+  /* أرقام الاتصال/البريد/NNI فقط LTR — لا تُجبر كلمات المرور أو النصوص العربية */
   input[type="tel"],
   input[type="email"],
-  input[type="password"],
   input[type="number"],
   input[name*="phone"],
   input[id*="phone"],
   input[id*="Phone"],
   input[id*="email"],
   input[id*="Email"],
-  input[id*="pw"],
   input[id*="nni"],
-  input[placeholder*="هاتف"],
-  input[placeholder*="جوال"],
   .phone-num, .phone-display, .contact-phone, [data-phone] {
     direction: ltr !important;
     text-align: left !important;
     unicode-bidi: isolate;
   }
 
-  /* اسم/مدينة/وصف — اتجاه تلقائي حسب لغة المحتوى */
-  input[type="text"].m-input,
-  textarea.m-input {
-    direction: auto;
-    unicode-bidi: plaintext;
-    text-align: start;
+  /* واجهة عربية: الاسم/المدينة/الوصف/كلمة المرور من اليمين */
+  html[dir="rtl"] input[type="text"].m-input:not([dir="ltr"]),
+  html[dir="rtl"] textarea.m-input:not([dir="ltr"]),
+  html[lang="ar"] input[type="text"].m-input:not([dir="ltr"]),
+  html[lang="ar"] textarea.m-input:not([dir="ltr"]) {
+    direction: rtl !important;
+    text-align: right !important;
+    unicode-bidi: isolate !important;
+  }
+  html[dir="rtl"] input[type="password"].m-input,
+  html[lang="ar"] input[type="password"].m-input {
+    direction: ltr !important;
+    text-align: right !important;
+    unicode-bidi: isolate !important;
+  }
+  html[dir="ltr"] input[type="text"].m-input,
+  html[dir="ltr"] textarea.m-input,
+  html[dir="ltr"] input[type="password"].m-input {
+    direction: ltr !important;
+    text-align: left !important;
   }
 
 /* ═══ RIZQ PROMO POPUP ═══ */
@@ -1908,7 +1918,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_input_bidi.js"></script>
+<script src="rizq_input_bidi.js?v=1.1"></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
@@ -3095,6 +3105,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR"><span class="lang-fr">FR</span><span class="lang-sep"> | </span><span class="lang-ar">AR</span></button>
     <div class="rizq-reg-chrome-links">
       <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+      <a href="rizq_browse.html"><span class="ar-only">تصفح الإعلانات</span><span class="fr-only">Parcourir</span></a>
       <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
       <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
       <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
@@ -3162,12 +3173,22 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
       <p style="color:var(--text-muted);font-size:12px;margin-bottom:24px">كيف تريد الانضمام إلى رزق؟</p>
 
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
-        <!-- خاص -->
+        <!-- تصفح / مشتري — نفس مسار الهاتف (rizq_register.html) -->
+        <div id="type-browse" onclick="selectType('browse')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
+          <div class="cat-icon-box" style="flex-shrink:0">🛒</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">حساب تصفح</span><span class="fr-only">Compte navigation</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للمشترين — تصفّح ومفضلة وتواصل بسرعة</span><span class="fr-only">Acheteurs — parcourir, favoris et contact</span></div>
+          </div>
+          <div id="chk-browse" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
+        </div>
+
+        <!-- خاص / بائع فرد -->
         <div id="type-private" onclick="selectType('private')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🧑‍💼</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">حساب خاص</div>
-            <div style="font-size:11.5px;color:var(--text-muted)">للأفراد — بع واشترِ بسهولة</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">حساب خاص (بائع)</span><span class="fr-only">Compte privé (vendeur)</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للأفراد — انشر إعلاناتك بسهولة</span><span class="fr-only">Particuliers — publiez vos annonces</span></div>
           </div>
           <div id="chk-private" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -3176,8 +3197,8 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
         <div id="type-company" onclick="selectType('company')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🏛️</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">شركة أو مؤسسة</div>
-            <div style="font-size:11.5px;color:var(--text-muted)">للتجار والشركات — حساب موثّق</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">شركة أو مؤسسة</span><span class="fr-only">Société ou établissement</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للتجار والشركات — حساب موثّق</span><span class="fr-only">Commerçants et entreprises — compte vérifié</span></div>
           </div>
           <div id="chk-company" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -3618,6 +3639,11 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
         <span class="rizq-reg-footer-icon">🏠</span>
         <span class="rizq-reg-footer-label ar-only">الرئيسية</span>
         <span class="rizq-reg-footer-label fr-only">Accueil</span>
+      </a>
+      <a href="rizq_browse.html" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">🔍</span>
+        <span class="rizq-reg-footer-label ar-only">تصفح</span>
+        <span class="rizq-reg-footer-label fr-only">Parcourir</span>
       </a>
       <a href="rizq_post.html" class="rizq-reg-footer-item">
         <span class="rizq-reg-footer-icon">📢</span>
@@ -7302,9 +7328,10 @@ function submitIndividualReg(){
 
 function selectType(t){
   acctType=t;
-  ['private','company'].forEach(x=>{
+  ['browse','private','company'].forEach(x=>{
     const card=document.getElementById('type-'+x);
     const chk=document.getElementById('chk-'+x);
+    if(!card||!chk) return;
     if(x===t){
       card.style.borderColor='rgba(201,168,76,.6)';
       card.style.background='rgba(201,168,76,.08)';
@@ -7323,6 +7350,11 @@ function selectType(t){
 
 function goFromType(){
   if(!acctType){alert(isAr?'يرجى اختيار نوع الحساب':'Veuillez choisir le type de compte');return;}
+  if(acctType==='browse'){
+    // نفس مسار حساب التصفح على الهاتف وسطح المكتب
+    location.href='rizq_register.html?mode=buyer';
+    return;
+  }
   if(acctType==='private'){
     showPanel('p-nat-type',1,5);
   } else {

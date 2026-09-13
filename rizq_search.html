@@ -572,10 +572,10 @@ main, .page-content.active, .main-content, .results-area,
       <input type="range" min="0" max="5000000" step="25000" value="5000000" data-price-max="5000000" id="price-range" oninput="updateRange(this)"/>
       <div class="range-labels"><span>0</span><span id="range-val" data-t="range-all">الكل</span><span>50 مليون+</span></div>
       <div id="price-radios" style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
-        <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"> <span class="filter-label">أقل من 50,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"> <span class="filter-label">50,000 — 250,000</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"> <span class="filter-label">250,000 — 1M</span></label>
-        <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"> <span class="filter-label">أكثر من 1M</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"> <span class="filter-label">أقل من 500 ألف</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="50000-250000" class="filter-cb"> <span class="filter-label">500 ألف — 2.5 مليون</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="250000-1000000" class="filter-cb"> <span class="filter-label">2.5 مليون — 10 مليون</span></label>
+        <label class="filter-option"><input type="radio" name="rprice" value="1000000-999999999" class="filter-cb"> <span class="filter-label">أكثر من 10 مليون</span></label>
       </div>
     </div>
 
@@ -1337,7 +1337,12 @@ document.querySelectorAll('#rooms-chips .chip').forEach(c=>{
 function updateRange(el){
   const v = parseInt(el.value);
   const rMax = parseInt(el.getAttribute('data-price-max') || el.max || 500000);
-  document.getElementById('range-val').textContent = v>=rMax ? (_rizqLang()==='fr'?'Tout':'الكل') : v.toLocaleString('en-US')+' MRU';
+  const fr = (_rizqLang()==='fr');
+  let label;
+  if (v>=rMax) label = fr?'Tout':'الكل';
+  else if (window.RizqUx && typeof RizqUx.formatPopularAmount==='function') label = RizqUx.formatPopularAmount(v, fr);
+  else label = ((v||0)*10).toLocaleString('en-US')+(fr?' UM':' أوقية');
+  document.getElementById('range-val').textContent = label;
   document.getElementById('pmax').value = v>=rMax ? '' : v;
 }
 
