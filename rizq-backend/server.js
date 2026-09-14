@@ -236,10 +236,10 @@ function cleanExpiredAdminSessions() {
 }
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 30,
+  max: 80,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'محاولات دخول كثيرة — انتظر قليلاً ثم أعد المحاولة' },
+  message: { ok:false, error: 'محاولات دخول كثيرة — انتظر دقيقة ثم أعد المحاولة', code:'TOO_MANY_REQUESTS' },
 });
 app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   cleanExpiredAdminSessions();
