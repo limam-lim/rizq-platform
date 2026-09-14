@@ -228,15 +228,19 @@ const {
   requirePermission,
   requireAdminPermission,
 } = createAdminAuth({ adminSessions });
-console.log('[adminAccounts] loaded ' + ADMIN_ACCOUNTS.length + ' account(s): ' +
-  ADMIN_ACCOUNTS.map(a => a.user + ':' + a.role).join(', '));
+const _isProdAdminLog = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+console.log('[adminAccounts] loaded ' + ADMIN_ACCOUNTS.length + ' account(s)' +
+  (_isProdAdminLog
+    ? (' roles=' + ADMIN_ACCOUNTS.map(a => a.role).join(','))
+    : (': ' + ADMIN_ACCOUNTS.map(a => a.user + ':' + a.role).join(', '))));
 function cleanExpiredAdminSessions() {
   const now = Date.now();
   for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
 }
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 80,
+  // حد صارم ضد التخمين؛ 12 يكفي لأخطاء الكتابة دون فتح باب القوة الغاشمة
+  max: 12,
   standardHeaders: true,
   legacyHeaders: false,
   message: { ok:false, error: 'محاولات دخول كثيرة — انتظر دقيقة ثم أعد المحاولة', code:'TOO_MANY_REQUESTS' },

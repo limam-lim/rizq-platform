@@ -7680,10 +7680,8 @@ function doLogin(){
   var loginFn = (window.RizqAccount && (window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller));
   if(loginFn){
     Promise.resolve(loginFn.call(window.RizqAccount, e, p)).then(function(res){
+      // لا نرجع لجلسة قديمة عند فشل التحقق — وإلا كلمة مرور خاطئة قد تفتح لوحة الضحية على جهاز مشترك
       if(res && res.ok && res.url){ _loginSuccess(res.url); return; }
-      var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
-        ? window.RizqAccount.resolveDashboardUrl() : '';
-      if(dashUrl){ _loginSuccess(dashUrl); return; }
       _loginFail();
     }).catch(_loginFail);
     return;
