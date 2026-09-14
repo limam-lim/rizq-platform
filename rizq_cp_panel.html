@@ -692,8 +692,12 @@ main, .page-content.active, .main-content, .results-area,
           </div>
         </div>
         <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. التفاصيل في rizq-backend/README.md</p>
-        <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
-        <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
+        <div id="subagent-health-box" style="display:none;margin:0 0 12px;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.6"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
+          <button type="button" onclick="checkSubAgentHealth()" style="padding:9px 18px;background:#0f766e;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔎 فحص ربط الوكلاء / Claude</button>
+          <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
+        </div>
       </div>
 
       <!-- ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (نفس رقم/حساب المكالمات)
@@ -2204,9 +2208,10 @@ main, .page-content.active, .main-content, .results-area,
     <div class="form-group"><label class="form-label" data-t="am-role-label">الدور والصلاحيات *</label>
       <select class="form-select" id="am-role">
         <option value="moderator" data-t="am-role-moderator">🔵 مشرف (Moderator) — مراجعة الإعلانات والبلاغات</option>
-        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — كل صلاحيات المشرف + إدارة المستخدمين</option>
-        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — الاطلاع على المدفوعات والإيرادات</option>
-        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التواصل مع المستخدمين وحل المشاكل</option>
+        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — تشغيل واسع بدون أسرار الفريق</option>
+        <option value="commercial" data-t="am-role-commercial">📈 تجاري (Commercial) — حسابات وإعلانات وباقات وأسعار</option>
+        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — المدفوعات والإيرادات والإيصالات</option>
+        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التذاكر ودعم المستخدمين</option>
         <option value="super" data-t="am-role-super">👑 Super Admin — صلاحيات كاملة</option>
       </select>
     </div>
@@ -2303,8 +2308,8 @@ let TEAM = [
   {id:10,name:'المشرف التاسع',     role:'support',   emoji:'💬', phone:'',                email:'direction@rizq.mr',    notes:'دعم المستخدمين',                online:false},
 ];
 
-const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', moderator:'🔵 Moderator', finance:'🟡 Finance', support:'🟢 Support'};
-const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
+const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', commercial:'📈 تجاري', moderator:'🔵 Moderator', finance:'🟡 مالية', support:'🟢 Support'};
+const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', commercial:'pill-active', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
 
 // ══ SAMPLE DATA ══
 const USERS_DATA = [];
@@ -2322,7 +2327,14 @@ const PAYMENTS_DATA = [];
 // نتحقق منه عند كل إعادة تحميل عبر /api/admin/verify بدل الثقة بأي حالة
 // محلية بلا تحقق.
 let currentAdmin = null;
-function _adminBackendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
+function _adminBackendBase(){
+  if (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+  // نفس أصل الصفحة عند فتح اللوحة عبر المسار السري على الخادم (يتجنب فشل localhost≠127.0.0.1)
+  try {
+    if (location && /^https?:$/i.test(location.protocol) && location.host) return location.origin;
+  } catch (e) {}
+  return 'http://127.0.0.1:3000';
+}
 
 function _enterAdminUI(found){
   currentAdmin = found;
@@ -2331,20 +2343,29 @@ function _enterAdminUI(found){
   updatePendingBadge();
   updatePaymentsBadge();
   document.getElementById('sb-admin-name').textContent = found.name;
+  const roleMeta = found.roleMeta || {};
+  const roleLine = (roleMeta.emoji || '') + ' ' + (ROLE_LABELS[found.role] || found.role || '');
+  const roleEl = document.querySelector('.sb-admin-role');
+  if (roleEl) roleEl.textContent = roleLine.trim() || found.role;
   document.getElementById('welcome-name').textContent = found.name;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-MR-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  // Restrict if not super/admin
-  if(found.role==='moderator'){
-    document.querySelectorAll('.sb-item').forEach(i=>{
-      if(i.querySelector('.sb-label')?.textContent.includes('المدفوعات')||
-         i.querySelector('.sb-label')?.textContent.includes('الإعدادات')||
-         i.querySelector('.sb-label')?.textContent.includes('فريق الإدارة')){
-        i.style.display='none';
-      }
-    });
-  }
+  // إخفاء لوحات الشريط حسب صلاحيات الدور القادمة من الخادم
+  const allowed = Array.isArray(found.panels) && found.panels.length
+    ? new Set(found.panels)
+    : null;
+  document.querySelectorAll('.sb-item[onclick*="showPanel"]').forEach(i=>{
+    const m = String(i.getAttribute('onclick')||'').match(/showPanel\('([^']+)'/);
+    const panelId = m && m[1];
+    if (!panelId) return;
+    if (allowed && !allowed.has(panelId)) i.style.display = 'none';
+    else i.style.display = '';
+  });
   initDashboard();
-  showPanel('overview', document.querySelector('.sb-item[onclick*="overview"]'));
+  const first = allowed
+    ? (['overview','payments','ads','accounts','reports','users'].find(p => allowed.has(p)) || [...allowed][0])
+    : 'overview';
+  const firstItem = document.querySelector(`.sb-item[onclick*="showPanel('${first}'"]`) || document.querySelector('.sb-item[onclick*="overview"]');
+  showPanel(first || 'overview', firstItem);
   showToast(`✅ ${RizqI18n.t2('أهلاً','Bienvenue')} ${found.name} — ${ROLE_LABELS[found.role]||''}`);
 }
 
@@ -2363,11 +2384,15 @@ async function doLogin(){
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok || !data.ok){
+      if (res.status === 429) {
+        err.textContent = RizqI18n.t2(data.error||'محاولات كثيرة — انتظر دقيقة ثم أعد المحاولة','Trop de tentatives — attendez une minute puis réessayez');
+        return;
+      }
       err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
       return;
     }
-    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role })); }catch(e){}
-    _enterAdminUI({ name:data.name, role:data.role });
+    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} })); }catch(e){}
+    _enterAdminUI({ name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} });
   }catch(e){
     err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
   }finally{
@@ -2385,7 +2410,15 @@ async function doLogin(){
     fetch(_adminBackendBase()+'/api/admin/verify', { headers:{ 'x-admin-token': saved.token } })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if(data && data.ok){ _enterAdminUI({ name:data.name, role:data.role }); }
+        if(data && data.ok){
+          _enterAdminUI({
+            name: data.name,
+            role: data.role,
+            panels: data.panels || [],
+            permissions: data.permissions || [],
+            roleMeta: data.roleMeta || {}
+          });
+        }
         else { try{ sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){} }
       })
       .catch(function(){ /* الخادم غير متاح الآن — تبقى شاشة الدخول اليدوي */ });
@@ -5190,13 +5223,69 @@ function toggleSubAgent(checkbox){
 }
 function saveSubAgentConfig(){
   if(typeof RizqSub === 'undefined') return;
+  var url = document.getElementById('subagent-backend-url').value.trim();
+  var secret = document.getElementById('subagent-backend-secret').value.trim();
+  if(url && !secret){
+    showToast(RizqI18n.t2('⚠️ رابط الخادم مضبوط لكن السر المشترك فارغ — الصق BACKEND_SHARED_SECRET ثم احفظ','⚠️ URL backend défini mais le secret partagé est vide — collez BACKEND_SHARED_SECRET puis enregistrez'), 'error');
+  }
+  if(secret && (secret === 'BACKEND_SHARED_SECRET' || secret.indexOf('change-me') === 0)){
+    showToast(RizqI18n.t2('❌ لا تضع النص التوضيحي — ضع القيمة الحقيقية من .env','❌ Ne mettez pas le texte d’exemple — collez la vraie valeur depuis .env'), 'error');
+    return;
+  }
   RizqSub.setAgentConfig({
     notes: document.getElementById('subagent-notes').value,
-    backendUrl: document.getElementById('subagent-backend-url').value.trim(),
-    backendSecret: document.getElementById('subagent-backend-secret').value.trim(),
+    backendUrl: url,
+    backendSecret: secret,
   });
   var msg = document.getElementById('subagent-saved-msg');
   if(msg){ msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2000); }
+  checkSubAgentHealth();
+}
+
+async function checkSubAgentHealth(){
+  var box = document.getElementById('subagent-health-box');
+  if(box){ box.style.display='block'; box.style.background='#f8fafc'; box.style.border='1px solid #e2e8f0'; box.style.color='#334155'; box.textContent = RizqI18n.t2('...جارٍ الفحص','...Vérification'); }
+  var cfg = (typeof RizqSub !== 'undefined') ? RizqSub.getAgentConfig() : {};
+  var base = (cfg.backendUrl || _adminBackendBase() || '').replace(/\/$/,'');
+  var secret = (cfg.backendSecret || (document.getElementById('subagent-backend-secret')||{}).value || '').trim();
+  var lines = [];
+  try{
+    var ai = await fetch(base + '/api/ai/status').then(function(r){ return r.json(); });
+    lines.push(ai.configured
+      ? ('✅ Claude مربوط على الخادم — النموذج: ' + (ai.agentModel || ai.model || ''))
+      : '❌ مفتاح Claude غير مضبوط على الخادم (ANTHROPIC_API_KEY)');
+  }catch(e){
+    lines.push('❌ تعذّر الوصول لـ /api/ai/status — تحقق من رابط الخادم');
+  }
+  try{
+    var health = await fetch(base + '/api/admin/agents-health', { headers: _adminAuthHeaders() }).then(function(r){ return r.json(); });
+    if(health && health.ok){
+      lines.push(health.sharedSecretConfigured ? '✅ BACKEND_SHARED_SECRET مضبوط على الخادم' : '❌ BACKEND_SHARED_SECRET ناقص في .env');
+      lines.push(secret ? '✅ السر المشترك محفوظ في اللوحة' : '⚠️ حقل السر المشترك في اللوحة فارغ — الصقه بعد الحفظ');
+      if(health.allClaudeAgentsLinkedToKeyLoader){
+        lines.push('✅ كل وكلاء Claude مربوطون بمُحمّل المفتاح الموحّد (config/anthropic)');
+      }
+      (health.agents||[]).forEach(function(a){
+        if(!a.needsClaude) return;
+        var link = a.linkedToKeyLoader === false ? '⚠️ غير مربوط بالكود' : '';
+        lines.push((a.wired ? '✅ ' : '❌ ') + a.name + (a.wired ? '' : ' (بانتظار المفتاح على الخادم)') + (link ? ' ' + link : ''));
+      });
+      if(health.blockers && health.blockers.length){
+        health.blockers.forEach(function(b){ lines.push('→ ' + b); });
+      }
+    } else if(health && health.error === 'session_expired'){
+      lines.push('⚠️ أعد تسجيل دخول الأدمن لعرض تفاصيل الوكلاء');
+    }
+  }catch(e2){
+    lines.push('⚠️ تعذّر /api/admin/agents-health (قد تحتاج جلسة أدمن)');
+  }
+  if(box){
+    var ready = lines.every(function(l){ return l.indexOf('❌') === -1; });
+    box.style.background = ready ? '#ecfdf5' : '#fff7ed';
+    box.style.border = '1px solid ' + (ready ? '#6ee7b7' : '#fdba74');
+    box.style.color = ready ? '#065f46' : '#9a3412';
+    box.innerHTML = lines.map(function(l){ return '<div>'+l+'</div>'; }).join('');
+  }
 }
 
 // ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (rizq-backend /api/broadcast-sms) ══

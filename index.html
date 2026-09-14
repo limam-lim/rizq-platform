@@ -6418,7 +6418,8 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register') ? '1' : '';
+  /* لا تخفّض z-index على التسجيل — وإلا يغطي تذييل الموقع زر «التالي» على الهاتف */
+  modal.style.zIndex = '';
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');

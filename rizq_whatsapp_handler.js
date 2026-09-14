@@ -32,7 +32,7 @@ const bodyParser = require('body-parser');
 const axios      = require('axios');
 const { askAgent } = require('./rizq_agent_brain');
 const { askSubscriberAgent, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
-const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel, isAnthropicConfigured } = require('./rizq-backend/config/anthropic');
 
 // تحميل المشتركين (يُستبدل بـ DB عند الإنتاج) — تُقرأ أولاً من
 // rizq_subscribers_store.json (نفس الملف الذي يقرأه خادم المكالمات)
@@ -267,7 +267,7 @@ app.get('/api/status', (req, res) => {
     messages_total : waLog.length,
     active_sessions: sessions.size,
     claude_model   : getAdvancedModel(),
-    api_key_set    : !!(process.env.ANTHROPIC_API_KEY),
+    api_key_set    : isAnthropicConfigured(),
     wa_token_set   : !!(WA_CONFIG.TOKEN),
     wa_phone_id_set: !!(WA_CONFIG.PHONE_ID)
   });
@@ -280,7 +280,7 @@ app.get('/', (req, res) => {
     <h1>📱 مدير رزق الذكي v1 — خادم واتساب</h1>
     <p>✅ الخادم يعمل على المنفذ <strong>${PORT}</strong></p>
     <p>🧠 العقل: <strong>${getAdvancedModel()}</strong></p>
-    <p>🔑 Anthropic Key: <strong>${process.env.ANTHROPIC_API_KEY ? '✅' : '❌ مفقود'}</strong></p>
+    <p>🔑 Anthropic Key: <strong>${isAnthropicConfigured() ? '✅' : '❌ مفقود'}</strong></p>
     <p>📲 WhatsApp Token: <strong>${WA_CONFIG.TOKEN ? '✅' : '❌ مفقود'}</strong></p>
     <p>📊 رسائل مسجّلة: <strong>${waLog.length}</strong></p>
     <p>👥 جلسات نشطة: <strong>${sessions.size}</strong></p>
@@ -295,6 +295,6 @@ app.listen(PORT, () => {
   console.log(`\n📱 رزق WhatsApp Handler v1 (Claude-Powered) — المنفذ: ${PORT}`);
   console.log(`   Webhook → Meta: https://YOUR-DOMAIN/api/whatsapp`);
   console.log(`   Verify Token: ${WA_CONFIG.VERIFY_TOKEN}`);
-  console.log(`   Anthropic Key: ${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود في .env'}`);
+  console.log(`   Anthropic Key: ${isAnthropicConfigured() ? '✅ موجود' : '❌ مفقود في .env'}`);
   console.log(`   WA Token: ${WA_CONFIG.TOKEN ? '✅ موجود' : '❌ مفقود في .env'}\n`);
 });

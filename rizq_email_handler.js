@@ -35,7 +35,7 @@ const express    = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const { askAgent } = require('./rizq_agent_brain');
-const { getFastModel } = require('./rizq-backend/config/anthropic');
+const { getFastModel, isAnthropicConfigured } = require('./rizq-backend/config/anthropic');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -214,7 +214,7 @@ app.get('/api/status', (req, res) => {
     port        : PORT,
     emails_total: emailLog.length,
     claude_model: getFastModel(),
-    api_key_set : !!(process.env.ANTHROPIC_API_KEY)
+    api_key_set : isAnthropicConfigured()
   });
 });
 
@@ -225,7 +225,7 @@ app.get('/', (req, res) => {
     <h1>📧 مدير رزق الذكي v2 — خادم البريد</h1>
     <p>✅ الخادم يعمل على المنفذ <strong>${PORT}</strong></p>
     <p>🧠 العقل: <strong>${getFastModel()}</strong></p>
-    <p>🔑 API Key: <strong>${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود'}</strong></p>
+    <p>🔑 API Key: <strong>${isAnthropicConfigured() ? '✅ موجود' : '❌ مفقود'}</strong></p>
     <p>📊 إيميلات معالجة: <strong>${emailLog.length}</strong></p>
     <hr>
     <pre>${JSON.stringify(emailLog.slice(0, 3), null, 2)}</pre>
@@ -237,5 +237,5 @@ app.listen(PORT, () => {
   console.log(`\n📧 رزق Email Handler v2 (Claude-Powered) — المنفذ: ${PORT}`);
   console.log(`   Inbound Webhook: POST /api/email/inbound`);
   console.log(`   SendGrid: Settings → Inbound Parse → https://YOUR-DOMAIN/api/email/inbound`);
-  console.log(`   API Key: ${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ ANTHROPIC_API_KEY مفقود في .env'}\n`);
+  console.log(`   API Key: ${isAnthropicConfigured() ? '✅ موجود' : '❌ ANTHROPIC_API_KEY مفقود في .env'}\n`);
 });

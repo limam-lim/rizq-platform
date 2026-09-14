@@ -14,7 +14,11 @@
     "test:widget-lang": "node scripts/test-widget-lang.js",
     "telegram:poll": "node scripts/telegram-polling-dev.js",
     "telegram:webhook": "node scripts/setup-telegram-webhook.js",
-    "test:hardening": "node scripts/test-prod-hardening.js"
+    "test:hardening": "node scripts/test-prod-hardening.js",
+    "provision:admin": "node scripts/provision-secret-admin.js",
+    "test:admin-roles": "node scripts/test-admin-roles.js",
+    "verify:agents": "node scripts/verify-claude-agents.js",
+    "verify:claude": "node scripts/verify-claude-agents.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
