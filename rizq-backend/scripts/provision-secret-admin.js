@@ -98,7 +98,7 @@ function writeEnv(map, slots, panelPath, gateKey) {
     .sort((a, b) => a.index - b.index)
     .forEach((s) => {
       lines.push('ADMIN_USER_' + s.index + '=' + s.user);
-      lines.push('ADMIN_PASS_HASH_' + s.index + '=' + s.passHash);
+      lines.push("ADMIN_PASS_HASH_" + s.index + "='" + s.passHash + "'");
       lines.push('ADMIN_NAME_' + s.index + '=' + s.name);
       lines.push('ADMIN_ROLE_' + s.index + '=' + s.role);
       lines.push('');
