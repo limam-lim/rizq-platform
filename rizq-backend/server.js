@@ -245,11 +245,18 @@ app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   cleanExpiredAdminSessions();
   const { user, pass } = req.body || {};
   if (!user || !pass) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
-  const acc = ADMIN_ACCOUNTS.find(a => a.user === String(user).trim());
+  const userKey = String(user).trim().toLowerCase();
+  // اسم المستخدم بلا حساسية لحالة الأحرف (M.LIMAM ≡ m.limam) — كلمة المرور تبقى حساسة
+  const acc = ADMIN_ACCOUNTS.find(a => String(a.user).trim().toLowerCase() === userKey);
   // مقارنة وهمية عند عدم وجود المستخدم لإبقاء زمن الاستجابة متقارباً
   // (يقلّل من إمكانية استكشاف أسماء المستخدمين الصحيحة عبر توقيت الرد).
   const ok = await bcrypt.compare(String(pass), acc ? acc.passHash : '$2b$10$........................................');
-  if (!acc || !ok) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
+  if (!acc || !ok) {
+    return res.status(401).json({
+      error: '❌ بيانات غير صحيحة — تحقق من اسم المستخدم وكلمة المرور (كلمة المرور حساسة لحالة الأحرف)',
+      code: 'INVALID_CREDENTIALS',
+    });
+  }
   const token = crypto.randomBytes(32).toString('hex');
   const roleInfo = describeRole(acc.role);
   adminSessions.set(token, {

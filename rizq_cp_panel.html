@@ -339,6 +339,17 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_pwa.js" defer></script>
 </head>
 <body class="rizq-dash" data-t-ns="admin">
+<script>
+(function(){
+  try{
+    var u=new URL(location.href);
+    if(u.searchParams.has('k')){
+      u.searchParams.delete('k');
+      history.replaceState(null,'',u.pathname+(u.search||'')+(u.hash||''));
+    }
+  }catch(e){}
+})();
+</script>
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -350,6 +361,7 @@ main, .page-content.active, .main-content, .results-area,
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/>
     <div class="login-err" id="login-err"></div>
     <button class="login-btn" id="login-btn" data-t="login-btn" onclick="doLogin()">🔐 دخول إلى لوحة التحكم</button>
+    <p id="login-hint" style="margin:14px 0 0;font-size:12px;line-height:1.7;color:rgba(201,168,76,.75);text-align:center">افتح اللوحة دائماً عبر الرابط الكامل الذي ينتهي بـ ?k= — وفضّل مضيفاً واحداً (127.0.0.1 أو localhost)</p>
   </div>
 </div>
 
@@ -2378,7 +2390,8 @@ async function doLogin(){
   err.textContent='';
   if(btn) btn.disabled = true;
   try{
-    const res = await fetch(_adminBackendBase()+'/api/admin/login', {
+    const loginUrl = _adminBackendBase()+'/api/admin/login';
+    const res = await fetch(loginUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user:u, pass:p })
     });
@@ -2388,13 +2401,26 @@ async function doLogin(){
         err.textContent = RizqI18n.t2(data.error||'محاولات كثيرة — انتظر دقيقة ثم أعد المحاولة','Trop de tentatives — attendez une minute puis réessayez');
         return;
       }
-      err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
+      if (res.status === 404 || (data && data.code === 'NOT_FOUND')) {
+        err.textContent = RizqI18n.t2(
+          '⚠️ الخادم لا يرى مسار الدخول — تأكد أنك فتحت اللوحة من رابط الخادم (المنفذ 3000) وليس ملفاً محلياً',
+          '⚠️ Endpoint introuvable — ouvrez le panneau via le serveur (port 3000), pas un fichier local'
+        );
+        return;
+      }
+      err.textContent = RizqI18n.t2(
+        data.error || '❌ بيانات غير صحيحة — كلمة المرور حساسة لحالة الأحرف',
+        '❌ Identifiants incorrects — le mot de passe est sensible à la casse'
+      );
       return;
     }
     try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} })); }catch(e){}
     _enterAdminUI({ name:data.name, role:data.role, panels:data.panels||[], permissions:data.permissions||[], roleMeta:data.roleMeta||{} });
   }catch(e){
-    err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
+    err.textContent = RizqI18n.t2(
+      '⚠️ تعذّر الاتصال بالخادم على '+_adminBackendBase()+' — شغّل rizq-backend ثم أعد المحاولة',
+      '⚠️ Impossible de joindre '+_adminBackendBase()+' — démarrez rizq-backend puis réessayez'
+    );
   }finally{
     if(btn) btn.disabled = false;
   }

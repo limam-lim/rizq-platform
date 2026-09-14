@@ -68,9 +68,9 @@ function loadAdminAccounts() {
   const fromIndexed = loadFromIndexedEnv();
   let list = fromJson.concat(fromIndexed);
 
-  // Deduplicate by username (last wins)
+  // Deduplicate by username, case-insensitive (last wins)
   const map = new Map();
-  list.forEach((a) => map.set(a.user, a));
+  list.forEach((a) => map.set(String(a.user).toLowerCase(), a));
   list = Array.from(map.values());
 
   if (!list.length && !isProd) {
