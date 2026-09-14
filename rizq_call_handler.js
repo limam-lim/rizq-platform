@@ -49,7 +49,9 @@ const twilio     = require('twilio');
 const axios      = require('axios');
 const { askSubscriberAgent, getSubscriberProfile, getAllSubscriberProfiles, registerSubscriber, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
 const { askAgent } = require('./rizq_agent_brain');
-const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel, isAnthropicConfigured } = require('./rizq-backend/config/anthropic');
+const { validateTwilioSignature } = require('./rizq-backend/middleware/twilioWebhookAuth');
+
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -149,7 +151,7 @@ function twiGather(text, action, digits = '1', timeout = 10) {
 //    To            = رقم رزق Twilio
 //    ForwardedFrom = رقم المشترك الأصلي (المفتاح!)
 // ══════════════════════════════════════════════════════════
-app.post('/api/call', (req, res) => {
+app.post('/api/call', validateTwilioSignature, (req, res) => {
   const caller        = req.body.From          || '';
   const callSid       = req.body.CallSid       || '';
   const forwardedFrom = req.body.ForwardedFrom || ''; // رقم المشترك
@@ -267,7 +269,7 @@ function _buildSubscriberGreeting(profile) {
 // ══════════════════════════════════════════════════════════
 //  مدخلات الزائر لوكيل المشترك — هنا يعمل Claude
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/subscriber-input', async (req, res) => {
+app.post('/api/call/subscriber-input', validateTwilioSignature, async (req, res) => {
   const digit     = req.body.Digits || 'timeout';
   const callSid   = req.body.CallSid || '';
   const caller    = req.body.From || '';
@@ -344,7 +346,7 @@ app.post('/api/call/subscriber-input', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  مدخلات المتصل المباشر برزق
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/rizq-input', async (req, res) => {
+app.post('/api/call/rizq-input', validateTwilioSignature, async (req, res) => {
   const digit   = req.body.Digits || '';
   const callSid = req.body.CallSid || '';
   const caller  = req.body.From || '';
@@ -389,6 +391,25 @@ app.post('/api/call/rizq-input', async (req, res) => {
   res.send(twiml.toString());
 });
 
+
+function _requireCallApiSecret(req, res) {
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  let expected = String(process.env.RIZQ_API_SECRET || '').trim();
+  if (!expected || expected === 'rizq_secret_2025') {
+    if (isProd) {
+      res.status(503).json({ ok: false, error: 'server_misconfigured' });
+      return null;
+    }
+    expected = 'rizq_secret_2025';
+  }
+  const provided = String(req.header('x-rizq-secret') || req.query.secret || '').trim();
+  if (provided !== expected) {
+    res.status(403).json({ ok: false, error: 'غير مصرّح' });
+    return null;
+  }
+  return expected;
+}
+
 // ══════════════════════════════════════════════════════════
 //  API: تفعيل / إيقاف الوكيل (من لوحة المشترك)
 //  POST /api/agent/toggle
@@ -397,9 +418,18 @@ app.post('/api/call/rizq-input', async (req, res) => {
 app.post('/api/agent/toggle', (req, res) => {
   const { subscriberPhone, active, secret } = req.body;
 
-  // تحقق بسيط من السر (يُحسَّن لاحقاً بـ JWT)
-  const expectedSecret = process.env.RIZQ_API_SECRET || 'rizq_secret_2025';
-  if(secret !== expectedSecret) {
+  // Require a non-default RIZQ_API_SECRET in production (no hardcoded fallback).
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  let expectedSecret = String(process.env.RIZQ_API_SECRET || '').trim();
+  if (!expectedSecret || expectedSecret === 'rizq_secret_2025') {
+    if (isProd) {
+      console.error('[call-handler] RIZQ_API_SECRET missing or insecure default — refusing toggle');
+      return res.status(503).json({ ok: false, error: 'server_misconfigured' });
+    }
+    expectedSecret = 'rizq_secret_2025';
+    console.warn('[call-handler] using insecure default RIZQ_API_SECRET — set env before production');
+  }
+  if (secret !== expectedSecret) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
 
@@ -424,6 +454,7 @@ app.post('/api/agent/toggle', (req, res) => {
 
 // ── API: حالة وكيل مشترك ────────────────────────────────
 app.get('/api/agent/status/:phone', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   const phone   = req.params.phone;
   const profile = getSubscriberProfile(phone);
   const active  = agentStatus.get(phone) !== false;
@@ -437,11 +468,13 @@ app.get('/api/agent/status/:phone', (req, res) => {
 
 // ── API: سجل المكالمات ───────────────────────────────────
 app.get('/api/call-log', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   res.json({ calls: callLog.slice(0, 50), total: callLog.length });
 });
 
 // ── API: سجل مكالمات مشترك بعينه ────────────────────────
 app.get('/api/call-log/:phone', (req, res) => {
+  if (!_requireCallApiSecret(req, res)) return;
   const phone = req.params.phone;
   const calls = callLog.filter(c => c.subscriberNum === phone);
   res.json({ calls: calls.slice(0, 50), total: calls.length });
@@ -459,7 +492,7 @@ app.get('/', (req, res) => {
       <tr><td style="padding:8px;font-weight:bold">وكلاء نشطون</td><td>${activeCount}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">مكالمات مسجّلة</td><td>${callLog.length}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Claude Model</td><td>${getAdvancedModel()}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">API Key</td><td>${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود'}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">API Key</td><td>${isAnthropicConfigured() ? '✅ موجود' : '❌ مفقود'}</td></tr>
     </table>
     <hr>
     <h3>آخر 5 مكالمات:</h3>

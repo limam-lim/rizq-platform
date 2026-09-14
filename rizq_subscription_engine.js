@@ -513,7 +513,7 @@
         var _accInfo2 = accounts[accId] || {};
         fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
           method: 'POST',
-          headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+          headers: (function(){ var h={'Content-Type':'application/json'}; if(_cfg.backendSecret) h['x-rizq-secret']=_cfg.backendSecret; try{ var s=JSON.parse(sessionStorage.getItem('rizq_admin_session')||'null'); if(s&&s.token) h['x-admin-token']=s.token; }catch(e){} return h; })(),
           body: JSON.stringify({
             accountId   : accId,
             accountName : _accInfo2.name || accId,
@@ -546,7 +546,7 @@
           if (diamondOn && _accInfo2.phone) {
             fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/subscriber/register', {
               method: 'POST',
-              headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+              headers: (function(){ var h={'Content-Type':'application/json'}; if(_cfg.backendSecret) h['x-rizq-secret']=_cfg.backendSecret; try{ var s=JSON.parse(sessionStorage.getItem('rizq_admin_session')||'null'); if(s&&s.token) h['x-admin-token']=s.token; }catch(e){} return h; })(),
               body: JSON.stringify({
                 subscriberId: String(_accInfo2.phone).replace(/[^0-9+]/g,'').slice(0, 40),
                 businessName: _accInfo2.name || accId,
@@ -1050,15 +1050,37 @@
   var AGENT_CFG_KEY = 'rizq_subagent_config';
   var DEFAULT_AGENT_CFG = { enabled: true, notes: '', officialAccounts: [], backendUrl: '', backendSecret: '' };
 
+  
+  function _agentAuthHeaders(extra) {
+    var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+    var cfg = getAgentConfig();
+    if (cfg.backendSecret) h['x-rizq-secret'] = cfg.backendSecret;
+    try {
+      var s = JSON.parse(sessionStorage.getItem('rizq_admin_session') || 'null');
+      if (s && s.token) h['x-admin-token'] = s.token;
+    } catch (e) {}
+    return h;
+  }
+
   function getAgentConfig() {
     try {
       var raw = JSON.parse(localStorage.getItem(AGENT_CFG_KEY) || 'null');
-      return raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
+      var cfg = raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
+      try {
+        var sec = sessionStorage.getItem(AGENT_CFG_KEY + '_secret');
+        if (sec) cfg.backendSecret = sec;
+      } catch (eSec) {}
+      return cfg;
     } catch(e) { return Object.assign({}, DEFAULT_AGENT_CFG); }
   }
   function setAgentConfig(partial) {
     var cfg = Object.assign(getAgentConfig(), partial || {});
-    localStorage.setItem(AGENT_CFG_KEY, JSON.stringify(cfg));
+    var toStore = Object.assign({}, cfg);
+    if (toStore.backendSecret) {
+      try { sessionStorage.setItem(AGENT_CFG_KEY + '_secret', String(toStore.backendSecret)); } catch (eS) {}
+      delete toStore.backendSecret;
+    }
+    localStorage.setItem(AGENT_CFG_KEY, JSON.stringify(toStore));
     return cfg;
   }
   function isAgentEnabled() { return getAgentConfig().enabled !== false; }

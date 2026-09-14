@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.9"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=7.2"/>
 <script>
 (function () {
   try {
@@ -163,18 +163,20 @@ html[dir="ltr"] .mobile-drawer-close{left:auto;right:22px}
 nav .btn-lang,nav .btn-lang-primary{
   position:static!important;top:auto!important;left:auto!important;bottom:auto!important;
   background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));
-  border:1.5px solid rgba(201,168,76,.55);color:#E8C96A;
+  border:1.5px solid rgba(201,168,76,.55);color:#fff;
   font-size:12.5px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:22px;
   cursor:pointer;transition:transform .15s ease,background .2s;white-space:nowrap;flex-shrink:0;z-index:auto!important;
   direction:ltr!important;unicode-bidi:isolate;display:inline-flex!important;flex-direction:row!important;align-items:center;gap:.2em;
 }
-nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1}
-nav .btn-lang .lang-sep,nav .btn-lang-primary .lang-sep{order:2;opacity:.85}
-nav .btn-lang .lang-ar,nav .btn-lang-primary .lang-ar{order:3}
-nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#fff}
+nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1;color:#fff;opacity:.8}
+nav .btn-lang .lang-sep,nav .btn-lang-primary .lang-sep{order:2;color:rgba(255,255,255,.5);opacity:1}
+nav .btn-lang .lang-ar,nav .btn-lang-primary .lang-ar{order:3;color:#fff;opacity:.8}
+html[lang="ar"] nav .btn-lang .lang-ar,html[lang="ar"] nav .btn-lang-primary .lang-ar{color:#E8C96A;opacity:1;font-weight:900}
+html[lang="fr"] nav .btn-lang .lang-fr,html[lang="fr"] nav .btn-lang-primary .lang-fr{color:#E8C96A;opacity:1;font-weight:900}
+nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28)}
 nav .btn-lang:active,nav .btn-lang-primary:active{transform:scale(0.98)}
-.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#C9A84C;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.btn-lang:hover{background:rgba(201,168,76,.22);color:#E8C96A}
+.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;direction:ltr}
+.btn-lang:hover{background:rgba(201,168,76,.22)}
 /* إصلاح جوهري: nav-center (8 روابط + قائمة الباقات) و nav-right (الإشعار
    القانوني + 3 أزرار) كانا كلاهما flex-shrink:0 مع logo أيضاً flex-shrink:0
    ومدفوعاً بـmargin-left:auto — إن تجاوز مجموع عرضها عرض الشريط (وارد جداً
@@ -3111,7 +3113,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 
 <div class="modal-overlay" id="modal">
   <nav class="rizq-reg-chrome" id="rizq-reg-chrome" aria-label="شريط التسجيل">
-    <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR"><span class="lang-fr">FR</span><span class="lang-sep"> | </span><span class="lang-ar">AR</span></button>
+    <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <div class="rizq-reg-chrome-links">
       <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
       <a href="rizq_browse.html"><span class="ar-only">تصفح الإعلانات</span><span class="fr-only">Parcourir</span></a>
@@ -5205,7 +5207,10 @@ function applyLandingLang(toAr) {
   var mbnLabels = document.querySelectorAll('#mobile-bottom-nav .mbn-label');
   var mbnAR = ['الرئيسية','الأقسام','نشر','رزق ذكي','المزيد'];
   var mbnFR = ['Accueil','Catégories','Publier','Rizq IA','Plus'];
-  mbnLabels.forEach(function(el, i){ if (mbnAR[i]) el.textContent = isAr ? mbnAR[i] : mbnFR[i]; });
+  mbnLabels.forEach(function(el, i){
+    var idx = i % 5;
+    if (mbnAR[idx]) el.textContent = isAr ? mbnAR[idx] : mbnFR[idx];
+  });
   var hubs = document.querySelector('.cta-hubs');
   if (hubs) hubs.setAttribute('aria-label', isAr ? 'أقسام رزق للأعمال' : 'Espaces professionnels Rizq');
   var backTop = document.getElementById('back-to-top');
@@ -6374,18 +6379,34 @@ function rizqMountAccountBars(modal){
   if(!modal) return;
   var chrome=document.getElementById('rizq-reg-chrome');
   var fakeFooter=document.getElementById('rizq-reg-footer');
-  if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
-  if(fakeFooter && fakeFooter.parentNode!==modal) modal.appendChild(fakeFooter);
+  /* ارفع الشريط إلى body ليبقى ثابتاً فوق الشاشة */
+  if(chrome && chrome.parentNode!==document.body){
+    document.body.insertBefore(chrome, document.body.firstChild);
+  }
   if(chrome){
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
     chrome.style.display='flex';
+    chrome.style.position='fixed';
+    chrome.style.top='0';
+    chrome.style.left='0';
+    chrome.style.right='0';
+    chrome.style.width='100%';
+    chrome.style.zIndex='10050';
+    chrome.style.transform='none';
   }
+  /* الشريط الرسمي = تذييل الموقع <footer> — لا نُظهر شريط الأيقونات القديم */
   if(fakeFooter){
-    fakeFooter.style.display='flex';
-    fakeFooter.style.visibility='visible';
-    fakeFooter.style.pointerEvents='auto';
+    fakeFooter.style.display='none';
+    fakeFooter.style.visibility='hidden';
+    fakeFooter.style.pointerEvents='none';
+  }
+  var siteFooter=document.querySelector('body > footer');
+  if(siteFooter){
+    siteFooter.style.display='';
+    siteFooter.style.visibility='';
+    siteFooter.style.pointerEvents='';
   }
 }
 
@@ -6407,7 +6428,8 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register') ? '1000001' : '';
+  /* لا تخفّض z-index على التسجيل — وإلا يغطي تذييل الموقع زر «التالي» على الهاتف */
+  modal.style.zIndex = '';
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
@@ -6441,8 +6463,11 @@ function openModal(mode){
       document.body.classList.remove('rizq-reg-open');
     }
   }
-  document.body.style.overflow='hidden';
-  ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
+  if(mode==='register' || document.body.classList.contains('rizq-reg-open')){
+    document.body.style.overflow='';
+  } else {
+    document.body.style.overflow='hidden';
+  }
   const dots=document.getElementById('sdots');
   if(mode==='login'){
     document.getElementById('p-login').style.display='block';
@@ -6476,6 +6501,12 @@ function closeModal(force){
   }
   document.body.classList.remove('rizq-reg-open');
   document.body.style.overflow='';
+  var chromeOff=document.getElementById('rizq-reg-chrome');
+  if(chromeOff){
+    chromeOff.style.display='none';
+    chromeOff.style.visibility='hidden';
+    chromeOff.style.pointerEvents='none';
+  }
   try{
     var u=new URL(window.location.href);
     if(u.searchParams.has('openRegister')){
@@ -6904,7 +6935,9 @@ function _syncAccountToBackend(acc){
       nni: acc.nni || '',
       idImage: acc.id_image || '',
       licenseImage: acc.license_image || '',
-      activityImage2: acc.activity_image2 || acc.activityImage2 || ''
+      activityImage2: acc.activity_image2 || acc.activityImage2 || '',
+      // كلمة المرور تُشفَّر على الخادم فقط (bcrypt) — لا تُعاد في الرد
+      password: acc.password || ''
     })
   }).then(function(res){
     return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
@@ -7636,25 +7669,24 @@ function doLogin(){
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
-    var res = window.RizqAccount.loginSeller(e, p);
-    if(res && res.ok && res.url){
-      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-      closeModal();
-      setTimeout(function(){ location.href = res.url; }, 400);
-      return;
-    }
-  }
-  var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
-    ? window.RizqAccount.resolveDashboardUrl()
-    : '';
-  if(dashUrl){
+  function _loginSuccess(url){
     showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
     closeModal();
-    setTimeout(function(){ location.href = dashUrl; }, 400);
+    setTimeout(function(){ location.href = url; }, 400);
+  }
+  function _loginFail(){
+    alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
+  }
+  var loginFn = (window.RizqAccount && (window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller));
+  if(loginFn){
+    Promise.resolve(loginFn.call(window.RizqAccount, e, p)).then(function(res){
+      // لا نرجع لجلسة قديمة عند فشل التحقق — وإلا كلمة مرور خاطئة قد تفتح لوحة الضحية على جهاز مشترك
+      if(res && res.ok && res.url){ _loginSuccess(res.url); return; }
+      _loginFail();
+    }).catch(_loginFail);
     return;
   }
-  alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
+  _loginFail();
 }
 
 // ══ XSS helpers ══

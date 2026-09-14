@@ -50,25 +50,47 @@
   }
 
   function injectCss() {
-    if (document.getElementById('rizq-lang-guard-css')) return;
     var css = [
-      /* ── قفل ثنائي اللغة: لا يظهر إلا لسان html[lang] ── */
-      'html[lang="fr"] .ar-only,html[lang="fr"] .lang-ar,html[lang="fr"] [data-lang="ar"],html[lang="fr"] [lang="ar"]:not(html):not([data-user-content]):not([data-bilingual-ok]){display:none!important}',
-      'html[lang="ar"] .fr-only,html[lang="ar"] .lang-fr,html[lang="ar"] [data-lang="fr"],html[lang="ar"] [lang="fr"]:not(html):not([data-user-content]):not([data-bilingual-ok]){display:none!important}',
-      'html[lang="ar"] .ar-only,html[lang="ar"] .lang-ar,html[lang="ar"] [data-lang="ar"]{display:revert}',
-      'html[lang="fr"] .fr-only,html[lang="fr"] .lang-fr,html[lang="fr"] [data-lang="fr"]{display:revert}',
-      /* أزرار اللغة نفسها تبقى ظاهرة دائماً */
-      '#rizq-lang-btn .lang-fr,#rizq-lang-btn .lang-ar,#rizq-lang-btn .lang-sep,',
+      /* ── قفل ثنائي اللغة للمحتوى فقط (.ar-only/.fr-only/[data-lang]) — لا نخفي .lang-ar/.lang-fr داخل زر اللغة ── */
+      'html[lang="fr"] .ar-only,html[lang="fr"] [data-lang="ar"],html[lang="fr"] [lang="ar"]:not(html):not([data-user-content]):not([data-bilingual-ok]){display:none!important}',
+      'html[lang="ar"] .fr-only,html[lang="ar"] [data-lang="fr"],html[lang="ar"] [lang="fr"]:not(html):not([data-user-content]):not([data-bilingual-ok]){display:none!important}',
+      'html[lang="ar"] .ar-only,html[lang="ar"] [data-lang="ar"]{display:revert}',
+      'html[lang="fr"] .fr-only,html[lang="fr"] [data-lang="fr"]{display:revert}',
+      /* أزرار اللغة: FR | AR ظاهران دائماً */
       '.btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang .lang-sep,',
-      '.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar,.btn-lang-primary .lang-sep{display:inline!important}',
+      '.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar,.btn-lang-primary .lang-sep,',
+      'html[lang="ar"] .rizq-reg-chrome-lang .lang-fr,html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,html[lang="ar"] .rizq-reg-chrome-lang .lang-sep,',
+'html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,html[lang="fr"] .rizq-reg-chrome-lang .lang-ar,html[lang="fr"] .rizq-reg-chrome-lang .lang-sep,',
+      '#lang-btn .lang-fr,#lang-btn .lang-ar,#lang-btn .lang-sep,',
+      '#rizq-lang-btn .lang-fr,#rizq-lang-btn .lang-ar,#rizq-lang-btn .lang-sep,',
+      '#nav-lang-btn .lang-fr,#nav-lang-btn .lang-ar,#nav-lang-btn .lang-sep,',
+      '#store-lang-btn .lang-fr,#store-lang-btn .lang-ar,#store-lang-btn .lang-sep,',
+      '#office-lang-btn .lang-fr,#office-lang-btn .lang-ar,#office-lang-btn .lang-sep,',
+      '#office-lang-btn-mobile .lang-fr,#office-lang-btn-mobile .lang-ar,#office-lang-btn-mobile .lang-sep{display:inline!important}',
+      /* غير النشط أبيض — النشط أصفر ذهبي */
+      '.btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar,',
+      '.rizq-reg-chrome-lang .lang-fr,.rizq-reg-chrome-lang .lang-ar,',
+      '#lang-btn .lang-fr,#lang-btn .lang-ar,#nav-lang-btn .lang-fr,#nav-lang-btn .lang-ar,',
+      '#rizq-lang-btn .lang-fr,#rizq-lang-btn .lang-ar,#store-lang-btn .lang-fr,#store-lang-btn .lang-ar,',
+      '#office-lang-btn .lang-fr,#office-lang-btn .lang-ar,#office-lang-btn-mobile .lang-fr,#office-lang-btn-mobile .lang-ar{color:#fff!important;opacity:.8;font-weight:700}',
+      '.btn-lang .lang-sep,.btn-lang-primary .lang-sep,.rizq-reg-chrome-lang .lang-sep{color:rgba(255,255,255,.5)!important;opacity:1}',
+      'html[lang="ar"] .btn-lang .lang-ar,html[lang="ar"] .btn-lang-primary .lang-ar,html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,',
+      'html[lang="ar"] #lang-btn .lang-ar,html[lang="ar"] #nav-lang-btn .lang-ar,html[lang="ar"] #rizq-lang-btn .lang-ar,',
+      'html[lang="ar"] #store-lang-btn .lang-ar,html[lang="ar"] #office-lang-btn .lang-ar,html[lang="ar"] #office-lang-btn-mobile .lang-ar{color:#E8C96A!important;opacity:1!important;font-weight:900!important;text-shadow:0 0 8px rgba(232,201,106,.35)}',
+      'html[lang="fr"] .btn-lang .lang-fr,html[lang="fr"] .btn-lang-primary .lang-fr,html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,',
+      'html[lang="fr"] #lang-btn .lang-fr,html[lang="fr"] #nav-lang-btn .lang-fr,html[lang="fr"] #rizq-lang-btn .lang-fr,',
+      'html[lang="fr"] #store-lang-btn .lang-fr,html[lang="fr"] #office-lang-btn .lang-fr,html[lang="fr"] #office-lang-btn-mobile .lang-fr{color:#E8C96A!important;opacity:1!important;font-weight:900!important;text-shadow:0 0 8px rgba(232,201,106,.35)}',
       /* عناصر وُسمت كمسرّبة حتى تُترجم */
       '[data-rizq-lang-leak="1"]{visibility:hidden!important}',
       'html.rizq-lang-guard-ready [data-rizq-lang-leak="1"]{visibility:hidden!important}'
     ].join('');
-    var style = document.createElement('style');
-    style.id = 'rizq-lang-guard-css';
+    var style = document.getElementById('rizq-lang-guard-css');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'rizq-lang-guard-css';
+      (document.head || document.documentElement).appendChild(style);
+    }
     style.textContent = css;
-    (document.head || document.documentElement).appendChild(style);
   }
 
   function hasArabic(s) {

@@ -660,13 +660,19 @@
     }
 
     /* دخول بائع مفعّل عبر التوجيه الموحّد (محل/مكتب/شركة/فرد) */
-    if (window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function') {
-      var seller = window.RizqAccount.loginSeller(email, pw);
-      if (seller && seller.ok && seller.url) {
-        setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = seller.url; }, 400);
-        return;
-      }
+    if (window.RizqAccount && (window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller)) {
+      var loginFn = window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller;
+      Promise.resolve(loginFn.call(window.RizqAccount, email, pw)).then(function (seller) {
+        if (seller && seller.ok && seller.url) {
+          setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+          setTimeout(function () { location.href = seller.url; }, 400);
+          return;
+        }
+        setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');
+      }).catch(function () {
+        setStatus(t('تعذّر الاتصال بالخادم. حاول مجدداً.', 'Connexion au serveur impossible.'), 'bad');
+      });
+      return;
     }
 
     setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');

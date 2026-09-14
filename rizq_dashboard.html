@@ -81,9 +81,12 @@ a{text-decoration:none;color:inherit}
 .main-content{margin-right:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden}
 
 /* Top bar */
-.topbar{background:rgba(8,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:0 28px;height:60px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50}
-.topbar-title{font-size:16px;font-weight:800;color:var(--white)}
-.topbar-actions{display:flex;align-items:center;gap:10px;margin-right:auto}
+.topbar{background:rgba(8,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:800;color:var(--white);flex-shrink:0}
+.topbar-controls{display:flex;align-items:center;gap:10px;min-width:0}
+/* Keep lang/notif/msg physically LEFT of gold CTAs in both AR and FR */
+.topbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;direction:ltr;unicode-bidi:isolate}
+.topbar-utils,.topbar-ctas{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .btn-new-ad{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:8px 18px;border-radius:9px;font-weight:800;font-size:12.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:flex;align-items:center;gap:6px}
 .btn-new-ad:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
 .topbar .btn-lang,.topbar .btn-lang-primary{
@@ -92,6 +95,11 @@ a{text-decoration:none;color:inherit}
   cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;height:auto;width:auto;line-height:1.2
 }
 .topbar .btn-lang:hover,.topbar .btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#E8C96A}
+.topbar .btn-lang .lang-fr,.topbar .btn-lang .lang-ar,.topbar .btn-lang-primary .lang-fr,.topbar .btn-lang-primary .lang-ar{color:#fff;opacity:.8}
+.topbar .btn-lang .lang-sep,.topbar .btn-lang-primary .lang-sep{color:rgba(255,255,255,.5)}
+html[lang="ar"] .topbar .btn-lang .lang-ar,html[lang="ar"] .topbar .btn-lang-primary .lang-ar{color:#E8C96A;opacity:1;font-weight:900}
+html[lang="fr"] .topbar .btn-lang .lang-fr,html[lang="fr"] .topbar .btn-lang-primary .lang-fr{color:#E8C96A;opacity:1;font-weight:900}
+
 .btn-icon{width:38px;height:38px;background:linear-gradient(160deg,#163056,#0c1c38);border:1.5px solid #C9A84C;border-radius:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;color:#e8c96a;position:relative;box-shadow:0 0 0 1px rgba(201,168,76,.2),0 6px 16px rgba(201,168,76,.22)}
 .btn-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
 .btn-icon:hover{background:linear-gradient(145deg,#e8c96a,#C9A84C);color:#0f2347;border-color:#e8c96a;box-shadow:0 8px 22px rgba(201,168,76,.5);transform:translateY(-1px)}
@@ -467,20 +475,24 @@ main, .page-content.active, .main-content, .results-area,
 <!-- ══ MAIN CONTENT ══ -->
 <div class="main-content">
 
-  <!-- TOPBAR -->
+  <!-- TOPBAR: title at logical start, actions at end (LTR+RTL) -->
   <div class="topbar">
+    <span class="topbar-title" id="topbar-title" data-t="overview">نظرة عامة</span>
     <div class="topbar-controls">
       <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
-      <div class="topbar-actions">
-        <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
-        <button type="button" class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item[onclick*=notifications]'))" data-t-title="notif-title" aria-label="الإشعارات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-dot" id="notif-dot" hidden></span></button>
-        <button type="button" class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item[onclick*=messages]'))" data-t-title="messages-title" aria-label="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12.2a7.5 7.5 0 0 1-7.2 7.5H8.2L4 22.5v-9.3a7.5 7.5 0 1 1 16.5-1"/></svg></button>
-        <button class="btn-new-ad" onclick="openShareModal()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" data-t="topbar-share-btn">📤 مشاركة ملفي</button>
-        <button class="btn-new-ad" onclick="showPanel('video-ads',null)" data-t="topbar-video-ad-btn">🎬 إعلان فيديو</button>
-        <button class="btn-new-ad" onclick="location.href='rizq_post.html'" data-t="topbar-new-ad-btn">➕ إعلان جديد</button>
+      <div class="topbar-actions" dir="ltr">
+        <div class="topbar-utils">
+          <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+          <button type="button" class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item[onclick*=notifications]'))" data-t-title="notif-title" aria-label="الإشعارات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-dot" id="notif-dot" hidden></span></button>
+          <button type="button" class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item[onclick*=messages]'))" data-t-title="messages-title" aria-label="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12.2a7.5 7.5 0 0 1-7.2 7.5H8.2L4 22.5v-9.3a7.5 7.5 0 1 1 16.5-1"/></svg></button>
+        </div>
+        <div class="topbar-ctas">
+          <button class="btn-new-ad" onclick="openShareModal()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" data-t="topbar-share-btn">📤 مشاركة ملفي</button>
+          <button class="btn-new-ad" onclick="showPanel('video-ads',null)" data-t="topbar-video-ad-btn">🎬 إعلان فيديو</button>
+          <button class="btn-new-ad" onclick="location.href='rizq_post.html'" data-t="topbar-new-ad-btn">➕ إعلان جديد</button>
+        </div>
       </div>
     </div>
-    <span class="topbar-title" id="topbar-title" data-t="overview">نظرة عامة</span>
   </div>
 
   <!-- ══ PAGE CONTENT ══ -->
@@ -1861,8 +1873,9 @@ function _resolveRealAccessToken(acc){
   return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.account) return null;
+      // accessToken لم يعد يُعاد من verify-dash — dashToken (SESSION_TOKEN) يكفي للملكية.
+      window.REAL_ACCESS_TOKEN = data.account.accessToken || SESSION_TOKEN;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });

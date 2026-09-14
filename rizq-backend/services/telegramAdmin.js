@@ -364,6 +364,25 @@ function inlineKeyboard(requestId) {
   };
 }
 
+
+function loadReceiptDataUrl(req) {
+  if (req && req.receiptImage) return req.receiptImage;
+  if (!req || !req.receiptPath) return null;
+  try {
+    const fs = require('fs');
+    const { resolveReceiptAbsolute } = require('./receiptStorage');
+    const abs = resolveReceiptAbsolute(req.receiptPath);
+    if (!abs) return null;
+    const buf = fs.readFileSync(abs);
+    const mime = (req.receiptMeta && req.receiptMeta.mime) || 'image/jpeg';
+    if (!String(mime).startsWith('image/')) return null; // PDF: notify without vision
+    return 'data:' + mime + ';base64,' + buf.toString('base64');
+  } catch (e) {
+    console.warn('[telegram-admin] load receipt:', e.message);
+    return null;
+  }
+}
+
 function parseDataUrl(receiptImage) {
   const m = String(receiptImage || '').match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
   if (!m) return null;
@@ -441,7 +460,7 @@ async function sendSubRequestNotification(req, aiResult) {
   const markup = JSON.stringify(inlineKeyboard(req.id));
   const chatId = ADMIN_CHAT_ID();
 
-  const parsed = parseDataUrl(req.receiptImage);
+  const parsed = parseDataUrl(loadReceiptDataUrl(req));
   if (parsed && parsed.buffer.length > 0) {
     const form = new FormData();
     form.append('chat_id', chatId);
@@ -513,8 +532,9 @@ async function processNewSubRequest(requestId, deps) {
   req._accountPhone = accRow?.phone || '';
 
   let aiResult = null;
-  if (req.receiptImage && isAnthropicAvailable(deps)) {
-    const analysis = await analyzeReceiptImage(req.receiptImage, {
+  const receiptDataUrl = loadReceiptDataUrl(req);
+  if (receiptDataUrl && isAnthropicAvailable(deps)) {
+    const analysis = await analyzeReceiptImage(receiptDataUrl, {
       expectedPrice: req.expectedPrice || req.price,
       pkgName: req.pkg,
       anthropic,
@@ -526,7 +546,7 @@ async function processNewSubRequest(requestId, deps) {
       riskLevel: aiResult.plausibilityLevel || req.riskLevel,
     }, writeSubRequests);
   } else {
-    aiResult = { plausibilityLevel: req.receiptImage ? 'unreviewed' : 'high', notes: req.receiptImage ? ['تعذّر التحليل الآلي'] : ['لا يوجد وصل مرفق'] };
+    aiResult = { plausibilityLevel: receiptDataUrl ? 'unreviewed' : 'high', notes: receiptDataUrl ? ['تعذّر التحليل الآلي'] : ['لا يوجد وصل مرفق'] };
   }
 
   try {
