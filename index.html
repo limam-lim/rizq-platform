@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=7.0"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=7.2"/>
 <script>
 (function () {
   try {
@@ -6379,12 +6379,22 @@ function rizqMountAccountBars(modal){
   if(!modal) return;
   var chrome=document.getElementById('rizq-reg-chrome');
   var fakeFooter=document.getElementById('rizq-reg-footer');
-  if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
+  /* ارفع الشريط إلى body ليبقى ثابتاً فوق الشاشة حتى لو تغيّر containing-block للمودال */
+  if(chrome && chrome.parentNode!==document.body){
+    document.body.insertBefore(chrome, document.body.firstChild);
+  }
   if(chrome){
     chrome.style.visibility='visible';
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
     chrome.style.display='flex';
+    chrome.style.position='fixed';
+    chrome.style.top='0';
+    chrome.style.left='0';
+    chrome.style.right='0';
+    chrome.style.width='100%';
+    chrome.style.zIndex='10050';
+    chrome.style.transform='none';
   }
   /* الشريط الرسمي = تذييل الموقع <footer> — لا نُظهر شريط الأيقونات القديم */
   if(fakeFooter){
@@ -6491,6 +6501,12 @@ function closeModal(force){
   }
   document.body.classList.remove('rizq-reg-open');
   document.body.style.overflow='';
+  var chromeOff=document.getElementById('rizq-reg-chrome');
+  if(chromeOff){
+    chromeOff.style.display='none';
+    chromeOff.style.visibility='hidden';
+    chromeOff.style.pointerEvents='none';
+  }
   try{
     var u=new URL(window.location.href);
     if(u.searchParams.has('openRegister')){
