@@ -117,6 +117,17 @@ function getSectionRules() {
 
 // ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
 // (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
+// PDFs de المناقصات — téléchargement protégé via /api/tenders/:id/document فقط
+app.use('/uploads/tenders', (req, res, next) => {
+  if (/\.pdf$/i.test(req.path)) {
+    return res.status(403).json({
+      error: 'document_access_forbidden',
+      msg: 'ملف المناقصة محمي — يلزم اشتراك للتحميل',
+      msg_fr: 'Document protégé — abonnement requis pour télécharger',
+    });
+  }
+  next();
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 function readJson(file, fallback) {
@@ -540,6 +551,10 @@ const {
   saveCatalogImage,
   saveTenderImages,
 } = require('./services/imagePipeline');
+const {
+  saveTenderDocument,
+  resolveTenderDocumentAbsPath,
+} = require('./services/tenderDocument');
 const { startMaintenanceScheduler } = require('./services/maintenanceScheduler');
 const { readAuditLog } = require('./services/adLifecycle');
 const { readLatestBackupMeta } = require('./services/backupService');
@@ -2368,6 +2383,7 @@ function toPublicTender(t, access) {
   const contacts = resolveTenderOwnerContacts(t);
   const rawImages = Array.isArray(t.images) ? t.images : [];
   const imageCount = rawImages.length;
+  const hasDocument = !!t.document;
   return {
     id: t.id,
     title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
@@ -2380,6 +2396,10 @@ function toPublicTender(t, access) {
     images: contactsUnlocked ? rawImages : [],
     imagesLocked: !contactsUnlocked && imageCount > 0,
     imageCount: imageCount,
+    hasDocument,
+    documentLocked: !contactsUnlocked && hasDocument,
+    documentUrl: (contactsUnlocked && hasDocument) ? ('/api/tenders/' + t.id + '/document') : null,
+    documentName: hasDocument ? (t.documentName || 'tender-document.pdf') : null,
     ownerName: t.ownerName,
     ownerId: t.ownerId || null,
     createdAt: t.createdAt,
@@ -2594,6 +2614,8 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     deadline: new Date(deadlineMs).toISOString(),
     // صور مرجعية اختيارية — تُراجع مع المناقصة قبل النشر العام
     images: await saveTenderImages(tenderId, b.images),
+    document: await saveTenderDocument(tenderId, b.document),
+    documentName: b.document ? String(b.documentName || 'tender-document.pdf').slice(0, 120) : null,
     status: 'pending_review',
     createdAt: new Date().toISOString(),
     bids: [],
@@ -2608,10 +2630,32 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     msg: 'تم استلام مناقصتك — ستُنشر بعد مراجعة فريق رزق.',
   });
   } catch (err) {
-    console.error('[tenders/post] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
+    console.error('[tenders/post] upload pipeline:', err.message);
+    if (err.code === 'invalid_pdf') {
+      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
+    }
+    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة المرفقات — تأكد من صحة الصور وملف PDF' });
   }
 });
+
+function streamTenderDocumentFile(t, res) {
+  const absPath = resolveTenderDocumentAbsPath(t.document);
+  if (!absPath || !fs.existsSync(absPath)) {
+    return res.status(404).json({ error: 'document_not_found' });
+  }
+  const name = (t.documentName || 'tender-document.pdf').replace(/[^\w.\-()\u0600-\u06FF ]+/g, '_');
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'inline; filename="' + name + '"');
+  fs.createReadStream(absPath).pipe(res);
+}
+
+function canAccessTenderDocument(req, t, viewerId, access) {
+  if (!t || !t.document) return false;
+  const token = extractAccountToken(req) || '';
+  if (viewerId && verifyAccountOwner(viewerId, token) && t.ownerId === viewerId) return true;
+  if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
+  return false;
+}
 
 /**
  * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة.
@@ -2721,6 +2765,33 @@ app.get('/api/tenders/mine', (req, res) => {
  */
 app.get('/api/tenders/admin', requireAdminAuth, (req, res) => {
   res.json({ ok: true, tenders: readTenders() });
+});
+
+/**
+ * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
+ */
+app.get('/api/tenders/:id/document', (req, res) => {
+  const viewerId = resolveOptionalTenderViewer(req);
+  const access = getTenderAccessForViewer(viewerId);
+  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
+  if (!canAccessTenderDocument(req, t, viewerId, access)) {
+    return res.status(403).json({
+      error: 'document_locked',
+      msg: 'ملف المناقصة متاح للمشتركين فقط — اشترك لتحميله',
+      msg_fr: 'Document réservé aux abonnés — abonnez-vous pour le télécharger',
+    });
+  }
+  return streamTenderDocumentFile(t, res);
+});
+
+/**
+ * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
+ */
+app.get('/api/tenders/admin/:id/document', requireAdminAuth, (req, res) => {
+  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
+  return streamTenderDocumentFile(t, res);
 });
 
 /**
