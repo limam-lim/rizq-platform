@@ -1387,6 +1387,11 @@ function rebuildCorpCatTabs(cats){
                 var pe=document.getElementById('plan-badge'); if(pe) pe.style.display=b.premium?'':'none';
                 var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
               }
+              if(acc.promo_video && window.RizqIntroVideo && typeof RizqIntroVideo.loadAndMountForAccount==='function'){
+                RizqIntroVideo.loadAndMountForAccount(id, {
+                  mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+                });
+              }
             }
           }
         }catch(e){}
@@ -1749,17 +1754,10 @@ window._rizqProfile = (function() {
   try{
     var p=new URLSearchParams(location.search);
     var corpId=p.get('id')||p.get('corp')||'';
-    if(!corpId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===corpId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
-    }
+    if(!corpId||!window.RizqIntroVideo||typeof RizqIntroVideo.loadAndMountForAccount!=='function') return;
+    RizqIntroVideo.loadAndMountForAccount(corpId, {
+      mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+    });
   }catch(e){}
 })();
 </script>

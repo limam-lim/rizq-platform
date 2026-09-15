@@ -1173,17 +1173,10 @@ function openMaps(){
   (function(){
     var params=new URLSearchParams(location.search);
     var officeId=params.get('id')||params.get('office');
-    if(!officeId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===officeId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
-    }
+    if(!officeId||!window.RizqIntroVideo||typeof RizqIntroVideo.loadAndMountForAccount!=='function') return;
+    RizqIntroVideo.loadAndMountForAccount(officeId, {
+      mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+    });
   })();
   </script>
 
@@ -1604,6 +1597,11 @@ function openMaps(){
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
+                }
+                if(acc.promo_video && window.RizqIntroVideo && typeof RizqIntroVideo.loadAndMountForAccount==='function'){
+                  RizqIntroVideo.loadAndMountForAccount(id, {
+                    mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+                  });
                 }
               }
             }

@@ -122,12 +122,111 @@
     }) || null;
   }
 
+  function backendBase() {
+    try {
+      if (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
+        return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function mergeServerAccount(serverAcc, password) {
+    if (!serverAcc || !serverAcc.id) return null;
+    var accs = readPendingAccounts();
+    var idx = accs.findIndex(function (a) { return a && a.id === serverAcc.id; });
+    var rec = idx >= 0 ? Object.assign({}, accs[idx]) : {};
+    rec.id = serverAcc.id;
+    rec.type = serverAcc.type || rec.type || 'individual';
+    rec.name = serverAcc.name || rec.name || rec.owner || rec.manager || '';
+    rec.email = serverAcc.email || rec.email || '';
+    rec.status = serverAcc.status || rec.status || 'approved';
+    rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
+    rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
+    if (password) rec.password = password;
+    ['phone', 'city', 'address', 'desc', 'promo_video', 'category', 'whatsapp', 'facebook', 'thumb', 'tagline', 'package', 'package_price'].forEach(function (k) {
+      if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
+    });
+    if (idx >= 0) accs[idx] = rec;
+    else accs.push(rec);
+    try { localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); } catch (e) {}
+    return rec;
+  }
+
+  function syncAccountFromBackend(acc) {
+    if (!acc || !acc.id || !acc.backendAccessToken) return Promise.resolve(acc);
+    var base = backendBase();
+    if (!base) return Promise.resolve(acc);
+    return fetch(base + '/api/accounts/mine/' + encodeURIComponent(acc.id), {
+      headers: { 'x-account-token': acc.backendAccessToken }
+    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (data) {
+      if (data && data.ok && data.account) {
+        var merged = mergeServerAccount(Object.assign({}, data.account, {
+          accessToken: acc.backendAccessToken,
+          dashToken: data.account.dashToken || acc.token
+        }), acc.password || '');
+        return merged || acc;
+      }
+      return acc;
+    }).catch(function () { return acc; });
+  }
+
   function loginSeller(email, password) {
     var acc = findSellerByLogin(email, password);
     if (!acc) return { ok: false, code: 'invalid' };
     setActiveSession(acc);
     var url = buildDashboardUrl(acc);
+    syncAccountFromBackend(acc);
     return { ok: true, account: acc, url: url };
+  }
+
+  function loginSellerAsync(email, password) {
+    var em = String(email || '').trim().toLowerCase();
+    var pw = String(password || '');
+    if (!em || !pw) return Promise.resolve({ ok: false, code: 'invalid' });
+
+    var local = findSellerByLogin(em, pw);
+    if (local) {
+      return syncAccountFromBackend(local).then(function (fresh) {
+        var acc = findSellerByLogin(em, pw) || fresh || local;
+        if (!acc || acc.status !== 'approved' || !acc.token) {
+          return { ok: false, code: 'invalid' };
+        }
+        setActiveSession(acc);
+        return { ok: true, account: acc, url: buildDashboardUrl(acc) };
+      });
+    }
+
+    var base = backendBase();
+    if (!base) return Promise.resolve({ ok: false, code: 'invalid' });
+
+    return fetch(base + '/api/accounts/seller-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: em, password: pw })
+    }).then(function (r) {
+      return r.json().then(function (data) { return { res: r, data: data }; }).catch(function () {
+        return { res: r, data: null };
+      });
+    }).then(function (out) {
+      var data = out.data;
+      if (out.res && out.res.status === 403 && data && data.code === 'not_approved') {
+        if (data.account) mergeServerAccount(data.account, pw);
+        return { ok: false, code: 'not_approved', status: data.status };
+      }
+      if (!data || !data.ok || !data.account) {
+        return { ok: false, code: (data && data.code) || 'invalid' };
+      }
+      var acc = mergeServerAccount(data.account, pw);
+      if (!acc.token && data.account.dashToken) acc.token = data.account.dashToken;
+      if (acc.status !== 'approved' || !acc.token) {
+        return { ok: false, code: 'not_approved', status: acc.status };
+      }
+      setActiveSession(acc);
+      return { ok: true, account: acc, url: buildDashboardUrl(acc) };
+    }).catch(function () {
+      return { ok: false, code: 'network' };
+    });
   }
 
   function goAfterRegistration(acc) {
@@ -144,14 +243,6 @@
   }
 
   function openGuestChoice() {
-    /* على الكمبيوتر/التابلت: نفتح صفحة الحساب الكاملة مباشرة */
-    var isDesktop = false;
-    try { isDesktop = window.matchMedia('(min-width: 769px)').matches; } catch (e) {}
-    if (isDesktop && typeof window.openModal === 'function') {
-      window.openModal('account');
-      return true;
-    }
-    /* على الهاتف: نستخدم نافذة AuthGate العادية */
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
       window.RizqAuthGate.openAccountChoice();
       return true;
@@ -161,7 +252,7 @@
       return true;
     }
     if (typeof window.openModal === 'function') {
-      window.openModal('account');
+      window.openModal('login');
       return true;
     }
     return false;
@@ -230,6 +321,26 @@
     return { id: acc.id, token: acc.token, account: acc, fromUrl: false };
   }
 
+  function refreshStoredSessionFromBackend() {
+    var sess = readStoredSession();
+    if (!sess) return Promise.resolve(null);
+    var acc = findApprovedAccount(sess);
+    if (!acc) return Promise.resolve(null);
+    return syncAccountFromBackend(acc).then(function (fresh) {
+      if (fresh && fresh.status === 'approved' && fresh.token) {
+        setActiveSession(fresh);
+        return fresh;
+      }
+      return acc;
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function () {
+      refreshStoredSessionFromBackend();
+    });
+  }
+
   window.RizqAccount = {
     open: openAccount,
     resolveDashboardUrl: resolveDashboardUrl,
@@ -239,6 +350,10 @@
     clearSession: clearSession,
     setActiveSession: setActiveSession,
     loginSeller: loginSeller,
+    loginSellerAsync: loginSellerAsync,
+    syncAccountFromBackend: syncAccountFromBackend,
+    mergeServerAccount: mergeServerAccount,
+    refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,
     goAfterRegistration: goAfterRegistration,
     findSellerByLogin: findSellerByLogin
   };

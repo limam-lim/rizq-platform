@@ -1317,7 +1317,7 @@ function toPublicAccountForViewer(acc, viewerAccountId) {
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
 function stripToken(acc) {
-  const { accessToken, ...safe } = acc;
+  const { accessToken, passHash, ...safe } = acc;
   if (safe.id_verified) {
     delete safe.idImage;
     delete safe.id_image;
@@ -1388,6 +1388,8 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const nni = nniCheck.nni;
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
+  const sellerPassword = String(b.password || '').slice(0, 128);
+  const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
   let autoApproved = false;
   if (canAutoApproveAccountType(reqType) && sellerEmail) {
     const ver = consumeBuyerVerificationByEmail(sellerEmail);
@@ -1446,6 +1448,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     // activateVerifiedPlusForRequest في rizq_admin.html) أو منحاً يدوياً.
     verifiedPlus: false,
     verifiedPlusExpiresAt: null,
+    passHash: passHash || undefined,
     status: autoApproved ? 'approved' : 'pending',
     approvedAt: autoApproved ? new Date().toISOString() : null,
     dashToken: dashToken || undefined,
@@ -1505,6 +1508,61 @@ app.get('/api/merchant-activities', (req, res) => {
     : [];
   const sectors = typeof cat.getSectors === 'function' ? cat.getSectors(accountType, lang) : [];
   return res.json({ ok: true, accountType, packageId, activities, sectors });
+});
+
+/**
+ * POST /api/accounts/seller-login — عام — دخول البائع (محل/مكتب/شركة/فرد)
+ * بالبريد وكلمة المرور المخزّنة على الخادم (bcrypt). يُعيد dashToken +
+ * accessToken لدمج الجلسة محلياً على أي جهاز.
+ */
+const sellerLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'محاولات دخول كثيرة — حاول مرة أخرى بعد قليل' },
+});
+app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
+  const email = String((req.body || {}).email || '').trim().toLowerCase();
+  const pass = String((req.body || {}).password || '');
+  if (!email || !pass) {
+    return res.status(400).json({ ok: false, code: 'missing_credentials', error: 'البريد وكلمة المرور مطلوبان' });
+  }
+  const dummyHash = '$2b$10$........................................';
+  const list = readAccounts();
+  const acc = list.find((a) => String(a.email || '').trim().toLowerCase() === email);
+  const ok = acc && acc.passHash ? await bcrypt.compare(pass, acc.passHash) : await bcrypt.compare(pass, dummyHash);
+  if (!acc || !acc.passHash || !ok) {
+    return res.status(401).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
+  }
+  if (acc.suspended) {
+    return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
+  }
+  if (acc.status !== 'approved') {
+    return res.status(403).json({
+      ok: false,
+      code: 'not_approved',
+      status: acc.status,
+      error: 'الحساب لم تتم الموافقة عليه بعد',
+    });
+  }
+  if (!acc.dashToken) {
+    acc.dashToken = 'TK_' + crypto.randomBytes(6).toString('hex').toUpperCase();
+    const idx = list.findIndex((a) => a.id === acc.id);
+    if (idx !== -1) {
+      list[idx].dashToken = acc.dashToken;
+      writeAccounts(list);
+    }
+  }
+  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, ...safeFields } = acc;
+  res.json({
+    ok: true,
+    account: Object.assign(safeFields, {
+      accessToken,
+      dashToken,
+      token: dashToken,
+    }),
+  });
 });
 
 /**
@@ -1770,7 +1828,7 @@ function handleVerifyDash(req, res) {
   if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
     return res.status(401).json({ error: 'unauthorized' });
   }
-  const { accessToken, dashToken, idImage, licenseImage, ...safeFields } = acc;
+  const { accessToken, passHash, dashToken, idImage, licenseImage, ...safeFields } = acc;
   res.json({ ok: true, account: Object.assign(safeFields, { accessToken }) });
 }
 app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);

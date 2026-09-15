@@ -6884,6 +6884,7 @@ function _syncAccountToBackend(acc){
       phoneIntl: acc.phoneIntl || acc.phone_intl || '',
       whatsapp: acc.whatsapp || '',
       email: acc.email || '',
+      password: acc.password || '',
       dashToken: acc.dashToken || acc.token || '',
       city: acc.city || '',
       category: acc.category || '',
@@ -7618,18 +7619,30 @@ function goToAccount(e){
   openModal('login');
 }
 
-function doLogin(){
+async function doLogin(){
   const e=document.getElementById('li-em').value.trim();
   const p=document.getElementById('li-pw').value;
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
-    var res = window.RizqAccount.loginSeller(e, p);
+  if(window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function'){
+    var res = await window.RizqAccount.loginSellerAsync(e, p);
     if(res && res.ok && res.url){
       showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
       closeModal();
       setTimeout(function(){ location.href = res.url; }, 400);
+      return;
+    }
+    if(res && res.code === 'not_approved'){
+      alert(isAr?'حسابك قيد المراجعة — ستصلك الموافقة قريباً.':'Votre compte est en cours de validation.');
+      return;
+    }
+  } else if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
+    var resSync = window.RizqAccount.loginSeller(e, p);
+    if(resSync && resSync.ok && resSync.url){
+      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
+      closeModal();
+      setTimeout(function(){ location.href = resSync.url; }, 400);
       return;
     }
   }

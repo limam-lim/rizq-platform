@@ -1391,17 +1391,10 @@ function rizqShare(title, url) {
   (function(){
     var params=new URLSearchParams(location.search);
     var storeId=params.get('id')||params.get('store');
-    if(!storeId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===storeId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
-    }
+    if(!storeId||!window.RizqIntroVideo||typeof RizqIntroVideo.loadAndMountForAccount!=='function') return;
+    RizqIntroVideo.loadAndMountForAccount(storeId, {
+      mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+    });
   })();
   </script>
 
@@ -1861,6 +1854,11 @@ function rizqShare(title, url) {
                 }
                 if(typeof RizqAccountPayments !== 'undefined'){
                   RizqAccountPayments.renderPublic(document.getElementById('store-payment-methods'), acc.paymentMethods, { fr: isFr() });
+                }
+                if(acc.promo_video && window.RizqIntroVideo && typeof RizqIntroVideo.loadAndMountForAccount==='function'){
+                  RizqIntroVideo.loadAndMountForAccount(id, {
+                    mountOpts: { title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗' }
+                  });
                 }
               }
             }
