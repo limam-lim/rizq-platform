@@ -646,7 +646,12 @@ function renderTenders(){
       ? (fr ? ('Budget : '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU') : ('الميزانية: '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU'))
       : '';
     var bidsLbl = fr ? (t.bidsCount+' offre(s) reçue(s)') : (t.bidsCount+' عرض مُقدَّم');
-    var thumb = (t.images && t.images.length) ? '<img class="t-card-thumb" src="'+t.images[0]+'"/>' : '';
+    var thumb = '';
+    if(t.images && t.images.length){
+      thumb = '<img class="t-card-thumb" src="'+t.images[0]+'"/>';
+    } else if(t.imagesLocked && t.imageCount>0){
+      thumb = '<div class="t-card-thumb" style="display:flex;align-items:center;justify-content:center;background:#f1f5f9;font-size:18px" title="'+(fr?'Abonnement requis pour voir les photos':'يلزم اشتراك لعرض الصور')+'">🔒</div>';
+    }
     var bidBtn = canBid
       ? '<button class="t-btn primary" onclick="openBidModal(\''+t.id+'\')">'+(fr?'Soumettre une offre':'قدّم عرضك')+'</button>'
       : '<button class="t-btn locked" onclick="openBidModal(\''+t.id+'\')" title="'+(fr?'Abonnement requis':'يلزم اشتراك')+'">🔒 '+(fr?'Offre (abonnement)':'عرض (اشتراك)')+'</button>';
@@ -657,6 +662,7 @@ function renderTenders(){
       + '<div class="t-title" style="flex:1">'+escapeHtml(t.title)+'</div>'
       + '</div>'
       + (t.desc ? '<div class="t-desc">'+escapeHtml(t.desc)+'</div>' : '')
+      + (t.imagesLocked && t.imageCount>0 ? '<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;margin:8px 0">📷 '+t.imageCount+' '+(fr?'photo(s) de référence — abonnez-vous pour les voir':'صورة مرجعية — اشترك لعرضها')+'</div>' : '')
       + _renderContactBlock(t, fr)
       + '<div class="t-meta">'
       + (t.city ? '<span>📍 '+escapeHtml(t.city)+'</span>' : '')
@@ -813,12 +819,16 @@ function submitTender(){
     }).then(function(res){ return res.json().then(function(data){ return {ok:res.ok, data:data}; }); })
       .then(function(r){
         if(!r.ok){
-          showToast((r.data && (r.data.msg||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر'));
+          var msg = (r.data && (r.data.msg||r.data.msg_fr||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر');
+          if(r.data && r.data.error==='contact_in_text_forbidden'){
+            msg = fr ? (r.data.msg_fr||r.data.msg) : (r.data.msg||msg);
+          }
+          showToast(msg);
           return;
         }
         closePostModal();
         window._tenderImages = [];
-        showToast(fr?'✅ Appel d\'offres publié':'✅ تم نشر مناقصتك');
+        showToast((r.data && r.data.msg) || (fr?'⏳ Appel d\'offres soumis — en attente de validation Rizq':'⏳ تم استلام مناقصتك — قيد مراجعة فريق رزق'));
         loadTenders();
       }).catch(function(){ showToast(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم'); });
   });
@@ -885,8 +895,13 @@ function submitBid(){
           var errMap = {
             cannot_bid_own_tender: fr?'Vous ne pouvez pas soumettre une offre sur votre propre appel d\'offres':'لا يمكنك تقديم عرض على مناقصتك أنت',
             tender_closed: fr?'Le délai de cet appel d\'offres est terminé':'انتهت مهلة هذه المناقصة',
+            tender_not_open: fr?'Cet appel d\'offres n\'accepte pas d\'offres pour le moment':'هذه المناقصة غير متاحة لتقديم العروض حالياً',
           };
-          showToast((r.data && (errMap[r.data.error] || r.data.msg || r.data.error)) || (fr?'Échec de l\'envoi de l\'offre':'تعذّر إرسال العرض'));
+          var msg = (r.data && (errMap[r.data.error] || r.data.msg_fr || r.data.msg || r.data.error)) || (fr?'Échec de l\'envoi de l\'offre':'تعذّر إرسال العرض');
+          if(r.data && r.data.error==='contact_in_text_forbidden'){
+            msg = fr ? (r.data.msg_fr||r.data.msg) : (r.data.msg||msg);
+          }
+          showToast(msg);
           return;
         }
         closeBidModal();

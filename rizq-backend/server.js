@@ -531,6 +531,7 @@ const {
   notifyContactAttemptFomo,
   normalizeModule,
 } = require('./services/contactGate');
+const { scanContactLeakFields } = require('./services/contactLeakGuard');
 const { canAutoApproveAccountType } = require('./config/verificationPolicy');
 const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, getPublicOtpConfig } = require('./services/otpService');
 const {
@@ -2349,12 +2350,24 @@ function resolveTenderOwnerContacts(t) {
   return { phone, email, whatsapp };
 }
 
+function isTenderPubliclyOpen(t) {
+  if (!t || t.status !== 'open') return false;
+  const deadlineMs = new Date(t.deadline).getTime();
+  return !Number.isNaN(deadlineMs) && deadlineMs > Date.now();
+}
+
+function filterPublicOpenTenders(list) {
+  return (list || []).filter(isTenderPubliclyOpen);
+}
+
 function toPublicTender(t, access) {
   const now = Date.now();
   const deadlineMs = new Date(t.deadline).getTime();
   const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
   const contactsUnlocked = !!ent.canUnlockContacts;
   const contacts = resolveTenderOwnerContacts(t);
+  const rawImages = Array.isArray(t.images) ? t.images : [];
+  const imageCount = rawImages.length;
   return {
     id: t.id,
     title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
@@ -2364,18 +2377,32 @@ function toPublicTender(t, access) {
     budgetMin: t.budgetMin,
     budgetMax: t.budgetMax,
     deadline: t.deadline,
-    images: Array.isArray(t.images) ? t.images : [],
+    images: contactsUnlocked ? rawImages : [],
+    imagesLocked: !contactsUnlocked && imageCount > 0,
+    imageCount: imageCount,
     ownerName: t.ownerName,
     ownerId: t.ownerId || null,
     createdAt: t.createdAt,
+    status: t.status || 'open',
     bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now,
+    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && t.status === 'open',
     contactsLocked: !contactsUnlocked,
     ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
     ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
     ownerWhatsApp: contactsUnlocked ? (contacts.whatsapp || null) : null,
     canSubmitBid: !!ent.canSubmitProposals,
   };
+}
+
+function rejectTenderContactLeak(res, scan, field) {
+  return res.status(422).json({
+    error: 'contact_in_text_forbidden',
+    field: field || (scan.fields && scan.fields[0] && scan.fields[0].field) || 'text',
+    hits: scan.hits || [],
+    fields: scan.fields || [],
+    msg: scan.messageAr,
+    msg_fr: scan.messageFr,
+  });
 }
 
 function TENDER_PUBLIC_ACCESS_FALLBACK() {
@@ -2539,6 +2566,13 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
   }
   if (!b.title || !b.deadline) return res.status(400).json({ error: 'title و deadline مطلوبان' });
+  const title = String(b.title).slice(0, 150);
+  const desc = String(b.desc || '').slice(0, 1500);
+  const leakScan = scanContactLeakFields([
+    { key: 'title', val: title },
+    { key: 'desc', val: desc },
+  ]);
+  if (leakScan.hasLeak) return rejectTenderContactLeak(res, leakScan);
   const deadlineMs = new Date(b.deadline).getTime();
   if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
     return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
@@ -2551,23 +2585,28 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     ownerPhone: String(acc.phone || '').slice(0, 40),
     ownerEmail: String(acc.email || '').slice(0, 120),
     ownerWhatsApp: String(acc.whatsapp || acc.phone || '').slice(0, 40),
-    title: String(b.title).slice(0, 150),
-    desc: String(b.desc || '').slice(0, 1500),
+    title,
+    desc,
     category: String(b.category || '').slice(0, 40),
     city: String(b.city || '').slice(0, 60),
     budgetMin: Number(b.budgetMin) || 0,
     budgetMax: Number(b.budgetMax) || 0,
     deadline: new Date(deadlineMs).toISOString(),
-    // صور مرجعية اختيارية توضّح المطلوب بدقة (مثال: "20 كرسي بهذا الشكل")
+    // صور مرجعية اختيارية — تُراجع مع المناقصة قبل النشر العام
     images: await saveTenderImages(tenderId, b.images),
-    status: 'open',
+    status: 'pending_review',
     createdAt: new Date().toISOString(),
     bids: [],
   };
   const list = readTenders();
   list.unshift(tender);
   writeTenders(list);
-  res.json({ ok: true, tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId)) });
+  res.json({
+    ok: true,
+    pendingReview: true,
+    tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId)),
+    msg: 'تم استلام مناقصتك — ستُنشر بعد مراجعة فريق رزق.',
+  });
   } catch (err) {
     console.error('[tenders/post] image pipeline:', err.message);
     res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
@@ -2579,12 +2618,7 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
  * يعرض عدد المناقصات المفتوحة + فئات آخر 3 مناقصات فقط (بلا حقول حسّاسة).
  */
 app.get('/api/tenders/public-stats', (req, res) => {
-  const now = Date.now();
-  const openList = readTenders().filter((t) => {
-    if (t.status === 'removed') return false;
-    const deadlineMs = new Date(t.deadline).getTime();
-    return !Number.isNaN(deadlineMs) && deadlineMs > now;
-  });
+  const openList = filterPublicOpenTenders(readTenders());
   const recentCategories = openList.slice(0, 3).map((t) => t.category).filter(Boolean);
   res.json({ ok: true, count: openList.length, recentCategories });
 });
@@ -2598,12 +2632,7 @@ app.get('/api/tenders', (req, res) => {
   const viewerId = resolveOptionalTenderViewer(req);
   const access = getTenderAccessForViewer(viewerId);
   const { cat, city } = req.query || {};
-  const now = Date.now();
-  let list = readTenders().filter((t) => {
-    if (t.status === 'removed') return false;
-    const deadlineMs = new Date(t.deadline).getTime();
-    return !Number.isNaN(deadlineMs) && deadlineMs > now;
-  });
+  let list = filterPublicOpenTenders(readTenders());
   if (cat) list = list.filter((t) => t.category === cat);
   if (city) list = list.filter((t) => t.city === city);
   res.json({
@@ -2638,19 +2667,25 @@ app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
   const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
   if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
   const t = list[idx];
+  if (t.status !== 'open') {
+    return res.status(400).json({ error: 'tender_not_open', msg: 'هذه المناقصة غير متاحة لتقديم العروض حالياً' });
+  }
   if (t.ownerId === acc.id) return res.status(400).json({ error: 'cannot_bid_own_tender' });
   const deadlineMs = new Date(t.deadline).getTime();
   if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
     return res.status(400).json({ error: 'tender_closed', msg: 'انتهت مهلة تقديم العروض على هذه المناقصة' });
   }
   if (!b.price) return res.status(400).json({ error: 'price مطلوب' });
+  const notes = String(b.notes || '').slice(0, 500);
+  const notesScan = scanContactLeakFields([{ key: 'notes', val: notes }]);
+  if (notesScan.hasLeak) return rejectTenderContactLeak(res, notesScan, 'notes');
   const bid = {
     id: genBidId(),
     bidderId: acc.id,
     bidderName: acc.name || '',
     price: Number(b.price) || 0,
     deliveryDays: Number(b.deliveryDays) || 0,
-    notes: String(b.notes || '').slice(0, 500),
+    notes,
     priority: !!bidderAccess.priorityPlacement,
     createdAt: new Date().toISOString(),
   };
@@ -2705,7 +2740,7 @@ app.get('/api/tenders/:id', (req, res) => {
   const viewerId = resolveOptionalTenderViewer(req);
   const access = getTenderAccessForViewer(viewerId);
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t) return res.status(404).json({ error: 'tender_not_found' });
+  if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
   res.json({
     ok: true,
     tender: toPublicTender(t, access),
@@ -2732,6 +2767,20 @@ app.post('/api/tenders/admin/:id/remove', requireAdminAuth, (req, res) => {
   list[idx].status = 'removed';
   writeTenders(list);
   res.json({ ok: true });
+});
+
+/**
+ * POST /api/tenders/admin/:id/approve — أدمين فقط — يُفعّل مناقصة pending_review
+ */
+app.post('/api/tenders/admin/:id/approve', requireAdminAuth, (req, res) => {
+  const list = readTenders();
+  const idx = list.findIndex((t) => t.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
+  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
+  list[idx].status = 'open';
+  list[idx].approvedAt = new Date().toISOString();
+  writeTenders(list);
+  res.json({ ok: true, tender: list[idx] });
 });
 
 /**
