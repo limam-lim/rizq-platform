@@ -1843,8 +1843,8 @@ let USER_ACC = null;
 // accessToken. الحل: window.REAL_ACCESS_TOKEN يُحل من مصدرين —
 // (أ) rizq_pending_accounts[].backendAccessToken المحفوظ محلياً وقت
 //     التسجيل (نفس الجهاز — rizq_landing_v8.html، _syncAccountToBackend)
-// (ب) وإلا GET /api/accounts/verify-dash/:id، الذي يُعيد الآن accessToken
-//     الحقيقي أيضاً (امتلاك dashToken الصحيح يُثبت أصلاً الملكية الشرعية).
+// (ب) وإلا POST /api/accounts/exchange-dash-token/:id (endpoint منفصل —
+//     verify-dash لا يُعيد accessToken مباشرة لأسباب أمنية).
 // ═══════════════════════════════════════════════════════════════
 window.REAL_ACCESS_TOKEN = null;
 function _resolveRealAccessToken(acc){
@@ -1857,11 +1857,11 @@ function _resolveRealAccessToken(acc){
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/exchange-dash-token/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.accessToken) return null;
+      window.REAL_ACCESS_TOKEN = data.accessToken;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });

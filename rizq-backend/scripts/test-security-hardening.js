@@ -10,6 +10,7 @@ const PORT = Number(process.env.PORT || 3000);
 const BASE = 'http://127.0.0.1:' + PORT;
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
+const PKG_FILE = path.join(DATA_DIR, 'account-packages.json');
 
 const results = [];
 function ok(name, pass, detail) {
@@ -106,6 +107,7 @@ async function main() {
 
   // ── 7. verify-dash POST + approved only ──
   const backupAccounts = fs.existsSync(ACCOUNTS_FILE) ? fs.readFileSync(ACCOUNTS_FILE, 'utf8') : '[]';
+  const backupPkg = fs.existsSync(PKG_FILE) ? fs.readFileSync(PKG_FILE, 'utf8') : '{}';
   const { id, dashToken, accessToken, pending, approved } = seedTestAccount();
 
   try {
@@ -127,13 +129,43 @@ async function main() {
     if (idx >= 0) list[idx] = approved;
     fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(list, null, 2));
 
+    const pkgStore = JSON.parse(backupPkg || '{}');
+    pkgStore[id] = {
+      accountId: id,
+      accountType: 'store',
+      status: 'active',
+      paymentConfirmed: true,
+      activatedBy: 'admin',
+      periodStart: new Date().toISOString(),
+      periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+      pkgName: 'monthly',
+      packageId: 'store-month',
+      accessToken,
+    };
+    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+
     const dashOk = await req('POST', '/api/accounts/verify-dash/' + id, { dashToken }, { 'x-dash-token': dashToken });
-    ok('verify-dash approved POST → 200 + accessToken',
-      dashOk.status === 200 && dashOk.body && dashOk.body.account && dashOk.body.account.accessToken === accessToken,
-      dashOk.body && dashOk.body.account ? 'got token' : 'no token');
+    ok('verify-dash approved POST → 200 without accessToken',
+      dashOk.status === 200 && dashOk.body && dashOk.body.account && dashOk.body.account.id === id && dashOk.body.account.accessToken === undefined,
+      dashOk.body && dashOk.body.account ? 'profile ok' : 'no account');
+
+    const exchangeOk = await req('POST', '/api/accounts/exchange-dash-token/' + id, { dashToken }, { 'x-dash-token': dashToken });
+    ok('exchange-dash-token approved → accessToken',
+      exchangeOk.status === 200 && exchangeOk.body && exchangeOk.body.accessToken === accessToken,
+      exchangeOk.body ? 'got token' : 'no token');
 
     const dashGet = await req('GET', '/api/accounts/verify-dash/' + id + '?token=' + encodeURIComponent(dashToken));
     ok('verify-dash GET still works in dev', dashGet.status === 200, 'status=' + dashGet.status);
+
+    const catalogPost = await req('POST', '/api/catalog', {
+      accountId: id,
+      name: 'Sec Test Item',
+      kind: 'product',
+      status: 'active',
+    }, { 'x-account-token': accessToken });
+    ok('catalog POST forces pending_review',
+      catalogPost.status === 200 && catalogPost.body && catalogPost.body.item && catalogPost.body.item.status === 'pending_review',
+      catalogPost.body && catalogPost.body.item ? 'status=' + catalogPost.body.item.status : 'no item');
 
     const mineOk = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': accessToken });
     ok('mine approved account readable', mineOk.status === 200 && mineOk.body && mineOk.body.ok, 'status=' + mineOk.status);
@@ -143,6 +175,7 @@ async function main() {
 
   } finally {
     fs.writeFileSync(ACCOUNTS_FILE, backupAccounts);
+    fs.writeFileSync(PKG_FILE, backupPkg);
   }
 
   // ── 9. OTP hashing (unit) ──

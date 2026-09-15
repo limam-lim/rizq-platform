@@ -45,9 +45,6 @@
     }) || null;
   }
 
-  /* Express على localhost:3000 لا يخدم الملفات بلا .html (يُرجع JSON 404).
-     نُبقي اسم الملف كاملاً في روابط اللوحات. المقارنة تتجاهل الامتداد
-     حتى لا تكسر Live Server إن حوّل *.html إلى مسار بلا امتداد. */
   function dashFileName(type) {
     return DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
   }
@@ -109,19 +106,6 @@
     });
   }
 
-  function findSellerByLogin(email, password) {
-    var em = String(email || '').trim().toLowerCase();
-    var pw = String(password || '');
-    if (!em || !pw) return null;
-    return readPendingAccounts().find(function (a) {
-      if (!a || a.status !== 'approved') return false;
-      if (!a.token) return false;
-      if (String(a.email || '').trim().toLowerCase() !== em) return false;
-      if (a.password == null || a.password === '') return false;
-      return String(a.password) === pw;
-    }) || null;
-  }
-
   function publicPageForAccount(accOrType, id) {
     var type = 'individual';
     var accId = '';
@@ -151,7 +135,7 @@
     return '';
   }
 
-  function mergeServerAccount(serverAcc, password) {
+  function mergeServerAccount(serverAcc) {
     if (!serverAcc || !serverAcc.id) return null;
     var accs = readPendingAccounts();
     var idx = accs.findIndex(function (a) { return a && a.id === serverAcc.id; });
@@ -163,7 +147,7 @@
     rec.status = serverAcc.status || rec.status || 'approved';
     rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
     rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
-    if (password) rec.password = password;
+    delete rec.password;
     ['phone', 'city', 'address', 'desc', 'promo_video', 'category', 'whatsapp', 'facebook', 'thumb', 'tagline', 'package', 'package_price'].forEach(function (k) {
       if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
     });
@@ -185,25 +169,22 @@
     if (!base) return Promise.resolve(acc);
     return fetch(base + '/api/accounts/mine/' + encodeURIComponent(acc.id), {
       headers: { 'x-account-token': token }
-    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (data) {
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) {
+        clearSession();
+        return null;
+      }
+      return r.ok ? r.json() : null;
+    }).then(function (data) {
       if (data && data.ok && data.account) {
         var merged = mergeServerAccount(Object.assign({}, data.account, {
           accessToken: token,
           dashToken: data.account.dashToken || acc.token
-        }), acc.password || '');
+        }));
         return merged || acc;
       }
       return acc;
     }).catch(function () { return acc; });
-  }
-
-  function loginSeller(email, password) {
-    var acc = findSellerByLogin(email, password);
-    if (!acc) return { ok: false, code: 'invalid' };
-    setActiveSession(acc);
-    var url = buildDashboardUrl(acc);
-    syncAccountFromBackend(acc);
-    return { ok: true, account: acc, url: url };
   }
 
   function loginSellerAsync(email, password) {
@@ -211,20 +192,8 @@
     var pw = String(password || '');
     if (!em || !pw) return Promise.resolve({ ok: false, code: 'invalid' });
 
-    var local = findSellerByLogin(em, pw);
-    if (local) {
-      return syncAccountFromBackend(local).then(function (fresh) {
-        var acc = findSellerByLogin(em, pw) || fresh || local;
-        if (!acc || acc.status !== 'approved' || !acc.token) {
-          return { ok: false, code: 'invalid' };
-        }
-        setActiveSession(acc);
-        return { ok: true, account: acc, url: buildDashboardUrl(acc) };
-      });
-    }
-
     var base = backendBase();
-    if (!base) return Promise.resolve({ ok: false, code: 'invalid' });
+    if (!base) return Promise.resolve({ ok: false, code: 'network' });
 
     return fetch(base + '/api/accounts/seller-login', {
       method: 'POST',
@@ -237,13 +206,13 @@
     }).then(function (out) {
       var data = out.data;
       if (out.res && out.res.status === 403 && data && data.code === 'not_approved') {
-        if (data.account) mergeServerAccount(data.account, pw);
+        if (data.account) mergeServerAccount(data.account);
         return { ok: false, code: 'not_approved', status: data.status };
       }
       if (!data || !data.ok || !data.account) {
         return { ok: false, code: (data && data.code) || 'invalid' };
       }
-      var acc = mergeServerAccount(data.account, pw);
+      var acc = mergeServerAccount(data.account);
       if (!acc.token && data.account.dashToken) acc.token = data.account.dashToken;
       if (acc.status !== 'approved' || !acc.token) {
         return { ok: false, code: 'not_approved', status: acc.status };
@@ -314,7 +283,6 @@
     var now = Date.now();
     var last = 0;
     try { last = parseInt(sessionStorage.getItem('rizq_dash_boot_ts') || '0', 10) || 0; } catch (eTs) {}
-    /* منع حلقة سريعة فقط (أقل من ثانية) — لا قفل دائم يمنع فتح اللوحة */
     if (last && (now - last) < 900) return;
     try { sessionStorage.setItem('rizq_dash_boot_ts', String(now)); } catch (eTs2) {}
 
@@ -326,8 +294,6 @@
     location.replace(htmlDashPath(targetFile) + query);
   }
 
-  /* إن فُقدت ?id=&token= من الرابط (تحويل السيرفر)، نستعيدها من الجلسة المحلية
-     بدون إعادة تحميل لتجنّب الشاشة البيضاء و«يجب تسجيل الدخول». */
   function recoverSessionParams(expectedType) {
     var p = new URLSearchParams(location.search);
     if (p.get('id') && p.get('token')) {
@@ -376,12 +342,10 @@
     recoverSessionParams: recoverSessionParams,
     clearSession: clearSession,
     setActiveSession: setActiveSession,
-    loginSeller: loginSeller,
     loginSellerAsync: loginSellerAsync,
     syncAccountFromBackend: syncAccountFromBackend,
     mergeServerAccount: mergeServerAccount,
     refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,
-    goAfterRegistration: goAfterRegistration,
-    findSellerByLogin: findSellerByLogin
+    goAfterRegistration: goAfterRegistration
   };
 })();

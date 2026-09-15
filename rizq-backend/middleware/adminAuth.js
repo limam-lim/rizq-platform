@@ -16,7 +16,14 @@ function createAdminAuth(deps) {
     next();
   }
 
-  /** للوحة الأدمن + السكربتات الخلفية — لا يُخزَّن السر في المتصفح */
+  function isBrowserOrigin(req) {
+    const origin = req.header('origin');
+    if (origin && origin !== 'null') return true;
+    const secFetchSite = String(req.header('sec-fetch-site') || '').toLowerCase();
+    return secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'cross-site';
+  }
+
+  /** للوحة الأدmin + السكربتات الخلفية — لا يُخزَّن السر في المتصفح */
   function requireAdminAuth(req, res, next) {
     const adminTok = req.header('x-admin-token');
     if (adminTok) {
@@ -30,6 +37,9 @@ function createAdminAuth(deps) {
     const got = req.header('x-rizq-secret');
     const secret = sharedSecret();
     if (secret && got && got === secret) {
+      if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+        return res.status(403).json({ error: 'server_secret_browser_forbidden' });
+      }
       req.adminUser = { user: 'server', name: 'Server', role: 'super' };
       return next();
     }

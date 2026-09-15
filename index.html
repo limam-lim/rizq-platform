@@ -6730,7 +6730,9 @@ const NNI_RE=/^\d{6,15}$/;
 var RIZQ_TERMS_VERSION = 'v1.0-2026-06-22';
 
 function _genDashToken(){
-  return 'TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
+  var arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return 'TK_' + Array.from(arr, function(b){ return b.toString(16).padStart(2,'0'); }).join('').toUpperCase();
 }
 
 function _normalizeIntlPhone(raw){
@@ -7652,23 +7654,6 @@ async function doLogin(){
       alert(isAr?'حسابك قيد المراجعة — ستصلك الموافقة قريباً.':'Votre compte est en cours de validation.');
       return;
     }
-  } else if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
-    var resSync = window.RizqAccount.loginSeller(e, p);
-    if(resSync && resSync.ok && resSync.url){
-      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-      closeModal();
-      setTimeout(function(){ location.href = resSync.url; }, 400);
-      return;
-    }
-  }
-  var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
-    ? window.RizqAccount.resolveDashboardUrl()
-    : '';
-  if(dashUrl){
-    showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-    closeModal();
-    setTimeout(function(){ location.href = dashUrl; }, 400);
-    return;
   }
   alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
 }

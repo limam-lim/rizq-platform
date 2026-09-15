@@ -513,7 +513,7 @@
         var _accInfo2 = accounts[accId] || {};
         fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
           method: 'POST',
-          headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+          headers: _adminAuthHeaders(),
           body: JSON.stringify({
             accountId   : accId,
             accountName : _accInfo2.name || accId,
@@ -546,7 +546,7 @@
           if (diamondOn && _accInfo2.phone) {
             fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/subscriber/register', {
               method: 'POST',
-              headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+              headers: _adminAuthHeaders(),
               body: JSON.stringify({
                 subscriberId: String(_accInfo2.phone).replace(/[^0-9+]/g,'').slice(0, 40),
                 businessName: _accInfo2.name || accId,
@@ -1050,6 +1050,15 @@
   var AGENT_CFG_KEY = 'rizq_subagent_config';
   var DEFAULT_AGENT_CFG = { enabled: true, notes: '', officialAccounts: [], backendUrl: '', backendSecret: '' };
 
+  function _adminAuthHeaders(extra) {
+    var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+    try {
+      var saved = JSON.parse(localStorage.getItem('rizq_admin_session') || 'null');
+      if (saved && saved.token) h['x-admin-token'] = saved.token;
+    } catch (e) {}
+    return h;
+  }
+
   function getAgentConfig() {
     try {
       var raw = JSON.parse(localStorage.getItem(AGENT_CFG_KEY) || 'null');
@@ -1305,7 +1314,7 @@
     var url = cfg.backendUrl.replace(/\/$/, '') + '/api/verify-receipt';
     return fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-rizq-secret': cfg.backendSecret || '' },
+      headers: _adminAuthHeaders(),
       body: JSON.stringify({ imageBase64: reqObj.receiptImage, expectedPrice: reqObj.price, pkgName: reqObj.pkg })
     }).then(function(res){
       if (!res.ok) throw new Error('backend_error_' + res.status);

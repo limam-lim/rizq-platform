@@ -233,6 +233,13 @@ app.post('/api/admin/logout', (req, res) => {
   res.json({ ok: true });
 });
 
+function isBrowserLikeRequest(req) {
+  const origin = req.header('origin');
+  if (origin && origin !== 'null') return true;
+  const secFetchSite = String(req.header('sec-fetch-site') || '').toLowerCase();
+  return secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'cross-site';
+}
+
 function isAdminRequest(req) {
   const adminTok = req.header('x-admin-token');
   if (adminTok) {
@@ -241,7 +248,11 @@ function isAdminRequest(req) {
   }
   const got = req.header('x-rizq-secret');
   const secret = process.env.BACKEND_SHARED_SECRET || '';
-  return !!(secret && got && got === secret);
+  if (secret && got && got === secret) {
+    if (isProdEnv() && isBrowserLikeRequest(req)) return false;
+    return true;
+  }
+  return false;
 }
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
@@ -1299,6 +1310,9 @@ function genAccountId() {
 function genAccessToken() {
   return crypto.randomBytes(20).toString('hex');
 }
+function genDashToken() {
+  return 'TK_' + crypto.randomBytes(32).toString('hex').toUpperCase();
+}
 
 // الحقول الآمنة للعرض العام — بدون phone/email/whatsapp (Contact Gate يتحكم)
 const ACCOUNT_PUBLIC_FIELDS = [
@@ -1395,9 +1409,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     const ver = consumeBuyerVerificationByEmail(sellerEmail);
     if (ver.ok) autoApproved = true;
   }
-  const dashToken = autoApproved
-    ? (String(b.dashToken || '').slice(0, 100) || ('TK_' + crypto.randomBytes(6).toString('hex').toUpperCase()))
-    : null;
+  const dashToken = autoApproved ? genDashToken() : null;
   const acc = {
     id,
     accessToken,
@@ -1547,7 +1559,7 @@ app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
     });
   }
   if (!acc.dashToken) {
-    acc.dashToken = 'TK_' + crypto.randomBytes(6).toString('hex').toUpperCase();
+    acc.dashToken = genDashToken();
     const idx = list.findIndex((a) => a.id === acc.id);
     if (idx !== -1) {
       list[idx].dashToken = acc.dashToken;
@@ -1828,10 +1840,23 @@ function handleVerifyDash(req, res) {
   if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
     return res.status(401).json({ error: 'unauthorized' });
   }
-  const { accessToken, passHash, dashToken, idImage, licenseImage, ...safeFields } = acc;
-  res.json({ ok: true, account: Object.assign(safeFields, { accessToken }) });
+  res.json({ ok: true, account: stripToken(acc) });
 }
+
+/** POST /api/accounts/exchange-dash-token/:id — يُرجع accessToken فقط (POST + rate limit) */
+function handleExchangeDashToken(req, res) {
+  const list = readAccounts();
+  const acc = list.find((a) => a.id === req.params.id);
+  if (!acc) return res.status(404).json({ error: 'account_not_found' });
+  const token = extractDashToken(req);
+  if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+  res.json({ ok: true, accessToken: acc.accessToken });
+}
+
 app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
+app.post('/api/accounts/exchange-dash-token/:id', verifyDashLimiter, handleExchangeDashToken);
 if (!isProdEnv()) {
   app.get('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
 }
@@ -3315,7 +3340,7 @@ app.post('/api/catalog', async (req, res) => {
     images: catImages,
     image: catImages[0] || null,
     emoji: String(b.emoji || '').slice(0, 8),
-    status: ['active', 'inactive', 'pending_review'].includes(b.status) ? b.status : 'active',
+    status: 'pending_review',
     sold: Number.isFinite(Number(b.sold)) ? Number(b.sold) : 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -4077,6 +4102,17 @@ startMaintenanceScheduler({
   dataDir: DATA_DIR,
   backendRoot: __dirname,
 });
+
+function assertProductionSecrets() {
+  if (!isProdEnv()) return;
+  const required = ['BACKEND_SHARED_SECRET', 'RIZQ_API_SECRET'];
+  const missing = required.filter((k) => !String(process.env[k] || '').trim());
+  if (missing.length) {
+    console.error('[FATAL] Missing required env in production:', missing.join(', '));
+    process.exit(1);
+  }
+}
+assertProductionSecrets();
 
 app.listen(PORT, async () => {
   console.log('[rizq-backend] running on port ' + PORT);

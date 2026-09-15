@@ -469,11 +469,11 @@ function _resolveRealAccessToken(session){
     }
   }catch(e){}
   if(!_backendBase() || !session || !session.token) return Promise.resolve(null);
-  return fetch(_backendBase() + '/api/accounts/verify-dash/' + encodeURIComponent(session.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':session.token}, body:JSON.stringify({dashToken:session.token}) })
+  return fetch(_backendBase() + '/api/accounts/exchange-dash-token/' + encodeURIComponent(session.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':session.token}, body:JSON.stringify({dashToken:session.token}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.accessToken) return null;
+      window.REAL_ACCESS_TOKEN = data.accessToken;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===session.id; });

@@ -643,13 +643,6 @@
         setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
         return;
       }
-    } else if (window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function') {
-      var sellerSync = window.RizqAccount.loginSeller(email, pw);
-      if (sellerSync && sellerSync.ok && sellerSync.url) {
-        setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = sellerSync.url; }, 400);
-        return;
-      }
     }
 
     setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');

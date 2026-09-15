@@ -451,11 +451,11 @@
         return Promise.resolve(_state.buyerRealToken);
       }
     } catch(e) {}
-    return fetch(base + '/api/accounts/verify-dash/' + encodeURIComponent(_state.buyerAccountId), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':_state.buyerToken}, body:JSON.stringify({dashToken:_state.buyerToken}) })
+    return fetch(base + '/api/accounts/exchange-dash-token/' + encodeURIComponent(_state.buyerAccountId), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':_state.buyerToken}, body:JSON.stringify({dashToken:_state.buyerToken}) })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if (!data || !data.ok || !data.account || !data.account.accessToken) return null;
-        _state.buyerRealToken = data.account.accessToken;
+        if (!data || !data.ok || !data.accessToken) return null;
+        _state.buyerRealToken = data.accessToken;
         try {
           var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
           var rec2 = accs2.find(function(a){ return a.id === _state.buyerAccountId; });
