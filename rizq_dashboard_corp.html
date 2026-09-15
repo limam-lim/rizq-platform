@@ -1188,11 +1188,16 @@ function initCorpAccess(){
   var p = new URLSearchParams(location.search);
   var isDemoParam = p.get('demo') === '1';
   if(isDemoParam){IS_DEMO=true;CORP_ACC=DEMO_ACC;initDashboard();return;}
-  var id = p.get('id'), tok = p.get('token');
-  if((!id||!tok) && window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+  var id = '', tok = '';
+  if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
     var rec = window.RizqAccount.recoverSessionParams('corp');
     if(rec){ id = rec.id; tok = rec.token; }
   }
+  if(!id) id = p.get('id') || '';
+  if(!tok && id && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
+    tok = window.RizqAccount.readDashToken(id);
+  }
+  if(!tok) tok = p.get('token') || '';
   if(!id||!tok){showAccessDenied();return;}
   try{
     // إصلاح جوهري: كان هذا الكود يقرأ rizq_accounts كأنه مصفوفة (accs.find)

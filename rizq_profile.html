@@ -582,7 +582,10 @@ function _dashboardBackUrl(){
     var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
     if(s && s.id && s.token){
       var files = {individual:'rizq_dashboard.html',store:'rizq_dashboard_store.html',office:'rizq_dashboard_office.html',corp:'rizq_dashboard_corp.html'};
-      return (files[s.type] || 'rizq_dashboard.html') + '?id=' + encodeURIComponent(s.id) + '&token=' + encodeURIComponent(s.token);
+      if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+        window.RizqAccount.storeDashToken(s.id, s.token);
+      }
+      return (files[s.type] || 'rizq_dashboard.html') + '?id=' + encodeURIComponent(s.id);
     }
   }catch(e1){}
   try{

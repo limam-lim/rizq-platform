@@ -636,7 +636,13 @@
       var seller = await window.RizqAccount.loginSellerAsync(email, pw);
       if (seller && seller.ok && seller.url) {
         setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = seller.url; }, 400);
+        setTimeout(function () {
+          if (window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function') {
+            window.RizqAccount.redirectAfterAuth(seller.url);
+          } else {
+            location.href = seller.url;
+          }
+        }, 400);
         return;
       }
       if (seller && seller.code === 'not_approved') {

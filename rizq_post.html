@@ -1455,11 +1455,27 @@ var _editAdId = null;
   }catch(e){}
 })();
 
+function _resolvePostAccessToken(sess){
+  if(sess && sess.accessToken) return sess.accessToken;
+  if(!sess || !sess.id) return '';
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+    var acc = accs.find(function(a){ return a && a.id === sess.id; });
+    if(acc && (acc.backendAccessToken || acc.accessToken)) return acc.backendAccessToken || acc.accessToken;
+  }catch(e){}
+  return '';
+}
+
 function saveAdEdit(){
   if(!_editAdId) return;
   var sess = null;
   try{ sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null'); }catch(e){}
-  if(!sess || !sess.id || !sess.token){
+  if(!sess || !sess.id){
+    showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
+    return;
+  }
+  var accessTok = _resolvePostAccessToken(sess);
+  if(!accessTok){
     showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
     return;
   }
@@ -1493,7 +1509,7 @@ function saveAdEdit(){
 
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads/' + encodeURIComponent(_editAdId), {
     method: 'PATCH',
-    headers: { 'Content-Type':'application/json', 'x-account-token': (sess.accessToken || sess.token) },
+    headers: { 'Content-Type':'application/json', 'x-account-token': accessTok },
     body: JSON.stringify(body)
   }).then(function(r){ return r.ok ? r.json() : Promise.reject(); })
     .then(function(){

@@ -1068,6 +1068,7 @@
       if (!cfg.backendUrl && typeof global !== 'undefined' && global.RIZQ_BACKEND_BASE) {
         cfg.backendUrl = global.RIZQ_BACKEND_BASE;
       }
+      delete cfg.backendSecret;
       return cfg;
     } catch(e) {
       var fallback = Object.assign({}, DEFAULT_AGENT_CFG);

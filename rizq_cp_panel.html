@@ -680,29 +680,23 @@ main, .page-content.active, .main-content, .results-area,
           <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">تعليمات / معرفة إضافية تُغذّى للوكيل (تُعرض كملاحظة مرجعية لك أثناء المراجعة)</label>
           <textarea id="subagent-notes" rows="3" placeholder="مثال: الحساب الرسمي البنكي هو ××××، أي وصل من حساب آخر يجب رفضه تلقائياً..." style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رابط خادم الذكاء (rizq-backend) — اختياري</label>
-            <input id="subagent-backend-url" placeholder="https://rizq-platform-api.onrender.com" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">السر المشترك مع الخادم</label>
-            <input id="subagent-backend-secret" type="password" placeholder="نفس BACKEND_SHARED_SECRET" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
-          </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رابط خادم الذكاء (rizq-backend) — اختياري</label>
+          <input id="subagent-backend-url" placeholder="https://rizq-platform-api.onrender.com" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
         </div>
-        <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. التفاصيل في rizq-backend/README.md</p>
+        <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. المصادقة مع الخادم تتم عبر جلسة المشرف (<code>x-admin-token</code>) — لا حاجة لسرّ مشترك في المتصفح.</p>
         <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
         <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
       </div>
 
       <!-- ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (نفس رقم/حساب المكالمات)
            إرسال فقط بأمر صريح من الأدمن هنا، لا جدولة ولا إرسال تلقائي أبداً.
-           يستخدم نفس backendUrl/backendSecret المضبوطين أعلاه في "وكيل الباقات". ══ -->
+           يستخدم نفس backendUrl المضبوط أعلاه في "وكيل الباقات" + جلسة المشرف. ══ -->
       <div class="card" style="margin-top:20px">
         <div class="card-header">
           <div class="card-title">📱 رسائل SMS ترويجية</div>
         </div>
-        <p style="font-size:11px;color:#9ca3af;margin:-2px 0 12px">إرسال يدوي فقط بأمر صريح منك — لا رسائل تلقائية أو مجدولة. يستخدم نفس رابط/سرّ الخادم المضبوطين أعلاه في "وكيل الباقات"، ونفس رقم Twilio المستخدم للمكالمات.</p>
+        <p style="font-size:11px;color:#9ca3af;margin:-2px 0 12px">إرسال يدوي فقط بأمر صريح منك — لا رسائل تلقائية أو مجدولة. يستخدم نفس رابط الخادم المضبوط أعلاه في "وكيل الباقات" + جلسة المشرف، ونفس رقم Twilio المستخدم للمكالمات.</p>
         <div style="margin-bottom:12px">
           <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">نص الرسالة</label>
           <textarea id="sms-broadcast-text" rows="4" oninput="_updateSmsCharCount()" placeholder="مثال: عروض رزق الجديدة! جدّد باقتك الآن واستفد من خصم خاص..." style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
@@ -4391,7 +4385,10 @@ function approveAccount(id, customPkg){
   acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  acc.dashLink=dashFile+'?id='+id+'&token='+acc.token;
+  acc.dashLink=dashFile+'?id='+id;
+  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+    window.RizqAccount.storeDashToken(id, acc.token);
+  }
   // رابط الملف الشخصي العام (يُشارَك مع المشترين) — فقط للحسابات الفردية حالياً؛
   // المحل/المكتب/الشركة لهم صفحاتهم العامة الخاصة (rizq_store.html/rizq_office.html/rizq_corp.html) بمنطق مختلف بالفعل.
   if(acc.type==='individual'){
@@ -5252,8 +5249,6 @@ function renderSubAgentControls(){
   if(notes) notes.value = cfg.notes || '';
   var burl = document.getElementById('subagent-backend-url');
   if(burl) burl.value = cfg.backendUrl || '';
-  var bsec = document.getElementById('subagent-backend-secret');
-  if(bsec) bsec.value = cfg.backendSecret || '';
 }
 function _paintSubAgentToggle(on){
   var track = document.getElementById('subagent-toggle-track');
@@ -5274,14 +5269,14 @@ function saveSubAgentConfig(){
   RizqSub.setAgentConfig({
     notes: document.getElementById('subagent-notes').value,
     backendUrl: document.getElementById('subagent-backend-url').value.trim(),
-    backendSecret: document.getElementById('subagent-backend-secret').value.trim(),
+    backendSecret: '',
   });
   var msg = document.getElementById('subagent-saved-msg');
   if(msg){ msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2000); }
 }
 
 // ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (rizq-backend /api/broadcast-sms) ══
-// يستخدم نفس backendUrl/backendSecret المضبوطين في "وكيل الباقات" (RizqSub.getAgentConfig)
+// يستخدم نفس backendUrl المضبوط في "وكيل الباقات" + جلسة المشرف (RizqSub.getAgentConfig)
 // تفادياً لأي إعداد مزدوج. إرسال فقط بأمر صريح من الأدمن، لا جدولة إطلاقاً.
 function _updateSmsCharCount(){
   var ta = document.getElementById('sms-broadcast-text');
@@ -5320,7 +5315,7 @@ function sendSmsBroadcast(btn){
   }).then(function(data){
     showToast(RizqI18n.t2('✅ أُرسل لـ '+data.sent+' مشترك، فشل '+data.failed,'✅ Envoyé à '+data.sent+' abonnés, échec pour '+data.failed), data.failed > 0 ? 'error' : 'success');
   }).catch(function(){
-    showToast(RizqI18n.t2('❌ فشل الإرسال — تحقق من رابط الخادم والسرّ المشترك','❌ Échec de l\'envoi — vérifiez l\'URL du serveur et le secret partagé'), 'error');
+    showToast(RizqI18n.t2('❌ فشل الإرسال — تحقق من رابط الخادم وجلسة المشرف','❌ Échec de l\'envoi — vérifiez l\'URL du serveur et la session admin'), 'error');
   }).finally(function(){
     if(btn){ btn.disabled = false; btn.textContent = origBtnText; }
   });
@@ -5341,11 +5336,11 @@ function aiVerifyReceipt(reqId, btn){
 }
 
 // ══ الفيديو الإعلاني للزوار — مرتبط بخادم rizq-backend الحقيقي ══
-// يستخدم نفس backendUrl/backendSecret المضبوطين في تبويب "وكيل الباقات"
-// (RizqSub.getAgentConfig) حفاظاً على التناسق وتجنّب إعداد مزدوج.
+// يستخدم نفس backendUrl المضبوط في تبويب "وكيل الباقات" + جلسة المشرف.
 function _pvBackendCfg(){
-  if (typeof RizqSub === 'undefined') return { backendUrl:'', backendSecret:'' };
-  return RizqSub.getAgentConfig();
+  if (typeof RizqSub === 'undefined') return { backendUrl:'' };
+  var cfg = RizqSub.getAgentConfig();
+  return { backendUrl: cfg.backendUrl || '' };
 }
 function _pvSetToggle(id, on){
   var el = document.getElementById(id);

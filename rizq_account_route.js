@@ -20,6 +20,50 @@
     'rizq_session_id'
   ];
 
+  var AFTER_AUTH_HREF_KEY = 'rizq_after_auth_href';
+
+  function dashTokenStorageKey(accountId) {
+    return 'rizq_dash_token_' + String(accountId || '');
+  }
+
+  function storeDashToken(accountId, token) {
+    if (!accountId || !token) return;
+    try {
+      sessionStorage.setItem(dashTokenStorageKey(accountId), String(token));
+    } catch (e) {}
+  }
+
+  function readDashToken(accountId) {
+    if (!accountId) return '';
+    try {
+      var stored = sessionStorage.getItem(dashTokenStorageKey(accountId));
+      if (stored) return stored;
+    } catch (e) {}
+    var sess = readStoredSession();
+    if (sess && sess.id === accountId && sess.token) return sess.token;
+    var acc = readPendingAccounts().find(function (a) {
+      return a && a.id === accountId && a.token;
+    });
+    return (acc && acc.token) || '';
+  }
+
+  function stripTokenFromUrl() {
+    try {
+      var p = new URLSearchParams(location.search);
+      if (!p.has('token')) return false;
+      var id = p.get('id');
+      var tok = p.get('token');
+      if (id && tok) storeDashToken(id, tok);
+      p.delete('token');
+      var qs = p.toString();
+      var path = location.pathname || '';
+      history.replaceState(null, '', path + (qs ? '?' + qs : '') + (location.hash || ''));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function readPendingAccounts() {
     try {
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
@@ -66,9 +110,10 @@
 
   function buildDashboardUrl(acc) {
     if (!acc || !acc.id || !acc.token) return '';
+    storeDashToken(acc.id, acc.token);
     var type = acc.type || 'individual';
     var path = htmlDashPath(dashFileName(type));
-    return path + '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
+    return path + '?id=' + encodeURIComponent(acc.id);
   }
 
   function resolveDashboardUrl() {
@@ -81,6 +126,7 @@
 
   function setActiveSession(acc) {
     if (!acc || !acc.id || !acc.token) return;
+    storeDashToken(acc.id, acc.token);
     try {
       localStorage.setItem('rizq_active_session', JSON.stringify({
         id: acc.id,
@@ -104,6 +150,28 @@
     SESSION_KEYS.forEach(function (k) {
       try { localStorage.removeItem(k); } catch (e) {}
     });
+    try {
+      for (var i = sessionStorage.length - 1; i >= 0; i--) {
+        var k = sessionStorage.key(i);
+        if (k && k.indexOf('rizq_dash_token_') === 0) sessionStorage.removeItem(k);
+      }
+    } catch (e2) {}
+  }
+
+  function consumeAfterAuthHref() {
+    var href = '';
+    try {
+      href = sessionStorage.getItem(AFTER_AUTH_HREF_KEY) || '';
+      if (href) sessionStorage.removeItem(AFTER_AUTH_HREF_KEY);
+    } catch (e) {}
+    return href;
+  }
+
+  function redirectAfterAuth(defaultUrl) {
+    var after = consumeAfterAuthHref();
+    var target = after || defaultUrl || '';
+    if (target) location.href = target;
+    return target;
   }
 
   function publicPageForAccount(accOrType, id) {
@@ -154,6 +222,7 @@
     if (idx >= 0) accs[idx] = rec;
     else accs.push(rec);
     try { localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); } catch (e) {}
+    if (rec.token) storeDashToken(rec.id, rec.token);
     return rec;
   }
 
@@ -230,7 +299,7 @@
       setActiveSession(acc);
       var url = buildDashboardUrl(acc);
       if (url) {
-        location.href = url;
+        redirectAfterAuth(url);
         return true;
       }
     }
@@ -268,7 +337,8 @@
   function bootstrapDashboard() {
     var p = new URLSearchParams(location.search);
     if (p.get('demo') === '1') return;
-    if (p.get('id') && p.get('token')) {
+    stripTokenFromUrl();
+    if (p.get('id')) {
       try {
         sessionStorage.removeItem('rizq_dash_boot_guard');
         sessionStorage.removeItem('rizq_dash_boot_ts');
@@ -295,21 +365,35 @@
   }
 
   function recoverSessionParams(expectedType) {
+    stripTokenFromUrl();
     var p = new URLSearchParams(location.search);
-    if (p.get('id') && p.get('token')) {
-      return { id: p.get('id'), token: p.get('token'), fromUrl: true };
+    var id = p.get('id') || '';
+    var token = id ? readDashToken(id) : '';
+
+    if (id && token) {
+      var accFromUrl = readPendingAccounts().find(function (a) {
+        return a && a.id === id && a.token === token && a.status === 'approved';
+      });
+      var typeFromUrl = accFromUrl && accFromUrl.type ? accFromUrl.type : (expectedType || '');
+      if (expectedType && typeFromUrl && typeFromUrl !== expectedType) return null;
+      try {
+        var pathOnly = htmlDashPath(dashFileName(typeFromUrl || expectedType || 'individual'));
+        history.replaceState(null, '', pathOnly + '?id=' + encodeURIComponent(id));
+      } catch (eHist) {}
+      return { id: id, token: token, account: accFromUrl || null, fromUrl: true };
     }
+
     var sess = readStoredSession();
     if (!sess) return null;
     var acc = findApprovedAccount(sess);
     if (!acc) return null;
     var type = acc.type || 'individual';
     if (expectedType && type !== expectedType) return null;
+    storeDashToken(acc.id, acc.token);
     try {
       var path = htmlDashPath(dashFileName(type));
-      var q = '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
-      history.replaceState(null, '', path + q);
-    } catch (eHist) {}
+      history.replaceState(null, '', path + '?id=' + encodeURIComponent(acc.id));
+    } catch (eHist2) {}
     return { id: acc.id, token: acc.token, account: acc, fromUrl: false };
   }
 
@@ -329,6 +413,7 @@
 
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', function () {
+      stripTokenFromUrl();
       refreshStoredSessionFromBackend();
     });
   }
@@ -342,6 +427,11 @@
     recoverSessionParams: recoverSessionParams,
     clearSession: clearSession,
     setActiveSession: setActiveSession,
+    storeDashToken: storeDashToken,
+    readDashToken: readDashToken,
+    stripTokenFromUrl: stripTokenFromUrl,
+    consumeAfterAuthHref: consumeAfterAuthHref,
+    redirectAfterAuth: redirectAfterAuth,
     loginSellerAsync: loginSellerAsync,
     syncAccountFromBackend: syncAccountFromBackend,
     mergeServerAccount: mergeServerAccount,

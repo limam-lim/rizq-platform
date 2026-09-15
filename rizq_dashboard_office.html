@@ -692,17 +692,20 @@ textarea.form-input{min-height:80px;resize:vertical}
 
 <script>
 const params=new URLSearchParams(window.location.search);
-var SESSION_ID=params.get('id')||'';
-var SESSION_TOKEN=params.get('token')||'';
+var SESSION_ID='';
+var SESSION_TOKEN='';
 const IS_DEMO=params.get('demo')==='1';
 (function rizqHydrateDashSession(){
-  if(SESSION_ID && SESSION_TOKEN) return;
   if(IS_DEMO) return;
-  if(!window.RizqAccount || typeof window.RizqAccount.recoverSessionParams !== 'function') return;
-  var rec = window.RizqAccount.recoverSessionParams('office');
-  if(!rec) return;
-  SESSION_ID = rec.id || '';
-  SESSION_TOKEN = rec.token || '';
+  if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+    var rec = window.RizqAccount.recoverSessionParams('office');
+    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+  }
+  SESSION_ID = params.get('id') || '';
+  SESSION_TOKEN = params.get('token') || '';
+  if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
+    SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
+  }
 })();
 
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}

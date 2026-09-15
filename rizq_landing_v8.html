@@ -7594,7 +7594,13 @@ async function doLogin(){
     if(res && res.ok && res.url){
       showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
       closeModal();
-      setTimeout(function(){ location.href = res.url; }, 400);
+      setTimeout(function(){
+        if(window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function'){
+          window.RizqAccount.redirectAfterAuth(res.url);
+        } else {
+          location.href = res.url;
+        }
+      }, 400);
       return;
     }
     if(res && res.code === 'not_approved'){
