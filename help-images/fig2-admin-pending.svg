@@ -1,0 +1,21 @@
+<svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="880" height="240" fill="#0f172a"/>
+  <rect x="0" y="0" width="200" height="240" fill="#0a1220"/>
+  <text x="100" y="28" fill="#64748b" text-anchor="middle" font-size="10" font-family="Segoe UI">SIDEBAR</text>
+  <rect x="16" y="44" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="64" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">F81) 9'E)</text>
+  <rect x="16" y="84" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="104" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">'DE3*./EHF </text>
+  <rect x="16" y="124" width="168" height="36" rx="6" fill="rgba(201,168,76,.25)" stroke="#C9A84C" stroke-width="2"/>
+  <text x="100" y="146" fill="#E8C96A" text-anchor="middle" font-size="12" font-weight="700" font-family="Segoe UI">=d 'D-3'('* Û</text>
+  <text x="100" y="162" fill="#fbbf24" text-anchor="middle" font-size="9" font-family="Segoe UI">ê GF' pending</text>
+  <rect x="216" y="16" width="648" height="208" rx="10" fill="#fff"/>
+  <text x="240" y="44" fill="#1B3A6B" font-size="14" font-weight="800" font-family="Segoe UI">7D('* 'D*3,JD  BJ/ 'DE1',9)</text>
+  <rect x="232" y="60" width="616" height="44" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="256" cy="82" r="14" fill="#1B3A6B"/><text x="256" y="86" fill="#C9A84C" text-anchor="middle" font-size="12"><Í</text>
+  <text x="284" y="78" fill="#1a2535" font-size="13" font-weight="700" font-family="Segoe UI">'3E F4'7C / Your Store</text>
+  <text x="284" y="94" fill="#64748b" font-size="10" font-family="Segoe UI">status: pending  JF*81 EH'AB*C</text>
+  <rect x="720" y="72" width="72" height="28" rx="6" fill="#16a34a"/><text x="756" y="90" fill="#fff" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">EH'AB)</text>
+  <rect x="800" y="72" width="36" height="28" rx="6" fill="#fee2e2" stroke="#ef4444"/><text x="818" y="90" fill="#dc2626" text-anchor="middle" font-size="11" font-family="Segoe UI"></text>
+  <path d="M440 120 L460 140 L420 140 Z" fill="#C9A84C"/>
+  <rect x="320" y="140" width="240" height="36" rx="8" fill="#C9A84C"/>
+  <text x="440" y="163" fill="#0f172a" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">† DJ3 *(HJ( ´'DE3*./EHFª</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg viewBox="0 0 880 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="880" height="160" fill="#fff"/>
+  <g font-family="Segoe UI,sans-serif" text-anchor="middle">
+    <rect x="40" y="40" width="180" height="90" rx="12" fill="#eff6ff" stroke="#1B3A6B"/><text x="130" y="72" fill="#1B3A6B" font-size="28">=d</text><text x="130" y="98" fill="#1B3A6B" font-size="12" font-weight="700">#A1'/</text><text x="130" y="114" fill="#64748b" font-size="10">dashboard.html</text>
+    <rect x="250" y="40" width="180" height="90" rx="12" fill="#fffbeb" stroke="#C9A84C"/><text x="340" y="72" fill="#a07820" font-size="28"><ê</text><text x="340" y="98" fill="#1B3A6B" font-size="12" font-weight="700">E-D / E916</text><text x="340" y="114" fill="#64748b" font-size="10">dashboard_store</text>
+    <rect x="460" y="40" width="180" height="90" rx="12" fill="#f0fdf4" stroke="#16a34a"/><text x="550" y="72" fill="#15803d" font-size="28"><â</text><text x="550" y="98" fill="#1B3A6B" font-size="12" font-weight="700">EC*(</text><text x="550" y="114" fill="#64748b" font-size="10">dashboard_office</text>
+    <rect x="670" y="40" width="180" height="90" rx="12" fill="#fdf4ff" stroke="#9333ea"/><text x="760" y="72" fill="#7e22ce" font-size="28"><í</text><text x="760" y="98" fill="#1B3A6B" font-size="12" font-weight="700">41C)</text><text x="760" y="114" fill="#64748b" font-size="10">dashboard_corp</text>
+  </g>
+</svg>
