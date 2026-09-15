@@ -39,6 +39,12 @@
     return pathName().toLowerCase().replace(/\.html$/, '');
   }
 
+  /** Pages that ship their own sticky nav (search bar, post wizard, etc.). */
+  function isNativeNavPage() {
+    if (document.documentElement.classList.contains('rizq-native-nav-page')) return true;
+    return /^(rizq_browse|rizq_post|rizq_listing|rizq_search)$/.test(pageKey());
+  }
+
   function isDashShell() {
     var p = pathName().toLowerCase();
     return /dashboard|admin\.html|chat_widget/.test(p);
@@ -1141,9 +1147,18 @@
     if (isDashShell()) {
       removeHeader();
       removeDeskNav();
-      document.documentElement.classList.remove('rizq-app-nav', 'has-rizq-desk-nav');
+      document.documentElement.classList.remove('rizq-app-nav', 'has-rizq-desk-nav', 'rizq-native-nav-page');
       if (document.body) document.body.classList.remove('landing-ux-mobile');
       unifyDashLangPills();
+      return;
+    }
+    if (isNativeNavPage()) {
+      removeHeader();
+      removeDeskNav();
+      document.documentElement.classList.remove('rizq-app-nav', 'has-rizq-desk-nav');
+      document.documentElement.classList.add('rizq-native-nav-page');
+      if (document.body) document.body.classList.remove('landing-ux-mobile');
+      ensureLangListener();
       return;
     }
     document.documentElement.classList.add('rizq-app-nav');

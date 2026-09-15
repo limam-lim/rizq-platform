@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=17.5"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
-  <script>document.documentElement.classList.add('rizq-app-nav')</script>
+  <script>document.documentElement.classList.add('rizq-native-nav-page')</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
@@ -867,7 +867,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   </div>
   <div class="nav-actions">
     <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>
-    <a href="rizq_post.html" class="btn-post" data-t="nav-post" onclick="return browseGoToPost(event)">➕ انشر إعلان</a>
+    <a href="rizq_post.html" class="btn-post" data-t="nav-post">➕ انشر إعلان</a>
     <a href="#" class="btn-ns" data-t="nav-account" onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)">حسابي</a>
     <button class="btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()">FR</button>
   </div>
@@ -2510,17 +2510,6 @@ function dpToggleDesc(){
   if(!dc)return;
   if(dc.classList.contains('expanded')){dc.classList.remove('expanded');if(btn)btn.textContent=_t('dp-read-more');}
   else{dc.classList.add('expanded');if(btn)btn.textContent=_t('dp-read-less');}
-}
-
-function browseGoToPost(ev){
-  if(ev&&ev.preventDefault) ev.preventDefault();
-  try{ sessionStorage.setItem('rizq_after_auth_href','rizq_post.html'); }catch(e){}
-  if(window.RizqAuthGate&&typeof RizqAuthGate.openAccountChoice==='function'){
-    RizqAuthGate.openAccountChoice();
-    return false;
-  }
-  location.href='rizq_landing_v8.html?openLogin=1';
-  return false;
 }
 
 // ══════════ INIT ══════════
