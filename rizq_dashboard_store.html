@@ -355,7 +355,9 @@ textarea.form-input{resize:vertical;min-height:90px}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -452,6 +454,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 
   <div class="content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
     <div class="panel active" id="panel-overview">
             <!-- Welcome Hero -->
       <div class="welcome-banner" style="padding:0;overflow:hidden;border-radius:20px;min-height:unset">
@@ -1317,9 +1320,21 @@ function _initWithAccount(acc){
   if(wbn) wbn.textContent=acc.name||_t2('محلي','Ma boutique');
   var wpb=document.getElementById('wb-plan-badge');if(wpb)wpb.textContent=_t2('💎 باقة ','💎 Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
   if(wbs) wbs.textContent=(acc.storeType||_t2('محل تجاري','Commerce'))+' · '+(acc.city||_t2('موريتانيا','Mauritanie'))+_t2(' · باقة ',' · Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
-  // Share link
-  var sli=document.getElementById('share-link-input');
-  if(sli) sli.value=location.origin+'/rizq_landing_v8.html?store='+(acc.id||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: products, itemType: 'catalog' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'store',
+      isDemo: IS_DEMO,
+      contentCount: products.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
 }
 
 // ══ PANELS ══
@@ -1777,6 +1792,9 @@ function renderProducts(){
       </div>
     </div>`;
   }).join('');
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: products, itemType: 'catalog' });
+  }
 }
 
 let _formOpen = true;

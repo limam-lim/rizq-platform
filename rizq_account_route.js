@@ -158,6 +158,13 @@
     } catch (e2) {}
   }
 
+  function setAfterAuthHref(href) {
+    if (!href) return;
+    try {
+      sessionStorage.setItem(AFTER_AUTH_HREF_KEY, String(href));
+    } catch (e) {}
+  }
+
   function consumeAfterAuthHref() {
     var href = '';
     try {
@@ -165,6 +172,22 @@
       if (href) sessionStorage.removeItem(AFTER_AUTH_HREF_KEY);
     } catch (e) {}
     return href;
+  }
+
+  function publicShareUrl(accOrType, id) {
+    var path = publicPageForAccount(accOrType, id);
+    if (!path) return '';
+    var origin = '';
+    try {
+      origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
+    } catch (e) {}
+    return origin ? origin + '/' + String(path).replace(/^\//, '') : String(path);
+  }
+
+  function initShareLinkInput(inputId, acc) {
+    var el = document.getElementById(inputId || 'share-link-input');
+    if (!el || !acc) return;
+    el.value = publicShareUrl(acc);
   }
 
   function redirectAfterAuth(defaultUrl) {
@@ -430,8 +453,11 @@
     storeDashToken: storeDashToken,
     readDashToken: readDashToken,
     stripTokenFromUrl: stripTokenFromUrl,
+    setAfterAuthHref: setAfterAuthHref,
     consumeAfterAuthHref: consumeAfterAuthHref,
     redirectAfterAuth: redirectAfterAuth,
+    publicShareUrl: publicShareUrl,
+    initShareLinkInput: initShareLinkInput,
     loginSellerAsync: loginSellerAsync,
     syncAccountFromBackend: syncAccountFromBackend,
     mergeServerAccount: mergeServerAccount,

@@ -297,8 +297,9 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
-<script src="rizq_profile_photo.js?v=2"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -378,6 +379,7 @@ textarea.form-input{min-height:80px;resize:vertical}
   </div>
   <div class="content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
     <div class="panel active" id="panel-overview">
                   <!-- ══ Hero Banner ══ -->
       <div id="hero-banner" style="background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#1a3a8f 100%);border-radius:20px;padding:0;overflow:hidden;position:relative;margin-bottom:20px;min-height:180px;display:flex">
@@ -1332,9 +1334,9 @@ function initDashboard(){
     txt.textContent = _t2('تجريبي — ترقية متاحة','Essai — mise à niveau disponible');
   }
 
-  // Share link input
-  var sli = document.getElementById('share-link-input');
-  if(sli) sli.value = location.origin + '/rizq_landing_v8.html?corp=' + (acc.id||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
 
   renderOverview();
   renderInquiries();
@@ -1362,6 +1364,18 @@ function initDashboard(){
   if(typeof RizqInvoice!=='undefined' && typeof renderMyInvoices==='function') renderMyInvoices();
   if(typeof renderAdsPackages==='function') renderAdsPackages();
   if(typeof loadProfile==='function') loadProfile();
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: getProds(), itemType: 'catalog' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'corp',
+      isDemo: IS_DEMO,
+      contentCount: (typeof getProds==='function' ? getProds().length : 0),
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
   // Activate overview tab in sidebar
   var defOvBtn = document.querySelector('.sb-item[onclick*="overview"]');
   if(defOvBtn) defOvBtn.classList.add('active');
@@ -2301,6 +2315,9 @@ function renderProducts(){
   }).join('');
   var cnt = document.getElementById('prod-count');
   if(cnt) cnt.textContent = prods.length + ' ' + _t2('منتج','produit(s)');
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: prods, itemType: 'catalog' });
+  }
 }
 
 // إصلاح: حذف المنتج/الخدمة كان يحدث فوراً بلا أي تأكيد (نفس علّة

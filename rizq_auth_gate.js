@@ -769,6 +769,31 @@
       });
   }
 
+  function rememberAfterAuthHref() {
+    try {
+      if (sessionStorage.getItem('rizq_after_auth_href')) return;
+      var href = location.pathname + location.search + (location.hash || '');
+      if (window.RizqAccount && typeof window.RizqAccount.setAfterAuthHref === 'function') {
+        window.RizqAccount.setAfterAuthHref(href);
+      } else {
+        sessionStorage.setItem('rizq_after_auth_href', href);
+      }
+    } catch (e) {}
+  }
+
+  function consumeAfterAuthHrefSafe() {
+    if (window.RizqAccount && typeof window.RizqAccount.consumeAfterAuthHref === 'function') {
+      return window.RizqAccount.consumeAfterAuthHref();
+    }
+    try {
+      var href = sessionStorage.getItem('rizq_after_auth_href') || '';
+      if (href) sessionStorage.removeItem('rizq_after_auth_href');
+      return href;
+    } catch (e2) {
+      return '';
+    }
+  }
+
   function finishRegister(session) {
     setSession(session);
     markEmailVerified(session.email);
@@ -782,7 +807,14 @@
       }
       closeModal();
       if (typeof window.showToast === 'function') window.showToast(d().successToast, 'success');
+      var hadPending = !!_pendingAction;
       runPendingAction();
+      if (hadPending) {
+        consumeAfterAuthHrefSafe();
+      } else {
+        var afterHref = consumeAfterAuthHrefSafe();
+        if (afterHref) location.href = afterHref;
+      }
     });
   }
 
@@ -1008,6 +1040,7 @@
       return true;
     }
     _pendingAction = actionFn;
+    rememberAfterAuthHref();
     openModal(reasonKey);
     return false;
   }
@@ -1015,10 +1048,22 @@
   function gateLink(el, ev, reasonKey) {
     if (isLoggedIn()) return true;
     if (ev && ev.preventDefault) ev.preventDefault();
+    var targetHref = el && el.href ? el.href : '';
+    if (targetHref) {
+      try {
+        if (window.RizqAccount && typeof window.RizqAccount.setAfterAuthHref === 'function') {
+          window.RizqAccount.setAfterAuthHref(targetHref);
+        } else {
+          sessionStorage.setItem('rizq_after_auth_href', targetHref);
+        }
+      } catch (e) {}
+    } else {
+      rememberAfterAuthHref();
+    }
     requireAuth(function () {
-      if (el && el.href) {
-        if (el.target === '_blank') window.open(el.href, '_blank', 'noopener');
-        else window.location.href = el.href;
+      if (targetHref) {
+        if (el && el.target === '_blank') window.open(targetHref, '_blank', 'noopener');
+        else window.location.href = targetHref;
       }
     }, reasonKey);
     return false;

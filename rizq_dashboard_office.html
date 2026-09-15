@@ -261,7 +261,9 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -334,6 +336,7 @@ textarea.form-input{min-height:80px;resize:vertical}
   </div>
   <div class="content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
     <div class="panel active" id="panel-overview">
                   <!-- ══ Hero Banner ══ -->
       <div id="hero-banner" style="background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#1a3a8f 100%);border-radius:20px;padding:0;overflow:hidden;position:relative;margin-bottom:20px;min-height:180px;display:flex">
@@ -1228,8 +1231,21 @@ function _initWithAccount(acc){
   const wbn=document.getElementById('wb-name');const wbs=document.getElementById('wb-sub');
   if(wbn)wbn.textContent=acc.name||_t2('مكتبي','Mon bureau');
   if(wbs)wbs.textContent=(acc.activity||_t2('مكتب افتراضي','Bureau virtuel'))+' · '+(acc.city||_t2('موريتانيا','Mauritanie'))+_t2(' · باقة ',' · Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
-  const sli=document.getElementById('share-link-input');
-  if(sli)sli.value=location.origin+'/rizq_landing_v8.html?office='+(acc.id||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'office',
+      isDemo: IS_DEMO,
+      contentCount: services.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
 }
 
 function renderOverview(){
@@ -1467,6 +1483,9 @@ function renderServices(){
         <button class="btn btn-danger btn-sm" onclick="deleteService(${i})" title="${_t2('حذف','Supprimer')}">🗑️</button>
       </div>
     </div>`).join('');
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
 }
 
 function saveService(){

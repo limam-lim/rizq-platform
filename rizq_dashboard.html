@@ -395,7 +395,9 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -485,6 +487,7 @@ main, .page-content.active, .main-content, .results-area,
   <!-- ══ PAGE CONTENT ══ -->
   <div class="page-content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
 
     <!-- ── OVERVIEW ── -->
     <div class="panel active" id="panel-overview">
@@ -1044,6 +1047,9 @@ function _updateAdFilterCounts(){
   if(adsNum) adsNum.textContent = String(n('active') || all);
   var adsChange = document.querySelector('.stat-card.balance .stat-change');
   if(adsChange){ adsChange.className='stat-change'; adsChange.textContent = all ? (all+' '+_t2('إعلان','annonce(s)')) : _t2('لا إعلانات بعد','aucune annonce'); }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: MY_ADS, itemType: 'ads' });
+  }
 }
 
 function renderQuickAds(){
@@ -2424,6 +2430,21 @@ function _initDashboardWithAccount(acc){
   applyDashAvatars();
   if(typeof initSubscriptionLifecycle==='function') initSubscriptionLifecycle(acc.id, 'individual');
   if(typeof renderMyInvoices==='function') renderMyInvoices();
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: MY_ADS, itemType: 'ads' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'individual',
+      isDemo: IS_DEMO,
+      contentCount: MY_ADS.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
 }
 // ── مزامنة طرق الدفع + كتالوجات الأسعار من الخادم — الأدمن قد يعدّلها من
 // جهازه الخاص؛ بدون هذا، يبقى هذا الجهاز يعرض فقط ما كان محفوظاً محلياً.
@@ -2577,8 +2598,9 @@ function rizqShare(title, url) {
 <script>
 // ══ Share & QR — ملفي الشخصي ══
 (function(){
-  var sli=document.getElementById('share-link-input');
-  if(sli) sli.value=location.origin+'/rizq_profile.html?user='+encodeURIComponent(SESSION_ID||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function' && USER_ACC){
+    RizqAccount.initShareLinkInput('share-link-input', USER_ACC);
+  }
 })();
 var _qrDone=false;
 function openShareModal(){
