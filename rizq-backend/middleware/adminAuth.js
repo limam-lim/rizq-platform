@@ -4,6 +4,7 @@
 function createAdminAuth(deps) {
   const adminSessions = deps.adminSessions;
   const sharedSecret = () => process.env.BACKEND_SHARED_SECRET || '';
+  const hasAdminPermission = deps.hasAdminPermission || (() => true);
 
   function requireAdminSession(req, res, next) {
     const token = req.header('x-admin-token');
@@ -40,10 +41,26 @@ function createAdminAuth(deps) {
       if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
         return res.status(403).json({ error: 'server_secret_browser_forbidden' });
       }
-      req.adminUser = { user: 'server', name: 'Server', role: 'super' };
+      req.adminUser = { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
       return next();
     }
     return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  /** يتطلب صلاحية (أو *) بعد requireAdminAuth */
+  function requireAdminPermission(...required) {
+    return (req, res, next) => {
+      requireAdminAuth(req, res, () => {
+        const perms = (req.adminUser && req.adminUser.permissions) || [];
+        if (hasAdminPermission(perms, required.length ? required : ['*'])) return next();
+        return res.status(403).json({
+          error: 'admin_forbidden',
+          msg: 'ليس لديك صلاحية لهذا الإجراء',
+          msg_fr: 'Permission insuffisante pour cette action',
+          required,
+        });
+      });
+    };
   }
 
   /** سرّ خادمي فقط — لا يُقبل من المتصفح في الإنتاج */
@@ -56,7 +73,7 @@ function createAdminAuth(deps) {
     next();
   }
 
-  return { requireAdminSession, requireAdminAuth, requireSharedSecret };
+  return { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret };
 }
 
 module.exports = { createAdminAuth };

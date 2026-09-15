@@ -373,34 +373,34 @@ main, .page-content.active, .main-content, .results-area,
   </div>
   <nav class="sb-nav">
     <div class="sb-section" data-t="sb-section-dashboard">لوحة التحكم</div>
-    <div class="sb-item active" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-overview">نظرة عامة</span></div>
-    <div class="sb-item" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge">1,247</span></div>
-    <div class="sb-item" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold">50,842</span></div>
-    <div class="sb-item" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge">23</span></div>
-    <div class="sb-item" id="sb-moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('analytics',this)"><span class="sb-icon">📈</span><span class="sb-label" data-t="sb-analytics">الإحصائيات</span></div>
+    <div class="sb-item active" data-admin-perm="overview" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-overview">نظرة عامة</span></div>
+    <div class="sb-item" data-admin-perm="users" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge">1,247</span></div>
+    <div class="sb-item" data-admin-perm="ads" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold">50,842</span></div>
+    <div class="sb-item" data-admin-perm="reports" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge">23</span></div>
+    <div class="sb-item" id="sb-moderation" data-admin-perm="moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="tenders" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="payments" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="analytics" onclick="showPanel('analytics',this)"><span class="sb-icon">📈</span><span class="sb-label" data-t="sb-analytics">الإحصائيات</span></div>
     <div class="sb-section" data-t="sb-section-admin">الإدارة</div>
-    <div class="sb-item" onclick="showPanel('team',this)"><span class="sb-icon">🛡️</span><span class="sb-label" data-t="sb-team">فريق الإدارة</span><span class="sb-badge blue">10</span></div>
-    <div class="sb-item" onclick="showPanel('packages',this)"><span class="sb-icon">📦</span><span class="sb-label" data-t="sb-packages">إدارة الباقات</span></div>
-    <div class="sb-item" onclick="showPanel('prices',this)"><span class="sb-icon">🛒</span><span class="sb-label" data-t="sb-prices">أسعار المواد</span></div>
-    <div class="sb-item" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
-    <div class="sb-item" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
-    <div class="sb-item" onclick="showPanel('siteconfig',this)"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-siteconfig">إعدادات الموقع</span></div>
-    <div class="sb-item" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label" data-t="sb-modules">إدارة الأقسام</span></div>
-    <div class="sb-item" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-settings">الإعدادات</span></div>
-    <div class="sb-item" onclick="showPanel('legal',this)"><span class="sb-icon">📜</span><span class="sb-label" data-t="sb-legal">القانوني</span></div>
-    <div class="sb-item" onclick="showPanel('legal-editor',this)"><span class="sb-icon">✏️</span><span class="sb-label" data-t="sb-legal-editor">تعديل نصوص القانون</span></div>
+    <div class="sb-item" data-admin-perm="team.manage" onclick="showPanel('team',this)"><span class="sb-icon">🛡️</span><span class="sb-label" data-t="sb-team">فريق الإدارة</span><span class="sb-badge blue" id="team-count-badge">15</span></div>
+    <div class="sb-item" data-admin-perm="packages" onclick="showPanel('packages',this)"><span class="sb-icon">📦</span><span class="sb-label" data-t="sb-packages">إدارة الباقات</span></div>
+    <div class="sb-item" data-admin-perm="prices" onclick="showPanel('prices',this)"><span class="sb-icon">🛒</span><span class="sb-label" data-t="sb-prices">أسعار المواد</span></div>
+    <div class="sb-item" data-admin-perm="extra-categories" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
+    <div class="sb-item" data-admin-perm="promo-video" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
+    <div class="sb-item" data-admin-perm="siteconfig" onclick="showPanel('siteconfig',this)"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-siteconfig">إعدادات الموقع</span></div>
+    <div class="sb-item" data-admin-perm="modules" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label" data-t="sb-modules">إدارة الأقسام</span></div>
+    <div class="sb-item" data-admin-perm="settings" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-settings">الإعدادات</span></div>
+    <div class="sb-item" data-admin-perm="legal" onclick="showPanel('legal',this)"><span class="sb-icon">📜</span><span class="sb-label" data-t="sb-legal">القانوني</span></div>
+    <div class="sb-item" data-admin-perm="legal-editor" onclick="showPanel('legal-editor',this)"><span class="sb-icon">✏️</span><span class="sb-label" data-t="sb-legal-editor">تعديل نصوص القانون</span></div>
     <div class="sb-section" data-t="sb-section-channels">قنوات التواصل</div>
-    <div class="sb-item" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
-    <div class="sb-item" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
+    <div class="sb-item" data-admin-perm="channels" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
+    <div class="sb-item" data-admin-perm="announcements" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
-    <div class="sb-item" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
-    <div class="sb-item" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
+    <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
+    <div class="sb-item" data-admin-perm="quota-guard" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="moderator-config" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
     <div class="sb-section" data-t="sb-section-site">الموقع</div>
     <div class="sb-item" onclick="window.open('rizq_landing_v8.html','_blank')"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-view-site">عرض الموقع</span></div>
   </nav>
@@ -764,9 +764,9 @@ main, .page-content.active, .main-content, .results-area,
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
           <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#1a2535" data-t="team-h">🛡️ فريق الإدارة</h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" data-t="team-sub">Super Admin + 9 مشرفين — إجمالي 10 أعضاء</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" id="team-subtitle">فريق الإدارة — صلاحيات ديناميكية (حتى 15 عضو)</p>
         </div>
-        <button class="btn-sm btn-primary" data-t="team-add-btn" onclick="openModal('add-admin')">➕ إضافة عضو</button>
+        <button class="btn-sm btn-primary" id="team-add-btn" data-t="team-add-btn" onclick="openAddAdminModal()">➕ إضافة عضو</button>
       </div>
       <div class="team-grid" id="team-grid"></div>
     </div>
@@ -2185,7 +2185,8 @@ main, .page-content.active, .main-content, .results-area,
 <div class="modal-bg" id="modal-add-admin">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('add-admin')">✕</button>
-    <div class="modal-title" data-t="am-title">➕ إضافة عضو في الفريق</div>
+    <div class="modal-title" id="am-title" data-t="am-title">➕ إضافة عضو في الفريق</div>
+    <input type="hidden" id="am-edit-id" value=""/>
     <div class="form-grid">
       <div class="form-group"><label class="form-label" data-t="am-name-label">الاسم الكامل *</label><input class="form-input" id="am-name" data-ph="am-name-ph" placeholder="محمد ولد ..."/></div>
       <div class="form-group"><label class="form-label" data-t="am-user-label">اسم المستخدم *</label><input class="form-input" id="am-user" placeholder="admin_..." dir="ltr"/></div>
@@ -2194,16 +2195,15 @@ main, .page-content.active, .main-content, .results-area,
       <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
       <div class="form-group"><label class="form-label" data-t="am-email-label">البريد الإلكتروني *</label><input class="form-input" id="am-email" placeholder="name@rizq.mr" dir="ltr"/></div>
     </div>
-    <div class="form-group"><label class="form-label" data-t="am-role-label">الدور والصلاحيات *</label>
-      <select class="form-select" id="am-role">
-        <option value="moderator" data-t="am-role-moderator">🔵 مشرف (Moderator) — مراجعة الإعلانات والبلاغات</option>
-        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — كل صلاحيات المشرف + إدارة المستخدمين</option>
-        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — الاطلاع على المدفوعات والإيرادات</option>
-        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التواصل مع المستخدمين وحل المشاكل</option>
-        <option value="super" data-t="am-role-super">👑 Super Admin — صلاحيات كاملة</option>
+    <div class="form-group"><label class="form-label">قالب صلاحيات جاهز</label>
+      <select class="form-select" id="am-preset" onchange="applyAdminPermPreset(this.value)">
+        <option value="">— اختر قالباً أو حدّد يدوياً —</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور المؤقتة *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/></div>
+    <div class="form-group"><label class="form-label">الصلاحيات * (واحدة أو أكثر)</label>
+      <div id="am-permissions-grid" style="max-height:240px;overflow:auto;border:1px solid rgba(27,58,107,.12);border-radius:10px;padding:10px;background:#f8fafc"></div>
+    </div>
+    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/><div style="font-size:11px;color:#64748b;margin-top:4px">عند التعديل: اتركها فارغة إن لم تُرد تغييرها</div></div>
     <div class="form-group"><label class="form-label" data-t="am-notes-label">ملاحظات</label><input class="form-input" id="am-notes" data-ph="am-notes-ph" placeholder="مسؤول عن ولاية نواكشوط..."/></div>
     <div style="display:flex;gap:10px;margin-top:6px">
       <button class="btn-sm btn-primary" style="flex:1;padding:12px" data-t="am-save-btn" onclick="saveAdmin()">💾 إضافة العضو</button>
@@ -2281,23 +2281,161 @@ function _adminAuthHeaders(extra) {
 }
 
 // ══════════════════════════════════════════
-// TEAM CONFIG — أضف/عدّل الفريق هنا
+// ADMIN PERMISSIONS — صلاحيات ديناميكية (حتى 15 عضو)
 // ══════════════════════════════════════════
-let TEAM = [
-  {id:1, name:'M. LIMAM',          role:'super',     emoji:'👑', phone:'+222 XX XX XX XX', email:'m.limam@rizq.mr',    notes:'المؤسس — صلاحيات كاملة',       online:true},
-  {id:2, name:'المشرف الأول',      role:'admin',     emoji:'🛡️', phone:'',                email:'admin1@rizq.mr',     notes:'إدارة المستخدمين والإعلانات',   online:true},
-  {id:3, name:'المشرف الثاني',     role:'moderator', emoji:'👮', phone:'',                email:'admin2@rizq.mr',     notes:'مراجعة البلاغات',               online:false},
-  {id:4, name:'المشرف الثالث',     role:'moderator', emoji:'👮', phone:'',                email:'admin3@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:5, name:'المشرف الرابع',     role:'moderator', emoji:'👮', phone:'',                email:'admin4@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:6, name:'المشرف الخامس',     role:'moderator', emoji:'👮', phone:'',                email:'admin5@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:7, name:'المشرف السادس',     role:'moderator', emoji:'👮', phone:'',                email:'admin6@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:8, name:'المشرف السابع',     role:'moderator', emoji:'👮', phone:'',                email:'admin7@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:9, name:'المشرف الثامن',     role:'finance',   emoji:'💰', phone:'',                email:'finance@rizq.mr',    notes:'المالية والاشتراكات',           online:false},
-  {id:10,name:'المشرف التاسع',     role:'support',   emoji:'💬', phone:'',                email:'direction@rizq.mr',    notes:'دعم المستخدمين',                online:false},
-];
+let TEAM = [];
+let ADMIN_PERM_CATALOG = { permissions: [], presets: {}, panelMap: {}, maxTeamMembers: 15 };
 
-const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', moderator:'🔵 Moderator', finance:'🟡 Finance', support:'🟢 Support'};
-const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
+const PANEL_PERM_KEYS = {
+  overview: 'overview', users: 'users', ads: 'ads', reports: 'reports', moderation: 'moderation',
+  'tenders-mod': 'tenders', payments: 'payments', analytics: 'analytics', team: 'team.manage',
+  packages: 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
+  siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
+  channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
+  'quota-guard': 'quota-guard', accounts: 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
+};
+
+function _adminHasPerm(required) {
+  if (!currentAdmin || !Array.isArray(currentAdmin.permissions)) return false;
+  const perms = currentAdmin.permissions;
+  if (perms.includes('*')) return true;
+  if (Array.isArray(required)) return required.some(function (r) { return perms.includes(r); });
+  return perms.includes(required);
+}
+
+function _permLabel(key) {
+  const defs = ADMIN_PERM_CATALOG.permissions || [];
+  const d = defs.find(function (x) { return x.key === key; });
+  return d ? RizqI18n.t2(d.labelAr, d.labelFr) : key;
+}
+
+function _applyAdminPermissions() {
+  const perms = (currentAdmin && currentAdmin.permissions) || [];
+  const isSuper = perms.includes('*');
+  document.querySelectorAll('.sb-item[data-admin-perm]').forEach(function (el) {
+    const need = el.getAttribute('data-admin-perm');
+    el.style.display = (isSuper || perms.includes(need)) ? '' : 'none';
+  });
+  document.querySelectorAll('.sb-section').forEach(function (sec) {
+    let next = sec.nextElementSibling;
+    let anyVisible = false;
+    while (next && !next.classList.contains('sb-section')) {
+      if (next.classList.contains('sb-item') && next.style.display !== 'none') anyVisible = true;
+      next = next.nextElementSibling;
+    }
+    sec.style.display = anyVisible ? '' : 'none';
+  });
+  const roleEl = document.querySelector('.sb-admin-role');
+  if (roleEl) {
+    roleEl.textContent = isSuper
+      ? '⭐ Super Administrator'
+      : (perms.length + ' ' + RizqI18n.t2('صلاحية', 'permission(s)'));
+  }
+  const addBtn = document.getElementById('team-add-btn');
+  if (addBtn) addBtn.style.display = _adminHasPerm('team.manage') ? '' : 'none';
+  const maxBadge = document.getElementById('team-count-badge');
+  if (maxBadge) maxBadge.textContent = String(ADMIN_PERM_CATALOG.maxTeamMembers || 15);
+  const sub = document.getElementById('team-subtitle');
+  if (sub) {
+    sub.textContent = RizqI18n.t2(
+      'فريق الإدارة — صلاحيات ديناميكية (حتى ' + (ADMIN_PERM_CATALOG.maxTeamMembers || 15) + ' عضو)',
+      'Équipe admin — permissions dynamiques (jusqu’à ' + (ADMIN_PERM_CATALOG.maxTeamMembers || 15) + ' membres)'
+    );
+  }
+}
+
+async function loadAdminPermCatalog() {
+  try {
+    const res = await fetch(_adminBackendBase() + '/api/admin/permissions', { headers: _adminAuthHeaders() });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.ok) {
+      ADMIN_PERM_CATALOG = data;
+      _fillAdminPresetSelect();
+    }
+  } catch (e) { /* offline */ }
+}
+
+function _fillAdminPresetSelect() {
+  const sel = document.getElementById('am-preset');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— ' + RizqI18n.t2('اختر قالباً أو حدّد يدوياً', 'Choisir un modèle ou personnaliser') + ' —</option>';
+  const presets = ADMIN_PERM_CATALOG.presets || {};
+  Object.keys(presets).forEach(function (k) {
+    const p = presets[k];
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = RizqI18n.t2(p.labelAr, p.labelFr);
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+function buildAdminPermGrid(selected) {
+  const grid = document.getElementById('am-permissions-grid');
+  if (!grid) return;
+  const sel = new Set(selected || []);
+  const defs = ADMIN_PERM_CATALOG.permissions || [];
+  grid.innerHTML = defs.map(function (d) {
+    const checked = sel.has(d.key) ? ' checked' : '';
+    const style = d.key === '*' ? 'font-weight:700;color:#92400e' : '';
+    return '<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 4px;cursor:pointer;font-size:12.5px;' + style + '">'
+      + '<input type="checkbox" class="am-perm-cb" value="' + d.key + '"' + checked + ' onchange="_onAdminPermCheckboxChange()"/>'
+      + '<span>' + RizqI18n.t2(d.labelAr, d.labelFr) + '</span></label>';
+  }).join('');
+}
+
+function _getSelectedAdminPermissions() {
+  const perms = Array.from(document.querySelectorAll('.am-perm-cb:checked')).map(function (b) { return b.value; });
+  if (perms.includes('*')) return ['*'];
+  return perms;
+}
+
+function _onAdminPermCheckboxChange() {
+  const boxes = document.querySelectorAll('.am-perm-cb');
+  const star = Array.from(boxes).find(function (b) { return b.value === '*' && b.checked; });
+  if (star) {
+    boxes.forEach(function (b) { if (b.value !== '*') { b.checked = false; b.disabled = true; } });
+  } else {
+    boxes.forEach(function (b) { b.disabled = false; });
+  }
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+}
+
+function applyAdminPermPreset(presetKey) {
+  if (!presetKey) return;
+  const preset = (ADMIN_PERM_CATALOG.presets || {})[presetKey];
+  if (!preset) return;
+  buildAdminPermGrid(preset.permissions);
+  _onAdminPermCheckboxChange();
+}
+
+function openAddAdminModal() {
+  document.getElementById('am-edit-id').value = '';
+  document.getElementById('am-title').textContent = RizqI18n.t2('➕ إضافة عضو في الفريق', '➕ Ajouter un membre');
+  document.querySelector('[data-t="am-save-btn"]').textContent = RizqI18n.t2('💾 إضافة العضو', '💾 Ajouter le membre');
+  ['am-name', 'am-user', 'am-phone', 'am-email', 'am-pass', 'am-notes'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const userEl = document.getElementById('am-user');
+  if (userEl) userEl.disabled = false;
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+  loadAdminPermCatalog().then(function () { buildAdminPermGrid(['overview']); });
+  openModal('add-admin');
+}
+
+function _teamPermSummary(member) {
+  const perms = member.permissions || [];
+  if (perms.includes('*')) return RizqI18n.t2('⭐ صلاحيات كاملة', '⭐ Accès total');
+  if (!perms.length) return RizqI18n.t2('بدون صلاحيات', 'Aucune permission');
+  const shown = perms.slice(0, 3).map(_permLabel).join(' · ');
+  const extra = perms.length > 3 ? ' +' + (perms.length - 3) : '';
+  return shown + extra;
+}
 
 // ══ SAMPLE DATA ══
 const USERS_DATA = [];
@@ -2326,16 +2464,7 @@ function _enterAdminUI(found){
   document.getElementById('sb-admin-name').textContent = found.name;
   document.getElementById('welcome-name').textContent = found.name;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-MR-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  // Restrict if not super/admin
-  if(found.role==='moderator'){
-    document.querySelectorAll('.sb-item').forEach(i=>{
-      if(i.querySelector('.sb-label')?.textContent.includes('المدفوعات')||
-         i.querySelector('.sb-label')?.textContent.includes('الإعدادات')||
-         i.querySelector('.sb-label')?.textContent.includes('فريق الإدارة')){
-        i.style.display='none';
-      }
-    });
-  }
+  loadAdminPermCatalog().then(function(){ _applyAdminPermissions(); });
   if(typeof RizqSub!=='undefined' && window.RIZQ_BACKEND_BASE){
     try{
       var _cfg0=RizqSub.getAgentConfig();
@@ -2345,8 +2474,13 @@ function _enterAdminUI(found){
     }catch(eCfg){}
   }
   initDashboard();
-  showPanel('overview', document.querySelector('.sb-item[onclick*="overview"]'));
-  showToast(`✅ ${RizqI18n.t2('أهلاً','Bienvenue')} ${found.name} — ${ROLE_LABELS[found.role]||''}`);
+  var firstPanel = _adminHasPerm('overview') ? 'overview' : Object.keys(PANEL_PERM_KEYS).find(function(pid){ return _adminHasPerm(PANEL_PERM_KEYS[pid]); }) || 'overview';
+  var navEl = document.querySelector('.sb-item[data-admin-perm="' + (PANEL_PERM_KEYS[firstPanel] || 'overview') + '"]');
+  showPanel(firstPanel, navEl);
+  var welcomeRole = (found.permissions || []).includes('*')
+    ? RizqI18n.t2('Super Admin', 'Super Admin')
+    : ((found.permissions || []).length + ' ' + RizqI18n.t2('صلاحية', 'permission(s)'));
+  showToast('✅ ' + RizqI18n.t2('أهلاً', 'Bienvenue') + ' ' + found.name + ' — ' + welcomeRole);
 }
 
 async function doLogin(){
@@ -2367,8 +2501,8 @@ async function doLogin(){
       err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
       return;
     }
-    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role })); }catch(e){}
-    _enterAdminUI({ name:data.name, role:data.role });
+    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, permissions:data.permissions||[], user:data.user })); }catch(e){}
+    _enterAdminUI({ name:data.name, role:data.role, permissions:data.permissions||[], user:data.user });
   }catch(e){
     err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
   }finally{
@@ -2386,7 +2520,10 @@ async function doLogin(){
     fetch(_adminBackendBase()+'/api/admin/verify', { headers:{ 'x-admin-token': saved.token } })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if(data && data.ok){ _enterAdminUI({ name:data.name, role:data.role }); }
+        if(data && data.ok){
+          try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:saved.token, name:data.name, role:data.role, permissions:data.permissions||[], user:data.user })); }catch(e){}
+          _enterAdminUI({ name:data.name, role:data.role, permissions:data.permissions||[], user:data.user });
+        }
         else { try{ sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){} }
       })
       .catch(function(){ /* الخادم غير متاح الآن — تبقى شاشة الدخول اليدوي */ });
@@ -2427,6 +2564,11 @@ document.addEventListener('rizq:langchange', renderExtraCategories);
 document.addEventListener('rizq:langchange', renderPackages);
 document.addEventListener('rizq:langchange', renderPricesAdmin);
 function showPanel(id, navEl){
+  const permKey = PANEL_PERM_KEYS[id];
+  if (permKey && currentAdmin && !_adminHasPerm(permKey)) {
+    showToast(RizqI18n.t2('⛔ ليس لديك صلاحية لهذا القسم', '⛔ Permission insuffisante pour cette section'), 'error');
+    return;
+  }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   const panel = document.getElementById('panel-'+id);
   if(panel) panel.classList.add('active');
@@ -3813,24 +3955,47 @@ function renderPayments(data){
   </tr>`).join('');
 }
 
-function renderTeam(){
+async function renderTeam(){
   const g=document.getElementById('team-grid');
-  g.innerHTML=TEAM.map(m=>`
-    <div class="team-card ${m.role==='super'?'super':''}">
-      <div class="team-status ${m.online?'':'offline'}"></div>
-      <div class="team-av">${m.emoji}</div>
-      <div class="team-name">${m.name}</div>
-      <span class="team-role-tag pill ${ROLE_COLORS[m.role]}">${ROLE_LABELS[m.role]}</span>
-      <div class="team-contact">
-        ${m.phone?`📱 <a href="tel:${m.phone}" dir="ltr" style="direction:ltr;unicode-bidi:isolate">${m.phone}</a><br/>`:''}
-        ${m.email?`✉️ <a href="mailto:${m.email}">${m.email}</a><br/>`:''}
-        ${m.notes?`<span style="font-size:10.5px;opacity:.6">${m.notes}</span>`:''}
-      </div>
-      <div class="team-actions">
-        <button class="btn-sm btn-outline" onclick="editAdmin(${m.id})">✏️ ${RizqI18n.t2('تعديل','Modifier')}</button>
-        ${m.role!=='super'?`<button class="btn-sm btn-danger" onclick="removeAdmin(${m.id})">🗑️</button>`:''}
-      </div>
-    </div>`).join('');
+  if(!g) return;
+  if(!_adminHasPerm('team.manage')){
+    g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t2('ليس لديك صلاحية إدارة الفريق','Permission insuffisante pour gérer l\'équipe')+'</p>';
+    return;
+  }
+  g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t2('جاري التحميل...','Chargement...')+'</p>';
+  try{
+    const res=await fetch(_adminBackendBase()+'/api/admin/team',{headers:_adminAuthHeaders()});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t2('تعذّر تحميل الفريق','Échec du chargement de l\'équipe')+'</p>';
+      return;
+    }
+    TEAM=data.team||[];
+    if(typeof data.max==='number') ADMIN_PERM_CATALOG.maxTeamMembers=data.max;
+    const maxEl=document.getElementById('team-count-badge');
+    if(maxEl) maxEl.textContent=String(TEAM.length)+'/'+String(data.max||15);
+    g.innerHTML=TEAM.map(function(m){
+      const isSuper=(m.permissions||[]).includes('*');
+      const isSelf=currentAdmin&&currentAdmin.user===m.user;
+      const idEsc=String(m.id).replace(/'/g,'\\\'');
+      return '<div class="team-card '+(isSuper?'super':'')+'">'
+        +'<div class="team-av">'+(isSuper?'👑':'👤')+'</div>'
+        +'<div class="team-name">'+m.name+'</div>'
+        +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" dir="ltr">@'+m.user+'</div>'
+        +'<span class="team-role-tag pill '+(isSuper?'pill-super':'pill-mod')+'">'+_teamPermSummary(m)+'</span>'
+        +'<div class="team-contact">'
+        +(m.phone?'📱 <a href="tel:'+m.phone+'" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'+m.phone+'</a><br/>':'')
+        +(m.email?'✉️ <a href="mailto:'+m.email+'">'+m.email+'</a><br/>':'')
+        +(m.notes?'<span style="font-size:10.5px;opacity:.6">'+m.notes+'</span>':'')
+        +'</div>'
+        +'<div class="team-actions">'
+        +'<button class="btn-sm btn-outline" onclick="editAdmin(\''+idEsc+'\')">✏️ '+RizqI18n.t2('تعديل','Modifier')+'</button>'
+        +(!isSelf?'<button class="btn-sm btn-danger" onclick="removeAdmin(\''+idEsc+'\')">🗑️</button>':'')
+        +'</div></div>';
+    }).join('');
+  }catch(e){
+    g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t2('تعذّر الاتصال بالخادم','Connexion au serveur impossible')+'</p>';
+  }
 }
 
 function renderChart(id, data, color){
@@ -3910,35 +4075,56 @@ function renderWilayaStats(){
 }
 
 // ══ ADMIN TEAM ACTIONS ══
-function saveAdmin(){
+async function saveAdmin(){
+  const editId = document.getElementById('am-edit-id').value.trim();
   const name  = document.getElementById('am-name').value.trim();
-  const user  = document.getElementById('am-user').value.trim();
+  const user  = document.getElementById('am-user').value.trim().toLowerCase();
   const phone = document.getElementById('am-phone').value.trim();
   const email = document.getElementById('am-email').value.trim();
-  const role  = document.getElementById('am-role').value;
   const pass  = document.getElementById('am-pass').value;
   const notes = document.getElementById('am-notes').value.trim();
-  if(!name||!user||!email||!pass){showToast(RizqI18n.t2('⚠️ يرجى تعبئة الحقول الإلزامية','⚠️ Veuillez remplir les champs obligatoires'));return;}
-  // حسابات الدخول الحقيقية تُدار فقط في rizq-backend/server.js (ADMIN_ACCOUNTS + bcrypt).
-  // هنا نُحدّث قائمة الفريق للعرض فقط — لا تُنشئ جلسة دخول فعلية.
-  // Add to TEAM
-  TEAM.push({id:TEAM.length+1,name,role,emoji:'👤',phone,email,notes,online:false});
-  closeModal('add-admin');
-  renderTeam();
-  showToast(`✅ ${RizqI18n.t2('تم إضافة','Ajouté(e) :')} ${name} ${RizqI18n.t2('إلى فريق الإدارة','à l’équipe d’administration')}`);
-  // Clear
-  ['am-name','am-user','am-phone','am-email','am-pass','am-notes'].forEach(id=>document.getElementById(id).value='');
+  const permissions = _getSelectedAdminPermissions();
+  if(!name||!permissions.length){showToast(RizqI18n.t2('⚠️ الاسم وصلاحية واحدة على الأقل مطلوبان','⚠️ Nom et au moins une permission requis'));return;}
+  if(!editId && (!user||!pass)){showToast(RizqI18n.t2('⚠️ اسم المستخدم وكلمة المرور مطلوبان للعضو الجديد','⚠️ Identifiant et mot de passe requis'));return;}
+  const payload = { name, phone, email, notes, permissions };
+  if(!editId) payload.user = user;
+  if(pass) payload.pass = pass;
+  const url = editId
+    ? _adminBackendBase()+'/api/admin/team/'+encodeURIComponent(editId)
+    : _adminBackendBase()+'/api/admin/team';
+  const method = editId ? 'PATCH' : 'POST';
+  try{
+    const res=await fetch(url,{method,headers:_adminAuthHeaders({'Content-Type':'application/json'}),body:JSON.stringify(payload)});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      const msg=(data&&data.msg)||(data&&data.error)||RizqI18n.t2('فشل الحفظ','Échec de l\'enregistrement');
+      showToast('❌ '+msg,'error');
+      return;
+    }
+    closeModal('add-admin');
+    renderTeam();
+    showToast('✅ '+RizqI18n.t2(editId?'تم تحديث العضو':'تم إضافة العضو','Membre '+(editId?'mis à jour':'ajouté')));
+  }catch(e){
+    showToast(RizqI18n.t2('❌ تعذّر الاتصال بالخادم','❌ Connexion au serveur impossible'),'error');
+  }
 }
 
 function editAdmin(id){
-  const m = TEAM.find(t=>t.id===id);
+  const m = TEAM.find(function(t){ return t.id===id; });
   if(!m) return;
-  // Pre-fill modal
+  document.getElementById('am-edit-id').value = m.id;
+  document.getElementById('am-title').textContent = RizqI18n.t2('✏️ تعديل عضو الفريق','✏️ Modifier le membre');
+  document.querySelector('[data-t="am-save-btn"]').textContent = RizqI18n.t2('💾 حفظ التعديلات','💾 Enregistrer');
   document.getElementById('am-name').value  = m.name;
-  document.getElementById('am-phone').value = m.phone;
-  document.getElementById('am-email').value = m.email;
-  document.getElementById('am-notes').value = m.notes;
-  document.getElementById('am-role').value  = m.role;
+  document.getElementById('am-user').value  = m.user;
+  document.getElementById('am-user').disabled = true;
+  document.getElementById('am-phone').value = m.phone||'';
+  document.getElementById('am-email').value = m.email||'';
+  document.getElementById('am-notes').value = m.notes||'';
+  document.getElementById('am-pass').value  = '';
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+  loadAdminPermCatalog().then(function(){ buildAdminPermGrid(m.permissions||[]); _onAdminPermCheckboxChange(); });
   openModal('add-admin');
 }
 
@@ -3976,10 +4162,20 @@ function editUser(id){
   openModal('add-user');
 }
 
-function removeAdmin(id){
-  if(!confirm(RizqI18n.t2('هل تريد حذف هذا العضو من الفريق؟','Voulez-vous supprimer ce membre de l’équipe ?'))) return;
-  const idx=TEAM.findIndex(t=>t.id===id);
-  if(idx>-1){TEAM.splice(idx,1);renderTeam();showToast(RizqI18n.t2('🗑️ تم حذف العضو','🗑️ Membre supprimé'));}
+async function removeAdmin(id){
+  if(!confirm(RizqI18n.t2('هل تريد تعطيل هذا العضو؟ لن يستطيع تسجيل الدخول.','Désactiver ce membre ? Il ne pourra plus se connecter.'))) return;
+  try{
+    const res=await fetch(_adminBackendBase()+'/api/admin/team/'+encodeURIComponent(id),{method:'DELETE',headers:_adminAuthHeaders()});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      showToast('❌ '+((data&&data.msg)||RizqI18n.t2('فشل التعطيل','Échec')),'error');
+      return;
+    }
+    renderTeam();
+    showToast(RizqI18n.t2('🗑️ تم تعطيل العضو','🗑️ Membre désactivé'));
+  }catch(e){
+    showToast(RizqI18n.t2('❌ تعذّر الاتصال بالخادم','❌ Connexion impossible'),'error');
+  }
 }
 
 function saveUser(){

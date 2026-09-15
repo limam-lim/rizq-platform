@@ -207,7 +207,13 @@ const ADMIN_ACCOUNTS = [
 ];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
-const { requireAdminSession, requireAdminAuth, requireSharedSecret } = createAdminAuth({ adminSessions });
+const adminTeamService = require('./services/adminTeam');
+const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
+adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
+const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
+  adminSessions,
+  hasAdminPermission,
+});
 function cleanExpiredAdminSessions() {
   const now = Date.now();
   for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
@@ -223,17 +229,91 @@ app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   cleanExpiredAdminSessions();
   const { user, pass } = req.body || {};
   if (!user || !pass) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
-  const acc = ADMIN_ACCOUNTS.find(a => a.user === String(user).trim());
-  // مقارنة وهمية عند عدم وجود المستخدم لإبقاء زمن الاستجابة متقارباً
-  // (يقلّل من إمكانية استكشاف أسماء المستخدمين الصحيحة عبر توقيت الرد).
-  const ok = await bcrypt.compare(String(pass), acc ? acc.passHash : '$2b$10$........................................');
-  if (!acc || !ok) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
+  const acc = await adminTeamService.authenticate(String(user).trim(), String(pass));
+  if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
+  adminTeamService.touchLogin(acc.user);
   const token = crypto.randomBytes(32).toString('hex');
-  adminSessions.set(token, { user: acc.user, name: acc.name, role: acc.role, expiresAt: Date.now() + ADMIN_SESSION_TTL_MS });
-  res.json({ ok: true, token, name: acc.name, role: acc.role });
+  const permissions = adminTeamService.normalizePermissions(acc.permissions);
+  adminSessions.set(token, {
+    user: acc.user,
+    name: acc.name,
+    role: acc.legacyRole || 'staff',
+    permissions,
+    expiresAt: Date.now() + ADMIN_SESSION_TTL_MS,
+  });
+  res.json({
+    ok: true,
+    token,
+    name: acc.name,
+    role: acc.legacyRole || 'staff',
+    permissions,
+    user: acc.user,
+  });
 });
 app.get('/api/admin/verify', requireAdminSession, (req, res) => {
-  res.json({ ok: true, name: req.adminUser.name, role: req.adminUser.role });
+  res.json({
+    ok: true,
+    name: req.adminUser.name,
+    role: req.adminUser.role,
+    permissions: req.adminUser.permissions || [],
+    user: req.adminUser.user,
+  });
+});
+
+/** GET /api/admin/permissions — قائمة الصلاحيات + قوالب جاهزة */
+app.get('/api/admin/permissions', requireAdminAuth, (req, res) => {
+  res.json({
+    ok: true,
+    permissions: adminTeamService.PERMISSION_DEFS,
+    presets: adminTeamService.PERMISSION_PRESETS,
+    panelMap: PANEL_PERMISSION_MAP,
+    maxTeamMembers: adminTeamService.MAX_TEAM_MEMBERS,
+  });
+});
+
+/** GET /api/admin/team — فريق الإدارة (يتطلب team.manage أو *) */
+app.get('/api/admin/team', requireAdminPermission('team.manage'), (req, res) => {
+  res.json({ ok: true, team: adminTeamService.listTeamPublic(), max: adminTeamService.MAX_TEAM_MEMBERS });
+});
+
+/** POST /api/admin/team — إضافة عضو */
+app.post('/api/admin/team', requireAdminPermission('team.manage'), async (req, res) => {
+  try {
+    const b = req.body || {};
+    const member = await adminTeamService.createMember(b, req.adminUser && req.adminUser.user);
+    res.json({ ok: true, member });
+  } catch (e) {
+    if (e.code === 'team_limit_reached') {
+      return res.status(400).json({ error: e.code, max: e.max, msg: 'وصلت للحد الأقصى ' + e.max + ' أعضاء' });
+    }
+    if (e.code === 'user_exists') return res.status(409).json({ error: e.code, msg: 'اسم المستخدم موجود' });
+    if (e.code === 'missing_fields') return res.status(400).json({ error: e.code, msg: 'الاسم واسم المستخدم وكلمة المرور مطلوبة' });
+    res.status(500).json({ error: 'create_failed' });
+  }
+});
+
+/** PATCH /api/admin/team/:id — تعديل صلاحيات/بيانات */
+app.patch('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
+  try {
+    const member = await adminTeamService.updateMember(req.params.id, req.body || {});
+    if (!member) return res.status(404).json({ error: 'member_not_found' });
+    res.json({ ok: true, member });
+  } catch (e) {
+    res.status(500).json({ error: 'update_failed' });
+  }
+});
+
+/** DELETE /api/admin/team/:id — تعطيل عضو */
+app.delete('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
+  const selfId = req.adminUser && req.adminUser.user;
+  const target = adminTeamService.getMemberById(req.params.id);
+  if (!target) return res.status(404).json({ error: 'member_not_found' });
+  if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
+  if ((target.permissions || []).includes('*') && adminTeamService.readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
+    return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
+  }
+  const member = await adminTeamService.deactivateMember(req.params.id);
+  res.json({ ok: true, member });
 });
 app.post('/api/admin/logout', (req, res) => {
   const token = req.header('x-admin-token');
@@ -2838,7 +2918,7 @@ app.get('/api/tenders/mine', (req, res) => {
  * GET /api/tenders/admin — أدمين فقط (سرّ مشترك) — كل المناقصات بكل حقولها
  * (بما فيها العروض) لأغراض المراجعة/إزالة السبام.
  */
-app.get('/api/tenders/admin', requireAdminAuth, (req, res) => {
+app.get('/api/tenders/admin', requireAdminPermission('tenders'), (req, res) => {
   res.json({ ok: true, tenders: readTenders() });
 });
 
@@ -2882,7 +2962,7 @@ app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, (req, res) => {
 /**
  * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
  */
-app.get('/api/tenders/admin/:id/document', requireAdminAuth, (req, res) => {
+app.get('/api/tenders/admin/:id/document', requireAdminPermission('tenders'), (req, res) => {
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
   if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
   return streamTenderDocumentFile(t, res);
@@ -2891,7 +2971,7 @@ app.get('/api/tenders/admin/:id/document', requireAdminAuth, (req, res) => {
 /**
  * GET /api/tenders/admin/:id/images/:index — أدمين — مراجعة صورة
  */
-app.get('/api/tenders/admin/:id/images/:index', requireAdminAuth, (req, res) => {
+app.get('/api/tenders/admin/:id/images/:index', requireAdminPermission('tenders'), (req, res) => {
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
   if (!t) return res.status(404).json({ error: 'tender_not_found' });
   return streamTenderImageFile(t, req.params.index, res);
@@ -2932,7 +3012,7 @@ app.get('/api/tenders/:id', (req, res) => {
 /**
  * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
  */
-app.post('/api/tenders/admin/:id/reject', requireAdminAuth, (req, res) => {
+app.post('/api/tenders/admin/:id/reject', requireAdminPermission('tenders'), (req, res) => {
   const b = req.body || {};
   const reason = String(b.reason || b.msg || '').trim().slice(0, 500);
   if (!reason) return res.status(400).json({ error: 'reason_required', msg: 'سبب الرفض مطلوب' });
@@ -2943,6 +3023,7 @@ app.post('/api/tenders/admin/:id/reject', requireAdminAuth, (req, res) => {
   list[idx].status = 'rejected';
   list[idx].rejectReason = reason;
   list[idx].rejectedAt = new Date().toISOString();
+  list[idx].rejectedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
   writeTenders(list);
   res.json({ ok: true, tender: list[idx] });
 });
@@ -2952,7 +3033,7 @@ app.post('/api/tenders/admin/:id/reject', requireAdminAuth, (req, res) => {
  * الواجهات العامة (سبام/محتوى مخالف) دون حذف السجل فعلياً (نفس مبدأ عدم
  * الحذف النهائي المتَّبع في بقية المنصة).
  */
-app.post('/api/tenders/admin/:id/remove', requireAdminAuth, (req, res) => {
+app.post('/api/tenders/admin/:id/remove', requireAdminPermission('tenders'), (req, res) => {
   const list = readTenders();
   const idx = list.findIndex((t) => t.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
@@ -2964,13 +3045,14 @@ app.post('/api/tenders/admin/:id/remove', requireAdminAuth, (req, res) => {
 /**
  * POST /api/tenders/admin/:id/approve — أدمين فقط — يُفعّل مناقصة pending_review
  */
-app.post('/api/tenders/admin/:id/approve', requireAdminAuth, (req, res) => {
+app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (req, res) => {
   const list = readTenders();
   const idx = list.findIndex((t) => t.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
   if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
   list[idx].status = 'open';
   list[idx].approvedAt = new Date().toISOString();
+  list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
   writeTenders(list);
   res.json({ ok: true, tender: list[idx] });
 });
