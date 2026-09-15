@@ -3892,8 +3892,8 @@ function saveAdmin(){
   const pass  = document.getElementById('am-pass').value;
   const notes = document.getElementById('am-notes').value.trim();
   if(!name||!user||!email||!pass){showToast(RizqI18n.t2('⚠️ يرجى تعبئة الحقول الإلزامية','⚠️ Veuillez remplir les champs obligatoires'));return;}
-  // Add to ADMIN_ACCOUNTS
-  ADMIN_ACCOUNTS.push({user,pass,name,role});
+  // حسابات الدخول الحقيقية تُدار فقط في rizq-backend/server.js (ADMIN_ACCOUNTS + bcrypt).
+  // هنا نُحدّث قائمة الفريق للعرض فقط — لا تُنشئ جلسة دخول فعلية.
   // Add to TEAM
   TEAM.push({id:TEAM.length+1,name,role,emoji:'👤',phone,email,notes,online:false});
   closeModal('add-admin');
