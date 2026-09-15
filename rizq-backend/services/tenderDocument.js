@@ -4,6 +4,13 @@
 const fs = require('fs');
 const path = require('path');
 
+let pdfParse = null;
+try {
+  pdfParse = require('pdf-parse');
+} catch (e) {
+  pdfParse = null;
+}
+
 const MAX_PDF_BYTES = 5 * 1024 * 1024;
 const PDF_DATA_URI_RE = /^data:application\/pdf;base64,(.+)$/i;
 const PDF_UPLOAD_PREFIX = '/uploads/tenders/';
@@ -50,7 +57,7 @@ async function saveTenderDocument(tenderId, document) {
   return PDF_UPLOAD_PREFIX + tenderId + '/document.pdf';
 }
 
-function resolveTenderDocumentAbsPath(relativePath) {
+function resolveTenderUploadAbsPath(relativePath) {
   if (!relativePath || typeof relativePath !== 'string') return null;
   const rel = relativePath.replace(/^\/uploads\//, '');
   if (!rel.startsWith('tenders/')) return null;
@@ -60,9 +67,32 @@ function resolveTenderDocumentAbsPath(relativePath) {
   return abs;
 }
 
+const resolveTenderDocumentAbsPath = resolveTenderUploadAbsPath;
+
+async function extractPdfText(buf) {
+  if (!buf || !buf.length) return '';
+  if (!pdfParse) return '';
+  try {
+    const data = await pdfParse(buf);
+    return String(data && data.text ? data.text : '').slice(0, 50000);
+  } catch (e) {
+    return '';
+  }
+}
+
+async function extractPdfTextFromDataUri(document) {
+  const parsed = parseDataUriPdf(document);
+  if (!parsed || parsed.error || !parsed.buf) return { text: '', error: parsed && parsed.error };
+  const text = await extractPdfText(parsed.buf);
+  return { text, buf: parsed.buf };
+}
+
 module.exports = {
   saveTenderDocument,
   resolveTenderDocumentAbsPath,
+  resolveTenderUploadAbsPath,
   parseDataUriPdf,
+  extractPdfText,
+  extractPdfTextFromDataUri,
   MAX_PDF_BYTES,
 };

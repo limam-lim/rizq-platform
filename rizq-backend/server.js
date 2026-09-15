@@ -117,16 +117,13 @@ function getSectionRules() {
 
 // ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
 // (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-// PDFs de المناقصات — téléchargement protégé via /api/tenders/:id/document فقط
-app.use('/uploads/tenders', (req, res, next) => {
-  if (/\.pdf$/i.test(req.path)) {
-    return res.status(403).json({
-      error: 'document_access_forbidden',
-      msg: 'ملف المناقصة محمي — يلزم اشتراك للتحميل',
-      msg_fr: 'Document protégé — abonnement requis pour télécharger',
-    });
-  }
-  next();
+// مرفقات المناقصات — لا تُخدم مباشرة؛ فقط عبر /api/tenders/:id/document|images
+app.use('/uploads/tenders', (req, res) => {
+  res.status(403).json({
+    error: 'tender_assets_forbidden',
+    msg: 'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
+    msg_fr: 'Pièces jointes protégées — abonnement requis',
+  });
 });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -554,7 +551,13 @@ const {
 const {
   saveTenderDocument,
   resolveTenderDocumentAbsPath,
+  resolveTenderUploadAbsPath,
+  extractPdfTextFromDataUri,
 } = require('./services/tenderDocument');
+const {
+  buildSignedTenderAssetUrl,
+  verifyTenderAssetSig,
+} = require('./services/tenderAssetAuth');
 const { startMaintenanceScheduler } = require('./services/maintenanceScheduler');
 const { readAuditLog } = require('./services/adLifecycle');
 const { readLatestBackupMeta } = require('./services/backupService');
@@ -2375,7 +2378,7 @@ function filterPublicOpenTenders(list) {
   return (list || []).filter(isTenderPubliclyOpen);
 }
 
-function toPublicTender(t, access) {
+function toPublicTender(t, access, viewerId) {
   const now = Date.now();
   const deadlineMs = new Date(t.deadline).getTime();
   const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
@@ -2384,6 +2387,19 @@ function toPublicTender(t, access) {
   const rawImages = Array.isArray(t.images) ? t.images : [];
   const imageCount = rawImages.length;
   const hasDocument = !!t.document;
+  const publicImages = (contactsUnlocked && viewerId)
+    ? rawImages.map((_, i) => buildSignedTenderAssetUrl(
+      '/api/tenders/' + t.id + '/images/' + i,
+      viewerId,
+      t.id,
+      'img:' + i
+    ))
+    : [];
+  const documentUrl = (contactsUnlocked && hasDocument)
+    ? (viewerId
+      ? buildSignedTenderAssetUrl('/api/tenders/' + t.id + '/document', viewerId, t.id, 'doc:0')
+      : '/api/tenders/' + t.id + '/document')
+    : null;
   return {
     id: t.id,
     title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
@@ -2393,12 +2409,12 @@ function toPublicTender(t, access) {
     budgetMin: t.budgetMin,
     budgetMax: t.budgetMax,
     deadline: t.deadline,
-    images: contactsUnlocked ? rawImages : [],
+    images: publicImages,
     imagesLocked: !contactsUnlocked && imageCount > 0,
     imageCount: imageCount,
     hasDocument,
     documentLocked: !contactsUnlocked && hasDocument,
-    documentUrl: (contactsUnlocked && hasDocument) ? ('/api/tenders/' + t.id + '/document') : null,
+    documentUrl,
     documentName: hasDocument ? (t.documentName || 'tender-document.pdf') : null,
     ownerName: t.ownerName,
     ownerId: t.ownerId || null,
@@ -2571,6 +2587,13 @@ const tenderBidLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'عدد كبير جداً من العروض المقدَّمة — حاول مرة أخرى بعد قليل' },
 });
+const tenderAssetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'عدد كبير من طلبات تحميل مرفقات المناقصة — حاول لاحقاً' },
+});
 
 /**
  * POST /api/tenders — نشر مناقصة جديدة. يتطلب x-account-token + accountId
@@ -2593,6 +2616,14 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     { key: 'desc', val: desc },
   ]);
   if (leakScan.hasLeak) return rejectTenderContactLeak(res, leakScan);
+  if (b.document) {
+    const pdfExtract = await extractPdfTextFromDataUri(b.document);
+    if (pdfExtract.error) {
+      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
+    }
+    const pdfScan = scanContactLeakFields([{ key: 'document', val: pdfExtract.text }]);
+    if (pdfScan.hasLeak) return rejectTenderContactLeak(res, pdfScan, 'document');
+  }
   const deadlineMs = new Date(b.deadline).getTime();
   if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
     return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
@@ -2623,10 +2654,23 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
   const list = readTenders();
   list.unshift(tender);
   writeTenders(list);
+  setImmediate(() => {
+    try {
+      const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
+      sendTelegramAdminNotification({
+        leadId: tender.id,
+        businessName: tender.ownerName,
+        whatsapp: acc.phone || acc.whatsapp || '',
+        package: tender.category || 'غرفة المناقصات',
+        reason: 'مناقصة جديدة — «' + tender.title + '» — بانتظار مراجعة الأدمن',
+        channel: 'tender_review',
+      }).catch((err) => console.warn('[tenders/post] telegram:', err && err.message));
+    } catch (e) { /* telegram optional */ }
+  });
   res.json({
     ok: true,
     pendingReview: true,
-    tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId)),
+    tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
     msg: 'تم استلام مناقصتك — ستُنشر بعد مراجعة فريق رزق.',
   });
   } catch (err) {
@@ -2649,12 +2693,39 @@ function streamTenderDocumentFile(t, res) {
   fs.createReadStream(absPath).pipe(res);
 }
 
-function canAccessTenderDocument(req, t, viewerId, access) {
-  if (!t || !t.document) return false;
+function canAccessTenderAsset(req, t, viewerId, access, assetKey) {
+  if (!t) return false;
   const token = extractAccountToken(req) || '';
-  if (viewerId && verifyAccountOwner(viewerId, token) && t.ownerId === viewerId) return true;
-  if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
+  if (viewerId && verifyAccountOwner(viewerId, token)) {
+    if (t.ownerId === viewerId) return true;
+    if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
+  }
+  const qViewer = String(req.query.viewer || '');
+  const qExp = Number(req.query.exp);
+  const qSig = String(req.query.sig || '');
+  if (qViewer && assetKey && verifyTenderAssetSig(qViewer, t.id, assetKey, qExp, qSig)) {
+    if (t.ownerId === qViewer) return true;
+    const qAccess = getTenderAccessForViewer(qViewer);
+    if (qAccess.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
+  }
   return false;
+}
+
+function streamTenderImageFile(t, index, res) {
+  const rawImages = Array.isArray(t.images) ? t.images : [];
+  const idx = Number(index);
+  if (!Number.isInteger(idx) || idx < 0 || idx >= rawImages.length) {
+    return res.status(404).json({ error: 'image_not_found' });
+  }
+  const absPath = resolveTenderUploadAbsPath(rawImages[idx]);
+  if (!absPath || !fs.existsSync(absPath)) {
+    return res.status(404).json({ error: 'image_not_found' });
+  }
+  const ext = path.extname(absPath).toLowerCase();
+  const type = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/webp';
+  res.setHeader('Content-Type', type);
+  res.setHeader('Cache-Control', 'private, max-age=3600');
+  fs.createReadStream(absPath).pipe(res);
 }
 
 /**
@@ -2681,7 +2752,7 @@ app.get('/api/tenders', (req, res) => {
   if (city) list = list.filter((t) => t.city === city);
   res.json({
     ok: true,
-    tenders: list.map((t) => toPublicTender(t, access)),
+    tenders: list.map((t) => toPublicTender(t, access, viewerId)),
     access: {
       contactsUnlocked: !!access.canUnlockContacts,
       canSubmitBid: !!access.canSubmitProposals,
@@ -2721,12 +2792,16 @@ app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
   }
   if (!b.price) return res.status(400).json({ error: 'price مطلوب' });
   const notes = String(b.notes || '').slice(0, 500);
-  const notesScan = scanContactLeakFields([{ key: 'notes', val: notes }]);
-  if (notesScan.hasLeak) return rejectTenderContactLeak(res, notesScan, 'notes');
+  const bidderName = String(acc.name || '').slice(0, 80);
+  const bidLeakScan = scanContactLeakFields([
+    { key: 'notes', val: notes },
+    { key: 'bidderName', val: bidderName },
+  ]);
+  if (bidLeakScan.hasLeak) return rejectTenderContactLeak(res, bidLeakScan, bidLeakScan.fields[0] && bidLeakScan.fields[0].field);
   const bid = {
     id: genBidId(),
     bidderId: acc.id,
-    bidderName: acc.name || '',
+    bidderName,
     price: Number(b.price) || 0,
     deliveryDays: Number(b.deliveryDays) || 0,
     notes,
@@ -2770,12 +2845,12 @@ app.get('/api/tenders/admin', requireAdminAuth, (req, res) => {
 /**
  * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
  */
-app.get('/api/tenders/:id/document', (req, res) => {
+app.get('/api/tenders/:id/document', tenderAssetLimiter, (req, res) => {
   const viewerId = resolveOptionalTenderViewer(req);
   const access = getTenderAccessForViewer(viewerId);
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
   if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-  if (!canAccessTenderDocument(req, t, viewerId, access)) {
+  if (!canAccessTenderAsset(req, t, viewerId, access, 'doc:0')) {
     return res.status(403).json({
       error: 'document_locked',
       msg: 'ملف المناقصة متاح للمشتركين فقط — اشترك لتحميله',
@@ -2786,12 +2861,40 @@ app.get('/api/tenders/:id/document', (req, res) => {
 });
 
 /**
+ * GET /api/tenders/:id/images/:index — صورة مرجعية (مشتركون أو صاحب المناقصة)
+ */
+app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, (req, res) => {
+  const viewerId = resolveOptionalTenderViewer(req);
+  const access = getTenderAccessForViewer(viewerId);
+  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  if (!t) return res.status(404).json({ error: 'tender_not_found' });
+  const assetKey = 'img:' + req.params.index;
+  if (!canAccessTenderAsset(req, t, viewerId, access, assetKey)) {
+    return res.status(403).json({
+      error: 'images_locked',
+      msg: 'الصور المرجعية متاحة للمشتركين فقط',
+      msg_fr: 'Photos réservées aux abonnés',
+    });
+  }
+  return streamTenderImageFile(t, req.params.index, res);
+});
+
+/**
  * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
  */
 app.get('/api/tenders/admin/:id/document', requireAdminAuth, (req, res) => {
   const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
   if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
   return streamTenderDocumentFile(t, res);
+});
+
+/**
+ * GET /api/tenders/admin/:id/images/:index — أدمين — مراجعة صورة
+ */
+app.get('/api/tenders/admin/:id/images/:index', requireAdminAuth, (req, res) => {
+  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  if (!t) return res.status(404).json({ error: 'tender_not_found' });
+  return streamTenderImageFile(t, req.params.index, res);
 });
 
 /**
@@ -2814,7 +2917,7 @@ app.get('/api/tenders/:id', (req, res) => {
   if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
   res.json({
     ok: true,
-    tender: toPublicTender(t, access),
+    tender: toPublicTender(t, access, viewerId),
     access: {
       contactsUnlocked: !!access.canUnlockContacts,
       canSubmitBid: !!access.canSubmitProposals,
@@ -2824,6 +2927,24 @@ app.get('/api/tenders/:id', (req, res) => {
       planType: access.planType,
     },
   });
+});
+
+/**
+ * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
+ */
+app.post('/api/tenders/admin/:id/reject', requireAdminAuth, (req, res) => {
+  const b = req.body || {};
+  const reason = String(b.reason || b.msg || '').trim().slice(0, 500);
+  if (!reason) return res.status(400).json({ error: 'reason_required', msg: 'سبب الرفض مطلوب' });
+  const list = readTenders();
+  const idx = list.findIndex((t) => t.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
+  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
+  list[idx].status = 'rejected';
+  list[idx].rejectReason = reason;
+  list[idx].rejectedAt = new Date().toISOString();
+  writeTenders(list);
+  res.json({ ok: true, tender: list[idx] });
 });
 
 /**

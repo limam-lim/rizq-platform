@@ -173,6 +173,52 @@ async function main() {
     const mineQuery = await req('GET', '/api/accounts/mine/' + id + '?token=' + accessToken);
     ok('mine query token works in dev', mineQuery.status === 200, 'status=' + mineQuery.status);
 
+    const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
+    const backupTenders = fs.existsSync(TENDERS_FILE) ? fs.readFileSync(TENDERS_FILE, 'utf8') : '[]';
+
+    const staticTenderAsset = await req('GET', '/uploads/tenders/test/0.webp');
+    ok('tender static assets blocked', staticTenderAsset.status === 403, 'status=' + staticTenderAsset.status);
+
+    pkgStore[id + '::tender'] = {
+      accountId: id + '::tender',
+      accountType: 'store',
+      status: 'active',
+      paymentConfirmed: true,
+      activatedBy: 'admin',
+      periodStart: new Date().toISOString(),
+      periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+      pkgName: 'باقة المناقصة',
+      packageId: 'tnd-month',
+    };
+    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+
+    const tenderLeak = await req('POST', '/api/tenders', {
+      accountId: id,
+      title: 'test واتس 22112233',
+      deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
+    }, { 'x-account-token': accessToken });
+    ok('tender POST rejects contact leak', tenderLeak.status === 422, 'status=' + tenderLeak.status);
+
+    const tenderPost = await req('POST', '/api/tenders', {
+      accountId: id,
+      title: 'Security harness tender',
+      desc: 'clean description',
+      deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
+    }, { 'x-account-token': accessToken });
+    ok('tender POST pending_review',
+      tenderPost.status === 200 && tenderPost.body && tenderPost.body.pendingReview === true
+        && tenderPost.body.tender && tenderPost.body.tender.status === 'pending_review',
+      tenderPost.body ? 'status=' + (tenderPost.body.tender && tenderPost.body.tender.status) : String(tenderPost.status));
+
+    const tenderId = tenderPost.body && tenderPost.body.tender && tenderPost.body.tender.id;
+    if (tenderId) {
+      const pub = await req('GET', '/api/tenders');
+      const found = (pub.body && pub.body.tenders || []).find((t) => t.id === tenderId);
+      ok('pending tender not in public list', !found);
+    }
+
+    fs.writeFileSync(TENDERS_FILE, backupTenders);
+
   } finally {
     fs.writeFileSync(ACCOUNTS_FILE, backupAccounts);
     fs.writeFileSync(PKG_FILE, backupPkg);

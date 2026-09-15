@@ -4790,10 +4790,12 @@ function renderTendersModPanel(){
         var bids = Array.isArray(t.bids) ? t.bids : [];
         var removed = t.status === 'removed';
         var pending = t.status === 'pending_review';
+        var rejected = t.status === 'rejected';
         var created = t.createdAt ? new Date(t.createdAt).toLocaleDateString(_modLoc) : '';
         var statusBadge = pending
           ? ' <span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px">⏳ '+RizqI18n.t2('قيد المراجعة','En révision')+'</span>'
-          : (t.status==='open' ? ' <span style="font-size:11px;font-weight:700;color:#065f46">✅ '+RizqI18n.t2('منشورة','Publiée')+'</span>' : '');
+          : (rejected ? ' <span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px">❌ '+RizqI18n.t2('مرفوضة','Refusée')+'</span>'
+          : (t.status==='open' ? ' <span style="font-size:11px;font-weight:700;color:#065f46">✅ '+RizqI18n.t2('منشورة','Publiée')+'</span>' : ''));
         var bidsHtml = bids.length
           ? bids.map(function(b){
               return '<div style="padding:6px 10px;background:#f7f9fc;border-radius:8px;margin-top:5px;font-size:12px">'
@@ -4805,6 +4807,7 @@ function renderTendersModPanel(){
           : '<p style="font-size:11.5px;color:#9ca3af;margin-top:4px">'+RizqI18n.t2('لا عروض بعد','Aucune offre')+'</p>';
         var actions = removed ? '' : (
           (pending ? '<button onclick="approveTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">✅ '+RizqI18n.t2('موافقة','Approuver')+'</button>' : '')
+          + ((pending || rejected) ? '<button onclick="rejectTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">❌ '+RizqI18n.t2('رفض','Refuser')+'</button>' : '')
           + '<button onclick="removeTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🗑️ '+RizqI18n.t2('إزالة','Retirer')+'</button>'
         );
         return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(27,58,107,.06)'+(removed?';opacity:.55':'')+'">'
@@ -4814,7 +4817,9 @@ function renderTendersModPanel(){
           + '</div>'
           + '<div style="font-size:11.5px;color:#2C3A4F;margin-bottom:8px">'+escHtml(t.ownerName||t.ownerId||'')+' · '+created+' · '+bids.length+' '+RizqI18n.t2('عرض','offre(s)')+'</div>'
           + (t.desc ? '<p style="font-size:12px;color:#64748b;margin:0 0 8px;line-height:1.6">'+escHtml(String(t.desc).slice(0,220))+(String(t.desc).length>220?'…':'')+'</p>' : '')
+          + (t.rejectReason ? '<p style="font-size:11.5px;color:#b91c1c;margin:0 0 8px">'+RizqI18n.t2('سبب الرفض:','Motif du refus :')+' '+escHtml(t.rejectReason)+'</p>' : '')
           + (t.document ? '<div style="margin:6px 0 8px"><button type="button" onclick="downloadTenderDocAdmin(\''+t.id+'\')" style="padding:5px 12px;background:#eff6ff;color:#1B3A6B;border:1px solid #93c5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📄 '+RizqI18n.t2('مراجعة PDF','Voir PDF')+'</button></div>' : '')
+          + ((Array.isArray(t.images) && t.images.length) ? '<div style="margin:6px 0 8px;font-size:11.5px;color:#64748b">📷 '+t.images.length+' '+RizqI18n.t2('صورة مرجعية','photo(s) de référence')+'</div>' : '')
           + bidsHtml
           + '</div>';
       }).join('');
@@ -4838,6 +4843,22 @@ function downloadTenderDocAdmin(id){
   }).catch(function(){
     alert(RizqI18n.t2('تعذّر فتح ملف PDF','Impossible d\'ouvrir le PDF'));
   });
+}
+
+function rejectTenderAdmin(id){
+  var reason = prompt(RizqI18n.t2('سبب رفض المناقصة (يظهر لصاحبها):','Motif du refus (visible par l\'auteur) :'), '');
+  if(reason===null) return;
+  reason = String(reason).trim();
+  if(!reason){ alert(RizqI18n.t2('السبب مطلوب','Le motif est obligatoire')); return; }
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/tenders/admin/' + encodeURIComponent(id) + '/reject', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type':'application/json' }, _adminAuthHeaders()),
+    body: JSON.stringify({ reason: reason })
+  }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+    .then(function(){ renderTendersModPanel(); })
+    .catch(function(){ alert(RizqI18n.t2('فشل الرفض — تحقق من الاتصال','Échec du refus — vérifiez la connexion')); });
 }
 
 function approveTenderAdmin(id){

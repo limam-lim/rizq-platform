@@ -648,7 +648,9 @@ function renderTenders(){
     var bidsLbl = fr ? (t.bidsCount+' offre(s) reçue(s)') : (t.bidsCount+' عرض مُقدَّم');
     var thumb = '';
     if(t.images && t.images.length){
-      thumb = '<img class="t-card-thumb" src="'+t.images[0]+'"/>';
+      var imgSrc = t.images[0];
+      if(imgSrc && imgSrc.indexOf('/api/')===0) imgSrc = _backendBase().replace(/\/$/,'') + imgSrc;
+      thumb = '<img class="t-card-thumb" src="'+imgSrc+'"/>';
     } else if(t.imagesLocked && t.imageCount>0){
       thumb = '<div class="t-card-thumb" style="display:flex;align-items:center;justify-content:center;background:#f1f5f9;font-size:18px" title="'+(fr?'Abonnement requis pour voir les photos':'يلزم اشتراك لعرض الصور')+'">🔒</div>';
     }
@@ -890,6 +892,8 @@ function submitTender(){
           var msg = (r.data && (r.data.msg||r.data.msg_fr||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر');
           if(r.data && r.data.error==='contact_in_text_forbidden'){
             msg = fr ? (r.data.msg_fr||r.data.msg) : (r.data.msg||msg);
+          } else if(r.data && r.data.error==='invalid_pdf'){
+            msg = fr ? 'PDF invalide ou trop volumineux (max 5 Mo)' : 'ملف PDF غير صالح أو أكبر من 5MB';
           }
           showToast(msg);
           return;

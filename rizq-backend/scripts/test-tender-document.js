@@ -61,7 +61,7 @@ async function main() {
   ok('resolveTenderDocumentAbsPath exists', abs && fs.existsSync(abs));
 
   const staticBlocked = await req('GET', '/uploads/tenders/' + tenderId + '/document.pdf');
-  ok('static PDF blocked', staticBlocked.status === 403);
+  ok('static tender assets blocked', staticBlocked.status === 403 && staticBlocked.body && staticBlocked.body.error === 'tender_assets_forbidden');
 
   const anonDoc = await req('GET', '/api/tenders/' + tenderId + '/document');
   ok('anonymous document download blocked', anonDoc.status === 403 || anonDoc.status === 404);
