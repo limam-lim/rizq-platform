@@ -329,6 +329,24 @@
     return false;
   }
 
+  function rememberCurrentForAfterAuth() {
+    try {
+      if (sessionStorage.getItem(AFTER_AUTH_HREF_KEY)) return;
+      setAfterAuthHref(location.pathname + location.search + (location.hash || ''));
+    } catch (e) {}
+  }
+
+  function promptLogin(returnHref) {
+    if (returnHref) setAfterAuthHref(returnHref);
+    else rememberCurrentForAfterAuth();
+    var dash = resolveDashboardUrl();
+    if (dash) {
+      location.href = dash;
+      return true;
+    }
+    return openGuestChoice();
+  }
+
   function openGuestChoice() {
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
       window.RizqAuthGate.openAccountChoice();
@@ -352,6 +370,7 @@
       location.href = url;
       return false;
     }
+    rememberCurrentForAfterAuth();
     if (openGuestChoice()) return false;
     location.href = 'rizq_register.html';
     return false;
@@ -454,6 +473,8 @@
     readDashToken: readDashToken,
     stripTokenFromUrl: stripTokenFromUrl,
     setAfterAuthHref: setAfterAuthHref,
+    rememberCurrentForAfterAuth: rememberCurrentForAfterAuth,
+    promptLogin: promptLogin,
     consumeAfterAuthHref: consumeAfterAuthHref,
     redirectAfterAuth: redirectAfterAuth,
     publicShareUrl: publicShareUrl,

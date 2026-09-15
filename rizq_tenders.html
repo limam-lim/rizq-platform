@@ -397,6 +397,8 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_disclaimer.js"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_auth_gate.js?v=16"></script>
 <script>
 /* ════════════════════════════════════════
    rizq_tenders.html — المناقصات (Tenders)
@@ -448,6 +450,49 @@ var _tenderAccess = { contactsUnlocked: false, canSubmitBid: false, canPost: fal
 // ── من المسجَّل دخوله الآن؟ (أي نوع حساب) ──
 function _getSession(){
   try{ return JSON.parse(localStorage.getItem('rizq_active_session')||'null'); }catch(e){ return null; }
+}
+
+function _tenderReturnHref(queryExtra){
+  var base = 'rizq_tenders.html';
+  return queryExtra ? (base + '?' + queryExtra) : base;
+}
+
+function _promptTenderLogin(queryExtra){
+  var href = _tenderReturnHref(queryExtra || '');
+  if(window.RizqAccount && typeof RizqAccount.promptLogin === 'function'){
+    RizqAccount.promptLogin(href);
+    return;
+  }
+  try{ sessionStorage.setItem('rizq_after_auth_href', href); }catch(e){}
+  location.href = 'rizq_landing_v8.html?openLogin=1';
+}
+
+function _tenderLoginBtn(queryExtra, labelAr, labelFr){
+  var fr = _rizqLang()==='fr';
+  var label = fr ? labelFr : labelAr;
+  return '<button type="button" onclick="_promptTenderLogin(\''+(queryExtra||'').replace(/'/g,"\\'")+'\')" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:inherit">'+label+'</button>';
+}
+
+function _resumeTenderIntent(){
+  var p = new URLSearchParams(location.search);
+  var action = p.get('action');
+  var bid = p.get('bid');
+  if(!_getSession()) return;
+  if(action === 'post'){
+    try{
+      var u = new URL(location.href);
+      u.searchParams.delete('action');
+      history.replaceState(null, '', u.pathname + (u.search || ''));
+    }catch(e){}
+    setTimeout(openPostModal, 350);
+  } else if(bid){
+    try{
+      var u2 = new URL(location.href);
+      u2.searchParams.delete('bid');
+      history.replaceState(null, '', u2.pathname + (u2.search || ''));
+    }catch(e2){}
+    setTimeout(function(){ openBidModal(bid); }, 350);
+  }
 }
 
 /* إصلاح جوهري: session.token هنا هو dashToken (رمز TK_... محلي تكتبه كل
@@ -560,7 +605,7 @@ function renderTenders(){
       + '<div class="emo-ring"><div class="emo">🔒</div></div>'
       + '<h3 style="color:#151f30;margin:0 0 8px;font-size:19px">'+(fr?'Connexion requise':'يلزم تسجيل الدخول')+'</h3>'
       + '<p style="color:#5b6472;max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.7">'+(fr?'Connectez-vous pour publier ou soumettre une offre.':'سجّل دخولك لنشر مناقصة أو تقديم عرض.')+'</p>'
-      + '<a href="rizq_landing_v8.html" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;text-decoration:none">'+(fr?'Aller au tableau de bord':'الذهاب إلى لوحة التحكم')+'</a>'
+      + _tenderLoginBtn('', fr?'Se connecter':'تسجيل الدخول')
       + '</div>';
     if(bannerEl) bannerEl.innerHTML='';
     return;
@@ -668,7 +713,7 @@ function openPostModal(){
       + '<div class="login-notice">'+(fr
         ? 'Connectez-vous d\'abord depuis votre tableau de bord (compte particulier, magasin, bureau ou société) pour publier un appel d\'offres.'
         : 'سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) حتى تقدر تنشر مناقصة.')
-      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
+      + '<br>'+_tenderLoginBtn('action=post', fr?'Se connecter pour publier':'سجّل دخولك للنشر')+'</div>';
     document.getElementById('post-modal').classList.add('open');
     return;
   }
@@ -791,7 +836,7 @@ function openBidModal(tenderId){
       + '<div class="login-notice">'+(fr
         ? 'Connectez-vous d\'abord depuis votre tableau de bord pour soumettre une offre.'
         : 'سجّل دخولك أولاً من لوحة تحكمك حتى تقدر تقدّم عرضاً.')
-      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
+      + '<br>'+_tenderLoginBtn('bid='+encodeURIComponent(tenderId), fr?'Se connecter pour soumettre':'سجّل دخولك لتقديم عرض')+'</div>';
     document.getElementById('bid-modal').classList.add('open');
     return;
   }
@@ -883,6 +928,7 @@ document.addEventListener('keydown', function(e){
 
 applyLang();
 loadTenders();
+_resumeTenderIntent();
 </script>
 </body>
 </html>

@@ -128,7 +128,17 @@
     msgs:       []
   };
 
-  /** يقرأ جلسة المشتري الفردي المسجَّل دخوله (إن وُجدت) — نفس مفتاح rizq_dashboard.html */
+  /** جلسة مشترٍ AuthGate (rizq_buyer_session) — OTP سريع للتصفح والتواصل */
+  function _getAuthGateBuyer() {
+    try {
+      var raw = localStorage.getItem('rizq_buyer_session');
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      return (s && s.id && s.token) ? s : null;
+    } catch (e) { return null; }
+  }
+
+  /** يقرأ جلسة المشتري/البائع الفردي (rizq_individual_session) — لمحادثات مرتبطة بحساب بائع */
   function _getBuyerSession() {
     try {
       var raw = localStorage.getItem('rizq_individual_session');
@@ -548,6 +558,10 @@
       var buyer = _getBuyerSession();
       _state.buyerAccountId = buyer ? buyer.id : null;
       _state.buyerToken     = buyer ? buyer.token : null;
+      _state.authGateBuyer  = _getAuthGateBuyer();
+      if (_state.authGateBuyer && !_state.buyerAccountId) {
+        _state.visitorName = _state.authGateBuyer.name || '';
+      }
 
       _injectStyles();
       _injectModal();
@@ -563,9 +577,16 @@
       var strip = document.getElementById('rzq-m-adstrip');
       if (strip) strip.style.display = _state.adTitle ? 'flex' : 'none';
 
-      // مشترٍ مسجَّل دخوله: لا حاجة لطلب اسم/هاتف يدوياً
+      // مشترٍ مسجَّل دخوله (بائع فردي أو AuthGate): لا حاجة لطلب الاسم/الهاتف يدوياً
       var nr = document.getElementById('rzq-m-namerow');
-      if (nr) nr.style.display = _state.buyerAccountId ? 'none' : 'flex';
+      if (nr) nr.style.display = (_state.buyerAccountId || _state.authGateBuyer) ? 'none' : 'flex';
+      if (_state.authGateBuyer) {
+        var nameInp0 = document.getElementById('rzq-m-nameinp');
+        var phoneInp0 = document.getElementById('rzq-m-phoneinp');
+        var b = _state.authGateBuyer;
+        if (nameInp0) nameInp0.value = b.name || '';
+        if (phoneInp0) phoneInp0.value = b.whatsapp || b.phone || b.phoneIntl || '';
+      }
 
       // مسح الرسائل السابقة وإعادة تحميلها
       var msgsEl = document.getElementById('rzq-m-msgs');
@@ -619,9 +640,13 @@
 
       // اسم الزائر
       var name = nameInp ? (nameInp.value.trim() || '') : '';
+      if (!name && _state.authGateBuyer) name = _state.authGateBuyer.name || '';
       if (!name) name = _t('زائر', 'Visiteur') + ' ' + _state.visitorId;
       _state.visitorName = name;
       var phone = phoneInp ? phoneInp.value.trim() : '';
+      if (!phone && _state.authGateBuyer) {
+        phone = _state.authGateBuyer.whatsapp || _state.authGateBuyer.phone || _state.authGateBuyer.phoneIntl || '';
+      }
 
       // عرض الرسالة
       _appendBubble(text, 'me');
@@ -726,6 +751,7 @@
       adTitle:    (ad && (ad.title_ar || ad.title)) || global._pageTitle || document.title || '',
       adId:       (ad && ad.id) ? String(ad.id) : 'g',
       adEmoji:    (ad && ad.emoji) ? ad.emoji : (global._pageEmoji || '📦'),
+      category:   (ad && (ad.cat || ad.category)) ? String(ad.cat || ad.category) : (global._pageCategory || ''),
       lang:       typeof _getLang === 'function' ? _getLang() : 'ar'
     });
   };

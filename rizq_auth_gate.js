@@ -953,6 +953,7 @@
   }
 
   function openAccountChoice() {
+    rememberAfterAuthHref();
     openRagShell();
     var dict = d();
     document.getElementById('rag-title').textContent = dict.titleChoice;
@@ -971,6 +972,7 @@
   }
 
   function openAccountModal() {
+    rememberAfterAuthHref();
     openRagShell();
     _modalMode = 'account';
     _sellerOtpCallback = null;
