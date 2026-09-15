@@ -4522,11 +4522,27 @@ function positionCatPopup(card) {
   return;
 }
 
+function _browseCatKeyFromCard(card) {
+  if (!card) return '';
+  var key = card.getAttribute('data-cat-key') || '';
+  if (key && typeof RizqCategories !== 'undefined' && RizqCategories.normalize) {
+    return RizqCategories.normalize(key) || key;
+  }
+  var ar = card.getAttribute('data-cat-ar') || (card.querySelector('.cat-name') && card.querySelector('.cat-name').textContent.trim()) || '';
+  if (typeof RizqCategories !== 'undefined' && RizqCategories.normalize) return RizqCategories.normalize(ar) || ar;
+  return ar;
+}
+function _browseCatUrl(catKey, sub) {
+  var u = 'rizq_browse.html?cat=' + encodeURIComponent(catKey || '');
+  if (sub) u += '&sub=' + encodeURIComponent(sub);
+  return u;
+}
 function openInlineExpand(card) {
   if (!card) return;
-  const catNameAr = card.querySelector('.cat-name')?.textContent?.trim() || card.getAttribute('data-cat-ar') || '';
+  const catKey = _browseCatKeyFromCard(card);
+  const catNameAr = card.getAttribute('data-cat-ar') || card.querySelector('.cat-name')?.textContent?.trim() || catKey;
   if (!iepanel) {
-    if (catNameAr) window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr);
+    if (catKey) window.location.href = _browseCatUrl(catKey);
     return;
   }
 
@@ -4561,7 +4577,7 @@ function openInlineExpand(card) {
     }
     return catNameAr;
   })();
-  const viewAllHref  = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr);
+  const viewAllHref  = _browseCatUrl(catKey);
   const viewAllLabel = isAr ? '📂 كل الإعلانات ←' : '📂 Toutes les annonces →';
 
   const drop = card.querySelector('.cat-drop');
@@ -4595,7 +4611,7 @@ function openInlineExpand(card) {
     link.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr) + '&sub=' + encodeURIComponent(this.dataset.ar);
+      window.location.href = _browseCatUrl(catKey, this.dataset.ar);
     });
   });
 
