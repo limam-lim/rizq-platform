@@ -1851,8 +1851,8 @@ function _resolveRealAccessToken(acc){
   try{
     var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var rec = accs.find(function(a){ return a.id===acc.id; });
-    if(rec && rec.backendAccessToken){
-      window.REAL_ACCESS_TOKEN = rec.backendAccessToken;
+    if(rec && (rec.backendAccessToken || rec.accessToken)){
+      window.REAL_ACCESS_TOKEN = rec.backendAccessToken || rec.accessToken;
       return Promise.resolve(window.REAL_ACCESS_TOKEN);
     }
   }catch(e){}

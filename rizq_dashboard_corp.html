@@ -3546,7 +3546,7 @@ function saveMyPayment(){
     // الاصطناعي، رسائل SMS الجماعية...).
     var _cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
     if(!_cfg.backendUrl){showToast(_t2('⚠️ لم يُضبط رابط الخادم الخلفي بعد من لوحة الأدمن','⚠️ URL du serveur backend non configurée depuis l\'admin'),'warn');return;}
-    fetch(_cfg.backendUrl.replace(/\/$/,'')+'/api/agent/toggle',{method:'POST',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||''},body:JSON.stringify({subscriberPhone:phone,active:active,accountId:SESSION_ID})})
+    fetch(_cfg.backendUrl.replace(/\/$/,'')+'/api/agent/toggle',{method:'POST',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||''},body:JSON.stringify({subscriberPhone:phone,active:active,accountId:(typeof CORP_ACC!=='undefined'&&CORP_ACC&&CORP_ACC.id)||''})})
       .then(function(r){return r.json();}).then(function(){
         var el=document.getElementById('agent-toggle-status');
         if(el){el.style.color=active?'#4ade80':'#f87171';el.textContent=active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé');}

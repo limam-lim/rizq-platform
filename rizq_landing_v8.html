@@ -4794,6 +4794,21 @@ function postInSubCat() {
 function goToPost(query) {
   var url = 'rizq_post.html';
   if (query) url += (String(query).indexOf('?') === 0 ? query : '?' + query);
+  var hasSession = false;
+  try {
+    if (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function' && window.RizqAccount.resolveDashboardUrl()) hasSession = true;
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function' && window.RizqAuthGate.getSession()) hasSession = true;
+  } catch (e) {}
+  if (!hasSession) {
+    try { sessionStorage.setItem('rizq_after_auth_href', url); } catch (e2) {}
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return;
+    }
+    if (typeof openModal === 'function') { openModal('login'); return; }
+    window.location.href = 'rizq_landing_v8.html?openLogin=1';
+    return;
+  }
   window.location.href = url;
 }
 window.goToPost = goToPost;

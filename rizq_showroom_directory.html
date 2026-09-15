@@ -150,6 +150,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#F7F9FC;c
 </style>
 
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_account_route.js?v=8"></script>
 <script src="rizq_disclaimer.js"></script>
 <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل بطاقة معرض (RizqSub.getBadges) -->
 <script src="rizq_subscription_engine.js"></script>
@@ -277,14 +278,21 @@ function renderDirectory(){
     var _badges = (typeof RizqSub!=='undefined') ? RizqSub.getBadges(a.id) : {verified:false,premium:false};
     var badgeHTML = (_badges.verified?'<span class="dir-badge dir-badge-verified">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
       + (_badges.premium?'<span class="dir-badge dir-badge-premium">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
-    return '<a class="dir-card" href="rizq_showroom.html?id='+encodeURIComponent(a.id)+'">'
+    var href = (window.RizqAccount && typeof window.RizqAccount.publicPageForAccount === 'function')
+      ? window.RizqAccount.publicPageForAccount(a)
+      : (({store:'rizq_store.html',office:'rizq_office.html',corp:'rizq_corp.html'})[a.type] || 'rizq_showroom.html') + '?id=' + encodeURIComponent(a.id);
+    var ctaLab = a.type==='store' ? (fr?'Voir la boutique →':'زيارة المحل ←')
+      : a.type==='office' ? (fr?'Voir le bureau →':'زيارة المكتب ←')
+      : a.type==='corp' ? (fr?'Voir l\'entreprise →':'زيارة الشركة ←')
+      : (fr?'Voir le showroom →':'زيارة المعرض ←');
+    return '<a class="dir-card" href="'+href+'">'
       + '<div class="dir-card-top"><div class="dir-thumb">'+thumb+'</div><div>'
       + '<div class="dir-name">'+escapeHtml(a.name||'')+(badgeHTML?'<span class="dir-badges-inline">'+badgeHTML+'</span>':'')+'</div>'
       + '<div class="dir-type">'+(fr?typeLab.fr:typeLab.ar)+(a.activity ? ' · '+escapeHtml(a.activity) : '')+'</div>'
       + '</div></div>'
       + (a.city ? '<div class="dir-city">📍 '+escapeHtml(a.city)+'</div>' : '')
       + (a.tagline ? '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>' : '')
-      + '<div class="dir-cta">'+(fr?'Voir le showroom →':'زيارة المعرض ←')+'</div>'
+      + '<div class="dir-cta">'+ctaLab+'</div>'
       + '</a>';
   }).join('');
 }

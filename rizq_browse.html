@@ -836,6 +836,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js"></script>
+<script src="rizq_account_route.js?v=8"></script>
 <script src="rizq_auth_gate.js?v=15.0" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_categories_config.js?v=20"></script>
@@ -870,7 +871,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   </div>
   <div class="nav-actions">
     <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>
-    <a href="rizq_post.html" class="btn-post" data-t="nav-post">➕ انشر إعلان</a>
+    <a href="rizq_post.html" class="btn-post" data-t="nav-post" onclick="return browseGoToPost(event)">➕ انشر إعلان</a>
     <a href="#" class="btn-ns" data-t="nav-account" onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)">حسابي</a>
     <button class="btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()">FR</button>
   </div>
@@ -1261,16 +1262,28 @@ function _mapRawAdsToDisplay(rawList){
         : (typeof RizqSub!=='undefined' && typeof RizqSub.isAdBoosted==='function' && RizqSub.isAdBoosted(a.id));
       var _origP = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,''))||0;
       var _discountPct = (_origP>0 && p>0 && _origP>p) ? Math.round((1-(p/_origP))*100) : 0;
+      var _accType = a.accountType || a.type || 'individual';
+      var _sellerName = a.sellerName || a.seller || sellerLbl;
+      if(a.accountId){
+        try{
+          var _accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+          var _acc = _accs.find(function(x){ return x && x.id===a.accountId; });
+          if(_acc){
+            if(_acc.name) _sellerName = _acc.name;
+            if(_acc.type) _accType = _acc.type;
+          }
+        }catch(_eAcc){}
+      }
       var item = {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
         title:a.title||noTitle,desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):negotiable,
-        priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
+        priceNum:p,rooms:Number(a.rooms)||0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
         images:Array.isArray(a.images)?a.images:[],
         condition:a.condition||'',
         seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
-        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
-        accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
+        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:_sellerName,date:a.date||'',
+        accountId:a.accountId||'', accountType:_accType, phone:'', contactsLocked:!!a.contactsLocked,
         sellerContact:a.sellerContact||null};
       if(!item.contactsLocked && a.sellerContact){
         item.phone = a.sellerContact.phone || a.sellerContact.whatsapp || '';
@@ -1309,14 +1322,22 @@ function _rizqMergeBackendAds(){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
           return;
         }
-        var existingIds = {};
-        ALL_ADS.forEach(function(a){ existingIds[String(a.id)] = true; });
-        var mapped = _mapRawAdsToDisplay(data.ads).filter(function(a){ return !existingIds[String(a.id)]; });
+        var existingIdx = {};
+        ALL_ADS.forEach(function(a, i){ existingIdx[String(a.id)] = i; });
+        var mapped = _mapRawAdsToDisplay(data.ads);
+        mapped.forEach(function(a){
+          var k = String(a.id);
+          if(existingIdx[k] !== undefined){
+            ALL_ADS[existingIdx[k]] = Object.assign({}, ALL_ADS[existingIdx[k]], a);
+          } else {
+            existingIdx[k] = ALL_ADS.length;
+            ALL_ADS.push(a);
+          }
+        });
         if(!mapped.length){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
           return;
         }
-        mapped.forEach(function(a){ ALL_ADS.push(a); });
         if(typeof applyFilters === 'function') applyFilters();
       })
       .catch(function(){
@@ -1956,7 +1977,7 @@ function dpRevealPhone(){
   var ad = window._currentAd;
   if(ad.contactsLocked || !ad.phone){
     if(window.RizqContactGate && ad.accountId){
-      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+      RizqContactGate.onMaskedContactClick(ad.accountId, ad.accountType || 'individual', { lang: _rizqLang() });
     }
     return;
   }
@@ -1976,7 +1997,7 @@ function dpCallNow(){
   var ad = window._currentAd;
   if(ad.contactsLocked || !ad.phone){
     if(window.RizqContactGate && ad.accountId){
-      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
+      RizqContactGate.onMaskedContactClick(ad.accountId, ad.accountType || 'individual', { lang: _rizqLang() });
     }
     return;
   }
@@ -2246,6 +2267,11 @@ function switchTab(tab){
     if(btnList){btnList.classList.add('active');}
     if(btnDetail){btnDetail.classList.remove('active');}
   } else {
+    if(!window._currentAd){
+      switchTab('list');
+      showToast(_rizqLang()==='fr' ? 'Sélectionnez une annonce d\'abord' : 'اختر إعلاناً من القائمة أولاً', 'info');
+      return;
+    }
     right.classList.remove('tab-hidden');right.classList.add('tab-active');
     left.classList.add('tab-hidden');left.classList.remove('tab-active');
     if(window.innerWidth<=900 && wrap) wrap.classList.add('has-detail');
@@ -2483,11 +2509,22 @@ function submitReport(){
     });
 }
 function dpToggleDesc(){
-  const dc=document.getElementById('dp-desc-content');
+  const dc=document.getElementById('dp-desc-text');
   const btn=document.getElementById('dp-read-more-btn');
   if(!dc)return;
   if(dc.classList.contains('expanded')){dc.classList.remove('expanded');if(btn)btn.textContent=_t('dp-read-more');}
   else{dc.classList.add('expanded');if(btn)btn.textContent=_t('dp-read-less');}
+}
+
+function browseGoToPost(ev){
+  if(ev&&ev.preventDefault) ev.preventDefault();
+  try{ sessionStorage.setItem('rizq_after_auth_href','rizq_post.html'); }catch(e){}
+  if(window.RizqAuthGate&&typeof RizqAuthGate.openAccountChoice==='function'){
+    RizqAuthGate.openAccountChoice();
+    return false;
+  }
+  location.href='rizq_landing_v8.html?openLogin=1';
+  return false;
 }
 
 // ══════════ INIT ══════════

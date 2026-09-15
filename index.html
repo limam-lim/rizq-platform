@@ -4804,6 +4804,21 @@ function postInSubCat() {
 function goToPost(query) {
   var url = 'rizq_post.html';
   if (query) url += (String(query).indexOf('?') === 0 ? query : '?' + query);
+  var hasSession = false;
+  try {
+    if (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function' && window.RizqAccount.resolveDashboardUrl()) hasSession = true;
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function' && window.RizqAuthGate.getSession()) hasSession = true;
+  } catch (e) {}
+  if (!hasSession) {
+    try { sessionStorage.setItem('rizq_after_auth_href', url); } catch (e2) {}
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return;
+    }
+    if (typeof openModal === 'function') { openModal('login'); return; }
+    window.location.href = 'index.html?openLogin=1';
+    return;
+  }
   window.location.href = url;
 }
 window.goToPost = goToPost;
@@ -8958,7 +8973,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
         emptyCta:{ar:'🏢 أنشئ مكتبك الآن',fr:'🏢 Créez votre bureau maintenant'},
         bizType:'office' },
-      corp: { page:'rizq_showroom.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
+      corp: { page:'rizq_corp.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
         emptyTitle:{ar:'🌟 كن أول من يفتح معرضه هنا',fr:'🌟 Soyez le premier à ouvrir votre showroom ici'},
         emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
         emptyCta:{ar:'🏬 أنشئ معرضك الآن',fr:'🏬 Créez votre showroom maintenant'},

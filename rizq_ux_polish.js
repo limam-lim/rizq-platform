@@ -307,7 +307,16 @@
     var verified = !!ad.verified;
     var adsCount = Number(ad.sellerAdsCount || ad.adsCount || 0);
     var since = ad.memberSince || ad.sellerSince || '';
-    var profileHref = opts.profileHref || (ad.accountId ? 'rizq_profile.html?id=' + encodeURIComponent(ad.accountId) : '');
+    var profileHref = opts.profileHref || '';
+    if (!profileHref && ad.accountId) {
+      var accType = ad.accountType || ad.type || 'individual';
+      if (global.RizqAccount && typeof global.RizqAccount.publicPageForAccount === 'function') {
+        profileHref = global.RizqAccount.publicPageForAccount({ type: accType, id: ad.accountId });
+      } else {
+        var pageMap = { store: 'rizq_store.html', office: 'rizq_office.html', corp: 'rizq_corp.html', individual: 'rizq_profile.html' };
+        profileHref = (pageMap[accType] || 'rizq_profile.html') + '?id=' + encodeURIComponent(ad.accountId);
+      }
+    }
     var rating = (score / 20).toFixed(1);
     var stars = score >= 80 ? '★★★★★' : score >= 60 ? '★★★★☆' : score >= 40 ? '★★★☆☆' : '★★☆☆☆';
 

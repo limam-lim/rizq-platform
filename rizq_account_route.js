@@ -122,6 +122,26 @@
     }) || null;
   }
 
+  function publicPageForAccount(accOrType, id) {
+    var type = 'individual';
+    var accId = '';
+    if (accOrType && typeof accOrType === 'object') {
+      type = accOrType.type || 'individual';
+      accId = accOrType.id || '';
+    } else {
+      type = accOrType || 'individual';
+      accId = id || '';
+    }
+    var map = {
+      store: 'rizq_store.html',
+      office: 'rizq_office.html',
+      corp: 'rizq_corp.html',
+      individual: 'rizq_profile.html'
+    };
+    var page = map[type] || 'rizq_profile.html';
+    return accId ? page + '?id=' + encodeURIComponent(accId) : page;
+  }
+
   function backendBase() {
     try {
       if (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
@@ -153,16 +173,22 @@
     return rec;
   }
 
+  function accountAccessToken(acc) {
+    if (!acc) return '';
+    return acc.backendAccessToken || acc.accessToken || '';
+  }
+
   function syncAccountFromBackend(acc) {
-    if (!acc || !acc.id || !acc.backendAccessToken) return Promise.resolve(acc);
+    var token = accountAccessToken(acc);
+    if (!acc || !acc.id || !token) return Promise.resolve(acc);
     var base = backendBase();
     if (!base) return Promise.resolve(acc);
     return fetch(base + '/api/accounts/mine/' + encodeURIComponent(acc.id), {
-      headers: { 'x-account-token': acc.backendAccessToken }
+      headers: { 'x-account-token': token }
     }).then(function (r) { return r.ok ? r.json() : null; }).then(function (data) {
       if (data && data.ok && data.account) {
         var merged = mergeServerAccount(Object.assign({}, data.account, {
-          accessToken: acc.backendAccessToken,
+          accessToken: token,
           dashToken: data.account.dashToken || acc.token
         }), acc.password || '');
         return merged || acc;
@@ -343,6 +369,7 @@
 
   window.RizqAccount = {
     open: openAccount,
+    publicPageForAccount: publicPageForAccount,
     resolveDashboardUrl: resolveDashboardUrl,
     buildDashboardUrl: buildDashboardUrl,
     bootstrapDashboard: bootstrapDashboard,
