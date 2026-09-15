@@ -248,6 +248,32 @@ const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
+// دليل المساعدة — تنزيل من الخادم (كتيب المنصة + دليل الداشبوردات)
+const HELP_GUIDE_FILES = {
+  'platform-manual': path.join(__dirname, '..', 'RIZQ_PLATFORM_MANUAL.md'),
+  'dashboard-guide': path.join(__dirname, 'help', 'dashboard-guide.md'),
+};
+app.get('/api/help-guide/:slug', (req, res) => {
+  const slug = String(req.params.slug || '').trim().toLowerCase();
+  const filePath = HELP_GUIDE_FILES[slug];
+  if (!filePath || !fs.existsSync(filePath)) {
+    return res.status(404).json({ ok: false, error: 'guide_not_found', slug });
+  }
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="rizq-${slug}.md"`);
+  res.send(fs.readFileSync(filePath, 'utf8'));
+});
+app.get('/api/help-guide', (req, res) => {
+  res.json({
+    ok: true,
+    guides: Object.keys(HELP_GUIDE_FILES).map((id) => ({
+      id,
+      url: `/api/help-guide/${id}`,
+      available: fs.existsSync(HELP_GUIDE_FILES[id]),
+    })),
+  });
+});
+
 /**
  * POST /api/subscriber/register  و  GET /api/subscribers
  * ═══════════════════════════════════════════════════════════════

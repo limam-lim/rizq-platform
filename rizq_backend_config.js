@@ -29,3 +29,21 @@
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
   window.RIZQ_BACKEND_BASE = isLocal ? 'http://localhost:3000' : 'https://rizq-platform-api.onrender.com';
 })();
+
+/** تنزيل دليل المساعدة من الخادم (كتيب المنصة أو دليل الداشبوردات) */
+window.rizqDownloadHelpGuide = function (ev, slug) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  slug = slug || 'platform-manual';
+  var base = (window.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
+  if (!base) {
+    alert('الخادم غير مضبوط بعد.');
+    return false;
+  }
+  window.open(base + '/api/help-guide/' + encodeURIComponent(slug), '_blank', 'noopener');
+  return false;
+};
+window.rizqHelpGuideUrl = function (slug) {
+  slug = slug || 'platform-manual';
+  var base = (window.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
+  return base ? base + '/api/help-guide/' + encodeURIComponent(slug) : '';
+};

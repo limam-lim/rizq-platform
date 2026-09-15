@@ -561,7 +561,13 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right.tab-active,
   .browse-wrap.has-detail .browse-right.tab-active{
     display:block!important;
+    padding-bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
   }
+  .browse-left.tab-active{
+    padding-bottom:calc(72px + env(safe-area-inset-bottom,0))!important;
+  }
+  .dp-wrap{padding:14px 12px calc(24px + env(safe-area-inset-bottom,0))!important}
+  .dp-back-btn{display:inline-flex!important;margin-bottom:10px!important}
   .browse-right.tab-hidden{display:none!important}
   .browse-left.tab-hidden{display:none!important}
   /* مهم: إلغاء top من rizq_header.css — كان يزيح التبويبات بـ 112px ويسبب قص الأرقام */
@@ -624,42 +630,46 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .stats-strip{
     flex-shrink:0;
     width:100%;
-    min-height:48px;
-    height:48px!important;
-    overflow:hidden!important;
+    min-height:52px;
+    height:auto!important;
+    overflow:visible!important;
     position:relative;
     z-index:1;
     display:flex!important;
     flex-direction:row!important;
     flex-wrap:nowrap!important;
-    align-items:center!important;
+    align-items:stretch!important;
     box-sizing:border-box;
+    padding:4px 0!important;
   }
   .stat-item{
     flex:1 1 0!important;
     min-width:0!important;
-    height:48px!important;
-    padding:0 4px!important;
-    gap:4px!important;
-    flex-direction:row!important;
+    min-height:44px!important;
+    height:auto!important;
+    padding:4px 3px!important;
+    gap:3px!important;
+    flex-direction:column!important;
     flex-wrap:nowrap!important;
     align-items:center!important;
     justify-content:center!important;
-    overflow:hidden!important;
-    white-space:nowrap!important;
+    overflow:visible!important;
+    white-space:normal!important;
+    text-align:center!important;
   }
   .stat-item .si-num{
-    font-size:13px!important;
-    line-height:1.2!important;
+    font-size:14px!important;
+    line-height:1.15!important;
     flex-shrink:0!important;
     white-space:nowrap!important;
   }
   .stat-item .si-label{
-    font-size:9.5px!important;
-    line-height:1.2!important;
-    white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
+    font-size:9px!important;
+    line-height:1.25!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    max-width:100%;
   }
   .browse-wrap{animation:none!important}
   #result-list-body{

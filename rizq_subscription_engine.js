@@ -1053,8 +1053,18 @@
   function getAgentConfig() {
     try {
       var raw = JSON.parse(localStorage.getItem(AGENT_CFG_KEY) || 'null');
-      return raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
-    } catch(e) { return Object.assign({}, DEFAULT_AGENT_CFG); }
+      var cfg = raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
+      // نفس رابط التسجيل (RIZQ_BACKEND_BASE) — كان backendUrl فارغاً في لوحة الأدمن
+      // فيُظهر جداولاً فارغة رغم وجود حسابات حقيقية على الخادم.
+      if (!cfg.backendUrl && typeof global !== 'undefined' && global.RIZQ_BACKEND_BASE) {
+        cfg.backendUrl = global.RIZQ_BACKEND_BASE;
+      }
+      return cfg;
+    } catch(e) {
+      var fallback = Object.assign({}, DEFAULT_AGENT_CFG);
+      if (typeof global !== 'undefined' && global.RIZQ_BACKEND_BASE) fallback.backendUrl = global.RIZQ_BACKEND_BASE;
+      return fallback;
+    }
   }
   function setAgentConfig(partial) {
     var cfg = Object.assign(getAgentConfig(), partial || {});
