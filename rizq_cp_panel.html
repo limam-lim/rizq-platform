@@ -341,6 +341,7 @@ main, .page-content.active, .main-content, .results-area,
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
+  <button type="button" class="btn-lang btn-lang-primary" id="login-lang-btn" style="position:absolute;top:18px;left:18px;z-index:10000" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   <div class="login-box">
     <div class="login-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
     <div class="login-title" data-t="login-title">لوحة إدارة رزق</div>
@@ -368,7 +369,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-admin-av">👑</div>
     <div>
       <div class="sb-admin-name" id="sb-admin-name">Super Admin</div>
-      <div class="sb-admin-role">⭐ Super Administrator</div>
+      <div class="sb-admin-role" id="sb-admin-role" data-t="adm-role-super">⭐ Super Administrator</div>
     </div>
   </div>
   <nav class="sb-nav">
@@ -443,6 +444,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="topbar-right">
       
       <span class="topbar-time" id="clock">--:--:--</span>
+      <button type="button" class="btn-icon-tb btn-lang btn-lang-primary" id="cp-lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
       <button class="btn-icon-tb" onclick="showPanel('reports',null)">🚨<span class="notif-dot"></span></button>
       <button class="btn-icon-tb" title="إشعار" onclick="showToast(RizqI18n.t2('🔔 لا توجد إشعارات جديدة في الوقت الحالي','🔔 Aucune nouvelle notification pour le moment'),'info')">🔔</button>
       <button class="btn-icon-tb" onclick="showPanel('settings',null)">⚙️</button>
@@ -764,7 +766,7 @@ main, .page-content.active, .main-content, .results-area,
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
           <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#1a2535" data-t="team-h">🛡️ فريق الإدارة</h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" id="team-subtitle">فريق الإدارة — صلاحيات ديناميكية (حتى 15 عضو)</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" id="team-subtitle" data-t="team-sub-dynamic">فريق الإدارة — صلاحيات ديناميكية (حتى 15 عضو)</p>
         </div>
         <button class="btn-sm btn-primary" id="team-add-btn" data-t="team-add-btn" onclick="openAddAdminModal()">➕ إضافة عضو</button>
       </div>
@@ -1571,21 +1573,21 @@ main, .page-content.active, .main-content, .results-area,
     <div class="panel" id="panel-tenders-mod">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
         <div>
-          <h2 style="font-size:22px;font-weight:700;color:var(--navy)">📋 مراقبة المناقصات</h2>
-          <p style="font-size:13px;color:#2C3A4F;margin-top:4px">جميع المناقصات المنشورة (مفتوحة/منتهية/محذوفة) — للمراجعة وإزالة السبام أو المخالف</p>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="tm-h">📋 مراقبة المناقصات</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="tm-sub">جميع المناقصات المنشورة (مفتوحة/منتهية/محذوفة) — للمراجعة وإزالة السبام أو المخالف</p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button onclick="renderTendersModPanel()" style="padding:8px 16px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600">🔄 تحديث</button>
+          <button onclick="renderTendersModPanel()" data-t="tm-refresh-btn" style="padding:8px 16px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600">🔄 تحديث</button>
         </div>
       </div>
       <div id="tenders-mod-list" style="display:flex;flex-direction:column;gap:12px"></div>
       <div id="tenders-mod-empty" style="display:none;text-align:center;padding:60px 20px;color:#9ca3af">
         <div style="font-size:48px;margin-bottom:12px">📋</div>
-        <p style="font-weight:600">لا توجد مناقصات منشورة بعد</p>
+        <p style="font-weight:600" data-t="tm-empty">لا توجد مناقصات منشورة بعد</p>
       </div>
       <div id="tenders-mod-error" style="display:none;text-align:center;padding:60px 20px;color:#9ca3af">
         <div style="font-size:48px;margin-bottom:12px">⚠️</div>
-        <p style="font-weight:600">تعذّر الاتصال بالخادم — تأكد من ضبط رابط/سرّ الخادم في إعدادات الموقع</p>
+        <p style="font-weight:600" data-t="tm-error">تعذّر الاتصال بالخادم — تأكد من ضبط رابط/سرّ الخادم في إعدادات الموقع</p>
       </div>
     </div>
 
@@ -2195,15 +2197,15 @@ main, .page-content.active, .main-content, .results-area,
       <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
       <div class="form-group"><label class="form-label" data-t="am-email-label">البريد الإلكتروني *</label><input class="form-input" id="am-email" placeholder="name@rizq.mr" dir="ltr"/></div>
     </div>
-    <div class="form-group"><label class="form-label">قالب صلاحيات جاهز</label>
+    <div class="form-group"><label class="form-label" data-t="am-preset-label">قالب صلاحيات جاهز</label>
       <select class="form-select" id="am-preset" onchange="applyAdminPermPreset(this.value)">
-        <option value="">— اختر قالباً أو حدّد يدوياً —</option>
+        <option value="" data-t="am-preset-placeholder">— اختر قالباً أو حدّد يدوياً —</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">الصلاحيات * (واحدة أو أكثر)</label>
+    <div class="form-group"><label class="form-label" data-t="am-perms-label">الصلاحيات * (واحدة أو أكثر)</label>
       <div id="am-permissions-grid" style="max-height:240px;overflow:auto;border:1px solid rgba(27,58,107,.12);border-radius:10px;padding:10px;background:#f8fafc"></div>
     </div>
-    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/><div style="font-size:11px;color:#64748b;margin-top:4px">عند التعديل: اتركها فارغة إن لم تُرد تغييرها</div></div>
+    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/><div id="am-pass-hint" style="font-size:11px;color:#64748b;margin-top:4px" data-t="am-pass-hint">عند التعديل: اتركها فارغة إن لم تُرد تغييرها</div></div>
     <div class="form-group"><label class="form-label" data-t="am-notes-label">ملاحظات</label><input class="form-input" id="am-notes" data-ph="am-notes-ph" placeholder="مسؤول عن ولاية نواكشوط..."/></div>
     <div style="display:flex;gap:10px;margin-top:6px">
       <button class="btn-sm btn-primary" style="flex:1;padding:12px" data-t="am-save-btn" onclick="saveAdmin()">💾 إضافة العضو</button>
@@ -2309,6 +2311,48 @@ function _permLabel(key) {
   return d ? RizqI18n.t2(d.labelAr, d.labelFr) : key;
 }
 
+function _teamSubText() {
+  const max = ADMIN_PERM_CATALOG.maxTeamMembers || 15;
+  const tpl = RizqI18n.t('team-sub-dynamic', 'admin');
+  if (tpl && tpl.indexOf('{max}') !== -1) return tpl.replace('{max}', String(max));
+  return RizqI18n.t2(
+    'فريق الإدارة — صلاحيات ديناميكية (حتى ' + max + ' عضو)',
+    'Équipe admin — permissions dynamiques (jusqu\'à ' + max + ' membres)'
+  );
+}
+
+function _refreshAdminModalTitles() {
+  const editId = (document.getElementById('am-edit-id') || {}).value || '';
+  const titleEl = document.getElementById('am-title');
+  const saveBtn = document.querySelector('[data-t="am-save-btn"]');
+  if (editId) {
+    if (titleEl) titleEl.textContent = RizqI18n.t('am-edit-title', 'admin');
+    if (saveBtn) saveBtn.textContent = RizqI18n.t('am-save-edit-btn', 'admin');
+  } else {
+    if (titleEl) {
+      const v = RizqI18n.t('am-title', 'admin');
+      if (v) titleEl.textContent = v;
+    }
+    if (saveBtn) {
+      const v = RizqI18n.t('am-save-btn', 'admin');
+      if (v) saveBtn.textContent = v;
+    }
+  }
+}
+
+function refreshAdminDynamicI18n() {
+  if (currentAdmin) _applyAdminPermissions();
+  _fillAdminPresetSelect();
+  const sel = _getSelectedAdminPermissions();
+  if (document.getElementById('am-permissions-grid') && (ADMIN_PERM_CATALOG.permissions || []).length) {
+    buildAdminPermGrid(sel.length ? sel : ['overview']);
+    _onAdminPermCheckboxChange();
+  }
+  _refreshAdminModalTitles();
+  if (_currentPanelId === 'team') renderTeam();
+  if (_currentPanelId === 'tenders-mod') renderTendersModPanel();
+}
+
 function _applyAdminPermissions() {
   const perms = (currentAdmin && currentAdmin.permissions) || [];
   const isSuper = perms.includes('*');
@@ -2325,23 +2369,18 @@ function _applyAdminPermissions() {
     }
     sec.style.display = anyVisible ? '' : 'none';
   });
-  const roleEl = document.querySelector('.sb-admin-role');
+  const roleEl = document.getElementById('sb-admin-role');
   if (roleEl) {
     roleEl.textContent = isSuper
-      ? '⭐ Super Administrator'
-      : (perms.length + ' ' + RizqI18n.t2('صلاحية', 'permission(s)'));
+      ? RizqI18n.t('adm-role-super', 'admin')
+      : (perms.length + ' ' + RizqI18n.t('adm-perm-word', 'admin'));
   }
   const addBtn = document.getElementById('team-add-btn');
   if (addBtn) addBtn.style.display = _adminHasPerm('team.manage') ? '' : 'none';
   const maxBadge = document.getElementById('team-count-badge');
-  if (maxBadge) maxBadge.textContent = String(ADMIN_PERM_CATALOG.maxTeamMembers || 15);
+  if (maxBadge && !TEAM.length) maxBadge.textContent = String(ADMIN_PERM_CATALOG.maxTeamMembers || 15);
   const sub = document.getElementById('team-subtitle');
-  if (sub) {
-    sub.textContent = RizqI18n.t2(
-      'فريق الإدارة — صلاحيات ديناميكية (حتى ' + (ADMIN_PERM_CATALOG.maxTeamMembers || 15) + ' عضو)',
-      'Équipe admin — permissions dynamiques (jusqu’à ' + (ADMIN_PERM_CATALOG.maxTeamMembers || 15) + ' membres)'
-    );
-  }
+  if (sub) sub.textContent = _teamSubText();
 }
 
 async function loadAdminPermCatalog() {
@@ -2360,7 +2399,8 @@ function _fillAdminPresetSelect() {
   const sel = document.getElementById('am-preset');
   if (!sel) return;
   const cur = sel.value;
-  sel.innerHTML = '<option value="">— ' + RizqI18n.t2('اختر قالباً أو حدّد يدوياً', 'Choisir un modèle ou personnaliser') + ' —</option>';
+  const ph = RizqI18n.t('am-preset-placeholder', 'admin') || RizqI18n.t2('اختر قالباً أو حدّد يدوياً', 'Choisir un modèle ou personnaliser');
+  sel.innerHTML = '<option value="">— ' + ph + ' —</option>';
   const presets = ADMIN_PERM_CATALOG.presets || {};
   Object.keys(presets).forEach(function (k) {
     const p = presets[k];
@@ -2414,8 +2454,7 @@ function applyAdminPermPreset(presetKey) {
 
 function openAddAdminModal() {
   document.getElementById('am-edit-id').value = '';
-  document.getElementById('am-title').textContent = RizqI18n.t2('➕ إضافة عضو في الفريق', '➕ Ajouter un membre');
-  document.querySelector('[data-t="am-save-btn"]').textContent = RizqI18n.t2('💾 إضافة العضو', '💾 Ajouter le membre');
+  _refreshAdminModalTitles();
   ['am-name', 'am-user', 'am-phone', 'am-email', 'am-pass', 'am-notes'].forEach(function (id) {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -2430,8 +2469,8 @@ function openAddAdminModal() {
 
 function _teamPermSummary(member) {
   const perms = member.permissions || [];
-  if (perms.includes('*')) return RizqI18n.t2('⭐ صلاحيات كاملة', '⭐ Accès total');
-  if (!perms.length) return RizqI18n.t2('بدون صلاحيات', 'Aucune permission');
+  if (perms.includes('*')) return RizqI18n.t('perm-full-access', 'admin');
+  if (!perms.length) return RizqI18n.t('perm-none', 'admin');
   const shown = perms.slice(0, 3).map(_permLabel).join(' · ');
   const extra = perms.length > 3 ? ' +' + (perms.length - 3) : '';
   return shown + extra;
@@ -2478,8 +2517,8 @@ function _enterAdminUI(found){
   var navEl = document.querySelector('.sb-item[data-admin-perm="' + (PANEL_PERM_KEYS[firstPanel] || 'overview') + '"]');
   showPanel(firstPanel, navEl);
   var welcomeRole = (found.permissions || []).includes('*')
-    ? RizqI18n.t2('Super Admin', 'Super Admin')
-    : ((found.permissions || []).length + ' ' + RizqI18n.t2('صلاحية', 'permission(s)'));
+    ? RizqI18n.t('adm-role-super', 'admin')
+    : ((found.permissions || []).length + ' ' + RizqI18n.t('adm-perm-word', 'admin'));
   showToast('✅ ' + RizqI18n.t2('أهلاً', 'Bienvenue') + ' ' + found.name + ' — ' + welcomeRole);
 }
 
@@ -2547,7 +2586,7 @@ function doLogout(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts',moderation:'topbar-moderation','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -2556,17 +2595,21 @@ function refreshTopbarTitle(){
   el.textContent=(key && window.RizqI18n) ? RizqI18n.t(key,'admin') : (key?titles_fallback(_currentPanelId):'لوحة التحكم');
 }
 function titles_fallback(id){
-  const ar=window.RIZQ_I18N_AR&&window.RIZQ_I18N_AR.admin;
-  return ar && PANEL_TITLE_KEYS[id] ? ar[PANEL_TITLE_KEYS[id]] : 'لوحة التحكم';
+  if (window.RizqI18n && PANEL_TITLE_KEYS[id]) {
+    const v = RizqI18n.t(PANEL_TITLE_KEYS[id], 'admin');
+    if (v) return v;
+  }
+  return (window.RizqI18n && RizqI18n.t('topbar-default', 'admin')) || 'لوحة التحكم';
 }
 document.addEventListener('rizq:langchange', refreshTopbarTitle);
 document.addEventListener('rizq:langchange', renderExtraCategories);
 document.addEventListener('rizq:langchange', renderPackages);
 document.addEventListener('rizq:langchange', renderPricesAdmin);
+document.addEventListener('rizq:langchange', refreshAdminDynamicI18n);
 function showPanel(id, navEl){
   const permKey = PANEL_PERM_KEYS[id];
   if (permKey && currentAdmin && !_adminHasPerm(permKey)) {
-    showToast(RizqI18n.t2('⛔ ليس لديك صلاحية لهذا القسم', '⛔ Permission insuffisante pour cette section'), 'error');
+    showToast(RizqI18n.t('perm-denied-section', 'admin'), 'error');
     return;
   }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -3959,15 +4002,15 @@ async function renderTeam(){
   const g=document.getElementById('team-grid');
   if(!g) return;
   if(!_adminHasPerm('team.manage')){
-    g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t2('ليس لديك صلاحية إدارة الفريق','Permission insuffisante pour gérer l\'équipe')+'</p>';
+    g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t('team-no-perm','admin')+'</p>';
     return;
   }
-  g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t2('جاري التحميل...','Chargement...')+'</p>';
+  g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t('team-loading','admin')+'</p>';
   try{
     const res=await fetch(_adminBackendBase()+'/api/admin/team',{headers:_adminAuthHeaders()});
     const data=await res.json().catch(function(){return{};});
     if(!res.ok||!data.ok){
-      g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t2('تعذّر تحميل الفريق','Échec du chargement de l\'équipe')+'</p>';
+      g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t('team-load-fail','admin')+'</p>';
       return;
     }
     TEAM=data.team||[];
@@ -3994,7 +4037,7 @@ async function renderTeam(){
         +'</div></div>';
     }).join('');
   }catch(e){
-    g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t2('تعذّر الاتصال بالخادم','Connexion au serveur impossible')+'</p>';
+    g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t('team-server-fail','admin')+'</p>';
   }
 }
 
@@ -4113,8 +4156,7 @@ function editAdmin(id){
   const m = TEAM.find(function(t){ return t.id===id; });
   if(!m) return;
   document.getElementById('am-edit-id').value = m.id;
-  document.getElementById('am-title').textContent = RizqI18n.t2('✏️ تعديل عضو الفريق','✏️ Modifier le membre');
-  document.querySelector('[data-t="am-save-btn"]').textContent = RizqI18n.t2('💾 حفظ التعديلات','💾 Enregistrer');
+  _refreshAdminModalTitles();
   document.getElementById('am-name').value  = m.name;
   document.getElementById('am-user').value  = m.user;
   document.getElementById('am-user').disabled = true;
