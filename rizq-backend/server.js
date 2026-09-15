@@ -248,16 +248,25 @@ const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// دليل المساعدة — تنزيل من الخادم (كتيب المنصة + دليل الداشبوردات)
+// دليل المساعدة — نص (MD) + نسخة مرئية (HTML بمخططات SVG)
 const HELP_GUIDE_FILES = {
   'platform-manual': path.join(__dirname, '..', 'RIZQ_PLATFORM_MANUAL.md'),
   'dashboard-guide': path.join(__dirname, 'help', 'dashboard-guide.md'),
+  'help-visual': path.join(__dirname, '..', 'rizq_help.html'),
+  'dashboard-guide-visual': path.join(__dirname, '..', 'rizq_help.html'),
 };
 app.get('/api/help-guide/:slug', (req, res) => {
   const slug = String(req.params.slug || '').trim().toLowerCase();
   const filePath = HELP_GUIDE_FILES[slug];
   if (!filePath || !fs.existsSync(filePath)) {
     return res.status(404).json({ ok: false, error: 'guide_not_found', slug });
+  }
+  const ext = path.extname(filePath).toLowerCase();
+  const inline = String(req.query.inline || '') === '1';
+  if (ext === '.html') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    if (!inline) res.setHeader('Content-Disposition', `inline; filename="rizq-${slug}.html"`);
+    return res.send(fs.readFileSync(filePath, 'utf8'));
   }
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="rizq-${slug}.md"`);
@@ -266,9 +275,11 @@ app.get('/api/help-guide/:slug', (req, res) => {
 app.get('/api/help-guide', (req, res) => {
   res.json({
     ok: true,
+    visualUrl: '/api/help-guide/help-visual?inline=1',
     guides: Object.keys(HELP_GUIDE_FILES).map((id) => ({
       id,
       url: `/api/help-guide/${id}`,
+      visual: path.extname(HELP_GUIDE_FILES[id]).toLowerCase() === '.html',
       available: fs.existsSync(HELP_GUIDE_FILES[id]),
     })),
   });

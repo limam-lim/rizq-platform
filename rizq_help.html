@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>دليل المساعدة — رزق | Rizq Help Guide</title>
+  <link rel="icon" href="favicon.ico">
+  <style>
+    :root{--royal:#1B3A6B;--gold:#C9A84C;--bg:#f8faff;--text:#1a2535;--muted:#64748b}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    .wrap{max-width:920px;margin:0 auto;padding:24px 16px 48px}
+    header{background:linear-gradient(135deg,#0f172a,#1B3A6B);color:#fff;border-radius:16px;padding:28px 24px;margin-bottom:28px}
+    header h1{font-size:1.55rem;margin-bottom:6px}
+    header p{color:rgba(255,255,255,.82);font-size:14px}
+    .lang-bar{display:flex;gap:8px;margin-top:14px}
+    .lang-bar button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+    .lang-bar button.on{background:var(--gold);color:#0f172a;border-color:var(--gold);font-weight:700}
+    section{background:#fff;border:1px solid #e2e8f5;border-radius:14px;padding:20px 18px;margin-bottom:20px;box-shadow:0 4px 20px rgba(15,35,65,.06)}
+    section h2{font-size:1.15rem;color:var(--royal);margin-bottom:10px}
+    section p,section li{font-size:14px;color:#334155}
+    section ul{margin:10px 20px 0}
+    .fig{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#fafbff}
+    .fig svg{display:block;width:100%;height:auto}
+    .fig-cap{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid #eef2f8;background:#fff}
+    .steps{display:grid;gap:10px;margin-top:12px}
+    .step{display:flex;gap:12px;align-items:flex-start;background:#f8faff;border-radius:10px;padding:12px 14px;border:1px solid #e8eef8}
+    .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#0f172a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+    .dl-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .dl-row a{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
+    .dl-primary{background:linear-gradient(135deg,var(--gold),#e8c96a);color:#0f172a}
+    .dl-outline{border:1.5px solid var(--royal);color:var(--royal);background:#fff}
+    footer{text-align:center;font-size:12px;color:var(--muted);margin-top:24px}
+    .fr-only{display:none}
+    html[lang="fr"] .ar-only{display:none}
+    html[lang="fr"] .fr-only{display:block}
+    html[lang="fr"] .fr-only-inline{display:inline}
+    @media(max-width:600px){header h1{font-size:1.25rem}.wrap{padding:16px 12px 32px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="ar-only">📘 دليل استعمال منصة رزق</span><span class="fr-only">📘 Guide d'utilisation Rizq</span></h1>
+    <p class="ar-only">صور توضيحية + خطوات عملية للتسجيل، لوحات التحكم، والأدمن</p>
+    <p class="fr-only">Schémas illustrés + étapes pour l'inscription, les tableaux de bord et l'admin</p>
+    <div class="lang-bar">
+      <button type="button" id="btn-ar" class="on" onclick="setHelpLang('ar')">AR</button>
+      <button type="button" id="btn-fr" onclick="setHelpLang('fr')">FR</button>
+    </div>
+  </header>
+
+  <!-- ══ مخطط 1: رحلة المنصة ══ -->
+  <section>
+    <h2><span class="ar-only">① خريطة المنصة — من الزائر إلى البائع</span><span class="fr-only">① Parcours — visiteur → vendeur</span></h2>
+    <div class="fig" role="img" aria-label="مخطط رحلة المنصة">
+      <svg viewBox="0 0 880 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1B3A6B"/><stop offset="100%" stop-color="#234d8f"/></linearGradient>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9A84C"/></marker>
+        </defs>
+        <rect width="880" height="200" fill="#f0f4ff"/>
+        <!-- boxes -->
+        <g font-family="Segoe UI,sans-serif" font-size="13" font-weight="700">
+          <rect x="24" y="70" width="120" height="56" rx="10" fill="url(#g1)"/><text x="84" y="94" fill="#fff" text-anchor="middle" class="ar-only">🏠 الرئيسية</text><text x="84" y="112" fill="#C9A84C" text-anchor="middle" font-size="10">rizq.mr</text>
+          <rect x="184" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#C9A84C" stroke-width="2"/><text x="244" y="94" fill="#1B3A6B" text-anchor="middle">📝 تسجيل</text><text x="244" y="112" fill="#64748b" text-anchor="middle" font-size="10">حساب بائع</text>
+          <rect x="344" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#1B3A6B" stroke-width="2"/><text x="404" y="94" fill="#1B3A6B" text-anchor="middle">⏳ مراجعة</text><text x="404" y="112" fill="#64748b" text-anchor="middle" font-size="10">Super Admin</text>
+          <rect x="504" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#16a34a" stroke-width="2"/><text x="564" y="94" fill="#15803d" text-anchor="middle">✅ لوحة التحكم</text><text x="564" y="112" fill="#64748b" text-anchor="middle" font-size="10">Dashboard</text>
+          <rect x="664" y="70" width="120" height="56" rx="10" fill="url(#g1)"/><text x="724" y="94" fill="#fff" text-anchor="middle">🌐 صفحة عامة</text><text x="724" y="112" fill="#C9A84C" text-anchor="middle" font-size="10">Store/Office</text>
+        </g>
+        <!-- arrows -->
+        <line x1="144" y1="98" x2="180" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+        <line x1="304" y1="98" x2="340" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+        <line x1="464" y1="98" x2="500" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+        <line x1="624" y1="98" x2="660" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+        <text x="440" y="36" fill="#1B3A6B" text-anchor="middle" font-size="14" font-weight="800" font-family="Segoe UI">RIZQ — مسار البائع الجديد</text>
+        <text x="440" y="170" fill="#64748b" text-anchor="middle" font-size="11" font-family="Segoe UI">التسجيل → موافقة الأدمن → نشر منتجات/إعلانات → ظهور للزوار</text>
+      </svg>
+    </div>
+    <p class="fig-cap ar-only">الشكل 1: مسار البائع من الصفحة الرئيسية حتى ظهور نشاطه للجمهور</p>
+    <p class="fig-cap fr-only">Figure 1 : Parcours vendeur — accueil → approbation → page publique</p>
+  </section>
+
+  <!-- ══ مخطط 2: Super Admin ══ -->
+  <section>
+    <h2><span class="ar-only">② أين يظهر حسابك الجديد في Super Admin؟</span><span class="fr-only">② Où voir un nouveau compte (Super Admin) ?</span></h2>
+    <div class="fig">
+      <svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg">
+        <rect width="880" height="240" fill="#0f172a"/>
+        <!-- sidebar mock -->
+        <rect x="0" y="0" width="200" height="240" fill="#0a1220"/>
+        <text x="100" y="28" fill="#64748b" text-anchor="middle" font-size="10" font-family="Segoe UI">SIDEBAR</text>
+        <rect x="16" y="44" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="64" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">نظرة عامة</text>
+        <rect x="16" y="84" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="104" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">المستخدمون ✓</text>
+        <rect x="16" y="124" width="168" height="36" rx="6" fill="rgba(201,168,76,.25)" stroke="#C9A84C" stroke-width="2"/>
+        <text x="100" y="146" fill="#E8C96A" text-anchor="middle" font-size="12" font-weight="700" font-family="Segoe UI">👤 الحسابات ⏳</text>
+        <text x="100" y="162" fill="#fbbf24" text-anchor="middle" font-size="9" font-family="Segoe UI">← هنا pending</text>
+        <!-- main panel -->
+        <rect x="216" y="16" width="648" height="208" rx="10" fill="#fff"/>
+        <text x="240" y="44" fill="#1B3A6B" font-size="14" font-weight="800" font-family="Segoe UI">طلبات التسجيل — قيد المراجعة</text>
+        <!-- table row highlight -->
+        <rect x="232" y="60" width="616" height="44" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="256" cy="82" r="14" fill="#1B3A6B"/><text x="256" y="86" fill="#C9A84C" text-anchor="middle" font-size="12">🏪</text>
+        <text x="284" y="78" fill="#1a2535" font-size="13" font-weight="700" font-family="Segoe UI">اسم نشاطك / Your Store</text>
+        <text x="284" y="94" fill="#64748b" font-size="10" font-family="Segoe UI">status: pending — ينتظر موافقتك</text>
+        <rect x="720" y="72" width="72" height="28" rx="6" fill="#16a34a"/><text x="756" y="90" fill="#fff" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">موافقة</text>
+        <rect x="800" y="72" width="36" height="28" rx="6" fill="#fee2e2" stroke="#ef4444"/><text x="818" y="90" fill="#dc2626" text-anchor="middle" font-size="11" font-family="Segoe UI">✕</text>
+        <!-- callout -->
+        <path d="M440 120 L460 140 L420 140 Z" fill="#C9A84C"/>
+        <rect x="320" y="140" width="240" height="36" rx="8" fill="#C9A84C"/>
+        <text x="440" y="163" fill="#0f172a" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">⚠️ ليس تبويب «المستخدمون»</text>
+      </svg>
+    </div>
+    <p class="ar-only">تبويب <strong>«الحسابات»</strong> = طلبات جديدة (pending). تبويب <strong>«المستخدمون»</strong> = معتمدون فقط (approved).</p>
+    <p class="fr-only">Onglet <strong>« Comptes »</strong> = nouvelles demandes. <strong>« Utilisateurs »</strong> = approuvés uniquement.</p>
+  </section>
+
+  <!-- ══ مخطط 3: الفيديو التعريفي ══ -->
+  <section>
+    <h2><span class="ar-only">③ الفيديو التعريفي في لوحة التحكم</span><span class="fr-only">③ Vidéo promotionnelle (dashboard)</span></h2>
+    <div class="fig">
+      <svg viewBox="0 0 880 220" xmlns="http://www.w3.org/2000/svg">
+        <rect width="880" height="220" fill="#f8faff"/>
+        <!-- dashboard mock -->
+        <rect x="40" y="20" width="380" height="180" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="60" y="48" fill="#1B3A6B" font-size="13" font-weight="800" font-family="Segoe UI">📋 الملف الشخصي — Profile</text>
+        <rect x="60" y="62" width="340" height="28" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+        <text x="72" y="80" fill="#64748b" font-size="10" font-family="Segoe UI">🎬 فيديو تعريفي</text>
+        <rect x="60" y="98" width="340" height="32" rx="6" fill="#fff" stroke="#C9A84C" stroke-width="2"/>
+        <text x="72" y="118" fill="#1B3A6B" font-size="10" font-family="monospace">https://youtu.be/...</text>
+        <rect x="60" y="142" width="140" height="36" rx="8" fill="#1B3A6B"/><text x="130" y="165" fill="#C9A84C" text-anchor="middle" font-size="12" font-weight="700" font-family="Segoe UI">💾 حفظ</text>
+        <!-- arrow to public page -->
+        <line x1="430" y1="110" x2="490" y2="110" stroke="#C9A84C" stroke-width="3" marker-end="url(#arr2)"/>
+        <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9A84C"/></marker></defs>
+        <!-- public page mock -->
+        <rect x="500" y="20" width="340" height="180" rx="12" fill="url(#g1)"/>
+        <text x="670" y="48" fill="#fff" text-anchor="middle" font-size="13" font-weight="800" font-family="Segoe UI">🌐 صفحتك العامة</text>
+        <rect x="530" y="70" width="280" height="100" rx="8" fill="rgba(0,0,0,.35)" stroke="#C9A84C"/>
+        <polygon points="650,95 650,145 690,120" fill="#C9A84C"/>
+        <text x="670" y="190" fill="#E8C96A" text-anchor="middle" font-size="10" font-family="Segoe UI">▶ YouTube / Facebook embed</text>
+        <text x="440" y="210" fill="#64748b" text-anchor="middle" font-size="10" font-family="Segoe UI">رابط فقط — ليس رفع ملف فيديو مباشر حالياً</text>
+      </svg>
+    </div>
+    <div class="steps ar-only">
+      <div class="step"><span class="step-num">1</span><span>لوحة التحكم → الملف الشخصي</span></div>
+      <div class="step"><span class="step-num">2</span><span>الصق رابط YouTube أو Facebook</span></div>
+      <div class="step"><span class="step-num">3</span><span>«حفظ التغييرات» — يُزامَن مع الخادم</span></div>
+      <div class="step"><span class="step-num">4</span><span>تحقق من صفحتك العامة (Store / Office / Corp)</span></div>
+    </div>
+    <div class="steps fr-only">
+      <div class="step"><span class="step-num">1</span><span>Tableau de bord → Profil</span></div>
+      <div class="step"><span class="step-num">2</span><span>Coller un lien YouTube ou Facebook</span></div>
+      <div class="step"><span class="step-num">3</span><span>Enregistrer — sync serveur</span></div>
+      <div class="step"><span class="step-num">4</span><span>Vérifier la page publique</span></div>
+    </div>
+  </section>
+
+  <!-- ══ مخطط 4: أنواع اللوحات ══ -->
+  <section>
+    <h2><span class="ar-only">④ أنواع لوحات التحكم</span><span class="fr-only">④ Types de tableaux de bord</span></h2>
+    <div class="fig">
+      <svg viewBox="0 0 880 160" xmlns="http://www.w3.org/2000/svg">
+        <rect width="880" height="160" fill="#fff"/>
+        <g font-family="Segoe UI,sans-serif" text-anchor="middle">
+          <rect x="40" y="40" width="180" height="90" rx="12" fill="#eff6ff" stroke="#1B3A6B"/><text x="130" y="72" fill="#1B3A6B" font-size="28">👤</text><text x="130" y="98" fill="#1B3A6B" font-size="12" font-weight="700">أفراد</text><text x="130" y="114" fill="#64748b" font-size="10">dashboard.html</text>
+          <rect x="250" y="40" width="180" height="90" rx="12" fill="#fffbeb" stroke="#C9A84C"/><text x="340" y="72" fill="#a07820" font-size="28">🏪</text><text x="340" y="98" fill="#1B3A6B" font-size="12" font-weight="700">محل / معرض</text><text x="340" y="114" fill="#64748b" font-size="10">dashboard_store</text>
+          <rect x="460" y="40" width="180" height="90" rx="12" fill="#f0fdf4" stroke="#16a34a"/><text x="550" y="72" fill="#15803d" font-size="28">🏢</text><text x="550" y="98" fill="#1B3A6B" font-size="12" font-weight="700">مكتب</text><text x="550" y="114" fill="#64748b" font-size="10">dashboard_office</text>
+          <rect x="670" y="40" width="180" height="90" rx="12" fill="#fdf4ff" stroke="#9333ea"/><text x="760" y="72" fill="#7e22ce" font-size="28">🏭</text><text x="760" y="98" fill="#1B3A6B" font-size="12" font-weight="700">شركة</text><text x="760" y="114" fill="#64748b" font-size="10">dashboard_corp</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="ar-only">📥 تنزيل النص الكامل</span><span class="fr-only">📥 Télécharger le texte complet</span></h2>
+    <p class="ar-only">النسخة المرئية (هذه الصفحة) للفهم السريع. للتفاصيل التقنية الكاملة:</p>
+    <p class="fr-only">Cette page visuelle pour un aperçu rapide. Pour le détail technique :</p>
+    <div class="dl-row">
+      <a href="rizq_help.html" class="dl-primary ar-only">🖼️ الدليل المرئي (هذه الصفحة)</a>
+      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'dashboard-guide')">📄 دليل الداشبورد (MD)</a>
+      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'platform-manual')">📚 كتيب المنصة (MD)</a>
+    </div>
+  </section>
+
+  <footer>
+    <span class="ar-only">© RIZQ — ADMINIA SARL · آخر تحديث سبتمبر 2026</span>
+    <span class="fr-only">© RIZQ — ADMINIA SARL · Sept. 2026</span>
+    · <a href="./" style="color:var(--royal)">← <span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+  </footer>
+</div>
+<script src="rizq_backend_config.js"></script>
+<script>
+function setHelpLang(l){
+  document.documentElement.lang=l;
+  document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.getElementById('btn-ar').classList.toggle('on',l==='ar');
+  document.getElementById('btn-fr').classList.toggle('on',l==='fr');
+  try{localStorage.setItem('rizq_lang',l);}catch(e){}
+}
+try{
+  var s=localStorage.getItem('rizq_lang');
+  if(s==='fr') setHelpLang('fr');
+}catch(e){}
+</script>
+</body>
+</html>

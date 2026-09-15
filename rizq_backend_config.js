@@ -30,7 +30,14 @@
   window.RIZQ_BACKEND_BASE = isLocal ? 'http://localhost:3000' : 'https://rizq-platform-api.onrender.com';
 })();
 
-/** تنزيل دليل المساعدة من الخادم (كتيب المنصة أو دليل الداشبوردات) */
+/** فتح الدليل المرئي (مخططات SVG) — يعمل من الواجهة مباشرة */
+window.rizqOpenHelpGuide = function (ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  window.open('rizq_help.html', '_blank', 'noopener');
+  return false;
+};
+
+/** تنزيل نص الدليل (MD) من الخادم */
 window.rizqDownloadHelpGuide = function (ev, slug) {
   if (ev && ev.preventDefault) ev.preventDefault();
   slug = slug || 'platform-manual';

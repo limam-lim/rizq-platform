@@ -614,7 +614,7 @@
       { ar: { label: 'الأقسام', action: 'chat:الفئات' }, fr: { label: 'Catégories', action: 'chat:catégories' } },
       { ar: { label: 'عن رزق', action: 'chat:ما هي رزق' }, fr: { label: 'À propos', action: 'chat:qu est ce que rizq' } },
       { ar: { label: 'تواصل', action: 'chat:تواصل' }, fr: { label: 'Contact', action: 'chat:contact support' } },
-      { ar: { label: '📥 دليل الاستعمال', action: 'help:dashboard-guide' }, fr: { label: '📥 Guide', action: 'help:dashboard-guide' } },
+      { ar: { label: '📘 دليل مرئي', action: 'nav:rizq_help.html' }, fr: { label: '📘 Guide visuel', action: 'nav:rizq_help.html' } },
       { ar: { label: 'شكوى', action: 'report' }, fr: { label: 'Réclamation', action: 'report' } }
     ];
 
