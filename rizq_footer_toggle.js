@@ -47,6 +47,7 @@
       + '.rzq-ft-toggle-btn .rzq-ft-chev{display:inline-block;font-size:8.5px;transition:transform .3s ease}'
       + '.rzq-ft-toggle-btn[aria-expanded="true"] .rzq-ft-chev{transform:rotate(180deg)}'
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
+      + '.rzq-ft-collapse-wrap.rzq-ft-open{overflow:visible}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
       // الفوتر الأصلي في كل صفحة يُعرَّف بحشوة علوية سخية (padding-top) لأنها
       // صُمِّمت لاستيعاب أعمدة الروابط الطويلة أسفلها. الآن بعد الطيّ الافتراضي
@@ -61,20 +62,7 @@
       + 'html body footer .footer-copy,html body footer .logo-sub{'
       + 'color:rgba(255,255,255,.82)!important}'
       + 'html body footer .footer-links a:hover{color:#C9A84C!important}'
-      + 'html body footer .footer-links li a{white-space:nowrap}'
-      + 'html body .section-header,html body .sec-header,html body .cta-inner,'
-      + 'html body .price-ticker-wrap,html body .price-card,html body .cs-strip,'
-      + 'html body .rzq-disc-empty,html body .hero-stats-bar,html body .rn-topnav,'
-      + 'html body .ticker-wrap,html body .hero-eyebrow,html body .hero-title-card,'
-      + 'html body .hero-subtitle-card,html body .hero-vid-ph,'
-      + 'html body .listings-label>span,html body .ad-card,html body .listing-card,'
-      + 'html body #cat-portal,html body .why-card,html body .rvid-section,'
-      + 'html body nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav),'
-      + 'html body .rpkg-card[style*="#1B3A6B"],html body .pricing-card[style*="#1B3A6B"]{'
-      + 'background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),'
-      + 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Cg fill=\'%23C9A84C\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M30 0l30 30-30 30L0 30z\'/%3E%3C/g%3E%3C/svg%3E")!important;'
-      + 'background-size:auto,60px 60px!important;background-repeat:no-repeat,repeat!important;'
-      + 'background-blend-mode:overlay!important}';
+      + 'html body footer .footer-links li a{white-space:nowrap}';
     var style = document.getElementById('rzq-ft-toggle-css');
     if (!style) {
       style = document.createElement('style');
@@ -175,22 +163,38 @@
       wrap.parentNode.insertBefore(row, wrap.nextSibling);
     }
 
-    var open = false;
+    var open = true;
+    try {
+      var savedOpen = localStorage.getItem('rzq_ft_open');
+      if (savedOpen === '0') open = false;
+      else if (savedOpen === '1') open = true;
+    } catch (eOpen) {}
     function render() {
       btn.setAttribute('aria-expanded', String(open));
       var txt = btn.querySelector('.rzq-ft-txt');
       if (txt) txt.textContent = label(open);
-      wrap.style.maxHeight = open ? wrap.scrollHeight + 'px' : '0';
+      wrap.classList.toggle('rzq-ft-open', open);
+      if (open) {
+        wrap.style.maxHeight = 'none';
+        wrap.style.overflow = 'visible';
+      } else {
+        wrap.style.maxHeight = '0';
+        wrap.style.overflow = 'hidden';
+      }
       if (footerEl) footerEl.classList.toggle('rzq-ft-compact', !open);
     }
     btn.addEventListener('click', function () {
       open = !open;
+      try { localStorage.setItem('rzq_ft_open', open ? '1' : '0'); } catch (eSave) {}
       render();
     });
     // إعادة حساب الارتفاع عند تغيير حجم النافذة (مثلاً تدوير الجوال) حتى لا
     // يُقطَع المحتوى إن كانت القيمة المحسوبة سابقاً أصغر من الحقيقية الجديدة
     window.addEventListener('resize', function () {
-      if (open) wrap.style.maxHeight = wrap.scrollHeight + 'px';
+      if (open) {
+        wrap.style.maxHeight = 'none';
+        wrap.style.overflow = 'visible';
+      }
     }, { passive: true });
     // تحديث نص الزر عند تبديل اللغة (rizq_i18n.js يُصدر هذا الحدث)
     document.addEventListener('rizq:langchange', function () {
@@ -199,6 +203,7 @@
     });
 
     render();
+    applyFooterLinks(footerEl || document);
   }
 
   function catStats() {
@@ -243,6 +248,51 @@
     }
   }
 
+  var FOOTER_HREF = {
+    'ft-q1': 'rizq_landing_v8.html', 'rzq-ft-l1': 'rizq_landing_v8.html',
+    'ft-q2': 'rizq_browse.html', 'rzq-ft-l2': 'rizq_browse.html',
+    'ft-q3': 'rizq_post.html', 'rzq-ft-l3': 'rizq_post.html',
+    'ft-q4': 'rizq_landing_v8.html#pricing', 'rzq-ft-l4': 'rizq_landing_v8.html#pricing',
+    'ft-q5': 'rizq_landing_v8.html#about', 'rzq-ft-l5': 'rizq_landing_v8.html#about',
+    'ft-h1': 'rizq_help.html', 'footer-help1': 'rizq_help.html', 'rzq-ft-h1': 'rizq_help.html',
+    'ft-h2': 'rizq_legal.html#s3', 'footer-help2': 'rizq_legal.html#s3', 'rzq-ft-h2': 'rizq_legal.html#s3',
+    'ft-h3': 'rizq_legal.html#s2', 'footer-help3': 'rizq_legal.html#s2', 'rzq-ft-h3': 'rizq_legal.html#s2',
+    'ft-h4': 'rizq_legal.html#s10', 'footer-help4': 'rizq_legal.html#s10', 'rzq-ft-h4': 'rizq_legal.html#s10',
+    'ft-h5': 'rizq_legal.html#s10', 'footer-col-contact': 'rizq_legal.html#s10', 'rzq-ft-h5': 'rizq_legal.html#s10',
+    'ft-tc1': 'rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA', 'rzq-ft-c1': 'rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA',
+    'ft-tc2': 'rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA', 'rzq-ft-c2': 'rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA',
+    'ft-tc3': 'rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA', 'rzq-ft-c3': 'rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA',
+    'ft-tc4': 'rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA', 'rzq-ft-c4': 'rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA',
+    'ft-tc5': 'rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9', 'rzq-ft-c5': 'rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9'
+  };
+  var FOOTER_CAT_ORDER = [
+    'rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA',
+    'rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA',
+    'rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA',
+    'rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA',
+    'rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9'
+  ];
+
+  function applyFooterLinks(scope) {
+    var root = scope || document;
+    var footer = root.querySelector('footer');
+    if (!footer) return;
+    footer.querySelectorAll('a[data-t], a[id^="rzq-ft-"], a[id^="ft-"]').forEach(function (a) {
+      var key = a.getAttribute('data-t') || a.id;
+      if (key && FOOTER_HREF[key]) a.setAttribute('href', FOOTER_HREF[key]);
+    });
+    footer.querySelectorAll('.footer-col-title').forEach(function (h4) {
+      var label = (h4.textContent || '') + ' ' + (h4.getAttribute('data-t') || '') + ' ' + (h4.id || '');
+      if (!/topcats|tcats|Meilleures|أبرز|catégories/i.test(label)) return;
+      var ul = h4.nextElementSibling;
+      if (!ul || !ul.classList.contains('footer-links')) return;
+      var links = ul.querySelectorAll('a[href*="rizq_browse"]');
+      links.forEach(function (a, i) {
+        if (FOOTER_CAT_ORDER[i]) a.setAttribute('href', FOOTER_CAT_ORDER[i]);
+      });
+    });
+  }
+
   function hookFooterStats() {
     applyFooterStats();
     var prev = window._rzqApplyFt;
@@ -257,10 +307,11 @@
 
   function boot() {
     injectStyle();
+    applyFooterLinks();
     init();
     hookFooterStats();
-    setTimeout(hookFooterStats, 80);
-    setTimeout(hookFooterStats, 400);
+    setTimeout(function () { applyFooterLinks(); hookFooterStats(); }, 80);
+    setTimeout(function () { applyFooterLinks(); hookFooterStats(); }, 400);
   }
 
   document.addEventListener('rizq:langchange', function () {
