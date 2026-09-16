@@ -951,7 +951,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <!-- الولاية -->
         <div class="filter-section">
           <div class="filter-title" data-t="filter-wilaya">الولاية</div>
-          <select class="wilaya-select" id="wilaya-select">
+          <select class="wilaya-select" id="wilaya-select" onchange="applyFilters()">
             <option value="" data-t="all-wilayas">كل الولايات</option>
             <option value="نواكشوط الغربية" data-ar="نواكشوط الغربية" data-fr="Nouakchott Ouest">نواكشوط الغربية</option>
             <option value="نواكشوط الشمالية" data-ar="نواكشوط الشمالية" data-fr="Nouakchott Nord">نواكشوط الشمالية</option>
@@ -975,10 +975,20 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="filter-section" id="condition-filter-section">
           <div class="filter-title"><span data-t="filter-condition">حالة المنتج</span><button type="button" onclick="clearSection('condition')" data-t="btn-clear-mini">مسح</button></div>
           <div class="chips" id="condition-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="جديد" class="filter-cb"><span class="filter-label" data-t="cond-new">✨ جديد</span></label>
-            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — ممتاز" class="filter-cb"><span class="filter-label" data-t="cond-exc">⭐ مستعمل — ممتاز</span></label>
-            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — جيد" class="filter-cb"><span class="filter-label" data-t="cond-good">👍 مستعمل — جيد</span></label>
-            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="للتصليح" class="filter-cb"><span class="filter-label" data-t="cond-fix">🔧 للتصليح</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="جديد" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="cond-new">✨ جديد</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — ممتاز" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="cond-exc">⭐ مستعمل — ممتاز</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="مستعمل — جيد" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="cond-good">👍 مستعمل — جيد</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rcond" value="للتصليح" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="cond-fix">🔧 للتصليح</span></label>
+          </div>
+        </div>
+
+        <!-- تاريخ النشر -->
+        <div class="filter-section" id="since-filter-section">
+          <div class="filter-title"><span data-t="filter-since">تاريخ النشر</span><button type="button" onclick="clearSection('since')" data-t="btn-clear-mini">مسح</button></div>
+          <div class="chips" id="since-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+            <label class="filter-option" style="margin:0"><input type="radio" name="rsince" value="1" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="since-1d">آخر 24 ساعة</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rsince" value="7" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="since-7d">آخر 7 أيام</span></label>
+            <label class="filter-option" style="margin:0"><input type="radio" name="rsince" value="30" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="since-30d">آخر 30 يوماً</span></label>
           </div>
         </div>
 
@@ -986,18 +996,18 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <div class="filter-section">
           <div class="filter-title"><span data-t="filter-price">السعر (MRU)</span><button onclick="clearSection('price')" data-t="btn-clear-mini">مسح</button></div>
           <div class="price-inputs" style="margin-bottom:8px">
-            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" data-ph="price-min" placeholder="الأدنى">
+            <input type="number" class="price-input" id="pmin" data-t-ph="price-min" data-ph="price-min" placeholder="الأدنى" onchange="applyFilters()" onkeydown="if(event.key==='Enter')applyFilters()">
             <span class="price-sep">—</span>
-            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى">
+            <input type="number" class="price-input" id="pmax" data-t-ph="price-max" data-ph="price-max" placeholder="الأقصى" onchange="applyFilters()" onkeydown="if(event.key==='Enter')applyFilters()">
           </div>
           <input type="range" id="price-range" min="0" max="2000000" step="10000" value="2000000" oninput="updateRange(this.value)">
           <div class="range-labels"><span>0</span><span id="range-val">2,000,000+</span></div>
           <div class="price-divider" aria-hidden="true"></div>
           <div id="price-radios">
-            <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb"><span class="filter-label" data-t="price-r1">أقل من 50,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="50000-150000" class="filter-cb"><span class="filter-label" data-t="price-r2">50,000 — 150,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="150000-500000" class="filter-cb"><span class="filter-label" data-t="price-r3">150,000 — 500,000</span></label>
-            <label class="filter-option"><input type="radio" name="rprice" value="500000-99999999" class="filter-cb"><span class="filter-label" data-t="price-r4">أكثر من 500,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="0-50000" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="price-r1">أقل من 50,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="50000-150000" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="price-r2">50,000 — 150,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="150000-500000" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="price-r3">150,000 — 500,000</span></label>
+            <label class="filter-option"><input type="radio" name="rprice" value="500000-99999999" class="filter-cb" onchange="applyFilters()"><span class="filter-label" data-t="price-r4">أكثر من 500,000</span></label>
           </div>
         </div>
 
@@ -1016,8 +1026,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
         <!-- خيارات أخرى -->
         <div class="filter-section">
           <div class="filter-title" data-t="filter-opts">خيارات أخرى</div>
-          <label class="filter-option"><input type="checkbox" class="filter-cb" id="cb-verified"><span class="filter-label" data-t="f-verified">موثّق فقط</span></label>
-          <label class="filter-option"><input type="checkbox" class="filter-cb" id="cb-pinned"><span class="filter-label" data-t="f-pinned">مميّز فقط</span></label>
+          <label class="filter-option"><input type="checkbox" class="filter-cb" id="cb-verified" onchange="applyFilters()"><span class="filter-label" data-t="f-verified">موثّق فقط</span></label>
+          <label class="filter-option"><input type="checkbox" class="filter-cb" id="cb-pinned" onchange="applyFilters()"><span class="filter-label" data-t="f-pinned">مميّز فقط</span></label>
         </div>
 
         <div class="filters-actions">
@@ -1305,6 +1315,7 @@ function _mapRawAdsToDisplay(rawList){
         seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
         loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
+        createdAt:a.createdAt||a.date||a.updatedAt||'',
         accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
         sellerContact:a.sellerContact||null};
       if(!item.contactsLocked && a.sellerContact){
@@ -1427,6 +1438,7 @@ const TRANSLATIONS = {
     'nav-post':'➕ انشر إعلان','nav-account':'حسابي','nav-home':'الرئيسية','all-cats':'كل الأقسام',
     'filter-title':'تصفية النتائج','filter-cat':'القسم','filter-wilaya':'الولاية','filter-price':'السعر (MRU)',
     'filter-condition':'حالة المنتج','cond-new':'✨ جديد','cond-exc':'⭐ مستعمل — ممتاز','cond-good':'👍 مستعمل — جيد','cond-fix':'🔧 للتصليح',
+    'filter-since':'تاريخ النشر','since-1d':'آخر 24 ساعة','since-7d':'آخر 7 أيام','since-30d':'آخر 30 يوماً',
     'filter-rooms':'عدد الغرف','filter-opts':'خيارات أخرى','btn-clear-mini':'مسح',
     'btn-apply':'تطبيق الفلاتر','btn-reset':'مسح الكل','all-wilayas':'كل الولايات',
     'f-verified':'موثّق فقط','f-pinned':'مميّز فقط',
@@ -1461,6 +1473,7 @@ const TRANSLATIONS = {
     'nav-post':'➕ Publier une annonce','nav-account':'Mon compte','nav-home':'Accueil','all-cats':'Toutes catégories',
     'filter-title':'Filtrer les résultats','filter-cat':'Catégorie','filter-wilaya':'Wilaya','filter-price':'Prix (MRU)',
     'filter-condition':'État','cond-new':'✨ Neuf','cond-exc':'⭐ Occasion — excellent','cond-good':'👍 Occasion — bon','cond-fix':'🔧 À réparer',
+    'filter-since':'Date de publication','since-1d':'Dernières 24 h','since-7d':'7 derniers jours','since-30d':'30 derniers jours',
     'filter-rooms':'Nb. de chambres','filter-opts':'Autres options','btn-clear-mini':'Effacer',
     'btn-apply':'Appliquer','btn-reset':'Tout effacer','all-wilayas':'Toutes les wilayas',
     'f-verified':'Vérifiés seulement','f-pinned':'En vedette seulement',
@@ -1678,8 +1691,17 @@ function applyFilters(){
   const onlyPinned=document.getElementById('cb-pinned').checked;
   const condR=document.querySelector('input[name="rcond"]:checked');
   const selCond=condR?condR.value:'';
+  const sinceR=document.querySelector('input[name="rsince"]:checked');
+  const sinceDays=sinceR?parseInt(sinceR.value,10):0;
+  const sinceMs=sinceDays>0?(Date.now()-(sinceDays*24*60*60*1000)):0;
   const navCat=normalizeCat(document.getElementById('nav-cat-select').value)||urlCat;
   const sortBy=document.getElementById('sort-select').value;
+
+  function adTimeMs(a){
+    const raw=a.createdAt||a.date||'';
+    const t=Date.parse(raw);
+    return Number.isFinite(t)?t:0;
+  }
 
   filtered=ALL_ADS.filter(a=>{
     if(searchText){const q=searchText.toLowerCase();if(!(a.title+a.desc+a.loc+a.seller).toLowerCase().includes(q))return false;}
@@ -1688,6 +1710,7 @@ function applyFilters(){
     if(selSeller&&a.seller!==selSeller)return false;
     if(selWilaya&&a.wilaya!==selWilaya)return false;
     if(selCond&&a.condition!==selCond)return false;
+    if(sinceMs){const ts=adTimeMs(a); if(ts && ts<sinceMs) return false; if(!ts && sinceDays<=7) return false;}
     if(onlyVerified&&!a.verified)return false;
     if(onlyPinned&&!a.pin)return false;
     if(selRooms.length){const ok=selRooms.some(r=>r>=4?a.rooms>=4:a.rooms===r);if(!ok)return false;}
@@ -1698,17 +1721,31 @@ function applyFilters(){
   if(sortBy==='price-asc')filtered.sort((a,b)=>a.priceNum-b.priceNum);
   else if(sortBy==='price-desc')filtered.sort((a,b)=>b.priceNum-a.priceNum);
   else if(sortBy==='pin')filtered.sort((a,b)=>b.pin-a.pin);
+  else filtered.sort((a,b)=>adTimeMs(b)-adTimeMs(a)); // الأحدث افتراضياً
 
   // ── الأولوية الدائمة في النتائج — تصحيح 25/07/2026 ──
-  // باقات "مميّز برزق" (vip_badge) تَعِد بـ"الصدارة الدائمة في النتائج"، لكن
-  // هذا لم يكن يحدث إلا لو اختار الزائر يدوياً ترتيب "مميّز أولاً" من القائمة.
-  // نطبّق الآن فرزاً ثانوياً مستقراً (stable) يرفع كل الإعلانات المميّزة
-  // للأعلى دائماً — أياً كان ترتيب المستخدم المختار — مع الحفاظ على ترتيبه
-  // (سعر/افتراضي) داخل كل مجموعة (مميّز/غير مميّز) لأن Array.sort مستقر.
   filtered.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0));
 
   page=1;
   renderResultList();
+  try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}
+}
+
+function _syncBrowseFiltersToUrl(opts){
+  opts=opts||{};
+  const u=new URL(location.href);
+  const setOrDel=function(k,v){ if(v!=null && v!=='' && v!==Infinity && !(typeof v==='number' && !Number.isFinite(v))) u.searchParams.set(k,String(v)); else u.searchParams.delete(k); };
+  setOrDel('wilaya', opts.selWilaya||'');
+  setOrDel('pmin', (opts.pMin>0)?opts.pMin:'');
+  setOrDel('pmax', (opts.pMax<Infinity && opts.pMax>0)?opts.pMax:'');
+  setOrDel('condition', opts.selCond||'');
+  setOrDel('since', opts.sinceDays||'');
+  setOrDel('verified', opts.onlyVerified?'1':'');
+  setOrDel('pinned', opts.onlyPinned?'1':'');
+  setOrDel('sort', (opts.sortBy && opts.sortBy!=='default')?opts.sortBy:'');
+  if(opts.navCat) setOrDel('cat', opts.navCat);
+  if(opts.selCat) setOrDel('sub', opts.selCat);
+  history.replaceState(null,'',u.pathname+u.search+u.hash);
 }
 
 function renderResultList(){
@@ -2391,6 +2428,7 @@ function resetAllFilters(){
   document.querySelectorAll('input[name="rcat"]').forEach(r=>r.checked=false);
   document.querySelectorAll('input[name="rprice"]').forEach(r=>r.checked=false);
   document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('input[name="rsince"]').forEach(r=>r.checked=false);
   document.querySelectorAll('#rooms-chips .chip').forEach(c=>c.classList.remove('on'));
   const wilaya=document.getElementById('wilaya-select');if(wilaya)wilaya.value='';
   const pmin=document.getElementById('pmin');if(pmin)pmin.value='';
@@ -2410,6 +2448,7 @@ function clearSection(sec){
     const pr=document.getElementById('price-range');if(pr){pr.value=2000000;updateRange(2000000);}
   }
   if(sec==='condition'){document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);}
+  if(sec==='since'){document.querySelectorAll('input[name="rsince"]').forEach(r=>r.checked=false);}
   applyFilters();
 }
 function toggleRoomChip(el){
@@ -2578,7 +2617,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const _pId  = _qp.get('id');
   const _pWilaya = _qp.get('wilaya');
   const _pVerified = _qp.get('verified');
+  const _pPinned = _qp.get('pinned');
   const _pQ = _qp.get('q');
+  const _pMin = _qp.get('pmin');
+  const _pMax = _qp.get('pmax');
+  const _pCond = _qp.get('condition');
+  const _pSince = _qp.get('since');
+  const _pSort = _qp.get('sort');
 
   if(_pQ){
     searchText = decodeURIComponent(_pQ);
@@ -2612,6 +2657,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(_pVerified === '1' || _pVerified === 'true'){
     const cb = document.getElementById('cb-verified');
     if(cb) cb.checked = true;
+  }
+  if(_pPinned === '1' || _pPinned === 'true'){
+    const cb = document.getElementById('cb-pinned');
+    if(cb) cb.checked = true;
+  }
+  if(_pMin){ const el=document.getElementById('pmin'); if(el) el.value=_pMin; }
+  if(_pMax){ const el=document.getElementById('pmax'); if(el) el.value=_pMax; }
+  if(_pCond){
+    const safe=String(_pCond).replace(/"/g,'');
+    const r=document.querySelector('input[name="rcond"][value="'+safe+'"]');
+    if(r) r.checked=true;
+  }
+  if(_pSince){
+    const r=document.querySelector('input[name="rsince"][value="'+String(parseInt(_pSince,10)||'')+'"]');
+    if(r) r.checked=true;
+  }
+  if(_pSort){
+    const sel=document.getElementById('sort-select');
+    if(sel) sel.value=_pSort;
   }
 
   applyFilters();

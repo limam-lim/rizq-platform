@@ -373,9 +373,9 @@ main, .page-content.active, .main-content, .results-area,
   <nav class="sb-nav">
     <div class="sb-section" data-t="sb-section-dashboard">لوحة التحكم</div>
     <div class="sb-item active" data-admin-perm="overview" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-overview">نظرة عامة</span></div>
-    <div class="sb-item" data-admin-perm="users" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge">1,247</span></div>
-    <div class="sb-item" data-admin-perm="ads" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold">50,842</span></div>
-    <div class="sb-item" data-admin-perm="reports" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge">23</span></div>
+    <div class="sb-item" data-admin-perm="users" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge" id="users-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="ads" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold" id="ads-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="reports" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge" id="reports-count-badge" style="display:none">0</span></div>
     <div class="sb-item" id="sb-moderation" data-admin-perm="moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" data-admin-perm="tenders" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" data-admin-perm="payments" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
@@ -397,6 +397,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
     <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
     <div class="sb-item" data-admin-perm="quota-guard" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('unified-review',this)" id="sb-unified-review"><span class="sb-icon">📥</span><span class="sb-label" data-t="sb-unified-review">مراجعة موحدة</span><span class="sb-badge" id="unified-review-badge" style="display:none;background:linear-gradient(135deg,#dc2626,#b91c1c)">0</span></div>
     <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
     <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('special-grant',this)"><span class="sb-icon">🎁</span><span class="sb-label" data-t="sb-special-grant">منح خاص</span></div>
     <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
@@ -1496,6 +1497,19 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <!-- ══ UNIFIED REVIEW QUEUE ══ -->
+    <div class="panel" id="panel-unified-review">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="ur-h">📥 مراجعة موحدة</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="ur-sub">كل الطوابير المعلّقة في مكان واحد — اضغط للانتقال إلى لوحة المعالجة</p>
+        </div>
+        <button type="button" onclick="refreshUnifiedReviewPanel()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔄 تحديث</button>
+      </div>
+      <div id="unified-review-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"></div>
+      <p id="unified-review-empty" style="display:none;text-align:center;color:#94a3b8;padding:36px 12px;font-size:14px">✅ لا توجد عناصر معلّقة حالياً</p>
+    </div>
+
     <!-- ══ ACCOUNTS ══ -->
     <div class="panel" id="panel-accounts">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
@@ -2357,7 +2371,7 @@ const PANEL_PERM_KEYS = {
   packages: 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
-  'quota-guard': 'quota-guard', accounts: 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
+  'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
 };
 
 function _adminHasPerm(required) {
@@ -2649,7 +2663,7 @@ function doLogout(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -2679,6 +2693,7 @@ function showPanel(id, navEl){
   const panel = document.getElementById('panel-'+id);
   if(panel) panel.classList.add('active');
   if(id==='accounts') refreshAccountsPanel();
+  if(id==='unified-review') refreshUnifiedReviewPanel();
   if(id==='special-grant'){ sgInitPanel(); }
   if(id==='moderation') loadModerationPanel();
   if(id==='tenders-mod') renderTendersModPanel();
@@ -4576,13 +4591,18 @@ function refreshOverviewFromBackend(){
     _ovSet('ov-stat-ads-num', String(ads.length));
     _ovSet('ov-stat-users-num', String(approved));
     _ovSet('ov-stat-pending-num', String(digest?digest.pendingAccounts.count:pendingAcc));
-    _ovSet('ov-stat-reports-num', String(reports.filter(function(r){ return r.status!=='resolved'; }).length));
+    var openReports=reports.filter(function(r){ return r.status!=='resolved'; }).length;
+    _ovSet('ov-stat-reports-num', String(openReports));
     _ovSet('ov-stat-subs-num', String(digest?digest.pendingSubRequests.count:0));
     _ovSet('ov-stat-ads-ch', RizqI18n.t2('من الخادم الحقيقي','Données serveur réelles'));
     _ovSet('ov-stat-users-ch', RizqI18n.t2('معتمدون','Approuvés'));
     _ovSet('ov-stat-pending-ch', RizqI18n.t2('راجع تبويب «الحسابات»','Voir l’onglet Comptes'));
     _ovSet('ov-stat-reports-ch', RizqI18n.t2('بلاغات غير مُغلقة','Signalements ouverts'));
     _ovSet('ov-stat-subs-ch', RizqI18n.t2('طلبات دفع/اشتراك','Demandes d’abonnement'));
+    _setSidebarCountBadge('users-count-badge', approved);
+    _setSidebarCountBadge('ads-count-badge', ads.length);
+    _setSidebarCountBadge('reports-count-badge', openReports);
+    if(digest) updateUnifiedReviewBadgeFromDigest(digest);
     window._activityFeedData=[];
     if(digest&&digest.pendingAccounts&&digest.pendingAccounts.items){
       digest.pendingAccounts.items.slice(0,5).forEach(function(a){
@@ -4604,6 +4624,106 @@ function refreshOverviewFromBackend(){
   }).catch(function(){});
 }
 
+function _setSidebarCountBadge(id, count){
+  var badge=document.getElementById(id);
+  if(!badge) return;
+  var n=Number(count)||0;
+  badge.textContent=n>999?(n.toLocaleString('en-US')):String(n);
+  badge.style.display=n>0?'':'none';
+}
+
+function updateUnifiedReviewBadgeFromDigest(digest){
+  if(!digest) return;
+  var total=
+    (digest.pendingAccounts&&digest.pendingAccounts.count||0)+
+    (digest.pendingAds&&digest.pendingAds.count||0)+
+    (digest.pendingSubRequests&&digest.pendingSubRequests.count||0)+
+    (digest.pendingBizContacts&&digest.pendingBizContacts.count||0)+
+    (digest.pendingTenders&&digest.pendingTenders.count||0)+
+    (digest.expiringSoon&&digest.expiringSoon.count||0)+
+    (digest.suspended&&digest.suspended.count||0);
+  _setSidebarCountBadge('unified-review-badge', total);
+}
+
+function openUnifiedReviewTarget(panelId){
+  var nav=document.querySelector('.sb-item[onclick*="showPanel(\''+panelId+'\'"]');
+  if(!nav) nav=document.querySelector('.sb-item[onclick*="showPanel(\\"'+panelId+'\\""]');
+  showPanel(panelId, nav||null);
+}
+
+function refreshUnifiedReviewPanel(){
+  var grid=document.getElementById('unified-review-grid');
+  var empty=document.getElementById('unified-review-empty');
+  if(!grid) return;
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:28px;font-size:13px">'+RizqI18n.t2('جارٍ التحميل…','Chargement…')+'</div>';
+  if(empty) empty.style.display='none';
+
+  var cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
+  var base=(cfg.backendUrl||window.RIZQ_BACKEND_BASE||_adminBackendBase()||'').replace(/\/$/,'');
+  if(!base){
+    grid.innerHTML='';
+    if(empty){
+      empty.style.display='block';
+      empty.textContent=RizqI18n.t2('⚠️ الخادم غير مضبوط — لا يمكن جلب طوابير المراجعة','⚠️ Serveur non configuré — impossible de charger les files');
+    }
+    _setSidebarCountBadge('unified-review-badge', 0);
+    return;
+  }
+
+  fetch(base+'/api/admin/daily-digest',{headers:_adminAuthHeaders()})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(digest){
+      if(!digest||!digest.ok){
+        grid.innerHTML='';
+        if(empty){
+          empty.style.display='block';
+          empty.textContent=RizqI18n.t2('❌ تعذّر جلب الملخص اليومي','❌ Impossible de charger le résumé quotidien');
+        }
+        return;
+      }
+      window._lastDailyDigest=digest;
+      updateUnifiedReviewBadgeFromDigest(digest);
+
+      var cards=[
+        {key:'accounts', icon:'⏳', color:'#f59e0b', count:digest.pendingAccounts&&digest.pendingAccounts.count||0, title:RizqI18n.t2('حسابات معلّقة','Comptes en attente'), panel:'accounts', hint:RizqI18n.t2('موافقة / رفض التسجيل','Approuver / refuser')},
+        {key:'ads', icon:'📋', color:'#3b82f6', count:digest.pendingAds&&digest.pendingAds.count||0, title:RizqI18n.t2('إعلانات معلّقة','Annonces en attente'), panel:'ads', hint:RizqI18n.t2('مراجعة الإعلانات','Modérer les annonces')},
+        {key:'subs', icon:'💳', color:'#8b5cf6', count:digest.pendingSubRequests&&digest.pendingSubRequests.count||0, title:RizqI18n.t2('طلبات اشتراك','Demandes d’abonnement'), panel:'payments', hint:RizqI18n.t2('مدفوعات وباقات','Paiements et forfaits')},
+        {key:'biz', icon:'📞', color:'#06b6d4', count:digest.pendingBizContacts&&digest.pendingBizContacts.count||0, title:RizqI18n.t2('طلبات تواصل أعمال','Contacts pro'), panel:'promo-video', hint:RizqI18n.t2('طلبات فيديو/إعلان','Demandes vidéo/pub')},
+        {key:'tenders', icon:'📄', color:'#10b981', count:digest.pendingTenders&&digest.pendingTenders.count||0, title:RizqI18n.t2('مناقصات معلّقة','Appels d’offres'), panel:'tenders-mod', hint:RizqI18n.t2('مراقبة المناقصات','Modération AO')},
+        {key:'expiring', icon:'⏰', color:'#ef4444', count:digest.expiringSoon&&digest.expiringSoon.count||0, title:RizqI18n.t2('باقات قاربت الانتهاء','Forfaits bientôt expirés'), panel:'quota-guard', hint:RizqI18n.t2('مراقبة الاستهلاك','Suivi consommation')},
+        {key:'suspended', icon:'🚫', color:'#64748b', count:digest.suspended&&digest.suspended.count||0, title:RizqI18n.t2('باقات معلّقة','Forfaits suspendus'), panel:'quota-guard', hint:RizqI18n.t2('إعادة التفعيل','Réactivation')}
+      ];
+
+      var pendingCards=cards.filter(function(c){ return c.count>0; });
+      if(!pendingCards.length){
+        grid.innerHTML='';
+        if(empty){
+          empty.style.display='block';
+          empty.textContent=RizqI18n.t2('✅ لا توجد عناصر معلّقة حالياً','✅ Aucun élément en attente pour le moment');
+        }
+        return;
+      }
+      if(empty) empty.style.display='none';
+      grid.innerHTML=pendingCards.map(function(c){
+        return '<button type="button" data-ur-panel="'+c.panel+'" onclick="openUnifiedReviewTarget(this.getAttribute(\'data-ur-panel\'))" style="text-align:inherit;cursor:pointer;border:1px solid rgba(27,58,107,.12);background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 4px 14px rgba(15,35,65,.04);font-family:inherit;display:flex;flex-direction:column;gap:8px">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+          +'<span style="font-size:22px">'+c.icon+'</span>'
+          +'<span style="background:'+c.color+';color:#fff;font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;min-width:28px;text-align:center">'+c.count+'</span>'
+          +'</div>'
+          +'<div style="font-size:15px;font-weight:800;color:var(--navy)">'+c.title+'</div>'
+          +'<div style="font-size:12px;color:#64748b">'+c.hint+'</div>'
+          +'</button>';
+      }).join('');
+    })
+    .catch(function(){
+      grid.innerHTML='';
+      if(empty){
+        empty.style.display='block';
+        empty.textContent=RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur');
+      }
+    });
+}
+
 function initDashboard(){
   loadUsersAdminPanel();
   loadDeactivationRequestsPanel();
@@ -4613,6 +4733,7 @@ function initDashboard(){
     if(changed){ updatePendingBadge(); renderPendingAccounts(); }
   });
   refreshOverviewFromBackend();
+  refreshUnifiedReviewPanel();
   renderPayments(PAYMENTS_DATA);
   renderTeam();
   renderCatDist();
