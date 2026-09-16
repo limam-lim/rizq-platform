@@ -65,32 +65,36 @@ body{
 .nav-home-link:hover{background:rgba(201,168,76,.1);color:var(--gold);border-color:rgba(201,168,76,.55)}
 .nav-right{display:flex;align-items:center;gap:10px}
 
-/* ══ HERO — دفتر عروض تنفيذي: كحلي داكن + خطوط ذهبية دقيقة + نسيج شبكي خفيف ══ */
+/* ══ HERO — مضغوط: كحلي + معلومات/أزرار واضحة بدون فراغ شاسع ══ */
 .hero{
-  position:relative;overflow:hidden;
-  padding:56px 5% 40px;text-align:center;
+  position:relative;overflow:hidden;min-height:0;height:auto;
+  padding:28px 5% 22px;text-align:center;
   background:
-    radial-gradient(720px 320px at 18% 0%, rgba(201,168,76,.16), transparent 60%),
-    radial-gradient(900px 420px at 100% 100%, rgba(201,168,76,.08), transparent 55%),
+    radial-gradient(520px 220px at 18% 0%, rgba(201,168,76,.14), transparent 62%),
     linear-gradient(150deg,#0a1730,#16294f 55%,#0a1626);
 }
 .hero::before{
-  content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;
   background-image:
-    linear-gradient(rgba(201,168,76,.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,.06) 1px, transparent 1px);
+    linear-gradient(rgba(201,168,76,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.05) 1px, transparent 1px);
   background-size:34px 34px;
-  mask-image:radial-gradient(760px 380px at 50% 20%, #000 10%, transparent 78%);
+  mask-image:radial-gradient(640px 280px at 50% 20%, #000 10%, transparent 78%);
 }
-.hero-eyebrow{position:relative;display:inline-flex;align-items:center;gap:9px;font-size:10.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:16px;opacity:0;animation:heroUp .7s .05s ease forwards}
+.hero-eyebrow{position:relative;display:inline-flex;align-items:center;gap:9px;font-size:10.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:10px;opacity:0;animation:heroUp .7s .05s ease forwards}
 .hero-eyebrow::before,.hero-eyebrow::after{content:'';width:22px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.75))}
 .hero-eyebrow::after{background:linear-gradient(90deg,rgba(201,168,76,.75),transparent)}
-.hero h1{position:relative;font-family:'Amiri',Georgia,serif;color:#fff;font-size:clamp(28px,4.4vw,42px);font-weight:700;margin-bottom:14px;letter-spacing:.2px;opacity:0;animation:heroUp .7s .15s ease forwards}
+.hero h1{position:relative;font-family:'Amiri',Georgia,serif;color:#fff;font-size:clamp(24px,3.6vw,34px);font-weight:700;margin-bottom:8px;letter-spacing:.2px;opacity:0;animation:heroUp .7s .15s ease forwards}
 .hero h1 span{color:var(--gold);position:relative}
-.hero p{position:relative;color:rgba(232,237,245,.72);font-size:14px;line-height:1.85;max-width:600px;margin:0 auto 26px;opacity:0;animation:heroUp .7s .25s ease forwards}
-.hero-cta{position:relative;display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:13px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;font-weight:800;font-size:14.5px;border:none;cursor:pointer;font-family:inherit;box-shadow:0 12px 28px rgba(201,168,76,.28), inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s,box-shadow .2s;opacity:0;animation:heroUp .7s .35s ease forwards}
-.hero-cta:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(201,168,76,.38), inset 0 1px 0 rgba(255,255,255,.4)}
+.hero p{position:relative;color:rgba(232,237,245,.72);font-size:13.5px;line-height:1.7;max-width:640px;margin:0 auto 14px;opacity:0;animation:heroUp .7s .25s ease forwards}
+.hero-pills{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 16px;max-width:720px;opacity:0;animation:heroUp .7s .3s ease forwards}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.88);background:rgba(255,255,255,.08);border:1px solid rgba(201,168,76,.28)}
+.hero-actions{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;opacity:0;animation:heroUp .7s .35s ease forwards}
+.hero-cta{display:inline-flex;align-items:center;gap:9px;padding:12px 22px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:inherit;text-decoration:none;box-shadow:0 10px 22px rgba(201,168,76,.28), inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s,box-shadow .2s}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(201,168,76,.38)}
 .hero-cta:active{transform:translateY(0)}
+.hero-cta.secondary{background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(201,168,76,.45);box-shadow:none}
+.hero-cta.secondary:hover{background:rgba(201,168,76,.16);box-shadow:0 8px 18px rgba(0,0,0,.2)}
 /* شريط نشر المناقصة — يبقى ظاهراً عند التمرير بعد إخفاء topnav */
 .tender-cta-strip{
   position:sticky;top:var(--rizq-header-h,0);z-index:44;
@@ -102,12 +106,24 @@ body{
   display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
 }
 .tender-cta-strip .tcs-label{font-size:13px;font-weight:700;color:#1B3A6B}
+.tender-cta-strip .tcs-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tender-cta-strip .tcs-btn{
   display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:11px;
   background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;
   font-size:13.5px;font-weight:800;border:none;cursor:pointer;font-family:inherit;
   text-decoration:none;box-shadow:0 6px 16px rgba(201,168,76,.28);
 }
+.tender-cta-strip .tcs-btn.ghost{
+  background:#fff;color:#1B3A6B;border:1.5px solid rgba(27,58,107,.22);box-shadow:none;
+}
+.tender-cta-strip .tcs-btn.ghost:hover{border-color:rgba(201,168,76,.55);background:#fffaf0}
+/* باقات غرفة المناقصات */
+.tender-pkg-section{padding:36px 5% 48px;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3}
+.tender-pkg-head{text-align:center;margin-bottom:24px;max-width:720px;margin-left:auto;margin-right:auto}
+.tender-pkg-head .eyebrow{font-size:11px;letter-spacing:2px;color:#C9A84C;font-weight:800;text-transform:uppercase;margin-bottom:8px}
+.tender-pkg-head h2{font-size:clamp(20px,3vw,28px);font-weight:800;color:#1B3A6B;margin:0 0 8px}
+.tender-pkg-head p{font-size:13.5px;color:#5b6b8a;line-height:1.7;margin:0}
+.tender-pkg-grid{max-width:1100px;margin:0 auto}
 @keyframes heroUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 /* ══ CONTENT ══ */
@@ -162,10 +178,17 @@ body{
 .t-access-banner{margin:0 0 16px;padding:12px 16px;border-radius:12px;font-size:12.5px;line-height:1.65;font-weight:600}
 .t-access-banner.info{background:#eff6ff;border:1.5px solid #bfdbfe;color:#1e40af}
 .t-access-banner.warn{background:#fffbeb;border:1.5px solid #fcd34d;color:#92400e}
-.t-empty{text-align:center;padding:70px 20px;background:#fff;border-radius:18px;border:1.5px dashed var(--line);grid-column:1/-1}
-.t-empty .emo-ring{width:74px;height:74px;border-radius:50%;border:1.5px dashed rgba(201,168,76,.55);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;background:rgba(201,168,76,.06)}
-.t-empty .emo{font-size:30px}
+.t-empty{text-align:center;padding:36px 20px;background:#fff;border-radius:18px;border:1.5px dashed var(--line);grid-column:1/-1}
+.t-empty .emo-ring{width:64px;height:64px;border-radius:50%;border:1.5px dashed rgba(201,168,76,.55);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;background:rgba(201,168,76,.06)}
+.t-empty .emo{font-size:26px}
 .t-empty p{color:var(--ink-soft);font-size:14px;font-weight:600}
+.t-empty .t-empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.t-empty .t-empty-actions a,.t-empty .t-empty-actions button{
+  display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:11px;font-size:13px;font-weight:800;
+  font-family:inherit;cursor:pointer;text-decoration:none;border:none;
+}
+.t-empty .tea-primary{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A}
+.t-empty .tea-secondary{background:#eff3ff;color:#1B3A6B;border:1px solid #bfcfef!important}
 
 /* ── Modal (نشر مناقصة / تقديم عرض) ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(9,15,28,.66);backdrop-filter:blur(3px);z-index:1500;display:none;align-items:flex-start;justify-content:center;padding:36px 16px;overflow-y:auto}
@@ -218,15 +241,28 @@ body{
 
 <section class="hero">
   <div class="hero-eyebrow" data-t-fr="Marché B2B privé · Mauritanie">سوق أعمال خاص · موريتانيا</div>
-  <h1 data-t-fr="Les appels d'offres">المنـاقصـات</h1>
-  <p data-t-fr="Publiez votre besoin (matériaux, services, équipements...) et recevez des offres de prix privées de commerçants réels — ou proposez votre propre offre sur les appels d'offres ouverts.">انشر احتياجك (مواد، خدمات، معدات...) واستقبل عروض أسعار خاصة من تجار حقيقيين — أو قدّم عرضك على المناقصات المفتوحة.</p>
-  <button class="hero-cta" onclick="openPostModal()" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</button>
+  <h1 data-t-fr="Salle des appels d'offres">غرفة المناقصات</h1>
+  <p data-t-fr="Publiez votre besoin et recevez des devis privés de commerçants réels — ou soumissionnez sur les appels d'offres ouverts. Consultation gratuite ; contacts et offres derrière un abonnement.">انشر احتياجك واستقبل عروض أسعار خاصة من تجار حقيقيين — أو قدّم عرضك على المناقصات المفتوحة. التصفح مجاني؛ التواصل والعروض خلف اشتراك.</p>
+  <div class="hero-pills">
+    <span class="hero-pill" data-t-fr="🔍 Consultation gratuite">🔍 تصفّح مجاني</span>
+    <span class="hero-pill" data-t-fr="🔒 Contacts derrière abonnement">🔒 تواصل خلف اشتراك</span>
+    <span class="hero-pill" data-t-fr="📝 Offres illimitées (mensuel+)">📝 عروض غير محدودة (شهرية+)</span>
+    <span class="hero-pill" data-t-fr="🏢 B2B privé">🏢 سوق B2B خاص</span>
+  </div>
+  <div class="hero-actions">
+    <button class="hero-cta" onclick="openPostModal()" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</button>
+    <a class="hero-cta secondary" href="#tender-packages" data-t-fr="💼 Voir les forfaits">💼 باقات الغرفة</a>
+    <a class="hero-cta secondary" href="rizq_landing_v8.html?openRegister=1" data-t-fr="✨ Créer un compte">✨ سجّل حساباً</a>
+  </div>
 </section>
 
 <div class="tender-cta-strip" role="navigation" aria-label="نشر مناقصة">
   <div class="tender-cta-strip-inner">
     <span class="tcs-label" data-t-fr="Publiez votre besoin et recevez des devis privés">انشر احتياجك واستقبل عروض أسعار خاصة</span>
-    <button type="button" class="tcs-btn" onclick="openPostModal()" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</button>
+    <div class="tcs-actions">
+      <a class="tcs-btn ghost" href="#tender-packages" data-t-fr="💼 Forfaits">💼 الباقات</a>
+      <button type="button" class="tcs-btn" onclick="openPostModal()" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</button>
+    </div>
   </div>
 </div>
 
@@ -236,6 +272,15 @@ body{
   <div id="t-access-banner"></div>
   <div class="t-grid" id="t-grid"></div>
 </div>
+
+<section class="tender-pkg-section" id="tender-packages">
+  <div class="tender-pkg-head">
+    <div class="eyebrow" data-t-fr="Rizq Tenders — Forfaits">Rizq Tenders — باقات الغرفة</div>
+    <h2 data-t-fr="Débloquez les contacts et les soumissions">افتح التواصل وتقديم العروض</h2>
+    <p data-t-fr="Essai gratuit pour parcourir. Mensuel et plus pour révéler les contacts et soumettre des offres sans limite.">تجربة مجانية للتصفّح. الشهرية فأعلى لكشف بيانات التواصل وتقديم عروض بلا حدود.</p>
+  </div>
+  <div class="tender-pkg-grid" id="tender-packages-grid" data-rizq-pkg-catalog="tender" data-rizq-pkg-cols="4"></div>
+</section>
 
 <!-- ══ FOOTER (نفس تصميم بقية صفحات المنصة) ══ -->
 <footer class="rizq-footer">
@@ -395,6 +440,8 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#16263d;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:3000;max-width:90vw;text-align:center"></div>
 
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_packages_config.js?v=13.4"></script>
+<script src="rizq_packages_ui.js?v=13.1"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script>
@@ -571,11 +618,14 @@ function renderTenders(){
     if(_tenderAccess.contactsUnlocked){
       bannerEl.innerHTML = '<div class="t-access-banner info">✅ '+(fr?'Votre abonnement est actif — contacts débloqués et soumission d\'offres activée.':'اشتراكك فعّال — بيانات التواصل مكشوفة ويمكنك تقديم العروض.')+'</div>';
     } else if(_tenderAccess.isTrial){
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. Les contacts restent masqués et la soumission est verrouillée.':'باقتك التجريبية فعّالة — للتصفّح فقط. التواصل مخفي وتقديم العروض مقفول.')+'</div>';
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. ':'باقتك التجريبية فعّالة — للتصفّح فقط. ')
+        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'Voir les forfaits →':'عرض الباقات ←')+'</a></div>';
     } else if(!_getSession()){
-      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — abonnez-vous pour débloquer les contacts et soumettre des offres.':'تصفّح مجاني — اشترك لكشف التواصل وتقديم العروض.')+'</div>';
+      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — ':'تصفّح مجاني — ')
+        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'abonnez-vous pour débloquer contacts et offres →':'اشترك لكشف التواصل وتقديم العروض ←')+'</a></div>';
     } else {
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis pour débloquer les contacts et soumettre des offres.':'يلزم اشتراك مدفوع لكشف التواصل وتقديم العروض.')+'</div>';
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis — ':'يلزم اشتراك مدفوع — ')
+        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'voir les forfaits →':'عرض الباقات ←')+'</a></div>';
     }
   }
 
@@ -590,7 +640,12 @@ function renderTenders(){
     : (_tenders.length + ' مناقصة مفتوحة');
 
   if(!_tenders.length){
-    grid.innerHTML = '<div class="t-empty"><div class="emo-ring"><div class="emo">📋</div></div><p>'+(fr?'Aucun appel d\'offres dans cette catégorie pour le moment.':'لا توجد مناقصات في هذه الفئة حالياً.')+'</p></div>';
+    grid.innerHTML = '<div class="t-empty"><div class="emo-ring"><div class="emo">📋</div></div>'
+      + '<p>'+(fr?'Aucun appel d\'offres dans cette catégorie pour le moment.':'لا توجد مناقصات في هذه الفئة حالياً.')+'</p>'
+      + '<div class="t-empty-actions">'
+      + '<button type="button" class="tea-primary" onclick="openPostModal()">'+(fr?'+ Publier un appel d\'offres':'+ انشر مناقصتك')+'</button>'
+      + '<a class="tea-secondary" href="#tender-packages">'+(fr?'💼 Voir les forfaits':'💼 باقات الغرفة')+'</a>'
+      + '</div></div>';
     return;
   }
 
@@ -872,6 +927,9 @@ function applyLang(){
   if (discCopy) discCopy.textContent = l === 'fr' ? 'Rizq Platform · Mauritanie ©' : 'Rizq Platform · موريتانيا ©';
   renderCatChips();
   renderTenders();
+  if (window.RizqPackagesUI && typeof RizqPackagesUI.mount === 'function') {
+    try { RizqPackagesUI.mount('tender-packages-grid', 'tender', { columns: 4, lang: l }); } catch (ePkg) {}
+  }
   try {
     document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: l } }));
   } catch (eEv) {}
