@@ -105,8 +105,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .sss-cart .sss-count{background:#0D1B2A;color:#E8C96A}
 .sss-count[hidden],.sss-count.is-empty{display:none!important}
 
-/* ====== HERO — قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
-.store-hero{position:relative;min-height:auto;overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#2a3a1f 0%,#1B3A6B 38%,#0D1B2A 100%);display:flex;flex-direction:column;justify-content:center}
+/* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
+.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#2a3a1f 0%,#1B3A6B 38%,#0D1B2A 100%);display:flex;flex-direction:column;justify-content:center}
 .store-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.22) 8deg,transparent 20deg,transparent 340deg,rgba(232,201,106,.14) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
 .hero-pattern{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 18% 30%,rgba(201,168,76,.16) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(27,58,107,.35) 0%,transparent 45%)}
 .store-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#E8C96A;box-shadow:0 0 8px 2px rgba(232,201,106,.8);animation:rzStGlint 3.4s ease-in-out infinite}
@@ -117,9 +117,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .store-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
 @keyframes rzStGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
 .store-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(201,168,76,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.16) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55;z-index:0}
-.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:42px 20px 28px;width:100%;box-sizing:border-box}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
 .store-profile{display:flex;align-items:center;gap:32px;max-width:920px;width:100%;position:relative;z-index:1}
-.store-logo-wrap{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite}
+.store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite}
 @keyframes rzStPulse{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.16),0 0 40px rgba(201,168,76,.55),0 8px 20px rgba(0,0,0,.5)}}
 .store-info{flex:1;min-width:0;text-align:right}
 .store-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#E8C96A;margin-bottom:8px;display:block}
@@ -135,7 +135,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .badge-pickup{background:rgba(27,58,107,.4);color:#7aa0e0;border:1px solid rgba(122,160,224,.35)}
 .store-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzStBounce 2s ease-in-out infinite}
 @keyframes rzStBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
-@media(max-width:640px){.store-hero .hero-floor{display:none}}
+@media(max-width:640px){.store-hero{min-height:clamp(240px,48vh,320px)}.hero-cover{padding:40px 16px 32px}.store-logo-wrap{width:76px;height:76px;font-size:34px}.store-hero .hero-floor{display:none}}
 @media(max-width:900px){.store-profile{flex-direction:column;text-align:center}.store-info{text-align:center}.store-badges,.store-meta{justify-content:center}}
 
 
@@ -518,9 +518,9 @@ footer{
   .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
-  .store-hero{height:auto;min-height:0;padding:0;overflow:visible}
-  .hero-cover{padding:32px 16px 22px}
-  .store-logo-wrap{width:84px;height:84px;font-size:36px;border-radius:16px}
+  .store-hero{height:auto;min-height:clamp(240px,48vh,320px);padding:0;overflow:hidden}
+  .hero-cover{padding:40px 16px 32px}
+  .store-logo-wrap{width:76px;height:76px;font-size:34px;border-radius:50%}
   .store-name{font-size:22px}
   .store-tagline{font-size:13px}
   .store-profile{flex-direction:column;text-align:center;gap:14px;padding:12px 16px}

@@ -53,8 +53,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 @media(max-width:900px){.nav-disclaimer{max-width:180px;font-size:10px}}
 @media(max-width:768px){.nav-disclaimer{display:none}}
 
-/* ── HERO: واجهة درامية "افتتاح معرض" — الأكثر اختلافاً عن صفحات المحلات ── */
-.showroom-hero{position:relative;min-height:auto;overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+/* ── HERO: واجهة درامية "افتتاح معرض" — قياسات موحّدة للمراكز ── */
+.showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
 .hero-beams{position:absolute;inset:0;background:
   conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.16) 8deg,transparent 20deg,transparent 340deg,rgba(201,168,76,.1) 352deg,transparent 360deg);
   mix-blend-mode:screen;pointer-events:none}
@@ -71,9 +71,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   background-size:64px 40px;
   -webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);
   transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
-.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:42px 20px 28px}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
 .showroom-profile{display:flex;align-items:center;gap:32px;max-width:920px;width:100%}
-.showroom-logo{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.35),rgba(27,58,107,.5) 70%);border:2px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5);animation:rzPulseRing 3s ease-in-out infinite}
+.showroom-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.35),rgba(27,58,107,.5) 70%);border:2px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5);animation:rzPulseRing 3s ease-in-out infinite}
 @keyframes rzPulseRing{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.14),0 0 40px rgba(201,168,76,.5),0 8px 20px rgba(0,0,0,.5)}}
 .showroom-info{flex:1}
 .showroom-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:8px;display:block}
@@ -92,7 +92,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
 .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzBounce 2s ease-in-out infinite}
 @keyframes rzBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
-@media(max-width:640px){.showroom-hero{min-height:auto}.hero-floor{display:none}}
+@media(max-width:640px){.showroom-hero{min-height:clamp(240px,48vh,320px)}.hero-cover{padding:40px 16px 32px}.showroom-logo{width:76px;height:76px;font-size:34px}.hero-floor{display:none}}
 
 
 
@@ -241,7 +241,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
       </div>
     </a>
     <div class="nav-links">
-      <button class="nav-link" onclick="rizqScroll('catalog-section')" id="nav-catalog-lbl">🚗 الكتالوج</button>
+      <button class="nav-link" onclick="rizqScroll('catalog-section')" id="nav-catalog-lbl">📦 الكتالوج</button>
       <button class="nav-link" onclick="rizqScroll('about-section')" id="nav-about-lbl">من نحن</button>
       <button class="nav-link" onclick="rizqScroll('reviews-section')" id="nav-reviews-lbl">التقييمات</button>
       <button class="nav-link" onclick="rizqScroll('info-section')" id="nav-info-lbl">معلومات المعرض</button>
@@ -260,11 +260,11 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
   <div class="hero-cover">
     <div class="showroom-profile">
-      <div class="showroom-logo" id="showroom-logo">🚗</div>
+      <div class="showroom-logo" id="showroom-logo">🏛️</div>
       <div class="showroom-info">
         <span class="showroom-eyebrow" id="showroom-eyebrow">✨ RIZQ SHOWROOMS</span>
         <div class="showroom-name" id="showroom-name">معرض الريادة</div>
-        <div class="showroom-tagline" id="showroom-tagline">Al-Riyada Showroom — سيارات ومعدات متميزة</div>
+        <div class="showroom-tagline" id="showroom-tagline">Al-Riyada Showroom — عروض ومعدات متميزة</div>
         <div class="showroom-meta">
           <span class="meta-item">📍 <span id="showroom-city">نواكشوط، موريتانيا</span></span>
           <span class="meta-item">📅 <span id="showroom-since">عضو منذ 2024</span></span>
@@ -311,7 +311,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 <!-- روابط أقسام المعرض — لا تُخفى مع topnav على الجوال -->
 <div class="page-sec-strip" role="navigation" aria-label="أقسام المعرض">
   <div class="page-sec-strip-inner">
-    <button type="button" class="page-sec-btn" onclick="rizqScroll('catalog-section')" id="sec-catalog-lbl">🚗 الكتالوج</button>
+    <button type="button" class="page-sec-btn" onclick="rizqScroll('catalog-section')" id="sec-catalog-lbl">📦 الكتالوج</button>
     <button type="button" class="page-sec-btn" onclick="rizqScroll('about-section')" id="sec-about-lbl">من نحن</button>
     <button type="button" class="page-sec-btn" onclick="rizqScroll('reviews-section')" id="sec-reviews-lbl">التقييمات</button>
     <button type="button" class="page-sec-btn" onclick="rizqScroll('info-section')" id="sec-info-lbl">معلومات المعرض</button>
@@ -806,7 +806,7 @@ function applyAccountData(){
     _iaEl.setAttribute('data-acc','1');
   }
   if(_acc.logo_emoji || _acc.logo)
-    document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏪';
+    document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏛️';
   if(_acc.desc || _acc.about){
     var _atEl = document.getElementById('about-text');
     _atEl.textContent = _acc.desc || _acc.about;
@@ -830,7 +830,7 @@ function openShowroomChat(){
     sellerName: name,
     adTitle   : _t('رسالة للمعرض','Message au showroom'),
     adId      : _showroomId,
-    adEmoji   : '🚗'
+    adEmoji   : '🏛️'
   });
 }
 
@@ -842,7 +842,7 @@ function openItemChat(itemId, itemName){
     sellerName: name,
     adTitle   : itemName || _t('استفسار عن عرض','Demande sur article'),
     adId      : itemId || _showroomId,
-    adEmoji   : '🚗'
+    adEmoji   : '🏛️'
   });
 }
 
@@ -942,7 +942,7 @@ function applyLang(){
     _discPill.textContent = isFr ? '⚖️ Avis juridique' : '⚖️ إشعار قانوني';
   }
   // Nav
-  document.getElementById('nav-catalog-lbl').textContent = isFr ? '🚗 Catalogue' : '🚗 الكتالوج';
+  document.getElementById('nav-catalog-lbl').textContent = isFr ? '📦 Catalogue' : '📦 الكتالوج';
   document.getElementById('nav-about-lbl').textContent   = isFr ? 'À propos' : 'من نحن';
   document.getElementById('nav-reviews-lbl').textContent = isFr ? 'Avis' : 'التقييمات';
   document.getElementById('nav-info-lbl').textContent    = isFr ? 'Infos showroom' : 'معلومات المعرض';
@@ -950,7 +950,7 @@ function applyLang(){
   var secAbout = document.getElementById('sec-about-lbl');
   var secRev = document.getElementById('sec-reviews-lbl');
   var secInfo = document.getElementById('sec-info-lbl');
-  if (secCat) secCat.textContent = isFr ? '🚗 Catalogue' : '🚗 الكتالوج';
+  if (secCat) secCat.textContent = isFr ? '📦 Catalogue' : '📦 الكتالوج';
   if (secAbout) secAbout.textContent = isFr ? 'À propos' : 'من نحن';
   if (secRev) secRev.textContent = isFr ? 'Avis' : 'التقييمات';
   if (secInfo) secInfo.textContent = isFr ? 'Infos showroom' : 'معلومات المعرض';
@@ -1002,7 +1002,7 @@ function applyLang(){
   }
   var _ss=document.getElementById('showroom-since'); if(_ss) _ss.textContent=isFr?'Membre depuis 2024':'عضو منذ 2024';
   var _sc2=document.getElementById('showroom-city'); if(_sc2&&!_sc2.hasAttribute('data-acc')) _sc2.textContent=isFr?'Nouakchott, Mauritanie':'نواكشوط، موريتانيا';
-  var _stag=document.getElementById('showroom-tagline'); if(_stag&&!_stag.hasAttribute('data-acc')) _stag.textContent=isFr?'Al-Riyada Showroom — Voitures & équipements':'Al-Riyada Showroom — سيارات ومعدات متميزة';
+  var _stag=document.getElementById('showroom-tagline'); if(_stag&&!_stag.hasAttribute('data-acc')) _stag.textContent=isFr?'Al-Riyada Showroom — Offres & équipements':'Al-Riyada Showroom — عروض ومعدات متميزة';
   // ── Demo showroom name / address / about / tags (were never translated — real AR leak) ──
   var _snm=document.getElementById('showroom-name'); if(_snm&&!_snm.hasAttribute('data-acc')) _snm.textContent=isFr?'Showroom Al-Riyada':'معرض الريادة';
   var _iad=document.getElementById('info-address'); if(_iad&&!_iad.hasAttribute('data-acc')) _iad.textContent=isFr?"Quartier Toujounine, Rue de l'Indépendance — Nouakchott":'حي التوجين، شارع الاستقلال — نواكشوط';

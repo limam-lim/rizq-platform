@@ -147,8 +147,8 @@ a{text-decoration:none;color:inherit}
 }
 .nav-lang-btn:hover{background:rgba(201,168,76,.15)}
 
-/* ════════ HERO — قياسات المعارض + هوية المكاتب (ثقة / خدمات / تركواز) ════════ */
-.office-hero{position:relative;min-height:auto;overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#134e6f 0%,#0F2347 42%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+/* ════════ HERO — نفس قياسات المعارض + هوية المكاتب (ثقة / خدمات / تركواز) ════════ */
+.office-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#134e6f 0%,#0F2347 42%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
 .office-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(14,116,144,.22) 8deg,transparent 20deg,transparent 340deg,rgba(201,168,76,.12) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
 .office-hero .hero-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 30%,rgba(14,116,144,.18) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(201,168,76,.1) 0%,transparent 45%)}
 .office-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#67e8f9;box-shadow:0 0 8px 2px rgba(103,232,249,.7);animation:rzOfGlint 3.4s ease-in-out infinite}
@@ -159,9 +159,9 @@ a{text-decoration:none;color:inherit}
 .office-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
 @keyframes rzOfGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
 .office-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(14,116,144,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(14,116,144,.18) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
-.office-hero .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:42px 20px 28px}
+.office-hero .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
 .office-profile{display:flex;align-items:center;gap:32px;max-width:920px;width:100%}
-.office-logo{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(103,232,249,.35),rgba(15,35,71,.55) 70%);border:2px solid rgba(14,116,144,.65);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5);animation:rzOfPulse 3s ease-in-out infinite}
+.office-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(103,232,249,.35),rgba(15,35,71,.55) 70%);border:2px solid rgba(14,116,144,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5);animation:rzOfPulse 3s ease-in-out infinite}
 @keyframes rzOfPulse{0%,100%{box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(14,116,144,.18),0 0 40px rgba(14,116,144,.5),0 8px 20px rgba(0,0,0,.5)}}
 .office-info{flex:1;min-width:0}
 .office-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#67e8f9;margin-bottom:8px;display:block}
@@ -178,7 +178,7 @@ a{text-decoration:none;color:inherit}
 .badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
 .office-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(103,232,249,.55);font-size:20px;animation:rzOfBounce 2s ease-in-out infinite}
 @keyframes rzOfBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
-@media(max-width:640px){.office-hero .hero-floor{display:none}}
+@media(max-width:640px){.office-hero{min-height:clamp(240px,48vh,320px)}.office-hero .hero-cover{padding:40px 16px 32px}.office-logo{width:76px;height:76px;font-size:34px}.office-hero .hero-floor{display:none}}
 @media(max-width:900px){.office-profile{flex-direction:column;text-align:center}.office-badges,.office-meta{justify-content:center}}
 
 /* legacy ids kept for JS — visually unused */
