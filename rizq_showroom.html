@@ -72,10 +72,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   -webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);
   transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
 .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
-.showroom-profile{display:flex;align-items:center;gap:32px;max-width:920px;width:100%}
+.showroom-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:920px;width:auto}
 .showroom-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.35),rgba(27,58,107,.5) 70%);border:2px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5);animation:rzPulseRing 3s ease-in-out infinite}
 @keyframes rzPulseRing{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.14),0 0 40px rgba(201,168,76,.5),0 8px 20px rgba(0,0,0,.5)}}
-.showroom-info{flex:1}
+.showroom-info{flex:0 1 auto;min-width:0;text-align:start}
 .showroom-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:8px;display:block}
 .showroom-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;
   background:linear-gradient(100deg,#fff 30%,#F5DFA0 45%,#C9A84C 50%,#F5DFA0 55%,#fff 70%);
