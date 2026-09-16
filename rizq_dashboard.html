@@ -428,9 +428,9 @@ main, .page-content.active, .main-content, .results-area,
     <div style="display:flex;align-items:center;gap:10px">
       <div class="user-av" id="dash-user-av"></div>
       <div class="user-info">
-        <div class="user-name">—</div>
-        <div class="user-badge">✅ موثّق</div>
-        <div class="user-plan">خطة: مجانية</div>
+        <div class="user-name" id="dash-user-name">—</div>
+        <div class="user-badge" id="dash-user-badge">—</div>
+        <div class="user-plan" id="dash-user-plan">—</div>
       </div>
     </div>
   </div>
@@ -498,7 +498,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="stats-grid">
         <div class="stat-card views"><div class="stat-icon">👁</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-views">إجمالي المشاهدات</div><div class="stat-change">—</div></div>
         <div class="stat-card contacts"><div class="stat-icon">📞</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-contacts">تواصل مع إعلاناتك</div><div class="stat-change">—</div></div>
-        <div class="stat-card favs"><div class="stat-icon">♥</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-saved">حفظ في المفضلة</div><div class="stat-change">—</div></div>
+        <div class="stat-card favs"><div class="stat-icon">♥</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-wishlist">قائمة أمنياتي</div><div class="stat-change">—</div></div>
         <div class="stat-card balance"><div class="stat-icon">⭐</div><div class="stat-num">0</div><div class="stat-label" data-t="stat-ads">إعلانات نشطة</div><div class="stat-change">—</div></div>
       </div>
 
@@ -652,16 +652,16 @@ main, .page-content.active, .main-content, .results-area,
           <button class="btn-save" data-t="btn-save-changes" onclick="saveProfile()">💾 حفظ التغييرات</button>
         </div>
         <div class="settings-card">
-          <div class="settings-card-title">📊 إحصائيات الحساب</div>
+          <div class="settings-card-title" data-t="profile-account-stats">📊 إحصائيات الحساب</div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)">عضو منذ</span><span style="font-size:13px;font-weight:700">مارس 2023</span></div>
-            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)">التقييم</span><span style="font-size:13px;font-weight:700;color:#fbbf24">★★★★☆ (48)</span></div>
-            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)">إجمالي الإعلانات</span><span style="font-size:13px;font-weight:700">23 إعلان</span></div>
-            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)">الحالة</span><span style="font-size:13px;font-weight:700;color:var(--green)">✅ موثّق</span></div>
-            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)">الخطة الحالية</span><span style="font-size:13px;font-weight:700">مجانية</span></div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)" data-t="member-since">عضو منذ</span><span style="font-size:13px;font-weight:700" id="pf-stat-since">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)" data-t="label-rating">التقييم</span><span style="font-size:13px;font-weight:700;color:#fbbf24" id="pf-stat-rating">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)" data-t="label-total-ads">إجمالي الإعلانات</span><span style="font-size:13px;font-weight:700" id="pf-stat-ads">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)" data-t="label-status">الحالة</span><span style="font-size:13px;font-weight:700;color:var(--green)" id="pf-stat-status">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5"><span style="font-size:13px;color:var(--text-muted)" data-t="label-current-plan">الخطة الحالية</span><span style="font-size:13px;font-weight:700" id="pf-stat-plan">—</span></div>
           </div>
           <div style="margin-top:16px">
-            <button onclick="location.href='rizq_landing_v8.html#pricing'" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:10px;font-weight:800;font-size:13.5px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif">🚀 ترقية إلى Pro</button>
+            <button onclick="showPanel('subscription',document.querySelector('.nav-item[onclick*=subscription]'))" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;border-radius:10px;font-weight:800;font-size:13.5px;cursor:pointer;font-family:inherit" data-t="btn-upgrade-pro">🚀 ترقية الباقة</button>
           </div>
         </div>
       </div>
@@ -674,39 +674,39 @@ main, .page-content.active, .main-content, .results-area,
       <div class="settings-grid">
         <div class="settings-card">
           <div class="settings-card-title" data-t="change-password-title">🔒 تغيير كلمة المرور</div>
-          <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">⚠️ نظام مصادقة حقيقي قيد التطوير (rizq-backend) — هذا النموذج للعرض فقط حالياً ولا يغيّر كلمة مرور فعلية.</p>
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px" data-t="password-note">⚠️ نظام مصادقة حقيقي قيد التطوير (rizq-backend) — هذا النموذج للعرض فقط حالياً ولا يغيّر كلمة مرور فعلية.</p>
           <div class="form-group"><label class="form-label" data-t="label-current-pw">كلمة المرور الحالية</label><input class="form-input-s" id="pw-current" type="password" placeholder="••••••••"/></div>
           <div class="form-group"><label class="form-label" data-t="label-new-pw">كلمة المرور الجديدة</label><input class="form-input-s" id="pw-new" type="password" data-t="ph-min-chars" placeholder="8 أحرف على الأقل"/></div>
           <div class="form-group"><label class="form-label" data-t="label-confirm-pw">تأكيد كلمة المرور</label><input class="form-input-s" id="pw-confirm" type="password" placeholder="••••••••"/></div>
           <button class="btn-save" data-t="btn-update-pw" onclick="changePassword()">🔒 تحديث كلمة المرور</button>
         </div>
         <div class="settings-card">
-          <div class="settings-card-title">🛡️ إعدادات الخصوصية</div>
+          <div class="settings-card-title" data-t="privacy-settings-title">🛡️ إعدادات الخصوصية</div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5">
-              <div><div style="font-size:13px;font-weight:600;color:#1a2535">إخفاء رقم الهاتف</div><div style="font-size:11px;color:var(--text-muted)">يُرسل عبر الرسائل فقط</div></div>
+              <div><div style="font-size:13px;font-weight:600;color:#1a2535" data-t="privacy-hide-phone">إخفاء رقم الهاتف</div><div style="font-size:11px;color:var(--text-muted)" data-t="privacy-hide-phone-sub">يُرسل عبر الرسائل فقط</div></div>
               <button class="toggle-sw" id="toggle-hide-phone" onclick="toggleHidePhone(this)" style="width:40px;height:22px;border-radius:11px;border:1px solid #e2e8f5;background:#eef2fb;cursor:pointer;position:relative;transition:all .3s">
                 <span style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;right:3px;transition:right .3s;box-shadow:0 1px 3px rgba(15,35,65,.2)"></span>
               </button>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5">
-              <div><div style="font-size:13px;font-weight:600;color:#1a2535">إشعارات البريد الإلكتروني</div><div style="font-size:11px;color:var(--text-muted)">عند تواصل أحد معك</div></div>
+              <div><div style="font-size:13px;font-weight:600;color:#1a2535" data-t="privacy-email-notif">إشعارات البريد الإلكتروني</div><div style="font-size:11px;color:var(--text-muted)" data-t="privacy-email-notif-sub">عند تواصل أحد معك</div></div>
               <button class="toggle-sw on" onclick="toggleNotifPref(this)" style="width:40px;height:22px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold-light));cursor:pointer;position:relative;transition:all .3s">
                 <span style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .3s"></span>
               </button>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5">
-              <div><div style="font-size:13px;font-weight:600;color:#1a2535">إشعارات SMS</div><div style="font-size:11px;color:var(--text-muted)">رسائل نصية للتواصل</div></div>
+              <div><div style="font-size:13px;font-weight:600;color:#1a2535" data-t="privacy-sms-notif">إشعارات SMS</div><div style="font-size:11px;color:var(--text-muted)" data-t="privacy-sms-notif-sub">رسائل نصية للتواصل</div></div>
               <button class="toggle-sw on" onclick="toggleNotifPref(this)" style="width:40px;height:22px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold-light));cursor:pointer;position:relative;transition:all .3s">
                 <span style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .3s"></span>
               </button>
             </div>
           </div>
           <div style="margin-top:16px;padding:12px 14px;background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.18);border-radius:10px">
-            <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">⚠️ منطقة الخطر</div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px" data-t="danger-zone">⚠️ منطقة الخطر</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button id="deactivate-account-btn" onclick="deactivateAccount()" style="padding:8px 16px;background:transparent;border:1px solid rgba(220,38,38,.3);color:var(--red);border-radius:8px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;font-size:12.5px">تعطيل الحساب مؤقتاً</button>
-              <button onclick="confirmDeleteAccount()" style="padding:8px 16px;background:transparent;border:1px solid rgba(220,38,38,.3);color:var(--red);border-radius:8px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;font-size:12.5px">حذف الحساب نهائياً</button>
+              <button id="deactivate-account-btn" onclick="deactivateAccount()" style="padding:8px 16px;background:transparent;border:1px solid rgba(220,38,38,.3);color:var(--red);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12.5px" data-t="btn-deactivate-temp">تعطيل الحساب مؤقتاً</button>
+              <button onclick="confirmDeleteAccount()" style="padding:8px 16px;background:transparent;border:1px solid rgba(220,38,38,.3);color:var(--red);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12.5px" data-t="btn-delete-account">حذف الحساب نهائياً</button>
             </div>
           </div>
         </div>
@@ -720,20 +720,6 @@ main, .page-content.active, .main-content, .results-area,
 
       <div id="sub-card-wrap"></div>
       <div id="my-invoices-wrap" style="margin-top:18px"></div>
-
-      <!-- Renewal Upload -->
-      <div class="settings-card" id="renewal-section" style="display:none;margin-top:18px">
-        <div class="settings-card-title" data-t="renewal-title">📤 تجديد الاشتراك</div>
-        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px" data-t="renewal-hint">ارفع وصل الدفع وسيتم التحقق من قِبل الإدارة خلال 24 ساعة</p>
-        <div id="renewal-zone" onclick="document.getElementById('renewal-file').click()" style="border:2px dashed rgba(201,168,76,.35);border-radius:12px;padding:22px;text-align:center;cursor:pointer">
-          <div style="font-size:30px;margin-bottom:6px">🧾</div>
-          <p style="font-size:13px;font-weight:600;color:#1a2535" data-t="renewal-upload-cta">انقر لرفع وصل الدفع</p>
-          <p style="font-size:11px;color:var(--text-muted)" data-t="renewal-upload-hint">JPG / PNG / PDF</p>
-          <input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>
-        </div>
-        <div id="renewal-packages" style="margin-top:16px"></div>
-        <button class="btn-save" style="margin-top:14px;width:100%" onclick="submitRenewal()" data-t="renewal-submit-btn">📤 إرسال طلب التجديد</button>
-      </div>
 
       <!-- Packages -->
       <div class="settings-card" style="margin-top:18px">
@@ -934,15 +920,17 @@ function _loadRealDashboardStats(acc){
         _renderChartFromDays(window._rizqVisitDays, [7,30,90][idx] || 7);
       }).catch(function(){});
 
-    fetch(base + '/api/messages/threads?accountId=' + encodeURIComponent(SESSION_ID), { headers: hdr })
+    // الرسائل تُحدَّث عبر renderMessages (seller threads + buyer mine)
+    if(typeof renderMessages === 'function') renderMessages();
+
+    // تقييم الملف الشخصي الحقيقي
+    fetch(base + '/api/reviews/' + encodeURIComponent(SESSION_ID) + '/stats')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        if(!data || !data.ok || !Array.isArray(data.threads)) return;
-        var contactsEl = document.querySelector('.stat-card.contacts .stat-num');
-        if(contactsEl) contactsEl.textContent = data.threads.length.toLocaleString();
-        var unread = data.threads.reduce(function(sum,t){ return sum + (t.unreadCount||0); }, 0);
-        var contactsChangeEl = document.querySelector('.stat-card.contacts .stat-change');
-        if(contactsChangeEl){ contactsChangeEl.className = 'stat-change'; contactsChangeEl.textContent = unread ? ('🔔 ' + unread + ' ' + _t2('غير مقروءة','non lu(s)')) : _t2('لا رسائل غير مقروءة','aucun message non lu'); }
+        var el = document.getElementById('pf-stat-rating');
+        if(!el) return;
+        if(data && data.count) el.textContent = '★ '+data.average+' ('+data.count+')';
+        else el.textContent = _t2('لا تقييمات بعد','Aucun avis');
       }).catch(function(){});
   }catch(e){}
 }
@@ -969,10 +957,11 @@ function adTitleLocalized(a){
 }
 
 const MESSAGES = [];
+let ACTIVE_CHAT_IDX = -1;
+let CHAT_MSGS = [];
 const NOTIFS = [];
 const CHART_DATA = [];
 const CHART_DAYS = [];
-const CHAT_MSGS = [];
 
 // ── RENDER FUNCTIONS ──
 function renderChart(){
@@ -1064,76 +1053,189 @@ function renderQuickAds(){
       <div style="width:40px;height:36px;border-radius:8px;background:linear-gradient(145deg,#eef2fb,#f8faff);border:1px solid #e2e8f5;display:flex;align-items:center;justify-content:center;color:var(--royal);flex-shrink:0"><span style="display:flex;width:18px;height:18px">${iconHTML(a.emoji).replace('<svg ', '<svg style="width:18px;height:18px;stroke-width:1.6" ')}</span></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:700;color:#1a2535;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${adTitleLocalized(a)}</div>
-        <div style="font-size:11.5px;color:var(--text-muted)">👁 ${a.views} مشاهدة · 📞 ${a.contacts} تواصل</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">👁 ${a.views} ${_t2('مشاهدة','vues')} · 📞 ${a.contacts} ${_t2('تواصل','contacts')}</div>
       </div>
       <div style="font-size:13px;font-weight:800;color:var(--gold-dk);white-space:nowrap">${a.price.split(' ')[0]}</div>
     </div>`).join('');
 }
 
+function _dashAuthHeaders(){
+  return { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN || '') };
+}
+function _escapeHtmlDash(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _fmtMsgTime(iso){
+  try{
+    return new Date(iso).toLocaleString(_rizqLang()==='fr'?'fr-FR':'ar-MR-u-nu-latn',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return ''; }
+}
+
 function renderMessages(){
   const list=document.getElementById('msgs-list');
   if(!list) return;
-  if(!MESSAGES.length){
-    list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل بعد','Aucun message pour le moment')+'</div>';
-    const msgs=document.getElementById('chat-msgs');
-    if(msgs) msgs.innerHTML='';
-    var dot=document.getElementById('notif-dot');
-    if(dot) dot.hidden=true;
+  if(IS_DEMO){
+    list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل في العرض التجريبي','Aucun message en mode démo')+'</div>';
     return;
   }
-  list.innerHTML=MESSAGES.map((m,i)=>`
-    <div class="msg-item${m.active?' active':''}${m.unread?' unread':''}" onclick="openChat(${i})">
-      <div style="display:flex;align-items:center;gap:9px">
-        <div class="msg-av">${m.emoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-            <div class="msg-name">${m.name}</div>
-            <div class="msg-time">${m.time}</div>
-          </div>
-          <div class="msg-preview">${m.preview}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${m.ad}</div>
-        </div>
-        ${m.unread?'<div class="msg-unread-dot"></div>':''}
-      </div>
-    </div>`).join('');
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID){
+    list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل بعد','Aucun message pour le moment')+'</div>';
+    return;
+  }
+  list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('جارٍ التحميل...','Chargement...')+'</div>';
+  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  var hdr = _dashAuthHeaders();
+  Promise.all([
+    fetch(base+'/api/messages/threads?accountId='+encodeURIComponent(SESSION_ID),{headers:hdr}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(base+'/api/messages/mine?accountId='+encodeURIComponent(SESSION_ID),{headers:hdr}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(results){
+    var sellerThreads = (results[0] && Array.isArray(results[0].threads)) ? results[0].threads : [];
+    var buyerThreads = (results[1] && Array.isArray(results[1].threads)) ? results[1].threads : [];
+    var byKey = {};
+    sellerThreads.forEach(function(t){
+      byKey[t.threadKey] = {
+        threadKey: t.threadKey, role:'seller', sellerAccountId: SESSION_ID,
+        name: t.buyerName || _t2('زبون','Client'),
+        emoji: '💬', preview: (t.lastMessage && t.lastMessage.body) || '',
+        time: _fmtMsgTime(t.lastMessage && t.lastMessage.createdAt),
+        ad: t.adTitle || _t2('إعلان','Annonce'), adId: t.adId || null,
+        unread: !!(t.unreadCount), unreadCount: t.unreadCount||0, active:false
+      };
+    });
+    buyerThreads.forEach(function(t){
+      if(byKey[t.threadKey]) return;
+      byKey[t.threadKey] = {
+        threadKey: t.threadKey, role:'buyer', sellerAccountId: t.sellerAccountId,
+        name: _t2('بائع','Vendeur'),
+        emoji: '🏪', preview: (t.lastMessage && t.lastMessage.body) || '',
+        time: _fmtMsgTime(t.lastMessage && t.lastMessage.createdAt),
+        ad: t.adTitle || _t2('إعلان','Annonce'), adId: t.adId || null,
+        unread: false, unreadCount: 0, active:false
+      };
+    });
+    MESSAGES.length = 0;
+    Object.keys(byKey).forEach(function(k){ MESSAGES.push(byKey[k]); });
+    MESSAGES.sort(function(a,b){ return (b.time||'').localeCompare(a.time||''); });
 
-  // Chat messages
-  const msgs=document.getElementById('chat-msgs');
-  msgs.innerHTML=CHAT_MSGS.map(m=>`
-    <div style="display:flex;flex-direction:column;align-items:${m.sent?'flex-end':'flex-start'}">
-      <div class="chat-msg ${m.sent?'sent':'recv'}">${m.text}</div>
-      <div class="chat-time">${m.time}</div>
-    </div>`).join('');
-  msgs.scrollTop=msgs.scrollHeight;
+    var totalUnread = MESSAGES.reduce(function(s,m){ return s+(m.unreadCount||0); },0);
+    var badge = document.querySelector('.nav-item[onclick*=messages] .nav-badge');
+    if(badge){ if(totalUnread>0){ badge.textContent=totalUnread; badge.style.display=''; } else badge.style.display='none'; }
+    var contactsEl = document.querySelector('.stat-card.contacts .stat-num');
+    if(contactsEl) contactsEl.textContent = String(MESSAGES.length);
+    var contactsChangeEl = document.querySelector('.stat-card.contacts .stat-change');
+    if(contactsChangeEl){
+      contactsChangeEl.className='stat-change';
+      contactsChangeEl.textContent = totalUnread ? ('🔔 '+totalUnread+' '+_t2('غير مقروءة','non lu(s)')) : _t2('لا رسائل غير مقروءة','aucun message non lu');
+    }
+
+    if(!MESSAGES.length){
+      list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل بعد','Aucun message pour le moment')+'</div>';
+      var msgs=document.getElementById('chat-msgs'); if(msgs) msgs.innerHTML='';
+      return;
+    }
+    list.innerHTML=MESSAGES.map(function(m,i){
+      return '<div class="msg-item'+(m.active?' active':'')+(m.unread?' unread':'')+'" onclick="openChat('+i+')">'
+        +'<div style="display:flex;align-items:center;gap:9px">'
+        +'<div class="msg-av">'+m.emoji+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'
+        +'<div class="msg-name">'+_escapeHtmlDash(m.name)+'</div>'
+        +'<div class="msg-time">'+_escapeHtmlDash(m.time)+'</div></div>'
+        +'<div class="msg-preview">'+_escapeHtmlDash(m.preview)+'</div>'
+        +'<div style="font-size:10px;color:var(--text-muted);margin-top:2px">'+_escapeHtmlDash(m.ad)+'</div>'
+        +'</div>'
+        +(m.unread?'<div class="msg-unread-dot"></div>':'')
+        +'</div></div>';
+    }).join('');
+    if(ACTIVE_CHAT_IDX>=0 && ACTIVE_CHAT_IDX<MESSAGES.length) openChat(ACTIVE_CHAT_IDX);
+  }).catch(function(){
+    list.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12.5px">'+_t2('لا رسائل بعد','Aucun message pour le moment')+'</div>';
+  });
 }
 
 function openChat(idx){
   const m=MESSAGES[idx];
   if(!m) return;
+  ACTIVE_CHAT_IDX = idx;
+  MESSAGES.forEach(function(x,i){ x.active = i===idx; });
   document.getElementById('chat-name').textContent=m.name;
   const sub=document.getElementById('chat-sub');
   if(sub) sub.textContent=(_rizqLang()==='fr'?'Concernant : ':'بخصوص: ')+m.ad;
-  document.querySelectorAll('.msg-item').forEach((el,i)=>el.classList.toggle('active',i===idx));
+  document.querySelectorAll('.msg-item').forEach(function(el,i){ el.classList.toggle('active',i===idx); });
+  const msgs=document.getElementById('chat-msgs');
+  if(msgs) msgs.innerHTML='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px">'+_t2('جارٍ التحميل...','Chargement...')+'</div>';
+  if(!window.RIZQ_BACKEND_BASE || !m.threadKey){ CHAT_MSGS=[]; _paintChatMsgs(); return; }
+  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  fetch(base+'/api/messages/thread/'+encodeURIComponent(m.threadKey), { headers: _dashAuthHeaders() })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      var list = (data && Array.isArray(data.messages)) ? data.messages : [];
+      CHAT_MSGS = list.map(function(msg){
+        var sent = (m.role==='seller' && msg.fromRole==='seller') || (m.role==='buyer' && msg.fromRole==='buyer');
+        return { text: msg.body||'', time: _fmtMsgTime(msg.createdAt), sent: !!sent };
+      });
+      _paintChatMsgs();
+      if(m.role==='seller' && m.unreadCount>0){
+        fetch(base+'/api/messages/thread/'+encodeURIComponent(m.threadKey)+'/read', {
+          method:'PATCH', headers: _dashAuthHeaders()
+        }).catch(function(){});
+        m.unread=false; m.unreadCount=0;
+      }
+    }).catch(function(){ CHAT_MSGS=[]; _paintChatMsgs(); });
+}
+function _paintChatMsgs(){
+  const msgs=document.getElementById('chat-msgs');
+  if(!msgs) return;
+  if(!CHAT_MSGS.length){
+    msgs.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12.5px">'+_t2('ابدأ المحادثة','Commencez la conversation')+'</div>';
+    return;
+  }
+  msgs.innerHTML=CHAT_MSGS.map(function(m){
+    return '<div style="display:flex;flex-direction:column;align-items:'+(m.sent?'flex-end':'flex-start')+'">'
+      +'<div class="chat-msg '+(m.sent?'sent':'recv')+'">'+_escapeHtmlDash(m.text)+'</div>'
+      +'<div class="chat-time">'+_escapeHtmlDash(m.time)+'</div></div>';
+  }).join('');
+  msgs.scrollTop=msgs.scrollHeight;
 }
 
-let msgCount=CHAT_MSGS.length;
 function sendMsg(){
   const input=document.getElementById('chat-input');
   const text=input.value.trim();
   if(!text)return;
-  if(!MESSAGES.length){
+  const m = ACTIVE_CHAT_IDX>=0 ? MESSAGES[ACTIVE_CHAT_IDX] : null;
+  if(!m || !m.threadKey){
     if(typeof showToast==='function') showToast(_t2('لا توجد محادثة محددة بعد','Aucune conversation sélectionnée pour le moment'));
     return;
   }
-  const msgs=document.getElementById('chat-msgs');
-  const now=new Date();
-  const time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  const div=document.createElement('div');
-  div.style.cssText='display:flex;flex-direction:column;align-items:flex-end';
-  div.innerHTML=`<div class="chat-msg sent">${text}</div><div class="chat-time">${time}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop=msgs.scrollHeight;
-  input.value='';
+  if(!window.RIZQ_BACKEND_BASE){
+    if(typeof showToast==='function') showToast(_t2('الخادم غير متاح','Serveur indisponible'));
+    return;
+  }
+  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  var btn = document.querySelector('.chat-send');
+  if(btn) btn.disabled = true;
+  var req;
+  if(m.role==='seller'){
+    req = fetch(base+'/api/messages/reply', {
+      method:'POST', headers: Object.assign({'Content-Type':'application/json'}, _dashAuthHeaders()),
+      body: JSON.stringify({ sellerAccountId: SESSION_ID, threadKey: m.threadKey, body: text })
+    });
+  } else {
+    req = fetch(base+'/api/messages', {
+      method:'POST', headers: Object.assign({'Content-Type':'application/json'}, _dashAuthHeaders()),
+      body: JSON.stringify({ sellerAccountId: m.sellerAccountId, buyerAccountId: SESSION_ID, body: text, adId: m.adId, adTitle: m.ad })
+    });
+  }
+  req.then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(){
+      input.value='';
+      openChat(ACTIVE_CHAT_IDX);
+      if(typeof showToast==='function') showToast(_t2('✅ تم الإرسال','✅ Envoyé'));
+    })
+    .catch(function(){
+      if(typeof showToast==='function') showToast(_t2('تعذّر إرسال الرسالة','Échec de l\'envoi'),'error');
+    })
+    .finally(function(){ if(btn) btn.disabled=false; });
 }
 
 function renderNotifs(){
@@ -2017,21 +2119,74 @@ function getSubInfo(){
       var isTrial = sub.status==='trial' || sub.status==='trial_expiring';
       var isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
       var totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
-      return {daysLeft:sub.daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon:isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/totalDays)*100))};
+      var pkgName = (sub.acc && (sub.acc.pkg_name || sub.acc.package || sub.acc.plan)) || '';
+      return {daysLeft:sub.daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon:isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName:pkgName, status:sub.status};
     }
   }
   var trialEnd = new Date((USER_ACC&&USER_ACC.trial_ends)||Date.now());
   var daysLeft = Math.max(0,Math.ceil((trialEnd-new Date())/86400000));
   var isTrial = !(USER_ACC&&USER_ACC.plan);
   var isExpired = daysLeft===0;
-  return {daysLeft:daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: isTrial?Math.max(0,Math.min(100,(daysLeft/3)*100)):80};
+  var totalDays = isTrial ? 3 : 30;
+  return {daysLeft:daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: Math.max(0,Math.min(100,(daysLeft/totalDays)*100)), pkgName:(USER_ACC&&USER_ACC.plan)||'', status:isExpired?'expired':(isTrial?'trial':'active')};
+}
+
+function updateSidebarUser(acc){
+  var nameEl = document.getElementById('dash-user-name') || document.querySelector('.user-name');
+  var badgeEl = document.getElementById('dash-user-badge');
+  var planEl = document.getElementById('dash-user-plan');
+  if(nameEl && acc && acc.name) nameEl.textContent = acc.name;
+  var verified = !!(acc && (acc.id_verified || acc.verified || acc.status==='approved'));
+  if(badgeEl){
+    badgeEl.textContent = verified ? _t2('✅ موثّق','✅ Vérifié') : _t2('⏳ بانتظار التوثيق','⏳ Vérification en attente');
+    badgeEl.style.color = verified ? '' : '#fbbf24';
+  }
+  if(planEl){
+    var info = getSubInfo();
+    var planLabel;
+    if(info.isExpired) planLabel = _t2('خطة: منتهية','Forfait : expiré');
+    else if(info.isTrial) planLabel = _t2('خطة: تجريبية','Forfait : essai');
+    else if(info.pkgName) planLabel = _t2('خطة: ','Forfait : ')+info.pkgName;
+    else planLabel = _t2('خطة: نشطة','Forfait : actif');
+    planEl.textContent = planLabel;
+  }
+}
+
+function updateProfileAccountStats(acc){
+  var sinceEl = document.getElementById('pf-stat-since');
+  var adsEl = document.getElementById('pf-stat-ads');
+  var statusEl = document.getElementById('pf-stat-status');
+  var planEl = document.getElementById('pf-stat-plan');
+  var ratingEl = document.getElementById('pf-stat-rating');
+  var sinceDate = (acc && (acc.approvedAt || acc.createdAt || acc.created_at)) || null;
+  if(sinceEl){
+    if(sinceDate){
+      try{
+        sinceEl.textContent = new Date(sinceDate).toLocaleDateString(_rizqLang()==='fr'?'fr-FR':'ar-MR-u-nu-latn',{year:'numeric',month:'long'});
+      }catch(e){ sinceEl.textContent = '—'; }
+    } else sinceEl.textContent = '—';
+  }
+  if(adsEl) adsEl.textContent = String((MY_ADS||[]).length) + ' ' + _t2('إعلان','annonce(s)');
+  var verified = !!(acc && (acc.id_verified || acc.verified || acc.status==='approved'));
+  if(statusEl){
+    statusEl.textContent = verified ? _t2('✅ موثّق','✅ Vérifié') : _t2('⏳ غير موثّق بعد','⏳ Pas encore vérifié');
+    statusEl.style.color = verified ? 'var(--green)' : '#f59e0b';
+  }
+  var info = getSubInfo();
+  if(planEl){
+    if(info.isExpired) planEl.textContent = _t2('منتهية','Expiré');
+    else if(info.isTrial) planEl.textContent = _t2('تجريبية','Essai');
+    else planEl.textContent = info.pkgName || _t2('نشطة','Actif');
+  }
+  if(ratingEl && ratingEl.textContent === '—'){
+    ratingEl.textContent = _t2('جارٍ التحميل...','Chargement...');
+  }
 }
 
 function renderSubscriptionPanel(){
   var info = getSubInfo();
   var daysLeft=info.daysLeft, isTrial=info.isTrial, isExpired=info.isExpired, isExpiringSoon=info.isExpiringSoon;
   var wrap = document.getElementById('sub-card-wrap');
-  var renewal = document.getElementById('renewal-section');
   if(!wrap) return;
   var bg = isExpired?'linear-gradient(145deg,#fef2f2,#fee2e2)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
   var border = isExpired?'1.5px solid #fca5a5':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
@@ -2047,14 +2202,6 @@ function renderSubscriptionPanel(){
     +(isExpiringSoon||isExpired?'<div style="margin-top:12px;text-align:center;background:#fff;border:1px solid #fde68a;border-radius:12px;padding:12px">'
       +'<div style="font-size:12.5px;font-weight:700;color:#92400e">'+(isExpired?_t2('⛔ انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','⛔ Votre abonnement a expiré — renouvelez maintenant'):_t2('⚠️ اشتراكك سينتهي بعد '+daysLeft+' أيام','⚠️ Votre abonnement expire dans '+daysLeft+' jours'))+'</div>'
       +'</div>':'');
-  // إصلاح جوهري: كان يُظهر renewal-section تلقائياً عند انتهاء الاشتراك —
-  // ذلك القسم يحفظ فقط في localStorage['rizq_renewal_requests'] بلا أي
-  // إرسال حقيقي للخادم (لا يقرأه أي طابور إدارة إطلاقاً)، رغم رسالته
-  // الصريحة بمراجعته خلال 24 ساعة — نفس العلة المكتشفة والمُصلَحة بتاريخ
-  // 09/08/2026 في rizq_dashboard_office.html. التجديد الحقيقي الوحيد هو
-  // زر "🔄 عرض الباقات" أعلاه (يمرّر إلى packages-display/openPayModal/
-  // submitPayment الذي يرسل فعلاً عبر RizqSub.submitSubscriptionRequest).
-  if(renewal) renewal.style.display = 'none';
 }
 
 function renderMyInvoices(){
@@ -2208,17 +2355,10 @@ function _rizqRenderAdsStatus(acc){
 }
 
 var renewalFile = null;
-function handleRenewalUpload(input){
-  const file = input.files[0]; if(!file) return;
-  renewalFile = file;
-  const zone = document.getElementById('renewal-zone');
-  zone.innerHTML=`<div style="font-size:28px;margin-bottom:6px">✅</div><p style="color:#10b981;font-size:13px;font-weight:700">${escapeHtml(file.name)}</p><p style="font-size:11px;color:var(--text-muted)">${Math.round(file.size/1024)} KB</p><input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>`;
-}
-
+function handleRenewalUpload(){ /* removed — use packages payment flow */ }
 function submitRenewal(){
   var el = document.getElementById('packages-display');
   if(el) el.scrollIntoView({behavior:'smooth'});
-  else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'));
 }
 
 // ══ منتقي الإعلان لباقة "مميزة" (#219) ══
@@ -2424,12 +2564,18 @@ function _initDashboardWithAccount(acc){
     var wish=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]');
     var favNum=document.querySelector('.stat-card.favs .stat-num');
     if(favNum && Array.isArray(wish)) favNum.textContent=String(wish.length);
+    var favChange=document.querySelector('.stat-card.favs .stat-change');
+    if(favChange) favChange.textContent = Array.isArray(wish) && wish.length ? _t2('محفوظة لديك','enregistrés') : _t2('فارغة','vide');
   }catch(eFav){}
+  updateSidebarUser(acc);
+  updateProfileAccountStats(acc);
   if(!IS_DEMO){
-    var un=document.querySelector('.user-name'); if(un && acc.name) un.textContent=acc.name;
     if(acc && acc.thumb && window.RizqProfilePhoto) RizqProfilePhoto.set(SESSION_ID, acc.thumb);
   }
+  var adsStat=document.querySelector('.stat-card.balance .stat-num');
+  if(adsStat) adsStat.textContent=String((MY_ADS||[]).filter(function(a){return (a.status||'active')==='active';}).length);
   applyDashAvatars();
+  if(typeof renderSubscriptionPanel==='function') renderSubscriptionPanel();
   if(typeof initSubscriptionLifecycle==='function') initSubscriptionLifecycle(acc.id, 'individual');
   if(typeof renderMyInvoices==='function') renderMyInvoices();
   if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){

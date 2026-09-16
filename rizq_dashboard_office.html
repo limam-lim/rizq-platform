@@ -575,17 +575,6 @@ textarea.form-input{min-height:80px;resize:vertical}
       <div id="rzq-pay-sub" style="margin-bottom:20px"></div>
       <div id="sub-card-wrap"></div>
       <div id="my-invoices-wrap" style="margin-top:18px"></div>
-      <div class="card" id="renewal-section" style="display:none">
-        <div class="card-title" style="margin-bottom:14px" data-t="sub-renew-title">📤 تجديد الاشتراك</div>
-        <div class="upload-zone" id="renewal-zone" onclick="document.getElementById('renewal-file').click()">
-          <div style="font-size:30px;margin-bottom:6px">🧾</div>
-          <p style="font-size:13px;font-weight:600;color:var(--navy)" data-t="sub-upload-receipt">رفع وصل الدفع</p>
-          <p style="font-size:11px;color:var(--text-muted);margin-top:3px">JPG / PNG / PDF</p>
-          <input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>
-        </div>
-        <div id="renewal-packages" style="margin-top:16px"></div>
-        <button class="btn btn-gold" style="margin-top:14px;width:100%" onclick="submitRenewal()" data-t="sub-submit-renewal">📤 إرسال طلب التجديد</button>
-      </div>
       <div class="card">
         <div class="card-title" style="margin-bottom:14px" data-t="sub-packages-title">📋 باقات الاشتراك</div>
         <div id="packages-display"></div>
@@ -1374,12 +1363,13 @@ function renderAdvancedStats(){
 
 function renderSubOverview(){
   const el=document.getElementById('ov-sub');if(!el||!OFFICE)return;
-  const trialEnd=new Date(OFFICE.trial_ends||Date.now());
-  const daysLeft=Math.max(0,Math.ceil((trialEnd-new Date())/86400000));
+  const info=getSubInfo();
+  const daysLeft=info.daysLeft;
+  const title=info.isExpired?_t2('❌ انتهى الاشتراك','❌ Abonnement expiré'):(!info.isTrial?_t2('✅ اشتراك نشط','✅ Abonnement actif'):_t2('🎁 فترة تجريبية','🎁 Période d\'essai'));
   el.innerHTML=`<div style="background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:13px;padding:16px;color:#fff">
-    <div style="font-size:13px;font-weight:700;margin-bottom:3px">${!OFFICE.plan?_t2('🎁 فترة تجريبية','🎁 Période d\'essai'):_t2('✅ اشتراك نشط','✅ Abonnement actif')}</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:3px">${title}</div>
     <div style="font-size:11px;opacity:.7;margin-bottom:10px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jour(s)`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
-    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${Math.min(100,(daysLeft/3)*100)}%;background:var(--gold);border-radius:3px"></div></div>
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${info.pct}%;background:var(--gold);border-radius:3px"></div></div>
     ${daysLeft<=2?`<button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="showPanel('subscription',null)">${_t2('🔄 جدّد الآن','🔄 Renouveler maintenant')}</button>`:''}
   </div>`;
 }
@@ -1825,7 +1815,8 @@ function getSubInfo(){
       const isTrial = sub.status==='trial' || sub.status==='trial_expiring';
       const isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
       const totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
-      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/totalDays)*100))};
+      const pkgName = (sub.acc && (sub.acc.pkg_name || sub.acc.package || sub.acc.plan)) || '';
+      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName};
     }
   }
   const trialEnd = new Date(OFFICE.trial_ends||Date.now());
@@ -1833,7 +1824,8 @@ function getSubInfo(){
   const daysLeft = Math.max(0,Math.ceil((trialEnd-now)/86400000));
   const isTrial = !OFFICE.plan;
   const isExpired = daysLeft===0;
-  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: isTrial?Math.max(0,Math.min(100,(daysLeft/3)*100)):80};
+  const totalDays = isTrial ? 3 : 30;
+  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: Math.max(0,Math.min(100,(daysLeft/totalDays)*100)), pkgName:OFFICE.plan||''};
 }
 
 function renderSubPanel(){
@@ -1913,24 +1905,18 @@ function _paintInvoices(invs, isLocalSource){
     + '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 
-function handleRenewalUpload(input){
-  const file=input.files[0];if(!file)return;
-  renewalFile=file;
-  const z=document.getElementById('renewal-zone');
-  z.innerHTML=`<div style="font-size:26px;margin-bottom:5px">✅</div><p style="color:#10b981;font-size:13px;font-weight:700">${escapeHtml(file.name)}</p><input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>`;
-  z.classList.add('has-file');
-}
+function handleRenewalUpload(){ /* removed — use packages payment flow */ }
 function submitRenewal(){
-  var el = document.getElementById('packages-display');
+  var el=document.getElementById('packages-display');
   if(el) el.scrollIntoView({behavior:'smooth'});
-  else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'),'error');
 }
 
 function updateSubBadge(){
   if(!OFFICE)return;
-  const d=Math.max(0,Math.ceil((new Date(OFFICE.trial_ends||Date.now())-new Date())/86400000));
+  const info=getSubInfo();
+  const d=info.daysLeft;
   const dot=document.getElementById('sb-sub-dot');const txt=document.getElementById('sb-sub-text');
-  if(d===0){if(dot)dot.className='sub-dot exp';if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré');}
+  if(info.isExpired||d===0){if(dot)dot.className='sub-dot exp';if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré');}
   else if(d<=2){if(dot)dot.className='sub-dot warn';if(txt)txt.textContent=_t2(`ينتهي خلال ${d} يوم`,`Expire dans ${d} jours`);}
   else{if(dot)dot.className='sub-dot';if(txt)txt.textContent=_t2('اشتراك نشط','Abonnement actif');}
 }
@@ -2546,7 +2532,7 @@ function saveMyPayment(){
           +'<div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.9">'
             +'<div>1️⃣ '+_t2('افتح تطبيق البنك أو بيماه على هاتفك','Ouvrez l\'application bancaire ou Bimbam sur votre téléphone')+'</div>'
             +'<div>2️⃣ '+_t2('اختر','Choisissez')+' <strong style="color:#e8c96a">'+_t2('دفع / تحويل','Payer / Transférer')+'</strong> '+_t2('وأدخل الرمز أعلاه','et saisissez le code ci-dessus')+'</div>'
-            +'<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">+222 XX XX XX XX</strong></div>'
+            +(function(){ var wa=(typeof _rizqSupportWhatsapp==='function'?_rizqSupportWhatsapp():''); return wa ? ('<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">'+escapeHtml(wa)+'</strong></div>') : ('<div>3️⃣ '+_t2('أرسل صورة التأكيد لفريق رزق عبر قنوات الدعم الرسمية','Envoyez la capture à l\'équipe Rizq via les canaux de support officiels')+'</div>'); })()
             +'<div>4️⃣ '+_t2('سيتم تفعيل اشتراكك خلال ساعات','Votre abonnement sera activé dans les heures qui suivent')+'</div>'
           +'</div>'
         +'</div>'
@@ -2579,7 +2565,23 @@ function saveMyPayment(){
     window.open(url,'_blank');
   }
   // ── وكيل كلود: تفعيل/إيقاف (مكتب) ──────────────────────
-  var RIZQ_TWILIO_NUM_OFFICE = '+222XXXXXXXX';
+  function _rizqSupportWhatsapp(){
+  try{
+    var cfg=JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+    var w=String(cfg.whatsapp||cfg.phone||'').trim();
+    if(w && !/X{2,}|XX\s*XX/i.test(w)) return w;
+  }catch(e){}
+  return '';
+}
+function _rizqTwilioForwardNum(){
+  try{
+    var ch=JSON.parse(localStorage.getItem('rizq_channels_config')||'{}');
+    var n=String((ch.phone&&ch.phone.number)||ch.twilioNumber||'').trim();
+    if(n && !/X{2,}|XX\s*XX/i.test(n)) return n;
+  }catch(e){}
+  return '';
+}
+var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
   function renderAgentsOffice(){
     var acc=(typeof OFFICE!=='undefined'&&OFFICE)||{};
     var plan=acc.plan||'free';
@@ -2602,7 +2604,7 @@ function saveMyPayment(){
           '<label class="rizq-toggle-switch"><input type="checkbox" id="agent-toggle-chk" '+(active?'checked':'')+' onchange="toggleRizqAgentOffice(this.checked)"><span class="rizq-toggle-slider"></span></label>'+
         '</div>'+
         '<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:11px;font-size:11.5px;line-height:1.8">'+
-          '<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+RIZQ_TWILIO_NUM_OFFICE+'</code></div>'+
+          (RIZQ_TWILIO_NUM_OFFICE?('<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+escapeHtml(RIZQ_TWILIO_NUM_OFFICE)+'</code></div>'):('<div style="color:#94a3b8">📞 '+_t2('رقم التحويل يُضبط من لوحة الإدارة عند التفعيل','Le numéro de renvoi est configuré depuis le panneau admin à l\'activation')+'</div>'))+
           '<div style="margin-top:6px;color:#94a3b8">'+_t2('حوّل مكالماتك عند عدم الرد — الوكيل يستقبل باسمك.','Renvoyez vos appels en cas de non-réponse — l\'agent répond en votre nom.')+'</div>'+
           '<div style="margin-top:6px">📱 '+_t2('رقمك:','Votre numéro:')+' <strong style="color:#fbbf24">'+(phone||'—')+'</strong></div>'+
         '</div>'+

@@ -651,7 +651,7 @@ textarea.form-input{resize:vertical;min-height:90px}
           </div>
           <div class="form-group">
             <label class="form-label" data-t="p-phone-label">رقم الهاتف (واتساب)</label>
-            <input class="form-input" id="p-phone" placeholder="+222 XX XX XX XX"/>
+            <input class="form-input" id="p-phone" placeholder="+222…"/>
           </div>
         </div>
         <div class="form-grid">
@@ -712,7 +712,7 @@ textarea.form-input{resize:vertical;min-height:90px}
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label" data-t="p-whatsapp-label">رابط واتساب</label>
-            <input class="form-input" id="p-whatsapp" placeholder="https://wa.me/222XXXXXXXX"/>
+            <input class="form-input" id="p-whatsapp" placeholder="https://wa.me/222…"/>
           </div>
           <div class="form-group">
             <label class="form-label" data-t="p-facebook-label">رابط صفحة فيسبوك (اختياري)</label>
@@ -791,20 +791,6 @@ textarea.form-input{resize:vertical;min-height:90px}
       <div id="rzq-pay-sub" style="margin-bottom:20px"></div>
       <div id="sub-card-wrap"></div>
       <div id="my-invoices-wrap" style="margin-top:18px"></div>
-
-      <!-- Renewal Upload -->
-      <div class="card" id="renewal-section" style="display:none">
-        <div class="card-title" style="margin-bottom:16px" data-t="renewal-title">📤 تجديد الاشتراك</div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px" data-t="renewal-hint">ارفع وصل الدفع وسيتم التحقق من قِبل الإدارة خلال 24 ساعة</p>
-        <div class="upload-zone" id="renewal-zone" onclick="document.getElementById('renewal-file').click()">
-          <div style="font-size:32px;margin-bottom:8px">🧾</div>
-          <p style="font-size:13px;font-weight:600;color:var(--navy)" data-t="renewal-upload-cta">انقر لرفع وصل الدفع</p>
-          <p style="font-size:11px;color:var(--text-muted);margin-top:4px" data-t="renewal-upload-hint">JPG / PNG / PDF</p>
-          <input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>
-        </div>
-        <div id="renewal-packages" style="margin-top:20px"></div>
-        <button class="btn btn-gold" style="margin-top:16px;width:100%" onclick="submitRenewal()" data-t="renewal-submit-btn">📤 إرسال طلب التجديد</button>
-      </div>
 
       <!-- Subscription history -->
       <div class="card">
@@ -1727,15 +1713,17 @@ function renderAdvancedStats(){
 function renderSubOverview(){
   const el = document.getElementById('overview-sub');
   if(!el||!STORE) return;
-  const trialEnd = new Date(STORE.trial_ends||Date.now());
-  const now = new Date();
-  const daysLeft = Math.max(0,Math.ceil((trialEnd-now)/86400000));
-  const isTrial = !STORE.plan;
-  const pct = isTrial ? Math.max(0,Math.min(100,(daysLeft/3)*100)) : 80;
+  const info = getSubInfo();
+  const daysLeft = info.daysLeft;
+  const isTrial = info.isTrial;
+  const pct = info.pct;
   const color = daysLeft<=1?'#ef4444':daysLeft<=3?'#f59e0b':'#10b981';
+  const planLabel = isTrial ? _t2('🎁 فترة تجريبية مجانية','🎁 Période d\'essai gratuite')
+    : (info.isExpired ? _t2('❌ انتهى الاشتراك','❌ Abonnement expiré')
+    : ('📦 '+escapeHtml(info.pkgName || STORE.plan || _t2('باقة نشطة','Forfait actif'))));
   el.innerHTML = `
     <div style="background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:14px;padding:18px;color:#fff">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${isTrial?_t2('🎁 فترة تجريبية مجانية','🎁 Période d\'essai gratuite'):`📦 ${escapeHtml(STORE.plan||_t2('باقة نشطة','Forfait actif'))}`}</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${planLabel}</div>
       <div style="font-size:12px;opacity:.7;margin-bottom:12px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم${daysLeft===1?'':'أيام'}`,`Se termine dans ${daysLeft} jour${daysLeft===1?'':'s'}`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
       <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-bottom:6px">
         <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .8s"></div>
@@ -2012,7 +2000,7 @@ function saveProduct(){
       // الأولى فقط لتوافق أي كود قديم ما زال يقرأ prod.imgData مباشرة.
       imgDataArr: (window._prodImages||[]).slice(),
       imgData: (window._prodImages && window._prodImages[0]) || null,
-      emoji: ['📦','👕','👟','💻','📱','🛋️','🍎','🧴'][Math.floor(Math.random()*8)],
+      emoji: '📦',
       addedAt: new Date().toISOString()
     };
     if(window._editingIdx!=null){ products[window._editingIdx]=prod; }
@@ -2292,7 +2280,8 @@ function getSubInfo(){
       const isTrial = sub.status==='trial' || sub.status==='trial_expiring';
       const isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
       const totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
-      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/totalDays)*100))};
+      const pkgName = (sub.acc && (sub.acc.pkg_name || sub.acc.package || sub.acc.plan)) || '';
+      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName};
     }
   }
   const trialEnd = new Date(STORE.trial_ends||Date.now());
@@ -2300,7 +2289,8 @@ function getSubInfo(){
   const daysLeft = Math.max(0,Math.ceil((trialEnd-now)/86400000));
   const isTrial = !STORE.plan;
   const isExpired = daysLeft===0;
-  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: isTrial?Math.max(0,Math.min(100,(daysLeft/3)*100)):80};
+  const totalDays = isTrial ? 3 : 30;
+  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: Math.max(0,Math.min(100,(daysLeft/totalDays)*100)), pkgName:STORE.plan||''};
 }
 
 function renderSubscriptionPanel(){
@@ -2568,11 +2558,11 @@ function _rizqSendThreadReply(threadKey){
 // ══ SUBSCRIPTION BADGE ══
 function updateSubBadge(){
   if(!STORE) return;
-  const trialEnd = new Date(STORE.trial_ends||Date.now());
-  const daysLeft = Math.max(0,Math.ceil((trialEnd-new Date())/86400000));
+  const info = getSubInfo();
+  const daysLeft = info.daysLeft;
   const dot = document.getElementById('sb-sub-dot');
   const txt = document.getElementById('sb-sub-text');
-  if(daysLeft===0){ if(dot)dot.className='sub-dot exp'; if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré'); }
+  if(info.isExpired || daysLeft===0){ if(dot)dot.className='sub-dot exp'; if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré'); }
   else if(daysLeft<=2){ if(dot)dot.className='sub-dot warn'; if(txt)txt.textContent=_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jour(s)`); }
   else { if(dot)dot.className='sub-dot'; if(txt)txt.textContent=_t2('اشتراك نشط','Abonnement actif'); }
 }
@@ -2646,10 +2636,27 @@ function showToast(msg, type=''){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 
+function _rizqSupportWhatsapp(){
+  try{
+    var cfg=JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+    var w=String(cfg.whatsapp||cfg.phone||'').trim();
+    if(w && !/X{2,}|XX\s*XX/i.test(w)) return w;
+  }catch(e){}
+  return '';
+}
+function _rizqTwilioForwardNum(){
+  try{
+    var ch=JSON.parse(localStorage.getItem('rizq_channels_config')||'{}');
+    var n=String((ch.phone&&ch.phone.number)||ch.twilioNumber||'').trim();
+    if(n && !/X{2,}|XX\s*XX/i.test(n)) return n;
+  }catch(e){}
+  return '';
+}
+
 // ══ AGENTS ══
 function doUpgrade(){ showPanel('subscription', document.querySelector('.sb-item[onclick*=subscription]')); }
 // ── وكيل كلود: زر التفعيل/الإيقاف ──────────────────────
-var RIZQ_TWILIO_NUM = '+222XXXXXXXX'; // يُستبدل بالرقم الحقيقي عند الإنتاج
+var RIZQ_TWILIO_NUM = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
 var _agentToggleKey = 'rizq_agent_active_' + (STORE && STORE.phone ? STORE.phone : 'unknown');
 
 function _getAgentActive(){
@@ -2671,7 +2678,7 @@ function _renderAgentToggle(){
       '</label>'+
     '</div>'+
     '<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:11px;font-size:11.5px;line-height:1.8">'+
-      '<div>📞 <strong>'+_t2('رقم تحويل المكالمات (Twilio رزق):','Numéro de renvoi d\'appel (Twilio Rizq):')+' </strong><code style="color:#fbbf24;font-size:12px">'+RIZQ_TWILIO_NUM+'</code></div>'+
+      (RIZQ_TWILIO_NUM?('<div>📞 <strong>'+_t2('رقم تحويل المكالمات (Twilio رزق):','Numéro de renvoi d\'appel (Twilio Rizq):')+' </strong><code style="color:#fbbf24;font-size:12px">'+escapeHtml(RIZQ_TWILIO_NUM)+'</code></div>'):('<div style="color:#94a3b8">📞 '+_t2('رقم التحويل يُضبط من لوحة الإدارة عند التفعيل','Le numéro de renvoi est configuré depuis le panneau admin à l\'activation')+'</div>'))+
       '<div style="margin-top:6px;color:#94a3b8">'+
         _t2(
           'حوّل مكالماتك إلى هذا الرقم عند عدم الرد، وسيتولى الوكيل الذكي الاستقبال باسمك.',
@@ -3333,7 +3340,7 @@ function saveMyPayment(){
           +'<div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.9">'
             +'<div>'+_t2('1️⃣ افتح تطبيق البنك أو بيماه على هاتفك','1️⃣ Ouvrez l\'application de votre banque ou Bimbam sur votre téléphone')+'</div>'
             +'<div>'+_t2('2️⃣ اختر <strong style="color:#e8c96a">دفع / تحويل</strong> وأدخل الرمز أعلاه','2️⃣ Choisissez <strong style="color:#e8c96a">Paiement / Virement</strong> et entrez le code ci-dessus')+'</div>'
-            +'<div>'+_t2('3️⃣ أرسل لنا صورة التأكيد على واتساب: <strong style="color:#e8c96a;direction:ltr">+222 XX XX XX XX</strong>','3️⃣ Envoyez-nous une capture de confirmation sur WhatsApp : <strong style="color:#e8c96a;direction:ltr">+222 XX XX XX XX</strong>')+'</div>'
+            +(function(){ var wa=(typeof _rizqSupportWhatsapp==='function'?_rizqSupportWhatsapp():''); return wa ? ('<div>'+_t2('3️⃣ أرسل لنا صورة التأكيد على واتساب:','3️⃣ Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">'+escapeHtml(wa)+'</strong></div>') : ('<div>'+_t2('3️⃣ أرسل صورة التأكيد لفريق رزق عبر قنوات الدعم الرسمية','3️⃣ Envoyez la capture à l\'équipe Rizq via les canaux de support officiels')+'</div>'); })()
             +'<div>'+_t2('4️⃣ سيتم تفعيل اشتراكك خلال ساعات','4️⃣ Votre abonnement sera activé dans les heures qui suivent')+'</div>'
           +'</div>'
         +'</div>'

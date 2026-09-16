@@ -790,7 +790,7 @@ main, .page-content.active, .main-content, .results-area,
               </div>
               <div class="settings-section">
                 <div class="settings-section-title" data-t="set-contact">📱 التواصل</div>
-                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" id="set-whatsapp" value="+222 XX XX XX XX" dir="ltr"/></div>
+                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" id="set-whatsapp" value="" dir="ltr" placeholder="+222…"/></div>
                 <div class="form-group"><label class="form-label" data-t="set-support-email">بريد الدعم</label><input class="form-input" id="set-support-email" value="direction@rizq.mr" dir="ltr"/></div>
                 <div class="form-group"><label class="form-label" data-t="set-reports-email">بريد البلاغات</label><input class="form-input" id="set-reports-email" value="report@rizq.mr" dir="ltr"/></div>
                 <button class="btn-sm btn-primary" data-t="set-save-contact" onclick="saveSettingsContact()">💾 حفظ</button>
@@ -1010,8 +1010,8 @@ main, .page-content.active, .main-content, .results-area,
             <div style="padding:18px">
               <div class="form-group"><label class="form-label" data-t="cfg-sitename-label">اسم الموقع</label><input class="form-input" id="cfg-sitename" placeholder="رزق | Rizq"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-tagline-label">الشعار الفرعي (Tagline)</label><input class="form-input" id="cfg-tagline" data-ph="cfg-tagline-ph" placeholder="منصة الإعلانات المبوبة الأولى في موريتانيا"/></div>
-              <div class="form-group"><label class="form-label" data-t="cfg-phone-label">رقم الهاتف</label><input class="form-input" id="cfg-phone" dir="ltr" placeholder="+222 XX XX XX XX"/></div>
-              <div class="form-group"><label class="form-label" data-t="cfg-whatsapp-label">رقم واتساب</label><input class="form-input" id="cfg-whatsapp" dir="ltr" placeholder="+222 XX XX XX XX"/></div>
+              <div class="form-group"><label class="form-label" data-t="cfg-phone-label">رقم الهاتف</label><input class="form-input" id="cfg-phone" dir="ltr" placeholder="+222…"/></div>
+              <div class="form-group"><label class="form-label" data-t="cfg-whatsapp-label">رقم واتساب</label><input class="form-input" id="cfg-whatsapp" dir="ltr" placeholder="+222…"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-email-label">البريد الإلكتروني</label><input class="form-input" id="cfg-email" dir="ltr" placeholder="direction@rizq.mr"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-report-email-label">بريد البلاغات</label><input class="form-input" id="cfg-report-email" dir="ltr" placeholder="report@rizq.mr"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-address-label">العنوان</label><input class="form-input" id="cfg-address" data-ph="cfg-address-ph" placeholder="نواكشوط، موريتانيا"/></div>
@@ -1371,7 +1371,7 @@ main, .page-content.active, .main-content, .results-area,
           <!-- معرّف الرقم -->
           <div style="grid-column:1/-1">
             <label style="font-size:12px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:5px">📡 معرّف الرقم (Twilio / WhatsApp) *</label>
-            <input id="sa-id" type="text" placeholder="+222XXXXXXXXX" style="width:100%;padding:9px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:9px;font-size:13px;font-family:inherit;box-sizing:border-box">
+            <input id="sa-id" type="text" placeholder="+222…" style="width:100%;padding:9px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:9px;font-size:13px;font-family:inherit;box-sizing:border-box">
             <div style="font-size:11px;color:#6b7280;margin-top:4px">هذا هو المعرّف الذي تُرسله Twilio في حقل "To" أو Meta في "display_phone_number"</div>
           </div>
 
@@ -1858,7 +1858,7 @@ main, .page-content.active, .main-content, .results-area,
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">📱 رقم الهاتف للمنصة (Twilio)</label>
-            <input id="ch-phone-number" placeholder="+222 XX XX XX XX" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
+            <input id="ch-phone-number" placeholder="+222…" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
           </div>
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">🔑 Twilio Account SID</label>
@@ -2031,7 +2031,7 @@ main, .page-content.active, .main-content, .results-area,
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رقم واتساب بيزنس</label>
-            <input id="ch-wa-number" placeholder="+222 XX XX XX XX" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" disabled />
+            <input id="ch-wa-number" placeholder="+222…" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" disabled />
           </div>
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Meta API Key (WhatsApp Business)</label>
@@ -2257,7 +2257,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="form-group"><label class="form-label" data-t="am-user-label">اسم المستخدم *</label><input class="form-input" id="am-user" placeholder="admin_..." dir="ltr"/></div>
     </div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222…" dir="ltr"/></div>
       <div class="form-group"><label class="form-label" data-t="am-email-label">البريد الإلكتروني *</label><input class="form-input" id="am-email" placeholder="name@rizq.mr" dir="ltr"/></div>
     </div>
     <div class="form-group"><label class="form-label" data-t="am-preset-label">قالب صلاحيات جاهز</label>
@@ -2284,7 +2284,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="modal-title" data-t="au-title">➕ إضافة مستخدم يدوياً</div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label" data-t="au-name-label">الاسم الكامل *</label><input class="form-input" id="au-name" data-ph="au-name-ph" placeholder="الاسم الكامل"/></div>
-      <div class="form-group"><label class="form-label" data-t="au-phone-label">رقم الهاتف *</label><input class="form-input" id="au-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label" data-t="au-phone-label">رقم الهاتف *</label><input class="form-input" id="au-phone" placeholder="+222…" dir="ltr"/></div>
     </div>
     <div class="form-group"><label class="form-label" data-t="au-email-label">البريد الإلكتروني</label><input class="form-input" id="au-email" placeholder="example@email.com" dir="ltr"/></div>
     <div class="form-grid">
@@ -3304,11 +3304,11 @@ function resetExtraCategories(){
 // ══ SITE CONFIG ══
 const DEFAULT_SITE_CONFIG = {
   sitename:'رزق | Rizq', tagline:'منصة الإعلانات المبوبة الأولى في موريتانيا',
-  phone:'+222 XX XX XX XX', whatsapp:'+222 XX XX XX XX',
-  email:'direction@rizq.mr', reportEmail:'report@rizq.mr',
-  address:'نواكشوط، موريتانيا',
-  adsCount:50842, usersCount:1247, wilayasCount:15,
-  bannerActive:false, bannerText:'🎉 عروض إطلاق رزق — سجّل الآن واستفد من مزايا حصرية'
+  phone:'', whatsapp:'',
+  email:'', reportEmail:'',
+  address:'',
+  adsCount:0, usersCount:0, wilayasCount:15,
+  bannerActive:false, bannerText:''
 };
 
 function loadSiteConfigData(){
@@ -5606,19 +5606,21 @@ function deleteBankCode(id){
     if(id==='payments') { setTimeout(renderBankCodes,50); syncBankCodesFromBackend().then(function(changed){ if(changed) renderBankCodes(); }); setTimeout(renderSubRequests,50); syncSubRequestsFromBackend().then(function(changed){ if(changed){ renderSubRequests(); renderExpiryAlerts(); } }); setTimeout(renderExpiryAlerts,50); setTimeout(renderSubAgentControls,50); renderPayments(PAYMENTS_DATA); }
     if(id==='analytics'){ renderActivity(); renderWilayaStats();
       var _dlbl2=function(ar,fr){return RizqI18n.t2(ar,fr);};
+      // لا أرقام وهمية — أصفار صادقة حتى تتوفر إحصائيات خادم حقيقية
       renderChart('analytics-chart-views',[
-        {val:8200,lbl:_dlbl2('يناير','Jan')},{val:12400,lbl:_dlbl2('فبراير','Fév')},{val:15800,lbl:_dlbl2('مارس','Mar')},{val:18900,lbl:_dlbl2('أبريل','Avr')},
-        {val:22100,lbl:_dlbl2('مايو','Mai')},{val:29300,lbl:_dlbl2('يونيو','Juin')},{val:34800,lbl:_dlbl2('يوليو','Juil')}
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')}
       ],'rgba(96,165,250,.7)');
       renderChart('analytics-chart-users',[
-        {val:42,lbl:_dlbl2('يناير','Jan')},{val:78,lbl:_dlbl2('فبراير','Fév')},{val:123,lbl:_dlbl2('مارس','Mar')},{val:89,lbl:_dlbl2('أبريل','Avr')},
-        {val:156,lbl:_dlbl2('مايو','Mai')},{val:234,lbl:_dlbl2('يونيو','Juin')},{val:189,lbl:_dlbl2('يوليو','Juil')}
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')}
       ],'rgba(74,222,128,.7)');
     }
     if(id==='overview'){ renderCatDist(); renderActivity(); renderWilayaStats();
-      renderChart('overview-chart',[
-        {val:120,lbl:RizqI18n.t2('الإثنين','Lun')},{val:185,lbl:RizqI18n.t2('الثلاثاء','Mar')},{val:143,lbl:RizqI18n.t2('الأربعاء','Mer')},
-        {val:267,lbl:RizqI18n.t2('الخميس','Jeu')},{val:198,lbl:RizqI18n.t2('الجمعة','Ven')},{val:342,lbl:RizqI18n.t2('السبت','Sam')},{val:290,lbl:RizqI18n.t2('اليوم','Aujourd\'hui')}
+      if(typeof refreshOverviewFromBackend==='function') refreshOverviewFromBackend();
+      else renderChart('overview-chart',[
+        {val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},
+        {val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')}
       ],'linear-gradient(180deg,var(--gold),var(--gold-light))');
     }
   };

@@ -576,7 +576,7 @@ textarea.form-input{min-height:80px;resize:vertical}
           <div class="form-group"><label class="form-label" data-t="tm-role-label">المنصب / الدور</label><input class="form-input" id="tm-role" placeholder="مثال: مدير المبيعات" data-ph="tm-role-ph"/></div>
         </div>
         <div class="form-grid">
-          <div class="form-group"><label class="form-label" data-t="tm-phone-label">رقم الهاتف</label><input class="form-input" id="tm-phone" placeholder="+222 XX XX XX XX"/></div>
+          <div class="form-group"><label class="form-label" data-t="tm-phone-label">رقم الهاتف</label><input class="form-input" id="tm-phone" placeholder="+222…"/></div>
           <div class="form-group"><label class="form-label" data-t="tm-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="tm-emoji" placeholder="👨‍💼" maxlength="4"/></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -643,7 +643,7 @@ textarea.form-input{min-height:80px;resize:vertical}
           </div>
         </div>
         <div class="form-grid">
-          <div class="form-group"><label class="form-label" data-t="pf-phone-label">الهاتف / واتساب</label><input class="form-input" id="p-phone" placeholder="+222 XX XX XX XX"/></div>
+          <div class="form-group"><label class="form-label" data-t="pf-phone-label">الهاتف / واتساب</label><input class="form-input" id="p-phone" placeholder="+222…"/></div>
           <div class="form-group"><label class="form-label" data-t="pf-email-label">البريد الإلكتروني</label><input class="form-input" id="p-email" placeholder="info@company.mr"/></div>
         </div>
         <div class="form-grid">
@@ -1874,14 +1874,17 @@ function renderOverview(){
     }
   }
 
-  // Sub overview
+  // Sub overview — من getSubInfo (RizqSub) لا حقول حساب قديمة مزيّفة
   var ovSub = document.getElementById('ov-sub');
   if(ovSub && CORP_ACC){
-    var planName = _trPkgName(CORP_ACC.planName || CORP_ACC.plan || _t2('تجريبي','Essai'));
+    var info = (typeof getSubInfo==='function') ? getSubInfo() : {daysLeft:0,isTrial:true,isExpired:false,pkgName:''};
+    var planName = _trPkgName(info.pkgName || CORP_ACC.planName || CORP_ACC.plan || (info.isTrial?_t2('تجريبي','Essai'):_t2('نشطة','Actif')));
+    var subLine = info.isExpired ? _t2('انتهى الاشتراك','Abonnement expiré')
+      : (info.daysLeft>0 ? _t2('ينتهي خلال '+info.daysLeft+' يوم','Expire dans '+info.daysLeft+' jour(s)') : (CORP_ACC.planExpiry||'—'));
     ovSub.innerHTML='<div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(27,58,107,.04);border-radius:12px;border:1px solid rgba(27,58,107,.08)">'
       +'<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:20px">💳</div>'
       +'<div><div style="font-size:14px;font-weight:700;color:var(--royal)">'+_t2('باقة ','Forfait ')+escapeHtml(planName)+'</div>'
-      +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px">'+_t2('نشطة حتى: ',"Active jusqu'au : ")+(CORP_ACC.planExpiry||'—')+'</div></div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px">'+escapeHtml(subLine)+'</div></div>'
       +'<button onclick="showPanel(\'subscription\',null)" class="btn btn-outline btn-sm" style="margin-inline-start:auto">'+_t2('ترقية','Mettre à niveau')+'</button>'
       +'</div>';
   }
@@ -2936,7 +2939,7 @@ function saveMyPayment(){
         var isTrial = sub.status==='trial' || sub.status==='trial_expiring';
         var isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
         var totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
-        return {daysLeft:sub.daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon:isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/totalDays)*100))};
+        var pkgName=(sub.acc&&(sub.acc.pkg_name||sub.acc.package||sub.acc.plan))||''; return {daysLeft:sub.daysLeft, isTrial:isTrial, isExpired:isExpired, isExpiringSoon:isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName:pkgName};
       }
     }
     var trialEnd = new Date(acc.trial_ends||Date.now());
@@ -2944,7 +2947,7 @@ function saveMyPayment(){
     var daysLeft2 = Math.max(0,Math.ceil((trialEnd-now)/86400000));
     var isTrial = !acc.plan;
     var isExpired2 = daysLeft2===0;
-    return {daysLeft:daysLeft2, isTrial:isTrial, isExpired:isExpired2, isExpiringSoon: !isTrial && !isExpired2 && daysLeft2<=5, pct: isTrial?Math.max(0,Math.min(100,(daysLeft2/3)*100)):80};
+    var totalDaysFb = isTrial ? 3 : 30; return {daysLeft:daysLeft2, isTrial:isTrial, isExpired:isExpired2, isExpiringSoon: !isTrial && !isExpired2 && daysLeft2<=5, pct: Math.max(0,Math.min(100,(daysLeft2/totalDaysFb)*100)), pkgName:acc.plan||''};
   }
   // مربع دائم لحالة الباقة (نفس نمط store/office) — يظهر دوماً، لا فقط عند الانتهاء
   function renderSubPanel(){
@@ -3504,7 +3507,7 @@ function saveMyPayment(){
           +'<div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.9">'
             +'<div>1️⃣ '+_t2('افتح تطبيق البنك أو بيماه على هاتفك','Ouvrez l\'application bancaire ou Bimbam sur votre téléphone')+'</div>'
             +'<div>2️⃣ '+_t2('اختر','Choisissez')+' <strong style="color:#e8c96a">'+_t2('دفع / تحويل','Paiement / Transfert')+'</strong> '+_t2('وأدخل الرمز أعلاه','et entrez le code ci-dessus')+'</div>'
-            +'<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">+222 XX XX XX XX</strong></div>'
+            +(function(){ var wa=(typeof _rizqSupportWhatsapp==='function'?_rizqSupportWhatsapp():''); return wa ? ('<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">'+escapeHtml(wa)+'</strong></div>') : ('<div>3️⃣ '+_t2('أرسل صورة التأكيد لفريق رزق عبر قنوات الدعم الرسمية','Envoyez la capture à l\'équipe Rizq via les canaux de support officiels')+'</div>'); })()
             +'<div>4️⃣ '+_t2('سيتم تفعيل اشتراكك خلال ساعات','Votre abonnement sera activé dans les heures qui suivent')+'</div>'
           +'</div>'
         +'</div>'
@@ -3537,7 +3540,23 @@ function saveMyPayment(){
     window.open(url,'_blank');
   }
   // ── وكيل كلود: تفعيل/إيقاف (شركة) ──────────────────────
-  var RIZQ_TWILIO_NUM_CORP = '+222XXXXXXXX';
+  function _rizqSupportWhatsapp(){
+  try{
+    var cfg=JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+    var w=String(cfg.whatsapp||cfg.phone||'').trim();
+    if(w && !/X{2,}|XX\s*XX/i.test(w)) return w;
+  }catch(e){}
+  return '';
+}
+function _rizqTwilioForwardNum(){
+  try{
+    var ch=JSON.parse(localStorage.getItem('rizq_channels_config')||'{}');
+    var n=String((ch.phone&&ch.phone.number)||ch.twilioNumber||'').trim();
+    if(n && !/X{2,}|XX\s*XX/i.test(n)) return n;
+  }catch(e){}
+  return '';
+}
+var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
   function renderAgentsCorp(){
     var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
     var isDiamond = (typeof _corpHasFeature === 'function') ? _corpHasFeature('ai_agent_full') : false;
@@ -3558,7 +3577,7 @@ function saveMyPayment(){
           '<label class="rizq-toggle-switch"><input type="checkbox" id="agent-toggle-chk" '+(active?'checked':'')+' onchange="toggleRizqAgentCorp(this.checked)"><span class="rizq-toggle-slider"></span></label>'+
         '</div>'+
         '<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:11px;font-size:11.5px;line-height:1.8">'+
-          '<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+RIZQ_TWILIO_NUM_CORP+'</code></div>'+
+          (RIZQ_TWILIO_NUM_CORP?('<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+escapeHtml(RIZQ_TWILIO_NUM_CORP)+'</code></div>'):('<div style="color:#94a3b8">📞 '+_t2('رقم التحويل يُضبط من لوحة الإدارة عند التفعيل','Le numéro de renvoi est configuré depuis le panneau admin à l\'activation')+'</div>'))+
           '<div style="margin-top:6px;color:#94a3b8">'+_t2('حوّل مكالماتك عند عدم الرد — الوكيل يستقبل باسم شركتك.','Renvoyez vos appels en cas de non-réponse — l\'agent répond au nom de votre entreprise.')+'</div>'+
           '<div style="margin-top:6px">📱 '+_t2('رقمك:','Votre numéro:')+' <strong style="color:#fbbf24">'+(phone||'—')+'</strong></div>'+
         '</div>'+
