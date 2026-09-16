@@ -7808,7 +7808,44 @@ function resolveQuotaAddon(id, status){
   function getAll(){
     try{ return JSON.parse(localStorage.getItem(ANN_KEY)||'[]'); }catch(e){ return []; }
   }
-  function saveAll(list){ localStorage.setItem(ANN_KEY, JSON.stringify(list)); }
+  function saveAll(list){
+    localStorage.setItem(ANN_KEY, JSON.stringify(list));
+    _syncAnnouncementsToBackend(list);
+  }
+
+  function _annBackendBase(){
+    try {
+      if (typeof _adminBackendBase === 'function') return _adminBackendBase();
+      var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+      return (c.backendUrl || window.RIZQ_BACKEND_BASE || '').replace(/\/$/,'');
+    } catch(e){ return ''; }
+  }
+
+  function _syncAnnouncementsToBackend(list){
+    var base = _annBackendBase();
+    if (!base) return;
+    var headers = { 'Content-Type':'application/json' };
+    try {
+      if (typeof _adminAuthHeaders === 'function') headers = _adminAuthHeaders(headers);
+    } catch(e){}
+    fetch(base + '/api/site-config', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ announcements: list || [] })
+    }).catch(function(){});
+  }
+
+  function syncAnnouncementsFromBackend(){
+    var base = _annBackendBase();
+    if (!base) return Promise.resolve(false);
+    return fetch(base + '/api/site-config', { cache: 'no-store' })
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config || !Array.isArray(data.config.announcements)) return false;
+        localStorage.setItem(ANN_KEY, JSON.stringify(data.config.announcements));
+        return true;
+      }).catch(function(){ return false; });
+  }
 
   var TYPES_INFO = {
     congrats:{ icon:'🎉', label:'تهنئة'    },
@@ -8031,11 +8068,15 @@ function resolveQuotaAddon(id, status){
   var _origShowPanel = window.showPanel;
   window.showPanel = function(id, el){
     if(typeof _origShowPanel==='function') _origShowPanel(id, el);
-    if(id==='announcements') renderAnnList();
+    if(id==='announcements'){
+      syncAnnouncementsFromBackend().then(function(){ renderAnnList(); });
+    }
   };
 
-  /* Init badge on load */
-  setTimeout(renderAnnList, 600);
+  /* Init badge on load — pull live list from server first */
+  setTimeout(function(){
+    syncAnnouncementsFromBackend().then(function(){ renderAnnList(); });
+  }, 600);
 })();
 </script>
 

@@ -1209,7 +1209,8 @@
         uiLang: _ctx.lang,
         autoLang: true,
         agentTier: _resolveAgentTier(),
-        systemInstruction: _masterSystemPrompt(),
+        // Server builds the full system prompt from live catalog + tools.
+        // Do not send a long client master prompt (stale prices / truncated junk).
         profile: _ctx.profile || null,
         history: (_history || []).slice(-10),
         catalogHint: _resolveCatalogHintForMessage(userText),

@@ -124,9 +124,21 @@
     visitorName:'',
     buyerAccountId: null, // مشترٍ مسجَّل دخوله (rizq_individual_session) — يتيح محادثة ثنائية حقيقية
     buyerToken:     null,
+    buyerPhone:     '',
     threadKey:      null,
-    msgs:       []
+    msgs:       [],
+    seenServerIds: {},
+    pollTimer: null,
+    pollAttempts: 0
   };
+
+  function _stopPoll() {
+    if (_state.pollTimer) {
+      clearInterval(_state.pollTimer);
+      _state.pollTimer = null;
+    }
+    _state.pollAttempts = 0;
+  }
 
   /** جلسة مشترٍ AuthGate (rizq_buyer_session) — OTP سريع للتصفح والتواصل */
   function _getAuthGateBuyer() {
@@ -352,6 +364,21 @@
     }, AGENT_DELAY_MS);
   }
 
+  /** عرض رسالة خادم جديدة (بائع أو وكيل ذكي) دون تكرار */
+  function _ingestServerMessages(list) {
+    if (!Array.isArray(list) || !list.length) return 0;
+    var added = 0;
+    list.forEach(function(m) {
+      if (!m || !m.id) return;
+      if (_state.seenServerIds[m.id]) return;
+      _state.seenServerIds[m.id] = true;
+      if (m.fromRole === 'buyer') return; // المشتري يرى رسائله محلياً فور الإرسال
+      _appendBubble(m.body, 'them');
+      added++;
+    });
+    return added;
+  }
+
   function _showTyping() {
     var msgs = document.getElementById('rzq-m-msgs');
     if (!msgs) return;
@@ -478,7 +505,8 @@
   function _sendToBackend(text, name, phone) {
     try {
       var base = _backendBase();
-      if (!base || !_state.sellerAccountId) return; // إعلان تجريبي/بلا حساب حقيقي — لا يوجد طرف خادم لإرسال الرسالة إليه
+      if (!base || !_state.sellerAccountId) return Promise.resolve(null);
+      _state.buyerPhone = phone || _state.buyerPhone || '';
       var doSend = function(realTok){
         var payload = {
           sellerAccountId: _state.sellerAccountId,
@@ -495,41 +523,91 @@
           payload.buyerPhone = phone || '';
           payload.buyerName = name;
         }
-        fetch(base + '/api/messages', {
+        return fetch(base + '/api/messages', {
           method: 'POST', headers: headers, body: JSON.stringify(payload)
         }).then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
           if (data && data.message && data.message.threadKey) _state.threadKey = data.message.threadKey;
-        }).catch(function(){});
+          else if (data && data.threadKey) _state.threadKey = data.threadKey;
+          if (data && data.message && data.message.id) _state.seenServerIds[data.message.id] = true;
+          return data;
+        });
       };
       if (_state.buyerAccountId && _state.buyerToken) {
-        _resolveBuyerRealToken().then(doSend);
-      } else {
-        doSend(null);
+        return _resolveBuyerRealToken().then(doSend).catch(function(){ return null; });
       }
+      return doSend(null).catch(function(){ return null; });
+    } catch(e) { return Promise.resolve(null); }
+  }
+
+  /** جلب المحادثة الحقيقية من الخادم (مشترٍ مسجّل أو ضيف برقم هاتف) */
+  function _fetchThreadOnce() {
+    var base = _backendBase();
+    if (!base || !_state.threadKey) return Promise.resolve(null);
+    var url = base + '/api/messages/thread/' + encodeURIComponent(_state.threadKey);
+    var headers = {};
+    if (_state.buyerAccountId && _state.buyerToken) {
+      return _resolveBuyerRealToken().then(function(realTok){
+        headers['x-account-token'] = realTok || _state.buyerToken;
+        return fetch(url, { headers: headers, cache: 'no-store' })
+          .then(function(r){ return r.ok ? r.json() : null; });
+      }).catch(function(){ return null; });
+    }
+    var phone = String(_state.buyerPhone || '').replace(/\D/g, '');
+    if (phone) {
+      url += (url.indexOf('?') >= 0 ? '&' : '?') + 'buyerPhone=' + encodeURIComponent(phone);
+      headers['x-guest-phone'] = phone;
+    }
+    return fetch(url, { headers: headers, cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
+  }
+
+  function _loadThreadFromBackend() {
+    try {
+      _fetchThreadOnce().then(function(data){
+        if (!data || !Array.isArray(data.messages) || !data.messages.length) return;
+        var msgsEl = document.getElementById('rzq-m-msgs');
+        if (msgsEl) msgsEl.innerHTML = '';
+        _state.seenServerIds = {};
+        data.messages.forEach(function(m){
+          if (!m || !m.id) return;
+          _state.seenServerIds[m.id] = true;
+          _appendBubble(m.body, m.fromRole === 'buyer' ? 'me' : 'them');
+        });
+        var sq = document.getElementById('rzq-m-suggest');
+        if (sq) sq.style.display = 'none';
+      });
     } catch(e) {}
   }
 
-  /** جلب المحادثة الحقيقية من الخادم (لمشترٍ مسجَّل دخوله فقط — يملك threadKey ثابتاً) */
-  function _loadThreadFromBackend() {
-    try {
-      var base = _backendBase();
-      if (!base || !_state.threadKey || !_state.buyerToken) return;
-      _resolveBuyerRealToken().then(function(realTok){
-        fetch(base + '/api/messages/thread/' + encodeURIComponent(_state.threadKey), {
-          headers: { 'x-account-token': realTok || _state.buyerToken }
-        }).then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
-          if (!data || !Array.isArray(data.messages) || !data.messages.length) return;
-          var msgsEl = document.getElementById('rzq-m-msgs');
-          if (msgsEl) msgsEl.innerHTML = '';
-          data.messages.forEach(function(m){
-            _appendBubble(m.body, m.fromRole === 'seller' ? 'them' : 'me');
-          });
-          // رسائل حقيقية موجودة فعلاً: نُخفي رسالة الترحيب/الاقتراحات الافتراضية وحقل الاسم
-          var sq = document.getElementById('rzq-m-suggest');
-          if (sq) sq.style.display = 'none';
-        }).catch(function(){});
+  /** بعد الإرسال: انتظر رد الوكيل/البائع بسرعة بدل الرسالة الوهمية */
+  function _startReplyPoll() {
+    _stopPoll();
+    if (!_backendBase() || !_state.sellerAccountId || !_state.threadKey) return;
+    _showTyping();
+    _state.pollAttempts = 0;
+    _state.pollTimer = setInterval(function() {
+      if (!_state.open) { _stopPoll(); _hideTyping(); return; }
+      _state.pollAttempts += 1;
+      if (_state.pollAttempts > 20) {
+        _stopPoll();
+        _hideTyping();
+        // لم يصل رد خلال ~30ث — رسالة قصيرة صادقة بدل canned عشوائي مزيف
+        _appendBubble(_t(
+          'رسالتك وصلت للبائع ✅ — سيرد عليك قريباً.',
+          'Message reçu ✅ — le vendeur répondra bientôt.'
+        ), 'them');
+        return;
+      }
+      _fetchThreadOnce().then(function(data){
+        if (!data || !Array.isArray(data.messages)) return;
+        var added = _ingestServerMessages(data.messages);
+        if (added > 0) {
+          _stopPoll();
+          _hideTyping();
+        }
       });
-    } catch(e) {}
+    }, 1500);
   }
 
   /* ══════════════════════════════
@@ -554,6 +632,9 @@
       _state.visitorId       = _getVisitorId();
       _state.visitorName     = '';
       _state.threadKey       = null;
+      _state.buyerPhone      = '';
+      _state.seenServerIds   = {};
+      _stopPoll();
 
       var buyer = _getBuyerSession();
       _state.buyerAccountId = buyer ? buyer.id : null;
@@ -648,6 +729,17 @@
         phone = _state.authGateBuyer.whatsapp || _state.authGateBuyer.phone || _state.authGateBuyer.phoneIntl || '';
       }
 
+      // الخادم يطلب رقم الهاتف للزائر الضيف — لا ترسل بلا رقم
+      var needsPhone = !_state.buyerAccountId && !!(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && _state.sellerAccountId);
+      if (needsPhone && !String(phone || '').replace(/\D/g, '')) {
+        _appendBubble(_t(
+          'أدخل رقم هاتفك أولاً حتى يصل رد البائع إليك.',
+          'Entrez votre numéro pour que le vendeur puisse vous répondre.'
+        ), 'them');
+        if (phoneInp) phoneInp.focus();
+        return;
+      }
+
       // عرض الرسالة
       _appendBubble(text, 'me');
       inp.value = '';
@@ -678,9 +770,6 @@
       // تحديث badge الداشبورد
       _updateBadge(_state.sellerKey, msgs);
 
-      // إرسال حقيقي للخادم — نظام الرسائل بين المشتري والبائع (مهمة #243/#247)
-      _sendToBackend(text, name, phone);
-
       // توست نجاح قصير بعد إرسال الرسالة
       try {
         var toastMsg = _t('✅ تم إرسال رسالتك', '✅ Message envoyé');
@@ -705,8 +794,20 @@
         }
       } catch (eToast) {}
 
-      // رد المساعد الآلي (يبقى كتجربة فورية بينما ينتظر رد البائع الحقيقي)
-      _autoReply();
+      // إرسال حقيقي للخادم — نظام الرسائل بين المشتري والبائع (مهمة #243/#247)
+      var hasBackend = !!(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && _state.sellerAccountId);
+      if (hasBackend) {
+        // لا نعرض رداً وهمياً — ننتظر رد الوكيل/البائع الحي من الخادم
+        _sendToBackend(text, name, phone).then(function(data){
+          if (data && (_state.threadKey || (data.message && data.message.threadKey))) {
+            _startReplyPoll();
+          } else {
+            _autoReply();
+          }
+        });
+      } else {
+        _autoReply();
+      }
     },
 
     /** إرسال سريع من الاقتراحات */
@@ -718,6 +819,8 @@
 
     /** إغلاق النافذة */
     close: function() {
+      _stopPoll();
+      _hideTyping();
       var modal = document.getElementById(MODAL_ID);
       if (!modal) return;
       modal.classList.remove('rzq-open');

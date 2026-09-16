@@ -885,10 +885,11 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
  * تعديل من الأدمن يظهر للزوار الجدد في أقل من دقيقة كحد أقصى.
  */
 app.get('/api/site-config', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=60');
+  // Short cache so admin package/announcement edits reach visitors quickly.
+  res.set('Cache-Control', 'public, max-age=10');
   const cfg = readJson(SITE_CONFIG_FILE, {});
-  cfg.moduleFlags = getModuleFlags(); // �`ض�&�  ظ�!��ر ا���`�& ا�افتراض�`ة حت�0 �ب� أ�` حفظ �&�  ا�أد�&� 
-  cfg.sectionRules = getSectionRules(); // � فس ا��&بدأ � ���اعد ْ� �س�& دائ�&ا�9 ظا�!رة ب��`�&�!ا ا�افتراض�`ة
+  cfg.moduleFlags = getModuleFlags();
+  cfg.sectionRules = getSectionRules();
   cfg.otp = getPublicOtpConfig();
   res.json({ ok: true, config: cfg });
 });
@@ -1070,6 +1071,30 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
     };
   }
 
+  if (Array.isArray(body.announcements)) {
+    // إشعارات المنصة (شريط + بطاقة مميزة) — كانت localStorage فقط فلا تصل
+    // للزوار على أجهزة أخرى. تُزامَن هنا مثل الباقات وmanagerConfig.
+    next.announcements = body.announcements.slice(0, 40).map((a) => ({
+      id: String(a.id || ('ann_' + Date.now())).slice(0, 60),
+      type: String(a.type || 'info').slice(0, 20),
+      titleAr: String(a.titleAr || '').slice(0, 200),
+      titleFr: String(a.titleFr || '').slice(0, 200),
+      textAr: String(a.textAr || '').slice(0, 500),
+      textFr: String(a.textFr || '').slice(0, 500),
+      ctaTextAr: String(a.ctaTextAr || '').slice(0, 80),
+      ctaTextFr: String(a.ctaTextFr || '').slice(0, 80),
+      ctaUrl: String(a.ctaUrl || '').slice(0, 500),
+      pages: String(a.pages || 'all').slice(0, 80),
+      expires: String(a.expires || '').slice(0, 20),
+      showBar: a.showBar !== false,
+      showSpotlight: !!a.showSpotlight,
+      isPaid: !!a.isPaid,
+      active: a.active !== false,
+      createdAt: String(a.createdAt || new Date().toISOString()).slice(0, 40),
+    }));
+    next.announcementsUpdatedAt = new Date().toISOString();
+  }
+
   if (body.moderatorConfig && typeof body.moderatorConfig === 'object') {
     // إصلاح جوهري: إعدادات "المشرف الآلي" (القواعد المعطَّلة/كلمات محظورة
     // مخصصة/عتبة الثقة/وضع مراجعة الكل) كانت rizq_moderator_overrides محلية
@@ -1220,6 +1245,14 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
   }
 
   writeJson(SITE_CONFIG_FILE, next);
+  if (body.packages) {
+    try {
+      const pkgCfg = require('../rizq_packages_config');
+      if (pkgCfg && typeof pkgCfg.invalidateRemoteCatalogCache === 'function') {
+        pkgCfg.invalidateRemoteCatalogCache();
+      }
+    } catch (eInv) { /* ignore */ }
+  }
   res.json({ ok: true, config: next });
 });
 
@@ -3970,7 +4003,13 @@ app.get('/api/messages/thread/:threadKey', (req, res) => {
   let asBuyer = null;
   const buyerMatch = /::acc:(.+)$/.exec(threadKey);
   if (buyerMatch) asBuyer = verifyAccountOwner(buyerMatch[1], token);
-  if (!asSeller && !asBuyer) return res.status(401).json({ error: 'unauthorized' });
+  let asGuest = false;
+  const guestMatch = /::guest:(\d+)$/.exec(threadKey);
+  if (!asSeller && !asBuyer && guestMatch) {
+    const phoneDigits = String(req.query.buyerPhone || req.header('x-guest-phone') || '').replace(/\D/g, '');
+    if (phoneDigits && phoneDigits === guestMatch[1]) asGuest = true;
+  }
+  if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
   const list = readMessages().filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   res.json({ ok: true, messages: list });
 });

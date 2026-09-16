@@ -986,7 +986,8 @@ function _stampCatalogRev(pkg) {
 function _pkgNeedsDefaultRefresh(livePkg, base) {
   if (!base || !base.id) return false;
   if (livePkg._catalogRev === CATALOG_SYNC_REVISION) return false;
-  if (base.price != null && Number(livePkg.price) !== Number(base.price)) return true;
+  // Never treat an intentional admin price edit as "stale".
+  // Only rewrite known-bad tender prices / video quotas / obsolete feature copy.
   if (STALE_TENDER_PRICES[base.id] != null && Number(livePkg.price) === STALE_TENDER_PRICES[base.id]) return true;
   if (/^vid-/.test(base.id) && base.maxVideosPerMonth != null) {
     var liveMax = livePkg.maxVideosPerMonth;
@@ -1016,9 +1017,15 @@ function _mergeLive(defaults, live) {
     var nameHit = pkgId && NAMES[pkgId] ? NAMES[pkgId] : null;
     var tier = resolveDiamondTierFromPkg(livePkg) || resolveDiamondTierFromPkg(base);
     var tierFields = diamond ? _diamondTierFields(tier || 'diamond_standard', livePkg.price != null ? livePkg.price : base.price) : null;
+    var staleTenderHit = STALE_TENDER_PRICES[base.id] != null
+      && Number(livePkg.price) === STALE_TENDER_PRICES[base.id]
+      && base.price != null;
     return _stampCatalogRev({
       id: pkgId,
-      price: refresh && base.price != null ? Number(base.price) : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
+      // Prefer live admin price always — only replace known stale tender prices.
+      price: staleTenderHit
+        ? Number(base.price)
+        : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
       maxCatalogItems: refresh && base.maxCatalogItems != null ? base.maxCatalogItems : (livePkg.maxCatalogItems != null ? livePkg.maxCatalogItems : base.maxCatalogItems),
       maxVideosPerMonth: refresh && base.maxVideosPerMonth != null ? base.maxVideosPerMonth : (livePkg.maxVideosPerMonth != null ? livePkg.maxVideosPerMonth : base.maxVideosPerMonth),
@@ -1142,7 +1149,7 @@ function syncCatalogFromBackend(opts) {
   if (!force && _lastCatalogSyncMs && (now - _lastCatalogSyncMs) < CATALOG_SYNC_TTL_MS) {
     return Promise.resolve(true);
   }
-  _catalogSyncPromise = fetch(base + '/api/site-config')
+  _catalogSyncPromise = fetch(base + '/api/site-config', { cache: 'no-store' })
     .then(function (res) { return res.ok ? res.json() : null; })
     .then(function (data) {
       var pkgs = data && data.ok && data.config && data.config.packages;
@@ -1151,6 +1158,12 @@ function syncCatalogFromBackend(opts) {
     .catch(function () { return false; })
     .finally(function () { _catalogSyncPromise = null; });
   return _catalogSyncPromise;
+}
+
+/** Clears in-memory catalog cache so the next getCatalog reads site-config fresh. */
+function invalidateRemoteCatalogCache() {
+  _remoteCatalogCache = {};
+  _lastCatalogSyncMs = 0;
 }
 
 function getCatalog(catalogKey, lang) {
@@ -1438,6 +1451,7 @@ var API = {
   CATALOG_SYNC_REVISION: CATALOG_SYNC_REVISION,
   ensureCatalogStorageFresh: ensureCatalogStorageFresh,
   syncCatalogFromBackend: syncCatalogFromBackend,
+  invalidateRemoteCatalogCache: invalidateRemoteCatalogCache,
   LS_KEYS: LS_KEYS,
   CATALOG_REGISTRY: CATALOG_REGISTRY,
   registerCatalogMapping: registerCatalogMapping,

@@ -117,17 +117,18 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
   } else {
     prompt +=
       `\n# Role\n` +
-      `You are "Rizq Smart Manager" — the official AI agent for Rizq (rizq.mr).\n` +
-      `Personality: friendly and professional.\n` +
+      `You are "Rizq Smart Manager" (مدير رزق الذكي) — the official human-sounding AI deputy for Rizq (rizq.mr).\n` +
+      `Personality: warm, sharp, commercially helpful — like a real manager who knows the platform cold.\n` +
       `CRITICAL: For any ad price, seller trust, or listing question — call tools first ` +
       `(get_ad_details, search_ads, get_seller_profile, get_seller_reputation) then answer ONLY from results.\n` +
       `If an ad id is open: call get_ad_details with that id before stating price or trust.\n` +
       `For trust questions: call get_seller_reputation after you know account_id from the ad.\n` +
       `Never guess prices or trust scores — if no data, say so clearly.\n` +
-      `For Rizq subscription/package/pricing questions: call get_packages_info and explain from official data — ` +
-      `do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
+      `For Rizq subscription/package/pricing questions: ALWAYS call get_packages_info (live catalog) and explain from that data ONLY — ` +
+      `never quote memorized/old prices, never invent MRU amounts, never mix store/office/corp catalogs.\n` +
+      `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free at rizq.mr.\n` +
-      `For general questions: keep replies concise (2-4 sentences).\n` +
+      `For general questions: keep replies concise (2-4 sentences) and actionable.\n` +
       `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE plain-text answer — ` +
       `call get_packages_info first and explain BOTH diamond tiers from live data — never invent prices. ` +
       `Finish with a plain comparison (Standard vs Pro: price, channels, voice) — no Markdown, no tables, no bullet symbols.\n` +
@@ -499,15 +500,24 @@ async function handleWidgetChat(body) {
   const pageFacts = resolvePageContextFacts(pageContext);
   const catalogHint = inferCatalogFromConversation(text, body.history, pageContext, body.catalogHint);
   const packageFlow = isPackagePricingQuery(text);
+  // Prefer live catalog from disk every pricing turn (avoid stale in-memory defaults).
+  try {
+    const pkgCfg = require('../../rizq_packages_config');
+    if (pkgCfg && typeof pkgCfg.invalidateRemoteCatalogCache === 'function' && packageFlow) {
+      pkgCfg.invalidateRemoteCatalogCache();
+    }
+  } catch (eInv) { /* ignore */ }
   let liveCatalogPrefetch = null;
   if (packageFlow) {
     liveCatalogPrefetch = catalogHint
       ? getLivePackagesForAI(detectedLang, { catalog: catalogHint })
       : getLivePackagesForAI(detectedLang);
   }
-  const extraInstruction = (body.autoLang === true || body.systemInstruction)
-    ? (body.systemInstruction || 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, or English) and reply only in that language.')
-    : '';
+  const extraInstruction = body.autoLang === true
+    ? 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, English, or Spanish) and reply only in that language.'
+    : (body.systemInstruction
+      ? String(body.systemInstruction).slice(0, 400)
+      : '');
   const systemPrompt = buildSystemPrompt({
     lang: uiLang,
     detectedLang,

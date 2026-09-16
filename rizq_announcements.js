@@ -239,11 +239,17 @@
   }
 
   /* ── INIT ── */
-  function init() {
-    var allAnns;
-    try { allAnns = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-    catch(e) { return; }
+  var _backendBase = function() {
+    if (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
+      return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+    }
+    if (/^https?:/.test(location.protocol || '')) return location.origin;
+    return '';
+  };
+
+  function applyAnnouncements(allAnns) {
     if (!Array.isArray(allAnns) || !allAnns.length) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allAnns)); } catch (e) {}
 
     injectCSS();
     var page      = getCurrentPage();
@@ -258,7 +264,7 @@
     var spotAnn = active.find(function(a){ return !!a.showSpotlight;   }) || null;
 
     /* Bar: insert after first <nav> */
-    if (barAnn) {
+    if (barAnn && !document.getElementById('rizq-ann-bar')) {
       var nav = document.querySelector('nav');
       if (nav && nav.parentNode) {
         nav.parentNode.insertBefore(buildBar(barAnn), nav.nextSibling);
@@ -266,9 +272,57 @@
     }
 
     /* Spotlight: append to body with small delay */
-    if (spotAnn) {
-      setTimeout(function(){ document.body.appendChild(buildSpotlight(spotAnn)); }, 900);
+    if (spotAnn && !document.querySelector('.rizq-spotlight-card')) {
+      setTimeout(function(){
+        if (document.querySelector('.rizq-spotlight-card')) return;
+        document.body.appendChild(buildSpotlight(spotAnn));
+      }, 900);
     }
+  }
+
+  function fetchAnnouncementsFromBackend() {
+    var base = _backendBase();
+    if (!base || typeof fetch === 'undefined') return Promise.resolve(null);
+    return fetch(base + '/api/site-config', { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config) return null;
+        var list = data.config.announcements;
+        return Array.isArray(list) ? list : null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  function init() {
+    // Live from server first (cross-device), fallback to localStorage cache.
+    fetchAnnouncementsFromBackend().then(function(remote){
+      if (remote && remote.length) {
+        applyAnnouncements(remote);
+        return;
+      }
+      var allAnns;
+      try { allAnns = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch(e) { return; }
+      applyAnnouncements(allAnns);
+    });
+
+    // Fast refresh so admin publishes reach visitors within seconds.
+    setInterval(function(){
+      fetchAnnouncementsFromBackend().then(function(remote){
+        if (!remote) return;
+        try {
+          var prev = localStorage.getItem(STORAGE_KEY) || '[]';
+          var next = JSON.stringify(remote);
+          if (prev === next) return;
+          // Replace visible bar/spotlight if content changed.
+          var oldBar = document.getElementById('rizq-ann-bar');
+          if (oldBar) oldBar.remove();
+          var oldSpot = document.querySelector('.rizq-spotlight-card');
+          if (oldSpot) oldSpot.remove();
+          applyAnnouncements(remote);
+        } catch (e2) {}
+      });
+    }, 12000);
   }
 
   if (document.readyState === 'loading') {
