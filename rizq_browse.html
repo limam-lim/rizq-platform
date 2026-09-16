@@ -1280,7 +1280,7 @@ function _mapRawAdsToDisplay(rawList){
       // الإعلان الفعلي عبر RizqSub.getBadges: verified = توثيق هوية مجاني لكل
       // حساب وافق عليه الأدمن، pin ("مميّز"/Vedette — نفس تسمية الواجهة الحالية)
       // = ميزة vip_badge المدفوعة الحصرية لمشتركي باقة من مستوى 2 فما فوق.
-      var _badges = (typeof RizqSub!=='undefined' && a.accountId) ? RizqSub.getBadges(a.accountId) : {verified:false,premium:false};
+      var _badges = (typeof RizqSub!=='undefined' && a.accountId) ? RizqSub.getBadges(a.accountId) : {verified:false,premium:false,priorityListing:false};
       // إصلاح جوهري #219: "pin" (شارة/ترتيب "مميّز") لم يعد يعتمد فقط على
       // باقة الحساب (vip_badge) — أي إعلان فردي مثبَّت بشراء "مميزة" الخاص
       // به (RizqSub.isAdBoosted، مستقل تماماً عن باقة صاحبه) يُعامَل بنفس
@@ -1296,10 +1296,12 @@ function _mapRawAdsToDisplay(rawList){
       var _discountPct = (_origP>0 && p>0 && _origP>p) ? Math.round((1-(p/_origP))*100) : 0;
       var item = {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
         title:a.title||noTitle,desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):negotiable,
-        priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
+        priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_badges.priorityListing||_boosted),boosted:_boosted,
+        priorityListing:!!_badges.priorityListing,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
         images:Array.isArray(a.images)?a.images:[],
         condition:a.condition||'',
+        negotiable:!!a.negotiable,urgent:!!a.urgent,hidePhone:!!a.hidePhone,
         seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
         loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',

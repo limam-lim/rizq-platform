@@ -2633,15 +2633,17 @@ function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof O
 
 var DEMO_PAYMENTS=[];
 function getMyPayments(){
-  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || SESSION_ID || 'demo';
+  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || '';
+  if(!accId) return IS_DEMO ? DEMO_PAYMENTS : [];
   if(typeof RizqAccountPayments !== 'undefined') return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
   if(IS_DEMO) return DEMO_PAYMENTS;
   try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }
 }
 function saveMyPayments(arr){
-  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || SESSION_ID || 'demo';
+  var accId = (typeof CORP_ACC !== 'undefined' && CORP_ACC && CORP_ACC.id) || '';
+  if(!accId) return Promise.resolve();
   if(typeof RizqAccountPayments !== 'undefined'){
-    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || (CORP_ACC && CORP_ACC.token), IS_DEMO).then(function(saved){
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || '', IS_DEMO).then(function(saved){
       if(Array.isArray(saved)) localStorage.setItem(getMyStoreKey(), JSON.stringify(saved));
     });
   }
@@ -3661,7 +3663,8 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
     if(!card||!content) return;
     card.style.display='block';
     var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
-    if(IS_DEMO||!window.RIZQ_BACKEND_BASE||!acc.id||!acc.token){
+    var apiTok = window.REAL_ACCESS_TOKEN || '';
+    if(IS_DEMO||!window.RIZQ_BACKEND_BASE||!acc.id||!apiTok){
       badge.textContent=_t2('🔒 تجريبي','🔒 Démo');
       badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
       content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('تكامل API متاح بعد تفعيل باقة الماسية Pro للشركات.','Intégration API disponible après activation du forfait Diamant Pro entreprise.')+'</p>';
@@ -3669,7 +3672,7 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
     }
     content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('جاري تحميل مفتاح API…','Chargement de la clé API…')+'</p>';
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/status/'+encodeURIComponent(acc.id),{
-      headers:{'x-account-token':acc.token}
+      headers:{'x-account-token':apiTok}
     }).then(function(r){return r.json();}).then(function(data){
       if(!data.ok){
         content.innerHTML='<p style="font-size:13px;color:#dc2626">'+_t2('تعذّر تحميل إعدادات API','Impossible de charger les paramètres API')+'</p>';
@@ -3738,10 +3741,11 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
   function saveCorpApiIp(){
     var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
     var ipEl=document.getElementById('corp-api-ip');
-    if(!acc.id||!acc.token||!ipEl||!window.RIZQ_BACKEND_BASE) return;
+    var apiTok=window.REAL_ACCESS_TOKEN||'';
+    if(!acc.id||!apiTok||!ipEl||!window.RIZQ_BACKEND_BASE) return;
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id),{
       method:'PATCH',
-      headers:{'Content-Type':'application/json','x-account-token':acc.token},
+      headers:{'Content-Type':'application/json','x-account-token':apiTok},
       body:JSON.stringify({allowedOriginIp:ipEl.value.trim()})
     }).then(function(r){return r.json();}).then(function(data){
       if(data.ok){showToast(_t2('✅ تم حفظ IP','✅ IP enregistrée'));renderApiIntegrationCorp();}
@@ -3751,11 +3755,12 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
 
   function regenerateCorpApiKey(){
     var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
-    if(!acc.id||!acc.token||!window.RIZQ_BACKEND_BASE) return;
+    var apiTok=window.REAL_ACCESS_TOKEN||'';
+    if(!acc.id||!apiTok||!window.RIZQ_BACKEND_BASE) return;
     if(!confirm(_t2('تجديد المفتاح يلغي المفتاح الحالي فوراً. متابعة؟','Régénérer la clé invalide l\'ancienne immédiatement. Continuer ?'))) return;
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id)+'/regenerate',{
       method:'POST',
-      headers:{'x-account-token':acc.token}
+      headers:{'x-account-token':apiTok}
     }).then(function(r){return r.json();}).then(function(data){
       if(data.ok){showToast(_t2('✅ تم تجديد المفتاح','✅ Clé régénérée'));renderApiIntegrationCorp();}
       else showToast(data.error||_t2('فشل التجديد','Échec'),'error');

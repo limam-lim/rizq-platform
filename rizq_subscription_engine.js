@@ -808,6 +808,7 @@
     return {
       verified: !!(acc && acc.status === 'approved'),
       premium : hasFeature(accId, 'vip_badge'),
+      priorityListing: hasFeature(accId, 'priority_listing'),
       verifiedPlus: verifiedPlusActive,
     };
   }

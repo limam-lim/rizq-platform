@@ -529,7 +529,7 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="ad-condition-wrap">
       <label class="form-label" data-t-fr='État du produit <span class="req">*</span>'>حالة المنتج <span class="req">*</span></label>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="subcat-btn selected" data-t-fr="✨ Neuf" onclick="selectCondition(this,'جديد')">✨ جديد</button>
@@ -619,7 +619,7 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
-    <div class="form-row">
+    <div class="form-row" id="ad-stock-wrap">
       <div class="form-group">
         <label class="form-label" data-t-fr="Quantité restante (optionnel — pour afficher une pastille de rareté)">الكمية المتبقية (اختياري — لعرض شارة ندرة)</label>
         <input class="form-input" type="number" id="ad-stock-qty" placeholder="غير محدود" min="0" max="9999"/>
@@ -631,15 +631,15 @@ main, .page-content.active, .main-content, .results-area,
       <p data-t-fr="Options de l'annonce" style="font-size:13px;font-weight:700;color:var(--text-soft);margin-bottom:12px">خيارات الإعلان</p>
       <div class="toggle-group">
         <div><div class="toggle-label" data-t-fr="Masquer le numéro de téléphone">إخفاء رقم الهاتف</div><div class="toggle-sub" data-t-fr="Les acheteurs vous contactent uniquement par message">يتواصل المشترون عبر الرسائل فقط</div></div>
-        <button class="toggle-switch" onclick="this.classList.toggle('on')"></button>
+        <button type="button" class="toggle-switch" id="tog-hide-phone" onclick="this.classList.toggle('on')" aria-pressed="false"></button>
       </div>
       <div class="toggle-group">
         <div><div class="toggle-label" data-t-fr="Prix négociable">السعر قابل للتفاوض</div><div class="toggle-sub" data-t-fr="S'affiche à côté du prix">يظهر بجانب السعر</div></div>
-        <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        <button type="button" class="toggle-switch on" id="tog-negotiable" onclick="this.classList.toggle('on')" aria-pressed="true"></button>
       </div>
       <div class="toggle-group">
         <div><div class="toggle-label" data-t-fr="Annonce urgente">إعلان عاجل</div><div class="toggle-sub" data-t-fr='Affiche un badge "Urgent" sur l&#39;annonce'>يظهر شارة "عاجل" على الإعلان</div></div>
-        <button class="toggle-switch" onclick="this.classList.toggle('on')"></button>
+        <button type="button" class="toggle-switch" id="tog-urgent" onclick="this.classList.toggle('on')" aria-pressed="false"></button>
       </div>
     </div>
 
@@ -869,7 +869,29 @@ function selectCat(btn, cat){
     list.innerHTML='';
     wrap.style.display='none';
   }
+  var catKey = (typeof RizqCategories !== 'undefined') ? (RizqCategories.normalize(cat) || cat) : cat;
+  var isService = catKey === 'خدمات' || catKey === 'services';
+  var condWrap = document.getElementById('ad-condition-wrap');
+  var stockWrap = document.getElementById('ad-stock-wrap');
+  if(condWrap) condWrap.style.display = isService ? 'none' : '';
+  if(stockWrap) stockWrap.style.display = isService ? 'none' : '';
+  if(isService){
+    selCondition = '';
+    var qtyEl = document.getElementById('ad-stock-qty');
+    if(qtyEl) qtyEl.value = '';
+  }
   document.getElementById('btn-next-1').disabled=false;
+}
+function _postToggleOn(id){
+  var el = document.getElementById(id);
+  return !!(el && el.classList.contains('on'));
+}
+function _collectPostOptionFlags(){
+  return {
+    hidePhone: _postToggleOn('tog-hide-phone'),
+    negotiable: _postToggleOn('tog-negotiable'),
+    urgent: _postToggleOn('tog-urgent')
+  };
 }
 function selectSub(btn,sub){
   document.querySelectorAll('#subcats-list .subcat-btn').forEach(b=>b.classList.remove('selected'));
@@ -1153,6 +1175,9 @@ function publishAd(){
   var wilaya   = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '');
 
   var cityLine = resolveCityField();
+  var optFlags = _collectPostOptionFlags();
+  var catKeyNorm = (typeof RizqCategories !== 'undefined' ? RizqCategories.normalize(selCat) : selCat) || categoryLabel;
+  var isServiceCat = catKeyNorm === 'خدمات';
   var adData = {
     id:       'RZQ-2026-' + Math.floor(10000 + Math.random() * 90000),
     title:    title,
@@ -1161,8 +1186,8 @@ function publishAd(){
     descFr:   descFr,
     price:    price,
     originalPrice: priceOriginal,
-    stockQty: stockQty,
-    category: (typeof RizqCategories !== 'undefined' ? RizqCategories.normalize(selCat) : selCat) || categoryLabel,
+    stockQty: isServiceCat ? null : stockQty,
+    category: catKeyNorm,
     categoryLabel: categoryLabel,
     subcat:   selSubcat || '',
     emoji:    catEmoji,
@@ -1171,7 +1196,10 @@ function publishAd(){
     city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
     seller_trust_score: 60, // افتراضي — يُحدَّث عند توفر نظام الثقة
-    condition: selCondition || 'جديد',
+    condition: isServiceCat ? '' : (selCondition || 'جديد'),
+    hidePhone: !!optFlags.hidePhone,
+    negotiable: !!optFlags.negotiable,
+    urgent: !!optFlags.urgent,
     accountType: 'individual', // هذه الصفحة تخص الأفراد فقط — يُستخدم في rizq_moderator_agent.js لتطبيق قواعد قسم "الأفراد" تحديداً (راجع RIZQ_SECTION_MANAGEMENT_RULES.md)
   };
 
@@ -1444,7 +1472,11 @@ function saveAdEdit(){
     title: title, desc: desc, titleFr: titleFr, descFr: descFr,
     price: price, originalPrice: priceOriginal, stockQty: stockQty,
     subcat: selSubcat || '', wilaya: wilaya,
-    images: photosData.filter(function(p){ return !!p; })
+    images: photosData.filter(function(p){ return !!p; }),
+    condition: selCondition || '',
+    hidePhone: !!_collectPostOptionFlags().hidePhone,
+    negotiable: !!_collectPostOptionFlags().negotiable,
+    urgent: !!_collectPostOptionFlags().urgent
   };
 
   var btn = document.getElementById('btn-publish');

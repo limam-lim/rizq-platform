@@ -598,9 +598,9 @@ main, .page-content.active, .main-content, .results-area,
     </div>
     <div class="panel" id="panel-payments">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-        <div class="stat-card c-gold"><div class="stat-icon">💰</div><div class="stat-num">284,000 MRU</div><div class="stat-lbl" data-t="pay-revenue">إيراد هذا الشهر</div></div>
-        <div class="stat-card c-green"><div class="stat-icon">🚀</div><div class="stat-num">47</div><div class="stat-lbl" data-t="pay-pro-active">اشتراك Pro نشط</div></div>
-        <div class="stat-card c-purple"><div class="stat-icon">🏢</div><div class="stat-num">12</div><div class="stat-lbl" data-t="pay-business-active">اشتراك Business نشط</div></div>
+        <div class="stat-card c-gold"><div class="stat-icon">💰</div><div class="stat-num" id="pay-stat-revenue">—</div><div class="stat-lbl" data-t="pay-revenue">إيراد هذا الشهر</div></div>
+        <div class="stat-card c-green"><div class="stat-icon">🚀</div><div class="stat-num" id="pay-stat-pro">—</div><div class="stat-lbl" data-t="pay-pro-active">اشتراك Pro نشط</div></div>
+        <div class="stat-card c-purple"><div class="stat-icon">🏢</div><div class="stat-num" id="pay-stat-business">—</div><div class="stat-lbl" data-t="pay-business-active">اشتراك Business نشط</div></div>
       </div>
       <!-- ══ تنبيهات انتهاء/تجديد الاشتراكات ══ -->
       <div class="card" style="margin-bottom:16px">
@@ -4052,14 +4052,55 @@ function adminUpdateTicket(id, status) {
 
 function renderPayments(data){
   const t=document.getElementById('payments-tbody');
-  t.innerHTML=data.map(p=>`<tr>
-    <td style="font-size:13px;font-weight:600;color:#1a2535">${p.user}</td>
-    <td>${p.plan}</td>
-    <td style="font-size:14px;font-weight:900;color:var(--gold)">${p.amount}</td>
-    <td style="font-size:12.5px;color:var(--text-muted)">${p.method}</td>
-    <td style="font-size:12px;color:var(--text-muted)">${p.date}</td>
-    <td><span class="pill ${p.status==='active'?'pill-active':'pill-banned'}">${p.status==='active'?'✅ '+RizqI18n.t2('نشط','Actif'):'❌ '+RizqI18n.t2('منتهي','Expiré')}</span></td>
-  </tr>`).join('');
+  if(t){
+    if(!data || !data.length){
+      t.innerHTML='<tr><td colspan="6" style="text-align:center;color:#9aa7bd;padding:24px">'+RizqI18n.t2('لا توجد مدفوعات مسجّلة بعد','Aucun paiement enregistré pour le moment')+'</td></tr>';
+    } else {
+      t.innerHTML=data.map(p=>`<tr>
+        <td style="font-size:13px;font-weight:600;color:#1a2535">${p.user}</td>
+        <td>${p.plan}</td>
+        <td style="font-size:14px;font-weight:900;color:var(--gold)">${p.amount}</td>
+        <td style="font-size:12.5px;color:var(--text-muted)">${p.method}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${p.date}</td>
+        <td><span class="pill ${p.status==='active'?'pill-active':'pill-banned'}">${p.status==='active'?'✅ '+RizqI18n.t2('نشط','Actif'):'❌ '+RizqI18n.t2('منتهي','Expiré')}</span></td>
+      </tr>`).join('');
+    }
+  }
+  updatePayOverviewStats();
+}
+
+function updatePayOverviewStats(){
+  var revEl = document.getElementById('pay-stat-revenue');
+  var proEl = document.getElementById('pay-stat-pro');
+  var bizEl = document.getElementById('pay-stat-business');
+  var reqs = [];
+  try { reqs = JSON.parse(localStorage.getItem('rizq_sub_requests')||'[]'); } catch(e){}
+  var now = new Date();
+  var monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  var revenue = 0;
+  var approvedMonth = 0;
+  reqs.forEach(function(r){
+    if(r.status !== 'approved') return;
+    var ts = r.approvedAt || r.submittedAt;
+    var t = ts ? new Date(ts).getTime() : 0;
+    if(t >= monthStart){
+      approvedMonth++;
+      var amt = Number(r.amount || r.price || r.package_price || 0);
+      if(Number.isFinite(amt)) revenue += amt;
+    }
+  });
+  var accounts = [];
+  try { accounts = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); } catch(e){}
+  var activePro = 0, activeBiz = 0;
+  accounts.forEach(function(a){
+    if(!a || a.status !== 'approved' || a.suspended) return;
+    var pkg = String(a.package || a.plan || '').toLowerCase();
+    if(/pro|ماسي|diamond|business|ربع|سنو/.test(pkg)) activeBiz++;
+    else if(pkg && !/تجريب|trial|essai/.test(pkg)) activePro++;
+  });
+  if(revEl) revEl.textContent = revenue > 0 ? (revenue.toLocaleString('en-US') + ' MRU') : '—';
+  if(proEl) proEl.textContent = activePro > 0 ? String(activePro) : (approvedMonth > 0 ? String(approvedMonth) : '—');
+  if(bizEl) bizEl.textContent = activeBiz > 0 ? String(activeBiz) : '—';
 }
 
 async function renderTeam(){
@@ -6219,6 +6260,7 @@ function renderSubRequests(){
   var pending = reqs.filter(function(r){return r.status==='pending';});
   if(badge){ badge.textContent=pending.length; badge.style.display=pending.length?'inline':'none'; }
   updatePaymentsBadge();
+  if(typeof updatePayOverviewStats === 'function') updatePayOverviewStats();
   if(!reqs.length){ el.innerHTML='<p style="color:#9aa7bd;font-size:13px;text-align:center;padding:20px">'+RizqI18n.t2('لا توجد طلبات','Aucune demande')+'</p>'; return; }
   el.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">' +
     '<thead><tr style="background:#f8faff">' +

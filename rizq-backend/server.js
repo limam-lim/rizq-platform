@@ -1717,6 +1717,7 @@ app.get('/api/accounts/mine/:id', (req, res) => {
   if (!acc) return res.status(404).json({ error: 'account_not_found' });
   const token = extractAccountToken(req);
   if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
+  if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
   res.json({ ok: true, account: stripToken(acc) });
 });
 

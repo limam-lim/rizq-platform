@@ -238,6 +238,7 @@
     rec.status = serverAcc.status || rec.status || 'approved';
     rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
     rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
+    if (typeof serverAcc.suspended !== 'undefined') rec.suspended = !!serverAcc.suspended;
     delete rec.password;
     ['phone', 'city', 'address', 'desc', 'promo_video', 'category', 'whatsapp', 'facebook', 'thumb', 'tagline', 'package', 'package_price'].forEach(function (k) {
       if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
@@ -268,14 +269,23 @@
       }
       return r.ok ? r.json() : null;
     }).then(function (data) {
+      if (!data) return null;
       if (data && data.ok && data.account) {
+        if (data.account.suspended) {
+          clearSession();
+          return null;
+        }
+        if (data.account.status && data.account.status !== 'approved') {
+          clearSession();
+          return null;
+        }
         var merged = mergeServerAccount(Object.assign({}, data.account, {
           accessToken: token,
           dashToken: data.account.dashToken || acc.token
         }));
-        return merged || acc;
+        return merged || null;
       }
-      return acc;
+      return null;
     }).catch(function () { return acc; });
   }
 
@@ -445,11 +455,12 @@
     var acc = findApprovedAccount(sess);
     if (!acc) return Promise.resolve(null);
     return syncAccountFromBackend(acc).then(function (fresh) {
-      if (fresh && fresh.status === 'approved' && fresh.token) {
+      if (fresh && fresh.status === 'approved' && !fresh.suspended && fresh.token) {
         setActiveSession(fresh);
         return fresh;
       }
-      return acc;
+      clearSession();
+      return null;
     });
   }
 
