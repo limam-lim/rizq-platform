@@ -185,26 +185,42 @@
   function renderCard(p, opts) {
     opts = opts || {};
     var lang = opts.lang || getLang();
+    var light = !!opts.light;
     var dia = isDiamond(p);
     var trial = isTrial(p);
     var year = isYearly(p);
     var quarter = isQuarterly(p);
     var highlight = !!p.highlight || (!trial && !dia && !year && (p.id === 'st-month' || p.id === 'cp-month' || p.id === 'of-month' || p.id === 'vid-pro' || p.name === 'Pro' || p.name === 'احترافية'));
-    var bg = dia ? 'linear-gradient(160deg,#0a1628,#1B3A6B)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : 'linear-gradient(160deg,#f8faff,#eff3ff)';
-    var border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid #86efac' : '1.5px solid #bfcfef';
-    var nameCol = dia ? '#f3de9c' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#15803d' : '#1B3A6B';
-    var priceCol = dia ? '#e8c96a' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#16a34a' : '#1d4ed8';
-    var featCol = dia ? 'rgba(255,255,255,.85)' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? '#166534' : '#3a4a63';
-    var periodCol = dia ? 'rgba(243,222,156,.7)' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? '#4ade80' : '#5b6b8a';
-    var btnStyle = dia
-      ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
-      : year
+    var bg, border, nameCol, priceCol, featCol, periodCol, btnStyle;
+    if (light) {
+      bg = dia ? 'linear-gradient(160deg,#fffbeb,#fef3c7)' : year ? 'linear-gradient(160deg,#fff,#f8faff)' : highlight ? 'linear-gradient(160deg,#fffaf0,#fff7e6)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : '#ffffff';
+      border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.45)' : highlight ? '2px solid #C9A84C' : trial ? '1.5px solid #86efac' : '1.5px solid #d8e0ef';
+      nameCol = '#1B3A6B';
+      priceCol = dia || year || highlight ? '#C9A84C' : trial ? '#16a34a' : '#1d4ed8';
+      featCol = '#3a4a63';
+      periodCol = '#6a7a8a';
+      btnStyle = (dia || year || highlight)
+        ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 4px 14px rgba(201,168,76,.3)'
+        : trial
+          ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
+          : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.25)';
+    } else {
+      bg = dia ? 'linear-gradient(160deg,#0a1628,#1B3A6B)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : 'linear-gradient(160deg,#f8faff,#eff3ff)';
+      border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid #86efac' : '1.5px solid #bfcfef';
+      nameCol = dia ? '#f3de9c' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#15803d' : '#1B3A6B';
+      priceCol = dia ? '#e8c96a' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#16a34a' : '#1d4ed8';
+      featCol = dia ? 'rgba(255,255,255,.85)' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? '#166534' : '#3a4a63';
+      periodCol = dia ? 'rgba(243,222,156,.7)' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? '#4ade80' : '#5b6b8a';
+      btnStyle = dia
         ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
-        : highlight
-          ? 'border:none;color:#16263d;background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));box-shadow:0 6px 18px rgba(201,168,76,.4)'
-          : trial
-            ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
-            : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.35)';
+        : year
+          ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
+          : highlight
+            ? 'border:none;color:#16263d;background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));box-shadow:0 6px 18px rgba(201,168,76,.4)'
+            : trial
+              ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
+              : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.35)';
+    }
     var priceTxt = trial ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
     var feats = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length)
       ? p.features_fr.slice(0, 6)
@@ -221,8 +237,9 @@
     } else if (highlight) {
       badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
     }
+    var roiCol = light ? '#8a6c1f' : '#fde68a';
     return ''
-      + '<div class="store-pkg-card rizq-pkg-card" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:' + (highlight || year || dia ? '32px' : '28px') + ' 18px 22px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s">'
+      + '<div class="store-pkg-card rizq-pkg-card' + (light ? ' rizq-pkg-light' : '') + '" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:' + (highlight || year || dia ? '28px' : '24px') + ' 16px 20px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s">'
       + badge
       + '<div class="pkg-name" style="font-size:15px;font-weight:800;color:' + nameCol + ';margin-bottom:4px">' + esc(p.name || '') + '</div>'
       + (desc ? '<div style="font-size:11px;color:' + featCol + ';margin-bottom:8px;line-height:1.5">' + esc(desc) + '</div>' : '')
@@ -234,7 +251,7 @@
       + '<ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:' + featCol + ';margin-bottom:20px;padding:0">'
       + feats.map(function (f) { return '<li>✓ ' + esc(f) + '</li>'; }).join('')
       + '</ul>'
-      + (roi ? '<div style="font-size:11px;color:#fde68a;margin:-8px 0 14px;line-height:1.5">💼 ' + esc(roi) + '</div>' : '')
+      + (roi ? '<div style="font-size:11px;color:' + roiCol + ';margin:-8px 0 14px;line-height:1.5">💼 ' + esc(roi) + '</div>' : '')
       + '<button type="button" class="store-pkg-btn" onclick="window.location=\'' + esc(ctaHref(p, opts)) + '\'" style="width:100%;padding:11px;border-radius:11px;font-weight:800;font-size:13px;cursor:pointer;' + btnStyle + '">' + esc(ctaLabel(p)) + '</button>'
       + '</div>';
   }
@@ -354,9 +371,11 @@
       if (!key) return;
       var cols = Number(el.getAttribute('data-rizq-pkg-cols')) || 0;
       var ensureDiamond = el.getAttribute('data-rizq-pkg-diamond') === '1';
+      var light = el.getAttribute('data-rizq-pkg-light') === '1';
       mount(el.id || el, key, {
         columns: cols || undefined,
         ensureDiamond: ensureDiamond,
+        light: light,
         registerHref: el.getAttribute('data-rizq-pkg-register') || undefined,
         pricingHref: el.getAttribute('data-rizq-pkg-pricing') || undefined
       });

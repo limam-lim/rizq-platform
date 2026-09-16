@@ -27,7 +27,7 @@
   --shadow:0 6px 24px rgba(0,0,0,0.4);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;color:#26303F;min-height:100vh}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#ffffff;color:#26303F;min-height:100vh}
 
 /* ── TOPNAV ── */
 .topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
@@ -98,11 +98,11 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .page-sec-strip-inner::-webkit-scrollbar{display:none}
 .page-sec-btn{
   flex:0 0 auto;padding:8px 14px;border-radius:999px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28);
-  color:#E8C96A;font-size:12.5px;font-weight:700;font-family:inherit;
+  background:#f4f7fc;border:1px solid rgba(27,58,107,.12);
+  color:#1B3A6B;font-size:12.5px;font-weight:700;font-family:inherit;
   cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s;
 }
-.page-sec-btn:hover{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.5)}
+.page-sec-btn:hover{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.45)}
 @media(max-width:800px){
   .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
 }
@@ -113,12 +113,12 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:800}
 .btn-wa:hover{background:#1da851;box-shadow:0 6px 18px rgba(37,211,102,.35)}
 .action-btn svg{width:16px;height:16px;flex-shrink:0}
-.btn-share{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.15)}
-.btn-share:hover{background:rgba(255,255,255,.14)}
+.btn-share{background:#fff;color:#1B3A6B;border:1px solid rgba(27,58,107,.15)}
+.btn-share:hover{background:#f7f9fc;border-color:rgba(201,168,76,.45)}
 .showroom-rating{display:flex;align-items:center;gap:8px}
 .stars{color:#F5A623;font-size:14px}
-.rating-val{font-size:20px;font-weight:900;color:#fff}
-.rating-cnt{font-size:11px;color:rgba(255,255,255,.5)}
+.rating-val{font-size:20px;font-weight:900;color:#1B3A6B}
+.rating-cnt{font-size:11px;color:#6a7a8a}
 
 /* ── LAYOUT ── */
 .main-wrap{max-width:1180px;margin:0 auto;padding:0 20px 28px}
@@ -449,7 +449,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
       <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
     </p>
   </div>
-  <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
+  <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
 </section>
 
 <!-- ══ FOOTER RIZQ (موحّد مع باقي الصفحات) ══ -->

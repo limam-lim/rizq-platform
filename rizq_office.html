@@ -35,7 +35,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);padding-bottom:0}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#ffffff;color:var(--text);padding-bottom:0}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
 a{text-decoration:none;color:inherit}
 
@@ -207,12 +207,19 @@ a{text-decoration:none;color:inherit}
 .hc-lbl{font-size:11px;color:#6a7a8a;margin-top:2px}
 .hc-icon{font-size:15px;opacity:.8}
 
-/* Empty office hub */
-body.rizq-empty-office .hero{padding:14px 24px 12px}
+/* Empty office hub — واجهة نظيفة: بانر + باقات فقط، بلا هيكل فارغ */
+body.rizq-empty-office .hero{padding:10px 24px 8px}
 body.rizq-empty-office .hero-card{display:none}
-body.rizq-empty-office .hero-inner{grid-template-columns:1fr;align-items:start;gap:0;padding-bottom:4px}
-body.rizq-empty-office .hero-hub-actions{display:flex}
-body.rizq-empty-office #office-empty-banner{display:block!important;margin:0 auto;border-radius:0;border-left:none;border-right:none;max-width:none}
+body.rizq-empty-office .hero-inner{grid-template-columns:1fr;align-items:start;gap:0;padding-bottom:0}
+body.rizq-empty-office .hero-hub-actions{display:none!important}
+body.rizq-empty-office .hero-title{font-size:clamp(18px,2.6vw,24px);margin-bottom:4px}
+body.rizq-empty-office .hero-desc{margin-bottom:8px;font-size:12.5px}
+body.rizq-empty-office #office-empty-banner{display:block!important;margin:0 auto;border-radius:0;border-left:none;border-right:none;max-width:none;padding:10px 16px}
+body.rizq-empty-office .main-wrap,
+body.rizq-empty-office .actions-bar,
+body.rizq-empty-office .stats-strip,
+body.rizq-empty-office .sticky-cta{display:none!important}
+body.rizq-empty-office .pkg-section{padding:28px 24px 40px;background:#ffffff}
 .hero-hub-actions{display:none}
 
 /* ════════ STATS STRIP ════════ */
@@ -348,9 +355,9 @@ body.rizq-empty-office #office-empty-banner{display:block!important;margin:0 aut
 .promo-card{background:linear-gradient(135deg,rgba(14,116,144,.06),rgba(201,168,76,.07));border:1px solid rgba(201,168,76,.22);border-radius:13px;padding:16px;text-align:center;margin-top:4px}
 
 /* ════════ PACKAGES SECTION ════════ */
-.pkg-section{padding:40px 24px 56px;background:linear-gradient(180deg,var(--bg2) 0%,#eef2fb 100%);border-top:1px solid #e0e8f0}
+.pkg-section{padding:28px 24px 40px;background:#ffffff;border-top:1px solid #e8eef6}
 .pkg-section-inner{max-width:1380px;margin:0 auto}
-.pkg-section-head{text-align:center;margin-bottom:28px}
+.pkg-section-head{text-align:center;margin-bottom:20px}
 .pkg-label{display:inline-block;font-size:11px;letter-spacing:2.5px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:10px;background:rgba(14,116,144,.08);padding:4px 16px;border-radius:20px;border:1px solid rgba(14,116,144,.2)}
 .pkg-h2{font-size:clamp(22px,3vw,34px);font-weight:700;color:#16263d;margin-bottom:10px}
 .pkg-h2 span{background:linear-gradient(90deg,var(--gold),var(--teal2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -1852,8 +1859,8 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_packages_config.js?v=13.3"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
+<script src="rizq_packages_config.js?v=13.5"></script>
+<script src="rizq_packages_ui.js?v=13.5"></script>
 <script src="rizq_video_ads.js"></script>
   <!-- ═══ وكيل السكرتير الذكي — الباقة الماسية فقط ═══ -->
   <script src="rizq_secretary_agent.js"></script>
@@ -1869,7 +1876,7 @@ window._rizqProfile = (function() {
       <p style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 
-    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
+    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
   </div>
 </section>
 
