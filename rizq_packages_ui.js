@@ -193,8 +193,8 @@
     var highlight = !!p.highlight || (!trial && !dia && !year && (p.id === 'st-month' || p.id === 'cp-month' || p.id === 'of-month' || p.id === 'vid-pro' || p.name === 'Pro' || p.name === 'احترافية'));
     var bg, border, nameCol, priceCol, featCol, periodCol, btnStyle;
     if (light) {
-      bg = dia ? 'linear-gradient(160deg,#fffbeb,#fef3c7)' : year ? 'linear-gradient(160deg,#fff,#f8faff)' : highlight ? 'linear-gradient(160deg,#fffaf0,#fff7e6)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : '#ffffff';
-      border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.45)' : highlight ? '2px solid #C9A84C' : trial ? '1.5px solid #86efac' : '1.5px solid #d8e0ef';
+      bg = dia ? 'linear-gradient(160deg,#fffdf5,#fff8e7)' : year ? 'linear-gradient(160deg,#ffffff,#f7f9ff)' : highlight ? 'linear-gradient(160deg,#fffaf0,#fff7e6)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : '#ffffff';
+      border = dia ? '1.5px solid rgba(201,168,76,.45)' : year ? '1.5px solid rgba(201,168,76,.35)' : highlight ? '2px solid #C9A84C' : trial ? '1.5px solid #86efac' : '1.5px solid #d8e0ef';
       nameCol = '#1B3A6B';
       priceCol = dia || year || highlight ? '#C9A84C' : trial ? '#16a34a' : '#1d4ed8';
       featCol = '#3a4a63';
