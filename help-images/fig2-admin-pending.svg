@@ -1,21 +1,28 @@
-<svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg">
-  <rect width="880" height="240" fill="#0f172a"/>
-  <rect x="0" y="0" width="200" height="240" fill="#0a1220"/>
-  <text x="100" y="28" fill="#64748b" text-anchor="middle" font-size="10" font-family="Segoe UI">SIDEBAR</text>
-  <rect x="16" y="44" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="64" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">F81) 9'E)</text>
-  <rect x="16" y="84" width="168" height="32" rx="6" fill="rgba(255,255,255,.06)"/><text x="100" y="104" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI">'DE3*./EHF </text>
-  <rect x="16" y="124" width="168" height="36" rx="6" fill="rgba(201,168,76,.25)" stroke="#C9A84C" stroke-width="2"/>
-  <text x="100" y="146" fill="#E8C96A" text-anchor="middle" font-size="12" font-weight="700" font-family="Segoe UI">=d 'D-3'('* �</text>
-  <text x="100" y="162" fill="#fbbf24" text-anchor="middle" font-size="9" font-family="Segoe UI">� GF' pending</text>
-  <rect x="216" y="16" width="648" height="208" rx="10" fill="#fff"/>
-  <text x="240" y="44" fill="#1B3A6B" font-size="14" font-weight="800" font-family="Segoe UI">7D('* 'D*3,JD  BJ/ 'DE1',9)</text>
-  <rect x="232" y="60" width="616" height="44" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
-  <circle cx="256" cy="82" r="14" fill="#1B3A6B"/><text x="256" y="86" fill="#C9A84C" text-anchor="middle" font-size="12"><�</text>
-  <text x="284" y="78" fill="#1a2535" font-size="13" font-weight="700" font-family="Segoe UI">'3E F4'7C / Your Store</text>
-  <text x="284" y="94" fill="#64748b" font-size="10" font-family="Segoe UI">status: pending  JF*81 EH'AB*C</text>
-  <rect x="720" y="72" width="72" height="28" rx="6" fill="#16a34a"/><text x="756" y="90" fill="#fff" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">EH'AB)</text>
-  <rect x="800" y="72" width="36" height="28" rx="6" fill="#fee2e2" stroke="#ef4444"/><text x="818" y="90" fill="#dc2626" text-anchor="middle" font-size="11" font-family="Segoe UI"></text>
-  <path d="M440 120 L460 140 L420 140 Z" fill="#C9A84C"/>
-  <rect x="320" y="140" width="240" height="36" rx="8" fill="#C9A84C"/>
-  <text x="440" y="163" fill="#0f172a" text-anchor="middle" font-size="11" font-weight="700" font-family="Segoe UI">� DJ3 *(HJ( �'DE3*./EHF�</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" direction="rtl">
+  <rect width="880" height="260" rx="12" fill="#0f172a"/>
+  <rect x="0" y="0" width="210" height="260" fill="#0a1220"/>
+  <text x="105" y="28" fill="#64748b" text-anchor="middle" font-size="11" font-family="Segoe UI,sans-serif">SIDEBAR</text>
+  <rect x="18" y="48" width="174" height="34" rx="8" fill="rgba(255,255,255,.06)"/>
+  <text x="105" y="70" fill="#94a3b8" text-anchor="middle" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">نظرة عامة</text>
+  <rect x="18" y="92" width="174" height="34" rx="8" fill="rgba(255,255,255,.06)"/>
+  <text x="105" y="114" fill="#94a3b8" text-anchor="middle" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">المستخدمون</text>
+  <rect x="18" y="136" width="174" height="42" rx="8" fill="rgba(201,168,76,.28)" stroke="#C9A84C" stroke-width="2"/>
+  <text x="105" y="156" fill="#E8C96A" text-anchor="middle" font-size="13" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">الحسابات ★</text>
+  <text x="105" y="172" fill="#fbbf24" text-anchor="middle" font-size="10" font-family="Segoe UI,sans-serif">طلبات pending</text>
+  <rect x="230" y="18" width="630" height="224" rx="12" fill="#fff"/>
+  <text x="250" y="48" fill="#1B3A6B" font-size="15" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">طابور الحسابات — الطلبات الجديدة</text>
+  <rect x="250" y="68" width="590" height="56" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="280" cy="96" r="16" fill="#1B3A6B"/>
+  <text x="280" y="101" fill="#C9A84C" text-anchor="middle" font-size="13" font-family="Segoe UI,sans-serif">م</text>
+  <text x="310" y="90" fill="#1a2535" font-size="14" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">محل جديد / Boutique</text>
+  <text x="310" y="110" fill="#64748b" font-size="11" font-family="Segoe UI,sans-serif">status: pending — بانتظار موافقة الأدمن</text>
+  <rect x="690" y="82" width="70" height="28" rx="7" fill="#16a34a"/>
+  <text x="725" y="101" fill="#fff" text-anchor="middle" font-size="12" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">موافقة</text>
+  <rect x="770" y="82" width="50" height="28" rx="7" fill="#fee2e2" stroke="#ef4444"/>
+  <text x="795" y="101" fill="#dc2626" text-anchor="middle" font-size="12" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">رفض</text>
+  <path d="M460 140 L480 160 L440 160 Z" fill="#C9A84C"/>
+  <rect x="320" y="168" width="280" height="40" rx="10" fill="#C9A84C"/>
+  <text x="460" y="193" fill="#0f172a" text-anchor="middle" font-size="13" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">بعد القبول يظهر في «المستخدمون»</text>
+  <text x="440" y="248" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI,sans-serif">Accounts tab = pending · Users tab = approved only</text>
 </svg>

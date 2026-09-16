@@ -8,7 +8,7 @@
   <style>
     :root{--royal:#1B3A6B;--gold:#C9A84C;--bg:#f8faff;--text:#1a2535;--muted:#64748b}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    body{font-family:Tahoma,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.75}
     .wrap{max-width:920px;margin:0 auto;padding:24px 16px 48px}
     header{background:linear-gradient(135deg,#0f172a,#1B3A6B);color:#fff;border-radius:16px;padding:28px 24px;margin-bottom:28px}
     header h1{font-size:1.55rem;margin-bottom:6px}
@@ -19,23 +19,30 @@
     section{background:#fff;border:1px solid #e2e8f5;border-radius:14px;padding:20px 18px;margin-bottom:20px;box-shadow:0 4px 20px rgba(15,35,65,.06)}
     section h2{font-size:1.15rem;color:var(--royal);margin-bottom:10px}
     section p,section li{font-size:14px;color:#334155}
-    section ul{margin:10px 20px 0}
+    section ul,section ol{margin:10px 22px 0}
+    section li{margin:4px 0}
     .fig{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#fafbff}
-    .fig img,.fig picture{display:block;width:100%;height:auto}
-    .fig img{width:100%;height:auto;display:block}
+    .fig img{display:block;width:100%;height:auto;min-height:120px;background:#eef2ff}
+    .fig-fallback{display:none;padding:28px 16px;text-align:center;color:#475569;font-size:14px;font-weight:700;background:#f1f5f9}
+    .fig.is-broken img{display:none}
+    .fig.is-broken .fig-fallback{display:block}
     .fig-cap{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid #eef2f8;background:#fff}
     .steps{display:grid;gap:10px;margin-top:12px}
     .step{display:flex;gap:12px;align-items:flex-start;background:#f8faff;border-radius:10px;padding:12px 14px;border:1px solid #e8eef8}
     .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#0f172a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+    .note{margin-top:12px;padding:12px 14px;border-radius:10px;background:#fffbeb;border:1px solid #fde68a;font-size:13px;color:#78350f}
     .dl-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-    .dl-row a{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
-    .dl-primary{background:linear-gradient(135deg,var(--gold),#e8c96a);color:#0f172a}
+    .dl-row a,.dl-row button{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+    .dl-primary{background:linear-gradient(135deg,var(--gold),#e8c96a);color:#0f172a;border:none}
     .dl-outline{border:1.5px solid var(--royal);color:var(--royal);background:#fff}
+    .dl-msg{margin-top:10px;font-size:12.5px;color:var(--muted);min-height:1.2em}
     footer{text-align:center;font-size:12px;color:var(--muted);margin-top:24px}
     .fr-only{display:none}
     html[lang="fr"] .ar-only{display:none}
     html[lang="fr"] .fr-only{display:block}
-    html[lang="fr"] .fr-only-inline{display:inline}
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+    th,td{border:1px solid #e2e8f0;padding:10px 12px;text-align:start}
+    th{background:#f1f5f9;color:var(--royal)}
     @media(max-width:600px){header h1{font-size:1.25rem}.wrap{padding:16px 12px 32px}}
   </style>
 </head>
@@ -43,48 +50,76 @@
 <div class="wrap">
   <header>
     <h1><span class="ar-only">📘 دليل استعمال منصة رزق</span><span class="fr-only">📘 Guide d'utilisation Rizq</span></h1>
-    <p class="ar-only">صور توضيحية + خطوات عملية للتسجيل، لوحات التحكم، والأدمن</p>
-    <p class="fr-only">Schémas illustrés + étapes pour l'inscription, les tableaux de bord et l'admin</p>
+    <p class="ar-only">صور توضيحية + خطوات عملية للتسجيل، الدخول، لوحات التحكم، والأدمن</p>
+    <p class="fr-only">Schémas + étapes pour inscription, connexion, tableaux de bord et admin</p>
     <div class="lang-bar">
       <button type="button" id="btn-ar" class="on" onclick="setHelpLang('ar')">AR</button>
       <button type="button" id="btn-fr" onclick="setHelpLang('fr')">FR</button>
     </div>
   </header>
 
-  <!-- ══ مخطط 1: رحلة المنصة ══ -->
   <section>
     <h2><span class="ar-only">① خريطة المنصة — من الزائر إلى البائع</span><span class="fr-only">① Parcours — visiteur → vendeur</span></h2>
+    <p class="ar-only">هذه هي الرحلة الكاملة لفتح نشاط على رزق:</p>
+    <p class="fr-only">Voici le parcours complet pour ouvrir une activité sur Rizq :</p>
     <div class="fig">
-      <picture>
-        <source type="image/svg+xml" srcset="help-images/fig1-journey.svg">
-        <img src="help-images/fig1-journey.png" alt="مخطط رحلة البائع — من التسجيل إلى الصفحة العامة" width="880" height="200" loading="lazy">
-      </picture>
+      <img src="help-images/fig1-journey.svg" alt="مخطط رحلة البائع — من التسجيل إلى الصفحة العامة" width="880" height="220" loading="eager" onerror="this.closest('.fig').classList.add('is-broken')">
+      <div class="fig-fallback ar-only">مخطط رحلة البائع — من التسجيل إلى الصفحة العامة</div>
+      <div class="fig-fallback fr-only">Parcours vendeur — inscription → page publique</div>
     </div>
+    <ol class="ar-only">
+      <li>من الرئيسية: <strong>حسابي</strong> ثم إنشاء حساب.</li>
+      <li>اختر النوع (فرد / محل / مكتب / شركة) وأرسل الطلب.</li>
+      <li>الأدمن يراجع الهوية في تبويب الحسابات.</li>
+      <li>بعد الموافقة تفتح لوحة التحكم الخاصة بنوعك.</li>
+      <li>تظهر منتجاتك/إعلاناتك في الصفحة العامة للزوار.</li>
+    </ol>
+    <ol class="fr-only">
+      <li>Accueil → <strong>Mon compte</strong> → créer un compte.</li>
+      <li>Choisir le type et envoyer la demande.</li>
+      <li>L'admin valide l'identité dans l'onglet Comptes.</li>
+      <li>Après approbation, ouvrir le tableau de bord.</li>
+      <li>Votre page publique devient visible aux visiteurs.</li>
+    </ol>
     <p class="fig-cap ar-only">الشكل 1: مسار البائع من الصفحة الرئيسية حتى ظهور نشاطه للجمهور</p>
-    <p class="fig-cap fr-only">Figure 1 : Parcours vendeur — accueil → approbation → page publique</p>
+    <p class="fig-cap fr-only">Figure 1 : Parcours vendeur jusqu'à la page publique</p>
   </section>
 
-  <!-- ══ مخطط 2: Super Admin ══ -->
   <section>
     <h2><span class="ar-only">② أين يظهر حسابك الجديد في Super Admin؟</span><span class="fr-only">② Où voir un nouveau compte (Super Admin) ?</span></h2>
     <div class="fig">
-      <picture>
-        <source type="image/svg+xml" srcset="help-images/fig2-admin-pending.svg">
-        <img src="help-images/fig2-admin-pending.png" alt="تبويب الحسابات في Super Admin — طلبات pending" width="880" height="240" loading="lazy">
-      </picture>
+      <img src="help-images/fig2-admin-pending.svg" alt="تبويب الحسابات في Super Admin — طلبات pending" width="880" height="260" loading="eager" onerror="this.closest('.fig').classList.add('is-broken')">
+      <div class="fig-fallback ar-only">تبويب الحسابات في Super Admin — طلبات pending</div>
+      <div class="fig-fallback fr-only">Onglet Comptes (Super Admin) — demandes pending</div>
     </div>
-    <p class="ar-only">تبويب <strong>«الحسابات»</strong> = طلبات جديدة (pending). تبويب <strong>«المستخدمون»</strong> = معتمدون فقط (approved).</p>
+    <p class="ar-only">تبويب <strong>«الحسابات»</strong> = طلبات جديدة (pending). تبويب <strong>«المستخدمون»</strong> = معتمدون فقط (approved). بعد الموافقة لا يبقى الطلب في طابور الحسابات.</p>
     <p class="fr-only">Onglet <strong>« Comptes »</strong> = nouvelles demandes. <strong>« Utilisateurs »</strong> = approuvés uniquement.</p>
+    <div class="note ar-only">💡 إذا سجّلت للتو ولم ترَ الحساب: تأكد أن الأدمن يفتح تبويب «الحسابات» وليس «المستخدمون».</div>
+    <div class="note fr-only">💡 Nouveau compte invisible ? Vérifiez l'onglet « Comptes », pas « Utilisateurs ».</div>
   </section>
 
-  <!-- ══ مخطط 3: الفيديو التعريفي ══ -->
   <section>
-    <h2><span class="ar-only">③ الفيديو التعريفي في لوحة التحكم</span><span class="fr-only">③ Vidéo promotionnelle (dashboard)</span></h2>
+    <h2><span class="ar-only">③ الدخول مرة أخرى (بعد الموافقة)</span><span class="fr-only">③ Se reconnecter (après approbation)</span></h2>
+    <div class="steps ar-only">
+      <div class="step"><span class="step-num">1</span><span>اضغط <strong>حسابي</strong> → دخول البائع</span></div>
+      <div class="step"><span class="step-num">2</span><span>أدخل البريد وكلمة المرور المسجَّلين</span></div>
+      <div class="step"><span class="step-num">3</span><span>يتم التحقق عبر الخادم (وليس الجهاز فقط)</span></div>
+      <div class="step"><span class="step-num">4</span><span>تُفتح اللوحة المناسبة لنوع حسابك تلقائياً</span></div>
+    </div>
+    <div class="steps fr-only">
+      <div class="step"><span class="step-num">1</span><span><strong>Mon compte</strong> → connexion vendeur</span></div>
+      <div class="step"><span class="step-num">2</span><span>Email + mot de passe</span></div>
+      <div class="step"><span class="step-num">3</span><span>Vérification serveur (pas seulement locale)</span></div>
+      <div class="step"><span class="step-num">4</span><span>Ouverture du bon tableau de bord</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="ar-only">④ الفيديو التعريفي في لوحة التحكم</span><span class="fr-only">④ Vidéo promotionnelle (dashboard)</span></h2>
     <div class="fig">
-      <picture>
-        <source type="image/svg+xml" srcset="help-images/fig3-promo-video.svg">
-        <img src="help-images/fig3-promo-video.png" alt="إضافة فيديو تعريفي من لوحة التحكم إلى الصفحة العامة" width="880" height="220" loading="lazy">
-      </picture>
+      <img src="help-images/fig3-promo-video.svg" alt="إضافة فيديو تعريفي من لوحة التحكم إلى الصفحة العامة" width="880" height="240" loading="eager" onerror="this.closest('.fig').classList.add('is-broken')">
+      <div class="fig-fallback ar-only">إضافة فيديو تعريفي من لوحة التحكم إلى الصفحة العامة</div>
+      <div class="fig-fallback fr-only">Vidéo promo : dashboard → page publique</div>
     </div>
     <div class="steps ar-only">
       <div class="step"><span class="step-num">1</span><span>لوحة التحكم → الملف الشخصي</span></div>
@@ -100,32 +135,71 @@
     </div>
   </section>
 
-  <!-- ══ مخطط 4: أنواع اللوحات ══ -->
   <section>
-    <h2><span class="ar-only">④ أنواع لوحات التحكم</span><span class="fr-only">④ Types de tableaux de bord</span></h2>
+    <h2><span class="ar-only">⑤ أنواع لوحات التحكم</span><span class="fr-only">⑤ Types de tableaux de bord</span></h2>
     <div class="fig">
-      <picture>
-        <source type="image/svg+xml" srcset="help-images/fig4-dashboard-types.svg">
-        <img src="help-images/fig4-dashboard-types.png" alt="أنواع لوحات التحكم — أفراد، محل، مكتب، شركة" width="880" height="160" loading="lazy">
-      </picture>
+      <img src="help-images/fig4-dashboard-types.svg" alt="أنواع لوحات التحكم — أفراد، محل، مكتب، شركة" width="880" height="180" loading="eager" onerror="this.closest('.fig').classList.add('is-broken')">
+      <div class="fig-fallback ar-only">أنواع لوحات التحكم — أفراد، محل، مكتب، شركة</div>
+      <div class="fig-fallback fr-only">Types de tableaux de bord</div>
     </div>
+    <table class="ar-only">
+      <thead><tr><th>النوع</th><th>الاستخدام</th><th>الصفحة العامة</th></tr></thead>
+      <tbody>
+        <tr><td>أفراد</td><td>إعلانات شخصية</td><td>صفحة الملف / الإعلان</td></tr>
+        <tr><td>محل</td><td>منتجات وتوصيل</td><td>rizq_store.html</td></tr>
+        <tr><td>مكتب</td><td>خدمات مكتبية</td><td>rizq_office.html</td></tr>
+        <tr><td>شركة</td><td>كتالوج ومعرض</td><td>rizq_corp.html</td></tr>
+      </tbody>
+    </table>
+    <table class="fr-only">
+      <thead><tr><th>Type</th><th>Usage</th><th>Page publique</th></tr></thead>
+      <tbody>
+        <tr><td>Particulier</td><td>Annonces</td><td>Profil / annonce</td></tr>
+        <tr><td>Boutique</td><td>Produits</td><td>rizq_store.html</td></tr>
+        <tr><td>Bureau</td><td>Services</td><td>rizq_office.html</td></tr>
+        <tr><td>Entreprise</td><td>Catalogue</td><td>rizq_corp.html</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="ar-only">⑥ نشر إعلان (للأفراد)</span><span class="fr-only">⑥ Publier une annonce</span></h2>
+    <ul class="ar-only">
+      <li>من اللوحة أو زر <strong>انشر إعلان</strong>.</li>
+      <li>اختر القسم والفرع، ثم العنوان والوصف والسعر والصور.</li>
+      <li>لقسم <strong>الخدمات</strong>: لا تظهر حالة المنتج ولا الكمية.</li>
+      <li>خيارات مفيدة: قابل للتفاوض · عاجل · إخفاء الهاتف.</li>
+      <li>الإعلان يبدأ بمراجعة الأدمن قبل الظهور الكامل.</li>
+    </ul>
+    <ul class="fr-only">
+      <li>Depuis le tableau de bord ou « Publier ».</li>
+      <li>Catégorie, titre, description, prix, photos.</li>
+      <li>Pour <strong>Services</strong> : pas d'état produit ni quantité.</li>
+      <li>Options : négociable · urgent · masquer le téléphone.</li>
+      <li>L'annonce part en révision admin.</li>
+    </ul>
   </section>
 
   <section>
     <h2><span class="ar-only">📥 تنزيل النص الكامل</span><span class="fr-only">📥 Télécharger le texte complet</span></h2>
-    <p class="ar-only">النسخة المرئية (هذه الصفحة) للفهم السريع. للتفاصيل التقنية الكاملة:</p>
-    <p class="fr-only">Cette page visuelle pour un aperçu rapide. Pour le détail technique :</p>
+    <p class="ar-only">هذه الصفحة للفهم السريع بالصور. للتنزيل:</p>
+    <p class="fr-only">Cette page est visuelle. Pour télécharger :</p>
     <div class="dl-row">
-      <a href="rizq_help.html" class="dl-primary ar-only">🖼️ الدليل المرئي (هذه الصفحة)</a>
-      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'dashboard-guide')">📄 دليل الداشبورد (MD)</a>
-      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'platform-manual')">📚 كتيب المنصة (MD)</a>
+      <a href="rizq_help.html" class="dl-primary"><span class="ar-only">🖼️ الدليل المرئي</span><span class="fr-only">🖼️ Guide visuel</span></a>
+      <button type="button" class="dl-outline" onclick="rizqDownloadHelpGuide(event,'dashboard-guide')"><span class="ar-only">📄 دليل الداشبورد (MD)</span><span class="fr-only">📄 Guide dashboard (MD)</span></button>
+      <button type="button" class="dl-outline" onclick="rizqDownloadHelpGuide(event,'platform-manual')"><span class="ar-only">📚 كتيب المنصة (MD)</span><span class="fr-only">📚 Manuel plateforme (MD)</span></button>
+      <a class="dl-outline" href="RIZQ_PLATFORM_MANUAL.md" download="rizq-platform-manual.md"><span class="ar-only">⬇️ رابط مباشر للكتيب</span><span class="fr-only">⬇️ Lien direct manuel</span></a>
+      <a class="dl-outline" href="rizq-backend/help/dashboard-guide.md" download="rizq-dashboard-guide.md"><span class="ar-only">⬇️ رابط مباشر لدليل اللوحات</span><span class="fr-only">⬇️ Lien direct dashboard</span></a>
     </div>
+    <p class="dl-msg" id="dl-msg"></p>
+    <div class="note ar-only">إذا فشل التنزيل عبر الزر الأصفر/الأزرق، استخدم «رابط مباشر» — يعمل حتى بدون تشغيل الخادم.</div>
+    <div class="note fr-only">Si le bouton API échoue, utilisez le « lien direct » (sans serveur).</div>
   </section>
 
   <footer>
     <span class="ar-only">© RIZQ — ADMINIA SARL · آخر تحديث سبتمبر 2026</span>
     <span class="fr-only">© RIZQ — ADMINIA SARL · Sept. 2026</span>
-    · <a href="./" style="color:var(--royal)">← <span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+    · <a href="rizq_landing_v8.html" style="color:var(--royal)">← <span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
   </footer>
 </div>
 <script src="rizq_backend_config.js"></script>
@@ -141,6 +215,83 @@ try{
   var s=localStorage.getItem('rizq_lang');
   if(s==='fr') setHelpLang('fr');
 }catch(e){}
+
+function _helpMsg(ar, fr){
+  var el=document.getElementById('dl-msg');
+  if(!el) return;
+  var isFr=document.documentElement.lang==='fr';
+  el.textContent=isFr?fr:ar;
+}
+
+function _helpSaveBlob(blob, filename){
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+
+function _helpStaticFallback(slug){
+  if(slug==='platform-manual') return { url:'RIZQ_PLATFORM_MANUAL.md', name:'rizq-platform-manual.md' };
+  if(slug==='dashboard-guide') return { url:'rizq-backend/help/dashboard-guide.md', name:'rizq-dashboard-guide.md' };
+  return null;
+}
+
+window.rizqDownloadHelpGuide=function(ev, slug){
+  if(ev && ev.preventDefault) ev.preventDefault();
+  slug=String(slug||'dashboard-guide').trim();
+  _helpMsg('جاري التنزيل…','Téléchargement…');
+  var base=(typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE)
+    ? window.RIZQ_BACKEND_BASE.replace(/\/$/,'') : '';
+  var apiUrl=base ? (base+'/api/help-guide/'+encodeURIComponent(slug)) : '';
+  var fallback=_helpStaticFallback(slug);
+
+  function viaAnchor(url, name){
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=name||'rizq-guide.md';
+    a.rel='noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function viaStatic(){
+    if(!fallback){ _helpMsg('الملف غير متوفر','Fichier indisponible'); return Promise.reject(); }
+    return fetch(fallback.url,{cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('static');
+      return r.blob();
+    }).then(function(blob){
+      _helpSaveBlob(blob, fallback.name);
+      _helpMsg('✅ تم تنزيل الملف','✅ Fichier téléchargé');
+    }).catch(function(){
+      viaAnchor(fallback.url, fallback.name);
+      _helpMsg('تم فتح الرابط المباشر للتنزيل','Lien direct ouvert');
+    });
+  }
+
+  var p = apiUrl
+    ? fetch(apiUrl,{cache:'no-store'}).then(function(r){
+        if(!r.ok) throw new Error('api');
+        return r.blob().then(function(blob){
+          _helpSaveBlob(blob, 'rizq-'+slug+'.md');
+          _helpMsg('✅ تم تنزيل الملف من الخادم','✅ Téléchargé depuis le serveur');
+        });
+      }).catch(function(){ return viaStatic(); })
+    : viaStatic();
+
+  return p.catch(function(){
+    if(fallback){
+      viaAnchor(fallback.url, fallback.name);
+      window.open(fallback.url, '_blank', 'noopener');
+    }
+    _helpMsg(
+      'إن لم يبدأ التنزيل تلقائياً استخدم «رابط مباشر» أسفل الأزرار',
+      'Si le téléchargement échoue, utilisez le lien direct'
+    );
+    return false;
+  }), false;
+};
 </script>
 </body>
 </html>
