@@ -2286,18 +2286,11 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     <!-- شارة + عنوان + وصف -->
     <div class="section-header fade-in" style="text-align:center;margin-bottom:52px">
       <p class="section-tag">Rizq Office</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(30px,4vw,52px);font-weight:800;margin-bottom:16px;line-height:1.25">
-        <!-- إصلاح حقيقي: .section-header نفسها خلفيتها تدرّج كحلي غامق (#0D1B2A→#1B3A6B، انظر CSS) بغض النظر
-             عن خلفية القسم #f8faff. الإصلاح السابق هنا لوّن النص كحلي غامق فوق هذه الخلفية الكحلية الغامقة
-             (كحلي على كحلي = غير مقروء تماماً). تم تصحيحه ليطابق الأقسام المماثلة (Rizq Stores سطر 1295،
-             ADS Packages سطر 1648) التي تستخدم أبيض/شبه أبيض على نفس الخلفية الكحلية. -->
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(30px,4vw,52px);font-weight:800;margin-bottom:16px;line-height:1.25" data-t="vo-title">
         <span style="color:#fff">مكتبك الاحترافي أونلاين</span><br>
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">في دقائق!</span>
       </h2>
-      <!-- إصلاح: أضيفت class="vo-desc-text" لأن selector السابق ('.section-header p') كان يطابق
-           أول <p> في الحاوية وهو <p class="section-tag">Rizq Office</p> وليس هذا الوصف، فتبقى
-           هذه الفقرة الفعلية بالعربية للأبد عند التبديل للفرنسية (والعكس). -->
-      <p class="vo-desc-text" style="color:rgba(255,255,255,.7);font-size:15.5px;max-width:620px;margin:0 auto;line-height:1.9">
+      <p class="vo-desc-text" style="color:rgba(255,255,255,.7);font-size:15.5px;max-width:620px;margin:0 auto;line-height:1.9" data-t="vo-desc">
         أنشئ مكتبك الافتراضي على رزق في دقائق — واجهة احترافية تعرض خدماتك، تتيح التواصل المباشر، وتوصلك إلى زبائن جدد كل يوم.
       </p>
     </div>
@@ -2307,32 +2300,32 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">🛡️</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">وكالات التأمين</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat1">وكالات التأمين</div>
       </div>
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">🏛️</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">الإجراءات الإدارية</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat2">الإجراءات الإدارية</div>
       </div>
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">🏠</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">المكاتب العقارية</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat3">المكاتب العقارية</div>
       </div>
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">⚖️</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">المحامون والموثقون</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat4">المحامون والموثقون</div>
       </div>
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">📋</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">الخدمات الإدارية</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat5">الخدمات الإدارية</div>
       </div>
 
       <div style="background:#fff;border:1.5px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 14px;text-align:center;box-shadow:0 3px 14px rgba(27,58,107,.06);transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.5)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(27,58,107,.12)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='';this.style.boxShadow='0 3px 14px rgba(27,58,107,.06)'">
         <div class="cat-icon-box" style="margin:0 auto 12px">💼</div>
-        <div style="font-size:13px;font-weight:700;color:#1B3A6B">استشارات أعمال</div>
+        <div style="font-size:13px;font-weight:700;color:#1B3A6B" data-t="vo-cat6">استشارات أعمال</div>
       </div>
 
     </div>
@@ -2343,32 +2336,32 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
       <div style="display:flex;align-items:flex-start;gap:14px">
         <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📍</span>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px">حضور رقمي دائم</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7">مكتبك مفتوح 24/7 — يستكشفه زبائنك وتتلقى طلباتهم في أي وقت</div>
+          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat1-title">حضور رقمي دائم</div>
+          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat1-desc">مكتبك مفتوح 24/7 — يستكشفه زبائنك وتتلقى طلباتهم في أي وقت</div>
         </div>
       </div>
 
       <div style="display:flex;align-items:flex-start;gap:14px">
         <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">💬</span>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px">تواصل مباشر</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7">واتساب وإيميل وهاتف في متناول الزبون بنقرة واحدة</div>
+          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat2-title">تواصل مباشر</div>
+          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat2-desc">واتساب وإيميل وهاتف في متناول الزبون بنقرة واحدة</div>
         </div>
       </div>
 
       <div style="display:flex;align-items:flex-start;gap:14px">
         <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(22,163,74,.04));display:flex;align-items:center;justify-content:center;font-size:18px">✅</span>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px">شارة "مكتب موثّق"</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7">احصل على الشارة الذهبية واكتسب ثقة الزبائن من اليوم الأول</div>
+          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat3-title">شارة "مكتب موثّق"</div>
+          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat3-desc">احصل على الشارة الذهبية واكتسب ثقة الزبائن من اليوم الأول</div>
         </div>
       </div>
 
       <div style="display:flex;align-items:flex-start;gap:14px">
         <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📊</span>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px">عرض خدماتك كاملاً</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7">قائمة منظّمة بكل الخدمات التي تقدّمها — واضحة وقابلة للتحديث</div>
+          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat4-title">عرض خدماتك كاملاً</div>
+          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat4-desc">قائمة منظّمة بكل الخدمات التي تقدّمها — واضحة وقابلة للتحديث</div>
         </div>
       </div>
 
@@ -2378,8 +2371,8 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
       <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700">📒 أنشئ مكتبك الآن</button>
-        <a id="vo-view-btn" href="rizq_office.html" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px">👁 عرض نموذج مكتب</a>
+        <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">📒 أنشئ مكتبك الآن</button>
+        <a id="vo-view-btn" href="rizq_office.html" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px" data-t="vo-btn2">👁 عرض نموذج مكتب</a>
       </div>
     </div>
 
@@ -4862,6 +4855,15 @@ const LANG = {
     'vs-card1-title': 'واجهة كاملة لمحلك', 'vs-card1-desc': 'شعار، اسم تجاري، وصف، ساعات العمل، وموقعك على الخريطة — كل ما يحتاجه الزبون ليثق بك',
     'vs-card2-title': 'عرض المنتجات والصور', 'vs-card2-desc': 'كتالوج منتجاتك بالصور والأسعار في مكان واحد — يتصفحه الزبون بسهولة قبل أن يتواصل معك',
     'vs-card3-title': 'إحصائيات بسيطة', 'vs-card3-desc': 'تابع عدد الزيارات والتواصل مع محلك، واعرف كيف يتفاعل الزبائن مع منتجاتك',
+    'vo-title': '<span style="color:#fff">مكتبك الاحترافي أونلاين</span><br><span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">في دقائق!</span>',
+    'vo-desc': 'أنشئ مكتبك الافتراضي على رزق في دقائق — واجهة احترافية تعرض خدماتك، تتيح التواصل المباشر، وتوصلك إلى زبائن جدد كل يوم.',
+    'vo-cat1': 'وكالات التأمين', 'vo-cat2': 'الإجراءات الإدارية', 'vo-cat3': 'المكاتب العقارية',
+    'vo-cat4': 'المحامون والموثقون', 'vo-cat5': 'الخدمات الإدارية', 'vo-cat6': 'استشارات أعمال',
+    'vo-feat1-title': 'حضور رقمي دائم', 'vo-feat1-desc': 'مكتبك مفتوح 24/7 — يستكشفه زبائنك وتتلقى طلباتهم في أي وقت',
+    'vo-feat2-title': 'تواصل مباشر', 'vo-feat2-desc': 'واتساب وإيميل وهاتف في متناول الزبون بنقرة واحدة',
+    'vo-feat3-title': 'شارة "مكتب موثّق"', 'vo-feat3-desc': 'احصل على الشارة الذهبية واكتسب ثقة الزبائن من اليوم الأول',
+    'vo-feat4-title': 'عرض خدماتك كاملاً', 'vo-feat4-desc': 'قائمة منظّمة بكل الخدمات التي تقدّمها — واضحة وقابلة للتحديث',
+    'vo-btn1': '📒 أنشئ مكتبك الآن', 'vo-btn2': '👁 عرض نموذج مكتب',
     'hero-badge': 'المنصة الأولى في موريتانيا',
     'search-ph': 'البحث في رزق...',
     'hbiz-stores': 'المحلات التجارية',
@@ -4933,6 +4935,15 @@ const LANG = {
     'vs-card1-title': 'Une vitrine complète pour votre boutique', 'vs-card1-desc': "Logo, nom commercial, description, horaires et emplacement sur la carte — tout ce qu'il faut pour gagner la confiance du client",
     'vs-card2-title': 'Présentation des produits & photos', 'vs-card2-desc': 'Catalogue de vos produits avec photos et prix au même endroit — le client le consulte facilement avant de vous contacter',
     'vs-card3-title': 'Statistiques simples', 'vs-card3-desc': 'Suivez le nombre de visites et de contacts de votre boutique, et découvrez comment les clients interagissent avec vos produits',
+    'vo-title': '<span style="color:#fff">Votre bureau pro en ligne</span><br><span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">en quelques minutes !</span>',
+    'vo-desc': 'Créez votre bureau virtuel sur Rizq en quelques minutes — une interface professionnelle qui présente vos services, facilite le contact direct et vous connecte à de nouveaux clients chaque jour.',
+    'vo-cat1': "Agences d'assurance", 'vo-cat2': 'Démarches admin.', 'vo-cat3': 'Agences immobilières',
+    'vo-cat4': 'Avocats & notaires', 'vo-cat5': 'Services admin.', 'vo-cat6': 'Conseil aux entreprises',
+    'vo-feat1-title': 'Présence digitale permanente', 'vo-feat1-desc': "Votre bureau ouvert 24/7 — vos clients l'explorent et vous recevez leurs demandes à tout moment",
+    'vo-feat2-title': 'Contact direct', 'vo-feat2-desc': 'WhatsApp, e-mail et téléphone à portée du client en un clic',
+    'vo-feat3-title': 'Badge "Bureau certifié"', 'vo-feat3-desc': 'Obtenez le badge or et gagnez la confiance des clients dès le premier jour',
+    'vo-feat4-title': 'Vos services en vitrine', 'vo-feat4-desc': 'Liste structurée de tous vos services — claire et facile à mettre à jour',
+    'vo-btn1': '📒 Créez votre bureau maintenant', 'vo-btn2': '👁 Voir un exemple de bureau',
     'hero-badge': 'N°1 en Mauritanie',
     'search-ph': 'Rechercher sur Rizq...',
     'hbiz-stores': 'Boutiques',
@@ -5460,51 +5471,7 @@ function applyLandingLang(toAr) {
   // Ticker is rebuilt from live ADS — no hardcoded dummy pairs
   if(typeof renderTickerFromAds==='function') renderTickerFromAds();
 
-  // Virtual Offices section — unified
-  const voSec = document.getElementById('virtual-offices');
-  if(voSec) {
-    voSec.querySelectorAll('span').forEach(el => {
-      const txt = el.textContent.trim();
-      if(txt==='مكتبك الاحترافي أونلاين'||txt==='Votre bureau pro en ligne')
-        el.textContent = RizqI18n.t2('مكتبك الاحترافي أونلاين','Votre bureau pro en ligne');
-      if(txt==='في دقائق!'||txt==='en quelques minutes !')
-        el.textContent = RizqI18n.t2('في دقائق!','en quelques minutes !');
-    });
-    const voDesc = voSec.querySelector('.vo-desc-text');
-    if(voDesc) voDesc.textContent = RizqI18n.t2(
-      'أنشئ مكتبك الافتراضي على رزق في دقائق — واجهة احترافية تعرض خدماتك، تتيح التواصل المباشر، وتوصلك إلى زبائن جدد كل يوم.',
-      'Créez votre bureau virtuel sur Rizq en quelques minutes — une interface professionnelle qui présente vos services, facilite le contact direct et vous connecte à de nouveaux clients chaque jour.'
-    );
-    const voCatAR = ['وكالات التأمين','الإجراءات الإدارية','المكاتب العقارية','المحامون والموثقون','الخدمات الإدارية','استشارات أعمال'];
-    const voCatFR = ["Agences d'assurance","Démarches admin.","Agences immobilières","Avocats & notaires","Services admin.","Conseil aux entreprises"];
-    voSec.querySelectorAll('div[style*="font-size:13px;font-weight:700;color:#1B3A6B"]').forEach((el,i) => {
-      el.textContent = isAr ? (voCatAR[i]||el.textContent) : (voCatFR[i]||el.textContent);
-    });
-    const voFeatTitlesAr = ['حضور رقمي دائم','تواصل مباشر','شارة "مكتب موثّق"','عرض خدماتك كاملاً'];
-    const voFeatTitlesFR = ['Présence digitale permanente','Contact direct','Badge "Bureau certifié"','Vos services en vitrine'];
-    const voFeatDescsAr = [
-      'مكتبك مفتوح 24/7 — يستكشفه زبائنك وتتلقى طلباتهم في أي وقت',
-      'واتساب وإيميل وهاتف في متناول الزبون بنقرة واحدة',
-      'احصل على الشارة الذهبية واكتسب ثقة الزبائن من اليوم الأول',
-      'قائمة منظّمة بكل الخدمات التي تقدّمها — واضحة وقابلة للتحديث'
-    ];
-    const voFeatDescsFR = [
-      'Votre bureau ouvert 24/7 — vos clients l\'explorent et vous recevez leurs demandes à tout moment',
-      'WhatsApp, e-mail et téléphone à portée du client en un clic',
-      'Obtenez le badge or et gagnez la confiance des clients dès le premier jour',
-      'Liste structurée de tous vos services — claire et facile à mettre à jour'
-    ];
-    voSec.querySelectorAll('div[style*="font-size:14px;font-weight:700;color:#1B3A6B"]').forEach((el,i) => {
-      el.textContent = isAr ? (voFeatTitlesAr[i]||el.textContent) : (voFeatTitlesFR[i]||el.textContent);
-    });
-    voSec.querySelectorAll('div[style*="font-size:12.5px;color:#2C3A4F"]').forEach((el,i) => {
-      el.textContent = isAr ? (voFeatDescsAr[i]||el.textContent) : (voFeatDescsFR[i]||el.textContent);
-    });
-    const voCreateBtn = document.getElementById('vo-create-btn');
-    if(voCreateBtn) voCreateBtn.innerHTML = RizqI18n.t2('📒 أنشئ مكتبك الآن','📒 Créez votre bureau maintenant');
-    const voViewBtn = document.getElementById('vo-view-btn');
-    if(voViewBtn) voViewBtn.innerHTML = RizqI18n.t2('👁 عرض نموذج مكتب','👁 Voir un exemple de bureau');
-  }
+  // Virtual Offices section: translated via data-t="vo-*" + LANG (same as vs-/vsh-)
 
   // Chat widget — unified
   const rzqInp = document.getElementById('rzq-inp');

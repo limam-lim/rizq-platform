@@ -1030,38 +1030,16 @@ function applyLang(){
     var _tagsFR=['🚗 Voitures','💻 Électronique','🛋️ Meubles','⚙️ Équipements'];
     _tagSpans.forEach(function(el,i){ el.textContent = isFr ? (_tagsFR[i]||el.textContent) : (_tagsAR[i]||el.textContent); });
   }
-    // Package MRU note & features
-  document.getElementById('mru-note').textContent  = isFr ? 'Prix en Ouguiya (MRU) · ' : 'الأسعار بالأوقية الجديدة · ';
-  document.getElementById('pf-t1').textContent = isFr ? '5 articles' : '5 عروض';
-  document.getElementById('pf-t2').textContent = isFr ? 'Photos des articles' : 'صور للمعروضات';
-  document.getElementById('pf-t3').textContent = isFr ? 'Fiche de présentation' : 'بطاقة تعريفية';
-  document.getElementById('pf-b1').textContent = isFr ? '15 articles' : '15 عرض';
-  document.getElementById('pf-b2').textContent = isFr ? 'Messagerie sécurisée' : 'مراسلة آمنة';
-  document.getElementById('pf-b3').textContent = isFr ? 'Badge vérifié' : 'وسم موثّق';
-  document.getElementById('pf-p1').textContent = isFr ? '30 articles' : '30 عرض';
-  document.getElementById('pf-p2').textContent = isFr ? 'Messagerie sécurisée' : 'مراسلة آمنة';
-  document.getElementById('pf-p3').textContent = isFr ? 'Support 24/7' : 'دعم 24/7';
-  document.getElementById('pf-d1').textContent = isFr ? 'Articles illimités' : 'عروض غير محدودة';
-  document.getElementById('pf-d2').textContent = isFr ? 'Agent IA 24/7' : 'وكيل ذكي 24/7';
-  document.getElementById('pf-d3').textContent = isFr ? 'Priorité dans les résultats' : 'أولوية في النتائج';
-  // ── Packages section — titres, noms, prix, périodes et CTA (كانت مفقودة، تسبب بقاء نص عربي في واجهة FR) ──
-  document.getElementById('pkg-eyebrow').textContent    = isFr ? 'Rizq Showrooms — Les forfaits' : 'Rizq Showrooms — الباقات';
-  document.getElementById('pkg-title-pre').textContent  = isFr ? 'Ouvrez votre showroom avec le forfait' : 'افتح معرضك بالباقة';
-  document.getElementById('pkg-title-gold').textContent = isFr ? ' qui vous convient' : ' المناسبة لك';
-  document.getElementById('pkg-desc').textContent       = isFr ? 'Essayez gratuitement 10 jours, puis choisissez le forfait adapté à votre activité' : 'جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك';
-  document.getElementById('pkg-trial-name').textContent   = isFr ? 'Essai' : 'تجريبية';
-  document.getElementById('pkg-trial-price').textContent  = isFr ? 'Gratuit' : 'مجاناً';
-  document.getElementById('pkg-trial-period').textContent = isFr ? 'Pendant 10 jours' : 'لمدة 10 أيام';
-  document.getElementById('pkg-trial-cta').textContent    = isFr ? 'Commencer gratuitement' : 'ابدأ مجاناً';
-  document.getElementById('pkg-biz-name').textContent   = isFr ? 'Business' : 'أعمال';
-  document.getElementById('pkg-biz-period').textContent = isFr ? '/mois' : '/شهر';
-  document.getElementById('pkg-biz-cta').textContent    = isFr ? "S'abonner maintenant" : 'اشترك الآن';
-  document.getElementById('pkg-pro-name').textContent   = isFr ? 'Pro' : 'Pro';
-  document.getElementById('pkg-pro-period').textContent = isFr ? '/mois' : '/شهر';
-  document.getElementById('pkg-pro-cta').textContent    = isFr ? "S'abonner maintenant" : 'اشترك الآن';
-  document.getElementById('pkg-diamond-name').textContent = isFr ? 'Diamant 💎' : 'الماسية 💎';
-  document.getElementById('pkg-dia-period').textContent   = isFr ? '/mois' : '/شهر';
-  document.getElementById('pkg-dia-cta').textContent      = isFr ? "S'abonner maintenant" : 'اشترك الآن';
+  // Packages header (cards themselves are remounted by RizqPackagesUI)
+  function _setTxt(id, ar, fr){
+    var el = document.getElementById(id);
+    if (el) el.textContent = isFr ? fr : ar;
+  }
+  _setTxt('mru-note', 'الأسعار بالأوقية الجديدة · ', 'Prix en Ouguiya (MRU) · ');
+  _setTxt('pkg-eyebrow', 'Rizq Showrooms — الباقات', 'Rizq Showrooms — Les forfaits');
+  _setTxt('pkg-title-pre', 'افتح معرضك بالباقة', 'Ouvrez votre showroom avec le forfait');
+  _setTxt('pkg-title-gold', ' المناسبة لك', ' qui vous convient');
+  _setTxt('pkg-desc', 'جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك', 'Essayez gratuitement 10 jours, puis choisissez le forfait adapté à votre activité');
   // ── Footer (موحّد) ──
   var _ftMap = {
     'ft-desc':[isFr?"La première plateforme d'annonces classées en Mauritanie. Nous connectons les showrooms haut de gamme aux acheteurs facilement et en toute sécurité.":'منصة الإعلانات المبوبة الأولى في موريتانيا. نربط المعارض الراقية بالمشترين بسهولة وأمان.'],
@@ -1092,9 +1070,6 @@ function applyLang(){
     if (!discH2.hasAttribute('data-t-ar')) discH2.setAttribute('data-t-ar', discH2.innerHTML);
     discH2.innerHTML = isFr ? discH2.getAttribute('data-t-fr') : discH2.getAttribute('data-t-ar');
   }
-  try {
-    document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: isFr ? 'fr' : 'ar' } }));
-  } catch (eEv) {}
 }
 
 /* ══ INIT ══ */
