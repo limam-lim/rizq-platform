@@ -64,7 +64,7 @@ function seedFromLegacyAccounts(legacyAccounts) {
     user: acc.user,
     passHash: acc.passHash,
     name: acc.name,
-    email: '',
+    email: acc.email || (String(acc.user || '').includes('@') ? String(acc.user) : ''),
     phone: '',
     notes: 'ترحيل تلقائي من ADMIN_ACCOUNTS',
     permissions: permissionsForLegacyRole(acc.role || 'moderator'),
@@ -77,10 +77,84 @@ function seedFromLegacyAccounts(legacyAccounts) {
   return seeded;
 }
 
+/**
+ * يضمن وجود سوبر أدمن المالك (البريد الدائم) في admin-team.json.
+ * المصدر: SUPER_ADMIN_EMAIL + SUPER_ADMIN_PASS_HASH من .env، أو ownerSpec من الكود.
+ */
+function ensureOwnerSuperAdmin(ownerSpec) {
+  const email = String(
+    (ownerSpec && ownerSpec.email) || process.env.SUPER_ADMIN_EMAIL || ''
+  ).trim().toLowerCase();
+  const passHash = String(
+    (ownerSpec && ownerSpec.passHash) || process.env.SUPER_ADMIN_PASS_HASH || ''
+  ).trim();
+  const name = String((ownerSpec && ownerSpec.name) || 'M. LIMAM').trim() || 'M. LIMAM';
+  const user = String((ownerSpec && ownerSpec.user) || email).trim().toLowerCase() || email;
+  if (!email || !passHash || !passHash.startsWith('$2')) return readTeam();
+
+  const list = readTeam();
+  const now = new Date().toISOString();
+  let idx = list.findIndex((m) => {
+    const e = String(m.email || '').toLowerCase();
+    const u = String(m.user || '').toLowerCase();
+    return e === email || u === email || u === user;
+  });
+  if (idx === -1) {
+    // ترقية/استبدال حساب admin القديم القديم إن وُجد
+    idx = list.findIndex((m) => String(m.user || '').toLowerCase() === 'admin' && (m.permissions || []).includes('*'));
+  }
+  if (idx === -1) {
+    list.unshift({
+      id: genAdminId(),
+      user,
+      email,
+      passHash,
+      name,
+      phone: '',
+      notes: 'سوبر أدمن المالك — دائم',
+      permissions: ['*'],
+      active: true,
+      createdAt: now,
+      updatedAt: now,
+      legacyRole: 'super',
+    });
+  } else {
+    const row = list[idx];
+    row.user = user;
+    row.email = email;
+    row.name = name;
+    row.passHash = passHash;
+    row.permissions = ['*'];
+    row.active = true;
+    row.legacyRole = 'super';
+    row.notes = row.notes || 'سوبر أدمن المالك — دائم';
+    row.updatedAt = now;
+    list[idx] = row;
+  }
+
+  // عطّل أي سوبر أدمن قديم باسم admin إن بقي مختلفاً عن المالك
+  list.forEach((m, i) => {
+    if (i === idx) return;
+    if (String(m.user || '').toLowerCase() === 'admin' && (m.permissions || []).includes('*')) {
+      m.active = false;
+      m.updatedAt = now;
+      m.notes = (m.notes || '') + ' | أُوقف بعد تعيين المالك ' + email;
+    }
+  });
+
+  writeTeam(list);
+  return list;
+}
+
 async function authenticate(user, pass) {
-  const u = String(user || '').trim();
+  const u = String(user || '').trim().toLowerCase();
   if (!u || !pass) return null;
-  const row = readTeam().find((m) => m.user === u && m.active !== false);
+  const row = readTeam().find((m) => {
+    if (m.active === false) return false;
+    const loginUser = String(m.user || '').trim().toLowerCase();
+    const loginEmail = String(m.email || '').trim().toLowerCase();
+    return loginUser === u || (loginEmail && loginEmail === u);
+  });
   const hash = row ? row.passHash : '$2b$10$........................................';
   const ok = await bcrypt.compare(String(pass), hash);
   if (!row || !ok) return null;
@@ -180,6 +254,7 @@ module.exports = {
   readTeam,
   writeTeam,
   seedFromLegacyAccounts,
+  ensureOwnerSuperAdmin,
   authenticate,
   touchLogin,
   listTeamPublic,

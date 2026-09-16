@@ -196,20 +196,27 @@ const adsSubmitLimiter = rateLimit({
 // ضع الناتج في passHash أدناه:
 //   node -e "console.log(require('bcryptjs').hashSync('كلمة_السر_الجديدة', 10))"
 const bcrypt = require('bcryptjs');
+// سوبر أدمن المالك الدائم — تسجيل الدخول بالبريد megalimam@gmail.com
+// كلمة السر ليست في المستودع؛ الهاش فقط. التعيين الفعلي عبر .env + ensureOwnerSuperAdmin.
+const OWNER_SUPER_ADMIN = {
+  user: 'megalimam@gmail.com',
+  email: 'megalimam@gmail.com',
+  name: 'M. LIMAM',
+  role: 'super',
+  // يُستبدل عند التشغيل بهاش SUPER_ADMIN_PASS_HASH من .env إن وُجد
+  passHash: process.env.SUPER_ADMIN_PASS_HASH || '$2a$10$vWBBtmikW0LUA/DLY5/eSelNOERYSEScGE.QnZ5uCdm/RsIgcXXpO',
+};
 const ADMIN_ACCOUNTS = [
-  // إصلاح 22/07/2026: كلمات السر أُعيد توليدها لأن النسخة الأصلية (plaintext) لم تكن
-  // محفوظة في أي مكان قابل للاسترجاع (bcrypt هاش لا يُفَكّ عكسياً). القيم الجديدة
-  // أُرسلت لـ Limam مرة واحدة في المحادثة — احفظها فوراً في مدير كلمات سر.
-  { user: 'admin', passHash: '$2a$10$P9STsJ2wU2iWUvL7IrtHl.KgOqcdRnUxCv7yOubuksk4zGbxo69Ki', name: 'M. LIMAM', role: 'super' },
+  OWNER_SUPER_ADMIN,
   { user: 'mod1', passHash: '$2a$10$Pz58idNGtWx5zJh6D.wwtOlKDZaZm23h6XQivYWhSyDA43pApWriG', name: 'المشرف الأول', role: 'moderator' },
   { user: 'mod2', passHash: '$2a$10$j1o0c2FMvWxLsFJn5B5IMuCQ8GfJc46rsWwVz3Ho/Z8hkU/eRUfgW', name: 'المشرف الثاني', role: 'moderator' },
-  // { user: 'mod3', passHash: '...', name: 'الاسم', role: 'moderator' },
 ];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
 adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
+adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
 const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,

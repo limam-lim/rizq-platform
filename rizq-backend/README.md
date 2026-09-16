@@ -101,3 +101,20 @@ SDK يعمل **على الخادم فقط** (نفس قاعدة "لا مفاتي�
 موصل واتساب بزنس يتطلب موافقة Meta وعملية تحقق تجارية مسبقة (نفس التعقيد الذي اتفقنا
 على تجنبه سابقاً). إذا قررت المتابعة، الخطوة الصحيحة: تثبيت `composio-core` هنا في
 `rizq-backend` (لا في الواجهة)، وربطه بـ endpoint جديد مثل `/api/composio/*`.
+
+## لوحة السوبر أدمن (مسار خفي)
+
+في `.env` (لا يُرفع للمستودع):
+
+```env
+ADMIN_PANEL_PATH=cp-xxxxxxxx        # مسار سري بدل rizq_cp_panel.html
+ADMIN_PANEL_GATE_KEY=long_random    # مفتاح أول زيارة ?k=...
+SUPER_ADMIN_EMAIL=megalimam@gmail.com
+SUPER_ADMIN_PASS_HASH=$2a$10$...   # bcrypt فقط — بلا كلمة سر صريحة
+```
+
+- الرابط: `https://your-domain.com/<ADMIN_PANEL_PATH>?k=<ADMIN_PANEL_GATE_KEY>`
+- بعد فتح الرابط مرة، تُحفظ كعكة بوابة ثم تظهر شاشة الدخول.
+- سجّل الدخول بالبريد `megalimam@gmail.com` وكلمة السر المحفوظة لديك (لا تُخزَّن في git).
+- المسار المباشر `/rizq_cp_panel.html` يعيد 404 عمداً.
+
