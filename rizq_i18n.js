@@ -456,9 +456,21 @@
 
   function paintPrimaryLangBtn(btn) {
     if (!btn) return;
+    var lang = state.lang === 'fr' ? 'fr' : 'ar';
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = PRIMARY_LANG_BTN_HTML;
     btn.setAttribute('aria-label', 'FR | AR');
+    btn.setAttribute('data-active-lang', lang);
+    var frEl = btn.querySelector('.lang-fr');
+    var arEl = btn.querySelector('.lang-ar');
+    if (frEl) {
+      frEl.classList.toggle('is-active-lang', lang === 'fr');
+      frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
+    }
+    if (arEl) {
+      arEl.classList.toggle('is-active-lang', lang === 'ar');
+      arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
+    }
   }
 
   function applyLang(lang) {

@@ -605,24 +605,32 @@ var CATALOGS = {
     Object.assign({ id: 'of-diam-pro' }, _officeDiamondProFields())
   ],
   corp: [
-    { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'] },
-    { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'] },
-    { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'] },
-    { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'] },
+    { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0,
+      features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'],
+      features_fr: ['Accès complet à la plateforme', 'Consultation des annonces', 'Support technique de base'] },
+    { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2,
+      features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'],
+      features_fr: ['Badge entreprise premium Rizq', 'Jusqu\'à 30 annonces', 'Statistiques mensuelles', 'Support prioritaire'] },
+    { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3,
+      features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'],
+      features_fr: ['Tous les avantages mensuels', '15% d\'économie vs mensuel', 'Annonces illimitées', 'Gestionnaire de compte'] },
+    { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3,
+      features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'],
+      features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Avantages VIP exclusifs', 'Support 24/7', 'Rapports annuels complets'] },
     Object.assign({ id: 'cp-diam-std' }, _corpDiamondStandardFields()),
     Object.assign({ id: 'cp-diam-pro' }, _corpDiamondProFields())
   ],
   video: [
     { id: 'vid-single',   price: 1500,  durationDays: 10, discountPct: 0, maxVideosPerMonth: 1, payPerAd: true, period: 'MRU / إعلان · 10 أيام', period_fr: 'MRU / annonce · 10 jours', features: ['فيديو إعلاني واحد لمدة 10 أيام', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'دفع لكل إعلان — بلا اشتراك شهري'], features_fr: ['Une vidéo publicitaire pendant 10 jours', 'Section publicitaire page d\'accueil', 'Paiement par annonce — sans abonnement mensuel'], cta_fr: 'Acheter une annonce vidéo' },
-    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, maxVideosPerMonth: 3, features: ['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'إحصائيات أداء أساسية آلية'] },
-    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, maxVideosPerMonth: 10, features: ['حتى 10 فيديوهات إعلانية ترويجية شهرياً', 'أولوية الترتيب في نتائج البحث', 'شارة «محتوى مميّز برزق» الموثّقة'] },
-    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, maxVideosPerMonth: Infinity, features: ['فيديوهات وعروض غير محدودة', 'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية', 'تقارير تحليل أداء آلية مفصّلة', 'دعم VIP ذو أولوية + شارة VIP موثّقة'] }
+    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, maxVideosPerMonth: 3, features: ['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'إحصائيات أداء أساسية آلية'], features_fr: ['Jusqu\'à 3 vidéos promo / mois', 'Section publicitaire page d\'accueil', 'Statistiques de performance de base'] },
+    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, maxVideosPerMonth: 10, features: ['حتى 10 فيديوهات إعلانية ترويجية شهرياً', 'أولوية الترتيب في نتائج البحث', 'شارة «محتوى مميّز برزق» الموثّقة'], features_fr: ['Jusqu\'à 10 vidéos promo / mois', 'Priorité dans les résultats de recherche', 'Badge « contenu mis en avant Rizq »'] },
+    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, maxVideosPerMonth: Infinity, features: ['فيديوهات وعروض غير محدودة', 'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية', 'تقارير تحليل أداء آلية مفصّلة', 'دعم VIP ذو أولوية + شارة VIP موثّقة'], features_fr: ['Vidéos et campagnes illimitées', 'Mise en avant sur la page d\'accueil', 'Rapports de performance détaillés', 'Support VIP prioritaire + badge VIP'] }
   ],
   tender: [
-    { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'] },
-    { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'] },
-    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'] },
-    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'] }
+    { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'], features_fr: ['Parcourir et filtrer les appels d\'offres', 'Coordonnées masquées / floutées', 'Soumission d\'offres verrouillée'] },
+    { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'], features_fr: ['Accès aux coordonnées du donneur d\'ordre', 'Soumissions d\'offres illimitées', 'Publication d\'appels d\'offres'] },
+    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos offres'] },
+    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres'] }
   ],
   verified_plus: [
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }
@@ -956,7 +964,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-08-29-pkg-i18n-fr';
+var CATALOG_SYNC_REVISION = '2026-09-16-pkg-fr-order';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',

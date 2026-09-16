@@ -20,9 +20,15 @@
       window.RizqI18n.paintPrimaryLangBtn(btn);
       return;
     }
+    var lang = currentLang();
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = langBtnHtml();
     btn.setAttribute('aria-label', 'FR | AR');
+    btn.setAttribute('data-active-lang', lang);
+    var frEl = btn.querySelector('.lang-fr');
+    var arEl = btn.querySelector('.lang-ar');
+    if (frEl) frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
+    if (arEl) arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
   }
 
   function pathName() {

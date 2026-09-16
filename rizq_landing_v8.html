@@ -8290,6 +8290,23 @@ function renderPricingSection(){
     if (ensureDiamond && window.RizqPackagesConfig && typeof RizqPackagesConfig.withDiamond === 'function') {
       list = RizqPackagesConfig.withDiamond(list, lang, catalogKey).map(function (p) { return enrichPkgForLanding(p, lang); });
     }
+    /* Stable order: trial → month → quarter → year → diamond std → diamond pro */
+    list.sort(function (a, b) {
+      function rank(p) {
+        var id = String(p.id || '');
+        var dia = !!(p.diamond || p.isDiamond || /ماس|diamond|diamant/i.test(id + (p.name || '')));
+        if (dia) return 1000 + (/pro/i.test(id) ? 2 : 1);
+        var d = Number(p.durationDays) || 0;
+        if (!Number(p.price)) return 0;
+        if (d >= 360) return 40;
+        if (d >= 80) return 30;
+        if (d >= 25) return 20;
+        return 10;
+      }
+      var ra = rank(a), rb = rank(b);
+      if (ra !== rb) return ra - rb;
+      return (Number(a.price) || 0) - (Number(b.price) || 0);
+    });
     return list;
     } catch (eCat) {
       return [];
@@ -8346,7 +8363,15 @@ function renderPricingSection(){
       out.name = out.name_fr || trPkg(out.name);
       out.period = out.period_fr || trPkg(out.period || '');
       if (!out.features_fr.length) out.features_fr = (out.features || []).map(trPkg);
+      /* Force primary fields to FR so any consumer reading .features/.name stays clean */
+      out.features = out.features_fr.slice();
       out.cta = out.cta_fr || trPkg(out.cta || '') || "S'abonner →";
+      if (out.description_fr) out.description = out.description_fr;
+      else if (/[\u0600-\u06FF]/.test(String(out.description || ''))) out.description = '';
+      if (out.featuredBadge_fr) out.featuredBadge = out.featuredBadge_fr;
+      else if (/[\u0600-\u06FF]/.test(String(out.featuredBadge || ''))) out.featuredBadge = '';
+      if (out.roi_fr) out.roi = out.roi_fr;
+      else if (/[\u0600-\u06FF]/.test(String(out.roi || ''))) out.roi = '';
     }
     return out;
   }
@@ -8402,12 +8427,20 @@ function renderPricingSection(){
         pDesc = trPkg(pDesc);
         pRoi = trPkg(pRoi);
         pBadge = trPkg(pBadge);
-        pFeats = (pFeats || []).map(trPkg);
+        pFeats = (pFeats || []).map(trPkg).filter(function(f){ return f && !/[\u0600-\u06FF]/.test(String(f)); });
+        if (/[\u0600-\u06FF]/.test(String(pName||''))) pName = p.name_fr || pName;
+        if (/[\u0600-\u06FF]/.test(String(pPeriod||''))) pPeriod = p.period_fr || '';
+        if (/[\u0600-\u06FF]/.test(String(pDesc||''))) pDesc = p.description_fr || '';
+        if (/[\u0600-\u06FF]/.test(String(pRoi||''))) pRoi = p.roi_fr || '';
+        if (/[\u0600-\u06FF]/.test(String(pBadge||''))) pBadge = p.featuredBadge_fr || '';
+        if (/[\u0600-\u06FF]/.test(String(pCta||''))) pCta = p.cta_fr || "S'abonner →";
       }
       var isFree=p.price===0||p.price==='0'||p.cta==='ابدأ مجاناً';
-      var isDiamond=p.diamond||p.isDiamond||/ماس|diamond|diamant/i.test(String(p.name||'')+String(p.cta||''));
-      var isYear=p.name==='سنوية'||p.name==='Annuelle';
-      var isTrial=p.name==='تجريبية'||p.name==='مجاني'||p.name==='مجانية'||!Number(p.price);
+      var isDiamond=p.diamond||p.isDiamond||/ماس|diamond|diamant/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')+String(p.cta||''));
+      var isYear=/year|annuel|سنوي/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || (Number(p.durationDays)>=360);
+      var isTrial=/trial|free|essai|gratuit|مجاني|تجريب/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || !Number(p.price);
+      var isQuart=/quart|trimestr|ربع/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || (Number(p.durationDays)>=80 && Number(p.durationDays)<360);
+      var isMonth=/month|mensuel|شهر/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) && !isYear && !isQuart;
       var isHL=p.highlight&&!isDiamond;
       var bg=isDiamond?'linear-gradient(145deg,#3b0764,#6b21a8)':isYear?'linear-gradient(145deg,#1B3A6B,#0f2347)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':isHL?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
       var border=isDiamond?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':isHL?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
@@ -8419,7 +8452,7 @@ function renderPricingSection(){
       var checkCol=isDiamond?'#c084fc':isYear?'#fde68a':isTrial?'#22c55e':'#10b981';
       var btnBg=isDiamond?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':isHL?'linear-gradient(135deg,#C9A84C,#e8c96a)':'linear-gradient(135deg,#3b82f6,#1d4ed8)';
       var btnCol=isDiamond?'#fff':isYear?'#0f2347':'#fff';
-      var icon=isTrial?'🎁':p.name==='شهرية'?'📅':p.name==='ربعية'?'🚀':isYear?'👑':isDiamond?'💎':'📦';
+      var icon=isTrial?'🎁':isMonth?'📅':isQuart?'🚀':isYear?'👑':isDiamond?'💎':'📦';
       var pJson=JSON.stringify(p).replace(/"/g,'&quot;');
       var lblPopular=_fr?'⭐ Le plus demandé':'⭐ الأكثر طلباً';
       var lblDiamondTier=pBadge;
@@ -8557,11 +8590,22 @@ function openPkgModal(cardEl,origin){
   var pDesc=_fr?(p.description_fr||p.description||''):(p.description||'');
   var pRoi=_fr?(p.roi_fr||p.roi||''):(p.roi||'');
   var pBadge=_fr?(p.featuredBadge_fr||p.featuredBadge||'Le plus choisi par les entreprises'):(p.featuredBadge||'الأكثر اختياراً للشركات');
+  if(_fr){
+    pFeats=(pFeats||[]).map(trPkg).filter(function(f){ return f && !/[\u0600-\u06FF]/.test(String(f)); });
+    if(/[\u0600-\u06FF]/.test(String(pName||''))) pName=p.name_fr||pName;
+    if(/[\u0600-\u06FF]/.test(String(pPeriod||''))) pPeriod=p.period_fr||'';
+    if(/[\u0600-\u06FF]/.test(String(pDesc||''))) pDesc=p.description_fr||'';
+    if(/[\u0600-\u06FF]/.test(String(pRoi||''))) pRoi=p.roi_fr||'';
+    if(/[\u0600-\u06FF]/.test(String(pBadge||''))) pBadge=p.featuredBadge_fr||'';
+    if(/[\u0600-\u06FF]/.test(String(pCta||''))) pCta=p.cta_fr||"S'abonner →";
+  }
   var lblFree=_fr?'Gratuit':'مجاناً';
   var lblStartFree=_fr?'Commencer gratuitement':'ابدأ مجاناً';
-  var isDiamond=p.diamond||p.isDiamond||String(p.name).indexOf('ماسي')!==-1||String(p.name).indexOf('ماسية')!==-1;
-  var isYear=p.name==='سنوية';
-  var isTrial=p.name==='تجريبية'||p.name==='مجاني';
+  var isDiamond=p.diamond||p.isDiamond||/ماس|diamond|diamant/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')+String(p.cta||''));
+  var isYear=/year|annuel|سنوي/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || (Number(p.durationDays)>=360);
+  var isTrial=/trial|free|essai|gratuit|مجاني|تجريب/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || !Number(p.price);
+  var isQuart=/quart|trimestr|ربع/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || (Number(p.durationDays)>=80 && Number(p.durationDays)<360);
+  var isMonth=/month|mensuel|شهر/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) && !isYear && !isQuart;
   var isFree=p.price===0||p.price==='0'||p.cta==='ابدأ مجاناً';
   var bg=isDiamond?'linear-gradient(145deg,#3b0764,#6b21a8)':isYear?'linear-gradient(145deg,#1B3A6B,#0f2347)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
   var nameCol=isDiamond?'#e9d5ff':isYear?'#fde68a':isTrial?'#15803d':'#1B3A6B';
@@ -8572,7 +8616,7 @@ function openPkgModal(cardEl,origin){
   var border=isDiamond?'2px solid rgba(192,132,252,.5)':isYear?'2px solid rgba(201,168,76,.5)':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
   var btnBg=isDiamond?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#3b82f6,#1d4ed8)';
   var btnCol=isYear?'#0f2347':'#fff';
-  var icon=isTrial?'🎁':p.name==='شهرية'?'📅':p.name==='ربعية'?'🚀':isYear?'👑':isDiamond?'💎':'📦';
+  var icon=isTrial?'🎁':isMonth?'📅':isQuart?'🚀':isYear?'👑':isDiamond?'💎':'📦';
 
   var box=document.getElementById('pkg-modal-box');
   box.style.background=bg; box.style.border=border;
