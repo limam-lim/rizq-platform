@@ -22,7 +22,6 @@
   var MOBILE_MORE_EXTRAS = [
     { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
-    { href: 'rizq_help.html', hdr: 'helpguide', ico: '📘' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
   ];
@@ -36,7 +35,6 @@
     rizqads: { ar: 'Rizq ADS', fr: 'Rizq ADS' },
     packs: { ar: 'الباقات', fr: 'Forfaits' },
     legal: { ar: 'المواد القانونية', fr: 'Mentions légales' },
-    helpguide: { ar: 'دليل المساعدة (صور)', fr: 'Guide visuel (illustrations)' },
     about: { ar: 'من نحن', fr: 'À propos' }
   };
 
