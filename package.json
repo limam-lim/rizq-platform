@@ -13,7 +13,9 @@
     "dev": "npm --prefix rizq-backend start",
     "dev:split": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
     "dev:front": "npx --yes serve -l 5500 .",
-    "dev:api": "npm --prefix rizq-backend run dev"
+    "dev:api": "npm --prefix rizq-backend run dev",
+    "test:links": "node scripts/audit-platform-links.js",
+    "test:smoke": "node scripts/e2e-platform-smoke.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
