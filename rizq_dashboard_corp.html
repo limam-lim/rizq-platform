@@ -909,7 +909,7 @@ var CORP_PKG_NAME_FR = {
   'باقة شهرية': 'Mensuel', 'أساسي': 'Basique', 'احترافي': 'Professionnel',
   'أعمال ومعارض': 'Entreprises et galeries', 'Pro': 'Pro', 'Business': 'Business'
 };
-var CORP_PERIOD_FR = { 'شهر': 'mois', 'شهرياً': 'Mensuel', '3 أيام': '3 jours', '3 أشهر': '3 mois', '12 شهر': '12 mois' };
+var CORP_PERIOD_FR = { 'شهر': 'mois', 'شهرياً': 'Mensuel', '3 أيام': '3 jours', '10 أيام': '10 jours', '3 أشهر': '3 mois', '12 شهر': '12 mois' };
 
 function _corpAccField(acc, field){
   var v = (acc && acc[field]) || '';
@@ -2358,7 +2358,7 @@ function renderPackagesDisplay(){
   var FEATS=(typeof _corpLang!=='undefined'&&_corpLang==='fr')?FEATS_FR:FEATS_AR;
   var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','الماسية الأساسية للشركات':'💎','الماسية Pro للشركات':'💎','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
 
-  var DEF=[{name:'تجريبية',duration:'3 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'الماسية الأساسية للشركات',duration:'شهر',price:6000,isDiamond:true},{name:'الماسية Pro للشركات',duration:'شهر',price:15000,isDiamond:true}];
+  var DEF=[{name:'تجريبية',duration:'10 أيام',price:0},{name:'شهرية',duration:'شهر',price:3500},{name:'ربعية',duration:'3 أشهر',price:9000,highlight:true},{name:'سنوية',duration:'12 شهر',price:25000},{name:'الماسية الأساسية للشركات',duration:'شهر',price:6000,isDiamond:true},{name:'الماسية Pro للشركات',duration:'شهر',price:15000,isDiamond:true}];
   var list=pkgs.length?pkgs:DEF;
   var lang=(typeof _corpLang!=='undefined'?_corpLang:'ar');
   if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){

@@ -690,7 +690,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <div class="section-head">
         <div class="section-bar"></div>
         <div class="section-ttl" id="svc-section-ttl" data-t="svc-section-ttl">الخدمات المقدَّمة</div>
-        <span class="section-sub" id="svc-count-badge" data-t="svc-count-badge">6 خدمات</span>
+        <span class="section-sub" id="svc-count-badge" data-t="svc-count-badge">— خدمات</span>
         <span id="mru-note" style="font-size:11px;color:#3a5080;display:flex;align-items:center;gap:6px;margin-right:8px;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:2px 8px;border-radius:5px;font-weight:800;font-size:10px;letter-spacing:.5px">MRU</span><span id="mru-note-text" data-t="mru-note-text">الأوقية الجديدة — العملة الرسمية لموريتانيا · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></span>
       </div>
       <div class="svc-list" id="svc-list">
@@ -919,7 +919,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <div style="font-size:20px;margin-bottom:8px">🚀</div>
       <div style="font-size:14px;font-weight:800;color:var(--gold2);margin-bottom:6px" id="promo-card-title" data-t="promo-card-title">أنشئ مكتبك على رزق</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" id="promo-card-sub" data-t="promo-card-sub">احضر رقمياً، اجذب زبائن جدد يومياً</div>
-      <a href="rizq_register.html" style="display:block;padding:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy2);border-radius:10px;font-size:13px;font-weight:800;text-align:center;text-decoration:none;transition:all .25s" id="promo-card-cta" data-t="promo-card-cta">ابدأ مجاناً — 3 أيام</a>
+      <a href="rizq_register.html" style="display:block;padding:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy2);border-radius:10px;font-size:13px;font-weight:800;text-align:center;text-decoration:none;transition:all .25s" id="promo-card-cta" data-t="promo-card-cta">ابدأ مجاناً — 10 أيام</a>
     </div>
   </div>
 </div>
@@ -940,13 +940,13 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <div class="promo-feats">
         <div class="promo-feat"><div class="pf-icon pf-i1">🏢</div><div><div class="pf-title" id="po-f1-t" data-t="po-f1-t">صفحة مكتب احترافية</div><div class="pf-sub" id="po-f1-s" data-t="po-f1-s">خدماتك وتواصلك في مكان واحد</div></div></div>
         <div class="promo-feat"><div class="pf-icon pf-i2">📞</div><div><div class="pf-title" id="po-f2-t" data-t="po-f2-t">زبائن يتواصلون معك مباشرة</div><div class="pf-sub" id="po-f2-s" data-t="po-f2-s">واتساب، هاتف، وإيميل — بضغطة</div></div></div>
-        <div class="promo-feat"><div class="pf-icon pf-i3">⚡</div><div><div class="pf-title" id="po-f3-t" data-t="po-f3-t">جاهز في دقائق — مجاناً 3 أيام</div><div class="pf-sub" id="po-f3-s" data-t="po-f3-s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
+        <div class="promo-feat"><div class="pf-icon pf-i3">⚡</div><div><div class="pf-title" id="po-f3-t" data-t="po-f3-t">جاهز في دقائق — مجاناً 10 أيام</div><div class="pf-sub" id="po-f3-s" data-t="po-f3-s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
       <div class="promo-cta-row">
         <a href="rizq_register.html" class="promo-cta-main" id="po-cta-main" data-t="po-cta-main">🚀 ابدأ مجاناً الآن</a>
         <a href="rizq_landing_v8.html" class="promo-cta-sec" id="po-cta-sec" data-t="po-cta-sec">تصفح المنصة أولاً ←</a>
       </div>
-      <div class="promo-note" id="po-note" data-t="po-note">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
+      <div class="promo-note" id="po-note" data-t="po-note">لا حاجة لبطاقة بنكية · 10 أيام تجريبية مجانية</div>
     </div>
   </div>
 </div>
@@ -1476,6 +1476,9 @@ function openMaps(){
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
           var browse = document.getElementById('act-browse-offices');
           if(browse) browse.textContent = isFr() ? 'Parcourir les bureaux' : 'تصفّح المكاتب';
+          var countBadge = document.getElementById('svc-count-badge');
+          if(countBadge){ countBadge.removeAttribute('data-t'); countBadge.textContent = isFr() ? '—' : '—'; }
+          setText('stat-svcs', '—');
         }
         if(!id){
           showEmptyOffice(
@@ -1816,7 +1819,7 @@ window._rizqProfile = (function() {
     <div class="pkg-section-head">
       <p style="font-size:12px;letter-spacing:2px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Office — الباقات</p>
       <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--navy);margin-bottom:10px"><span data-t="pkg-h2-pre">طوّر مكتبك بالباقة</span> <span style="color:var(--teal2)" data-t="pkg-h2-gold">المناسبة لك</span></h2>
-      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 3 أيام، ثم اختر الباقة التي تناسب نشاطك</p>
+      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام (حتى 3 خدمات)، ثم اختر الباقة التي تناسب نشاطك</p>
       <p style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 

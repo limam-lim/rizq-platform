@@ -561,7 +561,7 @@ function translateFeatureList(list, lang) {
 /** الكتالوجات المعتمدة — مطابقة PKG_DEFAULTS في لوحة الأدمن */
 var CATALOGS = {
   general: [
-    { id: 'trial',   price: 0,     durationDays: 3,   discountPct: 0, features: ['10 منتجات', 'شارة محل', 'تواصل مباشر'] },
+    { id: 'trial',   price: 0,     durationDays: 10,  discountPct: 0, features: ['10 منتجات', 'شارة محل', 'تواصل مباشر'] },
     { id: 'basic',   price: 1500,  durationDays: 30,  discountPct: 2, features: ['30 منتج', 'شارة مميّز برزق', 'إحصائيات'] },
     { id: 'pro',     price: 4000,  durationDays: 30,  discountPct: 3, features: ['منتجات غير محدودة', 'أولوية في نتائج البحث', 'دعم مخصص'] },
     { id: 'yearly',  price: 30000, durationDays: 365, discountPct: 3, features: ['كل مزايا Pro', 'خصم 37% عن السعر الشهري', 'فوترة سنوية واحدة'] },
@@ -592,9 +592,9 @@ var CATALOGS = {
     { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
       features: ['عرض حتى 3 خدمات نشطة', 'صفحة المكتب', 'طلبات تواصل'],
       features_fr: ['Jusqu\'à 3 services actifs', 'Page du bureau', 'Demandes de contact'] },
-    { id: 'of-month', price: 3500, durationDays: 30, discountPct: 2, highlight: true,
-      features: ['شارة مكتب موثوق', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
-      features_fr: ['Badge bureau vérifié', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
+    { id: 'of-month', price: 3500, durationDays: 30, maxCatalogItems: Infinity, discountPct: 2, highlight: true,
+      features: ['شارة مكتب موثوق', 'خدمات غير محدودة', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
+      features_fr: ['Badge bureau vérifié', 'Services illimités', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
     { id: 'of-quart', price: 9000, durationDays: 90, maxCatalogItems: Infinity, discountPct: 3,
       features: ['توفير 14%', 'عرض خدمات غير محدود', 'مدير حساب مخصص'],
       features_fr: ['Économisez 14%', 'Services illimités', 'Gestionnaire de compte dédié'] },
@@ -605,7 +605,7 @@ var CATALOGS = {
     Object.assign({ id: 'of-diam-pro' }, _officeDiamondProFields())
   ],
   corp: [
-    { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0,
+    { id: 'cp-trial', price: 0,     durationDays: 10,  discountPct: 0,
       features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'],
       features_fr: ['Accès complet à la plateforme', 'Consultation des annonces', 'Support technique de base'] },
     { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2,
@@ -964,7 +964,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-09-16-pkg-fr-order';
+var CATALOG_SYNC_REVISION = '2026-09-16-trial-10d';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',

@@ -3540,8 +3540,8 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
       </div>
 
       <!-- بدون دفع (تجريبي) -->
-      <div data-t-fr='<span style="color:var(--gold)">💡</span> Vous pouvez commencer avec l&#39;essai gratuit (3 jours) sans paiement' style="font-size:11px;color:var(--text-muted);margin-bottom:12px;text-align:center">
-        <span style="color:var(--gold)">💡</span> يمكنك البدء بالفترة التجريبية المجانية (3 أيام) بدون دفع
+      <div data-t-fr='<span style="color:var(--gold)">💡</span> Vous pouvez commencer avec l&#39;essai gratuit (10 jours) sans paiement' style="font-size:11px;color:var(--text-muted);margin-bottom:12px;text-align:center">
+        <span style="color:var(--gold)">💡</span> يمكنك البدء بالفترة التجريبية المجانية (10 أيام) بدون دفع
       </div>
 
       <button class="m-btn-main" data-t-fr="✅ Finaliser l'inscription" onclick="ppFinalSubmit()">✅ إتمام التسجيل</button>
@@ -7201,7 +7201,7 @@ function submitStoreReg(){
     // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
     // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
     _fileToBase64(stFile).then(function(id_image){
-      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),password:pw,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-store-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -7254,7 +7254,7 @@ function submitCorpReg(){
     if(!ok) return;
     Promise.all([_fileToBase64(crFile3), _fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
       var id_image=r[0], license_image=r[1], activity_image2=r[2];
-      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,activity_image2,password:pw,trial_ends:new Date(Date.now()+3*86400000).toISOString()};
+      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,activity_image2,password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-corp-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -7299,7 +7299,7 @@ function submitIndividualReg(){
       email: email,
       password: pw,
       id_image: id_image,
-      trial_ends:new Date(Date.now()+3*86400000).toISOString()
+      trial_ends:new Date(Date.now()+10*86400000).toISOString()
     };
     _ppBackPanel='p-individual-form'; _ppBackDot=2;
     ppShowPanel();
@@ -8077,7 +8077,7 @@ function renderPricingSection(){
       cta:'تواصل معنا',cta_fr:'Contactez-nous'}
   ];
   var DEF_STO=[
-    {name:'تجريبية',name_fr:'Essai',price:0,period:'3 أيام',period_fr:'3 jours',
+    {name:'تجريبية',name_fr:'Essai',price:0,period:'10 أيام',period_fr:'10 jours',
       features:['عرض المنتجات','صفحة المحل','تواصل مع الزبائن','❌ بدون فيديو'],
       features_fr:['Affichage des produits','Page de la boutique','Contact avec les clients','❌ Sans vidéo'],
       cta:'ابدأ مجاناً',cta_fr:'Commencer gratuitement'},
@@ -8686,11 +8686,11 @@ function pkgModalCTA(){
       <div class="rizq-promo-feats">
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i1">🏢</div><div><div class="rizq-pf-title" data-t-fr="Une page professionnelle pour votre activité">صفحة احترافية لعملك</div><div class="rizq-pf-sub" data-t-fr="Vos services, vos contacts et votre image — au même endroit">خدماتك، تواصلك، وصورتك — في مكان واحد</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-fr="Vos clients vous contactent directement">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-fr="WhatsApp, téléphone et e-mail — en un clic">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
-        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-fr="Prêt en quelques minutes — 3 jours gratuits">جاهز في دقائق — مجاناً 3 أيام</div><div class="rizq-pf-sub" data-t-fr="Aucun site web ni expérience technique requis">لا حاجة لموقع أو خبرة تقنية</div></div></div>
+        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-fr="Prêt en quelques minutes — 10 jours gratuits">جاهز في دقائق — مجاناً 10 أيام</div><div class="rizq-pf-sub" data-t-fr="Aucun site web ni expérience technique requis">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
       <a href="rizq_register.html" class="rizq-promo-cta-main" onclick="closeRizqPromo();location.href='rizq_register.html';return false;" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>
       <a href="./" class="rizq-promo-cta-sec" data-t-fr="Explorer la plateforme d'abord →">تصفح المنصة أولاً ←</a>
-      <div class="rizq-promo-note" data-t-fr="Aucune carte bancaire requise · 3 jours d'essai gratuit">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
+      <div class="rizq-promo-note" data-t-fr="Aucune carte bancaire requise · 10 jours d'essai gratuit">لا حاجة لبطاقة بنكية · 10 أيام تجريبية مجانية</div>
     </div>
   </div>
 </div><script>

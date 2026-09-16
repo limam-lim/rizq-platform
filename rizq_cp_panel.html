@@ -2651,7 +2651,7 @@ function showPanel(id, navEl){
 // على الإعلان/المنتج نفسه، كي تختفي/تظهر فوراً مع انتهاء/تفعيل الباقة.
 const PKG_DEFAULTS = {
   general: [
-    {id:'trial',  name:'تجريبية', price:0,     period:'مجاناً — 3 أيام',     durationDays:3,   features:['10 منتجات','شارة محل','تواصل مباشر'],                       active:true},
+    {id:'trial',  name:'تجريبية', price:0,     period:'مجاناً — 10 أيام',    durationDays:10,  features:['10 منتجات','شارة محل','تواصل مباشر'],                       active:true},
     {id:'basic',  name:'أساسي',   price:1500,  period:'MRU / شهر',           durationDays:30,  features:['30 منتج','🏅 شارة "مميّز برزق"','إحصائيات'],                    active:true},
     {id:'pro',    name:'Pro',     price:4000,  period:'MRU / شهر',           durationDays:30,  features:['منتجات غير محدودة','أولوية في نتائج البحث','دعم مخصص'],     active:true},
     {id:'yearly',   name:'سنوي',    price:30000, period:'MRU / سنة — خصم 37%', durationDays:365, features:['كل مزايا Pro','خصم 37% عن السعر الشهري','فوترة سنوية واحدة'], active:true},
@@ -2671,7 +2671,7 @@ const PKG_DEFAULTS = {
   ],
   office: [
     {id:'of-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10, maxCatalogItems:3, features:['عرض حتى 3 خدمات نشطة','صفحة المكتب','طلبات تواصل'], active:true},
-    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['شارة مكتب موثوق','نظام حجز المواعيد','فيديو تعريفي مشمول'], active:true},
+    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  maxCatalogItems:Infinity, features:['شارة مكتب موثوق','خدمات غير محدودة','نظام حجز المواعيد','فيديو تعريفي مشمول'], active:true},
     {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  maxCatalogItems:Infinity, features:['توفير 14%','عرض خدمات غير محدود','مدير حساب مخصص'], active:true},
     {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, maxCatalogItems:Infinity, features:['توفير 33%','فيديو تعريفي مشمول + 1 إضافي مجاناً','أولوية الدعم'], active:true},
     {id:'of-diam-std', name:'الماسية الأساسية للمكاتب', price:4000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, maxCatalogItems:Infinity, features:['موظف استقبال واستفسارات 24/7 (نصي)','تنظيم طلبات الخدمات والمواعيد','2,000 محادثة نصية شهرياً','ويدجت الموقع + واتساب'], active:true},
@@ -2686,7 +2686,7 @@ const PKG_DEFAULTS = {
     {id:'st-diam-pro', name:'الماسية Pro للمحلات', price:6000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:2500, quotaMinutes:150, maxCatalogItems:Infinity, features:['منتجات غير محدودة للمتجر','نائب ذكي تفاعلي للمحل (نصي + صوتي)','2,500 محادثة نصية + 150 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات آليّة','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
   ],
   corp: [
-    {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
+    {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10,  features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
     {id:'cp-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "شركة مميّزة برزق"','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'cp-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'], active:true},
     {id:'cp-year',  name:'سنوية',   price:25000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'], active:true},
