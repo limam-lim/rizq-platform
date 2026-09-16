@@ -1,6 +1,7 @@
 /**
- * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v18
+ * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v19
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
+ * v19: وضوح أعلى + زر رجوع + روابط الخصوصية/الشروط/المساعدة
  */
 (function () {
   'use strict';
@@ -16,6 +17,7 @@
   var _otpTimer = null;
   var _otpConfig = { devHintEnabled: false, production: false };
   var _ragOpenedAt = 0;
+  var _lastReasonKey = 'reasonGeneric';
 
   var MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,7 +78,13 @@
       backEdit: '← تعديل البيانات',
       resend: 'إعادة إرسال الرمز',
       resendIn: 'إعادة الإرسال خلال',
-      privacy: '🔒 بياناتك محمية — تُستخدم للتواصل والمفضلة ومكافحة الحسابات الوهمية فقط.',
+      privacy: '🔒 بياناتك محمية — للتواصل والمفضلة ومكافحة الحسابات الوهمية فقط.',
+      backBtn: '← رجوع',
+      linkPrivacy: 'الخصوصية',
+      linkTerms: 'الشروط',
+      linkHelp: 'المساعدة',
+      reasonBadgePrefix: 'مطلوب',
+      formIntro: 'املأ البيانات التالية ثم أكّد بريدك برمز قصير',
       errName: 'يرجى إدخال الاسم الكامل (الاسم واللقب)',
       errPhone: 'أدخل هاتفاً موريتانياً (8 أرقام) أو رقماً دولياً صالحاً',
       errWhatsapp: 'رقم واتساب صالح مطلوب',
@@ -131,6 +139,12 @@
       resend: 'Renvoyer le code',
       resendIn: 'Renvoi dans',
       privacy: '🔒 Vos données sont protégées — contact, favoris et lutte anti-fraude uniquement.',
+      backBtn: '← Retour',
+      linkPrivacy: 'Confidentialité',
+      linkTerms: 'Conditions',
+      linkHelp: 'Aide',
+      reasonBadgePrefix: 'Requis',
+      formIntro: 'Renseignez vos infos puis confirmez votre e-mail avec un code court',
       errName: 'Veuillez saisir votre nom complet',
       errPhone: 'Numéro mauritanien (8 chiffres) ou international valide requis',
       errWhatsapp: 'Numéro WhatsApp valide requis',
@@ -280,8 +294,11 @@
       '#rag-overlay.rag-overlay.open{display:flex!important;pointer-events:auto}',
       '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
       '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
-      '#rag-overlay .rag-close{position:absolute;top:12px;inset-inline-end:12px;background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:16px;z-index:5}',
-      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 20px 8px;border-bottom:1px solid #e2e8f5}',
+      '#rag-overlay .rag-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:6}',
+      '#rag-overlay .rag-back{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #e2e8f0;color:#1b3a6b;min-height:40px;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;font-family:inherit}',
+      '#rag-overlay .rag-back:hover{background:#e8eef8;border-color:#c9a84c}',
+      '#rag-overlay .rag-close{background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:16px;flex-shrink:0}',
+      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 20px 10px;border-bottom:1px solid #e2e8f5}',
       '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
       '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
       '#rag-overlay .rag-brand-name{font-size:16px;font-weight:800;color:#1b3a6b}',
@@ -296,23 +313,28 @@
       '#rag-overlay .rag-pstep-circle{width:34px;height:34px;border-radius:50%;background:#f8faff;border:2px solid rgba(13,27,42,.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#64748b;position:relative;z-index:1}',
       '#rag-overlay .rag-pstep.active .rag-pstep-circle{background:rgba(201,168,76,.15);border-color:#c9a84c;color:#a07820}',
       '#rag-overlay .rag-pstep.done .rag-pstep-circle{background:linear-gradient(135deg,#c9a84c,#e8c96a);border-color:#c9a84c;color:#0f2347}',
-      '#rag-overlay .rag-pstep-label{font-size:10.5px;color:#64748b;font-weight:600;text-align:center}',
+      '#rag-overlay .rag-pstep-label{font-size:11px;color:#64748b;font-weight:700;text-align:center}',
       '#rag-overlay .rag-pstep.active .rag-pstep-label{color:#a07820}',
-      '#rag-overlay .rag-body{padding:22px 20px 8px}',
-      '#rag-overlay .rag-title{color:#1a2535!important;font-size:1.35rem;font-weight:800;text-align:center;margin:0 0 6px}',
-      '#rag-overlay .rag-sub{color:#64748b!important;font-size:13px;text-align:center;margin:0 0 18px;line-height:1.6}',
+      '#rag-overlay .rag-body{padding:20px 20px 12px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box}',
+      '#rag-overlay .rag-title{color:#0f2347!important;font-size:1.4rem;font-weight:900;text-align:center;margin:0 0 8px;line-height:1.35}',
+      '#rag-overlay .rag-sub{color:#475569!important;font-size:13.5px;text-align:center;margin:0 0 12px;line-height:1.65}',
+      '#rag-overlay .rag-reason{display:none;align-items:center;justify-content:center;gap:8px;margin:0 auto 16px;padding:10px 14px;max-width:100%;box-sizing:border-box;border-radius:12px;background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid rgba(201,168,76,.4);color:#8a6a18;font-size:13px;font-weight:800;text-align:center;line-height:1.45}',
+      '#rag-overlay .rag-reason.show{display:flex}',
+      '#rag-overlay .rag-intro{display:none;text-align:center;font-size:12.5px;color:#64748b;margin:-4px 0 16px;line-height:1.55}',
+      '#rag-overlay .rag-intro.show{display:block}',
       '#rag-overlay .rag-returning{background:#fff8e8;border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 12px;font-size:12px;color:#92400e;text-align:center;margin:0 0 14px;display:none}',
       '#rag-overlay .rag-returning.show{display:block}',
-      '#rag-overlay .rag-label{display:block;color:#334155;font-size:12.5px;font-weight:700;margin:0 0 6px}',
-      '#rag-overlay .rag-hint{font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5}',
-      '#rag-overlay .rag-input{width:100%;box-sizing:border-box;background:#f8faff!important;border:1px solid rgba(13,27,42,.1)!important;border-radius:12px;padding:12px 14px;color:#1a2535!important;font-size:14px;font-family:inherit;margin-bottom:10px}',
-      '#rag-overlay .rag-input:focus{outline:none;border-color:rgba(201,168,76,.5)!important;background:#fff!important;box-shadow:0 0 0 3px rgba(201,168,76,.12)}',
+      '#rag-overlay .rag-label{display:block;color:#0f2347;font-size:13px;font-weight:800;margin:0 0 7px}',
+      '#rag-overlay .rag-hint{font-size:11.5px;color:#64748b;margin:-2px 0 12px;line-height:1.5}',
+      '#rag-overlay .rag-input{width:100%;box-sizing:border-box;background:#f8faff!important;border:1.5px solid rgba(13,27,42,.14)!important;border-radius:12px;padding:13px 14px;color:#1a2535!important;font-size:14.5px;font-family:inherit;margin-bottom:12px}',
+      '#rag-overlay .rag-input:focus{outline:none;border-color:rgba(201,168,76,.55)!important;background:#fff!important;box-shadow:0 0 0 3px rgba(201,168,76,.14)}',
       '#rag-overlay .rag-input.err{border-color:#ef4444!important}',
-      '#rag-overlay .rag-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;margin:-2px 0 10px;cursor:pointer}',
+      '#rag-overlay .rag-input::placeholder{color:#94a3b8;opacity:1}',
+      '#rag-overlay .rag-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#334155;margin:-2px 0 12px;cursor:pointer;font-weight:600}',
       '#rag-overlay .rag-check input{accent-color:#c9a84c}',
-      '#rag-overlay .rag-errmsg{color:#dc2626;font-size:11px;margin:-6px 0 8px;display:none}',
+      '#rag-overlay .rag-errmsg{color:#dc2626;font-size:11.5px;margin:-6px 0 10px;display:none;font-weight:600}',
       '#rag-overlay .rag-errmsg.show{display:block}',
-      '#rag-overlay .rag-btn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a)!important;color:#0f2347!important;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:8px;box-shadow:0 6px 18px rgba(201,168,76,.28)}',
+      '#rag-overlay .rag-btn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a)!important;color:#0f2347!important;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:8px;box-shadow:0 6px 18px rgba(201,168,76,.28)}',
       '#rag-overlay .rag-btn:disabled{opacity:.55;cursor:default}',
       '#rag-overlay .rag-btn-ghost{background:transparent!important;border:1px solid #e2e8f0!important;color:#475569!important;box-shadow:none;margin-top:8px}',
       '#rag-overlay .rag-choice{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}',
@@ -328,7 +350,10 @@
       '#rag-overlay .rag-otp-meta button{background:none;border:none;color:#1b3a6b;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;text-decoration:underline}',
       '#rag-overlay .rag-devhint{background:#fff8e8;border:1px dashed rgba(201,168,76,.45);border-radius:10px;padding:8px 10px;font-size:11px;color:#92400e;text-align:center;margin-bottom:10px;display:none}',
       '#rag-overlay .rag-devhint.show{display:block}',
-      '#rag-overlay .rag-privacy{color:#64748b;font-size:11px;text-align:center;margin-top:14px;line-height:1.6}',
+      '#rag-overlay .rag-privacy{color:#64748b;font-size:11.5px;text-align:center;margin-top:14px;line-height:1.65}',
+      '#rag-overlay .rag-legal{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 14px;margin-top:18px;padding:14px 12px 6px;border-top:1px solid #e8eef5}',
+      '#rag-overlay .rag-legal a{color:#1b3a6b;font-size:12.5px;font-weight:800;text-decoration:none;padding:6px 10px;border-radius:999px;background:#f1f5f9;border:1px solid #e2e8f0}',
+      '#rag-overlay .rag-legal a:hover{background:#fff8e8;border-color:rgba(201,168,76,.45);color:#8a6a18}',
       '#rag-overlay .rag-account-card{background:#f8faff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}',
       '#rag-overlay .rag-account-name{font-size:16px;font-weight:800;color:#1b3a6b;margin-bottom:4px}',
       '#rag-overlay .rag-account-meta{font-size:12px;color:#64748b;line-height:1.7}',
@@ -349,12 +374,15 @@
     injectStyle();
     var html = [
       '<div class="rag-overlay" id="rag-overlay">',
-      '  <div class="rag-modal" role="dialog" aria-modal="true">',
-      '    <button class="rag-close" id="rag-close-btn" type="button">✕</button>',
+      '  <div class="rag-modal" role="dialog" aria-modal="true" aria-labelledby="rag-title">',
+      '    <div class="rag-topbar">',
+      '      <button class="rag-back" id="rag-nav-back-btn" type="button"></button>',
+      '      <button class="rag-close" id="rag-close-btn" type="button" aria-label="Close">✕</button>',
+      '    </div>',
       '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
       '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
       '      <div class="rag-progress-steps">',
-      '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">الحساب</div></div>',
+      '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">البيانات</div></div>',
       '        <div class="rag-pstep" id="rag-pstep-2"><div class="rag-pstep-circle">2</div><div class="rag-pstep-label" id="rag-pstep-2-label">التحقق</div></div>',
       '        <div class="rag-pstep" id="rag-pstep-3"><div class="rag-pstep-circle">3</div><div class="rag-pstep-label" id="rag-pstep-3-label">تم</div></div>',
       '      </div>',
@@ -362,6 +390,8 @@
       '    <div class="rag-body">',
       '    <div class="rag-title" id="rag-title"></div>',
       '    <div class="rag-sub" id="rag-sub"></div>',
+      '    <div class="rag-reason" id="rag-reason" role="status"></div>',
+      '    <div class="rag-intro" id="rag-intro"></div>',
       '    <div class="rag-returning" id="rag-returning"></div>',
       '    <div class="rag-step" id="rag-step-choice">',
       '      <div class="rag-choice">',
@@ -411,6 +441,11 @@
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
+      '    <nav class="rag-legal" id="rag-legal" aria-label="Legal">',
+      '      <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
+      '      <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
+      '      <a id="rag-link-help" href="rizq_help.html" target="_blank" rel="noopener"></a>',
+      '    </nav>',
       '    </div>',
       '  </div>',
       '</div>'
@@ -432,6 +467,20 @@
       if (Date.now() - (_ragOpenedAt || 0) < 800) {
         e.preventDefault();
         e.stopPropagation();
+        return;
+      }
+      closeModal();
+    });
+    document.getElementById('rag-nav-back-btn').addEventListener('click', function (e) {
+      if (Date.now() - (_ragOpenedAt || 0) < 800) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      var otpStep = document.getElementById('rag-step-otp');
+      if (otpStep && otpStep.classList.contains('active')) {
+        showStep('form');
+        applyTexts(_pendingAction ? 'reasonGeneric' : 'reasonGeneric');
         return;
       }
       closeModal();
@@ -541,9 +590,24 @@
   function applyTexts(reasonKey) {
     var dict = d();
     var reason = dict[reasonKey] || dict.reasonGeneric;
+    var hasSpecificReason = !!(reasonKey && reasonKey !== 'reasonGeneric' && dict[reasonKey]);
     document.getElementById('rag-title').textContent = _modalMode === 'account' ? dict.titleAccount : dict.titleGate;
-    document.getElementById('rag-sub').textContent = (_modalMode === 'account' ? dict.subAccount : dict.subGate)
-      + (reasonKey && reasonKey !== 'reasonGeneric' ? ' — ' + reason : '');
+    document.getElementById('rag-sub').textContent = (_modalMode === 'account' ? dict.subAccount : dict.subGate);
+    var reasonEl = document.getElementById('rag-reason');
+    if (reasonEl) {
+      if (hasSpecificReason) {
+        reasonEl.textContent = dict.reasonBadgePrefix + ' — ' + reason;
+        reasonEl.classList.add('show');
+      } else {
+        reasonEl.textContent = '';
+        reasonEl.classList.remove('show');
+      }
+    }
+    var introEl = document.getElementById('rag-intro');
+    if (introEl) {
+      introEl.textContent = dict.formIntro || '';
+      introEl.classList.add('show');
+    }
     var l1 = document.getElementById('rag-pstep-1-label');
     var l2 = document.getElementById('rag-pstep-2-label');
     var l3 = document.getElementById('rag-pstep-3-label');
@@ -569,7 +633,15 @@
     document.getElementById('rag-send-otp-btn').textContent = dict.sendOtp;
     document.getElementById('rag-verify-btn').textContent = dict.verifyBtn;
     document.getElementById('rag-back-btn').textContent = dict.backEdit;
+    var navBack = document.getElementById('rag-nav-back-btn');
+    if (navBack) navBack.textContent = dict.backBtn;
     document.getElementById('rag-privacy-form').textContent = dict.privacy;
+    var lp = document.getElementById('rag-link-privacy');
+    var lt = document.getElementById('rag-link-terms');
+    var lh = document.getElementById('rag-link-help');
+    if (lp) lp.textContent = dict.linkPrivacy;
+    if (lt) lt.textContent = dict.linkTerms;
+    if (lh) lh.textContent = dict.linkHelp;
     document.getElementById('rag-name-err').textContent = dict.errName;
     document.getElementById('rag-phone-err').textContent = dict.errPhone;
     document.getElementById('rag-whatsapp-err').textContent = dict.errWhatsapp;
