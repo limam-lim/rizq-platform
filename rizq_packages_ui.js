@@ -238,21 +238,24 @@
       badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
     }
     var roiCol = light ? '#8a6c1f' : '#fde68a';
+    var descBlock = desc
+      ? '<div class="rizq-pkg-desc" style="font-size:11px;color:' + featCol + ';margin-bottom:8px;line-height:1.5;min-height:2.8em">' + esc(desc) + '</div>'
+      : '<div class="rizq-pkg-desc" style="min-height:2.8em;margin-bottom:8px" aria-hidden="true"></div>';
     return ''
-      + '<div class="store-pkg-card rizq-pkg-card' + (light ? ' rizq-pkg-light' : '') + '" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:' + (highlight || year || dia ? '28px' : '24px') + ' 16px 20px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s">'
+      + '<div class="store-pkg-card rizq-pkg-card' + (light ? ' rizq-pkg-light' : '') + '" data-pkg="' + esc(p.id || '') + '" data-catalog="' + esc(opts.catalogKey || '') + '" style="background:' + bg + ';border:' + border + ';border-radius:18px;padding:22px 16px 18px;text-align:center;position:relative;transition:transform .25s,box-shadow .25s;height:100%;display:flex;flex-direction:column;box-sizing:border-box;min-width:0">'
       + badge
-      + '<div class="pkg-name" style="font-size:15px;font-weight:800;color:' + nameCol + ';margin-bottom:4px">' + esc(p.name || '') + '</div>'
-      + (desc ? '<div style="font-size:11px;color:' + featCol + ';margin-bottom:8px;line-height:1.5">' + esc(desc) + '</div>' : '')
-      + '<div><span class="pkg-price" style="font-size:27px;font-weight:900;color:' + priceCol + '">' + priceTxt + '</span>'
+      + '<div class="pkg-name" style="font-size:14px;font-weight:800;color:' + nameCol + ';margin-bottom:4px;line-height:1.35;min-height:2.5em;display:flex;align-items:center;justify-content:center">' + esc(p.name || '') + '</div>'
+      + descBlock
+      + '<div><span class="pkg-price" style="font-size:26px;font-weight:900;color:' + priceCol + '">' + priceTxt + '</span>'
       + (!trial ? ' <span style="font-size:12px;color:' + periodCol + ';font-weight:600">MRU</span>' : '')
       + '</div>'
-      + '<div class="pkg-period" style="font-size:11px;color:' + periodCol + ';font-weight:600;margin-bottom:16px">' + esc(p.period || '') + '</div>'
-      + '<div style="height:1px;background:rgba(127,127,127,.15);margin-bottom:16px"></div>'
-      + '<ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:8px;text-align:start;font-size:12px;color:' + featCol + ';margin-bottom:20px;padding:0">'
-      + feats.map(function (f) { return '<li>✓ ' + esc(f) + '</li>'; }).join('')
+      + '<div class="pkg-period" style="font-size:11px;color:' + periodCol + ';font-weight:600;margin-bottom:12px">' + esc(p.period || '') + '</div>'
+      + '<div style="height:1px;background:rgba(127,127,127,.15);margin-bottom:12px;flex-shrink:0"></div>'
+      + '<ul class="pkg-feats" style="list-style:none;display:flex;flex-direction:column;gap:7px;text-align:start;font-size:12px;color:' + featCol + ';margin:0 0 12px;padding:0;flex:1 1 auto">'
+      + feats.map(function (f) { return '<li style="line-height:1.45">✓ ' + esc(f) + '</li>'; }).join('')
       + '</ul>'
-      + (roi ? '<div style="font-size:11px;color:' + roiCol + ';margin:-8px 0 14px;line-height:1.5">💼 ' + esc(roi) + '</div>' : '')
-      + '<button type="button" class="store-pkg-btn" onclick="window.location=\'' + esc(ctaHref(p, opts)) + '\'" style="width:100%;padding:11px;border-radius:11px;font-weight:800;font-size:13px;cursor:pointer;' + btnStyle + '">' + esc(ctaLabel(p)) + '</button>'
+      + (roi ? '<div style="font-size:11px;color:' + roiCol + ';margin:0 0 12px;line-height:1.45">💼 ' + esc(roi) + '</div>' : '')
+      + '<button type="button" class="store-pkg-btn" onclick="window.location=\'' + esc(ctaHref(p, opts)) + '\'" style="width:100%;padding:11px;border-radius:11px;font-weight:800;font-size:13px;cursor:pointer;margin-top:auto;' + btnStyle + '">' + esc(ctaLabel(p)) + '</button>'
       + '</div>';
   }
 
@@ -263,7 +266,8 @@
       return '<p style="text-align:center;color:#6a7a8a;font-size:14px;padding:24px">' + t2('لا توجد باقات متاحة حالياً', 'Aucun forfait disponible pour le moment') + '</p>';
     }
     var cols = opts.columns || Math.min(list.length, 5);
-    return '<div class="rizq-pkg-grid-inner" data-cols="' + cols + '" style="display:grid;grid-template-columns:repeat(' + cols + ',1fr);gap:16px">'
+    if (cols === 5 && list.length === 6) cols = 3;
+    return '<div class="rizq-pkg-grid-inner" data-cols="' + cols + '" style="display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:18px;align-items:stretch;width:100%">'
       + list.map(function (p) { return renderCard(p, opts); }).join('')
       + '</div>';
   }
@@ -358,9 +362,17 @@
     var s = document.createElement('style');
     s.id = 'rizq-pkg-grid-styles';
     s.textContent = ''
-      + '@media(max-width:1200px){.rizq-pkg-grid-inner[data-cols="5"]{grid-template-columns:repeat(3,1fr)!important}}'
-      + '@media(max-width:820px){.rizq-pkg-grid-inner[data-cols="5"]{grid-template-columns:repeat(2,1fr)!important}}'
-      + '@media(max-width:520px){.rizq-pkg-grid-inner[data-cols="5"]{grid-template-columns:1fr!important}}';
+      + '.rizq-pkg-grid-inner{width:100%;box-sizing:border-box}'
+      + '.rizq-pkg-grid-inner > .rizq-pkg-card{min-width:0}'
+      + '@media(max-width:1200px){'
+      + '.rizq-pkg-grid-inner[data-cols="5"],.rizq-pkg-grid-inner[data-cols="6"],.rizq-pkg-grid-inner[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}'
+      + '}'
+      + '@media(max-width:820px){'
+      + '.rizq-pkg-grid-inner[data-cols="5"],.rizq-pkg-grid-inner[data-cols="6"],.rizq-pkg-grid-inner[data-cols="3"],.rizq-pkg-grid-inner[data-cols="4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}'
+      + '}'
+      + '@media(max-width:520px){'
+      + '.rizq-pkg-grid-inner[data-cols="5"],.rizq-pkg-grid-inner[data-cols="6"],.rizq-pkg-grid-inner[data-cols="3"],.rizq-pkg-grid-inner[data-cols="4"]{grid-template-columns:1fr!important}'
+      + '}';
     document.head.appendChild(s);
   }
 
