@@ -230,7 +230,7 @@
 
   function applyMoreMenus(flags) {
     flags = flags && typeof flags === 'object' ? flags : {
-      individual: true, store: false, office: false, corp: false, tenders: false, videoAds: false
+      individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true
     };
     var mobileItems = getMobileMoreItems();
     document.querySelectorAll('#rizq-desk-more-li .nav-dropdown-menu, #nav-more-li .nav-dropdown-menu').forEach(function (menu) {

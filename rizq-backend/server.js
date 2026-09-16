@@ -72,7 +72,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // والمحلات فقط، بينما تبقى بقية الأقسام (مكاتب/شركات/مناقصات/فيديوهات
 // إعلانية) مبنية وجاهزة لكن مخفية خلف علم تفعيل، تُفتح لاحقاً من لوحة
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
-const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: false, corp: false, tenders: false, videoAds: false };
+const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
 function getModuleFlags() {
   const cfg = readJson(SITE_CONFIG_FILE, {});
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
