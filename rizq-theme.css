@@ -350,6 +350,23 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   z-index: 100 !important;
 }
 
+/* Native-nav pages (browse/post/listing): one header row, legal pill on edge hover only */
+html.rizq-native-nav-page body {
+  padding-top: 0 !important;
+}
+html.rizq-native-nav-page body > nav:not(#rizq-desk-nav) {
+  flex-wrap: nowrap !important;
+  max-height: 62px !important;
+  overflow: hidden !important;
+}
+html.rizq-native-nav-page nav .nav-disclaimer {
+  display: none !important;
+}
+html.rizq-native-nav-page #rizq-desk-nav,
+html.rizq-native-nav-page #rizq-app-header {
+  display: none !important;
+}
+
 /* ══ Rizq legal sidebar (fixed-disc-pill) — hidden until edge hover ══ */
 #rizq-disc-edge {
   position: fixed;
@@ -563,6 +580,15 @@ html[dir="ltr"] .rizq-hdr-more-menu {
   #rizq-rlogo-edge {
     display: none !important;
   }
+}
+
+body.rizq-hide-edge-widgets #rizq-disc-edge,
+body.rizq-hide-edge-widgets #rizq-disc-sidebar,
+body.rizq-hide-edge-widgets .fixed-rizq-logo,
+body.rizq-hide-edge-widgets #rizq-rlogo-edge {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* REMOVE ALL FLOATING CURSOR ELEMENTS */

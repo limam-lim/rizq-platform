@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '17.9';
+  var ASSET_V = '18.0';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -69,7 +69,12 @@
       document.documentElement.setAttribute('dir', bootLang === 'fr' ? 'ltr' : 'rtl');
     } catch (eBoot) {}
     if (!/dashboard|admin\.html|chat_widget/i.test(location.pathname || '')) {
-      var _pk = (location.pathname || '').split('/').pop().toLowerCase().replace(/\.html$/, '');
+      var _pkRaw = (location.pathname || '').split('/').pop().toLowerCase();
+      var _pkQ = _pkRaw.indexOf('?');
+      if (_pkQ !== -1) _pkRaw = _pkRaw.slice(0, _pkQ);
+      var _pkH = _pkRaw.indexOf('#');
+      if (_pkH !== -1) _pkRaw = _pkRaw.slice(0, _pkH);
+      var _pk = _pkRaw.replace(/\.html$/, '');
       var _nativeNav = document.documentElement.classList.contains('rizq-native-nav-page')
         || /^(rizq_browse|rizq_post|rizq_listing|rizq_search)$/.test(_pk);
       if (_nativeNav) {
