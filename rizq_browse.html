@@ -561,13 +561,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right.tab-active,
   .browse-wrap.has-detail .browse-right.tab-active{
     display:block!important;
-    padding-bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
   }
-  .browse-left.tab-active{
-    padding-bottom:calc(72px + env(safe-area-inset-bottom,0))!important;
-  }
-  .dp-wrap{padding:14px 12px calc(24px + env(safe-area-inset-bottom,0))!important}
-  .dp-back-btn{display:inline-flex!important;margin-bottom:10px!important}
   .browse-right.tab-hidden{display:none!important}
   .browse-left.tab-hidden{display:none!important}
   /* مهم: إلغاء top من rizq_header.css — كان يزيح التبويبات بـ 112px ويسبب قص الأرقام */
@@ -830,10 +824,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=19" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_terms_gate.js"></script>
-<script src="rizq_account_route.js?v=9"></script>
-<script src="rizq_auth_gate.js?v=16" defer></script>
+<script src="rizq_auth_gate.js?v=15.0" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
@@ -1258,28 +1251,16 @@ function _mapRawAdsToDisplay(rawList){
         : (typeof RizqSub!=='undefined' && typeof RizqSub.isAdBoosted==='function' && RizqSub.isAdBoosted(a.id));
       var _origP = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,''))||0;
       var _discountPct = (_origP>0 && p>0 && _origP>p) ? Math.round((1-(p/_origP))*100) : 0;
-      var _accType = a.accountType || a.type || 'individual';
-      var _sellerName = a.sellerName || a.seller || sellerLbl;
-      if(a.accountId){
-        try{
-          var _accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-          var _acc = _accs.find(function(x){ return x && x.id===a.accountId; });
-          if(_acc){
-            if(_acc.name) _sellerName = _acc.name;
-            if(_acc.type) _accType = _acc.type;
-          }
-        }catch(_eAcc){}
-      }
       var item = {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
         title:a.title||noTitle,desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):negotiable,
-        priceNum:p,rooms:Number(a.rooms)||0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
+        priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_boosted),boosted:_boosted,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
         images:Array.isArray(a.images)?a.images:[],
         condition:a.condition||'',
         seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
-        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:_sellerName,date:a.date||'',
-        accountId:a.accountId||'', accountType:_accType, phone:'', contactsLocked:!!a.contactsLocked,
+        loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
+        accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
         sellerContact:a.sellerContact||null};
       if(!item.contactsLocked && a.sellerContact){
         item.phone = a.sellerContact.phone || a.sellerContact.whatsapp || '';
@@ -1318,22 +1299,14 @@ function _rizqMergeBackendAds(){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
           return;
         }
-        var existingIdx = {};
-        ALL_ADS.forEach(function(a, i){ existingIdx[String(a.id)] = i; });
-        var mapped = _mapRawAdsToDisplay(data.ads);
-        mapped.forEach(function(a){
-          var k = String(a.id);
-          if(existingIdx[k] !== undefined){
-            ALL_ADS[existingIdx[k]] = Object.assign({}, ALL_ADS[existingIdx[k]], a);
-          } else {
-            existingIdx[k] = ALL_ADS.length;
-            ALL_ADS.push(a);
-          }
-        });
+        var existingIds = {};
+        ALL_ADS.forEach(function(a){ existingIds[String(a.id)] = true; });
+        var mapped = _mapRawAdsToDisplay(data.ads).filter(function(a){ return !existingIds[String(a.id)]; });
         if(!mapped.length){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
           return;
         }
+        mapped.forEach(function(a){ ALL_ADS.push(a); });
         if(typeof applyFilters === 'function') applyFilters();
       })
       .catch(function(){
@@ -1973,7 +1946,7 @@ function dpRevealPhone(){
   var ad = window._currentAd;
   if(ad.contactsLocked || !ad.phone){
     if(window.RizqContactGate && ad.accountId){
-      RizqContactGate.onMaskedContactClick(ad.accountId, ad.accountType || 'individual', { lang: _rizqLang() });
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
     }
     return;
   }
@@ -1993,7 +1966,7 @@ function dpCallNow(){
   var ad = window._currentAd;
   if(ad.contactsLocked || !ad.phone){
     if(window.RizqContactGate && ad.accountId){
-      RizqContactGate.onMaskedContactClick(ad.accountId, ad.accountType || 'individual', { lang: _rizqLang() });
+      RizqContactGate.onMaskedContactClick(ad.accountId, 'individual', { lang: _rizqLang() });
     }
     return;
   }
@@ -2090,12 +2063,14 @@ function openDrawer(){
   // إخفاء وسم "إشعار قانوني" الثابت (يسار الشاشة) أثناء فتح درج الفلاتر —
   // كان يبقى ظاهراً فوق محتوى الدرج (نفس منطقة الشاشة على الجوال) فيغطي
   // نص الفئات والأرقام.
-  document.body.classList.add('rizq-hide-edge-widgets');
+  const pill=document.getElementById('fixed-disc-pill'); if(pill) pill.style.display='none';
+  const logo=document.getElementById('fixed-rizq-logo'); if(logo) logo.style.display='none';
 }
 function closeDrawer(){
   document.getElementById('filter-overlay').classList.remove('open');
   document.getElementById('filter-drawer').classList.remove('open');
-  document.body.classList.remove('rizq-hide-edge-widgets');
+  const pill=document.getElementById('fixed-disc-pill'); if(pill) pill.style.display='';
+  const logo=document.getElementById('fixed-rizq-logo'); if(logo) logo.style.display='';
 }
 function closeRizqPromo(){
   const o=document.getElementById('rizq-promo-overlay');
@@ -2261,11 +2236,6 @@ function switchTab(tab){
     if(btnList){btnList.classList.add('active');}
     if(btnDetail){btnDetail.classList.remove('active');}
   } else {
-    if(!window._currentAd){
-      switchTab('list');
-      showToast(_rizqLang()==='fr' ? 'Sélectionnez une annonce d\'abord' : 'اختر إعلاناً من القائمة أولاً', 'info');
-      return;
-    }
     right.classList.remove('tab-hidden');right.classList.add('tab-active');
     left.classList.add('tab-hidden');left.classList.remove('tab-active');
     if(window.innerWidth<=900 && wrap) wrap.classList.add('has-detail');
@@ -2503,7 +2473,7 @@ function submitReport(){
     });
 }
 function dpToggleDesc(){
-  const dc=document.getElementById('dp-desc-text');
+  const dc=document.getElementById('dp-desc-content');
   const btn=document.getElementById('dp-read-more-btn');
   if(!dc)return;
   if(dc.classList.contains('expanded')){dc.classList.remove('expanded');if(btn)btn.textContent=_t('dp-read-more');}
@@ -2630,21 +2600,21 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div>
       <h4 class="footer-col-title" id="rzq-ft-topcats" data-t-fr="Meilleures catégories">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
-        <li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
       </ul>
     </div>
     <div>
       <h4 class="footer-col-title" id="rzq-ft-help" data-t-fr="Aide">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_help.html" id="rzq-ft-h1" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h1" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" id="rzq-ft-h2" data-t-fr="Politique de confidentialité">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html#s2" id="rzq-ft-h3" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h3" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" id="rzq-ft-h4" data-t-fr="Signaler une annonce">الإبلاغ عن إعلان</a></li>
-        <li><a href="rizq_legal.html#s10" id="rzq-ft-h5" data-t-fr="Contactez-nous">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h5" data-t-fr="Contactez-nous">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -2734,6 +2704,43 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 html{background:#071020!important}
 
+/* ══ FIXED RIZQ LOGO (right) ══ */
+.fixed-rizq-logo{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:10px 0 0 10px;
+  padding:14px 7px;cursor:pointer;
+  z-index:998;transition:all .25s;
+  box-shadow:-3px 0 18px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;
+}
+.fixed-rizq-logo:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  box-shadow:-4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ FIXED DISC PILL (left) ══ */
+.fixed-disc-pill{
+  position:fixed;left:0;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:0 10px 10px 0;
+  color:#C9A84C;font-size:10px;font-weight:700;
+  padding:16px 7px;cursor:pointer;
+  letter-spacing:1.5px;white-space:nowrap;
+  z-index:999;transition:all .25s;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+  font-family:Georgia,'Amiri',serif;
+}
+.fixed-disc-pill:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  color:#E8C96A;box-shadow:4px 0 24px rgba(201,168,76,.2);
+}
 </style>
 <!-- DISCLAIMER MODAL -->
 <div class="disc-overlay" id="discOverlay" onclick="if(event.target===this)closeDisc()">
@@ -2797,4 +2804,3 @@ html{background:#071020!important}
 <script src="rizq_manager_agent_config.js"></script>
 <script src="rizq_widget_embed.js"></script>
 <script src="rizq_navbar.js"></script>
-<script src="rizq_messenger.js?v=17"></script>

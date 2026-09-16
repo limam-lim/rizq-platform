@@ -27,34 +27,5 @@
   window.RIZQ_IS_LOCAL = isLocal;
   // rizq-backend.onrender.com = مشروع قديم (Jobs API) — ليس خادم منصة رزق.
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
-  // محلياً: نفس origin (127.0.0.1:3000 أو localhost:5500…) — لا نثبت localhost:3000
-  // حتى لا تفشل الروابط عند فتح الموقع من 127.0.0.1 أو منفذ مختلف.
-  window.RIZQ_BACKEND_BASE = isLocal
-    ? (window.location.protocol + '//' + window.location.host)
-    : 'https://rizq-platform-api.onrender.com';
+  window.RIZQ_BACKEND_BASE = isLocal ? 'http://localhost:3000' : 'https://rizq-platform-api.onrender.com';
 })();
-
-/** فتح الدليل المرئي (مخططات SVG) — يعمل من الواجهة مباشرة */
-window.rizqOpenHelpGuide = function (ev) {
-  if (ev && ev.preventDefault) ev.preventDefault();
-  window.open('rizq_help.html', '_blank', 'noopener');
-  return false;
-};
-
-/** تنزيل نص الدليل (MD) من الخادم */
-window.rizqDownloadHelpGuide = function (ev, slug) {
-  if (ev && ev.preventDefault) ev.preventDefault();
-  slug = slug || 'platform-manual';
-  var base = (window.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
-  if (!base) {
-    alert('الخادم غير مضبوط بعد.');
-    return false;
-  }
-  window.open(base + '/api/help-guide/' + encodeURIComponent(slug), '_blank', 'noopener');
-  return false;
-};
-window.rizqHelpGuideUrl = function (slug) {
-  slug = slug || 'platform-manual';
-  var base = (window.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
-  return base ? base + '/api/help-guide/' + encodeURIComponent(slug) : '';
-};

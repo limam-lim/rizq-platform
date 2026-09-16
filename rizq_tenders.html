@@ -198,7 +198,7 @@ body{
 @media (prefers-reduced-motion: reduce){.hero-eyebrow,.hero h1,.hero p,.hero-cta,.t-card{animation:none;opacity:1}}
 </style>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=19" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 </head>
 <body>
 
@@ -274,11 +274,11 @@ body{
     <div>
       <h4 class="footer-col-title" data-t-fr="AIDE">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_help.html" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
+        <li><a href="rizq_legal.html" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" data-t-fr="Politique de confidentialité">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html#s2" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" data-t-fr="Signaler une offre">الإبلاغ عن مناقصة</a></li>
-        <li><a href="rizq_legal.html#s10" data-t-fr="Contactez-nous">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html" data-t-fr="Contactez-nous">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -397,8 +397,6 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_disclaimer.js"></script>
-<script src="rizq_account_route.js?v=7"></script>
-<script src="rizq_auth_gate.js?v=16"></script>
 <script>
 /* ════════════════════════════════════════
    rizq_tenders.html — المناقصات (Tenders)
@@ -452,49 +450,6 @@ function _getSession(){
   try{ return JSON.parse(localStorage.getItem('rizq_active_session')||'null'); }catch(e){ return null; }
 }
 
-function _tenderReturnHref(queryExtra){
-  var base = 'rizq_tenders.html';
-  return queryExtra ? (base + '?' + queryExtra) : base;
-}
-
-function _promptTenderLogin(queryExtra){
-  var href = _tenderReturnHref(queryExtra || '');
-  if(window.RizqAccount && typeof RizqAccount.promptLogin === 'function'){
-    RizqAccount.promptLogin(href);
-    return;
-  }
-  try{ sessionStorage.setItem('rizq_after_auth_href', href); }catch(e){}
-  location.href = 'rizq_landing_v8.html?openLogin=1';
-}
-
-function _tenderLoginBtn(queryExtra, labelAr, labelFr){
-  var fr = _rizqLang()==='fr';
-  var label = fr ? labelFr : labelAr;
-  return '<button type="button" onclick="_promptTenderLogin(\''+(queryExtra||'').replace(/'/g,"\\'")+'\')" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:inherit">'+label+'</button>';
-}
-
-function _resumeTenderIntent(){
-  var p = new URLSearchParams(location.search);
-  var action = p.get('action');
-  var bid = p.get('bid');
-  if(!_getSession()) return;
-  if(action === 'post'){
-    try{
-      var u = new URL(location.href);
-      u.searchParams.delete('action');
-      history.replaceState(null, '', u.pathname + (u.search || ''));
-    }catch(e){}
-    setTimeout(openPostModal, 350);
-  } else if(bid){
-    try{
-      var u2 = new URL(location.href);
-      u2.searchParams.delete('bid');
-      history.replaceState(null, '', u2.pathname + (u2.search || ''));
-    }catch(e2){}
-    setTimeout(function(){ openBidModal(bid); }, 350);
-  }
-}
-
 /* إصلاح جوهري: session.token هنا هو dashToken (رمز TK_... محلي تكتبه كل
    لوحات التحكم الأربع عند الدخول، ويُستخدم فقط في verify-dash) وليس
    accessToken الحقيقي الذي يتحقق منه verifyAccountOwner() في كل من
@@ -514,11 +469,11 @@ function _resolveRealAccessToken(session){
     }
   }catch(e){}
   if(!_backendBase() || !session || !session.token) return Promise.resolve(null);
-  return fetch(_backendBase() + '/api/accounts/exchange-dash-token/' + encodeURIComponent(session.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':session.token}, body:JSON.stringify({dashToken:session.token}) })
+  return fetch(_backendBase() + '/api/accounts/verify-dash/' + encodeURIComponent(session.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':session.token}, body:JSON.stringify({dashToken:session.token}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.accessToken;
+      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
+      window.REAL_ACCESS_TOKEN = data.account.accessToken;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===session.id; });
@@ -605,7 +560,7 @@ function renderTenders(){
       + '<div class="emo-ring"><div class="emo">🔒</div></div>'
       + '<h3 style="color:#151f30;margin:0 0 8px;font-size:19px">'+(fr?'Connexion requise':'يلزم تسجيل الدخول')+'</h3>'
       + '<p style="color:#5b6472;max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.7">'+(fr?'Connectez-vous pour publier ou soumettre une offre.':'سجّل دخولك لنشر مناقصة أو تقديم عرض.')+'</p>'
-      + _tenderLoginBtn('', fr?'Se connecter':'تسجيل الدخول')
+      + '<a href="rizq_landing_v8.html" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;text-decoration:none">'+(fr?'Aller au tableau de bord':'الذهاب إلى لوحة التحكم')+'</a>'
       + '</div>';
     if(bannerEl) bannerEl.innerHTML='';
     return;
@@ -646,14 +601,7 @@ function renderTenders(){
       ? (fr ? ('Budget : '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU') : ('الميزانية: '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU'))
       : '';
     var bidsLbl = fr ? (t.bidsCount+' offre(s) reçue(s)') : (t.bidsCount+' عرض مُقدَّم');
-    var thumb = '';
-    if(t.images && t.images.length){
-      var imgSrc = t.images[0];
-      if(imgSrc && imgSrc.indexOf('/api/')===0) imgSrc = _backendBase().replace(/\/$/,'') + imgSrc;
-      thumb = '<img class="t-card-thumb" src="'+imgSrc+'"/>';
-    } else if(t.imagesLocked && t.imageCount>0){
-      thumb = '<div class="t-card-thumb" style="display:flex;align-items:center;justify-content:center;background:#f1f5f9;font-size:18px" title="'+(fr?'Abonnement requis pour voir les photos':'يلزم اشتراك لعرض الصور')+'">🔒</div>';
-    }
+    var thumb = (t.images && t.images.length) ? '<img class="t-card-thumb" src="'+t.images[0]+'"/>' : '';
     var bidBtn = canBid
       ? '<button class="t-btn primary" onclick="openBidModal(\''+t.id+'\')">'+(fr?'Soumettre une offre':'قدّم عرضك')+'</button>'
       : '<button class="t-btn locked" onclick="openBidModal(\''+t.id+'\')" title="'+(fr?'Abonnement requis':'يلزم اشتراك')+'">🔒 '+(fr?'Offre (abonnement)':'عرض (اشتراك)')+'</button>';
@@ -664,9 +612,6 @@ function renderTenders(){
       + '<div class="t-title" style="flex:1">'+escapeHtml(t.title)+'</div>'
       + '</div>'
       + (t.desc ? '<div class="t-desc">'+escapeHtml(t.desc)+'</div>' : '')
-      + (t.imagesLocked && t.imageCount>0 ? '<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;margin:8px 0">📷 '+t.imageCount+' '+(fr?'photo(s) de référence — abonnez-vous pour les voir':'صورة مرجعية — اشترك لعرضها')+'</div>' : '')
-      + (t.documentLocked ? '<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;margin:8px 0">📄 '+(fr?'Fichier PDF de l\'appel d\'offres — abonnez-vous pour le télécharger':'ملف PDF للمناقصة — اشترك لتحميله')+'</div>' : '')
-      + (t.documentUrl ? '<div style="margin:8px 0"><button type="button" class="t-btn" style="font-size:12px;padding:6px 12px" onclick="downloadTenderDocument(\''+t.id+'\')">📄 '+(fr?'Télécharger le PDF':'تحميل ملف PDF')+'</button></div>' : '')
       + _renderContactBlock(t, fr)
       + '<div class="t-meta">'
       + (t.city ? '<span>📍 '+escapeHtml(t.city)+'</span>' : '')
@@ -718,14 +663,12 @@ function openPostModal(){
   var session = _getSession();
   var body = document.getElementById('post-modal-body');
   window._tenderImages = [];
-  window._tenderDocument = null;
-  window._tenderDocumentName = '';
   if(!session){
     body.innerHTML = '<h3>'+(fr?'Publier un appel d\'offres':'انشر مناقصتك')+'</h3>'
       + '<div class="login-notice">'+(fr
         ? 'Connectez-vous d\'abord depuis votre tableau de bord (compte particulier, magasin, bureau ou société) pour publier un appel d\'offres.'
         : 'سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) حتى تقدر تنشر مناقصة.')
-      + '<br>'+_tenderLoginBtn('action=post', fr?'Se connecter pour publier':'سجّل دخولك للنشر')+'</div>';
+      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
     document.getElementById('post-modal').classList.add('open');
     return;
   }
@@ -755,13 +698,6 @@ function openPostModal(){
     + '<div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px">'+(fr?'Jusqu\'à 3 photos — JPG/PNG, max 3 Mo':'حتى 3 صور — JPG/PNG، أقصى 3MB')+'</div>'
     + '<input type="file" id="pt-img-input" accept="image/*" multiple style="display:none" onchange="_ptHandleImgUpload(this)"/>'
     + '</div><div class="pt-img-thumbs" id="pt-img-thumbs"></div></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Fichier PDF (optionnel)':'ملف PDF للمناقصة (اختياري)')+'</label>'
-    + '<div class="pt-img-zone" onclick="document.getElementById(\'pt-pdf-input\').click()" style="padding:14px">'
-    + '<div style="font-size:22px;margin-bottom:4px">📄</div>'
-    + '<div style="font-size:12.5px;font-weight:600;color:var(--navy)">'+(fr?'Joindre le cahier des charges (PDF)':'أرفق ملف المناقصة (PDF)')+'</div>'
-    + '<div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px">'+(fr?'1 fichier PDF, max 5 Mo — visible aux abonnés uniquement':'ملف PDF واحد، أقصى 5MB — للمشتركين فقط')+'</div>'
-    + '<input type="file" id="pt-pdf-input" accept="application/pdf,.pdf" style="display:none" onchange="_ptHandlePdfUpload(this)"/>'
-    + '</div><div id="pt-pdf-name" style="font-size:12px;color:var(--navy);margin-top:6px"></div></div>'
     + '<button class="f-submit" onclick="submitTender()">'+(fr?'📤 Publier':'📤 نشر المناقصة')+'</button>'
     + '<p class="f-hint">'+(fr?'Rizq est un simple intermédiaire de publication — nous ne garantissons pas les offres et n\'intervenons pas dans le choix du gagnant.':'رزق وسيط نشر فقط — لا نضمن العروض ولا نتدخل في اختيار الفائز.')+'</p>';
   document.getElementById('post-modal').classList.add('open');
@@ -803,61 +739,6 @@ function _ptHandleImgUpload(input){
   input.value = '';
 }
 
-function _ptRenderPdfName(){
-  var el = document.getElementById('pt-pdf-name');
-  if(!el) return;
-  var fr = _rizqLang()==='fr';
-  var name = window._tenderDocumentName || '';
-  el.innerHTML = name
-    ? ('📄 '+escapeHtml(name)+' <button type="button" onclick="window._tenderDocument=null;window._tenderDocumentName=\'\';_ptRenderPdfName();" style="margin-right:6px;background:none;border:none;color:#dc2626;cursor:pointer;font-size:11px">'+(fr?'Supprimer':'حذف')+'</button>')
-    : '';
-}
-
-function _ptHandlePdfUpload(input){
-  var fr = _rizqLang()==='fr';
-  var file = (input.files && input.files[0]) || null;
-  if(!file) return;
-  if(!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf'){
-    showToast(fr?'Format PDF uniquement':'ملف PDF فقط');
-    input.value = '';
-    return;
-  }
-  if(file.size > 5 * 1024 * 1024){
-    showToast(fr?'PDF trop volumineux (max 5 Mo)':'حجم PDF كبير (الحد 5MB)');
-    input.value = '';
-    return;
-  }
-  var reader = new FileReader();
-  reader.onload = function(e){
-    window._tenderDocument = e.target.result;
-    window._tenderDocumentName = file.name;
-    _ptRenderPdfName();
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-function downloadTenderDocument(tenderId){
-  var fr = _rizqLang()==='fr';
-  var session = _getSession();
-  if(!session){ showToast(fr?'Connectez-vous pour télécharger':'سجّل دخولك للتحميل'); return; }
-  _resolveRealAccessToken(session).then(function(realTok){
-    fetch(_backendBase().replace(/\/$/,'') + '/api/tenders/'+encodeURIComponent(tenderId)+'/document', {
-      headers: { 'x-account-id': session.id, 'x-account-token': (realTok || session.token) }
-    }).then(function(res){
-      if(!res.ok) return res.json().then(function(d){ throw d; });
-      return res.blob();
-    }).then(function(blob){
-      var url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-    }).catch(function(err){
-      var msg = (err && (fr ? (err.msg_fr||err.msg) : (err.msg||err.error))) || (fr?'Échec du téléchargement':'تعذّر التحميل');
-      showToast(msg);
-    });
-  });
-}
-
 function submitTender(){
   var fr = _rizqLang()==='fr';
   var session = _getSession();
@@ -878,8 +759,6 @@ function submitTender(){
     budgetMax: Number(document.getElementById('pt-bmax').value)||0,
     deadline: new Date(deadline+'T23:59:59').toISOString(),
     images: window._tenderImages||[],
-    document: window._tenderDocument || null,
-    documentName: window._tenderDocumentName || '',
   };
   _resolveRealAccessToken(session).then(function(realTok){
     fetch(_backendBase().replace(/\/$/,'') + '/api/tenders', {
@@ -889,20 +768,12 @@ function submitTender(){
     }).then(function(res){ return res.json().then(function(data){ return {ok:res.ok, data:data}; }); })
       .then(function(r){
         if(!r.ok){
-          var msg = (r.data && (r.data.msg||r.data.msg_fr||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر');
-          if(r.data && r.data.error==='contact_in_text_forbidden'){
-            msg = fr ? (r.data.msg_fr||r.data.msg) : (r.data.msg||msg);
-          } else if(r.data && r.data.error==='invalid_pdf'){
-            msg = fr ? 'PDF invalide ou trop volumineux (max 5 Mo)' : 'ملف PDF غير صالح أو أكبر من 5MB';
-          }
-          showToast(msg);
+          showToast((r.data && (r.data.msg||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر'));
           return;
         }
         closePostModal();
         window._tenderImages = [];
-        window._tenderDocument = null;
-        window._tenderDocumentName = '';
-        showToast((r.data && r.data.msg) || (fr?'⏳ Appel d\'offres soumis — en attente de validation Rizq':'⏳ تم استلام مناقصتك — قيد مراجعة فريق رزق'));
+        showToast(fr?'✅ Appel d\'offres publié':'✅ تم نشر مناقصتك');
         loadTenders();
       }).catch(function(){ showToast(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم'); });
   });
@@ -920,7 +791,7 @@ function openBidModal(tenderId){
       + '<div class="login-notice">'+(fr
         ? 'Connectez-vous d\'abord depuis votre tableau de bord pour soumettre une offre.'
         : 'سجّل دخولك أولاً من لوحة تحكمك حتى تقدر تقدّم عرضاً.')
-      + '<br>'+_tenderLoginBtn('bid='+encodeURIComponent(tenderId), fr?'Se connecter pour soumettre':'سجّل دخولك لتقديم عرض')+'</div>';
+      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
     document.getElementById('bid-modal').classList.add('open');
     return;
   }
@@ -969,13 +840,8 @@ function submitBid(){
           var errMap = {
             cannot_bid_own_tender: fr?'Vous ne pouvez pas soumettre une offre sur votre propre appel d\'offres':'لا يمكنك تقديم عرض على مناقصتك أنت',
             tender_closed: fr?'Le délai de cet appel d\'offres est terminé':'انتهت مهلة هذه المناقصة',
-            tender_not_open: fr?'Cet appel d\'offres n\'accepte pas d\'offres pour le moment':'هذه المناقصة غير متاحة لتقديم العروض حالياً',
           };
-          var msg = (r.data && (errMap[r.data.error] || r.data.msg_fr || r.data.msg || r.data.error)) || (fr?'Échec de l\'envoi de l\'offre':'تعذّر إرسال العرض');
-          if(r.data && r.data.error==='contact_in_text_forbidden'){
-            msg = fr ? (r.data.msg_fr||r.data.msg) : (r.data.msg||msg);
-          }
-          showToast(msg);
+          showToast((r.data && (errMap[r.data.error] || r.data.msg || r.data.error)) || (fr?'Échec de l\'envoi de l\'offre':'تعذّر إرسال العرض'));
           return;
         }
         closeBidModal();
@@ -1017,7 +883,6 @@ document.addEventListener('keydown', function(e){
 
 applyLang();
 loadTenders();
-_resumeTenderIntent();
 </script>
 </body>
 </html>

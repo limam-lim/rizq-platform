@@ -1564,6 +1564,29 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
   color:rgba(201,168,76,.85)!important;
 }
 
-/* Side legal pill + R logo: hover reveal — owned by rizq-theme.css (#rizq-disc-sidebar / #rizq-rlogo-edge) */
+/* Mediator / escrow side badge — always clickable, never covers the header */
+.fixed-disc-pill{
+  position:fixed !important;
+  left:8px !important;
+  top:58% !important;
+  transform:translateY(-50%) !important;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  background:#0f172a !important;
+  border:1.5px solid rgba(201,168,76,.5) !important;
+  border-radius:0 10px 10px 0;
+  color:#C9A84C !important;
+  font-size:10px;font-weight:700;
+  padding:14px 6px;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  letter-spacing:1.2px;white-space:nowrap;
+  z-index:1200 !important;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+}
+.fixed-disc-pill:hover{border-color:#C9A84C !important;color:#E8C96A !important}
+@media (max-width:768px){
+  .fixed-disc-pill{top:auto !important;bottom:96px !important;transform:none !important;max-height:38vh;overflow:hidden}
+}
 
 .nav-dd-ads strong{color:#E8C96A !important}

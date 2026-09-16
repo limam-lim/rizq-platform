@@ -565,15 +565,6 @@ html[dir="ltr"] .rizq-hdr-more-menu {
   }
 }
 
-body.rizq-hide-edge-widgets #rizq-disc-edge,
-body.rizq-hide-edge-widgets #rizq-disc-sidebar,
-body.rizq-hide-edge-widgets .fixed-rizq-logo,
-body.rizq-hide-edge-widgets #rizq-rlogo-edge {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 /* REMOVE ALL FLOATING CURSOR ELEMENTS */
 html, body { cursor: auto !important; }
 input, textarea, select, [contenteditable="true"] { cursor: text !important; }

@@ -390,7 +390,6 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
-  <script src="rizq_account_route.js?v=8"></script>
   <script src="rizq_input_bidi.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js?v=16.3"></script>
@@ -403,7 +402,7 @@ main, .page-content.active, .main-content, .results-area,
        نفس النمط المستخدَم فعلياً في rizq_dashboard_store/office/corp.html. -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=19" defer></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
 <body>
@@ -565,6 +564,8 @@ main, .page-content.active, .main-content, .results-area,
       <div><div class="photo-slot" onclick="addPhoto(5)"><div id="ph-5">+</div></div><div class="photo-label" data-t-fr="Photo 6">صورة 6</div></div>
       <div><div class="photo-slot" onclick="addPhoto(6)"><div id="ph-6">+</div></div><div class="photo-label" data-t-fr="Photo 7">صورة 7</div></div>
       <div><div class="photo-slot" onclick="addPhoto(7)"><div id="ph-7">+</div></div><div class="photo-label" data-t-fr="Photo 8">صورة 8</div></div>
+      <div><div class="photo-slot" onclick="addPhoto(8)"><div id="ph-8">+</div></div><div class="photo-label" data-t-fr="Photo 9">صورة 9</div></div>
+      <div><div class="photo-slot" onclick="addPhoto(9)"><div id="ph-9">+</div></div><div class="photo-label" data-t-fr="Photo 10">صورة 10</div></div>
     </div>
     <input type="file" id="file-input" accept="image/*" multiple style="display:none" onchange="handleFiles(this)"/>
 
@@ -696,8 +697,8 @@ main, .page-content.active, .main-content, .results-area,
     <div style="background:#f8faff;border:1px solid #e2e8f5;border-radius:12px;padding:16px;margin-bottom:20px">
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
         <input type="checkbox" id="terms-cb" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold)" onchange="togglePublish()"/>
-        <span style="font-size:13px;color:var(--text-muted);line-height:1.7" data-t-fr='J&#39;accepte les <a href="rizq_legal.html#s2" style="color:var(--gold)" target="_blank">conditions d&#39;utilisation</a> et la <a href="rizq_legal.html#s3" style="color:var(--gold)" target="_blank">politique de confidentialité</a> de la plateforme Rizq. Je confirme que cette annonce est authentique et conforme aux <a href="rizq_legal.html#s4" style="color:var(--gold)" target="_blank">règles de publication</a>, et je certifie être le propriétaire légal du contenu de cette annonce (textes et images), ou disposer d&#39;une licence valable pour l&#39;utiliser, et j&#39;assume seul toute responsabilité résultant d&#39;une violation des droits de propriété intellectuelle de tiers (voir la <a href="rizq_legal.html#s7" style="color:var(--gold)" target="_blank">clause de propriété intellectuelle</a>).'>
-          أوافق على <a href="rizq_legal.html#s2" style="color:var(--gold)" target="_blank">شروط الاستخدام</a> و<a href="rizq_legal.html#s3" style="color:var(--gold)" target="_blank">سياسة الخصوصية</a> لمنصة رزق.
+        <span style="font-size:13px;color:var(--text-muted);line-height:1.7" data-t-fr='J&#39;accepte les <a href="rizq_legal.html" style="color:var(--gold)" target="_blank">conditions d&#39;utilisation</a> et la <a href="rizq_legal.html" style="color:var(--gold)" target="_blank">politique de confidentialité</a> de la plateforme Rizq. Je confirme que cette annonce est authentique et conforme aux <a href="rizq_legal.html#s4" style="color:var(--gold)" target="_blank">règles de publication</a>, et je certifie être le propriétaire légal du contenu de cette annonce (textes et images), ou disposer d&#39;une licence valable pour l&#39;utiliser, et j&#39;assume seul toute responsabilité résultant d&#39;une violation des droits de propriété intellectuelle de tiers (voir la <a href="rizq_legal.html#s7" style="color:var(--gold)" target="_blank">clause de propriété intellectuelle</a>).'>
+          أوافق على <a href="rizq_legal.html" style="color:var(--gold)" target="_blank">شروط الاستخدام</a> و<a href="rizq_legal.html" style="color:var(--gold)" target="_blank">سياسة الخصوصية</a> لمنصة رزق.
           أؤكد أن هذا الإعلان حقيقي ولا يخالف <a href="rizq_legal.html#s4" style="color:var(--gold)" target="_blank">قواعد النشر</a>،
           وأؤكد أنني المالك القانوني لمحتوى هذا الإعلان (النصوص والصور)، أو أنني حاصل على ترخيص صحيح لاستخدامها، وأتحمّل وحدي أي مسؤولية ناتجة عن انتهاك حقوق ملكية فكرية للغير
           (راجع <a href="rizq_legal.html#s7" style="color:var(--gold)" target="_blank">بند الملكية الفكرية</a>).
@@ -705,7 +706,6 @@ main, .page-content.active, .main-content, .results-area,
       </label>
     </div>
 
-    <div id="mod-feedback" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.6"></div>
     <div class="nav-btns">
       <button class="btn-back" data-t-fr="← Retour" onclick="goStep(4)">← عودة</button>
       <button class="btn-next" id="btn-publish" data-t-fr="🚀 Publier l'annonce maintenant" onclick="publishAd()" disabled>🚀 انشر الإعلان الآن</button>
@@ -739,7 +739,7 @@ main, .page-content.active, .main-content, .results-area,
 const SUBCATS = {};
 const SUBCATS_FR = {};
 let selCat='', selSubcat='', selCondition='جديد', selPlan='مجاني';
-let photosData=new Array(8).fill(null);
+let photosData=new Array(10).fill(null);
 const emojis=['📷','🛋️','🍳','🛁','🌇','🅿️','📸','🖼️','🏠','✨'];
 let currentStep=1;
 
@@ -914,21 +914,6 @@ document.addEventListener('DOMContentLoaded',function(){
     wSel.addEventListener('change',toggleMoughataaField);
     toggleMoughataaField();
   }
-  try{
-    var params=new URLSearchParams(location.search);
-    var urlCat=params.get('cat');
-    var urlSub=params.get('sub');
-    if(urlCat){
-      var norm=(typeof RizqCategories!=='undefined')?RizqCategories.normalize(urlCat):urlCat;
-      document.querySelectorAll('.cat-btn').forEach(function(btn){
-        var key=btn.getAttribute('data-cat')||'';
-        if(key===norm||key===urlCat||(btn.querySelector('.cat-name')&&btn.querySelector('.cat-name').textContent.trim()===urlCat)){
-          if(typeof selectCat==='function') selectCat(btn,norm||urlCat);
-        }
-      });
-    }
-    if(urlSub) selSubcat=urlSub;
-  }catch(eCat){}
 });
 
 function goStep(n){
@@ -963,9 +948,7 @@ function updateChar(inputId,countId,max){
   el.style.color=len>max*0.9?'#f87171':'var(--text-muted)';
 }
 
-var _photoTargetIdx = 0;
 function addPhoto(idx){
-  _photoTargetIdx = (idx != null && idx >= 0) ? idx : 0;
   document.getElementById('file-input').click();
 }
 
@@ -1016,7 +999,7 @@ function compressImageFile(file, maxDim, quality){
 
 function getEmptyPhotoSlots(){
   var arr=[];
-  for(var i=0;i<8;i++){ if(!photosData[i]) arr.push(i); }
+  for(var i=0;i<10;i++){ if(!photosData[i]) arr.push(i); }
   return arr;
 }
 
@@ -1052,13 +1035,10 @@ function removePhoto(idx){
 function handleFiles(input){
   var _frH = (typeof isAr !== 'undefined' && !isAr);
   var slots=getEmptyPhotoSlots();
-  if(_photoTargetIdx >= 0 && photosData[_photoTargetIdx] == null && slots.indexOf(_photoTargetIdx) === -1){
-    slots.unshift(_photoTargetIdx);
-  }
   var picked=[...input.files];
   if(!picked.length){ input.value=''; return; }
   if(slots.length===0){
-    showToast(_frH ? '⚠️ Maximum atteint (8 photos) — supprimez une photo pour en ajouter une autre' : '⚠️ اكتمل الحد الأقصى (8 صور) — احذف صورة لإضافة أخرى','error');
+    showToast(_frH ? '⚠️ Maximum atteint (10 photos) — supprimez une photo pour en ajouter une autre' : '⚠️ اكتمل الحد الأقصى (10 صور) — احذف صورة لإضافة أخرى','error');
     input.value=''; return;
   }
   var files=picked.slice(0, slots.length);
@@ -1289,33 +1269,13 @@ function publishAd(){
           // المحلي (فوق) يبقى يعمل بشكل طبيعي في كل الحالات.
           try{
             if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
-              var _adHeaders = { 'Content-Type': 'application/json' };
-              if(data.accountId){
-                try{
-                  var _accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-                  var _acc = _accs.find(function(a){ return a && a.id===data.accountId; });
-                  var _tok = _acc && (_acc.backendAccessToken || _acc.accessToken);
-                  if(_tok) _adHeaders['x-account-token'] = _tok;
-                }catch(_eTok){}
-              }
               fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads', {
                 method: 'POST',
-                headers: _adHeaders,
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-              }).then(function(r){
-                return r.json().catch(function(){ return {}; }).then(function(j){
-                  if(!r.ok && j && j.error){
-                    showToast((typeof isAr !== 'undefined' && !isAr)
-                      ? ('⚠️ Serveur: ' + j.error)
-                      : ('⚠️ الخادم: ' + j.error), 'error');
-                  }
-                });
-              }).catch(function(){ /* انقطاع شبكة — النشر المحلي يكفي */ });
+              }).catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة */ });
             }
           }catch(e){}
-          if(_verifiedAccountId && typeof RizqSub !== 'undefined' && typeof RizqSub.recordAdPost === 'function'){
-            try{ RizqSub.recordAdPost(_verifiedAccountId); }catch(_eRec){}
-          }
           try{
             localStorage.setItem('rizq_ads', JSON.stringify(ads));
           }catch(quotaErr){
@@ -1455,27 +1415,11 @@ var _editAdId = null;
   }catch(e){}
 })();
 
-function _resolvePostAccessToken(sess){
-  if(sess && sess.accessToken) return sess.accessToken;
-  if(!sess || !sess.id) return '';
-  try{
-    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-    var acc = accs.find(function(a){ return a && a.id === sess.id; });
-    if(acc && (acc.backendAccessToken || acc.accessToken)) return acc.backendAccessToken || acc.accessToken;
-  }catch(e){}
-  return '';
-}
-
 function saveAdEdit(){
   if(!_editAdId) return;
   var sess = null;
   try{ sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null'); }catch(e){}
-  if(!sess || !sess.id){
-    showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
-    return;
-  }
-  var accessTok = _resolvePostAccessToken(sess);
-  if(!accessTok){
+  if(!sess || !sess.id || !sess.token){
     showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
     return;
   }
@@ -1509,7 +1453,7 @@ function saveAdEdit(){
 
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads/' + encodeURIComponent(_editAdId), {
     method: 'PATCH',
-    headers: { 'Content-Type':'application/json', 'x-account-token': accessTok },
+    headers: { 'Content-Type':'application/json', 'x-account-token': (sess.accessToken || sess.token) },
     body: JSON.stringify(body)
   }).then(function(r){ return r.ok ? r.json() : Promise.reject(); })
     .then(function(){
@@ -1844,21 +1788,21 @@ function rizqShare(title, url) {
     <div>
       <h4 class="footer-col-title" id="rzq-ft-topcats" data-t-fr="Meilleures catégories">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" data-t-fr="🏠 Immobilier">🏠 منازل وعقارات</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" data-t-fr="🚗 Voitures et pièces">🚗 سيارات وقطع غيار</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" data-t-fr="🚛 Camions et engins">🚛 شاحنات ومعدات</a></li>
-        <li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" data-t-fr="📱 Téléphones et électronique">📱 هواتف وإلكترونيات</a></li>
-        <li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" data-t-fr="🐄 Bétail et animaux">🐄 ماشية وحيوانات</a></li>
+        <li><a href="rizq_browse.html" data-t-fr="🏠 Immobilier">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html" data-t-fr="🚗 Voitures et pièces">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html" data-t-fr="🚛 Camions et engins">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html" data-t-fr="📱 Téléphones et électronique">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html" data-t-fr="🐄 Bétail et animaux">🐄 ماشية وحيوانات</a></li>
       </ul>
     </div>
     <div>
       <h4 class="footer-col-title" id="rzq-ft-help" data-t-fr="Aide">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_help.html" id="rzq-ft-h1" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h1" data-t-fr="Centre d'aide">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" id="rzq-ft-h2" data-t-fr="Politique de confidentialité">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html#s2" id="rzq-ft-h3" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h3" data-t-fr="Conditions d'utilisation">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" id="rzq-ft-h4" data-t-fr="Signaler une annonce">الإبلاغ عن إعلان</a></li>
-        <li><a href="rizq_legal.html#s10" id="rzq-ft-h5" data-t-fr="Contactez-nous">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html" id="rzq-ft-h5" data-t-fr="Contactez-nous">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -2010,6 +1954,43 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 html{background:#071020!important}
 
+/* ══ FIXED RIZQ LOGO (right) ══ */
+.fixed-rizq-logo{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:10px 0 0 10px;
+  padding:14px 7px;cursor:pointer;
+  z-index:998;transition:all .25s;
+  box-shadow:-3px 0 18px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;
+}
+.fixed-rizq-logo:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  box-shadow:-4px 0 24px rgba(201,168,76,.2);
+}
+
+/* ══ FIXED DISC PILL (left) ══ */
+.fixed-disc-pill{
+  position:fixed;left:0;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  background:linear-gradient(180deg,#0d1e3a,#162d52);
+  border:1.5px solid rgba(201,168,76,.5);
+  border-radius:0 10px 10px 0;
+  color:#C9A84C;font-size:10px;font-weight:700;
+  padding:16px 7px;cursor:pointer;
+  letter-spacing:1.5px;white-space:nowrap;
+  z-index:999;transition:all .25s;
+  box-shadow:3px 0 18px rgba(0,0,0,.35);
+  font-family:Georgia,'Amiri',serif;
+}
+.fixed-disc-pill:hover{
+  background:linear-gradient(180deg,#162d52,#1a3560);
+  border-color:rgba(201,168,76,.8);
+  color:#E8C96A;box-shadow:4px 0 24px rgba(201,168,76,.2);
+}
 </style>
 
 <!-- DISCLAIMER MODAL -->

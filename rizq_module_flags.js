@@ -292,8 +292,7 @@
       var a = e.target.closest('a[href], button[data-rizq-module]');
       if (!a) return;
       var key = a.getAttribute('data-rizq-module') || moduleKeyFromHref(a.getAttribute('href'));
-      if (!key || key === 'store') return;
-      if (!isModuleClosed(activeFlags, key)) return;
+      if (!key || !isModuleClosed(activeFlags, key)) return;
       e.preventDefault();
       e.stopPropagation();
       showComingSoonNotice(key);

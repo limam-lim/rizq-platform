@@ -1915,8 +1915,8 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 <script src="rizq_dynamic_nav.js?v=16.3"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=19" defer></script>
-<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_footer_toggle.js?v=18" defer></script>
+<script src="rizq_account_route.js?v=6"></script>
 <script src="rizq_auth_gate.js?v=18.7" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
@@ -2914,7 +2914,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-quick">روابط سريعة</h4>
-      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="rizq_landing_v8.html#about" data-t="ft-q5">من نحن</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="#about" data-t="ft-q5">من نحن</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-topcats">أبرز الأقسام</h4>
@@ -2922,7 +2922,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-help">المساعدة</h4>
-      <ul class="footer-links"><li><a href="rizq_help.html" data-t="ft-h1">مركز المساعدة</a></li><li><a href="rizq_help.html" target="_blank" rel="noopener">📘 دليل مرئي</a></li><li><a href="rizq_legal.html#s3" data-t="ft-h2">سياسة الخصوصية</a></li><li><a href="rizq_legal.html#s2" data-t="ft-h3">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h4">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h5">تواصل معنا</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_legal.html" data-t="ft-h1">مركز المساعدة</a></li><li><a href="rizq_legal.html#s3" data-t="ft-h2">سياسة الخصوصية</a></li><li><a href="rizq_legal.html" data-t="ft-h3">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h4">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html" data-t="ft-h5">تواصل معنا</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-contact">تواصل معنا</h4>
@@ -3607,6 +3607,34 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
       </div>
 
       <button class="m-btn-main" data-t-fr="🚀 Commencer à parcourir et publier" onclick="closeModal()">🚀 ابدأ التصفح والنشر</button>
+    </div>
+
+    <div id="p-phone" style="display:none">
+      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
+      <p style="color:var(--text-muted);font-size:12px;margin-bottom:4px">الخطوة 3 من 3</p>
+      <p class="ph-note" style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">رقم هاتف موريتاني مطلوب للتفعيل</p>
+      <div class="ph-row"><span class="ph-prefix">🇲🇷 +222</span><div class="ph-div"></div><input dir="ltr" style="direction:ltr;text-align:left;" class="ph-input" id="ph-in" type="tel" placeholder="XX XX XX XX" maxlength="8"/></div>
+      <div style="display:flex;justify-content:center;gap:14px;margin-bottom:16px">
+        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mauritel</span>
+        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mattel</span>
+        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Chinguitel</span>
+      </div>
+      <div id="otp-wrap" style="display:none;margin-bottom:16px">
+        <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">أدخل رمز التحقق (6 أرقام)</p>
+        <div class="otp-row"><input class="otp-box" maxlength="1" oninput="on(this,0)"/><input class="otp-box" maxlength="1" oninput="on(this,1)"/><input class="otp-box" maxlength="1" oninput="on(this,2)"/><input class="otp-box" maxlength="1" oninput="on(this,3)"/><input class="otp-box" maxlength="1" oninput="on(this,4)"/><input class="otp-box" maxlength="1" oninput="on(this,5)"/></div>
+        <p style="color:var(--text-muted);font-size:11px;margin-top:9px">إعادة الإرسال بعد <span id="cd">60</span>s</p>
+      </div>
+      <button id="btn-send" class="m-btn-main" onclick="sendOTP()">📲 إرسال رمز التحقق</button>
+      <button id="btn-verify" class="m-btn-main" style="display:none" onclick="verifyOTP()">✅ تأكيد وإنشاء الحساب</button>
+      <button class="m-link-btn" onclick="showPanel('p-id',2)">← عودة</button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="p-ok" style="display:none">
+      <div style="font-size:54px;margin-bottom:14px">🎉</div>
+      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:24px;font-weight:700;color:var(--gold);margin-bottom:10px">مرحباً بك في رزق!</h3>
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.8;margin-bottom:26px">تم إنشاء حسابك بنجاح.<br/>انشر إعلانك الأول الآن — مجاناً.</p>
+      <button class="m-btn-main" onclick="closeModal();goToPost()">🚀 انشر إعلانك الأول</button>
     </div>
   </div>
   <nav class="rizq-reg-footer" id="rizq-reg-footer" aria-label="تنقل سفلي">
@@ -4512,27 +4540,11 @@ function positionCatPopup(card) {
   return;
 }
 
-function _browseCatKeyFromCard(card) {
-  if (!card) return '';
-  var key = card.getAttribute('data-cat-key') || '';
-  if (key && typeof RizqCategories !== 'undefined' && RizqCategories.normalize) {
-    return RizqCategories.normalize(key) || key;
-  }
-  var ar = card.getAttribute('data-cat-ar') || (card.querySelector('.cat-name') && card.querySelector('.cat-name').textContent.trim()) || '';
-  if (typeof RizqCategories !== 'undefined' && RizqCategories.normalize) return RizqCategories.normalize(ar) || ar;
-  return ar;
-}
-function _browseCatUrl(catKey, sub) {
-  var u = 'rizq_browse.html?cat=' + encodeURIComponent(catKey || '');
-  if (sub) u += '&sub=' + encodeURIComponent(sub);
-  return u;
-}
 function openInlineExpand(card) {
   if (!card) return;
-  const catKey = _browseCatKeyFromCard(card);
-  const catNameAr = card.getAttribute('data-cat-ar') || card.querySelector('.cat-name')?.textContent?.trim() || catKey;
+  const catNameAr = card.querySelector('.cat-name')?.textContent?.trim() || card.getAttribute('data-cat-ar') || '';
   if (!iepanel) {
-    if (catKey) window.location.href = _browseCatUrl(catKey);
+    if (catNameAr) window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr);
     return;
   }
 
@@ -4567,7 +4579,7 @@ function openInlineExpand(card) {
     }
     return catNameAr;
   })();
-  const viewAllHref  = _browseCatUrl(catKey);
+  const viewAllHref  = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr);
   const viewAllLabel = isAr ? '📂 كل الإعلانات ←' : '📂 Toutes les annonces →';
 
   const drop = card.querySelector('.cat-drop');
@@ -4601,7 +4613,7 @@ function openInlineExpand(card) {
     link.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      window.location.href = _browseCatUrl(catKey, this.dataset.ar);
+      window.location.href = 'rizq_browse.html?cat=' + encodeURIComponent(catNameAr) + '&sub=' + encodeURIComponent(this.dataset.ar);
     });
   });
 
@@ -4810,21 +4822,6 @@ function postInSubCat() {
 function goToPost(query) {
   var url = 'rizq_post.html';
   if (query) url += (String(query).indexOf('?') === 0 ? query : '?' + query);
-  var hasSession = false;
-  try {
-    if (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function' && window.RizqAccount.resolveDashboardUrl()) hasSession = true;
-    if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function' && window.RizqAuthGate.getSession()) hasSession = true;
-  } catch (e) {}
-  if (!hasSession) {
-    try { sessionStorage.setItem('rizq_after_auth_href', url); } catch (e2) {}
-    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
-      window.RizqAuthGate.openAccountChoice();
-      return;
-    }
-    if (typeof openModal === 'function') { openModal('login'); return; }
-    window.location.href = 'rizq_landing_v8.html?openLogin=1';
-    return;
-  }
   window.location.href = url;
 }
 window.goToPost = goToPost;
@@ -6129,8 +6126,8 @@ function applyFullTranslation(lang) {
   const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','الأسعار','من نحن'];
   const ftCatsFR  = ['🏠 Immobilier','🚗 Voitures & pièces','🚛 Camions & engins','📱 Téléphones & électronique','🐄 Bétail & animaux'];
   const ftCatsAR  = ['🏠 منازل وعقارات','🚗 سيارات وقطع غيار','🚛 شاحنات ومعدات','📱 هواتف وإلكترونيات','🐄 ماشية وحيوانات'];
-  const ftHelpFR  = ['Centre d\'aide','Guide visuel (illustrations)','Politique de confidentialité','Conditions d\'utilisation','Signaler une annonce','Contactez-nous'];
-  const ftHelpAR  = ['مركز المساعدة','دليل المساعدة (صور توضيحية)','سياسة الخصوصية','شروط الاستخدام','الإبلاغ عن إعلان','تواصل معنا'];
+  const ftHelpFR  = ['Centre d\'aide','Politique de confidentialité','Conditions d\'utilisation','Signaler une annonce','Contactez-nous'];
+  const ftHelpAR  = ['مركز المساعدة','سياسة الخصوصية','شروط الاستخدام','الإبلاغ عن إعلان','تواصل معنا'];
   const ftSources = fr ? [ftQuickFR, ftCatsFR, ftHelpFR] : [ftQuickAR, ftCatsAR, ftHelpAR];
   ftLinks.forEach((ul,i) => {
     if(!ftSources[i]) return;
@@ -6698,9 +6695,7 @@ const NNI_RE=/^\d{6,15}$/;
 var RIZQ_TERMS_VERSION = 'v1.0-2026-06-22';
 
 function _genDashToken(){
-  var arr = new Uint8Array(32);
-  crypto.getRandomValues(arr);
-  return 'TK_' + Array.from(arr, function(b){ return b.toString(16).padStart(2,'0'); }).join('').toUpperCase();
+  return 'TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
 }
 
 function _normalizeIntlPhone(raw){
@@ -6866,7 +6861,6 @@ function _syncAccountToBackend(acc){
       phoneIntl: acc.phoneIntl || acc.phone_intl || '',
       whatsapp: acc.whatsapp || '',
       email: acc.email || '',
-      password: acc.password || '',
       dashToken: acc.dashToken || acc.token || '',
       city: acc.city || '',
       category: acc.category || '',
@@ -7599,30 +7593,29 @@ function goToAccount(e){
   openModal('login');
 }
 
-async function doLogin(){
+function doLogin(){
   const e=document.getElementById('li-em').value.trim();
   const p=document.getElementById('li-pw').value;
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  if(window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function'){
-    var res = await window.RizqAccount.loginSellerAsync(e, p);
+  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
+    var res = window.RizqAccount.loginSeller(e, p);
     if(res && res.ok && res.url){
       showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
       closeModal();
-      setTimeout(function(){
-        if(window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function'){
-          window.RizqAccount.redirectAfterAuth(res.url);
-        } else {
-          location.href = res.url;
-        }
-      }, 400);
+      setTimeout(function(){ location.href = res.url; }, 400);
       return;
     }
-    if(res && res.code === 'not_approved'){
-      alert(isAr?'حسابك قيد المراجعة — ستصلك الموافقة قريباً.':'Votre compte est en cours de validation.');
-      return;
-    }
+  }
+  var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
+    ? window.RizqAccount.resolveDashboardUrl()
+    : '';
+  if(dashUrl){
+    showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
+    closeModal();
+    setTimeout(function(){ location.href = dashUrl; }, 400);
+    return;
   }
   alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
 }
@@ -8927,7 +8920,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
         emptyCta:{ar:'🏢 أنشئ مكتبك الآن',fr:'🏢 Créez votre bureau maintenant'},
         bizType:'office' },
-      corp: { page:'rizq_corp.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
+      corp: { page:'rizq_showroom.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
         emptyTitle:{ar:'🌟 كن أول من يفتح معرضه هنا',fr:'🌟 Soyez le premier à ouvrir votre showroom ici'},
         emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
         emptyCta:{ar:'🏬 أنشئ معرضك الآن',fr:'🏬 Créez votre showroom maintenant'},
