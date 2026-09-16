@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '19.2';
+  var ASSET_V = '19.3';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -113,8 +113,7 @@
       appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
     }
-    if (isPublicShell() && !document.querySelector('script[src*="rizq_packages_config.js"]')) {
-      appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_packages_ui.js"]')) {
       appendScript('rizq_packages_ui.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
@@ -123,11 +122,28 @@
       css.href = 'rizq_mobile.css?v=' + ASSET_V;
       document.head.appendChild(css);
     }
-    if (isPublicShell()) {
+    /* Assistant stack is heavy (~500KB+) — load on demand, not on every page boot */
+    function loadAssistantStack(force) {
+      if (window.__rizqAssistantLoaded) return;
+      window.__rizqAssistantLoaded = true;
+      appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+    }
+    window.RizqLoadAssistant = loadAssistantStack;
+
+    if (isPublicShell()) {
       appendScript('rizq_productivity.js?v=' + ASSET_V, { defer: true });
+      var assistantSel = '#rizq-desk-assistant,#rizq-hdr-assistant,#nav-assistant-btn,#jump-assistant,#mbn-assistant,#rizq-chat-toggle';
+      document.addEventListener('click', function (e) {
+        if (e.target.closest(assistantSel)) loadAssistantStack(true);
+      }, true);
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function () { loadAssistantStack(false); }, { timeout: 12000 });
+      } else {
+        setTimeout(function () { loadAssistantStack(false); }, 8000);
+      }
     }
     if (!document.querySelector('link[rel="manifest"]')) {
       var link = document.createElement('link');
@@ -237,9 +253,15 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js?v=19.0').then(function (reg) {
-        if (reg && reg.update) reg.update();
-      }).catch(function (err) {
+      var host = location.hostname || '';
+      var isLocal = !host || host === 'localhost' || host === '127.0.0.1';
+      if (isLocal) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (r) { r.unregister(); });
+        }).catch(function () {});
+        return;
+      }
+      navigator.serviceWorker.register('sw.js?v=19.3').catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });
     });

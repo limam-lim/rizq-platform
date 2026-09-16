@@ -546,6 +546,9 @@
   }
 
   function openAssistant() {
+    if (typeof window.RizqLoadAssistant === 'function') {
+      window.RizqLoadAssistant(true);
+    }
     if (typeof window.openRizqWidget === 'function') {
       window.openRizqWidget();
       return;
