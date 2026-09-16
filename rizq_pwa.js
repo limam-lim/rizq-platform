@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '19.1';
+  var ASSET_V = '19.2';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -62,7 +62,21 @@
     '<text x="372" y="368" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-size="168" font-weight="700" fill="#C9A84C">,</text>' +
     '</svg>';
 
+  function showBootBanner(msg, isError) {
+    if (document.getElementById('rizq-boot-banner')) return;
+    var el = document.createElement('div');
+    el.id = 'rizq-boot-banner';
+    el.setAttribute('role', 'alert');
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:12px 16px;font:600 14px/1.45 Cairo,Segoe UI,sans-serif;text-align:center;'
+      + (isError ? 'background:#7f1d1d;color:#fff;' : 'background:#1e3a5f;color:#fef3c7;');
+    el.textContent = msg;
+    (document.body || document.documentElement).appendChild(el);
+  }
+
   try {
+    if (location.protocol === 'file:') {
+      showBootBanner('⚠️ لا تفتح الملف مباشرة — شغّل start-rizq.bat ثم افتح http://localhost:3000/', true);
+    }
     try {
       var bootLang = localStorage.getItem('rizq_lang') || 'ar';
       document.documentElement.lang = bootLang === 'fr' ? 'fr' : 'ar';

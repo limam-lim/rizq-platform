@@ -27,7 +27,9 @@
   window.RIZQ_IS_LOCAL = isLocal;
   // rizq-backend.onrender.com = مشروع قديم (Jobs API) — ليس خادم منصة رزق.
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
+  /* Local API is always rizq-backend on :3000 (static + /api same port).
+     Do not use location.host — dev.ps1 may serve HTML on :5500 while API is :3000. */
   window.RIZQ_BACKEND_BASE = isLocal
-    ? (window.location.protocol + '//' + window.location.host)
+    ? ('http://' + (host || 'localhost') + ':3000')
     : 'https://rizq-platform-api.onrender.com';
 })();
