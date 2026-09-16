@@ -1,0 +1,17 @@
+{
+  "name": "Rizq Platform",
+  "install": "cd rizq-backend && npm install",
+  "ports": [
+    {
+      "name": "rizq-platform",
+      "port": 3000
+    }
+  ],
+  "terminals": [
+    {
+      "name": "rizq-server",
+      "command": "cd rizq-backend && npm start",
+      "description": "Rizq static pages + API on http://localhost:3000"
+    }
+  ]
+}
