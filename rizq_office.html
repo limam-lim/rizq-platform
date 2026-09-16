@@ -185,8 +185,7 @@ a{text-decoration:none;color:inherit}
 .hero-card,.rating-strip{display:none!important}
 
 body.rizq-empty-office .office-meta,
-body.rizq-empty-office .stats-strip,
-body.rizq-empty-office .page-sec-strip{display:none!important}
+body.rizq-empty-office .stats-strip{display:none!important}
 /* أزرار التواصل تظهر دائماً قبل «تصفّح المكاتب» مثل المحلات/المعارض */
 body.rizq-empty-office #act-browse-offices{display:inline-flex!important}
 body.rizq-empty-office .rating-inline{display:none!important}
@@ -202,10 +201,17 @@ body.rizq-empty-office .rating-inline{display:none!important}
 
 /* ════════ PAGE SEC + ACTIONS (مثل المعارض) ════════ */
 .page-sec-strip{position:sticky;top:var(--rizq-header-h,0);z-index:44;background:linear-gradient(180deg,#0a1628,#0f2a3d);border-bottom:1px solid rgba(14,116,144,.35);box-shadow:0 6px 18px rgba(0,0,0,.2)}
-.page-sec-strip-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+/* عربية RTL: الخدمات يمين · تقييم زبائن يسار | فرنسية LTR: العكس */
+.page-sec-strip-inner{
+  max-width:1100px;margin:0 auto;padding:8px 12px;
+  display:flex;align-items:center;gap:8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  direction:inherit;
+}
 .page-sec-strip-inner::-webkit-scrollbar{display:none}
 .page-sec-btn{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(14,116,144,.35);color:#67e8f9;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
 .page-sec-btn:hover{background:rgba(14,116,144,.2);border-color:rgba(103,232,249,.5)}
+.page-sec-btn-reviews{margin-inline-start:auto}
 .actions-bar{background:linear-gradient(135deg,#0F2347,#0D1B2A);border-bottom:1px solid rgba(201,168,76,.28);padding:14px 20px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media(max-width:800px){.actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}}
@@ -700,10 +706,10 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 
 <div class="page-sec-strip" role="navigation" aria-label="أقسام المكتب">
   <div class="page-sec-strip-inner">
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('reviews-section')&&document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})">التقييمات</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('office-packages')&&document.getElementById('office-packages').scrollIntoView({behavior:'smooth'})">الباقات</button>
+    <button type="button" class="page-sec-btn" id="sec-services-btn" data-t="sec-services-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
+    <button type="button" class="page-sec-btn" id="sec-about-btn" data-t="sec-about-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
+    <button type="button" class="page-sec-btn" id="sec-packages-btn" data-t="sec-packages-btn" onclick="document.getElementById('office-packages')&&document.getElementById('office-packages').scrollIntoView({behavior:'smooth'})">الباقات</button>
+    <button type="button" class="page-sec-btn page-sec-btn-reviews" id="sec-reviews-btn" data-t="sec-reviews-btn" onclick="document.getElementById('reviews-section')&&document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})">⭐ تقييم زبائن</button>
   </div>
 </div>
 
