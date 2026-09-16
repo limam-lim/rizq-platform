@@ -1524,8 +1524,8 @@ function rebuildNavCatSelect(){
   sel.setAttribute('aria-label', isAr?'القسم':'Catégorie');
 }
 function applyLang(){
-  // Static [data-t] is owned by RizqI18n.apply — do not rewrite with textContent
-  // (strips HTML and can reintroduce Arabic via TRANSLATIONS fallback).
+  // Prefer RizqI18n for shared keys; fill browse-only keys from local TRANSLATIONS
+  // (no Arabic fallback while in FR).
   const l=_rizqLang();
   document.documentElement.lang=l;
   document.documentElement.dir=l==='fr'?'ltr':'rtl';
@@ -1535,6 +1535,27 @@ function applyLang(){
   } else if(langBtn){
     langBtn.textContent=l==='ar'?'FR':'AR';
   }
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const key=el.dataset.t;
+    let v='';
+    if(window.RizqI18n && typeof RizqI18n.t==='function'){
+      try{ v=RizqI18n.t(key)||''; }catch(e){ v=''; }
+    }
+    if(!v && TRANSLATIONS[l] && TRANSLATIONS[l][key]) v=TRANSLATIONS[l][key];
+    if(!v) return;
+    if(l==='fr' && /[\u0600-\u06FF]/.test(v)) return;
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.placeholder=v;
+    else el.innerHTML=v;
+  });
+  document.querySelectorAll('[data-t-ph]').forEach(el=>{
+    const key=el.dataset.tPh;
+    let v='';
+    if(window.RizqI18n && typeof RizqI18n.t==='function'){
+      try{ v=RizqI18n.t(key)||''; }catch(e){ v=''; }
+    }
+    if(!v && TRANSLATIONS[l] && TRANSLATIONS[l][key]) v=TRANSLATIONS[l][key];
+    if(v && !(l==='fr' && /[\u0600-\u06FF]/.test(v))) el.placeholder=v;
+  });
   document.querySelectorAll('#wilaya-select option[data-ar]').forEach(o=>{
     o.textContent=l==='fr'?(o.dataset.fr||o.dataset.ar):o.dataset.ar;
   });
