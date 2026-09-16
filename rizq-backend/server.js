@@ -3227,6 +3227,9 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
     emoji: String(b.emoji || '').slice(0, 8),
     wilaya: String(b.wilaya || '').slice(0, 60),
     condition: String(b.condition || '').slice(0, 40),
+    hidePhone: !!b.hidePhone,
+    negotiable: b.negotiable !== undefined ? !!b.negotiable : true,
+    urgent: !!b.urgent,
     images,
     seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
     accountId: b.accountId ? String(b.accountId).slice(0, 60) : null,
@@ -3356,6 +3359,9 @@ app.patch('/api/ads/:id', async (req, res) => {
     ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
       ? Math.floor(Number(b.stockQty)) : null;
   }
+  if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
+  if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
+  if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
   if (Array.isArray(b.images)) ad.images = await saveAdImages(ad.id, b.images);
   // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
   // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
