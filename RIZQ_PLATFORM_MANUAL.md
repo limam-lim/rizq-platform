@@ -1,11 +1,10 @@
-# RIZQ — الكتيب التوثيقي الشامل للمنصة
+# RIZQ — الكتيب التوثيقي الشامل للمنصة (داخلي)
 **الإصدار:** 1.1 · **التاريخ:** سبتمبر 2026  
 **الجهة المطوّرة:** ADMINIA SARL — Powered by M. LIMAM  
-**النطاق:** rizq.mr · `rizq-backend/` · `rizq_subscription_engine.js` · `entitlements.js`
+**النطاق:** داخلي للفريق والأدمن فقط — **ليس** دليلاً عاماً للزوّار
 
-> **دليل مرئي بالصور:** [`rizq_help.html`](rizq_help.html)  
-> **دليل اللوحات المختصر:** [`rizq-backend/help/dashboard-guide.md`](rizq-backend/help/dashboard-guide.md)  
-> **تنزيل عبر الخادم:** `GET /api/help-guide/platform-manual` · `GET /api/help-guide/dashboard-guide`
+> **دليل الزوّار العام (HTML):** [`rizq_help.html`](rizq_help.html)  
+> **تنبيه:** لا تُعرَض روابط هذا الملف أو مساراته التقنية في واجهة الزوّار. تنزيل MD عبر API يتطلّب مصادقة أدمن.
 
 ---
 
@@ -74,9 +73,9 @@
 
 ### 0.7 تنزيل هذا الكتيب
 
-- من الصفحة المرئية: زر **كتيب المنصة (MD)** أو **رابط مباشر للكتيب**.
-- عبر API: `/api/help-guide/platform-manual` (يتطلّب تشغيل الخادم).
-- ملف ثابت: `RIZQ_PLATFORM_MANUAL.md` في جذر المشروع.
+- هذا الفصل والكتيب كاملان **داخليان** (فريق/أدمن).
+- دليل الزوّار العام: صفحة HTML [`rizq_help.html`](rizq_help.html) فقط.
+- تنزيل MD عبر API محصور بمصادقة الأدمن.
 
 ---
 

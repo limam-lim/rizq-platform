@@ -347,15 +347,30 @@ const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// دليل المساعدة — نص (MD) + نسخة مرئية (HTML بمخططات SVG)
+// دليل المساعدة العام للزوّار = HTML فقط.
+// الأدلة التقنية (MD) محجوبة عن الزوّار وتتطلّب مصادقة أدمن.
+const HELP_PUBLIC_HTML = path.join(__dirname, '..', 'rizq_help.html');
 const HELP_GUIDE_FILES = {
+  'help-visual': HELP_PUBLIC_HTML,
+  'dashboard-guide-visual': HELP_PUBLIC_HTML,
   'platform-manual': path.join(__dirname, '..', 'RIZQ_PLATFORM_MANUAL.md'),
   'dashboard-guide': path.join(__dirname, 'help', 'dashboard-guide.md'),
-  'help-visual': path.join(__dirname, '..', 'rizq_help.html'),
-  'dashboard-guide-visual': path.join(__dirname, '..', 'rizq_help.html'),
 };
-app.get('/api/help-guide/:slug', (req, res) => {
+const HELP_ADMIN_ONLY_SLUGS = new Set(['platform-manual', 'dashboard-guide']);
+
+app.get('/api/help-guide/:slug', (req, res, next) => {
   const slug = String(req.params.slug || '').trim().toLowerCase();
+  if (HELP_ADMIN_ONLY_SLUGS.has(slug)) {
+    return requireAdminAuth(req, res, () => {
+      const filePath = HELP_GUIDE_FILES[slug];
+      if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ ok: false, error: 'guide_not_found', slug });
+      }
+      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="rizq-${slug}.md"`);
+      return res.send(fs.readFileSync(filePath, 'utf8'));
+    });
+  }
   const filePath = HELP_GUIDE_FILES[slug];
   if (!filePath || !fs.existsSync(filePath)) {
     return res.status(404).json({ ok: false, error: 'guide_not_found', slug });
@@ -367,20 +382,15 @@ app.get('/api/help-guide/:slug', (req, res) => {
     if (!inline) res.setHeader('Content-Disposition', `inline; filename="rizq-${slug}.html"`);
     return res.send(fs.readFileSync(filePath, 'utf8'));
   }
-  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="rizq-${slug}.md"`);
-  res.send(fs.readFileSync(filePath, 'utf8'));
+  return res.status(404).json({ ok: false, error: 'guide_not_found', slug });
 });
 app.get('/api/help-guide', (req, res) => {
   res.json({
     ok: true,
     visualUrl: '/api/help-guide/help-visual?inline=1',
-    guides: Object.keys(HELP_GUIDE_FILES).map((id) => ({
-      id,
-      url: `/api/help-guide/${id}`,
-      visual: path.extname(HELP_GUIDE_FILES[id]).toLowerCase() === '.html',
-      available: fs.existsSync(HELP_GUIDE_FILES[id]),
-    })),
+    guides: [
+      { id: 'help-visual', url: '/api/help-guide/help-visual', visual: true, public: true, available: fs.existsSync(HELP_PUBLIC_HTML) },
+    ],
   });
 });
 
@@ -4453,6 +4463,17 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
   });
   app.use((req, res, next) => {
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
+    // أدلة تقنية داخلية — لا تُعرض للزوّار عبر الملفات الثابتة
+    const p = String(req.path || '').toLowerCase();
+    if (
+      p === '/rizq_platform_manual.md' ||
+      p.endsWith('/rizq_platform_manual.md') ||
+      p.includes('platform_manual') ||
+      p.includes('dashboard-guide.md') ||
+      (p.endsWith('.md') && (p.includes('manual') || p.includes('audit') || p.includes('rules')))
+    ) {
+      return notFoundHandler(req, res);
+    }
     next();
   });
   app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore', extensions: ['html'] }));

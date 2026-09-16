@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" direction="rtl">
-  <rect width="880" height="260" rx="12" fill="#0f172a"/>
-  <rect x="0" y="0" width="210" height="260" fill="#0a1220"/>
-  <text x="105" y="28" fill="#64748b" text-anchor="middle" font-size="11" font-family="Segoe UI,sans-serif">SIDEBAR</text>
-  <rect x="18" y="48" width="174" height="34" rx="8" fill="rgba(255,255,255,.06)"/>
-  <text x="105" y="70" fill="#94a3b8" text-anchor="middle" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">نظرة عامة</text>
-  <rect x="18" y="92" width="174" height="34" rx="8" fill="rgba(255,255,255,.06)"/>
-  <text x="105" y="114" fill="#94a3b8" text-anchor="middle" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">المستخدمون</text>
-  <rect x="18" y="136" width="174" height="42" rx="8" fill="rgba(201,168,76,.28)" stroke="#C9A84C" stroke-width="2"/>
-  <text x="105" y="156" fill="#E8C96A" text-anchor="middle" font-size="13" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">الحسابات ★</text>
-  <text x="105" y="172" fill="#fbbf24" text-anchor="middle" font-size="10" font-family="Segoe UI,sans-serif">طلبات pending</text>
-  <rect x="230" y="18" width="630" height="224" rx="12" fill="#fff"/>
-  <text x="250" y="48" fill="#1B3A6B" font-size="15" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">طابور الحسابات — الطلبات الجديدة</text>
-  <rect x="250" y="68" width="590" height="56" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
-  <circle cx="280" cy="96" r="16" fill="#1B3A6B"/>
-  <text x="280" y="101" fill="#C9A84C" text-anchor="middle" font-size="13" font-family="Segoe UI,sans-serif">م</text>
-  <text x="310" y="90" fill="#1a2535" font-size="14" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">محل جديد / Boutique</text>
-  <text x="310" y="110" fill="#64748b" font-size="11" font-family="Segoe UI,sans-serif">status: pending — بانتظار موافقة الأدمن</text>
-  <rect x="690" y="82" width="70" height="28" rx="7" fill="#16a34a"/>
-  <text x="725" y="101" fill="#fff" text-anchor="middle" font-size="12" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">موافقة</text>
-  <rect x="770" y="82" width="50" height="28" rx="7" fill="#fee2e2" stroke="#ef4444"/>
-  <text x="795" y="101" fill="#dc2626" text-anchor="middle" font-size="12" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">رفض</text>
-  <path d="M460 140 L480 160 L440 160 Z" fill="#C9A84C"/>
-  <rect x="320" y="168" width="280" height="40" rx="10" fill="#C9A84C"/>
-  <text x="460" y="193" fill="#0f172a" text-anchor="middle" font-size="13" font-weight="700" font-family="Tahoma,Segoe UI,sans-serif">بعد القبول يظهر في «المستخدمون»</text>
-  <text x="440" y="248" fill="#94a3b8" text-anchor="middle" font-size="11" font-family="Segoe UI,sans-serif">Accounts tab = pending · Users tab = approved only</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" role="img" aria-label="activation wait">
+  <rect width="880" height="240" rx="14" fill="#f8faff"/>
+  <rect x="40" y="36" width="360" height="160" rx="16" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+  <circle cx="100" cy="90" r="28" fill="#fffbeb" stroke="#f59e0b" stroke-width="3"/>
+  <text x="100" y="98" text-anchor="middle" fill="#b45309" font-size="22" font-family="Segoe UI,sans-serif">...</text>
+  <text x="150" y="82" fill="#1B3A6B" font-size="16" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">طلبك قيد المراجعة</text>
+  <text x="150" y="108" fill="#64748b" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">عادةً خلال وقت قصير</text>
+  <text x="60" y="150" fill="#475569" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">ستصلك الموافقة ثم تستطيع الدخول</text>
+  <text x="60" y="172" fill="#475569" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">إلى لوحة التحكم الخاصة بك.</text>
+
+  <rect x="480" y="36" width="360" height="160" rx="16" fill="#0f172a"/>
+  <text x="660" y="78" text-anchor="middle" fill="#E8C96A" font-size="16" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">بعد التفعيل</text>
+  <text x="660" y="112" text-anchor="middle" fill="#fff" font-size="14" font-family="Tahoma,Segoe UI,sans-serif">حسابي → دخول البائع</text>
+  <text x="660" y="140" text-anchor="middle" fill="#94a3b8" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">بالبريد وكلمة المرور</text>
+  <text x="660" y="168" text-anchor="middle" fill="#C9A84C" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">ثم ابدأ إضافة إعلاناتك أو منتجاتك</text>
+
+  <text x="440" y="222" text-anchor="middle" fill="#64748b" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">لا حاجة لأي إعدادات تقنية — فقط انتظر التفعيل ثم سجّل الدخول</text>
 </svg>
