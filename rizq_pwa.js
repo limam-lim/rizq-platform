@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '19.3';
+  var ASSET_V = '19.4';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -261,7 +261,7 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=19.3').catch(function (err) {
+      navigator.serviceWorker.register('sw.js?v=19.4').catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });
     });

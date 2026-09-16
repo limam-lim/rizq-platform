@@ -433,6 +433,19 @@ body.rizq-disc-sidebar-dismissed #rizq-disc-sidebar {
   display: none !important;
 }
 
+/* Browse filter drawer open — hide edge widgets so they don't cover filters */
+body.rizq-hide-edge-widgets #rizq-disc-edge,
+body.rizq-hide-edge-widgets #rizq-disc-sidebar,
+body.rizq-hide-edge-widgets #fixed-disc-pill,
+body.rizq-hide-edge-widgets .fixed-disc-pill,
+body.rizq-hide-edge-widgets #fixed-rizq-logo,
+body.rizq-hide-edge-widgets .fixed-rizq-logo,
+body.rizq-hide-edge-widgets #rizq-rlogo-edge {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 @media (max-width: 768px) {
   #rizq-disc-edge,
   #rizq-disc-sidebar {

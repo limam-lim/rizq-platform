@@ -294,7 +294,14 @@
           return false;
         });
         el.textContent = (ico ? ico + ' ' : '') + text;
-      } else {
+        return;
+      }
+      /* Preserve icon spans inside more-menu items (don't wipe structure). */
+      var strong = el.tagName === 'STRONG' ? el : el.querySelector('strong[data-hdr], strong');
+      var labelTarget = strong || (el.querySelector('.rizq-hdr-lbl') ? el.querySelector('.rizq-hdr-lbl') : null);
+      if (labelTarget) {
+        labelTarget.textContent = text;
+      } else if (!el.querySelector('.nav-dd-icon, .rizq-hdr-ico')) {
         el.textContent = text;
       }
     });
@@ -304,7 +311,9 @@
 
   function apply(flags) {
     if (!flags || typeof flags !== 'object') {
-      flags = { store: true, office: false, corp: false, tenders: false };
+      /* Keep modules navigable until /api/site-config arrives — closed-by-default
+         made header links (مكاتب/معارض/مناقصات) vanish and feel “dead”. */
+      flags = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
     }
     _lastApplied = flags;
     applyMainBar(flags);

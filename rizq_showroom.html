@@ -641,7 +641,7 @@ document.addEventListener('rizq:langchange', function (e) {
 
 /* ── URL Params ── */
 var _params = new URLSearchParams(location.search);
-var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || 'demo';
+var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || '';
 
 /* ── Data ── */
 var _acc = null;
@@ -678,7 +678,7 @@ function loadData(){
      هنا أبداً فتظهر له بيانات تجريبية عامة بدل اسم/مدينة التاجر الحقيقي.
      نكمّل الآن بجلب الحساب من GET /api/accounts/public (نفس المصدر الذي
      يعرض عليه دليل المعارض) إن لم يوجد محلياً، ثم نُعيد ملء الواجهة. */
-  if(!_acc && _showroomId!=='demo' && window.RIZQ_BACKEND_BASE){
+  if(!_acc && _showroomId && window.RIZQ_BACKEND_BASE){
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/public')
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
