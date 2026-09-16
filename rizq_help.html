@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>دليل المساعدة — رزق | Rizq Help Guide</title>
+  <link rel="icon" href="favicon.ico">
+  <style>
+    :root{--royal:#1B3A6B;--gold:#C9A84C;--bg:#f8faff;--text:#1a2535;--muted:#64748b}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    .wrap{max-width:920px;margin:0 auto;padding:24px 16px 48px}
+    header{background:linear-gradient(135deg,#0f172a,#1B3A6B);color:#fff;border-radius:16px;padding:28px 24px;margin-bottom:28px}
+    header h1{font-size:1.55rem;margin-bottom:6px}
+    header p{color:rgba(255,255,255,.82);font-size:14px}
+    .lang-bar{display:flex;gap:8px;margin-top:14px}
+    .lang-bar button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+    .lang-bar button.on{background:var(--gold);color:#0f172a;border-color:var(--gold);font-weight:700}
+    section{background:#fff;border:1px solid #e2e8f5;border-radius:14px;padding:20px 18px;margin-bottom:20px;box-shadow:0 4px 20px rgba(15,35,65,.06)}
+    section h2{font-size:1.15rem;color:var(--royal);margin-bottom:10px}
+    section p,section li{font-size:14px;color:#334155}
+    section ul{margin:10px 20px 0}
+    .fig{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#fafbff}
+    .fig img,.fig picture{display:block;width:100%;height:auto}
+    .fig img{width:100%;height:auto;display:block}
+    .fig-cap{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid #eef2f8;background:#fff}
+    .steps{display:grid;gap:10px;margin-top:12px}
+    .step{display:flex;gap:12px;align-items:flex-start;background:#f8faff;border-radius:10px;padding:12px 14px;border:1px solid #e8eef8}
+    .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#0f172a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+    .dl-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .dl-row a{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
+    .dl-primary{background:linear-gradient(135deg,var(--gold),#e8c96a);color:#0f172a}
+    .dl-outline{border:1.5px solid var(--royal);color:var(--royal);background:#fff}
+    footer{text-align:center;font-size:12px;color:var(--muted);margin-top:24px}
+    .fr-only{display:none}
+    html[lang="fr"] .ar-only{display:none}
+    html[lang="fr"] .fr-only{display:block}
+    html[lang="fr"] .fr-only-inline{display:inline}
+    @media(max-width:600px){header h1{font-size:1.25rem}.wrap{padding:16px 12px 32px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="ar-only">📘 دليل استعمال منصة رزق</span><span class="fr-only">📘 Guide d'utilisation Rizq</span></h1>
+    <p class="ar-only">صور توضيحية + خطوات عملية للتسجيل، لوحات التحكم، والأدمن</p>
+    <p class="fr-only">Schémas illustrés + étapes pour l'inscription, les tableaux de bord et l'admin</p>
+    <div class="lang-bar">
+      <button type="button" id="btn-ar" class="on" onclick="setHelpLang('ar')">AR</button>
+      <button type="button" id="btn-fr" onclick="setHelpLang('fr')">FR</button>
+    </div>
+  </header>
+
+  <!-- ══ مخطط 1: رحلة المنصة ══ -->
+  <section>
+    <h2><span class="ar-only">① خريطة المنصة — من الزائر إلى البائع</span><span class="fr-only">① Parcours — visiteur → vendeur</span></h2>
+    <div class="fig">
+      <picture>
+        <source type="image/svg+xml" srcset="help-images/fig1-journey.svg">
+        <img src="help-images/fig1-journey.png" alt="مخطط رحلة البائع — من التسجيل إلى الصفحة العامة" width="880" height="200" loading="lazy">
+      </picture>
+    </div>
+    <p class="fig-cap ar-only">الشكل 1: مسار البائع من الصفحة الرئيسية حتى ظهور نشاطه للجمهور</p>
+    <p class="fig-cap fr-only">Figure 1 : Parcours vendeur — accueil → approbation → page publique</p>
+  </section>
+
+  <!-- ══ مخطط 2: Super Admin ══ -->
+  <section>
+    <h2><span class="ar-only">② أين يظهر حسابك الجديد في Super Admin؟</span><span class="fr-only">② Où voir un nouveau compte (Super Admin) ?</span></h2>
+    <div class="fig">
+      <picture>
+        <source type="image/svg+xml" srcset="help-images/fig2-admin-pending.svg">
+        <img src="help-images/fig2-admin-pending.png" alt="تبويب الحسابات في Super Admin — طلبات pending" width="880" height="240" loading="lazy">
+      </picture>
+    </div>
+    <p class="ar-only">تبويب <strong>«الحسابات»</strong> = طلبات جديدة (pending). تبويب <strong>«المستخدمون»</strong> = معتمدون فقط (approved).</p>
+    <p class="fr-only">Onglet <strong>« Comptes »</strong> = nouvelles demandes. <strong>« Utilisateurs »</strong> = approuvés uniquement.</p>
+  </section>
+
+  <!-- ══ مخطط 3: الفيديو التعريفي ══ -->
+  <section>
+    <h2><span class="ar-only">③ الفيديو التعريفي في لوحة التحكم</span><span class="fr-only">③ Vidéo promotionnelle (dashboard)</span></h2>
+    <div class="fig">
+      <picture>
+        <source type="image/svg+xml" srcset="help-images/fig3-promo-video.svg">
+        <img src="help-images/fig3-promo-video.png" alt="إضافة فيديو تعريفي من لوحة التحكم إلى الصفحة العامة" width="880" height="220" loading="lazy">
+      </picture>
+    </div>
+    <div class="steps ar-only">
+      <div class="step"><span class="step-num">1</span><span>لوحة التحكم → الملف الشخصي</span></div>
+      <div class="step"><span class="step-num">2</span><span>الصق رابط YouTube أو Facebook</span></div>
+      <div class="step"><span class="step-num">3</span><span>«حفظ التغييرات» — يُزامَن مع الخادم</span></div>
+      <div class="step"><span class="step-num">4</span><span>تحقق من صفحتك العامة (Store / Office / Corp)</span></div>
+    </div>
+    <div class="steps fr-only">
+      <div class="step"><span class="step-num">1</span><span>Tableau de bord → Profil</span></div>
+      <div class="step"><span class="step-num">2</span><span>Coller un lien YouTube ou Facebook</span></div>
+      <div class="step"><span class="step-num">3</span><span>Enregistrer — sync serveur</span></div>
+      <div class="step"><span class="step-num">4</span><span>Vérifier la page publique</span></div>
+    </div>
+  </section>
+
+  <!-- ══ مخطط 4: أنواع اللوحات ══ -->
+  <section>
+    <h2><span class="ar-only">④ أنواع لوحات التحكم</span><span class="fr-only">④ Types de tableaux de bord</span></h2>
+    <div class="fig">
+      <picture>
+        <source type="image/svg+xml" srcset="help-images/fig4-dashboard-types.svg">
+        <img src="help-images/fig4-dashboard-types.png" alt="أنواع لوحات التحكم — أفراد، محل، مكتب، شركة" width="880" height="160" loading="lazy">
+      </picture>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="ar-only">📥 تنزيل النص الكامل</span><span class="fr-only">📥 Télécharger le texte complet</span></h2>
+    <p class="ar-only">النسخة المرئية (هذه الصفحة) للفهم السريع. للتفاصيل التقنية الكاملة:</p>
+    <p class="fr-only">Cette page visuelle pour un aperçu rapide. Pour le détail technique :</p>
+    <div class="dl-row">
+      <a href="rizq_help.html" class="dl-primary ar-only">🖼️ الدليل المرئي (هذه الصفحة)</a>
+      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'dashboard-guide')">📄 دليل الداشبورد (MD)</a>
+      <a href="#" class="dl-outline ar-only" onclick="return rizqDownloadHelpGuide(event,'platform-manual')">📚 كتيب المنصة (MD)</a>
+    </div>
+  </section>
+
+  <footer>
+    <span class="ar-only">© RIZQ — ADMINIA SARL · آخر تحديث سبتمبر 2026</span>
+    <span class="fr-only">© RIZQ — ADMINIA SARL · Sept. 2026</span>
+    · <a href="./" style="color:var(--royal)">← <span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+  </footer>
+</div>
+<script src="rizq_backend_config.js"></script>
+<script>
+function setHelpLang(l){
+  document.documentElement.lang=l;
+  document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.getElementById('btn-ar').classList.toggle('on',l==='ar');
+  document.getElementById('btn-fr').classList.toggle('on',l==='fr');
+  try{localStorage.setItem('rizq_lang',l);}catch(e){}
+}
+try{
+  var s=localStorage.getItem('rizq_lang');
+  if(s==='fr') setHelpLang('fr');
+}catch(e){}
+</script>
+</body>
+</html>

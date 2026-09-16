@@ -113,5 +113,57 @@
     return true;
   }
 
-  global.RizqIntroVideo = { mount: mount, buildEmbedSrc: buildEmbedSrc, ytId: ytId, isFB: isFB };
+  /**
+   * loadAndMountForAccount(accountId, opts) — يقرأ promo_video من localStorage
+   * ثم من GET /api/accounts/public/:id ويُظهر القسم إن وُجد رابط صالح.
+   */
+  function loadAndMountForAccount(accountId, opts) {
+    opts = opts || {};
+    var sectionId = opts.sectionId || 'video-intro-section';
+    var mountId = opts.mountId || 'intro-video-mount';
+    var sec = document.getElementById(sectionId);
+    var mountEl = document.getElementById(mountId);
+    if (!accountId || !sec || !mountEl) return Promise.resolve(false);
+
+    function tryShow(url) {
+      if (!url) return false;
+      var ok = mount(mountEl, url, opts.mountOpts || {});
+      if (ok) sec.style.display = '';
+      return ok;
+    }
+
+    try {
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      var local = accs.find(function (a) { return a && a.id === accountId; });
+      if (local && local.promo_video && tryShow(local.promo_video)) {
+        return Promise.resolve(true);
+      }
+    } catch (e) {}
+
+    var base = '';
+    try {
+      if (typeof global.RIZQ_BACKEND_BASE === 'string' && global.RIZQ_BACKEND_BASE) {
+        base = global.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+      }
+    } catch (e2) {}
+    if (!base) return Promise.resolve(false);
+
+    return fetch(base + '/api/accounts/public/' + encodeURIComponent(accountId))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data.account && data.account.promo_video) {
+          return tryShow(data.account.promo_video);
+        }
+        return false;
+      })
+      .catch(function () { return false; });
+  }
+
+  global.RizqIntroVideo = {
+    mount: mount,
+    loadAndMountForAccount: loadAndMountForAccount,
+    buildEmbedSrc: buildEmbedSrc,
+    ytId: ytId,
+    isFB: isFB
+  };
 })(typeof window !== 'undefined' ? window : this);

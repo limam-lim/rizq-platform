@@ -1,0 +1,20 @@
+<svg viewBox="0 0 880 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1B3A6B"/><stop offset="100%" stop-color="#234d8f"/></linearGradient>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9A84C"/></marker>
+  </defs>
+  <rect width="880" height="200" fill="#f0f4ff"/>
+  <g font-family="Segoe UI,sans-serif" font-size="13" font-weight="700">
+    <rect x="24" y="70" width="120" height="56" rx="10" fill="url(#g1)"/><text x="84" y="94" fill="#fff" text-anchor="middle"><à 'D1&J3J)</text><text x="84" y="112" fill="#C9A84C" text-anchor="middle" font-size="10">rizq.mr</text>
+    <rect x="184" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#C9A84C" stroke-width="2"/><text x="244" y="94" fill="#1B3A6B" text-anchor="middle">=Ý *3,JD</text><text x="244" y="112" fill="#64748b" text-anchor="middle" font-size="10">-3'( ('&9</text>
+    <rect x="344" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#1B3A6B" stroke-width="2"/><text x="404" y="94" fill="#1B3A6B" text-anchor="middle">ó E1',9)</text><text x="404" y="112" fill="#64748b" text-anchor="middle" font-size="10">Super Admin</text>
+    <rect x="504" y="70" width="120" height="56" rx="10" fill="#fff" stroke="#16a34a" stroke-width="2"/><text x="564" y="94" fill="#15803d" text-anchor="middle"> DH-) 'D*-CE</text><text x="564" y="112" fill="#64748b" text-anchor="middle" font-size="10">Dashboard</text>
+    <rect x="664" y="70" width="120" height="56" rx="10" fill="url(#g1)"/><text x="724" y="94" fill="#fff" text-anchor="middle">< 5A-) 9'E)</text><text x="724" y="112" fill="#C9A84C" text-anchor="middle" font-size="10">Store/Office</text>
+  </g>
+  <line x1="144" y1="98" x2="180" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="304" y1="98" x2="340" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="464" y1="98" x2="500" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="624" y1="98" x2="660" y2="98" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="440" y="36" fill="#1B3A6B" text-anchor="middle" font-size="14" font-weight="800" font-family="Segoe UI">RIZQ  E3'1 'D('&9 'D,/J/</text>
+  <text x="440" y="170" fill="#64748b" text-anchor="middle" font-size="11" font-family="Segoe UI">'D*3,JD ’ EH'AB) 'D#/EF ’ F41 EF*,'*/%9D'F'* ’ 8GH1 DD2H'1</text>
+</svg>

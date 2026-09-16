@@ -355,8 +355,9 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     align-items: center !important;
     justify-content: space-between !important;
     gap: 10px !important;
-    padding: 0 14px !important;
-    height: 56px !important;
+    padding: env(safe-area-inset-top, 0px) 14px 0 !important;
+    min-height: 56px !important;
+    height: calc(56px + env(safe-area-inset-top, 0px)) !important;
     background: #0f172a !important;
     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
     position: sticky !important;
@@ -411,11 +412,12 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     --text-muted:#64748b; --text-soft:#334155;
   }
   #modal.reg-wizard-mode .modal-close {
-    top: 60px; inset-inline-end:12px;
-    background:#f1f5f9; border-color:#e2e8f0; color:#64748b; z-index:5;
+    top: calc(12px + env(safe-area-inset-top, 0px)); inset-inline-end:12px;
+    background:#f1f5f9; border-color:#e2e8f0; color:#64748b; z-index:50;
   }
   #modal.reg-wizard-mode .modal-close:hover { background:#e2e8f0; color:#1e293b; }
-  #modal.reg-wizard-mode .modal-header { padding:16px 20px 0; border-bottom:1px solid #e2e8f5; }
+  /* الشريط العلوي rizq-reg-chrome يكفي — إخفاء modal-header المكرر على الهاتف */
+  #modal.reg-wizard-mode .modal-header { display:none !important; }
   #modal.reg-wizard-mode .modal-logo img { width:56px !important; height:56px !important; }
 
   html.rizq-reg-page, html.rizq-reg-page body { background:#f8faff !important; }

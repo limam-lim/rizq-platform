@@ -420,7 +420,15 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav) .logo,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-actions,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-disclaimer,
-  html.rizq-app-nav.has-rizq-desk-nav #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn){
+  html.rizq-app-nav.has-rizq-desk-nav #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn),
+  #rizq-desk-nav ~ nav .logo,
+  #rizq-desk-nav ~ nav .nav-actions,
+  #rizq-desk-nav ~ nav .nav-disclaimer,
+  #rizq-desk-nav ~ nav #lang-btn:not(#rizq-desk-lang-btn),
+  nav.rizq-search-strip-nav .logo,
+  nav.rizq-search-strip-nav .nav-actions,
+  nav.rizq-search-strip-nav .nav-disclaimer,
+  nav.rizq-search-strip-nav #lang-btn{
     display:none !important;
   }
 
@@ -823,7 +831,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(:has(.nav-search)){
     display:none !important;
   }
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
+  #rizq-desk-nav ~ nav,
+  nav.rizq-search-strip-nav{
     position:relative !important;
     top:auto !important;
     inset:auto !important;

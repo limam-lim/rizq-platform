@@ -365,7 +365,13 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 //  في /api/agent/toggle (rizq_call_handler.js) لتوحيد آلية الحماية.
 // ══════════════════════════════════════════════════════════════
 function _requireApiSecret(req, res, next) {
-  const expected = process.env.RIZQ_API_SECRET || 'rizq_secret_2025';
+  const expected = process.env.RIZQ_API_SECRET;
+  if (!expected) {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(503).json({ ok: false, error: 'server_misconfigured' });
+    }
+    return res.status(403).json({ ok: false, error: 'غير مصرّح' });
+  }
   if (req.header('x-rizq-secret') !== expected) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }

@@ -546,6 +546,9 @@
   }
 
   function openAssistant() {
+    if (typeof window.RizqLoadAssistant === 'function') {
+      window.RizqLoadAssistant(true);
+    }
     if (typeof window.openRizqWidget === 'function') {
       window.openRizqWidget();
       return;
@@ -1130,6 +1133,54 @@
     var n = document.getElementById('rizq-desk-nav');
     if (n && n.parentNode) n.parentNode.removeChild(n);
     document.documentElement.classList.remove('has-rizq-desk-nav');
+    document.querySelectorAll('nav.rizq-search-strip-nav').forEach(function (nav) {
+      nav.classList.remove('rizq-search-strip-nav');
+      nav.querySelectorAll('[data-rizq-chrome-hidden]').forEach(function (el) {
+        el.removeAttribute('data-rizq-chrome-hidden');
+        el.style.cssText = '';
+      });
+      nav.style.cssText = '';
+    });
+  }
+
+  /** Force native browse/search nav to search-strip only (immune to stale CSS/cache). */
+  function applyNativeSearchStripNav() {
+    if (isMobileNav()) return;
+    var desk = document.getElementById('rizq-desk-nav');
+    if (!desk) return;
+    var nav = document.querySelector('body > nav:not(#rizq-desk-nav)');
+    if (!nav || !nav.querySelector('.nav-search, .nav-search-mini')) return;
+
+    document.documentElement.classList.add('rizq-app-nav', 'has-rizq-desk-nav');
+    nav.classList.add('rizq-search-strip-nav');
+
+    ['.logo', '.nav-actions', '.nav-disclaimer', '#lang-btn'].forEach(function (sel) {
+      nav.querySelectorAll(sel).forEach(function (el) {
+        el.setAttribute('data-rizq-chrome-hidden', '1');
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('height', '0', 'important');
+        el.style.setProperty('width', '0', 'important');
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.style.setProperty('position', 'absolute', 'important');
+        el.style.setProperty('pointer-events', 'none', 'important');
+      });
+    });
+
+    nav.style.setProperty('position', 'relative', 'important');
+    nav.style.setProperty('top', 'auto', 'important');
+    nav.style.setProperty('height', '56px', 'important');
+    nav.style.setProperty('min-height', '56px', 'important');
+    nav.style.setProperty('max-height', '56px', 'important');
+    nav.style.setProperty('background', '#fff', 'important');
+    nav.style.setProperty('display', 'flex', 'important');
+    nav.style.setProperty('align-items', 'center', 'important');
+    nav.style.setProperty('justify-content', 'center', 'important');
+    nav.style.setProperty('padding', '8px 24px', 'important');
+    nav.style.setProperty('border-bottom', '1px solid #e2e8f5', 'important');
+    nav.style.setProperty('box-shadow', 'none', 'important');
+    nav.style.setProperty('backdrop-filter', 'none', 'important');
+    nav.style.setProperty('z-index', '20', 'important');
   }
 
   function isDashPage() {
@@ -1150,12 +1201,17 @@
     ensureActiveNavListeners();
     if (!isMobileNav()) {
       removeHeader();
-      if (!isLanding() && !isDashPage() && !document.getElementById('rizq-desk-nav')) {
-        document.body.insertAdjacentHTML('afterbegin', deskNavHtml());
+      if (!isLanding() && !isDashPage()) {
+        if (!document.getElementById('rizq-desk-nav')) {
+          document.body.insertAdjacentHTML('afterbegin', deskNavHtml());
+        }
         document.documentElement.classList.add('has-rizq-desk-nav');
         bindDeskNav();
         ensureLangListener();
         applyLabels();
+        applyNativeSearchStripNav();
+      } else {
+        removeDeskNav();
       }
       if (!isDashPage()) {
         ensureMediatorPill();
@@ -1163,6 +1219,7 @@
         applyLabels();
         initRLogoSidebar();
       }
+      applyNativeSearchStripNav();
       if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
         window.RizqModuleFlags.reapply();
       } else {
@@ -1217,6 +1274,7 @@
     applyLabels: applyLabels,
     applyNavMenuOrder: applyNavMenuOrder,
     inject: inject,
+    applyNativeSearchStripNav: applyNativeSearchStripNav,
     markActive: markActive,
     resolveActiveNavKey: resolveActiveNavKey,
     positionMobileMoreMenu: positionMobileMoreMenu,

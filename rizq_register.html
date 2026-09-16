@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_input_bidi.js"></script>
-  <script src="rizq_account_route.js?v=2"></script>
+  <script src="rizq_account_route.js?v=7"></script>
   <title>الحساب | رزق</title>
   <style>
     :root{
@@ -613,7 +613,7 @@
     });
   }
 
-  function doLogin() {
+  async function doLogin() {
     clearErr();
     var email = document.getElementById('li-email').value.trim().toLowerCase();
     var pw = document.getElementById('li-pw').value;
@@ -631,12 +631,22 @@
       return;
     }
 
-    /* دخول بائع مفعّل عبر التوجيه الموحّد (محل/مكتب/شركة/فرد) */
-    if (window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function') {
-      var seller = window.RizqAccount.loginSeller(email, pw);
+    /* دخول بائع مفعّل — محلي ثم خادم */
+    if (window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function') {
+      var seller = await window.RizqAccount.loginSellerAsync(email, pw);
       if (seller && seller.ok && seller.url) {
         setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = seller.url; }, 400);
+        setTimeout(function () {
+          if (window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function') {
+            window.RizqAccount.redirectAfterAuth(seller.url);
+          } else {
+            location.href = seller.url;
+          }
+        }, 400);
+        return;
+      }
+      if (seller && seller.code === 'not_approved') {
+        setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
         return;
       }
     }

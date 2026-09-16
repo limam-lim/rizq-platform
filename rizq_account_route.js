@@ -20,6 +20,50 @@
     'rizq_session_id'
   ];
 
+  var AFTER_AUTH_HREF_KEY = 'rizq_after_auth_href';
+
+  function dashTokenStorageKey(accountId) {
+    return 'rizq_dash_token_' + String(accountId || '');
+  }
+
+  function storeDashToken(accountId, token) {
+    if (!accountId || !token) return;
+    try {
+      sessionStorage.setItem(dashTokenStorageKey(accountId), String(token));
+    } catch (e) {}
+  }
+
+  function readDashToken(accountId) {
+    if (!accountId) return '';
+    try {
+      var stored = sessionStorage.getItem(dashTokenStorageKey(accountId));
+      if (stored) return stored;
+    } catch (e) {}
+    var sess = readStoredSession();
+    if (sess && sess.id === accountId && sess.token) return sess.token;
+    var acc = readPendingAccounts().find(function (a) {
+      return a && a.id === accountId && a.token;
+    });
+    return (acc && acc.token) || '';
+  }
+
+  function stripTokenFromUrl() {
+    try {
+      var p = new URLSearchParams(location.search);
+      if (!p.has('token')) return false;
+      var id = p.get('id');
+      var tok = p.get('token');
+      if (id && tok) storeDashToken(id, tok);
+      p.delete('token');
+      var qs = p.toString();
+      var path = location.pathname || '';
+      history.replaceState(null, '', path + (qs ? '?' + qs : '') + (location.hash || ''));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function readPendingAccounts() {
     try {
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
@@ -45,9 +89,6 @@
     }) || null;
   }
 
-  /* Express على localhost:3000 لا يخدم الملفات بلا .html (يُرجع JSON 404).
-     نُبقي اسم الملف كاملاً في روابط اللوحات. المقارنة تتجاهل الامتداد
-     حتى لا تكسر Live Server إن حوّل *.html إلى مسار بلا امتداد. */
   function dashFileName(type) {
     return DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
   }
@@ -69,9 +110,10 @@
 
   function buildDashboardUrl(acc) {
     if (!acc || !acc.id || !acc.token) return '';
+    storeDashToken(acc.id, acc.token);
     var type = acc.type || 'individual';
     var path = htmlDashPath(dashFileName(type));
-    return path + '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
+    return path + '?id=' + encodeURIComponent(acc.id);
   }
 
   function resolveDashboardUrl() {
@@ -84,6 +126,7 @@
 
   function setActiveSession(acc) {
     if (!acc || !acc.id || !acc.token) return;
+    storeDashToken(acc.id, acc.token);
     try {
       localStorage.setItem('rizq_active_session', JSON.stringify({
         id: acc.id,
@@ -107,27 +150,170 @@
     SESSION_KEYS.forEach(function (k) {
       try { localStorage.removeItem(k); } catch (e) {}
     });
+    try {
+      for (var i = sessionStorage.length - 1; i >= 0; i--) {
+        var k = sessionStorage.key(i);
+        if (k && k.indexOf('rizq_dash_token_') === 0) sessionStorage.removeItem(k);
+      }
+    } catch (e2) {}
   }
 
-  function findSellerByLogin(email, password) {
+  function setAfterAuthHref(href) {
+    if (!href) return;
+    try {
+      sessionStorage.setItem(AFTER_AUTH_HREF_KEY, String(href));
+    } catch (e) {}
+  }
+
+  function consumeAfterAuthHref() {
+    var href = '';
+    try {
+      href = sessionStorage.getItem(AFTER_AUTH_HREF_KEY) || '';
+      if (href) sessionStorage.removeItem(AFTER_AUTH_HREF_KEY);
+    } catch (e) {}
+    return href;
+  }
+
+  function publicShareUrl(accOrType, id) {
+    var path = publicPageForAccount(accOrType, id);
+    if (!path) return '';
+    var origin = '';
+    try {
+      origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
+    } catch (e) {}
+    return origin ? origin + '/' + String(path).replace(/^\//, '') : String(path);
+  }
+
+  function initShareLinkInput(inputId, acc) {
+    var el = document.getElementById(inputId || 'share-link-input');
+    if (!el || !acc) return;
+    el.value = publicShareUrl(acc);
+  }
+
+  function redirectAfterAuth(defaultUrl) {
+    var after = consumeAfterAuthHref();
+    var target = after || defaultUrl || '';
+    if (target) location.href = target;
+    return target;
+  }
+
+  function publicPageForAccount(accOrType, id) {
+    var type = 'individual';
+    var accId = '';
+    if (accOrType && typeof accOrType === 'object') {
+      type = accOrType.type || 'individual';
+      accId = accOrType.id || '';
+    } else {
+      type = accOrType || 'individual';
+      accId = id || '';
+    }
+    var map = {
+      store: 'rizq_store.html',
+      office: 'rizq_office.html',
+      corp: 'rizq_corp.html',
+      individual: 'rizq_profile.html'
+    };
+    var page = map[type] || 'rizq_profile.html';
+    return accId ? page + '?id=' + encodeURIComponent(accId) : page;
+  }
+
+  function backendBase() {
+    try {
+      if (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
+        return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function mergeServerAccount(serverAcc) {
+    if (!serverAcc || !serverAcc.id) return null;
+    var accs = readPendingAccounts();
+    var idx = accs.findIndex(function (a) { return a && a.id === serverAcc.id; });
+    var rec = idx >= 0 ? Object.assign({}, accs[idx]) : {};
+    rec.id = serverAcc.id;
+    rec.type = serverAcc.type || rec.type || 'individual';
+    rec.name = serverAcc.name || rec.name || rec.owner || rec.manager || '';
+    rec.email = serverAcc.email || rec.email || '';
+    rec.status = serverAcc.status || rec.status || 'approved';
+    rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
+    rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
+    delete rec.password;
+    ['phone', 'city', 'address', 'desc', 'promo_video', 'category', 'whatsapp', 'facebook', 'thumb', 'tagline', 'package', 'package_price'].forEach(function (k) {
+      if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
+    });
+    if (idx >= 0) accs[idx] = rec;
+    else accs.push(rec);
+    try { localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); } catch (e) {}
+    if (rec.token) storeDashToken(rec.id, rec.token);
+    return rec;
+  }
+
+  function accountAccessToken(acc) {
+    if (!acc) return '';
+    return acc.backendAccessToken || acc.accessToken || '';
+  }
+
+  function syncAccountFromBackend(acc) {
+    var token = accountAccessToken(acc);
+    if (!acc || !acc.id || !token) return Promise.resolve(acc);
+    var base = backendBase();
+    if (!base) return Promise.resolve(acc);
+    return fetch(base + '/api/accounts/mine/' + encodeURIComponent(acc.id), {
+      headers: { 'x-account-token': token }
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) {
+        clearSession();
+        return null;
+      }
+      return r.ok ? r.json() : null;
+    }).then(function (data) {
+      if (data && data.ok && data.account) {
+        var merged = mergeServerAccount(Object.assign({}, data.account, {
+          accessToken: token,
+          dashToken: data.account.dashToken || acc.token
+        }));
+        return merged || acc;
+      }
+      return acc;
+    }).catch(function () { return acc; });
+  }
+
+  function loginSellerAsync(email, password) {
     var em = String(email || '').trim().toLowerCase();
     var pw = String(password || '');
-    if (!em || !pw) return null;
-    return readPendingAccounts().find(function (a) {
-      if (!a || a.status !== 'approved') return false;
-      if (!a.token) return false;
-      if (String(a.email || '').trim().toLowerCase() !== em) return false;
-      if (a.password == null || a.password === '') return false;
-      return String(a.password) === pw;
-    }) || null;
-  }
+    if (!em || !pw) return Promise.resolve({ ok: false, code: 'invalid' });
 
-  function loginSeller(email, password) {
-    var acc = findSellerByLogin(email, password);
-    if (!acc) return { ok: false, code: 'invalid' };
-    setActiveSession(acc);
-    var url = buildDashboardUrl(acc);
-    return { ok: true, account: acc, url: url };
+    var base = backendBase();
+    if (!base) return Promise.resolve({ ok: false, code: 'network' });
+
+    return fetch(base + '/api/accounts/seller-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: em, password: pw })
+    }).then(function (r) {
+      return r.json().then(function (data) { return { res: r, data: data }; }).catch(function () {
+        return { res: r, data: null };
+      });
+    }).then(function (out) {
+      var data = out.data;
+      if (out.res && out.res.status === 403 && data && data.code === 'not_approved') {
+        if (data.account) mergeServerAccount(data.account);
+        return { ok: false, code: 'not_approved', status: data.status };
+      }
+      if (!data || !data.ok || !data.account) {
+        return { ok: false, code: (data && data.code) || 'invalid' };
+      }
+      var acc = mergeServerAccount(data.account);
+      if (!acc.token && data.account.dashToken) acc.token = data.account.dashToken;
+      if (acc.status !== 'approved' || !acc.token) {
+        return { ok: false, code: 'not_approved', status: acc.status };
+      }
+      setActiveSession(acc);
+      return { ok: true, account: acc, url: buildDashboardUrl(acc) };
+    }).catch(function () {
+      return { ok: false, code: 'network' };
+    });
   }
 
   function goAfterRegistration(acc) {
@@ -136,22 +322,32 @@
       setActiveSession(acc);
       var url = buildDashboardUrl(acc);
       if (url) {
-        location.href = url;
+        redirectAfterAuth(url);
         return true;
       }
     }
     return false;
   }
 
-  function openGuestChoice() {
-    /* على الكمبيوتر/التابلت: نفتح صفحة الحساب الكاملة مباشرة */
-    var isDesktop = false;
-    try { isDesktop = window.matchMedia('(min-width: 769px)').matches; } catch (e) {}
-    if (isDesktop && typeof window.openModal === 'function') {
-      window.openModal('account');
+  function rememberCurrentForAfterAuth() {
+    try {
+      if (sessionStorage.getItem(AFTER_AUTH_HREF_KEY)) return;
+      setAfterAuthHref(location.pathname + location.search + (location.hash || ''));
+    } catch (e) {}
+  }
+
+  function promptLogin(returnHref) {
+    if (returnHref) setAfterAuthHref(returnHref);
+    else rememberCurrentForAfterAuth();
+    var dash = resolveDashboardUrl();
+    if (dash) {
+      location.href = dash;
       return true;
     }
-    /* على الهاتف: نستخدم نافذة AuthGate العادية */
+    return openGuestChoice();
+  }
+
+  function openGuestChoice() {
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
       window.RizqAuthGate.openAccountChoice();
       return true;
@@ -161,7 +357,7 @@
       return true;
     }
     if (typeof window.openModal === 'function') {
-      window.openModal('account');
+      window.openModal('login');
       return true;
     }
     return false;
@@ -174,6 +370,7 @@
       location.href = url;
       return false;
     }
+    rememberCurrentForAfterAuth();
     if (openGuestChoice()) return false;
     location.href = 'rizq_register.html';
     return false;
@@ -182,7 +379,8 @@
   function bootstrapDashboard() {
     var p = new URLSearchParams(location.search);
     if (p.get('demo') === '1') return;
-    if (p.get('id') && p.get('token')) {
+    stripTokenFromUrl();
+    if (p.get('id')) {
       try {
         sessionStorage.removeItem('rizq_dash_boot_guard');
         sessionStorage.removeItem('rizq_dash_boot_ts');
@@ -197,7 +395,6 @@
     var now = Date.now();
     var last = 0;
     try { last = parseInt(sessionStorage.getItem('rizq_dash_boot_ts') || '0', 10) || 0; } catch (eTs) {}
-    /* منع حلقة سريعة فقط (أقل من ثانية) — لا قفل دائم يمنع فتح اللوحة */
     if (last && (now - last) < 900) return;
     try { sessionStorage.setItem('rizq_dash_boot_ts', String(now)); } catch (eTs2) {}
 
@@ -209,37 +406,83 @@
     location.replace(htmlDashPath(targetFile) + query);
   }
 
-  /* إن فُقدت ?id=&token= من الرابط (تحويل السيرفر)، نستعيدها من الجلسة المحلية
-     بدون إعادة تحميل لتجنّب الشاشة البيضاء و«يجب تسجيل الدخول». */
   function recoverSessionParams(expectedType) {
+    stripTokenFromUrl();
     var p = new URLSearchParams(location.search);
-    if (p.get('id') && p.get('token')) {
-      return { id: p.get('id'), token: p.get('token'), fromUrl: true };
+    var id = p.get('id') || '';
+    var token = id ? readDashToken(id) : '';
+
+    if (id && token) {
+      var accFromUrl = readPendingAccounts().find(function (a) {
+        return a && a.id === id && a.token === token && a.status === 'approved';
+      });
+      var typeFromUrl = accFromUrl && accFromUrl.type ? accFromUrl.type : (expectedType || '');
+      if (expectedType && typeFromUrl && typeFromUrl !== expectedType) return null;
+      try {
+        var pathOnly = htmlDashPath(dashFileName(typeFromUrl || expectedType || 'individual'));
+        history.replaceState(null, '', pathOnly + '?id=' + encodeURIComponent(id));
+      } catch (eHist) {}
+      return { id: id, token: token, account: accFromUrl || null, fromUrl: true };
     }
+
     var sess = readStoredSession();
     if (!sess) return null;
     var acc = findApprovedAccount(sess);
     if (!acc) return null;
     var type = acc.type || 'individual';
     if (expectedType && type !== expectedType) return null;
+    storeDashToken(acc.id, acc.token);
     try {
       var path = htmlDashPath(dashFileName(type));
-      var q = '?id=' + encodeURIComponent(acc.id) + '&token=' + encodeURIComponent(acc.token);
-      history.replaceState(null, '', path + q);
-    } catch (eHist) {}
+      history.replaceState(null, '', path + '?id=' + encodeURIComponent(acc.id));
+    } catch (eHist2) {}
     return { id: acc.id, token: acc.token, account: acc, fromUrl: false };
+  }
+
+  function refreshStoredSessionFromBackend() {
+    var sess = readStoredSession();
+    if (!sess) return Promise.resolve(null);
+    var acc = findApprovedAccount(sess);
+    if (!acc) return Promise.resolve(null);
+    return syncAccountFromBackend(acc).then(function (fresh) {
+      if (fresh && fresh.status === 'approved' && fresh.token) {
+        setActiveSession(fresh);
+        return fresh;
+      }
+      return acc;
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function () {
+      stripTokenFromUrl();
+      refreshStoredSessionFromBackend();
+    });
   }
 
   window.RizqAccount = {
     open: openAccount,
+    publicPageForAccount: publicPageForAccount,
     resolveDashboardUrl: resolveDashboardUrl,
     buildDashboardUrl: buildDashboardUrl,
     bootstrapDashboard: bootstrapDashboard,
     recoverSessionParams: recoverSessionParams,
     clearSession: clearSession,
     setActiveSession: setActiveSession,
-    loginSeller: loginSeller,
-    goAfterRegistration: goAfterRegistration,
-    findSellerByLogin: findSellerByLogin
+    storeDashToken: storeDashToken,
+    readDashToken: readDashToken,
+    stripTokenFromUrl: stripTokenFromUrl,
+    setAfterAuthHref: setAfterAuthHref,
+    rememberCurrentForAfterAuth: rememberCurrentForAfterAuth,
+    promptLogin: promptLogin,
+    consumeAfterAuthHref: consumeAfterAuthHref,
+    redirectAfterAuth: redirectAfterAuth,
+    publicShareUrl: publicShareUrl,
+    initShareLinkInput: initShareLinkInput,
+    loginSellerAsync: loginSellerAsync,
+    syncAccountFromBackend: syncAccountFromBackend,
+    mergeServerAccount: mergeServerAccount,
+    refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,
+    goAfterRegistration: goAfterRegistration
   };
 })();

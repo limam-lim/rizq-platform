@@ -395,7 +395,9 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -485,6 +487,7 @@ main, .page-content.active, .main-content, .results-area,
   <!-- ══ PAGE CONTENT ══ -->
   <div class="page-content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
 
     <!-- ── OVERVIEW ── -->
     <div class="panel active" id="panel-overview">
@@ -1044,6 +1047,9 @@ function _updateAdFilterCounts(){
   if(adsNum) adsNum.textContent = String(n('active') || all);
   var adsChange = document.querySelector('.stat-card.balance .stat-change');
   if(adsChange){ adsChange.className='stat-change'; adsChange.textContent = all ? (all+' '+_t2('إعلان','annonce(s)')) : _t2('لا إعلانات بعد','aucune annonce'); }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: MY_ADS, itemType: 'ads' });
+  }
 }
 
 function renderQuickAds(){
@@ -1716,17 +1722,20 @@ function confirmDeleteAccount(){
 // SESSION / ACCESS — الحساب الفردي (غير التجاري)
 // ═══════════════════════════════════════════════════════════════
 const params = new URLSearchParams(window.location.search);
-var SESSION_ID = params.get('id') || '';
-var SESSION_TOKEN = params.get('token') || '';
+var SESSION_ID = '';
+var SESSION_TOKEN = '';
 const IS_DEMO = params.get('demo') === '1';
 (function rizqHydrateDashSession(){
-  if(SESSION_ID && SESSION_TOKEN) return;
   if(IS_DEMO) return;
-  if(!window.RizqAccount || typeof window.RizqAccount.recoverSessionParams !== 'function') return;
-  var rec = window.RizqAccount.recoverSessionParams('individual');
-  if(!rec) return;
-  SESSION_ID = rec.id || '';
-  SESSION_TOKEN = rec.token || '';
+  if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+    var rec = window.RizqAccount.recoverSessionParams('individual');
+    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+  }
+  SESSION_ID = params.get('id') || '';
+  SESSION_TOKEN = params.get('token') || '';
+  if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
+    SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
+  }
 })();
 if(typeof applyDashAvatars === 'function') applyDashAvatars();
 
@@ -1789,6 +1798,13 @@ function renderTenderSubStatus(){
     });
 }
 
+function _tenderStatusBadgeOwner(t, fr){
+  var s = t.status || 'open';
+  if(s==='pending_review') return '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px;margin-left:6px">⏳ '+(fr?'En révision':'قيد المراجعة')+'</span>';
+  if(s==='rejected') return '<span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:6px">❌ '+(fr?'Refusée':'مرفوضة')+'</span>';
+  if(s==='open') return '<span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin-left:6px">✅ '+(fr?'Publiée':'منشورة')+'</span>';
+  return '';
+}
 function renderMyTenders(){
   var fr = (_rizqLang()==='fr');
   var el = document.getElementById('tenders-mine-list');
@@ -1819,7 +1835,8 @@ function renderMyTenders(){
             }).join('')
           : '<p style="font-size:11.5px;color:#94a3b8;margin-top:4px">'+(fr?'Aucune offre pour le moment':'لا عروض بعد')+'</p>';
         return '<div style="margin-bottom:14px;border:1px solid #e2e8f5;border-radius:14px;padding:14px;background:#fff">'
-          + '<div style="font-weight:800;font-size:14px;color:#16263d">'+escapeHtml(t.title)+'</div>'
+          + '<div style="font-weight:800;font-size:14px;color:#16263d;display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span>'+escapeHtml(t.title)+'</span>'+_tenderStatusBadgeOwner(t, fr)+'</div>'
+          + (t.status==='rejected' && t.rejectReason ? '<div style="font-size:11.5px;color:#b91c1c;margin:6px 0">'+escapeHtml(t.rejectReason)+'</div>' : '')
           + '<div style="font-size:11.5px;color:var(--text-muted);margin:4px 0 8px">'+(fr?bids.length+' offre(s) reçue(s)':bids.length+' عرض مُقدَّم')+'</div>'
           + bidsHtml
           + '</div>';
@@ -1843,25 +1860,25 @@ let USER_ACC = null;
 // accessToken. الحل: window.REAL_ACCESS_TOKEN يُحل من مصدرين —
 // (أ) rizq_pending_accounts[].backendAccessToken المحفوظ محلياً وقت
 //     التسجيل (نفس الجهاز — rizq_landing_v8.html، _syncAccountToBackend)
-// (ب) وإلا GET /api/accounts/verify-dash/:id، الذي يُعيد الآن accessToken
-//     الحقيقي أيضاً (امتلاك dashToken الصحيح يُثبت أصلاً الملكية الشرعية).
+// (ب) وإلا POST /api/accounts/exchange-dash-token/:id (endpoint منفصل —
+//     verify-dash لا يُعيد accessToken مباشرة لأسباب أمنية).
 // ═══════════════════════════════════════════════════════════════
 window.REAL_ACCESS_TOKEN = null;
 function _resolveRealAccessToken(acc){
   try{
     var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var rec = accs.find(function(a){ return a.id===acc.id; });
-    if(rec && rec.backendAccessToken){
-      window.REAL_ACCESS_TOKEN = rec.backendAccessToken;
+    if(rec && (rec.backendAccessToken || rec.accessToken)){
+      window.REAL_ACCESS_TOKEN = rec.backendAccessToken || rec.accessToken;
       return Promise.resolve(window.REAL_ACCESS_TOKEN);
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/exchange-dash-token/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.accessToken) return null;
+      window.REAL_ACCESS_TOKEN = data.accessToken;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });
@@ -2421,6 +2438,21 @@ function _initDashboardWithAccount(acc){
   applyDashAvatars();
   if(typeof initSubscriptionLifecycle==='function') initSubscriptionLifecycle(acc.id, 'individual');
   if(typeof renderMyInvoices==='function') renderMyInvoices();
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: MY_ADS, itemType: 'ads' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'individual',
+      isDemo: IS_DEMO,
+      contentCount: MY_ADS.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
 }
 // ── مزامنة طرق الدفع + كتالوجات الأسعار من الخادم — الأدمن قد يعدّلها من
 // جهازه الخاص؛ بدون هذا، يبقى هذا الجهاز يعرض فقط ما كان محفوظاً محلياً.
@@ -2574,8 +2606,9 @@ function rizqShare(title, url) {
 <script>
 // ══ Share & QR — ملفي الشخصي ══
 (function(){
-  var sli=document.getElementById('share-link-input');
-  if(sli) sli.value=location.origin+'/rizq_profile.html?user='+encodeURIComponent(SESSION_ID||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function' && USER_ACC){
+    RizqAccount.initShareLinkInput('share-link-input', USER_ACC);
+  }
 })();
 var _qrDone=false;
 function openShareModal(){

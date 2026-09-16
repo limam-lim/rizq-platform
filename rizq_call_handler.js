@@ -398,8 +398,8 @@ app.post('/api/agent/toggle', (req, res) => {
   const { subscriberPhone, active, secret } = req.body;
 
   // تحقق بسيط من السر (يُحسَّن لاحقاً بـ JWT)
-  const expectedSecret = process.env.RIZQ_API_SECRET || 'rizq_secret_2025';
-  if(secret !== expectedSecret) {
+  const expectedSecret = process.env.RIZQ_API_SECRET;
+  if(!expectedSecret || secret !== expectedSecret) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
 
