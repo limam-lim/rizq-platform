@@ -406,13 +406,26 @@
   var TIER_FEATURES_PRO_ONLY = ['auto_reply_calls','calls_channel'];
 
   // ── تفعيل الباقة (يُستدعى من الأدمن أو مدير رزق الذكي) ─────────
-  function activatePackage(accId, pkgName, activatedBy, priceOverride) {
+  // daysOrOpts: رقم أيام اختياري، أو كائن { days, grantReason, sponsored }
+  function activatePackage(accId, pkgName, activatedBy, priceOverride, daysOrOpts) {
     if(!accId || !pkgName) return false;
+    var daysOverride = null;
+    var grantMeta = null;
+    if (typeof daysOrOpts === 'number' && isFinite(daysOrOpts) && daysOrOpts > 0) {
+      daysOverride = Math.floor(daysOrOpts);
+    } else if (daysOrOpts && typeof daysOrOpts === 'object') {
+      grantMeta = daysOrOpts;
+      if (daysOrOpts.days != null && Number(daysOrOpts.days) > 0) {
+        daysOverride = Math.floor(Number(daysOrOpts.days));
+      }
+    }
     var accounts = getAccounts();
-    var days = getDurationDays(pkgName);
+    var days = (daysOverride > 0) ? daysOverride : getDurationDays(pkgName);
     var now  = new Date();
     var ends = new Date(now.getTime() + days * 86400000);
-    var isTrial = pkgName.indexOf('تجريب')!==-1 || pkgName.indexOf('مجان')!==-1;
+    // المنح الخاص/المدعوم لا يُعامل كتجربة حتى لو السعر 0
+    var isSponsored = !!(grantMeta && (grantMeta.sponsored || grantMeta.specialGrant));
+    var isTrial = !isSponsored && (pkgName.indexOf('تجريب')!==-1 || pkgName.indexOf('مجان')!==-1);
 
     // إذا كان هناك حساب موجود وباقته لم تنتهِ بعد → مد المدة من نهايتها
     if(accounts[accId] && accounts[accId].pkg_ends_at) {
@@ -443,11 +456,14 @@
       pkg_ends_at : ends.toISOString(),
       planType    : resolvePlanType(pkgName, accExisting.type) || (diamondOn ? (diamondTier === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard') : 'free'),
       subscriptionStatus: isTrial ? 'active' : 'active',
-      paymentConfirmed: !isTrial && (activatedBy === 'admin' || (priceOverride != null && priceOverride !== '')),
+      paymentConfirmed: !isTrial && (activatedBy === 'admin' || isSponsored || (priceOverride != null && priceOverride !== '')),
       activated_by: activatedBy || 'admin',
       reminder_sent: false,
       pkg_history : history,
       pkg_count   : history.length,
+      sponsoredGrant: isSponsored || !!accExisting.sponsoredGrant,
+      grantReason: (grantMeta && grantMeta.grantReason) || accExisting.grantReason || '',
+      grantKind: (grantMeta && grantMeta.grantKind) || accExisting.grantKind || (isSponsored ? 'special' : ''),
       plan        : diamondOn ? 'diamond' : (accExisting.plan || pkgName),
       planName    : pkgName,
       tier        : diamondOn ? 'diamond' : (accExisting.tier || ''),

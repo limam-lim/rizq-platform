@@ -398,6 +398,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
     <div class="sb-item" data-admin-perm="quota-guard" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
     <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('special-grant',this)"><span class="sb-icon">🎁</span><span class="sb-label" data-t="sb-special-grant">منح خاص</span></div>
     <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" data-admin-perm="moderator-config" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
     <div class="sb-section" data-t="sb-section-site">الموقع</div>
@@ -1529,6 +1530,70 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <!-- ══ SPECIAL GRANT / منح خاص ══ -->
+    <div class="panel" id="panel-special-grant">
+      <div style="margin-bottom:22px">
+        <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="sg-h">🎁 منح خاص</h2>
+        <p style="font-size:13px;color:#2C3A4F;margin-top:6px;max-width:720px;line-height:1.7" data-t="sg-sub">تفعيل امتياز مجاني لمدة محددة أو طويلة — للعائلة والشركاء والزبائن المميّزين. ابحث بالاسم أو الهاتف ثم اختر الامتياز والمدة.</p>
+      </div>
+
+      <div class="card" style="padding:22px;margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px" data-t="sg-search-lbl">بحث عن حساب (الاسم أو الهاتف)</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input id="sg-search" type="search" autocomplete="off" placeholder="مثال: فاطمة / 44…" data-ph-ar="مثال: فاطمة / 44…" data-ph-fr="Ex. : Fatima / 44…" oninput="sgSearchAccounts(this.value)" style="flex:1;min-width:220px;padding:11px 14px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:14px;font-family:inherit"/>
+          <button type="button" onclick="sgLoadAccounts(true)" style="padding:10px 16px;background:var(--royal,#1B3A6B);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit" data-t="sg-refresh">🔄 تحديث القائمة</button>
+        </div>
+        <div id="sg-results" style="margin-top:12px;display:grid;gap:8px"></div>
+      </div>
+
+      <div class="card" id="sg-form-card" style="padding:22px;margin-bottom:20px;opacity:.55;pointer-events:none">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:14px" data-t="sg-form-title">تفاصيل المنح</div>
+        <div id="sg-selected" style="font-size:13px;color:#3a4a63;margin-bottom:16px;padding:10px 12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5" data-t="sg-pick-hint">اختر حساباً من نتائج البحث أولاً</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-priv-lbl">نوع الامتياز</label>
+            <select id="sg-privilege" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;background:#fff">
+              <option value="monthly" data-t="sg-priv-monthly">باقة شهرية (مدعومة)</option>
+              <option value="yearly" data-t="sg-priv-yearly">باقة سنوية (مدعومة)</option>
+              <option value="diamond" data-t="sg-priv-diamond">باقة ماسية أساسية (مدعومة)</option>
+              <option value="verified_plus" data-t="sg-priv-vp">شارة موثّق⁺ فقط</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-days-lbl">المدة</label>
+            <select id="sg-days" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;background:#fff">
+              <option value="30" data-t="sg-d-30">30 يوماً</option>
+              <option value="90" data-t="sg-d-90">3 أشهر</option>
+              <option value="365" selected data-t="sg-d-365">سنة واحدة</option>
+              <option value="1095" data-t="sg-d-1095">3 سنوات</option>
+              <option value="3650" data-t="sg-d-3650">10 سنوات (طويل جداً)</option>
+              <option value="custom" data-t="sg-d-custom">مخصص…</option>
+            </select>
+          </div>
+          <div id="sg-custom-wrap" style="display:none">
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-custom-lbl">عدد الأيام</label>
+            <input id="sg-custom-days" type="number" min="1" max="3650" value="180" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit"/>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-reason-lbl">سبب المنح (اختياري — للسجل)</label>
+          <input id="sg-reason" type="text" maxlength="120" placeholder="مثال: شريك طويل الأمد / رعاية داخلية" data-ph-ar="مثال: شريك طويل الأمد / رعاية داخلية" data-ph-fr="Ex. : partenaire de longue date / geste commercial" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+        </div>
+
+        <button type="button" id="sg-grant-btn" onclick="sgSubmitGrant()" style="padding:12px 22px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;border:none;border-radius:12px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit" data-t="sg-grant-btn">✅ تفعيل المنح الخاص</button>
+      </div>
+
+      <div class="card" style="padding:18px 22px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <div style="font-size:13px;font-weight:800;color:var(--navy)" data-t="sg-log-title">آخر المنح الخاصة</div>
+          <button type="button" onclick="sgRenderGrantLog()" style="padding:6px 12px;border:1px solid #d8e0ef;background:#fff;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit" data-t="sg-log-refresh">تحديث</button>
+        </div>
+        <div id="sg-grant-log" style="font-size:13px;color:#3a4a63"></div>
+      </div>
+    </div>
+
 
     <!-- ══ PANEL: مراقبة المحتوى ══ -->
     <div class="panel" id="panel-moderation">
@@ -2292,7 +2357,7 @@ const PANEL_PERM_KEYS = {
   packages: 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
-  'quota-guard': 'quota-guard', accounts: 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
+  'quota-guard': 'quota-guard', accounts: 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
 };
 
 function _adminHasPerm(required) {
@@ -2584,7 +2649,7 @@ function doLogout(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -2614,6 +2679,7 @@ function showPanel(id, navEl){
   const panel = document.getElementById('panel-'+id);
   if(panel) panel.classList.add('active');
   if(id==='accounts') refreshAccountsPanel();
+  if(id==='special-grant'){ sgInitPanel(); }
   if(id==='moderation') loadModerationPanel();
   if(id==='tenders-mod') renderTendersModPanel();
   if(navEl){
@@ -6398,11 +6464,11 @@ function findPackageBoostDays(pkgName){
   return null;
 }
 
-function activateSubscriptionForAccount(accountId, pkgName, price){
+function activateSubscriptionForAccount(accountId, pkgName, price, daysOrOpts){
   // يُفعَّل عبر محرك دورة حياة الباقات rizq_subscription_engine.js (RizqSub) — مصدر الحقيقة الوحيد لتاريخ الانتهاء
   if(!accountId) return false;
   if(typeof RizqSub !== 'undefined'){
-    RizqSub.activatePackage(accountId, pkgName, 'admin', price);
+    RizqSub.activatePackage(accountId, pkgName, 'admin', price, daysOrOpts);
   }
   try{
     var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
@@ -6487,14 +6553,15 @@ function activateVerifiedPlusForRequest(req){
 
 // منح/سحب يدوي مباشر (بلا طلب شراء) — يُستخدَم من لوحة "الحسابات" لأي حساب
 // مُوافَق عليه بالفعل، تماماً كأي إجراء استثنائي آخر يتخذه الأدمن مباشرة.
-function toggleVerifiedPlusManually(accountId, grant){
+function toggleVerifiedPlusManually(accountId, grant, durationDays){
   if(!accountId) return;
   var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!cfg.backendUrl){ showToast(RizqI18n.t2('⚠️ لا يوجد اتصال بالخادم','⚠️ Aucune connexion au serveur'),'error'); return; }
+  var days = Math.max(1, Math.min(3650, Number(durationDays) || 365));
   fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin/' + encodeURIComponent(accountId) + '/verified-plus', {
     method: 'POST',
     headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
-    body: JSON.stringify(grant ? { action:'grant', durationDays: 365 } : { action:'revoke' })
+    body: JSON.stringify(grant ? { action:'grant', durationDays: days } : { action:'revoke' })
   }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
     .then(function(data){
       try{
@@ -6506,11 +6573,264 @@ function toggleVerifiedPlusManually(accountId, grant){
         }
       }catch(e){}
       showToast(grant
-        ? RizqI18n.t2('✅ تم منح شارة موثّق⁺ يدوياً (سنة واحدة)','✅ Badge Vérifié+ accordé manuellement (1 an)')
+        ? RizqI18n.t2('✅ تم منح شارة موثّق⁺ يدوياً','✅ Badge Vérifié+ accordé manuellement')
         : RizqI18n.t2('✅ تم سحب شارة موثّق⁺','✅ Badge Vérifié+ retiré'), 'success');
       renderPendingAccounts();
     })
     .catch(function(){ showToast(RizqI18n.t2('❌ فشل الإجراء — تأكد من إعدادات الخادم','❌ Échec de l\'action — vérifiez la config serveur'),'error'); });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   منح خاص — Attribution spéciale
+   بحث بالاسم/الهاتف ثم تفعيل امتياز مجاني لمدة محددة أو طويلة
+   (عائلة، شركاء، زبائن مميّزون) دون تسمية «عائلي» في الواجهة.
+═══════════════════════════════════════════════════════════════ */
+window._sgAccountsCache = [];
+window._sgSelected = null;
+
+function sgInitPanel(){
+  var daysSel = document.getElementById('sg-days');
+  if (daysSel && !daysSel._sgBound) {
+    daysSel._sgBound = true;
+    daysSel.addEventListener('change', function(){
+      var wrap = document.getElementById('sg-custom-wrap');
+      if (wrap) wrap.style.display = daysSel.value === 'custom' ? '' : 'none';
+    });
+  }
+  sgLoadAccounts(false);
+  sgRenderGrantLog();
+}
+
+function sgLoadAccounts(forceNet){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  function fromLocal(){
+    var list = [];
+    try {
+      var pending = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      (pending||[]).forEach(function(a){
+        if (!a || !a.id) return;
+        if (a.status && a.status !== 'approved' && a.status !== 'active') return;
+        list.push({
+          id: a.id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+          type: a.type || a.accountType || 'individual', status: a.status || 'approved'
+        });
+      });
+    } catch (e) {}
+    try {
+      var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
+      Object.keys(accts||{}).forEach(function(id){
+        var a = accts[id];
+        if (!a) return;
+        if (list.some(function(x){ return x.id === id; })) return;
+        list.push({
+          id: id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+          type: a.type || 'individual', status: 'approved'
+        });
+      });
+    } catch (e2) {}
+    window._sgAccountsCache = list;
+    sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+  }
+  if (!forceNet || !cfg.backendUrl) { fromLocal(); return; }
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin', { headers: _adminAuthHeaders() })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data || !Array.isArray(data.accounts)) { fromLocal(); return; }
+      window._sgAccountsCache = data.accounts
+        .filter(function(a){ return a && a.status === 'approved'; })
+        .map(function(a){
+          return {
+            id: a.id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+            type: a.type || 'individual', status: 'approved'
+          };
+        });
+      sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+      showToast(RizqI18n.t2('تم تحديث قائمة الحسابات','Liste des comptes actualisée'), 'success');
+    })
+    .catch(function(){ fromLocal(); });
+}
+
+function sgSearchAccounts(q){
+  var box = document.getElementById('sg-results');
+  if (!box) return;
+  q = String(q || '').trim().toLowerCase();
+  var list = window._sgAccountsCache || [];
+  var hits = !q ? list.slice(0, 12) : list.filter(function(a){
+    return String(a.name||'').toLowerCase().indexOf(q) !== -1
+      || String(a.phone||'').toLowerCase().indexOf(q) !== -1
+      || String(a.email||'').toLowerCase().indexOf(q) !== -1
+      || String(a.id||'').toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 20);
+  window._sgSearchHits = hits;
+  if (!hits.length) {
+    box.innerHTML = '<div style="padding:12px;color:#6a7a8a;font-size:13px">' + RizqI18n.t2('لا نتائج','Aucun résultat') + '</div>';
+    return;
+  }
+  var typeLbl = { store: RizqI18n.t2('محل','Boutique'), office: RizqI18n.t2('مكتب','Bureau'), corp: RizqI18n.t2('معرض/شركة','Showroom'), individual: RizqI18n.t2('فرد','Particulier') };
+  box.innerHTML = hits.map(function(a, idx){
+    var selected = window._sgSelected && window._sgSelected.id === a.id;
+    return '<button type="button" data-sg-idx="'+idx+'" onclick="sgSelectAccountByIdx('+idx+')" style="text-align:start;padding:12px 14px;border-radius:12px;border:1.5px solid '+(selected?'#C9A84C':'#e2e8f5')+';background:'+(selected?'#fffaf0':'#fff')+';cursor:pointer;font-family:inherit;width:100%">'
+      + '<div style="font-weight:800;color:#1B3A6B;font-size:14px">' + escapeHtml(a.name || a.id) + '</div>'
+      + '<div style="font-size:12px;color:#5b6b85;margin-top:4px">' + escapeHtml(typeLbl[a.type] || a.type) + ' · ' + escapeHtml(a.phone || '—') + '</div>'
+      + '</button>';
+  }).join('');
+}
+
+function sgSelectAccountByIdx(idx){
+  var hits = window._sgSearchHits || [];
+  var acc = hits[idx];
+  if (!acc) return;
+  sgSelectAccount(acc);
+}
+
+function sgSelectAccount(acc){
+  window._sgSelected = acc;
+  var form = document.getElementById('sg-form-card');
+  if (form) { form.style.opacity = '1'; form.style.pointerEvents = 'auto'; }
+  var typeLbl = { store: RizqI18n.t2('محل','Boutique'), office: RizqI18n.t2('مكتب','Bureau'), corp: RizqI18n.t2('معرض/شركة','Showroom'), individual: RizqI18n.t2('فرد','Particulier') };
+  var sel = document.getElementById('sg-selected');
+  if (sel) {
+    sel.innerHTML = '<strong>' + escapeHtml(acc.name || acc.id) + '</strong> · '
+      + escapeHtml(typeLbl[acc.type] || acc.type) + ' · ' + escapeHtml(acc.phone || '—');
+  }
+  sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+}
+
+function sgResolveDays(){
+  var sel = document.getElementById('sg-days');
+  var v = sel ? sel.value : '365';
+  if (v === 'custom') {
+    var n = Number((document.getElementById('sg-custom-days')||{}).value || 0);
+    return Math.max(1, Math.min(3650, n || 1));
+  }
+  return Math.max(1, Math.min(3650, Number(v) || 365));
+}
+
+function sgPackageNameFor(accType, privilege){
+  if (privilege === 'verified_plus') return null;
+  var t = accType || 'store';
+  if (t === 'individual') {
+    if (privilege === 'diamond' || privilege === 'yearly') return 'باقة شهرية';
+    return 'مميزة';
+  }
+  if (privilege === 'diamond') {
+    if (t === 'office') return 'الماسية الأساسية للمكاتب';
+    if (t === 'corp') return 'الماسية الأساسية للشركات';
+    return 'الماسية الأساسية للمحلات';
+  }
+  if (privilege === 'yearly') return 'سنوية';
+  return 'شهرية';
+}
+
+function sgEnsureLocalAccount(acc){
+  try {
+    var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
+    if (!accts[acc.id]) {
+      accts[acc.id] = {
+        id: acc.id, name: acc.name || '', phone: acc.phone || '', email: acc.email || '',
+        type: acc.type || 'individual'
+      };
+      localStorage.setItem('rizq_accounts', JSON.stringify(accts));
+    } else {
+      accts[acc.id].name = accts[acc.id].name || acc.name || '';
+      accts[acc.id].phone = accts[acc.id].phone || acc.phone || '';
+      accts[acc.id].email = accts[acc.id].email || acc.email || '';
+      accts[acc.id].type = accts[acc.id].type || acc.type || 'individual';
+      localStorage.setItem('rizq_accounts', JSON.stringify(accts));
+    }
+  } catch (e) {}
+}
+
+function sgAppendGrantLog(entry){
+  var key = 'rizq_special_grants';
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem(key)||'[]'); } catch (e) { list = []; }
+  if (!Array.isArray(list)) list = [];
+  list.unshift(entry);
+  list = list.slice(0, 40);
+  try { localStorage.setItem(key, JSON.stringify(list)); } catch (e2) {}
+}
+
+function sgRenderGrantLog(){
+  var el = document.getElementById('sg-grant-log');
+  if (!el) return;
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('rizq_special_grants')||'[]'); } catch (e) { list = []; }
+  if (!list.length) {
+    el.textContent = RizqI18n.t2('لا توجد منح مسجّلة على هذا الجهاز بعد.','Aucune attribution enregistrée sur cet appareil pour le moment.');
+    return;
+  }
+  el.innerHTML = '<div style="display:grid;gap:8px">' + list.slice(0, 12).map(function(g){
+    return '<div style="padding:10px 12px;border:1px solid #e8eef8;border-radius:10px;background:#fbfcfe">'
+      + '<div style="font-weight:700;color:#1B3A6B">' + escapeHtml(g.name || g.accountId) + '</div>'
+      + '<div style="font-size:12px;color:#5b6b85;margin-top:3px">' + escapeHtml(g.privilegeLabel || g.pkgName || '') + ' · '
+      + (g.days || '—') + ' ' + RizqI18n.t2('يوم','j') + ' · '
+      + (g.at ? new Date(g.at).toLocaleString() : '') + '</div>'
+      + (g.reason ? '<div style="font-size:12px;color:#8a6c1f;margin-top:3px">' + escapeHtml(g.reason) + '</div>' : '')
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function sgSubmitGrant(){
+  var acc = window._sgSelected;
+  if (!acc || !acc.id) {
+    showToast(RizqI18n.t2('اختر حساباً أولاً','Choisissez d\'abord un compte'), 'error');
+    return;
+  }
+  var priv = (document.getElementById('sg-privilege')||{}).value || 'monthly';
+  var days = sgResolveDays();
+  var reason = String((document.getElementById('sg-reason')||{}).value || '').trim();
+  var btn = document.getElementById('sg-grant-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.7'; }
+
+  function done(ok, label){
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (!ok) return;
+    sgAppendGrantLog({
+      accountId: acc.id, name: acc.name, type: acc.type,
+      privilege: priv, privilegeLabel: label, pkgName: label,
+      days: days, reason: reason, at: new Date().toISOString()
+    });
+    sgRenderGrantLog();
+    showToast(RizqI18n.t2('✅ تم تفعيل المنح الخاص','✅ Attribution spéciale activée'), 'success');
+  }
+
+  if (priv === 'verified_plus') {
+    sgEnsureLocalAccount(acc);
+    var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+    if (!cfg.backendUrl) {
+      showToast(RizqI18n.t2('⚠️ لا يوجد اتصال بالخادم','⚠️ Aucune connexion au serveur'), 'error');
+      done(false);
+      return;
+    }
+    fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin/' + encodeURIComponent(acc.id) + '/verified-plus', {
+      method: 'POST',
+      headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+      body: JSON.stringify({ action:'grant', durationDays: days })
+    }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+      .then(function(){ done(true, RizqI18n.t2('موثّق⁺','Vérifié+')); })
+      .catch(function(){
+        showToast(RizqI18n.t2('❌ فشل منح موثّق⁺','❌ Échec du badge Vérifié+'), 'error');
+        done(false);
+      });
+    return;
+  }
+
+  var pkgName = sgPackageNameFor(acc.type, priv);
+  sgEnsureLocalAccount(acc);
+  var ok = activateSubscriptionForAccount(acc.id, pkgName, 0, {
+    days: days,
+    sponsored: true,
+    specialGrant: true,
+    grantKind: 'special',
+    grantReason: reason || RizqI18n.t2('منح خاص','Attribution spéciale')
+  });
+  if (!ok) {
+    showToast(RizqI18n.t2('❌ تعذّر تفعيل الباقة','❌ Impossible d\'activer le forfait'), 'error');
+    done(false);
+    return;
+  }
+  done(true, pkgName);
 }
 
 function checkAccountExpiryStatus(acc, accId){
