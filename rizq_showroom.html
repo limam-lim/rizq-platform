@@ -199,11 +199,13 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .review-date{font-size:11px;color:#9a9484}
 .review-text{font-size:13px;color:#4a5364;line-height:1.7}
 
-/* ── PACKAGES ── */
-.pkg-section{padding:70px 5%;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3}
-.pkg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;max-width:1380px;margin:0 auto}
-@media(max-width:900px){.pkg-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.pkg-grid{grid-template-columns:1fr}}
+/* ── PACKAGES — حاوية فقط؛ الشبكة من rizq_packages_ui (تجنّب تداخل grid داخل grid) ── */
+.pkg-section{padding:40px 4% 56px;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3;overflow:visible}
+.pkg-section-inner{max-width:1320px;margin:0 auto;width:100%}
+.pkg-grid{display:block;width:100%;max-width:100%;box-sizing:border-box}
+#pkg-grid{width:100%}
+#pkg-grid .rizq-pkg-grid-inner{width:100%!important;max-width:100%!important;gap:14px!important;box-sizing:border-box}
+#pkg-grid .rizq-pkg-card{min-width:0;max-width:100%}
 .pkg-card{border-radius:18px;padding:26px 18px 22px;text-align:center;transition:transform .25s,box-shadow .25s;cursor:pointer}
 .pkg-card:hover{transform:translateY(-7px)}
 .pkg-name{font-size:15px;font-weight:800;margin-bottom:4px}
@@ -211,6 +213,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .pkg-period{font-size:11px;font-weight:600;margin-bottom:16px}
 .pkg-feat{font-size:12px;margin-bottom:7px;text-align:start}
 .pkg-cta{margin-top:16px;width:100%;padding:10px;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .25s}
+@media(max-width:900px){
+  .pkg-section{padding:32px 3% 48px}
+}
 
 /* ── TOAST ── */
 .rizq-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1B3A6B;color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.3)}
@@ -462,19 +467,21 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 
 <!-- ══ PACKAGES ══ -->
 <section class="pkg-section" id="pkg-section">
-  <div style="text-align:center;margin-bottom:40px">
-    <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-eyebrow">Rizq Showrooms — الباقات</p>
-    <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:#16263d;margin-bottom:10px">
-      <span id="pkg-title-pre">افتح معرضك بالباقة</span>
-      <span style="color:var(--gold)" id="pkg-title-gold"> المناسبة لك</span>
-    </h2>
-    <p style="color:#6a7a8a;font-size:14px" id="pkg-desc">جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك</p>
-    <p style="font-size:12px;color:#3a5080;margin-top:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap">
-      <span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px">MRU</span>
-      <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
-    </p>
+  <div class="pkg-section-inner">
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-eyebrow">Rizq Showrooms — الباقات</p>
+      <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:#16263d;margin-bottom:10px">
+        <span id="pkg-title-pre">افتح معرضك بالباقة</span>
+        <span style="color:var(--gold)" id="pkg-title-gold"> المناسبة لك</span>
+      </h2>
+      <p style="color:#6a7a8a;font-size:14px" id="pkg-desc">جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك</p>
+      <p style="font-size:12px;color:#3a5080;margin-top:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap">
+        <span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px">MRU</span>
+        <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
+      </p>
+    </div>
+    <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
   </div>
-  <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
 </section>
 
 <!-- ══ FOOTER RIZQ (موحّد مع باقي الصفحات) ══ -->
@@ -820,10 +827,11 @@ function applyAccountData(){
   }
 }
 
-/* ── Load Packages — dynamic from localStorage or keep static defaults ── */
+/* ── Load Packages — شبكة كاملة العرض بدون تداخل grid ── */
 function loadPackages(){
   if(window.RizqPackagesUI && typeof RizqPackagesUI.mount==='function'){
-    RizqPackagesUI.mount('pkg-grid','corp',{columns:4,ensureDiamond:true});
+    var lang = (window.RizqI18n ? RizqI18n.getLang() : localStorage.getItem('rizq_lang')) || 'ar';
+    RizqPackagesUI.mount('pkg-grid','corp',{columns:3,ensureDiamond:true,light:true,lang:lang});
   }
 }
 
