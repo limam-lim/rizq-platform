@@ -5383,6 +5383,7 @@ function applyLandingLang(toAr) {
   if(liForgot) liForgot.textContent = RizqI18n.t2('نسيت كلمة المرور؟','Mot de passe oublié?');
   const liBtn = document.querySelector('#p-login .m-btn-main');
   if(liBtn) liBtn.textContent = RizqI18n.t2('دخول ←','Connexion →');
+  const authTabLogin = document.getElementById('modal-tab-login');
   if(authTabLogin) authTabLogin.textContent = RizqI18n.t2('دخول بائع','Connexion vendeur');
   const authTabRegister = document.getElementById('modal-tab-register');
   if(authTabRegister) authTabRegister.textContent = RizqI18n.t2('حساب بائع جديد','Nouveau compte vendeur');
