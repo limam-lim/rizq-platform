@@ -547,7 +547,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#ffffff;c
 <!-- ══ SCRIPTS ══ -->
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
+<script src="rizq_packages_ui.js?v=13.5"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_announcements.js"></script>
@@ -791,7 +791,7 @@ function applyAccountData(){
 /* ── Load Packages — dynamic from localStorage or keep static defaults ── */
 function loadPackages(){
   if(window.RizqPackagesUI && typeof RizqPackagesUI.mount==='function'){
-    RizqPackagesUI.mount('pkg-grid','corp',{columns:4,ensureDiamond:true});
+    RizqPackagesUI.mount('pkg-grid','corp',{columns:5,ensureDiamond:true,light:true});
   }
 }
 
