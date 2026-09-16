@@ -223,8 +223,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .info-row{
   display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
   padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
-  text-align:start!important;direction:rtl!important;
+  text-align:start!important;direction:inherit!important;
 }
+html[dir="rtl"] .info-row{direction:rtl!important}
+html[dir="ltr"] .info-row{direction:ltr!important}
 .info-row:last-child{border-bottom:none}
 .info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px;order:0}
 .info-row > div{flex:0 1 auto!important;min-width:0;max-width:100%;text-align:start!important;margin-inline-start:0!important;margin-inline-end:auto!important;order:0}
@@ -250,14 +252,20 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .hours-row{
   display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
   gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
-  text-align:start!important;direction:rtl!important;
+  text-align:start!important;direction:inherit!important;
 }
+html[dir="rtl"] .hours-row{direction:rtl!important}
+html[dir="ltr"] .hours-row{direction:ltr!important}
 .hours-row:last-child{border-bottom:none}
 .hours-day{color:#6a7a8a;min-width:4.8em;flex:0 0 auto!important;text-align:start!important}
 .hours-time,.hours-closed{font-weight:700;flex:0 0 auto!important;margin-inline-start:0!important;margin-inline-end:auto!important}
 .hours-time{color:var(--navy)}
 .hours-closed{color:var(--red)}
-#info-section,#info-section .info-card{text-align:start!important;direction:rtl!important}
+#info-section,#info-section .info-card{text-align:start!important;direction:inherit!important}
+html[dir="rtl"] #info-section,
+html[dir="rtl"] #info-section .info-card{direction:rtl!important}
+html[dir="ltr"] #info-section,
+html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 /* Reviews */
 .review-item{padding:14px 0;border-bottom:1px solid #f0f3f8}
 .review-item:last-child{border-bottom:none}

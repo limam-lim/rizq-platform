@@ -1062,6 +1062,15 @@ html body footer .footer-copy {
 ══════════════════════════════════ */
 html[dir="rtl"] body { direction: rtl; }
 html[dir="ltr"] body { direction: ltr; }
+/* محتوى الواجهة الفرنسية يبدأ يساراً — لا تُثبَّت direction:rtl على صفوف المحتوى */
+html[dir="ltr"] .loc-info-row,
+html[dir="ltr"] .info-row,
+html[dir="ltr"] .hours-row,
+html[dir="ltr"] .rzq-disc-empty,
+html[dir="ltr"] #info-section,
+html[dir="ltr"] #info-section .info-card {
+  direction: ltr !important;
+}
 html[dir="rtl"] .form-group label,
 html[dir="rtl"] .form-label,
 html[dir="rtl"] .section-title { text-align: right; }

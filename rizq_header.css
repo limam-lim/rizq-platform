@@ -482,9 +482,13 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     align-items:center;
     gap:4px;
     list-style:none;
-    direction:rtl;
+    direction:inherit;
     margin:0;padding:0;
   }
+  html[dir="rtl"].rizq-app-nav #nav > .nav-center,
+  html[dir="rtl"].rizq-app-nav #rizq-desk-nav > .nav-center{direction:rtl}
+  html[dir="ltr"].rizq-app-nav #nav > .nav-center,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{direction:ltr}
   html.rizq-app-nav #nav > .logo,
   html.rizq-app-nav #rizq-desk-nav > .logo{
     grid-column:3;
@@ -1069,9 +1073,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding:0 2px !important;
     margin:0 !important;
     gap:0 !important;
-    direction:rtl !important;
+    direction:inherit !important;
     overflow:visible !important;
   }
+  html[dir="rtl"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{direction:rtl !important}
+  html[dir="ltr"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{direction:ltr !important}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-desktop-more-only{
@@ -1297,7 +1303,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   #rizq-app-header .rizq-hdr-tools{order:30}
   #rizq-app-header nav.rizq-hdr-row2,
   #rizq-app-header .rizq-hdr-row2{
-    direction:rtl;
+    direction:inherit;
     display:flex !important;
     flex-direction:row !important;
     align-items:center;
@@ -1311,6 +1317,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     position:static !important;
     box-shadow:none !important;
   }
+  html[dir="rtl"] #rizq-app-header nav.rizq-hdr-row2,
+  html[dir="rtl"] #rizq-app-header .rizq-hdr-row2{direction:rtl}
+  html[dir="ltr"] #rizq-app-header nav.rizq-hdr-row2,
+  html[dir="ltr"] #rizq-app-header .rizq-hdr-row2{direction:ltr}
   .rizq-hdr-item{
     flex:1;
     min-width:0;
