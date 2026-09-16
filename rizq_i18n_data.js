@@ -230,7 +230,11 @@ window.RIZQ_I18N_AR = {
     "share-print-qr": "🖨️ طباعة QR",
     "share-link-copied": "✅ تم نسخ الرابط!",
     "share-link-copied-fr": "✅ Lien copié !",
-    "pay-activate-trial": "✓ تفعيل التجربة"
+    "pay-activate-trial": "✓ تفعيل التجربة",
+    "denied-title": "رابط غير صالح",
+    "denied-msg-pre": "تواصل مع منصة",
+    "denied-msg-post": "للحصول على رابط داشبورد صحيح.",
+    "denied-home": "الصفحة الرئيسية"
   },
   "admin": {
     "login-title": "لوحة إدارة رزق",
@@ -770,7 +774,7 @@ window.RIZQ_I18N_AR = {
     "hb-preview-btn": "👁️ معاينة صفحتي",
     "hb-share-btn": "📤 مشاركة",
     "hb-your-rating": "تقييمك",
-    "hb-12-ratings": "(12 تقييم)",
+    "hb-12-ratings": "—",
     "qa-add-product": "➕ إضافة منتج",
     "qa-rizq-ads": "Rizq ADS",
     "qa-inquiries": "📩 الاستفسارات",
@@ -940,7 +944,11 @@ window.RIZQ_I18N_AR = {
     "ad-video-zone-text": "اضغط لاختيار الفيديو (MP4، MOV، AVI)",
     "ad-info-pre": "💡 بعد الإرسال سيتواصل معك فريق",
     "ad-info-post": "خلال 24 ساعة لتأكيد الدفع ومراجعة المحتوى.",
-    "ad-submit-btn": "📤 إرسال الحملة للمراجعة"
+    "ad-submit-btn": "📤 إرسال الحملة للمراجعة",
+    "denied-title": "رابط غير صالح",
+    "denied-msg-pre": "تواصل مع منصة",
+    "denied-msg-post": "للحصول على رابط داشبورد صحيح.",
+    "denied-home": "الصفحة الرئيسية"
   },
   "products": {
     "nav-home": "🏠 رزق",
@@ -1222,7 +1230,7 @@ window.RIZQ_I18N_AR = {
     "hero-preview": "👁 عاين واجهتي",
     "hero-share": "📤 مشاركة",
     "hero-your-rating": "تقييمك",
-    "hero-rating-count": "12 تقييم",
+    "hero-rating-count": "—",
     "qa-add-service": "إضافة خدمة",
     "qa-share-office": "مشاركة المكتب",
     "qa-requests": "الطلبات",
@@ -1630,7 +1638,11 @@ window.RIZQ_I18N_AR = {
     "pay-upload-cta": "انقر لرفع صورة الوصل",
     "pay-upload-hint": "JPG / PNG / PDF",
     "pay-submit-btn-text": "📤 إرسال طلب الاشتراك",
-    "pay-review-note": "سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل"
+    "pay-review-note": "سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل",
+    "denied-title": "رابط غير صالح",
+    "denied-msg-pre": "تواصل مع منصة",
+    "denied-msg-post": "للحصول على رابط داشبورد صحيح.",
+    "denied-home": "الصفحة الرئيسية"
   }
 };
 
@@ -1864,7 +1876,11 @@ window.RIZQ_I18N_FR = {
     "share-print-qr": "🖨️ Imprimer le QR",
     "share-link-copied": "✅ Lien copié !",
     "share-link-copied-fr": "✅ Lien copié !",
-    "pay-activate-trial": "✓ Activer l'essai"
+    "pay-activate-trial": "✓ Activer l'essai",
+    "denied-title": "Lien invalide",
+    "denied-msg-pre": "Contactez la plateforme",
+    "denied-msg-post": "pour obtenir un lien de tableau de bord valide.",
+    "denied-home": "Page d'accueil"
   },
   "admin": {
     "login-title": "Panneau d'administration Rizq",
@@ -2404,7 +2420,7 @@ window.RIZQ_I18N_FR = {
     "hb-preview-btn": "👁️ Aperçu de ma page",
     "hb-share-btn": "📤 Partager",
     "hb-your-rating": "Votre note",
-    "hb-12-ratings": "(12 avis)",
+    "hb-12-ratings": "—",
     "qa-add-product": "➕ Ajouter un produit",
     "qa-rizq-ads": "Rizq ADS",
     "qa-inquiries": "📩 Demandes",
@@ -2574,7 +2590,11 @@ window.RIZQ_I18N_FR = {
     "ad-video-zone-text": "Cliquez pour choisir la vidéo (MP4, MOV, AVI)",
     "ad-info-pre": "💡 Après l'envoi, l'équipe",
     "ad-info-post": "vous contactera dans 24 heures pour confirmer le paiement et examiner le contenu.",
-    "ad-submit-btn": "📤 Envoyer la campagne pour examen"
+    "ad-submit-btn": "📤 Envoyer la campagne pour examen",
+    "denied-title": "Lien invalide",
+    "denied-msg-pre": "Contactez la plateforme",
+    "denied-msg-post": "pour obtenir un lien de tableau de bord valide.",
+    "denied-home": "Page d'accueil"
   },
   "products": {
     "nav-home": "🏠 Accueil",
@@ -2856,7 +2876,7 @@ window.RIZQ_I18N_FR = {
     "hero-preview": "👁 Voir ma page",
     "hero-share": "📤 Partager",
     "hero-your-rating": "Votre note",
-    "hero-rating-count": "12 avis",
+    "hero-rating-count": "—",
     "qa-add-service": "Ajouter un service",
     "qa-share-office": "Partager le cabinet",
     "qa-requests": "Demandes",
@@ -3264,6 +3284,10 @@ window.RIZQ_I18N_FR = {
     "pay-upload-cta": "Cliquez pour télécharger la photo du reçu",
     "pay-upload-hint": "JPG / PNG / PDF",
     "pay-submit-btn-text": "📤 Envoyer la demande d'abonnement",
-    "pay-review-note": "Le reçu sera vérifié et le forfait activé dans les 24 heures ou moins"
+    "pay-review-note": "Le reçu sera vérifié et le forfait activé dans les 24 heures ou moins",
+    "denied-title": "Lien invalide",
+    "denied-msg-pre": "Contactez la plateforme",
+    "denied-msg-post": "pour obtenir un lien de tableau de bord valide.",
+    "denied-home": "Page d'accueil"
   }
 };

@@ -367,9 +367,9 @@ textarea.form-input{resize:vertical;min-height:90px}
 <!-- ACCESS DENIED -->
 <div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:20px">
   <div style="font-size:64px">🔒</div>
-  <h2 style="font-size:22px;font-weight:800;color:var(--navy)">رابط غير صالح</h2>
-  <p style="color:var(--text-muted);font-size:14px;max-width:340px">هذا الرابط غير صحيح أو انتهت صلاحيته. تواصل مع منصة <span style="color:#e8c96a;font-weight:900">رزق</span> للحصول على رابط جديد.</p>
-  <a href="rizq_landing_v8.html" style="padding:12px 28px;background:var(--royal);color:#fff;border-radius:12px;font-weight:700;font-size:14px">الصفحة الرئيسية</a>
+  <h2 style="font-size:22px;font-weight:800;color:var(--navy)" data-t="denied-title">رابط غير صالح</h2>
+  <p style="color:var(--text-muted);font-size:14px;max-width:340px"><span data-t="denied-msg-pre">تواصل مع منصة</span> <span style="color:#e8c96a;font-weight:900">رزق</span> <span data-t="denied-msg-post">للحصول على رابط داشبورد صحيح.</span></p>
+  <a href="rizq_landing_v8.html" style="padding:12px 28px;background:var(--royal);color:#fff;border-radius:12px;font-weight:700;font-size:14px" data-t="denied-home">الصفحة الرئيسية</a>
 </div>
 
 <!-- MOBILE BAR -->
@@ -469,9 +469,9 @@ textarea.form-input{resize:vertical;min-height:90px}
           </div>
         </div>
         <div style="padding:24px 22px;text-align:center;flex-shrink:0;background:rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:120px">
-          <div style="font-size:24px;color:#f59e0b">★★★★★</div>
-          <div style="font-size:34px;font-weight:900;color:#fff;line-height:1">4.8</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px" data-t="wb-rating-label">تقييم محلك</div>
+          <div id="hero-rating-stars" style="font-size:24px;color:#f59e0b">★★★★★</div>
+          <div id="hero-rating-num" style="font-size:34px;font-weight:900;color:#fff;line-height:1">…</div>
+          <div id="hero-rating-count" style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px" data-t="wb-rating-label">تقييم محلك</div>
         </div>
       </div>
       <!-- Quick Actions -->
@@ -1600,21 +1600,37 @@ function renderOverview(){
   // إصلاح جوهري 29/07/2026: كان تقييم "4.8" ثابتاً مزيَّفاً دائماً بلا أي
   // علاقة بتقييمات حقيقية. الآن يُجلب من /api/reviews (نفس targetId
   // المستخدَم أصلاً في نظام المراسلة rizq_messenger.js — SESSION_ID).
-  if(!IS_DEMO && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
+  function _paintStoreRating(avg, count){
+    var vEl = document.getElementById('ov-stat-rating'); var cEl = document.getElementById('ov-stat-rating-change');
+    var hNum = document.getElementById('hero-rating-num'); var hCnt = document.getElementById('hero-rating-count');
+    var hStars = document.getElementById('hero-rating-stars');
+    if(!count){
+      if(vEl) vEl.textContent='—';
+      if(cEl) cEl.textContent=_t2('لا تقييمات بعد','Aucun avis pour le moment');
+      if(hNum) hNum.textContent='—';
+      if(hCnt) hCnt.textContent=_t2('لا تقييمات بعد','Aucun avis');
+      if(hStars) hStars.textContent='☆☆☆☆☆';
+      return;
+    }
+    if(vEl) vEl.textContent=avg;
+    if(cEl) cEl.textContent=count+_t2(' تقييم(ات)',' avis');
+    if(hNum) hNum.textContent=avg;
+    if(hCnt) hCnt.textContent=count+_t2(' تقييم',' avis');
+    if(hStars){
+      var full=Math.round(Number(avg)||0); if(full<0)full=0; if(full>5)full=5;
+      hStars.textContent='★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);
+    }
+  }
+  if(IS_DEMO){ _paintStoreRating(null, 0); }
+  else if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/reviews/'+encodeURIComponent(SESSION_ID)+'/stats')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        var vEl = document.getElementById('ov-stat-rating'); var cEl = document.getElementById('ov-stat-rating-change');
-        if(!data || !data.count){
-          if(vEl) vEl.textContent='—';
-          if(cEl) cEl.textContent=_t2('لا تقييمات بعد','Aucun avis pour le moment');
-          return;
-        }
-        if(vEl) vEl.textContent=data.average;
-        if(cEl) cEl.textContent=data.count+_t2(' تقييم(ات)',' avis');
-      }).catch(function(){
-        var vEl = document.getElementById('ov-stat-rating'); if(vEl) vEl.textContent='—';
-      });
+        if(!data || !data.count){ _paintStoreRating(null, 0); return; }
+        _paintStoreRating(data.average, data.count);
+      }).catch(function(){ _paintStoreRating(null, 0); });
+  } else {
+    _paintStoreRating(null, 0);
   }
   renderRealVisits();
   renderAdvancedStats();
@@ -2312,7 +2328,9 @@ function renderSubscriptionPanel(){
         <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">${_t2('🔄 عرض الباقات','🔄 Voir les forfaits')}</button>
       </div>
     </div>${reminderBanner}`;
-  if(renewal) renewal.style.display = isExpired?'block':'none';
+  // التجديد الحقيقي الوحيد: packages-display → openPayModal → submitPayment
+  // (RizqSub.submitSubscriptionRequest). قسم renewal-section كان localStorage فقط.
+  if(renewal) renewal.style.display = 'none';
 }
 
 function renderMyInvoices(){
@@ -2450,16 +2468,10 @@ function handleRenewalUpload(input){
 }
 
 function submitRenewal(){
-  if(!renewalFile){showToast(_t2('يرجى رفع وصل الدفع','Veuillez télécharger le reçu de paiement'),'error');return;}
-  const pkg = document.querySelector('input[name="renewal-pkg"]:checked');
-  if(!pkg){showToast(_t2('يرجى اختيار الباقة','Veuillez choisir un forfait'),'error');return;}
-  // Save renewal request
-  const renewals = JSON.parse(localStorage.getItem('rizq_renewal_requests')||'[]');
-  renewals.push({storeId:SESSION_ID,storeName:STORE.name,pkg:pkg.value,file:renewalFile.name,submittedAt:new Date().toISOString(),status:'pending'});
-  localStorage.setItem('rizq_renewal_requests',JSON.stringify(renewals));
-  showToast(_t2('تم إرسال طلب التجديد — ستُراجع خلال 24 ساعة ✅','Demande de renouvellement envoyée — elle sera examinée dans les 24 heures ✅'),'success');
-  document.getElementById('renewal-section').style.display='none';
-  renewalFile = null;
+  // مسار التجديد الوهمي (localStorage فقط) أُبطل — وجّه المستخدم للباقات الحقيقية.
+  var el = document.getElementById('packages-display');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+  else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'),'error');
 }
 
 // ══ MESSAGES ══

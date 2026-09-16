@@ -4687,7 +4687,9 @@ function approveAccount(id, customPkg){
   acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  acc.dashLink=dashFile+'?id='+id;
+  // رابط يفتح من أي جهاز: id + token في الـ URL، والداشبورد يخزّن التوكن
+  // في sessionStorage ثم يزيل ?token= من الشريط (انظر RizqAccount.stripTokenFromUrl).
+  acc.dashLink=dashFile+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(acc.token);
   if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
     window.RizqAccount.storeDashToken(id, acc.token);
   }
@@ -4811,6 +4813,26 @@ function copyDashLink(link){
     document.execCommand('copy');document.body.removeChild(ta);
   });
   showToast(RizqI18n.t2('تم نسخ الرابط — أرسله للمالك عبر واتساب 📲','Lien copié — envoyez-le au propriétaire via WhatsApp 📲'),'success');
+}
+
+/** يضمن أن رابط الداشبورد يحمل ?token= (حسابات قديمة وافَق عليها قبل الإصلاح). */
+function ensureDashLinkWithToken(acc){
+  if(!acc || !acc.id || !acc.token) return acc && acc.dashLink || '';
+  var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
+  var dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
+  var need = dashFile+'?id='+encodeURIComponent(acc.id)+'&token='+encodeURIComponent(acc.token);
+  if(acc.dashLink !== need){
+    acc.dashLink = need;
+    try{
+      var accs=getPendingAccounts();
+      var i=accs.findIndex(function(a){return a.id===acc.id;});
+      if(i>=0){ accs[i].dashLink=need; savePendingAccounts(accs); }
+    }catch(e){}
+  }
+  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+    window.RizqAccount.storeDashToken(acc.id, acc.token);
+  }
+  return acc.dashLink;
 }
 
 // ── تبديل تاب الحسابات ────────────────────────────────────────────
@@ -4983,11 +5005,14 @@ function renderPendingAccounts(){
           </div>`:`<div style="margin-top:8px;font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:6px"><span>📭</span> ${RizqI18n.t2('لا يوجد وصل دفع مرفوع','Aucun reçu de paiement téléchargé')}</div>`}
 
           ${acc.rejectReason?`<div style="margin-top:8px;font-size:12px;color:#ef4444;background:#fef2f2;padding:6px 10px;border-radius:8px">❌ ${RizqI18n.t2('سبب الرفض:','Motif du refus :')} ${escapeHtml(acc.rejectReason)}</div>`:''}
-          ${isApproved&&acc.dashLink?`<div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:#f0fdf4;padding:8px 12px;border-radius:10px;border:1px solid #86efac;flex-wrap:wrap">
+          ${isApproved&&acc.token?(function(){
+            var link = ensureDashLinkWithToken(acc);
+            return link ? `<div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:#f0fdf4;padding:8px 12px;border-radius:10px;border:1px solid #86efac;flex-wrap:wrap">
             <span style="font-size:12px;color:#16a34a;font-weight:600">🔗 ${RizqI18n.t2('رابط الداشبورد:','Lien du tableau de bord :')}</span>
-            <code style="font-size:11px;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(acc.dashLink)}</code>
-            <button onclick="copyDashLink('${escapeAttr(acc.dashLink)}')" style="padding:4px 12px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">📋 ${RizqI18n.t2('نسخ','Copier')}</button>
-          </div>`:''}
+            <code style="font-size:11px;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(link)}</code>
+            <button onclick="copyDashLink('${escapeAttr(link)}')" style="padding:4px 12px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">📋 ${RizqI18n.t2('نسخ','Copier')}</button>
+          </div>` : '';
+          })():''}
           ${isApproved&&acc.type==='individual'&&acc.profileLink?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px;background:#eff6ff;padding:8px 12px;border-radius:10px;border:1px solid #93c5fd;flex-wrap:wrap">
             <span style="font-size:12px;color:#1d4ed8;font-weight:600">👤 ${RizqI18n.t2('رابط الملف الشخصي العام:','Lien du profil public :')}</span>
             <code style="font-size:11px;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(acc.profileLink)}</code>

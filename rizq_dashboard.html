@@ -407,9 +407,9 @@ main, .page-content.active, .main-content, .results-area,
 <!-- ACCESS DENIED -->
 <div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:20px">
   <div style="font-size:64px">🔒</div>
-  <h2 style="font-size:22px;font-weight:800;color:var(--royal)">رابط غير صالح</h2>
-  <p style="color:var(--text-muted);font-size:14px;max-width:340px">هذا الرابط غير صحيح أو انتهت صلاحيته. تواصل مع منصة <span style="color:var(--gold);font-weight:900">رزق</span> للحصول على رابط جديد.</p>
-  <a href="rizq_landing_v8.html" style="padding:12px 28px;background:var(--royal);color:#fff;border-radius:12px;font-weight:700;font-size:14px">الصفحة الرئيسية</a>
+  <h2 style="font-size:22px;font-weight:800;color:var(--royal)" data-t="denied-title">رابط غير صالح</h2>
+  <p style="color:var(--text-muted);font-size:14px;max-width:340px"><span data-t="denied-msg-pre">تواصل مع منصة</span> <span style="color:var(--gold);font-weight:900">رزق</span> <span data-t="denied-msg-post">للحصول على رابط داشبورد صحيح.</span></p>
+  <a href="rizq_landing_v8.html" style="padding:12px 28px;background:var(--royal);color:#fff;border-radius:12px;font-weight:700;font-size:14px" data-t="denied-home">الصفحة الرئيسية</a>
 </div>
 
 <!-- SIDEBAR OVERLAY (mobile) -->
@@ -2216,15 +2216,9 @@ function handleRenewalUpload(input){
 }
 
 function submitRenewal(){
-  var pkg = document.querySelector('input[name="renewal-pkg"]:checked');
-  if(!pkg){ showToast(_t2('يرجى اختيار الباقة','Veuillez choisir un forfait')); return; }
-  if(!renewalFile){ showToast(_t2('يرجى رفع وصل الدفع','Veuillez télécharger le reçu de paiement')); return; }
-  var renewals = JSON.parse(localStorage.getItem('rizq_renewal_requests')||'[]');
-  renewals.push({storeId:SESSION_ID, storeName:(USER_ACC&&USER_ACC.name)||'', pkg:pkg.value, file:renewalFile.name, submittedAt:new Date().toISOString(), status:'pending'});
-  localStorage.setItem('rizq_renewal_requests', JSON.stringify(renewals));
-  showToast(_t2('تم إرسال طلب التجديد — ستُراجع خلال 24 ساعة ✅','Demande de renouvellement envoyée — elle sera examinée dans les 24 heures ✅'));
-  document.getElementById('renewal-section').style.display='none';
-  renewalFile = null;
+  var el = document.getElementById('packages-display');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+  else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'));
 }
 
 // ══ منتقي الإعلان لباقة "مميزة" (#219) ══

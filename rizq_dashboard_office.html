@@ -364,9 +364,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         <!-- Rating side -->
         <div style="padding:22px 24px;text-align:center;background:rgba(0,0,0,.15);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:120px;border-right:1px solid rgba(255,255,255,.07);position:relative;z-index:1">
           <div style="font-size:8px;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:4px" data-t="hero-your-rating">تقييمك</div>
-          <div style="font-size:40px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(201,168,76,.4)">4.8</div>
-          <div style="color:#f59e0b;font-size:14px;margin-top:4px">★★★★★</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px" data-t="hero-rating-count">12 تقييم</div>
+          <div id="hero-rating-num" style="font-size:40px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(201,168,76,.4)">…</div>
+          <div id="hero-rating-stars" style="color:#f59e0b;font-size:14px;margin-top:4px">★★★★★</div>
+          <div id="hero-rating-count" style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px" data-t="hero-rating-count">—</div>
         </div>
       </div>
       <div class="quick-actions">
@@ -1269,14 +1269,36 @@ function renderOverview(){
     {icon:'⭐',val:'…',id:'ov-stat-rating',label:_t2('تقييم المكتب','Note du cabinet'),accent:'#f59e0b'},
   ].map(s=>`<div class="stat-card" style="--accent:${s.accent}"><div style="font-size:22px;margin-bottom:8px">${s.icon}</div><div class="stat-val"${s.id?` id="${s.id}"`:''}>${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
   // إصلاح جوهري 29/07/2026: كان تقييم "4.9" ثابتاً مزيَّفاً دائماً.
-  if(!IS_DEMO && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
+  function _paintOfficeRating(avg, count){
+    var vEl = document.getElementById('ov-stat-rating');
+    var hNum = document.getElementById('hero-rating-num');
+    var hCnt = document.getElementById('hero-rating-count');
+    var hStars = document.getElementById('hero-rating-stars');
+    if(!count){
+      if(vEl) vEl.textContent='—';
+      if(hNum) hNum.textContent='—';
+      if(hCnt) hCnt.textContent=_t2('لا تقييمات بعد','Aucun avis');
+      if(hStars) hStars.textContent='☆☆☆☆☆';
+      return;
+    }
+    if(vEl) vEl.textContent=avg;
+    if(hNum) hNum.textContent=avg;
+    if(hCnt) hCnt.textContent=count+_t2(' تقييم',' avis');
+    if(hStars){
+      var full=Math.round(Number(avg)||0); if(full<0)full=0; if(full>5)full=5;
+      hStars.textContent='★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);
+    }
+  }
+  if(IS_DEMO){ _paintOfficeRating(null, 0); }
+  else if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/reviews/'+encodeURIComponent(SESSION_ID)+'/stats')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        var vEl = document.getElementById('ov-stat-rating');
-        if(!vEl) return;
-        vEl.textContent = (data && data.count) ? data.average : '—';
-      }).catch(function(){ var vEl=document.getElementById('ov-stat-rating'); if(vEl) vEl.textContent='—'; });
+        if(!data || !data.count){ _paintOfficeRating(null, 0); return; }
+        _paintOfficeRating(data.average, data.count);
+      }).catch(function(){ _paintOfficeRating(null, 0); });
+  } else {
+    _paintOfficeRating(null, 0);
   }
   renderRealVisits();
   renderAdvancedStats();
@@ -1899,15 +1921,9 @@ function handleRenewalUpload(input){
   z.classList.add('has-file');
 }
 function submitRenewal(){
-  if(!renewalFile){showToast(_t2('يرجى رفع وصل الدفع','Veuillez télécharger le reçu de paiement'),'error');return;}
-  const pkg=document.querySelector('input[name="renewal-pkg"]:checked');
-  if(!pkg){showToast(_t2('يرجى اختيار الباقة','Veuillez choisir un forfait'),'error');return;}
-  const rs=JSON.parse(localStorage.getItem('rizq_renewal_requests')||'[]');
-  rs.push({storeId:SESSION_ID,officeName:OFFICE.name,pkg:pkg.value,submittedAt:new Date().toISOString(),status:'pending'});
-  localStorage.setItem('rizq_renewal_requests',JSON.stringify(rs));
-  showToast(_t2('تم إرسال طلب التجديد ✅','Demande de renouvellement envoyée ✅'),'success');
-  document.getElementById('renewal-section').style.display='none';
-  renewalFile=null;
+  var el = document.getElementById('packages-display');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+  else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'),'error');
 }
 
 function updateSubBadge(){
