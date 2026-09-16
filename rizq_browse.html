@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=18.6"/>
+  <link rel="stylesheet" href="rizq_header.css?v=19.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -61,8 +61,20 @@ select option{background:#fff!important;color:#1a2535!important}
   }
 }
 
-/* NAV */
-nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(201,168,76,.12);height:62px;display:flex;align-items:center;padding:0 4%;gap:16px;direction:ltr;justify-content:flex-start}
+/* NAV — full dark bar only without unified desk header above */
+body>nav:not(#rizq-desk-nav):not(.rizq-search-strip-nav){
+  position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(201,168,76,.12);height:62px;display:flex;align-items:center;
+  padding:0 4%;gap:16px;direction:ltr;justify-content:flex-start
+}
+#rizq-desk-nav~nav,nav.rizq-search-strip-nav{
+  position:relative!important;top:auto!important;height:56px!important;max-height:56px!important;
+  background:#fff!important;border-bottom:1px solid #e2e8f5!important;box-shadow:none!important;
+  backdrop-filter:none!important;z-index:20!important;padding:8px 24px!important
+}
+#rizq-desk-nav~nav .logo,#rizq-desk-nav~nav .nav-actions,#rizq-desk-nav~nav .nav-disclaimer,
+#rizq-desk-nav~nav #lang-btn,nav.rizq-search-strip-nav .logo,nav.rizq-search-strip-nav .nav-actions,
+nav.rizq-search-strip-nav .nav-disclaimer,nav.rizq-search-strip-nav #lang-btn{display:none!important}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
 .logo-mark{width:42px;height:42px;background:var(--royal);border:2px solid var(--gold);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:var(--gold);font-family:Georgia,serif;box-shadow:0 0 0 1px rgba(201,168,76,.3),0 4px 16px rgba(27,58,107,.4);flex-shrink:0;cursor:pointer}
 .logo-text{display:flex;flex-direction:column;justify-content:center}
@@ -859,44 +871,26 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_contact_gate.js" defer></script>
 <script>
 (function(){
-  function syncBrowseNavForViewport(){
-    var nav=document.querySelector('body>nav:not(#rizq-desk-nav)');
-    if(!nav||!nav.querySelector('.nav-search')) return;
-    var desk=document.getElementById('rizq-desk-nav');
-    var mobile=window.innerWidth<769
-      || (window.matchMedia && window.matchMedia('(max-width:768px)').matches);
-    if(mobile){
-      document.documentElement.classList.remove('has-rizq-desk-nav');
-      if(window.RizqHeader&&typeof window.RizqHeader.inject==='function') window.RizqHeader.inject();
-      return;
+  function syncBrowseNav(){
+    if(window.RizqHeader&&typeof window.RizqHeader.applyNativeSearchStripNav==='function'){
+      window.RizqHeader.applyNativeSearchStripNav();
+    }else if(window.RizqHeader&&typeof window.RizqHeader.inject==='function'){
+      window.RizqHeader.inject();
     }
-    if(!desk) return;
-    document.documentElement.classList.add('rizq-app-nav','has-rizq-desk-nav');
-    ['.logo','.nav-actions','.nav-disclaimer','#lang-btn'].forEach(function(sel){
-      var el=nav.querySelector(sel);
-      if(el) el.style.setProperty('display','none','important');
-    });
-    nav.style.setProperty('position','relative','important');
-    nav.style.setProperty('height','56px','important');
-    nav.style.setProperty('background','#fff','important');
-    nav.style.setProperty('box-shadow','none','important');
-    nav.style.setProperty('backdrop-filter','none','important');
   }
-  function run(){ syncBrowseNavForViewport(); }
+  function run(){ syncBrowseNav(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
   else run();
   window.addEventListener('load',run);
-  window.addEventListener('resize',function(){ run(); });
-  try{
-    new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
-  }catch(e){}
+  window.addEventListener('resize',run);
+  try{ new MutationObserver(run).observe(document.body,{childList:true,subtree:true}); }catch(e){}
 })();
 </script>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
+<nav id="nav-browse-search">
   <a href="rizq_landing_v8.html" class="logo">
     
     <div class="logo-text">

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '18.6';
+  var ASSET_V = '19.0';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -211,9 +211,21 @@
   if (document.body) mountSplash();
   else document.addEventListener('DOMContentLoaded', mountSplash);
 
+  if ('caches' in window) {
+    try {
+      caches.keys().then(function (keys) {
+        keys.forEach(function (k) {
+          if (/^rizq-cache-v(1[0-3]|14\.)/.test(k)) caches.delete(k);
+        });
+      });
+    } catch (eCache) {}
+  }
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function (err) {
+      navigator.serviceWorker.register('sw.js?v=19.0').then(function (reg) {
+        if (reg && reg.update) reg.update();
+      }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });
     });
