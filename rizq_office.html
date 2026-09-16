@@ -827,7 +827,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <div class="section-bar"></div>
         <div class="section-ttl" id="about-section-ttl" data-t="about-section-ttl">عن المكتب</div>
       </div>
-      <p class="about-text" id="about-txt" data-t="about-txt">مكتب الفجر للتأمين والخدمات — وكالة معتمدة تعمل في موريتانيا منذ عام 2010. نتميز بالسرعة في إصدار وثائق التأمين، الشفافية الكاملة في التسعير، والمتابعة المستمرة لملفات الزبائن حتى الحل النهائي. فريقنا من المختصين يضمن لك أفضل تغطية بأنسب الأسعار.</p>
+      <p class="about-text" id="about-txt" data-t="about-txt">تُعرض بيانات المكتب من الحساب الحقيقي فقط بعد اختيار مكتب من الدليل.</p>
       <div class="about-stats">
         <div class="about-stat"><div class="about-stat-val">2010</div><div class="about-stat-lbl" id="ab-year-lbl" data-t="ab-year-lbl">سنة التأسيس</div></div>
         <div class="about-stat"><div class="about-stat-val" id="ab-clients">—</div><div class="about-stat-lbl" id="ab-clients-lbl" data-t="ab-clients-lbl">زبون مخدوم</div></div>
@@ -1462,6 +1462,7 @@ function openMaps(){
           setText('hero-office-name', isFr() ? 'Bureau' : 'مكتب');
           setText('hero-office-spec', '');
           setText('hero-desc', isFr() ? msgFr : msgAr);
+          setText('about-txt', isFr() ? msgFr : msgAr);
           setText('hc-name', '—');
           setText('hc-type', '—');
           setText('hero-tag1', '—');
