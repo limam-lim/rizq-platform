@@ -94,20 +94,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 @keyframes rzBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 @media(max-width:640px){.showroom-hero{min-height:auto}.hero-floor{display:none}}
 
-/* ── شريط تواصل تحت الهيرو (واتساب / إيميل / اتصال) ── */
-.hub-contact-strip{background:#fff;border-bottom:1px solid #e7ecf3;padding:14px 20px;box-shadow:0 6px 18px rgba(15,35,65,.06);position:relative;z-index:5}
-.hub-contact-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.hub-cta{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;border-radius:12px;font-size:14px;font-weight:800;font-family:inherit;text-decoration:none;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;width:100%;box-sizing:border-box}
-.hub-cta:hover{transform:translateY(-1px)}
-.hub-cta-wa{background:linear-gradient(135deg,#128C7E,#25D366);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.28)}
-.hub-cta-mail{background:#E8F4FF;color:#0369a1;border:1.5px solid #7dd3fc;box-shadow:0 4px 12px rgba(3,105,161,.1)}
-.hub-cta-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;box-shadow:0 4px 14px rgba(15,35,71,.22)}
-.hub-cta svg,.hub-cta .hub-cta-ico{width:18px;height:18px;flex-shrink:0;font-size:16px;line-height:1}
-@media(max-width:700px){.hub-contact-inner{grid-template-columns:1fr}}
 
 
 /* ── ACTIONS BAR ── */
-.actions-bar{background:linear-gradient(135deg,var(--navy2),var(--dark));border-bottom:1px solid var(--border);padding:14px 20px}
+.actions-bar{background:linear-gradient(135deg,#0F2347,#0D1B2A);border-bottom:1px solid rgba(201,168,76,.28);padding:14px 20px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 /* روابط أقسام الصفحة — تبقى ظاهرة عند إخفاء topnav على الجوال */
 .page-sec-strip{
@@ -133,16 +123,16 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
 }
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
-.action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .25s}
-.btn-msg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);font-weight:800}
-.btn-msg:hover{box-shadow:0 6px 20px rgba(201,168,76,.4);transform:translateY(-1px)}
-.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:800}
-.btn-wa:hover{background:#1da851;box-shadow:0 6px 18px rgba(37,211,102,.35)}
-.btn-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;font-weight:800}
-.btn-call:hover{box-shadow:0 6px 18px rgba(15,35,71,.35)}
+.action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .25s}
 .action-btn svg{width:16px;height:16px;flex-shrink:0}
-.btn-share{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.15)}
-.btn-share:hover{background:rgba(255,255,255,.14)}
+.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.btn-wa:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.35)}
+.btn-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.btn-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
+.btn-share{background:transparent;color:#e8eef8;border:1.5px solid rgba(255,255,255,.35)}
+.btn-share:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.55)}
+.btn-msg{background:transparent;color:#E8C96A;border:1.5px solid rgba(201,168,76,.75)}
+.btn-msg:hover{background:rgba(201,168,76,.12);border-color:#E8C96A}
 .showroom-rating{display:flex;align-items:center;gap:8px}
 .stars{color:#F5A623;font-size:14px}
 .rating-val{font-size:20px;font-weight:900;color:#fff}
@@ -292,6 +282,32 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   <div class="hero-scroll-cue">⌄</div>
 </div>
 
+<!-- ══ ACTIONS BAR — مباشرة تحت الهيرو مثل المحل ══ -->
+<div class="actions-bar">
+  <div class="actions-bar-inner">
+    <div class="action-btns">
+      <a class="action-btn btn-wa" id="wa-btn" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span id="wa-btn-lbl">واتساب</span>
+      </a>
+      <a class="action-btn btn-call" id="call-btn" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate" onclick="return rizqGateLink(this,event,'reasonPhone')">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
+        <span id="call-btn-lbl">اتصال مباشر</span>
+      </a>
+      <button class="action-btn btn-share" onclick="shareShowroom()" id="share-btn-lbl">📤 مشاركة</button>
+      <button class="action-btn btn-msg" onclick="rizqRequireAuth(function(){openShowroomChat()},'reasonMsg')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        <span id="msg-btn-lbl">محادثة على رزق</span>
+      </button>
+    </div>
+    <div class="showroom-rating">
+      <div class="stars">★★★★★</div>
+      <div class="rating-val" id="rating-val">4.9</div>
+      <div class="rating-cnt" id="rating-count">(87 تقييم)</div>
+    </div>
+  </div>
+</div>
+
 <!-- روابط أقسام المعرض — لا تُخفى مع topnav على الجوال -->
 <div class="page-sec-strip" role="navigation" aria-label="أقسام المعرض">
   <div class="page-sec-strip-inner">
@@ -302,49 +318,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
   </div>
 </div>
 
-<!-- شريط تواصل تحت الهيرو -->
-<div class="hub-contact-strip" role="navigation" aria-label="تواصل">
-  <div class="hub-contact-inner">
-    <a class="hub-cta hub-cta-wa" id="hub-wa-top" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span>واتساب مباشر</span>
-    </a>
-    <a class="hub-cta hub-cta-mail" id="hub-email-top" href="mailto:" onclick="return rizqGateLink(this,event,'reasonGeneric')">
-      <span class="hub-cta-ico" aria-hidden="true">📧</span>
-      <span>إرسال إيميل</span>
-    </a>
-    <a class="hub-cta hub-cta-call" id="hub-call-top" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate" onclick="return rizqGateLink(this,event,'reasonPhone')">
-      <span class="hub-cta-ico" aria-hidden="true">📞</span>
-      <span>اتصال مباشر</span>
-    </a>
-  </div>
-</div>
 
-<!-- ══ ACTIONS BAR ══ -->
-<div class="actions-bar">
-  <div class="actions-bar-inner">
-    <div class="action-btns">
-      <button class="action-btn btn-msg" onclick="rizqRequireAuth(function(){openShowroomChat()},'reasonMsg')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
-        <span id="msg-btn-lbl">محادثة على رزق</span>
-      </button>
-      <a class="action-btn btn-wa" id="wa-btn" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        <span id="wa-btn-lbl">واتساب</span>
-      </a>
-      <a class="action-btn btn-call" id="call-btn" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate" onclick="return rizqGateLink(this,event,'reasonPhone')">
-        <span>📞</span>
-        <span id="call-btn-lbl">اتصال مباشر</span>
-      </a>
-      <button class="action-btn btn-share" onclick="shareShowroom()" id="share-btn-lbl">📤 مشاركة</button>
-    </div>
-    <div class="showroom-rating">
-      <div class="stars">★★★★★</div>
-      <div class="rating-val" id="rating-val">4.9</div>
-      <div class="rating-cnt" id="rating-count">(87 تقييم)</div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ MAIN ══ -->
 <div class="main-wrap">
@@ -818,15 +792,13 @@ function applyAccountData(){
     var phoneEl = document.getElementById('info-phone');
     if(phoneEl) phoneEl.textContent = _acc.phone;
     var waNum = String(_acc.whatsapp || _acc.phone).replace(/\D/g,'');
-    ['wa-btn','hub-wa-top'].forEach(function(id){ var el=document.getElementById(id); if(el && waNum) el.href = 'https://wa.me/'+waNum; });
+    ['wa-btn'].forEach(function(id){ var el=document.getElementById(id); if(el && waNum) el.href = 'https://wa.me/'+waNum; });
     var telNum = String(_acc.phone).replace(/\s/g,'');
-    ['call-btn','hub-call-top'].forEach(function(id){ var el=document.getElementById(id); if(el && telNum) el.href = 'tel:'+telNum; });
+    ['call-btn'].forEach(function(id){ var el=document.getElementById(id); if(el && telNum) el.href = 'tel:'+telNum; });
   }
   if(_acc.email){
     var em = document.getElementById('info-email');
     if(em) em.textContent = _acc.email;
-    var mailTop = document.getElementById('hub-email-top');
-    if(mailTop) mailTop.href = 'mailto:' + _acc.email;
   }
   if(_acc.address){
     var _iaEl = document.getElementById('info-address');

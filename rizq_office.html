@@ -186,8 +186,7 @@ a{text-decoration:none;color:inherit}
 
 body.rizq-empty-office .office-meta,
 body.rizq-empty-office .stats-strip,
-body.rizq-empty-office .page-sec-strip,
-body.rizq-empty-office .hub-contact-strip{display:none!important}
+body.rizq-empty-office .page-sec-strip{display:none!important}
 body.rizq-empty-office .action-btns > :not(#act-browse-offices){display:none!important}
 body.rizq-empty-office #act-browse-offices{display:inline-flex!important}
 body.rizq-empty-office .rating-inline{display:none!important}
@@ -207,36 +206,28 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .page-sec-strip-inner::-webkit-scrollbar{display:none}
 .page-sec-btn{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(14,116,144,.35);color:#67e8f9;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
 .page-sec-btn:hover{background:rgba(14,116,144,.2);border-color:rgba(103,232,249,.5)}
-.actions-bar{background:linear-gradient(135deg,#0F2347,#06111C);border-bottom:1px solid rgba(14,116,144,.3);padding:14px 20px}
+.actions-bar{background:linear-gradient(135deg,#0F2347,#0D1B2A);border-bottom:1px solid rgba(201,168,76,.28);padding:14px 20px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media(max-width:800px){.actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}}
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .act-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;transition:all .25s;text-decoration:none;font-family:inherit;border:none}
 .act-btn svg{width:16px;height:16px;flex-shrink:0}
 .act-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
-.act-wa:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,211,102,.35)}
-.act-call{background:linear-gradient(135deg,#0e7490,#134e6f);color:#fff}
-.act-call:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(14,116,144,.35)}
-.act-chat{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
-.act-chat:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
-.act-share{background:rgba(255,255,255,.08);color:#e8eef8;border:1px solid rgba(255,255,255,.15)}
-.act-share:hover{background:rgba(255,255,255,.14)}
+.act-wa:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.35)}
+.act-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.act-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
+.act-share{background:transparent;color:#e8eef8;border:1.5px solid rgba(255,255,255,.35)}
+.act-share:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.55)}
+.act-chat{background:transparent;color:#E8C96A;border:1.5px solid rgba(201,168,76,.75)}
+.act-chat:hover{background:rgba(201,168,76,.12);border-color:#E8C96A}
+.act-browse{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.act-browse:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
 .rating-inline{display:flex;align-items:center;gap:8px}
 .ri-stars{color:#F5A623;font-size:14px;letter-spacing:1px}
 .ri-val{font-size:20px;font-weight:900;color:#fff}
 .ri-cnt{font-size:11px;color:rgba(255,255,255,.5)}
 
 
-/* ── شريط تواصل تحت الهيرو (واتساب / إيميل / اتصال) ── */
-.hub-contact-strip{background:#fff;border-bottom:1px solid #e7ecf3;padding:14px 20px;box-shadow:0 6px 18px rgba(15,35,65,.06);position:relative;z-index:5}
-.hub-contact-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.hub-cta{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;border-radius:12px;font-size:14px;font-weight:800;font-family:inherit;text-decoration:none;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;width:100%;box-sizing:border-box}
-.hub-cta:hover{transform:translateY(-1px)}
-.hub-cta-wa{background:linear-gradient(135deg,#128C7E,#25D366);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.28)}
-.hub-cta-mail{background:#E8F4FF;color:#0369a1;border:1.5px solid #7dd3fc;box-shadow:0 4px 12px rgba(3,105,161,.1)}
-.hub-cta-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;box-shadow:0 4px 14px rgba(15,35,71,.22)}
-.hub-cta svg,.hub-cta .hub-cta-ico{width:18px;height:18px;flex-shrink:0;font-size:16px;line-height:1}
-@media(max-width:700px){.hub-contact-inner{grid-template-columns:1fr}}
 
 /* ════════ MAIN LAYOUT ════════ */
 .main-wrap{max-width:1140px;margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:1fr 310px;gap:26px}
@@ -646,48 +637,10 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <div class="hero-scroll-cue">⌄</div>
 </div>
 
-<div class="page-sec-strip" role="navigation" aria-label="أقسام المكتب">
-  <div class="page-sec-strip-inner">
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('reviews-section')&&document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})">التقييمات</button>
-    <button type="button" class="page-sec-btn" onclick="document.getElementById('office-packages')&&document.getElementById('office-packages').scrollIntoView({behavior:'smooth'})">الباقات</button>
-  </div>
-</div>
-
-<!-- شريط تواصل تحت الهيرو -->
-<div class="hub-contact-strip" role="navigation" aria-label="تواصل">
-  <div class="hub-contact-inner">
-    <a class="hub-cta hub-cta-wa" id="hub-wa-top" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span>واتساب مباشر</span>
-    </a>
-    <a class="hub-cta hub-cta-mail" id="hub-email-top" href="mailto:" onclick="return rizqGateLink(this,event,'reasonGeneric')">
-      <span class="hub-cta-ico" aria-hidden="true">📧</span>
-      <span>إرسال إيميل</span>
-    </a>
-    <a class="hub-cta hub-cta-call" id="hub-call-top" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate" onclick="return rizqGateLink(this,event,'reasonPhone')">
-      <span class="hub-cta-ico" aria-hidden="true">📞</span>
-      <span>اتصال مباشر</span>
-    </a>
-  </div>
-</div>
-
-<!-- ════ STATS STRIP ════ -->
-<div class="stats-strip">
-  <div class="stats-strip-inner">
-    <div class="stat-blk"><div class="stat-num" id="stat-svcs">—</div><div class="stat-lbl" id="stat-svcs-lbl" data-t="stat-svcs-lbl">أنواع خدمات</div></div>
-    <div class="stat-blk"><div class="stat-num" id="stat-clients">—</div><div class="stat-lbl" id="stat-clients-lbl" data-t="stat-clients-lbl">زبون راضٍ</div></div>
-    <div class="stat-blk"><div class="stat-num" id="stat-exp">—</div><div class="stat-lbl" id="stat-exp-lbl" data-t="stat-exp-lbl">سنة خبرة</div></div>
-    <div class="stat-blk"><div class="stat-num">—</div><div class="stat-lbl" id="stat-resp-lbl" data-t="stat-resp-lbl">استجابة سريعة</div></div>
-  </div>
-</div>
-
-<!-- ════ ACTIONS BAR ════ -->
+<!-- ════ ACTIONS BAR — مباشرة تحت الهيرو مثل المحل ════ -->
 <div class="actions-bar">
   <div class="actions-bar-inner">
     <div class="action-btns">
-      <a class="act-btn act-chat" id="act-browse-offices" href="rizq_landing_v8.html#virtual-offices" data-t="act-browse-offices">تصفّح المكاتب</a>
       <a class="act-btn act-wa" id="act-wa-top" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         <span id="act-wa-top-lbl" data-t="act-wa-top-lbl">واتساب</span>
@@ -701,6 +654,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         <span data-t="btn-chat">محادثة على رزق</span>
       </button>
+      <a class="act-btn act-browse" id="act-browse-offices" href="rizq_landing_v8.html#virtual-offices" data-t="act-browse-offices">تصفّح المكاتب</a>
     </div>
     <div class="rating-inline">
       <div class="ri-stars">★★★★★</div>
@@ -709,6 +663,27 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     </div>
   </div>
 </div>
+
+<div class="page-sec-strip" role="navigation" aria-label="أقسام المكتب">
+  <div class="page-sec-strip-inner">
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('reviews-section')&&document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})">التقييمات</button>
+    <button type="button" class="page-sec-btn" onclick="document.getElementById('office-packages')&&document.getElementById('office-packages').scrollIntoView({behavior:'smooth'})">الباقات</button>
+  </div>
+</div>
+
+
+<!-- ════ STATS STRIP ════ -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stat-blk"><div class="stat-num" id="stat-svcs">—</div><div class="stat-lbl" id="stat-svcs-lbl" data-t="stat-svcs-lbl">أنواع خدمات</div></div>
+    <div class="stat-blk"><div class="stat-num" id="stat-clients">—</div><div class="stat-lbl" id="stat-clients-lbl" data-t="stat-clients-lbl">زبون راضٍ</div></div>
+    <div class="stat-blk"><div class="stat-num" id="stat-exp">—</div><div class="stat-lbl" id="stat-exp-lbl" data-t="stat-exp-lbl">سنة خبرة</div></div>
+    <div class="stat-blk"><div class="stat-num">—</div><div class="stat-lbl" id="stat-resp-lbl" data-t="stat-resp-lbl">استجابة سريعة</div></div>
+  </div>
+</div>
+
 
 <!-- ════ MAIN ════ -->
 <div class="main-wrap">
@@ -1396,7 +1371,7 @@ function openMaps(){
       if(locked || (!phone && !email && !wa)){
         setText('contact-info-phone', '📞 ••• ••• •••');
         setText('contact-info-email', '✉️ •••@•••.•••');
-        ['sb-wa','act-wa-top','sticky-wa','hub-wa-top','sb-call','act-call-top','sticky-call','hub-call-top','sb-email','hub-email-top'].forEach(function(btnId){
+        ['sb-wa','act-wa-top','sticky-wa','sb-call','act-call-top','sticky-call','sb-email'].forEach(function(btnId){
           var el = document.getElementById(btnId);
           if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
         });
@@ -1407,20 +1382,17 @@ function openMaps(){
         var waNum = String(waSrc).replace(/[^0-9]/g,'');
         setHref('sb-wa', 'https://wa.me/' + waNum);
         setHref('act-wa-top', 'https://wa.me/' + waNum);
-        setHref('hub-wa-top', 'https://wa.me/' + waNum);
         setHref('sticky-wa', 'https://wa.me/' + waNum);
       }
       if(phone){
         var telNum = String(phone).replace(/\s/g,'');
         setHref('sb-call', 'tel:' + telNum);
         setHref('act-call-top', 'tel:' + telNum);
-        setHref('hub-call-top', 'tel:' + telNum);
         setHref('sticky-call', 'tel:' + telNum);
         setText('contact-info-phone', '📞 ' + phone);
       }
       if(email){
         setHref('sb-email', 'mailto:' + email);
-        setHref('hub-email-top', 'mailto:' + email);
         setText('contact-info-email', '✉️ ' + email);
       }
     }
