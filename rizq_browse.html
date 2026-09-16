@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=18.5"/>
+  <link rel="stylesheet" href="rizq_header.css?v=18.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -859,11 +859,18 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_contact_gate.js" defer></script>
 <script>
 (function(){
-  function syncBrowseDeskNav(){
-    if(window.innerWidth<769) return;
-    var desk=document.getElementById('rizq-desk-nav');
+  function syncBrowseNavForViewport(){
     var nav=document.querySelector('body>nav:not(#rizq-desk-nav)');
-    if(!desk||!nav||!nav.querySelector('.nav-search')) return;
+    if(!nav||!nav.querySelector('.nav-search')) return;
+    var desk=document.getElementById('rizq-desk-nav');
+    var mobile=window.innerWidth<769
+      || (window.matchMedia && window.matchMedia('(max-width:768px)').matches);
+    if(mobile){
+      document.documentElement.classList.remove('has-rizq-desk-nav');
+      if(window.RizqHeader&&typeof window.RizqHeader.inject==='function') window.RizqHeader.inject();
+      return;
+    }
+    if(!desk) return;
     document.documentElement.classList.add('rizq-app-nav','has-rizq-desk-nav');
     ['.logo','.nav-actions','.nav-disclaimer','#lang-btn'].forEach(function(sel){
       var el=nav.querySelector(sel);
@@ -875,10 +882,11 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     nav.style.setProperty('box-shadow','none','important');
     nav.style.setProperty('backdrop-filter','none','important');
   }
-  function run(){ syncBrowseDeskNav(); }
+  function run(){ syncBrowseNavForViewport(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
   else run();
   window.addEventListener('load',run);
+  window.addEventListener('resize',function(){ run(); });
   try{
     new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
   }catch(e){}

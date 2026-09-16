@@ -13,7 +13,7 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v14.2';
+var CACHE_NAME = 'rizq-cache-v14.3';
 var CORE_ASSETS = [
   'rizq-theme.css',
   'rizq_header.css',

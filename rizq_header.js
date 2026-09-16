@@ -1150,12 +1150,16 @@
     ensureActiveNavListeners();
     if (!isMobileNav()) {
       removeHeader();
-      if (!isLanding() && !isDashPage() && !document.getElementById('rizq-desk-nav')) {
-        document.body.insertAdjacentHTML('afterbegin', deskNavHtml());
+      if (!isLanding() && !isDashPage()) {
+        if (!document.getElementById('rizq-desk-nav')) {
+          document.body.insertAdjacentHTML('afterbegin', deskNavHtml());
+        }
         document.documentElement.classList.add('has-rizq-desk-nav');
         bindDeskNav();
         ensureLangListener();
         applyLabels();
+      } else {
+        removeDeskNav();
       }
       if (!isDashPage()) {
         ensureMediatorPill();
