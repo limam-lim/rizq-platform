@@ -147,73 +147,70 @@ a{text-decoration:none;color:inherit}
 }
 .nav-lang-btn:hover{background:rgba(201,168,76,.15)}
 
-/* ════════ HERO — مضغوط: أقل مساحة زرقاء ════════ */
+/* ════════ HERO ════════ */
 .hero{
   background:linear-gradient(145deg,var(--navy3) 0%,var(--navy2) 45%,#143060 100%);
-  padding:18px 24px 14px;position:relative;overflow:hidden;min-height:0;height:auto;
+  padding:56px 24px 0;position:relative;overflow:hidden;
 }
 .hero::before{
   content:'';position:absolute;inset:0;
   background-image:
-    linear-gradient(rgba(201,168,76,.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(201,168,76,.05) 1px,transparent 1px);
-  background-size:50px 50px;pointer-events:none;opacity:.55;
+    linear-gradient(rgba(201,168,76,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(201,168,76,.06) 1px,transparent 1px);
+  background-size:50px 50px;pointer-events:none;
 }
-.hero-orb1{position:absolute;top:-80px;right:-80px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(14,116,144,.18),transparent 65%);pointer-events:none}
-.hero-orb2{position:absolute;bottom:-60px;left:15%;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 65%);pointer-events:none}
-.hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:center;position:relative;z-index:2}
+.hero-orb1{position:absolute;top:-120px;right:-120px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(14,116,144,.2),transparent 65%);pointer-events:none}
+.hero-orb2{position:absolute;bottom:-80px;left:20%;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 65%);pointer-events:none}
+.hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:48px;align-items:end;position:relative;z-index:2}
 
 .verified-badge{
   display:inline-flex;align-items:center;gap:8px;
   background:rgba(14,116,144,.2);border:1px solid rgba(8,145,178,.4);
-  border-radius:30px;padding:5px 12px;font-size:11.5px;color:#67e8f9;
-  font-weight:700;letter-spacing:.5px;margin-bottom:8px;
+  border-radius:30px;padding:7px 18px;font-size:12px;color:#67e8f9;
+  font-weight:700;letter-spacing:.5px;margin-bottom:20px;
 }
-.hero-title{font-size:clamp(22px,3vw,30px);font-weight:900;color:#fff;line-height:1.2;margin-bottom:8px}
+.hero-title{font-size:clamp(28px,4vw,46px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:14px}
 .hero-title .gold-txt{background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-desc{font-size:13px;color:rgba(255,255,255,.7);line-height:1.65;max-width:520px;margin-bottom:10px}
-.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.hero-desc{font-size:14.5px;color:rgba(255,255,255,.62);line-height:1.9;max-width:500px;margin-bottom:28px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:30px}
 .hero-tag{
   display:inline-flex;align-items:center;gap:6px;
   background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
-  border-radius:30px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,.75);transition:all .25s;
+  border-radius:30px;padding:7px 16px;font-size:12.5px;color:rgba(255,255,255,.75);transition:all .25s;
 }
 .hero-tag.teal{background:rgba(14,116,144,.18);border-color:rgba(8,145,178,.35);color:#67e8f9}
 .hero-tag.gold{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.32);color:var(--gold2)}
-.rating-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.stars-hero{color:var(--gold2);font-size:16px;letter-spacing:2px;text-shadow:0 2px 8px rgba(201,168,76,.4)}
-.rating-big{font-size:20px;font-weight:900;color:#fff}
-.rating-sub{font-size:12px;color:rgba(255,255,255,.68)}
+.rating-strip{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.stars-hero{color:var(--gold2);font-size:22px;letter-spacing:3px;text-shadow:0 2px 8px rgba(201,168,76,.4)}
+.rating-big{font-size:28px;font-weight:900;color:#fff}
+.rating-sub{font-size:13px;color:rgba(255,255,255,.68)}
 
 .hero-card{
   background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.22);
-  border-radius:16px;backdrop-filter:blur(16px);padding:14px 14px;
+  border-radius:20px 20px 0 0;backdrop-filter:blur(16px);padding:28px 22px;
 }
 .hc-logo{
-  width:52px;height:52px;border-radius:14px;
+  width:82px;height:82px;border-radius:22px;
   background:linear-gradient(145deg,rgba(14,116,144,.3),rgba(14,116,144,.08));
   border:2px solid rgba(8,145,178,.4);
   display:flex;align-items:center;justify-content:center;
-  font-size:24px;margin:0 auto 10px;
+  font-size:36px;margin:0 auto 16px;
   box-shadow:0 8px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
 }
-.hc-name{font-size:14px;font-weight:800;color:#fff;text-align:center;margin-bottom:4px}
-.hc-type{font-size:11px;color:var(--gold2);text-align:center;margin-bottom:10px;background:rgba(201,168,76,.12);display:inline-block;padding:3px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.25);width:100%}
-.hc-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border-radius:10px;padding:8px 10px;margin-bottom:6px;border:1px solid rgba(255,255,255,.06);transition:background .2s}
+.hc-name{font-size:16px;font-weight:800;color:#fff;text-align:center;margin-bottom:5px}
+.hc-type{font-size:11.5px;color:var(--gold2);text-align:center;margin-bottom:20px;background:rgba(201,168,76,.12);display:inline-block;padding:3px 14px;border-radius:20px;border:1px solid rgba(201,168,76,.25);width:100%}
+.hc-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border-radius:12px;padding:11px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);transition:background .2s}
 .hc-row:hover{background:rgba(255,255,255,.09)}
-.hc-val{font-size:14px;font-weight:800;color:#fff}
+.hc-val{font-size:16px;font-weight:800;color:#fff}
 .hc-lbl{font-size:11px;color:rgba(255,255,255,.68);margin-top:2px}
-.hc-icon{font-size:15px;opacity:.8}
+.hc-icon{font-size:18px;opacity:.8}
 
-/* Empty office: أقصر شريط كحلي — بدون بانر فوق الهيرو */
-body.rizq-empty-office .hero{padding:14px 24px 12px}
+/* Empty office: hide scaffold only — keep original navy hero proportions */
 body.rizq-empty-office .hero-card{display:none}
 body.rizq-empty-office .hero-inner{grid-template-columns:1fr;gap:0}
 body.rizq-empty-office .hero-tags,
 body.rizq-empty-office .rating-strip,
 body.rizq-empty-office .stats-strip{display:none!important}
-body.rizq-empty-office .hero-title{font-size:clamp(20px,2.8vw,26px);margin-bottom:6px}
-body.rizq-empty-office .hero-desc{margin-bottom:10px;max-width:640px}
 body.rizq-empty-office .action-btns > :not(#act-browse-offices){display:none!important}
 body.rizq-empty-office #act-browse-offices{display:inline-flex!important}
 body.rizq-empty-office .rating-inline{display:none!important}
