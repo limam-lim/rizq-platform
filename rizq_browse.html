@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=17.5"/>
+  <link rel="stylesheet" href="rizq_header.css?v=18.5"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -33,6 +33,33 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;c
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 a{text-decoration:none;color:inherit}
 select option{background:#fff!important;color:#1a2535!important}
+
+/* Critical: one desk nav + search strip only (survives stale CSS cache) */
+@media (min-width:769px){
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .logo,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .nav-actions,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .nav-disclaimer,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) #lang-btn,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .logo,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-actions,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-disclaimer,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) #lang-btn{
+    display:none!important;
+  }
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav):has(.nav-search),
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search){
+    position:relative!important;top:auto!important;inset:auto!important;
+    height:56px!important;max-height:56px!important;z-index:20!important;
+    display:flex!important;align-items:center;justify-content:center;gap:12px;
+    padding:8px 24px!important;background:#fff!important;
+    border-bottom:1px solid #e2e8f5!important;box-shadow:none!important;
+    backdrop-filter:none!important;
+  }
+  html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .nav-search,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-search{
+    flex:1 1 auto!important;max-width:720px!important;margin:0 auto;
+  }
+}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(201,168,76,.12);height:62px;display:flex;align-items:center;padding:0 4%;gap:16px;direction:ltr;justify-content:flex-start}
@@ -81,7 +108,7 @@ nav .nav-disclaimer{flex-shrink:0}
 .mtab.active{color:var(--gold-dk);border-bottom-color:var(--gold)}
 
 /* BROWSE LAYOUT */
-.browse-wrap{display:flex;overflow:hidden}
+.browse-wrap{display:flex;height:calc(100vh - 62px - 41px);overflow:hidden}
 .browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1}
 /* browse-right: hidden by default, shown only when an ad is selected */
 .browse-right{display:none;overflow-y:auto;background:#f8faff;min-width:0}
@@ -830,6 +857,33 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
+<script>
+(function(){
+  function syncBrowseDeskNav(){
+    if(window.innerWidth<769) return;
+    var desk=document.getElementById('rizq-desk-nav');
+    var nav=document.querySelector('body>nav:not(#rizq-desk-nav)');
+    if(!desk||!nav||!nav.querySelector('.nav-search')) return;
+    document.documentElement.classList.add('rizq-app-nav','has-rizq-desk-nav');
+    ['.logo','.nav-actions','.nav-disclaimer','#lang-btn'].forEach(function(sel){
+      var el=nav.querySelector(sel);
+      if(el) el.style.setProperty('display','none','important');
+    });
+    nav.style.setProperty('position','relative','important');
+    nav.style.setProperty('height','56px','important');
+    nav.style.setProperty('background','#fff','important');
+    nav.style.setProperty('box-shadow','none','important');
+    nav.style.setProperty('backdrop-filter','none','important');
+  }
+  function run(){ syncBrowseDeskNav(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
+  else run();
+  window.addEventListener('load',run);
+  try{
+    new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
