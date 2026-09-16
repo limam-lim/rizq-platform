@@ -5222,11 +5222,8 @@ function loadModerationPanel(){
   var idsEmpty = document.getElementById('mod-ids-empty');
   if(pendingIds.length === 0){
     idsList.innerHTML = '';
-    // Show static demo card so admin can see panel design
-    idsEmpty.style.display = 'none';
-    idsList.innerHTML = _buildDemoIdCard('demo-static-1',RizqI18n.t2('فاطمة بنت إبراهيم','Fatima Bint Ibrahim'),'🏪 '+RizqI18n.t2('محل','Boutique'),RizqI18n.t2('نواكشوط الشمالية','Nouakchott Nord'),'+222 36 12 34 56') +
-      _buildDemoIdCard('demo-static-2',RizqI18n.t2('محمد أحمد ولد سيدي','Mohamed Ahmed Ould Sidi'),'🏢 '+RizqI18n.t2('مكتب','Bureau'),RizqI18n.t2('نواذيبو','Nouadhibou'),'+222 22 98 76 54');
-    document.getElementById('mod-ids-count').textContent = '2 ('+RizqI18n.t2('تجريبي','démo')+')';
+    idsEmpty.style.display = 'block';
+    document.getElementById('mod-ids-count').textContent = '0';
   } else {
     idsEmpty.style.display = 'none';
     var _modLoc = (window.RizqI18n && RizqI18n.getLang()==='fr') ? 'fr-FR' : 'ar-MR-u-nu-latn';

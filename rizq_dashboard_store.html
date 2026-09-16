@@ -2449,16 +2449,8 @@ function _rizqRenderAdsStatus(acc){
 
 
 
-function handleRenewalUpload(input){
-  const file = input.files[0]; if(!file) return;
-  renewalFile = file;
-  const zone = document.getElementById('renewal-zone');
-  zone.innerHTML=`<div style="font-size:28px;margin-bottom:6px">✅</div><p style="color:#10b981;font-size:13px;font-weight:700">${escapeHtml(file.name)}</p><p style="font-size:11px;color:var(--text-muted)">${Math.round(file.size/1024)} KB</p><input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>`;
-  zone.classList.add('has-file');
-}
-
+function handleRenewalUpload(){ /* removed — use packages payment flow */ }
 function submitRenewal(){
-  // مسار التجديد الوهمي (localStorage فقط) أُبطل — وجّه المستخدم للباقات الحقيقية.
   var el = document.getElementById('packages-display');
   if(el) el.scrollIntoView({behavior:'smooth'});
   else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'),'error');

@@ -895,16 +895,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     <div class="logo-mark" onclick="event.stopPropagation();openRizqPromo()" style="cursor:pointer;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
   </a>
   <div class="nav-search rizq-sugg-host">
-    <select id="nav-cat-select" onchange="filterByCat(this.value);renderCatSidebar(normalizeCat(this.value))">
+    <select id="nav-cat-select" onchange="filterByCat(this.value);renderCatSidebar(normalizeCat(this.value))" aria-label="القسم">
       <option value="" data-t="all-cats">كل الأقسام</option>
-      <option value="عقارات" data-ar="🏠 عقارات" data-fr="🏠 Immobilier">🏠 عقارات</option>
-      <option value="سيارات" data-ar="🚗 سيارات" data-fr="🚗 Voitures">🚗 سيارات</option>
-      <option value="شاحنات" data-ar="🚛 شاحنات" data-fr="🚛 Camions">🚛 شاحنات</option>
-      <option value="إلكترونيات" data-ar="📱 إلكترونيات" data-fr="📱 Électronique">📱 إلكترونيات</option>
-      <option value="ذهب" data-ar="🪙 ذهب" data-fr="🪙 Or & Bijoux">🪙 ذهب</option>
-      <option value="أزياء" data-ar="👗 أزياء" data-fr="👗 Mode">👗 أزياء</option>
-      <option value="ماشية" data-ar="🐄 ماشية" data-fr="🐄 Bétail">🐄 ماشية</option>
-      <option value="خدمات" data-ar="🔧 خدمات" data-fr="🔧 Services">🔧 خدمات</option>
     </select>
     <input type="text" id="nav-search-input" placeholder="ابحث في رزق..." data-t-ph="nav-search-ph" data-ph="nav-search-ph"/>
     <button class="nav-search-btn" onclick="doSearch()">🔍</button>
@@ -1499,6 +1491,27 @@ const TRANSLATIONS = {
 };
 
 function _t(key){const l=_rizqLang();return (TRANSLATIONS[l]&&TRANSLATIONS[l][key])||TRANSLATIONS['ar'][key]||key;}
+function rebuildNavCatSelect(){
+  const sel=document.getElementById('nav-cat-select');
+  if(!sel) return;
+  const l=_rizqLang();
+  const isAr=l!=='fr';
+  const allLabel=_t('all-cats')||(isAr?'كل الأقسام':'Toutes catégories');
+  const prev=sel.value;
+  let html='<option value="" data-t="all-cats">'+allLabel+'</option>';
+  if(typeof RizqCategories!=='undefined'&&RizqCategories.BUILTIN){
+    RizqCategories.BUILTIN.forEach(function(c){
+      const label=isAr?c.nameAr:c.nameFr;
+      html+='<option value="'+String(c.key).replace(/"/g,'&quot;')+'">'+c.icon+' '+label+'</option>';
+    });
+  }
+  sel.innerHTML=html;
+  if(prev){
+    const match=[...sel.options].find(o=>normalizeCat(o.value)===normalizeCat(prev)||o.value===prev);
+    if(match) sel.value=match.value;
+  }
+  sel.setAttribute('aria-label', isAr?'القسم':'Catégorie');
+}
 function applyLang(){
   const l=_rizqLang();
   document.documentElement.lang=l;
@@ -1516,10 +1529,7 @@ function applyLang(){
   document.querySelectorAll('#wilaya-select option[data-ar]').forEach(o=>{
     o.textContent=l==='fr'?(o.dataset.fr||o.dataset.ar):o.dataset.ar;
   });
-  // Update category select options
-  document.querySelectorAll('#nav-cat-select option[data-ar]').forEach(o=>{
-    o.textContent=l==='fr'?(o.dataset.fr||o.dataset.ar):o.dataset.ar;
-  });
+  rebuildNavCatSelect();
   // Re-render if needed
   if(filtered.length) renderResultList();
   // Update nav-disclaimer text on every lang apply (initial load + toggle)
@@ -2630,7 +2640,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 16 sections, 120+ branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 22 sections, 268 branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px" data-t-fr="Réseaux supportés :">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -2691,7 +2701,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     c1:"🏠 Immobilier",c2:"🚗 Voitures et pièces",c3:"🚛 Camions et engins",c4:"📱 Téléphones & électronique",c5:"🐄 Bétail et animaux",
@@ -2701,7 +2711,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     c1:"🏠 منازل وعقارات",c2:"🚗 سيارات وقطع غيار",c3:"🚛 شاحنات ومعدات",c4:"📱 هواتف وإلكترونيات",c5:"🐄 ماشية وحيوانات",

@@ -1852,7 +1852,8 @@ function renderSubPanel(){
   // بعكس ما توحي به رسالة "سيتم مراجعته"). أُبطل تفعيله؛ التجديد الحقيقي
   // الوحيد الآن هو مسار packages-display/openPayModal/submitPayment الذي
   // يرسل فعلاً عبر RizqSub.submitSubscriptionRequest ويصل لطابور مراجعة حقيقي.
-  document.getElementById('renewal-section').style.display='none';
+  var _rs=document.getElementById('renewal-section');
+  if(_rs) _rs.style.display='none';
 }
 
 function renderMyInvoices(){

@@ -817,31 +817,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
       </div>
       <div id="office-reviews-body">
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv1-avatar" data-t="rv1-avatar">م</div>
-          <div><div class="rv-name" id="rv1-name" data-t="rv1-name">محمد أحمد</div><div class="rv-date" id="rv1-date" data-t="rv1-date">منذ أسبوع</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <div class="rv-text" id="rv1-text" data-t="rv1-text">خدمة ممتازة وسريعة، أنجزت وثيقة التأمين في أقل من ساعة. الفريق محترف جداً وسأعود دائماً.</div>
-      </div>
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv2-avatar" data-t="rv2-avatar">ف</div>
-          <div><div class="rv-name" id="rv2-name" data-t="rv2-name">فاطمة إدوم</div><div class="rv-date" id="rv2-date" data-t="rv2-date">منذ شهر</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <div class="rv-text" id="rv2-text" data-t="rv2-text">تعامل راقٍ وأسعار منافسة. ساعدوني في ملف التعويض بعد حادث وتابعوه معي حتى النهاية.</div>
-      </div>
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv3-avatar" data-t="rv3-avatar">ب</div>
-          <div><div class="rv-name" id="rv3-name" data-t="rv3-name">بكر ولد سيدي</div><div class="rv-date" id="rv3-date" data-t="rv3-date">منذ شهرين</div></div>
-          <div class="rv-stars">★★★★☆</div>
-        </div>
-        <div class="rv-text" id="rv3-text" data-t="rv3-text">عملت معهم لتأمين أسطول شاحناتي الثلاث. احترافية عالية وتقييم دقيق للاحتياجات.</div>
-      </div>
-      <button style="margin-top:14px;width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--teal2);color:var(--teal2);background:transparent;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:all .25s" onmouseover="this.style.background='rgba(14,116,144,.07)'" onmouseout="this.style.background='transparent'" onclick="showToast((window.RizqI18n?RizqI18n.getLang():'ar')==='ar'?'⭐ التقييمات معروضة في الصفحة':'⭐ Les avis sont affichés sur la page')" id="reviews-all-btn" data-t="reviews-all-btn">عرض جميع التقييمات ←</button>
+        <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
       </div>
     </div>
 
@@ -866,58 +842,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <span id="mru-note" style="font-size:11px;color:#3a5080;display:flex;align-items:center;gap:6px;margin-right:8px;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:2px 8px;border-radius:5px;font-weight:800;font-size:10px;letter-spacing:.5px">MRU</span><span id="mru-note-text" data-t="mru-note-text">الأوقية الجديدة — العملة الرسمية لموريتانيا · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></span>
       </div>
       <div class="svc-list" id="svc-list">
-        <!-- JS will inject from localStorage if available, else show defaults below -->
-        <div class="svc-item featured">
-          <div class="svc-icon icon-gold">🚗</div>
-          <div class="svc-body">
-            <div class="svc-title-row">
-              <div class="svc-name" id="svc1-name" data-t="svc1-name">تأمين السيارات الخاصة</div>
-              <span class="svc-hot" id="svc1-hot" data-t="svc1-hot">⚡ الأكثر طلباً</span>
-            </div>
-            <div class="svc-desc" id="svc1-desc" data-t="svc1-desc">جميع أنواع التأمين — شامل، أطراف ثالثة، إضافي. معالجة فورية للوثائق وإصدار مباشر من المكتب.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc1-price" data-t="svc1-price">من 8,000 MRU</span><span class="svc-tag" id="svc1-tag" data-t="svc1-tag">⚡ إصدار فوري</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-navy">🚛</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc2-name" data-t="svc2-name">تأمين الشاحنات والنقل الثقيل</div>
-            <div class="svc-desc" id="svc2-desc" data-t="svc2-desc">تأمين أساطيل الشاحنات وسيارات النقل الثقيل مع تغطية شاملة وأسعار تنافسية.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc2-price" data-t="svc2-price">من 22,000 MRU</span><span class="svc-tag" id="svc2-tag" data-t="svc2-tag">📋 وثيقة شاملة</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-teal">⚙️</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc3-name" data-t="svc3-name">تأمين الآلات والمعدات الثقيلة</div>
-            <div class="svc-desc" id="svc3-desc" data-t="svc3-desc">حماية كاملة لمعدات البناء والمقاولات — ضد الحريق، السرقة، والأضرار الميكانيكية.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc3-price" data-t="svc3-price">من 35,000 MRU</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-green">🔄</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc4-name" data-t="svc4-name">تجديد رخص التسيير والتأمين</div>
-            <div class="svc-desc" id="svc4-desc" data-t="svc4-desc">تجديد سريع لجميع الوثائق دون انتظار — خدمة منزلية متاحة عند الطلب.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc4-price" data-t="svc4-price">حسب النوع</span><span class="svc-tag" id="svc4-tag" data-t="svc4-tag">🏠 خدمة منزلية</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-purple">📋</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc5-name" data-t="svc5-name">خبرة الأضرار ومعالجة الحوادث</div>
-            <div class="svc-desc" id="svc5-desc" data-t="svc5-desc">تقييم الأضرار، تحرير المحاضر، ومتابعة ملفات التعويض مع شركات التأمين.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc5-price" data-t="svc5-price">استشارة مجانية</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-orange">🏍️</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc6-name" data-t="svc6-name">تأمين الدراجات النارية</div>
-            <div class="svc-desc" id="svc6-desc" data-t="svc6-desc">وثائق تأمين فورية لجميع موديلات الدراجات النارية بأسعار مناسبة.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc6-price" data-t="svc6-price">من 3,500 MRU</span><span class="svc-tag" id="svc6-tag" data-t="svc6-tag">⚡ فوري</span></div>
-          </div>
-        </div>
+        <p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a" id="svc-list-empty">لا توجد خدمات معروضة بعد.</p>
       </div>
 
       <!-- ═══ مقدّر التكلفة السريع (خدمة جديدة للزائر) ═══
@@ -1315,9 +1240,23 @@ function openMaps(){
 
     function render(){
       var targetId = resolveOfficeAccount();
-      if(!targetId || !window.RizqReviews) return; // لا حساب حقيقي مطابق — نترك المحتوى التجريبي كما هو تماماً
-      window._rizqOfficeReviewsTarget = targetId;
       var fr = isFr();
+      if(!targetId || !window.RizqReviews){
+        var heroRating0 = document.getElementById('hero-rating');
+        if(heroRating0) heroRating0.textContent = '—';
+        var heroRevCnt0 = document.getElementById('hero-rev-cnt');
+        if(heroRevCnt0) heroRevCnt0.textContent = fr ? 'Pas encore noté' : 'لم يُقيَّم بعد';
+        var barRating0 = document.getElementById('bar-rating');
+        if(barRating0) barRating0.textContent = '—';
+        var barRevCnt0 = document.getElementById('bar-rev-cnt');
+        if(barRevCnt0) barRevCnt0.textContent = fr ? '(Aucun avis)' : '(بدون تقييم)';
+        var sub0 = document.getElementById('reviews-section-sub');
+        if(sub0) sub0.textContent = fr ? 'Pas encore de note' : 'لا يوجد تقييم بعد';
+        var body0 = document.getElementById('office-reviews-body');
+        if(body0) body0.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">'+(fr?"Aucun avis pour l'instant.":'لا توجد آراء حتى الآن.')+'</p>';
+        return;
+      }
+      window._rizqOfficeReviewsTarget = targetId;
       var stats = RizqReviews.getStats(targetId);
       var list  = RizqReviews.getReviews(targetId);
 
@@ -1551,6 +1490,8 @@ function openMaps(){
           });
           var svcs = document.getElementById('svc-list');
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
+          var revs = document.getElementById('office-reviews-body');
+          if(revs) revs.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">'+(isFr()?"Aucun avis pour l'instant.":'لا توجد آراء حتى الآن.')+'</p>';
           var browse = document.getElementById('act-browse-offices');
           if(browse) browse.textContent = isFr() ? 'Parcourir les bureaux' : 'تصفّح المكاتب';
           var countBadge = document.getElementById('svc-count-badge');
@@ -1623,6 +1564,16 @@ function openMaps(){
                 + services.map(function(s){ return '<option>' + esc(s.name||'') + '</option>'; }).join('');
             }
             if(typeof initCalcServices === 'function') initCalcServices(); // إعادة بناء مقدّر التكلفة من الخدمات الحقيقية
+          } else {
+            var svcListEmpty = document.getElementById('svc-list');
+            if(svcListEmpty){
+              svcListEmpty.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">'+(isFr()?'Aucun service publié pour le moment.':'لا توجد خدمات معروضة بعد.')+'</p>';
+            }
+            var countBadgeEmpty = document.getElementById('svc-count-badge');
+            if(countBadgeEmpty){ countBadgeEmpty.removeAttribute('data-t'); countBadgeEmpty.textContent = '—'; }
+            setText('stat-svcs', '—');
+            setText('ab-svcs', '—');
+            if(typeof initCalcServices === 'function') initCalcServices();
           }
         }catch(e){}
 
@@ -1912,7 +1863,7 @@ window._rizqProfile = (function() {
         <div class="rizq-promo-mark" style="pointer-events:none"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -1973,7 +1924,7 @@ window._rizqProfile = (function() {
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -1983,7 +1934,7 @@ window._rizqProfile = (function() {
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",

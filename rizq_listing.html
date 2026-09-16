@@ -23,14 +23,14 @@
   <link rel="stylesheet" href="rizq_header.css?v=17.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
-<meta name="description" content="شقة فاخرة 3 غرف للكراء في نواكشوط الغربية — 150,000 MRU/شهر. تكييف مركزي، موقف سيارات، حراسة 24/7"/>
-<meta property="og:title" content="شقة فاخرة 3 غرف — نواكشوط | رزق"/>
-<meta property="og:description" content="شقة فاخرة 3 غرف للكراء في نواكشوط الغربية — 150,000 MRU/شهر. تكييف مركزي، موقف سيارات، حراسة 24/7"/>
+<meta name="description" content="إعلان على منصة رزق"/>
+<meta property="og:title" content="إعلان | رزق"/>
+<meta property="og:description" content="إعلان على منصة رزق"/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>شقة فاخرة 3 غرف — نواكشوط | رزق</title><style>
+<title>إعلان | رزق</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
   --gold:#C9A84C;--gold-light:#e8c96a;--gold-pale:#f5e9c8;
@@ -500,7 +500,7 @@ function _trackAdListingVisit(ad){
   <a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a><span class="sep">›</span>
   <a href="rizq_browse.html" data-fr="Immobilier">منازل وعقارات</a><span class="sep">›</span>
   <a href="rizq_browse.html" data-fr="Appartements à louer">شقق للكراء</a><span class="sep">›</span>
-  <span class="cur" data-fr="Appartement de luxe 3 chambres — Nouakchott Ouest">شقة فاخرة 3 غرف — نواكشوط الغربية</span>
+  <span class="cur" id="bc-ad-title" data-fr="Annonce">إعلان</span>
 </div>
 
 <!-- ══ PAGE ══ -->
@@ -512,11 +512,11 @@ function _trackAdListingVisit(ad){
     <!-- Gallery -->
     <div class="gallery">
       <div class="gallery-main" id="gallery-main" onclick="openLightbox()">
-        <div class="gallery-badge" data-fr="⭐ En vedette">⭐ مميز</div>
+        <div class="gallery-badge" data-fr="⭐ En vedette" style="display:none">⭐ مميز</div>
         <span class="gallery-main-emoji" id="gallery-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></span>
         <button class="gallery-nav prev" onclick="event.stopPropagation();changePhoto(-1)">›</button>
         <button class="gallery-nav next" onclick="event.stopPropagation();changePhoto(1)">‹</button>
-        <div class="gallery-count" id="gallery-count">1 / 6</div>
+        <div class="gallery-count" id="gallery-count">—</div>
       </div>
       <div class="gallery-thumbs">
         <div class="thumb active" onclick="setPhoto(0,this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></div>
@@ -531,24 +531,24 @@ function _trackAdListingVisit(ad){
     <!-- Listing header -->
     <div class="listing-header">
       <div class="listing-cat">
-        <a href="rizq_browse.html" data-fr="🏠 Immobilier" data-t-fr="🏠 Immobilier">🏠 منازل وعقارات</a>
+        <a href="rizq_browse.html" data-fr="Catégorie">القسم</a>
         <span style="color:rgba(13,27,42,.2)">›</span>
-        <a href="rizq_browse.html" data-fr="Appartements à louer">شقق للكراء</a>
+        <a href="rizq_browse.html" data-fr="Sous-catégorie">فرع</a>
       </div>
-      <h1 class="listing-title" data-fr="Appartement de luxe 3 chambres — Nouakchott Ouest">شقة فاخرة 3 غرف — نواكشوط الغربية</h1>
+      <h1 class="listing-title" data-fr="Annonce">إعلان</h1>
       <div class="listing-meta-row">
-        <span class="badge badge-verified" data-fr="✅ Vérifié">✅ موثّق</span>
-        <span class="listing-loc" data-fr="📍 Nouakchott Nord — quartier Teyaret">📍 نواكشوط الشمالية — حي تيارت</span>
-        <span class="listing-date" data-fr="🕐 Il y a 2 heures">🕐 منذ ساعتين</span>
-        <span class="listing-views" id="views-count" data-fr="👁 1 247 vues">👁 1,247 مشاهدة</span>
+        <span class="badge badge-verified" data-fr="✅ Vérifié" style="display:none">✅ موثّق</span>
+        <span class="listing-loc" data-fr="📍 —">📍 —</span>
+        <span class="listing-date" data-fr="🕐 —">🕐 —</span>
+        <span class="listing-views" id="views-count" data-fr="👁 —">👁 —</span>
       </div>
     </div>
 
     <!-- Price -->
     <div class="price-box">
       <div>
-        <div class="price-main">150,000 <span style="font-size:16px;font-weight:500">MRU</span></div>
-        <div class="price-period" data-fr="Par mois — un mois d'avance">شهرياً — دفع مسبق شهر واحد</div>
+        <div class="price-main">—</div>
+        <div class="price-period" data-fr="—">—</div>
       </div>
       <div class="price-negotiate" data-fr="💬 Prix négociable">💬 السعر قابل للتفاوض</div>
     </div>
@@ -556,84 +556,26 @@ function _trackAdListingVisit(ad){
     <!-- Description -->
     <div class="section-block">
       <div class="section-block-title" data-fr="📝 Description de l'annonce">📝 وصف الإعلان</div>
-      <div class="desc-text collapsed" id="desc-text" data-fr="Appartement de luxe à louer dans le plus chic quartier de Nouakchott Ouest.
-
-Caractéristiques :
-• 3 grandes chambres avec armoires intégrées
-• Grand salon ouvert sur cuisine moderne
-• 2 salles de bain + toilettes invités
-• Climatisation centrale dans toutes les pièces
-• Vue panoramique sur la ville depuis le 4e étage
-• Place de parking privée couverte
-• Sécurité 24/7 avec caméras de surveillance
-• Internet fibre 100MB gratuit
-
-Emplacement :
-Proche des grands centres commerciaux, des écoles internationales et des hôpitaux. À 10 minutes de l'aéroport.
-
-Conditions de location :
-• Loyer : 150 000 MRU/mois
-• Caution : un mois
-• Durée du contrat : un an renouvelable
-• Disponible immédiatement">شقة فاخرة للكراء في أرقى أحياء نواكشوط الغربية.
-
-المواصفات:
-• 3 غرف نوم واسعة مع خزائن مدمجة
-• صالة كبيرة مفتوحة على المطبخ الحديث
-• 2 حمام + حمام خدم
-• تكييف مركزي في كل الغرف
-• إطلالة بانورامية على المدينة من الطابق الرابع
-• موقف سيارات خاص مغطى
-• حراسة أمنية 24/7 مع كاميرات مراقبة
-• إنترنت فيبر 100MB مجاناً
-
-الموقع:
-قريبة من المراكز التجارية الكبرى، المدارس الدولية، والمستشفيات. مسافة 10 دقائق من المطار.
-
-شروط التأجير:
-• الإيجار: 150,000 MRU/شهر
-• التأمين: شهر واحد
-• مدة العقد: سنة قابلة للتجديد
-• تسليم فوري</div>
+      <div class="desc-text collapsed" id="desc-text" data-fr="Chargement de l'annonce…">جاري تحميل الإعلان…</div>
       <button class="btn-read-more" id="read-more-btn" onclick="toggleDesc()">▾ قراءة المزيد</button>
     </div>
 
     <!-- Specs -->
     <div class="section-block">
       <div class="section-block-title" data-fr="📋 Caractéristiques">📋 المواصفات</div>
-      <div class="specs-grid" id="specs-grid">
-        <div class="spec-item"><span class="spec-icon">🛏️</span><div><div class="spec-label" data-fr="Chambres">الغرف</div><div class="spec-val" data-fr="3 chambres">3 غرف نوم</div></div></div>
-        <div class="spec-item"><span class="spec-icon">🚿</span><div><div class="spec-label" data-fr="Salles de bain">الحمامات</div><div class="spec-val" data-fr="2 + toilettes invités">2 + حمام خدم</div></div></div>
-        <div class="spec-item"><span class="spec-icon">📐</span><div><div class="spec-label" data-fr="Surface">المساحة</div><div class="spec-val" data-fr="145 m²">145 م²</div></div></div>
-        <div class="spec-item"><span class="spec-icon">🏢</span><div><div class="spec-label" data-fr="Étage">الطابق</div><div class="spec-val" data-fr="4e sur 8">الرابع من 8</div></div></div>
-        <div class="spec-item"><span class="spec-icon">❄️</span><div><div class="spec-label" data-fr="Climatisation">التكييف</div><div class="spec-val" data-fr="Centrale complète">مركزي كامل</div></div></div>
-        <div class="spec-item"><span class="spec-icon">🅿️</span><div><div class="spec-label" data-fr="Parking">الموقف</div><div class="spec-val" data-fr="Place privée couverte">موقف خاص مغطى</div></div></div>
-        <div class="spec-item"><span class="spec-icon">🛋️</span><div><div class="spec-label" data-fr="État">الحالة</div><div class="spec-val" data-fr="Partiellement meublé">مفروشة جزئياً</div></div></div>
-        <div class="spec-item"><span class="spec-icon">📅</span><div><div class="spec-label" data-fr="Disponibilité">التسليم</div><div class="spec-val" data-fr="Immédiate">فوري</div></div></div>
-      </div>
+      <div class="specs-grid" id="specs-grid"></div>
     </div>
 
     <!-- Tags -->
     <div class="section-block">
       <div class="section-block-title" data-fr="🏷️ Tags">🏷️ الوسوم</div>
-      <div class="tags" id="tags-wrap">
-        <span class="tag" data-fr="Appartement à louer">شقة للكراء</span>
-        <span class="tag" data-fr="Nouakchott">نواكشوط</span>
-        <span class="tag" data-fr="3 chambres">3 غرف</span>
-        <span class="tag" data-fr="Meublé">مفروشة</span>
-        <span class="tag" data-fr="Climatisation">تكييف</span>
-        <span class="tag" data-fr="Parking">موقف سيارات</span>
-        <span class="tag" data-fr="Sécurité">حراسة</span>
-        <span class="tag" data-fr="Internet">إنترنت</span>
-        <span class="tag" data-fr="4e étage">طابق 4</span>
-        <span class="tag" data-fr="Vue">إطلالة</span>
-      </div>
+      <div class="tags" id="tags-wrap"></div>
     </div>
 
     <!-- Location -->
     <div class="section-block">
       <div class="section-block-title" data-t="location">📍 الموقع</div>
-      <p id="loc-detail" style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-fr="Nouakchott Nord — quartier Teyaret, près de l'hôpital de l'Amitié">نواكشوط الشمالية — حي تيارت، قرب مستشفى الصداقة</p>
+      <p id="loc-detail" style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-fr="—">—</p>
       <div style="border-radius:12px;overflow:hidden;height:200px;border:1px solid rgba(13,27,42,.08)">
         <iframe
           src="https://www.openstreetmap.org/export/embed.html?bbox=-16.02,-17.97,-15.92,-17.89&layer=mapnik&marker=-17.93,-15.97"
@@ -670,15 +612,15 @@ Conditions de location :
             <a href="rizq_profile.html" style="text-decoration:none">
               <div class="seller-name">—</div>
             </a>
-            <div class="seller-badge" data-fr="✅ Vendeur vérifié">✅ بائع موثّق</div>
+            <div class="seller-badge" data-fr="—">—</div>
             <div class="stars">
-              <span class="star on">★</span><span class="star on">★</span><span class="star on">★</span><span class="star on">★</span><span class="star">★</span>
-              <span style="font-size:11px;color:var(--text-muted);margin-right:5px" data-fr="4.0 (48 avis)">4.0 (48 تقييم)</span>
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              <span style="font-size:11px;color:var(--text-muted);margin-right:5px" data-fr="—">—</span>
             </div>
             <div class="seller-stats">
-              <span class="seller-stat" data-fr="<strong>23</strong> annonces"><strong>23</strong> إعلان</span>
+              <span class="seller-stat" data-fr="<strong>—</strong> annonces"><strong>—</strong> إعلان</span>
               <span class="seller-stat">|</span>
-              <span class="seller-stat" data-fr="Membre depuis 2023">عضو منذ 2023</span>
+              <span class="seller-stat" data-fr="Membre —">عضو —</span>
             </div>
           </div>
         </div>
@@ -1056,9 +998,19 @@ function renderLocAndStats(ad){
   const locL = (lang==='fr' && ad.locFr) ? ad.locFr : (ad.loc||'');
   const detailEl = document.getElementById('loc-detail');
   if(detailEl && locL) detailEl.textContent = locL.replace('📍','').trim();
-  const n = 600 + ((Number(ad.id)*137) % 4500);
   const viewsEl = document.getElementById('views-count');
-  if(viewsEl) viewsEl.textContent = lang==='fr' ? ('👁 '+n.toLocaleString('fr-FR')+' vues') : ('👁 '+n.toLocaleString('en-US')+' مشاهدة');
+  if(viewsEl){
+    const raw = (ad.views != null && ad.views !== '') ? Number(ad.views) : NaN;
+    if(Number.isFinite(raw) && raw >= 0){
+      viewsEl.textContent = lang==='fr'
+        ? ('👁 '+raw.toLocaleString('fr-FR')+' vues')
+        : ('👁 '+raw.toLocaleString('en-US')+' مشاهدة');
+      viewsEl.setAttribute('data-fr', '👁 '+raw.toLocaleString('fr-FR')+' vues');
+    } else {
+      viewsEl.textContent = lang==='fr' ? '👁 —' : '👁 —';
+      viewsEl.setAttribute('data-fr', '👁 —');
+    }
+  }
   const ref = 'RZQ-2026-' + String(ad.id).padStart(5,'0');
   const refEl = document.getElementById('ad-ref-block');
   if(refEl) refEl.textContent = lang==='fr' ? ('Numéro de l\'annonce : '+ref) : ('رقم الإعلان: '+ref);
@@ -1810,7 +1762,7 @@ document.addEventListener('keydown', e=>{
         <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 16 sections, 120+ branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 22 sections, 268 branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px" data-t-fr="Réseaux supportés :">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -1871,7 +1823,7 @@ document.addEventListener('keydown', e=>{
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -1880,7 +1832,7 @@ document.addEventListener('keydown', e=>{
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",
