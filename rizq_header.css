@@ -7,10 +7,6 @@
   --rizq-header-h:70px;
 }
 
-html.rizq-native-nav-page body{
-  padding-top:0 !important;
-  padding-bottom:0 !important;
-}
 html.rizq-app-nav,
 html.rizq-app-nav body,
 html.rizq-app-nav *:not(.logo-ar):not(.logo-sub):not(.logo-text):not(.rizq-hdr-brand-ar):not(.rizq-hdr-brand-sub):not(.logo-mark):not(.logo-mark-img):not(.rizq-hdr-brand-mark):not(.rizq-splash-brand):not(.rn-logo-ar):not(.rn-logo-sub):not(.sb-logo-ar):not(.sb-logo-sub){
