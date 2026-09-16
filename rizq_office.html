@@ -293,9 +293,43 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .about-stat-val{font-size:20px;font-weight:900;color:var(--teal)}
 .about-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
 
-/* ════════ MAP ════════ */
+/* ════════ MAP + LOCATION INFO (store-like) ════════ */
 .map-placeholder{height:160px;border-radius:14px;background:linear-gradient(135deg,var(--bg2),var(--bg));border:2px dashed rgba(14,116,144,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s}
 .map-placeholder:hover{border-color:rgba(14,116,144,.45);background:rgba(14,116,144,.04);transform:translateY(-2px)}
+.loc-info-row{
+  display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
+  padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
+  text-align:start!important;direction:rtl!important;
+}
+.loc-info-row:last-of-type{border-bottom:none}
+.loc-info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.loc-info-row > div{flex:0 1 auto;min-width:0;text-align:start!important}
+.loc-info-row .info-label{color:#6a7a8a;font-size:11px;margin-bottom:3px;text-align:start!important}
+.loc-info-row .info-value{
+  color:#1a2a3a;font-weight:600;text-align:start!important;
+  display:block;width:fit-content;max-width:100%;
+}
+.loc-info-row .info-value .rzq-contact-masked,
+.loc-info-row .info-value .rizq-phone-ltr{
+  direction:ltr!important;unicode-bidi:isolate!important;
+  display:inline-block!important;text-align:left!important;white-space:nowrap;
+}
+.rzq-contact-masked{filter:blur(5px);cursor:pointer;transition:filter .25s;user-select:none}
+.rzq-contact-masked.shown{filter:none;cursor:text;user-select:text}
+#location-card .hours-row,
+#hours-card-el .hours-row{
+  display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
+  gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
+  text-align:start!important;direction:rtl!important;margin-bottom:0;
+}
+#location-card .hours-row:last-child,
+#hours-card-el .hours-row:last-child{border-bottom:none}
+#location-card .hours-row .day,
+#hours-card-el .hours-row .day{color:#6a7a8a;min-width:4.8em;flex:0 0 auto;text-align:start}
+#location-card .hours-row .time,
+#hours-card-el .hours-row .time{font-weight:700;color:var(--navy);flex:0 0 auto}
+#location-card .hours-row .closed-txt,
+#hours-card-el .hours-row .closed-txt{font-weight:700;color:var(--red);flex:0 0 auto}
 
 /* ════════ REVIEWS ════════ */
 .review-item{padding:18px 0;border-bottom:1px solid rgba(27,58,107,.05)}
@@ -308,7 +342,7 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .rv-text{font-size:13px;color:#4a5568;line-height:1.75;padding:12px 14px;background:var(--bg);border-radius:10px;border:1px solid var(--border);border-right:3px solid var(--teal2)}
 
 /* ════════ SIDEBAR ════════ */
-.contact-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:26px;overflow:hidden}
+.contact-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:26px;overflow:hidden;position:relative}
 .sidebar-sticky{position:sticky;top:82px;align-self:start}
 .contact-card::before{content:'';position:absolute;top:0;right:0;left:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--teal))}
 .open-badge-new{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:700;margin-bottom:18px;width:100%;border:1.5px solid transparent}
@@ -819,7 +853,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     <div class="card fade-in">
       <div class="section-head">
         <div class="section-bar"></div>
-        </PLACEHOLDER> data-t="about-section-ttl">عن المكتب</div>
+        <div class="section-ttl" id="about-section-ttl" data-t="about-section-ttl">عن المكتب</div>
       </div>
       <p class="about-text" id="about-txt" data-t="about-txt">تُعرض بيانات المكتب من الحساب الحقيقي فقط بعد اختيار مكتب من الدليل.</p>
       <div class="about-stats">
@@ -830,16 +864,50 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       </div>
     </div>
 
-    <!-- MAP -->
-    <div class="card fade-in">
+    <!-- LOCATION + CONTACT + HOURS (same pattern as stores) -->
+    <div class="card fade-in" id="location-card">
       <div class="section-head">
         <div class="section-bar"></div>
-        <div class="section-ttl" id="map-section-ttl" data-t="map-section-ttl">الموقع</div>
+        <div class="section-ttl" id="map-section-ttl" data-t="info-title-location">📍 الموقع والتواصل</div>
       </div>
-      <div class="map-placeholder" onclick="openMaps()">
-        <div style="font-size:40px">🗺️</div>
-        <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">—</div>
-        <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
+      <div class="loc-info-row">
+        <span class="info-icon">🏠</span>
+        <div>
+          <div class="info-label" data-t="info-label-address">العنوان</div>
+          <div class="info-value" id="contact-info-addr" data-t="contact-info-addr">—</div>
+        </div>
+      </div>
+      <div class="loc-info-row">
+        <span class="info-icon">📱</span>
+        <div>
+          <div class="info-label" data-t="info-label-phone">الهاتف وواتساب</div>
+          <div class="info-value"><span id="contact-info-phone" class="rzq-contact-masked rizq-phone-ltr">—</span></div>
+        </div>
+      </div>
+      <div class="loc-info-row">
+        <span class="info-icon">📧</span>
+        <div>
+          <div class="info-label" data-t="info-label-email">البريد الإلكتروني</div>
+          <div class="info-value"><span id="contact-info-email" class="rzq-contact-masked">—</span></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="map-placeholder" onclick="openMaps()">
+          <div style="font-size:40px">🗺️</div>
+          <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">—</div>
+          <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
+        </div>
+      </div>
+      <div class="divider" style="margin:18px 0"></div>
+      <div id="hours-card-el">
+        <div style="font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid rgba(201,168,76,.35)" id="hours-title" data-t="info-title-hours">🕐 ساعات العمل</div>
+        <div class="hours-row"><span class="day" id="hours-day1" data-t="day-sat">السبت</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" id="hours-day2" data-t="day-sun">الأحد</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-mon">الإثنين</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-tue">الثلاثاء</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-wed">الأربعاء</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-thu">الخميس</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-fri">الجمعة</span><span class="closed-txt" id="hours-closed-txt" data-t="hours-closed">مغلق</span></div>
       </div>
     </div>
 
@@ -885,39 +953,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <div class="sidebar-sticky">
     <div class="contact-card fade-in">
       <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
-
-      <a href="https://wa.me/" class="cta-btn cta-wa" id="sb-wa" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
-        <span class="cta-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </span>
-        <span id="sb-wa-lbl" data-t="sb-wa-lbl">واتساب مباشر</span>
-      </a>
-
-      <a href="mailto:office@rizq.mr" class="cta-btn cta-teal" id="sb-email">
-        <span class="cta-icon">📧</span>
-        <span id="sb-email-lbl" data-t="sb-email-lbl">إرسال إيميل</span>
-      </a>
-
-      <a href="tel:#" class="cta-btn cta-outline" id="sb-call" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
-        <span class="cta-icon">📞</span>
-        <span id="sb-call-lbl" data-t="sb-call-lbl">اتصال مباشر</span>
-      </a>
-
-      <div class="divider"></div>
-
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="hours-title" data-t="hours-title">🕐 ساعات العمل</div>
-      <div class="hours-row"><span class="day" id="hours-day1" data-t="hours-day1">السبت — الخميس</span><span class="time">8:00 — 18:00</span></div>
-      <div class="hours-row"><span class="day" id="hours-day2" data-t="hours-day2">الجمعة</span><span class="closed-txt" id="hours-closed-txt" data-t="hours-closed-txt">مغلق</span></div>
-
-      <div class="divider"></div>
-
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="contact-info-title" data-t="contact-info-title">📍 معلومات التواصل</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="contact-info-addr" data-t="contact-info-addr">—</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="contact-info-phone">📞 +222 XX XX XX XX</div>
-      <div style="font-size:13px;color:var(--muted)" id="contact-info-email">✉️ office@rizq.mr</div>
-
-      <div id="office-payment-methods" style="display:none;margin-top:14px"></div>
-
+      <div id="office-payment-methods" style="display:none;margin-top:4px"></div>
     </div>
 
     <!-- RIZQ PROMO CARD -->
@@ -1120,8 +1156,8 @@ function submitReq(){
   reqs.unshift({ name:name, phone:phone, service:svc, msg:msg, date:new Date().toISOString() });
   localStorage.setItem('rizq_office_requests', JSON.stringify(reqs.slice(0,100)));
   // WhatsApp fallback
-  var wa = document.getElementById('sb-wa');
-  var waNum = wa ? wa.href.replace('https://wa.me/','').split('?')[0] : '';
+  var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa');
+  var waNum = wa && wa.href ? wa.href.replace('https://wa.me/','').split('?')[0] : '';
   var waText = _t2('طلب استشارة - ','Demande de consultation - ') + name + ' - ' + phone + (svc ? ' - ' + svc : '') + (msg ? ' - ' + msg : '');
   window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(waText), '_blank', 'noopener');
   showToast(_t2('تم إرسال طلبك بنجاح! سنتواصل معك قريباً ✅','✅ Votre demande a été envoyée avec succès ! Nous vous contacterons bientôt'), 'success');
@@ -1368,10 +1404,12 @@ function openMaps(){
           RizqContactGate.onMaskedContactClick(accountId, 'office', { lang: fr ? 'fr' : 'ar' });
         }
       }
+      var phoneEl = document.getElementById('contact-info-phone');
+      var emailEl = document.getElementById('contact-info-email');
       if(locked || (!phone && !email && !wa)){
-        setText('contact-info-phone', '📞 ••• ••• •••');
-        setText('contact-info-email', '✉️ •••@•••.•••');
-        ['sb-wa','act-wa-top','sticky-wa','sb-call','act-call-top','sticky-call','sb-email'].forEach(function(btnId){
+        if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
+        if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
+        ['act-wa-top','sticky-wa','act-call-top','sticky-call'].forEach(function(btnId){
           var el = document.getElementById(btnId);
           if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
         });
@@ -1380,20 +1418,17 @@ function openMaps(){
       var waSrc = wa || phone;
       if(waSrc){
         var waNum = String(waSrc).replace(/[^0-9]/g,'');
-        setHref('sb-wa', 'https://wa.me/' + waNum);
         setHref('act-wa-top', 'https://wa.me/' + waNum);
         setHref('sticky-wa', 'https://wa.me/' + waNum);
       }
       if(phone){
         var telNum = String(phone).replace(/\s/g,'');
-        setHref('sb-call', 'tel:' + telNum);
         setHref('act-call-top', 'tel:' + telNum);
         setHref('sticky-call', 'tel:' + telNum);
-        setText('contact-info-phone', '📞 ' + phone);
+        if(phoneEl){ phoneEl.textContent = phone; phoneEl.classList.remove('rzq-contact-masked'); phoneEl.onclick = null; }
       }
       if(email){
-        setHref('sb-email', 'mailto:' + email);
-        setText('contact-info-email', '✉️ ' + email);
+        if(emailEl){ emailEl.textContent = email; emailEl.classList.remove('rzq-contact-masked'); emailEl.onclick = null; }
       }
     }
 
@@ -1517,7 +1552,7 @@ function openMaps(){
           clearMock(['hero-tag1','map-addr','contact-info-addr']);
           setText('hero-tag1', '📍 ' + addr);
           setText('map-addr', addr);
-          setText('contact-info-addr', '📍 ' + addr);
+          setText('contact-info-addr', addr);
         }
 
         // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
@@ -1561,7 +1596,7 @@ function openMaps(){
           if(Array.isArray(hours) && hours.length){
             var dayFr = {'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
             var day1 = document.getElementById('hours-day1');
-            var card = day1 ? day1.closest('.contact-card') : null;
+            var card = document.getElementById('hours-card-el') || (day1 ? day1.closest('#location-card, .contact-card, .card') : null);
             if(card){
               var rowsHtml = hours.map(function(h){
                 var dayLbl = isFr() ? (dayFr[h.day]||h.day) : h.day;
@@ -1637,7 +1672,7 @@ function openMaps(){
                 if(acc.desc){ setText('hero-desc', acc.desc); setText('about-txt', acc.desc); }
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
-                if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr','📍 '+addr); }
+                if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr); }
                 if(typeof RizqSub!=='undefined'){
                   var b = RizqSub.getBadges(id);
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
@@ -1707,7 +1742,7 @@ function openMaps(){
               if(hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
                 var dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
                 var day1 = document.getElementById('hours-day1');
-                var card = day1 ? day1.closest('.contact-card') : null;
+                var card = document.getElementById('hours-card-el') || (day1 ? day1.closest('#location-card, .contact-card, .card') : null);
                 if(card){
                   var rowsHtml = hdata.hours.map(function(h){
                     var dayLbl = isFr() ? (dayFr[h.day]||h.day) : h.day;
