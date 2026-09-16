@@ -36,7 +36,12 @@
   /* Page key without .html — some servers serve clean URLs (rizq_browse
      instead of rizq_browse.html), so compare both forms. */
   function pageKey() {
-    return pathName().toLowerCase().replace(/\.html$/, '');
+    var p = pathName().toLowerCase();
+    var q = p.indexOf('?');
+    if (q !== -1) p = p.slice(0, q);
+    var h = p.indexOf('#');
+    if (h !== -1) p = p.slice(0, h);
+    return p.replace(/\.html$/, '');
   }
 
   function isDashShell() {
@@ -1077,14 +1082,11 @@
 
     var hideTimer = null;
 
-    function visibleLogos() {
-      return Array.prototype.filter.call(logos, function (el) {
-        return el.style.display !== 'none' && el.offsetParent !== null;
-      });
-    }
-
     function show() {
-      visibleLogos().forEach(function (el) { el.classList.add('rzq-rlogo-visible'); });
+      logos.forEach(function (el) {
+        if (el.style.display === 'none') return;
+        el.classList.add('rzq-rlogo-visible');
+      });
     }
 
     function hide() {

@@ -43,7 +43,12 @@
 
   function pageKey() {
     try {
-      return (location.pathname || '').split('/').pop().toLowerCase().replace(/\.html$/, '');
+      var p = (location.pathname || '').split('/').pop().toLowerCase();
+      var q = p.indexOf('?');
+      if (q !== -1) p = p.slice(0, q);
+      var h = p.indexOf('#');
+      if (h !== -1) p = p.slice(0, h);
+      return p.replace(/\.html$/, '');
     } catch (e) {
       return '';
     }
