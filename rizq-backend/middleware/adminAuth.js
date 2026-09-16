@@ -70,6 +70,9 @@ function createAdminAuth(deps) {
     if (!secret || got !== secret) {
       return res.status(401).json({ error: 'unauthorized' });
     }
+    if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+      return res.status(403).json({ error: 'server_secret_browser_forbidden' });
+    }
     next();
   }
 

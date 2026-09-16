@@ -1,3 +1,5 @@
+/rizq_search.html  /rizq_browse.html  301
+/rizq_search  /rizq_browse.html  301
 # حظر الملف الحقيقي للوحة الأدمن على الاستضافة الثابتة (Netlify / Cloudflare Pages)
 /rizq_cp_panel.html  /rizq_admin.html  404
 /rizq_cp_panel  /rizq_admin.html  404

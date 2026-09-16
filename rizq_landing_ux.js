@@ -90,7 +90,7 @@
     var hero = document.getElementById('hero-search');
     if (hero) hero.value = q;
     if (typeof window.doMainSearch === 'function') window.doMainSearch();
-    else if (q) window.location.href = 'rizq_search.html?q=' + encodeURIComponent(q);
+    else if (q) window.location.href = 'rizq_browse.html?q=' + encodeURIComponent(q);
   };
 
   if (stickyInput) {

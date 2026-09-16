@@ -228,7 +228,7 @@
   }
 
   function bindPrefetch() {
-    var targets = ['rizq_browse.html', 'rizq_post.html', 'rizq_search.html', 'rizq_listing.html'];
+    var targets = ['rizq_browse.html', 'rizq_post.html', 'rizq_listing.html'];
     document.addEventListener('mouseover', function (e) {
       var a = e.target.closest && e.target.closest('a[href]');
       if (!a) return;

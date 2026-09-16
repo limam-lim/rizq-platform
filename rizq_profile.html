@@ -529,6 +529,22 @@ const ICON_SVG = {
 };
 function iconHTML(emoji){ return ICON_SVG[emoji] || emoji; }
 
+function escapeHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function safeHref(u){
+  var s=String(u==null?'':u).trim();
+  if(!s) return 'rizq_browse.html';
+  if(/^https?:\/\//i.test(s) || /^mailto:/i.test(s) || /^tel:/i.test(s)) return escapeHtml(s);
+  if(/^[a-zA-Z0-9_\-.\/]+\.html(\?[^"'\s<>]*)?(#[^"'\s<>]*)?$/.test(s)) return escapeHtml(s);
+  return 'rizq_browse.html';
+}
+
 const ADS=[];
 
 function renderAds(list){
@@ -539,15 +555,15 @@ function renderAds(list){
     return;
   }
   grid.innerHTML=list.map((a,i)=>`
-    <a href="${a.href||'rizq_browse.html'}" class="ad-card" style="--i:${i*.05}">
+    <a href="${safeHref(a.href||'rizq_browse.html')}" class="ad-card" style="--i:${i*.05}">
       ${a.pin?`<div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;z-index:1">${fr?'⭐ Premium':'⭐ مميز'}</div>`:''}
       <div class="ac-img" style="position:relative">${iconHTML(a.emoji)}</div>
       <div class="ac-body">
-        <div class="ac-cat">${fr?a.catFr:a.cat}</div>
-        <div class="ac-title">${fr?a.titleFr:a.title}</div>
+        <div class="ac-cat">${escapeHtml(fr?a.catFr:a.cat)}</div>
+        <div class="ac-title">${escapeHtml(fr?a.titleFr:a.title)}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e2e8f5;padding-top:8px;margin-top:6px">
-          <span class="ac-price">${fr?a.priceFr:a.price}</span>
-          <span class="ac-loc">${fr?a.locFr:a.loc}</span>
+          <span class="ac-price">${escapeHtml(fr?a.priceFr:a.price)}</span>
+          <span class="ac-loc">${escapeHtml(fr?a.locFr:a.loc)}</span>
         </div>
       </div>
     </a>`).join('');
