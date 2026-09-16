@@ -1045,7 +1045,7 @@
         if (sw) return sw;
       }
       if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|ما\s*كاين|دراري|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|حسانية|شنهي/.test(t)) return 'hs';
-      if (/[\u0600-\u06FF]/.test(t)) return _ctx.chatLang || _ctx.lang || 'ar';
+      if (/[\u0600-\u06FF]/.test(t)) return 'ar';
       if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonjour/.test(lower)) return 'fr';
       if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
       if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package|hi\b|hey\b/.test(lower)) return 'en';
@@ -1551,25 +1551,29 @@
        محمَّل مسبقاً من فتحة سابقة، نُعيد كتابة السطر باسم المتجر فوق النص العام
        بدل أن يبقى النص العام ظاهراً حتى إغلاق الويدجت وإعادة فتحه) */
     function _refreshWidgetLang() {
+      _ctx.lang = _detectLang();
+      // Reset sticky chat language so replies follow the new UI language.
+      _ctx.chatLang = null;
       _applyWidgetLang();
       _applyBusinessStatus();
     }
 
     /* ── مزامنة اللغة عند التحميل + عند أي تبديل لغة في الصفحة ──
-       إصلاح 11/08/2026: كان الاستماع على window بينما RizqI18n.applyLang()
-       يُطلق الحدث على document فعلياً (بلا bubbles:true) — أي أن الحدث لا
-       يصل أبداً إلى مستمع مسجَّل على window. صُحِّح إلى document (يطابق
-       rizq_footer_toggle.js). هذا يُصلح الصفحات ذات محرك RizqI18n المركزي.
-       لكن صفحات أخرى (rizq_landing_v8.html وغيرها) لديها toggleLang() محلية
-       لا تُطلق هذا الحدث إطلاقاً مهما كان — لذا أضفنا أيضاً MutationObserver
-       يراقب تغيّر خاصية lang على <html> مباشرة، وهي الإشارة الوحيدة التي
-       تُحدَّث فعلياً من كل آليات تبديل اللغة الموجودة في المنصة بلا استثناء،
-       فيعمل الويدجت بشكل صحيح على كل الصفحات دون أي تعديل يدوي لكل صفحة. */
+       Prefer rizq:langchange; MutationObserver is a fallback only and debounced
+       so landing (which flips html[lang] AND fires the event) does not refresh twice. */
     _applyWidgetLang();
     _ensureLiveCatalog(false);
-    document.addEventListener('rizq:langchange', _refreshWidgetLang);
+    var _langRefreshTimer = null;
+    function _scheduleWidgetLangRefresh() {
+      if (_langRefreshTimer) clearTimeout(_langRefreshTimer);
+      _langRefreshTimer = setTimeout(function () {
+        _langRefreshTimer = null;
+        _refreshWidgetLang();
+      }, 30);
+    }
+    document.addEventListener('rizq:langchange', _scheduleWidgetLangRefresh);
     try {
-      new MutationObserver(_refreshWidgetLang)
+      new MutationObserver(_scheduleWidgetLangRefresh)
         .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
     } catch (e) {}
 

@@ -329,13 +329,18 @@
   function applyLegacyBridge(root) {
     root = root || document;
     var isFr = state.lang === 'fr';
+    function cacheArAttr(el, attrAr, readVal) {
+      if (el.hasAttribute(attrAr)) return;
+      var cur = readVal();
+      // Never cache French (or empty) as the Arabic original — that permanently corrupts AR↔FR.
+      if (isFr && cur && !_hasArabic(cur) && /[A-Za-zÀ-ÿ]/.test(cur)) return;
+      el.setAttribute(attrAr, cur);
+    }
     root.querySelectorAll('[data-t-fr]').forEach(function (el) {
-      if (!el.hasAttribute('data-t-ar')) {
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-          el.setAttribute('data-t-ar', el.value || el.placeholder || '');
-        } else {
-          el.setAttribute('data-t-ar', el.innerHTML);
-        }
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        cacheArAttr(el, 'data-t-ar', function () { return el.value || el.placeholder || ''; });
+      } else {
+        cacheArAttr(el, 'data-t-ar', function () { return el.innerHTML; });
       }
       var val = isFr ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');
       if (val == null) return;
@@ -346,27 +351,29 @@
       }
     });
     root.querySelectorAll('[data-ph-fr]').forEach(function (el) {
-      if (!el.hasAttribute('data-ph-ar')) el.setAttribute('data-ph-ar', el.placeholder || '');
-      el.placeholder = isFr ? el.getAttribute('data-ph-fr') : el.getAttribute('data-ph-ar');
+      cacheArAttr(el, 'data-ph-ar', function () { return el.placeholder || ''; });
+      var ph = isFr ? el.getAttribute('data-ph-fr') : el.getAttribute('data-ph-ar');
+      if (ph != null) el.placeholder = ph;
     });
     root.querySelectorAll('option[data-t-fr]').forEach(function (el) {
-      if (!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.textContent);
-      el.textContent = isFr ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');
+      cacheArAttr(el, 'data-t-ar', function () { return el.textContent; });
+      var ov = isFr ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');
+      if (ov != null) el.textContent = ov;
     });
     /* جسر data-fr / data-ar المستخدم في listing وغيرها */
     root.querySelectorAll('[data-fr]').forEach(function (el) {
       if (el.hasAttribute('data-t-fr')) return;
-      if (!el.hasAttribute('data-ar')) el.setAttribute('data-ar', el.innerHTML);
+      cacheArAttr(el, 'data-ar', function () { return el.innerHTML; });
       var val = isFr ? el.getAttribute('data-fr') : el.getAttribute('data-ar');
       if (val != null) el.innerHTML = val;
     });
     root.querySelectorAll('option[data-fr]').forEach(function (el) {
       if (el.hasAttribute('data-t-fr')) return;
-      if (!el.hasAttribute('data-ar')) el.setAttribute('data-ar', el.textContent);
+      cacheArAttr(el, 'data-ar', function () { return el.textContent; });
       el.textContent = isFr ? el.getAttribute('data-fr') : el.getAttribute('data-ar');
     });
     root.querySelectorAll('[data-fr-title]').forEach(function (el) {
-      if (!el.hasAttribute('data-ar-title')) el.setAttribute('data-ar-title', el.getAttribute('title') || '');
+      cacheArAttr(el, 'data-ar-title', function () { return el.getAttribute('title') || ''; });
       el.setAttribute('title', isFr ? el.getAttribute('data-fr-title') : el.getAttribute('data-ar-title'));
     });
   }
@@ -473,9 +480,16 @@
     }
   }
 
+  var _applyGen = 0;
+  var _langEventTimer = null;
+
   function applyLang(lang) {
+    var gen = ++_applyGen;
     state.lang = lang === 'fr' ? 'fr' : 'ar';
     saveLang(state.lang);
+    // Translate static DOM first, then flip dir — reduces AR/FR flicker.
+    applyStaticDom(document);
+    if (gen !== _applyGen) return;
     applyRootDir(state.lang);
     stripLeakedDirs();
     document.querySelectorAll('.btn-lang').forEach(function (btn) {
@@ -486,9 +500,16 @@
       btn.textContent = state.lang === 'ar' ? 'FR' : 'AR';
       btn.setAttribute('aria-label', state.lang === 'ar' ? 'Passer au français' : 'التبديل إلى العربية');
     });
-    applyStaticDom(document);
     applyDocumentTitle();
-    document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: state.lang } }));
+    if (gen !== _applyGen) return;
+    // Coalesce stacked listeners (browse/store/widget) into one event per toggle.
+    if (_langEventTimer) clearTimeout(_langEventTimer);
+    var emitLang = state.lang;
+    _langEventTimer = setTimeout(function () {
+      _langEventTimer = null;
+      if (gen !== _applyGen) return;
+      document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: emitLang } }));
+    }, 0);
   }
 
   function toggle() {

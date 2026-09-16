@@ -5148,12 +5148,26 @@ function applyLandingLang(toAr) {
   //    Original Arabic is cached on first run so switching back to AR
   //    always restores the exact original markup (fixes non-reversibility).
   document.querySelectorAll('[data-t-fr]').forEach(el => {
-    if (!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
-    el.innerHTML = isAr ? el.getAttribute('data-t-ar') : el.getAttribute('data-t-fr');
+    if (!el.hasAttribute('data-t-ar')) {
+      var cur = el.innerHTML;
+      // Don't cache French as Arabic when first load is FR.
+      if (!isAr && cur && !/[\u0600-\u06FF]/.test(cur) && /[A-Za-zÀ-ÿ]/.test(cur)) { /* skip */ }
+      else el.setAttribute('data-t-ar', cur);
+    }
+    if (el.hasAttribute('data-t-ar') || isAr) {
+      el.innerHTML = isAr ? (el.getAttribute('data-t-ar') || el.innerHTML) : el.getAttribute('data-t-fr');
+    } else if (!isAr) {
+      el.innerHTML = el.getAttribute('data-t-fr');
+    }
   });
   document.querySelectorAll('[data-ph-fr]').forEach(el => {
-    if (!el.hasAttribute('data-ph-ar')) el.setAttribute('data-ph-ar', el.placeholder);
-    el.placeholder = isAr ? el.getAttribute('data-ph-ar') : el.getAttribute('data-ph-fr');
+    if (!el.hasAttribute('data-ph-ar')) {
+      var ph = el.placeholder || '';
+      if (!isAr && ph && !/[\u0600-\u06FF]/.test(ph) && /[A-Za-zÀ-ÿ]/.test(ph)) { /* skip */ }
+      else el.setAttribute('data-ph-ar', ph);
+    }
+    var phAr = el.getAttribute('data-ph-ar');
+    el.placeholder = isAr ? (phAr != null ? phAr : el.placeholder) : el.getAttribute('data-ph-fr');
   });
 
   // Navbar + mobile drawer Login / Register buttons
@@ -5563,7 +5577,10 @@ function toggleLang() {
   _langBusy = true;
   try { applyLandingLang(!isAr); }
   catch (eLang) { console.error('toggleLang failed', eLang); }
-  finally { setTimeout(function () { _langBusy = false; }, 400); }
+  finally {
+    // Unlock on next frame — was 400ms and felt like a delayed language switch.
+    requestAnimationFrame(function () { _langBusy = false; });
+  }
 }
 window.toggleLang = toggleLang;
 window.applyLandingLang = applyLandingLang;
@@ -5588,11 +5605,7 @@ document.addEventListener('click', function (e) {
   } else {
     run();
   }
-  window.addEventListener('load', function () {
-    var now;
-    try { now = localStorage.getItem('rizq_lang'); } catch (e2) { now = saved; }
-    if (now === 'fr') applyLandingLang(false);
-  });
+  // Do not re-apply on window "load" — that caused a second delayed FR pass and mixed text.
   if (window.RizqI18n) {
     window.RizqI18n.toggle = toggleLang;
     window.RizqI18n.apply = function (lang) { applyLandingLang(lang !== 'fr'); };
@@ -8523,9 +8536,9 @@ function renderPricingSection(){
 
 document.addEventListener('DOMContentLoaded', function(){
   try {
+    // Language already applied by syncLandingLangOnLoad — only refresh pricing if still AR.
     var saved = localStorage.getItem('rizq_lang');
-    if (saved === 'fr' && typeof applyLandingLang === 'function') applyLandingLang(false);
-    else if (typeof renderPricingSection === 'function') renderPricingSection();
+    if (saved !== 'fr' && typeof renderPricingSection === 'function') renderPricingSection();
   } catch (e) {
     if (typeof renderPricingSection === 'function') renderPricingSection();
   }

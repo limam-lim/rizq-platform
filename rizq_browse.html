@@ -855,7 +855,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <script src="rizq_backend_config.js"></script>
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.4"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
@@ -1492,7 +1492,16 @@ const TRANSLATIONS = {
   }
 };
 
-function _t(key){const l=_rizqLang();return (TRANSLATIONS[l]&&TRANSLATIONS[l][key])||TRANSLATIONS['ar'][key]||key;}
+function _t(key){
+  const l=_rizqLang();
+  if(window.RizqI18n && typeof RizqI18n.t==='function'){
+    const v=RizqI18n.t(key);
+    if(v) return v;
+  }
+  // Never fall back to Arabic while UI is French — that reintroduces mixed text.
+  if(l==='fr') return (TRANSLATIONS.fr && TRANSLATIONS.fr[key]) || '';
+  return (TRANSLATIONS.ar && TRANSLATIONS.ar[key]) || key;
+}
 function rebuildNavCatSelect(){
   const sel=document.getElementById('nav-cat-select');
   if(!sel) return;
@@ -1515,29 +1524,23 @@ function rebuildNavCatSelect(){
   sel.setAttribute('aria-label', isAr?'القسم':'Catégorie');
 }
 function applyLang(){
+  // Static [data-t] is owned by RizqI18n.apply — do not rewrite with textContent
+  // (strips HTML and can reintroduce Arabic via TRANSLATIONS fallback).
   const l=_rizqLang();
   document.documentElement.lang=l;
   document.documentElement.dir=l==='fr'?'ltr':'rtl';
-  document.getElementById('lang-btn').textContent=l==='ar'?'FR':'AR';
-  document.querySelectorAll('[data-t]').forEach(el=>{
-    const v=_t(el.dataset.t);
-    if(v) el.textContent=v;
-  });
-  document.querySelectorAll('[data-t-ph]').forEach(el=>{
-    const v=_t(el.dataset.tPh);
-    if(v) el.placeholder=v;
-  });
-  // Update wilaya options
+  const langBtn=document.getElementById('lang-btn');
+  if(langBtn && window.RizqI18n && typeof RizqI18n.paintPrimaryLangBtn==='function' && RizqI18n.isPrimaryLangBtn(langBtn)){
+    RizqI18n.paintPrimaryLangBtn(langBtn);
+  } else if(langBtn){
+    langBtn.textContent=l==='ar'?'FR':'AR';
+  }
   document.querySelectorAll('#wilaya-select option[data-ar]').forEach(o=>{
     o.textContent=l==='fr'?(o.dataset.fr||o.dataset.ar):o.dataset.ar;
   });
   rebuildNavCatSelect();
-  // Re-render if needed
   if(filtered.length) renderResultList();
-  // Update nav-disclaimer text on every lang apply (initial load + toggle)
   if(typeof _discApply==='function') _discApply(l);
-  /* إصلاح: الفوتر (rzq-ft-*) كان لا يترجَم إلا عند تحميل الصفحة أو من تبويب آخر —
-     الآن يُحدَّث فوراً مع كل تبديل للغة في نفس الصفحة أيضاً. */
   if(window._rzqApplyFt) window._rzqApplyFt();
 }
 function onBrowseLangChange(){

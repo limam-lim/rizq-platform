@@ -768,7 +768,7 @@ footer{
 </style>
   
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.4"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
@@ -2315,11 +2315,16 @@ if(typeof _t2 === 'undefined'){
     _setNavOrder(isFr);
     document.documentElement.lang = lang;
     document.documentElement.dir = isFr ? 'ltr' : 'rtl';
-    // Apply data-t — إصلاح: كانت تُترجَم فقط عند الذهاب للفرنسية، ولا
-    // تُستعاد للعربية عند الرجوع (نص فرنسي يبقى عالقاً بعد تبديلتين).
+    // If RizqI18n already translated [data-t], only restore/apply store-specific extras.
+    var i18nOwnsStatic = !!(window.RizqI18n && typeof window.RizqI18n.t === 'function');
     document.querySelectorAll('[data-t]').forEach(function(el){
       var key = el.getAttribute('data-t');
-      if(!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
+      if(!el.hasAttribute('data-t-ar')){
+        var cur = el.innerHTML;
+        // Never cache FR text as the Arabic original.
+        if(isFr && cur && !/[\u0600-\u06FF]/.test(cur) && /[A-Za-zÀ-ÿ]/.test(cur)) { /* skip */ }
+        else el.setAttribute('data-t-ar', cur);
+      }
       if(isFr){
         var frVal = STORE_FR[key];
         if(!frVal && window.RizqI18n && typeof window.RizqI18n.t === 'function'){
@@ -2327,13 +2332,17 @@ if(typeof _t2 === 'undefined'){
         }
         if(frVal && /[\u0600-\u06FF]/.test(frVal)) frVal = '';
         if(frVal) el.innerHTML = frVal;
-      } else {
+      } else if(el.hasAttribute('data-t-ar')) {
         el.innerHTML = el.getAttribute('data-t-ar');
       }
     });
     // Lang button
-    var btn = document.getElementById('lang-btn');
-    if(btn) btn.textContent = isFr ? 'AR' : 'FR';
+    var btn = document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
+    if(btn && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function' && window.RizqI18n.isPrimaryLangBtn(btn)){
+      window.RizqI18n.paintPrimaryLangBtn(btn);
+    } else if(btn) {
+      btn.textContent = isFr ? 'AR' : 'FR';
+    }
     // Disclaimer nav badge
     var nd = document.getElementById('nav-disclaimer-txt');
     if(nd) nd.textContent = isFr ? '⚖️ Rizq = diffuseur uniquement — vérifiez avant paiement' : '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
