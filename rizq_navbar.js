@@ -129,7 +129,18 @@ function _toggleLang(btn){
   var current = _getLang();
   var next = current === 'ar' ? 'fr' : 'ar';
   _setLang(next);
-  if(btn) btn.textContent = next === 'ar' ? 'FR' : 'AR';
+  if(btn){
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, next); }
+    else {
+      btn.classList.add('btn-lang','btn-lang-primary');
+      btn.setAttribute('dir','ltr');
+      btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      btn.setAttribute('data-active-lang', next);
+      var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = next==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = next==='ar'?'#C9A84C':'#ffffff';
+    }
+  }
   /* تحديث اتجاه الصفحة — يُقلب الـ navbar تلقائياً */
   document.documentElement.dir  = next === 'ar' ? 'rtl' : 'ltr';
   document.documentElement.lang = next === 'ar' ? 'ar'  : 'fr';

@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.3"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.4"/>
 <script>
 (function () {
   try {
@@ -3690,19 +3690,42 @@ if (typeof RizqI18n === 'undefined') {
     t2: function(ar, fr) { return isAr ? ar : fr; },
     getLang: function() { return isAr ? 'ar' : 'fr'; },
     stripLeakedDirs: function() {
-      var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"],.btn-lang-primary,#rizq-lang-btn,#nav-lang-btn,#rizq-desk-lang-btn';
+      var keep = '.logo,.rizq-hdr-brand,.logo-text,.phone-num,#rizq-chat-window,.rw-input,[href^="tel:"],input[type="tel"],.btn-lang-primary,#rizq-lang-btn,#nav-lang-btn,#rizq-desk-lang-btn,.rizq-reg-chrome-lang,#lang-btn';
       document.querySelectorAll('nav, .nav-center, .nav-dropdown-li, .nav-dropdown-menu, .rizq-hdr-row2, .rizq-hdr-more-menu, .modal-overlay, .modal-box, #qcat-portal, #cat-inline-panel, .rzq-sheet, .why-grid, footer, .hero-pills').forEach(function(el) {
         if (el.closest && el.closest(keep)) return;
         if (el.hasAttribute('dir')) el.removeAttribute('dir');
         if (el.style && el.style.direction) el.style.direction = '';
       });
     },
-    paintPrimaryLangBtn: function(btn) {
+    paintPrimaryLangBtn: function(btn, langOverride) {
       if (!btn) return;
+      var lang = (langOverride === 'fr' || langOverride === 'ar') ? langOverride : (isAr ? 'ar' : 'fr');
+      if (!btn.classList.contains('btn-lang') && !btn.classList.contains('rizq-reg-chrome-lang')) btn.classList.add('btn-lang');
+      if (!btn.classList.contains('rizq-reg-chrome-lang')) btn.classList.add('btn-lang-primary');
       btn.setAttribute('dir', 'ltr');
       btn.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
       btn.setAttribute('aria-label', 'FR | AR');
-    }
+      btn.setAttribute('data-active-lang', lang);
+      var frEl = btn.querySelector('.lang-fr');
+      var arEl = btn.querySelector('.lang-ar');
+      if (frEl) {
+        frEl.classList.toggle('is-active-lang', lang === 'fr');
+        frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
+        frEl.style.opacity = lang === 'fr' ? '1' : '0.9';
+      }
+      if (arEl) {
+        arEl.classList.toggle('is-active-lang', lang === 'ar');
+        arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
+        arEl.style.opacity = lang === 'ar' ? '1' : '0.9';
+      }
+    },
+    paintAllLangButtons: function(langOverride) {
+      var lang = (langOverride === 'fr' || langOverride === 'ar') ? langOverride : (isAr ? 'ar' : 'fr');
+      document.querySelectorAll('.btn-lang, .btn-lang-primary, .rizq-reg-chrome-lang, #lang-btn, #nav-lang-btn, #rizq-lang-btn, #rizq-desk-lang-btn').forEach(function(btn) {
+        RizqI18n.paintPrimaryLangBtn(btn, lang);
+      });
+    },
+    isPrimaryLangBtn: function() { return true; }
   };
 }
 
@@ -5130,21 +5153,21 @@ function applyLandingLang(toAr) {
   // Direction & lang
   document.documentElement.lang = lang;
   document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+  if (document.body) {
+    document.body.classList.toggle('rizq-lang-ar', isAr);
+    document.body.classList.toggle('rizq-lang-fr', !isAr);
+  }
   document.title = isAr ? 'رزق | Rizq — سوقك الموريتاني' : 'Rizq — Votre marketplace mauritanien';
   try { RizqI18n.stripLeakedDirs(); } catch (eD) {}
-  document.querySelectorAll('.btn-lang').forEach(b => {
-    if (b.classList.contains('btn-lang-primary') || b.id === 'rizq-lang-btn' || b.id === 'nav-lang-btn' || b.id === 'rizq-desk-lang-btn') {
+  if (window.RizqI18n && typeof window.RizqI18n.paintAllLangButtons === 'function') {
+    window.RizqI18n.paintAllLangButtons();
+  } else {
+    document.querySelectorAll('.btn-lang, .btn-lang-primary, .rizq-reg-chrome-lang, #nav-lang-btn, #rizq-lang-btn, #rizq-desk-lang-btn').forEach(function(b) {
       if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
         window.RizqI18n.paintPrimaryLangBtn(b);
-      } else {
-        b.setAttribute('dir', 'ltr');
-        b.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
-        b.setAttribute('aria-label', 'FR | AR');
       }
-    } else {
-      b.textContent = isAr ? 'FR' : 'AR';
-    }
-  });
+    });
+  }
   // ملاحظة: شارة الإشعار القانوني (nav-disclaimer-txt / fixed-disc-pill) لم تعد
   // تُحدَّث هنا يدوياً — localStorage.setItem('rizq_lang',...) أعلاه يُشغّل
   // تلقائياً تصحيح rizq_disclaimer.js المشترك، وهو يراعي أيضاً نص الأدمن

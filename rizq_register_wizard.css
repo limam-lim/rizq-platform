@@ -345,8 +345,19 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   padding:8px 16px; border-radius:22px;
   cursor:pointer; transition:background 0.2s;
   white-space:nowrap; flex-shrink:0; font-family:inherit; direction:ltr;
+  display:inline-flex; align-items:center; gap:0.15em;
 }
-.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); color:#fff; }
+.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); }
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar { color:#ffffff; opacity:0.9; }
+.rizq-reg-chrome-lang[data-active-lang="ar"] .lang-ar,
+.rizq-reg-chrome-lang .lang-ar.is-active-lang,
+html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,
+body.rizq-lang-ar .rizq-reg-chrome-lang .lang-ar { color:#C9A84C !important; opacity:1 !important; }
+.rizq-reg-chrome-lang[data-active-lang="fr"] .lang-fr,
+.rizq-reg-chrome-lang .lang-fr.is-active-lang,
+html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,
+body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opacity:1 !important; }
 
 /* ═══════════════════════════════════════════════════════════
    §6  الشريط السفلي — مطابق لشريط rizq_post

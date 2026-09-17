@@ -21,14 +21,24 @@
       return;
     }
     var lang = currentLang();
+    if (!btn.classList.contains('btn-lang') && !btn.classList.contains('rizq-reg-chrome-lang')) btn.classList.add('btn-lang');
+    if (!btn.classList.contains('rizq-reg-chrome-lang')) btn.classList.add('btn-lang-primary');
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = langBtnHtml();
     btn.setAttribute('aria-label', 'FR | AR');
     btn.setAttribute('data-active-lang', lang);
     var frEl = btn.querySelector('.lang-fr');
     var arEl = btn.querySelector('.lang-ar');
-    if (frEl) frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
-    if (arEl) arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
+    if (frEl) {
+      frEl.classList.toggle('is-active-lang', lang === 'fr');
+      frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
+      frEl.style.opacity = lang === 'fr' ? '1' : '0.9';
+    }
+    if (arEl) {
+      arEl.classList.toggle('is-active-lang', lang === 'ar');
+      arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
+      arEl.style.opacity = lang === 'ar' ? '1' : '0.9';
+    }
   }
 
   function pathName() {

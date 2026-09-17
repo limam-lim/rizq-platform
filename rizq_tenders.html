@@ -915,7 +915,18 @@ function applyLang(){
   document.documentElement.lang = l==='fr' ? 'fr' : 'ar';
   document.documentElement.dir  = l==='fr' ? 'ltr' : 'rtl';
   document.title = l==='fr' ? "Appels d'offres | Rizq" : 'المناقصات | رزق';
-  var btn = document.getElementById('lang-btn'); if(btn) btn.textContent = l==='fr' ? 'ع' : 'FR';
+  var btn = document.getElementById('lang-btn');
+  if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
+    window.RizqI18n.paintPrimaryLangBtn(btn, l === 'fr' ? 'fr' : 'ar');
+  } else if (btn) {
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', l === 'fr' ? 'fr' : 'ar');
+    var frEl = btn.querySelector('.lang-fr'), arEl = btn.querySelector('.lang-ar');
+    if (frEl) frEl.style.color = l === 'fr' ? '#C9A84C' : '#ffffff';
+    if (arEl) arEl.style.color = l === 'ar' ? '#C9A84C' : '#ffffff';
+  }
   document.querySelectorAll('[data-t-fr]').forEach(function(el){
     if(!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
     el.innerHTML = l==='fr' ? el.getAttribute('data-t-fr') : el.getAttribute('data-t-ar');

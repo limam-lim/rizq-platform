@@ -958,9 +958,21 @@ function _applyCorpLang(lang){
   else { try{ localStorage.setItem('rizq_lang', lang); }catch(e){} document.documentElement.lang = lang; document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr'; }
   var otherLabel = (lang === 'ar') ? 'FR' : 'AR';
   var btn1 = document.getElementById('corp-lang-btn');
-  if(btn1) btn1.textContent = otherLabel;
   var btn2 = document.getElementById('corp-lang-btn-mobile');
-  if(btn2) btn2.textContent = otherLabel;
+  [btn1, btn2].forEach(function(b){
+    if(!b) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){
+      window.RizqI18n.paintPrimaryLangBtn(b, lang === 'ar' ? 'ar' : 'fr');
+    } else {
+      b.classList.add('btn-lang','btn-lang-primary');
+      b.setAttribute('dir','ltr');
+      b.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      b.setAttribute('data-active-lang', lang === 'ar' ? 'ar' : 'fr');
+      var frEl=b.querySelector('.lang-fr'), arEl=b.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+    }
+  });
   // Refresh the currently active panel's topbar title via the bilingual lookup
   var activePanel = document.querySelector('.panel.active');
   var title = document.getElementById('topbar-title');

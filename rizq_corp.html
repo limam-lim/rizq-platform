@@ -1035,7 +1035,17 @@ function _applyCorpLang(lang){
   document.title = isFr ? 'Al-Riyada Corp | Rizq' : 'معرض الريادة | رزق';
   // Update lang btn label
   var btn=document.getElementById('lang-btn');
-  if(btn) btn.textContent = isFr?'AR':'FR';
+  if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
+    window.RizqI18n.paintPrimaryLangBtn(btn, isFr ? 'fr' : 'ar');
+  } else if (btn) {
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', isFr ? 'fr' : 'ar');
+    var frEl = btn.querySelector('.lang-fr'), arEl = btn.querySelector('.lang-ar');
+    if (frEl) frEl.style.color = isFr ? '#C9A84C' : '#ffffff';
+    if (arEl) arEl.style.color = isFr ? '#ffffff' : '#C9A84C';
+  }
   // Sync footer
   if(typeof applyFt==='function') applyFt();
   // Sync disc nav text

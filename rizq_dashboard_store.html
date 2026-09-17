@@ -2852,14 +2852,19 @@ function _applyStoreLang(lang, silent){
   // القاموس المركزي namespace="dashboard_store" تلقائياً في نفس الاستدعاء.
   if(typeof RizqI18n !== 'undefined') RizqI18n.apply(lang);
   else { try{ localStorage.setItem('rizq_lang', lang); }catch(e){} document.documentElement.lang = lang; document.documentElement.dir = isAr ? 'rtl' : 'ltr'; }
-  // update lang button label (show OTHER language)
-  var label = isAr ? 'FR' : 'AR';
-  document.querySelectorAll('.btn-lang-store, .rizq-lang-btn').forEach(function(btn){
-    if (btn.classList.contains('btn-lang-primary') && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
-      window.RizqI18n.paintPrimaryLangBtn(btn);
+  // update lang button — FR|AR أصفر/أبيض حسب اللغة الحالية
+  document.querySelectorAll('.btn-lang-store, .rizq-lang-btn, .btn-lang').forEach(function(btn){
+    if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
+      window.RizqI18n.paintPrimaryLangBtn(btn, isAr ? 'ar' : 'fr');
       return;
     }
-    btn.textContent = label;
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', isAr ? 'ar' : 'fr');
+    var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+    if(frEl) frEl.style.color = isAr ? '#ffffff' : '#C9A84C';
+    if(arEl) arEl.style.color = isAr ? '#C9A84C' : '#ffffff';
   });
   // re-apply topbar title for current panel (not a data-t element — set dynamically by showPanel)
   var activePanel = document.querySelector('.panel.active');

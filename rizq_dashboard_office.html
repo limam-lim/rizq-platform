@@ -2019,12 +2019,24 @@ function _applyOfficeLang(lang, silent){
     var t = document.getElementById('topbar-title');
     if(t) t.textContent = (isAr ? TITLES[pid] : TITLES_FR[pid]) || t.textContent;
   }
-  // update lang toggle button label to show the OTHER language
-  var label = isAr ? 'FR' : 'AR';
+  // update lang toggle button — FR|AR أصفر/أبيض حسب اللغة الحالية
+  var _ol = isAr ? 'ar' : 'fr';
   var btn = document.getElementById('office-lang-btn');
-  if(btn) btn.textContent = label;
   var btnM = document.getElementById('office-lang-btn-mobile');
-  if(btnM) btnM.textContent = label;
+  [btn, btnM].forEach(function(b){
+    if(!b) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){
+      window.RizqI18n.paintPrimaryLangBtn(b, _ol);
+    } else {
+      b.classList.add('btn-lang','btn-lang-primary');
+      b.setAttribute('dir','ltr');
+      b.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      b.setAttribute('data-active-lang', _ol);
+      var frEl=b.querySelector('.lang-fr'), arEl=b.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = _ol==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = _ol==='ar'?'#C9A84C':'#ffffff';
+    }
+  });
   if(!silent) showToast(isAr ? 'تم التبديل إلى العربية 🇲🇷' : 'Langue changée en Français 🇫🇷', 'info');
 
   try{ if(typeof renderOverview==='function') renderOverview(); }catch(e){}

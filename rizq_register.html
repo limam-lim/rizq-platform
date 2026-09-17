@@ -282,7 +282,17 @@
   function applyDir() {
     document.documentElement.lang = fr ? 'fr' : 'ar';
     document.documentElement.dir = fr ? 'ltr' : 'rtl';
-    document.getElementById('lang-btn').textContent = fr ? 'AR' : 'FR';
+    (function(btn, lang){
+      if(!btn) return;
+      if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, lang); return; }
+      btn.classList.add('btn-lang','btn-lang-primary');
+      btn.setAttribute('dir','ltr');
+      btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      btn.setAttribute('data-active-lang', lang);
+      var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+    })(document.getElementById('lang-btn'), fr ? 'fr' : 'ar');
   }
   applyDir();
   function t(a, b) { return fr ? b : a; }

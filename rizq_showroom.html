@@ -656,7 +656,17 @@ function toggleLang(){
   try{ localStorage.setItem('rizq_lang', _lang); }catch(e){}
   /* تحديث dir/lang مركزياً عبر RizqI18n ثم المحلي */
   if(window.RizqI18n) RizqI18n.apply(_lang);
-  document.getElementById('lang-btn').textContent = _lang==='ar' ? 'FR' : 'ع';
+  (function(btn, lang){
+    if(!btn) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, lang); return; }
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', lang);
+    var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+    if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+    if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+  })(document.getElementById('lang-btn'), _lang==='ar' ? 'ar' : 'fr');
   document.documentElement.lang = _lang==='ar' ? 'ar' : 'fr';
   document.documentElement.dir  = _lang==='ar' ? 'rtl' : 'ltr';
   applyLang();
@@ -668,7 +678,18 @@ function toggleLang(){
 document.addEventListener('rizq:langchange', function (e) {
   _lang = e.detail.lang;
   var btn = document.getElementById('lang-btn');
-  if (btn) btn.textContent = _lang === 'ar' ? 'FR' : 'ع';
+  if (btn) {
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, _lang === 'ar' ? 'ar' : 'fr'); }
+    else {
+      btn.classList.add('btn-lang','btn-lang-primary');
+      btn.setAttribute('dir','ltr');
+      btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      btn.setAttribute('data-active-lang', _lang === 'ar' ? 'ar' : 'fr');
+      var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = _lang==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = _lang==='ar'?'#C9A84C':'#ffffff';
+    }
+  }
   applyLang();
   renderCatalog();
 });
@@ -951,7 +972,17 @@ function applyLang(){
   document.documentElement.dir  = isFr ? 'ltr' : 'rtl';
   document.documentElement.lang = isFr ? 'fr'  : 'ar';
   document.title = isFr ? 'Showroom Rizq | Rizq' : 'معرض رزق | Rizq';
-  document.getElementById('lang-btn').textContent = isFr ? 'ع' : 'FR';
+  (function(btn, lang){
+    if(!btn) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, lang); return; }
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', lang);
+    var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+    if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+    if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+  })(document.getElementById('lang-btn'), isFr ? 'fr' : 'ar');
   var _typeLbl = document.getElementById('showroom-type-label');
   if (_typeLbl) _typeLbl.textContent = isFr ? 'Showroom' : 'المعرض';
   var _premBadge = document.getElementById('premium-badge-lbl');
@@ -1092,7 +1123,17 @@ document.addEventListener('DOMContentLoaded', function(){
   renderCatalog();
   loadPackages();
   /* sync lang button */
-  document.getElementById('lang-btn').textContent = _lang==='ar' ? 'FR' : 'ع';
+  (function(btn, lang){
+    if(!btn) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, lang); return; }
+    btn.classList.add('btn-lang','btn-lang-primary');
+    btn.setAttribute('dir','ltr');
+    btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+    btn.setAttribute('data-active-lang', lang);
+    var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+    if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+    if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+  })(document.getElementById('lang-btn'), _lang==='ar' ? 'ar' : 'fr');
   /* listen for lang changes from i18n system */
   try{
     var _orig = Storage.prototype.setItem;

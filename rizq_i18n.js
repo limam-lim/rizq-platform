@@ -449,21 +449,23 @@
     '<span class="lang-ar" dir="ltr">AR</span>';
 
   function isPrimaryLangBtn(btn) {
-    return !!(btn && (
-      btn.classList.contains('btn-lang-primary') ||
-      btn.id === 'rizq-lang-btn' ||
-      btn.id === 'rizq-desk-lang-btn' ||
-      btn.id === 'nav-lang-btn' ||
-      btn.id === 'lang-btn' ||
-      btn.id === 'store-lang-btn' ||
-      btn.id === 'office-lang-btn' ||
-      btn.id === 'corp-lang-btn'
-    ));
+    if (!btn || !btn.tagName) return false;
+    if (btn.classList.contains('btn-lang') || btn.classList.contains('btn-lang-primary') || btn.classList.contains('rizq-reg-chrome-lang')) return true;
+    var id = btn.id || '';
+    return /lang-btn|lang_btn|rizq-lang|store-lang|office-lang|corp-lang|cp-lang|login-lang|desk-lang|nav-lang/i.test(id);
   }
 
-  function paintPrimaryLangBtn(btn) {
+  function paintPrimaryLangBtn(btn, langOverride) {
     if (!btn) return;
-    var lang = state.lang === 'fr' ? 'fr' : 'ar';
+    var lang = (langOverride === 'fr' || langOverride === 'ar')
+      ? langOverride
+      : (state.lang === 'fr' ? 'fr' : 'ar');
+    if (!btn.classList.contains('btn-lang') && !btn.classList.contains('rizq-reg-chrome-lang')) {
+      btn.classList.add('btn-lang');
+    }
+    if (!btn.classList.contains('rizq-reg-chrome-lang')) {
+      btn.classList.add('btn-lang-primary');
+    }
     btn.setAttribute('dir', 'ltr');
     btn.innerHTML = PRIMARY_LANG_BTN_HTML;
     btn.setAttribute('aria-label', 'FR | AR');
@@ -473,11 +475,19 @@
     if (frEl) {
       frEl.classList.toggle('is-active-lang', lang === 'fr');
       frEl.style.color = lang === 'fr' ? '#C9A84C' : '#ffffff';
+      frEl.style.opacity = lang === 'fr' ? '1' : '0.9';
     }
     if (arEl) {
       arEl.classList.toggle('is-active-lang', lang === 'ar');
       arEl.style.color = lang === 'ar' ? '#C9A84C' : '#ffffff';
+      arEl.style.opacity = lang === 'ar' ? '1' : '0.9';
     }
+  }
+
+  function paintAllLangButtons(langOverride) {
+    document.querySelectorAll('.btn-lang, .btn-lang-primary, .rizq-reg-chrome-lang, #lang-btn, #store-lang-btn, #office-lang-btn, #office-lang-btn-mobile, #corp-lang-btn, #nav-lang-btn, #rizq-lang-btn, #rizq-desk-lang-btn, #cp-lang-btn, #login-lang-btn').forEach(function (btn) {
+      paintPrimaryLangBtn(btn, langOverride);
+    });
   }
 
   var _applyGen = 0;
@@ -492,14 +502,7 @@
     if (gen !== _applyGen) return;
     applyRootDir(state.lang);
     stripLeakedDirs();
-    document.querySelectorAll('.btn-lang').forEach(function (btn) {
-      if (isPrimaryLangBtn(btn)) {
-        paintPrimaryLangBtn(btn);
-        return;
-      }
-      btn.textContent = state.lang === 'ar' ? 'FR' : 'AR';
-      btn.setAttribute('aria-label', state.lang === 'ar' ? 'Passer au français' : 'التبديل إلى العربية');
-    });
+    paintAllLangButtons();
     applyDocumentTitle();
     if (gen !== _applyGen) return;
     // Coalesce stacked listeners (browse/store/widget) into one event per toggle.
@@ -539,6 +542,7 @@
     applyRootDir: applyRootDir,
     stripLeakedDirs: stripLeakedDirs,
     paintPrimaryLangBtn: paintPrimaryLangBtn,
+    paintAllLangButtons: paintAllLangButtons,
     isPrimaryLangBtn: isPrimaryLangBtn
   };
 
