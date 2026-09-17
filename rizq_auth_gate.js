@@ -444,7 +444,7 @@
       '    <nav class="rag-legal" id="rag-legal" aria-label="Legal">',
       '      <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
       '      <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
-      '      <a id="rag-link-help" href="rizq_help.html" target="_blank" rel="noopener"></a>',
+      '      <a id="rag-link-help" href="rizq_help.html"></a>',
       '    </nav>',
       '    </div>',
       '  </div>',

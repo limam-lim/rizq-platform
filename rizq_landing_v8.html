@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.2"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.3"/>
 <script>
 (function () {
   try {
@@ -2927,8 +2927,8 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       <ul class="footer-links"><li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" data-t="ft-tc1">🏠 منازل وعقارات</a></li><li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" data-t="ft-tc2">🚗 سيارات وقطع غيار</a></li><li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" data-t="ft-tc3">🚛 شاحنات ومعدات</a></li><li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" data-t="ft-tc4">📱 هواتف وإلكترونيات</a></li><li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" data-t="ft-tc5">🐄 ماشية وحيوانات</a></li></ul>
     </div>
     <div>
-      <h4 class="footer-col-title" data-t="ft-help">المساعدة</h4>
-      <ul class="footer-links"><li><a href="rizq_help.html" data-t="ft-h1">مركز المساعدة</a></li><li><a href="rizq_legal.html#s3" data-t="ft-h2">سياسة الخصوصية</a></li><li><a href="rizq_legal.html#s2" data-t="ft-h3">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h4">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h5">تواصل معنا</a></li></ul>
+      <h4 class="footer-col-title rizq-help-title" data-t="ft-help" title="مركز المساعدة">المساعدة</h4>
+      <ul class="footer-links"><li><a href="rizq_help.html" data-t="ft-h1" id="rzq-ft-h1">مركز المساعدة</a></li><li><a href="rizq_legal.html#s3" data-t="ft-h2">سياسة الخصوصية</a></li><li><a href="rizq_legal.html#s2" data-t="ft-h3">شروط الاستخدام</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h4">الإبلاغ عن إعلان</a></li><li><a href="rizq_legal.html#s10" data-t="ft-h5">تواصل معنا</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-contact">تواصل معنا</h4>
@@ -3655,7 +3655,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <span class="rizq-reg-footer-label ar-only">الأقسام</span>
         <span class="rizq-reg-footer-label fr-only">Catégories</span>
       </a>
-      <a href="rizq_help.html" class="rizq-reg-footer-item">
+      <a href="rizq_help.html" class="rizq-reg-footer-item" id="rizq-reg-help" aria-label="مركز المساعدة" onclick="return (typeof goRizqHelp==='function'?goRizqHelp(event):(location.assign('rizq_help.html'),false))">
         <span class="rizq-reg-footer-icon">📘</span>
         <span class="rizq-reg-footer-label ar-only">المساعدة</span>
         <span class="rizq-reg-footer-label fr-only">Aide</span>

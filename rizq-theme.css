@@ -1361,3 +1361,7 @@ a.rizq-trust-card:hover {
   .rizq-toast-global { transition: none; }
 }
 
+
+/* Help column title → مركز المساعدة */
+.rizq-help-title{cursor:pointer}
+.rizq-help-title:hover{color:var(--gold,#c9a84c)}

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '19.4';
+  var ASSET_V = '19.5';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -170,7 +170,54 @@
     }
   }
 
-  global.RizqViewport = { isPhone: isPhoneViewport };
+  /** Help / مساعدة → always open the public help center (دليل المساعد). */
+  function goRizqHelp(e) {
+    if (e) {
+      try { e.preventDefault(); } catch (e0) {}
+      try { e.stopPropagation(); } catch (e1) {}
+    }
+    try { location.assign('rizq_help.html'); } catch (e2) { location.href = 'rizq_help.html'; }
+    return false;
+  }
+  window.goRizqHelp = goRizqHelp;
+
+  function bindHelpRoutes() {
+    var titleSel = [
+      '#rzq-ft-help',
+      '#ft-help',
+      'h4[data-t="ft-help"]',
+      'h4[data-t="footer-col-help"]',
+      'h4[data-t-fr="AIDE"]',
+      'h4[data-t-fr="Aide"]',
+      '.rizq-help-title'
+    ].join(',');
+    document.querySelectorAll(titleSel).forEach(function (el) {
+      if (el.getAttribute('data-rizq-help-bound')) return;
+      el.setAttribute('data-rizq-help-bound', '1');
+      el.style.cursor = 'pointer';
+      el.setAttribute('role', 'link');
+      el.setAttribute('tabindex', '0');
+      el.addEventListener('click', goRizqHelp);
+      el.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          goRizqHelp(ev);
+        }
+      });
+    });
+    document.querySelectorAll('a[href="rizq_help.html"], a[href="./rizq_help.html"], a[href="/rizq_help.html"]').forEach(function (a) {
+      if (a.getAttribute('data-rizq-help-bound')) return;
+      a.setAttribute('data-rizq-help-bound', '1');
+      a.addEventListener('click', function (ev) {
+        goRizqHelp(ev);
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindHelpRoutes);
+  else bindHelpRoutes();
+  window.addEventListener('load', function () { setTimeout(bindHelpRoutes, 80); });
+
+  window.RizqViewport = { isPhone: isPhoneViewport };
 
   function onViewportChange() {
     try { window.dispatchEvent(new Event('resize')); } catch (eR) {}
@@ -261,7 +308,7 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=19.4').catch(function (err) {
+      navigator.serviceWorker.register('sw.js?v=19.5').catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });
     });
