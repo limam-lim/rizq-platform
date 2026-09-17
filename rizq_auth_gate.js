@@ -1049,6 +1049,11 @@
   }
 
   function openAccountChoice() {
+    /* إن كان المشتري مسجّلاً بالفعل → لوحة الحساب مباشرة */
+    if (isLoggedIn()) {
+      openAccountModal();
+      return;
+    }
     rememberAfterAuthHref();
     openRagShell();
     var dict = d();
