@@ -657,6 +657,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="panel" id="panel-settings">
       <div class="card">
         <div class="card-header"><div class="card-title" data-t="set-title">⚙️ إعدادات الحساب</div></div>
+        <div class="form-group"><label class="form-label" data-t="set-pw-cur-label">كلمة المرور الحالية</label><input class="form-input" type="password" id="s-pw-cur" placeholder="••••••••"/></div>
         <div class="form-group"><label class="form-label" data-t="set-pw-new-label">كلمة المرور الجديدة</label><input class="form-input" type="password" id="s-pw-new" placeholder="8 أحرف على الأقل" data-ph="set-pw-new-ph"/></div>
         <div class="form-group"><label class="form-label" data-t="set-pw2-label">تأكيد كلمة المرور</label><input class="form-input" type="password" id="s-pw2" placeholder="••••••••"/></div>
         <button class="btn btn-primary" onclick="changePw()" data-t="set-pw-btn">🔒 تغيير كلمة المرور</button>
@@ -1956,7 +1957,31 @@ function deactivateAccount(){
 
 // إصلاح: كانت تدّعي "تم تغيير كلمة المرور ✅" بلا أي نظام مصادقة حقيقي خلف
 // الكواليس — نجاح وهمي بالكامل (نفس علّة rizq_dashboard_store.html).
-function changePw(){const pw=document.getElementById('s-pw-new').value;const c2=document.getElementById('s-pw2').value;if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}showToast(_t2('⚠️ نظام مصادقة حقيقي قيد التطوير — هذا النموذج للعرض فقط حالياً','⚠️ Le système d\'authentification réel est en cours de développement — indicatif uniquement pour l\'instant'),'error');}
+function changePw(){
+  const cur=(document.getElementById('s-pw-cur')||{}).value||'';
+  const pw=document.getElementById('s-pw-new').value;
+  const c2=document.getElementById('s-pw2').value;
+  if(!cur||!pw||!c2){showToast(_t2('عبّئ جميع الحقول','Remplissez tous les champs'),'error');return;}
+  if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}
+  if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}
+  if(typeof IS_DEMO!=='undefined' && IS_DEMO){showToast(_t2('👁 وضع تجريبي','👁 Mode démo'));return;}
+  var tok=window.REAL_ACCESS_TOKEN||SESSION_TOKEN;
+  if(!SESSION_ID||!tok||!window.RizqAccount||typeof window.RizqAccount.changePasswordAsync!=='function'){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'),'error');return;
+  }
+  window.RizqAccount.changePasswordAsync(SESSION_ID,tok,cur,pw).then(function(res){
+    if(res&&res.ok){
+      document.getElementById('s-pw-cur').value='';
+      document.getElementById('s-pw-new').value='';
+      document.getElementById('s-pw2').value='';
+      showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+      return;
+    }
+    var msg=(res&&res.error)||_t2('تعذّر التحديث','Échec');
+    if(res&&res.code==='invalid_current') msg=_t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+    showToast('⚠️ '+msg,'error');
+  }).catch(function(){showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible'),'error');});
+}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');}
 function logout(){
   if(!confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?'))) return;

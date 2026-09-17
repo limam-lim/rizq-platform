@@ -1929,7 +1929,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
-<script src="rizq_account_route.js?v=8"></script>
+<script src="rizq_account_route.js?v=9"></script>
 <script src="rizq_auth_gate.js?v=19.2" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
@@ -3142,7 +3142,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       <p class="modal-auth-sub">أهلاً بعودتك إلى رزق 🎉</p>
       <input class="m-input" id="li-em" type="email" data-ph-fr="Adresse e-mail" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email" required/>
       <div class="m-pw-wrap"><input class="m-input" id="li-pw" type="password" data-ph-fr="Mot de passe" placeholder="كلمة المرور" autocomplete="current-password" minlength="6" required/><button class="m-eye" type="button" onclick="tp('li-pw')" aria-label="إظهار كلمة المرور">👁</button></div>
-      <div style="text-align:left;margin-bottom:18px"><a href="#" onclick="event.preventDefault();alert(isAr?'لاستعادة كلمة المرور، تواصل معنا على direction@rizq.mr وسنساعدك فوراً.':'Pour récupérer votre mot de passe, contactez-nous à direction@rizq.mr et nous vous aiderons immédiatement.');" style="color:var(--gold);font-size:12px;text-decoration:none">نسيت كلمة المرور؟</a></div>
+      <div style="text-align:left;margin-bottom:18px"><a href="#" id="li-forgot-link" onclick="event.preventDefault();openForgotPassword();" style="color:var(--gold);font-size:12px;text-decoration:none">نسيت كلمة المرور؟</a></div>
       <button class="m-btn-main" type="button" onclick="doLogin()">دخول ←</button>
       <p class="modal-auth-switch"><span data-t="auth-no-account">ليس لديك حساب؟</span> <button type="button" class="m-link-btn" onclick="openModal('register')" data-t="auth-create-free">أنشئ حسابك مجاناً</button></p>
       <div class="rizq-reg-trust">
@@ -3152,13 +3152,42 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         </div>
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">استعادة كلمة المرور</span><span class="fr-only">Récupérer le mot de passe</span></b>
-          <p><span class="ar-only">اكتب لـ direction@rizq.mr من بريد الحساب المسجّل. لا نطلب أبداً كلمة المرور أو رمز الدفع عبر رسالة.</span><span class="fr-only">Écrivez à direction@rizq.mr depuis l’e-mail du compte. Rizq ne demande jamais votre mot de passe ou un code de paiement par message.</span></p>
+          <p><span class="ar-only">اضغط «نسيت كلمة المرور؟» وأدخل بريدك — يصلك رمز تحقق لإعادة التعيين. رزق لا يطلب كلمة المرور عبر رسالة.</span><span class="fr-only">Cliquez sur « Mot de passe oublié ? », saisissez votre e-mail — un code vous permet de réinitialiser. Rizq ne demande jamais le mot de passe par message.</span></p>
         </div>
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">أمان المشتركين</span><span class="fr-only">Sécurité des membres</span></b>
           <p><span class="ar-only">بيانات الدفع والهوية تُعالج في مسار معزول، وصورة الهوية تُحذف بعد التوثيق. جلسة الدخول تبقى على جهازك فقط.</span><span class="fr-only">Paiements et pièces d’identité sont traités à part ; la photo d’identité est effacée après contrôle. La session reste sur votre appareil.</span></p>
         </div>
       </div>
+    </div>
+
+    <!-- ══ FORGOT / RESET PASSWORD ══ -->
+    <div id="p-forgot" style="display:none">
+      <h3 class="modal-auth-heading" id="forgot-heading">استعادة كلمة المرور</h3>
+      <p class="modal-auth-sub" id="forgot-sub">أدخل بريد حساب البائع لإرسال رمز التحقق</p>
+
+      <div id="forgot-step-email">
+        <input class="m-input" id="fg-em" type="email" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email"/>
+        <button class="m-btn-main" type="button" id="fg-send-btn" onclick="forgotSendCode()">إرسال الرمز ←</button>
+      </div>
+
+      <div id="forgot-step-code" style="display:none">
+        <p style="font-size:13px;color:#64748b;margin:0 0 12px;text-align:center" id="forgot-code-hint"></p>
+        <div style="display:flex;gap:8px;justify-content:center;margin:0 0 14px;direction:ltr" id="fg-otp-row">
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 1" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 2" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 3" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 4" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 5" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+          <input class="m-input fg-otp" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="digit 6" style="width:44px;text-align:center;font-size:20px;font-weight:800;padding:10px 0"/>
+        </div>
+        <div class="m-pw-wrap"><input class="m-input" id="fg-pw" type="password" placeholder="كلمة المرور الجديدة (8+)" autocomplete="new-password" minlength="8"/><button class="m-eye" type="button" onclick="tp('fg-pw')" aria-label="إظهار">👁</button></div>
+        <div class="m-pw-wrap"><input class="m-input" id="fg-pw2" type="password" placeholder="تأكيد كلمة المرور" autocomplete="new-password" minlength="8"/><button class="m-eye" type="button" onclick="tp('fg-pw2')" aria-label="إظهار">👁</button></div>
+        <button class="m-btn-main" type="button" id="fg-confirm-btn" onclick="forgotConfirmReset()">تعيين كلمة المرور ←</button>
+        <button type="button" class="m-link-btn" onclick="forgotSendCode()" id="fg-resend-btn" style="margin-top:8px">إعادة إرسال الرمز</button>
+      </div>
+
+      <button type="button" class="m-link-btn" onclick="openModal('login')" style="margin-top:14px">← عودة لتسجيل الدخول</button>
     </div>
 
     <!-- ══ STEP 0: نوع الحساب (خاص / شركة) ══ -->
@@ -5430,7 +5459,7 @@ function applyLandingLang(toAr) {
   if(liEm) liEm.placeholder = RizqI18n.t2('البريد الإلكتروني','Adresse e-mail');
   const liPw = document.getElementById('li-pw');
   if(liPw) liPw.placeholder = RizqI18n.t2('كلمة المرور','Mot de passe');
-  const liForgot = document.querySelector('#p-login a');
+  const liForgot = document.getElementById('li-forgot-link') || document.querySelector('#p-login a');
   if(liForgot) liForgot.textContent = RizqI18n.t2('نسيت كلمة المرور؟','Mot de passe oublié?');
   const liBtn = document.querySelector('#p-login .m-btn-main');
   if(liBtn) liBtn.textContent = RizqI18n.t2('دخول ←','Connexion →');
@@ -5932,7 +5961,7 @@ function applyFullTranslation(lang) {
   const liSub   = q('#p-login .modal-auth-sub');
   const liEmail = q('#li-em');
   const liPw    = q('#li-pw');
-  const liForgot= q('#p-login a');
+  const liForgot= q('#li-forgot-link') || q('#p-login a');
   const liBtn   = q('#p-login .m-btn-main');
   const authTabLogin = q('#modal-tab-login');
   const authTabRegister = q('#modal-tab-register');
@@ -6220,7 +6249,7 @@ let bizType='';  // 'store' | 'office' | 'corp'
 let stFile=null,ofFile1=null,ofFile2=null,crFile1=null,crFile2=null,crFile3=null,indFile=null;
 let phoneBackPanel='';
 
-const ALL_PANELS=['p-login','p-type','p-nat-type','p-biz-type','p-individual-form','p-store-form','p-office-form','p-corp-form','p-company','p-phone','p-id-upload','p-pkg-payment','p-ok'];
+const ALL_PANELS=['p-login','p-forgot','p-type','p-nat-type','p-biz-type','p-individual-form','p-store-form','p-office-form','p-corp-form','p-company','p-phone','p-id-upload','p-pkg-payment','p-ok'];
 
 /* ── إصلاح قائمة "الباقات ▾" في النافبار: كانت تعتمد على :hover فقط فتختفي
    أثناء تحريك الماوس نحوها قبل الوصول (فجوة بين الزر والقائمة). الآن تُفتح
@@ -6401,7 +6430,7 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register' || mode==='login') ? '1000001' : '';
+  modal.style.zIndex = (mode==='register' || mode==='login' || mode==='forgot') ? '1000001' : '';
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
@@ -6421,7 +6450,7 @@ function openModal(mode){
       }
     }catch(eUrl){}
   } else {
-    /* login — شاشة فاتحة واضحة على الهاتف والكمبيوتر */
+    /* login / forgot — شاشة فاتحة واضحة */
     modal.classList.add('reg-wizard-mode');
     modal.classList.add('auth-login-mode');
     modal.classList.remove('reg-wizard-arming');
@@ -6442,6 +6471,12 @@ function openModal(mode){
     if(dots) dots.style.display='none';
     if(prog){ prog.style.display='none'; prog.setAttribute('aria-hidden','true'); }
     syncModalAuthTabs('login');
+  } else if(mode==='forgot'){
+    document.getElementById('p-forgot').style.display='block';
+    if(dots) dots.style.display='none';
+    if(prog){ prog.style.display='none'; prog.setAttribute('aria-hidden','true'); }
+    syncModalAuthTabs('login');
+    resetForgotUi();
   } else {
     acctType=''; natType=''; bizType='';
     document.getElementById('p-type').style.display='block';
@@ -6529,7 +6564,7 @@ document.getElementById('modal').addEventListener('click',function(e){
 function showPanel(id,dot,total){
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
   document.getElementById(id).style.display='block';
-  if(id==='p-login') syncModalAuthTabs('login');
+  if(id==='p-login' || id==='p-forgot') syncModalAuthTabs('login');
   else if(id==='p-type') syncModalAuthTabs('register');
   else syncModalAuthTabs('');
   if(dot!==undefined)setDot(dot,total||3);
@@ -7663,6 +7698,144 @@ function doLogin(){
   }
   alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
 }
+
+/* ══ استعادة كلمة مرور البائع (OTP بالبريد) ══ */
+var _forgotEmail = '';
+function openForgotPassword(){
+  var pre = (document.getElementById('li-em') && document.getElementById('li-em').value) || '';
+  openModal('forgot');
+  var em = document.getElementById('fg-em');
+  if(em && pre) em.value = pre.trim();
+}
+function resetForgotUi(){
+  _forgotEmail = '';
+  var stepE = document.getElementById('forgot-step-email');
+  var stepC = document.getElementById('forgot-step-code');
+  if(stepE) stepE.style.display = 'block';
+  if(stepC) stepC.style.display = 'none';
+  var h = document.getElementById('forgot-heading');
+  var s = document.getElementById('forgot-sub');
+  if(h) h.textContent = isAr ? 'استعادة كلمة المرور' : 'Récupérer le mot de passe';
+  if(s) s.textContent = isAr ? 'أدخل بريد حساب البائع لإرسال رمز التحقق' : 'Saisissez l\'e-mail du compte vendeur pour recevoir un code';
+  document.querySelectorAll('.fg-otp').forEach(function(inp){ inp.value = ''; });
+  var pw = document.getElementById('fg-pw');
+  var pw2 = document.getElementById('fg-pw2');
+  if(pw) pw.value = '';
+  if(pw2) pw2.value = '';
+  wireForgotOtpBoxes();
+}
+function wireForgotOtpBoxes(){
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.fg-otp'));
+  boxes.forEach(function(box, idx){
+    box.oninput = function(){
+      var v = String(box.value || '').replace(/\D/g,'').slice(0,1);
+      box.value = v;
+      if(v && boxes[idx+1]) boxes[idx+1].focus();
+    };
+    box.onkeydown = function(ev){
+      if(ev.key === 'Backspace' && !box.value && boxes[idx-1]){
+        boxes[idx-1].focus();
+      }
+    };
+    box.onpaste = function(ev){
+      try{
+        var t = (ev.clipboardData || window.clipboardData).getData('text') || '';
+        var digits = String(t).replace(/\D/g,'').slice(0,6);
+        if(digits.length){
+          ev.preventDefault();
+          digits.split('').forEach(function(d,i){ if(boxes[i]) boxes[i].value = d; });
+          if(boxes[Math.min(digits.length, boxes.length)-1]) boxes[Math.min(digits.length, boxes.length)-1].focus();
+        }
+      }catch(eP){}
+    };
+  });
+}
+function forgotReadCode(){
+  return Array.prototype.map.call(document.querySelectorAll('.fg-otp'), function(inp){
+    return String(inp.value || '').replace(/\D/g,'');
+  }).join('').slice(0,6);
+}
+function forgotSendCode(){
+  var emEl = document.getElementById('fg-em');
+  var email = (emEl && emEl.value || _forgotEmail || '').trim().toLowerCase();
+  var emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRx.test(email)){ alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide'); return; }
+  var btn = document.getElementById('fg-send-btn');
+  var resend = document.getElementById('fg-resend-btn');
+  if(btn){ btn.disabled = true; btn.textContent = isAr ? 'جارٍ الإرسال...' : 'Envoi...'; }
+  if(resend) resend.disabled = true;
+  var fn = window.RizqAccount && window.RizqAccount.requestPasswordReset;
+  if(typeof fn !== 'function'){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'إرسال الرمز ←' : 'Envoyer le code →'; }
+    alert(isAr?'تعذّر الاتصال':'Connexion impossible');
+    return;
+  }
+  fn(email).then(function(res){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'إرسال الرمز ←' : 'Envoyer le code →'; }
+    if(resend) resend.disabled = false;
+    if(!res || !res.ok){
+      alert((res && res.error) || (isAr?'تعذّر إرسال الرمز':'Échec d\'envoi du code'));
+      return;
+    }
+    _forgotEmail = email;
+    document.getElementById('forgot-step-email').style.display = 'none';
+    document.getElementById('forgot-step-code').style.display = 'block';
+    var h = document.getElementById('forgot-heading');
+    var s = document.getElementById('forgot-sub');
+    if(h) h.textContent = isAr ? 'أدخل الرمز وكلمة المرور الجديدة' : 'Code + nouveau mot de passe';
+    if(s) s.textContent = isAr ? 'تحقق من بريدك ثم عيّن كلمة مرور جديدة' : 'Vérifiez votre e-mail puis définissez un nouveau mot de passe';
+    var hint = document.getElementById('forgot-code-hint');
+    var msg = isAr
+      ? ('إن وُجد حساب لـ ' + email + ' فسيصلك رمز خلال دقائق.')
+      : ('Si un compte existe pour ' + email + ', un code arrivera sous peu.');
+    if(res.devHint) msg += (isAr ? ' (تجريبي: ' : ' (dev: ') + res.devHint + ')';
+    if(hint) hint.textContent = msg;
+    wireForgotOtpBoxes();
+    var first = document.querySelector('.fg-otp');
+    if(first) first.focus();
+  }).catch(function(){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'إرسال الرمز ←' : 'Envoyer le code →'; }
+    if(resend) resend.disabled = false;
+    alert(isAr?'تعذّر الاتصال':'Connexion impossible');
+  });
+}
+function forgotConfirmReset(){
+  var email = _forgotEmail || ((document.getElementById('fg-em')||{}).value||'').trim().toLowerCase();
+  var code = forgotReadCode();
+  var pw = (document.getElementById('fg-pw')||{}).value || '';
+  var pw2 = (document.getElementById('fg-pw2')||{}).value || '';
+  if(code.length !== 6){ alert(isAr?'أدخل الرمز المكوّن من 6 أرقام':'Saisissez le code à 6 chiffres'); return; }
+  if(String(pw).length < 8){ alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères'); return; }
+  if(pw !== pw2){ alert(isAr?'كلمتا المرور غير متطابقتين':'Les mots de passe ne correspondent pas'); return; }
+  var btn = document.getElementById('fg-confirm-btn');
+  if(btn){ btn.disabled = true; btn.textContent = isAr ? 'جارٍ الحفظ...' : 'Enregistrement...'; }
+  var fn = window.RizqAccount && window.RizqAccount.confirmPasswordReset;
+  if(typeof fn !== 'function'){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'تعيين كلمة المرور ←' : 'Définir le mot de passe →'; }
+    alert(isAr?'تعذّر الاتصال':'Connexion impossible');
+    return;
+  }
+  fn(email, code, pw).then(function(res){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'تعيين كلمة المرور ←' : 'Définir le mot de passe →'; }
+    if(res && res.ok){
+      showToast(isAr?'✅ تم تعيين كلمة المرور':'✅ Mot de passe mis à jour');
+      closeModal(true);
+      if(res.url){
+        setTimeout(function(){ location.href = res.url; }, 400);
+      } else {
+        setTimeout(function(){ openModal('login'); }, 300);
+      }
+      return;
+    }
+    var msg = (res && res.error) || (isAr?'تعذّر التعيين — تحقق من الرمز':'Échec — vérifiez le code');
+    if(res && res.code === 'weak_password') msg = isAr?'كلمة المرور قصيرة جداً':'Mot de passe trop court';
+    alert(msg);
+  }).catch(function(){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'تعيين كلمة المرور ←' : 'Définir le mot de passe →'; }
+    alert(isAr?'تعذّر الاتصال':'Connexion impossible');
+  });
+}
+window.openForgotPassword = openForgotPassword;
 
 // ══ XSS helpers ══
 function escapeHtml(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

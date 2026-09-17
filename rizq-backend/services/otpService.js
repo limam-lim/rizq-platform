@@ -28,20 +28,27 @@ function getMailer() {
   }
 }
 
-async function sendOtpEmail(to, code, name) {
+async function sendOtpEmail(to, code, name, opts) {
   const mailer = getMailer();
   if (!mailer || !to) return { ok: false };
   const safeName = escapeHtml(String(name || '').trim() || 'عزيزي المستخدم');
   const safeCode = escapeHtml(code);
+  const purpose = (opts && opts.purpose) === 'reset' ? 'reset' : 'verify';
+  const subject = purpose === 'reset'
+    ? 'إعادة تعيين كلمة المرور — رزق Rizq'
+    : 'رمز التحقق — رزق Rizq';
+  const lead = purpose === 'reset'
+    ? 'رمز إعادة تعيين كلمة المرور:'
+    : 'رمز التحقق الخاص بك:';
   try {
     await mailer.sendMail({
       from: process.env.EMAIL_FROM || '"رزق Rizq" <direction@rizq.mr>',
       to,
-      subject: 'رمز التحقق — رزق Rizq',
+      subject,
       html: '<div dir="rtl" style="font-family:Segoe UI,Tahoma,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1B3A6B">'
         + '<h2 style="color:#C9A84C;margin:0 0 12px">رزق Rizq</h2>'
         + '<p>مرحباً ' + safeName + '،</p>'
-        + '<p>رمز التحقق الخاص بك:</p>'
+        + '<p>' + lead + '</p>'
         + '<p style="font-size:28px;font-weight:800;letter-spacing:6px;color:#0d1b2a">' + safeCode + '</p>'
         + '<p style="font-size:13px;color:#64748b">صالح لمدة 5 دقائق. لا تشارك هذا الرمز مع أحد.</p>'
         + '</div>',
@@ -100,6 +107,10 @@ function normalizeIntlPhone(raw) {
 
 function buyerStoreKey(email) {
   return 'buyer:' + normalizeEmail(email);
+}
+
+function sellerResetStoreKey(email) {
+  return 'seller-reset:' + normalizeEmail(email);
 }
 
 function isValidMauritanianPhone(ph) {
@@ -367,6 +378,117 @@ function consumeBuyerVerificationByEmail(email) {
   return { ok: true, email: em };
 }
 
+/**
+ * استعادة كلمة مرور البائع — OTP بالبريد فقط.
+ * لا يُفصح إن كان البريد مسجّلاً أم لا (نفس الرد دائماً).
+ */
+async function sendSellerResetOtp(email, opts) {
+  const em = normalizeEmail(email);
+  if (!em || !EMAIL_RE.test(em)) {
+    return { ok: false, error: 'invalid_email', message: 'بريد إلكتروني غير صالح' };
+  }
+
+  const accountExists = !!(opts && opts.accountExists);
+  const name = String((opts && opts.name) || '').trim();
+  const generic = {
+    ok: true,
+    expiresIn: Math.floor(TTL_MS / 1000),
+    sentViaEmail: false,
+    channel: 'seller-reset',
+    message: 'إن وُجد حساب بهذا البريد فسيصلك رمز خلال دقائق',
+  };
+
+  if (!accountExists) {
+    return generic;
+  }
+
+  const code = generateCode();
+  const now = Date.now();
+  const key = sellerResetStoreKey(em);
+  const list = readStore().filter((x) => x.key !== key);
+  list.push({
+    key,
+    channel: 'seller-reset',
+    email: em,
+    name,
+    codeHash: hashOtpCode(code),
+    expiresAt: now + TTL_MS,
+    attempts: 0,
+    verified: false,
+    createdAt: new Date(now).toISOString(),
+  });
+  writeStore(list);
+
+  const mail = await sendOtpEmail(em, code, name, { purpose: 'reset' });
+  const sentViaEmail = !!(mail && mail.ok);
+  const out = Object.assign({}, generic, { sentViaEmail });
+  const cfg = getPublicOtpConfig();
+  if (cfg.devHintEnabled && !sentViaEmail) out.devHint = code;
+  if (!sentViaEmail && !cfg.devHintEnabled) {
+    out.emailWarning = 'تعذّر إرسال البريد — تحقق من العنوان أو حاول لاحقاً';
+  }
+  return out;
+}
+
+function verifySellerResetOtp(email, code) {
+  const em = normalizeEmail(email);
+  const submitted = String(code || '').replace(/\D/g, '');
+  if (!em || submitted.length !== 6) {
+    return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
+  }
+
+  const list = readStore();
+  const key = sellerResetStoreKey(em);
+  const idx = list.findIndex((x) => x.key === key);
+  if (idx < 0) {
+    return { ok: false, error: 'no_otp', message: 'لم يُرسَل رمز — اطلب رمزاً جديداً' };
+  }
+
+  const rec = list[idx];
+  if (Date.now() > rec.expiresAt) {
+    list.splice(idx, 1);
+    writeStore(list);
+    return { ok: false, error: 'expired', message: 'انتهت صلاحية الرمز — اطلب رمزاً جديداً' };
+  }
+
+  rec.attempts = (rec.attempts || 0) + 1;
+  if (rec.attempts > MAX_ATTEMPTS) {
+    list.splice(idx, 1);
+    writeStore(list);
+    return { ok: false, error: 'too_many_attempts', message: 'محاولات كثيرة — اطلب رمزاً جديداً' };
+  }
+
+  if (!codesMatch(submitted, rec)) {
+    writeStore(list);
+    return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
+  }
+
+  rec.verified = true;
+  rec.verifiedUntil = Date.now() + VERIFY_WINDOW_MS;
+  delete rec.code;
+  writeStore(list);
+  return { ok: true };
+}
+
+function consumeSellerResetVerification(email) {
+  const em = normalizeEmail(email);
+  const list = readStore();
+  const key = sellerResetStoreKey(em);
+  const idx = list.findIndex((x) => x.key === key && x.verified);
+  if (idx < 0) {
+    return { ok: false, error: 'otp_required', message: 'يجب التحقق من البريد برمز OTP أولاً' };
+  }
+  const rec = list[idx];
+  if (Date.now() > (rec.verifiedUntil || rec.expiresAt)) {
+    list.splice(idx, 1);
+    writeStore(list);
+    return { ok: false, error: 'otp_expired', message: 'انتهت صلاحية التحقق — أعد إرسال الرمز' };
+  }
+  list.splice(idx, 1);
+  writeStore(list);
+  return { ok: true, email: em };
+}
+
 module.exports = {
   sendOtp,
   verifyOtp,
@@ -374,6 +496,9 @@ module.exports = {
   sendBuyerOtp,
   verifyBuyerOtp,
   consumeBuyerVerificationByEmail,
+  sendSellerResetOtp,
+  verifySellerResetOtp,
+  consumeSellerResetVerification,
   getPublicOtpConfig,
   normalizePhone,
   normalizeEmail,

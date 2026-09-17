@@ -2559,16 +2559,32 @@ function updateSubBadge(){
   else { if(dot)dot.className='sub-dot'; if(txt)txt.textContent=_t2('اشتراك نشط','Abonnement actif'); }
 }
 
-// ══ SETTINGS ══
-// إصلاح: كانت تدّعي "تم تغيير كلمة المرور ✅" بلا أي نظام مصادقة حقيقي
-// خلف الكواليس (لا يوجد كلمات مرور فعلية بعد بكل المنصة) — نجاح وهمي
-// بالكامل. نفس النهج الصادق المستخدم في rizq_dashboard.html بالضبط.
+// ══ SETTINGS — تغيير كلمة المرور عبر الخادم ══
 function changePassword(){
+  const cur = (document.getElementById('s-pw-old')||{}).value||'';
   const pw = document.getElementById('s-pw-new').value;
   const c2 = document.getElementById('s-pw-confirm').value;
+  if(!cur||!pw||!c2){showToast(_t2('عبّئ جميع الحقول','Remplissez tous les champs'),'error');return;}
   if(pw.length<8){showToast(_t2('كلمة المرور يجب أن تكون 8 أحرف+','Le mot de passe doit contenir 8 caractères ou plus'),'error');return;}
   if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}
-  showToast(_t2('⚠️ نظام مصادقة حقيقي قيد التطوير — هذا النموذج للعرض فقط حالياً','⚠️ Le système d\'authentification réel est en cours de développement — ce formulaire est pour l\'instant à titre indicatif uniquement'),'error');
+  if(typeof IS_DEMO!=='undefined' && IS_DEMO){showToast(_t2('👁 وضع تجريبي','👁 Mode démo'));return;}
+  var tok = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  if(!SESSION_ID || !tok || !window.RizqAccount || typeof window.RizqAccount.changePasswordAsync !== 'function'){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'),'error');
+    return;
+  }
+  window.RizqAccount.changePasswordAsync(SESSION_ID, tok, cur, pw).then(function(res){
+    if(res && res.ok){
+      document.getElementById('s-pw-old').value='';
+      document.getElementById('s-pw-new').value='';
+      document.getElementById('s-pw-confirm').value='';
+      showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+      return;
+    }
+    var msg = (res && res.error) || _t2('تعذّر التحديث','Échec');
+    if(res && res.code === 'invalid_current') msg = _t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+    showToast('⚠️ '+msg,'error');
+  }).catch(function(){ showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible'),'error'); });
 }
 
 // إصلاح جوهري (09/08/2026): كانت تعرض توست نجاح فوراً بلا أي إرسال حقيقي

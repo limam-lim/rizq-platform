@@ -326,6 +326,65 @@
     });
   }
 
+  function requestPasswordReset(email) {
+    var em = String(email || '').trim().toLowerCase();
+    var base = backendBase();
+    if (!em || !base) return Promise.resolve({ ok: false, code: 'invalid' });
+    return fetch(base + '/api/accounts/password-reset/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: em })
+    }).then(function (r) {
+      return r.json().then(function (data) { return data || { ok: false }; }).catch(function () {
+        return { ok: false, code: 'network' };
+      });
+    }).catch(function () { return { ok: false, code: 'network' }; });
+  }
+
+  function confirmPasswordReset(email, code, newPassword) {
+    var em = String(email || '').trim().toLowerCase();
+    var base = backendBase();
+    if (!em || !code || !newPassword || !base) return Promise.resolve({ ok: false, code: 'invalid' });
+    return fetch(base + '/api/accounts/password-reset/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: em, code: String(code).replace(/\D/g, ''), newPassword: String(newPassword) })
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (data && data.ok && data.account) {
+          var acc = mergeServerAccount(data.account);
+          if (!acc.token && data.account.dashToken) acc.token = data.account.dashToken;
+          if (acc.status === 'approved' && acc.token) setActiveSession(acc);
+          return { ok: true, account: acc, url: buildDashboardUrl(acc) };
+        }
+        return { ok: false, code: (data && data.code) || 'invalid', error: data && data.error };
+      }).catch(function () { return { ok: false, code: 'network' }; });
+    }).catch(function () { return { ok: false, code: 'network' }; });
+  }
+
+  function changePasswordAsync(accountId, accessToken, currentPassword, newPassword) {
+    var id = String(accountId || '');
+    var tok = String(accessToken || '');
+    var base = backendBase();
+    if (!id || !tok || !base) return Promise.resolve({ ok: false, code: 'unauthorized' });
+    return fetch(base + '/api/accounts/mine/' + encodeURIComponent(id) + '/password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-account-token': tok
+      },
+      body: JSON.stringify({
+        currentPassword: String(currentPassword || ''),
+        newPassword: String(newPassword || '')
+      })
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (r.ok && data && data.ok) return { ok: true };
+        return { ok: false, code: (data && data.code) || 'invalid', error: data && data.error };
+      }).catch(function () { return { ok: false, code: 'network' }; });
+    }).catch(function () { return { ok: false, code: 'network' }; });
+  }
+
   function goAfterRegistration(acc) {
     if (!acc) return false;
     if (acc.status === 'approved' && acc.token) {
@@ -498,6 +557,9 @@
     publicShareUrl: publicShareUrl,
     initShareLinkInput: initShareLinkInput,
     loginSellerAsync: loginSellerAsync,
+    requestPasswordReset: requestPasswordReset,
+    confirmPasswordReset: confirmPasswordReset,
+    changePasswordAsync: changePasswordAsync,
     syncAccountFromBackend: syncAccountFromBackend,
     mergeServerAccount: mergeServerAccount,
     refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,

@@ -798,6 +798,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="panel" id="panel-settings">
       <div class="card">
         <div class="card-header"><div class="card-title" data-t="st-account-settings">⚙️ إعدادات الحساب</div></div>
+        <div class="form-group"><label class="form-label" data-t="st-cur-pass-label">كلمة المرور الحالية</label><input class="form-input" type="password" id="s-pass-cur" placeholder="••••••••"/></div>
         <div class="form-group"><label class="form-label" data-t="st-new-pass-label">كلمة المرور الجديدة</label><input class="form-input" type="password" id="s-pass" placeholder="اتركه فارغاً إذا لم تريد التغيير" data-ph="st-new-pass-ph"/></div>
         <div class="form-group"><label class="form-label" data-t="st-confirm-pass-label">تأكيد كلمة المرور</label><input class="form-input" type="password" id="s-pass2" placeholder="أعد كتابة كلمة المرور" data-ph="st-confirm-pass-ph"/></div>
         <div style="margin-top:6px;padding:14px;background:#fff8e8;border:1px solid rgba(201,168,76,.3);border-radius:12px;font-size:13px;color:#7a5c00">
@@ -3241,12 +3242,32 @@ function saveMyPayment(){
   // في rizq_dashboard.html / _store / _office). الآن تعرض رسالة صادقة بدل
   // الادعاء بنجاح تغيير كلمة المرور فعلياً.
   function saveSettings(){
+    var cur=(document.getElementById('s-pass-cur') && document.getElementById('s-pass-cur').value) || '';
     var p1=(document.getElementById('s-pass')  &&document.getElementById('s-pass').value)  ||'';
     var p2=(document.getElementById('s-pass2') &&document.getElementById('s-pass2').value) ||'';
-    if(p1||p2){
+    if(p1||p2||cur){
+      if(!cur||!p1||!p2){ showToast(_t2('عبّئ كلمة المرور الحالية والجديدة والتأكيد','Remplissez le mot de passe actuel, le nouveau et la confirmation'),'error'); return; }
       if(p1!==p2){ showToast(_t2('كلمتا المرور غير متطابقتين','Les mots de passe ne correspondent pas'),'error'); return; }
-      if(p1.length<6){ showToast(_t2('كلمة المرور يجب أن تكون 6 أحرف على الأقل','Le mot de passe doit contenir au moins 6 caractères'),'error'); return; }
-      showToast(_t2('⚠️ نظام مصادقة حقيقي قيد التطوير — هذا النموذج للعرض فقط حالياً','⚠️ Le système d\'authentification réel est en cours de développement — ce formulaire est pour l\'instant à titre indicatif uniquement'),'error');
+      if(p1.length<8){ showToast(_t2('كلمة المرور يجب أن تكون 8 أحرف على الأقل','Le mot de passe doit contenir au moins 8 caractères'),'error'); return; }
+      if(typeof IS_DEMO!=='undefined' && IS_DEMO){ showToast(_t2('👁 وضع تجريبي','👁 Mode démo')); return; }
+      var tok = window.REAL_ACCESS_TOKEN || (CORP_ACC && CORP_ACC.token);
+      var id = CORP_ACC && CORP_ACC.id;
+      if(!id || !tok || !window.RizqAccount || typeof window.RizqAccount.changePasswordAsync !== 'function'){
+        showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'),'error');
+        return;
+      }
+      window.RizqAccount.changePasswordAsync(id, tok, cur, p1).then(function(res){
+        if(res && res.ok){
+          document.getElementById('s-pass-cur').value='';
+          document.getElementById('s-pass').value='';
+          document.getElementById('s-pass2').value='';
+          showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+          return;
+        }
+        var msg = (res && res.error) || _t2('تعذّر التحديث','Échec');
+        if(res && res.code === 'invalid_current') msg = _t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+        showToast('⚠️ '+msg,'error');
+      }).catch(function(){ showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible'),'error'); });
       return;
     }
     showToast(_t2('✅ تم حفظ الإعدادات','✅ Paramètres enregistrés'),'success');

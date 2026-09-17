@@ -60,7 +60,7 @@ app.use((req, res, next) => {
     }
   } catch (eHsts) {}
   /* لا تخزين مؤقت لاستجابات المصادقة/الجلسات */
-  if (/^\/api\/(admin\/login|admin\/verify|accounts\/seller-login|auth\/|otp\/)/i.test(req.path)) {
+  if (/^\/api\/(admin\/login|admin\/verify|accounts\/seller-login|accounts\/password|auth\/|otp\/)/i.test(req.path)) {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Pragma', 'no-cache');
   }
@@ -665,7 +665,7 @@ const {
 } = require('./services/contactGate');
 const { scanContactLeakFields } = require('./services/contactLeakGuard');
 const { canAutoApproveAccountType } = require('./config/verificationPolicy');
-const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, getPublicOtpConfig } = require('./services/otpService');
+const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, sendSellerResetOtp, verifySellerResetOtp, consumeSellerResetVerification, getPublicOtpConfig } = require('./services/otpService');
 const {
   saveAdImages,
   saveCatalogImages,
@@ -1762,6 +1762,155 @@ app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
       token: dashToken,
     }),
   });
+});
+
+/**
+ * POST /api/accounts/password-reset/request — عام — إرسال OTP لإعادة تعيين
+ * كلمة مرور البائع. لا يُفصح إن كان البريد مسجّلاً (منع التعداد).
+ */
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'محاولات كثيرة — حاول لاحقاً' },
+});
+app.post('/api/accounts/password-reset/request', passwordResetLimiter, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const email = String((req.body || {}).email || '').trim().toLowerCase().slice(0, 120);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ ok: false, code: 'invalid_email', error: 'بريد إلكتروني غير صالح' });
+  }
+  const acc = readAccounts().find((a) => String(a.email || '').trim().toLowerCase() === email);
+  const accountExists = !!(acc && !acc.suspended && acc.email);
+  try {
+    const result = await sendSellerResetOtp(email, {
+      accountExists,
+      name: acc && acc.name ? acc.name : '',
+    });
+    if (!result.ok) {
+      return res.status(400).json({ ok: false, code: result.error || 'invalid', error: result.message || 'تعذّر الإرسال' });
+    }
+    const out = {
+      ok: true,
+      expiresIn: result.expiresIn,
+      message: result.message || 'إن وُجد حساب بهذا البريد فسيصلك رمز خلال دقائق',
+    };
+    if (result.devHint) out.devHint = result.devHint;
+    if (result.emailWarning) out.emailWarning = result.emailWarning;
+    return res.json(out);
+  } catch (eReq) {
+    return res.status(500).json({ ok: false, code: 'send_failed', error: 'تعذّر إرسال الرمز' });
+  }
+});
+
+/**
+ * POST /api/accounts/password-reset/confirm — عام — تحقق OTP + كلمة مرور جديدة
+ */
+app.post('/api/accounts/password-reset/confirm', passwordResetLimiter, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const b = req.body || {};
+  const email = String(b.email || '').trim().toLowerCase().slice(0, 120);
+  const code = String(b.code || '').replace(/\D/g, '').slice(0, 6);
+  const newPassword = String(b.newPassword || b.password || '');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ ok: false, code: 'invalid_email', error: 'بريد إلكتروني غير صالح' });
+  }
+  if (code.length !== 6) {
+    return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح' });
+  }
+  if (newPassword.length < 8 || newPassword.length > 128) {
+    return res.status(400).json({ ok: false, code: 'weak_password', error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' });
+  }
+
+  const list = readAccounts();
+  const idx = list.findIndex((a) => String(a.email || '').trim().toLowerCase() === email);
+  if (idx < 0) {
+    return res.status(404).json({ ok: false, code: 'not_found', error: 'الحساب غير موجود' });
+  }
+  const acc = list[idx];
+  if (acc.suspended) {
+    return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
+  }
+
+  const verified = verifySellerResetOtp(email, code);
+  if (!verified.ok) {
+    return res.status(400).json({ ok: false, code: verified.error || 'invalid_code', error: verified.message || 'رمز غير صحيح' });
+  }
+  const consumed = consumeSellerResetVerification(email);
+  if (!consumed.ok) {
+    return res.status(400).json({ ok: false, code: consumed.error || 'otp_required', error: consumed.message || 'تحقق مطلوب' });
+  }
+
+  try {
+    acc.passHash = bcrypt.hashSync(newPassword, 10);
+  } catch (eHash) {
+    return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
+  }
+  /* تدوير التوكنات بعد إعادة التعيين */
+  acc.accessToken = genAccessToken();
+  acc.dashToken = genDashToken();
+  acc.passwordChangedAt = new Date().toISOString();
+  acc.updatedAt = acc.passwordChangedAt;
+  list[idx] = acc;
+  writeAccounts(list);
+
+  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+  res.json({
+    ok: true,
+    account: Object.assign(safeFields, {
+      accessToken,
+      dashToken,
+      token: dashToken,
+    }),
+  });
+});
+
+/**
+ * POST /api/accounts/mine/:id/password — صاحب الحساب يغيّر كلمة مروره
+ * (يتطلب كلمة المرور الحالية + x-account-token).
+ */
+app.post('/api/accounts/mine/:id/password', sellerLoginLimiter, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const list = readAccounts();
+  const idx = list.findIndex((a) => a.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
+  const acc = list[idx];
+  const token = extractAccountToken(req);
+  if (!token || token !== acc.accessToken) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
+
+  const b = req.body || {};
+  const currentPassword = String(b.currentPassword || '');
+  const newPassword = String(b.newPassword || '');
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ ok: false, code: 'missing', error: 'كلمة المرور الحالية والجديدة مطلوبتان' });
+  }
+  if (newPassword.length < 8 || newPassword.length > 128) {
+    return res.status(400).json({ ok: false, code: 'weak_password', error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' });
+  }
+  if (!acc.passHash) {
+    return res.status(400).json({ ok: false, code: 'no_password', error: 'لا توجد كلمة مرور على الحساب — استخدم استعادة كلمة المرور' });
+  }
+  let okCur = false;
+  try {
+    okCur = await bcrypt.compare(currentPassword, acc.passHash);
+  } catch (eCmp) {
+    okCur = false;
+  }
+  if (!okCur) {
+    return res.status(401).json({ ok: false, code: 'invalid_current', error: 'كلمة المرور الحالية غير صحيحة' });
+  }
+  try {
+    acc.passHash = bcrypt.hashSync(newPassword, 10);
+  } catch (eHash) {
+    return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
+  }
+  acc.passwordChangedAt = new Date().toISOString();
+  acc.updatedAt = acc.passwordChangedAt;
+  list[idx] = acc;
+  writeAccounts(list);
+  res.json({ ok: true });
 });
 
 /**

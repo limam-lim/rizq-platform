@@ -1764,7 +1764,7 @@ function initSecurityToggles(){
     }).catch(function(){});
 }
 
-// ── PASSWORD: لا يوجد نظام مصادقة حقيقي بعد — عرض صادق فقط ──
+// ── PASSWORD: تغيير كلمة المرور عبر الخادم (bcrypt) ──
 function changePassword(){
   var cur = document.getElementById('pw-current').value;
   var nw  = document.getElementById('pw-new').value;
@@ -1772,7 +1772,24 @@ function changePassword(){
   if(!cur || !nw || !cf){ showToast((_rizqLang()==='ar')?'⚠️ عبّئ جميع الحقول':'⚠️ Remplissez tous les champs'); return; }
   if(nw.length < 8){ showToast((_rizqLang()==='ar')?'⚠️ كلمة المرور الجديدة قصيرة جداً':'⚠️ Le nouveau mot de passe est trop court'); return; }
   if(nw !== cf){ showToast((_rizqLang()==='ar')?'⚠️ كلمتا المرور غير متطابقتين':'⚠️ Les mots de passe ne correspondent pas'); return; }
-  showToast((_rizqLang()==='ar')?'⚠️ غير متاح بعد — نظام المصادقة الحقيقي قيد التطوير':'⚠️ Pas encore disponible — le système d\'authentification réel est en cours de développement');
+  if(IS_DEMO){ showToast(_t2('👁 وضع تجريبي','👁 Mode démo')); return; }
+  var tok = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  if(!SESSION_ID || !tok || !window.RizqAccount || typeof window.RizqAccount.changePasswordAsync !== 'function'){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'));
+    return;
+  }
+  window.RizqAccount.changePasswordAsync(SESSION_ID, tok, cur, nw).then(function(res){
+    if(res && res.ok){
+      document.getElementById('pw-current').value='';
+      document.getElementById('pw-new').value='';
+      document.getElementById('pw-confirm').value='';
+      showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'));
+      return;
+    }
+    var msg = (res && res.error) || _t2('تعذّر التحديث','Échec de la mise à jour');
+    if(res && res.code === 'invalid_current') msg = _t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+    showToast('⚠️ ' + msg);
+  }).catch(function(){ showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible')); });
 }
 
 // ── تعطيل الحساب مؤقتاً: ميزة جديدة (09/08/2026) — تُرسِل طلباً حقيقياً
