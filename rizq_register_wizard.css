@@ -176,7 +176,55 @@ html[dir="ltr"] #modal.reg-wizard-mode .m-input:not([type="tel"]):not([type="ema
 #modal.reg-wizard-mode .m-link-btn       { color:#1b3a6b !important; margin-top:12px; display:inline-block; width:100%; text-align:center; }
 #modal.reg-wizard-mode .modal-auth-tabs  { background:#f1f5f9 !important; border-color:#e2e8f0 !important; }
 #modal.reg-wizard-mode .modal-auth-tab        { color:#64748b !important; }
-#modal.reg-wizard-mode .modal-auth-tab.active { color:#0f2347 !important; }
+#modal.reg-wizard-mode .modal-auth-tab.active { color:#0f2347 !important; background:#fff !important; box-shadow:0 2px 8px rgba(15,35,65,.08); }
+#modal.auth-login-mode .reg-progress-bar { display:none !important; }
+#modal.auth-login-mode #sdots { display:none !important; }
+/* يجب أن يفوز على إخفاء modal-header في reg-wizard-mode / rizq-reg-page */
+#modal.reg-wizard-mode.auth-login-mode .modal-header,
+#modal.auth-login-mode .modal-header,
+html.rizq-reg-page #modal.auth-login-mode .modal-header,
+html.rizq-reg-page #modal.reg-wizard-mode.auth-login-mode .modal-header {
+  display: block !important;
+  padding: 12px 4% 8px;
+}
+#modal.auth-login-mode .modal-auth-tabs,
+#modal.reg-wizard-mode.auth-login-mode .modal-auth-tabs {
+  display:flex !important;
+  gap:8px;
+  margin:8px 0 18px;
+  padding:5px;
+  border-radius:14px;
+}
+#modal.auth-login-mode .modal-auth-tab {
+  flex:1;
+  min-height:48px;
+  font-size:15px !important;
+  font-weight:800 !important;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+#modal.auth-login-mode .modal-auth-heading {
+  font-family:'Noto Naskh Arabic',serif;
+  font-size:1.55rem;
+  font-weight:800;
+  color:#0f2347 !important;
+  margin:0 0 8px;
+  text-align:center;
+}
+@media (max-width:768px){
+  #modal.reg-wizard-mode.auth-login-mode .modal-header,
+  #modal.auth-login-mode .modal-header,
+  html.rizq-reg-page #modal.auth-login-mode .modal-header {
+    display: block !important;
+    padding: 12px 4% 0;
+  }
+  #modal.auth-login-mode .modal-logo { display:none !important; }
+  #modal.auth-login-mode .modal-auth-tabs { margin-top:4px; }
+  #modal.auth-login-mode .rizq-reg-trust { gap:10px; }
+  #modal.auth-login-mode .rizq-reg-trust-card { padding:14px !important; }
+}
 
 /* بطاقات الثقة */
 #modal.reg-wizard-mode .rizq-reg-trust { display:grid; gap:12px; margin-top:18px; }
@@ -488,8 +536,8 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     background:#f1f5f9; border-color:#e2e8f0; color:#64748b; z-index:50;
   }
   #modal.reg-wizard-mode .modal-close:hover { background:#e2e8f0; color:#1e293b; }
-  /* الشريط العلوي rizq-reg-chrome يكفي — إخفاء modal-header المكرر على الهاتف */
-  #modal.reg-wizard-mode .modal-header { display:none !important; }
+  /* الشريط العلوي rizq-reg-chrome يكفي — إخفاء modal-header المكرر على الهاتف (إلا وضع الدخول) */
+  #modal.reg-wizard-mode:not(.auth-login-mode) .modal-header { display:none !important; }
   #modal.reg-wizard-mode .modal-logo img { width:56px !important; height:56px !important; }
 
   html.rizq-reg-page, html.rizq-reg-page body { background:#f8faff !important; }
@@ -638,8 +686,8 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   /* مساحة للشريط العلوي الثابت */
   #modal.reg-wizard-mode .modal-box { padding-top: 0 !important; }
 
-  /* ── modal-header: مخفي على الكمبيوتر (الشريط العلوي يأخذ دوره) ── */
-  #modal.reg-wizard-mode .modal-header { display: none !important; }
+  /* ── modal-header: مخفي على الكمبيوتر إلا وضع الدخول (تبويبات دخول/حساب جديد) ── */
+  #modal.reg-wizard-mode:not(.auth-login-mode) .modal-header { display: none !important; }
 
   /* ── صفحة الدخول: عمودان على الكمبيوتر ── */
   #modal.reg-wizard-mode #p-login .rwz-login-wrap {
@@ -737,7 +785,8 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     opacity: 1 !important; visibility: visible !important;
   }
   html.rizq-reg-page #modal .modal-close  { display: none !important; }
-  html.rizq-reg-page #modal .modal-header { display: none !important; }
+  html.rizq-reg-page #modal:not(.auth-login-mode) .modal-header { display: none !important; }
+  html.rizq-reg-page #modal.auth-login-mode .modal-header { display: block !important; }
   html.rizq-reg-page #modal .modal-box {
     width: 100% !important; max-width: 100% !important;
     min-width: 0 !important;

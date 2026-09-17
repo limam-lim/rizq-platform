@@ -317,7 +317,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <div class="mobile-bar">
   <div style="font-size:15px;font-weight:800;color:var(--royal)" data-t="mobile-title">🏭 داشبورد الشركة</div>
   <div class="mobile-bar-actions">
-    <button class="btn btn-outline btn-sm" id="corp-lang-btn-mobile" onclick="toggleLangCorp()" style="font-size:11px;padding:4px 10px">FR</button>
+    <button type="button" class="btn btn-outline btn-sm btn-lang btn-lang-primary" id="corp-lang-btn-mobile" onclick="toggleLangCorp()" dir="ltr" aria-label="FR | AR" style="font-size:11px;padding:4px 10px"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:22px">☰</button>
   </div>
 </div>
@@ -374,7 +374,7 @@ textarea.form-input{min-height:80px;resize:vertical}
       <button class="btn btn-outline btn-sm" onclick="openShareModal()" data-t="tb-share">📤 مشاركة صفحتي</button>
       <a class="btn btn-outline btn-sm" id="topbar-view-btn" href="#" onclick="previewMyPage();return false;" target="_blank" data-t="tb-preview">👁️ معاينة</a>
       <button class="btn btn-gold btn-sm" onclick="showPanel('ads',null)" data-t="tb-rizq-ads">🎬 Rizq ADS</button>
-      <button class="btn btn-outline btn-sm" id="corp-lang-btn" onclick="toggleLangCorp()">FR</button>
+      <button type="button" class="btn btn-outline btn-sm btn-lang btn-lang-primary" id="corp-lang-btn" onclick="toggleLangCorp()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     </div>
   </div>
   <div class="content">

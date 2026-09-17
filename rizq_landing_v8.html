@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.4"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.6"/>
 <script>
 (function () {
   try {
@@ -1930,7 +1930,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_account_route.js?v=6"></script>
-<script src="rizq_auth_gate.js?v=18.7" defer></script>
+<script src="rizq_auth_gate.js?v=19.1" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
@@ -3117,8 +3117,8 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     <div class="modal-header">
       <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
       <div id="modal-auth-tabs" class="modal-auth-tabs" style="display:none" role="tablist" aria-label="تسجيل الدخول أو إنشاء حساب">
-        <button type="button" id="modal-tab-login" class="modal-auth-tab active" role="tab" aria-selected="true" onclick="openModal('login')" data-t="auth-tab-login">دخول بائع</button>
-        <button type="button" id="modal-tab-register" class="modal-auth-tab" role="tab" aria-selected="false" onclick="openModal('register')" data-t="auth-tab-register">حساب بائع جديد</button>
+        <button type="button" id="modal-tab-login" class="modal-auth-tab active" role="tab" aria-selected="true" onclick="openModal('login')" data-t="auth-tab-login">دخول</button>
+        <button type="button" id="modal-tab-register" class="modal-auth-tab" role="tab" aria-selected="false" onclick="openModal('register')" data-t="auth-tab-register">حساب جديد</button>
       </div>
       <div id="sdots" style="display:none;justify-content:center;align-items:center;gap:6px;margin-bottom:20px">
         <div class="sdot active" id="sd1"></div><div class="sline" id="sl1"></div>
@@ -3138,16 +3138,17 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 
     <!-- ══ LOGIN ══ -->
     <div id="p-login" style="display:none">
+      <h3 class="modal-auth-heading" data-t="auth-login-heading">تسجيل الدخول</h3>
       <p class="modal-auth-sub">أهلاً بعودتك إلى رزق 🎉</p>
-      <input class="m-input" id="li-em" type="email" data-ph-fr="Adresse e-mail" placeholder="البريد الإلكتروني"/>
-      <div class="m-pw-wrap"><input class="m-input" id="li-pw" type="password" data-ph-fr="Mot de passe" placeholder="كلمة المرور"/><button class="m-eye" onclick="tp('li-pw')">👁</button></div>
+      <input class="m-input" id="li-em" type="email" data-ph-fr="Adresse e-mail" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email" required/>
+      <div class="m-pw-wrap"><input class="m-input" id="li-pw" type="password" data-ph-fr="Mot de passe" placeholder="كلمة المرور" autocomplete="current-password" minlength="6" required/><button class="m-eye" type="button" onclick="tp('li-pw')" aria-label="إظهار كلمة المرور">👁</button></div>
       <div style="text-align:left;margin-bottom:18px"><a href="#" onclick="event.preventDefault();alert(isAr?'لاستعادة كلمة المرور، تواصل معنا على direction@rizq.mr وسنساعدك فوراً.':'Pour récupérer votre mot de passe, contactez-nous à direction@rizq.mr et nous vous aiderons immédiatement.');" style="color:var(--gold);font-size:12px;text-decoration:none">نسيت كلمة المرور؟</a></div>
-      <button class="m-btn-main" onclick="doLogin()">دخول ←</button>
+      <button class="m-btn-main" type="button" onclick="doLogin()">دخول ←</button>
       <p class="modal-auth-switch"><span data-t="auth-no-account">ليس لديك حساب؟</span> <button type="button" class="m-link-btn" onclick="openModal('register')" data-t="auth-create-free">أنشئ حسابك مجاناً</button></p>
       <div class="rizq-reg-trust">
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">كيف أفتح حساباً؟</span><span class="fr-only">Comment ouvrir un compte ?</span></b>
-          <p><span class="ar-only">اختر «حساب بائع جديد»، حدّد نوع النشاط، ثم أكمل البيانات والتحقق. بعد الموافقة تُفتح لوحة تحكم نشاطك مباشرة.</span><span class="fr-only">Choisissez « Nouveau compte vendeur », sélectionnez votre activité, puis validez vos données. Après activation, votre tableau de bord s’ouvre.</span></p>
+          <p><span class="ar-only">اختر «حساب جديد»، حدّد نوع النشاط، ثم أكمل البيانات والتحقق. بعد الموافقة تُفتح لوحة تحكم نشاطك مباشرة.</span><span class="fr-only">Choisissez « Nouveau compte », sélectionnez votre activité, puis validez vos données. Après activation, votre tableau de bord s’ouvre.</span></p>
         </div>
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">استعادة كلمة المرور</span><span class="fr-only">Récupérer le mot de passe</span></b>
@@ -3155,7 +3156,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         </div>
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">أمان المشتركين</span><span class="fr-only">Sécurité des membres</span></b>
-          <p><span class="ar-only">بيانات الدفع والهوية تُعالج في مسار معزول، وصورة الهوية تُحذف بعد التوثيق. جلسة الدخول تبقى على جهازك فقط.</span><span class="fr-only">Paiements et pièces d’identité sont traités à part ; la photo d’identité est supprimée après vérification. La session reste sur votre appareil.</span></p>
+          <p><span class="ar-only">بيانات الدفع والهوية تُعالج في مسار معزول، وصورة الهوية تُحذف بعد التوثيق. جلسة الدخول تبقى على جهازك فقط.</span><span class="fr-only">Paiements et pièces d’identité sont traités à part ; la photo d’identité est effacée après contrôle. La session reste sur votre appareil.</span></p>
         </div>
       </div>
     </div>
@@ -5434,9 +5435,11 @@ function applyLandingLang(toAr) {
   const liBtn = document.querySelector('#p-login .m-btn-main');
   if(liBtn) liBtn.textContent = RizqI18n.t2('دخول ←','Connexion →');
   const authTabLogin = document.getElementById('modal-tab-login');
-  if(authTabLogin) authTabLogin.textContent = RizqI18n.t2('دخول بائع','Connexion vendeur');
+  if(authTabLogin) authTabLogin.textContent = RizqI18n.t2('دخول','Connexion');
   const authTabRegister = document.getElementById('modal-tab-register');
-  if(authTabRegister) authTabRegister.textContent = RizqI18n.t2('حساب بائع جديد','Nouveau compte vendeur');
+  if(authTabRegister) authTabRegister.textContent = RizqI18n.t2('حساب جديد','Nouveau compte');
+  const authHeading = document.querySelector('#p-login .modal-auth-heading');
+  if(authHeading) authHeading.textContent = RizqI18n.t2('تسجيل الدخول','Connexion');
   const authNoAcc = document.querySelector('#p-login [data-t="auth-no-account"]');
   if(authNoAcc) authNoAcc.textContent = RizqI18n.t2('ليس لديك حساب؟','Pas encore de compte ?');
   const authCreate = document.querySelector('#p-login [data-t="auth-create-free"]');
@@ -5662,8 +5665,9 @@ const TR = {
     'amd-call':        '📞 اتصال',
     'amd-msg':         '💬 واتساب',
     // Auth modal — login
-    'auth-tab-login':  'دخول بائع',
-    'auth-tab-register':'حساب بائع جديد',
+    'auth-tab-login':  'دخول',
+    'auth-tab-register':'حساب جديد',
+    'auth-login-heading': 'تسجيل الدخول',
     'auth-no-account': 'ليس لديك حساب؟',
     'auth-create-free':'أنشئ حسابك مجاناً',
     'li-sub':          'أهلاً بعودتك إلى رزق 🎉',
@@ -5774,8 +5778,9 @@ const TR = {
     'sm-close':        '✕ Fermer',
     'amd-call':        '📞 Appeler',
     'amd-msg':         '💬 WhatsApp',
-    'auth-tab-login':  'Connexion vendeur',
-    'auth-tab-register':'Nouveau compte vendeur',
+    'auth-tab-login':  'Connexion',
+    'auth-tab-register':'Nouveau compte',
+    'auth-login-heading': 'Connexion',
     'auth-no-account': 'Pas encore de compte ?',
     'auth-create-free':'Créez votre compte gratuitement',
     'li-sub':          'Bienvenue de retour sur Rizq 🎉',
@@ -5940,6 +5945,8 @@ function applyFullTranslation(lang) {
   if(liBtn)    liBtn.textContent    = t['li-btn'];
   if(authTabLogin) authTabLogin.textContent = t['auth-tab-login'];
   if(authTabRegister) authTabRegister.textContent = t['auth-tab-register'];
+  const authHeading = q('#p-login .modal-auth-heading');
+  if(authHeading && t['auth-login-heading']) authHeading.textContent = t['auth-login-heading'];
   if(authNoAcc) authNoAcc.textContent = t['auth-no-account'];
   if(authCreate) authCreate.textContent = t['auth-create-free'];
 
@@ -6394,11 +6401,12 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register') ? '1000001' : '';
+  modal.style.zIndex = (mode==='register' || mode==='login') ? '1000001' : '';
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
     modal.classList.add('reg-wizard-arming');
+    modal.classList.remove('auth-login-mode');
     document.body.classList.add('rizq-reg-open');
     clearTimeout(window._rizqRegArmTimer);
     window._rizqRegArmTimer=setTimeout(function(){
@@ -6413,32 +6421,32 @@ function openModal(mode){
       }
     }catch(eUrl){}
   } else {
-    var keepLight = false;
+    /* login — شاشة فاتحة واضحة على الهاتف والكمبيوتر */
+    modal.classList.add('reg-wizard-mode');
+    modal.classList.add('auth-login-mode');
+    modal.classList.remove('reg-wizard-arming');
+    document.body.classList.add('rizq-reg-open');
     try {
-      keepLight = document.documentElement.classList.contains('rizq-reg-page') || window.matchMedia('(min-width: 769px)').matches;
-    } catch (eKeep) {}
-    if (keepLight) {
-      try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (ePage) {}
-      modal.classList.add('reg-wizard-mode');
-      document.body.classList.add('rizq-reg-open');
-      rizqMountAccountBars(modal);
-    } else {
-      modal.classList.remove('reg-wizard-mode');
-      modal.classList.remove('reg-wizard-arming');
-      document.body.classList.remove('rizq-reg-open');
-    }
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.documentElement.classList.add('rizq-reg-page');
+      }
+    } catch (ePhone) {}
+    rizqMountAccountBars(modal);
   }
   document.body.style.overflow='hidden';
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
   const dots=document.getElementById('sdots');
+  const prog=document.getElementById('reg-progress');
   if(mode==='login'){
     document.getElementById('p-login').style.display='block';
     if(dots) dots.style.display='none';
+    if(prog){ prog.style.display='none'; prog.setAttribute('aria-hidden','true'); }
     syncModalAuthTabs('login');
   } else {
     acctType=''; natType=''; bizType='';
     document.getElementById('p-type').style.display='block';
     if(dots) dots.style.display='flex';
+    if(prog){ prog.style.display=''; prog.setAttribute('aria-hidden','false'); }
     setDot(0,5);
     syncModalAuthTabs('register');
   }
@@ -6457,6 +6465,7 @@ function closeModal(force){
   if(modal){
     modal.classList.remove('reg-wizard-mode');
     modal.classList.remove('reg-wizard-arming');
+    modal.classList.remove('auth-login-mode');
     modal.classList.remove('open');
     modal.style.display='none';
     modal.style.zIndex='';
@@ -7616,21 +7625,39 @@ function doLogin(){
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!e||!p){alert(isAr?'يرجى تعبئة جميع الحقول':'Veuillez remplir tous les champs');return;}
   if(!emailRx.test(e)){alert(isAr?'يرجى إدخال بريد إلكتروني صحيح':'Veuillez saisir une adresse e-mail valide');return;}
-  if(window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function'){
-    var res = window.RizqAccount.loginSeller(e, p);
-    if(res && res.ok && res.url){
-      showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-      closeModal();
-      setTimeout(function(){ location.href = res.url; }, 400);
-      return;
-    }
+  if(String(p).length < 6){alert(isAr?'كلمة المرور قصيرة جداً':'Mot de passe trop court');return;}
+  var btn = document.querySelector('#p-login .m-btn-main');
+  if(btn){ btn.disabled = true; btn.textContent = isAr ? 'جارٍ الدخول...' : 'Connexion...'; }
+  function unlock(){
+    if(btn){ btn.disabled = false; btn.textContent = isAr ? 'دخول ←' : 'Connexion →'; }
   }
+  var loginFn = window.RizqAccount && (window.RizqAccount.loginSellerAsync || window.RizqAccount.loginSeller);
+  if(typeof loginFn === 'function'){
+    Promise.resolve(loginFn.call(window.RizqAccount, e, p)).then(function(res){
+      unlock();
+      if(res && res.ok && res.url){
+        showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
+        closeModal(true);
+        setTimeout(function(){ location.href = res.url; }, 400);
+        return;
+      }
+      var msg = isAr ? 'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد.' : 'Identifiants incorrects ou compte non encore activé.';
+      if(res && res.code === 'not_approved') msg = isAr ? 'الحساب بانتظار الموافقة.' : 'Compte en attente d\'approbation.';
+      if(res && res.code === 'network') msg = isAr ? 'تعذّر الاتصال — حاول مرة أخرى.' : 'Connexion impossible — réessayez.';
+      alert(msg);
+    }).catch(function(){
+      unlock();
+      alert(isAr?'تعذّر الاتصال — حاول مرة أخرى':'Connexion impossible — réessayez');
+    });
+    return;
+  }
+  unlock();
   var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
     ? window.RizqAccount.resolveDashboardUrl()
     : '';
   if(dashUrl){
     showToast(isAr?'✅ مرحباً بك في رزق!':'✅ Bienvenue sur Rizq !');
-    closeModal();
+    closeModal(true);
     setTimeout(function(){ location.href = dashUrl; }, 400);
     return;
   }

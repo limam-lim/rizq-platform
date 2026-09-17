@@ -1,7 +1,7 @@
 /**
- * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v19
+ * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v19.1
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
- * v19: وضوح أعلى + زر رجوع + روابط الخصوصية/الشروط/المساعدة
+ * v19.1: بطاقة دخول بائع واضحة + نصوص أوضح للشراء/البيع
  */
 (function () {
   'use strict';
@@ -49,16 +49,18 @@
       titleGate: 'خطوة أخيرة قبل المتابعة',
       titleAccount: 'حسابي',
       titleOtp: 'تأكيد بريدك الإلكتروني',
-      titleChoice: 'كيف تريد استخدام رزق؟',
+      titleChoice: 'حسابي على رزق',
       subGate: 'سجّل مجاناً للتواصل مع البائعين وحفظ المفضلة — أقل من دقيقة',
       subAccount: 'حسابك على رزق — للتصفح والتواصل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
       subReturning: 'مرحباً بعودتك! أكّد بريدك برمز التحقق',
-      subChoice: 'اختر ما يناسبك — يمكنك التبديل لاحقاً',
-      choiceBuyer: '🛒 أشتري — حساب سريع',
-      choiceBuyerSub: 'للتصفح والتواصل والمفضلة',
-      choiceSeller: '🏪 أبيع — حساب بائع',
-      choiceSellerSub: 'لنشر الإعلانات وإدارة متجرك',
+      subChoice: 'اختر بوضوح: شراء سريع، أو إنشاء حساب بائع، أو دخول لحساب موجود',
+      choiceBuyer: '🛒 أشتري أو أتصفّح',
+      choiceBuyerSub: 'حساب سريع للتواصل والمفضلة — أقل من دقيقة',
+      choiceSeller: '🏪 أبيع — حساب بائع جديد',
+      choiceSellerSub: 'لنشر الإعلانات وفتح محل أو مكتب أو معرض',
+      choiceSellerLogin: '🔑 لدي حساب بائع — دخول',
+      choiceSellerLoginSub: 'البريد وكلمة المرور للوحة التحكم',
       nameLabel: 'الاسم الكامل *',
       namePh: 'مثال: محمد أحمد ولد سيدي',
       phoneMrLabel: 'هاتف موريتاني (اختياري)',
@@ -109,16 +111,18 @@
       titleGate: 'Dernière étape avant de continuer',
       titleAccount: 'Mon compte',
       titleOtp: 'Confirmez votre e-mail',
-      titleChoice: 'Comment utiliser Rizq ?',
+      titleChoice: 'Mon compte Rizq',
       subGate: 'Inscrivez-vous gratuitement pour contacter les vendeurs et sauvegarder vos favoris',
       subAccount: 'Votre compte Rizq — navigation, contact et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
       subReturning: 'Bon retour ! Confirmez votre e-mail avec le code',
-      subChoice: 'Choisissez — vous pourrez changer plus tard',
-      choiceBuyer: '🛒 J\'achète — compte rapide',
-      choiceBuyerSub: 'Parcourir, contacter et favoris',
-      choiceSeller: '🏪 Je vends — compte vendeur',
-      choiceSellerSub: 'Publier des annonces et gérer votre activité',
+      subChoice: 'Choisissez clairement : achat rapide, nouveau compte vendeur, ou connexion',
+      choiceBuyer: '🛒 J\'achète / je parcours',
+      choiceBuyerSub: 'Compte rapide pour contact et favoris',
+      choiceSeller: '🏪 Je vends — nouveau compte vendeur',
+      choiceSellerSub: 'Publier et ouvrir boutique, bureau ou showroom',
+      choiceSellerLogin: '🔑 J\'ai un compte vendeur — Connexion',
+      choiceSellerLoginSub: 'E-mail et mot de passe du tableau de bord',
       nameLabel: 'Nom complet *',
       namePh: 'Ex : Mohamed Ahmed Ould Sidi',
       phoneMrLabel: 'Tél. mauritanien (optionnel)',
@@ -338,11 +342,15 @@
       '#rag-overlay .rag-btn:disabled{opacity:.55;cursor:default}',
       '#rag-overlay .rag-btn-ghost{background:transparent!important;border:1px solid #e2e8f0!important;color:#475569!important;box-shadow:none;margin-top:8px}',
       '#rag-overlay .rag-choice{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}',
-      '#rag-overlay .rag-choice-card{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px 14px;cursor:pointer;text-align:inherit;box-shadow:0 10px 30px -10px rgba(0,0,0,.06);transition:border-color .2s,background .2s}',
+      '#rag-overlay .rag-choice-card{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px 14px;cursor:pointer;text-align:inherit;box-shadow:0 10px 30px -10px rgba(0,0,0,.06);transition:border-color .2s,background .2s,transform .15s}',
+      '#rag-overlay .rag-choice-card:active{transform:scale(.98)}',
       '#rag-overlay .rag-choice-card:hover{border-color:rgba(201,168,76,.45);background:#fffdf6}',
+      '#rag-overlay .rag-choice-card-accent{border-color:rgba(201,168,76,.55)!important;background:linear-gradient(180deg,#fffef8,#fff)!important;box-shadow:0 8px 24px rgba(201,168,76,.12)}',
       '#rag-overlay .rag-choice-icon{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0f2347,#1b3a6b);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}',
+      '#rag-overlay .rag-choice-icon-gold{background:linear-gradient(135deg,#c9a84c,#e8c96a)!important}',
       '#rag-overlay .rag-choice-title{font-size:15px;font-weight:800;color:#1b3a6b}',
-      '#rag-overlay .rag-choice-sub{font-size:12px;color:#64748b;margin-top:2px}',
+      '#rag-overlay .rag-choice-sub{font-size:12px;color:#64748b;margin-top:2px;line-height:1.45}',
+      '@media (max-width:768px){#rag-overlay .rag-title{font-size:1.55rem!important}#rag-overlay .rag-choice-card{padding:18px 16px;min-height:76px}#rag-overlay .rag-choice-title{font-size:16px}#rag-overlay .rag-choice-sub{font-size:12.5px}}',
       '#rag-overlay .rag-otp-row{display:flex;gap:8px;justify-content:center;margin:14px 0 10px}',
       '#rag-overlay .rag-otp-box{width:44px;height:50px;background:#f8faff;border:1.5px solid rgba(13,27,42,.12);border-radius:10px;text-align:center;font-size:20px;font-weight:800;color:#1a2535;font-family:inherit}',
       '#rag-overlay .rag-otp-box:focus{outline:none;border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.15)}',
@@ -398,6 +406,10 @@
       '        <div class="rag-choice-card" id="rag-choice-buyer" role="button" tabindex="0">',
       '          <div class="rag-choice-icon">🛒</div>',
       '          <div><div class="rag-choice-title" id="rag-choice-buyer-title"></div><div class="rag-choice-sub" id="rag-choice-buyer-sub"></div></div>',
+      '        </div>',
+      '        <div class="rag-choice-card rag-choice-card-accent" id="rag-choice-seller-login" role="button" tabindex="0">',
+      '          <div class="rag-choice-icon rag-choice-icon-gold">🔑</div>',
+      '          <div><div class="rag-choice-title" id="rag-choice-seller-login-title"></div><div class="rag-choice-sub" id="rag-choice-seller-login-sub"></div></div>',
       '        </div>',
       '        <div class="rag-choice-card" id="rag-choice-seller" role="button" tabindex="0">',
       '          <div class="rag-choice-icon">🏪</div>',
@@ -512,6 +524,13 @@
       prefillDraft();
       showStep('form');
     });
+    document.getElementById('rag-choice-seller-login').addEventListener('click', function () {
+      closeModal();
+      setTimeout(function () {
+        if (typeof window.openModal === 'function') window.openModal('login');
+        else location.href = '?openLogin=1';
+      }, 60);
+    });
     document.getElementById('rag-choice-seller').addEventListener('click', function () {
       closeModal();
       setTimeout(function () {
@@ -619,6 +638,10 @@
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
     document.getElementById('rag-choice-seller-sub').textContent = dict.choiceSellerSub;
+    var loginTitle = document.getElementById('rag-choice-seller-login-title');
+    var loginSub = document.getElementById('rag-choice-seller-login-sub');
+    if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
+    if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
     document.getElementById('rag-name-label').textContent = dict.nameLabel;
     document.getElementById('rag-name').placeholder = dict.namePh;
     document.getElementById('rag-phone-mr-label').textContent = dict.phoneMrLabel;
@@ -1035,6 +1058,10 @@
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
     document.getElementById('rag-choice-seller-sub').textContent = dict.choiceSellerSub;
+    var loginTitle = document.getElementById('rag-choice-seller-login-title');
+    var loginSub = document.getElementById('rag-choice-seller-login-sub');
+    if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
+    if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
     var l1 = document.getElementById('rag-pstep-1-label');
     var l2 = document.getElementById('rag-pstep-2-label');
     var l3 = document.getElementById('rag-pstep-3-label');

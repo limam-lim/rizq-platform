@@ -33,6 +33,8 @@ const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./servi
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 
 const app = express();
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
 
 // ── ضغط الاستجابات (gzip/Brotli حسب ما يدعمه المتصفح) ──────────────
 // خطوة خفّة حقيقية وقابلة للتنفيذ الآن (بخلاف CDN/Redis التي تحتاج نشراً
@@ -46,8 +48,22 @@ app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  res.set('Cross-Origin-Opener-Policy', 'same-origin');
+  res.set('Cross-Origin-Resource-Policy', 'same-site');
+  res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
   res.set('X-Copyright', '(c) Rizq ADMINIA SARL - Proprietary. Unauthorized copying prohibited.');
+  try {
+    if (req.secure || String(req.headers['x-forwarded-proto'] || '') === 'https') {
+      res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+  } catch (eHsts) {}
+  /* لا تخزين مؤقت لاستجابات المصادقة/الجلسات */
+  if (/^\/api\/(admin\/login|admin\/verify|accounts\/seller-login|auth\/|otp\/)/i.test(req.path)) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+  }
   next();
 });
 
@@ -235,8 +251,18 @@ const adminLoginLimiter = rateLimit({
 app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   cleanExpiredAdminSessions();
   const { user, pass } = req.body || {};
-  if (!user || !pass) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
-  const acc = await adminTeamService.authenticate(String(user).trim(), String(pass));
+  const u = String(user || '').trim().slice(0, 80);
+  const p = String(pass || '').slice(0, 200);
+  if (!u || !p) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
+  if (String(pass || '').length > 200) {
+    return res.status(400).json({ error: '❌ بيانات غير صحيحة' });
+  }
+  let acc = null;
+  try {
+    acc = await adminTeamService.authenticate(u, p);
+  } catch (eAuth) {
+    acc = null;
+  }
   if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
   adminTeamService.touchLogin(acc.user);
   const token = crypto.randomBytes(32).toString('hex');
@@ -248,6 +274,7 @@ app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
     permissions,
     expiresAt: Date.now() + ADMIN_SESSION_TTL_MS,
   });
+  res.set('Cache-Control', 'no-store');
   res.json({
     ok: true,
     token,
@@ -1678,22 +1705,32 @@ app.get('/api/merchant-activities', (req, res) => {
  */
 const sellerLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 12,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'محاولات دخول كثيرة — حاول مرة أخرى بعد قليل' },
 });
 app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
-  const email = String((req.body || {}).email || '').trim().toLowerCase();
+  const email = String((req.body || {}).email || '').trim().toLowerCase().slice(0, 120);
   const pass = String((req.body || {}).password || '');
   if (!email || !pass) {
     return res.status(400).json({ ok: false, code: 'missing_credentials', error: 'البريد وكلمة المرور مطلوبان' });
   }
-  const dummyHash = '$2b$10$........................................';
+  if (pass.length > 200 || email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
+  }
+  /* bcrypt hash صالح للمقارنة الوهمية — يمنع تسرّب التوقيت عند غياب الحساب */
+  const dummyHash = '$2a$10$Cr7J1rfztqkXC9ZpESd5qO2PLvx6D3SJKxfBjfX3DXVMuu3YBVDYy';
   const list = readAccounts();
   const acc = list.find((a) => String(a.email || '').trim().toLowerCase() === email);
-  const ok = acc && acc.passHash ? await bcrypt.compare(pass, acc.passHash) : await bcrypt.compare(pass, dummyHash);
+  let ok = false;
+  try {
+    ok = acc && acc.passHash ? await bcrypt.compare(pass, acc.passHash) : await bcrypt.compare(pass, dummyHash);
+  } catch (eCmp) {
+    ok = false;
+  }
   if (!acc || !acc.passHash || !ok) {
+    res.set('Cache-Control', 'no-store');
     return res.status(401).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
   }
   if (acc.suspended) {
@@ -1715,7 +1752,8 @@ app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
       writeAccounts(list);
     }
   }
-  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, ...safeFields } = acc;
+  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+  res.set('Cache-Control', 'no-store');
   res.json({
     ok: true,
     account: Object.assign(safeFields, {
@@ -2027,7 +2065,7 @@ app.use('/api/auth', authRouter);
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 8,
   standardHeaders: true,
   legacyHeaders: false,
   message: { ok: false, error: 'عدد كبير من طلبات OTP — حاول لاحقاً' },
