@@ -10,6 +10,7 @@ const PORT = Number(process.env.PORT || 3000);
 const BASE = 'http://127.0.0.1:' + PORT;
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
+const PKG_FILE = path.join(DATA_DIR, 'account-packages.json');
 
 const results = [];
 function ok(name, pass, detail) {
@@ -106,6 +107,7 @@ async function main() {
 
   // ── 7. verify-dash POST + approved only ──
   const backupAccounts = fs.existsSync(ACCOUNTS_FILE) ? fs.readFileSync(ACCOUNTS_FILE, 'utf8') : '[]';
+  const backupPkg = fs.existsSync(PKG_FILE) ? fs.readFileSync(PKG_FILE, 'utf8') : '{}';
   const { id, dashToken, accessToken, pending, approved } = seedTestAccount();
 
   try {
@@ -127,13 +129,43 @@ async function main() {
     if (idx >= 0) list[idx] = approved;
     fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(list, null, 2));
 
+    const pkgStore = JSON.parse(backupPkg || '{}');
+    pkgStore[id] = {
+      accountId: id,
+      accountType: 'store',
+      status: 'active',
+      paymentConfirmed: true,
+      activatedBy: 'admin',
+      periodStart: new Date().toISOString(),
+      periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+      pkgName: 'monthly',
+      packageId: 'store-month',
+      accessToken,
+    };
+    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+
     const dashOk = await req('POST', '/api/accounts/verify-dash/' + id, { dashToken }, { 'x-dash-token': dashToken });
-    ok('verify-dash approved POST → 200 + accessToken',
-      dashOk.status === 200 && dashOk.body && dashOk.body.account && dashOk.body.account.accessToken === accessToken,
-      dashOk.body && dashOk.body.account ? 'got token' : 'no token');
+    ok('verify-dash approved POST → 200 without accessToken',
+      dashOk.status === 200 && dashOk.body && dashOk.body.account && dashOk.body.account.id === id && dashOk.body.account.accessToken === undefined,
+      dashOk.body && dashOk.body.account ? 'profile ok' : 'no account');
+
+    const exchangeOk = await req('POST', '/api/accounts/exchange-dash-token/' + id, { dashToken }, { 'x-dash-token': dashToken });
+    ok('exchange-dash-token approved → accessToken',
+      exchangeOk.status === 200 && exchangeOk.body && exchangeOk.body.accessToken === accessToken,
+      exchangeOk.body ? 'got token' : 'no token');
 
     const dashGet = await req('GET', '/api/accounts/verify-dash/' + id + '?token=' + encodeURIComponent(dashToken));
     ok('verify-dash GET still works in dev', dashGet.status === 200, 'status=' + dashGet.status);
+
+    const catalogPost = await req('POST', '/api/catalog', {
+      accountId: id,
+      name: 'Sec Test Item',
+      kind: 'product',
+      status: 'active',
+    }, { 'x-account-token': accessToken });
+    ok('catalog POST forces pending_review',
+      catalogPost.status === 200 && catalogPost.body && catalogPost.body.item && catalogPost.body.item.status === 'pending_review',
+      catalogPost.body && catalogPost.body.item ? 'status=' + catalogPost.body.item.status : 'no item');
 
     const mineOk = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': accessToken });
     ok('mine approved account readable', mineOk.status === 200 && mineOk.body && mineOk.body.ok, 'status=' + mineOk.status);
@@ -141,8 +173,55 @@ async function main() {
     const mineQuery = await req('GET', '/api/accounts/mine/' + id + '?token=' + accessToken);
     ok('mine query token works in dev', mineQuery.status === 200, 'status=' + mineQuery.status);
 
+    const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
+    const backupTenders = fs.existsSync(TENDERS_FILE) ? fs.readFileSync(TENDERS_FILE, 'utf8') : '[]';
+
+    const staticTenderAsset = await req('GET', '/uploads/tenders/test/0.webp');
+    ok('tender static assets blocked', staticTenderAsset.status === 403, 'status=' + staticTenderAsset.status);
+
+    pkgStore[id + '::tender'] = {
+      accountId: id + '::tender',
+      accountType: 'store',
+      status: 'active',
+      paymentConfirmed: true,
+      activatedBy: 'admin',
+      periodStart: new Date().toISOString(),
+      periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+      pkgName: 'باقة المناقصة',
+      packageId: 'tnd-month',
+    };
+    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+
+    const tenderLeak = await req('POST', '/api/tenders', {
+      accountId: id,
+      title: 'test واتس 22112233',
+      deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
+    }, { 'x-account-token': accessToken });
+    ok('tender POST rejects contact leak', tenderLeak.status === 422, 'status=' + tenderLeak.status);
+
+    const tenderPost = await req('POST', '/api/tenders', {
+      accountId: id,
+      title: 'Security harness tender',
+      desc: 'clean description',
+      deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
+    }, { 'x-account-token': accessToken });
+    ok('tender POST pending_review',
+      tenderPost.status === 200 && tenderPost.body && tenderPost.body.pendingReview === true
+        && tenderPost.body.tender && tenderPost.body.tender.status === 'pending_review',
+      tenderPost.body ? 'status=' + (tenderPost.body.tender && tenderPost.body.tender.status) : String(tenderPost.status));
+
+    const tenderId = tenderPost.body && tenderPost.body.tender && tenderPost.body.tender.id;
+    if (tenderId) {
+      const pub = await req('GET', '/api/tenders');
+      const found = (pub.body && pub.body.tenders || []).find((t) => t.id === tenderId);
+      ok('pending tender not in public list', !found);
+    }
+
+    fs.writeFileSync(TENDERS_FILE, backupTenders);
+
   } finally {
     fs.writeFileSync(ACCOUNTS_FILE, backupAccounts);
+    fs.writeFileSync(PKG_FILE, backupPkg);
   }
 
   // ── 9. OTP hashing (unit) ──

@@ -31,15 +31,7 @@ function normalizeModule(moduleOrType) {
   return 'individual';
 }
 
-function redactContactPatterns(text) {
-  if (!text) return text;
-  let s = String(text);
-  s = s.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/gi, '•••@•••.•••');
-  s = s.replace(/(?:https?:\/\/)?(?:wa\.me|api\.whatsapp\.com)[^\s]*/gi, '[واتساب محجوب — اشترك لعرض التواصل]');
-  s = s.replace(/(?:\+?222|00222)[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}/g, '••• ••• •••');
-  s = s.replace(/\b(?:\+?\d{1,3}[\s.-]?)?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2}\b/g, '••• ••• •••');
-  return s;
-}
+const { redactContactPatterns } = require('./contactLeakGuard');
 
 function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   if (!targetAccountId) {

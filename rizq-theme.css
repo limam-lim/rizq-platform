@@ -433,6 +433,19 @@ body.rizq-disc-sidebar-dismissed #rizq-disc-sidebar {
   display: none !important;
 }
 
+/* Browse filter drawer open — hide edge widgets so they don't cover filters */
+body.rizq-hide-edge-widgets #rizq-disc-edge,
+body.rizq-hide-edge-widgets #rizq-disc-sidebar,
+body.rizq-hide-edge-widgets #fixed-disc-pill,
+body.rizq-hide-edge-widgets .fixed-disc-pill,
+body.rizq-hide-edge-widgets #fixed-rizq-logo,
+body.rizq-hide-edge-widgets .fixed-rizq-logo,
+body.rizq-hide-edge-widgets #rizq-rlogo-edge {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 @media (max-width: 768px) {
   #rizq-disc-edge,
   #rizq-disc-sidebar {
@@ -575,7 +588,7 @@ input, textarea, select, [contenteditable="true"] { cursor: text !important; }
   opacity: 0 !important;
 }
 
-#rizq-lang-btn, .btn-lang-primary, nav .btn-lang, .topnav .btn-lang {
+#rizq-lang-btn, .btn-lang-primary, nav .btn-lang, .topnav .btn-lang, .btn-lang {
   position: static !important;
   top: auto !important;
   left: auto !important;
@@ -607,22 +620,98 @@ input, textarea, select, [contenteditable="true"] { cursor: text !important; }
 }
 #rizq-lang-btn .lang-fr,
 .btn-lang-primary .lang-fr,
+.btn-lang .lang-fr,
 #nav-lang-btn .lang-fr,
-#rizq-desk-lang-btn .lang-fr {
+#rizq-desk-lang-btn .lang-fr,
+#lang-btn .lang-fr {
   order: 1;
 }
 #rizq-lang-btn .lang-sep,
 .btn-lang-primary .lang-sep,
+.btn-lang .lang-sep,
 #nav-lang-btn .lang-sep,
-#rizq-desk-lang-btn .lang-sep {
+#rizq-desk-lang-btn .lang-sep,
+#lang-btn .lang-sep {
   order: 2;
   opacity: .85;
+  color: rgba(255,255,255,.75) !important;
 }
 #rizq-lang-btn .lang-ar,
 .btn-lang-primary .lang-ar,
+.btn-lang .lang-ar,
 #nav-lang-btn .lang-ar,
-#rizq-desk-lang-btn .lang-ar {
+#rizq-desk-lang-btn .lang-ar,
+#lang-btn .lang-ar {
   order: 3;
+}
+/* Active language = gold; inactive = white — all lang pills site-wide */
+.btn-lang .lang-fr,
+.btn-lang .lang-ar,
+.btn-lang-primary .lang-fr,
+.btn-lang-primary .lang-ar,
+#rizq-lang-btn .lang-fr,
+#rizq-lang-btn .lang-ar,
+#nav-lang-btn .lang-fr,
+#nav-lang-btn .lang-ar,
+#rizq-desk-lang-btn .lang-fr,
+#rizq-desk-lang-btn .lang-ar,
+#lang-btn .lang-fr,
+#lang-btn .lang-ar,
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar {
+  color: #ffffff !important;
+  opacity: 0.9;
+  transition: color .15s ease, opacity .15s ease;
+}
+body.rizq-lang-ar .btn-lang .lang-ar,
+body.rizq-lang-ar .btn-lang-primary .lang-ar,
+body.rizq-lang-ar #rizq-lang-btn .lang-ar,
+body.rizq-lang-ar #nav-lang-btn .lang-ar,
+body.rizq-lang-ar #rizq-desk-lang-btn .lang-ar,
+body.rizq-lang-ar #lang-btn .lang-ar,
+body.rizq-lang-ar .rizq-reg-chrome-lang .lang-ar,
+html[lang="ar"] .btn-lang .lang-ar,
+html[lang="ar"] .btn-lang-primary .lang-ar,
+html[lang="ar"] #rizq-lang-btn .lang-ar,
+html[lang="ar"] #nav-lang-btn .lang-ar,
+html[lang="ar"] #rizq-desk-lang-btn .lang-ar,
+html[lang="ar"] #lang-btn .lang-ar,
+html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,
+.btn-lang[data-active-lang="ar"] .lang-ar,
+.btn-lang-primary[data-active-lang="ar"] .lang-ar,
+#rizq-lang-btn[data-active-lang="ar"] .lang-ar,
+#nav-lang-btn[data-active-lang="ar"] .lang-ar,
+#rizq-desk-lang-btn[data-active-lang="ar"] .lang-ar,
+#lang-btn[data-active-lang="ar"] .lang-ar,
+.rizq-reg-chrome-lang[data-active-lang="ar"] .lang-ar,
+.lang-ar.is-active-lang {
+  color: #C9A84C !important;
+  opacity: 1 !important;
+}
+body.rizq-lang-fr .btn-lang .lang-fr,
+body.rizq-lang-fr .btn-lang-primary .lang-fr,
+body.rizq-lang-fr #rizq-lang-btn .lang-fr,
+body.rizq-lang-fr #nav-lang-btn .lang-fr,
+body.rizq-lang-fr #rizq-desk-lang-btn .lang-fr,
+body.rizq-lang-fr #lang-btn .lang-fr,
+body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr,
+html[lang="fr"] .btn-lang .lang-fr,
+html[lang="fr"] .btn-lang-primary .lang-fr,
+html[lang="fr"] #rizq-lang-btn .lang-fr,
+html[lang="fr"] #nav-lang-btn .lang-fr,
+html[lang="fr"] #rizq-desk-lang-btn .lang-fr,
+html[lang="fr"] #lang-btn .lang-fr,
+html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,
+.btn-lang[data-active-lang="fr"] .lang-fr,
+.btn-lang-primary[data-active-lang="fr"] .lang-fr,
+#rizq-lang-btn[data-active-lang="fr"] .lang-fr,
+#nav-lang-btn[data-active-lang="fr"] .lang-fr,
+#rizq-desk-lang-btn[data-active-lang="fr"] .lang-fr,
+#lang-btn[data-active-lang="fr"] .lang-fr,
+.rizq-reg-chrome-lang[data-active-lang="fr"] .lang-fr,
+.lang-fr.is-active-lang {
+  color: #C9A84C !important;
+  opacity: 1 !important;
 }
 
 .btn-primary:active, .btn-register:active, .btn-next:active, .btn-post:active {
@@ -1004,6 +1093,15 @@ html body footer .footer-copy {
 ══════════════════════════════════ */
 html[dir="rtl"] body { direction: rtl; }
 html[dir="ltr"] body { direction: ltr; }
+/* محتوى الواجهة الفرنسية يبدأ يساراً — لا تُثبَّت direction:rtl على صفوف المحتوى */
+html[dir="ltr"] .loc-info-row,
+html[dir="ltr"] .info-row,
+html[dir="ltr"] .hours-row,
+html[dir="ltr"] .rzq-disc-empty,
+html[dir="ltr"] #info-section,
+html[dir="ltr"] #info-section .info-card {
+  direction: ltr !important;
+}
 html[dir="rtl"] .form-group label,
 html[dir="rtl"] .form-label,
 html[dir="rtl"] .section-title { text-align: right; }
@@ -1294,3 +1392,7 @@ a.rizq-trust-card:hover {
   .rizq-toast-global { transition: none; }
 }
 
+
+/* Help column title → مركز المساعدة */
+.rizq-help-title{cursor:pointer}
+.rizq-help-title:hover{color:var(--gold,#c9a84c)}

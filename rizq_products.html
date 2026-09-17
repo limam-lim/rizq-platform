@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -391,7 +391,7 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
 <body data-t-ns="products">
-<button class="btn-lang" id="lang-btn">FR</button>
+<button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- NAV -->
 <nav class="topnav">
@@ -872,6 +872,9 @@ updateCartCount();
     var ar = lang !== 'fr';
     _setNavOrder(!ar);
     window.isAr = ar; // was never synced — renderProducts()/openModal() etc. rely on this
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
+      window.RizqI18n.paintPrimaryLangBtn(document.getElementById('lang-btn'), ar ? 'ar' : 'fr');
+    }
     document.querySelectorAll('[data-t-fr]').forEach(function(el){
       if(!el.hasAttribute('data-t-ar'))el.setAttribute('data-t-ar',el.innerHTML);
       el.innerHTML = ar ? el.getAttribute('data-t-ar') : el.getAttribute('data-t-fr');
@@ -886,6 +889,11 @@ updateCartCount();
   }
   document.addEventListener('rizq:langchange',function(e){_productsBridge(e.detail&&e.detail.lang||'ar');if(window._rzqApplyFt)window._rzqApplyFt();});
   window.toggleRizqLang=function(){if(window.RizqI18n)RizqI18n.toggle();};
+  // طلاء أولي لزر FR|AR
+  try{
+    var _initL = (window.RizqI18n && RizqI18n.getLang) ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar');
+    _productsBridge(_initL);
+  }catch(eInit){}
 })();
 </script>
 
@@ -897,7 +905,7 @@ updateCartCount();
         <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -916,21 +924,21 @@ updateCartCount();
     <div>
       <h4 class="footer-col-title" id="rzq-ft-topcats">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_browse.html" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
       </ul>
     </div>
     <div>
-      <h4 class="footer-col-title" id="rzq-ft-help">المساعدة</h4>
+      <h4 class="rizq-help-title footer-col-title" id="rzq-ft-help">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_legal.html" id="rzq-ft-h1">مركز المساعدة</a></li>
+        <li><a href="rizq_help.html" id="rzq-ft-h1">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" id="rzq-ft-h2">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h3">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html#s2" id="rzq-ft-h3">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" id="rzq-ft-h4">الإبلاغ عن إعلان</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h5">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html#s10" id="rzq-ft-h5">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -958,7 +966,7 @@ updateCartCount();
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -968,7 +976,7 @@ updateCartCount();
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",
@@ -1132,11 +1140,11 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="rizq-promo-feats">
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i1">🏢</div><div><div class="rizq-pf-title" data-t-promo="f1t">صفحة احترافية لعملك</div><div class="rizq-pf-sub" data-t-promo="f1s">خدماتك، تواصلك، وصورتك — في مكان واحد</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-promo="f2t">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-promo="f2s">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
-        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-promo="f3t">جاهز في دقائق — مجاناً 3 أيام</div><div class="rizq-pf-sub" data-t-promo="f3s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
+        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-promo="f3t">جاهز في دقائق — مجاناً 10 أيام</div><div class="rizq-pf-sub" data-t-promo="f3s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
       <a href="rizq_register.html" class="rizq-promo-cta-main" data-t-promo="ctaMain">🚀 ابدأ مجاناً الآن</a>
       <a href="rizq_landing_v8.html" class="rizq-promo-cta-sec" data-t-promo="ctaSec">تصفح المنصة أولاً ←</a>
-      <div class="rizq-promo-note" data-t-promo="note">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
+      <div class="rizq-promo-note" data-t-promo="note">لا حاجة لبطاقة بنكية · 10 أيام تجريبية مجانية</div>
     </div>
   </div>
 </div>
@@ -1153,11 +1161,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRizqPro
     f1s: 'Vos services, vos contacts et votre image — au même endroit',
     f2t: 'Des clients vous contactent directement',
     f2s: 'WhatsApp, téléphone et email — en un clic',
-    f3t: 'Prêt en quelques minutes — 3 jours gratuits',
+    f3t: 'Prêt en quelques minutes — 10 jours gratuits',
     f3s: "Aucun site web ni expérience technique requis",
     ctaMain: '🚀 Commencez gratuitement maintenant',
     ctaSec: "Découvrir la plateforme d'abord ←",
-    note: "Aucune carte bancaire requise · 3 jours d'essai gratuit"
+    note: "Aucune carte bancaire requise · 10 jours d'essai gratuit"
   };
   var RIZQ_PROMO_AR = null;
   function applyRizqPromoLang(){

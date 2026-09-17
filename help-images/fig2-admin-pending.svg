@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" role="img" aria-label="activation wait">
+  <rect width="880" height="240" rx="14" fill="#f8faff"/>
+  <rect x="40" y="36" width="360" height="160" rx="16" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+  <circle cx="100" cy="90" r="28" fill="#fffbeb" stroke="#f59e0b" stroke-width="3"/>
+  <text x="100" y="98" text-anchor="middle" fill="#b45309" font-size="22" font-family="Segoe UI,sans-serif">...</text>
+  <text x="150" y="82" fill="#1B3A6B" font-size="16" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">طلبك قيد المراجعة</text>
+  <text x="150" y="108" fill="#64748b" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">عادةً خلال وقت قصير</text>
+  <text x="60" y="150" fill="#475569" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">ستصلك الموافقة ثم تستطيع الدخول</text>
+  <text x="60" y="172" fill="#475569" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">إلى لوحة التحكم الخاصة بك.</text>
+
+  <rect x="480" y="36" width="360" height="160" rx="16" fill="#0f172a"/>
+  <text x="660" y="78" text-anchor="middle" fill="#E8C96A" font-size="16" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">بعد التفعيل</text>
+  <text x="660" y="112" text-anchor="middle" fill="#fff" font-size="14" font-family="Tahoma,Segoe UI,sans-serif">حسابي → دخول البائع</text>
+  <text x="660" y="140" text-anchor="middle" fill="#94a3b8" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">بالبريد وكلمة المرور</text>
+  <text x="660" y="168" text-anchor="middle" fill="#C9A84C" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">ثم ابدأ إضافة إعلاناتك أو منتجاتك</text>
+
+  <text x="440" y="222" text-anchor="middle" fill="#64748b" font-size="12" font-family="Tahoma,Segoe UI,sans-serif">لا حاجة لأي إعدادات تقنية — فقط انتظر التفعيل ثم سجّل الدخول</text>
+</svg>

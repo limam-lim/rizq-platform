@@ -333,14 +333,13 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
   <script src="rizq_packages_config.js?v=13"></script>
-  <script src="rizq_agent.js"></script>
-  <script src="rizq_manager_agent_config.js"></script>
-<script src="rizq_pwa.js" defer></script>
+  <script src="rizq_pwa.js" defer></script>
 </head>
 <body class="rizq-dash" data-t-ns="admin">
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
+  <button type="button" class="btn-lang btn-lang-primary" id="login-lang-btn" style="position:absolute;top:18px;left:18px;z-index:10000" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   <div class="login-box">
     <div class="login-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
     <div class="login-title" data-t="login-title">لوحة إدارة رزق</div>
@@ -368,39 +367,41 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-admin-av">👑</div>
     <div>
       <div class="sb-admin-name" id="sb-admin-name">Super Admin</div>
-      <div class="sb-admin-role">⭐ Super Administrator</div>
+      <div class="sb-admin-role" id="sb-admin-role" data-t="adm-role-super">⭐ Super Administrator</div>
     </div>
   </div>
   <nav class="sb-nav">
     <div class="sb-section" data-t="sb-section-dashboard">لوحة التحكم</div>
-    <div class="sb-item active" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-overview">نظرة عامة</span></div>
-    <div class="sb-item" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge">1,247</span></div>
-    <div class="sb-item" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold">50,842</span></div>
-    <div class="sb-item" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge">23</span></div>
-    <div class="sb-item" id="sb-moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('analytics',this)"><span class="sb-icon">📈</span><span class="sb-label" data-t="sb-analytics">الإحصائيات</span></div>
+    <div class="sb-item active" data-admin-perm="overview" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-overview">نظرة عامة</span></div>
+    <div class="sb-item" data-admin-perm="users" onclick="showPanel('users',this)"><span class="sb-icon">👥</span><span class="sb-label" data-t="sb-users">المستخدمون</span><span class="sb-badge" id="users-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="ads" onclick="showPanel('ads',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-ads">الإعلانات</span><span class="sb-badge gold" id="ads-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="reports" onclick="showPanel('reports',this)"><span class="sb-icon">🚨</span><span class="sb-label" data-t="sb-reports">البلاغات</span><span class="sb-badge" id="reports-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" id="sb-moderation" data-admin-perm="moderation" onclick="showPanel('moderation',this)"><span class="sb-icon">🔍</span><span class="sb-label" data-t="sb-moderation">مراقبة المحتوى</span><span class="sb-badge" id="mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="tenders" onclick="showPanel('tenders-mod',this)"><span class="sb-icon">📋</span><span class="sb-label" data-t="sb-tenders-mod">مراقبة المناقصات</span><span class="sb-badge" id="tenders-mod-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="payments" onclick="showPanel('payments',this)"><span class="sb-icon">💳</span><span class="sb-label" data-t="sb-payments">المدفوعات</span><span class="sb-badge" id="payments-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="analytics" onclick="showPanel('analytics',this)"><span class="sb-icon">📈</span><span class="sb-label" data-t="sb-analytics">الإحصائيات</span></div>
     <div class="sb-section" data-t="sb-section-admin">الإدارة</div>
-    <div class="sb-item" onclick="showPanel('team',this)"><span class="sb-icon">🛡️</span><span class="sb-label" data-t="sb-team">فريق الإدارة</span><span class="sb-badge blue">10</span></div>
-    <div class="sb-item" onclick="showPanel('packages',this)"><span class="sb-icon">📦</span><span class="sb-label" data-t="sb-packages">إدارة الباقات</span></div>
-    <div class="sb-item" onclick="showPanel('prices',this)"><span class="sb-icon">🛒</span><span class="sb-label" data-t="sb-prices">أسعار المواد</span></div>
-    <div class="sb-item" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
-    <div class="sb-item" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
-    <div class="sb-item" onclick="showPanel('siteconfig',this)"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-siteconfig">إعدادات الموقع</span></div>
-    <div class="sb-item" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label" data-t="sb-modules">إدارة الأقسام</span></div>
-    <div class="sb-item" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-settings">الإعدادات</span></div>
-    <div class="sb-item" onclick="showPanel('legal',this)"><span class="sb-icon">📜</span><span class="sb-label" data-t="sb-legal">القانوني</span></div>
-    <div class="sb-item" onclick="showPanel('legal-editor',this)"><span class="sb-icon">✏️</span><span class="sb-label" data-t="sb-legal-editor">تعديل نصوص القانون</span></div>
+    <div class="sb-item" data-admin-perm="team.manage" onclick="showPanel('team',this)"><span class="sb-icon">🛡️</span><span class="sb-label" data-t="sb-team">فريق الإدارة</span><span class="sb-badge blue" id="team-count-badge">15</span></div>
+    <div class="sb-item" data-admin-perm="packages" onclick="showPanel('packages',this)"><span class="sb-icon">📦</span><span class="sb-label" data-t="sb-packages">إدارة الباقات</span></div>
+    <div class="sb-item" data-admin-perm="prices" onclick="showPanel('prices',this)"><span class="sb-icon">🛒</span><span class="sb-label" data-t="sb-prices">أسعار المواد</span></div>
+    <div class="sb-item" data-admin-perm="extra-categories" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
+    <div class="sb-item" data-admin-perm="promo-video" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
+    <div class="sb-item" data-admin-perm="siteconfig" onclick="showPanel('siteconfig',this)"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-siteconfig">إعدادات الموقع</span></div>
+    <div class="sb-item" data-admin-perm="modules" onclick="showPanel('modules',this)"><span class="sb-icon">🧩</span><span class="sb-label" data-t="sb-modules">إدارة الأقسام</span></div>
+    <div class="sb-item" data-admin-perm="settings" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-settings">الإعدادات</span></div>
+    <div class="sb-item" data-admin-perm="legal" onclick="showPanel('legal',this)"><span class="sb-icon">📜</span><span class="sb-label" data-t="sb-legal">القانوني</span></div>
+    <div class="sb-item" data-admin-perm="legal-editor" onclick="showPanel('legal-editor',this)"><span class="sb-icon">✏️</span><span class="sb-label" data-t="sb-legal-editor">تعديل نصوص القانون</span></div>
     <div class="sb-section" data-t="sb-section-channels">قنوات التواصل</div>
-    <div class="sb-item" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
-    <div class="sb-item" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
+    <div class="sb-item" data-admin-perm="channels" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
+    <div class="sb-item" data-admin-perm="announcements" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
-    <div class="sb-item" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
-    <div class="sb-item" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
-    <div class="sb-item" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
+    <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
+    <div class="sb-item" data-admin-perm="quota-guard" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('unified-review',this)" id="sb-unified-review"><span class="sb-icon">📥</span><span class="sb-label" data-t="sb-unified-review">مراجعة موحدة</span><span class="sb-badge" id="unified-review-badge" style="display:none;background:linear-gradient(135deg,#dc2626,#b91c1c)">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('accounts',this)"><span class="sb-icon">⏳</span><span class="sb-label" data-t="sb-accounts">حسابات معلقة</span><span class="sb-badge" id="pending-count-badge" style="display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="accounts" onclick="showPanel('special-grant',this)"><span class="sb-icon">🎁</span><span class="sb-label" data-t="sb-special-grant">منح خاص</span></div>
+    <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('ai-manager',this)"><span class="sb-icon">🤖</span><span class="sb-label" data-t="sb-ai-manager">مدير رزق الذكي</span><span class="sb-badge" id="ai-missed-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
+    <div class="sb-item" data-admin-perm="moderator-config" onclick="showPanel('moderator-config',this)"><span class="sb-icon">⚙️</span><span class="sb-label" data-t="sb-moderator-config">إعدادات المراقب</span></div>
     <div class="sb-section" data-t="sb-section-site">الموقع</div>
     <div class="sb-item" onclick="window.open('rizq_landing_v8.html','_blank')"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-view-site">عرض الموقع</span></div>
   </nav>
@@ -443,6 +444,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="topbar-right">
       
       <span class="topbar-time" id="clock">--:--:--</span>
+      <button type="button" class="btn-icon-tb btn-lang btn-lang-primary" id="cp-lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
       <button class="btn-icon-tb" onclick="showPanel('reports',null)">🚨<span class="notif-dot"></span></button>
       <button class="btn-icon-tb" title="إشعار" onclick="showToast(RizqI18n.t2('🔔 لا توجد إشعارات جديدة في الوقت الحالي','🔔 Aucune nouvelle notification pour le moment'),'info')">🔔</button>
       <button class="btn-icon-tb" onclick="showPanel('settings',null)">⚙️</button>
@@ -458,11 +460,11 @@ main, .page-content.active, .main-content, .results-area,
         <p style="font-size:13px;color:var(--text-muted);margin-top:4px"><span data-t="ov-dashboard-line">لوحة تحكم رزق — ADMINIA SARL</span> | <span id="today-date"></span></p>
       </div>
       <div class="stats-row">
-        <div class="stat-card c-gold"><div class="stat-icon">📋</div><div class="stat-num">50,842</div><div class="stat-lbl" data-t="ov-stat-ads">إجمالي الإعلانات</div><div class="stat-change up" data-t="ov-stat-ads-change">▲ 342 هذا الأسبوع</div></div>
-        <div class="stat-card c-green"><div class="stat-icon">👥</div><div class="stat-num">1,247</div><div class="stat-lbl" data-t="ov-stat-users">مستخدمون مسجلون</div><div class="stat-change up" data-t="ov-stat-users-change">▲ 28 هذا الأسبوع</div></div>
-        <div class="stat-card c-blue"><div class="stat-icon">👁</div><div class="stat-num">148,390</div><div class="stat-lbl" data-t="ov-stat-views">مشاهدة هذا الشهر</div><div class="stat-change up" data-t="ov-stat-views-change">▲ 18%</div></div>
-        <div class="stat-card c-red"><div class="stat-icon">🚨</div><div class="stat-num">23</div><div class="stat-lbl" data-t="ov-stat-reports">بلاغات معلّقة</div><div class="stat-change dn" data-t="ov-stat-reports-change">▼ يجب المراجعة</div></div>
-        <div class="stat-card c-purple"><div class="stat-icon">💰</div><div class="stat-num">284,000</div><div class="stat-lbl" data-t="ov-stat-revenue">إيراد MRU هذا الشهر</div><div class="stat-change up" data-t="ov-stat-revenue-change">▲ 12%</div></div>
+        <div class="stat-card c-gold"><div class="stat-icon">📋</div><div class="stat-num" id="ov-stat-ads-num">—</div><div class="stat-lbl" data-t="ov-stat-ads">إجمالي الإعلانات</div><div class="stat-change up" id="ov-stat-ads-ch" data-t="ov-stat-ads-change">…</div></div>
+        <div class="stat-card c-green"><div class="stat-icon">👥</div><div class="stat-num" id="ov-stat-users-num">—</div><div class="stat-lbl" data-t="ov-stat-users">مستخدمون مسجلون</div><div class="stat-change up" id="ov-stat-users-ch" data-t="ov-stat-users-change">…</div></div>
+        <div class="stat-card c-blue"><div class="stat-icon">⏳</div><div class="stat-num" id="ov-stat-pending-num">—</div><div class="stat-lbl" data-t="ov-stat-pending-accts">حسابات قيد المراجعة</div><div class="stat-change up" id="ov-stat-pending-ch">…</div></div>
+        <div class="stat-card c-red"><div class="stat-icon">🚨</div><div class="stat-num" id="ov-stat-reports-num">—</div><div class="stat-lbl" data-t="ov-stat-reports">بلاغات معلّقة</div><div class="stat-change dn" id="ov-stat-reports-ch" data-t="ov-stat-reports-change">…</div></div>
+        <div class="stat-card c-purple"><div class="stat-icon">💳</div><div class="stat-num" id="ov-stat-subs-num">—</div><div class="stat-lbl" data-t="ov-stat-subs">طلبات اشتراك معلّقة</div><div class="stat-change up" id="ov-stat-subs-ch">…</div></div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;margin-bottom:20px">
@@ -597,9 +599,9 @@ main, .page-content.active, .main-content, .results-area,
     </div>
     <div class="panel" id="panel-payments">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-        <div class="stat-card c-gold"><div class="stat-icon">💰</div><div class="stat-num">284,000 MRU</div><div class="stat-lbl" data-t="pay-revenue">إيراد هذا الشهر</div></div>
-        <div class="stat-card c-green"><div class="stat-icon">🚀</div><div class="stat-num">47</div><div class="stat-lbl" data-t="pay-pro-active">اشتراك Pro نشط</div></div>
-        <div class="stat-card c-purple"><div class="stat-icon">🏢</div><div class="stat-num">12</div><div class="stat-lbl" data-t="pay-business-active">اشتراك Business نشط</div></div>
+        <div class="stat-card c-gold"><div class="stat-icon">💰</div><div class="stat-num" id="pay-stat-revenue">—</div><div class="stat-lbl" data-t="pay-revenue">إيراد هذا الشهر</div></div>
+        <div class="stat-card c-green"><div class="stat-icon">🚀</div><div class="stat-num" id="pay-stat-pro">—</div><div class="stat-lbl" data-t="pay-pro-active">اشتراك Pro نشط</div></div>
+        <div class="stat-card c-purple"><div class="stat-icon">🏢</div><div class="stat-num" id="pay-stat-business">—</div><div class="stat-lbl" data-t="pay-business-active">اشتراك Business نشط</div></div>
       </div>
       <!-- ══ تنبيهات انتهاء/تجديد الاشتراكات ══ -->
       <div class="card" style="margin-bottom:16px">
@@ -680,29 +682,23 @@ main, .page-content.active, .main-content, .results-area,
           <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">تعليمات / معرفة إضافية تُغذّى للوكيل (تُعرض كملاحظة مرجعية لك أثناء المراجعة)</label>
           <textarea id="subagent-notes" rows="3" placeholder="مثال: الحساب الرسمي البنكي هو ××××، أي وصل من حساب آخر يجب رفضه تلقائياً..." style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رابط خادم الذكاء (rizq-backend) — اختياري</label>
-            <input id="subagent-backend-url" placeholder="https://rizq-platform-api.onrender.com" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">السر المشترك مع الخادم</label>
-            <input id="subagent-backend-secret" type="password" placeholder="نفس BACKEND_SHARED_SECRET" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
-          </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رابط خادم الذكاء (rizq-backend) — اختياري</label>
+          <input id="subagent-backend-url" placeholder="https://rizq-platform-api.onrender.com" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:12.5px;font-family:inherit;box-sizing:border-box;direction:ltr;text-align:left">
         </div>
-        <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. التفاصيل في rizq-backend/README.md</p>
+        <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">بدون هذا الرابط، يبقى الوكيل يعمل بالفحوص الإحصائية فقط (تكرار الوصل، تطابق المبلغ) — وهذا كافٍ وآمن تماماً. الرابط فقط يفعّل قراءة الوصل بالذكاء الاصطناعي عند توفّر الخادم. المصادقة مع الخادم تتم عبر جلسة المشرف (<code>x-admin-token</code>) — لا حاجة لسرّ مشترك في المتصفح.</p>
         <button onclick="saveSubAgentConfig()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ</button>
         <span id="subagent-saved-msg" style="display:none;color:#059669;font-size:12px;font-weight:700;margin-right:8px">✅ تم الحفظ</span>
       </div>
 
       <!-- ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (نفس رقم/حساب المكالمات)
            إرسال فقط بأمر صريح من الأدمن هنا، لا جدولة ولا إرسال تلقائي أبداً.
-           يستخدم نفس backendUrl/backendSecret المضبوطين أعلاه في "وكيل الباقات". ══ -->
+           يستخدم نفس backendUrl المضبوط أعلاه في "وكيل الباقات" + جلسة المشرف. ══ -->
       <div class="card" style="margin-top:20px">
         <div class="card-header">
           <div class="card-title">📱 رسائل SMS ترويجية</div>
         </div>
-        <p style="font-size:11px;color:#9ca3af;margin:-2px 0 12px">إرسال يدوي فقط بأمر صريح منك — لا رسائل تلقائية أو مجدولة. يستخدم نفس رابط/سرّ الخادم المضبوطين أعلاه في "وكيل الباقات"، ونفس رقم Twilio المستخدم للمكالمات.</p>
+        <p style="font-size:11px;color:#9ca3af;margin:-2px 0 12px">إرسال يدوي فقط بأمر صريح منك — لا رسائل تلقائية أو مجدولة. يستخدم نفس رابط الخادم المضبوط أعلاه في "وكيل الباقات" + جلسة المشرف، ونفس رقم Twilio المستخدم للمكالمات.</p>
         <div style="margin-bottom:12px">
           <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">نص الرسالة</label>
           <textarea id="sms-broadcast-text" rows="4" oninput="_updateSmsCharCount()" placeholder="مثال: عروض رزق الجديدة! جدّد باقتك الآن واستفد من خصم خاص..." style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
@@ -770,9 +766,9 @@ main, .page-content.active, .main-content, .results-area,
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
           <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#1a2535" data-t="team-h">🛡️ فريق الإدارة</h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" data-t="team-sub">Super Admin + 9 مشرفين — إجمالي 10 أعضاء</p>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:4px" id="team-subtitle" data-t="team-sub-dynamic">فريق الإدارة — صلاحيات ديناميكية (حتى 15 عضو)</p>
         </div>
-        <button class="btn-sm btn-primary" data-t="team-add-btn" onclick="openModal('add-admin')">➕ إضافة عضو</button>
+        <button class="btn-sm btn-primary" id="team-add-btn" data-t="team-add-btn" onclick="openAddAdminModal()">➕ إضافة عضو</button>
       </div>
       <div class="team-grid" id="team-grid"></div>
     </div>
@@ -795,7 +791,7 @@ main, .page-content.active, .main-content, .results-area,
               </div>
               <div class="settings-section">
                 <div class="settings-section-title" data-t="set-contact">📱 التواصل</div>
-                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" id="set-whatsapp" value="+222 XX XX XX XX" dir="ltr"/></div>
+                <div class="form-group"><label class="form-label" data-t="set-whatsapp">رقم واتساب الدعم</label><input class="form-input" id="set-whatsapp" value="" dir="ltr" placeholder="+222…"/></div>
                 <div class="form-group"><label class="form-label" data-t="set-support-email">بريد الدعم</label><input class="form-input" id="set-support-email" value="direction@rizq.mr" dir="ltr"/></div>
                 <div class="form-group"><label class="form-label" data-t="set-reports-email">بريد البلاغات</label><input class="form-input" id="set-reports-email" value="report@rizq.mr" dir="ltr"/></div>
                 <button class="btn-sm btn-primary" data-t="set-save-contact" onclick="saveSettingsContact()">💾 حفظ</button>
@@ -1015,8 +1011,8 @@ main, .page-content.active, .main-content, .results-area,
             <div style="padding:18px">
               <div class="form-group"><label class="form-label" data-t="cfg-sitename-label">اسم الموقع</label><input class="form-input" id="cfg-sitename" placeholder="رزق | Rizq"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-tagline-label">الشعار الفرعي (Tagline)</label><input class="form-input" id="cfg-tagline" data-ph="cfg-tagline-ph" placeholder="منصة الإعلانات المبوبة الأولى في موريتانيا"/></div>
-              <div class="form-group"><label class="form-label" data-t="cfg-phone-label">رقم الهاتف</label><input class="form-input" id="cfg-phone" dir="ltr" placeholder="+222 XX XX XX XX"/></div>
-              <div class="form-group"><label class="form-label" data-t="cfg-whatsapp-label">رقم واتساب</label><input class="form-input" id="cfg-whatsapp" dir="ltr" placeholder="+222 XX XX XX XX"/></div>
+              <div class="form-group"><label class="form-label" data-t="cfg-phone-label">رقم الهاتف</label><input class="form-input" id="cfg-phone" dir="ltr" placeholder="+222…"/></div>
+              <div class="form-group"><label class="form-label" data-t="cfg-whatsapp-label">رقم واتساب</label><input class="form-input" id="cfg-whatsapp" dir="ltr" placeholder="+222…"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-email-label">البريد الإلكتروني</label><input class="form-input" id="cfg-email" dir="ltr" placeholder="direction@rizq.mr"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-report-email-label">بريد البلاغات</label><input class="form-input" id="cfg-report-email" dir="ltr" placeholder="report@rizq.mr"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-address-label">العنوان</label><input class="form-input" id="cfg-address" data-ph="cfg-address-ph" placeholder="نواكشوط، موريتانيا"/></div>
@@ -1376,7 +1372,7 @@ main, .page-content.active, .main-content, .results-area,
           <!-- معرّف الرقم -->
           <div style="grid-column:1/-1">
             <label style="font-size:12px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:5px">📡 معرّف الرقم (Twilio / WhatsApp) *</label>
-            <input id="sa-id" type="text" placeholder="+222XXXXXXXXX" style="width:100%;padding:9px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:9px;font-size:13px;font-family:inherit;box-sizing:border-box">
+            <input id="sa-id" type="text" placeholder="+222…" style="width:100%;padding:9px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:9px;font-size:13px;font-family:inherit;box-sizing:border-box">
             <div style="font-size:11px;color:#6b7280;margin-top:4px">هذا هو المعرّف الذي تُرسله Twilio في حقل "To" أو Meta في "display_phone_number"</div>
           </div>
 
@@ -1501,6 +1497,19 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <!-- ══ UNIFIED REVIEW QUEUE ══ -->
+    <div class="panel" id="panel-unified-review">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="ur-h">📥 مراجعة موحدة</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="ur-sub">كل الطوابير المعلّقة في مكان واحد — اضغط للانتقال إلى لوحة المعالجة</p>
+        </div>
+        <button type="button" onclick="refreshUnifiedReviewPanel()" style="padding:9px 18px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔄 تحديث</button>
+      </div>
+      <div id="unified-review-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"></div>
+      <p id="unified-review-empty" style="display:none;text-align:center;color:#94a3b8;padding:36px 12px;font-size:14px">✅ لا توجد عناصر معلّقة حالياً</p>
+    </div>
+
     <!-- ══ ACCOUNTS ══ -->
     <div class="panel" id="panel-accounts">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
@@ -1532,6 +1541,70 @@ main, .page-content.active, .main-content, .results-area,
       <div id="expired-section" style="display:none">
         <div id="expired-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px"></div>
         <div id="expired-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ SPECIAL GRANT / منح خاص ══ -->
+    <div class="panel" id="panel-special-grant">
+      <div style="margin-bottom:22px">
+        <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="sg-h">🎁 منح خاص</h2>
+        <p style="font-size:13px;color:#2C3A4F;margin-top:6px;max-width:720px;line-height:1.7" data-t="sg-sub">تفعيل امتياز مجاني لمدة محددة أو طويلة — للعائلة والشركاء والزبائن المميّزين. ابحث بالاسم أو الهاتف ثم اختر الامتياز والمدة.</p>
+      </div>
+
+      <div class="card" style="padding:22px;margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px" data-t="sg-search-lbl">بحث عن حساب (الاسم أو الهاتف)</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input id="sg-search" type="search" autocomplete="off" placeholder="مثال: فاطمة / 44…" data-ph-ar="مثال: فاطمة / 44…" data-ph-fr="Ex. : Fatima / 44…" oninput="sgSearchAccounts(this.value)" style="flex:1;min-width:220px;padding:11px 14px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:14px;font-family:inherit"/>
+          <button type="button" onclick="sgLoadAccounts(true)" style="padding:10px 16px;background:var(--royal,#1B3A6B);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit" data-t="sg-refresh">🔄 تحديث القائمة</button>
+        </div>
+        <div id="sg-results" style="margin-top:12px;display:grid;gap:8px"></div>
+      </div>
+
+      <div class="card" id="sg-form-card" style="padding:22px;margin-bottom:20px;opacity:.55;pointer-events:none">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:14px" data-t="sg-form-title">تفاصيل المنح</div>
+        <div id="sg-selected" style="font-size:13px;color:#3a4a63;margin-bottom:16px;padding:10px 12px;background:#f8faff;border-radius:10px;border:1px solid #e2e8f5" data-t="sg-pick-hint">اختر حساباً من نتائج البحث أولاً</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-priv-lbl">نوع الامتياز</label>
+            <select id="sg-privilege" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;background:#fff">
+              <option value="monthly" data-t="sg-priv-monthly">باقة شهرية (مدعومة)</option>
+              <option value="yearly" data-t="sg-priv-yearly">باقة سنوية (مدعومة)</option>
+              <option value="diamond" data-t="sg-priv-diamond">باقة ماسية أساسية (مدعومة)</option>
+              <option value="verified_plus" data-t="sg-priv-vp">شارة موثّق⁺ فقط</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-days-lbl">المدة</label>
+            <select id="sg-days" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;background:#fff">
+              <option value="30" data-t="sg-d-30">30 يوماً</option>
+              <option value="90" data-t="sg-d-90">3 أشهر</option>
+              <option value="365" selected data-t="sg-d-365">سنة واحدة</option>
+              <option value="1095" data-t="sg-d-1095">3 سنوات</option>
+              <option value="3650" data-t="sg-d-3650">10 سنوات (طويل جداً)</option>
+              <option value="custom" data-t="sg-d-custom">مخصص…</option>
+            </select>
+          </div>
+          <div id="sg-custom-wrap" style="display:none">
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-custom-lbl">عدد الأيام</label>
+            <input id="sg-custom-days" type="number" min="1" max="3650" value="180" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit"/>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="sg-reason-lbl">سبب المنح (اختياري — للسجل)</label>
+          <input id="sg-reason" type="text" maxlength="120" placeholder="مثال: شريك طويل الأمد / رعاية داخلية" data-ph-ar="مثال: شريك طويل الأمد / رعاية داخلية" data-ph-fr="Ex. : partenaire de longue date / geste commercial" style="width:100%;padding:10px 12px;border:1px solid rgba(27,58,107,.18);border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+        </div>
+
+        <button type="button" id="sg-grant-btn" onclick="sgSubmitGrant()" style="padding:12px 22px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;border:none;border-radius:12px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit" data-t="sg-grant-btn">✅ تفعيل المنح الخاص</button>
+      </div>
+
+      <div class="card" style="padding:18px 22px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <div style="font-size:13px;font-weight:800;color:var(--navy)" data-t="sg-log-title">آخر المنح الخاصة</div>
+          <button type="button" onclick="sgRenderGrantLog()" style="padding:6px 12px;border:1px solid #d8e0ef;background:#fff;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit" data-t="sg-log-refresh">تحديث</button>
+        </div>
+        <div id="sg-grant-log" style="font-size:13px;color:#3a4a63"></div>
       </div>
     </div>
 
@@ -1577,21 +1650,21 @@ main, .page-content.active, .main-content, .results-area,
     <div class="panel" id="panel-tenders-mod">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
         <div>
-          <h2 style="font-size:22px;font-weight:700;color:var(--navy)">📋 مراقبة المناقصات</h2>
-          <p style="font-size:13px;color:#2C3A4F;margin-top:4px">جميع المناقصات المنشورة (مفتوحة/منتهية/محذوفة) — للمراجعة وإزالة السبام أو المخالف</p>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="tm-h">📋 مراقبة المناقصات</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="tm-sub">جميع المناقصات المنشورة (مفتوحة/منتهية/محذوفة) — للمراجعة وإزالة السبام أو المخالف</p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button onclick="renderTendersModPanel()" style="padding:8px 16px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600">🔄 تحديث</button>
+          <button onclick="renderTendersModPanel()" data-t="tm-refresh-btn" style="padding:8px 16px;background:var(--royal);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600">🔄 تحديث</button>
         </div>
       </div>
       <div id="tenders-mod-list" style="display:flex;flex-direction:column;gap:12px"></div>
       <div id="tenders-mod-empty" style="display:none;text-align:center;padding:60px 20px;color:#9ca3af">
         <div style="font-size:48px;margin-bottom:12px">📋</div>
-        <p style="font-weight:600">لا توجد مناقصات منشورة بعد</p>
+        <p style="font-weight:600" data-t="tm-empty">لا توجد مناقصات منشورة بعد</p>
       </div>
       <div id="tenders-mod-error" style="display:none;text-align:center;padding:60px 20px;color:#9ca3af">
         <div style="font-size:48px;margin-bottom:12px">⚠️</div>
-        <p style="font-weight:600">تعذّر الاتصال بالخادم — تأكد من ضبط رابط/سرّ الخادم في إعدادات الموقع</p>
+        <p style="font-weight:600" data-t="tm-error">تعذّر الاتصال بالخادم — تأكد من ضبط رابط/سرّ الخادم في إعدادات الموقع</p>
       </div>
     </div>
 
@@ -1799,7 +1872,7 @@ main, .page-content.active, .main-content, .results-area,
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">📱 رقم الهاتف للمنصة (Twilio)</label>
-            <input id="ch-phone-number" placeholder="+222 XX XX XX XX" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
+            <input id="ch-phone-number" placeholder="+222…" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
           </div>
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">🔑 Twilio Account SID</label>
@@ -1972,7 +2045,7 @@ main, .page-content.active, .main-content, .results-area,
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">رقم واتساب بيزنس</label>
-            <input id="ch-wa-number" placeholder="+222 XX XX XX XX" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" disabled />
+            <input id="ch-wa-number" placeholder="+222…" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" disabled />
           </div>
           <div>
             <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Meta API Key (WhatsApp Business)</label>
@@ -2191,25 +2264,25 @@ main, .page-content.active, .main-content, .results-area,
 <div class="modal-bg" id="modal-add-admin">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('add-admin')">✕</button>
-    <div class="modal-title" data-t="am-title">➕ إضافة عضو في الفريق</div>
+    <div class="modal-title" id="am-title" data-t="am-title">➕ إضافة عضو في الفريق</div>
+    <input type="hidden" id="am-edit-id" value=""/>
     <div class="form-grid">
       <div class="form-group"><label class="form-label" data-t="am-name-label">الاسم الكامل *</label><input class="form-input" id="am-name" data-ph="am-name-ph" placeholder="محمد ولد ..."/></div>
       <div class="form-group"><label class="form-label" data-t="am-user-label">اسم المستخدم *</label><input class="form-input" id="am-user" placeholder="admin_..." dir="ltr"/></div>
     </div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label" data-t="am-phone-label">رقم الهاتف *</label><input class="form-input" id="am-phone" placeholder="+222…" dir="ltr"/></div>
       <div class="form-group"><label class="form-label" data-t="am-email-label">البريد الإلكتروني *</label><input class="form-input" id="am-email" placeholder="name@rizq.mr" dir="ltr"/></div>
     </div>
-    <div class="form-group"><label class="form-label" data-t="am-role-label">الدور والصلاحيات *</label>
-      <select class="form-select" id="am-role">
-        <option value="moderator" data-t="am-role-moderator">🔵 مشرف (Moderator) — مراجعة الإعلانات والبلاغات</option>
-        <option value="admin" data-t="am-role-admin">🟣 مدير (Admin) — كل صلاحيات المشرف + إدارة المستخدمين</option>
-        <option value="finance" data-t="am-role-finance">🟡 مالية (Finance) — الاطلاع على المدفوعات والإيرادات</option>
-        <option value="support" data-t="am-role-support">🟢 دعم (Support) — التواصل مع المستخدمين وحل المشاكل</option>
-        <option value="super" data-t="am-role-super">👑 Super Admin — صلاحيات كاملة</option>
+    <div class="form-group"><label class="form-label" data-t="am-preset-label">قالب صلاحيات جاهز</label>
+      <select class="form-select" id="am-preset" onchange="applyAdminPermPreset(this.value)">
+        <option value="" data-t="am-preset-placeholder">— اختر قالباً أو حدّد يدوياً —</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور المؤقتة *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/></div>
+    <div class="form-group"><label class="form-label" data-t="am-perms-label">الصلاحيات * (واحدة أو أكثر)</label>
+      <div id="am-permissions-grid" style="max-height:240px;overflow:auto;border:1px solid rgba(27,58,107,.12);border-radius:10px;padding:10px;background:#f8fafc"></div>
+    </div>
+    <div class="form-group"><label class="form-label" data-t="am-pass-label">كلمة المرور *</label><input class="form-input" id="am-pass" type="password" placeholder="••••••••"/><div id="am-pass-hint" style="font-size:11px;color:#64748b;margin-top:4px" data-t="am-pass-hint">عند التعديل: اتركها فارغة إن لم تُرد تغييرها</div></div>
     <div class="form-group"><label class="form-label" data-t="am-notes-label">ملاحظات</label><input class="form-input" id="am-notes" data-ph="am-notes-ph" placeholder="مسؤول عن ولاية نواكشوط..."/></div>
     <div style="display:flex;gap:10px;margin-top:6px">
       <button class="btn-sm btn-primary" style="flex:1;padding:12px" data-t="am-save-btn" onclick="saveAdmin()">💾 إضافة العضو</button>
@@ -2225,7 +2298,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="modal-title" data-t="au-title">➕ إضافة مستخدم يدوياً</div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label" data-t="au-name-label">الاسم الكامل *</label><input class="form-input" id="au-name" data-ph="au-name-ph" placeholder="الاسم الكامل"/></div>
-      <div class="form-group"><label class="form-label" data-t="au-phone-label">رقم الهاتف *</label><input class="form-input" id="au-phone" placeholder="+222 XX XX XX XX" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label" data-t="au-phone-label">رقم الهاتف *</label><input class="form-input" id="au-phone" placeholder="+222…" dir="ltr"/></div>
     </div>
     <div class="form-group"><label class="form-label" data-t="au-email-label">البريد الإلكتروني</label><input class="form-input" id="au-email" placeholder="example@email.com" dir="ltr"/></div>
     <div class="form-grid">
@@ -2269,7 +2342,7 @@ main, .page-content.active, .main-content, .results-area,
 // بلا أي تحقق فعلي من طرف الخادم. تم إصلاح هذا: تسجيل الدخول الآن يستدعي
 // /api/admin/login على الخادم، الذي يتحقق من كلمة السر (مُشفّرة bcrypt،
 // موجودة فقط في server.js ولا تصل أبداً لهذا الملف) ويُصدر جلسة حقيقية.
-// لإضافة/تعديل حساب: عدّل مصفوفة ADMIN_ACCOUNTS في rizq-backend/server.js.
+// سوبر أدمن المالك الدائم: megalimam@gmail.com — عبر المسار الخفي للوحة.
 const ADMIN_SESSION_KEY = 'rizq_admin_session';
 
 function _adminSessionToken() {
@@ -2287,23 +2360,198 @@ function _adminAuthHeaders(extra) {
 }
 
 // ══════════════════════════════════════════
-// TEAM CONFIG — أضف/عدّل الفريق هنا
+// ADMIN PERMISSIONS — صلاحيات ديناميكية (حتى 15 عضو)
 // ══════════════════════════════════════════
-let TEAM = [
-  {id:1, name:'M. LIMAM',          role:'super',     emoji:'👑', phone:'+222 XX XX XX XX', email:'m.limam@rizq.mr',    notes:'المؤسس — صلاحيات كاملة',       online:true},
-  {id:2, name:'المشرف الأول',      role:'admin',     emoji:'🛡️', phone:'',                email:'admin1@rizq.mr',     notes:'إدارة المستخدمين والإعلانات',   online:true},
-  {id:3, name:'المشرف الثاني',     role:'moderator', emoji:'👮', phone:'',                email:'admin2@rizq.mr',     notes:'مراجعة البلاغات',               online:false},
-  {id:4, name:'المشرف الثالث',     role:'moderator', emoji:'👮', phone:'',                email:'admin3@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:5, name:'المشرف الرابع',     role:'moderator', emoji:'👮', phone:'',                email:'admin4@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:6, name:'المشرف الخامس',     role:'moderator', emoji:'👮', phone:'',                email:'admin5@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:7, name:'المشرف السادس',     role:'moderator', emoji:'👮', phone:'',                email:'admin6@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:8, name:'المشرف السابع',     role:'moderator', emoji:'👮', phone:'',                email:'admin7@rizq.mr',     notes:'متاح لاحقاً',                   online:false},
-  {id:9, name:'المشرف الثامن',     role:'finance',   emoji:'💰', phone:'',                email:'finance@rizq.mr',    notes:'المالية والاشتراكات',           online:false},
-  {id:10,name:'المشرف التاسع',     role:'support',   emoji:'💬', phone:'',                email:'direction@rizq.mr',    notes:'دعم المستخدمين',                online:false},
-];
+let TEAM = [];
+let ADMIN_PERM_CATALOG = { permissions: [], presets: {}, panelMap: {}, maxTeamMembers: 15 };
 
-const ROLE_LABELS = {super:'👑 Super Admin', admin:'🟣 Admin', moderator:'🔵 Moderator', finance:'🟡 Finance', support:'🟢 Support'};
-const ROLE_COLORS = {super:'pill-super', admin:'pill-admin', moderator:'pill-mod', finance:'pill-pending', support:'pill-active'};
+const PANEL_PERM_KEYS = {
+  overview: 'overview', users: 'users', ads: 'ads', reports: 'reports', moderation: 'moderation',
+  'tenders-mod': 'tenders', payments: 'payments', analytics: 'analytics', team: 'team.manage',
+  packages: 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
+  siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
+  channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
+  'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
+};
+
+function _adminHasPerm(required) {
+  if (!currentAdmin || !Array.isArray(currentAdmin.permissions)) return false;
+  const perms = currentAdmin.permissions;
+  if (perms.includes('*')) return true;
+  if (Array.isArray(required)) return required.some(function (r) { return perms.includes(r); });
+  return perms.includes(required);
+}
+
+function _permLabel(key) {
+  const defs = ADMIN_PERM_CATALOG.permissions || [];
+  const d = defs.find(function (x) { return x.key === key; });
+  return d ? RizqI18n.t2(d.labelAr, d.labelFr) : key;
+}
+
+function _teamSubText() {
+  const max = ADMIN_PERM_CATALOG.maxTeamMembers || 15;
+  const tpl = RizqI18n.t('team-sub-dynamic', 'admin');
+  if (tpl && tpl.indexOf('{max}') !== -1) return tpl.replace('{max}', String(max));
+  return RizqI18n.t2(
+    'فريق الإدارة — صلاحيات ديناميكية (حتى ' + max + ' عضو)',
+    'Équipe admin — permissions dynamiques (jusqu\'à ' + max + ' membres)'
+  );
+}
+
+function _refreshAdminModalTitles() {
+  const editId = (document.getElementById('am-edit-id') || {}).value || '';
+  const titleEl = document.getElementById('am-title');
+  const saveBtn = document.querySelector('[data-t="am-save-btn"]');
+  if (editId) {
+    if (titleEl) titleEl.textContent = RizqI18n.t('am-edit-title', 'admin');
+    if (saveBtn) saveBtn.textContent = RizqI18n.t('am-save-edit-btn', 'admin');
+  } else {
+    if (titleEl) {
+      const v = RizqI18n.t('am-title', 'admin');
+      if (v) titleEl.textContent = v;
+    }
+    if (saveBtn) {
+      const v = RizqI18n.t('am-save-btn', 'admin');
+      if (v) saveBtn.textContent = v;
+    }
+  }
+}
+
+function refreshAdminDynamicI18n() {
+  if (currentAdmin) _applyAdminPermissions();
+  _fillAdminPresetSelect();
+  const sel = _getSelectedAdminPermissions();
+  if (document.getElementById('am-permissions-grid') && (ADMIN_PERM_CATALOG.permissions || []).length) {
+    buildAdminPermGrid(sel.length ? sel : ['overview']);
+    _onAdminPermCheckboxChange();
+  }
+  _refreshAdminModalTitles();
+  if (_currentPanelId === 'team') renderTeam();
+  if (_currentPanelId === 'tenders-mod') renderTendersModPanel();
+}
+
+function _applyAdminPermissions() {
+  const perms = (currentAdmin && currentAdmin.permissions) || [];
+  const isSuper = perms.includes('*');
+  document.querySelectorAll('.sb-item[data-admin-perm]').forEach(function (el) {
+    const need = el.getAttribute('data-admin-perm');
+    el.style.display = (isSuper || perms.includes(need)) ? '' : 'none';
+  });
+  document.querySelectorAll('.sb-section').forEach(function (sec) {
+    let next = sec.nextElementSibling;
+    let anyVisible = false;
+    while (next && !next.classList.contains('sb-section')) {
+      if (next.classList.contains('sb-item') && next.style.display !== 'none') anyVisible = true;
+      next = next.nextElementSibling;
+    }
+    sec.style.display = anyVisible ? '' : 'none';
+  });
+  const roleEl = document.getElementById('sb-admin-role');
+  if (roleEl) {
+    roleEl.textContent = isSuper
+      ? RizqI18n.t('adm-role-super', 'admin')
+      : (perms.length + ' ' + RizqI18n.t('adm-perm-word', 'admin'));
+  }
+  const addBtn = document.getElementById('team-add-btn');
+  if (addBtn) addBtn.style.display = _adminHasPerm('team.manage') ? '' : 'none';
+  const maxBadge = document.getElementById('team-count-badge');
+  if (maxBadge && !TEAM.length) maxBadge.textContent = String(ADMIN_PERM_CATALOG.maxTeamMembers || 15);
+  const sub = document.getElementById('team-subtitle');
+  if (sub) sub.textContent = _teamSubText();
+}
+
+async function loadAdminPermCatalog() {
+  try {
+    const res = await fetch(_adminBackendBase() + '/api/admin/permissions', { headers: _adminAuthHeaders() });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.ok) {
+      ADMIN_PERM_CATALOG = data;
+      _fillAdminPresetSelect();
+    }
+  } catch (e) { /* offline */ }
+}
+
+function _fillAdminPresetSelect() {
+  const sel = document.getElementById('am-preset');
+  if (!sel) return;
+  const cur = sel.value;
+  const ph = RizqI18n.t('am-preset-placeholder', 'admin') || RizqI18n.t2('اختر قالباً أو حدّد يدوياً', 'Choisir un modèle ou personnaliser');
+  sel.innerHTML = '<option value="">— ' + ph + ' —</option>';
+  const presets = ADMIN_PERM_CATALOG.presets || {};
+  Object.keys(presets).forEach(function (k) {
+    const p = presets[k];
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = RizqI18n.t2(p.labelAr, p.labelFr);
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+function buildAdminPermGrid(selected) {
+  const grid = document.getElementById('am-permissions-grid');
+  if (!grid) return;
+  const sel = new Set(selected || []);
+  const defs = ADMIN_PERM_CATALOG.permissions || [];
+  grid.innerHTML = defs.map(function (d) {
+    const checked = sel.has(d.key) ? ' checked' : '';
+    const style = d.key === '*' ? 'font-weight:700;color:#92400e' : '';
+    return '<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 4px;cursor:pointer;font-size:12.5px;' + style + '">'
+      + '<input type="checkbox" class="am-perm-cb" value="' + d.key + '"' + checked + ' onchange="_onAdminPermCheckboxChange()"/>'
+      + '<span>' + RizqI18n.t2(d.labelAr, d.labelFr) + '</span></label>';
+  }).join('');
+}
+
+function _getSelectedAdminPermissions() {
+  const perms = Array.from(document.querySelectorAll('.am-perm-cb:checked')).map(function (b) { return b.value; });
+  if (perms.includes('*')) return ['*'];
+  return perms;
+}
+
+function _onAdminPermCheckboxChange() {
+  const boxes = document.querySelectorAll('.am-perm-cb');
+  const star = Array.from(boxes).find(function (b) { return b.value === '*' && b.checked; });
+  if (star) {
+    boxes.forEach(function (b) { if (b.value !== '*') { b.checked = false; b.disabled = true; } });
+  } else {
+    boxes.forEach(function (b) { b.disabled = false; });
+  }
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+}
+
+function applyAdminPermPreset(presetKey) {
+  if (!presetKey) return;
+  const preset = (ADMIN_PERM_CATALOG.presets || {})[presetKey];
+  if (!preset) return;
+  buildAdminPermGrid(preset.permissions);
+  _onAdminPermCheckboxChange();
+}
+
+function openAddAdminModal() {
+  document.getElementById('am-edit-id').value = '';
+  _refreshAdminModalTitles();
+  ['am-name', 'am-user', 'am-phone', 'am-email', 'am-pass', 'am-notes'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const userEl = document.getElementById('am-user');
+  if (userEl) userEl.disabled = false;
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+  loadAdminPermCatalog().then(function () { buildAdminPermGrid(['overview']); });
+  openModal('add-admin');
+}
+
+function _teamPermSummary(member) {
+  const perms = member.permissions || [];
+  if (perms.includes('*')) return RizqI18n.t('perm-full-access', 'admin');
+  if (!perms.length) return RizqI18n.t('perm-none', 'admin');
+  const shown = perms.slice(0, 3).map(_permLabel).join(' · ');
+  const extra = perms.length > 3 ? ' +' + (perms.length - 3) : '';
+  return shown + extra;
+}
 
 // ══ SAMPLE DATA ══
 const USERS_DATA = [];
@@ -2332,19 +2580,23 @@ function _enterAdminUI(found){
   document.getElementById('sb-admin-name').textContent = found.name;
   document.getElementById('welcome-name').textContent = found.name;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-MR-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  // Restrict if not super/admin
-  if(found.role==='moderator'){
-    document.querySelectorAll('.sb-item').forEach(i=>{
-      if(i.querySelector('.sb-label')?.textContent.includes('المدفوعات')||
-         i.querySelector('.sb-label')?.textContent.includes('الإعدادات')||
-         i.querySelector('.sb-label')?.textContent.includes('فريق الإدارة')){
-        i.style.display='none';
+  loadAdminPermCatalog().then(function(){ _applyAdminPermissions(); });
+  if(typeof RizqSub!=='undefined' && window.RIZQ_BACKEND_BASE){
+    try{
+      var _cfg0=RizqSub.getAgentConfig();
+      if(!_cfg0.backendUrl || _cfg0.backendUrl!==window.RIZQ_BACKEND_BASE){
+        RizqSub.setAgentConfig({ backendUrl: window.RIZQ_BACKEND_BASE });
       }
-    });
+    }catch(eCfg){}
   }
   initDashboard();
-  showPanel('overview', document.querySelector('.sb-item[onclick*="overview"]'));
-  showToast(`✅ ${RizqI18n.t2('أهلاً','Bienvenue')} ${found.name} — ${ROLE_LABELS[found.role]||''}`);
+  var firstPanel = _adminHasPerm('overview') ? 'overview' : Object.keys(PANEL_PERM_KEYS).find(function(pid){ return _adminHasPerm(PANEL_PERM_KEYS[pid]); }) || 'overview';
+  var navEl = document.querySelector('.sb-item[data-admin-perm="' + (PANEL_PERM_KEYS[firstPanel] || 'overview') + '"]');
+  showPanel(firstPanel, navEl);
+  var welcomeRole = (found.permissions || []).includes('*')
+    ? RizqI18n.t('adm-role-super', 'admin')
+    : ((found.permissions || []).length + ' ' + RizqI18n.t('adm-perm-word', 'admin'));
+  showToast('✅ ' + RizqI18n.t2('أهلاً', 'Bienvenue') + ' ' + found.name + ' — ' + welcomeRole);
 }
 
 async function doLogin(){
@@ -2365,8 +2617,8 @@ async function doLogin(){
       err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
       return;
     }
-    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role })); }catch(e){}
-    _enterAdminUI({ name:data.name, role:data.role });
+    try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, permissions:data.permissions||[], user:data.user })); }catch(e){}
+    _enterAdminUI({ name:data.name, role:data.role, permissions:data.permissions||[], user:data.user });
   }catch(e){
     err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
   }finally{
@@ -2384,7 +2636,10 @@ async function doLogin(){
     fetch(_adminBackendBase()+'/api/admin/verify', { headers:{ 'x-admin-token': saved.token } })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if(data && data.ok){ _enterAdminUI({ name:data.name, role:data.role }); }
+        if(data && data.ok){
+          try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:saved.token, name:data.name, role:data.role, permissions:data.permissions||[], user:data.user })); }catch(e){}
+          _enterAdminUI({ name:data.name, role:data.role, permissions:data.permissions||[], user:data.user });
+        }
         else { try{ sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){} }
       })
       .catch(function(){ /* الخادم غير متاح الآن — تبقى شاشة الدخول اليدوي */ });
@@ -2408,7 +2663,7 @@ function doLogout(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts',moderation:'topbar-moderation','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -2417,18 +2672,29 @@ function refreshTopbarTitle(){
   el.textContent=(key && window.RizqI18n) ? RizqI18n.t(key,'admin') : (key?titles_fallback(_currentPanelId):'لوحة التحكم');
 }
 function titles_fallback(id){
-  const ar=window.RIZQ_I18N_AR&&window.RIZQ_I18N_AR.admin;
-  return ar && PANEL_TITLE_KEYS[id] ? ar[PANEL_TITLE_KEYS[id]] : 'لوحة التحكم';
+  if (window.RizqI18n && PANEL_TITLE_KEYS[id]) {
+    const v = RizqI18n.t(PANEL_TITLE_KEYS[id], 'admin');
+    if (v) return v;
+  }
+  return (window.RizqI18n && RizqI18n.t('topbar-default', 'admin')) || 'لوحة التحكم';
 }
 document.addEventListener('rizq:langchange', refreshTopbarTitle);
 document.addEventListener('rizq:langchange', renderExtraCategories);
 document.addEventListener('rizq:langchange', renderPackages);
 document.addEventListener('rizq:langchange', renderPricesAdmin);
+document.addEventListener('rizq:langchange', refreshAdminDynamicI18n);
 function showPanel(id, navEl){
+  const permKey = PANEL_PERM_KEYS[id];
+  if (permKey && currentAdmin && !_adminHasPerm(permKey)) {
+    showToast(RizqI18n.t('perm-denied-section', 'admin'), 'error');
+    return;
+  }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   const panel = document.getElementById('panel-'+id);
   if(panel) panel.classList.add('active');
   if(id==='accounts') refreshAccountsPanel();
+  if(id==='unified-review') refreshUnifiedReviewPanel();
+  if(id==='special-grant'){ sgInitPanel(); }
   if(id==='moderation') loadModerationPanel();
   if(id==='tenders-mod') renderTendersModPanel();
   if(navEl){
@@ -2466,7 +2732,7 @@ function showPanel(id, navEl){
 // على الإعلان/المنتج نفسه، كي تختفي/تظهر فوراً مع انتهاء/تفعيل الباقة.
 const PKG_DEFAULTS = {
   general: [
-    {id:'trial',  name:'تجريبية', price:0,     period:'مجاناً — 3 أيام',     durationDays:3,   features:['10 منتجات','شارة محل','تواصل مباشر'],                       active:true},
+    {id:'trial',  name:'تجريبية', price:0,     period:'مجاناً — 10 أيام',    durationDays:10,  features:['10 منتجات','شارة محل','تواصل مباشر'],                       active:true},
     {id:'basic',  name:'أساسي',   price:1500,  period:'MRU / شهر',           durationDays:30,  features:['30 منتج','🏅 شارة "مميّز برزق"','إحصائيات'],                    active:true},
     {id:'pro',    name:'Pro',     price:4000,  period:'MRU / شهر',           durationDays:30,  features:['منتجات غير محدودة','أولوية في نتائج البحث','دعم مخصص'],     active:true},
     {id:'yearly',   name:'سنوي',    price:30000, period:'MRU / سنة — خصم 37%', durationDays:365, features:['كل مزايا Pro','خصم 37% عن السعر الشهري','فوترة سنوية واحدة'], active:true},
@@ -2486,7 +2752,7 @@ const PKG_DEFAULTS = {
   ],
   office: [
     {id:'of-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10, maxCatalogItems:3, features:['عرض حتى 3 خدمات نشطة','صفحة المكتب','طلبات تواصل'], active:true},
-    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['شارة مكتب موثوق','نظام حجز المواعيد','فيديو تعريفي مشمول'], active:true},
+    {id:'of-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  maxCatalogItems:Infinity, features:['شارة مكتب موثوق','خدمات غير محدودة','نظام حجز المواعيد','فيديو تعريفي مشمول'], active:true},
     {id:'of-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  maxCatalogItems:Infinity, features:['توفير 14%','عرض خدمات غير محدود','مدير حساب مخصص'], active:true},
     {id:'of-year',  name:'سنوية',   price:28000, period:'MRU / 12 شهر',     durationDays:365, maxCatalogItems:Infinity, features:['توفير 33%','فيديو تعريفي مشمول + 1 إضافي مجاناً','أولوية الدعم'], active:true},
     {id:'of-diam-std', name:'الماسية الأساسية للمكاتب', price:4000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, maxCatalogItems:Infinity, features:['موظف استقبال واستفسارات 24/7 (نصي)','تنظيم طلبات الخدمات والمواعيد','2,000 محادثة نصية شهرياً','ويدجت الموقع + واتساب'], active:true},
@@ -2501,7 +2767,7 @@ const PKG_DEFAULTS = {
     {id:'st-diam-pro', name:'الماسية Pro للمحلات', price:6000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:2500, quotaMinutes:150, maxCatalogItems:Infinity, features:['منتجات غير محدودة للمتجر','نائب ذكي تفاعلي للمحل (نصي + صوتي)','2,500 محادثة نصية + 150 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات آليّة','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
   ],
   corp: [
-    {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 3 أيام', durationDays:3,   features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
+    {id:'cp-trial', name:'تجريبية', price:0,     period:'مجاناً — 10 أيام', durationDays:10,  features:['وصول كامل للمنصة','استعراض الإعلانات','دعم فني أساسي'], active:true},
     {id:'cp-month', name:'شهرية',   price:3500,  period:'MRU / شهر',        durationDays:30,  features:['🏅 شارة "شركة مميّزة برزق"','عرض 30 إعلان','إحصائيات شهرية','دعم بالأولوية'], active:true},
     {id:'cp-quart', name:'ربعية',   price:9000,  period:'MRU / 3 أشهر',     durationDays:90,  features:['كل مزايا الشهرية','توفير 15% عن الشهري','إعلانات غير محدودة','مدير حساب'], active:true},
     {id:'cp-year',  name:'سنوية',   price:25000, period:'MRU / 12 شهر',     durationDays:365, features:['كل مزايا الربعية','توفير 35% عن الشهري','ميزات VIP حصرية','دعم 24/7','تقارير سنوية شاملة'], active:true},
@@ -3053,11 +3319,11 @@ function resetExtraCategories(){
 // ══ SITE CONFIG ══
 const DEFAULT_SITE_CONFIG = {
   sitename:'رزق | Rizq', tagline:'منصة الإعلانات المبوبة الأولى في موريتانيا',
-  phone:'+222 XX XX XX XX', whatsapp:'+222 XX XX XX XX',
-  email:'direction@rizq.mr', reportEmail:'report@rizq.mr',
-  address:'نواكشوط، موريتانيا',
-  adsCount:50842, usersCount:1247, wilayasCount:15,
-  bannerActive:false, bannerText:'🎉 عروض إطلاق رزق — سجّل الآن واستفد من مزايا حصرية'
+  phone:'', whatsapp:'',
+  email:'', reportEmail:'',
+  address:'',
+  adsCount:0, usersCount:0, wilayasCount:15,
+  bannerActive:false, bannerText:''
 };
 
 function loadSiteConfigData(){
@@ -3437,7 +3703,12 @@ function loadUsersAdminPanel(){
       };
     });
     renderUsers(window._usersAdminData);
-  }).catch(function(){ renderUsers(USERS_DATA); });
+    renderCatDist();
+    renderWilayaStats();
+  }).catch(function(){
+    renderUsers(USERS_DATA);
+    showToast(RizqI18n.t2('⚠️ تعذّر جلب المستخدمين من الخادم','⚠️ Impossible de charger les utilisateurs'), 'info');
+  });
 }
 // ── طلبات تعطيل الحساب الذاتية — راجع server.js لتفاصيل الميزة ──
 window._deactRequestsData = [];
@@ -3582,7 +3853,8 @@ function loadAdsAdminPanel(){
         id: ad.id,
         title: ad.title || RizqI18n.t2('(بدون عنوان)','(Sans titre)'),
         seller: nameMap[ad.accountId] || ad.accountId || RizqI18n.t2('—','—'),
-        cat: ad.categoryLabel || ad.category || '—',
+        cat: ad.categoryLabel || ad.category || ad.cat || '—',
+        wilaya: ad.wilaya || ad.city || '',
         price: (ad.price || '0') + ' MRU',
         views: 0,
         date: ad.date || (ad.createdAt ? new Date(ad.createdAt).toLocaleDateString('fr-FR') : ''),
@@ -3590,6 +3862,9 @@ function loadAdsAdminPanel(){
       };
     });
     renderAds(window._adsAdminData);
+    renderCatDist();
+    renderWilayaStats();
+    refreshOverviewFromBackend();
   }).catch(function(){ renderAds(ADS_DATA_ADMIN); });
 }
 function adminTableApproveAd(id){
@@ -3792,34 +4067,98 @@ function adminUpdateTicket(id, status) {
 
 function renderPayments(data){
   const t=document.getElementById('payments-tbody');
-  t.innerHTML=data.map(p=>`<tr>
-    <td style="font-size:13px;font-weight:600;color:#1a2535">${p.user}</td>
-    <td>${p.plan}</td>
-    <td style="font-size:14px;font-weight:900;color:var(--gold)">${p.amount}</td>
-    <td style="font-size:12.5px;color:var(--text-muted)">${p.method}</td>
-    <td style="font-size:12px;color:var(--text-muted)">${p.date}</td>
-    <td><span class="pill ${p.status==='active'?'pill-active':'pill-banned'}">${p.status==='active'?'✅ '+RizqI18n.t2('نشط','Actif'):'❌ '+RizqI18n.t2('منتهي','Expiré')}</span></td>
-  </tr>`).join('');
+  if(t){
+    if(!data || !data.length){
+      t.innerHTML='<tr><td colspan="6" style="text-align:center;color:#9aa7bd;padding:24px">'+RizqI18n.t2('لا توجد مدفوعات مسجّلة بعد','Aucun paiement enregistré pour le moment')+'</td></tr>';
+    } else {
+      t.innerHTML=data.map(p=>`<tr>
+        <td style="font-size:13px;font-weight:600;color:#1a2535">${p.user}</td>
+        <td>${p.plan}</td>
+        <td style="font-size:14px;font-weight:900;color:var(--gold)">${p.amount}</td>
+        <td style="font-size:12.5px;color:var(--text-muted)">${p.method}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${p.date}</td>
+        <td><span class="pill ${p.status==='active'?'pill-active':'pill-banned'}">${p.status==='active'?'✅ '+RizqI18n.t2('نشط','Actif'):'❌ '+RizqI18n.t2('منتهي','Expiré')}</span></td>
+      </tr>`).join('');
+    }
+  }
+  updatePayOverviewStats();
 }
 
-function renderTeam(){
+function updatePayOverviewStats(){
+  var revEl = document.getElementById('pay-stat-revenue');
+  var proEl = document.getElementById('pay-stat-pro');
+  var bizEl = document.getElementById('pay-stat-business');
+  var reqs = [];
+  try { reqs = JSON.parse(localStorage.getItem('rizq_sub_requests')||'[]'); } catch(e){}
+  var now = new Date();
+  var monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  var revenue = 0;
+  var approvedMonth = 0;
+  reqs.forEach(function(r){
+    if(r.status !== 'approved') return;
+    var ts = r.approvedAt || r.submittedAt;
+    var t = ts ? new Date(ts).getTime() : 0;
+    if(t >= monthStart){
+      approvedMonth++;
+      var amt = Number(r.amount || r.price || r.package_price || 0);
+      if(Number.isFinite(amt)) revenue += amt;
+    }
+  });
+  var accounts = [];
+  try { accounts = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); } catch(e){}
+  var activePro = 0, activeBiz = 0;
+  accounts.forEach(function(a){
+    if(!a || a.status !== 'approved' || a.suspended) return;
+    var pkg = String(a.package || a.plan || '').toLowerCase();
+    if(/pro|ماسي|diamond|business|ربع|سنو/.test(pkg)) activeBiz++;
+    else if(pkg && !/تجريب|trial|essai/.test(pkg)) activePro++;
+  });
+  if(revEl) revEl.textContent = revenue > 0 ? (revenue.toLocaleString('en-US') + ' MRU') : '—';
+  if(proEl) proEl.textContent = activePro > 0 ? String(activePro) : (approvedMonth > 0 ? String(approvedMonth) : '—');
+  if(bizEl) bizEl.textContent = activeBiz > 0 ? String(activeBiz) : '—';
+}
+
+async function renderTeam(){
   const g=document.getElementById('team-grid');
-  g.innerHTML=TEAM.map(m=>`
-    <div class="team-card ${m.role==='super'?'super':''}">
-      <div class="team-status ${m.online?'':'offline'}"></div>
-      <div class="team-av">${m.emoji}</div>
-      <div class="team-name">${m.name}</div>
-      <span class="team-role-tag pill ${ROLE_COLORS[m.role]}">${ROLE_LABELS[m.role]}</span>
-      <div class="team-contact">
-        ${m.phone?`📱 <a href="tel:${m.phone}" dir="ltr" style="direction:ltr;unicode-bidi:isolate">${m.phone}</a><br/>`:''}
-        ${m.email?`✉️ <a href="mailto:${m.email}">${m.email}</a><br/>`:''}
-        ${m.notes?`<span style="font-size:10.5px;opacity:.6">${m.notes}</span>`:''}
-      </div>
-      <div class="team-actions">
-        <button class="btn-sm btn-outline" onclick="editAdmin(${m.id})">✏️ ${RizqI18n.t2('تعديل','Modifier')}</button>
-        ${m.role!=='super'?`<button class="btn-sm btn-danger" onclick="removeAdmin(${m.id})">🗑️</button>`:''}
-      </div>
-    </div>`).join('');
+  if(!g) return;
+  if(!_adminHasPerm('team.manage')){
+    g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t('team-no-perm','admin')+'</p>';
+    return;
+  }
+  g.innerHTML='<p style="color:var(--text-muted);padding:20px">'+RizqI18n.t('team-loading','admin')+'</p>';
+  try{
+    const res=await fetch(_adminBackendBase()+'/api/admin/team',{headers:_adminAuthHeaders()});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t('team-load-fail','admin')+'</p>';
+      return;
+    }
+    TEAM=data.team||[];
+    if(typeof data.max==='number') ADMIN_PERM_CATALOG.maxTeamMembers=data.max;
+    const maxEl=document.getElementById('team-count-badge');
+    if(maxEl) maxEl.textContent=String(TEAM.length)+'/'+String(data.max||15);
+    g.innerHTML=TEAM.map(function(m){
+      const isSuper=(m.permissions||[]).includes('*');
+      const isSelf=currentAdmin&&currentAdmin.user===m.user;
+      const idEsc=String(m.id).replace(/'/g,'\\\'');
+      return '<div class="team-card '+(isSuper?'super':'')+'">'
+        +'<div class="team-av">'+(isSuper?'👑':'👤')+'</div>'
+        +'<div class="team-name">'+m.name+'</div>'
+        +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" dir="ltr">@'+m.user+'</div>'
+        +'<span class="team-role-tag pill '+(isSuper?'pill-super':'pill-mod')+'">'+_teamPermSummary(m)+'</span>'
+        +'<div class="team-contact">'
+        +(m.phone?'📱 <a href="tel:'+m.phone+'" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'+m.phone+'</a><br/>':'')
+        +(m.email?'✉️ <a href="mailto:'+m.email+'">'+m.email+'</a><br/>':'')
+        +(m.notes?'<span style="font-size:10.5px;opacity:.6">'+m.notes+'</span>':'')
+        +'</div>'
+        +'<div class="team-actions">'
+        +'<button class="btn-sm btn-outline" onclick="editAdmin(\''+idEsc+'\')">✏️ '+RizqI18n.t2('تعديل','Modifier')+'</button>'
+        +(!isSelf?'<button class="btn-sm btn-danger" onclick="removeAdmin(\''+idEsc+'\')">🗑️</button>':'')
+        +'</div></div>';
+    }).join('');
+  }catch(e){
+    g.innerHTML='<p style="color:var(--red);padding:20px">'+RizqI18n.t('team-server-fail','admin')+'</p>';
+  }
 }
 
 function renderChart(id, data, color){
@@ -3835,16 +4174,20 @@ function renderChart(id, data, color){
 }
 
 function renderCatDist(){
-  const cats=[
-    {name:'🏠 عقارات',pct:35,num:'17,795'},
-    {name:'🚗 سيارات',pct:22,num:'11,185'},
-    {name:'📱 إلكترونيات',pct:15,num:'7,626'},
-    {name:'🐄 ماشية',pct:12,num:'6,101'},
-    {name:'👗 أزياء',pct:8,num:'4,067'},
-    {name:'💰 ذهب',pct:4,num:'2,034'},
-    {name:'أخرى',pct:4,num:'2,034'},
-  ];
-  document.getElementById('cat-dist').innerHTML=cats.map(c=>`
+  const el=document.getElementById('cat-dist');
+  if(!el) return;
+  const ads=window._adsAdminData||[];
+  if(!ads.length){
+    el.innerHTML='<p style="font-size:12px;color:var(--text-muted);line-height:1.6">'+RizqI18n.t2('لا توجد بيانات بعد — يُحدَّث تلقائياً من الإعلانات الحقيقية على الخادم','Aucune donnée — mise à jour automatique depuis les annonces réelles')+'</p>';
+    return;
+  }
+  const counts={};
+  ads.forEach(function(a){ var c=a.cat||'أخرى'; counts[c]=(counts[c]||0)+1; });
+  const total=Object.values(counts).reduce(function(s,n){ return s+n; },0)||1;
+  const cats=Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; }).slice(0,7).map(function(name){
+    return {name:name, num:counts[name], pct:Math.round(counts[name]/total*100)};
+  });
+  el.innerHTML=cats.map(c=>`
     <div style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
         <span style="color:var(--text-soft)">${c.name}</span>
@@ -3857,8 +4200,14 @@ function renderCatDist(){
 }
 
 function renderActivity(){
-  const acts=[];
-  document.getElementById('activity-feed').innerHTML=acts.map(a=>`
+  const acts=window._activityFeedData||[];
+  const el=document.getElementById('activity-feed');
+  if(!el) return;
+  if(!acts.length){
+    el.innerHTML='<p style="font-size:12px;color:var(--text-muted);padding:12px 0">'+RizqI18n.t2('لا نشاط حديث — ستظهر هنا طلبات التسجيل والبلاغات من الخادم','Aucune activité récente — les inscriptions et signalements apparaîtront ici')+'</p>';
+    return;
+  }
+  el.innerHTML=acts.map(a=>`
     <div class="activity-item">
       <div class="act-icon" style="background:${a.bg}">${a.icon}</div>
       <div class="act-text">${a.text}</div>
@@ -3867,12 +4216,18 @@ function renderActivity(){
 }
 
 function renderWilayaStats(){
-  const stats=[
-    {w:'نواكشوط الغربية',n:412},{w:'نواكشوط الشمالية',n:289},{w:'نواكشوط الجنوبية',n:201},
-    {w:'نواذيبو',n:156},{w:'ترارزة',n:87},{w:'براكنة',n:43},{w:'كيفة',n:28},{w:'تيرس زمور',n:21},{w:'أخرى',n:10},
-  ];
-  const max=stats[0].n;
-  document.getElementById('wilaya-stats').innerHTML=stats.map(s=>`
+  const el=document.getElementById('wilaya-stats');
+  if(!el) return;
+  const ads=window._adsAdminData||[];
+  if(!ads.length){
+    el.innerHTML='<p style="font-size:12px;color:var(--text-muted)">'+RizqI18n.t2('لا توزيع جغرافي بعد','Pas encore de répartition géographique')+'</p>';
+    return;
+  }
+  const counts={};
+  ads.forEach(function(a){ var w=a.wilaya||a.city||'أخرى'; counts[w]=(counts[w]||0)+1; });
+  const stats=Object.keys(counts).map(function(w){ return {w:w,n:counts[w]}; }).sort(function(a,b){ return b.n-a.n; }).slice(0,9);
+  const max=stats[0]?stats[0].n:1;
+  el.innerHTML=stats.map(s=>`
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
       <div style="font-size:13px;color:var(--text-soft);width:170px;flex-shrink:0">${s.w}</div>
       <div style="flex:1;height:8px;background:#eef2fb;border-radius:4px;overflow:hidden">
@@ -3883,35 +4238,55 @@ function renderWilayaStats(){
 }
 
 // ══ ADMIN TEAM ACTIONS ══
-function saveAdmin(){
+async function saveAdmin(){
+  const editId = document.getElementById('am-edit-id').value.trim();
   const name  = document.getElementById('am-name').value.trim();
-  const user  = document.getElementById('am-user').value.trim();
+  const user  = document.getElementById('am-user').value.trim().toLowerCase();
   const phone = document.getElementById('am-phone').value.trim();
   const email = document.getElementById('am-email').value.trim();
-  const role  = document.getElementById('am-role').value;
   const pass  = document.getElementById('am-pass').value;
   const notes = document.getElementById('am-notes').value.trim();
-  if(!name||!user||!email||!pass){showToast(RizqI18n.t2('⚠️ يرجى تعبئة الحقول الإلزامية','⚠️ Veuillez remplir les champs obligatoires'));return;}
-  // Add to ADMIN_ACCOUNTS
-  ADMIN_ACCOUNTS.push({user,pass,name,role});
-  // Add to TEAM
-  TEAM.push({id:TEAM.length+1,name,role,emoji:'👤',phone,email,notes,online:false});
-  closeModal('add-admin');
-  renderTeam();
-  showToast(`✅ ${RizqI18n.t2('تم إضافة','Ajouté(e) :')} ${name} ${RizqI18n.t2('إلى فريق الإدارة','à l’équipe d’administration')}`);
-  // Clear
-  ['am-name','am-user','am-phone','am-email','am-pass','am-notes'].forEach(id=>document.getElementById(id).value='');
+  const permissions = _getSelectedAdminPermissions();
+  if(!name||!permissions.length){showToast(RizqI18n.t2('⚠️ الاسم وصلاحية واحدة على الأقل مطلوبان','⚠️ Nom et au moins une permission requis'));return;}
+  if(!editId && (!user||!pass)){showToast(RizqI18n.t2('⚠️ اسم المستخدم وكلمة المرور مطلوبان للعضو الجديد','⚠️ Identifiant et mot de passe requis'));return;}
+  const payload = { name, phone, email, notes, permissions };
+  if(!editId) payload.user = user;
+  if(pass) payload.pass = pass;
+  const url = editId
+    ? _adminBackendBase()+'/api/admin/team/'+encodeURIComponent(editId)
+    : _adminBackendBase()+'/api/admin/team';
+  const method = editId ? 'PATCH' : 'POST';
+  try{
+    const res=await fetch(url,{method,headers:_adminAuthHeaders({'Content-Type':'application/json'}),body:JSON.stringify(payload)});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      const msg=(data&&data.msg)||(data&&data.error)||RizqI18n.t2('فشل الحفظ','Échec de l\'enregistrement');
+      showToast('❌ '+msg,'error');
+      return;
+    }
+    closeModal('add-admin');
+    renderTeam();
+    showToast('✅ '+RizqI18n.t2(editId?'تم تحديث العضو':'تم إضافة العضو','Membre '+(editId?'mis à jour':'ajouté')));
+  }catch(e){
+    showToast(RizqI18n.t2('❌ تعذّر الاتصال بالخادم','❌ Connexion au serveur impossible'),'error');
+  }
 }
 
 function editAdmin(id){
-  const m = TEAM.find(t=>t.id===id);
+  const m = TEAM.find(function(t){ return t.id===id; });
   if(!m) return;
-  // Pre-fill modal
+  document.getElementById('am-edit-id').value = m.id;
+  _refreshAdminModalTitles();
   document.getElementById('am-name').value  = m.name;
-  document.getElementById('am-phone').value = m.phone;
-  document.getElementById('am-email').value = m.email;
-  document.getElementById('am-notes').value = m.notes;
-  document.getElementById('am-role').value  = m.role;
+  document.getElementById('am-user').value  = m.user;
+  document.getElementById('am-user').disabled = true;
+  document.getElementById('am-phone').value = m.phone||'';
+  document.getElementById('am-email').value = m.email||'';
+  document.getElementById('am-notes').value = m.notes||'';
+  document.getElementById('am-pass').value  = '';
+  const preset = document.getElementById('am-preset');
+  if (preset) preset.value = '';
+  loadAdminPermCatalog().then(function(){ buildAdminPermGrid(m.permissions||[]); _onAdminPermCheckboxChange(); });
   openModal('add-admin');
 }
 
@@ -3949,10 +4324,20 @@ function editUser(id){
   openModal('add-user');
 }
 
-function removeAdmin(id){
-  if(!confirm(RizqI18n.t2('هل تريد حذف هذا العضو من الفريق؟','Voulez-vous supprimer ce membre de l’équipe ?'))) return;
-  const idx=TEAM.findIndex(t=>t.id===id);
-  if(idx>-1){TEAM.splice(idx,1);renderTeam();showToast(RizqI18n.t2('🗑️ تم حذف العضو','🗑️ Membre supprimé'));}
+async function removeAdmin(id){
+  if(!confirm(RizqI18n.t2('هل تريد تعطيل هذا العضو؟ لن يستطيع تسجيل الدخول.','Désactiver ce membre ? Il ne pourra plus se connecter.'))) return;
+  try{
+    const res=await fetch(_adminBackendBase()+'/api/admin/team/'+encodeURIComponent(id),{method:'DELETE',headers:_adminAuthHeaders()});
+    const data=await res.json().catch(function(){return{};});
+    if(!res.ok||!data.ok){
+      showToast('❌ '+((data&&data.msg)||RizqI18n.t2('فشل التعطيل','Échec')),'error');
+      return;
+    }
+    renderTeam();
+    showToast(RizqI18n.t2('🗑️ تم تعطيل العضو','🗑️ Membre désactivé'));
+  }catch(e){
+    showToast(RizqI18n.t2('❌ تعذّر الاتصال بالخادم','❌ Connexion impossible'),'error');
+  }
 }
 
 function saveUser(){
@@ -4184,29 +4569,184 @@ document.addEventListener('keydown',e=>{
 });
 
 // ══ INIT DASHBOARD ══
+function _ovSet(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; }
+
+function refreshOverviewFromBackend(){
+  var cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
+  var base=(cfg.backendUrl||window.RIZQ_BACKEND_BASE||_adminBackendBase()||'').replace(/\/$/,'');
+  if(!base) return;
+  var headers=_adminAuthHeaders();
+  Promise.all([
+    fetch(base+'/api/admin/daily-digest',{headers:headers}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(base+'/api/accounts/admin',{headers:headers}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(base+'/api/ads/admin',{headers:headers}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    fetch(base+'/api/reports/admin',{headers:headers}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    var digest=res[0], accData=res[1], adsData=res[2], repData=res[3];
+    var accounts=(accData&&accData.accounts)||[];
+    var ads=(adsData&&adsData.ads)||[];
+    var reports=(repData&&repData.reports)||[];
+    var pendingAcc=accounts.filter(function(a){ return a.status==='pending'; }).length;
+    var approved=accounts.filter(function(a){ return a.status==='approved'; }).length;
+    _ovSet('ov-stat-ads-num', String(ads.length));
+    _ovSet('ov-stat-users-num', String(approved));
+    _ovSet('ov-stat-pending-num', String(digest?digest.pendingAccounts.count:pendingAcc));
+    var openReports=reports.filter(function(r){ return r.status!=='resolved'; }).length;
+    _ovSet('ov-stat-reports-num', String(openReports));
+    _ovSet('ov-stat-subs-num', String(digest?digest.pendingSubRequests.count:0));
+    _ovSet('ov-stat-ads-ch', RizqI18n.t2('من الخادم الحقيقي','Données serveur réelles'));
+    _ovSet('ov-stat-users-ch', RizqI18n.t2('معتمدون','Approuvés'));
+    _ovSet('ov-stat-pending-ch', RizqI18n.t2('راجع تبويب «الحسابات»','Voir l’onglet Comptes'));
+    _ovSet('ov-stat-reports-ch', RizqI18n.t2('بلاغات غير مُغلقة','Signalements ouverts'));
+    _ovSet('ov-stat-subs-ch', RizqI18n.t2('طلبات دفع/اشتراك','Demandes d’abonnement'));
+    _setSidebarCountBadge('users-count-badge', approved);
+    _setSidebarCountBadge('ads-count-badge', ads.length);
+    _setSidebarCountBadge('reports-count-badge', openReports);
+    if(digest) updateUnifiedReviewBadgeFromDigest(digest);
+    window._activityFeedData=[];
+    if(digest&&digest.pendingAccounts&&digest.pendingAccounts.items){
+      digest.pendingAccounts.items.slice(0,5).forEach(function(a){
+        window._activityFeedData.push({icon:'👤',bg:'rgba(96,165,250,.12)',text:RizqI18n.t2('طلب تسجيل جديد: ','Nouvelle inscription : ')+ (a.name||a.id),time:''});
+      });
+    }
+    renderActivity();
+    var _dlbl=function(ar,fr){ return RizqI18n.t2(ar,fr); };
+    var chartData=[
+      {val:pendingAcc,lbl:_dlbl('حسابات معلّقة','Comptes en attente')},
+      {val:ads.filter(function(a){ return a.status==='pending'; }).length,lbl:_dlbl('إعلانات معلّقة','Annonces en attente')},
+      {val:approved,lbl:_dlbl('حسابات معتمدة','Comptes approuvés')},
+      {val:ads.length,lbl:_dlbl('إعلانات','Annonces')},
+      {val:reports.length,lbl:_dlbl('بلاغات','Signalements')},
+      {val:digest?digest.pendingSubRequests.count:0,lbl:_dlbl('اشتراكات','Abonnements')},
+      {val:digest?digest.pendingTenders.count:0,lbl:_dlbl('مناقصات','Appels d’offres')}
+    ];
+    renderChart('overview-chart', chartData, 'linear-gradient(180deg,var(--gold),var(--gold-light))');
+  }).catch(function(){});
+}
+
+function _setSidebarCountBadge(id, count){
+  var badge=document.getElementById(id);
+  if(!badge) return;
+  var n=Number(count)||0;
+  badge.textContent=n>999?(n.toLocaleString('en-US')):String(n);
+  badge.style.display=n>0?'':'none';
+}
+
+function updateUnifiedReviewBadgeFromDigest(digest){
+  if(!digest) return;
+  var total=
+    (digest.pendingAccounts&&digest.pendingAccounts.count||0)+
+    (digest.pendingAds&&digest.pendingAds.count||0)+
+    (digest.pendingSubRequests&&digest.pendingSubRequests.count||0)+
+    (digest.pendingBizContacts&&digest.pendingBizContacts.count||0)+
+    (digest.pendingTenders&&digest.pendingTenders.count||0)+
+    (digest.expiringSoon&&digest.expiringSoon.count||0)+
+    (digest.suspended&&digest.suspended.count||0);
+  _setSidebarCountBadge('unified-review-badge', total);
+}
+
+function openUnifiedReviewTarget(panelId){
+  var nav=document.querySelector('.sb-item[onclick*="showPanel(\''+panelId+'\'"]');
+  if(!nav) nav=document.querySelector('.sb-item[onclick*="showPanel(\\"'+panelId+'\\""]');
+  showPanel(panelId, nav||null);
+}
+
+function refreshUnifiedReviewPanel(){
+  var grid=document.getElementById('unified-review-grid');
+  var empty=document.getElementById('unified-review-empty');
+  if(!grid) return;
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:28px;font-size:13px">'+RizqI18n.t2('جارٍ التحميل…','Chargement…')+'</div>';
+  if(empty) empty.style.display='none';
+
+  var cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
+  var base=(cfg.backendUrl||window.RIZQ_BACKEND_BASE||_adminBackendBase()||'').replace(/\/$/,'');
+  if(!base){
+    grid.innerHTML='';
+    if(empty){
+      empty.style.display='block';
+      empty.textContent=RizqI18n.t2('⚠️ الخادم غير مضبوط — لا يمكن جلب طوابير المراجعة','⚠️ Serveur non configuré — impossible de charger les files');
+    }
+    _setSidebarCountBadge('unified-review-badge', 0);
+    return;
+  }
+
+  fetch(base+'/api/admin/daily-digest',{headers:_adminAuthHeaders()})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(digest){
+      if(!digest||!digest.ok){
+        grid.innerHTML='';
+        if(empty){
+          empty.style.display='block';
+          empty.textContent=RizqI18n.t2('❌ تعذّر جلب الملخص اليومي','❌ Impossible de charger le résumé quotidien');
+        }
+        return;
+      }
+      window._lastDailyDigest=digest;
+      updateUnifiedReviewBadgeFromDigest(digest);
+
+      var cards=[
+        {key:'accounts', icon:'⏳', color:'#f59e0b', count:digest.pendingAccounts&&digest.pendingAccounts.count||0, title:RizqI18n.t2('حسابات معلّقة','Comptes en attente'), panel:'accounts', hint:RizqI18n.t2('موافقة / رفض التسجيل','Approuver / refuser')},
+        {key:'ads', icon:'📋', color:'#3b82f6', count:digest.pendingAds&&digest.pendingAds.count||0, title:RizqI18n.t2('إعلانات معلّقة','Annonces en attente'), panel:'ads', hint:RizqI18n.t2('مراجعة الإعلانات','Modérer les annonces')},
+        {key:'subs', icon:'💳', color:'#8b5cf6', count:digest.pendingSubRequests&&digest.pendingSubRequests.count||0, title:RizqI18n.t2('طلبات اشتراك','Demandes d’abonnement'), panel:'payments', hint:RizqI18n.t2('مدفوعات وباقات','Paiements et forfaits')},
+        {key:'biz', icon:'📞', color:'#06b6d4', count:digest.pendingBizContacts&&digest.pendingBizContacts.count||0, title:RizqI18n.t2('طلبات تواصل أعمال','Contacts pro'), panel:'promo-video', hint:RizqI18n.t2('طلبات فيديو/إعلان','Demandes vidéo/pub')},
+        {key:'tenders', icon:'📄', color:'#10b981', count:digest.pendingTenders&&digest.pendingTenders.count||0, title:RizqI18n.t2('مناقصات معلّقة','Appels d’offres'), panel:'tenders-mod', hint:RizqI18n.t2('مراقبة المناقصات','Modération AO')},
+        {key:'expiring', icon:'⏰', color:'#ef4444', count:digest.expiringSoon&&digest.expiringSoon.count||0, title:RizqI18n.t2('باقات قاربت الانتهاء','Forfaits bientôt expirés'), panel:'quota-guard', hint:RizqI18n.t2('مراقبة الاستهلاك','Suivi consommation')},
+        {key:'suspended', icon:'🚫', color:'#64748b', count:digest.suspended&&digest.suspended.count||0, title:RizqI18n.t2('باقات معلّقة','Forfaits suspendus'), panel:'quota-guard', hint:RizqI18n.t2('إعادة التفعيل','Réactivation')}
+      ];
+
+      var pendingCards=cards.filter(function(c){ return c.count>0; });
+      if(!pendingCards.length){
+        grid.innerHTML='';
+        if(empty){
+          empty.style.display='block';
+          empty.textContent=RizqI18n.t2('✅ لا توجد عناصر معلّقة حالياً','✅ Aucun élément en attente pour le moment');
+        }
+        return;
+      }
+      if(empty) empty.style.display='none';
+      grid.innerHTML=pendingCards.map(function(c){
+        return '<button type="button" data-ur-panel="'+c.panel+'" onclick="openUnifiedReviewTarget(this.getAttribute(\'data-ur-panel\'))" style="text-align:inherit;cursor:pointer;border:1px solid rgba(27,58,107,.12);background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 4px 14px rgba(15,35,65,.04);font-family:inherit;display:flex;flex-direction:column;gap:8px">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+          +'<span style="font-size:22px">'+c.icon+'</span>'
+          +'<span style="background:'+c.color+';color:#fff;font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;min-width:28px;text-align:center">'+c.count+'</span>'
+          +'</div>'
+          +'<div style="font-size:15px;font-weight:800;color:var(--navy)">'+c.title+'</div>'
+          +'<div style="font-size:12px;color:#64748b">'+c.hint+'</div>'
+          +'</button>';
+      }).join('');
+    })
+    .catch(function(){
+      grid.innerHTML='';
+      if(empty){
+        empty.style.display='block';
+        empty.textContent=RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur');
+      }
+    });
+}
+
 function initDashboard(){
   loadUsersAdminPanel();
   loadDeactivationRequestsPanel();
   loadAdsAdminPanel();
   loadReportsAdminPanel();
+  syncPendingAccountsFromBackend().then(function(changed){
+    if(changed){ updatePendingBadge(); renderPendingAccounts(); }
+  });
+  refreshOverviewFromBackend();
+  refreshUnifiedReviewPanel();
   renderPayments(PAYMENTS_DATA);
   renderTeam();
   renderCatDist();
   renderActivity();
   renderWilayaStats();
-  // Charts
   const _dlbl=(ar,fr)=>RizqI18n.t2(ar,fr);
-  renderChart('overview-chart',[
-    {val:120,lbl:_dlbl('الإثنين','Lun')},{val:185,lbl:_dlbl('الثلاثاء','Mar')},{val:143,lbl:_dlbl('الأربعاء','Mer')},
-    {val:267,lbl:_dlbl('الخميس','Jeu')},{val:198,lbl:_dlbl('الجمعة','Ven')},{val:342,lbl:_dlbl('السبت','Sam')},{val:290,lbl:_dlbl('اليوم','Aujourd\'hui')}
-  ],'linear-gradient(180deg,var(--gold),var(--gold-light))');
   renderChart('analytics-chart-views',[
-    {val:8200,lbl:_dlbl('يناير','Jan')},{val:12400,lbl:_dlbl('فبراير','Fév')},{val:15800,lbl:_dlbl('مارس','Mar')},{val:18900,lbl:_dlbl('أبريل','Avr')},
-    {val:22100,lbl:_dlbl('مايو','Mai')},{val:29300,lbl:_dlbl('يونيو','Juin')},{val:34800,lbl:_dlbl('يوليو','Juil')}
+    {val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},
+    {val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')}
   ],'rgba(96,165,250,.7)');
   renderChart('analytics-chart-users',[
-    {val:42,lbl:_dlbl('يناير','Jan')},{val:78,lbl:_dlbl('فبراير','Fév')},{val:123,lbl:_dlbl('مارس','Mar')},{val:89,lbl:_dlbl('أبريل','Avr')},
-    {val:156,lbl:_dlbl('مايو','Mai')},{val:234,lbl:_dlbl('يونيو','Juin')},{val:189,lbl:_dlbl('يوليو','Juil')}
+    {val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},
+    {val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')},{val:0,lbl:_dlbl('—','—')}
   ],'rgba(74,222,128,.7)');
 }
 
@@ -4309,7 +4849,12 @@ function approveAccount(id, customPkg){
   acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  acc.dashLink=dashFile+'?id='+id+'&token='+acc.token;
+  // رابط يفتح من أي جهاز: id + token في الـ URL، والداشبورد يخزّن التوكن
+  // في sessionStorage ثم يزيل ?token= من الشريط (انظر RizqAccount.stripTokenFromUrl).
+  acc.dashLink=dashFile+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(acc.token);
+  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+    window.RizqAccount.storeDashToken(id, acc.token);
+  }
   // رابط الملف الشخصي العام (يُشارَك مع المشترين) — فقط للحسابات الفردية حالياً؛
   // المحل/المكتب/الشركة لهم صفحاتهم العامة الخاصة (rizq_store.html/rizq_office.html/rizq_corp.html) بمنطق مختلف بالفعل.
   if(acc.type==='individual'){
@@ -4430,6 +4975,26 @@ function copyDashLink(link){
     document.execCommand('copy');document.body.removeChild(ta);
   });
   showToast(RizqI18n.t2('تم نسخ الرابط — أرسله للمالك عبر واتساب 📲','Lien copié — envoyez-le au propriétaire via WhatsApp 📲'),'success');
+}
+
+/** يضمن أن رابط الداشبورد يحمل ?token= (حسابات قديمة وافَق عليها قبل الإصلاح). */
+function ensureDashLinkWithToken(acc){
+  if(!acc || !acc.id || !acc.token) return acc && acc.dashLink || '';
+  var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
+  var dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
+  var need = dashFile+'?id='+encodeURIComponent(acc.id)+'&token='+encodeURIComponent(acc.token);
+  if(acc.dashLink !== need){
+    acc.dashLink = need;
+    try{
+      var accs=getPendingAccounts();
+      var i=accs.findIndex(function(a){return a.id===acc.id;});
+      if(i>=0){ accs[i].dashLink=need; savePendingAccounts(accs); }
+    }catch(e){}
+  }
+  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+    window.RizqAccount.storeDashToken(acc.id, acc.token);
+  }
+  return acc.dashLink;
 }
 
 // ── تبديل تاب الحسابات ────────────────────────────────────────────
@@ -4602,11 +5167,14 @@ function renderPendingAccounts(){
           </div>`:`<div style="margin-top:8px;font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:6px"><span>📭</span> ${RizqI18n.t2('لا يوجد وصل دفع مرفوع','Aucun reçu de paiement téléchargé')}</div>`}
 
           ${acc.rejectReason?`<div style="margin-top:8px;font-size:12px;color:#ef4444;background:#fef2f2;padding:6px 10px;border-radius:8px">❌ ${RizqI18n.t2('سبب الرفض:','Motif du refus :')} ${escapeHtml(acc.rejectReason)}</div>`:''}
-          ${isApproved&&acc.dashLink?`<div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:#f0fdf4;padding:8px 12px;border-radius:10px;border:1px solid #86efac;flex-wrap:wrap">
+          ${isApproved&&acc.token?(function(){
+            var link = ensureDashLinkWithToken(acc);
+            return link ? `<div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:#f0fdf4;padding:8px 12px;border-radius:10px;border:1px solid #86efac;flex-wrap:wrap">
             <span style="font-size:12px;color:#16a34a;font-weight:600">🔗 ${RizqI18n.t2('رابط الداشبورد:','Lien du tableau de bord :')}</span>
-            <code style="font-size:11px;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(acc.dashLink)}</code>
-            <button onclick="copyDashLink('${escapeAttr(acc.dashLink)}')" style="padding:4px 12px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">📋 ${RizqI18n.t2('نسخ','Copier')}</button>
-          </div>`:''}
+            <code style="font-size:11px;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(link)}</code>
+            <button onclick="copyDashLink('${escapeAttr(link)}')" style="padding:4px 12px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-weight:600;white-space:nowrap">📋 ${RizqI18n.t2('نسخ','Copier')}</button>
+          </div>` : '';
+          })():''}
           ${isApproved&&acc.type==='individual'&&acc.profileLink?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px;background:#eff6ff;padding:8px 12px;border-radius:10px;border:1px solid #93c5fd;flex-wrap:wrap">
             <span style="font-size:12px;color:#1d4ed8;font-weight:600">👤 ${RizqI18n.t2('رابط الملف الشخصي العام:','Lien du profil public :')}</span>
             <code style="font-size:11px;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:6px;flex:1">${escapeHtml(acc.profileLink)}</code>
@@ -4704,12 +5272,19 @@ function renderTendersModPanel(){
       }
       emptyEl.style.display='none'; errEl.style.display='none';
       var openCount = list.filter(function(t){ return t.status!=='removed'; }).length;
-      if(activeBadge){ activeBadge.textContent=openCount; activeBadge.style.display = openCount>0?'':'none'; }
+      var pendingCount = list.filter(function(t){ return t.status==='pending_review'; }).length;
+      if(activeBadge){ activeBadge.textContent=(pendingCount>0?pendingCount+' ⏳ ':openCount); activeBadge.style.display = openCount>0?'':'none'; }
       var _modLoc = (window.RizqI18n && RizqI18n.getLang()==='fr') ? 'fr-FR' : 'ar-MR-u-nu-latn';
       listEl.innerHTML = list.slice().reverse().map(function(t){
         var bids = Array.isArray(t.bids) ? t.bids : [];
         var removed = t.status === 'removed';
+        var pending = t.status === 'pending_review';
+        var rejected = t.status === 'rejected';
         var created = t.createdAt ? new Date(t.createdAt).toLocaleDateString(_modLoc) : '';
+        var statusBadge = pending
+          ? ' <span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px">⏳ '+RizqI18n.t2('قيد المراجعة','En révision')+'</span>'
+          : (rejected ? ' <span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px">❌ '+RizqI18n.t2('مرفوضة','Refusée')+'</span>'
+          : (t.status==='open' ? ' <span style="font-size:11px;font-weight:700;color:#065f46">✅ '+RizqI18n.t2('منشورة','Publiée')+'</span>' : ''));
         var bidsHtml = bids.length
           ? bids.map(function(b){
               return '<div style="padding:6px 10px;background:#f7f9fc;border-radius:8px;margin-top:5px;font-size:12px">'
@@ -4719,18 +5294,71 @@ function renderTendersModPanel(){
                 + '</div>';
             }).join('')
           : '<p style="font-size:11.5px;color:#9ca3af;margin-top:4px">'+RizqI18n.t2('لا عروض بعد','Aucune offre')+'</p>';
+        var actions = removed ? '' : (
+          (pending ? '<button onclick="approveTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">✅ '+RizqI18n.t2('موافقة','Approuver')+'</button>' : '')
+          + ((pending || rejected) ? '<button onclick="rejectTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">❌ '+RizqI18n.t2('رفض','Refuser')+'</button>' : '')
+          + '<button onclick="removeTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🗑️ '+RizqI18n.t2('إزالة','Retirer')+'</button>'
+        );
         return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(27,58,107,.06)'+(removed?';opacity:.55':'')+'">'
           + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
-          +   '<div style="font-size:14px;font-weight:700;color:#1a2535">'+escHtml(t.title||'')+(removed?' <span style="font-size:11px;font-weight:700;color:#dc2626">('+RizqI18n.t2('محذوفة','Retirée')+')</span>':'')+'</div>'
-          +   (removed ? '' : '<button onclick="removeTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🗑️ '+RizqI18n.t2('إزالة','Retirer')+'</button>')
+          +   '<div style="font-size:14px;font-weight:700;color:#1a2535">'+escHtml(t.title||'')+statusBadge+(removed?' <span style="font-size:11px;font-weight:700;color:#dc2626">('+RizqI18n.t2('محذوفة','Retirée')+')</span>':'')+'</div>'
+          +   '<div style="display:flex;gap:6px;flex-wrap:wrap">'+actions+'</div>'
           + '</div>'
           + '<div style="font-size:11.5px;color:#2C3A4F;margin-bottom:8px">'+escHtml(t.ownerName||t.ownerId||'')+' · '+created+' · '+bids.length+' '+RizqI18n.t2('عرض','offre(s)')+'</div>'
+          + (t.desc ? '<p style="font-size:12px;color:#64748b;margin:0 0 8px;line-height:1.6">'+escHtml(String(t.desc).slice(0,220))+(String(t.desc).length>220?'…':'')+'</p>' : '')
+          + (t.rejectReason ? '<p style="font-size:11.5px;color:#b91c1c;margin:0 0 8px">'+RizqI18n.t2('سبب الرفض:','Motif du refus :')+' '+escHtml(t.rejectReason)+'</p>' : '')
+          + (t.document ? '<div style="margin:6px 0 8px"><button type="button" onclick="downloadTenderDocAdmin(\''+t.id+'\')" style="padding:5px 12px;background:#eff6ff;color:#1B3A6B;border:1px solid #93c5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📄 '+RizqI18n.t2('مراجعة PDF','Voir PDF')+'</button></div>' : '')
+          + ((Array.isArray(t.images) && t.images.length) ? '<div style="margin:6px 0 8px;font-size:11.5px;color:#64748b">📷 '+t.images.length+' '+RizqI18n.t2('صورة مرجعية','photo(s) de référence')+'</div>' : '')
           + bidsHtml
           + '</div>';
       }).join('');
     }).catch(function(){
       listEl.innerHTML=''; emptyEl.style.display='none'; errEl.style.display='';
     });
+}
+
+function downloadTenderDocAdmin(id){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/tenders/admin/' + encodeURIComponent(id) + '/document', {
+    headers: _adminAuthHeaders()
+  }).then(function(res){
+    if(!res.ok) return Promise.reject(res.status);
+    return res.blob();
+  }).then(function(blob){
+    var url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  }).catch(function(){
+    alert(RizqI18n.t2('تعذّر فتح ملف PDF','Impossible d\'ouvrir le PDF'));
+  });
+}
+
+function rejectTenderAdmin(id){
+  var reason = prompt(RizqI18n.t2('سبب رفض المناقصة (يظهر لصاحبها):','Motif du refus (visible par l\'auteur) :'), '');
+  if(reason===null) return;
+  reason = String(reason).trim();
+  if(!reason){ alert(RizqI18n.t2('السبب مطلوب','Le motif est obligatoire')); return; }
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/tenders/admin/' + encodeURIComponent(id) + '/reject', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type':'application/json' }, _adminAuthHeaders()),
+    body: JSON.stringify({ reason: reason })
+  }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+    .then(function(){ renderTendersModPanel(); })
+    .catch(function(){ alert(RizqI18n.t2('فشل الرفض — تحقق من الاتصال','Échec du refus — vérifiez la connexion')); });
+}
+
+function approveTenderAdmin(id){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return;
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/tenders/admin/' + encodeURIComponent(id) + '/approve', {
+    method: 'POST',
+    headers: _adminAuthHeaders()
+  }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+    .then(function(){ renderTendersModPanel(); })
+    .catch(function(){ alert(RizqI18n.t2('فشل الموافقة — تحقق من الاتصال','Échec de l\'approbation — vérifiez la connexion')); });
 }
 
 function removeTenderAdmin(id){
@@ -4756,11 +5384,8 @@ function loadModerationPanel(){
   var idsEmpty = document.getElementById('mod-ids-empty');
   if(pendingIds.length === 0){
     idsList.innerHTML = '';
-    // Show static demo card so admin can see panel design
-    idsEmpty.style.display = 'none';
-    idsList.innerHTML = _buildDemoIdCard('demo-static-1',RizqI18n.t2('فاطمة بنت إبراهيم','Fatima Bint Ibrahim'),'🏪 '+RizqI18n.t2('محل','Boutique'),RizqI18n.t2('نواكشوط الشمالية','Nouakchott Nord'),'+222 36 12 34 56') +
-      _buildDemoIdCard('demo-static-2',RizqI18n.t2('محمد أحمد ولد سيدي','Mohamed Ahmed Ould Sidi'),'🏢 '+RizqI18n.t2('مكتب','Bureau'),RizqI18n.t2('نواذيبو','Nouadhibou'),'+222 22 98 76 54');
-    document.getElementById('mod-ids-count').textContent = '2 ('+RizqI18n.t2('تجريبي','démo')+')';
+    idsEmpty.style.display = 'block';
+    document.getElementById('mod-ids-count').textContent = '0';
   } else {
     idsEmpty.style.display = 'none';
     var _modLoc = (window.RizqI18n && RizqI18n.getLang()==='fr') ? 'fr-FR' : 'ar-MR-u-nu-latn';
@@ -5140,19 +5765,21 @@ function deleteBankCode(id){
     if(id==='payments') { setTimeout(renderBankCodes,50); syncBankCodesFromBackend().then(function(changed){ if(changed) renderBankCodes(); }); setTimeout(renderSubRequests,50); syncSubRequestsFromBackend().then(function(changed){ if(changed){ renderSubRequests(); renderExpiryAlerts(); } }); setTimeout(renderExpiryAlerts,50); setTimeout(renderSubAgentControls,50); renderPayments(PAYMENTS_DATA); }
     if(id==='analytics'){ renderActivity(); renderWilayaStats();
       var _dlbl2=function(ar,fr){return RizqI18n.t2(ar,fr);};
+      // لا أرقام وهمية — أصفار صادقة حتى تتوفر إحصائيات خادم حقيقية
       renderChart('analytics-chart-views',[
-        {val:8200,lbl:_dlbl2('يناير','Jan')},{val:12400,lbl:_dlbl2('فبراير','Fév')},{val:15800,lbl:_dlbl2('مارس','Mar')},{val:18900,lbl:_dlbl2('أبريل','Avr')},
-        {val:22100,lbl:_dlbl2('مايو','Mai')},{val:29300,lbl:_dlbl2('يونيو','Juin')},{val:34800,lbl:_dlbl2('يوليو','Juil')}
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')}
       ],'rgba(96,165,250,.7)');
       renderChart('analytics-chart-users',[
-        {val:42,lbl:_dlbl2('يناير','Jan')},{val:78,lbl:_dlbl2('فبراير','Fév')},{val:123,lbl:_dlbl2('مارس','Mar')},{val:89,lbl:_dlbl2('أبريل','Avr')},
-        {val:156,lbl:_dlbl2('مايو','Mai')},{val:234,lbl:_dlbl2('يونيو','Juin')},{val:189,lbl:_dlbl2('يوليو','Juil')}
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},
+        {val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')},{val:0,lbl:_dlbl2('—','—')}
       ],'rgba(74,222,128,.7)');
     }
     if(id==='overview'){ renderCatDist(); renderActivity(); renderWilayaStats();
-      renderChart('overview-chart',[
-        {val:120,lbl:RizqI18n.t2('الإثنين','Lun')},{val:185,lbl:RizqI18n.t2('الثلاثاء','Mar')},{val:143,lbl:RizqI18n.t2('الأربعاء','Mer')},
-        {val:267,lbl:RizqI18n.t2('الخميس','Jeu')},{val:198,lbl:RizqI18n.t2('الجمعة','Ven')},{val:342,lbl:RizqI18n.t2('السبت','Sam')},{val:290,lbl:RizqI18n.t2('اليوم','Aujourd\'hui')}
+      if(typeof refreshOverviewFromBackend==='function') refreshOverviewFromBackend();
+      else renderChart('overview-chart',[
+        {val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},
+        {val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')},{val:0,lbl:RizqI18n.t2('—','—')}
       ],'linear-gradient(180deg,var(--gold),var(--gold-light))');
     }
   };
@@ -5170,8 +5797,6 @@ function renderSubAgentControls(){
   if(notes) notes.value = cfg.notes || '';
   var burl = document.getElementById('subagent-backend-url');
   if(burl) burl.value = cfg.backendUrl || '';
-  var bsec = document.getElementById('subagent-backend-secret');
-  if(bsec) bsec.value = cfg.backendSecret || '';
 }
 function _paintSubAgentToggle(on){
   var track = document.getElementById('subagent-toggle-track');
@@ -5192,14 +5817,14 @@ function saveSubAgentConfig(){
   RizqSub.setAgentConfig({
     notes: document.getElementById('subagent-notes').value,
     backendUrl: document.getElementById('subagent-backend-url').value.trim(),
-    backendSecret: document.getElementById('subagent-backend-secret').value.trim(),
+    backendSecret: '',
   });
   var msg = document.getElementById('subagent-saved-msg');
   if(msg){ msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2000); }
 }
 
 // ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (rizq-backend /api/broadcast-sms) ══
-// يستخدم نفس backendUrl/backendSecret المضبوطين في "وكيل الباقات" (RizqSub.getAgentConfig)
+// يستخدم نفس backendUrl المضبوط في "وكيل الباقات" + جلسة المشرف (RizqSub.getAgentConfig)
 // تفادياً لأي إعداد مزدوج. إرسال فقط بأمر صريح من الأدمن، لا جدولة إطلاقاً.
 function _updateSmsCharCount(){
   var ta = document.getElementById('sms-broadcast-text');
@@ -5238,7 +5863,7 @@ function sendSmsBroadcast(btn){
   }).then(function(data){
     showToast(RizqI18n.t2('✅ أُرسل لـ '+data.sent+' مشترك، فشل '+data.failed,'✅ Envoyé à '+data.sent+' abonnés, échec pour '+data.failed), data.failed > 0 ? 'error' : 'success');
   }).catch(function(){
-    showToast(RizqI18n.t2('❌ فشل الإرسال — تحقق من رابط الخادم والسرّ المشترك','❌ Échec de l\'envoi — vérifiez l\'URL du serveur et le secret partagé'), 'error');
+    showToast(RizqI18n.t2('❌ فشل الإرسال — تحقق من رابط الخادم وجلسة المشرف','❌ Échec de l\'envoi — vérifiez l\'URL du serveur et la session admin'), 'error');
   }).finally(function(){
     if(btn){ btn.disabled = false; btn.textContent = origBtnText; }
   });
@@ -5259,11 +5884,11 @@ function aiVerifyReceipt(reqId, btn){
 }
 
 // ══ الفيديو الإعلاني للزوار — مرتبط بخادم rizq-backend الحقيقي ══
-// يستخدم نفس backendUrl/backendSecret المضبوطين في تبويب "وكيل الباقات"
-// (RizqSub.getAgentConfig) حفاظاً على التناسق وتجنّب إعداد مزدوج.
+// يستخدم نفس backendUrl المضبوط في تبويب "وكيل الباقات" + جلسة المشرف.
 function _pvBackendCfg(){
-  if (typeof RizqSub === 'undefined') return { backendUrl:'', backendSecret:'' };
-  return RizqSub.getAgentConfig();
+  if (typeof RizqSub === 'undefined') return { backendUrl:'' };
+  var cfg = RizqSub.getAgentConfig();
+  return { backendUrl: cfg.backendUrl || '' };
 }
 function _pvSetToggle(id, on){
   var el = document.getElementById(id);
@@ -5756,6 +6381,7 @@ function renderSubRequests(){
   var pending = reqs.filter(function(r){return r.status==='pending';});
   if(badge){ badge.textContent=pending.length; badge.style.display=pending.length?'inline':'none'; }
   updatePaymentsBadge();
+  if(typeof updatePayOverviewStats === 'function') updatePayOverviewStats();
   if(!reqs.length){ el.innerHTML='<p style="color:#9aa7bd;font-size:13px;text-align:center;padding:20px">'+RizqI18n.t2('لا توجد طلبات','Aucune demande')+'</p>'; return; }
   el.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">' +
     '<thead><tr style="background:#f8faff">' +
@@ -6025,11 +6651,11 @@ function findPackageBoostDays(pkgName){
   return null;
 }
 
-function activateSubscriptionForAccount(accountId, pkgName, price){
+function activateSubscriptionForAccount(accountId, pkgName, price, daysOrOpts){
   // يُفعَّل عبر محرك دورة حياة الباقات rizq_subscription_engine.js (RizqSub) — مصدر الحقيقة الوحيد لتاريخ الانتهاء
   if(!accountId) return false;
   if(typeof RizqSub !== 'undefined'){
-    RizqSub.activatePackage(accountId, pkgName, 'admin', price);
+    RizqSub.activatePackage(accountId, pkgName, 'admin', price, daysOrOpts);
   }
   try{
     var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
@@ -6114,14 +6740,15 @@ function activateVerifiedPlusForRequest(req){
 
 // منح/سحب يدوي مباشر (بلا طلب شراء) — يُستخدَم من لوحة "الحسابات" لأي حساب
 // مُوافَق عليه بالفعل، تماماً كأي إجراء استثنائي آخر يتخذه الأدمن مباشرة.
-function toggleVerifiedPlusManually(accountId, grant){
+function toggleVerifiedPlusManually(accountId, grant, durationDays){
   if(!accountId) return;
   var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!cfg.backendUrl){ showToast(RizqI18n.t2('⚠️ لا يوجد اتصال بالخادم','⚠️ Aucune connexion au serveur'),'error'); return; }
+  var days = Math.max(1, Math.min(3650, Number(durationDays) || 365));
   fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin/' + encodeURIComponent(accountId) + '/verified-plus', {
     method: 'POST',
     headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
-    body: JSON.stringify(grant ? { action:'grant', durationDays: 365 } : { action:'revoke' })
+    body: JSON.stringify(grant ? { action:'grant', durationDays: days } : { action:'revoke' })
   }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
     .then(function(data){
       try{
@@ -6133,11 +6760,264 @@ function toggleVerifiedPlusManually(accountId, grant){
         }
       }catch(e){}
       showToast(grant
-        ? RizqI18n.t2('✅ تم منح شارة موثّق⁺ يدوياً (سنة واحدة)','✅ Badge Vérifié+ accordé manuellement (1 an)')
+        ? RizqI18n.t2('✅ تم منح شارة موثّق⁺ يدوياً','✅ Badge Vérifié+ accordé manuellement')
         : RizqI18n.t2('✅ تم سحب شارة موثّق⁺','✅ Badge Vérifié+ retiré'), 'success');
       renderPendingAccounts();
     })
     .catch(function(){ showToast(RizqI18n.t2('❌ فشل الإجراء — تأكد من إعدادات الخادم','❌ Échec de l\'action — vérifiez la config serveur'),'error'); });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   منح خاص — Attribution spéciale
+   بحث بالاسم/الهاتف ثم تفعيل امتياز مجاني لمدة محددة أو طويلة
+   (عائلة، شركاء، زبائن مميّزون) دون تسمية «عائلي» في الواجهة.
+═══════════════════════════════════════════════════════════════ */
+window._sgAccountsCache = [];
+window._sgSelected = null;
+
+function sgInitPanel(){
+  var daysSel = document.getElementById('sg-days');
+  if (daysSel && !daysSel._sgBound) {
+    daysSel._sgBound = true;
+    daysSel.addEventListener('change', function(){
+      var wrap = document.getElementById('sg-custom-wrap');
+      if (wrap) wrap.style.display = daysSel.value === 'custom' ? '' : 'none';
+    });
+  }
+  sgLoadAccounts(false);
+  sgRenderGrantLog();
+}
+
+function sgLoadAccounts(forceNet){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  function fromLocal(){
+    var list = [];
+    try {
+      var pending = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      (pending||[]).forEach(function(a){
+        if (!a || !a.id) return;
+        if (a.status && a.status !== 'approved' && a.status !== 'active') return;
+        list.push({
+          id: a.id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+          type: a.type || a.accountType || 'individual', status: a.status || 'approved'
+        });
+      });
+    } catch (e) {}
+    try {
+      var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
+      Object.keys(accts||{}).forEach(function(id){
+        var a = accts[id];
+        if (!a) return;
+        if (list.some(function(x){ return x.id === id; })) return;
+        list.push({
+          id: id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+          type: a.type || 'individual', status: 'approved'
+        });
+      });
+    } catch (e2) {}
+    window._sgAccountsCache = list;
+    sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+  }
+  if (!forceNet || !cfg.backendUrl) { fromLocal(); return; }
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin', { headers: _adminAuthHeaders() })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data || !Array.isArray(data.accounts)) { fromLocal(); return; }
+      window._sgAccountsCache = data.accounts
+        .filter(function(a){ return a && a.status === 'approved'; })
+        .map(function(a){
+          return {
+            id: a.id, name: a.name || '', phone: a.phone || '', email: a.email || '',
+            type: a.type || 'individual', status: 'approved'
+          };
+        });
+      sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+      showToast(RizqI18n.t2('تم تحديث قائمة الحسابات','Liste des comptes actualisée'), 'success');
+    })
+    .catch(function(){ fromLocal(); });
+}
+
+function sgSearchAccounts(q){
+  var box = document.getElementById('sg-results');
+  if (!box) return;
+  q = String(q || '').trim().toLowerCase();
+  var list = window._sgAccountsCache || [];
+  var hits = !q ? list.slice(0, 12) : list.filter(function(a){
+    return String(a.name||'').toLowerCase().indexOf(q) !== -1
+      || String(a.phone||'').toLowerCase().indexOf(q) !== -1
+      || String(a.email||'').toLowerCase().indexOf(q) !== -1
+      || String(a.id||'').toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 20);
+  window._sgSearchHits = hits;
+  if (!hits.length) {
+    box.innerHTML = '<div style="padding:12px;color:#6a7a8a;font-size:13px">' + RizqI18n.t2('لا نتائج','Aucun résultat') + '</div>';
+    return;
+  }
+  var typeLbl = { store: RizqI18n.t2('محل','Boutique'), office: RizqI18n.t2('مكتب','Bureau'), corp: RizqI18n.t2('معرض/شركة','Showroom'), individual: RizqI18n.t2('فرد','Particulier') };
+  box.innerHTML = hits.map(function(a, idx){
+    var selected = window._sgSelected && window._sgSelected.id === a.id;
+    return '<button type="button" data-sg-idx="'+idx+'" onclick="sgSelectAccountByIdx('+idx+')" style="text-align:start;padding:12px 14px;border-radius:12px;border:1.5px solid '+(selected?'#C9A84C':'#e2e8f5')+';background:'+(selected?'#fffaf0':'#fff')+';cursor:pointer;font-family:inherit;width:100%">'
+      + '<div style="font-weight:800;color:#1B3A6B;font-size:14px">' + escapeHtml(a.name || a.id) + '</div>'
+      + '<div style="font-size:12px;color:#5b6b85;margin-top:4px">' + escapeHtml(typeLbl[a.type] || a.type) + ' · ' + escapeHtml(a.phone || '—') + '</div>'
+      + '</button>';
+  }).join('');
+}
+
+function sgSelectAccountByIdx(idx){
+  var hits = window._sgSearchHits || [];
+  var acc = hits[idx];
+  if (!acc) return;
+  sgSelectAccount(acc);
+}
+
+function sgSelectAccount(acc){
+  window._sgSelected = acc;
+  var form = document.getElementById('sg-form-card');
+  if (form) { form.style.opacity = '1'; form.style.pointerEvents = 'auto'; }
+  var typeLbl = { store: RizqI18n.t2('محل','Boutique'), office: RizqI18n.t2('مكتب','Bureau'), corp: RizqI18n.t2('معرض/شركة','Showroom'), individual: RizqI18n.t2('فرد','Particulier') };
+  var sel = document.getElementById('sg-selected');
+  if (sel) {
+    sel.innerHTML = '<strong>' + escapeHtml(acc.name || acc.id) + '</strong> · '
+      + escapeHtml(typeLbl[acc.type] || acc.type) + ' · ' + escapeHtml(acc.phone || '—');
+  }
+  sgSearchAccounts((document.getElementById('sg-search')||{}).value || '');
+}
+
+function sgResolveDays(){
+  var sel = document.getElementById('sg-days');
+  var v = sel ? sel.value : '365';
+  if (v === 'custom') {
+    var n = Number((document.getElementById('sg-custom-days')||{}).value || 0);
+    return Math.max(1, Math.min(3650, n || 1));
+  }
+  return Math.max(1, Math.min(3650, Number(v) || 365));
+}
+
+function sgPackageNameFor(accType, privilege){
+  if (privilege === 'verified_plus') return null;
+  var t = accType || 'store';
+  if (t === 'individual') {
+    if (privilege === 'diamond' || privilege === 'yearly') return 'باقة شهرية';
+    return 'مميزة';
+  }
+  if (privilege === 'diamond') {
+    if (t === 'office') return 'الماسية الأساسية للمكاتب';
+    if (t === 'corp') return 'الماسية الأساسية للشركات';
+    return 'الماسية الأساسية للمحلات';
+  }
+  if (privilege === 'yearly') return 'سنوية';
+  return 'شهرية';
+}
+
+function sgEnsureLocalAccount(acc){
+  try {
+    var accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
+    if (!accts[acc.id]) {
+      accts[acc.id] = {
+        id: acc.id, name: acc.name || '', phone: acc.phone || '', email: acc.email || '',
+        type: acc.type || 'individual'
+      };
+      localStorage.setItem('rizq_accounts', JSON.stringify(accts));
+    } else {
+      accts[acc.id].name = accts[acc.id].name || acc.name || '';
+      accts[acc.id].phone = accts[acc.id].phone || acc.phone || '';
+      accts[acc.id].email = accts[acc.id].email || acc.email || '';
+      accts[acc.id].type = accts[acc.id].type || acc.type || 'individual';
+      localStorage.setItem('rizq_accounts', JSON.stringify(accts));
+    }
+  } catch (e) {}
+}
+
+function sgAppendGrantLog(entry){
+  var key = 'rizq_special_grants';
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem(key)||'[]'); } catch (e) { list = []; }
+  if (!Array.isArray(list)) list = [];
+  list.unshift(entry);
+  list = list.slice(0, 40);
+  try { localStorage.setItem(key, JSON.stringify(list)); } catch (e2) {}
+}
+
+function sgRenderGrantLog(){
+  var el = document.getElementById('sg-grant-log');
+  if (!el) return;
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem('rizq_special_grants')||'[]'); } catch (e) { list = []; }
+  if (!list.length) {
+    el.textContent = RizqI18n.t2('لا توجد منح مسجّلة على هذا الجهاز بعد.','Aucune attribution enregistrée sur cet appareil pour le moment.');
+    return;
+  }
+  el.innerHTML = '<div style="display:grid;gap:8px">' + list.slice(0, 12).map(function(g){
+    return '<div style="padding:10px 12px;border:1px solid #e8eef8;border-radius:10px;background:#fbfcfe">'
+      + '<div style="font-weight:700;color:#1B3A6B">' + escapeHtml(g.name || g.accountId) + '</div>'
+      + '<div style="font-size:12px;color:#5b6b85;margin-top:3px">' + escapeHtml(g.privilegeLabel || g.pkgName || '') + ' · '
+      + (g.days || '—') + ' ' + RizqI18n.t2('يوم','j') + ' · '
+      + (g.at ? new Date(g.at).toLocaleString() : '') + '</div>'
+      + (g.reason ? '<div style="font-size:12px;color:#8a6c1f;margin-top:3px">' + escapeHtml(g.reason) + '</div>' : '')
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function sgSubmitGrant(){
+  var acc = window._sgSelected;
+  if (!acc || !acc.id) {
+    showToast(RizqI18n.t2('اختر حساباً أولاً','Choisissez d\'abord un compte'), 'error');
+    return;
+  }
+  var priv = (document.getElementById('sg-privilege')||{}).value || 'monthly';
+  var days = sgResolveDays();
+  var reason = String((document.getElementById('sg-reason')||{}).value || '').trim();
+  var btn = document.getElementById('sg-grant-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.7'; }
+
+  function done(ok, label){
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (!ok) return;
+    sgAppendGrantLog({
+      accountId: acc.id, name: acc.name, type: acc.type,
+      privilege: priv, privilegeLabel: label, pkgName: label,
+      days: days, reason: reason, at: new Date().toISOString()
+    });
+    sgRenderGrantLog();
+    showToast(RizqI18n.t2('✅ تم تفعيل المنح الخاص','✅ Attribution spéciale activée'), 'success');
+  }
+
+  if (priv === 'verified_plus') {
+    sgEnsureLocalAccount(acc);
+    var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+    if (!cfg.backendUrl) {
+      showToast(RizqI18n.t2('⚠️ لا يوجد اتصال بالخادم','⚠️ Aucune connexion au serveur'), 'error');
+      done(false);
+      return;
+    }
+    fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/accounts/admin/' + encodeURIComponent(acc.id) + '/verified-plus', {
+      method: 'POST',
+      headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+      body: JSON.stringify({ action:'grant', durationDays: days })
+    }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+      .then(function(){ done(true, RizqI18n.t2('موثّق⁺','Vérifié+')); })
+      .catch(function(){
+        showToast(RizqI18n.t2('❌ فشل منح موثّق⁺','❌ Échec du badge Vérifié+'), 'error');
+        done(false);
+      });
+    return;
+  }
+
+  var pkgName = sgPackageNameFor(acc.type, priv);
+  sgEnsureLocalAccount(acc);
+  var ok = activateSubscriptionForAccount(acc.id, pkgName, 0, {
+    days: days,
+    sponsored: true,
+    specialGrant: true,
+    grantKind: 'special',
+    grantReason: reason || RizqI18n.t2('منح خاص','Attribution spéciale')
+  });
+  if (!ok) {
+    showToast(RizqI18n.t2('❌ تعذّر تفعيل الباقة','❌ Impossible d\'activer le forfait'), 'error');
+    done(false);
+    return;
+  }
+  done(true, pkgName);
 }
 
 function checkAccountExpiryStatus(acc, accId){
@@ -7049,7 +7929,44 @@ function resolveQuotaAddon(id, status){
   function getAll(){
     try{ return JSON.parse(localStorage.getItem(ANN_KEY)||'[]'); }catch(e){ return []; }
   }
-  function saveAll(list){ localStorage.setItem(ANN_KEY, JSON.stringify(list)); }
+  function saveAll(list){
+    localStorage.setItem(ANN_KEY, JSON.stringify(list));
+    _syncAnnouncementsToBackend(list);
+  }
+
+  function _annBackendBase(){
+    try {
+      if (typeof _adminBackendBase === 'function') return _adminBackendBase();
+      var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+      return (c.backendUrl || window.RIZQ_BACKEND_BASE || '').replace(/\/$/,'');
+    } catch(e){ return ''; }
+  }
+
+  function _syncAnnouncementsToBackend(list){
+    var base = _annBackendBase();
+    if (!base) return;
+    var headers = { 'Content-Type':'application/json' };
+    try {
+      if (typeof _adminAuthHeaders === 'function') headers = _adminAuthHeaders(headers);
+    } catch(e){}
+    fetch(base + '/api/site-config', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ announcements: list || [] })
+    }).catch(function(){});
+  }
+
+  function syncAnnouncementsFromBackend(){
+    var base = _annBackendBase();
+    if (!base) return Promise.resolve(false);
+    return fetch(base + '/api/site-config', { cache: 'no-store' })
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config || !Array.isArray(data.config.announcements)) return false;
+        localStorage.setItem(ANN_KEY, JSON.stringify(data.config.announcements));
+        return true;
+      }).catch(function(){ return false; });
+  }
 
   var TYPES_INFO = {
     congrats:{ icon:'🎉', label:'تهنئة'    },
@@ -7272,11 +8189,15 @@ function resolveQuotaAddon(id, status){
   var _origShowPanel = window.showPanel;
   window.showPanel = function(id, el){
     if(typeof _origShowPanel==='function') _origShowPanel(id, el);
-    if(id==='announcements') renderAnnList();
+    if(id==='announcements'){
+      syncAnnouncementsFromBackend().then(function(){ renderAnnList(); });
+    }
   };
 
-  /* Init badge on load */
-  setTimeout(renderAnnList, 600);
+  /* Init badge on load — pull live list from server first */
+  setTimeout(function(){
+    syncAnnouncementsFromBackend().then(function(){ renderAnnList(); });
+  }, 600);
 })();
 </script>
 

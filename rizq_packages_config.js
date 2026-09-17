@@ -561,7 +561,7 @@ function translateFeatureList(list, lang) {
 /** الكتالوجات المعتمدة — مطابقة PKG_DEFAULTS في لوحة الأدمن */
 var CATALOGS = {
   general: [
-    { id: 'trial',   price: 0,     durationDays: 3,   discountPct: 0, features: ['10 منتجات', 'شارة محل', 'تواصل مباشر'] },
+    { id: 'trial',   price: 0,     durationDays: 10,  discountPct: 0, features: ['10 منتجات', 'شارة محل', 'تواصل مباشر'] },
     { id: 'basic',   price: 1500,  durationDays: 30,  discountPct: 2, features: ['30 منتج', 'شارة مميّز برزق', 'إحصائيات'] },
     { id: 'pro',     price: 4000,  durationDays: 30,  discountPct: 3, features: ['منتجات غير محدودة', 'أولوية في نتائج البحث', 'دعم مخصص'] },
     { id: 'yearly',  price: 30000, durationDays: 365, discountPct: 3, features: ['كل مزايا Pro', 'خصم 37% عن السعر الشهري', 'فوترة سنوية واحدة'] },
@@ -592,9 +592,9 @@ var CATALOGS = {
     { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
       features: ['عرض حتى 3 خدمات نشطة', 'صفحة المكتب', 'طلبات تواصل'],
       features_fr: ['Jusqu\'à 3 services actifs', 'Page du bureau', 'Demandes de contact'] },
-    { id: 'of-month', price: 3500, durationDays: 30, discountPct: 2, highlight: true,
-      features: ['شارة مكتب موثوق', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
-      features_fr: ['Badge bureau vérifié', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
+    { id: 'of-month', price: 3500, durationDays: 30, maxCatalogItems: Infinity, discountPct: 2, highlight: true,
+      features: ['شارة مكتب موثوق', 'خدمات غير محدودة', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
+      features_fr: ['Badge bureau vérifié', 'Services illimités', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
     { id: 'of-quart', price: 9000, durationDays: 90, maxCatalogItems: Infinity, discountPct: 3,
       features: ['توفير 14%', 'عرض خدمات غير محدود', 'مدير حساب مخصص'],
       features_fr: ['Économisez 14%', 'Services illimités', 'Gestionnaire de compte dédié'] },
@@ -605,24 +605,32 @@ var CATALOGS = {
     Object.assign({ id: 'of-diam-pro' }, _officeDiamondProFields())
   ],
   corp: [
-    { id: 'cp-trial', price: 0,     durationDays: 3,   discountPct: 0, features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'] },
-    { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2, features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'] },
-    { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'] },
-    { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'] },
+    { id: 'cp-trial', price: 0,     durationDays: 10,  discountPct: 0,
+      features: ['وصول كامل للمنصة', 'استعراض الإعلانات', 'دعم فني أساسي'],
+      features_fr: ['Accès complet à la plateforme', 'Consultation des annonces', 'Support technique de base'] },
+    { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2,
+      features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'],
+      features_fr: ['Badge entreprise premium Rizq', 'Jusqu\'à 30 annonces', 'Statistiques mensuelles', 'Support prioritaire'] },
+    { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3,
+      features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'],
+      features_fr: ['Tous les avantages mensuels', '15% d\'économie vs mensuel', 'Annonces illimitées', 'Gestionnaire de compte'] },
+    { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3,
+      features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'],
+      features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Avantages VIP exclusifs', 'Support 24/7', 'Rapports annuels complets'] },
     Object.assign({ id: 'cp-diam-std' }, _corpDiamondStandardFields()),
     Object.assign({ id: 'cp-diam-pro' }, _corpDiamondProFields())
   ],
   video: [
     { id: 'vid-single',   price: 1500,  durationDays: 10, discountPct: 0, maxVideosPerMonth: 1, payPerAd: true, period: 'MRU / إعلان · 10 أيام', period_fr: 'MRU / annonce · 10 jours', features: ['فيديو إعلاني واحد لمدة 10 أيام', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'دفع لكل إعلان — بلا اشتراك شهري'], features_fr: ['Une vidéo publicitaire pendant 10 jours', 'Section publicitaire page d\'accueil', 'Paiement par annonce — sans abonnement mensuel'], cta_fr: 'Acheter une annonce vidéo' },
-    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, maxVideosPerMonth: 3, features: ['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'إحصائيات أداء أساسية آلية'] },
-    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, maxVideosPerMonth: 10, features: ['حتى 10 فيديوهات إعلانية ترويجية شهرياً', 'أولوية الترتيب في نتائج البحث', 'شارة «محتوى مميّز برزق» الموثّقة'] },
-    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, maxVideosPerMonth: Infinity, features: ['فيديوهات وعروض غير محدودة', 'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية', 'تقارير تحليل أداء آلية مفصّلة', 'دعم VIP ذو أولوية + شارة VIP موثّقة'] }
+    { id: 'vid-basic',    price: 5000,  durationDays: 30, discountPct: 0, maxVideosPerMonth: 3, features: ['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)', 'ظهور في قسم الإعلانات بالصفحة الرئيسية', 'إحصائيات أداء أساسية آلية'], features_fr: ['Jusqu\'à 3 vidéos promo / mois', 'Section publicitaire page d\'accueil', 'Statistiques de performance de base'] },
+    { id: 'vid-pro',      price: 12000, durationDays: 30, discountPct: 0, maxVideosPerMonth: 10, features: ['حتى 10 فيديوهات إعلانية ترويجية شهرياً', 'أولوية الترتيب في نتائج البحث', 'شارة «محتوى مميّز برزق» الموثّقة'], features_fr: ['Jusqu\'à 10 vidéos promo / mois', 'Priorité dans les résultats de recherche', 'Badge « contenu mis en avant Rizq »'] },
+    { id: 'vid-business', price: 25000, durationDays: 30, discountPct: 0, maxVideosPerMonth: Infinity, features: ['فيديوهات وعروض غير محدودة', 'ظهور مميز في القسم الرئيسي بالصفحة الرئيسية', 'تقارير تحليل أداء آلية مفصّلة', 'دعم VIP ذو أولوية + شارة VIP موثّقة'], features_fr: ['Vidéos et campagnes illimitées', 'Mise en avant sur la page d\'accueil', 'Rapports de performance détaillés', 'Support VIP prioritaire + badge VIP'] }
   ],
   tender: [
-    { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'] },
-    { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'] },
-    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'] },
-    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'] }
+    { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'], features_fr: ['Parcourir et filtrer les appels d\'offres', 'Coordonnées masquées / floutées', 'Soumission d\'offres verrouillée'] },
+    { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'], features_fr: ['Accès aux coordonnées du donneur d\'ordre', 'Soumissions d\'offres illimitées', 'Publication d\'appels d\'offres'] },
+    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos offres'] },
+    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres'] }
   ],
   verified_plus: [
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }
@@ -956,7 +964,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-08-29-pkg-i18n-fr';
+var CATALOG_SYNC_REVISION = '2026-09-16-trial-10d';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',
@@ -978,7 +986,8 @@ function _stampCatalogRev(pkg) {
 function _pkgNeedsDefaultRefresh(livePkg, base) {
   if (!base || !base.id) return false;
   if (livePkg._catalogRev === CATALOG_SYNC_REVISION) return false;
-  if (base.price != null && Number(livePkg.price) !== Number(base.price)) return true;
+  // Never treat an intentional admin price edit as "stale".
+  // Only rewrite known-bad tender prices / video quotas / obsolete feature copy.
   if (STALE_TENDER_PRICES[base.id] != null && Number(livePkg.price) === STALE_TENDER_PRICES[base.id]) return true;
   if (/^vid-/.test(base.id) && base.maxVideosPerMonth != null) {
     var liveMax = livePkg.maxVideosPerMonth;
@@ -1008,9 +1017,15 @@ function _mergeLive(defaults, live) {
     var nameHit = pkgId && NAMES[pkgId] ? NAMES[pkgId] : null;
     var tier = resolveDiamondTierFromPkg(livePkg) || resolveDiamondTierFromPkg(base);
     var tierFields = diamond ? _diamondTierFields(tier || 'diamond_standard', livePkg.price != null ? livePkg.price : base.price) : null;
+    var staleTenderHit = STALE_TENDER_PRICES[base.id] != null
+      && Number(livePkg.price) === STALE_TENDER_PRICES[base.id]
+      && base.price != null;
     return _stampCatalogRev({
       id: pkgId,
-      price: refresh && base.price != null ? Number(base.price) : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
+      // Prefer live admin price always — only replace known stale tender prices.
+      price: staleTenderHit
+        ? Number(base.price)
+        : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
       maxCatalogItems: refresh && base.maxCatalogItems != null ? base.maxCatalogItems : (livePkg.maxCatalogItems != null ? livePkg.maxCatalogItems : base.maxCatalogItems),
       maxVideosPerMonth: refresh && base.maxVideosPerMonth != null ? base.maxVideosPerMonth : (livePkg.maxVideosPerMonth != null ? livePkg.maxVideosPerMonth : base.maxVideosPerMonth),
@@ -1134,7 +1149,7 @@ function syncCatalogFromBackend(opts) {
   if (!force && _lastCatalogSyncMs && (now - _lastCatalogSyncMs) < CATALOG_SYNC_TTL_MS) {
     return Promise.resolve(true);
   }
-  _catalogSyncPromise = fetch(base + '/api/site-config')
+  _catalogSyncPromise = fetch(base + '/api/site-config', { cache: 'no-store' })
     .then(function (res) { return res.ok ? res.json() : null; })
     .then(function (data) {
       var pkgs = data && data.ok && data.config && data.config.packages;
@@ -1143,6 +1158,12 @@ function syncCatalogFromBackend(opts) {
     .catch(function () { return false; })
     .finally(function () { _catalogSyncPromise = null; });
   return _catalogSyncPromise;
+}
+
+/** Clears in-memory catalog cache so the next getCatalog reads site-config fresh. */
+function invalidateRemoteCatalogCache() {
+  _remoteCatalogCache = {};
+  _lastCatalogSyncMs = 0;
 }
 
 function getCatalog(catalogKey, lang) {
@@ -1430,6 +1451,7 @@ var API = {
   CATALOG_SYNC_REVISION: CATALOG_SYNC_REVISION,
   ensureCatalogStorageFresh: ensureCatalogStorageFresh,
   syncCatalogFromBackend: syncCatalogFromBackend,
+  invalidateRemoteCatalogCache: invalidateRemoteCatalogCache,
   LS_KEYS: LS_KEYS,
   CATALOG_REGISTRY: CATALOG_REGISTRY,
   registerCatalogMapping: registerCatalogMapping,

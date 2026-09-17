@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" role="img" aria-label="seller journey">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1B3A6B"/>
+      <stop offset="100%" stop-color="#234d8f"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#C9A84C"/>
+    </marker>
+  </defs>
+  <rect width="880" height="220" rx="14" fill="#f0f4ff"/>
+  <text x="440" y="34" text-anchor="middle" fill="#1B3A6B" font-size="17" font-weight="800" font-family="Tahoma,Segoe UI,sans-serif">كيف تبدأ البيع على رزق</text>
+  <g font-family="Tahoma,Segoe UI,sans-serif" font-size="13" font-weight="700">
+    <rect x="24" y="68" width="140" height="78" rx="14" fill="url(#g1)"/>
+    <text x="94" y="100" fill="#fff" text-anchor="middle">1. إنشاء حساب</text>
+    <text x="94" y="122" fill="#E8C96A" text-anchor="middle" font-size="11">من «حسابي»</text>
+
+    <rect x="194" y="68" width="140" height="78" rx="14" fill="#fff" stroke="#C9A84C" stroke-width="2"/>
+    <text x="264" y="100" fill="#1B3A6B" text-anchor="middle">2. اختر النوع</text>
+    <text x="264" y="122" fill="#64748b" text-anchor="middle" font-size="11">فرد · محل · مكتب · شركة</text>
+
+    <rect x="364" y="68" width="140" height="78" rx="14" fill="#fff" stroke="#1B3A6B" stroke-width="2"/>
+    <text x="434" y="100" fill="#1B3A6B" text-anchor="middle">3. انتظار التفعيل</text>
+    <text x="434" y="122" fill="#64748b" text-anchor="middle" font-size="11">مراجعة قصيرة</text>
+
+    <rect x="534" y="68" width="140" height="78" rx="14" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+    <text x="604" y="100" fill="#15803d" text-anchor="middle">4. لوحة التحكم</text>
+    <text x="604" y="122" fill="#64748b" text-anchor="middle" font-size="11">أضف منتجاتك</text>
+
+    <rect x="704" y="68" width="152" height="78" rx="14" fill="url(#g1)"/>
+    <text x="780" y="100" fill="#fff" text-anchor="middle">5. الظهور للزوار</text>
+    <text x="780" y="122" fill="#E8C96A" text-anchor="middle" font-size="11">صفحتك العامة</text>
+  </g>
+  <line x1="164" y1="107" x2="190" y2="107" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="334" y1="107" x2="360" y2="107" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="504" y1="107" x2="530" y2="107" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="674" y1="107" x2="700" y2="107" stroke="#C9A84C" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="440" y="188" text-anchor="middle" fill="#64748b" font-size="13" font-family="Tahoma,Segoe UI,sans-serif">سجّل → اختر نوع نشاطك → انتظر التفعيل → أدر محتواك → يظهر للجمهور</text>
+  <text x="440" y="208" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Segoe UI,sans-serif">Register → Choose type → Activation → Manage → Public page</text>
+</svg>

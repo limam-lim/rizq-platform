@@ -406,13 +406,26 @@
   var TIER_FEATURES_PRO_ONLY = ['auto_reply_calls','calls_channel'];
 
   // ── تفعيل الباقة (يُستدعى من الأدمن أو مدير رزق الذكي) ─────────
-  function activatePackage(accId, pkgName, activatedBy, priceOverride) {
+  // daysOrOpts: رقم أيام اختياري، أو كائن { days, grantReason, sponsored }
+  function activatePackage(accId, pkgName, activatedBy, priceOverride, daysOrOpts) {
     if(!accId || !pkgName) return false;
+    var daysOverride = null;
+    var grantMeta = null;
+    if (typeof daysOrOpts === 'number' && isFinite(daysOrOpts) && daysOrOpts > 0) {
+      daysOverride = Math.floor(daysOrOpts);
+    } else if (daysOrOpts && typeof daysOrOpts === 'object') {
+      grantMeta = daysOrOpts;
+      if (daysOrOpts.days != null && Number(daysOrOpts.days) > 0) {
+        daysOverride = Math.floor(Number(daysOrOpts.days));
+      }
+    }
     var accounts = getAccounts();
-    var days = getDurationDays(pkgName);
+    var days = (daysOverride > 0) ? daysOverride : getDurationDays(pkgName);
     var now  = new Date();
     var ends = new Date(now.getTime() + days * 86400000);
-    var isTrial = pkgName.indexOf('تجريب')!==-1 || pkgName.indexOf('مجان')!==-1;
+    // المنح الخاص/المدعوم لا يُعامل كتجربة حتى لو السعر 0
+    var isSponsored = !!(grantMeta && (grantMeta.sponsored || grantMeta.specialGrant));
+    var isTrial = !isSponsored && (pkgName.indexOf('تجريب')!==-1 || pkgName.indexOf('مجان')!==-1);
 
     // إذا كان هناك حساب موجود وباقته لم تنتهِ بعد → مد المدة من نهايتها
     if(accounts[accId] && accounts[accId].pkg_ends_at) {
@@ -443,11 +456,14 @@
       pkg_ends_at : ends.toISOString(),
       planType    : resolvePlanType(pkgName, accExisting.type) || (diamondOn ? (diamondTier === 'diamond_pro' ? 'diamond_pro' : 'diamond_standard') : 'free'),
       subscriptionStatus: isTrial ? 'active' : 'active',
-      paymentConfirmed: !isTrial && (activatedBy === 'admin' || (priceOverride != null && priceOverride !== '')),
+      paymentConfirmed: !isTrial && (activatedBy === 'admin' || isSponsored || (priceOverride != null && priceOverride !== '')),
       activated_by: activatedBy || 'admin',
       reminder_sent: false,
       pkg_history : history,
       pkg_count   : history.length,
+      sponsoredGrant: isSponsored || !!accExisting.sponsoredGrant,
+      grantReason: (grantMeta && grantMeta.grantReason) || accExisting.grantReason || '',
+      grantKind: (grantMeta && grantMeta.grantKind) || accExisting.grantKind || (isSponsored ? 'special' : ''),
       plan        : diamondOn ? 'diamond' : (accExisting.plan || pkgName),
       planName    : pkgName,
       tier        : diamondOn ? 'diamond' : (accExisting.tier || ''),
@@ -513,7 +529,7 @@
         var _accInfo2 = accounts[accId] || {};
         fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
           method: 'POST',
-          headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+          headers: _adminAuthHeaders(),
           body: JSON.stringify({
             accountId   : accId,
             accountName : _accInfo2.name || accId,
@@ -546,7 +562,7 @@
           if (diamondOn && _accInfo2.phone) {
             fetch(_cfg.backendUrl.replace(/\/$/,'') + '/api/subscriber/register', {
               method: 'POST',
-              headers: Object.assign({'Content-Type':'application/json'}, _cfg.backendSecret ? {'x-rizq-secret': _cfg.backendSecret} : {}),
+              headers: _adminAuthHeaders(),
               body: JSON.stringify({
                 subscriberId: String(_accInfo2.phone).replace(/[^0-9+]/g,'').slice(0, 40),
                 businessName: _accInfo2.name || accId,
@@ -792,6 +808,7 @@
     return {
       verified: !!(acc && acc.status === 'approved'),
       premium : hasFeature(accId, 'vip_badge'),
+      priorityListing: hasFeature(accId, 'priority_listing'),
       verifiedPlus: verifiedPlusActive,
     };
   }
@@ -1050,11 +1067,31 @@
   var AGENT_CFG_KEY = 'rizq_subagent_config';
   var DEFAULT_AGENT_CFG = { enabled: true, notes: '', officialAccounts: [], backendUrl: '', backendSecret: '' };
 
+  function _adminAuthHeaders(extra) {
+    var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+    try {
+      var saved = JSON.parse(localStorage.getItem('rizq_admin_session') || 'null');
+      if (saved && saved.token) h['x-admin-token'] = saved.token;
+    } catch (e) {}
+    return h;
+  }
+
   function getAgentConfig() {
     try {
       var raw = JSON.parse(localStorage.getItem(AGENT_CFG_KEY) || 'null');
-      return raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
-    } catch(e) { return Object.assign({}, DEFAULT_AGENT_CFG); }
+      var cfg = raw ? Object.assign({}, DEFAULT_AGENT_CFG, raw) : Object.assign({}, DEFAULT_AGENT_CFG);
+      // نفس رابط التسجيل (RIZQ_BACKEND_BASE) — كان backendUrl فارغاً في لوحة الأدمن
+      // فيُظهر جداولاً فارغة رغم وجود حسابات حقيقية على الخادم.
+      if (!cfg.backendUrl && typeof global !== 'undefined' && global.RIZQ_BACKEND_BASE) {
+        cfg.backendUrl = global.RIZQ_BACKEND_BASE;
+      }
+      delete cfg.backendSecret;
+      return cfg;
+    } catch(e) {
+      var fallback = Object.assign({}, DEFAULT_AGENT_CFG);
+      if (typeof global !== 'undefined' && global.RIZQ_BACKEND_BASE) fallback.backendUrl = global.RIZQ_BACKEND_BASE;
+      return fallback;
+    }
   }
   function setAgentConfig(partial) {
     var cfg = Object.assign(getAgentConfig(), partial || {});
@@ -1295,7 +1332,7 @@
     var url = cfg.backendUrl.replace(/\/$/, '') + '/api/verify-receipt';
     return fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-rizq-secret': cfg.backendSecret || '' },
+      headers: _adminAuthHeaders(),
       body: JSON.stringify({ imageBase64: reqObj.receiptImage, expectedPrice: reqObj.price, pkgName: reqObj.pkg })
     }).then(function(res){
       if (!res.ok) throw new Error('backend_error_' + res.status);

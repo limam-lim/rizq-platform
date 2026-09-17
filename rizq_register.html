@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_input_bidi.js"></script>
-  <script src="rizq_account_route.js?v=2"></script>
+  <script src="rizq_account_route.js?v=7"></script>
   <title>الحساب | رزق</title>
   <style>
     :root{
@@ -123,7 +123,7 @@
   <a class="btn-ns" href="rizq_legal.html#s2" target="_blank" rel="noopener" id="nav-terms">شروط القبول</a>
   <a class="btn-ns" href="mailto:direction@rizq.mr" id="nav-contact">تواصل</a>
   <button type="button" class="btn-ns" id="nav-login">دخول</button>
-  <button type="button" class="btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR">FR | AR</button>
+  <button type="button" class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   <span class="nav-title" id="nav-title">الحساب</span>
   <a class="logo" href="index.html" aria-label="رزق">
     <div class="logo-text">
@@ -282,7 +282,17 @@
   function applyDir() {
     document.documentElement.lang = fr ? 'fr' : 'ar';
     document.documentElement.dir = fr ? 'ltr' : 'rtl';
-    document.getElementById('lang-btn').textContent = fr ? 'AR' : 'FR';
+    (function(btn, lang){
+      if(!btn) return;
+      if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){ window.RizqI18n.paintPrimaryLangBtn(btn, lang); return; }
+      btn.classList.add('btn-lang','btn-lang-primary');
+      btn.setAttribute('dir','ltr');
+      btn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      btn.setAttribute('data-active-lang', lang);
+      var frEl=btn.querySelector('.lang-fr'), arEl=btn.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = lang==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = lang==='ar'?'#C9A84C':'#ffffff';
+    })(document.getElementById('lang-btn'), fr ? 'fr' : 'ar');
   }
   applyDir();
   function t(a, b) { return fr ? b : a; }
@@ -613,7 +623,7 @@
     });
   }
 
-  function doLogin() {
+  async function doLogin() {
     clearErr();
     var email = document.getElementById('li-email').value.trim().toLowerCase();
     var pw = document.getElementById('li-pw').value;
@@ -631,12 +641,22 @@
       return;
     }
 
-    /* دخول بائع مفعّل عبر التوجيه الموحّد (محل/مكتب/شركة/فرد) */
-    if (window.RizqAccount && typeof window.RizqAccount.loginSeller === 'function') {
-      var seller = window.RizqAccount.loginSeller(email, pw);
+    /* دخول بائع مفعّل — محلي ثم خادم */
+    if (window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function') {
+      var seller = await window.RizqAccount.loginSellerAsync(email, pw);
       if (seller && seller.ok && seller.url) {
         setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-        setTimeout(function () { location.href = seller.url; }, 400);
+        setTimeout(function () {
+          if (window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function') {
+            window.RizqAccount.redirectAfterAuth(seller.url);
+          } else {
+            location.href = seller.url;
+          }
+        }, 400);
+        return;
+      }
+      if (seller && seller.code === 'not_approved') {
+        setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
         return;
       }
     }

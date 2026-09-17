@@ -147,102 +147,121 @@ a{text-decoration:none;color:inherit}
 }
 .nav-lang-btn:hover{background:rgba(201,168,76,.15)}
 
-/* ════════ HERO ════════ */
-.hero{
-  background:linear-gradient(145deg,var(--navy3) 0%,var(--navy2) 45%,#143060 100%);
-  padding:56px 24px 0;position:relative;overflow:hidden;
+/* ════════ HERO — نفس قياسات المعارض + هوية المكاتب (ثقة / خدمات / تركواز) ════════ */
+.office-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#134e6f 0%,#0F2347 42%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+.office-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(14,116,144,.22) 8deg,transparent 20deg,transparent 340deg,rgba(201,168,76,.12) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
+.office-hero .hero-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 30%,rgba(14,116,144,.18) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(201,168,76,.1) 0%,transparent 45%)}
+.office-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#67e8f9;box-shadow:0 0 8px 2px rgba(103,232,249,.7);animation:rzOfGlint 3.4s ease-in-out infinite}
+.office-hero .hero-glints span:nth-child(1){top:18%;left:12%;animation-delay:.2s}
+.office-hero .hero-glints span:nth-child(2){top:30%;left:82%;animation-delay:1.1s}
+.office-hero .hero-glints span:nth-child(3){top:65%;left:22%;animation-delay:2s}
+.office-hero .hero-glints span:nth-child(4){top:55%;left:70%;animation-delay:.7s}
+.office-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
+@keyframes rzOfGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
+.office-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(14,116,144,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(14,116,144,.18) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
+.office-hero .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
+.office-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:920px;width:auto}
+.office-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(103,232,249,.35),rgba(15,35,71,.55) 70%);border:2px solid rgba(14,116,144,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5);animation:rzOfPulse 3s ease-in-out infinite}
+@keyframes rzOfPulse{0%,100%{box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(14,116,144,.18),0 0 40px rgba(14,116,144,.5),0 8px 20px rgba(0,0,0,.5)}}
+.office-info{flex:0 1 auto;min-width:0;text-align:start}
+.office-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#67e8f9;margin-bottom:8px;display:block}
+.office-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;background:linear-gradient(100deg,#fff 30%,#a5f3fc 45%,#67e8f9 50%,#E8C96A 58%,#fff 70%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rzOfShimmer 5s linear infinite}
+@keyframes rzOfShimmer{0%{background-position:0% center}100%{background-position:-220% center}}
+.office-tagline{font-size:14.5px;color:rgba(255,255,255,.68);margin-top:10px;padding-top:12px;border-top:1px solid rgba(14,116,144,.4);display:inline-block;max-width:100%}
+.office-spec{display:block;font-size:13px;color:#E8C96A;margin-top:6px;font-weight:700}
+.office-meta{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.office-meta .meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.6)}
+.office-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.office-badges .badge{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(6px)}
+.badge-office{background:rgba(14,116,144,.2);color:#67e8f9;border:1px solid rgba(8,145,178,.4)}
+.badge-verified{background:rgba(46,204,113,.15);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
+.badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
+.office-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(103,232,249,.55);font-size:20px;animation:rzOfBounce 2s ease-in-out infinite}
+@keyframes rzOfBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+.office-type-label{display:none}
+@media(max-width:640px){.office-hero{min-height:clamp(240px,48vh,320px)}.office-hero .hero-cover{padding:40px 16px 32px}.office-logo{width:76px;height:76px;font-size:34px}.office-hero .hero-floor{display:none}}
+@media(max-width:900px){
+  .office-profile{flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .office-info{text-align:center;width:100%;display:flex;flex-direction:column;align-items:center}
+  .office-type-label{display:block;order:-1;margin:2px 0 4px;font-size:15px;font-weight:800;color:#E8C96A;letter-spacing:.3px}
+  .office-eyebrow{order:0;margin-bottom:6px;font-size:10px;letter-spacing:2px}
+  .office-name{order:1}
+  .office-badges,.office-meta{justify-content:center}
 }
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(201,168,76,.06) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(201,168,76,.06) 1px,transparent 1px);
-  background-size:50px 50px;pointer-events:none;
-}
-.hero-orb1{position:absolute;top:-120px;right:-120px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(14,116,144,.2),transparent 65%);pointer-events:none}
-.hero-orb2{position:absolute;bottom:-80px;left:20%;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 65%);pointer-events:none}
-.hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:48px;align-items:end;position:relative;z-index:2}
 
-.verified-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(14,116,144,.2);border:1px solid rgba(8,145,178,.4);
-  border-radius:30px;padding:7px 18px;font-size:12px;color:#67e8f9;
-  font-weight:700;letter-spacing:.5px;margin-bottom:20px;
-}
-.hero-title{font-size:clamp(28px,4vw,46px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:14px}
-.hero-title .gold-txt{background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-desc{font-size:14.5px;color:rgba(255,255,255,.62);line-height:1.9;max-width:500px;margin-bottom:28px}
-.hero-tags{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:30px}
-.hero-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
-  border-radius:30px;padding:7px 16px;font-size:12.5px;color:rgba(255,255,255,.75);transition:all .25s;
-}
-.hero-tag.teal{background:rgba(14,116,144,.18);border-color:rgba(8,145,178,.35);color:#67e8f9}
-.hero-tag.gold{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.32);color:var(--gold2)}
-.rating-strip{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.stars-hero{color:var(--gold2);font-size:22px;letter-spacing:3px;text-shadow:0 2px 8px rgba(201,168,76,.4)}
-.rating-big{font-size:28px;font-weight:900;color:#fff}
-.rating-sub{font-size:13px;color:rgba(255,255,255,.68)}
+/* legacy ids kept for JS — visually unused */
+.hero-card,.rating-strip{display:none!important}
 
-.hero-card{
-  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.22);
-  border-radius:20px 20px 0 0;backdrop-filter:blur(16px);padding:28px 22px;
-}
-.hc-logo{
-  width:82px;height:82px;border-radius:22px;
-  background:linear-gradient(145deg,rgba(14,116,144,.3),rgba(14,116,144,.08));
-  border:2px solid rgba(8,145,178,.4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;margin:0 auto 16px;
-  box-shadow:0 8px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
-}
-.hc-name{font-size:16px;font-weight:800;color:#fff;text-align:center;margin-bottom:5px}
-.hc-type{font-size:11.5px;color:var(--gold2);text-align:center;margin-bottom:20px;background:rgba(201,168,76,.12);display:inline-block;padding:3px 14px;border-radius:20px;border:1px solid rgba(201,168,76,.25);width:100%}
-.hc-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border-radius:12px;padding:11px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);transition:background .2s}
-.hc-row:hover{background:rgba(255,255,255,.09)}
-.hc-val{font-size:16px;font-weight:800;color:#fff}
-.hc-lbl{font-size:11px;color:rgba(255,255,255,.68);margin-top:2px}
-.hc-icon{font-size:18px;opacity:.8}
+body.rizq-empty-office .office-meta,
+body.rizq-empty-office .stats-strip{display:none!important}
+body.rizq-empty-office #open-badge{display:none!important}
+/* أزرار التواصل تظهر دائماً قبل «تصفّح المكاتب» مثل المحلات/المعارض */
+body.rizq-empty-office #act-browse-offices{display:inline-flex!important}
+body.rizq-empty-office .rating-inline{display:none!important}
+#act-browse-offices{display:none}
 
 /* ════════ STATS STRIP ════════ */
 .stats-strip{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:0 24px;box-shadow:0 4px 20px rgba(14,116,144,.35)}
-.stats-strip-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-.stat-blk{padding:20px 10px;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
+.stats-strip-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-blk{padding:16px 10px;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
 .stat-blk:last-child{border-left:none}
-.stat-num{font-size:26px;font-weight:900;color:#fff}
+.stat-num{font-size:22px;font-weight:900;color:#fff}
 .stat-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:.3px}
 
-/* ════════ ACTIONS BAR ════════ */
-.actions-bar{background:#fff;border-bottom:1px solid #e0e8f0;padding:0 20px;box-shadow:var(--shadow-sm)}
-.actions-bar-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:11px 0;gap:12px;flex-wrap:wrap}
-@media(max-width:820px){
-  .actions-bar{position:sticky;top:var(--rizq-header-h,0);z-index:43}
+/* ════════ PAGE SEC + ACTIONS (مثل المعارض) ════════ */
+.page-sec-strip{position:sticky;top:var(--rizq-header-h,0);z-index:44;background:linear-gradient(180deg,#0a1628,#0f2a3d);border-bottom:1px solid rgba(14,116,144,.35);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+/* عربية RTL: الخدمات يمين · تقييم زبائن يسار | فرنسية LTR: العكس */
+.page-sec-strip-inner{
+  max-width:1100px;margin:0 auto;padding:8px 12px;
+  display:flex;align-items:center;gap:8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  direction:inherit;
 }
-.action-btns{display:flex;gap:9px;flex-wrap:wrap}
-.act-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;transition:all .25s;text-decoration:none;font-family:inherit;border:none}
+.page-sec-strip-inner::-webkit-scrollbar{display:none}
+.page-sec-btn{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(14,116,144,.35);color:#67e8f9;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.page-sec-btn:hover{background:rgba(14,116,144,.2);border-color:rgba(103,232,249,.5)}
+.page-sec-btn-reviews{margin-inline-start:auto}
+.actions-bar{background:linear-gradient(135deg,#0F2347,#0D1B2A);border-bottom:1px solid rgba(201,168,76,.28);padding:14px 20px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:800px){.actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}}
+.action-btns{display:flex;gap:10px;flex-wrap:wrap}
+.act-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;transition:all .25s;text-decoration:none;font-family:inherit;border:none}
 .act-btn svg{width:16px;height:16px;flex-shrink:0}
 .act-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
-.act-wa:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,211,102,.35)}
-.act-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff}
-.act-call:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,35,71,.28)}
-.act-chat{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
-.act-chat:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
-.act-share{background:var(--bg);color:var(--navy);border:1px solid #d0d8e8}
-.act-share:hover{background:var(--bg2);transform:translateY(-1px)}
-.rating-inline{display:flex;align-items:center;gap:7px}
-.ri-stars{color:#F5A623;font-size:17px}
-.ri-val{font-size:14px;font-weight:800;color:var(--text)}
-.ri-cnt{font-size:12px;color:var(--muted)}
+.act-wa:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.35)}
+.act-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.act-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
+.act-share{background:transparent;color:#e8eef8;border:1.5px solid rgba(255,255,255,.35)}
+.act-share:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.55)}
+.act-email{background:transparent;color:#7dd3fc;border:1.5px solid rgba(125,211,252,.55)}
+.act-email:hover{background:rgba(125,211,252,.12);border-color:#7dd3fc}
+.act-chat{background:transparent;color:#E8C96A;border:1.5px solid rgba(201,168,76,.75)}
+.act-chat:hover{background:rgba(201,168,76,.12);border-color:#E8C96A}
+.act-browse{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.act-browse:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
+.rating-inline{display:flex;align-items:center;gap:8px}
+.ri-stars{color:#F5A623;font-size:14px;letter-spacing:1px}
+.ri-val{font-size:20px;font-weight:900;color:#fff}
+.ri-cnt{font-size:11px;color:rgba(255,255,255,.5)}
+
+
 
 /* ════════ MAIN LAYOUT ════════ */
-.main-wrap{max-width:1140px;margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:1fr 310px;gap:26px}
+.main-wrap{
+  max-width:1140px;margin:0 auto;padding:36px 24px;
+  display:grid;gap:26px;align-items:start;
+  /* يمين = الموقع/الساعات/التقييمات | يسار = الخدمات (RTL مثل المحلات) */
+  grid-template-columns:minmax(300px,360px) minmax(0,1fr);
+  grid-template-areas:"side main";
+}
+.main-wrap > aside#info-section{grid-area:side}
+.main-wrap > .office-main{grid-area:main;min-width:0}
 
 /* ════════ SECTION ════════ */
 .section-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .section-bar{width:4px;height:24px;background:linear-gradient(to bottom,var(--gold),var(--teal));border-radius:4px;flex-shrink:0}
 .section-ttl{font-size:17px;font-weight:800;color:var(--navy)}
-.section-sub{font-size:12px;color:var(--muted);background:rgba(27,58,107,.06);padding:3px 11px;border-radius:20px;margin-right:auto;border:1px solid var(--border)}
+.section-sub{font-size:12px;color:var(--muted);background:rgba(27,58,107,.06);padding:3px 11px;border-radius:20px;margin-inline-start:auto;border:1px solid var(--border)}
 
 /* ════════ CARD ════════ */
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:26px;margin-bottom:20px;transition:box-shadow .3s}
@@ -299,9 +318,49 @@ a{text-decoration:none;color:inherit}
 .about-stat-val{font-size:20px;font-weight:900;color:var(--teal)}
 .about-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
 
-/* ════════ MAP ════════ */
+/* ════════ MAP + LOCATION INFO (store-like) ════════ */
 .map-placeholder{height:160px;border-radius:14px;background:linear-gradient(135deg,var(--bg2),var(--bg));border:2px dashed rgba(14,116,144,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s}
 .map-placeholder:hover{border-color:rgba(14,116,144,.45);background:rgba(14,116,144,.04);transform:translateY(-2px)}
+.loc-info-row{
+  display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
+  padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
+  text-align:start!important;direction:inherit!important;
+}
+html[dir="rtl"] .loc-info-row{direction:rtl!important}
+html[dir="ltr"] .loc-info-row{direction:ltr!important}
+.loc-info-row:last-of-type{border-bottom:none}
+.loc-info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.loc-info-row > div{flex:0 1 auto;min-width:0;text-align:start!important}
+.loc-info-row .info-label{color:#6a7a8a;font-size:11px;margin-bottom:3px;text-align:start!important}
+.loc-info-row .info-value{
+  color:#1a2a3a;font-weight:600;text-align:start!important;
+  display:block;width:fit-content;max-width:100%;
+}
+.loc-info-row .info-value .rzq-contact-masked,
+.loc-info-row .info-value .rizq-phone-ltr{
+  direction:ltr!important;unicode-bidi:isolate!important;
+  display:inline-block!important;text-align:left!important;white-space:nowrap;
+}
+.rzq-contact-masked{filter:blur(5px);cursor:pointer;transition:filter .25s;user-select:none}
+.rzq-contact-masked.shown{filter:none;cursor:text;user-select:text}
+#location-card .hours-row,
+#hours-card-el .hours-row{
+  display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
+  gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
+  text-align:start!important;direction:inherit!important;margin-bottom:0;
+}
+html[dir="rtl"] #location-card .hours-row,
+html[dir="rtl"] #hours-card-el .hours-row{direction:rtl!important}
+html[dir="ltr"] #location-card .hours-row,
+html[dir="ltr"] #hours-card-el .hours-row{direction:ltr!important}
+#location-card .hours-row:last-child,
+#hours-card-el .hours-row:last-child{border-bottom:none}
+#location-card .hours-row .day,
+#hours-card-el .hours-row .day{color:#6a7a8a;min-width:4.8em;flex:0 0 auto;text-align:start}
+#location-card .hours-row .time,
+#hours-card-el .hours-row .time{font-weight:700;color:var(--navy);flex:0 0 auto}
+#location-card .hours-row .closed-txt,
+#hours-card-el .hours-row .closed-txt{font-weight:700;color:var(--red);flex:0 0 auto}
 
 /* ════════ REVIEWS ════════ */
 .review-item{padding:18px 0;border-bottom:1px solid rgba(27,58,107,.05)}
@@ -310,11 +369,11 @@ a{text-decoration:none;color:inherit}
 .rv-avatar{width:44px;height:44px;min-width:44px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--navy));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;border:2px solid rgba(14,116,144,.25)}
 .rv-name{font-size:14px;font-weight:700;color:var(--navy)}
 .rv-date{font-size:11px;color:var(--muted)}
-.rv-stars{margin-right:auto;color:#F5A623;font-size:14px}
+.rv-stars{margin-inline-start:auto;color:#F5A623;font-size:14px}
 .rv-text{font-size:13px;color:#4a5568;line-height:1.75;padding:12px 14px;background:var(--bg);border-radius:10px;border:1px solid var(--border);border-right:3px solid var(--teal2)}
 
 /* ════════ SIDEBAR ════════ */
-.contact-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:26px;overflow:hidden}
+.contact-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:26px;overflow:hidden;position:relative}
 .sidebar-sticky{position:sticky;top:82px;align-self:start}
 .contact-card::before{content:'';position:absolute;top:0;right:0;left:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--teal))}
 .open-badge-new{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:700;margin-bottom:18px;width:100%;border:1.5px solid transparent}
@@ -338,14 +397,17 @@ a{text-decoration:none;color:inherit}
 .promo-card{background:linear-gradient(135deg,rgba(14,116,144,.06),rgba(201,168,76,.07));border:1px solid rgba(201,168,76,.22);border-radius:13px;padding:16px;text-align:center;margin-top:4px}
 
 /* ════════ PACKAGES SECTION ════════ */
-.pkg-section{padding:72px 24px;background:linear-gradient(180deg,var(--bg2) 0%,#eef2fb 100%);border-top:1px solid #e0e8f0}
-.pkg-section-inner{max-width:1380px;margin:0 auto}
-.pkg-section-head{text-align:center;margin-bottom:46px}
+.pkg-section{padding:28px 16px 48px;background:linear-gradient(180deg,#f8faff 0%,#eef2fb 100%);border-top:1px solid #e0e8f0}
+.pkg-section-inner{max-width:1320px;margin:0 auto;width:100%}
+.pkg-section-head{text-align:center;margin-bottom:20px}
 .pkg-label{display:inline-block;font-size:11px;letter-spacing:2.5px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:10px;background:rgba(14,116,144,.08);padding:4px 16px;border-radius:20px;border:1px solid rgba(14,116,144,.2)}
 .pkg-h2{font-size:clamp(22px,3vw,34px);font-weight:700;color:#16263d;margin-bottom:10px}
 .pkg-h2 span{background:linear-gradient(90deg,var(--gold),var(--teal2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .pkg-desc{color:#6a7a8a;font-size:14px}
-.pkg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+/* حاوية فقط — الشبكة الداخلية من rizq_packages_ui */
+.pkg-grid{display:block;width:100%;max-width:100%}
+#office-packages-grid{width:100%}
+#office-packages-grid .rizq-pkg-grid-inner{width:100%;gap:12px!important}
 .pkg-card{background:#fff;border:1px solid #e4ecf5;border-radius:18px;padding:28px 18px;text-align:center;transition:all .32s;position:relative;overflow:hidden}
 .pkg-card::before{content:'';position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal2),var(--navy));transform:scaleX(0);transition:transform .35s;transform-origin:right}
 .pkg-card:hover{border-color:rgba(14,116,144,.3);transform:translateY(-5px);box-shadow:var(--shadow-lg)}
@@ -398,9 +460,15 @@ a{text-decoration:none;color:inherit}
 .fade-in.visible{opacity:1;transform:none}
 
 /* ════════ RESPONSIVE ════════ */
-@media(max-width:900px){.pkg-grid{grid-template-columns:repeat(2,1fr)}.about-stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:820px){.main-wrap{grid-template-columns:1fr}.hero-inner{grid-template-columns:1fr}.hero-card{border-radius:16px;margin-top:24px}.stats-strip-inner{grid-template-columns:repeat(2,1fr)}.sidebar-sticky{position:static}}
-@media(max-width:500px){.pkg-grid{grid-template-columns:1fr}.trust-grid{grid-template-columns:1fr}.about-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.about-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){
+  .main-wrap{grid-template-columns:1fr;grid-template-areas:"main" "side"}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-card{border-radius:16px;margin-top:24px}
+  .stats-strip-inner{grid-template-columns:repeat(2,1fr)}
+  .sidebar-sticky{position:static}
+}
+@media(max-width:500px){.trust-grid{grid-template-columns:1fr}.about-stats{grid-template-columns:repeat(2,1fr)}}
 
 input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important}
 
@@ -565,7 +633,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 </script>
 
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.5"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
@@ -598,161 +666,192 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <button class="nav-logo-ring" onclick="openPromo()" style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .2s,box-shadow .2s,border-color .2s;padding:0" onmouseover="this.style.transform='scale(1.06)';this.style.borderColor='#C9A84C'" onmouseout="this.style.transform='';this.style.borderColor='rgba(201,168,76,.75)'"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></button>
       <a href="rizq_landing_v8.html" style="text-decoration:none"><div class="rizq-logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div></a>
     </div>
-    <button class="btn-lang" id="lang-btn">FR</button>
+    <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   </div>
 </nav>
 
-<!-- ════ HERO ════ -->
-<div class="hero">
-  <div class="hero-orb1"></div>
-  <div class="hero-orb2"></div>
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="verified-badge" id="verified-badge" data-t="verified-badge">🛡️ مكتب موثَّق ومعتمد على منصة رزق</div>
-      <div class="verified-badge" id="premium-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d" data-t="premium-badge-lbl">🏅 وكالة مميّزة برزق</div>
-      <div class="verified-badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;gap:6px;align-items:center;border:1px solid rgba(201,168,76,.5)"><svg viewBox="0 0 40 40" width="14" height="14" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> <span data-t="verified-plus-badge-txt">موثّق⁺</span></div>
-      <h1 class="hero-title">
-        <span id="hero-office-name" data-t="hero-office-name">مكتب الفجر</span><br/>
-        <span class="gold-txt" id="hero-office-spec" data-t="hero-office-spec">للتأمين والخدمات</span>
-      </h1>
-      <p class="hero-desc" id="hero-desc" data-t="hero-desc">وكالة متخصصة في تأمين المركبات، الشاحنات، والآلات الثقيلة — نخدمكم بسرعة وشفافية منذ عام 2010 في موريتانيا</p>
-      <div class="hero-tags" id="hero-tags">
-        <span class="hero-tag" id="hero-tag1" data-t="hero-tag1">📍 نواكشوط — حي تيارت</span>
-        <span class="hero-tag" id="hero-tag2" data-t="hero-tag2">🕐 السبت–الخميس | 8:00–18:00</span>
-        <span class="hero-tag teal" id="hero-tag3" data-t="hero-tag3">🏅 وكالة معتمدة رسمياً</span>
-        <span class="hero-tag gold" id="hero-tag4" data-t="hero-tag4">🌐 عربي · فرنسي</span>
-      </div>
-      <div class="rating-strip">
-        <span class="stars-hero">★★★★★</span>
-        <span class="rating-big" id="hero-rating">4.8</span>
-        <span class="rating-sub" id="hero-rev-cnt" data-t="hero-rev-cnt">من 127 تقييم موثّق</span>
-      </div>
-    </div>
-
-    <!-- Hero Card -->
-    <div class="hero-card">
-      <div class="hc-logo" id="hc-logo">🛡️</div>
-      <div class="hc-name" id="hc-name" data-t="hc-name">مكتب الفجر للتأمين</div>
-      <div class="hc-type" id="hc-type" data-t="hc-type">🏢 وكالة تأمين معتمدة</div>
-      <div class="hc-row">
-        <div><div class="hc-val" id="hc-clients">+3,200</div><div class="hc-lbl" id="hc-clients-lbl" data-t="hc-clients-lbl">زبون مخدوم</div></div>
-        <span class="hc-icon">👥</span>
-      </div>
-      <div class="hc-row">
-        <div><div class="hc-val" id="hc-exp" data-t="hc-exp">+15 سنة</div><div class="hc-lbl" id="hc-exp-lbl" data-t="hc-exp-lbl">خبرة في السوق</div></div>
-        <span class="hc-icon">⭐</span>
-      </div>
-      <div class="hc-row">
-        <div><div class="hc-val" id="hero-status-txt" data-t="hero-status-txt">جارٍ التحقق...</div><div class="hc-lbl" id="hero-status-lbl" data-t="hero-status-lbl">الحالة الآن</div></div>
-        <span class="hc-icon" id="hero-status-dot">🔄</span>
+<!-- ════ HERO — قياسات المعارض + هوية المكاتب ════ -->
+<div class="office-hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-beams"></div>
+  <div class="hero-floor"></div>
+  <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="hero-cover">
+    <div class="office-profile">
+      <div class="office-logo" id="hc-logo">🛡️</div>
+      <div class="office-info">
+        <span class="office-type-label" id="office-type-label" data-t="office-type-label">المكتب</span>
+        <span class="office-eyebrow" id="office-eyebrow">✨ RIZQ OFFICES</span>
+        <div class="office-name" id="hero-office-name" data-t="hero-office-name">مكتب</div>
+        <div class="office-spec" id="hero-office-spec" data-t="hero-office-spec"></div>
+        <div class="office-tagline" id="hero-desc" data-t="hero-desc">لم يُحدَّد مكتب. افتح مكتباً من الدليل لعرض الخدمات ومعلومات التواصل.</div>
+        <div class="office-meta" id="hero-tags">
+          <span class="meta-item" id="hero-tag1" data-t="hero-tag1">—</span>
+          <span class="meta-item" id="hero-tag2" data-t="hero-tag2">—</span>
+          <span class="meta-item" id="hero-tag3" data-t="hero-tag3">—</span>
+          <span class="meta-item" id="hero-tag4" data-t="hero-tag4">—</span>
+        </div>
+        <div class="office-badges">
+          <span class="badge badge-office" id="verified-badge" data-t="verified-badge">🛡️ مكتب على منصة رزق</span>
+          <span class="badge" id="premium-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none" data-t="premium-badge-lbl">🏅 وكالة مميّزة برزق</span>
+          <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5)"><span data-t="verified-plus-badge-txt">موثّق⁺</span></span>
+          <span class="badge badge-rated" id="badge-rating-lbl"><span id="hero-rating">—</span> <span id="hero-rev-cnt" data-t="hero-rev-cnt"></span></span>
+        </div>
+        <!-- legacy fields for apply() JS -->
+        <span id="hc-name" hidden data-t="hc-name">مكتب</span>
+        <span id="hc-type" hidden data-t="hc-type">—</span>
+        <span id="hc-clients" hidden>—</span>
+        <span id="hc-exp" hidden data-t="hc-exp">—</span>
+        <span id="hero-status-txt" hidden data-t="hero-status-txt">—</span>
       </div>
     </div>
   </div>
+  <div class="hero-scroll-cue">⌄</div>
 </div>
 
-<!-- ════ STATS STRIP ════ -->
-<div class="stats-strip">
-  <div class="stats-strip-inner">
-    <div class="stat-blk"><div class="stat-num" id="stat-svcs">6</div><div class="stat-lbl" id="stat-svcs-lbl" data-t="stat-svcs-lbl">أنواع خدمات</div></div>
-    <div class="stat-blk"><div class="stat-num" id="stat-clients">+3,200</div><div class="stat-lbl" id="stat-clients-lbl" data-t="stat-clients-lbl">زبون راضٍ</div></div>
-    <div class="stat-blk"><div class="stat-num" id="stat-exp">15+</div><div class="stat-lbl" id="stat-exp-lbl" data-t="stat-exp-lbl">سنة خبرة</div></div>
-    <div class="stat-blk"><div class="stat-num">24h</div><div class="stat-lbl" id="stat-resp-lbl" data-t="stat-resp-lbl">استجابة سريعة</div></div>
-  </div>
-</div>
-
-<!-- ════ ACTIONS BAR ════ -->
+<!-- ════ ACTIONS BAR — مباشرة تحت الهيرو مثل المحل ════ -->
 <div class="actions-bar">
   <div class="actions-bar-inner">
     <div class="action-btns">
+      <a class="act-btn act-call" id="act-call-top" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
+        <span id="act-call-top-lbl" data-t="act-call-top-lbl">اتصال</span>
+      </a>
       <a class="act-btn act-wa" id="act-wa-top" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         <span id="act-wa-top-lbl" data-t="act-wa-top-lbl">واتساب</span>
       </a>
-      <a class="act-btn act-call" id="act-call-top" href="tel:#" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
-        <span id="act-call-top-lbl" data-t="act-call-top-lbl">اتصال مباشر</span>
+      <a class="act-btn act-email" id="act-email-top" href="mailto:" onclick="return rizqGateLink(this,event,'reasonGeneric')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+        <span id="act-email-top-lbl" data-t="act-email-top-lbl">إيميل</span>
       </a>
-      <button class="act-btn act-share" onclick="shareOffice()" id="act-share-btn" data-t="act-share-btn">📤 مشاركة</button>
-      <button class="act-btn act-chat" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">
+      <button class="act-btn act-chat" id="act-chat-top" type="button" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
-        <span data-t="btn-chat">محادثة على رزق</span>
+        <span data-t="btn-chat">محادثة</span>
       </button>
+      <button class="act-btn act-share" onclick="shareOffice()" id="act-share-btn" data-t="act-share-btn" type="button">📤 مشاركة</button>
+      <a class="act-btn act-browse" id="act-browse-offices" href="rizq_landing_v8.html#virtual-offices" data-t="act-browse-offices">تصفّح المكاتب</a>
     </div>
     <div class="rating-inline">
       <div class="ri-stars">★★★★★</div>
-      <div class="ri-val" id="bar-rating">4.8</div>
-      <div class="ri-cnt" id="bar-rev-cnt" data-t="bar-rev-cnt">(127 تقييم)</div>
+      <div class="ri-val" id="bar-rating">—</div>
+      <div class="ri-cnt" id="bar-rev-cnt" data-t="bar-rev-cnt"></div>
     </div>
   </div>
 </div>
 
+<div class="page-sec-strip" role="navigation" aria-label="أقسام المكتب">
+  <div class="page-sec-strip-inner">
+    <button type="button" class="page-sec-btn" id="sec-services-btn" data-t="sec-services-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
+    <button type="button" class="page-sec-btn" id="sec-about-btn" data-t="sec-about-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
+    <button type="button" class="page-sec-btn" id="sec-packages-btn" data-t="sec-packages-btn" onclick="document.getElementById('office-packages')&&document.getElementById('office-packages').scrollIntoView({behavior:'smooth'})">الباقات</button>
+    <button type="button" class="page-sec-btn page-sec-btn-reviews" id="sec-reviews-btn" data-t="sec-reviews-btn" onclick="document.getElementById('reviews-section')&&document.getElementById('reviews-section').scrollIntoView({behavior:'smooth'})">⭐ تقييم زبائن</button>
+  </div>
+</div>
+
+
+<!-- ════ STATS STRIP ════ -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stat-blk"><div class="stat-num" id="stat-svcs">—</div><div class="stat-lbl" id="stat-svcs-lbl" data-t="stat-svcs-lbl">أنواع خدمات</div></div>
+    <div class="stat-blk"><div class="stat-num" id="stat-clients">—</div><div class="stat-lbl" id="stat-clients-lbl" data-t="stat-clients-lbl">زبون راضٍ</div></div>
+    <div class="stat-blk"><div class="stat-num" id="stat-exp">—</div><div class="stat-lbl" id="stat-exp-lbl" data-t="stat-exp-lbl">سنة خبرة</div></div>
+    <div class="stat-blk"><div class="stat-num">—</div><div class="stat-lbl" id="stat-resp-lbl" data-t="stat-resp-lbl">استجابة سريعة</div></div>
+  </div>
+</div>
+
+
 <!-- ════ MAIN ════ -->
 <div class="main-wrap">
 
-  <!-- ── LEFT COLUMN ── -->
-  <div>
+  <!-- ── SIDEBAR يمين RTL: الموقع والساعات والتقييمات ── -->
+  <aside class="sidebar-sticky" id="info-section">
+    <div class="contact-card fade-in">
+      <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
+      <div id="office-payment-methods" style="display:none;margin-top:4px"></div>
+    </div>
+
+    <!-- LOCATION + CONTACT + HOURS (same pattern as stores) -->
+    <div class="card fade-in" id="location-card">
+      <div class="section-head">
+        <div class="section-bar"></div>
+        <div class="section-ttl" id="map-section-ttl" data-t="info-title-location">📍 الموقع والتواصل</div>
+      </div>
+      <div class="loc-info-row">
+        <span class="info-icon">🏠</span>
+        <div>
+          <div class="info-label" data-t="info-label-address">العنوان</div>
+          <div class="info-value" id="contact-info-addr" data-t="contact-info-addr">—</div>
+        </div>
+      </div>
+      <div class="loc-info-row">
+        <span class="info-icon">📱</span>
+        <div>
+          <div class="info-label" data-t="info-label-phone">الهاتف وواتساب</div>
+          <div class="info-value"><span id="contact-info-phone" class="rzq-contact-masked rizq-phone-ltr">—</span></div>
+        </div>
+      </div>
+      <div class="loc-info-row">
+        <span class="info-icon">📧</span>
+        <div>
+          <div class="info-label" data-t="info-label-email">البريد الإلكتروني</div>
+          <div class="info-value"><span id="contact-info-email" class="rzq-contact-masked">—</span></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="map-placeholder" onclick="openMaps()">
+          <div style="font-size:40px">🗺️</div>
+          <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">—</div>
+          <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
+        </div>
+      </div>
+      <div class="divider" style="margin:18px 0"></div>
+      <div id="hours-card-el">
+        <div style="font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid rgba(201,168,76,.35)" id="hours-title" data-t="info-title-hours">🕐 ساعات العمل</div>
+        <div class="hours-row"><span class="day" id="hours-day1" data-t="day-sat">السبت</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" id="hours-day2" data-t="day-sun">الأحد</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-mon">الإثنين</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-tue">الثلاثاء</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-wed">الأربعاء</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-thu">الخميس</span><span class="time">—</span></div>
+        <div class="hours-row"><span class="day" data-t="day-fri">الجمعة</span><span class="closed-txt" id="hours-closed-txt" data-t="hours-closed">مغلق</span></div>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="card fade-in" id="reviews-section">
+      <div class="section-head">
+        <div class="section-bar"></div>
+        <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
+        <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
+      </div>
+      <div id="office-reviews-body">
+        <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
+      </div>
+    </div>
+
+    <!-- RIZQ PROMO CARD -->
+    <div class="promo-card fade-in">
+      <div style="font-size:20px;margin-bottom:8px">🚀</div>
+      <div style="font-size:14px;font-weight:800;color:var(--gold2);margin-bottom:6px" id="promo-card-title" data-t="promo-card-title">أنشئ مكتبك على رزق</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" id="promo-card-sub" data-t="promo-card-sub">احضر رقمياً، اجذب زبائن جدد يومياً</div>
+      <a href="rizq_register.html" style="display:block;padding:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy2);border-radius:10px;font-size:13px;font-weight:800;text-align:center;text-decoration:none;transition:all .25s" id="promo-card-cta" data-t="promo-card-cta">ابدأ مجاناً — 10 أيام</a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN: الخدمات ── -->
+  <div class="office-main">
 
     <!-- SERVICES -->
-    <div class="card fade-in">
+    <div class="card fade-in" id="svc-section">
       <div class="section-head">
         <div class="section-bar"></div>
         <div class="section-ttl" id="svc-section-ttl" data-t="svc-section-ttl">الخدمات المقدَّمة</div>
-        <span class="section-sub" id="svc-count-badge" data-t="svc-count-badge">6 خدمات</span>
+        <span class="section-sub" id="svc-count-badge" data-t="svc-count-badge">—</span>
         <span id="mru-note" style="font-size:11px;color:#3a5080;display:flex;align-items:center;gap:6px;margin-right:8px;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:2px 8px;border-radius:5px;font-weight:800;font-size:10px;letter-spacing:.5px">MRU</span><span id="mru-note-text" data-t="mru-note-text">الأوقية الجديدة — العملة الرسمية لموريتانيا · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></span>
       </div>
       <div class="svc-list" id="svc-list">
-        <!-- JS will inject from localStorage if available, else show defaults below -->
-        <div class="svc-item featured">
-          <div class="svc-icon icon-gold">🚗</div>
-          <div class="svc-body">
-            <div class="svc-title-row">
-              <div class="svc-name" id="svc1-name" data-t="svc1-name">تأمين السيارات الخاصة</div>
-              <span class="svc-hot" id="svc1-hot" data-t="svc1-hot">⚡ الأكثر طلباً</span>
-            </div>
-            <div class="svc-desc" id="svc1-desc" data-t="svc1-desc">جميع أنواع التأمين — شامل، أطراف ثالثة، إضافي. معالجة فورية للوثائق وإصدار مباشر من المكتب.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc1-price" data-t="svc1-price">من 8,000 MRU</span><span class="svc-tag" id="svc1-tag" data-t="svc1-tag">⚡ إصدار فوري</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-navy">🚛</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc2-name" data-t="svc2-name">تأمين الشاحنات والنقل الثقيل</div>
-            <div class="svc-desc" id="svc2-desc" data-t="svc2-desc">تأمين أساطيل الشاحنات وسيارات النقل الثقيل مع تغطية شاملة وأسعار تنافسية.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc2-price" data-t="svc2-price">من 22,000 MRU</span><span class="svc-tag" id="svc2-tag" data-t="svc2-tag">📋 وثيقة شاملة</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-teal">⚙️</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc3-name" data-t="svc3-name">تأمين الآلات والمعدات الثقيلة</div>
-            <div class="svc-desc" id="svc3-desc" data-t="svc3-desc">حماية كاملة لمعدات البناء والمقاولات — ضد الحريق، السرقة، والأضرار الميكانيكية.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc3-price" data-t="svc3-price">من 35,000 MRU</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-green">🔄</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc4-name" data-t="svc4-name">تجديد رخص التسيير والتأمين</div>
-            <div class="svc-desc" id="svc4-desc" data-t="svc4-desc">تجديد سريع لجميع الوثائق دون انتظار — خدمة منزلية متاحة عند الطلب.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc4-price" data-t="svc4-price">حسب النوع</span><span class="svc-tag" id="svc4-tag" data-t="svc4-tag">🏠 خدمة منزلية</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-purple">📋</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc5-name" data-t="svc5-name">خبرة الأضرار ومعالجة الحوادث</div>
-            <div class="svc-desc" id="svc5-desc" data-t="svc5-desc">تقييم الأضرار، تحرير المحاضر، ومتابعة ملفات التعويض مع شركات التأمين.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc5-price" data-t="svc5-price">استشارة مجانية</span></div>
-          </div>
-        </div>
-        <div class="svc-item">
-          <div class="svc-icon icon-orange">🏍️</div>
-          <div class="svc-body">
-            <div class="svc-name" id="svc6-name" data-t="svc6-name">تأمين الدراجات النارية</div>
-            <div class="svc-desc" id="svc6-desc" data-t="svc6-desc">وثائق تأمين فورية لجميع موديلات الدراجات النارية بأسعار مناسبة.</div>
-            <div class="svc-meta"><span class="svc-price" id="svc6-price" data-t="svc6-price">من 3,500 MRU</span><span class="svc-tag" id="svc6-tag" data-t="svc6-tag">⚡ فوري</span></div>
-          </div>
-        </div>
+        <p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a" id="svc-list-empty">لا توجد خدمات معروضة بعد.</p>
       </div>
 
       <!-- ═══ مقدّر التكلفة السريع (خدمة جديدة للزائر) ═══
@@ -786,7 +885,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn">إرسال طلب ←</button>
         <div class="req-form" id="req-form">
           <input class="req-input" id="rf-name" placeholder="اسمك الكامل *" style="margin-top:14px"/ data-ph="rf-name">
-          <input dir="ltr" class="req-input" id="rf-phone" placeholder="+222 XX XX XX XX *" data-ph="rf-phone-ph"/>
+          <input dir="ltr" class="req-input" id="rf-phone" placeholder="+222…" data-ph="rf-phone-ph"/>
           <select class="req-input" id="rf-service">
             <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
             <option id="rf-svc-opt1" data-t="rf-svc-opt1">تأمين السيارات الخاصة</option>
@@ -817,118 +916,23 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     </div>
 
     <!-- ABOUT -->
-    <div class="card fade-in">
+    <div class="card fade-in" id="about-section">
       <div class="section-head">
         <div class="section-bar"></div>
         <div class="section-ttl" id="about-section-ttl" data-t="about-section-ttl">عن المكتب</div>
       </div>
-      <p class="about-text" id="about-txt" data-t="about-txt">مكتب الفجر للتأمين والخدمات — وكالة معتمدة تعمل في موريتانيا منذ عام 2010. نتميز بالسرعة في إصدار وثائق التأمين، الشفافية الكاملة في التسعير، والمتابعة المستمرة لملفات الزبائن حتى الحل النهائي. فريقنا من المختصين يضمن لك أفضل تغطية بأنسب الأسعار.</p>
+      <p class="about-text" id="about-txt" data-t="about-txt">تُعرض بيانات المكتب من الحساب الحقيقي فقط بعد اختيار مكتب من الدليل.</p>
       <div class="about-stats">
         <div class="about-stat"><div class="about-stat-val">2010</div><div class="about-stat-lbl" id="ab-year-lbl" data-t="ab-year-lbl">سنة التأسيس</div></div>
-        <div class="about-stat"><div class="about-stat-val" id="ab-clients">+3,200</div><div class="about-stat-lbl" id="ab-clients-lbl" data-t="ab-clients-lbl">زبون مخدوم</div></div>
+        <div class="about-stat"><div class="about-stat-val" id="ab-clients">—</div><div class="about-stat-lbl" id="ab-clients-lbl" data-t="ab-clients-lbl">زبون مخدوم</div></div>
         <div class="about-stat"><div class="about-stat-val" id="ab-svcs">6</div><div class="about-stat-lbl" id="ab-svcs-lbl" data-t="ab-svcs-lbl">خدمات متخصصة</div></div>
         <div class="about-stat"><div class="about-stat-val">✓</div><div class="about-stat-lbl" id="ab-cert-lbl" data-t="ab-cert-lbl">معتمد رسمياً</div></div>
       </div>
     </div>
 
-    <!-- MAP -->
-    <div class="card fade-in">
-      <div class="section-head">
-        <div class="section-bar"></div>
-        <div class="section-ttl" id="map-section-ttl" data-t="map-section-ttl">الموقع</div>
-      </div>
-      <div class="map-placeholder" onclick="openMaps()">
-        <div style="font-size:40px">🗺️</div>
-        <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">نواكشوط — حي تيارت، شارع الأمل</div>
-        <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
-      </div>
-    </div>
-
-    <!-- REVIEWS -->
-    <div class="card fade-in">
-      <div class="section-head">
-        <div class="section-bar"></div>
-        <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
-        <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub">4.8 ⭐ · 127 تقييم</span>
-      </div>
-      <div id="office-reviews-body">
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv1-avatar" data-t="rv1-avatar">م</div>
-          <div><div class="rv-name" id="rv1-name" data-t="rv1-name">محمد أحمد</div><div class="rv-date" id="rv1-date" data-t="rv1-date">منذ أسبوع</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <div class="rv-text" id="rv1-text" data-t="rv1-text">خدمة ممتازة وسريعة، أنجزت وثيقة التأمين في أقل من ساعة. الفريق محترف جداً وسأعود دائماً.</div>
-      </div>
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv2-avatar" data-t="rv2-avatar">ف</div>
-          <div><div class="rv-name" id="rv2-name" data-t="rv2-name">فاطمة إدوم</div><div class="rv-date" id="rv2-date" data-t="rv2-date">منذ شهر</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <div class="rv-text" id="rv2-text" data-t="rv2-text">تعامل راقٍ وأسعار منافسة. ساعدوني في ملف التعويض بعد حادث وتابعوه معي حتى النهاية.</div>
-      </div>
-      <div class="review-item">
-        <div class="rv-header">
-          <div class="rv-avatar" id="rv3-avatar" data-t="rv3-avatar">ب</div>
-          <div><div class="rv-name" id="rv3-name" data-t="rv3-name">بكر ولد سيدي</div><div class="rv-date" id="rv3-date" data-t="rv3-date">منذ شهرين</div></div>
-          <div class="rv-stars">★★★★☆</div>
-        </div>
-        <div class="rv-text" id="rv3-text" data-t="rv3-text">عملت معهم لتأمين أسطول شاحناتي الثلاث. احترافية عالية وتقييم دقيق للاحتياجات.</div>
-      </div>
-      <button style="margin-top:14px;width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--teal2);color:var(--teal2);background:transparent;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:all .25s" onmouseover="this.style.background='rgba(14,116,144,.07)'" onmouseout="this.style.background='transparent'" onclick="showToast((window.RizqI18n?RizqI18n.getLang():'ar')==='ar'?'⭐ التقييمات معروضة في الصفحة':'⭐ Les avis sont affichés sur la page')" id="reviews-all-btn" data-t="reviews-all-btn">عرض جميع التقييمات ←</button>
-      </div>
-    </div>
 
   </div>
 
-  <!-- ── SIDEBAR ── -->
-  <div class="sidebar-sticky">
-    <div class="contact-card fade-in">
-      <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
-
-      <a href="https://wa.me/" class="cta-btn cta-wa" id="sb-wa" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
-        <span class="cta-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </span>
-        <span id="sb-wa-lbl" data-t="sb-wa-lbl">واتساب مباشر</span>
-      </a>
-
-      <a href="mailto:office@rizq.mr" class="cta-btn cta-teal" id="sb-email">
-        <span class="cta-icon">📧</span>
-        <span id="sb-email-lbl" data-t="sb-email-lbl">إرسال إيميل</span>
-      </a>
-
-      <a href="tel:#" class="cta-btn cta-outline" id="sb-call" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
-        <span class="cta-icon">📞</span>
-        <span id="sb-call-lbl" data-t="sb-call-lbl">اتصال مباشر</span>
-      </a>
-
-      <div class="divider"></div>
-
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="hours-title" data-t="hours-title">🕐 ساعات العمل</div>
-      <div class="hours-row"><span class="day" id="hours-day1" data-t="hours-day1">السبت — الخميس</span><span class="time">8:00 — 18:00</span></div>
-      <div class="hours-row"><span class="day" id="hours-day2" data-t="hours-day2">الجمعة</span><span class="closed-txt" id="hours-closed-txt" data-t="hours-closed-txt">مغلق</span></div>
-
-      <div class="divider"></div>
-
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="contact-info-title" data-t="contact-info-title">📍 معلومات التواصل</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="contact-info-addr" data-t="contact-info-addr">📍 نواكشوط — حي تيارت، شارع الأمل</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="contact-info-phone">📞 +222 XX XX XX XX</div>
-      <div style="font-size:13px;color:var(--muted)" id="contact-info-email">✉️ office@rizq.mr</div>
-
-      <div id="office-payment-methods" style="display:none;margin-top:14px"></div>
-
-    </div>
-
-    <!-- RIZQ PROMO CARD -->
-    <div class="promo-card fade-in">
-      <div style="font-size:20px;margin-bottom:8px">🚀</div>
-      <div style="font-size:14px;font-weight:800;color:var(--gold2);margin-bottom:6px" id="promo-card-title" data-t="promo-card-title">أنشئ مكتبك على رزق</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" id="promo-card-sub" data-t="promo-card-sub">احضر رقمياً، اجذب زبائن جدد يومياً</div>
-      <a href="rizq_register.html" style="display:block;padding:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy2);border-radius:10px;font-size:13px;font-weight:800;text-align:center;text-decoration:none;transition:all .25s" id="promo-card-cta" data-t="promo-card-cta">ابدأ مجاناً — 3 أيام</a>
-    </div>
-  </div>
 </div>
 
 <!-- ═══ TOAST ═══ -->
@@ -947,13 +951,13 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       <div class="promo-feats">
         <div class="promo-feat"><div class="pf-icon pf-i1">🏢</div><div><div class="pf-title" id="po-f1-t" data-t="po-f1-t">صفحة مكتب احترافية</div><div class="pf-sub" id="po-f1-s" data-t="po-f1-s">خدماتك وتواصلك في مكان واحد</div></div></div>
         <div class="promo-feat"><div class="pf-icon pf-i2">📞</div><div><div class="pf-title" id="po-f2-t" data-t="po-f2-t">زبائن يتواصلون معك مباشرة</div><div class="pf-sub" id="po-f2-s" data-t="po-f2-s">واتساب، هاتف، وإيميل — بضغطة</div></div></div>
-        <div class="promo-feat"><div class="pf-icon pf-i3">⚡</div><div><div class="pf-title" id="po-f3-t" data-t="po-f3-t">جاهز في دقائق — مجاناً 3 أيام</div><div class="pf-sub" id="po-f3-s" data-t="po-f3-s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
+        <div class="promo-feat"><div class="pf-icon pf-i3">⚡</div><div><div class="pf-title" id="po-f3-t" data-t="po-f3-t">جاهز في دقائق — مجاناً 10 أيام</div><div class="pf-sub" id="po-f3-s" data-t="po-f3-s">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
       <div class="promo-cta-row">
         <a href="rizq_register.html" class="promo-cta-main" id="po-cta-main" data-t="po-cta-main">🚀 ابدأ مجاناً الآن</a>
         <a href="rizq_landing_v8.html" class="promo-cta-sec" id="po-cta-sec" data-t="po-cta-sec">تصفح المنصة أولاً ←</a>
       </div>
-      <div class="promo-note" id="po-note" data-t="po-note">لا حاجة لبطاقة بنكية · 3 أيام تجريبية مجانية</div>
+      <div class="promo-note" id="po-note" data-t="po-note">لا حاجة لبطاقة بنكية · 10 أيام تجريبية مجانية</div>
     </div>
   </div>
 </div>
@@ -1121,8 +1125,8 @@ function submitReq(){
   reqs.unshift({ name:name, phone:phone, service:svc, msg:msg, date:new Date().toISOString() });
   localStorage.setItem('rizq_office_requests', JSON.stringify(reqs.slice(0,100)));
   // WhatsApp fallback
-  var wa = document.getElementById('sb-wa');
-  var waNum = wa ? wa.href.replace('https://wa.me/','').split('?')[0] : '';
+  var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa');
+  var waNum = wa && wa.href ? wa.href.replace('https://wa.me/','').split('?')[0] : '';
   var waText = _t2('طلب استشارة - ','Demande de consultation - ') + name + ' - ' + phone + (svc ? ' - ' + svc : '') + (msg ? ' - ' + msg : '');
   window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(waText), '_blank', 'noopener');
   showToast(_t2('تم إرسال طلبك بنجاح! سنتواصل معك قريباً ✅','✅ Votre demande a été envoyée avec succès ! Nous vous contacterons bientôt'), 'success');
@@ -1245,9 +1249,23 @@ function openMaps(){
 
     function render(){
       var targetId = resolveOfficeAccount();
-      if(!targetId || !window.RizqReviews) return; // لا حساب حقيقي مطابق — نترك المحتوى التجريبي كما هو تماماً
-      window._rizqOfficeReviewsTarget = targetId;
       var fr = isFr();
+      if(!targetId || !window.RizqReviews){
+        var heroRating0 = document.getElementById('hero-rating');
+        if(heroRating0) heroRating0.textContent = '—';
+        var heroRevCnt0 = document.getElementById('hero-rev-cnt');
+        if(heroRevCnt0) heroRevCnt0.textContent = fr ? 'Pas encore noté' : 'لم يُقيَّم بعد';
+        var barRating0 = document.getElementById('bar-rating');
+        if(barRating0) barRating0.textContent = '—';
+        var barRevCnt0 = document.getElementById('bar-rev-cnt');
+        if(barRevCnt0) barRevCnt0.textContent = fr ? '(Aucun avis)' : '(بدون تقييم)';
+        var sub0 = document.getElementById('reviews-section-sub');
+        if(sub0) sub0.textContent = fr ? 'Pas encore de note' : 'لا يوجد تقييم بعد';
+        var body0 = document.getElementById('office-reviews-body');
+        if(body0) body0.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">'+(fr?"Aucun avis pour l'instant.":'لا توجد آراء حتى الآن.')+'</p>';
+        return;
+      }
+      window._rizqOfficeReviewsTarget = targetId;
       var stats = RizqReviews.getStats(targetId);
       var list  = RizqReviews.getReviews(targetId);
 
@@ -1369,10 +1387,12 @@ function openMaps(){
           RizqContactGate.onMaskedContactClick(accountId, 'office', { lang: fr ? 'fr' : 'ar' });
         }
       }
+      var phoneEl = document.getElementById('contact-info-phone');
+      var emailEl = document.getElementById('contact-info-email');
       if(locked || (!phone && !email && !wa)){
-        setText('contact-info-phone', '📞 ••• ••• •••');
-        setText('contact-info-email', '✉️ •••@•••.•••');
-        ['sb-wa','act-wa-top','sticky-wa','sb-call','act-call-top','sticky-call','sb-email'].forEach(function(btnId){
+        if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
+        if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
+        ['act-wa-top','sticky-wa','act-call-top','sticky-call','act-email-top'].forEach(function(btnId){
           var el = document.getElementById(btnId);
           if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
         });
@@ -1381,20 +1401,18 @@ function openMaps(){
       var waSrc = wa || phone;
       if(waSrc){
         var waNum = String(waSrc).replace(/[^0-9]/g,'');
-        setHref('sb-wa', 'https://wa.me/' + waNum);
         setHref('act-wa-top', 'https://wa.me/' + waNum);
         setHref('sticky-wa', 'https://wa.me/' + waNum);
       }
       if(phone){
         var telNum = String(phone).replace(/\s/g,'');
-        setHref('sb-call', 'tel:' + telNum);
         setHref('act-call-top', 'tel:' + telNum);
         setHref('sticky-call', 'tel:' + telNum);
-        setText('contact-info-phone', '📞 ' + phone);
+        if(phoneEl){ phoneEl.textContent = phone; phoneEl.classList.remove('rzq-contact-masked'); phoneEl.onclick = null; }
       }
       if(email){
-        setHref('sb-email', 'mailto:' + email);
-        setText('contact-info-email', '✉️ ' + email);
+        if(emailEl){ emailEl.textContent = email; emailEl.classList.remove('rzq-contact-masked'); emailEl.onclick = null; }
+        setHref('act-email-top', 'mailto:' + email);
       }
     }
 
@@ -1438,34 +1456,76 @@ function openMaps(){
       try{
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('office') || '';
-        if(!id){
+        function clearMock(ids){
+          ids.forEach(function(fid){
+            var el = document.getElementById(fid);
+            if(!el) return;
+            el.removeAttribute('data-t');
+            el.removeAttribute('data-t-fr');
+          });
+        }
+        function showEmptyOffice(msgAr, msgFr){
           document.body.classList.add('rizq-empty-office');
           document.title = isFr() ? 'Bureaux — Rizq' : 'المكاتب — رزق';
+          clearMock([
+            'hero-office-name','hero-office-spec','hero-desc','hero-tag1','hero-tag2','hero-tag3','hero-tag4',
+            'hero-rev-cnt','hc-name','hc-type','hc-clients-lbl','about-txt','map-addr','contact-info-addr',
+            'verified-badge','bar-rev-cnt','reviews-section-sub','stat-clients-lbl','ab-clients-lbl'
+          ]);
           setText('hero-office-name', isFr() ? 'Bureau' : 'مكتب');
+          setText('office-type-label', isFr() ? 'Bureau' : 'المكتب');
           setText('hero-office-spec', '');
-          setText('hero-desc', isFr() ? 'Aucun bureau sélectionné. Ouvrez un bureau depuis l’annuaire.' : 'لم يُحدَّد مكتب. افتح مكتباً من الدليل.');
+          setText('hero-desc', isFr() ? msgFr : msgAr);
+          setText('about-txt', isFr() ? msgFr : msgAr);
           setText('hc-name', '—');
           setText('hc-type', '—');
-          setText('about-txt', isFr() ? 'Les fiches bureaux s’affichent à partir des comptes réels uniquement.' : 'تُعرض صفحات المكاتب من الحسابات الحقيقية فقط.');
-          var svcs = document.getElementById('svc-list');
-          if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
-          ['trust-grid','about-stats','req-box'].forEach(function(cls){
+          setText('hero-tag1', '—');
+          setText('hero-tag2', '—');
+          setText('hero-tag3', '—');
+          setText('hero-tag4', '—');
+          setText('hero-rev-cnt', '');
+          setText('hc-clients', '—');
+          setText('stat-clients', '—');
+          setText('ab-clients', '—');
+          setText('map-addr', '—');
+          setText('contact-info-addr', '—');
+          var rating = document.getElementById('hero-rating');
+          if(rating) rating.textContent = '—';
+          var badge = document.getElementById('verified-badge');
+          if(badge) badge.style.display = 'none';
+          var ratingStrip = document.querySelector('.rating-strip');
+          if(ratingStrip) ratingStrip.style.display = 'none';
+          ['trust-grid','about-stats','req-box','hero-tags','stats-strip','rating-inline'].forEach(function(cls){
             document.querySelectorAll('.'+cls).forEach(function(el){ el.style.display='none'; });
           });
+          var svcs = document.getElementById('svc-list');
+          if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
+          var revs = document.getElementById('office-reviews-body');
+          if(revs) revs.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">'+(isFr()?"Aucun avis pour l'instant.":'لا توجد آراء حتى الآن.')+'</p>';
+          var browse = document.getElementById('act-browse-offices');
+          if(browse) browse.textContent = isFr() ? 'Parcourir les bureaux' : 'تصفّح المكاتب';
+          var countBadge = document.getElementById('svc-count-badge');
+          if(countBadge){ countBadge.removeAttribute('data-t'); countBadge.textContent = isFr() ? '—' : '—'; }
+          setText('stat-svcs', '—');
+        }
+        if(!id){
+          showEmptyOffice(
+            'لم يُحدَّد مكتب. افتح مكتباً من الدليل أو من قسم المكاتب في الصفحة الرئيسية.',
+            'Aucun bureau sélectionné. Ouvrez un bureau depuis l’annuaire.'
+          );
           return;
         }
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'office'; });
         if(!acc){
-          document.body.classList.add('rizq-empty-office');
-          setText('hero-office-name', isFr() ? 'Bureau' : 'مكتب');
-          setText('about-txt', isFr() ? 'Fiche introuvable.' : 'تعذر العثور على هذا المكتب.');
-          var svcs2 = document.getElementById('svc-list');
-          if(svcs2) svcs2.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
+          showEmptyOffice('تعذر العثور على هذا المكتب.', 'Fiche introuvable.');
           return;
         }
 
+        document.body.classList.remove('rizq-empty-office');
+
         // ── الهوية الأساسية ──
+        clearMock(['hero-office-name','hero-office-spec','hero-desc','hc-name','hc-type']);
         setText('hero-office-name', acc.name);
         setText('hero-office-spec', acc.activity);
         setText('hc-name', acc.name);
@@ -1476,9 +1536,10 @@ function openMaps(){
         // ── الموقع ──
         var addr = acc.address || acc.city || '';
         if(addr){
+          clearMock(['hero-tag1','map-addr','contact-info-addr']);
           setText('hero-tag1', '📍 ' + addr);
           setText('map-addr', addr);
-          setText('contact-info-addr', '📍 ' + addr);
+          setText('contact-info-addr', addr);
         }
 
         // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
@@ -1513,6 +1574,16 @@ function openMaps(){
                 + services.map(function(s){ return '<option>' + esc(s.name||'') + '</option>'; }).join('');
             }
             if(typeof initCalcServices === 'function') initCalcServices(); // إعادة بناء مقدّر التكلفة من الخدمات الحقيقية
+          } else {
+            var svcListEmpty = document.getElementById('svc-list');
+            if(svcListEmpty){
+              svcListEmpty.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">'+(isFr()?'Aucun service publié pour le moment.':'لا توجد خدمات معروضة بعد.')+'</p>';
+            }
+            var countBadgeEmpty = document.getElementById('svc-count-badge');
+            if(countBadgeEmpty){ countBadgeEmpty.removeAttribute('data-t'); countBadgeEmpty.textContent = '—'; }
+            setText('stat-svcs', '—');
+            setText('ab-svcs', '—');
+            if(typeof initCalcServices === 'function') initCalcServices();
           }
         }catch(e){}
 
@@ -1522,7 +1593,7 @@ function openMaps(){
           if(Array.isArray(hours) && hours.length){
             var dayFr = {'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
             var day1 = document.getElementById('hours-day1');
-            var card = day1 ? day1.closest('.contact-card') : null;
+            var card = document.getElementById('hours-card-el') || (day1 ? day1.closest('#location-card, .contact-card, .card') : null);
             if(card){
               var rowsHtml = hours.map(function(h){
                 var dayLbl = isFr() ? (dayFr[h.day]||h.day) : h.day;
@@ -1598,7 +1669,7 @@ function openMaps(){
                 if(acc.desc){ setText('hero-desc', acc.desc); setText('about-txt', acc.desc); }
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
-                if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr','📍 '+addr); }
+                if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr); }
                 if(typeof RizqSub!=='undefined'){
                   var b = RizqSub.getBadges(id);
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
@@ -1668,7 +1739,7 @@ function openMaps(){
               if(hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
                 var dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
                 var day1 = document.getElementById('hours-day1');
-                var card = day1 ? day1.closest('.contact-card') : null;
+                var card = document.getElementById('hours-card-el') || (day1 ? day1.closest('#location-card, .contact-card, .card') : null);
                 if(card){
                   var rowsHtml = hdata.hours.map(function(h){
                     var dayLbl = isFr() ? (dayFr[h.day]||h.day) : h.day;
@@ -1773,12 +1844,9 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_packages_config.js?v=13.3"></script>
-<script src="rizq_packages_ui.js?v=13.0"></script>
-<script src="rizq_agent.js"></script>
-<script src="rizq_manager_agent_config.js"></script>
-  <script src="rizq_video_ads.js"></script>
-  <script src="rizq_widget_embed.js"></script>
+<script src="rizq_packages_config.js?v=13.4"></script>
+<script src="rizq_packages_ui.js?v=13.1"></script>
+<script src="rizq_video_ads.js"></script>
   <!-- ═══ وكيل السكرتير الذكي — الباقة الماسية فقط ═══ -->
   <script src="rizq_secretary_agent.js"></script>
 
@@ -1789,11 +1857,11 @@ window._rizqProfile = (function() {
     <div class="pkg-section-head">
       <p style="font-size:12px;letter-spacing:2px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Office — الباقات</p>
       <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--navy);margin-bottom:10px"><span data-t="pkg-h2-pre">طوّر مكتبك بالباقة</span> <span style="color:var(--teal2)" data-t="pkg-h2-gold">المناسبة لك</span></h2>
-      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 3 أيام، ثم اختر الباقة التي تناسب نشاطك</p>
+      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام (حتى 3 خدمات)، ثم اختر الباقة التي تناسب نشاطك</p>
       <p style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 
-    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
+    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
   </div>
 </section>
 
@@ -1805,7 +1873,7 @@ window._rizqProfile = (function() {
         <div class="rizq-promo-mark" style="pointer-events:none"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -1824,21 +1892,21 @@ window._rizqProfile = (function() {
     <div>
       <h4 class="footer-col-title" id="rzq-ft-topcats">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_browse.html" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
       </ul>
     </div>
     <div>
-      <h4 class="footer-col-title" id="rzq-ft-help">المساعدة</h4>
+      <h4 class="rizq-help-title footer-col-title" id="rzq-ft-help">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_legal.html" id="rzq-ft-h1">مركز المساعدة</a></li>
+        <li><a href="rizq_help.html" id="rzq-ft-h1">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" id="rzq-ft-h2">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h3">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html#s2" id="rzq-ft-h3">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" id="rzq-ft-h4">الإبلاغ عن إعلان</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h5">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html#s10" id="rzq-ft-h5">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -1866,7 +1934,7 @@ window._rizqProfile = (function() {
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -1876,7 +1944,7 @@ window._rizqProfile = (function() {
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",
@@ -2026,8 +2094,7 @@ html{background:#071020!important}
 
 <!-- FIXED DISC PILL (left) -->
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
-  <script src="rizq_navbar.js"></script>
-<script src="rizq_messenger.js?v=16.2"></script>
+  <script src="rizq_messenger.js?v=16.2"></script>
 
 <script>
 /* ── ربط زر المراسلة الآمنة بـ RizqMessenger ── */
@@ -2035,7 +2102,7 @@ html{background:#071020!important}
   window.openChat = function(ad) {
     if (!window.RizqMessenger) return;
     var params   = new URLSearchParams(location.search);
-    var offId    = params.get('id') || params.get('office') || 'demo';
+    var offId    = params.get('id') || params.get('office') || '';
     var nameEl   = document.querySelector('.office-name, .biz-name, h1');
     var name     = nameEl ? nameEl.textContent.trim() : 'المكتب';
     RizqMessenger.open({

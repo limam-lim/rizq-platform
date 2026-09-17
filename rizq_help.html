@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>مركز المساعدة — رزق | Centre d'aide — Rizq</title>
+  <meta name="description" content="دليل واضح لاستخدام منصة رزق: التصفح، التسجيل، نشر الإعلان، وإدارة نشاطك."/>
+  <link rel="canonical" href="https://rizq.mr/rizq_help.html"/>
+  <link rel="icon" href="favicon.ico"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --royal:#1B3A6B; --royal-deep:#0f172a; --gold:#C9A84C; --gold-soft:#e8c96a;
+      --bg:#f5f7fb; --card:#fff; --text:#152033; --muted:#5b6b82; --line:#e4eaf5;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      background:
+        radial-gradient(1200px 420px at 100% -10%, rgba(201,168,76,.16), transparent 55%),
+        radial-gradient(900px 380px at 0% 0%, rgba(27,58,107,.10), transparent 50%),
+        var(--bg);
+      color:var(--text); line-height:1.75; min-height:100vh;
+    }
+    html[dir="rtl"] body{font-family:'Cairo',Tahoma,sans-serif}
+    html[dir="ltr"] body{font-family:'Manrope','Segoe UI',sans-serif}
+
+    .topbar{
+      position:sticky; top:0; z-index:40;
+      backdrop-filter:blur(10px);
+      background:rgba(15,23,42,.92);
+      border-bottom:1px solid rgba(201,168,76,.22);
+    }
+    .topbar-inner{
+      max-width:980px; margin:0 auto; padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .brand{display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#E8C96A}
+    .brand img{width:36px;height:36px;border-radius:9px;background:#0f172a}
+    .brand strong{display:block; font-size:15px; line-height:1.1}
+    .brand span{display:block; font-size:10px; letter-spacing:.12em; opacity:.75; text-transform:uppercase}
+    .top-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .lang-btn,.ghost-btn,.print-btn{
+      border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.06);
+      color:#fff; padding:8px 14px; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+      text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+    }
+    .lang-btn.on{background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#0f172a; border-color:transparent}
+    .print-btn{background:rgba(201,168,76,.16); border-color:rgba(201,168,76,.4); color:#E8C96A}
+
+    .wrap{max-width:980px; margin:0 auto; padding:22px 16px 56px}
+    .hero{
+      background:linear-gradient(145deg,#0f172a 0%, #1B3A6B 70%);
+      color:#fff; border-radius:20px; padding:28px 24px; margin-bottom:18px;
+      box-shadow:0 18px 40px rgba(15,35,65,.18);
+    }
+    .hero h1{font-size:clamp(1.45rem, 3vw, 2rem); margin-bottom:8px}
+    .hero p{color:rgba(255,255,255,.84); max-width:46rem; font-size:15px}
+    .toc{
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-top:18px;
+    }
+    .toc a{
+      text-decoration:none; color:#fff; background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:12px 14px; font-size:13px; font-weight:700;
+    }
+    .toc a:hover{background:rgba(201,168,76,.18); border-color:rgba(201,168,76,.35)}
+
+    section.card{
+      background:var(--card); border:1px solid var(--line); border-radius:16px;
+      padding:22px 20px; margin-bottom:16px; box-shadow:0 8px 24px rgba(15,35,65,.05);
+    }
+    section.card h2{color:var(--royal); font-size:1.2rem; margin-bottom:8px}
+    section.card h3{color:var(--royal); font-size:1rem; margin:14px 0 6px}
+    section.card p, section.card li{font-size:15px; color:#2b3a51}
+    section.card ul, section.card ol{margin:10px 1.2em 0}
+    section.card li{margin:5px 0}
+    .lead{color:var(--muted); font-size:14px; margin-bottom:10px}
+
+    .fig{margin:16px 0; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:#fafbff}
+    .fig img{display:block; width:100%; height:auto; background:#eef2ff}
+    .fig-cap{font-size:12px; color:var(--muted); padding:10px 14px; border-top:1px solid #eef2f8; background:#fff}
+
+    .steps{display:grid; gap:10px; margin-top:12px}
+    .step{
+      display:flex; gap:12px; align-items:flex-start; background:#f7f9fd;
+      border:1px solid #e8eef8; border-radius:12px; padding:12px 14px;
+    }
+    .step-num{
+      flex-shrink:0; width:28px; height:28px; border-radius:50%;
+      background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#0f172a;
+      font-weight:800; display:flex; align-items:center; justify-content:center; font-size:13px;
+    }
+    .note{
+      margin-top:12px; padding:12px 14px; border-radius:12px;
+      background:#fffbeb; border:1px solid #fde68a; font-size:14px; color:#78350f;
+    }
+    .tip{
+      margin-top:12px; padding:12px 14px; border-radius:12px;
+      background:#eff6ff; border:1px solid #bfdbfe; font-size:14px; color:#1e3a5f;
+    }
+    .grid-2{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:12px}
+    .mini{
+      background:#f8faff; border:1px solid var(--line); border-radius:12px; padding:14px;
+    }
+    .mini strong{display:block; color:var(--royal); margin-bottom:4px}
+    .mini span{font-size:13px; color:var(--muted)}
+
+    table{width:100%; border-collapse:collapse; margin-top:12px; font-size:14px}
+    th,td{border:1px solid var(--line); padding:10px 12px; text-align:start}
+    th{background:#f1f5f9; color:var(--royal)}
+
+    .cta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+    .cta-row a{
+      display:inline-flex; align-items:center; gap:6px; padding:10px 16px; border-radius:12px;
+      text-decoration:none; font-size:14px; font-weight:800;
+    }
+    .cta-primary{background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#0f172a}
+    .cta-outline{border:1.5px solid var(--royal); color:var(--royal); background:#fff}
+
+    footer{text-align:center; font-size:13px; color:var(--muted); margin-top:18px}
+    footer a{color:var(--royal); font-weight:700; text-decoration:none}
+
+    /* Language visibility — use revert so tables/lists keep correct display */
+    .ar-block,.fr-block{display:none}
+    html[lang="ar"] .ar-block{display:block}
+    html[lang="fr"] .fr-block{display:block}
+    html[lang="ar"] .ar-inline{display:inline}
+    html[lang="fr"] .fr-inline{display:inline}
+    html[lang="ar"] .fr-inline, html[lang="fr"] .ar-inline{display:none}
+    html[lang="ar"] table.ar-block{display:table}
+    html[lang="fr"] table.fr-block{display:table}
+
+
+    .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+    .flow-card{background:#f7f9fd;border:1px solid var(--line);border-radius:14px;padding:14px 12px;text-align:center;min-height:110px}
+    .flow-card .n{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold-soft));color:#0f172a;font-weight:800;font-size:13px;margin-bottom:8px}
+    .flow-card strong{display:block;color:var(--royal);font-size:14px;margin-bottom:4px}
+    .flow-card span{display:block;color:var(--muted);font-size:12px;line-height:1.45}
+    .split{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+    .split-card{border-radius:14px;padding:18px 16px;border:1px solid var(--line)}
+    .split-card.wait{background:#fffbeb;border-color:#fde68a}
+    .split-card.ready{background:#0f172a;color:#fff;border-color:#0f172a}
+    .split-card.ready strong{color:#E8C96A}
+    .split-card.ready p{color:rgba(255,255,255,.82)}
+    .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}
+    .type-card{border-radius:14px;padding:16px 12px;text-align:center;border:2px solid var(--line);background:#fff}
+    .type-card .ico{font-size:22px;font-weight:800;margin-bottom:6px}
+    .type-card strong{display:block;color:var(--royal);margin-bottom:4px}
+    .type-card span{font-size:12px;color:var(--muted)}
+
+    @media(max-width:640px){
+      .hero{padding:22px 16px}
+      section.card{padding:18px 14px}
+    }
+    @media print{
+      .topbar,.print-btn,.lang-btn,.ghost-btn,.cta-row{display:none!important}
+      body{background:#fff}
+      .hero{box-shadow:none}
+      section.card{break-inside:avoid; box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="rizq_landing_v8.html">
+        <img src="rizq-mark-512.png" width="36" height="36" alt="رزق"/>
+        <div>
+          <strong>رزق · Rizq</strong>
+          <span class="ar-inline">مركز المساعدة</span>
+          <span class="fr-inline">Centre d'aide</span>
+        </div>
+      </a>
+      <div class="top-actions">
+        <button type="button" class="lang-btn on" id="btn-ar" onclick="setHelpLang('ar')">العربية</button>
+        <button type="button" class="lang-btn" id="btn-fr" onclick="setHelpLang('fr')">Français</button>
+        <button type="button" class="print-btn" onclick="window.print()">
+          <span class="ar-inline">🖨️ طباعة الدليل</span>
+          <span class="fr-inline">🖨️ Imprimer</span>
+        </button>
+        <a class="ghost-btn" href="rizq_landing_v8.html">
+          <span class="ar-inline">← الرئيسية</span>
+          <span class="fr-inline">← Accueil</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="hero">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h1>📘 كيف تستخدم منصة رزق؟</h1>
+        <p>دليل بسيط للزوّار والبائعين: تصفّح الإعلانات، أنشئ حساباً، انشر إعلانك، وأدر نشاطك — بدون مصطلحات تقنية.</p>
+        <nav class="toc" aria-label="أقسام الدليل">
+          <a href="#browse">التصفح والبحث</a>
+          <a href="#register">إنشاء حساب</a>
+          <a href="#login">تسجيل الدخول</a>
+          <a href="#types">أنواع الحسابات</a>
+          <a href="#post">نشر إعلان</a>
+          <a href="#manage">إدارة نشاطك</a>
+          <a href="#safety">نصائح الأمان</a>
+          <a href="#faq">أسئلة شائعة</a>
+        </nav>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h1>📘 Comment utiliser Rizq ?</h1>
+        <p>Guide simple pour visiteurs et vendeurs : parcourir, créer un compte, publier, gérer votre activité — sans jargon technique.</p>
+        <nav class="toc" aria-label="Sections du guide">
+          <a href="#browse">Parcourir &amp; chercher</a>
+          <a href="#register">Créer un compte</a>
+          <a href="#login">Se connecter</a>
+          <a href="#types">Types de comptes</a>
+          <a href="#post">Publier une annonce</a>
+          <a href="#manage">Gérer votre activité</a>
+          <a href="#safety">Conseils de sécurité</a>
+          <a href="#faq">Questions fréquentes</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- BROWSE -->
+    <section class="card" id="browse">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>① التصفح والبحث</h2>
+        <p class="lead">للشراء أو الاستطلاع — لا تحتاج حساباً.</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>من الرئيسية اختر <strong>الأقسام</strong> أو افتح صفحة التصفح.</span></div>
+          <div class="step"><span class="step-num">2</span><span>ابحث بالكلمة، أو صفِّ حسب الولاية والسعر وتاريخ النشر وحالة المنتج.</span></div>
+          <div class="step"><span class="step-num">3</span><span>افتح الإعلان للتفاصيل، ثم تواصل مع البائع عبر الوسائل الظاهرة.</span></div>
+        </div>
+        <div class="cta-row">
+          <a class="cta-primary" href="rizq_browse.html">تصفح الإعلانات</a>
+          <a class="cta-outline" href="rizq_landing_v8.html">العودة للرئيسية</a>
+        </div>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>① Parcourir et chercher</h2>
+        <p class="lead">Pour acheter ou explorer — aucun compte requis.</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>Depuis l'accueil, ouvrez <strong>Catégories</strong> ou la page Parcourir.</span></div>
+          <div class="step"><span class="step-num">2</span><span>Recherchez par mot-clé, ou filtrez par wilaya, prix, date et état.</span></div>
+          <div class="step"><span class="step-num">3</span><span>Ouvrez l'annonce puis contactez le vendeur via les moyens affichés.</span></div>
+        </div>
+        <div class="cta-row">
+          <a class="cta-primary" href="rizq_browse.html">Parcourir les annonces</a>
+          <a class="cta-outline" href="rizq_landing_v8.html">Retour à l'accueil</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTER -->
+    <section class="card" id="register">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>② إنشاء حساب للبيع</h2>
+        <p class="lead">إذا أردت نشر إعلانات أو فتح محل/مكتب/شركة على رزق.</p>
+        <div class="flow" aria-label="خطوات بدء البيع">
+          <div class="flow-card"><div class="n">1</div><strong>إنشاء حساب</strong><span>من زر «حسابي»</span></div>
+          <div class="flow-card"><div class="n">2</div><strong>اختر النوع</strong><span>فرد · محل · مكتب · شركة</span></div>
+          <div class="flow-card"><div class="n">3</div><strong>انتظار التفعيل</strong><span>مراجعة قصيرة</span></div>
+          <div class="flow-card"><div class="n">4</div><strong>لوحة التحكم</strong><span>أضف منتجاتك أو إعلاناتك</span></div>
+          <div class="flow-card"><div class="n">5</div><strong>الظهور للزوار</strong><span>صفحتك العامة</span></div>
+        </div>
+        <p class="fig-cap">الشكل 1 — من إنشاء الحساب حتى ظهور نشاطك للزوّار</p>
+        <ol>
+          <li>اضغط <strong>حسابي</strong> ثم <strong>إنشاء حساب</strong>.</li>
+          <li>اختر النوع: فرد، محل، مكتب، أو شركة.</li>
+          <li>املأ البيانات المطلوبة وارفع صورة الهوية عند الطلب.</li>
+          <li>أرسل الطلب وانتظر رسالة التفعيل.</li>
+          <li>بعد التفعيل تدخل لوحة التحكم وتبدأ إضافة محتواك.</li>
+        </ol>
+        <div class="split">
+          <div class="split-card wait"><strong>⏳ طلبك قيد المراجعة</strong><p style="margin-top:8px;font-size:14px;color:#78350f">عادةً خلال وقت قصير. نشاطك لا يظهر للجمهور قبل التفعيل.</p></div>
+          <div class="split-card ready"><strong>بعد التفعيل</strong><p style="margin-top:8px;font-size:14px">حسابي → دخول البائع<br/>بالبريد وكلمة المرور<br/>ثم ابدأ إضافة محتواك</p></div>
+        </div>
+        <p class="fig-cap">الشكل 2 — بعد التسجيل ينتظر حسابك تفعيلًا قصيرًا قبل الدخول</p>
+        <div class="note">💡 لا يظهر نشاطك للجمهور قبل التفعيل. إذا تأخر الأمر، تواصل مع دعم رزق من الصفحة القانونية أو عبر قنوات التواصل الظاهرة في الموقع.</div>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>② Créer un compte vendeur</h2>
+        <p class="lead">Pour publier des annonces ou ouvrir une boutique / un bureau / une entreprise.</p>
+        <div class="flow" aria-label="Étapes pour vendre">
+          <div class="flow-card"><div class="n">1</div><strong>Créer un compte</strong><span>via « Mon compte »</span></div>
+          <div class="flow-card"><div class="n">2</div><strong>Choisir le type</strong><span>Particulier · Boutique · Bureau · Entreprise</span></div>
+          <div class="flow-card"><div class="n">3</div><strong>Activation</strong><span>Courte vérification</span></div>
+          <div class="flow-card"><div class="n">4</div><strong>Tableau de bord</strong><span>Ajoutez vos contenus</span></div>
+          <div class="flow-card"><div class="n">5</div><strong>Page publique</strong><span>Visible aux visiteurs</span></div>
+        </div>
+        <p class="fig-cap">Figure 1 — De la création du compte à la page publique</p>
+        <ol>
+          <li>Cliquez sur <strong>Mon compte</strong> puis <strong>Créer un compte</strong>.</li>
+          <li>Choisissez le type : particulier, boutique, bureau ou entreprise.</li>
+          <li>Remplissez les informations et ajoutez une pièce d'identité si demandé.</li>
+          <li>Envoyez la demande et attendez l'activation.</li>
+          <li>Après activation, ouvrez votre tableau de bord et ajoutez votre contenu.</li>
+        </ol>
+        <div class="split">
+          <div class="split-card wait"><strong>⏳ Demande en cours d'examen</strong><p style="margin-top:8px;font-size:14px;color:#78350f">Généralement rapide. Votre activité n'est pas publique avant activation.</p></div>
+          <div class="split-card ready"><strong>Après activation</strong><p style="margin-top:8px;font-size:14px">Mon compte → Connexion vendeur<br/>E-mail + mot de passe<br/>Puis ajoutez votre contenu</p></div>
+        </div>
+        <p class="fig-cap">Figure 2 — Après inscription, une courte activation est nécessaire</p>
+        <div class="note">💡 Votre activité n'est pas publique avant activation. En cas de délai, contactez le support Rizq via les canaux indiqués sur le site.</div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="card" id="login">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>③ تسجيل الدخول مرة أخرى</h2>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>من أي صفحة: <strong>حسابي → دخول البائع</strong>.</span></div>
+          <div class="step"><span class="step-num">2</span><span>أدخل البريد الإلكتروني وكلمة المرور اللذين سجّلت بهما.</span></div>
+          <div class="step"><span class="step-num">3</span><span>تُفتح لوحة التحكم المناسبة لنوع حسابك تلقائياً.</span></div>
+        </div>
+        <div class="tip">🔐 احفظ كلمة المرور في مكان آمن. لا تشارك رابط لوحة التحكم مع أحد.</div>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>③ Se reconnecter</h2>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>Depuis n'importe quelle page : <strong>Mon compte → Connexion vendeur</strong>.</span></div>
+          <div class="step"><span class="step-num">2</span><span>Saisissez l'e-mail et le mot de passe de votre inscription.</span></div>
+          <div class="step"><span class="step-num">3</span><span>Le bon tableau de bord s'ouvre automatiquement selon votre type de compte.</span></div>
+        </div>
+        <div class="tip">🔐 Conservez votre mot de passe en sécurité. Ne partagez pas le lien de votre tableau de bord.</div>
+      </div>
+    </section>
+
+    <!-- TYPES -->
+    <section class="card" id="types">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>④ أنواع الحسابات</h2>
+        <p class="lead">اختر ما يناسب نشاطك — كل نوع له لوحة وصفحة عامة مخصّصة.</p>
+        <div class="type-grid">
+          <div class="type-card" style="border-color:#1B3A6B"><div class="ico">أ</div><strong>أفراد</strong><span>إعلانات شخصية</span></div>
+          <div class="type-card" style="border-color:#C9A84C"><div class="ico">م</div><strong>محل</strong><span>منتجات ومتجر</span></div>
+          <div class="type-card" style="border-color:#16a34a"><div class="ico">ك</div><strong>مكتب</strong><span>خدمات مهنية</span></div>
+          <div class="type-card" style="border-color:#7c3aed"><div class="ico">ش</div><strong>شركة</strong><span>كتالوج ومعرض</span></div>
+        </div>
+        <p class="fig-cap">الشكل 3 — أربعة أنواع واضحة للاستخدام</p>
+        <table class="ar-block">
+          <thead><tr><th>النوع</th><th>لمن؟</th><th>ماذا تفعل بعد الدخول؟</th></tr></thead>
+          <tbody>
+            <tr><td>أفراد</td><td>بيع شخصي</td><td>انشر إعلانات مع صور وسعر</td></tr>
+            <tr><td>محل</td><td>تجارة منتجات</td><td>أضف منتجاتك وحدّث بيانات المتجر</td></tr>
+            <tr><td>مكتب</td><td>خدمات مهنية</td><td>اعرض خدماتك ومواعيد التواصل</td></tr>
+            <tr><td>شركة / معرض</td><td>مؤسسات ومعارض</td><td>ابنِ كتالوجاً أو معرضاً للجمهور</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>④ Types de comptes</h2>
+        <p class="lead">Choisissez selon votre activité — chaque type a son tableau de bord et sa page publique.</p>
+        <div class="type-grid">
+          <div class="type-card" style="border-color:#1B3A6B"><div class="ico">P</div><strong>Particulier</strong><span>Annonces personnelles</span></div>
+          <div class="type-card" style="border-color:#C9A84C"><div class="ico">B</div><strong>Boutique</strong><span>Produits &amp; magasin</span></div>
+          <div class="type-card" style="border-color:#16a34a"><div class="ico">U</div><strong>Bureau</strong><span>Services pro</span></div>
+          <div class="type-card" style="border-color:#7c3aed"><div class="ico">E</div><strong>Entreprise</strong><span>Catalogue / showroom</span></div>
+        </div>
+        <p class="fig-cap">Figure 3 — Quatre types d'usage clairs</p>
+        <table class="fr-block">
+          <thead><tr><th>Type</th><th>Pour qui ?</th><th>Après connexion</th></tr></thead>
+          <tbody>
+            <tr><td>Particulier</td><td>Vente personnelle</td><td>Publier des annonces avec photos et prix</td></tr>
+            <tr><td>Boutique</td><td>Commerce de produits</td><td>Ajouter des produits et mettre à jour la boutique</td></tr>
+            <tr><td>Bureau</td><td>Services professionnels</td><td>Présenter services et horaires</td></tr>
+            <tr><td>Entreprise</td><td>Sociétés / showrooms</td><td>Construire un catalogue ou un showroom</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- POST -->
+    <section class="card" id="post">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>⑤ نشر إعلان (حساب الأفراد)</h2>
+        <ol>
+          <li>من لوحة التحكم أو زر <strong>انشر إعلان</strong>.</li>
+          <li>اختر القسم والفرع، ثم اكتب عنواناً واضحاً ووصفاً صادقاً.</li>
+          <li>أضف السعر والصور (صور واضحة تزيد فرص البيع).</li>
+          <li>لقسم <strong>الخدمات</strong>: لا تحتاج حالة منتج ولا كمية.</li>
+          <li>خيارات مفيدة: قابل للتفاوض · عاجل · إخفاء رقم الهاتف.</li>
+          <li>بعد الإرسال يمرّ الإعلان بمراجعة قصيرة قبل الظهور الكامل.</li>
+        </ol>
+        <div class="cta-row">
+          <a class="cta-primary" href="rizq_post.html">انشر إعلانك</a>
+        </div>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>⑤ Publier une annonce (particulier)</h2>
+        <ol>
+          <li>Depuis le tableau de bord ou le bouton <strong>Publier</strong>.</li>
+          <li>Choisissez catégorie et sous-catégorie, puis un titre clair et une description honnête.</li>
+          <li>Ajoutez le prix et des photos nettes.</li>
+          <li>Pour <strong>Services</strong> : pas d'état produit ni de quantité.</li>
+          <li>Options utiles : négociable · urgent · masquer le téléphone.</li>
+          <li>Après envoi, une courte révision précède la publication complète.</li>
+        </ol>
+        <div class="cta-row">
+          <a class="cta-primary" href="rizq_post.html">Publier une annonce</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANAGE -->
+    <section class="card" id="manage">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>⑥ إدارة نشاطك بعد الدخول</h2>
+        <div class="grid-2">
+          <div class="mini"><strong>🏪 المحل</strong><span>أضف المنتجات مع الأسعار والصور، وحدّث اسم المتجر والوصف والعنوان.</span></div>
+          <div class="mini"><strong>🏢 المكتب</strong><span>اعرض خدماتك المهنية وساعات العمل ووسائل التواصل.</span></div>
+          <div class="mini"><strong>🏭 الشركة</strong><span>ابنِ كتالوجاً أو معرضاً، وحدّث الصفحة العامة بعد كل حفظ.</span></div>
+          <div class="mini"><strong>🎬 فيديو تعريفي</strong><span>من الملف الشخصي: الصق رابط يوتيوب أو فيسبوك ثم احفظ.</span></div>
+        </div>
+        <div class="split">
+          <div class="split-card wait"><strong>1) في لوحة التحكم</strong><p style="margin-top:8px;font-size:14px;color:#78350f">الملف الشخصي → الصق رابط يوتيوب أو فيسبوك → حفظ</p></div>
+          <div class="split-card ready"><strong>2) في صفحتك العامة</strong><p style="margin-top:8px;font-size:14px">يظهر مشغّل الفيديو للزوّار بعد الحفظ مباشرة</p></div>
+        </div>
+        <p class="fig-cap">الشكل 4 — الفيديو يظهر للزوّار بعد الحفظ</p>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>⑥ Gérer votre activité</h2>
+        <div class="grid-2">
+          <div class="mini"><strong>🏪 Boutique</strong><span>Ajoutez produits, prix et photos ; mettez à jour nom, description et adresse.</span></div>
+          <div class="mini"><strong>🏢 Bureau</strong><span>Présentez services, horaires et contacts.</span></div>
+          <div class="mini"><strong>🏭 Entreprise</strong><span>Construisez catalogue ou showroom, puis vérifiez la page publique.</span></div>
+          <div class="mini"><strong>🎬 Vidéo promo</strong><span>Dans le profil : collez un lien YouTube/Facebook puis enregistrez.</span></div>
+        </div>
+        <div class="split">
+          <div class="split-card wait"><strong>1) Dans le tableau de bord</strong><p style="margin-top:8px;font-size:14px;color:#78350f">Profil → coller un lien YouTube/Facebook → Enregistrer</p></div>
+          <div class="split-card ready"><strong>2) Sur votre page publique</strong><p style="margin-top:8px;font-size:14px">Le lecteur vidéo apparaît aux visiteurs après enregistrement</p></div>
+        </div>
+        <p class="fig-cap">Figure 4 — La vidéo apparaît après enregistrement</p>
+      </div>
+    </section>
+
+    <!-- SAFETY -->
+    <section class="card" id="safety">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>⑦ نصائح الأمان</h2>
+        <ul>
+          <li>قابل البائع/المشتري في مكان عام عند الإمكان.</li>
+          <li>لا ترسل أموالاً مقدّماً لشخص لا تعرفه.</li>
+          <li>تحقق من الصور والوصف قبل الاتفاق.</li>
+          <li>أبلغ عن أي إعلان مشبوه من صفحة الإعلان أو عبر التواصل القانوني.</li>
+          <li>لا تشارك كلمة المرور أو رموز الدخول مع أحد.</li>
+        </ul>
+        <div class="cta-row">
+          <a class="cta-outline" href="rizq_legal.html#s10">الإبلاغ والتواصل</a>
+          <a class="cta-outline" href="rizq_legal.html#s3">سياسة الخصوصية</a>
+        </div>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>⑦ Conseils de sécurité</h2>
+        <ul>
+          <li>Rencontrez-vous de préférence dans un lieu public.</li>
+          <li>N'envoyez pas d'argent à l'avance à un inconnu.</li>
+          <li>Vérifiez photos et description avant de conclure.</li>
+          <li>Signalez toute annonce suspecte via la page légale / contact.</li>
+          <li>Ne partagez jamais votre mot de passe.</li>
+        </ul>
+        <div class="cta-row">
+          <a class="cta-outline" href="rizq_legal.html#s10">Signaler / contact</a>
+          <a class="cta-outline" href="rizq_legal.html#s3">Confidentialité</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="card" id="faq">
+      <div class="ar-block" dir="rtl" lang="ar">
+        <h2>⑧ أسئلة شائعة</h2>
+        <h3>لماذا لا أستطيع الدخول بعد التسجيل؟</h3>
+        <p>الحساب يحتاج تفعيلًا قصيرًا. بعد الموافقة استخدم البريد وكلمة المرور من «دخول البائع».</p>
+        <h3>صفحتي العامة فارغة؟</h3>
+        <p>أضف منتجاتًا أو إعلانات من لوحة التحكم واحفظ. بعض الإعلانات تنتظر مراجعة قصيرة قبل الظهور.</p>
+        <h3>الفيديو لا يظهر؟</h3>
+        <p>تأكد أن الرابط عام وقابل للمشاهدة، ثم احفظ من الملف الشخصي وحدّث صفحتك العامة.</p>
+        <h3>هل الدليل هذا كافٍ؟</h3>
+        <p>نعم — هذا الدليل موجّه للزوّار والبائعين. اطبعه أو احفظ الصفحة من المتصفح عند الحاجة.</p>
+      </div>
+      <div class="fr-block" dir="ltr" lang="fr">
+        <h2>⑧ Questions fréquentes</h2>
+        <h3>Je ne peux pas me connecter après inscription ?</h3>
+        <p>Le compte nécessite une courte activation. Ensuite utilisez e-mail + mot de passe via « Connexion vendeur ».</p>
+        <h3>Ma page publique est vide ?</h3>
+        <p>Ajoutez du contenu depuis le tableau de bord et enregistrez. Certaines annonces passent une courte révision.</p>
+        <h3>La vidéo n'apparaît pas ?</h3>
+        <p>Vérifiez que le lien est public, enregistrez dans le profil, puis actualisez la page publique.</p>
+        <h3>Ce guide suffit-il ?</h3>
+        <p>Oui — il est conçu pour visiteurs et vendeurs. Imprimez ou enregistrez la page depuis le navigateur si besoin.</p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="ar-block" dir="rtl" lang="ar">© رزق — ADMINIA SARL · دليل استخدام المنصة · سبتمبر 2026</div>
+      <div class="fr-block" dir="ltr" lang="fr">© Rizq — ADMINIA SARL · Guide d'utilisation · Sept. 2026</div>
+      <div style="margin-top:8px"><a href="rizq_landing_v8.html"><span class="ar-inline">العودة إلى الرئيسية</span><span class="fr-inline">Retour à l'accueil</span></a></div>
+    </footer>
+  </div>
+
+  <script>
+  function setHelpLang(l){
+    var lang = (l === 'fr') ? 'fr' : 'ar';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    var ar = document.getElementById('btn-ar');
+    var fr = document.getElementById('btn-fr');
+    if(ar) ar.classList.toggle('on', lang === 'ar');
+    if(fr) fr.classList.toggle('on', lang === 'fr');
+    try{ localStorage.setItem('rizq_lang', lang); }catch(e){}
+    try{ document.title = lang === 'fr' ? "Centre d'aide — Rizq" : 'مركز المساعدة — رزق'; }catch(e2){}
+  }
+  try{
+    var q = new URLSearchParams(location.search).get('lang');
+    var s = (q === 'fr' || q === 'ar') ? q : localStorage.getItem('rizq_lang');
+    if(s === 'fr' || s === 'ar') setHelpLang(s);
+    else setHelpLang('ar');
+  }catch(e){ setHelpLang('ar'); }
+  </script>
+</body>
+</html>

@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=17.0"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -75,143 +75,105 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 }
 .cart-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,0.4)}
 /* شريط تسوق ثابت — بين الهيرو وأزرار التواصل، يلتصق بالهيدر عند التمرير */
-.store-shop-strip{
-  position:sticky;
-  top:var(--rizq-header-h,0);
-  z-index:45;
-  background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
-  border-top:3px solid var(--gold);
-  border-bottom:1px solid rgba(27,58,107,.1);
-  box-shadow:0 6px 20px rgba(15,35,65,.08);
-}
-.store-shop-strip-inner{
-  max-width:1280px;margin:0 auto;padding:12px 20px;
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-}
+/* أزرار المفضلة/السلة داخل صف التصنيفات — مباشرة بعد «الكل» */
 .sss-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  min-height:48px;padding:12px 16px;border-radius:12px;
-  font-family:inherit;font-size:14px;font-weight:800;
-  text-decoration:none;cursor:pointer;border:none;
-  transition:transform .2s,box-shadow .2s,filter .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  flex:0 0 auto;min-height:36px;padding:8px 14px;border-radius:20px;
+  font-family:inherit;font-size:12.5px;font-weight:800;
+  text-decoration:none;cursor:pointer;border:none;white-space:nowrap;
+  transition:transform .2s,box-shadow .2s,filter .2s,border-color .2s;
 }
 .sss-btn:active{transform:scale(.98)}
-.sss-ico{font-size:18px;line-height:1}
+.sss-ico{font-size:14px;line-height:1}
 .sss-count{
-  min-width:22px;height:22px;padding:0 6px;border-radius:999px;
-  font-size:11px;font-weight:900;
+  min-width:18px;height:18px;padding:0 5px;border-radius:999px;
+  font-size:10px;font-weight:900;
   display:inline-flex;align-items:center;justify-content:center;
 }
 .sss-wish{
   background:#fff;color:#1B3A6B;
-  border:2px solid rgba(27,58,107,.15);
+  border:1.5px solid rgba(27,58,107,.18);
 }
-.sss-wish:hover{border-color:rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(27,58,107,.08)}
+.sss-wish:hover{border-color:rgba(201,168,76,.55);box-shadow:0 3px 10px rgba(27,58,107,.08)}
 .sss-wish .sss-count{background:rgba(27,58,107,.08);color:#1B3A6B}
 .sss-cart{
   background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#0D1B2A;border:none;
-  box-shadow:0 6px 18px rgba(201,168,76,.3);
+  color:#0D1B2A;border:1.5px solid transparent;
+  box-shadow:0 3px 12px rgba(201,168,76,.28);
 }
-.sss-cart:hover{filter:brightness(1.03);box-shadow:0 8px 22px rgba(201,168,76,.4)}
+.sss-cart:hover{filter:brightness(1.03);box-shadow:0 5px 16px rgba(201,168,76,.4)}
 .sss-cart .sss-count{background:#0D1B2A;color:#E8C96A}
 .sss-count[hidden],.sss-count.is-empty{display:none!important}
-@media(max-width:800px){
-  .store-shop-strip-inner{padding:10px 12px;gap:8px}
-  .sss-btn{font-size:13px;padding:11px 10px}
-}
 
-/* ====== HERO / STORE COVER ====== */
-.store-hero{
-  position:relative;height:auto;min-height:0;overflow:visible;
-  background:linear-gradient(135deg,var(--navy2) 0%,var(--dark) 50%,var(--navy) 100%);
-  padding:0;
-}
-.hero-cover{
-  position:relative;inset:auto;
-  background:linear-gradient(135deg,
-    rgba(27,58,107,0.8) 0%,
-    rgba(201,168,76,0.15) 50%,
-    rgba(13,27,42,0.9) 100%);
-  display:flex;align-items:center;justify-content:center;
-  padding:28px 0 24px;
-  width:100%;
-  box-sizing:border-box;
-}
-.hero-pattern{
-  position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:
-    radial-gradient(circle at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(27,58,107,0.3) 0%, transparent 50%);
-}
-.store-profile{
-  display:flex;align-items:center;gap:24px;
-  position:relative;z-index:1;text-align:right;padding:20px;
-  flex-wrap:wrap;justify-content:center;
-}
-.store-logo-wrap{
-  width:110px;height:110px;border-radius:20px;
-  border:3px solid var(--gold);
-  background:rgba(0,0,0,0.4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:48px;flex-shrink:0;box-shadow:var(--shadow);
-  backdrop-filter:blur(10px);
-}
-.store-info{text-align:right}
-.store-name{font-size:30px;font-weight:900;color:var(--white);letter-spacing:1px;margin-bottom:6px}
-.store-tagline{font-size:15px;color:var(--gold);margin-bottom:10px}
-.store-meta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.store-meta span{
-  font-size:12px;color:rgba(255,255,255,0.75);
-  display:flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,0.25);padding:4px 10px;border-radius:20px;
-}
-.store-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.badge{
-  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
-  letter-spacing:1px;
-}
-.badge-open{background:rgba(46,204,113,0.2);color:var(--green);border:1px solid rgba(46,204,113,0.4)}
-.badge-delivery{background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.4)}
-.badge-pickup{background:rgba(27,58,107,0.4);color:#7aa0e0;border:1px solid rgba(27,58,107,0.6)}
+/* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
+.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#2a3a1f 0%,#1B3A6B 38%,#0D1B2A 100%);display:flex;flex-direction:column;justify-content:center}
+.store-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.22) 8deg,transparent 20deg,transparent 340deg,rgba(232,201,106,.14) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
+.hero-pattern{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 18% 30%,rgba(201,168,76,.16) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(27,58,107,.35) 0%,transparent 45%)}
+.store-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#E8C96A;box-shadow:0 0 8px 2px rgba(232,201,106,.8);animation:rzStGlint 3.4s ease-in-out infinite}
+.store-hero .hero-glints span:nth-child(1){top:18%;left:12%;animation-delay:.2s}
+.store-hero .hero-glints span:nth-child(2){top:30%;left:82%;animation-delay:1.1s}
+.store-hero .hero-glints span:nth-child(3){top:65%;left:22%;animation-delay:2s}
+.store-hero .hero-glints span:nth-child(4){top:55%;left:70%;animation-delay:.7s}
+.store-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
+@keyframes rzStGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
+.store-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(201,168,76,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.16) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55;z-index:0}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
+.store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:920px;width:auto;position:relative;z-index:1}
+.store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite}
+@keyframes rzStPulse{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.16),0 0 40px rgba(201,168,76,.55),0 8px 20px rgba(0,0,0,.5)}}
+.store-info{flex:0 1 auto;min-width:0;text-align:start}
+.store-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#E8C96A;margin-bottom:8px;display:block}
+.store-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;margin-bottom:0;background:linear-gradient(100deg,#fff 30%,#F5DFA0 45%,#C9A84C 50%,#F5DFA0 55%,#fff 70%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rzStShimmer 5s linear infinite}
+@keyframes rzStShimmer{0%{background-position:0% center}100%{background-position:-220% center}}
+.store-tagline{font-size:14.5px;color:rgba(255,255,255,.68);margin-top:10px;padding-top:12px;border-top:1px solid rgba(201,168,76,.3);display:inline-block}
+.store-meta{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.store-meta span{font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;background:transparent;padding:0;border-radius:0}
+.store-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.badge{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(6px);letter-spacing:0}
+.badge-open{background:rgba(46,204,113,.15);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
+.badge-delivery{background:rgba(201,168,76,.15);color:#C9A84C;border:1px solid rgba(201,168,76,.3)}
+.badge-pickup{background:rgba(27,58,107,.4);color:#7aa0e0;border:1px solid rgba(122,160,224,.35)}
+.store-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzStBounce 2s ease-in-out infinite}
+@keyframes rzStBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+@media(max-width:640px){.store-hero{min-height:clamp(240px,48vh,320px)}.hero-cover{padding:40px 16px 32px}.store-logo-wrap{width:76px;height:76px;font-size:34px}.store-hero .hero-floor{display:none}}
+@media(max-width:900px){.store-profile{flex-direction:column;text-align:center}.store-info{text-align:center}.store-badges,.store-meta{justify-content:center}}
+
+
 
 /* ====== STORE ACTIONS BAR ====== */
 .actions-bar{
-  background:linear-gradient(180deg,#ffffff 0%,#f7f9fc 100%);
-  border-bottom:1px solid rgba(27,58,107,.08);
-  padding:0 24px;
-  box-shadow:0 8px 24px rgba(15,35,65,.04);
+  background:linear-gradient(135deg,#0F2347,#0D1B2A);
+  border-bottom:1px solid rgba(201,168,76,.28);
+  padding:14px 20px;
+  box-shadow:0 6px 18px rgba(0,0,0,.2);
 }
 .actions-bar-inner{
-  max-width:1280px;margin:0 auto;
+  max-width:1100px;margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 0;gap:16px;flex-wrap:wrap;
+  gap:12px;flex-wrap:wrap;
 }
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .action-btn{
-  display:flex;align-items:center;gap:8px;
-  padding:11px 18px;border-radius:12px;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 20px;border-radius:10px;
   font-size:13px;font-weight:800;cursor:pointer;
   transition:all .25s;text-decoration:none;font-family:inherit;border:none;
-  box-shadow:0 2px 10px rgba(15,35,65,.06);
 }
 .action-btn svg{width:16px;height:16px;flex-shrink:0}
 .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .btn-whatsapp:hover{background:#1da851;transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,0.35)}
-.btn-call{background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff}
-.btn-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(15,35,71,.28)}
-.btn-chat{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
-.btn-chat:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
-.btn-share{background:#fff;color:var(--navy);border:1px solid #d0d8e8}
-.btn-share:hover{background:#f0f3f8;border-color:rgba(201,168,76,.45)}
-.store-rating{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 14px;border-radius:999px;
-  background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);
-}
-.stars{color:#F5A623;font-size:17px;letter-spacing:2px}
-.rating-text{font-size:14px;font-weight:700;color:#1a2a3a}
-.rating-count{font-size:12px;color:#6a7a8a}
+.btn-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.btn-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
+.btn-email{background:transparent;color:#7dd3fc;border:1.5px solid rgba(125,211,252,.55)}
+.btn-email:hover{background:rgba(125,211,252,.12);border-color:#7dd3fc}
+.btn-share{background:transparent;color:#e8eef8;border:1.5px solid rgba(255,255,255,.35)}
+.btn-share:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.55)}
+.btn-chat{background:transparent;color:#E8C96A;border:1.5px solid rgba(201,168,76,.75)}
+.btn-chat:hover{background:rgba(201,168,76,.12);border-color:#E8C96A}
+.store-rating{display:flex;align-items:center;gap:8px}
+.stars{color:#F5A623;font-size:14px;letter-spacing:1px}
+.rating-text{font-size:20px;font-weight:900;color:#fff}
+.rating-count{font-size:11px;color:rgba(255,255,255,.5)}
 
 /* ====== MAIN CONTENT ====== */
 .main-wrap{
@@ -261,8 +223,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .info-row{
   display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
   padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
-  text-align:start!important;direction:rtl!important;
+  text-align:start!important;direction:inherit!important;
 }
+html[dir="rtl"] .info-row{direction:rtl!important}
+html[dir="ltr"] .info-row{direction:ltr!important}
 .info-row:last-child{border-bottom:none}
 .info-row .info-icon{font-size:16px;flex-shrink:0;margin-top:1px;order:0}
 .info-row > div{flex:0 1 auto!important;min-width:0;max-width:100%;text-align:start!important;margin-inline-start:0!important;margin-inline-end:auto!important;order:0}
@@ -288,14 +252,20 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .hours-row{
   display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
   gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
-  text-align:start!important;direction:rtl!important;
+  text-align:start!important;direction:inherit!important;
 }
+html[dir="rtl"] .hours-row{direction:rtl!important}
+html[dir="ltr"] .hours-row{direction:ltr!important}
 .hours-row:last-child{border-bottom:none}
 .hours-day{color:#6a7a8a;min-width:4.8em;flex:0 0 auto!important;text-align:start!important}
 .hours-time,.hours-closed{font-weight:700;flex:0 0 auto!important;margin-inline-start:0!important;margin-inline-end:auto!important}
 .hours-time{color:var(--navy)}
 .hours-closed{color:var(--red)}
-#info-section,#info-section .info-card{text-align:start!important;direction:rtl!important}
+#info-section,#info-section .info-card{text-align:start!important;direction:inherit!important}
+html[dir="rtl"] #info-section,
+html[dir="rtl"] #info-section .info-card{direction:rtl!important}
+html[dir="ltr"] #info-section,
+html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 /* Reviews */
 .review-item{padding:14px 0;border-bottom:1px solid #f0f3f8}
 .review-item:last-child{border-bottom:none}
@@ -558,9 +528,9 @@ footer{
   .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
-  .store-hero{height:auto;min-height:0;padding:0;overflow:visible}
-  .hero-cover{padding:20px 0 16px}
-  .store-logo-wrap{width:84px;height:84px;font-size:36px;border-radius:16px}
+  .store-hero{height:auto;min-height:clamp(240px,48vh,320px);padding:0;overflow:hidden}
+  .hero-cover{padding:40px 16px 32px}
+  .store-logo-wrap{width:76px;height:76px;font-size:34px;border-radius:50%}
   .store-name{font-size:22px}
   .store-tagline{font-size:13px}
   .store-profile{flex-direction:column;text-align:center;gap:14px;padding:12px 16px}
@@ -798,7 +768,7 @@ footer{
 </style>
   
   <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js?v=16.3"></script>
+  <script src="rizq_i18n.js?v=16.5"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_announcements.js"></script>
   <script src="rizq_reviews_engine.js"></script>
@@ -814,7 +784,7 @@ footer{
 <script src="rizq_ux_polish.js?v=17.4"></script>
 </head>
 <body data-t-ns="store">
-<button class="btn-lang" id="lang-btn">FR</button>
+<button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -865,10 +835,14 @@ footer{
 <!-- STORE HERO -->
 <div class="store-hero" id="store-hero">
   <div class="hero-pattern"></div>
+  <div class="hero-beams"></div>
+  <div class="hero-floor"></div>
+  <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
   <div class="hero-cover">
     <div class="store-profile">
       <div class="store-logo-wrap" id="store-logo-wrap">🏪</div>
       <div class="store-info">
+        <span class="store-eyebrow">✨ RIZQ STORES</span>
         <div class="store-name" id="store-name-el">—</div>
         <div class="store-tagline" id="store-tagline-el"></div>
         <div class="store-meta">
@@ -887,46 +861,32 @@ footer{
       </div>
     </div>
   </div>
-</div>
-
-<!-- شريط السلة والمفضلة — ثابت تحت الهيرو -->
-<div class="store-shop-strip" role="navigation" aria-label="السلة والمفضلة">
-  <div class="store-shop-strip-inner">
-    <button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="المفضلة" data-t="nav-wish">
-      <span class="sss-ico" aria-hidden="true">❤</span>
-      <span data-t="nav-wish-label">المفضلة</span>
-      <span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>
-    </button>
-    <a class="sss-btn sss-cart" href="rizq_cart.html" title="السلة" data-t="cart-label">
-      <span class="sss-ico" aria-hidden="true">🛒</span>
-      <span data-t="cart-label-text">السلة</span>
-      <span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>
-    </a>
-  </div>
+  <div class="hero-scroll-cue">⌄</div>
 </div>
 
 <!-- ACTIONS BAR -->
 <div class="actions-bar">
   <div class="actions-bar-inner">
     <div class="action-btns">
-      <!-- بوابة تسجيل (طلب Limam 13/08/2026): rizqGateLink()/rizqRequireAuth()
-           من rizq_auth_gate.js — تمنع فتح الرابط/تنفيذ الفعل فوراً إن كان
-           الزائر غير مسجَّل، تفتح نافذة تسجيل سريعة، ثم تتابع تلقائياً. -->
+      <a class="action-btn btn-call" id="store-call-top" href="#" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
+        <span data-t="btn-call">اتصال</span>
+      </a>
       <a class="action-btn btn-whatsapp" id="store-wa-top"
          href="#"
          target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.14-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.8h-.01a9.87 9.87 0 01-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37A9.86 9.86 0 012.54 11.9C2.54 6.45 6.98 2.02 12.43 2.02a9.82 9.82 0 016.99 2.9 9.83 9.83 0 012.89 6.99c0 5.45-4.44 9.88-9.89 9.88zm8.41-18.3A11.82 11.82 0 0012.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 005.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.49-8.41z"/></svg>
         <span data-t="btn-whatsapp">واتساب</span>
       </a>
-      <a class="action-btn btn-call" id="store-call-top" href="#" dir="ltr" style="direction:ltr;unicode-bidi:isolate;white-space:nowrap" onclick="return rizqGateLink(this,event,'reasonPhone')">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>
-        <span data-t="btn-call">اتصال مباشر</span>
+      <a class="action-btn btn-email" id="store-email-top" href="mailto:" onclick="return rizqGateLink(this,event,'reasonGeneric')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+        <span data-t="btn-email">إيميل</span>
       </a>
-      <button class="action-btn btn-share" onclick="shareStore()" data-t="btn-share">📤 مشاركة</button>
       <button class="action-btn btn-chat" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
-        <span data-t="btn-chat">محادثة على رزق</span>
+        <span data-t="btn-chat">محادثة</span>
       </button>
+      <button class="action-btn btn-share" onclick="shareStore()" data-t="btn-share">📤 مشاركة</button>
     </div>
     <div class="store-rating">
       <div class="stars" id="store-ab-stars">☆☆☆☆☆</div>
@@ -1014,9 +974,19 @@ footer{
     <main>
 <!-- Rizq Intermediary Notice -->
 
-      <!-- Category tabs -->
+      <!-- Category tabs — الكل ثم المفضلة ثم السلة -->
       <div class="cat-tabs" id="cat-tabs-el" role="tablist">
         <button class="cat-tab active" onclick="filterCat(this,'all')" data-t="cat-all">الكل</button>
+        <button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="المفضلة" data-t="nav-wish">
+          <span class="sss-ico" aria-hidden="true">❤</span>
+          <span data-t="nav-wish-label">المفضلة</span>
+          <span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>
+        </button>
+        <a class="sss-btn sss-cart" href="rizq_cart.html" title="السلة" data-t="cart-label">
+          <span class="sss-ico" aria-hidden="true">🛒</span>
+          <span data-t="cart-label-text">السلة</span>
+          <span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>
+        </a>
       </div>
 
       <!-- Products — filled from store_products_{id} / API -->
@@ -1056,7 +1026,7 @@ footer{
     <div style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Stores — الباقات</p>
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(24px,3vw,36px);font-weight:700;color:#16263d;margin-bottom:10px"><span data-t="pkg-title-pre">افتح محلك بالباقة</span> <span style="color:var(--gold)" data-t="pkg-title-gold">المناسبة لك</span></h2>
-      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 3 أيام، ثم اختر الباقة التي تناسب نشاطك — الأسعار والمميزات قابلة للتحديث من لوحة التحكم</p>
+      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك — الأسعار والمميزات قابلة للتحديث من لوحة التحكم</p>
       <p id="mru-note-store" style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-store-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 
@@ -1285,7 +1255,7 @@ function rizqShare(title, url) {
         <div class="rizq-promo-mark" style="pointer-events:none"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">شبكات مدعومة:</span>
         <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
@@ -1304,21 +1274,21 @@ function rizqShare(title, url) {
     <div>
       <h4 class="footer-col-title" id="rzq-ft-topcats">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_browse.html" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
-        <li><a href="rizq_browse.html" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c1">🏠 منازل وعقارات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" id="rzq-ft-c2">🚗 سيارات وقطع غيار</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%B4%D8%A7%D8%AD%D9%86%D8%A7%D8%AA" id="rzq-ft-c3">🚛 شاحنات ومعدات</a></li>
+        <li><a href="rizq_browse.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" id="rzq-ft-c4">📱 هواتف وإلكترونيات</a></li>
+        <li><a href="rizq_browse.html?cat=%D9%85%D8%A7%D8%B4%D9%8A%D8%A9" id="rzq-ft-c5">🐄 ماشية وحيوانات</a></li>
       </ul>
     </div>
     <div>
-      <h4 class="footer-col-title" id="rzq-ft-help">المساعدة</h4>
+      <h4 class="rizq-help-title footer-col-title" id="rzq-ft-help">المساعدة</h4>
       <ul class="footer-links">
-        <li><a href="rizq_legal.html" id="rzq-ft-h1">مركز المساعدة</a></li>
+        <li><a href="rizq_help.html" id="rzq-ft-h1">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" id="rzq-ft-h2">سياسة الخصوصية</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h3">شروط الاستخدام</a></li>
+        <li><a href="rizq_legal.html#s2" id="rzq-ft-h3">شروط الاستخدام</a></li>
         <li><a href="rizq_legal.html#s10" id="rzq-ft-h4">الإبلاغ عن إعلان</a></li>
-        <li><a href="rizq_legal.html" id="rzq-ft-h5">تواصل معنا</a></li>
+        <li><a href="rizq_legal.html#s10" id="rzq-ft-h5">تواصل معنا</a></li>
       </ul>
     </div>
     <div>
@@ -1346,7 +1316,7 @@ function rizqShare(title, url) {
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 16 catégories, 120+ sous-catégories, des millions d'opportunités.",
+    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
     quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -1356,7 +1326,7 @@ function rizqShare(title, url) {
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 16 قسماً، 120+ فرعاً، ملايين الفرص.",
+    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
     netlabel:"شبكات مدعومة:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",
@@ -1610,7 +1580,7 @@ function rizqShare(title, url) {
         if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
         var emailEl = document.getElementById('info-value-email-el');
         if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
-        ['store-wa-top','store-call-top'].forEach(function(btnId){
+        ['store-wa-top','store-call-top','store-email-top','hub-wa-top','hub-call-top','hub-email-top'].forEach(function(btnId){
           var el = document.getElementById(btnId);
           if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
         });
@@ -1620,14 +1590,18 @@ function rizqShare(title, url) {
       if(waSrc){
         var waNum = String(waSrc).replace(/[^0-9]/g,'');
         setHref('store-wa-top', 'https://wa.me/' + waNum);
+        setHref('hub-wa-top', 'https://wa.me/' + waNum);
       }
       if(phone){
         setHref('store-call-top', 'tel:' + String(phone).replace(/\s/g,''));
+        setHref('hub-call-top', 'tel:' + String(phone).replace(/\s/g,''));
         var phoneEl2 = document.getElementById('info-value-phone-el');
         if(phoneEl2){ phoneEl2.textContent = phone; phoneEl2.classList.remove('rzq-contact-masked'); phoneEl2.onclick = null; }
       }
       if(email){
         setText('info-value-email-el', email);
+        setHref('store-email-top', 'mailto:' + email);
+        setHref('hub-email-top', 'mailto:' + email);
         var emailEl2 = document.getElementById('info-value-email-el');
         if(emailEl2){ emailEl2.classList.remove('rzq-contact-masked'); emailEl2.onclick = null; }
       }
@@ -1750,9 +1724,7 @@ function rizqShare(title, url) {
             }
 
             if(tabsEl && cats.length){
-              var allLbl = isFr() ? 'Tout' : 'الكل';
-              tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">' + allLbl + '</button>'
-                + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\'' + esc(c).replace(/'/g,"\\'") + '\')">' + esc(c) + '</button>'; }).join('');
+              renderStoreCatTabs(tabsEl, cats, isFr());
             }
           }
         }catch(e){}
@@ -1910,9 +1882,7 @@ function rizqShare(title, url) {
                   grid.insertAdjacentHTML('beforeend', addedHtml);
                 }
                 if(tabsEl && cats.length){
-                  var allLbl = isFr()?'Tout':'الكل';
-                  tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">'+allLbl+'</button>'
-                    + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\''+esc(c).replace(/'/g,"\\'")+'\')">'+esc(c)+'</button>'; }).join('');
+                  renderStoreCatTabs(tabsEl, cats, isFr());
                 }
               }
             }
@@ -2025,10 +1995,7 @@ window._rizqProfile = (function() {
 </script>
 <script src="rizq_packages_config.js?v=13.3"></script>
 <script src="rizq_packages_ui.js?v=16.1"></script>
-<script src="rizq_agent.js"></script>
-<script src="rizq_manager_agent_config.js"></script>
-  <script src="rizq_video_ads.js"></script>
-  <script src="rizq_widget_embed.js"></script>
+<script src="rizq_video_ads.js"></script>
   <!-- ═══ وكيل السكرتير الذكي — الباقة الماسية فقط ═══ -->
   <script src="rizq_secretary_agent.js"></script>
 <style id="rzq-footer-css">
@@ -2164,7 +2131,35 @@ function showToast(msg, type){
   setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.parentNode&&t.parentNode.removeChild(t);},300);},2800);
 }
 
-/* Filter products by category tab */
+/* Filter products by category tab — أزرار المفضلة/السلة تبقى مباشرة بعد «الكل» */
+function storeShopBtnsHtml(fr){
+  var wishLbl = fr ? 'Favoris' : 'المفضلة';
+  var cartLbl = fr ? 'Panier' : 'السلة';
+  return ''
+    + '<button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="'+wishLbl+'" data-t="nav-wish">'
+    + '<span class="sss-ico" aria-hidden="true">❤</span>'
+    + '<span data-t="nav-wish-label">'+wishLbl+'</span>'
+    + '<span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>'
+    + '</button>'
+    + '<a class="sss-btn sss-cart" href="rizq_cart.html" title="'+cartLbl+'" data-t="cart-label">'
+    + '<span class="sss-ico" aria-hidden="true">🛒</span>'
+    + '<span data-t="cart-label-text">'+cartLbl+'</span>'
+    + '<span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>'
+    + '</a>';
+}
+function renderStoreCatTabs(tabsEl, cats, fr){
+  if(!tabsEl) return;
+  var allLbl = fr ? 'Tout' : 'الكل';
+  var list = Array.isArray(cats) ? cats : [];
+  tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')" data-t="cat-all">'+allLbl+'</button>'
+    + storeShopBtnsHtml(!!fr)
+    + list.map(function(c){
+        var safe = String(c).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'");
+        return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+String(c).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</button>';
+      }).join('');
+  if(typeof updateCartCount === 'function') updateCartCount();
+  if(typeof _renderWishUI === 'function') _renderWishUI();
+}
 function filterCat(btn, cat){
   // Update tab active state
   document.querySelectorAll('.cat-tab').forEach(function(b){b.classList.remove('active');});
@@ -2237,7 +2232,7 @@ if(typeof _t2 === 'undefined'){
     'badge-verified':'✅ Boutique vérifiée',
     'badge-premium':'🏅 Boutique premium',
     'btn-whatsapp':'WhatsApp','meta-location':'📍 —',
-    'btn-call':'Appel direct','btn-chat':'Discussion sur Rizq','btn-share':'📤 Partager','rating-count':'',
+    'btn-call':'Appel','btn-email':'Email','btn-chat':'Discussion','btn-share':'📤 Partager','rating-count':'',
     'store-empty-title':'Aucune boutique sélectionnée',
     'store-empty-desc':'Choisissez une boutique dans la liste ou ouvrez le lien direct pour voir les produits et les contacts.',
     'store-empty-cta':'Parcourir les boutiques',
@@ -2271,10 +2266,10 @@ if(typeof _t2 === 'undefined'){
     'pkg-eyebrow':'ABONNEMENTS','pkg-title-pre':'Rejoignez','pkg-title-gold':'Rizq',
     'pkg-desc':'Choisissez la formule qui correspond à votre boutique',
     'mru-note-store-text':'Prix en Ouguiya officiel depuis 2018 · ',
-    'pkg-trial-name':'Essai','pkg-trial-price':'Gratuit','pkg-trial-period':'3 jours',
+    'pkg-trial-name':'Essai','pkg-trial-price':'Gratuit','pkg-trial-period':'10 jours',
     'pkg-trial-feat1':'✓ 5 produits max','pkg-trial-feat2':'✓ Page boutique basique',
     'pkg-trial-feat3':'✓ 1 photo par produit',
-    'trial-cta':"Commencer l'essai gratuit — 3 jours",
+    'trial-cta':"Commencer l'essai gratuit — 10 jours",
     'pkg-trial-btn':'Commencer gratuitement',
     'pkg-basic-name':'Basique','pkg-period-monthly':'/ mois',
     'pkg-basic-feat1':'✓ 30 produits','pkg-basic-feat2':'✓ Page boutique complète',
@@ -2320,11 +2315,16 @@ if(typeof _t2 === 'undefined'){
     _setNavOrder(isFr);
     document.documentElement.lang = lang;
     document.documentElement.dir = isFr ? 'ltr' : 'rtl';
-    // Apply data-t — إصلاح: كانت تُترجَم فقط عند الذهاب للفرنسية، ولا
-    // تُستعاد للعربية عند الرجوع (نص فرنسي يبقى عالقاً بعد تبديلتين).
+    // If RizqI18n already translated [data-t], only restore/apply store-specific extras.
+    var i18nOwnsStatic = !!(window.RizqI18n && typeof window.RizqI18n.t === 'function');
     document.querySelectorAll('[data-t]').forEach(function(el){
       var key = el.getAttribute('data-t');
-      if(!el.hasAttribute('data-t-ar')) el.setAttribute('data-t-ar', el.innerHTML);
+      if(!el.hasAttribute('data-t-ar')){
+        var cur = el.innerHTML;
+        // Never cache FR text as the Arabic original.
+        if(isFr && cur && !/[\u0600-\u06FF]/.test(cur) && /[A-Za-zÀ-ÿ]/.test(cur)) { /* skip */ }
+        else el.setAttribute('data-t-ar', cur);
+      }
       if(isFr){
         var frVal = STORE_FR[key];
         if(!frVal && window.RizqI18n && typeof window.RizqI18n.t === 'function'){
@@ -2332,13 +2332,23 @@ if(typeof _t2 === 'undefined'){
         }
         if(frVal && /[\u0600-\u06FF]/.test(frVal)) frVal = '';
         if(frVal) el.innerHTML = frVal;
-      } else {
+      } else if(el.hasAttribute('data-t-ar')) {
         el.innerHTML = el.getAttribute('data-t-ar');
       }
     });
     // Lang button
-    var btn = document.getElementById('lang-btn');
-    if(btn) btn.textContent = isFr ? 'AR' : 'FR';
+    var btn = document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
+    if(btn && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
+      window.RizqI18n.paintPrimaryLangBtn(btn, isFr ? 'fr' : 'ar');
+    } else if(btn) {
+      btn.classList.add('btn-lang','btn-lang-primary');
+      btn.setAttribute('dir','ltr');
+      btn.innerHTML = '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      btn.setAttribute('data-active-lang', isFr ? 'fr' : 'ar');
+      var frEl = btn.querySelector('.lang-fr'), arEl = btn.querySelector('.lang-ar');
+      if (frEl) frEl.style.color = isFr ? '#C9A84C' : '#ffffff';
+      if (arEl) arEl.style.color = isFr ? '#ffffff' : '#C9A84C';
+    }
     // Disclaimer nav badge
     var nd = document.getElementById('nav-disclaimer-txt');
     if(nd) nd.textContent = isFr ? '⚖️ Rizq = diffuseur uniquement — vérifiez avant paiement' : '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
@@ -2427,8 +2437,7 @@ if(typeof _t2 === 'undefined'){
 <!-- FIXED DISC PILL (left) -->
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
 
-  <script src="rizq_navbar.js"></script>
-<script src="rizq_messenger.js?v=16.2"></script>
+  <script src="rizq_messenger.js?v=16.2"></script>
 
 <script>
 /* ── ربط زر المراسلة الآمنة بـ RizqMessenger ── */

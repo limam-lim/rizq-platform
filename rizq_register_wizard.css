@@ -1,5 +1,5 @@
 /**
- * rizq_register_wizard.css  v6.0
+ * rizq_register_wizard.css  v6.6
  * ─────────────────────────────────────────────────────────────
  * هاتف  (≤768px) : شريط علوي (شعار + FR|AR) + شريط سفلي أيقونات
  * كمبيوتر/تابلت (≥769px) : صفحة كاملة فاتحة — شريط علوي داكن كـ #nav
@@ -144,12 +144,87 @@ html[dir='ltr'] .reg-step:not(:last-child)::after  { left: 50%; right: auto; }
 #modal.reg-wizard-mode .m-input { background: #fff !important; border: 1.5px solid #e2e8f0 !important; color: #1a2535 !important; border-radius: 12px !important; margin-bottom: 12px; }
 #modal.reg-wizard-mode .m-input::placeholder { color: #94a3b8 !important; }
 #modal.reg-wizard-mode .m-input:focus { border-color: #c9a84c !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(201,168,76,0.1) !important; }
+
+/* عربية RTL: حقول النص العربي من اليمين — الهاتف/البريد/كلمة السر تبقى LTR */
+html[dir="rtl"] #modal.reg-wizard-mode .modal-box,
+html[dir="rtl"] #modal.reg-wizard-mode .reg-progress-bar {
+  direction: rtl !important;
+  text-align: right !important;
+}
+html[dir="rtl"] #modal.reg-wizard-mode .m-input:not([type="tel"]):not([type="email"]):not([type="password"]):not([type="number"]):not([id*="phone"]):not([id*="Phone"]):not([id*="email"]):not([id*="Email"]):not([id*="pw"]):not([id*="nni"]):not([id*="Nni"]) {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext;
+}
+html[dir="rtl"] #modal.reg-wizard-mode label,
+html[dir="rtl"] #modal.reg-wizard-mode .rwz-label,
+html[dir="rtl"] #modal.reg-wizard-mode h3,
+html[dir="rtl"] #modal.reg-wizard-mode p {
+  text-align: right !important;
+}
+html[dir="ltr"] #modal.reg-wizard-mode .modal-box,
+html[dir="ltr"] #modal.reg-wizard-mode .reg-progress-bar {
+  direction: ltr !important;
+  text-align: left !important;
+}
+html[dir="ltr"] #modal.reg-wizard-mode .m-input:not([type="tel"]):not([type="email"]):not([type="password"]):not([type="number"]) {
+  direction: ltr !important;
+  text-align: left !important;
+}
 #modal.reg-wizard-mode .m-eye { color: #94a3b8 !important; }
 #modal.reg-wizard-mode .m-btn-main       { margin-top:8px; border-radius:12px; }
 #modal.reg-wizard-mode .m-link-btn       { color:#1b3a6b !important; margin-top:12px; display:inline-block; width:100%; text-align:center; }
 #modal.reg-wizard-mode .modal-auth-tabs  { background:#f1f5f9 !important; border-color:#e2e8f0 !important; }
 #modal.reg-wizard-mode .modal-auth-tab        { color:#64748b !important; }
-#modal.reg-wizard-mode .modal-auth-tab.active { color:#0f2347 !important; }
+#modal.reg-wizard-mode .modal-auth-tab.active { color:#0f2347 !important; background:#fff !important; box-shadow:0 2px 8px rgba(15,35,65,.08); }
+#modal.auth-login-mode .reg-progress-bar { display:none !important; }
+#modal.auth-login-mode #sdots { display:none !important; }
+/* يجب أن يفوز على إخفاء modal-header في reg-wizard-mode / rizq-reg-page */
+#modal.reg-wizard-mode.auth-login-mode .modal-header,
+#modal.auth-login-mode .modal-header,
+html.rizq-reg-page #modal.auth-login-mode .modal-header,
+html.rizq-reg-page #modal.reg-wizard-mode.auth-login-mode .modal-header {
+  display: block !important;
+  padding: 12px 4% 8px;
+}
+#modal.auth-login-mode .modal-auth-tabs,
+#modal.reg-wizard-mode.auth-login-mode .modal-auth-tabs {
+  display:flex !important;
+  gap:8px;
+  margin:8px 0 18px;
+  padding:5px;
+  border-radius:14px;
+}
+#modal.auth-login-mode .modal-auth-tab {
+  flex:1;
+  min-height:48px;
+  font-size:15px !important;
+  font-weight:800 !important;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+#modal.auth-login-mode .modal-auth-heading {
+  font-family:'Noto Naskh Arabic',serif;
+  font-size:1.55rem;
+  font-weight:800;
+  color:#0f2347 !important;
+  margin:0 0 8px;
+  text-align:center;
+}
+@media (max-width:768px){
+  #modal.reg-wizard-mode.auth-login-mode .modal-header,
+  #modal.auth-login-mode .modal-header,
+  html.rizq-reg-page #modal.auth-login-mode .modal-header {
+    display: block !important;
+    padding: 12px 4% 0;
+  }
+  #modal.auth-login-mode .modal-logo { display:none !important; }
+  #modal.auth-login-mode .modal-auth-tabs { margin-top:4px; }
+  #modal.auth-login-mode .rizq-reg-trust { gap:10px; }
+  #modal.auth-login-mode .rizq-reg-trust-card { padding:14px !important; }
+}
 
 /* بطاقات الثقة */
 #modal.reg-wizard-mode .rizq-reg-trust { display:grid; gap:12px; margin-top:18px; }
@@ -318,8 +393,19 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   padding:8px 16px; border-radius:22px;
   cursor:pointer; transition:background 0.2s;
   white-space:nowrap; flex-shrink:0; font-family:inherit; direction:ltr;
+  display:inline-flex; align-items:center; gap:0.15em;
 }
-.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); color:#fff; }
+.rizq-reg-chrome-lang:hover { background:rgba(201,168,76,0.28); }
+.rizq-reg-chrome-lang .lang-fr,
+.rizq-reg-chrome-lang .lang-ar { color:#ffffff; opacity:0.9; }
+.rizq-reg-chrome-lang[data-active-lang="ar"] .lang-ar,
+.rizq-reg-chrome-lang .lang-ar.is-active-lang,
+html[lang="ar"] .rizq-reg-chrome-lang .lang-ar,
+body.rizq-lang-ar .rizq-reg-chrome-lang .lang-ar { color:#C9A84C !important; opacity:1 !important; }
+.rizq-reg-chrome-lang[data-active-lang="fr"] .lang-fr,
+.rizq-reg-chrome-lang .lang-fr.is-active-lang,
+html[lang="fr"] .rizq-reg-chrome-lang .lang-fr,
+body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opacity:1 !important; }
 
 /* ═══════════════════════════════════════════════════════════
    §6  الشريط السفلي — مطابق لشريط rizq_post
@@ -355,8 +441,9 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     align-items: center !important;
     justify-content: space-between !important;
     gap: 10px !important;
-    padding: 0 14px !important;
-    height: 56px !important;
+    padding: env(safe-area-inset-top, 0px) 14px 0 !important;
+    min-height: 56px !important;
+    height: calc(56px + env(safe-area-inset-top, 0px)) !important;
     background: #0f172a !important;
     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
     position: sticky !important;
@@ -378,11 +465,45 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     visibility: visible !important;
     pointer-events: auto !important;
     position: fixed !important;
-    left: 0; right: 0; bottom: 0;
-    z-index: 40 !important;
-    height: 56px !important;
+    left: 0 !important; right: 0 !important; bottom: 0 !important;
+    top: auto !important;
+    z-index: 1000020 !important;
+    height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     background: #0f172a !important;
     border-top: 1px solid rgba(255,255,255,0.08) !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+  /* وضوح خطوات التسجيل على الهاتف */
+  #modal.reg-wizard-mode .reg-progress-bar {
+    padding: 16px 4% 18px !important;
+    position: sticky !important;
+    top: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    z-index: 30 !important;
+    background: #fff !important;
+    box-shadow: 0 4px 14px rgba(15,35,65,.06) !important;
+  }
+  #modal.reg-wizard-mode .modal-box > [id^="p-"] {
+    padding: 18px 16px 28px !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+  }
+  #modal.reg-wizard-mode .modal-box h3 {
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 8px !important;
+    color: #0f2347 !important;
+  }
+  #modal.reg-wizard-mode .m-input {
+    min-height: 48px !important;
+    font-size: 16px !important; /* يمنع تكبير iOS */
+    padding: 12px 14px !important;
+  }
+  #modal.reg-wizard-mode .m-btn-main {
+    min-height: 52px !important;
+    font-size: 15.5px !important;
+    width: 100% !important;
   }
   .rizq-reg-chrome-links {
     display: none !important; /* الشروط/الخصوصية/الأمان في الشريط السفلي على الهاتف */
@@ -411,11 +532,12 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     --text-muted:#64748b; --text-soft:#334155;
   }
   #modal.reg-wizard-mode .modal-close {
-    top: 60px; inset-inline-end:12px;
-    background:#f1f5f9; border-color:#e2e8f0; color:#64748b; z-index:5;
+    top: calc(12px + env(safe-area-inset-top, 0px)); inset-inline-end:12px;
+    background:#f1f5f9; border-color:#e2e8f0; color:#64748b; z-index:50;
   }
   #modal.reg-wizard-mode .modal-close:hover { background:#e2e8f0; color:#1e293b; }
-  #modal.reg-wizard-mode .modal-header { padding:16px 20px 0; border-bottom:1px solid #e2e8f5; }
+  /* الشريط العلوي rizq-reg-chrome يكفي — إخفاء modal-header المكرر على الهاتف (إلا وضع الدخول) */
+  #modal.reg-wizard-mode:not(.auth-login-mode) .modal-header { display:none !important; }
   #modal.reg-wizard-mode .modal-logo img { width:56px !important; height:56px !important; }
 
   html.rizq-reg-page, html.rizq-reg-page body { background:#f8faff !important; }
@@ -564,8 +686,8 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
   /* مساحة للشريط العلوي الثابت */
   #modal.reg-wizard-mode .modal-box { padding-top: 0 !important; }
 
-  /* ── modal-header: مخفي على الكمبيوتر (الشريط العلوي يأخذ دوره) ── */
-  #modal.reg-wizard-mode .modal-header { display: none !important; }
+  /* ── modal-header: مخفي على الكمبيوتر إلا وضع الدخول (تبويبات دخول/حساب جديد) ── */
+  #modal.reg-wizard-mode:not(.auth-login-mode) .modal-header { display: none !important; }
 
   /* ── صفحة الدخول: عمودان على الكمبيوتر ── */
   #modal.reg-wizard-mode #p-login .rwz-login-wrap {
@@ -663,7 +785,8 @@ html.rizq-reg-page #rag-overlay:not(.open) { display:none !important; visibility
     opacity: 1 !important; visibility: visible !important;
   }
   html.rizq-reg-page #modal .modal-close  { display: none !important; }
-  html.rizq-reg-page #modal .modal-header { display: none !important; }
+  html.rizq-reg-page #modal:not(.auth-login-mode) .modal-header { display: none !important; }
+  html.rizq-reg-page #modal.auth-login-mode .modal-header { display: block !important; }
   html.rizq-reg-page #modal .modal-box {
     width: 100% !important; max-width: 100% !important;
     min-width: 0 !important;

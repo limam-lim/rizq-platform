@@ -261,7 +261,9 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=6"></script>
+<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_seller_onboarding.js"></script>
+<script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -277,7 +279,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 
 <div class="mobile-bar">
   <div class="mobile-bar-controls">
-    <button class="btn btn-outline btn-sm btn-lang" id="office-lang-btn-mobile" onclick="toggleLangOffice()" style="font-size:11px;padding:4px 10px">FR</button>
+    <button type="button" class="btn btn-outline btn-sm btn-lang btn-lang-primary" id="office-lang-btn-mobile" onclick="toggleLangOffice()" dir="ltr" aria-label="FR | AR" style="font-size:11px;padding:4px 10px"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:22px" aria-label="Menu">☰</button>
   </div>
   <div class="mobile-bar-title" style="font-size:15px;font-weight:800;color:var(--navy)" data-t="mobile-title">🏢 داشبورد المكتب</div>
@@ -328,12 +330,13 @@ textarea.form-input{min-height:80px;resize:vertical}
       <button type="button" class="btn btn-outline btn-sm" data-t="tb-new-service" onclick="openNewServicePanel()">➕ خدمة جديدة</button>
       <button type="button" class="btn btn-outline btn-sm" data-t="tb-preview" onclick="previewMyPage()">👁️ معاينة</button>
       <button type="button" class="btn btn-gold btn-sm" data-t="tb-subscription" onclick="showPanel('subscription',null)">💳 اشتراكي</button>
-      <button type="button" class="btn btn-outline btn-sm btn-lang" id="office-lang-btn" onclick="toggleLangOffice()">FR</button>
+      <button type="button" class="btn btn-outline btn-sm btn-lang btn-lang-primary" id="office-lang-btn" onclick="toggleLangOffice()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     </div>
     <div class="topbar-title" id="topbar-title" data-t="sb-overview">📊 نظرة عامة</div>
   </div>
   <div class="content">
     <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
     <div class="panel active" id="panel-overview">
                   <!-- ══ Hero Banner ══ -->
       <div id="hero-banner" style="background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#1a3a8f 100%);border-radius:20px;padding:0;overflow:hidden;position:relative;margin-bottom:20px;min-height:180px;display:flex">
@@ -361,9 +364,9 @@ textarea.form-input{min-height:80px;resize:vertical}
         <!-- Rating side -->
         <div style="padding:22px 24px;text-align:center;background:rgba(0,0,0,.15);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:120px;border-right:1px solid rgba(255,255,255,.07);position:relative;z-index:1">
           <div style="font-size:8px;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:4px" data-t="hero-your-rating">تقييمك</div>
-          <div style="font-size:40px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(201,168,76,.4)">4.8</div>
-          <div style="color:#f59e0b;font-size:14px;margin-top:4px">★★★★★</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px" data-t="hero-rating-count">12 تقييم</div>
+          <div id="hero-rating-num" style="font-size:40px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(201,168,76,.4)">…</div>
+          <div id="hero-rating-stars" style="color:#f59e0b;font-size:14px;margin-top:4px">★★★★★</div>
+          <div id="hero-rating-count" style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px" data-t="hero-rating-count">—</div>
         </div>
       </div>
       <div class="quick-actions">
@@ -572,17 +575,6 @@ textarea.form-input{min-height:80px;resize:vertical}
       <div id="rzq-pay-sub" style="margin-bottom:20px"></div>
       <div id="sub-card-wrap"></div>
       <div id="my-invoices-wrap" style="margin-top:18px"></div>
-      <div class="card" id="renewal-section" style="display:none">
-        <div class="card-title" style="margin-bottom:14px" data-t="sub-renew-title">📤 تجديد الاشتراك</div>
-        <div class="upload-zone" id="renewal-zone" onclick="document.getElementById('renewal-file').click()">
-          <div style="font-size:30px;margin-bottom:6px">🧾</div>
-          <p style="font-size:13px;font-weight:600;color:var(--navy)" data-t="sub-upload-receipt">رفع وصل الدفع</p>
-          <p style="font-size:11px;color:var(--text-muted);margin-top:3px">JPG / PNG / PDF</p>
-          <input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>
-        </div>
-        <div id="renewal-packages" style="margin-top:16px"></div>
-        <button class="btn btn-gold" style="margin-top:14px;width:100%" onclick="submitRenewal()" data-t="sub-submit-renewal">📤 إرسال طلب التجديد</button>
-      </div>
       <div class="card">
         <div class="card-title" style="margin-bottom:14px" data-t="sub-packages-title">📋 باقات الاشتراك</div>
         <div id="packages-display"></div>
@@ -665,6 +657,7 @@ textarea.form-input{min-height:80px;resize:vertical}
     <div class="panel" id="panel-settings">
       <div class="card">
         <div class="card-header"><div class="card-title" data-t="set-title">⚙️ إعدادات الحساب</div></div>
+        <div class="form-group"><label class="form-label" data-t="set-pw-cur-label">كلمة المرور الحالية</label><input class="form-input" type="password" id="s-pw-cur" placeholder="••••••••"/></div>
         <div class="form-group"><label class="form-label" data-t="set-pw-new-label">كلمة المرور الجديدة</label><input class="form-input" type="password" id="s-pw-new" placeholder="8 أحرف على الأقل" data-ph="set-pw-new-ph"/></div>
         <div class="form-group"><label class="form-label" data-t="set-pw2-label">تأكيد كلمة المرور</label><input class="form-input" type="password" id="s-pw2" placeholder="••••••••"/></div>
         <button class="btn btn-primary" onclick="changePw()" data-t="set-pw-btn">🔒 تغيير كلمة المرور</button>
@@ -692,17 +685,20 @@ textarea.form-input{min-height:80px;resize:vertical}
 
 <script>
 const params=new URLSearchParams(window.location.search);
-var SESSION_ID=params.get('id')||'';
-var SESSION_TOKEN=params.get('token')||'';
+var SESSION_ID='';
+var SESSION_TOKEN='';
 const IS_DEMO=params.get('demo')==='1';
 (function rizqHydrateDashSession(){
-  if(SESSION_ID && SESSION_TOKEN) return;
   if(IS_DEMO) return;
-  if(!window.RizqAccount || typeof window.RizqAccount.recoverSessionParams !== 'function') return;
-  var rec = window.RizqAccount.recoverSessionParams('office');
-  if(!rec) return;
-  SESSION_ID = rec.id || '';
-  SESSION_TOKEN = rec.token || '';
+  if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+    var rec = window.RizqAccount.recoverSessionParams('office');
+    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+  }
+  SESSION_ID = params.get('id') || '';
+  SESSION_TOKEN = params.get('token') || '';
+  if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
+    SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
+  }
 })();
 
 function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -760,7 +756,7 @@ function showAccessDenied(){
 // الداشبورد ?token=) — مختلف تماماً عن accessToken الحقيقي الذي يتطلبه
 // verifyAccountOwner() بالخادم لكل فعل كتابة حقيقي. window.REAL_ACCESS_TOKEN
 // يُحل من مصدرين: (أ) rizq_pending_accounts[].accessToken أو .backendAccessToken
-// المحفوظ محلياً، (ب) وإلا GET /api/accounts/verify-dash/:id.
+// المحفوظ محلياً، (ب) وإلا POST /api/accounts/exchange-dash-token/:id.
 window.REAL_ACCESS_TOKEN = null;
 function _resolveRealAccessToken(acc){
   try{
@@ -772,11 +768,11 @@ function _resolveRealAccessToken(acc){
     }
   }catch(e){}
   if(!window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return Promise.resolve(null);
-  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/exchange-dash-token/' + encodeURIComponent(acc.id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !data.ok || !data.account || !data.account.accessToken) return null;
-      window.REAL_ACCESS_TOKEN = data.account.accessToken;
+      if(!data || !data.ok || !data.accessToken) return null;
+      window.REAL_ACCESS_TOKEN = data.accessToken;
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });
@@ -940,6 +936,13 @@ function renderTenderSubStatus(){
     });
 }
 
+function _tenderStatusBadgeOwner(t, fr){
+  var s = t.status || 'open';
+  if(s==='pending_review') return '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px;margin-left:6px">⏳ '+(fr?'En révision':'قيد المراجعة')+'</span>';
+  if(s==='rejected') return '<span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:6px">❌ '+(fr?'Refusée':'مرفوضة')+'</span>';
+  if(s==='open') return '<span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin-left:6px">✅ '+(fr?'Publiée':'منشورة')+'</span>';
+  return '';
+}
 function renderMyTenders(){
   var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
   var el = document.getElementById('tenders-mine-list');
@@ -970,7 +973,8 @@ function renderMyTenders(){
             }).join('')
           : '<p style="font-size:11.5px;color:#94a3b8;margin-top:4px">'+(fr?'Aucune offre pour le moment':'لا عروض بعد')+'</p>';
         return '<div class="card" style="margin-bottom:14px">'
-          + '<div style="font-weight:800;font-size:14px;color:#16263d">'+escapeHtml(t.title)+'</div>'
+          + '<div style="font-weight:800;font-size:14px;color:#16263d;display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span>'+escapeHtml(t.title)+'</span>'+_tenderStatusBadgeOwner(t, fr)+'</div>'
+          + (t.status==='rejected' && t.rejectReason ? '<div style="font-size:11.5px;color:#b91c1c;margin:6px 0">'+escapeHtml(t.rejectReason)+'</div>' : '')
           + '<div style="font-size:11.5px;color:var(--text-muted);margin:4px 0 8px">'+(fr?bids.length+' offre(s) reçue(s)':bids.length+' عرض مُقدَّم')+'</div>'
           + bidsHtml
           + '</div>';
@@ -1225,8 +1229,21 @@ function _initWithAccount(acc){
   const wbn=document.getElementById('wb-name');const wbs=document.getElementById('wb-sub');
   if(wbn)wbn.textContent=acc.name||_t2('مكتبي','Mon bureau');
   if(wbs)wbs.textContent=(acc.activity||_t2('مكتب افتراضي','Bureau virtuel'))+' · '+(acc.city||_t2('موريتانيا','Mauritanie'))+_t2(' · باقة ',' · Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
-  const sli=document.getElementById('share-link-input');
-  if(sli)sli.value=location.origin+'/rizq_landing_v8.html?office='+(acc.id||'demo');
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'office',
+      isDemo: IS_DEMO,
+      contentCount: services.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
 }
 
 function renderOverview(){
@@ -1242,14 +1259,36 @@ function renderOverview(){
     {icon:'⭐',val:'…',id:'ov-stat-rating',label:_t2('تقييم المكتب','Note du cabinet'),accent:'#f59e0b'},
   ].map(s=>`<div class="stat-card" style="--accent:${s.accent}"><div style="font-size:22px;margin-bottom:8px">${s.icon}</div><div class="stat-val"${s.id?` id="${s.id}"`:''}>${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
   // إصلاح جوهري 29/07/2026: كان تقييم "4.9" ثابتاً مزيَّفاً دائماً.
-  if(!IS_DEMO && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
+  function _paintOfficeRating(avg, count){
+    var vEl = document.getElementById('ov-stat-rating');
+    var hNum = document.getElementById('hero-rating-num');
+    var hCnt = document.getElementById('hero-rating-count');
+    var hStars = document.getElementById('hero-rating-stars');
+    if(!count){
+      if(vEl) vEl.textContent='—';
+      if(hNum) hNum.textContent='—';
+      if(hCnt) hCnt.textContent=_t2('لا تقييمات بعد','Aucun avis');
+      if(hStars) hStars.textContent='☆☆☆☆☆';
+      return;
+    }
+    if(vEl) vEl.textContent=avg;
+    if(hNum) hNum.textContent=avg;
+    if(hCnt) hCnt.textContent=count+_t2(' تقييم',' avis');
+    if(hStars){
+      var full=Math.round(Number(avg)||0); if(full<0)full=0; if(full>5)full=5;
+      hStars.textContent='★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);
+    }
+  }
+  if(IS_DEMO){ _paintOfficeRating(null, 0); }
+  else if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/reviews/'+encodeURIComponent(SESSION_ID)+'/stats')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        var vEl = document.getElementById('ov-stat-rating');
-        if(!vEl) return;
-        vEl.textContent = (data && data.count) ? data.average : '—';
-      }).catch(function(){ var vEl=document.getElementById('ov-stat-rating'); if(vEl) vEl.textContent='—'; });
+        if(!data || !data.count){ _paintOfficeRating(null, 0); return; }
+        _paintOfficeRating(data.average, data.count);
+      }).catch(function(){ _paintOfficeRating(null, 0); });
+  } else {
+    _paintOfficeRating(null, 0);
   }
   renderRealVisits();
   renderAdvancedStats();
@@ -1325,12 +1364,13 @@ function renderAdvancedStats(){
 
 function renderSubOverview(){
   const el=document.getElementById('ov-sub');if(!el||!OFFICE)return;
-  const trialEnd=new Date(OFFICE.trial_ends||Date.now());
-  const daysLeft=Math.max(0,Math.ceil((trialEnd-new Date())/86400000));
+  const info=getSubInfo();
+  const daysLeft=info.daysLeft;
+  const title=info.isExpired?_t2('❌ انتهى الاشتراك','❌ Abonnement expiré'):(!info.isTrial?_t2('✅ اشتراك نشط','✅ Abonnement actif'):_t2('🎁 فترة تجريبية','🎁 Période d\'essai'));
   el.innerHTML=`<div style="background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:13px;padding:16px;color:#fff">
-    <div style="font-size:13px;font-weight:700;margin-bottom:3px">${!OFFICE.plan?_t2('🎁 فترة تجريبية','🎁 Période d\'essai'):_t2('✅ اشتراك نشط','✅ Abonnement actif')}</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:3px">${title}</div>
     <div style="font-size:11px;opacity:.7;margin-bottom:10px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jour(s)`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
-    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${Math.min(100,(daysLeft/3)*100)}%;background:var(--gold);border-radius:3px"></div></div>
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${info.pct}%;background:var(--gold);border-radius:3px"></div></div>
     ${daysLeft<=2?`<button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="showPanel('subscription',null)">${_t2('🔄 جدّد الآن','🔄 Renouveler maintenant')}</button>`:''}
   </div>`;
 }
@@ -1464,6 +1504,9 @@ function renderServices(){
         <button class="btn btn-danger btn-sm" onclick="deleteService(${i})" title="${_t2('حذف','Supprimer')}">🗑️</button>
       </div>
     </div>`).join('');
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
 }
 
 function saveService(){
@@ -1773,7 +1816,8 @@ function getSubInfo(){
       const isTrial = sub.status==='trial' || sub.status==='trial_expiring';
       const isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
       const totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
-      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/totalDays)*100))};
+      const pkgName = (sub.acc && (sub.acc.pkg_name || sub.acc.package || sub.acc.plan)) || '';
+      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName};
     }
   }
   const trialEnd = new Date(OFFICE.trial_ends||Date.now());
@@ -1781,7 +1825,8 @@ function getSubInfo(){
   const daysLeft = Math.max(0,Math.ceil((trialEnd-now)/86400000));
   const isTrial = !OFFICE.plan;
   const isExpired = daysLeft===0;
-  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: isTrial?Math.max(0,Math.min(100,(daysLeft/3)*100)):80};
+  const totalDays = isTrial ? 3 : 30;
+  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: Math.max(0,Math.min(100,(daysLeft/totalDays)*100)), pkgName:OFFICE.plan||''};
 }
 
 function renderSubPanel(){
@@ -1808,7 +1853,8 @@ function renderSubPanel(){
   // بعكس ما توحي به رسالة "سيتم مراجعته"). أُبطل تفعيله؛ التجديد الحقيقي
   // الوحيد الآن هو مسار packages-display/openPayModal/submitPayment الذي
   // يرسل فعلاً عبر RizqSub.submitSubscriptionRequest ويصل لطابور مراجعة حقيقي.
-  document.getElementById('renewal-section').style.display='none';
+  var _rs=document.getElementById('renewal-section');
+  if(_rs) _rs.style.display='none';
 }
 
 function renderMyInvoices(){
@@ -1861,30 +1907,18 @@ function _paintInvoices(invs, isLocalSource){
     + '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 
-function handleRenewalUpload(input){
-  const file=input.files[0];if(!file)return;
-  renewalFile=file;
-  const z=document.getElementById('renewal-zone');
-  z.innerHTML=`<div style="font-size:26px;margin-bottom:5px">✅</div><p style="color:#10b981;font-size:13px;font-weight:700">${escapeHtml(file.name)}</p><input type="file" id="renewal-file" accept="image/*,.pdf" style="display:none" onchange="handleRenewalUpload(this)"/>`;
-  z.classList.add('has-file');
-}
+function handleRenewalUpload(){ /* removed — use packages payment flow */ }
 function submitRenewal(){
-  if(!renewalFile){showToast(_t2('يرجى رفع وصل الدفع','Veuillez télécharger le reçu de paiement'),'error');return;}
-  const pkg=document.querySelector('input[name="renewal-pkg"]:checked');
-  if(!pkg){showToast(_t2('يرجى اختيار الباقة','Veuillez choisir un forfait'),'error');return;}
-  const rs=JSON.parse(localStorage.getItem('rizq_renewal_requests')||'[]');
-  rs.push({storeId:SESSION_ID,officeName:OFFICE.name,pkg:pkg.value,submittedAt:new Date().toISOString(),status:'pending'});
-  localStorage.setItem('rizq_renewal_requests',JSON.stringify(rs));
-  showToast(_t2('تم إرسال طلب التجديد ✅','Demande de renouvellement envoyée ✅'),'success');
-  document.getElementById('renewal-section').style.display='none';
-  renewalFile=null;
+  var el=document.getElementById('packages-display');
+  if(el) el.scrollIntoView({behavior:'smooth'});
 }
 
 function updateSubBadge(){
   if(!OFFICE)return;
-  const d=Math.max(0,Math.ceil((new Date(OFFICE.trial_ends||Date.now())-new Date())/86400000));
+  const info=getSubInfo();
+  const d=info.daysLeft;
   const dot=document.getElementById('sb-sub-dot');const txt=document.getElementById('sb-sub-text');
-  if(d===0){if(dot)dot.className='sub-dot exp';if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré');}
+  if(info.isExpired||d===0){if(dot)dot.className='sub-dot exp';if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré');}
   else if(d<=2){if(dot)dot.className='sub-dot warn';if(txt)txt.textContent=_t2(`ينتهي خلال ${d} يوم`,`Expire dans ${d} jours`);}
   else{if(dot)dot.className='sub-dot';if(txt)txt.textContent=_t2('اشتراك نشط','Abonnement actif');}
 }
@@ -1923,7 +1957,31 @@ function deactivateAccount(){
 
 // إصلاح: كانت تدّعي "تم تغيير كلمة المرور ✅" بلا أي نظام مصادقة حقيقي خلف
 // الكواليس — نجاح وهمي بالكامل (نفس علّة rizq_dashboard_store.html).
-function changePw(){const pw=document.getElementById('s-pw-new').value;const c2=document.getElementById('s-pw2').value;if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}showToast(_t2('⚠️ نظام مصادقة حقيقي قيد التطوير — هذا النموذج للعرض فقط حالياً','⚠️ Le système d\'authentification réel est en cours de développement — indicatif uniquement pour l\'instant'),'error');}
+function changePw(){
+  const cur=(document.getElementById('s-pw-cur')||{}).value||'';
+  const pw=document.getElementById('s-pw-new').value;
+  const c2=document.getElementById('s-pw2').value;
+  if(!cur||!pw||!c2){showToast(_t2('عبّئ جميع الحقول','Remplissez tous les champs'),'error');return;}
+  if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}
+  if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}
+  if(typeof IS_DEMO!=='undefined' && IS_DEMO){showToast(_t2('👁 وضع تجريبي','👁 Mode démo'));return;}
+  var tok=window.REAL_ACCESS_TOKEN||SESSION_TOKEN;
+  if(!SESSION_ID||!tok||!window.RizqAccount||typeof window.RizqAccount.changePasswordAsync!=='function'){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'),'error');return;
+  }
+  window.RizqAccount.changePasswordAsync(SESSION_ID,tok,cur,pw).then(function(res){
+    if(res&&res.ok){
+      document.getElementById('s-pw-cur').value='';
+      document.getElementById('s-pw-new').value='';
+      document.getElementById('s-pw2').value='';
+      showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+      return;
+    }
+    var msg=(res&&res.error)||_t2('تعذّر التحديث','Échec');
+    if(res&&res.code==='invalid_current') msg=_t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+    showToast('⚠️ '+msg,'error');
+  }).catch(function(){showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible'),'error');});
+}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');}
 function logout(){
   if(!confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?'))) return;
@@ -1986,12 +2044,24 @@ function _applyOfficeLang(lang, silent){
     var t = document.getElementById('topbar-title');
     if(t) t.textContent = (isAr ? TITLES[pid] : TITLES_FR[pid]) || t.textContent;
   }
-  // update lang toggle button label to show the OTHER language
-  var label = isAr ? 'FR' : 'AR';
+  // update lang toggle button — FR|AR أصفر/أبيض حسب اللغة الحالية
+  var _ol = isAr ? 'ar' : 'fr';
   var btn = document.getElementById('office-lang-btn');
-  if(btn) btn.textContent = label;
   var btnM = document.getElementById('office-lang-btn-mobile');
-  if(btnM) btnM.textContent = label;
+  [btn, btnM].forEach(function(b){
+    if(!b) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){
+      window.RizqI18n.paintPrimaryLangBtn(b, _ol);
+    } else {
+      b.classList.add('btn-lang','btn-lang-primary');
+      b.setAttribute('dir','ltr');
+      b.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      b.setAttribute('data-active-lang', _ol);
+      var frEl=b.querySelector('.lang-fr'), arEl=b.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = _ol==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = _ol==='ar'?'#C9A84C':'#ffffff';
+    }
+  });
   if(!silent) showToast(isAr ? 'تم التبديل إلى العربية 🇲🇷' : 'Langue changée en Français 🇫🇷', 'info');
 
   try{ if(typeof renderOverview==='function') renderOverview(); }catch(e){}
@@ -2500,7 +2570,7 @@ function saveMyPayment(){
           +'<div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.9">'
             +'<div>1️⃣ '+_t2('افتح تطبيق البنك أو بيماه على هاتفك','Ouvrez l\'application bancaire ou Bimbam sur votre téléphone')+'</div>'
             +'<div>2️⃣ '+_t2('اختر','Choisissez')+' <strong style="color:#e8c96a">'+_t2('دفع / تحويل','Payer / Transférer')+'</strong> '+_t2('وأدخل الرمز أعلاه','et saisissez le code ci-dessus')+'</div>'
-            +'<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">+222 XX XX XX XX</strong></div>'
+            +(function(){ var wa=(typeof _rizqSupportWhatsapp==='function'?_rizqSupportWhatsapp():''); return wa ? ('<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">'+escapeHtml(wa)+'</strong></div>') : ('<div>3️⃣ '+_t2('أرسل صورة التأكيد لفريق رزق عبر قنوات الدعم الرسمية','Envoyez la capture à l\'équipe Rizq via les canaux de support officiels')+'</div>'); })()
             +'<div>4️⃣ '+_t2('سيتم تفعيل اشتراكك خلال ساعات','Votre abonnement sera activé dans les heures qui suivent')+'</div>'
           +'</div>'
         +'</div>'
@@ -2533,7 +2603,23 @@ function saveMyPayment(){
     window.open(url,'_blank');
   }
   // ── وكيل كلود: تفعيل/إيقاف (مكتب) ──────────────────────
-  var RIZQ_TWILIO_NUM_OFFICE = '+222XXXXXXXX';
+  function _rizqSupportWhatsapp(){
+  try{
+    var cfg=JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+    var w=String(cfg.whatsapp||cfg.phone||'').trim();
+    if(w && !/X{2,}|XX\s*XX/i.test(w)) return w;
+  }catch(e){}
+  return '';
+}
+function _rizqTwilioForwardNum(){
+  try{
+    var ch=JSON.parse(localStorage.getItem('rizq_channels_config')||'{}');
+    var n=String((ch.phone&&ch.phone.number)||ch.twilioNumber||'').trim();
+    if(n && !/X{2,}|XX\s*XX/i.test(n)) return n;
+  }catch(e){}
+  return '';
+}
+var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
   function renderAgentsOffice(){
     var acc=(typeof OFFICE!=='undefined'&&OFFICE)||{};
     var plan=acc.plan||'free';
@@ -2556,7 +2642,7 @@ function saveMyPayment(){
           '<label class="rizq-toggle-switch"><input type="checkbox" id="agent-toggle-chk" '+(active?'checked':'')+' onchange="toggleRizqAgentOffice(this.checked)"><span class="rizq-toggle-slider"></span></label>'+
         '</div>'+
         '<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:11px;font-size:11.5px;line-height:1.8">'+
-          '<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+RIZQ_TWILIO_NUM_OFFICE+'</code></div>'+
+          (RIZQ_TWILIO_NUM_OFFICE?('<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+escapeHtml(RIZQ_TWILIO_NUM_OFFICE)+'</code></div>'):('<div style="color:#94a3b8">📞 '+_t2('رقم التحويل يُضبط من لوحة الإدارة عند التفعيل','Le numéro de renvoi est configuré depuis le panneau admin à l\'activation')+'</div>'))+
           '<div style="margin-top:6px;color:#94a3b8">'+_t2('حوّل مكالماتك عند عدم الرد — الوكيل يستقبل باسمك.','Renvoyez vos appels en cas de non-réponse — l\'agent répond en votre nom.')+'</div>'+
           '<div style="margin-top:6px">📱 '+_t2('رقمك:','Votre numéro:')+' <strong style="color:#fbbf24">'+(phone||'—')+'</strong></div>'+
         '</div>'+

@@ -13,7 +13,7 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v13.6';
+var CACHE_NAME = 'rizq-cache-v19.6';
 var CORE_ASSETS = [
   'rizq-theme.css',
   'rizq_header.css',
@@ -67,6 +67,14 @@ self.addEventListener('fetch', function (event) {
   // نداءات الـ API (تسجيل، دخول، بيانات حيّة) — تمر مباشرة، بلا كاش أبداً
   if (url.pathname.indexOf('/api/') !== -1) return;
 
+  /* HTML/CSS/JS always from network — never serve stale layout scripts */
+  if (/\.(html|css|js)(\?|$)/i.test(url.pathname)) {
+    event.respondWith(
+      fetch(req).catch(function () { return caches.match(req); })
+    );
+    return;
+  }
+
   var isStaticAsset = /\.(png|jpg|jpeg|webp|svg|ico|woff2?)$/i.test(url.pathname);
 
   if (isStaticAsset) {
@@ -86,16 +94,7 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // صفحات HTML وبقية الملفات: network-first مع fallback للكاش عند انقطاع النت
   event.respondWith(
-    fetch(req)
-      .then(function (res) {
-        var clone = res.clone();
-        caches.open(CACHE_NAME).then(function (cache) { cache.put(req, clone); });
-        return res;
-      })
-      .catch(function () {
-        return caches.match(req);
-      })
+    fetch(req).catch(function () { return caches.match(req); })
   );
 });

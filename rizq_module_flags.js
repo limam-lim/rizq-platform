@@ -12,6 +12,7 @@
     'rizq_store.html': 'store',
     'rizq_office.html': 'office',
     'rizq_showroom.html': 'corp',
+    'rizq_showroom_directory.html': 'corp',
     'rizq_corp.html': 'corp',
     'rizq_tenders.html': 'tenders',
     'rizq_ads_info.html': 'videoAds'
@@ -25,7 +26,7 @@
   ];
 
   function defaultFlags() {
-    return { individual: true, store: true, office: false, corp: false, tenders: false, videoAds: false };
+    return { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
   }
 
   function lang() {
@@ -43,7 +44,12 @@
 
   function pageKey() {
     try {
-      return (location.pathname || '').split('/').pop().toLowerCase().replace(/\.html$/, '');
+      var p = (location.pathname || '').split('/').pop().toLowerCase();
+      var q = p.indexOf('?');
+      if (q !== -1) p = p.slice(0, q);
+      var h = p.indexOf('#');
+      if (h !== -1) p = p.slice(0, h);
+      return p.replace(/\.html$/, '');
     } catch (e) {
       return '';
     }
@@ -277,26 +283,13 @@
     }
   }
 
-  function guardCurrentPage(flags) {
-    var pk = pageKey();
-    var pageMod = HREF_MODULE[pk + '.html'] || null;
-    if (!pageMod || !isModuleClosed(flags, pageMod)) return;
-    setTimeout(function () { showComingSoonNotice(pageMod); }, 350);
+  function guardCurrentPage() {
+    /* Navigation is never blocked — closed modules may still show an info strip only. */
   }
 
-  function bindModuleGuard(flags) {
-    if (_guardBound) return;
+  function bindModuleGuard() {
+    /* Removed capture-phase preventDefault: it made header/footer links feel dead. */
     _guardBound = true;
-    document.addEventListener('click', function (e) {
-      var activeFlags = _lastFlags || flags || defaultFlags();
-      var a = e.target.closest('a[href], button[data-rizq-module]');
-      if (!a) return;
-      var key = a.getAttribute('data-rizq-module') || moduleKeyFromHref(a.getAttribute('href'));
-      if (!key || !isModuleClosed(activeFlags, key)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      showComingSoonNotice(key);
-    }, true);
   }
 
   function apply(flags) {

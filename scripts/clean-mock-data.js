@@ -117,11 +117,7 @@ browse = browse.replace(
 );
 write('rizq_browse.html', browse);
 
-// ── rizq_search.html ──
-let search = read('rizq_search.html');
-search = replaceArrayBlock(search, 'DEMO_ADS', '[]');
-search = search.replace(/const ALL_ADS = loadRealSearchAds\(\)\.concat\(DEMO_ADS\);/, 'const ALL_ADS = loadRealSearchAds();');
-write('rizq_search.html', search);
+// ── rizq_search.html ── (redirect stub only — skipped)
 
 // ── rizq_listing.html ──
 let listing = read('rizq_listing.html');
