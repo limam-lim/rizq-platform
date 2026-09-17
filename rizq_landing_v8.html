@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.1"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.2"/>
 <script>
 (function () {
   try {
@@ -1597,12 +1597,18 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
     unicode-bidi: isolate;
   }
 
-  /* اسم/مدينة/وصف — اتجاه تلقائي حسب لغة المحتوى */
-  input[type="text"].m-input,
-  textarea.m-input {
-    direction: auto;
+  /* اسم/مدينة/وصف — اتجاه حسب لغة الصفحة (عربية يمين، فرنسية يسار) */
+  html[dir="rtl"] input[type="text"].m-input,
+  html[dir="rtl"] textarea.m-input {
+    direction: rtl;
     unicode-bidi: plaintext;
-    text-align: start;
+    text-align: right;
+  }
+  html[dir="ltr"] input[type="text"].m-input,
+  html[dir="ltr"] textarea.m-input {
+    direction: ltr;
+    unicode-bidi: plaintext;
+    text-align: left;
   }
 
 /* ═══ RIZQ PROMO POPUP ═══ */
@@ -3644,19 +3650,19 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <span class="rizq-reg-footer-label ar-only">الرئيسية</span>
         <span class="rizq-reg-footer-label fr-only">Accueil</span>
       </a>
-      <a href="rizq_post.html" class="rizq-reg-footer-item">
-        <span class="rizq-reg-footer-icon">📢</span>
-        <span class="rizq-reg-footer-label ar-only">نشر إعلان</span>
-        <span class="rizq-reg-footer-label fr-only">Publier</span>
-      </a>
       <a href="./#categories" class="rizq-reg-footer-item">
         <span class="rizq-reg-footer-icon">📂</span>
         <span class="rizq-reg-footer-label ar-only">الأقسام</span>
         <span class="rizq-reg-footer-label fr-only">Catégories</span>
       </a>
+      <a href="rizq_help.html" class="rizq-reg-footer-item">
+        <span class="rizq-reg-footer-icon">📘</span>
+        <span class="rizq-reg-footer-label ar-only">المساعدة</span>
+        <span class="rizq-reg-footer-label fr-only">Aide</span>
+      </a>
       <a href="rizq_legal.html#s2" target="_blank" rel="noopener" class="rizq-reg-footer-item">
         <span class="rizq-reg-footer-icon">📋</span>
-        <span class="rizq-reg-footer-label ar-only">شروط الاستخدام</span>
+        <span class="rizq-reg-footer-label ar-only">الشروط</span>
         <span class="rizq-reg-footer-label fr-only">Conditions</span>
       </a>
       <a href="rizq_legal.html#s3" target="_blank" rel="noopener" class="rizq-reg-footer-item">

@@ -142,7 +142,15 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 
 /* ── LAYOUT ── */
 .main-wrap{max-width:1180px;margin:0 auto;padding:0 20px 28px}
-@media(max-width:900px){.showroom-profile{flex-direction:column;text-align:center}.showroom-badges{justify-content:center}}
+.showroom-type-label{display:none}
+@media(max-width:900px){
+  .showroom-profile{flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .showroom-info{text-align:center;width:100%;display:flex;flex-direction:column;align-items:center}
+  .showroom-type-label{display:block;order:-1;margin:2px 0 4px;font-size:15px;font-weight:800;color:#E8C96A;letter-spacing:.3px}
+  .showroom-eyebrow{order:0;margin-bottom:6px;font-size:10px;letter-spacing:2px}
+  .showroom-name{order:1}
+  .showroom-badges,.showroom-meta{justify-content:center}
+}
 
 /* ── VISIT STRIP: شريط أفقي بدل الشريط الجانبي (هوية "زوروا المعرض") ── */
 .visit-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 30px;position:relative;z-index:5}
@@ -269,6 +277,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
     <div class="showroom-profile">
       <div class="showroom-logo" id="showroom-logo">🏛️</div>
       <div class="showroom-info">
+        <span class="showroom-type-label" id="showroom-type-label">المعرض</span>
         <span class="showroom-eyebrow" id="showroom-eyebrow">✨ RIZQ SHOWROOMS</span>
         <div class="showroom-name" id="showroom-name">معرض الريادة</div>
         <div class="showroom-tagline" id="showroom-tagline">Al-Riyada Showroom — عروض ومعدات متميزة</div>
@@ -943,6 +952,8 @@ function applyLang(){
   document.documentElement.lang = isFr ? 'fr'  : 'ar';
   document.title = isFr ? 'Showroom Rizq | Rizq' : 'معرض رزق | Rizq';
   document.getElementById('lang-btn').textContent = isFr ? 'ع' : 'FR';
+  var _typeLbl = document.getElementById('showroom-type-label');
+  if (_typeLbl) _typeLbl.textContent = isFr ? 'Showroom' : 'المعرض';
   var _premBadge = document.getElementById('premium-badge-lbl');
   if (_premBadge && _premBadge.style.display !== 'none') {
     _premBadge.textContent = isFr ? '🏅 Showroom Premium Rizq' : '🏅 معرض مميّز برزق';

@@ -227,11 +227,13 @@ footer{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:32px
 .item-modal-actions a,.item-modal-actions button{flex:1;min-width:120px;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;border:none;font-family:inherit}
 
 /* ──── RESPONSIVE ──── */
+.corp-type-label{display:none}
 @media(max-width:800px){
   .content-grid{grid-template-columns:1fr}
   .corp-hero{height:auto;padding:24px 0}
-  .corp-profile{flex-direction:column;text-align:center}
-  .corp-info{text-align:center}
+  .corp-profile{flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .corp-info{text-align:center;display:flex;flex-direction:column;align-items:center}
+  .corp-type-label{display:block;order:-1;margin:2px 0 6px;font-size:15px;font-weight:800;color:#E8C96A}
   .corp-meta{justify-content:center}
   .corp-badges{justify-content:center}
   .nav-links{display:none}
@@ -430,6 +432,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
     <div class="corp-profile">
       <div class="corp-logo-wrap" id="corp-logo-wrap">🏢</div>
       <div class="corp-info">
+        <span class="corp-type-label" id="corp-type-label">المعرض</span>
         <div class="corp-name" id="corp-name">معرض الريادة</div>
         <div class="corp-tagline" id="corp-tagline">Al-Riyada Corp — سيارات وعقارات متميزة</div>
         <div class="corp-meta" id="corp-meta">

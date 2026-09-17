@@ -178,8 +178,16 @@ a{text-decoration:none;color:inherit}
 .badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
 .office-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(103,232,249,.55);font-size:20px;animation:rzOfBounce 2s ease-in-out infinite}
 @keyframes rzOfBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+.office-type-label{display:none}
 @media(max-width:640px){.office-hero{min-height:clamp(240px,48vh,320px)}.office-hero .hero-cover{padding:40px 16px 32px}.office-logo{width:76px;height:76px;font-size:34px}.office-hero .hero-floor{display:none}}
-@media(max-width:900px){.office-profile{flex-direction:column;text-align:center}.office-badges,.office-meta{justify-content:center}}
+@media(max-width:900px){
+  .office-profile{flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .office-info{text-align:center;width:100%;display:flex;flex-direction:column;align-items:center}
+  .office-type-label{display:block;order:-1;margin:2px 0 4px;font-size:15px;font-weight:800;color:#E8C96A;letter-spacing:.3px}
+  .office-eyebrow{order:0;margin-bottom:6px;font-size:10px;letter-spacing:2px}
+  .office-name{order:1}
+  .office-badges,.office-meta{justify-content:center}
+}
 
 /* legacy ids kept for JS — visually unused */
 .hero-card,.rating-strip{display:none!important}
@@ -672,6 +680,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     <div class="office-profile">
       <div class="office-logo" id="hc-logo">🛡️</div>
       <div class="office-info">
+        <span class="office-type-label" id="office-type-label" data-t="office-type-label">المكتب</span>
         <span class="office-eyebrow" id="office-eyebrow">✨ RIZQ OFFICES</span>
         <div class="office-name" id="hero-office-name" data-t="hero-office-name">مكتب</div>
         <div class="office-spec" id="hero-office-spec" data-t="hero-office-spec"></div>
@@ -1464,6 +1473,7 @@ function openMaps(){
             'verified-badge','bar-rev-cnt','reviews-section-sub','stat-clients-lbl','ab-clients-lbl'
           ]);
           setText('hero-office-name', isFr() ? 'Bureau' : 'مكتب');
+          setText('office-type-label', isFr() ? 'Bureau' : 'المكتب');
           setText('hero-office-spec', '');
           setText('hero-desc', isFr() ? msgFr : msgAr);
           setText('about-txt', isFr() ? msgFr : msgAr);
