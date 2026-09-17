@@ -358,6 +358,13 @@
   }
 
   function openGuestChoice() {
+    /* مشتري مسجّل: لوحة الحساب لا شاشة الاختيار */
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.isLoggedIn === 'function' && window.RizqAuthGate.isLoggedIn()) {
+      if (typeof window.RizqAuthGate.openAccount === 'function') {
+        window.RizqAuthGate.openAccount();
+        return true;
+      }
+    }
     if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
       window.RizqAuthGate.openAccountChoice();
       return true;
