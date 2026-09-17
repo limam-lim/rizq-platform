@@ -366,7 +366,7 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 </head>
 <body data-t-ns="cart">
-<button class="btn-lang" id="lang-btn">FR</button>
+<button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- NAV -->
 <nav class="topnav">
@@ -915,6 +915,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function _cartBridge(lang){
     var ar = lang !== 'fr';
     _setNavOrder(!ar);
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
+      window.RizqI18n.paintPrimaryLangBtn(document.getElementById('lang-btn'), ar ? 'ar' : 'fr');
+    }
     document.querySelectorAll('[data-t-fr]').forEach(function(el){
       if(!el.hasAttribute('data-t-ar'))el.setAttribute('data-t-ar',el.innerHTML);
       el.innerHTML = ar ? el.getAttribute('data-t-ar') : el.getAttribute('data-t-fr');
@@ -934,6 +937,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.addEventListener('rizq:langchange',function(e){_cartBridge(e.detail&&e.detail.lang||'ar');});
   window.toggleRizqLang=function(){if(window.RizqI18n)RizqI18n.toggle();};
+  try{
+    var _initL = (window.RizqI18n && RizqI18n.getLang) ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar');
+    _cartBridge(_initL);
+  }catch(eInit){}
 })();
 </script>
 

@@ -103,8 +103,24 @@ nav .nav-disclaimer{flex-shrink:0}
 .btn-post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4)}
 .btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.78);padding:7px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .3s}
 .btn-ns:hover{border-color:rgba(201,168,76,.4);color:var(--gold)}
-.btn-lang{background:transparent;border:1px solid rgba(201,168,76,.35);color:var(--gold);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;font-family:'Segoe UI',sans-serif;transition:all .3s}
-.btn-lang:hover{background:rgba(201,168,76,.1)}
+.btn-lang,.btn-lang-primary{
+  background:rgba(201,168,76,.12);
+  border:1px solid rgba(201,168,76,.4);
+  color:#C9A84C;
+  padding:5px 14px;
+  border-radius:20px;
+  font-size:11px;
+  cursor:pointer;
+  font-weight:800;
+  letter-spacing:1px;
+  font-family:inherit;
+  transition:all .2s;
+  white-space:nowrap;
+  direction:ltr;
+}
+.btn-lang:hover,.btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#fff}
+.btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar{font-weight:800}
+.btn-lang .lang-sep,.btn-lang-primary .lang-sep{opacity:.85}
 
 /* BREADCRUMB */
 .breadcrumb{padding:10px 4%;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);border-bottom:1px solid #e2e8f5;flex-wrap:wrap;background:#fff}
@@ -905,7 +921,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     <span class="nav-disclaimer" id="nav-disclaimer-txt" onclick="openDisc()" title="اضغط للإشعار القانوني الكامل">⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع</span>
     <a href="rizq_post.html" class="btn-post" data-t="nav-post">➕ انشر إعلان</a>
     <a href="#" class="btn-ns" data-t="nav-account" onclick="return window.RizqAccount?RizqAccount.open(event):(location.href='rizq_landing_v8.html?openLogin=1',!1)">حسابي</a>
-    <button class="btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()">FR</button>
+    <button class="btn-lang-primary btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   </div>
 </nav>
 
@@ -1543,10 +1559,18 @@ function applyLang(){
   document.documentElement.lang=l;
   document.documentElement.dir=l==='fr'?'ltr':'rtl';
   const langBtn=document.getElementById('lang-btn');
-  if(langBtn && window.RizqI18n && typeof RizqI18n.paintPrimaryLangBtn==='function' && RizqI18n.isPrimaryLangBtn(langBtn)){
-    RizqI18n.paintPrimaryLangBtn(langBtn);
-  } else if(langBtn){
-    langBtn.textContent=l==='ar'?'FR':'AR';
+  if(langBtn){
+    if(window.RizqI18n && typeof RizqI18n.paintPrimaryLangBtn==='function'){
+      RizqI18n.paintPrimaryLangBtn(langBtn, l);
+    } else {
+      langBtn.classList.add('btn-lang','btn-lang-primary');
+      langBtn.setAttribute('dir','ltr');
+      langBtn.setAttribute('aria-label','FR | AR');
+      langBtn.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      var frEl=langBtn.querySelector('.lang-fr'), arEl=langBtn.querySelector('.lang-ar');
+      if(frEl){ frEl.style.color = l==='fr'?'#C9A84C':'#ffffff'; }
+      if(arEl){ arEl.style.color = l==='ar'?'#C9A84C':'#ffffff'; }
+    }
   }
   document.querySelectorAll('[data-t]').forEach(el=>{
     const key=el.dataset.t;
