@@ -1,5 +1,5 @@
 /**
- * rizq_register_wizard.css  v6.11
+ * rizq_register_wizard.css  v6.12
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
  *   (روابط سريعة + أرقام التواصل) بدل شريط الأيقونات السفلي القديم
@@ -850,8 +850,18 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     overflow-x: hidden !important; overflow-y: auto !important;
     height: auto !important; min-height: 100% !important; max-height: none !important;
   }
+  html.rizq-reg-page body {
+    display: flex !important;
+    flex-direction: column !important;
+  }
   html.rizq-reg-page body > *:not(#modal):not(footer):not(#rizq-terms-modal):not(#rag-overlay):not(.rizq-act-select-menu):not(#rizq-reg-chrome):not(script):not(style):not(link) {
     display:none !important; visibility:hidden !important; pointer-events:none !important;
+  }
+  html.rizq-reg-page #modal,
+  html.rizq-reg-page #modal.modal-overlay,
+  html.rizq-reg-page #modal.modal-overlay.open,
+  html.rizq-reg-page #modal.reg-wizard-mode {
+    order: 1 !important;
   }
   html.rizq-reg-page body > footer,
   html.rizq-reg-page body > footer.rizq-footer {
@@ -861,6 +871,7 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     position: relative !important;
     z-index: 4 !important;
     order: 2 !important;
+    margin-top: auto;
   }
   html.rizq-reg-page #modal.modal-overlay,
   html.rizq-reg-page #modal.modal-overlay.open,

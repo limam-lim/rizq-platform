@@ -993,13 +993,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding:7px 10px !important;
     font-size:12px !important;
   }
-  /* نفس ارتفاع الكمبيوتر */
-  html.rizq-app-nav.has-rizq-desk-nav body,
-  html.rizq-app-nav body:has(#nav){
+  /* نفس ارتفاع الكمبيوتر — دون صفحات التسجيل/الدخول */
+  html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
+  html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
     padding-top:70px !important;
   }
-  html.rizq-app-nav body .hero{
+  html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
     padding-top:70px !important;
+  }
+  html.rizq-app-nav body.rizq-reg-open,
+  html.rizq-reg-page body,
+  html.rizq-app-nav.rizq-reg-page body,
+  html.rizq-app-nav.has-rizq-desk-nav.rizq-reg-page body,
+  html.rizq-app-nav.has-rizq-desk-nav body.rizq-reg-open{
+    padding-top:0 !important;
   }
 }
 
