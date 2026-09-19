@@ -41,9 +41,9 @@ var PLATFORM_OVERVIEW = {
 // ═══════════════════════════════════════════════════════════════
 var REGISTRATION_GUIDE = {
   overview_ar:
-    '📝 التسجيل في رزق — مساران واضحان:\n\n🛒 مشتري / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أشتري — حساب سريع»\n3️⃣ أو افتح صفحة التسجيل: rizq-register (ملف rizq register.html)\n4️⃣ أكّد بريدك برمز OTP\n\n🏪 بائع / محل / مكتب / شركة:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ أو من الرابط: الصفحة الرئيسية مع ?openRegister=1\n3️⃣ اختر نوع الحساب وأكمل البيانات + التحقق\n4️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب بائع؟\n• من «حسابي» اختر «لدي حساب بائع — دخول»\n• أو الصفحة الرئيسية مع ?openLogin=1',
+    '📝 التسجيل في رزق — مساران واضحان:\n\n🛒 مشتري / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أشتري أو أتصفّح»\n3️⃣ أدخل بياناتك ثم أكّد بريدك برمز التحقق\n\n🏪 بائع / محل / مكتب / شركة:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ اختر نوع الحساب وأكمل البيانات والتحقق\n3️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب بائع؟\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب بائع — دخول»',
   overview_fr:
-    '📝 Inscription sur Rizq — deux parcours clairs:\n\n🛒 Acheteur / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « J\'achète — compte rapide »\n3️⃣ Ou ouvrez la page d\'inscription acheteur (rizq register)\n4️⃣ Confirmez votre e-mail avec le code OTP\n\n🏪 Vendeur / boutique / bureau / entreprise:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Ou l\'accueil avec ?openRegister=1\n3️⃣ Choisissez le type de compte et complétez + vérification\n4️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte vendeur?\n• Depuis « Compte » → « J\'ai un compte vendeur — Connexion »\n• Ou l\'accueil avec ?openLogin=1',
+    '📝 Inscription sur Rizq — deux parcours clairs:\n\n🛒 Acheteur / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « J\'achète ou je parcours »\n3️⃣ Entrez vos infos puis confirmez votre e-mail avec le code\n\n🏪 Vendeur / boutique / bureau / entreprise:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Choisissez le type de compte et complétez la vérification\n3️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte vendeur?\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte vendeur — Connexion »',
 
   account_types: {
     private_mr: {
@@ -96,8 +96,8 @@ var REGISTRATION_GUIDE = {
     }
   },
 
-  otp_ar: '📱 رمز التحقق OTP:\n• المشتري: يُرسَل غالباً إلى بريدك الإلكتروني من شاشة rizq_register.html أو «حسابي»\n• البائع: التحقق حسب خطوات معالج التسجيل (بريد/هاتف حسب الخطوة)\n• الرمز صالح لدقائق معدودة — إن لم يصلك انتظر ثم أعد الإرسال\n• للأرقام الموريتانية يُستخدم غالباً الشكل +222',
-  otp_fr: '📱 Code OTP:\n• Acheteur: envoyé le plus souvent par e-mail depuis rizq_register.html ou « Compte »\n• Vendeur: selon l\'assistant d\'inscription (e-mail/téléphone selon l\'étape)\n• Le code expire rapidement — sinon attendez puis renvoyez\n• Pour la Mauritanie le format +222 est courant',
+  otp_ar: '📱 رمز التحقق:\n• المشتري: يُرسل إلى بريدك الإلكتروني بعد إدخال البيانات من «حسابي»\n• البائع: يظهر أثناء خطوات التسجيل حسب المرحلة\n• الرمز صالح لدقائق معدودة — إن لم يصلك انتظر ثم أعد الإرسال\n• للأرقام الموريتانية يُستخدم غالباً الرقم الدولي لموريتانيا',
+  otp_fr: '📱 Code de vérification:\n• Acheteur: envoyé par e-mail après saisie des infos depuis « Compte »\n• Vendeur: selon les étapes d\'inscription\n• Le code expire rapidement — sinon attendez puis renvoyez\n• Pour la Mauritanie, utilisez le format international du pays',
 
   id_verification_ar: '🪪 توثيق الهوية:\n• بعد التسجيل سيُطلب منك رفع صورة بطاقتك الوطنية\n• الصورة يجب أن تكون واضحة وغير مقطوعة\n• تستغرق المراجعة حتى 24 ساعة\n• بعد القبول: شارة "موثّق" تظهر على حسابك\n• يمكنك تخطي هذه الخطوة مؤقتاً لكن الحساب سيكون مُعلَّق حتى التوثيق',
   id_verification_fr: '🪪 Vérification d\'identité:\n• Après l\'inscription, on vous demandera de téléverser une photo de votre carte d\'identité nationale\n• La photo doit être claire et non coupée\n• La vérification prend jusqu\'à 24 heures\n• Une fois acceptée: le badge "vérifié" apparaît sur votre compte\n• Vous pouvez passer cette étape temporairement, mais le compte restera suspendu jusqu\'à vérification',
@@ -285,8 +285,8 @@ var FAQ = [
   {
     q: ['دخول','تسجيل دخول','لدي حساب','login','connexion','se connecter','openLogin'],
     a: {
-      ar: '🔑 دخول البائع:\n• الرئيسية → زر «دخول»\n• أو الصفحة الرئيسية مع ?openLogin=1\n• أو «حسابي» → «لدي حساب بائع — دخول»\n\n🛒 حساب مشتري / سريع: من «حسابي» → حساب سريع (أو صفحة rizq register).',
-      fr: '🔑 Connexion vendeur:\n• Accueil → « Connexion »\n• Ou l\'accueil avec ?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n\n🛒 Compte acheteur: « Compte » → compte rapide (page rizq register).'
+      ar: '🔑 دخول البائع:\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب بائع — دخول»\n\n🛒 حساب مشتري / سريع: من «حسابي» اختر «أشتري أو أتصفّح».',
+      fr: '🔑 Connexion vendeur:\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte vendeur — Connexion »\n\n🛒 Compte acheteur: depuis « Compte » choisissez « J\'achète ou je parcours ».'
     }
   },
   {
@@ -724,8 +724,8 @@ function processMessage(userMessage, context) {
   // Forgot password / login issue
   if (/\u0646\u0633\u064A\u062A|\u0643\u0644\u0645\u0629 \u0633\u0631|\u062F\u062E\u0648\u0644|\u062A\u0633\u062C\u064A\u0644 \u062F\u062E\u0648\u0644|oubli|forgot|password|login/.test(lower)) {
     return { reply: lang==='fr'
-      ? '🔑 Connexion vendeur:\n• Accueil → « Connexion » ou ?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (code e-mail).\n\n🛒 Compte acheteur: « Compte » → compte rapide.'
-      : '🔑 دخول البائع:\n• الرئيسية → «دخول» أو ?openLogin=1\n• أو من «حسابي» → «لدي حساب بائع — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (رمز على البريد).\n\n🛒 حساب المشتري: «حسابي» → حساب سريع.', lang: lang };
+      ? '🔑 Connexion vendeur:\n• Accueil → « Connexion »\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (un code arrive sur votre e-mail).\n\n🛒 Compte acheteur: « Compte » → « J\'achète ou je parcours ».'
+      : '🔑 دخول البائع:\n• الرئيسية → «دخول»\n• أو من «حسابي» → «لدي حساب بائع — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (يصلك رمز على بريدك).\n\n🛒 حساب المشتري: «حسابي» → «أشتري أو أتصفّح».', lang: lang };
   }
 
   if (context.tier === 'diamond' && /\u062A\u0642\u0631\u064A\u0631|\u062A\u062D\u0644\u064A\u0644|report|analyse/.test(lower)) {
