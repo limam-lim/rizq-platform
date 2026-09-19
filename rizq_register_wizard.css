@@ -44,7 +44,9 @@ body.rizq-reg-open #back-to-top {
 }
 
 /* فوتر المنصة الموحّد ظاهر أثناء التسجيل/الدخول (كل الشاشات) */
+body.rizq-reg-open > footer,
 body.rizq-reg-open > footer.rizq-footer,
+html.rizq-reg-page body > footer,
 html.rizq-reg-page body > footer.rizq-footer {
   display: block !important;
   visibility: visible !important;
@@ -52,7 +54,17 @@ html.rizq-reg-page body > footer.rizq-footer {
   position: relative !important;
   z-index: 4 !important;
   margin-top: 0 !important;
-  order: 2;
+  order: 2 !important;
+}
+/* أثناء التسجيل/الدخول: أظهر أعمدة الروابط والأرقام (لا تبقَ مطوية) */
+body.rizq-reg-open > footer .rzq-ft-collapse-wrap,
+html.rizq-reg-page body > footer .rzq-ft-collapse-wrap {
+  max-height: none !important;
+  overflow: visible !important;
+}
+body.rizq-reg-open > footer.rzq-ft-compact,
+html.rizq-reg-page body > footer.rzq-ft-compact {
+  padding-top: 40px !important;
 }
 
 #modal.reg-wizard-arming .modal-close {
@@ -505,11 +517,12 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     height: auto !important;
     overflow: visible !important;
   }
+  body.rizq-reg-open > footer,
   body.rizq-reg-open > footer.rizq-footer {
     display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    order: 2;
+    order: 2 !important;
   }
   /* وضوح خطوات التسجيل على الهاتف */
   #modal.reg-wizard-mode .reg-progress-bar {
@@ -794,12 +807,14 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   html.rizq-reg-page body > *:not(#modal):not(footer):not(#rizq-terms-modal):not(#rag-overlay):not(.rizq-act-select-menu):not(#rizq-reg-chrome):not(script):not(style):not(link) {
     display:none !important; visibility:hidden !important; pointer-events:none !important;
   }
+  html.rizq-reg-page body > footer,
   html.rizq-reg-page body > footer.rizq-footer {
     display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;
     position: relative !important;
     z-index: 4 !important;
+    order: 2 !important;
   }
   html.rizq-reg-page #modal.modal-overlay,
   html.rizq-reg-page #modal.modal-overlay.open,
