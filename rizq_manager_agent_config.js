@@ -41,9 +41,9 @@ var PLATFORM_OVERVIEW = {
 // ═══════════════════════════════════════════════════════════════
 var REGISTRATION_GUIDE = {
   overview_ar:
-    '📝 التسجيل في رزق — مساران واضحان:\n\n🛒 مشتري / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أشتري — حساب سريع»\n3️⃣ أو افتح مباشرة: rizq_register.html\n4️⃣ أكّد بريدك برمز OTP\n\n🏪 بائع / محل / مكتب / شركة:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ أو افتح: rizq_landing_v8.html?openRegister=1\n3️⃣ اختر نوع الحساب وأكمل البيانات + التحقق\n4️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب بائع؟\n• من «حسابي» اختر «لدي حساب بائع — دخول»\n• أو: rizq_landing_v8.html?openLogin=1',
+    '📝 التسجيل في رزق — مساران واضحان:\n\n🛒 مشتري / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أشتري — حساب سريع»\n3️⃣ أو افتح صفحة التسجيل: rizq-register (ملف rizq register.html)\n4️⃣ أكّد بريدك برمز OTP\n\n🏪 بائع / محل / مكتب / شركة:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ أو من الرابط: الصفحة الرئيسية مع ?openRegister=1\n3️⃣ اختر نوع الحساب وأكمل البيانات + التحقق\n4️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب بائع؟\n• من «حسابي» اختر «لدي حساب بائع — دخول»\n• أو الصفحة الرئيسية مع ?openLogin=1',
   overview_fr:
-    '📝 Inscription sur Rizq — deux parcours clairs:\n\n🛒 Acheteur / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « J\'achète — compte rapide »\n3️⃣ Ou ouvrez directement: rizq_register.html\n4️⃣ Confirmez votre e-mail avec le code OTP\n\n🏪 Vendeur / boutique / bureau / entreprise:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Ou ouvrez: rizq_landing_v8.html?openRegister=1\n3️⃣ Choisissez le type de compte et complétez + vérification\n4️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte vendeur?\n• Depuis « Compte » → « J\'ai un compte vendeur — Connexion »\n• Ou: rizq_landing_v8.html?openLogin=1',
+    '📝 Inscription sur Rizq — deux parcours clairs:\n\n🛒 Acheteur / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « J\'achète — compte rapide »\n3️⃣ Ou ouvrez la page d\'inscription acheteur (rizq register)\n4️⃣ Confirmez votre e-mail avec le code OTP\n\n🏪 Vendeur / boutique / bureau / entreprise:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Ou l\'accueil avec ?openRegister=1\n3️⃣ Choisissez le type de compte et complétez + vérification\n4️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte vendeur?\n• Depuis « Compte » → « J\'ai un compte vendeur — Connexion »\n• Ou l\'accueil avec ?openLogin=1',
 
   account_types: {
     private_mr: {
@@ -285,8 +285,8 @@ var FAQ = [
   {
     q: ['دخول','تسجيل دخول','لدي حساب','login','connexion','se connecter','openLogin'],
     a: {
-      ar: '🔑 دخول البائع:\n• الرئيسية → زر «دخول»\n• أو الرابط: rizq_landing_v8.html?openLogin=1\n• أو «حسابي» → «لدي حساب بائع — دخول»\n\n🛒 حساب مشتري / سريع: rizq_register.html أو «حسابي» → حساب سريع.',
-      fr: '🔑 Connexion vendeur:\n• Accueil → « Connexion »\n• Ou: rizq_landing_v8.html?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n\n🛒 Compte acheteur: rizq_register.html ou « Compte » → compte rapide.'
+      ar: '🔑 دخول البائع:\n• الرئيسية → زر «دخول»\n• أو الصفحة الرئيسية مع ?openLogin=1\n• أو «حسابي» → «لدي حساب بائع — دخول»\n\n🛒 حساب مشتري / سريع: من «حسابي» → حساب سريع (أو صفحة rizq register).',
+      fr: '🔑 Connexion vendeur:\n• Accueil → « Connexion »\n• Ou l\'accueil avec ?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n\n🛒 Compte acheteur: « Compte » → compte rapide (page rizq register).'
     }
   },
   {
@@ -724,8 +724,8 @@ function processMessage(userMessage, context) {
   // Forgot password / login issue
   if (/\u0646\u0633\u064A\u062A|\u0643\u0644\u0645\u0629 \u0633\u0631|\u062F\u062E\u0648\u0644|\u062A\u0633\u062C\u064A\u0644 \u062F\u062E\u0648\u0644|oubli|forgot|password|login/.test(lower)) {
     return { reply: lang==='fr'
-      ? '🔑 Connexion vendeur:\n• Accueil → « Connexion » ou lien: rizq_landing_v8.html?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (code e-mail).\n\n🛒 Compte acheteur: rizq_register.html ou « Compte » → compte rapide.'
-      : '🔑 دخول البائع:\n• الرئيسية → «دخول» أو الرابط: rizq_landing_v8.html?openLogin=1\n• أو من «حسابي» → «لدي حساب بائع — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (رمز على البريد).\n\n🛒 حساب المشتري: rizq_register.html أو «حسابي» → حساب سريع.', lang: lang };
+      ? '🔑 Connexion vendeur:\n• Accueil → « Connexion » ou ?openLogin=1\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (code e-mail).\n\n🛒 Compte acheteur: « Compte » → compte rapide.'
+      : '🔑 دخول البائع:\n• الرئيسية → «دخول» أو ?openLogin=1\n• أو من «حسابي» → «لدي حساب بائع — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (رمز على البريد).\n\n🛒 حساب المشتري: «حسابي» → حساب سريع.', lang: lang };
   }
 
   if (context.tier === 'diamond' && /\u062A\u0642\u0631\u064A\u0631|\u062A\u062D\u0644\u064A\u0644|report|analyse/.test(lower)) {

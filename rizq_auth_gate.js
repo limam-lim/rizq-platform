@@ -299,10 +299,10 @@
       '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
       '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
       '#rag-overlay .rag-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:6}',
-      '#rag-overlay .rag-back{display:inline-flex;align-items:center;gap:6px;background:#0f2347;border:2px solid #c9a84c;color:#e8c96a;min-height:44px;padding:10px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit;box-shadow:0 4px 12px rgba(15,35,65,.18)}',
-      '#rag-overlay .rag-back:hover{background:#1b3a6b;border-color:#e8c96a;color:#fff}',
-      '#rag-overlay .rag-close{background:#fff;border:2px solid #cbd5e1;color:#0f2347;width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:20px;font-weight:800;flex-shrink:0;line-height:1;box-shadow:0 2px 8px rgba(15,35,65,.08)}',
-      '#rag-overlay .rag-close:hover{background:#fef2f2;border-color:#ef4444;color:#b91c1c}',
+      '#rag-overlay .rag-back{display:inline-flex!important;align-items:center;gap:6px;background:#0f2347!important;border:2px solid #c9a84c!important;color:#e8c96a!important;min-height:44px;padding:10px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit;box-shadow:0 4px 12px rgba(15,35,65,.18)}',
+      '#rag-overlay .rag-back:hover{background:#1b3a6b!important;border-color:#e8c96a!important;color:#fff!important}',
+      '#rag-overlay .rag-close{background:#fff!important;border:2px solid #94a3b8!important;color:#0f2347!important;width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:22px;font-weight:900;flex-shrink:0;line-height:1;box-shadow:0 2px 8px rgba(15,35,65,.12)!important}',
+      '#rag-overlay .rag-close:hover{background:#fef2f2!important;border-color:#ef4444!important;color:#b91c1c!important}',
       '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 20px 10px;border-bottom:1px solid #e2e8f5}',
       '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
       '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
@@ -1057,6 +1057,8 @@
     }
     rememberAfterAuthHref();
     openRagShell();
+    _modalMode = 'gate';
+    applyTexts('reasonGeneric');
     var dict = d();
     document.getElementById('rag-title').textContent = dict.titleChoice;
     document.getElementById('rag-sub').textContent = dict.subChoice;
@@ -1068,6 +1070,11 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var closeBtn = document.getElementById('rag-close-btn');
+    if (closeBtn) {
+      closeBtn.setAttribute('aria-label', t('إغلاق', 'Fermer'));
+      closeBtn.setAttribute('title', t('إغلاق', 'Fermer'));
+    }
     var l1 = document.getElementById('rag-pstep-1-label');
     var l2 = document.getElementById('rag-pstep-2-label');
     var l3 = document.getElementById('rag-pstep-3-label');
