@@ -611,7 +611,21 @@
     ov.style.zIndex = '1000001';
     ov.style.pointerEvents = 'none';
     document.body.classList.add('rizq-reg-open');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = '';
+    try {
+      if (typeof window.RizqEnsureSiteFooter === 'function') window.RizqEnsureSiteFooter();
+      if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
+        window.RizqFooterToggle.setOpen(true);
+      }
+      var siteFooter = document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
+      if (siteFooter) {
+        siteFooter.style.display = 'block';
+        siteFooter.style.visibility = 'visible';
+        siteFooter.style.pointerEvents = 'auto';
+        siteFooter.style.order = '2';
+        siteFooter.style.zIndex = '4';
+      }
+    } catch (eFt) {}
     setTimeout(function () {
       if (ov.classList.contains('open')) ov.style.pointerEvents = 'auto';
     }, 500);

@@ -56,15 +56,41 @@ html.rizq-reg-page body > footer.rizq-footer {
   margin-top: 0 !important;
   order: 2 !important;
 }
-/* أثناء التسجيل/الدخول: أظهر أعمدة الروابط والأرقام (لا تبقَ مطوية) */
-body.rizq-reg-open > footer .rzq-ft-collapse-wrap,
-html.rizq-reg-page body > footer .rzq-ft-collapse-wrap {
+/* أثناء التسجيل/حسابي: ألغِ حشوة الهيدر الثابت حتى لا يبقى فراغ أعلى الشاشة */
+html.rizq-app-nav body.rizq-reg-open,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-reg-open,
+html.rizq-app-nav body.rizq-reg-open:has(#nav),
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-reg-open:has(#nav),
+html.rizq-reg-page body,
+html.rizq-app-nav html.rizq-reg-page body,
+html.rizq-app-nav.rizq-reg-page body,
+body.rizq-reg-open,
+html.rizq-reg-page body {
+  padding-top: 0 !important;
+}
+/* شاشة حسابي (#rag-overlay): ضمن تدفق الصفحة فوق الفوتر الرسمي */
+body.rizq-reg-open #rag-overlay.rag-overlay.open {
+  position: relative !important;
+  inset: auto !important;
+  order: 1 !important;
+  z-index: 4 !important;
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
+  background: #f8faff !important;
+  padding: 0 !important;
 }
-body.rizq-reg-open > footer.rzq-ft-compact,
-html.rizq-reg-page body > footer.rzq-ft-compact {
-  padding-top: 40px !important;
+body.rizq-reg-open #rag-overlay .rag-modal {
+  min-height: auto !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+  padding-bottom: 28px !important;
+}
+/* الشريط المصغّر داخل الحساب يُخفى — الفوتر الرسمي للمنصة يحلّ محلّه */
+body.rizq-reg-open #rag-overlay .rag-legal {
+  display: none !important;
 }
 
 #modal.reg-wizard-arming .modal-close {

@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.7"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.10"/>
 <script>
 (function () {
   try {
@@ -6371,7 +6371,7 @@ function rizqMountAccountBars(modal){
   var chrome=document.getElementById('rizq-reg-chrome');
   var fakeFooter=document.getElementById('rizq-reg-footer');
   if(chrome && chrome.parentNode!==modal) modal.insertBefore(chrome, modal.firstChild);
-  /* الشريط السفلي الموحد للمنصة (footer.rizq-footer) — لا نستخدم شريط الأيقونات القديم */
+  /* الشريط السفلي الموحد للمنصة (footer.rizq-footer) — لا نستخدم شريط الأيقونات القديمة */
   if(fakeFooter){
     fakeFooter.setAttribute('hidden','');
     fakeFooter.setAttribute('aria-hidden','true');
@@ -6393,21 +6393,10 @@ function rizqMountAccountBars(modal){
       siteFooter.style.position='relative';
       siteFooter.style.zIndex='4';
       siteFooter.style.order='2';
-      /* أثناء التسجيل/الدخول: افتح أعمدة الروابط والأرقام مباشرة */
-      var wrap=siteFooter.querySelector('.rzq-ft-collapse-wrap');
-      var btn=siteFooter.querySelector('.rzq-ft-toggle-btn');
-      if(wrap){
-        wrap.style.maxHeight=wrap.scrollHeight ? (wrap.scrollHeight + 'px') : '2000px';
-      }
-      if(btn){
-        btn.setAttribute('aria-expanded','true');
-        var txt=btn.querySelector('.rzq-ft-txt');
-        if(txt){
-          var isFr=(document.documentElement.getAttribute('lang')==='fr') || (document.documentElement.getAttribute('dir')==='ltr');
-          txt.textContent=isFr ? 'Masquer les liens' : 'إخفاء الروابط';
-        }
-      }
-      siteFooter.classList.remove('rzq-ft-compact');
+    }
+    /* افتح الأقسام عبر الـ API حتى يبقى زر «إخفاء الروابط» متزامناً ويعمل */
+    if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
+      window.RizqFooterToggle.setOpen(true);
     }
   }catch(e){}
 }
