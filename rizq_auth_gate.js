@@ -360,7 +360,9 @@
       '#rag-overlay .rag-devhint{background:#fff8e8;border:1px dashed rgba(201,168,76,.45);border-radius:10px;padding:8px 10px;font-size:11px;color:#92400e;text-align:center;margin-bottom:10px;display:none}',
       '#rag-overlay .rag-devhint.show{display:block}',
       '#rag-overlay .rag-privacy{color:#64748b!important;font-size:11.5px;text-align:center;margin-top:14px;line-height:1.65}',
-      '#rag-overlay .rag-legal{display:block!important;margin-top:18px;padding:16px 14px!important;border-top:1px solid #e2e8f0;background:#0f172a!important;border-radius:14px;min-height:auto!important;height:auto!important;position:static!important;box-shadow:none!important;color:rgba(255,255,255,.85)}',
+      '#rag-overlay .rag-card{display:flex!important;flex-direction:column!important;max-height:min(92vh,920px)!important}',
+      '#rag-overlay .rag-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}',
+      '#rag-overlay .rag-legal{display:block!important;margin-top:auto!important;padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px))!important;border-top:1px solid rgba(201,168,76,.22);background:#0f172a!important;border-radius:14px 14px 0 0;min-height:auto!important;height:auto!important;position:sticky!important;bottom:0!important;z-index:5!important;box-shadow:0 -8px 24px rgba(0,0,0,.18)!important;color:rgba(255,255,255,.85);flex:0 0 auto}',
       '#rag-overlay .rag-legal-title{font-size:12px;font-weight:800;color:#c9a84c;letter-spacing:.6px;margin:0 0 10px;text-transform:uppercase}',
       '#rag-overlay .rag-legal-links{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:0 0 12px}',
       '#rag-overlay .rag-legal a{color:#e8c96a!important;font-size:12.5px!important;font-weight:800!important;text-decoration:none!important;padding:8px 12px!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;border:1px solid rgba(201,168,76,.28)!important;display:inline-flex!important;align-items:center;line-height:1.2}',
@@ -462,6 +464,8 @@
       '    <nav class="rag-legal" id="rag-legal" aria-label="روابط سريعة وتواصل">',
       '      <div class="rag-legal-title" id="rag-legal-title">روابط سريعة</div>',
       '      <div class="rag-legal-links">',
+      '        <a id="rag-link-home" href="rizq_landing_v8.html">الرئيسية</a>',
+      '        <a id="rag-link-browse" href="rizq_browse.html">تصفّح</a>',
       '        <a id="rag-link-help" href="rizq_help.html"></a>',
       '        <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
       '        <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
@@ -679,9 +683,17 @@
     var lp = document.getElementById('rag-link-privacy');
     var lt = document.getElementById('rag-link-terms');
     var lh = document.getElementById('rag-link-help');
+    var lhome = document.getElementById('rag-link-home');
+    var lbrowse = document.getElementById('rag-link-browse');
     if (lp) lp.textContent = dict.linkPrivacy;
     if (lt) lt.textContent = dict.linkTerms;
     if (lh) lh.textContent = dict.linkHelp;
+    if (lhome) lhome.textContent = t('الرئيسية', 'Accueil');
+    if (lbrowse) lbrowse.textContent = t('تصفّح', 'Parcourir');
+    var legalTitle = document.getElementById('rag-legal-title');
+    var contactTitle = document.getElementById('rag-contact-title');
+    if (legalTitle) legalTitle.textContent = t('روابط سريعة', 'Liens rapides');
+    if (contactTitle) contactTitle.textContent = t('تواصل معنا', 'Contact');
     document.getElementById('rag-name-err').textContent = dict.errName;
     document.getElementById('rag-phone-err').textContent = dict.errPhone;
     document.getElementById('rag-whatsapp-err').textContent = dict.errWhatsapp;

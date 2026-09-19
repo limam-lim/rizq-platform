@@ -263,6 +263,15 @@
     setTimeout(hookFooterStats, 400);
   }
 
+  /* يُستدعى بعد حقن الفوتر الموحّد ديناميكياً (rizq_site_footer.js) */
+  window.RizqFooterToggleRefresh = function () {
+    try {
+      injectStyle();
+      init();
+      hookFooterStats();
+    } catch (e) {}
+  };
+
   document.addEventListener('rizq:langchange', function () {
     applyFooterStats();
   });
