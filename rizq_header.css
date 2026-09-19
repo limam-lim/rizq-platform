@@ -388,11 +388,34 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   #rizq-app-header{display:none !important}
 }
 
-/* Tablet / narrow desk: hide «الرئيسية» — logo already goes home; frees crowded top bar */
+/* Tablet / narrow desk: declutter top bar (logo already goes home).
+   Hide Home + Smart assistant link; keep Favorites as icon-only to stop overlap with «المزيد». */
 @media (min-width:769px) and (max-width:1100px) and (min-height:501px){
   html.rizq-app-nav #nav .nav-center > li[data-nav-order="1"],
-  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="1"]{
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="1"],
+  html.rizq-app-nav #nav .nav-center > li[data-nav-order="8"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="8"]{
     display:none !important;
+  }
+  html.rizq-app-nav #nav .nav-fav-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{
+    display:none !important;
+  }
+  html.rizq-app-nav #nav .nav-fav-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-btn{
+    padding:8px 11px !important;
+    min-width:38px;
+  }
+  html.rizq-app-nav #nav .nav-center a,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    padding:6px 8px !important;
+    font-size:12px !important;
+  }
+  html.rizq-app-nav #nav .nav-center,
+  html.rizq-app-nav #rizq-desk-nav .nav-center{
+    gap:0 !important;
   }
 }
 
