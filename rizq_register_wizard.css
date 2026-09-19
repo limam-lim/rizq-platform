@@ -1,8 +1,9 @@
 /**
- * rizq_register_wizard.css  v6.7
+ * rizq_register_wizard.css  v6.11
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
  *   (روابط سريعة + أرقام التواصل) بدل شريط الأيقونات السفلي القديم
+ * تابلت ≥769: شريط كروم مثل الكمبيوتر (الرئيسية + RIZQ PLATFORM)
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -734,27 +735,46 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     box-sizing: border-box;
   }
 
-  /* تابلت / شاشات ضيقة: منع تداخل FR|AR مع الروابط */
+  /* تابلت / شاشات متوسطة: نفس عناصر الكمبيوتر مع ضغط خفيف فقط */
   @media (max-width: 1100px) {
     #modal.reg-wizard-mode > .rizq-reg-chrome,
-    body.rizq-reg-open #rizq-reg-chrome {
-      gap: 8px;
-      padding: 0 2.5%;
+    body.rizq-reg-open #rizq-reg-chrome,
+    html.rizq-reg-page #rizq-reg-chrome {
+      gap: 10px;
+      padding: 0 max(20px, 2.5%);
     }
-    .rizq-reg-chrome-links { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .rizq-reg-chrome-links {
+      gap: 2px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+    }
     .rizq-reg-chrome-links a {
-      font-size: 12px;
-      padding: 6px 8px;
+      display: inline-flex !important; /* أبقي الرئيسية ظاهرة مثل الكمبيوتر */
+      font-size: 12.5px;
+      padding: 6px 9px;
+      white-space: nowrap;
     }
-    .rizq-reg-chrome-links a:first-child { display: none; } /* إخفاء الرئيسية */
     .rizq-reg-chrome-lang {
-      font-size: 11px;
-      padding: 6px 10px;
+      font-size: 12px;
+      padding: 7px 11px;
       z-index: 2;
+      flex-shrink: 0;
     }
-    #modal .rizq-reg-chrome .logo-sub { display: none !important; }
-    #modal .rizq-reg-chrome .logo-mark-img { width: 34px !important; height: 34px !important; }
-    #modal .rizq-reg-chrome .logo-ar { font-size: 18px !important; }
+    #modal .rizq-reg-chrome .logo-sub,
+    .rizq-reg-chrome-logo .logo-sub {
+      display: block !important; /* RIZQ PLATFORM مثل الكمبيوتر */
+      font-size: 7px !important;
+    }
+    #modal .rizq-reg-chrome .logo-mark-img,
+    .rizq-reg-chrome-logo .logo-mark-img {
+      width: 38px !important;
+      height: 38px !important;
+    }
+    #modal .rizq-reg-chrome .logo-ar,
+    .rizq-reg-chrome-logo .logo-ar {
+      font-size: 20px !important;
+    }
   }
 
   /* مساحة للشريط العلوي الثابت */
