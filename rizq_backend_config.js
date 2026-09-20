@@ -28,6 +28,8 @@
     || h.endsWith('.gitpod.io')
     || h.endsWith('.loca.lt')
     || h.endsWith('.localtunnel.me')
+    || h.endsWith('.serveousercontent.com')
+    || h.endsWith('.trycloudflare.com')
     || /\.github\.io$/i.test(h);
   var isLocal = !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || isPreview;
   window.RIZQ_IS_LOCAL = isLocal;

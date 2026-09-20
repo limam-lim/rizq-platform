@@ -234,6 +234,8 @@ function isDevPreviewOrigin(origin) {
     if (h.endsWith('.gitpod.io')) return true;
     if (h.endsWith('.loca.lt')) return true;
     if (h.endsWith('.localtunnel.me')) return true;
+    if (h.endsWith('.serveousercontent.com')) return true;
+    if (h.endsWith('.trycloudflare.com')) return true;
     if (/^[a-z0-9-]+\.github\.io$/i.test(h)) return true;
     return false;
   } catch (e) {
