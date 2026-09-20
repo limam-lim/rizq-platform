@@ -1853,7 +1853,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 
 /* Restore every landing block that fade-in had left invisible */
-#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,
+#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
@@ -1951,7 +1951,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 <script src="rizq_dynamic_nav.js?v=16.3" defer></script>
 <script src="rizq_module_flags.js" defer></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=18" defer></script>
+<script src="rizq_footer_toggle.js?v=19" defer></script>
 <script src="rizq_account_route.js?v=9"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.5" defer></script>
@@ -2622,6 +2622,78 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       _origSetItem2.call(this, k, v);
       if(k === 'rizq_lang') renderTenderStats();
     };
+  }catch(e){}
+})();
+</script>
+
+<!-- ══ SECTION: غرفة الاستثمارات — نفس نمط ترويج المحلات/المكاتب/المعارض/المناقصات ══ -->
+<section id="virtual-investments" data-rizq-module="investments" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
+
+  <div style="position:absolute;top:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);pointer-events:none"></div>
+
+  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
+
+    <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
+      <p class="section-tag" style="color:var(--gold)">Rizq Investments</p>
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--navy)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
+        <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
+      </h2>
+      <p style="color:#5b6b85;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t-fr="Présentez votre projet d'investissement, trouvez des partenaires, et connectez-vous dans un espace sérieux réservé aux opportunités réelles.">
+        اعرض مشروعك الاستثماري، ابحث عن شركاء، وتواصل في فضاء جاد مخصّص للفرص الحقيقية.
+      </p>
+    </div>
+
+    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 40px">
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📈</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Publiez votre opportunité">انشر فرصتك الاستثمارية</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Décrivez le projet, le secteur et le besoin — et atteignez des investisseurs intéressés.">صف المشروع والقطاع والاحتياج — وصل إلى مستثمرين مهتمين.</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🤝</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Mise en relation prudente">تواصل حذر ومدروس</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Revue initiale avant mise en relation — pour un espace plus sérieux et plus sûr.">مراجعة أوّلية قبل الربط — لمساحة أكثر جدّية وأماناً.</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🇲🇷</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Opportunités locales">فرص موريتانية</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Commerce, immobilier, agriculture, services — au même endroit.">تجارة، عقار، زراعة، خدمات — في مكان واحد.</div>
+      </div>
+    </div>
+
+    <div class="fade-in" id="investments-empty-mount" style="max-width:720px;margin:0 auto 32px">
+      <div class="rzq-disc-empty">
+        <div class="rzq-disc-empty-icon">🌟</div>
+        <div class="rzq-disc-empty-title">كن أول من ينشر فرصة استثمار هنا</div>
+        <div class="rzq-disc-empty-desc">فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.</div>
+      </div>
+    </div>
+
+    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
+      <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">📈 ادخل غرفة الاستثمارات</a>
+      <a href="rizq_investments.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">+ انشر فرصة استثمار</a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function(){
+  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+  function paintInvestEmpty(){
+    var mount = document.getElementById('investments-empty-mount');
+    if(!mount) return;
+    var fr = isFr();
+    mount.innerHTML = '<div class="rzq-disc-empty">'
+      + '<div class="rzq-disc-empty-icon">🌟</div>'
+      + '<div class="rzq-disc-empty-title">'+(fr?'Soyez le premier à publier une opportunité ici':'كن أول من ينشر فرصة استثمار هنا')+'</div>'
+      + '<div class="rzq-disc-empty-desc">'+(fr?'Les opportunités apparaîtront ici dès leur publication.':'فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.')+'</div>'
+      + '</div>';
+  }
+  document.addEventListener('DOMContentLoaded', paintInvestEmpty);
+  try{
+    var _si = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(k,v){ _si.call(this,k,v); if(k==='rizq_lang') paintInvestEmpty(); };
   }catch(e){}
 })();
 </script>
@@ -3712,7 +3784,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   <!-- الشريط السفلي الموحد = footer.rizq-footer في أسفل الصفحة (يُظهر أثناء التسجيل/الدخول) -->
 </div><!-- /#modal -->
 
-<script src="rizq_categories_config.js?v=20" defer></script>
+<script src="rizq_categories_config.js?v=21" defer></script>
 <script>
 var isAr = true;
 
@@ -5080,7 +5152,28 @@ var _catNamesInit = (typeof RizqCategories !== 'undefined') ? RizqCategories.cat
   fr: ['Immobilier','Voitures & pièces',"Agences d'assurance véhicules",'Camions & engins','Téléphones & électronique','Mode & vêtements','Or & bijoux','Santé & beauté','Emplois','Services & métiers','Meubles & décor','Construction','Commerce & industrie','Sports & loisirs','Éducation & culture','Alimentation','Arts & artisanat','Bétail, volaille & vétérinaire']
 };
 const CAT_NAMES = _catNamesInit;
-_rizqInitBuiltinCategories();
+/* كان الاستدعاء هنا يسبق تنفيذ rizq_categories_config.js (defer) فيبقى
+   #builtin-cats-mount فارغاً ولا تظهر إلا بطاقة «اقترح قسماً» — إصلاح السباق. */
+function _rizqBootCategoryGrid() {
+  try {
+    if (typeof RizqCategories !== 'undefined' && typeof RizqCategories.catNamesArrays === 'function') {
+      var names = RizqCategories.catNamesArrays();
+      if (names && names.ar && names.ar.length) {
+        CAT_NAMES.ar = names.ar;
+        CAT_NAMES.fr = names.fr || CAT_NAMES.fr;
+      }
+    }
+  } catch (eBootNames) { /* ignore */ }
+  _rizqInitBuiltinCategories();
+  try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) { /* ignore */ }
+  try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSug) { /* ignore */ }
+  try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) { /* ignore */ }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _rizqBootCategoryGrid);
+} else {
+  setTimeout(_rizqBootCategoryGrid, 0);
+}
 
 const QCAT_NAMES = {
   ar: ['عقارات','سيارات','شاحنات','إلكترونيات','أزياء','ذهب','صحة وجمال','وظائف','ماشية'],

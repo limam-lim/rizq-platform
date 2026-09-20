@@ -62,19 +62,26 @@
       + 'color:rgba(255,255,255,.82)!important}'
       + 'html body footer .footer-links a:hover{color:#C9A84C!important}'
       + 'html body footer .footer-links li a{white-space:nowrap}'
-      + 'html body .section-header,html body .sec-header,html body .cta-inner,'
-      + 'html body .price-ticker-wrap,html body .price-card,html body .cs-strip,'
-      + 'html body .rzq-disc-empty,html body .hero-stats-bar,html body .rn-topnav,'
-      + 'html body .ticker-wrap,html body .hero-eyebrow,html body .hero-title-card,'
-      + 'html body .hero-subtitle-card,html body .hero-vid-ph,'
-      + 'html body .listings-label>span,html body .ad-card,html body .listing-card,'
-      + 'html body #cat-portal,html body .why-card,html body .rvid-section,'
-      + 'html body nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav),'
-      + 'html body .rpkg-card[style*="#1B3A6B"],html body .pricing-card[style*="#1B3A6B"]{'
-      + 'background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),'
-      + 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Cg fill=\'%23C9A84C\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M30 0l30 30-30 30L0 30z\'/%3E%3C/g%3E%3C/svg%3E")!important;'
-      + 'background-size:auto,60px 60px!important;background-repeat:no-repeat,repeat!important;'
-      + 'background-blend-mode:overlay!important}';
+      /* نمط شريط المحادثة (rag-legal): روابط سريعة كحبوب + تواصل مضغوط */
+      + 'footer.rizq-footer .rzq-ft-pill-wrap{display:flex;flex-wrap:wrap;align-items:center;'
+      + 'justify-content:center;gap:6px;margin:0 0 10px}'
+      + 'footer.rizq-footer .rzq-ft-pill-wrap a{color:#e8c96a!important;font-size:11.5px!important;'
+      + 'font-weight:800!important;text-decoration:none!important;padding:6px 10px!important;'
+      + 'border-radius:8px!important;background:rgba(255,255,255,.06)!important;'
+      + 'border:1px solid rgba(201,168,76,.28)!important;display:inline-flex!important;'
+      + 'align-items:center;line-height:1.15;white-space:nowrap}'
+      + 'footer.rizq-footer .rzq-ft-pill-wrap a:hover{background:rgba(201,168,76,.16)!important;'
+      + 'border-color:rgba(201,168,76,.55)!important;color:#fff!important}'
+      + 'footer.rizq-footer .rzq-ft-contact-grid{display:grid;grid-template-columns:1fr 1fr;'
+      + 'gap:4px 10px;font-size:11.5px;line-height:1.35;max-width:420px;margin:0 auto}'
+      + 'footer.rizq-footer .rzq-ft-contact-grid > li:last-child{grid-column:1/-1;text-align:center}'
+      + 'footer.rizq-footer.rzq-ft-compact-layout .footer-grid{'
+      + 'grid-template-columns:1fr!important;gap:14px!important;text-align:center}'
+      + 'footer.rizq-footer.rzq-ft-compact-layout .footer-grid > div:first-child{display:none}'
+      + 'footer.rizq-footer.rzq-ft-compact-layout .footer-col-title{margin-bottom:8px!important;'
+      + 'font-size:10.5px!important;letter-spacing:.4px!important}'
+      + '@media (max-width:600px){footer.rizq-footer .rzq-ft-contact-grid{grid-template-columns:1fr;'
+      + 'justify-items:center}}';
     var style = document.getElementById('rzq-ft-toggle-css');
     if (!style) {
       style = document.createElement('style');
@@ -132,6 +139,73 @@
     }
   }
 
+  function compactFooterLikeAuthGate(footerEl, grid) {
+    if (!footerEl || !grid || footerEl.getAttribute('data-rzq-ft-compacted') === '1') return;
+    footerEl.setAttribute('data-rzq-ft-compacted', '1');
+    footerEl.classList.add('rzq-ft-compact-layout');
+
+    var quickCol = null;
+    var contactCol = null;
+    var cols = grid.children;
+    for (var i = 0; i < cols.length; i++) {
+      var title = cols[i].querySelector('.footer-col-title, h4');
+      var t = title ? (title.getAttribute('data-t') || '') : '';
+      var txt = title ? (title.textContent || '') : '';
+      if (t === 'ft-quick' || /روابط سريعة|Liens rapides/i.test(txt)) quickCol = cols[i];
+      if (t === 'ft-contact' || /تواصل معنا|Contact/i.test(txt)) contactCol = cols[i];
+    }
+    if (quickCol) {
+      var links = quickCol.querySelectorAll('.footer-links a');
+      if (links.length) {
+        var pill = document.createElement('div');
+        pill.className = 'rzq-ft-pill-wrap';
+        var want = [
+          { re: /رئيسية|Accueil|Home/i, href: 'rizq_landing_v8.html', ar: 'الرئيسية', fr: 'Accueil' },
+          { re: /تصف|Browse|Annonces/i, href: 'rizq_browse.html', ar: 'تصفّح', fr: 'Parcourir' },
+          { re: /مساعدة|Help|aide/i, href: 'rizq_help.html', ar: 'المساعدة', fr: 'Aide' },
+          { re: /شروط|Conditions|Terms/i, href: 'rizq_legal.html#s2', ar: 'الشروط', fr: 'Conditions' },
+          { re: /خصوص|Privacy|Confidential/i, href: 'rizq_legal.html#s3', ar: 'الخصوصية', fr: 'Confidentialité' }
+        ];
+        var fr = lang() === 'fr';
+        want.forEach(function (w) {
+          var found = null;
+          for (var j = 0; j < links.length; j++) {
+            if (w.re.test(links[j].textContent || '') || (links[j].getAttribute('href') || '').indexOf(w.href.split('#')[0]) !== -1) {
+              found = links[j];
+              break;
+            }
+          }
+          var a = document.createElement('a');
+          a.href = found ? found.getAttribute('href') : w.href;
+          a.textContent = fr ? w.fr : w.ar;
+          if ((a.href || '').indexOf('rizq_legal') !== -1) {
+            a.target = '_blank';
+            a.rel = 'noopener';
+          }
+          pill.appendChild(a);
+        });
+        var ul = quickCol.querySelector('.footer-links');
+        if (ul) ul.style.display = 'none';
+        quickCol.appendChild(pill);
+      }
+    }
+    if (contactCol) {
+      var cul = contactCol.querySelector('.footer-links');
+      if (cul) cul.classList.add('rzq-ft-contact-grid');
+    }
+    /* أخفِ أعمدة «أبرز الأقسام» و«المساعدة» — الروابط السريعة تغطيها */
+    for (var k = 0; k < cols.length; k++) {
+      if (cols[k] === quickCol || cols[k] === contactCol) continue;
+      var ht = cols[k].querySelector('.footer-col-title, h4');
+      var hd = ht ? (ht.getAttribute('data-t') || '') : '';
+      if (hd === 'ft-topcats' || hd === 'ft-help' || hd === 'ft-desc') {
+        cols[k].style.display = 'none';
+      } else if (ht && /أبرز الأقسام|المساعدة|Catégories|Aide/i.test(ht.textContent || '')) {
+        cols[k].style.display = 'none';
+      }
+    }
+  }
+
   function init() {
     var grid = document.querySelector('.footer-grid');
     if (!grid || grid.closest('.rzq-ft-collapse-wrap')) return; // لا فوتر بهذا النمط، أو حُقن مسبقاً
@@ -139,6 +213,7 @@
     injectStyle();
 
     var footerEl = grid.closest('footer'); // قبل أي نقل DOM — closest() يعمل من مكانه الأصلي
+    try { compactFooterLikeAuthGate(footerEl, grid); } catch (eCompact) { /* ignore */ }
     shrinkFooterBottom(footerEl);
 
     // لفّ .footer-grid بغلاف قابل للطي دون المساس بأي display/grid خاص به
