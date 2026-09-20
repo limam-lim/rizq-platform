@@ -49,21 +49,37 @@ app.use(compression());
 // ── Security & IP protection headers (Contact Gate + platform copyright) ──
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
-  res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
-  res.set('Cross-Origin-Opener-Policy', 'same-origin');
-  res.set('Cross-Origin-Resource-Policy', 'same-site');
   res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
   res.set('X-Copyright', '(c) Rizq ADMINIA SARL - Proprietary. Unauthorized copying prohibited.');
-  res.set(
-    'Content-Security-Policy',
-    "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
-    + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
-    + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
-    + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
-  );
+
+  if (isProdEnv()) {
+    // إنتاج: منع التضمين في iframe وحصر الموارد
+    res.set('X-Frame-Options', 'DENY');
+    res.set('Cross-Origin-Opener-Policy', 'same-origin');
+    res.set('Cross-Origin-Resource-Policy', 'same-site');
+    res.set(
+      'Content-Security-Policy',
+      "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
+      + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
+      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
+      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
+    );
+  } else {
+    // تطوير / مراجعة Cursor Ports: السماح بالإطار والمعاينة وإلا تظهر الصفحة فارغة
+    // ولا تُفتح الروابط داخل لوحة Ports أو Simple Browser.
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set(
+      'Content-Security-Policy',
+      "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; "
+      + "frame-ancestors *; "
+      + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
+      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
+      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss: http: ws:;"
+    );
+  }
   try {
     if (req.secure || String(req.headers['x-forwarded-proto'] || '') === 'https') {
       res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -216,6 +232,8 @@ function isDevPreviewOrigin(origin) {
     // Cursor Cloud / port-forward previews, GitHub Pages, Gitpod
     if (h.endsWith('.cursorusercontent.com')) return true;
     if (h.endsWith('.gitpod.io')) return true;
+    if (h.endsWith('.loca.lt')) return true;
+    if (h.endsWith('.localtunnel.me')) return true;
     if (/^[a-z0-9-]+\.github\.io$/i.test(h)) return true;
     return false;
   } catch (e) {
