@@ -18,6 +18,8 @@ const {
   shouldAutoApprove,
   TIER,
 } = require('./provisionalTier');
+const { saveInvestmentImages } = require('./imagePipeline');
+const { saveInvestmentDocument, extractPdfTextFromDataUri } = require('./tenderDocument');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const FILE = path.join(DATA_DIR, 'investments.json');
@@ -268,7 +270,7 @@ function listPublic(opts) {
   return { ok: true, opportunities: list, publicContact: PUBLIC_CONTACT };
 }
 
-function submitOpportunity(body) {
+async function submitOpportunity(body) {
   const lang = body && body.lang === 'fr' ? 'fr' : 'ar';
   const title = sanitizeText(body && body.title, 140);
   const description = sanitizeText(body && body.description, 3000);
@@ -283,6 +285,16 @@ function submitOpportunity(body) {
     throw err;
   }
 
+  if (body && body.document) {
+    const pdfExtract = await extractPdfTextFromDataUri(body.document);
+    if (pdfExtract.error) {
+      const err = new Error(lang === 'fr' ? 'PDF invalide ou trop volumineux (max 5 Mo)' : 'ملف PDF غير صالح أو أكبر من 5MB');
+      err.status = 400;
+      err.code = 'invalid_pdf';
+      throw err;
+    }
+  }
+
   const draft = {
     title,
     description,
@@ -293,9 +305,24 @@ function submitOpportunity(body) {
   const score = scoreInvestmentOpportunity(draft);
   const auto = shouldAutoApprove(score.provisionalTier);
   const status = auto ? 'provisionally_approved' : 'pending_review';
+  const id = 'inv_' + crypto.randomBytes(7).toString('hex');
+
+  let images = [];
+  let documentPath = null;
+  try {
+    images = await saveInvestmentImages(id, body && body.images);
+    documentPath = await saveInvestmentDocument(id, body && body.document);
+  } catch (e) {
+    if (e && e.code === 'invalid_pdf') {
+      const err = new Error(lang === 'fr' ? 'PDF invalide ou trop volumineux (max 5 Mo)' : 'ملف PDF غير صالح أو أكبر من 5MB');
+      err.status = 400;
+      throw err;
+    }
+    throw e;
+  }
 
   const item = {
-    id: 'inv_' + crypto.randomBytes(7).toString('hex'),
+    id,
     title,
     titleFr: sanitizeText(body && body.titleFr, 140),
     sector: draft.sector,
@@ -308,6 +335,11 @@ function submitOpportunity(body) {
     contactEmail: sanitizeText(body && body.contactEmail, 120),
     contactPhone: sanitizeText(body && body.contactPhone, 40),
     accountId: sanitizeText(body && body.accountId, 80) || null,
+    images: images || [],
+    document: documentPath,
+    documentName: documentPath
+      ? sanitizeText(body && body.documentName, 120) || 'document.pdf'
+      : null,
     status,
     createdAt: new Date().toISOString(),
     lang,
@@ -331,6 +363,8 @@ function submitOpportunity(body) {
     lang,
     provisionalTier: item.provisionalTier,
     autoApproved: auto,
+    imageCount: (item.images || []).length,
+    hasDocument: !!item.document,
   });
   if (auto) {
     pushEvent('opportunity_provisional_approve', { id: item.id, tier: TIER.GREEN });

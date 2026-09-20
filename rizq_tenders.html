@@ -213,8 +213,9 @@ body{
 .pt-img-zone{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:#fdfcfa}
 .pt-img-zone:hover{border-color:var(--gold);background:#fffaf0}
 .pt-img-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.pt-img-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.pt-img-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);background:#f0f2f7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--navy)}
 .pt-img-thumb img{width:100%;height:100%;object-fit:cover}
+.pt-img-thumb.pdf{font-size:12px;letter-spacing:.2px}
 .pt-img-thumb button{position:absolute;top:2px;left:2px;background:rgba(220,60,60,.92);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .login-notice{background:#fff8e9;border:1.5px solid #f0d99a;border-radius:13px;padding:18px;font-size:13px;color:#7a5c00;text-align:center;line-height:1.85}
 .login-notice a{color:var(--navy);font-weight:700}
@@ -328,12 +329,12 @@ body{
         <input class="f-input" type="date" id="pt-deadline" name="deadline" required dir="ltr"/>
       </div>
       <div class="f-group">
-        <label class="f-label" data-t-fr="Photo de référence (optionnel)">صورة مرجعية (اختياري)</label>
+        <label class="f-label" data-t-fr="Pièces jointes (optionnel) — photos ou PDF">مرفقات توضيحية (اختياري) — صور أو PDF</label>
         <div class="pt-img-zone" id="pt-img-zone" onclick="document.getElementById('pt-img-input').click()">
-          <div style="font-size:22px;margin-bottom:4px">📷</div>
-          <div style="font-size:12.5px;font-weight:600;color:var(--navy)" data-t-fr="Ajouter des photos (ex : « 20 chaises comme ça »)">أضف صوراً (مثال: «20 كرسي بهذا الشكل»)</div>
-          <div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px" data-t-fr="Jusqu'à 3 photos — JPG/PNG, max 3 Mo">حتى 3 صور — JPG/PNG، أقصى 3MB</div>
-          <input type="file" id="pt-img-input" accept="image/*" multiple style="display:none" onchange="_ptHandleImgUpload(this)"/>
+          <div style="font-size:22px;margin-bottom:4px">📎</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--navy)" data-t-fr="Ajouter des photos ou un PDF pour clarifier le besoin">أضف صوراً أو ملف PDF لتوضيح الاحتياج</div>
+          <div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px" data-t-fr="Jusqu'à 3 photos + 1 PDF — JPG/PNG/PDF, max 5 Mo">حتى 3 صور + PDF واحد — JPG/PNG/PDF، أقصى 5MB</div>
+          <input type="file" id="pt-img-input" accept="image/*,application/pdf,.pdf" multiple style="display:none" onchange="_ptHandleImgUpload(this)"/>
         </div>
         <div class="pt-img-thumbs" id="pt-img-thumbs"></div>
       </div>
@@ -843,37 +844,69 @@ function openPostModal(){
 }
 function closePostModal(){ /* لم يعد هناك نافذة نشر — الإبقاء للتوافق */ }
 
-/* صور مرجعية اختيارية لتوضيح المطلوب بدقة لمقدّمي العروض */
+/* صور/PDF مرجعية اختيارية لتوضيح المطلوب بدقة لمقدّمي العروض */
 function _ptRenderImgThumbs(){
   var wrap = document.getElementById('pt-img-thumbs');
   if(!wrap) return;
   var imgs = window._tenderImages || [];
-  wrap.innerHTML = imgs.map(function(src,i){
-    return '<div class="pt-img-thumb"><img src="'+src+'"/><button type="button" onclick="_ptDeleteImg('+i+')">×</button></div>';
+  var pdf = window._tenderPdf || null;
+  var html = imgs.map(function(src,i){
+    return '<div class="pt-img-thumb"><img src="'+src+'"/><button type="button" onclick="_ptDeleteImg('+i+')" aria-label="remove">×</button></div>';
   }).join('');
+  if(pdf){
+    html += '<div class="pt-img-thumb pdf">PDF<button type="button" onclick="_ptDeletePdf()" aria-label="remove">×</button></div>';
+  }
+  wrap.innerHTML = html;
   var zone = document.getElementById('pt-img-zone') || document.querySelector('.pt-img-zone');
-  if(zone) zone.style.display = imgs.length >= 3 ? 'none' : '';
+  if(zone) zone.style.display = (imgs.length >= 3 && pdf) ? 'none' : '';
 }
 function _ptDeleteImg(i){
   (window._tenderImages||[]).splice(i,1);
+  _ptRenderImgThumbs();
+}
+function _ptDeletePdf(){
+  window._tenderPdf = null;
   _ptRenderImgThumbs();
 }
 function _ptHandleImgUpload(input){
   var fr = _rizqLang()==='fr';
   var files = Array.from(input.files||[]); if(!files.length) return;
   window._tenderImages = window._tenderImages || [];
-  var room = Math.max(0, 3 - window._tenderImages.length);
-  if(!room){ showToast(fr?'Limite atteinte : 3 photos':'وصلت للحد الأقصى: 3 صور'); return; }
-  var toLoad = files.slice(0, room);
-  var loaded = 0;
-  toLoad.forEach(function(file){
-    var reader = new FileReader();
-    reader.onload = function(e){
+  var maxBytes = 5 * 1024 * 1024;
+  files.forEach(function(file){
+    if(file.size > maxBytes){
+      showToast(fr?'Fichier trop volumineux (max 5 Mo)':'الملف أكبر من 5MB');
+      return;
+    }
+    var isPdf = (file.type === 'application/pdf') || /\.pdf$/i.test(file.name||'');
+    var isImg = (file.type||'').indexOf('image/') === 0;
+    if(isPdf){
+      if(window._tenderPdf){
+        showToast(fr?'Un seul PDF autorisé':'يُسمح بملف PDF واحد فقط');
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e){
+        window._tenderPdf = { dataUri: e.target.result, name: file.name || 'document.pdf' };
+        _ptRenderImgThumbs();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+    if(!isImg){
+      showToast(fr?'Formats acceptés : JPG, PNG, PDF':'الصيغ المقبولة: JPG و PNG و PDF');
+      return;
+    }
+    if(window._tenderImages.length >= 3){
+      showToast(fr?'Limite atteinte : 3 photos':'وصلت للحد الأقصى: 3 صور');
+      return;
+    }
+    var r2 = new FileReader();
+    r2.onload = function(e){
       window._tenderImages.push(e.target.result);
-      loaded++;
-      if(loaded===toLoad.length) _ptRenderImgThumbs();
+      _ptRenderImgThumbs();
     };
-    reader.readAsDataURL(file);
+    r2.readAsDataURL(file);
   });
   input.value = '';
 }
@@ -907,6 +940,8 @@ function submitTender(ev){
     budgetMax: Number((document.getElementById('pt-bmax')||{}).value)||0,
     deadline: new Date(deadline+'T23:59:59').toISOString(),
     images: window._tenderImages||[],
+    document: (window._tenderPdf && window._tenderPdf.dataUri) || null,
+    documentName: (window._tenderPdf && window._tenderPdf.name) || null,
   };
   _resolveRealAccessToken(session).then(function(realTok){
     fetch(_backendBase().replace(/\/$/,'') + '/api/tenders', {
@@ -921,6 +956,7 @@ function submitTender(ev){
           return;
         }
         window._tenderImages = [];
+        window._tenderPdf = null;
         _ptRenderImgThumbs();
         var form = document.getElementById('td-submit-form');
         if(form) form.reset();
@@ -1060,6 +1096,7 @@ document.addEventListener('keydown', function(e){
   var form = document.getElementById('td-submit-form');
   if(form) form.addEventListener('submit', submitTender);
   window._tenderImages = window._tenderImages || [];
+  window._tenderPdf = window._tenderPdf || null;
 })();
 
 applyLang();

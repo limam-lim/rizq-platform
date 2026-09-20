@@ -133,12 +133,19 @@ function getSectionRules() {
 
 // ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
 // (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-// مرفقات المناقصات — لا تُخدم مباشرة؛ فقط عبر /api/tenders/:id/document|images
+// مرفقات المناقصات والاستثمارات — لا تُخدم مباشرة عبر static
 app.use('/uploads/tenders', (req, res) => {
   res.status(403).json({
     error: 'tender_assets_forbidden',
     msg: 'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
     msg_fr: 'Pièces jointes protégées — abonnement requis',
+  });
+});
+app.use('/uploads/investments', (req, res) => {
+  res.status(403).json({
+    error: 'investment_assets_forbidden',
+    msg: 'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
+    msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
   });
 });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -671,9 +678,11 @@ const {
   saveCatalogImages,
   saveCatalogImage,
   saveTenderImages,
+  saveInvestmentImages,
 } = require('./services/imagePipeline');
 const {
   saveTenderDocument,
+  saveInvestmentDocument,
   resolveTenderDocumentAbsPath,
   resolveTenderUploadAbsPath,
   extractPdfTextFromDataUri,
@@ -3318,9 +3327,9 @@ app.get('/api/investments', (req, res) => {
 });
 
 /** POST /api/investments/submit — إيداع فرصة + موافقة مبدئية عند الأخضر */
-app.post('/api/investments/submit', investmentSubmitLimiter, (req, res) => {
+app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
   try {
-    const out = investmentRoom.submitOpportunity(req.body || {});
+    const out = await investmentRoom.submitOpportunity(req.body || {});
     res.json(out);
   } catch (err) {
     const status = err.status && err.status >= 400 ? err.status : 500;

@@ -114,6 +114,12 @@ body{
 .f-submit{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;font-weight:800;font-size:14px;cursor:pointer;margin-top:6px;font-family:inherit;box-shadow:0 10px 22px rgba(201,168,76,.3)}
 .f-submit:disabled{opacity:.65;cursor:wait}
 .f-hint{font-size:11.5px;color:var(--ink-faint);margin-top:10px;line-height:1.6}
+.att-zone{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:#fdfcfa}
+.att-zone:hover{border-color:var(--gold);background:#fffaf0}
+.att-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.att-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);background:#f0f2f7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--navy)}
+.att-thumb img{width:100%;height:100%;object-fit:cover}
+.att-thumb button{position:absolute;top:2px;left:2px;background:rgba(220,60,60,.92);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
 .inv-plan-card{margin-bottom:12px;padding:14px 14px 12px;border-radius:12px;background:#f8f6f0;border:1px solid var(--line)}
 .inv-plan-card h4{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:6px}
 .inv-plan-card p{font-size:12.5px;color:var(--ink-soft);line-height:1.7;white-space:pre-wrap}
@@ -331,6 +337,16 @@ body{
           <label class="f-label" for="sub-phone" data-t-fr="Téléphone (privé)">الهاتف (خاص)</label>
           <input class="f-input" id="sub-phone" name="contactPhone" maxlength="40" dir="ltr"/>
         </div>
+      </div>
+      <div class="f-group">
+        <label class="f-label" data-t-fr="Pièces jointes (optionnel) — photos ou PDF">مرفقات توضيحية (اختياري) — صور أو PDF</label>
+        <div class="att-zone" id="inv-att-zone" onclick="document.getElementById('inv-att-input').click()">
+          <div style="font-size:22px;margin-bottom:4px">📎</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--navy)" data-t-fr="Ajouter des photos ou un PDF pour clarifier le dossier">أضف صوراً أو ملف PDF لتوضيح الملف</div>
+          <div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px" data-t-fr="Jusqu'à 3 photos + 1 PDF — JPG/PNG/PDF, max 5 Mo">حتى 3 صور + PDF واحد — JPG/PNG/PDF، أقصى 5MB</div>
+          <input type="file" id="inv-att-input" accept="image/*,application/pdf,.pdf" multiple style="display:none"/>
+        </div>
+        <div class="att-thumbs" id="inv-att-thumbs"></div>
       </div>
       <button type="submit" class="f-submit" data-t-fr="إرسال للمراجعة / Envoyer pour revue">إرسال للمراجعة</button>
       <p class="f-hint" data-t-fr="Vos contacts ne sont pas affichés publiquement. Canal public: direction@rizq.mr">بياناتك لا تُعرض للعامة. القناة العامة: direction@rizq.mr</p>
@@ -585,6 +601,77 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     var form = document.getElementById('inv-submit-form');
     var msg = document.getElementById('inv-submit-msg');
     if (!form) return;
+    window._invImages = window._invImages || [];
+    window._invPdf = window._invPdf || null;
+
+    function renderAttThumbs() {
+      var wrap = document.getElementById('inv-att-thumbs');
+      if (!wrap) return;
+      var imgs = window._invImages || [];
+      var pdf = window._invPdf;
+      var html = imgs.map(function (src, i) {
+        return '<div class="att-thumb"><img src="' + src + '"/><button type="button" onclick="window._invDeleteImg(' + i + ')" aria-label="remove">×</button></div>';
+      }).join('');
+      if (pdf) {
+        html += '<div class="att-thumb">PDF<button type="button" onclick="window._invDeletePdf()" aria-label="remove">×</button></div>';
+      }
+      wrap.innerHTML = html;
+      var zone = document.getElementById('inv-att-zone');
+      if (zone) zone.style.display = (imgs.length >= 3 && pdf) ? 'none' : '';
+    }
+    window._invDeleteImg = function (i) {
+      (window._invImages || []).splice(i, 1);
+      renderAttThumbs();
+    };
+    window._invDeletePdf = function () {
+      window._invPdf = null;
+      renderAttThumbs();
+    };
+    var attInput = document.getElementById('inv-att-input');
+    if (attInput) {
+      attInput.addEventListener('change', function () {
+        var fr = isFr();
+        var files = Array.from(attInput.files || []);
+        var maxBytes = 5 * 1024 * 1024;
+        files.forEach(function (file) {
+          if (file.size > maxBytes) {
+            showToast(fr ? 'Fichier trop volumineux (max 5 Mo)' : 'الملف أكبر من 5MB');
+            return;
+          }
+          var isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+          var isImg = (file.type || '').indexOf('image/') === 0;
+          if (isPdf) {
+            if (window._invPdf) {
+              showToast(fr ? 'Un seul PDF autorisé' : 'يُسمح بملف PDF واحد فقط');
+              return;
+            }
+            var r = new FileReader();
+            r.onload = function (e) {
+              window._invPdf = { dataUri: e.target.result, name: file.name || 'document.pdf' };
+              renderAttThumbs();
+            };
+            r.readAsDataURL(file);
+            return;
+          }
+          if (!isImg) {
+            showToast(fr ? 'Formats acceptés : JPG, PNG, PDF' : 'الصيغ المقبولة: JPG و PNG و PDF');
+            return;
+          }
+          if ((window._invImages || []).length >= 3) {
+            showToast(fr ? 'Limite atteinte : 3 photos' : 'وصلت للحد الأقصى: 3 صور');
+            return;
+          }
+          var r2 = new FileReader();
+          r2.onload = function (e) {
+            window._invImages.push(e.target.result);
+            renderAttThumbs();
+          };
+          r2.readAsDataURL(file);
+        });
+        attInput.value = '';
+      });
+    }
+
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var fr = isFr();
@@ -596,7 +683,10 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
         description: (form.querySelector('[name="description"]') || {}).value || '',
         contactEmail: (form.querySelector('[name="contactEmail"]') || {}).value || '',
         contactPhone: (form.querySelector('[name="contactPhone"]') || {}).value || '',
-        lang: fr ? 'fr' : 'ar'
+        lang: fr ? 'fr' : 'ar',
+        images: window._invImages || [],
+        document: (window._invPdf && window._invPdf.dataUri) || null,
+        documentName: (window._invPdf && window._invPdf.name) || null
       };
       if (btn) { btn.disabled = true; }
       var base = apiBase();
@@ -613,6 +703,9 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
           if (msg) { msg.hidden = false; msg.textContent = text; }
           showToast(text);
           form.reset();
+          window._invImages = [];
+          window._invPdf = null;
+          renderAttThumbs();
         } else {
           showToast((data && data.error) || (fr ? 'Échec de l\'envoi' : 'فشل الإرسال'));
         }

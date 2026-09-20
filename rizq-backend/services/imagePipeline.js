@@ -114,6 +114,16 @@ async function saveTenderImages(tenderId, images) {
   });
 }
 
+async function saveInvestmentImages(invId, images) {
+  return saveProcessedImages({
+    uploadUrlPrefix: '/uploads/investments/',
+    uploadsDir: path.join(__dirname, '..', 'uploads', 'investments'),
+    entityId: invId,
+    images,
+    maxCount: 3,
+  });
+}
+
 module.exports = {
   detectImageMagic,
   parseDataUriImage,
@@ -123,5 +133,6 @@ module.exports = {
   saveCatalogImages,
   saveCatalogImage,
   saveTenderImages,
+  saveInvestmentImages,
   MAX_INPUT_BYTES,
 };
