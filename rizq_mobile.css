@@ -26,6 +26,7 @@ body {
   --rzq-z-fab:500;
   --rzq-z-header:1000;
   --rzq-z-modal:10050;
+  --rzq-z-lightbox:30000;
   --rzq-nav-clearance:72px;
 }
 html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:120px}
@@ -51,13 +52,16 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
 #rizq-chat-window,
 #rizq-prompt-bubbles,
 .modal-overlay,.disc-overlay,.rizq-promo-overlay,.rizq-modal-overlay,
-.filter-overlay,.filter-drawer,.report-overlay,#lightbox,#chat-modal,
+.filter-overlay,.filter-drawer,.report-overlay,#chat-modal,
 .mobile-drawer-overlay,.mobile-drawer,
 #ad-modal,#all-ads-modal,#pkg-modal,#sub-modal,#sub-modal-overlay,#suggest-cat-overlay,#suggest-cat-modal,
 .rvid-overlay,.cs-modal-overlay,
 #pay-modal,#ad-boost-modal,#my-pay-modal,#svc-upgrade-modal,
 .rzq-sheet-backdrop,.rzq-sheet,#rizq-splash{
   z-index:var(--rzq-z-modal)!important;
+}
+#lightbox{
+  z-index:var(--rzq-z-lightbox)!important;
 }
 
 /* ── Splash ── */

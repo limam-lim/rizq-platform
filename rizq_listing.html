@@ -19,7 +19,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
+<link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
   <link rel="stylesheet" href="rizq_header.css?v=17.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta charset="UTF-8"/>
@@ -146,7 +146,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,15,30,.97);backdrop-filt
 .similar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .sim-card{background:linear-gradient(145deg,#111d2e,#1B3A6B);border:1px solid rgba(201,168,76,.15);box-shadow:0 4px 20px rgba(0,0,0,.2);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .3s;text-decoration:none;display:block}
 .sim-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-3px);box-shadow:0 10px 24px rgba(201,168,76,.15)}
-.sim-img{height:90px;background:linear-gradient(145deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.sim-img{height:90px;background:linear-gradient(145deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold);overflow:hidden}
+.sim-img img,.sim-img .rizq-img-wrap{width:100%;height:100%;object-fit:cover;display:block}
 .sim-img svg{width:34px;height:34px;stroke-width:1.5}
 .sim-badge{position:absolute;top:6px;left:6px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:8.5px;font-weight:800;padding:3px 7px;border-radius:6px}
 .sim-body{padding:10px}
@@ -835,7 +836,9 @@ function loadActiveAdFromHandoff(numId){
     const raw = localStorage.getItem('rizq_active_ad');
     if(!raw) return null;
     const a = JSON.parse(raw);
-    if(a && Number(a.id) === Number(numId)) return a;
+    if(!a) return null;
+    if(String(a.id) === String(numId)) return a;
+    if(!isNaN(Number(numId)) && Number(a.id) === Number(numId)) return a;
   }catch(e){}
   return null;
 }
@@ -1207,8 +1210,12 @@ function buildSimilarAds(current){
 function similarCardHTML(x, sameBadge, fr){
   const badge = sameBadge ? (fr?'🔥 Même vendeur':'🔥 نفس البائع') : (fr?'📂 Même catégorie':'📂 نفس الفئة');
   const priceTxt = x.price || (fr?'À négocier':'تفاوض');
+  const imgSrc = (x.images && x.images[0]) ? String(x.images[0]) : '';
+  const media = imgSrc
+    ? '<div class="rizq-img-wrap" style="width:100%;height:100%"><img src="'+escapeHtmlLT(imgSrc)+'" alt="" style="width:100%;height:100%;object-fit:cover" loading="lazy" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"></div>'
+    : iconHTML(x.emoji);
   return `<a href="rizq_listing.html?id=${encodeURIComponent(x.id)}" class="sim-card">
-    <div class="sim-img" style="position:relative">${iconHTML(x.emoji)}<span class="sim-badge">${badge}</span></div>
+    <div class="sim-img" style="position:relative">${media}<span class="sim-badge">${badge}</span></div>
     <div class="sim-body"><div class="sim-title">${escapeHtmlLT(x.title||'')}</div><div class="sim-price">${escapeHtmlLT(priceTxt)}</div><div class="sim-loc">📍 ${escapeHtmlLT(x.loc||'')}</div></div>
   </a>`;
 }

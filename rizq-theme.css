@@ -914,13 +914,14 @@ body.page-light .listing-card:hover {
 body.page-light .ad-title { color: var(--dark-txt) !important; font-weight:700 !important; }
 body.page-light .ad-price { color: var(--gold) !important; font-weight:900 !important; }
 
-/* إطار صور الإعلانات الموحّد — نسبة ثابتة + object-fit */
+/* إطار صور الإعلانات الموحّد — نسبة ثابتة + object-fit
+   لا نفرض height:auto / max-height:none على .dp-main-img و.gallery-main
+   و.rc-thumb (صفحات التصفح/التفاصيل تحدّد أبعادها بنفسها). */
 .rizq-ad-frame,
-.ad-img, .card-img, .ad-card-img, .product-img, .hc-img,
-.dp-main-img, .gallery-main, .rc-thumb {
+.ad-img, .card-img, .ad-card-img, .product-img, .hc-img {
   aspect-ratio: var(--rizq-ad-aspect);
   width: 100%;
-  height: auto !important;
+  height: auto;
   max-height: none;
 }
 .rizq-ad-frame > img,
@@ -931,14 +932,7 @@ body.page-light .ad-price { color: var(--gold) !important; font-weight:900 !impo
   object-fit: cover;
   display: block;
 }
-.rc-thumb {
-  flex-shrink: 0;
-  width: 88px !important;
-  min-width: 88px;
-  max-width: 88px;
-  border-radius: 10px;
-  overflow: hidden;
-}
+/* .rc-thumb كان مضغوطاً إلى 88px (تخطيط أفقي قديم) — ألغِ ذلك لبطاقات الصورة */
 
 /* صور افتراضية بهوية رزق — خلفية بيضاء وأيقونات أزرق داكن، موحّدة على جميع الصفحات */
 .ad-img, .card-img, .ad-card-img, .product-img, .hc-img {
