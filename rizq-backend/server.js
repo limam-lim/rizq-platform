@@ -4839,6 +4839,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
 }
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
@@ -4863,8 +4864,8 @@ function assertProductionSecrets() {
 }
 assertProductionSecrets();
 
-app.listen(PORT, async () => {
-  console.log('[rizq-backend] running on port ' + PORT);
+app.listen(PORT, HOST, async () => {
+  console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
   console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {
