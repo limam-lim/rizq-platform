@@ -236,123 +236,7 @@ const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSh
   adminSessions,
   hasAdminPermission,
 });
-function cleanExpiredAdminSessions() {
-  const now = Date.now();
-  for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
-}
-const adminLoginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'محاولات كثيرة جداً — حاول مرة أخرى بعد قليل' },
-});
-app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
-  cleanExpiredAdminSessions();
-  const { user, pass } = req.body || {};
-  const u = String(user || '').trim().slice(0, 80);
-  const p = String(pass || '').slice(0, 200);
-  if (!u || !p) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
-  if (String(pass || '').length > 200) {
-    return res.status(400).json({ error: '❌ بيانات غير صحيحة' });
-  }
-  let acc = null;
-  try {
-    acc = await adminTeamService.authenticate(u, p);
-  } catch (eAuth) {
-    acc = null;
-  }
-  if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
-  adminTeamService.touchLogin(acc.user);
-  const token = crypto.randomBytes(32).toString('hex');
-  const permissions = adminTeamService.normalizePermissions(acc.permissions);
-  adminSessions.set(token, {
-    user: acc.user,
-    name: acc.name,
-    role: acc.legacyRole || 'staff',
-    permissions,
-    expiresAt: Date.now() + ADMIN_SESSION_TTL_MS,
-  });
-  res.set('Cache-Control', 'no-store');
-  res.json({
-    ok: true,
-    token,
-    name: acc.name,
-    role: acc.legacyRole || 'staff',
-    permissions,
-    user: acc.user,
-  });
-});
-app.get('/api/admin/verify', requireAdminSession, (req, res) => {
-  res.json({
-    ok: true,
-    name: req.adminUser.name,
-    role: req.adminUser.role,
-    permissions: req.adminUser.permissions || [],
-    user: req.adminUser.user,
-  });
-});
-
-/** GET /api/admin/permissions — قائمة الصلاحيات + قوالب جاهزة */
-app.get('/api/admin/permissions', requireAdminAuth, (req, res) => {
-  res.json({
-    ok: true,
-    permissions: adminTeamService.PERMISSION_DEFS,
-    presets: adminTeamService.PERMISSION_PRESETS,
-    panelMap: PANEL_PERMISSION_MAP,
-    maxTeamMembers: adminTeamService.MAX_TEAM_MEMBERS,
-  });
-});
-
-/** GET /api/admin/team — فريق الإدارة (يتطلب team.manage أو *) */
-app.get('/api/admin/team', requireAdminPermission('team.manage'), (req, res) => {
-  res.json({ ok: true, team: adminTeamService.listTeamPublic(), max: adminTeamService.MAX_TEAM_MEMBERS });
-});
-
-/** POST /api/admin/team — إضافة عضو */
-app.post('/api/admin/team', requireAdminPermission('team.manage'), async (req, res) => {
-  try {
-    const b = req.body || {};
-    const member = await adminTeamService.createMember(b, req.adminUser && req.adminUser.user);
-    res.json({ ok: true, member });
-  } catch (e) {
-    if (e.code === 'team_limit_reached') {
-      return res.status(400).json({ error: e.code, max: e.max, msg: 'وصلت للحد الأقصى ' + e.max + ' أعضاء' });
-    }
-    if (e.code === 'user_exists') return res.status(409).json({ error: e.code, msg: 'اسم المستخدم موجود' });
-    if (e.code === 'missing_fields') return res.status(400).json({ error: e.code, msg: 'الاسم واسم المستخدم وكلمة المرور مطلوبة' });
-    res.status(500).json({ error: 'create_failed' });
-  }
-});
-
-/** PATCH /api/admin/team/:id — تعديل صلاحيات/بيانات */
-app.patch('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
-  try {
-    const member = await adminTeamService.updateMember(req.params.id, req.body || {});
-    if (!member) return res.status(404).json({ error: 'member_not_found' });
-    res.json({ ok: true, member });
-  } catch (e) {
-    res.status(500).json({ error: 'update_failed' });
-  }
-});
-
-/** DELETE /api/admin/team/:id — تعطيل عضو */
-app.delete('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
-  const selfId = req.adminUser && req.adminUser.user;
-  const target = adminTeamService.getMemberById(req.params.id);
-  if (!target) return res.status(404).json({ error: 'member_not_found' });
-  if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
-  if ((target.permissions || []).includes('*') && adminTeamService.readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
-    return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
-  }
-  const member = await adminTeamService.deactivateMember(req.params.id);
-  res.json({ ok: true, member });
-});
-app.post('/api/admin/logout', (req, res) => {
-  const token = req.header('x-admin-token');
-  if (token) adminSessions.delete(token);
-  res.json({ ok: true });
-});
+// مسارات /api/admin/login|verify|permissions|team|logout|daily-digest — في routes/adminCore.js عبر mountAdminCoreRoutes
 
 function isBrowserLikeRequest(req) {
   const origin = req.header('origin');
@@ -1383,8 +1267,9 @@ function normalizeAccountPaymentMethods(arr) {
   })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');
 }
 
-function readAccounts() { return readJson(ACCOUNTS_FILE, []); }
-function writeAccounts(list) { writeJson(ACCOUNTS_FILE, list); }
+const platformStore = require('./db/platformStore');
+function readAccounts() { return platformStore.readAccounts(); }
+function writeAccounts(list) { return platformStore.writeAccounts(list); }
 
 /**
  * بعد التوثيق: تُحذف صورة الهوية فقط (idImage/id_image).
@@ -2043,50 +1928,30 @@ setInterval(() => {
 // وفحص أول عند إقلاع الخادم مباشرة (لا ننتظر ساعة كاملة لأول مرة)
 runLifecycleScan(_lifecycleHelpers).catch((e) => console.error('[package-lifecycle] initial scan error:', e.message));
 
-// ── الملخص اليومي (Daily Digest) — يُستدعى من مهمة مجدولة خارجية (وكيل
-// إدارة المنصة) وليس من أي صفحة عامة. مبني الآن كاملاً لكنه بلا فائدة
-// حقيقية حتى تنطلق المنصة فعلياً على استضافة حقيقية وتستقبل مستخدمين —
-// قبل ذلك سيعيد دائماً أصفاراً لأن data/ فارغة. لا يغيّر أي بيانات، قراءة
-// فقط، ومحمي بنفس BACKEND_SHARED_SECRET العام لبقية نقاط لوحة الأدمن.
-app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
-  try {
-    const pendingAccounts = readAccounts().filter((a) => a.status === 'pending');
-    const pendingAds = readAds().filter((a) => a.status === 'pending');
-    const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
-    const pendingBizContacts = readJson(ADS_REQUESTS_FILE, []).filter((r) => r.status === 'pending_contact');
-    const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
-
-    const pkgRecords = getAllAccountPackageRecords();
-    const expiringSoon = [];
-    const suspended = [];
-    Object.keys(pkgRecords).forEach((accountId) => {
-      const rec = pkgRecords[accountId];
-      if (!rec) return;
-      if (rec.status === 'expiring_soon') expiringSoon.push({ accountId, periodEnd: rec.periodEnd || null });
-      if (rec.status === 'suspended') suspended.push({ accountId, periodEnd: rec.periodEnd || null });
-    });
-
-    const maintenanceAudit = readAuditLog(DATA_DIR);
-    const lastMaintenance = maintenanceAudit[0] || null;
-    const lastBackup = readLatestBackupMeta(__dirname);
-
-    res.json({
-      ok: true,
-      generatedAt: new Date().toISOString(),
-      pendingAccounts: { count: pendingAccounts.length, items: pendingAccounts.slice(0, 20).map((a) => ({ id: a.id, name: a.name, type: a.type, createdAt: a.createdAt })) },
-      pendingAds: { count: pendingAds.length, items: pendingAds.slice(0, 20).map((a) => ({ id: a.id, title: a.title, accountId: a.accountId })) },
-      pendingSubRequests: { count: pendingSubRequests.length },
-      pendingBizContacts: { count: pendingBizContacts.length },
-      pendingTenders: { count: pendingTenders.length },
-      expiringSoon: { count: expiringSoon.length, items: expiringSoon.slice(0, 20) },
-      suspended: { count: suspended.length, items: suspended.slice(0, 20) },
-      lastMaintenance,
-      lastBackup,
-    });
-  } catch (err) {
-    console.error('[daily-digest] error:', err.message);
-    res.status(500).json({ error: 'فشل توليد الملخص اليومي' });
-  }
+/**
+ * مسارات نواة الأدمن (login/verify/permissions/team/logout/daily-digest)
+ * — مستخرجة إلى routes/adminCore.js
+ */
+const { mountAdminCoreRoutes } = require('./routes/adminCore');
+mountAdminCoreRoutes(app, {
+  requireAdminSession,
+  requireAdminAuth,
+  requireAdminPermission,
+  adminSessions,
+  adminTeamService,
+  ADMIN_SESSION_TTL_MS,
+  PANEL_PERMISSION_MAP,
+  readAccounts,
+  readAds,
+  readSubRequests,
+  readJson,
+  ADS_REQUESTS_FILE,
+  readTenders,
+  getAllAccountPackageRecords,
+  readAuditLog,
+  DATA_DIR,
+  readLatestBackupMeta,
+  backendRootDir: __dirname,
 });
 
 // ── "قريباً + أعلمني عند التفعيل" — إشارة اهتمام حقيقية بدل التخمين (طلب
@@ -2190,8 +2055,8 @@ app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
 // عام (GET /api/tenders أو GET /api/tenders/:id) — فقط صاحب المناقصة (عبر
 // GET /api/tenders/mine بتوكنه الخاص) أو الأدمن يراها.
 const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-function readTenders() { return readJson(TENDERS_FILE, []); }
-function writeTenders(list) { writeJson(TENDERS_FILE, list); }
+function readTenders() { return platformStore.readTenders(); }
+function writeTenders(list) { return platformStore.writeTenders(list); }
 
 /**
  * saveTenderImages(tenderId, images) — صور مرجعية اختيارية لما يحتاجه
@@ -2360,107 +2225,14 @@ mountTendersRoutes(app, {
 
 // ── غرفة الاستثمارات ──────────────────────────────────────────────
 const investmentRoom = require('./services/investmentRoom');
-const investmentPlanLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'too_many_requests' },
-});
-const investmentSubmitLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'too_many_requests' },
-});
-
-/** POST /api/investments/plan — وكيل المراجعة الأوّلية (JSON plan) */
-app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
-  try {
-    const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
-    res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
-  }
-});
-
-/** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
-app.get('/api/investments', (req, res) => {
-  try {
-    res.json(investmentRoom.listPublic({ unlockContacts: false }));
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'list_failed' });
-  }
-});
-
-/** POST /api/investments/submit — إيداع فرصة + موافقة مبدئية عند الأخضر */
-app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
-  try {
-    const out = await investmentRoom.submitOpportunity(req.body || {});
-    res.json(out);
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'submit_failed' });
-  }
-});
-
-/** GET /api/admin/investments — قائمة كاملة للأدمن (بما فيها المعلّقة) */
-app.get('/api/admin/investments', requireAdminAuth, (req, res) => {
-  try {
-    res.json(investmentRoom.listAdmin({
-      status: req.query.status || null,
-      tier: req.query.tier || null,
-    }));
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'list_failed' });
-  }
-});
-
-/** POST /api/admin/investments/:id/decision — نقض/تأكيد الموافقة المبدئية */
-app.post('/api/admin/investments/:id/decision', requireAdminAuth, (req, res) => {
-  try {
-    const action = (req.body && req.body.action) || '';
-    const reviewer = (req.adminUser && (req.adminUser.name || req.adminUser.user)) || 'admin';
-    const out = investmentRoom.decideOpportunity(req.params.id, action, reviewer);
-    res.json(out);
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'decision_failed' });
-  }
-});
-
-/** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
-app.get('/api/admin/investments/daily-report', requireAdminAuth, (req, res) => {
-  try {
-    const digest = investmentRoom.buildDailyDigest();
-    res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'digest_failed' });
-  }
-});
-
-/** POST /api/admin/investments/send-ops-report — إرسال التقرير للبريد التشغيلي الخاص */
-app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req, res) => {
-  try {
-    const result = await investmentRoom.sendOpsDailyReport();
-    res.json({
-      ok: !!result.ok,
-      skipped: !!result.skipped,
-      reason: result.reason || null,
-      error: result.error || null,
-      summary: result.digest ? {
-        plansRequested: result.digest.plansRequested,
-        opportunitiesSubmitted: result.digest.opportunitiesSubmitted,
-        pendingReview: result.digest.pendingReview,
-        autoProvisionallyApproved: result.digest.autoProvisionallyApproved,
-        tiers: result.digest.tiers,
-      } : null,
-    });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'send_failed' });
-  }
+/**
+ * مسارات /api/investments* و /api/admin/investments* — مستخرجة إلى routes/investments.js
+ */
+const { mountInvestmentsRoutes } = require('./routes/investments');
+mountInvestmentsRoutes(app, {
+  requireAdminAuth,
+  investmentRoom,
+  anthropic,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -2474,8 +2246,8 @@ app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req,
 // images/...) حتى لا تحتاج الواجهة لتغيير جوهري، فقط استبدال
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
-function readAds() { return readJson(ADS_FILE, []); }
-function writeAds(list) { writeJson(ADS_FILE, list); }
+function readAds() { return platformStore.readAds(); }
+function writeAds(list) { return platformStore.writeAds(list); }
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -2702,8 +2474,8 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminAuth, (req,
 // يربطه بصاحبه) بدل ثلاثة أنظمة منفصلة، لأن الشكل والمنطق (ownership +
 // CRUD) متطابق تماماً بين الثلاثة.
 const CATALOG_FILE = path.join(DATA_DIR, 'catalog.json');
-function readCatalog() { return readJson(CATALOG_FILE, []); }
-function writeCatalog(list) { writeJson(CATALOG_FILE, list); }
+function readCatalog() { return platformStore.readCatalog(); }
+function writeCatalog(list) { return platformStore.writeCatalog(list); }
 
 const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
 function readAllHours() { return readJson(HOURS_FILE, {}); }

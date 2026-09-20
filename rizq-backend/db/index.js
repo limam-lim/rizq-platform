@@ -64,8 +64,9 @@ function migrateLegacyBuyersJson() {
     VALUES (@id, @name, @phone, @email, @token, @created_at, @last_login_at)
   `);
   let n = 0;
-  const tx = db.transaction((rows) => {
-    rows.forEach((b) => {
+  db.exec('BEGIN');
+  try {
+    list.forEach((b) => {
       if (!b || !b.id || !b.phone || !b.token) return;
       const r = ins.run({
         id: String(b.id),
@@ -78,8 +79,11 @@ function migrateLegacyBuyersJson() {
       });
       if (r.changes) n++;
     });
-  });
-  tx(list);
+    db.exec('COMMIT');
+  } catch (e) {
+    try { db.exec('ROLLBACK'); } catch (e2) {}
+    throw e;
+  }
   if (n) console.log('[rizq-db] migrated ' + n + ' buyer(s) from buyers.json');
   return n;
 }

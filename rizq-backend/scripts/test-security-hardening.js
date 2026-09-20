@@ -1,15 +1,18 @@
 /**
  * اختبار شامل لإصلاحات الأمان — يعمل ضد خادم يعمل على PORT (افتراضي 3000)
  * node scripts/test-security-hardening.js
+ *
+ * الحسابات/المناقصات تُزرع عبر platformStore (SQLite) لأن الخادم لم يعد
+ * يقرأ accounts.json / tenders.json كمصدر تشغيلي.
  */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const platformStore = require('../db/platformStore');
 
 const PORT = Number(process.env.PORT || 3000);
 const BASE = 'http://127.0.0.1:' + PORT;
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
 const PKG_FILE = path.join(DATA_DIR, 'account-packages.json');
 
 const results = [];
@@ -106,14 +109,14 @@ async function main() {
   ok('GET /api/agent/status/:phone protected', agentPub.status === 401, 'status=' + agentPub.status);
 
   // ── 7. verify-dash POST + approved only ──
-  const backupAccounts = fs.existsSync(ACCOUNTS_FILE) ? fs.readFileSync(ACCOUNTS_FILE, 'utf8') : '[]';
   const backupPkg = fs.existsSync(PKG_FILE) ? fs.readFileSync(PKG_FILE, 'utf8') : '{}';
+  const backupTenders = platformStore.readTenders();
   const { id, dashToken, accessToken, pending, approved } = seedTestAccount();
+  let seededCatalogId = null;
+  let seededTenderId = null;
 
   try {
-    let list = JSON.parse(backupAccounts || '[]');
-    list.push(pending);
-    fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(list, null, 2));
+    platformStore.upsertAccount(pending);
 
     const dashPending = await req('POST', '/api/accounts/verify-dash/' + id, { dashToken }, { 'x-dash-token': dashToken });
     ok('verify-dash pending account → 401', dashPending.status === 401, 'status=' + dashPending.status);
@@ -124,10 +127,7 @@ async function main() {
     const entPending = await req('GET', '/api/entitlements/' + id, null, { 'x-account-token': accessToken });
     ok('entitlements pending account → 401', entPending.status === 401, 'status=' + entPending.status);
 
-    list = JSON.parse(fs.readFileSync(ACCOUNTS_FILE, 'utf8'));
-    const idx = list.findIndex((a) => a.id === id);
-    if (idx >= 0) list[idx] = approved;
-    fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(list, null, 2));
+    platformStore.upsertAccount(approved);
 
     const pkgStore = JSON.parse(backupPkg || '{}');
     pkgStore[id] = {
@@ -166,15 +166,13 @@ async function main() {
     ok('catalog POST forces pending_review',
       catalogPost.status === 200 && catalogPost.body && catalogPost.body.item && catalogPost.body.item.status === 'pending_review',
       catalogPost.body && catalogPost.body.item ? 'status=' + catalogPost.body.item.status : 'no item');
+    seededCatalogId = catalogPost.body && catalogPost.body.item && catalogPost.body.item.id;
 
     const mineOk = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': accessToken });
     ok('mine approved account readable', mineOk.status === 200 && mineOk.body && mineOk.body.ok, 'status=' + mineOk.status);
 
     const mineQuery = await req('GET', '/api/accounts/mine/' + id + '?token=' + accessToken);
     ok('mine query token works in dev', mineQuery.status === 200, 'status=' + mineQuery.status);
-
-    const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-    const backupTenders = fs.existsSync(TENDERS_FILE) ? fs.readFileSync(TENDERS_FILE, 'utf8') : '[]';
 
     const staticTenderAsset = await req('GET', '/uploads/tenders/test/0.webp');
     ok('tender static assets blocked', staticTenderAsset.status === 403, 'status=' + staticTenderAsset.status);
@@ -210,17 +208,29 @@ async function main() {
         && tenderPost.body.tender && tenderPost.body.tender.status === 'pending_review',
       tenderPost.body ? 'status=' + (tenderPost.body.tender && tenderPost.body.tender.status) : String(tenderPost.status));
 
-    const tenderId = tenderPost.body && tenderPost.body.tender && tenderPost.body.tender.id;
-    if (tenderId) {
+    seededTenderId = tenderPost.body && tenderPost.body.tender && tenderPost.body.tender.id;
+    if (seededTenderId) {
       const pub = await req('GET', '/api/tenders');
-      const found = (pub.body && pub.body.tenders || []).find((t) => t.id === tenderId);
+      const found = (pub.body && pub.body.tenders || []).find((t) => t.id === seededTenderId);
       ok('pending tender not in public list', !found);
     }
 
-    fs.writeFileSync(TENDERS_FILE, backupTenders);
-
   } finally {
-    fs.writeFileSync(ACCOUNTS_FILE, backupAccounts);
+    try {
+      platformStore.writeAccounts(platformStore.readAccounts().filter((a) => a.id !== id));
+    } catch (e) { /* ignore cleanup */ }
+    try {
+      if (seededCatalogId) {
+        platformStore.writeCatalog(platformStore.readCatalog().filter((c) => c.id !== seededCatalogId));
+      }
+    } catch (e) { /* ignore cleanup */ }
+    try {
+      if (seededTenderId) {
+        platformStore.writeTenders(platformStore.readTenders().filter((t) => t.id !== seededTenderId));
+      } else {
+        platformStore.writeTenders(backupTenders);
+      }
+    } catch (e) { /* ignore cleanup */ }
     fs.writeFileSync(PKG_FILE, backupPkg);
   }
 
