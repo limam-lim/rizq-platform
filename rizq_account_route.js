@@ -175,9 +175,23 @@
 
   function setAfterAuthHref(href) {
     if (!href) return;
+    var safe = String(href);
+    /* منع تحويل مفتوح: نفس المنشأ أو مسار نسبي فقط */
     try {
-      sessionStorage.setItem(AFTER_AUTH_HREF_KEY, String(href));
-    } catch (e) {}
+      if (/^https?:\/\//i.test(safe) || safe.indexOf('//') === 0) {
+        var u = new URL(safe, location.href);
+        if (u.origin !== location.origin) return;
+        safe = u.pathname + u.search + u.hash;
+      }
+      if (safe.charAt(0) !== '/' && safe.indexOf('.html') < 0 && safe.indexOf('rizq_') !== 0) {
+        return;
+      }
+    } catch (e) {
+      return;
+    }
+    try {
+      sessionStorage.setItem(AFTER_AUTH_HREF_KEY, safe);
+    } catch (e2) {}
   }
 
   function consumeAfterAuthHref() {
@@ -186,6 +200,16 @@
       href = sessionStorage.getItem(AFTER_AUTH_HREF_KEY) || '';
       if (href) sessionStorage.removeItem(AFTER_AUTH_HREF_KEY);
     } catch (e) {}
+    if (!href) return '';
+    try {
+      if (/^https?:\/\//i.test(href) || href.indexOf('//') === 0) {
+        var u = new URL(href, location.href);
+        if (u.origin !== location.origin) return '';
+        return u.pathname + u.search + u.hash;
+      }
+    } catch (e2) {
+      return '';
+    }
     return href;
   }
 

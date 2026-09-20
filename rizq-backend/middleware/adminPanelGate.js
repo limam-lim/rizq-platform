@@ -160,17 +160,16 @@ function installAdminPanelGate(app, frontendRoot) {
   app.get('/' + panelPath + '/', servePanel);
 
   const base = process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000));
-  const url = base.replace(/\/$/, '') + '/' + panelPath + (gateKey ? '?k=' + gateKey : '');
+  const url = base.replace(/\/$/, '') + '/' + panelPath + (gateKey ? '?k=***' : '');
 
   console.log('[admin-panel] مسار لوحة الأدمن السري: /' + panelPath);
   if (gateKey) {
-    console.log('[admin-panel] رابط الدخول الكامل (احفظه في مدير كلمات السر — لا تشاركه):');
-    console.log('[admin-panel] ' + url);
+    console.log('[admin-panel] بوابة مفتاح مفعّلة (المفتاح لا يُطبع في السجلات)');
   } else if (isProdEnv()) {
     console.warn('[admin-panel] يُنصح بضبط ADMIN_PANEL_GATE_KEY في الإنتاج');
   }
 
-  return { panelPath, url };
+  return { panelPath, url: base.replace(/\/$/, '') + '/' + panelPath };
 }
 
 function fsExists(f) {

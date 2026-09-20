@@ -25,6 +25,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
+const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
@@ -174,7 +175,10 @@ const LOCAL_DEV_ORIGINS = [
   'http://localhost:8080',
   'http://127.0.0.1:8080',
 ];
-LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+/* أمان خارجي: أصول التطوير المحلية تُضاف فقط خارج الإنتاج */
+if (!isProdEnv()) {
+  LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+}
 app.use(cors({
   origin: function (origin, cb) {
     if (!origin) {
@@ -1486,7 +1490,7 @@ function resolveOptionalAccountViewer(req) {
   const token = req.header('x-account-token') || '';
   if (!accountId || !token) return null;
   const acc = readAccounts().find((a) => a.id === accountId);
-  return (acc && acc.accessToken === token && !acc.suspended) ? accountId : null;
+  return (acc && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
 }
 
 function genAccountId() {
@@ -1588,20 +1592,32 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
-  const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
-  // فرد/محل: تفعيل فوري عند بريد + كلمة مرور (≥6) — يطابق RizqVerificationPolicy
-  // في الواجهة. إن وُجد تحقق OTP مسبق للمشتري يُستهلك (أفضل)، وإلا يكفي
-  // إثبات ملكية البريد بكلمة المرور عند التسجيل التجاري حتى يعمل
-  // seller-login لاحقاً ويُوجَّه كل نوع إلى داشبورده.
-  let autoApproved = false;
-  if (canAutoApproveAccountType(reqType) && sellerEmail && sellerPassword.length >= 6) {
-    try { consumeBuyerVerificationByEmail(sellerEmail); } catch (eOtp) { /* optional */ }
-    autoApproved = true;
+  if (sellerPassword && sellerPassword.length < 8) {
+    return res.status(400).json({
+      ok: false,
+      code: 'weak_password',
+      error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+    });
   }
-  const clientDash = typeof b.dashToken === 'string' && /^TK_[A-Za-z0-9]+$/.test(b.dashToken)
-    ? String(b.dashToken).slice(0, 80)
-    : null;
-  const dashToken = autoApproved ? (clientDash || genDashToken()) : null;
+  const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
+  // فرد/محل: تفعيل فوري فقط بعد إثبات ملكية البريد بـ OTP (عند otpRequired)
+  // + كلمة مرور ≥8. لا يُقبل dashToken من العميل أبداً — الخادم يولّده.
+  const platformFlags = getPlatformFlags();
+  let autoApproved = false;
+  let otpGate = null;
+  if (canAutoApproveAccountType(reqType) && sellerEmail && sellerPassword.length >= 8) {
+    if (platformFlags.otpRequired === false) {
+      autoApproved = true;
+    } else {
+      try {
+        otpGate = consumeBuyerVerificationByEmail(sellerEmail);
+      } catch (eOtp) {
+        otpGate = { ok: false, error: 'otp_required' };
+      }
+      autoApproved = !!(otpGate && otpGate.ok);
+    }
+  }
+  const dashToken = autoApproved ? genDashToken() : null;
   const acc = {
     id,
     accessToken,
@@ -1669,7 +1685,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     purgeAccountIdDocument(list[idx]);
     writeAccounts(list);
   }
-  res.json({
+  const regOut = {
     ok: true,
     id,
     accessToken,
@@ -1677,7 +1693,13 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     status: acc.status,
     type: acc.type,
     dashToken: dashToken || undefined,
-  });
+  };
+  if (!autoApproved && canAutoApproveAccountType(reqType) && platformFlags.otpRequired !== false) {
+    regOut.otpRequired = true;
+    regOut.code = (otpGate && otpGate.error) || 'otp_required';
+    regOut.message = (otpGate && otpGate.message) || 'فعّل البريد برمز OTP لتفعيل الحساب فوراً، أو انتظر موافقة الإدارة';
+  }
+  res.json(regOut);
 
   // إشعار الأدمن تلقائياً عند تسجيل حساب جديد (لا يُبطئ رد العميل)
   setImmediate(() => {
@@ -1687,7 +1709,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
         businessName: acc.name,
         whatsapp: acc.phone || acc.whatsapp || '',
         package: acc.type,
-        reason: autoApproved ? 'تسجيل حساب جديد — مُفعَّل تلقائياً' : 'تسجيل حساب جديد — بانتظار الموافقة',
+        reason: autoApproved ? 'تسجيل حساب جديد — مُفعَّل تلقائياً بعد OTP' : 'تسجيل حساب جديد — بانتظار الموافقة',
         channel: 'registration',
       }).catch((err) => console.warn('[accounts/register] telegram:', err && err.message));
     } catch (e) { /* telegram optional */ }
@@ -1788,6 +1810,71 @@ app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
       dashToken,
       token: dashToken,
     }),
+  });
+});
+
+/**
+ * POST /api/accounts/activate-by-otp — تفعيل فرد/محل بعد التحقق من البريد
+ * body: { id, accessToken } — يستهلك OTP مُتحقَّق مسبقاً على البريد.
+ */
+app.post('/api/accounts/activate-by-otp', accountsRegisterLimiter, (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const b = req.body || {};
+  const id = String(b.id || '').slice(0, 60);
+  const token = String(b.accessToken || extractAccountToken(req) || '').trim();
+  if (!id || !token) {
+    return res.status(400).json({ ok: false, code: 'missing', error: 'معرّف الحساب والتوكن مطلوبان' });
+  }
+  const list = readAccounts();
+  const idx = list.findIndex((a) => a.id === id);
+  if (idx < 0) return res.status(404).json({ ok: false, code: 'not_found', error: 'الحساب غير موجود' });
+  const acc = list[idx];
+  if (!timingSafeEqualStr(acc.accessToken, token)) {
+    return res.status(401).json({ ok: false, code: 'unauthorized', error: 'unauthorized' });
+  }
+  if (acc.suspended) {
+    return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
+  }
+  if (acc.status === 'approved' && acc.dashToken) {
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+    return res.json({
+      ok: true,
+      already: true,
+      account: Object.assign(safeFields, { accessToken, dashToken, token: dashToken }),
+    });
+  }
+  if (!canAutoApproveAccountType(acc.type)) {
+    return res.status(403).json({
+      ok: false,
+      code: 'admin_review_required',
+      error: 'هذا النوع يتطلب موافقة الإدارة',
+    });
+  }
+  const email = String(acc.email || '').trim().toLowerCase();
+  if (!email) {
+    return res.status(400).json({ ok: false, code: 'email_required', error: 'البريد مطلوب للتفعيل' });
+  }
+  const ver = consumeBuyerVerificationByEmail(email);
+  if (!ver.ok) {
+    return res.status(403).json({
+      ok: false,
+      code: ver.error || 'otp_required',
+      error: ver.message || 'يجب التحقق من البريد برمز OTP أولاً',
+      otpRequired: true,
+    });
+  }
+  acc.status = 'approved';
+  acc.approvedAt = new Date().toISOString();
+  acc.autoVerified = true;
+  acc.dashToken = genDashToken();
+  if (acc.idImage) purgeAccountIdDocument(acc);
+  list[idx] = acc;
+  writeAccounts(list);
+  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+  res.json({
+    ok: true,
+    autoApproved: true,
+    account: Object.assign(safeFields, { accessToken, dashToken, token: dashToken }),
   });
 });
 
@@ -1904,7 +1991,7 @@ app.post('/api/accounts/mine/:id/password', sellerLoginLimiter, async (req, res)
   if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
   const acc = list[idx];
   const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ ok: false, error: 'unauthorized' });
   if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
 
   const b = req.body || {};
@@ -2141,10 +2228,8 @@ app.post('/api/accounts/admin/:id/decision', requireAdminAuth, (req, res) => {
   list[idx].approvedAt = action === 'approve' ? new Date().toISOString() : null;
   list[idx].reviewedAt = new Date().toISOString();
   if (action === 'approve') {
-    // dashToken = نفس رمز TK_... الذي يولّده rizq_admin.html محلياً لبناء
-    // رابط لوحة تحكم المشترك — نخزّنه هنا أيضاً حتى يتحقق منه /api/accounts/verify-dash
-    // عندما يفتح المشترك رابطه من جهازه الخاص (لا يوجد لديه سجل محلي أصلاً).
-    if (body.dashToken) list[idx].dashToken = String(body.dashToken).slice(0, 100);
+    // أمان داخلي: dashToken يُولَّد على الخادم فقط — لا يُقبل من العميل/الأدمن
+    list[idx].dashToken = genDashToken();
     if (body.package) list[idx].package = String(body.package).slice(0, 60);
     if (body.package_price !== undefined) list[idx].package_price = Number(body.package_price) || 0;
     // التزام قانوني: بعد الموافقة تُحذف صورة الهوية من الخادم — ويبقى NNI + id_verified.
@@ -2201,7 +2286,7 @@ function handleVerifyDash(req, res) {
   const acc = list.find((a) => a.id === req.params.id);
   if (!acc) return res.status(404).json({ error: 'account_not_found' });
   const token = extractDashToken(req);
-  if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
+  if (acc.status !== 'approved' || !acc.dashToken || !token || !timingSafeEqualStr(token, acc.dashToken)) {
     return res.status(401).json({ error: 'unauthorized' });
   }
   res.json({ ok: true, account: stripToken(acc) });
@@ -2213,7 +2298,7 @@ function handleExchangeDashToken(req, res) {
   const acc = list.find((a) => a.id === req.params.id);
   if (!acc) return res.status(404).json({ error: 'account_not_found' });
   const token = extractDashToken(req);
-  if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
+  if (acc.status !== 'approved' || !acc.dashToken || !token || !timingSafeEqualStr(token, acc.dashToken)) {
     return res.status(401).json({ error: 'unauthorized' });
   }
   res.json({ ok: true, accessToken: acc.accessToken });
@@ -2289,16 +2374,14 @@ app.post('/api/buyers/register', buyersRegisterLimiter, (req, res) => {
   res.status(410).json({ ok: false, error: 'deprecated', message: 'استخدم POST /api/auth/register بعد التحقق بـ OTP' });
 });
 
-/** @deprecated � استخد�& GET /api/auth/me */
-app.get('/api/buyers/me', (req, res, next) => {
-  try {
-    const id = req.query.id;
-    const token = req.query.token;
-    if (!id || !token) return res.status(400).json({ ok: false, error: 'id �� token �&ط���با� ', code: 'AUTH_REQUIRED' });
-    const row = BuyerModel.findByIdAndToken(id, token);
-    if (!row) return res.status(401).json({ ok: false, error: 'unauthorized', code: 'UNAUTHORIZED' });
-    res.json({ ok: true, buyer: BuyerModel.publicBuyer(row) });
-  } catch (err) { next(err); }
+/** @deprecated — استخدم GET /api/auth/me (بدون توكن في query) */
+app.get('/api/buyers/me', (req, res) => {
+  res.status(410).json({
+    ok: false,
+    error: 'deprecated',
+    code: 'GONE',
+    message: 'استخدم GET /api/auth/me مع ترويسات المصادقة — توكنات الـ query لم تعد مدعومة',
+  });
 });
 
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
@@ -2804,7 +2887,7 @@ function verifyAccountOwner(accountId, token) {
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
-  return (acc && acc.status === 'approved' && acc.accessToken === token && !acc.suspended) ? acc : null;
+  return (acc && acc.status === 'approved' && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? acc : null;
 }
 
 const RizqPromptsServer = require('../rizq_ai_prompts');
@@ -3581,10 +3664,7 @@ const adsPublishLimiter = rateLimit({
 });
 
 /**
- * POST /api/ads — نشر إعلان حقيقي (عام، بلا سرّ مشترك — أي زائر ناشر
- * حقيقي). الإشراف (موافقة/رفض المبدئي) يبقى بمنطق RizqAgent في العميل
- * كما هو — status المُرسَل هنا (active أو pending) يُحفَظ كما هو فقط،
- * فيصبح مشتركاً بين الأجهزة بدل أن يبقى محبوساً في متصفح واحد.
+ * POST /api/ads — نشر إعلان (يتطلب حساباً مصادقاً — لا نشر مجهول)
  */
 app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) => {
   try {
@@ -3594,19 +3674,34 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
   const b = req.body || {};
   if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'العنوان مطلوب' });
   if (!b.category) return res.status(400).json({ error: 'الفئة مطلوبة' });
-  if (b.accountId) {
-    const token = extractAccountToken(req) || '';
-    const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
-    if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-    const acc = ownerAcc;
-    const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
-    const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
-    try {
-      assertCanPostAd(ent, activeCount);
-      if (Array.isArray(b.images) && b.images.length) assertPhotoCount(ent, b.images.length);
-    } catch (gateErr) {
-      return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
-    }
+  if (!b.accountId) {
+    return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required', message: 'نشر الإعلان يتطلب حساباً مسجّلاً' });
+  }
+  const token = extractAccountToken(req) || '';
+  const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
+  if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  const acc = ownerAcc;
+  const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
+  const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
+  try {
+    assertCanPostAd(ent, activeCount);
+    if (Array.isArray(b.images) && b.images.length) assertPhotoCount(ent, b.images.length);
+  } catch (gateErr) {
+    return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
+  }
+  const leakScan = scanContactLeakFields([
+    { key: 'title', val: b.title },
+    { key: 'desc', val: b.desc },
+  ]);
+  if (leakScan && leakScan.hasLeak) {
+    return res.status(422).json({
+      ok: false,
+      error: 'contact_in_text_forbidden',
+      field: leakScan.fields && leakScan.fields[0] && leakScan.fields[0].field,
+      hits: leakScan.hits || [],
+      msg: leakScan.messageAr,
+      msg_fr: leakScan.messageFr,
+    });
   }
   const list = readAds();
   let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
@@ -3633,7 +3728,7 @@ app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) 
     urgent: !!b.urgent,
     images,
     seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
-    accountId: b.accountId ? String(b.accountId).slice(0, 60) : null,
+    accountId: String(b.accountId).slice(0, 60),
     // إصلاح ثغرة أمنية (2026-08-04): كان الحقل status قابلاً للتحكم من العميل
     // (b.status)، وبقيمة افتراضية 'active' إن لم يُرسَل شيء — أي أن أي طلب
     // مباشر لهذا الـ API (متجاوزاً rizq_moderator_agent.js الذي يعمل في

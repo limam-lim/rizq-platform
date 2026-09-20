@@ -6844,22 +6844,121 @@ function _autoApproveAccount(data){
     }
     return;
   }
-  data.status='approved';
-  data.approvedAt=new Date().toISOString();
-  data.token=data.token||_genDashToken();
-  data.dashToken=data.dashToken||data.token;
-  data.autoVerified=true;
-  if(t==='individual') data.id_status=data.id_status||'auto_archived';
-  else data.id_status=data.id_status||'trial_active';
-  if(policy && policy.isIdOnlyTier(t) && data.nni){
-    data.id_verified=true;
-    data.id_verified_at=new Date().toISOString();
+  /* بلا خادم فقط: تفعيل محلي للتطوير. مع الخادم: المصدر هو الرد بعد OTP */
+  if(!window.RIZQ_BACKEND_BASE){
+    data.status='approved';
+    data.approvedAt=new Date().toISOString();
+    data.token=data.token||_genDashToken();
+    data.dashToken=data.dashToken||data.token;
+    data.autoVerified=true;
+    if(t==='individual') data.id_status=data.id_status||'auto_archived';
+    else data.id_status=data.id_status||'trial_active';
+    if(policy && policy.isIdOnlyTier(t) && data.nni){
+      data.id_verified=true;
+      data.id_verified_at=new Date().toISOString();
+    }
+    try{
+      localStorage.setItem('rizq_active_session', JSON.stringify({
+        id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
+      }));
+    }catch(e){}
   }
-  try{
-    localStorage.setItem('rizq_active_session', JSON.stringify({
-      id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
-    }));
-  }catch(e){}
+}
+
+/** تحقق بريد OTP قبل التفعيل الفوري لفرد/محل — يعيد استخدام أنماط otp-box الموجودة */
+function _ensureSellerEmailOtp(data){
+  var policy=window.RizqVerificationPolicy;
+  if(!policy || !policy.canAutoApprove(data.type||'')) return Promise.resolve(true);
+  if(!window.RIZQ_BACKEND_BASE) return Promise.resolve(true);
+  var email=String(data.email||'').trim().toLowerCase();
+  if(!email) return Promise.resolve(false);
+  window._rizqVerifiedEmails=window._rizqVerifiedEmails||{};
+  if(window._rizqVerifiedEmails[email]) return Promise.resolve(true);
+
+  return new Promise(function(resolve){
+    var overlay=document.getElementById('rizq-reg-otp-overlay');
+    if(!overlay){
+      overlay=document.createElement('div');
+      overlay.id='rizq-reg-otp-overlay';
+      overlay.setAttribute('role','dialog');
+      overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(13,27,42,.72);display:flex;align-items:center;justify-content:center;padding:16px';
+      overlay.innerHTML='<div style="background:#fff;border-radius:16px;padding:22px 18px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25)">'
+        +'<h3 style="margin:0 0 8px;font-size:18px;color:#1b3a6b">تفعيل البريد</h3>'
+        +'<p id="rizq-reg-otp-msg" style="margin:0 0 14px;font-size:13px;color:#64748b;line-height:1.5"></p>'
+        +'<div class="otp-row" id="rizq-reg-otp-row" style="display:flex;gap:8px;justify-content:center;margin:0 0 14px;direction:ltr">'
+        +'<input class="otp-box" maxlength="1" inputmode="numeric"/><input class="otp-box" maxlength="1" inputmode="numeric"/><input class="otp-box" maxlength="1" inputmode="numeric"/>'
+        +'<input class="otp-box" maxlength="1" inputmode="numeric"/><input class="otp-box" maxlength="1" inputmode="numeric"/><input class="otp-box" maxlength="1" inputmode="numeric"/>'
+        +'</div>'
+        +'<button type="button" class="m-btn-main" id="rizq-reg-otp-verify" style="width:100%">تأكيد الرمز</button>'
+        +'<button type="button" class="m-link-btn" id="rizq-reg-otp-resend" style="margin-top:10px">إعادة إرسال</button>'
+        +'<button type="button" class="m-link-btn" id="rizq-reg-otp-skip" style="margin-top:4px;opacity:.75">المتابعة بانتظار الموافقة</button>'
+        +'</div>';
+      document.body.appendChild(overlay);
+      var boxes=overlay.querySelectorAll('.otp-box');
+      boxes.forEach(function(box,i){
+        box.addEventListener('input',function(){
+          var v=box.value.replace(/\D/g,'').slice(0,1);
+          box.value=v;
+          if(v && boxes[i+1]) boxes[i+1].focus();
+        });
+        box.addEventListener('keydown',function(ev){
+          if(ev.key==='Backspace' && !box.value && boxes[i-1]) boxes[i-1].focus();
+        });
+      });
+    }
+    var msg=document.getElementById('rizq-reg-otp-msg');
+    var base=window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+    function sendCode(){
+      if(msg) msg.textContent=isAr?'جارٍ إرسال رمز التحقق إلى بريدك...':'Envoi du code à votre e-mail...';
+      fetch(base+'/api/otp/send',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          channel:'buyer',
+          email:email,
+          name:data.name||data.owner||'',
+          phoneMr:data.phone||'',
+          phoneIntl:data.phoneIntl||'',
+          whatsapp:data.whatsapp||data.phone||''
+        })
+      }).then(function(r){return r.json().then(function(j){return {ok:r.ok,data:j};});})
+        .then(function(res){
+          if(!res.ok){
+            if(msg) msg.textContent=(res.data&&res.data.message)||(isAr?'تعذّر إرسال الرمز — يمكنك المتابعة بانتظار الموافقة':'Échec envoi — vous pouvez continuer en attente');
+            return;
+          }
+          var t=isAr?'أدخل الرمز المرسل إلى ':'Entrez le code envoyé à ';
+          if(res.data&&res.data.devHint) t+=(isAr?' (تطوير: '+res.data.devHint+')':' (dev: '+res.data.devHint+')');
+          else t+=email;
+          if(msg) msg.textContent=t;
+        }).catch(function(){
+          if(msg) msg.textContent=isAr?'تعذّر الاتصال — يمكنك المتابعة بانتظار الموافقة':'Connexion impossible — continuez en attente';
+        });
+    }
+    sendCode();
+    overlay.style.display='flex';
+    var done=false;
+    function finish(ok){
+      if(done) return;
+      done=true;
+      overlay.style.display='none';
+      resolve(ok);
+    }
+    document.getElementById('rizq-reg-otp-verify').onclick=function(){
+      var code=Array.prototype.map.call(document.querySelectorAll('#rizq-reg-otp-row .otp-box'),function(el){return el.value.replace(/\D/g,'');}).join('');
+      if(code.length!==6){ if(msg) msg.textContent=isAr?'أدخل 6 أرقام':'6 chiffres'; return; }
+      fetch(base+'/api/otp/verify',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({channel:'buyer',email:email,code:code})
+      }).then(function(r){return r.json().then(function(j){return {ok:r.ok,data:j};});})
+        .then(function(res){
+          if(!res.ok){ if(msg) msg.textContent=(res.data&&res.data.message)||(isAr?'رمز غير صحيح':'Code incorrect'); return; }
+          window._rizqVerifiedEmails[email]=true;
+          finish(true);
+        }).catch(function(){ if(msg) msg.textContent=isAr?'تعذّر التحقق':'Échec vérification'; });
+    };
+    document.getElementById('rizq-reg-otp-resend').onclick=function(){ sendCode(); };
+    document.getElementById('rizq-reg-otp-skip').onclick=function(){ finish(false); };
+  });
 }
 
 function saveAccountPending(data){
@@ -6875,23 +6974,24 @@ function saveAccountPending(data){
     agreedAt: new Date().toISOString(),
     ip: 'غير مسجَّل — لا يوجد خادم لتسجيل عنوان IP في النسخة الحالية (ثابتة/بلا باك إند)'
   };
-  _autoApproveAccount(data);
-  accounts.push(data);
-  localStorage.setItem('rizq_pending_accounts',JSON.stringify(accounts));
-  // store last account id for ID upload step
-  localStorage.setItem('rizq_last_acc_id', data.id);
-  // dedicated consent log for audit (separate from account record, never purged by cleanup)
-  try{
-    const log=JSON.parse(localStorage.getItem('rizq_consent_log')||'[]');
-    log.push({accountId:data.id, name:data.name||data.owner||data.manager||'', termsVersion:RIZQ_TERMS_VERSION, agreedAt:data.legal_consent.agreedAt, ip:data.legal_consent.ip});
-    localStorage.setItem('rizq_consent_log',JSON.stringify(log));
-  }catch(e){}
-  return _syncAccountToBackend(data).then(function(result){
-    var pol=window.RizqVerificationPolicy;
-    if(data.autoVerified && pol && pol.isIdOnlyTier(data.type)){
-      _purgeLocalIdImage(data.id);
-    }
-    return result;
+  return _ensureSellerEmailOtp(data).then(function(otpOk){
+    data._otpVerified = !!otpOk;
+    _autoApproveAccount(data);
+    accounts.push(data);
+    localStorage.setItem('rizq_pending_accounts',JSON.stringify(accounts));
+    localStorage.setItem('rizq_last_acc_id', data.id);
+    try{
+      const log=JSON.parse(localStorage.getItem('rizq_consent_log')||'[]');
+      log.push({accountId:data.id, name:data.name||data.owner||data.manager||'', termsVersion:RIZQ_TERMS_VERSION, agreedAt:data.legal_consent.agreedAt, ip:data.legal_consent.ip});
+      localStorage.setItem('rizq_consent_log',JSON.stringify(log));
+    }catch(e){}
+    return _syncAccountToBackend(data).then(function(result){
+      var pol=window.RizqVerificationPolicy;
+      if(data.autoVerified && pol && pol.isIdOnlyTier(data.type)){
+        _purgeLocalIdImage(data.id);
+      }
+      return result;
+    });
   });
 }
 
@@ -6956,7 +7056,6 @@ function _syncAccountToBackend(acc){
       email: acc.email || '',
       // ضروري لـ seller-login بعد التسجيل — يُهشَّر على الخادم فوراً ولا يُعاد في الرد
       password: acc.password || '',
-      dashToken: acc.dashToken || acc.token || '',
       city: acc.city || '',
       category: acc.category || '',
       activityId: acc.activityId || '',

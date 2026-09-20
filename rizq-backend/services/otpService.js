@@ -137,8 +137,9 @@ function codesMatch(submitted, record) {
   if (!record) return false;
   const plain = String(submitted || '').replace(/\D/g, '');
   if (plain.length !== 6) return false;
-  if (record.codeHash) return hashOtpCode(plain) === record.codeHash;
-  return plain === String(record.code || '');
+  const { timingSafeEqualStr } = require('../lib/secureCompare');
+  if (record.codeHash) return timingSafeEqualStr(hashOtpCode(plain), record.codeHash);
+  return timingSafeEqualStr(plain, String(record.code || ''));
 }
 
 function generateCode() {
