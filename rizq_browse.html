@@ -256,6 +256,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-main-img svg{width:48px;height:48px;stroke-width:1.2;opacity:.9}
 .dp-main-img img{width:100%;height:100%;object-fit:contain;background:#0b1628;transition:transform .25s ease}
 .dp-main-img:hover img{transform:scale(1.03)}
+.dp-thumbs-wrap{width:100%;max-width:300px}
+.dp-thumbs-label{font-size:11px;font-weight:700;color:var(--text-muted);margin:2px 0 6px}
 .dp-thumbs{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 6px;max-width:100%;scrollbar-width:thin}
 .dp-thumbs::-webkit-scrollbar{height:3px}
 .dp-thumbs::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:2px}
@@ -1942,8 +1944,15 @@ function renderDetailPanel(ad){
   }
 
   const thumbsHTML=hasImages
-    ? ad.images.map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" title="${i+1}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
-    : galleryEmojis.slice(0,6).map((e,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" data-emoji="${escapeHtml(e)}">${iconHTML(e)}</div>`).join('');
+    ? (ad.images.length>1
+        ? ad.images.map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" title="${i+1}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
+        : '')
+    : (galleryEmojis.length>1
+        ? galleryEmojis.slice(0,8).map((e,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" data-emoji="${escapeHtml(e)}">${iconHTML(e)}</div>`).join('')
+        : '');
+  const thumbsBlock=thumbsHTML
+    ? `<div class="dp-thumbs-wrap"><div class="dp-thumbs-label">${fr?((ad.images&&ad.images.length)||galleryEmojis.length)+' photos':((ad.images&&ad.images.length)||galleryEmojis.length)+' صور'}</div><div class="dp-thumbs" role="list">${thumbsHTML}</div></div>`
+    : '';
 
   const galNavHTML=totalGallery>1
     ?`<button type="button" class="dp-gal-btn dp-gal-prev" onclick="event.stopPropagation();dpNavPhoto(-1)" aria-label="${fr?'Précédente':'السابقة'}">‹</button><button type="button" class="dp-gal-btn dp-gal-next" onclick="event.stopPropagation();dpNavPhoto(1)" aria-label="${fr?'Suivante':'التالية'}">›</button>`
@@ -2001,7 +2010,7 @@ function renderDetailPanel(ad){
           <div class="dp-main-img" id="dp-main-img" onclick="dpOpenLightbox(0)" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
           ${galNavHTML}
         </div>
-        ${thumbsHTML?`<div class="dp-thumbs" role="list">${thumbsHTML}</div>`:''}
+        ${thumbsBlock}
       </div>
       <div class="dp-hero-info">
         <div class="dp-listing-cat">
