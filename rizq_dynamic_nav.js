@@ -9,7 +9,8 @@
     { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4, always: true },
     { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5 },
     { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 6 },
-    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'غرفة المناقصات' }
+    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'غرفة المناقصات' },
+    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 8, always: true, labelAr: 'غرفة الاستثمارات', labelFr: 'Salle des investissements' }
   ];
 
   var DESKTOP_MORE = [
@@ -31,6 +32,7 @@
     offices: { ar: 'المكاتب', fr: 'Bureaux' },
     showrooms: { ar: 'المعارض', fr: 'Showrooms' },
     tenders: { ar: 'غرفة المناقصات', fr: 'Appels d\'offres' },
+    investments: { ar: 'غرفة الاستثمارات', fr: 'Salle des investissements' },
     ads: { ar: 'الإعلانات', fr: 'Annonces' },
     rizqads: { ar: 'Rizq ADS', fr: 'Rizq ADS' },
     packs: { ar: 'الباقات', fr: 'Forfaits' },

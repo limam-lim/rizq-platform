@@ -1989,7 +1989,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     <li data-nav-order="2"><a href="#categories" data-hdr="cats" data-t="nav-cats">الأقسام</a></li>
     <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" data-t="nav-post">نشر (+)</a></li>
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
-    <li data-nav-order="8"><button type="button" class="nav-link-btn" id="nav-assistant-btn" data-hdr="ai" data-t="nav-assistant">✨ رزق ذكي</button></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="rizq_investments.html" data-hdr="investments" data-t="nav-investments">غرفة الاستثمارات</a></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
       <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
       <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
@@ -2021,7 +2021,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   <a href="#categories" data-jump="#categories">الأقسام</a>
   <a href="#hero-listings" data-jump="#hero-listings">الإعلانات</a>
   <a href="#pricing" data-jump="#pricing">الباقات</a>
-  <button type="button" id="jump-assistant">✨ رزق ذكي</button>
+  <a href="rizq_investments.html" data-jump="invest">غرفة الاستثمارات</a>
 </nav>
 
 <button type="button" id="back-to-top" aria-label="العودة للأعلى" title="العودة للأعلى">↑</button>
@@ -2032,7 +2032,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🏠</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>
     <a href="rizq_post.html" id="mbn-post" class="mbn-post"><span><span class="mbn-icon">+</span></span><span class="mbn-label">نشر</span></a>
-    <button type="button" id="mbn-assistant"><span class="mbn-icon">✨</span><span class="mbn-label">رزق ذكي</span></button>
+    <a href="rizq_investments.html" id="mbn-invest"><span class="mbn-icon">📈</span><span class="mbn-label">استثمار</span></a>
     <button type="button" id="mbn-more" aria-haspopup="true" aria-controls="mobile-drawer"><span class="mbn-icon">⋯</span><span class="mbn-label">المزيد</span></button>
   </div>
 </nav>
@@ -2163,6 +2163,11 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
         <span class="hero-biz-ico" aria-hidden="true">📋</span>
         <span class="hero-biz-label" data-t="hbiz-tenders">غرفة المناقصات</span>
+      </a>
+      <a href="rizq_investments.html" class="hero-biz-btn hero-biz-gold">
+        <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
+        <span class="hero-biz-ico" aria-hidden="true">📈</span>
+        <span class="hero-biz-label" data-t="hbiz-investments">غرفة الاستثمارات</span>
       </a>
     </nav>
 
@@ -2704,7 +2709,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       </div>
 
       <!-- Main description — translated by data-t engine -->
-      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال، الأولى في موريتانيا بوكلاء أذكياء يعملون على مدار الساعة. من الإعلانات المبوبة الفردية، إلى المعارض التجارية الموثّقة، إلى غرفة المناقصات الخاصة بين الشركات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em></p>
+      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال. من الإعلانات المبوبة، إلى المحلات والمعارض والمكاتب، إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار والمستثمرين في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em></p>
 
       <!-- Divider -->
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);margin-bottom:28px"></div>
@@ -2716,6 +2721,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <span data-t-fr="📍 Toutes les wilayas" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.10),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--gold-dk)">📍 كل الولايات</span>
         <span data-t-fr="⚡ Gratuit pour démarrer" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(99,102,241,.07),rgba(99,102,241,.03));border:1px solid rgba(99,102,241,.16);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:#4338ca">⚡ مجاني للبدء</span>
         <span data-t-fr="📋 Salle des appels d'offres B2B" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(27,58,107,.03));border:1px solid rgba(27,58,107,.14);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--royal)">📋 غرفة مناقصات B2B</span>
+        <span data-t-fr="📈 Salle des investissements" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.10),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--gold-dk)">📈 غرفة الاستثمارات</span>
       </div>
 
       <!-- ADMINIA signature line -->
@@ -2732,7 +2738,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   <div class="section-header fade-in">
     <p class="section-tag">لماذا رزق؟</p>
     <h2 class="section-title" data-t="s-why-title">لماذا يختار الناس <span>رزق؟</span></h2>
-    <p class="section-desc" data-t="s-why-desc">لسنا مجرد موقع إعلانات — منصة إعلانات ومعارض ومناقصات، مبنية على الثقة والقيم الموريتانية الأصيلة</p>
+    <p class="section-desc" data-t="s-why-desc">لسنا مجرد موقع إعلانات — منصة إعلانات ومعارض ومناقصات واستثمارات، مبنية على الثقة والقيم الموريتانية الأصيلة</p>
   </div>
   <div class="why-grid">
     <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🛡️</div></div><h3 class="why-title" data-t="why1-title">تسجيل آمن وموثوق</h3><p class="why-desc" data-t="why1-desc">إنشاء حساب بالإيميل وكلمة مرور، مع توثيق هويتك برقم هاتف موريتاني حقيقي — Mauritel أو Mattel أو Chinguitel. لا حسابات وهمية، لا احتيال.</p></div>
@@ -2888,21 +2894,25 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <span class="cta-hub-ico" aria-hidden="true">📋</span>
         <span class="cta-hub-lbl" data-t="cta-hub-tenders">غرفة المناقصات</span>
       </a>
+      <a href="rizq_investments.html" class="cta-hub cta-hub-gold">
+        <span class="cta-hub-ico" aria-hidden="true">📈</span>
+        <span class="cta-hub-lbl" data-t="cta-hub-investments">غرفة الاستثمارات</span>
+      </a>
     </nav>
 
-    <h2 class="cta-title" data-t="cta-title">تبيع، تناقص، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span></h2>
-    <p class="cta-desc" data-t="cta-desc">رزق منصة إلكترونية متكاملة بوكلاء أذكياء يعملون على مدار الساعة؛ يفتح لك ولأعمالك آفاقاً جديدة، فهو ليس سوقاً عادياً — بل مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، و<strong style="color:#a7f3d0">غرف المناقصات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.</p>
+    <h2 class="cta-title" data-t="cta-title">تبيع، تناقص، تستثمر، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span></h2>
+    <p class="cta-desc" data-t="cta-desc">رزق منصة إلكترونية متكاملة؛ يفتح لك ولأعمالك آفاقاً جديدة — مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، <strong style="color:#a7f3d0">غرف المناقصات</strong>، و<strong style="color:#fde68a">غرفة الاستثمارات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.</p>
 
     <div class="cta-btns">
       <button class="btn-primary" onclick="rizqOpenRegister(event)" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
-      <a href="rizq_tenders.html" class="btn-tender" data-t="cta-btn4">📋 غرفة المناقصات</a>
+      <a href="rizq_investments.html" class="btn-tender" data-t="cta-btn-invest">📈 غرفة الاستثمارات</a>
+      <a href="rizq_tenders.html" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn4">📋 غرفة المناقصات</a>
       <a href="./?openRegister=1&regPage=1&preType=company" onclick="openRegisterAs('company');return false" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
-      <button class="btn-outline" style="padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn2">📲 التطبيق قريباً</button>
     </div>
 
     <div class="cta-chips">
       <span class="cta-chip" data-t="cta-chip1">✓ مجاني للبدء</span>
-      <span class="cta-chip" data-t="cta-chip2">✓ مناقصات آمنة وخاصة</span>
+      <span class="cta-chip" data-t="cta-chip2">✓ مناقصات واستثمارات بحذر</span>
       <span class="cta-chip" data-t="cta-chip3">✓ توثيق بالهاتف الموريتاني</span>
     </div>
 
@@ -2929,7 +2939,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         <img class="logo-mark-img" src="rizq-mark-512.png?v=9.6" width="42" height="42" alt="رزق"/>
         <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" data-t="ft-desc">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص. الرزق من الله والمنصة من رزق.</p>
+      <p class="footer-desc" data-t="ft-desc">منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، وغرفة الاستثمارات. الرزق من الله والمنصة من رزق.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <!-- إصلاح 1 (تباين): var(--text-muted) = #2C3A4F (كحلي غامق مصمم لخلفيات فاتحة)، بينما الفوتر خلفيته
              كحلية غامقة (var(--dark)→var(--royal-deep)) — فكان النص غير مقروء تقريباً (غامق على غامق).
@@ -4890,9 +4900,9 @@ const LANG = {
     'qc-home':'معدات منزل','qc-energy':'طاقة','qc-travel':'رحلات',
     'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
-    'nav-account': 'حسابي', 'nav-post': 'نشر (+)', 'nav-assistant': '✨ رزق ذكي', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
+    'nav-account': 'حسابي', 'nav-post': 'نشر (+)', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'غرفة الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
-    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال، الأولى في موريتانيا بوكلاء أذكياء يعملون على مدار الساعة. من الإعلانات المبوبة الفردية، إلى المعارض التجارية الموثّقة، إلى غرفة المناقصات الخاصة بين الشركات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em>',
+    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا الشاملة للإعلانات والأعمال. من الإعلانات المبوبة، إلى المحلات والمعارض والمكاتب، إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> يجمع البائعين والمشترين والتجار والمستثمرين في كل الولايات — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ذلك في مكان واحد، بأمان وبساطة.</em>',
     'nav-stores': '🏪 المحلات', 'nav-offices': '💼 المكاتب', 'nav-showrooms': '🏬 المعارض', 'nav-tenders': '📋 المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن',
     'vsh-title': 'افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">معرضك الافتراضي</span> على رزق',
@@ -4909,8 +4919,8 @@ const LANG = {
     'prices-note': 'الأسعار تقريبية وتعكس متوسط السوق المحلي — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">انشر منتجاتك على رزق الآن ←</a>',
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · معارض · مكاتب · مناقصات', 'cta-btn3': '🏢 افتح محلك أو معرضك',
     'cta-btn4': '📋 غرفة المناقصات',
-    'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض', 'cta-hub-tenders': 'غرفة المناقصات',
-    'cta-chip1': '✓ مجاني للبدء', 'cta-chip2': '✓ مناقصات آمنة وخاصة', 'cta-chip3': '✓ توثيق بالهاتف الموريتاني',
+    'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض', 'cta-hub-tenders': 'غرفة المناقصات', 'cta-hub-investments': 'غرفة الاستثمارات',
+    'cta-chip1': '✓ مجاني للبدء', 'cta-chip2': '✓ مناقصات واستثمارات بحذر', 'cta-chip3': '✓ توثيق بالهاتف الموريتاني',
     'vs-title': 'افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك الافتراضي</span> على رزق',
     'vs-desc': 'صفحة تجارية دائمة باسمك — اعرض منتجاتك، اربح ثقة الزبائن بشارة "محل موثّق"، وتابع كل تواصل وزيارة من مكان واحد.',
     'vs-btn1': '🏪 افتح محلك الآن', 'vs-btn2': '👁 عرض نموذج محل',
@@ -4932,6 +4942,8 @@ const LANG = {
     'hbiz-offices': 'المكاتب والخدمات',
     'hbiz-showrooms': 'معارض الشو روم',
     'hbiz-tenders': 'غرفة المناقصات',
+    'hbiz-investments': 'غرفة الاستثمارات',
+    'hbiz-inv-badge': 'جديد',
     'hbiz-tender-badge': 'جديد',
     'hbiz-new': 'جديد',
     'hbiz-cta': 'افتح متجرك أو أضف إعلانك مجاناً',
@@ -4943,7 +4955,7 @@ const LANG = {
     's-lst-desc': 'أفضل الإعلانات المنشورة الآن على رزق',
     'view-all': 'عرض جميع الإعلانات ←',
     's-why-title': 'لماذا يختار الناس <span>رزق؟</span>',
-    's-why-desc': 'لسنا مجرد موقع إعلانات — منصة إعلانات ومعارض ومناقصات، مبنية على الثقة والقيم الموريتانية الأصيلة',
+    's-why-desc': 'لسنا مجرد موقع إعلانات — منصة إعلانات ومعارض ومناقصات واستثمارات، مبنية على الثقة والقيم الموريتانية الأصيلة',
     'why1-title': 'تسجيل آمن وموثوق',
     'why1-desc': 'إنشاء حساب بالإيميل وكلمة مرور، مع توثيق هويتك برقم هاتف موريتاني حقيقي — Mauritel أو Mattel أو Chinguitel. لا حسابات وهمية، لا احتيال.',
     'why2-title': '22 قسماً و268 فرعاً',
@@ -4952,15 +4964,15 @@ const LANG = {
     'why3-desc': 'صوّر، اكتب السعر، اختر الفئة والولاية، اضغط نشر. إعلانك يصل فوراً لآلاف المهتمين في موريتانيا وما حولها.',
     's-price-title': 'خطط <span>شفافة وبسيطة</span>',
     's-price-desc': 'ابدأ مجاناً وطوّر تجربتك متى شئت',
-    'cta-title': 'تبيع، تناقص، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span>',
-    'cta-desc': 'رزق منصة إلكترونية متكاملة بوكلاء أذكياء يعملون على مدار الساعة؛ يفتح لك ولأعمالك آفاقاً جديدة، فهو ليس سوقاً عادياً — بل مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، و<strong style="color:#a7f3d0">غرف المناقصات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.',
-    'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً',
+    'cta-title': 'تبيع، تناقص، تستثمر، أو تدير عملك؟<br/><span>رزق يجمع كل خياراتك</span>',
+    'cta-desc': 'رزق منصة إلكترونية متكاملة؛ يفتح لك ولأعمالك آفاقاً جديدة — مساحة للمحلات، المعارض، مكاتب الخدمات، إعلانات الفيديو، <strong style="color:#a7f3d0">غرف المناقصات</strong>، و<strong style="color:#fde68a">غرفة الاستثمارات</strong>.<br/>سجّل الآن وانشر إعلانك الأول مجاناً.',
+    'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 غرفة الاستثمارات',
     'cta-note': '&nbsp;تسجيل آمن بالإيميل &nbsp;|&nbsp; مجاني تماماً',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
     'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5':'من نحن',
     'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
-    'ft-desc': 'منصة الإعلانات المبوبة الأولى في موريتانيا. 17 قسماً، 130+ فرعاً، ملايين الفرص.',
+    'ft-desc': 'منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، وغرفة الاستثمارات.',
     'ft-net-label': 'شبكات مدعومة:',
     'ft-contact': 'تواصل معنا',
     'ft-copy': '© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷',
@@ -4970,9 +4982,9 @@ const LANG = {
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
-    'nav-account': 'Compte', 'nav-post': 'Publier (+)', 'nav-assistant': '✨ Rizq IA', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
+    'nav-account': 'Compte', 'nav-post': 'Publier (+)', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Salle des investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
-    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. Des annonces classées individuelles aux showrooms professionnels vérifiés, en passant par la salle privée des appels d\'offres entre entreprises — un espace de confiance développé par <strong style="color:var(--royal)">ADMINIA SARL</strong> qui réunit vendeurs, acheteurs et commerçants de toutes les wilayas — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">tout au même endroit, en toute sécurité et simplicité.</em>',
+    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. Des annonces classées aux boutiques, showrooms et bureaux, en passant par la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)">ADMINIA SARL</strong> qui réunit vendeurs, acheteurs, commerçants et investisseurs de toutes les wilayas — <em style="color:var(--gold-dk);font-style:normal;font-weight:700">tout au même endroit, en toute sécurité et simplicité.</em>',
     'nav-stores': '🏪 Boutiques', 'nav-offices': '💼 Bureaux', 'nav-showrooms': '🏬 Showrooms', 'nav-tenders': '📋 Appels d\'offres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos',
     'vsh-title': 'Ouvrez votre <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">showroom virtuel</span> sur Rizq',
@@ -4989,8 +5001,8 @@ const LANG = {
     'prices-note': 'Les prix sont indicatifs et reflètent la moyenne du marché local — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">Publiez vos produits sur Rizq →</a>',
     'cta-badge1': 'Rejoignez-nous', 'cta-badge2': 'Particuliers · Boutiques · Showrooms · Bureaux · Appels d\'offres', 'cta-btn3': '🏢 Ma boutique / showroom',
     'cta-btn4': '📋 Salle des appels d\'offres',
-    'cta-hub-stores': 'Boutiques', 'cta-hub-offices': 'Bureaux', 'cta-hub-showrooms': 'Showrooms', 'cta-hub-tenders': 'Appels d\'offres',
-    'cta-chip1': '✓ Gratuit pour commencer', 'cta-chip2': '✓ Appels d\'offres sécurisés', 'cta-chip3': '✓ Vérification par téléphone',
+    'cta-hub-stores': 'Boutiques', 'cta-hub-offices': 'Bureaux', 'cta-hub-showrooms': 'Showrooms', 'cta-hub-tenders': 'Appels d\'offres', 'cta-hub-investments': 'Salle des investissements',
+    'cta-chip1': '✓ Gratuit pour commencer', 'cta-chip2': '✓ Appels d\'offres & investissements prudents', 'cta-chip3': '✓ Vérification par téléphone',
     'vs-title': 'Lancez <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">votre boutique virtuelle</span> sur Rizq',
     'vs-desc': 'Une page commerciale permanente à votre nom — présentez vos produits, gagnez la confiance des clients avec le badge \"boutique vérifiée\", et suivez tous vos contacts et visites depuis un seul endroit.',
     'vs-btn1': '🏪 Ouvrez votre boutique maintenant', 'vs-btn2': '👁 Voir un exemple de boutique',
@@ -5012,6 +5024,8 @@ const LANG = {
     'hbiz-offices': 'Bureaux &amp; services',
     'hbiz-showrooms': 'Showrooms',
     'hbiz-tenders': 'Appels d\'offres',
+    'hbiz-investments': 'Salle des investissements',
+    'hbiz-inv-badge': 'Nouveau',
     'hbiz-tender-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Ouvrez votre boutique ou publiez une annonce — gratuit',
@@ -5023,7 +5037,7 @@ const LANG = {
     's-lst-desc': 'Les meilleures annonces publiées sur Rizq',
     'view-all': 'Voir toutes les annonces →',
     's-why-title': 'Pourquoi choisir <span>Rizq?</span>',
-    's-why-desc': "Pas seulement un site d'annonces — annonces, showrooms et appels d'offres, une plateforme de confiance ancrée dans les valeurs mauritaniennes",
+    's-why-desc': "Pas seulement un site d'annonces — annonces, showrooms, appels d'offres et investissements, une plateforme de confiance ancrée dans les valeurs mauritaniennes",
     'why1-title': 'Inscription sécurisée',
     'why1-desc': 'Créez votre compte avec email et mot de passe, vérifiez votre identité avec un numéro mauritanien (Mauritel, Mattel ou Chinguitel). Zéro faux compte.',
     'why2-title': '22 catégories et 268 sous-catégories',
@@ -5032,15 +5046,15 @@ const LANG = {
     'why3-desc': 'Photographiez, indiquez le prix, choisissez la catégorie et la wilaya, publiez. Votre annonce atteint instantanément des milliers d\'acheteurs.',
     's-price-title': 'Offres <span>simples et transparentes</span>',
     's-price-desc': 'Commencez gratuitement, évoluez quand vous voulez',
-    'cta-title': 'Vendre, lancer un appel d\'offres, ou gérer votre bureau?<br/><span>Votre Rizq vous attend</span>',
-    'cta-desc': 'Rizq n\'est pas qu\'un marché — particulier, boutique, showroom auto, bureau de services, ou <strong style="color:#a7f3d0">salle d\'appels d\'offres</strong> recevant des devis réels.<br/>Inscrivez-vous et publiez votre première annonce ou appel d\'offres gratuitement.',
-    'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt',
+    'cta-title': 'Vendre, lancer un appel d\'offres, investir, ou gérer votre bureau?<br/><span>Votre Rizq vous attend</span>',
+    'cta-desc': 'Rizq n\'est pas qu\'un marché — particulier, boutique, showroom, bureau, <strong style="color:#a7f3d0">salle d\'appels d\'offres</strong>, et <strong style="color:#fde68a">salle des investissements</strong>.<br/>Inscrivez-vous et publiez votre première annonce gratuitement.',
+    'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Salle des investissements',
     'cta-note': '&nbsp;Inscription sécurisée &nbsp;|&nbsp; Totalement gratuit',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
     'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5':'À propos',
     'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
-    'ft-desc': 'La première plateforme d\'annonces classées en Mauritanie. 17 catégories, +130 sous-catégories.',
+    'ft-desc': 'La plateforme mauritanienne des annonces et des affaires: boutiques, showrooms, appels d\'offres et salle des investissements.',
     'ft-net-label': 'Réseaux supportés :',
     'ft-contact': 'Contactez-nous',
     'ft-copy': '© 2026 Rizq — Tous droits réservés 🇲🇷',
@@ -5260,18 +5274,16 @@ function applyLandingLang(toAr) {
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {
     var jumpMap = isAr
-      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#pricing':'الباقات'}
-      : {'#categories':'Catégories','#hero-listings':'Annonces','#pricing':'Forfaits'};
+      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#pricing':'الباقات','invest':'غرفة الاستثمارات'}
+      : {'#categories':'Catégories','#hero-listings':'Annonces','#pricing':'Forfaits','invest':'Salle des investissements'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];
     });
-    var ja = document.getElementById('jump-assistant');
-    if (ja) ja.textContent = isAr ? '✨ رزق ذكي' : '✨ Rizq IA';
   }
   var mbnLabels = document.querySelectorAll('#mobile-bottom-nav .mbn-label');
-  var mbnAR = ['الرئيسية','الأقسام','نشر','رزق ذكي','المزيد'];
-  var mbnFR = ['Accueil','Catégories','Publier','Rizq IA','Plus'];
+  var mbnAR = ['الرئيسية','الأقسام','نشر','استثمار','المزيد'];
+  var mbnFR = ['Accueil','Catégories','Publier','Investir','Plus'];
   mbnLabels.forEach(function(el, i){ if (mbnAR[i]) el.textContent = isAr ? mbnAR[i] : mbnFR[i]; });
   var hubs = document.querySelector('.cta-hubs');
   if (hubs) hubs.setAttribute('aria-label', isAr ? 'أقسام رزق للأعمال' : 'Espaces professionnels Rizq');
@@ -8148,10 +8160,10 @@ function refreshCatStatsText(){
   try { localStorage.setItem('rizq_cat_stats', JSON.stringify({n:n,m:m,cats:cats})); } catch(e){}
   LANG.ar['s-cats-desc'] = n+' قسماً رئيسياً و'+m+'+ فرعاً — السوق الموريتاني الأشمل والأدق';
   LANG.ar['why2-title']  = n+' قسماً و'+m+'+ فرعاً';
-  LANG.ar['ft-desc']     = 'منصة الإعلانات المبوبة الأولى في موريتانيا. '+n+' قسماً، '+m+'+ فرعاً، ملايين الفرص.';
+  LANG.ar['ft-desc']     = 'منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، وغرفة الاستثمارات — '+n+' قسماً و'+m+'+ فرعاً.';
   LANG.fr['s-cats-desc'] = n+' catégories et +'+m+' sous-catégories — le marché mauritanien le plus complet';
   LANG.fr['why2-title']  = n+' catégories et +'+m+' sous-catégories';
-  LANG.fr['ft-desc']     = 'La première plateforme d\'annonces classées en Mauritanie. '+n+' catégories, +'+m+' sous-catégories.';
+  LANG.fr['ft-desc']     = 'Plateforme mauritanienne des annonces et des affaires: boutiques, showrooms, appels d\'offres et salle des investissements — '+n+' catégories, +'+m+' sous-catégories.';
   const lang = (typeof isAr!=='undefined' && !isAr) ? 'fr' : 'ar';
   ['s-cats-desc','why2-title','ft-desc'].forEach(function(key){
     document.querySelectorAll('[data-t="'+key+'"]').forEach(function(el){ el.innerHTML = LANG[lang][key]; });
@@ -8909,12 +8921,12 @@ function pkgModalCTA(){
       <button class="rizq-promo-close" onclick="closeRizqPromo()">✕</button>
       <div class="rizq-promo-pill" data-t-fr="🇫🇷 Plateforme Rizq — Mauritanie">🇲🇷 منصة رزق — موريتانيا</div>
       <div class="rizq-promo-h" data-t-fr='Votre présence numérique<br/><span>sur la plateforme Rizq</span>'>حضورك الرقمي<br/><span>على منصة رزق</span></div>
-      <div class="rizq-promo-sub" data-t-fr="Rejoignez des milliers d'entreprises mauritaniennes<br/>qui présentent leurs services sur Rizq chaque jour">انضم لآلاف الأعمال الموريتانية<br/>التي تعرض خدماتها على رزق يومياً</div>
+      <div class="rizq-promo-sub" data-t-fr="Annonces, boutiques, appels d'offres et salle des investissements — tout sur Rizq">إعلانات، محلات، مناقصات، وغرفة الاستثمارات — كل ذلك على رزق</div>
     </div>
     <div class="rizq-promo-body">
       <div class="rizq-promo-feats">
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i1">🏢</div><div><div class="rizq-pf-title" data-t-fr="Une page professionnelle pour votre activité">صفحة احترافية لعملك</div><div class="rizq-pf-sub" data-t-fr="Vos services, vos contacts et votre image — au même endroit">خدماتك، تواصلك، وصورتك — في مكان واحد</div></div></div>
-        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📞</div><div><div class="rizq-pf-title" data-t-fr="Vos clients vous contactent directement">زبائن يتواصلون معك مباشرة</div><div class="rizq-pf-sub" data-t-fr="WhatsApp, téléphone et e-mail — en un clic">واتساب، هاتف، وإيميل — بضغطة واحدة</div></div></div>
+        <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i2">📈</div><div><div class="rizq-pf-title" data-t-fr="Salle des investissements">غرفة الاستثمارات</div><div class="rizq-pf-sub" data-t-fr="Revue initiale prudente de votre projet avant mise en relation">مراجعة أوّلية حذرة لمشروعك قبل التواصل</div></div></div>
         <div class="rizq-promo-feat"><div class="rizq-pf-icon rizq-pf-i3">⚡</div><div><div class="rizq-pf-title" data-t-fr="Prêt en quelques minutes — 10 jours gratuits">جاهز في دقائق — مجاناً 10 أيام</div><div class="rizq-pf-sub" data-t-fr="Aucun site web ni expérience technique requis">لا حاجة لموقع أو خبرة تقنية</div></div></div>
       </div>
       <a href="rizq_register.html" class="rizq-promo-cta-main" onclick="closeRizqPromo();location.href='rizq_register.html';return false;" data-t-fr="🚀 Commencer gratuitement">🚀 ابدأ مجاناً الآن</a>

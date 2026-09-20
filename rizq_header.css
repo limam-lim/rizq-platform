@@ -1706,3 +1706,14 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
 }
 
 .nav-dd-ads strong{color:#E8C96A !important}
+
+/* إخفاء رزق ذكي من الشريط — الودجت العائم يكفي */
+html.rizq-app-nav #nav-assistant-btn,
+html.rizq-app-nav #rizq-desk-assistant,
+html.rizq-app-nav #rizq-hdr-assistant,
+html.rizq-app-nav li:has(>#nav-assistant-btn),
+html.rizq-app-nav li:has(>#rizq-desk-assistant),
+#jump-assistant,
+#mbn-assistant{
+  display:none !important;
+}

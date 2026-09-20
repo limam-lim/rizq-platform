@@ -3247,6 +3247,85 @@ app.get('/api/tenders/:id', (req, res) => {
   });
 });
 
+// ── غرفة الاستثمارات ──────────────────────────────────────────────
+const investmentRoom = require('./services/investmentRoom');
+const investmentPlanLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_requests' },
+});
+const investmentSubmitLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_requests' },
+});
+
+/** POST /api/investments/plan — وكيل المراجعة الأوّلية (JSON plan) */
+app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
+  try {
+    const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
+    res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
+  } catch (err) {
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
+  }
+});
+
+/** GET /api/investments — فرص منشورة (بدون كشف بريد تشغيلي خاص) */
+app.get('/api/investments', (req, res) => {
+  try {
+    res.json(investmentRoom.listPublic({ unlockContacts: false }));
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'list_failed' });
+  }
+});
+
+/** POST /api/investments/submit — إيداع فرصة للمراجعة الداخلية */
+app.post('/api/investments/submit', investmentSubmitLimiter, (req, res) => {
+  try {
+    const out = investmentRoom.submitOpportunity(req.body || {});
+    res.json(out);
+  } catch (err) {
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'submit_failed' });
+  }
+});
+
+/** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
+app.get('/api/admin/investments/daily-report', requireAdminAuth, (req, res) => {
+  try {
+    const digest = investmentRoom.buildDailyDigest();
+    // لا نُرجع عنوان البريد التشغيلي الخاص في الاستجابة
+    res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'digest_failed' });
+  }
+});
+
+/** POST /api/admin/investments/send-ops-report — إرسال التقرير للبريد التشغيلي الخاص */
+app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req, res) => {
+  try {
+    const result = await investmentRoom.sendOpsDailyReport();
+    res.json({
+      ok: !!result.ok,
+      skipped: !!result.skipped,
+      reason: result.reason || null,
+      error: result.error || null,
+      summary: result.digest ? {
+        plansRequested: result.digest.plansRequested,
+        opportunitiesSubmitted: result.digest.opportunitiesSubmitted,
+        pendingReview: result.digest.pendingReview,
+      } : null,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'send_failed' });
+  }
+});
+
 /**
  * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
  */
@@ -4718,6 +4797,14 @@ app.listen(PORT, async () => {
   setInterval(function () {
     autoRefreshCurrencyRatesIfStale().catch(function () {});
   }, CURRENCY_AUTO_REFRESH_MS);
+  try {
+    const invSched = investmentRoom.startDailyOpsScheduler();
+    if (invSched && invSched.started) {
+      console.log('[investments] daily ops report scheduler started');
+    }
+  } catch (e) {
+    console.warn('[investments] scheduler:', e && e.message);
+  }
 });
 
 process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });
