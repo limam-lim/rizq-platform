@@ -146,11 +146,7 @@
       document.addEventListener('click', function (e) {
         if (e.target.closest(assistantSel)) loadAssistantStack(true);
       }, true);
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(function () { loadAssistantStack(false); }, { timeout: 12000 });
-      } else {
-        setTimeout(function () { loadAssistantStack(false); }, 8000);
-      }
+      /* خفة: لا تحميل مسبق للمساعد في idle — فقط عند الضغط */
     }
     if (!document.querySelector('link[rel="manifest"]')) {
       var link = document.createElement('link');
