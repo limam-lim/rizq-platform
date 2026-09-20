@@ -24,7 +24,6 @@
 
 'use strict';
 
-const path = require('path');
 const RizqPrompts = require('./rizq_ai_prompts');
 const { formatDynamicKnowledgeForPrompt } = require('./rizq-backend/services/dynamicKnowledge');
 
