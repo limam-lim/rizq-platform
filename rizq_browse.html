@@ -223,8 +223,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 
 /* COMPACT RESULT CARDS → rich photo cards */
 .rc{
-  display:flex;flex-direction:column;align-items:stretch;gap:0;
-  padding:0;border:1px solid rgba(27,58,107,.1);border-radius:14px;
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;
+  padding:0!important;border:1px solid rgba(27,58,107,.1);border-radius:14px;
   cursor:pointer;transition:transform .2s,box-shadow .22s,border-color .2s;
   position:relative;background:#fff;overflow:hidden;
   box-shadow:0 4px 14px rgba(15,31,61,.05);
@@ -232,7 +232,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .rc:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,31,61,.12);border-color:rgba(201,168,76,.45)}
 .rc.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.28),0 12px 28px rgba(15,31,61,.1)}
 .rc-thumb{
-  width:100%;height:auto;aspect-ratio:4/3;border-radius:0;
+  width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;
+  aspect-ratio:4/3;border-radius:0!important;
   background:linear-gradient(145deg,#12284a,#1B3A6B 55%,#234d8f);
   display:flex;align-items:center;justify-content:center;color:var(--gold);
   flex-shrink:0;overflow:hidden;position:relative;
