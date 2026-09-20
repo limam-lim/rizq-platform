@@ -334,6 +334,27 @@ async function main() {
     } catch (e) { /* ignore */ }
   }
 
+  // ── 18. Admin list strips dashToken; approve reveals once ──
+  const reveal = seedTestAccount();
+  try {
+    platformStore.upsertAccount(reveal.pending);
+    const secret = process.env.BACKEND_SHARED_SECRET || '';
+    if (secret) {
+      const adminList = await req('GET', '/api/accounts/admin', null, { 'x-rizq-secret': secret });
+      const row = (adminList.body && adminList.body.accounts || []).find((a) => a.id === reveal.id);
+      ok('admin list strips dashToken', !!(row && row.dashToken === undefined && row.accessToken === undefined));
+      const dec = await req('POST', '/api/accounts/admin/' + reveal.id + '/decision', { action: 'approve' }, { 'x-rizq-secret': secret });
+      ok('approve response reveals dashToken once',
+        dec.status === 200 && dec.body && dec.body.account && !!dec.body.account.dashToken
+        && dec.body.account.accessToken === undefined);
+    } else {
+      ok('admin list strips dashToken', true, 'SKIP — no BACKEND_SHARED_SECRET');
+      ok('approve response reveals dashToken once', true, 'SKIP — no BACKEND_SHARED_SECRET');
+    }
+  } finally {
+    try { platformStore.deleteAccount(reveal.id); } catch (e) { /* ignore */ }
+  }
+
   // ── Summary ──
   const failed = results.filter((r) => !r.pass);
   console.log('\n=== Summary ===');

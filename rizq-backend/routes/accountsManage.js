@@ -247,7 +247,13 @@ function mountAccountsManageRoutes(app, deps) {
       purgeAccountIdDocument(list[idx]);
     }
     writeAccounts(list);
-    res.json({ ok: true, account: stripToken(list[idx]) });
+    const safe = stripToken(list[idx]);
+    // كشف لمرة واحدة بعد الموافقة — الأدمن يحتاج dashToken لرابط لوحة المشترك
+    if (action === 'approve' && list[idx].dashToken) {
+      safe.dashToken = list[idx].dashToken;
+      safe.token = list[idx].dashToken;
+    }
+    res.json({ ok: true, account: safe });
   });
 
   /**
