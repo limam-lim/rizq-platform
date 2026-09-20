@@ -224,7 +224,29 @@ app.use(cors({
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
+// في التطوير/المراجعة ارفع السقف كثيراً حتى لا تُغلق المنصة بعد اختبارات الأمان.
+// الإنتاج يبقى صارماً (60 / 15 دقيقة). يمكن تجاوز السقف بـ API_RATE_LIMIT_MAX.
+const API_RATE_MAX = Number(process.env.API_RATE_LIMIT_MAX)
+  || (isProdEnv() ? 60 : 5000);
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: API_RATE_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // مسارات القراءة العامة للواجهة — لا تُحسب ضد حد الحماية من الاستهلاك العشوائي
+    // ملاحظة: عند mount على /api/ يكون req.path نسبياً (/site-config) وليس /api/site-config
+    const p = String(req.path || '');
+    if (req.method !== 'GET' && req.method !== 'HEAD') return false;
+    return p === '/health'
+      || p === '/site-config'
+      || p === '/otp/config'
+      || p === '/merchant-activities'
+      || p === '/ads'
+      || p === '/ads/batch'
+      || p.startsWith('/discovery/');
+  },
+}));
 
 // ── سرّ مشترك / جلسة أدمن — يمنع استدعاء endpoints الإدارية من خارج الجلسة ──
 // ══ مصادقة لوحة الإدارة (rizq_admin.html) — من طرف السيرفر فعلياً ═══
