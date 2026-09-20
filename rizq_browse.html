@@ -417,24 +417,47 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-sim-loc{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
 
 /* LIGHTBOX */
-#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:20000;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox.open{display:flex;flex-direction:column;gap:12px}
-#lightbox-close{position:fixed;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;z-index:9002;transition:all .2s}
+#lightbox-close{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:18px;cursor:pointer;z-index:20002;transition:all .2s}
 #lightbox-close:hover{background:rgba(220,38,38,.55)}
-#lightbox-content{max-width:90vw;max-height:78vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold);position:relative}
-#lightbox-content img{max-width:min(920px,90vw);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);cursor:default}
-.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:24px;cursor:pointer;z-index:9002;display:none;align-items:center;justify-content:center;transition:background .2s}
+#lightbox-content{max-width:92vw;max-height:78vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold);position:relative;z-index:20001}
+#lightbox-content img{max-width:min(960px,92vw);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);cursor:default;background:#0b1628}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:26px;cursor:pointer;z-index:20002;display:none;align-items:center;justify-content:center;transition:background .2s}
 .lb-nav:hover{background:rgba(201,168,76,.75)}
 #lightbox.open .lb-nav{display:flex}
 .lb-prev{left:18px}
 .lb-next{right:18px}
-.lb-meta{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:9002;display:none;align-items:center;gap:10px;background:rgba(15,31,61,.75);color:#fff;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid rgba(201,168,76,.3);pointer-events:none;direction:ltr;unicode-bidi:isolate}
+.lb-meta{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:20002;display:none;align-items:center;gap:10px;background:rgba(15,31,61,.8);color:#fff;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid rgba(201,168,76,.3);pointer-events:none;direction:ltr;unicode-bidi:isolate}
 #lightbox.open .lb-meta{display:inline-flex}
-.lb-thumbs{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:9002;display:none;gap:8px;max-width:90vw;overflow-x:auto;padding:4px}
+.lb-thumbs{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:20002;display:none;gap:8px;max-width:90vw;overflow-x:auto;padding:4px}
 #lightbox.open .lb-thumbs{display:flex}
-.lb-thumb{width:52px;height:40px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;opacity:.7;flex-shrink:0;background:#1B3A6B}
+.lb-thumb{width:56px;height:44px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;opacity:.7;flex-shrink:0;background:#1B3A6B;padding:0}
 .lb-thumb.active,.lb-thumb:hover{border-color:var(--gold);opacity:1}
 .lb-thumb img{width:100%;height:100%;object-fit:cover}
+.rl-infinite{
+  grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:18px 12px 28px;color:var(--text-muted);font-size:12.5px;font-weight:700;
+}
+.rl-infinite .ri-bar{
+  width:min(280px,70%);height:4px;border-radius:99px;background:rgba(27,58,107,.08);overflow:hidden;
+}
+.rl-infinite .ri-bar>i{
+  display:block;height:100%;width:40%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  animation:riSlide 1.1s ease-in-out infinite;
+}
+@keyframes riSlide{0%{transform:translateX(-120%)}100%{transform:translateX(280%)}}
+.rl-infinite.done .ri-bar{display:none}
+.rl-infinite button{
+  margin-top:4px;padding:8px 16px;border-radius:9px;border:1px solid rgba(201,168,76,.35);
+  background:#fff;color:var(--gold-dk);font-weight:800;font-size:12.5px;cursor:pointer;
+  font-family:'Cairo',sans-serif;
+}
+.rl-infinite button:hover{background:rgba(201,168,76,.1)}
+.dp-zoom-hint{
+  pointer-events:auto!important;cursor:zoom-in;
+}
 
 /* CHAT MODAL — floating bottom-right, page stays visible */
 .chat-overlay{display:none;position:fixed;bottom:72px;right:24px;z-index:7000;align-items:flex-end;justify-content:flex-end;padding:0;pointer-events:none}
@@ -1461,6 +1484,8 @@ function getAdById(id){
 let filtered = [...ALL_ADS];
 let page = 1;
 const PER_PAGE = 24;
+let visibleCount = PER_PAGE;
+let _infiniteLoading = false;
 // ── المفضلة (Wishlist) — كانت "favs" مجرد Set في الذاكرة يُفرَّغ مع كل
 // تحديث للصفحة (وهم بصري بلا أي تخزين فعلي). أُصلح ليُخزَّن فعلياً في
 // localStorage['rizq_wishlist'] (نفس نمط rizq_recently_viewed)، فيبقى
@@ -1820,6 +1845,7 @@ function applyFilters(){
   }
 
   page=1;
+  visibleCount=PER_PAGE;
   renderResultList();
   try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}
 }
@@ -1841,82 +1867,116 @@ function _syncBrowseFiltersToUrl(opts){
   history.replaceState(null,'',u.pathname+u.search+u.hash);
 }
 
+function _adCardHtml(a, fr){
+  const svgIcon=iconHTML(a.emoji);
+  const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
+  const _title=adTitleLocalized(a);
+  const _price=fr?priceFr(a.price||''):(a.price||'');
+  const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
+  const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
+  const nImg=(a.images&&a.images.length)||0;
+  const photoCount=nImg>1?`<span class="rc-photo-count">📷 ${nImg}</span>`:'';
+  let thumbInner;
+  if(a.images&&a.images[0]){
+    if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
+      thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
+    } else {
+      thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
+    }
+  } else {
+    thumbInner=svgIcon;
+  }
+  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
+    <div class="rc-thumb">${thumbInner}${_disc}${photoCount}</div>
+    <div class="rc-body">
+      <div class="rc-title">${escapeHtml(_title)}</div>
+      <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
+      <div class="rc-meta">
+        <span class="rc-loc">${escapeHtml(_loc)}</span>
+        ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
+        ${a.verified?`<span class="rc-verified">✓</span>`:''}
+        ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function _infiniteStatusHtml(fr){
+  const shown=Math.min(visibleCount, filtered.length);
+  const total=filtered.length;
+  const done=shown>=total;
+  if(!total) return '';
+  if(done){
+    return `<div class="rl-infinite done" id="rl-infinite"><span>${fr?('Fin — '+total+' annonces'):('تم عرض كل الإعلانات — '+total)}</span></div>`;
+  }
+  return `<div class="rl-infinite" id="rl-infinite">
+    <span>${fr?('Affichage '+shown+' / '+total+' — continuez à défiler'):('عرض '+shown+' من '+total+' — مرّر للأسفل للمزيد')}</span>
+    <div class="ri-bar" aria-hidden="true"><i></i></div>
+    <button type="button" onclick="loadMoreAds()">${fr?'Charger plus':'تحميل المزيد'}</button>
+  </div>`;
+}
+
 function renderResultList(){
   const body=document.getElementById('result-list-body');
   const pagEl=document.getElementById('result-pagination');
   const countEl=document.getElementById('rl-count-num');
   if(countEl)countEl.textContent=filtered.length;
-  // مزامنة شريط الإحصاءات مع العدد الحقيقي (تجنّب 27+ مقابل 0)
   const statAds=document.getElementById('stat-ads-num');
   if(statAds){
     const total=typeof ALL_ADS!=='undefined'?ALL_ADS.length:filtered.length;
-    statAds.textContent=total>0?(total>=27?total+'+':String(total)):'0';
+    statAds.textContent=total>0?(total>=100?total+'+':String(total)):'0';
   }
-  const start=(page-1)*PER_PAGE;
-  const items=filtered.slice(start,start+PER_PAGE);
+  if(visibleCount<PER_PAGE) visibleCount=PER_PAGE;
+  const items=filtered.slice(0, visibleCount);
   const fr=_rizqLang()==='fr';
 
-  if(!items.length){
+  if(!filtered.length){
     if(window.RizqUx && typeof RizqUx.emptyStateHtml==='function'){
       body.innerHTML=RizqUx.emptyStateHtml({ secondaryOnclick:'resetAllFilters()' });
     } else {
       body.innerHTML=`<div class="rc-empty"><div class="rei">🔍</div><p>${fr?'Aucune annonce trouvée':'لا توجد إعلانات مطابقة'}</p></div>`;
     }
-    pagEl.innerHTML='';
+    if(pagEl) pagEl.innerHTML='';
     return;
   }
 
-  body.innerHTML=items.map(a=>{
-    const svgIcon=iconHTML(a.emoji);
-    const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
-    const catLabel=fr?catFrOf(a.cat):a.cat;
-    const _title=adTitleLocalized(a);
-    const _price=fr?priceFr(a.price||''):(a.price||'');
-    const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
-    const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
-    const nImg=(a.images&&a.images.length)||0;
-    const photoCount=nImg>1?`<span class="rc-photo-count">📷 ${nImg}</span>`:'';
-    let thumbInner;
-    if(a.images&&a.images[0]){
-      if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
-        thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
-      } else {
-        thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
-      }
-    } else {
-      thumbInner=svgIcon;
-    }
-    return `<div class="rc ${isActive}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
-      <div class="rc-thumb">${thumbInner}${_disc}${photoCount}</div>
-      <div class="rc-body">
-        <div class="rc-title">${escapeHtml(_title)}</div>
-        <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
-        <div class="rc-meta">
-          <span class="rc-loc">${escapeHtml(_loc)}</span>
-          ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
-          ${a.verified?`<span class="rc-verified">✓</span>`:''}
-          ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  body.innerHTML=items.map(a=>_adCardHtml(a,fr)).join('') + _infiniteStatusHtml(fr);
+  if(pagEl) pagEl.innerHTML=''; // infinite scroll بدل أرقام الصفحات
+  _bindInfiniteScroll();
+}
 
-  // Pagination
-  const totalPages=Math.ceil(filtered.length/PER_PAGE);
-  if(totalPages<=1){pagEl.innerHTML='';return;}
-  let ph='';
-  for(let i=1;i<=totalPages;i++){
-    if(i===1||i===totalPages||Math.abs(i-page)<=1)
-      ph+=`<button class="rp-btn ${i===page?'on':''}" onclick="gotoPage(${i})">${i}</button>`;
-    else if(Math.abs(i-page)===2)ph+=`<span class="rp-btn" style="border:none;background:none">…</span>`;
-  }
-  pagEl.innerHTML=ph;
+function loadMoreAds(){
+  if(_infiniteLoading) return;
+  if(visibleCount>=filtered.length) return;
+  _infiniteLoading=true;
+  visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
+  // أبقِ موضع التمرير تقريباً بإعادة الرسم ثم إزاحة خفيفة
+  const body=document.getElementById('result-list-body');
+  const prevTop=body?body.scrollTop:0;
+  renderResultList();
+  if(body) body.scrollTop=prevTop;
+  _infiniteLoading=false;
+}
+
+function _bindInfiniteScroll(){
+  const body=document.getElementById('result-list-body');
+  if(!body || body._rizqInfiniteBound) return;
+  body._rizqInfiniteBound=true;
+  body.addEventListener('scroll', function(){
+    if(_infiniteLoading) return;
+    if(visibleCount>=filtered.length) return;
+    const nearBottom=body.scrollTop+body.clientHeight >= body.scrollHeight-280;
+    if(nearBottom) loadMoreAds();
+  }, {passive:true});
 }
 
 function gotoPage(p){
+  // توافق خلفي: انتقل لدفعة معيّنة عبر التمرير اللانهائي
   page=p;
+  visibleCount=Math.max(PER_PAGE, Math.min(p*PER_PAGE, filtered.length||PER_PAGE));
   renderResultList();
-  document.getElementById('result-list-body').scrollTop=0;
+  const body=document.getElementById('result-list-body');
+  if(body) body.scrollTop=0;
 }
 
 // ══════════ CORE SPA: selectAd ══════════
@@ -1970,10 +2030,10 @@ function renderDetailPanel(ad){
   ad._catEmojis=[]; // disable emoji photo strip
 
   let mainImgHTML;
-  const zoomHintHTML=hasImages?`<span class="dp-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></span>`:'';
+  const zoomHintHTML=hasImages?`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`:'';
   const counterHTML=hasImages&&totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onclick="event.stopPropagation();dpOpenLightbox(0)" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:contain"></div>${zoomHintHTML}${counterHTML}`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1'" style="width:100%;height:100%;object-fit:contain;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
   } else {
     mainImgHTML=`<span style="display:flex;width:72px;height:72px">${iconHTML(ad.emoji||'🏠')}</span>`;
   }
@@ -2038,7 +2098,7 @@ function renderDetailPanel(ad){
     <div class="dp-hero">
       <div class="dp-gallery">
         <div class="dp-gal-wrap">
-          <div class="dp-main-img" id="dp-main-img" onclick="dpOpenLightbox(0)" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
+          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
           ${galNavHTML}
         </div>
         ${thumbsBlock}
@@ -2296,33 +2356,49 @@ function closeRizqPromo(){
   const o=document.getElementById('rizq-promo-overlay');
   if(o){o.style.opacity='0';o.style.pointerEvents='none';setTimeout(()=>{o.style.display='none';},300);}
 }
+function _dpGalleryImages(){
+  const ad=window._currentAd;
+  if(!ad) return [];
+  const raw=Array.isArray(ad.images)?ad.images:[];
+  // مسارات صالحة فقط (نص غير فارغ)
+  return raw.map(function(s){return String(s||'').trim();}).filter(Boolean);
+}
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;
-  const imgs=window._currentAd.images||[];
-  if(!imgs.length)return;
-  window._lbIdx=Math.max(0,Math.min(idx|0,imgs.length-1));
+  const imgs=_dpGalleryImages();
+  if(!imgs.length){
+    try{ showToast(_rizqLang()==='fr'?'Pas de photo à agrandir':'لا توجد صورة للتكبير'); }catch(e){}
+    return;
+  }
+  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
+  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   const lb=document.getElementById('lightbox');
   if(!lb)return;
+  // ارفع اللايت بوكس فوق كل الطبقات (تفاصيل/أوفرلاي)
+  if(lb.parentElement!==document.body) document.body.appendChild(lb);
   dpRenderLightbox();
   lb.classList.add('open');
+  document.body.classList.add('rizq-lightbox-open');
 }
 function dpRenderLightbox(){
-  const imgs=(window._currentAd&&window._currentAd.images)||[];
+  const imgs=_dpGalleryImages();
   if(!imgs.length)return;
-  const idx=window._lbIdx||0;
+  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
+  window._lbIdx=idx;
   const fr=_rizqLang()==='fr';
   const lbc=document.getElementById('lightbox-content');
   const meta=document.getElementById('lightbox-meta');
   const thumbs=document.getElementById('lightbox-thumbs');
+  const src=imgs[idx];
   if(lbc){
-    lbc.innerHTML='<img src="'+escapeHtml(imgs[idx])+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()">';
+    lbc.innerHTML='<img src="'+escapeHtml(src)+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()" onerror="this.alt=(window._rizqLang&&_rizqLang()===\'fr\'?\'Image indisponible\':\'الصورة غير متاحة\');this.style.opacity=.4">';
   }
   if(meta){
     const tip=fr?' — Click outside to close':' — انقر خارج الصورة للإغلاق';
     meta.innerHTML='<span dir="ltr">'+(idx+1)+' / '+imgs.length+'</span><span dir="auto">'+tip+'</span>';
   }
   if(thumbs){
-    thumbs.innerHTML=imgs.map((src,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(src)+'" alt=""></button>').join('');
+    thumbs.innerHTML=imgs.map((s,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(s)+'" alt=""></button>').join('');
     thumbs.style.display=imgs.length>1?'flex':'none';
   }
   const prev=document.querySelector('.lb-prev');
@@ -2331,7 +2407,7 @@ function dpRenderLightbox(){
   if(next)next.style.display=imgs.length>1?'flex':'none';
 }
 function dpLightboxGoto(idx){
-  const imgs=(window._currentAd&&window._currentAd.images)||[];
+  const imgs=_dpGalleryImages();
   if(!imgs.length)return;
   window._lbIdx=((idx%imgs.length)+imgs.length)%imgs.length;
   dpRenderLightbox();
@@ -2342,21 +2418,18 @@ function dpLightboxNav(dir){
 function dpOpenWhatsApp(){dpWhatsApp();}
 function dpSetPhoto(idx){
   if(!window._currentAd)return;
-  _dpCurrentIdx=idx; // track for dpNavPhoto
-  const imgs=window._currentAd.images||[];
-  const emojis=window._currentAd._catEmojis||[];
+  const imgs=_dpGalleryImages();
+  if(!imgs.length)return;
+  idx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
+  _dpCurrentIdx=idx;
   const mainEl=document.getElementById('dp-main-img');
   if(!mainEl)return;
   const fr=_rizqLang()==='fr';
-  const total=imgs.length||emojis.length||1;
-  const zoomHint=`<span class="dp-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></span>`;
+  const total=imgs.length;
+  const zoomHint=`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`;
   const counter=total>1?`<span class="dp-gal-counter" id="dp-gal-counter">${idx+1} / ${total}</span>`:'';
-  if(imgs[idx]){
-    mainEl.innerHTML='<div class="rizq-img-wrap loaded" style="width:100%;height:100%"><img id="dp-main-img-el" src="'+escapeHtml(imgs[idx])+'" style="width:100%;height:100%;object-fit:contain" onclick="event.stopPropagation();dpOpenLightbox('+idx+')"></div>'+zoomHint+counter;
-    mainEl.setAttribute('onclick','dpOpenLightbox('+idx+')');
-  } else if(emojis[idx]){
-    mainEl.innerHTML='<span style="font-size:48px">'+emojis[idx]+'</span>'+counter;
-  }
+  mainEl.innerHTML='<div class="rizq-img-wrap loaded" style="width:100%;height:100%"><img id="dp-main-img-el" src="'+escapeHtml(imgs[idx])+'" style="width:100%;height:100%;object-fit:contain;pointer-events:none" onerror="this.dataset.broken=\'1\'"></div>'+zoomHint+counter;
+  mainEl.setAttribute('onclick','dpOpenLightbox()');
   document.querySelectorAll('.dp-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
 }
 // ── وظيفة موحّدة لكل وسوم الفلترة ──
@@ -2473,10 +2546,9 @@ function filterByVerified(v){
 // ── تنقل معرض الصور بالأسهم
 function dpNavPhoto(dir){
   if(!window._currentAd) return;
-  const ad=window._currentAd;
-  const total=(ad.images&&ad.images.length>0)?ad.images.length:(ad._catEmojis||[]).length;
-  if(total<=1) return;
-  _dpCurrentIdx=(_dpCurrentIdx+dir+total)%total;
+  const imgs=_dpGalleryImages();
+  if(imgs.length<=1) return;
+  _dpCurrentIdx=(_dpCurrentIdx+dir+imgs.length)%imgs.length;
   dpSetPhoto(_dpCurrentIdx);
 }
 function switchTab(tab){
@@ -2612,6 +2684,7 @@ function openLightbox(src){
 function closeLightbox(){
   const lb=document.getElementById('lightbox');
   if(lb)lb.classList.remove('open');
+  document.body.classList.remove('rizq-lightbox-open');
 }
 document.addEventListener('keydown',function(e){
   const lb=document.getElementById('lightbox');
