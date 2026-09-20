@@ -3259,7 +3259,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
         </div>
         <div class="rizq-reg-trust-card">
           <b><span class="ar-only">حماية الدفع والخصوصية</span><span class="fr-only">Paiement et confidentialité</span></b>
-          <p><span class="ar-only">إيصالات الدفع تُراجع يدوياً. صورة الهوية تُحذف بعد التوثيق ويبقى رقم الهوية فقط داخل ملفك.</span><span class="fr-only">Les reçus sont vérifiés manuellement. La photo d’identité est effacée après contrôle ; seul le NNI reste au dossier.</span></p>
+          <p><span class="ar-only">إيصالات الدفع تُراجع يدوياً. صورة الهوية تُحذف بعد التوثيق ويبقى رقم الهوية فقط داخل ملفك.</span><span class="fr-only">Les reçus sont vérifiés manuellement. La photo d’identité est effacée après contrôle ; seul le numéro d’identité reste au dossier.</span></p>
         </div>
       </div>
     </div>
@@ -3473,16 +3473,18 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       <input class="m-input" id="ind-city" type="text" data-ph-fr="Ville" placeholder="المدينة" data-t-ph="pmr-city-ph"/>
       <input class="m-input" id="ind-email" type="email" required data-ph-fr="E-mail *" placeholder="البريد الإلكتروني *" data-t-ph="pmr-email-ph"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="ind-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale (NNI)" placeholder="الرقم الوطني للتعريف (NNI)"/>
+      <input dir="ltr" style="direction:ltr;text-align:left;display:none" class="m-input" id="ind-foreign-id" type="text" maxlength="40" data-ph-fr="N° passeport / carte de séjour *" placeholder="رقم جواز السفر / بطاقة الإقامة *"/>
+      <input class="m-input" id="ind-nationality-country" type="text" maxlength="60" style="display:none" data-ph-fr="Nationalité (pays) *" placeholder="الجنسية (الدولة) *"/>
       <div class="m-pw-wrap"><input class="m-input" id="ind-pw" type="password" data-ph-fr="Mot de passe (8 caractères+)" placeholder="كلمة المرور (8 أحرف+)" data-t-ph="pmr-pw-ph"/><button class="m-eye" onclick="tp('ind-pw')">👁</button></div>
       <div class="m-pw-wrap" style="margin-bottom:14px"><input class="m-input" id="ind-pw2" type="password" data-ph-fr="Confirmer le mot de passe" placeholder="تأكيد كلمة المرور" data-t-ph="pmr-pw2-ph"/><button class="m-eye" onclick="tp('ind-pw2')">👁</button></div>
 
       <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:11px;padding:12px;margin-bottom:14px">
         <p id="ind-id-label" data-t-fr="📋 Photo de la carte d'identité" style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px" data-t="pmr-id-label">📋 البطاقة الوطنية الموريتانية</p>
-        <p id="ind-id-hint" data-t-fr="Supprimée après vérification — seul le NNI est conservé" style="font-size:10px;color:var(--text-muted);margin-bottom:8px" data-t="pmr-upload-hint">تُحذف بعد التوثيق — يُحتفظ برقم NNI فقط</p>
+        <p id="ind-id-hint" data-t-fr="Supprimée après vérification — seul le NNI est conservé" style="font-size:10px;color:var(--text-muted);margin-bottom:8px" data-t="pmr-id-hint">تُحذف بعد التوثيق — يُحتفظ برقم NNI فقط</p>
         <div id="uz-ind" onclick="document.getElementById('f-ind').click()" style="border:2px dashed rgba(201,168,76,.3);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.7)'" onmouseout="this.style.borderColor='rgba(201,168,76,.3)'">
-          <div style="font-size:26px;margin-bottom:4px">🪪</div>
+          <div id="ind-upload-icon" style="font-size:26px;margin-bottom:4px">🪪</div>
           <p id="ind-upload-txt" data-t-fr="Cliquez pour télécharger la photo" style="color:var(--text-soft);font-size:12px;font-weight:600" data-t="pmr-upload-txt">انقر لرفع صورة البطاقة</p>
-          <p style="color:var(--text-muted);font-size:10px;margin-top:2px" data-t="pmr-upload-hint">JPG / PNG — واضحة وكاملة</p>
+          <p id="ind-upload-fmt" style="color:var(--text-muted);font-size:10px;margin-top:2px" data-t="pmr-upload-hint">JPG / PNG — واضحة وكاملة</p>
           <input type="file" id="f-ind" accept="image/*" style="display:none" onchange="handleUpload('f-ind','uz-ind','indFile')"/>
         </div>
       </div>
@@ -5741,6 +5743,7 @@ const TR = {
     'pmr-pw-ph':       'كلمة المرور (8 أحرف+)',
     'pmr-pw2-ph':      'تأكيد كلمة المرور',
     'pmr-id-label':    '📋 البطاقة الوطنية الموريتانية',
+    'pmr-id-hint':     'تُحذف بعد التوثيق — يُحتفظ برقم NNI فقط',
     'pmr-upload-txt':  'انقر لرفع صورة البطاقة',
     'pmr-upload-hint': 'JPG / PNG — واضحة وكاملة',
     'pmr-uploaded':    '✅ تم الرفع',
@@ -5754,8 +5757,10 @@ const TR = {
     'pint-city-ph':    'المدينة التي تقطن فيها',
     'pint-pw-ph':      'كلمة المرور (8 أحرف+)',
     'pint-pw2-ph':     'تأكيد كلمة المرور',
+    'pint-foreign-id-ph': 'رقم جواز السفر / بطاقة الإقامة *',
+    'pint-nat-country-ph': 'الجنسية (الدولة) *',
     'pint-id-label':   '🌍 وثيقة إثبات الهوية',
-    'pint-id-hint':    'جواز سفر أو بطاقة هوية وطنية',
+    'pint-id-hint':    'جواز سفر أو بطاقة إقامة/هوية — تُحذف بعد التوثيق ويُحتفظ بالرقم فقط',
     'pint-upload-txt': 'انقر لرفع وثيقة الهوية',
     'pint-upload-hint':'JPG / PNG — واضحة وكاملة',
     'pint-uploaded':   '✅ تم الرفع',
@@ -5851,6 +5856,7 @@ const TR = {
     'pmr-pw-ph':       'Mot de passe (8 caractères min.)',
     'pmr-pw2-ph':      'Confirmer le mot de passe',
     'pmr-id-label':    '📋 Carte nationale mauritanienne',
+    'pmr-id-hint':     'Supprimée après vérification — seul le NNI est conservé',
     'pmr-upload-txt':  'Cliquez pour télécharger la carte',
     'pmr-upload-hint': 'JPG / PNG — claire et complète',
     'pmr-uploaded':    '✅ Téléchargé',
@@ -5863,8 +5869,10 @@ const TR = {
     'pint-city-ph':    'Ville de résidence',
     'pint-pw-ph':      'Mot de passe (8 caractères min.)',
     'pint-pw2-ph':     'Confirmer le mot de passe',
+    'pint-foreign-id-ph': 'N° passeport / carte de séjour *',
+    'pint-nat-country-ph': 'Nationalité (pays) *',
     'pint-id-label':   '🌍 Pièce d\'identité',
-    'pint-id-hint':    'Passeport ou carte nationale d\'identité',
+    'pint-id-hint':    'Passeport ou carte de séjour — photo effacée après contrôle ; seul le numéro est conservé',
     'pint-upload-txt': 'Cliquez pour télécharger le document',
     'pint-upload-hint':'JPG / PNG — claire et complète',
     'pint-uploaded':   '✅ Téléchargé',
@@ -6957,6 +6965,9 @@ function _syncAccountToBackend(acc){
       // مكتب/شركة) لكن لا تُرسَل هنا إطلاقاً — تبقى حبيسة localStorage فقط
       // فتصبح شارة "موثّق" غير قابلة للتحقق من أي جهاز آخر غير جهاز التسجيل.
       nni: acc.nni || '',
+      foreignId: acc.foreignId || '',
+      nationality: acc.nationality || '',
+      nationalityCountry: acc.nationalityCountry || '',
       idImage: acc.id_image || '',
       licenseImage: acc.license_image || '',
       activityImage2: acc.activity_image2 || acc.activityImage2 || ''
@@ -7354,6 +7365,10 @@ function submitIndividualReg(){
   const city=document.getElementById('ind-city').value.trim();
   const email=document.getElementById('ind-email').value.trim().toLowerCase();
   const nni=document.getElementById('ind-nni').value.trim();
+  const foreignIdEl=document.getElementById('ind-foreign-id');
+  const foreignId=foreignIdEl ? foreignIdEl.value.trim() : '';
+  const natCountryEl=document.getElementById('ind-nationality-country');
+  const nationalityCountry=natCountryEl ? natCountryEl.value.trim() : '';
   const pw=document.getElementById('ind-pw').value;
   const pw2=document.getElementById('ind-pw2').value;
   const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -7364,6 +7379,16 @@ function submitIndividualReg(){
   if(!whatsapp){alert(isAr?'رقم واتساب صالح مطلوب':'Numéro WhatsApp valide requis');return;}
   var isMr = natType !== 'int';
   if(isMr && !NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
+  if(!isMr){
+    if(!nationalityCountry || nationalityCountry.length < 2){
+      alert(isAr?'يرجى إدخال جنسيتك (اسم الدولة)':'Veuillez indiquer votre nationalité (pays)');
+      return;
+    }
+    if(!foreignId || foreignId.replace(/\s/g,'').length < 5){
+      alert(isAr?'يرجى إدخال رقم جواز السفر أو بطاقة الإقامة':'Veuillez saisir le n° de passeport ou de carte de séjour');
+      return;
+    }
+  }
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
   if(!indFile){alert(isAr?(isMr?'يرجى رفع صورة البطاقة الوطنية':'يرجى رفع جواز السفر أو بطاقة الإقامة/الجنسية'):(isMr?'Veuillez télécharger une photo de la carte d\'identité nationale':'Veuillez télécharger votre passeport ou carte de séjour/nationalité'));return;}
@@ -7375,12 +7400,14 @@ function submitIndividualReg(){
     _ppPendingData={
       type:'individual',
       nationality: isMr ? 'mr' : 'foreign',
+      nationalityCountry: isMr ? 'MR' : nationalityCountry,
       name,owner:name,
       phone: primaryPhone,
       phoneIntl: phoneIntl,
       whatsapp: whatsapp,
       city,
       nni: isMr ? nni : '',
+      foreignId: isMr ? '' : foreignId,
       email: email,
       password: pw,
       id_image: id_image,
@@ -7461,20 +7488,58 @@ function applyIndividualNatForm(){
   var isMr = natType !== 'int';
   var lang = (window.RizqI18n && typeof RizqI18n.getLang === 'function') ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang') || 'ar');
   var fr = lang === 'fr';
-  var t = LANG[fr ? 'fr' : 'ar'] || LANG.ar;
+  var t = (TR && TR[fr ? 'fr' : 'ar']) || {};
+  var prefix = isMr ? 'pmr' : 'pint';
+  var title = document.querySelector('#p-individual-form h3');
   var sub = document.getElementById('ind-form-sub');
   var idLabel = document.getElementById('ind-id-label');
   var idHint = document.getElementById('ind-id-hint');
   var uploadTxt = document.getElementById('ind-upload-txt');
+  var uploadFmt = document.getElementById('ind-upload-fmt');
+  var uploadIcon = document.getElementById('ind-upload-icon');
   var nni = document.getElementById('ind-nni');
-  if(sub) sub.textContent = t[isMr ? 'pmr-sub' : 'pint-sub'] || sub.textContent;
-  if(idLabel) idLabel.textContent = t[isMr ? 'pmr-id-label' : 'pint-id-label'] || idLabel.textContent;
-  if(idHint) idHint.textContent = t[isMr ? 'pmr-upload-hint' : 'pint-id-hint'] || idHint.textContent;
-  if(uploadTxt) uploadTxt.textContent = t[isMr ? 'pmr-upload-txt' : 'pint-upload-txt'] || uploadTxt.textContent;
+  var foreignId = document.getElementById('ind-foreign-id');
+  var natCountry = document.getElementById('ind-nationality-country');
+  var btn = document.getElementById('btn-ind-submit');
+  function setText(el, key, alsoDataT){
+    if(!el) return;
+    var val = t[key];
+    if(val) el.textContent = val;
+    if(alsoDataT){
+      el.setAttribute('data-t', key);
+      var frVal = (TR.fr && TR.fr[key]) || '';
+      if(frVal) el.setAttribute('data-t-fr', frVal);
+    }
+  }
+  setText(title, prefix + '-title', true);
+  setText(sub, prefix + '-sub', true);
+  setText(idLabel, prefix + '-id-label', true);
+  setText(idHint, prefix + (isMr ? '-id-hint' : '-id-hint'), true);
+  setText(uploadTxt, prefix + '-upload-txt', true);
+  setText(uploadFmt, prefix + '-upload-hint', true);
+  if(uploadIcon) uploadIcon.textContent = isMr ? '🪪' : '🛂';
   if(nni){
     nni.style.display = isMr ? '' : 'none';
-    nni.required = isMr;
+    nni.required = !!isMr;
     if(!isMr) nni.value = '';
+  }
+  if(foreignId){
+    foreignId.style.display = isMr ? 'none' : '';
+    foreignId.required = !isMr;
+    foreignId.placeholder = t['pint-foreign-id-ph'] || foreignId.placeholder;
+    if(isMr) foreignId.value = '';
+  }
+  if(natCountry){
+    natCountry.style.display = isMr ? 'none' : '';
+    natCountry.required = !isMr;
+    natCountry.placeholder = t['pint-nat-country-ph'] || natCountry.placeholder;
+    if(isMr) natCountry.value = '';
+  }
+  if(btn){
+    var nextKey = prefix + '-next';
+    /* زر الإرسال الحالي «إرسال الطلب» — نُبقي نص الزر كما في الواجهة، ونحدّث data-t فقط */
+    btn.setAttribute('data-t', nextKey);
+    if(TR.fr && TR.fr[nextKey]) btn.setAttribute('data-t-fr', TR.fr[nextKey]);
   }
   syncIndWhatsapp();
 }

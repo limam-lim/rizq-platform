@@ -52,17 +52,17 @@ var REGISTRATION_GUIDE = {
       when_fr: 'Si vous êtes de nationalité mauritanienne et souhaitez vendre ou acheter en tant que particulier',
       fields_ar: 'الاسم الكامل، رقم الهاتف، الولاية',
       fields_fr: 'Nom complet, numéro de téléphone, wilaya',
-      features_ar: 'نشر إعلانات، تواصل مع البائعين، تقييم الصفقات',
-      features_fr: 'Publier des annonces, contacter les vendeurs, évaluer les transactions'
+      features_ar: 'نشر إعلانات، تواصل، تقييم الصفقات، متابعة المناقصات والاستثمارات',
+      features_fr: 'Publier des annonces, contacter, évaluer, suivre AO et investissements'
     },
     private_int: {
       name_ar: 'مقيم أجنبي', name_fr: 'Résident étranger',
       when_ar: 'إذا كنت مقيماً في موريتانيا وغير موريتاني',
       when_fr: 'Si vous résidez en Mauritanie et n\'êtes pas de nationalité mauritanienne',
-      fields_ar: 'الاسم، رقم الهاتف، جنسيتك، رقم الإقامة',
-      fields_fr: 'Nom, numéro de téléphone, nationalité, numéro de résidence',
-      features_ar: 'نفس مزايا الفرد الموريتاني',
-      features_fr: 'Mêmes avantages que le particulier mauritanien'
+      fields_ar: 'الاسم، رقم الهاتف، جنسيتك (الدولة)، رقم جواز السفر أو بطاقة الإقامة، صورة الوثيقة',
+      fields_fr: 'Nom, téléphone, nationalité (pays), n° passeport ou carte de séjour, photo du document',
+      features_ar: 'نفس مزايا الحساب الشخصي',
+      features_fr: 'Mêmes avantages que le compte personnel'
     },
     store: {
       name_ar: 'متجر افتراضي (محل تجاري)', name_fr: 'Boutique virtuelle (commerce)',

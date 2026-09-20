@@ -1614,6 +1614,9 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     // هنا — idImage لا يظهر أبداً في ACCOUNT_PUBLIC_FIELDS (خاص بصاحب
     // الحساب + الأدمن فقط، مثل الهاتف/الإيميل تماماً).
     nni,
+    foreignId: String(b.foreignId || b.foreign_id || '').slice(0, 40),
+    nationality: String(b.nationality || '').slice(0, 20),
+    nationalityCountry: String(b.nationalityCountry || b.nationality_country || '').slice(0, 60),
     // الحد 8 ملايين حرف (~5.8MB ثنائي بعد فك base64) لأن واجهة الرفع تعرض
     // "حجم أقصى 5MB" فعلياً — حد thumb (2M) أضيق بكثير وكان سيقصّ صورة
     // هوية حقيقية بحجمها الطبيعي فتفسدها (base64 يُضخّم الحجم ~37%).
