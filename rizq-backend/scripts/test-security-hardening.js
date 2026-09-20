@@ -264,8 +264,8 @@ async function main() {
   ok('site-config has moduleFlags', !!(pub && pub.moduleFlags));
 
   // ── 11. CSP header ──
-  const health = await fetch(BASE + '/health');
-  ok('CSP header present', !!health.headers.get('content-security-policy'));
+  const healthRes = await fetch(BASE + '/health');
+  ok('CSP header present', !!healthRes.headers.get('content-security-policy'));
 
   // ── 12. Invalid account type ──
   const badType = await req('POST', '/api/accounts', { name: 'Bad', type: 'hacker', email: 'bad_' + Date.now() + '@t.com' });
@@ -309,38 +309,27 @@ async function main() {
   // ── 16. Suspended verify-dash ──
   const sus = seedTestAccount();
   try {
-    const list = platformStore.readAccounts();
-    const idx = list.findIndex((a) => a.id === sus.id);
-    list[idx].status = 'approved';
-    list[idx].suspended = true;
-    platformStore.writeAccounts(list);
+    platformStore.upsertAccount(Object.assign({}, sus.approved, { suspended: true }));
     const vSus = await req('POST', '/api/accounts/verify-dash/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
     ok('verify-dash suspended → 401', vSus.status === 401);
     const exSus = await req('POST', '/api/accounts/exchange-dash-token/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
     ok('exchange-dash-token suspended → 401', exSus.status === 401);
   } finally {
-    try { platformStore.deleteAccount(sus.id); } catch (e) {
-      const list2 = platformStore.readAccounts().filter((a) => a.id !== sus.id);
-      platformStore.writeAccounts(list2);
-    }
+    try { platformStore.deleteAccount(sus.id); } catch (e) { /* ignore */ }
   }
 
   // ── 17. visit-stats rejects query token ──
   const pkgAcc = seedTestAccount();
   try {
-    const list = platformStore.readAccounts();
-    const idx = list.findIndex((a) => a.id === pkgAcc.id);
-    list[idx].status = 'approved';
-    platformStore.writeAccounts(list);
-    repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store' });
+    platformStore.upsertAccount(pkgAcc.approved);
+    repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store', accountId: pkgAcc.id });
     const qTok = await req('GET', '/api/visit-stats/' + pkgAcc.id + '?token=' + encodeURIComponent(pkgAcc.accessToken));
     ok('visit-stats query token rejected', qTok.status === 401);
     const hTok = await req('GET', '/api/visit-stats/' + pkgAcc.id, null, { 'x-account-token': pkgAcc.accessToken });
-    ok('visit-stats header token accepted', hTok.status === 200 && hTok.body && hTok.body.ok);
+    ok('visit-stats header token accepted', hTok.status === 200 && hTok.body && hTok.body.ok, 'status=' + hTok.status);
   } finally {
     try {
-      const list2 = platformStore.readAccounts().filter((a) => a.id !== pkgAcc.id);
-      platformStore.writeAccounts(list2);
+      platformStore.deleteAccount(pkgAcc.id);
       repos.packages.remove(pkgAcc.id);
     } catch (e) { /* ignore */ }
   }
