@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /**
- * مراجعة يومية — تسجيل + OTP + دخول + توجيه كل نوع حساب إلى داشبورده.
- * تشغيل: OTP_DEV_HINT=true node scripts/test-auth-dashboard-routing.js
+ * مراجعة يومية — تسجيل + OTP + دخول + موافقة أدمن (مكتب/شركة) + توجيه كل نوع.
+ * تشغيل:
+ *   OTP_DEV_HINT=true BACKEND_SHARED_SECRET=rizq-test-secret \
+ *     node scripts/test-auth-dashboard-routing.js
  */
 'use strict';
 
 const BASE = process.env.RIZQ_BASE || 'http://127.0.0.1:3000';
+const ADMIN_SECRET = process.env.BACKEND_SHARED_SECRET || '';
 
 const DASH = {
   individual: 'rizq_dashboard.html',
@@ -91,7 +94,15 @@ async function registerAndLogin(type, extras) {
     const expectedFile = DASH[type];
     const urlPath = expectedFile + '?id=' + encodeURIComponent(login.data.account.id);
     assert(login.data.account.dashToken || login.data.account.token, type + ' missing dashToken');
-    return { type, email, id: login.data.account.id, urlPath, status: 'approved', dashToken: login.data.account.dashToken };
+    return {
+      type,
+      email,
+      password,
+      id: login.data.account.id,
+      urlPath,
+      status: 'approved',
+      dashToken: login.data.account.dashToken || login.data.account.token,
+    };
   }
 
   assert(reg.data.autoApproved !== true, type + ' must NOT auto-approve');
@@ -99,7 +110,90 @@ async function registerAndLogin(type, extras) {
   const login = await json('POST', '/api/accounts/seller-login', { email, password });
   assert(login.status === 403 && login.data && login.data.code === 'not_approved',
     type + ' login should be not_approved, got ' + JSON.stringify(login.data));
-  return { type, email, id: reg.data.id, urlPath: DASH[type] + '?id=' + encodeURIComponent(reg.data.id), status: 'pending' };
+  return {
+    type,
+    email,
+    password,
+    id: reg.data.id,
+    urlPath: DASH[type] + '?id=' + encodeURIComponent(reg.data.id),
+    status: 'pending',
+  };
+}
+
+/** موافقة أدمن → دخول ناجح → verify-dash يقفل النوع → مسار اللوحة الصحيح */
+async function adminApproveThenEnter(pendingAcc) {
+  assert(ADMIN_SECRET, 'BACKEND_SHARED_SECRET required for admin approve path in this harness');
+  const type = pendingAcc.type;
+  const approve = await json(
+    'POST',
+    '/api/accounts/admin/' + encodeURIComponent(pendingAcc.id) + '/decision',
+    { action: 'approve' },
+    { 'x-rizq-secret': ADMIN_SECRET }
+  );
+  assert(
+    approve.status === 200 && approve.data && approve.data.ok && approve.data.account,
+    type + ' admin approve failed: ' + JSON.stringify(approve.data)
+  );
+  assert(approve.data.account.status === 'approved', type + ' must be approved after decision');
+  assert(approve.data.account.type === type, type + ' type must stay locked after approve');
+  assert(approve.data.account.dashToken, type + ' admin approve must mint server dashToken');
+  assert(!approve.data.account.accessToken, type + ' admin response must not leak accessToken');
+
+  const login = await json('POST', '/api/accounts/seller-login', {
+    email: pendingAcc.email,
+    password: pendingAcc.password,
+  });
+  assert(
+    login.status === 200 && login.data && login.data.ok,
+    type + ' post-approve login failed: ' + JSON.stringify(login.data)
+  );
+  assert(login.data.account.type === type, type + ' login type mismatch after approve');
+  assert(login.data.account.status === 'approved', type + ' login status must be approved');
+  const tok = login.data.account.dashToken || login.data.account.token;
+  assert(tok && String(tok).length > 20, type + ' missing server dashToken after login');
+
+  const vRes = await fetch(BASE + '/api/accounts/verify-dash/' + encodeURIComponent(pendingAcc.id), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-dash-token': tok,
+    },
+    body: JSON.stringify({ dashToken: tok }),
+  });
+  const verified = await vRes.json().catch(() => null);
+  assert(vRes.status === 200 && verified && verified.ok && verified.account, type + ' verify-dash failed');
+  assert(verified.account.type === type, type + ' verify-dash type lock failed');
+  assert(verified.account.id === pendingAcc.id, type + ' verify-dash id mismatch');
+  assert(verified.account.accessToken === undefined, type + ' verify-dash must not return accessToken');
+
+  const expectedFile = DASH[type];
+  const urlPath = expectedFile + '?id=' + encodeURIComponent(pendingAcc.id);
+  return {
+    type,
+    email: pendingAcc.email,
+    id: pendingAcc.id,
+    urlPath,
+    status: 'approved',
+    dashToken: tok,
+    via: 'admin-approve',
+  };
+}
+
+async function assertVerifyDashTypeLock(acc) {
+  const login = await json('POST', '/api/accounts/seller-login', {
+    email: acc.email,
+    password: acc.password || 'TestPass9!',
+  });
+  assert(login.data && login.data.ok, acc.type + ' re-login');
+  const tok = login.data.account.dashToken || login.data.account.token;
+  const vRes = await fetch(BASE + '/api/accounts/verify-dash/' + encodeURIComponent(acc.id), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-dash-token': tok },
+    body: JSON.stringify({ dashToken: tok }),
+  });
+  const verified = await vRes.json();
+  assert(verified && verified.ok && verified.account, acc.type + ' verify-dash body');
+  assert(verified.account.type === acc.type, 'verify-dash must keep ' + acc.type + ' type');
 }
 
 async function main() {
@@ -143,26 +237,21 @@ async function main() {
   results.push(await registerAndLogin('corp', corpAct));
 
   const store = results.find((r) => r.type === 'store');
-  const loginStore = await json('POST', '/api/accounts/seller-login', {
-    email: store.email,
-    password: 'TestPass9!',
-  });
-  assert(loginStore.data && loginStore.data.ok, 'store re-login');
-  const tok = loginStore.data.account.dashToken || loginStore.data.account.token;
-  const vRes = await fetch(BASE + '/api/accounts/verify-dash/' + encodeURIComponent(store.id), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-dash-token': tok },
-    body: JSON.stringify({ dashToken: tok }),
-  });
-  const verified = await vRes.json();
-  if (verified && verified.ok && verified.account) {
-    assert(verified.account.type === 'store', 'verify-dash must keep store type');
-  }
+  await assertVerifyDashTypeLock(store);
 
-  console.log('OK auth→dashboard routing + security gates');
+  /* الفجوة المغلقة: مكتب/شركة بعد موافقة الأدمن يدخلان لوحتهما */
+  const office = results.find((r) => r.type === 'office');
+  const corp = results.find((r) => r.type === 'corp');
+  const officeLive = await adminApproveThenEnter(office);
+  const corpLive = await adminApproveThenEnter(corp);
+  results.push(officeLive);
+  results.push(corpLive);
+
+  console.log('OK auth→dashboard routing + security gates + admin-approve lifecycle');
   results.forEach((r) => {
-    console.log(' -', r.type, r.status, '→', r.urlPath);
+    console.log(' -', r.type, r.status, r.via ? '(' + r.via + ')' : '', '→', r.urlPath);
   });
+  console.log('CHECKLIST_COVERED: otp-auto-approve, pending-gate, bcrypt-login, server-dashToken, verify-dash type lock, admin-approve office/corp → dashboard');
   console.log('ACHIEVEMENTS_PRESERVED: type-map, recoverSessionParams, bcrypt seller-login, verify-dash type lock, OTP gate, server dashToken');
 }
 
