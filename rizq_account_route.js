@@ -73,6 +73,21 @@
     }
   }
 
+  /** تنظيف أمني: إزالة أي password نصي قديم دون المساس بالجلسات/التوكنات */
+  function purgeLegacyPlaintextPasswords() {
+    try {
+      var accs = readPendingAccounts();
+      var changed = false;
+      for (var i = 0; i < accs.length; i++) {
+        if (accs[i] && Object.prototype.hasOwnProperty.call(accs[i], 'password')) {
+          delete accs[i].password;
+          changed = true;
+        }
+      }
+      if (changed) localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+    } catch (e) {}
+  }
+
   function readStoredSession() {
     var sess = null;
     try { sess = JSON.parse(localStorage.getItem('rizq_active_session') || 'null'); } catch (e) {}
@@ -533,6 +548,7 @@
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', function () {
       stripTokenFromUrl();
+      purgeLegacyPlaintextPasswords();
       refreshStoredSessionFromBackend();
     });
   }

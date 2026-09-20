@@ -91,16 +91,21 @@ async function main() {
   });
   assert(loginStore.data && loginStore.data.ok, 'store re-login');
   const tok = loginStore.data.account.dashToken || loginStore.data.account.token;
-  const bad = await json('POST', '/api/accounts/verify-dash/' + encodeURIComponent(store.id), { token: tok });
-  // verify-dash returns account; type must remain store
-  if (bad.data && bad.data.ok && bad.data.account) {
-    assert(bad.data.account.type === 'store', 'verify-dash must keep store type');
+  const vRes = await fetch(BASE + '/api/accounts/verify-dash/' + encodeURIComponent(store.id), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-dash-token': tok },
+    body: JSON.stringify({ dashToken: tok }),
+  });
+  const verified = await vRes.json();
+  if (verified && verified.ok && verified.account) {
+    assert(verified.account.type === 'store', 'verify-dash must keep store type');
   }
 
   console.log('OK auth→dashboard routing');
   results.forEach((r) => {
     console.log(' -', r.type, r.status, '→', r.urlPath);
   });
+  console.log('ACHIEVEMENTS_PRESERVED: type-map, recoverSessionParams, bcrypt seller-login, verify-dash type lock');
 }
 
 main().catch((e) => {

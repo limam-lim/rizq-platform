@@ -18,8 +18,10 @@ function extractAccountToken(req) {
 function extractDashToken(req) {
   const header = String(req.header('x-dash-token') || '').trim();
   if (header) return header;
-  const body = req.body && req.body.dashToken;
-  if (body) return String(body).trim();
+  const body = req.body || {};
+  // الداشبوردات ترسل dashToken — نقبل token أيضاً للتوافق دون كسر المسار الحالي
+  const fromBody = body.dashToken || body.token;
+  if (fromBody) return String(fromBody).trim();
   if (!isProdEnv() && req.query && req.query.token) {
     return String(req.query.token).trim();
   }
