@@ -1953,7 +1953,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=18" defer></script>
 <script src="rizq_account_route.js?v=9"></script>
-<script src="rizq_auth_gate.js?v=19.2" defer></script>
+<script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
@@ -3197,7 +3197,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     <!-- ══ FORGOT / RESET PASSWORD ══ -->
     <div id="p-forgot" style="display:none">
       <h3 class="modal-auth-heading" id="forgot-heading">استعادة كلمة المرور</h3>
-      <p class="modal-auth-sub" id="forgot-sub">أدخل بريد حساب البائع لإرسال رمز التحقق</p>
+      <p class="modal-auth-sub" id="forgot-sub">أدخل بريد حسابك على رزق لإرسال رمز التحقق</p>
 
       <div id="forgot-step-email">
         <input class="m-input" id="fg-em" type="email" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email"/>
@@ -7740,7 +7740,7 @@ function resetForgotUi(){
   var h = document.getElementById('forgot-heading');
   var s = document.getElementById('forgot-sub');
   if(h) h.textContent = isAr ? 'استعادة كلمة المرور' : 'Récupérer le mot de passe';
-  if(s) s.textContent = isAr ? 'أدخل بريد حساب البائع لإرسال رمز التحقق' : 'Saisissez l\'e-mail du compte vendeur pour recevoir un code';
+  if(s) s.textContent = isAr ? 'أدخل بريد حسابك على رزق لإرسال رمز التحقق' : 'Saisissez l\'e-mail de votre compte Rizq pour recevoir un code';
   document.querySelectorAll('.fg-otp').forEach(function(inp){ inp.value = ''; });
   var pw = document.getElementById('fg-pw');
   var pw2 = document.getElementById('fg-pw2');

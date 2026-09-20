@@ -129,9 +129,9 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free.\n` +
       `When explaining how to register or log in, use ONLY on-screen button labels the user can tap:\n` +
-      `- Buyer: «حسابي» → «أشتري أو أتصفّح» then email verification code\n` +
-      `- New seller: homepage «حساب جديد» or «سجّل الآن — مجاناً»\n` +
-      `- Seller login: homepage «دخول» or «حسابي» → «لدي حساب بائع — دخول»\n` +
+      `- Personal account: «حسابي» → «أتصفّح وأتواصل» then email verification code\n` +
+      `- New business account: homepage «حساب جديد» or «سجّل الآن — مجاناً»\n` +
+      `- Account login: homepage «دخول» or «حسابي» → «لدي حساب على رزق — دخول»\n` +
       `NEVER expose file names, .html paths, query parameters (?openRegister, ?openLogin), or internal technical URLs in replies.\n` +
       `For general questions: keep replies concise (2-4 sentences) and actionable.\n` +
       `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE plain-text answer — ` +

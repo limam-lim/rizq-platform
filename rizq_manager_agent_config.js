@@ -41,9 +41,9 @@ var PLATFORM_OVERVIEW = {
 // ═══════════════════════════════════════════════════════════════
 var REGISTRATION_GUIDE = {
   overview_ar:
-    '📝 التسجيل في رزق — مساران واضحان:\n\n🛒 مشتري / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أشتري أو أتصفّح»\n3️⃣ أدخل بياناتك ثم أكّد بريدك برمز التحقق\n\n🏪 بائع / محل / مكتب / شركة:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ اختر نوع الحساب وأكمل البيانات والتحقق\n3️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب بائع؟\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب بائع — دخول»',
+    '📝 التسجيل في رزق — مساران واضحان:\n\n👤 حساب شخصي / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أتصفّح وأتواصل»\n3️⃣ أدخل بياناتك ثم أكّد بريدك برمز التحقق\n\n🏢 حساب أعمال / محل / مكتب / معرض / مناقصات:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ اختر نوع الحساب وأكمل البيانات والتحقق\n3️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب على رزق؟\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب على رزق — دخول»',
   overview_fr:
-    '📝 Inscription sur Rizq — deux parcours clairs:\n\n🛒 Acheteur / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « J\'achète ou je parcours »\n3️⃣ Entrez vos infos puis confirmez votre e-mail avec le code\n\n🏪 Vendeur / boutique / bureau / entreprise:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Choisissez le type de compte et complétez la vérification\n3️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte vendeur?\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte vendeur — Connexion »',
+    '📝 Inscription sur Rizq — deux parcours clairs:\n\n👤 Compte personnel / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « Je parcours et je contacte »\n3️⃣ Entrez vos infos puis confirmez votre e-mail avec le code\n\n🏢 Compte pro / boutique / bureau / showroom / appels d\'offres:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Choisissez le type de compte et complétez la vérification\n3️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte Rizq?\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte Rizq — Connexion »',
 
   account_types: {
     private_mr: {
@@ -285,8 +285,8 @@ var FAQ = [
   {
     q: ['دخول','تسجيل دخول','لدي حساب','login','connexion','se connecter','openLogin'],
     a: {
-      ar: '🔑 دخول البائع:\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب بائع — دخول»\n\n🛒 حساب مشتري / سريع: من «حسابي» اختر «أشتري أو أتصفّح».',
-      fr: '🔑 Connexion vendeur:\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte vendeur — Connexion »\n\n🛒 Compte acheteur: depuis « Compte » choisissez « J\'achète ou je parcours ».'
+      ar: '🔑 دخول حساب الأعمال:\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب على رزق — دخول»\n\n👤 حساب شخصي: من «حسابي» اختر «أتصفّح وأتواصل».',
+      fr: '🔑 Connexion compte pro:\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte Rizq — Connexion »\n\n👤 Compte personnel: depuis « Compte » choisissez « Je parcours et je contacte ».'
     }
   },
   {
@@ -724,8 +724,8 @@ function processMessage(userMessage, context) {
   // Forgot password / login issue
   if (/\u0646\u0633\u064A\u062A|\u0643\u0644\u0645\u0629 \u0633\u0631|\u062F\u062E\u0648\u0644|\u062A\u0633\u062C\u064A\u0644 \u062F\u062E\u0648\u0644|oubli|forgot|password|login/.test(lower)) {
     return { reply: lang==='fr'
-      ? '🔑 Connexion vendeur:\n• Accueil → « Connexion »\n• Ou « Compte » → « J\'ai un compte vendeur — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (un code arrive sur votre e-mail).\n\n🛒 Compte acheteur: « Compte » → « J\'achète ou je parcours ».'
-      : '🔑 دخول البائع:\n• الرئيسية → «دخول»\n• أو من «حسابي» → «لدي حساب بائع — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (يصلك رمز على بريدك).\n\n🛒 حساب المشتري: «حسابي» → «أشتري أو أتصفّح».', lang: lang };
+      ? '🔑 Connexion compte pro:\n• Accueil → « Connexion »\n• Ou « Compte » → « J\'ai un compte Rizq — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (un code arrive sur votre e-mail).\n\n👤 Compte personnel: « Compte » → « Je parcours et je contacte ».'
+      : '🔑 دخول حساب الأعمال:\n• الرئيسية → «دخول»\n• أو من «حسابي» → «لدي حساب على رزق — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (يصلك رمز على بريدك).\n\n👤 حساب شخصي: «حسابي» → «أتصفّح وأتواصل».', lang: lang };
   }
 
   if (context.tier === 'diamond' && /\u062A\u0642\u0631\u064A\u0631|\u062A\u062D\u0644\u064A\u0644|report|analyse/.test(lower)) {

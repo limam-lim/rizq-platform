@@ -1,7 +1,7 @@
 /**
- * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v19.2
+ * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.3
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
- * v19.2: بطاقة دخول بائع + حسابي يفتح لوحة المشتري إن كان مسجّلاً
+ * v19.3: تسميات أوسع من بائع/مشتري — حساب شخصي · حساب أعمال · دخول رزق
  */
 (function () {
   'use strict';
@@ -50,16 +50,16 @@
       titleAccount: 'حسابي',
       titleOtp: 'تأكيد بريدك الإلكتروني',
       titleChoice: 'حسابي على رزق',
-      subGate: 'سجّل مجاناً للتواصل مع البائعين وحفظ المفضلة — أقل من دقيقة',
+      subGate: 'سجّل مجاناً للتواصل وحفظ المفضلة واستخدام غرف المنصة — أقل من دقيقة',
       subAccount: 'حسابك على رزق — للتصفح والتواصل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
       subReturning: 'مرحباً بعودتك! أكّد بريدك برمز التحقق',
-      subChoice: 'اختر بوضوح: شراء سريع، أو إنشاء حساب بائع، أو دخول لحساب موجود',
-      choiceBuyer: '🛒 أشتري أو أتصفّح',
-      choiceBuyerSub: 'حساب سريع للتواصل والمفضلة — أقل من دقيقة',
-      choiceSeller: '🏪 أبيع — حساب بائع جديد',
-      choiceSellerSub: 'لنشر الإعلانات وفتح محل أو مكتب أو معرض',
-      choiceSellerLogin: '🔑 لدي حساب بائع — دخول',
+      subChoice: 'اختر بوضوح: حساب شخصي، أو حساب أعمال جديد، أو دخول لحساب موجود',
+      choiceBuyer: '👤 أتصفّح وأتواصل',
+      choiceBuyerSub: 'حساب شخصي للتواصل والمفضلة والمناقصات — أقل من دقيقة',
+      choiceSeller: '🏢 أنشر وأدير — حساب أعمال جديد',
+      choiceSellerSub: 'إعلانات · محل · مكتب · معرض · مناقصات · استثمارات',
+      choiceSellerLogin: '🔑 لدي حساب على رزق — دخول',
       choiceSellerLoginSub: 'البريد وكلمة المرور للوحة التحكم',
       nameLabel: 'الاسم الكامل *',
       namePh: 'مثال: محمد أحمد ولد سيدي',
@@ -97,11 +97,11 @@
       successToast: '✅ تم تفعيل حسابك بنجاح',
       welcomeBack: '👋 أهلاً بعودتك',
       logout: 'تسجيل الخروج',
-      sellerCta: '🏪 أنا بائع — فتح حساب بائع',
-      loggedAs: 'مسجّل كمشتري',
+      sellerCta: '🏢 أفتح حساب أعمال على رزق',
+      loggedAs: 'مسجّل كعضو',
       reasonPhone: 'لعرض رقم الهاتف',
       reasonWhatsapp: 'للتواصل عبر واتساب',
-      reasonMsg: 'لإرسال رسالة للبائع',
+      reasonMsg: 'لإرسال رسالة',
       reasonFav: 'لإضافة الإعلان للمفضلة',
       reasonGeneric: 'للمتابعة',
       otpSent: 'تم إرسال الرمز إلى بريدك',
@@ -112,16 +112,16 @@
       titleAccount: 'Mon compte',
       titleOtp: 'Confirmez votre e-mail',
       titleChoice: 'Mon compte Rizq',
-      subGate: 'Inscrivez-vous gratuitement pour contacter les vendeurs et sauvegarder vos favoris',
+      subGate: 'Inscrivez-vous gratuitement pour contacter, sauvegarder vos favoris et utiliser les salles Rizq',
       subAccount: 'Votre compte Rizq — navigation, contact et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
       subReturning: 'Bon retour ! Confirmez votre e-mail avec le code',
-      subChoice: 'Choisissez clairement : achat rapide, nouveau compte vendeur, ou connexion',
-      choiceBuyer: '🛒 J\'achète / je parcours',
-      choiceBuyerSub: 'Compte rapide pour contact et favoris',
-      choiceSeller: '🏪 Je vends — nouveau compte vendeur',
-      choiceSellerSub: 'Publier et ouvrir boutique, bureau ou showroom',
-      choiceSellerLogin: '🔑 J\'ai un compte vendeur — Connexion',
+      subChoice: 'Choisissez clairement : compte personnel, nouveau compte pro, ou connexion',
+      choiceBuyer: '👤 Je parcours et je contacte',
+      choiceBuyerSub: 'Compte personnel — contact, favoris et salles Rizq',
+      choiceSeller: '🏢 Je publie et gère — nouveau compte pro',
+      choiceSellerSub: 'Annonces · boutique · bureau · showroom · appels d\'offres · investissements',
+      choiceSellerLogin: '🔑 J\'ai un compte Rizq — Connexion',
       choiceSellerLoginSub: 'E-mail et mot de passe du tableau de bord',
       nameLabel: 'Nom complet *',
       namePh: 'Ex : Mohamed Ahmed Ould Sidi',
@@ -159,8 +159,8 @@
       successToast: '✅ Compte activé avec succès',
       welcomeBack: '👋 Bon retour',
       logout: 'Déconnexion',
-      sellerCta: '🏪 Je suis vendeur — compte vendeur',
-      loggedAs: 'Connecté en tant qu\'acheteur',
+      sellerCta: '🏢 Ouvrir un compte pro sur Rizq',
+      loggedAs: 'Connecté en tant que membre',
       reasonPhone: 'pour afficher le numéro',
       reasonWhatsapp: 'pour WhatsApp',
       reasonMsg: 'pour envoyer un message',
@@ -1161,7 +1161,7 @@
     document.getElementById('rag-wa-same').checked = false;
     document.getElementById('rag-whatsapp').disabled = false;
     document.getElementById('rag-title').textContent = d().titleOtp;
-    document.getElementById('rag-sub').textContent = t('أكّد بريدك قبل إتمام التسجيل كبائع', 'Confirmez votre e-mail avant de finaliser l\'inscription vendeur');
+    document.getElementById('rag-sub').textContent = t('أكّد بريدك قبل إتمام تسجيل حساب الأعمال', 'Confirmez votre e-mail avant de finaliser le compte pro');
     showStep('form');
   }
 
