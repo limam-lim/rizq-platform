@@ -191,8 +191,20 @@ body{
 .td-section-head h2{font-size:clamp(20px,3vw,28px);font-weight:800;color:#1B3A6B;margin:0 0 8px}
 .td-section-head p{font-size:13.5px;color:#5b6b8a;line-height:1.7;margin:0}
 
-.submit-panel{background:linear-gradient(180deg,#fbfcff 0%,#eef2fb 100%);border:1px solid #e7ecf3;border-radius:20px;padding:28px 24px;margin:8px auto 36px;max-width:760px;box-shadow:var(--shadow-card)}
+.td-notice{margin-bottom:28px;padding:14px 18px;border-radius:14px;background:#fff8e9;border:1.5px solid #f0d99a;color:#7a5c00;font-size:13px;line-height:1.75;font-weight:600}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:42px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:var(--shadow-card);opacity:0;animation:cardIn .55s ease forwards}
+.step:nth-child(1){animation-delay:.05s}.step:nth-child(2){animation-delay:.12s}.step:nth-child(3){animation-delay:.2s}
+.step-num{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-bottom:12px}
+.step h3{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.step p{font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+
+.submit-panel{background:linear-gradient(180deg,#fbfcff 0%,#eef2fb 100%);border:1px solid #e7ecf3;border-radius:20px;padding:28px 24px;margin:0 auto 42px;max-width:760px;box-shadow:var(--shadow-card)}
 .submit-panel .f-submit{max-width:320px}
+.agent-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow-card);margin-top:8px}
+.agent-card > h3{font-family:'Amiri',Georgia,serif;font-size:20px;color:var(--navy);margin-bottom:6px}
+.agent-card > .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:18px;line-height:1.65}
 
 .f-group{margin-bottom:13px}
 .f-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;display:block;letter-spacing:.2px}
@@ -204,11 +216,12 @@ body{
 .f-submit:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(201,168,76,.38)}
 .f-submit:disabled{opacity:.65;cursor:wait}
 .f-hint{font-size:11.5px;color:var(--ink-faint);margin-top:8px;line-height:1.6}
-.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 auto 8px;max-width:760px}
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 auto 36px;max-width:760px}
 .trust-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
 .trust-item strong{display:block;font-size:13px;color:var(--navy);margin-bottom:6px}
 .trust-item span{font-size:12px;color:var(--ink-soft);line-height:1.6}
-@media(max-width:900px){.trust-row{grid-template-columns:1fr}}
+@media(max-width:900px){.trust-row,.steps{grid-template-columns:1fr}}
+
 /* صور مرجعية اختيارية للمناقصة (مثال: "20 كرسي بهذا الشكل" + صورة) */
 .pt-img-zone{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:#fdfcfa}
 .pt-img-zone:hover{border-color:var(--gold);background:#fffaf0}
@@ -281,21 +294,45 @@ body{
 </div>
 
 <div class="wrap">
-  <div class="cats" id="t-cats"></div>
-  <div class="list-head"><div class="t-count" id="t-count"></div></div>
-  <div id="t-access-banner"></div>
-  <div class="t-grid" id="t-grid"></div>
+  <div class="td-notice" data-t-fr="Rizq est un intermédiaire de publication. Remplissez le dossier ci-dessous — photos/PDF optionnels pour clarifier le besoin. Contact public: direction@rizq.mr">
+    رزق وسيط نشر إلكتروني. املأ ملف المناقصة أدناه — صور/PDF اختيارية لتوضيح الاحتياج. التواصل العام: direction@rizq.mr
+  </div>
+
+  <div class="td-section-head">
+    <div class="eyebrow" data-t-fr="Comment ça marche">كيف تعمل الغرفة</div>
+    <h2 data-t-fr="Du besoin aux devis privés">من الاحتياج إلى عروض خاصة</h2>
+    <p data-t-fr="Un parcours simple, bilingue, conçu pour la clarté et la prudence.">مسار بسيط ثنائي اللغة، مبني على الوضوح والحذر.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3 data-t-fr="Décrivez le besoin">صف الاحتياج</h3>
+      <p data-t-fr="Titre, catégorie, budget, délai et une description précise.">العنوان، الفئة، الميزانية، الموعد، ووصف واضح.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3 data-t-fr="Joignez des preuves (optionnel)">أرفق توضيحاً (اختياري)</h3>
+      <p data-t-fr="Photos ou PDF pour préciser le produit ou le cahier des charges.">صور أو PDF لتوضيح المنتج أو دفتر الشروط.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3 data-t-fr="Recevez des devis privés">استقبل عروض خاصة</h3>
+      <p data-t-fr="Les abonnés soumettent des offres — vous choisissez le gagnant.">المشتركون يقدّمون عروضاً — وأنت تختار الفائز.</p>
+    </div>
+  </div>
 
   <div class="submit-panel" id="td-submit">
     <div class="td-section-head" style="margin-bottom:18px">
       <div class="eyebrow" data-t-fr="Soumettre">إيداع</div>
       <h2 data-t-fr="Déposer un appel d'offres">أودع مناقصة جديدة</h2>
-      <p data-t-fr="Remplissez le dossier ci-dessous. Rizq est un intermédiaire de publication — aucune garantie d'offres.">املأ الملف أدناه. رزق وسيط نشر فقط — بلا ضمان للعروض.</p>
+      <p data-t-fr="Même style que la salle des investissements — dossier clair, revue prudente.">بنفس أسلوب غرفة الاستثمارات — ملف واضح ومراجعة حذرة.</p>
     </div>
 
-    <div id="td-submit-login" class="login-notice" hidden></div>
-
-    <form id="td-submit-form" autocomplete="off">
+    <div class="agent-card">
+      <h3 data-t-fr="Formulaire de l'appel d'offres">نموذج المناقصة</h3>
+      <p class="sub" data-t-fr="Remplissez les champs essentiels. Plus vous êtes précis, plus les devis sont utiles.">املأ الحقول الأساسية. كلّما كنت أدقّ، كانت العروض أنفع.</p>
+      <div id="td-submit-login" class="login-notice" hidden style="margin-bottom:14px"></div>
+      <form id="td-submit-form" autocomplete="off">
       <div class="f-group">
         <label class="f-label" for="pt-title" data-t-fr="Titre *">العنوان *</label>
         <input class="f-input" id="pt-title" name="title" required maxlength="140" data-ph-ar="مثال: توريد 50 كيس أسمنت" data-ph-fr="Ex : Fourniture de 50 sacs de ciment" placeholder="مثال: توريد 50 كيس أسمنت"/>
@@ -342,7 +379,18 @@ body{
       <p class="f-hint" data-t-fr="Rizq est un simple intermédiaire de publication — nous ne garantissons pas les offres et n'intervenons pas dans le choix du gagnant.">رزق وسيط نشر فقط — لا نضمن العروض ولا نتدخل في اختيار الفائز.</p>
       <p id="td-submit-msg" class="f-hint" style="color:var(--ok);font-weight:700" hidden></p>
     </form>
+    </div>
   </div>
+
+  <div class="td-section-head" id="td-list">
+    <div class="eyebrow" data-t-fr="Appels ouverts">المناقصات</div>
+    <h2 data-t-fr="Appels d'offres ouverts">مناقصات مفتوحة</h2>
+    <p data-t-fr="Parcourez les besoins publiés. Les contacts restent derrière abonnement.">تصفّح الاحتياجات المنشورة. التواصل يبقى خلف اشتراك.</p>
+  </div>
+  <div class="cats" id="t-cats"></div>
+  <div class="list-head"><div class="t-count" id="t-count"></div></div>
+  <div id="t-access-banner"></div>
+  <div class="t-grid" id="t-grid"></div>
 
   <div class="trust-row">
     <div class="trust-item">
@@ -359,6 +407,7 @@ body{
     </div>
   </div>
 </div>
+
 
 <section class="tender-pkg-section" id="tender-packages">
   <div class="tender-pkg-head">
@@ -815,18 +864,20 @@ function refreshTdSubmitGate(){
   var session = _getSession();
   var loginEl = document.getElementById('td-submit-login');
   var formEl = document.getElementById('td-submit-form');
-  if(!loginEl || !formEl) return;
-  if(!session){
-    loginEl.hidden = false;
-    loginEl.innerHTML = (fr
-      ? 'Connectez-vous d\'abord depuis votre tableau de bord (compte particulier, magasin, bureau ou société) pour publier un appel d\'offres.'
-      : 'سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) حتى تقدر تنشر مناقصة.')
-      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a>';
-    formEl.style.display = 'none';
-  } else {
-    loginEl.hidden = true;
-    loginEl.innerHTML = '';
-    formEl.style.display = '';
+  if(!formEl) return;
+  /* النموذج يبقى ظاهراً دائماً (مثل غرفة الاستثمارات) — التنبيه فقط عند غياب الجلسة */
+  formEl.style.display = '';
+  if(loginEl){
+    if(!session){
+      loginEl.hidden = false;
+      loginEl.innerHTML = (fr
+        ? 'Astuce : connectez-vous depuis votre tableau de bord (compte particulier, magasin, bureau ou société) avant d\'envoyer. Vous pouvez déjà préparer le dossier ci-dessous.'
+        : 'تنبيه: سجّل دخولك من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) قبل الإرسال. يمكنك تحضير الملف أدناه الآن.')
+        + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a>';
+    } else {
+      loginEl.hidden = true;
+      loginEl.innerHTML = '';
+    }
   }
   _fillCatSelect();
   _applyTdPlaceholders();
@@ -837,8 +888,7 @@ function openPostModal(){
   var panel = document.getElementById('td-submit');
   if(panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   var title = document.getElementById('pt-title');
-  var form = document.getElementById('td-submit-form');
-  if(title && form && form.style.display !== 'none'){
+  if(title){
     setTimeout(function(){ try{ title.focus(); }catch(e){} }, 350);
   }
 }
