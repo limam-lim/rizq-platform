@@ -1444,7 +1444,7 @@ function _rizqMergeBackendAds(){
       body.innerHTML = window.rizqSkeletonHtml(6);
       showedSkel = true;
     }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=200')
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=2000')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !Array.isArray(data.ads) || !data.ads.length){
@@ -1937,37 +1937,63 @@ function renderResultList(){
       body.innerHTML=`<div class="rc-empty"><div class="rei">🔍</div><p>${fr?'Aucune annonce trouvée':'لا توجد إعلانات مطابقة'}</p></div>`;
     }
     if(pagEl) pagEl.innerHTML='';
+    _teardownInfiniteObserver();
     return;
   }
 
   body.innerHTML=items.map(a=>_adCardHtml(a,fr)).join('') + _infiniteStatusHtml(fr);
-  if(pagEl) pagEl.innerHTML=''; // infinite scroll بدل أرقام الصفحات
+  if(pagEl) pagEl.innerHTML='';
   _bindInfiniteScroll();
 }
 
 function loadMoreAds(){
-  if(_infiniteLoading) return;
-  if(visibleCount>=filtered.length) return;
+  if(_infiniteLoading) return false;
+  if(visibleCount>=filtered.length) return false;
   _infiniteLoading=true;
-  visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
-  // أبقِ موضع التمرير تقريباً بإعادة الرسم ثم إزاحة خفيفة
   const body=document.getElementById('result-list-body');
   const prevTop=body?body.scrollTop:0;
+  visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
   renderResultList();
   if(body) body.scrollTop=prevTop;
-  _infiniteLoading=false;
+  // امنع سلسلة تحميل فورية إذا بقي الـ sentinel ظاهراً في الشاشة
+  setTimeout(function(){ _infiniteLoading=false; }, 120);
+  return true;
+}
+
+function _teardownInfiniteObserver(){
+  if(window._rizqIO){
+    try{ window._rizqIO.disconnect(); }catch(e){}
+    window._rizqIO=null;
+  }
 }
 
 function _bindInfiniteScroll(){
   const body=document.getElementById('result-list-body');
-  if(!body || body._rizqInfiniteBound) return;
-  body._rizqInfiniteBound=true;
-  body.addEventListener('scroll', function(){
-    if(_infiniteLoading) return;
-    if(visibleCount>=filtered.length) return;
-    const nearBottom=body.scrollTop+body.clientHeight >= body.scrollHeight-280;
-    if(nearBottom) loadMoreAds();
-  }, {passive:true});
+  const sentinel=document.getElementById('rl-infinite');
+  if(!body) return;
+  if(!body._rizqInfiniteBound){
+    body._rizqInfiniteBound=true;
+    body._rizqUserScrolled=false;
+    body.addEventListener('scroll', function(){
+      if(body.scrollTop>40) body._rizqUserScrolled=true;
+      if(_infiniteLoading) return;
+      if(visibleCount>=filtered.length) return;
+      if(body.scrollTop+body.clientHeight >= body.scrollHeight-320) loadMoreAds();
+    }, {passive:true});
+  }
+  _teardownInfiniteObserver();
+  if(!sentinel || visibleCount>=filtered.length) return;
+  if(typeof IntersectionObserver==='undefined') return;
+  window._rizqIO=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting) return;
+      if(_infiniteLoading) return;
+      // لا تحمّل دفعة تلو الأخرى تلقائياً عند أول رسم — فقط بعد تمرير المستخدم
+      if(!body._rizqUserScrolled) return;
+      loadMoreAds();
+    });
+  }, {root: body, rootMargin:'120px 0px', threshold:0});
+  window._rizqIO.observe(sentinel);
 }
 
 function gotoPage(p){
