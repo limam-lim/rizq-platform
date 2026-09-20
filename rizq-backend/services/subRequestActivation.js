@@ -187,6 +187,18 @@ async function activateSubRequest(req, deps) {
       if (typeof readAdBoosts !== 'function' || typeof writeAdBoosts !== 'function') {
         return { ok: false, error: 'ad_boosts_io_missing' };
       }
+      // يجب أن يملك الدافع الإعلان — منع تعزيز إعلان منافس
+      if (typeof readAccounts === 'function') {
+        try {
+          const { readAds } = deps;
+          if (typeof readAds === 'function') {
+            const ad = readAds().find((a) => a.id === req.adId);
+            if (!ad || ad.accountId !== req.accountId) {
+              return { ok: false, error: 'ad_ownership_mismatch' };
+            }
+          }
+        } catch (eOwn) { /* continue if ads io unavailable */ }
+      }
       const boostDays = resolvePackageBoostDays(req.pkg) || 3;
       const now = new Date();
       const ends = new Date(now.getTime() + boostDays * 86400000);
@@ -202,7 +214,18 @@ async function activateSubRequest(req, deps) {
       return { ok: true, category, boost: all[req.adId], accountName };
     }
 
-    // package + video (default)
+    if (category === 'video') {
+      const v = activateVideoAdOnServer(req);
+      if (v && v.ok === false) return v;
+      return { ok: true, category, video: v, accountName };
+    }
+
+    // package فقط — لا نفعّل باقة كاملة من فئة أخرى
+    if (category !== 'package') {
+      return { ok: false, error: 'unknown_category', category };
+    }
+
+    // package (default)
     const existingPkg = getAccountRecord(req.accountId);
     const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
     const isTrial = isTrialPackage(req.pkg, req.price);
@@ -224,10 +247,6 @@ async function activateSubRequest(req, deps) {
       isTrial,
     });
     if (!result.ok) return result;
-
-    if (category === 'video') {
-      activateVideoAdOnServer(req);
-    }
 
     if (!isTrial && isDiamondPackageRef(req.pkg) && accountPhone && typeof registerSubscriber === 'function') {
       try {

@@ -285,7 +285,7 @@ async function submitOpportunity(body) {
     stage: sanitizeText(body && body.stage, 80) || (lang === 'fr' ? 'Idée' : 'فكرة'),
   };
   const score = scoreInvestmentOpportunity(draft);
-  const auto = shouldAutoApprove(score.provisionalTier);
+  const auto = !body.requireHumanReview && shouldAutoApprove(score.provisionalTier);
   const status = auto ? 'provisionally_approved' : 'pending_review';
   const id = 'inv_' + crypto.randomBytes(7).toString('hex');
 

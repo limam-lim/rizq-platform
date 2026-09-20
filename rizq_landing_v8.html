@@ -4177,7 +4177,12 @@ function populateAdModal(a) {
   if (locEl) locEl.textContent = d.loc || '';
   document.getElementById('amd-title').textContent = d.title;
   document.getElementById('amd-desc').textContent = d.desc;
-  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(t=>`<span class="amd-tag">${t}</span>`).join('');
+  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(function(t){
+    var s = document.createElement('span');
+    s.className = 'amd-tag';
+    s.textContent = String(t == null ? '' : t);
+    return s.outerHTML;
+  }).join('');
   document.getElementById('amd-price').textContent = d.price;
   document.getElementById('amd-status').textContent = d.status;
   document.getElementById('amd-seller-av').textContent = d.sellerEmoji||'👤';

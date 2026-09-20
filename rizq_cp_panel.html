@@ -7577,11 +7577,13 @@ function syncModCfgFromBackend(){
 // ما كان يسبب خطأ JS صامتاً في الكونسول عند فتح تبويب "قنوات التواصل".
 var CHANNELS_CFG_KEY = 'rizq_channels_config';
 var CHANNELS_FIELD_IDS = [
-  'ch-phone-number','ch-twilio-sid','ch-twilio-token','ch-webhook-url',
+  'ch-phone-number','ch-twilio-sid','ch-webhook-url',
   'ch-call-greeting','ch-ivr-1','ch-ivr-2','ch-ivr-3','ch-call-closing',
-  'ch-email-from','ch-email-pass','ch-email-subj-inquiry',
+  'ch-email-from','ch-email-subj-inquiry',
   'ch-email-body-inquiry','ch-email-body-support','ch-email-body-partner'
 ];
+/** أسرار تشغيلية — لا تُحفظ في localStorage أبداً (XSS) */
+var CHANNELS_SECRET_IDS = ['ch-twilio-token', 'ch-email-pass'];
 
 function switchChTab(tab){
   var tabs=['calls','email','whatsapp','setup'];
@@ -7596,9 +7598,21 @@ function switchChTab(tab){
 function renderChannelsPanel(){
   var cfg = {};
   try{ cfg = JSON.parse(localStorage.getItem(CHANNELS_CFG_KEY)||'{}') || {}; }catch(e){ cfg = {}; }
+  // تنظيف أي أسرار قديمة كانت مخزّنة قبل هذا الإصلاح
+  var dirty = false;
+  CHANNELS_SECRET_IDS.forEach(function(id){
+    if (Object.prototype.hasOwnProperty.call(cfg, id)) { delete cfg[id]; dirty = true; }
+  });
+  if (dirty) {
+    try { localStorage.setItem(CHANNELS_CFG_KEY, JSON.stringify(cfg)); } catch (eC) {}
+  }
   CHANNELS_FIELD_IDS.forEach(function(id){
     var el = document.getElementById(id);
     if(el && cfg[id]!=null) el.value = cfg[id];
+  });
+  CHANNELS_SECRET_IDS.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value = '';
   });
 }
 
@@ -7608,6 +7622,7 @@ function saveChannelsConfig(){
     var el = document.getElementById(id);
     if(el) cfg[id] = el.value;
   });
+  // لا نخزّن كلمات السر في المتصفح — XSS لن يجد Twilio/SMTP هنا
   localStorage.setItem(CHANNELS_CFG_KEY, JSON.stringify(cfg));
   _adminPostSiteConfig({
     channelsPublic: {
@@ -7627,7 +7642,7 @@ function saveChannelsConfig(){
   }, function(){
     if(typeof showToast==='function') showToast(RizqI18n.t2('✅ تم حفظ إعدادات قنوات التواصل','✅ Paramètres des canaux enregistrés'),'success');
   }, function(){
-    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ حُفظ محلياً (أسرار Twilio تبقى على هذا الجهاز)','✅ Enregistré localement (les secrets Twilio restent sur cet appareil)'),'success');
+    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ حُفظ محلياً (بدون أسرار Twilio/SMTP في المتصفح)','✅ Enregistré localement (sans secrets Twilio/SMTP dans le navigateur)'),'success');
   });
 }
 

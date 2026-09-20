@@ -606,7 +606,12 @@ function _dashboardBackUrl(){
     if(p.get('demo') === '1' || p.get('user') === 'demo') return 'rizq_dashboard.html?demo=1';
   }catch(e2){}
   try{
-    if(document.referrer && /rizq_dashboard/.test(document.referrer)) return document.referrer;
+    if(document.referrer && /rizq_dashboard/.test(document.referrer)){
+      var ref = new URL(document.referrer, location.href);
+      if(ref.origin === location.origin && /^\/?rizq_dashboard(_\w+)?\.html$/i.test(ref.pathname.split('/').pop() || '')){
+        return ref.pathname.split('/').pop() + (ref.search || '');
+      }
+    }
   }catch(e3){}
   return '';
 }

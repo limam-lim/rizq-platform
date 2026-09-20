@@ -272,7 +272,12 @@
   function verifySessionSilently() {
     var s = getSession();
     if (!s || !s.id || !s.token || !apiBase()) return;
-    fetch(apiBase() + '/api/auth/me?id=' + encodeURIComponent(s.id) + '&token=' + encodeURIComponent(s.token))
+    fetch(apiBase() + '/api/auth/me', {
+      headers: {
+        'Authorization': 'Bearer ' + s.token,
+        'X-Buyer-Id': s.id
+      }
+    })
       .then(function (res) {
         if (res.status === 401) { clearSession(); return; }
         if (res.ok) return pullWishlistFromServer(s);

@@ -533,7 +533,9 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
 
   app.get('/api/quota/mine/:accountId', (req, res) => {
     const accountId = req.params.accountId;
-    const token = req.header('x-account-token') || req.query.token || '';
+    // في الإنتاج: رأس فقط — منع تسريب الرمز عبر Referer/سجلات
+    const token = req.header('x-account-token')
+      || ((process.env.NODE_ENV !== 'production' && process.env.RIZQ_ENV !== 'production') ? (req.query.token || '') : '');
     const acc = ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const snap = getSnapshot(acc.phone || accountId, accountId);
@@ -560,7 +562,8 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
 
   app.post('/api/quota/mine/:accountId/addon', (req, res) => {
     const accountId = req.params.accountId;
-    const token = req.header('x-account-token') || req.query.token || '';
+    const token = req.header('x-account-token')
+      || ((process.env.NODE_ENV !== 'production' && process.env.RIZQ_ENV !== 'production') ? (req.query.token || '') : '');
     const acc = ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const type = (req.body && req.body.type) || 'text';

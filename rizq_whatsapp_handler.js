@@ -28,6 +28,7 @@
 require('dotenv').config();
 
 const express    = require('express');
+const { requireSatelliteSecret } = require('./rizq-backend/lib/satelliteAuth');
 const bodyParser = require('body-parser');
 const axios      = require('axios');
 const { askAgent } = require('./rizq_agent_brain');
@@ -237,12 +238,12 @@ app.post('/api/whatsapp', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  API: سجل محادثات واتساب للأدمن
 // ══════════════════════════════════════════════════════════
-app.get('/api/whatsapp-log', (req, res) => {
+app.get('/api/whatsapp-log', requireSatelliteSecret, (req, res) => {
   res.json({ messages: waLog.slice(0, 50) });
 });
 
 // ── API: إرسال رسالة يدوية من الأدمن ─────────────────────
-app.post('/api/whatsapp/send', async (req, res) => {
+app.post('/api/whatsapp/send', requireSatelliteSecret, async (req, res) => {
   const { to, text } = req.body;
   if(!to || !text) return res.status(400).json({ ok: false, error: 'to + text مطلوبان' });
   const result = await sendWhatsAppMessage(to, text);
@@ -250,7 +251,7 @@ app.post('/api/whatsapp/send', async (req, res) => {
 });
 
 // ── API: الحالة ──────────────────────────────────────────
-app.get('/api/status', (req, res) => {
+app.get('/api/status', requireSatelliteSecret, (req, res) => {
   res.json({
     status         : 'running',
     port           : PORT,
@@ -264,7 +265,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // ── صفحة الحالة HTML ─────────────────────────────────────
-app.get('/', (req, res) => {
+app.get('/', requireSatelliteSecret, (req, res) => {
   res.send(`
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">
     <h1>📱 مدير رزق الذكي v1 — خادم واتساب</h1>

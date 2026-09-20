@@ -17,6 +17,7 @@ function genAdId() {
 function mountAdsRoutes(app, deps) {
   const {
     requireAdminAuth,
+    requireAdminPermission,
     moderatorAdMiddleware,
     getPlatformFlags,
     extractAccountToken,
@@ -30,6 +31,7 @@ function mountAdsRoutes(app, deps) {
     resolveContactGate,
     toPublicAdGated,
     isAdminRequest,
+    adminHasPermission,
     readAccounts,
     readAdsRequests,
     writeAdsRequests,
@@ -37,6 +39,13 @@ function mountAdsRoutes(app, deps) {
     writeAds,
     readAdBoosts,
   } = deps;
+
+  const requireAdsAdmin = typeof requireAdminPermission === 'function'
+    ? requireAdminPermission('ads')
+    : requireAdminAuth;
+  const isAdsAdmin = (req) => (typeof adminHasPermission === 'function'
+    ? adminHasPermission(req, 'ads', 'moderation')
+    : isAdminRequest(req));
 
   /**
    * withBoostFlag(ad) — يضيف علم boosted:true/false للإعلان حسب ad_boosts.json
@@ -106,7 +115,7 @@ function mountAdsRoutes(app, deps) {
    * أدمين فقط (سرّ مشترك) — لائحة طلبات نشر فيديو الإعلانات الواردة فعلياً،
    * حتى يكون وعد "سيتواصل معك رزق" قابلاً للتنفيذ حقاً.
    */
-  app.get('/api/ads/requests', requireAdminAuth, (req, res) => {
+  app.get('/api/ads/requests', requireAdsAdmin, (req, res) => {
     const list = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
     res.json({ ok: true, requests: list.slice().reverse() });
   });
@@ -262,7 +271,7 @@ function mountAdsRoutes(app, deps) {
   });
 
   /** GET /api/ads/admin — لوحة إشراف الأدمن (كل الحالات، كل الإعلانات) */
-  app.get('/api/ads/admin', requireAdminAuth, (req, res) => {
+  app.get('/api/ads/admin', requireAdsAdmin, (req, res) => {
     res.json({ ok: true, ads: readAds() });
   });
 
@@ -270,7 +279,7 @@ function mountAdsRoutes(app, deps) {
   app.get('/api/ads/:id', (req, res) => {
     const ad = readAds().find((a) => a.id === req.params.id);
     if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isAdsAdmin(req);
     const token = extractAccountToken(req) || '';
     const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
     if (ad.status !== 'active' && !isAdmin && !isOwner) {
@@ -293,7 +302,7 @@ function mountAdsRoutes(app, deps) {
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
     const ad = list[idx];
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isAdsAdmin(req);
     const token = req.header('x-account-token') || '';
     const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
@@ -339,7 +348,7 @@ function mountAdsRoutes(app, deps) {
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
     const ad = list[idx];
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isAdsAdmin(req);
     const token = req.header('x-account-token') || '';
     const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
@@ -353,7 +362,7 @@ function mountAdsRoutes(app, deps) {
    * POST /api/ads/admin/:id/decision — قرار إشراف الأدمن (موافقة/رفض) —
    * يحلّ محل syncRealAdReviewStatus المحلي بالكامل في rizq_admin.html.
    */
-  app.post('/api/ads/admin/:id/decision', requireAdminAuth, (req, res) => {
+  app.post('/api/ads/admin/:id/decision', requireAdsAdmin, (req, res) => {
     const action = (req.body || {}).action;
     if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
     const list = readAds();

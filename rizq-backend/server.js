@@ -272,19 +272,31 @@ function isBrowserLikeRequest(req) {
   return secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'cross-site';
 }
 
-function isAdminRequest(req) {
+/** يحلّ هوية الأدمن من الجلسة أو السرّ الخادمي */
+function resolveAdminUser(req) {
   const adminTok = req.header('x-admin-token');
   if (adminTok) {
     const sess = adminSessions.get(adminTok);
-    if (sess && sess.expiresAt >= Date.now()) return true;
+    if (sess && sess.expiresAt >= Date.now()) return sess;
   }
   const got = req.header('x-rizq-secret');
   const secret = process.env.BACKEND_SHARED_SECRET || '';
   if (secret && got && timingSafeEqualStr(got, secret)) {
-    if (isProdEnv() && isBrowserLikeRequest(req)) return false;
-    return true;
+    if (isProdEnv() && isBrowserLikeRequest(req)) return null;
+    return { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
   }
-  return false;
+  return null;
+}
+
+function isAdminRequest(req) {
+  return !!resolveAdminUser(req);
+}
+
+/** فحص صلاحية RBAC لمسارات تستخدم isAdminRequest بدل middleware */
+function adminHasPermission(req, ...keys) {
+  const u = resolveAdminUser(req);
+  if (!u) return false;
+  return hasAdminPermission(u.permissions || [], keys.length ? keys : ['*']);
 }
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
@@ -492,7 +504,7 @@ app.get('/api/agent/status', requireAdminPermission('subscriber-agents'), (req, 
  * من قاعدة بيانات بنكية حقيقية ولا "يثبت" أن الدفع تم أو لم يُزوَّر.
  * القرار النهائي يبقى دوماً بشرياً (الأدمين).
  */
-app.post('/api/verify-receipt', requireAdminAuth, async (req, res) => {
+app.post('/api/verify-receipt', requireAdminPermission('payments'), async (req, res) => {
   try {
     const { imageBase64, expectedPrice, pkgName } = req.body || {};
     const { analyzeReceiptImage } = require('./services/receiptVision');
@@ -530,7 +542,7 @@ app.post('/api/verify-receipt', requireAdminAuth, async (req, res) => {
  * باقات، مزايا، أزرار) لكنها ليست بديلاً عن مراجعة بشرية لنصوص قانونية
  * حساسة (rizq_legal.html تبقى مكتوبة يدوياً بكل لغة).
  */
-app.post('/api/translate', requireAdminAuth, async (req, res) => {
+app.post('/api/translate', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const { items, direction } = req.body || {};
     if (!Array.isArray(items) || !items.length) {
@@ -698,7 +710,7 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
 });
 
 /** GET /api/telegram/status — diagnostic (requires X-Copyright admin secret) */
-app.get('/api/telegram/status', requireAdminAuth, async (req, res) => {
+app.get('/api/telegram/status', requireAdminPermission('channels'), async (req, res) => {
   try {
     const {
       getTelegramDiagnostics,
@@ -726,7 +738,7 @@ app.get('/api/telegram/status', requireAdminAuth, async (req, res) => {
 });
 
 /** POST /api/telegram/test-lead-alert — diagnostic (requires X-Copyright admin secret) */
-app.post('/api/telegram/test-lead-alert', requireAdminAuth, async (req, res) => {
+app.post('/api/telegram/test-lead-alert', requireAdminPermission('channels'), async (req, res) => {
   try {
     const { getTelegramDiagnostics, sendLeadEscalationAlert } = require('./services/telegramAdmin');
     const diag = getTelegramDiagnostics();
@@ -1371,7 +1383,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
  * POST /api/currency-rates/refresh
  * أدمين — جلب أسعار العملات من الإنترنت (Frankfurter + fallback) مع تصحيح السوق %
  */
-app.post('/api/currency-rates/refresh', requireAdminAuth, async (req, res) => {
+app.post('/api/currency-rates/refresh', requireAdminPermission('prices'), async (req, res) => {
   try {
     const current = repos.getSiteConfig();
     const existing = (current.prices && current.prices.currencies) || [];
@@ -1637,6 +1649,16 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
+  if (sellerEmail) {
+    const emailTaken = list.some((a) => String(a.email || '').trim().toLowerCase() === sellerEmail);
+    if (emailTaken) {
+      return res.status(409).json({
+        ok: false,
+        code: 'email_in_use',
+        error: 'البريد الإلكتروني مستخدم مسبقاً — سجّل الدخول أو استخدم بريداً آخر',
+      });
+    }
+  }
   if (sellerPassword && sellerPassword.length < 8) {
     return res.status(400).json({
       ok: false,
@@ -2028,7 +2050,7 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
  * GET /api/sub-requests/admin — أدمين فقط (سرّ مشترك) — قائمة كل الطلبات
  * ليراها أي جهاز أدمن، وليس فقط جهاز المشترك الذي أرسل الطلب.
  */
-app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
+app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res) => {
   res.json({ ok: true, requests: readSubRequests().reverse() });
 });
 
@@ -2038,7 +2060,7 @@ app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
  * يبقى محلياً في rizq_admin.html كما هو؛ هذا فقط يجعل الحالة النهائية
  * مرئية عبر كل الأجهزة بدل الاقتصار على جهاز الأدمن الذي وافق فعلياً.
  */
-app.post('/api/sub-requests/admin/:id/decision', requireAdminAuth, (req, res) => {
+app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
   const list = readSubRequests();
@@ -2066,7 +2088,7 @@ const {
 // معالج /api/account-package/sync (داخل الملف الآخر) أن يقرأ/يكتب حقل
 // referredBy على accounts.json عند منح مكافأة إحالة — راجع rizq_package_
 // lifecycle_agent.js لتفاصيل آلية "جيب صاحبك واربح".
-setupPackageLifecycleAPI(app, requireAdminAuth, { readAccounts, writeAccounts });
+setupPackageLifecycleAPI(app, requireAdminPermission('payments'), { readAccounts, writeAccounts });
 
 /** GET /api/entitlements/:accountId — صلاحيات الحساب (محمي بـ x-account-token) */
 app.get('/api/entitlements/:accountId', (req, res) => {
@@ -2218,7 +2240,7 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
  * أدمين فقط — عدد التسجيلات لكل قسم مغلق + آخر المسجّلين، ليقرر الأدمن
  * أي قسم يفتحه تالياً بناءً على بيانات حقيقية لا تخميناً.
  */
-app.get('/api/section-interest/admin', requireAdminAuth, (req, res) => {
+app.get('/api/section-interest/admin', requireAdminPermission('analytics'), (req, res) => {
   const list = readInterest();
   const bySection = {};
   INTEREST_SECTIONS.forEach((s) => { bySection[s] = { count: 0, items: [] }; });
@@ -2239,7 +2261,7 @@ app.get('/api/section-interest/admin', requireAdminAuth, (req, res) => {
  * body: { message, filterStatus? } — filterStatus اختياري لتصفية المشتركين
  * حسب حالة باقتهم (active/trial/expiring_soon/expired/suspended/all).
  */
-app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
+app.post('/api/broadcast-sms', requireAdminPermission('announcements'), async (req, res) => {
   try {
     const { message, filterStatus } = req.body || {};
     if (!message || !String(message).trim()) return res.status(400).json({ error: 'message مطلوب' });
@@ -2394,7 +2416,7 @@ app.post('/api/subscriber/knowledge/upload', (req, res) => {
   });
 });
 
-setupQuotaGuardAPI(app, requireAdminAuth, {
+setupQuotaGuardAPI(app, requireAdminPermission('quota-guard'), {
   verifyAccountOwner,
   getAccountRecord,
   loadProfiles: () => {
@@ -2449,8 +2471,11 @@ const investmentRoom = require('./services/investmentRoom');
 const { mountInvestmentsRoutes } = require('./routes/investments');
 mountInvestmentsRoutes(app, {
   requireAdminAuth,
+  requireAdminPermission,
   investmentRoom,
   anthropic,
+  verifyAccountOwner,
+  extractAccountToken,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -2482,6 +2507,7 @@ if (!fs.existsSync(ADS_UPLOADS_DIR)) fs.mkdirSync(ADS_UPLOADS_DIR, { recursive: 
 const { mountAdsRoutes } = require('./routes/ads');
 mountAdsRoutes(app, {
   requireAdminAuth,
+  requireAdminPermission,
   moderatorAdMiddleware,
   getPlatformFlags,
   extractAccountToken,
@@ -2495,6 +2521,7 @@ mountAdsRoutes(app, {
   resolveContactGate,
   toPublicAdGated,
   isAdminRequest,
+  adminHasPermission,
   readAccounts,
   readAdsRequests: () => repos.adsRequests.list(),
   writeAdsRequests: (list) => {
@@ -2560,7 +2587,7 @@ app.post('/api/reports', reportsLimiter, (req, res) => {
 });
 
 /** GET /api/reports/admin — أدمين فقط — كل البلاغات (المعلّقة أولاً، الأحدث أولاً) */
-app.get('/api/reports/admin', requireAdminAuth, (req, res) => {
+app.get('/api/reports/admin', requireAdminPermission('reports'), (req, res) => {
   const list = readReports().sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -2569,7 +2596,7 @@ app.get('/api/reports/admin', requireAdminAuth, (req, res) => {
 });
 
 /** POST /api/reports/admin/:id/resolve — أدمين فقط — يُعلِّم البلاغ كمحلول */
-app.post('/api/reports/admin/:id/resolve', requireAdminAuth, (req, res) => {
+app.post('/api/reports/admin/:id/resolve', requireAdminPermission('reports'), (req, res) => {
   const list = readReports();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'report_not_found' });
@@ -2580,7 +2607,7 @@ app.post('/api/reports/admin/:id/resolve', requireAdminAuth, (req, res) => {
 });
 
 /** GET /api/support-tickets/admin — admin list support tickets */
-app.get('/api/support-tickets/admin', requireAdminAuth, (req, res) => {
+app.get('/api/support-tickets/admin', requireAdminPermission('users'), (req, res) => {
   const list = readTickets().sort((a, b) => {
     if (a.status !== b.status) {
       const order = { open: 0, in_progress: 1, resolved: 2, closed: 3 };
@@ -2592,7 +2619,7 @@ app.get('/api/support-tickets/admin', requireAdminAuth, (req, res) => {
 });
 
 /** PATCH /api/support-tickets/admin/:id — update ticket status */
-app.patch('/api/support-tickets/admin/:id', requireAdminAuth, (req, res) => {
+app.patch('/api/support-tickets/admin/:id', requireAdminPermission('users'), (req, res) => {
   const { status, adminNote } = req.body || {};
   if (!status) return res.status(400).json({ error: 'status required' });
   const updated = updateTicketStatus(req.params.id, status, adminNote);
@@ -2654,7 +2681,7 @@ app.post('/api/deactivation-requests', deactivationRequestsLimiter, (req, res) =
 });
 
 /** GET /api/deactivation-requests/admin — أدمين فقط — المعلّقة أولاً، الأحدث أولاً */
-app.get('/api/deactivation-requests/admin', requireAdminAuth, (req, res) => {
+app.get('/api/deactivation-requests/admin', requireAdminPermission('accounts'), (req, res) => {
   const list = readDeactivationRequests().sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -2668,7 +2695,7 @@ app.get('/api/deactivation-requests/admin', requireAdminAuth, (req, res) => {
  * (suspended=true، نفس أثر action='suspend' بمسار القرار الإداري
  * للحسابات) بالإضافة لتعليم الطلب كمحلول. reject: يُعلِّم الطلب كمحلول فقط.
  */
-app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminAuth, (req, res) => {
+app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission('accounts'), (req, res) => {
   const action = (req.body || {}).action;
   if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
   const list = readDeactivationRequests();
@@ -2732,6 +2759,7 @@ mountCatalogRoutes(app, {
   saveCatalogImage,
   extractAccountToken,
   isAdminRequest,
+  adminHasPermission,
 });
 
 /**
@@ -2743,9 +2771,29 @@ app.post('/api/business-hours', (req, res) => {
   const token = req.header('x-account-token') || '';
   const acc = verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.hours || typeof b.hours !== 'object') return res.status(400).json({ error: 'hours مطلوب' });
+  if (!b.hours || typeof b.hours !== 'object' || Array.isArray(b.hours)) {
+    return res.status(400).json({ error: 'hours مطلوب' });
+  }
+  const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri',
+    'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+  const clean = {};
+  const keys = Object.keys(b.hours).slice(0, 14);
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(Object.prototype, k)) continue;
+    if (!DAYS.includes(k) && !/^[a-zA-Z\u0600-\u06FF]{2,20}$/.test(k)) continue;
+    const v = b.hours[k];
+    if (v == null) continue;
+    if (typeof v === 'string') clean[k] = String(v).slice(0, 40);
+    else if (typeof v === 'object' && !Array.isArray(v)) {
+      clean[k] = {
+        open: String(v.open || '').slice(0, 16),
+        close: String(v.close || '').slice(0, 16),
+        closed: !!v.closed,
+      };
+    }
+  }
   const all = readAllHours();
-  all[b.accountId] = { hours: b.hours, updatedAt: new Date().toISOString() };
+  all[b.accountId] = { hours: clean, updatedAt: new Date().toISOString() };
   writeAllHours(all);
   res.json({ ok: true });
 });
@@ -2880,8 +2928,7 @@ app.get('/api/reviews/:targetId/stats', (req, res) => {
  * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم للأدمن فقط
  * (البائع لا يمسح تقييمات الزبائن — كان يسمح بمسح السلبي).
  */
-app.delete('/api/reviews/:targetId/:reviewId', (req, res) => {
-  if (!isAdminRequest(req)) return res.status(401).json({ error: 'unauthorized' });
+app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderation'), (req, res) => {
   const all = readReviews();
   const list = all[req.params.targetId] || [];
   const next = list.filter((r) => r.id !== req.params.reviewId);
@@ -2980,9 +3027,13 @@ function writeAdBoosts(obj) {
 }
 
 /** POST /api/ad-boosts — الأدمن فقط، بعد موافقته الفعلية على طلب "مميزة" */
-app.post('/api/ad-boosts', requireAdminAuth, (req, res) => {
+app.post('/api/ad-boosts', requireAdminPermission('payments'), (req, res) => {
   const b = req.body || {};
   if (!b.accountId || !b.adId) return res.status(400).json({ error: 'accountId و adId مطلوبان' });
+  const ad = readAds().find((a) => a.id === b.adId);
+  if (!ad || ad.accountId !== b.accountId) {
+    return res.status(400).json({ error: 'ad_ownership_mismatch' });
+  }
   const days = Number(b.days) > 0 ? Number(b.days) : 3;
   const now = new Date();
   const ends = new Date(now.getTime() + days * 86400000);
@@ -2998,12 +3049,12 @@ app.post('/api/ad-boosts', requireAdminAuth, (req, res) => {
   res.json({ ok: true, boost: all[b.adId] });
 });
 
-/** GET /api/ad-boosts/:adId — عام، هل هذا الإعلان مثبَّت الآن؟ */
+/** GET /api/ad-boosts/:adId — عام، هل هذا الإعلان مثبَّت الآن؟ (بدون بيانات دفع) */
 app.get('/api/ad-boosts/:adId', (req, res) => {
   const all = readAdBoosts();
   const b = all[req.params.adId];
   const active = !!(b && b.endsAt && new Date(b.endsAt) > new Date());
-  res.json({ ok: true, active, boost: active ? b : null });
+  res.json({ ok: true, active, boosted: active, endsAt: active ? b.endsAt : null });
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -3090,6 +3141,7 @@ setTelegramDeps({
   getAccountRecord,
   readAdBoosts,
   writeAdBoosts,
+  readAds,
   registerSubscriber,
 });
 
@@ -3107,7 +3159,7 @@ app.post('/api/telegram/webhook/:secret', handleTelegramWebhook);
  * POST /api/telegram/setup-webhook — أدمين فقط — يسجّل webhook لدى Telegram
  * body: { publicBaseUrl?: "https://your-domain.com" }
  */
-app.post('/api/telegram/setup-webhook', requireAdminAuth, async (req, res) => {
+app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), async (req, res) => {
   if (!isTelegramBotConfigured()) {
     return res.status(503).json({ error: 'telegram_bot_not_configured', hint: 'TELEGRAM_BOT_TOKEN in .env' });
   }

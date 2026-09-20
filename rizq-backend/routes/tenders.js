@@ -595,7 +595,7 @@ function mountTendersRoutes(app, deps) {
    * إطلاقاً مع سجل الباقة العامة لنفس الحساب (راجع تعليق hasTenderAccess أعلاه
    * لتفصيل سبب هذا العزل). يدعم التجريبية (10 أيام) والباقات المدفوعة.
    */
-  app.post('/api/tenders/package/activate', requireAdminAuth, async (req, res) => {
+  app.post('/api/tenders/package/activate', requireAdminPermission('payments'), async (req, res) => {
     const b = req.body || {};
     if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
     const { findCatalogPackage, isTrialPackage } = require('../services/catalogConfig');

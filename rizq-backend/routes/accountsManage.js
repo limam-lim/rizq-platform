@@ -111,8 +111,19 @@ function mountAccountsManageRoutes(app, deps) {
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
+    if (b.email !== undefined) {
+      const nextEmail = String(b.email || '').trim().toLowerCase();
+      const cur = String(acc.email || '').trim().toLowerCase();
+      if (nextEmail && nextEmail !== cur) {
+        return res.status(403).json({
+          ok: false,
+          code: 'email_change_requires_otp',
+          error: 'لتغيير البريد استخدم مسار التحقق بـ OTP',
+        });
+      }
+    }
     if (b.nni !== undefined) {
       const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
       if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
@@ -138,12 +149,6 @@ function mountAccountsManageRoutes(app, deps) {
           val = stripBidiControls(val).normalize('NFC');
         } catch (eSan) { /* ignore */ }
       }
-      if (k === 'email') {
-        try {
-          const { normalizeEmailSafe } = require('../lib/sanitizeText');
-          val = normalizeEmailSafe(val);
-        } catch (eSan) { /* ignore */ }
-      }
       acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
@@ -152,9 +157,28 @@ function mountAccountsManageRoutes(app, deps) {
     // الأدمن بتاتاً (قرار خصوصية سابق) — هذا الحقل يُخزَّن فقط ليُستخدم
     // لاحقاً (مثلاً في نظام الرسائل) بدل أن يُفقَد كما كان الحال سابقاً.
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone;
-    if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
-    if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
-    if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
+    // قنوات الوكيل الماسي — لا تُفعَّل إلا مع استحقاق الباقة
+    if (b.widget_enabled !== undefined || b.whatsapp_enabled !== undefined || b.calls_enabled !== undefined) {
+      let diamondOk = false;
+      try {
+        const { assertAiAgentAccess } = require('../services/packageAccessGuard');
+        assertAiAgentAccess(acc, { channel: 'dashboard' });
+        diamondOk = true;
+      } catch (eAi) {
+        diamondOk = false;
+      }
+      if (!diamondOk) {
+        return res.status(403).json({
+          ok: false,
+          error: 'diamond_required',
+          code: 'diamond_required',
+          msg: 'تفعيل قنوات الوكيل يتطلب باقة ماسية نشطة',
+        });
+      }
+      if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
+      if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
+      if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
+    }
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;

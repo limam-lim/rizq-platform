@@ -1383,7 +1383,12 @@
     function _handleQuickAction(action) {
       if (!action) return;
       if (action.indexOf('nav:') === 0) {
-        window.location.href = action.slice(4);
+        var target = String(action.slice(4) || '').trim();
+        if (!/^rizq_[a-z0-9_]+\.html([?#].*)?$/i.test(target) && !/^[a-z0-9_\-]+\.html([?#].*)?$/i.test(target)) {
+          return;
+        }
+        if (/^(https?:|\/\/|javascript:|data:)/i.test(target)) return;
+        window.location.href = target;
         return;
       }
       if (action.indexOf('help:') === 0) {

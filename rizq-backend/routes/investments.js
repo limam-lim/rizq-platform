@@ -13,9 +13,16 @@ const rateLimit = require('express-rate-limit');
 function mountInvestmentsRoutes(app, deps) {
   const {
     requireAdminAuth,
+    requireAdminPermission,
     investmentRoom,
     anthropic,
+    verifyAccountOwner,
+    extractAccountToken,
   } = deps;
+
+  const requireInvAdmin = typeof requireAdminPermission === 'function'
+    ? requireAdminPermission('moderation')
+    : requireAdminAuth;
 
   const investmentPlanLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -32,15 +39,22 @@ function mountInvestmentsRoutes(app, deps) {
     message: { ok: false, error: 'too_many_requests' },
   });
 
-  /** POST /api/investments/plan — وكيل المراجعة الأوّلية (JSON plan) */
-  app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
-    try {
-      const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
-      res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
-    } catch (err) {
-      const status = err.status && err.status >= 400 ? err.status : 500;
-      res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
+  /** POST /api/investments/plan — يتطلب حساباً موثّقاً (منع استنزاف Claude عاماً) */
+  app.post('/api/investments/plan', investmentPlanLimiter, (req, res) => {
+    const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || req.header('x-account-token') || '';
+    const accountId = String((req.body && req.body.accountId) || '').slice(0, 60);
+    if (!accountId || !verifyAccountOwner || !verifyAccountOwner(accountId, token)) {
+      return res.status(401).json({ ok: false, error: 'unauthorized', code: 'auth_required' });
     }
+    return (async () => {
+      try {
+        const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
+        res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
+      } catch (err) {
+        const status = err.status && err.status >= 400 ? err.status : 500;
+        res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
+      }
+    })();
   });
 
   /** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
@@ -52,10 +66,21 @@ function mountInvestmentsRoutes(app, deps) {
     }
   });
 
-  /** POST /api/investments/submit — إيداع فرصة + موافقة مبدئية عند الأخضر */
+  /** POST /api/investments/submit — إيداع فرصة (حساب موثّق فقط؛ لا نشر عام تلقائي بلا مراجعة) */
   app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
     try {
-      const out = await investmentRoom.submitOpportunity(req.body || {});
+      const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || req.header('x-account-token') || '';
+      const accountId = String((req.body && req.body.accountId) || '').slice(0, 60);
+      if (!accountId || !verifyAccountOwner || !verifyAccountOwner(accountId, token)) {
+        return res.status(401).json({ ok: false, error: 'unauthorized', code: 'auth_required' });
+      }
+      const body = Object.assign({}, req.body || {}, { accountId, requireHumanReview: true });
+      const out = await investmentRoom.submitOpportunity(body);
+      // لا نعرض للعموم قبل موافقة أدمن — أخضر يبقى معلّقاً إن فرضنا المراجعة
+      if (out && out.opportunity && out.opportunity.status === 'provisionally_approved') {
+        out.opportunity.status = 'pending_review';
+        out.heldForReview = true;
+      }
       res.json(out);
     } catch (err) {
       const status = err.status && err.status >= 400 ? err.status : 500;
@@ -64,7 +89,7 @@ function mountInvestmentsRoutes(app, deps) {
   });
 
   /** GET /api/admin/investments — قائمة كاملة للأدمن (بما فيها المعلّقة) */
-  app.get('/api/admin/investments', requireAdminAuth, (req, res) => {
+  app.get('/api/admin/investments', requireInvAdmin, (req, res) => {
     try {
       res.json(investmentRoom.listAdmin({
         status: req.query.status || null,
@@ -76,7 +101,7 @@ function mountInvestmentsRoutes(app, deps) {
   });
 
   /** POST /api/admin/investments/:id/decision — نقض/تأكيد الموافقة المبدئية */
-  app.post('/api/admin/investments/:id/decision', requireAdminAuth, (req, res) => {
+  app.post('/api/admin/investments/:id/decision', requireInvAdmin, (req, res) => {
     try {
       const action = (req.body && req.body.action) || '';
       const reviewer = (req.adminUser && (req.adminUser.name || req.adminUser.user)) || 'admin';
@@ -89,7 +114,7 @@ function mountInvestmentsRoutes(app, deps) {
   });
 
   /** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
-  app.get('/api/admin/investments/daily-report', requireAdminAuth, (req, res) => {
+  app.get('/api/admin/investments/daily-report', requireInvAdmin, (req, res) => {
     try {
       const digest = investmentRoom.buildDailyDigest();
       res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
@@ -99,7 +124,7 @@ function mountInvestmentsRoutes(app, deps) {
   });
 
   /** POST /api/admin/investments/send-ops-report — إرسال التقرير للبريد التشغيلي الخاص */
-  app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req, res) => {
+  app.post('/api/admin/investments/send-ops-report', requireInvAdmin, async (req, res) => {
     try {
       const result = await investmentRoom.sendOpsDailyReport();
       res.json({

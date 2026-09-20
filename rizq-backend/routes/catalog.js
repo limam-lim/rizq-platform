@@ -24,7 +24,12 @@ function mountCatalogRoutes(app, deps) {
     saveCatalogImage,
     extractAccountToken,
     isAdminRequest,
+    adminHasPermission,
   } = deps;
+
+  const isCatalogAdmin = (req) => (typeof adminHasPermission === 'function'
+    ? adminHasPermission(req, 'moderation', 'ads')
+    : isAdminRequest(req));
 
   /**
    * POST /api/catalog — إضافة منتج/خدمة (صاحب الحساب فقط عبر x-account-token)
@@ -111,7 +116,7 @@ function mountCatalogRoutes(app, deps) {
   app.get('/api/catalog/:id', (req, res) => {
     const item = readCatalog().find((it) => it.id === req.params.id);
     if (!item) return res.status(404).json({ error: 'item_not_found' });
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isCatalogAdmin(req);
     const token = extractAccountToken(req) || '';
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (item.status !== 'active' && !isAdmin && !isOwner) {
@@ -127,7 +132,7 @@ function mountCatalogRoutes(app, deps) {
     const idx = list.findIndex((it) => it.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
     const item = list[idx];
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isCatalogAdmin(req);
     const token = req.header('x-account-token') || '';
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
@@ -166,7 +171,7 @@ function mountCatalogRoutes(app, deps) {
     const idx = list.findIndex((it) => it.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
     const item = list[idx];
-    const isAdmin = isAdminRequest(req);
+    const isAdmin = isCatalogAdmin(req);
     const token = req.header('x-account-token') || '';
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });

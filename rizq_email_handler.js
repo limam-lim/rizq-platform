@@ -32,6 +32,7 @@
 require('dotenv').config();
 
 const express    = require('express');
+const { requireSatelliteSecret } = require('./rizq-backend/lib/satelliteAuth');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const { askAgent } = require('./rizq_agent_brain');
@@ -178,12 +179,12 @@ app.post('/api/email/inbound', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  API: جلب سجل الإيميلات للأدمن
 // ══════════════════════════════════════════════════════════
-app.get('/api/email-log', (req, res) => {
+app.get('/api/email-log', requireSatelliteSecret, (req, res) => {
   res.json({ emails: emailLog.slice(0, 50) });
 });
 
 // ── API: إرسال رد يدوي من الأدمن (بدون كلود) ────────────
-app.post('/api/email/manual-reply', async (req, res) => {
+app.post('/api/email/manual-reply', requireSatelliteSecret, async (req, res) => {
   const { to, subject, body } = req.body;
   if(!to || !body) return res.status(400).json({ ok: false, error: 'to + body مطلوبان' });
   try {
@@ -200,7 +201,7 @@ app.post('/api/email/manual-reply', async (req, res) => {
 });
 
 // ── API: رد يدوي بكلود (يولّد الرد ويرسله) ──────────────
-app.post('/api/email/ai-reply', async (req, res) => {
+app.post('/api/email/ai-reply', requireSatelliteSecret, async (req, res) => {
   const { to, name, subject, body } = req.body;
   if(!to || !subject) return res.status(400).json({ ok: false, error: 'to + subject مطلوبان' });
   const result = await processAndReply(to, name || to.split('@')[0], subject, body || '');
@@ -208,7 +209,7 @@ app.post('/api/email/ai-reply', async (req, res) => {
 });
 
 // ── API: الحالة ──────────────────────────────────────────
-app.get('/api/status', (req, res) => {
+app.get('/api/status', requireSatelliteSecret, (req, res) => {
   res.json({
     status      : 'running',
     port        : PORT,
@@ -219,7 +220,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // ── صفحة الحالة ─────────────────────────────────────────
-app.get('/', (req, res) => {
+app.get('/', requireSatelliteSecret, (req, res) => {
   res.send(`
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">
     <h1>📧 مدير رزق الذكي v2 — خادم البريد</h1>

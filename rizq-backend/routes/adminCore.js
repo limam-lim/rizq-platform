@@ -164,7 +164,7 @@ function mountAdminCoreRoutes(app, deps) {
   // حقيقية حتى تنطلق المنصة فعلياً على استضافة حقيقية وتستقبل مستخدمين —
   // قبل ذلك سيعيد دائماً أصفاراً لأن data/ فارغة. لا يغيّر أي بيانات، قراءة
   // فقط، ومحمي بنفس BACKEND_SHARED_SECRET العام لبقية نقاط لوحة الأدمن.
-  app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
+  app.get('/api/admin/daily-digest', requireAdminPermission('overview'), (req, res) => {
     try {
       const pendingAccounts = readAccounts().filter((a) => a.status === 'pending');
       const pendingAds = readAds().filter((a) => a.status === 'pending');
