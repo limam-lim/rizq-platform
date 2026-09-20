@@ -13,6 +13,11 @@ const {
   getAgentModel,
   createCachedMessage,
 } = require('../config/anthropic');
+const {
+  scoreInvestmentOpportunity,
+  shouldAutoApprove,
+  TIER,
+} = require('./provisionalTier');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const FILE = path.join(DATA_DIR, 'investments.json');
@@ -236,6 +241,9 @@ function toPublicOpportunity(item, unlockContacts) {
     wilaya: item.wilaya || '',
     createdAt: item.createdAt,
     status: item.status,
+    provisionalTier: item.provisionalTier || null,
+    provisionalLabelAr: item.provisionalLabelAr || null,
+    provisionalLabelFr: item.provisionalLabelFr || null,
   };
   if (unlockContacts) {
     out.contactHint = PUBLIC_CONTACT;
@@ -246,11 +254,15 @@ function toPublicOpportunity(item, unlockContacts) {
   return out;
 }
 
+function isPublicStatus(status) {
+  return status === 'approved' || status === 'published' || status === 'provisionally_approved';
+}
+
 function listPublic(opts) {
   const unlock = !!(opts && opts.unlockContacts);
   const store = readInvestments();
   const list = store.opportunities
-    .filter((o) => o && (o.status === 'approved' || o.status === 'published'))
+    .filter((o) => o && isPublicStatus(o.status))
     .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
     .map((o) => toPublicOpportunity(o, unlock));
   return { ok: true, opportunities: list, publicContact: PUBLIC_CONTACT };
@@ -271,13 +283,24 @@ function submitOpportunity(body) {
     throw err;
   }
 
+  const draft = {
+    title,
+    description,
+    capital: sanitizeText(body && body.capital, 80),
+    sector: sanitizeText(body && body.sector, 80) || (lang === 'fr' ? 'Autre' : 'أخرى'),
+    stage: sanitizeText(body && body.stage, 80) || (lang === 'fr' ? 'Idée' : 'فكرة'),
+  };
+  const score = scoreInvestmentOpportunity(draft);
+  const auto = shouldAutoApprove(score.provisionalTier);
+  const status = auto ? 'provisionally_approved' : 'pending_review';
+
   const item = {
     id: 'inv_' + crypto.randomBytes(7).toString('hex'),
     title,
     titleFr: sanitizeText(body && body.titleFr, 140),
-    sector: sanitizeText(body && body.sector, 80) || (lang === 'fr' ? 'Autre' : 'أخرى'),
-    capital: sanitizeText(body && body.capital, 80),
-    stage: sanitizeText(body && body.stage, 80) || (lang === 'fr' ? 'Idée' : 'فكرة'),
+    sector: draft.sector,
+    capital: draft.capital,
+    stage: draft.stage,
     summary: description.slice(0, 400),
     summaryFr: sanitizeText(body && body.summaryFr, 400),
     description,
@@ -285,9 +308,16 @@ function submitOpportunity(body) {
     contactEmail: sanitizeText(body && body.contactEmail, 120),
     contactPhone: sanitizeText(body && body.contactPhone, 40),
     accountId: sanitizeText(body && body.accountId, 80) || null,
-    status: 'pending_review',
+    status,
     createdAt: new Date().toISOString(),
     lang,
+    provisionalTier: score.provisionalTier,
+    provisionalLabelAr: score.provisionalLabelAr,
+    provisionalLabelFr: score.provisionalLabelFr,
+    provisionalReasons: score.provisionalReasons,
+    provisionalAt: score.provisionalAt,
+    provisionalBy: score.provisionalBy,
+    provisionallyApprovedAt: auto ? new Date().toISOString() : null,
   };
 
   const store = readInvestments();
@@ -299,16 +329,90 @@ function submitOpportunity(body) {
     sector: item.sector,
     stage: item.stage,
     lang,
+    provisionalTier: item.provisionalTier,
+    autoApproved: auto,
   });
+  if (auto) {
+    pushEvent('opportunity_provisional_approve', { id: item.id, tier: TIER.GREEN });
+  }
+
+  const msgAr = auto
+    ? 'موافقة مبدئية من وكيل الاستثمارات. يمكنك المتابعة — القرار قابل للمراجعة. التواصل العام: ' + PUBLIC_CONTACT
+    : 'تم استلام الملف. معلّق بانتظار مراجعة Limam (لبس أو شبهة). التواصل العام: ' + PUBLIC_CONTACT;
+  const msgFr = auto
+    ? 'Approbation provisoire par le conseiller investissement. Suite possible — décision révocable. Contact public: ' + PUBLIC_CONTACT
+    : 'Dossier reçu. En attente de Limam (ambiguïté ou suspicion). Contact public: ' + PUBLIC_CONTACT;
 
   return {
     ok: true,
     id: item.id,
     status: item.status,
-    message: lang === 'fr'
-      ? 'Dossier reçu. Revue interne avant publication. Contact public: ' + PUBLIC_CONTACT
-      : 'تم استلام الملف. مراجعة داخلية قبل النشر. التواصل العام: ' + PUBLIC_CONTACT,
+    provisionalTier: item.provisionalTier,
+    provisionalLabel: lang === 'fr' ? item.provisionalLabelFr : item.provisionalLabelAr,
+    autoApproved: auto,
+    message: lang === 'fr' ? msgFr : msgAr,
     publicContact: PUBLIC_CONTACT,
+  };
+}
+
+/** قرار بشري نهائي — ينقض أو يؤكد الموافقة المبدئية */
+function decideOpportunity(id, action, reviewer) {
+  const store = readInvestments();
+  const idx = store.opportunities.findIndex((o) => o && o.id === id);
+  if (idx === -1) {
+    const err = new Error('not_found');
+    err.status = 404;
+    throw err;
+  }
+  const act = String(action || '').toLowerCase();
+  if (act !== 'approve' && act !== 'reject' && act !== 'hold') {
+    const err = new Error('invalid_action');
+    err.status = 400;
+    throw err;
+  }
+  const item = store.opportunities[idx];
+  if (act === 'approve') {
+    item.status = 'approved';
+    item.publishedAt = new Date().toISOString();
+  } else if (act === 'reject') {
+    item.status = 'rejected';
+    item.rejectedAt = new Date().toISOString();
+  } else {
+    item.status = 'pending_review';
+  }
+  item.reviewedAt = new Date().toISOString();
+  item.reviewedBy = String(reviewer || 'admin').slice(0, 80);
+  item.humanOverride = true;
+  store.opportunities[idx] = item;
+  writeInvestments(store);
+  pushEvent('opportunity_decision', { id, action: act, by: item.reviewedBy });
+  return { ok: true, opportunity: toPublicOpportunity(item, true) };
+}
+
+function listAdmin(opts) {
+  const store = readInvestments();
+  let list = store.opportunities.slice();
+  const status = opts && opts.status;
+  if (status) list = list.filter((o) => o && o.status === status);
+  const tier = opts && opts.tier;
+  if (tier) list = list.filter((o) => o && o.provisionalTier === tier);
+  return {
+    ok: true,
+    opportunities: list.slice(0, 200).map((o) => ({
+      id: o.id,
+      title: o.title,
+      sector: o.sector,
+      capital: o.capital,
+      stage: o.stage,
+      status: o.status,
+      provisionalTier: o.provisionalTier,
+      provisionalLabelAr: o.provisionalLabelAr,
+      provisionalReasons: o.provisionalReasons,
+      createdAt: o.createdAt,
+      contactEmail: o.contactEmail || null,
+      contactPhone: o.contactPhone || null,
+      humanOverride: !!o.humanOverride,
+    })),
   };
 }
 
@@ -318,22 +422,32 @@ function buildDailyDigest() {
   const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
   const recentEvents = events.filter((e) => e && e.at && Date.parse(e.at) >= dayAgo);
   const pending = store.opportunities.filter((o) => o && o.status === 'pending_review');
+  const provisional = store.opportunities.filter((o) => o && o.status === 'provisionally_approved');
   const approved = store.opportunities.filter((o) => o && (o.status === 'approved' || o.status === 'published'));
   const plans = recentEvents.filter((e) => e.type === 'plan_request').length;
   const submits = recentEvents.filter((e) => e.type === 'opportunity_submit').length;
+  const auto = recentEvents.filter((e) => e.type === 'opportunity_provisional_approve').length;
+  const byTier = { green: 0, yellow: 0, red: 0 };
+  store.opportunities.forEach((o) => {
+    if (o && o.provisionalTier && byTier[o.provisionalTier] != null) byTier[o.provisionalTier] += 1;
+  });
 
   return {
     generatedAt: new Date().toISOString(),
     windowHours: 24,
     plansRequested: plans,
     opportunitiesSubmitted: submits,
+    autoProvisionallyApproved: auto,
     pendingReview: pending.length,
+    provisionallyApproved: provisional.length,
     published: approved.length,
+    tiers: byTier,
     pendingItems: pending.slice(0, 15).map((o) => ({
       id: o.id,
       title: o.title,
       sector: o.sector,
       capital: o.capital,
+      provisionalTier: o.provisionalTier,
       createdAt: o.createdAt,
     })),
     publicContact: PUBLIC_CONTACT,
@@ -375,12 +489,17 @@ async function sendOpsDailyReport() {
     'Plans (24h): ' + digest.plansRequested,
     'Submissions (24h): ' + digest.opportunitiesSubmitted,
     'Pending review: ' + digest.pendingReview,
+    'Provisionally approved live: ' + (digest.provisionallyApproved || 0),
+    'Auto provisional (24h): ' + (digest.autoProvisionallyApproved || 0),
     'Published: ' + digest.published,
+    'Tiers: green=' + ((digest.tiers && digest.tiers.green) || 0) +
+      ' yellow=' + ((digest.tiers && digest.tiers.yellow) || 0) +
+      ' red=' + ((digest.tiers && digest.tiers.red) || 0),
     '',
-    'Pending titles:',
+    'Pending / yellow-red titles:',
   ];
   digest.pendingItems.forEach((it) => {
-    lines.push('- [' + it.id + '] ' + it.title + ' · ' + (it.sector || '') + ' · ' + (it.capital || ''));
+    lines.push('- [' + (it.provisionalTier || '?') + '] [' + it.id + '] ' + it.title + ' · ' + (it.sector || '') + ' · ' + (it.capital || ''));
   });
   if (!digest.pendingItems.length) lines.push('- (none)');
   lines.push('', 'Public contact (platform): ' + PUBLIC_CONTACT);
@@ -422,11 +541,14 @@ module.exports = {
   generatePlan,
   localPlan,
   listPublic,
+  listAdmin,
   submitOpportunity,
+  decideOpportunity,
   buildDailyDigest,
   sendOpsDailyReport,
   startDailyOpsScheduler,
   opsEmail,
   readInvestments,
   toPublicOpportunity,
+  isPublicStatus,
 };

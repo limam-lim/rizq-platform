@@ -75,19 +75,30 @@ function formatSubRequestCaption(req, aiResult, formatPlausibility) {
   const accRow = typeof req._accountPhone === 'string' ? req._accountPhone : '';
   const phone = cleanField(accRow || req._phone);
   const price = cleanField(Number(req.price) || 0) + ' MRU';
+  const tier = String(req.provisionalTier || '').toLowerCase();
+  const tierLine = tier === 'green'
+    ? (req.provisionalAutoApproved ? '🟢 موافقة مبدئية تلقائية (وكيل الباقات)' : '🟢 أخضر — جاهز للموافقة المبدئية')
+    : tier === 'yellow'
+      ? '🟡 أصفر — لبس، بانتظارك'
+      : tier === 'red'
+        ? '🔴 أحمر — شبهة / غير منطقي، بانتظارك'
+        : null;
 
   const lines = [
-    '🧾 طلب اشتراك جديد',
+    req.provisionalAutoApproved ? '🧾 طلب اشتراك — تفعيل مبدئي آلي' : '🧾 طلب اشتراك جديد',
     '',
     '👤 العميل: ' + cleanField(req.account || req.accountId),
     '📱 الهاتف: ' + phone,
     '📦 الباقة: ' + cleanField(req.pkg),
     '💰 المبلغ: ' + price,
     '🔍 الموثوقية: ' + cleanField(pl),
+  ];
+  if (tierLine) lines.push(tierLine);
+  lines.push(
     '🏷 الفئة: ' + cleanField(req.category || 'package'),
     '🆔 المرجع: ' + cleanField(req.id),
     timestampLine(req),
-  ];
+  );
 
   if (aiResult && aiResult.amount) {
     lines.push('💵 مبلغ الوصل: ' + cleanField(aiResult.amount));
@@ -100,6 +111,9 @@ function formatSubRequestCaption(req, aiResult, formatPlausibility) {
   }
   if (aiResult && Array.isArray(aiResult.notes) && aiResult.notes.length) {
     lines.push('📝 ملاحظات: ' + cleanField(aiResult.notes.slice(0, 2).join(' · ')));
+  }
+  if (req.provisionalAutoApproved) {
+    lines.push('', 'ℹ️ يمكنك النقض لاحقاً من لوحة الأدمن إن لزم.');
   }
 
   return lines.join('\n');

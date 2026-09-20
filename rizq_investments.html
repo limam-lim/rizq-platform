@@ -201,8 +201,8 @@ body{
 </div>
 
 <div class="wrap">
-  <div class="inv-notice" data-t-fr="Rizq est un intermédiaire de publication. Le conseiller investissement offre une revue de premier passage — pas un conseil financier agréé, ni une garantie de rendement. Vérifiez toujours avant d'investir. Contact public: direction@rizq.mr">
-    رزق وسيط نشر إلكتروني. وكيل الاستثمار يقدّم مراجعة أوّلية — وليس استشارة مالية مرخّصة، ولا ضماناً لأي عائد. تحقّق دائماً قبل الاستثمار. التواصل العام: direction@rizq.mr
+  <div class="inv-notice" data-t-fr="Rizq est un intermédiaire de publication. Le conseiller peut donner une approbation provisoire (vert) ou suspendre en cas d'ambiguïté/suspicion (jaune/rouge) pour Limam. Pas un conseil financier agréé. Contact public: direction@rizq.mr">
+    رزق وسيط نشر إلكتروني. وكيل الاستثمار يمنح موافقة مبدئية (أخضر) أو يعلّق عند اللبس/الشبهة (أصفر/أحمر) لعرضها عليك. ليس استشارة مالية مرخّصة. التواصل العام: direction@rizq.mr
   </div>
 
   <div class="inv-section-head">
@@ -556,8 +556,13 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     grid.innerHTML = list.map(function (o) {
       var title = fr && o.titleFr ? o.titleFr : o.title;
       var summary = fr && o.summaryFr ? o.summaryFr : (o.summary || '');
+      var tier = o.provisionalTier || '';
+      var tierLbl = tier === 'green'
+        ? (fr ? '✅ Provisoire' : '✅ مبدئي')
+        : '';
       return '<article class="opp-card">'
         + '<span class="opp-tag">' + escapeHtml(o.sector || (fr ? 'Autre' : 'أخرى')) + '</span>'
+        + (tierLbl ? '<span class="opp-tag" style="margin-inline-start:6px;background:rgba(46,204,113,.12);color:#0E6E4E">' + tierLbl + '</span>' : '')
         + '<h3 class="opp-title">' + escapeHtml(title) + '</h3>'
         + '<p class="opp-desc">' + escapeHtml(summary) + '</p>'
         + '<div class="opp-meta">'

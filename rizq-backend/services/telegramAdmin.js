@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const { analyzeReceiptImage } = require('./receiptVision');
 const { activateSubRequest, rejectSubRequest, formatPlausibility } = require('./subRequestActivation');
+const { scorePackageRequest, shouldAutoApprove } = require('./provisionalTier');
 const {
   formatLeadAlertText,
   formatWidgetMediaCaption,
@@ -355,7 +356,10 @@ function buildSubRequestCaption(req, aiResult) {
   return formatSubRequestCaption(req, aiResult, formatPlausibility);
 }
 
-function inlineKeyboard(requestId) {
+function inlineKeyboard(requestId, opts) {
+  if (opts && opts.autoApproved) {
+    return { inline_keyboard: [] };
+  }
   return {
     inline_keyboard: [[
       { text: '✅ تفعيل الاشتراك', callback_data: 'sr:a:' + requestId },
@@ -434,11 +438,12 @@ async function sendWidgetMediaAlert(payload) {
 const sendTelegramNotification = sendLeadEscalationAlert;
 const sendTelegramAdminNotification = sendLeadEscalationAlert;
 
-async function sendSubRequestNotification(req, aiResult) {
+async function sendSubRequestNotification(req, aiResult, opts) {
   if (!isConfigured()) return null;
+  opts = opts || {};
 
   const caption = buildSubRequestCaption(req, aiResult);
-  const markup = JSON.stringify(inlineKeyboard(req.id));
+  const markup = JSON.stringify(inlineKeyboard(req.id, { autoApproved: !!opts.autoApproved }));
   const chatId = ADMIN_CHAT_ID();
 
   const parsed = parseDataUrl(req.receiptImage);
@@ -455,7 +460,7 @@ async function sendSubRequestNotification(req, aiResult) {
   return telegramApi('sendMessage', {
     chat_id: chatId,
     text: caption + '\n\n⚠️ لم تُرفق صورة وصل',
-    reply_markup: inlineKeyboard(req.id),
+    reply_markup: inlineKeyboard(req.id, { autoApproved: !!opts.autoApproved }),
   });
 }
 
@@ -496,49 +501,99 @@ function patchSubRequest(list, idx, patch, writeSubRequests) {
 }
 
 /**
- * بعد POST /api/sub-requests — تحليل الوصل + إشعار Telegram (لا يُوقف الاستجابة للعميل)
+ * بعد POST /api/sub-requests — تحليل الوصل + موافقة مبدئية (أخضر) أو تعليق (أصفر/أحمر)
+ * ثم إشعار Telegram إن كان مضبوطاً. لا يعتمد تشغيل الموافقة المبدئية على Telegram.
  */
 async function processNewSubRequest(requestId, deps) {
   deps = deps || {};
   const { readSubRequests, writeSubRequests, anthropic, readAccounts } = deps;
-  if (!isConfigured()) return;
+  if (typeof readSubRequests !== 'function' || typeof writeSubRequests !== 'function') return;
 
   const { idx, list, req } = findSubRequestById(readSubRequests, requestId);
   if (idx === -1 || !req) return;
+  if (req.status !== 'pending') return;
 
   const accRow = typeof readAccounts === 'function'
     ? readAccounts().find((a) => a.id === req.accountId)
     : null;
-  req._phone = accRow?.phone || '';
-  req._accountPhone = accRow?.phone || '';
+  req._phone = (accRow && accRow.phone) || '';
+  req._accountPhone = (accRow && accRow.phone) || '';
 
   let aiResult = null;
   if (req.receiptImage && isAnthropicAvailable(deps)) {
-    const analysis = await analyzeReceiptImage(req.receiptImage, {
-      expectedPrice: req.expectedPrice || req.price,
-      pkgName: req.pkg,
-      anthropic,
-    });
-    aiResult = analysis.result || { plausibilityLevel: 'unreviewed' };
-    patchSubRequest(list, idx, {
-      aiAnalysis: aiResult,
-      aiAnalyzedAt: new Date().toISOString(),
-      riskLevel: aiResult.plausibilityLevel || req.riskLevel,
-    }, writeSubRequests);
+    try {
+      const analysis = await analyzeReceiptImage(req.receiptImage, {
+        expectedPrice: req.expectedPrice || req.price,
+        pkgName: req.pkg,
+        anthropic,
+      });
+      aiResult = analysis.result || { plausibilityLevel: 'unreviewed' };
+    } catch (e) {
+      console.warn('[telegram-admin] receipt analysis:', e && e.message);
+      aiResult = { plausibilityLevel: 'unreviewed', notes: ['تعذّر التحليل الآلي'] };
+    }
   } else {
-    aiResult = { plausibilityLevel: req.receiptImage ? 'unreviewed' : 'high', notes: req.receiptImage ? ['تعذّر التحليل الآلي'] : ['لا يوجد وصل مرفق'] };
+    aiResult = {
+      plausibilityLevel: req.receiptImage
+        ? (req.riskLevel || 'unreviewed')
+        : 'high',
+      notes: req.receiptImage ? [] : ['لا يوجد وصل مرفق'],
+    };
   }
 
-  try {
-    const msg = await sendSubRequestNotification(req, aiResult);
-    if (msg && msg.message_id) {
-      const fresh = findSubRequestById(readSubRequests, requestId);
-      if (fresh.idx !== -1) {
+  const score = scorePackageRequest(req, aiResult);
+  const patch = {
+    aiAnalysis: aiResult,
+    aiAnalyzedAt: new Date().toISOString(),
+    riskLevel: aiResult.plausibilityLevel || req.riskLevel,
+    provisionalTier: score.provisionalTier,
+    provisionalLabelAr: score.provisionalLabelAr,
+    provisionalLabelFr: score.provisionalLabelFr,
+    provisionalReasons: score.provisionalReasons,
+    provisionalAt: score.provisionalAt,
+    provisionalBy: score.provisionalBy,
+  };
+  patchSubRequest(list, idx, patch, writeSubRequests);
+
+  let autoActivated = false;
+  if (shouldAutoApprove(score.provisionalTier)) {
+    const fresh = findSubRequestById(readSubRequests, requestId);
+    if (fresh.idx !== -1 && fresh.req && fresh.req.status === 'pending') {
+      const activation = await activateSubRequest(fresh.req, deps);
+      if (activation && activation.ok) {
         patchSubRequest(fresh.list, fresh.idx, {
-          telegramChatId: String(msg.chat?.id || ADMIN_CHAT_ID()),
-          telegramMessageId: msg.message_id,
+          status: 'approved',
+          reviewedAt: new Date().toISOString(),
+          reviewedVia: 'agent_provisional',
+          paymentConfirmed: true,
+          provisionalAutoApproved: true,
         }, writeSubRequests);
+        autoActivated = true;
+        console.log('[packages-agent] provisional auto-approve:', requestId);
+      } else {
+        console.warn('[packages-agent] green but activation failed:', activation && activation.error);
       }
+    }
+  }
+
+  if (!isConfigured()) return;
+
+  try {
+    const latest = findSubRequestById(readSubRequests, requestId);
+    const notifyReq = latest.req || req;
+    notifyReq._phone = req._phone;
+    notifyReq._accountPhone = req._accountPhone;
+    notifyReq.provisionalTier = score.provisionalTier;
+    notifyReq.provisionalAutoApproved = autoActivated;
+    const msg = await sendSubRequestNotification(notifyReq, aiResult, {
+      provisionalTier: score.provisionalTier,
+      autoApproved: autoActivated,
+    });
+    if (msg && msg.message_id && latest.idx !== -1) {
+      patchSubRequest(latest.list, latest.idx, {
+        telegramChatId: String(msg.chat?.id || ADMIN_CHAT_ID()),
+        telegramMessageId: msg.message_id,
+      }, writeSubRequests);
     }
   } catch (err) {
     console.error('[telegram-admin] notify failed:', err.message);
