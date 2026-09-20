@@ -186,14 +186,29 @@ body{
 .modal-close:hover{background:#fff0f0;color:var(--danger);border-color:#f3caca}
 .modal-box[dir="ltr"] .modal-close{left:auto;right:14px}
 .modal-box h3{font-family:'Amiri',Georgia,serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.td-section-head{text-align:center;max-width:720px;margin:0 auto 28px}
+.td-section-head .eyebrow{font-size:11px;letter-spacing:2px;color:#C9A84C;font-weight:800;text-transform:uppercase;margin-bottom:8px}
+.td-section-head h2{font-size:clamp(20px,3vw,28px);font-weight:800;color:#1B3A6B;margin:0 0 8px}
+.td-section-head p{font-size:13.5px;color:#5b6b8a;line-height:1.7;margin:0}
+
+.submit-panel{background:linear-gradient(180deg,#fbfcff 0%,#eef2fb 100%);border:1px solid #e7ecf3;border-radius:20px;padding:28px 24px;margin:8px auto 36px;max-width:760px;box-shadow:var(--shadow-card)}
+.submit-panel .f-submit{max-width:320px}
+
 .f-group{margin-bottom:13px}
 .f-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;display:block;letter-spacing:.2px}
-.f-input{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;background:#fdfcfa;transition:border-color .18s,box-shadow .18s}
-.f-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.16);background:#fff}
+.f-input,.f-select,.f-area{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;background:#fdfcfa;transition:border-color .18s,box-shadow .18s}
+.f-area{min-height:110px;resize:vertical}
+.f-input:focus,.f-select:focus,.f-area:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.16);background:#fff}
 .f-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .f-submit{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;font-weight:800;font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit;box-shadow:0 10px 22px rgba(201,168,76,.3);transition:transform .18s,box-shadow .18s}
 .f-submit:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(201,168,76,.38)}
+.f-submit:disabled{opacity:.65;cursor:wait}
 .f-hint{font-size:11.5px;color:var(--ink-faint);margin-top:8px;line-height:1.6}
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 auto 8px;max-width:760px}
+.trust-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+.trust-item strong{display:block;font-size:13px;color:var(--navy);margin-bottom:6px}
+.trust-item span{font-size:12px;color:var(--ink-soft);line-height:1.6}
+@media(max-width:900px){.trust-row{grid-template-columns:1fr}}
 /* صور مرجعية اختيارية للمناقصة (مثال: "20 كرسي بهذا الشكل" + صورة) */
 .pt-img-zone{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:#fdfcfa}
 .pt-img-zone:hover{border-color:var(--gold);background:#fffaf0}
@@ -259,7 +274,7 @@ body{
     <span class="tcs-label" data-t-fr="Publiez votre besoin et recevez des devis privés">انشر احتياجك واستقبل عروض أسعار خاصة</span>
     <div class="tcs-actions">
       <a class="tcs-btn ghost" href="#tender-packages" data-t-fr="💼 Forfaits">💼 الباقات</a>
-      <button type="button" class="tcs-btn" onclick="openPostModal()" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</button>
+      <a class="tcs-btn" href="#td-submit" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</a>
     </div>
   </div>
 </div>
@@ -269,6 +284,79 @@ body{
   <div class="list-head"><div class="t-count" id="t-count"></div></div>
   <div id="t-access-banner"></div>
   <div class="t-grid" id="t-grid"></div>
+
+  <div class="submit-panel" id="td-submit">
+    <div class="td-section-head" style="margin-bottom:18px">
+      <div class="eyebrow" data-t-fr="Soumettre">إيداع</div>
+      <h2 data-t-fr="Déposer un appel d'offres">أودع مناقصة جديدة</h2>
+      <p data-t-fr="Remplissez le dossier ci-dessous. Rizq est un intermédiaire de publication — aucune garantie d'offres.">املأ الملف أدناه. رزق وسيط نشر فقط — بلا ضمان للعروض.</p>
+    </div>
+
+    <div id="td-submit-login" class="login-notice" hidden></div>
+
+    <form id="td-submit-form" autocomplete="off">
+      <div class="f-group">
+        <label class="f-label" for="pt-title" data-t-fr="Titre *">العنوان *</label>
+        <input class="f-input" id="pt-title" name="title" required maxlength="140" data-ph-ar="مثال: توريد 50 كيس أسمنت" data-ph-fr="Ex : Fourniture de 50 sacs de ciment" placeholder="مثال: توريد 50 كيس أسمنت"/>
+      </div>
+      <div class="f-group">
+        <label class="f-label" for="pt-desc" data-t-fr="Description détaillée">وصف مفصّل</label>
+        <textarea class="f-area" id="pt-desc" name="description" maxlength="3000" data-ph-ar="اشرح احتياجك ومواصفاته وكميته…" data-ph-fr="Détaillez vos besoins, spécifications, quantité…" placeholder="اشرح احتياجك ومواصفاته وكميته…"></textarea>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label" for="pt-cat" data-t-fr="Catégorie">الفئة</label>
+          <select class="f-select" id="pt-cat" name="category"></select>
+        </div>
+        <div class="f-group">
+          <label class="f-label" for="pt-city" data-t-fr="Ville">المدينة</label>
+          <input class="f-input" id="pt-city" name="city" maxlength="80" data-ph-ar="نواكشوط" data-ph-fr="Nouakchott" placeholder="نواكشوط"/>
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label" for="pt-bmin" data-t-fr="Budget min (MRU)">الميزانية الدنيا (أوقية)</label>
+          <input class="f-input" type="number" id="pt-bmin" name="budgetMin" min="0" placeholder="0" dir="ltr"/>
+        </div>
+        <div class="f-group">
+          <label class="f-label" for="pt-bmax" data-t-fr="Budget max (MRU)">الميزانية القصوى (أوقية)</label>
+          <input class="f-input" type="number" id="pt-bmax" name="budgetMax" min="0" placeholder="0" dir="ltr"/>
+        </div>
+      </div>
+      <div class="f-group">
+        <label class="f-label" for="pt-deadline" data-t-fr="Date limite *">الموعد النهائي *</label>
+        <input class="f-input" type="date" id="pt-deadline" name="deadline" required dir="ltr"/>
+      </div>
+      <div class="f-group">
+        <label class="f-label" data-t-fr="Photo de référence (optionnel)">صورة مرجعية (اختياري)</label>
+        <div class="pt-img-zone" id="pt-img-zone" onclick="document.getElementById('pt-img-input').click()">
+          <div style="font-size:22px;margin-bottom:4px">📷</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--navy)" data-t-fr="Ajouter des photos (ex : « 20 chaises comme ça »)">أضف صوراً (مثال: «20 كرسي بهذا الشكل»)</div>
+          <div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px" data-t-fr="Jusqu'à 3 photos — JPG/PNG, max 3 Mo">حتى 3 صور — JPG/PNG، أقصى 3MB</div>
+          <input type="file" id="pt-img-input" accept="image/*" multiple style="display:none" onchange="_ptHandleImgUpload(this)"/>
+        </div>
+        <div class="pt-img-thumbs" id="pt-img-thumbs"></div>
+      </div>
+      <button type="submit" class="f-submit" id="pt-submit-btn" data-t-fr="إرسال للمراجعة / Envoyer pour revue">إرسال للمراجعة</button>
+      <p class="f-hint" data-t-fr="Rizq est un simple intermédiaire de publication — nous ne garantissons pas les offres et n'intervenons pas dans le choix du gagnant.">رزق وسيط نشر فقط — لا نضمن العروض ولا نتدخل في اختيار الفائز.</p>
+      <p id="td-submit-msg" class="f-hint" style="color:var(--ok);font-weight:700" hidden></p>
+    </form>
+  </div>
+
+  <div class="trust-row">
+    <div class="trust-item">
+      <strong data-t-fr="Publication médiée">نشر بوساطة</strong>
+      <span data-t-fr="Rizq ne choisit pas le gagnant et ne gère pas vos paiements.">رزق لا تختار الفائز ولا تدير مدفوعاتك.</span>
+    </div>
+    <div class="trust-item">
+      <strong data-t-fr="Revue initiale">مراجعة أوّلية</strong>
+      <span data-t-fr="Les dossiers complets peuvent recevoir une validation provisoire.">الملفات المكتملة قد تحصل على موافقة مبدئية.</span>
+    </div>
+    <div class="trust-item">
+      <strong data-t-fr="Devis privés">عروض خاصة</strong>
+      <span data-t-fr="Seuls l'auteur et les abonnés voient les contacts.">صاحب المناقصة والمشتركون فقط يرون التواصل.</span>
+    </div>
+  </div>
 </div>
 
 <section class="tender-pkg-section" id="tender-packages">
@@ -299,7 +387,7 @@ body{
       <ul class="footer-links">
         <li><a href="rizq_landing_v8.html" data-t-fr="Accueil">الرئيسية</a></li>
         <li><a href="#t-grid" data-t-fr="Toutes les offres">كل المناقصات</a></li>
-        <li><a href="#" onclick="openPostModal();return false" data-t-fr="Publier un appel d'offres">انشر مناقصتك</a></li>
+        <li><a href="#td-submit" data-t-fr="Publier un appel d'offres">انشر مناقصتك</a></li>
         <li><a href="rizq_landing_v8.html#pricing" data-t-fr="Tarifs">الأسعار</a></li>
         <li><a href="rizq_landing_v8.html#about" data-t-fr="À propos">من نحن</a></li>
       </ul>
@@ -358,14 +446,6 @@ body{
 .fixed-rizq-logo{position:fixed;right:0;top:50%;transform:translateY(-50%);background:linear-gradient(180deg,#0d1e3a,#162d52);border:1.5px solid rgba(201,168,76,.5);border-radius:10px 0 0 10px;padding:14px 7px;cursor:pointer;z-index:998;transition:all .25s;box-shadow:-3px 0 18px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;text-decoration:none}
 .fixed-rizq-logo:hover{background:linear-gradient(180deg,#162d52,#1a3560);border-color:rgba(201,168,76,.8)}
 </style>
-
-<!-- ══ POST TENDER MODAL ══ -->
-<div class="modal-overlay" id="post-modal" onclick="if(event.target===this)closePostModal()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closePostModal()">✕</button>
-    <div id="post-modal-body"></div>
-  </div>
-</div>
 
 <!-- ══ SUBMIT BID MODAL ══ -->
 <div class="modal-overlay" id="bid-modal" onclick="if(event.target===this)closeBidModal()">
@@ -710,52 +790,58 @@ function loadTenders(){
   });
 }
 
-/* ══ نشر مناقصة جديدة ══ */
-function openPostModal(){
+/* ══ نشر مناقصة — لوحة إدخال بنفس أسلوب غرفة الاستثمارات ══ */
+function _fillCatSelect(){
+  var sel = document.getElementById('pt-cat');
+  if(!sel) return;
+  var fr = _rizqLang()==='fr';
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">'+(fr?'— Choisir —':'— اختر —')+'</option>'
+    + CAT_ORDER.map(function(c){
+      var lab = CAT_LABELS[c];
+      return '<option value="'+c+'">'+(fr?lab.fr:lab.ar)+'</option>';
+    }).join('');
+  if(cur) sel.value = cur;
+}
+function _applyTdPlaceholders(){
+  var fr = _rizqLang()==='fr';
+  document.querySelectorAll('#td-submit [data-ph-ar]').forEach(function(el){
+    el.placeholder = fr ? (el.getAttribute('data-ph-fr')||'') : (el.getAttribute('data-ph-ar')||'');
+  });
+}
+function refreshTdSubmitGate(){
   var fr = _rizqLang()==='fr';
   var session = _getSession();
-  var body = document.getElementById('post-modal-body');
-  window._tenderImages = [];
+  var loginEl = document.getElementById('td-submit-login');
+  var formEl = document.getElementById('td-submit-form');
+  if(!loginEl || !formEl) return;
   if(!session){
-    body.innerHTML = '<h3>'+(fr?'Publier un appel d\'offres':'انشر مناقصتك')+'</h3>'
-      + '<div class="login-notice">'+(fr
-        ? 'Connectez-vous d\'abord depuis votre tableau de bord (compte particulier, magasin, bureau ou société) pour publier un appel d\'offres.'
-        : 'سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) حتى تقدر تنشر مناقصة.')
-      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a></div>';
-    document.getElementById('post-modal').classList.add('open');
-    return;
+    loginEl.hidden = false;
+    loginEl.innerHTML = (fr
+      ? 'Connectez-vous d\'abord depuis votre tableau de bord (compte particulier, magasin, bureau ou société) pour publier un appel d\'offres.'
+      : 'سجّل دخولك أولاً من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) حتى تقدر تنشر مناقصة.')
+      + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a>';
+    formEl.style.display = 'none';
+  } else {
+    loginEl.hidden = true;
+    loginEl.innerHTML = '';
+    formEl.style.display = '';
   }
-  var catOptions = CAT_ORDER.map(function(c){
-    var lab = CAT_LABELS[c];
-    return '<option value="'+c+'">'+(fr?lab.fr:lab.ar)+'</option>';
-  }).join('');
-  body.innerHTML = '<h3>'+(fr?'Publier un appel d\'offres':'انشر مناقصتك')+'</h3>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Titre *':'العنوان *')+'</label>'
-    + '<input class="f-input" id="pt-title" placeholder="'+(fr?'Ex : Fourniture de 50 sacs de ciment':'مثال: توريد 50 كيس أسمنت')+'"/></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Description':'الوصف')+'</label>'
-    + '<textarea class="f-input" id="pt-desc" rows="3" placeholder="'+(fr?'Détaillez vos besoins, spécifications, quantité...':'اشرح احتياجك ومواصفاته وكميته...')+'"></textarea></div>'
-    + '<div class="f-row"><div class="f-group"><label class="f-label">'+(fr?'Catégorie':'الفئة')+'</label>'
-    + '<select class="f-input" id="pt-cat"><option value="">'+(fr?'— Choisir —':'— اختر —')+'</option>'+catOptions+'</select></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Ville':'المدينة')+'</label>'
-    + '<input class="f-input" id="pt-city" placeholder="'+(fr?'Nouakchott':'نواكشوط')+'"/></div></div>'
-    + '<div class="f-row"><div class="f-group"><label class="f-label">'+(fr?'Budget min (MRU)':'الميزانية الدنيا (أوقية)')+'</label>'
-    + '<input class="f-input" type="number" id="pt-bmin" placeholder="0"/></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Budget max (MRU)':'الميزانية القصوى (أوقية)')+'</label>'
-    + '<input class="f-input" type="number" id="pt-bmax" placeholder="0"/></div></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Date limite *':'الموعد النهائي *')+'</label>'
-    + '<input class="f-input" type="date" id="pt-deadline"/></div>'
-    + '<div class="f-group"><label class="f-label">'+(fr?'Photo de référence (optionnel)':'صورة مرجعية (اختياري)')+'</label>'
-    + '<div class="pt-img-zone" onclick="document.getElementById(\'pt-img-input\').click()">'
-    + '<div style="font-size:22px;margin-bottom:4px">📷</div>'
-    + '<div style="font-size:12.5px;font-weight:600;color:var(--navy)">'+(fr?'Ajouter des photos (ex : « 20 chaises comme ça »)':'أضف صوراً (مثال: "20 كرسي بهذا الشكل")')+'</div>'
-    + '<div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px">'+(fr?'Jusqu\'à 3 photos — JPG/PNG, max 3 Mo':'حتى 3 صور — JPG/PNG، أقصى 3MB')+'</div>'
-    + '<input type="file" id="pt-img-input" accept="image/*" multiple style="display:none" onchange="_ptHandleImgUpload(this)"/>'
-    + '</div><div class="pt-img-thumbs" id="pt-img-thumbs"></div></div>'
-    + '<button class="f-submit" onclick="submitTender()">'+(fr?'📤 Publier':'📤 نشر المناقصة')+'</button>'
-    + '<p class="f-hint">'+(fr?'Rizq est un simple intermédiaire de publication — nous ne garantissons pas les offres et n\'intervenons pas dans le choix du gagnant.':'رزق وسيط نشر فقط — لا نضمن العروض ولا نتدخل في اختيار الفائز.')+'</p>';
-  document.getElementById('post-modal').classList.add('open');
+  _fillCatSelect();
+  _applyTdPlaceholders();
 }
-function closePostModal(){ document.getElementById('post-modal').classList.remove('open'); }
+function openPostModal(){
+  /* توافق مع الأزرار القديمة: انتقل للوحة الإيداع بدل النافذة المنبثقة */
+  refreshTdSubmitGate();
+  var panel = document.getElementById('td-submit');
+  if(panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var title = document.getElementById('pt-title');
+  var form = document.getElementById('td-submit-form');
+  if(title && form && form.style.display !== 'none'){
+    setTimeout(function(){ try{ title.focus(); }catch(e){} }, 350);
+  }
+}
+function closePostModal(){ /* لم يعد هناك نافذة نشر — الإبقاء للتوافق */ }
 
 /* صور مرجعية اختيارية لتوضيح المطلوب بدقة لمقدّمي العروض */
 function _ptRenderImgThumbs(){
@@ -765,7 +851,7 @@ function _ptRenderImgThumbs(){
   wrap.innerHTML = imgs.map(function(src,i){
     return '<div class="pt-img-thumb"><img src="'+src+'"/><button type="button" onclick="_ptDeleteImg('+i+')">×</button></div>';
   }).join('');
-  var zone = document.querySelector('.pt-img-zone');
+  var zone = document.getElementById('pt-img-zone') || document.querySelector('.pt-img-zone');
   if(zone) zone.style.display = imgs.length >= 3 ? 'none' : '';
 }
 function _ptDeleteImg(i){
@@ -792,24 +878,33 @@ function _ptHandleImgUpload(input){
   input.value = '';
 }
 
-function submitTender(){
+function submitTender(ev){
+  if(ev && ev.preventDefault) ev.preventDefault();
   var fr = _rizqLang()==='fr';
   var session = _getSession();
-  if(!session) return;
-  var title = document.getElementById('pt-title').value.trim();
-  var deadline = document.getElementById('pt-deadline').value;
+  if(!session){
+    refreshTdSubmitGate();
+    showToast(fr?'Connectez-vous pour publier':'سجّل دخولك للنشر');
+    return;
+  }
+  var titleEl = document.getElementById('pt-title');
+  var deadlineEl = document.getElementById('pt-deadline');
+  var title = titleEl ? titleEl.value.trim() : '';
+  var deadline = deadlineEl ? deadlineEl.value : '';
   if(!title || !deadline){
     showToast(fr?'Le titre et la date limite sont obligatoires':'العنوان والموعد النهائي مطلوبان');
     return;
   }
+  var btn = document.getElementById('pt-submit-btn');
+  if(btn){ btn.disabled = true; }
   var body = {
     accountId: session.id,
     title: title,
-    desc: document.getElementById('pt-desc').value.trim(),
-    category: document.getElementById('pt-cat').value,
-    city: document.getElementById('pt-city').value.trim(),
-    budgetMin: Number(document.getElementById('pt-bmin').value)||0,
-    budgetMax: Number(document.getElementById('pt-bmax').value)||0,
+    desc: ((document.getElementById('pt-desc')||{}).value||'').trim(),
+    category: (document.getElementById('pt-cat')||{}).value || '',
+    city: ((document.getElementById('pt-city')||{}).value||'').trim(),
+    budgetMin: Number((document.getElementById('pt-bmin')||{}).value)||0,
+    budgetMax: Number((document.getElementById('pt-bmax')||{}).value)||0,
     deadline: new Date(deadline+'T23:59:59').toISOString(),
     images: window._tenderImages||[],
   };
@@ -820,15 +915,27 @@ function submitTender(){
       body: JSON.stringify(body)
     }).then(function(res){ return res.json().then(function(data){ return {ok:res.ok, data:data}; }); })
       .then(function(r){
+        if(btn) btn.disabled = false;
         if(!r.ok){
           showToast((r.data && (r.data.msg||r.data.error)) || (fr?'Échec de la publication':'تعذّر النشر'));
           return;
         }
-        closePostModal();
         window._tenderImages = [];
+        _ptRenderImgThumbs();
+        var form = document.getElementById('td-submit-form');
+        if(form) form.reset();
+        _fillCatSelect();
+        var msg = document.getElementById('td-submit-msg');
+        if(msg){
+          msg.hidden = false;
+          msg.textContent = fr ? '✅ Appel d\'offres envoyé pour revue' : '✅ تم إرسال المناقصة للمراجعة';
+        }
         showToast(fr?'✅ Appel d\'offres publié':'✅ تم نشر مناقصتك');
         loadTenders();
-      }).catch(function(){ showToast(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم'); });
+      }).catch(function(){
+        if(btn) btn.disabled = false;
+        showToast(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم');
+      });
   });
 }
 
@@ -936,6 +1043,7 @@ function applyLang(){
   if (discCopy) discCopy.textContent = l === 'fr' ? 'Rizq Platform · Mauritanie ©' : 'Rizq Platform · موريتانيا ©';
   renderCatChips();
   renderTenders();
+  if (typeof refreshTdSubmitGate === 'function') refreshTdSubmitGate();
   if (window.RizqPackagesUI && typeof RizqPackagesUI.mount === 'function') {
     try { RizqPackagesUI.mount('tender-packages-grid', 'tender', { columns: 4, lang: l }); } catch (ePkg) {}
   }
@@ -945,8 +1053,14 @@ function applyLang(){
 }
 
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){ closePostModal(); closeBidModal(); }
+  if(e.key==='Escape'){ closeBidModal(); }
 });
+
+(function wireTdSubmitForm(){
+  var form = document.getElementById('td-submit-form');
+  if(form) form.addEventListener('submit', submitTender);
+  window._tenderImages = window._tenderImages || [];
+})();
 
 applyLang();
 loadTenders();
