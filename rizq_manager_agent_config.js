@@ -264,9 +264,9 @@ var SECTIONS_GUIDE = {
     '📂 Les 16 catégories sur Rizq:\n1. Voitures et véhicules\n2. Immobilier\n3. Électronique et technologie\n4. Vêtements et mode\n5. Alimentation\n6. Animaux et bétail\n7. Meubles et ameublement\n8. Services professionnels\n9. Santé et beauté\n10. Éducation et formation\n11. Sport et loisirs\n12. Construction et matériaux\n13. Agriculture et jardinage\n14. Livres et fournitures\n15. Cadeaux et occasions\n16. Autres',
 
   prices_board_ar:
-    '📊 لوحة أسعار السوق:\n• تجد في الصفحة الرئيسية لوحة أسعار اليوم\n• تشمل: أسعار المواد الغذائية الأساسية، المحروقات\n• تُحدَّث بانتظام\n• مرجع للبائعين والمشترين',
+    '📊 لوحة أسعار السوق:\n• تجد في الصفحة الرئيسية لوحة أسعار اليوم\n• تشمل: أسعار المواد الغذائية الأساسية، المحروقات، والعملات\n• تُحدَّث بانتظام\n• مرجع للبائعين والمشترين',
   prices_board_fr:
-    '📊 Tableau des prix du marché:\n• Disponible sur la page d\'accueil\n• Comprend: prix des produits alimentaires de base, carburants\n• Mis à jour régulièrement\n• Référence pour vendeurs et acheteurs',
+    '📊 Tableau des prix du marché:\n• Disponible sur la page d\'accueil\n• Comprend: prix des produits alimentaires de base, carburants et devises\n• Mis à jour régulièrement\n• Référence pour vendeurs et acheteurs',
 
   legal_ar:
     '⚖️ الصفحة القانونية:\n• شروط الاستخدام\n• سياسة المحتوى (R01-R14)\n• سياسة التحقق من الهوية\n• سياسة الإعلانات\n• قوانين موريتانية سارية',
