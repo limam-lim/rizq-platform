@@ -41,9 +41,9 @@ var PLATFORM_OVERVIEW = {
 // ═══════════════════════════════════════════════════════════════
 var REGISTRATION_GUIDE = {
   overview_ar:
-    '📝 التسجيل في رزق سهل وسريع:\n\n1️⃣ اضغط "سجّل مجاناً" في الصفحة الرئيسية\n2️⃣ اختر نوع حسابك (راجع الخيارات أدناه)\n3️⃣ أدخل بياناتك الأساسية\n4️⃣ تحقق برقم هاتفك (OTP)\n5️⃣ ارفع صورة الهوية الوطنية للتوثيق\n6️⃣ حسابك جاهز! ✅',
+    '📝 التسجيل في رزق — مساران واضحان:\n\n👤 حساب شخصي / تصفح وتواصل:\n1️⃣ من أي صفحة اضغط «حسابي» أعلى الشاشة\n2️⃣ اختر «أتصفّح وأتواصل»\n3️⃣ أدخل بياناتك ثم أكّد بريدك برمز التحقق\n\n🏢 حساب أعمال / محل / مكتب / معرض / مناقصات:\n1️⃣ من الصفحة الرئيسية اضغط «حساب جديد» أو «سجّل الآن — مجاناً»\n2️⃣ اختر نوع الحساب وأكمل البيانات والتحقق\n3️⃣ ارفع صورة الهوية عند الطلب للتوثيق\n\n🔑 لديك حساب على رزق؟\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب على رزق — دخول»',
   overview_fr:
-    '📝 L\'inscription sur Rizq est simple et rapide:\n\n1️⃣ Cliquez sur "S\'inscrire gratuitement" sur la page d\'accueil\n2️⃣ Choisissez votre type de compte (voir les options ci-dessous)\n3️⃣ Entrez vos informations de base\n4️⃣ Vérifiez votre numéro de téléphone (OTP)\n5️⃣ Téléversez une photo de votre pièce d\'identité\n6️⃣ Votre compte est prêt! ✅',
+    '📝 Inscription sur Rizq — deux parcours clairs:\n\n👤 Compte personnel / navigation & contact:\n1️⃣ Sur toute page, appuyez sur « Compte »\n2️⃣ Choisissez « Je parcours et je contacte »\n3️⃣ Entrez vos infos puis confirmez votre e-mail avec le code\n\n🏢 Compte pro / boutique / bureau / showroom / appels d\'offres:\n1️⃣ Sur l\'accueil, cliquez « Nouveau compte » ou « S\'inscrire — gratuit »\n2️⃣ Choisissez le type de compte et complétez la vérification\n3️⃣ Téléversez une pièce d\'identité si demandé\n\n🔑 Déjà un compte Rizq?\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte Rizq — Connexion »',
 
   account_types: {
     private_mr: {
@@ -52,17 +52,17 @@ var REGISTRATION_GUIDE = {
       when_fr: 'Si vous êtes de nationalité mauritanienne et souhaitez vendre ou acheter en tant que particulier',
       fields_ar: 'الاسم الكامل، رقم الهاتف، الولاية',
       fields_fr: 'Nom complet, numéro de téléphone, wilaya',
-      features_ar: 'نشر إعلانات، تواصل مع البائعين، تقييم الصفقات',
-      features_fr: 'Publier des annonces, contacter les vendeurs, évaluer les transactions'
+      features_ar: 'نشر إعلانات، تواصل، تقييم الصفقات، متابعة المناقصات والاستثمارات',
+      features_fr: 'Publier des annonces, contacter, évaluer, suivre AO et investissements'
     },
     private_int: {
       name_ar: 'مقيم أجنبي', name_fr: 'Résident étranger',
       when_ar: 'إذا كنت مقيماً في موريتانيا وغير موريتاني',
       when_fr: 'Si vous résidez en Mauritanie et n\'êtes pas de nationalité mauritanienne',
-      fields_ar: 'الاسم، رقم الهاتف، جنسيتك، رقم الإقامة',
-      fields_fr: 'Nom, numéro de téléphone, nationalité, numéro de résidence',
-      features_ar: 'نفس مزايا الفرد الموريتاني',
-      features_fr: 'Mêmes avantages que le particulier mauritanien'
+      fields_ar: 'الاسم، رقم الهاتف، جنسيتك (الدولة)، رقم جواز السفر أو بطاقة الإقامة، صورة الوثيقة',
+      fields_fr: 'Nom, téléphone, nationalité (pays), n° passeport ou carte de séjour, photo du document',
+      features_ar: 'نفس مزايا الحساب الشخصي',
+      features_fr: 'Mêmes avantages que le compte personnel'
     },
     store: {
       name_ar: 'متجر افتراضي (محل تجاري)', name_fr: 'Boutique virtuelle (commerce)',
@@ -96,8 +96,8 @@ var REGISTRATION_GUIDE = {
     }
   },
 
-  otp_ar: '📱 رمز التحقق OTP:\n• يُرسَل إلى رقم هاتفك عبر SMS\n• صالح 5 دقائق فقط\n• لم يصلك؟ انتظر دقيقة ثم اضغط "إعادة الإرسال"\n• تأكد أن رقمك موريتاني ويبدأ بـ +222',
-  otp_fr: '📱 Code de vérification OTP:\n• Envoyé par SMS à votre numéro\n• Valide seulement 5 minutes\n• Pas reçu? Attendez une minute puis cliquez sur "Renvoyer"\n• Vérifiez que votre numéro est mauritanien et commence par +222',
+  otp_ar: '📱 رمز التحقق:\n• المشتري: يُرسل إلى بريدك الإلكتروني بعد إدخال البيانات من «حسابي»\n• البائع: يظهر أثناء خطوات التسجيل حسب المرحلة\n• الرمز صالح لدقائق معدودة — إن لم يصلك انتظر ثم أعد الإرسال\n• للأرقام الموريتانية يُستخدم غالباً الرقم الدولي لموريتانيا',
+  otp_fr: '📱 Code de vérification:\n• Acheteur: envoyé par e-mail après saisie des infos depuis « Compte »\n• Vendeur: selon les étapes d\'inscription\n• Le code expire rapidement — sinon attendez puis renvoyez\n• Pour la Mauritanie, utilisez le format international du pays',
 
   id_verification_ar: '🪪 توثيق الهوية:\n• بعد التسجيل سيُطلب منك رفع صورة بطاقتك الوطنية\n• الصورة يجب أن تكون واضحة وغير مقطوعة\n• تستغرق المراجعة حتى 24 ساعة\n• بعد القبول: شارة "موثّق" تظهر على حسابك\n• يمكنك تخطي هذه الخطوة مؤقتاً لكن الحساب سيكون مُعلَّق حتى التوثيق',
   id_verification_fr: '🪪 Vérification d\'identité:\n• Après l\'inscription, on vous demandera de téléverser une photo de votre carte d\'identité nationale\n• La photo doit être claire et non coupée\n• La vérification prend jusqu\'à 24 heures\n• Une fois acceptée: le badge "vérifié" apparaît sur votre compte\n• Vous pouvez passer cette étape temporairement, mais le compte restera suspendu jusqu\'à vérification',
@@ -264,9 +264,9 @@ var SECTIONS_GUIDE = {
     '📂 Les 16 catégories sur Rizq:\n1. Voitures et véhicules\n2. Immobilier\n3. Électronique et technologie\n4. Vêtements et mode\n5. Alimentation\n6. Animaux et bétail\n7. Meubles et ameublement\n8. Services professionnels\n9. Santé et beauté\n10. Éducation et formation\n11. Sport et loisirs\n12. Construction et matériaux\n13. Agriculture et jardinage\n14. Livres et fournitures\n15. Cadeaux et occasions\n16. Autres',
 
   prices_board_ar:
-    '📊 لوحة أسعار السوق:\n• تجد في الصفحة الرئيسية لوحة أسعار اليوم\n• تشمل: أسعار المواد الغذائية الأساسية، المحروقات\n• تُحدَّث بانتظام\n• مرجع للبائعين والمشترين',
+    '📊 لوحة أسعار السوق:\n• تجد في الصفحة الرئيسية لوحة أسعار اليوم\n• تشمل: أسعار المواد الغذائية الأساسية، المحروقات، والعملات\n• تُحدَّث بانتظام\n• مرجع للبائعين والمشترين',
   prices_board_fr:
-    '📊 Tableau des prix du marché:\n• Disponible sur la page d\'accueil\n• Comprend: prix des produits alimentaires de base, carburants\n• Mis à jour régulièrement\n• Référence pour vendeurs et acheteurs',
+    '📊 Tableau des prix du marché:\n• Disponible sur la page d\'accueil\n• Comprend: prix des produits alimentaires de base, carburants et devises\n• Mis à jour régulièrement\n• Référence pour vendeurs et acheteurs',
 
   legal_ar:
     '⚖️ الصفحة القانونية:\n• شروط الاستخدام\n• سياسة المحتوى (R01-R14)\n• سياسة التحقق من الهوية\n• سياسة الإعلانات\n• قوانين موريتانية سارية',
@@ -281,6 +281,13 @@ var FAQ = [
   {
     q: ['كيف أسجل','كيف اسجل','تسجيل','انشاء حساب','إنشاء حساب','حساب جديد','register','inscription','comment creer'],
     a: { ar: REGISTRATION_GUIDE.overview_ar, fr: REGISTRATION_GUIDE.overview_fr }
+  },
+  {
+    q: ['دخول','تسجيل دخول','لدي حساب','login','connexion','se connecter','openLogin'],
+    a: {
+      ar: '🔑 دخول حساب الأعمال:\n• من الصفحة الرئيسية اضغط «دخول»\n• أو من «حسابي» اختر «لدي حساب على رزق — دخول»\n\n👤 حساب شخصي: من «حسابي» اختر «أتصفّح وأتواصل».',
+      fr: '🔑 Connexion compte pro:\n• Sur l\'accueil, cliquez « Connexion »\n• Ou depuis « Compte » → « J\'ai un compte Rizq — Connexion »\n\n👤 Compte personnel: depuis « Compte » choisissez « Je parcours et je contacte ».'
+    }
   },
   {
     q: ['أنواع الحسابات','نوع الحساب','الفرق بين','ما الفرق','أي حساب','متجر مكتب شركة'],
@@ -716,7 +723,9 @@ function processMessage(userMessage, context) {
 
   // Forgot password / login issue
   if (/\u0646\u0633\u064A\u062A|\u0643\u0644\u0645\u0629 \u0633\u0631|\u062F\u062E\u0648\u0644|\u062A\u0633\u062C\u064A\u0644 \u062F\u062E\u0648\u0644|oubli|forgot|password|login/.test(lower)) {
-    return { reply: lang==='fr' ? '\uD83D\uDD11 Cliquez sur « Mot de passe oubli\u00E9 ? » \u00E0 la connexion.\nUn code arrive sur votre e-mail pour d\u00E9finir un nouveau mot de passe.' : '\uD83D\uDD11 \u0627\u0636\u063A\u0637 «\u0646\u0633\u064A\u062A \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061F» \u0641\u064A \u0635\u0641\u062D\u0629 \u0627\u0644\u062F\u062E\u0648\u0644.\n\u064A\u0635\u0644\u0643 \u0631\u0645\u0632 \u0639\u0644\u0649 \u0628\u0631\u064A\u062F\u0643 \u0644\u062A\u0639\u064A\u064A\u0646 \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u062C\u062F\u064A\u062F\u0629.', lang: lang };
+    return { reply: lang==='fr'
+      ? '🔑 Connexion compte pro:\n• Accueil → « Connexion »\n• Ou « Compte » → « J\'ai un compte Rizq — Connexion »\n• Mot de passe oublié? utilisez « Mot de passe oublié ? » dans la fenêtre de connexion (un code arrive sur votre e-mail).\n\n👤 Compte personnel: « Compte » → « Je parcours et je contacte ».'
+      : '🔑 دخول حساب الأعمال:\n• الرئيسية → «دخول»\n• أو من «حسابي» → «لدي حساب على رزق — دخول»\n• نسيت كلمة المرور؟ استخدم «نسيت كلمة المرور؟» داخل نافذة الدخول (يصلك رمز على بريدك).\n\n👤 حساب شخصي: «حسابي» → «أتصفّح وأتواصل».', lang: lang };
   }
 
   if (context.tier === 'diamond' && /\u062A\u0642\u0631\u064A\u0631|\u062A\u062D\u0644\u064A\u0644|report|analyse/.test(lower)) {

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '19.6';
+  var ASSET_V = '20.0';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -108,6 +108,13 @@
     }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
+    }
+    /* فوتر المنصة الموحّد — زوار + داشبوردات المشتركين */
+    if (!document.querySelector('script[src*="rizq_site_footer.js"]')) {
+      appendScript('rizq_site_footer.js?v=' + ASSET_V, { defer: true });
+    }
+    if (!document.querySelector('script[src*="rizq_footer_toggle.js"]')) {
+      appendScript('rizq_footer_toggle.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('script[src*="rizq_module_flags.js"]')) {
       appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });

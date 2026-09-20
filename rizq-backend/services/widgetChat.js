@@ -127,7 +127,12 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `For Rizq subscription/package/pricing questions: ALWAYS call get_packages_info (live catalog) and explain from that data ONLY — ` +
       `never quote memorized/old prices, never invent MRU amounts, never mix store/office/corp catalogs.\n` +
       `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
-      `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free at rizq.mr.\n` +
+      `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free.\n` +
+      `When explaining how to register or log in, use ONLY on-screen button labels the user can tap:\n` +
+      `- Personal account: «حسابي» → «أتصفّح وأتواصل» then email verification code\n` +
+      `- New business account: homepage «حساب جديد» or «سجّل الآن — مجاناً»\n` +
+      `- Account login: homepage «دخول» or «حسابي» → «لدي حساب على رزق — دخول»\n` +
+      `NEVER expose file names, .html paths, query parameters (?openRegister, ?openLogin), or internal technical URLs in replies.\n` +
       `For general questions: keep replies concise (2-4 sentences) and actionable.\n` +
       `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE plain-text answer — ` +
       `call get_packages_info first and explain BOTH diamond tiers from live data — never invent prices. ` +

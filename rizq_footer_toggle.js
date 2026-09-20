@@ -176,21 +176,37 @@
     }
 
     var open = false;
+    var api = {
+      setOpen: function (next) {
+        open = !!next;
+        render();
+      },
+      isOpen: function () { return open; },
+      toggle: function () {
+        open = !open;
+        render();
+      }
+    };
     function render() {
       btn.setAttribute('aria-expanded', String(open));
       var txt = btn.querySelector('.rzq-ft-txt');
       if (txt) txt.textContent = label(open);
-      wrap.style.maxHeight = open ? wrap.scrollHeight + 'px' : '0';
+      /* استخدم صنفاً بدل !important خارجي حتى يعمل الإخفاء دائماً */
+      wrap.classList.toggle('rzq-ft-open', open);
+      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 400) + 'px') : '0px';
+      wrap.style.overflow = open ? 'visible' : 'hidden';
       if (footerEl) footerEl.classList.toggle('rzq-ft-compact', !open);
     }
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       open = !open;
       render();
     });
     // إعادة حساب الارتفاع عند تغيير حجم النافذة (مثلاً تدوير الجوال) حتى لا
     // يُقطَع المحتوى إن كانت القيمة المحسوبة سابقاً أصغر من الحقيقية الجديدة
     window.addEventListener('resize', function () {
-      if (open) wrap.style.maxHeight = wrap.scrollHeight + 'px';
+      if (open) wrap.style.maxHeight = Math.max(wrap.scrollHeight, 400) + 'px';
     }, { passive: true });
     // تحديث نص الزر عند تبديل اللغة (rizq_i18n.js يُصدر هذا الحدث)
     document.addEventListener('rizq:langchange', function () {
@@ -198,6 +214,7 @@
       if (txt) txt.textContent = label(open);
     });
 
+    window.__rizqFooterToggleApi = api;
     render();
   }
 
@@ -262,6 +279,48 @@
     setTimeout(hookFooterStats, 80);
     setTimeout(hookFooterStats, 400);
   }
+
+  /* يُستدعى بعد حقن الفوتر الموحّد ديناميكياً (rizq_site_footer.js) */
+  window.RizqFooterToggleRefresh = function () {
+    try {
+      injectStyle();
+      init();
+      hookFooterStats();
+    } catch (e) {}
+  };
+
+  window.RizqFooterToggle = {
+    setOpen: function (next) {
+      try {
+        if (window.__rizqFooterToggleApi && typeof window.__rizqFooterToggleApi.setOpen === 'function') {
+          window.__rizqFooterToggleApi.setOpen(!!next);
+          return;
+        }
+      } catch (e) {}
+      /* احتياطي قبل اكتمال init */
+      var wrap = document.querySelector('.rzq-ft-collapse-wrap');
+      var btn = document.querySelector('.rzq-ft-toggle-btn');
+      var footerEl = document.querySelector('footer.rizq-footer, body > footer');
+      if (!wrap) return;
+      var open = !!next;
+      wrap.classList.toggle('rzq-ft-open', open);
+      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 400) + 'px') : '0px';
+      wrap.style.overflow = open ? 'visible' : 'hidden';
+      if (btn) {
+        btn.setAttribute('aria-expanded', String(open));
+        var txt = btn.querySelector('.rzq-ft-txt');
+        if (txt) txt.textContent = label(open);
+      }
+      if (footerEl) footerEl.classList.toggle('rzq-ft-compact', !open);
+    },
+    isOpen: function () {
+      try {
+        if (window.__rizqFooterToggleApi) return !!window.__rizqFooterToggleApi.isOpen();
+      } catch (e2) {}
+      var btn = document.querySelector('.rzq-ft-toggle-btn');
+      return !!(btn && btn.getAttribute('aria-expanded') === 'true');
+    }
+  };
 
   document.addEventListener('rizq:langchange', function () {
     applyFooterStats();

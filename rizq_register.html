@@ -167,18 +167,18 @@
     <h1 id="t-choice">كيف تريد استخدام رزق؟</h1>
     <p class="lead" id="t-choice-sub">اختر نوع الحساب للمتابعة.</p>
     <div class="card" id="card-buyer" role="button" tabindex="0">
-      <div class="ico">🛒</div>
-      <div><b id="t-buyer">أشتري — حساب سريع</b><small id="t-buyer-sub">تصفّح ومفضلة وتواصل</small></div>
+      <div class="ico">👤</div>
+      <div><b id="t-buyer">أتصفّح وأتواصل — حساب شخصي</b><small id="t-buyer-sub">تصفّح ومفضلة وتواصل ومناقصات</small></div>
     </div>
     <div class="card" id="card-seller" role="button" tabindex="0">
-      <div class="ico">🏪</div>
-      <div><b id="t-seller">أبيع — حساب بائع</b><small id="t-seller-sub">محل · مكتب · معرض · فرد</small></div>
+      <div class="ico">🏢</div>
+      <div><b id="t-seller">أنشر وأدير — حساب أعمال</b><small id="t-seller-sub">محل · مكتب · معرض · مناقصات · استثمارات</small></div>
     </div>
     <p class="switch">لديك حساب؟ <button type="button" id="goto-login">سجّل دخولك هنا</button></p>
   </section>
 
   <section class="panel" id="panel-buyer">
-    <h1 id="t-buyer-title">حساب مشتري جديد</h1>
+    <h1 id="t-buyer-title">حساب شخصي جديد</h1>
     <p class="lead" id="t-buyer-lead">فعّل حسابك مرة واحدة برمز البريد، ثم ادخل لاحقاً بكلمة المرور فقط.</p>
 
     <label class="lbl" for="b-name" id="l-name">الاسم الكامل *</label>
@@ -246,15 +246,15 @@
     </div>
     <button type="button" class="btn" id="btn-acc-home">العودة للرئيسية</button>
     <button type="button" class="btn-ghost" id="btn-logout">تسجيل الخروج</button>
-    <a class="seller-link" id="acc-seller-link" href="index.html?openRegister=1&regPage=1">🏪 أنا بائع — فتح حساب بائع</a>
+    <a class="seller-link" id="acc-seller-link" href="index.html?openRegister=1&regPage=1">🏢 أفتح حساب أعمال على رزق</a>
   </section>
 
-  <footer class="foot">
-    <div>© رزق · <a href="mailto:direction@rizq.mr">direction@rizq.mr</a></div>
-    <div><a href="index.html">الرئيسية</a> · <a href="rizq_legal.html#s2" target="_blank" rel="noopener">شروط القبول</a></div>
-  </footer>
+  <footer class="foot" hidden aria-hidden="true"></footer>
 </main>
 
+<script src="rizq_pwa.js" defer></script>
+<script src="rizq_site_footer.js?v=19.7" defer></script>
+<script src="rizq_footer_toggle.js?v=19.7" defer></script>
 <script>
 (function () {
   'use strict';
@@ -678,11 +678,11 @@
     document.getElementById('btn-do-login').textContent = t('دخول ←', 'Connexion ←');
     document.getElementById('t-choice').textContent = t('كيف تريد استخدام رزق؟', 'Comment utiliser Rizq ?');
     document.getElementById('t-choice-sub').textContent = t('اختر نوع الحساب للمتابعة.', 'Choisissez le type de compte.');
-    document.getElementById('t-buyer').textContent = t('أشتري — حساب سريع', 'J\'achète — compte rapide');
-    document.getElementById('t-buyer-sub').textContent = t('تصفّح ومفضلة وتواصل', 'Parcourir et contacter');
-    document.getElementById('t-seller').textContent = t('أبيع — حساب بائع', 'Je vends — compte vendeur');
-    document.getElementById('t-seller-sub').textContent = t('محل · مكتب · معرض · فرد', 'Boutique · Bureau · Showroom');
-    document.getElementById('t-buyer-title').textContent = t('حساب مشتري جديد', 'Nouveau compte acheteur');
+    document.getElementById('t-buyer').textContent = t('أتصفّح وأتواصل — حساب شخصي', 'Je parcours et contacte — compte personnel');
+    document.getElementById('t-buyer-sub').textContent = t('تصفّح ومفضلة وتواصل ومناقصات', 'Parcourir, favoris, contact et salles');
+    document.getElementById('t-seller').textContent = t('أنشر وأدير — حساب أعمال', 'Je publie et gère — compte pro');
+    document.getElementById('t-seller-sub').textContent = t('محل · مكتب · معرض · مناقصات · استثمارات', 'Boutique · Bureau · Showroom · AO · Invest.');
+    document.getElementById('t-buyer-title').textContent = t('حساب شخصي جديد', 'Nouveau compte personnel');
     document.getElementById('t-buyer-lead').textContent = t('فعّل حسابك مرة واحدة برمز البريد، ثم ادخل لاحقاً بكلمة المرور فقط.', 'Activez une fois par e-mail, puis connectez-vous par mot de passe.');
     document.getElementById('l-name').textContent = t('الاسم الكامل *', 'Nom complet *');
     document.getElementById('l-email').textContent = t('البريد الإلكتروني *', 'E-mail *');
@@ -707,7 +707,7 @@
     document.getElementById('t-acc-sub').textContent = t('حسابك على رزق — للتصفح والتواصل والمفضلة', 'Votre compte Rizq — navigation, contact et favoris');
     document.getElementById('btn-acc-home').textContent = t('العودة للرئيسية', 'Retour à l\'accueil');
     document.getElementById('btn-logout').textContent = t('تسجيل الخروج', 'Se déconnecter');
-    document.getElementById('acc-seller-link').textContent = t('🏪 أنا بائع — فتح حساب بائع', '🏪 Je suis vendeur — ouvrir un compte');
+    document.getElementById('acc-seller-link').textContent = t('🏢 أفتح حساب أعمال على رزق', '🏢 Ouvrir un compte pro sur Rizq');
     document.getElementById('sl1').textContent = t('النوع', 'Type');
     document.getElementById('sl2').textContent = t('البيانات', 'Infos');
     document.getElementById('sl3').textContent = t('التفعيل', 'Activation');

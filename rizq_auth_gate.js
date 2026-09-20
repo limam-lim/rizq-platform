@@ -1,7 +1,7 @@
 /**
- * rizq_auth_gate.js — بوابة المشتري/الزائر (Guest Gate) v19.2
+ * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.3
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
- * v19.2: بطاقة دخول بائع + حسابي يفتح لوحة المشتري إن كان مسجّلاً
+ * v19.3: تسميات أوسع من بائع/مشتري — حساب شخصي · حساب أعمال · دخول رزق
  */
 (function () {
   'use strict';
@@ -50,16 +50,16 @@
       titleAccount: 'حسابي',
       titleOtp: 'تأكيد بريدك الإلكتروني',
       titleChoice: 'حسابي على رزق',
-      subGate: 'سجّل مجاناً للتواصل مع البائعين وحفظ المفضلة — أقل من دقيقة',
+      subGate: 'سجّل مجاناً للتواصل وحفظ المفضلة واستخدام غرف المنصة — أقل من دقيقة',
       subAccount: 'حسابك على رزق — للتصفح والتواصل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
       subReturning: 'مرحباً بعودتك! أكّد بريدك برمز التحقق',
-      subChoice: 'اختر بوضوح: شراء سريع، أو إنشاء حساب بائع، أو دخول لحساب موجود',
-      choiceBuyer: '🛒 أشتري أو أتصفّح',
-      choiceBuyerSub: 'حساب سريع للتواصل والمفضلة — أقل من دقيقة',
-      choiceSeller: '🏪 أبيع — حساب بائع جديد',
-      choiceSellerSub: 'لنشر الإعلانات وفتح محل أو مكتب أو معرض',
-      choiceSellerLogin: '🔑 لدي حساب بائع — دخول',
+      subChoice: 'اختر بوضوح: حساب شخصي، أو حساب أعمال جديد، أو دخول لحساب موجود',
+      choiceBuyer: '👤 أتصفّح وأتواصل',
+      choiceBuyerSub: 'حساب شخصي للتواصل والمفضلة والمناقصات — أقل من دقيقة',
+      choiceSeller: '🏢 أنشر وأدير — حساب أعمال جديد',
+      choiceSellerSub: 'إعلانات · محل · مكتب · معرض · مناقصات · استثمارات',
+      choiceSellerLogin: '🔑 لدي حساب على رزق — دخول',
       choiceSellerLoginSub: 'البريد وكلمة المرور للوحة التحكم',
       nameLabel: 'الاسم الكامل *',
       namePh: 'مثال: محمد أحمد ولد سيدي',
@@ -97,11 +97,11 @@
       successToast: '✅ تم تفعيل حسابك بنجاح',
       welcomeBack: '👋 أهلاً بعودتك',
       logout: 'تسجيل الخروج',
-      sellerCta: '🏪 أنا بائع — فتح حساب بائع',
-      loggedAs: 'مسجّل كمشتري',
+      sellerCta: '🏢 أفتح حساب أعمال على رزق',
+      loggedAs: 'مسجّل كعضو',
       reasonPhone: 'لعرض رقم الهاتف',
       reasonWhatsapp: 'للتواصل عبر واتساب',
-      reasonMsg: 'لإرسال رسالة للبائع',
+      reasonMsg: 'لإرسال رسالة',
       reasonFav: 'لإضافة الإعلان للمفضلة',
       reasonGeneric: 'للمتابعة',
       otpSent: 'تم إرسال الرمز إلى بريدك',
@@ -112,16 +112,16 @@
       titleAccount: 'Mon compte',
       titleOtp: 'Confirmez votre e-mail',
       titleChoice: 'Mon compte Rizq',
-      subGate: 'Inscrivez-vous gratuitement pour contacter les vendeurs et sauvegarder vos favoris',
+      subGate: 'Inscrivez-vous gratuitement pour contacter, sauvegarder vos favoris et utiliser les salles Rizq',
       subAccount: 'Votre compte Rizq — navigation, contact et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
       subReturning: 'Bon retour ! Confirmez votre e-mail avec le code',
-      subChoice: 'Choisissez clairement : achat rapide, nouveau compte vendeur, ou connexion',
-      choiceBuyer: '🛒 J\'achète / je parcours',
-      choiceBuyerSub: 'Compte rapide pour contact et favoris',
-      choiceSeller: '🏪 Je vends — nouveau compte vendeur',
-      choiceSellerSub: 'Publier et ouvrir boutique, bureau ou showroom',
-      choiceSellerLogin: '🔑 J\'ai un compte vendeur — Connexion',
+      subChoice: 'Choisissez clairement : compte personnel, nouveau compte pro, ou connexion',
+      choiceBuyer: '👤 Je parcours et je contacte',
+      choiceBuyerSub: 'Compte personnel — contact, favoris et salles Rizq',
+      choiceSeller: '🏢 Je publie et gère — nouveau compte pro',
+      choiceSellerSub: 'Annonces · boutique · bureau · showroom · appels d\'offres · investissements',
+      choiceSellerLogin: '🔑 J\'ai un compte Rizq — Connexion',
       choiceSellerLoginSub: 'E-mail et mot de passe du tableau de bord',
       nameLabel: 'Nom complet *',
       namePh: 'Ex : Mohamed Ahmed Ould Sidi',
@@ -159,8 +159,8 @@
       successToast: '✅ Compte activé avec succès',
       welcomeBack: '👋 Bon retour',
       logout: 'Déconnexion',
-      sellerCta: '🏪 Je suis vendeur — compte vendeur',
-      loggedAs: 'Connecté en tant qu\'acheteur',
+      sellerCta: '🏢 Ouvrir un compte pro sur Rizq',
+      loggedAs: 'Connecté en tant que membre',
       reasonPhone: 'pour afficher le numéro',
       reasonWhatsapp: 'pour WhatsApp',
       reasonMsg: 'pour envoyer un message',
@@ -299,9 +299,10 @@
       '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
       '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
       '#rag-overlay .rag-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:6}',
-      '#rag-overlay .rag-back{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #e2e8f0;color:#1b3a6b;min-height:40px;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;font-family:inherit}',
-      '#rag-overlay .rag-back:hover{background:#e8eef8;border-color:#c9a84c}',
-      '#rag-overlay .rag-close{background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:16px;flex-shrink:0}',
+      '#rag-overlay .rag-back{display:inline-flex!important;align-items:center;gap:6px;background:#0f2347!important;border:2px solid #c9a84c!important;color:#e8c96a!important;min-height:44px;padding:10px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit;box-shadow:0 4px 12px rgba(15,35,65,.18)}',
+      '#rag-overlay .rag-back:hover{background:#1b3a6b!important;border-color:#e8c96a!important;color:#fff!important}',
+      '#rag-overlay .rag-close{background:#fff!important;border:2px solid #94a3b8!important;color:#0f2347!important;width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:22px;font-weight:900;flex-shrink:0;line-height:1;box-shadow:0 2px 8px rgba(15,35,65,.12)!important}',
+      '#rag-overlay .rag-close:hover{background:#fef2f2!important;border-color:#ef4444!important;color:#b91c1c!important}',
       '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 20px 10px;border-bottom:1px solid #e2e8f5}',
       '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
       '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
@@ -350,7 +351,7 @@
       '#rag-overlay .rag-choice-icon-gold{background:linear-gradient(135deg,#c9a84c,#e8c96a)!important}',
       '#rag-overlay .rag-choice-title{font-size:15px;font-weight:800;color:#1b3a6b}',
       '#rag-overlay .rag-choice-sub{font-size:12px;color:#64748b;margin-top:2px;line-height:1.45}',
-      '@media (max-width:768px){#rag-overlay .rag-title{font-size:1.55rem!important}#rag-overlay .rag-choice-card{padding:18px 16px;min-height:76px}#rag-overlay .rag-choice-title{font-size:16px}#rag-overlay .rag-choice-sub{font-size:12.5px}}',
+      '@media (max-width:768px){#rag-overlay .rag-title{font-size:1.35rem!important}#rag-overlay .rag-sub,#rag-overlay .rag-intro{font-size:12.5px!important}#rag-overlay .rag-choice{gap:8px!important}#rag-overlay .rag-choice-card{padding:11px 10px;min-height:58px;border-width:1.5px;box-shadow:0 6px 16px rgba(15,35,65,.06)}#rag-overlay .rag-choice-title{font-size:14.5px}#rag-overlay .rag-choice-sub{font-size:11.5px;color:#475569}#rag-overlay .rag-choice-icon{width:40px;height:40px;font-size:18px}#rag-overlay .rag-legal{padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px))!important;border-radius:0}#rag-overlay .rag-legal-links{flex-direction:row;flex-wrap:wrap;justify-content:center}#rag-overlay .rag-legal-links a{width:auto;min-height:30px;font-size:11px!important;padding:5px 8px!important}#rag-overlay .rag-topbar{padding:10px 12px;gap:8px}#rag-overlay .rag-back{min-height:40px;font-size:13.5px;padding:8px 14px}#rag-overlay .rag-close{width:40px;height:40px;font-size:18px}}',
       '#rag-overlay .rag-otp-row{display:flex;gap:8px;justify-content:center;margin:14px 0 10px}',
       '#rag-overlay .rag-otp-box{width:44px;height:50px;background:#f8faff;border:1.5px solid rgba(13,27,42,.12);border-radius:10px;text-align:center;font-size:20px;font-weight:800;color:#1a2535;font-family:inherit}',
       '#rag-overlay .rag-otp-box:focus{outline:none;border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.15)}',
@@ -359,9 +360,17 @@
       '#rag-overlay .rag-devhint{background:#fff8e8;border:1px dashed rgba(201,168,76,.45);border-radius:10px;padding:8px 10px;font-size:11px;color:#92400e;text-align:center;margin-bottom:10px;display:none}',
       '#rag-overlay .rag-devhint.show{display:block}',
       '#rag-overlay .rag-privacy{color:#64748b!important;font-size:11.5px;text-align:center;margin-top:14px;line-height:1.65}',
-      '#rag-overlay .rag-legal{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 12px;margin-top:18px;padding:14px 12px!important;border-top:1px solid #e2e8f0;background:#f8faff!important;border-radius:0 0 14px 14px;min-height:auto!important;height:auto!important;position:static!important;box-shadow:none!important}',
-      '#rag-overlay .rag-legal a{color:#1b3a6b!important;font-size:12.5px!important;font-weight:800!important;text-decoration:none!important;padding:8px 12px!important;border-radius:999px!important;background:#fff!important;border:1.5px solid #dbe3ef!important;display:inline-flex!important;align-items:center;line-height:1.2}',
-      '#rag-overlay .rag-legal a:hover{background:#fff8e8!important;border-color:rgba(201,168,76,.55)!important;color:#8a6a18!important}',
+      '#rag-overlay .rag-card{display:flex!important;flex-direction:column!important;max-height:min(94vh,960px)!important;overflow:hidden!important}',
+      '#rag-overlay .rag-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;display:flex;flex-direction:column}',
+      '#rag-overlay .rag-legal{display:block!important;margin-top:0!important;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px))!important;border-top:1px solid rgba(201,168,76,.22);background:#0f172a!important;border-radius:0;min-height:auto!important;height:auto!important;position:relative!important;z-index:5!important;box-shadow:0 -6px 18px rgba(0,0,0,.16)!important;color:rgba(255,255,255,.85);flex:0 0 auto}',
+      '#rag-overlay .rag-legal-title{font-size:10.5px;font-weight:800;color:#c9a84c;letter-spacing:.4px;margin:0 0 6px;text-transform:uppercase}',
+      '#rag-overlay .rag-legal-links{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:5px;margin:0 0 6px}',
+      '#rag-overlay .rag-legal a{color:#e8c96a!important;font-size:11px!important;font-weight:800!important;text-decoration:none!important;padding:5px 8px!important;border-radius:8px!important;background:rgba(255,255,255,.06)!important;border:1px solid rgba(201,168,76,.28)!important;display:inline-flex!important;align-items:center;line-height:1.15}',
+      '#rag-overlay .rag-legal a:hover{background:rgba(201,168,76,.16)!important;border-color:rgba(201,168,76,.55)!important;color:#fff!important}',
+      '#rag-overlay .rag-legal-phones{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:11px;line-height:1.3;text-align:start}',
+      '#rag-overlay .rag-legal-phones > div:last-child{grid-column:1/-1;text-align:center}',
+      '#rag-overlay .rag-legal-phones a{color:rgba(255,255,255,.85)!important;background:transparent!important;border:none!important;padding:0!important;font-weight:700!important;font-size:11px!important}',
+      '#rag-overlay .rag-legal-phones strong{color:#c9a84c}',
       '#rag-overlay .rag-account-card{background:#f8faff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}',
       '#rag-overlay .rag-account-name{font-size:16px;font-weight:800;color:#1b3a6b;margin-bottom:4px}',
       '#rag-overlay .rag-account-meta{font-size:12px;color:#64748b;line-height:1.7}',
@@ -385,7 +394,7 @@
       '  <div class="rag-modal" role="dialog" aria-modal="true" aria-labelledby="rag-title">',
       '    <div class="rag-topbar">',
       '      <button class="rag-back" id="rag-nav-back-btn" type="button"></button>',
-      '      <button class="rag-close" id="rag-close-btn" type="button" aria-label="Close">✕</button>',
+      '      <button class="rag-close" id="rag-close-btn" type="button" aria-label="إغلاق">✕</button>',
       '    </div>',
       '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
       '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
@@ -404,7 +413,7 @@
       '    <div class="rag-step" id="rag-step-choice">',
       '      <div class="rag-choice">',
       '        <div class="rag-choice-card" id="rag-choice-buyer" role="button" tabindex="0">',
-      '          <div class="rag-choice-icon">🛒</div>',
+      '          <div class="rag-choice-icon">👤</div>',
       '          <div><div class="rag-choice-title" id="rag-choice-buyer-title"></div><div class="rag-choice-sub" id="rag-choice-buyer-sub"></div></div>',
       '        </div>',
       '        <div class="rag-choice-card rag-choice-card-accent" id="rag-choice-seller-login" role="button" tabindex="0">',
@@ -412,7 +421,7 @@
       '          <div><div class="rag-choice-title" id="rag-choice-seller-login-title"></div><div class="rag-choice-sub" id="rag-choice-seller-login-sub"></div></div>',
       '        </div>',
       '        <div class="rag-choice-card" id="rag-choice-seller" role="button" tabindex="0">',
-      '          <div class="rag-choice-icon">🏪</div>',
+      '          <div class="rag-choice-icon">🏢</div>',
       '          <div><div class="rag-choice-title" id="rag-choice-seller-title"></div><div class="rag-choice-sub" id="rag-choice-seller-sub"></div></div>',
       '        </div>',
       '      </div>',
@@ -453,12 +462,24 @@
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
-      '    <nav class="rag-legal" id="rag-legal" aria-label="Legal">',
-      '      <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
-      '      <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
-      '      <a id="rag-link-help" href="rizq_help.html"></a>',
-      '    </nav>',
       '    </div>',
+      '    <nav class="rag-legal" id="rag-legal" aria-label="روابط سريعة وتواصل">',
+      '      <div class="rag-legal-title" id="rag-legal-title">روابط سريعة</div>',
+      '      <div class="rag-legal-links">',
+      '        <a id="rag-link-home" href="rizq_landing_v8.html">الرئيسية</a>',
+      '        <a id="rag-link-browse" href="rizq_browse.html">تصفّح</a>',
+      '        <a id="rag-link-help" href="rizq_help.html"></a>',
+      '        <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
+      '        <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
+      '      </div>',
+      '      <div class="rag-legal-title" id="rag-contact-title">تواصل معنا</div>',
+      '      <div class="rag-legal-phones">',
+      '        <div><strong>Mauritel:</strong> <a href="tel:+22244882212" dir="ltr">+222 44 88 22 12</a></div>',
+      '        <div><strong>Mattel:</strong> <a href="tel:+22236485784" dir="ltr">+222 36 48 57 84</a></div>',
+      '        <div><strong>Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr">+222 22 70 83 38</a></div>',
+      '        <div><a href="mailto:direction@rizq.mr">direction@rizq.mr</a></div>',
+      '      </div>',
+      '    </nav>',
       '  </div>',
       '</div>'
     ].join('');
@@ -590,7 +611,21 @@
     ov.style.zIndex = '1000001';
     ov.style.pointerEvents = 'none';
     document.body.classList.add('rizq-reg-open');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = '';
+    try {
+      if (typeof window.RizqEnsureSiteFooter === 'function') window.RizqEnsureSiteFooter();
+      if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
+        window.RizqFooterToggle.setOpen(true);
+      }
+      var siteFooter = document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
+      if (siteFooter) {
+        siteFooter.style.display = 'block';
+        siteFooter.style.visibility = 'visible';
+        siteFooter.style.pointerEvents = 'auto';
+        siteFooter.style.order = '2';
+        siteFooter.style.zIndex = '4';
+      }
+    } catch (eFt) {}
     setTimeout(function () {
       if (ov.classList.contains('open')) ov.style.pointerEvents = 'auto';
     }, 500);
@@ -663,9 +698,17 @@
     var lp = document.getElementById('rag-link-privacy');
     var lt = document.getElementById('rag-link-terms');
     var lh = document.getElementById('rag-link-help');
+    var lhome = document.getElementById('rag-link-home');
+    var lbrowse = document.getElementById('rag-link-browse');
     if (lp) lp.textContent = dict.linkPrivacy;
     if (lt) lt.textContent = dict.linkTerms;
     if (lh) lh.textContent = dict.linkHelp;
+    if (lhome) lhome.textContent = t('الرئيسية', 'Accueil');
+    if (lbrowse) lbrowse.textContent = t('تصفّح', 'Parcourir');
+    var legalTitle = document.getElementById('rag-legal-title');
+    var contactTitle = document.getElementById('rag-contact-title');
+    if (legalTitle) legalTitle.textContent = t('روابط سريعة', 'Liens rapides');
+    if (contactTitle) contactTitle.textContent = t('تواصل معنا', 'Contact');
     document.getElementById('rag-name-err').textContent = dict.errName;
     document.getElementById('rag-phone-err').textContent = dict.errPhone;
     document.getElementById('rag-whatsapp-err').textContent = dict.errWhatsapp;
@@ -1056,6 +1099,8 @@
     }
     rememberAfterAuthHref();
     openRagShell();
+    _modalMode = 'gate';
+    applyTexts('reasonGeneric');
     var dict = d();
     document.getElementById('rag-title').textContent = dict.titleChoice;
     document.getElementById('rag-sub').textContent = dict.subChoice;
@@ -1067,6 +1112,11 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var closeBtn = document.getElementById('rag-close-btn');
+    if (closeBtn) {
+      closeBtn.setAttribute('aria-label', t('إغلاق', 'Fermer'));
+      closeBtn.setAttribute('title', t('إغلاق', 'Fermer'));
+    }
     var l1 = document.getElementById('rag-pstep-1-label');
     var l2 = document.getElementById('rag-pstep-2-label');
     var l3 = document.getElementById('rag-pstep-3-label');
@@ -1111,7 +1161,7 @@
     document.getElementById('rag-wa-same').checked = false;
     document.getElementById('rag-whatsapp').disabled = false;
     document.getElementById('rag-title').textContent = d().titleOtp;
-    document.getElementById('rag-sub').textContent = t('أكّد بريدك قبل إتمام التسجيل كبائع', 'Confirmez votre e-mail avant de finaliser l\'inscription vendeur');
+    document.getElementById('rag-sub').textContent = t('أكّد بريدك قبل إتمام تسجيل حساب الأعمال', 'Confirmez votre e-mail avant de finaliser le compte pro');
     showStep('form');
   }
 

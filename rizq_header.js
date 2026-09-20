@@ -100,6 +100,7 @@
       item('rizq_showroom.html', 'showrooms', '🏬', 'المعارض', 'Showrooms') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
       item('rizq_tenders.html', 'tenders', '📋', 'غرفة المناقصات', 'Appels d\'offres') +
+      item('rizq_investments.html', 'investments', '📈', 'غرفة الاستثمارات', 'Salle des investissements') +
       item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
       item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
       item(aboutHref(), 'about', 'ℹ️', 'من نحن', 'À propos');
@@ -284,9 +285,9 @@
           '<a class="rizq-hdr-item rizq-nav-module" href="rizq_store.html" data-rizq-module="store" data-nav-order="4">' +
             '<span class="rizq-hdr-ico">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores">المحلات</span>' +
           '</a>' +
-          '<button type="button" class="rizq-hdr-item" id="rizq-hdr-assistant" data-nav-order="8">' +
-            '<span class="rizq-hdr-ico">✨</span><span class="rizq-hdr-lbl" data-hdr="ai">رزق ذكي</span>' +
-          '</button>' +
+          '<a class="rizq-hdr-item rizq-nav-module" href="rizq_investments.html" data-rizq-module="investments" data-nav-order="8">' +
+            '<span class="rizq-hdr-ico">📈</span><span class="rizq-hdr-lbl" data-hdr="investments">غرفة الاستثمارات</span>' +
+          '</a>' +
           '<div class="rizq-hdr-more-wrap" id="rizq-hdr-more-wrap" data-nav-order="9">' +
             '<button type="button" class="rizq-hdr-item" id="rizq-hdr-more" aria-haspopup="true" aria-expanded="false">' +
               '<span class="rizq-hdr-ico">⋯</span><span class="rizq-hdr-lbl" data-hdr="more">المزيد</span>' +
@@ -302,6 +303,7 @@
     cats: ['hdr-cats', 'nav-cats'],
     post: ['hdr-post', 'nav-post'],
     ai: ['hdr-ai', 'nav-assistant'],
+    investments: ['hdr-investments', 'nav-investments'],
     more: ['hdr-more', 'nav-more'],
     stores: ['hdr-stores', 'dd-stores', 'nav-stores'],
     offices: ['hdr-offices', 'dd-offices', 'nav-offices'],
@@ -352,6 +354,7 @@
       showrooms: t2('المعارض', 'Showrooms'),
       ads: t2('الإعلانات', 'Annonces'),
       tenders: t2('غرفة المناقصات', 'Appels d\'offres'),
+      investments: t2('غرفة الاستثمارات', 'Salle des investissements'),
       packs: t2('الباقات', 'Forfaits'),
       legal: t2('المواد القانونية', 'Mentions légales'),
       about: t2('من نحن', 'À propos'),
@@ -413,6 +416,7 @@
     rizq_showroom_directory: 'showrooms',
     rizq_corp: 'showrooms',
     rizq_tenders: 'tenders',
+    rizq_investments: 'investments',
     rizq_legal: 'legal',
     rizq_ads_info: 'ads'
   };
@@ -756,7 +760,7 @@
           '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</a></li>' +
           '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + t2('المحلات', 'Boutiques') + '</a></li>' +
-          '<li data-nav-order="8"><button type="button" class="nav-link-btn" id="rizq-desk-assistant" data-hdr="ai">' + t2('✨ رزق ذكي', '✨ Rizq IA') + '</button></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="rizq_investments.html" data-hdr="investments">' + t2('غرفة الاستثمارات', 'Salle des investissements') + '</a></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +

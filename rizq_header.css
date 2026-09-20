@@ -388,6 +388,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   #rizq-app-header{display:none !important}
 }
 
+/* Tablet two-row nav is defined AFTER the desktop grid block below
+   so it can override display:grid / height:70px. */
+
 /* ════════════ DESKTOP ≥769px — original page header ════════════ */
 @media (min-width:769px) and (min-height:501px){
   #rizq-app-header,
@@ -885,6 +888,99 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav aside.sidebar{
     top:0 !important;
     height:100% !important;
+  }
+}
+
+/* ════════════ TABLET 769–1100: two-row nav — ALL buttons visible ════════════
+   Must come AFTER desktop grid (height:70 / 3-col) so it overrides.
+   الصفحة الرئيسية كما كانت قبل محاذاة الصف الواحد. */
+@media (min-width:769px) and (max-width:1100px) and (min-height:501px){
+  html.rizq-app-nav #nav,
+  html.rizq-app-nav #rizq-desk-nav{
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    grid-template-rows:auto auto !important;
+    height:auto !important;
+    max-height:none !important;
+    min-height:70px !important;
+    align-items:center !important;
+    row-gap:2px !important;
+    column-gap:8px !important;
+    padding-block:8px !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav #nav > .nav-start,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    justify-self:start !important;
+    min-width:0 !important;
+  }
+  html.rizq-app-nav #nav > .logo,
+  html.rizq-app-nav #rizq-desk-nav > .logo{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    justify-self:end !important;
+    margin:0 !important;
+  }
+  html.rizq-app-nav #nav > .nav-sticky-tools,
+  html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools{
+    display:none !important;
+  }
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    justify-self:stretch !important;
+    width:100% !important;
+    max-width:100% !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:2px 4px !important;
+    overflow:visible !important;
+    min-width:0 !important;
+    padding:4px 0 2px !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li,
+  html.rizq-app-nav #nav .nav-center > li[data-nav-order="1"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="1"],
+  html.rizq-app-nav #nav .nav-center > li[data-nav-order="8"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="8"],
+  html.rizq-app-nav #nav .nav-center li[data-rizq-module],
+  html.rizq-app-nav #rizq-desk-nav .nav-center li[data-rizq-module]{
+    display:list-item !important;
+    visibility:visible !important;
+    flex:0 0 auto !important;
+  }
+  html.rizq-app-nav #nav .nav-center a,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    padding:5px 7px !important;
+    font-size:11.5px !important;
+    white-space:nowrap !important;
+  }
+  html.rizq-app-nav #nav .nav-fav-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{
+    display:inline !important;
+  }
+  /* content clearance under taller tablet header — دون صفحات التسجيل */
+  html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
+  html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
+    padding-top:118px !important;
+  }
+  html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
+    padding-top:118px !important;
+  }
+  html.rizq-app-nav body.rizq-reg-open,
+  html.rizq-reg-page body,
+  html.rizq-app-nav.rizq-reg-page body,
+  html.rizq-app-nav.has-rizq-desk-nav.rizq-reg-page body,
+  html.rizq-app-nav.has-rizq-desk-nav body.rizq-reg-open{
+    padding-top:0 !important;
   }
 }
 
@@ -1610,3 +1706,14 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
 }
 
 .nav-dd-ads strong{color:#E8C96A !important}
+
+/* إخفاء رزق ذكي من الشريط — الودجت العائم يكفي */
+html.rizq-app-nav #nav-assistant-btn,
+html.rizq-app-nav #rizq-desk-assistant,
+html.rizq-app-nav #rizq-hdr-assistant,
+html.rizq-app-nav li:has(>#nav-assistant-btn),
+html.rizq-app-nav li:has(>#rizq-desk-assistant),
+#jump-assistant,
+#mbn-assistant{
+  display:none !important;
+}

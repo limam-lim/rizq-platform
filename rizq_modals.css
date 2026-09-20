@@ -449,15 +449,34 @@ body.rizq-dash .cs-modal-input {
   line-height: 1.65 !important;
 }
 
+/* Guest auth gate — light sheet (matches rizq_auth_gate.js injectStyle).
+   Keep selectors scoped so dark-theme leftovers cannot hide close/back/legal. */
 .rag-modal .rag-close {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #fff !important;
-  border: 1px solid rgba(201, 168, 76, 0.2) !important;
+  background: #fff !important;
+  color: #0f2347 !important;
+  border: 2px solid #94a3b8 !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
 }
 
 .rag-modal .rag-close:hover {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(201, 168, 76, 0.45) !important;
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+#rag-overlay .rag-back,
+.rag-modal .rag-back {
+  background: #0f2347 !important;
+  color: #e8c96a !important;
+  border: 2px solid #c9a84c !important;
+}
+
+#rag-overlay .rag-legal a,
+.rag-modal .rag-legal a {
+  color: #0f2347 !important;
+  background: #fff !important;
+  border: 1.5px solid #cbd5e1 !important;
 }
 
 /* ── Full-screen ad modals (no top artifact bar) ── */

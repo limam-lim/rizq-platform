@@ -277,12 +277,10 @@
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
       '#pricing': fr ? 'Forfaits' : 'الباقات',
-      '#jump-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي'
+      invest: fr ? 'Salle des investissements' : 'غرفة الاستثمارات'
     };
     Object.keys(jumpLabels).forEach(function (sel) {
-      var el = sel === '#jump-assistant'
-        ? document.getElementById('jump-assistant')
-        : document.querySelector('[data-jump="' + sel + '"]');
+      var el = document.querySelector('[data-jump="' + sel + '"]');
       if (el) el.textContent = jumpLabels[sel];
     });
     if (bottomNav) {
@@ -290,7 +288,7 @@
         'mbn-home': fr ? 'Accueil' : 'الرئيسية',
         'mbn-cats': fr ? 'Sections' : 'الأقسام',
         'mbn-post': fr ? 'Publier' : 'نشر',
-        'mbn-assistant': fr ? '✨ Rizq IA' : '✨ رزق ذكي',
+        'mbn-invest': fr ? 'Investir' : 'استثمار',
         'mbn-more': fr ? 'Plus' : 'المزيد'
       };
       Object.keys(mbn).forEach(function (id) {

@@ -5279,12 +5279,18 @@ function renderTendersModPanel(){
         var bids = Array.isArray(t.bids) ? t.bids : [];
         var removed = t.status === 'removed';
         var pending = t.status === 'pending_review';
+        var provisional = t.status === 'provisionally_approved' || !!t.provisionalAutoApproved;
         var rejected = t.status === 'rejected';
         var created = t.createdAt ? new Date(t.createdAt).toLocaleDateString(_modLoc) : '';
+        var tierBadge = '';
+        if (t.provisionalTier === 'green') tierBadge = ' <span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px">🟢 '+RizqI18n.t2('مبدئي','Provisoire')+'</span>';
+        else if (t.provisionalTier === 'yellow') tierBadge = ' <span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px">🟡 '+RizqI18n.t2('لبس','Ambigu')+'</span>';
+        else if (t.provisionalTier === 'red') tierBadge = ' <span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px">🔴 '+RizqI18n.t2('شبهة','Suspect')+'</span>';
         var statusBadge = pending
           ? ' <span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px">⏳ '+RizqI18n.t2('قيد المراجعة','En révision')+'</span>'
+          : (provisional ? ' <span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px">✅ '+RizqI18n.t2('موافقة مبدئية (الوكيل)','Approbation provisoire (agent)')+'</span>'
           : (rejected ? ' <span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px">❌ '+RizqI18n.t2('مرفوضة','Refusée')+'</span>'
-          : (t.status==='open' ? ' <span style="font-size:11px;font-weight:700;color:#065f46">✅ '+RizqI18n.t2('منشورة','Publiée')+'</span>' : ''));
+          : (t.status==='open' ? ' <span style="font-size:11px;font-weight:700;color:#065f46">✅ '+RizqI18n.t2('منشورة','Publiée')+'</span>' : '')));
         var bidsHtml = bids.length
           ? bids.map(function(b){
               return '<div style="padding:6px 10px;background:#f7f9fc;border-radius:8px;margin-top:5px;font-size:12px">'
@@ -5295,17 +5301,18 @@ function renderTendersModPanel(){
             }).join('')
           : '<p style="font-size:11.5px;color:#9ca3af;margin-top:4px">'+RizqI18n.t2('لا عروض بعد','Aucune offre')+'</p>';
         var actions = removed ? '' : (
-          (pending ? '<button onclick="approveTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">✅ '+RizqI18n.t2('موافقة','Approuver')+'</button>' : '')
-          + ((pending || rejected) ? '<button onclick="rejectTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">❌ '+RizqI18n.t2('رفض','Refuser')+'</button>' : '')
+          ((pending || provisional) ? '<button onclick="approveTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">✅ '+RizqI18n.t2(provisional?'تأكيد نهائي':'موافقة', provisional?'Confirmer':'Approuver')+'</button>' : '')
+          + ((pending || provisional || rejected) ? '<button onclick="rejectTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">❌ '+RizqI18n.t2('رفض','Refuser')+'</button>' : '')
           + '<button onclick="removeTenderAdmin(\''+t.id+'\')" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🗑️ '+RizqI18n.t2('إزالة','Retirer')+'</button>'
         );
         return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(27,58,107,.06)'+(removed?';opacity:.55':'')+'">'
           + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
-          +   '<div style="font-size:14px;font-weight:700;color:#1a2535">'+escHtml(t.title||'')+statusBadge+(removed?' <span style="font-size:11px;font-weight:700;color:#dc2626">('+RizqI18n.t2('محذوفة','Retirée')+')</span>':'')+'</div>'
+          +   '<div style="font-size:14px;font-weight:700;color:#1a2535">'+escHtml(t.title||'')+statusBadge+tierBadge+(removed?' <span style="font-size:11px;font-weight:700;color:#dc2626">('+RizqI18n.t2('محذوفة','Retirée')+')</span>':'')+'</div>'
           +   '<div style="display:flex;gap:6px;flex-wrap:wrap">'+actions+'</div>'
           + '</div>'
           + '<div style="font-size:11.5px;color:#2C3A4F;margin-bottom:8px">'+escHtml(t.ownerName||t.ownerId||'')+' · '+created+' · '+bids.length+' '+RizqI18n.t2('عرض','offre(s)')+'</div>'
           + (t.desc ? '<p style="font-size:12px;color:#64748b;margin:0 0 8px;line-height:1.6">'+escHtml(String(t.desc).slice(0,220))+(String(t.desc).length>220?'…':'')+'</p>' : '')
+          + (Array.isArray(t.provisionalReasons) && t.provisionalReasons.length ? '<p style="font-size:11px;color:#64748b;margin:0 0 8px">'+RizqI18n.t2('أسباب الوكيل:','Motifs agent :')+' '+escHtml(t.provisionalReasons.join(' · '))+'</p>' : '')
           + (t.rejectReason ? '<p style="font-size:11.5px;color:#b91c1c;margin:0 0 8px">'+RizqI18n.t2('سبب الرفض:','Motif du refus :')+' '+escHtml(t.rejectReason)+'</p>' : '')
           + (t.document ? '<div style="margin:6px 0 8px"><button type="button" onclick="downloadTenderDocAdmin(\''+t.id+'\')" style="padding:5px 12px;background:#eff6ff;color:#1B3A6B;border:1px solid #93c5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📄 '+RizqI18n.t2('مراجعة PDF','Voir PDF')+'</button></div>' : '')
           + ((Array.isArray(t.images) && t.images.length) ? '<div style="margin:6px 0 8px;font-size:11.5px;color:#64748b">📷 '+t.images.length+' '+RizqI18n.t2('صورة مرجعية','photo(s) de référence')+'</div>' : '')
@@ -6409,7 +6416,16 @@ function renderSubRequests(){
         clear:  {c:'#059669', t:RizqI18n.t2('🟢 سليم','🟢 Conforme')},
         unreviewed: {c:'#9ca3af', t:RizqI18n.t2('⏸️ الوكيل متوقف','⏸️ Agent arrêté')},
       };
+      var tierMap = {
+        green:  {c:'#059669', t:RizqI18n.t2('🟢 موافقة مبدئية','🟢 Approbation provisoire')},
+        yellow: {c:'#f59e0b', t:RizqI18n.t2('🟡 لبس — بانتظارك','🟡 Ambigu — en attente')},
+        red:    {c:'#ef4444', t:RizqI18n.t2('🔴 شبهة — بانتظارك','🔴 Suspect — en attente')},
+      };
       var risk = riskMap[r.riskLevel] || null;
+      var tier = tierMap[r.provisionalTier] || null;
+      if (r.provisionalAutoApproved || (r.status === 'approved' && r.reviewedVia === 'agent_provisional')) {
+        tier = {c:'#059669', t:RizqI18n.t2('🟢 مُفعَّل مبدئياً (الوكيل)','🟢 Activé provisoirement (agent)')};
+      }
       var flagsHtml = (r.flags||[]).map(function(f){ return '<div style="font-size:10.5px;color:#2C3A4F">• '+escapeHtml(f.msg)+'</div>'; }).join('');
       var aiHtml = r.aiAnalysis
         ? '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #e5e7eb;font-size:10.5px;color:#4b5563">🤖 '+
@@ -6418,8 +6434,8 @@ function renderSubRequests(){
           (r.aiAnalysis.bankOrOperator?escapeHtml(r.aiAnalysis.bankOrOperator):'') +
           '</div>' + (r.aiAnalysis.notes||[]).map(function(n){return '<div style="font-size:10px;color:#9ca3af">↳ '+escapeHtml(n)+'</div>';}).join('')
         : (r.receiptImage && r.status==='pending' ? '<button onclick="aiVerifyReceipt(\''+r.id+'\',this)" style="margin-top:4px;font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #c7d2fe;background:#eef2ff;color:#4338ca;cursor:pointer;font-family:inherit">🤖 '+RizqI18n.t2('تحقق بالذكاء الاصطناعي','Vérifier par IA')+'</button>' : '');
-      var analysisCell = risk
-        ? '<div style="font-weight:700;font-size:11.5px;color:'+risk.c+'">'+risk.t+'</div>'+flagsHtml+aiHtml
+      var analysisCell = (tier || risk)
+        ? '<div style="font-weight:700;font-size:11.5px;color:'+(tier||risk).c+'">'+(tier||risk).t+'</div>'+(risk && tier ? '<div style="font-size:10px;color:'+risk.c+';margin-top:2px">'+risk.t+'</div>' : '')+flagsHtml+aiHtml
         : '<span style="color:#9aa7bd;font-size:11px">—</span>'+aiHtml;
       var videoBadge = r.category==='video'
         ? '<div style="margin-top:3px"><span style="background:#ede9fe;color:#6d28d9;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px">🎬 Rizq ADS</span></div>' +

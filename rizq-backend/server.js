@@ -133,12 +133,19 @@ function getSectionRules() {
 
 // ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
 // (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-// مرفقات المناقصات — لا تُخدم مباشرة؛ فقط عبر /api/tenders/:id/document|images
+// مرفقات المناقصات والاستثمارات — لا تُخدم مباشرة عبر static
 app.use('/uploads/tenders', (req, res) => {
   res.status(403).json({
     error: 'tender_assets_forbidden',
     msg: 'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
     msg_fr: 'Pièces jointes protégées — abonnement requis',
+  });
+});
+app.use('/uploads/investments', (req, res) => {
+  res.status(403).json({
+    error: 'investment_assets_forbidden',
+    msg: 'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
+    msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
   });
 });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -671,9 +678,11 @@ const {
   saveCatalogImages,
   saveCatalogImage,
   saveTenderImages,
+  saveInvestmentImages,
 } = require('./services/imagePipeline');
 const {
   saveTenderDocument,
+  saveInvestmentDocument,
   resolveTenderDocumentAbsPath,
   resolveTenderUploadAbsPath,
   extractPdfTextFromDataUri,
@@ -1614,6 +1623,9 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     // هنا — idImage لا يظهر أبداً في ACCOUNT_PUBLIC_FIELDS (خاص بصاحب
     // الحساب + الأدمن فقط، مثل الهاتف/الإيميل تماماً).
     nni,
+    foreignId: String(b.foreignId || b.foreign_id || '').slice(0, 40),
+    nationality: String(b.nationality || '').slice(0, 20),
+    nationalityCountry: String(b.nationalityCountry || b.nationality_country || '').slice(0, 60),
     // الحد 8 ملايين حرف (~5.8MB ثنائي بعد فك base64) لأن واجهة الرفع تعرض
     // "حجم أقصى 5MB" فعلياً — حد thumb (2M) أضيق بكثير وكان سيقصّ صورة
     // هوية حقيقية بحجمها الطبيعي فتفسدها (base64 يُضخّم الحجم ~37%).
@@ -2358,19 +2370,22 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   }
   res.json({ ok: true, id });
 
-  // إشعار Telegram + تحليل Claude Vision — غير متزامن (لا يُبطئ رد العميل)
+  // تحليل الوصل + موافقة مبدئية (أخضر) أو تعليق — ثم Telegram إن وُجد
   setImmediate(() => {
     try {
       const { getTelegramDeps } = require('./services/telegramDeps');
       const { processNewSubRequest } = require('./services/telegramAdmin');
-      const deps = getTelegramDeps();
-      if (deps) {
-        processNewSubRequest(id, deps).catch((err) => {
-          console.warn('[sub-requests] telegram pipeline:', err.message);
-        });
-      }
+      const deps = getTelegramDeps() || {
+        readSubRequests,
+        writeSubRequests,
+        anthropic,
+        readAccounts,
+      };
+      processNewSubRequest(id, deps).catch((err) => {
+        console.warn('[sub-requests] provisional pipeline:', err.message);
+      });
     } catch (pipeErr) {
-      console.warn('[sub-requests] telegram pipeline init:', pipeErr.message);
+      console.warn('[sub-requests] provisional pipeline init:', pipeErr.message);
     }
   });
 });
@@ -2504,7 +2519,7 @@ app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
     const pendingAds = readAds().filter((a) => a.status === 'pending');
     const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
     const pendingBizContacts = readJson(ADS_REQUESTS_FILE, []).filter((r) => r.status === 'pending_contact');
-    const pendingTenders = readTenders().filter((t) => t.status === 'pending');
+    const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
 
     const pkgRecords = getAllAccountPackageRecords();
     const expiringSoon = [];
@@ -2687,7 +2702,8 @@ function resolveTenderOwnerContacts(t) {
 }
 
 function isTenderPubliclyOpen(t) {
-  if (!t || t.status !== 'open') return false;
+  if (!t) return false;
+  if (t.status !== 'open' && t.status !== 'provisionally_approved') return false;
   const deadlineMs = new Date(t.deadline).getTime();
   return !Number.isNaN(deadlineMs) && deadlineMs > Date.now();
 }
@@ -2738,8 +2754,11 @@ function toPublicTender(t, access, viewerId) {
     ownerId: t.ownerId || null,
     createdAt: t.createdAt,
     status: t.status || 'open',
+    provisionalTier: t.provisionalTier || null,
+    provisionalLabelAr: t.provisionalLabelAr || null,
+    provisionalAutoApproved: !!t.provisionalAutoApproved,
     bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && t.status === 'open',
+    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && (t.status === 'open' || t.status === 'provisionally_approved'),
     contactsLocked: !contactsUnlocked,
     ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
     ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
@@ -2947,7 +2966,7 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
   }
   const tenderId = genTenderId();
-  const tender = {
+  const tenderDraft = {
     id: tenderId,
     ownerId: acc.id,
     ownerName: acc.name || '',
@@ -2965,31 +2984,54 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     images: await saveTenderImages(tenderId, b.images),
     document: await saveTenderDocument(tenderId, b.document),
     documentName: b.document ? String(b.documentName || 'tender-document.pdf').slice(0, 120) : null,
-    status: 'pending_review',
     createdAt: new Date().toISOString(),
     bids: [],
   };
+  const { scoreTender, shouldAutoApprove } = require('./services/provisionalTier');
+  const score = scoreTender(tenderDraft);
+  const auto = shouldAutoApprove(score.provisionalTier);
+  const tender = Object.assign({}, tenderDraft, {
+    status: auto ? 'provisionally_approved' : 'pending_review',
+    provisionalTier: score.provisionalTier,
+    provisionalLabelAr: score.provisionalLabelAr,
+    provisionalLabelFr: score.provisionalLabelFr,
+    provisionalReasons: score.provisionalReasons,
+    provisionalAt: score.provisionalAt,
+    provisionalBy: score.provisionalBy,
+    provisionalAutoApproved: auto,
+    approvedAt: auto ? new Date().toISOString() : null,
+    approvedBy: auto ? 'tenders_agent' : null,
+  });
   const list = readTenders();
   list.unshift(tender);
   writeTenders(list);
   setImmediate(() => {
     try {
       const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
+      const tierEmoji = score.provisionalTier === 'green' ? '🟢' : (score.provisionalTier === 'yellow' ? '🟡' : '🔴');
+      const reason = auto
+        ? (tierEmoji + ' مناقصة «' + tender.title + '» — موافقة مبدئية تلقائية من وكيل المناقصات (قابلة للنقض)')
+        : (tierEmoji + ' مناقصة «' + tender.title + '» — معلّقة بانتظارك (' + (score.provisionalLabelAr || score.provisionalTier) + ')');
       sendTelegramAdminNotification({
         leadId: tender.id,
         businessName: tender.ownerName,
         whatsapp: acc.phone || acc.whatsapp || '',
         package: tender.category || 'غرفة المناقصات',
-        reason: 'مناقصة جديدة — «' + tender.title + '» — بانتظار مراجعة الأدمن',
+        reason,
         channel: 'tender_review',
       }).catch((err) => console.warn('[tenders/post] telegram:', err && err.message));
     } catch (e) { /* telegram optional */ }
   });
   res.json({
     ok: true,
-    pendingReview: true,
+    pendingReview: !auto,
+    provisionalTier: score.provisionalTier,
+    provisionalLabel: score.provisionalLabelAr,
+    autoApproved: auto,
     tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
-    msg: 'تم استلام مناقصتك — ستُنشر بعد مراجعة فريق رزق.',
+    msg: auto
+      ? 'موافقة مبدئية من وكيل المناقصات — نُشرت بصفة مبدئية (قابلة للمراجعة).'
+      : 'تم استلام مناقصتك — معلّقة بانتظار مراجعة Limam (لبس أو شبهة).',
   });
   } catch (err) {
     console.error('[tenders/post] upload pipeline:', err.message);
@@ -3247,6 +3289,111 @@ app.get('/api/tenders/:id', (req, res) => {
   });
 });
 
+// ── غرفة الاستثمارات ──────────────────────────────────────────────
+const investmentRoom = require('./services/investmentRoom');
+const investmentPlanLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_requests' },
+});
+const investmentSubmitLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_requests' },
+});
+
+/** POST /api/investments/plan — وكيل المراجعة الأوّلية (JSON plan) */
+app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
+  try {
+    const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
+    res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
+  } catch (err) {
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
+  }
+});
+
+/** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
+app.get('/api/investments', (req, res) => {
+  try {
+    res.json(investmentRoom.listPublic({ unlockContacts: false }));
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'list_failed' });
+  }
+});
+
+/** POST /api/investments/submit — إيداع فرصة + موافقة مبدئية عند الأخضر */
+app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
+  try {
+    const out = await investmentRoom.submitOpportunity(req.body || {});
+    res.json(out);
+  } catch (err) {
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'submit_failed' });
+  }
+});
+
+/** GET /api/admin/investments — قائمة كاملة للأدمن (بما فيها المعلّقة) */
+app.get('/api/admin/investments', requireAdminAuth, (req, res) => {
+  try {
+    res.json(investmentRoom.listAdmin({
+      status: req.query.status || null,
+      tier: req.query.tier || null,
+    }));
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'list_failed' });
+  }
+});
+
+/** POST /api/admin/investments/:id/decision — نقض/تأكيد الموافقة المبدئية */
+app.post('/api/admin/investments/:id/decision', requireAdminAuth, (req, res) => {
+  try {
+    const action = (req.body && req.body.action) || '';
+    const reviewer = (req.adminUser && (req.adminUser.name || req.adminUser.user)) || 'admin';
+    const out = investmentRoom.decideOpportunity(req.params.id, action, reviewer);
+    res.json(out);
+  } catch (err) {
+    const status = err.status && err.status >= 400 ? err.status : 500;
+    res.status(status).json({ ok: false, error: err.message || 'decision_failed' });
+  }
+});
+
+/** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
+app.get('/api/admin/investments/daily-report', requireAdminAuth, (req, res) => {
+  try {
+    const digest = investmentRoom.buildDailyDigest();
+    res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'digest_failed' });
+  }
+});
+
+/** POST /api/admin/investments/send-ops-report — إرسال التقرير للبريد التشغيلي الخاص */
+app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req, res) => {
+  try {
+    const result = await investmentRoom.sendOpsDailyReport();
+    res.json({
+      ok: !!result.ok,
+      skipped: !!result.skipped,
+      reason: result.reason || null,
+      error: result.error || null,
+      summary: result.digest ? {
+        plansRequested: result.digest.plansRequested,
+        opportunitiesSubmitted: result.digest.opportunitiesSubmitted,
+        pendingReview: result.digest.pendingReview,
+        autoProvisionallyApproved: result.digest.autoProvisionallyApproved,
+        tiers: result.digest.tiers,
+      } : null,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'send_failed' });
+  }
+});
+
 /**
  * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
  */
@@ -3291,6 +3438,8 @@ app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (r
   list[idx].status = 'open';
   list[idx].approvedAt = new Date().toISOString();
   list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
+  list[idx].humanOverride = true;
+  list[idx].provisionalAutoApproved = false;
   writeTenders(list);
   res.json({ ok: true, tender: list[idx] });
 });
@@ -4718,6 +4867,14 @@ app.listen(PORT, async () => {
   setInterval(function () {
     autoRefreshCurrencyRatesIfStale().catch(function () {});
   }, CURRENCY_AUTO_REFRESH_MS);
+  try {
+    const invSched = investmentRoom.startDailyOpsScheduler();
+    if (invSched && invSched.started) {
+      console.log('[investments] daily ops report scheduler started');
+    }
+  } catch (e) {
+    console.warn('[investments] scheduler:', e && e.message);
+  }
 });
 
 process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });
