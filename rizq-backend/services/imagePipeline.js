@@ -1,9 +1,10 @@
 /**
  * Safe Image Upload Pipeline — magic bytes + sharp WebP + EXIF strip
+ * يحفظ عبر objectStorage (محلي الآن / S3 لاحقاً) دون ربط API بمسارات القرص.
  */
-const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+const objectStorage = require('../lib/objectStorage');
 
 const MAX_INPUT_BYTES = 3 * 1024 * 1024;
 const DATA_URI_RE = /^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i;
@@ -39,50 +40,64 @@ function parseDataUriImage(dataUri) {
   return { buf, detected };
 }
 
-/** Re-encode to WebP; auto-rotate strips EXIF orientation then output has no EXIF. */
-async function processBufferToWebp(buf, outPath) {
-  await sharp(buf, { failOn: 'error', limitInputPixels: 4096 * 4096 })
+/** Re-encode to WebP buffer; auto-rotate strips EXIF. */
+async function processBufferToWebpBuffer(buf) {
+  return sharp(buf, { failOn: 'error', limitInputPixels: 4096 * 4096 })
     .rotate()
     .webp({ quality: WEBP_QUALITY, effort: 4 })
-    .toFile(outPath);
+    .toBuffer();
+}
+
+/** @deprecated تفضيل processBufferToWebpBuffer + objectStorage.putObject */
+async function processBufferToWebp(buf, outPath) {
+  const webp = await processBufferToWebpBuffer(buf);
+  const key = path.relative(objectStorage.LOCAL_ROOT, outPath).replace(/\\/g, '/');
+  await objectStorage.putObject({ key, buffer: webp, contentType: 'image/webp' });
 }
 
 /**
  * Save array of data-URI images (or keep existing /uploads/ paths).
  * @param {object} opts
- * @param {string} opts.uploadUrlPrefix e.g. '/uploads/ads/'
- * @param {string} opts.uploadsDir absolute dir
+ * @param {string} opts.namespace e.g. 'ads' | 'catalog' | 'tenders' | 'investments'
+ * @param {string} [opts.uploadUrlPrefix] legacy — يُشتق من namespace إن غاب
+ * @param {string} [opts.uploadsDir] ignored (تجريد التخزين)
  * @param {string} opts.entityId
  * @param {string[]} opts.images
  * @param {number} opts.maxCount
  */
-async function saveProcessedImages({ uploadUrlPrefix, uploadsDir, entityId, images, maxCount }) {
+async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, images, maxCount }) {
   if (!Array.isArray(images) || !images.length) return [];
-  const dir = path.join(uploadsDir, entityId);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const ns = String(namespace || '').replace(/^\/+|\/+$/g, '')
+    || String(uploadUrlPrefix || '').replace(/^\/?uploads\/?/, '').replace(/\/+$/, '')
+    || 'misc';
+  const prefix = '/uploads/' + ns + '/';
   const urls = [];
   const slice = images.slice(0, maxCount);
   for (let i = 0; i < slice.length; i++) {
     const img = slice[i];
     if (typeof img !== 'string') continue;
-    if (img.indexOf(uploadUrlPrefix) === 0) {
+    if (img.indexOf(prefix) === 0 || (uploadUrlPrefix && img.indexOf(uploadUrlPrefix) === 0)) {
       urls.push(img);
       continue;
     }
     const parsed = parseDataUriImage(img);
     if (!parsed || parsed.error) continue;
     const filename = i + '.webp';
-    const outPath = path.join(dir, filename);
-    await processBufferToWebp(parsed.buf, outPath);
-    urls.push(uploadUrlPrefix + entityId + '/' + filename);
+    const key = ns + '/' + entityId + '/' + filename;
+    const webp = await processBufferToWebpBuffer(parsed.buf);
+    const saved = await objectStorage.putObject({
+      key,
+      buffer: webp,
+      contentType: 'image/webp',
+    });
+    urls.push(saved.url);
   }
   return urls;
 }
 
 async function saveAdImages(adId, images) {
   return saveProcessedImages({
-    uploadUrlPrefix: '/uploads/ads/',
-    uploadsDir: path.join(__dirname, '..', 'uploads', 'ads'),
+    namespace: 'ads',
     entityId: adId,
     images,
     maxCount: 8,
@@ -91,8 +106,7 @@ async function saveAdImages(adId, images) {
 
 async function saveCatalogImages(itemId, images) {
   return saveProcessedImages({
-    uploadUrlPrefix: '/uploads/catalog/',
-    uploadsDir: path.join(__dirname, '..', 'uploads', 'catalog'),
+    namespace: 'catalog',
     entityId: itemId,
     images,
     maxCount: 8,
@@ -106,8 +120,7 @@ async function saveCatalogImage(itemId, image) {
 
 async function saveTenderImages(tenderId, images) {
   return saveProcessedImages({
-    uploadUrlPrefix: '/uploads/tenders/',
-    uploadsDir: path.join(__dirname, '..', 'uploads', 'tenders'),
+    namespace: 'tenders',
     entityId: tenderId,
     images,
     maxCount: 3,
@@ -116,8 +129,7 @@ async function saveTenderImages(tenderId, images) {
 
 async function saveInvestmentImages(invId, images) {
   return saveProcessedImages({
-    uploadUrlPrefix: '/uploads/investments/',
-    uploadsDir: path.join(__dirname, '..', 'uploads', 'investments'),
+    namespace: 'investments',
     entityId: invId,
     images,
     maxCount: 3,
@@ -128,6 +140,7 @@ module.exports = {
   detectImageMagic,
   parseDataUriImage,
   processBufferToWebp,
+  processBufferToWebpBuffer,
   saveProcessedImages,
   saveAdImages,
   saveCatalogImages,

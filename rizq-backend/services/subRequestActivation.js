@@ -1,14 +1,13 @@
 'use strict';
 
-const fs = require('fs');
 const {
   findCatalogPackage,
   isDiamondPackageRef,
   isTrialPackage,
   readSiteConfigRaw,
   resolvePackageBoostDays,
-  SITE_CONFIG_FILE,
 } = require('./catalogConfig');
+const repos = require('../db/repos');
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
@@ -75,7 +74,7 @@ function activateVideoAdOnServer(req) {
   videoAds[target] = list.slice(0, 50);
 
   const next = Object.assign({}, cfg, { videoAds });
-  fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(next, null, 2), 'utf8');
+  repos.saveSiteConfig(next);
   return { ok: true, slot: target };
 }
 

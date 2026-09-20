@@ -1,12 +1,11 @@
 /**
  * OTP — إرسال/تحقق رمز الهاتف (+ البريد للمشتري)
+ * التخزين عبر طبقة repos (SQLite) — بلا JSON تشغيلي.
  */
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const { sendSMS } = require('../rizq_package_lifecycle_agent');
+const repos = require('../db/repos');
 
-const FILE = path.join(__dirname, '..', 'data', 'otp-store.json');
 const TTL_MS = 5 * 60 * 1000;
 const VERIFY_WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
@@ -68,18 +67,11 @@ function isDemoOtpAllowed() {
 }
 
 function readStore() {
-  try {
-    if (!fs.existsSync(FILE)) return [];
-    return JSON.parse(fs.readFileSync(FILE, 'utf8'));
-  } catch (e) {
-    return [];
-  }
+  return repos.listOtp();
 }
 
 function writeStore(list) {
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf8');
+  repos.replaceOtpStore(Array.isArray(list) ? list : []);
 }
 
 function normalizePhone(phone) {

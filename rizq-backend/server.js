@@ -11,6 +11,7 @@ const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentM
 ensureAnthropicEnv();
 // ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
+const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
@@ -91,7 +92,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
 const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
 function getModuleFlags() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
 }
 
@@ -105,7 +106,7 @@ const DEFAULT_PLATFORM_FLAGS = {
   sessionTimeoutMin: 60,
 };
 function getPlatformFlags() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   return Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
 }
 
@@ -123,7 +124,7 @@ const DEFAULT_SECTION_RULES = {
   videoAds:    { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب مفتوح أصلاً (فرد/محل) — مراجعة الفيديو قبل النشر العام' },
 };
 function getSectionRules() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   const stored = (cfg.sectionRules && typeof cfg.sectionRules === 'object') ? cfg.sectionRules : {};
   const out = {};
   Object.keys(DEFAULT_SECTION_RULES).forEach((key) => {
@@ -816,7 +817,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
 app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   cfg.moduleFlags = getModuleFlags();
   cfg.sectionRules = getSectionRules();
   cfg.otp = getPublicOtpConfig();
@@ -843,7 +844,7 @@ const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني ك�
  */
 app.post('/api/site-config', requireAdminAuth, (req, res) => {
   const body = req.body || {};
-  const current = readJson(SITE_CONFIG_FILE, {});
+  const current = repos.getSiteConfig();
   const next = Object.assign({}, current);
 
   if (body.promoVideo && typeof body.promoVideo === 'object') {
@@ -1173,7 +1174,7 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
     };
   }
 
-  writeJson(SITE_CONFIG_FILE, next);
+  repos.saveSiteConfig(next);
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -1191,7 +1192,7 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
  */
 app.post('/api/currency-rates/refresh', requireAdminAuth, async (req, res) => {
   try {
-    const current = readJson(SITE_CONFIG_FILE, {});
+    const current = repos.getSiteConfig();
     const existing = (current.prices && current.prices.currencies) || [];
     const result = await refreshCurrencyRates(existing, { onlyEnabled: true });
     const next = Object.assign({}, current);
@@ -1202,7 +1203,7 @@ app.post('/api/currency-rates/refresh', requireAdminAuth, async (req, res) => {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    writeJson(SITE_CONFIG_FILE, next);
+    repos.saveSiteConfig(next);
     res.json({ ok: true, currencies: result.currencies, errors: result.errors, updatedAt: result.updatedAt, config: next });
   } catch (err) {
     console.error('[currency-rates] refresh failed:', err.message);
@@ -1216,7 +1217,7 @@ async function autoRefreshCurrencyRatesIfStale() {
   if (_currencyRefreshRunning) return;
   _currencyRefreshRunning = true;
   try {
-    const current = readJson(SITE_CONFIG_FILE, {});
+    const current = repos.getSiteConfig();
     const prices = current.prices || {};
     const last = prices.currenciesUpdatedAt || prices.updatedAt;
     const stale = !last || (Date.now() - new Date(last).getTime() > CURRENCY_AUTO_REFRESH_MS);
@@ -1229,7 +1230,7 @@ async function autoRefreshCurrencyRatesIfStale() {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    writeJson(SITE_CONFIG_FILE, next);
+    repos.saveSiteConfig(next);
     if (result.errors && result.errors.length) {
       console.warn('[currency-rates] partial refresh:', result.errors.map((e) => e.code).join(', '));
     } else {
@@ -1268,8 +1269,8 @@ function normalizeAccountPaymentMethods(arr) {
 }
 
 const platformStore = require('./db/platformStore');
-function readAccounts() { return platformStore.readAccounts(); }
-function writeAccounts(list) { return platformStore.writeAccounts(list); }
+function readAccounts() { return repos.accounts.list(); }
+function writeAccounts(list) { return repos.accounts.replaceAll(list); }
 
 /**
  * بعد التوثيق: تُحذف صورة الهوية فقط (idImage/id_image).
@@ -1714,8 +1715,11 @@ app.get('/api/buyers/me', (req, res) => {
 // /api/accounts با�ضبط � إرسا� عا�& + �&راجعة أد�&�`�  بسر� �&شترْ.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const SUB_REQUESTS_FILE = path.join(DATA_DIR, 'sub-requests.json');
-function readSubRequests() { return readJson(SUB_REQUESTS_FILE, []); }
-function writeSubRequests(list) { writeJson(SUB_REQUESTS_FILE, list); }
+function readSubRequests() { return repos.subRequests.list(); }
+function writeSubRequests(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 
 const subRequestsLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -1944,8 +1948,7 @@ mountAdminCoreRoutes(app, {
   readAccounts,
   readAds,
   readSubRequests,
-  readJson,
-  ADS_REQUESTS_FILE,
+  readAdsRequests: () => repos.adsRequests.list(),
   readTenders,
   getAllAccountPackageRecords,
   readAuditLog,
@@ -1960,8 +1963,11 @@ mountAdminCoreRoutes(app, {
 // من لوحة التحكم قبل القرار. لا علاقة لهذا بالتسجيل الفعلي في الحساب — مجرد
 // نية اهتمام (لا تحتاج مصادقة، لكن محدودة المعدل لمنع الإغراق). ──────────
 const INTEREST_FILE = path.join(DATA_DIR, 'section-interest.json');
-function readInterest() { return readJson(INTEREST_FILE, []); }
-function writeInterest(list) { writeJson(INTEREST_FILE, list); }
+function readInterest() { return repos.sectionInterest.list(); }
+function writeInterest(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.sectionInterest.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'videoAds'];
 
 const interestLimiter = rateLimit({
@@ -2055,8 +2061,8 @@ app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
 // عام (GET /api/tenders أو GET /api/tenders/:id) — فقط صاحب المناقصة (عبر
 // GET /api/tenders/mine بتوكنه الخاص) أو الأدمن يراها.
 const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-function readTenders() { return platformStore.readTenders(); }
-function writeTenders(list) { return platformStore.writeTenders(list); }
+function readTenders() { return repos.tenders.list(); }
+function writeTenders(list) { return repos.tenders.replaceAll(list); }
 
 /**
  * saveTenderImages(tenderId, images) — صور مرجعية اختيارية لما يحتاجه
@@ -2246,8 +2252,8 @@ mountInvestmentsRoutes(app, {
 // images/...) حتى لا تحتاج الواجهة لتغيير جوهري، فقط استبدال
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
-function readAds() { return platformStore.readAds(); }
-function writeAds(list) { return platformStore.writeAds(list); }
+function readAds() { return repos.ads.list(); }
+function writeAds(list) { return repos.ads.replaceAll(list); }
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -2278,9 +2284,11 @@ mountAdsRoutes(app, {
   toPublicAdGated,
   isAdminRequest,
   readAccounts,
-  readJson,
-  writeJson,
-  ADS_REQUESTS_FILE,
+  readAdsRequests: () => repos.adsRequests.list(),
+  writeAdsRequests: (list) => {
+    const rows = Array.isArray(list) ? list : [];
+    repos.adsRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  },
   readAds,
   writeAds,
   readAdBoosts,
@@ -2293,8 +2301,11 @@ mountAdsRoutes(app, {
 // (بلا تسجيل دخول) يمكنه إرسال بلاغ عن إعلان محدد، ويراجعه الأدمن هنا.
 // ══════════════════════════════════════════════════════════════════
 const REPORTS_FILE = path.join(DATA_DIR, 'reports.json');
-function readReports() { return readJson(REPORTS_FILE, []); }
-function writeReports(list) { writeJson(REPORTS_FILE, list); }
+function readReports() { return repos.reports.list(); }
+function writeReports(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.reports.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genReportId() { return 'RPT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 const REPORT_REASONS = ['fake_photos', 'suspicious_item', 'fraud', 'banned_content', 'misleading_price', 'other'];
@@ -2387,8 +2398,11 @@ app.patch('/api/support-tickets/admin/:id', requireAdminAuth, (req, res) => {
 // admin/:id/decision (action='suspend')�R �ا � ُْرِ�ر�!ا ب� � ستدع�`�!ا �&باشرة.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const DEACTIVATION_REQUESTS_FILE = path.join(DATA_DIR, 'deactivation-requests.json');
-function readDeactivationRequests() { return readJson(DEACTIVATION_REQUESTS_FILE, []); }
-function writeDeactivationRequests(list) { writeJson(DEACTIVATION_REQUESTS_FILE, list); }
+function readDeactivationRequests() { return repos.deactivationRequests.list(); }
+function writeDeactivationRequests(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.deactivationRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genDeactivationRequestId() { return 'DEACT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 const deactivationRequestsLimiter = rateLimit({
@@ -2474,12 +2488,15 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminAuth, (req,
 // يربطه بصاحبه) بدل ثلاثة أنظمة منفصلة، لأن الشكل والمنطق (ownership +
 // CRUD) متطابق تماماً بين الثلاثة.
 const CATALOG_FILE = path.join(DATA_DIR, 'catalog.json');
-function readCatalog() { return platformStore.readCatalog(); }
-function writeCatalog(list) { return platformStore.writeCatalog(list); }
+function readCatalog() { return repos.catalog.list(); }
+function writeCatalog(list) { return repos.catalog.replaceAll(list); }
 
 const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
-function readAllHours() { return readJson(HOURS_FILE, {}); }
-function writeAllHours(obj) { writeJson(HOURS_FILE, obj); }
+function readAllHours() { return repos.businessHours.asMap(); }
+function writeAllHours(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.businessHours.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 
 // نفس منطق حفظ صور الإعلانات كملفات حقيقية بدل base64 داخل catalog.json
 // (راجع saveAdImages أعلاه لتفصيل سبب القرار: base64 في localStorage
@@ -2543,8 +2560,11 @@ app.get('/api/business-hours/:accountId', (req, res) => {
 // كل الرسائل تُجمَّع بمفتاح "محادثة" واحد لكل (بائع + مشتري)، سواء كان
 // المشتري ضيفاً (بمفتاح مبني على رقم هاتفه) أو صاحب حساب حقيقي.
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
-function readMessages() { return readJson(MESSAGES_FILE, []); }
-function writeMessages(list) { writeJson(MESSAGES_FILE, list); }
+function readMessages() { return repos.messages.list(); }
+function writeMessages(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.messages.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 
 /**
  * مسارات /api/messages* — مستخرجة إلى routes/messages.js
@@ -2569,8 +2589,11 @@ mountMessagesRoutes(app, {
 // حتى تبقى واجهة rizq_reviews_engine.js قابلة للاستبدال بطبقة fetch رقيقة
 // بلا تغيير جوهري في بقية الملفات المستهلِكة لها (task #245).
 const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
-function readReviews() { return readJson(REVIEWS_FILE, {}); } // { [targetId]: [review, ...] }
-function writeReviews(obj) { writeJson(REVIEWS_FILE, obj); }
+function readReviews() { return repos.reviews.asMap(); }
+function writeReviews(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.reviews.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 function genReviewId() { return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 
 const reviewsLimiter = rateLimit({
@@ -2664,8 +2687,11 @@ app.delete('/api/reviews/:targetId/:reviewId', (req, res) => {
 // (بلا أرقام هواتف) لصفحة المعرض العامة مستقبلاً إن رغب Limam بعرضها.
 // ══════════════════════════════════════════════════════════════════
 const TEAM_FILE = path.join(DATA_DIR, 'team.json');
-function readTeam() { return readJson(TEAM_FILE, []); }
-function writeTeam(list) { writeJson(TEAM_FILE, list); }
+function readTeam() { return repos.corpTeam.list(); }
+function writeTeam(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.corpTeam.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genTeamId() { return 'TM-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 /** POST /api/team — إضافة عضو فريق (صاحب الحساب فقط) */
@@ -2735,8 +2761,11 @@ app.delete('/api/team/:id', (req, res) => {
 // الحالي المستخدم في browse/search/listing — إضافة صرفة فقط.
 // ══════════════════════════════════════════════════════════════════
 const AD_BOOSTS_FILE = path.join(DATA_DIR, 'ad_boosts.json');
-function readAdBoosts() { return readJson(AD_BOOSTS_FILE, {}); }
-function writeAdBoosts(obj) { writeJson(AD_BOOSTS_FILE, obj); }
+function readAdBoosts() { return repos.adBoosts.asMap(); }
+function writeAdBoosts(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.adBoosts.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 
 /** POST /api/ad-boosts — الأدمن فقط، بعد موافقته الفعلية على طلب "مميزة" */
 app.post('/api/ad-boosts', requireAdminAuth, (req, res) => {

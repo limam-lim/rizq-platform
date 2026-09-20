@@ -2,18 +2,17 @@
  * اختبار شامل لإصلاحات الأمان — يعمل ضد خادم يعمل على PORT (افتراضي 3000)
  * node scripts/test-security-hardening.js
  *
- * الحسابات/المناقصات تُزرع عبر platformStore (SQLite) لأن الخادم لم يعد
- * يقرأ accounts.json / tenders.json كمصدر تشغيلي.
+ * الحسابات/المناقصات/الباقات تُزرع عبر platformStore + repos (SQLite).
  */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const platformStore = require('../db/platformStore');
+const repos = require('../db/repos');
 
 const PORT = Number(process.env.PORT || 3000);
 const BASE = 'http://127.0.0.1:' + PORT;
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const PKG_FILE = path.join(DATA_DIR, 'account-packages.json');
 
 const results = [];
 function ok(name, pass, detail) {
@@ -109,11 +108,11 @@ async function main() {
   ok('GET /api/agent/status/:phone protected', agentPub.status === 401, 'status=' + agentPub.status);
 
   // ── 7. verify-dash POST + approved only ──
-  const backupPkg = fs.existsSync(PKG_FILE) ? fs.readFileSync(PKG_FILE, 'utf8') : '{}';
   const backupTenders = platformStore.readTenders();
   const { id, dashToken, accessToken, pending, approved } = seedTestAccount();
   let seededCatalogId = null;
   let seededTenderId = null;
+  const tenderPkgKey = id + '::tender';
 
   try {
     platformStore.upsertAccount(pending);
@@ -129,8 +128,7 @@ async function main() {
 
     platformStore.upsertAccount(approved);
 
-    const pkgStore = JSON.parse(backupPkg || '{}');
-    pkgStore[id] = {
+    repos.setPackage(id, {
       accountId: id,
       accountType: 'store',
       status: 'active',
@@ -141,8 +139,7 @@ async function main() {
       pkgName: 'monthly',
       packageId: 'store-month',
       accessToken,
-    };
-    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+    });
 
     const dashOk = await req('POST', '/api/accounts/verify-dash/' + id, { dashToken }, { 'x-dash-token': dashToken });
     ok('verify-dash approved POST → 200 without accessToken',
@@ -177,8 +174,8 @@ async function main() {
     const staticTenderAsset = await req('GET', '/uploads/tenders/test/0.webp');
     ok('tender static assets blocked', staticTenderAsset.status === 403, 'status=' + staticTenderAsset.status);
 
-    pkgStore[id + '::tender'] = {
-      accountId: id + '::tender',
+    repos.setPackage(tenderPkgKey, {
+      accountId: tenderPkgKey,
       accountType: 'store',
       status: 'active',
       paymentConfirmed: true,
@@ -187,8 +184,7 @@ async function main() {
       periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
       pkgName: 'باقة المناقصة',
       packageId: 'tnd-month',
-    };
-    fs.writeFileSync(PKG_FILE, JSON.stringify(pkgStore, null, 2));
+    });
 
     const tenderLeak = await req('POST', '/api/tenders', {
       accountId: id,
@@ -217,34 +213,31 @@ async function main() {
 
   } finally {
     try {
-      platformStore.writeAccounts(platformStore.readAccounts().filter((a) => a.id !== id));
+      platformStore.deleteAccount(id);
     } catch (e) { /* ignore cleanup */ }
     try {
-      if (seededCatalogId) {
-        platformStore.writeCatalog(platformStore.readCatalog().filter((c) => c.id !== seededCatalogId));
-      }
+      if (seededCatalogId) platformStore.deleteCatalogItem(seededCatalogId);
     } catch (e) { /* ignore cleanup */ }
     try {
-      if (seededTenderId) {
-        platformStore.writeTenders(platformStore.readTenders().filter((t) => t.id !== seededTenderId));
-      } else {
-        platformStore.writeTenders(backupTenders);
-      }
+      if (seededTenderId) platformStore.deleteTender(seededTenderId);
+      else platformStore.writeTenders(backupTenders);
     } catch (e) { /* ignore cleanup */ }
-    fs.writeFileSync(PKG_FILE, backupPkg);
+    try {
+      repos.packages.remove(id);
+      repos.packages.remove(tenderPkgKey);
+    } catch (e) { /* ignore cleanup */ }
   }
 
   // ── 9. OTP hashing (unit) ──
   const otp = require('../services/otpService');
-  const fsOtp = path.join(DATA_DIR, 'otp-store.json');
-  const backupOtp = fs.existsSync(fsOtp) ? fs.readFileSync(fsOtp, 'utf8') : '[]';
+  const backupOtp = repos.listOtp();
   process.env.OTP_ALLOW_DEMO = 'true';
   process.env.OTP_DEMO_CODE = '112233';
   const testEmail = 'otpsec_' + Date.now() + '@rizq.test';
   try {
     const sent = await otp.sendBuyerOtp({ email: testEmail, name: 'OTP Sec', phoneMr: '33112244' });
     ok('sendBuyerOtp', sent.ok === true);
-    const store = JSON.parse(fs.readFileSync(fsOtp, 'utf8'));
+    const store = repos.listOtp();
     const rec = store.find((x) => x.email === testEmail.toLowerCase());
     ok('OTP stored as hash not plaintext', !!(rec && rec.codeHash && !rec.code));
     const bad = otp.verifyBuyerOtp(testEmail, '000000');
@@ -260,7 +253,7 @@ async function main() {
     ok('POST /api/auth/register after OTP', (reg.status === 200 || reg.status === 201) && reg.body && reg.body.ok && reg.body.token,
       reg.body ? JSON.stringify({ status: reg.status, error: reg.body.error, message: reg.body.message }) : 'status=' + reg.status);
   } finally {
-    fs.writeFileSync(fsOtp, backupOtp);
+    repos.replaceOtpStore(backupOtp);
   }
 
   // ── 10. Site config public read ──

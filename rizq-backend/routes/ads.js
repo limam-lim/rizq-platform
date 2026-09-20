@@ -31,9 +31,8 @@ function mountAdsRoutes(app, deps) {
     toPublicAdGated,
     isAdminRequest,
     readAccounts,
-    readJson,
-    writeJson,
-    ADS_REQUESTS_FILE,
+    readAdsRequests,
+    writeAdsRequests,
     readAds,
     writeAds,
     readAdBoosts,
@@ -85,7 +84,7 @@ function mountAdsRoutes(app, deps) {
   app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
     const b = req.body || {};
     if (!b.title || !b.phone) return res.status(400).json({ error: 'العنوان ورقم التواصل مطلوبان' });
-    const requests = readJson(ADS_REQUESTS_FILE, []);
+    const requests = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
     const id = 'ADREQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
     requests.push({
       id,
@@ -98,7 +97,7 @@ function mountAdsRoutes(app, deps) {
       status: 'pending_contact',
       createdAt: new Date().toISOString(),
     });
-    writeJson(ADS_REQUESTS_FILE, requests);
+    if (typeof writeAdsRequests === 'function') writeAdsRequests(requests);
     res.json({ ok: true, id });
   });
 
@@ -108,7 +107,8 @@ function mountAdsRoutes(app, deps) {
    * حتى يكون وعد "سيتواصل معك رزق" قابلاً للتنفيذ حقاً.
    */
   app.get('/api/ads/requests', requireAdminAuth, (req, res) => {
-    res.json({ ok: true, requests: readJson(ADS_REQUESTS_FILE, []).reverse() });
+    const list = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
+    res.json({ ok: true, requests: list.slice().reverse() });
   });
 
   /**

@@ -5,8 +5,6 @@
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const {
   isAnthropicConfigured,
@@ -20,10 +18,7 @@ const {
 } = require('./provisionalTier');
 const { saveInvestmentImages } = require('./imagePipeline');
 const { saveInvestmentDocument, extractPdfTextFromDataUri } = require('./tenderDocument');
-
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const FILE = path.join(DATA_DIR, 'investments.json');
-const EVENTS_FILE = path.join(DATA_DIR, 'investment-events.json');
+const repos = require('../db/repos');
 
 const PUBLIC_CONTACT = 'direction@rizq.mr';
 const SECTORS = [
@@ -31,52 +26,39 @@ const SECTORS = [
   'commerce', 'services', 'technologie', 'immobilier', 'agriculture', 'industrie', 'energie', 'tourisme', 'education', 'sante', 'autre'
 ];
 
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-function readJson(file, fallback) {
-  try {
-    if (!fs.existsSync(file)) return fallback;
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch (e) {
-    return fallback;
-  }
-}
-
-function writeJson(file, data) {
-  ensureDataDir();
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
-}
-
 function readInvestments() {
-  const raw = readJson(FILE, { opportunities: [], updatedAt: null });
-  if (!Array.isArray(raw.opportunities)) raw.opportunities = [];
-  return raw;
+  return {
+    opportunities: repos.listInvestmentOpportunities(),
+    updatedAt: (repos.investments.get('_meta') || {}).updatedAt || null,
+  };
 }
 
 function writeInvestments(store) {
-  store.updatedAt = new Date().toISOString();
-  writeJson(FILE, store);
+  const opps = (store && Array.isArray(store.opportunities)) ? store.opportunities : [];
+  const entries = opps.filter((o) => o && o.id).map((o) => ({ id: String(o.id), data: o }));
+  entries.push({ id: '_meta', data: { updatedAt: new Date().toISOString() } });
+  repos.investments.replaceAll(entries);
 }
 
 function readEvents() {
-  const raw = readJson(EVENTS_FILE, { events: [] });
-  if (!Array.isArray(raw.events)) raw.events = [];
-  return raw;
+  return { events: repos.listInvestmentEvents() };
 }
 
 function pushEvent(type, meta) {
-  const store = readEvents();
-  store.events.unshift({
-    id: 'iev_' + crypto.randomBytes(6).toString('hex'),
+  const id = 'iev_' + crypto.randomBytes(6).toString('hex');
+  const ev = {
+    id,
     type: String(type || 'event'),
     meta: meta && typeof meta === 'object' ? meta : {},
     at: new Date().toISOString(),
-  });
-  if (store.events.length > 2000) store.events = store.events.slice(0, 2000);
-  writeJson(EVENTS_FILE, store);
-  return store;
+  };
+  repos.pushInvestmentEvent(ev);
+  // احتفظ بحد أقصى ~2000 حدث
+  const all = repos.listInvestmentEvents().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  if (all.length > 2000) {
+    all.slice(2000).forEach((e) => repos.investmentEvents.remove(String(e.id)));
+  }
+  return readEvents();
 }
 
 function opsEmail() {

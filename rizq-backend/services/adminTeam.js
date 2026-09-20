@@ -1,10 +1,9 @@
 /**
  * adminTeam.js — فريق الإدارة + صلاحيات ديناميكية
+ * التخزين عبر repos (SQLite).
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const {
@@ -15,27 +14,22 @@ const {
   hasAdminPermission,
   permissionsForLegacyRole,
 } = require('./adminPermissions');
-
-const TEAM_FILE = path.join(__dirname, '..', 'data', 'admin-team.json');
-
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
-}
-
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
-}
+const repos = require('../db/repos');
 
 function genAdminId() {
   return 'adm_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex');
 }
 
 function readTeam() {
-  return readJson(TEAM_FILE, []);
+  return repos.adminTeam.list();
 }
 
 function writeTeam(list) {
-  writeJson(TEAM_FILE, list);
+  const rows = Array.isArray(list) ? list : [];
+  repos.adminTeam.replaceAll(rows.map((m) => ({
+    id: String(m.id || genAdminId()),
+    data: m,
+  })));
 }
 
 function publicMember(row) {

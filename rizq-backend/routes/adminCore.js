@@ -23,8 +23,7 @@ function mountAdminCoreRoutes(app, deps) {
     readAccounts,
     readAds,
     readSubRequests,
-    readJson,
-    ADS_REQUESTS_FILE,
+    readAdsRequests,
     readTenders,
     getAllAccountPackageRecords,
     readAuditLog,
@@ -165,7 +164,8 @@ function mountAdminCoreRoutes(app, deps) {
       const pendingAccounts = readAccounts().filter((a) => a.status === 'pending');
       const pendingAds = readAds().filter((a) => a.status === 'pending');
       const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
-      const pendingBizContacts = readJson(ADS_REQUESTS_FILE, []).filter((r) => r.status === 'pending_contact');
+      const pendingBizContacts = (typeof readAdsRequests === 'function' ? readAdsRequests() : [])
+        .filter((r) => r.status === 'pending_contact');
       const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
 
       const pkgRecords = getAllAccountPackageRecords();

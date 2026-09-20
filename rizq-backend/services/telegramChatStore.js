@@ -2,14 +2,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const repos = require('../db/repos');
 
-const FILE = path.join(__dirname, '..', 'data', 'telegram-admin-chat.json');
 const ENV_FILE = path.join(__dirname, '..', '.env');
 
 function readPersistedAdminChat() {
   try {
-    if (!fs.existsSync(FILE)) return null;
-    const raw = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+    const raw = repos.getTelegramChat();
     const chatId = String(raw && raw.chatId || '').trim();
     return chatId || null;
   } catch (e) {
@@ -20,15 +19,13 @@ function readPersistedAdminChat() {
 
 function writePersistedAdminChat(chatId, meta) {
   meta = meta || {};
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const payload = {
     chatId: String(chatId),
     registeredAt: new Date().toISOString(),
     source: meta.source || 'unknown',
     title: meta.title || '',
   };
-  fs.writeFileSync(FILE, JSON.stringify(payload, null, 2), 'utf8');
+  repos.saveTelegramChat(payload);
   return payload;
 }
 

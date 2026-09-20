@@ -188,7 +188,19 @@ function upsertAccount(acc) {
   const row = accountRow(acc);
   if (!row) return null;
   stmtAccountUpsert.run(row);
+  // نسخة احتياطية خفيفة — لا تعيد كتابة كل الصفوف من مسار API
+  try {
+    const file = path.join(DATA_DIR, 'accounts.json');
+    const list = readAccounts();
+    backupJson(file, list);
+  } catch (e) { /* ignore */ }
   return acc;
+}
+
+function deleteAccount(id) {
+  const r = db.prepare('DELETE FROM accounts WHERE id = ?').run(String(id || ''));
+  if (r.changes) backupJson(path.join(DATA_DIR, 'accounts.json'), readAccounts());
+  return r.changes > 0;
 }
 
 /* ── Ads ──────────────────────────────────────────────────── */
@@ -262,6 +274,20 @@ function getAdById(id) {
   return r ? safeParse(r.data, null) : null;
 }
 
+function upsertAd(ad) {
+  const row = adRow(ad);
+  if (!row) return null;
+  stmtAdsUpsert.run(row);
+  try { backupJson(path.join(DATA_DIR, 'ads.json'), readAds()); } catch (e) { /* ignore */ }
+  return ad;
+}
+
+function deleteAd(id) {
+  const r = db.prepare('DELETE FROM ads WHERE id = ?').run(String(id || ''));
+  if (r.changes) backupJson(path.join(DATA_DIR, 'ads.json'), readAds());
+  return r.changes > 0;
+}
+
 /* ── Catalog ──────────────────────────────────────────────── */
 
 const stmtCatalogCount = db.prepare('SELECT COUNT(*) AS n FROM catalog_items');
@@ -323,6 +349,20 @@ function writeCatalog(list) {
   });
   backupJson(path.join(DATA_DIR, 'catalog.json'), rows);
   return rows;
+}
+
+function upsertCatalogItem(item) {
+  const row = catalogRow(item);
+  if (!row) return null;
+  stmtCatalogUpsert.run(row);
+  try { backupJson(path.join(DATA_DIR, 'catalog.json'), readCatalog()); } catch (e) { /* ignore */ }
+  return item;
+}
+
+function deleteCatalogItem(id) {
+  const r = db.prepare('DELETE FROM catalog_items WHERE id = ?').run(String(id || ''));
+  if (r.changes) backupJson(path.join(DATA_DIR, 'catalog.json'), readCatalog());
+  return r.changes > 0;
 }
 
 /* ── Tenders ──────────────────────────────────────────────── */
@@ -388,6 +428,20 @@ function writeTendersStore(list) {
   return rows;
 }
 
+function upsertTender(t) {
+  const row = tenderRow(t);
+  if (!row) return null;
+  stmtTendersUpsert.run(row);
+  try { backupJson(path.join(DATA_DIR, 'tenders.json'), readTendersStore()); } catch (e) { /* ignore */ }
+  return t;
+}
+
+function deleteTender(id) {
+  const r = db.prepare('DELETE FROM tenders WHERE id = ?').run(String(id || ''));
+  if (r.changes) backupJson(path.join(DATA_DIR, 'tenders.json'), readTendersStore());
+  return r.changes > 0;
+}
+
 function migrateAllPlatformStores() {
   return {
     accounts: migrateAccountsFromJson(),
@@ -405,13 +459,20 @@ module.exports = {
   getAccountById,
   getAccountByEmail,
   upsertAccount,
+  deleteAccount,
   readAds,
   writeAds,
   getAdById,
+  upsertAd,
+  deleteAd,
   readCatalog,
   writeCatalog,
+  upsertCatalogItem,
+  deleteCatalogItem,
   readTenders: readTendersStore,
   writeTenders: writeTendersStore,
+  upsertTender,
+  deleteTender,
   migrateAllPlatformStores,
   DATA_DIR,
 };
