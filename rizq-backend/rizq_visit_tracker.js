@@ -70,12 +70,16 @@ function setupVisitTrackingAPI(app, trackVisitLimiter, getAccountRecord, getMain
 
   app.get('/api/visit-stats/:id', (req, res) => {
     const id = req.params.id;
-    const token = req.header('x-account-token') || req.query.token;
+    // رأس فقط — لا نقبل ?token= (يمنع تسريب التوكن في السجلات/المراجع)
+    const token = String(req.header('x-account-token') || '').trim();
     const mainAcc = getMainAccount ? getMainAccount(id) : null;
     const pkgRec = getAccountRecord ? getAccountRecord(id) : null;
     if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
     const validToken = (mainAcc && mainAcc.accessToken) || (pkgRec && pkgRec.accessToken) || null;
-    if (!token || !validToken || token !== validToken) return res.status(401).json({ error: 'unauthorized' });
+    const { timingSafeEqualStr } = require('./lib/secureCompare');
+    if (!token || !validToken || !timingSafeEqualStr(token, validToken)) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
     res.json({ ok: true, stats: getVisitStats(id) });
   });
 }

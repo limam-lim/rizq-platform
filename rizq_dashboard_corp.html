@@ -1206,19 +1206,8 @@ function initCorpAccess(){
   }
   if(!tok) tok = p.get('token') || '';
   if(!id||!tok){showAccessDenied();return;}
-  try{
-    // إصلاح جوهري: كان هذا الكود يقرأ rizq_accounts كأنه مصفوفة (accs.find)
-    // بينما يكتبه rizq_admin.html ككائن ({[id]:{...}}) — فكان .find() يفشل
-    // دوماً برمي استثناء صامت يُمسكه catch أدناه، أي أن كل حساب شركة حقيقي
-    // (غير تجريبي) كان يُرفض وصوله دائماً. الآن نقرأ من rizq_pending_accounts
-    // — نفس مصدر الحقيقة المستخدم فعلياً في داشبوردات المحل والمكتب.
-    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc = accs.find(function(a){return a.id===id && a.token===tok && a.status==='approved' && a.type==='corp';});
-    if(acc){ CORP_ACC = loadActivatedPackage(acc); initDashboard(); return; }
-  // لا سجل محلي — متوقّع تماماً عندما يفتح صاحب الشركة الرابط من جهازه
-  // الخاص (وليس نفس متصفح الأدمن). نحاول التحقق من الخادم قبل الرفض النهائي.
-    verifyCorpAccessRemote(id, tok);
-  }catch(e){showAccessDenied();}
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (تعليق/رفض/تدوير توكن)
+  verifyCorpAccessRemote(id, tok);
 }
 
 // ── يُستدعى فقط عندما لا يوجد سجل محلي — يتحقق من الخادم (rizq_backend_config.js

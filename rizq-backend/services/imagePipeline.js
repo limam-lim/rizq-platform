@@ -73,13 +73,17 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
   const prefix = '/uploads/' + ns + '/';
   const urls = [];
   const slice = images.slice(0, maxCount);
+  // إعادة استخدام URL موجود فقط إن كان تحت مجلد هذا الكيان (منع اختطاف وسائط الغير)
+  const ownedPrefix = prefix + String(entityId || '').replace(/[^a-zA-Z0-9_-]/g, '') + '/';
   for (let i = 0; i < slice.length; i++) {
     const img = slice[i];
     if (typeof img !== 'string') continue;
-    if (img.indexOf(prefix) === 0 || (uploadUrlPrefix && img.indexOf(uploadUrlPrefix) === 0)) {
+    if (img.indexOf(ownedPrefix) === 0) {
       urls.push(img);
       continue;
     }
+    // رفض أي /uploads/... لا يخص هذا الكيان
+    if (img.indexOf('/uploads/') === 0) continue;
     const parsed = parseDataUriImage(img);
     if (!parsed || parsed.error) continue;
     const filename = i + '.webp';

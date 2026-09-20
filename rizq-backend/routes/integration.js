@@ -70,7 +70,7 @@ function setupIntegrationAPI(app, deps) {
   /** GET /api/integration/status/:accountId — owner dashboard */
   app.get('/api/integration/status/:accountId', integrationLimiter, (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
-    const token = req.header('x-account-token') || req.query.token || '';
+    const token = String(req.header('x-account-token') || '').trim();
     const guard = ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 

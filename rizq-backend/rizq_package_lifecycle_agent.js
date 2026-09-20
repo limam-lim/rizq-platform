@@ -554,8 +554,12 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   app.get('/api/account-package/:id', (req, res) => {
     const rec = getAccountRecord(req.params.id);
     if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
-    const token = req.header('x-account-token') || req.query.token;
-    if (!token || token !== rec.accessToken) return res.status(401).json({ error: 'unauthorized' });
+    // رأس فقط — لا نقبل ?token=
+    const token = String(req.header('x-account-token') || '').trim();
+    const { timingSafeEqualStr } = require('./lib/secureCompare');
+    if (!token || !rec.accessToken || !timingSafeEqualStr(token, rec.accessToken)) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
     const { accessToken, ...safe } = rec; // لا نُعيد التوكن نفسه في الرد
     let entitlements = null;
     try {

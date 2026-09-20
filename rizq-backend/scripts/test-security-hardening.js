@@ -256,9 +256,94 @@ async function main() {
     repos.replaceOtpStore(backupOtp);
   }
 
-  // ── 10. Site config public read ──
+  // ── 10. Site config public read + no secrets ──
   const cfg = await req('GET', '/api/site-config');
   ok('GET /api/site-config public', cfg.status === 200 && cfg.body && cfg.body.ok);
+  const pub = cfg.body && cfg.body.config;
+  ok('site-config has no webhookUrl', !!(pub && (!pub.channelsPublic || !pub.channelsPublic.webhookUrl)));
+  ok('site-config has moduleFlags', !!(pub && pub.moduleFlags));
+
+  // ── 11. CSP header ──
+  const health = await fetch(BASE + '/health');
+  ok('CSP header present', !!health.headers.get('content-security-policy'));
+
+  // ── 12. Invalid account type ──
+  const badType = await req('POST', '/api/accounts', { name: 'Bad', type: 'hacker', email: 'bad_' + Date.now() + '@t.com' });
+  ok('invalid account type rejected', badType.status === 400 && badType.body && badType.body.code === 'invalid_type');
+
+  // ── 13. NNI available does not enumerate duplicates ──
+  const nniFmt = await req('GET', '/api/accounts/nni-available?nni=abc');
+  ok('NNI invalid format → 400', nniFmt.status === 400);
+  const nniOk = await req('GET', '/api/accounts/nni-available?nni=1234567890');
+  ok('NNI valid format → available without DB reveal', nniOk.status === 200 && nniOk.body && nniOk.body.available === true);
+
+  // ── 14. Image URL reuse ownership ──
+  const { saveProcessedImages } = require('../services/imagePipeline');
+  const stolen = await saveProcessedImages({
+    namespace: 'ads',
+    entityId: 'RZQ-OWN',
+    images: ['/uploads/ads/RZQ-OTHER/0.webp'],
+    maxCount: 2,
+  });
+  ok('image reuse rejects foreign entity URL', Array.isArray(stolen) && stolen.length === 0);
+  const owned = await saveProcessedImages({
+    namespace: 'ads',
+    entityId: 'RZQ-OWN',
+    images: ['/uploads/ads/RZQ-OWN/0.webp'],
+    maxCount: 2,
+  });
+  ok('image reuse allows own entity URL', Array.isArray(owned) && owned[0] === '/uploads/ads/RZQ-OWN/0.webp');
+
+  // ── 15. JSON backup scrub ──
+  const { scrubSecretsForBackup } = require('../lib/scrubSecrets');
+  const scrubbed = scrubSecretsForBackup({
+    accessToken: 'secret',
+    dashToken: 'TK_x',
+    passHash: '$2a',
+    name: 'Safe',
+    channelsPublic: { phone: '1', webhookUrl: 'https://evil' },
+  });
+  ok('scrub removes tokens/hashes', !scrubbed.accessToken && !scrubbed.dashToken && !scrubbed.passHash && scrubbed.name === 'Safe');
+  ok('scrub removes nested webhookUrl', !(scrubbed.channelsPublic && scrubbed.channelsPublic.webhookUrl));
+
+  // ── 16. Suspended verify-dash ──
+  const sus = seedTestAccount();
+  try {
+    const list = platformStore.readAccounts();
+    const idx = list.findIndex((a) => a.id === sus.id);
+    list[idx].status = 'approved';
+    list[idx].suspended = true;
+    platformStore.writeAccounts(list);
+    const vSus = await req('POST', '/api/accounts/verify-dash/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
+    ok('verify-dash suspended → 401', vSus.status === 401);
+    const exSus = await req('POST', '/api/accounts/exchange-dash-token/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
+    ok('exchange-dash-token suspended → 401', exSus.status === 401);
+  } finally {
+    try { platformStore.deleteAccount(sus.id); } catch (e) {
+      const list2 = platformStore.readAccounts().filter((a) => a.id !== sus.id);
+      platformStore.writeAccounts(list2);
+    }
+  }
+
+  // ── 17. visit-stats rejects query token ──
+  const pkgAcc = seedTestAccount();
+  try {
+    const list = platformStore.readAccounts();
+    const idx = list.findIndex((a) => a.id === pkgAcc.id);
+    list[idx].status = 'approved';
+    platformStore.writeAccounts(list);
+    repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store' });
+    const qTok = await req('GET', '/api/visit-stats/' + pkgAcc.id + '?token=' + encodeURIComponent(pkgAcc.accessToken));
+    ok('visit-stats query token rejected', qTok.status === 401);
+    const hTok = await req('GET', '/api/visit-stats/' + pkgAcc.id, null, { 'x-account-token': pkgAcc.accessToken });
+    ok('visit-stats header token accepted', hTok.status === 200 && hTok.body && hTok.body.ok);
+  } finally {
+    try {
+      const list2 = platformStore.readAccounts().filter((a) => a.id !== pkgAcc.id);
+      platformStore.writeAccounts(list2);
+      repos.packages.remove(pkgAcc.id);
+    } catch (e) { /* ignore */ }
+  }
 
   // ── Summary ──
   const failed = results.filter((r) => !r.pass);

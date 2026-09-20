@@ -2454,15 +2454,12 @@ function submitPayment(){
 
 // ── INIT ──
 function initDashboard(){
-  var acc = verifyAccess();
-  if(acc){ _initDashboardWithAccount(acc); return; }
-  if(acc===null && !IS_DEMO && SESSION_ID && SESSION_TOKEN){
-    verifyAccessRemote().then(function(remoteAcc){
-      if(remoteAcc) _initDashboardWithAccount(remoteAcc); else showAccessDenied();
-    });
-  } else {
-    showAccessDenied();
-  }
+  if(IS_DEMO){ _initDashboardWithAccount(DEMO_ACCOUNT); return; }
+  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (حساب معلّق/مرفوض)
+  verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc) _initDashboardWithAccount(remoteAcc); else showAccessDenied();
+  });
 }
 
 function _initDashboardWithAccount(acc){

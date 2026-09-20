@@ -203,7 +203,8 @@ function toPublicAccountGated(acc, gate) {
   out.whatsapp = contact.whatsapp;
   out.hidePhone = contact.hidePhone;
   if (gate) out.contactAccess = { lockReason: gate.lockReason, fomoEligible: gate.fomoEligible };
-  if (Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
+  // طرق الدفع حساسة — تُكشف فقط بعد فتح بوابة التواصل
+  if (gate && gate.contactsUnlocked && Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
     out.paymentMethods = acc.paymentMethods.slice(0, 10);
   }
   return out;

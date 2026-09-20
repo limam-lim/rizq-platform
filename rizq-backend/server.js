@@ -56,6 +56,13 @@ app.use((req, res, next) => {
   res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
   res.set('X-Copyright', '(c) Rizq ADMINIA SARL - Proprietary. Unauthorized copying prohibited.');
+  res.set(
+    'Content-Security-Policy',
+    "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
+    + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
+    + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
+    + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
+  );
   try {
     if (req.secure || String(req.headers['x-forwarded-proto'] || '') === 'https') {
       res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -150,6 +157,35 @@ app.use('/uploads/investments', (req, res) => {
     msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
   });
 });
+// وسائط الإعلانات/الكتالوج — عامة فقط إن كانت الحالة منشورة/نشطة
+app.use('/uploads/ads', (req, res, next) => {
+  try {
+    const adId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+    const ad = adId ? repos.ads.getById(adId) : null;
+    const st = String(ad && ad.status || '');
+    if (!ad || !['active', 'approved', 'published'].includes(st)) {
+      return res.status(403).json({ error: 'ad_media_forbidden', msg: 'وسائط الإعلان غير متاحة' });
+    }
+    return next();
+  } catch (e) {
+    return res.status(403).json({ error: 'ad_media_forbidden' });
+  }
+});
+app.use('/uploads/catalog', (req, res, next) => {
+  try {
+    const itemId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+    const item = itemId
+      ? (repos.catalog.list().find((c) => c && c.id === itemId) || null)
+      : null;
+    const st = String(item && item.status || '');
+    if (!item || st !== 'active') {
+      return res.status(403).json({ error: 'catalog_media_forbidden', msg: 'وسائط الكتالوج غير متاحة' });
+    }
+    return next();
+  } catch (e) {
+    return res.status(403).json({ error: 'catalog_media_forbidden' });
+  }
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── CORS: أصول مسموحة (ALLOWED_ORIGIN قائمة مفصولة بفواصل)
@@ -203,27 +239,25 @@ app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
 // ضع الناتج في passHash أدناه:
 //   node -e "console.log(require('bcryptjs').hashSync('كلمة_السر_الجديدة', 10))"
 const bcrypt = require('bcryptjs');
-// سوبر أدمن المالك الدائم — تسجيل الدخول بالبريد megalimam@gmail.com
-// كلمة السر ليست في المستودع؛ الهاش فقط. التعيين الفعلي عبر .env + ensureOwnerSuperAdmin.
+// سوبر أدمن المالك — الهاش من البيئة فقط في الإنتاج؛ لا هاشات تشغيلية في المصدر.
 const OWNER_SUPER_ADMIN = {
-  user: 'megalimam@gmail.com',
-  email: 'megalimam@gmail.com',
-  name: 'M. LIMAM',
+  user: String(process.env.SUPER_ADMIN_EMAIL || process.env.SUPER_ADMIN_USER || '').trim().toLowerCase() || 'owner@localhost',
+  email: String(process.env.SUPER_ADMIN_EMAIL || '').trim().toLowerCase(),
+  name: String(process.env.SUPER_ADMIN_NAME || 'Owner').trim() || 'Owner',
   role: 'super',
-  // يُستبدل عند التشغيل بهاش SUPER_ADMIN_PASS_HASH من .env إن وُجد
-  passHash: process.env.SUPER_ADMIN_PASS_HASH || '$2a$10$vWBBtmikW0LUA/DLY5/eSelNOERYSEScGE.QnZ5uCdm/RsIgcXXpO',
+  passHash: String(process.env.SUPER_ADMIN_PASS_HASH || '').trim(),
 };
-const ADMIN_ACCOUNTS = [
-  OWNER_SUPER_ADMIN,
-  { user: 'mod1', passHash: '$2a$10$Pz58idNGtWx5zJh6D.wwtOlKDZaZm23h6XQivYWhSyDA43pApWriG', name: 'المشرف الأول', role: 'moderator' },
-  { user: 'mod2', passHash: '$2a$10$j1o0c2FMvWxLsFJn5B5IMuCQ8GfJc46rsWwVz3Ho/Z8hkU/eRUfgW', name: 'المشرف الثاني', role: 'moderator' },
-];
+const ADMIN_ACCOUNTS = OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2')
+  ? [OWNER_SUPER_ADMIN]
+  : [];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
-adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
-adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
+if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
+if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
+  adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
+}
 const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,
@@ -245,7 +279,7 @@ function isAdminRequest(req) {
   }
   const got = req.header('x-rizq-secret');
   const secret = process.env.BACKEND_SHARED_SECRET || '';
-  if (secret && got && got === secret) {
+  if (secret && got && timingSafeEqualStr(got, secret)) {
     if (isProdEnv() && isBrowserLikeRequest(req)) return false;
     return true;
   }
@@ -808,11 +842,33 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
 app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
-  const cfg = repos.getSiteConfig();
-  cfg.moduleFlags = getModuleFlags();
-  cfg.sectionRules = getSectionRules();
-  cfg.otp = getPublicOtpConfig();
-  res.json({ ok: true, config: cfg });
+  const raw = repos.getSiteConfig() || {};
+  const publicCfg = {
+    moduleFlags: getModuleFlags(),
+    platformFlags: getPlatformFlags(),
+    sectionRules: getSectionRules(),
+    otp: getPublicOtpConfig(),
+    packages: raw.packages || undefined,
+    prices: raw.prices || undefined,
+    promoVideo: raw.promoVideo || undefined,
+    videoAds: raw.videoAds || undefined,
+    announcements: raw.announcements || undefined,
+    legalOverrides: raw.legalOverrides || undefined,
+    currency: raw.currency || undefined,
+    quotaConfig: raw.quotaConfig || undefined,
+    quotaTopups: raw.quotaTopups || undefined,
+    bankCodes: Array.isArray(raw.bankCodes) ? raw.bankCodes : undefined,
+  };
+  // لا نُسرّب webhookUrl / قنوات داخلية / أسرار تشغيل
+  if (raw.channelsPublic && typeof raw.channelsPublic === 'object') {
+    publicCfg.channelsPublic = {
+      phone: raw.channelsPublic.phone || '',
+      whatsapp: raw.channelsPublic.whatsapp || '',
+      email: raw.channelsPublic.email || '',
+      // webhookUrl محذوف عمداً من الواجهة العامة
+    };
+  }
+  res.json({ ok: true, config: publicCfg });
 });
 
 /**
@@ -1288,11 +1344,12 @@ function findAccountByNni(list, nni, excludeId) {
   return list.find((a) => normalizeNni(a.nni) === nni && a.id !== excludeId) || null;
 }
 function nniDuplicatePayload() {
+  // رسالة عامة — لا تؤكد وجود حساب آخر (تخفيف تعداد NNI)
   return {
     ok: false,
-    code: 'nni_duplicate',
-    error: 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر',
-    error_fr: "Ce numéro d'identité (NNI) est déjà associé à un autre compte",
+    code: 'nni_unavailable',
+    error: 'تعذّر استخدام رقم الهوية هذا — تحقّق من الرقم أو تواصل مع الدعم',
+    error_fr: "Ce numéro d'identité ne peut pas être utilisé — vérifiez-le ou contactez le support",
   };
 }
 function assertNniAssignable(list, rawNni, excludeId, acc) {
@@ -1317,10 +1374,13 @@ function assertNniAssignable(list, rawNni, excludeId, acc) {
 
 function resolveOptionalAccountViewer(req) {
   const accountId = req.header('x-account-id') || '';
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req);
   if (!accountId || !token) return null;
   const acc = readAccounts().find((a) => a.id === accountId);
-  return (acc && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
+  return (acc
+    && acc.status === 'approved'
+    && !acc.suspended
+    && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
 }
 
 function genAccountId() {
@@ -1350,7 +1410,16 @@ function toPublicAccountForViewer(acc, viewerAccountId) {
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
 function stripToken(acc) {
-  const { accessToken, passHash, ...safe } = acc;
+  if (!acc) return null;
+  const {
+    accessToken,
+    passHash,
+    dashToken,
+    idImage,
+    id_image,
+    licenseImage,
+    ...safe
+  } = acc;
   if (safe.id_verified) {
     delete safe.idImage;
     delete safe.id_image;
@@ -1368,15 +1437,19 @@ const accountsRegisterLimiter = rateLimit({
 
 /**
  * GET /api/accounts/nni-available?nni= — عام، بلا سرّ —
- * تحقق مبكر من فراغ رقم الهوية أثناء التسجيل/التوثيق. لا يُفصح عن صاحب الرقم.
+ * يتحقق من صيغة الرقم فقط. لا يكشف إن كان الرقم مستخدماً (تخفيف تعداد).
+ * الفحص الحقيقي للتكرار يحدث عند POST /api/accounts.
  */
 app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
-  const nniCheck = assertNniAssignable(readAccounts(), req.query.nni, null, null);
-  if (!nniCheck.ok) {
-    return res.status(nniCheck.status).json(Object.assign({ available: false }, nniCheck.body));
-  }
-  if (!nniCheck.nni) {
-    return res.status(400).json({ ok: false, available: false, code: 'nni_invalid', error: 'رقم الهوية (NNI) غير صالح', error_fr: "Numéro d'identité (NNI) invalide" });
+  const nni = normalizeNni(req.query.nni);
+  if (!nni || !NNI_RE.test(nni)) {
+    return res.status(400).json({
+      ok: false,
+      available: false,
+      code: 'nni_invalid',
+      error: 'رقم الهوية (NNI) غير صالح',
+      error_fr: "Numéro d'identité (NNI) invalide",
+    });
   }
   res.json({ ok: true, available: true });
 });
@@ -1395,7 +1468,11 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   // ── بوابة "الإطلاق التدريجي" — رفض تسجيل أي نوع حساب قسمه مغلق حالياً
   // (moduleFlags)، حتى لو تجاوز طالب التسجيل واجهة الموقع وأرسل الطلب
   // مباشرة لهذا الـ endpoint. الإخفاء في الواجهة وحده غير كافٍ أمنياً. ──
-  const reqType = String(b.type || '').toLowerCase();
+  const reqType = String(b.type || '').toLowerCase().trim();
+  const ALLOWED_ACCOUNT_TYPES = ['individual', 'store', 'office', 'corp'];
+  if (!ALLOWED_ACCOUNT_TYPES.includes(reqType)) {
+    return res.status(400).json({ ok: false, error: 'نوع الحساب غير مدعوم', code: 'invalid_type' });
+  }
   const flags = getModuleFlags();
   if (Object.prototype.hasOwnProperty.call(flags, reqType) && !flags[reqType]) {
     return res.status(403).json({ error: 'هذا القسم غير مفتوح للتسجيل حالياً' });
@@ -1451,7 +1528,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const acc = {
     id,
     accessToken,
-    type: String(b.type).slice(0, 30),
+    type: reqType,
     name: String(b.name).slice(0, 120),
     phone: String(b.phone || '').slice(0, 30),
     phoneIntl: String(b.phoneIntl || b.phone_intl || '').slice(0, 30),
@@ -1610,6 +1687,7 @@ const { REFERRAL_BONUS_DAYS } = require('./rizq_package_lifecycle_agent');
 const { mountAccountsManageRoutes } = require('./routes/accountsManage');
 mountAccountsManageRoutes(app, {
   requireAdminAuth,
+  requireAdminPermission,
   readAccounts,
   writeAccounts,
   extractAccountToken,
@@ -1621,14 +1699,15 @@ mountAccountsManageRoutes(app, {
   normalizeAccountActivityFields,
   normalizeAccountPaymentMethods,
   genDashToken,
+  genAccessToken,
   purgeAccountIdDocument,
   REFERRAL_BONUS_DAYS,
 });
 
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
-// حسابات "ا��&شتر�` ا�سر�`ع" � SQLite عبر /api/auth + /api/wishlist
-// (ت��اف� رجع�`: /api/buyers/register �� /api/buyers/me)
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+// ═══════════════════════════════════════════════════════════════
+// حسابات "المشتري السريع" — SQLite عبر /api/auth + /api/wishlist
+// (توافق رجعي: /api/buyers/register و /api/buyers/me)
+// ═══════════════════════════════════════════════════════════════
 const buyersRegisterLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 15,
@@ -3039,10 +3118,19 @@ startMaintenanceScheduler({
 
 function assertProductionSecrets() {
   if (!isProdEnv()) return;
-  const required = ['BACKEND_SHARED_SECRET', 'RIZQ_API_SECRET'];
+  const required = ['BACKEND_SHARED_SECRET', 'RIZQ_API_SECRET', 'SUPER_ADMIN_PASS_HASH', 'SUPER_ADMIN_EMAIL'];
   const missing = required.filter((k) => !String(process.env[k] || '').trim());
   if (missing.length) {
     console.error('[FATAL] Missing required env in production:', missing.join(', '));
+    process.exit(1);
+  }
+  if (!String(process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim()) {
+    console.error('[FATAL] OTP_PEPPER or BACKEND_SHARED_SECRET required in production');
+    process.exit(1);
+  }
+  const hash = String(process.env.SUPER_ADMIN_PASS_HASH || '');
+  if (!hash.startsWith('$2')) {
+    console.error('[FATAL] SUPER_ADMIN_PASS_HASH must be a bcrypt hash');
     process.exit(1);
   }
 }

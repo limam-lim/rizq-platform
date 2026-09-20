@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { db, DATA_DIR } = require('./index');
+const { scrubSecretsForBackup } = require('../lib/scrubSecrets');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS accounts (
@@ -80,7 +81,8 @@ function backupJson(file, data) {
   try {
     const dir = path.dirname(file);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
+    const safe = scrubSecretsForBackup(data);
+    fs.writeFileSync(file, JSON.stringify(safe, null, 2), 'utf8');
   } catch (e) {
     console.warn('[platform-store] backup json failed:', file, e.message);
   }

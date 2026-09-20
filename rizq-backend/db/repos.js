@@ -155,6 +155,11 @@ const maintenanceAudit = createCollection('maintenance_audit', {
   onBackup: arrayBackup,
 });
 
+const subscribers = createCollection('subscribers', {
+  backupFile: 'rizq_subscribers_store.json',
+  onBackup: mapBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -375,6 +380,22 @@ function migrateAllSecondaryStores() {
   contactFomo.migrateFromMap(p('contact-fomo-log.json'));
   maintenanceAudit.migrateFromArray(p('maintenance-audit.json'), 'id');
 
+  // ملف المشتركين الماسيين — كان JSON مشتركاً بين عمليات منفصلة
+  if (subscribers.count() === 0) {
+    const legacyPaths = [
+      p('rizq_subscribers_store.json'),
+      path.join(__dirname, '..', '..', 'rizq_subscribers_store.json'),
+    ];
+    for (const lp of legacyPaths) {
+      const raw = require('./docStore').readLegacyJson(lp, null);
+      if (raw && typeof raw === 'object' && !Array.isArray(raw) && Object.keys(raw).length) {
+        subscribers.migrateFromMap(lp);
+        console.log('[repos] migrated subscribers from', lp);
+        break;
+      }
+    }
+  }
+
   return {
     packages: packages.count(),
     otp: otp.count(),
@@ -440,6 +461,7 @@ module.exports = {
   telegramAdminChat,
   contactFomo,
   maintenanceAudit,
+  subscribers,
 
   getSiteConfig,
   saveSiteConfig,

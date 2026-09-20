@@ -303,11 +303,19 @@ function mountAccountsSessionRoutes(app, deps) {
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
+    // إبطال الجلسات القديمة فور تغيير كلمة المرور
+    acc.accessToken = genAccessToken();
+    acc.dashToken = genDashToken();
     acc.passwordChangedAt = new Date().toISOString();
     acc.updatedAt = acc.passwordChangedAt;
     list[idx] = acc;
     writeAccounts(list);
-    res.json({ ok: true });
+    res.json({
+      ok: true,
+      accessToken: acc.accessToken,
+      dashToken: acc.dashToken,
+      token: acc.dashToken,
+    });
   });
 
   function handleVerifyDash(req, res) {
@@ -315,7 +323,13 @@ function mountAccountsSessionRoutes(app, deps) {
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractDashToken(req);
-    if (acc.status !== 'approved' || !acc.dashToken || !token || !timingSafeEqualStr(token, acc.dashToken)) {
+    if (
+      acc.suspended
+      || acc.status !== 'approved'
+      || !acc.dashToken
+      || !token
+      || !timingSafeEqualStr(token, acc.dashToken)
+    ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     res.json({ ok: true, account: stripToken(acc) });
@@ -326,7 +340,13 @@ function mountAccountsSessionRoutes(app, deps) {
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractDashToken(req);
-    if (acc.status !== 'approved' || !acc.dashToken || !token || !timingSafeEqualStr(token, acc.dashToken)) {
+    if (
+      acc.suspended
+      || acc.status !== 'approved'
+      || !acc.dashToken
+      || !token
+      || !timingSafeEqualStr(token, acc.dashToken)
+    ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     res.json({ ok: true, accessToken: acc.accessToken });

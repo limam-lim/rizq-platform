@@ -24,52 +24,73 @@
 
 'use strict';
 
-const fs   = require('fs');
 const path = require('path');
 const RizqPrompts = require('./rizq_ai_prompts');
 const { formatDynamicKnowledgeForPrompt } = require('./rizq-backend/services/dynamicKnowledge');
 
 // ══════════════════════════════════════════════════════════════
-//  قاعدة بيانات المشتركين
-//  ─────────────────────────────────────────────────────────────
-//  إصلاح جوهري: كانت Map() في الذاكرة فقط — تُمسَح عند إعادة تشغيل
-//  السيرفر، والأهم: rizq_call_handler.js و rizq_whatsapp_handler.js
-//  هما عمليتا Node منفصلتان (منافذ مختلفة)، فكل require('./rizq_subscriber_agent')
-//  يحصل على نسخته الخاصة من الذاكرة — تسجيل مشترك عبر خادم المكالمات
-//  لم يكن يظهر إطلاقاً في خادم واتساب والعكس. الحل: ملف JSON مشترك
-//  على القرص يقرأه كل خادم عند الإقلاع ويُحدَّث عند كل تسجيل —
-//  يكفي لحجم مشتركين صغير (عشرات) قبل الانتقال لقاعدة بيانات حقيقية.
+//  قاعدة بيانات المشتركين — SQLite عبر repos.subscribers
+//  (ملف JSON القديم يُرحَّل مرة واحدة؛ النسخ الاحتياطية تُكتب عبر docStore)
 // ══════════════════════════════════════════════════════════════
+let _repos = null;
+function getSubscribersRepo() {
+  if (_repos) return _repos.subscribers;
+  try {
+    _repos = require('./rizq-backend/db/repos');
+    return _repos.subscribers;
+  } catch (e) {
+    console.error('⚠️ فشل تحميل repos.subscribers:', e.message);
+    return null;
+  }
+}
+
 const subscriberProfiles = new Map();
-const STORE_FILE = path.join(__dirname, 'rizq_subscribers_store.json');
+let _memorySynced = false;
+
+function _syncFromStore() {
+  const store = getSubscribersRepo();
+  if (!store) return 0;
+  try {
+    const map = store.asMap();
+    subscriberProfiles.clear();
+    Object.keys(map).forEach((id) => {
+      if (map[id]) subscriberProfiles.set(id, map[id]);
+    });
+    _memorySynced = true;
+    return subscriberProfiles.size;
+  } catch (e) {
+    console.error('⚠️ فشل قراءة مشتركي SQLite:', e.message);
+    return 0;
+  }
+}
 
 function _persistToDisk() {
+  const store = getSubscribersRepo();
+  if (!store) return;
   try {
-    const obj = {};
-    for (const [id, profile] of subscriberProfiles.entries()) obj[id] = profile;
-    fs.writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf8');
+    const entries = [];
+    for (const [id, profile] of subscriberProfiles.entries()) {
+      entries.push({ id: String(id), data: profile });
+    }
+    if (typeof store.replaceAll === 'function') {
+      store.replaceAll(entries);
+    } else {
+      entries.forEach((e) => store.upsert(e.id, e.data, { skipBackup: true }));
+      if (typeof store.writeBackup === 'function') store.writeBackup();
+    }
   } catch (e) {
-    console.error('⚠️ فشل حفظ ملف المشتركين على القرص:', e.message);
+    console.error('⚠️ فشل حفظ المشتركين في SQLite:', e.message);
   }
 }
 
 function _loadFromDisk() {
-  try {
-    if (!fs.existsSync(STORE_FILE)) return 0;
-    const raw  = JSON.parse(fs.readFileSync(STORE_FILE, 'utf8'));
-    const keys = Object.keys(raw);
-    keys.forEach(id => subscriberProfiles.set(id, raw[id]));
-    return keys.length;
-  } catch (e) {
-    console.error('⚠️ فشل قراءة ملف المشتركين من القرص:', e.message);
-    return 0;
-  }
+  return _syncFromStore();
 }
 
 // نحمّل أي مشتركين حقيقيين محفوظين مسبقاً فور تحميل الوحدة
 const _loadedFromDisk = _loadFromDisk();
 if (_loadedFromDisk > 0) {
-  console.log(`📂 تم تحميل ${_loadedFromDisk} مشترك حقيقي من rizq_subscribers_store.json`);
+  console.log(`📂 تم تحميل ${_loadedFromDisk} مشترك حقيقي من SQLite (subscribers)`);
 }
 
 /**

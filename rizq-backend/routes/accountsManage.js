@@ -12,6 +12,7 @@
 function mountAccountsManageRoutes(app, deps) {
   const {
     requireAdminAuth,
+    requireAdminPermission,
     readAccounts,
     writeAccounts,
     extractAccountToken,
@@ -23,9 +24,14 @@ function mountAccountsManageRoutes(app, deps) {
     normalizeAccountActivityFields,
     normalizeAccountPaymentMethods,
     genDashToken,
+    genAccessToken,
     purgeAccountIdDocument,
     REFERRAL_BONUS_DAYS,
   } = deps;
+
+  const requireAccountsAdmin = typeof requireAdminPermission === 'function'
+    ? requireAdminPermission('accounts')
+    : requireAdminAuth;
 
   /**
    * GET /api/accounts/public — عام، بلا سرّ — الحسابات الموافَق عليها فقط،
@@ -146,7 +152,7 @@ function mountAccountsManageRoutes(app, deps) {
    * GET /api/accounts/admin — أدمين فقط (سرّ مشترك) — كل الحسابات بكل
    * حقولها (عدا accessToken) لطابور المراجعة في rizq_admin.html.
    */
-  app.get('/api/accounts/admin', requireAdminAuth, (req, res) => {
+  app.get('/api/accounts/admin', requireAccountsAdmin, (req, res) => {
     res.json({ ok: true, accounts: readAccounts().map(stripToken).reverse() });
   });
 
@@ -156,7 +162,7 @@ function mountAccountsManageRoutes(app, deps) {
    * الأدمن بدل توكن صاحب الحساب — يغذّي زر "تعديل" في لوحة "المستخدمون"
    * بـrizq_admin.html، الذي كان يعدّل بيانات وهمية محلية فقط سابقاً.
    */
-  app.patch('/api/accounts/admin/:id', requireAdminAuth, (req, res) => {
+  app.patch('/api/accounts/admin/:id', requireAccountsAdmin, (req, res) => {
     const list = readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
@@ -198,7 +204,7 @@ function mountAccountsManageRoutes(app, deps) {
    * GET /api/accounts/public إن كانت موافقة.
    * عند approve: تُحذف صورة الهوية فوراً من accounts.json ويُثبَّت id_verified فقط.
    */
-  app.post('/api/accounts/admin/:id/decision', requireAdminAuth, (req, res) => {
+  app.post('/api/accounts/admin/:id/decision', requireAccountsAdmin, (req, res) => {
     const body = req.body || {};
     const action = body.action;
     if (!['approve', 'reject', 'suspend', 'reactivate'].includes(action)) {
@@ -215,6 +221,11 @@ function mountAccountsManageRoutes(app, deps) {
     if (action === 'suspend' || action === 'reactivate') {
       list[idx].suspended = action === 'suspend';
       list[idx].suspendedAt = action === 'suspend' ? new Date().toISOString() : null;
+      if (action === 'suspend') {
+        // إبطال الجلسات المسروقة فور التعليق
+        list[idx].dashToken = typeof genDashToken === 'function' ? genDashToken() : list[idx].dashToken;
+        list[idx].accessToken = typeof genAccessToken === 'function' ? genAccessToken() : list[idx].accessToken;
+      }
       writeAccounts(list);
       return res.json({ ok: true, account: stripToken(list[idx]) });
     }
@@ -247,7 +258,7 @@ function mountAccountsManageRoutes(app, deps) {
    * من الأدمن مباشرة (منح/سحب استثنائي بلا طلب شراء). مستقلة تماماً عن status
    * (التوثيق المجاني) وعن package (باقة الحساب العامة) — لا تُعدِّل أياً منهما.
    */
-  app.post('/api/accounts/admin/:id/verified-plus', requireAdminAuth, (req, res) => {
+  app.post('/api/accounts/admin/:id/verified-plus', requireAccountsAdmin, (req, res) => {
     const body = req.body || {};
     const action = body.action;
     if (action !== 'grant' && action !== 'revoke') return res.status(400).json({ error: "action يجب أن يكون 'grant' أو 'revoke'" });

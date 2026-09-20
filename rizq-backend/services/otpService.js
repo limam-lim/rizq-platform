@@ -110,7 +110,13 @@ function isValidMauritanianPhone(ph) {
 }
 
 function otpPepper() {
-  return process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || 'rizq-otp-pepper';
+  const pepper = String(process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim();
+  if (pepper) return pepper;
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  if (isProd) {
+    throw new Error('OTP_PEPPER or BACKEND_SHARED_SECRET required in production');
+  }
+  return 'rizq-otp-pepper-dev-only';
 }
 
 function escapeHtml(s) {

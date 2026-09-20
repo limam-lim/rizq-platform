@@ -1252,15 +1252,12 @@ function loadActivatedPackage(acc) {
 
 // ══ INIT ══
 function init(){
-  const acc = verifyAccess();
-  if(acc){ _initWithAccount(acc); return; }
-  if(acc===null && !IS_DEMO && SESSION_ID && SESSION_TOKEN){
-    verifyAccessRemote().then(function(remoteAcc){
-      if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
-    });
-  } else {
-    showAccessDenied();
-  }
+  if(IS_DEMO){ _initWithAccount(DEMO_ACCOUNT); return; }
+  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده
+  verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
+  });
 }
 
 function _initWithAccount(acc){

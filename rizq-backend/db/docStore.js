@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const { db, DATA_DIR } = require('./index');
+const { scrubSecretsForBackup } = require('../lib/scrubSecrets');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS documents (
@@ -79,7 +80,8 @@ function backupJson(file, data) {
     const dir = path.dirname(file);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     const tmp = file + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
+    const safe = scrubSecretsForBackup(data);
+    fs.writeFileSync(tmp, JSON.stringify(safe, null, 2), 'utf8');
     fs.renameSync(tmp, file);
   } catch (e) {
     console.warn('[doc-store] backup failed:', file, e && e.message);
