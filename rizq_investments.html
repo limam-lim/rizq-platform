@@ -241,7 +241,7 @@ body{
       <form id="inv-agent-form" autocomplete="off">
         <div class="f-group">
           <label class="f-label" for="inv-title" data-t-fr="Titre du projet">عنوان المشروع</label>
-          <input class="f-input" id="inv-title" name="title" required maxlength="120" placeholder="مثال: منصة لوجستية محلية"/>
+          <input class="f-input" id="inv-title" name="title" required maxlength="120" data-ph-ar="مثال: منصة لوجستية محلية" data-ph-fr="Ex. : plateforme logistique locale" placeholder="مثال: منصة لوجستية محلية"/>
         </div>
         <div class="f-row">
           <div class="f-group">
@@ -272,11 +272,11 @@ body{
         </div>
         <div class="f-group">
           <label class="f-label" for="inv-capital" data-t-fr="Capital recherché (MRU)">رأس المال المطلوب (أوقية)</label>
-          <input class="f-input" id="inv-capital" name="capital" maxlength="80" placeholder="مثال: 500,000"/>
+          <input class="f-input" id="inv-capital" name="capital" maxlength="80" data-ph-ar="مثال: 500,000" data-ph-fr="Ex. : 500 000" placeholder="مثال: 500,000"/>
         </div>
         <div class="f-group">
           <label class="f-label" for="inv-desc" data-t-fr="Description">الوصف</label>
-          <textarea class="f-area" id="inv-desc" name="description" maxlength="2500" placeholder="الفكرة، السوق، العملاء، وما تحتاجه من الشراكة…"></textarea>
+          <textarea class="f-area" id="inv-desc" name="description" maxlength="2500" data-ph-ar="الفكرة، السوق، العملاء، وما تحتاجه من الشراكة…" data-ph-fr="L'idée, le marché, les clients, et ce que vous attendez du partenariat…" placeholder="الفكرة، السوق، العملاء، وما تحتاجه من الشراكة…"></textarea>
         </div>
         <button type="submit" class="f-submit" data-t-fr="✨ Préparer le dossier">✨ إعداد المخطط</button>
         <p class="f-hint" data-t-fr="Le résultat est indicatif. Due diligence obligatoire avant tout engagement.">النتيجة إرشادية. يلزم فحص عناية واجبة قبل أي التزام.</p>
@@ -311,7 +311,7 @@ body{
       <div class="f-row">
         <div class="f-group">
           <label class="f-label" for="sub-sector" data-t-fr="Secteur">القطاع</label>
-          <input class="f-input" id="sub-sector" name="sector" maxlength="80" placeholder="خدمات / تجارة…"/>
+          <input class="f-input" id="sub-sector" name="sector" maxlength="80" data-ph-ar="خدمات / تجارة…" data-ph-fr="Services / commerce…" placeholder="خدمات / تجارة…"/>
         </div>
         <div class="f-group">
           <label class="f-label" for="sub-capital" data-t-fr="Capital">رأس المال</label>
@@ -514,8 +514,16 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     document.documentElement.lang = fr ? 'fr' : 'ar';
     document.documentElement.dir = fr ? 'ltr' : 'rtl';
     document.querySelectorAll('[data-t-fr]').forEach(function (el) {
+      if (el.tagName === 'OPTION') {
+        if (!el.dataset.tAr) el.dataset.tAr = el.textContent;
+        el.textContent = fr ? el.getAttribute('data-t-fr') : el.dataset.tAr;
+        return;
+      }
       if (!el.dataset.tAr) el.dataset.tAr = el.innerHTML;
       el.innerHTML = fr ? el.getAttribute('data-t-fr') : el.dataset.tAr;
+    });
+    document.querySelectorAll('[data-ph-ar][data-ph-fr]').forEach(function (el) {
+      el.setAttribute('placeholder', fr ? el.getAttribute('data-ph-fr') : el.getAttribute('data-ph-ar'));
     });
     var home = document.querySelector('.nav-home-link');
     if (home) home.textContent = fr ? '← Accueil' : '← الرئيسية';
