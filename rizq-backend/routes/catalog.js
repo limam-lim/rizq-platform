@@ -107,10 +107,16 @@ function mountCatalogRoutes(app, deps) {
     res.json({ ok: true, items: list });
   });
 
-  /** GET /api/catalog/:id */
+  /** GET /api/catalog/:id — عام فقط للعناصر النشطة؛ المالك/الأدمن يريان الباقي */
   app.get('/api/catalog/:id', (req, res) => {
     const item = readCatalog().find((it) => it.id === req.params.id);
     if (!item) return res.status(404).json({ error: 'item_not_found' });
+    const isAdmin = isAdminRequest(req);
+    const token = extractAccountToken(req) || '';
+    const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
+    if (item.status !== 'active' && !isAdmin && !isOwner) {
+      return res.status(404).json({ error: 'item_not_found' });
+    }
     res.json({ ok: true, item });
   });
 
@@ -128,7 +134,8 @@ function mountCatalogRoutes(app, deps) {
     const b = req.body || {};
     const editable = ['name', 'nameFr', 'price', 'cat', 'desc', 'descFr', 'stock', 'variants', 'emoji'];
     editable.forEach((k) => { if (typeof b[k] === 'string') item[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 3000 : 200); });
-    if (typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
+    // لا نسمح للمالك بتضخيم sold — للأدمن فقط
+    if (isAdmin && typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
     if (Array.isArray(b.images)) {
       item.images = await saveCatalogImages(item.id, b.images);
       item.image = item.images[0] || null;
@@ -136,7 +143,13 @@ function mountCatalogRoutes(app, deps) {
       item.image = await saveCatalogImage(item.id, b.image);
       item.images = item.image ? [item.image] : [];
     }
-    if (typeof b.status === 'string' && ['active', 'inactive', 'pending_review', 'removed'].includes(b.status)) item.status = b.status;
+    // مثل الإعلانات: المالك يدير inactive/removed فقط؛ active/pending_review للأدمن
+    if (typeof b.status === 'string') {
+      const ownerAllowed = ['inactive', 'removed'];
+      const adminAllowed = ['active', 'inactive', 'pending_review', 'removed'];
+      const allowed = isAdmin ? adminAllowed : ownerAllowed;
+      if (allowed.includes(b.status)) item.status = b.status;
+    }
     item.updatedAt = new Date().toISOString();
     list[idx] = item;
     writeCatalog(list);

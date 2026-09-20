@@ -119,10 +119,9 @@ function scoreInvestmentOpportunity(item) {
  * تقييم طلب باقة بعد تحليل الوصل (أو من riskLevel القادم من العميل).
  */
 function scorePackageRequest(req, aiResult) {
-  const level = (aiResult && aiResult.plausibilityLevel) || (req && req.riskLevel) || 'unreviewed';
-  const flags = []
-    .concat((req && req.flags) || [])
-    .concat((aiResult && aiResult.notes) || []);
+  // لا نثق بـ riskLevel من العميل — فقط نتيجة التحليل الآلي إن وُجدت
+  const level = (aiResult && aiResult.plausibilityLevel) || 'unreviewed';
+  const flags = [].concat((aiResult && aiResult.notes) || []);
   let tier = tierFromPlausibility(level, flags);
   const reasons = [];
   if (!req || !req.receiptImage) {

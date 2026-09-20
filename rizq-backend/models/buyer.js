@@ -105,8 +105,17 @@ function registerOrLogin(payload) {
   const primaryPhone = MR_PHONE_RE.test(mr) ? mr : wa.replace(/\D/g, '').slice(-15);
   const now = new Date().toISOString();
 
-  let row = findByEmail(cleanEmail) || (MR_PHONE_RE.test(mr) ? findByPhone(mr) : null);
+  // تطابق بالبريد فقط بعد OTP — لا نربط بحساب موجود عبر الهاتف وحده
+  // (كان يسمح باختطاف حساب الضحية بمعرفة رقمه + OTP على بريد المهاجم).
+  let row = findByEmail(cleanEmail);
   if (row) {
+    const phoneOwner = MR_PHONE_RE.test(mr) ? findByPhone(mr) : null;
+    if (phoneOwner && phoneOwner.id !== row.id) {
+      const err = new Error('رقم الهاتف مرتبط بحساب آخر');
+      err.status = 409;
+      err.code = 'PHONE_IN_USE';
+      throw err;
+    }
     db.prepare(`
       UPDATE buyers SET name = ?, email = ?, phone = ?, phone_intl = ?, whatsapp = ?, last_login_at = ?
       WHERE id = ?
@@ -118,6 +127,16 @@ function registerOrLogin(payload) {
     }
     row = findById(row.id);
     return { buyer: publicBuyer(row), token: row.token, created: false };
+  }
+
+  if (MR_PHONE_RE.test(mr)) {
+    const phoneOwner = findByPhone(mr);
+    if (phoneOwner) {
+      const err = new Error('رقم الهاتف مسجّل مسبقاً — سجّل دخولك بنفس البريد المرتبط');
+      err.status = 409;
+      err.code = 'PHONE_IN_USE';
+      throw err;
+    }
   }
 
   const id = genBuyerId();

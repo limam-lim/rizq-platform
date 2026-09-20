@@ -181,7 +181,7 @@ function assertTeamCapacity() {
   }
 }
 
-async function createMember(payload, actorUser) {
+async function createMember(payload, actorUser, actorPerms) {
   assertTeamCapacity();
   const user = String(payload.user || '').trim().toLowerCase();
   const name = String(payload.name || '').trim();
@@ -196,6 +196,13 @@ async function createMember(payload, actorUser) {
     err.code = 'user_exists';
     throw err;
   }
+  let perms = normalizePermissions(payload.permissions);
+  // team.manage alone لا يمنح Super (*) — يلزم أن يكون الفاعل Super أصلاً
+  if (perms.includes('*') && !hasAdminPermission(actorPerms, '*')) {
+    const err = new Error('cannot_grant_super');
+    err.code = 'cannot_grant_super';
+    throw err;
+  }
   const now = new Date().toISOString();
   const member = {
     id: genAdminId(),
@@ -205,7 +212,7 @@ async function createMember(payload, actorUser) {
     email: String(payload.email || '').slice(0, 120),
     phone: String(payload.phone || '').slice(0, 40),
     notes: String(payload.notes || '').slice(0, 300),
-    permissions: normalizePermissions(payload.permissions),
+    permissions: perms,
     active: true,
     createdAt: now,
     updatedAt: now,
@@ -217,7 +224,7 @@ async function createMember(payload, actorUser) {
   return publicMember(member);
 }
 
-async function updateMember(id, payload) {
+async function updateMember(id, payload, actorPerms) {
   const list = readTeam();
   const idx = list.findIndex((m) => m.id === id);
   if (idx === -1) return null;
@@ -226,7 +233,25 @@ async function updateMember(id, payload) {
   if (payload.email != null) row.email = String(payload.email).slice(0, 120);
   if (payload.phone != null) row.phone = String(payload.phone).slice(0, 40);
   if (payload.notes != null) row.notes = String(payload.notes).slice(0, 300);
-  if (payload.permissions != null) row.permissions = normalizePermissions(payload.permissions);
+  if (payload.permissions != null) {
+    const next = normalizePermissions(payload.permissions);
+    if (next.includes('*') && !hasAdminPermission(actorPerms, '*')) {
+      const err = new Error('cannot_grant_super');
+      err.code = 'cannot_grant_super';
+      throw err;
+    }
+    // منع إسقاط آخر Super
+    const wasSuper = (row.permissions || []).includes('*');
+    if (wasSuper && !next.includes('*')) {
+      const supers = readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*'));
+      if (supers.length <= 1) {
+        const err = new Error('last_super_admin');
+        err.code = 'last_super_admin';
+        throw err;
+      }
+    }
+    row.permissions = next;
+  }
   if (payload.active != null) row.active = !!payload.active;
   if (payload.pass && String(payload.pass).length >= 6) {
     row.passHash = await bcrypt.hash(String(payload.pass), 10);

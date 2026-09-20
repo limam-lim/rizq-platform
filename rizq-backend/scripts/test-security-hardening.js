@@ -238,8 +238,9 @@ async function main() {
   process.env.OTP_ALLOW_DEMO = 'true';
   process.env.OTP_DEMO_CODE = '112233';
   const testEmail = 'otpsec_' + Date.now() + '@rizq.test';
+  const testPhone = '33' + String(Date.now()).slice(-6);
   try {
-    const sent = await otp.sendBuyerOtp({ email: testEmail, name: 'OTP Sec', phoneMr: '33112244' });
+    const sent = await otp.sendBuyerOtp({ email: testEmail, name: 'OTP Sec', phoneMr: testPhone });
     ok('sendBuyerOtp', sent.ok === true);
     const store = repos.listOtp();
     const rec = store.find((x) => x.email === testEmail.toLowerCase());
@@ -251,8 +252,8 @@ async function main() {
     const reg = await req('POST', '/api/auth/register', {
       name: 'OTP Sec User',
       email: testEmail,
-      phone: '33112244',
-      whatsapp: '+22233112244',
+      phone: testPhone,
+      whatsapp: '+222' + testPhone,
     });
     ok('POST /api/auth/register after OTP', (reg.status === 200 || reg.status === 201) && reg.body && reg.body.ok && reg.body.token,
       reg.body ? JSON.stringify({ status: reg.status, error: reg.body.error, message: reg.body.message }) : 'status=' + reg.status);

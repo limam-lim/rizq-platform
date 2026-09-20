@@ -9,7 +9,32 @@ const repos = require('../db/repos');
 const TTL_MS = 5 * 60 * 1000;
 const VERIFY_WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
+const RESEND_COOLDOWN_MS = 60 * 1000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** destination key → last send timestamp (anti-bombing) */
+const _otpLastSend = new Map();
+
+function assertOtpCooldown(destKey) {
+  const key = String(destKey || '').toLowerCase();
+  if (!key) return { ok: true };
+  const last = _otpLastSend.get(key) || 0;
+  const wait = RESEND_COOLDOWN_MS - (Date.now() - last);
+  if (wait > 0) {
+    return {
+      ok: false,
+      error: 'cooldown',
+      message: 'انتظر قليلاً قبل طلب رمز جديد',
+      retryAfterSec: Math.ceil(wait / 1000),
+    };
+  }
+  return { ok: true };
+}
+
+function markOtpSent(destKey) {
+  const key = String(destKey || '').toLowerCase();
+  if (key) _otpLastSend.set(key, Date.now());
+}
 
 let _mailer = null;
 function getMailer() {
@@ -169,6 +194,13 @@ async function sendOtp(phone, opts) {
     return { ok: false, error: 'invalid_email', message: 'بريد إلكتروني غير صالح' };
   }
 
+  const coolPhone = assertOtpCooldown('phone:' + ph);
+  if (!coolPhone.ok) return coolPhone;
+  if (email) {
+    const coolEmail = assertOtpCooldown('email:' + email);
+    if (!coolEmail.ok) return coolEmail;
+  }
+
   const code = generateCode();
   const now = Date.now();
   const list = readStore().filter((x) => x.phone !== ph);
@@ -196,6 +228,9 @@ async function sendOtp(phone, opts) {
     const mail = await sendOtpEmail(email, code, name);
     sentViaEmail = !!(mail && mail.ok);
   }
+
+  markOtpSent('phone:' + ph);
+  if (email) markOtpSent('email:' + email);
 
   const out = { ok: true, expiresIn: Math.floor(TTL_MS / 1000), sentViaSms, sentViaEmail };
   const cfg = getPublicOtpConfig();
@@ -280,6 +315,13 @@ async function sendBuyerOtp(payload) {
     return { ok: false, error: 'phone_required', message: 'أدخل هاتفاً موريتانياً أو رقماً دولياً' };
   }
 
+  const coolEmail = assertOtpCooldown('email:' + email);
+  if (!coolEmail.ok) return coolEmail;
+  if (isValidMauritanianPhone(mr)) {
+    const coolPhone = assertOtpCooldown('phone:' + mr);
+    if (!coolPhone.ok) return coolPhone;
+  }
+
   const code = generateCode();
   const now = Date.now();
   const key = buyerStoreKey(email);
@@ -308,6 +350,9 @@ async function sendBuyerOtp(payload) {
 
   const mail = await sendOtpEmail(email, code, name);
   const sentViaEmail = !!(mail && mail.ok);
+
+  markOtpSent('email:' + email);
+  if (isValidMauritanianPhone(mr)) markOtpSent('phone:' + mr);
 
   const out = { ok: true, expiresIn: Math.floor(TTL_MS / 1000), sentViaSms, sentViaEmail, channel: 'buyer' };
   const cfg = getPublicOtpConfig();

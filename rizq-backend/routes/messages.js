@@ -4,11 +4,40 @@
  */
 'use strict';
 
+const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 
 function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
   const buyerPart = buyerAccountId ? ('acc:' + buyerAccountId) : ('guest:' + String(buyerPhone || '').replace(/\D/g, ''));
   return sellerAccountId + '::' + buyerPart;
+}
+
+/** أسرار قراءة محادثات الضيوف — threadKey → { hash, phoneDigits } */
+const _guestThreadSecrets = new Map();
+
+function issueGuestThreadToken(threadKey, phoneDigits) {
+  const token = crypto.randomBytes(24).toString('hex');
+  const hash = crypto.createHash('sha256').update(token).digest('hex');
+  _guestThreadSecrets.set(threadKey, {
+    hash,
+    phoneDigits: String(phoneDigits || '').replace(/\D/g, ''),
+    createdAt: Date.now(),
+  });
+  return token;
+}
+
+function verifyGuestThreadToken(threadKey, token, phoneDigits) {
+  const rec = _guestThreadSecrets.get(threadKey);
+  if (!rec || !token) return false;
+  const hash = crypto.createHash('sha256').update(String(token)).digest('hex');
+  try {
+    if (!crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(rec.hash, 'hex'))) return false;
+  } catch (e) {
+    return false;
+  }
+  const ph = String(phoneDigits || '').replace(/\D/g, '');
+  if (rec.phoneDigits && ph && rec.phoneDigits !== ph) return false;
+  return true;
 }
 
 /**
@@ -71,7 +100,11 @@ function mountMessagesRoutes(app, deps) {
     };
     list.push(rec);
     writeMessages(list);
-    res.json({ ok: true, threadKey, message: rec });
+    const out = { ok: true, threadKey, message: rec };
+    if (!buyerAccountId) {
+      out.guestThreadToken = issueGuestThreadToken(threadKey, String(b.buyerPhone || '').replace(/\D/g, ''));
+    }
+    res.json(out);
 
     const sellerAcc = readAccounts().find((a) => a.id === b.sellerAccountId);
     if (sellerAcc) {
@@ -193,7 +226,11 @@ function mountMessagesRoutes(app, deps) {
     const guestMatch = /::guest:(\d+)$/.exec(threadKey);
     if (!asSeller && !asBuyer && guestMatch) {
       const phoneDigits = String(req.query.buyerPhone || req.header('x-guest-phone') || '').replace(/\D/g, '');
-      if (phoneDigits && phoneDigits === guestMatch[1]) asGuest = true;
+      const guestTok = String(req.query.guestThreadToken || req.header('x-guest-thread-token') || '');
+      // هاتف alone لم يعد كافياً — يلزم رمز صدر عند أول إرسال
+      if (phoneDigits && phoneDigits === guestMatch[1] && verifyGuestThreadToken(threadKey, guestTok, phoneDigits)) {
+        asGuest = true;
+      }
     }
     if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
     const list = readMessages().filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));

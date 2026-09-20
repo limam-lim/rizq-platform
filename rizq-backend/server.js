@@ -439,8 +439,11 @@ app.post('/api/agent/toggle', (req, res) => {
       }
       const want = String(subscriberPhone || '').replace(/\D/g, '').slice(-8);
       const accPh = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '').slice(-8);
-      // إن وُجد رقم على الحساب يجب أن يطابق، وإلا نسمح لمالك الحساب الماسي
-      authorized = !want || !accPh || want === accPh;
+      // يجب ربط التبديل برقم الحساب — لا IDOR عند غياب الهاتف
+      if (!want || !accPh || want !== accPh) {
+        return res.status(403).json({ ok: false, error: 'phone_mismatch', code: 'phone_mismatch' });
+      }
+      authorized = true;
     }
   }
   if (!authorized) {
@@ -1971,8 +1974,9 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
     receiptImage: b.receiptImage ? String(b.receiptImage).slice(0, 2_500_000) : null,
-    riskLevel: String(b.riskLevel || 'unreviewed').slice(0, 20),
-    flags: Array.isArray(b.flags) ? b.flags.slice(0, 20) : [],
+    // لا نخزّن riskLevel/flags من العميل — السيرفر فقط يحدّدهما بعد التحليل
+    riskLevel: 'unreviewed',
+    flags: [],
     // إصلاح مرافق: adId/adTitle (فئة 'ad_boost') لم تكونا تُخزَّنان إطلاقاً هنا،
     // فكان activateAdBoostForRequest (يتطلب req.adId) يفشل بصمت لأي طلب "مميزة"
     // معزول يصل من جهاز غير جهاز الأدمن — الزبون يدفع ولا يُفعَّل شيء.
@@ -2826,23 +2830,26 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (typeof rating !== 'number' || isNaN(rating) || !isFinite(rating) || !Number.isInteger(rating) || rating < 1 || rating > 5) {
     return res.status(400).json({ error: 'rating يجب أن يكون عدداً صحيحاً بين 1 و5' });
   }
-  let reviewerAccountId = null;
-  if (b.reviewerAccountId) {
-    const token = req.header('x-account-token') || '';
-    const reviewerAcc = verifyAccountOwner(b.reviewerAccountId, token);
-    if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized' });
-    reviewerAccountId = b.reviewerAccountId;
+  // تقييمات مجهولة ممنوعة — يلزم حساب مشتري/بائع موثّق
+  const token = req.header('x-account-token') || '';
+  const buyerId = String(b.reviewerAccountId || '').slice(0, 60);
+  if (!buyerId) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+  const reviewerAcc = verifyAccountOwner(buyerId, token);
+  if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized' });
+  if (buyerId === String(b.targetId)) {
+    return res.status(400).json({ error: 'cannot_review_self' });
   }
+  const reviewerAccountId = buyerId;
   const all = readReviews();
   const list = all[b.targetId] || [];
-  if (reviewerAccountId && list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
+  if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
     return res.status(409).json({ error: 'already_reviewed' });
   }
   const review = {
     id: genReviewId(),
     rating,
     comment: String(b.comment == null ? '' : b.comment).trim().slice(0, 500),
-    reviewerName: String(b.reviewerName == null ? '' : b.reviewerName).trim().slice(0, 60),
+    reviewerName: String((b.reviewerName || reviewerAcc.name || '')).trim().slice(0, 60),
     reviewerAccountId,
     createdAt: new Date().toISOString(),
   };
@@ -2870,14 +2877,11 @@ app.get('/api/reviews/:targetId/stats', (req, res) => {
 });
 
 /**
- * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم (لموديريشن البائع
- * صاحب targetId، عبر x-account-token، أو الأدمن عبر x-rizq-secret).
+ * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم للأدمن فقط
+ * (البائع لا يمسح تقييمات الزبائن — كان يسمح بمسح السلبي).
  */
 app.delete('/api/reviews/:targetId/:reviewId', (req, res) => {
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!verifyAccountOwner(req.params.targetId, token);
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
+  if (!isAdminRequest(req)) return res.status(401).json({ error: 'unauthorized' });
   const all = readReviews();
   const list = all[req.params.targetId] || [];
   const next = list.filter((r) => r.id !== req.params.reviewId);

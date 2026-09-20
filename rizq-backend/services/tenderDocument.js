@@ -39,7 +39,14 @@ function parseDataUriPdf(dataUri) {
 
 async function saveTenderDocument(tenderId, document) {
   if (!document || typeof document !== 'string') return null;
-  if (document.indexOf(PDF_UPLOAD_PREFIX) === 0) return document;
+  // قبول مسار موجود فقط إن كان تحت بادئة هذا المناقصة نفسه (منع IDOR)
+  const ownedPrefix = PDF_UPLOAD_PREFIX + String(tenderId) + '/';
+  if (document.indexOf(PDF_UPLOAD_PREFIX) === 0) {
+    if (document.indexOf(ownedPrefix) === 0 && !document.includes('..')) return document;
+    const err = new Error('document_path_forbidden');
+    err.code = 'document_path_forbidden';
+    throw err;
+  }
 
   const parsed = parseDataUriPdf(document);
   if (!parsed || parsed.error) {
@@ -59,7 +66,13 @@ async function saveTenderDocument(tenderId, document) {
 
 async function saveInvestmentDocument(invId, document) {
   if (!document || typeof document !== 'string') return null;
-  if (document.indexOf(INV_PDF_UPLOAD_PREFIX) === 0) return document;
+  const ownedPrefix = INV_PDF_UPLOAD_PREFIX + String(invId) + '/';
+  if (document.indexOf(INV_PDF_UPLOAD_PREFIX) === 0) {
+    if (document.indexOf(ownedPrefix) === 0 && !document.includes('..')) return document;
+    const err = new Error('document_path_forbidden');
+    err.code = 'document_path_forbidden';
+    throw err;
+  }
 
   const parsed = parseDataUriPdf(document);
   if (!parsed || parsed.error) {

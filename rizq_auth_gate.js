@@ -907,6 +907,23 @@
       });
   }
 
+  function sanitizeAfterAuthHref(href) {
+    if (!href) return '';
+    var safe = String(href);
+    try {
+      if (/^https?:\/\//i.test(safe) || safe.indexOf('//') === 0) {
+        var u = new URL(safe, location.href);
+        if (u.origin !== location.origin) return '';
+        safe = u.pathname + u.search + u.hash;
+      }
+      if (/^(javascript|data|vbscript):/i.test(safe)) return '';
+      if (safe.charAt(0) === '/' || safe.indexOf('.html') >= 0 || safe.indexOf('rizq_') === 0 || safe.charAt(0) === '?') {
+        return safe;
+      }
+    } catch (e) {}
+    return '';
+  }
+
   function rememberAfterAuthHref() {
     try {
       if (sessionStorage.getItem('rizq_after_auth_href')) return;
@@ -914,19 +931,20 @@
       if (window.RizqAccount && typeof window.RizqAccount.setAfterAuthHref === 'function') {
         window.RizqAccount.setAfterAuthHref(href);
       } else {
-        sessionStorage.setItem('rizq_after_auth_href', href);
+        var safe = sanitizeAfterAuthHref(href);
+        if (safe) sessionStorage.setItem('rizq_after_auth_href', safe);
       }
     } catch (e) {}
   }
 
   function consumeAfterAuthHrefSafe() {
     if (window.RizqAccount && typeof window.RizqAccount.consumeAfterAuthHref === 'function') {
-      return window.RizqAccount.consumeAfterAuthHref();
+      return sanitizeAfterAuthHref(window.RizqAccount.consumeAfterAuthHref());
     }
     try {
       var href = sessionStorage.getItem('rizq_after_auth_href') || '';
       if (href) sessionStorage.removeItem('rizq_after_auth_href');
-      return href;
+      return sanitizeAfterAuthHref(href);
     } catch (e2) {
       return '';
     }
@@ -1209,7 +1227,8 @@
   function gateLink(el, ev, reasonKey) {
     if (isLoggedIn()) return true;
     if (ev && ev.preventDefault) ev.preventDefault();
-    var targetHref = el && el.href ? el.href : '';
+    var rawHref = el && el.href ? el.href : '';
+    var targetHref = sanitizeAfterAuthHref(rawHref);
     if (targetHref) {
       try {
         if (window.RizqAccount && typeof window.RizqAccount.setAfterAuthHref === 'function') {

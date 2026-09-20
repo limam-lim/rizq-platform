@@ -112,7 +112,8 @@ function mountAdminCoreRoutes(app, deps) {
   app.post('/api/admin/team', requireAdminPermission('team.manage'), async (req, res) => {
     try {
       const b = req.body || {};
-      const member = await adminTeamService.createMember(b, req.adminUser && req.adminUser.user);
+      const actorPerms = (req.adminUser && req.adminUser.permissions) || [];
+      const member = await adminTeamService.createMember(b, req.adminUser && req.adminUser.user, actorPerms);
       res.json({ ok: true, member });
     } catch (e) {
       if (e.code === 'team_limit_reached') {
@@ -120,6 +121,7 @@ function mountAdminCoreRoutes(app, deps) {
       }
       if (e.code === 'user_exists') return res.status(409).json({ error: e.code, msg: 'اسم المستخدم موجود' });
       if (e.code === 'missing_fields') return res.status(400).json({ error: e.code, msg: 'الاسم واسم المستخدم وكلمة المرور مطلوبة' });
+      if (e.code === 'cannot_grant_super') return res.status(403).json({ error: e.code, msg: 'منح صلاحية Super يتطلب أن تكون Super Admin' });
       res.status(500).json({ error: 'create_failed' });
     }
   });
@@ -127,10 +129,13 @@ function mountAdminCoreRoutes(app, deps) {
   /** PATCH /api/admin/team/:id — تعديل صلاحيات/بيانات */
   app.patch('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
     try {
-      const member = await adminTeamService.updateMember(req.params.id, req.body || {});
+      const actorPerms = (req.adminUser && req.adminUser.permissions) || [];
+      const member = await adminTeamService.updateMember(req.params.id, req.body || {}, actorPerms);
       if (!member) return res.status(404).json({ error: 'member_not_found' });
       res.json({ ok: true, member });
     } catch (e) {
+      if (e.code === 'cannot_grant_super') return res.status(403).json({ error: e.code, msg: 'منح صلاحية Super يتطلب أن تكون Super Admin' });
+      if (e.code === 'last_super_admin') return res.status(400).json({ error: e.code, msg: 'لا يمكن إزالة آخر Super Admin' });
       res.status(500).json({ error: 'update_failed' });
     }
   });

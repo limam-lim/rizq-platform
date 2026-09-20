@@ -191,9 +191,9 @@ function assertIpAllowed(row, clientIp) {
 }
 
 function resolveClientIp(req) {
-  const forwarded = req.header('x-forwarded-for');
-  if (forwarded) return String(forwarded).split(',')[0].trim();
-  return req.ip || req.connection?.remoteAddress || '';
+  // مع trust proxy، Express يضبط req.ip من أقصى اليمين في XFF — لا نثق باليسار (قابل للتزوير)
+  const ip = req.ip || (req.connection && req.connection.remoteAddress) || '';
+  return String(ip).replace(/^::ffff:/, '');
 }
 
 function authenticateApiKeyRequest(req) {

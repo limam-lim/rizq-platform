@@ -44,6 +44,20 @@ function getAccountInfo(accountId, readAccounts) {
 
 function activateVideoAdOnServer(req) {
   if (!req.videoUrl) return { ok: true, skipped: true, reason: 'no_video_url' };
+  const rawUrl = String(req.videoUrl).trim().slice(0, 500);
+  let safeUrl = '';
+  try {
+    const u = new URL(rawUrl);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') {
+      return { ok: false, error: 'invalid_video_url' };
+    }
+    if (/^(javascript|data|vbscript|file):/i.test(rawUrl)) {
+      return { ok: false, error: 'invalid_video_url' };
+    }
+    safeUrl = u.toString().slice(0, 500);
+  } catch (e) {
+    return { ok: false, error: 'invalid_video_url' };
+  }
   const cfg = readSiteConfigRaw();
   const videoAds = cfg.videoAds && typeof cfg.videoAds === 'object'
     ? { hero: cfg.videoAds.hero || [], popup: cfg.videoAds.popup || [] }
@@ -60,13 +74,13 @@ function activateVideoAdOnServer(req) {
   const list = videoAds[target] || [];
   const existing = req.accountId ? list.find((a) => a.accountId === req.accountId) : null;
   if (existing) {
-    existing.url = req.videoUrl;
+    existing.url = safeUrl;
     existing.advertiser = req.account || '';
     existing.active = true;
   } else {
     list.push({
       advertiser: req.account || '',
-      url: req.videoUrl,
+      url: safeUrl,
       active: true,
       accountId: req.accountId || '',
     });

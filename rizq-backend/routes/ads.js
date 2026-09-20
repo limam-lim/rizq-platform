@@ -175,7 +175,8 @@ function mountAdsRoutes(app, deps) {
       negotiable: b.negotiable !== undefined ? !!b.negotiable : true,
       urgent: !!b.urgent,
       images,
-      seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
+      // درجة الثقة من السيرفر فقط — لا نقبل قيمة العميل
+      seller_trust_score: 60,
       accountId: String(b.accountId).slice(0, 60),
       // إصلاح ثغرة أمنية (2026-08-04): كان الحقل status قابلاً للتحكم من العميل
       // (b.status)، وبقيمة افتراضية 'active' إن لم يُرسَل شيء — أي أن أي طلب
