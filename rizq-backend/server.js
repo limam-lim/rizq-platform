@@ -208,6 +208,20 @@ const LOCAL_DEV_ORIGINS = [
 if (!isProdEnv()) {
   LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
 }
+function isDevPreviewOrigin(origin) {
+  if (!origin || isProdEnv()) return false;
+  try {
+    const u = new URL(origin);
+    const h = String(u.hostname || '').toLowerCase();
+    // Cursor Cloud / port-forward previews, GitHub Pages, Gitpod
+    if (h.endsWith('.cursorusercontent.com')) return true;
+    if (h.endsWith('.gitpod.io')) return true;
+    if (/^[a-z0-9-]+\.github\.io$/i.test(h)) return true;
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
 app.use(cors({
   origin: function (origin, cb) {
     if (!origin) {
@@ -217,8 +231,8 @@ app.use(cors({
       return cb(null, !isProdEnv());
     }
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // معاينة GitHub Pages — للتطوير/الاختبار فقط، وليس في الإنتاج
-    if (!isProdEnv() && /^https:\/\/[a-z0-9-]+\.github\.io$/i.test(origin)) return cb(null, true);
+    // معاينة Cursor Cloud / GitHub Pages / Gitpod — للتطوير والمراجعة فقط
+    if (isDevPreviewOrigin(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
 }));
