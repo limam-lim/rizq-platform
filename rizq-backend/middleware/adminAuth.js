@@ -2,6 +2,7 @@
  * مصادقة الأدمن — جلسة x-admin-token (المتصفح) أو سرّ خادمي (سكربتات فقط)
  */
 const { timingSafeEqualStr } = require('../lib/secureCompare');
+const { isProdEnv } = require('./accountAuth');
 
 function createAdminAuth(deps) {
   const adminSessions = deps.adminSessions;
@@ -40,7 +41,7 @@ function createAdminAuth(deps) {
     const got = req.header('x-rizq-secret');
     const secret = sharedSecret();
     if (secret && got && timingSafeEqualStr(got, secret)) {
-      if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+      if (isProdEnv() && isBrowserOrigin(req)) {
         return res.status(403).json({ error: 'server_secret_browser_forbidden' });
       }
       req.adminUser = { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
@@ -72,7 +73,7 @@ function createAdminAuth(deps) {
     if (!secret || !got || !timingSafeEqualStr(got, secret)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+    if (isProdEnv() && isBrowserOrigin(req)) {
       return res.status(403).json({ error: 'server_secret_browser_forbidden' });
     }
     next();

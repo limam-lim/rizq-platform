@@ -387,12 +387,13 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 function _requireApiSecret(req, res, next) {
   const expected = process.env.RIZQ_API_SECRET;
   if (!expected) {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production') {
       return res.status(503).json({ ok: false, error: 'server_misconfigured' });
     }
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
-  if (req.header('x-rizq-secret') !== expected) {
+  const { timingSafeEqualStr } = require('./rizq-backend/lib/secureCompare');
+  if (!timingSafeEqualStr(req.header('x-rizq-secret') || '', expected)) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
   next();

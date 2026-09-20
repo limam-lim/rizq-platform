@@ -498,7 +498,11 @@
     if (busy) return;
     var data = readBuyer();
     if (!data) return;
-    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
+    try {
+      var draftSafe = Object.assign({}, data);
+      delete draftSafe.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSafe));
+    } catch (e) {}
     pending = { data: data };
     busy = true;
     var btn = document.getElementById('btn-send-otp');

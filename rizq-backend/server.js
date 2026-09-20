@@ -889,7 +889,7 @@ const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني ك�
  *   -- يُدمَج مفتاحاً بمفتاح (لا يمسح أقساماً أخرى محفوظة سابقاً)
  *   -- قيمة نصية فارغة "" لمفتاح ما = إعادته للنص الافتراضي (حذف الـ override)
  */
-app.post('/api/site-config', requireAdminAuth, (req, res) => {
+app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) => {
   const body = req.body || {};
   const current = repos.getSiteConfig();
   const next = Object.assign({}, current);
@@ -1230,7 +1230,9 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
       }
     } catch (eInv) { /* ignore */ }
   }
-  res.json({ ok: true, config: next });
+  // لا نُعيد webhookUrl في ردّ الأدمن للمتصفح
+  const { scrubSecretsForBackup } = require('./lib/scrubSecrets');
+  res.json({ ok: true, config: scrubSecretsForBackup(next) });
 });
 
 /**
@@ -1418,12 +1420,16 @@ function stripToken(acc) {
     idImage,
     id_image,
     licenseImage,
+    activityImage2,
+    activity_image2,
+    receiptImage,
     ...safe
   } = acc;
   if (safe.id_verified) {
     delete safe.idImage;
     delete safe.id_image;
   }
+  delete safe.password;
   return safe;
 }
 

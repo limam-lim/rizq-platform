@@ -789,10 +789,9 @@
     fetch(apiBase() + '/api/auth/preview?email=' + encodeURIComponent(email))
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
-        if (!data || !data.exists) {
-          badge.classList.remove('show');
-          return;
-        }
+        // الخادم لم يعد يكشف exists (منع تعداد البريد) — اعتمد الجلسة المحلية فقط
+        badge.classList.remove('show');
+        if (!data || data.exists !== true) return;
         badge.textContent = d().welcomeBack;
         badge.classList.add('show');
       }).catch(function () { badge.classList.remove('show'); });

@@ -12,9 +12,13 @@ const KEY_PREFIX = 'rizq_live_';
 const KEY_RANDOM_BYTES = 32;
 
 function getPepper() {
-  return process.env.API_KEY_PEPPER
-    || process.env.BACKEND_SHARED_SECRET
-    || 'rizq-api-pepper-change-in-production';
+  const pepper = String(process.env.API_KEY_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim();
+  if (pepper) return pepper;
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  if (isProd) {
+    throw new Error('API_KEY_PEPPER or BACKEND_SHARED_SECRET required in production');
+  }
+  return 'rizq-api-pepper-dev-only';
 }
 
 function hashApiKey(plainKey) {

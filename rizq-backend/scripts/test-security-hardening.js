@@ -77,12 +77,16 @@ async function main() {
   } catch (e) { /* ignore */ }
 
   const preview = await req('GET', '/api/auth/preview?email=' + encodeURIComponent(email));
-  const noPii = preview.body && preview.body.exists === true
-    && preview.body.name === undefined
-    && preview.body.phone === undefined
-    && preview.body.email === undefined;
-  ok('GET /api/auth/preview no PII leak', preview.status === 200 && (preview.body.exists === false || noPii || preview.body.exists === true && !preview.body.name),
+  const preview2 = await req('GET', '/api/auth/preview?email=' + encodeURIComponent('no_such_' + Date.now() + '@rizq.test'));
+  ok('GET /api/auth/preview no PII leak',
+    preview.status === 200 && preview.body && preview.body.ok
+    && preview.body.name === undefined && preview.body.phone === undefined && preview.body.email === undefined,
     preview.body ? JSON.stringify(preview.body) : 'no body');
+  ok('GET /api/auth/preview does not enumerate existence',
+    preview.status === 200 && preview2.status === 200
+    && preview.body.exists === preview2.body.exists
+    && preview.body.exists !== true && preview.body.exists !== false,
+    'exists=' + (preview.body && preview.body.exists));
 
   // ── 5. Admin routes require auth ──
   const adminNoAuth = await req('GET', '/api/accounts/admin');
@@ -354,6 +358,20 @@ async function main() {
   } finally {
     try { platformStore.deleteAccount(reveal.id); } catch (e) { /* ignore */ }
   }
+
+  // ── 19. Leak / enumeration soft checks ──
+  const resetMissing = await req('POST', '/api/accounts/password-reset/confirm', {
+    email: 'missing_' + Date.now() + '@rizq.test',
+    code: '000000',
+    newPassword: 'NewPass99!',
+  });
+  ok('password-reset missing email does not 404-enumerate',
+    resetMissing.status === 400 && resetMissing.body && resetMissing.body.code !== 'not_found',
+    'status=' + resetMissing.status + ' code=' + (resetMissing.body && resetMissing.body.code));
+
+  const { scrubSecretsForBackup: scrub2 } = require('../lib/scrubSecrets');
+  const scrubImg = scrub2({ name: 'X', idImage: 'data:...', activityImage2: 'data:...', receiptImage: 'r' });
+  ok('scrub removes identity/receipt images', !scrubImg.idImage && !scrubImg.activityImage2 && !scrubImg.receiptImage && scrubImg.name === 'X');
 
   // ── Summary ──
   const failed = results.filter((r) => !r.pass);

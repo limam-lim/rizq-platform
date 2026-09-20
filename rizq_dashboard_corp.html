@@ -3662,7 +3662,8 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
       if(!data.hasKey){
         badge.textContent=_t2('⏳ بانتظار التفعيل','⏳ En attente');
         badge.style.cssText='background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
-        content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('سيُولَّد مفتاح API تلقائياً عند تأكيد اشتراك الماسية Pro.','La clé API sera générée automatiquement après confirmation de l\'abonnement Diamant Pro.')+'</p>';
+        content.innerHTML='<div style="text-align:center;padding:16px"><p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">'+_t2('أنشئ مفتاح API لربطه بنظامك. سيُعرض مرة واحدة فقط.','Créez une clé API pour votre système. Elle ne s\'affiche qu\'une seule fois.')+'</p>'+
+          '<button type="button" class="btn btn-gold btn-sm" onclick="createCorpApiKey()">🔑 '+_t2('إنشاء مفتاح API','Créer une clé API')+'</button></div>';
         return;
       }
       var ig=data.integration||{};
@@ -3697,6 +3698,34 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
     }).catch(function(){
       content.innerHTML='<p style="font-size:13px;color:#dc2626">'+_t2('تعذّر تحميل إعدادات API','Impossible de charger les paramètres API')+'</p>';
     });
+  }
+
+  function createCorpApiKey(){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    var apiTok=window.REAL_ACCESS_TOKEN||'';
+    if(!acc.id||!apiTok||!window.RIZQ_BACKEND_BASE) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id)+'/create',{
+      method:'POST',
+      headers:{'x-account-token':apiTok}
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.ok && data.integration){
+        showToast(_t2('✅ تم إنشاء المفتاح — انسخه الآن','✅ Clé créée — copiez-la maintenant'));
+        _paintCorpApiKeyOnce(data.integration);
+      } else showToast(data.error||_t2('فشل الإنشاء','Échec'),'error');
+    }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
+  }
+
+  function _paintCorpApiKeyOnce(ig){
+    var content=document.getElementById('api-integration-content');
+    var badge=document.getElementById('api-integration-badge');
+    if(!content) return;
+    if(badge){
+      badge.textContent=_t2('✅ نشط','✅ Actif');
+      badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+    }
+    var key=ig.apiKey||'';
+    content.innerHTML='<div style="margin-top:4px;background:#0f172a;border-radius:10px;padding:14px"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px">'+_t2('⚠️ انسخ المفتاح الآن — لن يُعرض مرة أخرى','⚠️ Copiez la clé maintenant — elle ne sera plus affichée')+'</div><code id="corp-api-key-val" style="display:block;word-break:break-all;font-size:12px;color:#fbbf24;background:rgba(0,0,0,.25);padding:10px;border-radius:8px">'+escapeHtml(key)+'</code><button type="button" class="btn btn-gold btn-sm" style="margin-top:10px" onclick="copyCorpApiKey()">📋 '+_t2('نسخ المفتاح','Copier la clé')+'</button></div>'+
+      '<p style="font-size:12px;color:var(--text-muted);margin-top:12px">'+_t2('البادئة: ','Préfixe : ')+escapeHtml(ig.apiKeyPrefix||'')+'</p>';
   }
 
   function copyCorpApiKey(){
@@ -3735,7 +3764,10 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
       method:'POST',
       headers:{'x-account-token':apiTok}
     }).then(function(r){return r.json();}).then(function(data){
-      if(data.ok){showToast(_t2('✅ تم تجديد المفتاح','✅ Clé régénérée'));renderApiIntegrationCorp();}
+      if(data.ok && data.integration){
+        showToast(_t2('✅ تم تجديد المفتاح — انسخه الآن','✅ Clé régénérée — copiez-la maintenant'));
+        _paintCorpApiKeyOnce(data.integration);
+      }
       else showToast(data.error||_t2('فشل التجديد','Échec'),'error');
     }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
   }

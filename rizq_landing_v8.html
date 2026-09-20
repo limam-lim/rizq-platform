@@ -6977,7 +6977,10 @@ function saveAccountPending(data){
   return _ensureSellerEmailOtp(data).then(function(otpOk){
     data._otpVerified = !!otpOk;
     _autoApproveAccount(data);
-    accounts.push(data);
+    // لا نخزّن كلمة المرور في localStorage أبداً — تُرسل للخادم من الذاكرة فقط
+    var localSafe = Object.assign({}, data);
+    delete localSafe.password;
+    accounts.push(localSafe);
     localStorage.setItem('rizq_pending_accounts',JSON.stringify(accounts));
     localStorage.setItem('rizq_last_acc_id', data.id);
     try{

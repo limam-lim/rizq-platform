@@ -90,6 +90,7 @@ function mountAccountsManageRoutes(app, deps) {
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractAccountToken(req);
     if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
+    if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
     const count = list.filter((a) => a.referredBy === req.params.id && a.referralBonusGranted).length;
     res.json({ ok: true, count, bonusDaysPerReferral: REFERRAL_BONUS_DAYS, bonusDaysTotal: count * REFERRAL_BONUS_DAYS });
   });

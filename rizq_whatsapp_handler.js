@@ -284,7 +284,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n📱 رزق WhatsApp Handler v1 (Claude-Powered) — المنفذ: ${PORT}`);
   console.log(`   Webhook → Meta: https://YOUR-DOMAIN/api/whatsapp`);
-  console.log(`   Verify Token: ${WA_CONFIG.VERIFY_TOKEN}`);
+  console.log(`   Verify Token: ${WA_CONFIG.VERIFY_TOKEN ? '✅ مضبوط' : '❌ مفقود'}`);
   console.log(`   Anthropic Key: ${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود في .env'}`);
   console.log(`   WA Token: ${WA_CONFIG.TOKEN ? '✅ موجود' : '❌ مفقود في .env'}\n`);
 });

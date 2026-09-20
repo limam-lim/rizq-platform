@@ -34,17 +34,18 @@ router.post('/register', authLimiter, asyncHandler(async (req, res) => {
   });
 }));
 
-/** GET /api/auth/preview — هل الحساب موجود؟ (بدون كشف بيانات شخصية) */
+/** GET /api/auth/preview — لا يكشف وجود الحساب (تخفيف تعداد البريد/الهاتف) */
 router.get('/preview', authLimiter, asyncHandler(async (req, res) => {
   const email = String(req.query.email || '').trim().toLowerCase();
   if (email && Buyer.EMAIL_RE.test(email)) {
-    return res.json({ ok: true, exists: !!Buyer.findByEmail(email) });
+    // لا نستعلم قاعدة البيانات — نفس الرد دائماً
+    return res.json({ ok: true, exists: null, check: 'accepted' });
   }
   const phone = Buyer.normalizePhone(req.query.phone);
   if (!Buyer.MR_PHONE_RE.test(phone)) {
-    return res.json({ ok: true, exists: false });
+    return res.json({ ok: true, exists: null, check: 'invalid' });
   }
-  return res.json({ ok: true, exists: !!Buyer.findByPhone(phone) });
+  return res.json({ ok: true, exists: null, check: 'accepted' });
 }));
 
 /** POST /api/auth/login — مُعطَّل: الدخول يتطلب OTP عبر /api/auth/register */

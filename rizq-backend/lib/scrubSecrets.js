@@ -23,6 +23,13 @@ const SECRET_KEYS = new Set([
   'codeHash',
   'otp',
   'otpHash',
+  'idImage',
+  'id_image',
+  'licenseImage',
+  'license_image',
+  'activityImage2',
+  'activity_image2',
+  'receiptImage',
 ]);
 
 function scrubValue(value, depth) {

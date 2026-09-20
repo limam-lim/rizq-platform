@@ -97,7 +97,7 @@ function mountAccountsSessionRoutes(app, deps) {
         writeAccounts(list);
       }
     }
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
     res.set('Cache-Control', 'no-store');
     res.json({
       ok: true,
@@ -129,7 +129,7 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
     }
     if (acc.status === 'approved' && acc.dashToken) {
-      const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+      const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
       return res.json({
         ok: true,
         already: true,
@@ -163,7 +163,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (acc.idImage) purgeAccountIdDocument(acc);
     list[idx] = acc;
     writeAccounts(list);
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
     res.json({
       ok: true,
       autoApproved: true,
@@ -221,11 +221,12 @@ function mountAccountsSessionRoutes(app, deps) {
     const list = readAccounts();
     const idx = list.findIndex((a) => String(a.email || '').trim().toLowerCase() === email);
     if (idx < 0) {
-      return res.status(404).json({ ok: false, code: 'not_found', error: 'الحساب غير موجود' });
+      // لا نكشف وجود الحساب — نفس رسالة رمز غير صالح
+      return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
     const acc = list[idx];
     if (acc.suspended) {
-      return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
+      return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
 
     const verified = verifySellerResetOtp(email, code);
@@ -249,7 +250,7 @@ function mountAccountsSessionRoutes(app, deps) {
     list[idx] = acc;
     writeAccounts(list);
 
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
     res.json({
       ok: true,
       account: Object.assign(safeFields, {
