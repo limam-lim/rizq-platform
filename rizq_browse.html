@@ -1433,6 +1433,7 @@ function _rizqLang(){
   try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}
 }
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escapeJsAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'');}
 function adTitleLocalized(a){
   if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
   var fr=_rizqLang()==='fr';
@@ -1969,9 +1970,9 @@ function renderDetailPanel(ad){
 
     <!-- Category -->
     <div class="dp-listing-cat">
-      <a href="#" onclick="filterByCat('${ad.cat}');return false">${escapeHtml(catLabel)}</a>
+      <a href="#" onclick="filterByCat('${escapeJsAttr(ad.cat)}');return false">${escapeHtml(catLabel)}</a>
       <span class="sep">›</span>
-      <a href="#" onclick="filterBySubcat('${ad.subcat}');return false">${escapeHtml(subcatLabel)}</a>
+      <a href="#" onclick="filterBySubcat('${escapeJsAttr(ad.subcat)}');return false">${escapeHtml(subcatLabel)}</a>
       ${ad.verified?`<span class="dp-verified-badge">${_t('dp-seller-verified')}</span>`:''}
     </div>
 

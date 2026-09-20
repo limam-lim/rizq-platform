@@ -423,8 +423,9 @@ async function sendSellerResetOtp(email, opts) {
   const out = Object.assign({}, generic, { sentViaEmail });
   const cfg = getPublicOtpConfig();
   if (cfg.devHintEnabled && !sentViaEmail) out.devHint = code;
+  // لا نُرجع emailWarning — كان يكشف وجود الحساب عندما يفشل الإرسال فقط للحسابات الموجودة
   if (!sentViaEmail && !cfg.devHintEnabled) {
-    out.emailWarning = 'تعذّر إرسال البريد — تحقق من العنوان أو حاول لاحقاً';
+    console.warn('[otp/seller-reset] email send failed for existing account');
   }
   return out;
 }

@@ -131,7 +131,20 @@ function mountAccountsManageRoutes(app, deps) {
       if (b[k] === undefined) return;
       if (k === 'activityId' || k === 'activity') return;
       if (k === 'idImage' && acc.id_verified) return;
-      acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      let val = String(b[k]);
+      if (k === 'name' || k === 'city' || k === 'address' || k === 'desc' || k === 'tagline') {
+        try {
+          const { stripBidiControls } = require('../lib/sanitizeText');
+          val = stripBidiControls(val).normalize('NFC');
+        } catch (eSan) { /* ignore */ }
+      }
+      if (k === 'email') {
+        try {
+          const { normalizeEmailSafe } = require('../lib/sanitizeText');
+          val = normalizeEmailSafe(val);
+        } catch (eSan) { /* ignore */ }
+      }
+      acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
     // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
@@ -188,7 +201,20 @@ function mountAccountsManageRoutes(app, deps) {
       if (b[k] === undefined) return;
       if (k === 'activityId' || k === 'activity') return;
       if (k === 'idImage' && acc.id_verified) return;
-      acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      let val = String(b[k]);
+      if (k === 'name' || k === 'city' || k === 'address' || k === 'desc' || k === 'tagline') {
+        try {
+          const { stripBidiControls } = require('../lib/sanitizeText');
+          val = stripBidiControls(val).normalize('NFC');
+        } catch (eSan) { /* ignore */ }
+      }
+      if (k === 'email') {
+        try {
+          const { normalizeEmailSafe } = require('../lib/sanitizeText');
+          val = normalizeEmailSafe(val);
+        } catch (eSan) { /* ignore */ }
+      }
+      acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);

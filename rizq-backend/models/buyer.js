@@ -3,6 +3,7 @@
  */
 const crypto = require('crypto');
 const { db } = require('../db');
+const { normalizeDisplayName, normalizeEmailSafe } = require('../lib/sanitizeText');
 
 const MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,7 +61,7 @@ function findByPhone(phone) {
 }
 
 function findByEmail(email) {
-  const em = String(email || '').trim().toLowerCase();
+  const em = normalizeEmailSafe(email);
   if (!em) return null;
   return db.prepare('SELECT * FROM buyers WHERE lower(email) = ?').get(em);
 }
@@ -70,8 +71,8 @@ function findByIdAndToken(id, token) {
 }
 
 function registerOrLogin(payload) {
-  const cleanName = String(payload.name || '').trim().slice(0, 120);
-  const cleanEmail = String(payload.email || '').trim().toLowerCase().slice(0, 120);
+  const cleanName = normalizeDisplayName(payload.name, 120);
+  const cleanEmail = normalizeEmailSafe(payload.email);
   const mr = normalizePhone(payload.phone || payload.phoneMr);
   const intl = normalizeIntlPhone(payload.phoneIntl || payload.phone_intl);
   const wa = normalizeIntlPhone(payload.whatsapp) || (MR_PHONE_RE.test(mr) ? '+222' + mr : intl);

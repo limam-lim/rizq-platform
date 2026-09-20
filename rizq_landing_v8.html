@@ -7015,9 +7015,15 @@ function _rollbackLocalAccount(accId){
 }
 
 function nniRejectMessage(data){
+  // نفس المعنى باللغتين — لا نلمّح لوجود حساب آخر (تخفيف تعداد)
+  if (data && data.code === 'nni_invalid') {
+    return isAr
+      ? ((data.error) || 'رقم الهوية (NNI) غير صالح')
+      : ((data.error_fr) || "Numéro d'identité (NNI) invalide");
+  }
   return isAr
-    ? ((data && data.error) || 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر')
-    : ((data && data.error_fr) || 'Ce numéro d\'identité (NNI) est déjà associé à un autre compte');
+    ? ((data && data.error) || 'تعذّر استخدام رقم الهوية هذا — تحقّق من الرقم أو تواصل مع الدعم')
+    : ((data && data.error_fr) || "Ce numéro d'identité ne peut pas être utilisé — vérifiez-le ou contactez le support");
 }
 
 function checkNniAvailable(nni){
@@ -7028,7 +7034,7 @@ function checkNniAvailable(nni){
     })
     .then(function(out){
       var data = out.data;
-      if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.available === false)){
+      if(data && (data.code === 'nni_unavailable' || data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.available === false)){
         alert(nniRejectMessage(data));
         return false;
       }

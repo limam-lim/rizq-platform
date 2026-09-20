@@ -27,6 +27,7 @@ const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
+const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
@@ -349,51 +350,97 @@ app.get('/api/help-guide', (req, res) => {
  * مباشرة registerSubscriber() من نفس وحدة rizq_subscriber_agent.js التي
  * يقرأها خادما المكالمات/واتساب (ملف rizq_subscribers_store.json المشترك).
  */
-app.post('/api/subscriber/register', requireAdminAuth, (req, res) => {
+app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents'), (req, res) => {
   const { subscriberId, ...profile } = req.body || {};
   if (!subscriberId || !profile.businessName) {
     return res.status(400).json({ error: 'subscriberId + businessName مطلوبان' });
   }
   try {
-    registerSubscriber(String(subscriberId).slice(0, 40), Object.assign({
+    const safeId = String(subscriberId).replace(/[^\w+\-@.]/g, '').slice(0, 40);
+    const safeProfile = {
       plan: 'diamond',
       tier: 'diamond',
       widget_enabled: true,
       whatsapp_enabled: true,
       calls_enabled: true,
-    }, profile));
-    res.json({ ok: true, message: 'تم تسجيل ' + profile.businessName });
+      businessName: normalizeDisplayName(profile.businessName, 120),
+      businessType: String(profile.businessType || '').slice(0, 40),
+      accountId: profile.accountId ? String(profile.accountId).slice(0, 60) : undefined,
+      phone: profile.phone ? String(profile.phone).replace(/[^\d+]/g, '').slice(0, 20) : undefined,
+      activity: profile.activity ? stripBidiControls(String(profile.activity)).normalize('NFC').slice(0, 200) : undefined,
+    };
+    registerSubscriber(safeId, safeProfile);
+    res.json({ ok: true, message: 'تم تسجيل ' + safeProfile.businessName });
   } catch (err) {
     console.error('[subscriber/register] error:', err.message);
     res.status(500).json({ error: 'فشل التسجيل' });
   }
 });
 
-app.get('/api/subscriber/:id', requireAdminAuth, (req, res) => {
+app.get('/api/subscriber/:id', requireAdminPermission('subscriber-agents'), (req, res) => {
   const profile = getSubscriberProfile(req.params.id);
   if (!profile) return res.status(404).json({ error: 'subscriber_not_found' });
-  res.json({ ok: true, profile });
+  // لا نُعيد حقولاً داخلية حساسة إن وُجدت
+  const {
+    apiKey, apiKeyHash, accessToken, dashToken, passHash, password,
+    ...safe
+  } = profile;
+  res.json({ ok: true, profile: safe });
+});
+
+app.get('/api/subscribers', requireAdminPermission('subscriber-agents'), (req, res) => {
+  try {
+    const list = getAllSubscriberProfiles().map((row) => {
+      const p = getSubscriberProfile(row.subscriberId) || {};
+      return {
+        id: row.subscriberId,
+        accountId: row.accountId || null,
+        name: p.businessName || '',
+        type: p.businessType || '',
+        plan: p.plan || '',
+      };
+    });
+    res.json({ ok: true, count: list.length, subscribers: list });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'تعذّر جلب القائمة' });
+  }
 });
 
 const { setActive, isActive, readAll: readAgentStatusAll } = require('./services/agentStatus');
 
 function verifyAgentToggleSecret(secret) {
-  const a = process.env.BACKEND_SHARED_SECRET || '';
-  const b = process.env.RIZQ_API_SECRET || '';
-  return secret && (secret === a || secret === b);
+  const a = String(process.env.BACKEND_SHARED_SECRET || '');
+  const b = String(process.env.RIZQ_API_SECRET || '');
+  const got = String(secret || '');
+  if (!got) return false;
+  if (a && timingSafeEqualStr(got, a)) return true;
+  if (b && timingSafeEqualStr(got, b)) return true;
+  return false;
 }
 
 /** POST /api/agent/toggle — لوحات التحكم (Diamond) — تفعيل/إيقاف الوكيل الهاتفي */
 app.post('/api/agent/toggle', (req, res) => {
-  const { subscriberPhone, active, secret, accountId } = req.body || {};
+  const b = req.body || {};
+  const subscriberPhone = b.subscriberPhone;
+  const active = b.active;
+  const accountId = b.accountId;
   const token = extractAccountToken(req);
-  let authorized = verifyAgentToggleSecret(secret);
+  // السرّ من الرأس فقط في الإنتاج؛ body مسموح في التطوير للتوافق مع خوادم المكالمات
+  const secretHdr = req.header('x-rizq-secret') || '';
+  const secretBody = (!isProdEnv() && b.secret) ? b.secret : '';
+  let authorized = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
   if (!authorized && accountId && token) {
     const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
+      try {
+        assertAiAgentAccess(acc, { channel: 'dashboard' });
+      } catch (eAi) {
+        return res.status(403).json({ ok: false, error: eAi.message || 'unauthorized', code: eAi.code });
+      }
       const want = String(subscriberPhone || '').replace(/\D/g, '').slice(-8);
-      const accPh = String(acc.phone || '').replace(/\D/g, '').slice(-8);
-      authorized = !!(want && accPh && want === accPh);
+      const accPh = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '').slice(-8);
+      // إن وُجد رقم على الحساب يجب أن يطابق، وإلا نسمح لمالك الحساب الماسي
+      authorized = !want || !accPh || want === accPh;
     }
   }
   if (!authorized) {
@@ -416,7 +463,7 @@ app.post('/api/agent/toggle', (req, res) => {
 });
 
 /** GET /api/agent/status/:phone — محمي (لا كشف عام لحالة الوكلاء) */
-app.get('/api/agent/status/:phone', requireAdminAuth, (req, res) => {
+app.get('/api/agent/status/:phone', requireAdminPermission('subscriber-agents'), (req, res) => {
   const phone = req.params.phone;
   let profile = null;
   try { profile = getSubscriberProfile(phone); } catch (e) { /* optional */ }
@@ -429,7 +476,7 @@ app.get('/api/agent/status/:phone', requireAdminAuth, (req, res) => {
 });
 
 /** GET /api/agent/status — admin/debug */
-app.get('/api/agent/status', requireAdminAuth, (req, res) => {
+app.get('/api/agent/status', requireAdminPermission('subscriber-agents'), (req, res) => {
   res.json({ ok: true, status: readAgentStatusAll() });
 });
 
@@ -713,43 +760,121 @@ app.post('/api/telegram/test-lead-alert', requireAdminAuth, async (req, res) => 
 app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = req.body || {};
-    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
-      const token = req.header('x-account-token') || '';
-      const acc = verifyAccountOwner(profileAccountId, token);
-      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-      assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
+    const token = extractAccountToken(req) || '';
+    const accountId = String(
+      (body.profile && body.profile.accountId) || body.accountId || ''
+    ).trim();
+
+    if (accountId) {
+      let acc = null;
+      if (token) {
+        acc = verifyAccountOwner(accountId, token);
+        if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      } else {
+        // زائر عام على صفحة التاجر — نثق بالخادم فقط لا بـ profile العميل
+        acc = readAccounts().find((a) => a.id === accountId) || null;
+        if (!acc || acc.status !== 'approved' || acc.suspended) {
+          return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
+        }
+      }
+      try {
+        assertAiAgentAccess(acc, { channel: 'widget' });
+      } catch (e) {
+        const ent = getAccountEntitlements(acc);
+        const status = e.status && e.status >= 400 ? e.status : 403;
+        return res.status(status).json({
+          ok: false,
+          error: e.code === 'quota_exhausted' ? (e.message || 'تم استنفاد الحصة') : resolveAccessDenialMessage(ent),
+          code: e.code || ent.subscriptionStatus,
+        });
+      }
+      body.accountId = accountId;
+      body.profile = buildProfileFromAccount(acc);
+      body.agentTier = 'diamond';
+    } else {
+      // مساعد المنصة العام — امنع انتحال الباقة الماسية من العميل
+      if (body.profile && typeof body.profile === 'object') {
+        delete body.profile.tier;
+        delete body.profile.plan;
+        delete body.profile.dynamicKnowledge;
+        delete body.profile.customInstructions;
+        delete body.profile.accountId;
+      }
+      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
+        body.agentTier = 'standard';
+      }
     }
+
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[widget/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد الآلي' : (err.message || 'تعذّر الرد الآلي'),
+      code: err.code || undefined,
+    });
   }
 });
 
 /** POST /api/ai/chat — alias for Diamond widget agent (same engine as /api/widget/chat) */
 app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
   try {
-    const body = Object.assign({ agentTier: 'diamond' }, req.body || {});
-    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
-      const token = req.header('x-account-token') || '';
-      const acc = verifyAccountOwner(profileAccountId, token);
-      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-      assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
+    const body = Object.assign({}, req.body || {});
+    const token = extractAccountToken(req) || '';
+    const accountId = String(
+      (body.profile && body.profile.accountId) || body.accountId || ''
+    ).trim();
+
+    if (accountId) {
+      let acc = null;
+      if (token) {
+        acc = verifyAccountOwner(accountId, token);
+        if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      } else {
+        acc = readAccounts().find((a) => a.id === accountId) || null;
+        if (!acc || acc.status !== 'approved' || acc.suspended) {
+          return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
+        }
+      }
+      try {
+        assertAiAgentAccess(acc, { channel: 'widget' });
+      } catch (e) {
+        const ent = getAccountEntitlements(acc);
+        const status = e.status && e.status >= 400 ? e.status : 403;
+        return res.status(status).json({
+          ok: false,
+          error: e.code === 'quota_exhausted' ? (e.message || 'تم استنفاد الحصة') : resolveAccessDenialMessage(ent),
+          code: e.code || ent.subscriptionStatus,
+        });
+      }
+      body.accountId = accountId;
+      body.profile = buildProfileFromAccount(acc);
+      body.agentTier = 'diamond';
+    } else {
+      if (body.profile && typeof body.profile === 'object') {
+        delete body.profile.tier;
+        delete body.profile.plan;
+        delete body.profile.dynamicKnowledge;
+        delete body.profile.customInstructions;
+        delete body.profile.accountId;
+      }
+      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
+        body.agentTier = 'standard';
+      }
     }
+
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[ai/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد الآلي' : (err.message || 'تعذّر الرد الآلي'),
+      code: err.code || undefined,
+    });
   }
 });
 
@@ -785,12 +910,9 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     if (!accountId || !message) {
       return res.status(400).json({ ok: false, error: 'accountId و message مطلوبان' });
     }
-    if (!isAnthropicConfigured()) {
-      return res.status(503).json({ ok: false, error: 'AI غير مفعّل — أضف ANTHROPIC_API_KEY أو CLAUDE_API_KEY في .env' });
-    }
     const acc = readAccounts().find((a) => a.id === accountId);
     if (!acc) return res.status(404).json({ ok: false, error: 'account_not_found' });
-    const token = req.header('x-account-token') || '';
+    const token = extractAccountToken(req) || req.header('x-account-token') || '';
     if (!verifyAccountOwner(accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
@@ -800,6 +922,9 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
       const ent = getAccountEntitlements(acc);
       const status = e.status && e.status >= 400 ? e.status : 403;
       return res.status(status).json({ ok: false, error: e.message || resolveAccessDenialMessage(ent), code: e.code || ent.subscriptionStatus });
+    }
+    if (!isAnthropicConfigured()) {
+      return res.status(503).json({ ok: false, error: 'AI غير مفعّل حالياً', code: 'ai_unavailable' });
     }
     const result = await handleWidgetChat({
       message,
@@ -826,7 +951,11 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
   } catch (err) {
     console.error('[subscriber/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد' });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد' : (err.message || 'تعذّر الرد'),
+      code: err.code || undefined,
+    });
   }
 });
 
@@ -1535,22 +1664,22 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     id,
     accessToken,
     type: reqType,
-    name: String(b.name).slice(0, 120),
+    name: normalizeDisplayName(b.name, 120),
     phone: String(b.phone || '').slice(0, 30),
     phoneIntl: String(b.phoneIntl || b.phone_intl || '').slice(0, 30),
-    email: String(b.email || '').slice(0, 120),
-    city: String(b.city || '').slice(0, 60),
+    email: normalizeEmailSafe(b.email || ''),
+    city: stripBidiControls(String(b.city || '')).normalize('NFC').slice(0, 60),
     category: activityFields.category || String(b.category || '').slice(0, 40),
     activityId: activityFields.activityId || String(b.activityId || '').slice(0, 80) || null,
     activity: activityFields.activity || String(b.activity || '').slice(0, 120) || null,
     packageId: String(b.packageId || b.package_id || '').slice(0, 40) || null,
-    address: String(b.address || '').slice(0, 200),
-    desc: String(b.desc || '').slice(0, 1000),
+    address: stripBidiControls(String(b.address || '')).normalize('NFC').slice(0, 200),
+    desc: stripBidiControls(String(b.desc || '')).normalize('NFC').slice(0, 1000),
     promo_video: String(b.promo_video || '').slice(0, 500),
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
     thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة
-    tagline: String(b.tagline || '').slice(0, 50),
+    tagline: stripBidiControls(String(b.tagline || '')).normalize('NFC').slice(0, 50),
     // إصلاح 13/08/2026: حقلا التوثيق (NNI + صورة بطاقة التعريف/جواز السفر)
     // كانا يُجمَعان في واجهة التسجيل (rizq_landing_v8.html) لكن لا يصلان
     // الخادم إطلاقاً — يبقيان في localStorage متصفح المسجِّل فقط، فتصبح
@@ -2237,6 +2366,9 @@ app.post('/api/subscriber/knowledge/upload', (req, res) => {
     buffer = Buffer.from(fileDataBase64, 'base64');
   } catch (e) {
     return res.status(400).json({ ok: false, error: 'invalid_base64' });
+  }
+  if (!buffer.length || buffer.length > 2 * 1024 * 1024) {
+    return res.status(400).json({ ok: false, error: 'file_too_large', message: 'الحد الأقصى لملف المعرفة 2 ميجابايت' });
   }
 
   const parsed = parseKnowledgeFile(fileName, buffer);

@@ -194,7 +194,6 @@ function mountAccountsSessionRoutes(app, deps) {
         message: result.message || 'إن وُجد حساب بهذا البريد فسيصلك رمز خلال دقائق',
       };
       if (result.devHint) out.devHint = result.devHint;
-      if (result.emailWarning) out.emailWarning = result.emailWarning;
       return res.json(out);
     } catch (eReq) {
       return res.status(500).json({ ok: false, code: 'send_failed', error: 'تعذّر إرسال الرمز' });
@@ -231,11 +230,12 @@ function mountAccountsSessionRoutes(app, deps) {
 
     const verified = verifySellerResetOtp(email, code);
     if (!verified.ok) {
-      return res.status(400).json({ ok: false, code: verified.error || 'invalid_code', error: verified.message || 'رمز غير صحيح' });
+      // نفس الشكل دائماً — لا نفرّق no_otp / invalid_code للعميل
+      return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
     const consumed = consumeSellerResetVerification(email);
     if (!consumed.ok) {
-      return res.status(400).json({ ok: false, code: consumed.error || 'otp_required', error: consumed.message || 'تحقق مطلوب' });
+      return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
 
     try {
