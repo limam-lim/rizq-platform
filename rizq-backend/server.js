@@ -197,18 +197,6 @@ app.use(cors({
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
 app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
 
-// ── Rate limit مخصص أشد على /api/ads/submit ─────────────────────────
-// هذا الـ endpoint عام بلا أي مصادقة (requireAdminAuth) لأنه مخصص
-// لزوار حقيقيين يطلبون نشر إعلان — الحد العام أعلاه (60/15 دقيقة) لا
-// يكفي وحده لمنع إغراق ملف ads-requests.json بطلبات مزيفة من IP واحد.
-const adsSubmitLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الطلبات — حاول مرة أخرى بعد قليل' },
-});
-
 // ── سرّ مشترك / جلسة أدمن — يمنع استدعاء endpoints الإدارية من خارج الجلسة ──
 // ══ مصادقة لوحة الإدارة (rizq_admin.html) — من طرف السيرفر فعلياً ═══
 // كانت شاشة الدخول في rizq_admin.html تقارن كلمة السر بمصفوفة JS داخل
@@ -1370,42 +1358,7 @@ async function autoRefreshCurrencyRatesIfStale() {
   }
 }
 
-/**
- * POST /api/ads/submit
- * عام — صاحب معرض/محل يرسل طلب نشر فيديو إعلاني عبر Rizq ADS.
- * ⚠️ لا يُرفع ملف الفيديو نفسه هنا (لا توجد بنية تخزين فيديو حقيقية بعد —
- * تحتاج CDN/S3 حسب خطة rizq_backend_plan.html) — فقط بيانات الطلب +
- * معلومات تواصل، ليتواصل فريق رزق فعلياً ويستلم الفيديو وينشره يدوياً.
- * لا وعد بنشر تلقائي فوري لأنه غير موجود فعلاً.
- */
-app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
-  const b = req.body || {};
-  if (!b.title || !b.phone) return res.status(400).json({ error: 'العنوان ورقم التواصل مطلوبان' });
-  const requests = readJson(ADS_REQUESTS_FILE, []);
-  const id = 'ADREQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-  requests.push({
-    id,
-    title: String(b.title).slice(0, 120),
-    category: String(b.category || '').slice(0, 80),
-    phone: String(b.phone).slice(0, 20),
-    pkg: String(b.pkg || 'basic').slice(0, 20),
-    hasVideoFile: !!b.hasVideoFile,
-    videoFileName: String(b.videoFileName || '').slice(0, 200),
-    status: 'pending_contact',
-    createdAt: new Date().toISOString(),
-  });
-  writeJson(ADS_REQUESTS_FILE, requests);
-  res.json({ ok: true, id });
-});
-
-/**
- * GET /api/ads/requests
- * أدمين فقط (سرّ مشترك) — لائحة طلبات نشر فيديو الإعلانات الواردة فعلياً،
- * حتى يكون وعد "سيتواصل معك رزق" قابلاً للتنفيذ حقاً.
- */
-app.get('/api/ads/requests', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, requests: readJson(ADS_REQUESTS_FILE, []).reverse() });
-});
+// مسارات /api/ads/submit و /api/ads/requests — في routes/ads.js عبر mountAdsRoutes
 
 // ══════════════════════════════════════════════════════════════════
 // حسابات المشتركين (محل/مكتب/شركة/فرد) — تسجيل + موافقة الأدمن
@@ -1773,244 +1726,27 @@ mountAccountsSessionRoutes(app, {
 });
 
 /**
- * GET /api/accounts/public — عام، بلا سرّ — الحسابات الموافَق عليها فقط،
- * بحقول آمنة فقط. تستخدمه صفحات المحل/المكتب/الشركة العامة + شريط "آخر
- * المحلات/المكاتب/المعارض" بالرئيسية بدل قراءة localStorage المحلي.
+ * مسارات إدارة الحسابات (عام / ملكية / أدمن) —
+ * مستخرجة إلى routes/accountsManage.js
  */
-app.get('/api/accounts/public', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=30');
-  const viewerId = resolveOptionalAccountViewer(req);
-  const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
-  res.json({
-    ok: true,
-    accounts: list.map((acc) => toPublicAccountForViewer(acc, viewerId)),
-    viewerId: viewerId || null,
-  });
+const { REFERRAL_BONUS_DAYS } = require('./rizq_package_lifecycle_agent');
+const { mountAccountsManageRoutes } = require('./routes/accountsManage');
+mountAccountsManageRoutes(app, {
+  requireAdminAuth,
+  readAccounts,
+  writeAccounts,
+  extractAccountToken,
+  timingSafeEqualStr,
+  stripToken,
+  resolveOptionalAccountViewer,
+  toPublicAccountForViewer,
+  assertNniAssignable,
+  normalizeAccountActivityFields,
+  normalizeAccountPaymentMethods,
+  genDashToken,
+  purgeAccountIdDocument,
+  REFERRAL_BONUS_DAYS,
 });
-
-/**
- * GET /api/accounts/public/:id — حساب موافَق واحد بحقول عامة فقط
- * (منها thumb) لصفحة الملف الشخصي، دون تنزيل قائمة الحسابات كلها.
- */
-app.get('/api/accounts/public/:id', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=30');
-  const viewerId = resolveOptionalAccountViewer(req);
-  const acc = readAccounts().find((a) => a && a.id === req.params.id);
-  if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
-    return res.status(404).json({ ok: false, error: 'account_not_found' });
-  }
-  res.json({ ok: true, account: toPublicAccountForViewer(acc, viewerId) });
-});
-
-/**
- * GET /api/accounts/mine/:id — يتطلب x-account-token مطابقاً — يقرأ
- * صاحب الحساب حالة طلبه (pending/approved/rejected) + كل بياناته لملء
- * لوحة تحكمه، من أي جهاز يملك فيه هذا التوكن (وليس فقط الجهاز الذي سجّل منه).
- */
-app.get('/api/accounts/mine/:id', (req, res) => {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractAccountToken(req);
-  if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
-  if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * GET /api/accounts/mine/:id/referrals — يتطلب x-account-token مطابقاً —
- * عدد الأصدقاء الذين سجّلوا عبر رابط إحالة هذا الحساب وأصبحوا مشتركين
- * مدفوعين فعلاً (referralBonusGranted=true فقط — التسجيل وحده لا يُحتسب)،
- * + إجمالي أيام المكافأة المكتسبة. يغذّي بطاقة "برنامج الإحالة" بالداشبورد.
- */
-app.get('/api/accounts/mine/:id/referrals', (req, res) => {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractAccountToken(req);
-  if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
-  const count = list.filter((a) => a.referredBy === req.params.id && a.referralBonusGranted).length;
-  res.json({ ok: true, count, bonusDaysPerReferral: REFERRAL_BONUS_DAYS, bonusDaysTotal: count * REFERRAL_BONUS_DAYS });
-});
-
-/**
- * PATCH /api/accounts/mine/:id — يتطلب x-account-token — صاحب الحساب
- * يحدّث ملفه الشخصي (الوصف، الفيديو، الصورة، رقم واتساب...) من أي جهاز.
- * لا يمكن تعديل status/accessToken/id عبر هذا المسار أبداً.
- */
-app.patch('/api/accounts/mine/:id', (req, res) => {
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  const acc = list[idx];
-  const token = extractAccountToken(req);
-  if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
-  // حساب مُعلَّق من الأدمن (suspended) لا يستطيع تعديل ملفه الشخصي أيضاً —
-  // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
-  if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
-
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
-  const b = req.body || {};
-  if (b.nni !== undefined) {
-    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-    b.nni = nniCheck.nni;
-  }
-  if (b.activityId !== undefined || b.activity !== undefined) {
-    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
-    if (!normalized.ok) {
-      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
-    }
-    acc.activityId = normalized.activityId;
-    acc.activity = normalized.activity;
-    acc.category = normalized.category;
-  }
-  EDITABLE.forEach((k) => {
-    if (b[k] === undefined) return;
-    if (k === 'activityId' || k === 'activity') return;
-    if (k === 'idImage' && acc.id_verified) return;
-    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
-  });
-  // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
-  // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
-  // فعلي: ACCOUNT_PUBLIC_FIELDS أصلاً لا يُخرج phone لغير صاحب الحساب أو
-  // الأدمن بتاتاً (قرار خصوصية سابق) — هذا الحقل يُخزَّن فقط ليُستخدم
-  // لاحقاً (مثلاً في نظام الرسائل) بدل أن يُفقَد كما كان الحال سابقاً.
-  if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone;
-  if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
-  if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
-  if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
-  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
-  acc.updatedAt = new Date().toISOString();
-  list[idx] = acc;
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * GET /api/accounts/admin — أدمين فقط (سرّ مشترك) — كل الحسابات بكل
- * حقولها (عدا accessToken) لطابور المراجعة في rizq_admin.html.
- */
-app.get('/api/accounts/admin', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, accounts: readAccounts().map(stripToken).reverse() });
-});
-
-/**
- * PATCH /api/accounts/admin/:id — تعديل حساب من الأدمن مباشرة (سرّ مشترك)،
- * نفس الحقول القابلة للتعديل في PATCH /api/accounts/mine/:id لكن بصلاحية
- * الأدمن بدل توكن صاحب الحساب — يغذّي زر "تعديل" في لوحة "المستخدمون"
- * بـrizq_admin.html، الذي كان يعدّل بيانات وهمية محلية فقط سابقاً.
- */
-app.patch('/api/accounts/admin/:id', requireAdminAuth, (req, res) => {
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  const acc = list[idx];
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
-  const b = req.body || {};
-  if (b.nni !== undefined) {
-    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-    b.nni = nniCheck.nni;
-  }
-  if (b.activityId !== undefined || b.activity !== undefined) {
-    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
-    if (!normalized.ok) {
-      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
-    }
-    acc.activityId = normalized.activityId;
-    acc.activity = normalized.activity;
-    acc.category = normalized.category;
-  }
-  EDITABLE.forEach((k) => {
-    if (b[k] === undefined) return;
-    if (k === 'activityId' || k === 'activity') return;
-    if (k === 'idImage' && acc.id_verified) return;
-    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
-  });
-  if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
-  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
-  acc.updatedAt = new Date().toISOString();
-  list[idx] = acc;
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * POST /api/accounts/admin/:id/decision — أدمين فقط — body:{action:'approve'|'reject'}
- * يضبط status + approvedAt. هذا هو الفعل الذي يجعل الموافقة مرئية فعلياً
- * لصاحب الحساب من جهازه (عبر GET /api/accounts/mine/:id) وللزوار عبر
- * GET /api/accounts/public إن كانت موافقة.
- * عند approve: تُحذف صورة الهوية فوراً من accounts.json ويُثبَّت id_verified فقط.
- */
-app.post('/api/accounts/admin/:id/decision', requireAdminAuth, (req, res) => {
-  const body = req.body || {};
-  const action = body.action;
-  if (!['approve', 'reject', 'suspend', 'reactivate'].includes(action)) {
-    return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject' أو 'suspend' أو 'reactivate'" });
-  }
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-
-  // تعليق/إعادة تفعيل حساب مُعتمَد مسبقاً — مستقل تماماً عن status (approved/
-  // rejected). طالما suspended=true: يختفي الحساب من GET /api/accounts/public
-  // (صفحته العامة + شريط الرئيسية)، ويُرفَض verifyAccountOwner لأي فعل يتطلب
-  // توكن الملكية (نشر إعلان جديد، تعديل الكتالوج، تعديل الملف الشخصي...).
-  if (action === 'suspend' || action === 'reactivate') {
-    list[idx].suspended = action === 'suspend';
-    list[idx].suspendedAt = action === 'suspend' ? new Date().toISOString() : null;
-    writeAccounts(list);
-    return res.json({ ok: true, account: stripToken(list[idx]) });
-  }
-
-  if (action === 'approve') {
-    const nniCheck = assertNniAssignable(list, list[idx].nni, list[idx].id, list[idx]);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-  }
-
-  list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-  list[idx].approvedAt = action === 'approve' ? new Date().toISOString() : null;
-  list[idx].reviewedAt = new Date().toISOString();
-  if (action === 'approve') {
-    // أمان داخلي: dashToken يُولَّد على الخادم فقط — لا يُقبل من العميل/الأدمن
-    list[idx].dashToken = genDashToken();
-    if (body.package) list[idx].package = String(body.package).slice(0, 60);
-    if (body.package_price !== undefined) list[idx].package_price = Number(body.package_price) || 0;
-    // التزام قانوني: بعد الموافقة تُحذف صورة الهوية من الخادم — ويبقى NNI + id_verified.
-    purgeAccountIdDocument(list[idx]);
-  }
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(list[idx]) });
-});
-
-/**
- * POST /api/accounts/admin/:id/verified-plus — أدمين فقط — يمنح/يُلغي شارة
- * "موثّق⁺" المدفوعة لحساب. body:{action:'grant'|'revoke', durationDays}.
- * تُستدعى إما تلقائياً بعد موافقة الأدمن على طلب شراء (activateVerifiedPlusForRequest
- * في rizq_admin.html، فئة sub_requests.category==='verified_plus')، أو يدوياً
- * من الأدمن مباشرة (منح/سحب استثنائي بلا طلب شراء). مستقلة تماماً عن status
- * (التوثيق المجاني) وعن package (باقة الحساب العامة) — لا تُعدِّل أياً منهما.
- */
-app.post('/api/accounts/admin/:id/verified-plus', requireAdminAuth, (req, res) => {
-  const body = req.body || {};
-  const action = body.action;
-  if (action !== 'grant' && action !== 'revoke') return res.status(400).json({ error: "action يجب أن يكون 'grant' أو 'revoke'" });
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  if (action === 'grant') {
-    const days = Math.max(1, Math.min(3650, Number(body.durationDays) || 365));
-    list[idx].verifiedPlus = true;
-    list[idx].verifiedPlusExpiresAt = new Date(Date.now() + days * 86400000).toISOString();
-  } else {
-    list[idx].verifiedPlus = false;
-    list[idx].verifiedPlusExpiresAt = null;
-  }
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(list[idx]) });
-});
-
 
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 // حسابات "ا��&شتر�` ا�سر�`ع" � SQLite عبر /api/auth + /api/wishlist
@@ -2227,7 +1963,6 @@ const {
   getAllAccountPackageRecords,
   syncAccountPackage,
   createPendingPackageFromRequest,
-  REFERRAL_BONUS_DAYS,
 } = require('./rizq_package_lifecycle_agent');
 // نمرّر readAccounts/writeAccounts (مُعرَّفتان أعلاه في هذا الملف) حتى يقدر
 // معالج /api/account-package/sync (داخل الملف الآخر) أن يقرأ/يكتب حقل
@@ -2457,130 +2192,16 @@ app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
 const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
 function readTenders() { return readJson(TENDERS_FILE, []); }
 function writeTenders(list) { writeJson(TENDERS_FILE, list); }
-function genTenderId() { return 'TND_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'); }
 
 /**
  * saveTenderImages(tenderId, images) — صور مرجعية اختيارية لما يحتاجه
  * صاحب المناقصة (مثال: "20 كرسي بهذا الشكل" + صورة) ليفهم مقدّمو العروض
  * المطلوب بدقة. حد أقصى 3 صور (لا حاجة لمعرض كامل كصور منتج للبيع، هذه
- * مرجع فقط) — نفس منطق saveAdImages/saveCatalogImages.
+ * مرجع فقط) — نفس منطق saveAdImages/saveCatalogImages. التنفيذ في
+ * services/imagePipeline؛ مسارات /api/tenders* في routes/tenders.js.
  */
 const TENDER_UPLOADS_DIR = path.join(__dirname, 'uploads', 'tenders');
 if (!fs.existsSync(TENDER_UPLOADS_DIR)) fs.mkdirSync(TENDER_UPLOADS_DIR, { recursive: true });
-function genBidId() { return 'BID_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'); }
-
-const TENDER_PACKAGE_NAME = 'باقة المناقصة';
-const TENDER_ACTIVE_STATUSES = ['active', 'expiring_soon'];
-const TENDER_REQUIRES_PACKAGE = true;
-
-function resolveOptionalTenderViewer(req) {
-  return resolveOptionalAccountViewer(req);
-}
-
-function getTenderAccessForViewer(accountId) {
-  return getTenderEntitlements(accountId || null);
-}
-
-function hasTenderPaidAccess(accountId) {
-  const ent = getTenderEntitlements(accountId);
-  return !!(ent && ent.canSubmitProposals && ent.subscribed);
-}
-
-/** توافق مع الاستدعاءات القديمة — يعني اشتراك مدفوع فعّال (ليس تجريبي) */
-function hasTenderAccess(accountId) {
-  return hasTenderPaidAccess(accountId);
-}
-
-// redactContactPatterns imported from contactGate.js
-
-function resolveTenderOwnerContacts(t) {
-  const owner = readAccounts().find((a) => a.id === t.ownerId) || {};
-  const phone = String(t.ownerPhone || owner.phone || '').trim();
-  const email = String(t.ownerEmail || owner.email || '').trim();
-  const whatsapp = String(t.ownerWhatsApp || owner.whatsapp || phone || '').trim();
-  return { phone, email, whatsapp };
-}
-
-function isTenderPubliclyOpen(t) {
-  if (!t) return false;
-  if (t.status !== 'open' && t.status !== 'provisionally_approved') return false;
-  const deadlineMs = new Date(t.deadline).getTime();
-  return !Number.isNaN(deadlineMs) && deadlineMs > Date.now();
-}
-
-function filterPublicOpenTenders(list) {
-  return (list || []).filter(isTenderPubliclyOpen);
-}
-
-function toPublicTender(t, access, viewerId) {
-  const now = Date.now();
-  const deadlineMs = new Date(t.deadline).getTime();
-  const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
-  const contactsUnlocked = !!ent.canUnlockContacts;
-  const contacts = resolveTenderOwnerContacts(t);
-  const rawImages = Array.isArray(t.images) ? t.images : [];
-  const imageCount = rawImages.length;
-  const hasDocument = !!t.document;
-  const publicImages = (contactsUnlocked && viewerId)
-    ? rawImages.map((_, i) => buildSignedTenderAssetUrl(
-      '/api/tenders/' + t.id + '/images/' + i,
-      viewerId,
-      t.id,
-      'img:' + i
-    ))
-    : [];
-  const documentUrl = (contactsUnlocked && hasDocument)
-    ? (viewerId
-      ? buildSignedTenderAssetUrl('/api/tenders/' + t.id + '/document', viewerId, t.id, 'doc:0')
-      : '/api/tenders/' + t.id + '/document')
-    : null;
-  return {
-    id: t.id,
-    title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
-    desc: contactsUnlocked ? t.desc : redactContactPatterns(t.desc),
-    category: t.category,
-    city: t.city,
-    budgetMin: t.budgetMin,
-    budgetMax: t.budgetMax,
-    deadline: t.deadline,
-    images: publicImages,
-    imagesLocked: !contactsUnlocked && imageCount > 0,
-    imageCount: imageCount,
-    hasDocument,
-    documentLocked: !contactsUnlocked && hasDocument,
-    documentUrl,
-    documentName: hasDocument ? (t.documentName || 'tender-document.pdf') : null,
-    ownerName: t.ownerName,
-    ownerId: t.ownerId || null,
-    createdAt: t.createdAt,
-    status: t.status || 'open',
-    provisionalTier: t.provisionalTier || null,
-    provisionalLabelAr: t.provisionalLabelAr || null,
-    provisionalAutoApproved: !!t.provisionalAutoApproved,
-    bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && (t.status === 'open' || t.status === 'provisionally_approved'),
-    contactsLocked: !contactsUnlocked,
-    ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
-    ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
-    ownerWhatsApp: contactsUnlocked ? (contacts.whatsapp || null) : null,
-    canSubmitBid: !!ent.canSubmitProposals,
-  };
-}
-
-function rejectTenderContactLeak(res, scan, field) {
-  return res.status(422).json({
-    error: 'contact_in_text_forbidden',
-    field: field || (scan.fields && scan.fields[0] && scan.fields[0].field) || 'text',
-    hits: scan.hits || [],
-    fields: scan.fields || [],
-    msg: scan.messageAr,
-    msg_fr: scan.messageFr,
-  });
-}
-
-function TENDER_PUBLIC_ACCESS_FALLBACK() {
-  return getTenderEntitlements(null);
-}
 
 // يثبت أن accountId + token يطابقان حساباً حقيقياً في accounts.json، ويُعيده
 function verifyAccountOwner(accountId, token) {
@@ -2710,383 +2331,31 @@ setupQuotaGuardAPI(app, requireAdminAuth, {
   },
 });
 
-const tenderPostLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من المناقصات المنشورة — حاول مرة أخرى بعد قليل' },
-});
-const tenderBidLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من العروض المقدَّمة — حاول مرة أخرى بعد قليل' },
-});
-const tenderAssetLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 120,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير من طلبات تحميل مرفقات المناقصة — حاول لاحقاً' },
-});
-
 /**
- * POST /api/tenders — نشر مناقصة جديدة. يتطلب x-account-token + accountId
- * صالحين، وباقة "غرفة المناقصات" فعّالة على الحساب (وإلا 403 برسالة واضحة).
+ * مسارات /api/tenders* — مستخرجة إلى routes/tenders.js
  */
-app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
-  try {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderPaidAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
-  }
-  if (!b.title || !b.deadline) return res.status(400).json({ error: 'title و deadline مطلوبان' });
-  const title = String(b.title).slice(0, 150);
-  const desc = String(b.desc || '').slice(0, 1500);
-  const leakScan = scanContactLeakFields([
-    { key: 'title', val: title },
-    { key: 'desc', val: desc },
-  ]);
-  if (leakScan.hasLeak) return rejectTenderContactLeak(res, leakScan);
-  if (b.document) {
-    const pdfExtract = await extractPdfTextFromDataUri(b.document);
-    if (pdfExtract.error) {
-      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
-    }
-    const pdfScan = scanContactLeakFields([{ key: 'document', val: pdfExtract.text }]);
-    if (pdfScan.hasLeak) return rejectTenderContactLeak(res, pdfScan, 'document');
-  }
-  const deadlineMs = new Date(b.deadline).getTime();
-  if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
-    return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
-  }
-  const tenderId = genTenderId();
-  const tenderDraft = {
-    id: tenderId,
-    ownerId: acc.id,
-    ownerName: acc.name || '',
-    ownerPhone: String(acc.phone || '').slice(0, 40),
-    ownerEmail: String(acc.email || '').slice(0, 120),
-    ownerWhatsApp: String(acc.whatsapp || acc.phone || '').slice(0, 40),
-    title,
-    desc,
-    category: String(b.category || '').slice(0, 40),
-    city: String(b.city || '').slice(0, 60),
-    budgetMin: Number(b.budgetMin) || 0,
-    budgetMax: Number(b.budgetMax) || 0,
-    deadline: new Date(deadlineMs).toISOString(),
-    // صور مرجعية اختيارية — تُراجع مع المناقصة قبل النشر العام
-    images: await saveTenderImages(tenderId, b.images),
-    document: await saveTenderDocument(tenderId, b.document),
-    documentName: b.document ? String(b.documentName || 'tender-document.pdf').slice(0, 120) : null,
-    createdAt: new Date().toISOString(),
-    bids: [],
-  };
-  const { scoreTender, shouldAutoApprove } = require('./services/provisionalTier');
-  const score = scoreTender(tenderDraft);
-  const auto = shouldAutoApprove(score.provisionalTier);
-  const tender = Object.assign({}, tenderDraft, {
-    status: auto ? 'provisionally_approved' : 'pending_review',
-    provisionalTier: score.provisionalTier,
-    provisionalLabelAr: score.provisionalLabelAr,
-    provisionalLabelFr: score.provisionalLabelFr,
-    provisionalReasons: score.provisionalReasons,
-    provisionalAt: score.provisionalAt,
-    provisionalBy: score.provisionalBy,
-    provisionalAutoApproved: auto,
-    approvedAt: auto ? new Date().toISOString() : null,
-    approvedBy: auto ? 'tenders_agent' : null,
-  });
-  const list = readTenders();
-  list.unshift(tender);
-  writeTenders(list);
-  setImmediate(() => {
-    try {
-      const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
-      const tierEmoji = score.provisionalTier === 'green' ? '🟢' : (score.provisionalTier === 'yellow' ? '🟡' : '🔴');
-      const reason = auto
-        ? (tierEmoji + ' مناقصة «' + tender.title + '» — موافقة مبدئية تلقائية من وكيل المناقصات (قابلة للنقض)')
-        : (tierEmoji + ' مناقصة «' + tender.title + '» — معلّقة بانتظارك (' + (score.provisionalLabelAr || score.provisionalTier) + ')');
-      sendTelegramAdminNotification({
-        leadId: tender.id,
-        businessName: tender.ownerName,
-        whatsapp: acc.phone || acc.whatsapp || '',
-        package: tender.category || 'غرفة المناقصات',
-        reason,
-        channel: 'tender_review',
-      }).catch((err) => console.warn('[tenders/post] telegram:', err && err.message));
-    } catch (e) { /* telegram optional */ }
-  });
-  res.json({
-    ok: true,
-    pendingReview: !auto,
-    provisionalTier: score.provisionalTier,
-    provisionalLabel: score.provisionalLabelAr,
-    autoApproved: auto,
-    tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
-    msg: auto
-      ? 'موافقة مبدئية من وكيل المناقصات — نُشرت بصفة مبدئية (قابلة للمراجعة).'
-      : 'تم استلام مناقصتك — معلّقة بانتظار مراجعة Limam (لبس أو شبهة).',
-  });
-  } catch (err) {
-    console.error('[tenders/post] upload pipeline:', err.message);
-    if (err.code === 'invalid_pdf') {
-      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
-    }
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة المرفقات — تأكد من صحة الصور وملف PDF' });
-  }
-});
-
-function streamTenderDocumentFile(t, res) {
-  const absPath = resolveTenderDocumentAbsPath(t.document);
-  if (!absPath || !fs.existsSync(absPath)) {
-    return res.status(404).json({ error: 'document_not_found' });
-  }
-  const name = (t.documentName || 'tender-document.pdf').replace(/[^\w.\-()\u0600-\u06FF ]+/g, '_');
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'inline; filename="' + name + '"');
-  fs.createReadStream(absPath).pipe(res);
-}
-
-function canAccessTenderAsset(req, t, viewerId, access, assetKey) {
-  if (!t) return false;
-  const token = extractAccountToken(req) || '';
-  if (viewerId && verifyAccountOwner(viewerId, token)) {
-    if (t.ownerId === viewerId) return true;
-    if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
-  }
-  const qViewer = String(req.query.viewer || '');
-  const qExp = Number(req.query.exp);
-  const qSig = String(req.query.sig || '');
-  if (qViewer && assetKey && verifyTenderAssetSig(qViewer, t.id, assetKey, qExp, qSig)) {
-    if (t.ownerId === qViewer) return true;
-    const qAccess = getTenderAccessForViewer(qViewer);
-    if (qAccess.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
-  }
-  return false;
-}
-
-function streamTenderImageFile(t, index, res) {
-  const rawImages = Array.isArray(t.images) ? t.images : [];
-  const idx = Number(index);
-  if (!Number.isInteger(idx) || idx < 0 || idx >= rawImages.length) {
-    return res.status(404).json({ error: 'image_not_found' });
-  }
-  const absPath = resolveTenderUploadAbsPath(rawImages[idx]);
-  if (!absPath || !fs.existsSync(absPath)) {
-    return res.status(404).json({ error: 'image_not_found' });
-  }
-  const ext = path.extname(absPath).toLowerCase();
-  const type = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/webp';
-  res.setHeader('Content-Type', type);
-  res.setHeader('Cache-Control', 'private, max-age=3600');
-  fs.createReadStream(absPath).pipe(res);
-}
-
-/**
- * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة.
- * يعرض عدد المناقصات المفتوحة + فئات آخر 3 مناقصات فقط (بلا حقول حسّاسة).
- */
-app.get('/api/tenders/public-stats', (req, res) => {
-  const openList = filterPublicOpenTenders(readTenders());
-  const recentCategories = openList.slice(0, 3).map((t) => t.category).filter(Boolean);
-  res.json({ ok: true, count: openList.length, recentCategories });
-});
-
-/**
- * GET /api/tenders — تصفّح عام للمناقصات المفتوحة مع حماية بيانات التواصل.
- * الزائر/التجريبي يرى العنوان والوصف والمتطلبات؛ أرقام التواصل مخفية/مُشفّرة.
- * المشترك المدفوع يكشف التواصل ويمكنه تقديم العروض. يدعم ?cat=&city=
- */
-app.get('/api/tenders', (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const { cat, city } = req.query || {};
-  let list = filterPublicOpenTenders(readTenders());
-  if (cat) list = list.filter((t) => t.category === cat);
-  if (city) list = list.filter((t) => t.city === city);
-  res.json({
-    ok: true,
-    tenders: list.map((t) => toPublicTender(t, access, viewerId)),
-    access: {
-      contactsUnlocked: !!access.canUnlockContacts,
-      canSubmitBid: !!access.canSubmitProposals,
-      canPost: !!access.canPostTenders,
-      isTrial: !!access.isTrial,
-      subscribed: !!access.subscribed,
-      planType: access.planType,
-    },
-  });
-});
-
-/**
- * POST /api/tenders/:id/bids — تقديم عرض على مناقصة. يتطلب x-account-token +
- * accountId صالحين، وباقة "غرفة المناقصات" فعّالة. لا يمكن لصاحب المناقصة
- * تقديم عرض على مناقصته هو نفسها. العرض لا يظهر لأي أحد إلا صاحب المناقصة.
- */
-app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderPaidAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لتقديم عرض — الباقة التجريبية للتصفّح فقط' });
-  }
-  const bidderAccess = getTenderAccessForViewer(b.accountId);
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  const t = list[idx];
-  if (t.status !== 'open') {
-    return res.status(400).json({ error: 'tender_not_open', msg: 'هذه المناقصة غير متاحة لتقديم العروض حالياً' });
-  }
-  if (t.ownerId === acc.id) return res.status(400).json({ error: 'cannot_bid_own_tender' });
-  const deadlineMs = new Date(t.deadline).getTime();
-  if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
-    return res.status(400).json({ error: 'tender_closed', msg: 'انتهت مهلة تقديم العروض على هذه المناقصة' });
-  }
-  if (!b.price) return res.status(400).json({ error: 'price مطلوب' });
-  const notes = String(b.notes || '').slice(0, 500);
-  const bidderName = String(acc.name || '').slice(0, 80);
-  const bidLeakScan = scanContactLeakFields([
-    { key: 'notes', val: notes },
-    { key: 'bidderName', val: bidderName },
-  ]);
-  if (bidLeakScan.hasLeak) return rejectTenderContactLeak(res, bidLeakScan, bidLeakScan.fields[0] && bidLeakScan.fields[0].field);
-  const bid = {
-    id: genBidId(),
-    bidderId: acc.id,
-    bidderName,
-    price: Number(b.price) || 0,
-    deliveryDays: Number(b.deliveryDays) || 0,
-    notes,
-    priority: !!bidderAccess.priorityPlacement,
-    createdAt: new Date().toISOString(),
-  };
-  if (!Array.isArray(t.bids)) t.bids = [];
-  t.bids.push(bid);
-  if (bid.priority && t.bids.length > 1) {
-    t.bids.sort((a, b2) => {
-      if (!!a.priority !== !!b2.priority) return a.priority ? -1 : 1;
-      return new Date(a.createdAt).getTime() - new Date(b2.createdAt).getTime();
-    });
-  }
-  list[idx] = t;
-  writeTenders(list);
-  res.json({ ok: true });
-});
-
-/**
- * GET /api/tenders/mine — مناقصاتي (اللي نشرتها أنا) + كل العروض المقدَّمة
- * عليها كاملة. يتطلب x-account-token + accountId مطابقين.
- */
-app.get('/api/tenders/mine', (req, res) => {
-  const accountId = req.query.accountId || '';
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const mine = readTenders().filter((t) => t.ownerId === accountId && t.status !== 'removed');
-  res.json({ ok: true, tenders: mine });
-});
-
-/**
- * GET /api/tenders/admin — أدمين فقط (سرّ مشترك) — كل المناقصات بكل حقولها
- * (بما فيها العروض) لأغراض المراجعة/إزالة السبام.
- */
-app.get('/api/tenders/admin', requireAdminPermission('tenders'), (req, res) => {
-  res.json({ ok: true, tenders: readTenders() });
-});
-
-/**
- * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
- */
-app.get('/api/tenders/:id/document', tenderAssetLimiter, (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-  if (!canAccessTenderAsset(req, t, viewerId, access, 'doc:0')) {
-    return res.status(403).json({
-      error: 'document_locked',
-      msg: 'ملف المناقصة متاح للمشتركين فقط — اشترك لتحميله',
-      msg_fr: 'Document réservé aux abonnés — abonnez-vous pour le télécharger',
-    });
-  }
-  return streamTenderDocumentFile(t, res);
-});
-
-/**
- * GET /api/tenders/:id/images/:index — صورة مرجعية (مشتركون أو صاحب المناقصة)
- */
-app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t) return res.status(404).json({ error: 'tender_not_found' });
-  const assetKey = 'img:' + req.params.index;
-  if (!canAccessTenderAsset(req, t, viewerId, access, assetKey)) {
-    return res.status(403).json({
-      error: 'images_locked',
-      msg: 'الصور المرجعية متاحة للمشتركين فقط',
-      msg_fr: 'Photos réservées aux abonnés',
-    });
-  }
-  return streamTenderImageFile(t, req.params.index, res);
-});
-
-/**
- * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
- */
-app.get('/api/tenders/admin/:id/document', requireAdminPermission('tenders'), (req, res) => {
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-  return streamTenderDocumentFile(t, res);
-});
-
-/**
- * GET /api/tenders/admin/:id/images/:index — أدمين — مراجعة صورة
- */
-app.get('/api/tenders/admin/:id/images/:index', requireAdminPermission('tenders'), (req, res) => {
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t) return res.status(404).json({ error: 'tender_not_found' });
-  return streamTenderImageFile(t, req.params.index, res);
-});
-
-/**
- * GET /api/tenders/:id — محجوب أيضاً خلف نفس باقة "غرفة المناقصات" (تفاصيل
- * مناقصة واحدة، بلا عروض).
- * ⚠️ إصلاح جوهري 03/08/2026 (اكتُشف أثناء اختبار تجريبي شامل): كان هذا
- * المسار مُسجَّلاً في Express *قبل* /api/tenders/mine و/api/tenders/admin.
- * express يطابق المسارات بترتيب التسجيل لا بالتحديد — أي طلب لـ /api/tenders/
- * mine أو /api/tenders/admin كان يقع فعلياً هنا (يُعامَل "mine"/"admin" كقيمة
- * :id) ويُطبَّق عليه بوابة "غرفة المناقصات" الخاطئة بدل بوابته الحقيقية. أي
- * أن لوحة إشراف المناقصات في rizq_admin.html ولوحة "مناقصاتي" لدى التاجر لم
- * تعملا فعلياً من قبل. الإصلاح: نقل هذا المسار العام (:id) ليُسجَّل بعد كل
- * المسارات الثابتة الأكثر تحديداً (mine/admin) — قاعدة عامة في Express: أي
- * مسار به معامل (:id) يجب أن يُسجَّل دائماً بعد كل المسارات الثابتة المشابهة.
- */
-app.get('/api/tenders/:id', (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
-  res.json({
-    ok: true,
-    tender: toPublicTender(t, access, viewerId),
-    access: {
-      contactsUnlocked: !!access.canUnlockContacts,
-      canSubmitBid: !!access.canSubmitProposals,
-      canPost: !!access.canPostTenders,
-      isTrial: !!access.isTrial,
-      subscribed: !!access.subscribed,
-      planType: access.planType,
-    },
-  });
+const { mountTendersRoutes } = require('./routes/tenders');
+mountTendersRoutes(app, {
+  requireAdminAuth,
+  requireAdminPermission,
+  extractAccountToken,
+  verifyAccountOwner,
+  resolveOptionalAccountViewer,
+  getTenderEntitlements,
+  scanContactLeakFields,
+  redactContactPatterns,
+  saveTenderImages,
+  saveTenderDocument,
+  extractPdfTextFromDataUri,
+  resolveTenderDocumentAbsPath,
+  resolveTenderUploadAbsPath,
+  buildSignedTenderAssetUrl,
+  verifyTenderAssetSig,
+  readAccounts,
+  readTenders,
+  writeTenders,
+  syncAccountPackage,
+  getAccountRecord,
 });
 
 // ── غرفة الاستثمارات ──────────────────────────────────────────────
@@ -3194,127 +2463,6 @@ app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req,
   }
 });
 
-/**
- * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
- */
-app.post('/api/tenders/admin/:id/reject', requireAdminPermission('tenders'), (req, res) => {
-  const b = req.body || {};
-  const reason = String(b.reason || b.msg || '').trim().slice(0, 500);
-  if (!reason) return res.status(400).json({ error: 'reason_required', msg: 'سبب الرفض مطلوب' });
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
-  list[idx].status = 'rejected';
-  list[idx].rejectReason = reason;
-  list[idx].rejectedAt = new Date().toISOString();
-  list[idx].rejectedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
-  writeTenders(list);
-  res.json({ ok: true, tender: list[idx] });
-});
-
-/**
- * POST /api/tenders/admin/:id/remove — أدمين فقط — يخفي مناقصة نهائياً من كل
- * الواجهات العامة (سبام/محتوى مخالف) دون حذف السجل فعلياً (نفس مبدأ عدم
- * الحذف النهائي المتَّبع في بقية المنصة).
- */
-app.post('/api/tenders/admin/:id/remove', requireAdminPermission('tenders'), (req, res) => {
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  list[idx].status = 'removed';
-  writeTenders(list);
-  res.json({ ok: true });
-});
-
-/**
- * POST /api/tenders/admin/:id/approve — أدمين فقط — يُفعّل مناقصة pending_review
- */
-app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (req, res) => {
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
-  list[idx].status = 'open';
-  list[idx].approvedAt = new Date().toISOString();
-  list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
-  list[idx].humanOverride = true;
-  list[idx].provisionalAutoApproved = false;
-  writeTenders(list);
-  res.json({ ok: true, tender: list[idx] });
-});
-
-/**
- * POST /api/tenders/package/activate — أدمين فقط (سرّ مشترك) — يُفعّل/يجدّد
- * اشتراك "باقة المناقصة" لحساب معيّن بعد موافقة الأدمن على طلب اشتراك حقيقي
- * (rizq_sub_requests بفئة category:'tender'). يُستخدَم مفتاح معزول
- * (accountId + '::tender') داخل مخزن account-packages.json حتى لا يتصادم
- * إطلاقاً مع سجل الباقة العامة لنفس الحساب (راجع تعليق hasTenderAccess أعلاه
- * لتفصيل سبب هذا العزل). يدعم التجريبية (10 أيام) والباقات المدفوعة.
- */
-app.post('/api/tenders/package/activate', requireAdminAuth, async (req, res) => {
-  const b = req.body || {};
-  if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
-  const { findCatalogPackage, isTrialPackage } = require('./services/catalogConfig');
-  const pkgName = b.pkgName || TENDER_PACKAGE_NAME;
-  const pkgDef = findCatalogPackage(b.packageId || pkgName);
-  const days = Number(b.days) || (pkgDef && pkgDef.durationDays) || 30;
-  const price = Number(b.price) || (pkgDef && pkgDef.price) || 0;
-  const isTrial = b.isTrial === true || isTrialPackage((pkgDef && pkgDef.name) || pkgName, price);
-  const now = new Date();
-  const periodEnd = new Date(now.getTime() + days * 86400000);
-  try {
-    const result = await syncAccountPackage({
-      accountId: b.accountId + '::tender',
-      accountName: b.accountName || b.accountId,
-      accountPhone: b.accountPhone || '',
-      accountEmail: b.accountEmail || '',
-      accountType: b.accountType || '',
-      pkgName: (pkgDef && pkgDef.name) || pkgName,
-      packageId: (pkgDef && pkgDef.id) || b.packageId || null,
-      price,
-      days,
-      periodStart: now.toISOString(),
-      periodEnd: periodEnd.toISOString(),
-      activatedBy: b.activatedBy || 'admin',
-      isTrial,
-      paymentConfirmed: !isTrial,
-      paidAt: isTrial ? null : now.toISOString(),
-    });
-    if (!result.ok) return res.status(400).json(result);
-    res.json({ ok: true, periodEnd: periodEnd.toISOString() });
-  } catch (err) {
-    console.error('[tenders/package/activate] error:', err.message);
-    res.status(500).json({ error: 'فشل تفعيل باقة المناقصة' });
-  }
-});
-
-/**
- * GET /api/tenders/package/status/:id — حالة اشتراك "باقة المناقصة" لحساب
- * معيّن، من طرف صاحب الحساب نفسه فقط (x-account-token يطابق accessToken
- * الحقيقي في accounts.json — نفس نمط /api/accounts/mine/:id). لا يستخدم
- * سرّ الأدمن العام لأن هذه النقطة تُستدعى من داشبورد المشترك مباشرة.
- */
-app.get('/api/tenders/package/status/:id', (req, res) => {
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(req.params.id, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const ent = getTenderEntitlements(req.params.id);
-  const rec = getAccountRecord(req.params.id + '::tender');
-  const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
-  res.json({
-    ok: true,
-    subscribed: !!ent.subscribed,
-    isTrial: !!ent.isTrial,
-    contactsUnlocked: !!ent.canUnlockContacts,
-    canSubmitBid: !!ent.canSubmitProposals,
-    canPost: !!ent.canPostTenders,
-    planType: ent.planType,
-    pkgName: ent.pkgName || null,
-    record: safeRec,
-  });
-});
-
 // ══════════════════════════════════════════════════════════════════
 // إعلانات رزق الحقيقية (ads.json) — البنية التحتية الأساسية للمنصة
 // ══════════════════════════════════════════════════════════════════
@@ -3337,285 +2485,33 @@ function writeAds(list) { writeJson(ADS_FILE, list); }
 const ADS_UPLOADS_DIR = path.join(__dirname, 'uploads', 'ads');
 if (!fs.existsSync(ADS_UPLOADS_DIR)) fs.mkdirSync(ADS_UPLOADS_DIR, { recursive: true });
 
-function genAdId() {
-  return 'RZQ-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random() * 90000));
-}
-
 /**
- * withBoostFlag(ad) — يضيف علم boosted:true/false للإعلان حسب ad_boosts.json
- * (نفس المصدر الذي يقرأه GET /api/discovery/ending-soon). readAdBoosts معرَّفة
- * لاحقاً في الملف لكن يصح استدعاؤها هنا بفضل hoisting لتعريفات الدوال.
+ * مسارات /api/ads* — مستخرجة إلى routes/ads.js
+ * (submit / requests / publish / browse / batch / mine / admin / :id / decision)
  */
-function withBoostFlag(ad) {
-  try {
-    const boosts = readAdBoosts();
-    const b = boosts[ad.id];
-    const boosted = !!(b && b.endsAt && new Date(b.endsAt).getTime() > Date.now());
-    return Object.assign({}, ad, { boosted });
-  } catch (e) {
-    return Object.assign({}, ad, { boosted: false });
-  }
-}
-
-const adsPublishLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الإعلانات المنشورة — حاول لاحقاً' },
-});
-
-/**
- * POST /api/ads — نشر إعلان (يتطلب حساباً مصادقاً — لا نشر مجهول)
- */
-app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) => {
-  try {
-  const pFlags = getPlatformFlags();
-  if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
-  if (pFlags.adsOpen === false) return res.status(403).json({ error: 'نشر الإعلانات مغلق حالياً' });
-  const b = req.body || {};
-  if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'العنوان مطلوب' });
-  if (!b.category) return res.status(400).json({ error: 'الفئة مطلوبة' });
-  if (!b.accountId) {
-    return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required', message: 'نشر الإعلان يتطلب حساباً مسجّلاً' });
-  }
-  const token = extractAccountToken(req) || '';
-  const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
-  if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-  const acc = ownerAcc;
-  const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
-  const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
-  try {
-    assertCanPostAd(ent, activeCount);
-    if (Array.isArray(b.images) && b.images.length) assertPhotoCount(ent, b.images.length);
-  } catch (gateErr) {
-    return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
-  }
-  const leakScan = scanContactLeakFields([
-    { key: 'title', val: b.title },
-    { key: 'desc', val: b.desc },
-  ]);
-  if (leakScan && leakScan.hasLeak) {
-    return res.status(422).json({
-      ok: false,
-      error: 'contact_in_text_forbidden',
-      field: leakScan.fields && leakScan.fields[0] && leakScan.fields[0].field,
-      hits: leakScan.hits || [],
-      msg: leakScan.messageAr,
-      msg_fr: leakScan.messageFr,
-    });
-  }
-  const list = readAds();
-  let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
-  while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
-  const images = await saveAdImages(id, b.images);
-  const rec = {
-    id,
-    title: String(b.title).slice(0, 200),
-    desc: String(b.desc || '').slice(0, 5000),
-    titleFr: String(b.titleFr || '').slice(0, 200),
-    descFr: String(b.descFr || '').slice(0, 5000),
-    price: String(b.price || '').slice(0, 40),
-    originalPrice: String(b.originalPrice || '').slice(0, 40), // سعر أصلي اختياري لعرض شارة الخصم (إلهام أمازون)
-    stockQty: (b.stockQty !== undefined && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
-      ? Math.floor(Number(b.stockQty)) : null, // كمية متبقية اختيارية — شارة "متبقي X فقط" (إلهام أمازون/Temu)، null = غير محدود
-    category: String(b.category).slice(0, 60),
-    categoryLabel: String(b.categoryLabel || '').slice(0, 60),
-    subcat: String(b.subcat || '').slice(0, 80),
-    emoji: String(b.emoji || '').slice(0, 8),
-    wilaya: String(b.wilaya || '').slice(0, 60),
-    condition: String(b.condition || '').slice(0, 40),
-    hidePhone: !!b.hidePhone,
-    negotiable: b.negotiable !== undefined ? !!b.negotiable : true,
-    urgent: !!b.urgent,
-    images,
-    seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
-    accountId: String(b.accountId).slice(0, 60),
-    // إصلاح ثغرة أمنية (2026-08-04): كان الحقل status قابلاً للتحكم من العميل
-    // (b.status)، وبقيمة افتراضية 'active' إن لم يُرسَل شيء — أي أن أي طلب
-    // مباشر لهذا الـ API (متجاوزاً rizq_moderator_agent.js الذي يعمل في
-    // المتصفح فقط) كان يُنشر الإعلان مباشرة بلا أي مراجعة من السيرفر.
-    // الآن: كل إعلان جديد يبدأ 'pending' إلزامياً بغضّ النظر عمّا يرسله
-    // العميل — التفعيل الفعلي فقط عبر POST /api/ads/admin/:id/decision.
-    status: 'pending',
-    date: b.date ? String(b.date).slice(0, 40) : new Date().toLocaleDateString('ar'),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeAds(list);
-  const out = { ok: true, id: rec.id, ad: rec };
-  if (req.moderatorDecision) out.moderator = req.moderatorDecision;
-  res.json(out);
-  } catch (err) {
-    console.error('[ads/post] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/**
- * GET /api/ads — تصفح عام (rizq_browse.html / rizq_search.html) — لا
- * يُرجع إلا status==='active' افتراضياً، مع فلاتر بسيطة + ترقيم صفحات.
- */
-app.get('/api/ads', (req, res) => {
-  const q = req.query || {};
-  const viewerId = resolveOptionalAccountViewer(req);
-  let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
-  if (q.category) list = list.filter((a) => a.category === q.category);
-  if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
-  if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);
-  if (q.accountId) list = list.filter((a) => a.accountId === q.accountId);
-  if (q.search) {
-    const s = String(q.search).toLowerCase();
-    list = list.filter((a) => (a.title + ' ' + a.desc).toLowerCase().indexOf(s) !== -1);
-  }
-  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
-  const offset = Math.max(0, Number(q.offset) || 0);
-  const accounts = readAccounts();
-  const page = list.slice(offset, offset + limit).map((ad) => {
-    const seller = accounts.find((a) => a.id === ad.accountId);
-    const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-    return toPublicAdGated(withBoostFlag(ad), gate, seller);
-  });
-  res.json({ ok: true, total: list.length, ads: page });
-});
-
-/**
- * GET /api/ads/batch?ids=RZQ-...,RZQ-... — جلب عدة إعلانات دفعة واحدة
- * (يستخدمه شريط "تابع التصفح" على الصفحة الرئيسية بدل استدعاء /api/ads/:id
- * مرة لكل إعلان شاهده الزائر). عام، لا يُرجع إلا status==='active'.
- */
-app.get('/api/ads/batch', (req, res) => {
-  const idsParam = String(req.query.ids || '');
-  const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 30);
-  if (!ids.length) return res.json({ ok: true, ads: [] });
-  const viewerId = resolveOptionalAccountViewer(req);
-  const all = readAds();
-  const accounts = readAccounts();
-  const found = ids
-    .map((id) => all.find((a) => a.id === id && a.status === 'active'))
-    .filter(Boolean)
-    .map((ad) => {
-      const seller = accounts.find((a) => a.id === ad.accountId);
-      const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-      return toPublicAdGated(withBoostFlag(ad), gate, seller);
-    });
-  res.json({ ok: true, ads: found });
-});
-
-/** GET /api/ads/mine — كل إعلانات حساب معيّن (كل الحالات)، لصاحبه فقط */
-app.get('/api/ads/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readAds().filter((a) => a.accountId === accountId);
-  res.json({ ok: true, ads: list });
-});
-
-/** GET /api/ads/admin — لوحة إشراف الأدمن (كل الحالات، كل الإعلانات) */
-app.get('/api/ads/admin', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, ads: readAds() });
-});
-
-/** GET /api/ads/:id — تفاصيل إعلان واحد (صفحة rizq_listing.html) */
-app.get('/api/ads/:id', (req, res) => {
-  const ad = readAds().find((a) => a.id === req.params.id);
-  if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-  const isAdmin = isAdminRequest(req);
-  const token = extractAccountToken(req) || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (ad.status !== 'active' && !isAdmin && !isOwner) {
-    return res.status(404).json({ error: 'ad_not_found' });
-  }
-  const viewerId = resolveOptionalAccountViewer(req);
-  const seller = readAccounts().find((a) => a.id === ad.accountId);
-  const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-  res.json({ ok: true, ad: toPublicAdGated(withBoostFlag(ad), gate, seller), access: gate });
-});
-
-/**
- * PATCH /api/ads/:id — تعديل من صاحب الإعلان (x-account-token) أو الأدمن
- * (x-rizq-secret). يدعم تعديل الحقول الأساسية + تغيير الحالة (نشِط/مباع/
- * متوقف) + استبدال الصور.
- */
-app.patch('/api/ads/:id', async (req, res) => {
-  try {
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  const ad = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  const b = req.body || {};
-  const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition'];
-  editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
-  if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
-    ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
-      ? Math.floor(Number(b.stockQty)) : null;
-  }
-  if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
-  if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
-  if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
-  if (Array.isArray(b.images)) ad.images = await saveAdImages(ad.id, b.images);
-  // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
-  // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
-  // 'active' بعد رفضه من الأدمن — نفس قرار المراجعة (POST
-  // /api/ads/admin/:id/decision) كان بلا قيمة فعلية. الآن: المالك يستطيع
-  // فقط تعديل حالات إدارة ذاتية لا تحتاج مراجعة (sold/inactive/removed)،
-  // أما active/pending/rejected فللأدمن حصراً (x-rizq-secret).
-  if (typeof b.status === 'string') {
-    const ownerAllowedStatus = ['sold', 'inactive', 'removed'];
-    const adminAllowedStatus = ['active', 'pending', 'rejected', 'sold', 'inactive', 'removed'];
-    const allowedStatus = isAdmin ? adminAllowedStatus : ownerAllowedStatus;
-    if (allowedStatus.includes(b.status)) ad.status = b.status;
-  }
-  ad.updatedAt = new Date().toISOString();
-  list[idx] = ad;
-  writeAds(list);
-  res.json({ ok: true, ad });
-  } catch (err) {
-    console.error('[ads/patch] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/**
- * DELETE /api/ads/:id — حذف ناعم (status='removed') وليس حذفاً نهائياً،
- * بنفس مبدأ عدم الحذف النهائي المتَّبع في بقية المنصة (المناقصات مثلاً).
- */
-app.delete('/api/ads/:id', (req, res) => {
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  const ad = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  list[idx].status = 'removed';
-  list[idx].updatedAt = new Date().toISOString();
-  writeAds(list);
-  res.json({ ok: true });
-});
-
-/**
- * POST /api/ads/admin/:id/decision — قرار إشراف الأدمن (موافقة/رفض) —
- * يحلّ محل syncRealAdReviewStatus المحلي بالكامل في rizq_admin.html.
- */
-app.post('/api/ads/admin/:id/decision', requireAdminAuth, (req, res) => {
-  const action = (req.body || {}).action;
-  if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  list[idx].status = action === 'approve' ? 'active' : 'rejected';
-  list[idx].updatedAt = new Date().toISOString();
-  writeAds(list);
-  res.json({ ok: true, ad: list[idx] });
+const { mountAdsRoutes } = require('./routes/ads');
+mountAdsRoutes(app, {
+  requireAdminAuth,
+  moderatorAdMiddleware,
+  getPlatformFlags,
+  extractAccountToken,
+  verifyAccountOwner,
+  getEntitlements,
+  assertCanPostAd,
+  assertPhotoCount,
+  scanContactLeakFields,
+  saveAdImages,
+  resolveOptionalAccountViewer,
+  resolveContactGate,
+  toPublicAdGated,
+  isAdminRequest,
+  readAccounts,
+  readJson,
+  writeJson,
+  ADS_REQUESTS_FILE,
+  readAds,
+  writeAds,
+  readAdBoosts,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -3813,8 +2709,6 @@ const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
 function readAllHours() { return readJson(HOURS_FILE, {}); }
 function writeAllHours(obj) { writeJson(HOURS_FILE, obj); }
 
-function genCatalogId() { return 'CAT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
-
 // نفس منطق حفظ صور الإعلانات كملفات حقيقية بدل base64 داخل catalog.json
 // (راجع saveAdImages أعلاه لتفصيل سبب القرار: base64 في localStorage
 // يصطدم بحد السعة القصوى فعلياً).
@@ -3822,140 +2716,21 @@ const CATALOG_UPLOADS_DIR = path.join(__dirname, 'uploads', 'catalog');
 if (!fs.existsSync(CATALOG_UPLOADS_DIR)) fs.mkdirSync(CATALOG_UPLOADS_DIR, { recursive: true });
 
 /**
- * POST /api/catalog — إضافة منتج/خدمة (صاحب الحساب فقط عبر x-account-token)
+ * مسارات /api/catalog* — مستخرجة إلى routes/catalog.js
+ * (POST / GET / mine / :id / PATCH / DELETE)
  */
-app.post('/api/catalog', async (req, res) => {
-  try {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.name || !String(b.name).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
-  if (!['product', 'service'].includes(b.kind)) return res.status(400).json({ error: "kind يجب أن يكون 'product' أو 'service'" });
-  const ent = getEntitlements(b.accountId, acc.type);
-  const activeCount = readCatalog().filter((it) => it.accountId === b.accountId && it.status === 'active').length;
-  const imageCount = Array.isArray(b.images) ? b.images.length : (b.image ? 1 : 0);
-  try {
-    assertCanAddCatalogItem(ent, activeCount);
-    if (imageCount) assertPhotoCount(ent, imageCount);
-  } catch (gateErr) {
-    return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
-  }
-  const list = readCatalog();
-  const id = genCatalogId();
-  // images: مصفوفة (حتى 6) — الحقل الجديد للمعرض. image: الصورة الأولى
-  // منها، يبقى محدَّثاً لتوافق أي كود قديم يقرأ item.image فقط. يدعم
-  // كلا المسارين: عميل جديد يرسل images[]، أو عميل قديم يرسل image واحدة.
-  let catImages;
-  if (Array.isArray(b.images) && b.images.length) {
-    catImages = await saveCatalogImages(id, b.images);
-  } else {
-    const single = await saveCatalogImage(id, b.image);
-    catImages = single ? [single] : [];
-  }
-  const rec = {
-    id,
-    accountId: b.accountId,
-    kind: b.kind,
-    name: String(b.name).slice(0, 200),
-    nameFr: String(b.nameFr || '').slice(0, 200),
-    price: String(b.price || '').slice(0, 40),
-    cat: String(b.cat || '').slice(0, 80),
-    desc: String(b.desc || '').slice(0, 3000),
-    descFr: String(b.descFr || '').slice(0, 3000),
-    stock: String(b.stock || '').slice(0, 20),
-    variants: String(b.variants || '').slice(0, 300),
-    images: catImages,
-    image: catImages[0] || null,
-    emoji: String(b.emoji || '').slice(0, 8),
-    status: 'pending_review',
-    sold: Number.isFinite(Number(b.sold)) ? Number(b.sold) : 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeCatalog(list);
-  res.json({ ok: true, item: rec });
-  } catch (err) {
-    console.error('[catalog/post] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/** GET /api/catalog?accountId=...&kind=... — عرض عام (فقط status active) لصفحات المتجر/المكتب/الشركة */
-app.get('/api/catalog', (req, res) => {
-  const q = req.query || {};
-  let list = readCatalog().filter((it) => it.status === 'active');
-  if (q.accountId) list = list.filter((it) => it.accountId === q.accountId);
-  if (q.kind) list = list.filter((it) => it.kind === q.kind);
-  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ ok: true, items: list });
-});
-
-/** GET /api/catalog/mine?accountId=... — كل عناصر صاحب الحساب (كل الحالات)، للوحة التحكم */
-app.get('/api/catalog/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readCatalog().filter((it) => it.accountId === accountId && it.status !== 'removed');
-  res.json({ ok: true, items: list });
-});
-
-/** GET /api/catalog/:id */
-app.get('/api/catalog/:id', (req, res) => {
-  const item = readCatalog().find((it) => it.id === req.params.id);
-  if (!item) return res.status(404).json({ error: 'item_not_found' });
-  res.json({ ok: true, item });
-});
-
-/** PATCH /api/catalog/:id — تعديل من صاحب الحساب أو الأدمن */
-app.patch('/api/catalog/:id', async (req, res) => {
-  try {
-  const list = readCatalog();
-  const idx = list.findIndex((it) => it.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
-  const item = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  const b = req.body || {};
-  const editable = ['name', 'nameFr', 'price', 'cat', 'desc', 'descFr', 'stock', 'variants', 'emoji'];
-  editable.forEach((k) => { if (typeof b[k] === 'string') item[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 3000 : 200); });
-  if (typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
-  if (Array.isArray(b.images)) {
-    item.images = await saveCatalogImages(item.id, b.images);
-    item.image = item.images[0] || null;
-  } else if (typeof b.image === 'string') {
-    item.image = await saveCatalogImage(item.id, b.image);
-    item.images = item.image ? [item.image] : [];
-  }
-  if (typeof b.status === 'string' && ['active', 'inactive', 'pending_review', 'removed'].includes(b.status)) item.status = b.status;
-  item.updatedAt = new Date().toISOString();
-  list[idx] = item;
-  writeCatalog(list);
-  res.json({ ok: true, item });
-  } catch (err) {
-    console.error('[catalog/patch] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/** DELETE /api/catalog/:id — حذف ناعم (status='removed') */
-app.delete('/api/catalog/:id', (req, res) => {
-  const list = readCatalog();
-  const idx = list.findIndex((it) => it.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
-  const item = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  list[idx].status = 'removed';
-  list[idx].updatedAt = new Date().toISOString();
-  writeCatalog(list);
-  res.json({ ok: true });
+const { mountCatalogRoutes } = require('./routes/catalog');
+mountCatalogRoutes(app, {
+  verifyAccountOwner,
+  getEntitlements,
+  assertCanAddCatalogItem,
+  assertPhotoCount,
+  readCatalog,
+  writeCatalog,
+  saveCatalogImages,
+  saveCatalogImage,
+  extractAccountToken,
+  isAdminRequest,
 });
 
 /**
@@ -3999,198 +2774,18 @@ const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 function readMessages() { return readJson(MESSAGES_FILE, []); }
 function writeMessages(list) { writeJson(MESSAGES_FILE, list); }
 
-function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
-  const buyerPart = buyerAccountId ? ('acc:' + buyerAccountId) : ('guest:' + String(buyerPhone || '').replace(/\D/g, ''));
-  return sellerAccountId + '::' + buyerPart;
-}
-
-const messagesLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الرسائل — حاول لاحقاً' },
-});
-
 /**
- * POST /api/messages — إرسال أول رسالة أو رسالة تكميلية من طرف المشتري.
- * body: { sellerAccountId, buyerAccountId?, buyerName, buyerPhone, adId?,
- *         adTitle?, body }
- * إن أُرسل buyerAccountId يجب أن يطابق x-account-token حقيقياً (لا يمكن
- * انتحال هوية مشترٍ آخر)؛ وإلا تُعامَل كرسالة زائر (guest) بمفتاح الهاتف.
+ * مسارات /api/messages* — مستخرجة إلى routes/messages.js
+ * (POST / /reply · GET /threads /mine /thread/:key · PATCH .../read)
  */
-app.post('/api/messages', messagesLimiter, (req, res) => {
-  const b = req.body || {};
-  if (!b.sellerAccountId) return res.status(400).json({ error: 'sellerAccountId مطلوب' });
-  if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
-  let buyerAccountId = null;
-  if (b.buyerAccountId) {
-    const token = req.header('x-account-token') || '';
-    const buyerAcc = verifyAccountOwner(b.buyerAccountId, token);
-    if (!buyerAcc) return res.status(401).json({ error: 'unauthorized' });
-    buyerAccountId = b.buyerAccountId;
-  } else if (!b.buyerPhone || !String(b.buyerPhone).trim()) {
-    return res.status(400).json({ error: 'رقم الهاتف مطلوب للزائر غير المسجَّل' });
-  }
-  const threadKey = buildThreadKey(b.sellerAccountId, buyerAccountId, b.buyerPhone);
-  const list = readMessages();
-  const rec = {
-    id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
-    threadKey,
-    sellerAccountId: b.sellerAccountId,
-    buyerAccountId,
-    buyerName: String(b.buyerName || '').slice(0, 100),
-    buyerPhone: String(b.buyerPhone || '').slice(0, 30),
-    adId: b.adId ? String(b.adId).slice(0, 80) : null,
-    adTitle: b.adTitle ? String(b.adTitle).slice(0, 200) : null,
-    body: String(b.body).slice(0, 3000),
-    fromRole: 'buyer',
-    read: false,
-    createdAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeMessages(list);
-  res.json({ ok: true, threadKey, message: rec });
-
-  const sellerAcc = readAccounts().find((a) => a.id === b.sellerAccountId);
-  if (sellerAcc) {
-    setImmediate(() => {
-      maybeAutoReplyToInquiry({
-        sellerAccount: sellerAcc,
-        buyerMessage: rec,
-        threadKey,
-        readMessagesFn: readMessages,
-        writeMessagesFn: writeMessages,
-      }).catch((e) => console.error('[inquiry-auto-reply]', e.message));
-    });
-  }
-});
-
-/**
- * POST /api/messages/reply — ردّ البائع (صاحب الحساب فقط، عبر x-account-token)
- * body: { sellerAccountId, threadKey, body }
- */
-app.post('/api/messages/reply', messagesLimiter, (req, res) => {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const seller = verifyAccountOwner(b.sellerAccountId, token);
-  if (!seller) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.threadKey || b.threadKey.indexOf(b.sellerAccountId + '::') !== 0) {
-    return res.status(400).json({ error: 'threadKey غير صالح' });
-  }
-  if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
-  const list = readMessages();
-  const rec = {
-    id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
-    threadKey: b.threadKey,
-    sellerAccountId: b.sellerAccountId,
-    buyerAccountId: null,
-    buyerName: '',
-    buyerPhone: '',
-    adId: null,
-    adTitle: null,
-    body: String(b.body).slice(0, 3000),
-    fromRole: 'seller',
-    read: true,
-    createdAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeMessages(list);
-  res.json({ ok: true, message: rec });
-});
-
-/** GET /api/messages/threads?accountId=...&token=... — صندوق وارد البائع: قائمة محادثات مجمّعة */
-app.get('/api/messages/threads', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.sellerAccountId === accountId);
-  const accountsById = new Map(readAccounts().map((a) => [a.id, a]));
-  const byThread = new Map();
-  list.forEach((m) => {
-    if (!byThread.has(m.threadKey)) byThread.set(m.threadKey, []);
-    byThread.get(m.threadKey).push(m);
-  });
-  const threads = Array.from(byThread.entries()).map(([threadKey, msgs]) => {
-    msgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    const lastMessage = msgs[msgs.length - 1];
-    // نجمع اسم/هاتف/إعلان المشتري من أي رسالة تحمله في المحادثة (لا نعتمد
-    // فقط على آخر رسالة، لأن ردود البائع أو رسائل المشتري اللاحقة لا تحمل
-    // هذه الحقول من الأساس) — ولحساب مسجَّل نعرض اسمه الحقيقي من accounts.json.
-    const buyerAccountId = msgs.find((m) => m.buyerAccountId)?.buyerAccountId || null;
-    const buyerAcc = buyerAccountId ? accountsById.get(buyerAccountId) : null;
-    const buyerName = buyerAcc ? (buyerAcc.name || '') : (msgs.find((m) => m.buyerName)?.buyerName || '');
-    const buyerPhone = buyerAcc ? (buyerAcc.phone || '') : (msgs.find((m) => m.buyerPhone)?.buyerPhone || '');
-    const adRef = msgs.find((m) => m.adId);
-    return {
-      threadKey,
-      buyerAccountId,
-      buyerName,
-      buyerPhone,
-      adId: adRef ? adRef.adId : null,
-      adTitle: adRef ? adRef.adTitle : null,
-      lastMessage,
-      unreadCount: msgs.filter((m) => m.fromRole === 'buyer' && !m.read).length,
-    };
-  }).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
-  res.json({ ok: true, threads });
-});
-
-/** GET /api/messages/mine?accountId=...&token=... — صندوق وارد المشتري صاحب حساب فردي: كل محادثاته عبر كل البائعين */
-app.get('/api/messages/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.buyerAccountId === accountId || (m.threadKey && m.threadKey.indexOf('::acc:' + accountId) !== -1));
-  const byThread = new Map();
-  list.forEach((m) => {
-    const existing = byThread.get(m.threadKey);
-    if (!existing || new Date(m.createdAt) > new Date(existing.lastMessage.createdAt)) {
-      byThread.set(m.threadKey, { threadKey: m.threadKey, sellerAccountId: m.sellerAccountId, adId: m.adId, adTitle: m.adTitle, lastMessage: m });
-    }
-  });
-  const threads = Array.from(byThread.values()).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
-  res.json({ ok: true, threads });
-});
-
-/**
- * GET /api/messages/thread/:threadKey — كل رسائل محادثة واحدة. مسموح
- * للبائع (صاحب threadKey) أو للمشتري صاحب الحساب (إن كانت محادثة مرتبطة
- * بحساب لا بضيف) — عبر x-account-token يطابق أحد الطرفين.
- */
-app.get('/api/messages/thread/:threadKey', (req, res) => {
-  const threadKey = req.params.threadKey;
-  const sellerAccountId = threadKey.split('::')[0];
-  const token = extractAccountToken(req) || '';
-  const asSeller = verifyAccountOwner(sellerAccountId, token);
-  let asBuyer = null;
-  const buyerMatch = /::acc:(.+)$/.exec(threadKey);
-  if (buyerMatch) asBuyer = verifyAccountOwner(buyerMatch[1], token);
-  let asGuest = false;
-  const guestMatch = /::guest:(\d+)$/.exec(threadKey);
-  if (!asSeller && !asBuyer && guestMatch) {
-    const phoneDigits = String(req.query.buyerPhone || req.header('x-guest-phone') || '').replace(/\D/g, '');
-    if (phoneDigits && phoneDigits === guestMatch[1]) asGuest = true;
-  }
-  if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-  res.json({ ok: true, messages: list });
-});
-
-/** PATCH /api/messages/thread/:threadKey/read — البائع يعلّم المحادثة كمقروءة */
-app.patch('/api/messages/thread/:threadKey/read', (req, res) => {
-  const threadKey = req.params.threadKey;
-  const sellerAccountId = threadKey.split('::')[0];
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(sellerAccountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages();
-  let changed = 0;
-  list.forEach((m) => { if (m.threadKey === threadKey && m.fromRole === 'buyer' && !m.read) { m.read = true; changed++; } });
-  if (changed) writeMessages(list);
-  res.json({ ok: true, updated: changed });
+const { mountMessagesRoutes } = require('./routes/messages');
+mountMessagesRoutes(app, {
+  verifyAccountOwner,
+  extractAccountToken,
+  readMessages,
+  writeMessages,
+  readAccounts,
+  maybeAutoReplyToInquiry,
 });
 
 // ══════════════════════════════════════════════════════════════════
