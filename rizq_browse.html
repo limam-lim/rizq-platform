@@ -94,11 +94,14 @@ nav .nav-search{order:1;flex:1;min-width:0}
 nav .nav-disclaimer{flex-shrink:0}
 .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;order:0}
 /* gallery prev/next arrows */
-.dp-gal-wrap{position:relative}
-.dp-gal-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:22px;z-index:5;transition:background .2s;display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:2px}
-.dp-gal-btn:hover{background:rgba(201,168,76,.75)}
-.dp-gal-prev{left:10px}
-.dp-gal-next{right:10px}
+.dp-gal-wrap{position:relative;max-width:360px;width:100%}
+.dp-gal-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;z-index:5;transition:background .2s;display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:2px;opacity:.85}
+.dp-gal-btn:hover{background:rgba(201,168,76,.85);opacity:1}
+.dp-gal-prev{left:8px}
+.dp-gal-next{right:8px}
+.dp-zoom-hint{position:absolute;bottom:10px;inset-inline-end:10px;z-index:4;display:inline-flex;align-items:center;gap:5px;background:rgba(15,31,61,.78);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none;backdrop-filter:blur(4px);border:1px solid rgba(201,168,76,.35)}
+.dp-zoom-hint svg{width:13px;height:13px;stroke:#C9A84C;fill:none;stroke-width:2}
+.dp-gal-counter{position:absolute;bottom:10px;inset-inline-start:10px;z-index:4;background:rgba(15,31,61,.78);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;pointer-events:none;border:1px solid rgba(255,255,255,.12)}
 .btn-post{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:8px 18px;border-radius:9px;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Segoe UI',sans-serif;white-space:nowrap;transition:all .3s}
 .btn-post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4)}
 .btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.78);padding:7px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .3s}
@@ -239,18 +242,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .empty-detail p{font-size:13px;max-width:280px;line-height:1.6}
 
 /* DETAIL CONTENT — detail panel */
-.dp-wrap{padding:20px 24px 40px;max-width:860px;margin:0 auto}
+.dp-wrap{padding:20px 24px 40px;max-width:560px;margin:0 auto}
 .dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:7px 14px;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
 .dp-back-btn:hover{background:rgba(27,58,107,.06);border-color:rgba(27,58,107,.3)}
-.dp-gallery{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
-.dp-main-img{height:280px;border-radius:14px;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold);overflow:hidden;cursor:zoom-in;position:relative}
-.dp-main-img svg{width:90px;height:90px;stroke-width:1.2;opacity:.9}
-.dp-main-img img{width:100%;height:100%;object-fit:cover}
-.dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.dp-gallery{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:18px;max-width:360px}
+.dp-main-img{width:100%;aspect-ratio:4/3;max-height:200px;height:auto;border-radius:12px;background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold);overflow:hidden;cursor:zoom-in;position:relative;box-shadow:0 6px 18px rgba(15,31,61,.12);border:1px solid rgba(27,58,107,.12)}
+.dp-main-img svg{width:56px;height:56px;stroke-width:1.2;opacity:.9}
+.dp-main-img img{width:100%;height:100%;object-fit:contain;background:#0b1628;transition:transform .25s ease}
+.dp-main-img:hover img{transform:scale(1.03)}
+.dp-thumbs{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 6px;max-width:100%;scrollbar-width:thin}
 .dp-thumbs::-webkit-scrollbar{height:3px}
-.dp-thumb{width:62px;height:52px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s;overflow:hidden}
+.dp-thumbs::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:2px}
+.dp-thumb{width:56px;height:48px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden}
+.dp-thumb:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(15,31,61,.15)}
 .dp-thumb:hover,.dp-thumb.active{border-color:var(--gold)}
-.dp-thumb svg{width:22px;height:22px;stroke-width:1.5}
+.dp-thumb.active{box-shadow:0 0 0 1px rgba(201,168,76,.35)}
+.dp-thumb svg{width:20px;height:20px;stroke-width:1.5}
 .dp-thumb img{width:100%;height:100%;object-fit:cover}
 
 .dp-listing-cat{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);margin-bottom:8px}
@@ -360,11 +367,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 
 /* LIGHTBOX */
 #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;align-items:center;justify-content:center;cursor:zoom-out}
-#lightbox.open{display:flex}
-#lightbox-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;cursor:pointer;z-index:9001;transition:all .2s}
-#lightbox-close:hover{background:rgba(220,38,38,.5)}
-#lightbox-content{max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold)}
-#lightbox-content img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px}
+#lightbox.open{display:flex;flex-direction:column;gap:12px}
+#lightbox-close{position:fixed;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;z-index:9002;transition:all .2s}
+#lightbox-close:hover{background:rgba(220,38,38,.55)}
+#lightbox-content{max-width:90vw;max-height:78vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold);position:relative}
+#lightbox-content img{max-width:min(920px,90vw);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);cursor:default}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:24px;cursor:pointer;z-index:9002;display:none;align-items:center;justify-content:center;transition:background .2s}
+.lb-nav:hover{background:rgba(201,168,76,.75)}
+#lightbox.open .lb-nav{display:flex}
+.lb-prev{left:18px}
+.lb-next{right:18px}
+.lb-meta{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:9002;display:none;align-items:center;gap:10px;background:rgba(15,31,61,.75);color:#fff;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid rgba(201,168,76,.3);pointer-events:none}
+#lightbox.open .lb-meta{display:inline-flex}
+.lb-thumbs{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:9002;display:none;gap:8px;max-width:90vw;overflow-x:auto;padding:4px}
+#lightbox.open .lb-thumbs{display:flex}
+.lb-thumb{width:52px;height:40px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;opacity:.7;flex-shrink:0;background:#1B3A6B}
+.lb-thumb.active,.lb-thumb:hover{border-color:var(--gold);opacity:1}
+.lb-thumb img{width:100%;height:100%;object-fit:cover}
 
 /* CHAT MODAL — floating bottom-right, page stays visible */
 .chat-overlay{display:none;position:fixed;bottom:72px;right:24px;z-index:7000;align-items:flex-end;justify-content:flex-end;padding:0;pointer-events:none}
@@ -564,7 +583,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     overflow:hidden;
   }
   .browse-wrap.has-detail .browse-left{
-    flex:0 0 min(520px, 48vw);
+    flex:0 0 min(620px, 58vw);
   }
   .browse-wrap.has-detail .bs-sidebar{
     width:220px;
@@ -574,11 +593,12 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-wrap.has-detail .browse-right{display:block}
   .browse-right{min-height:0}
   .empty-detail{min-height:100%}
+  .dp-wrap{max-width:520px;padding:16px 18px 36px}
 }
 
 @media(max-width:1080px) and (min-width:901px){
   .bs-sidebar{width:240px;flex-basis:240px}
-  .browse-wrap.has-detail .browse-left{flex:0 0 min(460px,52vw)}
+  .browse-wrap.has-detail .browse-left{flex:0 0 min(540px,56vw)}
 }
 
 @media(max-width:900px){
@@ -737,6 +757,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   nav{padding:0 3%;gap:10px}
   .nav-search select{display:none}
   .dp-wrap{padding:14px 14px 32px}
+  .dp-gallery,.dp-gal-wrap{max-width:100%}
+  .dp-main-img{max-height:210px;aspect-ratio:16/10}
   .dp-title{font-size:18px}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
@@ -1122,8 +1144,12 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="closeLightbox()">
-  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-  <div id="lightbox-content"></div>
+  <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button type="button" class="lb-nav lb-prev" onclick="event.stopPropagation();dpLightboxNav(-1)" aria-label="السابق">‹</button>
+  <button type="button" class="lb-nav lb-next" onclick="event.stopPropagation();dpLightboxNav(1)" aria-label="التالي">›</button>
+  <div id="lightbox-content" onclick="event.stopPropagation()"></div>
+  <div class="lb-thumbs" id="lightbox-thumbs" onclick="event.stopPropagation()"></div>
+  <div class="lb-meta" id="lightbox-meta"></div>
 </div>
 
 <!-- REPORT MODAL — إبلاغ حقيقي متصل بـ POST /api/reports (إصلاح 11/08/2026) -->
@@ -1900,18 +1926,20 @@ function renderDetailPanel(ad){
   window._dpCurrentIdx=0; // reset on new ad
 
   let mainImgHTML;
+  const zoomHintHTML=`<span class="dp-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></span>`;
+  const counterHTML=totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onclick="dpOpenLightbox(0)" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div>`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onclick="event.stopPropagation();dpOpenLightbox(0)" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:contain"></div>${zoomHintHTML}${counterHTML}`;
   } else {
-    mainImgHTML=`<span style="display:flex;width:90px;height:90px">${iconHTML(ad.emoji||'🏠')}</span>`;
+    mainImgHTML=`<span style="display:flex;width:56px;height:56px">${iconHTML(ad.emoji||'🏠')}</span>${counterHTML}`;
   }
 
   const thumbsHTML=hasImages
-    ? ad.images.slice(0,5).map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
-    : galleryEmojis.slice(0,5).map((e,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" data-emoji="${escapeHtml(e)}">${iconHTML(e)}</div>`).join('');
+    ? ad.images.map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" title="${i+1}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
+    : galleryEmojis.slice(0,6).map((e,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" data-emoji="${escapeHtml(e)}">${iconHTML(e)}</div>`).join('');
 
   const galNavHTML=totalGallery>1
-    ?`<button class="dp-gal-btn dp-gal-prev" onclick="dpNavPhoto(-1)">‹</button><button class="dp-gal-btn dp-gal-next" onclick="dpNavPhoto(1)">›</button>`
+    ?`<button type="button" class="dp-gal-btn dp-gal-prev" onclick="event.stopPropagation();dpNavPhoto(-1)" aria-label="${fr?'Précédente':'السابقة'}">‹</button><button type="button" class="dp-gal-btn dp-gal-next" onclick="event.stopPropagation();dpNavPhoto(1)" aria-label="${fr?'Suivante':'التالية'}">›</button>`
     :'';
   const adPrice=fr?priceFr(ad.price||''):(ad.price||'');
   const adLoc=fr?locFr(ad.loc,ad.wilaya):(ad.loc||ad.wilaya||'');
@@ -1962,10 +1990,10 @@ function renderDetailPanel(ad){
     <!-- Gallery -->
     <div class="dp-gallery">
       <div class="dp-gal-wrap">
-        <div class="dp-main-img" id="dp-main-img" onclick="dpOpenLightbox(0)">${mainImgHTML}</div>
+        <div class="dp-main-img" id="dp-main-img" onclick="dpOpenLightbox(0)" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
         ${galNavHTML}
       </div>
-      <div class="dp-thumbs">${thumbsHTML}</div>
+      ${thumbsHTML?`<div class="dp-thumbs" role="list">${thumbsHTML}</div>`:''}
     </div>
 
     <!-- Category -->
@@ -2226,13 +2254,44 @@ function closeRizqPromo(){
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;
   const imgs=window._currentAd.images||[];
-  const src=imgs[idx]||'';
-  if(!src)return;
+  if(!imgs.length)return;
+  window._lbIdx=Math.max(0,Math.min(idx|0,imgs.length-1));
   const lb=document.getElementById('lightbox');
-  const lbc=document.getElementById('lightbox-content');
-  if(!lb||!lbc)return;
-  lbc.innerHTML='<img src="'+src+'" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px">';
+  if(!lb)return;
+  dpRenderLightbox();
   lb.classList.add('open');
+}
+function dpRenderLightbox(){
+  const imgs=(window._currentAd&&window._currentAd.images)||[];
+  if(!imgs.length)return;
+  const idx=window._lbIdx||0;
+  const fr=_rizqLang()==='fr';
+  const lbc=document.getElementById('lightbox-content');
+  const meta=document.getElementById('lightbox-meta');
+  const thumbs=document.getElementById('lightbox-thumbs');
+  if(lbc){
+    lbc.innerHTML='<img src="'+escapeHtml(imgs[idx])+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()">';
+  }
+  if(meta){
+    meta.textContent=(idx+1)+' / '+imgs.length+(fr?' — Cliquez hors de l\'image pour fermer':' — انقر خارج الصورة للإغلاق');
+  }
+  if(thumbs){
+    thumbs.innerHTML=imgs.map((src,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(src)+'" alt=""></button>').join('');
+    thumbs.style.display=imgs.length>1?'flex':'none';
+  }
+  const prev=document.querySelector('.lb-prev');
+  const next=document.querySelector('.lb-next');
+  if(prev)prev.style.display=imgs.length>1?'flex':'none';
+  if(next)next.style.display=imgs.length>1?'flex':'none';
+}
+function dpLightboxGoto(idx){
+  const imgs=(window._currentAd&&window._currentAd.images)||[];
+  if(!imgs.length)return;
+  window._lbIdx=((idx%imgs.length)+imgs.length)%imgs.length;
+  dpRenderLightbox();
+}
+function dpLightboxNav(dir){
+  dpLightboxGoto((window._lbIdx||0)+dir);
 }
 function dpOpenWhatsApp(){dpWhatsApp();}
 function dpSetPhoto(idx){
@@ -2242,10 +2301,15 @@ function dpSetPhoto(idx){
   const emojis=window._currentAd._catEmojis||[];
   const mainEl=document.getElementById('dp-main-img');
   if(!mainEl)return;
+  const fr=_rizqLang()==='fr';
+  const total=imgs.length||emojis.length||1;
+  const zoomHint=`<span class="dp-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></span>`;
+  const counter=total>1?`<span class="dp-gal-counter" id="dp-gal-counter">${idx+1} / ${total}</span>`:'';
   if(imgs[idx]){
-    mainEl.innerHTML='<img src="'+imgs[idx]+'" style="width:100%;height:100%;object-fit:cover" onclick="dpOpenLightbox('+idx+')">';
+    mainEl.innerHTML='<div class="rizq-img-wrap loaded" style="width:100%;height:100%"><img id="dp-main-img-el" src="'+escapeHtml(imgs[idx])+'" style="width:100%;height:100%;object-fit:contain" onclick="event.stopPropagation();dpOpenLightbox('+idx+')"></div>'+zoomHint+counter;
+    mainEl.setAttribute('onclick','dpOpenLightbox('+idx+')');
   } else if(emojis[idx]){
-    mainEl.innerHTML='<span style="font-size:64px">'+emojis[idx]+'</span>';
+    mainEl.innerHTML='<span style="font-size:48px">'+emojis[idx]+'</span>'+counter;
   }
   document.querySelectorAll('.dp-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
 }
@@ -2501,6 +2565,13 @@ function closeLightbox(){
   const lb=document.getElementById('lightbox');
   if(lb)lb.classList.remove('open');
 }
+document.addEventListener('keydown',function(e){
+  const lb=document.getElementById('lightbox');
+  if(!lb||!lb.classList.contains('open'))return;
+  if(e.key==='Escape'){closeLightbox();return;}
+  if(e.key==='ArrowLeft'){dpLightboxNav(-1);e.preventDefault();}
+  if(e.key==='ArrowRight'){dpLightboxNav(1);e.preventDefault();}
+});
 function openRizqPromo(){
   window.location.href='rizq_landing_v8.html#about';
 }
