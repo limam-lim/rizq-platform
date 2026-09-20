@@ -1052,15 +1052,20 @@
   function showAccountPanel() {
     var s = getSession();
     var dict = d();
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
     document.getElementById('rag-title').textContent = dict.titleAccount;
     document.getElementById('rag-sub').textContent = dict.subAccount;
     document.getElementById('rag-returning').classList.remove('show');
     document.getElementById('rag-acc-name').textContent = s.name || '—';
     var lines = ['<div>' + dict.loggedAs + '</div>'];
-    if (s.phone) lines.push('<div>📱 +222 ' + s.phone + '</div>');
-    if (s.phoneIntl) lines.push('<div>🌍 ' + s.phoneIntl + '</div>');
-    if (s.whatsapp) lines.push('<div>💬 ' + s.whatsapp + '</div>');
-    lines.push('<div>✉️ ' + (s.email || '—') + '</div>');
+    if (s.phone) lines.push('<div>📱 +222 ' + esc(s.phone) + '</div>');
+    if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
+    if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
+    lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
     document.getElementById('rag-acc-meta').innerHTML = lines.join('');
     showStep('account');
   }

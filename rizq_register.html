@@ -343,11 +343,16 @@
     if (!s || !s.id || !s.token) { goLogin(); return; }
     setStatus('');
     document.getElementById('acc-name').textContent = s.name || s.email || '—';
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
     var lines = ['<div>' + t('مسجّل كمشتري', 'Connecté comme acheteur') + '</div>'];
-    if (s.phone) lines.push('<div>📱 +222 ' + s.phone + '</div>');
-    if (s.phoneIntl) lines.push('<div>🌍 ' + s.phoneIntl + '</div>');
-    if (s.whatsapp) lines.push('<div>💬 ' + s.whatsapp + '</div>');
-    lines.push('<div>✉️ ' + (s.email || '—') + '</div>');
+    if (s.phone) lines.push('<div>📱 +222 ' + esc(s.phone) + '</div>');
+    if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
+    if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
+    lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
     document.getElementById('acc-meta').innerHTML = lines.join('');
     show('panel-account');
   }
@@ -410,9 +415,24 @@
   function loadCreds() {
     try { return JSON.parse(localStorage.getItem(CREDS_KEY) || '{}') || {}; } catch (e) { return {}; }
   }
+  /** بصمة محلية فقط — لا نخزّن كلمة المرور نصاً صريحاً */
+  function localPwFingerprint(pw) {
+    var s = String(pw || '');
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return 'fp_' + (h >>> 0).toString(16) + '_' + s.length;
+  }
   function saveCreds(email, password, session) {
     var all = loadCreds();
-    all[String(email).toLowerCase()] = { password: String(password), session: session || null, activated: true };
+    var prev = all[String(email).toLowerCase()] || {};
+    all[String(email).toLowerCase()] = {
+      passwordHash: localPwFingerprint(password),
+      session: session || prev.session || null,
+      activated: true
+    };
     try { localStorage.setItem(CREDS_KEY, JSON.stringify(all)); } catch (e) {}
   }
   function saveSession(session) {
@@ -632,16 +652,7 @@
     if (!pw) { document.getElementById('e-li-pw').classList.add('show'); ok = false; }
     if (!ok) return;
 
-    var creds = loadCreds()[email];
-    if (creds && String(creds.password) === String(pw)) {
-      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
-      saveSession(session);
-      setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-      setTimeout(function () { location.href = 'index.html'; }, 400);
-      return;
-    }
-
-    /* دخول بائع مفعّل — محلي ثم خادم */
+    /* أولاً: بائع مفعّل → داشبورد النوع الصحيح (فرد/محل/مكتب/شركة) */
     if (window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function') {
       var seller = await window.RizqAccount.loginSellerAsync(email, pw);
       if (seller && seller.ok && seller.url) {
@@ -659,6 +670,23 @@
         setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
         return;
       }
+    }
+
+    /* ثانياً: مشتري محلي (بصمة كلمة المرور — بلا نص صريح) */
+    var creds = loadCreds()[email];
+    var fpOk = creds && (
+      (creds.passwordHash && creds.passwordHash === localPwFingerprint(pw)) ||
+      (creds.password && String(creds.password) === String(pw)) /* توافق رجعي لجلسات قديمة */
+    );
+    if (fpOk) {
+      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
+      if (creds.password && !creds.passwordHash) {
+        try { saveCreds(email, pw, session); } catch (eMig) {}
+      }
+      saveSession(session);
+      setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+      setTimeout(function () { location.href = 'index.html'; }, 400);
+      return;
     }
 
     setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');

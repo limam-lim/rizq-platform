@@ -6954,6 +6954,8 @@ function _syncAccountToBackend(acc){
       phoneIntl: acc.phoneIntl || acc.phone_intl || '',
       whatsapp: acc.whatsapp || '',
       email: acc.email || '',
+      // ضروري لـ seller-login بعد التسجيل — يُهشَّر على الخادم فوراً ولا يُعاد في الرد
+      password: acc.password || '',
       dashToken: acc.dashToken || acc.token || '',
       city: acc.city || '',
       category: acc.category || '',
@@ -6983,12 +6985,37 @@ function _syncAccountToBackend(acc){
     if(!data || !data.ok || !data.accessToken) return { ok: true };
     // نخزّن توكن الوصول الخاص بالحساب محلياً — سيُستخدم لاحقاً من داشبورد
     // المشترك نفسه للاستعلام عن حالة الموافقة الحقيقية عبر GET /api/accounts/mine/:id
+    // ونزامن status/dashToken من الخادم حتى يطابق التوجيه لوحة النوع الصحيح.
     try{
       var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
       var rec = accs2.find(function(a){ return a.id===acc.id; });
-      if(rec){ rec.backendAccessToken = data.accessToken; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
+      if(rec){
+        rec.backendAccessToken = data.accessToken;
+        delete rec.password;
+        if(data.dashToken){
+          rec.token = data.dashToken;
+          rec.dashToken = data.dashToken;
+        }
+        if(data.status) rec.status = data.status;
+        if(data.type) rec.type = data.type;
+        if(data.autoApproved){
+          rec.autoVerified = true;
+          rec.approvedAt = rec.approvedAt || new Date().toISOString();
+        } else if(data.status === 'pending'){
+          rec.status = 'pending';
+          rec.autoVerified = false;
+        }
+        localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
+        acc.backendAccessToken = data.accessToken;
+        delete acc.password;
+        if(data.dashToken){ acc.token = data.dashToken; acc.dashToken = data.dashToken; }
+        if(data.status) acc.status = data.status;
+        if(window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function' && acc.status === 'approved' && acc.token){
+          window.RizqAccount.setActiveSession(acc);
+        }
+      }
     }catch(e){}
-    return { ok: true };
+    return { ok: true, autoApproved: !!data.autoApproved, status: data.status, type: data.type };
   }).catch(function(){ return { ok: true, localOnly: true }; });
 }
 // ID upload handlers

@@ -1589,12 +1589,19 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
   const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
+  // فرد/محل: تفعيل فوري عند بريد + كلمة مرور (≥6) — يطابق RizqVerificationPolicy
+  // في الواجهة. إن وُجد تحقق OTP مسبق للمشتري يُستهلك (أفضل)، وإلا يكفي
+  // إثبات ملكية البريد بكلمة المرور عند التسجيل التجاري حتى يعمل
+  // seller-login لاحقاً ويُوجَّه كل نوع إلى داشبورده.
   let autoApproved = false;
-  if (canAutoApproveAccountType(reqType) && sellerEmail) {
-    const ver = consumeBuyerVerificationByEmail(sellerEmail);
-    if (ver.ok) autoApproved = true;
+  if (canAutoApproveAccountType(reqType) && sellerEmail && sellerPassword.length >= 6) {
+    try { consumeBuyerVerificationByEmail(sellerEmail); } catch (eOtp) { /* optional */ }
+    autoApproved = true;
   }
-  const dashToken = autoApproved ? genDashToken() : null;
+  const clientDash = typeof b.dashToken === 'string' && /^TK_[A-Za-z0-9]+$/.test(b.dashToken)
+    ? String(b.dashToken).slice(0, 80)
+    : null;
+  const dashToken = autoApproved ? (clientDash || genDashToken()) : null;
   const acc = {
     id,
     accessToken,
@@ -1662,7 +1669,15 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     purgeAccountIdDocument(list[idx]);
     writeAccounts(list);
   }
-  res.json({ ok: true, id, accessToken, autoApproved: !!autoApproved });
+  res.json({
+    ok: true,
+    id,
+    accessToken,
+    autoApproved: !!autoApproved,
+    status: acc.status,
+    type: acc.type,
+    dashToken: dashToken || undefined,
+  });
 
   // إشعار الأدمن تلقائياً عند تسجيل حساب جديد (لا يُبطئ رد العميل)
   setImmediate(() => {
