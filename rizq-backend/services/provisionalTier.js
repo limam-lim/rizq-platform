@@ -60,6 +60,9 @@ function tierFromPlausibility(level, flags) {
 const INV_RED_RE = /ضمان\s*عائد|عائد\s*مضمون|ربح\s*مضمون|100\s*%\s*ربح|بدون\s*مخاطر|garant(?:ie|i)\s*(?:de\s*)?rendement|guaranteed\s*return|sans\s*risque|get\s*rich|ponzi|احتيال|نصب/i;
 const INV_YELLOW_RE = /قريباً|غير\s*محدد|تواصل\s*خاص|whatsapp\s*only|بسرعة|فرصة\s*نادرة|urgent|asap|limited\s*time/i;
 
+const TENDER_RED_RE = /احتيال|نصب|وهمي|مزيف|بدون\s*دفع|free\s*money|scam|fraud|fake\s*tender|غسيل\s*أموال/i;
+const TENDER_YELLOW_RE = /عاجل\s*جدا|فوراً|اليوم\s*فقط|تواصل\s*واتساب\s*فقط|whatsapp\s*only|asap|urgent\s*only|غير\s*محدد/i;
+
 /**
  * تقييم فرصة استثمارية — قواعد حذرة مناسبة لعمل فردي.
  */
@@ -145,6 +148,90 @@ function shouldAutoApprove(tier) {
   return autoApproveEnabled() && tier === TIER.GREEN;
 }
 
+/**
+ * تقييم مناقصة جديدة — اكتمال الملف + إشارات خطر قبل النشر العام.
+ */
+function scoreTender(tender) {
+  const reasons = [];
+  const title = String((tender && tender.title) || '').trim();
+  const desc = String((tender && tender.desc) || '').trim();
+  const category = String((tender && tender.category) || '').trim();
+  const city = String((tender && tender.city) || '').trim();
+  const budgetMin = Number((tender && tender.budgetMin) || 0);
+  const budgetMax = Number((tender && tender.budgetMax) || 0);
+  const deadline = tender && tender.deadline ? new Date(tender.deadline).getTime() : NaN;
+  const hasDoc = !!(tender && tender.document);
+  const imageCount = Array.isArray(tender && tender.images) ? tender.images.length : 0;
+  const ownerName = String((tender && tender.ownerName) || '').trim();
+  const blob = title + '\n' + desc;
+
+  let tier = TIER.GREEN;
+
+  if (TENDER_RED_RE.test(blob)) {
+    tier = TIER.RED;
+    reasons.push('fraud_or_scam_language');
+  }
+  if (title.length < 8) {
+    tier = tier === TIER.RED ? TIER.RED : TIER.YELLOW;
+    reasons.push('title_short');
+  }
+  if (desc.length < 40) {
+    tier = tier === TIER.RED ? TIER.RED : TIER.YELLOW;
+    reasons.push('description_short');
+  }
+  if (!category) {
+    if (tier === TIER.GREEN) tier = TIER.YELLOW;
+    reasons.push('category_missing');
+  }
+  if (!city) {
+    if (tier === TIER.GREEN) tier = TIER.YELLOW;
+    reasons.push('city_missing');
+  }
+  if (Number.isNaN(deadline) || deadline <= Date.now()) {
+    tier = TIER.RED;
+    reasons.push('deadline_invalid');
+  } else {
+    const hoursLeft = (deadline - Date.now()) / 3600000;
+    if (hoursLeft < 12) {
+      tier = tier === TIER.RED ? TIER.RED : TIER.YELLOW;
+      reasons.push('deadline_too_soon');
+    }
+  }
+  if (budgetMax > 0 && budgetMin > 0 && budgetMax < budgetMin) {
+    tier = TIER.RED;
+    reasons.push('budget_inconsistent');
+  }
+  if (budgetMax <= 0 && budgetMin <= 0) {
+    if (tier === TIER.GREEN) tier = TIER.YELLOW;
+    reasons.push('budget_missing');
+  }
+  if (budgetMax >= 1e9 && desc.length < 100) {
+    tier = TIER.RED;
+    reasons.push('unrealistic_budget_thin_desc');
+  }
+  if (!hasDoc && imageCount === 0 && desc.length < 80) {
+    if (tier === TIER.GREEN) tier = TIER.YELLOW;
+    reasons.push('no_attachments_thin_file');
+  }
+  if (!ownerName) {
+    if (tier === TIER.GREEN) tier = TIER.YELLOW;
+    reasons.push('owner_name_missing');
+  }
+  if (TENDER_YELLOW_RE.test(blob) && tier === TIER.GREEN) {
+    tier = TIER.YELLOW;
+    reasons.push('urgency_or_ambiguity');
+  }
+
+  return {
+    provisionalTier: tier,
+    provisionalLabelAr: label(tier, 'ar'),
+    provisionalLabelFr: label(tier, 'fr'),
+    provisionalReasons: reasons.slice(0, 12),
+    provisionalAt: new Date().toISOString(),
+    provisionalBy: 'tenders_agent',
+  };
+}
+
 module.exports = {
   TIER,
   LABELS,
@@ -153,5 +240,6 @@ module.exports = {
   tierFromPlausibility,
   scoreInvestmentOpportunity,
   scorePackageRequest,
+  scoreTender,
   shouldAutoApprove,
 };

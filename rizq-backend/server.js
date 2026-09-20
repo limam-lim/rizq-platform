@@ -2507,7 +2507,7 @@ app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
     const pendingAds = readAds().filter((a) => a.status === 'pending');
     const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
     const pendingBizContacts = readJson(ADS_REQUESTS_FILE, []).filter((r) => r.status === 'pending_contact');
-    const pendingTenders = readTenders().filter((t) => t.status === 'pending');
+    const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
 
     const pkgRecords = getAllAccountPackageRecords();
     const expiringSoon = [];
@@ -2690,7 +2690,8 @@ function resolveTenderOwnerContacts(t) {
 }
 
 function isTenderPubliclyOpen(t) {
-  if (!t || t.status !== 'open') return false;
+  if (!t) return false;
+  if (t.status !== 'open' && t.status !== 'provisionally_approved') return false;
   const deadlineMs = new Date(t.deadline).getTime();
   return !Number.isNaN(deadlineMs) && deadlineMs > Date.now();
 }
@@ -2741,8 +2742,11 @@ function toPublicTender(t, access, viewerId) {
     ownerId: t.ownerId || null,
     createdAt: t.createdAt,
     status: t.status || 'open',
+    provisionalTier: t.provisionalTier || null,
+    provisionalLabelAr: t.provisionalLabelAr || null,
+    provisionalAutoApproved: !!t.provisionalAutoApproved,
     bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && t.status === 'open',
+    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && (t.status === 'open' || t.status === 'provisionally_approved'),
     contactsLocked: !contactsUnlocked,
     ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
     ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
@@ -2950,7 +2954,7 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
   }
   const tenderId = genTenderId();
-  const tender = {
+  const tenderDraft = {
     id: tenderId,
     ownerId: acc.id,
     ownerName: acc.name || '',
@@ -2968,31 +2972,54 @@ app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
     images: await saveTenderImages(tenderId, b.images),
     document: await saveTenderDocument(tenderId, b.document),
     documentName: b.document ? String(b.documentName || 'tender-document.pdf').slice(0, 120) : null,
-    status: 'pending_review',
     createdAt: new Date().toISOString(),
     bids: [],
   };
+  const { scoreTender, shouldAutoApprove } = require('./services/provisionalTier');
+  const score = scoreTender(tenderDraft);
+  const auto = shouldAutoApprove(score.provisionalTier);
+  const tender = Object.assign({}, tenderDraft, {
+    status: auto ? 'provisionally_approved' : 'pending_review',
+    provisionalTier: score.provisionalTier,
+    provisionalLabelAr: score.provisionalLabelAr,
+    provisionalLabelFr: score.provisionalLabelFr,
+    provisionalReasons: score.provisionalReasons,
+    provisionalAt: score.provisionalAt,
+    provisionalBy: score.provisionalBy,
+    provisionalAutoApproved: auto,
+    approvedAt: auto ? new Date().toISOString() : null,
+    approvedBy: auto ? 'tenders_agent' : null,
+  });
   const list = readTenders();
   list.unshift(tender);
   writeTenders(list);
   setImmediate(() => {
     try {
       const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
+      const tierEmoji = score.provisionalTier === 'green' ? '🟢' : (score.provisionalTier === 'yellow' ? '🟡' : '🔴');
+      const reason = auto
+        ? (tierEmoji + ' مناقصة «' + tender.title + '» — موافقة مبدئية تلقائية من وكيل المناقصات (قابلة للنقض)')
+        : (tierEmoji + ' مناقصة «' + tender.title + '» — معلّقة بانتظارك (' + (score.provisionalLabelAr || score.provisionalTier) + ')');
       sendTelegramAdminNotification({
         leadId: tender.id,
         businessName: tender.ownerName,
         whatsapp: acc.phone || acc.whatsapp || '',
         package: tender.category || 'غرفة المناقصات',
-        reason: 'مناقصة جديدة — «' + tender.title + '» — بانتظار مراجعة الأدمن',
+        reason,
         channel: 'tender_review',
       }).catch((err) => console.warn('[tenders/post] telegram:', err && err.message));
     } catch (e) { /* telegram optional */ }
   });
   res.json({
     ok: true,
-    pendingReview: true,
+    pendingReview: !auto,
+    provisionalTier: score.provisionalTier,
+    provisionalLabel: score.provisionalLabelAr,
+    autoApproved: auto,
     tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
-    msg: 'تم استلام مناقصتك — ستُنشر بعد مراجعة فريق رزق.',
+    msg: auto
+      ? 'موافقة مبدئية من وكيل المناقصات — نُشرت بصفة مبدئية (قابلة للمراجعة).'
+      : 'تم استلام مناقصتك — معلّقة بانتظار مراجعة Limam (لبس أو شبهة).',
   });
   } catch (err) {
     console.error('[tenders/post] upload pipeline:', err.message);
@@ -3399,6 +3426,8 @@ app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (r
   list[idx].status = 'open';
   list[idx].approvedAt = new Date().toISOString();
   list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
+  list[idx].humanOverride = true;
+  list[idx].provisionalAutoApproved = false;
   writeTenders(list);
   res.json({ ok: true, tender: list[idx] });
 });
