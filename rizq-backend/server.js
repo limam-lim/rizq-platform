@@ -152,16 +152,7 @@ app.use('/uploads/investments', (req, res) => {
 });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
-}
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
-}
-
-// ���� CORS: أص��� �&س�&��حة (ALLOWED_ORIGIN � �ائ�&ة �&فص���ة بف��اص�) ��������������
-// �&ثا� إ� تاج: https://rizq.mr,https://www.rizq.mr
-// �&ثا� تط���`ر: أضف http://localhost:5500,http://127.0.0.1:5500
+// ── CORS: أصول مسموحة (ALLOWED_ORIGIN قائمة مفصولة بفواصل)
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || '')
   .split(',')
   .map((s) => s.trim())
