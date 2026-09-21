@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '20.0';
+  var ASSET_V = '20.1';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -129,13 +129,19 @@
       css.href = 'rizq_mobile.css?v=' + ASSET_V;
       document.head.appendChild(css);
     }
-    /* Assistant stack is heavy (~500KB+) — load on demand, not on every page boot */
+    /* Assistant: floating #rizq-chat-toggle is created by rizq_widget_embed.js.
+       Loading the stack only on click hid the widget entirely (toggle never existed).
+       Restore auto-load on public pages (idle) so مدير رزق الذكي stays visible;
+       keep click handler for early force-load from nav/jump buttons. */
     function loadAssistantStack(force) {
       if (window.__rizqAssistantLoaded) return;
       window.__rizqAssistantLoaded = true;
       appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
+      if (!document.querySelector('script[src*="rizq_widget_markdown.js"]')) {
+        appendScript('rizq_widget_markdown.js?v=' + ASSET_V, { defer: true });
+      }
       appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
     }
     window.RizqLoadAssistant = loadAssistantStack;
@@ -146,7 +152,22 @@
       document.addEventListener('click', function (e) {
         if (e.target.closest(assistantSel)) loadAssistantStack(true);
       }, true);
-      /* خفة: لا تحميل مسبق للمساعد في idle — فقط عند الضغط */
+      function scheduleAssistantBoot() {
+        try {
+          if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(function () { loadAssistantStack(false); }, { timeout: 2500 });
+          } else {
+            setTimeout(function () { loadAssistantStack(false); }, 600);
+          }
+        } catch (eIdle) {
+          setTimeout(function () { loadAssistantStack(false); }, 600);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scheduleAssistantBoot);
+      } else {
+        scheduleAssistantBoot();
+      }
     }
     if (!document.querySelector('link[rel="manifest"]')) {
       var link = document.createElement('link');
