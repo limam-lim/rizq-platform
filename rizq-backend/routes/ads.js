@@ -275,7 +275,7 @@ function mountAdsRoutes(app, deps) {
     res.json({ ok: true, ads: readAds() });
   });
 
-  /** GET /api/ads/:id — تفاصيل إعلان واحد (صفحة rizq_listing.html) */
+  /** GET /api/ads/:id — تفاصيل إعلان واحد (صفحة التصفح rizq_browse.html?id=) */
   app.get('/api/ads/:id', (req, res) => {
     const ad = readAds().find((a) => a.id === req.params.id);
     if (!ad) return res.status(404).json({ error: 'ad_not_found' });

@@ -119,11 +119,8 @@ write('rizq_browse.html', browse);
 
 // ── rizq_search.html ── (redirect stub only — skipped)
 
-// ── rizq_listing.html ──
-let listing = read('rizq_listing.html');
-listing = replaceArrayBlock(listing, 'ALL_ADS_DATA', '[]');
-listing = listing.replace(/\+22234567800/g, '');
-write('rizq_listing.html', listing);
+// ── rizq_listing.html ── (redirect stub → rizq_browse — لا تُمس)
+// سابقاً كانت تُنظَّف هنا؛ الملف أصبح تحويلاً آمناً فقط.
 
 // ── rizq_profile.html ──
 let profile = read('rizq_profile.html');
@@ -131,13 +128,8 @@ profile = replaceArrayBlock(profile, 'ADS', '[]');
 profile = profile.replace(/sellerId\s*=\s*'profile_demo'/g, "sellerId = ''");
 write('rizq_profile.html', profile);
 
-// ── rizq_admin.html ──
-let admin = read('rizq_admin.html');
-admin = replaceArrayBlock(admin, 'USERS_DATA', '[]');
-admin = replaceArrayBlock(admin, 'ADS_DATA_ADMIN', '[]');
-admin = replaceArrayBlock(admin, 'REPORTS_DATA', '[]');
-admin = replaceArrayBlock(admin, 'PAYMENTS_DATA', '[]');
-write('rizq_admin.html', admin);
+// ── rizq_admin.html ── (طُعم أمني 404 — لا تُمس ولا تُفرَّغ)
+// سابقاً كانت تُنظَّف هنا؛ الملف الآن decoy متعمَّد.
 
 // ── rizq_products.html ──
 let products = read('rizq_products.html');

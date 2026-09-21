@@ -1287,7 +1287,7 @@ function renderFavs(){
       const raw = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
       if(!raw.length){ grid.innerHTML = _favEmptyHTML('لم تُضِف أي إعلان إلى المفضلة بعد — اضغط ♥ على أي إعلان أثناء التصفح','Vous n\'avez encore ajouté aucune annonce aux favoris — appuyez sur ♥ sur une annonce en parcourant'); return; }
       const favAds = raw.map(_mapRawAdToDashboard);
-      grid.innerHTML = favAds.map(a=>_favCardHTML(a,'rizq_listing.html?id='+encodeURIComponent(a.id))).join('');
+      grid.innerHTML = favAds.map(a=>_favCardHTML(a,'rizq_browse.html?id='+encodeURIComponent(a.id))).join('');
     }).catch(function(){ grid.innerHTML = _favEmptyHTML('تعذّر تحميل المفضلة — حاول مرة أخرى','Échec du chargement des favoris — veuillez réessayer'); });
 }
 
