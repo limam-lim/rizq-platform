@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -94,11 +94,14 @@ nav .nav-search{order:1;flex:1;min-width:0}
 nav .nav-disclaimer{flex-shrink:0}
 .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;order:0}
 /* gallery prev/next arrows */
-.dp-gal-wrap{position:relative}
-.dp-gal-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:22px;z-index:5;transition:background .2s;display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:2px}
-.dp-gal-btn:hover{background:rgba(201,168,76,.75)}
-.dp-gal-prev{left:10px}
-.dp-gal-next{right:10px}
+.dp-gal-wrap{position:relative;max-width:none;width:100%}
+.dp-gal-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;z-index:5;transition:background .2s;display:flex;align-items:center;justify-content:center;line-height:1;padding-bottom:2px;opacity:.85}
+.dp-gal-btn:hover{background:rgba(201,168,76,.85);opacity:1}
+.dp-gal-prev{left:12px}
+.dp-gal-next{right:12px}
+.dp-zoom-hint{position:absolute;bottom:12px;inset-inline-end:12px;z-index:4;display:inline-flex;align-items:center;gap:5px;background:rgba(15,31,61,.78);color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;pointer-events:none;backdrop-filter:blur(4px);border:1px solid rgba(201,168,76,.35);opacity:.95}
+.dp-zoom-hint svg{width:13px;height:13px;stroke:#C9A84C;fill:none;stroke-width:2}
+.dp-gal-counter{position:absolute;bottom:12px;inset-inline-start:12px;z-index:4;background:rgba(15,31,61,.78);color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none;border:1px solid rgba(255,255,255,.12);direction:ltr;unicode-bidi:isolate}
 .btn-post{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:8px 18px;border-radius:9px;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Segoe UI',sans-serif;white-space:nowrap;transition:all .3s}
 .btn-post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4)}
 .btn-ns{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.78);padding:7px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .3s}
@@ -135,15 +138,19 @@ nav .nav-disclaimer{flex-shrink:0}
 .mtab{flex:1;padding:11px;background:none;border:none;cursor:pointer;font-size:13.5px;font-weight:700;font-family:'Segoe UI',sans-serif;color:var(--text-muted);border-bottom:3px solid transparent;transition:all .2s}
 .mtab.active{color:var(--gold-dk);border-bottom-color:var(--gold)}
 
-/* BROWSE LAYOUT */
-.browse-wrap{display:flex;height:calc(100vh - 62px - 41px);overflow:hidden}
+/* BROWSE LAYOUT — full-width grid; detail opens as overlay sheet */
+.browse-wrap{display:flex;height:calc(100vh - 62px - 41px);overflow:hidden;position:relative}
 .browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1}
-/* browse-right: hidden by default, shown only when an ad is selected */
-.browse-right{display:none;overflow-y:auto;background:#f8faff;min-width:0}
-.browse-wrap.has-detail .browse-left{flex:0 0 var(--left-w);overflow:hidden}
-.browse-wrap.has-detail .browse-right{display:block;flex:1;min-width:0}
+.browse-right{
+  display:none;position:fixed;inset:0;z-index:5200;
+  background:rgba(8,15,30,.58);backdrop-filter:blur(6px);
+  padding:max(16px,2vh) 16px;overflow-y:auto;align-items:flex-start;justify-content:center;
+}
+.browse-wrap.has-detail .browse-left{flex:1;overflow:hidden;filter:none}
+.browse-wrap.has-detail .browse-right{display:flex}
 .browse-right::-webkit-scrollbar{width:4px}
 .browse-right::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
+body.rizq-detail-open{overflow:hidden}
 
 /* LEFT SIDEBAR (FILTERS) — إعادة تصميم بصري (2026-08-11): تسلسل هرمي أوضح
    بين الأقسام، عناصر تحكم مخصصة بدل عناصر المتصفح الافتراضية الصغيرة،
@@ -198,37 +205,71 @@ input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:3p
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--gold);border:2.5px solid #fff;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .range-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);margin:4px 0 10px;font-weight:600}
 
-/* RESULT LIST */
-.rl-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:2}
-.rl-count{font-size:11.5px;color:var(--text-muted)}
-.rl-count strong{color:#1a2535;font-size:13px}
-.rl-sort select{background:#f8faff;border:1px solid #e2e8f5;border-radius:6px;padding:4px 8px;font-size:11px;color:#1a2535;outline:none;cursor:pointer;font-family:'Segoe UI',sans-serif}
-#result-list-body{overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;background:#fff}
-#result-list-body::-webkit-scrollbar{width:3px}
-#result-list-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3)}
+/* RESULT LIST — photo-first marketplace grid */
+.rl-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:2}
+.rl-count{font-size:12.5px;color:var(--text-muted)}
+.rl-count strong{color:#1a2535;font-size:14px}
+.rl-sort select{background:#f8faff;border:1px solid #e2e8f5;border-radius:8px;padding:6px 10px;font-size:12px;color:#1a2535;outline:none;cursor:pointer;font-family:'Cairo',sans-serif}
+#result-list-body{
+  overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:14px;padding:14px 16px 20px;align-content:start;align-items:start;
+  grid-auto-rows:min-content;
+  background:
+    radial-gradient(ellipse 80% 50% at 100% 0%,rgba(201,168,76,.08),transparent 55%),
+    linear-gradient(180deg,#f5f8fd 0%,#eef3fa 100%);
+}
+#result-list-body::-webkit-scrollbar{width:4px}
+#result-list-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35)}
 
-/* COMPACT RESULT CARDS */
-.rc{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(27,58,107,.06);cursor:pointer;transition:all .2s;position:relative}
-.rc:hover{background:rgba(201,168,76,.05)}
-.rc.active{background:rgba(201,168,76,.1);border-right:3px solid var(--gold)}
-.rc-thumb{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0;overflow:hidden;position:relative}
-.rc-thumb svg{width:22px;height:22px;stroke-width:1.5}
-.rc-discount-badge{position:absolute;top:-3px;left:-3px;background:#dc2626;color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:4px;line-height:1.5}
+/* COMPACT RESULT CARDS → rich photo cards
+   Note: overflow:hidden + CSS Grid default stretch collapses row height to ~40px
+   ("thin colored lines"). Force min-content sizing so photo + title stay visible. */
+.rc{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;
+  padding:0!important;border:1px solid rgba(27,58,107,.1);border-radius:14px;
+  cursor:pointer;transition:transform .2s,box-shadow .22s,border-color .2s;
+  position:relative;background:#fff;overflow:hidden;
+  box-shadow:0 4px 14px rgba(15,31,61,.05);
+  align-self:start;height:auto!important;min-height:min-content;max-height:none;
+}
+.rc:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,31,61,.12);border-color:rgba(201,168,76,.45)}
+.rc.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.28),0 12px 28px rgba(15,31,61,.1)}
+.rc-thumb{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:auto!important;min-height:140px;
+  aspect-ratio:4/3;border-radius:0!important;
+  background:linear-gradient(145deg,#12284a,#1B3A6B 55%,#234d8f);
+  display:flex;align-items:center;justify-content:center;color:var(--gold);
+  flex-shrink:0;overflow:hidden;position:relative;
+}
+.rc-thumb svg{width:40px;height:40px;stroke-width:1.4;opacity:.85}
+.rc-thumb .rizq-img-wrap,.rc-thumb .rizq-ad-frame,.rc-thumb img{
+  width:100%!important;height:100%!important;min-height:140px;object-fit:cover;display:block;
+  aspect-ratio:auto!important;max-width:none!important;
+}
+.rc-photo-count{
+  position:absolute;bottom:8px;inset-inline-start:8px;z-index:2;
+  background:rgba(8,15,30,.72);color:#fff;font-size:10px;font-weight:800;
+  padding:3px 8px;border-radius:999px;direction:ltr;unicode-bidi:isolate;
+  border:1px solid rgba(255,255,255,.14);
+}
+.rc-discount-badge{position:absolute;top:8px;inset-inline-start:8px;background:#dc2626;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:8px;line-height:1.4;z-index:2}
 .rc-stock-badge{display:inline-flex;align-items:center;gap:2px;background:rgba(217,119,6,.12);color:#b45309;border:1px solid rgba(217,119,6,.3);font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:6px}
 .dp-stock-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(217,119,6,.12);color:#b45309;border:1px solid rgba(217,119,6,.3);font-size:12px;font-weight:800;padding:4px 10px;border-radius:8px;margin-inline-start:8px}
-.rc-body{flex:1;min-width:0}
-.rc-title{font-size:12.5px;font-weight:700;color:#1a2535;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.rc-price{font-size:12px;font-weight:800;color:var(--gold);margin:1px 0}
-.rc-price-orig{font-size:10px;font-weight:600;color:var(--text-muted);text-decoration:line-through}
-.rc-meta{display:flex;align-items:center;gap:6px}
-.rc-loc{font-size:10px;color:var(--text-muted)}
+.rc-body{flex:1;min-width:0;padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.rc-title{font-size:13.5px;font-weight:800;color:#1a2535;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+.rc-price{font-size:14px;font-weight:900;color:var(--gold-dk);margin:2px 0}
+.rc-price-orig{font-size:11px;font-weight:600;color:var(--text-muted);text-decoration:line-through}
+.rc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
+.rc-loc{font-size:11px;color:var(--text-muted);font-weight:600}
 .rc-pin{font-size:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:var(--royal-dark);padding:3px 8px;border-radius:5px;font-weight:900;box-shadow:0 3px 10px rgba(201,168,76,.35);border:1px solid rgba(255,248,224,.5)}
 .rc-sponsored{font-size:10px;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#78350f;border:1px solid #f59e0b;padding:3px 8px;border-radius:5px;font-weight:900}
-.rc-verified{font-size:9px;color:var(--green)}
-.rc-empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.rc-verified{font-size:10px;color:var(--green);font-weight:800}
+.rc-empty{text-align:center;padding:48px 20px;color:var(--text-muted);grid-column:1/-1}
 .rc-empty .rei{font-size:40px;margin-bottom:12px}
-.rc-pagination{display:flex;justify-content:center;gap:4px;padding:10px;border-top:1px solid #e2e8f5}
-.rp-btn{width:30px;height:30px;border-radius:6px;border:1px solid #e2e8f5;background:#fff;color:var(--text-muted);cursor:pointer;font-size:12px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.rc-pagination{display:flex;justify-content:center;gap:4px;padding:12px;border-top:1px solid #e2e8f5;background:#fff;grid-column:1/-1}
+.rp-btn{width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f5;background:#fff;color:var(--text-muted);cursor:pointer;font-size:12px;transition:all .2s;display:flex;align-items:center;justify-content:center}
 .rp-btn:hover{border-color:rgba(201,168,76,.4);color:var(--gold-dk)}
 .rp-btn.on{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);border:none;font-weight:800}
 
@@ -238,19 +279,45 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .empty-detail h3{font-size:18px;font-weight:800;color:#1a2535;margin-bottom:8px}
 .empty-detail p{font-size:13px;max-width:280px;line-height:1.6}
 
-/* DETAIL CONTENT — detail panel */
-.dp-wrap{padding:20px 24px 40px;max-width:860px;margin:0 auto}
-.dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:7px 14px;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+/* DETAIL PANEL — overlay sheet with large gallery */
+.empty-detail{display:none}
+#detail-content{
+  width:min(980px,100%);margin:0 auto;background:#fff;border-radius:18px;
+  box-shadow:0 24px 64px rgba(0,0,0,.35);overflow:hidden;position:relative;
+  max-height:none;min-height:min(90vh,920px);
+}
+.dp-wrap{padding:18px 22px 36px;max-width:none;margin:0}
+.dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:8px 14px;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:9px;font-size:13px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
 .dp-back-btn:hover{background:rgba(27,58,107,.06);border-color:rgba(27,58,107,.3)}
-.dp-gallery{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
-.dp-main-img{height:280px;border-radius:14px;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;color:var(--gold);overflow:hidden;cursor:zoom-in;position:relative}
-.dp-main-img svg{width:90px;height:90px;stroke-width:1.2;opacity:.9}
-.dp-main-img img{width:100%;height:100%;object-fit:cover}
-.dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.dp-gallery{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;max-width:none;flex:1 1 100%;width:100%}
+.dp-hero{display:flex;flex-direction:column;align-items:stretch;gap:16px;margin-bottom:18px}
+.dp-hero-info{flex:1;min-width:0}
+.dp-hero-info .dp-listing-cat{margin-bottom:6px}
+.dp-hero-info .dp-title{font-size:24px;margin-bottom:6px}
+.dp-hero-info .dp-meta-row{margin-bottom:12px}
+.dp-hero-info .dp-price-box{margin-bottom:0}
+.dp-gal-wrap{position:relative;max-width:none;width:100%}
+.dp-main-img{
+  width:100%!important;aspect-ratio:16/10;max-height:min(52vh,480px)!important;height:auto!important;
+  border-radius:14px;background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
+  display:flex;align-items:center;justify-content:center;color:var(--gold);
+  overflow:hidden;cursor:zoom-in;position:relative;
+  box-shadow:0 10px 28px rgba(15,31,61,.16);border:1px solid rgba(27,58,107,.1);
+}
+.dp-main-img svg{width:64px;height:64px;stroke-width:1.2;opacity:.9}
+.dp-main-img .rizq-img-wrap,.dp-main-img .rizq-ad-frame{width:100%!important;height:100%!important;aspect-ratio:auto!important}
+.dp-main-img img{width:100%;height:100%;object-fit:cover;background:#0b1628;transition:transform .25s ease}
+.dp-main-img:hover img{transform:scale(1.02)}
+.dp-thumbs-wrap{width:100%;max-width:none}
+.dp-thumbs-label{font-size:12px;font-weight:700;color:var(--text-muted);margin:2px 0 8px}
+.dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;max-width:100%;scrollbar-width:thin}
 .dp-thumbs::-webkit-scrollbar{height:3px}
-.dp-thumb{width:62px;height:52px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s;overflow:hidden}
+.dp-thumbs::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:2px}
+.dp-thumb{width:72px;height:58px;border-radius:10px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden}
+.dp-thumb:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(15,31,61,.15)}
 .dp-thumb:hover,.dp-thumb.active{border-color:var(--gold)}
-.dp-thumb svg{width:22px;height:22px;stroke-width:1.5}
+.dp-thumb.active{box-shadow:0 0 0 1px rgba(201,168,76,.35)}
+.dp-thumb svg{width:20px;height:20px;stroke-width:1.5}
 .dp-thumb img{width:100%;height:100%;object-fit:cover}
 
 .dp-listing-cat{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);margin-bottom:8px}
@@ -289,8 +356,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .tag-link:hover{background:var(--gold);color:#fff!important}
 .tag-clicked{background:var(--gold)!important;color:#fff!important;transform:scale(1.08);transition:transform .15s ease}
 
-.dp-map-wrap{border-radius:12px;overflow:hidden;height:200px;border:1px solid rgba(13,27,42,.08)}
-.dp-map-link{display:block;text-align:center;font-size:11px;color:var(--text-muted);margin-top:6px;text-decoration:none}
+.dp-map-wrap{border-radius:12px;overflow:hidden;height:220px;border:1px solid rgba(13,27,42,.08);position:relative;background:linear-gradient(135deg,#e8eef8,#dce6f5)}
+.dp-map-wrap .leaflet-container{width:100%;height:100%;font-family:inherit;z-index:1}
+.dp-map-wrap .leaflet-control-attribution{font-size:9px;background:rgba(255,255,255,.85)}
+.dp-map-fallback{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:16px;text-align:center;color:var(--text-muted);font-size:12.5px;z-index:0;
+}
+.dp-map-fallback strong{color:#1a2535;font-size:13.5px}
+.dp-map-pin{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-100%);z-index:2;pointer-events:none;
+  width:28px;height:28px;filter:drop-shadow(0 4px 8px rgba(15,31,61,.35));
+}
+.dp-map-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12px;font-weight:700;color:var(--gold-dk);margin-top:8px;text-decoration:none;padding:7px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08)}
+.dp-map-link:hover{background:rgba(201,168,76,.16)}
 
 /* CONTACT CARD */
 .dp-contact{background:#fff;border:1.5px solid rgba(201,168,76,.2);border-radius:14px;padding:18px;margin-bottom:14px}
@@ -359,12 +438,48 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-sim-loc{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
 
 /* LIGHTBOX */
-#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;align-items:center;justify-content:center;cursor:zoom-out}
-#lightbox.open{display:flex}
-#lightbox-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;cursor:pointer;z-index:9001;transition:all .2s}
-#lightbox-close:hover{background:rgba(220,38,38,.5)}
-#lightbox-content{max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold)}
-#lightbox-content img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px}
+/* Above detail overlay (5200) and rizq_mobile --rzq-z-modal (~10050) */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:30000!important;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.open{display:flex;flex-direction:column;gap:12px}
+#lightbox-close{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:18px;cursor:pointer;z-index:30002!important;transition:all .2s}
+#lightbox-close:hover{background:rgba(220,38,38,.55)}
+#lightbox-content{max-width:92vw;max-height:78vh;display:flex;align-items:center;justify-content:center;font-size:80px;color:var(--gold);position:relative;z-index:30001!important}
+#lightbox-content img{max-width:min(960px,92vw);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);cursor:default;background:#0b1628}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:26px;cursor:pointer;z-index:30002!important;display:none;align-items:center;justify-content:center;transition:background .2s}
+.lb-nav:hover{background:rgba(201,168,76,.75)}
+#lightbox.open .lb-nav{display:flex}
+.lb-prev{left:18px}
+.lb-next{right:18px}
+.lb-meta{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:30002!important;display:none;align-items:center;gap:10px;background:rgba(15,31,61,.8);color:#fff;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid rgba(201,168,76,.3);pointer-events:none;direction:ltr;unicode-bidi:isolate}
+#lightbox.open .lb-meta{display:inline-flex}
+.lb-thumbs{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:30002!important;display:none;gap:8px;max-width:90vw;overflow-x:auto;padding:4px}
+#lightbox.open .lb-thumbs{display:flex}
+.lb-thumb{width:56px;height:44px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;opacity:.7;flex-shrink:0;background:#1B3A6B;padding:0}
+.lb-thumb.active,.lb-thumb:hover{border-color:var(--gold);opacity:1}
+.lb-thumb img{width:100%;height:100%;object-fit:cover}
+.rl-infinite{
+  grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:18px 12px 28px;color:var(--text-muted);font-size:12.5px;font-weight:700;
+}
+.rl-infinite .ri-bar{
+  width:min(280px,70%);height:4px;border-radius:99px;background:rgba(27,58,107,.08);overflow:hidden;
+}
+.rl-infinite .ri-bar>i{
+  display:block;height:100%;width:40%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  animation:riSlide 1.1s ease-in-out infinite;
+}
+@keyframes riSlide{0%{transform:translateX(-120%)}100%{transform:translateX(280%)}}
+.rl-infinite.done .ri-bar{display:none}
+.rl-infinite button{
+  margin-top:4px;padding:8px 16px;border-radius:9px;border:1px solid rgba(201,168,76,.35);
+  background:#fff;color:var(--gold-dk);font-weight:800;font-size:12.5px;cursor:pointer;
+  font-family:'Cairo',sans-serif;
+}
+.rl-infinite button:hover{background:rgba(201,168,76,.1)}
+.dp-zoom-hint{
+  pointer-events:auto!important;cursor:zoom-in;
+}
 
 /* CHAT MODAL — floating bottom-right, page stays visible */
 .chat-overlay{display:none;position:fixed;bottom:72px;right:24px;z-index:7000;align-items:flex-end;justify-content:flex-end;padding:0;pointer-events:none}
@@ -563,22 +678,17 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     flex-direction:column;
     overflow:hidden;
   }
-  .browse-wrap.has-detail .browse-left{
-    flex:0 0 min(520px, 48vw);
-  }
-  .browse-wrap.has-detail .bs-sidebar{
-    width:220px;
-    flex:0 0 220px;
-  }
   .mobile-filter-btn{display:none!important}
-  .browse-wrap.has-detail .browse-right{display:block}
-  .browse-right{min-height:0}
-  .empty-detail{min-height:100%}
+  /* Detail is a centered overlay sheet — keep the grid full-width */
+  .browse-wrap.has-detail .browse-left{flex:1}
+  .browse-wrap.has-detail .bs-sidebar{width:260px;flex:0 0 260px}
+  .dp-wrap{padding:20px 24px 40px}
+  .dp-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+  .dp-main-img{max-height:min(48vh,440px)}
 }
 
 @media(max-width:1080px) and (min-width:901px){
-  .bs-sidebar{width:240px;flex-basis:240px}
-  .browse-wrap.has-detail .browse-left{flex:0 0 min(460px,52vw)}
+  .bs-sidebar{width:220px;flex-basis:220px}
 }
 
 @media(max-width:900px){
@@ -608,17 +718,21 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   }
   .bs-sidebar{display:none!important}
   .browse-right{
-    height:auto;
-    min-height:calc(100dvh - var(--rizq-header-h,112px) - 130px);
-    display:none;
-    overflow:visible!important;
+    position:fixed!important;inset:0!important;z-index:5200!important;
+    height:auto;min-height:0;padding:12px;
+    display:none;overflow-y:auto!important;
+    background:rgba(8,15,30,.6)!important;backdrop-filter:blur(6px);
   }
-  .browse-right.tab-active,
-  .browse-wrap.has-detail .browse-right.tab-active{
-    display:block!important;
+  .browse-wrap.has-detail .browse-right,
+  .browse-wrap.has-detail .browse-right.tab-active,
+  .browse-wrap.has-detail .browse-right.tab-hidden{
+    display:flex!important;
   }
-  .browse-right.tab-hidden{display:none!important}
+  .browse-right.tab-hidden{display:none}
+  .browse-wrap.has-detail .browse-right.tab-hidden{display:flex!important}
   .browse-left.tab-hidden{display:none!important}
+  #detail-content{border-radius:14px;min-height:0;max-height:none;width:100%}
+  #result-list-body{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:10px 12px 18px}
   /* مهم: إلغاء top من rizq_header.css — كان يزيح التبويبات بـ 112px ويسبب قص الأرقام */
   .mobile-tabs,
   html.rizq-app-nav .mobile-tabs,
@@ -737,6 +851,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   nav{padding:0 3%;gap:10px}
   .nav-search select{display:none}
   .dp-wrap{padding:14px 14px 32px}
+  .dp-gallery,.dp-gal-wrap{max-width:100%}
+  .dp-main-img{max-height:210px;aspect-ratio:16/10}
   .dp-title{font-size:18px}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
@@ -877,7 +993,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=18" defer></script>
+<script src="rizq_footer_toggle.js?v=20" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
@@ -1079,7 +1195,8 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
           <div class="rl-count"><strong id="rl-count-num">0</strong> <span data-t="result-count-label">إعلان</span></div>
           <div class="rl-sort">
             <select id="sort-select" onchange="applyFilters()">
-              <option value="default" data-t="sort-default">الأحدث</option>
+              <option value="default" data-t="sort-default">الأفضل أولاً</option>
+              <option value="newest" data-t="sort-newest">الأحدث</option>
               <option value="price-asc" data-t="sort-price-asc">السعر: الأقل</option>
               <option value="price-desc" data-t="sort-price-desc">السعر: الأعلى</option>
               <option value="pin" data-t="sort-pin">المميّزة أولاً</option>
@@ -1093,37 +1210,22 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 
   </div><!-- end browse-left -->
 
-  <!-- RIGHT: Detail Panel -->
-  <div class="browse-right tab-hidden" id="browse-right">
-    <div class="empty-detail" id="empty-detail">
-      <div class="ed-hero">
-        <div class="ed-orb"><div class="ed-orb-inner">🏠</div></div>
-        <div class="ed-ring"></div>
-      </div>
-      <h3 data-t="empty-detail-h">اختر إعلاناً للاطلاع على تفاصيله</h3>
-      <p data-t="empty-detail-p">انقر على أي إعلان في القائمة لعرض التفاصيل الكاملة هنا</p>
-      <div class="ed-shimmer-bar"></div>
-      <div class="ed-cats">
-        <div class="ed-cat-chip" onclick="filterByCat('عقارات')" data-t="cat-immo">🏠 عقارات</div>
-        <div class="ed-cat-chip" onclick="filterByCat('سيارات')" data-t="cat-cars">🚗 سيارات</div>
-        <div class="ed-cat-chip" onclick="filterByCat('إلكترونيات')" data-t="cat-elec">📱 إلكترونيات</div>
-        <div class="ed-cat-chip" onclick="filterByCat('ذهب')" data-t="cat-gold">💰 ذهب</div>
-        <div class="ed-cat-chip" onclick="filterByCat('ماشية')" data-t="cat-live">🐪 ماشية</div>
-        <div class="ed-cat-chip" onclick="filterByCat('خدمات')" data-t="cat-serv">🔧 خدمات</div>
-      </div>
-      <div class="ed-cta">
-        <a href="rizq_post.html">➕ <span data-t="nav-post">انشر إعلانك مجاناً</span></a>
-      </div>
-    </div>
-    <div id="detail-content" style="display:none"></div>
+  <!-- RIGHT: Detail overlay sheet -->
+  <div class="browse-right tab-hidden" id="browse-right" onclick="if(event.target===this)closeAdDetail()">
+    <div class="empty-detail" id="empty-detail" style="display:none"></div>
+    <div id="detail-content" style="display:none" onclick="event.stopPropagation()"></div>
   </div>
 
 </div><!-- end browse-wrap -->
 
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="closeLightbox()">
-  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-  <div id="lightbox-content"></div>
+  <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button type="button" class="lb-nav lb-prev" onclick="event.stopPropagation();dpLightboxNav(-1)" aria-label="السابق">‹</button>
+  <button type="button" class="lb-nav lb-next" onclick="event.stopPropagation();dpLightboxNav(1)" aria-label="التالي">›</button>
+  <div id="lightbox-content" onclick="event.stopPropagation()"></div>
+  <div class="lb-thumbs" id="lightbox-thumbs" onclick="event.stopPropagation()"></div>
+  <div class="lb-meta" id="lightbox-meta"></div>
 </div>
 
 <!-- REPORT MODAL — إبلاغ حقيقي متصل بـ POST /api/reports (إصلاح 11/08/2026) -->
@@ -1245,11 +1347,97 @@ const WILAYA_COORDS = {
   'سيلبابي':{lat:15.17,lon:-12.18},
   'default':{lat:18.07,lon:-15.96}
 };
+function _wilayaCoords(ad){
+  const w=String((ad&&(ad.wilaya||ad.loc))||'').trim();
+  // طابق جزئي إن وُجدت الولاية داخل نص أطول
+  if(WILAYA_COORDS[w]) return WILAYA_COORDS[w];
+  const hit=Object.keys(WILAYA_COORDS).find(k=>k!=='default'&&(w.includes(k)||k.includes(w)));
+  return WILAYA_COORDS[hit]||WILAYA_COORDS['default'];
+}
 function buildMapHTML(ad){
-  const w = ad.wilaya||ad.loc||'';
-  const coords = WILAYA_COORDS[w]||WILAYA_COORDS['default'];
-  const {lat,lon} = coords;
-  return `<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.05},${lat-0.08},${lon+0.05},${lat+0.07}&layer=mapnik&marker=${lat},${lon}" width="100%" height="200" style="border:none" loading="lazy" title="موقع الإعلان"></iframe>`;
+  const fr=_rizqLang()==='fr';
+  const coords=_wilayaCoords(ad);
+  const {lat,lon}=coords;
+  const label=escapeHtml(ad.wilaya||ad.loc||(fr?'Mauritanie':'موريتانيا'));
+  // خريطة ذاتية (بلا iframe) — صور البلاط مسموحة عبر img-src https:
+  // مع طبقة Leaflet عند توفّرها لتكبير/تحريك تفاعلي.
+  return `<div class="dp-map-fallback" id="dp-map-fallback">
+      <strong>📍 ${label}</strong>
+      <span>${fr?'Chargement de la carte…':'جاري تحميل الخريطة…'}</span>
+    </div>
+    <div id="dp-leaflet-map" style="width:100%;height:100%" data-lat="${lat}" data-lon="${lon}" data-label="${label}"></div>`;
+}
+function _ensureLeaflet(cb){
+  if(window.L && window.L.map){ cb(); return; }
+  if(window._rizqLeafletLoading){ window._rizqLeafletLoading.push(cb); return; }
+  window._rizqLeafletLoading=[cb];
+  const done=function(){
+    const q=window._rizqLeafletLoading||[];
+    window._rizqLeafletLoading=null;
+    q.forEach(function(fn){ try{ fn(); }catch(e){} });
+  };
+  if(!document.getElementById('rizq-leaflet-css')){
+    const link=document.createElement('link');
+    link.id='rizq-leaflet-css';
+    link.rel='stylesheet';
+    link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+  }
+  const s=document.createElement('script');
+  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload=done;
+  s.onerror=function(){
+    window._rizqLeafletLoading=null;
+    // سقوط إلى صورة بلاطة ثابتة
+    try{ _dpRenderStaticMap(); }catch(e){}
+  };
+  document.head.appendChild(s);
+}
+function _dpRenderStaticMap(){
+  const el=document.getElementById('dp-leaflet-map');
+  const fb=document.getElementById('dp-map-fallback');
+  if(!el) return;
+  const lat=parseFloat(el.dataset.lat), lon=parseFloat(el.dataset.lon);
+  const zoom=12;
+  const n=Math.pow(2,zoom);
+  const x=Math.floor((lon+180)/360*n);
+  const latRad=lat*Math.PI/180;
+  const y=Math.floor((1-Math.log(Math.tan(latRad)+1/Math.cos(latRad))/Math.PI)/2*n);
+  const tiles=[];
+  for(let dy=-1; dy<=1; dy++){
+    for(let dx=-1; dx<=1; dx++){
+      const tx=((x+dx)%n+n)%n, ty=y+dy;
+      if(ty<0||ty>=n) continue;
+      tiles.push(`<img src="https://tile.openstreetmap.org/${zoom}/${tx}/${ty}.png" alt="" style="width:33.333%;height:33.333%;object-fit:cover;display:block;float:left" loading="lazy">`);
+    }
+  }
+  el.innerHTML=`<div style="width:100%;height:100%;overflow:hidden;position:relative">${tiles.join('')}<svg class="dp-map-pin" viewBox="0 0 24 24" fill="#dc2626"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z"/></svg></div>`;
+  if(fb) fb.style.display='none';
+}
+function dpInitMap(){
+  const el=document.getElementById('dp-leaflet-map');
+  if(!el) return;
+  const lat=parseFloat(el.dataset.lat), lon=parseFloat(el.dataset.lon);
+  const label=el.dataset.label||'';
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+  _ensureLeaflet(function(){
+    try{
+      if(window._dpMap){ try{ window._dpMap.remove(); }catch(e){} window._dpMap=null; }
+      const map=L.map(el, {scrollWheelZoom:false, attributionControl:true}).setView([lat,lon], 12);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      L.marker([lat,lon]).addTo(map).bindPopup('📍 '+label);
+      window._dpMap=map;
+      const fb=document.getElementById('dp-map-fallback');
+      if(fb) fb.style.display='none';
+      setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 80);
+      setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 320);
+    }catch(err){
+      _dpRenderStaticMap();
+    }
+  });
 }
 
 // ══════════ DEMO_ADS ══════════
@@ -1392,7 +1580,7 @@ function _rizqMergeBackendAds(){
       body.innerHTML = window.rizqSkeletonHtml(6);
       showedSkel = true;
     }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=200')
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=2000')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !Array.isArray(data.ads) || !data.ads.length){
@@ -1431,7 +1619,9 @@ function getAdById(id){
 // SHARED STATE
 let filtered = [...ALL_ADS];
 let page = 1;
-const PER_PAGE = 12;
+const PER_PAGE = 24;
+let visibleCount = PER_PAGE;
+let _infiniteLoading = false;
 // ── المفضلة (Wishlist) — كانت "favs" مجرد Set في الذاكرة يُفرَّغ مع كل
 // تحديث للصفحة (وهم بصري بلا أي تخزين فعلي). أُصلح ليُخزَّن فعلياً في
 // localStorage['rizq_wishlist'] (نفس نمط rizq_recently_viewed)، فيبقى
@@ -1461,6 +1651,7 @@ function _rizqLang(){
   try{return localStorage.getItem('rizq_lang')||'ar';}catch(e){return 'ar';}
 }
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escapeJsAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'');}
 function adTitleLocalized(a){
   if(typeof RizqLocale!=='undefined') return RizqLocale.adTitle(a, _rizqLang());
   var fr=_rizqLang()==='fr';
@@ -1486,7 +1677,7 @@ const TRANSLATIONS = {
     'filter-rooms':'عدد الغرف','filter-opts':'خيارات أخرى','btn-clear-mini':'مسح',
     'btn-apply':'تطبيق الفلاتر','btn-reset':'مسح الكل','all-wilayas':'كل الولايات',
     'f-verified':'موثّق فقط','f-pinned':'مميّز فقط',
-    'result-count-label':'إعلان','sort-default':'الأحدث','sort-price-asc':'السعر: الأقل',
+    'result-count-label':'إعلان','sort-default':'الأفضل أولاً','sort-newest':'الأحدث','sort-price-asc':'السعر: الأقل',
     'sort-price-desc':'السعر: الأعلى','sort-pin':'المميّزة أولاً',
     'tab-list':'📋 النتائج','tab-detail':'📄 التفاصيل',
     'empty-detail-h':'اختر إعلاناً للاطلاع على تفاصيله',
@@ -1521,7 +1712,7 @@ const TRANSLATIONS = {
     'filter-rooms':'Nb. de chambres','filter-opts':'Autres options','btn-clear-mini':'Effacer',
     'btn-apply':'Appliquer','btn-reset':'Tout effacer','all-wilayas':'Toutes les wilayas',
     'f-verified':'Vérifiés seulement','f-pinned':'En vedette seulement',
-    'result-count-label':'annonce(s)','sort-default':'Plus récentes','sort-price-asc':'Prix: croissant',
+    'result-count-label':'annonce(s)','sort-default':'Meilleures d\'abord','sort-newest':'Plus récentes','sort-price-asc':'Prix: croissant',
     'sort-price-desc':'Prix: décroissant','sort-pin':'En vedette d\'abord',
     'tab-list':'📋 Résultats','tab-detail':'📄 Détails',
     'empty-detail-h':'Sélectionnez une annonce','empty-detail-p':'Cliquez sur une annonce pour voir ses détails ici',
@@ -1773,12 +1964,24 @@ function applyFilters(){
   if(sortBy==='price-asc')filtered.sort((a,b)=>a.priceNum-b.priceNum);
   else if(sortBy==='price-desc')filtered.sort((a,b)=>b.priceNum-a.priceNum);
   else if(sortBy==='pin')filtered.sort((a,b)=>b.pin-a.pin);
-  else filtered.sort((a,b)=>adTimeMs(b)-adTimeMs(a)); // الأحدث افتراضياً
+  else if(sortBy==='newest')filtered.sort((a,b)=>adTimeMs(b)-adTimeMs(a));
+  else {
+    // الأفضل أولاً: مموّل/مميّز ثم صور ثم الأحدث
+    filtered.sort((a,b)=>{
+      const qa=(a.boosted?4:0)+(a.pin?2:0)+((a.images&&a.images.length)?1:0);
+      const qb=(b.boosted?4:0)+(b.pin?2:0)+((b.images&&b.images.length)?1:0);
+      if(qb!==qa) return qb-qa;
+      return adTimeMs(b)-adTimeMs(a);
+    });
+  }
 
   // ── الأولوية الدائمة في النتائج — تصحيح 25/07/2026 ──
-  filtered.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0));
+  if(sortBy==='price-asc'||sortBy==='price-desc'||sortBy==='newest'){
+    filtered.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0));
+  }
 
   page=1;
+  visibleCount=PER_PAGE;
   renderResultList();
   try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}
 }
@@ -1800,80 +2003,142 @@ function _syncBrowseFiltersToUrl(opts){
   history.replaceState(null,'',u.pathname+u.search+u.hash);
 }
 
+function _adCardHtml(a, fr){
+  const svgIcon=iconHTML(a.emoji);
+  const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
+  const _title=adTitleLocalized(a);
+  const _price=fr?priceFr(a.price||''):(a.price||'');
+  const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
+  const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
+  const nImg=(a.images&&a.images.length)||0;
+  const photoCount=nImg>1?`<span class="rc-photo-count">📷 ${nImg}</span>`:'';
+  let thumbInner;
+  if(a.images&&a.images[0]){
+    if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
+      thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
+    } else {
+      thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
+    }
+  } else {
+    thumbInner=svgIcon;
+  }
+  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
+    <div class="rc-thumb">${thumbInner}${_disc}${photoCount}</div>
+    <div class="rc-body">
+      <div class="rc-title">${escapeHtml(_title)}</div>
+      <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
+      <div class="rc-meta">
+        <span class="rc-loc">${escapeHtml(_loc)}</span>
+        ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
+        ${a.verified?`<span class="rc-verified">✓</span>`:''}
+        ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function _infiniteStatusHtml(fr){
+  const shown=Math.min(visibleCount, filtered.length);
+  const total=filtered.length;
+  const done=shown>=total;
+  if(!total) return '';
+  if(done){
+    return `<div class="rl-infinite done" id="rl-infinite"><span>${fr?('Fin — '+total+' annonces'):('تم عرض كل الإعلانات — '+total)}</span></div>`;
+  }
+  return `<div class="rl-infinite" id="rl-infinite">
+    <span>${fr?('Affichage '+shown+' / '+total+' — continuez à défiler'):('عرض '+shown+' من '+total+' — مرّر للأسفل للمزيد')}</span>
+    <div class="ri-bar" aria-hidden="true"><i></i></div>
+    <button type="button" onclick="loadMoreAds()">${fr?'Charger plus':'تحميل المزيد'}</button>
+  </div>`;
+}
+
 function renderResultList(){
   const body=document.getElementById('result-list-body');
   const pagEl=document.getElementById('result-pagination');
   const countEl=document.getElementById('rl-count-num');
   if(countEl)countEl.textContent=filtered.length;
-  // مزامنة شريط الإحصاءات مع العدد الحقيقي (تجنّب 27+ مقابل 0)
   const statAds=document.getElementById('stat-ads-num');
   if(statAds){
     const total=typeof ALL_ADS!=='undefined'?ALL_ADS.length:filtered.length;
-    statAds.textContent=total>0?(total>=27?total+'+':String(total)):'0';
+    statAds.textContent=total>0?(total>=100?total+'+':String(total)):'0';
   }
-  const start=(page-1)*PER_PAGE;
-  const items=filtered.slice(start,start+PER_PAGE);
+  if(visibleCount<PER_PAGE) visibleCount=PER_PAGE;
+  const items=filtered.slice(0, visibleCount);
   const fr=_rizqLang()==='fr';
 
-  if(!items.length){
+  if(!filtered.length){
     if(window.RizqUx && typeof RizqUx.emptyStateHtml==='function'){
       body.innerHTML=RizqUx.emptyStateHtml({ secondaryOnclick:'resetAllFilters()' });
     } else {
       body.innerHTML=`<div class="rc-empty"><div class="rei">🔍</div><p>${fr?'Aucune annonce trouvée':'لا توجد إعلانات مطابقة'}</p></div>`;
     }
-    pagEl.innerHTML='';
+    if(pagEl) pagEl.innerHTML='';
+    _teardownInfiniteObserver();
     return;
   }
 
-  body.innerHTML=items.map(a=>{
-    const svgIcon=iconHTML(a.emoji);
-    const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
-    const catLabel=fr?catFrOf(a.cat):a.cat;
-    const _title=adTitleLocalized(a);
-    const _price=fr?priceFr(a.price||''):(a.price||'');
-    const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
-    const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
-    let thumbInner;
-    if(a.images&&a.images[0]){
-      if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
-        thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
-      } else {
-        thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
-      }
-    } else {
-      thumbInner=svgIcon;
-    }
-    return `<div class="rc ${isActive}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
-      <div class="rc-thumb">${thumbInner}${_disc}</div>
-      <div class="rc-body">
-        <div class="rc-title">${escapeHtml(_title)}</div>
-        <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
-        <div class="rc-meta">
-          <span class="rc-loc">${escapeHtml(_loc)}</span>
-          ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
-          ${a.verified?`<span class="rc-verified">✓</span>`:''}
-          ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  body.innerHTML=items.map(a=>_adCardHtml(a,fr)).join('') + _infiniteStatusHtml(fr);
+  if(pagEl) pagEl.innerHTML='';
+  _bindInfiniteScroll();
+}
 
-  // Pagination
-  const totalPages=Math.ceil(filtered.length/PER_PAGE);
-  if(totalPages<=1){pagEl.innerHTML='';return;}
-  let ph='';
-  for(let i=1;i<=totalPages;i++){
-    if(i===1||i===totalPages||Math.abs(i-page)<=1)
-      ph+=`<button class="rp-btn ${i===page?'on':''}" onclick="gotoPage(${i})">${i}</button>`;
-    else if(Math.abs(i-page)===2)ph+=`<span class="rp-btn" style="border:none;background:none">…</span>`;
+function loadMoreAds(){
+  if(_infiniteLoading) return false;
+  if(visibleCount>=filtered.length) return false;
+  _infiniteLoading=true;
+  const body=document.getElementById('result-list-body');
+  const prevTop=body?body.scrollTop:0;
+  visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
+  renderResultList();
+  if(body) body.scrollTop=prevTop;
+  // امنع سلسلة تحميل فورية إذا بقي الـ sentinel ظاهراً في الشاشة
+  setTimeout(function(){ _infiniteLoading=false; }, 120);
+  return true;
+}
+
+function _teardownInfiniteObserver(){
+  if(window._rizqIO){
+    try{ window._rizqIO.disconnect(); }catch(e){}
+    window._rizqIO=null;
   }
-  pagEl.innerHTML=ph;
+}
+
+function _bindInfiniteScroll(){
+  const body=document.getElementById('result-list-body');
+  const sentinel=document.getElementById('rl-infinite');
+  if(!body) return;
+  if(!body._rizqInfiniteBound){
+    body._rizqInfiniteBound=true;
+    body._rizqUserScrolled=false;
+    body.addEventListener('scroll', function(){
+      if(body.scrollTop>40) body._rizqUserScrolled=true;
+      if(_infiniteLoading) return;
+      if(visibleCount>=filtered.length) return;
+      if(body.scrollTop+body.clientHeight >= body.scrollHeight-320) loadMoreAds();
+    }, {passive:true});
+  }
+  _teardownInfiniteObserver();
+  if(!sentinel || visibleCount>=filtered.length) return;
+  if(typeof IntersectionObserver==='undefined') return;
+  window._rizqIO=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting) return;
+      if(_infiniteLoading) return;
+      // لا تحمّل دفعة تلو الأخرى تلقائياً عند أول رسم — فقط بعد تمرير المستخدم
+      if(!body._rizqUserScrolled) return;
+      loadMoreAds();
+    });
+  }, {root: body, rootMargin:'120px 0px', threshold:0});
+  window._rizqIO.observe(sentinel);
 }
 
 function gotoPage(p){
+  // توافق خلفي: انتقل لدفعة معيّنة عبر التمرير اللانهائي
   page=p;
+  visibleCount=Math.max(PER_PAGE, Math.min(p*PER_PAGE, filtered.length||PER_PAGE));
   renderResultList();
-  document.getElementById('result-list-body').scrollTop=0;
+  const body=document.getElementById('result-list-body');
+  if(body) body.scrollTop=0;
 }
 
 // ══════════ CORE SPA: selectAd ══════════
@@ -1885,24 +2150,28 @@ function selectAd(id){
 
   // Mark active in list
   document.querySelectorAll('.rc').forEach(el=>el.classList.remove('active'));
-  // يدعم كلا الصيغتين: ID نصي مقتبس 'CORP-123' أو رقمي 1
   const _idEsc = String(id).replace(/'/g,"\\'");
   const el = document.querySelector(`.rc[onclick="selectAd('${_idEsc}')"]`) ||
              document.querySelector(`.rc[onclick="selectAd(${id})"]`);
   if(el){el.classList.add('active');el.scrollIntoView({block:'nearest',behavior:'smooth'});}
 
-  // Show detail panel
+  // Show detail overlay sheet
   document.querySelector('.browse-wrap').classList.add('has-detail');
-  document.getElementById('empty-detail').style.display='none';
+  document.body.classList.add('rizq-detail-open');
+  const ed=document.getElementById('empty-detail');
+  if(ed) ed.style.display='none';
   const dc=document.getElementById('detail-content');
   dc.style.display='block';
   dc.innerHTML=renderDetailPanel(ad);
+  // فعّل خريطة الموقع بعد رسم اللوحة
+  setTimeout(function(){ try{ dpInitMap(); }catch(e){} }, 30);
 
-  // Switch to detail tab on mobile
+  // Mobile: also mark detail tab
   if(window.innerWidth<=900) switchTab('detail');
 
-  // Scroll right panel to top
-  document.getElementById('browse-right').scrollTop=0;
+  // Scroll sheet to top
+  const br=document.getElementById('browse-right');
+  if(br) br.scrollTop=0;
 }
 
 function renderDetailPanel(ad){
@@ -1918,27 +2187,30 @@ function renderDetailPanel(ad){
   const titleFallbackNote=titlePick.isFallback?_langFallbackNoteHtml(titlePick.sourceLang,true):'';
   const descFallbackNote=descPick.isFallback?_langFallbackNoteHtml(descPick.sourceLang,true):'';
 
-  // Gallery icons
-  const extraIcons=(GALLERY_ICONS_EXTRA[ad.cat]||GALLERY_ICONS_EXTRA['default']);
-  const galleryEmojis=[ad.emoji,...extraIcons];
-  ad._catEmojis=galleryEmojis; // persist for dpSetPhoto() / dpNavPhoto()
+  // Gallery — real photos only (no fake emoji "gallery")
   const hasImages=Array.isArray(ad.images)&&ad.images.length>0;
-  const totalGallery=hasImages?ad.images.length:galleryEmojis.length;
-  window._dpCurrentIdx=0; // reset on new ad
+  const totalGallery=hasImages?ad.images.length:1;
+  window._dpCurrentIdx=0;
+  ad._catEmojis=[]; // disable emoji photo strip
 
   let mainImgHTML;
+  const zoomHintHTML=hasImages?`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`:'';
+  const counterHTML=hasImages&&totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onclick="dpOpenLightbox(0)" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div>`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1'" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
   } else {
-    mainImgHTML=`<span style="display:flex;width:90px;height:90px">${iconHTML(ad.emoji||'🏠')}</span>`;
+    mainImgHTML=`<span style="display:flex;width:72px;height:72px">${iconHTML(ad.emoji||'🏠')}</span>`;
   }
 
-  const thumbsHTML=hasImages
-    ? ad.images.slice(0,5).map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
-    : galleryEmojis.slice(0,5).map((e,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" data-emoji="${escapeHtml(e)}">${iconHTML(e)}</div>`).join('');
+  const thumbsHTML=hasImages&&ad.images.length>1
+    ? ad.images.map((img,i)=>`<div class="dp-thumb ${i===0?'active':''}" onclick="dpSetPhoto(${i})" id="dp-thumb-${i}" title="${i+1}"><div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(img)}" loading="lazy" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div></div>`).join('')
+    : '';
+  const thumbsBlock=thumbsHTML
+    ? `<div class="dp-thumbs-wrap"><div class="dp-thumbs-label">${fr?ad.images.length+' photos':ad.images.length+' صور'}</div><div class="dp-thumbs" role="list">${thumbsHTML}</div></div>`
+    : '';
 
-  const galNavHTML=totalGallery>1
-    ?`<button class="dp-gal-btn dp-gal-prev" onclick="dpNavPhoto(-1)">‹</button><button class="dp-gal-btn dp-gal-next" onclick="dpNavPhoto(1)">›</button>`
+  const galNavHTML=hasImages&&totalGallery>1
+    ?`<button type="button" class="dp-gal-btn dp-gal-prev" onclick="event.stopPropagation();dpNavPhoto(-1)" aria-label="${fr?'Précédente':'السابقة'}">‹</button><button type="button" class="dp-gal-btn dp-gal-next" onclick="event.stopPropagation();dpNavPhoto(1)" aria-label="${fr?'Suivante':'التالية'}">›</button>`
     :'';
   const adPrice=fr?priceFr(ad.price||''):(ad.price||'');
   const adLoc=fr?locFr(ad.loc,ad.wilaya):(ad.loc||ad.wilaya||'');
@@ -1968,7 +2240,8 @@ function renderDetailPanel(ad){
 
   // Map
   const mapHTML=buildMapHTML(ad);
-  const mapLink=`https://www.openstreetmap.org/?mlat=${(WILAYA_COORDS[ad.wilaya||'']||WILAYA_COORDS['default']).lat}&mlon=${(WILAYA_COORDS[ad.wilaya||'']||WILAYA_COORDS['default']).lon}`;
+  const _mc=_wilayaCoords(ad);
+  const mapLink=`https://www.openstreetmap.org/?mlat=${_mc.lat}&mlon=${_mc.lon}#map=13/${_mc.lat}/${_mc.lon}`;
 
   // Similar ads (3 from same category)
   const similar=ALL_ADS.filter(x=>x.cat===ad.cat&&String(x.id)!==String(ad.id)).slice(0,4);
@@ -1986,38 +2259,36 @@ function renderDetailPanel(ad){
     <button class="dp-back-btn" onclick="closeAdDetail()" title="${fr?'Retour à la liste':'رجوع للقائمة'}">
       ← ${fr?'Annonces':'الإعلانات'}
     </button>
-    <!-- Gallery -->
-    <div class="dp-gallery">
-      <div class="dp-gal-wrap">
-        <div class="dp-main-img" id="dp-main-img" onclick="dpOpenLightbox(0)">${mainImgHTML}</div>
-        ${galNavHTML}
+    <!-- Gallery + key facts -->
+    <div class="dp-hero">
+      <div class="dp-gallery">
+        <div class="dp-gal-wrap">
+          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
+          ${galNavHTML}
+        </div>
+        ${thumbsBlock}
       </div>
-      <div class="dp-thumbs">${thumbsHTML}</div>
-    </div>
-
-    <!-- Category -->
-    <div class="dp-listing-cat">
-      <a href="#" onclick="filterByCat('${ad.cat}');return false">${escapeHtml(catLabel)}</a>
-      <span class="sep">›</span>
-      <a href="#" onclick="filterBySubcat('${ad.subcat}');return false">${escapeHtml(subcatLabel)}</a>
-      ${ad.verified?`<span class="dp-verified-badge">${_t('dp-seller-verified')}</span>`:''}
-    </div>
-
-    <!-- Title -->
-    <h1 class="dp-title">${escapeHtml(adTitle)}${titleFallbackNote}</h1>
-    <div class="dp-meta-row">
-      <span class="dp-loc">${escapeHtml(adLoc)}</span>
-      <span class="dp-date">${escapeHtml(adDate)}</span>
-    </div>
-
-    <!-- Price Box -->
-    <div class="dp-price-box">
-      <div>
-        <div class="dp-price-main">${escapeHtml(adPrice)}${ad.originalPriceNum>0?` <span class="dp-price-orig">${ad.originalPriceNum.toLocaleString()} MRU</span>`:''}${ad.discountPct>0?`<span class="dp-discount-badge">-${ad.discountPct}%</span>`:''}</div>
-        <div class="dp-price-period">${escapeHtml(period)}</div>
+      <div class="dp-hero-info">
+        <div class="dp-listing-cat">
+          <a href="#" onclick="filterByCat('${escapeJsAttr(ad.cat)}');return false">${escapeHtml(catLabel)}</a>
+          <span class="sep">›</span>
+          <a href="#" onclick="filterBySubcat('${escapeJsAttr(ad.subcat)}');return false">${escapeHtml(subcatLabel)}</a>
+          ${ad.verified?`<span class="dp-verified-badge">${_t('dp-seller-verified')}</span>`:''}
+        </div>
+        <h1 class="dp-title">${escapeHtml(adTitle)}${titleFallbackNote}</h1>
+        <div class="dp-meta-row">
+          <span class="dp-loc">${escapeHtml(adLoc)}</span>
+          <span class="dp-date">${escapeHtml(adDate)}</span>
+        </div>
+        <div class="dp-price-box">
+          <div>
+            <div class="dp-price-main">${escapeHtml(adPrice)}${ad.originalPriceNum>0?` <span class="dp-price-orig">${ad.originalPriceNum.toLocaleString()} MRU</span>`:''}${ad.discountPct>0?`<span class="dp-discount-badge">-${ad.discountPct}%</span>`:''}</div>
+            <div class="dp-price-period">${escapeHtml(period)}</div>
+          </div>
+          ${ad.boosted?`<div class="dp-pin-badge">⭐ ${fr?'Sponsorisé':'مُموَّل'}</div>`:(ad.pin?`<div class="dp-pin-badge">${_t('dp-featured')}</div>`:'')}
+          ${(ad.stockQty!=null && ad.stockQty<=5)?`<div class="dp-stock-badge">⚡ ${fr?('Il ne reste que '+ad.stockQty+' !'):('متبقي '+ad.stockQty+' فقط')}</div>`:''}
+        </div>
       </div>
-      ${ad.boosted?`<div class="dp-pin-badge">⭐ ${fr?'Sponsorisé':'مُموَّل'}</div>`:(ad.pin?`<div class="dp-pin-badge">${_t('dp-featured')}</div>`:'')}
-      ${(ad.stockQty!=null && ad.stockQty<=5)?`<div class="dp-stock-badge">⚡ ${fr?('Il ne reste que '+ad.stockQty+' !'):('متبقي '+ad.stockQty+' فقط')}</div>`:''}
     </div>
 
     <!-- Description -->
@@ -2250,30 +2521,80 @@ function closeRizqPromo(){
   const o=document.getElementById('rizq-promo-overlay');
   if(o){o.style.opacity='0';o.style.pointerEvents='none';setTimeout(()=>{o.style.display='none';},300);}
 }
+function _dpGalleryImages(){
+  const ad=window._currentAd;
+  if(!ad) return [];
+  const raw=Array.isArray(ad.images)?ad.images:[];
+  // مسارات صالحة فقط (نص غير فارغ)
+  return raw.map(function(s){return String(s||'').trim();}).filter(Boolean);
+}
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;
-  const imgs=window._currentAd.images||[];
-  const src=imgs[idx]||'';
-  if(!src)return;
+  const imgs=_dpGalleryImages();
+  if(!imgs.length){
+    try{ showToast(_rizqLang()==='fr'?'Pas de photo à agrandir':'لا توجد صورة للتكبير'); }catch(e){}
+    return;
+  }
+  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
+  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   const lb=document.getElementById('lightbox');
-  const lbc=document.getElementById('lightbox-content');
-  if(!lb||!lbc)return;
-  lbc.innerHTML='<img src="'+src+'" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px">';
+  if(!lb)return;
+  // ارفع اللايت بوكس فوق كل الطبقات (تفاصيل/أوفرلاي)
+  if(lb.parentElement!==document.body) document.body.appendChild(lb);
+  dpRenderLightbox();
   lb.classList.add('open');
+  document.body.classList.add('rizq-lightbox-open');
+}
+function dpRenderLightbox(){
+  const imgs=_dpGalleryImages();
+  if(!imgs.length)return;
+  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
+  window._lbIdx=idx;
+  const fr=_rizqLang()==='fr';
+  const lbc=document.getElementById('lightbox-content');
+  const meta=document.getElementById('lightbox-meta');
+  const thumbs=document.getElementById('lightbox-thumbs');
+  const src=imgs[idx];
+  if(lbc){
+    lbc.innerHTML='<img src="'+escapeHtml(src)+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()" onerror="this.alt=(window._rizqLang&&_rizqLang()===\'fr\'?\'Image indisponible\':\'الصورة غير متاحة\');this.style.opacity=.4">';
+  }
+  if(meta){
+    const tip=fr?' — Click outside to close':' — انقر خارج الصورة للإغلاق';
+    meta.innerHTML='<span dir="ltr">'+(idx+1)+' / '+imgs.length+'</span><span dir="auto">'+tip+'</span>';
+  }
+  if(thumbs){
+    thumbs.innerHTML=imgs.map((s,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(s)+'" alt=""></button>').join('');
+    thumbs.style.display=imgs.length>1?'flex':'none';
+  }
+  const prev=document.querySelector('.lb-prev');
+  const next=document.querySelector('.lb-next');
+  if(prev)prev.style.display=imgs.length>1?'flex':'none';
+  if(next)next.style.display=imgs.length>1?'flex':'none';
+}
+function dpLightboxGoto(idx){
+  const imgs=_dpGalleryImages();
+  if(!imgs.length)return;
+  window._lbIdx=((idx%imgs.length)+imgs.length)%imgs.length;
+  dpRenderLightbox();
+}
+function dpLightboxNav(dir){
+  dpLightboxGoto((window._lbIdx||0)+dir);
 }
 function dpOpenWhatsApp(){dpWhatsApp();}
 function dpSetPhoto(idx){
   if(!window._currentAd)return;
-  _dpCurrentIdx=idx; // track for dpNavPhoto
-  const imgs=window._currentAd.images||[];
-  const emojis=window._currentAd._catEmojis||[];
+  const imgs=_dpGalleryImages();
+  if(!imgs.length)return;
+  idx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
+  _dpCurrentIdx=idx;
   const mainEl=document.getElementById('dp-main-img');
   if(!mainEl)return;
-  if(imgs[idx]){
-    mainEl.innerHTML='<img src="'+imgs[idx]+'" style="width:100%;height:100%;object-fit:cover" onclick="dpOpenLightbox('+idx+')">';
-  } else if(emojis[idx]){
-    mainEl.innerHTML='<span style="font-size:64px">'+emojis[idx]+'</span>';
-  }
+  const fr=_rizqLang()==='fr';
+  const total=imgs.length;
+  const zoomHint=`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`;
+  const counter=total>1?`<span class="dp-gal-counter" id="dp-gal-counter">${idx+1} / ${total}</span>`:'';
+  mainEl.innerHTML='<div class="rizq-img-wrap loaded" style="width:100%;height:100%"><img id="dp-main-img-el" src="'+escapeHtml(imgs[idx])+'" style="width:100%;height:100%;object-fit:cover;pointer-events:none" onerror="this.dataset.broken=\'1\'"></div>'+zoomHint+counter;
+  mainEl.setAttribute('onclick','dpOpenLightbox()');
   document.querySelectorAll('.dp-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
 }
 // ── وظيفة موحّدة لكل وسوم الفلترة ──
@@ -2289,8 +2610,9 @@ function rizqTagClick(el){
   const dc=document.getElementById('detail-content');
   const ed=document.getElementById('empty-detail');
   if(dc){dc.style.display='none'; dc.innerHTML='';}
-  if(ed) ed.style.display='';
+  if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
+  document.body.classList.remove('rizq-detail-open');
   window._currentAd=null;
   // على الموبايل: switchTab
   switchTab('list');
@@ -2300,9 +2622,11 @@ function rizqTagClick(el){
 function closeAdDetail(){
   const dc=document.getElementById('detail-content');
   const ed=document.getElementById('empty-detail');
+  if(window._dpMap){ try{ window._dpMap.remove(); }catch(e){} window._dpMap=null; }
   if(dc){dc.style.display='none'; dc.innerHTML='';}
-  if(ed) ed.style.display='';
+  if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
+  document.body.classList.remove('rizq-detail-open');
   document.querySelectorAll('.rc').forEach(el=>el.classList.remove('active'));
   window._currentAd=null;
   if(window.innerWidth<=900) switchTab('list');
@@ -2388,10 +2712,9 @@ function filterByVerified(v){
 // ── تنقل معرض الصور بالأسهم
 function dpNavPhoto(dir){
   if(!window._currentAd) return;
-  const ad=window._currentAd;
-  const total=(ad.images&&ad.images.length>0)?ad.images.length:(ad._catEmojis||[]).length;
-  if(total<=1) return;
-  _dpCurrentIdx=(_dpCurrentIdx+dir+total)%total;
+  const imgs=_dpGalleryImages();
+  if(imgs.length<=1) return;
+  _dpCurrentIdx=(_dpCurrentIdx+dir+imgs.length)%imgs.length;
   dpSetPhoto(_dpCurrentIdx);
 }
 function switchTab(tab){
@@ -2527,7 +2850,20 @@ function openLightbox(src){
 function closeLightbox(){
   const lb=document.getElementById('lightbox');
   if(lb)lb.classList.remove('open');
+  document.body.classList.remove('rizq-lightbox-open');
 }
+document.addEventListener('keydown',function(e){
+  const lb=document.getElementById('lightbox');
+  if(lb&&lb.classList.contains('open')){
+    if(e.key==='Escape'){closeLightbox();return;}
+    if(e.key==='ArrowLeft'){dpLightboxNav(-1);e.preventDefault();}
+    if(e.key==='ArrowRight'){dpLightboxNav(1);e.preventDefault();}
+    return;
+  }
+  if(e.key==='Escape' && document.querySelector('.browse-wrap.has-detail')){
+    closeAdDetail();
+  }
+});
 function openRizqPromo(){
   window.location.href='rizq_landing_v8.html#about';
 }
@@ -2857,7 +3193,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   var FR={
     desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
     netlabel:"Réseaux pris en charge :",
-    quick:"LIENS RAPIDES",topcats:"MEILLEURES CATÉGORIES",help:"AIDE",contact:"CONTACTEZ-NOUS",
+    quick:"Liens rapides",topcats:"Meilleures catégories",help:"Aide",contact:"Contactez-nous",
     c1:"🏠 Immobilier",c2:"🚗 Voitures et pièces",c3:"🚛 Camions et engins",c4:"📱 Téléphones & électronique",c5:"🐄 Bétail et animaux",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
     h1:"Centre d'aide",h2:"Politique de confidentialité",h3:"Conditions d'utilisation",h4:"Signaler une annonce",h5:"Contactez-nous",

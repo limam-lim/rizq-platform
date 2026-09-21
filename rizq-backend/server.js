@@ -63,6 +63,7 @@ app.use((req, res, next) => {
     res.set(
       'Content-Security-Policy',
       "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
+      + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
       + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
       + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
@@ -75,6 +76,7 @@ app.use((req, res, next) => {
       'Content-Security-Policy',
       "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; "
       + "frame-ancestors *; "
+      + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org https:; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
       + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
       + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss: http: ws:;"
