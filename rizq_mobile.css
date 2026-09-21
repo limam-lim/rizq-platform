@@ -324,7 +324,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     scroll-snap-align:start!important;
   }
 
-  .listings-grid,.hero-biz-nav,.quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
+  .listings-grid,.quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
   .similar-grid,.dp-similar-grid,.cta-btns,
   .store-badges,.store-meta{
     display:flex!important;flex-direction:column!important;
@@ -486,8 +486,20 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   .cat-card,.listing-card,.ad-card,.product-card{
     width:100%!important;height:auto!important;min-width:0!important;
   }
-  .hero-biz-nav{flex-direction:row!important;flex-wrap:wrap!important}
-  .hero-biz-btn{flex:1 1 180px!important}
+  .hero-biz-nav{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    flex-direction:unset!important;flex-wrap:unset!important;
+    overflow:visible!important;gap:10px!important;
+    width:100%!important;max-width:100%!important;
+  }
+  .hero-biz-btn{
+    flex:none!important;width:auto!important;min-width:0!important;
+    min-height:108px!important;
+  }
+  .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){
+    grid-column:1 / -1;max-width:70%;justify-self:center;
+  }
   .quick-cats{flex-direction:row!important;flex-wrap:wrap!important}
   .mobile-bottom-nav{padding-bottom:calc(4px + env(safe-area-inset-bottom,0))}
 }

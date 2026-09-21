@@ -1,13 +1,14 @@
 'use strict';
 
+const fs = require('fs');
 const {
   findCatalogPackage,
   isDiamondPackageRef,
   isTrialPackage,
   readSiteConfigRaw,
   resolvePackageBoostDays,
+  SITE_CONFIG_FILE,
 } = require('./catalogConfig');
-const repos = require('../db/repos');
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
@@ -44,24 +45,15 @@ function getAccountInfo(accountId, readAccounts) {
 
 function activateVideoAdOnServer(req) {
   if (!req.videoUrl) return { ok: true, skipped: true, reason: 'no_video_url' };
-  const rawUrl = String(req.videoUrl).trim().slice(0, 500);
-  let safeUrl = '';
-  try {
-    const u = new URL(rawUrl);
-    if (u.protocol !== 'https:' && u.protocol !== 'http:') {
-      return { ok: false, error: 'invalid_video_url' };
-    }
-    if (/^(javascript|data|vbscript|file):/i.test(rawUrl)) {
-      return { ok: false, error: 'invalid_video_url' };
-    }
-    safeUrl = u.toString().slice(0, 500);
-  } catch (e) {
-    return { ok: false, error: 'invalid_video_url' };
-  }
   const cfg = readSiteConfigRaw();
-  const videoAds = cfg.videoAds && typeof cfg.videoAds === 'object'
-    ? { hero: cfg.videoAds.hero || [], popup: cfg.videoAds.popup || [] }
-    : { hero: [], popup: [] };
+  const prev = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
+  const videoAds = {
+    hero: prev.hero || [],
+    popup: prev.popup || [],
+    platformPromoUrl: prev.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4',
+    platformPromoEnabled: prev.platformPromoEnabled !== false,
+    adSlotSeconds: Number(prev.adSlotSeconds) || 25,
+  };
 
   const videoPkgs = (cfg.packages && Array.isArray(cfg.packages.video)) ? cfg.packages.video.filter((p) => p && p.active !== false) : [];
   const defaults = [{ price: 5000 }, { price: 12000 }, { price: 25000 }];
@@ -74,13 +66,13 @@ function activateVideoAdOnServer(req) {
   const list = videoAds[target] || [];
   const existing = req.accountId ? list.find((a) => a.accountId === req.accountId) : null;
   if (existing) {
-    existing.url = safeUrl;
+    existing.url = req.videoUrl;
     existing.advertiser = req.account || '';
     existing.active = true;
   } else {
     list.push({
       advertiser: req.account || '',
-      url: safeUrl,
+      url: req.videoUrl,
       active: true,
       accountId: req.accountId || '',
     });
@@ -88,7 +80,7 @@ function activateVideoAdOnServer(req) {
   videoAds[target] = list.slice(0, 50);
 
   const next = Object.assign({}, cfg, { videoAds });
-  repos.saveSiteConfig(next);
+  fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(next, null, 2), 'utf8');
   return { ok: true, slot: target };
 }
 
@@ -187,18 +179,6 @@ async function activateSubRequest(req, deps) {
       if (typeof readAdBoosts !== 'function' || typeof writeAdBoosts !== 'function') {
         return { ok: false, error: 'ad_boosts_io_missing' };
       }
-      // يجب أن يملك الدافع الإعلان — منع تعزيز إعلان منافس
-      if (typeof readAccounts === 'function') {
-        try {
-          const { readAds } = deps;
-          if (typeof readAds === 'function') {
-            const ad = readAds().find((a) => a.id === req.adId);
-            if (!ad || ad.accountId !== req.accountId) {
-              return { ok: false, error: 'ad_ownership_mismatch' };
-            }
-          }
-        } catch (eOwn) { /* continue if ads io unavailable */ }
-      }
       const boostDays = resolvePackageBoostDays(req.pkg) || 3;
       const now = new Date();
       const ends = new Date(now.getTime() + boostDays * 86400000);
@@ -214,18 +194,7 @@ async function activateSubRequest(req, deps) {
       return { ok: true, category, boost: all[req.adId], accountName };
     }
 
-    if (category === 'video') {
-      const v = activateVideoAdOnServer(req);
-      if (v && v.ok === false) return v;
-      return { ok: true, category, video: v, accountName };
-    }
-
-    // package فقط — لا نفعّل باقة كاملة من فئة أخرى
-    if (category !== 'package') {
-      return { ok: false, error: 'unknown_category', category };
-    }
-
-    // package (default)
+    // package + video (default)
     const existingPkg = getAccountRecord(req.accountId);
     const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
     const isTrial = isTrialPackage(req.pkg, req.price);
@@ -247,6 +216,10 @@ async function activateSubRequest(req, deps) {
       isTrial,
     });
     if (!result.ok) return result;
+
+    if (category === 'video') {
+      activateVideoAdOnServer(req);
+    }
 
     if (!isTrial && isDiamondPackageRef(req.pkg) && accountPhone && typeof registerSubscriber === 'function') {
       try {
