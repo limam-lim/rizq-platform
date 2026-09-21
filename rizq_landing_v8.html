@@ -675,11 +675,12 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 
 /* ── HERO BIZ NAV — محلات / مكاتب / معارض (بطاقات مميزة) ── */
 .hero-biz-nav{
-  display:grid;
+  display:grid!important;
   grid-template-columns:repeat(5,minmax(0,1fr));
   gap:12px;max-width:920px;margin:0 auto 20px;
   animation:fadeUp .8s .28s ease both;z-index:61;position:relative;
   padding:4px 2px 8px;
+  flex-direction:unset!important;flex-wrap:unset!important;
 }
 .hero-biz-btn{
   position:relative;
@@ -1232,6 +1233,9 @@ html[dir="ltr"] .listings-section .section-desc{
 @media(min-width:769px) and (max-width:1100px){
   .cats-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
   .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:22px!important}
+  .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px;gap:12px}
+  .hero-biz-nav .hero-biz-btn:nth-child(4){grid-column:1 / 2}
+  .hero-biz-nav .hero-biz-btn:nth-child(5){grid-column:2 / 4;max-width:none}
   .rizq-type-row{
     grid-template-columns:repeat(6,minmax(0,1fr))!important;
     gap:10px!important;
@@ -1290,8 +1294,10 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-vid-wrap{width:min(100%,96%);margin-bottom:24px}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
   .hero-biz-nav{
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:10px;margin-bottom:16px;max-width:100%;
+    flex-direction:unset!important;flex-wrap:unset!important;
   }
   .hero-biz-btn{min-height:108px;padding:14px 10px 12px}
   .hero-biz-label{white-space:normal;text-align:center;font-size:12.5px}
