@@ -34,7 +34,7 @@ const { requireSatelliteSecret } = require('./rizq-backend/lib/satelliteAuth');
 const bodyParser = require('body-parser');
 const axios      = require('axios');
 const { askAgent } = require('./rizq_agent_brain');
-const { askSubscriberAgent, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
+const { askSubscriberAgent, resolveSubscriberProfile, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
 const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
 
 // تحميل المشتركين (يُستبدل بـ DB عند الإنتاج) — تُقرأ أولاً من
@@ -224,38 +224,69 @@ app.post('/api/whatsapp', async (req, res) => {
     const session = sessions.get(from);
     session.lastSeen = Date.now();
 
-    // ── تحديد هوية المشترك (رقم واتساب المُستلَم إليه) ────
-    // في Meta API: value.metadata.phone_number_id أو display_phone_number
-    const receivingPhoneId = value?.metadata?.phone_number_id || WA_CONFIG.PHONE_ID;
+    // ── عزل المستأجر: رقم الاستقبال فقط (ليس رقم المرسل) ────
+    // display_phone_number هو مفتاح المنشأة؛ phone_number_id احتياطي
+    // بشرط تطابق فريد — وإلا مدير رزق العام (لا تاجر عشوائي).
+    const receivingPhoneId = value?.metadata?.phone_number_id || '';
     const receivingPhone   = value?.metadata?.display_phone_number || '';
 
-    // ── اطلب من Claude رداً (بشخصية المشترك إن كان ماسية) ──
+    function resolveWhatsAppTenant() {
+      if (receivingPhone) {
+        const byDisplay = resolveSubscriberProfile(receivingPhone);
+        if (byDisplay) return byDisplay;
+      }
+      if (receivingPhoneId) {
+        const byId = resolveSubscriberProfile(receivingPhoneId);
+        if (byId) return byId;
+      }
+      return null;
+    }
+
+    const tenant = resolveWhatsAppTenant();
+
     let replyText = 'شكراً لرسالتكم. سأرد عليكم قريباً إن شاء الله.';
+    let replyMode = 'platform';
 
     try {
-      const result = await askSubscriberAgent({
-        subscriberId: receivingPhone || receivingPhoneId,
-        channel: 'whatsapp',
-        message: userText,
-        context: {
-          sender : from,
-          name   : senderName,
-          history: session.history.slice(-MAX_HISTORY)
-        }
-      });
+      let result;
+      if (tenant) {
+        result = await askSubscriberAgent({
+          subscriberId: tenant.subscriberId,
+          channel: 'whatsapp',
+          message: userText,
+          context: {
+            sender : from,
+            name   : senderName,
+            history: session.history.slice(-MAX_HISTORY)
+          }
+        });
+        replyMode = (result.isolation && result.isolation.mode === 'tenant')
+          ? 'tenant:' + tenant.subscriberId
+          : (result.isolation && result.isolation.mode) || 'subscriber';
+      } else {
+        console.log('📱 واتساب بلا مستأجر مطابق — عقل رزق الأساسي');
+        result = await askAgent({
+          channel: 'whatsapp',
+          message: userText,
+          context: {
+            sender : from,
+            name   : senderName,
+            history: session.history.slice(-MAX_HISTORY)
+          }
+        });
+        replyMode = 'platform';
+      }
 
       replyText = result.text;
 
-      // حدّث تاريخ الجلسة
       session.history.push({ role: 'user',      content: userText  });
       session.history.push({ role: 'assistant', content: replyText });
 
-      // اقطع التاريخ إن طال
       if(session.history.length > MAX_HISTORY * 2) {
         session.history = session.history.slice(-MAX_HISTORY * 2);
       }
 
-      console.log(`🧠 Claude: ${replyText.substring(0, 80)}...`);
+      console.log(`🧠 Claude [${replyMode}]: ${replyText.substring(0, 80)}...`);
 
     } catch(err) {
       console.error('❌ Claude error:', err.message);
@@ -271,6 +302,8 @@ app.post('/api/whatsapp', async (req, res) => {
       name   : senderName,
       msg    : userText.substring(0, 100),
       reply  : replyText.substring(0, 100),
+      mode   : replyMode,
+      tenant : tenant ? tenant.subscriberId : null,
       time   : new Date().toLocaleString('ar-MA-u-nu-latn'),
       ai     : true
     });

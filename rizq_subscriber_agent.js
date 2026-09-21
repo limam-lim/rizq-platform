@@ -43,10 +43,16 @@ function getSubscribersRepo() {
   }
 }
 
+/** وضع اختبار العزل: ذاكرة فقط — بلا قراءة/كتابة SQLite */
+function _memoryOnly() {
+  return process.env.RIZQ_SUBSCRIBERS_MEMORY_ONLY === '1';
+}
+
 const subscriberProfiles = new Map();
 let _memorySynced = false;
 
 function _syncFromStore() {
+  if (_memoryOnly()) return subscriberProfiles.size;
   const store = getSubscribersRepo();
   if (!store) return 0;
   try {
@@ -64,6 +70,7 @@ function _syncFromStore() {
 }
 
 function _persistToDisk() {
+  if (_memoryOnly()) return;
   const store = getSubscribersRepo();
   if (!store) return;
   try {
@@ -111,15 +118,89 @@ function registerSubscriber(subscriberId, profile) {
 }
 
 /**
+ * تطبيع رقم/معرّف إلى أرقام فقط — للعزل الآمن بين المشتركين.
+ * لا يُستخدم وحده كمفتاح بحث غامض؛ انظر phonesEquivalent / resolveSubscriberProfile.
+ */
+function digitsOnly(raw) {
+  return String(raw || '').replace(/\D/g, '');
+}
+
+/**
+ * مقارنة رقمين بدون خلط مشتركين مختلفين:
+ * - تطابق كامل على الأرقام، أو
+ * - لاحقة آمنة (أحدهما ينتهي بالآخر) بشرط أن الأقصر ≥ 8 أرقام.
+ * لا تُرجع true بين أرقام غير مرتبطة.
+ */
+function phonesEquivalent(a, b) {
+  const da = digitsOnly(a);
+  const db = digitsOnly(b);
+  if (!da || !db) return false;
+  if (da === db) return true;
+  const [longer, shorter] = da.length >= db.length ? [da, db] : [db, da];
+  return shorter.length >= 8 && longer.endsWith(shorter);
+}
+
+function _profilePhoneKeys(id, profile) {
+  const keys = [id];
+  if (profile) {
+    if (profile.phone) keys.push(profile.phone);
+    if (profile.whatsapp) keys.push(profile.whatsapp);
+    if (profile.subscriberPhone) keys.push(profile.subscriberPhone);
+  }
+  return keys.filter(Boolean);
+}
+
+/**
+ * حلّ صارم لمعرّف المشترك → بروفايل واحد حصري.
+ * - فشل آمن: لا تطابق أو تطابق غامض (أكثر من مشترك) → null (مسار المنصة العامة).
+ * - لا يختار «أول» مشترك أبداً.
+ * @returns {{ subscriberId: string, profile: object } | null}
+ */
+function resolveSubscriberProfile(rawId) {
+  const raw = String(rawId || '').trim();
+  if (!raw) return null;
+  _loadFromDisk();
+
+  if (subscriberProfiles.has(raw)) {
+    return { subscriberId: raw, profile: subscriberProfiles.get(raw) };
+  }
+
+  const matches = new Map();
+  for (const [id, profile] of subscriberProfiles.entries()) {
+    if (!profile) continue;
+    const keys = _profilePhoneKeys(id, profile);
+    if (keys.some((k) => phonesEquivalent(raw, k))) {
+      matches.set(id, profile);
+    }
+  }
+
+  if (matches.size === 1) {
+    const [subscriberId, profile] = matches.entries().next().value;
+    return { subscriberId, profile };
+  }
+  if (matches.size > 1) {
+    console.warn(
+      `⚠️ عزل مشتركين: تطابق غامض لـ "${raw}" (${matches.size} ملفات) — رفض وتحويل لمسار المنصة`
+    );
+    return null;
+  }
+  return null;
+}
+
+/**
  * جلب ملف تعريف المشترك
  * إصلاح: كانت تقرأ فقط من Map في الذاكرة (تُملأ مرة واحدة عند إقلاع
  * العملية) — فتسجيل مشترك من عملية أخرى (مثلاً عبر rizq-backend/server.js
  * من لوحة الأدمن) لن يظهر هنا إلا بعد إعادة تشغيل خادم المكالمات/واتساب.
  * الآن: نعيد القراءة من نفس ملف القرص المشترك في كل استدعاء — تكلفة قراءة
  * ملف صغير مهملة مقارنة بفائدة رؤية التسجيلات الجديدة فوراً دون إعادة تشغيل.
+ *
+ * ملاحظة أمان: للمطابقة عبر ForwardedFrom / واتساب استخدم resolveSubscriberProfile
+ * (تطبيع + رفض الغموض). getSubscriberProfile يبقى بحثاً بالمفتاح الحرفي فقط.
  */
 function getSubscriberProfile(subscriberId) {
   _loadFromDisk();
+  if (!subscriberId) return null;
   return subscriberProfiles.get(subscriberId) || null;
 }
 
@@ -248,14 +329,23 @@ function buildSubscriberSystemPrompt(profile, channel) {
 //  context: { sender, name, subject, history[] }
 // ══════════════════════════════════════════════════════════════
 async function askSubscriberAgent({ subscriberId, channel, message, context = {} }) {
-  const profile = getSubscriberProfile(subscriberId);
+  const { askAgent } = require('./rizq_agent_brain');
 
-  // لو لا يوجد مشترك → استخدم عقل رزق الأساسي
-  if(!profile) {
-    console.log(`⚠️ لا يوجد مشترك بالمعرّف: ${subscriberId} — استخدام عقل رزق الأساسي`);
-    const { askAgent } = require('./rizq_agent_brain');
+  // عزل صارم: بلا معرّف → مدير رزق العام فقط (لا تاجر عشوائي)
+  if (!subscriberId || !String(subscriberId).trim()) {
+    console.log('⚠️ askSubscriberAgent بلا subscriberId — عقل رزق الأساسي');
     return askAgent({ channel, message, context });
   }
+
+  // حلّ حصري واحد فقط؛ الغموض أو الغياب → المنصة العامة
+  const resolved = resolveSubscriberProfile(subscriberId);
+  if (!resolved || !resolved.profile) {
+    console.log(`⚠️ لا يوجد مشترك بالمعرّف: ${subscriberId} — استخدام عقل رزق الأساسي`);
+    return askAgent({ channel, message, context });
+  }
+
+  const canonicalId = resolved.subscriberId;
+  const profile = resolved.profile;
 
   const {
     getAdvancedModel,
@@ -268,7 +358,8 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     return {
       text   : 'خدمة الوكيل الذكي متاحة فقط لمشتركي الباقة الماسية.',
       channel: channel,
-      model  : null
+      model  : null,
+      isolation: { subscriberId: canonicalId, mode: 'diamond_required' },
     };
   }
 
@@ -280,29 +371,38 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
           text: 'انتهت باقتك الماسية أو لم يُؤكَّد الدفع بعد — جدّد الاشتراك لاستعادة الوكيل الذكي.',
           channel,
           model: null,
+          isolation: { subscriberId: canonicalId, mode: 'diamond_inactive' },
         };
       }
     } catch (e) { /* optional if lifecycle module unavailable */ }
   }
 
-  // ── بناء System Prompt خاص بالمشترك ──────────────────────
-  const systemPrompt = buildSubscriberSystemPrompt(profile, channel);
+  // ── بناء System Prompt خاص بالمشترك فقط (لا تُحمَّل منشآت أخرى) ──
+  const isolationFence =
+    `\n\n## عزل المستأجر (Tenant Isolation — NON-NEGOTIABLE)\n` +
+    `- المعرّف الحصري لهذه الجلسة: ${canonicalId}\n` +
+    `- اسم المنشأة الحصري: ${profile.businessName || 'المنشأة'}\n` +
+    `- ممنوع تماماً استخدام أو ذكر أسعار/خدمات/عروض أي منشأة أخرى أو منصة رزق كبديل تجاري.\n` +
+    `- إن طُلب منك التحدث عن تاجر آخر: اعتذر وأعد التركيز على منشأتك فقط.\n`;
+
+  const systemPrompt = buildSubscriberSystemPrompt(profile, channel) + isolationFence;
 
   const Anthropic = require('@anthropic-ai/sdk');
   const { assertQuotaAvailable, recordUsage, isQuotaBlocked } = require('./rizq_quota_guard_agent');
 
-  if (isQuotaBlocked(subscriberId, profile.accountId, channel)) {
+  if (isQuotaBlocked(canonicalId, profile.accountId, channel)) {
     return {
       text: 'انتهت حصة الباقة الماسية لهذا الشهر. اشترِ شحناً إضافياً من لوحة التحكم أو جدّد الباقة.',
       channel,
       model: null,
       quotaBlocked: true,
+      isolation: { subscriberId: canonicalId, mode: 'quota_blocked' },
     };
   }
 
   try {
     assertQuotaAvailable({
-      subscriberId,
+      subscriberId: canonicalId,
       accountId: profile.accountId || '',
       channel,
       diamondTier: profile.diamondTier,
@@ -313,6 +413,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
       channel,
       model: null,
       quotaBlocked: true,
+      isolation: { subscriberId: canonicalId, mode: 'quota_blocked' },
     };
   }
 
@@ -351,10 +452,10 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   let quota = null;
   try {
     quota = await recordUsage({
-      subscriberId,
+      subscriberId: canonicalId,
       accountId: profile.accountId || '',
       businessName: profile.businessName,
-      phone: subscriberId,
+      phone: canonicalId,
       channel,
       model: created.model,
       usage: response.usage,
@@ -373,7 +474,8 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     channel   : channel,
     business  : profile.businessName,
     businessType: profile.businessType,
-    usage     : response.usage
+    usage     : response.usage,
+    isolation : { subscriberId: canonicalId, mode: 'tenant' },
   };
 }
 
@@ -449,6 +551,9 @@ function loadDemoSubscribers() { /* mock subscribers removed — register real a
 module.exports = {
   registerSubscriber,
   getSubscriberProfile,
+  resolveSubscriberProfile,
+  digitsOnly,
+  phonesEquivalent,
   getSubscriberProfileByAccountId,
   getAllSubscriberProfiles,
   updateDynamicKnowledge,
