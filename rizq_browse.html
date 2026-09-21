@@ -1573,34 +1573,58 @@ function loadRealSearchAds(){
 // سلوك سابق، فقط إضافة تدريجية فوق ما كان يعمل أصلاً.
 function _rizqMergeBackendAds(){
   try{
-    if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE) return;
+    if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE) return Promise.resolve(false);
     var body = document.getElementById('result-list-body');
     var showedSkel = false;
     if(body && !ALL_ADS.length && typeof window.rizqSkeletonHtml === 'function'){
       body.innerHTML = window.rizqSkeletonHtml(6);
       showedSkel = true;
     }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=2000')
+    return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads?limit=2000')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !Array.isArray(data.ads) || !data.ads.length){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
-          return;
+          return false;
         }
         var existingIds = {};
         ALL_ADS.forEach(function(a){ existingIds[String(a.id)] = true; });
         var mapped = _mapRawAdsToDisplay(data.ads).filter(function(a){ return !existingIds[String(a.id)]; });
         if(!mapped.length){
           if(showedSkel && typeof applyFilters === 'function') applyFilters();
-          return;
+          return false;
         }
         mapped.forEach(function(a){ ALL_ADS.push(a); });
         if(typeof applyFilters === 'function') applyFilters();
+        return true;
       })
       .catch(function(){
         if(showedSkel && typeof applyFilters === 'function') applyFilters();
+        return false;
       });
-  }catch(e){}
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
+
+/** جلب إعلان واحد من الخادم ودمجه في ALL_ADS ثم فتحه في لوحة التفاصيل */
+function _rizqFetchAndOpenAd(id){
+  if(!id || typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE) return Promise.resolve(false);
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads/' + encodeURIComponent(id))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok || !data.ad) return false;
+      var mapped = _mapRawAdsToDisplay([data.ad]);
+      if(!mapped.length) return false;
+      var existing = ALL_ADS.findIndex(function(a){ return String(a.id)===String(id); });
+      if(existing >= 0) ALL_ADS[existing] = Object.assign({}, ALL_ADS[existing], mapped[0]);
+      else ALL_ADS.unshift(mapped[0]);
+      if(typeof applyFilters === 'function') applyFilters();
+      selectAd(id);
+      if(window.innerWidth <= 900) switchTab('detail');
+      return true;
+    })
+    .catch(function(){ return false; });
 }
 const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
 
@@ -3067,7 +3091,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 
   applyFilters();
-  _rizqMergeBackendAds();
+  var _mergeP = _rizqMergeBackendAds();
   relocateFiltersForViewport();
   if(window.innerWidth<=900) switchTab('list');
 
@@ -3079,17 +3103,33 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  // إذا كان ?id= → فتح الإعلان مباشرة بعد الرندر
+  // إذا كان ?id= → فتح الإعلان في لوحة التصفح (لا تحويل لـ rizq_listing القديمة)
   if(_pId){
-    // تحقق إذا كان الإعلان موجوداً في القائمة الحالية أو localStorage
-    const _adCheck = getAdById(_pId);
-    const _adExists = _adCheck && (_adCheck.title || _adCheck.id);
-    if(_adExists){
-      selectAd(_pId);
-      if(window.innerWidth <= 900) switchTab('detail');
-    } else {
-      // الإعلان غير موجود في browse → حوّل لصفحة العرض الكاملة
-      window.location.replace('rizq_listing.html?id=' + encodeURIComponent(_pId));
+    function _openFromUrl(){
+      const _adCheck = getAdById(_pId);
+      const _adExists = _adCheck && (_adCheck.title || (ALL_ADS||[]).some(function(a){ return String(a.id)===String(_pId); }));
+      if(_adExists){
+        selectAd(_pId);
+        if(window.innerWidth <= 900) switchTab('detail');
+        return true;
+      }
+      return false;
+    }
+    if(!_openFromUrl()){
+      Promise.resolve(_mergeP).then(function(){
+        if(_openFromUrl()) return;
+        return _rizqFetchAndOpenAd(_pId);
+      }).then(function(ok){
+        if(ok) return;
+        /* آخر محاولة: handoff من الصفحة الرئيسية */
+        try{
+          var s=JSON.parse(localStorage.getItem('rizq_active_ad')||'null');
+          if(s && String(s.id)===String(_pId)){
+            selectAd(_pId);
+            if(window.innerWidth <= 900) switchTab('detail');
+          }
+        }catch(e){}
+      });
     }
   }
 

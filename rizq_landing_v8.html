@@ -4552,16 +4552,17 @@ function qcatBrowseAll() {
 // هناك) + ?id= في الرابط، حتى تُعرض المواصفات/الوسوم الحقيقية بدل محتوى تجريبي ثابت.
 function goToListing(a) {
   if (!a) return;
-  const verified = /موثّق|Vérifié/.test(a.status || '');
+  const verified = /موثّق|Vérifié/.test(a.status || '') || !!a.verified;
   const handoff = {
-    id: a.id, title: a.title, titleFr: a.titleFR || '', desc: a.desc, descFr: a.descFR || '',
-    price: a.price, loc: a.loc, locFr: a.locFR || '', emoji: a.emoji, cat: a.cat, catKey: a.catKey,
-    tags: a.tags || [], tagsFr: a.tagsFR || [], seller: a.seller, sellerFr: a.sellerFR || '',
-    phone: '', verified, images: []
+    id: a.id, title: a.title, titleFr: a.titleFR || a.titleFr || '', desc: a.desc, descFr: a.descFR || a.descFr || '',
+    price: a.price, loc: a.loc, locFr: a.locFR || a.locFr || '', emoji: a.emoji, cat: a.cat, catKey: a.catKey,
+    tags: a.tags || [], tagsFr: a.tagsFR || a.tagsFr || [], seller: a.seller, sellerFr: a.sellerFR || a.sellerFr || '',
+    phone: a.phone || '', verified, images: Array.isArray(a.images) ? a.images : [],
+    wilaya: a.wilaya || '', subcat: a.subcat || '', accountId: a.accountId || ''
   };
   try { localStorage.setItem('rizq_active_ad', JSON.stringify(handoff)); } catch (e) {}
-  // ← يذهب لصفحة العرض الكاملة مباشرةً بدل شاشة التصفح المقسومة
-  window.location.href = 'rizq_listing.html?id=' + encodeURIComponent(a.id);
+  /* صفحة التصفح المطوّرة (شبكة + لوحة تفاصيل) — لا rizq_listing القديمة */
+  window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(a.id);
 }
 // ── AD MODAL (Featured + Carousel) — أصبحت تُحوِّل لصفحة العرض الكاملة بدل فتح نافذة ──
 function openAdModal(idx) {
@@ -9826,7 +9827,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var pNum = parseInt(String(a.price||'0').replace(/[^\d]/g,''))||0;
       var oNum = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,''))||0;
       var discPct = (oNum>0 && pNum>0 && oNum>pNum) ? Math.round((1-(pNum/oNum))*100) : 0;
-      return '<a class="rzq-disc-card" href="rizq_listing.html?id='+encodeURIComponent(a.adId)+'">'
+      return '<a class="rzq-disc-card" href="rizq_browse.html?id='+encodeURIComponent(a.adId)+'">'
         + '<div class="rzq-disc-img" style="display:flex;align-items:center;justify-content:center;font-size:38px;position:relative">'+esc(a.emoji||'📦')
         +   (discPct>0?'<span style="position:absolute;top:4px;left:4px;background:#dc2626;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px">-'+discPct+'%</span>':'')
         + '</div>'
@@ -9905,7 +9906,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var discPct = (oNum>0 && pNum>0 && oNum>pNum) ? Math.round((1-(pNum/oNum))*100) : 0;
       var priceTxt = a.price ? (pNum.toLocaleString()+' MRU') : (fr ? 'À négocier' : 'تفاوض');
       var stockQty = (a.stockQty!=null && Number.isFinite(Number(a.stockQty))) ? Number(a.stockQty) : null;
-      return '<a class="rzq-disc-card" href="rizq_listing.html?id='+encodeURIComponent(a.id)+'">'
+      return '<a class="rzq-disc-card" href="rizq_browse.html?id='+encodeURIComponent(a.id)+'">'
         + '<div class="rzq-disc-img" style="display:flex;align-items:center;justify-content:center;font-size:38px;position:relative">'+esc(a.emoji||'📦')
         +   (discPct>0?'<span style="position:absolute;top:4px;left:4px;background:#dc2626;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px">-'+discPct+'%</span>':'')
         + '</div>'
