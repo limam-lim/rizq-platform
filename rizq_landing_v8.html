@@ -2674,8 +2674,8 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     </div>
 
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
-      <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">📈 ادخل غرفة الاستثمارات</a>
-      <a href="rizq_investments.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px">+ انشر فرصة استثمار</a>
+      <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="📈 Entrer dans la salle des investissements">📈 ادخل غرفة الاستثمارات</a>
+      <a href="rizq_investments.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="+ Publier une opportunité d'investissement">+ انشر فرصة استثمار</a>
     </div>
 
   </div>
@@ -5180,10 +5180,20 @@ function _rizqBootCategoryGrid() {
       }
     }
   } catch (eBootNames) { /* ignore */ }
+  try { if (typeof mergeSubFrFromConfig === 'function') mergeSubFrFromConfig(); } catch (eMerge) { /* ignore */ }
   _rizqInitBuiltinCategories();
   try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) { /* ignore */ }
   try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSug) { /* ignore */ }
   try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) { /* ignore */ }
+  /* بطاقات الأقسام تُبنى بالعربية دائماً — أعد تطبيق الترجمة إن كانت FR
+     محفوظة، حتى لا تبقى الفروع عربية بعد سباق DOMContentLoaded. */
+  try {
+    var bootLang = 'ar';
+    try { bootLang = localStorage.getItem('rizq_lang') || 'ar'; } catch (eL) {}
+    if (bootLang === 'fr' && typeof translateCatTaxonomy === 'function') {
+      translateCatTaxonomy(true);
+    }
+  } catch (eTxBoot) { /* ignore */ }
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _rizqBootCategoryGrid);
@@ -5262,13 +5272,21 @@ const SUB_FR = {
   'تقييم أضرار وحوادث':'Expertise dommages & accidents',
   'استشارات ووساطة تأمين':'Conseil & courtage en assurance'
 };
-if (typeof RizqCategories !== 'undefined') {
-  if (RizqCategories.SUB_FR) Object.assign(SUB_FR, RizqCategories.SUB_FR);
-  if (RizqCategories.GROUP_FR) Object.assign(SUB_FR, RizqCategories.GROUP_FR);
+/* rizq_categories_config.js محمّل بـ defer فيُنفَّذ بعد السكربت المضمّن —
+   لذلك يجب دمج SUB_FR/GROUP_FR عند الاستعمال وليس عند التحليل. */
+function mergeSubFrFromConfig() {
+  try {
+    if (typeof RizqCategories === 'undefined') return;
+    if (RizqCategories.SUB_FR) Object.assign(SUB_FR, RizqCategories.SUB_FR);
+    if (RizqCategories.GROUP_FR) Object.assign(SUB_FR, RizqCategories.GROUP_FR);
+  } catch (eMergeSub) { /* ignore */ }
+  window._subFR = SUB_FR;
 }
+mergeSubFrFromConfig();
 window._subFR = SUB_FR;
 
 function translateCatTaxonomy(toFr) {
+  mergeSubFrFromConfig();
   document.querySelectorAll('.drop-link, .drop-group-title').forEach(function(el) {
     if (el.closest('[data-extra="1"], [data-suggest="1"]')) return;
     var current = (el.textContent || '').trim();
@@ -5303,6 +5321,7 @@ function applyLandingLang(toAr) {
   isAr = !!toAr;
   const lang = isAr ? 'ar' : 'fr';
   try { localStorage.setItem('rizq_lang', lang); } catch(e) {}
+  mergeSubFrFromConfig();
   const t = LANG[lang] || LANG.ar || {};
   if (!t || typeof t !== 'object') return;
 
