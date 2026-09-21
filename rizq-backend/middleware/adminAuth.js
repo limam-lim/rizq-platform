@@ -1,6 +1,9 @@
 /**
  * مصادقة الأدمن — جلسة x-admin-token (المتصفح) أو سرّ خادمي (سكربتات فقط)
  */
+const { timingSafeEqualStr } = require('../lib/secureCompare');
+const { isProdEnv } = require('./accountAuth');
+
 function createAdminAuth(deps) {
   const adminSessions = deps.adminSessions;
   const sharedSecret = () => process.env.BACKEND_SHARED_SECRET || '';
@@ -37,8 +40,8 @@ function createAdminAuth(deps) {
     }
     const got = req.header('x-rizq-secret');
     const secret = sharedSecret();
-    if (secret && got && got === secret) {
-      if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+    if (secret && got && timingSafeEqualStr(got, secret)) {
+      if (isProdEnv() && isBrowserOrigin(req)) {
         return res.status(403).json({ error: 'server_secret_browser_forbidden' });
       }
       req.adminUser = { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
@@ -67,10 +70,10 @@ function createAdminAuth(deps) {
   function requireSharedSecret(req, res, next) {
     const got = req.header('x-rizq-secret');
     const secret = sharedSecret();
-    if (!secret || got !== secret) {
+    if (!secret || !got || !timingSafeEqualStr(got, secret)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    if (process.env.NODE_ENV === 'production' && isBrowserOrigin(req)) {
+    if (isProdEnv() && isBrowserOrigin(req)) {
       return res.status(403).json({ error: 'server_secret_browser_forbidden' });
     }
     next();

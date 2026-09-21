@@ -1,8 +1,8 @@
 /**
- * tenderDocument.js — رفع ملف مناقصة PDF (محمي — لا يُخدم مباشرة عبر static)
+ * tenderDocument.js — رفع ملف مناقصة PDF عبر objectStorage
  */
-const fs = require('fs');
 const path = require('path');
+const objectStorage = require('../lib/objectStorage');
 
 let pdfParse = null;
 try {
@@ -37,12 +37,16 @@ function parseDataUriPdf(dataUri) {
   return { buf };
 }
 
-/**
- * @returns {Promise<string|null>} internal path e.g. /uploads/tenders/TND_x/document.pdf
- */
 async function saveTenderDocument(tenderId, document) {
   if (!document || typeof document !== 'string') return null;
-  if (document.indexOf(PDF_UPLOAD_PREFIX) === 0) return document;
+  // قبول مسار موجود فقط إن كان تحت بادئة هذا المناقصة نفسه (منع IDOR)
+  const ownedPrefix = PDF_UPLOAD_PREFIX + String(tenderId) + '/';
+  if (document.indexOf(PDF_UPLOAD_PREFIX) === 0) {
+    if (document.indexOf(ownedPrefix) === 0 && !document.includes('..')) return document;
+    const err = new Error('document_path_forbidden');
+    err.code = 'document_path_forbidden';
+    throw err;
+  }
 
   const parsed = parseDataUriPdf(document);
   if (!parsed || parsed.error) {
@@ -51,19 +55,24 @@ async function saveTenderDocument(tenderId, document) {
     throw err;
   }
 
-  const dir = path.join(__dirname, '..', 'uploads', 'tenders', tenderId);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const outPath = path.join(dir, 'document.pdf');
-  fs.writeFileSync(outPath, parsed.buf);
-  return PDF_UPLOAD_PREFIX + tenderId + '/document.pdf';
+  const key = 'tenders/' + tenderId + '/document.pdf';
+  const saved = await objectStorage.putObject({
+    key,
+    buffer: parsed.buf,
+    contentType: 'application/pdf',
+  });
+  return saved.url;
 }
 
-/**
- * @returns {Promise<string|null>} /uploads/investments/<id>/document.pdf
- */
 async function saveInvestmentDocument(invId, document) {
   if (!document || typeof document !== 'string') return null;
-  if (document.indexOf(INV_PDF_UPLOAD_PREFIX) === 0) return document;
+  const ownedPrefix = INV_PDF_UPLOAD_PREFIX + String(invId) + '/';
+  if (document.indexOf(INV_PDF_UPLOAD_PREFIX) === 0) {
+    if (document.indexOf(ownedPrefix) === 0 && !document.includes('..')) return document;
+    const err = new Error('document_path_forbidden');
+    err.code = 'document_path_forbidden';
+    throw err;
+  }
 
   const parsed = parseDataUriPdf(document);
   if (!parsed || parsed.error) {
@@ -72,21 +81,29 @@ async function saveInvestmentDocument(invId, document) {
     throw err;
   }
 
-  const dir = path.join(__dirname, '..', 'uploads', 'investments', invId);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const outPath = path.join(dir, 'document.pdf');
-  fs.writeFileSync(outPath, parsed.buf);
-  return INV_PDF_UPLOAD_PREFIX + invId + '/document.pdf';
+  const key = 'investments/' + invId + '/document.pdf';
+  const saved = await objectStorage.putObject({
+    key,
+    buffer: parsed.buf,
+    contentType: 'application/pdf',
+  });
+  return saved.url;
 }
 
 function resolveTenderUploadAbsPath(relativePath) {
   if (!relativePath || typeof relativePath !== 'string') return null;
-  const rel = relativePath.replace(/^\/uploads\//, '');
-  if (!rel.startsWith('tenders/')) return null;
-  const abs = path.resolve(path.join(__dirname, '..', 'uploads', rel));
-  const base = path.resolve(path.join(__dirname, '..', 'uploads', 'tenders'));
-  if (!abs.startsWith(base + path.sep) && abs !== base) return null;
-  return abs;
+  try {
+    const abs = objectStorage.resolveLocalPath(relativePath);
+    const baseT = path.resolve(objectStorage.LOCAL_ROOT, 'tenders');
+    const baseI = path.resolve(objectStorage.LOCAL_ROOT, 'investments');
+    if (abs.startsWith(baseT + path.sep) || abs === baseT) return abs;
+    if (abs.startsWith(baseI + path.sep) || abs === baseI) return abs;
+    // توافق قديم: tenders فقط
+    if (!String(relativePath).includes('tenders/')) return null;
+    return abs.startsWith(baseT + path.sep) ? abs : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 const resolveTenderDocumentAbsPath = resolveTenderUploadAbsPath;

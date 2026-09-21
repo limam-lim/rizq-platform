@@ -6,8 +6,6 @@
  * responses. Frontend blur is UX only; this module is the source of truth.
  * ══════════════════════════════════════════════════════════════════
  */
-const fs = require('fs');
-const path = require('path');
 const { getAccountRecord, sendSMS, sendWhatsApp } = require('../rizq_package_lifecycle_agent');
 const {
   getEntitlements,
@@ -16,8 +14,8 @@ const {
   isPaymentConfirmed,
   ACTIVE_STATUSES,
 } = require('./entitlements');
+const repos = require('../db/repos');
 
-const FOMO_LOG_FILE = path.join(__dirname, '..', 'data', 'contact-fomo-log.json');
 const FOMO_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour per target account
 
 const FOMO_MSG_AR = 'عميل محتمل حاول التواصل مع نشاطك أو الاطلاع على بياناتك! جدّد أو رقِّ اشتراكك الآن لفتح العملاء المباشرين.';
@@ -205,7 +203,8 @@ function toPublicAccountGated(acc, gate) {
   out.whatsapp = contact.whatsapp;
   out.hidePhone = contact.hidePhone;
   if (gate) out.contactAccess = { lockReason: gate.lockReason, fomoEligible: gate.fomoEligible };
-  if (Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
+  // طرق الدفع حساسة — تُكشف فقط بعد فتح بوابة التواصل
+  if (gate && gate.contactsUnlocked && Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
     out.paymentMethods = acc.paymentMethods.slice(0, 10);
   }
   return out;
@@ -232,18 +231,15 @@ function toPublicAdGated(ad, gate, sellerAccount) {
 }
 
 function _readFomoLog() {
-  try {
-    if (fs.existsSync(FOMO_LOG_FILE)) return JSON.parse(fs.readFileSync(FOMO_LOG_FILE, 'utf8'));
-  } catch (e) { /* ignore */ }
-  return {};
+  return repos.contactFomo.asMap();
 }
 
 function _writeFomoLog(log) {
-  try {
-    const dir = path.dirname(FOMO_LOG_FILE);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(FOMO_LOG_FILE, JSON.stringify(log, null, 2), 'utf8');
-  } catch (e) { /* ignore */ }
+  // يُستدعى عادة بعد تحديث مفتاح واحد — خزّن ذرياً
+  const map = log && typeof log === 'object' ? log : {};
+  Object.keys(map).forEach((key) => {
+    repos.contactFomo.upsert(String(key), map[key]);
+  });
 }
 
 function _normalizePhoneE164(phone) {
@@ -265,13 +261,11 @@ async function notifyContactAttemptFomo(targetAccountId, module, opts) {
   }
 
   const pkgRec = getAccountRecord(targetAccountId);
-  const accountsFile = path.join(__dirname, '..', 'data', 'accounts.json');
   let accPhone = pkgRec && pkgRec.accountPhone;
   let accEmail = pkgRec && pkgRec.accountEmail;
   if (!accPhone || !accEmail) {
     try {
-      const list = JSON.parse(fs.readFileSync(accountsFile, 'utf8'));
-      const acc = list.find((a) => a.id === targetAccountId);
+      const acc = repos.accounts.getById(targetAccountId);
       if (acc) {
         accPhone = accPhone || acc.phone;
         accEmail = accEmail || acc.email;

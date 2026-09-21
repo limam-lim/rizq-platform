@@ -1,32 +1,16 @@
 /**
- * أدوات مدير رزق الذكي — استعلامات حتمية من قاعدة البيانات (JSON/SQLite)
+ * أدوات مدير رزق الذكي — استعلامات حتمية من قاعدة البيانات (SQLite عبر repos)
  * بدون تخمين — تُستدعى عبر function calling في /api/widget/chat
  */
-const fs = require('fs');
-const path = require('path');
 const { saveTicket } = require('./agentTickets');
 const { getLivePackagesForAI, normalizeCatalogKey } = require('./packageCatalogLive');
 const { handleLeadEscalation } = require('./leadEscalation');
+const repos = require('../db/repos');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const ADS_FILE = path.join(DATA_DIR, 'ads.json');
-const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
-const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
-const AD_BOOSTS_FILE = path.join(DATA_DIR, 'ad_boosts.json');
-
-function readJson(file, fallback) {
-  try {
-    if (!fs.existsSync(file)) return fallback;
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch (e) {
-    return fallback;
-  }
-}
-
-function readAds() { return readJson(ADS_FILE, []); }
-function readAccounts() { return readJson(ACCOUNTS_FILE, []); }
-function readReviews() { return readJson(REVIEWS_FILE, {}); }
-function readAdBoosts() { return readJson(AD_BOOSTS_FILE, {}); }
+function readAds() { return repos.ads.list(); }
+function readAccounts() { return repos.accounts.list(); }
+function readReviews() { return repos.reviews.asMap(); }
+function readAdBoosts() { return repos.adBoosts.asMap(); }
 
 const ACCOUNT_PUBLIC = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'category',

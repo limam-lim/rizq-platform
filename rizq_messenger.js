@@ -529,6 +529,10 @@
           if (data && data.message && data.message.threadKey) _state.threadKey = data.message.threadKey;
           else if (data && data.threadKey) _state.threadKey = data.threadKey;
           if (data && data.message && data.message.id) _state.seenServerIds[data.message.id] = true;
+          if (data && data.guestThreadToken) {
+            _state.guestThreadToken = data.guestThreadToken;
+            try { sessionStorage.setItem('rzq_guest_tok_' + _state.threadKey, data.guestThreadToken); } catch (eTok) {}
+          }
           return data;
         });
       };
@@ -553,9 +557,18 @@
       }).catch(function(){ return null; });
     }
     var phone = String(_state.buyerPhone || '').replace(/\D/g, '');
+    var gTok = _state.guestThreadToken || '';
+    if (!gTok) {
+      try { gTok = sessionStorage.getItem('rzq_guest_tok_' + _state.threadKey) || ''; } catch (eG) {}
+      if (gTok) _state.guestThreadToken = gTok;
+    }
     if (phone) {
       url += (url.indexOf('?') >= 0 ? '&' : '?') + 'buyerPhone=' + encodeURIComponent(phone);
       headers['x-guest-phone'] = phone;
+    }
+    if (gTok) {
+      url += (url.indexOf('?') >= 0 ? '&' : '?') + 'guestThreadToken=' + encodeURIComponent(gTok);
+      headers['x-guest-thread-token'] = gTok;
     }
     return fetch(url, { headers: headers, cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : null; })

@@ -1,16 +1,40 @@
 /**
  * OTP — إرسال/تحقق رمز الهاتف (+ البريد للمشتري)
+ * التخزين عبر طبقة repos (SQLite) — بلا JSON تشغيلي.
  */
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const { sendSMS } = require('../rizq_package_lifecycle_agent');
+const repos = require('../db/repos');
 
-const FILE = path.join(__dirname, '..', 'data', 'otp-store.json');
 const TTL_MS = 5 * 60 * 1000;
 const VERIFY_WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
+const RESEND_COOLDOWN_MS = 60 * 1000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** destination key → last send timestamp (anti-bombing) */
+const _otpLastSend = new Map();
+
+function assertOtpCooldown(destKey) {
+  const key = String(destKey || '').toLowerCase();
+  if (!key) return { ok: true };
+  const last = _otpLastSend.get(key) || 0;
+  const wait = RESEND_COOLDOWN_MS - (Date.now() - last);
+  if (wait > 0) {
+    return {
+      ok: false,
+      error: 'cooldown',
+      message: 'انتظر قليلاً قبل طلب رمز جديد',
+      retryAfterSec: Math.ceil(wait / 1000),
+    };
+  }
+  return { ok: true };
+}
+
+function markOtpSent(destKey) {
+  const key = String(destKey || '').toLowerCase();
+  if (key) _otpLastSend.set(key, Date.now());
+}
 
 let _mailer = null;
 function getMailer() {
@@ -68,18 +92,11 @@ function isDemoOtpAllowed() {
 }
 
 function readStore() {
-  try {
-    if (!fs.existsSync(FILE)) return [];
-    return JSON.parse(fs.readFileSync(FILE, 'utf8'));
-  } catch (e) {
-    return [];
-  }
+  return repos.listOtp();
 }
 
 function writeStore(list) {
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf8');
+  repos.replaceOtpStore(Array.isArray(list) ? list : []);
 }
 
 function normalizePhone(phone) {
@@ -118,7 +135,13 @@ function isValidMauritanianPhone(ph) {
 }
 
 function otpPepper() {
-  return process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || 'rizq-otp-pepper';
+  const pepper = String(process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim();
+  if (pepper) return pepper;
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  if (isProd) {
+    throw new Error('OTP_PEPPER or BACKEND_SHARED_SECRET required in production');
+  }
+  return 'rizq-otp-pepper-dev-only';
 }
 
 function escapeHtml(s) {
@@ -137,8 +160,10 @@ function codesMatch(submitted, record) {
   if (!record) return false;
   const plain = String(submitted || '').replace(/\D/g, '');
   if (plain.length !== 6) return false;
-  if (record.codeHash) return hashOtpCode(plain) === record.codeHash;
-  return plain === String(record.code || '');
+  /* رفض أي سجل بلا codeHash — لا مقارنة نصّية صريحة أبداً */
+  if (!record.codeHash) return false;
+  const { timingSafeEqualStr } = require('../lib/secureCompare');
+  return timingSafeEqualStr(hashOtpCode(plain), record.codeHash);
 }
 
 function generateCode() {
@@ -170,6 +195,13 @@ async function sendOtp(phone, opts) {
     return { ok: false, error: 'invalid_email', message: 'بريد إلكتروني غير صالح' };
   }
 
+  const coolPhone = assertOtpCooldown('phone:' + ph);
+  if (!coolPhone.ok) return coolPhone;
+  if (email) {
+    const coolEmail = assertOtpCooldown('email:' + email);
+    if (!coolEmail.ok) return coolEmail;
+  }
+
   const code = generateCode();
   const now = Date.now();
   const list = readStore().filter((x) => x.phone !== ph);
@@ -197,6 +229,9 @@ async function sendOtp(phone, opts) {
     const mail = await sendOtpEmail(email, code, name);
     sentViaEmail = !!(mail && mail.ok);
   }
+
+  markOtpSent('phone:' + ph);
+  if (email) markOtpSent('email:' + email);
 
   const out = { ok: true, expiresIn: Math.floor(TTL_MS / 1000), sentViaSms, sentViaEmail };
   const cfg = getPublicOtpConfig();
@@ -281,6 +316,13 @@ async function sendBuyerOtp(payload) {
     return { ok: false, error: 'phone_required', message: 'أدخل هاتفاً موريتانياً أو رقماً دولياً' };
   }
 
+  const coolEmail = assertOtpCooldown('email:' + email);
+  if (!coolEmail.ok) return coolEmail;
+  if (isValidMauritanianPhone(mr)) {
+    const coolPhone = assertOtpCooldown('phone:' + mr);
+    if (!coolPhone.ok) return coolPhone;
+  }
+
   const code = generateCode();
   const now = Date.now();
   const key = buyerStoreKey(email);
@@ -309,6 +351,9 @@ async function sendBuyerOtp(payload) {
 
   const mail = await sendOtpEmail(email, code, name);
   const sentViaEmail = !!(mail && mail.ok);
+
+  markOtpSent('email:' + email);
+  if (isValidMauritanianPhone(mr)) markOtpSent('phone:' + mr);
 
   const out = { ok: true, expiresIn: Math.floor(TTL_MS / 1000), sentViaSms, sentViaEmail, channel: 'buyer' };
   const cfg = getPublicOtpConfig();
@@ -424,8 +469,9 @@ async function sendSellerResetOtp(email, opts) {
   const out = Object.assign({}, generic, { sentViaEmail });
   const cfg = getPublicOtpConfig();
   if (cfg.devHintEnabled && !sentViaEmail) out.devHint = code;
+  // لا نُرجع emailWarning — كان يكشف وجود الحساب عندما يفشل الإرسال فقط للحسابات الموجودة
   if (!sentViaEmail && !cfg.devHintEnabled) {
-    out.emailWarning = 'تعذّر إرسال البريد — تحقق من العنوان أو حاول لاحقاً';
+    console.warn('[otp/seller-reset] email send failed for existing account');
   }
   return out;
 }

@@ -18,7 +18,8 @@
  * متغيرات .env المطلوبة:
  *   WHATSAPP_TOKEN=EAA...       (من Meta App → WhatsApp → Access Token)
  *   WHATSAPP_PHONE_ID=1234...   (Phone Number ID في Meta Console)
- *   WHATSAPP_VERIFY_TOKEN=rizq_secret_2025
+ *   WHATSAPP_VERIFY_TOKEN=<سرّ عشوائي قوي>
+ *   WHATSAPP_APP_SECRET=<App Secret من Meta>  (للتحقق من X-Hub-Signature-256)
  *   ANTHROPIC_API_KEY=sk-ant-...
  * ══════════════════════════════════════════════════════
  */
@@ -27,7 +28,9 @@
 
 require('dotenv').config();
 
+const crypto     = require('crypto');
 const express    = require('express');
+const { requireSatelliteSecret } = require('./rizq-backend/lib/satelliteAuth');
 const bodyParser = require('body-parser');
 const axios      = require('axios');
 const { askAgent } = require('./rizq_agent_brain');
@@ -41,7 +44,16 @@ loadDemoSubscribers();
 const app  = express();
 const PORT = process.env.WA_PORT || 3002;
 
-app.use(bodyParser.json());
+function isProdEnv() {
+  return process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+}
+
+/* احتفظ بالنص الخام قبل JSON للتحقق من توقيع Meta */
+app.use(bodyParser.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  },
+}));
 
 // نفس API التسجيل المتاحة في خادم المكالمات — الآن كلا الخادمين يتشاركان
 // نفس ملف rizq_subscribers_store.json فمشترك يُسجَّل من أي منهما يظهر للآخر
@@ -51,12 +63,37 @@ setupSubscriberAPI(app);
 const WA_CONFIG = {
   TOKEN      : process.env.WHATSAPP_TOKEN       || '',
   PHONE_ID   : process.env.WHATSAPP_PHONE_ID    || '',
-  VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN || 'rizq_secret_2025',
+  /* بلا قيمة افتراضية — فشل مغلق إن غاب المتغير */
+  VERIFY_TOKEN: String(process.env.WHATSAPP_VERIFY_TOKEN || '').trim(),
+  APP_SECRET : String(process.env.WHATSAPP_APP_SECRET || '').trim(),
   API_VERSION: 'v20.0',
 
   // رسالة ترحيب تلقائية لأول رسالة
   WELCOME_TRIGGER: ['السلام', 'مرحبا', 'hello', 'bonjour', 'salut', 'hi', 'salam']
 };
+
+function verifyMetaSignature(req) {
+  const secret = WA_CONFIG.APP_SECRET;
+  if (!secret) {
+    /* في الإنتاج يلزم السرّ؛ في التطوير نسمح بدون توقيع مع تحذير */
+    return !isProdEnv();
+  }
+  const header = String(req.header('x-hub-signature-256') || '');
+  const match = /^sha256=(.+)$/i.exec(header);
+  if (!match) return false;
+  const raw = req.rawBody;
+  if (!raw || !Buffer.isBuffer(raw)) return false;
+  const expected = crypto.createHmac('sha256', secret).update(raw).digest('hex');
+  const got = match[1];
+  try {
+    const a = Buffer.from(expected, 'hex');
+    const b = Buffer.from(String(got), 'hex');
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  } catch (e) {
+    return false;
+  }
+}
 
 // ── سجل المحادثات (واتساب) ──────────────────────────────
 const waLog = [];
@@ -117,6 +154,11 @@ app.get('/api/whatsapp', (req, res) => {
   const token     = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
+  if (!WA_CONFIG.VERIFY_TOKEN) {
+    console.error('❌ WHATSAPP_VERIFY_TOKEN غير مضبوط — رفض Handshake');
+    return res.sendStatus(503);
+  }
+
   if(mode === 'subscribe' && token === WA_CONFIG.VERIFY_TOKEN) {
     console.log('✅ Meta Webhook تم التحقق بنجاح');
     return res.status(200).send(challenge);
@@ -130,6 +172,10 @@ app.get('/api/whatsapp', (req, res) => {
 //  POST /api/whatsapp — استقبال الرسائل الواردة
 // ══════════════════════════════════════════════════════════
 app.post('/api/whatsapp', async (req, res) => {
+  if (!verifyMetaSignature(req)) {
+    console.warn('❌ توقيع Meta Webhook غير صالح أو مفقود');
+    return res.sendStatus(403);
+  }
   // رد فوري بـ 200 لـ Meta (لا تنتظر المعالجة)
   res.sendStatus(200);
 
@@ -237,12 +283,12 @@ app.post('/api/whatsapp', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  API: سجل محادثات واتساب للأدمن
 // ══════════════════════════════════════════════════════════
-app.get('/api/whatsapp-log', (req, res) => {
+app.get('/api/whatsapp-log', requireSatelliteSecret, (req, res) => {
   res.json({ messages: waLog.slice(0, 50) });
 });
 
 // ── API: إرسال رسالة يدوية من الأدمن ─────────────────────
-app.post('/api/whatsapp/send', async (req, res) => {
+app.post('/api/whatsapp/send', requireSatelliteSecret, async (req, res) => {
   const { to, text } = req.body;
   if(!to || !text) return res.status(400).json({ ok: false, error: 'to + text مطلوبان' });
   const result = await sendWhatsAppMessage(to, text);
@@ -250,7 +296,7 @@ app.post('/api/whatsapp/send', async (req, res) => {
 });
 
 // ── API: الحالة ──────────────────────────────────────────
-app.get('/api/status', (req, res) => {
+app.get('/api/status', requireSatelliteSecret, (req, res) => {
   res.json({
     status         : 'running',
     port           : PORT,
@@ -264,7 +310,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // ── صفحة الحالة HTML ─────────────────────────────────────
-app.get('/', (req, res) => {
+app.get('/', requireSatelliteSecret, (req, res) => {
   res.send(`
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">
     <h1>📱 مدير رزق الذكي v1 — خادم واتساب</h1>
@@ -282,9 +328,18 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
+  if (isProdEnv() && !WA_CONFIG.VERIFY_TOKEN) {
+    console.error('[FATAL] WHATSAPP_VERIFY_TOKEN required in production');
+    process.exit(1);
+  }
+  if (isProdEnv() && !WA_CONFIG.APP_SECRET) {
+    console.error('[FATAL] WHATSAPP_APP_SECRET required in production');
+    process.exit(1);
+  }
   console.log(`\n📱 رزق WhatsApp Handler v1 (Claude-Powered) — المنفذ: ${PORT}`);
   console.log(`   Webhook → Meta: https://YOUR-DOMAIN/api/whatsapp`);
-  console.log(`   Verify Token: ${WA_CONFIG.VERIFY_TOKEN}`);
+  console.log(`   Verify Token: ${WA_CONFIG.VERIFY_TOKEN ? '✅ مضبوط' : '❌ مفقود'}`);
+  console.log(`   App Secret: ${WA_CONFIG.APP_SECRET ? '✅ مضبوط' : '❌ مفقود'}`);
   console.log(`   Anthropic Key: ${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود في .env'}`);
   console.log(`   WA Token: ${WA_CONFIG.TOKEN ? '✅ موجود' : '❌ مفقود في .env'}\n`);
 });

@@ -46,9 +46,14 @@ function getAccountInfo(accountId, readAccounts) {
 function activateVideoAdOnServer(req) {
   if (!req.videoUrl) return { ok: true, skipped: true, reason: 'no_video_url' };
   const cfg = readSiteConfigRaw();
-  const videoAds = cfg.videoAds && typeof cfg.videoAds === 'object'
-    ? { hero: cfg.videoAds.hero || [], popup: cfg.videoAds.popup || [] }
-    : { hero: [], popup: [] };
+  const prev = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
+  const videoAds = {
+    hero: prev.hero || [],
+    popup: prev.popup || [],
+    platformPromoUrl: prev.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4',
+    platformPromoEnabled: prev.platformPromoEnabled !== false,
+    adSlotSeconds: Number(prev.adSlotSeconds) || 25,
+  };
 
   const videoPkgs = (cfg.packages && Array.isArray(cfg.packages.video)) ? cfg.packages.video.filter((p) => p && p.active !== false) : [];
   const defaults = [{ price: 5000 }, { price: 12000 }, { price: 25000 }];

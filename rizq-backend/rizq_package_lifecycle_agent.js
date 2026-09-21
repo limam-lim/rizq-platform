@@ -23,25 +23,26 @@
  * قرأ كود الصفحة بالكامل.
  * ══════════════════════════════════════════════════════════════════
  */
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const { resolveDiamondTier, isTrialPackage } = require('./services/catalogConfig');
-
-const DATA_DIR = path.join(__dirname, 'data');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-const STORE_FILE = path.join(DATA_DIR, 'account-packages.json');
+const repos = require('./db/repos');
 
 const REMINDER_WINDOWS_DAYS = [3, 1]; // نُذكّر عند تبقّي 3 أيام ويوم واحد
 
-// ── تخزين على ملف JSON (نفس نمط rizq_subscribers_store.json الذي أثبت
-//    عمله عبر عمليات Node منفصلة) ──────────────────────────────────────
+// ── تخزين عبر repos (SQLite) — JSON للنسخ الاحتياطي فقط ───────────────
 function _load() {
-  try { return JSON.parse(fs.readFileSync(STORE_FILE, 'utf8')); } catch (e) { return {}; }
+  return repos.listPackagesMap();
 }
 function _save(store) {
-  try { fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2), 'utf8'); }
-  catch (e) { console.error('⚠️ فشل حفظ account-packages.json:', e.message); }
+  const map = store && typeof store === 'object' ? store : {};
+  const invoiceSeq = map.__invoiceSeq || 0;
+  const entries = [];
+  Object.keys(map).forEach((key) => {
+    if (key === '__invoiceSeq' || key === '__meta') return;
+    entries.push({ id: key, data: map[key] });
+  });
+  entries.push({ id: '__meta', data: { invoiceSeq } });
+  repos.packages.replaceAll(entries);
 }
 
 function _genToken() { return crypto.randomBytes(20).toString('hex'); }
@@ -553,8 +554,12 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   app.get('/api/account-package/:id', (req, res) => {
     const rec = getAccountRecord(req.params.id);
     if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
-    const token = req.header('x-account-token') || req.query.token;
-    if (!token || token !== rec.accessToken) return res.status(401).json({ error: 'unauthorized' });
+    // رأس فقط — لا نقبل ?token=
+    const token = String(req.header('x-account-token') || '').trim();
+    const { timingSafeEqualStr } = require('./lib/secureCompare');
+    if (!token || !rec.accessToken || !timingSafeEqualStr(token, rec.accessToken)) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
     const { accessToken, ...safe } = rec; // لا نُعيد التوكن نفسه في الرد
     let entitlements = null;
     try {

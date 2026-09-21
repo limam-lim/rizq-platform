@@ -247,7 +247,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 }
 </style>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
@@ -261,7 +261,8 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_account_route.js?v=9"></script>
+<script src="rizq_dashboard_shared.js?v=1"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -701,8 +702,6 @@ const IS_DEMO=params.get('demo')==='1';
   }
 })();
 
-function escapeHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function escapeAttr(s){if(!s)return'';return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 const DEMO_ACC={id:'DEMO_OFF',token:'DEMO',status:'approved',type:'office',
   name:'مكتب المستقبل للخدمات الإدارية',owner:'أحمد ولد محمد',
@@ -823,22 +822,8 @@ function renderReferralPanel(){
       '<div>🎁 <b>'+data.bonusDaysTotal+'</b> '+_t2('يوماً مجانياً مكتسباً','jours gratuits gagnés')+'</div>';
   }).catch(function(){});
 }
-function copyReferralLink(){
-  var input = document.getElementById('referral-link-input');
-  if(!input || !input.value) return;
-  navigator.clipboard.writeText(input.value).then(function(){
-    if(typeof showToast==='function') showToast(_t2('✅ تم نسخ الرابط','✅ Lien copié'),'success');
-  }).catch(function(){});
-}
 
 /* ── شارة "موثّق⁺" (Verified+) — مهمة #232 ── */
-function _verifiedPlusPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_verified_plus_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [{name:'سنوية', price:5000, duration:'سنة'}];
-}
 
 function renderVerifiedPlusPanel(){
   var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
@@ -882,18 +867,6 @@ function renderVerifiedPlusPanel(){
 }
 
 /* ══ غرفة المناقصات — مناقصاتي المنشورة + العروض المقدَّمة عليها ══ */
-function _tenderPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_tender_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [
-    {name:'تجريبية', price:0,     duration:'10 أيام'},
-    {name:'شهرية', price:5000,  duration:'شهر'},
-    {name:'ربعية', price:13500, duration:'3 أشهر'},
-    {name:'سنوية', price:45000, duration:'12 شهر'}
-  ];
-}
 
 function renderTenderSubStatus(){
   var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
@@ -936,13 +909,6 @@ function renderTenderSubStatus(){
     });
 }
 
-function _tenderStatusBadgeOwner(t, fr){
-  var s = t.status || 'open';
-  if(s==='pending_review') return '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px;margin-left:6px">⏳ '+(fr?'En révision':'قيد المراجعة')+'</span>';
-  if(s==='rejected') return '<span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:6px">❌ '+(fr?'Refusée':'مرفوضة')+'</span>';
-  if(s==='open') return '<span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin-left:6px">✅ '+(fr?'Publiée':'منشورة')+'</span>';
-  return '';
-}
 function renderMyTenders(){
   var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
   var el = document.getElementById('tenders-mine-list');
@@ -1175,15 +1141,12 @@ function loadActivatedPackage(acc) {
 }
 
 function init(){
-  const acc=verifyAccess();
-  if(acc){ _initWithAccount(acc); return; }
-  if(acc===null && !IS_DEMO && SESSION_ID && SESSION_TOKEN){
-    verifyAccessRemote().then(function(remoteAcc){
-      if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
-    });
-  } else {
-    showAccessDenied();
-  }
+  if(IS_DEMO){ _initWithAccount(DEMO_ACC); return; }
+  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده
+  verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
+  });
 }
 
 function _initWithAccount(acc){
@@ -1992,7 +1955,6 @@ function logout(){
   }
   window.location.href='rizq_landing_v8.html';
 }
-function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 
 // ── ترجمات AR / FR — داشبورد المكتب ─────────────────────────
 var _officeLang = (function(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } })();
@@ -2313,10 +2275,6 @@ function openPayModal(pkgName, pkgPrice, category){
   document.body.style.overflow = 'hidden';
 }
 
-function closePayModal(){
-  document.getElementById('pay-modal').style.display = 'none';
-  document.body.style.overflow = '';
-}
 
 function switchPayTab(btn, type){
   var modal = btn.closest('#pay-modal') || document.getElementById('pay-modal');

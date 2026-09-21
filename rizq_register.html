@@ -498,7 +498,11 @@
     if (busy) return;
     var data = readBuyer();
     if (!data) return;
-    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
+    try {
+      var draftSafe = Object.assign({}, data);
+      delete draftSafe.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSafe));
+    } catch (e) {}
     pending = { data: data };
     busy = true;
     var btn = document.getElementById('btn-send-otp');
@@ -516,25 +520,12 @@
     }
 
     var base = api();
-    if (!base || isLocal()) {
-      /* محلي: فحص سريع ثم تجريبي */
-      if (!base) return localOtp();
-      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
-        if (!h.ok) return localOtp();
-        fetchJson(base + '/api/otp/send', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ channel: 'buyer', email: data.email, name: data.name, phoneMr: data.phoneMr, phoneIntl: data.phoneIntl, whatsapp: data.whatsapp })
-        }, 4000).then(function (r) {
-          busy = false;
-          btn.disabled = !document.getElementById('b-terms').checked;
-          btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
-          if (!r.ok || !r.body || !r.body.ok) return localOtp();
-          var msg = t('تم إرسال الرمز إلى بريدك.', 'Code envoyé.');
-          if (r.body.devHint) msg += ' ' + t('رمز التطوير:', 'Code:') + ' ' + r.body.devHint;
-          setStatus(msg, 'ok');
-          show('panel-otp');
-        }).catch(localOtp);
-      }).catch(localOtp);
+    /* أمان: لا تفعيل وهمي إذا كان الخادم متاحاً */
+    if (!base) {
+      setStatus(t('الخادم غير مُضبّط — لا يمكن التفعيل الآمن', 'Serveur non configuré'), 'bad');
+      busy = false;
+      btn.disabled = !document.getElementById('b-terms').checked;
+      btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
       return;
     }
 
@@ -578,40 +569,19 @@
     function doneLocal() {
       btn.disabled = false;
       btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
-      finishOk(data);
+      setStatus(t('التفعيل الآمن يتطلب الخادم — أعد المحاولة', 'Activation sécurisée requiert le serveur'), 'bad');
+      busy = false;
     }
 
-    if (pending.local || !api() || isLocal()) {
-      var base = api();
-      if (!base || pending.local) return doneLocal();
-      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
-        if (!h.ok) return doneLocal();
-        fetchJson(base + '/api/otp/verify', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
-        }, 4000).then(function (r) {
-          if (!r.ok || !r.body || !r.body.ok) return doneLocal();
-          return fetchJson(base + '/api/auth/register', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          }, 4000).then(function (r2) {
-            btn.disabled = false;
-            btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
-            if (!r2.ok || !r2.body || !r2.body.ok) return finishOk(data);
-            finishOk(data, {
-              id: (r2.body.buyer && r2.body.buyer.id) || r2.body.id,
-              token: r2.body.token,
-              name: (r2.body.buyer && r2.body.buyer.name) || data.name,
-              email: data.email,
-              phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
-            });
-          }).catch(doneLocal);
-        }).catch(doneLocal);
-      }).catch(doneLocal);
-      return;
+    if (pending.local) {
+      return doneLocal();
     }
 
     var base = api();
+    if (!base) {
+      return doneLocal();
+    }
+
     fetchJson(base + '/api/otp/verify', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
