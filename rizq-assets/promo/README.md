@@ -1,11 +1,13 @@
 # Rizq platform promo (Hero loop starter)
 
-- `rizq-platform-promo-light.mp4` — ~730KB, 960p, ~23s (default Hero seed)
-- `rizq-platform-promo.mp4` — higher bitrate master
+Professional promotional cut (~27s) with branded stills + live product/dashboard shots and bilingual slogans.
 
-Playback order in `rizq_video_ads.js`:
-1. This platform promo
-2. Paid Rizq ADS hero advertisers (YouTube/Facebook)
+- `rizq-platform-promo.mp4` — master (higher bitrate)
+- `rizq-platform-promo-light.mp4` — Hero default (web-optimized)
+
+Playback order (`rizq_video_ads.js`):
+1. Platform promo
+2. Paid Rizq ADS hero advertisers
 3. Back to platform promo
 
-Configured via `site-config.videoAds.platformPromoUrl` / `platformPromoEnabled`.
+Config: `site-config.videoAds.platformPromoUrl` / `platformPromoEnabled` / `adSlotSeconds`.
