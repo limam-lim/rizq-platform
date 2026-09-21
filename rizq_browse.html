@@ -1628,6 +1628,25 @@ function _rizqFetchAndOpenAd(id){
 }
 const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
 
+/* Showcase featured ads from landing (ids 201–210) so deep-links work even without handoff */
+(function _injectFeaturedShowcase(){
+  var showcase = [
+    {id:201,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appartement de luxe 3 pièces — Nouakchott Ouest',desc:'تشطيب عالي الجودة، إطلالة بانورامية على المدينة، تكييف مركزي في كل الغرف، حراسة 24/7، موقف سيارات خاص.',descFr:'Finition haut de gamme, vue panoramique, climatisation centrale, sécurité 24/7, parking privé.',price:'150,000 MRU/شهر',priceNum:150000,verified:true,pin:true,emoji:'🏠',loc:'📍 نواكشوط الغربية',seller:'محمد الأمين'},
+    {id:202,subcat:'شاحنات للبيع',cat:'شاحنات',wilaya:'نواكشوط',title:'حفارة Caterpillar 320D — بحالة ممتازة',titleFr:'Pelleteuse Caterpillar 320D — excellent état',desc:'ساعات عمل منخفضة جداً (3200 ساعة فقط)، جاهزة للتسليم الفوري مع ضمان ستة أشهر.',descFr:'Très peu d\'heures (3200h), prête à livrer avec garantie six mois.',price:'35,000,000 MRU',priceNum:35000000,verified:true,pin:false,emoji:'🚛',loc:'📍 نواكشوط',seller:'شركة المعدات الموريتانية'},
+    {id:203,subcat:'إبل',cat:'ماشية',wilaya:'أدرار',title:'إبل للبيع — 10 رؤوس أصيلة من أدرار',titleFr:'Chameaux à vendre — 10 têtes pur-sang d\'Adrar',desc:'من منطقة أدرار، أصيلة وبصحة ممتازة، مستعدة للفحص البيطري.',descFr:'De la région d\'Adrar, pur-sang, prêts pour contrôle vétérinaire.',price:'2,400,000 MRU',priceNum:2400000,verified:false,pin:false,emoji:'🐪',loc:'📍 أدرار',seller:'احمد ولد أمبارك'},
+    {id:204,subcat:'ذهب عيار 21',cat:'ذهب',wilaya:'نواكشوط',title:'ذهب عيار 21 — 50 غرام — جمالية نادرة',titleFr:'Or 21 carats — 50g — pièce rare',desc:'ذهب أصيل عيار 21 بالوثائق. فصلة من الذهب السوداني الأصيل.',descFr:'Or authentique 21 carats avec documents.',price:'450,000 MRU',priceNum:450000,verified:true,pin:true,emoji:'🥇',loc:'📍 نواكشوط',seller:'ورشة الذهب الموريتانية'},
+    {id:205,subcat:'هواتف ذكية',cat:'إلكترونيات',wilaya:'نواكشوط',title:'iPhone 15 Pro Max 256GB — كالجديد',titleFr:'iPhone 15 Pro Max 256 Go — comme neuf',desc:'هاتف بحالة ممتازة، لا خدوش، بكل ملحقاته الأصلية وعلبته.',descFr:'Parfait état, accessoires d\'origine, boîte.',price:'180,000 MRU',priceNum:180000,verified:true,pin:false,emoji:'📱',loc:'📍 نواكشوط',seller:'تقني موبايل'},
+    {id:206,subcat:'منازل للبيع',cat:'عقارات',wilaya:'كيفة',title:'فيلا راقية — 5 غرف — كيفة',titleFr:'Villa de standing — 5 chambres — Kiffa',desc:'فيلا فاخرة في حي راقي، 5 غرف نوم، حديقة خاصة، بناء 2022.',descFr:'Villa luxueuse, 5 chambres, jardin privé, construction 2022.',price:'4,800,000 MRU',priceNum:4800000,verified:true,pin:false,emoji:'🏡',loc:'📍 كيفة',seller:'عمار الأمين'},
+    {id:207,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط',title:'Toyota Land Cruiser 2020 — خليجي',titleFr:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. فل كامل، فتحة سقف. الوثائق متوفرة.',descFr:'Land Cruiser 2020 import Golfe, 48 000 km, full options.',price:'9,500,000 MRU',priceNum:9500000,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة السيارات الأولى'},
+    {id:208,subcat:'أراضي',cat:'عقارات',wilaya:'نواذيبو',title:'أرض سكنية — 600 م² — نواذيبو',titleFr:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة.',descFr:'Terrain résidentiel près de la zone économique, titre clair.',price:'2,200,000 MRU',priceNum:2200000,verified:true,pin:false,emoji:'🌍',loc:'📍 نواذيبو',seller:'الوطنية للعقار'},
+    {id:209,subcat:'بقر',cat:'ماشية',wilaya:'ترارزة',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFr:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. شهادة بيطرية.',descFr:'Vaches laitières de race pure, 15-20L/jour, certificat vétérinaire.',price:'960,000 MRU',priceNum:960000,verified:false,pin:false,emoji:'🐄',loc:'📍 ترارزة',seller:'مزرعة البركة'},
+    {id:210,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFr:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام.',descFr:'Sites vitrines et e-commerce. Livraison en 7 jours.',price:'85,000 MRU',priceNum:85000,verified:true,pin:true,emoji:'💻',loc:'📍 نواكشوط',seller:'محمد ليمام | ADMINIA'}
+  ];
+  showcase.forEach(function(s){
+    if(!ALL_ADS.some(function(a){ return String(a.id)===String(s.id); })) ALL_ADS.push(s);
+  });
+})();
+
 // getAdById — merges DEMO_ADS + ALL_ADS_DATA + localStorage['rizq_active_ad']
 function getAdById(id){
   // يقرأ أولاً من localStorage (يُخزَّن بواسطة goToListing في الصفحة الرئيسية)
