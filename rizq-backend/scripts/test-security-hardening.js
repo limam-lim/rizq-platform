@@ -376,24 +376,24 @@ async function main() {
 
   // ── 20. Close remaining gaps (satellite header-only, OTP no plaintext, admin KYC, site-config flags) ──
   {
-    const { requireSatelliteSecret } = require('../lib/satelliteAuth');
+    const { requireSatelliteSecret, expectedSecret } = require('../lib/satelliteAuth');
     let viaQuery = null;
     requireSatelliteSecret(
-      { header: () => '', body: { secret: process.env.BACKEND_SHARED_SECRET || 'x' }, query: { secret: process.env.BACKEND_SHARED_SECRET || 'x' } },
+      { header: () => '', body: { secret: expectedSecret() || 'x' }, query: { secret: expectedSecret() || 'x' } },
       { status(c) { viaQuery = c; return this; }, json() { return this; } },
       () => { viaQuery = 200; }
     );
     ok('satellite rejects query/body secret', viaQuery === 401 || viaQuery === 503);
 
     let viaHdr = null;
-    const sec = process.env.BACKEND_SHARED_SECRET || process.env.RIZQ_API_SECRET || '';
+    const sec = expectedSecret();
     if (sec) {
       requireSatelliteSecret(
         { header: (n) => (n === 'x-rizq-secret' ? sec : ''), body: {}, query: {} },
         { status(c) { viaHdr = c; return this; }, json() { return this; } },
         () => { viaHdr = 200; }
       );
-      ok('satellite accepts header secret', viaHdr === 200);
+      ok('satellite accepts header secret', viaHdr === 200, 'status=' + viaHdr);
     } else {
       ok('satellite accepts header secret', true, 'SKIP — no secret');
     }
