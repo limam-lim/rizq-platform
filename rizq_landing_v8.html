@@ -682,82 +682,89 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
   padding:4px 2px 8px;
   flex-direction:unset!important;flex-wrap:unset!important;
 }
+
 .hero-biz-btn{
   position:relative;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   padding:18px 12px 16px;border-radius:18px;text-decoration:none;
   font-weight:800;font-size:clamp(12px,1.35vw,13.5px);line-height:1.3;
   color:#fff;font-family:'Cairo','Segoe UI','Arial',sans-serif;
-  background:linear-gradient(155deg,#1B3A6B 0%,#234d8f 48%,#0f2347 100%);
-  border:1.5px solid rgba(201,168,76,.55);
-  box-shadow:0 10px 26px rgba(15,35,65,.28),inset 0 1px 0 rgba(255,255,255,.14);
+  background:linear-gradient(160deg,#2a5aa8 0%,#1B3A6B 55%,#152e58 100%);
+  border:2px solid #C9A84C;
+  box-shadow:0 8px 22px rgba(15,35,65,.22),inset 0 1px 0 rgba(255,255,255,.22);
   transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease,filter .28s ease,background .28s ease;
   overflow:hidden;min-height:118px;text-align:center;
 }
 .hero-biz-btn::before{
-  content:'';position:absolute;inset:auto -20% -45% -20%;height:75%;
-  background:radial-gradient(ellipse at center,rgba(201,168,76,.32),transparent 70%);
-  pointer-events:none;opacity:.85;transition:opacity .28s ease;
+  content:'';position:absolute;top:0;left:0;right:0;height:42%;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);
+  pointer-events:none;
 }
 .hero-biz-btn:hover{
   transform:translateY(-6px) scale(1.02);
-  filter:brightness(1.08);
-  border-color:var(--gold);
-  box-shadow:0 18px 40px rgba(15,35,65,.36),0 0 28px rgba(201,168,76,.28),inset 0 1px 0 rgba(255,255,255,.18);
+  filter:brightness(1.1);
+  border-color:#E8C96A;
+  box-shadow:0 16px 36px rgba(15,35,65,.32),0 0 24px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.28);
 }
-.hero-biz-btn:hover::before{opacity:1}
 .hero-biz-ico-wrap{
-  width:48px;height:48px;border-radius:14px;
+  width:50px;height:50px;border-radius:15px;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(145deg,#C9A84C,#d4bc72);
-  border:1px solid rgba(255,248,224,.45);
-  box-shadow:0 6px 16px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.35);
+  background:linear-gradient(145deg,#E8C96A,#C9A84C);
+  border:2px solid #fff8e0;
+  box-shadow:0 4px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5);
   position:relative;z-index:1;
   transition:transform .28s ease,box-shadow .28s ease;
 }
 .hero-biz-btn:hover .hero-biz-ico-wrap{
-  transform:translateY(-2px) scale(1.06);
-  box-shadow:0 10px 22px rgba(201,168,76,.45),inset 0 1px 0 rgba(255,255,255,.4);
+  transform:translateY(-2px) scale(1.07);
+  box-shadow:0 8px 20px rgba(201,168,76,.5),inset 0 1px 0 rgba(255,255,255,.55);
 }
-.hero-biz-ico{font-size:1.4em;line-height:1;display:block;filter:drop-shadow(0 1px 1px rgba(15,35,65,.25))}
+.hero-biz-ico{font-size:1.45em;line-height:1;display:block;filter:drop-shadow(0 1px 1px rgba(15,35,65,.3))}
 .hero-biz-text{display:flex;flex-direction:column;gap:3px;position:relative;z-index:1;min-width:0}
-.hero-biz-label{white-space:nowrap;font-size:inherit;letter-spacing:.2px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.hero-biz-label{white-space:nowrap;font-size:inherit;letter-spacing:.2px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35)}
 .hero-biz-hint{
-  font-size:10px;font-weight:700;line-height:1.25;
-  color:#E8C96A;letter-spacing:.15px;
+  font-size:10.5px;font-weight:800;line-height:1.25;
+  color:#FFE7A0;letter-spacing:.15px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
+/* محلات + استثمارات — كحلي ذهبي واضح */
 .hero-biz-gold{
-  background:linear-gradient(155deg,#1a3560 0%,#2a4f8a 45%,#0f2347 100%);
-  border-color:rgba(201,168,76,.7);
-  box-shadow:0 10px 26px rgba(15,35,65,.28),0 0 18px rgba(201,168,76,.22),inset 0 1px 0 rgba(255,255,255,.14);
+  background:linear-gradient(160deg,#3a6bb8 0%,#1B3A6B 50%,#0f2a52 100%);
+  border-color:#C9A84C;
+  box-shadow:0 8px 22px rgba(15,35,65,.22),0 0 16px rgba(201,168,76,.25),inset 0 1px 0 rgba(255,255,255,.2);
 }
-.hero-biz-gold .hero-biz-ico-wrap{background:linear-gradient(145deg,#b89840,#C9A84C,#d4bc72);border-color:rgba(255,248,224,.5)}
-.hero-biz-gold:hover{border-color:var(--gold-light);box-shadow:0 18px 40px rgba(201,168,76,.32),0 0 32px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.18)}
+.hero-biz-gold .hero-biz-ico-wrap{background:linear-gradient(145deg,#F0D78A,#C9A84C,#b89840);border-color:#fff8e0}
+.hero-biz-gold:hover{border-color:#E8C96A;box-shadow:0 16px 36px rgba(201,168,76,.38),0 0 28px rgba(201,168,76,.4),inset 0 1px 0 rgba(255,255,255,.28)}
+/* مكاتب — أزرق ملكي حي */
 .hero-biz-royal{
-  background:linear-gradient(155deg,#153a78 0%,#234d8f 48%,#0d2a5c 100%);
-  border-color:rgba(120,170,255,.65);
+  background:linear-gradient(160deg,#3d7fd4 0%,#1e4f9a 50%,#123a78 100%);
+  border-color:#7eb6ff;
 }
-.hero-biz-royal .hero-biz-ico-wrap{background:linear-gradient(145deg,#3b6ec4,#5b8fde);border-color:rgba(200,220,255,.45)}
-.hero-biz-royal:hover{border-color:#8eb6ff;box-shadow:0 18px 40px rgba(27,58,107,.45),0 0 28px rgba(80,140,230,.4),inset 0 1px 0 rgba(255,255,255,.18)}
+.hero-biz-royal .hero-biz-ico-wrap{background:linear-gradient(145deg,#9ec5ff,#4a8adf,#2f6bc4);border-color:#e8f2ff}
+.hero-biz-royal .hero-biz-hint{color:#C8E0FF}
+.hero-biz-royal:hover{border-color:#b6d4ff;box-shadow:0 16px 36px rgba(30,79,154,.45),0 0 28px rgba(100,160,240,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+/* شو روم — بنفسجي غني */
 .hero-biz-diamond{
-  background:linear-gradient(155deg,#2a2a6e 0%,#3d3d9a 48%,#1a1a55 100%);
-  border-color:rgba(196,181,253,.7);
+  background:linear-gradient(160deg,#7b6ae8 0%,#4c3db8 50%,#2e2680 100%);
+  border-color:#c4b5fd;
 }
-.hero-biz-diamond .hero-biz-ico-wrap{background:linear-gradient(145deg,#8b7cf0,#c4b5fd);border-color:rgba(240,235,255,.45)}
-.hero-biz-diamond:hover{border-color:#ddd6fe;box-shadow:0 18px 40px rgba(99,70,200,.35),0 0 28px rgba(196,181,253,.4),inset 0 1px 0 rgba(255,255,255,.18)}
+.hero-biz-diamond .hero-biz-ico-wrap{background:linear-gradient(145deg,#ddd6fe,#a78bfa,#7c3aed);border-color:#f5f3ff}
+.hero-biz-diamond .hero-biz-hint{color:#E9DFFF}
+.hero-biz-diamond:hover{border-color:#e9e0ff;box-shadow:0 16px 36px rgba(76,61,184,.45),0 0 28px rgba(167,139,250,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+/* مناقصات — أخضر زمردي */
 .hero-biz-tender{
-  background:linear-gradient(155deg,#0f4a3c 0%,#167a5f 48%,#0a3329 100%);
-  border-color:rgba(52,211,153,.7);
+  background:linear-gradient(160deg,#2dba8a 0%,#0f8f6a 50%,#0a5c46 100%);
+  border-color:#34d399;
 }
-.hero-biz-tender .hero-biz-ico-wrap{background:linear-gradient(145deg,#10b981,#34d399);border-color:rgba(220,255,240,.45)}
-.hero-biz-tender:hover{border-color:#6ee7b7;box-shadow:0 18px 40px rgba(16,185,129,.35),0 0 28px rgba(52,211,153,.4),inset 0 1px 0 rgba(255,255,255,.18)}
+.hero-biz-tender .hero-biz-ico-wrap{background:linear-gradient(145deg,#a7f3d0,#34d399,#059669);border-color:#ecfdf5}
+.hero-biz-tender .hero-biz-hint{color:#C6FFE8}
+.hero-biz-tender:hover{border-color:#6ee7b7;box-shadow:0 16px 36px rgba(15,143,106,.45),0 0 28px rgba(52,211,153,.45),inset 0 1px 0 rgba(255,255,255,.28)}
 .hero-biz-badge{
   position:absolute;top:8px;inset-inline-end:8px;z-index:2;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:var(--royal-dark);font-size:8.5px;font-weight:900;
+  background:linear-gradient(135deg,#E8C96A,#C9A84C);
+  color:#0f2347;font-size:8.5px;font-weight:900;
   padding:3px 8px;border-radius:100px;letter-spacing:.3px;
-  box-shadow:0 2px 10px rgba(201,168,76,.45);
+  box-shadow:0 2px 10px rgba(201,168,76,.55);
 }
 
 /* ── HERO PRIMARY CTA (تحويل: متجر أو إعلان مجاني) ── */
