@@ -1173,9 +1173,21 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
       active: a.active !== false,
       accountId: a.accountId ? String(a.accountId).slice(0, 60) : '',
     }));
+    const prevVideoAds = (current && current.videoAds) || {};
+    const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
     next.videoAds = {
       hero: sanitizeAdList(body.videoAds.hero),
       popup: sanitizeAdList(body.videoAds.popup),
+      // فيديو المنصة المزروع: بداية حلقة الـ Hero وبعد انتهاء إعلانات المعلنين
+      platformPromoUrl: body.videoAds.platformPromoUrl != null
+        ? String(body.videoAds.platformPromoUrl || '').slice(0, 500)
+        : String(prevVideoAds.platformPromoUrl || defaultPromo).slice(0, 500),
+      platformPromoEnabled: body.videoAds.platformPromoEnabled != null
+        ? body.videoAds.platformPromoEnabled !== false
+        : prevVideoAds.platformPromoEnabled !== false,
+      adSlotSeconds: Math.max(8, Math.min(120,
+        Number(body.videoAds.adSlotSeconds != null ? body.videoAds.adSlotSeconds : prevVideoAds.adSlotSeconds) || 25
+      )),
     };
   }
 
