@@ -191,7 +191,14 @@ app.use(cors({
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
+// في التطوير نرفع السقف حتى لا تختفي الإعلانات التجريبية بعد اختبارات CDP/الواجهة.
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isProdEnv() ? 120 : 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' },
+}));
 
 // ── Rate limit مخصص أشد على /api/ads/submit ─────────────────────────
 // هذا الـ endpoint عام بلا أي مصادقة (requireAdminAuth) لأنه مخصص
