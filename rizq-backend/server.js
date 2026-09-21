@@ -131,7 +131,10 @@ const DEFAULT_PLATFORM_FLAGS = {
 };
 function getPlatformFlags() {
   const cfg = repos.getSiteConfig();
-  return Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
+  const flags = Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
+  /* قفل إنتاج: لا يمكن تعطيل OTP عبر site-config */
+  if (isProdEnv()) flags.otpRequired = true;
+  return flags;
 }
 
 // ── محرك القواعد المشترك لكل قسم (وكيل واحد + قواعد منفصلة لكل قسم بدل
@@ -1048,6 +1051,8 @@ app.get('/api/site-config', (req, res) => {
     platformFlags: getPlatformFlags(),
     sectionRules: getSectionRules(),
     otp: getPublicOtpConfig(),
+    demoDashboardAllowed: !isProdEnv(),
+    production: isProdEnv(),
     packages: raw.packages || undefined,
     prices: raw.prices || undefined,
     promoVideo: raw.promoVideo || undefined,
@@ -1383,6 +1388,8 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     ['platformOpen', 'registrationOpen', 'adsOpen', 'moderationRequired', 'otpRequired', 'vpnBlock'].forEach((k) => {
       if (k in f) existing[k] = f[k] === true;
     });
+    /* في الإنتاج: OTP إلزامي ولا يمكن إطفاؤه من لوحة الإعدادات */
+    if (isProdEnv()) existing.otpRequired = true;
     if (f.sessionTimeoutMin != null) {
       existing.sessionTimeoutMin = Math.max(5, Math.min(1440, Number(f.sessionTimeoutMin) || 60));
     }
@@ -1629,6 +1636,20 @@ function stripToken(acc) {
     delete safe.idImage;
     delete safe.id_image;
   }
+  delete safe.password;
+  return safe;
+}
+
+/** نسخة أدمن: تحتفظ بوثائق KYC للمراجعة، بلا أسرار وصول */
+function toAdminAccount(acc) {
+  if (!acc) return null;
+  const {
+    accessToken,
+    passHash,
+    dashToken,
+    password,
+    ...safe
+  } = acc;
   delete safe.password;
   return safe;
 }
@@ -1893,6 +1914,7 @@ mountAccountsSessionRoutes(app, {
   accountsRegisterLimiter,
   isProdEnv,
   stripToken,
+  toAdminAccount,
 });
 
 /**
@@ -1909,6 +1931,7 @@ mountAccountsManageRoutes(app, {
   extractAccountToken,
   timingSafeEqualStr,
   stripToken,
+  toAdminAccount,
   resolveOptionalAccountViewer,
   toPublicAccountForViewer,
   assertNniAssignable,
@@ -3368,7 +3391,14 @@ startMaintenanceScheduler({
 
 function assertProductionSecrets() {
   if (!isProdEnv()) return;
-  const required = ['BACKEND_SHARED_SECRET', 'RIZQ_API_SECRET', 'SUPER_ADMIN_PASS_HASH', 'SUPER_ADMIN_EMAIL'];
+  const required = [
+    'BACKEND_SHARED_SECRET',
+    'RIZQ_API_SECRET',
+    'SUPER_ADMIN_PASS_HASH',
+    'SUPER_ADMIN_EMAIL',
+    'ADMIN_PANEL_PATH',
+    'ADMIN_PANEL_GATE_KEY',
+  ];
   const missing = required.filter((k) => !String(process.env[k] || '').trim());
   if (missing.length) {
     console.error('[FATAL] Missing required env in production:', missing.join(', '));

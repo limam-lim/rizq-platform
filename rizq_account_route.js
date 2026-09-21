@@ -173,22 +173,26 @@
     } catch (e2) {}
   }
 
-  function setAfterAuthHref(href) {
-    if (!href) return;
+  function sanitizeAfterAuthHref(href) {
+    if (!href) return '';
     var safe = String(href);
-    /* منع تحويل مفتوح: نفس المنشأ أو مسار نسبي فقط */
     try {
       if (/^https?:\/\//i.test(safe) || safe.indexOf('//') === 0) {
         var u = new URL(safe, location.href);
-        if (u.origin !== location.origin) return;
+        if (u.origin !== location.origin) return '';
         safe = u.pathname + u.search + u.hash;
       }
-      if (safe.charAt(0) !== '/' && safe.indexOf('.html') < 0 && safe.indexOf('rizq_') !== 0) {
-        return;
+      if (/^(javascript|data|vbscript):/i.test(safe)) return '';
+      if (safe.charAt(0) === '/' || safe.indexOf('.html') >= 0 || safe.indexOf('rizq_') === 0 || safe.charAt(0) === '?') {
+        return safe;
       }
-    } catch (e) {
-      return;
-    }
+    } catch (e) {}
+    return '';
+  }
+
+  function setAfterAuthHref(href) {
+    var safe = sanitizeAfterAuthHref(href);
+    if (!safe) return;
     try {
       sessionStorage.setItem(AFTER_AUTH_HREF_KEY, safe);
     } catch (e2) {}
@@ -200,17 +204,7 @@
       href = sessionStorage.getItem(AFTER_AUTH_HREF_KEY) || '';
       if (href) sessionStorage.removeItem(AFTER_AUTH_HREF_KEY);
     } catch (e) {}
-    if (!href) return '';
-    try {
-      if (/^https?:\/\//i.test(href) || href.indexOf('//') === 0) {
-        var u = new URL(href, location.href);
-        if (u.origin !== location.origin) return '';
-        return u.pathname + u.search + u.hash;
-      }
-    } catch (e2) {
-      return '';
-    }
-    return href;
+    return sanitizeAfterAuthHref(href);
   }
 
   function publicShareUrl(accOrType, id) {
@@ -231,7 +225,7 @@
 
   function redirectAfterAuth(defaultUrl) {
     var after = consumeAfterAuthHref();
-    var target = after || defaultUrl || '';
+    var target = sanitizeAfterAuthHref(after || defaultUrl || '');
     if (target) location.href = target;
     return target;
   }
@@ -491,9 +485,29 @@
     return false;
   }
 
+  function demoDashboardAllowed() {
+    if (window.__RIZQ_ALLOW_DEMO_DASH === true) return true;
+    if (window.__RIZQ_ALLOW_DEMO_DASH === false) return false;
+    try {
+      if (window.RIZQ_PUBLIC_CONFIG && window.RIZQ_PUBLIC_CONFIG.demoDashboardAllowed === false) return false;
+      if (window.RIZQ_PUBLIC_CONFIG && window.RIZQ_PUBLIC_CONFIG.production === true) return false;
+    } catch (e0) {}
+    try {
+      var h = String(location.hostname || '').toLowerCase();
+      if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.endsWith('.local')) return true;
+    } catch (e1) {}
+    return false;
+  }
+
   function bootstrapDashboard() {
     var p = new URLSearchParams(location.search);
-    if (p.get('demo') === '1') return;
+    if (p.get('demo') === '1') {
+      if (!demoDashboardAllowed()) {
+        location.replace('rizq_register.html');
+        return;
+      }
+      return;
+    }
     stripTokenFromUrl();
     if (p.get('id')) {
       try {
@@ -590,9 +604,11 @@
     readDashToken: readDashToken,
     stripTokenFromUrl: stripTokenFromUrl,
     setAfterAuthHref: setAfterAuthHref,
+    consumeAfterAuthHref: consumeAfterAuthHref,
+    sanitizeAfterAuthHref: sanitizeAfterAuthHref,
+    demoDashboardAllowed: demoDashboardAllowed,
     rememberCurrentForAfterAuth: rememberCurrentForAfterAuth,
     promptLogin: promptLogin,
-    consumeAfterAuthHref: consumeAfterAuthHref,
     redirectAfterAuth: redirectAfterAuth,
     publicShareUrl: publicShareUrl,
     initShareLinkInput: initShareLinkInput,

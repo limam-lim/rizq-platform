@@ -18,6 +18,7 @@ function mountAccountsManageRoutes(app, deps) {
     extractAccountToken,
     timingSafeEqualStr,
     stripToken,
+    toAdminAccount,
     resolveOptionalAccountViewer,
     toPublicAccountForViewer,
     assertNniAssignable,
@@ -28,6 +29,8 @@ function mountAccountsManageRoutes(app, deps) {
     purgeAccountIdDocument,
     REFERRAL_BONUS_DAYS,
   } = deps;
+
+  const adminView = typeof toAdminAccount === 'function' ? toAdminAccount : stripToken;
 
   const requireAccountsAdmin = typeof requireAdminPermission === 'function'
     ? requireAdminPermission('accounts')
@@ -191,7 +194,7 @@ function mountAccountsManageRoutes(app, deps) {
    * حقولها (عدا accessToken) لطابور المراجعة في rizq_admin.html.
    */
   app.get('/api/accounts/admin', requireAccountsAdmin, (req, res) => {
-    res.json({ ok: true, accounts: readAccounts().map(stripToken).reverse() });
+    res.json({ ok: true, accounts: readAccounts().map(adminView).reverse() });
   });
 
   /**
@@ -245,7 +248,7 @@ function mountAccountsManageRoutes(app, deps) {
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);
-    res.json({ ok: true, account: stripToken(acc) });
+    res.json({ ok: true, account: adminView(acc) });
   });
 
   /**
@@ -278,7 +281,7 @@ function mountAccountsManageRoutes(app, deps) {
         list[idx].accessToken = typeof genAccessToken === 'function' ? genAccessToken() : list[idx].accessToken;
       }
       writeAccounts(list);
-      return res.json({ ok: true, account: stripToken(list[idx]) });
+      return res.json({ ok: true, account: adminView(list[idx]) });
     }
 
     if (action === 'approve') {
@@ -298,7 +301,7 @@ function mountAccountsManageRoutes(app, deps) {
       purgeAccountIdDocument(list[idx]);
     }
     writeAccounts(list);
-    const safe = stripToken(list[idx]);
+    const safe = adminView(list[idx]);
     // كشف لمرة واحدة بعد الموافقة — الأدمن يحتاج dashToken لرابط لوحة المشترك
     if (action === 'approve' && list[idx].dashToken) {
       safe.dashToken = list[idx].dashToken;
@@ -331,7 +334,7 @@ function mountAccountsManageRoutes(app, deps) {
       list[idx].verifiedPlusExpiresAt = null;
     }
     writeAccounts(list);
-    res.json({ ok: true, account: stripToken(list[idx]) });
+    res.json({ ok: true, account: adminView(list[idx]) });
   });
 }
 

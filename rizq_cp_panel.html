@@ -4828,6 +4828,28 @@ function _syncAccountDecisionToBackend(id, action, extra){
         data.error || 'تعذّر استخدام رقم الهوية هذا — تحقّق من الرقم أو تواصل مع الدعم',
         data.error_fr || "Ce numéro d'identité ne peut pas être utilisé — vérifiez-le ou contactez le support"
       ));
+      return;
+    }
+    /* تبنّي dashToken الصادر من الخادم فقط — بلا mint في المتصفح */
+    if(action === 'approve' && data && data.ok && data.account){
+      var serverTok = data.account.dashToken || data.account.token || '';
+      if(serverTok){
+        try{
+          var accs=getPendingAccounts();
+          var i=accs.findIndex(function(a){return a && a.id===id;});
+          if(i>=0){
+            accs[i].token=serverTok;
+            accs[i].dashToken=serverTok;
+            var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
+            var dashFile=dashFiles[accs[i].type]||'rizq_dashboard_store.html';
+            accs[i].dashLink=dashFile+'?id='+encodeURIComponent(id);
+            savePendingAccounts(accs);
+          }
+        }catch(eTok){}
+        if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+          window.RizqAccount.storeDashToken(id, serverTok);
+        }
+      }
     }
   }).catch(function(){ /* صامت — رابط ادفع خادم قد لا يكون هذا الحساب مسجلاً به بعد */ });
 }
@@ -4849,15 +4871,12 @@ function approveAccount(id, customPkg){
   acc.id_image=null;
   delete acc.idImage;
   // license_image / activity_image2 — وثائق نشاط محفوظة عمداً
-  acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
+  /* لا نولّد dashToken في المتصفح — الخادم يصدره عند /decision */
+  delete acc.token;
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  // رابط يفتح من أي جهاز: id + token في الـ URL، والداشبورد يخزّن التوكن
-  // في sessionStorage ثم يزيل ?token= من الشريط (انظر RizqAccount.stripTokenFromUrl).
-  acc.dashLink=dashFile+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(acc.token);
-  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
-    window.RizqAccount.storeDashToken(id, acc.token);
-  }
+  /* رابط بلا token في الـ URL — التوكن في sessionStorage فقط بعد رد الخادم */
+  acc.dashLink=dashFile+'?id='+encodeURIComponent(id);
   // رابط الملف الشخصي العام (يُشارَك مع المشترين) — فقط للحسابات الفردية حالياً؛
   // المحل/المكتب/الشركة لهم صفحاتهم العامة الخاصة (rizq_store.html/rizq_office.html/rizq_corp.html) بمنطق مختلف بالفعل.
   if(acc.type==='individual'){
@@ -4898,7 +4917,7 @@ function approveAccount(id, customPkg){
   var _isDiamondPkg = /ماسي/.test(String(pkgName));
   if(_isDiamondPkg) _autoRegisterDiamondAgent(acc);
 
-  _syncAccountDecisionToBackend(id, 'approve', { dashToken: acc.token, package: pkgName, package_price: acc.package_price||0 });
+  _syncAccountDecisionToBackend(id, 'approve', { package: pkgName, package_price: acc.package_price||0 });
   renderPendingAccounts();
   updatePendingBadge();
   showToast(RizqI18n.t2('✅ تمت الموافقة — الباقة "'+pkgName+'" مُفعَّلة للحساب','✅ Approuvé — le forfait "'+pkgName+'" est activé pour le compte'),'success');
@@ -4980,12 +4999,12 @@ function copyDashLink(link){
   showToast(RizqI18n.t2('تم نسخ الرابط — أرسله للمالك عبر واتساب 📲','Lien copié — envoyez-le au propriétaire via WhatsApp 📲'),'success');
 }
 
-/** يضمن أن رابط الداشبورد يحمل ?token= (حسابات قديمة وافَق عليها قبل الإصلاح). */
+/** يضمن رابط داشبورد بلا ?token= (التوكن في sessionStorage فقط). */
 function ensureDashLinkWithToken(acc){
-  if(!acc || !acc.id || !acc.token) return acc && acc.dashLink || '';
+  if(!acc || !acc.id) return acc && acc.dashLink || '';
   var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   var dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  var need = dashFile+'?id='+encodeURIComponent(acc.id)+'&token='+encodeURIComponent(acc.token);
+  var need = dashFile+'?id='+encodeURIComponent(acc.id);
   if(acc.dashLink !== need){
     acc.dashLink = need;
     try{
@@ -4994,7 +5013,7 @@ function ensureDashLinkWithToken(acc){
       if(i>=0){ accs[i].dashLink=need; savePendingAccounts(accs); }
     }catch(e){}
   }
-  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+  if(acc.token && window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
     window.RizqAccount.storeDashToken(acc.id, acc.token);
   }
   return acc.dashLink;

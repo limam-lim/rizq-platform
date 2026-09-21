@@ -70,11 +70,13 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
   const ns = String(namespace || '').replace(/^\/+|\/+$/g, '')
     || String(uploadUrlPrefix || '').replace(/^\/?uploads\/?/, '').replace(/\/+$/, '')
     || 'misc';
+  const safeId = String(entityId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!safeId) return [];
   const prefix = '/uploads/' + ns + '/';
   const urls = [];
   const slice = images.slice(0, maxCount);
   // إعادة استخدام URL موجود فقط إن كان تحت مجلد هذا الكيان (منع اختطاف وسائط الغير)
-  const ownedPrefix = prefix + String(entityId || '').replace(/[^a-zA-Z0-9_-]/g, '') + '/';
+  const ownedPrefix = prefix + safeId + '/';
   for (let i = 0; i < slice.length; i++) {
     const img = slice[i];
     if (typeof img !== 'string') continue;
@@ -87,7 +89,7 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
     const parsed = parseDataUriImage(img);
     if (!parsed || parsed.error) continue;
     const filename = i + '.webp';
-    const key = ns + '/' + entityId + '/' + filename;
+    const key = ns + '/' + safeId + '/' + filename;
     const webp = await processBufferToWebpBuffer(parsed.buf);
     const saved = await objectStorage.putObject({
       key,

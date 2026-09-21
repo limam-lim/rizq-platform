@@ -6,6 +6,7 @@
 
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
+const { isProdEnv } = require('../middleware/accountAuth');
 
 function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
   const buyerPart = buyerAccountId ? ('acc:' + buyerAccountId) : ('guest:' + String(buyerPhone || '').replace(/\D/g, ''));
@@ -225,8 +226,8 @@ function mountMessagesRoutes(app, deps) {
     let asGuest = false;
     const guestMatch = /::guest:(\d+)$/.exec(threadKey);
     if (!asSeller && !asBuyer && guestMatch) {
-      const phoneDigits = String(req.query.buyerPhone || req.header('x-guest-phone') || '').replace(/\D/g, '');
-      const guestTok = String(req.query.guestThreadToken || req.header('x-guest-thread-token') || '');
+      const phoneDigits = String(req.header('x-guest-phone') || (!isProdEnv() ? req.query.buyerPhone : '') || '').replace(/\D/g, '');
+      const guestTok = String(req.header('x-guest-thread-token') || (!isProdEnv() ? req.query.guestThreadToken : '') || '');
       // هاتف alone لم يعد كافياً — يلزم رمز صدر عند أول إرسال
       if (phoneDigits && phoneDigits === guestMatch[1] && verifyGuestThreadToken(threadKey, guestTok, phoneDigits)) {
         asGuest = true;

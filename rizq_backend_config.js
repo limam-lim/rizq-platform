@@ -49,4 +49,10 @@
   } else {
     window.RIZQ_BACKEND_BASE = 'https://rizq-platform-api.onrender.com';
   }
+  /* إشارات أمان للعميل: demo dashboards فقط محلياً/معاينة */
+  window.RIZQ_PUBLIC_CONFIG = Object.assign({}, window.RIZQ_PUBLIC_CONFIG || {}, {
+    production: !isLocal,
+    demoDashboardAllowed: !!isLocal,
+  });
+  if (!isLocal) window.__RIZQ_ALLOW_DEMO_DASH = false;
 })();

@@ -161,7 +161,7 @@ async function processAndReply(senderEmail, senderName, subject, emailBody) {
 // ══════════════════════════════════════════════════════════
 //  Webhook: استقبال إيميل جديد (SendGrid / Mailgun)
 // ══════════════════════════════════════════════════════════
-app.post('/api/email/inbound', async (req, res) => {
+app.post('/api/email/inbound', requireSatelliteSecret, async (req, res) => {
   const from    = req.body.from    || req.body.sender || '';
   const subject = req.body.subject || '(بدون موضوع)';
   const body    = req.body.text    || req.body.body   || '';

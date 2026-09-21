@@ -160,9 +160,10 @@ function codesMatch(submitted, record) {
   if (!record) return false;
   const plain = String(submitted || '').replace(/\D/g, '');
   if (plain.length !== 6) return false;
+  /* رفض أي سجل بلا codeHash — لا مقارنة نصّية صريحة أبداً */
+  if (!record.codeHash) return false;
   const { timingSafeEqualStr } = require('../lib/secureCompare');
-  if (record.codeHash) return timingSafeEqualStr(hashOtpCode(plain), record.codeHash);
-  return timingSafeEqualStr(plain, String(record.code || ''));
+  return timingSafeEqualStr(hashOtpCode(plain), record.codeHash);
 }
 
 function generateCode() {

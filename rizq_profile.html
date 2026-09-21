@@ -598,12 +598,20 @@ function _dashboardBackUrl(){
     var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
     if(s && s.id && s.token){
       var files = {individual:'rizq_dashboard.html',store:'rizq_dashboard_store.html',office:'rizq_dashboard_office.html',corp:'rizq_dashboard_corp.html'};
-      return (files[s.type] || 'rizq_dashboard.html') + '?id=' + encodeURIComponent(s.id) + '&token=' + encodeURIComponent(s.token);
+      if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+        window.RizqAccount.storeDashToken(s.id, s.token);
+      }
+      return (files[s.type] || 'rizq_dashboard.html') + '?id=' + encodeURIComponent(s.id);
     }
   }catch(e1){}
   try{
     var p = new URLSearchParams(location.search);
-    if(p.get('demo') === '1' || p.get('user') === 'demo') return 'rizq_dashboard.html?demo=1';
+    if(p.get('demo') === '1' || p.get('user') === 'demo'){
+      var allowDemo = window.RizqAccount && typeof window.RizqAccount.demoDashboardAllowed === 'function'
+        ? window.RizqAccount.demoDashboardAllowed()
+        : (window.__RIZQ_ALLOW_DEMO_DASH === true || (window.RIZQ_IS_LOCAL === true));
+      if(allowDemo) return 'rizq_dashboard.html?demo=1';
+    }
   }catch(e2){}
   try{
     if(document.referrer && /rizq_dashboard/.test(document.referrer)){

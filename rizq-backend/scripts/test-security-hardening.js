@@ -374,6 +374,84 @@ async function main() {
   const scrubImg = scrub2({ name: 'X', idImage: 'data:...', activityImage2: 'data:...', receiptImage: 'r' });
   ok('scrub removes identity/receipt images', !scrubImg.idImage && !scrubImg.activityImage2 && !scrubImg.receiptImage && scrubImg.name === 'X');
 
+  // ── 20. Close remaining gaps (satellite header-only, OTP no plaintext, admin KYC, site-config flags) ──
+  {
+    const { requireSatelliteSecret } = require('../lib/satelliteAuth');
+    let viaQuery = null;
+    requireSatelliteSecret(
+      { header: () => '', body: { secret: process.env.BACKEND_SHARED_SECRET || 'x' }, query: { secret: process.env.BACKEND_SHARED_SECRET || 'x' } },
+      { status(c) { viaQuery = c; return this; }, json() { return this; } },
+      () => { viaQuery = 200; }
+    );
+    ok('satellite rejects query/body secret', viaQuery === 401 || viaQuery === 503);
+
+    let viaHdr = null;
+    const sec = process.env.BACKEND_SHARED_SECRET || process.env.RIZQ_API_SECRET || '';
+    if (sec) {
+      requireSatelliteSecret(
+        { header: (n) => (n === 'x-rizq-secret' ? sec : ''), body: {}, query: {} },
+        { status(c) { viaHdr = c; return this; }, json() { return this; } },
+        () => { viaHdr = 200; }
+      );
+      ok('satellite accepts header secret', viaHdr === 200);
+    } else {
+      ok('satellite accepts header secret', true, 'SKIP — no secret');
+    }
+  }
+
+  {
+    const otpSvc = require('../services/otpService');
+    const poisonBackup = repos.listOtp();
+    const poisonEmail = 'poison_' + Date.now() + '@rizq.test';
+    const store = repos.listOtp().slice();
+    store.push({
+      key: 'buyer:' + poisonEmail.toLowerCase(),
+      channel: 'buyer',
+      email: poisonEmail.toLowerCase(),
+      code: '999999',
+      expiresAt: Date.now() + 600000,
+      attempts: 0,
+      verified: false,
+    });
+    repos.replaceOtpStore(store);
+    const poisoned = otpSvc.verifyBuyerOtp(poisonEmail, '999999');
+    ok('OTP plaintext-only record rejected', !(poisoned && poisoned.ok));
+    repos.replaceOtpStore(poisonBackup);
+  }
+
+  ok('site-config exposes demoDashboardAllowed', !!(pub && typeof pub.demoDashboardAllowed === 'boolean'));
+  ok('site-config production flag boolean', !!(pub && typeof pub.production === 'boolean'));
+
+  {
+    const adminSecret = process.env.BACKEND_SHARED_SECRET || '';
+    if (adminSecret) {
+      const kycSeed = seedTestAccount();
+      kycSeed.pending.idImage = 'data:image/png;base64,aaa';
+      kycSeed.pending.licenseImage = 'data:image/png;base64,bbb';
+      try {
+        platformStore.upsertAccount(kycSeed.pending);
+        const adminList2 = await req('GET', '/api/accounts/admin', null, { 'x-rizq-secret': adminSecret });
+        const row2 = (adminList2.body && adminList2.body.accounts || []).find((a) => a.id === kycSeed.id);
+        ok('admin list keeps KYC images', !!(row2 && row2.idImage && row2.licenseImage && !row2.accessToken && !row2.dashToken));
+      } finally {
+        try { platformStore.deleteAccount(kycSeed.id); } catch (e) { /* ignore */ }
+      }
+    } else {
+      ok('admin list keeps KYC images', true, 'SKIP — no BACKEND_SHARED_SECRET');
+    }
+  }
+
+  {
+    const { saveProcessedImages } = require('../services/imagePipeline');
+    const evil = await saveProcessedImages({
+      namespace: 'ads',
+      entityId: '../escape',
+      images: ['data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='],
+      maxCount: 1,
+    });
+    ok('entityId path traversal sanitized', Array.isArray(evil) && (evil.length === 0 || (evil[0] && evil[0].indexOf('..') < 0 && /\/uploads\/ads\/escape\//.test(evil[0]))));
+  }
+
   // ── Summary ──
   const failed = results.filter((r) => !r.pass);
   console.log('\n=== Summary ===');

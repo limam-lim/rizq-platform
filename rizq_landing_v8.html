@@ -6793,7 +6793,16 @@ const NNI_RE=/^\d{6,15}$/;
 var RIZQ_TERMS_VERSION = 'v1.0-2026-06-22';
 
 function _genDashToken(){
-  return 'TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
+  /* تطوير بلا خادم فقط — يُفضَّل crypto.getRandomValues */
+  try{
+    if(window.crypto && crypto.getRandomValues){
+      var buf=new Uint8Array(24);
+      crypto.getRandomValues(buf);
+      var hex=Array.prototype.map.call(buf,function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+      return 'TK_'+hex.toUpperCase();
+    }
+  }catch(e){}
+  return '';
 }
 
 function _normalizeIntlPhone(raw){
@@ -6853,7 +6862,9 @@ function _autoApproveAccount(data){
   if(!window.RIZQ_BACKEND_BASE){
     data.status='approved';
     data.approvedAt=new Date().toISOString();
-    data.token=data.token||_genDashToken();
+    var localTok = data.token || _genDashToken();
+    if(!localTok) return; /* لا تفعيل بلا توكن آمن */
+    data.token=localTok;
     data.dashToken=data.dashToken||data.token;
     data.autoVerified=true;
     if(t==='individual') data.id_status=data.id_status||'auto_archived';

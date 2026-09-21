@@ -449,8 +449,8 @@ app.get('/api/call-log/:phone', requireSatelliteSecret, (req, res) => {
   res.json({ calls: calls.slice(0, 50), total: calls.length });
 });
 
-// ── صفحة الحالة ─────────────────────────────────────────
-app.get('/', (req, res) => {
+// ── صفحة الحالة (سرّ الأقمار فقط — لا تكشف أرقاماً/سجلات للعامة) ─
+app.get('/', requireSatelliteSecret, (req, res) => {
   const activeCount = Array.from(agentStatus.values()).filter(Boolean).length;
   res.send(`
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">

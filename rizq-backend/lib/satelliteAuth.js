@@ -26,10 +26,9 @@ function requireSatelliteSecret(req, res, next) {
   if (!expected) {
     return res.status(503).json({ ok: false, error: 'satellite_secret_not_configured' });
   }
+  /* رأس فقط — لا query/body حتى لا يتسرب السر في السجلات أو Referer */
   const got = req.header('x-rizq-secret')
     || req.header('x-api-secret')
-    || (req.body && req.body.secret)
-    || (req.query && req.query.secret)
     || '';
   if (!got || !timingSafeEqualStr(got, expected)) {
     return res.status(401).json({ ok: false, error: 'unauthorized' });
