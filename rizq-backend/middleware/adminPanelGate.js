@@ -73,9 +73,16 @@ function ipAllowed(req) {
 }
 
 function gateSecret() {
-  return process.env.ADMIN_PANEL_GATE_KEY
+  const key = process.env.ADMIN_PANEL_GATE_KEY
     || process.env.BACKEND_SHARED_SECRET
-    || 'rizq-admin-gate-dev-only';
+    || '';
+  if (!key) {
+    if (isProdEnv()) {
+      throw new Error('[admin-panel] ADMIN_PANEL_GATE_KEY or BACKEND_SHARED_SECRET required in production');
+    }
+    return 'rizq-admin-gate-dev-only';
+  }
+  return key;
 }
 
 function signGateCookie() {
@@ -86,7 +93,8 @@ function signGateCookie() {
 
 function verifyGateCookie(value) {
   const gateKey = getGateKey();
-  if (!gateKey) return true;
+  /* بلا مفتاح بوابة: في الإنتاج نرفض دائماً؛ في التطوير نسمح */
+  if (!gateKey) return !isProdEnv();
   const parts = String(value || '').split('.');
   if (parts.length !== 2) return false;
   const exp = Number(parts[0]);
@@ -138,6 +146,10 @@ function installAdminPanelGate(app, frontendRoot) {
   const servePanel = (req, res) => {
     if (!ipAllowed(req)) return res.status(404).send('Not Found');
 
+    if (isProdEnv() && !gateKey) {
+      return res.status(404).send('Not Found');
+    }
+
     if (gateKey) {
       const qk = req.query && req.query.k;
       if (qk && qk === gateKey) {
@@ -160,17 +172,16 @@ function installAdminPanelGate(app, frontendRoot) {
   app.get('/' + panelPath + '/', servePanel);
 
   const base = process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000));
-  const url = base.replace(/\/$/, '') + '/' + panelPath + (gateKey ? '?k=' + gateKey : '');
+  const url = base.replace(/\/$/, '') + '/' + panelPath + (gateKey ? '?k=***' : '');
 
   console.log('[admin-panel] مسار لوحة الأدمن السري: /' + panelPath);
   if (gateKey) {
-    console.log('[admin-panel] رابط الدخول الكامل (احفظه في مدير كلمات السر — لا تشاركه):');
-    console.log('[admin-panel] ' + url);
+    console.log('[admin-panel] بوابة مفتاح مفعّلة (المفتاح لا يُطبع في السجلات)');
   } else if (isProdEnv()) {
-    console.warn('[admin-panel] يُنصح بضبط ADMIN_PANEL_GATE_KEY في الإنتاج');
+    console.error('[admin-panel] ADMIN_PANEL_GATE_KEY مفقود — اللوحة محظورة');
   }
 
-  return { panelPath, url };
+  return { panelPath, url: base.replace(/\/$/, '') + '/' + panelPath };
 }
 
 function fsExists(f) {

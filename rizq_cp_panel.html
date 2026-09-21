@@ -1103,6 +1103,40 @@ main, .page-content.active, .main-content, .results-area,
     <div class="panel" id="panel-promo-video">
 
       <!-- ══════════════════════════════════════════════════
+           🎬 PLATFORM PROMO — فيديو المنصة المزروع
+      ══════════════════════════════════════════════════ -->
+      <div class="card" style="max-width:760px;margin:0 auto 20px" id="rzv-platform-promo-card">
+        <div class="card-header" style="background:linear-gradient(135deg,#0D1B2A,#1B3A6B);padding:18px 24px;border-radius:12px 12px 0 0">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:28px">🎬</div>
+            <div>
+              <div style="color:#C9A84C;font-size:15px;font-weight:800">فيديو المنصة المزروع — بداية الحلقة</div>
+              <div style="color:rgba(201,168,76,.65);font-size:11px;margin-top:2px">يُشغَّل أولاً في موضع Rizq ADS، ويعود تلقائياً بعد انتهاء سلسلة إعلانات المعلنين</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#1B3A6B;cursor:pointer">
+            <input type="checkbox" id="rzv-platform-enabled" checked onchange="rzqVidSavePlatformPromo(false)" style="width:16px;height:16px"/>
+            تفعيل فيديو المنصة كبداية للـ Hero Playlist
+          </label>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#1B3A6B;display:block;margin-bottom:4px">مسار الفيديو (خادم المنصة)</label>
+            <input class="form-input" id="rzv-platform-url" dir="ltr" value="/rizq-assets/promo/rizq-platform-promo-light.mp4" style="font-size:11px;font-family:monospace"/>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#1B3A6B;display:block;margin-bottom:4px">مدة إعلان المعلن الواحد (ثوانٍ) قبل الانتقال للتالي</label>
+            <input class="form-input" id="rzv-ad-slot" type="number" min="8" max="120" value="25" style="max-width:120px;font-size:12px"/>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button type="button" onclick="rzqVidSavePlatformPromo(true)" style="background:linear-gradient(135deg,#C9A84C,#a07820);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">💾 حفظ إعداد المنصة</button>
+            <a id="rzv-platform-preview-link" href="/rizq-assets/promo/rizq-platform-promo-light.mp4" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#1B3A6B;align-self:center">▶️ معاينة الفيديو</a>
+          </div>
+          <div id="rzv-platform-status" style="font-size:11px;color:#64748b"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════
            🥇 HERO PLAYLIST — الموضع الأول
       ══════════════════════════════════════════════════ -->
       <div class="card" style="max-width:760px;margin:0 auto 20px">
@@ -3935,16 +3969,16 @@ function renderReports(data){
     const typeTxt = RizqI18n.t2(label.ar,label.fr);
     const isResolved = r.status==='resolved';
     return `<tr${isResolved?' style="opacity:.55"':''}>
-    <td style="font-size:13px;font-weight:700;color:#1a2535;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.adTitle||r.adId}</td>
-    <td><span class="pill pill-pending">${typeTxt}</span></td>
-    <td style="font-size:12.5px;color:var(--text-soft);direction:ltr;text-align:left">${r.reporterPhone||RizqI18n.t2('—','—')}</td>
+    <td style="font-size:13px;font-weight:700;color:#1a2535;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(r.adTitle||r.adId)}</td>
+    <td><span class="pill pill-pending">${escapeHtml(typeTxt)}</span></td>
+    <td style="font-size:12.5px;color:var(--text-soft);direction:ltr;text-align:left">${escapeHtml(r.reporterPhone||RizqI18n.t2('—','—'))}</td>
     <td style="font-size:12px;color:var(--text-muted)">${r.createdAt?new Date(r.createdAt).toLocaleDateString('fr-FR'):''}</td>
     <td>${isResolved?`<span class="pill pill-active">✅ ${RizqI18n.t2('محلول','Résolu')}</span>`:prioMap[label.prio]}</td>
     <td><div style="display:flex;gap:5px;flex-wrap:wrap">
       ${isResolved?'':`
-      <button class="btn-sm btn-danger" onclick="adminDeleteReportedAd('${r.id}','${r.adId}')">${RizqI18n.t2('حذف الإعلان','Supprimer l’annonce')}</button>
-      <button class="btn-sm btn-success" onclick="adminResolveReport('${r.id}')">${RizqI18n.t2('حل','Résoudre')}</button>
-      <button class="btn-sm btn-outline" onclick="adminSuspendReportedSeller('${r.id}','${r.adAccountId||''}')">${RizqI18n.t2('تعليق البائع','Suspendre le vendeur')}</button>`}
+      <button class="btn-sm btn-danger" onclick="adminDeleteReportedAd('${escAdmin(r.id)}','${escAdmin(r.adId)}')">${RizqI18n.t2('حذف الإعلان','Supprimer l’annonce')}</button>
+      <button class="btn-sm btn-success" onclick="adminResolveReport('${escAdmin(r.id)}')">${RizqI18n.t2('حل','Résoudre')}</button>
+      <button class="btn-sm btn-outline" onclick="adminSuspendReportedSeller('${escAdmin(r.id)}','${escAdmin(r.adAccountId||'')}')">${RizqI18n.t2('تعليق البائع','Suspendre le vendeur')}</button>`}
     </div></td>
   </tr>`;
   }).join('');
@@ -4024,17 +4058,17 @@ function renderSupportTickets(list) {
     var st = tk.status || 'open';
     var isDone = st === 'resolved' || st === 'closed';
     return '<tr>' +
-      '<td style="font-size:12px;font-weight:700">' + (tk.id || '') + '</td>' +
-      '<td style="font-size:12px">' + (tk.source || '') + '</td>' +
-      '<td style="font-size:12px">' + (tk.type || '') + '</td>' +
-      '<td style="font-size:12px;max-width:220px">' + (tk.summary || '').slice(0, 120) + '</td>' +
-      '<td style="font-size:12px">' + (tk.contact || '—') + '</td>' +
+      '<td style="font-size:12px;font-weight:700">' + escapeHtml(tk.id || '') + '</td>' +
+      '<td style="font-size:12px">' + escapeHtml(tk.source || '') + '</td>' +
+      '<td style="font-size:12px">' + escapeHtml(tk.type || '') + '</td>' +
+      '<td style="font-size:12px;max-width:220px">' + escapeHtml((tk.summary || '').slice(0, 120)) + '</td>' +
+      '<td style="font-size:12px">' + escapeHtml(tk.contact || '—') + '</td>' +
       '<td style="font-size:12px;color:var(--text-muted)">' + (tk.createdAt ? new Date(tk.createdAt).toLocaleDateString('fr-FR') : '') + '</td>' +
-      '<td><span class="pill ' + (isDone ? 'pill-active' : 'pill-banned') + '">' + (statusMap[st] || st) + '</span></td>' +
+      '<td><span class="pill ' + (isDone ? 'pill-active' : 'pill-banned') + '">' + escapeHtml(statusMap[st] || st) + '</span></td>' +
       '<td><div style="display:flex;gap:5px;flex-wrap:wrap">' +
       (isDone ? '' :
-        '<button class="btn-sm btn-outline" onclick="adminUpdateTicket(\'' + tk.id + '\',\'in_progress\')">' + RizqI18n.t2('معالجة', 'Traiter') + '</button>' +
-        '<button class="btn-sm btn-success" onclick="adminUpdateTicket(\'' + tk.id + '\',\'resolved\')">' + RizqI18n.t2('حل', 'Résoudre') + '</button>') +
+        '<button class="btn-sm btn-outline" onclick="adminUpdateTicket(\'' + escAdmin(tk.id) + '\',\'in_progress\')">' + RizqI18n.t2('معالجة', 'Traiter') + '</button>' +
+        '<button class="btn-sm btn-success" onclick="adminUpdateTicket(\'' + escAdmin(tk.id) + '\',\'resolved\')">' + RizqI18n.t2('حل', 'Résoudre') + '</button>') +
       '</div></td></tr>';
   }).join('');
 }
@@ -4072,11 +4106,11 @@ function renderPayments(data){
       t.innerHTML='<tr><td colspan="6" style="text-align:center;color:#9aa7bd;padding:24px">'+RizqI18n.t2('لا توجد مدفوعات مسجّلة بعد','Aucun paiement enregistré pour le moment')+'</td></tr>';
     } else {
       t.innerHTML=data.map(p=>`<tr>
-        <td style="font-size:13px;font-weight:600;color:#1a2535">${p.user}</td>
-        <td>${p.plan}</td>
-        <td style="font-size:14px;font-weight:900;color:var(--gold)">${p.amount}</td>
-        <td style="font-size:12.5px;color:var(--text-muted)">${p.method}</td>
-        <td style="font-size:12px;color:var(--text-muted)">${p.date}</td>
+        <td style="font-size:13px;font-weight:600;color:#1a2535">${escapeHtml(p.user)}</td>
+        <td>${escapeHtml(p.plan)}</td>
+        <td style="font-size:14px;font-weight:900;color:var(--gold)">${escapeHtml(p.amount)}</td>
+        <td style="font-size:12.5px;color:var(--text-muted)">${escapeHtml(p.method)}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${escapeHtml(p.date)}</td>
         <td><span class="pill ${p.status==='active'?'pill-active':'pill-banned'}">${p.status==='active'?'✅ '+RizqI18n.t2('نشط','Actif'):'❌ '+RizqI18n.t2('منتهي','Expiré')}</span></td>
       </tr>`).join('');
     }
@@ -4143,13 +4177,13 @@ async function renderTeam(){
       const idEsc=String(m.id).replace(/'/g,'\\\'');
       return '<div class="team-card '+(isSuper?'super':'')+'">'
         +'<div class="team-av">'+(isSuper?'👑':'👤')+'</div>'
-        +'<div class="team-name">'+m.name+'</div>'
-        +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" dir="ltr">@'+m.user+'</div>'
+        +'<div class="team-name">'+escAdmin(m.name)+'</div>'
+        +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" dir="ltr">@'+escAdmin(m.user)+'</div>'
         +'<span class="team-role-tag pill '+(isSuper?'pill-super':'pill-mod')+'">'+_teamPermSummary(m)+'</span>'
         +'<div class="team-contact">'
-        +(m.phone?'📱 <a href="tel:'+m.phone+'" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'+m.phone+'</a><br/>':'')
-        +(m.email?'✉️ <a href="mailto:'+m.email+'">'+m.email+'</a><br/>':'')
-        +(m.notes?'<span style="font-size:10.5px;opacity:.6">'+m.notes+'</span>':'')
+        +(m.phone?'📱 <a href="tel:'+escAdmin(String(m.phone).replace(/[^\d+]/g,''))+'" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'+escAdmin(m.phone)+'</a><br/>':'')
+        +(m.email?'✉️ <a href="mailto:'+escAdmin(m.email)+'">'+escAdmin(m.email)+'</a><br/>':'')
+        +(m.notes?'<span style="font-size:10.5px;opacity:.6">'+escAdmin(m.notes)+'</span>':'')
         +'</div>'
         +'<div class="team-actions">'
         +'<button class="btn-sm btn-outline" onclick="editAdmin(\''+idEsc+'\')">✏️ '+RizqI18n.t2('تعديل','Modifier')+'</button>'
@@ -4190,7 +4224,7 @@ function renderCatDist(){
   el.innerHTML=cats.map(c=>`
     <div style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-        <span style="color:var(--text-soft)">${c.name}</span>
+        <span style="color:var(--text-soft)">${escapeHtml(c.name)}</span>
         <span style="color:var(--gold-dk);font-weight:700">${c.num}</span>
       </div>
       <div style="height:6px;background:#eef2fb;border-radius:3px;overflow:hidden">
@@ -4210,8 +4244,8 @@ function renderActivity(){
   el.innerHTML=acts.map(a=>`
     <div class="activity-item">
       <div class="act-icon" style="background:${a.bg}">${a.icon}</div>
-      <div class="act-text">${a.text}</div>
-      <div class="act-time">${a.time}</div>
+      <div class="act-text">${escapeHtml(a.text)}</div>
+      <div class="act-time">${escapeHtml(a.time)}</div>
     </div>`).join('');
 }
 
@@ -4229,7 +4263,7 @@ function renderWilayaStats(){
   const max=stats[0]?stats[0].n:1;
   el.innerHTML=stats.map(s=>`
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-      <div style="font-size:13px;color:var(--text-soft);width:170px;flex-shrink:0">${s.w}</div>
+      <div style="font-size:13px;color:var(--text-soft);width:170px;flex-shrink:0">${escapeHtml(s.w)}</div>
       <div style="flex:1;height:8px;background:#eef2fb;border-radius:4px;overflow:hidden">
         <div style="height:100%;width:${(s.n/max*100).toFixed(0)}%;background:linear-gradient(90deg,var(--royal-light),var(--gold));border-radius:4px;transition:width .8s"></div>
       </div>
@@ -4823,8 +4857,33 @@ function _syncAccountDecisionToBackend(id, action, extra){
     return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
   }).then(function(out){
     var data = out.data;
-    if(data && data.code === 'nni_duplicate'){
-      alert(RizqI18n.t2(data.error || 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر', data.error_fr || "Ce numéro d'identité (NNI) est déjà associé à un autre compte"));
+    if(data && (data.code === 'nni_unavailable' || data.code === 'nni_duplicate')){
+      alert(RizqI18n.t2(
+        data.error || 'تعذّر استخدام رقم الهوية هذا — تحقّق من الرقم أو تواصل مع الدعم',
+        data.error_fr || "Ce numéro d'identité ne peut pas être utilisé — vérifiez-le ou contactez le support"
+      ));
+      return;
+    }
+    /* تبنّي dashToken الصادر من الخادم فقط — بلا mint في المتصفح */
+    if(action === 'approve' && data && data.ok && data.account){
+      var serverTok = data.account.dashToken || data.account.token || '';
+      if(serverTok){
+        try{
+          var accs=getPendingAccounts();
+          var i=accs.findIndex(function(a){return a && a.id===id;});
+          if(i>=0){
+            accs[i].token=serverTok;
+            accs[i].dashToken=serverTok;
+            var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
+            var dashFile=dashFiles[accs[i].type]||'rizq_dashboard_store.html';
+            accs[i].dashLink=dashFile+'?id='+encodeURIComponent(id);
+            savePendingAccounts(accs);
+          }
+        }catch(eTok){}
+        if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+          window.RizqAccount.storeDashToken(id, serverTok);
+        }
+      }
     }
   }).catch(function(){ /* صامت — رابط ادفع خادم قد لا يكون هذا الحساب مسجلاً به بعد */ });
 }
@@ -4846,15 +4905,12 @@ function approveAccount(id, customPkg){
   acc.id_image=null;
   delete acc.idImage;
   // license_image / activity_image2 — وثائق نشاط محفوظة عمداً
-  acc.token='TK_'+Math.random().toString(36).substr(2,10).toUpperCase();
+  /* لا نولّد dashToken في المتصفح — الخادم يصدره عند /decision */
+  delete acc.token;
   const dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   const dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  // رابط يفتح من أي جهاز: id + token في الـ URL، والداشبورد يخزّن التوكن
-  // في sessionStorage ثم يزيل ?token= من الشريط (انظر RizqAccount.stripTokenFromUrl).
-  acc.dashLink=dashFile+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(acc.token);
-  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
-    window.RizqAccount.storeDashToken(id, acc.token);
-  }
+  /* رابط بلا token في الـ URL — التوكن في sessionStorage فقط بعد رد الخادم */
+  acc.dashLink=dashFile+'?id='+encodeURIComponent(id);
   // رابط الملف الشخصي العام (يُشارَك مع المشترين) — فقط للحسابات الفردية حالياً؛
   // المحل/المكتب/الشركة لهم صفحاتهم العامة الخاصة (rizq_store.html/rizq_office.html/rizq_corp.html) بمنطق مختلف بالفعل.
   if(acc.type==='individual'){
@@ -4895,7 +4951,7 @@ function approveAccount(id, customPkg){
   var _isDiamondPkg = /ماسي/.test(String(pkgName));
   if(_isDiamondPkg) _autoRegisterDiamondAgent(acc);
 
-  _syncAccountDecisionToBackend(id, 'approve', { dashToken: acc.token, package: pkgName, package_price: acc.package_price||0 });
+  _syncAccountDecisionToBackend(id, 'approve', { package: pkgName, package_price: acc.package_price||0 });
   renderPendingAccounts();
   updatePendingBadge();
   showToast(RizqI18n.t2('✅ تمت الموافقة — الباقة "'+pkgName+'" مُفعَّلة للحساب','✅ Approuvé — le forfait "'+pkgName+'" est activé pour le compte'),'success');
@@ -4977,12 +5033,12 @@ function copyDashLink(link){
   showToast(RizqI18n.t2('تم نسخ الرابط — أرسله للمالك عبر واتساب 📲','Lien copié — envoyez-le au propriétaire via WhatsApp 📲'),'success');
 }
 
-/** يضمن أن رابط الداشبورد يحمل ?token= (حسابات قديمة وافَق عليها قبل الإصلاح). */
+/** يضمن رابط داشبورد بلا ?token= (التوكن في sessionStorage فقط). */
 function ensureDashLinkWithToken(acc){
-  if(!acc || !acc.id || !acc.token) return acc && acc.dashLink || '';
+  if(!acc || !acc.id) return acc && acc.dashLink || '';
   var dashFiles={office:'rizq_dashboard_office.html',store:'rizq_dashboard_store.html',corp:'rizq_dashboard_corp.html',individual:'rizq_dashboard.html'};
   var dashFile=dashFiles[acc.type]||'rizq_dashboard_store.html';
-  var need = dashFile+'?id='+encodeURIComponent(acc.id)+'&token='+encodeURIComponent(acc.token);
+  var need = dashFile+'?id='+encodeURIComponent(acc.id);
   if(acc.dashLink !== need){
     acc.dashLink = need;
     try{
@@ -4991,7 +5047,7 @@ function ensureDashLinkWithToken(acc){
       if(i>=0){ accs[i].dashLink=need; savePendingAccounts(accs); }
     }catch(e){}
   }
-  if(window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
+  if(acc.token && window.RizqAccount && typeof window.RizqAccount.storeDashToken === 'function'){
     window.RizqAccount.storeDashToken(acc.id, acc.token);
   }
   return acc.dashLink;
@@ -6019,21 +6075,33 @@ function clearPromoVideoConfig(){
 // ════════════════════════════════════════════════════════════════
 // ══ Rizq Video Ads v2 — إدارة Hero Playlist + Popup Rotation ══
 // ════════════════════════════════════════════════════════════════
-var _rzqVidData = { hero: [], popup: [] };
+var _rzqVidData = {
+  hero: [],
+  popup: [],
+  platformPromoUrl: '/rizq-assets/promo/rizq-platform-promo-light.mp4',
+  platformPromoEnabled: true,
+  adSlotSeconds: 25
+};
 
 function rzqVidLoadPanel() {
   try {
-    _rzqVidData = JSON.parse(localStorage.getItem('rizq_video_ads') || '{"hero":[],"popup":[]}');
-  } catch(e) { _rzqVidData = { hero: [], popup: [] }; }
+    _rzqVidData = JSON.parse(localStorage.getItem('rizq_video_ads') || '{}');
+  } catch(e) { _rzqVidData = {}; }
   _rzqVidData.hero  = _rzqVidData.hero  || [];
   _rzqVidData.popup = _rzqVidData.popup || [];
+  if (!_rzqVidData.platformPromoUrl) {
+    _rzqVidData.platformPromoUrl = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  }
+  if (_rzqVidData.platformPromoEnabled == null) _rzqVidData.platformPromoEnabled = true;
+  if (!_rzqVidData.adSlotSeconds) _rzqVidData.adSlotSeconds = 25;
   rzqVidRenderHero();
   rzqVidRenderPopup();
+  rzqVidRenderPlatformPromo();
   // إصلاح جوهري: قائمتا المعلنين (Hero/Popup) كانتا rizq_video_ads محلية
   // 100% — نجلب آخر نسخة من الخادم (قد تكون عُدِّلت من جهاز أدمن آخر أو
   // بعد موافقة على طلب Rizq ADS من جهاز مختلف) بعد العرض الفوري المحلي.
   syncVideoAdsFromBackend().then(function(changed){
-    if(changed){ rzqVidRenderHero(); rzqVidRenderPopup(); }
+    if(changed){ rzqVidRenderHero(); rzqVidRenderPopup(); rzqVidRenderPlatformPromo(); }
   });
 }
 
@@ -6056,10 +6124,41 @@ function syncVideoAdsFromBackend(){
       if(!data || !data.ok || !data.config || !data.config.videoAds) return false;
       var remote = data.config.videoAds;
       if(!Array.isArray(remote.hero) && !Array.isArray(remote.popup)) return false;
-      _rzqVidData = { hero: remote.hero||[], popup: remote.popup||[] };
+      _rzqVidData = Object.assign({}, _rzqVidData, { hero: remote.hero||[], popup: remote.popup||[], platformPromoUrl: remote.platformPromoUrl || _rzqVidData.platformPromoUrl, platformPromoEnabled: remote.platformPromoEnabled != null ? remote.platformPromoEnabled : _rzqVidData.platformPromoEnabled, adSlotSeconds: remote.adSlotSeconds || _rzqVidData.adSlotSeconds });
       localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
       return true;
     }).catch(function(){ return false; });
+}
+
+function rzqVidRenderPlatformPromo() {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  var st = document.getElementById('rzv-platform-status');
+  var link = document.getElementById('rzv-platform-preview-link');
+  if (en) en.checked = _rzqVidData.platformPromoEnabled !== false;
+  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  if (slot) slot.value = String(_rzqVidData.adSlotSeconds || 25);
+  if (link && url) link.href = url.value;
+  if (st) {
+    st.textContent = (_rzqVidData.platformPromoEnabled !== false)
+      ? '✅ الحلقة: فيديو المنصة → معلنو Hero → يعود لفيديو المنصة'
+      : '⏸ فيديو المنصة متوقف — يظهر معلنو Hero فقط';
+  }
+}
+function rzqVidSavePlatformPromo(showToastMsg) {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  _rzqVidData.platformPromoEnabled = !!(en && en.checked);
+  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  _rzqVidData.adSlotSeconds = Math.max(8, Math.min(120, Number(slot && slot.value) || 25));
+  localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
+  _syncVideoAdsToBackend(_rzqVidData);
+  rzqVidRenderPlatformPromo();
+  if (showToastMsg) {
+    showToast(RizqI18n.t2('💾 تم حفظ فيديو المنصة المزروع','💾 Promo plateforme enregistrée'));
+  }
 }
 
 function rzqVidRenderHero() {
@@ -7574,11 +7673,13 @@ function syncModCfgFromBackend(){
 // ما كان يسبب خطأ JS صامتاً في الكونسول عند فتح تبويب "قنوات التواصل".
 var CHANNELS_CFG_KEY = 'rizq_channels_config';
 var CHANNELS_FIELD_IDS = [
-  'ch-phone-number','ch-twilio-sid','ch-twilio-token','ch-webhook-url',
+  'ch-phone-number','ch-twilio-sid','ch-webhook-url',
   'ch-call-greeting','ch-ivr-1','ch-ivr-2','ch-ivr-3','ch-call-closing',
-  'ch-email-from','ch-email-pass','ch-email-subj-inquiry',
+  'ch-email-from','ch-email-subj-inquiry',
   'ch-email-body-inquiry','ch-email-body-support','ch-email-body-partner'
 ];
+/** أسرار تشغيلية — لا تُحفظ في localStorage أبداً (XSS) */
+var CHANNELS_SECRET_IDS = ['ch-twilio-token', 'ch-email-pass'];
 
 function switchChTab(tab){
   var tabs=['calls','email','whatsapp','setup'];
@@ -7593,9 +7694,21 @@ function switchChTab(tab){
 function renderChannelsPanel(){
   var cfg = {};
   try{ cfg = JSON.parse(localStorage.getItem(CHANNELS_CFG_KEY)||'{}') || {}; }catch(e){ cfg = {}; }
+  // تنظيف أي أسرار قديمة كانت مخزّنة قبل هذا الإصلاح
+  var dirty = false;
+  CHANNELS_SECRET_IDS.forEach(function(id){
+    if (Object.prototype.hasOwnProperty.call(cfg, id)) { delete cfg[id]; dirty = true; }
+  });
+  if (dirty) {
+    try { localStorage.setItem(CHANNELS_CFG_KEY, JSON.stringify(cfg)); } catch (eC) {}
+  }
   CHANNELS_FIELD_IDS.forEach(function(id){
     var el = document.getElementById(id);
     if(el && cfg[id]!=null) el.value = cfg[id];
+  });
+  CHANNELS_SECRET_IDS.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value = '';
   });
 }
 
@@ -7605,6 +7718,7 @@ function saveChannelsConfig(){
     var el = document.getElementById(id);
     if(el) cfg[id] = el.value;
   });
+  // لا نخزّن كلمات السر في المتصفح — XSS لن يجد Twilio/SMTP هنا
   localStorage.setItem(CHANNELS_CFG_KEY, JSON.stringify(cfg));
   _adminPostSiteConfig({
     channelsPublic: {
@@ -7624,7 +7738,7 @@ function saveChannelsConfig(){
   }, function(){
     if(typeof showToast==='function') showToast(RizqI18n.t2('✅ تم حفظ إعدادات قنوات التواصل','✅ Paramètres des canaux enregistrés'),'success');
   }, function(){
-    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ حُفظ محلياً (أسرار Twilio تبقى على هذا الجهاز)','✅ Enregistré localement (les secrets Twilio restent sur cet appareil)'),'success');
+    if(typeof showToast==='function') showToast(RizqI18n.t2('✅ حُفظ محلياً (بدون أسرار Twilio/SMTP في المتصفح)','✅ Enregistré localement (sans secrets Twilio/SMTP dans le navigateur)'),'success');
   });
 }
 

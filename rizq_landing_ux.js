@@ -121,7 +121,19 @@
   /* ── فتح ويدجت المساعد — scroll سلس ثم open() ── */
   function openRizqWidget() {
     var toggle = document.getElementById('rizq-chat-toggle');
-    if (!toggle) return;
+    if (!toggle) {
+      if (typeof window.RizqLoadAssistant === 'function') window.RizqLoadAssistant(true);
+      var tries = 0;
+      var wait = setInterval(function () {
+        tries++;
+        toggle = document.getElementById('rizq-chat-toggle');
+        if (toggle || tries > 40) {
+          clearInterval(wait);
+          if (toggle) openRizqWidget();
+        }
+      }, 100);
+      return;
+    }
 
     function doOpen() {
       if (window.RizqWidget && typeof window.RizqWidget.open === 'function') {

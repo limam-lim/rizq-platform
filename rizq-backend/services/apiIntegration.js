@@ -12,9 +12,13 @@ const KEY_PREFIX = 'rizq_live_';
 const KEY_RANDOM_BYTES = 32;
 
 function getPepper() {
-  return process.env.API_KEY_PEPPER
-    || process.env.BACKEND_SHARED_SECRET
-    || 'rizq-api-pepper-change-in-production';
+  const pepper = String(process.env.API_KEY_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim();
+  if (pepper) return pepper;
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+  if (isProd) {
+    throw new Error('API_KEY_PEPPER or BACKEND_SHARED_SECRET required in production');
+  }
+  return 'rizq-api-pepper-dev-only';
 }
 
 function hashApiKey(plainKey) {
@@ -187,9 +191,9 @@ function assertIpAllowed(row, clientIp) {
 }
 
 function resolveClientIp(req) {
-  const forwarded = req.header('x-forwarded-for');
-  if (forwarded) return String(forwarded).split(',')[0].trim();
-  return req.ip || req.connection?.remoteAddress || '';
+  // مع trust proxy، Express يضبط req.ip من أقصى اليمين في XFF — لا نثق باليسار (قابل للتزوير)
+  const ip = req.ip || (req.connection && req.connection.remoteAddress) || '';
+  return String(ip).replace(/^::ffff:/, '');
 }
 
 function authenticateApiKeyRequest(req) {

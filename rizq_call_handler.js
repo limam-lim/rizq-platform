@@ -389,17 +389,19 @@ app.post('/api/call/rizq-input', async (req, res) => {
   res.send(twiml.toString());
 });
 
+const { requireSatelliteSecret, timingSafeEqualStr } = require('./rizq-backend/lib/satelliteAuth');
+
 // ══════════════════════════════════════════════════════════
 //  API: تفعيل / إيقاف الوكيل (من لوحة المشترك)
 //  POST /api/agent/toggle
 //  { subscriberPhone, active: true|false, secret: 'xxx' }
 // ══════════════════════════════════════════════════════════
 app.post('/api/agent/toggle', (req, res) => {
-  const { subscriberPhone, active, secret } = req.body;
-
-  // تحقق بسيط من السر (يُحسَّن لاحقاً بـ JWT)
-  const expectedSecret = process.env.RIZQ_API_SECRET;
-  if(!expectedSecret || secret !== expectedSecret) {
+  const { subscriberPhone, active, secret } = req.body || {};
+  const expectedSecret = process.env.RIZQ_API_SECRET || '';
+  const headerSecret = req.header('x-rizq-secret') || '';
+  const got = headerSecret || secret || '';
+  if (!expectedSecret || !got || !timingSafeEqualStr(got, expectedSecret)) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
 
@@ -423,7 +425,7 @@ app.post('/api/agent/toggle', (req, res) => {
 });
 
 // ── API: حالة وكيل مشترك ────────────────────────────────
-app.get('/api/agent/status/:phone', (req, res) => {
+app.get('/api/agent/status/:phone', requireSatelliteSecret, (req, res) => {
   const phone   = req.params.phone;
   const profile = getSubscriberProfile(phone);
   const active  = agentStatus.get(phone) !== false;
@@ -436,19 +438,19 @@ app.get('/api/agent/status/:phone', (req, res) => {
 });
 
 // ── API: سجل المكالمات ───────────────────────────────────
-app.get('/api/call-log', (req, res) => {
+app.get('/api/call-log', requireSatelliteSecret, (req, res) => {
   res.json({ calls: callLog.slice(0, 50), total: callLog.length });
 });
 
 // ── API: سجل مكالمات مشترك بعينه ────────────────────────
-app.get('/api/call-log/:phone', (req, res) => {
+app.get('/api/call-log/:phone', requireSatelliteSecret, (req, res) => {
   const phone = req.params.phone;
   const calls = callLog.filter(c => c.subscriberNum === phone);
   res.json({ calls: calls.slice(0, 50), total: calls.length });
 });
 
-// ── صفحة الحالة ─────────────────────────────────────────
-app.get('/', (req, res) => {
+// ── صفحة الحالة (سرّ الأقمار فقط — لا تكشف أرقاماً/سجلات للعامة) ─
+app.get('/', requireSatelliteSecret, (req, res) => {
   const activeCount = Array.from(agentStatus.values()).filter(Boolean).length;
   res.send(`
     <html dir="rtl"><body style="font-family:Arial;padding:40px;background:#f0f4fa">

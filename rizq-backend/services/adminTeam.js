@@ -1,10 +1,9 @@
 /**
  * adminTeam.js — فريق الإدارة + صلاحيات ديناميكية
+ * التخزين عبر repos (SQLite).
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const {
@@ -15,27 +14,22 @@ const {
   hasAdminPermission,
   permissionsForLegacyRole,
 } = require('./adminPermissions');
-
-const TEAM_FILE = path.join(__dirname, '..', 'data', 'admin-team.json');
-
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
-}
-
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
-}
+const repos = require('../db/repos');
 
 function genAdminId() {
   return 'adm_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex');
 }
 
 function readTeam() {
-  return readJson(TEAM_FILE, []);
+  return repos.adminTeam.list();
 }
 
 function writeTeam(list) {
-  writeJson(TEAM_FILE, list);
+  const rows = Array.isArray(list) ? list : [];
+  repos.adminTeam.replaceAll(rows.map((m) => ({
+    id: String(m.id || genAdminId()),
+    data: m,
+  })));
 }
 
 function publicMember(row) {
@@ -187,7 +181,7 @@ function assertTeamCapacity() {
   }
 }
 
-async function createMember(payload, actorUser) {
+async function createMember(payload, actorUser, actorPerms) {
   assertTeamCapacity();
   const user = String(payload.user || '').trim().toLowerCase();
   const name = String(payload.name || '').trim();
@@ -202,6 +196,13 @@ async function createMember(payload, actorUser) {
     err.code = 'user_exists';
     throw err;
   }
+  let perms = normalizePermissions(payload.permissions);
+  // team.manage alone لا يمنح Super (*) — يلزم أن يكون الفاعل Super أصلاً
+  if (perms.includes('*') && !hasAdminPermission(actorPerms, '*')) {
+    const err = new Error('cannot_grant_super');
+    err.code = 'cannot_grant_super';
+    throw err;
+  }
   const now = new Date().toISOString();
   const member = {
     id: genAdminId(),
@@ -211,7 +212,7 @@ async function createMember(payload, actorUser) {
     email: String(payload.email || '').slice(0, 120),
     phone: String(payload.phone || '').slice(0, 40),
     notes: String(payload.notes || '').slice(0, 300),
-    permissions: normalizePermissions(payload.permissions),
+    permissions: perms,
     active: true,
     createdAt: now,
     updatedAt: now,
@@ -223,7 +224,7 @@ async function createMember(payload, actorUser) {
   return publicMember(member);
 }
 
-async function updateMember(id, payload) {
+async function updateMember(id, payload, actorPerms) {
   const list = readTeam();
   const idx = list.findIndex((m) => m.id === id);
   if (idx === -1) return null;
@@ -232,7 +233,25 @@ async function updateMember(id, payload) {
   if (payload.email != null) row.email = String(payload.email).slice(0, 120);
   if (payload.phone != null) row.phone = String(payload.phone).slice(0, 40);
   if (payload.notes != null) row.notes = String(payload.notes).slice(0, 300);
-  if (payload.permissions != null) row.permissions = normalizePermissions(payload.permissions);
+  if (payload.permissions != null) {
+    const next = normalizePermissions(payload.permissions);
+    if (next.includes('*') && !hasAdminPermission(actorPerms, '*')) {
+      const err = new Error('cannot_grant_super');
+      err.code = 'cannot_grant_super';
+      throw err;
+    }
+    // منع إسقاط آخر Super
+    const wasSuper = (row.permissions || []).includes('*');
+    if (wasSuper && !next.includes('*')) {
+      const supers = readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*'));
+      if (supers.length <= 1) {
+        const err = new Error('last_super_admin');
+        err.code = 'last_super_admin';
+        throw err;
+      }
+    }
+    row.permissions = next;
+  }
   if (payload.active != null) row.active = !!payload.active;
   if (payload.pass && String(payload.pass).length >= 6) {
     row.passHash = await bcrypt.hash(String(payload.pass), 10);

@@ -32,8 +32,12 @@ function globalErrorHandler(err, req, res, next) {
     return sendError(res, 403, 'غير مسموح من هذا الأصل (CORS)', 'CORS_DENIED');
   }
   const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 500;
-  if (status >= 500) console.error('[rizq-api]', req.method, req.path, err.message);
-  sendError(res, status, err.message || 'خطأ داخلي في الخادم', err.code);
+  if (status >= 500) {
+    console.error('[rizq-api]', req.method, req.path, err && err.message);
+    // لا نُسرّب err.message التقني (مسارات/SQL) للعميل بأي لغة
+    return sendError(res, 500, 'خطأ داخلي في الخادم', 'INTERNAL_ERROR');
+  }
+  sendError(res, status, err.message || 'طلب غير صالح', err.code);
 }
 
 module.exports = {

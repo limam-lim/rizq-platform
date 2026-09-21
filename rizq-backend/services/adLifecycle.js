@@ -4,6 +4,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const repos = require('../db/repos');
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 const ACTIVE_LIFECYCLE_MS = 30 * MS_DAY;
@@ -14,7 +15,6 @@ const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp']);
 const DIAMOND_PKG_RE = /(ماسية|diamond)/i;
 const VIDEO_ADS_PKG_RE = /(video|فيديو|rizq\s*ads|إعلان.*فيديو)/i;
 
-const AUDIT_FILE = 'maintenance-audit.json';
 const MAX_AUDIT_ENTRIES = 120;
 
 function isPaidParticipant(account, pkgRecord) {
@@ -88,22 +88,21 @@ function purgeAdMedia(adId, uploadsDir) {
   return bytesBefore;
 }
 
-function readAuditLog(dataDir) {
-  const file = path.join(dataDir, AUDIT_FILE);
-  try {
-    const list = JSON.parse(fs.readFileSync(file, 'utf8'));
-    return Array.isArray(list) ? list : [];
-  } catch (e) {
-    return [];
-  }
+function readAuditLog(_dataDir) {
+  return repos.maintenanceAudit.list();
 }
 
-function appendAuditEntry(dataDir, entry) {
-  const file = path.join(dataDir, AUDIT_FILE);
-  const list = readAuditLog(dataDir);
-  list.unshift(entry);
-  if (list.length > MAX_AUDIT_ENTRIES) list.length = MAX_AUDIT_ENTRIES;
-  fs.writeFileSync(file, JSON.stringify(list, null, 2), 'utf8');
+function appendAuditEntry(_dataDir, entry) {
+  const id = (entry && entry.id) || ('aud_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+  const rec = Object.assign({ id }, entry || {});
+  repos.maintenanceAudit.upsert(id, rec);
+  const all = repos.maintenanceAudit.list();
+  if (all.length > MAX_AUDIT_ENTRIES) {
+    all
+      .sort((a, b) => String(b.at || b.createdAt || '').localeCompare(String(a.at || a.createdAt || '')))
+      .slice(MAX_AUDIT_ENTRIES)
+      .forEach((e) => repos.maintenanceAudit.remove(String(e.id)));
+  }
 }
 
 /**

@@ -1,13 +1,10 @@
 /**
- * catalogConfig.js — مصدر الحقيقة الديناميكي (site-config.json) مع defaults
+ * catalogConfig.js — مصدر الحقيقة الديناميكي (site-config عبر repos) مع defaults
  * الأسعار والسعات والميزات تُقرأ من لوحة الأدمن؛ الكود يحمل افتراضات فقط.
  */
-const fs = require('fs');
-const path = require('path');
+const repos = require('../db/repos');
 
-const SITE_CONFIG_FILE = path.join(__dirname, '..', 'data', 'site-config.json');
-
-/** افتراضيات باقات الأفراد — تُستخدم عند غياب site-config.json */
+/** افتراضيات باقات الأفراد — تُستخدم عند غياب الإعداد */
 const DEFAULT_INDIVIDUAL_PACKAGES = [
   { id: 'ind-free', name: 'مجانية', price: 0, durationDays: 10, active: true },
   { id: 'ind-boost', name: 'مميزة', price: 300, durationDays: 30, boostDays: 3, active: true },
@@ -50,7 +47,7 @@ const DIAMOND_TIER_IDS = {
 
 function readSiteConfigRaw() {
   try {
-    return JSON.parse(fs.readFileSync(SITE_CONFIG_FILE, 'utf8'));
+    return repos.getSiteConfig() || {};
   } catch (e) {
     return {};
   }
@@ -184,7 +181,6 @@ function isTrialPackage(pkgName, price) {
 }
 
 module.exports = {
-  SITE_CONFIG_FILE,
   DEFAULT_QUOTA_CONFIG,
   DEFAULT_TOPUP_CONFIG,
   readSiteConfigRaw,

@@ -1,24 +1,10 @@
 /**
- * تذاكر دعم/شكاوى — تخزين موحّد لجميع الوكلاء
+ * تذاكر دعم/شكاوى — تخزين موحّد لجميع الوكلاء (SQLite عبر repos)
  */
-const fs = require('fs');
-const path = require('path');
-
-const FILE = path.join(__dirname, '..', 'data', 'support-tickets.json');
+const repos = require('../db/repos');
 
 function readTickets() {
-  try {
-    if (!fs.existsSync(FILE)) return [];
-    return JSON.parse(fs.readFileSync(FILE, 'utf8'));
-  } catch (e) {
-    return [];
-  }
-}
-
-function writeTickets(list) {
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf8');
+  return repos.supportTickets.list();
 }
 
 function saveTicket({ source, type, summary, adId, contact, meta }) {
@@ -34,23 +20,22 @@ function saveTicket({ source, type, summary, adId, contact, meta }) {
     status: 'open',
     createdAt: new Date().toISOString(),
   };
-  const list = readTickets();
-  list.push(rec);
-  writeTickets(list);
+  repos.supportTickets.upsert(id, rec);
   return rec;
 }
 
 function updateTicketStatus(id, status, adminNote) {
-  const list = readTickets();
-  const idx = list.findIndex((t) => t.id === id);
-  if (idx < 0) return null;
+  const cur = repos.supportTickets.get(String(id));
+  if (!cur) return null;
   const allowed = ['open', 'in_progress', 'resolved', 'closed'];
   if (!allowed.includes(status)) return null;
-  list[idx].status = status;
-  list[idx].updatedAt = new Date().toISOString();
-  if (adminNote) list[idx].adminNote = String(adminNote).slice(0, 500);
-  writeTickets(list);
-  return list[idx];
+  const next = Object.assign({}, cur, {
+    status,
+    updatedAt: new Date().toISOString(),
+  });
+  if (adminNote) next.adminNote = String(adminNote).slice(0, 500);
+  repos.supportTickets.upsert(String(id), next);
+  return next;
 }
 
-module.exports = { saveTicket, readTickets, updateTicketStatus, FILE };
+module.exports = { saveTicket, readTickets, updateTicketStatus };

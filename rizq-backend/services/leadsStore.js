@@ -1,30 +1,15 @@
 /**
  * leadsStore.js — طلبات Leads من الويدجت/التيليغرام (حالة pending → معالجة)
+ * التخزين عبر repos (SQLite).
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const { nowIsoWithLocal } = require('./localTime');
 const { formatPendingLeadsList, timestampLine } = require('./telegramNotifyFormat');
-
-const FILE = path.join(__dirname, '..', 'data', 'leads.json');
+const repos = require('../db/repos');
 
 function readLeads() {
-  try {
-    if (!fs.existsSync(FILE)) return [];
-    const raw = JSON.parse(fs.readFileSync(FILE, 'utf8'));
-    return Array.isArray(raw) ? raw : [];
-  } catch (e) {
-    console.error('[leads-store] read error:', e.message);
-    return [];
-  }
-}
-
-function writeLeads(list) {
-  const dir = path.dirname(FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf8');
+  return repos.leads.list();
 }
 
 function saveLead({
@@ -62,21 +47,18 @@ function saveLead({
     telegramSent: false,
     telegramMessageId: null,
   };
-  const list = readLeads();
-  list.push(rec);
-  writeLeads(list);
+  repos.leads.upsert(id, rec);
   console.log('[leads-store] saved', rec.id, rec.businessName, rec.whatsapp, '@', rec.createdAtLocal);
   return rec;
 }
 
-  function patchLead(id, patch) {
-  const list = readLeads();
-  const idx = list.findIndex((l) => l.id === id);
-  if (idx < 0) return null;
+function patchLead(id, patch) {
+  const cur = repos.leads.get(String(id));
+  if (!cur) return null;
   const ts = nowIsoWithLocal();
-  Object.assign(list[idx], patch, { updatedAt: ts.iso, updatedAtLocal: ts.local });
-  writeLeads(list);
-  return list[idx];
+  const next = Object.assign({}, cur, patch, { updatedAt: ts.iso, updatedAtLocal: ts.local });
+  repos.leads.upsert(String(id), next);
+  return next;
 }
 
 function getPendingLeads() {
@@ -86,7 +68,7 @@ function getPendingLeads() {
 }
 
 function getLeadById(id) {
-  return readLeads().find((l) => l.id === id) || null;
+  return repos.leads.get(String(id)) || null;
 }
 
 function updateLeadStatus(id, status, adminNote) {
@@ -118,7 +100,6 @@ function formatPendingLeadsForAdmin(leads) {
 }
 
 module.exports = {
-  FILE,
   readLeads,
   saveLead,
   patchLead,

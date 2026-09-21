@@ -2,15 +2,12 @@
  * فحص المشرف على جانب الخادم — يعيد استخدام rizq_moderator_agent.js
  * قبل حفظ أي إعلان جديد عبر POST /api/ads
  */
-const fs = require('fs');
 const path = require('path');
-
-const SITE_CONFIG_FILE = path.join(__dirname, '..', 'data', 'site-config.json');
+const repos = require('../db/repos');
 
 function readSiteConfig() {
   try {
-    if (!fs.existsSync(SITE_CONFIG_FILE)) return {};
-    return JSON.parse(fs.readFileSync(SITE_CONFIG_FILE, 'utf8'));
+    return repos.getSiteConfig() || {};
   } catch (e) {
     return {};
   }

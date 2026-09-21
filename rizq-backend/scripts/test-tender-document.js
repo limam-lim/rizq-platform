@@ -1,6 +1,8 @@
 /**
  * Tests for tender PDF document pipeline + access control
  * node scripts/test-tender-document.js
+ *
+ * Seeds accounts/tenders via platformStore (SQLite source of truth).
  */
 const fs = require('fs');
 const path = require('path');
@@ -10,12 +12,10 @@ const {
   resolveTenderDocumentAbsPath,
   parseDataUriPdf,
 } = require('../services/tenderDocument');
+const platformStore = require('../db/platformStore');
 
 const PORT = Number(process.env.PORT || 3000);
 const BASE = 'http://127.0.0.1:' + PORT;
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
 
 let passed = 0;
 let failed = 0;
@@ -34,14 +34,6 @@ async function req(method, urlPath, body, headers) {
   let j = null;
   try { j = await r.json(); } catch (e) { j = null; }
   return { status: r.status, body: j, headers: r.headers };
-}
-
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
-}
-
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
 }
 
 // Minimal valid PDF header
@@ -66,11 +58,10 @@ async function main() {
   const anonDoc = await req('GET', '/api/tenders/' + tenderId + '/document');
   ok('anonymous document download blocked', anonDoc.status === 403 || anonDoc.status === 404);
 
-  // Seed tender + account for owner access
+  // Seed tender + account for owner access (SQLite)
   const accessToken = crypto.randomBytes(20).toString('hex');
   const accountId = 'acc_tdoc_' + Date.now();
-  const accounts = readJson(ACCOUNTS_FILE, []);
-  accounts.push({
+  platformStore.upsertAccount({
     id: accountId,
     type: 'store',
     name: 'Doc Test Owner',
@@ -78,9 +69,8 @@ async function main() {
     status: 'approved',
     accessToken,
   });
-  writeJson(ACCOUNTS_FILE, accounts);
 
-  const tenders = readJson(TENDERS_FILE, []);
+  const tenders = platformStore.readTenders();
   tenders.unshift({
     id: tenderId,
     ownerId: accountId,
@@ -99,7 +89,7 @@ async function main() {
     createdAt: new Date().toISOString(),
     bids: [],
   });
-  writeJson(TENDERS_FILE, tenders);
+  platformStore.writeTenders(tenders);
 
   const ownerDoc = await fetch(BASE + '/api/tenders/' + tenderId + '/document', {
     headers: { 'x-account-id': accountId, 'x-account-token': accessToken },
@@ -112,8 +102,8 @@ async function main() {
   ok('pending tender not in public list', !pub);
 
   // Cleanup test tender + account
-  writeJson(TENDERS_FILE, readJson(TENDERS_FILE, []).filter((t) => t.id !== tenderId));
-  writeJson(ACCOUNTS_FILE, readJson(ACCOUNTS_FILE, []).filter((a) => a.id !== accountId));
+  platformStore.writeTenders(platformStore.readTenders().filter((t) => t.id !== tenderId));
+  platformStore.writeAccounts(platformStore.readAccounts().filter((a) => a.id !== accountId));
   if (abs && fs.existsSync(abs)) {
     try { fs.unlinkSync(abs); fs.rmdirSync(path.dirname(abs)); } catch (e) { /* ignore */ }
   }

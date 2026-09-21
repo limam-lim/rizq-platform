@@ -67,27 +67,27 @@ function setupIntegrationAPI(app, deps) {
     return { ok: true, acc };
   }
 
-  /** GET /api/integration/status/:accountId — owner dashboard */
+  /** GET /api/integration/status/:accountId — owner dashboard (لا يُنشئ مفتاحاً) */
   app.get('/api/integration/status/:accountId', integrationLimiter, (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
-    const token = req.header('x-account-token') || req.query.token || '';
+    const token = String(req.header('x-account-token') || '').trim();
     const guard = ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 
-    let status = getIntegrationStatus(accountId, guard.acc.type);
-    if (status.entitled && !status.hasKey) {
-      const created = ensureApiKeyForCompany(accountId, guard.acc.type);
-      if (created.ok && created.integration) {
-        status = {
-          ok: true,
-          entitled: true,
-          hasKey: true,
-          integration: created.integration,
-          justCreated: !!created.created,
-        };
-      }
-    }
+    const status = getIntegrationStatus(accountId, guard.acc.type);
     res.json({ ok: true, ...status });
+  });
+
+  /** POST /api/integration/key/:accountId/create — إنشاء مفتاح لأول مرة (يكشف النص مرة واحدة) */
+  app.post('/api/integration/key/:accountId/create', integrationLimiter, (req, res) => {
+    const accountId = String(req.params.accountId || '').trim();
+    const token = String(req.header('x-account-token') || '').trim();
+    const guard = ownerGuard(accountId, token);
+    if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
+
+    const result = ensureApiKeyForCompany(accountId, guard.acc.type);
+    if (!result.ok) return sendError(res, 403, result.error, result.code);
+    res.json(result);
   });
 
   /** POST /api/integration/key/:accountId/regenerate — rotate key (owner) */

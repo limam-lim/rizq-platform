@@ -284,7 +284,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 </style>
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_packages_config.js?v=12.9"></script>
+<script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -297,7 +297,8 @@ textarea.form-input{min-height:80px;resize:vertical}
   <script src="rizq_i18n.js"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_account_route.js?v=9"></script>
+<script src="rizq_dashboard_shared.js?v=1"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -872,15 +873,6 @@ textarea.form-input{min-height:80px;resize:vertical}
 // ═══════════════════════════════════════════════════════════════
 // SUBSCRIPTION LIFECYCLE UI — يستخدم RizqSub engine
 // ═══════════════════════════════════════════════════════════════
-function showToast(msg, type){
-  var t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.className = 'toast' + (type ? ' ' + type : '');
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(function(){ t.classList.remove('show'); }, 3000);
-}
 
 // ══ Language Toggle (AR ⇄ FR) ══
 var _corpLang = (function(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } })();
@@ -1214,19 +1206,8 @@ function initCorpAccess(){
   }
   if(!tok) tok = p.get('token') || '';
   if(!id||!tok){showAccessDenied();return;}
-  try{
-    // إصلاح جوهري: كان هذا الكود يقرأ rizq_accounts كأنه مصفوفة (accs.find)
-    // بينما يكتبه rizq_admin.html ككائن ({[id]:{...}}) — فكان .find() يفشل
-    // دوماً برمي استثناء صامت يُمسكه catch أدناه، أي أن كل حساب شركة حقيقي
-    // (غير تجريبي) كان يُرفض وصوله دائماً. الآن نقرأ من rizq_pending_accounts
-    // — نفس مصدر الحقيقة المستخدم فعلياً في داشبوردات المحل والمكتب.
-    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc = accs.find(function(a){return a.id===id && a.token===tok && a.status==='approved' && a.type==='corp';});
-    if(acc){ CORP_ACC = loadActivatedPackage(acc); initDashboard(); return; }
-  // لا سجل محلي — متوقّع تماماً عندما يفتح صاحب الشركة الرابط من جهازه
-  // الخاص (وليس نفس متصفح الأدمن). نحاول التحقق من الخادم قبل الرفض النهائي.
-    verifyCorpAccessRemote(id, tok);
-  }catch(e){showAccessDenied();}
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (تعليق/رفض/تدوير توكن)
+  verifyCorpAccessRemote(id, tok);
 }
 
 // ── يُستدعى فقط عندما لا يوجد سجل محلي — يتحقق من الخادم (rizq_backend_config.js
@@ -1282,10 +1263,6 @@ function showAccessDenied(){
   if(el){el.style.display='flex';}
 }
 
-function escapeHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
-}
-function escapeAttr(s){return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
 
 
 // ══ Init ══
@@ -1664,22 +1641,8 @@ function renderReferralPanel(){
       '<div>🎁 <b>'+data.bonusDaysTotal+'</b> '+_t2('يوماً مجانياً مكتسباً','jours gratuits gagnés')+'</div>';
   }).catch(function(){});
 }
-function copyReferralLink(){
-  var input = document.getElementById('referral-link-input');
-  if(!input || !input.value) return;
-  navigator.clipboard.writeText(input.value).then(function(){
-    if(typeof showToast==='function') showToast(_t2('✅ تم نسخ الرابط','✅ Lien copié'),'success');
-  }).catch(function(){});
-}
 
 // ── شارة "موثّق⁺" (Verified+) — مهمة #232 — يستخدم CORP_ACC مثل الإحالة أعلاه ──
-function _verifiedPlusPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_verified_plus_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [{name:'سنوية', price:5000, duration:'سنة'}];
-}
 
 function renderVerifiedPlusPanel(){
   var fr = (typeof _corpLang!=='undefined' && _corpLang==='fr');
@@ -1725,18 +1688,6 @@ function renderVerifiedPlusPanel(){
 }
 
 /* ══ غرفة المناقصات — مناقصاتي المنشورة + العروض المقدَّمة عليها ══ */
-function _tenderPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_tender_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [
-    {name:'تجريبية', price:0,     duration:'10 أيام'},
-    {name:'شهرية', price:5000,  duration:'شهر'},
-    {name:'ربعية', price:13500, duration:'3 أشهر'},
-    {name:'سنوية', price:45000, duration:'12 شهر'}
-  ];
-}
 
 function renderTenderSubStatus(){
   var fr = (typeof _corpLang!=='undefined' && _corpLang==='fr');
@@ -1779,13 +1730,6 @@ function renderTenderSubStatus(){
     });
 }
 
-function _tenderStatusBadgeOwner(t, fr){
-  var s = t.status || 'open';
-  if(s==='pending_review') return '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px;margin-left:6px">⏳ '+(fr?'En révision':'قيد المراجعة')+'</span>';
-  if(s==='rejected') return '<span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:6px">❌ '+(fr?'Refusée':'مرفوضة')+'</span>';
-  if(s==='open') return '<span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin-left:6px">✅ '+(fr?'Publiée':'منشورة')+'</span>';
-  return '';
-}
 function renderMyTenders(){
   var fr = (typeof _corpLang!=='undefined' && _corpLang==='fr');
   var el = document.getElementById('tenders-mine-list');
@@ -2540,10 +2484,6 @@ function openPayModal(pkgName, pkgPrice, category){
   document.body.style.overflow = 'hidden';
 }
 
-function closePayModal(){
-  document.getElementById('pay-modal').style.display = 'none';
-  document.body.style.overflow = '';
-}
 
 function switchPayTab(btn, type){
   var modal = btn.closest('#pay-modal') || document.getElementById('pay-modal');
@@ -3722,7 +3662,8 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
       if(!data.hasKey){
         badge.textContent=_t2('⏳ بانتظار التفعيل','⏳ En attente');
         badge.style.cssText='background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
-        content.innerHTML='<p style="font-size:13px;color:var(--text-muted)">'+_t2('سيُولَّد مفتاح API تلقائياً عند تأكيد اشتراك الماسية Pro.','La clé API sera générée automatiquement après confirmation de l\'abonnement Diamant Pro.')+'</p>';
+        content.innerHTML='<div style="text-align:center;padding:16px"><p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">'+_t2('أنشئ مفتاح API لربطه بنظامك. سيُعرض مرة واحدة فقط.','Créez une clé API pour votre système. Elle ne s\'affiche qu\'une seule fois.')+'</p>'+
+          '<button type="button" class="btn btn-gold btn-sm" onclick="createCorpApiKey()">🔑 '+_t2('إنشاء مفتاح API','Créer une clé API')+'</button></div>';
         return;
       }
       var ig=data.integration||{};
@@ -3757,6 +3698,34 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
     }).catch(function(){
       content.innerHTML='<p style="font-size:13px;color:#dc2626">'+_t2('تعذّر تحميل إعدادات API','Impossible de charger les paramètres API')+'</p>';
     });
+  }
+
+  function createCorpApiKey(){
+    var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
+    var apiTok=window.REAL_ACCESS_TOKEN||'';
+    if(!acc.id||!apiTok||!window.RIZQ_BACKEND_BASE) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/integration/key/'+encodeURIComponent(acc.id)+'/create',{
+      method:'POST',
+      headers:{'x-account-token':apiTok}
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.ok && data.integration){
+        showToast(_t2('✅ تم إنشاء المفتاح — انسخه الآن','✅ Clé créée — copiez-la maintenant'));
+        _paintCorpApiKeyOnce(data.integration);
+      } else showToast(data.error||_t2('فشل الإنشاء','Échec'),'error');
+    }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
+  }
+
+  function _paintCorpApiKeyOnce(ig){
+    var content=document.getElementById('api-integration-content');
+    var badge=document.getElementById('api-integration-badge');
+    if(!content) return;
+    if(badge){
+      badge.textContent=_t2('✅ نشط','✅ Actif');
+      badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+    }
+    var key=ig.apiKey||'';
+    content.innerHTML='<div style="margin-top:4px;background:#0f172a;border-radius:10px;padding:14px"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px">'+_t2('⚠️ انسخ المفتاح الآن — لن يُعرض مرة أخرى','⚠️ Copiez la clé maintenant — elle ne sera plus affichée')+'</div><code id="corp-api-key-val" style="display:block;word-break:break-all;font-size:12px;color:#fbbf24;background:rgba(0,0,0,.25);padding:10px;border-radius:8px">'+escapeHtml(key)+'</code><button type="button" class="btn btn-gold btn-sm" style="margin-top:10px" onclick="copyCorpApiKey()">📋 '+_t2('نسخ المفتاح','Copier la clé')+'</button></div>'+
+      '<p style="font-size:12px;color:var(--text-muted);margin-top:12px">'+_t2('البادئة: ','Préfixe : ')+escapeHtml(ig.apiKeyPrefix||'')+'</p>';
   }
 
   function copyCorpApiKey(){
@@ -3795,7 +3764,10 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
       method:'POST',
       headers:{'x-account-token':apiTok}
     }).then(function(r){return r.json();}).then(function(data){
-      if(data.ok){showToast(_t2('✅ تم تجديد المفتاح','✅ Clé régénérée'));renderApiIntegrationCorp();}
+      if(data.ok && data.integration){
+        showToast(_t2('✅ تم تجديد المفتاح — انسخه الآن','✅ Clé régénérée — copiez-la maintenant'));
+        _paintCorpApiKeyOnce(data.integration);
+      }
       else showToast(data.error||_t2('فشل التجديد','Échec'),'error');
     }).catch(function(){showToast(_t2('فشل الاتصال','Échec connexion'),'error');});
   }

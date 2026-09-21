@@ -395,7 +395,8 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=7"></script>
+<script src="rizq_account_route.js?v=9"></script>
+<script src="rizq_dashboard_shared.js?v=1"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -1286,7 +1287,7 @@ function renderFavs(){
       const raw = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
       if(!raw.length){ grid.innerHTML = _favEmptyHTML('لم تُضِف أي إعلان إلى المفضلة بعد — اضغط ♥ على أي إعلان أثناء التصفح','Vous n\'avez encore ajouté aucune annonce aux favoris — appuyez sur ♥ sur une annonce en parcourant'); return; }
       const favAds = raw.map(_mapRawAdToDashboard);
-      grid.innerHTML = favAds.map(a=>_favCardHTML(a,'rizq_listing.html?id='+encodeURIComponent(a.id))).join('');
+      grid.innerHTML = favAds.map(a=>_favCardHTML(a,'rizq_browse.html?id='+encodeURIComponent(a.id))).join('');
     }).catch(function(){ grid.innerHTML = _favEmptyHTML('تعذّر تحميل المفضلة — حاول مرة أخرى','Échec du chargement des favoris — veuillez réessayer'); });
 }
 
@@ -1330,22 +1331,8 @@ function renderReferralPanel(){
       '<div>🎁 <b>'+data.bonusDaysTotal+'</b> '+_t2('يوماً مجانياً مكتسباً','jours gratuits gagnés')+'</div>';
   }).catch(function(){});
 }
-function copyReferralLink(){
-  var input = document.getElementById('referral-link-input');
-  if(!input || !input.value) return;
-  navigator.clipboard.writeText(input.value).then(function(){
-    if(typeof showToast==='function') showToast(_t2('✅ تم نسخ الرابط','✅ Lien copié'),'success');
-  }).catch(function(){});
-}
 
 // ── شارة "موثّق⁺" (Verified+) — مهمة #232 ──
-function _verifiedPlusPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_verified_plus_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [{name:'سنوية', price:5000, duration:'سنة'}];
-}
 
 function renderVerifiedPlusPanel(){
   var fr = (_rizqLang()==='fr');
@@ -1570,12 +1557,6 @@ function openSidebar(){document.getElementById('sidebar').classList.add('open');
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
 
 let toastTimer;
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
-}
 
 // ── PROFILE: حفظ/تحميل حقيقي على هذا الجهاز (localStorage) ──
 function _dashPhotoId(){
@@ -1843,23 +1824,10 @@ const IS_DEMO = params.get('demo') === '1';
 })();
 if(typeof applyDashAvatars === 'function') applyDashAvatars();
 
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // قائمة مستويات باقة المناقصة (شهرية/ربعية/سنوية) — تُقرأ من مخزون الأدمن
 // المتزامن محلياً، وإلا نرجع لنفس القيم الافتراضية المعرَّفة في PKG_DEFAULTS.tender
 // داخل rizq_admin.html (راجع تعليق التوسيع هناك بتاريخ 24/07/2026).
-function _tenderPkgList(){
-  try{
-    var list = JSON.parse(localStorage.getItem('rizq_tender_packages')||'null');
-    if(Array.isArray(list) && list.length) return list;
-  }catch(e){}
-  return [
-    {name:'تجريبية', price:0,     duration:'10 أيام'},
-    {name:'شهرية', price:5000,  duration:'شهر'},
-    {name:'ربعية', price:13500, duration:'3 أشهر'},
-    {name:'سنوية', price:45000, duration:'12 شهر'}
-  ];
-}
 
 function renderTenderSubStatus(){
   var fr = (_rizqLang()==='fr');
@@ -1902,13 +1870,6 @@ function renderTenderSubStatus(){
     });
 }
 
-function _tenderStatusBadgeOwner(t, fr){
-  var s = t.status || 'open';
-  if(s==='pending_review') return '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:6px;margin-left:6px">⏳ '+(fr?'En révision':'قيد المراجعة')+'</span>';
-  if(s==='rejected') return '<span style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:6px">❌ '+(fr?'Refusée':'مرفوضة')+'</span>';
-  if(s==='open') return '<span style="font-size:11px;font-weight:700;color:#065f46;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin-left:6px">✅ '+(fr?'Publiée':'منشورة')+'</span>';
-  return '';
-}
 function renderMyTenders(){
   var fr = (_rizqLang()==='fr');
   var el = document.getElementById('tenders-mine-list');
@@ -1949,7 +1910,6 @@ function renderMyTenders(){
       el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم')+'</p>';
     });
 }
-function escapeAttr(s){ if(!s) return ''; return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 const DEMO_ACCOUNT = { id: "demo", name: "", phone: "", email: "", wilaya: "" };
 
@@ -2437,10 +2397,6 @@ function openPayModal(pkgName, pkgPrice, category, adId, adTitle){
   document.body.style.overflow = 'hidden';
 }
 
-function closePayModal(){
-  document.getElementById('pay-modal').style.display = 'none';
-  document.body.style.overflow = '';
-}
 
 function handlePayReceipt(inp){
   if(!inp.files||!inp.files[0]) return;
@@ -2498,15 +2454,12 @@ function submitPayment(){
 
 // ── INIT ──
 function initDashboard(){
-  var acc = verifyAccess();
-  if(acc){ _initDashboardWithAccount(acc); return; }
-  if(acc===null && !IS_DEMO && SESSION_ID && SESSION_TOKEN){
-    verifyAccessRemote().then(function(remoteAcc){
-      if(remoteAcc) _initDashboardWithAccount(remoteAcc); else showAccessDenied();
-    });
-  } else {
-    showAccessDenied();
-  }
+  if(IS_DEMO){ _initDashboardWithAccount(DEMO_ACCOUNT); return; }
+  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (حساب معلّق/مرفوض)
+  verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc) _initDashboardWithAccount(remoteAcc); else showAccessDenied();
+  });
 }
 
 function _initDashboardWithAccount(acc){

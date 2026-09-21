@@ -343,11 +343,16 @@
     if (!s || !s.id || !s.token) { goLogin(); return; }
     setStatus('');
     document.getElementById('acc-name').textContent = s.name || s.email || '—';
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
     var lines = ['<div>' + t('مسجّل كمشتري', 'Connecté comme acheteur') + '</div>'];
-    if (s.phone) lines.push('<div>📱 +222 ' + s.phone + '</div>');
-    if (s.phoneIntl) lines.push('<div>🌍 ' + s.phoneIntl + '</div>');
-    if (s.whatsapp) lines.push('<div>💬 ' + s.whatsapp + '</div>');
-    lines.push('<div>✉️ ' + (s.email || '—') + '</div>');
+    if (s.phone) lines.push('<div>📱 +222 ' + esc(s.phone) + '</div>');
+    if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
+    if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
+    lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
     document.getElementById('acc-meta').innerHTML = lines.join('');
     show('panel-account');
   }
@@ -410,9 +415,24 @@
   function loadCreds() {
     try { return JSON.parse(localStorage.getItem(CREDS_KEY) || '{}') || {}; } catch (e) { return {}; }
   }
+  /** بصمة محلية فقط — لا نخزّن كلمة المرور نصاً صريحاً */
+  function localPwFingerprint(pw) {
+    var s = String(pw || '');
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return 'fp_' + (h >>> 0).toString(16) + '_' + s.length;
+  }
   function saveCreds(email, password, session) {
     var all = loadCreds();
-    all[String(email).toLowerCase()] = { password: String(password), session: session || null, activated: true };
+    var prev = all[String(email).toLowerCase()] || {};
+    all[String(email).toLowerCase()] = {
+      passwordHash: localPwFingerprint(password),
+      session: session || prev.session || null,
+      activated: true
+    };
     try { localStorage.setItem(CREDS_KEY, JSON.stringify(all)); } catch (e) {}
   }
   function saveSession(session) {
@@ -478,7 +498,11 @@
     if (busy) return;
     var data = readBuyer();
     if (!data) return;
-    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
+    try {
+      var draftSafe = Object.assign({}, data);
+      delete draftSafe.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSafe));
+    } catch (e) {}
     pending = { data: data };
     busy = true;
     var btn = document.getElementById('btn-send-otp');
@@ -496,25 +520,12 @@
     }
 
     var base = api();
-    if (!base || isLocal()) {
-      /* محلي: فحص سريع ثم تجريبي */
-      if (!base) return localOtp();
-      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
-        if (!h.ok) return localOtp();
-        fetchJson(base + '/api/otp/send', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ channel: 'buyer', email: data.email, name: data.name, phoneMr: data.phoneMr, phoneIntl: data.phoneIntl, whatsapp: data.whatsapp })
-        }, 4000).then(function (r) {
-          busy = false;
-          btn.disabled = !document.getElementById('b-terms').checked;
-          btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
-          if (!r.ok || !r.body || !r.body.ok) return localOtp();
-          var msg = t('تم إرسال الرمز إلى بريدك.', 'Code envoyé.');
-          if (r.body.devHint) msg += ' ' + t('رمز التطوير:', 'Code:') + ' ' + r.body.devHint;
-          setStatus(msg, 'ok');
-          show('panel-otp');
-        }).catch(localOtp);
-      }).catch(localOtp);
+    /* أمان: لا تفعيل وهمي إذا كان الخادم متاحاً */
+    if (!base) {
+      setStatus(t('الخادم غير مُضبّط — لا يمكن التفعيل الآمن', 'Serveur non configuré'), 'bad');
+      busy = false;
+      btn.disabled = !document.getElementById('b-terms').checked;
+      btn.textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
       return;
     }
 
@@ -558,40 +569,19 @@
     function doneLocal() {
       btn.disabled = false;
       btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
-      finishOk(data);
+      setStatus(t('التفعيل الآمن يتطلب الخادم — أعد المحاولة', 'Activation sécurisée requiert le serveur'), 'bad');
+      busy = false;
     }
 
-    if (pending.local || !api() || isLocal()) {
-      var base = api();
-      if (!base || pending.local) return doneLocal();
-      fetchJson(base + '/health', { method: 'GET' }, 1000).then(function (h) {
-        if (!h.ok) return doneLocal();
-        fetchJson(base + '/api/otp/verify', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
-        }, 4000).then(function (r) {
-          if (!r.ok || !r.body || !r.body.ok) return doneLocal();
-          return fetchJson(base + '/api/auth/register', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          }, 4000).then(function (r2) {
-            btn.disabled = false;
-            btn.textContent = t('تأكيد وتفعيل', 'Confirmer');
-            if (!r2.ok || !r2.body || !r2.body.ok) return finishOk(data);
-            finishOk(data, {
-              id: (r2.body.buyer && r2.body.buyer.id) || r2.body.id,
-              token: r2.body.token,
-              name: (r2.body.buyer && r2.body.buyer.name) || data.name,
-              email: data.email,
-              phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
-            });
-          }).catch(doneLocal);
-        }).catch(doneLocal);
-      }).catch(doneLocal);
-      return;
+    if (pending.local) {
+      return doneLocal();
     }
 
     var base = api();
+    if (!base) {
+      return doneLocal();
+    }
+
     fetchJson(base + '/api/otp/verify', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: data.email, code: code, channel: 'buyer' })
@@ -632,16 +622,7 @@
     if (!pw) { document.getElementById('e-li-pw').classList.add('show'); ok = false; }
     if (!ok) return;
 
-    var creds = loadCreds()[email];
-    if (creds && String(creds.password) === String(pw)) {
-      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
-      saveSession(session);
-      setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
-      setTimeout(function () { location.href = 'index.html'; }, 400);
-      return;
-    }
-
-    /* دخول بائع مفعّل — محلي ثم خادم */
+    /* أولاً: بائع مفعّل → داشبورد النوع الصحيح (فرد/محل/مكتب/شركة) */
     if (window.RizqAccount && typeof window.RizqAccount.loginSellerAsync === 'function') {
       var seller = await window.RizqAccount.loginSellerAsync(email, pw);
       if (seller && seller.ok && seller.url) {
@@ -659,6 +640,23 @@
         setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
         return;
       }
+    }
+
+    /* ثانياً: مشتري محلي (بصمة كلمة المرور — بلا نص صريح) */
+    var creds = loadCreds()[email];
+    var fpOk = creds && (
+      (creds.passwordHash && creds.passwordHash === localPwFingerprint(pw)) ||
+      (creds.password && String(creds.password) === String(pw)) /* توافق رجعي لجلسات قديمة */
+    );
+    if (fpOk) {
+      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
+      if (creds.password && !creds.passwordHash) {
+        try { saveCreds(email, pw, session); } catch (eMig) {}
+      }
+      saveSession(session);
+      setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+      setTimeout(function () { location.href = 'index.html'; }, 400);
+      return;
     }
 
     setStatus(t('بيانات الدخول غير صحيحة. إن كان حساباً جديداً فأنشئه أولاً وفعّله مرة واحدة.', 'Identifiants incorrects.'), 'bad');

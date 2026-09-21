@@ -1,20 +1,20 @@
 // ═══════════════════════════════════════════════════════════════════
 // rizq_video_ads.js — Rizq ADS Video Engine v2.0
 // ═══════════════════════════════════════════════════════════════════
-// أمان: لا ملفات فيديو على سيرفرنا — كل شيء embed من YouTube / Facebook
+// أمان: إعلانات المعلنين عبر YouTube / Facebook embed
+// فيديو المنصة المزروع: ملف خفيف محلي يبدأ الحلقة ويعود بعد انتهاء سلسلة المعلنين
 //
 // الموضع الأول — HERO:
-//   Playlist دوراني تلقائي (فيديو → فيديو) لجميع المعلنين في قائمة Hero
+//   Playlist: [فيديو المنصة] → معلن 1 → معلن 2 → … → فيديو المنصة
 //   يظهر داخل بطاقة الـ Hero في الصفحة الرئيسية
-//   الزائر يختار — يمكنه التمرير عليه أو تجاهله
 //
 // الموضع الثاني — POPUP:
 //   شريط ثابت أعلى كل صفحات المنصة (position:fixed top:0)
 //   muted تلقائياً — لا زر إغلاق — يبقى طول الجلسة
 //   يدور بالزوار: زائر 1 → محمد, زائر 2 → أحمد, زائر 3 → فاطمة ...
 //
-// الإعدادات في localStorage تحت المفتاح: 'rizq_video_ads'
-// تُعدَّل من لوحة الأدمن (تبويب "Rizq ADS — الفيديو")
+// الإعدادات في localStorage /api/site-config تحت: videoAds
+// تُعدَّل من لوحة الأدمن (تبويب "الفيديو الإعلاني")
 // ═══════════════════════════════════════════════════════════════════
 
 (function RizqVideoAds() {
@@ -105,66 +105,160 @@
     return f;
   }
 
+  // فيديو المنصة المزروع — بداية الحلقة وبعد انتهاء إعلانات المعلنين
+  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  var DEFAULT_AD_SLOT_SEC = 25;
+  var _heroAdvanceTimer = null;
+  var _heroPlaylist = [];
+  var _heroIdx = 0;
+
+  function isDirectVideo(url) {
+    return /\.(mp4|webm|ogg)(\?|#|$)/i.test(url || '') || /\/rizq-assets\/promo\//i.test(url || '');
+  }
+
+  function clearHeroAdvance() {
+    if (_heroAdvanceTimer) {
+      clearTimeout(_heroAdvanceTimer);
+      _heroAdvanceTimer = null;
+    }
+  }
+
+  function buildHeroPlaylist() {
+    var list = [];
+    var promoEnabled = config.platformPromoEnabled !== false;
+    var promoUrl = String(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO).trim();
+    if (promoEnabled && promoUrl) {
+      list.push({
+        advertiser: 'رزق · Rizq Platform',
+        url: promoUrl,
+        active: true,
+        isPlatform: true
+      });
+    }
+    heroAds.forEach(function (a) {
+      if (a && a.url) list.push(a);
+    });
+    return list;
+  }
+
   // ════════════════════════════════════════
   //  ① HERO — Playlist دوراني
+  //     [فيديو المنصة] → معلن 1 → معلن 2 → … → يعود لفيديو المنصة
   // ════════════════════════════════════════
   function initHero() {
-    var wrapEl  = document.getElementById('hero-vid-wrap');
-    if (!wrapEl || !heroAds.length) return; // لسنا في الصفحة الرئيسية
+    var wrapEl = document.getElementById('hero-vid-wrap');
+    if (!wrapEl) return;
 
-    var vidEl   = document.getElementById('hero-featured-vid');
-    var phEl    = document.getElementById('hero-vid-ph');
-    var advBar  = document.getElementById('hero-vid-adv-bar');
+    _heroPlaylist = buildHeroPlaylist();
+    if (!_heroPlaylist.length) return;
+
+    var mount = document.getElementById('hero-featured-vid');
+    var phEl = document.getElementById('hero-vid-ph');
+    var advBar = document.getElementById('hero-vid-adv-bar');
     var advName = document.getElementById('hero-vid-adv-name');
-    var sndBtn  = document.getElementById('hero-vid-sound-btn');
+    var advLoc = document.getElementById('hero-vid-adv-loc');
+    var sndBtn = document.getElementById('hero-vid-sound-btn');
     var viewsEl = document.getElementById('hero-vid-views');
+    var host = mount && mount.parentNode;
+    if (!host) return;
 
-    // — جمع كل IDs اليوتيوب —
-    var ytIds = [];
-    heroAds.forEach(function (a) {
-      var id = ytId(a.url);
-      if (id) ytIds.push(id);
-    });
-
-    var iframeSrc;
-    if (ytIds.length) {
-      // Playlist YouTube دوراني
-      iframeSrc = buildYTPlaylistSrc(ytIds);
-    } else {
-      // Facebook — فيديو واحد مع loop
-      iframeSrc = buildEmbedSrc(heroAds[0].url, { mute: 1, autoplay: 1, controls: 1 });
-    }
-
-    if (!iframeSrc) return;
-
-    var iframe = makeIframe(iframeSrc, '100%', '100%');
-
-    // استبدال <video> بـ <iframe>
-    if (vidEl) {
-      vidEl.parentNode.replaceChild(iframe, vidEl);
-    }
-
-    // إخفاء الـ placeholder
     if (phEl) phEl.style.display = 'none';
+    wrapEl.style.display = '';
 
-    // إخفاء زر الصوت (YouTube يتكفّل بالتحكم)
-    if (sndBtn) sndBtn.style.display = 'none';
-
-    // إظهار شريط المعلنين
-    if (advBar && advName) {
-      advName.textContent = heroAds.length > 1
-        ? 'Rizq ADS · ' + heroAds.length + ' معلنون'
-        : (heroAds[0].advertiser || 'Rizq ADS');
-      advBar.style.display = 'block';
-    }
-
-    // عداد وهمي للزخم (يُستبدَل بأرقام حقيقية من الباك إند مستقبلاً)
-    if (viewsEl && heroAds.length) {
-      viewsEl.textContent = '👁 مُعلنون نشطون: ' + heroAds.length;
+    var paidCount = heroAds.length;
+    if (viewsEl) {
+      viewsEl.textContent = paidCount
+        ? ('👁 مُعلنون نشطون: ' + paidCount)
+        : '🎬 Rizq · فيديو المنصة';
       viewsEl.style.display = 'block';
     }
 
-    wrapEl.style.display = '';
+    function paintMeta(ad) {
+      if (advBar && advName) {
+        advName.textContent = ad.isPlatform
+          ? 'رزق · فيديو المنصة'
+          : (ad.advertiser || 'Rizq ADS');
+        if (advLoc) {
+          advLoc.textContent = ad.isPlatform
+            ? 'يبدأ الحلقة · ويعود بعد إعلانات المعلنين'
+            : '';
+        }
+        advBar.style.display = 'block';
+      }
+    }
+
+    function clearMount() {
+      clearHeroAdvance();
+      Array.prototype.slice.call(host.querySelectorAll('iframe, video#hero-featured-vid, video.rzq-hero-player'))
+        .forEach(function (el) { try { el.remove(); } catch (eR) { /* ignore */ } });
+    }
+
+    function advance() {
+      if (_heroPlaylist.length <= 1) {
+        // فيديو المنصة وحده — أعد التشغيل
+        playAt(0);
+        return;
+      }
+      _heroIdx = (_heroIdx + 1) % _heroPlaylist.length;
+      playAt(_heroIdx);
+    }
+
+    function playAt(i) {
+      var ad = _heroPlaylist[i];
+      if (!ad) return;
+      _heroIdx = i;
+      paintMeta(ad);
+      clearMount();
+
+      if (isDirectVideo(ad.url)) {
+        var v = document.createElement('video');
+        v.id = 'hero-featured-vid';
+        v.className = 'rzq-hero-player';
+        v.setAttribute('playsinline', '');
+        v.setAttribute('muted', '');
+        v.muted = true;
+        v.autoplay = true;
+        v.controls = false;
+        // حلقة واحدة فقط إن وُجدت إعلانات مدفوعة؛ وإلا loop مستمر
+        v.loop = _heroPlaylist.length <= 1;
+        v.src = ad.url;
+        v.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000';
+        host.insertBefore(v, host.firstChild);
+        if (sndBtn) {
+          sndBtn.style.display = '';
+          sndBtn.textContent = '🔇';
+          sndBtn.onclick = function () {
+            v.muted = !v.muted;
+            sndBtn.textContent = v.muted ? '🔇' : '🔊';
+          };
+        }
+        v.play().catch(function () { /* autoplay policies */ });
+        if (!v.loop) {
+          v.onended = function () { advance(); };
+        }
+        return;
+      }
+
+      var embedSrc = buildEmbedSrc(ad.url, { mute: 1, autoplay: 1, controls: 1 });
+      if (!embedSrc) {
+        advance();
+        return;
+      }
+      // لا loop على عنصر واحد — التقدّم يتم بالمؤقّت حتى نعود لفيديو المنصة
+      var id = ytId(ad.url);
+      if (id) {
+        embedSrc = 'https://www.youtube.com/embed/' + id +
+          '?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1';
+      }
+      var iframe = makeIframe(embedSrc, '100%', '100%');
+      iframe.className = 'rzq-hero-player';
+      host.insertBefore(iframe, host.firstChild);
+      if (sndBtn) sndBtn.style.display = 'none';
+      var slotSec = Math.max(8, Math.min(120, Number(config.adSlotSeconds) || DEFAULT_AD_SLOT_SEC));
+      _heroAdvanceTimer = setTimeout(advance, slotSec * 1000);
+    }
+
+    playAt(0);
   }
 
   // ════════════════════════════════════════
@@ -264,9 +358,9 @@
   //  التشغيل
   // ════════════════════════════════════════
   function run() {
-    if (!heroAds.length && !popupAds.length) return; // لا معلنون نشطون — لا شيء لعرضه
+    // Hero يعمل حتى بدون معلنين مدفوعين إن وُجد فيديو المنصة المزروع
     initHero();
-    initPopup();
+    if (popupAds.length) initPopup();
   }
 
   function _startWithConfig(cfg) {

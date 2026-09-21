@@ -16,20 +16,43 @@
  * يضبط ALLOWED_ORIGIN في rizq-backend/.env لاسم نطاق الواجهة).
  *
  * إنتاج: https://rizq.mr  |  تطوير محلي: http://localhost:3000
- * يُكتشف تلقائياً: localhost → :3000 ، أي نطاق آخر → Render API
+ * يُكتشف تلقائياً: localhost / معاينة Cursor → نفس الأصل ، غير ذلك → Render API
  * ═══════════════════════════════════════════════════════════════════
  */
 (function () {
   if (window.RIZQ_BACKEND_BASE) return;
   var host = '';
   try { host = window.location.hostname || ''; } catch (e) {}
-  var isLocal = !host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+  var h = String(host || '').toLowerCase();
+  var isPreview = h.endsWith('.cursorusercontent.com')
+    || h.endsWith('.gitpod.io')
+    || h.endsWith('.loca.lt')
+    || h.endsWith('.localtunnel.me')
+    || h.endsWith('.serveousercontent.com')
+    || h.endsWith('.trycloudflare.com')
+    || /\.github\.io$/i.test(h);
+  var isLocal = !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || isPreview;
   window.RIZQ_IS_LOCAL = isLocal;
   // rizq-backend.onrender.com = مشروع قديم (Jobs API) — ليس خادم منصة رزق.
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
   /* Local API is always rizq-backend on :3000 (static + /api same port).
-     Do not use location.host — dev.ps1 may serve HTML on :5500 while API is :3000. */
-  window.RIZQ_BACKEND_BASE = isLocal
-    ? ('http://' + (host || 'localhost') + ':3000')
-    : 'https://rizq-platform-api.onrender.com';
+     Do not use location.host — dev.ps1 may serve HTML on :5500 while API is :3000.
+     Cursor / Gitpod previews serve HTML+API on the same forwarded origin. */
+  if (isPreview) {
+    try {
+      window.RIZQ_BACKEND_BASE = String(window.location.origin || '').replace(/\/$/, '');
+    } catch (e2) {
+      window.RIZQ_BACKEND_BASE = '';
+    }
+  } else if (isLocal) {
+    window.RIZQ_BACKEND_BASE = 'http://' + (host || 'localhost') + ':3000';
+  } else {
+    window.RIZQ_BACKEND_BASE = 'https://rizq-platform-api.onrender.com';
+  }
+  /* إشارات أمان للعميل: demo dashboards فقط محلياً/معاينة */
+  window.RIZQ_PUBLIC_CONFIG = Object.assign({}, window.RIZQ_PUBLIC_CONFIG || {}, {
+    production: !isLocal,
+    demoDashboardAllowed: !!isLocal,
+  });
+  if (!isLocal) window.__RIZQ_ALLOW_DEMO_DASH = false;
 })();

@@ -11,6 +11,7 @@ const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentM
 ensureAnthropicEnv();
 // ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
+const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
@@ -25,6 +26,8 @@ const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
+const { timingSafeEqualStr } = require('./lib/secureCompare');
+const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
@@ -46,14 +49,39 @@ app.use(compression());
 // ── Security & IP protection headers (Contact Gate + platform copyright) ──
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
-  res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
-  res.set('Cross-Origin-Opener-Policy', 'same-origin');
-  res.set('Cross-Origin-Resource-Policy', 'same-site');
   res.set('X-DNS-Prefetch-Control', 'off');
   res.set('X-Rizq-Platform', 'Rizq-ADMINIA-SARL');
   res.set('X-Copyright', '(c) Rizq ADMINIA SARL - Proprietary. Unauthorized copying prohibited.');
+
+  if (isProdEnv()) {
+    // إنتاج: منع التضمين في iframe وحصر الموارد
+    res.set('X-Frame-Options', 'DENY');
+    res.set('Cross-Origin-Opener-Policy', 'same-origin');
+    res.set('Cross-Origin-Resource-Policy', 'same-site');
+    res.set(
+      'Content-Security-Policy',
+      "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
+      + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; "
+      + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
+      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
+      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
+    );
+  } else {
+    // تطوير / مراجعة Cursor Ports: السماح بالإطار والمعاينة وإلا تظهر الصفحة فارغة
+    // ولا تُفتح الروابط داخل لوحة Ports أو Simple Browser.
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set(
+      'Content-Security-Policy',
+      "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; "
+      + "frame-ancestors *; "
+      + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org https:; "
+      + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
+      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
+      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss: http: ws:;"
+    );
+  }
   try {
     if (req.secure || String(req.headers['x-forwarded-proto'] || '') === 'https') {
       res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -90,7 +118,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
 const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
 function getModuleFlags() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
 }
 
@@ -104,8 +132,11 @@ const DEFAULT_PLATFORM_FLAGS = {
   sessionTimeoutMin: 60,
 };
 function getPlatformFlags() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
-  return Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
+  const cfg = repos.getSiteConfig();
+  const flags = Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
+  /* قفل إنتاج: لا يمكن تعطيل OTP عبر site-config */
+  if (isProdEnv()) flags.otpRequired = true;
+  return flags;
 }
 
 // ── محرك القواعد المشترك لكل قسم (وكيل واحد + قواعد منفصلة لكل قسم بدل
@@ -122,7 +153,7 @@ const DEFAULT_SECTION_RULES = {
   videoAds:    { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب مفتوح أصلاً (فرد/محل) — مراجعة الفيديو قبل النشر العام' },
 };
 function getSectionRules() {
-  const cfg = readJson(SITE_CONFIG_FILE, {});
+  const cfg = repos.getSiteConfig();
   const stored = (cfg.sectionRules && typeof cfg.sectionRules === 'object') ? cfg.sectionRules : {};
   const out = {};
   Object.keys(DEFAULT_SECTION_RULES).forEach((key) => {
@@ -148,18 +179,38 @@ app.use('/uploads/investments', (req, res) => {
     msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
   });
 });
+// وسائط الإعلانات/الكتالوج — عامة فقط إن كانت الحالة منشورة/نشطة
+app.use('/uploads/ads', (req, res, next) => {
+  try {
+    const adId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+    const ad = adId ? repos.ads.getById(adId) : null;
+    const st = String(ad && ad.status || '');
+    if (!ad || !['active', 'approved', 'published'].includes(st)) {
+      return res.status(403).json({ error: 'ad_media_forbidden', msg: 'وسائط الإعلان غير متاحة' });
+    }
+    return next();
+  } catch (e) {
+    return res.status(403).json({ error: 'ad_media_forbidden' });
+  }
+});
+app.use('/uploads/catalog', (req, res, next) => {
+  try {
+    const itemId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+    const item = itemId
+      ? (repos.catalog.list().find((c) => c && c.id === itemId) || null)
+      : null;
+    const st = String(item && item.status || '');
+    if (!item || st !== 'active') {
+      return res.status(403).json({ error: 'catalog_media_forbidden', msg: 'وسائط الكتالوج غير متاحة' });
+    }
+    return next();
+  } catch (e) {
+    return res.status(403).json({ error: 'catalog_media_forbidden' });
+  }
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
-}
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
-}
-
-// ���� CORS: أص��� �&س�&��حة (ALLOWED_ORIGIN � �ائ�&ة �&فص���ة بف��اص�) ��������������
-// �&ثا� إ� تاج: https://rizq.mr,https://www.rizq.mr
-// �&ثا� تط���`ر: أضف http://localhost:5500,http://127.0.0.1:5500
+// ── CORS: أصول مسموحة (ALLOWED_ORIGIN قائمة مفصولة بفواصل)
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || '')
   .split(',')
   .map((s) => s.trim())
@@ -174,7 +225,28 @@ const LOCAL_DEV_ORIGINS = [
   'http://localhost:8080',
   'http://127.0.0.1:8080',
 ];
-LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+/* أمان خارجي: أصول التطوير المحلية تُضاف فقط خارج الإنتاج */
+if (!isProdEnv()) {
+  LOCAL_DEV_ORIGINS.forEach((o) => { if (!ALLOWED_ORIGINS.includes(o)) ALLOWED_ORIGINS.push(o); });
+}
+function isDevPreviewOrigin(origin) {
+  if (!origin || isProdEnv()) return false;
+  try {
+    const u = new URL(origin);
+    const h = String(u.hostname || '').toLowerCase();
+    // Cursor Cloud / port-forward previews, GitHub Pages, Gitpod
+    if (h.endsWith('.cursorusercontent.com')) return true;
+    if (h.endsWith('.gitpod.io')) return true;
+    if (h.endsWith('.loca.lt')) return true;
+    if (h.endsWith('.localtunnel.me')) return true;
+    if (h.endsWith('.serveousercontent.com')) return true;
+    if (h.endsWith('.trycloudflare.com')) return true;
+    if (/^[a-z0-9-]+\.github\.io$/i.test(h)) return true;
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
 app.use(cors({
   origin: function (origin, cb) {
     if (!origin) {
@@ -184,26 +256,36 @@ app.use(cors({
       return cb(null, !isProdEnv());
     }
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // معاينة GitHub Pages — للتطوير/الاختبار فقط، وليس في الإنتاج
-    if (!isProdEnv() && /^https:\/\/[a-z0-9-]+\.github\.io$/i.test(origin)) return cb(null, true);
+    // معاينة Cursor Cloud / GitHub Pages / Gitpod — للتطوير والمراجعة فقط
+    if (isDevPreviewOrigin(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
-
-// ── Rate limit مخصص أشد على /api/ads/submit ─────────────────────────
-// هذا الـ endpoint عام بلا أي مصادقة (requireAdminAuth) لأنه مخصص
-// لزوار حقيقيين يطلبون نشر إعلان — الحد العام أعلاه (60/15 دقيقة) لا
-// يكفي وحده لمنع إغراق ملف ads-requests.json بطلبات مزيفة من IP واحد.
-const adsSubmitLimiter = rateLimit({
+// في التطوير/المراجعة ارفع السقف كثيراً حتى لا تُغلق المنصة بعد اختبارات الأمان.
+// الإنتاج يبقى صارماً (60 / 15 دقيقة). يمكن تجاوز السقف بـ API_RATE_LIMIT_MAX.
+const API_RATE_MAX = Number(process.env.API_RATE_LIMIT_MAX)
+  || (isProdEnv() ? 60 : 5000);
+app.use('/api/', rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: API_RATE_MAX,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الطلبات — حاول مرة أخرى بعد قليل' },
-});
+  skip: (req) => {
+    // مسارات القراءة العامة للواجهة — لا تُحسب ضد حد الحماية من الاستهلاك العشوائي
+    // ملاحظة: عند mount على /api/ يكون req.path نسبياً (/site-config) وليس /api/site-config
+    const p = String(req.path || '');
+    if (req.method !== 'GET' && req.method !== 'HEAD') return false;
+    return p === '/health'
+      || p === '/site-config'
+      || p === '/otp/config'
+      || p === '/merchant-activities'
+      || p === '/ads'
+      || p === '/ads/batch'
+      || p.startsWith('/discovery/');
+  },
+}));
 
 // ── سرّ مشترك / جلسة أدمن — يمنع استدعاء endpoints الإدارية من خارج الجلسة ──
 // ══ مصادقة لوحة الإدارة (rizq_admin.html) — من طرف السيرفر فعلياً ═══
@@ -219,148 +301,30 @@ const adsSubmitLimiter = rateLimit({
 // ضع الناتج في passHash أدناه:
 //   node -e "console.log(require('bcryptjs').hashSync('كلمة_السر_الجديدة', 10))"
 const bcrypt = require('bcryptjs');
-// سوبر أدمن المالك الدائم — تسجيل الدخول بالبريد megalimam@gmail.com
-// كلمة السر ليست في المستودع؛ الهاش فقط. التعيين الفعلي عبر .env + ensureOwnerSuperAdmin.
+// سوبر أدمن المالك — الهاش من البيئة فقط في الإنتاج؛ لا هاشات تشغيلية في المصدر.
 const OWNER_SUPER_ADMIN = {
-  user: 'megalimam@gmail.com',
-  email: 'megalimam@gmail.com',
-  name: 'M. LIMAM',
+  user: String(process.env.SUPER_ADMIN_EMAIL || process.env.SUPER_ADMIN_USER || '').trim().toLowerCase() || 'owner@localhost',
+  email: String(process.env.SUPER_ADMIN_EMAIL || '').trim().toLowerCase(),
+  name: String(process.env.SUPER_ADMIN_NAME || 'Owner').trim() || 'Owner',
   role: 'super',
-  // يُستبدل عند التشغيل بهاش SUPER_ADMIN_PASS_HASH من .env إن وُجد
-  passHash: process.env.SUPER_ADMIN_PASS_HASH || '$2a$10$vWBBtmikW0LUA/DLY5/eSelNOERYSEScGE.QnZ5uCdm/RsIgcXXpO',
+  passHash: String(process.env.SUPER_ADMIN_PASS_HASH || '').trim(),
 };
-const ADMIN_ACCOUNTS = [
-  OWNER_SUPER_ADMIN,
-  { user: 'mod1', passHash: '$2a$10$Pz58idNGtWx5zJh6D.wwtOlKDZaZm23h6XQivYWhSyDA43pApWriG', name: 'المشرف الأول', role: 'moderator' },
-  { user: 'mod2', passHash: '$2a$10$j1o0c2FMvWxLsFJn5B5IMuCQ8GfJc46rsWwVz3Ho/Z8hkU/eRUfgW', name: 'المشرف الثاني', role: 'moderator' },
-];
+const ADMIN_ACCOUNTS = OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2')
+  ? [OWNER_SUPER_ADMIN]
+  : [];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
-adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
-adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
+if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
+if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
+  adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
+}
 const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,
 });
-function cleanExpiredAdminSessions() {
-  const now = Date.now();
-  for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
-}
-const adminLoginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'محاولات كثيرة جداً — حاول مرة أخرى بعد قليل' },
-});
-app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
-  cleanExpiredAdminSessions();
-  const { user, pass } = req.body || {};
-  const u = String(user || '').trim().slice(0, 80);
-  const p = String(pass || '').slice(0, 200);
-  if (!u || !p) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
-  if (String(pass || '').length > 200) {
-    return res.status(400).json({ error: '❌ بيانات غير صحيحة' });
-  }
-  let acc = null;
-  try {
-    acc = await adminTeamService.authenticate(u, p);
-  } catch (eAuth) {
-    acc = null;
-  }
-  if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
-  adminTeamService.touchLogin(acc.user);
-  const token = crypto.randomBytes(32).toString('hex');
-  const permissions = adminTeamService.normalizePermissions(acc.permissions);
-  adminSessions.set(token, {
-    user: acc.user,
-    name: acc.name,
-    role: acc.legacyRole || 'staff',
-    permissions,
-    expiresAt: Date.now() + ADMIN_SESSION_TTL_MS,
-  });
-  res.set('Cache-Control', 'no-store');
-  res.json({
-    ok: true,
-    token,
-    name: acc.name,
-    role: acc.legacyRole || 'staff',
-    permissions,
-    user: acc.user,
-  });
-});
-app.get('/api/admin/verify', requireAdminSession, (req, res) => {
-  res.json({
-    ok: true,
-    name: req.adminUser.name,
-    role: req.adminUser.role,
-    permissions: req.adminUser.permissions || [],
-    user: req.adminUser.user,
-  });
-});
-
-/** GET /api/admin/permissions — قائمة الصلاحيات + قوالب جاهزة */
-app.get('/api/admin/permissions', requireAdminAuth, (req, res) => {
-  res.json({
-    ok: true,
-    permissions: adminTeamService.PERMISSION_DEFS,
-    presets: adminTeamService.PERMISSION_PRESETS,
-    panelMap: PANEL_PERMISSION_MAP,
-    maxTeamMembers: adminTeamService.MAX_TEAM_MEMBERS,
-  });
-});
-
-/** GET /api/admin/team — فريق الإدارة (يتطلب team.manage أو *) */
-app.get('/api/admin/team', requireAdminPermission('team.manage'), (req, res) => {
-  res.json({ ok: true, team: adminTeamService.listTeamPublic(), max: adminTeamService.MAX_TEAM_MEMBERS });
-});
-
-/** POST /api/admin/team — إضافة عضو */
-app.post('/api/admin/team', requireAdminPermission('team.manage'), async (req, res) => {
-  try {
-    const b = req.body || {};
-    const member = await adminTeamService.createMember(b, req.adminUser && req.adminUser.user);
-    res.json({ ok: true, member });
-  } catch (e) {
-    if (e.code === 'team_limit_reached') {
-      return res.status(400).json({ error: e.code, max: e.max, msg: 'وصلت للحد الأقصى ' + e.max + ' أعضاء' });
-    }
-    if (e.code === 'user_exists') return res.status(409).json({ error: e.code, msg: 'اسم المستخدم موجود' });
-    if (e.code === 'missing_fields') return res.status(400).json({ error: e.code, msg: 'الاسم واسم المستخدم وكلمة المرور مطلوبة' });
-    res.status(500).json({ error: 'create_failed' });
-  }
-});
-
-/** PATCH /api/admin/team/:id — تعديل صلاحيات/بيانات */
-app.patch('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
-  try {
-    const member = await adminTeamService.updateMember(req.params.id, req.body || {});
-    if (!member) return res.status(404).json({ error: 'member_not_found' });
-    res.json({ ok: true, member });
-  } catch (e) {
-    res.status(500).json({ error: 'update_failed' });
-  }
-});
-
-/** DELETE /api/admin/team/:id — تعطيل عضو */
-app.delete('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
-  const selfId = req.adminUser && req.adminUser.user;
-  const target = adminTeamService.getMemberById(req.params.id);
-  if (!target) return res.status(404).json({ error: 'member_not_found' });
-  if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
-  if ((target.permissions || []).includes('*') && adminTeamService.readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
-    return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
-  }
-  const member = await adminTeamService.deactivateMember(req.params.id);
-  res.json({ ok: true, member });
-});
-app.post('/api/admin/logout', (req, res) => {
-  const token = req.header('x-admin-token');
-  if (token) adminSessions.delete(token);
-  res.json({ ok: true });
-});
+// مسارات /api/admin/login|verify|permissions|team|logout|daily-digest — في routes/adminCore.js عبر mountAdminCoreRoutes
 
 function isBrowserLikeRequest(req) {
   const origin = req.header('origin');
@@ -369,19 +333,31 @@ function isBrowserLikeRequest(req) {
   return secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'cross-site';
 }
 
-function isAdminRequest(req) {
+/** يحلّ هوية الأدمن من الجلسة أو السرّ الخادمي */
+function resolveAdminUser(req) {
   const adminTok = req.header('x-admin-token');
   if (adminTok) {
     const sess = adminSessions.get(adminTok);
-    if (sess && sess.expiresAt >= Date.now()) return true;
+    if (sess && sess.expiresAt >= Date.now()) return sess;
   }
   const got = req.header('x-rizq-secret');
   const secret = process.env.BACKEND_SHARED_SECRET || '';
-  if (secret && got && got === secret) {
-    if (isProdEnv() && isBrowserLikeRequest(req)) return false;
-    return true;
+  if (secret && got && timingSafeEqualStr(got, secret)) {
+    if (isProdEnv() && isBrowserLikeRequest(req)) return null;
+    return { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
   }
-  return false;
+  return null;
+}
+
+function isAdminRequest(req) {
+  return !!resolveAdminUser(req);
+}
+
+/** فحص صلاحية RBAC لمسارات تستخدم isAdminRequest بدل middleware */
+function adminHasPermission(req, ...keys) {
+  const u = resolveAdminUser(req);
+  if (!u) return false;
+  return hasAdminPermission(u.permissions || [], keys.length ? keys : ['*']);
 }
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
@@ -447,51 +423,100 @@ app.get('/api/help-guide', (req, res) => {
  * مباشرة registerSubscriber() من نفس وحدة rizq_subscriber_agent.js التي
  * يقرأها خادما المكالمات/واتساب (ملف rizq_subscribers_store.json المشترك).
  */
-app.post('/api/subscriber/register', requireAdminAuth, (req, res) => {
+app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents'), (req, res) => {
   const { subscriberId, ...profile } = req.body || {};
   if (!subscriberId || !profile.businessName) {
     return res.status(400).json({ error: 'subscriberId + businessName مطلوبان' });
   }
   try {
-    registerSubscriber(String(subscriberId).slice(0, 40), Object.assign({
+    const safeId = String(subscriberId).replace(/[^\w+\-@.]/g, '').slice(0, 40);
+    const safeProfile = {
       plan: 'diamond',
       tier: 'diamond',
       widget_enabled: true,
       whatsapp_enabled: true,
       calls_enabled: true,
-    }, profile));
-    res.json({ ok: true, message: 'تم تسجيل ' + profile.businessName });
+      businessName: normalizeDisplayName(profile.businessName, 120),
+      businessType: String(profile.businessType || '').slice(0, 40),
+      accountId: profile.accountId ? String(profile.accountId).slice(0, 60) : undefined,
+      phone: profile.phone ? String(profile.phone).replace(/[^\d+]/g, '').slice(0, 20) : undefined,
+      activity: profile.activity ? stripBidiControls(String(profile.activity)).normalize('NFC').slice(0, 200) : undefined,
+    };
+    registerSubscriber(safeId, safeProfile);
+    res.json({ ok: true, message: 'تم تسجيل ' + safeProfile.businessName });
   } catch (err) {
     console.error('[subscriber/register] error:', err.message);
     res.status(500).json({ error: 'فشل التسجيل' });
   }
 });
 
-app.get('/api/subscriber/:id', requireAdminAuth, (req, res) => {
+app.get('/api/subscriber/:id', requireAdminPermission('subscriber-agents'), (req, res) => {
   const profile = getSubscriberProfile(req.params.id);
   if (!profile) return res.status(404).json({ error: 'subscriber_not_found' });
-  res.json({ ok: true, profile });
+  // لا نُعيد حقولاً داخلية حساسة إن وُجدت
+  const {
+    apiKey, apiKeyHash, accessToken, dashToken, passHash, password,
+    ...safe
+  } = profile;
+  res.json({ ok: true, profile: safe });
+});
+
+app.get('/api/subscribers', requireAdminPermission('subscriber-agents'), (req, res) => {
+  try {
+    const list = getAllSubscriberProfiles().map((row) => {
+      const p = getSubscriberProfile(row.subscriberId) || {};
+      return {
+        id: row.subscriberId,
+        accountId: row.accountId || null,
+        name: p.businessName || '',
+        type: p.businessType || '',
+        plan: p.plan || '',
+      };
+    });
+    res.json({ ok: true, count: list.length, subscribers: list });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'تعذّر جلب القائمة' });
+  }
 });
 
 const { setActive, isActive, readAll: readAgentStatusAll } = require('./services/agentStatus');
 
 function verifyAgentToggleSecret(secret) {
-  const a = process.env.BACKEND_SHARED_SECRET || '';
-  const b = process.env.RIZQ_API_SECRET || '';
-  return secret && (secret === a || secret === b);
+  const a = String(process.env.BACKEND_SHARED_SECRET || '');
+  const b = String(process.env.RIZQ_API_SECRET || '');
+  const got = String(secret || '');
+  if (!got) return false;
+  if (a && timingSafeEqualStr(got, a)) return true;
+  if (b && timingSafeEqualStr(got, b)) return true;
+  return false;
 }
 
 /** POST /api/agent/toggle — لوحات التحكم (Diamond) — تفعيل/إيقاف الوكيل الهاتفي */
 app.post('/api/agent/toggle', (req, res) => {
-  const { subscriberPhone, active, secret, accountId } = req.body || {};
+  const b = req.body || {};
+  const subscriberPhone = b.subscriberPhone;
+  const active = b.active;
+  const accountId = b.accountId;
   const token = extractAccountToken(req);
-  let authorized = verifyAgentToggleSecret(secret);
+  // السرّ من الرأس فقط في الإنتاج؛ body مسموح في التطوير للتوافق مع خوادم المكالمات
+  const secretHdr = req.header('x-rizq-secret') || '';
+  const secretBody = (!isProdEnv() && b.secret) ? b.secret : '';
+  let authorized = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
   if (!authorized && accountId && token) {
     const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
+      try {
+        assertAiAgentAccess(acc, { channel: 'dashboard' });
+      } catch (eAi) {
+        return res.status(403).json({ ok: false, error: eAi.message || 'unauthorized', code: eAi.code });
+      }
       const want = String(subscriberPhone || '').replace(/\D/g, '').slice(-8);
-      const accPh = String(acc.phone || '').replace(/\D/g, '').slice(-8);
-      authorized = !!(want && accPh && want === accPh);
+      const accPh = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '').slice(-8);
+      // يجب ربط التبديل برقم الحساب — لا IDOR عند غياب الهاتف
+      if (!want || !accPh || want !== accPh) {
+        return res.status(403).json({ ok: false, error: 'phone_mismatch', code: 'phone_mismatch' });
+      }
+      authorized = true;
     }
   }
   if (!authorized) {
@@ -514,7 +539,7 @@ app.post('/api/agent/toggle', (req, res) => {
 });
 
 /** GET /api/agent/status/:phone — محمي (لا كشف عام لحالة الوكلاء) */
-app.get('/api/agent/status/:phone', requireAdminAuth, (req, res) => {
+app.get('/api/agent/status/:phone', requireAdminPermission('subscriber-agents'), (req, res) => {
   const phone = req.params.phone;
   let profile = null;
   try { profile = getSubscriberProfile(phone); } catch (e) { /* optional */ }
@@ -527,7 +552,7 @@ app.get('/api/agent/status/:phone', requireAdminAuth, (req, res) => {
 });
 
 /** GET /api/agent/status — admin/debug */
-app.get('/api/agent/status', requireAdminAuth, (req, res) => {
+app.get('/api/agent/status', requireAdminPermission('subscriber-agents'), (req, res) => {
   res.json({ ok: true, status: readAgentStatusAll() });
 });
 
@@ -540,7 +565,7 @@ app.get('/api/agent/status', requireAdminAuth, (req, res) => {
  * من قاعدة بيانات بنكية حقيقية ولا "يثبت" أن الدفع تم أو لم يُزوَّر.
  * القرار النهائي يبقى دوماً بشرياً (الأدمين).
  */
-app.post('/api/verify-receipt', requireAdminAuth, async (req, res) => {
+app.post('/api/verify-receipt', requireAdminPermission('payments'), async (req, res) => {
   try {
     const { imageBase64, expectedPrice, pkgName } = req.body || {};
     const { analyzeReceiptImage } = require('./services/receiptVision');
@@ -578,7 +603,7 @@ app.post('/api/verify-receipt', requireAdminAuth, async (req, res) => {
  * باقات، مزايا، أزرار) لكنها ليست بديلاً عن مراجعة بشرية لنصوص قانونية
  * حساسة (rizq_legal.html تبقى مكتوبة يدوياً بكل لغة).
  */
-app.post('/api/translate', requireAdminAuth, async (req, res) => {
+app.post('/api/translate', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const { items, direction } = req.body || {};
     if (!Array.isArray(items) || !items.length) {
@@ -746,7 +771,7 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
 });
 
 /** GET /api/telegram/status — diagnostic (requires X-Copyright admin secret) */
-app.get('/api/telegram/status', requireAdminAuth, async (req, res) => {
+app.get('/api/telegram/status', requireAdminPermission('channels'), async (req, res) => {
   try {
     const {
       getTelegramDiagnostics,
@@ -774,7 +799,7 @@ app.get('/api/telegram/status', requireAdminAuth, async (req, res) => {
 });
 
 /** POST /api/telegram/test-lead-alert — diagnostic (requires X-Copyright admin secret) */
-app.post('/api/telegram/test-lead-alert', requireAdminAuth, async (req, res) => {
+app.post('/api/telegram/test-lead-alert', requireAdminPermission('channels'), async (req, res) => {
   try {
     const { getTelegramDiagnostics, sendLeadEscalationAlert } = require('./services/telegramAdmin');
     const diag = getTelegramDiagnostics();
@@ -811,43 +836,121 @@ app.post('/api/telegram/test-lead-alert', requireAdminAuth, async (req, res) => 
 app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = req.body || {};
-    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
-      const token = req.header('x-account-token') || '';
-      const acc = verifyAccountOwner(profileAccountId, token);
-      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-      assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
+    const token = extractAccountToken(req) || '';
+    const accountId = String(
+      (body.profile && body.profile.accountId) || body.accountId || ''
+    ).trim();
+
+    if (accountId) {
+      let acc = null;
+      if (token) {
+        acc = verifyAccountOwner(accountId, token);
+        if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      } else {
+        // زائر عام على صفحة التاجر — نثق بالخادم فقط لا بـ profile العميل
+        acc = readAccounts().find((a) => a.id === accountId) || null;
+        if (!acc || acc.status !== 'approved' || acc.suspended) {
+          return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
+        }
+      }
+      try {
+        assertAiAgentAccess(acc, { channel: 'widget' });
+      } catch (e) {
+        const ent = getAccountEntitlements(acc);
+        const status = e.status && e.status >= 400 ? e.status : 403;
+        return res.status(status).json({
+          ok: false,
+          error: e.code === 'quota_exhausted' ? (e.message || 'تم استنفاد الحصة') : resolveAccessDenialMessage(ent),
+          code: e.code || ent.subscriptionStatus,
+        });
+      }
+      body.accountId = accountId;
+      body.profile = buildProfileFromAccount(acc);
+      body.agentTier = 'diamond';
+    } else {
+      // مساعد المنصة العام — امنع انتحال الباقة الماسية من العميل
+      if (body.profile && typeof body.profile === 'object') {
+        delete body.profile.tier;
+        delete body.profile.plan;
+        delete body.profile.dynamicKnowledge;
+        delete body.profile.customInstructions;
+        delete body.profile.accountId;
+      }
+      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
+        body.agentTier = 'standard';
+      }
     }
+
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[widget/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد الآلي' : (err.message || 'تعذّر الرد الآلي'),
+      code: err.code || undefined,
+    });
   }
 });
 
 /** POST /api/ai/chat — alias for Diamond widget agent (same engine as /api/widget/chat) */
 app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
   try {
-    const body = Object.assign({ agentTier: 'diamond' }, req.body || {});
-    const profileAccountId = String((body.profile && body.profile.accountId) || body.accountId || '').trim();
-    if (profileAccountId) {
-      const token = req.header('x-account-token') || '';
-      const acc = verifyAccountOwner(profileAccountId, token);
-      if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-      assertAiAgentAccess(acc, { channel: 'widget' });
-    } else if (body.profile && (body.profile.accountId || body.profile.businessName)) {
-      assertDiamondWidgetAccess(body, readAccounts);
+    const body = Object.assign({}, req.body || {});
+    const token = extractAccountToken(req) || '';
+    const accountId = String(
+      (body.profile && body.profile.accountId) || body.accountId || ''
+    ).trim();
+
+    if (accountId) {
+      let acc = null;
+      if (token) {
+        acc = verifyAccountOwner(accountId, token);
+        if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      } else {
+        acc = readAccounts().find((a) => a.id === accountId) || null;
+        if (!acc || acc.status !== 'approved' || acc.suspended) {
+          return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
+        }
+      }
+      try {
+        assertAiAgentAccess(acc, { channel: 'widget' });
+      } catch (e) {
+        const ent = getAccountEntitlements(acc);
+        const status = e.status && e.status >= 400 ? e.status : 403;
+        return res.status(status).json({
+          ok: false,
+          error: e.code === 'quota_exhausted' ? (e.message || 'تم استنفاد الحصة') : resolveAccessDenialMessage(ent),
+          code: e.code || ent.subscriptionStatus,
+        });
+      }
+      body.accountId = accountId;
+      body.profile = buildProfileFromAccount(acc);
+      body.agentTier = 'diamond';
+    } else {
+      if (body.profile && typeof body.profile === 'object') {
+        delete body.profile.tier;
+        delete body.profile.plan;
+        delete body.profile.dynamicKnowledge;
+        delete body.profile.customInstructions;
+        delete body.profile.accountId;
+      }
+      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
+        body.agentTier = 'standard';
+      }
     }
+
     const result = await handleWidgetChat(body);
     res.json(result);
   } catch (err) {
     console.error('[ai/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد الآلي', code: err.code || undefined });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد الآلي' : (err.message || 'تعذّر الرد الآلي'),
+      code: err.code || undefined,
+    });
   }
 });
 
@@ -883,12 +986,9 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     if (!accountId || !message) {
       return res.status(400).json({ ok: false, error: 'accountId و message مطلوبان' });
     }
-    if (!isAnthropicConfigured()) {
-      return res.status(503).json({ ok: false, error: 'AI غير مفعّل — أضف ANTHROPIC_API_KEY أو CLAUDE_API_KEY في .env' });
-    }
     const acc = readAccounts().find((a) => a.id === accountId);
     if (!acc) return res.status(404).json({ ok: false, error: 'account_not_found' });
-    const token = req.header('x-account-token') || '';
+    const token = extractAccountToken(req) || req.header('x-account-token') || '';
     if (!verifyAccountOwner(accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
@@ -898,6 +998,9 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
       const ent = getAccountEntitlements(acc);
       const status = e.status && e.status >= 400 ? e.status : 403;
       return res.status(status).json({ ok: false, error: e.message || resolveAccessDenialMessage(ent), code: e.code || ent.subscriptionStatus });
+    }
+    if (!isAnthropicConfigured()) {
+      return res.status(503).json({ ok: false, error: 'AI غير مفعّل حالياً', code: 'ai_unavailable' });
     }
     const result = await handleWidgetChat({
       message,
@@ -924,7 +1027,11 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
   } catch (err) {
     console.error('[subscriber/chat] error:', err.message);
     const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'تعذّر الرد' });
+    res.status(status).json({
+      ok: false,
+      error: status >= 500 ? 'تعذّر الرد' : (err.message || 'تعذّر الرد'),
+      code: err.code || undefined,
+    });
   }
 });
 
@@ -940,11 +1047,35 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
 app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
-  const cfg = readJson(SITE_CONFIG_FILE, {});
-  cfg.moduleFlags = getModuleFlags();
-  cfg.sectionRules = getSectionRules();
-  cfg.otp = getPublicOtpConfig();
-  res.json({ ok: true, config: cfg });
+  const raw = repos.getSiteConfig() || {};
+  const publicCfg = {
+    moduleFlags: getModuleFlags(),
+    platformFlags: getPlatformFlags(),
+    sectionRules: getSectionRules(),
+    otp: getPublicOtpConfig(),
+    demoDashboardAllowed: !isProdEnv(),
+    production: isProdEnv(),
+    packages: raw.packages || undefined,
+    prices: raw.prices || undefined,
+    promoVideo: raw.promoVideo || undefined,
+    videoAds: raw.videoAds || undefined,
+    announcements: raw.announcements || undefined,
+    legalOverrides: raw.legalOverrides || undefined,
+    currency: raw.currency || undefined,
+    quotaConfig: raw.quotaConfig || undefined,
+    quotaTopups: raw.quotaTopups || undefined,
+    bankCodes: Array.isArray(raw.bankCodes) ? raw.bankCodes : undefined,
+  };
+  // لا نُسرّب webhookUrl / قنوات داخلية / أسرار تشغيل
+  if (raw.channelsPublic && typeof raw.channelsPublic === 'object') {
+    publicCfg.channelsPublic = {
+      phone: raw.channelsPublic.phone || '',
+      whatsapp: raw.channelsPublic.whatsapp || '',
+      email: raw.channelsPublic.email || '',
+      // webhookUrl محذوف عمداً من الواجهة العامة
+    };
+  }
+  res.json({ ok: true, config: publicCfg });
 });
 
 /**
@@ -965,9 +1096,9 @@ const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني ك�
  *   -- يُدمَج مفتاحاً بمفتاح (لا يمسح أقساماً أخرى محفوظة سابقاً)
  *   -- قيمة نصية فارغة "" لمفتاح ما = إعادته للنص الافتراضي (حذف الـ override)
  */
-app.post('/api/site-config', requireAdminAuth, (req, res) => {
+app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) => {
   const body = req.body || {};
-  const current = readJson(SITE_CONFIG_FILE, {});
+  const current = repos.getSiteConfig();
   const next = Object.assign({}, current);
 
   if (body.promoVideo && typeof body.promoVideo === 'object') {
@@ -1173,9 +1304,21 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
       active: a.active !== false,
       accountId: a.accountId ? String(a.accountId).slice(0, 60) : '',
     }));
+    const prevVideoAds = (current && current.videoAds) || {};
+    const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
     next.videoAds = {
       hero: sanitizeAdList(body.videoAds.hero),
       popup: sanitizeAdList(body.videoAds.popup),
+      // فيديو المنصة المزروع: بداية حلقة الـ Hero وبعد انتهاء إعلانات المعلنين
+      platformPromoUrl: body.videoAds.platformPromoUrl != null
+        ? String(body.videoAds.platformPromoUrl || '').slice(0, 500)
+        : String(prevVideoAds.platformPromoUrl || defaultPromo).slice(0, 500),
+      platformPromoEnabled: body.videoAds.platformPromoEnabled != null
+        ? body.videoAds.platformPromoEnabled !== false
+        : prevVideoAds.platformPromoEnabled !== false,
+      adSlotSeconds: Math.max(8, Math.min(120,
+        Number(body.videoAds.adSlotSeconds != null ? body.videoAds.adSlotSeconds : prevVideoAds.adSlotSeconds) || 25
+      )),
     };
   }
 
@@ -1259,6 +1402,8 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
     ['platformOpen', 'registrationOpen', 'adsOpen', 'moderationRequired', 'otpRequired', 'vpnBlock'].forEach((k) => {
       if (k in f) existing[k] = f[k] === true;
     });
+    /* في الإنتاج: OTP إلزامي ولا يمكن إطفاؤه من لوحة الإعدادات */
+    if (isProdEnv()) existing.otpRequired = true;
     if (f.sessionTimeoutMin != null) {
       existing.sessionTimeoutMin = Math.max(5, Math.min(1440, Number(f.sessionTimeoutMin) || 60));
     }
@@ -1297,7 +1442,7 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
     };
   }
 
-  writeJson(SITE_CONFIG_FILE, next);
+  repos.saveSiteConfig(next);
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -1306,16 +1451,18 @@ app.post('/api/site-config', requireAdminAuth, (req, res) => {
       }
     } catch (eInv) { /* ignore */ }
   }
-  res.json({ ok: true, config: next });
+  // لا نُعيد webhookUrl في ردّ الأدمن للمتصفح
+  const { scrubSecretsForBackup } = require('./lib/scrubSecrets');
+  res.json({ ok: true, config: scrubSecretsForBackup(next) });
 });
 
 /**
  * POST /api/currency-rates/refresh
  * أدمين — جلب أسعار العملات من الإنترنت (Frankfurter + fallback) مع تصحيح السوق %
  */
-app.post('/api/currency-rates/refresh', requireAdminAuth, async (req, res) => {
+app.post('/api/currency-rates/refresh', requireAdminPermission('prices'), async (req, res) => {
   try {
-    const current = readJson(SITE_CONFIG_FILE, {});
+    const current = repos.getSiteConfig();
     const existing = (current.prices && current.prices.currencies) || [];
     const result = await refreshCurrencyRates(existing, { onlyEnabled: true });
     const next = Object.assign({}, current);
@@ -1326,7 +1473,7 @@ app.post('/api/currency-rates/refresh', requireAdminAuth, async (req, res) => {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    writeJson(SITE_CONFIG_FILE, next);
+    repos.saveSiteConfig(next);
     res.json({ ok: true, currencies: result.currencies, errors: result.errors, updatedAt: result.updatedAt, config: next });
   } catch (err) {
     console.error('[currency-rates] refresh failed:', err.message);
@@ -1340,7 +1487,7 @@ async function autoRefreshCurrencyRatesIfStale() {
   if (_currencyRefreshRunning) return;
   _currencyRefreshRunning = true;
   try {
-    const current = readJson(SITE_CONFIG_FILE, {});
+    const current = repos.getSiteConfig();
     const prices = current.prices || {};
     const last = prices.currenciesUpdatedAt || prices.updatedAt;
     const stale = !last || (Date.now() - new Date(last).getTime() > CURRENCY_AUTO_REFRESH_MS);
@@ -1353,7 +1500,7 @@ async function autoRefreshCurrencyRatesIfStale() {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    writeJson(SITE_CONFIG_FILE, next);
+    repos.saveSiteConfig(next);
     if (result.errors && result.errors.length) {
       console.warn('[currency-rates] partial refresh:', result.errors.map((e) => e.code).join(', '));
     } else {
@@ -1366,42 +1513,7 @@ async function autoRefreshCurrencyRatesIfStale() {
   }
 }
 
-/**
- * POST /api/ads/submit
- * عام — صاحب معرض/محل يرسل طلب نشر فيديو إعلاني عبر Rizq ADS.
- * ⚠️ لا يُرفع ملف الفيديو نفسه هنا (لا توجد بنية تخزين فيديو حقيقية بعد —
- * تحتاج CDN/S3 حسب خطة rizq_backend_plan.html) — فقط بيانات الطلب +
- * معلومات تواصل، ليتواصل فريق رزق فعلياً ويستلم الفيديو وينشره يدوياً.
- * لا وعد بنشر تلقائي فوري لأنه غير موجود فعلاً.
- */
-app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
-  const b = req.body || {};
-  if (!b.title || !b.phone) return res.status(400).json({ error: 'العنوان ورقم التواصل مطلوبان' });
-  const requests = readJson(ADS_REQUESTS_FILE, []);
-  const id = 'ADREQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-  requests.push({
-    id,
-    title: String(b.title).slice(0, 120),
-    category: String(b.category || '').slice(0, 80),
-    phone: String(b.phone).slice(0, 20),
-    pkg: String(b.pkg || 'basic').slice(0, 20),
-    hasVideoFile: !!b.hasVideoFile,
-    videoFileName: String(b.videoFileName || '').slice(0, 200),
-    status: 'pending_contact',
-    createdAt: new Date().toISOString(),
-  });
-  writeJson(ADS_REQUESTS_FILE, requests);
-  res.json({ ok: true, id });
-});
-
-/**
- * GET /api/ads/requests
- * أدمين فقط (سرّ مشترك) — لائحة طلبات نشر فيديو الإعلانات الواردة فعلياً،
- * حتى يكون وعد "سيتواصل معك رزق" قابلاً للتنفيذ حقاً.
- */
-app.get('/api/ads/requests', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, requests: readJson(ADS_REQUESTS_FILE, []).reverse() });
-});
+// مسارات /api/ads/submit و /api/ads/requests — في routes/ads.js عبر mountAdsRoutes
 
 // ══════════════════════════════════════════════════════════════════
 // حسابات المشتركين (محل/مكتب/شركة/فرد) — تسجيل + موافقة الأدمن
@@ -1426,8 +1538,9 @@ function normalizeAccountPaymentMethods(arr) {
   })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');
 }
 
-function readAccounts() { return readJson(ACCOUNTS_FILE, []); }
-function writeAccounts(list) { writeJson(ACCOUNTS_FILE, list); }
+const platformStore = require('./db/platformStore');
+function readAccounts() { return repos.accounts.list(); }
+function writeAccounts(list) { return repos.accounts.replaceAll(list); }
 
 /**
  * بعد التوثيق: تُحذف صورة الهوية فقط (idImage/id_image).
@@ -1454,11 +1567,12 @@ function findAccountByNni(list, nni, excludeId) {
   return list.find((a) => normalizeNni(a.nni) === nni && a.id !== excludeId) || null;
 }
 function nniDuplicatePayload() {
+  // رسالة عامة — لا تؤكد وجود حساب آخر (تخفيف تعداد NNI)
   return {
     ok: false,
-    code: 'nni_duplicate',
-    error: 'رقم الهوية (NNI) مستخدم بالفعل لحساب آخر',
-    error_fr: "Ce numéro d'identité (NNI) est déjà associé à un autre compte",
+    code: 'nni_unavailable',
+    error: 'تعذّر استخدام رقم الهوية هذا — تحقّق من الرقم أو تواصل مع الدعم',
+    error_fr: "Ce numéro d'identité ne peut pas être utilisé — vérifiez-le ou contactez le support",
   };
 }
 function assertNniAssignable(list, rawNni, excludeId, acc) {
@@ -1483,10 +1597,13 @@ function assertNniAssignable(list, rawNni, excludeId, acc) {
 
 function resolveOptionalAccountViewer(req) {
   const accountId = req.header('x-account-id') || '';
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req);
   if (!accountId || !token) return null;
   const acc = readAccounts().find((a) => a.id === accountId);
-  return (acc && acc.accessToken === token && !acc.suspended) ? accountId : null;
+  return (acc
+    && acc.status === 'approved'
+    && !acc.suspended
+    && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
 }
 
 function genAccountId() {
@@ -1516,11 +1633,38 @@ function toPublicAccountForViewer(acc, viewerAccountId) {
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
 function stripToken(acc) {
-  const { accessToken, passHash, ...safe } = acc;
+  if (!acc) return null;
+  const {
+    accessToken,
+    passHash,
+    dashToken,
+    idImage,
+    id_image,
+    licenseImage,
+    activityImage2,
+    activity_image2,
+    receiptImage,
+    ...safe
+  } = acc;
   if (safe.id_verified) {
     delete safe.idImage;
     delete safe.id_image;
   }
+  delete safe.password;
+  return safe;
+}
+
+/** نسخة أدمن: تحتفظ بوثائق KYC للمراجعة، بلا أسرار وصول */
+function toAdminAccount(acc) {
+  if (!acc) return null;
+  const {
+    accessToken,
+    passHash,
+    dashToken,
+    password,
+    ...safe
+  } = acc;
+  delete safe.password;
   return safe;
 }
 
@@ -1534,15 +1678,19 @@ const accountsRegisterLimiter = rateLimit({
 
 /**
  * GET /api/accounts/nni-available?nni= — عام، بلا سرّ —
- * تحقق مبكر من فراغ رقم الهوية أثناء التسجيل/التوثيق. لا يُفصح عن صاحب الرقم.
+ * يتحقق من صيغة الرقم فقط. لا يكشف إن كان الرقم مستخدماً (تخفيف تعداد).
+ * الفحص الحقيقي للتكرار يحدث عند POST /api/accounts.
  */
 app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
-  const nniCheck = assertNniAssignable(readAccounts(), req.query.nni, null, null);
-  if (!nniCheck.ok) {
-    return res.status(nniCheck.status).json(Object.assign({ available: false }, nniCheck.body));
-  }
-  if (!nniCheck.nni) {
-    return res.status(400).json({ ok: false, available: false, code: 'nni_invalid', error: 'رقم الهوية (NNI) غير صالح', error_fr: "Numéro d'identité (NNI) invalide" });
+  const nni = normalizeNni(req.query.nni);
+  if (!nni || !NNI_RE.test(nni)) {
+    return res.status(400).json({
+      ok: false,
+      available: false,
+      code: 'nni_invalid',
+      error: 'رقم الهوية (NNI) غير صالح',
+      error_fr: "Numéro d'identité (NNI) invalide",
+    });
   }
   res.json({ ok: true, available: true });
 });
@@ -1561,7 +1709,11 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   // ── بوابة "الإطلاق التدريجي" — رفض تسجيل أي نوع حساب قسمه مغلق حالياً
   // (moduleFlags)، حتى لو تجاوز طالب التسجيل واجهة الموقع وأرسل الطلب
   // مباشرة لهذا الـ endpoint. الإخفاء في الواجهة وحده غير كافٍ أمنياً. ──
-  const reqType = String(b.type || '').toLowerCase();
+  const reqType = String(b.type || '').toLowerCase().trim();
+  const ALLOWED_ACCOUNT_TYPES = ['individual', 'store', 'office', 'corp'];
+  if (!ALLOWED_ACCOUNT_TYPES.includes(reqType)) {
+    return res.status(400).json({ ok: false, error: 'نوع الحساب غير مدعوم', code: 'invalid_type' });
+  }
   const flags = getModuleFlags();
   if (Object.prototype.hasOwnProperty.call(flags, reqType) && !flags[reqType]) {
     return res.status(403).json({ error: 'هذا القسم غير مفتوح للتسجيل حالياً' });
@@ -1588,33 +1740,62 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
+  if (sellerEmail) {
+    const emailTaken = list.some((a) => String(a.email || '').trim().toLowerCase() === sellerEmail);
+    if (emailTaken) {
+      return res.status(409).json({
+        ok: false,
+        code: 'email_in_use',
+        error: 'البريد الإلكتروني مستخدم مسبقاً — سجّل الدخول أو استخدم بريداً آخر',
+      });
+    }
+  }
+  if (sellerPassword && sellerPassword.length < 8) {
+    return res.status(400).json({
+      ok: false,
+      code: 'weak_password',
+      error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+    });
+  }
   const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
+  // فرد/محل: تفعيل فوري فقط بعد إثبات ملكية البريد بـ OTP (عند otpRequired)
+  // + كلمة مرور ≥8. لا يُقبل dashToken من العميل أبداً — الخادم يولّده.
+  const platformFlags = getPlatformFlags();
   let autoApproved = false;
-  if (canAutoApproveAccountType(reqType) && sellerEmail) {
-    const ver = consumeBuyerVerificationByEmail(sellerEmail);
-    if (ver.ok) autoApproved = true;
+  let otpGate = null;
+  if (canAutoApproveAccountType(reqType) && sellerEmail && sellerPassword.length >= 8) {
+    if (platformFlags.otpRequired === false) {
+      autoApproved = true;
+    } else {
+      try {
+        otpGate = consumeBuyerVerificationByEmail(sellerEmail);
+      } catch (eOtp) {
+        otpGate = { ok: false, error: 'otp_required' };
+      }
+      autoApproved = !!(otpGate && otpGate.ok);
+    }
   }
   const dashToken = autoApproved ? genDashToken() : null;
   const acc = {
     id,
     accessToken,
-    type: String(b.type).slice(0, 30),
-    name: String(b.name).slice(0, 120),
+    type: reqType,
+    name: normalizeDisplayName(b.name, 120),
     phone: String(b.phone || '').slice(0, 30),
     phoneIntl: String(b.phoneIntl || b.phone_intl || '').slice(0, 30),
-    email: String(b.email || '').slice(0, 120),
-    city: String(b.city || '').slice(0, 60),
+    email: normalizeEmailSafe(b.email || ''),
+    city: stripBidiControls(String(b.city || '')).normalize('NFC').slice(0, 60),
     category: activityFields.category || String(b.category || '').slice(0, 40),
     activityId: activityFields.activityId || String(b.activityId || '').slice(0, 80) || null,
     activity: activityFields.activity || String(b.activity || '').slice(0, 120) || null,
     packageId: String(b.packageId || b.package_id || '').slice(0, 40) || null,
-    address: String(b.address || '').slice(0, 200),
-    desc: String(b.desc || '').slice(0, 1000),
+    address: stripBidiControls(String(b.address || '')).normalize('NFC').slice(0, 200),
+    desc: stripBidiControls(String(b.desc || '')).normalize('NFC').slice(0, 1000),
     promo_video: String(b.promo_video || '').slice(0, 500),
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
     thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة
-    tagline: String(b.tagline || '').slice(0, 50),
+    tagline: stripBidiControls(String(b.tagline || '')).normalize('NFC').slice(0, 50),
     // إصلاح 13/08/2026: حقلا التوثيق (NNI + صورة بطاقة التعريف/جواز السفر)
     // كانا يُجمَعان في واجهة التسجيل (rizq_landing_v8.html) لكن لا يصلان
     // الخادم إطلاقاً — يبقيان في localStorage متصفح المسجِّل فقط، فتصبح
@@ -1662,7 +1843,21 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
     purgeAccountIdDocument(list[idx]);
     writeAccounts(list);
   }
-  res.json({ ok: true, id, accessToken, autoApproved: !!autoApproved });
+  const regOut = {
+    ok: true,
+    id,
+    accessToken,
+    autoApproved: !!autoApproved,
+    status: acc.status,
+    type: acc.type,
+    dashToken: dashToken || undefined,
+  };
+  if (!autoApproved && canAutoApproveAccountType(reqType) && platformFlags.otpRequired !== false) {
+    regOut.otpRequired = true;
+    regOut.code = (otpGate && otpGate.error) || 'otp_required';
+    regOut.message = (otpGate && otpGate.message) || 'فعّل البريد برمز OTP لتفعيل الحساب فوراً، أو انتظر موافقة الإدارة';
+  }
+  res.json(regOut);
 
   // إشعار الأدمن تلقائياً عند تسجيل حساب جديد (لا يُبطئ رد العميل)
   setImmediate(() => {
@@ -1672,7 +1867,7 @@ app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
         businessName: acc.name,
         whatsapp: acc.phone || acc.whatsapp || '',
         package: acc.type,
-        reason: autoApproved ? 'تسجيل حساب جديد — مُفعَّل تلقائياً' : 'تسجيل حساب جديد — بانتظار الموافقة',
+        reason: autoApproved ? 'تسجيل حساب جديد — مُفعَّل تلقائياً بعد OTP' : 'تسجيل حساب جديد — بانتظار الموافقة',
         channel: 'registration',
       }).catch((err) => console.warn('[accounts/register] telegram:', err && err.message));
     } catch (e) { /* telegram optional */ }
@@ -1711,509 +1906,61 @@ app.get('/api/merchant-activities', (req, res) => {
 });
 
 /**
- * POST /api/accounts/seller-login — عام — دخول البائع (محل/مكتب/شركة/فرد)
- * بالبريد وكلمة المرور المخزّنة على الخادم (bcrypt). يُعيد dashToken +
- * accessToken لدمج الجلسة محلياً على أي جهاز.
+ * مسارات جلسة المشترك — مستخرجة إلى routes/accountsSession.js
+ * (seller-login / activate-by-otp / password-reset / verify-dash)
  */
-const sellerLoginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 12,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'محاولات دخول كثيرة — حاول مرة أخرى بعد قليل' },
-});
-app.post('/api/accounts/seller-login', sellerLoginLimiter, async (req, res) => {
-  const email = String((req.body || {}).email || '').trim().toLowerCase().slice(0, 120);
-  const pass = String((req.body || {}).password || '');
-  if (!email || !pass) {
-    return res.status(400).json({ ok: false, code: 'missing_credentials', error: 'البريد وكلمة المرور مطلوبان' });
-  }
-  if (pass.length > 200 || email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
-  }
-  /* bcrypt hash صالح للمقارنة الوهمية — يمنع تسرّب التوقيت عند غياب الحساب */
-  const dummyHash = '$2a$10$Cr7J1rfztqkXC9ZpESd5qO2PLvx6D3SJKxfBjfX3DXVMuu3YBVDYy';
-  const list = readAccounts();
-  const acc = list.find((a) => String(a.email || '').trim().toLowerCase() === email);
-  let ok = false;
-  try {
-    ok = acc && acc.passHash ? await bcrypt.compare(pass, acc.passHash) : await bcrypt.compare(pass, dummyHash);
-  } catch (eCmp) {
-    ok = false;
-  }
-  if (!acc || !acc.passHash || !ok) {
-    res.set('Cache-Control', 'no-store');
-    return res.status(401).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
-  }
-  if (acc.suspended) {
-    return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
-  }
-  if (acc.status !== 'approved') {
-    return res.status(403).json({
-      ok: false,
-      code: 'not_approved',
-      status: acc.status,
-      error: 'الحساب لم تتم الموافقة عليه بعد',
-    });
-  }
-  if (!acc.dashToken) {
-    acc.dashToken = genDashToken();
-    const idx = list.findIndex((a) => a.id === acc.id);
-    if (idx !== -1) {
-      list[idx].dashToken = acc.dashToken;
-      writeAccounts(list);
-    }
-  }
-  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
-  res.set('Cache-Control', 'no-store');
-  res.json({
-    ok: true,
-    account: Object.assign(safeFields, {
-      accessToken,
-      dashToken,
-      token: dashToken,
-    }),
-  });
+const { mountAccountsSessionRoutes } = require('./routes/accountsSession');
+mountAccountsSessionRoutes(app, {
+  bcrypt,
+  readAccounts,
+  writeAccounts,
+  genDashToken,
+  genAccessToken,
+  extractAccountToken,
+  extractDashToken,
+  timingSafeEqualStr,
+  canAutoApproveAccountType,
+  consumeBuyerVerificationByEmail,
+  sendSellerResetOtp,
+  verifySellerResetOtp,
+  consumeSellerResetVerification,
+  purgeAccountIdDocument,
+  accountsRegisterLimiter,
+  isProdEnv,
+  stripToken,
+  toAdminAccount,
 });
 
 /**
- * POST /api/accounts/password-reset/request — عام — إرسال OTP لإعادة تعيين
- * كلمة مرور البائع. لا يُفصح إن كان البريد مسجّلاً (منع التعداد).
+ * مسارات إدارة الحسابات (عام / ملكية / أدمن) —
+ * مستخرجة إلى routes/accountsManage.js
  */
-const passwordResetLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'محاولات كثيرة — حاول لاحقاً' },
-});
-app.post('/api/accounts/password-reset/request', passwordResetLimiter, async (req, res) => {
-  res.set('Cache-Control', 'no-store');
-  const email = String((req.body || {}).email || '').trim().toLowerCase().slice(0, 120);
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ ok: false, code: 'invalid_email', error: 'بريد إلكتروني غير صالح' });
-  }
-  const acc = readAccounts().find((a) => String(a.email || '').trim().toLowerCase() === email);
-  const accountExists = !!(acc && !acc.suspended && acc.email);
-  try {
-    const result = await sendSellerResetOtp(email, {
-      accountExists,
-      name: acc && acc.name ? acc.name : '',
-    });
-    if (!result.ok) {
-      return res.status(400).json({ ok: false, code: result.error || 'invalid', error: result.message || 'تعذّر الإرسال' });
-    }
-    const out = {
-      ok: true,
-      expiresIn: result.expiresIn,
-      message: result.message || 'إن وُجد حساب بهذا البريد فسيصلك رمز خلال دقائق',
-    };
-    if (result.devHint) out.devHint = result.devHint;
-    if (result.emailWarning) out.emailWarning = result.emailWarning;
-    return res.json(out);
-  } catch (eReq) {
-    return res.status(500).json({ ok: false, code: 'send_failed', error: 'تعذّر إرسال الرمز' });
-  }
+const { REFERRAL_BONUS_DAYS } = require('./rizq_package_lifecycle_agent');
+const { mountAccountsManageRoutes } = require('./routes/accountsManage');
+mountAccountsManageRoutes(app, {
+  requireAdminAuth,
+  requireAdminPermission,
+  readAccounts,
+  writeAccounts,
+  extractAccountToken,
+  timingSafeEqualStr,
+  stripToken,
+  toAdminAccount,
+  resolveOptionalAccountViewer,
+  toPublicAccountForViewer,
+  assertNniAssignable,
+  normalizeAccountActivityFields,
+  normalizeAccountPaymentMethods,
+  genDashToken,
+  genAccessToken,
+  purgeAccountIdDocument,
+  REFERRAL_BONUS_DAYS,
 });
 
-/**
- * POST /api/accounts/password-reset/confirm — عام — تحقق OTP + كلمة مرور جديدة
- */
-app.post('/api/accounts/password-reset/confirm', passwordResetLimiter, async (req, res) => {
-  res.set('Cache-Control', 'no-store');
-  const b = req.body || {};
-  const email = String(b.email || '').trim().toLowerCase().slice(0, 120);
-  const code = String(b.code || '').replace(/\D/g, '').slice(0, 6);
-  const newPassword = String(b.newPassword || b.password || '');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ ok: false, code: 'invalid_email', error: 'بريد إلكتروني غير صالح' });
-  }
-  if (code.length !== 6) {
-    return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح' });
-  }
-  if (newPassword.length < 8 || newPassword.length > 128) {
-    return res.status(400).json({ ok: false, code: 'weak_password', error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' });
-  }
-
-  const list = readAccounts();
-  const idx = list.findIndex((a) => String(a.email || '').trim().toLowerCase() === email);
-  if (idx < 0) {
-    return res.status(404).json({ ok: false, code: 'not_found', error: 'الحساب غير موجود' });
-  }
-  const acc = list[idx];
-  if (acc.suspended) {
-    return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
-  }
-
-  const verified = verifySellerResetOtp(email, code);
-  if (!verified.ok) {
-    return res.status(400).json({ ok: false, code: verified.error || 'invalid_code', error: verified.message || 'رمز غير صحيح' });
-  }
-  const consumed = consumeSellerResetVerification(email);
-  if (!consumed.ok) {
-    return res.status(400).json({ ok: false, code: consumed.error || 'otp_required', error: consumed.message || 'تحقق مطلوب' });
-  }
-
-  try {
-    acc.passHash = bcrypt.hashSync(newPassword, 10);
-  } catch (eHash) {
-    return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
-  }
-  /* تدوير التوكنات بعد إعادة التعيين */
-  acc.accessToken = genAccessToken();
-  acc.dashToken = genDashToken();
-  acc.passwordChangedAt = new Date().toISOString();
-  acc.updatedAt = acc.passwordChangedAt;
-  list[idx] = acc;
-  writeAccounts(list);
-
-  const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, ...safeFields } = acc;
-  res.json({
-    ok: true,
-    account: Object.assign(safeFields, {
-      accessToken,
-      dashToken,
-      token: dashToken,
-    }),
-  });
-});
-
-/**
- * POST /api/accounts/mine/:id/password — صاحب الحساب يغيّر كلمة مروره
- * (يتطلب كلمة المرور الحالية + x-account-token).
- */
-app.post('/api/accounts/mine/:id/password', sellerLoginLimiter, async (req, res) => {
-  res.set('Cache-Control', 'no-store');
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
-  const acc = list[idx];
-  const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ ok: false, error: 'unauthorized' });
-  if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
-
-  const b = req.body || {};
-  const currentPassword = String(b.currentPassword || '');
-  const newPassword = String(b.newPassword || '');
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ ok: false, code: 'missing', error: 'كلمة المرور الحالية والجديدة مطلوبتان' });
-  }
-  if (newPassword.length < 8 || newPassword.length > 128) {
-    return res.status(400).json({ ok: false, code: 'weak_password', error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' });
-  }
-  if (!acc.passHash) {
-    return res.status(400).json({ ok: false, code: 'no_password', error: 'لا توجد كلمة مرور على الحساب — استخدم استعادة كلمة المرور' });
-  }
-  let okCur = false;
-  try {
-    okCur = await bcrypt.compare(currentPassword, acc.passHash);
-  } catch (eCmp) {
-    okCur = false;
-  }
-  if (!okCur) {
-    return res.status(401).json({ ok: false, code: 'invalid_current', error: 'كلمة المرور الحالية غير صحيحة' });
-  }
-  try {
-    acc.passHash = bcrypt.hashSync(newPassword, 10);
-  } catch (eHash) {
-    return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
-  }
-  acc.passwordChangedAt = new Date().toISOString();
-  acc.updatedAt = acc.passwordChangedAt;
-  list[idx] = acc;
-  writeAccounts(list);
-  res.json({ ok: true });
-});
-
-/**
- * GET /api/accounts/public — عام، بلا سرّ — الحسابات الموافَق عليها فقط،
- * بحقول آمنة فقط. تستخدمه صفحات المحل/المكتب/الشركة العامة + شريط "آخر
- * المحلات/المكاتب/المعارض" بالرئيسية بدل قراءة localStorage المحلي.
- */
-app.get('/api/accounts/public', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=30');
-  const viewerId = resolveOptionalAccountViewer(req);
-  const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
-  res.json({
-    ok: true,
-    accounts: list.map((acc) => toPublicAccountForViewer(acc, viewerId)),
-    viewerId: viewerId || null,
-  });
-});
-
-/**
- * GET /api/accounts/public/:id — حساب موافَق واحد بحقول عامة فقط
- * (منها thumb) لصفحة الملف الشخصي، دون تنزيل قائمة الحسابات كلها.
- */
-app.get('/api/accounts/public/:id', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=30');
-  const viewerId = resolveOptionalAccountViewer(req);
-  const acc = readAccounts().find((a) => a && a.id === req.params.id);
-  if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
-    return res.status(404).json({ ok: false, error: 'account_not_found' });
-  }
-  res.json({ ok: true, account: toPublicAccountForViewer(acc, viewerId) });
-});
-
-/**
- * GET /api/accounts/mine/:id — يتطلب x-account-token مطابقاً — يقرأ
- * صاحب الحساب حالة طلبه (pending/approved/rejected) + كل بياناته لملء
- * لوحة تحكمه، من أي جهاز يملك فيه هذا التوكن (وليس فقط الجهاز الذي سجّل منه).
- */
-app.get('/api/accounts/mine/:id', (req, res) => {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
-  if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * GET /api/accounts/mine/:id/referrals — يتطلب x-account-token مطابقاً —
- * عدد الأصدقاء الذين سجّلوا عبر رابط إحالة هذا الحساب وأصبحوا مشتركين
- * مدفوعين فعلاً (referralBonusGranted=true فقط — التسجيل وحده لا يُحتسب)،
- * + إجمالي أيام المكافأة المكتسبة. يغذّي بطاقة "برنامج الإحالة" بالداشبورد.
- */
-app.get('/api/accounts/mine/:id/referrals', (req, res) => {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
-  const count = list.filter((a) => a.referredBy === req.params.id && a.referralBonusGranted).length;
-  res.json({ ok: true, count, bonusDaysPerReferral: REFERRAL_BONUS_DAYS, bonusDaysTotal: count * REFERRAL_BONUS_DAYS });
-});
-
-/**
- * PATCH /api/accounts/mine/:id — يتطلب x-account-token — صاحب الحساب
- * يحدّث ملفه الشخصي (الوصف، الفيديو، الصورة، رقم واتساب...) من أي جهاز.
- * لا يمكن تعديل status/accessToken/id عبر هذا المسار أبداً.
- */
-app.patch('/api/accounts/mine/:id', (req, res) => {
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  const acc = list[idx];
-  const token = extractAccountToken(req);
-  if (!token || token !== acc.accessToken) return res.status(401).json({ error: 'unauthorized' });
-  // حساب مُعلَّق من الأدمن (suspended) لا يستطيع تعديل ملفه الشخصي أيضاً —
-  // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
-  if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
-
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
-  const b = req.body || {};
-  if (b.nni !== undefined) {
-    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-    b.nni = nniCheck.nni;
-  }
-  if (b.activityId !== undefined || b.activity !== undefined) {
-    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
-    if (!normalized.ok) {
-      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
-    }
-    acc.activityId = normalized.activityId;
-    acc.activity = normalized.activity;
-    acc.category = normalized.category;
-  }
-  EDITABLE.forEach((k) => {
-    if (b[k] === undefined) return;
-    if (k === 'activityId' || k === 'activity') return;
-    if (k === 'idImage' && acc.id_verified) return;
-    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
-  });
-  // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
-  // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
-  // فعلي: ACCOUNT_PUBLIC_FIELDS أصلاً لا يُخرج phone لغير صاحب الحساب أو
-  // الأدمن بتاتاً (قرار خصوصية سابق) — هذا الحقل يُخزَّن فقط ليُستخدم
-  // لاحقاً (مثلاً في نظام الرسائل) بدل أن يُفقَد كما كان الحال سابقاً.
-  if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone;
-  if (b.widget_enabled !== undefined) acc.widget_enabled = !!b.widget_enabled;
-  if (b.whatsapp_enabled !== undefined) acc.whatsapp_enabled = !!b.whatsapp_enabled;
-  if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
-  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
-  acc.updatedAt = new Date().toISOString();
-  list[idx] = acc;
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * GET /api/accounts/admin — أدمين فقط (سرّ مشترك) — كل الحسابات بكل
- * حقولها (عدا accessToken) لطابور المراجعة في rizq_admin.html.
- */
-app.get('/api/accounts/admin', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, accounts: readAccounts().map(stripToken).reverse() });
-});
-
-/**
- * PATCH /api/accounts/admin/:id — تعديل حساب من الأدمن مباشرة (سرّ مشترك)،
- * نفس الحقول القابلة للتعديل في PATCH /api/accounts/mine/:id لكن بصلاحية
- * الأدمن بدل توكن صاحب الحساب — يغذّي زر "تعديل" في لوحة "المستخدمون"
- * بـrizq_admin.html، الذي كان يعدّل بيانات وهمية محلية فقط سابقاً.
- */
-app.patch('/api/accounts/admin/:id', requireAdminAuth, (req, res) => {
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  const acc = list[idx];
-  const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
-  const b = req.body || {};
-  if (b.nni !== undefined) {
-    const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-    b.nni = nniCheck.nni;
-  }
-  if (b.activityId !== undefined || b.activity !== undefined) {
-    const normalized = normalizeAccountActivityFields(Object.assign({}, acc, b), acc.type);
-    if (!normalized.ok) {
-      return res.status(400).json({ ok: false, error: normalized.error, code: normalized.code });
-    }
-    acc.activityId = normalized.activityId;
-    acc.activity = normalized.activity;
-    acc.category = normalized.category;
-  }
-  EDITABLE.forEach((k) => {
-    if (b[k] === undefined) return;
-    if (k === 'activityId' || k === 'activity') return;
-    if (k === 'idImage' && acc.id_verified) return;
-    acc[k] = String(b[k]).slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
-  });
-  if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
-  if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
-  acc.updatedAt = new Date().toISOString();
-  list[idx] = acc;
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(acc) });
-});
-
-/**
- * POST /api/accounts/admin/:id/decision — أدمين فقط — body:{action:'approve'|'reject'}
- * يضبط status + approvedAt. هذا هو الفعل الذي يجعل الموافقة مرئية فعلياً
- * لصاحب الحساب من جهازه (عبر GET /api/accounts/mine/:id) وللزوار عبر
- * GET /api/accounts/public إن كانت موافقة.
- * عند approve: تُحذف صورة الهوية فوراً من accounts.json ويُثبَّت id_verified فقط.
- */
-app.post('/api/accounts/admin/:id/decision', requireAdminAuth, (req, res) => {
-  const body = req.body || {};
-  const action = body.action;
-  if (!['approve', 'reject', 'suspend', 'reactivate'].includes(action)) {
-    return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject' أو 'suspend' أو 'reactivate'" });
-  }
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-
-  // تعليق/إعادة تفعيل حساب مُعتمَد مسبقاً — مستقل تماماً عن status (approved/
-  // rejected). طالما suspended=true: يختفي الحساب من GET /api/accounts/public
-  // (صفحته العامة + شريط الرئيسية)، ويُرفَض verifyAccountOwner لأي فعل يتطلب
-  // توكن الملكية (نشر إعلان جديد، تعديل الكتالوج، تعديل الملف الشخصي...).
-  if (action === 'suspend' || action === 'reactivate') {
-    list[idx].suspended = action === 'suspend';
-    list[idx].suspendedAt = action === 'suspend' ? new Date().toISOString() : null;
-    writeAccounts(list);
-    return res.json({ ok: true, account: stripToken(list[idx]) });
-  }
-
-  if (action === 'approve') {
-    const nniCheck = assertNniAssignable(list, list[idx].nni, list[idx].id, list[idx]);
-    if (!nniCheck.ok) return res.status(nniCheck.status).json(nniCheck.body);
-  }
-
-  list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-  list[idx].approvedAt = action === 'approve' ? new Date().toISOString() : null;
-  list[idx].reviewedAt = new Date().toISOString();
-  if (action === 'approve') {
-    // dashToken = نفس رمز TK_... الذي يولّده rizq_admin.html محلياً لبناء
-    // رابط لوحة تحكم المشترك — نخزّنه هنا أيضاً حتى يتحقق منه /api/accounts/verify-dash
-    // عندما يفتح المشترك رابطه من جهازه الخاص (لا يوجد لديه سجل محلي أصلاً).
-    if (body.dashToken) list[idx].dashToken = String(body.dashToken).slice(0, 100);
-    if (body.package) list[idx].package = String(body.package).slice(0, 60);
-    if (body.package_price !== undefined) list[idx].package_price = Number(body.package_price) || 0;
-    // التزام قانوني: بعد الموافقة تُحذف صورة الهوية من الخادم — ويبقى NNI + id_verified.
-    purgeAccountIdDocument(list[idx]);
-  }
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(list[idx]) });
-});
-
-/**
- * POST /api/accounts/admin/:id/verified-plus — أدمين فقط — يمنح/يُلغي شارة
- * "موثّق⁺" المدفوعة لحساب. body:{action:'grant'|'revoke', durationDays}.
- * تُستدعى إما تلقائياً بعد موافقة الأدمن على طلب شراء (activateVerifiedPlusForRequest
- * في rizq_admin.html، فئة sub_requests.category==='verified_plus')، أو يدوياً
- * من الأدمن مباشرة (منح/سحب استثنائي بلا طلب شراء). مستقلة تماماً عن status
- * (التوثيق المجاني) وعن package (باقة الحساب العامة) — لا تُعدِّل أياً منهما.
- */
-app.post('/api/accounts/admin/:id/verified-plus', requireAdminAuth, (req, res) => {
-  const body = req.body || {};
-  const action = body.action;
-  if (action !== 'grant' && action !== 'revoke') return res.status(400).json({ error: "action يجب أن يكون 'grant' أو 'revoke'" });
-  const list = readAccounts();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-  if (action === 'grant') {
-    const days = Math.max(1, Math.min(3650, Number(body.durationDays) || 365));
-    list[idx].verifiedPlus = true;
-    list[idx].verifiedPlusExpiresAt = new Date(Date.now() + days * 86400000).toISOString();
-  } else {
-    list[idx].verifiedPlus = false;
-    list[idx].verifiedPlusExpiresAt = null;
-  }
-  writeAccounts(list);
-  res.json({ ok: true, account: stripToken(list[idx]) });
-});
-
-const verifyDashLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 60,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من المحاولات — حاول مرة أخرى بعد قليل' },
-});
-
-/**
- * GET /api/accounts/verify-dash/:id?token=TK_... — عام، بلا سرّ أدمن —
- * يتحقق من رمز لوحة التحكم (dashToken، وليس accessToken الخاص بـ /mine)
- * ويعيد بيانات الحساب فقط إن كان مُوافَقاً عليه. هذا ما يسمح لداشبورد
- * المحل/المكتب/الشركة/الحساب الفردي بالعمل فعلياً عندما يفتحه صاحبه من
- * جهازه الخاص (لا يملك أي سجل محلي في localStorage على ذلك الجهاز أصلاً).
- */
-function handleVerifyDash(req, res) {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractDashToken(req);
-  if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
-    return res.status(401).json({ error: 'unauthorized' });
-  }
-  res.json({ ok: true, account: stripToken(acc) });
-}
-
-/** POST /api/accounts/exchange-dash-token/:id — يُرجع accessToken فقط (POST + rate limit) */
-function handleExchangeDashToken(req, res) {
-  const list = readAccounts();
-  const acc = list.find((a) => a.id === req.params.id);
-  if (!acc) return res.status(404).json({ error: 'account_not_found' });
-  const token = extractDashToken(req);
-  if (acc.status !== 'approved' || !acc.dashToken || !token || token !== acc.dashToken) {
-    return res.status(401).json({ error: 'unauthorized' });
-  }
-  res.json({ ok: true, accessToken: acc.accessToken });
-}
-
-app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
-app.post('/api/accounts/exchange-dash-token/:id', verifyDashLimiter, handleExchangeDashToken);
-if (!isProdEnv()) {
-  app.get('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);
-}
-
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
-// حسابات "ا��&شتر�` ا�سر�`ع" � SQLite عبر /api/auth + /api/wishlist
-// (ت��اف� رجع�`: /api/buyers/register �� /api/buyers/me)
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+// ═══════════════════════════════════════════════════════════════
+// حسابات "المشتري السريع" — SQLite عبر /api/auth + /api/wishlist
+// (توافق رجعي: /api/buyers/register و /api/buyers/me)
+// ═══════════════════════════════════════════════════════════════
 const buyersRegisterLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 15,
@@ -2274,16 +2021,14 @@ app.post('/api/buyers/register', buyersRegisterLimiter, (req, res) => {
   res.status(410).json({ ok: false, error: 'deprecated', message: 'استخدم POST /api/auth/register بعد التحقق بـ OTP' });
 });
 
-/** @deprecated � استخد�& GET /api/auth/me */
-app.get('/api/buyers/me', (req, res, next) => {
-  try {
-    const id = req.query.id;
-    const token = req.query.token;
-    if (!id || !token) return res.status(400).json({ ok: false, error: 'id �� token �&ط���با� ', code: 'AUTH_REQUIRED' });
-    const row = BuyerModel.findByIdAndToken(id, token);
-    if (!row) return res.status(401).json({ ok: false, error: 'unauthorized', code: 'UNAUTHORIZED' });
-    res.json({ ok: true, buyer: BuyerModel.publicBuyer(row) });
-  } catch (err) { next(err); }
+/** @deprecated — استخدم GET /api/auth/me (بدون توكن في query) */
+app.get('/api/buyers/me', (req, res) => {
+  res.status(410).json({
+    ok: false,
+    error: 'deprecated',
+    code: 'GONE',
+    message: 'استخدم GET /api/auth/me مع ترويسات المصادقة — توكنات الـ query لم تعد مدعومة',
+  });
 });
 
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
@@ -2293,8 +2038,11 @@ app.get('/api/buyers/me', (req, res, next) => {
 // /api/accounts با�ضبط � إرسا� عا�& + �&راجعة أد�&�`�  بسر� �&شترْ.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const SUB_REQUESTS_FILE = path.join(DATA_DIR, 'sub-requests.json');
-function readSubRequests() { return readJson(SUB_REQUESTS_FILE, []); }
-function writeSubRequests(list) { writeJson(SUB_REQUESTS_FILE, list); }
+function readSubRequests() { return repos.subRequests.list(); }
+function writeSubRequests(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 
 const subRequestsLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -2341,8 +2089,9 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
     receiptImage: b.receiptImage ? String(b.receiptImage).slice(0, 2_500_000) : null,
-    riskLevel: String(b.riskLevel || 'unreviewed').slice(0, 20),
-    flags: Array.isArray(b.flags) ? b.flags.slice(0, 20) : [],
+    // لا نخزّن riskLevel/flags من العميل — السيرفر فقط يحدّدهما بعد التحليل
+    riskLevel: 'unreviewed',
+    flags: [],
     // إصلاح مرافق: adId/adTitle (فئة 'ad_boost') لم تكونا تُخزَّنان إطلاقاً هنا،
     // فكان activateAdBoostForRequest (يتطلب req.adId) يفشل بصمت لأي طلب "مميزة"
     // معزول يصل من جهاز غير جهاز الأدمن — الزبون يدفع ولا يُفعَّل شيء.
@@ -2394,7 +2143,7 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
  * GET /api/sub-requests/admin — أدمين فقط (سرّ مشترك) — قائمة كل الطلبات
  * ليراها أي جهاز أدمن، وليس فقط جهاز المشترك الذي أرسل الطلب.
  */
-app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
+app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res) => {
   res.json({ ok: true, requests: readSubRequests().reverse() });
 });
 
@@ -2404,7 +2153,7 @@ app.get('/api/sub-requests/admin', requireAdminAuth, (req, res) => {
  * يبقى محلياً في rizq_admin.html كما هو؛ هذا فقط يجعل الحالة النهائية
  * مرئية عبر كل الأجهزة بدل الاقتصار على جهاز الأدمن الذي وافق فعلياً.
  */
-app.post('/api/sub-requests/admin/:id/decision', requireAdminAuth, (req, res) => {
+app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
   const list = readSubRequests();
@@ -2427,13 +2176,12 @@ const {
   getAllAccountPackageRecords,
   syncAccountPackage,
   createPendingPackageFromRequest,
-  REFERRAL_BONUS_DAYS,
 } = require('./rizq_package_lifecycle_agent');
 // نمرّر readAccounts/writeAccounts (مُعرَّفتان أعلاه في هذا الملف) حتى يقدر
 // معالج /api/account-package/sync (داخل الملف الآخر) أن يقرأ/يكتب حقل
 // referredBy على accounts.json عند منح مكافأة إحالة — راجع rizq_package_
 // lifecycle_agent.js لتفاصيل آلية "جيب صاحبك واربح".
-setupPackageLifecycleAPI(app, requireAdminAuth, { readAccounts, writeAccounts });
+setupPackageLifecycleAPI(app, requireAdminPermission('payments'), { readAccounts, writeAccounts });
 
 /** GET /api/entitlements/:accountId — صلاحيات الحساب (محمي بـ x-account-token) */
 app.get('/api/entitlements/:accountId', (req, res) => {
@@ -2508,50 +2256,29 @@ setInterval(() => {
 // وفحص أول عند إقلاع الخادم مباشرة (لا ننتظر ساعة كاملة لأول مرة)
 runLifecycleScan(_lifecycleHelpers).catch((e) => console.error('[package-lifecycle] initial scan error:', e.message));
 
-// ── الملخص اليومي (Daily Digest) — يُستدعى من مهمة مجدولة خارجية (وكيل
-// إدارة المنصة) وليس من أي صفحة عامة. مبني الآن كاملاً لكنه بلا فائدة
-// حقيقية حتى تنطلق المنصة فعلياً على استضافة حقيقية وتستقبل مستخدمين —
-// قبل ذلك سيعيد دائماً أصفاراً لأن data/ فارغة. لا يغيّر أي بيانات، قراءة
-// فقط، ومحمي بنفس BACKEND_SHARED_SECRET العام لبقية نقاط لوحة الأدمن.
-app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
-  try {
-    const pendingAccounts = readAccounts().filter((a) => a.status === 'pending');
-    const pendingAds = readAds().filter((a) => a.status === 'pending');
-    const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
-    const pendingBizContacts = readJson(ADS_REQUESTS_FILE, []).filter((r) => r.status === 'pending_contact');
-    const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
-
-    const pkgRecords = getAllAccountPackageRecords();
-    const expiringSoon = [];
-    const suspended = [];
-    Object.keys(pkgRecords).forEach((accountId) => {
-      const rec = pkgRecords[accountId];
-      if (!rec) return;
-      if (rec.status === 'expiring_soon') expiringSoon.push({ accountId, periodEnd: rec.periodEnd || null });
-      if (rec.status === 'suspended') suspended.push({ accountId, periodEnd: rec.periodEnd || null });
-    });
-
-    const maintenanceAudit = readAuditLog(DATA_DIR);
-    const lastMaintenance = maintenanceAudit[0] || null;
-    const lastBackup = readLatestBackupMeta(__dirname);
-
-    res.json({
-      ok: true,
-      generatedAt: new Date().toISOString(),
-      pendingAccounts: { count: pendingAccounts.length, items: pendingAccounts.slice(0, 20).map((a) => ({ id: a.id, name: a.name, type: a.type, createdAt: a.createdAt })) },
-      pendingAds: { count: pendingAds.length, items: pendingAds.slice(0, 20).map((a) => ({ id: a.id, title: a.title, accountId: a.accountId })) },
-      pendingSubRequests: { count: pendingSubRequests.length },
-      pendingBizContacts: { count: pendingBizContacts.length },
-      pendingTenders: { count: pendingTenders.length },
-      expiringSoon: { count: expiringSoon.length, items: expiringSoon.slice(0, 20) },
-      suspended: { count: suspended.length, items: suspended.slice(0, 20) },
-      lastMaintenance,
-      lastBackup,
-    });
-  } catch (err) {
-    console.error('[daily-digest] error:', err.message);
-    res.status(500).json({ error: 'فشل توليد الملخص اليومي' });
-  }
+/**
+ * مسارات نواة الأدمن (login/verify/permissions/team/logout/daily-digest)
+ * — مستخرجة إلى routes/adminCore.js
+ */
+const { mountAdminCoreRoutes } = require('./routes/adminCore');
+mountAdminCoreRoutes(app, {
+  requireAdminSession,
+  requireAdminAuth,
+  requireAdminPermission,
+  adminSessions,
+  adminTeamService,
+  ADMIN_SESSION_TTL_MS,
+  PANEL_PERMISSION_MAP,
+  readAccounts,
+  readAds,
+  readSubRequests,
+  readAdsRequests: () => repos.adsRequests.list(),
+  readTenders,
+  getAllAccountPackageRecords,
+  readAuditLog,
+  DATA_DIR,
+  readLatestBackupMeta,
+  backendRootDir: __dirname,
 });
 
 // ── "قريباً + أعلمني عند التفعيل" — إشارة اهتمام حقيقية بدل التخمين (طلب
@@ -2560,8 +2287,11 @@ app.get('/api/admin/daily-digest', requireAdminAuth, (req, res) => {
 // من لوحة التحكم قبل القرار. لا علاقة لهذا بالتسجيل الفعلي في الحساب — مجرد
 // نية اهتمام (لا تحتاج مصادقة، لكن محدودة المعدل لمنع الإغراق). ──────────
 const INTEREST_FILE = path.join(DATA_DIR, 'section-interest.json');
-function readInterest() { return readJson(INTEREST_FILE, []); }
-function writeInterest(list) { writeJson(INTEREST_FILE, list); }
+function readInterest() { return repos.sectionInterest.list(); }
+function writeInterest(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.sectionInterest.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'videoAds'];
 
 const interestLimiter = rateLimit({
@@ -2603,7 +2333,7 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
  * أدمين فقط — عدد التسجيلات لكل قسم مغلق + آخر المسجّلين، ليقرر الأدمن
  * أي قسم يفتحه تالياً بناءً على بيانات حقيقية لا تخميناً.
  */
-app.get('/api/section-interest/admin', requireAdminAuth, (req, res) => {
+app.get('/api/section-interest/admin', requireAdminPermission('analytics'), (req, res) => {
   const list = readInterest();
   const bySection = {};
   INTEREST_SECTIONS.forEach((s) => { bySection[s] = { count: 0, items: [] }; });
@@ -2624,7 +2354,7 @@ app.get('/api/section-interest/admin', requireAdminAuth, (req, res) => {
  * body: { message, filterStatus? } — filterStatus اختياري لتصفية المشتركين
  * حسب حالة باقتهم (active/trial/expiring_soon/expired/suspended/all).
  */
-app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
+app.post('/api/broadcast-sms', requireAdminPermission('announcements'), async (req, res) => {
   try {
     const { message, filterStatus } = req.body || {};
     if (!message || !String(message).trim()) return res.status(400).json({ error: 'message مطلوب' });
@@ -2655,132 +2385,18 @@ app.post('/api/broadcast-sms', requireAdminAuth, async (req, res) => {
 // عام (GET /api/tenders أو GET /api/tenders/:id) — فقط صاحب المناقصة (عبر
 // GET /api/tenders/mine بتوكنه الخاص) أو الأدمن يراها.
 const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-function readTenders() { return readJson(TENDERS_FILE, []); }
-function writeTenders(list) { writeJson(TENDERS_FILE, list); }
-function genTenderId() { return 'TND_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'); }
+function readTenders() { return repos.tenders.list(); }
+function writeTenders(list) { return repos.tenders.replaceAll(list); }
 
 /**
  * saveTenderImages(tenderId, images) — صور مرجعية اختيارية لما يحتاجه
  * صاحب المناقصة (مثال: "20 كرسي بهذا الشكل" + صورة) ليفهم مقدّمو العروض
  * المطلوب بدقة. حد أقصى 3 صور (لا حاجة لمعرض كامل كصور منتج للبيع، هذه
- * مرجع فقط) — نفس منطق saveAdImages/saveCatalogImages.
+ * مرجع فقط) — نفس منطق saveAdImages/saveCatalogImages. التنفيذ في
+ * services/imagePipeline؛ مسارات /api/tenders* في routes/tenders.js.
  */
 const TENDER_UPLOADS_DIR = path.join(__dirname, 'uploads', 'tenders');
 if (!fs.existsSync(TENDER_UPLOADS_DIR)) fs.mkdirSync(TENDER_UPLOADS_DIR, { recursive: true });
-function genBidId() { return 'BID_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'); }
-
-const TENDER_PACKAGE_NAME = 'باقة المناقصة';
-const TENDER_ACTIVE_STATUSES = ['active', 'expiring_soon'];
-const TENDER_REQUIRES_PACKAGE = true;
-
-function resolveOptionalTenderViewer(req) {
-  return resolveOptionalAccountViewer(req);
-}
-
-function getTenderAccessForViewer(accountId) {
-  return getTenderEntitlements(accountId || null);
-}
-
-function hasTenderPaidAccess(accountId) {
-  const ent = getTenderEntitlements(accountId);
-  return !!(ent && ent.canSubmitProposals && ent.subscribed);
-}
-
-/** توافق مع الاستدعاءات القديمة — يعني اشتراك مدفوع فعّال (ليس تجريبي) */
-function hasTenderAccess(accountId) {
-  return hasTenderPaidAccess(accountId);
-}
-
-// redactContactPatterns imported from contactGate.js
-
-function resolveTenderOwnerContacts(t) {
-  const owner = readAccounts().find((a) => a.id === t.ownerId) || {};
-  const phone = String(t.ownerPhone || owner.phone || '').trim();
-  const email = String(t.ownerEmail || owner.email || '').trim();
-  const whatsapp = String(t.ownerWhatsApp || owner.whatsapp || phone || '').trim();
-  return { phone, email, whatsapp };
-}
-
-function isTenderPubliclyOpen(t) {
-  if (!t) return false;
-  if (t.status !== 'open' && t.status !== 'provisionally_approved') return false;
-  const deadlineMs = new Date(t.deadline).getTime();
-  return !Number.isNaN(deadlineMs) && deadlineMs > Date.now();
-}
-
-function filterPublicOpenTenders(list) {
-  return (list || []).filter(isTenderPubliclyOpen);
-}
-
-function toPublicTender(t, access, viewerId) {
-  const now = Date.now();
-  const deadlineMs = new Date(t.deadline).getTime();
-  const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
-  const contactsUnlocked = !!ent.canUnlockContacts;
-  const contacts = resolveTenderOwnerContacts(t);
-  const rawImages = Array.isArray(t.images) ? t.images : [];
-  const imageCount = rawImages.length;
-  const hasDocument = !!t.document;
-  const publicImages = (contactsUnlocked && viewerId)
-    ? rawImages.map((_, i) => buildSignedTenderAssetUrl(
-      '/api/tenders/' + t.id + '/images/' + i,
-      viewerId,
-      t.id,
-      'img:' + i
-    ))
-    : [];
-  const documentUrl = (contactsUnlocked && hasDocument)
-    ? (viewerId
-      ? buildSignedTenderAssetUrl('/api/tenders/' + t.id + '/document', viewerId, t.id, 'doc:0')
-      : '/api/tenders/' + t.id + '/document')
-    : null;
-  return {
-    id: t.id,
-    title: contactsUnlocked ? t.title : redactContactPatterns(t.title),
-    desc: contactsUnlocked ? t.desc : redactContactPatterns(t.desc),
-    category: t.category,
-    city: t.city,
-    budgetMin: t.budgetMin,
-    budgetMax: t.budgetMax,
-    deadline: t.deadline,
-    images: publicImages,
-    imagesLocked: !contactsUnlocked && imageCount > 0,
-    imageCount: imageCount,
-    hasDocument,
-    documentLocked: !contactsUnlocked && hasDocument,
-    documentUrl,
-    documentName: hasDocument ? (t.documentName || 'tender-document.pdf') : null,
-    ownerName: t.ownerName,
-    ownerId: t.ownerId || null,
-    createdAt: t.createdAt,
-    status: t.status || 'open',
-    provisionalTier: t.provisionalTier || null,
-    provisionalLabelAr: t.provisionalLabelAr || null,
-    provisionalAutoApproved: !!t.provisionalAutoApproved,
-    bidsCount: Array.isArray(t.bids) ? t.bids.length : 0,
-    isOpen: !Number.isNaN(deadlineMs) && deadlineMs > now && (t.status === 'open' || t.status === 'provisionally_approved'),
-    contactsLocked: !contactsUnlocked,
-    ownerPhone: contactsUnlocked ? (contacts.phone || null) : null,
-    ownerEmail: contactsUnlocked ? (contacts.email || null) : null,
-    ownerWhatsApp: contactsUnlocked ? (contacts.whatsapp || null) : null,
-    canSubmitBid: !!ent.canSubmitProposals,
-  };
-}
-
-function rejectTenderContactLeak(res, scan, field) {
-  return res.status(422).json({
-    error: 'contact_in_text_forbidden',
-    field: field || (scan.fields && scan.fields[0] && scan.fields[0].field) || 'text',
-    hits: scan.hits || [],
-    fields: scan.fields || [],
-    msg: scan.messageAr,
-    msg_fr: scan.messageFr,
-  });
-}
-
-function TENDER_PUBLIC_ACCESS_FALLBACK() {
-  return getTenderEntitlements(null);
-}
 
 // يثبت أن accountId + token يطابقان حساباً حقيقياً في accounts.json، ويُعيده
 function verifyAccountOwner(accountId, token) {
@@ -2789,7 +2405,7 @@ function verifyAccountOwner(accountId, token) {
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
-  return (acc && acc.status === 'approved' && acc.accessToken === token && !acc.suspended) ? acc : null;
+  return (acc && acc.status === 'approved' && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? acc : null;
 }
 
 const RizqPromptsServer = require('../rizq_ai_prompts');
@@ -2870,6 +2486,9 @@ app.post('/api/subscriber/knowledge/upload', (req, res) => {
   } catch (e) {
     return res.status(400).json({ ok: false, error: 'invalid_base64' });
   }
+  if (!buffer.length || buffer.length > 2 * 1024 * 1024) {
+    return res.status(400).json({ ok: false, error: 'file_too_large', message: 'الحد الأقصى لملف المعرفة 2 ميجابايت' });
+  }
 
   const parsed = parseKnowledgeFile(fileName, buffer);
   if (!parsed.ok) {
@@ -2890,7 +2509,7 @@ app.post('/api/subscriber/knowledge/upload', (req, res) => {
   });
 });
 
-setupQuotaGuardAPI(app, requireAdminAuth, {
+setupQuotaGuardAPI(app, requireAdminPermission('quota-guard'), {
   verifyAccountOwner,
   getAccountRecord,
   loadProfiles: () => {
@@ -2910,609 +2529,46 @@ setupQuotaGuardAPI(app, requireAdminAuth, {
   },
 });
 
-const tenderPostLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من المناقصات المنشورة — حاول مرة أخرى بعد قليل' },
-});
-const tenderBidLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من العروض المقدَّمة — حاول مرة أخرى بعد قليل' },
-});
-const tenderAssetLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 120,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير من طلبات تحميل مرفقات المناقصة — حاول لاحقاً' },
-});
-
 /**
- * POST /api/tenders — نشر مناقصة جديدة. يتطلب x-account-token + accountId
- * صالحين، وباقة "غرفة المناقصات" فعّالة على الحساب (وإلا 403 برسالة واضحة).
+ * مسارات /api/tenders* — مستخرجة إلى routes/tenders.js
  */
-app.post('/api/tenders', tenderPostLimiter, async (req, res) => {
-  try {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderPaidAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
-  }
-  if (!b.title || !b.deadline) return res.status(400).json({ error: 'title و deadline مطلوبان' });
-  const title = String(b.title).slice(0, 150);
-  const desc = String(b.desc || '').slice(0, 1500);
-  const leakScan = scanContactLeakFields([
-    { key: 'title', val: title },
-    { key: 'desc', val: desc },
-  ]);
-  if (leakScan.hasLeak) return rejectTenderContactLeak(res, leakScan);
-  if (b.document) {
-    const pdfExtract = await extractPdfTextFromDataUri(b.document);
-    if (pdfExtract.error) {
-      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
-    }
-    const pdfScan = scanContactLeakFields([{ key: 'document', val: pdfExtract.text }]);
-    if (pdfScan.hasLeak) return rejectTenderContactLeak(res, pdfScan, 'document');
-  }
-  const deadlineMs = new Date(b.deadline).getTime();
-  if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
-    return res.status(400).json({ error: 'الموعد النهائي يجب أن يكون تاريخاً صالحاً في المستقبل' });
-  }
-  const tenderId = genTenderId();
-  const tenderDraft = {
-    id: tenderId,
-    ownerId: acc.id,
-    ownerName: acc.name || '',
-    ownerPhone: String(acc.phone || '').slice(0, 40),
-    ownerEmail: String(acc.email || '').slice(0, 120),
-    ownerWhatsApp: String(acc.whatsapp || acc.phone || '').slice(0, 40),
-    title,
-    desc,
-    category: String(b.category || '').slice(0, 40),
-    city: String(b.city || '').slice(0, 60),
-    budgetMin: Number(b.budgetMin) || 0,
-    budgetMax: Number(b.budgetMax) || 0,
-    deadline: new Date(deadlineMs).toISOString(),
-    // صور مرجعية اختيارية — تُراجع مع المناقصة قبل النشر العام
-    images: await saveTenderImages(tenderId, b.images),
-    document: await saveTenderDocument(tenderId, b.document),
-    documentName: b.document ? String(b.documentName || 'tender-document.pdf').slice(0, 120) : null,
-    createdAt: new Date().toISOString(),
-    bids: [],
-  };
-  const { scoreTender, shouldAutoApprove } = require('./services/provisionalTier');
-  const score = scoreTender(tenderDraft);
-  const auto = shouldAutoApprove(score.provisionalTier);
-  const tender = Object.assign({}, tenderDraft, {
-    status: auto ? 'provisionally_approved' : 'pending_review',
-    provisionalTier: score.provisionalTier,
-    provisionalLabelAr: score.provisionalLabelAr,
-    provisionalLabelFr: score.provisionalLabelFr,
-    provisionalReasons: score.provisionalReasons,
-    provisionalAt: score.provisionalAt,
-    provisionalBy: score.provisionalBy,
-    provisionalAutoApproved: auto,
-    approvedAt: auto ? new Date().toISOString() : null,
-    approvedBy: auto ? 'tenders_agent' : null,
-  });
-  const list = readTenders();
-  list.unshift(tender);
-  writeTenders(list);
-  setImmediate(() => {
-    try {
-      const { sendTelegramAdminNotification } = require('./services/telegramAdmin');
-      const tierEmoji = score.provisionalTier === 'green' ? '🟢' : (score.provisionalTier === 'yellow' ? '🟡' : '🔴');
-      const reason = auto
-        ? (tierEmoji + ' مناقصة «' + tender.title + '» — موافقة مبدئية تلقائية من وكيل المناقصات (قابلة للنقض)')
-        : (tierEmoji + ' مناقصة «' + tender.title + '» — معلّقة بانتظارك (' + (score.provisionalLabelAr || score.provisionalTier) + ')');
-      sendTelegramAdminNotification({
-        leadId: tender.id,
-        businessName: tender.ownerName,
-        whatsapp: acc.phone || acc.whatsapp || '',
-        package: tender.category || 'غرفة المناقصات',
-        reason,
-        channel: 'tender_review',
-      }).catch((err) => console.warn('[tenders/post] telegram:', err && err.message));
-    } catch (e) { /* telegram optional */ }
-  });
-  res.json({
-    ok: true,
-    pendingReview: !auto,
-    provisionalTier: score.provisionalTier,
-    provisionalLabel: score.provisionalLabelAr,
-    autoApproved: auto,
-    tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
-    msg: auto
-      ? 'موافقة مبدئية من وكيل المناقصات — نُشرت بصفة مبدئية (قابلة للمراجعة).'
-      : 'تم استلام مناقصتك — معلّقة بانتظار مراجعة Limam (لبس أو شبهة).',
-  });
-  } catch (err) {
-    console.error('[tenders/post] upload pipeline:', err.message);
-    if (err.code === 'invalid_pdf') {
-      return res.status(400).json({ error: 'invalid_pdf', message: 'ملف PDF غير صالح أو أكبر من 5MB' });
-    }
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة المرفقات — تأكد من صحة الصور وملف PDF' });
-  }
-});
-
-function streamTenderDocumentFile(t, res) {
-  const absPath = resolveTenderDocumentAbsPath(t.document);
-  if (!absPath || !fs.existsSync(absPath)) {
-    return res.status(404).json({ error: 'document_not_found' });
-  }
-  const name = (t.documentName || 'tender-document.pdf').replace(/[^\w.\-()\u0600-\u06FF ]+/g, '_');
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'inline; filename="' + name + '"');
-  fs.createReadStream(absPath).pipe(res);
-}
-
-function canAccessTenderAsset(req, t, viewerId, access, assetKey) {
-  if (!t) return false;
-  const token = extractAccountToken(req) || '';
-  if (viewerId && verifyAccountOwner(viewerId, token)) {
-    if (t.ownerId === viewerId) return true;
-    if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
-  }
-  const qViewer = String(req.query.viewer || '');
-  const qExp = Number(req.query.exp);
-  const qSig = String(req.query.sig || '');
-  if (qViewer && assetKey && verifyTenderAssetSig(qViewer, t.id, assetKey, qExp, qSig)) {
-    if (t.ownerId === qViewer) return true;
-    const qAccess = getTenderAccessForViewer(qViewer);
-    if (qAccess.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
-  }
-  return false;
-}
-
-function streamTenderImageFile(t, index, res) {
-  const rawImages = Array.isArray(t.images) ? t.images : [];
-  const idx = Number(index);
-  if (!Number.isInteger(idx) || idx < 0 || idx >= rawImages.length) {
-    return res.status(404).json({ error: 'image_not_found' });
-  }
-  const absPath = resolveTenderUploadAbsPath(rawImages[idx]);
-  if (!absPath || !fs.existsSync(absPath)) {
-    return res.status(404).json({ error: 'image_not_found' });
-  }
-  const ext = path.extname(absPath).toLowerCase();
-  const type = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/webp';
-  res.setHeader('Content-Type', type);
-  res.setHeader('Cache-Control', 'private, max-age=3600');
-  fs.createReadStream(absPath).pipe(res);
-}
-
-/**
- * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة.
- * يعرض عدد المناقصات المفتوحة + فئات آخر 3 مناقصات فقط (بلا حقول حسّاسة).
- */
-app.get('/api/tenders/public-stats', (req, res) => {
-  const openList = filterPublicOpenTenders(readTenders());
-  const recentCategories = openList.slice(0, 3).map((t) => t.category).filter(Boolean);
-  res.json({ ok: true, count: openList.length, recentCategories });
-});
-
-/**
- * GET /api/tenders — تصفّح عام للمناقصات المفتوحة مع حماية بيانات التواصل.
- * الزائر/التجريبي يرى العنوان والوصف والمتطلبات؛ أرقام التواصل مخفية/مُشفّرة.
- * المشترك المدفوع يكشف التواصل ويمكنه تقديم العروض. يدعم ?cat=&city=
- */
-app.get('/api/tenders', (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const { cat, city } = req.query || {};
-  let list = filterPublicOpenTenders(readTenders());
-  if (cat) list = list.filter((t) => t.category === cat);
-  if (city) list = list.filter((t) => t.city === city);
-  res.json({
-    ok: true,
-    tenders: list.map((t) => toPublicTender(t, access, viewerId)),
-    access: {
-      contactsUnlocked: !!access.canUnlockContacts,
-      canSubmitBid: !!access.canSubmitProposals,
-      canPost: !!access.canPostTenders,
-      isTrial: !!access.isTrial,
-      subscribed: !!access.subscribed,
-      planType: access.planType,
-    },
-  });
-});
-
-/**
- * POST /api/tenders/:id/bids — تقديم عرض على مناقصة. يتطلب x-account-token +
- * accountId صالحين، وباقة "غرفة المناقصات" فعّالة. لا يمكن لصاحب المناقصة
- * تقديم عرض على مناقصته هو نفسها. العرض لا يظهر لأي أحد إلا صاحب المناقصة.
- */
-app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!hasTenderPaidAccess(b.accountId)) {
-    return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لتقديم عرض — الباقة التجريبية للتصفّح فقط' });
-  }
-  const bidderAccess = getTenderAccessForViewer(b.accountId);
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  const t = list[idx];
-  if (t.status !== 'open') {
-    return res.status(400).json({ error: 'tender_not_open', msg: 'هذه المناقصة غير متاحة لتقديم العروض حالياً' });
-  }
-  if (t.ownerId === acc.id) return res.status(400).json({ error: 'cannot_bid_own_tender' });
-  const deadlineMs = new Date(t.deadline).getTime();
-  if (Number.isNaN(deadlineMs) || deadlineMs <= Date.now()) {
-    return res.status(400).json({ error: 'tender_closed', msg: 'انتهت مهلة تقديم العروض على هذه المناقصة' });
-  }
-  if (!b.price) return res.status(400).json({ error: 'price مطلوب' });
-  const notes = String(b.notes || '').slice(0, 500);
-  const bidderName = String(acc.name || '').slice(0, 80);
-  const bidLeakScan = scanContactLeakFields([
-    { key: 'notes', val: notes },
-    { key: 'bidderName', val: bidderName },
-  ]);
-  if (bidLeakScan.hasLeak) return rejectTenderContactLeak(res, bidLeakScan, bidLeakScan.fields[0] && bidLeakScan.fields[0].field);
-  const bid = {
-    id: genBidId(),
-    bidderId: acc.id,
-    bidderName,
-    price: Number(b.price) || 0,
-    deliveryDays: Number(b.deliveryDays) || 0,
-    notes,
-    priority: !!bidderAccess.priorityPlacement,
-    createdAt: new Date().toISOString(),
-  };
-  if (!Array.isArray(t.bids)) t.bids = [];
-  t.bids.push(bid);
-  if (bid.priority && t.bids.length > 1) {
-    t.bids.sort((a, b2) => {
-      if (!!a.priority !== !!b2.priority) return a.priority ? -1 : 1;
-      return new Date(a.createdAt).getTime() - new Date(b2.createdAt).getTime();
-    });
-  }
-  list[idx] = t;
-  writeTenders(list);
-  res.json({ ok: true });
-});
-
-/**
- * GET /api/tenders/mine — مناقصاتي (اللي نشرتها أنا) + كل العروض المقدَّمة
- * عليها كاملة. يتطلب x-account-token + accountId مطابقين.
- */
-app.get('/api/tenders/mine', (req, res) => {
-  const accountId = req.query.accountId || '';
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const mine = readTenders().filter((t) => t.ownerId === accountId && t.status !== 'removed');
-  res.json({ ok: true, tenders: mine });
-});
-
-/**
- * GET /api/tenders/admin — أدمين فقط (سرّ مشترك) — كل المناقصات بكل حقولها
- * (بما فيها العروض) لأغراض المراجعة/إزالة السبام.
- */
-app.get('/api/tenders/admin', requireAdminPermission('tenders'), (req, res) => {
-  res.json({ ok: true, tenders: readTenders() });
-});
-
-/**
- * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
- */
-app.get('/api/tenders/:id/document', tenderAssetLimiter, (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-  if (!canAccessTenderAsset(req, t, viewerId, access, 'doc:0')) {
-    return res.status(403).json({
-      error: 'document_locked',
-      msg: 'ملف المناقصة متاح للمشتركين فقط — اشترك لتحميله',
-      msg_fr: 'Document réservé aux abonnés — abonnez-vous pour le télécharger',
-    });
-  }
-  return streamTenderDocumentFile(t, res);
-});
-
-/**
- * GET /api/tenders/:id/images/:index — صورة مرجعية (مشتركون أو صاحب المناقصة)
- */
-app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t) return res.status(404).json({ error: 'tender_not_found' });
-  const assetKey = 'img:' + req.params.index;
-  if (!canAccessTenderAsset(req, t, viewerId, access, assetKey)) {
-    return res.status(403).json({
-      error: 'images_locked',
-      msg: 'الصور المرجعية متاحة للمشتركين فقط',
-      msg_fr: 'Photos réservées aux abonnés',
-    });
-  }
-  return streamTenderImageFile(t, req.params.index, res);
-});
-
-/**
- * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
- */
-app.get('/api/tenders/admin/:id/document', requireAdminPermission('tenders'), (req, res) => {
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-  return streamTenderDocumentFile(t, res);
-});
-
-/**
- * GET /api/tenders/admin/:id/images/:index — أدمين — مراجعة صورة
- */
-app.get('/api/tenders/admin/:id/images/:index', requireAdminPermission('tenders'), (req, res) => {
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t) return res.status(404).json({ error: 'tender_not_found' });
-  return streamTenderImageFile(t, req.params.index, res);
-});
-
-/**
- * GET /api/tenders/:id — محجوب أيضاً خلف نفس باقة "غرفة المناقصات" (تفاصيل
- * مناقصة واحدة، بلا عروض).
- * ⚠️ إصلاح جوهري 03/08/2026 (اكتُشف أثناء اختبار تجريبي شامل): كان هذا
- * المسار مُسجَّلاً في Express *قبل* /api/tenders/mine و/api/tenders/admin.
- * express يطابق المسارات بترتيب التسجيل لا بالتحديد — أي طلب لـ /api/tenders/
- * mine أو /api/tenders/admin كان يقع فعلياً هنا (يُعامَل "mine"/"admin" كقيمة
- * :id) ويُطبَّق عليه بوابة "غرفة المناقصات" الخاطئة بدل بوابته الحقيقية. أي
- * أن لوحة إشراف المناقصات في rizq_admin.html ولوحة "مناقصاتي" لدى التاجر لم
- * تعملا فعلياً من قبل. الإصلاح: نقل هذا المسار العام (:id) ليُسجَّل بعد كل
- * المسارات الثابتة الأكثر تحديداً (mine/admin) — قاعدة عامة في Express: أي
- * مسار به معامل (:id) يجب أن يُسجَّل دائماً بعد كل المسارات الثابتة المشابهة.
- */
-app.get('/api/tenders/:id', (req, res) => {
-  const viewerId = resolveOptionalTenderViewer(req);
-  const access = getTenderAccessForViewer(viewerId);
-  const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
-  if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
-  res.json({
-    ok: true,
-    tender: toPublicTender(t, access, viewerId),
-    access: {
-      contactsUnlocked: !!access.canUnlockContacts,
-      canSubmitBid: !!access.canSubmitProposals,
-      canPost: !!access.canPostTenders,
-      isTrial: !!access.isTrial,
-      subscribed: !!access.subscribed,
-      planType: access.planType,
-    },
-  });
+const { mountTendersRoutes } = require('./routes/tenders');
+mountTendersRoutes(app, {
+  requireAdminAuth,
+  requireAdminPermission,
+  extractAccountToken,
+  verifyAccountOwner,
+  resolveOptionalAccountViewer,
+  getTenderEntitlements,
+  scanContactLeakFields,
+  redactContactPatterns,
+  saveTenderImages,
+  saveTenderDocument,
+  extractPdfTextFromDataUri,
+  resolveTenderDocumentAbsPath,
+  resolveTenderUploadAbsPath,
+  buildSignedTenderAssetUrl,
+  verifyTenderAssetSig,
+  readAccounts,
+  readTenders,
+  writeTenders,
+  syncAccountPackage,
+  getAccountRecord,
 });
 
 // ── غرفة الاستثمارات ──────────────────────────────────────────────
 const investmentRoom = require('./services/investmentRoom');
-const investmentPlanLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'too_many_requests' },
-});
-const investmentSubmitLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'too_many_requests' },
-});
-
-/** POST /api/investments/plan — وكيل المراجعة الأوّلية (JSON plan) */
-app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
-  try {
-    const result = await investmentRoom.generatePlan(req.body || {}, anthropic);
-    res.json({ ok: true, plan: result.plan, source: result.source, lang: result.lang, publicContact: investmentRoom.PUBLIC_CONTACT });
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'plan_failed' });
-  }
-});
-
-/** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
-app.get('/api/investments', (req, res) => {
-  try {
-    res.json(investmentRoom.listPublic({ unlockContacts: false }));
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'list_failed' });
-  }
-});
-
-/** POST /api/investments/submit — إيداع فرصة + موافقة مبدئية عند الأخضر */
-app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
-  try {
-    const out = await investmentRoom.submitOpportunity(req.body || {});
-    res.json(out);
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'submit_failed' });
-  }
-});
-
-/** GET /api/admin/investments — قائمة كاملة للأدمن (بما فيها المعلّقة) */
-app.get('/api/admin/investments', requireAdminAuth, (req, res) => {
-  try {
-    res.json(investmentRoom.listAdmin({
-      status: req.query.status || null,
-      tier: req.query.tier || null,
-    }));
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'list_failed' });
-  }
-});
-
-/** POST /api/admin/investments/:id/decision — نقض/تأكيد الموافقة المبدئية */
-app.post('/api/admin/investments/:id/decision', requireAdminAuth, (req, res) => {
-  try {
-    const action = (req.body && req.body.action) || '';
-    const reviewer = (req.adminUser && (req.adminUser.name || req.adminUser.user)) || 'admin';
-    const out = investmentRoom.decideOpportunity(req.params.id, action, reviewer);
-    res.json(out);
-  } catch (err) {
-    const status = err.status && err.status >= 400 ? err.status : 500;
-    res.status(status).json({ ok: false, error: err.message || 'decision_failed' });
-  }
-});
-
-/** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
-app.get('/api/admin/investments/daily-report', requireAdminAuth, (req, res) => {
-  try {
-    const digest = investmentRoom.buildDailyDigest();
-    res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'digest_failed' });
-  }
-});
-
-/** POST /api/admin/investments/send-ops-report — إرسال التقرير للبريد التشغيلي الخاص */
-app.post('/api/admin/investments/send-ops-report', requireAdminAuth, async (req, res) => {
-  try {
-    const result = await investmentRoom.sendOpsDailyReport();
-    res.json({
-      ok: !!result.ok,
-      skipped: !!result.skipped,
-      reason: result.reason || null,
-      error: result.error || null,
-      summary: result.digest ? {
-        plansRequested: result.digest.plansRequested,
-        opportunitiesSubmitted: result.digest.opportunitiesSubmitted,
-        pendingReview: result.digest.pendingReview,
-        autoProvisionallyApproved: result.digest.autoProvisionallyApproved,
-        tiers: result.digest.tiers,
-      } : null,
-    });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: 'send_failed' });
-  }
-});
-
 /**
- * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
+ * مسارات /api/investments* و /api/admin/investments* — مستخرجة إلى routes/investments.js
  */
-app.post('/api/tenders/admin/:id/reject', requireAdminPermission('tenders'), (req, res) => {
-  const b = req.body || {};
-  const reason = String(b.reason || b.msg || '').trim().slice(0, 500);
-  if (!reason) return res.status(400).json({ error: 'reason_required', msg: 'سبب الرفض مطلوب' });
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
-  list[idx].status = 'rejected';
-  list[idx].rejectReason = reason;
-  list[idx].rejectedAt = new Date().toISOString();
-  list[idx].rejectedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
-  writeTenders(list);
-  res.json({ ok: true, tender: list[idx] });
-});
-
-/**
- * POST /api/tenders/admin/:id/remove — أدمين فقط — يخفي مناقصة نهائياً من كل
- * الواجهات العامة (سبام/محتوى مخالف) دون حذف السجل فعلياً (نفس مبدأ عدم
- * الحذف النهائي المتَّبع في بقية المنصة).
- */
-app.post('/api/tenders/admin/:id/remove', requireAdminPermission('tenders'), (req, res) => {
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  list[idx].status = 'removed';
-  writeTenders(list);
-  res.json({ ok: true });
-});
-
-/**
- * POST /api/tenders/admin/:id/approve — أدمين فقط — يُفعّل مناقصة pending_review
- */
-app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (req, res) => {
-  const list = readTenders();
-  const idx = list.findIndex((t) => t.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
-  if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
-  list[idx].status = 'open';
-  list[idx].approvedAt = new Date().toISOString();
-  list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
-  list[idx].humanOverride = true;
-  list[idx].provisionalAutoApproved = false;
-  writeTenders(list);
-  res.json({ ok: true, tender: list[idx] });
-});
-
-/**
- * POST /api/tenders/package/activate — أدمين فقط (سرّ مشترك) — يُفعّل/يجدّد
- * اشتراك "باقة المناقصة" لحساب معيّن بعد موافقة الأدمن على طلب اشتراك حقيقي
- * (rizq_sub_requests بفئة category:'tender'). يُستخدَم مفتاح معزول
- * (accountId + '::tender') داخل مخزن account-packages.json حتى لا يتصادم
- * إطلاقاً مع سجل الباقة العامة لنفس الحساب (راجع تعليق hasTenderAccess أعلاه
- * لتفصيل سبب هذا العزل). يدعم التجريبية (10 أيام) والباقات المدفوعة.
- */
-app.post('/api/tenders/package/activate', requireAdminAuth, async (req, res) => {
-  const b = req.body || {};
-  if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
-  const { findCatalogPackage, isTrialPackage } = require('./services/catalogConfig');
-  const pkgName = b.pkgName || TENDER_PACKAGE_NAME;
-  const pkgDef = findCatalogPackage(b.packageId || pkgName);
-  const days = Number(b.days) || (pkgDef && pkgDef.durationDays) || 30;
-  const price = Number(b.price) || (pkgDef && pkgDef.price) || 0;
-  const isTrial = b.isTrial === true || isTrialPackage((pkgDef && pkgDef.name) || pkgName, price);
-  const now = new Date();
-  const periodEnd = new Date(now.getTime() + days * 86400000);
-  try {
-    const result = await syncAccountPackage({
-      accountId: b.accountId + '::tender',
-      accountName: b.accountName || b.accountId,
-      accountPhone: b.accountPhone || '',
-      accountEmail: b.accountEmail || '',
-      accountType: b.accountType || '',
-      pkgName: (pkgDef && pkgDef.name) || pkgName,
-      packageId: (pkgDef && pkgDef.id) || b.packageId || null,
-      price,
-      days,
-      periodStart: now.toISOString(),
-      periodEnd: periodEnd.toISOString(),
-      activatedBy: b.activatedBy || 'admin',
-      isTrial,
-      paymentConfirmed: !isTrial,
-      paidAt: isTrial ? null : now.toISOString(),
-    });
-    if (!result.ok) return res.status(400).json(result);
-    res.json({ ok: true, periodEnd: periodEnd.toISOString() });
-  } catch (err) {
-    console.error('[tenders/package/activate] error:', err.message);
-    res.status(500).json({ error: 'فشل تفعيل باقة المناقصة' });
-  }
-});
-
-/**
- * GET /api/tenders/package/status/:id — حالة اشتراك "باقة المناقصة" لحساب
- * معيّن، من طرف صاحب الحساب نفسه فقط (x-account-token يطابق accessToken
- * الحقيقي في accounts.json — نفس نمط /api/accounts/mine/:id). لا يستخدم
- * سرّ الأدمن العام لأن هذه النقطة تُستدعى من داشبورد المشترك مباشرة.
- */
-app.get('/api/tenders/package/status/:id', (req, res) => {
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(req.params.id, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const ent = getTenderEntitlements(req.params.id);
-  const rec = getAccountRecord(req.params.id + '::tender');
-  const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
-  res.json({
-    ok: true,
-    subscribed: !!ent.subscribed,
-    isTrial: !!ent.isTrial,
-    contactsUnlocked: !!ent.canUnlockContacts,
-    canSubmitBid: !!ent.canSubmitProposals,
-    canPost: !!ent.canPostTenders,
-    planType: ent.planType,
-    pkgName: ent.pkgName || null,
-    record: safeRec,
-  });
+const { mountInvestmentsRoutes } = require('./routes/investments');
+mountInvestmentsRoutes(app, {
+  requireAdminAuth,
+  requireAdminPermission,
+  investmentRoom,
+  anthropic,
+  verifyAccountOwner,
+  extractAccountToken,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -3526,8 +2582,8 @@ app.get('/api/tenders/package/status/:id', (req, res) => {
 // images/...) حتى لا تحتاج الواجهة لتغيير جوهري، فقط استبدال
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
-function readAds() { return readJson(ADS_FILE, []); }
-function writeAds(list) { writeJson(ADS_FILE, list); }
+function readAds() { return repos.ads.list(); }
+function writeAds(list) { return repos.ads.replaceAll(list); }
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -3537,273 +2593,37 @@ function writeAds(list) { writeJson(ADS_FILE, list); }
 const ADS_UPLOADS_DIR = path.join(__dirname, 'uploads', 'ads');
 if (!fs.existsSync(ADS_UPLOADS_DIR)) fs.mkdirSync(ADS_UPLOADS_DIR, { recursive: true });
 
-function genAdId() {
-  return 'RZQ-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random() * 90000));
-}
-
 /**
- * withBoostFlag(ad) — يضيف علم boosted:true/false للإعلان حسب ad_boosts.json
- * (نفس المصدر الذي يقرأه GET /api/discovery/ending-soon). readAdBoosts معرَّفة
- * لاحقاً في الملف لكن يصح استدعاؤها هنا بفضل hoisting لتعريفات الدوال.
+ * مسارات /api/ads* — مستخرجة إلى routes/ads.js
+ * (submit / requests / publish / browse / batch / mine / admin / :id / decision)
  */
-function withBoostFlag(ad) {
-  try {
-    const boosts = readAdBoosts();
-    const b = boosts[ad.id];
-    const boosted = !!(b && b.endsAt && new Date(b.endsAt).getTime() > Date.now());
-    return Object.assign({}, ad, { boosted });
-  } catch (e) {
-    return Object.assign({}, ad, { boosted: false });
-  }
-}
-
-const adsPublishLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الإعلانات المنشورة — حاول لاحقاً' },
-});
-
-/**
- * POST /api/ads — نشر إعلان حقيقي (عام، بلا سرّ مشترك — أي زائر ناشر
- * حقيقي). الإشراف (موافقة/رفض المبدئي) يبقى بمنطق RizqAgent في العميل
- * كما هو — status المُرسَل هنا (active أو pending) يُحفَظ كما هو فقط،
- * فيصبح مشتركاً بين الأجهزة بدل أن يبقى محبوساً في متصفح واحد.
- */
-app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) => {
-  try {
-  const pFlags = getPlatformFlags();
-  if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
-  if (pFlags.adsOpen === false) return res.status(403).json({ error: 'نشر الإعلانات مغلق حالياً' });
-  const b = req.body || {};
-  if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'العنوان مطلوب' });
-  if (!b.category) return res.status(400).json({ error: 'الفئة مطلوبة' });
-  if (b.accountId) {
-    const token = extractAccountToken(req) || '';
-    const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
-    if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-    const acc = ownerAcc;
-    const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
-    const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
-    try {
-      assertCanPostAd(ent, activeCount);
-      if (Array.isArray(b.images) && b.images.length) assertPhotoCount(ent, b.images.length);
-    } catch (gateErr) {
-      return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
-    }
-  }
-  const list = readAds();
-  let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
-  while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
-  const images = await saveAdImages(id, b.images);
-  const rec = {
-    id,
-    title: String(b.title).slice(0, 200),
-    desc: String(b.desc || '').slice(0, 5000),
-    titleFr: String(b.titleFr || '').slice(0, 200),
-    descFr: String(b.descFr || '').slice(0, 5000),
-    price: String(b.price || '').slice(0, 40),
-    originalPrice: String(b.originalPrice || '').slice(0, 40), // سعر أصلي اختياري لعرض شارة الخصم (إلهام أمازون)
-    stockQty: (b.stockQty !== undefined && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
-      ? Math.floor(Number(b.stockQty)) : null, // كمية متبقية اختيارية — شارة "متبقي X فقط" (إلهام أمازون/Temu)، null = غير محدود
-    category: String(b.category).slice(0, 60),
-    categoryLabel: String(b.categoryLabel || '').slice(0, 60),
-    subcat: String(b.subcat || '').slice(0, 80),
-    emoji: String(b.emoji || '').slice(0, 8),
-    wilaya: String(b.wilaya || '').slice(0, 60),
-    condition: String(b.condition || '').slice(0, 40),
-    hidePhone: !!b.hidePhone,
-    negotiable: b.negotiable !== undefined ? !!b.negotiable : true,
-    urgent: !!b.urgent,
-    images,
-    seller_trust_score: Number.isFinite(Number(b.seller_trust_score)) ? Number(b.seller_trust_score) : 60,
-    accountId: b.accountId ? String(b.accountId).slice(0, 60) : null,
-    // إصلاح ثغرة أمنية (2026-08-04): كان الحقل status قابلاً للتحكم من العميل
-    // (b.status)، وبقيمة افتراضية 'active' إن لم يُرسَل شيء — أي أن أي طلب
-    // مباشر لهذا الـ API (متجاوزاً rizq_moderator_agent.js الذي يعمل في
-    // المتصفح فقط) كان يُنشر الإعلان مباشرة بلا أي مراجعة من السيرفر.
-    // الآن: كل إعلان جديد يبدأ 'pending' إلزامياً بغضّ النظر عمّا يرسله
-    // العميل — التفعيل الفعلي فقط عبر POST /api/ads/admin/:id/decision.
-    status: 'pending',
-    date: b.date ? String(b.date).slice(0, 40) : new Date().toLocaleDateString('ar'),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeAds(list);
-  const out = { ok: true, id: rec.id, ad: rec };
-  if (req.moderatorDecision) out.moderator = req.moderatorDecision;
-  res.json(out);
-  } catch (err) {
-    console.error('[ads/post] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/**
- * GET /api/ads — تصفح عام (rizq_browse.html / rizq_search.html) — لا
- * يُرجع إلا status==='active' افتراضياً، مع فلاتر بسيطة + ترقيم صفحات.
- */
-app.get('/api/ads', (req, res) => {
-  const q = req.query || {};
-  const viewerId = resolveOptionalAccountViewer(req);
-  let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
-  if (q.category) list = list.filter((a) => a.category === q.category);
-  if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
-  if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);
-  if (q.accountId) list = list.filter((a) => a.accountId === q.accountId);
-  if (q.search) {
-    const s = String(q.search).toLowerCase();
-    list = list.filter((a) => (a.title + ' ' + a.desc).toLowerCase().indexOf(s) !== -1);
-  }
-  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
-  const offset = Math.max(0, Number(q.offset) || 0);
-  const accounts = readAccounts();
-  const page = list.slice(offset, offset + limit).map((ad) => {
-    const seller = accounts.find((a) => a.id === ad.accountId);
-    const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-    return toPublicAdGated(withBoostFlag(ad), gate, seller);
-  });
-  res.json({ ok: true, total: list.length, ads: page });
-});
-
-/**
- * GET /api/ads/batch?ids=RZQ-...,RZQ-... — جلب عدة إعلانات دفعة واحدة
- * (يستخدمه شريط "تابع التصفح" على الصفحة الرئيسية بدل استدعاء /api/ads/:id
- * مرة لكل إعلان شاهده الزائر). عام، لا يُرجع إلا status==='active'.
- */
-app.get('/api/ads/batch', (req, res) => {
-  const idsParam = String(req.query.ids || '');
-  const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 30);
-  if (!ids.length) return res.json({ ok: true, ads: [] });
-  const viewerId = resolveOptionalAccountViewer(req);
-  const all = readAds();
-  const accounts = readAccounts();
-  const found = ids
-    .map((id) => all.find((a) => a.id === id && a.status === 'active'))
-    .filter(Boolean)
-    .map((ad) => {
-      const seller = accounts.find((a) => a.id === ad.accountId);
-      const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-      return toPublicAdGated(withBoostFlag(ad), gate, seller);
-    });
-  res.json({ ok: true, ads: found });
-});
-
-/** GET /api/ads/mine — كل إعلانات حساب معيّن (كل الحالات)، لصاحبه فقط */
-app.get('/api/ads/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readAds().filter((a) => a.accountId === accountId);
-  res.json({ ok: true, ads: list });
-});
-
-/** GET /api/ads/admin — لوحة إشراف الأدمن (كل الحالات، كل الإعلانات) */
-app.get('/api/ads/admin', requireAdminAuth, (req, res) => {
-  res.json({ ok: true, ads: readAds() });
-});
-
-/** GET /api/ads/:id — تفاصيل إعلان واحد (صفحة rizq_listing.html) */
-app.get('/api/ads/:id', (req, res) => {
-  const ad = readAds().find((a) => a.id === req.params.id);
-  if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-  const isAdmin = isAdminRequest(req);
-  const token = extractAccountToken(req) || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (ad.status !== 'active' && !isAdmin && !isOwner) {
-    return res.status(404).json({ error: 'ad_not_found' });
-  }
-  const viewerId = resolveOptionalAccountViewer(req);
-  const seller = readAccounts().find((a) => a.id === ad.accountId);
-  const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-  res.json({ ok: true, ad: toPublicAdGated(withBoostFlag(ad), gate, seller), access: gate });
-});
-
-/**
- * PATCH /api/ads/:id — تعديل من صاحب الإعلان (x-account-token) أو الأدمن
- * (x-rizq-secret). يدعم تعديل الحقول الأساسية + تغيير الحالة (نشِط/مباع/
- * متوقف) + استبدال الصور.
- */
-app.patch('/api/ads/:id', async (req, res) => {
-  try {
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  const ad = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  const b = req.body || {};
-  const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition'];
-  editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
-  if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
-    ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
-      ? Math.floor(Number(b.stockQty)) : null;
-  }
-  if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
-  if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
-  if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
-  if (Array.isArray(b.images)) ad.images = await saveAdImages(ad.id, b.images);
-  // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
-  // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
-  // 'active' بعد رفضه من الأدمن — نفس قرار المراجعة (POST
-  // /api/ads/admin/:id/decision) كان بلا قيمة فعلية. الآن: المالك يستطيع
-  // فقط تعديل حالات إدارة ذاتية لا تحتاج مراجعة (sold/inactive/removed)،
-  // أما active/pending/rejected فللأدمن حصراً (x-rizq-secret).
-  if (typeof b.status === 'string') {
-    const ownerAllowedStatus = ['sold', 'inactive', 'removed'];
-    const adminAllowedStatus = ['active', 'pending', 'rejected', 'sold', 'inactive', 'removed'];
-    const allowedStatus = isAdmin ? adminAllowedStatus : ownerAllowedStatus;
-    if (allowedStatus.includes(b.status)) ad.status = b.status;
-  }
-  ad.updatedAt = new Date().toISOString();
-  list[idx] = ad;
-  writeAds(list);
-  res.json({ ok: true, ad });
-  } catch (err) {
-    console.error('[ads/patch] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/**
- * DELETE /api/ads/:id — حذف ناعم (status='removed') وليس حذفاً نهائياً،
- * بنفس مبدأ عدم الحذف النهائي المتَّبع في بقية المنصة (المناقصات مثلاً).
- */
-app.delete('/api/ads/:id', (req, res) => {
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  const ad = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  list[idx].status = 'removed';
-  list[idx].updatedAt = new Date().toISOString();
-  writeAds(list);
-  res.json({ ok: true });
-});
-
-/**
- * POST /api/ads/admin/:id/decision — قرار إشراف الأدمن (موافقة/رفض) —
- * يحلّ محل syncRealAdReviewStatus المحلي بالكامل في rizq_admin.html.
- */
-app.post('/api/ads/admin/:id/decision', requireAdminAuth, (req, res) => {
-  const action = (req.body || {}).action;
-  if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
-  const list = readAds();
-  const idx = list.findIndex((a) => a.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
-  list[idx].status = action === 'approve' ? 'active' : 'rejected';
-  list[idx].updatedAt = new Date().toISOString();
-  writeAds(list);
-  res.json({ ok: true, ad: list[idx] });
+const { mountAdsRoutes } = require('./routes/ads');
+mountAdsRoutes(app, {
+  requireAdminAuth,
+  requireAdminPermission,
+  moderatorAdMiddleware,
+  getPlatformFlags,
+  extractAccountToken,
+  verifyAccountOwner,
+  getEntitlements,
+  assertCanPostAd,
+  assertPhotoCount,
+  scanContactLeakFields,
+  saveAdImages,
+  resolveOptionalAccountViewer,
+  resolveContactGate,
+  toPublicAdGated,
+  isAdminRequest,
+  adminHasPermission,
+  readAccounts,
+  readAdsRequests: () => repos.adsRequests.list(),
+  writeAdsRequests: (list) => {
+    const rows = Array.isArray(list) ? list : [];
+    repos.adsRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  },
+  readAds,
+  writeAds,
+  readAdBoosts,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -3813,8 +2633,11 @@ app.post('/api/ads/admin/:id/decision', requireAdminAuth, (req, res) => {
 // (بلا تسجيل دخول) يمكنه إرسال بلاغ عن إعلان محدد، ويراجعه الأدمن هنا.
 // ══════════════════════════════════════════════════════════════════
 const REPORTS_FILE = path.join(DATA_DIR, 'reports.json');
-function readReports() { return readJson(REPORTS_FILE, []); }
-function writeReports(list) { writeJson(REPORTS_FILE, list); }
+function readReports() { return repos.reports.list(); }
+function writeReports(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.reports.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genReportId() { return 'RPT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 const REPORT_REASONS = ['fake_photos', 'suspicious_item', 'fraud', 'banned_content', 'misleading_price', 'other'];
@@ -3857,7 +2680,7 @@ app.post('/api/reports', reportsLimiter, (req, res) => {
 });
 
 /** GET /api/reports/admin — أدمين فقط — كل البلاغات (المعلّقة أولاً، الأحدث أولاً) */
-app.get('/api/reports/admin', requireAdminAuth, (req, res) => {
+app.get('/api/reports/admin', requireAdminPermission('reports'), (req, res) => {
   const list = readReports().sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -3866,7 +2689,7 @@ app.get('/api/reports/admin', requireAdminAuth, (req, res) => {
 });
 
 /** POST /api/reports/admin/:id/resolve — أدمين فقط — يُعلِّم البلاغ كمحلول */
-app.post('/api/reports/admin/:id/resolve', requireAdminAuth, (req, res) => {
+app.post('/api/reports/admin/:id/resolve', requireAdminPermission('reports'), (req, res) => {
   const list = readReports();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'report_not_found' });
@@ -3877,7 +2700,7 @@ app.post('/api/reports/admin/:id/resolve', requireAdminAuth, (req, res) => {
 });
 
 /** GET /api/support-tickets/admin — admin list support tickets */
-app.get('/api/support-tickets/admin', requireAdminAuth, (req, res) => {
+app.get('/api/support-tickets/admin', requireAdminPermission('users'), (req, res) => {
   const list = readTickets().sort((a, b) => {
     if (a.status !== b.status) {
       const order = { open: 0, in_progress: 1, resolved: 2, closed: 3 };
@@ -3889,7 +2712,7 @@ app.get('/api/support-tickets/admin', requireAdminAuth, (req, res) => {
 });
 
 /** PATCH /api/support-tickets/admin/:id — update ticket status */
-app.patch('/api/support-tickets/admin/:id', requireAdminAuth, (req, res) => {
+app.patch('/api/support-tickets/admin/:id', requireAdminPermission('users'), (req, res) => {
   const { status, adminNote } = req.body || {};
   if (!status) return res.status(400).json({ error: 'status required' });
   const updated = updateTicketStatus(req.params.id, status, adminNote);
@@ -3907,8 +2730,11 @@ app.patch('/api/support-tickets/admin/:id', requireAdminAuth, (req, res) => {
 // admin/:id/decision (action='suspend')�R �ا � ُْرِ�ر�!ا ب� � ستدع�`�!ا �&باشرة.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const DEACTIVATION_REQUESTS_FILE = path.join(DATA_DIR, 'deactivation-requests.json');
-function readDeactivationRequests() { return readJson(DEACTIVATION_REQUESTS_FILE, []); }
-function writeDeactivationRequests(list) { writeJson(DEACTIVATION_REQUESTS_FILE, list); }
+function readDeactivationRequests() { return repos.deactivationRequests.list(); }
+function writeDeactivationRequests(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.deactivationRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genDeactivationRequestId() { return 'DEACT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 const deactivationRequestsLimiter = rateLimit({
@@ -3948,7 +2774,7 @@ app.post('/api/deactivation-requests', deactivationRequestsLimiter, (req, res) =
 });
 
 /** GET /api/deactivation-requests/admin — أدمين فقط — المعلّقة أولاً، الأحدث أولاً */
-app.get('/api/deactivation-requests/admin', requireAdminAuth, (req, res) => {
+app.get('/api/deactivation-requests/admin', requireAdminPermission('accounts'), (req, res) => {
   const list = readDeactivationRequests().sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -3962,7 +2788,7 @@ app.get('/api/deactivation-requests/admin', requireAdminAuth, (req, res) => {
  * (suspended=true، نفس أثر action='suspend' بمسار القرار الإداري
  * للحسابات) بالإضافة لتعليم الطلب كمحلول. reject: يُعلِّم الطلب كمحلول فقط.
  */
-app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminAuth, (req, res) => {
+app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission('accounts'), (req, res) => {
   const action = (req.body || {}).action;
   if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
   const list = readDeactivationRequests();
@@ -3994,14 +2820,15 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminAuth, (req,
 // يربطه بصاحبه) بدل ثلاثة أنظمة منفصلة، لأن الشكل والمنطق (ownership +
 // CRUD) متطابق تماماً بين الثلاثة.
 const CATALOG_FILE = path.join(DATA_DIR, 'catalog.json');
-function readCatalog() { return readJson(CATALOG_FILE, []); }
-function writeCatalog(list) { writeJson(CATALOG_FILE, list); }
+function readCatalog() { return repos.catalog.list(); }
+function writeCatalog(list) { return repos.catalog.replaceAll(list); }
 
 const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
-function readAllHours() { return readJson(HOURS_FILE, {}); }
-function writeAllHours(obj) { writeJson(HOURS_FILE, obj); }
-
-function genCatalogId() { return 'CAT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
+function readAllHours() { return repos.businessHours.asMap(); }
+function writeAllHours(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.businessHours.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 
 // نفس منطق حفظ صور الإعلانات كملفات حقيقية بدل base64 داخل catalog.json
 // (راجع saveAdImages أعلاه لتفصيل سبب القرار: base64 في localStorage
@@ -4010,140 +2837,22 @@ const CATALOG_UPLOADS_DIR = path.join(__dirname, 'uploads', 'catalog');
 if (!fs.existsSync(CATALOG_UPLOADS_DIR)) fs.mkdirSync(CATALOG_UPLOADS_DIR, { recursive: true });
 
 /**
- * POST /api/catalog — إضافة منتج/خدمة (صاحب الحساب فقط عبر x-account-token)
+ * مسارات /api/catalog* — مستخرجة إلى routes/catalog.js
+ * (POST / GET / mine / :id / PATCH / DELETE)
  */
-app.post('/api/catalog', async (req, res) => {
-  try {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.name || !String(b.name).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
-  if (!['product', 'service'].includes(b.kind)) return res.status(400).json({ error: "kind يجب أن يكون 'product' أو 'service'" });
-  const ent = getEntitlements(b.accountId, acc.type);
-  const activeCount = readCatalog().filter((it) => it.accountId === b.accountId && it.status === 'active').length;
-  const imageCount = Array.isArray(b.images) ? b.images.length : (b.image ? 1 : 0);
-  try {
-    assertCanAddCatalogItem(ent, activeCount);
-    if (imageCount) assertPhotoCount(ent, imageCount);
-  } catch (gateErr) {
-    return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
-  }
-  const list = readCatalog();
-  const id = genCatalogId();
-  // images: مصفوفة (حتى 6) — الحقل الجديد للمعرض. image: الصورة الأولى
-  // منها، يبقى محدَّثاً لتوافق أي كود قديم يقرأ item.image فقط. يدعم
-  // كلا المسارين: عميل جديد يرسل images[]، أو عميل قديم يرسل image واحدة.
-  let catImages;
-  if (Array.isArray(b.images) && b.images.length) {
-    catImages = await saveCatalogImages(id, b.images);
-  } else {
-    const single = await saveCatalogImage(id, b.image);
-    catImages = single ? [single] : [];
-  }
-  const rec = {
-    id,
-    accountId: b.accountId,
-    kind: b.kind,
-    name: String(b.name).slice(0, 200),
-    nameFr: String(b.nameFr || '').slice(0, 200),
-    price: String(b.price || '').slice(0, 40),
-    cat: String(b.cat || '').slice(0, 80),
-    desc: String(b.desc || '').slice(0, 3000),
-    descFr: String(b.descFr || '').slice(0, 3000),
-    stock: String(b.stock || '').slice(0, 20),
-    variants: String(b.variants || '').slice(0, 300),
-    images: catImages,
-    image: catImages[0] || null,
-    emoji: String(b.emoji || '').slice(0, 8),
-    status: 'pending_review',
-    sold: Number.isFinite(Number(b.sold)) ? Number(b.sold) : 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeCatalog(list);
-  res.json({ ok: true, item: rec });
-  } catch (err) {
-    console.error('[catalog/post] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/** GET /api/catalog?accountId=...&kind=... — عرض عام (فقط status active) لصفحات المتجر/المكتب/الشركة */
-app.get('/api/catalog', (req, res) => {
-  const q = req.query || {};
-  let list = readCatalog().filter((it) => it.status === 'active');
-  if (q.accountId) list = list.filter((it) => it.accountId === q.accountId);
-  if (q.kind) list = list.filter((it) => it.kind === q.kind);
-  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ ok: true, items: list });
-});
-
-/** GET /api/catalog/mine?accountId=... — كل عناصر صاحب الحساب (كل الحالات)، للوحة التحكم */
-app.get('/api/catalog/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readCatalog().filter((it) => it.accountId === accountId && it.status !== 'removed');
-  res.json({ ok: true, items: list });
-});
-
-/** GET /api/catalog/:id */
-app.get('/api/catalog/:id', (req, res) => {
-  const item = readCatalog().find((it) => it.id === req.params.id);
-  if (!item) return res.status(404).json({ error: 'item_not_found' });
-  res.json({ ok: true, item });
-});
-
-/** PATCH /api/catalog/:id — تعديل من صاحب الحساب أو الأدمن */
-app.patch('/api/catalog/:id', async (req, res) => {
-  try {
-  const list = readCatalog();
-  const idx = list.findIndex((it) => it.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
-  const item = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  const b = req.body || {};
-  const editable = ['name', 'nameFr', 'price', 'cat', 'desc', 'descFr', 'stock', 'variants', 'emoji'];
-  editable.forEach((k) => { if (typeof b[k] === 'string') item[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 3000 : 200); });
-  if (typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
-  if (Array.isArray(b.images)) {
-    item.images = await saveCatalogImages(item.id, b.images);
-    item.image = item.images[0] || null;
-  } else if (typeof b.image === 'string') {
-    item.image = await saveCatalogImage(item.id, b.image);
-    item.images = item.image ? [item.image] : [];
-  }
-  if (typeof b.status === 'string' && ['active', 'inactive', 'pending_review', 'removed'].includes(b.status)) item.status = b.status;
-  item.updatedAt = new Date().toISOString();
-  list[idx] = item;
-  writeCatalog(list);
-  res.json({ ok: true, item });
-  } catch (err) {
-    console.error('[catalog/patch] image pipeline:', err.message);
-    res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
-  }
-});
-
-/** DELETE /api/catalog/:id — حذف ناعم (status='removed') */
-app.delete('/api/catalog/:id', (req, res) => {
-  const list = readCatalog();
-  const idx = list.findIndex((it) => it.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
-  const item = list[idx];
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
-  list[idx].status = 'removed';
-  list[idx].updatedAt = new Date().toISOString();
-  writeCatalog(list);
-  res.json({ ok: true });
+const { mountCatalogRoutes } = require('./routes/catalog');
+mountCatalogRoutes(app, {
+  verifyAccountOwner,
+  getEntitlements,
+  assertCanAddCatalogItem,
+  assertPhotoCount,
+  readCatalog,
+  writeCatalog,
+  saveCatalogImages,
+  saveCatalogImage,
+  extractAccountToken,
+  isAdminRequest,
+  adminHasPermission,
 });
 
 /**
@@ -4155,9 +2864,29 @@ app.post('/api/business-hours', (req, res) => {
   const token = req.header('x-account-token') || '';
   const acc = verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.hours || typeof b.hours !== 'object') return res.status(400).json({ error: 'hours مطلوب' });
+  if (!b.hours || typeof b.hours !== 'object' || Array.isArray(b.hours)) {
+    return res.status(400).json({ error: 'hours مطلوب' });
+  }
+  const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri',
+    'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+  const clean = {};
+  const keys = Object.keys(b.hours).slice(0, 14);
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(Object.prototype, k)) continue;
+    if (!DAYS.includes(k) && !/^[a-zA-Z\u0600-\u06FF]{2,20}$/.test(k)) continue;
+    const v = b.hours[k];
+    if (v == null) continue;
+    if (typeof v === 'string') clean[k] = String(v).slice(0, 40);
+    else if (typeof v === 'object' && !Array.isArray(v)) {
+      clean[k] = {
+        open: String(v.open || '').slice(0, 16),
+        close: String(v.close || '').slice(0, 16),
+        closed: !!v.closed,
+      };
+    }
+  }
   const all = readAllHours();
-  all[b.accountId] = { hours: b.hours, updatedAt: new Date().toISOString() };
+  all[b.accountId] = { hours: clean, updatedAt: new Date().toISOString() };
   writeAllHours(all);
   res.json({ ok: true });
 });
@@ -4184,201 +2913,24 @@ app.get('/api/business-hours/:accountId', (req, res) => {
 // كل الرسائل تُجمَّع بمفتاح "محادثة" واحد لكل (بائع + مشتري)، سواء كان
 // المشتري ضيفاً (بمفتاح مبني على رقم هاتفه) أو صاحب حساب حقيقي.
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
-function readMessages() { return readJson(MESSAGES_FILE, []); }
-function writeMessages(list) { writeJson(MESSAGES_FILE, list); }
-
-function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
-  const buyerPart = buyerAccountId ? ('acc:' + buyerAccountId) : ('guest:' + String(buyerPhone || '').replace(/\D/g, ''));
-  return sellerAccountId + '::' + buyerPart;
+function readMessages() { return repos.messages.list(); }
+function writeMessages(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.messages.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 
-const messagesLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'عدد كبير جداً من الرسائل — حاول لاحقاً' },
-});
-
 /**
- * POST /api/messages — إرسال أول رسالة أو رسالة تكميلية من طرف المشتري.
- * body: { sellerAccountId, buyerAccountId?, buyerName, buyerPhone, adId?,
- *         adTitle?, body }
- * إن أُرسل buyerAccountId يجب أن يطابق x-account-token حقيقياً (لا يمكن
- * انتحال هوية مشترٍ آخر)؛ وإلا تُعامَل كرسالة زائر (guest) بمفتاح الهاتف.
+ * مسارات /api/messages* — مستخرجة إلى routes/messages.js
+ * (POST / /reply · GET /threads /mine /thread/:key · PATCH .../read)
  */
-app.post('/api/messages', messagesLimiter, (req, res) => {
-  const b = req.body || {};
-  if (!b.sellerAccountId) return res.status(400).json({ error: 'sellerAccountId مطلوب' });
-  if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
-  let buyerAccountId = null;
-  if (b.buyerAccountId) {
-    const token = req.header('x-account-token') || '';
-    const buyerAcc = verifyAccountOwner(b.buyerAccountId, token);
-    if (!buyerAcc) return res.status(401).json({ error: 'unauthorized' });
-    buyerAccountId = b.buyerAccountId;
-  } else if (!b.buyerPhone || !String(b.buyerPhone).trim()) {
-    return res.status(400).json({ error: 'رقم الهاتف مطلوب للزائر غير المسجَّل' });
-  }
-  const threadKey = buildThreadKey(b.sellerAccountId, buyerAccountId, b.buyerPhone);
-  const list = readMessages();
-  const rec = {
-    id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
-    threadKey,
-    sellerAccountId: b.sellerAccountId,
-    buyerAccountId,
-    buyerName: String(b.buyerName || '').slice(0, 100),
-    buyerPhone: String(b.buyerPhone || '').slice(0, 30),
-    adId: b.adId ? String(b.adId).slice(0, 80) : null,
-    adTitle: b.adTitle ? String(b.adTitle).slice(0, 200) : null,
-    body: String(b.body).slice(0, 3000),
-    fromRole: 'buyer',
-    read: false,
-    createdAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeMessages(list);
-  res.json({ ok: true, threadKey, message: rec });
-
-  const sellerAcc = readAccounts().find((a) => a.id === b.sellerAccountId);
-  if (sellerAcc) {
-    setImmediate(() => {
-      maybeAutoReplyToInquiry({
-        sellerAccount: sellerAcc,
-        buyerMessage: rec,
-        threadKey,
-        readMessagesFn: readMessages,
-        writeMessagesFn: writeMessages,
-      }).catch((e) => console.error('[inquiry-auto-reply]', e.message));
-    });
-  }
-});
-
-/**
- * POST /api/messages/reply — ردّ البائع (صاحب الحساب فقط، عبر x-account-token)
- * body: { sellerAccountId, threadKey, body }
- */
-app.post('/api/messages/reply', messagesLimiter, (req, res) => {
-  const b = req.body || {};
-  const token = req.header('x-account-token') || '';
-  const seller = verifyAccountOwner(b.sellerAccountId, token);
-  if (!seller) return res.status(401).json({ error: 'unauthorized' });
-  if (!b.threadKey || b.threadKey.indexOf(b.sellerAccountId + '::') !== 0) {
-    return res.status(400).json({ error: 'threadKey غير صالح' });
-  }
-  if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
-  const list = readMessages();
-  const rec = {
-    id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
-    threadKey: b.threadKey,
-    sellerAccountId: b.sellerAccountId,
-    buyerAccountId: null,
-    buyerName: '',
-    buyerPhone: '',
-    adId: null,
-    adTitle: null,
-    body: String(b.body).slice(0, 3000),
-    fromRole: 'seller',
-    read: true,
-    createdAt: new Date().toISOString(),
-  };
-  list.push(rec);
-  writeMessages(list);
-  res.json({ ok: true, message: rec });
-});
-
-/** GET /api/messages/threads?accountId=...&token=... — صندوق وارد البائع: قائمة محادثات مجمّعة */
-app.get('/api/messages/threads', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.sellerAccountId === accountId);
-  const accountsById = new Map(readAccounts().map((a) => [a.id, a]));
-  const byThread = new Map();
-  list.forEach((m) => {
-    if (!byThread.has(m.threadKey)) byThread.set(m.threadKey, []);
-    byThread.get(m.threadKey).push(m);
-  });
-  const threads = Array.from(byThread.entries()).map(([threadKey, msgs]) => {
-    msgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    const lastMessage = msgs[msgs.length - 1];
-    // نجمع اسم/هاتف/إعلان المشتري من أي رسالة تحمله في المحادثة (لا نعتمد
-    // فقط على آخر رسالة، لأن ردود البائع أو رسائل المشتري اللاحقة لا تحمل
-    // هذه الحقول من الأساس) — ولحساب مسجَّل نعرض اسمه الحقيقي من accounts.json.
-    const buyerAccountId = msgs.find((m) => m.buyerAccountId)?.buyerAccountId || null;
-    const buyerAcc = buyerAccountId ? accountsById.get(buyerAccountId) : null;
-    const buyerName = buyerAcc ? (buyerAcc.name || '') : (msgs.find((m) => m.buyerName)?.buyerName || '');
-    const buyerPhone = buyerAcc ? (buyerAcc.phone || '') : (msgs.find((m) => m.buyerPhone)?.buyerPhone || '');
-    const adRef = msgs.find((m) => m.adId);
-    return {
-      threadKey,
-      buyerAccountId,
-      buyerName,
-      buyerPhone,
-      adId: adRef ? adRef.adId : null,
-      adTitle: adRef ? adRef.adTitle : null,
-      lastMessage,
-      unreadCount: msgs.filter((m) => m.fromRole === 'buyer' && !m.read).length,
-    };
-  }).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
-  res.json({ ok: true, threads });
-});
-
-/** GET /api/messages/mine?accountId=...&token=... — صندوق وارد المشتري صاحب حساب فردي: كل محادثاته عبر كل البائعين */
-app.get('/api/messages/mine', (req, res) => {
-  const accountId = req.query.accountId;
-  const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.buyerAccountId === accountId || (m.threadKey && m.threadKey.indexOf('::acc:' + accountId) !== -1));
-  const byThread = new Map();
-  list.forEach((m) => {
-    const existing = byThread.get(m.threadKey);
-    if (!existing || new Date(m.createdAt) > new Date(existing.lastMessage.createdAt)) {
-      byThread.set(m.threadKey, { threadKey: m.threadKey, sellerAccountId: m.sellerAccountId, adId: m.adId, adTitle: m.adTitle, lastMessage: m });
-    }
-  });
-  const threads = Array.from(byThread.values()).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
-  res.json({ ok: true, threads });
-});
-
-/**
- * GET /api/messages/thread/:threadKey — كل رسائل محادثة واحدة. مسموح
- * للبائع (صاحب threadKey) أو للمشتري صاحب الحساب (إن كانت محادثة مرتبطة
- * بحساب لا بضيف) — عبر x-account-token يطابق أحد الطرفين.
- */
-app.get('/api/messages/thread/:threadKey', (req, res) => {
-  const threadKey = req.params.threadKey;
-  const sellerAccountId = threadKey.split('::')[0];
-  const token = extractAccountToken(req) || '';
-  const asSeller = verifyAccountOwner(sellerAccountId, token);
-  let asBuyer = null;
-  const buyerMatch = /::acc:(.+)$/.exec(threadKey);
-  if (buyerMatch) asBuyer = verifyAccountOwner(buyerMatch[1], token);
-  let asGuest = false;
-  const guestMatch = /::guest:(\d+)$/.exec(threadKey);
-  if (!asSeller && !asBuyer && guestMatch) {
-    const phoneDigits = String(req.query.buyerPhone || req.header('x-guest-phone') || '').replace(/\D/g, '');
-    if (phoneDigits && phoneDigits === guestMatch[1]) asGuest = true;
-  }
-  if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages().filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-  res.json({ ok: true, messages: list });
-});
-
-/** PATCH /api/messages/thread/:threadKey/read — البائع يعلّم المحادثة كمقروءة */
-app.patch('/api/messages/thread/:threadKey/read', (req, res) => {
-  const threadKey = req.params.threadKey;
-  const sellerAccountId = threadKey.split('::')[0];
-  const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(sellerAccountId, token);
-  if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readMessages();
-  let changed = 0;
-  list.forEach((m) => { if (m.threadKey === threadKey && m.fromRole === 'buyer' && !m.read) { m.read = true; changed++; } });
-  if (changed) writeMessages(list);
-  res.json({ ok: true, updated: changed });
+const { mountMessagesRoutes } = require('./routes/messages');
+mountMessagesRoutes(app, {
+  verifyAccountOwner,
+  extractAccountToken,
+  readMessages,
+  writeMessages,
+  readAccounts,
+  maybeAutoReplyToInquiry,
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -4390,8 +2942,11 @@ app.patch('/api/messages/thread/:threadKey/read', (req, res) => {
 // حتى تبقى واجهة rizq_reviews_engine.js قابلة للاستبدال بطبقة fetch رقيقة
 // بلا تغيير جوهري في بقية الملفات المستهلِكة لها (task #245).
 const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
-function readReviews() { return readJson(REVIEWS_FILE, {}); } // { [targetId]: [review, ...] }
-function writeReviews(obj) { writeJson(REVIEWS_FILE, obj); }
+function readReviews() { return repos.reviews.asMap(); }
+function writeReviews(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.reviews.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 function genReviewId() { return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 
 const reviewsLimiter = rateLimit({
@@ -4416,23 +2971,26 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (typeof rating !== 'number' || isNaN(rating) || !isFinite(rating) || !Number.isInteger(rating) || rating < 1 || rating > 5) {
     return res.status(400).json({ error: 'rating يجب أن يكون عدداً صحيحاً بين 1 و5' });
   }
-  let reviewerAccountId = null;
-  if (b.reviewerAccountId) {
-    const token = req.header('x-account-token') || '';
-    const reviewerAcc = verifyAccountOwner(b.reviewerAccountId, token);
-    if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized' });
-    reviewerAccountId = b.reviewerAccountId;
+  // تقييمات مجهولة ممنوعة — يلزم حساب مشتري/بائع موثّق
+  const token = req.header('x-account-token') || '';
+  const buyerId = String(b.reviewerAccountId || '').slice(0, 60);
+  if (!buyerId) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+  const reviewerAcc = verifyAccountOwner(buyerId, token);
+  if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized' });
+  if (buyerId === String(b.targetId)) {
+    return res.status(400).json({ error: 'cannot_review_self' });
   }
+  const reviewerAccountId = buyerId;
   const all = readReviews();
   const list = all[b.targetId] || [];
-  if (reviewerAccountId && list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
+  if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
     return res.status(409).json({ error: 'already_reviewed' });
   }
   const review = {
     id: genReviewId(),
     rating,
     comment: String(b.comment == null ? '' : b.comment).trim().slice(0, 500),
-    reviewerName: String(b.reviewerName == null ? '' : b.reviewerName).trim().slice(0, 60),
+    reviewerName: String((b.reviewerName || reviewerAcc.name || '')).trim().slice(0, 60),
     reviewerAccountId,
     createdAt: new Date().toISOString(),
   };
@@ -4460,14 +3018,10 @@ app.get('/api/reviews/:targetId/stats', (req, res) => {
 });
 
 /**
- * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم (لموديريشن البائع
- * صاحب targetId، عبر x-account-token، أو الأدمن عبر x-rizq-secret).
+ * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم للأدمن فقط
+ * (البائع لا يمسح تقييمات الزبائن — كان يسمح بمسح السلبي).
  */
-app.delete('/api/reviews/:targetId/:reviewId', (req, res) => {
-  const isAdmin = isAdminRequest(req);
-  const token = req.header('x-account-token') || '';
-  const isOwner = !!verifyAccountOwner(req.params.targetId, token);
-  if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
+app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderation'), (req, res) => {
   const all = readReviews();
   const list = all[req.params.targetId] || [];
   const next = list.filter((r) => r.id !== req.params.reviewId);
@@ -4485,8 +3039,11 @@ app.delete('/api/reviews/:targetId/:reviewId', (req, res) => {
 // (بلا أرقام هواتف) لصفحة المعرض العامة مستقبلاً إن رغب Limam بعرضها.
 // ══════════════════════════════════════════════════════════════════
 const TEAM_FILE = path.join(DATA_DIR, 'team.json');
-function readTeam() { return readJson(TEAM_FILE, []); }
-function writeTeam(list) { writeJson(TEAM_FILE, list); }
+function readTeam() { return repos.corpTeam.list(); }
+function writeTeam(list) {
+  const rows = Array.isArray(list) ? list : [];
+  repos.corpTeam.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+}
 function genTeamId() { return 'TM-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 /** POST /api/team — إضافة عضو فريق (صاحب الحساب فقط) */
@@ -4556,13 +3113,20 @@ app.delete('/api/team/:id', (req, res) => {
 // الحالي المستخدم في browse/search/listing — إضافة صرفة فقط.
 // ══════════════════════════════════════════════════════════════════
 const AD_BOOSTS_FILE = path.join(DATA_DIR, 'ad_boosts.json');
-function readAdBoosts() { return readJson(AD_BOOSTS_FILE, {}); }
-function writeAdBoosts(obj) { writeJson(AD_BOOSTS_FILE, obj); }
+function readAdBoosts() { return repos.adBoosts.asMap(); }
+function writeAdBoosts(obj) {
+  const map = obj && typeof obj === 'object' ? obj : {};
+  repos.adBoosts.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+}
 
 /** POST /api/ad-boosts — الأدمن فقط، بعد موافقته الفعلية على طلب "مميزة" */
-app.post('/api/ad-boosts', requireAdminAuth, (req, res) => {
+app.post('/api/ad-boosts', requireAdminPermission('payments'), (req, res) => {
   const b = req.body || {};
   if (!b.accountId || !b.adId) return res.status(400).json({ error: 'accountId و adId مطلوبان' });
+  const ad = readAds().find((a) => a.id === b.adId);
+  if (!ad || ad.accountId !== b.accountId) {
+    return res.status(400).json({ error: 'ad_ownership_mismatch' });
+  }
   const days = Number(b.days) > 0 ? Number(b.days) : 3;
   const now = new Date();
   const ends = new Date(now.getTime() + days * 86400000);
@@ -4578,12 +3142,12 @@ app.post('/api/ad-boosts', requireAdminAuth, (req, res) => {
   res.json({ ok: true, boost: all[b.adId] });
 });
 
-/** GET /api/ad-boosts/:adId — عام، هل هذا الإعلان مثبَّت الآن؟ */
+/** GET /api/ad-boosts/:adId — عام، هل هذا الإعلان مثبَّت الآن؟ (بدون بيانات دفع) */
 app.get('/api/ad-boosts/:adId', (req, res) => {
   const all = readAdBoosts();
   const b = all[req.params.adId];
   const active = !!(b && b.endsAt && new Date(b.endsAt) > new Date());
-  res.json({ ok: true, active, boost: active ? b : null });
+  res.json({ ok: true, active, boosted: active, endsAt: active ? b.endsAt : null });
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -4670,6 +3234,7 @@ setTelegramDeps({
   getAccountRecord,
   readAdBoosts,
   writeAdBoosts,
+  readAds,
   registerSubscriber,
 });
 
@@ -4687,7 +3252,7 @@ app.post('/api/telegram/webhook/:secret', handleTelegramWebhook);
  * POST /api/telegram/setup-webhook — أدمين فقط — يسجّل webhook لدى Telegram
  * body: { publicBaseUrl?: "https://your-domain.com" }
  */
-app.post('/api/telegram/setup-webhook', requireAdminAuth, async (req, res) => {
+app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), async (req, res) => {
   if (!isTelegramBotConfigured()) {
     return res.status(503).json({ error: 'telegram_bot_not_configured', hint: 'TELEGRAM_BOT_TOKEN in .env' });
   }
@@ -4824,6 +3389,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
 }
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
@@ -4839,17 +3405,33 @@ startMaintenanceScheduler({
 
 function assertProductionSecrets() {
   if (!isProdEnv()) return;
-  const required = ['BACKEND_SHARED_SECRET', 'RIZQ_API_SECRET'];
+  const required = [
+    'BACKEND_SHARED_SECRET',
+    'RIZQ_API_SECRET',
+    'SUPER_ADMIN_PASS_HASH',
+    'SUPER_ADMIN_EMAIL',
+    'ADMIN_PANEL_PATH',
+    'ADMIN_PANEL_GATE_KEY',
+  ];
   const missing = required.filter((k) => !String(process.env[k] || '').trim());
   if (missing.length) {
     console.error('[FATAL] Missing required env in production:', missing.join(', '));
     process.exit(1);
   }
+  if (!String(process.env.OTP_PEPPER || process.env.BACKEND_SHARED_SECRET || '').trim()) {
+    console.error('[FATAL] OTP_PEPPER or BACKEND_SHARED_SECRET required in production');
+    process.exit(1);
+  }
+  const hash = String(process.env.SUPER_ADMIN_PASS_HASH || '');
+  if (!hash.startsWith('$2')) {
+    console.error('[FATAL] SUPER_ADMIN_PASS_HASH must be a bcrypt hash');
+    process.exit(1);
+  }
 }
 assertProductionSecrets();
 
-app.listen(PORT, async () => {
-  console.log('[rizq-backend] running on port ' + PORT);
+app.listen(PORT, HOST, async () => {
+  console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
   console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {

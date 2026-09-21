@@ -80,6 +80,10 @@ function logTelegramSendFailure(method, chatId, err, extra) {
   console.error('[telegram-api] ❌ SEND REJECTED — full details:', JSON.stringify(payload, null, 2));
 }
 
+/**
+ * محادثات التنبيه/الموافقة فقط — لا تُضمَّن محادثات الزوار العشوائية
+ * (_seenChatIds) وإلا أي من يراسل البوت يصبح قادراً على Approve باقات.
+ */
 function buildAlertChatCandidates() {
   const ids = [];
   const seen = new Set();
@@ -91,9 +95,28 @@ function buildAlertChatCandidates() {
   };
   add(ADMIN_CHAT_ID());
   add(readPersistedAdminChat());
-  add(SUBSCRIBER_ID());
-  _seenChatIds.forEach((meta) => add(meta.id));
+  // SUBSCRIBER_ID إن كان رقم محادثة تيليجرام صريحاً فقط (وليس معرف مشترك نصي)
+  const sub = String(SUBSCRIBER_ID() || '').trim();
+  if (/^-?\d+$/.test(sub)) add(sub);
   return ids;
+}
+
+/** هل يُسمح بتثبيت chat_id كأدمن؟ فقط إن طابق الإعداد أو قائمة سماح صريحة. */
+function canPromoteAdminChat(chatId) {
+  const id = normalizeTelegramChatId(chatId);
+  if (!id) return false;
+  const configured = normalizeTelegramChatId(ADMIN_CHAT_ID());
+  if (configured && id === configured) return true;
+  const allow = String(process.env.TELEGRAM_ADMIN_CHAT_ALLOWLIST || '')
+    .split(/[,\s]+/)
+    .map((s) => normalizeTelegramChatId(s))
+    .filter(Boolean);
+  if (allow.includes(id)) return true;
+  // bootstrap مرة واحدة فقط عندما لا يوجد أدمن مُعدّ مسبقاً
+  if (!configured && !readPersistedAdminChat() && process.env.TELEGRAM_ALLOW_AUTO_ADMIN === '1') {
+    return true;
+  }
+  return false;
 }
 
 async function fetchRecentPrivateChatIds(limit) {
@@ -149,13 +172,16 @@ async function validateAdminChatAtStartup() {
     try {
       await telegramApi('getChat', { chat_id: chatId });
       const configured = normalizeTelegramChatId(ADMIN_CHAT_ID());
-      if (chatId !== configured) {
+      if (chatId !== configured && canPromoteAdminChat(chatId)) {
         registerAdminChatId(chatId, { source: 'startup_auto_fix' });
         console.log('[telegram] admin chat auto-fixed →', chatId, '(was invalid:', configured || '(empty)', ')');
-      } else {
+      } else if (chatId === configured) {
         console.log('[telegram] admin chat validated:', chatId);
+      } else {
+        console.warn('[telegram] candidate chat valid but not promoted (set TELEGRAM_ADMIN_CHAT_ID):', chatId);
+        return { ok: true, chatId, autoFixed: false };
       }
-      return { ok: true, chatId, autoFixed: chatId !== configured };
+      return { ok: true, chatId, autoFixed: chatId !== configured && canPromoteAdminChat(chatId) };
     } catch (e) {
       lastErr = e;
       if (chatId === normalizeTelegramChatId(ADMIN_CHAT_ID())) {
@@ -164,17 +190,19 @@ async function validateAdminChatAtStartup() {
     }
   }
 
+  // لا نرقّي محادثات مكتشفة عشوائياً إلى أدمن — نطبعها للمساعدة فقط
   const discovered = await fetchRecentPrivateChatIds(15);
   for (let j = 0; j < discovered.length; j += 1) {
     const chatId = String(discovered[j].id);
     if (candidates.includes(chatId)) continue;
+    if (!canPromoteAdminChat(chatId)) continue;
     try {
       await telegramApi('getChat', { chat_id: chatId });
       registerAdminChatId(chatId, {
         source: 'startup_discovered',
         title: discovered[j].title,
       });
-      console.log('[telegram] admin chat auto-registered from discovery →', chatId);
+      console.log('[telegram] admin chat auto-registered from allowlist discovery →', chatId);
       return { ok: true, chatId, autoFixed: true };
     } catch (e) {
       lastErr = e;
@@ -212,14 +240,16 @@ async function sendMessageToAlertChats(text, meta) {
     }
   }
 
+  // محاولة إرسال لمحادثات مكتشفة مسموح بها فقط — بلا ترقية عشوائية
   const discovered = await fetchRecentPrivateChatIds(20);
   for (let j = 0; j < discovered.length; j += 1) {
     const chatId = String(discovered[j].id);
     if (candidates.includes(chatId)) continue;
+    if (!canPromoteAdminChat(chatId)) continue;
     try {
       const result = await telegramApi('sendMessage', { chat_id: chatId, text });
       registerAdminChatId(chatId, { source: 'discovered_send', title: discovered[j].title });
-      console.warn('[telegram-admin] alert delivered via discovered chat_id ' + chatId + ' — TELEGRAM_ADMIN_CHAT_ID updated in .env');
+      console.warn('[telegram-admin] alert delivered via allowlisted chat_id ' + chatId);
       return { result, chatId, via: 'discovered' };
     } catch (e) {
       lastErr = e;
@@ -519,33 +549,55 @@ async function processNewSubRequest(requestId, deps) {
   req._phone = (accRow && accRow.phone) || '';
   req._accountPhone = (accRow && accRow.phone) || '';
 
+  // لا نثق أبداً بـ riskLevel / flags القادمة من العميل — فقط تحليل السيرفر
   let aiResult = null;
+  let visionRan = false;
+  let serverExpectedPrice = Number(req.expectedPrice) || Number(req.price) || 0;
+  try {
+    const { findCatalogPackage } = require('./catalogConfig');
+    const catalogPkg = findCatalogPackage({ pkgName: req.pkg, name: req.pkg, id: req.pkg });
+    if (catalogPkg && Number(catalogPkg.price) > 0) {
+      serverExpectedPrice = Number(catalogPkg.price);
+    }
+  } catch (eCat) { /* optional */ }
+
   if (req.receiptImage && isAnthropicAvailable(deps)) {
     try {
       const analysis = await analyzeReceiptImage(req.receiptImage, {
-        expectedPrice: req.expectedPrice || req.price,
+        expectedPrice: serverExpectedPrice,
         pkgName: req.pkg,
         anthropic,
       });
       aiResult = analysis.result || { plausibilityLevel: 'unreviewed' };
+      visionRan = true;
     } catch (e) {
       console.warn('[telegram-admin] receipt analysis:', e && e.message);
       aiResult = { plausibilityLevel: 'unreviewed', notes: ['تعذّر التحليل الآلي'] };
     }
   } else {
     aiResult = {
-      plausibilityLevel: req.receiptImage
-        ? (req.riskLevel || 'unreviewed')
-        : 'high',
-      notes: req.receiptImage ? [] : ['لا يوجد وصل مرفق'],
+      plausibilityLevel: req.receiptImage ? 'unreviewed' : 'high',
+      notes: req.receiptImage
+        ? ['تحليل آلي غير متاح — بانتظار مراجعة بشرية']
+        : ['لا يوجد وصل مرفق'],
     };
   }
 
-  const score = scorePackageRequest(req, aiResult);
+  // تجاهل أعلام العميل — فقط ملاحظات التحليل الآلي
+  const safeReq = Object.assign({}, req, {
+    riskLevel: undefined,
+    flags: [],
+    expectedPrice: serverExpectedPrice,
+    price: serverExpectedPrice || req.price,
+  });
+  const score = scorePackageRequest(safeReq, aiResult);
   const patch = {
     aiAnalysis: aiResult,
     aiAnalyzedAt: new Date().toISOString(),
-    riskLevel: aiResult.plausibilityLevel || req.riskLevel,
+    riskLevel: aiResult.plausibilityLevel || 'unreviewed',
+    clientRiskIgnored: true,
+    visionRan,
+    serverExpectedPrice,
     provisionalTier: score.provisionalTier,
     provisionalLabelAr: score.provisionalLabelAr,
     provisionalLabelFr: score.provisionalLabelFr,
@@ -556,7 +608,8 @@ async function processNewSubRequest(requestId, deps) {
   patchSubRequest(list, idx, patch, writeSubRequests);
 
   let autoActivated = false;
-  if (shouldAutoApprove(score.provisionalTier)) {
+  // موافقة تلقائية فقط إن شغّل الرؤية فعلاً وأعاد أخضر — بلا ثقة بعميل
+  if (visionRan && shouldAutoApprove(score.provisionalTier)) {
     const fresh = findSubRequestById(readSubRequests, requestId);
     if (fresh.idx !== -1 && fresh.req && fresh.req.status === 'pending') {
       const activation = await activateSubRequest(fresh.req, deps);
@@ -639,19 +692,23 @@ async function handleIncomingMessage(message, deps) {
   console.log('[telegram-bot] message from chat', chatId, ':', text.slice(0, 80));
 
   if (text === '/start') {
-    if (message.chat && message.chat.type === 'private') {
+    let promoted = false;
+    if (message.chat && message.chat.type === 'private' && canPromoteAdminChat(chatId)) {
       registerAdminChatId(chatId, {
         source: '/start',
         title: [message.from && message.from.first_name, message.from && message.from.username]
           .filter(Boolean).join(' '),
       });
+      promoted = true;
     }
     await telegramApi('sendMessage', {
       chat_id: chatId,
-      text: '👋 مرحباً!\nأنا وكيل رزق الذكي (@RizqOficial_bot).\nاكتب سؤالك وسأرد عليك فوراً.\n\n✅ تم تسجيل هذه المحادثة لإشعارات Leads (LEAD-…).',
+      text: promoted
+        ? '👋 مرحباً!\nأنا وكيل رزق الذكي (@RizqOficial_bot).\n✅ تم تثبيت هذه المحادثة كمحادثة إدارة.'
+        : '👋 مرحباً!\nأنا وكيل رزق الذكي (@RizqOficial_bot).\nاكتب سؤالك وسأرد عليك.\n\n(محادثة الإدارة مُحدَّدة مسبقاً — /start لا يمنح صلاحيات موافقة الباقات.)',
     });
-    console.log('[telegram-bot] /start replied + admin chat registered:', chatId);
-    return { ok: true, action: 'welcome', chatIdRegistered: chatId };
+    console.log('[telegram-bot] /start replied', { chatId, promoted });
+    return { ok: true, action: 'welcome', chatIdRegistered: promoted ? chatId : null };
   }
 
   if (isAuthorizedChat(chatId) && (
@@ -939,4 +996,6 @@ module.exports = {
   validateAdminChatAtStartup,
   fetchRecentPrivateChatIds,
   buildAlertChatCandidates,
+  canPromoteAdminChat,
+  isAuthorizedChat,
 };
