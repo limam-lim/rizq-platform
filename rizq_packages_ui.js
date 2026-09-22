@@ -311,16 +311,32 @@
     var price = Number(p.price) ? Number(p.price).toLocaleString() : t2('مجاناً', 'Gratuit');
     var featSrc = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length) ? p.features_fr : (p.features || []);
     var feats = featSrc.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
+    var period = (lang === 'fr' && p.period_fr) ? p.period_fr : (p.period || t2('أوقية / شهر', 'MRU / mois'));
+    var sub = '';
+    if (p.payPerAd) sub = t2('دفع لكل إعلان — بلا اشتراك شهري', 'Paiement par annonce — sans abonnement');
+    else if (p.sub) sub = p.sub;
+    else sub = t2('باقة شهرية', 'Forfait mensuel');
+    var name = p.name || '';
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.localizedName === 'function') {
+      name = global.RizqPackagesConfig.localizedName(p, lang) || name;
+    }
+    var cta = t2('ابدأ الآن', 'Commencer');
+    if (p.id === 'vid-pro') cta = t2('اشترك الآن', "S'abonner");
+    if (p.id === 'vid-business') cta = t2('تواصل معنا', 'Contactez-nous');
+    var icon = p.id === 'vid-single' ? '🎬' : popular ? '🥇' : p.id === 'vid-business' ? '💎' : '🥈';
+    var href = (p.id === 'vid-business')
+      ? (opts.waHref || 'https://wa.me/22244882212')
+      : (opts.registerHref || 'rizq_register.html?mode=seller');
     return ''
       + '<div class="' + cls + '" data-pkg="' + esc(p.id || '') + '">'
       + badge
-      + '<div class="p-icon">' + (popular ? '🥇' : idx === 2 ? '💎' : '🥈') + '</div>'
-      + '<div class="p-name">' + esc(p.name || '') + '</div>'
-      + '<div class="p-sub">' + esc(p.period || t2('MRU / شهر', 'MRU / mois')) + '</div>'
+      + '<div class="p-icon">' + icon + '</div>'
+      + '<div class="p-name">' + esc(name) + '</div>'
+      + '<div class="p-sub">' + esc(sub) + '</div>'
       + '<div class="p-price">' + price + '</div>'
-      + '<div class="p-period">' + t2('MRU / شهر', 'MRU / mois') + '</div>'
+      + '<div class="p-period">' + esc(period) + '</div>'
       + '<ul class="p-feats">' + feats + '</ul>'
-      + '<a href="' + esc(opts.registerHref || 'rizq_landing_v8.html?openRegister=1') + '" class="p-cta">' + t2('ابدأ الآن', 'Commencer') + '</a>'
+      + '<a href="' + esc(href) + '" class="p-cta">' + cta + '</a>'
       + '</div>';
   }
 
