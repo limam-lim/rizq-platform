@@ -305,22 +305,86 @@
   function renderAdsCard(p, idx, opts) {
     opts = opts || {};
     var lang = opts.lang || getLang();
-    var popular = p.id === 'vid-pro' || idx === 1;
-    var cls = popular ? 'p-card popular reveal-init' : 'p-card reveal-init';
-    var badge = popular ? '<div class="p-badge">' + t2('⭐ الأكثر شعبية', '⭐ Le plus populaire') + '</div>' : '';
-    var price = Number(p.price) ? Number(p.price).toLocaleString() : t2('مجاناً', 'Gratuit');
-    var featSrc = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length) ? p.features_fr : (p.features || []);
-    var feats = featSrc.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('');
+    var fr = lang === 'fr';
+    var name = p.name || '';
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.localizedName === 'function') {
+      name = global.RizqPackagesConfig.localizedName(p, lang) || name;
+    }
+    var period = (fr && p.period_fr) ? p.period_fr : (p.period || t2('أوقية / شهر', 'MRU / mois'));
+    var featSrc = (fr && Array.isArray(p.features_fr) && p.features_fr.length) ? p.features_fr : (p.features || []);
+    var desc = '';
+    if (p.payPerAd) desc = t2('دفع لكل إعلان — بلا اشتراك شهري', 'Paiement par annonce — sans abonnement');
+    else if (p.description) desc = (fr && p.description_fr) ? p.description_fr : p.description;
+    else desc = t2('باقة شهرية للإعلان بالفيديو', 'Forfait mensuel publicité vidéo');
+
+    var isHL = p.id === 'vid-pro' || !!p.highlight;
+    var isBiz = p.id === 'vid-business';
+    var isSingle = p.id === 'vid-single';
+    var isFree = !Number(p.price);
+
+    var bg = isBiz
+      ? 'linear-gradient(145deg,#1B3A6B,#0f2347)'
+      : isHL
+        ? 'linear-gradient(145deg,#fffbeb,#fef3c7)'
+        : isSingle
+          ? 'linear-gradient(145deg,#f0fdf4,#dcfce7)'
+          : 'linear-gradient(145deg,#f8faff,#eff3ff)';
+    var border = isBiz
+      ? '2px solid rgba(201,168,76,.55)'
+      : isHL
+        ? '2px solid #C9A84C'
+        : isSingle
+          ? '1.5px solid #86efac'
+          : '1.5px solid #bfcfef';
+    var shadow = isBiz
+      ? '0 8px 28px rgba(15,35,71,.28)'
+      : isHL
+        ? '0 8px 28px rgba(201,168,76,.2)'
+        : '0 4px 16px rgba(27,58,107,.08)';
+    var nameCol = isBiz ? '#fde68a' : isHL ? '#92400e' : isSingle ? '#15803d' : '#1B3A6B';
+    var priceCol = isBiz ? '#fbbf24' : isHL ? '#C9A84C' : isSingle ? '#16a34a' : '#1d4ed8';
+    var mutedCol = isBiz ? 'rgba(255,255,255,.5)' : isSingle ? '#4ade80' : '#9ca3af';
+    var featCol = isBiz ? 'rgba(255,255,255,.85)' : isSingle ? '#166534' : '#4b5563';
+    var checkCol = isBiz ? '#fde68a' : isHL ? '#C9A84C' : isSingle ? '#22c55e' : '#10b981';
+    var btnBg = isBiz
+      ? 'linear-gradient(135deg,#e8c96a,#C9A84C)'
+      : isHL
+        ? 'linear-gradient(135deg,#C9A84C,#e8c96a)'
+        : isSingle
+          ? 'linear-gradient(135deg,#22c55e,#16a34a)'
+          : 'linear-gradient(135deg,#3b82f6,#1d4ed8)';
+    var btnCol = isBiz || isHL ? '#0f2347' : '#fff';
+    var icon = isSingle ? '🎬' : isHL ? '🥇' : isBiz ? '💎' : '🥈';
+    var cta = isBiz
+      ? t2('تواصل معنا ←', 'Contactez-nous →')
+      : isHL
+        ? t2('اشترك الآن ←', "S'abonner →")
+        : t2('ابدأ الآن ←', 'Commencer →');
+    var href = isBiz
+      ? (opts.waHref || 'https://wa.me/22244882212')
+      : (opts.registerHref || 'rizq_register.html?mode=seller');
+    var badge = isHL
+      ? '<div class="pricing-card-badge pricing-card-badge--popular">' + t2('⭐ الأكثر طلباً', '⭐ Le plus demandé') + '</div>'
+      : (isBiz ? '<div class="pricing-card-badge pricing-card-badge--year">' + t2('💎 للأعمال', '💎 Entreprises') + '</div>' : '');
+    var price = isFree ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
+    var feats = featSrc.map(function (f) {
+      return '<li><span style="color:' + checkCol + ';font-size:13px;flex-shrink:0">✓</span><span style="color:' + featCol + '">' + esc(f) + '</span></li>';
+    }).join('');
+
     return ''
-      + '<div class="' + cls + '" data-pkg="' + esc(p.id || '') + '">'
+      + '<div class="rpkg-card pricing-card' + (badge ? ' has-badge' : '') + '" data-pkg="' + esc(p.id || '') + '"'
+      + ' style="background:' + bg + ';border:' + border + ';box-shadow:' + shadow + '">'
       + badge
-      + '<div class="p-icon">' + (popular ? '🥇' : idx === 2 ? '💎' : '🥈') + '</div>'
-      + '<div class="p-name">' + esc(p.name || '') + '</div>'
-      + '<div class="p-sub">' + esc(p.period || t2('MRU / شهر', 'MRU / mois')) + '</div>'
-      + '<div class="p-price">' + price + '</div>'
-      + '<div class="p-period">' + t2('MRU / شهر', 'MRU / mois') + '</div>'
-      + '<ul class="p-feats">' + feats + '</ul>'
-      + '<a href="' + esc(opts.registerHref || 'rizq_landing_v8.html?openRegister=1') + '" class="p-cta">' + t2('ابدأ الآن', 'Commencer') + '</a>'
+      + '<div class="pricing-card-icon">' + icon + '</div>'
+      + '<div class="pricing-card-name" style="color:' + nameCol + '">' + esc(name) + '</div>'
+      + (desc ? '<div class="pricing-card-desc" style="color:' + featCol + '">' + esc(desc) + '</div>' : '')
+      + '<div class="pricing-card-period" style="color:' + mutedCol + '">' + esc(period) + '</div>'
+      + '<div class="pricing-card-divider" style="background:' + (isBiz ? 'rgba(255,255,255,.12)' : 'rgba(27,58,107,.08)') + '"></div>'
+      + '<div class="pricing-card-price-wrap"><span class="price" style="color:' + priceCol + '">' + price + '</span>'
+      + (!isFree ? '<div class="pricing-card-price-unit" style="color:' + mutedCol + '">MRU</div>' : '')
+      + '</div>'
+      + '<ul class="pricing-features">' + feats + '</ul>'
+      + '<a class="pricing-card-cta" href="' + esc(href) + '" style="background:' + btnBg + ';color:' + btnCol + '">' + cta + '</a>'
       + '</div>';
   }
 
@@ -328,20 +392,13 @@
     var el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     if (!el) return;
     opts = opts || {};
-    var shownAt = Date.now();
-    if (!el.getAttribute('data-rizq-pkg-ready')) {
-      el.innerHTML = pkgSkeletonHtml(3);
-    }
     function draw() {
       var list = getPackages('video', opts.lang);
+      if (!list || !list.length) return;
       el.innerHTML = list.map(function (p, i) { return renderAdsCard(p, i, opts); }).join('');
       el.setAttribute('data-rizq-pkg-ready', '1');
     }
-    function drawAfterMin() {
-      var wait = Math.max(0, 480 - (Date.now() - shownAt));
-      setTimeout(draw, wait);
-    }
-    drawAfterMin();
+    draw();
     syncAllFromBackend(function () { draw(); });
   }
 

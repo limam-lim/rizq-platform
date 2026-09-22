@@ -242,16 +242,22 @@
     var st = catStats();
     var fr = lang() === 'fr';
     var desc = fr
-      ? ('La première plateforme d\'annonces classées en Mauritanie. ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
-      : ('منصة الإعلانات المبوبة الأولى في موريتانيا. ' + st.n + ' قسماً، ' + st.m + '+ فرعاً، ملايين الفرص.');
+      ? ('La plateforme mauritanienne des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
+      : ('منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
     document.querySelectorAll('#rzq-ft-desc, footer .footer-desc, [data-t="ft-desc"]').forEach(function (el) {
       el.textContent = desc;
     });
     var why2 = document.querySelector('[data-t="why2-title"]');
     if (why2) {
       why2.textContent = fr
-        ? (st.n + ' catégories et +' + st.m + ' sous-catégories')
-        : (st.n + ' قسماً و' + st.m + '+ فرعاً');
+        ? 'Des catégories pour tout le marché'
+        : 'أقسام تغطي السوق كاملاً';
+    }
+    var why2desc = document.querySelector('[data-t="why2-desc"]');
+    if (why2desc) {
+      why2desc.textContent = fr
+        ? ("De l'immobilier aux chameaux, de la daraa aux engins — " + st.n + ' catégories et +' + st.m + ' sous-catégories pour chercher mieux et décider plus clairement.')
+        : ('من العقارات إلى الإبل، من الدراعة إلى الحفارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً لتنظيم أدق وبحث أوضح.');
     }
   }
 

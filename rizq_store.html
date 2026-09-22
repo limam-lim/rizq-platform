@@ -1222,24 +1222,33 @@ function openQuickView(id, name, price, emoji, cat){
       titleFR: name,
       emoji: emoji || '📦',
       cat: cat || '',
-      catKey: cat || 'أزياء',
+      catKey: cat || '',
       images: seedImages,
       href: storeHref || ('rizq_store.html' + location.search)
     };
-    /* حفظ محلي حتى لو لم تكن صفحة الهبوط محمّلة */
-    var KEY = 'rizq_style_seeds';
-    var list = [];
-    try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
-    var men = /دراعة|رجالي|homme|daraa|قميص/i.test(name + ' ' + (cat||''));
-    var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(name + ' ' + (cat||''));
-    feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
-    feed.ts = Date.now();
-    feed.fromView = true;
-    feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
-    list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
-    list.unshift(feed);
-    localStorage.setItem(KEY, JSON.stringify(list.slice(0, 12)));
-    if(typeof window.rizqFeedStyleSeed === 'function') window.rizqFeedStyleSeed(feed);
+    /* أفكار الأنماط: أزياء/ملابس/إكسسوارات فقط — لا سيارات ولا شاحنات ولا غير ذلك */
+    var fashionCat = /أزياء|موضة|ذهب|مجوهرات|إكسسوار|أحذية|حقائب|عطور|fashion|mode|bijou|accessoire/i;
+    var fashionHint = /دراعة|ملحفة|قميص|فستان|عباية|حذاء|حقيبة|أسورة|خاتم|ملابس|ذهب|مجوهرات|daraa|melhfa|robe|bijou/i;
+    var fashionBlock = /سيارات|شاحنة|حفارة|عقارات|ماشية|إلكترون|هواتف|caterpillar|excavator|truck|voiture|iphone/i;
+    var blob = [name, cat || ''].join(' ');
+    if(fashionBlock.test(blob) || (!fashionCat.test(cat || '') && !fashionHint.test(blob))){
+      /* تجاهل — ليس منتج أناقة */
+    } else {
+      var KEY = 'rizq_style_seeds';
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
+      var men = /دراعة|رجالي|homme|daraa|قميص/i.test(blob);
+      var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(blob);
+      feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
+      feed.ts = Date.now();
+      feed.fromView = true;
+      feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+      if(!feed.catKey) feed.catKey = 'أزياء';
+      list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
+      list.unshift(feed);
+      localStorage.setItem(KEY, JSON.stringify(list.slice(0, 12)));
+      if(typeof window.rizqFeedStyleSeed === 'function') window.rizqFeedStyleSeed(feed);
+    }
   } catch(eSeed) {}
 }
 function closeQuickView(){
@@ -1332,13 +1341,12 @@ function rizqShare(title, url) {
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" id="rzq-ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px">
-      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>
       </div>
-    </div>
+    </a>
     <p class="footer-copy" id="rzq-ft-sig" style="display:flex;align-items:center;gap:4px"><span id="rzq-sig-pre">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>
   </div>
 </footer>

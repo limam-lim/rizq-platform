@@ -683,6 +683,7 @@ const {
 const {
   getEntitlements,
   getTenderEntitlements,
+  getMediaEntitlements,
   assertCanPostAd,
   assertCanAddCatalogItem,
   assertPhotoCount,
@@ -1058,13 +1059,30 @@ app.get('/api/site-config', (req, res) => {
     packages: raw.packages || undefined,
     prices: raw.prices || undefined,
     promoVideo: raw.promoVideo || undefined,
-    videoAds: raw.videoAds || undefined,
+    // لا نُسرّب stats (مشاهدات/نقرات المعلنين) للعامة
+    videoAds: raw.videoAds ? {
+      hero: raw.videoAds.hero,
+      popup: raw.videoAds.popup,
+      platformPromoUrl: raw.videoAds.platformPromoUrl,
+      platformPromoEnabled: raw.videoAds.platformPromoEnabled,
+      adSlotSeconds: raw.videoAds.adSlotSeconds,
+    } : undefined,
     announcements: raw.announcements || undefined,
     legalOverrides: raw.legalOverrides || undefined,
     currency: raw.currency || undefined,
     quotaConfig: raw.quotaConfig || undefined,
     quotaTopups: raw.quotaTopups || undefined,
-    bankCodes: Array.isArray(raw.bankCodes) ? raw.bankCodes : undefined,
+    // طرق الدفع للعامة بلا أرقام/رموز حساسة — الرمز الكامل عبر /api/pay-methods
+    bankCodes: Array.isArray(raw.bankCodes)
+      ? raw.bankCodes.map((b) => ({
+          id: b.id,
+          type: b.type,
+          bank: b.bank,
+          instruction: b.instruction,
+          active: b.active !== false,
+          // code محذوف عمداً من الواجهة العامة
+        }))
+      : undefined,
   };
   // لا نُسرّب webhookUrl / قنوات داخلية / أسرار تشغيل
   if (raw.channelsPublic && typeof raw.channelsPublic === 'object') {
@@ -1085,6 +1103,7 @@ app.get('/api/site-config', (req, res) => {
 const LEGAL_KEYS_AR = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
 const LEGAL_KEYS_FR = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11'];
 const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني كامل بصياغة HTML بسيطة
+const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
 
 /**
  * POST /api/site-config
@@ -1133,17 +1152,19 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     if (incoming.ar && typeof incoming.ar === 'object') {
       for (const key of LEGAL_KEYS_AR) {
         if (!(key in incoming.ar)) continue;
-        const val = String(incoming.ar[key] || '').slice(0, LEGAL_MAX_LEN);
+        const raw = String(incoming.ar[key] || '').slice(0, LEGAL_MAX_LEN);
         touched = true;
-        if (val === '') delete mergedAr[key]; else mergedAr[key] = val;
+        if (raw === '') delete mergedAr[key];
+        else mergedAr[key] = sanitizeLegalHtml(raw, LEGAL_MAX_LEN);
       }
     }
     if (incoming.fr && typeof incoming.fr === 'object') {
       for (const key of LEGAL_KEYS_FR) {
         if (!(key in incoming.fr)) continue;
-        const val = String(incoming.fr[key] || '').slice(0, LEGAL_MAX_LEN);
+        const raw = String(incoming.fr[key] || '').slice(0, LEGAL_MAX_LEN);
         touched = true;
-        if (val === '') delete mergedFr[key]; else mergedFr[key] = val;
+        if (raw === '') delete mergedFr[key];
+        else mergedFr[key] = sanitizeLegalHtml(raw, LEGAL_MAX_LEN);
       }
     }
 
@@ -1267,7 +1288,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       textFr: String(a.textFr || '').slice(0, 500),
       ctaTextAr: String(a.ctaTextAr || '').slice(0, 80),
       ctaTextFr: String(a.ctaTextFr || '').slice(0, 80),
-      ctaUrl: String(a.ctaUrl || '').slice(0, 500),
+      ctaUrl: sanitizeSafeUrl(a.ctaUrl || '', 500),
       pages: String(a.pages || 'all').slice(0, 80),
       expires: String(a.expires || '').slice(0, 20),
       showBar: a.showBar !== false,
@@ -1303,6 +1324,14 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       url: String(a.url || '').slice(0, 500),
       active: a.active !== false,
       accountId: a.accountId ? String(a.accountId).slice(0, 60) : '',
+      packageId: a.packageId ? String(a.packageId).slice(0, 40) : '',
+      pkgName: a.pkgName ? String(a.pkgName).slice(0, 80) : '',
+      featuredBadge: !!a.featuredBadge,
+      vipBadge: !!a.vipBadge,
+      prioritySearch: !!a.prioritySearch,
+      heroPlacement: !!a.heroPlacement,
+      basicStats: a.basicStats !== false,
+      automatedReports: !!a.automatedReports,
     }));
     const prevVideoAds = (current && current.videoAds) || {};
     const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
@@ -1319,6 +1348,10 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       adSlotSeconds: Math.max(8, Math.min(120,
         Number(body.videoAds.adSlotSeconds != null ? body.videoAds.adSlotSeconds : prevVideoAds.adSlotSeconds) || 25
       )),
+      // لا نقبل stats من جسم الأدمن — دائماً نحافظ على إحصائيات السيرفر
+      stats: (prevVideoAds.stats && typeof prevVideoAds.stats === 'object')
+        ? prevVideoAds.stats
+        : {},
     };
   }
 
@@ -2148,21 +2181,58 @@ app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res
 });
 
 /**
- * POST /api/sub-requests/admin/:id/decision — أدمين فقط — يسجّل قرار
- * الموافقة/الرفض. منطق التفعيل الفعلي (تفعيل الباقة، وضع الفيديو الإعلاني)
- * يبقى محلياً في rizq_admin.html كما هو؛ هذا فقط يجعل الحالة النهائية
- * مرئية عبر كل الأجهزة بدل الاقتصار على جهاز الأدمن الذي وافق فعلياً.
+ * POST /api/sub-requests/admin/:id/decision — أدمين فقط — موافقة/رفض مع
+ * تفعيل فعلي عند الموافقة (نفس مسار Telegram عبر activateSubRequest).
  */
-app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), (req, res) => {
+app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), async (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
   const list = readSubRequests();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'request_not_found' });
-  list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-  list[idx].reviewedAt = new Date().toISOString();
-  writeSubRequests(list);
-  res.json({ ok: true, request: list[idx] });
+  const row = list[idx];
+
+  if (action === 'reject') {
+    list[idx].status = 'rejected';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    writeSubRequests(list);
+    return res.json({ ok: true, request: list[idx] });
+  }
+
+  if (row.status !== 'pending') {
+    return res.status(409).json({ ok: false, error: 'not_pending', status: row.status, request: row });
+  }
+
+  try {
+    const { activateSubRequest } = require('./services/subRequestActivation');
+    const { getTelegramDeps } = require('./services/telegramDeps');
+    const deps = getTelegramDeps() || {
+      syncAccountPackage,
+      getAccountRecord,
+      readAccounts,
+      writeAccounts,
+      readAdBoosts,
+      writeAdBoosts,
+    };
+    const activation = await activateSubRequest(row, deps);
+    if (!activation || !activation.ok) {
+      return res.status(500).json({
+        ok: false,
+        error: (activation && activation.error) || 'activation_failed',
+        message: (activation && activation.message) || 'فشل تفعيل الباقة',
+      });
+    }
+    list[idx].status = 'approved';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    list[idx].paymentConfirmed = true;
+    writeSubRequests(list);
+    return res.json({ ok: true, request: list[idx], activation });
+  } catch (e) {
+    console.error('[sub-requests/decision]', e.message);
+    return res.status(500).json({ ok: false, error: 'activation_exception', message: e.message });
+  }
 });
 
 // ── وكيل دورة حياة الباقات (تذكير قبل الانتهاء + إيقاف فوري عند periodEnd
@@ -2190,7 +2260,127 @@ app.get('/api/entitlements/:accountId', (req, res) => {
   const acc = verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
   const ent = getEntitlements(accountId, acc.type);
-  res.json({ ok: true, entitlements: ent });
+  const media = getMediaEntitlements(accountId);
+  const tender = getTenderEntitlements(accountId);
+  res.json({ ok: true, entitlements: ent, media, tender });
+});
+
+/**
+ * GET /api/pay-methods — أرقام/رموز التحويل الكاملة لصاحب حساب معتمد فقط.
+ * الواجهة العامة (/api/site-config) تعرض الاسم والتعليمات بلا code.
+ */
+app.get('/api/pay-methods', (req, res) => {
+  const accountId = String(req.query.accountId || req.header('x-account-id') || '').trim().slice(0, 60);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  const raw = repos.getSiteConfig() || {};
+  const list = Array.isArray(raw.bankCodes) ? raw.bankCodes : [];
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    ok: true,
+    methods: list.filter((b) => b && b.active !== false).map((b) => ({
+      id: b.id,
+      type: b.type,
+      bank: b.bank,
+      code: b.code,
+      instruction: b.instruction,
+      active: true,
+    })),
+  });
+});
+
+/** POST /api/video-ads/event — تسجيل مشاهدة/نقرة لإعلان فيديو (عام محدود) */
+const videoAdsEventLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_events' },
+});
+app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
+  try {
+    const body = req.body || {};
+    const accountId = String(body.accountId || '').trim().slice(0, 60);
+    const type = String(body.type || '').trim(); // impression | click
+    if (!accountId || (type !== 'impression' && type !== 'click')) {
+      return res.status(400).json({ ok: false, error: 'invalid_event' });
+    }
+    // رفض معرّفات عشوائية — فقط معلن موجود فعلياً في قائمة العرض النشطة
+    const cfg = repos.getSiteConfig() || {};
+    const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
+    const activeAdv = ['hero', 'popup'].some((slot) =>
+      (Array.isArray(videoAds[slot]) ? videoAds[slot] : []).some(
+        (a) => a && a.active !== false && a.url && String(a.accountId || '') === accountId
+      )
+    );
+    if (!activeAdv) {
+      return res.status(404).json({ ok: false, error: 'advertiser_not_active' });
+    }
+    const stats = Object.assign({}, (videoAds.stats && typeof videoAds.stats === 'object') ? videoAds.stats : {});
+    // حد أقصى للمفاتيح المخزّنة — حماية من نمو غير منضبط
+    const keys = Object.keys(stats);
+    if (!stats[accountId] && keys.length > 500) {
+      return res.status(429).json({ ok: false, error: 'stats_capacity' });
+    }
+    const row = Object.assign({ impressions: 0, clicks: 0 }, stats[accountId] || {});
+    // سقف يومي بسيط ضد التضخم السخيف لنفس المعلن
+    const today = new Date().toISOString().slice(0, 10);
+    if (row._day !== today) {
+      row._day = today;
+      row._dayImpressions = 0;
+      row._dayClicks = 0;
+    }
+    if (type === 'impression') {
+      if ((Number(row._dayImpressions) || 0) >= 5000) {
+        return res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks }, capped: true });
+      }
+      row.impressions = (Number(row.impressions) || 0) + 1;
+      row._dayImpressions = (Number(row._dayImpressions) || 0) + 1;
+    }
+    if (type === 'click') {
+      if ((Number(row._dayClicks) || 0) >= 2000) {
+        return res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks }, capped: true });
+      }
+      row.clicks = (Number(row.clicks) || 0) + 1;
+      row._dayClicks = (Number(row._dayClicks) || 0) + 1;
+    }
+    row.updatedAt = new Date().toISOString();
+    stats[accountId] = row;
+    const nextVideoAds = Object.assign({}, videoAds, { stats });
+    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds }));
+    res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks } });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+/** GET /api/video-ads/stats/:accountId — إحصائيات معلن (محمي بمالك الحساب) */
+app.get('/api/video-ads/stats/:accountId', (req, res) => {
+  const accountId = req.params.accountId;
+  const token = extractAccountToken(req) || '';
+  const acc = verifyAccountOwner(accountId, token);
+  if (!acc) return res.status(401).json({ error: 'unauthorized' });
+  const media = getMediaEntitlements(accountId);
+  if (!media.subscribed || !media.basicStats) {
+    return res.status(403).json({ ok: false, error: 'stats_not_available', media });
+  }
+  const cfg = repos.getSiteConfig() || {};
+  const statsAll = (cfg.videoAds && cfg.videoAds.stats) || {};
+  const row = statsAll[accountId] || { impressions: 0, clicks: 0 };
+  res.json({
+    ok: true,
+    stats: row,
+    media: {
+      planType: media.planType,
+      automatedReports: media.automatedReports,
+      featuredBadge: media.featuredBadge,
+      vipBadge: media.vipBadge,
+      heroPlacement: media.heroPlacement,
+      maxVideosPerMonth: media.maxVideosPerMonth,
+    },
+  });
 });
 
 const contactGateLimiter = rateLimit({
@@ -2440,7 +2630,7 @@ app.get('/api/subscriber/knowledge/mine/:accountId', (req, res) => {
 app.post('/api/subscriber/knowledge/instructions', (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req) || '';
   const customInstructions = String(b.customInstructions || '').trim().slice(0, 4000);
   if (!accountId) {
     return res.status(400).json({ ok: false, error: 'accountId مطلوب' });
@@ -2467,7 +2657,7 @@ app.post('/api/subscriber/knowledge/instructions', (req, res) => {
 app.post('/api/subscriber/knowledge/upload', (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req) || '';
   const fileName = String(b.fileName || '').trim();
   const fileDataBase64 = String(b.fileDataBase64 || '').trim();
   if (!accountId || !fileName || !fileDataBase64) {
@@ -3000,10 +3190,18 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   res.json({ ok: true, review });
 });
 
-/** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام) */
+/** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام؛ بدون reviewerAccountId) */
 app.get('/api/reviews/:targetId', (req, res) => {
   const all = readReviews();
-  const list = (all[req.params.targetId] || []).slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const list = (all[req.params.targetId] || []).slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      comment: r.comment,
+      reviewerName: r.reviewerName,
+      createdAt: r.createdAt,
+    }));
   res.json({ ok: true, reviews: list });
 });
 

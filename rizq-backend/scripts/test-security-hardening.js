@@ -151,12 +151,20 @@ async function main() {
       dashOk.body && dashOk.body.account ? 'profile ok' : 'no account');
 
     const exchangeOk = await req('POST', '/api/accounts/exchange-dash-token/' + id, { dashToken }, { 'x-dash-token': dashToken });
-    ok('exchange-dash-token approved → accessToken',
-      exchangeOk.status === 200 && exchangeOk.body && exchangeOk.body.accessToken === accessToken,
-      exchangeOk.body ? 'got token' : 'no token');
+    ok('exchange-dash-token approved → accessToken + rotated dashToken',
+      exchangeOk.status === 200
+        && exchangeOk.body
+        && exchangeOk.body.accessToken === accessToken
+        && !!exchangeOk.body.dashToken
+        && exchangeOk.body.dashToken !== dashToken,
+      exchangeOk.body ? 'rotated' : 'no token');
 
-    const dashGet = await req('GET', '/api/accounts/verify-dash/' + id + '?token=' + encodeURIComponent(dashToken));
-    ok('verify-dash GET still works in dev', dashGet.status === 200, 'status=' + dashGet.status);
+    const exchangeReplay = await req('POST', '/api/accounts/exchange-dash-token/' + id, { dashToken }, { 'x-dash-token': dashToken });
+    ok('exchange-dash-token old dash → 401 (single-use rotation)', exchangeReplay.status === 401);
+
+    const newDash = exchangeOk.body && exchangeOk.body.dashToken;
+    const dashGet = await req('GET', '/api/accounts/verify-dash/' + id + '?token=' + encodeURIComponent(newDash || ''));
+    ok('verify-dash GET works with rotated dashToken', dashGet.status === 200, 'status=' + dashGet.status);
 
     const catalogPost = await req('POST', '/api/catalog', {
       accountId: id,

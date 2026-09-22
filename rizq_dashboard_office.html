@@ -772,10 +772,27 @@ function _resolveRealAccessToken(acc){
     .then(function(data){
       if(!data || !data.ok || !data.accessToken) return null;
       window.REAL_ACCESS_TOKEN = data.accessToken;
+      if(data.dashToken){
+        try{ SESSION_TOKEN = data.dashToken; }catch(e){}
+      }
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });
-        if(rec2){ rec2.backendAccessToken = window.REAL_ACCESS_TOKEN; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
+        if(rec2){
+          rec2.backendAccessToken = window.REAL_ACCESS_TOKEN;
+          if(data.dashToken){ rec2.token = data.dashToken; rec2.dashToken = data.dashToken; }
+          localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
+        }
+        if(data.dashToken){
+          try{
+            var act = JSON.parse(localStorage.getItem('rizq_active_session')||'null');
+            if(act && act.id===acc.id){ act.token = data.dashToken; localStorage.setItem('rizq_active_session', JSON.stringify(act)); }
+          }catch(e2){}
+          try{
+            var ind = JSON.parse(localStorage.getItem('rizq_individual_session')||'null');
+            if(ind && ind.id===acc.id){ ind.token = data.dashToken; localStorage.setItem('rizq_individual_session', JSON.stringify(ind)); }
+          }catch(e3){}
+        }
       }catch(e){}
       return window.REAL_ACCESS_TOKEN;
     }).catch(function(){ return null; });
@@ -2059,6 +2076,20 @@ if (_officeLang === 'fr') {
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
         if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
+      // أرقام التحويل الكاملة — لصاحب الحساب فقط
+      (function _loadPayMethodsFull(){
+        var accId = (typeof SESSION_ID!=='undefined' && SESSION_ID) || (window.USER_ACC&&USER_ACC.id) || (window.CORP_ACC&&CORP_ACC.id) || (window.STORE&&STORE.id) || (window.OFFICE&&OFFICE.id) || '';
+        var tok = window.REAL_ACCESS_TOKEN || '';
+        if(!accId || !tok || !window.RIZQ_BACKEND_BASE) return;
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/pay-methods?accountId=' + encodeURIComponent(accId), {
+          headers: { 'x-account-token': tok }
+        }).then(function(r){ return r.ok ? r.json() : null; }).then(function(pm){
+          if(pm && pm.ok && Array.isArray(pm.methods)){
+            localStorage.setItem('rizq_bank_codes', JSON.stringify(pm.methods));
+            if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
+          }
+        }).catch(function(){});
+      })();
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.office))  localStorage.setItem('rizq_office_packages', JSON.stringify(data.config.packages.office));
         if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
@@ -2347,6 +2378,7 @@ function submitPayment(){
     price: _payPkg.price,
     accountName: typeof STORE !== 'undefined' ? STORE.name : (typeof OFFICE !== 'undefined' ? OFFICE.name : _t2('مشترك','Abonné')),
     accountId: typeof SESSION_ID !== 'undefined' ? SESSION_ID : '',
+    accessToken: window.REAL_ACCESS_TOKEN || '',
     category: _payPkg.category,
     videoUrl: isVideo ? videoUrl : null
   }).then(function(){

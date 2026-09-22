@@ -1,14 +1,17 @@
 'use strict';
 
-const fs = require('fs');
 const {
   findCatalogPackage,
   isDiamondPackageRef,
   isTrialPackage,
   readSiteConfigRaw,
   resolvePackageBoostDays,
-  SITE_CONFIG_FILE,
 } = require('./catalogConfig');
+const {
+  resolveMediaPlanFromPackageRef,
+  assertCanAddMediaVideo,
+} = require('./entitlements');
+const repos = require('../db/repos');
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
@@ -53,35 +56,66 @@ function activateVideoAdOnServer(req) {
     platformPromoUrl: prev.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4',
     platformPromoEnabled: prev.platformPromoEnabled !== false,
     adSlotSeconds: Number(prev.adSlotSeconds) || 25,
+    stats: prev.stats && typeof prev.stats === 'object' ? prev.stats : {},
   };
 
-  const videoPkgs = (cfg.packages && Array.isArray(cfg.packages.video)) ? cfg.packages.video.filter((p) => p && p.active !== false) : [];
-  const defaults = [{ price: 5000 }, { price: 12000 }, { price: 25000 }];
-  const pkgs = videoPkgs.length ? videoPkgs : defaults;
-  const maxPrice = Math.max.apply(null, pkgs.map((p) => Number(p.price) || 0));
-  const target = (maxPrice > 0 && Number(req.price) >= maxPrice) ? 'hero' : 'popup';
+  const pkgDef = findCatalogPackage(req.pkg);
+  const packageId = (pkgDef && pkgDef.id) || req.packageId || null;
+  const plan = resolveMediaPlanFromPackageRef(req.pkg, packageId, req.price);
+  const target = plan.heroPlacement ? 'hero' : 'popup';
   const other = target === 'hero' ? 'popup' : 'hero';
+
+  // حصة الفيديوهات: استبدال URL لنفس الحساب لا يزيد العدد؛ إضافة جديد يخضع للحد
+  const existingAnywhere = ['hero', 'popup'].some((slot) =>
+    (videoAds[slot] || []).some((a) => req.accountId && a.accountId === req.accountId)
+  );
+  if (!existingAnywhere && req.accountId) {
+    const gate = assertCanAddMediaVideo(req.accountId, videoAds);
+    // عند أول تفعيل مباشرة بعد sync قد لا يكون السجل جاهزاً — نستخدم خطة الباقة كحد
+    if (!gate.ok && gate.code === 'media_video_quota') {
+      return { ok: false, error: gate.code, message: gate.message, limit: gate.limit };
+    }
+    if (!gate.ok && gate.code === 'media_not_subscribed') {
+      const limit = plan.maxVideosPerMonth;
+      const current = (videoAds.hero || []).concat(videoAds.popup || [])
+        .filter((a) => a && a.accountId === req.accountId && a.active !== false).length;
+      if (limit !== Infinity && current >= limit) {
+        return { ok: false, error: 'media_video_quota', message: 'حد فيديوهات الباقة', limit, current };
+      }
+    }
+  }
 
   videoAds[other] = (videoAds[other] || []).filter((a) => !req.accountId || a.accountId !== req.accountId);
   const list = videoAds[target] || [];
   const existing = req.accountId ? list.find((a) => a.accountId === req.accountId) : null;
+  const meta = {
+    advertiser: req.account || '',
+    url: req.videoUrl,
+    active: true,
+    accountId: req.accountId || '',
+    packageId: packageId || '',
+    pkgName: req.pkg || '',
+    featuredBadge: !!plan.featuredBadge,
+    vipBadge: !!plan.vipBadge,
+    prioritySearch: !!plan.prioritySearch,
+    heroPlacement: !!plan.heroPlacement,
+    basicStats: !!plan.basicStats,
+    automatedReports: !!plan.automatedReports,
+  };
   if (existing) {
-    existing.url = req.videoUrl;
-    existing.advertiser = req.account || '';
-    existing.active = true;
+    Object.assign(existing, meta);
   } else {
-    list.push({
-      advertiser: req.account || '',
-      url: req.videoUrl,
-      active: true,
-      accountId: req.accountId || '',
-    });
+    list.push(meta);
   }
-  videoAds[target] = list.slice(0, 50);
+  // أولوية البحث: رتّب عناصر الـ popup/hero بحيث prioritySearch أولاً
+  videoAds[target] = list
+    .slice()
+    .sort((a, b) => Number(!!b.prioritySearch) - Number(!!a.prioritySearch))
+    .slice(0, 50);
 
   const next = Object.assign({}, cfg, { videoAds });
-  fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(next, null, 2), 'utf8');
-  return { ok: true, slot: target };
+  repos.saveSiteConfig(next);
+  return { ok: true, slot: target, planType: plan.planType };
 }
 
 function maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts) {
@@ -194,7 +228,51 @@ async function activateSubRequest(req, deps) {
       return { ok: true, category, boost: all[req.adId], accountName };
     }
 
-    // package + video (default)
+    // باقة Rizq ADS / الفيديو — معزولة بمفتاح accountId::video (مثل المناقصات)
+    // حتى لا تستبدل باقة الحساب العامة (محل/مكتب/فرد).
+    if (category === 'video') {
+      const pkgDef = findCatalogPackage(req.pkg);
+      const packageId = (pkgDef && pkgDef.id) || req.packageId || null;
+      const isVidId = !!(packageId && /^vid-/.test(String(packageId)));
+      // رفض تفعيل أسماء باقات غير فيديو عبر فئة video (حماية من منح ماسية بالخطأ)
+      if (!isVidId && (isDiamondPackageRef(req.pkg) || !/فيديو|video|rizq\s*ads|إعلان/i.test(String(req.pkg || '')))) {
+        return { ok: false, error: 'invalid_video_package', message: 'باقة الفيديو غير صالحة' };
+      }
+      const { periodStart, periodEnd, now } = computeActivationPeriod(
+        days,
+        getAccountRecord(req.accountId + '::video')
+      );
+      const isTrial = isTrialPackage(req.pkg, req.price);
+      const result = await syncAccountPackage({
+        accountId: req.accountId + '::video',
+        accountName,
+        accountPhone,
+        accountEmail,
+        accountType: 'video',
+        pkgName: (pkgDef && pkgDef.name) || req.pkg || 'أساسي فيديو',
+        packageId,
+        price: Number(req.price) || 0,
+        days,
+        periodStart,
+        periodEnd,
+        activatedBy: 'admin',
+        paymentConfirmed: !isTrial,
+        paidAt: isTrial ? null : now.toISOString(),
+        isTrial,
+      });
+      if (!result.ok) return result;
+      const adResult = activateVideoAdOnServer(Object.assign({}, req, {
+        pkg: (pkgDef && pkgDef.name) || req.pkg,
+        packageId,
+      }));
+      if (adResult && adResult.ok === false) {
+        return { ok: false, error: adResult.error || 'video_slot_failed', message: adResult.message, category };
+      }
+      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+      return { ok: true, category, result, adResult, accountName, isolated: true };
+    }
+
+    // package (default) — باقات الحساب العامة فقط
     const existingPkg = getAccountRecord(req.accountId);
     const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
     const isTrial = isTrialPackage(req.pkg, req.price);
@@ -216,10 +294,6 @@ async function activateSubRequest(req, deps) {
       isTrial,
     });
     if (!result.ok) return result;
-
-    if (category === 'video') {
-      activateVideoAdOnServer(req);
-    }
 
     if (!isTrial && isDiamondPackageRef(req.pkg) && accountPhone && typeof registerSubscriber === 'function') {
       try {

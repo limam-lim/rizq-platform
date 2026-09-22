@@ -131,11 +131,23 @@
   }
 
   /** مزامنة صلاحيات الخادم → localStorage (يُستدعى عند فتح الداشبورد) */
-  function syncEntitlementsFromServer(accId) {
+  function syncEntitlementsFromServer(accId, accessTokenOverride) {
     try {
       var cfg = (typeof getAgentConfig === 'function') ? getAgentConfig() : {};
       var accounts = getAccounts();
-      var token = accounts[accId] && accounts[accId].server_token;
+      var token = accessTokenOverride
+        || (accounts[accId] && (accounts[accId].server_token || accounts[accId].accessToken))
+        || '';
+      // جلسات الداشبورد الشائعة
+      if (!token) {
+        try {
+          var sess = JSON.parse(localStorage.getItem('rizq_individual_session') || '{}');
+          if (sess && sess.id === accId && sess.accessToken) token = sess.accessToken;
+        } catch (e0) { /* ignore */ }
+      }
+      if (!token && typeof window !== 'undefined' && window.REAL_ACCESS_TOKEN) {
+        token = String(window.REAL_ACCESS_TOKEN);
+      }
       if (!cfg.backendUrl || !token) return Promise.resolve(null);
       return fetch(cfg.backendUrl.replace(/\/$/, '') + '/api/entitlements/' + encodeURIComponent(accId), {
         headers: { 'x-account-token': token },
@@ -143,7 +155,7 @@
         if (!data || !data.entitlements) return null;
         var ent = data.entitlements;
         var accs = getAccounts();
-        if (!accs[accId]) return ent;
+        if (!accs[accId]) return data;
         accs[accId].planType = ent.planType;
         accs[accId].subscriptionStatus = ent.subscriptionStatus;
         if (ent.endDate) accs[accId].pkg_ends_at = ent.endDate;
@@ -152,10 +164,14 @@
         } else if (ent.subscriptionStatus === 'pending') {
           accs[accId].pkg_status = 'pending';
         } else if (ent.subscriptionStatus === 'active' || ent.subscriptionStatus === 'expiring_soon') {
-          accs[accId].pkg_status = ent.subscriptionStatus === 'expiring_soon' ? 'active' : 'active';
+          accs[accId].pkg_status = 'active';
+        }
+        // صلاحيات الفيديو المعزولة
+        if (data.media) {
+          accs[accId].mediaEntitlements = data.media;
         }
         saveAccounts(accs);
-        return ent;
+        return data;
       }).catch(function(){ return null; });
     } catch(e) { return Promise.resolve(null); }
   }
@@ -285,6 +301,14 @@
     var table = POST_LIMITS[category];
     if(!table) return Infinity;
     var pkgId = resolveAccountPackageId(accId, sub);
+    // باقات الفيديو معزولة بمفتاح accountId::video — اقرأ packageId من هناك
+    if ((category === 'video' || category === 'ads') && (!pkgId || !/^vid-/.test(pkgId))) {
+      try {
+        var packs = JSON.parse(localStorage.getItem('rizq_account_packages') || '{}');
+        var vRec = packs[accId + '::video'] || packs[accId];
+        if (vRec && (vRec.packageId || vRec.pkgId)) pkgId = String(vRec.packageId || vRec.pkgId).toLowerCase();
+      } catch (e) { /* ignore */ }
+    }
     if (pkgId && Object.prototype.hasOwnProperty.call(table, pkgId)) return table[pkgId];
     if (/diam-pro|diamond_pro/.test(pkgId)) return Infinity;
     if (/diam|diamond/.test(pkgId)) return Infinity;
@@ -1281,7 +1305,11 @@
       if (!global.RIZQ_BACKEND_BASE) return;
       var headers = { 'Content-Type': 'application/json' };
       var tok = req.accessToken || (typeof global.REAL_ACCESS_TOKEN !== 'undefined' ? global.REAL_ACCESS_TOKEN : null);
-      if (tok) headers['x-account-token'] = tok;
+      if (!tok) {
+        console.warn('[RizqSub] sub-request sync skipped — missing accessToken');
+        return;
+      }
+      headers['x-account-token'] = tok;
       fetch(global.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/sub-requests', {
         method: 'POST',
         headers: headers,

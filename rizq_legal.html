@@ -531,13 +531,12 @@ body.fr [data-fr]{display:block}
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" id="rzq-ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px">
-      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>
       </div>
-    </div>
+    </a>
     <p class="footer-copy" id="rzq-ft-sig" style="display:flex;align-items:center;gap:4px"><span id="rzq-sig-pre">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>
   </div>
 </footer>
@@ -620,6 +619,15 @@ document.addEventListener('rizq:langchange', function (e) { setLang(e.detail.lan
 <script>
 (function applyLegalOverrides(){
   if (!window.RIZQ_BACKEND_BASE) return;
+  function sanitizeLegalClient(html) {
+    var s = String(html || '');
+    s = s.replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '');
+    s = s.replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)[^>]*\/?\s*>/gi, '');
+    s = s.replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+    s = s.replace(/\s(href|src)\s*=\s*(["'])\s*javascript:[\s\S]*?\2/gi, ' $1="#"');
+    s = s.replace(/\s(href|src)\s*=\s*javascript:[^\s>]*/gi, ' $1="#"');
+    return s;
+  }
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
     .then(function(res){ return res.json(); })
     .then(function(data){
@@ -628,11 +636,11 @@ document.addEventListener('rizq:langchange', function (e) { setLang(e.detail.lan
       var ar = lo.ar || {}, fr = lo.fr || {};
       Object.keys(ar).forEach(function(key){
         var el = document.getElementById(key);
-        if (el && ar[key]) el.innerHTML = ar[key];
+        if (el && ar[key]) el.innerHTML = sanitizeLegalClient(ar[key]);
       });
       Object.keys(fr).forEach(function(key){
         var el = document.getElementById(key);
-        if (el && fr[key]) el.innerHTML = fr[key];
+        if (el && fr[key]) el.innerHTML = sanitizeLegalClient(fr[key]);
       });
       if (lo.updatedAt) {
         var realDate = new Date(lo.updatedAt);

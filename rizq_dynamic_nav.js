@@ -6,14 +6,18 @@
   'use strict';
 
   var MODULES = [
-    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 4, always: true },
-    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5 },
-    { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 6 },
-    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'غرفة المناقصات' },
-    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 8, always: true, labelAr: 'غرفة الاستثمارات', labelFr: 'Salle des investissements' }
+    /* الترتيب = توالي أقسام الصفحة الرئيسية من الأعلى للأسفل */
+    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#virtual-stores' },
+    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 4, landingHref: '#virtual-offices' },
+    { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 5, landingHref: '#virtual-showrooms' },
+    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 6, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
+    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 7, always: true, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
   ];
 
   var DESKTOP_MORE = [
+    { href: 'rizq_landing_v8.html#categories', hdr: 'cats', key: 'cats', ico: '📂', landingHref: '#categories' },
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', key: 'rizqads', ico: '🎬' },
+    { href: 'rizq_post.html', hdr: 'post', key: 'post', ico: '➕' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', key: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', key: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', key: 'about', ico: 'ℹ️', landingHref: '#about' }
@@ -22,19 +26,28 @@
   /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
   var MOBILE_MORE_EXTRAS = [
     { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬' },
+    { href: 'rizq_post.html', hdr: 'post', ico: '➕' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
+  ];
+
+  /** روابط سطح المكتب الثابتة — الإعلانات بعد الرئيسية مباشرة */
+  var DESKTOP_MAIN_EXTRAS = [
+    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', order: 2, landingHref: '#listings', gold: false }
   ];
 
   var LABELS = {
     stores: { ar: 'المحلات', fr: 'Boutiques' },
     offices: { ar: 'المكاتب', fr: 'Bureaux' },
     showrooms: { ar: 'المعارض', fr: 'Showrooms' },
-    tenders: { ar: 'غرفة المناقصات', fr: 'Appels d\'offres' },
-    investments: { ar: 'غرفة الاستثمارات', fr: 'Salle des investissements' },
+    tenders: { ar: 'المناقصات', fr: 'Appels d\'offres' },
+    investments: { ar: 'الاستثمارات', fr: 'Investissements' },
     ads: { ar: 'الإعلانات', fr: 'Annonces' },
     rizqads: { ar: 'Rizq ADS', fr: 'Rizq ADS' },
+    cats: { ar: 'الأقسام', fr: 'Catégories' },
+    post: { ar: 'نشر (+)', fr: 'Publier (+)' },
     packs: { ar: 'الباقات', fr: 'Forfaits' },
     legal: { ar: 'المواد القانونية', fr: 'Mentions légales' },
     about: { ar: 'من نحن', fr: 'À propos' }
@@ -112,8 +125,8 @@
 
   function ensureModuleSlots(container) {
     if (!container || container.getAttribute('data-rizq-modules-ready')) return;
-    var postLi = container.querySelector('[data-nav-order="3"], .nav-post-plus, #rizq-hdr-post');
-    var postEl = postLi ? (postLi.closest('li') || postLi) : null;
+    var onLanding = isLanding();
+    var moreLi = container.querySelector('#nav-more-li, #rizq-desk-more-li');
     var aiLi = container.querySelector('#rizq-hdr-assistant, #rizq-desk-assistant, #nav-assistant-btn');
     aiLi = aiLi ? aiLi.closest('li') || aiLi.parentElement : null;
     if (!aiLi && container.classList.contains('rizq-hdr-row2')) {
@@ -122,12 +135,18 @@
 
     MODULES.forEach(function (mod) {
       var sel = '[data-rizq-module="' + mod.key + '"]';
-      if (container.querySelector(sel)) return;
+      var existing = container.querySelector(sel);
+      if (existing) {
+        var existingA = existing.tagName === 'A' ? existing : existing.querySelector('a');
+        if (existingA) existingA.href = resolveHref(mod, onLanding);
+        existing.setAttribute('data-nav-order', String(mod.order));
+        return;
+      }
       var el;
       if (container.classList.contains('rizq-hdr-row2')) {
         el = document.createElement('a');
         el.className = 'rizq-hdr-item rizq-nav-module';
-        el.href = mod.href;
+        el.href = resolveHref(mod, onLanding);
         el.setAttribute('data-rizq-module', mod.key);
         el.setAttribute('data-nav-order', String(mod.order));
         el.innerHTML = '<span class="rizq-hdr-ico">' + mod.ico + '</span><span class="rizq-hdr-lbl" data-hdr="' + mod.hdr + '">' + labelFor(mod) + '</span>';
@@ -139,42 +158,80 @@
         el.className = 'rizq-nav-module';
         el.setAttribute('data-rizq-module', mod.key);
         el.setAttribute('data-nav-order', String(mod.order));
-        el.innerHTML = '<a href="' + mod.href + '" data-hdr="' + mod.hdr + '">' + labelFor(mod) + '</a>';
-        if (aiLi && aiLi.parentNode) aiLi.parentNode.insertBefore(el, aiLi);
-        else if (postEl && postEl.parentNode) postEl.parentNode.insertBefore(el, postEl.nextSibling);
+        el.innerHTML = '<a href="' + resolveHref(mod, onLanding) + '" data-hdr="' + mod.hdr + '">' + labelFor(mod) + '</a>';
+        if (moreLi && moreLi.parentNode) moreLi.parentNode.insertBefore(el, moreLi);
+        else if (aiLi && aiLi.parentNode) aiLi.parentNode.insertBefore(el, aiLi);
         else container.appendChild(el);
       }
     });
     container.setAttribute('data-rizq-modules-ready', '1');
   }
 
+  function ensureDesktopMainExtras(container) {
+    if (!container || container.classList.contains('rizq-hdr-row2')) return;
+    var onLanding = isLanding();
+    var insertAfter = container.querySelector('[data-nav-order="1"]');
+    DESKTOP_MAIN_EXTRAS.forEach(function (item) {
+      var sel = '[data-rizq-nav-extra="' + item.hdr + '"]';
+      var existing = container.querySelector(sel);
+      if (existing) {
+        var a0 = existing.querySelector('a') || (existing.tagName === 'A' ? existing : null);
+        if (a0) a0.href = resolveHref(item, onLanding);
+        existing.setAttribute('data-nav-order', String(item.order));
+        insertAfter = existing;
+        return;
+      }
+      var li = document.createElement('li');
+      li.className = 'rizq-nav-extra';
+      li.setAttribute('data-rizq-nav-extra', item.hdr);
+      li.setAttribute('data-nav-order', String(item.order));
+      var a = document.createElement('a');
+      a.href = resolveHref(item, onLanding);
+      a.setAttribute('data-hdr', item.hdr);
+      a.textContent = labelFor(item);
+      li.appendChild(a);
+      if (insertAfter && insertAfter.parentNode) {
+        insertAfter.parentNode.insertBefore(li, insertAfter.nextSibling);
+        insertAfter = li;
+      } else {
+        container.appendChild(li);
+        insertAfter = li;
+      }
+    });
+  }
+
   function applyMainBar(flags) {
     var phone = isPhoneNav();
+    var onLanding = isLanding();
     document.querySelectorAll('#nav .nav-center, #rizq-desk-nav .nav-center, #rizq-app-header .rizq-hdr-row2').forEach(function (container) {
       ensureModuleSlots(container);
+      ensureDesktopMainExtras(container);
       MODULES.forEach(function (mod) {
         var open = moduleOpen(flags, mod.key);
         container.querySelectorAll('[data-rizq-module="' + mod.key + '"]').forEach(function (el) {
-          if (phone) {
+          var link = el.tagName === 'A' ? el : el.querySelector('a');
+          if (link) link.href = resolveHref(mod, onLanding);
+          el.setAttribute('data-nav-order', String(mod.order));
+          /* على الهبوط: أظهر كل الأقسام في الشريط (تمرير أفقي) حسب ترتيب الصفحة */
+          if (phone && !onLanding) {
             el.style.display = 'none';
             return;
           }
-          if (open || mod.always) {
-            el.style.removeProperty('display');
-          } else {
-            el.style.display = 'none';
-          }
+          if (open || mod.always) el.style.removeProperty('display');
+          else el.style.display = 'none';
         });
       });
-      var aiOrder = 8;
-      var moreOrder = 9;
+      container.querySelectorAll('[data-rizq-nav-extra]').forEach(function (el) {
+        if (phone && !onLanding) el.style.display = 'none';
+        else el.style.removeProperty('display');
+      });
       container.querySelectorAll('#rizq-hdr-assistant, #rizq-desk-assistant, #nav-assistant-btn').forEach(function (ai) {
         var li = ai.closest('li') || ai;
-        if (li.setAttribute) li.setAttribute('data-nav-order', String(aiOrder));
+        if (li.setAttribute) li.setAttribute('data-nav-order', '9');
       });
       container.querySelectorAll('#rizq-hdr-more-wrap, #rizq-desk-more-li, #nav-more-li').forEach(function (more) {
         more.style.display = '';
-        if (more.setAttribute) more.setAttribute('data-nav-order', String(moreOrder));
+        if (more.setAttribute) more.setAttribute('data-nav-order', '8');
       });
     });
   }
@@ -286,7 +343,7 @@
       if (!k || !LABELS[k]) return;
       var text = t(LABELS[k].ar, LABELS[k].fr);
       if (k === 'tenders' && el.closest('[data-rizq-module="tenders"]')) {
-        text = t('غرفة المناقصات', 'Appels d\'offres');
+        text = t('المناقصات', 'Appels d\'offres');
       }
       if (!text) return;
       if (el.closest('#mobile-drawer-list')) {

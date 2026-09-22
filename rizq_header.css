@@ -382,7 +382,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   #nav .nav-desktop-more-only{display:inline!important}
   #nav .nav-center li[data-rizq-module="store"],
   #rizq-desk-nav .nav-center li[data-rizq-module="store"]{
-    display:list-item!important;
+    display:flex!important;
     visibility:visible!important;
   }
   #rizq-app-header{display:none !important}
@@ -594,6 +594,23 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     background:none;border:none;cursor:pointer;
     font-family:inherit;
     transition:color .18s,background .18s,transform .15s;
+  }
+  /* FR labels longer — tighter padding to avoid Accueil/Compte overlap */
+  html[dir="ltr"].rizq-app-nav #nav .nav-center a,
+  html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    font-size:12.5px !important;
+    padding:7px 8px !important;
+    letter-spacing:0;
+  }
+  html[dir="ltr"].rizq-app-nav #nav > .nav-center,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
+    gap:2px;
+  }
+  html[dir="ltr"].rizq-app-nav #nav,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav{
+    grid-template-columns:auto minmax(8px,.6fr) auto minmax(8px,.6fr) auto;
   }
   html.rizq-app-nav #nav .nav-center a:hover,
   html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
@@ -957,9 +974,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-order="8"],
   html.rizq-app-nav #nav .nav-center li[data-rizq-module],
   html.rizq-app-nav #rizq-desk-nav .nav-center li[data-rizq-module]{
-    display:list-item !important;
+    display:flex !important;
+    align-items:center !important;
     visibility:visible !important;
     flex:0 0 auto !important;
+    list-style:none !important;
   }
   html.rizq-app-nav #nav .nav-center a,
   html.rizq-app-nav #nav .nav-center .nav-link-btn,
@@ -1182,18 +1201,22 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     max-width:100% !important;
     display:flex !important;
     align-items:center !important;
-    justify-content:space-between !important;
+    justify-content:flex-start !important;
     height:44px !important;
-    padding:3px 4px !important;
+    padding:3px 6px !important;
     margin:4px 10px 6px !important;
     gap:4px !important;
     direction:inherit !important;
-    overflow:visible !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:none !important;
     background:rgba(255,255,255,.06) !important;
     border:1px solid rgba(201,168,76,.22) !important;
     border-radius:999px !important;
     box-sizing:border-box !important;
   }
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center::-webkit-scrollbar{display:none !important}
   html[dir="rtl"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{direction:rtl !important}
   html[dir="ltr"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{direction:ltr !important}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
@@ -1203,15 +1226,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.nav-desktop-more-only{
     display:none !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"]{
-    display:none !important;
-  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li.rizq-nav-extra,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
-    flex:0 1 auto !important;
+    display:flex !important;
+    flex:0 0 auto !important;
     min-width:0;
     list-style:none;
-    display:flex;
     justify-content:center;
+    visibility:visible !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a,

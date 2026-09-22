@@ -141,6 +141,27 @@
     return list;
   }
 
+  /** إرسال حدث إحصائي (مشاهدة/نقرة) — بدون تعطيل الواجهة */
+  function trackEvent(accountId, type) {
+    if (!accountId || !window.RIZQ_BACKEND_BASE) return;
+    try {
+      fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/video-ads/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId: accountId, type: type }),
+        keepalive: true,
+      }).catch(function () { /* ignore */ });
+    } catch (e) { /* ignore */ }
+  }
+
+  function badgeHtml(ad) {
+    if (!ad || ad.isPlatform) return '';
+    var parts = [];
+    if (ad.vipBadge) parts.push('<span style="background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0f2347;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-inline-start:6px">VIP</span>');
+    else if (ad.featuredBadge) parts.push('<span style="background:#1B3A6B;color:#fde68a;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-inline-start:6px">مميّز برزق</span>');
+    return parts.join('');
+  }
+
   // ════════════════════════════════════════
   //  ① HERO — Playlist دوراني
   //     [فيديو المنصة] → معلن 1 → معلن 2 → … → يعود لفيديو المنصة
@@ -149,6 +170,10 @@
     var wrapEl = document.getElementById('hero-vid-wrap');
     if (!wrapEl) return;
 
+    // أولوية البحث: معلنون بـ prioritySearch أولاً بعد فيديو المنصة
+    heroAds = heroAds.slice().sort(function (a, b) {
+      return Number(!!b.prioritySearch) - Number(!!a.prioritySearch);
+    });
     _heroPlaylist = buildHeroPlaylist();
     if (!_heroPlaylist.length) return;
 
@@ -175,15 +200,20 @@
 
     function paintMeta(ad) {
       if (advBar && advName) {
-        advName.textContent = ad.isPlatform
+        advName.innerHTML = ad.isPlatform
           ? 'رزق · فيديو المنصة'
-          : (ad.advertiser || 'Rizq ADS');
+          : (esc(ad.advertiser || 'Rizq ADS') + badgeHtml(ad));
         if (advLoc) {
           advLoc.textContent = ad.isPlatform
             ? 'يبدأ الحلقة · ويعود بعد إعلانات المعلنين'
             : '';
         }
         advBar.style.display = 'block';
+        advBar.style.cursor = ad.isPlatform ? 'default' : 'pointer';
+        advBar.onclick = function () {
+          if (ad.isPlatform || !ad.accountId) return;
+          trackEvent(ad.accountId, 'click');
+        };
       }
     }
 
@@ -209,6 +239,7 @@
       _heroIdx = i;
       paintMeta(ad);
       clearMount();
+      if (ad.accountId && !ad.isPlatform) trackEvent(ad.accountId, 'impression');
 
       if (isDirectVideo(ad.url)) {
         var v = document.createElement('video');
@@ -277,6 +308,7 @@
     var ad = popupAds[adIdx];
     var embedSrc = buildEmbedSrc(ad.url, { mute: 1, autoplay: 1, controls: 0 });
     if (!embedSrc) return;
+    if (ad.accountId) trackEvent(ad.accountId, 'impression');
 
     // YouTube: أضف loop
     var id = ytId(ad.url);
@@ -307,7 +339,7 @@
       'font-family:sans-serif', 'white-space:nowrap',
       'pointer-events:none'
     ].join(';');
-    badge.textContent = '● RIZQ ADS';
+    badge.innerHTML = '● RIZQ ADS' + (ad.vipBadge ? ' · VIP' : (ad.featuredBadge ? ' · مميّز' : ''));
 
     // اسم المعلن (أسفل يمين)
     var advLabel = null;
@@ -316,9 +348,12 @@
       advLabel.style.cssText = [
         'position:absolute', 'bottom:5px', 'right:10px', 'z-index:2',
         'font-size:9px', 'color:rgba(255,255,255,.4)',
-        'font-family:sans-serif', 'pointer-events:none'
+        'font-family:sans-serif', 'cursor:pointer'
       ].join(';');
       advLabel.textContent = esc(ad.advertiser);
+      if (ad.accountId) {
+        advLabel.onclick = function () { trackEvent(ad.accountId, 'click'); };
+      }
     }
 
     // iframe الفيديو

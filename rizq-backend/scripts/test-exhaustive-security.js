@@ -84,8 +84,8 @@ async function main() {
   } catch (e) {
     videoAct = { ok: false, error: e.message };
   }
-  ok('video category does not call syncAccountPackage for diamond',
-    videoAct && videoAct.ok === true && videoAct.category === 'video' && !videoAct.result,
+  ok('video category rejects diamond package masquerading as video',
+    videoAct && videoAct.ok === false && (videoAct.error === 'invalid_video_package' || /diamond|ماس|invalid/i.test(String(videoAct.error || videoAct.message || ''))),
     JSON.stringify(videoAct));
 
   // 4. Email uniqueness on register (seed then conflict)

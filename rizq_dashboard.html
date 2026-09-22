@@ -1943,10 +1943,27 @@ function _resolveRealAccessToken(acc){
     .then(function(data){
       if(!data || !data.ok || !data.accessToken) return null;
       window.REAL_ACCESS_TOKEN = data.accessToken;
+      if(data.dashToken){
+        try{ SESSION_TOKEN = data.dashToken; }catch(e){}
+      }
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });
-        if(rec2){ rec2.backendAccessToken = window.REAL_ACCESS_TOKEN; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
+        if(rec2){
+          rec2.backendAccessToken = window.REAL_ACCESS_TOKEN;
+          if(data.dashToken){ rec2.token = data.dashToken; rec2.dashToken = data.dashToken; }
+          localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
+        }
+        if(data.dashToken){
+          try{
+            var act = JSON.parse(localStorage.getItem('rizq_active_session')||'null');
+            if(act && act.id===acc.id){ act.token = data.dashToken; localStorage.setItem('rizq_active_session', JSON.stringify(act)); }
+          }catch(e2){}
+          try{
+            var ind = JSON.parse(localStorage.getItem('rizq_individual_session')||'null');
+            if(ind && ind.id===acc.id){ ind.token = data.dashToken; localStorage.setItem('rizq_individual_session', JSON.stringify(ind)); }
+          }catch(e3){}
+        }
       }catch(e){}
       return window.REAL_ACCESS_TOKEN;
     }).catch(function(){ return null; });
@@ -2296,24 +2313,61 @@ function openVideoAdPayModal(pkgId){
 function _rizqRenderAdsStatus(acc){
   var mount=document.getElementById('rizq-ads-status-mount');
   if(!mount || !window.RIZQ_BACKEND_BASE || !acc || !acc.id) return;
-  var fr=(_rizqLang()==='fr');
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/site-config').then(function(r){return r.ok?r.json():null;}).then(function(data){
+  var base=window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  var run=function(token){
+  Promise.all([
+    fetch(base+'/api/site-config').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+    token ? fetch(base+'/api/video-ads/stats/'+encodeURIComponent(acc.id), {
+      headers: { 'x-account-token': token }
+    }).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}) : Promise.resolve(null),
+    token ? fetch(base+'/api/entitlements/'+encodeURIComponent(acc.id), {
+      headers: { 'x-account-token': token }
+    }).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}) : Promise.resolve(null)
+  ]).then(function(results){
+    var data = results[0];
+    var statsPayload = results[1];
+    var entPayload = results[2];
     var va = data && data.config && data.config.videoAds;
-    if(!va) return;
-    var inHero = (va.hero||[]).find(function(a){return a.accountId===acc.id;});
-    var inPopup = (va.popup||[]).find(function(a){return a.accountId===acc.id;});
-    if(!inHero && !inPopup) return;
-    var spots=[];
-    if(inHero) spots.push(_t2('🏠 الواجهة الرئيسية (Hero)','🏠 Page d\'accueil (Hero)'));
-    if(inPopup) spots.push(_t2('📌 الشريط العلوي (Popup)','📌 Bandeau supérieur (Popup)'));
-    var active = (inHero && inHero.active!==false) || (inPopup && inPopup.active!==false);
-    mount.innerHTML = '<div style="background:'+(active?'#ecfdf5':'#fff7ed')+';border:1.5px solid '+(active?'#6ee7b7':'#fdba74')+';border-radius:12px;padding:14px 16px;font-size:12.5px;color:'+(active?'#065f46':'#9a3412')+';display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:22px">'+(active?'🟢':'🟡')+'</span>'
-      + '<span>'+(active
-          ? ('✅ '+_t2('فيديوك الإعلاني نشط الآن في: ','Votre vidéo publicitaire est active sur : ')+spots.join(' + '))
-          : _t2('⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة','⏸️ Votre vidéo est ajoutée mais suspendue par l\'administration'))+'</span>'
-      + '</div>';
-  }).catch(function(){});
+    var media = (entPayload && entPayload.media) || (statsPayload && statsPayload.media) || null;
+    var parts = [];
+    if(va){
+      var inHero = (va.hero||[]).find(function(a){return a.accountId===acc.id;});
+      var inPopup = (va.popup||[]).find(function(a){return a.accountId===acc.id;});
+      if(inHero || inPopup){
+        var spots=[];
+        if(inHero) spots.push(_t2('🏠 الواجهة الرئيسية (Hero)','🏠 Page d\'accueil (Hero)'));
+        if(inPopup) spots.push(_t2('📌 الشريط العلوي (Popup)','📌 Bandeau supérieur (Popup)'));
+        var active = (inHero && inHero.active!==false) || (inPopup && inPopup.active!==false);
+        var badges = [];
+        var ad = inHero || inPopup;
+        if(ad && ad.vipBadge) badges.push('VIP');
+        else if(ad && ad.featuredBadge) badges.push(_t2('مميّز برزق','Mis en avant Rizq'));
+        parts.push('<div style="background:'+(active?'#ecfdf5':'#fff7ed')+';border:1.5px solid '+(active?'#6ee7b7':'#fdba74')+';border-radius:12px;padding:14px 16px;font-size:12.5px;color:'+(active?'#065f46':'#9a3412')+';display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+          + '<span style="font-size:22px">'+(active?'🟢':'🟡')+'</span>'
+          + '<span>'+(active
+              ? ('✅ '+_t2('فيديوك الإعلاني نشط الآن في: ','Votre vidéo publicitaire est active sur : ')+spots.join(' + ') + (badges.length?' · '+badges.join(' · '):''))
+              : _t2('⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة','⏸️ Votre vidéo est ajoutée mais suspendue par l\'administration'))+'</span>'
+          + '</div>');
+      }
+    }
+    if(statsPayload && statsPayload.ok && statsPayload.stats){
+      var st = statsPayload.stats;
+      parts.push('<div style="background:#f8faff;border:1.5px solid #bfcfef;border-radius:12px;padding:14px 16px;font-size:12.5px;color:#1B3A6B;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+        + '<div><div style="font-size:11px;color:#6b7280">'+_t2('المشاهدات','Impressions')+'</div><div style="font-size:20px;font-weight:800">'+(Number(st.impressions)||0).toLocaleString()+'</div></div>'
+        + '<div><div style="font-size:11px;color:#6b7280">'+_t2('النقرات','Clics')+'</div><div style="font-size:20px;font-weight:800">'+(Number(st.clicks)||0).toLocaleString()+'</div></div>'
+        + (media && media.maxVideosPerMonth != null ? '<div style="grid-column:1/-1;font-size:11.5px;color:#5B6478">'+_t2('حد الفيديوهات الشهري: ','Limite mensuelle de vidéos : ')+(media.maxVideosPerMonth===null||media.maxVideosPerMonth===Infinity||media.maxVideosPerMonth>999?'∞':media.maxVideosPerMonth)+'</div>' : '')
+        + '</div>');
+    } else if(media && media.subscribed){
+      parts.push('<div style="background:#f8faff;border:1.5px solid #bfcfef;border-radius:12px;padding:12px 14px;font-size:12px;color:#1B3A6B">'+_t2('باقة Rizq ADS نشطة','Forfait Rizq ADS actif')+(media.planType?' · '+media.planType:'')+'</div>');
+    }
+    if(parts.length) mount.innerHTML = parts.join('');
+  });
+  };
+  var tok = window.REAL_ACCESS_TOKEN || '';
+  if(tok){ run(tok); return; }
+  if(typeof _resolveRealAccessToken==='function'){
+    _resolveRealAccessToken(acc).then(function(t){ run(t || window.REAL_ACCESS_TOKEN || ''); });
+  } else { run(''); }
 }
 
 var renewalFile = null;
@@ -2420,9 +2474,32 @@ function submitPayment(){
       showToast(_t2('يرجى إدخال رابط الفيديو الإعلاني','Veuillez entrer le lien de la vidéo publicitaire'));
       return;
     }
+    // فحص حصة الفيديوهات حسب الباقة قبل الإرسال
+    if(typeof RizqSub !== 'undefined' && typeof RizqSub.checkPostLimit === 'function' && SESSION_ID){
+      var activeVidCount = 0;
+      try {
+        var va = JSON.parse(localStorage.getItem('rizq_video_ads')||'{}');
+        ['hero','popup'].forEach(function(slot){
+          (va[slot]||[]).forEach(function(a){
+            if(a && a.accountId === SESSION_ID && a.active !== false && a.url) activeVidCount++;
+          });
+        });
+      } catch(e){}
+      var lim = RizqSub.checkPostLimit(SESSION_ID, 'video', activeVidCount);
+      // إن لم تكن باقة فيديو نشطة بعد، نسمح بطلب الشراء الأول؛ الحصة تُفرض عند التفعيل
+      if(lim && lim.allowed === false && lim.reason === 'tier_limit_reached'){
+        showToast(_t2('وصلت لحد فيديوهات باقتك ('+lim.limit+')','Vous avez atteint la limite de vidéos ('+lim.limit+')'));
+        return;
+      }
+    }
   }
   if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
     showToast(_t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'));
+    return;
+  }
+  if(!window.REAL_ACCESS_TOKEN){
+    showToast(_t2('جارٍ تجهيز الجلسة — أعد المحاولة بعد ثانية','Préparation de la session — réessayez dans une seconde'));
+    if(typeof _resolveRealAccessToken==='function' && USER_ACC) _resolveRealAccessToken(USER_ACC);
     return;
   }
   // حماية من الإرسال المزدوج (نقر متكرر سريع قبل انتهاء قراءة/رفع الملف)
@@ -2436,6 +2513,7 @@ function submitPayment(){
     price: _payPkg.price,
     accountName: (USER_ACC&&USER_ACC.name) || _t2('مشترك','Abonné'),
     accountId: SESSION_ID,
+    accessToken: window.REAL_ACCESS_TOKEN || '',
     category: _payPkg.category || 'package',
     adId: _payPkg.adId || null,
     adTitle: _payPkg.adTitle || '',
@@ -2494,9 +2572,14 @@ function _initDashboardWithAccount(acc){
           s.accessToken = realToken;
           localStorage.setItem('rizq_individual_session', JSON.stringify(s));
         }catch(e){}
+        // مزامنة صلاحيات الباقة من الخادم (حدود/ميزات حية بما فيها media)
+        if(typeof RizqSub !== 'undefined' && typeof RizqSub.syncEntitlementsFromServer === 'function'){
+          try{ RizqSub.syncEntitlementsFromServer(acc.id, realToken); }catch(eSync){}
+        }
       }
       _rizqMergeMyBackendAds(acc);
       _loadRealDashboardStats(acc);
+      if(typeof _rizqRenderAdsStatus === 'function') _rizqRenderAdsStatus(acc);
     });
   }
   renderChart();
@@ -2561,6 +2644,20 @@ function _initDashboardWithAccount(acc){
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
         if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
+      // أرقام التحويل الكاملة — لصاحب الحساب فقط
+      (function _loadPayMethodsFull(){
+        var accId = (typeof SESSION_ID!=='undefined' && SESSION_ID) || (window.USER_ACC&&USER_ACC.id) || (window.CORP_ACC&&CORP_ACC.id) || (window.STORE&&STORE.id) || (window.OFFICE&&OFFICE.id) || '';
+        var tok = window.REAL_ACCESS_TOKEN || '';
+        if(!accId || !tok || !window.RIZQ_BACKEND_BASE) return;
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/pay-methods?accountId=' + encodeURIComponent(accId), {
+          headers: { 'x-account-token': tok }
+        }).then(function(r){ return r.ok ? r.json() : null; }).then(function(pm){
+          if(pm && pm.ok && Array.isArray(pm.methods)){
+            localStorage.setItem('rizq_bank_codes', JSON.stringify(pm.methods));
+            if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
+          }
+        }).catch(function(){});
+      })();
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.individual)) localStorage.setItem('rizq_individual_packages', JSON.stringify(data.config.packages.individual));
         if(Array.isArray(data.config.packages.general))     localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
