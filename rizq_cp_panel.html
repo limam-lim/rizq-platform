@@ -6240,7 +6240,41 @@ function rzqVidToggle(type, idx) {
   if (type==='hero') rzqVidRenderHero(); else rzqVidRenderPopup();
 }
 
+function rzqVidRenderPlatformPromo() {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  var st = document.getElementById('rzv-platform-status');
+  var link = document.getElementById('rzv-platform-preview-link');
+  if (en) en.checked = _rzqVidData.platformPromoEnabled !== false;
+  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  if (slot) slot.value = String(_rzqVidData.adSlotSeconds || 25);
+  if (link && url) link.href = url.value;
+  if (st) {
+    st.textContent = (_rzqVidData.platformPromoEnabled !== false)
+      ? '✅ الحلقة: فيديو المنصة → معلنو Hero → يعود لفيديو المنصة'
+      : '⏸ فيديو المنصة متوقف — يظهر معلنو Hero فقط';
+  }
+}
+
+function rzqVidSavePlatformPromo(showToastMsg) {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  _rzqVidData.platformPromoEnabled = !!(en && en.checked);
+  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  _rzqVidData.adSlotSeconds = Math.max(8, Math.min(120, Number(slot && slot.value) || 25));
+  localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
+  _syncVideoAdsToBackend(_rzqVidData);
+  rzqVidRenderPlatformPromo();
+  if (showToastMsg) {
+    showToast(RizqI18n.t2('💾 تم حفظ فيديو المنصة المزروع','💾 Promo plateforme enregistrée'));
+  }
+}
+
 function rzqVidSave() {
+  // حافظ على إعدادات فيديو المنصة إن وُجدت حقول اللوحة
+  try { rzqVidSavePlatformPromo(false); } catch (eP) { /* ignore */ }
   localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
   _syncVideoAdsToBackend(_rzqVidData);
   showToast(RizqI18n.t2('💾 تم الحفظ — يُطبَّق فور فتح أي صفحة من المنصة','💾 Enregistré — appliqué dès l\'ouverture de n\'importe quelle page de la plateforme'));
