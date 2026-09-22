@@ -38,43 +38,52 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
 .reveal-init{opacity:0;transform:translateY(16px);transition:opacity .65s ease,transform .65s ease}
 .reveal-init.in-view{opacity:1;transform:translateY(0)}
 
-/* ══ HERO — مضيء مثل المحلات/المكاتب ══ */
+/* ══ HERO — أزرق فوتر المحلات ══ */
 .ads-hero{
   position:relative;overflow:hidden;min-height:0;
   display:flex;flex-direction:column;justify-content:flex-start;
-  background:
-    radial-gradient(ellipse 900px 420px at 50% -20%,rgba(154,134,82,.12),transparent 60%),
-    linear-gradient(180deg,#f7f9fc 0%,#eef2f7 100%);
-  padding:14px 5% 0;text-align:center;
-  border-bottom:1px solid rgba(47,74,110,.06);
+  background:linear-gradient(135deg,#06111C,#0F2347);
+  padding:16px 5% 0;text-align:center;
+  border-bottom:1px solid rgba(201,168,76,.18);
 }
-.ads-hero .beams,
-.ads-hero .grain,
-.ads-hero .map-glow{display:none}
-.ads-hero-inner{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:8px 0 14px}
+.ads-hero .beams{
+  display:block;position:absolute;inset:0;pointer-events:none;
+  background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.14) 10deg,transparent 22deg);
+  opacity:.85;
+}
+.ads-hero .grain{
+  display:block;position:absolute;inset:0;pointer-events:none;opacity:.2;
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.ads-hero .map-glow{
+  display:block;position:absolute;left:10%;top:10%;width:160px;height:160px;pointer-events:none;
+  background:radial-gradient(circle,rgba(201,168,76,.1),transparent 68%);
+  filter:blur(8px);
+}
+.ads-hero-inner{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:8px 0 16px}
 .ads-brand{
   font-family:var(--display);font-size:clamp(26px,4vw,36px);font-weight:700;
-  letter-spacing:.3px;line-height:1.1;margin-bottom:6px;
-  background:linear-gradient(100deg,#1B3A6B 20%,#C9A84C 48%,#1B3A6B 75%);
-  background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-  animation:brandIn .7s ease both, adsShimmer 6s linear infinite;
+  letter-spacing:.3px;line-height:1.1;margin-bottom:6px;color:#C9A84C;
+  text-shadow:0 0 24px rgba(201,168,76,.25);
+  background:none;-webkit-background-clip:unset;background-clip:unset;
+  animation:brandIn .7s ease both;
 }
-@keyframes adsShimmer{to{background-position:200% center}}
 @keyframes brandIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .ads-badge{
   display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;
-  padding:5px 12px;border-radius:999px;font-size:10.5px;font-weight:800;color:#1B3A6B;
-  background:#fff;border:1px solid rgba(201,168,76,.35);letter-spacing:.2px;
-  box-shadow:0 2px 8px rgba(27,58,107,.05);
+  padding:5px 12px;border-radius:999px;font-size:10.5px;font-weight:800;color:#E8C96A;
+  background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);letter-spacing:.2px;
+  box-shadow:none;
 }
 .ads-badge .dot{width:7px;height:7px;border-radius:50%;background:#e24;box-shadow:none;animation:none}
 .ads-hero h1{
-  font-family:var(--font);font-size:clamp(18px,2.8vw,26px);font-weight:900;color:#1C2536;
+  font-family:var(--font);font-size:clamp(18px,2.8vw,26px);font-weight:900;color:#fff;
   line-height:1.35;margin:0 auto 6px;max-width:600px;
 }
-.ads-hero h1 span{color:#1B3A6B;border-bottom:2px solid rgba(201,168,76,.45)}
+.ads-hero h1 span{color:#E8C96A;border-bottom:2px solid rgba(201,168,76,.45)}
 .ads-hero .lead{
-  color:#5B6478;font-size:13px;line-height:1.6;max-width:520px;
+  color:rgba(255,255,255,.78);font-size:13px;line-height:1.6;max-width:520px;
   margin:0 auto 14px;font-weight:500;
 }
 .ads-hero-ctas{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:0}
@@ -86,15 +95,16 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
 .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(201,168,76,.38)}
 .btn-ghost{
   padding:10px 20px;border-radius:11px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
-  background:#fff;border:1.5px solid #bfcfef;color:#1B3A6B;font-weight:700;font-size:13.5px;
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(201,168,76,.4);color:#E8C96A;font-weight:700;font-size:13.5px;
   transition:background .2s,transform .2s,border-color .2s;
 }
-.btn-ghost:hover{border-color:rgba(201,168,76,.45);transform:translateY(-2px)}
-.hero-wave{display:none}
+.btn-ghost:hover{background:rgba(201,168,76,.12);transform:translateY(-2px)}
+.hero-wave{display:block;width:100%;height:22px;position:relative;z-index:2;margin-top:4px}
 
-/* preview — بطاقة مضيئة على خلفية فاتحة */
+/* preview — بطاقة بيضاء تحت بطل أزرق فوتر المحلات */
 .ads-preview-strip{
-  background:transparent;border-bottom:none;
+  background:linear-gradient(180deg,#eef2f7,#f5f7fb);
+  border-bottom:none;
   padding:8px 5% 28px;
 }
 .ads-preview-inner{
@@ -327,7 +337,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
       <a href="#ads-placements" class="btn-ghost" data-t="cta2">شاهد المواضع</a>
     </div>
   </div>
-  <svg class="hero-wave" viewBox="0 0 1440 56" preserveAspectRatio="none" aria-hidden="true"><path d="M0,28 C240,56 480,0 720,14 C960,28 1200,56 1440,28 L1440,56 L0,56 Z" fill="#121a26"></path></svg>
+  <svg class="hero-wave" viewBox="0 0 1440 56" preserveAspectRatio="none" aria-hidden="true"><path d="M0,28 C240,56 480,0 720,14 C960,28 1200,56 1440,28 L1440,56 L0,56 Z" fill="#eef2f7"></path></svg>
 </section>
 
 <section class="ads-preview-strip">
