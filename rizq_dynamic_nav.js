@@ -212,7 +212,8 @@
           var link = el.tagName === 'A' ? el : el.querySelector('a');
           if (link) link.href = resolveHref(mod, onLanding);
           el.setAttribute('data-nav-order', String(mod.order));
-          if (phone) {
+          /* على الهبوط: أظهر كل الأقسام في الشريط (تمرير أفقي) حسب ترتيب الصفحة */
+          if (phone && !onLanding) {
             el.style.display = 'none';
             return;
           }
@@ -221,7 +222,7 @@
         });
       });
       container.querySelectorAll('[data-rizq-nav-extra]').forEach(function (el) {
-        if (phone) el.style.display = 'none';
+        if (phone && !onLanding) el.style.display = 'none';
         else el.style.removeProperty('display');
       });
       container.querySelectorAll('#rizq-hdr-assistant, #rizq-desk-assistant, #nav-assistant-btn').forEach(function (ai) {
@@ -342,7 +343,7 @@
       if (!k || !LABELS[k]) return;
       var text = t(LABELS[k].ar, LABELS[k].fr);
       if (k === 'tenders' && el.closest('[data-rizq-module="tenders"]')) {
-        text = t('غرفة المناقصات', 'Appels d\'offres');
+        text = t('المناقصات', 'Appels d\'offres');
       }
       if (!text) return;
       if (el.closest('#mobile-drawer-list')) {
