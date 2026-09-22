@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.6"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -154,12 +154,17 @@ nav.scrolled{
 #nav .nav-center{
   overflow-x:auto;overflow-y:visible;
   -webkit-overflow-scrolling:touch;
-  gap:6px;
+  gap:8px;
   flex-wrap:nowrap;
 }
 #nav .nav-center > li{
   display:flex;flex-shrink:0;align-items:center;
   list-style:none;margin:0;padding:0;
+}
+#nav .nav-center > li > a,
+#nav .nav-center > li > .nav-link-btn{
+  padding:8px 12px;
+  white-space:nowrap;
 }
 #nav .nav-center > li.rizq-nav-extra{display:flex}
 @media (max-width:768px){
@@ -2488,7 +2493,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_terms_gate.js?v=18.2"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=16.5"></script>
+<script src="rizq_dynamic_nav.js?v=16.6"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
