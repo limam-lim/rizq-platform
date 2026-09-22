@@ -29,10 +29,10 @@ body {
   --rzq-z-lightbox:30000;
   --rzq-nav-clearance:72px;
 }
-html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:104px}
+html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:110px}
 @media(max-width:768px){
   :root{--rzq-nav-clearance:64px}
-  html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:104px}
+  html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:110px}
 }
 
 /* ── Layering ── */
@@ -343,28 +343,29 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     flex-direction:unset!important;
-    gap:10px!important;
+    gap:8px!important;
     width:100%!important;max-width:100%!important;
     overflow:visible!important;
+    padding:0 2px!important;
   }
   .listings-grid .listing-card{
     width:100%!important;max-width:100%!important;min-width:0!important;
-    padding:0!important;border-radius:14px!important;
+    padding:0!important;border-radius:12px!important;
   }
   .listings-grid .listing-card .l-img{
-    height:78px!important;min-height:78px!important;max-height:78px!important;
-    font-size:28px!important;border-radius:14px 14px 0 0!important;
+    height:64px!important;min-height:64px!important;max-height:64px!important;
+    font-size:24px!important;border-radius:12px 12px 0 0!important;
   }
-  .listings-grid .listing-card .l-body{padding:8px 9px 10px!important}
-  .listings-grid .listing-card .l-cat{font-size:9px!important;margin-bottom:3px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .listings-grid .listing-card .l-body{padding:7px 8px 8px!important}
+  .listings-grid .listing-card .l-cat{font-size:8.5px!important;margin-bottom:2px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .listings-grid .listing-card .l-title{
-    font-size:11.5px!important;line-height:1.35!important;margin-bottom:4px!important;
+    font-size:11px!important;line-height:1.3!important;margin-bottom:3px!important;
     display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important;
   }
   .listings-grid .listing-card .l-desc{display:none!important}
-  .listings-grid .listing-card .l-meta{padding-top:8px!important;flex-wrap:wrap;gap:4px}
-  .listings-grid .listing-card .l-price{font-size:12px!important}
-  .listings-grid .listing-card .l-loc{font-size:9px!important}
+  .listings-grid .listing-card .l-meta{padding-top:6px!important;flex-wrap:wrap;gap:2px}
+  .listings-grid .listing-card .l-price{font-size:11px!important}
+  .listings-grid .listing-card .l-loc{font-size:8.5px!important;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .listings-grid .listing-card .lc-hover{display:none!important}
   .listings-grid .listing-card .l-badge{font-size:8px!important;padding:2px 6px!important;top:6px!important;right:6px!important}
   .listings-grid .listing-card .l-body > div:last-child{display:none!important}
