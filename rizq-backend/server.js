@@ -1059,12 +1059,20 @@ app.get('/api/site-config', (req, res) => {
     packages: raw.packages || undefined,
     prices: raw.prices || undefined,
     promoVideo: raw.promoVideo || undefined,
-    videoAds: raw.videoAds || undefined,
+    // لا نُسرّب stats (مشاهدات/نقرات المعلنين) للعامة
+    videoAds: raw.videoAds ? {
+      hero: raw.videoAds.hero,
+      popup: raw.videoAds.popup,
+      platformPromoUrl: raw.videoAds.platformPromoUrl,
+      platformPromoEnabled: raw.videoAds.platformPromoEnabled,
+      adSlotSeconds: raw.videoAds.adSlotSeconds,
+    } : undefined,
     announcements: raw.announcements || undefined,
     legalOverrides: raw.legalOverrides || undefined,
     currency: raw.currency || undefined,
     quotaConfig: raw.quotaConfig || undefined,
     quotaTopups: raw.quotaTopups || undefined,
+    // أرقام الحسابات البنكية للتحويل — عامة عمداً (نموذج الدفع يحتاجها)
     bankCodes: Array.isArray(raw.bankCodes) ? raw.bankCodes : undefined,
   };
   // لا نُسرّب webhookUrl / قنوات داخلية / أسرار تشغيل
@@ -2211,7 +2219,7 @@ app.get('/api/entitlements/:accountId', (req, res) => {
 /** POST /api/video-ads/event — تسجيل مشاهدة/نقرة لإعلان فيديو (عام محدود) */
 const videoAdsEventLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 60,
+  max: 40,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_events' },
@@ -2219,22 +2227,55 @@ const videoAdsEventLimiter = rateLimit({
 app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
   try {
     const body = req.body || {};
-    const accountId = String(body.accountId || '').trim();
+    const accountId = String(body.accountId || '').trim().slice(0, 60);
     const type = String(body.type || '').trim(); // impression | click
     if (!accountId || (type !== 'impression' && type !== 'click')) {
       return res.status(400).json({ ok: false, error: 'invalid_event' });
     }
+    // رفض معرّفات عشوائية — فقط معلن موجود فعلياً في قائمة العرض النشطة
     const cfg = repos.getSiteConfig() || {};
-    const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? Object.assign({}, cfg.videoAds) : {};
+    const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
+    const activeAdv = ['hero', 'popup'].some((slot) =>
+      (Array.isArray(videoAds[slot]) ? videoAds[slot] : []).some(
+        (a) => a && a.active !== false && a.url && String(a.accountId || '') === accountId
+      )
+    );
+    if (!activeAdv) {
+      return res.status(404).json({ ok: false, error: 'advertiser_not_active' });
+    }
     const stats = Object.assign({}, (videoAds.stats && typeof videoAds.stats === 'object') ? videoAds.stats : {});
+    // حد أقصى للمفاتيح المخزّنة — حماية من نمو غير منضبط
+    const keys = Object.keys(stats);
+    if (!stats[accountId] && keys.length > 500) {
+      return res.status(429).json({ ok: false, error: 'stats_capacity' });
+    }
     const row = Object.assign({ impressions: 0, clicks: 0 }, stats[accountId] || {});
-    if (type === 'impression') row.impressions = (Number(row.impressions) || 0) + 1;
-    if (type === 'click') row.clicks = (Number(row.clicks) || 0) + 1;
+    // سقف يومي بسيط ضد التضخم السخيف لنفس المعلن
+    const today = new Date().toISOString().slice(0, 10);
+    if (row._day !== today) {
+      row._day = today;
+      row._dayImpressions = 0;
+      row._dayClicks = 0;
+    }
+    if (type === 'impression') {
+      if ((Number(row._dayImpressions) || 0) >= 5000) {
+        return res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks }, capped: true });
+      }
+      row.impressions = (Number(row.impressions) || 0) + 1;
+      row._dayImpressions = (Number(row._dayImpressions) || 0) + 1;
+    }
+    if (type === 'click') {
+      if ((Number(row._dayClicks) || 0) >= 2000) {
+        return res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks }, capped: true });
+      }
+      row.clicks = (Number(row.clicks) || 0) + 1;
+      row._dayClicks = (Number(row._dayClicks) || 0) + 1;
+    }
     row.updatedAt = new Date().toISOString();
     stats[accountId] = row;
-    videoAds.stats = stats;
-    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds }));
-    res.json({ ok: true, stats: row });
+    const nextVideoAds = Object.assign({}, videoAds, { stats });
+    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds }));
+    res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks } });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
@@ -2514,7 +2555,7 @@ app.get('/api/subscriber/knowledge/mine/:accountId', (req, res) => {
 app.post('/api/subscriber/knowledge/instructions', (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req) || '';
   const customInstructions = String(b.customInstructions || '').trim().slice(0, 4000);
   if (!accountId) {
     return res.status(400).json({ ok: false, error: 'accountId مطلوب' });
@@ -2541,7 +2582,7 @@ app.post('/api/subscriber/knowledge/instructions', (req, res) => {
 app.post('/api/subscriber/knowledge/upload', (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
-  const token = req.header('x-account-token') || '';
+  const token = extractAccountToken(req) || '';
   const fileName = String(b.fileName || '').trim();
   const fileDataBase64 = String(b.fileDataBase64 || '').trim();
   if (!accountId || !fileName || !fileDataBase64) {

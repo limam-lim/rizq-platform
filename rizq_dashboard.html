@@ -2543,9 +2543,14 @@ function _initDashboardWithAccount(acc){
           s.accessToken = realToken;
           localStorage.setItem('rizq_individual_session', JSON.stringify(s));
         }catch(e){}
+        // مزامنة صلاحيات الباقة من الخادم (حدود/ميزات حية بما فيها media)
+        if(typeof RizqSub !== 'undefined' && typeof RizqSub.syncEntitlementsFromServer === 'function'){
+          try{ RizqSub.syncEntitlementsFromServer(acc.id, realToken); }catch(eSync){}
+        }
       }
       _rizqMergeMyBackendAds(acc);
       _loadRealDashboardStats(acc);
+      if(typeof _rizqRenderAdsStatus === 'function') _rizqRenderAdsStatus(acc);
     });
   }
   renderChart();

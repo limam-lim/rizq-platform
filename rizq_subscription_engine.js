@@ -131,11 +131,23 @@
   }
 
   /** مزامنة صلاحيات الخادم → localStorage (يُستدعى عند فتح الداشبورد) */
-  function syncEntitlementsFromServer(accId) {
+  function syncEntitlementsFromServer(accId, accessTokenOverride) {
     try {
       var cfg = (typeof getAgentConfig === 'function') ? getAgentConfig() : {};
       var accounts = getAccounts();
-      var token = accounts[accId] && accounts[accId].server_token;
+      var token = accessTokenOverride
+        || (accounts[accId] && (accounts[accId].server_token || accounts[accId].accessToken))
+        || '';
+      // جلسات الداشبورد الشائعة
+      if (!token) {
+        try {
+          var sess = JSON.parse(localStorage.getItem('rizq_individual_session') || '{}');
+          if (sess && sess.id === accId && sess.accessToken) token = sess.accessToken;
+        } catch (e0) { /* ignore */ }
+      }
+      if (!token && typeof window !== 'undefined' && window.REAL_ACCESS_TOKEN) {
+        token = String(window.REAL_ACCESS_TOKEN);
+      }
       if (!cfg.backendUrl || !token) return Promise.resolve(null);
       return fetch(cfg.backendUrl.replace(/\/$/, '') + '/api/entitlements/' + encodeURIComponent(accId), {
         headers: { 'x-account-token': token },
@@ -143,7 +155,7 @@
         if (!data || !data.entitlements) return null;
         var ent = data.entitlements;
         var accs = getAccounts();
-        if (!accs[accId]) return ent;
+        if (!accs[accId]) return data;
         accs[accId].planType = ent.planType;
         accs[accId].subscriptionStatus = ent.subscriptionStatus;
         if (ent.endDate) accs[accId].pkg_ends_at = ent.endDate;
@@ -152,10 +164,14 @@
         } else if (ent.subscriptionStatus === 'pending') {
           accs[accId].pkg_status = 'pending';
         } else if (ent.subscriptionStatus === 'active' || ent.subscriptionStatus === 'expiring_soon') {
-          accs[accId].pkg_status = ent.subscriptionStatus === 'expiring_soon' ? 'active' : 'active';
+          accs[accId].pkg_status = 'active';
+        }
+        // صلاحيات الفيديو المعزولة
+        if (data.media) {
+          accs[accId].mediaEntitlements = data.media;
         }
         saveAccounts(accs);
-        return ent;
+        return data;
       }).catch(function(){ return null; });
     } catch(e) { return Promise.resolve(null); }
   }

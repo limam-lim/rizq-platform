@@ -469,12 +469,19 @@ async function runLifecycleScan(accountsHelpers) {
       const msg = `🔒 رزق: انتهت باقة "${rec.pkgName}". تم إيقاف جميع الميزات فوراً. جدّد الآن لاستعادتها.`;
       if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
       if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — انتهت باقتك', `<p dir="rtl">${msg}</p>`);
-      _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
-      try {
-        const { onSubscriptionExpired } = require('./services/apiIntegration');
-        onSubscriptionExpired(accountId);
-      } catch (apiErr) {
-        console.warn('[lifecycle] api key suspend:', apiErr.message);
+      const isVideoPkg = String(accountId).includes('::video');
+      const isTenderPkg = String(accountId).includes('::tender');
+      if (isVideoPkg) {
+        // إيقاف إعلانات الفيديو في الموقع عند انتهاء باقة ADS — لا نلمس accounts.json
+        _deactivateExpiredVideoAds(String(accountId).split('::')[0]);
+      } else if (!isTenderPkg) {
+        _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
+        try {
+          const { onSubscriptionExpired } = require('./services/apiIntegration');
+          onSubscriptionExpired(accountId);
+        } catch (apiErr) {
+          console.warn('[lifecycle] api key suspend:', apiErr.message);
+        }
       }
       changed = true;
     }
@@ -503,6 +510,35 @@ function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, subscript
   }
 }
 
+/** عند انتهاء باقة Rizq ADS — إيقاف إعلانات الحساب من hero/popup فوراً */
+function _deactivateExpiredVideoAds(baseAccountId) {
+  const id = String(baseAccountId || '').trim();
+  if (!id) return;
+  try {
+    const repos = require('./db/repos');
+    const cfg = repos.getSiteConfig() || {};
+    const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? Object.assign({}, cfg.videoAds) : null;
+    if (!videoAds) return;
+    let changed = false;
+    ['hero', 'popup'].forEach((slot) => {
+      const list = Array.isArray(videoAds[slot]) ? videoAds[slot] : [];
+      videoAds[slot] = list.map((a) => {
+        if (a && String(a.accountId || '') === id && a.active !== false) {
+          changed = true;
+          return Object.assign({}, a, { active: false, expiredAt: new Date().toISOString() });
+        }
+        return a;
+      });
+    });
+    if (changed) {
+      repos.saveSiteConfig(Object.assign({}, cfg, { videoAds }));
+      console.log('[lifecycle] deactivated video ads for', id);
+    }
+  } catch (e) {
+    console.warn('[lifecycle] video ads deactivate:', e.message);
+  }
+}
+
 // ── نقاط الـ API ────────────────────────────────────────────────────
 // accountsHelpers (اختياري): { readAccounts, writeAccounts } من server.js —
 // مطلوب فقط لتفعيل مكافأة الإحالة (تحتاج قراءة/كتابة accounts.json الذي لا
@@ -520,9 +556,11 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
       // الحساب، ومرة واحدة فقط لكل حساب مُحال (علم referralBonusGranted
       // في accounts.json يمنع تكرارها عند كل تجديد لاحق). ─────────────
       try {
-        const accountId = (req.body || {}).accountId;
+        const rawAccountId = (req.body || {}).accountId;
+        // باقات معزولة (video/tender): كافئ الحساب الأساسي لمكافأة الإحالة
+        const accountId = String(rawAccountId || '').split('::')[0];
         const price = Number((req.body || {}).price) || 0;
-        if (price > 0 && accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
+        if (price > 0 && accountId && accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
           const accounts = accountsHelpers.readAccounts();
           const idx = accounts.findIndex((a) => a.id === accountId);
           if (idx > -1) {
@@ -548,23 +586,46 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     }
   });
 
-  // قراءة حالة/فواتير حساب — محمية بـ accessToken خاص بهذا الحساب فقط
-  // (وليس سرّ الأدمن العام) لأن هذه النقطة تُستدعى من داشبورد المشترك
-  // نفسه، وأي سرّ يُضمَّن في تلك الصفحة يصبح مرئياً لكل زائر لها.
+  // قراءة حالة/فواتير حساب — محمية بـ accessToken
+  // للحساب الأساسي (أو توكن سجل الباقة نفسه). يدعم مفاتيح معزولة مثل
+  // accountId::video و accountId::tender عبر التحقق من الحساب الأساسي.
   app.get('/api/account-package/:id', (req, res) => {
     const rec = getAccountRecord(req.params.id);
     if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
-    // رأس فقط — لا نقبل ?token=
     const token = String(req.header('x-account-token') || '').trim();
     const { timingSafeEqualStr } = require('./lib/secureCompare');
-    if (!token || !rec.accessToken || !timingSafeEqualStr(token, rec.accessToken)) {
+    const pkgTokenOk = !!(token && rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
+    let ownerOk = false;
+    const baseId = String(req.params.id).split('::')[0];
+    if (!pkgTokenOk && token) {
+      const mainRec = getAccountRecord(baseId);
+      if (mainRec && mainRec.accessToken && timingSafeEqualStr(token, mainRec.accessToken)) {
+        ownerOk = true;
+      }
+      if (!ownerOk && accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
+        try {
+          const list = accountsHelpers.readAccounts();
+          const acc = list.find((a) => a && a.id === baseId);
+          if (acc && acc.accessToken && timingSafeEqualStr(token, String(acc.accessToken))) {
+            ownerOk = true;
+          }
+        } catch (e) { /* ignore */ }
+      }
+    }
+    if (!token || (!pkgTokenOk && !ownerOk)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    const { accessToken, ...safe } = rec; // لا نُعيد التوكن نفسه في الرد
+    const { accessToken, ...safe } = rec;
     let entitlements = null;
     try {
-      const { getEntitlements } = require('./services/entitlements');
-      entitlements = getEntitlements(req.params.id, rec.accountType, rec);
+      const { getEntitlements, getMediaEntitlements, getTenderEntitlements } = require('./services/entitlements');
+      if (String(req.params.id).includes('::video')) {
+        entitlements = getMediaEntitlements(baseId, rec);
+      } else if (String(req.params.id).includes('::tender')) {
+        entitlements = getTenderEntitlements(baseId);
+      } else {
+        entitlements = getEntitlements(req.params.id, rec.accountType, rec);
+      }
     } catch (e) { /* optional */ }
     res.json({ ok: true, account: safe, entitlements });
   });
