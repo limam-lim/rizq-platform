@@ -47,7 +47,11 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   color: var(--text-on-navy, rgba(255, 255, 255, 0.96)) !important;
 }
 .section-header .section-desc {
-  color: var(--text-on-navy-muted, rgba(255, 255, 255, 0.88)) !important;
+  color: var(--text-on-navy-muted, rgba(255, 255, 255, 0.9)) !important;
+}
+.section-header > p:not(.section-tag) {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600 !important;
 }
 .section-header .section-tag {
   color: var(--gold, #C9A84C) !important;
