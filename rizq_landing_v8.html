@@ -2073,6 +2073,15 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 }
 .rizq-styles-reshuffle:hover{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.45)}
 .rizq-styles-reshuffle:active{transform:scale(.97)}
+.rizq-styles-tick{
+  margin:8px 0 0;font-size:11.5px;color:#5b6b85;min-height:1.2em
+}
+.rizq-style-from-view{
+  display:inline-flex;align-self:flex-start;
+  font-size:9.5px;font-weight:800;
+  color:#8a6f2a;background:rgba(201,168,76,.14);
+  border:1px solid rgba(201,168,76,.35);border-radius:999px;padding:2px 8px;margin-bottom:2px
+}
 .rizq-styles-gender-tabs{
   display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
 }
@@ -2658,8 +2667,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in">
       <p class="section-tag">Style Ideas</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">النظام يختار عشوائياً من إعلانات المنصة ويقترح إطلالات رجالية ونسائية</p>
+      <p class="section-desc" data-t="sty-desc">يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة</p>
       <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
+      <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
     </div>
     <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجالي أو نسائي">
       <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-sty-gender="men" id="sty-tab-men" onclick="setStyleGender('men')">👔 <span data-t="sty-men">رجالي</span></button>
@@ -4460,6 +4470,109 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   }
   return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+emoji+'</div>';
 }
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg){
+  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  if(src){
+    return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></div>';
+  }
+  return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</div>';
+}
+
+/* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
+var RIZQ_STYLE_SEED_KEY = 'rizq_style_seeds';
+var RIZQ_STYLE_AUTO_MS = 3 * 60 * 1000;
+var _rizqStyleAutoTimer = null;
+var _rizqStyleNextAt = 0;
+
+function _styLoadSeeds(){
+  try {
+    var raw = JSON.parse(localStorage.getItem(RIZQ_STYLE_SEED_KEY) || '[]');
+    if(!Array.isArray(raw)) return [];
+    var now = Date.now();
+    return raw.filter(function(s){ return s && s.ts && (now - s.ts) < 7*24*3600*1000; }).slice(0, 12);
+  } catch(e){ return []; }
+}
+function _stySaveSeeds(list){
+  try { localStorage.setItem(RIZQ_STYLE_SEED_KEY, JSON.stringify((list||[]).slice(0, 12))); } catch(e){}
+}
+function rizqFeedStyleSeed(item){
+  if(!item) return;
+  var title = String(item.title || item.name || '').trim();
+  if(!title) return;
+  var blob = [title, item.titleFR || item.nameF || '', item.desc || '', item.cat || '', item.catKey || ''].join(' ');
+  var men = RIZQ_STYLE_MEN_HINTS.test(blob);
+  var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
+  var gender = 'both';
+  if(men && !women) gender = 'men';
+  else if(women && !men) gender = 'women';
+  else {
+    var k = String(item.catKey || item.cat || '');
+    if(/ذهب|صحة|جمال|إلكترون|أزياء|موضة|fashion|mode/i.test(k) || men || women) gender = 'both';
+    else if(!_styIsStyleCat({ catKey: k }) && !/أزياء|موضة|ذهب|صحة|جمال|إلكترون|دراعة|ملحفة|daraa|melhfa/i.test(blob)){
+      return; /* ليس منتج أناقة — تجاهل */
+    }
+  }
+  var images = [];
+  if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
+  else if(item.image) images = [item.image];
+  var seed = {
+    id: String(item.id != null ? item.id : ('seed-' + Date.now())),
+    title: title,
+    titleFR: String(item.titleFR || item.nameF || title),
+    emoji: item.emoji || '✨',
+    cat: item.cat || '',
+    catKey: item.catKey || item.cat || 'أزياء',
+    images: images,
+    gender: gender,
+    href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
+    bg: item.bg || 'linear-gradient(145deg,#1B3A6B,#0f2347)',
+    fromView: true,
+    ts: Date.now()
+  };
+  var list = _styLoadSeeds().filter(function(s){ return String(s.id) !== String(seed.id); });
+  list.unshift(seed);
+  _stySaveSeeds(list);
+  if(typeof buildStyleIdeas === 'function' && document.getElementById('rizq-styles-rail')){
+    if(seed.gender === 'men' || seed.gender === 'women') setStyleGender(seed.gender);
+    else buildStyleIdeas(true);
+  }
+}
+window.rizqFeedStyleSeed = rizqFeedStyleSeed;
+
+function _styUpdateTick(fr){
+  var el = document.getElementById('rizq-styles-tick');
+  if(!el) return;
+  if(!_rizqStyleNextAt){ el.textContent = ''; return; }
+  var left = Math.max(0, _rizqStyleNextAt - Date.now());
+  var mins = Math.floor(left / 60000);
+  var secs = Math.floor((left % 60000) / 1000);
+  var mm = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  el.textContent = fr
+    ? ('🔄 Prochain renouvellement dans ' + mm)
+    : ('🔄 التجديد التلقائي خلال ' + mm);
+}
+function _styStartAutoRefresh(){
+  if(_rizqStyleAutoTimer) clearInterval(_rizqStyleAutoTimer);
+  _rizqStyleNextAt = Date.now() + RIZQ_STYLE_AUTO_MS;
+  _rizqStyleAutoTimer = setInterval(function(){
+    if(document.hidden) return;
+    _rizqStyleNextAt = Date.now() + RIZQ_STYLE_AUTO_MS;
+    try { buildStyleIdeas(true); } catch(e){}
+  }, RIZQ_STYLE_AUTO_MS);
+  setInterval(function(){
+    var fr = false;
+    try {
+      if(typeof isAr !== 'undefined') fr = !isAr;
+      else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+    } catch(e){}
+    _styUpdateTick(fr);
+  }, 1000);
+  try {
+    var fr0 = (typeof isAr !== 'undefined') ? !isAr : false;
+    _styUpdateTick(fr0);
+  } catch(e2){}
+}
+
 function setStyleGender(gender){
   if(gender !== 'men' && gender !== 'women') gender = 'men';
   _rizqStyleGender = gender;
@@ -4484,10 +4597,41 @@ function buildStyleIdeas(reshuffle){
   var templates = gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES;
   var pool = _styPool();
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
+  var seeds = _styLoadSeeds().filter(function(s){
+    return s.gender === gender || s.gender === 'both';
+  });
   var tplList = _styShuffle(templates).slice(0, 3);
   var usedIds = {};
   var cards = [];
   var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
+  var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
+
+  /* بطاقة أولى من آخر منتج شاهدته (دراعة من محل، إعلان أزياء…) */
+  if(seeds.length){
+    var seed = seeds[0];
+    usedIds[String(seed.id)] = 1;
+    var seedImgs = (seed.images || []).slice(0, 3);
+    while(seedImgs.length < 3) seedImgs.push(null);
+    var seedTiles = '';
+    for(var si=0; si<3; si++){
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg);
+      else seedTiles += _styTileHtml({ emoji: seed.emoji, bg: seed.bg, images: [] }, (gender==='women'?RIZQ_STYLE_WOMEN_TEMPLATES:RIZQ_STYLE_MEN_TEMPLATES)[0].emoji[si], seed.bg);
+    }
+    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
+    var genderBadge0 = gender === 'women' ? (fr ? 'Femme' : 'نسائي') : (fr ? 'Homme' : 'رجالي');
+    cards.push(
+      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seed.href||'#')+'" data-sty-gender="'+gender+'" data-sty-seed="1">'
+      + '<div class="rizq-style-mosaic" aria-hidden="true">'+seedTiles+'</div>'
+      + '<div class="rizq-style-body">'
+      +   '<div class="rizq-style-from-view">'+_styEsc(fromViewLbl)+'</div>'
+      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge0)+'</div>'
+      +   '<div class="rizq-style-name">'+_styEsc(seedName)+'</div>'
+      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك')+'</div>'
+      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
+      + '</div></a>'
+    );
+    tplList = tplList.slice(0, 2);
+  }
 
   tplList.forEach(function(tpl){
     var styleGendered = gendered.filter(_styIsStyleCat);
@@ -4547,8 +4691,10 @@ function buildStyleIdeas(reshuffle){
     try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
     catch(e2) { rail.scrollLeft = 0; }
   }
+  _styUpdateTick(fr);
 }
 try { buildStyleIdeas(false); } catch(eSty) {}
+try { _styStartAutoRefresh(); } catch(eAuto) {}
 
 // ── QCAT PORTAL ──
 var QCAT_DATA = (typeof RizqCategories !== 'undefined') ? RizqCategories.qcatData() : {
@@ -4832,6 +4978,22 @@ function qcatBrowseAll() {
 // هناك) + ?id= في الرابط، حتى تُعرض المواصفات/الوسوم الحقيقية بدل محتوى تجريبي ثابت.
 function goToListing(a) {
   if (!a) return;
+  try {
+    if(typeof rizqFeedStyleSeed === 'function'){
+      rizqFeedStyleSeed({
+        id: a.id,
+        title: a.title,
+        titleFR: a.titleFR || a.titleFr || '',
+        desc: a.desc || '',
+        emoji: a.emoji,
+        cat: a.cat,
+        catKey: a.catKey,
+        images: Array.isArray(a.images) ? a.images : [],
+        bg: a.bg,
+        href: 'rizq_browse.html?id=' + encodeURIComponent(a.id)
+      });
+    }
+  } catch(eFeed) {}
   const verified = /موثّق|Vérifié/.test(a.status || '') || !!a.verified;
   const imgs = Array.isArray(a.images) ? a.images.filter(Boolean) : [];
   const handoff = {
@@ -5698,11 +5860,12 @@ const LANG = {
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
     'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
-    'sty-desc': 'النظام يختار عشوائياً من إعلانات المنصة ويقترح إطلالات رجالية ونسائية',
+    'sty-desc': 'يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة',
     'sty-reshuffle': '🔀 اقتراحات جديدة',
     'sty-men': 'رجالي',
     'sty-women': 'نسائي',
     'sty-cta': 'تسوّق الإطلالة',
+    'sty-from-view': 'من مشاهدتك',
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
@@ -5791,11 +5954,12 @@ const LANG = {
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
     'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
-    'sty-desc': 'Le système choisit au hasard parmi les annonces et propose des looks homme et femme',
+    'sty-desc': 'Se renouvelle toutes les 3 minutes, ou quand vous ouvrez un produit (ex. daraa en boutique) — ses photos apparaissent dans le look',
     'sty-reshuffle': '🔀 Nouvelles suggestions',
     'sty-men': 'Homme',
     'sty-women': 'Femme',
     'sty-cta': 'Voir le look',
+    'sty-from-view': 'Vu récemment',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
     'qc-home':'Électroménager','qc-energy':'Énergie','qc-travel':'Voyages',
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services',
