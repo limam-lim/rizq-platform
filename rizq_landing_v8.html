@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=17.2"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=17.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=17.1"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.5"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -57,9 +57,13 @@ document.documentElement.classList.add('rizq-app-nav');
 </script>
 <style id="rizq-mobile-header-critical">
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav body.landing-ux-mobile{padding-top:112px!important}
-  html.rizq-app-nav body.landing-ux-mobile>nav#nav{display:flex!important;visibility:visible!important;height:112px!important;position:fixed!important;top:0;left:0;right:0;z-index:1000!important;background:#0f172a!important;flex-wrap:wrap!important}
+  html.rizq-app-nav body.landing-ux-mobile{padding-top:110px!important}
+  html.rizq-app-nav body.landing-ux-mobile>nav#nav{display:flex!important;visibility:visible!important;height:110px!important;position:fixed!important;top:0;left:0;right:0;z-index:1000!important;background:#0f172a!important;flex-wrap:wrap!important}
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
+  /* تيكر في التدفق الطبيعي — لا يغطي عنوان الهيرو «رزق» */
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
+    position:relative!important;top:auto!important;z-index:1!important;margin:0 0 12px!important;
+  }
 }
 </style>
 <script src="rizq_packages_config.js?v=16.3"></script>
@@ -1276,7 +1280,20 @@ html[dir="ltr"] .listings-section .section-desc{
   .cta-hubs{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
 }
-@media(max-width:480px){.listings-grid{grid-template-columns:1fr}}
+/* موبايل ضيق: عمودان للإعلانات المميزة (لا بطاقة واحدة عملاقة) */
+@media(max-width:480px){
+  .listings-grid,
+  #listings .listings-grid,
+  .listings-section .listings-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .listings-grid .listing-card .l-desc{display:none!important}
+  .listings-grid .listing-card .l-img{height:64px!important;font-size:24px!important}
+  .listings-grid .listing-card .l-title{font-size:11px!important;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .listings-grid .listing-card .l-body{padding:7px 8px!important}
+  .listings-grid .listing-card .lc-hover{display:none!important}
+}
 @media(max-width:640px){
   .cta-hubs{grid-template-columns:repeat(2,1fr);gap:8px}
   .cta-btns{grid-template-columns:1fr}
@@ -1304,8 +1321,8 @@ html[dir="ltr"] .listings-section .section-desc{
   body.landing-ux-mobile .nav-hamburger{display:none!important}
   .nav-right .btn-login,.nav-right .btn-register{display:none}
   .cats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:14px!important;overflow:visible!important;flex-direction:unset!important}
-  .why-grid{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;flex-direction:row!important;max-width:100%!important;justify-content:flex-start!important}
-  .why-card{flex:0 0 82vw!important;max-width:82vw!important;width:82vw!important}
+  .why-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex-wrap:unset!important;overflow:visible!important;overflow-x:visible!important;flex-direction:unset!important;max-width:100%!important;justify-content:stretch!important;gap:10px!important;scroll-snap-type:none!important}
+  .why-card,.why-section .why-card,#about .why-card{flex:none!important;max-width:100%!important;width:100%!important;min-width:0!important;scroll-snap-align:none!important}
   .listings-grid{grid-template-columns:repeat(2,1fr)}
   .footer-grid{grid-template-columns:1fr}
   .hero-stats-bar{flex-wrap:wrap}
@@ -1326,18 +1343,29 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
   .hero-cta-wrap{margin:0 auto 28px}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
-  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة على الموبايل */
+  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
+     direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
   #hero-listings .cards-track-wrap{
-    overflow-x:auto!important;overflow-y:hidden!important;
-    -webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;
+    overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
+    scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
+    direction:ltr!important;
   }
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:10px!important;
+    direction:ltr!important;
+    animation:slide 36s linear infinite!important;
+    will-change:transform;backface-visibility:hidden;transform:translateZ(0);
   }
   #hero-listings .cards-track .ad-card{
     width:158px!important;min-width:158px!important;max-width:158px!important;
-    flex:0 0 158px!important;scroll-snap-align:start;
+    flex:0 0 158px!important;scroll-snap-align:none!important;
+    direction:rtl!important;
+  }
+  /* شريط التيكر كان absolute فيغطي كلمة «رزق» في الهيرو */
+  .ticker-wrap{
+    position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+    z-index:1!important;margin:0 0 12px!important;
   }
   #hero-listings .cards-track .ad-card-img{
     height:100px!important;min-height:100px!important;max-height:100px!important;
@@ -1984,7 +2012,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 
 /* Restore every landing block that fade-in had left invisible */
-#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
+#categories,#listings,#virtual-stores,#rizq-styles,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
@@ -2012,6 +2040,177 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
 .rzq-disc-empty-desc{font-size:12.5px;color:rgba(255,255,255,.65);max-width:420px;margin:0 auto 16px;line-height:1.7}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
+
+/* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
+#rizq-styles{
+  padding:48px 5%;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(201,168,76,.10),transparent 55%),
+    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(27,58,107,.07),transparent 50%),
+    linear-gradient(180deg,#fff 0%,#f7f9fc 100%);
+  position:relative;overflow:hidden;
+}
+.rizq-styles-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+#rizq-styles .section-header{text-align:center;margin-bottom:28px}
+#rizq-styles .section-title{
+  font-family:'Noto Naskh Arabic',Cairo,serif;
+  font-size:clamp(22px,3vw,34px);font-weight:800;color:var(--royal-dark,#0f2347);margin:0 0 10px;line-height:1.35
+}
+#rizq-styles .section-title span{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+#rizq-styles .section-desc{
+  color:#3d4f6a;font-size:14.5px;max-width:560px;margin:0 auto;line-height:1.75
+}
+.rizq-styles-reshuffle{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;padding:8px 16px;
+  font-size:12.5px;font-weight:700;font-family:inherit;
+  color:var(--royal,#1B3A6B);background:rgba(27,58,107,.06);
+  border:1px solid rgba(27,58,107,.18);border-radius:999px;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.rizq-styles-reshuffle:hover{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.45)}
+.rizq-styles-reshuffle:active{transform:scale(.97)}
+.rizq-styles-tick{
+  margin:8px 0 0;font-size:11.5px;color:#5b6b85;min-height:1.2em
+}
+.rizq-style-from-view{
+  display:inline-flex;align-self:flex-start;
+  font-size:9.5px;font-weight:800;
+  color:#8a6f2a;background:rgba(201,168,76,.14);
+  border:1px solid rgba(201,168,76,.35);border-radius:999px;padding:2px 8px;margin-bottom:2px
+}
+.rizq-styles-gender-tabs{
+  display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
+}
+.rizq-styles-gtab{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;font-size:13px;font-weight:700;font-family:inherit;
+  color:#3d4f6a;background:#fff;border:1.5px solid rgba(27,58,107,.16);
+  border-radius:999px;cursor:pointer;transition:all .2s
+}
+.rizq-styles-gtab:hover{border-color:rgba(201,168,76,.45);color:var(--royal,#1B3A6B)}
+.rizq-styles-gtab.is-active{
+  color:#fff;background:linear-gradient(135deg,#1B3A6B,#0f2347);
+  border-color:rgba(201,168,76,.45);box-shadow:0 4px 14px rgba(13,27,42,.18)
+}
+.rizq-styles-gtab.is-active[data-sty-gender="women"]{
+  background:linear-gradient(135deg,#6b2d4a,#3d1a2c)
+}
+.rizq-styles-rail{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.rizq-styles-empty{
+  grid-column:1/-1;text-align:center;padding:28px 16px;
+  color:#5b6b85;font-size:13.5px;line-height:1.7;
+  background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
+}
+.rizq-style-card{
+  display:flex;flex-direction:column;
+  background:#fff;
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:16px;
+  overflow:hidden;
+  text-decoration:none;
+  color:inherit;
+  box-shadow:0 4px 18px rgba(13,27,42,.06);
+  transition:transform .28s cubic-bezier(.23,1,.32,1),box-shadow .28s,border-color .28s;
+  min-width:0;cursor:pointer;
+}
+.rizq-style-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 14px 32px rgba(13,27,42,.12);
+  border-color:rgba(201,168,76,.4);
+}
+.rizq-style-mosaic{
+  display:grid;
+  grid-template-columns:1.35fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:3px;
+  height:168px;
+  background:#0f2347;
+  overflow:hidden;
+}
+.rizq-style-tile{
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;line-height:1;position:relative;overflow:hidden;
+  transition:transform .35s ease;
+}
+.rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.rizq-style-card:hover .rizq-style-tile{transform:scale(1.06)}
+.rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
+.rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.rizq-style-badge{
+  display:inline-flex;align-self:flex-start;
+  font-size:10px;font-weight:800;letter-spacing:.3px;
+  color:var(--royal,#1B3A6B);background:rgba(27,58,107,.08);
+  border:1px solid rgba(27,58,107,.14);border-radius:999px;padding:2px 8px;margin-bottom:2px
+}
+.rizq-style-card[data-sty-gender="women"] .rizq-style-badge{
+  color:#6b2d4a;background:rgba(107,45,74,.08);border-color:rgba(107,45,74,.2)
+}
+.rizq-style-name{
+  font-size:14.5px;font-weight:800;color:var(--royal,#1B3A6B);
+  line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+}
+.rizq-style-meta{font-size:11.5px;color:#5b6b85;line-height:1.45;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.rizq-style-cta{
+  margin-top:auto;padding-top:8px;
+  font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
+  display:inline-flex;align-items:center;gap:4px;
+}
+.rizq-style-cta::after{content:'←';font-size:11px;transition:transform .25s}
+html[dir="ltr"] .rizq-style-cta::after{content:'→'}
+.rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
+html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(3px)}
+@media(max-width:900px){
+  .rizq-styles-rail{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .rizq-style-mosaic{height:148px}
+}
+@media(max-width:640px){
+  #rizq-styles{padding:28px 3% 32px}
+  #rizq-styles .section-header{margin-bottom:16px}
+  #rizq-styles .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
+  #rizq-styles .section-desc{font-size:12px;line-height:1.6;max-width:100%}
+  .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
+  .rizq-styles-gender-tabs{gap:6px;margin-bottom:12px}
+  .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
+  .rizq-styles-rail{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:2px 2px 8px;
+    margin-inline:-2%;
+    padding-inline:2%;
+  }
+  .rizq-styles-rail::-webkit-scrollbar{display:none}
+  .rizq-styles-empty{flex:0 0 100%;min-width:100%;font-size:12px;padding:18px 12px}
+  .rizq-style-card{
+    flex:0 0 138px;
+    width:138px;
+    border-radius:12px;
+    scroll-snap-align:start;
+    box-shadow:0 2px 10px rgba(13,27,42,.06);
+  }
+  .rizq-style-card:hover{transform:none;box-shadow:0 2px 10px rgba(13,27,42,.06)}
+  .rizq-style-mosaic{height:96px;gap:2px}
+  .rizq-style-tile{font-size:20px}
+  .rizq-style-tile:first-child{font-size:30px}
+  .rizq-style-body{padding:8px 8px 10px;gap:3px}
+  .rizq-style-badge{font-size:8.5px;padding:1px 6px;margin-bottom:0}
+  .rizq-style-name{font-size:11px;font-weight:700;-webkit-line-clamp:2}
+  .rizq-style-meta{font-size:9.5px;display:none}
+  .rizq-style-cta{font-size:10px;padding-top:4px}
+}
 
 /* ── شريط "قريباً" — اهتمام حقيقي بالأقسام المغلقة (طلب Limam 03/08/2026) ── */
 .cs-strip{background:linear-gradient(135deg,#0D1B2A,#1B3A6B);padding:22px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px}
@@ -2461,6 +2660,25 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
     </div>
   </div>
 </section>
+
+<!-- ══ أفكار أنماط — النظام يقترح عشوائياً (رجالي / نسائي) ══ -->
+<section id="rizq-styles" class="rizq-styles-section" aria-labelledby="rizq-styles-title">
+  <div class="rizq-styles-inner">
+    <div class="section-header fade-in">
+      <p class="section-tag">Style Ideas</p>
+      <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
+      <p class="section-desc" data-t="sty-desc">يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة</p>
+      <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
+      <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
+    </div>
+    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجالي أو نسائي">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-sty-gender="men" id="sty-tab-men" onclick="setStyleGender('men')">👔 <span data-t="sty-men">رجالي</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="women" id="sty-tab-women" onclick="setStyleGender('women')">🧕 <span data-t="sty-women">نسائي</span></button>
+    </div>
+    <div class="rizq-styles-rail fade-in" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
+  </div>
+</section>
+
 <!-- ══ المكاتب الافتراضية ══ -->
 <section id="virtual-offices" style="padding:48px 20px;background:var(--bg-section);position:relative;overflow:hidden">
 
@@ -2781,10 +2999,10 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag" style="color:var(--gold)">Rizq Investments</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--navy)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
       </h2>
-      <p style="color:#5b6b85;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t-fr="Présentez votre projet d'investissement, trouvez des partenaires, et connectez-vous dans un espace sérieux réservé aux opportunités réelles.">
+      <p class="section-desc" style="color:rgba(255,255,255,.9);font-size:15px;max-width:640px;margin:0 auto;line-height:1.8;font-weight:600" data-t-fr="Présentez votre projet d'investissement, trouvez des partenaires, et connectez-vous dans un espace sérieux réservé aux opportunités réelles.">
         اعرض مشروعك الاستثماري، ابحث عن شركاء، وتواصل في فضاء جاد مخصّص للفرص الحقيقية.
       </p>
     </div>
@@ -4014,6 +4232,8 @@ const ADS=[
   {id:105,emoji:'🚛',bg:'linear-gradient(135deg,#0f2347,#162235)',cat:'🚛 شاحنات',catKey:'شاحنات',title:'شاحنة مرسيدس Actros 2020',titleFR:'Camion Mercedes Actros 2020',desc:'شاحنة نقل ثقيل، محرك 500 حصان، جاهزة للعمل الفوري، وثائق كاملة وسجل صيانة متكامل.',descFR:'Camion de transport lourd, moteur 500 chevaux, prêt à l\'emploi immédiat, documents complets et carnet d\'entretien intégral.',price:'18,000,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['2020','500 HP','Actros','صيانة كاملة'],tagsFR:['2020','500 ch','Actros','Entretien complet'],seller:'شركة النقل الموريتانية',sellerFR:'Société de Transport Mauritanienne',sellerMeta:'★★★★★ — شركة موثّقة',sellerMetaFR:'★★★★★ — Entreprise vérifiée',sellerEmoji:'🏢',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée'},
   {id:106,emoji:'🏠',bg:'linear-gradient(135deg,#234d8f,#0f2347)',cat:'🏠 عقارات',catKey:'عقارات',title:'أرض للبيع — نواذيبو',titleFR:'Terrain à vendre — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي، قريبة من الميناء، مساحة 600 متر، وثائق قانونية كاملة.',descFR:'Terrain résidentiel idéalement situé, proche du port, superficie de 600 m², documents légaux complets.',price:'4,500,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['600 م²','سكني','وثائق كاملة','قرب الميناء'],tagsFR:['600 m²','Résidentiel','Documents complets','Proche du port'],seller:'سيدي محمد',sellerFR:'Sidi Mohamed',sellerMeta:'★★★★☆ — بائع موثّق',sellerMetaFR:'★★★★☆ — Vendeur vérifié',sellerEmoji:'🏠',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:107,emoji:'👗',bg:'linear-gradient(135deg,#1B3A6B,#162235)',cat:'👗 أزياء',catKey:'أزياء',title:'دراعة موريتانية فاخرة مطرزة',titleFR:'Daraa mauritanienne de luxe brodée',desc:'دراعة رجالية من أفضل أقمشة الجاكار المستورد، تطريز يدوي أصيل، مقاسات متعددة.',descFR:'Daraa pour homme dans le meilleur tissu jacquard importé, broderie artisanale authentique, plusieurs tailles disponibles.',price:'45,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['جاكار','تطريز يدوي','فاخر','مقاسات متعددة'],tagsFR:['Jacquard','Broderie artisanale','Luxe','Plusieurs tailles'],seller:'مرتضى حبيب',sellerFR:'Mortada Habib',sellerMeta:'★★★★★ — خياط محترف',sellerMetaFR:'★★★★★ — Tailleur professionnel',sellerEmoji:'👗',status:'✅ موثّق',statusFR:'✅ Vérifié'},
+  {id:111,emoji:'🧕',bg:'linear-gradient(135deg,#6b2d4a,#3d1a2c)',cat:'👗 أزياء',catKey:'أزياء',title:'ملحفة حريرية فاخرة — نقش تقليدي',titleFR:'Melhfa en soie de luxe — motif traditionnel',desc:'ملحفة نسائية من الحرير الناعم، ألوان زاهية ونقش موريتاني أصيل، مثالية للمناسبات.',descFR:'Melhfa femme en soie douce, couleurs vives et motif mauritanien authentique, idéale pour les occasions.',price:'38,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حرير','نسائي','نقش تقليدي','مناسبات'],tagsFR:['Soie','Femme','Motif traditionnel','Occasions'],seller:'ورشة الأناقة',sellerFR:'Atelier Élégance',sellerMeta:'★★★★★ — خياطة موثّقة',sellerMetaFR:'★★★★★ — Couturière vérifiée',sellerEmoji:'🧕',status:'✅ موثّق',statusFR:'✅ Vérifié'},
+  {id:112,emoji:'💍',bg:'linear-gradient(135deg,#7a4a00,#3a2200)',cat:'🪙 ذهب ومجوهرات',catKey:'ذهب',title:'أسورة ذهب عيار 21 — تصميم نسائي',titleFR:'Bracelet or 21 carats — design femme',desc:'أسورة ذهب نسائية عيار 21، وزن 12 غرام، تصميم أنيق مع شهادة أصالة.',descFR:'Bracelet femme en or 21 carats, 12g, design élégant avec certificat d\'authenticité.',price:'110,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['21 عيار','نسائي','12 غرام','شهادة'],tagsFR:['21 carats','Femme','12g','Certificat'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',sellerEmoji:'💍',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:108,emoji:'🔧',bg:'linear-gradient(135deg,#162235,#234d8f)',cat:'🔧 خدمات',catKey:'خدمات',title:'مهندس كهرباء — خدمة منزلية',titleFR:'Ingénieur électricien — service à domicile',desc:'خبرة 10 سنوات في الكهرباء المنزلية والصناعية، شبكات شمسية، تمديدات وصيانة فورية.',descFR:'10 ans d\'expérience en électricité domestique et industrielle, installations solaires, câblage et maintenance rapide.',price:'تواصل للسعر',priceFR:'Contacter pour le prix',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['كهرباء','طاقة شمسية','10 سنوات خبرة','متاح 24/7'],tagsFR:['Électricité','Énergie solaire','10 ans d\'expérience','Disponible 24/7'],seller:'سليمان بكار',sellerFR:'Souleymane Bakar',sellerMeta:'★★★★☆ — حرفي موثّق',sellerMetaFR:'★★★★☆ — Artisan vérifié',sellerEmoji:'🔧',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:109,emoji:'🐄',bg:'linear-gradient(135deg,#0f2347,#1B3A6B)',cat:'🐄 ماشية',catKey:'ماشية',title:'بقر للبيع — 8 رؤوس بصحة جيدة',titleFR:'Vaches à vendre — 8 têtes en bonne santé',desc:'أبقار لحم وحلوب، محصّنة ضد الأمراض، شهادات بيطرية، جاهزة للتسليم في ترارزة.',descFR:'Vaches à viande et laitières, vaccinées, certificats vétérinaires, prêtes à livrer à Trarza.',price:'960,000 MRU',loc:'📍 ترارزة',locFR:'📍 Trarza',tags:['8 رؤوس','لحم وحلوب','محصّنة','ترارزة'],tagsFR:['8 têtes','Viande & lait','Vaccinées','Trarza'],seller:'محفوظ بربر',sellerFR:'Mahfoudh Berbar',sellerMeta:'★★★☆☆ — مزارع',sellerMetaFR:'★★★☆☆ — Agriculteur',sellerEmoji:'🐄',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification'},
   {id:110,emoji:'🧱',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🧱 بناء',catKey:'بناء',title:'ألواح شمسية 300W — مستعملة',titleFR:'Panneaux solaires 300W — occasion',desc:'10 ألواح شمسية 300W بحالة جيدة، استُعملت 2 سنة فقط، مع متحكم شحن MPPT 40A.',descFR:'10 panneaux solaires 300W en bon état, utilisés seulement 2 ans, avec régulateur de charge MPPT 40A.',price:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['300W','10 ألواح','MPPT 40A','2 سنوات'],tagsFR:['300W','10 panneaux','MPPT 40A','2 ans'],seller:'تقنيات الطاقة',sellerFR:'Technologies de l\'Énergie',sellerMeta:'★★★★☆ — شركة موثّقة',sellerMetaFR:'★★★★☆ — Entreprise vérifiée',sellerEmoji:'🏢',status:'✅ موثّق',statusFR:'✅ Vérifié'},
@@ -4155,6 +4375,326 @@ function buildFeaturedCards(){
   }).join('');
 }
 buildFeaturedCards();
+
+/* ── Style Ideas: النظام يقترح عشوائياً ويميّز رجالي / نسائي ── */
+var _rizqStyleGender = 'men';
+var RIZQ_STYLE_MEN_HINTS = /دراعة|رجالي|رجل|رجال|homme|men'?s?|daraa|قميص|بدلة|حذاء\s*رجالي|ملابس\s*رجالي/i;
+var RIZQ_STYLE_WOMEN_HINTS = /ملحفة|نسائي|نساء|امرأة|femme|women|melhfa|عباية|فستان|حقيبة|طرح|حجاب|مكياج|عطر|مجوهرات\s*نسائي|ملابس\s*نسائي/i;
+var RIZQ_STYLE_MEN_TEMPLATES = [
+  { ar:'أناقة الدراعة', fr:'Élégance Daraa', emoji:['👔','📿','🩴'], cats:['أزياء'], browseSub:'دراعة رجالية' },
+  { ar:'إطلالة رجالية يومية', fr:'Look homme du quotidien', emoji:['🧥','⌚','👟'], cats:['أزياء','إلكترونيات'], browseSub:'ملابس رجالية' },
+  { ar:'لمسة ذهبية رجالية', fr:'Touche d\'or homme', emoji:['🪙','⌚','📿'], cats:['ذهب','أزياء'], browseSub:'' },
+  { ar:'تقنية رجالية', fr:'Tech homme', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'' }
+];
+var RIZQ_STYLE_WOMEN_TEMPLATES = [
+  { ar:'أناقة الملحفة', fr:'Élégance Melhfa', emoji:['🧕','💍','👜'], cats:['أزياء'], browseSub:'ملحفة نسائية' },
+  { ar:'إطلالة ذهبية نسائية', fr:'Touche d\'or femme', emoji:['🪙','💍','✨'], cats:['ذهب','أزياء'], browseSub:'' },
+  { ar:'عناية وجمال', fr:'Soins & beauté', emoji:['🌿','🧴','✨'], cats:['صحة وجمال','أزياء'], browseSub:'' },
+  { ar:'أناقة نسائية يومية', fr:'Look femme du quotidien', emoji:['👗','👜','👠'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال' }
+];
+
+function _styShuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+function _styEsc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _styAdBlob(a){
+  if(!a) return '';
+  return [a.title,a.titleFR,a.desc,a.descFR,a.cat,a.catKey,(a.tags||[]).join(' '),(a.tagsFR||[]).join(' ')].join(' ');
+}
+function _styDetectGender(a){
+  var blob = _styAdBlob(a);
+  var men = RIZQ_STYLE_MEN_HINTS.test(blob);
+  var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
+  if(men && !women) return 'men';
+  if(women && !men) return 'women';
+  if(men && women) return 'both';
+  var k = String(a.catKey||'');
+  if(/ذهب|صحة|جمال|إلكترون/.test(k)) return 'both';
+  if(/أزياء|موضة/.test(k)) return 'both';
+  return 'neutral';
+}
+function _styPool(){
+  var seen = {};
+  var out = [];
+  function add(list){
+    (list||[]).forEach(function(a){
+      if(!a || a.id==null) return;
+      var id = String(a.id);
+      if(seen[id]) return;
+      seen[id] = 1;
+      out.push(a);
+    });
+  }
+  if(typeof ADS !== 'undefined') add(ADS);
+  if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
+  return out;
+}
+function _styMatchGender(a, gender){
+  var g = _styDetectGender(a);
+  return g === gender || g === 'both';
+}
+function _styIsStyleCat(a){
+  var k = String((a && a.catKey) || '');
+  return /أزياء|موضة|ذهب|صحة|جمال|إلكترون/.test(k);
+}
+function _styPickCompanions(primary, pool, gender, n){
+  var stylePool = pool.filter(_styIsStyleCat);
+  var same = stylePool.filter(function(a){
+    return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
+      (a.catKey === primary.catKey || /ذهب|أزياء|صحة|إلكترون/.test(String(a.catKey||'')));
+  });
+  var picks = _styShuffle(same).slice(0, n);
+  if(picks.length < n){
+    var rest = _styShuffle(stylePool.filter(function(a){
+      return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
+        !picks.some(function(p){ return String(p.id)===String(a.id); });
+    }));
+    picks = picks.concat(rest.slice(0, n - picks.length));
+  }
+  return picks;
+}
+function _styTileHtml(ad, fallbackEmoji, fallbackBg){
+  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
+  var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
+  if(src){
+    return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></div>';
+  }
+  return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+emoji+'</div>';
+}
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg){
+  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  if(src){
+    return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></div>';
+  }
+  return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</div>';
+}
+
+/* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
+var RIZQ_STYLE_SEED_KEY = 'rizq_style_seeds';
+var RIZQ_STYLE_AUTO_MS = 3 * 60 * 1000;
+var _rizqStyleAutoTimer = null;
+var _rizqStyleNextAt = 0;
+
+function _styLoadSeeds(){
+  try {
+    var raw = JSON.parse(localStorage.getItem(RIZQ_STYLE_SEED_KEY) || '[]');
+    if(!Array.isArray(raw)) return [];
+    var now = Date.now();
+    return raw.filter(function(s){ return s && s.ts && (now - s.ts) < 7*24*3600*1000; }).slice(0, 12);
+  } catch(e){ return []; }
+}
+function _stySaveSeeds(list){
+  try { localStorage.setItem(RIZQ_STYLE_SEED_KEY, JSON.stringify((list||[]).slice(0, 12))); } catch(e){}
+}
+function rizqFeedStyleSeed(item){
+  if(!item) return;
+  var title = String(item.title || item.name || '').trim();
+  if(!title) return;
+  var blob = [title, item.titleFR || item.nameF || '', item.desc || '', item.cat || '', item.catKey || ''].join(' ');
+  var men = RIZQ_STYLE_MEN_HINTS.test(blob);
+  var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
+  var gender = 'both';
+  if(men && !women) gender = 'men';
+  else if(women && !men) gender = 'women';
+  else {
+    var k = String(item.catKey || item.cat || '');
+    if(/ذهب|صحة|جمال|إلكترون|أزياء|موضة|fashion|mode/i.test(k) || men || women) gender = 'both';
+    else if(!_styIsStyleCat({ catKey: k }) && !/أزياء|موضة|ذهب|صحة|جمال|إلكترون|دراعة|ملحفة|daraa|melhfa/i.test(blob)){
+      return; /* ليس منتج أناقة — تجاهل */
+    }
+  }
+  var images = [];
+  if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
+  else if(item.image) images = [item.image];
+  var seed = {
+    id: String(item.id != null ? item.id : ('seed-' + Date.now())),
+    title: title,
+    titleFR: String(item.titleFR || item.nameF || title),
+    emoji: item.emoji || '✨',
+    cat: item.cat || '',
+    catKey: item.catKey || item.cat || 'أزياء',
+    images: images,
+    gender: gender,
+    href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
+    bg: item.bg || 'linear-gradient(145deg,#1B3A6B,#0f2347)',
+    fromView: true,
+    ts: Date.now()
+  };
+  var list = _styLoadSeeds().filter(function(s){ return String(s.id) !== String(seed.id); });
+  list.unshift(seed);
+  _stySaveSeeds(list);
+  if(typeof buildStyleIdeas === 'function' && document.getElementById('rizq-styles-rail')){
+    if(seed.gender === 'men' || seed.gender === 'women') setStyleGender(seed.gender);
+    else buildStyleIdeas(true);
+  }
+}
+window.rizqFeedStyleSeed = rizqFeedStyleSeed;
+
+function _styUpdateTick(fr){
+  var el = document.getElementById('rizq-styles-tick');
+  if(!el) return;
+  if(!_rizqStyleNextAt){ el.textContent = ''; return; }
+  var left = Math.max(0, _rizqStyleNextAt - Date.now());
+  var mins = Math.floor(left / 60000);
+  var secs = Math.floor((left % 60000) / 1000);
+  var mm = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  el.textContent = fr
+    ? ('🔄 Prochain renouvellement dans ' + mm)
+    : ('🔄 التجديد التلقائي خلال ' + mm);
+}
+function _styStartAutoRefresh(){
+  if(_rizqStyleAutoTimer) clearInterval(_rizqStyleAutoTimer);
+  _rizqStyleNextAt = Date.now() + RIZQ_STYLE_AUTO_MS;
+  _rizqStyleAutoTimer = setInterval(function(){
+    if(document.hidden) return;
+    _rizqStyleNextAt = Date.now() + RIZQ_STYLE_AUTO_MS;
+    try { buildStyleIdeas(true); } catch(e){}
+  }, RIZQ_STYLE_AUTO_MS);
+  setInterval(function(){
+    var fr = false;
+    try {
+      if(typeof isAr !== 'undefined') fr = !isAr;
+      else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+    } catch(e){}
+    _styUpdateTick(fr);
+  }, 1000);
+  try {
+    var fr0 = (typeof isAr !== 'undefined') ? !isAr : false;
+    _styUpdateTick(fr0);
+  } catch(e2){}
+}
+
+function setStyleGender(gender){
+  if(gender !== 'men' && gender !== 'women') gender = 'men';
+  _rizqStyleGender = gender;
+  document.querySelectorAll('.rizq-styles-gtab').forEach(function(btn){
+    var on = btn.getAttribute('data-sty-gender') === gender;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  var rail = document.getElementById('rizq-styles-rail');
+  if(rail) rail.setAttribute('aria-labelledby', gender === 'women' ? 'sty-tab-women' : 'sty-tab-men');
+  buildStyleIdeas(false);
+}
+function buildStyleIdeas(reshuffle){
+  var rail = document.getElementById('rizq-styles-rail');
+  if(!rail) return;
+  var fr = false;
+  try {
+    if(typeof isAr !== 'undefined') fr = !isAr;
+    else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+  } catch(e) {}
+  var gender = _rizqStyleGender === 'women' ? 'women' : 'men';
+  var templates = gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES;
+  var pool = _styPool();
+  var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
+  var seeds = _styLoadSeeds().filter(function(s){
+    return s.gender === gender || s.gender === 'both';
+  });
+  var tplList = _styShuffle(templates).slice(0, 3);
+  var usedIds = {};
+  var cards = [];
+  var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
+  var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
+
+  /* بطاقة أولى من آخر منتج شاهدته (دراعة من محل، إعلان أزياء…) */
+  if(seeds.length){
+    var seed = seeds[0];
+    usedIds[String(seed.id)] = 1;
+    var seedImgs = (seed.images || []).slice(0, 3);
+    while(seedImgs.length < 3) seedImgs.push(null);
+    var seedTiles = '';
+    for(var si=0; si<3; si++){
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg);
+      else seedTiles += _styTileHtml({ emoji: seed.emoji, bg: seed.bg, images: [] }, (gender==='women'?RIZQ_STYLE_WOMEN_TEMPLATES:RIZQ_STYLE_MEN_TEMPLATES)[0].emoji[si], seed.bg);
+    }
+    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
+    var genderBadge0 = gender === 'women' ? (fr ? 'Femme' : 'نسائي') : (fr ? 'Homme' : 'رجالي');
+    cards.push(
+      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seed.href||'#')+'" data-sty-gender="'+gender+'" data-sty-seed="1">'
+      + '<div class="rizq-style-mosaic" aria-hidden="true">'+seedTiles+'</div>'
+      + '<div class="rizq-style-body">'
+      +   '<div class="rizq-style-from-view">'+_styEsc(fromViewLbl)+'</div>'
+      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge0)+'</div>'
+      +   '<div class="rizq-style-name">'+_styEsc(seedName)+'</div>'
+      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك')+'</div>'
+      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
+      + '</div></a>'
+    );
+    tplList = tplList.slice(0, 2);
+  }
+
+  tplList.forEach(function(tpl){
+    var styleGendered = gendered.filter(_styIsStyleCat);
+    var catPool = styleGendered.filter(function(a){
+      var k = String(a.catKey||'');
+      return (tpl.cats||[]).some(function(c){ return k === c || k.indexOf(c)>=0 || c.indexOf(k)>=0; }) && !usedIds[String(a.id)];
+    });
+    if(!catPool.length) catPool = styleGendered.filter(function(a){ return !usedIds[String(a.id)]; });
+    if(!catPool.length) catPool = pool.filter(function(a){ return _styIsStyleCat(a) && !usedIds[String(a.id)]; });
+    var primary = catPool.length ? _styShuffle(catPool)[0] : null;
+    if(primary) usedIds[String(primary.id)] = 1;
+    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool.filter(_styIsStyleCat), gender, 2) : [];
+    companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
+    var items = primary ? [primary].concat(companions) : [];
+    while(items.length < 3) items.push(null);
+    var name = fr ? tpl.fr : tpl.ar;
+    var metaParts = items.filter(Boolean).map(function(a){
+      var d = (typeof trAd === 'function') ? trAd(a) : a;
+      return String((d && (d.title || a.title)) || '').slice(0, 28);
+    }).filter(Boolean);
+    if(!metaParts.length) metaParts = [fr ? 'Suggestion Rizq' : 'اقتراح رزق'];
+    var href;
+    if(primary && primary.id){
+      href = 'rizq_browse.html?id=' + encodeURIComponent(primary.id);
+    } else if(tpl.browseSub){
+      href = 'rizq_browse.html?cat=' + encodeURIComponent('أزياء') + '&sub=' + encodeURIComponent(tpl.browseSub);
+    } else if((tpl.cats||[])[0]){
+      href = 'rizq_browse.html?cat=' + encodeURIComponent(tpl.cats[0]);
+    } else {
+      href = 'rizq_browse.html';
+    }
+    var genderBadge = gender === 'women' ? (fr ? 'Femme' : 'نسائي') : (fr ? 'Homme' : 'رجالي');
+    var tiles = '';
+    for(var ti=0; ti<3; ti++){
+      tiles += _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg);
+    }
+    cards.push(
+      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(href)+'" data-sty-gender="'+gender+'">'
+      + '<div class="rizq-style-mosaic" aria-hidden="true">'+tiles+'</div>'
+      + '<div class="rizq-style-body">'
+      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge)+'</div>'
+      +   '<div class="rizq-style-name">'+_styEsc(name)+'</div>'
+      +   '<div class="rizq-style-meta">'+_styEsc(metaParts.join(' · '))+'</div>'
+      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
+      + '</div></a>'
+    );
+  });
+
+  if(!cards.length){
+    rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
+      ? 'Pas encore assez d\'annonces pour suggérer des looks. Revenez bientôt.'
+      : 'لا توجد إعلانات كافية بعد لاقتراح إطلالات. عد لاحقاً.')+'</div>';
+    return;
+  }
+  rail.innerHTML = cards.join('');
+  if(reshuffle){
+    try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
+    catch(e2) { rail.scrollLeft = 0; }
+  }
+  _styUpdateTick(fr);
+}
+try { buildStyleIdeas(false); } catch(eSty) {}
+try { _styStartAutoRefresh(); } catch(eAuto) {}
 
 // ── QCAT PORTAL ──
 var QCAT_DATA = (typeof RizqCategories !== 'undefined') ? RizqCategories.qcatData() : {
@@ -4438,6 +4978,22 @@ function qcatBrowseAll() {
 // هناك) + ?id= في الرابط، حتى تُعرض المواصفات/الوسوم الحقيقية بدل محتوى تجريبي ثابت.
 function goToListing(a) {
   if (!a) return;
+  try {
+    if(typeof rizqFeedStyleSeed === 'function'){
+      rizqFeedStyleSeed({
+        id: a.id,
+        title: a.title,
+        titleFR: a.titleFR || a.titleFr || '',
+        desc: a.desc || '',
+        emoji: a.emoji,
+        cat: a.cat,
+        catKey: a.catKey,
+        images: Array.isArray(a.images) ? a.images : [],
+        bg: a.bg,
+        href: 'rizq_browse.html?id=' + encodeURIComponent(a.id)
+      });
+    }
+  } catch(eFeed) {}
   const verified = /موثّق|Vérifié/.test(a.status || '') || !!a.verified;
   const imgs = Array.isArray(a.images) ? a.images.filter(Boolean) : [];
   const handoff = {
@@ -4829,6 +5385,7 @@ function applyList(list){
     });
     refreshAllAdsIndex();
     if(typeof buildCards==='function') buildCards();
+    if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
     renderTickerFromAds();
@@ -5302,6 +5859,13 @@ const LANG = {
     'ft-sig': '<span>بتوقيع</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
+    'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
+    'sty-desc': 'يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة',
+    'sty-reshuffle': '🔀 اقتراحات جديدة',
+    'sty-men': 'رجالي',
+    'sty-women': 'نسائي',
+    'sty-cta': 'تسوّق الإطلالة',
+    'sty-from-view': 'من مشاهدتك',
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
@@ -5389,6 +5953,13 @@ const LANG = {
     'ft-sig': '<span>Signé par</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
+    'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
+    'sty-desc': 'Se renouvelle toutes les 3 minutes, ou quand vous ouvrez un produit (ex. daraa en boutique) — ses photos apparaissent dans le look',
+    'sty-reshuffle': '🔀 Nouvelles suggestions',
+    'sty-men': 'Homme',
+    'sty-women': 'Femme',
+    'sty-cta': 'Voir le look',
+    'sty-from-view': 'Vu récemment',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
     'qc-home':'Électroménager','qc-energy':'Énergie','qc-travel':'Voyages',
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services',
@@ -5759,6 +6330,10 @@ function applyLandingLang(toAr) {
   if(liveTag) liveTag.textContent = isAr ? 'نشط على رزق' : 'Actif sur Rizq';
   const allAdsTag = document.querySelector('#all-ads-modal .section-tag');
   if(allAdsTag) allAdsTag.textContent = isAr ? 'جميع الإعلانات' : 'Toutes les annonces';
+  const stylesTag = document.querySelector('#rizq-styles .section-tag');
+  if(stylesTag) stylesTag.textContent = isAr ? 'أفكار الأنماط' : 'Idées de style';
+  var styReshuffle = document.getElementById('rizq-styles-reshuffle');
+  if(styReshuffle) styReshuffle.setAttribute('aria-label', isAr ? 'اقتراحات جديدة' : 'Nouvelles suggestions');
 
   // Footer carrier labels (brand names — Latin transliteration in FR)
   const carrierFR = ['Mauritel:','Mattel:','Chinguitel:'];
@@ -5815,6 +6390,7 @@ function applyLandingLang(toAr) {
   const track = document.getElementById('cards-track');
   if(track) { track.innerHTML=''; buildCards(); if(typeof renderPrices==='function') renderPrices(); }
   if(typeof buildFeaturedCards==='function') buildFeaturedCards();
+  if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
   // إصلاح حقيقي: شريط أسعار السوق المتحرك (#price-ticker) كان يُترجم في لوحة الأسعار
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();

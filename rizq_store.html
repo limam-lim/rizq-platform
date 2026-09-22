@@ -361,6 +361,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   font-size:56px;position:relative;overflow:hidden;
   transition:transform .4s ease;
 }
+.product-img img{width:100%;height:100%;object-fit:cover;display:block}
 .product-card:hover .product-img{transform:scale(1.06)}
 /* معرض الصور + معلومات إضافية داخل نافذة "عرض سريع" */
 .qv-gallery-main{height:220px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#0f2038,#16294a);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px}
@@ -1212,6 +1213,34 @@ function openQuickView(id, name, price, emoji, cat){
     };
   }
   document.getElementById('qv-modal-overlay').classList.add('open');
+  try {
+    var seedImages = images.slice();
+    var storeHref = location.pathname.split('/').pop() + location.search;
+    var feed = {
+      id: 'store-' + id,
+      title: name,
+      titleFR: name,
+      emoji: emoji || '📦',
+      cat: cat || '',
+      catKey: cat || 'أزياء',
+      images: seedImages,
+      href: storeHref || ('rizq_store.html' + location.search)
+    };
+    /* حفظ محلي حتى لو لم تكن صفحة الهبوط محمّلة */
+    var KEY = 'rizq_style_seeds';
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
+    var men = /دراعة|رجالي|homme|daraa|قميص/i.test(name + ' ' + (cat||''));
+    var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(name + ' ' + (cat||''));
+    feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
+    feed.ts = Date.now();
+    feed.fromView = true;
+    feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+    list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
+    list.unshift(feed);
+    localStorage.setItem(KEY, JSON.stringify(list.slice(0, 12)));
+    if(typeof window.rizqFeedStyleSeed === 'function') window.rizqFeedStyleSeed(feed);
+  } catch(eSeed) {}
 }
 function closeQuickView(){
   document.getElementById('qv-modal-overlay').classList.remove('open');
@@ -1695,10 +1724,11 @@ function rizqShare(title, url) {
             if(grid){
               grid.innerHTML = products.map(function(p, i){
                 var pid = i + 1;
+                var imgs = (p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []);
                 featured[pid] = { name: p.name, nameF: p.name, price: Number(p.price)||0, emoji: p.emoji || '📦' };
                 window._qvProductsMap = window._qvProductsMap || {};
                 window._qvProductsMap[pid] = {
-                  images: (p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []),
+                  images: imgs.slice(),
                   desc: p.desc || '',
                   descFr: '',
                   stock: p.stock
@@ -1707,8 +1737,11 @@ function rizqShare(title, url) {
                 var priceTxt = (Number(p.price)||0).toLocaleString('en-US') + ' MRU';
                 var tagHtml = p.status === 'limited' ? '<span class="product-tag product-tag-hot">⚠️ ' + (isFr()?'Stock limité':'كمية محدودة') + '</span>'
                             : p.status === 'out' ? '<span class="product-tag" style="background:#9aa;color:#fff">❌ ' + (isFr()?'Épuisé':'نفذ') + '</span>' : '';
+                var imgInner = imgs[0]
+                  ? '<img src="' + esc(imgs[0]) + '" alt="" loading="lazy" decoding="async"/>'
+                  : esc(p.emoji || '📦');
                 return '<div class="product-card" data-cat="' + esc(p.cat||'') + '" onclick="openQuickView(' + pid + ',\'' + esc(p.name).replace(/'/g,"\\'") + '\',\'' + priceTxt + '\',\'' + (p.emoji||'📦') + '\',\'' + esc(p.cat||'').replace(/'/g,"\\'") + '\')">'
-                  + '<div class="product-img">' + esc(p.emoji || '📦')
+                  + '<div class="product-img">' + imgInner
                   + tagHtml
                   + '<button class="wish-btn" data-wish-id="' + pid + '" onclick="event.stopPropagation();rizqRequireAuth(function(){toggleWish(' + pid + ',\'' + esc(p.name).replace(/'/g,"\\'") + '\',\'' + priceTxt + '\',\'' + (p.emoji||'📦') + '\')},\'reasonFav\')">♡</button>'
                   + '<div class="product-quickview"><button class="qv-btn" onclick="event.stopPropagation();openQuickView(' + pid + ',\'' + esc(p.name).replace(/'/g,"\\'") + '\',\'' + priceTxt + '\',\'' + (p.emoji||'📦') + '\',\'' + esc(p.cat||'').replace(/'/g,"\\'") + '\')">👁 ' + (isFr()?'Aperçu':'عرض سريع') + '</button></div>'
@@ -1860,16 +1893,20 @@ function rizqShare(title, url) {
                   var pid = 'B' + p.id;
                   window.STORE_FEATURED_PRODUCTS[pid] = { name:p.name, nameF:p.name, price:Number(p.price)||0, emoji:p.emoji||'📦' };
                   window._qvProductsMap = window._qvProductsMap || {};
+                  var bImgs = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
                   window._qvProductsMap[pid] = {
-                    images: (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []),
+                    images: bImgs,
                     desc: p.desc || '',
                     descFr: p.descFr || '',
                     stock: p.stock
                   };
                   if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
                   var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
+                  var imgInner = bImgs[0]
+                    ? '<img src="'+esc(bImgs[0])+'" alt="" loading="lazy" decoding="async"/>'
+                    : esc(p.emoji||'📦');
                   addedHtml += '<div class="product-card" data-cat="'+esc(p.cat||'')+'" onclick="openQuickView(\''+pid+'\',\''+esc(p.name).replace(/'/g,"\\'")+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+esc(p.cat||'').replace(/'/g,"\\'")+'\')">'
-                    + '<div class="product-img">'+esc(p.emoji||'📦')+'</div>'
+                    + '<div class="product-img">'+imgInner+'</div>'
                     + '<div class="product-info">'
                     + '<div class="product-name">'+esc(p.name)+'</div>'
                     + '<div class="product-price">'+priceTxt+'</div>'
