@@ -72,20 +72,25 @@ function seedFromLegacyAccounts(legacyAccounts) {
 }
 
 /**
- * يضمن وجود سوبر أدمن المالك (البريد الدائم) في admin-team.json.
+ * يضمن وجود سوبر أدمن المالك (البريد الدائم) في فريق الإدارة.
  * المصدر: SUPER_ADMIN_EMAIL + SUPER_ADMIN_PASS_HASH من .env، أو ownerSpec من الكود.
+ *
+ * مهم: لا نستبدل passHash الموجود عند كل إقلاع — وإلا تلغى كلمة السر
+ * التي غيّرها الأدمن من اللوحة. لإعادة فرض هاش .env استخدم SUPER_ADMIN_FORCE_PASS_HASH=1.
  */
 function ensureOwnerSuperAdmin(ownerSpec) {
   const email = String(
     (ownerSpec && ownerSpec.email) || process.env.SUPER_ADMIN_EMAIL || ''
   ).trim().toLowerCase();
-  const passHash = String(
+  const envPassHash = String(
     (ownerSpec && ownerSpec.passHash) || process.env.SUPER_ADMIN_PASS_HASH || ''
   ).trim();
-  const name = String((ownerSpec && ownerSpec.name) || 'M. LIMAM').trim() || 'M. LIMAM';
+  const name = String((ownerSpec && ownerSpec.name) || process.env.SUPER_ADMIN_NAME || 'M. LIMAM').trim() || 'M. LIMAM';
   const user = String((ownerSpec && ownerSpec.user) || email).trim().toLowerCase() || email;
-  if (!email || !passHash || !passHash.startsWith('$2')) return readTeam();
+  if (!email || !envPassHash || !envPassHash.startsWith('$2')) return readTeam();
 
+  const forcePass = String(process.env.SUPER_ADMIN_FORCE_PASS_HASH || '').trim() === '1'
+    || !!(ownerSpec && ownerSpec.forcePassHash);
   const list = readTeam();
   const now = new Date().toISOString();
   let idx = list.findIndex((m) => {
@@ -94,7 +99,7 @@ function ensureOwnerSuperAdmin(ownerSpec) {
     return e === email || u === email || u === user;
   });
   if (idx === -1) {
-    // ترقية/استبدال حساب admin القديم القديم إن وُجد
+    // ترقية/استبدال حساب admin السابق الوحيد إن وُجد
     idx = list.findIndex((m) => String(m.user || '').toLowerCase() === 'admin' && (m.permissions || []).includes('*'));
   }
   if (idx === -1) {
@@ -102,7 +107,7 @@ function ensureOwnerSuperAdmin(ownerSpec) {
       id: genAdminId(),
       user,
       email,
-      passHash,
+      passHash: envPassHash,
       name,
       phone: '',
       notes: 'سوبر أدمن المالك — دائم',
@@ -114,10 +119,14 @@ function ensureOwnerSuperAdmin(ownerSpec) {
     });
   } else {
     const row = list[idx];
+    const existingHash = String(row.passHash || '').trim();
     row.user = user;
     row.email = email;
     row.name = name;
-    row.passHash = passHash;
+    // احفظ كلمة السر التي عُيّنت من اللوحة؛ لا تُعد الكتابة من .env إلا عند الإنشاء/الإجبار/هاش تالف
+    if (forcePass || !existingHash.startsWith('$2')) {
+      row.passHash = envPassHash;
+    }
     row.permissions = ['*'];
     row.active = true;
     row.legacyRole = 'super';
@@ -138,6 +147,55 @@ function ensureOwnerSuperAdmin(ownerSpec) {
 
   writeTeam(list);
   return list;
+}
+
+/**
+ * تغيير كلمة مرور العضو الحالي (يتطلب كلمة السر الحالية).
+ * لا يحتاج صلاحية team.manage — أي أدمن مسجّل دخوله.
+ */
+async function changeOwnPassword(loginUser, currentPass, newPass) {
+  const u = String(loginUser || '').trim().toLowerCase();
+  const cur = String(currentPass || '');
+  const next = String(newPass || '');
+  if (!u || !cur || !next) {
+    const err = new Error('missing_fields');
+    err.code = 'missing_fields';
+    throw err;
+  }
+  if (next.length < 8) {
+    const err = new Error('weak_password');
+    err.code = 'weak_password';
+    throw err;
+  }
+  if (next === cur) {
+    const err = new Error('same_password');
+    err.code = 'same_password';
+    throw err;
+  }
+  const list = readTeam();
+  const idx = list.findIndex((m) => {
+    if (m.active === false) return false;
+    const loginU = String(m.user || '').trim().toLowerCase();
+    const loginE = String(m.email || '').trim().toLowerCase();
+    return loginU === u || (loginE && loginE === u);
+  });
+  if (idx === -1) {
+    const err = new Error('not_found');
+    err.code = 'not_found';
+    throw err;
+  }
+  const row = list[idx];
+  const ok = await bcrypt.compare(cur, String(row.passHash || ''));
+  if (!ok) {
+    const err = new Error('invalid_current');
+    err.code = 'invalid_current';
+    throw err;
+  }
+  row.passHash = await bcrypt.hash(next, 12);
+  row.updatedAt = new Date().toISOString();
+  list[idx] = row;
+  writeTeam(list);
+  return publicMember(row);
 }
 
 async function authenticate(user, pass) {
@@ -274,6 +332,7 @@ module.exports = {
   writeTeam,
   seedFromLegacyAccounts,
   ensureOwnerSuperAdmin,
+  changeOwnPassword,
   authenticate,
   touchLogin,
   listTeamPublic,

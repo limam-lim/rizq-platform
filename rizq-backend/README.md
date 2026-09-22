@@ -111,6 +111,9 @@ ADMIN_PANEL_PATH=cp-xxxxxxxx        # مسار سري بدل rizq_cp_panel.html
 ADMIN_PANEL_GATE_KEY=long_random    # مفتاح أول زيارة ?k=...
 SUPER_ADMIN_EMAIL=megalimam@gmail.com
 SUPER_ADMIN_PASS_HASH=$2a$10$...   # bcrypt فقط — بلا كلمة سر صريحة
+# بعد أول دخول يمكنك تغيير كلمة السر من اللوحة (الإعدادات أو الشريط الجانبي).
+# التغيير يُحفظ في قاعدة البيانات ولا يُلغى عند إعادة التشغيل ما لم تضع:
+# SUPER_ADMIN_FORCE_PASS_HASH=1
 ```
 
 - الرابط: `https://your-domain.com/<ADMIN_PANEL_PATH>?k=<ADMIN_PANEL_GATE_KEY>`

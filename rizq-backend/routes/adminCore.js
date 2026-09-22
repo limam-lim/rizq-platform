@@ -153,6 +153,37 @@ function mountAdminCoreRoutes(app, deps) {
     res.json({ ok: true, member });
   });
 
+  /** POST /api/admin/change-password — تغيير كلمة سر الحساب الحالي */
+  app.post('/api/admin/change-password', requireAdminSession, async (req, res) => {
+    try {
+      const b = req.body || {};
+      const member = await adminTeamService.changeOwnPassword(
+        req.adminUser && req.adminUser.user,
+        b.currentPass || b.current || b.oldPass,
+        b.newPass || b.pass || b.password
+      );
+      res.set('Cache-Control', 'no-store');
+      res.json({ ok: true, member });
+    } catch (e) {
+      if (e.code === 'invalid_current') {
+        return res.status(401).json({ error: e.code, msg: 'كلمة المرور الحالية غير صحيحة' });
+      }
+      if (e.code === 'weak_password') {
+        return res.status(400).json({ error: e.code, msg: 'كلمة المرور الجديدة قصيرة جداً (8 أحرف على الأقل)' });
+      }
+      if (e.code === 'same_password') {
+        return res.status(400).json({ error: e.code, msg: 'كلمة المرور الجديدة مطابقة للحالية' });
+      }
+      if (e.code === 'missing_fields') {
+        return res.status(400).json({ error: e.code, msg: 'الحقول مطلوبة' });
+      }
+      if (e.code === 'not_found') {
+        return res.status(404).json({ error: e.code, msg: 'الحساب غير موجود' });
+      }
+      res.status(500).json({ error: 'change_password_failed' });
+    }
+  });
+
   app.post('/api/admin/logout', (req, res) => {
     const token = req.header('x-admin-token');
     if (token) adminSessions.delete(token);
