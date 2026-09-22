@@ -7199,12 +7199,8 @@ function updatePaymentsBadge(){
 // {advertiser,url,active} الذي تحرّره لوحة "Rizq ADS — الفيديو" يدوياً
 // (rzqVidAddHero/rzqVidAddPopup/rzqVidSave أعلاه).
 //
-// تمييز الباقات حسب الموضع: أعلى باقة سعراً في تصنيف "الفيديو الإعلاني"
-// (rizq_video_packages — عادة "أعمال ومعارض") تذهب لموضع Hero (الأقوى:
-// يظهر لكل زائر أعلى الرئيسية ضمن Playlist دوّار). أي باقة أدنى (أساسي/
-// احترافي) تذهب لموضع Popup (شريط دوّار بالزوار على كل الصفحات). هذا
-// التمييز ديناميكي حسب الأسعار الفعلية المضبوطة من الأدمن حالياً، وليس
-// بمطابقة اسم ثابت — يبقى صحيحاً حتى لو غيّر الأدمن أسماء/أسعار الباقات.
+// تمييز الموضع حسب صلاحيات الباقة (MEDIA_PLANS.heroPlacement):
+// vid-business → Hero؛ الباقات الأدنى → Popup. لم يعد يعتمد على أعلى سعر فقط.
 function activateVideoAdForRequest(req){
   var data = { hero: [], popup: [] };
   try { data = JSON.parse(localStorage.getItem('rizq_video_ads') || '{"hero":[],"popup":[]}'); } catch(e){}
@@ -7213,8 +7209,18 @@ function activateVideoAdForRequest(req){
   var pkgs = [];
   try { pkgs = JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); } catch(e){}
   if(!pkgs.length) pkgs = (typeof PKG_DEFAULTS !== 'undefined' && PKG_DEFAULTS.video) ? PKG_DEFAULTS.video.slice() : [{id:'vid-basic',name:'أساسي فيديو',price:5000},{id:'vid-pro',name:'احترافي فيديو',price:12000},{id:'vid-business',name:'أعمال ومعارض',price:25000}];
-  var maxPrice = Math.max.apply(null, pkgs.map(function(p){ return Number(p.price)||0; }));
-  var target = (maxPrice>0 && Number(req.price) >= maxPrice) ? 'hero' : 'popup';
+  var pkgDef = null;
+  try {
+    pkgDef = pkgs.find(function(p){ return p.name === req.pkg || p.id === req.packageId; })
+      || pkgs.find(function(p){ return Number(p.price) === Number(req.price); });
+  } catch(e){}
+  var packageId = (pkgDef && pkgDef.id) || req.packageId || '';
+  // hero فقط لباقة الأعمال (vid-business) أو أسماء أعمال/معارض
+  var hero = packageId === 'vid-business' || /أعمال|معارض|business|corporate|showroom/i.test(String(req.pkg||packageId));
+  var featuredBadge = packageId === 'vid-pro' || packageId === 'vid-business' || /احتراف|pro/i.test(String(req.pkg||''));
+  var vipBadge = packageId === 'vid-business';
+  var prioritySearch = featuredBadge;
+  var target = hero ? 'hero' : 'popup';
   var other  = target === 'hero' ? 'popup' : 'hero';
 
   // إزالة الحساب من الموضع الآخر أولاً (حالة ترقية/تخفيض باقة لاحقاً)
@@ -7222,11 +7228,26 @@ function activateVideoAdForRequest(req){
 
   var list = data[target];
   var existing = req.accountId ? list.find(function(a){ return a.accountId === req.accountId; }) : null;
+  var meta = {
+    advertiser: req.account || '',
+    url: req.videoUrl || '',
+    active: true,
+    accountId: req.accountId || '',
+    packageId: packageId,
+    pkgName: req.pkg || '',
+    featuredBadge: !!featuredBadge,
+    vipBadge: !!vipBadge,
+    prioritySearch: !!prioritySearch,
+    heroPlacement: !!hero,
+    basicStats: true,
+    automatedReports: !!vipBadge
+  };
   if(existing){
-    existing.url = req.videoUrl || ''; existing.advertiser = req.account || ''; existing.active = true;
+    Object.keys(meta).forEach(function(k){ existing[k] = meta[k]; });
   } else {
-    list.push({ advertiser: req.account || '', url: req.videoUrl || '', active: true, accountId: req.accountId || '' });
+    list.push(meta);
   }
+  data[target] = list.slice().sort(function(a,b){ return Number(!!b.prioritySearch) - Number(!!a.prioritySearch); });
 
   localStorage.setItem('rizq_video_ads', JSON.stringify(data));
   _syncVideoAdsToBackend(data);
@@ -7234,6 +7255,47 @@ function activateVideoAdForRequest(req){
   var posAr = target==='hero' ? 'الموضع المميز (Hero) بالرئيسية' : 'الشريط الدوّار (Popup) بكل الصفحات';
   var posFr = target==='hero' ? 'l\'emplacement premium (Hero) en page d\'accueil' : 'le bandeau rotatif (Popup) sur toutes les pages';
   showToast(RizqI18n.t2('✅ تم تفعيل الباقة والفيديو معاً — الفيديو الآن ضمن '+posAr,'✅ Forfait et vidéo activés ensemble — la vidéo est maintenant dans '+posFr));
+}
+
+function activateVideoPackageForAccount(req){
+  if(!req || !req.accountId) return false;
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl){ showToast(RizqI18n.t2('⚠️ لا يوجد اتصال بالخادم — تعذّر تفعيل باقة الفيديو','⚠️ Aucune connexion au serveur — impossible d\'activer le forfait vidéo'),'error'); return false; }
+  var accts = {};
+  try{ accts = JSON.parse(localStorage.getItem('rizq_accounts')||'{}'); }catch(e){}
+  var accInfo = accts[req.accountId] || {};
+  var pkgDef = null;
+  try{
+    var list = JSON.parse(localStorage.getItem('rizq_video_packages')||'null') || (PKG_DEFAULTS && PKG_DEFAULTS.video) || [];
+    pkgDef = list.find(function(p){ return p.name===req.pkg || p.id===req.packageId; }) || list[0];
+  }catch(e){}
+  var days = (pkgDef && pkgDef.durationDays) || findPackageDurationDays(req.pkg) || 30;
+  var packageId = (pkgDef && pkgDef.id) || req.packageId || null;
+  if(packageId && String(packageId).indexOf('vid-') !== 0){
+    showToast(RizqI18n.t2('❌ باقة فيديو غير صالحة','❌ Forfait vidéo invalide'),'error');
+    return false;
+  }
+  fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({
+      accountId: req.accountId + '::video',
+      accountName: accInfo.name || req.account || req.accountId,
+      accountPhone: accInfo.phone || '',
+      accountEmail: accInfo.email || '',
+      accountType: 'video',
+      pkgName: (pkgDef && pkgDef.name) || req.pkg,
+      packageId: packageId,
+      price: Number(req.price) || 0,
+      days: days,
+      isTrial: false,
+      paymentConfirmed: true,
+      activatedBy: 'admin',
+    })
+  }).then(function(res){ return res.ok ? res.json() : Promise.reject(res.status); })
+    .then(function(){ showToast(RizqI18n.t2('✅ تم تفعيل باقة Rizq ADS (معزولة عن باقة الحساب)','✅ Forfait Rizq ADS activé (isolé du forfait compte)'),'success'); })
+    .catch(function(){ showToast(RizqI18n.t2('❌ فشل تفعيل باقة الفيديو — تأكد من إعدادات الخادم','❌ Échec de l\'activation du forfait vidéo'),'error'); });
+  return true;
 }
 
 function handleSubReq(btn){
@@ -7267,11 +7329,14 @@ function handleSubReq(btn){
         // فكانت ستُلغي أي باقة حقيقية نشطة للمستخدم). التثبيت هنا يُطبَّق فقط
         // على الإعلان المحدَّد (adId) عبر RizqSub.activateAdBoost، بمعزل تام.
         activateAdBoostForRequest(reqs[idx]);
-      } else {
-        activateSubscriptionForAccount(reqs[idx].accountId, reqs[idx].pkg, reqs[idx].price);
-        if(reqs[idx].category==='video' && reqs[idx].videoUrl){
+      } else if(reqs[idx].category==='video'){
+        // عزل باقة الفيديو بمفتاح accountId::video — لا تستبدل باقة الحساب العامة
+        activateVideoPackageForAccount(reqs[idx]);
+        if(reqs[idx].videoUrl){
           activateVideoAdForRequest(reqs[idx]);
         }
+      } else {
+        activateSubscriptionForAccount(reqs[idx].accountId, reqs[idx].pkg, reqs[idx].price);
       }
     }
     localStorage.setItem('rizq_sub_requests', JSON.stringify(reqs));

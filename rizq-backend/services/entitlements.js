@@ -119,7 +119,7 @@ const INDIVIDUAL_PLANS = {
 /** حدود المحلات — مطابقة PKG_DEFAULTS + POST_LIMITS */
 const STORE_PLANS = {
   store_trial: { planType: 'store_trial', maxCatalogItems: 10, maxPhotosPerItem: 5, videoMaxSec: 0, videoMaxMb: 0, videoWatermark: true, features: ['dashboard_access'] },
-  store_monthly: { planType: 'store_monthly', maxCatalogItems: 100, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'extra_photos'] },
+  store_monthly: { planType: 'store_monthly', maxCatalogItems: 100, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'extra_photos', 'vip_badge'] },
   store_quarterly: { planType: 'store_quarterly', maxCatalogItems: 500, maxPhotosPerItem: 8, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
   store_yearly: { planType: 'store_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge'] },
   store_diamond: { planType: 'store_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false, quotaMessages: 1500, quotaMinutes: 0 },
@@ -163,7 +163,7 @@ const OFFICE_PLANS = {
 
 const CORP_PLANS = {
   corp_trial: { planType: 'corp_trial', maxCatalogItems: Infinity, maxPhotosPerItem: 5, videoMaxSec: 30, videoMaxMb: 20, videoWatermark: true, features: ['dashboard_access'] },
-  corp_monthly: { planType: 'corp_monthly', maxCatalogItems: 30, maxPhotosPerItem: 8, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics'] },
+  corp_monthly: { planType: 'corp_monthly', maxCatalogItems: 30, maxPhotosPerItem: 8, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'vip_badge'] },
   corp_quarterly: { planType: 'corp_quarterly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing'] },
   corp_yearly: { planType: 'corp_yearly', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 60, videoMaxMb: 40, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'priority_listing', 'vip_badge'] },
   corp_diamond: { planType: 'corp_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false, quotaMessages: 4000, quotaMinutes: 0 },
@@ -244,18 +244,30 @@ function mapMediaPackageToPlanType(rec) {
 
 /**
  * صلاحيات Rizq ADS / الفيديو الإعلاني لحساب (من سجل الباقة النشط).
+ * المفتاح المعزول accountId::video — مستقل عن باقة الحساب العامة.
  */
 function getMediaEntitlements(accountId, accountRecordOverride) {
-  const rec = accountRecordOverride || getAccountRecord(accountId);
+  const id = String(accountId || '');
+  const rec = accountRecordOverride
+    || getAccountRecord(id.includes('::video') ? id : (id + '::video'))
+    || getAccountRecord(id);
   const planType = mapMediaPackageToPlanType(rec);
   if (!rec || !planType) {
     return {
-      accountId,
+      accountId: id.replace(/::video$/, ''),
       planType: null,
       subscribed: false,
       subscriptionStatus: 'no_subscription',
       maxVideosPerMonth: 0,
       canUploadVideo: false,
+      heroPlacement: false,
+      prioritySearch: false,
+      featuredBadge: false,
+      basicStats: false,
+      automatedReports: false,
+      vipSupport: false,
+      vipBadge: false,
+      features: [],
     };
   }
   const subscriptionStatus = getSubscriptionStatus(rec);
@@ -264,7 +276,7 @@ function getMediaEntitlements(accountId, accountRecordOverride) {
   const isPaidActive = isActive && isPaymentConfirmed(rec);
 
   return {
-    accountId,
+    accountId: id.replace(/::video$/, ''),
     planType: isPaidActive ? planType : null,
     pkgName: rec.pkgName,
     packageId: rec.packageId || rec.pkgId || null,
@@ -285,6 +297,53 @@ function getMediaEntitlements(accountId, accountRecordOverride) {
     vipBadge: isPaidActive && !!plan.vipBadge,
     features: isPaidActive ? (plan.features || []) : [],
   };
+}
+
+/** عدد فيديوهات معلن نشطة في hero+popup */
+function countActiveMediaVideos(accountId, videoAds) {
+  const id = String(accountId || '');
+  if (!id || !videoAds || typeof videoAds !== 'object') return 0;
+  let n = 0;
+  ['hero', 'popup'].forEach((slot) => {
+    const list = Array.isArray(videoAds[slot]) ? videoAds[slot] : [];
+    list.forEach((a) => {
+      if (a && a.active !== false && String(a.accountId || '') === id && a.url) n += 1;
+    });
+  });
+  return n;
+}
+
+/**
+ * بوابة حصة فيديوهات الباقة قبل إضافة إعلان جديد.
+ * @returns {{ ok: true } | { ok: false, code, message, limit, current }}
+ */
+function assertCanAddMediaVideo(accountId, videoAds, accountRecordOverride) {
+  const media = getMediaEntitlements(accountId, accountRecordOverride);
+  if (!media.subscribed || !media.canUploadVideo) {
+    return entitlementError('media_not_subscribed', 'لا توجد باقة Rizq ADS نشطة — اشترك أولاً');
+  }
+  const limit = media.maxVideosPerMonth;
+  if (limit === Infinity || limit == null) return { ok: true, media };
+  const current = countActiveMediaVideos(accountId, videoAds);
+  if (current >= limit) {
+    return entitlementError(
+      'media_video_quota',
+      'وصلت للحد الأقصى من فيديوهات باقتك هذا الشهر (' + limit + ')',
+      { limit, current, planType: media.planType }
+    );
+  }
+  return { ok: true, media, current, limit };
+}
+
+/** صلاحيات خطة فيديو من مرجع الباقة (قبل التفعيل) — لتحديد الموضع/الشارات */
+function resolveMediaPlanFromPackageRef(pkgName, packageId, price) {
+  const planType = mapMediaPackageToPlanType({
+    packageId: packageId || '',
+    pkgId: packageId || '',
+    pkgName: pkgName || '',
+    price: price,
+  }) || 'media_basic';
+  return MEDIA_PLANS[planType] || MEDIA_PLANS.media_basic;
 }
 
 /** باقات غرفة المناقصات — حماية بيانات التواصل + تقديم العروض */
@@ -719,6 +778,9 @@ module.exports = {
   MEDIA_PLANS,
   mapMediaPackageToPlanType,
   getMediaEntitlements,
+  countActiveMediaVideos,
+  assertCanAddMediaVideo,
+  resolveMediaPlanFromPackageRef,
   mapTenderPackageToPlanType,
   getTenderEntitlements,
   resolveTenderPlanFromRef,

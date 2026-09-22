@@ -285,6 +285,14 @@
     var table = POST_LIMITS[category];
     if(!table) return Infinity;
     var pkgId = resolveAccountPackageId(accId, sub);
+    // باقات الفيديو معزولة بمفتاح accountId::video — اقرأ packageId من هناك
+    if ((category === 'video' || category === 'ads') && (!pkgId || !/^vid-/.test(pkgId))) {
+      try {
+        var packs = JSON.parse(localStorage.getItem('rizq_account_packages') || '{}');
+        var vRec = packs[accId + '::video'] || packs[accId];
+        if (vRec && (vRec.packageId || vRec.pkgId)) pkgId = String(vRec.packageId || vRec.pkgId).toLowerCase();
+      } catch (e) { /* ignore */ }
+    }
     if (pkgId && Object.prototype.hasOwnProperty.call(table, pkgId)) return table[pkgId];
     if (/diam-pro|diamond_pro/.test(pkgId)) return Infinity;
     if (/diam|diamond/.test(pkgId)) return Infinity;

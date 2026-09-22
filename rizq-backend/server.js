@@ -683,6 +683,7 @@ const {
 const {
   getEntitlements,
   getTenderEntitlements,
+  getMediaEntitlements,
   assertCanPostAd,
   assertCanAddCatalogItem,
   assertPhotoCount,
@@ -1303,6 +1304,14 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       url: String(a.url || '').slice(0, 500),
       active: a.active !== false,
       accountId: a.accountId ? String(a.accountId).slice(0, 60) : '',
+      packageId: a.packageId ? String(a.packageId).slice(0, 40) : '',
+      pkgName: a.pkgName ? String(a.pkgName).slice(0, 80) : '',
+      featuredBadge: !!a.featuredBadge,
+      vipBadge: !!a.vipBadge,
+      prioritySearch: !!a.prioritySearch,
+      heroPlacement: !!a.heroPlacement,
+      basicStats: a.basicStats !== false,
+      automatedReports: !!a.automatedReports,
     }));
     const prevVideoAds = (current && current.videoAds) || {};
     const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
@@ -1319,6 +1328,10 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       adSlotSeconds: Math.max(8, Math.min(120,
         Number(body.videoAds.adSlotSeconds != null ? body.videoAds.adSlotSeconds : prevVideoAds.adSlotSeconds) || 25
       )),
+      // الحفاظ على إحصائيات المشاهدات/النقرات عند تحديث القوائم من الأدمن
+      stats: (body.videoAds.stats && typeof body.videoAds.stats === 'object')
+        ? body.videoAds.stats
+        : (prevVideoAds.stats || {}),
     };
   }
 
@@ -2190,7 +2203,68 @@ app.get('/api/entitlements/:accountId', (req, res) => {
   const acc = verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
   const ent = getEntitlements(accountId, acc.type);
-  res.json({ ok: true, entitlements: ent });
+  const media = getMediaEntitlements(accountId);
+  const tender = getTenderEntitlements(accountId);
+  res.json({ ok: true, entitlements: ent, media, tender });
+});
+
+/** POST /api/video-ads/event — تسجيل مشاهدة/نقرة لإعلان فيديو (عام محدود) */
+const videoAdsEventLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_events' },
+});
+app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
+  try {
+    const body = req.body || {};
+    const accountId = String(body.accountId || '').trim();
+    const type = String(body.type || '').trim(); // impression | click
+    if (!accountId || (type !== 'impression' && type !== 'click')) {
+      return res.status(400).json({ ok: false, error: 'invalid_event' });
+    }
+    const cfg = repos.getSiteConfig() || {};
+    const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? Object.assign({}, cfg.videoAds) : {};
+    const stats = Object.assign({}, (videoAds.stats && typeof videoAds.stats === 'object') ? videoAds.stats : {});
+    const row = Object.assign({ impressions: 0, clicks: 0 }, stats[accountId] || {});
+    if (type === 'impression') row.impressions = (Number(row.impressions) || 0) + 1;
+    if (type === 'click') row.clicks = (Number(row.clicks) || 0) + 1;
+    row.updatedAt = new Date().toISOString();
+    stats[accountId] = row;
+    videoAds.stats = stats;
+    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds }));
+    res.json({ ok: true, stats: row });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+/** GET /api/video-ads/stats/:accountId — إحصائيات معلن (محمي بمالك الحساب) */
+app.get('/api/video-ads/stats/:accountId', (req, res) => {
+  const accountId = req.params.accountId;
+  const token = extractAccountToken(req) || '';
+  const acc = verifyAccountOwner(accountId, token);
+  if (!acc) return res.status(401).json({ error: 'unauthorized' });
+  const media = getMediaEntitlements(accountId);
+  if (!media.subscribed || !media.basicStats) {
+    return res.status(403).json({ ok: false, error: 'stats_not_available', media });
+  }
+  const cfg = repos.getSiteConfig() || {};
+  const statsAll = (cfg.videoAds && cfg.videoAds.stats) || {};
+  const row = statsAll[accountId] || { impressions: 0, clicks: 0 };
+  res.json({
+    ok: true,
+    stats: row,
+    media: {
+      planType: media.planType,
+      automatedReports: media.automatedReports,
+      featuredBadge: media.featuredBadge,
+      vipBadge: media.vipBadge,
+      heroPlacement: media.heroPlacement,
+      maxVideosPerMonth: media.maxVideosPerMonth,
+    },
+  });
 });
 
 const contactGateLimiter = rateLimit({
