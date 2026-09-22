@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=16.6"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=16.7"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=17.1"/>
+<link rel="stylesheet" href="rizq_header.css?v=17.2"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -60,6 +60,10 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile{padding-top:112px!important}
   html.rizq-app-nav body.landing-ux-mobile>nav#nav{display:flex!important;visibility:visible!important;height:112px!important;position:fixed!important;top:0;left:0;right:0;z-index:1000!important;background:#0f172a!important;flex-wrap:wrap!important}
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
+  /* تيكر في التدفق الطبيعي — لا يغطي عنوان الهيرو «رزق» */
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
+    position:relative!important;top:auto!important;z-index:1!important;margin:0 0 12px!important;
+  }
 }
 </style>
 <script src="rizq_packages_config.js?v=16.3"></script>
@@ -1326,18 +1330,25 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
   .hero-cta-wrap{margin:0 auto 28px}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
-  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة على الموبايل */
+  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد) */
   #hero-listings .cards-track-wrap{
-    overflow-x:auto!important;overflow-y:hidden!important;
-    -webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;
+    overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
+    scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
   }
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:10px!important;
+    animation:slide 36s linear infinite!important;
+    will-change:transform;backface-visibility:hidden;transform:translateZ(0);
   }
   #hero-listings .cards-track .ad-card{
     width:158px!important;min-width:158px!important;max-width:158px!important;
-    flex:0 0 158px!important;scroll-snap-align:start;
+    flex:0 0 158px!important;scroll-snap-align:none!important;
+  }
+  /* شريط التيكر كان absolute فيغطي كلمة «رزق» في الهيرو */
+  .ticker-wrap{
+    position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+    z-index:1!important;margin:0 0 12px!important;
   }
   #hero-listings .cards-track .ad-card-img{
     height:100px!important;min-height:100px!important;max-height:100px!important;

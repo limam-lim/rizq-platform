@@ -1325,6 +1325,15 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile .hero-content{
     padding-top:12px !important;
   }
+  /* تيكر مطلق كان يغطي بطاقة «رزق» — ضعه في التدفق تحت النافبار */
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
+    position:relative !important;
+    top:auto !important;
+    left:auto !important;
+    right:auto !important;
+    z-index:1 !important;
+    margin:0 0 12px !important;
+  }
 
   #rizq-app-header{
     display:block !important;
