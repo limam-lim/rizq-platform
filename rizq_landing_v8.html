@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.15"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
 (function () {
   try {
@@ -6630,6 +6630,19 @@ function rizqIsRegPageMode(){
   }catch(e){ return document.documentElement.classList.contains('rizq-reg-page'); }
 }
 
+function rizqIsPhoneViewport(){
+  try { return window.matchMedia('(max-width: 768px)').matches; } catch (e) { return false; }
+}
+
+function rizqApplyRegMobileScroll(){
+  if (!document.body.classList.contains('rizq-reg-open')) return;
+  if (!rizqIsPhoneViewport()) return;
+  document.documentElement.classList.add('rizq-reg-page');
+  document.body.style.overflow = 'auto';
+  document.body.style.overflowY = 'auto';
+  document.body.style.overflowX = 'hidden';
+}
+
 function rizqMountAccountBars(modal){
   if(!modal) return;
   var chrome=document.getElementById('rizq-reg-chrome');
@@ -6649,24 +6662,24 @@ function rizqMountAccountBars(modal){
   }
   try{
     var siteFooter=document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
+    var isPhone=rizqIsPhoneViewport();
     if(siteFooter){
       siteFooter.classList.add('rizq-footer');
-      siteFooter.style.display='block';
-      siteFooter.style.visibility='visible';
-      siteFooter.style.pointerEvents='auto';
-      siteFooter.style.position='relative';
-      siteFooter.style.zIndex='4';
-      siteFooter.style.order='2';
-    }
-    /* افتح الأقسام عبر الـ API حتى يبقى زر «إخفاء الروابط» متزامناً ويعمل */
-    /* على الهاتف أثناء التسجيل: اترك الفوتر مطوياً حتى لا يغطي زر التالي */
-    if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
-      try {
-        var isPhone = window.matchMedia('(max-width: 768px)').matches;
-        window.RizqFooterToggle.setOpen(!isPhone);
-      } catch (eFt) {
-        window.RizqFooterToggle.setOpen(true);
+      if(isPhone){
+        siteFooter.style.display='none';
+        siteFooter.style.visibility='hidden';
+        siteFooter.style.pointerEvents='none';
+      } else {
+        siteFooter.style.display='block';
+        siteFooter.style.visibility='visible';
+        siteFooter.style.pointerEvents='auto';
+        siteFooter.style.position='relative';
+        siteFooter.style.zIndex='4';
+        siteFooter.style.order='2';
       }
+    }
+    if (!isPhone && window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
+      window.RizqFooterToggle.setOpen(true);
     }
   }catch(e){}
 }
@@ -6696,7 +6709,7 @@ function openModal(mode){
     modal.style.zIndex='';
   }
   if(mode==='register'){
-    try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
+    try { document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');
     modal.classList.add('reg-wizard-arming');
     modal.classList.remove('auth-login-mode');
@@ -6719,14 +6732,18 @@ function openModal(mode){
     modal.classList.add('auth-login-mode');
     modal.classList.remove('reg-wizard-arming');
     document.body.classList.add('rizq-reg-open');
-    try {
-      if (window.matchMedia('(max-width: 768px)').matches) {
-        document.documentElement.classList.add('rizq-reg-page');
-      }
-    } catch (ePhone) {}
+    try { document.documentElement.classList.add('rizq-reg-page'); } catch (ePhone) {}
     rizqMountAccountBars(modal);
   }
-  document.body.style.overflow='hidden';
+  if(mode==='register' || mode==='login' || mode==='forgot'){
+    if(rizqIsPhoneViewport()){
+      rizqApplyRegMobileScroll();
+    } else {
+      document.body.style.overflow='hidden';
+    }
+  } else {
+    document.body.style.overflow='hidden';
+  }
   ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
   const dots=document.getElementById('sdots');
   const prog=document.getElementById('reg-progress');
@@ -6770,7 +6787,21 @@ function closeModal(force){
     modal.style.zIndex='';
   }
   document.body.classList.remove('rizq-reg-open');
+  document.documentElement.classList.remove('rizq-reg-page');
   document.body.style.overflow='';
+  document.body.style.overflowY='';
+  document.body.style.overflowX='';
+  try{
+    var siteFooter=document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
+    if(siteFooter){
+      siteFooter.style.display='';
+      siteFooter.style.visibility='';
+      siteFooter.style.pointerEvents='';
+      siteFooter.style.position='';
+      siteFooter.style.zIndex='';
+      siteFooter.style.order='';
+    }
+  }catch(eFtReset){}
   try{
     var u=new URL(window.location.href);
     if(u.searchParams.has('openRegister')){

@@ -1,9 +1,9 @@
 /**
- * rizq_register_wizard.css  v6.15
+ * rizq_register_wizard.css  v6.16
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
- * v6.15: إزالة sticky عن الفوتر على الهاتف — المحتوى (التالي + البطاقات
- *   التوجيهية) يتدفق كاملاً ثم الشريط السفلي بعده بلا تغطية
+ * v6.16: الهاتف — إخفاء فوتر المنصة أثناء مسارات التسجيل/الدخول + تجاوز
+ *   rizq_modal_viewport (max-height/overflow) حتى يتمرّر المستند كاملاً
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -567,38 +567,23 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     z-index: 4 !important;
     flex: 0 0 auto !important;
   }
+  /* الهاتف: أخفِ فوتر المنصة أثناء مسارات التسجيل/الدخول — كان يغطي «التالي» */
   body.rizq-reg-open > footer,
   body.rizq-reg-open > footer.rizq-footer,
   html.rizq-reg-page body > footer,
   html.rizq-reg-page body > footer.rizq-footer {
-    display: block !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    order: 2 !important;
-    /* تدفق طبيعي أسفل المحتوى — لا sticky حتى لا يغطي زر التالي والبطاقات */
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    z-index: 4 !important;
-    margin-top: 0 !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    max-height: none !important;
-    overflow: visible !important;
-    box-shadow: none !important;
-    padding-top: 10px !important;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-  body.rizq-reg-open > footer .footer-bottom,
-  html.rizq-reg-page body > footer .footer-bottom {
-    position: relative !important;
-    z-index: 1 !important;
-  }
-  /* أثناء التسجيل على الهاتف: الفوتر المطوي يبقى رفيعاً؛ عند فتحه من الزر يتمدد طبيعياً */
-  body.rizq-reg-open > footer .rzq-ft-collapse-wrap:not(.rzq-ft-open) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
     max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow: hidden !important;
+    order: 2 !important;
+    position: relative !important;
+    z-index: 0 !important;
   }
   /* المحتوى أولاً بالكامل: البطاقات + التالي + نوافذ التوجيه ثم الفوتر */
   #modal.reg-wizard-mode .modal-box,
@@ -1034,4 +1019,51 @@ body.rizq-reg-open #modal .modal-box {
   --white: #0f2347;
   --text-muted: #475569;
   --text-soft: #334155;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   §9b  الهاتف — تجاوز rizq_modal_viewport (بعد كل القواعد)
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  body.rizq-reg-open,
+  html.rizq-reg-page body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.rizq-reg-open #modal.modal-overlay,
+  body.rizq-reg-open #modal.modal-overlay.open,
+  html.rizq-reg-page #modal.modal-overlay,
+  html.rizq-reg-page #modal.modal-overlay.open,
+  #modal.reg-wizard-mode.modal-overlay,
+  #modal.reg-wizard-mode.modal-overlay.open {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    z-index: 4 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  body.rizq-reg-open #modal .modal-box,
+  html.rizq-reg-page #modal .modal-box,
+  #modal.reg-wizard-mode .modal-box {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+  }
+  body.rizq-reg-open #modal .modal-box > [id^="p-"],
+  #modal.reg-wizard-mode .modal-box > [id^="p-"] {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
 }

@@ -606,6 +606,10 @@
     }
   }
 
+  function ragIsPhoneViewport() {
+    try { return window.matchMedia('(max-width: 768px)').matches; } catch (e) { return false; }
+  }
+
   function openRagShell() {
     ensureModal();
     injectStyle();
@@ -616,19 +620,33 @@
     ov.style.zIndex = '1000001';
     ov.style.pointerEvents = 'none';
     document.body.classList.add('rizq-reg-open');
-    document.body.style.overflow = '';
+    var isPhone = ragIsPhoneViewport();
+    if (isPhone) {
+      document.documentElement.classList.add('rizq-reg-page');
+      document.body.style.overflow = 'auto';
+      document.body.style.overflowY = 'auto';
+      document.body.style.overflowX = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     try {
       if (typeof window.RizqEnsureSiteFooter === 'function') window.RizqEnsureSiteFooter();
-      if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
-        window.RizqFooterToggle.setOpen(true);
-      }
       var siteFooter = document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
       if (siteFooter) {
-        siteFooter.style.display = 'block';
-        siteFooter.style.visibility = 'visible';
-        siteFooter.style.pointerEvents = 'auto';
-        siteFooter.style.order = '2';
-        siteFooter.style.zIndex = '4';
+        if (isPhone) {
+          siteFooter.style.display = 'none';
+          siteFooter.style.visibility = 'hidden';
+          siteFooter.style.pointerEvents = 'none';
+        } else {
+          siteFooter.style.display = 'block';
+          siteFooter.style.visibility = 'visible';
+          siteFooter.style.pointerEvents = 'auto';
+          siteFooter.style.order = '2';
+          siteFooter.style.zIndex = '4';
+          if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
+            window.RizqFooterToggle.setOpen(true);
+          }
+        }
       }
     } catch (eFt) {}
     setTimeout(function () {
@@ -1200,8 +1218,23 @@
       ov.style.display = 'none';
     }
     document.body.classList.remove('rizq-reg-open');
+    document.documentElement.classList.remove('rizq-reg-page');
     var sellerOpen = document.getElementById('modal') && document.getElementById('modal').classList.contains('open');
-    if (!sellerOpen) document.body.style.overflow = '';
+    if (!sellerOpen) {
+      document.body.style.overflow = '';
+      document.body.style.overflowY = '';
+      document.body.style.overflowX = '';
+      try {
+        var siteFooter = document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
+        if (siteFooter) {
+          siteFooter.style.display = '';
+          siteFooter.style.visibility = '';
+          siteFooter.style.pointerEvents = '';
+          siteFooter.style.order = '';
+          siteFooter.style.zIndex = '';
+        }
+      } catch (eFtReset) {}
+    }
     clearInterval(_otpTimer);
     _pendingAction = null;
     _sellerOtpCallback = null;
