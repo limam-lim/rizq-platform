@@ -1011,15 +1011,18 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:none !important;
   }
 
-  /* شريط البحث يبقى ظاهراً تحت الهيدر الموحّد (browse / search / listing) */
+  /* شريط البحث تحت الهيدر الموحّد (browse / search / listing).
+     position:relative وليس sticky — كان sticky يغطي شريط المسار (breadcrumb)
+     وبيانات الصفحة عند التمرير على الهاتف. */
   html.rizq-app-nav body > nav:has(.nav-search),
   html.rizq-app-nav body > nav:has(.nav-search-mini),
   html.rizq-app-nav .topnav:has(.nav-search),
   html.rizq-app-nav .topnav:has(.nav-search-mini){
     display:flex !important;
-    position:sticky !important;
-    top:var(--rizq-header-h,112px) !important;
-    z-index:50 !important;
+    position:relative !important;
+    top:auto !important;
+    inset:auto !important;
+    z-index:20 !important;
     height:auto !important;
     min-height:52px;
     align-items:center;
@@ -1029,6 +1032,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     background:#fff !important;
     border-bottom:1px solid #e2e8f5 !important;
     box-shadow:0 4px 14px rgba(15,35,65,.06) !important;
+  }
+  /* مسار التنقل وبيانات الصفحة تبقى فوق أي طبقة بحث ولا تُغطى */
+  html.rizq-app-nav .breadcrumb{
+    position:relative !important;
+    z-index:10 !important;
+    background:#fff !important;
+    margin-top:0 !important;
+    clear:both !important;
   }
   html.rizq-app-nav body > nav:has(.nav-search) > .logo,
   html.rizq-app-nav body > nav:has(.nav-search-mini) > .logo,
