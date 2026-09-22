@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.13"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.14"/>
 <script>
 (function () {
   try {
@@ -6683,7 +6683,12 @@ function openModal(mode){
   modal.classList.add('open');
   modal.style.display='flex';
   modal.style.pointerEvents='auto';
-  modal.style.zIndex = (mode==='register' || mode==='login' || mode==='forgot') ? '1000001' : '';
+  /* أثناء التسجيل/الدخول: لا ترفع z-index فوق فوتر المنصة (الأقسام/المساعدة/الشعار) */
+  if(mode==='register' || mode==='login' || mode==='forgot'){
+    modal.style.zIndex='4';
+  } else {
+    modal.style.zIndex='';
+  }
   if(mode==='register'){
     try { if (window.matchMedia('(min-width: 769px)').matches) document.documentElement.classList.add('rizq-reg-page'); } catch (eDesk) {}
     modal.classList.add('reg-wizard-mode');

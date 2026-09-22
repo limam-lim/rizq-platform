@@ -1,10 +1,11 @@
 /**
- * rizq_register_wizard.css  v6.13
+ * rizq_register_wizard.css  v6.14
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
  *   (روابط سريعة + أرقام التواصل) بدل شريط الأيقونات السفلي القديمة
  * تابلت ≥769: شريط كروم مثل الكمبيوتر (الرئيسية + RIZQ PLATFORM)
- * v6.13: على الهاتف لا يغطي محتوى التسجيل فوتر الأقسام/المساعدة/الشعار
+ * v6.13/6.14: على الهاتف لا يغطي محتوى التسجيل فوتر الأقسام/المساعدة/الشعار
+ *   — المودال relative وليس fixed، والفوتر sticky أسفل الشاشة
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -492,14 +493,27 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
 ═══════════════════════════════════════════════════════════ */
 @media (max-width:768px) {
   /* تمرير المستند (لا التمرير الداخلي) حتى يبقى فوتر الأقسام/المساعدة/الشعار ظاهراً وقابلاً للنقر */
-  #modal.reg-wizard-mode {
-    background:#f8faff !important; align-items:stretch !important;
-    justify-content:flex-start !important; padding:0 !important;
+  #modal.reg-wizard-mode,
+  #modal.modal-overlay.reg-wizard-mode,
+  body.rizq-reg-open #modal.modal-overlay,
+  html.rizq-reg-page #modal.modal-overlay {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    background:#f8faff !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    padding:0 !important;
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
     z-index: 4 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
   /* هاتف — شريط علوي: شعار + FR|AR (الروابط في الشريط السفلي) */
   #modal.reg-wizard-mode > .rizq-reg-chrome,
@@ -563,15 +577,42 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     visibility: visible !important;
     pointer-events: auto !important;
     order: 2 !important;
-    position: relative !important;
-    z-index: 6 !important;
-    margin-top: 0 !important;
-    /* يظهر بعد المحتوى ولا يُغطّى بطبقة المودال */
+    position: sticky !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 60 !important;
+    margin-top: 8px !important;
     flex: 0 0 auto !important;
     width: 100% !important;
+    /* شريط مدمج: الشعار + زر الروابط؛ عند الفتح يتمدد ضمن الشاشة */
+    max-height: min(52vh, 420px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 -10px 28px rgba(0,0,0,.28) !important;
+    padding-top: 10px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* في وضع التسجيل: أظهر شريط الحقوق/الشعار دائماً فوق المحتوى */
+  body.rizq-reg-open > footer .footer-bottom,
+  html.rizq-reg-page body > footer .footer-bottom {
+    position: relative !important;
+    z-index: 2 !important;
+    background: transparent !important;
+  }
+  body.rizq-reg-open > footer.rzq-ft-compact,
+  html.rizq-reg-page body > footer.rzq-ft-compact {
     max-height: none !important;
-    overflow: visible !important;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-top: 10px !important;
+  }
+  /* مساحة سفلية داخل المحتوى حتى لا تُقصّ آخر بطاقة تحت الفوتر اللاصق */
+  #modal.reg-wizard-mode .modal-box,
+  body.rizq-reg-open #modal .modal-box {
+    padding-bottom: 110px !important;
+  }
+  #modal.reg-wizard-mode .modal-box > [id^="p-"] {
+    padding-bottom: 36px !important;
   }
   /* وضوح خطوات التسجيل على الهاتف */
   #modal.reg-wizard-mode .reg-progress-bar {
