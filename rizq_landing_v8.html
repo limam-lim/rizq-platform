@@ -2966,8 +2966,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in">
       <p class="section-tag">Style Ideas</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">إطلالات مختارة من محلات موثوقة على رزق — اختر القطعة أو تسوّق الإطلالة كاملة</p>
-      <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
+      <p class="section-desc" data-t="sty-desc">أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة</p>      <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
       <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
     </div>
     <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجال أو نساء أو أولاد أو بنات">
@@ -4777,7 +4776,8 @@ function buildLandingAds(resetVisible){
 }
 try { buildLandingAds(true); } catch(eLad) {}
 
-/* ── Style Ideas: النظام يقترح عشوائياً ويميّز رجال / نساء / أولاد / بنات ── */
+
+/* ── Style Ideas: أزياء وملابس وإكسسوارات فقط (لا سيارات/شاحنات/إلكترونيات…) ── */
 var _rizqStyleGender = 'men';
 var RIZQ_STYLE_GENDERS = { men:1, women:1, boys:1, girls:1 };
 var RIZQ_STYLE_MEN_HINTS = /دراعة|رجالي|رجل|رجال|homme|men'?s?|daraa|قميص|بدلة|حذاء\s*رجالي|ملابس\s*رجالي/i;
@@ -4785,35 +4785,32 @@ var RIZQ_STYLE_WOMEN_HINTS = /ملحفة|نسائي|نساء|امرأة|femme|wo
 var RIZQ_STYLE_BOYS_HINTS = /أولاد|ولد|صبي|فتى|طفل\s*ذكر|garçon|boy|boys|ملابس\s*أولاد|حذاء\s*ولد|تي.?شيرت\s*أولاد/i;
 var RIZQ_STYLE_GIRLS_HINTS = /بنات|بنت|طفلة|فتاة|fille|girl|girls|ملابس\s*بنات|حذاء\s*بنت|فستان\s*بنات/i;
 var RIZQ_STYLE_KIDS_HINTS = /أطفال|طفل|رضيع|رضيعة|أطفال\s*و?\s*رضّع|kids?|enfant|bébé|bebe|baby|مدرسة|مدرسي|لعب\s*أطفال|ألعاب|حذاء\s*أطفال|ملابس\s*أطفال|تي.?شيرت\s*أطفال/i;
+/* فئات وأنماط مسموحة: أزياء، ملابس، ذهب/مجوهرات، إكسسوارات، أحذية، حقائب، عطور */
+var RIZQ_STYLE_ALLOW_CAT = /أزياء|موضة|ذهب|مجوهرات|إكسسوار|أحذية|حقائب|عطور|fashion|mode|bijou|accessoire|chaussure|sac|parfum/i;
+var RIZQ_STYLE_ALLOW_HINTS = /دراعة|ملحفة|قميص|فستان|عباية|حجاب|طرح|حذاء|حقيبة|أسورة|خلخال|خاتم|عقد|ساعة(?:\s|$)|مجوهرات|ذهب\s*عيار|ملابس|ثوب|بدلة|جاكيت|معطف|حقيبة|إكسسوار|daraa|melhfa|robe|bijou|bracelet|bague|chaussure|vêtement|montre|sac|accessoire/i;
+/* استبعاد صريح: مركبات، معدات، عقارات، ماشية، إلكترونيات، أثاث… */
+var RIZQ_STYLE_BLOCK = /سيارات|شاحنة|شاحنات|حافلة|حفارة|موتوسيكل|دراجة\s*نارية|عقارات|شقق|أراضي|ماشية|إبل|بقر|غنم|إلكترون|هواتف|لابتوب|تلفزيون|أثاث|معدات|آليات|caterpillar|excavator|truck|camion|voiture|moto|iphone|samsung|laptop|appartement|terrain|engin|bulldozer/i;
 var RIZQ_STYLE_MEN_TEMPLATES = [
   { ar:'أناقة الدراعة', fr:'Élégance Daraa', emoji:['👔','📿','🩴'], cats:['أزياء'], browseSub:'دراعة رجالية', kind:'daraa' },
-  { ar:'قميص وإطلالة يومية', fr:'Chemise & look du jour', emoji:['👔','👖','👟'], cats:['أزياء'], browseSub:'ملابس رجالية', kind:'shirt' },
-  { ar:'حذاء وساعة رجالية', fr:'Chaussures & montre', emoji:['👟','⌚','🧥'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'shoe' },
-  { ar:'هاتف وإكسسوارات', fr:'Téléphone & accessoires', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'', kind:'phone' },
+  { ar:'إطلالة رجالية يومية', fr:'Look homme du quotidien', emoji:['🧥','⌚','👟'], cats:['أزياء'], browseSub:'ملابس رجالية', kind:'shirt' },
   { ar:'لمسة ذهبية رجالية', fr:'Touche d\'or homme', emoji:['🪙','⌚','📿'], cats:['ذهب','أزياء'], browseSub:'', kind:'gold' },
-  { ar:'تقنية رجالية', fr:'Tech homme', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'', kind:'phone' }
+  { ar:'إكسسوارات رجالية', fr:'Accessoires homme', emoji:['⌚','📿','👞'], cats:['ذهب','أزياء'], browseSub:'', kind:'watch' }
 ];
 var RIZQ_STYLE_WOMEN_TEMPLATES = [
   { ar:'أناقة الملحفة', fr:'Élégance Melhfa', emoji:['🧕','💍','👜'], cats:['أزياء'], browseSub:'ملحفة نسائية', kind:'melhfa' },
-  { ar:'حقيبة وحذاء أنيق', fr:'Sac & chaussures', emoji:['👜','👠','👗'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
-  { ar:'ساعة ومجوهرات', fr:'Montre & bijoux', emoji:['⌚','💍','✨'], cats:['ذهب','أزياء'], browseSub:'', kind:'watch' },
   { ar:'إطلالة ذهبية نسائية', fr:'Touche d\'or femme', emoji:['🪙','💍','✨'], cats:['ذهب','أزياء'], browseSub:'', kind:'gold' },
-  { ar:'عناية وجمال', fr:'Soins & beauté', emoji:['🌿','🧴','✨'], cats:['صحة وجمال','أزياء'], browseSub:'', kind:'' },
+  { ar:'إكسسوارات نسائية', fr:'Accessoires femme', emoji:['👜','👠','💍'], cats:['أزياء','ذهب'], browseSub:'أحذية وحقائب', kind:'shoe' },
   { ar:'أناقة نسائية يومية', fr:'Look femme du quotidien', emoji:['👗','👜','👠'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' }
 ];
 var RIZQ_STYLE_BOYS_TEMPLATES = [
   { ar:'إطلالة يومية للأولاد', fr:'Look garçon du quotidien', emoji:['👦','👕','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
-  { ar:'حذاء وألعاب للأولاد', fr:'Chaussures & jeux garçon', emoji:['👟','🧸','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
-  { ar:'إطلالة مدرسية للأولاد', fr:'Look scolaire garçon', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
-  { ar:'رياضة للأولاد', fr:'Sport garçon', emoji:['⚽','👕','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
-  { ar:'هدايا للأولاد', fr:'Cadeaux garçon', emoji:['🎁','🧸','✨'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'' }
+  { ar:'حذاء وأناقة للأولاد', fr:'Chaussures & style garçon', emoji:['👟','🧢','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
+  { ar:'إطلالة مدرسية للأولاد', fr:'Look scolaire garçon', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' }
 ];
 var RIZQ_STYLE_GIRLS_TEMPLATES = [
   { ar:'إطلالة يومية للبنات', fr:'Look fille du quotidien', emoji:['👧','👗','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
   { ar:'حذاء وأناقة للبنات', fr:'Chaussures & style fille', emoji:['👟','🎀','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
-  { ar:'إطلالة مدرسية للبنات', fr:'Look scolaire fille', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
-  { ar:'فستان أنيق للبنات', fr:'Robe fille élégante', emoji:['👗','✨','👒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
-  { ar:'هدايا للبنات', fr:'Cadeaux fille', emoji:['🎁','🧸','✨'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'' }
+  { ar:'فستان أنيق للبنات', fr:'Robe fille élégante', emoji:['👗','✨','👒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' }
 ];
 function _styTemplatesFor(gender){
   if(gender === 'women') return RIZQ_STYLE_WOMEN_TEMPLATES;
@@ -4862,9 +4859,8 @@ function _styDetectGender(a){
   if(men && !women) return 'men';
   if(women && !men) return 'women';
   if(men && women) return 'both';
-  var k = String(a.catKey||'');
-  if(/ذهب|صحة|جمال|إلكترون/.test(k)) return 'both';
-  if(/أزياء|موضة/.test(k)) return 'both';
+  /* منتج أناقة بلا تلميح جنس → يظهر في الرجالي والنسائي */
+  if(_styIsStyleCat(a)) return 'both';
   return 'neutral';
 }
 function _styPool(){
@@ -4892,9 +4888,15 @@ function _styMatchGender(a, gender){
   if(gender === 'women') return g === 'women' || g === 'both';
   return g === gender || g === 'both';
 }
+/** إطلالة أزياء/ملابس/إكسسوارات فقط — يرفض السيارات والشاحنات والإلكترونيات وغيرها */
 function _styIsStyleCat(a){
-  var k = String((a && (a.catKey || a.cat)) || '');
-  return /أزياء|موضة|ذهب|صحة|جمال|إلكترون|fashion|mode|bijou|or\b|beaut|phone|télé|teleph|daraa|melhfa|دراعة|ملحفة/i.test(k);
+  if(!a) return false;
+  var k = String(a.catKey || a.cat || '');
+  var blob = _styAdBlob(a) || [a.title, a.name, k].filter(Boolean).join(' ');
+  if(RIZQ_STYLE_BLOCK.test(k) || RIZQ_STYLE_BLOCK.test(blob)) return false;
+  if(RIZQ_STYLE_ALLOW_CAT.test(k)) return true;
+  if(RIZQ_STYLE_ALLOW_HINTS.test(blob)) return true;
+  return false;
 }
 function _styCatMatch(adCat, want){
   var k = String(adCat || '');
@@ -4906,7 +4908,7 @@ function _styPickCompanions(primary, pool, gender, n){
   var stylePool = pool.filter(_styIsStyleCat);
   var same = stylePool.filter(function(a){
     return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
-      (_styCatMatch(a.catKey, primary.catKey) || _styIsStyleCat(a));
+      (_styCatMatch(a.catKey, primary.catKey) || /ذهب|أزياء|مجوهرات|موضة|إكسسوار|أحذية|حقائب/.test(String(a.catKey||'')));
   });
   var picks = _styShuffle(same).slice(0, n);
   if(picks.length < n){
@@ -5010,7 +5012,12 @@ function _styLoadSeeds(){
     var raw = JSON.parse(localStorage.getItem(RIZQ_STYLE_SEED_KEY) || '[]');
     if(!Array.isArray(raw)) return [];
     var now = Date.now();
-    return raw.filter(function(s){ return s && s.ts && (now - s.ts) < 7*24*3600*1000; }).slice(0, 12);
+    var cleaned = raw.filter(function(s){
+      if(!s || !s.ts || (now - s.ts) >= 7*24*3600*1000) return false;
+      return _styIsStyleCat(s);
+    }).slice(0, 12);
+    if(cleaned.length !== raw.length) _stySaveSeeds(cleaned);
+    return cleaned;
   } catch(e){ return []; }
 }
 function _stySaveSeeds(list){
@@ -5020,6 +5027,8 @@ function rizqFeedStyleSeed(item){
   if(!item) return;
   var title = String(item.title || item.name || '').trim();
   if(!title) return;
+  /* لا بذور من سيارات/شاحنات/إلكترونيات — أزياء وملابس وإكسسوارات فقط */
+  if(!_styIsStyleCat(item)) return;
   var blob = [title, item.titleFR || item.nameF || '', item.desc || '', item.cat || '', item.catKey || ''].join(' ');
   var boys = RIZQ_STYLE_BOYS_HINTS.test(blob);
   var girls = RIZQ_STYLE_GIRLS_HINTS.test(blob);
@@ -5032,13 +5041,6 @@ function rizqFeedStyleSeed(item){
   else if(kids || (boys && girls)) gender = 'kids';
   else if(men && !women) gender = 'men';
   else if(women && !men) gender = 'women';
-  else {
-    var k = String(item.catKey || item.cat || '');
-    if(/ذهب|صحة|جمال|إلكترون|أزياء|موضة|fashion|mode/i.test(k) || men || women) gender = 'both';
-    else if(!_styIsStyleCat({ catKey: k }) && !/أزياء|موضة|ذهب|صحة|جمال|إلكترون|دراعة|ملحفة|daraa|melhfa|أطفال|أولاد|بنات/i.test(blob)){
-      return; /* ليس منتج أناقة — تجاهل */
-    }
-  }
   var images = [];
   if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
   else if(item.image) images = [item.image];
@@ -5134,11 +5136,12 @@ function buildStyleIdeas(reshuffle){
     if(typeof isAr !== 'undefined') fr = !isAr;
     else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   } catch(e) {}
-  var gender = RIZQ_STYLE_GENDERS[_rizqStyleGender] ? _rizqStyleGender : 'men';
-  var templates = _styTemplatesFor(gender);
-  var pool = _styPool();
+  var gender = (typeof RIZQ_STYLE_GENDERS !== 'undefined' && RIZQ_STYLE_GENDERS[_rizqStyleGender]) ? _rizqStyleGender : (_rizqStyleGender === 'women' ? 'women' : 'men');
+  var templates = (typeof _styTemplatesFor === 'function') ? _styTemplatesFor(gender) : (gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES);
+  var pool = _styPool().filter(_styIsStyleCat);
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
   var seeds = _styLoadSeeds().filter(function(s){
+    if(!_styIsStyleCat(s)) return false;
     if(gender === 'boys') return s.gender === 'boys' || s.gender === 'kids';
     if(gender === 'girls') return s.gender === 'girls' || s.gender === 'kids';
     return s.gender === gender || s.gender === 'both';
@@ -5150,7 +5153,7 @@ function buildStyleIdeas(reshuffle){
   var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
   var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
 
-  /* بطاقة أولى من آخر منتج شاهدته */
+  /* بطاقة أولى من آخر منتج أزياء/إكسسوار شاهدته */
   if(seeds.length){
     var seed = seeds[0];
     usedIds[String(seed.id)] = 1;
@@ -5179,8 +5182,8 @@ function buildStyleIdeas(reshuffle){
   }
 
   tplList.forEach(function(tpl){
-    var styleGendered = gendered.filter(_styIsStyleCat);
-    var kindPool = (tpl.kind ? styleGendered.filter(function(a){ return _styAdKind(a) === tpl.kind && !usedIds[String(a.id)]; }) : []);
+    var styleGendered = gendered;
+    var kindPool = (tpl.kind ? styleGendered.filter(function(a){ return typeof _styAdKind==='function' && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)]; }) : []);
     var catPool = styleGendered.filter(function(a){
       var k = String(a.catKey||a.cat||'');
       return (tpl.cats||[]).some(function(c){ return _styCatMatch(k, c); }) && !usedIds[String(a.id)];
@@ -5189,12 +5192,11 @@ function buildStyleIdeas(reshuffle){
       return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
     }));
     if(!catPool.length) catPool = styleGendered.filter(function(a){ return !usedIds[String(a.id)]; });
-    if(!catPool.length) catPool = pool.filter(function(a){ return _styIsStyleCat(a) && !usedIds[String(a.id)]; });
+    if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
-    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool.filter(_styIsStyleCat), gender, 2) : [];
-    /* Prefer same kind companions when possible (other shirts / phones…) */
-    if(primary && tpl.kind){
+    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool, gender, 2) : [];
+    if(primary && tpl.kind && typeof _styAdKind==='function'){
       var sameKind = styleGendered.filter(function(a){
         return String(a.id) !== String(primary.id) && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)];
       });
@@ -6561,8 +6563,7 @@ const LANG = {
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
     'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
-    'sty-desc': 'إطلالات مختارة من محلات موثوقة على رزق — اختر القطعة أو تسوّق الإطلالة كاملة',
-    'sty-reshuffle': '🔀 اقتراحات جديدة',
+    'sty-desc': 'أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة',    'sty-reshuffle': '🔀 اقتراحات جديدة',
     'sty-men': 'رجال',
     'sty-women': 'نساء',
     'sty-boys': 'أولاد',
@@ -6660,8 +6661,7 @@ const LANG = {
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
     'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
-    'sty-desc': 'Looks sélectionnés depuis des boutiques vérifiées sur Rizq — choisissez une pièce ou achetez le look complet',
-    'sty-reshuffle': '🔀 Nouvelles suggestions',
+    'sty-desc': 'Mode, vêtements et accessoires uniquement — se renouvelle toutes les 3 minutes, ou quand vous ouvrez un article de style',    'sty-reshuffle': '🔀 Nouvelles suggestions',
     'sty-men': 'Hommes',
     'sty-women': 'Femmes',
     'sty-boys': 'Garçons',

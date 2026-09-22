@@ -1222,24 +1222,33 @@ function openQuickView(id, name, price, emoji, cat){
       titleFR: name,
       emoji: emoji || '📦',
       cat: cat || '',
-      catKey: cat || 'أزياء',
+      catKey: cat || '',
       images: seedImages,
       href: storeHref || ('rizq_store.html' + location.search)
     };
-    /* حفظ محلي حتى لو لم تكن صفحة الهبوط محمّلة */
-    var KEY = 'rizq_style_seeds';
-    var list = [];
-    try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
-    var men = /دراعة|رجالي|homme|daraa|قميص/i.test(name + ' ' + (cat||''));
-    var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(name + ' ' + (cat||''));
-    feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
-    feed.ts = Date.now();
-    feed.fromView = true;
-    feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
-    list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
-    list.unshift(feed);
-    localStorage.setItem(KEY, JSON.stringify(list.slice(0, 12)));
-    if(typeof window.rizqFeedStyleSeed === 'function') window.rizqFeedStyleSeed(feed);
+    /* أفكار الأنماط: أزياء/ملابس/إكسسوارات فقط — لا سيارات ولا شاحنات ولا غير ذلك */
+    var fashionCat = /أزياء|موضة|ذهب|مجوهرات|إكسسوار|أحذية|حقائب|عطور|fashion|mode|bijou|accessoire/i;
+    var fashionHint = /دراعة|ملحفة|قميص|فستان|عباية|حذاء|حقيبة|أسورة|خاتم|ملابس|ذهب|مجوهرات|daraa|melhfa|robe|bijou/i;
+    var fashionBlock = /سيارات|شاحنة|حفارة|عقارات|ماشية|إلكترون|هواتف|caterpillar|excavator|truck|voiture|iphone/i;
+    var blob = [name, cat || ''].join(' ');
+    if(fashionBlock.test(blob) || (!fashionCat.test(cat || '') && !fashionHint.test(blob))){
+      /* تجاهل — ليس منتج أناقة */
+    } else {
+      var KEY = 'rizq_style_seeds';
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
+      var men = /دراعة|رجالي|homme|daraa|قميص/i.test(blob);
+      var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(blob);
+      feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
+      feed.ts = Date.now();
+      feed.fromView = true;
+      feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+      if(!feed.catKey) feed.catKey = 'أزياء';
+      list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
+      list.unshift(feed);
+      localStorage.setItem(KEY, JSON.stringify(list.slice(0, 12)));
+      if(typeof window.rizqFeedStyleSeed === 'function') window.rizqFeedStyleSeed(feed);
+    }
   } catch(eSeed) {}
 }
 function closeQuickView(){
