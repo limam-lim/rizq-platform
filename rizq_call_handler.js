@@ -47,7 +47,15 @@ const express    = require('express');
 const bodyParser = require('body-parser');
 const twilio     = require('twilio');
 const axios      = require('axios');
-const { askSubscriberAgent, getSubscriberProfile, getAllSubscriberProfiles, registerSubscriber, loadDemoSubscribers, setupSubscriberAPI } = require('./rizq_subscriber_agent');
+const {
+  askSubscriberAgent,
+  getSubscriberProfile,
+  resolveSubscriberProfile,
+  phonesEquivalent,
+  getAllSubscriberProfiles,
+  loadDemoSubscribers,
+  setupSubscriberAPI,
+} = require('./rizq_subscriber_agent');
 const { askAgent } = require('./rizq_agent_brain');
 const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
 
@@ -56,6 +64,42 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+function isProdEnv() {
+  return process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+}
+
+/**
+ * التحقق من توقيع Twilio — يمنع تزوير ForwardedFrom / CallSid وخلط المشتركين.
+ * في الإنتاج: إلزامي. في التطوير: يُتخطّى فقط إن غاب TWILIO_TOKEN.
+ */
+function requireTwilioSignature(req, res, next) {
+  const authToken = process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN || '';
+  if (!authToken) {
+    if (isProdEnv()) {
+      console.error('❌ TWILIO_TOKEN مفقود — رفض webhook المكالمات');
+      return res.status(503).type('text/plain').send('Twilio auth not configured');
+    }
+    return next();
+  }
+  const signature = req.headers['x-twilio-signature'] || '';
+  const webhookBase = (process.env.TWILIO_WEBHOOK_BASE_URL || '').replace(/\/$/, '');
+  const url = webhookBase
+    ? webhookBase + req.originalUrl
+    : `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+  const params = req.body && typeof req.body === 'object' ? req.body : {};
+  let valid = false;
+  try {
+    valid = twilio.validateRequest(authToken, signature, url, params);
+  } catch (e) {
+    valid = false;
+  }
+  if (!valid) {
+    console.warn('❌ توقيع Twilio غير صالح — رفض الطلب (عزل المكالمات)');
+    return res.status(403).type('text/plain').send('Forbidden');
+  }
+  return next();
+}
 
 // ── رقم رزق الواحد + رقم الطوارئ ────────────────────────
 const RIZQ_NUMBER  = process.env.RIZQ_TWILIO_NUMBER || '+1XXXXXXXXXX';
@@ -116,7 +160,35 @@ setInterval(_refreshDiamondStatuses, DIAMOND_REFRESH_MS);
 
 // هل هذا الرقم (subscriberPhone) يملك فعلاً باقة ماسية موثّقة من الخادم؟
 function isVerifiedDiamondSubscriber(subscriberPhone) {
-  return diamondStatus.get(subscriberPhone) === true;
+  if (!subscriberPhone) return false;
+  if (diamondStatus.get(subscriberPhone) === true) return true;
+  // جرّب المفتاح الكانوني إن وُجد تطابق بعد التطبيع
+  const resolved = resolveSubscriberProfile(subscriberPhone);
+  if (resolved && diamondStatus.get(resolved.subscriberId) === true) return true;
+  return false;
+}
+
+/** هل وكيل هذا الرقم مفعّل؟ (افتراضياً مفعّل إن لم يُوقف صراحة) */
+function isAgentToggledOn(subscriberPhone) {
+  if (!subscriberPhone) return false;
+  if (agentStatus.get(subscriberPhone) === false) return false;
+  const resolved = resolveSubscriberProfile(subscriberPhone);
+  if (resolved && agentStatus.get(resolved.subscriberId) === false) return false;
+  return true;
+}
+
+/**
+ * عزل المكالمة: ForwardedFrom → مشترك واحد + ماسي موثّق + مفعّل.
+ * أي فشل → null → مسار مدير رزق العام.
+ */
+function resolveActiveCallTenant(forwardedFrom) {
+  if (!forwardedFrom) return null;
+  const resolved = resolveSubscriberProfile(forwardedFrom);
+  if (!resolved) return null;
+  const { subscriberId, profile } = resolved;
+  if (!isAgentToggledOn(subscriberId)) return null;
+  if (!isVerifiedDiamondSubscriber(subscriberId)) return null;
+  return { subscriberId, profile };
 }
 
 // تفعيل API تسجيل/جلب المشتركين (كان موجوداً في rizq_subscriber_agent.js
@@ -149,7 +221,7 @@ function twiGather(text, action, digits = '1', timeout = 10) {
 //    To            = رقم رزق Twilio
 //    ForwardedFrom = رقم المشترك الأصلي (المفتاح!)
 // ══════════════════════════════════════════════════════════
-app.post('/api/call', (req, res) => {
+app.post('/api/call', requireTwilioSignature, (req, res) => {
   const caller        = req.body.From          || '';
   const callSid       = req.body.CallSid       || '';
   const forwardedFrom = req.body.ForwardedFrom || ''; // رقم المشترك
@@ -159,48 +231,40 @@ app.post('/api/call', (req, res) => {
   console.log(`   تحوّلت من: ${forwardedFrom || '(لا تحويل — مكالمة مباشرة)'}`);
   console.log(`   SID   : ${callSid}`);
 
-  // ── تحديد هوية المشترك ────────────────────────────────
-  const subscriberPhone = forwardedFrom || '';        // رقم من حوّل المكالمة
-  const profile         = subscriberPhone
-    ? getSubscriberProfile(subscriberPhone)
-    : null;
+  // ── عزل صارم: ForwardedFrom فقط → مشترك واحد أو مسار المنصة ──
+  const tenant = resolveActiveCallTenant(forwardedFrom);
+  const looseMatch = forwardedFrom ? resolveSubscriberProfile(forwardedFrom) : null;
+  const isToggledOn = forwardedFrom ? isAgentToggledOn(forwardedFrom) : false;
+  const isDiamondVerified = forwardedFrom ? isVerifiedDiamondSubscriber(forwardedFrom) : false;
 
-  // ── هل الوكيل مفعّل؟ ─────────────────────────────────
-  const isToggledOn = subscriberPhone
-    ? (agentStatus.get(subscriberPhone) !== false)   // افتراضياً: مفعّل
-    : false;
-
-  // ── إصلاح جوهري: التفعيل اليدوي وحده لم يكن يكفي — أي "وكيل مشترك" مسجَّل
-  // في لوحة الأدمن (حتى بلا حساب حقيقي وراءه) كان يرد بشخصية كاملة على كل
-  // مكالمة. الآن نتطلّب أيضاً تحقّقاً حقيقياً من الخادم (rizq-backend) بأن
-  // صاحب هذا الرقم يملك فعلاً باقة "ماسية" نشطة — انظر isVerifiedDiamondSubscriber
-  // وتعليق _refreshDiamondStatuses أعلى الملف.
-  const isDiamondVerified = subscriberPhone ? isVerifiedDiamondSubscriber(subscriberPhone) : false;
-  const isActive = isToggledOn && isDiamondVerified;
-
-  // ── تسجيل المكالمة ────────────────────────────────────
   callLog.unshift({
     sid          : callSid,
     caller       : caller,
-    subscriberNum: subscriberPhone,
-    subscriberName: profile?.businessName || '(مكالمة مباشرة)',
+    subscriberNum: tenant ? tenant.subscriberId : (forwardedFrom || ''),
+    subscriberName: tenant?.profile?.businessName || '(مكالمة مباشرة / منصة رزق)',
     time         : new Date().toLocaleString('ar-MA-u-nu-latn'),
-    status       : (profile && isActive) ? 'agent_answered' : (profile && isToggledOn && !isDiamondVerified) ? 'blocked_not_diamond' : 'direct_rizq',
+    status       : tenant
+      ? 'agent_answered'
+      : (looseMatch && isToggledOn && !isDiamondVerified)
+        ? 'blocked_not_diamond'
+        : 'direct_rizq',
     digit        : null,
     reply        : null
   });
 
-  // ابدأ الجلسة
-  callSessions.set(callSid, { history: [], subscriberPhone });
+  // الجلسة تربط CallSid بالمعرّف الكانوني فقط عند تفعيل المستأجر
+  callSessions.set(callSid, {
+    history: [],
+    subscriberPhone: tenant ? tenant.subscriberId : '',
+    tenantActive: !!tenant,
+    mode: tenant ? 'subscriber' : 'platform',
+  });
 
   const twiml = new twilio.twiml.VoiceResponse();
 
-  // ── حالة 1: مكالمة مُحوّلة + مشترك موجود + وكيل مفعّل ──
-  if(profile && isActive) {
+  if (tenant) {
+    const profile = tenant.profile;
     const businessName = profile.businessName;
-    const persona      = profile.ownerName ? `مكتب ${profile.ownerName}` : businessName;
-
-    // تحية فورية بشخصية المشترك
     const greeting = _buildSubscriberGreeting(profile);
 
     const gather = twiml.gather({
@@ -210,15 +274,10 @@ app.post('/api/call', (req, res) => {
       language  : 'ar-SA'
     });
     gather.say({ language: 'ar-SA', voice: 'Polly.Zeina' }, greeting);
-
-    // لو لم يضغط شيئاً → اعرض خيار التسجيل الصوتي
     twiml.redirect('/api/call/subscriber-input?Digits=timeout');
-
-    console.log(`🎭 وكيل "${businessName}" يرد...`);
-  }
-
-  // ── حالة 2: مكالمة مباشرة لرزق (بدون تحويل) ─────────
-  else {
+    console.log(`🎭 وكيل "${businessName}" [${tenant.subscriberId}] يرد...`);
+  } else {
+    // لا تطابق / غير ماسي / موقوف / بلا ForwardedFrom → مدير رزق العام
     const gather = twiml.gather({
       numDigits: '1',
       action   : '/api/call/rizq-input',
@@ -267,21 +326,41 @@ function _buildSubscriberGreeting(profile) {
 // ══════════════════════════════════════════════════════════
 //  مدخلات الزائر لوكيل المشترك — هنا يعمل Claude
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/subscriber-input', async (req, res) => {
-  const digit     = req.body.Digits || 'timeout';
+app.post('/api/call/subscriber-input', requireTwilioSignature, async (req, res) => {
+  const digit     = req.body.Digits || req.query.Digits || 'timeout';
   const callSid   = req.body.CallSid || '';
   const caller    = req.body.From || '';
-  const session   = callSessions.get(callSid) || { history: [], subscriberPhone: '' };
-  const profile   = getSubscriberProfile(session.subscriberPhone);
+  const session   = callSessions.get(callSid) || { history: [], subscriberPhone: '', tenantActive: false };
   const logEntry  = callLog.find(l => l.sid === callSid);
 
   if(logEntry) logEntry.digit = digit;
 
   const twiml = new twilio.twiml.VoiceResponse();
 
-  // ── 0 = تحويل فوري للمشترك ────────────────────────────
+  // إعادة التحقق من العزل في كل خطوة (لا نعتمد على الجلسة وحدها)
+  const forwardedNow = req.body.ForwardedFrom || '';
+  if (forwardedNow && session.subscriberPhone && !phonesEquivalent(forwardedNow, session.subscriberPhone)) {
+    console.warn(`⚠️ عزل مكالمة: ForwardedFrom (${forwardedNow}) ≠ جلسة (${session.subscriberPhone})`);
+    twiml.redirect('/api/call/rizq-input?Digits=timeout');
+    res.type('text/xml');
+    return res.send(twiml.toString());
+  }
+
+  const tenant = resolveActiveCallTenant(session.subscriberPhone || forwardedNow);
+  if (!tenant) {
+    console.warn('⚠️ subscriber-input بلا مستأجر نشط — تحويل لمسار المنصة');
+    twiml.redirect('/api/call/rizq-input?Digits=' + encodeURIComponent(digit === 'timeout' ? 'timeout' : digit));
+    res.type('text/xml');
+    return res.send(twiml.toString());
+  }
+
+  const profile = tenant.profile;
+  session.subscriberPhone = tenant.subscriberId;
+  session.tenantActive = true;
+
+  // ── 0 = تحويل فوري للمشترك الموثّق فقط ────────────────
   if(digit === '0') {
-    const subscriberRealNumber = session.subscriberPhone;
+    const subscriberRealNumber = tenant.subscriberId;
     console.log(`🔄 تحويل → ${subscriberRealNumber}`);
     twiml.say({ language: 'ar-SA', voice: 'Polly.Zeina' },
       `جاري تحويل مكالمتكم. يرجى الانتظار لحظة.`
@@ -291,7 +370,6 @@ app.post('/api/call/subscriber-input', async (req, res) => {
     return res.send(twiml.toString());
   }
 
-  // ── بقية الأرقام → Claude يرد بشخصية المشترك ─────────
   const intentMap = {
     '1'      : 'المتصل يريد مساعدة. رحّب به وساعده حسب تخصص المنشأة.',
     '2'      : 'المتصل يريد موعداً أو استفساراً إضافياً.',
@@ -299,31 +377,37 @@ app.post('/api/call/subscriber-input', async (req, res) => {
   };
   const userMessage = intentMap[digit] || `المتصل ضغط "${digit}". ساعده حسب تخصص المنشأة.`;
 
-  let claudeReply = profile
-    ? `شكراً لاتصالكم بـ${profile.businessName}. سنتواصل معكم قريباً.`
-    : 'شكراً لاتصالكم. سنتواصل معكم قريباً.';
+  let claudeReply = `شكراً لاتصالكم بـ${profile.businessName}. سنتواصل معكم قريباً.`;
 
   try {
     const result = await askSubscriberAgent({
-      subscriberId: session.subscriberPhone,
+      subscriberId: tenant.subscriberId,
       channel     : 'call',
       message     : userMessage,
       context     : { sender: caller, name: caller, history: session.history }
     });
 
-    claudeReply = result.text;
+    // إن سقط العزل داخل askSubscriberAgent → لا ننطق رد المنصة تحت هوية التاجر
+    if (!result.isolation || result.isolation.mode !== 'tenant') {
+      console.warn('⚠️ رد خارج وضع المستأجر — رسالة محايدة للمنشأة');
+      claudeReply = `شكراً لاتصالكم بـ${profile.businessName}. سنتواصل معكم قريباً.`;
+    } else if (result.business && result.business !== profile.businessName) {
+      console.warn('⚠️ رفض رد عابر للمستأجرين');
+      claudeReply = `شكراً لاتصالكم بـ${profile.businessName}. سنتواصل معكم قريباً.`;
+    } else {
+      claudeReply = result.text;
+    }
     session.history.push({ role: 'user',      content: userMessage  });
     session.history.push({ role: 'assistant', content: claudeReply });
     callSessions.set(callSid, session);
 
     if(logEntry) logEntry.reply = claudeReply.substring(0, 120);
-    console.log(`🧠 Claude [${profile?.businessName}]: ${claudeReply.substring(0,60)}...`);
+    console.log(`🧠 Claude [${profile.businessName}]: ${claudeReply.substring(0,60)}...`);
 
   } catch(err) {
     console.error('❌ Claude error:', err.message);
   }
 
-  // رد صوتي + خيار المتابعة
   const gather = twiml.gather({
     numDigits: '1',
     action   : '/api/call/subscriber-input',
@@ -334,7 +418,7 @@ app.post('/api/call/subscriber-input', async (req, res) => {
     claudeReply + ' ... اضغط 0 للتحويل للمسؤول. أو أخبرني بأي شيء آخر.'
   );
   twiml.say({ language: 'ar-SA', voice: 'Polly.Zeina' },
-    `شكراً لاتصالكم بـ${profile?.businessName || 'رزق'}. مع السلامة.`
+    `شكراً لاتصالكم بـ${profile.businessName}. مع السلامة.`
   );
 
   res.type('text/xml');
@@ -344,7 +428,7 @@ app.post('/api/call/subscriber-input', async (req, res) => {
 // ══════════════════════════════════════════════════════════
 //  مدخلات المتصل المباشر برزق
 // ══════════════════════════════════════════════════════════
-app.post('/api/call/rizq-input', async (req, res) => {
+app.post('/api/call/rizq-input', requireTwilioSignature, async (req, res) => {
   const digit   = req.body.Digits || '';
   const callSid = req.body.CallSid || '';
   const caller  = req.body.From || '';
@@ -407,14 +491,17 @@ app.post('/api/agent/toggle', (req, res) => {
 
   if(!subscriberPhone) return res.status(400).json({ ok: false, error: 'subscriberPhone مطلوب' });
 
-  agentStatus.set(subscriberPhone, !!active);
-  const profile = getSubscriberProfile(subscriberPhone);
+  const resolved = resolveSubscriberProfile(subscriberPhone);
+  const canonical = resolved ? resolved.subscriberId : subscriberPhone;
+  agentStatus.set(canonical, !!active);
+  if (canonical !== subscriberPhone) agentStatus.set(subscriberPhone, !!active);
+  const profile = resolved ? resolved.profile : getSubscriberProfile(subscriberPhone);
 
-  console.log(`${active ? '🟢' : '🔴'} وكيل "${profile?.businessName || subscriberPhone}": ${active ? 'مفعّل' : 'موقوف'}`);
+  console.log(`${active ? '🟢' : '🔴'} وكيل "${profile?.businessName || canonical}": ${active ? 'مفعّل' : 'موقوف'}`);
 
   res.json({
     ok        : true,
-    phone     : subscriberPhone,
+    phone     : canonical,
     active    : !!active,
     business  : profile?.businessName || null,
     twilioNum : RIZQ_NUMBER,
@@ -427,10 +514,12 @@ app.post('/api/agent/toggle', (req, res) => {
 // ── API: حالة وكيل مشترك ────────────────────────────────
 app.get('/api/agent/status/:phone', requireSatelliteSecret, (req, res) => {
   const phone   = req.params.phone;
-  const profile = getSubscriberProfile(phone);
-  const active  = agentStatus.get(phone) !== false;
+  const resolved = resolveSubscriberProfile(phone);
+  const canonical = resolved ? resolved.subscriberId : phone;
+  const profile = resolved ? resolved.profile : getSubscriberProfile(phone);
+  const active  = isAgentToggledOn(canonical);
   res.json({
-    phone,
+    phone: canonical,
     active,
     business : profile?.businessName || null,
     twilioNum: RIZQ_NUMBER

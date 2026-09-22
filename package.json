@@ -16,7 +16,8 @@
     "dev:front": "npx --yes serve -l 5500 .",
     "dev:api": "npm --prefix rizq-backend run dev",
     "test:links": "node scripts/audit-platform-links.js",
-    "test:smoke": "node scripts/e2e-platform-smoke.js"
+    "test:smoke": "node scripts/e2e-platform-smoke.js",
+    "test:isolation": "node scripts/test-subscriber-isolation.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
