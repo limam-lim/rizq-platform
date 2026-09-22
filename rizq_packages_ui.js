@@ -306,7 +306,7 @@
     opts = opts || {};
     var lang = opts.lang || getLang();
     var popular = p.id === 'vid-pro' || idx === 1;
-    var cls = popular ? 'p-card popular reveal-init' : 'p-card reveal-init';
+    var cls = popular ? 'p-card popular' : 'p-card';
     var badge = popular ? '<div class="p-badge">' + t2('⭐ الأكثر شعبية', '⭐ Le plus populaire') + '</div>' : '';
     var price = Number(p.price) ? Number(p.price).toLocaleString() : t2('مجاناً', 'Gratuit');
     var featSrc = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length) ? p.features_fr : (p.features || []);
@@ -334,6 +334,7 @@
     }
     function draw() {
       var list = getPackages('video', opts.lang);
+      if (!list || !list.length) return; /* لا تمسح الباقات الاحتياطية إن فشل التحميل */
       el.innerHTML = list.map(function (p, i) { return renderAdsCard(p, i, opts); }).join('');
       el.setAttribute('data-rizq-pkg-ready', '1');
     }
