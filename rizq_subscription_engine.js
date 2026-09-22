@@ -1305,7 +1305,11 @@
       if (!global.RIZQ_BACKEND_BASE) return;
       var headers = { 'Content-Type': 'application/json' };
       var tok = req.accessToken || (typeof global.REAL_ACCESS_TOKEN !== 'undefined' ? global.REAL_ACCESS_TOKEN : null);
-      if (tok) headers['x-account-token'] = tok;
+      if (!tok) {
+        console.warn('[RizqSub] sub-request sync skipped — missing accessToken');
+        return;
+      }
+      headers['x-account-token'] = tok;
       fetch(global.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/sub-requests', {
         method: 'POST',
         headers: headers,

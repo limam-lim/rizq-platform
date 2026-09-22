@@ -188,6 +188,18 @@ async function syncAccountPackage(opts) {
     || (opts.activatedBy === 'admin' && opts.paymentConfirmed !== false)
   );
 
+  // إن أُرسل days بلا periodEnd (لوحة الأدمن)، نحسب نهاية الفترة هنا
+  let periodStart = opts.periodStart || null;
+  let periodEnd = opts.periodEnd || null;
+  if (paymentConfirmed || isTrial) {
+    const daysNum = Math.max(1, Math.min(3650, Number(opts.days) || 0));
+    if (!periodStart) periodStart = new Date().toISOString();
+    if (!periodEnd && daysNum > 0) {
+      const startMs = new Date(periodStart).getTime() || Date.now();
+      periodEnd = new Date(startMs + daysNum * 86400000).toISOString();
+    }
+  }
+
   const invoice = paymentConfirmed ? {
     id: 'INV_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
     number: _nextInvoiceNumber(store),
@@ -195,8 +207,8 @@ async function syncAccountPackage(opts) {
     accountName: opts.accountName || opts.accountId,
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
-    periodStart: opts.periodStart || new Date().toISOString(),
-    periodEnd: opts.periodEnd || null,
+    periodStart: periodStart || new Date().toISOString(),
+    periodEnd: periodEnd || null,
     issuedAt: new Date().toISOString(),
   } : null;
 
@@ -213,8 +225,8 @@ async function syncAccountPackage(opts) {
     subscriptionStatus: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
-    periodStart: paymentConfirmed ? (opts.periodStart || new Date().toISOString()) : (existing.periodStart || null),
-    periodEnd: paymentConfirmed ? (opts.periodEnd || null) : (existing.periodEnd || null),
+    periodStart: paymentConfirmed ? (periodStart || new Date().toISOString()) : (existing.periodStart || null),
+    periodEnd: paymentConfirmed ? (periodEnd || null) : (existing.periodEnd || null),
     activatedBy: opts.activatedBy || 'admin',
     status: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     paymentConfirmed: !!paymentConfirmed,

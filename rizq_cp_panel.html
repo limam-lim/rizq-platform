@@ -7275,6 +7275,8 @@ function activateVideoPackageForAccount(req){
     showToast(RizqI18n.t2('❌ باقة فيديو غير صالحة','❌ Forfait vidéo invalide'),'error');
     return false;
   }
+  var periodStart = new Date().toISOString();
+  var periodEnd = new Date(Date.now() + days * 86400000).toISOString();
   fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/account-package/sync', {
     method: 'POST',
     headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
@@ -7288,6 +7290,8 @@ function activateVideoPackageForAccount(req){
       packageId: packageId,
       price: Number(req.price) || 0,
       days: days,
+      periodStart: periodStart,
+      periodEnd: periodEnd,
       isTrial: false,
       paymentConfirmed: true,
       activatedBy: 'admin',

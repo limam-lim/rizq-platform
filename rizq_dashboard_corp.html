@@ -1241,6 +1241,20 @@ function verifyCorpAccessRemote(id, tok){
         localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
         if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
       }
+      // أرقام التحويل الكاملة — لصاحب الحساب فقط
+      (function _loadPayMethodsFull(){
+        var accId = (typeof SESSION_ID!=='undefined' && SESSION_ID) || (window.USER_ACC&&USER_ACC.id) || (window.CORP_ACC&&CORP_ACC.id) || (window.STORE&&STORE.id) || (window.OFFICE&&OFFICE.id) || '';
+        var tok = window.REAL_ACCESS_TOKEN || '';
+        if(!accId || !tok || !window.RIZQ_BACKEND_BASE) return;
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/pay-methods?accountId=' + encodeURIComponent(accId), {
+          headers: { 'x-account-token': tok }
+        }).then(function(r){ return r.ok ? r.json() : null; }).then(function(pm){
+          if(pm && pm.ok && Array.isArray(pm.methods)){
+            localStorage.setItem('rizq_bank_codes', JSON.stringify(pm.methods));
+            if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
+          }
+        }).catch(function(){});
+      })();
       if(data.config.packages && typeof data.config.packages==='object'){
         if(Array.isArray(data.config.packages.corp))    localStorage.setItem('rizq_corp_packages', JSON.stringify(data.config.packages.corp));
         if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
@@ -2576,6 +2590,7 @@ function submitPayment(){
     // مكان آخر بهذا الملف.
     accountName: (CORP_ACC && CORP_ACC.name) || _t2('مشترك','Abonné'),
     accountId: (CORP_ACC && CORP_ACC.id) || '',
+    accessToken: window.REAL_ACCESS_TOKEN || '',
     category: _payPkg.category,
     videoUrl: isVideo ? videoUrl : null
   }).then(function(){

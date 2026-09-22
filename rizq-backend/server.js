@@ -1072,8 +1072,17 @@ app.get('/api/site-config', (req, res) => {
     currency: raw.currency || undefined,
     quotaConfig: raw.quotaConfig || undefined,
     quotaTopups: raw.quotaTopups || undefined,
-    // أرقام الحسابات البنكية للتحويل — عامة عمداً (نموذج الدفع يحتاجها)
-    bankCodes: Array.isArray(raw.bankCodes) ? raw.bankCodes : undefined,
+    // طرق الدفع للعامة بلا أرقام/رموز حساسة — الرمز الكامل عبر /api/pay-methods
+    bankCodes: Array.isArray(raw.bankCodes)
+      ? raw.bankCodes.map((b) => ({
+          id: b.id,
+          type: b.type,
+          bank: b.bank,
+          instruction: b.instruction,
+          active: b.active !== false,
+          // code محذوف عمداً من الواجهة العامة
+        }))
+      : undefined,
   };
   // لا نُسرّب webhookUrl / قنوات داخلية / أسرار تشغيل
   if (raw.channelsPublic && typeof raw.channelsPublic === 'object') {
@@ -1339,10 +1348,10 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       adSlotSeconds: Math.max(8, Math.min(120,
         Number(body.videoAds.adSlotSeconds != null ? body.videoAds.adSlotSeconds : prevVideoAds.adSlotSeconds) || 25
       )),
-      // الحفاظ على إحصائيات المشاهدات/النقرات عند تحديث القوائم من الأدمن
-      stats: (body.videoAds.stats && typeof body.videoAds.stats === 'object')
-        ? body.videoAds.stats
-        : (prevVideoAds.stats || {}),
+      // لا نقبل stats من جسم الأدمن — دائماً نحافظ على إحصائيات السيرفر
+      stats: (prevVideoAds.stats && typeof prevVideoAds.stats === 'object')
+        ? prevVideoAds.stats
+        : {},
     };
   }
 
@@ -2172,21 +2181,58 @@ app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res
 });
 
 /**
- * POST /api/sub-requests/admin/:id/decision — أدمين فقط — يسجّل قرار
- * الموافقة/الرفض. منطق التفعيل الفعلي (تفعيل الباقة، وضع الفيديو الإعلاني)
- * يبقى محلياً في rizq_admin.html كما هو؛ هذا فقط يجعل الحالة النهائية
- * مرئية عبر كل الأجهزة بدل الاقتصار على جهاز الأدمن الذي وافق فعلياً.
+ * POST /api/sub-requests/admin/:id/decision — أدمين فقط — موافقة/رفض مع
+ * تفعيل فعلي عند الموافقة (نفس مسار Telegram عبر activateSubRequest).
  */
-app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), (req, res) => {
+app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), async (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
   const list = readSubRequests();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'request_not_found' });
-  list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-  list[idx].reviewedAt = new Date().toISOString();
-  writeSubRequests(list);
-  res.json({ ok: true, request: list[idx] });
+  const row = list[idx];
+
+  if (action === 'reject') {
+    list[idx].status = 'rejected';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    writeSubRequests(list);
+    return res.json({ ok: true, request: list[idx] });
+  }
+
+  if (row.status !== 'pending') {
+    return res.status(409).json({ ok: false, error: 'not_pending', status: row.status, request: row });
+  }
+
+  try {
+    const { activateSubRequest } = require('./services/subRequestActivation');
+    const { getTelegramDeps } = require('./services/telegramDeps');
+    const deps = getTelegramDeps() || {
+      syncAccountPackage,
+      getAccountRecord,
+      readAccounts,
+      writeAccounts,
+      readAdBoosts,
+      writeAdBoosts,
+    };
+    const activation = await activateSubRequest(row, deps);
+    if (!activation || !activation.ok) {
+      return res.status(500).json({
+        ok: false,
+        error: (activation && activation.error) || 'activation_failed',
+        message: (activation && activation.message) || 'فشل تفعيل الباقة',
+      });
+    }
+    list[idx].status = 'approved';
+    list[idx].reviewedAt = new Date().toISOString();
+    list[idx].reviewedVia = 'admin_api';
+    list[idx].paymentConfirmed = true;
+    writeSubRequests(list);
+    return res.json({ ok: true, request: list[idx], activation });
+  } catch (e) {
+    console.error('[sub-requests/decision]', e.message);
+    return res.status(500).json({ ok: false, error: 'activation_exception', message: e.message });
+  }
 });
 
 // ── وكيل دورة حياة الباقات (تذكير قبل الانتهاء + إيقاف فوري عند periodEnd
@@ -2217,6 +2263,32 @@ app.get('/api/entitlements/:accountId', (req, res) => {
   const media = getMediaEntitlements(accountId);
   const tender = getTenderEntitlements(accountId);
   res.json({ ok: true, entitlements: ent, media, tender });
+});
+
+/**
+ * GET /api/pay-methods — أرقام/رموز التحويل الكاملة لصاحب حساب معتمد فقط.
+ * الواجهة العامة (/api/site-config) تعرض الاسم والتعليمات بلا code.
+ */
+app.get('/api/pay-methods', (req, res) => {
+  const accountId = String(req.query.accountId || req.header('x-account-id') || '').trim().slice(0, 60);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  const raw = repos.getSiteConfig() || {};
+  const list = Array.isArray(raw.bankCodes) ? raw.bankCodes : [];
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    ok: true,
+    methods: list.filter((b) => b && b.active !== false).map((b) => ({
+      id: b.id,
+      type: b.type,
+      bank: b.bank,
+      code: b.code,
+      instruction: b.instruction,
+      active: true,
+    })),
+  });
 });
 
 /** POST /api/video-ads/event — تسجيل مشاهدة/نقرة لإعلان فيديو (عام محدود) */
