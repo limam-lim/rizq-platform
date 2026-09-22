@@ -318,16 +318,57 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     width:48px!important;height:48px!important;border-radius:14px!important;
     background:linear-gradient(135deg,#1B3A6B,#234d8f)!important;
   }
+  /* لماذا رزق: شبكة عمودين ثابتة — لا شريط تمرير أفقي ولا عرض 82vw */
+  .why-section .why-grid,
+  #about .why-grid,
   .why-grid{
-    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-    overflow-x:auto!important;overflow-y:hidden!important;
-    scroll-snap-type:x mandatory!important;gap:14px!important;width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    flex-direction:unset!important;
+    flex-wrap:unset!important;
+    overflow:visible!important;
+    overflow-x:visible!important;
+    overflow-y:visible!important;
+    scroll-snap-type:none!important;
+    gap:10px!important;
+    width:100%!important;
+    max-width:100%!important;
+    justify-content:stretch!important;
+    padding:4px 0 8px!important;
   }
-  /* why-cards: already forced to 2-col grid above — keep compact */
+  .why-section .why-card,
+  #about .why-card,
   .why-card{
-    flex:none!important;width:100%!important;max-width:100%!important;height:auto!important;
+    flex:none!important;
+    flex-basis:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    padding:16px 12px 14px!important;
+    border-radius:14px!important;
     scroll-snap-align:none!important;
+    transform:none!important;
   }
+  #about .why-card:hover,
+  .why-card:hover{
+    transform:none!important;
+  }
+  .why-section .why-title,
+  #about .why-title,
+  .why-card .why-title{font-size:13px!important;margin-bottom:6px!important;line-height:1.35!important}
+  .why-section .why-desc,
+  #about .why-desc,
+  .why-card .why-desc{
+    font-size:11px!important;line-height:1.45!important;
+    display:-webkit-box!important;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden!important;
+  }
+  .why-section .why-icon .cat-icon-box,
+  #about .why-icon .cat-icon-box{
+    width:42px!important;height:42px!important;font-size:18px!important;border-radius:12px!important;
+  }
+  .why-section .why-icon,
+  #about .why-icon{margin-bottom:10px!important}
 
   .quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
   .similar-grid,.dp-similar-grid,.cta-btns,
@@ -821,4 +862,14 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
     padding:32px 16px !important;
     box-sizing:border-box !important;
   }
+}
+
+
+/* #about why cards — override landing_ux large desktop padding on phone */
+@media(max-width:768px){
+  #about .why-grid{gap:10px!important;padding-top:4px!important}
+  #about .why-card{padding:16px 12px 14px!important;box-shadow:0 6px 18px rgba(10,22,42,.28)!important}
+  #about .why-title{font-size:13px!important;margin-bottom:6px!important}
+  #about .why-desc{font-size:11px!important;line-height:1.45!important}
+  #about .why-icon .cat-icon-box{width:42px!important;height:42px!important;font-size:18px!important}
 }

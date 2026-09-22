@@ -1321,8 +1321,8 @@ html[dir="ltr"] .listings-section .section-desc{
   body.landing-ux-mobile .nav-hamburger{display:none!important}
   .nav-right .btn-login,.nav-right .btn-register{display:none}
   .cats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:14px!important;overflow:visible!important;flex-direction:unset!important}
-  .why-grid{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;flex-direction:row!important;max-width:100%!important;justify-content:flex-start!important}
-  .why-card{flex:0 0 82vw!important;max-width:82vw!important;width:82vw!important}
+  .why-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex-wrap:unset!important;overflow:visible!important;overflow-x:visible!important;flex-direction:unset!important;max-width:100%!important;justify-content:stretch!important;gap:10px!important;scroll-snap-type:none!important}
+  .why-card,.why-section .why-card,#about .why-card{flex:none!important;max-width:100%!important;width:100%!important;min-width:0!important;scroll-snap-align:none!important}
   .listings-grid{grid-template-columns:repeat(2,1fr)}
   .footer-grid{grid-template-columns:1fr}
   .hero-stats-bar{flex-wrap:wrap}
