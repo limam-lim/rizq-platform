@@ -430,8 +430,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-similar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .dp-sim-card{background:linear-gradient(145deg,#111d2e,#1B3A6B);border:1px solid rgba(201,168,76,.15);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .3s;display:flex;flex-direction:column}
 .dp-sim-card:hover{border-color:rgba(201,168,76,.45);transform:translateY(-3px)}
-.dp-sim-img{height:70px;display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.dp-sim-img{height:88px;display:flex;align-items:center;justify-content:center;color:var(--gold);background:rgba(13,27,42,.35);overflow:hidden;position:relative}
+.dp-sim-img img{width:100%;height:100%;object-fit:cover;display:block}
 .dp-sim-img svg{width:28px;height:28px;stroke-width:1.5}
+.dp-also-liked .section-block-title,.dp-same-type .section-block-title{color:var(--gold-dk,#8a6f2a)}
+.dp-store-cta{
+  display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;
+  border-radius:12px;border:1px solid rgba(201,168,76,.28);
+  background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(27,58,107,.06));
+  text-decoration:none;color:inherit;transition:border-color .2s,transform .2s
+}
+.dp-store-cta:hover{border-color:rgba(201,168,76,.55);transform:translateY(-1px)}
+.dp-store-cta-ico{font-size:22px;line-height:1}
+.dp-store-cta-title{font-size:13px;font-weight:800;color:var(--royal,#1B3A6B)}
+.dp-store-cta-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
 .dp-sim-body{padding:8px 10px}
 .dp-sim-title{font-size:11.5px;font-weight:700;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;margin-bottom:4px}
 .dp-sim-price{font-size:12px;font-weight:800;color:var(--gold)}
@@ -1749,6 +1761,10 @@ const TRANSLATIONS = {
     'dp-report':'🚨 الإبلاغ عن هذا الإعلان','dp-safety':'⚠️ نصائح الأمان',
     'dp-read-more':'▾ قراءة المزيد','dp-read-less':'▴ إخفاء',
     'dp-map-link':'🗺️ فتح في OpenStreetMap','dp-similar':'🔍 إعلانات مشابهة',
+    'dp-also-liked':'👥 زبائن آخرون أعجبهم هذا أيضاً',
+    'dp-same-type':'📦 المزيد من نفس النوع',
+    'dp-visit-store':'🏪 زيارة صفحة البائع / المحل',
+    'dp-visit-store-sub':'شاهد منتجات أخرى من نفس البائع',
     'dp-specs':'📋 المواصفات','dp-tags':'🏷️ الوسوم','dp-location':'📍 الموقع','dp-desc':'📝 الوصف',
     'dp-seller-verified':'✅ بائع موثّق','dp-featured':'⭐ إعلان مميّز',
     'stat-ads':'إعلاناً','stat-cats':'قسماً','stat-wilayas':'ولاية',
@@ -1783,6 +1799,10 @@ const TRANSLATIONS = {
     'dp-report':'🚨 Signaler cette annonce','dp-safety':'⚠️ Conseils de sécurité',
     'dp-read-more':'▾ Lire la suite','dp-read-less':'▴ Réduire',
     'dp-map-link':'🗺️ Ouvrir dans OpenStreetMap','dp-similar':'🔍 Annonces similaires',
+    'dp-also-liked':'👥 D\'autres clients ont aussi aimé ceci',
+    'dp-same-type':'📦 Plus du même type',
+    'dp-visit-store':'🏪 Voir la page vendeur / boutique',
+    'dp-visit-store-sub':'Découvrez d\'autres produits du même vendeur',
     'dp-specs':'📋 Caractéristiques','dp-tags':'🏷️ Tags','dp-location':'📍 Localisation','dp-desc':'📝 Description',
     'dp-seller-verified':'✅ Vendeur vérifié','dp-featured':'⭐ Annonce en vedette',
     'stat-ads':'annonces','stat-cats':'catégories','stat-wilayas':'wilayas',
@@ -2204,6 +2224,42 @@ function selectAd(id){
   window._currentAd=ad;
   _phoneRevealed=false;
   try { window.dispatchEvent(new CustomEvent('rizq:ad-context', { detail: { id: ad.id, ad: ad } })); } catch(e){}
+  /* غذِّ أفكار الأنماط من المنتج المعروض (قميص، هاتف، حذاء، ساعة…) */
+  try {
+    if(ad && typeof window.rizqFeedStyleSeed === 'function'){
+      window.rizqFeedStyleSeed({
+        id: ad.id,
+        title: ad.title,
+        titleFR: ad.titleFr || ad.titleFR || '',
+        desc: ad.desc || '',
+        emoji: ad.emoji,
+        cat: ad.cat,
+        catKey: ad.catKey || ad.cat,
+        images: Array.isArray(ad.images) ? ad.images : [],
+        bg: ad.bg,
+        href: 'rizq_browse.html?id=' + encodeURIComponent(ad.id),
+        accountId: ad.accountId || ''
+      });
+    } else if(ad){
+      var KEY='rizq_style_seeds';
+      var list=[];
+      try{ list=JSON.parse(localStorage.getItem(KEY)||'[]'); if(!Array.isArray(list)) list=[]; }catch(e0){ list=[]; }
+      var blob=[ad.title||'',ad.cat||'',ad.subcat||''].join(' ');
+      var men=/دراعة|رجالي|homme|daraa|قميص|حذاء|ساعة|هاتف|iphone/i.test(blob);
+      var women=/ملحفة|نسائي|femme|melhfa|عباية|فستان|حقيبة/i.test(blob);
+      var seed={
+        id:String(ad.id), title:ad.title||'', titleFR:ad.titleFr||ad.title||'',
+        emoji:ad.emoji||'✨', cat:ad.cat||'', catKey:ad.catKey||ad.cat||'',
+        images:Array.isArray(ad.images)?ad.images.filter(Boolean).slice(0,6):[],
+        gender: men&&!women?'men':(women&&!men?'women':'both'),
+        href:'rizq_browse.html?id='+encodeURIComponent(ad.id),
+        bg:ad.bg||'linear-gradient(145deg,#1B3A6B,#0f2347)', fromView:true, ts:Date.now()
+      };
+      list=list.filter(function(s){ return s && String(s.id)!==String(seed.id); });
+      list.unshift(seed);
+      localStorage.setItem(KEY, JSON.stringify(list.slice(0,12)));
+    }
+  } catch(eFeed){}
 
   // Mark active in list
   document.querySelectorAll('.rc').forEach(el=>el.classList.remove('active'));
@@ -2300,10 +2356,79 @@ function renderDetailPanel(ad){
   const _mc=_wilayaCoords(ad);
   const mapLink=`https://www.openstreetmap.org/?mlat=${_mc.lat}&mlon=${_mc.lon}#map=13/${_mc.lat}/${_mc.lon}`;
 
-  // Similar ads (3 from same category)
-  const similar=ALL_ADS.filter(x=>x.cat===ad.cat&&String(x.id)!==String(ad.id)).slice(0,4);
-  const similarHTML=similar.length?similar.map(s=>`<div class="dp-sim-card" onclick="selectAd('${String(s.id).replace(/'/g,"\\'")}')"><div class="dp-sim-img">${iconHTML(s.emoji)}</div><div class="dp-sim-body"><div class="dp-sim-title">${escapeHtml(adTitleLocalized(s))}</div><div class="dp-sim-price">${escapeHtml(fr?priceFr(s.price||''):s.price)}</div><div class="dp-sim-loc">${escapeHtml(fr?locFr(s.loc,s.wilaya):s.loc)}</div></div></div>`).join(''):
-    `<p style="font-size:12px;color:var(--text-muted)">${fr?'Aucune annonce similaire':'لا توجد إعلانات مشابهة'}</p>`;
+  // Similar / also-liked / same-type recommendation rails
+  function _adKind(a){
+    var blob = [a.title||'', a.titleFr||'', a.subcat||'', a.cat||'', a.catKey||'', (a.tags||[]).join(' ')].join(' ');
+    if(/قميص|chemise|shirt|تي.?شيرت|t-?shirt/i.test(blob)) return 'shirt';
+    if(/هاتف|iphone|samsung|phone|téléphone|telephone|جوال|موبايل/i.test(blob)) return 'phone';
+    if(/حذاء|shoe|sneaker|صندل|صندلة|كوتشي|بوت/i.test(blob)) return 'shoe';
+    if(/ساعة|watch|montre|smartwatch/i.test(blob)) return 'watch';
+    if(/دراعة|daraa/i.test(blob)) return 'daraa';
+    if(/ملحفة|melhfa|عباية/i.test(blob)) return 'melhfa';
+    if(/حقيبة|sac|bag|handbag/i.test(blob)) return 'bag';
+    if(/ذهب|or\b|bijou|سوار|خاتم|ring/i.test(blob)) return 'gold';
+    return '';
+  }
+  function _simCardHtml(s){
+    var sid = String(s.id).replace(/'/g,"\\'");
+    var img = (Array.isArray(s.images) && s.images[0])
+      ? `<div class="rizq-img-wrap" style="width:100%;height:100%"><img src="${escapeHtml(String(s.images[0]))}" alt="" loading="lazy" onload="this.closest('.rizq-img-wrap')&&this.closest('.rizq-img-wrap').classList.add('loaded')" style="width:100%;height:100%;object-fit:cover"></div>`
+      : iconHTML(s.emoji||'📦');
+    return `<div class="dp-sim-card" onclick="selectAd('${sid}')"><div class="dp-sim-img">${img}</div><div class="dp-sim-body"><div class="dp-sim-title">${escapeHtml(adTitleLocalized(s))}</div><div class="dp-sim-price">${escapeHtml(fr?priceFr(s.price||''):s.price)}</div><div class="dp-sim-loc">${escapeHtml(fr?locFr(s.loc,s.wilaya):s.loc)}</div></div></div>`;
+  }
+  function _pickRails(list, n){
+    var a = list.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a.slice(0, n);
+  }
+  var kind = _adKind(ad);
+  var others = ALL_ADS.filter(function(x){ return String(x.id) !== String(ad.id); });
+  var sameType = kind
+    ? others.filter(function(x){ return _adKind(x) === kind; })
+    : (ad.subcat ? others.filter(function(x){ return x.subcat === ad.subcat; }) : []);
+  var sameSeller = ad.accountId
+    ? others.filter(function(x){ return String(x.accountId||'') === String(ad.accountId); })
+    : [];
+  var sameCat = others.filter(function(x){ return x.cat === ad.cat || x.catKey === ad.catKey; });
+  var alsoLikedPool = sameSeller.length ? sameSeller.concat(sameCat) : sameCat;
+  // de-dupe
+  var seenAlso = {};
+  alsoLikedPool = alsoLikedPool.filter(function(x){
+    var id = String(x.id);
+    if(seenAlso[id]) return false;
+    seenAlso[id] = 1;
+    return true;
+  });
+  var sameTypePick = _pickRails(sameType, 4);
+  var alsoLikedPick = _pickRails(alsoLikedPool.filter(function(x){
+    return !sameTypePick.some(function(s){ return String(s.id)===String(x.id); });
+  }), 4);
+  if(alsoLikedPick.length < 2){
+    alsoLikedPick = _pickRails(sameCat, 4);
+  }
+  var similarPick = _pickRails(sameCat.filter(function(x){
+    return !alsoLikedPick.some(function(s){ return String(s.id)===String(x.id); }) &&
+           !sameTypePick.some(function(s){ return String(s.id)===String(x.id); });
+  }), 4);
+  if(!similarPick.length) similarPick = _pickRails(sameCat, 4);
+
+  const sameTypeHTML = sameTypePick.length
+    ? sameTypePick.map(_simCardHtml).join('')
+    : '';
+  const alsoLikedHTML = alsoLikedPick.length
+    ? alsoLikedPick.map(_simCardHtml).join('')
+    : `<p style="font-size:12px;color:var(--text-muted)">${fr?'Aucune suggestion pour le moment':'لا توجد اقتراحات حالياً'}</p>`;
+  const similarHTML = similarPick.length
+    ? similarPick.map(_simCardHtml).join('')
+    : `<p style="font-size:12px;color:var(--text-muted)">${fr?'Aucune annonce similaire':'لا توجد إعلانات مشابهة'}</p>`;
+
+  var storeHref = '';
+  if(ad.accountId){
+    storeHref = 'rizq_profile.html?id=' + encodeURIComponent(ad.accountId);
+  }
+  const storeCtaHTML = storeHref
+    ? `<a class="dp-store-cta" href="${escapeHtml(storeHref)}"><span class="dp-store-cta-ico">🏪</span><span><div class="dp-store-cta-title">${_t('dp-visit-store')}</div><div class="dp-store-cta-sub">${escapeHtml(ad.seller||'')} — ${_t('dp-visit-store-sub')}</div></span></a>`
+    : '';
 
   // Price period
   let period=fr?'Prix total':'سعر إجمالي';
@@ -2390,6 +2515,7 @@ function renderDetailPanel(ad){
           </div>
         </div>
       </div>`}
+      ${storeCtaHTML}
 
       <!-- Phone reveal -->
       <!-- بوابة تسجيل (طلب Limam 13/08/2026): كشف الرقم/اتصال/واتساب/رسالة/
@@ -2430,6 +2556,18 @@ function renderDetailPanel(ad){
         <li>${fr?'✔ Ne payez pas à l\'avance':'✔ لا ترسل مبلغاً مسبقاً'}</li>
         <li>${fr?'✔ Vérifiez l\'identité du vendeur':'✔ تحقق من هوية البائع'}</li>
       </ul>
+    </div>
+
+    ${sameTypeHTML ? `<!-- Same type (shirts / phones / shoes / watches…) -->
+    <div class="section-block dp-same-type">
+      <div class="section-block-title">${_t('dp-same-type')}</div>
+      <div class="dp-similar-grid">${sameTypeHTML}</div>
+    </div>` : ''}
+
+    <!-- Also liked -->
+    <div class="section-block dp-also-liked">
+      <div class="section-block-title">${_t('dp-also-liked')}</div>
+      <div class="dp-similar-grid">${alsoLikedHTML}</div>
     </div>
 
     <!-- Similar -->

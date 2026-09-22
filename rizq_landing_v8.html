@@ -2099,6 +2099,18 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-styles-gtab.is-active[data-sty-gender="women"]{
   background:linear-gradient(135deg,#6b2d4a,#3d1a2c)
 }
+.rizq-styles-gtab.is-active[data-sty-gender="boys"]{
+  background:linear-gradient(135deg,#1a5a7a,#0f3548)
+}
+.rizq-styles-gtab.is-active[data-sty-gender="girls"]{
+  background:linear-gradient(135deg,#8a3a5c,#4a1f34)
+}
+.rizq-style-card[data-sty-gender="boys"] .rizq-style-badge{
+  color:#1a5a7a;background:rgba(26,90,122,.1);border-color:rgba(26,90,122,.22)
+}
+.rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
+  color:#8a3a5c;background:rgba(138,58,92,.1);border-color:rgba(138,58,92,.22)
+}
 .rizq-styles-rail{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -2138,9 +2150,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
   font-size:34px;line-height:1;position:relative;overflow:hidden;
-  transition:transform .35s ease;
+  transition:transform .35s ease, box-shadow .25s;
+  cursor:pointer;border:0;padding:0;appearance:none;-webkit-appearance:none;
+  color:inherit;font-family:inherit;
 }
-.rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:2}
+.rizq-style-tile.is-linked:hover{z-index:1;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55)}
+.rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .rizq-style-card:hover .rizq-style-tile{transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
 .rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
@@ -2661,7 +2677,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ أفكار أنماط — النظام يقترح عشوائياً (رجالي / نسائي) ══ -->
+<!-- ══ أفكار أنماط — النظام يقترح عشوائياً (رجال / نساء / أولاد / بنات) ══ -->
 <section id="rizq-styles" class="rizq-styles-section" aria-labelledby="rizq-styles-title">
   <div class="rizq-styles-inner">
     <div class="section-header fade-in">
@@ -2671,9 +2687,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
       <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
     </div>
-    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجالي أو نسائي">
-      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-sty-gender="men" id="sty-tab-men" onclick="setStyleGender('men')">👔 <span data-t="sty-men">رجالي</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="women" id="sty-tab-women" onclick="setStyleGender('women')">🧕 <span data-t="sty-women">نسائي</span></button>
+    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجال أو نساء أو أولاد أو بنات">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-sty-gender="men" id="sty-tab-men" onclick="setStyleGender('men')">👔 <span data-t="sty-men">رجال</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="women" id="sty-tab-women" onclick="setStyleGender('women')">🧕 <span data-t="sty-women">نساء</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="boys" id="sty-tab-boys" onclick="setStyleGender('boys')">👦 <span data-t="sty-boys">أولاد</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="girls" id="sty-tab-girls" onclick="setStyleGender('girls')">👧 <span data-t="sty-girls">بنات</span></button>
     </div>
     <div class="rizq-styles-rail fade-in" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
   </div>
@@ -4376,22 +4394,62 @@ function buildFeaturedCards(){
 }
 buildFeaturedCards();
 
-/* ── Style Ideas: النظام يقترح عشوائياً ويميّز رجالي / نسائي ── */
+/* ── Style Ideas: النظام يقترح عشوائياً ويميّز رجال / نساء / أولاد / بنات ── */
 var _rizqStyleGender = 'men';
+var RIZQ_STYLE_GENDERS = { men:1, women:1, boys:1, girls:1 };
 var RIZQ_STYLE_MEN_HINTS = /دراعة|رجالي|رجل|رجال|homme|men'?s?|daraa|قميص|بدلة|حذاء\s*رجالي|ملابس\s*رجالي/i;
 var RIZQ_STYLE_WOMEN_HINTS = /ملحفة|نسائي|نساء|امرأة|femme|women|melhfa|عباية|فستان|حقيبة|طرح|حجاب|مكياج|عطر|مجوهرات\s*نسائي|ملابس\s*نسائي/i;
+var RIZQ_STYLE_BOYS_HINTS = /أولاد|ولد|صبي|فتى|طفل\s*ذكر|garçon|boy|boys|ملابس\s*أولاد|حذاء\s*ولد|تي.?شيرت\s*أولاد/i;
+var RIZQ_STYLE_GIRLS_HINTS = /بنات|بنت|طفلة|فتاة|fille|girl|girls|ملابس\s*بنات|حذاء\s*بنت|فستان\s*بنات/i;
+var RIZQ_STYLE_KIDS_HINTS = /أطفال|طفل|رضيع|رضيعة|أطفال\s*و?\s*رضّع|kids?|enfant|bébé|bebe|baby|مدرسة|مدرسي|لعب\s*أطفال|ألعاب|حذاء\s*أطفال|ملابس\s*أطفال|تي.?شيرت\s*أطفال/i;
 var RIZQ_STYLE_MEN_TEMPLATES = [
-  { ar:'أناقة الدراعة', fr:'Élégance Daraa', emoji:['👔','📿','🩴'], cats:['أزياء'], browseSub:'دراعة رجالية' },
-  { ar:'إطلالة رجالية يومية', fr:'Look homme du quotidien', emoji:['🧥','⌚','👟'], cats:['أزياء','إلكترونيات'], browseSub:'ملابس رجالية' },
-  { ar:'لمسة ذهبية رجالية', fr:'Touche d\'or homme', emoji:['🪙','⌚','📿'], cats:['ذهب','أزياء'], browseSub:'' },
-  { ar:'تقنية رجالية', fr:'Tech homme', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'' }
+  { ar:'أناقة الدراعة', fr:'Élégance Daraa', emoji:['👔','📿','🩴'], cats:['أزياء'], browseSub:'دراعة رجالية', kind:'daraa' },
+  { ar:'قميص وإطلالة يومية', fr:'Chemise & look du jour', emoji:['👔','👖','👟'], cats:['أزياء'], browseSub:'ملابس رجالية', kind:'shirt' },
+  { ar:'حذاء وساعة رجالية', fr:'Chaussures & montre', emoji:['👟','⌚','🧥'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'shoe' },
+  { ar:'هاتف وإكسسوارات', fr:'Téléphone & accessoires', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'', kind:'phone' },
+  { ar:'لمسة ذهبية رجالية', fr:'Touche d\'or homme', emoji:['🪙','⌚','📿'], cats:['ذهب','أزياء'], browseSub:'', kind:'gold' },
+  { ar:'تقنية رجالية', fr:'Tech homme', emoji:['📱','🎧','⌚'], cats:['إلكترونيات'], browseSub:'', kind:'phone' }
 ];
 var RIZQ_STYLE_WOMEN_TEMPLATES = [
-  { ar:'أناقة الملحفة', fr:'Élégance Melhfa', emoji:['🧕','💍','👜'], cats:['أزياء'], browseSub:'ملحفة نسائية' },
-  { ar:'إطلالة ذهبية نسائية', fr:'Touche d\'or femme', emoji:['🪙','💍','✨'], cats:['ذهب','أزياء'], browseSub:'' },
-  { ar:'عناية وجمال', fr:'Soins & beauté', emoji:['🌿','🧴','✨'], cats:['صحة وجمال','أزياء'], browseSub:'' },
-  { ar:'أناقة نسائية يومية', fr:'Look femme du quotidien', emoji:['👗','👜','👠'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال' }
+  { ar:'أناقة الملحفة', fr:'Élégance Melhfa', emoji:['🧕','💍','👜'], cats:['أزياء'], browseSub:'ملحفة نسائية', kind:'melhfa' },
+  { ar:'حقيبة وحذاء أنيق', fr:'Sac & chaussures', emoji:['👜','👠','👗'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
+  { ar:'ساعة ومجوهرات', fr:'Montre & bijoux', emoji:['⌚','💍','✨'], cats:['ذهب','أزياء'], browseSub:'', kind:'watch' },
+  { ar:'إطلالة ذهبية نسائية', fr:'Touche d\'or femme', emoji:['🪙','💍','✨'], cats:['ذهب','أزياء'], browseSub:'', kind:'gold' },
+  { ar:'عناية وجمال', fr:'Soins & beauté', emoji:['🌿','🧴','✨'], cats:['صحة وجمال','أزياء'], browseSub:'', kind:'' },
+  { ar:'أناقة نسائية يومية', fr:'Look femme du quotidien', emoji:['👗','👜','👠'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' }
 ];
+var RIZQ_STYLE_BOYS_TEMPLATES = [
+  { ar:'إطلالة يومية للأولاد', fr:'Look garçon du quotidien', emoji:['👦','👕','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
+  { ar:'حذاء وألعاب للأولاد', fr:'Chaussures & jeux garçon', emoji:['👟','🧸','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
+  { ar:'إطلالة مدرسية للأولاد', fr:'Look scolaire garçon', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
+  { ar:'رياضة للأولاد', fr:'Sport garçon', emoji:['⚽','👕','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
+  { ar:'هدايا للأولاد', fr:'Cadeaux garçon', emoji:['🎁','🧸','✨'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'' }
+];
+var RIZQ_STYLE_GIRLS_TEMPLATES = [
+  { ar:'إطلالة يومية للبنات', fr:'Look fille du quotidien', emoji:['👧','👗','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
+  { ar:'حذاء وأناقة للبنات', fr:'Chaussures & style fille', emoji:['👟','🎀','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
+  { ar:'إطلالة مدرسية للبنات', fr:'Look scolaire fille', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
+  { ar:'فستان أنيق للبنات', fr:'Robe fille élégante', emoji:['👗','✨','👒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' },
+  { ar:'هدايا للبنات', fr:'Cadeaux fille', emoji:['🎁','🧸','✨'], cats:['أزياء','إلكترونيات'], browseSub:'', kind:'' }
+];
+function _styTemplatesFor(gender){
+  if(gender === 'women') return RIZQ_STYLE_WOMEN_TEMPLATES;
+  if(gender === 'boys') return RIZQ_STYLE_BOYS_TEMPLATES;
+  if(gender === 'girls') return RIZQ_STYLE_GIRLS_TEMPLATES;
+  return RIZQ_STYLE_MEN_TEMPLATES;
+}
+function _styGenderBadge(gender, fr){
+  if(gender === 'women') return fr ? 'Femmes' : 'نساء';
+  if(gender === 'boys') return fr ? 'Garçons' : 'أولاد';
+  if(gender === 'girls') return fr ? 'Filles' : 'بنات';
+  return fr ? 'Hommes' : 'رجال';
+}
+function _styTabIdFor(gender){
+  if(gender === 'women') return 'sty-tab-women';
+  if(gender === 'boys') return 'sty-tab-boys';
+  if(gender === 'girls') return 'sty-tab-girls';
+  return 'sty-tab-men';
+}
 
 function _styShuffle(arr){
   var a = arr.slice();
@@ -4410,6 +4468,12 @@ function _styAdBlob(a){
 }
 function _styDetectGender(a){
   var blob = _styAdBlob(a);
+  var boys = RIZQ_STYLE_BOYS_HINTS.test(blob);
+  var girls = RIZQ_STYLE_GIRLS_HINTS.test(blob);
+  var kids = RIZQ_STYLE_KIDS_HINTS.test(blob);
+  if(boys && !girls) return 'boys';
+  if(girls && !boys) return 'girls';
+  if(kids || (boys && girls)) return 'kids';
   var men = RIZQ_STYLE_MEN_HINTS.test(blob);
   var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
   if(men && !women) return 'men';
@@ -4439,17 +4503,27 @@ function _styPool(){
 }
 function _styMatchGender(a, gender){
   var g = _styDetectGender(a);
+  if(gender === 'boys') return g === 'boys' || g === 'kids';
+  if(gender === 'girls') return g === 'girls' || g === 'kids';
+  if(gender === 'men') return g === 'men' || g === 'both';
+  if(gender === 'women') return g === 'women' || g === 'both';
   return g === gender || g === 'both';
 }
 function _styIsStyleCat(a){
-  var k = String((a && a.catKey) || '');
-  return /أزياء|موضة|ذهب|صحة|جمال|إلكترون/.test(k);
+  var k = String((a && (a.catKey || a.cat)) || '');
+  return /أزياء|موضة|ذهب|صحة|جمال|إلكترون|fashion|mode|bijou|or\b|beaut|phone|télé|teleph|daraa|melhfa|دراعة|ملحفة/i.test(k);
+}
+function _styCatMatch(adCat, want){
+  var k = String(adCat || '');
+  var w = String(want || '');
+  if(!k || !w) return false;
+  return k === w || k.indexOf(w) >= 0 || w.indexOf(k) >= 0;
 }
 function _styPickCompanions(primary, pool, gender, n){
   var stylePool = pool.filter(_styIsStyleCat);
   var same = stylePool.filter(function(a){
     return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
-      (a.catKey === primary.catKey || /ذهب|أزياء|صحة|إلكترون/.test(String(a.catKey||'')));
+      (_styCatMatch(a.catKey, primary.catKey) || _styIsStyleCat(a));
   });
   var picks = _styShuffle(same).slice(0, n);
   if(picks.length < n){
@@ -4461,21 +4535,85 @@ function _styPickCompanions(primary, pool, gender, n){
   }
   return picks;
 }
+function _styFindAdById(id){
+  if(id == null || id === '') return null;
+  var sid = String(id);
+  var pool = _styPool();
+  for(var i=0;i<pool.length;i++){
+    if(String(pool[i].id) === sid) return pool[i];
+  }
+  if(typeof FEATURED_ADS !== 'undefined'){
+    for(var j=0;j<FEATURED_ADS.length;j++){
+      if(String(FEATURED_ADS[j].id) === sid) return FEATURED_ADS[j];
+    }
+  }
+  try {
+    var seeds = _styLoadSeeds();
+    for(var s=0;s<seeds.length;s++){
+      if(String(seeds[s].id) === sid) return seeds[s];
+    }
+  } catch(e){}
+  return null;
+}
+function rizqOpenStyleItem(ev, adId){
+  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  var ad = _styFindAdById(adId);
+  if(!ad){
+    if(adId != null && String(adId).indexOf('store-') !== 0){
+      window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(adId);
+    }
+    return false;
+  }
+  if(ad.href && (ad.fromView || String(ad.id).indexOf('store-') === 0)){
+    window.location.href = ad.href;
+    return false;
+  }
+  if(typeof goToListing === 'function') goToListing(ad);
+  else window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(ad.id);
+  return false;
+}
+function rizqOpenStyleLook(ev, primaryId, fallbackHref){
+  if(ev){
+    var t = ev.target;
+    if(t && t.closest && t.closest('.rizq-style-tile.is-linked')) return true;
+    ev.preventDefault();
+  }
+  if(primaryId){
+    return rizqOpenStyleItem(null, primaryId);
+  }
+  if(fallbackHref) window.location.href = fallbackHref;
+  return false;
+}
+window.rizqOpenStyleItem = rizqOpenStyleItem;
+window.rizqOpenStyleLook = rizqOpenStyleLook;
+
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
+  var linked = !!(ad && ad.id != null);
+  var openAttr = linked
+    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
+    : ' class="rizq-style-tile"';
+  var tag = linked ? 'button type="button"' : 'div';
+  var close = linked ? 'button' : 'div';
   if(src){
-    return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></div>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
   }
-  return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+emoji+'</div>';
+  return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
-function _styTileFromSrc(src, fallbackEmoji, fallbackBg){
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var linked = adId != null && adId !== '';
+  var openAttr = linked
+    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
+    : ' class="rizq-style-tile"';
+  var tag = linked ? 'button type="button"' : 'div';
+  var close = linked ? 'button' : 'div';
   if(src){
-    return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></div>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
   }
-  return '<div class="rizq-style-tile" style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</div>';
+  return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</'+close+'>';
 }
 
 /* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
@@ -4500,15 +4638,21 @@ function rizqFeedStyleSeed(item){
   var title = String(item.title || item.name || '').trim();
   if(!title) return;
   var blob = [title, item.titleFR || item.nameF || '', item.desc || '', item.cat || '', item.catKey || ''].join(' ');
+  var boys = RIZQ_STYLE_BOYS_HINTS.test(blob);
+  var girls = RIZQ_STYLE_GIRLS_HINTS.test(blob);
+  var kids = RIZQ_STYLE_KIDS_HINTS.test(blob);
   var men = RIZQ_STYLE_MEN_HINTS.test(blob);
   var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
   var gender = 'both';
-  if(men && !women) gender = 'men';
+  if(boys && !girls) gender = 'boys';
+  else if(girls && !boys) gender = 'girls';
+  else if(kids || (boys && girls)) gender = 'kids';
+  else if(men && !women) gender = 'men';
   else if(women && !men) gender = 'women';
   else {
     var k = String(item.catKey || item.cat || '');
     if(/ذهب|صحة|جمال|إلكترون|أزياء|موضة|fashion|mode/i.test(k) || men || women) gender = 'both';
-    else if(!_styIsStyleCat({ catKey: k }) && !/أزياء|موضة|ذهب|صحة|جمال|إلكترون|دراعة|ملحفة|daraa|melhfa/i.test(blob)){
+    else if(!_styIsStyleCat({ catKey: k }) && !/أزياء|موضة|ذهب|صحة|جمال|إلكترون|دراعة|ملحفة|daraa|melhfa|أطفال|أولاد|بنات/i.test(blob)){
       return; /* ليس منتج أناقة — تجاهل */
     }
   }
@@ -4533,7 +4677,8 @@ function rizqFeedStyleSeed(item){
   list.unshift(seed);
   _stySaveSeeds(list);
   if(typeof buildStyleIdeas === 'function' && document.getElementById('rizq-styles-rail')){
-    if(seed.gender === 'men' || seed.gender === 'women') setStyleGender(seed.gender);
+    if(RIZQ_STYLE_GENDERS[seed.gender]) setStyleGender(seed.gender);
+    else if(seed.gender === 'kids') setStyleGender(_rizqStyleGender === 'girls' ? 'girls' : 'boys');
     else buildStyleIdeas(true);
   }
 }
@@ -4574,7 +4719,7 @@ function _styStartAutoRefresh(){
 }
 
 function setStyleGender(gender){
-  if(gender !== 'men' && gender !== 'women') gender = 'men';
+  if(!RIZQ_STYLE_GENDERS[gender]) gender = 'men';
   _rizqStyleGender = gender;
   document.querySelectorAll('.rizq-styles-gtab').forEach(function(btn){
     var on = btn.getAttribute('data-sty-gender') === gender;
@@ -4582,8 +4727,21 @@ function setStyleGender(gender){
     btn.setAttribute('aria-selected', on ? 'true' : 'false');
   });
   var rail = document.getElementById('rizq-styles-rail');
-  if(rail) rail.setAttribute('aria-labelledby', gender === 'women' ? 'sty-tab-women' : 'sty-tab-men');
+  if(rail) rail.setAttribute('aria-labelledby', _styTabIdFor(gender));
   buildStyleIdeas(false);
+}
+function _styAdKind(a){
+  if(!a) return '';
+  var blob = [a.title||'', a.titleFR||'', a.subcat||'', a.cat||'', a.catKey||'', (a.tags||[]).join(' ')].join(' ');
+  if(/قميص|chemise|shirt|تي.?شيرت|t-?shirt/i.test(blob)) return 'shirt';
+  if(/هاتف|iphone|samsung|phone|téléphone|telephone|جوال|موبايل/i.test(blob)) return 'phone';
+  if(/حذاء|shoe|sneaker|صندل|صندلة|كوتشي|بوت/i.test(blob)) return 'shoe';
+  if(/ساعة|watch|montre|smartwatch/i.test(blob)) return 'watch';
+  if(/دراعة|daraa/i.test(blob)) return 'daraa';
+  if(/ملحفة|melhfa|عباية/i.test(blob)) return 'melhfa';
+  if(/حقيبة|sac|bag|handbag/i.test(blob)) return 'bag';
+  if(/ذهب|or\b|bijou|سوار|خاتم|ring/i.test(blob)) return 'gold';
+  return '';
 }
 function buildStyleIdeas(reshuffle){
   var rail = document.getElementById('rizq-styles-rail');
@@ -4593,20 +4751,24 @@ function buildStyleIdeas(reshuffle){
     if(typeof isAr !== 'undefined') fr = !isAr;
     else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   } catch(e) {}
-  var gender = _rizqStyleGender === 'women' ? 'women' : 'men';
-  var templates = gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES;
+  var gender = RIZQ_STYLE_GENDERS[_rizqStyleGender] ? _rizqStyleGender : 'men';
+  var templates = _styTemplatesFor(gender);
   var pool = _styPool();
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
   var seeds = _styLoadSeeds().filter(function(s){
+    if(gender === 'boys') return s.gender === 'boys' || s.gender === 'kids';
+    if(gender === 'girls') return s.gender === 'girls' || s.gender === 'kids';
     return s.gender === gender || s.gender === 'both';
   });
   var tplList = _styShuffle(templates).slice(0, 3);
   var usedIds = {};
   var cards = [];
-  var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
+  var cta = (typeof LANG !== 'undefined' && LANG[fr?'fr':'ar'] && LANG[fr?'fr':'ar']['sty-cta'])
+    ? LANG[fr?'fr':'ar']['sty-cta']
+    : (fr ? 'Voir le look' : 'تسوّق الإطلالة');
   var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
 
-  /* بطاقة أولى من آخر منتج شاهدته (دراعة من محل، إعلان أزياء…) */
+  /* بطاقة أولى من آخر منتج شاهدته */
   if(seeds.length){
     var seed = seeds[0];
     usedIds[String(seed.id)] = 1;
@@ -4614,14 +4776,15 @@ function buildStyleIdeas(reshuffle){
     while(seedImgs.length < 3) seedImgs.push(null);
     var seedTiles = '';
     for(var si=0; si<3; si++){
-      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg);
-      else seedTiles += _styTileHtml({ emoji: seed.emoji, bg: seed.bg, images: [] }, (gender==='women'?RIZQ_STYLE_WOMEN_TEMPLATES:RIZQ_STYLE_MEN_TEMPLATES)[0].emoji[si], seed.bg);
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id);
+      else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true }, templates[0].emoji[si], seed.bg);
     }
     var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
-    var genderBadge0 = gender === 'women' ? (fr ? 'Femme' : 'نسائي') : (fr ? 'Homme' : 'رجالي');
+    var genderBadge0 = _styGenderBadge(gender, fr);
+    var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
     cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seed.href||'#')+'" data-sty-gender="'+gender+'" data-sty-seed="1">'
-      + '<div class="rizq-style-mosaic" aria-hidden="true">'+seedTiles+'</div>'
+      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seedHref)+'" data-sty-gender="'+gender+'" data-sty-seed="1" onclick="return rizqOpenStyleLook(event,\''+_styEsc(String(seed.id)).replace(/'/g,'&#39;')+'\',\''+_styEsc(seedHref).replace(/'/g,'&#39;')+'\')">'
+      + '<div class="rizq-style-mosaic">'+seedTiles+'</div>'
       + '<div class="rizq-style-body">'
       +   '<div class="rizq-style-from-view">'+_styEsc(fromViewLbl)+'</div>'
       +   '<div class="rizq-style-badge">'+_styEsc(genderBadge0)+'</div>'
@@ -4635,15 +4798,28 @@ function buildStyleIdeas(reshuffle){
 
   tplList.forEach(function(tpl){
     var styleGendered = gendered.filter(_styIsStyleCat);
+    var kindPool = (tpl.kind ? styleGendered.filter(function(a){ return _styAdKind(a) === tpl.kind && !usedIds[String(a.id)]; }) : []);
     var catPool = styleGendered.filter(function(a){
-      var k = String(a.catKey||'');
-      return (tpl.cats||[]).some(function(c){ return k === c || k.indexOf(c)>=0 || c.indexOf(k)>=0; }) && !usedIds[String(a.id)];
+      var k = String(a.catKey||a.cat||'');
+      return (tpl.cats||[]).some(function(c){ return _styCatMatch(k, c); }) && !usedIds[String(a.id)];
     });
+    if(kindPool.length) catPool = kindPool.concat(catPool.filter(function(a){
+      return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
+    }));
     if(!catPool.length) catPool = styleGendered.filter(function(a){ return !usedIds[String(a.id)]; });
     if(!catPool.length) catPool = pool.filter(function(a){ return _styIsStyleCat(a) && !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
     var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool.filter(_styIsStyleCat), gender, 2) : [];
+    /* Prefer same kind companions when possible (other shirts / phones…) */
+    if(primary && tpl.kind){
+      var sameKind = styleGendered.filter(function(a){
+        return String(a.id) !== String(primary.id) && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)];
+      });
+      if(sameKind.length){
+        companions = _styShuffle(sameKind).slice(0, 2);
+      }
+    }
     companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
@@ -4663,14 +4839,17 @@ function buildStyleIdeas(reshuffle){
     } else {
       href = 'rizq_browse.html';
     }
-    var genderBadge = gender === 'women' ? (fr ? 'Femme' : 'نسائي') : (fr ? 'Homme' : 'رجالي');
+    var genderBadge = _styGenderBadge(gender, fr);
     var tiles = '';
     for(var ti=0; ti<3; ti++){
       tiles += _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg);
     }
+    var primaryIdAttr = primary && primary.id != null
+      ? String(primary.id).replace(/'/g,'&#39;')
+      : '';
     cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(href)+'" data-sty-gender="'+gender+'">'
-      + '<div class="rizq-style-mosaic" aria-hidden="true">'+tiles+'</div>'
+      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(href)+'" data-sty-gender="'+gender+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+_styEsc(href).replace(/'/g,'&#39;')+'\')">'
+      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
       + '<div class="rizq-style-body">'
       +   '<div class="rizq-style-badge">'+_styEsc(genderBadge)+'</div>'
       +   '<div class="rizq-style-name">'+_styEsc(name)+'</div>'
@@ -4690,6 +4869,7 @@ function buildStyleIdeas(reshuffle){
   if(reshuffle){
     try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
     catch(e2) { rail.scrollLeft = 0; }
+    try { _styStartAutoRefresh(); } catch(e3) {}
   }
   _styUpdateTick(fr);
 }
@@ -5862,8 +6042,10 @@ const LANG = {
     'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
     'sty-desc': 'إطلالات مختارة من محلات موثوقة على رزق — اختر القطعة أو تسوّق الإطلالة كاملة',
     'sty-reshuffle': '🔀 اقتراحات جديدة',
-    'sty-men': 'رجالي',
-    'sty-women': 'نسائي',
+    'sty-men': 'رجال',
+    'sty-women': 'نساء',
+    'sty-boys': 'أولاد',
+    'sty-girls': 'بنات',
     'sty-cta': 'تسوّق الإطلالة',
     'sty-from-view': 'من مشاهدتك',
   },
@@ -5956,8 +6138,10 @@ const LANG = {
     'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
     'sty-desc': 'Looks sélectionnés depuis des boutiques vérifiées sur Rizq — choisissez une pièce ou achetez le look complet',
     'sty-reshuffle': '🔀 Nouvelles suggestions',
-    'sty-men': 'Homme',
-    'sty-women': 'Femme',
+    'sty-men': 'Hommes',
+    'sty-women': 'Femmes',
+    'sty-boys': 'Garçons',
+    'sty-girls': 'Filles',
     'sty-cta': 'Voir le look',
     'sty-from-view': 'Vu récemment',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
