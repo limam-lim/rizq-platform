@@ -2472,7 +2472,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_terms_gate.js?v=18.2"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=16.3"></script>
+<script src="rizq_dynamic_nav.js?v=16.4"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
@@ -2481,6 +2481,66 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_ux_polish.js?v=17.5"></script>
 </head>
 <body>
+
+<!-- معاينة قابلة للرجوع — فرع منفصل؛ إخفاء الشريط لا يلغي الكود -->
+<div id="rizq-ads-preview-banner" role="status" hidden>
+  <div class="rzq-preview-inner">
+    <span class="rzq-preview-dot" aria-hidden="true"></span>
+    <span id="rizq-ads-preview-text">معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · موضع واحد في الصفحة · يمكن الرجوع عبر Git</span>
+    <button type="button" id="rizq-ads-preview-dismiss" aria-label="إخفاء">✕</button>
+  </div>
+</div>
+<style>
+#rizq-ads-preview-banner{
+  position:fixed;top:70px;left:0;right:0;z-index:980;
+  background:linear-gradient(90deg,rgba(15,23,42,.97),rgba(27,58,107,.95));
+  border-bottom:1px solid rgba(201,168,76,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+#rizq-ads-preview-banner[hidden]{display:none!important}
+.rzq-preview-inner{
+  max-width:1100px;margin:0 auto;padding:10px 16px;
+  display:flex;align-items:center;gap:12px;justify-content:center;
+  color:rgba(255,255,255,.92);font-size:13px;font-weight:600;line-height:1.45;text-align:center;
+}
+.rzq-preview-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:#C9A84C;box-shadow:0 0 10px rgba(201,168,76,.6);
+  animation:rzqPreviewPulse 1.6s ease-in-out infinite;
+}
+@keyframes rzqPreviewPulse{0%,100%{opacity:.55}50%{opacity:1}}
+#rizq-ads-preview-dismiss{
+  flex-shrink:0;margin-inline-start:auto;
+  width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:14px;
+}
+#rizq-ads-preview-dismiss:hover{background:rgba(255,255,255,.12)}
+@media(max-width:768px){
+  #rizq-ads-preview-banner{top:auto;bottom:64px}
+  .rzq-preview-inner{font-size:12px;padding:9px 12px}
+}
+</style>
+<script>
+(function(){
+  try{
+    if(sessionStorage.getItem('rizq_ads_preview_hide')==='1') return;
+  }catch(e){}
+  var b=document.getElementById('rizq-ads-preview-banner');
+  var t=document.getElementById('rizq-ads-preview-text');
+  var d=document.getElementById('rizq-ads-preview-dismiss');
+  if(!b) return;
+  var fr=(document.documentElement.lang==='fr')||(localStorage.getItem('rizq_lang')==='fr');
+  if(t) t.textContent=fr
+    ? 'Aperçu Rizq ADS — Annonces classées séparées · 1 emplacement homepage · Annulable via Git'
+    : 'معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · موضع واحد في الصفحة · يمكن الرجوع عبر Git';
+  b.hidden=false;
+  if(d) d.addEventListener('click',function(){
+    b.hidden=true;
+    try{sessionStorage.setItem('rizq_ads_preview_hide','1')}catch(e){}
+  });
+})();
+</script>
 
 <div id="rizq-splash" class="rizq-splash" aria-hidden="true">
   <div class="rizq-splash-mark">
@@ -2544,6 +2604,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع">
   <a href="#categories" data-jump="#categories">الأقسام</a>
   <a href="#hero-listings" data-jump="#hero-listings">الإعلانات</a>
+  <a href="#hero-vid-wrap" data-jump="#hero-vid-wrap">Rizq ADS</a>
   <a href="#pricing" data-jump="#pricing">الباقات</a>
   <a href="rizq_investments.html" data-jump="invest">غرفة الاستثمارات</a>
 </nav>
@@ -2623,9 +2684,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <p class="hero-tagline">متجرك الافتراضي &nbsp;·&nbsp; مكتبك المهني &nbsp;·&nbsp; إعلانك المؤسسي &nbsp;—&nbsp; كل شيء في مكان واحد</p>
 
-    <!-- ══ FEATURED VIDEO AD (Rizq ADS — الموضع الأول — يُفعَّل من الأدمن) ══ -->
-    <div class="hero-vid-wrap" id="hero-vid-wrap">
-      <span class="hero-vid-badge">🎬 إعلان فيديو مميز · Rizq ADS</span>
+    <!-- ══ FEATURED VIDEO AD (Rizq ADS — موضع واحد مميز فقط · معاينة IA) ══ -->
+    <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
+      <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
       <div class="hero-vid-inner">
         <video id="hero-featured-vid" autoplay muted loop playsinline></video>
         <!-- placeholder: يُخفى تلقائياً حين يوجد فيديو -->
@@ -6830,8 +6891,8 @@ function applyLandingLang(toAr) {
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {
     var jumpMap = isAr
-      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#pricing':'الباقات','invest':'غرفة الاستثمارات'}
-      : {'#categories':'Catégories','#hero-listings':'Annonces','#pricing':'Forfaits','invest':'Salle des investissements'};
+      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#hero-vid-wrap':'Rizq ADS','#pricing':'الباقات','invest':'غرفة الاستثمارات'}
+      : {'#categories':'Catégories','#hero-listings':'Annonces','#hero-vid-wrap':'Rizq ADS','#pricing':'Forfaits','invest':'Salle des investissements'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];

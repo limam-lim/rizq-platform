@@ -21,10 +21,19 @@
 
   /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
   var MOBILE_MORE_EXTRAS = [
-    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
+    /* الإعلانات المبوبة ≠ Rizq ADS — فصل واضح في القائمة */
+    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#hero-listings' },
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬', landingHref: '#hero-vid-wrap' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
+  ];
+
+  /** روابط سطح المكتب الثابتة في الشريط (فصل الإعلانات عن المنتج الإعلاني) */
+  var DESKTOP_MAIN_EXTRAS = [
+    { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', order: 2.5, landingHref: '#hero-listings', gold: false },
+    /* Rizq ADS دائماً → صفحة المنتج (الموضع في الهوم عبر شريط القفز) */
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬', order: 2.6, gold: true }
   ];
 
   var LABELS = {
@@ -148,10 +157,42 @@
     container.setAttribute('data-rizq-modules-ready', '1');
   }
 
+  function ensureDesktopMainExtras(container) {
+    if (!container || container.classList.contains('rizq-hdr-row2')) return;
+    var onLanding = isLanding();
+    var insertAfter = container.querySelector('[data-nav-order="2"]');
+    DESKTOP_MAIN_EXTRAS.forEach(function (item) {
+      var sel = '[data-rizq-nav-extra="' + item.hdr + '"]';
+      if (container.querySelector(sel)) return;
+      var li = document.createElement('li');
+      li.className = 'rizq-nav-extra';
+      li.setAttribute('data-rizq-nav-extra', item.hdr);
+      li.setAttribute('data-nav-order', String(item.order));
+      var a = document.createElement('a');
+      a.href = resolveHref(item, onLanding);
+      a.setAttribute('data-hdr', item.hdr);
+      a.textContent = labelFor(item);
+      if (item.gold) {
+        a.style.color = 'var(--gold)';
+        a.style.background = 'rgba(201,168,76,.10)';
+        a.style.border = '1px solid rgba(201,168,76,.25)';
+      }
+      li.appendChild(a);
+      if (insertAfter && insertAfter.parentNode) {
+        insertAfter.parentNode.insertBefore(li, insertAfter.nextSibling);
+        insertAfter = li;
+      } else {
+        container.appendChild(li);
+        insertAfter = li;
+      }
+    });
+  }
+
   function applyMainBar(flags) {
     var phone = isPhoneNav();
     document.querySelectorAll('#nav .nav-center, #rizq-desk-nav .nav-center, #rizq-app-header .rizq-hdr-row2').forEach(function (container) {
       ensureModuleSlots(container);
+      ensureDesktopMainExtras(container);
       MODULES.forEach(function (mod) {
         var open = moduleOpen(flags, mod.key);
         container.querySelectorAll('[data-rizq-module="' + mod.key + '"]').forEach(function (el) {
@@ -165,6 +206,11 @@
             el.style.display = 'none';
           }
         });
+      });
+      /* على الجوال: الإعلانات وRizq ADS في «المزيد» فقط — إخفاء من الشريط */
+      container.querySelectorAll('[data-rizq-nav-extra]').forEach(function (el) {
+        if (phone) el.style.display = 'none';
+        else el.style.removeProperty('display');
       });
       var aiOrder = 8;
       var moreOrder = 9;
