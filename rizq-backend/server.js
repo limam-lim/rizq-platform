@@ -5,7 +5,7 @@
  * خادم خلفي صغير وآمن لمنصة رزق
  * ══════════════════════════════════════════════════════════════════
  */
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
 ensureAnthropicEnv();
@@ -297,8 +297,7 @@ app.use('/api/', rateLimit({
 // وتسجيل الدخول يمر عبر /api/admin/login الذي يتحقق من الهاش ويُصدر
 // جلسة (token) عشوائية يتحقق منها الخادم في كل مرة عبر requireAdminSession.
 //
-// لإضافة حساب جديد أو تغيير كلمة سر موجودة، احسب الهاش بهذا الأمر ثم
-// ضع الناتج في passHash أدناه:
+// لإضافة حساب أدمن: ضع bcrypt hash في ADMIN_ACCOUNTS_JSON أو ADMIN_PASS_HASH_N
 //   node -e "console.log(require('bcryptjs').hashSync('كلمة_السر_الجديدة', 10))"
 const bcrypt = require('bcryptjs');
 // سوبر أدمن المالك — الهاش من البيئة فقط في الإنتاج؛ لا هاشات تشغيلية في المصدر.
@@ -964,6 +963,49 @@ app.get('/api/ai/status', (req, res) => {
     agentModel: getAgentModel(),
     advancedModel: getAdvancedModel(),
     haikuFallback: false,
+  });
+});
+
+/** GET /api/admin/agents-health — حالة ربط كل الوكلاء بمفتاح Claude + السر المشترك */
+app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
+  const sharedConfigured = !!(process.env.BACKEND_SHARED_SECRET || '').trim();
+  const apiSecretConfigured = !!(process.env.RIZQ_API_SECRET || '').trim();
+  const claudeConfigured = isAnthropicConfigured();
+  // linkedToKeyLoader = الكود يقرأ المفتاح عبر config/anthropic فقط (لا مفتاح منفصل)
+  // wired = جاهز للتشغيل الآن (المفتاح موجود في بيئة الخادم)
+  const agents = [
+    { id: 'widget', name: 'ويدجت الدردشة', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'services/widgetChat.js → getAnthropicApiKey()' },
+    { id: 'inquiry-auto-reply', name: 'رد تلقائي على الاستفسارات', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'inquiryAutoReply → widgetChat' },
+    { id: 'brain', name: 'عقل القنوات (مركزي)', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_agent_brain.js → getAnthropicApiKey()' },
+    { id: 'call', name: 'وكيل المكالمات', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_call_handler → agent_brain / subscriber_agent' },
+    { id: 'whatsapp', name: 'وكيل واتساب', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_whatsapp_handler → agent_brain / subscriber_agent' },
+    { id: 'email', name: 'وكيل البريد', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_email_handler → agent_brain' },
+    { id: 'subscriber', name: 'وكيل المشترك الماسي', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'rizq_subscriber_agent.js → getAnthropicApiKey()' },
+    { id: 'receipt-vision', name: 'قراءة إيصالات الدفع', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'services/receiptVision.js → getAnthropicApiKey()' },
+    { id: 'translate', name: 'الترجمة الإدارية', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'server /api/translate → getAnthropicApiKey()' },
+    { id: 'telegram-admin', name: 'بوت تيليغرام الإداري', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'telegramAdmin + anthropic client من server' },
+    { id: 'package-lifecycle', name: 'دورة حياة الباقات', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'SMS/قواعد — لا يحتاج Claude' },
+    { id: 'moderator', name: 'المشرف الآلي', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'قواعد محلية في المتصفح' },
+    { id: 'visual', name: 'الوكيل البصري', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'Canvas في المتصفح — بلا Claude' },
+    { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'عدّاد حصص — بلا استدعاء Claude' },
+    { id: 'secretary-gate', name: 'بوابة السكرتير (واجهة)', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'يُفعّل الويدجت فقط؛ الذكاء عبر widget/subscriber' },
+  ];
+  const blockers = [];
+  if (!claudeConfigured) blockers.push('أضف ANTHROPIC_API_KEY (أو CLAUDE_API_KEY) في rizq-backend/.env ثم أعد تشغيل الخادم');
+  if (!sharedConfigured) blockers.push('أضف BACKEND_SHARED_SECRET في .env والصقه في حقل السر المشترك بلوحة التحكم');
+  const claudeAgents = agents.filter((a) => a.needsClaude);
+  res.json({
+    ok: true,
+    claudeConfigured,
+    sharedSecretConfigured: sharedConfigured,
+    apiSecretConfigured,
+    model: getAgentModel(),
+    advancedModel: getAdvancedModel(),
+    agents,
+    allClaudeAgentsLinkedToKeyLoader: claudeAgents.every((a) => a.linkedToKeyLoader),
+    allClaudeAgentsRuntimeReady: claudeConfigured && claudeAgents.every((a) => a.wired),
+    ready: claudeConfigured && sharedConfigured,
+    blockers,
   });
 });
 
@@ -1733,7 +1775,7 @@ app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
  * شركة/فرد). يُعيد {id, accessToken} — الجهاز المسجِّل يحفظهما محلياً
  * ليتحقق لاحقاً من حالة الموافقة عبر GET /api/accounts/mine/:id.
  */
-app.post('/api/accounts', accountsRegisterLimiter, (req, res) => {
+app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const b = req.body || {};
   const pFlags = getPlatformFlags();
   if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
@@ -2101,6 +2143,16 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
     ? clientId : ('sub_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex'));
+  let receiptPath = null;
+  let receiptMeta = null;
+  if (b.receiptImage) {
+    const stored = storeReceipt(b.receiptImage, { accountId: String(b.accountId || '').slice(0, 60), requestId: id });
+    if (!stored.ok) {
+      return res.status(stored.status || 400).json({ ok: false, error: stored.error, maxBytes: stored.maxBytes });
+    }
+    receiptPath = stored.relativePath;
+    receiptMeta = { mime: stored.mime, bytes: stored.bytes };
+  }
   const rec = {
     id,
     pkg: String(b.pkg).slice(0, 60),
@@ -2244,6 +2296,7 @@ const {
   broadcastSMS,
   getAccountRecord,
   getAllAccountPackageRecords,
+  updatePackageStatus,
   syncAccountPackage,
   createPendingPackageFromRequest,
 } = require('./rizq_package_lifecycle_agent');
@@ -3556,7 +3609,7 @@ setupIntegrationAPI(app, {
   readCatalog,
   readMessages,
   writeMessages,
-  requireAdminAuth,
+  requireAdminAuth: requireAdminPermission('siteconfig.write'),
 });
 
 // ── تطوير محلي: صفحات HTML + API على نفس المنفذ (localhost:3000) ──
@@ -3631,6 +3684,12 @@ assertProductionSecrets();
 app.listen(PORT, HOST, async () => {
   console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
   console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
+  if (isAnthropicConfigured()) {
+    const k = getAnthropicApiKey();
+    console.log('[rizq-backend] Claude key: READY (len=' + k.length + ', prefix=' + k.slice(0, 7) + '…)');
+  } else {
+    console.warn('[rizq-backend] Claude key: MISSING — set ANTHROPIC_API_KEY in rizq-backend/.env (uncommented) then restart');
+  }
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {
     console.log('[telegram-admin] subscription alerts enabled');

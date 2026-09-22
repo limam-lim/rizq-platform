@@ -1119,7 +1119,12 @@
   }
   function setAgentConfig(partial) {
     var cfg = Object.assign(getAgentConfig(), partial || {});
-    localStorage.setItem(AGENT_CFG_KEY, JSON.stringify(cfg));
+    var toStore = Object.assign({}, cfg);
+    if (toStore.backendSecret) {
+      try { sessionStorage.setItem(AGENT_CFG_KEY + '_secret', String(toStore.backendSecret)); } catch (eS) {}
+      delete toStore.backendSecret;
+    }
+    localStorage.setItem(AGENT_CFG_KEY, JSON.stringify(toStore));
     return cfg;
   }
   function isAgentEnabled() { return getAgentConfig().enabled !== false; }

@@ -352,6 +352,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+<script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
@@ -442,15 +443,15 @@ textarea.form-input{resize:vertical;min-height:90px}
 <!-- MAIN -->
 <div class="main">
   <div class="topbar" style="background:#1B3A6B">
+    <div class="topbar-title" id="topbar-title" data-t="topbar-overview">📊 نظرة عامة</div>
     <div class="topbar-actions topbar-controls">
       <div class="notif-bell" onclick="showPanel('messages',null)" data-t-title="topbar-notif-title" title="رسائل جديدة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notif-count" hidden>0</span></div>
       <button type="button" class="topbar-btn" onclick="openShareModal()" data-t="topbar-share">📤 مشاركة</button>
       <button type="button" class="topbar-btn" onclick="openAddProduct()" data-t="topbar-new-product">➕ منتج جديد</button>
       <button type="button" class="topbar-btn" onclick="previewMyPage()" data-t="topbar-preview">👁️ معاينة</button>
       <button type="button" class="topbar-btn gold" onclick="showPanel('subscription',null)" data-t="topbar-my-sub">💳 اشتراكي</button>
-      <button type="button" class="topbar-btn btn-lang-store btn-lang btn-lang-primary" id="store-lang-btn" onclick="toggleLangStore()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+      <button type="button" class="topbar-btn btn-lang-store btn-lang btn-lang-primary" id="store-lang-btn" onclick="toggleLangStore()" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     </div>
-    <div class="topbar-title" id="topbar-title" data-t="topbar-overview">📊 نظرة عامة</div>
   </div>
 
   <div class="content">

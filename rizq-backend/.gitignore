@@ -3,3 +3,8 @@ node_modules/
 *.log
 data/
 backups/
+
+# Secure receipt storage (admin-only via API)
+uploads/receipts/**
+!uploads/receipts/.gitkeep
+!uploads/receipts/.htaccess

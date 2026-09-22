@@ -1,5 +1,6 @@
 /**
  * مصادقة الأدمن — جلسة x-admin-token (المتصفح) أو سرّ خادمي (سكربتات فقط)
+ * + فحص صلاحيات الدور (RBAC)
  */
 const { timingSafeEqualStr } = require('../lib/secureCompare');
 const { isProdEnv } = require('./accountAuth');

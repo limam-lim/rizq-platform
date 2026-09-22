@@ -64,10 +64,11 @@
       'chat-ph': 'اكتب رسالة...',
       'chat-send': 'إرسال',
       'chat-continue-wa': 'متابعة المحادثة على واتساب',
-      'price-r1': 'أقل من 50,000',
-      'price-r2': '50,000 — 150,000',
-      'price-r3': '150,000 — 500,000',
-      'price-r4': 'أكثر من 500,000',
+      /* نطاقات افتراضية (MRU) ×10 — تُستبدَل حسب القسم عبر RizqUx */
+      'price-r1': 'أقل من 500 ألف',
+      'price-r2': '500 ألف — 2.5 مليون',
+      'price-r3': '2.5 مليون — 10 مليون',
+      'price-r4': 'أكثر من 10 مليون',
       'save-ad': '♡ حفظ',
       'share-ad': '↗ مشاركة',
       'nav-search-ph': 'ابحث في رزق...',
@@ -178,10 +179,10 @@
       'chat-ph': 'Écrire un message...',
       'chat-send': 'Envoyer',
       'chat-continue-wa': 'Continuer sur WhatsApp',
-      'price-r1': 'Moins de 50 000',
-      'price-r2': '50 000 — 150 000',
-      'price-r3': '150 000 — 500 000',
-      'price-r4': 'Plus de 500 000',
+      'price-r1': 'Moins de 500 mille',
+      'price-r2': '500 mille — 2,5 millions',
+      'price-r3': '2,5 — 10 millions',
+      'price-r4': 'Plus de 10 millions',
       'save-ad': '♡ Sauvegarder',
       'share-ad': '↗ Partager',
       'nav-search-ph': 'Rechercher sur Rizq...',
@@ -521,6 +522,16 @@
     }, 0);
   }
 
+  /** إعادة تطبيق الترجمة على جذر ديناميكي (بعد innerHTML) */
+  function refresh(root) {
+    applyStaticDom(root || document);
+    try {
+      if (global.RizqLangGuard && typeof global.RizqLangGuard.refresh === 'function') {
+        global.RizqLangGuard.refresh(root || document);
+      }
+    } catch (eR) {}
+  }
+
   function toggle() {
     applyLang(state.lang === 'ar' ? 'fr' : 'ar');
   }
@@ -543,6 +554,7 @@
     apply: applyLang,
     toggle: toggle,
     init: init,
+    refresh: refresh,
     getLang: function () { return state.lang; },
     applyStaticDom: applyStaticDom,
     applyRootDir: applyRootDir,

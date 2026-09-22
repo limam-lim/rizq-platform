@@ -1,5 +1,7 @@
 /**
  * استخراج توكن الحساب — في الإنتاج: رأس فقط (لا query string)
+ * dashToken يُقبل كدليل ملكية على مسارات المالك حتى لا نحتاج لإرجاع accessToken
+ * من verify-dash (تصعيد صلاحيات عبر رابط الداشبورد).
  */
 function isProdEnv() {
   return process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
@@ -28,4 +30,14 @@ function extractDashToken(req) {
   return '';
 }
 
-module.exports = { isProdEnv, extractAccountToken, extractDashToken };
+/** يطابق accessToken أو dashToken لنفس الحساب (كلاهما يثبت الملكية). */
+function tokenMatchesAccount(acc, token) {
+  if (!acc || !token) return false;
+  const t = String(token).trim();
+  if (!t) return false;
+  if (acc.accessToken && t === acc.accessToken) return true;
+  if (acc.dashToken && t === acc.dashToken) return true;
+  return false;
+}
+
+module.exports = { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount };

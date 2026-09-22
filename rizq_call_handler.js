@@ -57,7 +57,9 @@ const {
   setupSubscriberAPI,
 } = require('./rizq_subscriber_agent');
 const { askAgent } = require('./rizq_agent_brain');
-const { getAdvancedModel } = require('./rizq-backend/config/anthropic');
+const { getAdvancedModel, isAnthropicConfigured } = require('./rizq-backend/config/anthropic');
+const { validateTwilioSignature } = require('./rizq-backend/middleware/twilioWebhookAuth');
+
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -550,7 +552,7 @@ app.get('/', requireSatelliteSecret, (req, res) => {
       <tr><td style="padding:8px;font-weight:bold">وكلاء نشطون</td><td>${activeCount}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">مكالمات مسجّلة</td><td>${callLog.length}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Claude Model</td><td>${getAdvancedModel()}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">API Key</td><td>${process.env.ANTHROPIC_API_KEY ? '✅ موجود' : '❌ مفقود'}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">API Key</td><td>${isAnthropicConfigured() ? '✅ موجود' : '❌ مفقود'}</td></tr>
     </table>
     <hr>
     <h3>آخر 5 مكالمات:</h3>

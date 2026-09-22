@@ -332,10 +332,22 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+<script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_packages_config.js?v=13"></script>
   <script src="rizq_pwa.js" defer></script>
 </head>
 <body class="rizq-dash" data-t-ns="admin">
+<script>
+(function(){
+  try{
+    var u=new URL(location.href);
+    if(u.searchParams.has('k')){
+      u.searchParams.delete('k');
+      history.replaceState(null,'',u.pathname+(u.search||'')+(u.hash||''));
+    }
+  }catch(e){}
+})();
+</script>
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -348,6 +360,7 @@ main, .page-content.active, .main-content, .results-area,
     <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/>
     <div class="login-err" id="login-err"></div>
     <button class="login-btn" id="login-btn" data-t="login-btn" onclick="doLogin()">🔐 دخول إلى لوحة التحكم</button>
+    <p id="login-hint" style="margin:14px 0 0;font-size:12px;line-height:1.7;color:rgba(201,168,76,.75);text-align:center">افتح اللوحة دائماً عبر الرابط الكامل الذي ينتهي بـ ?k= — وفضّل مضيفاً واحداً (127.0.0.1 أو localhost)</p>
   </div>
 </div>
 
@@ -2603,7 +2616,14 @@ const PAYMENTS_DATA = [];
 // نتحقق منه عند كل إعادة تحميل عبر /api/admin/verify بدل الثقة بأي حالة
 // محلية بلا تحقق.
 let currentAdmin = null;
-function _adminBackendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
+function _adminBackendBase(){
+  if (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) return window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+  // نفس أصل الصفحة عند فتح اللوحة عبر المسار السري على الخادم (يتجنب فشل localhost≠127.0.0.1)
+  try {
+    if (location && /^https?:$/i.test(location.protocol) && location.host) return location.origin;
+  } catch (e) {}
+  return 'http://127.0.0.1:3000';
+}
 
 function _enterAdminUI(found){
   currentAdmin = found;
@@ -2612,6 +2632,10 @@ function _enterAdminUI(found){
   updatePendingBadge();
   updatePaymentsBadge();
   document.getElementById('sb-admin-name').textContent = found.name;
+  const roleMeta = found.roleMeta || {};
+  const roleLine = (roleMeta.emoji || '') + ' ' + (ROLE_LABELS[found.role] || found.role || '');
+  const roleEl = document.querySelector('.sb-admin-role');
+  if (roleEl) roleEl.textContent = roleLine.trim() || found.role;
   document.getElementById('welcome-name').textContent = found.name;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-MR-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   loadAdminPermCatalog().then(function(){ _applyAdminPermissions(); });
@@ -2642,19 +2666,37 @@ async function doLogin(){
   err.textContent='';
   if(btn) btn.disabled = true;
   try{
-    const res = await fetch(_adminBackendBase()+'/api/admin/login', {
+    const loginUrl = _adminBackendBase()+'/api/admin/login';
+    const res = await fetch(loginUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user:u, pass:p })
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok || !data.ok){
-      err.textContent = RizqI18n.t2(data.error||'❌ بيانات غير صحيحة','❌ Identifiants incorrects');
+      if (res.status === 429) {
+        err.textContent = RizqI18n.t2(data.error||'محاولات كثيرة — انتظر دقيقة ثم أعد المحاولة','Trop de tentatives — attendez une minute puis réessayez');
+        return;
+      }
+      if (res.status === 404 || (data && data.code === 'NOT_FOUND')) {
+        err.textContent = RizqI18n.t2(
+          '⚠️ الخادم لا يرى مسار الدخول — تأكد أنك فتحت اللوحة من رابط الخادم (المنفذ 3000) وليس ملفاً محلياً',
+          '⚠️ Endpoint introuvable — ouvrez le panneau via le serveur (port 3000), pas un fichier local'
+        );
+        return;
+      }
+      err.textContent = RizqI18n.t2(
+        data.error || '❌ بيانات غير صحيحة — كلمة المرور حساسة لحالة الأحرف',
+        '❌ Identifiants incorrects — le mot de passe est sensible à la casse'
+      );
       return;
     }
     try{ sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ token:data.token, name:data.name, role:data.role, permissions:data.permissions||[], user:data.user })); }catch(e){}
     _enterAdminUI({ name:data.name, role:data.role, permissions:data.permissions||[], user:data.user });
   }catch(e){
-    err.textContent = RizqI18n.t2('⚠️ تعذّر الاتصال بالخادم، حاول مرة أخرى','⚠️ Connexion au serveur impossible, réessayez');
+    err.textContent = RizqI18n.t2(
+      '⚠️ تعذّر الاتصال بالخادم على '+_adminBackendBase()+' — شغّل rizq-backend ثم أعد المحاولة',
+      '⚠️ Impossible de joindre '+_adminBackendBase()+' — démarrez rizq-backend puis réessayez'
+    );
   }finally{
     if(btn) btn.disabled = false;
   }
@@ -5877,6 +5919,15 @@ function toggleSubAgent(checkbox){
 }
 function saveSubAgentConfig(){
   if(typeof RizqSub === 'undefined') return;
+  var url = document.getElementById('subagent-backend-url').value.trim();
+  var secret = document.getElementById('subagent-backend-secret').value.trim();
+  if(url && !secret){
+    showToast(RizqI18n.t2('⚠️ رابط الخادم مضبوط لكن السر المشترك فارغ — الصق BACKEND_SHARED_SECRET ثم احفظ','⚠️ URL backend défini mais le secret partagé est vide — collez BACKEND_SHARED_SECRET puis enregistrez'), 'error');
+  }
+  if(secret && (secret === 'BACKEND_SHARED_SECRET' || secret.indexOf('change-me') === 0)){
+    showToast(RizqI18n.t2('❌ لا تضع النص التوضيحي — ضع القيمة الحقيقية من .env','❌ Ne mettez pas le texte d’exemple — collez la vraie valeur depuis .env'), 'error');
+    return;
+  }
   RizqSub.setAgentConfig({
     notes: document.getElementById('subagent-notes').value,
     backendUrl: document.getElementById('subagent-backend-url').value.trim(),
@@ -5884,6 +5935,53 @@ function saveSubAgentConfig(){
   });
   var msg = document.getElementById('subagent-saved-msg');
   if(msg){ msg.style.display='inline'; setTimeout(function(){msg.style.display='none';},2000); }
+  checkSubAgentHealth();
+}
+
+async function checkSubAgentHealth(){
+  var box = document.getElementById('subagent-health-box');
+  if(box){ box.style.display='block'; box.style.background='#f8fafc'; box.style.border='1px solid #e2e8f0'; box.style.color='#334155'; box.textContent = RizqI18n.t2('...جارٍ الفحص','...Vérification'); }
+  var cfg = (typeof RizqSub !== 'undefined') ? RizqSub.getAgentConfig() : {};
+  var base = (cfg.backendUrl || _adminBackendBase() || '').replace(/\/$/,'');
+  var secret = (cfg.backendSecret || (document.getElementById('subagent-backend-secret')||{}).value || '').trim();
+  var lines = [];
+  try{
+    var ai = await fetch(base + '/api/ai/status').then(function(r){ return r.json(); });
+    lines.push(ai.configured
+      ? ('✅ Claude مربوط على الخادم — النموذج: ' + (ai.agentModel || ai.model || ''))
+      : '❌ مفتاح Claude غير مضبوط على الخادم (ANTHROPIC_API_KEY)');
+  }catch(e){
+    lines.push('❌ تعذّر الوصول لـ /api/ai/status — تحقق من رابط الخادم');
+  }
+  try{
+    var health = await fetch(base + '/api/admin/agents-health', { headers: _adminAuthHeaders() }).then(function(r){ return r.json(); });
+    if(health && health.ok){
+      lines.push(health.sharedSecretConfigured ? '✅ BACKEND_SHARED_SECRET مضبوط على الخادم' : '❌ BACKEND_SHARED_SECRET ناقص في .env');
+      lines.push(secret ? '✅ السر المشترك محفوظ في اللوحة' : '⚠️ حقل السر المشترك في اللوحة فارغ — الصقه بعد الحفظ');
+      if(health.allClaudeAgentsLinkedToKeyLoader){
+        lines.push('✅ كل وكلاء Claude مربوطون بمُحمّل المفتاح الموحّد (config/anthropic)');
+      }
+      (health.agents||[]).forEach(function(a){
+        if(!a.needsClaude) return;
+        var link = a.linkedToKeyLoader === false ? '⚠️ غير مربوط بالكود' : '';
+        lines.push((a.wired ? '✅ ' : '❌ ') + a.name + (a.wired ? '' : ' (بانتظار المفتاح على الخادم)') + (link ? ' ' + link : ''));
+      });
+      if(health.blockers && health.blockers.length){
+        health.blockers.forEach(function(b){ lines.push('→ ' + b); });
+      }
+    } else if(health && health.error === 'session_expired'){
+      lines.push('⚠️ أعد تسجيل دخول الأدمن لعرض تفاصيل الوكلاء');
+    }
+  }catch(e2){
+    lines.push('⚠️ تعذّر /api/admin/agents-health (قد تحتاج جلسة أدمن)');
+  }
+  if(box){
+    var ready = lines.every(function(l){ return l.indexOf('❌') === -1; });
+    box.style.background = ready ? '#ecfdf5' : '#fff7ed';
+    box.style.border = '1px solid ' + (ready ? '#6ee7b7' : '#fdba74');
+    box.style.color = ready ? '#065f46' : '#9a3412';
+    box.innerHTML = lines.map(function(l){ return '<div>'+l+'</div>'; }).join('');
+  }
 }
 
 // ══ SMS ترويجي — بثّ يدوي حقيقي عبر Twilio (rizq-backend /api/broadcast-sms) ══
@@ -6240,7 +6338,41 @@ function rzqVidToggle(type, idx) {
   if (type==='hero') rzqVidRenderHero(); else rzqVidRenderPopup();
 }
 
+function rzqVidRenderPlatformPromo() {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  var st = document.getElementById('rzv-platform-status');
+  var link = document.getElementById('rzv-platform-preview-link');
+  if (en) en.checked = _rzqVidData.platformPromoEnabled !== false;
+  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  if (slot) slot.value = String(_rzqVidData.adSlotSeconds || 25);
+  if (link && url) link.href = url.value;
+  if (st) {
+    st.textContent = (_rzqVidData.platformPromoEnabled !== false)
+      ? '✅ الحلقة: فيديو المنصة → معلنو Hero → يعود لفيديو المنصة'
+      : '⏸ فيديو المنصة متوقف — يظهر معلنو Hero فقط';
+  }
+}
+
+function rzqVidSavePlatformPromo(showToastMsg) {
+  var en = document.getElementById('rzv-platform-enabled');
+  var url = document.getElementById('rzv-platform-url');
+  var slot = document.getElementById('rzv-ad-slot');
+  _rzqVidData.platformPromoEnabled = !!(en && en.checked);
+  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  _rzqVidData.adSlotSeconds = Math.max(8, Math.min(120, Number(slot && slot.value) || 25));
+  localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
+  _syncVideoAdsToBackend(_rzqVidData);
+  rzqVidRenderPlatformPromo();
+  if (showToastMsg) {
+    showToast(RizqI18n.t2('💾 تم حفظ فيديو المنصة المزروع','💾 Promo plateforme enregistrée'));
+  }
+}
+
 function rzqVidSave() {
+  // حافظ على إعدادات فيديو المنصة إن وُجدت حقول اللوحة
+  try { rzqVidSavePlatformPromo(false); } catch (eP) { /* ignore */ }
   localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
   _syncVideoAdsToBackend(_rzqVidData);
   showToast(RizqI18n.t2('💾 تم الحفظ — يُطبَّق فور فتح أي صفحة من المنصة','💾 Enregistré — appliqué dès l\'ouverture de n\'importe quelle page de la plateforme'));

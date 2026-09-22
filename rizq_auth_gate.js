@@ -312,6 +312,7 @@
       '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
       '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
       '#rag-overlay .rag-brand-name{font-size:16px;font-weight:800;color:#1b3a6b}',
+      '#rag-overlay .rag-brand-back{font-size:12px;font-weight:700;color:#a07820;letter-spacing:.2px}',
       '#rag-overlay .rag-progress{display:none;background:#fff;border-bottom:1px solid #e2e8f5;padding:14px 16px 16px}',
       '#rag-overlay.open .rag-progress{display:block}',
       '#rag-overlay .rag-progress-steps{display:flex;align-items:center;max-width:640px;margin:0 auto}',
