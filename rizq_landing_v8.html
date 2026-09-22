@@ -4763,9 +4763,8 @@ function buildStyleIdeas(reshuffle){
   var tplList = _styShuffle(templates).slice(0, 3);
   var usedIds = {};
   var cards = [];
-  var cta = (typeof LANG !== 'undefined' && LANG[fr?'fr':'ar'] && LANG[fr?'fr':'ar']['sty-cta'])
-    ? LANG[fr?'fr':'ar']['sty-cta']
-    : (fr ? 'Voir le look' : 'تسوّق الإطلالة');
+  /* لا نلمس معرف LANG هنا — يُعرَّف لاحقاً بـ const ويسبب TDZ إن استُدعي buildStyleIdeas مبكراً */
+  var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
   var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
 
   /* بطاقة أولى من آخر منتج شاهدته */
