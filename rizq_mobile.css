@@ -389,7 +389,8 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     padding-bottom:28px!important;
     overflow:hidden!important;
   }
-  /* Marquee: overflow:hidden + CSS transform only — no scroll/snap (was jittering) */
+  /* Marquee: overflow:hidden + CSS transform only — no scroll/snap (was jittering).
+     direction:ltr so translateX(-50%) stays on-screen under page RTL. */
   .cards-track-wrap{
     overflow:hidden!important;
     overflow-x:hidden!important;
@@ -397,6 +398,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     width:100%!important;
     max-width:100%!important;
     scroll-snap-type:none!important;
+    direction:ltr!important;
     border-radius:14px!important;
     padding:4px 2px 10px!important;
     scrollbar-width:none;
@@ -409,6 +411,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     flex-wrap:nowrap!important;
     width:max-content!important;
     max-width:none!important;
+    direction:ltr!important;
     animation:slide 36s linear infinite!important;
     will-change:transform;
     backface-visibility:hidden;
@@ -427,6 +430,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
     flex:0 0 158px!important;
     height:auto!important;
     scroll-snap-align:none!important;
+    direction:rtl!important;
     border-radius:14px!important;
   }
   .cards-track .ad-card .ad-card-img{

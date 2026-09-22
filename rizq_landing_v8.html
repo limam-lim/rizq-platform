@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=16.7"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=16.8"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
@@ -1330,20 +1330,24 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
   .hero-cta-wrap{margin:0 auto 28px}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
-  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد) */
+  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
+     direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
+    direction:ltr!important;
   }
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:10px!important;
+    direction:ltr!important;
     animation:slide 36s linear infinite!important;
     will-change:transform;backface-visibility:hidden;transform:translateZ(0);
   }
   #hero-listings .cards-track .ad-card{
     width:158px!important;min-width:158px!important;max-width:158px!important;
     flex:0 0 158px!important;scroll-snap-align:none!important;
+    direction:rtl!important;
   }
   /* شريط التيكر كان absolute فيغطي كلمة «رزق» في الهيرو */
   .ticker-wrap{
