@@ -1,9 +1,10 @@
 /**
- * rizq_register_wizard.css  v6.12
+ * rizq_register_wizard.css  v6.13
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
- *   (روابط سريعة + أرقام التواصل) بدل شريط الأيقونات السفلي القديم
+ *   (روابط سريعة + أرقام التواصل) بدل شريط الأيقونات السفلي القديمة
  * تابلت ≥769: شريط كروم مثل الكمبيوتر (الرئيسية + RIZQ PLATFORM)
+ * v6.13: على الهاتف لا يغطي محتوى التسجيل فوتر الأقسام/المساعدة/الشعار
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -490,10 +491,15 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
    §7  الهاتف (≤768px) — نافذة بيضاء تملأ الشاشة
 ═══════════════════════════════════════════════════════════ */
 @media (max-width:768px) {
+  /* تمرير المستند (لا التمرير الداخلي) حتى يبقى فوتر الأقسام/المساعدة/الشعار ظاهراً وقابلاً للنقر */
   #modal.reg-wizard-mode {
     background:#f8faff !important; align-items:stretch !important;
     justify-content:flex-start !important; padding:0 !important;
-    overflow-y:auto !important; z-index:1000001 !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    z-index: 4 !important;
   }
   /* هاتف — شريط علوي: شعار + FR|AR (الروابط في الشريط السفلي) */
   #modal.reg-wizard-mode > .rizq-reg-chrome,
@@ -529,9 +535,11 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   body.rizq-reg-open {
     display: flex !important;
     flex-direction: column !important;
-    overflow: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     height: auto !important;
     max-height: none !important;
+    min-height: 100dvh !important;
   }
   body.rizq-reg-open > *:not(#modal):not(footer):not(#rizq-terms-modal):not(#rag-overlay):not(script):not(style):not(link) {
     display: none !important;
@@ -542,14 +550,28 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     inset: auto !important;
     min-height: auto !important;
     height: auto !important;
+    max-height: none !important;
     overflow: visible !important;
+    z-index: 4 !important;
+    flex: 0 0 auto !important;
   }
   body.rizq-reg-open > footer,
-  body.rizq-reg-open > footer.rizq-footer {
+  body.rizq-reg-open > footer.rizq-footer,
+  html.rizq-reg-page body > footer,
+  html.rizq-reg-page body > footer.rizq-footer {
     display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;
     order: 2 !important;
+    position: relative !important;
+    z-index: 6 !important;
+    margin-top: 0 !important;
+    /* يظهر بعد المحتوى ولا يُغطّى بطبقة المودال */
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
   }
   /* وضوح خطوات التسجيل على الهاتف */
   #modal.reg-wizard-mode .reg-progress-bar {
@@ -603,8 +625,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
 
   #modal.reg-wizard-mode .modal-box {
     background:#fff !important; width:100% !important;
-    min-height: calc(100vh - 52px); min-height: calc(100dvh - 52px);
-    border-radius:0 !important; padding:0 0 80px !important; box-shadow:none !important;
+    /* لا تملأ الشاشة بالكامل — اترك الفوتر الرسمي يظهر أسفل الخطوات */
+    min-height: 0 !important;
+    height: auto !important;
+    border-radius:0 !important; padding:0 0 28px !important; box-shadow:none !important;
     --text-muted:#64748b; --text-soft:#334155;
   }
   #modal.reg-wizard-mode .modal-close {
@@ -635,9 +659,15 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     width:100% !important; margin:0 !important;
     border-radius:0 !important; box-shadow:none !important; border:none !important;
     min-height: auto !important;
+    height: auto !important;
     padding-bottom:24px !important;
   }
   html.rizq-reg-page #modal .modal-close { display:flex !important; }
+
+  /* شاشة حسابي (rag): نفس مبدأ عدم تغطية الفوتر */
+  body.rizq-reg-open #rag-overlay.rag-overlay.open {
+    z-index: 4 !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
