@@ -1204,6 +1204,62 @@ html[dir="ltr"] .listings-section .section-desc{
   margin:0 auto !important;
   justify-items:stretch;
 }
+.landing-ads-count{
+  margin:10px 0 0;font-size:13px;font-weight:700;
+  color:rgba(255,255,255,.88);letter-spacing:.2px
+}
+.landing-ads-filters{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+  max-width:1200px;margin:0 auto 22px;padding:0 4px
+}
+.landing-ads-filter{
+  padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:12.5px;font-weight:700;
+  color:#3d4f6a;background:#fff;border:1.5px solid rgba(27,58,107,.14);
+  transition:all .2s;box-shadow:0 2px 8px rgba(13,27,42,.05)
+}
+.landing-ads-filter:hover{border-color:rgba(201,168,76,.45);color:var(--royal,#1B3A6B)}
+.landing-ads-filter.is-active{
+  color:#0f2347;background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border-color:rgba(201,168,76,.55);box-shadow:0 4px 14px rgba(201,168,76,.28)
+}
+.landing-ads-grid .listing-card{
+  display:flex;flex-direction:column;min-height:0
+}
+.landing-ads-grid .l-img{height:150px}
+.landing-ads-grid .l-title{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:2.5em
+}
+.landing-ads-more{
+  max-width:1200px;margin:18px auto 0;text-align:center;padding:0 8px
+}
+.landing-ads-more-inner{
+  display:inline-flex;flex-direction:column;align-items:center;gap:10px;
+  padding:14px 22px;border-radius:14px;
+  background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18)
+}
+.landing-ads-more-lbl{font-size:12.5px;color:#5b6b85;font-weight:600}
+.landing-ads-more-btn{
+  padding:10px 22px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:13px;font-weight:800;color:#0f2347;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border:1px solid rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(201,168,76,.25);
+  transition:transform .2s,box-shadow .2s
+}
+.landing-ads-more-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(201,168,76,.35)}
+.landing-ads-more.is-done .landing-ads-more-inner{
+  border-style:solid;background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.28)
+}
+.landing-ads-footer-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.lad-fav{
+  position:absolute;top:10px;left:10px;z-index:3;
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(8,15,30,.55);color:#fff;font-size:14px;
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+  transition:transform .2s,background .2s
+}
+.lad-fav:hover{transform:scale(1.08);background:rgba(8,15,30,.75)}
 .listings-section .listings-grid > p,
 .listings-section .listings-grid > .rzq-empty,
 .listings-section .listings-grid > div[style*="grid-column"]{
@@ -2197,6 +2253,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   #rizq-styles .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
   #rizq-styles .section-desc{font-size:12px;line-height:1.6;max-width:100%}
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
+  .landing-ads-filters{gap:6px;margin-bottom:14px}
+  .landing-ads-filter{padding:6px 12px;font-size:11.5px}
+  .landing-ads-more-btn{padding:8px 16px;font-size:12px}
+  .landing-ads-footer-actions{flex-direction:column}
   .rizq-styles-gender-tabs{gap:6px;margin-bottom:12px}
   .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
   .rizq-styles-rail{
@@ -2624,18 +2684,31 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ FEATURED LISTINGS ══ -->
-<section class="listings-section" id="listings">
+<!-- ══ كل الإعلانات — شبكة غنية مثل صفحة التصفح (حتى 1000) ══ -->
+<section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
   <div class="section-header fade-in">
-    <p class="section-tag">Featured Listings</p>
-    <h2 class="section-title" data-t="s-lst-title">إعلانات <span>مختارة اليوم</span></h2>
-    <p class="section-desc" data-t="s-lst-desc">أفضل العروض المنشورة الآن على رزق — تصفّح واختر بثقة</p>
+    <p class="section-tag" data-t="s-lst-tag">كل الإعلانات</p>
+    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">كل <span>الإعلانات</span> على رزق</h2>
+    <p class="section-desc" data-t="s-lst-desc">تصفّح عروض السوق الحيّة — صوّر، فلتر، وافتح التفاصيل كما في صفحة الإعلانات</p>
+    <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
   </div>
-  <div class="listings-grid">
-    <!-- cards rendered from FEATURED_ADS via buildFeaturedCards() -->
-    </div>
-  <div style="text-align:center;margin-top:36px" class="fade-in">
-    <button class="btn-outline" data-t="view-all" onclick="openAllAds()">عرض جميع الإعلانات ←</button>
+  <div class="landing-ads-filters" id="landing-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
+    <button type="button" class="landing-ads-filter is-active" role="tab" aria-selected="true" data-lad-cat="all" onclick="filterLandingAds('all',this)" data-t="f-all">الكل</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="عقارات" onclick="filterLandingAds('عقارات',this)" data-t="f-re">عقارات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="سيارات" onclick="filterLandingAds('سيارات',this)" data-t="f-car">سيارات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="إلكترونيات" onclick="filterLandingAds('إلكترونيات',this)" data-t="f-elec">إلكترونيات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="أزياء" onclick="filterLandingAds('أزياء',this)" data-t="f-fashion">موضة</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="شاحنات" onclick="filterLandingAds('شاحنات',this)" data-t="f-truck">شاحنات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="ماشية" onclick="filterLandingAds('ماشية',this)" data-t="f-live">ماشية</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="خدمات" onclick="filterLandingAds('خدمات',this)" data-t="f-srv">خدمات</button>
+  </div>
+  <div class="listings-grid landing-ads-grid" id="landing-ads-grid" role="list">
+    <!-- يُملأ عبر buildLandingAds() -->
+  </div>
+  <div class="landing-ads-more" id="landing-ads-more"></div>
+  <div style="text-align:center;margin-top:28px" class="fade-in landing-ads-footer-actions">
+    <a class="btn-outline" href="rizq_browse.html" data-t="browse-full" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">📂 فتح صفحة الإعلانات كاملة ←</a>
+    <button type="button" class="btn-outline" data-t="view-all" onclick="openAllAds()" style="margin-inline-start:10px">عرض الكل في نافذة ←</button>
   </div>
 </section>
 
@@ -4339,63 +4412,156 @@ function buildCards(){
 buildCards();
 
 function buildFeaturedCards(){
-  function _escFeat(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  var grid=document.querySelector('#listings .listings-grid');
-  if(!grid) return;
-  if(typeof FEATURED_ADS==='undefined'||!FEATURED_ADS.length){
-    grid.innerHTML='<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'+(typeof isAr!=='undefined'&&!isAr?'Aucune annonce en vedette pour le moment.':'لا توجد إعلانات مميزة بعد.')+'</p>';
-    return;
-  }
-  var fr=typeof isAr!=='undefined'&&!isAr;
-  grid.innerHTML=FEATURED_ADS.map(function(a){
-    var d=typeof trAd==='function'?trAd(a):a;
-    var idNum=Number(a.id);
-    var idAttr=String(a.id).replace(/"/g,'&quot;');
-    var title=_escFeat(d.title||'');
-    var desc=_escFeat((d.desc||'').slice(0,90));
-    var cat=_escFeat(d.cat||'');
-    var price=_escFeat(d.price||'');
-    var loc=_escFeat(d.loc||'');
-    var emoji=_escFeat(d.emoji||'📦');
-    var bg=d.bg||'linear-gradient(145deg,#111d2e,#1B3A6B)';
-    var statusRaw=d.status||'';
-    var status=_escFeat(statusRaw);
-    var meta=(d.sellerMeta||'').replace(/^.*?(\★.*)$/,'$1')||'';
-    var starsMatch=(d.sellerMeta||'').match(/[★☆]+[^\n—]*/);
-    var stars=_escFeat(starsMatch?starsMatch[0].trim():'');
-    var pin=!!d.pin;
-    var badge=pin?('<span class="l-badge">'+(fr?'⭐ Vedette':'⭐ مميز')+'</span>'):'';
-    var statusStyle=/شركة|Entreprise/.test(statusRaw)
-      ?'background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold-dk)'
-      :/قيد|cours/i.test(statusRaw)
-        ?'background:rgba(255,180,0,.1);border:1px solid rgba(255,180,0,.25);color:#fbbf24'
-        :'background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80';
-    return ''
-      +'<div class="listing-card'+(pin?' pin':'')+' fade-in" data-ad-id="'+idAttr+'" onclick="openAdModal('+idNum+')">'
-      + badge
-      +'<div class="lc-hover">'
-      +  '<div class="lc-hover-title">'+title+'</div>'
-      +  '<div class="lc-hover-desc">'+desc+'</div>'
-      +  '<div class="lc-hover-price">'+price+'</div>'
-      +  '<div class="lc-hover-btns">'
-      +    '<button class="lc-hover-btn-open" onclick="event.stopPropagation();openAdModal('+idNum+')">'+(fr?'📋 Voir tout':'📋 عرض كامل')+'</button>'
-      +    '<button class="lc-hover-btn-msg" onclick="event.stopPropagation();window.open(\'https://wa.me/22200000000?text=\'+encodeURIComponent(waContactMsg()),\'_blank\')">💬</button>'
-      +  '</div>'
-      +'</div>'
-      +'<div class="l-img" style="background:'+bg+'">'+emoji+'</div>'
-      +'<div class="l-body">'
-      +  '<p class="l-cat">'+cat+'</p>'
-      +  '<h3 class="l-title">'+title+'</h3>'
-      +  '<p class="l-desc">'+desc+'</p>'
-      +  '<div class="l-meta"><span class="l-price">'+price+'</span><span class="l-loc">'+loc+'</span></div>'
-      +  '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
-      +    '<span style="'+statusStyle+';border-radius:5px;padding:2px 7px;font-size:9.5px">'+status+'</span>'
-      +    '<span style="font-size:9.5px;color:var(--text-muted)">'+stars+'</span>'
-      +  '</div>'
-      +'</div></div>';
-  }).join('');
+  /* توافق خلفي — القسم أصبح «كل الإعلانات» عبر buildLandingAds */
+  buildLandingAds(false);
 }
-buildFeaturedCards();
+
+var LANDING_ADS_MAX = 1000;
+var LANDING_ADS_PAGE = 24;
+var _landingAdsCat = 'all';
+var _landingAdsVisible = LANDING_ADS_PAGE;
+var _landingAdsLoading = false;
+
+function _landingAdsPool(){
+  var seen = {};
+  var out = [];
+  function add(list){
+    (list || []).forEach(function(a){
+      if(!a || a.id == null) return;
+      var id = String(a.id);
+      if(seen[id]) return;
+      seen[id] = 1;
+      out.push(a);
+    });
+  }
+  if(typeof ADS !== 'undefined') add(ADS);
+  if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
+  if(out.length > LANDING_ADS_MAX) out = out.slice(0, LANDING_ADS_MAX);
+  return out;
+}
+function _landingAdsFiltered(){
+  var pool = _landingAdsPool();
+  var cat = _landingAdsCat || 'all';
+  if(cat === 'all') return pool;
+  return pool.filter(function(a){
+    var k = String(a.catKey || a.cat || '');
+    return k.indexOf(cat) >= 0 || cat.indexOf(k) >= 0;
+  });
+}
+function filterLandingAds(cat, btn){
+  _landingAdsCat = cat || 'all';
+  _landingAdsVisible = LANDING_ADS_PAGE;
+  document.querySelectorAll('.landing-ads-filter').forEach(function(b){
+    var on = b.getAttribute('data-lad-cat') === _landingAdsCat;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  buildLandingAds(false);
+}
+function loadMoreLandingAds(){
+  if(_landingAdsLoading) return;
+  var filtered = _landingAdsFiltered();
+  if(_landingAdsVisible >= filtered.length) return;
+  _landingAdsLoading = true;
+  _landingAdsVisible = Math.min(_landingAdsVisible + LANDING_ADS_PAGE, filtered.length, LANDING_ADS_MAX);
+  buildLandingAds(false);
+  setTimeout(function(){ _landingAdsLoading = false; }, 120);
+}
+function _landingAdCardHtml(a, fr){
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  var d = typeof trAd === 'function' ? trAd(a) : a;
+  var idAttr = esc(String(a.id));
+  var title = esc(d.title || '');
+  var desc = esc(String(d.desc || '').slice(0, 90));
+  var cat = esc(d.cat || '');
+  var price = esc(d.price || '');
+  var loc = esc(d.loc || '');
+  var bg = d.bg || 'linear-gradient(145deg,#111d2e,#1B3A6B)';
+  var pin = !!d.pin || !!a.boosted;
+  var badge = pin ? ('<span class="l-badge">' + (fr ? '⭐ Vedette' : '⭐ مميز') + '</span>') : '';
+  var fav = typeof isFavorited === 'function' ? isFavorited(a.id) : false;
+  var idJs = String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var favBtn = '<button type="button" class="lad-fav" onclick="event.stopPropagation();quickToggleFavorite(\'' + idJs + '\',this)" aria-label="favorite">' + (fav ? '❤️' : '🤍') + '</button>';
+  var openFn = 'openAdById(\'' + idJs + '\')';
+  var photo = typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 150) : ('<span>' + esc(d.emoji || '📦') + '</span>');
+  return ''
+    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" onclick="' + openFn + '">'
+    + badge + favBtn
+    + '<div class="lc-hover">'
+    +   '<div class="lc-hover-title">' + title + '</div>'
+    +   '<div class="lc-hover-desc">' + desc + '</div>'
+    +   '<div class="lc-hover-price">' + price + '</div>'
+    +   '<div class="lc-hover-btns">'
+    +     '<button type="button" class="lc-hover-btn-open" onclick="event.stopPropagation();' + openFn + '">' + (fr ? '📋 Voir tout' : '📋 عرض كامل') + '</button>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="l-img" style="background:' + esc(bg) + '">' + photo + '</div>'
+    + '<div class="l-body">'
+    +   '<p class="l-cat">' + cat + '</p>'
+    +   '<h3 class="l-title">' + title + '</h3>'
+    +   '<div class="l-meta"><span class="l-price">' + price + '</span><span class="l-loc">' + loc + '</span></div>'
+    + '</div></div>';
+}
+function buildLandingAds(resetVisible){
+  var grid = document.getElementById('landing-ads-grid') || document.querySelector('#listings .listings-grid');
+  if(!grid) return;
+  if(resetVisible) _landingAdsVisible = LANDING_ADS_PAGE;
+  var fr = typeof isAr !== 'undefined' && !isAr;
+  var filtered = _landingAdsFiltered();
+  var total = Math.min(filtered.length, LANDING_ADS_MAX);
+  if(_landingAdsVisible < LANDING_ADS_PAGE) _landingAdsVisible = LANDING_ADS_PAGE;
+  if(_landingAdsVisible > total) _landingAdsVisible = Math.max(total, 0);
+  var items = filtered.slice(0, _landingAdsVisible);
+
+  var countEl = document.getElementById('landing-ads-count');
+  if(countEl){
+    if(!total){
+      countEl.textContent = fr ? 'Aucune annonce pour le moment' : 'لا توجد إعلانات بعد';
+    } else {
+      countEl.textContent = fr
+        ? ('Affichage ' + items.length + ' / ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : '') + ' annonces')
+        : ('عرض ' + items.length + ' من ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : '') + ' إعلان');
+    }
+  }
+
+  if(!items.length){
+    if(window.RizqUx && typeof RizqUx.emptyStateHtml === 'function'){
+      grid.innerHTML = RizqUx.emptyStateHtml({
+        title: fr ? 'Aucune annonce dans cette catégorie' : 'لا توجد إعلانات في هذا القسم',
+        primaryHref: 'rizq_post.html'
+      });
+    } else {
+      grid.innerHTML = '<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:32px 16px;font-size:14px">'
+        + (fr ? 'Aucune annonce dans cette catégorie.' : 'لا توجد إعلانات في هذا القسم.') + '</p>';
+    }
+  } else {
+    grid.innerHTML = items.map(function(a){ return _landingAdCardHtml(a, fr); }).join('');
+  }
+
+  var more = document.getElementById('landing-ads-more');
+  if(more){
+    if(!total){
+      more.innerHTML = '';
+      more.classList.remove('is-done');
+    } else if(items.length >= total){
+      more.classList.add('is-done');
+      more.innerHTML = '<div class="landing-ads-more-inner"><span class="landing-ads-more-lbl">'
+        + (fr ? ('Fin — ' + total + ' annonces') : ('تم عرض كل الإعلانات الظاهرة — ' + total))
+        + '</span></div>';
+    } else {
+      more.classList.remove('is-done');
+      more.innerHTML = '<div class="landing-ads-more-inner">'
+        + '<span class="landing-ads-more-lbl">'
+        + (fr ? ('Affichage ' + items.length + ' / ' + total + ' — chargez plus') : ('عرض ' + items.length + ' من ' + total + ' — حمّل المزيد'))
+        + '</span>'
+        + '<button type="button" class="landing-ads-more-btn" onclick="loadMoreLandingAds()">'
+        + (fr ? 'Charger plus' : 'تحميل المزيد')
+        + '</button></div>';
+    }
+  }
+}
+try { buildLandingAds(true); } catch(eLad) {}
 
 /* ── Style Ideas: النظام يقترح عشوائياً ويميّز رجال / نساء / أولاد / بنات ── */
 var _rizqStyleGender = 'men';
@@ -5423,9 +5589,11 @@ function filterAllAds(cat, btn) {
 }
 function renderAllAds(cat) {
   const grid = document.getElementById('all-ads-grid');
-  const filtered = cat==='all' ? ALL_ADS_DATA : ALL_ADS_DATA.filter(a=>a.catKey && a.catKey.includes(cat));
+  const maxN = typeof LANDING_ADS_MAX === 'number' ? LANDING_ADS_MAX : 1000;
+  const filteredFull = cat==='all' ? ALL_ADS_DATA : ALL_ADS_DATA.filter(a=>a.catKey && a.catKey.includes(cat));
+  const filtered = filteredFull.slice(0, maxN);
   grid.innerHTML = filtered.map((a,i)=>{ const d=trAd(a); const fav=isFavorited(a.id); return `\n    <div onclick="openAdById('${String(a.id).replace(/'/g,"\\'")}')" style="background:linear-gradient(145deg,rgba(27,58,107,.14),rgba(8,15,30,.85));border:1px solid rgba(201,168,76,.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative" onmouseover="this.style.borderColor='rgba(201,168,76,.45)';this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='rgba(201,168,76,.1)';this.style.transform='translateY(0)'">\n      ${d.pin?`<div class="ad-badge" style="position:absolute;top:8px;right:8px;z-index:1">⭐ ${isAr?'مميّز':'Vedette'}</div>`:''}
-      <button onclick="event.stopPropagation();quickToggleFavorite(${a.id},this)" style="position:absolute;top:8px;left:8px;z-index:1;width:28px;height:28px;border-radius:50%;border:none;background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">${fav?'❤️':'🤍'}</button>
+      <button onclick="event.stopPropagation();quickToggleFavorite(${JSON.stringify(String(a.id))},this)" style="position:absolute;top:8px;left:8px;z-index:1;width:28px;height:28px;border-radius:50%;border:none;background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">${fav?'❤️':'🤍'}</button>
       <div style="height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;background:${d.bg};overflow:hidden">${_adPhotoHtml(a, d, 110)}</div>
       <div style="padding:12px">
         <div style="font-size:10px;color:#C9A84C;font-weight:700;margin-bottom:5px">${d.cat}</div>
@@ -5447,7 +5615,11 @@ function renderAllAds(cat) {
     }
   }
   const countEl = document.getElementById('all-ads-count');
-  if(countEl) countEl.textContent = isAr ? (filtered.length+' إعلان') : (filtered.length+(filtered.length===1?' annonce':' annonces'));
+  if(countEl){
+    var shown = filtered.length;
+    var moreNote = filteredFull.length > maxN ? (isAr ? (' (حد أقصى '+maxN+')') : (' (max '+maxN+')')) : '';
+    countEl.textContent = isAr ? (shown+' إعلان'+moreNote) : (shown+(shown===1?' annonce':' annonces')+moreNote);
+  }
 }
 function quickToggleFavorite(adId, btn) {
   var added = _wishlistToggle(adId);
@@ -5567,6 +5739,7 @@ function applyList(list){
     });
     refreshAllAdsIndex();
     if(typeof buildCards==='function') buildCards();
+    if(typeof buildLandingAds==='function') buildLandingAds(true);
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
@@ -5605,7 +5778,7 @@ function applyList(list){
       else if(typeof buildCards==='function') buildCards();
     }, wait);
   }
-  fetch(base+'/api/ads?limit=40').then(function(r){ return r.ok?r.json():null; }).then(function(data){
+  fetch(base+'/api/ads?limit=1000').then(function(r){ return r.ok?r.json():null; }).then(function(data){
     if(data && data.ok && Array.isArray(data.ads)) finishHydrate(data.ads);
     else finishHydrate(null);
   }).catch(function(){ finishHydrate(null); });
@@ -5955,7 +6128,7 @@ const LANG = {
   ar: {
     'qc0':'عقارات','qc1':'سيارات','qc2':'شاحنات','qc3':'إلكترونيات','qc4':'أزياء','qc5':'صحة وجمال','qc6':'وظائف','qc7':'ماشية','qc8':'ذهب',
     'qc-home':'معدات منزل','qc-energy':'طاقة','qc-travel':'رحلات',
-    'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات',
+    'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات','f-fashion':'موضة',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
     'nav-account': 'حسابي', 'nav-post': 'نشر (+)', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'غرفة الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
@@ -6013,9 +6186,12 @@ const LANG = {
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'أقسام دقيقة تغطي السوق الموريتاني — من الدراعة إلى السيارة',
-    's-lst-title': 'إعلانات <span>مختارة اليوم</span>',
-    's-lst-desc': 'أفضل العروض المنشورة الآن على رزق — تصفّح واختر بثقة',
-    'view-all': 'عرض جميع الإعلانات ←',
+    's-lst-tag': 'كل الإعلانات',
+    's-lst-title': 'كل <span>الإعلانات</span> على رزق',
+    's-lst-desc': 'تصفّح عروض السوق الحيّة — صوّر، فلتر، وافتح التفاصيل كما في صفحة الإعلانات',
+    'view-all': 'عرض الكل في نافذة ←',
+    'browse-full': '📂 فتح صفحة الإعلانات كاملة ←',
+    'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'منصة متكاملة للإعلانات والمحلات والمعارض والمناقصات والاستثمارات — بمعايير واضحة وثقة موريتانية',
     'why1-title': 'تسجيل موثوق وآمن',
@@ -6109,9 +6285,12 @@ const LANG = {
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'Des catégories précises pour le marché mauritanien — de la daraa à la voiture',
-    's-lst-title': 'Annonces <span>sélectionnées du jour</span>',
-    's-lst-desc': 'Les meilleures offres publiées maintenant sur Rizq — parcourez et choisissez en confiance',
-    'view-all': 'Voir toutes les annonces →',
+    's-lst-tag': 'Toutes les annonces',
+    's-lst-title': 'Toutes les <span>annonces</span> sur Rizq',
+    's-lst-desc': 'Parcourez les offres du marché en direct — filtrez et ouvrez les détails comme sur la page Annonces',
+    'view-all': 'Tout voir en fenêtre →',
+    'browse-full': '📂 Ouvrir la page Annonces complète →',
+    'f-fashion': 'Mode',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Une plateforme complète pour annonces, boutiques, showrooms, appels d\'offres et investissements — avec des règles claires et une confiance mauritanienne',
     'why1-title': 'Inscription fiable et sécurisée',
@@ -6148,7 +6327,7 @@ const LANG = {
     'sty-from-view': 'Vu récemment',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
     'qc-home':'Électroménager','qc-energy':'Énergie','qc-travel':'Voyages',
-    'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services',
+    'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services','f-fashion':'Mode',
   }
 };
 
@@ -6755,7 +6934,10 @@ function applyLandingLang(toAr) {
 
   // "View all" button
   const viewAllBtn = document.querySelector('[data-t="view-all"]');
-  if(viewAllBtn) viewAllBtn.textContent = isAr ? 'عرض جميع الإعلانات ←' : 'Voir toutes les annonces →';
+  if(viewAllBtn) viewAllBtn.textContent = isAr ? 'عرض الكل في نافذة ←' : 'Tout voir en fenêtre →';
+  const browseFullBtn = document.querySelector('[data-t="browse-full"]');
+  if(browseFullBtn) browseFullBtn.textContent = isAr ? '📂 فتح صفحة الإعلانات كاملة ←' : '📂 Ouvrir la page Annonces complète →';
+  if(typeof buildLandingAds === 'function') buildLandingAds(false);
 
   // Featured listing hover copy — only translate nodes that exist from live data
   document.querySelectorAll('.lc-hover-btn-open').forEach(b=>b.textContent = isAr ? '📋 عرض الإعلان' : '📋 Voir tout');
