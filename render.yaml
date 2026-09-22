@@ -16,6 +16,20 @@ services:
         value: https://limam-lim.github.io,https://rizq.mr,https://www.rizq.mr
       - key: OTP_ALLOW_DEMO
         value: "false"
-      # أضف يدوياً من لوحة Render → Environment (مطلوبة للوكلاء):
-      # ANTHROPIC_API_KEY, BACKEND_SHARED_SECRET, RIZQ_API_SECRET
-      # EMAIL_USER, EMAIL_PASS, OTP_PEPPER
+      - key: SUPER_ADMIN_EMAIL
+        value: megalimam@gmail.com
+      - key: SUPER_ADMIN_NAME
+        value: M. LIMAM
+      # أسرار — تُدخل من Render Dashboard → Environment (لا تُرفع للمستودع):
+      - key: SUPER_ADMIN_PASS_HASH
+        sync: false
+      - key: ADMIN_PANEL_PATH
+        sync: false
+      - key: ADMIN_PANEL_GATE_KEY
+        sync: false
+      - key: BACKEND_SHARED_SECRET
+        sync: false
+      - key: RIZQ_API_SECRET
+        sync: false
+      # أضف يدوياً أيضاً عند الحاجة:
+      # ANTHROPIC_API_KEY, EMAIL_USER, EMAIL_PASS, OTP_PEPPER
