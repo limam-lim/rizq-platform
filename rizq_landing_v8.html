@@ -1326,6 +1326,24 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
   .hero-cta-wrap{margin:0 auto 28px}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
+  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة على الموبايل */
+  #hero-listings .cards-track-wrap{
+    overflow-x:auto!important;overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;
+  }
+  #hero-listings .cards-track{
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    width:max-content!important;max-width:none!important;gap:10px!important;
+  }
+  #hero-listings .cards-track .ad-card{
+    width:158px!important;min-width:158px!important;max-width:158px!important;
+    flex:0 0 158px!important;scroll-snap-align:start;
+  }
+  #hero-listings .cards-track .ad-card-img{
+    height:100px!important;min-height:100px!important;max-height:100px!important;
+    aspect-ratio:auto!important;
+  }
+  #hero-listings .cards-track .ad-hover-detail{display:none!important}
   .quick-cats{gap:8px}
   .qcat{min-width:60px;padding:10px 12px}
   .search-bar{flex-wrap:wrap}
