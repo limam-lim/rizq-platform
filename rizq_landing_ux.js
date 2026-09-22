@@ -289,7 +289,7 @@
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
       '#pricing': fr ? 'Forfaits' : 'الباقات',
-      invest: fr ? 'Salle des investissements' : 'غرفة الاستثمارات'
+      invest: fr ? 'Investissements' : 'الاستثمارات'
     };
     Object.keys(jumpLabels).forEach(function (sel) {
       var el = document.querySelector('[data-jump="' + sel + '"]');
