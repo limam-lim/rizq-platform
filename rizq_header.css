@@ -1193,7 +1193,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html[dir="ltr"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{direction:ltr !important}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-sticky-tools,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-hamburger,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-desktop-more-only{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-desktop-more-only,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-desktop-more-only,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.nav-desktop-more-only{
     display:none !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"]{
