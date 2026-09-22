@@ -154,9 +154,16 @@ section{max-width:1100px;margin:0 auto;padding:56px 5%}
   display:inline-block; margin-top:14px;
   font-size:clamp(20px,3vw,28px); color:var(--gold); text-decoration:none;
   font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; letter-spacing:1px;
-  border-bottom:1px solid rgba(201,168,76,.35); padding-bottom:4px;
+  border-bottom:1px solid rgba(201,168,76,.55); padding-bottom:4px;
+  cursor:pointer; transition:color .2s, border-color .2s, opacity .2s;
+}
+.contact a.mail:hover,
+.contact a.mail:focus-visible{
+  color:#e8d5a3; border-bottom-color:var(--gold); outline:none;
 }
 .contact .hint{margin-top:16px; font-size:12.5px; color:var(--muted)}
+.contact .hint a{color:rgba(201,168,76,.9); text-decoration:none; border-bottom:1px solid rgba(201,168,76,.35)}
+.contact .hint a:hover{color:var(--gold)}
 
 footer{
   margin-top:40px; padding:28px 5% 40px; border-top:1px solid rgba(201,168,76,.12);
@@ -307,9 +314,9 @@ html[data-lang="fr"] body{font-family:'Cormorant Garamond','Noto Naskh Arabic',G
       <p data-ar>للتواصل الرسمي والامتثال للمنصات المؤسسية (مثل Twilio Trust Hub).</p>
       <p data-fr>Contact officiel et conformité (ex. Twilio Trust Hub).</p>
     </div>
-    <a class="mail" href="mailto:direction@rizq.mr">direction@rizq.mr</a>
-    <p class="hint" data-ar>منصة رزق · rizq.mr — مملوكة ومدارة من ADMINIA SARL</p>
-    <p class="hint" data-fr>Plateforme Rizq · rizq.mr — détenue et opérée par ADMINIA SARL</p>
+    <a class="mail" href="mailto:direction@rizq.mr" dir="ltr" title="إرسال بريد إلى direction@rizq.mr / Envoyer un e-mail">direction@rizq.mr</a>
+    <p class="hint" data-ar>منصة رزق · <a href="https://rizq.mr" dir="ltr" rel="noopener">rizq.mr</a> — مملوكة ومدارة من ADMINIA SARL</p>
+    <p class="hint" data-fr>Plateforme Rizq · <a href="https://rizq.mr" dir="ltr" rel="noopener">rizq.mr</a> — détenue et opérée par ADMINIA SARL</p>
   </div>
 </section>
 
