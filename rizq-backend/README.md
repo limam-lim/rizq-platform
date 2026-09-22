@@ -120,4 +120,7 @@ SUPER_ADMIN_PASS_HASH=$2a$10$...   # bcrypt فقط — بلا كلمة سر صر
 - بعد فتح الرابط مرة، تُحفظ كعكة بوابة ثم تظهر شاشة الدخول.
 - سجّل الدخول بالبريد `megalimam@gmail.com` وكلمة السر المحفوظة لديك (لا تُخزَّن في git).
 - المسار المباشر `/rizq_cp_panel.html` يعيد 404 عمداً.
+- لتطبيق السوبر أدمن على سيرفر محلي/إنتاجي دفعة واحدة:
+  `node scripts/apply-super-admin.js --email megalimam@gmail.com --pass 'YOUR_PASSWORD'`
+  ثم أعد تشغيل الخادم. على Render ضع `SUPER_ADMIN_PASS_HASH` من لوحة Environment.
 
