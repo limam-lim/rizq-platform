@@ -102,7 +102,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ══════════════════════════════════
    NAVBAR — Premium Redesign
 ══════════════════════════════════ */
-nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav){
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome){
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:0 max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));height:70px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -193,18 +193,20 @@ html[dir="ltr"] .mobile-drawer-close{left:auto;right:22px}
 nav .btn-lang,nav .btn-lang-primary{
   position:static!important;top:auto!important;left:auto!important;bottom:auto!important;
   background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));
-  border:1.5px solid rgba(201,168,76,.55);color:#E8C96A;
+  border:1.5px solid rgba(201,168,76,.55);color:#fff;
   font-size:12.5px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:22px;
   cursor:pointer;transition:transform .15s ease,background .2s;white-space:nowrap;flex-shrink:0;z-index:auto!important;
   direction:ltr!important;unicode-bidi:isolate;display:inline-flex!important;flex-direction:row!important;align-items:center;gap:.2em;
 }
-nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1}
-nav .btn-lang .lang-sep,nav .btn-lang-primary .lang-sep{order:2;opacity:.85}
-nav .btn-lang .lang-ar,nav .btn-lang-primary .lang-ar{order:3}
-nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28);color:#fff}
+nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1;color:#fff;opacity:.8}
+nav .btn-lang .lang-sep,nav .btn-lang-primary .lang-sep{order:2;color:rgba(255,255,255,.5);opacity:1}
+nav .btn-lang .lang-ar,nav .btn-lang-primary .lang-ar{order:3;color:#fff;opacity:.8}
+html[lang="ar"] nav .btn-lang .lang-ar,html[lang="ar"] nav .btn-lang-primary .lang-ar{color:#E8C96A;opacity:1;font-weight:900}
+html[lang="fr"] nav .btn-lang .lang-fr,html[lang="fr"] nav .btn-lang-primary .lang-fr{color:#E8C96A;opacity:1;font-weight:900}
+nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28)}
 nav .btn-lang:active,nav .btn-lang-primary:active{transform:scale(0.98)}
-.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#C9A84C;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.btn-lang:hover{background:rgba(201,168,76,.22);color:#E8C96A}
+.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;direction:ltr}
+.btn-lang:hover{background:rgba(201,168,76,.22)}
 /* إصلاح جوهري: nav-center (8 روابط + قائمة الباقات) و nav-right (الإشعار
    القانوني + 3 أزرار) كانا كلاهما flex-shrink:0 مع logo أيضاً flex-shrink:0
    ومدفوعاً بـmargin-left:auto — إن تجاوز مجموع عرضها عرض الشريط (وارد جداً
@@ -1951,20 +1953,16 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 
 
-  /* Phone numbers always LTR */
+  /* أرقام الاتصال/البريد/NNI فقط LTR — لا تُجبر كلمات المرور أو النصوص العربية */
   input[type="tel"],
   input[type="email"],
-  input[type="password"],
   input[type="number"],
   input[name*="phone"],
   input[id*="phone"],
   input[id*="Phone"],
   input[id*="email"],
   input[id*="Email"],
-  input[id*="pw"],
   input[id*="nni"],
-  input[placeholder*="هاتف"],
-  input[placeholder*="جوال"],
   .phone-num, .phone-display, .contact-phone, [data-phone] {
     direction: ltr !important;
     text-align: left !important;
@@ -2492,8 +2490,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_input_bidi.js"></script>
-<script src="rizq_terms_gate.js?v=18.2"></script>
+<script src="rizq_input_bidi.js?v=1.2"></script>
+<script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=16.6"></script>
@@ -3537,27 +3535,27 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="pricing-tabs">
     <button class="ptab-card" data-ptab="individual" onclick="switchPriceTab('individual',this)">
       <span class="ptab-icon">👤</span>
-      <span class="ptab-lbl">الأفراد</span>
+      <span class="ptab-lbl" data-t-fr="Particuliers">الأفراد</span>
     </button>
     <button class="ptab-card" data-ptab="stores" onclick="switchPriceTab('stores',this)">
       <span class="ptab-icon">🏪</span>
-      <span class="ptab-lbl">المحلات التجارية</span>
+      <span class="ptab-lbl" data-t-fr="Boutiques">المحلات التجارية</span>
     </button>
     <button class="ptab-card active" data-ptab="offices" onclick="switchPriceTab('offices',this)">
       <span class="ptab-icon">🏢</span>
-      <span class="ptab-lbl">المكاتب الافتراضية</span>
+      <span class="ptab-lbl" data-t-fr="Bureaux virtuels">المكاتب الافتراضية</span>
     </button>
     <button class="ptab-card" data-ptab="corp" onclick="switchPriceTab('corp',this)">
       <span class="ptab-icon">🏛️</span>
-      <span class="ptab-lbl">الشركات والمعارض</span>
+      <span class="ptab-lbl" data-t-fr="Entreprises &amp; showrooms">الشركات والمعارض</span>
     </button>
     <button class="ptab-card" data-ptab="tender" onclick="switchPriceTab('tender',this)">
       <span class="ptab-icon">💼</span>
-      <span class="ptab-lbl">غرفة المناقصة</span>
+      <span class="ptab-lbl" data-t-fr="Appels d'offres">غرفة المناقصة</span>
     </button>
     <button class="ptab-card" data-ptab="ads" onclick="switchPriceTab('ads',this)">
       <span class="ptab-icon">🎬</span>
-      <span class="ptab-lbl">الإعلانات</span>
+      <span class="ptab-lbl" data-t-fr="Annonces">الإعلانات</span>
     </button>
   </div>
 
@@ -3875,18 +3873,20 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <div class="modal-overlay" id="modal">
   <nav class="rizq-reg-chrome" id="rizq-reg-chrome" aria-label="شريط التسجيل">
-    <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR"><span class="lang-fr">FR</span><span class="lang-sep"> | </span><span class="lang-ar">AR</span></button>
+    <button type="button" class="rizq-reg-chrome-lang" onclick="toggleLang()" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <div class="rizq-reg-chrome-links">
       <a href="./"><span class="ar-only">الرئيسية</span><span class="fr-only">Accueil</span></a>
+      <a href="rizq_browse.html"><span class="ar-only">تصفح الإعلانات</span><span class="fr-only">Parcourir</span></a>
       <a href="rizq_legal.html#s2" target="_blank" rel="noopener"><span class="ar-only">شروط الاستخدام</span><span class="fr-only">Conditions</span></a>
       <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
       <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
     </div>
-    <a href="./" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="closeModal(true)">
+    <a href="./" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="closeModal(true)" aria-label="رجوع">
       <img class="logo-mark-img" src="rizq-mark-512.png?v=9.7" width="42" height="42" alt="رزق"/>
       <div class="logo-text">
         <span class="logo-ar">رزق</span>
-        <span class="logo-sub">RIZQ PLATFORM</span>
+        <span class="logo-sub ar-only">رجوع</span>
+        <span class="logo-sub fr-only">Retour</span>
       </div>
     </a>
   </nav>
@@ -3974,12 +3974,22 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <p style="color:var(--text-muted);font-size:12px;margin-bottom:24px">كيف تريد الانضمام إلى رزق؟</p>
 
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
-        <!-- خاص -->
+        <!-- تصفح / مشتري — نفس مسار الهاتف (rizq_register.html) -->
+        <div id="type-browse" onclick="selectType('browse')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
+          <div class="cat-icon-box" style="flex-shrink:0">🛒</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">حساب تصفح</span><span class="fr-only">Compte navigation</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للمشترين — تصفّح ومفضلة وتواصل بسرعة</span><span class="fr-only">Acheteurs — parcourir, favoris et contact</span></div>
+          </div>
+          <div id="chk-browse" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
+        </div>
+
+        <!-- خاص / بائع فرد -->
         <div id="type-private" onclick="selectType('private')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🧑‍💼</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">حساب خاص</div>
-            <div style="font-size:11.5px;color:var(--text-muted)">للأفراد — بع واشترِ بسهولة</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">حساب خاص (بائع)</span><span class="fr-only">Compte privé (vendeur)</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للأفراد — انشر إعلاناتك بسهولة</span><span class="fr-only">Particuliers — publiez vos annonces</span></div>
           </div>
           <div id="chk-private" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -3988,8 +3998,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <div id="type-company" onclick="selectType('company')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🏛️</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px">شركة أو مؤسسة</div>
-            <div style="font-size:11.5px;color:var(--text-muted)">للتجار والشركات — حساب موثّق</div>
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">شركة أو مؤسسة</span><span class="fr-only">Société ou établissement</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للتجار والشركات — حساب موثّق</span><span class="fr-only">Commerçants et entreprises — compte vérifié</span></div>
           </div>
           <div id="chk-company" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -4423,34 +4433,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
 
       <button class="m-btn-main" data-t-fr="🚀 Commencer à parcourir et publier" onclick="closeModal()">🚀 ابدأ التصفح والنشر</button>
-    </div>
-
-    <div id="p-phone" style="display:none">
-      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:5px">تحقق الهاتف</h3>
-      <p style="color:var(--text-muted);font-size:12px;margin-bottom:4px">الخطوة 3 من 3</p>
-      <p class="ph-note" style="color:rgba(201,168,76,.75);font-size:11px;margin-bottom:18px">رقم هاتف موريتاني مطلوب للتفعيل</p>
-      <div class="ph-row"><span class="ph-prefix">🇲🇷 +222</span><div class="ph-div"></div><input dir="ltr" style="direction:ltr;text-align:left;" class="ph-input" id="ph-in" type="tel" placeholder="XX XX XX XX" maxlength="8"/></div>
-      <div style="display:flex;justify-content:center;gap:14px;margin-bottom:16px">
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mauritel</span>
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Mattel</span>
-        <span style="font-size:10.5px;color:var(--text-muted)"><span style="color:var(--gold)">✓</span> Chinguitel</span>
-      </div>
-      <div id="otp-wrap" style="display:none;margin-bottom:16px">
-        <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">أدخل رمز التحقق (6 أرقام)</p>
-        <div class="otp-row"><input class="otp-box" maxlength="1" oninput="on(this,0)"/><input class="otp-box" maxlength="1" oninput="on(this,1)"/><input class="otp-box" maxlength="1" oninput="on(this,2)"/><input class="otp-box" maxlength="1" oninput="on(this,3)"/><input class="otp-box" maxlength="1" oninput="on(this,4)"/><input class="otp-box" maxlength="1" oninput="on(this,5)"/></div>
-        <p style="color:var(--text-muted);font-size:11px;margin-top:9px">إعادة الإرسال بعد <span id="cd">60</span>s</p>
-      </div>
-      <button id="btn-send" class="m-btn-main" onclick="sendOTP()">📲 إرسال رمز التحقق</button>
-      <button id="btn-verify" class="m-btn-main" style="display:none" onclick="verifyOTP()">✅ تأكيد وإنشاء الحساب</button>
-      <button class="m-link-btn" onclick="showPanel('p-id',2)">← عودة</button>
-    </div>
-
-    <!-- SUCCESS -->
-    <div id="p-ok" style="display:none">
-      <div style="font-size:54px;margin-bottom:14px">🎉</div>
-      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:24px;font-weight:700;color:var(--gold);margin-bottom:10px">مرحباً بك في رزق!</h3>
-      <p style="color:var(--text-muted);font-size:13px;line-height:1.8;margin-bottom:26px">تم إنشاء حسابك بنجاح.<br/>انشر إعلانك الأول الآن — مجاناً.</p>
-      <button class="m-btn-main" onclick="closeModal();goToPost()">🚀 انشر إعلانك الأول</button>
+      <button class="m-link-btn" data-t-fr="🚀 Publier ma première annonce" onclick="closeModal();typeof goToPost==='function'&&goToPost()" style="margin-top:8px">🚀 انشر إعلانك الأول</button>
     </div>
   </div>
   <nav class="rizq-reg-footer" id="rizq-reg-footer" aria-hidden="true" hidden></nav>
@@ -6893,6 +6876,16 @@ function applyLandingLang(toAr) {
     el.placeholder = isAr ? (phAr != null ? phAr : el.placeholder) : el.getAttribute('data-ph-fr');
   });
 
+  // /* early pricing lang sync */ — قبل ترجمة النوافذ حتى لا يوقفها أي خطأ لاحق
+  try {
+    var _ptabLabelsEarly = document.querySelectorAll('#pricing .ptab-lbl, .pricing-tabs .ptab-lbl');
+    var _ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','الإعلانات'];
+    var _ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Annonces'];
+    _ptabLabelsEarly.forEach(function(el,i){ if(_ptabAR[i]) el.textContent = isAr ? _ptabAR[i] : _ptabFR[i]; });
+    if (typeof renderPricingSection === 'function') renderPricingSection();
+  } catch (eEarlyPkg) { console.warn('early pricing lang sync failed', eEarlyPkg); }
+
+
   // Navbar + mobile drawer Login / Register buttons
   document.querySelectorAll('.btn-login').forEach(b => b.textContent = isAr ? 'دخول' : 'Connexion');
   document.querySelectorAll('.btn-register').forEach(b => b.textContent = isAr ? '📱 حساب جديد' : '📱 S\'inscrire');
@@ -7105,7 +7098,8 @@ function applyLandingLang(toAr) {
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
 
-// ── Translate all remaining static text blocks — unified RizqI18n.t2() ──
+try { /* remaining-static-i18n */
+  // ── Translate all remaining static text blocks — unified RizqI18n.t2() ──
   // Pop tag
   const popTag = document.querySelector('.pop-tag');
   if(popTag) popTag.textContent = RizqI18n.t2('⭐ الأكثر شعبية','⭐ Le plus populaire');
@@ -7290,6 +7284,9 @@ function applyLandingLang(toAr) {
   try { applyFullTranslation(lang); } catch (eTr) {}
   try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) {}
   try { translateCatTaxonomy(!isAr); } catch (eTx) {}
+  
+  } catch (eRemI18n) { console.warn('remaining static i18n failed', eRemI18n); }
+
   try { if (typeof renderPricingSection === 'function') renderPricingSection(); } catch (ePr) {}
   try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSg) {}
   try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) {}
@@ -7301,6 +7298,11 @@ function applyLandingLang(toAr) {
   });
 
   document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: lang } }));
+  try {
+    if (window.RizqLangGuard && typeof window.RizqLangGuard.sync === 'function') {
+      window.RizqLangGuard.sync(lang);
+    }
+  } catch (eG) {}
 }
 
 var _langBusy = false;
@@ -8094,6 +8096,13 @@ function rizqMountAccountBars(modal){
     chrome.style.opacity='1';
     chrome.style.pointerEvents='auto';
     chrome.style.display='flex';
+    chrome.style.position='fixed';
+    chrome.style.top='0';
+    chrome.style.left='0';
+    chrome.style.right='0';
+    chrome.style.width='100%';
+    chrome.style.zIndex='10050';
+    chrome.style.transform='none';
   }
   try{
     var siteFooter=document.querySelector('footer.rizq-footer') || document.querySelector('body > footer');
@@ -8684,7 +8693,9 @@ function _syncAccountToBackend(acc){
       nationalityCountry: acc.nationalityCountry || '',
       idImage: acc.id_image || '',
       licenseImage: acc.license_image || '',
-      activityImage2: acc.activity_image2 || acc.activityImage2 || ''
+      activityImage2: acc.activity_image2 || acc.activityImage2 || '',
+      // كلمة المرور تُشفَّر على الخادم فقط (bcrypt) — لا تُعاد في الرد
+      password: acc.password || ''
     })
   }).then(function(res){
     return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
@@ -9173,9 +9184,10 @@ function submitIndividualReg(){
 
 function selectType(t){
   acctType=t;
-  ['private','company'].forEach(x=>{
+  ['browse','private','company'].forEach(x=>{
     const card=document.getElementById('type-'+x);
     const chk=document.getElementById('chk-'+x);
+    if(!card||!chk) return;
     if(x===t){
       card.style.borderColor='rgba(201,168,76,.6)';
       card.style.background='rgba(201,168,76,.08)';
@@ -9194,6 +9206,11 @@ function selectType(t){
 
 function goFromType(){
   if(!acctType){alert(isAr?'يرجى اختيار نوع الحساب':'Veuillez choisir le type de compte');return;}
+  if(acctType==='browse'){
+    // نفس مسار حساب التصفح على الهاتف وسطح المكتب
+    location.href='rizq_register.html?mode=buyer';
+    return;
+  }
   if(acctType==='private'){
     showPanel('p-nat-type',1,5);
   } else {
@@ -9426,10 +9443,11 @@ function verifyOTP(){
       var okType = document.getElementById('p-ok').dataset.type || 'private';
       ALL_PANELS.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
       document.getElementById('sdots').style.display='none';
-      if(okType === 'private'){
-        document.getElementById('p-id-upload').style.display='block';
-      } else {
-        document.getElementById('p-ok').style.display='block';
+      /* بعد تحقق الهاتف: النجاح مباشرة (رفع الهوية داخل نموذج الفرد مسبقاً) */
+      var okPanel=document.getElementById('p-ok');
+      if(okPanel){
+        okPanel.style.display='block';
+        okPanel.dataset.type=okType;
       }
     }).catch(function(){
       alert(isAr?'تعذّر الاتصال بالخادم':'Échec de connexion au serveur');
@@ -9524,7 +9542,7 @@ function doLogin(){
     setTimeout(function(){ location.href = dashUrl; }, 400);
     return;
   }
-  alert(isAr?'بيانات الدخول غير صحيحة أو الحساب غير مفعّل بعد. إن كان حساباً جديداً فأكمل التسجيل أولاً.':'Identifiants incorrects ou compte non encore activé.');
+  _loginFail();
 }
 
 /* ══ استعادة كلمة مرور البائع (OTP بالبريد) ══ */

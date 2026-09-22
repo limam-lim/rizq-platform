@@ -531,11 +531,11 @@ main, .page-content.active, .main-content, .results-area,
 
     <div class="form-group" id="ad-condition-wrap">
       <label class="form-label" data-t-fr='État du produit <span class="req">*</span>'>حالة المنتج <span class="req">*</span></label>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="subcat-btn selected" data-t-fr="✨ Neuf" onclick="selectCondition(this,'جديد')">✨ جديد</button>
-        <button class="subcat-btn" data-t-fr="⭐ Occasion — excellent" onclick="selectCondition(this,'مستعمل — ممتاز')">⭐ مستعمل — ممتاز</button>
-        <button class="subcat-btn" data-t-fr="👍 Occasion — bon état" onclick="selectCondition(this,'مستعمل — جيد')">👍 مستعمل — جيد</button>
-        <button class="subcat-btn" data-t-fr="🔧 À réparer" onclick="selectCondition(this,'للتصليح')">🔧 يحتاج تصليح</button>
+      <div id="condition-btns" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="subcat-btn selected" data-cond="جديد">✨ جديد</button>
+        <button type="button" class="subcat-btn" data-cond="مستعمل — ممتاز">⭐ مستعمل — ممتاز</button>
+        <button type="button" class="subcat-btn" data-cond="مستعمل — جيد">👍 مستعمل — جيد</button>
+        <button type="button" class="subcat-btn" data-cond="للتصليح">🔧 يحتاج تصليح</button>
       </div>
     </div>
 
@@ -899,7 +899,7 @@ function selectSub(btn,sub){
   selSubcat=sub;
 }
 function selectCondition(btn,cond){
-  document.querySelectorAll('#panel-2 .subcat-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('#condition-btns .subcat-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   selCondition=cond;
 }
@@ -935,6 +935,12 @@ document.addEventListener('DOMContentLoaded',function(){
   if(wSel){
     wSel.addEventListener('change',toggleMoughataaField);
     toggleMoughataaField();
+  }
+  var condWrap=document.getElementById('condition-btns');
+  if(condWrap){
+    condWrap.querySelectorAll('.subcat-btn').forEach(function(b){
+      b.addEventListener('click', function(){ selectCondition(b, b.getAttribute('data-cond')); });
+    });
   }
 });
 

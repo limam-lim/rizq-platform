@@ -180,6 +180,9 @@ async function main() {
     const mineOk = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': accessToken });
     ok('mine approved account readable', mineOk.status === 200 && mineOk.body && mineOk.body.ok, 'status=' + mineOk.status);
 
+    const mineDash = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': dashToken });
+    ok('mine accepts dashToken as owner proof', mineDash.status === 200 && mineDash.body && mineDash.body.ok, 'status=' + mineDash.status);
+
     const mineQuery = await req('GET', '/api/accounts/mine/' + id + '?token=' + accessToken);
     ok('mine query token works in dev', mineQuery.status === 200, 'status=' + mineQuery.status);
 

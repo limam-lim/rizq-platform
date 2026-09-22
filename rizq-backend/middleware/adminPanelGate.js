@@ -105,15 +105,53 @@ function verifyGateCookie(value) {
 
 function setGateCookie(res) {
   const val = signGateCookie();
+  // Lax: يسمح بفتح اللوحة من رابط محفوظ/مدير كلمات سر ويُبقي الحماية من CSRF عبر POST
+  // Strict كان يكسر الدخول عند التنقل بين localhost و 127.0.0.1 أو من رابط خارجي
   const bits = [
     COOKIE_NAME + '=' + encodeURIComponent(val),
     'HttpOnly',
     'Path=/',
-    'SameSite=Strict',
+    'SameSite=Lax',
     'Max-Age=' + Math.floor(GATE_TTL_MS / 1000),
   ];
   if (isProdEnv()) bits.push('Secure');
   res.setHeader('Set-Cookie', bits.join('; '));
+}
+
+function sendGateUnlockPage(res, panelPath) {
+  const safePath = String(panelPath || '').replace(/[<>&"']/g, '');
+  const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>رزق — فتح لوحة الإدارة</title>
+<style>
+  :root{--bg:#0f1419;--card:#1a222d;--gold:#c9a84c;--muted:#9aa7b5;--text:#f2f5f8}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(1200px 600px at 70% -10%,#243044 0%,var(--bg) 55%);
+    color:var(--text);padding:24px}
+  .box{max-width:440px;width:100%;background:var(--card);border:1px solid rgba(201,168,76,.28);
+    border-radius:16px;padding:28px 24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  h1{margin:0 0 10px;font-size:1.25rem;color:var(--gold)}
+  p{margin:0 0 12px;line-height:1.75;color:var(--muted);font-size:.95rem}
+  code{display:inline-block;direction:ltr;background:rgba(0,0,0,.35);padding:2px 8px;border-radius:6px;
+    color:#e8c96a;font-size:.85rem}
+  .tip{margin-top:16px;padding:12px 14px;border-radius:10px;background:rgba(201,168,76,.08);
+    border:1px solid rgba(201,168,76,.22);color:#e8d9a8;font-size:.88rem;line-height:1.7}
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>يلزم رابط الفتح الكامل</h1>
+    <p>لوحة الإدارة محمية بمسار سري. فتح <code>/${safePath}</code> مباشرة بدون مفتاح البوابة لا يعمل — وهذا ليس خطأ في اسم المستخدم أو كلمة المرور.</p>
+    <p>استخدم الرابط الكامل المحفوظ لديك والذي ينتهي بـ <code>?k=...</code> (من مدير كلمات السر أو رسالة الإعداد الأولى).</p>
+    <div class="tip">بعد فتح الرابط مرة واحدة تبقى الجلسة مفعّلة ليوم واحد على نفس المضيف (<code>127.0.0.1</code> أو <code>localhost</code> — اختر أحدهما وثبّت عليه).</div>
+  </div>
+</body>
+</html>`;
+  res.status(401).type('html').send(html);
 }
 
 function installAdminPanelGate(app, frontendRoot) {
@@ -154,14 +192,13 @@ function installAdminPanelGate(app, frontendRoot) {
       const qk = req.query && req.query.k;
       if (qk && qk === gateKey) {
         setGateCookie(res);
-        const q = Object.assign({}, req.query);
-        delete q.k;
-        const qs = Object.keys(q).length ? '?' + new URLSearchParams(q).toString() : '';
-        return res.redirect(302, '/' + panelPath + qs);
+        // لا نعيد التوجيه بعد فتح المفتاح: أول زيارة تفتح اللوحة مباشرة
+        // حتى لو رفض المتصفح حفظ الكوكي (localhost≠127.0.0.1 / سياسات صارمة)
+        return res.sendFile(panelFile);
       }
       const cookies = parseCookies(req);
       if (!verifyGateCookie(cookies[COOKIE_NAME])) {
-        return res.status(404).send('Not Found');
+        return sendGateUnlockPage(res, panelPath);
       }
     }
 

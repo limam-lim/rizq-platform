@@ -258,6 +258,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
+<script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
@@ -325,6 +326,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 
 <div class="main">
   <div class="topbar" style="background:#1B3A6B">
+    <div class="topbar-title" id="topbar-title" data-t="sb-overview">📊 نظرة عامة</div>
     <div class="topbar-controls">
       <div class="notif-bell" onclick="showPanel('requests',null)" data-t-title="tb-notif-title" title="طلبات جديدة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notif-count">0</span></div>
       <button type="button" class="btn btn-outline btn-sm" data-t="tb-share" onclick="openShareModal()">📤 مشاركة</button>
@@ -333,7 +335,6 @@ textarea.form-input{min-height:80px;resize:vertical}
       <button type="button" class="btn btn-gold btn-sm" data-t="tb-subscription" onclick="showPanel('subscription',null)">💳 اشتراكي</button>
       <button type="button" class="btn btn-outline btn-sm btn-lang btn-lang-primary" id="office-lang-btn" onclick="toggleLangOffice()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     </div>
-    <div class="topbar-title" id="topbar-title" data-t="sb-overview">📊 نظرة عامة</div>
   </div>
   <div class="content">
     <div id="rizq-sub-slot"></div>

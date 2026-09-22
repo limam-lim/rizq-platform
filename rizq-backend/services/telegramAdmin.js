@@ -398,6 +398,25 @@ function inlineKeyboard(requestId, opts) {
   };
 }
 
+
+function loadReceiptDataUrl(req) {
+  if (req && req.receiptImage) return req.receiptImage;
+  if (!req || !req.receiptPath) return null;
+  try {
+    const fs = require('fs');
+    const { resolveReceiptAbsolute } = require('./receiptStorage');
+    const abs = resolveReceiptAbsolute(req.receiptPath);
+    if (!abs) return null;
+    const buf = fs.readFileSync(abs);
+    const mime = (req.receiptMeta && req.receiptMeta.mime) || 'image/jpeg';
+    if (!String(mime).startsWith('image/')) return null; // PDF: notify without vision
+    return 'data:' + mime + ';base64,' + buf.toString('base64');
+  } catch (e) {
+    console.warn('[telegram-admin] load receipt:', e.message);
+    return null;
+  }
+}
+
 function parseDataUrl(receiptImage) {
   const m = String(receiptImage || '').match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
   if (!m) return null;
@@ -476,7 +495,7 @@ async function sendSubRequestNotification(req, aiResult, opts) {
   const markup = JSON.stringify(inlineKeyboard(req.id, { autoApproved: !!opts.autoApproved }));
   const chatId = ADMIN_CHAT_ID();
 
-  const parsed = parseDataUrl(req.receiptImage);
+  const parsed = parseDataUrl(loadReceiptDataUrl(req));
   if (parsed && parsed.buffer.length > 0) {
     const form = new FormData();
     form.append('chat_id', chatId);

@@ -336,7 +336,7 @@ app.get('/api/status', requireSatelliteSecret, (req, res) => {
     messages_total : waLog.length,
     active_sessions: sessions.size,
     claude_model   : getAdvancedModel(),
-    api_key_set    : !!(process.env.ANTHROPIC_API_KEY),
+    api_key_set    : isAnthropicConfigured(),
     wa_token_set   : !!(WA_CONFIG.TOKEN),
     wa_phone_id_set: !!(WA_CONFIG.PHONE_ID)
   });
@@ -349,7 +349,7 @@ app.get('/', requireSatelliteSecret, (req, res) => {
     <h1>📱 مدير رزق الذكي v1 — خادم واتساب</h1>
     <p>✅ الخادم يعمل على المنفذ <strong>${PORT}</strong></p>
     <p>🧠 العقل: <strong>${getAdvancedModel()}</strong></p>
-    <p>🔑 Anthropic Key: <strong>${process.env.ANTHROPIC_API_KEY ? '✅' : '❌ مفقود'}</strong></p>
+    <p>🔑 Anthropic Key: <strong>${isAnthropicConfigured() ? '✅' : '❌ مفقود'}</strong></p>
     <p>📲 WhatsApp Token: <strong>${WA_CONFIG.TOKEN ? '✅' : '❌ مفقود'}</strong></p>
     <p>📊 رسائل مسجّلة: <strong>${waLog.length}</strong></p>
     <p>👥 جلسات نشطة: <strong>${sessions.size}</strong></p>
