@@ -912,27 +912,127 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .amd-rel-price{font-size:12px;font-weight:800;color:var(--gold-dk)}
 
 /* ── ALL ADS MODAL ── */
-#all-ads-modal{display:none;position:fixed;inset:0;z-index:99997;background:rgba(15,35,65,.45);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:0}
+#all-ads-modal{display:none;position:fixed;inset:0;z-index:99997;background:rgba(8,15,30,.62);backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:0}
 #all-ads-modal.open{display:flex}
-#all-ads-box{background:linear-gradient(160deg,#ffffff 0%,#f8faff 55%,#f3f6fc 100%);border:none;border-radius:0;width:100%;max-width:100%;height:100vh;max-height:100vh;padding:0;margin:0;position:relative;box-shadow:none;display:flex;flex-direction:column;overflow:hidden}
+#all-ads-box{
+  background:linear-gradient(165deg,#0b1628 0%,#10203a 42%,#0e1a2e 100%);
+  border:none;border-radius:0;width:100%;max-width:100%;height:100vh;max-height:100vh;
+  padding:0;margin:0;position:relative;box-shadow:none;display:flex;flex-direction:column;overflow:hidden;color:#fff
+}
 #all-ads-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--royal),var(--gold),var(--royal));z-index:3}
-#all-ads-close{position:absolute;top:18px;left:18px;z-index:2;background:rgba(15,35,65,.35);border:1px solid rgba(255,255,255,.25);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px;transition:all .3s;backdrop-filter:blur(6px)}
+#all-ads-close{
+  position:absolute;top:16px;left:16px;z-index:4;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;
+  width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:17px;transition:all .3s;backdrop-filter:blur(6px)
+}
 #all-ads-close:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);color:#0f2347;transform:rotate(90deg)}
-.all-ads-header{flex:0 0 auto;text-align:center;padding:32px 24px 18px;background:radial-gradient(ellipse at top,rgba(201,168,76,.08),transparent 70%)}
-.all-ads-header .section-tag{color:var(--gold-dk)}
-.all-ads-header .section-title{color:var(--royal-dark);margin-bottom:4px}
-.all-ads-count{font-size:12.5px;color:var(--text-muted);font-family:'Segoe UI','Arial',sans-serif}
-.all-ads-filters{flex:0 0 auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 24px 18px;border-bottom:1px solid #e2e8f5}
-.all-ads-filter{padding:8px 18px;border-radius:20px;border:1px solid #e2e8f5;color:var(--text-soft);background:#fff;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;font-size:12.5px;font-weight:600;transition:all .25s}
-.all-ads-filter.active,.all-ads-filter:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);color:#0f2347;box-shadow:0 4px 14px rgba(201,168,76,.35)}
-.all-ads-scroll{flex:1 1 auto;overflow-y:auto;padding:24px;scrollbar-width:thin;scrollbar-color:rgba(201,168,76,.4) transparent}
-.all-ads-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-@media(max-width:1200px){.all-ads-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:880px){.all-ads-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.all-ads-grid{grid-template-columns:repeat(2,1fr)}}
+.all-ads-header{
+  flex:0 0 auto;text-align:center;padding:28px 24px 14px;
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 0%,rgba(201,168,76,.16),transparent 60%),
+    linear-gradient(180deg,rgba(255,255,255,.03),transparent)
+}
+.all-ads-header .section-tag{color:var(--gold);letter-spacing:2.5px}
+.all-ads-header .section-title{
+  color:#fff;margin-bottom:6px;font-size:clamp(22px,3.2vw,36px);font-weight:800;
+  background:none;-webkit-text-fill-color:initial
+}
+.all-ads-header .section-title span{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+.all-ads-count{font-size:13px;color:rgba(255,255,255,.78);font-weight:600;margin:0}
+.all-ads-toolbar{
+  flex:0 0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;
+  padding:8px 20px 14px;max-width:1100px;margin:0 auto;width:100%;box-sizing:border-box
+}
+.all-ads-search{
+  flex:1 1 260px;max-width:420px;display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.07);border:1.5px solid rgba(201,168,76,.28);
+  border-radius:999px;padding:9px 14px
+}
+.all-ads-search input{
+  flex:1;border:none;outline:none;background:transparent;color:#fff;font:inherit;font-size:13.5px;min-width:0
+}
+.all-ads-search input::placeholder{color:rgba(255,255,255,.45)}
+.all-ads-browse-link{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;
+  font-size:12.5px;font-weight:800;text-decoration:none;color:#0f2347;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border:1px solid rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(201,168,76,.25);white-space:nowrap
+}
+.all-ads-filters{
+  flex:0 0 auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  padding:0 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)
+}
+.all-ads-filter{
+  padding:8px 16px;border-radius:999px;border:1.5px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.82);background:rgba(255,255,255,.05);cursor:pointer;
+  font-family:inherit;font-size:12.5px;font-weight:700;transition:all .25s
+}
+.all-ads-filter.active,.all-ads-filter:hover{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:var(--gold);
+  color:#0f2347;box-shadow:0 4px 14px rgba(201,168,76,.35)
+}
+.all-ads-scroll{flex:1 1 auto;overflow-y:auto;padding:20px 18px 28px;scrollbar-width:thin;scrollbar-color:rgba(201,168,76,.45) transparent}
+.all-ads-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;max-width:1280px;margin:0 auto}
+.aam-card{
+  background:#fff;border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;
+  cursor:pointer;transition:transform .28s,box-shadow .28s,border-color .28s;position:relative;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);display:flex;flex-direction:column;min-height:0;color:#1a2535
+}
+.aam-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,.55);box-shadow:0 16px 36px rgba(0,0,0,.32),0 0 0 1px rgba(201,168,76,.2)}
+.aam-card.is-pin{border-color:rgba(201,168,76,.4)}
+.aam-thumb{
+  height:148px;position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center
+}
+.aam-thumb .rizq-img-wrap,.aam-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.aam-thumb > span{font-size:48px;line-height:1}
+.aam-badge{
+  position:absolute;top:8px;right:8px;z-index:1;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;
+  font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:6px
+}
+.aam-fav{
+  position:absolute;top:8px;left:8px;z-index:1;width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)
+}
+.aam-body{padding:12px 13px 14px;display:flex;flex-direction:column;gap:5px;flex:1}
+.aam-cat{font-size:10.5px;color:#8a6f2a;font-weight:700}
+.aam-title{font-size:13.5px;font-weight:800;color:#1a2535;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+.aam-desc{font-size:11.5px;color:#5b6b85;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.aam-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid #eef1f6}
+.aam-price{font-size:14px;font-weight:900;color:#8a6f2a}
+.aam-loc{font-size:11px;color:#5b6b85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%}
+.all-ads-more{
+  grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:18px 12px;margin-top:4px;border-radius:14px;
+  background:rgba(255,255,255,.04);border:1.5px dashed rgba(201,168,76,.28)
+}
+.all-ads-more-lbl{font-size:12.5px;color:rgba(255,255,255,.78);font-weight:600}
+.all-ads-more-btn{
+  padding:10px 22px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:13px;font-weight:800;color:#0f2347;border:1px solid rgba(201,168,76,.5);
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));box-shadow:0 4px 14px rgba(201,168,76,.25)
+}
+.all-ads-more.is-done{border-style:solid;border-color:rgba(201,168,76,.22)}
+.all-ads-empty{grid-column:1/-1;text-align:center;padding:48px 16px;color:rgba(255,255,255,.7)}
+@media(max-width:1200px){.all-ads-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:880px){.all-ads-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.all-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aam-thumb{height:120px}}
 @media(max-width:420px){.all-ads-grid{grid-template-columns:1fr}}
-@media(max-width:768px){.all-ads-grid{grid-template-columns:1fr}#all-ads-box{height:100vh;max-height:100vh;border-radius:0}#all-ads-modal{padding:0}}
-@media(max-width:1024px){.all-ads-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  .all-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #all-ads-box{height:100vh;max-height:100vh;border-radius:0}
+  #all-ads-modal{padding:0}
+  .all-ads-header{padding:22px 16px 10px}
+  .all-ads-filters{padding:0 12px 12px;gap:6px}
+  .all-ads-filter{padding:6px 12px;font-size:11.5px}
+  .all-ads-scroll{padding:14px 12px 22px}
+}
+@media(max-width:1024px){.all-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .hero-listings-section{position:relative;z-index:2;width:100%;overflow:hidden;padding-bottom:60px}
 .listings-label{text-align:center;margin-bottom:20px;animation:fadeUp .8s .5s ease both}
 .listings-label>span{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--dark),var(--royal));border:1px solid rgba(201,168,76,.25);border-radius:24px;padding:8px 20px;font-size:12px;color:rgba(255,255,255,.9);letter-spacing:1.5px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;box-shadow:0 4px 16px rgba(0,0,0,.2)}
@@ -3634,26 +3734,34 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </div>
 
-<!-- ══ ALL ADS MODAL ══ -->
+<!-- ══ ALL ADS MODAL — نافذة كل الإعلانات (غنية حتى 1000) ══ -->
 <div id="all-ads-modal" onclick="if(event.target===this)closeAllAds()">
-  <div id="all-ads-box">
-    <button id="all-ads-close" onclick="closeAllAds()">✕</button>
+  <div id="all-ads-box" role="dialog" aria-modal="true" aria-labelledby="all-ads-title">
+    <button type="button" id="all-ads-close" onclick="closeAllAds()" aria-label="إغلاق">✕</button>
     <div class="all-ads-header">
-      <p class="section-tag">All Listings</p>
+      <p class="section-tag" id="all-ads-tag">كل الإعلانات</p>
       <h2 class="section-title" id="all-ads-title">كل <span>الإعلانات</span></h2>
-      <p class="all-ads-count" id="all-ads-count"></p>
+      <p class="all-ads-count" id="all-ads-count" aria-live="polite"></p>
     </div>
-    <div class="all-ads-filters" id="all-ads-filters">
-      <button class="all-ads-filter active" onclick="filterAllAds('all',this)" data-t="f-all">الكل</button>
-      <button class="all-ads-filter" onclick="filterAllAds('عقارات',this)" data-t="f-re">عقارات</button>
-      <button class="all-ads-filter" onclick="filterAllAds('سيارات',this)" data-t="f-car">سيارات</button>
-      <button class="all-ads-filter" onclick="filterAllAds('ماشية',this)" data-t="f-live">ماشية</button>
-      <button class="all-ads-filter" onclick="filterAllAds('إلكترونيات',this)" data-t="f-elec">إلكترونيات</button>
-      <button class="all-ads-filter" onclick="filterAllAds('شاحنات',this)" data-t="f-truck">شاحنات</button>
-      <button class="all-ads-filter" onclick="filterAllAds('خدمات',this)" data-t="f-srv">خدمات</button>
+    <div class="all-ads-toolbar">
+      <label class="all-ads-search" for="all-ads-q">
+        <span aria-hidden="true">🔍</span>
+        <input type="search" id="all-ads-q" maxlength="80" placeholder="ابحث في الإعلانات…" oninput="searchAllAds(this.value)" autocomplete="off"/>
+      </label>
+      <a class="all-ads-browse-link" href="rizq_browse.html" id="all-ads-browse-link">📂 صفحة الإعلانات الكاملة</a>
     </div>
-    <div class="all-ads-scroll">
-      <div class="all-ads-grid" id="all-ads-grid"></div>
+    <div class="all-ads-filters" id="all-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
+      <button type="button" class="all-ads-filter active" role="tab" aria-selected="true" data-aam-cat="all" onclick="filterAllAds('all',this)" data-t="f-all">الكل</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="عقارات" onclick="filterAllAds('عقارات',this)" data-t="f-re">عقارات</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="سيارات" onclick="filterAllAds('سيارات',this)" data-t="f-car">سيارات</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="إلكترونيات" onclick="filterAllAds('إلكترونيات',this)" data-t="f-elec">إلكترونيات</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="أزياء" onclick="filterAllAds('أزياء',this)" data-t="f-fashion">موضة</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="ماشية" onclick="filterAllAds('ماشية',this)" data-t="f-live">ماشية</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="شاحنات" onclick="filterAllAds('شاحنات',this)" data-t="f-truck">شاحنات</button>
+      <button type="button" class="all-ads-filter" role="tab" aria-selected="false" data-aam-cat="خدمات" onclick="filterAllAds('خدمات',this)" data-t="f-srv">خدمات</button>
+    </div>
+    <div class="all-ads-scroll" id="all-ads-scroll">
+      <div class="all-ads-grid" id="all-ads-grid" role="list"></div>
     </div>
   </div>
 </div>
@@ -5559,67 +5667,196 @@ function openAdByGlobalIndex(idx) {
   goToListing(a);
 }
 
+var ALL_ADS_MODAL_MAX = 1000;
+var ALL_ADS_MODAL_PAGE = 24;
+var _allAdsCat = 'all';
+var _allAdsQ = '';
+var _allAdsVisible = ALL_ADS_MODAL_PAGE;
+var _allAdsLoading = false;
+var _allAdsIO = null;
+
+function _allAdsPool(){
+  var seen = {};
+  var out = [];
+  function add(list){
+    (list || []).forEach(function(a){
+      if(!a || a.id == null) return;
+      var id = String(a.id);
+      if(seen[id]) return;
+      seen[id] = 1;
+      out.push(a);
+    });
+  }
+  if(typeof ADS !== 'undefined') add(ADS);
+  if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
+  if(out.length > ALL_ADS_MODAL_MAX) out = out.slice(0, ALL_ADS_MODAL_MAX);
+  return out;
+}
+function _allAdsFiltered(){
+  var pool = _allAdsPool();
+  var cat = _allAdsCat || 'all';
+  var q = String(_allAdsQ || '').trim().toLowerCase();
+  return pool.filter(function(a){
+    if(cat !== 'all'){
+      var k = String(a.catKey || a.cat || '');
+      if(k.indexOf(cat) < 0 && cat.indexOf(k) < 0) return false;
+    }
+    if(q){
+      var blob = [a.title, a.titleFR, a.desc, a.cat, a.catKey, a.loc, a.price].join(' ').toLowerCase();
+      if(blob.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+function _aamEsc(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _aamCardHtml(a, fr){
+  var d = typeof trAd === 'function' ? trAd(a) : a;
+  var idJs = String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var pin = !!d.pin || !!a.boosted;
+  var fav = typeof isFavorited === 'function' ? isFavorited(a.id) : false;
+  var photo = typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 148) : ('<span>' + _aamEsc(d.emoji || '📦') + '</span>');
+  var desc = String(d.desc || '').slice(0, 78);
+  return ''
+    + '<article class="aam-card' + (pin ? ' is-pin' : '') + '" role="listitem" data-ad-id="' + _aamEsc(a.id) + '" onclick="openAdById(\'' + idJs + '\')">'
+    + (pin ? ('<span class="aam-badge">⭐ ' + (fr ? 'Vedette' : 'مميز') + '</span>') : '')
+    + '<button type="button" class="aam-fav" onclick="event.stopPropagation();quickToggleFavorite(\'' + idJs + '\',this)" aria-label="favorite">' + (fav ? '❤️' : '🤍') + '</button>'
+    + '<div class="aam-thumb" style="background:' + _aamEsc(d.bg || 'linear-gradient(145deg,#1B3A6B,#0f2347)') + '">' + photo + '</div>'
+    + '<div class="aam-body">'
+    +   '<div class="aam-cat">' + _aamEsc(d.cat || '') + '</div>'
+    +   '<div class="aam-title">' + _aamEsc(d.title || '') + '</div>'
+    +   (desc ? ('<div class="aam-desc">' + _aamEsc(desc) + (String(d.desc||'').length > 78 ? '…' : '') + '</div>') : '')
+    +   '<div class="aam-meta"><span class="aam-price">' + _aamEsc(d.price || '') + '</span><span class="aam-loc">' + _aamEsc(d.loc || '') + '</span></div>'
+    + '</div></article>';
+}
+function _allAdsBindInfinite(){
+  if(_allAdsIO){ try{ _allAdsIO.disconnect(); }catch(e){} _allAdsIO = null; }
+  var sentinel = document.getElementById('all-ads-sentinel');
+  var root = document.getElementById('all-ads-scroll');
+  if(!sentinel || !root || typeof IntersectionObserver === 'undefined') return;
+  _allAdsIO = new IntersectionObserver(function(entries){
+    if(!entries[0] || !entries[0].isIntersecting) return;
+    loadMoreAllAds();
+  }, { root: root, rootMargin: '120px', threshold: 0.01 });
+  _allAdsIO.observe(sentinel);
+}
 function openAllAds() {
   const modal = document.getElementById('all-ads-modal');
+  if(!modal) return;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  renderAllAds('all');
-  // Translate filters if FR
-  if(!isAr){
-    document.getElementById('all-ads-title').innerHTML = 'Toutes les <span>annonces</span>';
-    const filters = document.querySelectorAll('.all-ads-filter');
-    const frLabels = ['Tout','Immobilier','Voitures','Bétail','Électronique','Camions','Services'];
-    filters.forEach((f,i)=>{ if(frLabels[i]) f.textContent=frLabels[i]; });
-  } else {
-    document.getElementById('all-ads-title').innerHTML = 'كل <span>الإعلانات</span>';
-    const filters = document.querySelectorAll('.all-ads-filter');
-    const arLabels = ['الكل','عقارات','سيارات','ماشية','إلكترونيات','شاحنات','خدمات'];
-    filters.forEach((f,i)=>{ if(arLabels[i]) f.textContent=arLabels[i]; });
-  }
-  document.querySelector('.all-ads-filter').classList.add('active');
+  _allAdsCat = 'all';
+  _allAdsQ = '';
+  _allAdsVisible = ALL_ADS_MODAL_PAGE;
+  var qEl = document.getElementById('all-ads-q');
+  if(qEl) qEl.value = '';
+  try { if(typeof refreshAllAdsIndex === 'function') refreshAllAdsIndex(); } catch(e){}
+  var fr = typeof isAr !== 'undefined' && !isAr;
+  var title = document.getElementById('all-ads-title');
+  var tag = document.getElementById('all-ads-tag');
+  var browse = document.getElementById('all-ads-browse-link');
+  if(title) title.innerHTML = fr ? 'Toutes les <span>annonces</span>' : 'كل <span>الإعلانات</span>';
+  if(tag) tag.textContent = fr ? 'Toutes les annonces' : 'كل الإعلانات';
+  if(browse) browse.textContent = fr ? '📂 Page Annonces complète' : '📂 صفحة الإعلانات الكاملة';
+  if(qEl) qEl.placeholder = fr ? 'Rechercher dans les annonces…' : 'ابحث في الإعلانات…';
+  var labels = fr
+    ? {all:'Tout',عقارات:'Immobilier',سيارات:'Voitures',إلكترونيات:'Électronique',أزياء:'Mode',ماشية:'Bétail',شاحنات:'Camions',خدمات:'Services'}
+    : {all:'الكل',عقارات:'عقارات',سيارات:'سيارات',إلكترونيات:'إلكترونيات',أزياء:'موضة',ماشية:'ماشية',شاحنات:'شاحنات',خدمات:'خدمات'};
+  document.querySelectorAll('.all-ads-filter').forEach(function(f){
+    var c = f.getAttribute('data-aam-cat') || 'all';
+    if(labels[c]) f.textContent = labels[c];
+    var on = c === 'all';
+    f.classList.toggle('active', on);
+    f.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  renderAllAds(true);
 }
 function closeAllAds() {
-  document.getElementById('all-ads-modal').classList.remove('open');
+  var modal = document.getElementById('all-ads-modal');
+  if(modal) modal.classList.remove('open');
   document.body.style.overflow = '';
+  if(_allAdsIO){ try{ _allAdsIO.disconnect(); }catch(e){} _allAdsIO = null; }
 }
 function filterAllAds(cat, btn) {
-  document.querySelectorAll('.all-ads-filter').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAllAds(cat);
+  _allAdsCat = cat || 'all';
+  _allAdsVisible = ALL_ADS_MODAL_PAGE;
+  document.querySelectorAll('.all-ads-filter').forEach(function(b){
+    var on = b === btn || b.getAttribute('data-aam-cat') === _allAdsCat;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  renderAllAds(false);
+  var scroll = document.getElementById('all-ads-scroll');
+  if(scroll) scroll.scrollTop = 0;
 }
-function renderAllAds(cat) {
+function searchAllAds(q){
+  _allAdsQ = q || '';
+  _allAdsVisible = ALL_ADS_MODAL_PAGE;
+  renderAllAds(false);
+}
+function loadMoreAllAds(){
+  if(_allAdsLoading) return false;
+  var filtered = _allAdsFiltered();
+  if(_allAdsVisible >= filtered.length) return false;
+  _allAdsLoading = true;
+  _allAdsVisible = Math.min(_allAdsVisible + ALL_ADS_MODAL_PAGE, filtered.length, ALL_ADS_MODAL_MAX);
+  renderAllAds(false);
+  setTimeout(function(){ _allAdsLoading = false; }, 140);
+  return true;
+}
+function renderAllAds(resetVisible) {
   const grid = document.getElementById('all-ads-grid');
-  const maxN = typeof LANDING_ADS_MAX === 'number' ? LANDING_ADS_MAX : 1000;
-  const filteredFull = cat==='all' ? ALL_ADS_DATA : ALL_ADS_DATA.filter(a=>a.catKey && a.catKey.includes(cat));
-  const filtered = filteredFull.slice(0, maxN);
-  grid.innerHTML = filtered.map((a,i)=>{ const d=trAd(a); const fav=isFavorited(a.id); return `\n    <div onclick="openAdById('${String(a.id).replace(/'/g,"\\'")}')" style="background:linear-gradient(145deg,rgba(27,58,107,.14),rgba(8,15,30,.85));border:1px solid rgba(201,168,76,.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative" onmouseover="this.style.borderColor='rgba(201,168,76,.45)';this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='rgba(201,168,76,.1)';this.style.transform='translateY(0)'">\n      ${d.pin?`<div class="ad-badge" style="position:absolute;top:8px;right:8px;z-index:1">⭐ ${isAr?'مميّز':'Vedette'}</div>`:''}
-      <button onclick="event.stopPropagation();quickToggleFavorite(${JSON.stringify(String(a.id))},this)" style="position:absolute;top:8px;left:8px;z-index:1;width:28px;height:28px;border-radius:50%;border:none;background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">${fav?'❤️':'🤍'}</button>
-      <div style="height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;background:${d.bg};overflow:hidden">${_adPhotoHtml(a, d, 110)}</div>
-      <div style="padding:12px">
-        <div style="font-size:10px;color:#C9A84C;font-weight:700;margin-bottom:5px">${d.cat}</div>
-        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35">${d.title}</div>\n        <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:10px">${(d.desc||'').substring(0,70)}...</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.05);padding-top:9px">
-          <span style="font-size:14px;font-weight:900;color:#C9A84C">${d.price}</span>
-          <span style="font-size:10px;color:rgba(255,255,255,.6)">${d.loc}</span>
-        </div>
-      </div>\n    </div>`; }).join('');
-  if(filtered.length===0){
-    if(window.RizqUx&&typeof RizqUx.emptyStateHtml==='function'){
-      grid.innerHTML=RizqUx.emptyStateHtml({
-        title: isAr?'لا توجد إعلانات في هذا القسم':'Aucune annonce dans cette catégorie',
-        primaryHref:'rizq_post.html',
-        secondaryOnclick:"document.getElementById('all-ads-grid')&&(document.getElementById('all-ads-grid').scrollIntoView({behavior:'smooth'}))"
-      });
-    } else {
-      grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">${isAr?'لا توجد إعلانات في هذا القسم':'Aucune annonce dans cette catégorie'}</div>`;
-    }
-  }
+  if(!grid) return;
+  if(resetVisible) _allAdsVisible = ALL_ADS_MODAL_PAGE;
+  var fr = typeof isAr !== 'undefined' && !isAr;
+  var filtered = _allAdsFiltered();
+  var total = Math.min(filtered.length, ALL_ADS_MODAL_MAX);
+  if(_allAdsVisible < ALL_ADS_MODAL_PAGE) _allAdsVisible = ALL_ADS_MODAL_PAGE;
+  if(_allAdsVisible > total) _allAdsVisible = Math.max(total, 0);
+  var items = filtered.slice(0, _allAdsVisible);
+
   const countEl = document.getElementById('all-ads-count');
   if(countEl){
-    var shown = filtered.length;
-    var moreNote = filteredFull.length > maxN ? (isAr ? (' (حد أقصى '+maxN+')') : (' (max '+maxN+')')) : '';
-    countEl.textContent = isAr ? (shown+' إعلان'+moreNote) : (shown+(shown===1?' annonce':' annonces')+moreNote);
+    if(!total){
+      countEl.textContent = fr ? 'Aucune annonce' : 'لا توجد إعلانات';
+    } else {
+      countEl.textContent = fr
+        ? ('Affichage ' + items.length + ' / ' + total + (filtered.length >= ALL_ADS_MODAL_MAX ? '+' : '') + ' annonces')
+        : ('عرض ' + items.length + ' من ' + total + (filtered.length >= ALL_ADS_MODAL_MAX ? '+' : '') + ' إعلان');
+    }
   }
+
+  if(!items.length){
+    if(window.RizqUx && typeof RizqUx.emptyStateHtml === 'function'){
+      grid.innerHTML = RizqUx.emptyStateHtml({
+        title: fr ? 'Aucune annonce dans cette catégorie' : 'لا توجد إعلانات في هذا القسم',
+        primaryHref: 'rizq_post.html'
+      });
+    } else {
+      grid.innerHTML = '<div class="all-ads-empty">' + (fr ? 'Aucune annonce dans cette catégorie' : 'لا توجد إعلانات في هذا القسم') + '</div>';
+    }
+    if(_allAdsIO){ try{ _allAdsIO.disconnect(); }catch(e){} _allAdsIO = null; }
+    return;
+  }
+
+  var moreHtml = '';
+  if(items.length >= total){
+    moreHtml = '<div class="all-ads-more is-done"><span class="all-ads-more-lbl">'
+      + (fr ? ('Fin — ' + total + ' annonces') : ('تم عرض كل الإعلانات الظاهرة — ' + total))
+      + '</span></div>';
+  } else {
+    moreHtml = '<div class="all-ads-more" id="all-ads-sentinel">'
+      + '<span class="all-ads-more-lbl">'
+      + (fr ? ('Affichage ' + items.length + ' / ' + total + ' — continuez à défiler') : ('عرض ' + items.length + ' من ' + total + ' — مرّر للمزيد'))
+      + '</span>'
+      + '<button type="button" class="all-ads-more-btn" onclick="loadMoreAllAds()">'
+      + (fr ? 'Charger plus' : 'تحميل المزيد')
+      + '</button></div>';
+  }
+  grid.innerHTML = items.map(function(a){ return _aamCardHtml(a, fr); }).join('') + moreHtml;
+  _allAdsBindInfinite();
 }
 function quickToggleFavorite(adId, btn) {
   var added = _wishlistToggle(adId);
