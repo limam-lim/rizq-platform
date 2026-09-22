@@ -2571,6 +2571,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <ul class="nav-center">
     <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home" data-t="nav-home">الرئيسية</a></li>
     <li data-nav-order="2"><a href="#categories" data-hdr="cats" data-t="nav-cats">الأقسام</a></li>
+    <!-- معاينة IA: فصل الإعلانات المبوبة عن Rizq ADS (قابل للرجوع) -->
+    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2.5"><a href="#hero-listings" data-hdr="ads">الإعلانات</a></li>
+    <li class="rizq-nav-extra" data-rizq-nav-extra="rizqads" data-nav-order="2.6"><a href="rizq_ads_info.html" data-hdr="rizqads" style="color:var(--gold);background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.25)">Rizq ADS</a></li>
     <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" data-t="nav-post">نشر (+)</a></li>
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
     <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="rizq_investments.html" data-hdr="investments" data-t="nav-investments">غرفة الاستثمارات</a></li>
@@ -6959,7 +6962,7 @@ function applyLandingLang(toAr) {
 
   // Hero featured-video placeholder slot (shown when no admin video is configured)
   const vidBadge = document.querySelector('.hero-vid-badge');
-  if(vidBadge) vidBadge.textContent = isAr ? '🎬 إعلان فيديو مميز · Rizq ADS' : '🎬 Annonce vidéo sponsorisée · Rizq ADS';
+  if(vidBadge) vidBadge.textContent = isAr ? '🎬 موضع واحد · Rizq ADS' : '🎬 Emplacement unique · Rizq ADS';
   const vidPhLive = document.querySelector('.hero-vid-ph-live');
   if(vidPhLive) vidPhLive.innerHTML = '<div class="hero-vid-ph-live-dot"></div>' + (isAr ? '🔴 LIVE · RIZQ ADS · الموضع الأول' : '🔴 LIVE · RIZQ ADS · 1ère position');
   const vidPhExcl = document.querySelector('.hero-vid-ph-excl');

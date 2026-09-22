@@ -23,7 +23,7 @@
   var MOBILE_MORE_EXTRAS = [
     /* الإعلانات المبوبة ≠ Rizq ADS — فصل واضح في القائمة */
     { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#hero-listings' },
-    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬', landingHref: '#hero-vid-wrap' },
+    { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
