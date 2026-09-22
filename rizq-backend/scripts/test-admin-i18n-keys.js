@@ -36,6 +36,9 @@ const REQUIRED = [
   'team-no-perm', 'team-server-fail', 'tm-h', 'tm-sub', 'tm-refresh-btn', 'tm-empty', 'tm-error',
   'topbar-tenders-mod', 'topbar-promo-video', 'topbar-modules', 'topbar-announcements',
   'topbar-subscriber-agents', 'topbar-quota-guard',
+  'set-my-pass-title', 'set-my-pass-sub', 'set-my-pass-btn', 'sb-change-pass',
+  'cap-title', 'cap-sub', 'cap-cur-label', 'cap-new-label', 'cap-confirm-label',
+  'cap-save-btn', 'cap-cancel-btn',
 ];
 
 const ar = extractAdminKeys('RIZQ_I18N_AR');

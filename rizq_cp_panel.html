@@ -418,8 +418,9 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-section" data-t="sb-section-site">الموقع</div>
     <div class="sb-item" onclick="window.open('rizq_landing_v8.html','_blank')"><span class="sb-icon">🌐</span><span class="sb-label" data-t="sb-view-site">عرض الموقع</span></div>
   </nav>
-  <div class="sb-footer">
+    <div class="sb-footer">
     <div class="sb-version">رزق Admin v1.0 | ADMINIA SARL © 2026</div>
+    <button class="btn-logout-sb" type="button" data-t="sb-change-pass" onclick="openModal('change-admin-pass')" style="margin-bottom:8px;background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.35);color:#e8c96a">🔑 تغيير كلمة المرور</button>
     <button class="btn-logout-sb" data-t="sb-logout" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div>
 </aside>
@@ -831,6 +832,11 @@ main, .page-content.active, .main-content, .results-area,
               <div class="toggle-row"><div class="toggle-info"><div class="toggle-name" data-t="set-vpn-block">حظر VPN</div><div class="toggle-desc" data-t="set-vpn-block-sub">منع الدخول عبر VPN</div></div><button class="toggle-sw" id="set-vpn-block" onclick="persistPlatformFlag(this,'vpnBlock')"></button></div>
               <div class="form-group" style="margin-top:14px"><label class="form-label" data-t="set-session-timeout">جلسة الجلسة تنتهي بعد (دقيقة)</label><input class="form-input" type="number" id="set-session-timeout" value="60" dir="ltr"/></div>
               <button class="btn-sm btn-primary" data-t="set-save-security" onclick="saveSettingsSecurity()">💾 حفظ</button>
+              <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(27,58,107,.1)">
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="set-my-pass-title">🔑 كلمة مرور حسابك</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6" data-t="set-my-pass-sub">غيّر كلمة سر دخول اللوحة. التغيير يُحفظ فوراً ولا يُلغى عند إعادة تشغيل الخادم.</div>
+                <button class="btn-sm btn-outline" type="button" data-t="set-my-pass-btn" onclick="openModal('change-admin-pass')">تغيير كلمة المرور</button>
+              </div>
             </div>
           </div>
         </div>
@@ -2307,6 +2313,22 @@ main, .page-content.active, .main-content, .results-area,
 
 <!-- ══ MODALS ══ -->
 
+<!-- Change own admin password -->
+<div class="modal-bg" id="modal-change-admin-pass">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('change-admin-pass')">✕</button>
+    <div class="modal-title" data-t="cap-title">🔑 تغيير كلمة مرور حسابك</div>
+    <p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6" data-t="cap-sub">أدخل كلمة السر الحالية ثم الجديدة (8 أحرف على الأقل).</p>
+    <div class="form-group"><label class="form-label" data-t="cap-cur-label">كلمة المرور الحالية</label><input class="form-input" id="cap-cur" type="password" autocomplete="current-password" placeholder="••••••••"/></div>
+    <div class="form-group"><label class="form-label" data-t="cap-new-label">كلمة المرور الجديدة</label><input class="form-input" id="cap-new" type="password" autocomplete="new-password" placeholder="••••••••" minlength="8"/></div>
+    <div class="form-group"><label class="form-label" data-t="cap-confirm-label">تأكيد كلمة المرور</label><input class="form-input" id="cap-confirm" type="password" autocomplete="new-password" placeholder="••••••••" minlength="8"/></div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn-sm btn-primary" style="flex:1;padding:12px" data-t="cap-save-btn" onclick="saveOwnAdminPassword()">💾 حفظ كلمة المرور</button>
+      <button class="btn-sm btn-danger" style="padding:12px 20px" data-t="cap-cancel-btn" onclick="closeModal('change-admin-pass')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Admin Modal -->
 <div class="modal-bg" id="modal-add-admin">
   <div class="modal-box">
@@ -2735,6 +2757,44 @@ function doLogout(){
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
   document.getElementById('login-err').textContent='';
+}
+
+async function saveOwnAdminPassword(){
+  const cur = (document.getElementById('cap-cur')||{}).value || '';
+  const nw = (document.getElementById('cap-new')||{}).value || '';
+  const conf = (document.getElementById('cap-confirm')||{}).value || '';
+  if(!cur || !nw){
+    showToast(RizqI18n.t2('⚠️ أدخل كلمة السر الحالية والجديدة','⚠️ Saisissez le mot de passe actuel et le nouveau'),'error');
+    return;
+  }
+  if(String(nw).length < 8){
+    showToast(RizqI18n.t2('⚠️ كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل','⚠️ Le nouveau mot de passe doit contenir au moins 8 caractères'),'error');
+    return;
+  }
+  if(nw !== conf){
+    showToast(RizqI18n.t2('⚠️ كلمة المرور غير متطابقة','⚠️ Les mots de passe ne correspondent pas'),'error');
+    return;
+  }
+  try{
+    const res = await fetch(_adminBackendBase()+'/api/admin/change-password',{
+      method:'POST',
+      headers:_adminAuthHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ currentPass: cur, newPass: nw })
+    });
+    const data = await res.json().catch(function(){ return {}; });
+    if(!res.ok || !data.ok){
+      showToast('❌ '+((data && data.msg) || (data && data.error) || RizqI18n.t2('فشل التغيير','Échec')),'error');
+      return;
+    }
+    ['cap-cur','cap-new','cap-confirm'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    closeModal('change-admin-pass');
+    showToast(RizqI18n.t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+  }catch(e){
+    showToast(RizqI18n.t2('❌ تعذّر الاتصال بالخادم','❌ Connexion au serveur impossible'),'error');
+  }
 }
 
 // ══ PANELS ══
