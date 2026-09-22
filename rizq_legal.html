@@ -620,6 +620,15 @@ document.addEventListener('rizq:langchange', function (e) { setLang(e.detail.lan
 <script>
 (function applyLegalOverrides(){
   if (!window.RIZQ_BACKEND_BASE) return;
+  function sanitizeLegalClient(html) {
+    var s = String(html || '');
+    s = s.replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '');
+    s = s.replace(/<\s*(script|style|iframe|object|embed|form|input|button|textarea|select)[^>]*\/?\s*>/gi, '');
+    s = s.replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+    s = s.replace(/\s(href|src)\s*=\s*(["'])\s*javascript:[\s\S]*?\2/gi, ' $1="#"');
+    s = s.replace(/\s(href|src)\s*=\s*javascript:[^\s>]*/gi, ' $1="#"');
+    return s;
+  }
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
     .then(function(res){ return res.json(); })
     .then(function(data){
@@ -628,11 +637,11 @@ document.addEventListener('rizq:langchange', function (e) { setLang(e.detail.lan
       var ar = lo.ar || {}, fr = lo.fr || {};
       Object.keys(ar).forEach(function(key){
         var el = document.getElementById(key);
-        if (el && ar[key]) el.innerHTML = ar[key];
+        if (el && ar[key]) el.innerHTML = sanitizeLegalClient(ar[key]);
       });
       Object.keys(fr).forEach(function(key){
         var el = document.getElementById(key);
-        if (el && fr[key]) el.innerHTML = fr[key];
+        if (el && fr[key]) el.innerHTML = sanitizeLegalClient(fr[key]);
       });
       if (lo.updatedAt) {
         var realDate = new Date(lo.updatedAt);

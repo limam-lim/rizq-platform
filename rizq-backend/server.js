@@ -1094,6 +1094,7 @@ app.get('/api/site-config', (req, res) => {
 const LEGAL_KEYS_AR = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
 const LEGAL_KEYS_FR = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11'];
 const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني كامل بصياغة HTML بسيطة
+const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
 
 /**
  * POST /api/site-config
@@ -1142,17 +1143,19 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     if (incoming.ar && typeof incoming.ar === 'object') {
       for (const key of LEGAL_KEYS_AR) {
         if (!(key in incoming.ar)) continue;
-        const val = String(incoming.ar[key] || '').slice(0, LEGAL_MAX_LEN);
+        const raw = String(incoming.ar[key] || '').slice(0, LEGAL_MAX_LEN);
         touched = true;
-        if (val === '') delete mergedAr[key]; else mergedAr[key] = val;
+        if (raw === '') delete mergedAr[key];
+        else mergedAr[key] = sanitizeLegalHtml(raw, LEGAL_MAX_LEN);
       }
     }
     if (incoming.fr && typeof incoming.fr === 'object') {
       for (const key of LEGAL_KEYS_FR) {
         if (!(key in incoming.fr)) continue;
-        const val = String(incoming.fr[key] || '').slice(0, LEGAL_MAX_LEN);
+        const raw = String(incoming.fr[key] || '').slice(0, LEGAL_MAX_LEN);
         touched = true;
-        if (val === '') delete mergedFr[key]; else mergedFr[key] = val;
+        if (raw === '') delete mergedFr[key];
+        else mergedFr[key] = sanitizeLegalHtml(raw, LEGAL_MAX_LEN);
       }
     }
 
@@ -1276,7 +1279,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       textFr: String(a.textFr || '').slice(0, 500),
       ctaTextAr: String(a.ctaTextAr || '').slice(0, 80),
       ctaTextFr: String(a.ctaTextFr || '').slice(0, 80),
-      ctaUrl: String(a.ctaUrl || '').slice(0, 500),
+      ctaUrl: sanitizeSafeUrl(a.ctaUrl || '', 500),
       pages: String(a.pages || 'all').slice(0, 80),
       expires: String(a.expires || '').slice(0, 20),
       showBar: a.showBar !== false,
@@ -3115,10 +3118,18 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   res.json({ ok: true, review });
 });
 
-/** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام) */
+/** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام؛ بدون reviewerAccountId) */
 app.get('/api/reviews/:targetId', (req, res) => {
   const all = readReviews();
-  const list = (all[req.params.targetId] || []).slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const list = (all[req.params.targetId] || []).slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      comment: r.comment,
+      reviewerName: r.reviewerName,
+      createdAt: r.createdAt,
+    }));
   res.json({ ok: true, reviews: list });
 });
 

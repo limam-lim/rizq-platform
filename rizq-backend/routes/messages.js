@@ -16,17 +16,6 @@ function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
 /** أسرار قراءة محادثات الضيوف — threadKey → { hash, phoneDigits } */
 const _guestThreadSecrets = new Map();
 
-function issueGuestThreadToken(threadKey, phoneDigits) {
-  const token = crypto.randomBytes(24).toString('hex');
-  const hash = crypto.createHash('sha256').update(token).digest('hex');
-  _guestThreadSecrets.set(threadKey, {
-    hash,
-    phoneDigits: String(phoneDigits || '').replace(/\D/g, ''),
-    createdAt: Date.now(),
-  });
-  return token;
-}
-
 function verifyGuestThreadToken(threadKey, token, phoneDigits) {
   const rec = _guestThreadSecrets.get(threadKey);
   if (!rec || !token) return false;
@@ -39,6 +28,31 @@ function verifyGuestThreadToken(threadKey, token, phoneDigits) {
   const ph = String(phoneDigits || '').replace(/\D/g, '');
   if (rec.phoneDigits && ph && rec.phoneDigits !== ph) return false;
   return true;
+}
+
+/**
+ * إصدار أو إعادة استخدام رمز قراءة الضيف.
+ * لا يُستبدَل رمز قائم أبداً — يمنع اختطاف المحادثة بمعرفة رقم الهاتف فقط.
+ * إن وُجد سرّ سابق: يُعاد نفس الرمز فقط عند تقديمه صحيحاً؛ وإلا null
+ * (الرسالة تُحفظ للبائع، لكن المهاجم لا يحصل على حق القراءة).
+ */
+function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
+  const ph = String(phoneDigits || '').replace(/\D/g, '');
+  const existing = _guestThreadSecrets.get(threadKey);
+  if (existing) {
+    if (presentedToken && verifyGuestThreadToken(threadKey, presentedToken, ph)) {
+      return String(presentedToken);
+    }
+    return null;
+  }
+  const token = crypto.randomBytes(24).toString('hex');
+  const hash = crypto.createHash('sha256').update(token).digest('hex');
+  _guestThreadSecrets.set(threadKey, {
+    hash,
+    phoneDigits: ph,
+    createdAt: Date.now(),
+  });
+  return token;
 }
 
 /**
@@ -103,7 +117,16 @@ function mountMessagesRoutes(app, deps) {
     writeMessages(list);
     const out = { ok: true, threadKey, message: rec };
     if (!buyerAccountId) {
-      out.guestThreadToken = issueGuestThreadToken(threadKey, String(b.buyerPhone || '').replace(/\D/g, ''));
+      const phoneDigits = String(b.buyerPhone || '').replace(/\D/g, '');
+      const presented = String(
+        req.header('x-guest-thread-token')
+        || b.guestThreadToken
+        || (!isProdEnv() ? req.query.guestThreadToken : '')
+        || ''
+      ).trim();
+      const tok = issueOrReuseGuestThreadToken(threadKey, phoneDigits, presented);
+      if (tok) out.guestThreadToken = tok;
+      else out.guestThreadTokenRequired = true;
     }
     res.json(out);
 

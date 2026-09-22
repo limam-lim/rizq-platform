@@ -1041,10 +1041,27 @@ function _resolveRealAccessToken(acc){
     .then(function(data){
       if(!data || !data.ok || !data.accessToken) return null;
       window.REAL_ACCESS_TOKEN = data.accessToken;
+      if(data.dashToken){
+        try{ SESSION_TOKEN = data.dashToken; }catch(e){}
+      }
       try{
         var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
         var rec2 = accs2.find(function(a){ return a.id===acc.id; });
-        if(rec2){ rec2.backendAccessToken = window.REAL_ACCESS_TOKEN; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
+        if(rec2){
+          rec2.backendAccessToken = window.REAL_ACCESS_TOKEN;
+          if(data.dashToken){ rec2.token = data.dashToken; rec2.dashToken = data.dashToken; }
+          localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
+        }
+        if(data.dashToken){
+          try{
+            var act = JSON.parse(localStorage.getItem('rizq_active_session')||'null');
+            if(act && act.id===acc.id){ act.token = data.dashToken; localStorage.setItem('rizq_active_session', JSON.stringify(act)); }
+          }catch(e2){}
+          try{
+            var ind = JSON.parse(localStorage.getItem('rizq_individual_session')||'null');
+            if(ind && ind.id===acc.id){ ind.token = data.dashToken; localStorage.setItem('rizq_individual_session', JSON.stringify(ind)); }
+          }catch(e3){}
+        }
       }catch(e){}
       return window.REAL_ACCESS_TOKEN;
     }).catch(function(){ return null; });

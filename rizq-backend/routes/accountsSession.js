@@ -338,8 +338,9 @@ function mountAccountsSessionRoutes(app, deps) {
 
   function handleExchangeDashToken(req, res) {
     const list = readAccounts();
-    const acc = list.find((a) => a.id === req.params.id);
-    if (!acc) return res.status(404).json({ error: 'account_not_found' });
+    const idx = list.findIndex((a) => a.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
+    const acc = list[idx];
     const token = extractDashToken(req);
     if (
       acc.suspended
@@ -350,7 +351,15 @@ function mountAccountsSessionRoutes(app, deps) {
     ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    res.json({ ok: true, accessToken: acc.accessToken });
+    // تدوير dashToken بعد كل تبادل ناجح — الرمز المسروق يصبح لمرة واحدة
+    // (العميل يحفظ dashToken الجديد من الاستجابة).
+    const newDash = genDashToken();
+    acc.dashToken = newDash;
+    acc.dashExchangedAt = new Date().toISOString();
+    list[idx] = acc;
+    writeAccounts(list);
+    res.set('Cache-Control', 'no-store');
+    res.json({ ok: true, accessToken: acc.accessToken, dashToken: newDash, token: newDash });
   }
 
   app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);

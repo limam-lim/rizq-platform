@@ -31,6 +31,22 @@
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  /** روابط CTA آمنة فقط — يمنع javascript:/data: XSS بعد HTML-escape */
+  function safeUrl(u) {
+    if (!u) return '';
+    var s = String(u).trim();
+    if (!s) return '';
+    if (s.charAt(0) === '/' || s.charAt(0) === '#' || s.indexOf('./') === 0) {
+      if (/[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+      return s;
+    }
+    try {
+      var p = new URL(s);
+      if (p.protocol !== 'http:' && p.protocol !== 'https:') return '';
+      return s;
+    } catch (e) { return ''; }
+  }
+
   function getDismissed() {
     try { return JSON.parse(sessionStorage.getItem(DISMISSED_KEY) || '[]'); }
     catch(e) { return []; }
@@ -132,11 +148,14 @@
     html += '</span>';
 
     if (ctaTxt && ann.ctaUrl) {
-      html += '<a href="' + esc(ann.ctaUrl) + '" target="_blank" rel="noopener" '
-        + 'style="font-size:11px;font-weight:700;background:rgba(0,0,0,.2);'
-        + 'color:inherit;border-radius:6px;padding:4px 14px;text-decoration:none;'
-        + 'border:1px solid rgba(0,0,0,.18);white-space:nowrap;flex-shrink:0">'
-        + esc(ctaTxt) + '</a>';
+      var href1 = safeUrl(ann.ctaUrl);
+      if (href1) {
+        html += '<a href="' + esc(href1) + '" target="_blank" rel="noopener" '
+          + 'style="font-size:11px;font-weight:700;background:rgba(0,0,0,.2);'
+          + 'color:inherit;border-radius:6px;padding:4px 14px;text-decoration:none;'
+          + 'border:1px solid rgba(0,0,0,.18);white-space:nowrap;flex-shrink:0">'
+          + esc(ctaTxt) + '</a>';
+      }
     }
     if (ann.isPaid) {
       html += '<span style="font-size:10px;opacity:.6;flex-shrink:0;font-weight:400">'
@@ -215,10 +234,13 @@
 
     html += '<div style="display:flex;gap:8px;align-items:center">';
     if (ann.ctaUrl) {
-      html += '<a href="' + esc(ann.ctaUrl) + '" target="_blank" rel="noopener" '
-        + 'style="flex:1;background:#C9A84C;color:#fff;border:none;border-radius:9px;'
-        + 'padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;'
-        + 'text-decoration:none;display:block;font-family:inherit">' + esc(ctaTxt) + '</a>';
+      var href2 = safeUrl(ann.ctaUrl);
+      if (href2) {
+        html += '<a href="' + esc(href2) + '" target="_blank" rel="noopener" '
+          + 'style="flex:1;background:#C9A84C;color:#fff;border:none;border-radius:9px;'
+          + 'padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;'
+          + 'text-decoration:none;display:block;font-family:inherit">' + esc(ctaTxt) + '</a>';
+      }
     }
     html += '<button class="_sp-close" '
       + 'style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);'

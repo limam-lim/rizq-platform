@@ -493,10 +493,15 @@
       .then(function(data){
         if (!data || !data.ok || !data.accessToken) return null;
         _state.buyerRealToken = data.accessToken;
+        if (data.dashToken) _state.buyerToken = data.dashToken;
         try {
           var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
           var rec2 = accs2.find(function(a){ return a.id === _state.buyerAccountId; });
-          if (rec2) { rec2.backendAccessToken = _state.buyerRealToken; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2)); }
+          if (rec2) {
+            rec2.backendAccessToken = _state.buyerRealToken;
+            if (data.dashToken) { rec2.token = data.dashToken; rec2.dashToken = data.dashToken; }
+            localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
+          }
         } catch(e) {}
         return _state.buyerRealToken;
       }).catch(function(){ return null; });
