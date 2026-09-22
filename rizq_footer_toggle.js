@@ -242,16 +242,22 @@
     var st = catStats();
     var fr = lang() === 'fr';
     var desc = fr
-      ? ('La première plateforme d\'annonces classées en Mauritanie. ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
-      : ('منصة الإعلانات المبوبة الأولى في موريتانيا. ' + st.n + ' قسماً، ' + st.m + '+ فرعاً، ملايين الفرص.');
+      ? ('Rizq — le marché quotidien de Mauritanie : achetez, vendez et gérez depuis une seule plateforme — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
+      : ('رزق — سوق موريتانيا اليومي: تسوّق، بع، وأدر عملك من منصة واحدة — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
     document.querySelectorAll('#rzq-ft-desc, footer .footer-desc, [data-t="ft-desc"]').forEach(function (el) {
       el.textContent = desc;
     });
     var why2 = document.querySelector('[data-t="why2-title"]');
     if (why2) {
       why2.textContent = fr
-        ? (st.n + ' catégories et +' + st.m + ' sous-catégories')
-        : (st.n + ' قسماً و' + st.m + '+ فرعاً');
+        ? 'Tout ce que vous cherchez… bien rangé'
+        : 'كل ما تريده… منظّماً';
+    }
+    var why2desc = document.querySelector('[data-t="why2-desc"]');
+    if (why2desc) {
+      why2desc.textContent = fr
+        ? ("De l'immobilier aux chameaux, de la daraa aux engins — " + st.n + ' catégories et +' + st.m + ' sous-catégories pour découvrir et acheter plus vite.')
+        : ('من العقارات إلى الإبل، من الدراعة إلى الحفارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً تجعل الاكتشاف ممتعاً والشراء أسرع.');
     }
   }
 
