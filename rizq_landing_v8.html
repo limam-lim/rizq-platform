@@ -829,6 +829,8 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .ad-card{width:220px;flex-shrink:0;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.18);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.25)}
 .ad-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(15,35,65,.12),var(--s-gold)}
 .ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden}
+.ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
+.ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .ad-card-img span{display:flex;align-items:center;justify-content:center}
 .ad-card-img span svg{width:38px;height:38px;display:block;stroke-width:1.6}
 .ad-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px}
@@ -942,6 +944,8 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .ad-card{width:220px;flex-shrink:0;background:#fff;border:1px solid #e2e8f5;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;box-shadow:0 2px 12px rgba(15,35,65,.05)}
 .ad-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(15,35,65,.12),var(--s-gold)}
 .ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden}
+.ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
+.ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .ad-card-img span{display:flex;align-items:center;justify-content:center}
 .ad-card-img span svg{width:38px;height:38px;display:block;stroke-width:1.6}
 .ad-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px}
@@ -1962,7 +1966,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 
 /* Restore every landing block that fade-in had left invisible */
-#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,
+#categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
@@ -2060,7 +2064,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 <script src="rizq_dynamic_nav.js?v=16.3"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=18" defer></script>
+<script src="rizq_footer_toggle.js?v=20" defer></script>
 <script src="rizq_account_route.js?v=9"></script>
 <script src="rizq_auth_gate.js?v=19.4" defer></script>
 <script src="rizq_ux_polish.js?v=17.5"></script>
@@ -2746,6 +2750,78 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
       _origSetItem2.call(this, k, v);
       if(k === 'rizq_lang') renderTenderStats();
     };
+  }catch(e){}
+})();
+</script>
+
+<!-- ══ SECTION: غرفة الاستثمارات — نفس نمط ترويج المحلات/المكاتب/المعارض/المناقصات ══ -->
+<section id="virtual-investments" data-rizq-module="investments" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
+
+  <div style="position:absolute;top:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);pointer-events:none"></div>
+
+  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
+
+    <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
+      <p class="section-tag" style="color:var(--gold)">Rizq Investments</p>
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--navy)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
+        <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
+      </h2>
+      <p style="color:#5b6b85;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t-fr="Présentez votre projet d'investissement, trouvez des partenaires, et connectez-vous dans un espace sérieux réservé aux opportunités réelles.">
+        اعرض مشروعك الاستثماري، ابحث عن شركاء، وتواصل في فضاء جاد مخصّص للفرص الحقيقية.
+      </p>
+    </div>
+
+    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 40px">
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📈</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Publiez votre opportunité">انشر فرصتك الاستثمارية</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Décrivez le projet, le secteur et le besoin — et atteignez des investisseurs intéressés.">صف المشروع والقطاع والاحتياج — وصل إلى مستثمرين مهتمين.</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🤝</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Mise en relation prudente">تواصل حذر ومدروس</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Revue initiale avant mise en relation — pour un espace plus sérieux et plus sûr.">مراجعة أوّلية قبل الربط — لمساحة أكثر جدّية وأماناً.</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🇲🇷</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Opportunités locales">فرص موريتانية</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Commerce, immobilier, agriculture, services — au même endroit.">تجارة، عقار، زراعة، خدمات — في مكان واحد.</div>
+      </div>
+    </div>
+
+    <div class="fade-in" id="investments-empty-mount" style="max-width:720px;margin:0 auto 32px">
+      <div class="rzq-disc-empty">
+        <div class="rzq-disc-empty-icon">🌟</div>
+        <div class="rzq-disc-empty-title">كن أول من ينشر فرصة استثمار هنا</div>
+        <div class="rzq-disc-empty-desc">فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.</div>
+      </div>
+    </div>
+
+    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
+      <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="📈 Entrer dans la salle des investissements">📈 ادخل غرفة الاستثمارات</a>
+      <a href="rizq_investments.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="+ Publier une opportunité d'investissement">+ انشر فرصة استثمار</a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function(){
+  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+  function paintInvestEmpty(){
+    var mount = document.getElementById('investments-empty-mount');
+    if(!mount) return;
+    var fr = isFr();
+    mount.innerHTML = '<div class="rzq-disc-empty">'
+      + '<div class="rzq-disc-empty-icon">🌟</div>'
+      + '<div class="rzq-disc-empty-title">'+(fr?'Soyez le premier à publier une opportunité ici':'كن أول من ينشر فرصة استثمار هنا')+'</div>'
+      + '<div class="rzq-disc-empty-desc">'+(fr?'Les opportunités apparaîtront ici dès leur publication.':'فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.')+'</div>'
+      + '</div>';
+  }
+  document.addEventListener('DOMContentLoaded', paintInvestEmpty);
+  try{
+    var _si = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(k,v){ _si.call(this,k,v); if(k==='rizq_lang') paintInvestEmpty(); };
   }catch(e){}
 })();
 </script>
@@ -3836,7 +3912,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   <!-- الشريط السفلي الموحد = footer.rizq-footer في أسفل الصفحة (يُظهر أثناء التسجيل/الدخول) -->
 </div><!-- /#modal -->
 
-<script src="rizq_categories_config.js?v=20"></script>
+<script src="rizq_categories_config.js?v=21" defer></script>
 <script>
 var isAr = true;
 
@@ -3981,7 +4057,7 @@ function buildCards(){
     const d = trAd(a);
     c.innerHTML=`
       <div class="ad-card-img" style="background:${d.bg}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
-        <span>${d.emoji}</span>
+        ${_adPhotoHtml(a, d, 130)}
       </div>
       <div class="ad-card-body">
         <div class="ad-cat">${d.cat}</div>
@@ -4345,11 +4421,12 @@ function qcatBrowseAll() {
 function goToListing(a) {
   if (!a) return;
   const verified = /موثّق|Vérifié/.test(a.status || '') || !!a.verified;
+  const imgs = Array.isArray(a.images) ? a.images.filter(Boolean) : [];
   const handoff = {
     id: a.id, title: a.title, titleFr: a.titleFR || a.titleFr || '', desc: a.desc, descFr: a.descFR || a.descFr || '',
     price: a.price, loc: a.loc, locFr: a.locFR || a.locFr || '', emoji: a.emoji, cat: a.cat, catKey: a.catKey,
     tags: a.tags || [], tagsFr: a.tagsFR || a.tagsFr || [], seller: a.seller, sellerFr: a.sellerFR || a.sellerFr || '',
-    phone: a.phone || '', verified, images: Array.isArray(a.images) ? a.images : [],
+    phone: a.phone || '', verified, images: imgs,
     wilaya: a.wilaya || '', subcat: a.subcat || '', accountId: a.accountId || ''
   };
   try { localStorage.setItem('rizq_active_ad', JSON.stringify(handoff)); } catch (e) {}
@@ -4593,7 +4670,7 @@ function renderAllAds(cat) {
   const filtered = cat==='all' ? ALL_ADS_DATA : ALL_ADS_DATA.filter(a=>a.catKey && a.catKey.includes(cat));
   grid.innerHTML = filtered.map((a,i)=>{ const d=trAd(a); const fav=isFavorited(a.id); return `\n    <div onclick="openAdById('${String(a.id).replace(/'/g,"\\'")}')" style="background:linear-gradient(145deg,rgba(27,58,107,.14),rgba(8,15,30,.85));border:1px solid rgba(201,168,76,.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative" onmouseover="this.style.borderColor='rgba(201,168,76,.45)';this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='rgba(201,168,76,.1)';this.style.transform='translateY(0)'">\n      ${d.pin?`<div class="ad-badge" style="position:absolute;top:8px;right:8px;z-index:1">⭐ ${isAr?'مميّز':'Vedette'}</div>`:''}
       <button onclick="event.stopPropagation();quickToggleFavorite(${a.id},this)" style="position:absolute;top:8px;left:8px;z-index:1;width:28px;height:28px;border-radius:50%;border:none;background:rgba(8,15,30,.55);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">${fav?'❤️':'🤍'}</button>
-      <div style="height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;background:${d.bg}">${d.emoji}</div>
+      <div style="height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;background:${d.bg};overflow:hidden">${_adPhotoHtml(a, d, 110)}</div>
       <div style="padding:12px">
         <div style="font-size:10px;color:#C9A84C;font-weight:700;margin-bottom:5px">${d.cat}</div>
         <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35">${d.title}</div>\n        <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:10px">${(d.desc||'').substring(0,70)}...</div>
@@ -4648,6 +4725,7 @@ function hideSugg(){var box=document.getElementById('suggestions'); if(box) box.
 function mapApiAdToHero(a){
   var raw = String(a.price||'').replace(/[^\d]/g,'');
   var price = raw ? (Number(raw).toLocaleString('en-US')+' MRU') : (a.price||'');
+  var images = Array.isArray(a.images) ? a.images.filter(Boolean) : [];
   return {
     id: a.id,
     title: a.title || '',
@@ -4664,8 +4742,18 @@ function mapApiAdToHero(a){
     bg: 'linear-gradient(135deg,#1B3A6B,#0f2347)',
     pin: !!a.boosted,
     seller: a.seller || '',
-    status: a.status || ''
+    status: a.status || '',
+    images: images
   };
+}
+function _adPhotoHtml(a, d, h){
+  h = h || 130;
+  var src = (a && Array.isArray(a.images) && a.images[0]) ? String(a.images[0]) : '';
+  var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+  if(src){
+    return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"></div>';
+  }
+  return '<span>'+(d&&d.emoji?d.emoji:'📦')+'</span>';
 }
 function refreshAllAdsIndex(){
   ALL_ADS_DATA.length = 0;
@@ -5295,7 +5383,38 @@ var _catNamesInit = (typeof RizqCategories !== 'undefined') ? RizqCategories.cat
   fr: ['Immobilier','Voitures & pièces',"Agences d'assurance véhicules",'Camions & engins','Téléphones & électronique','Mode & vêtements','Or & bijoux','Santé & beauté','Emplois','Services & métiers','Meubles & décor','Construction','Commerce & industrie','Sports & loisirs','Éducation & culture','Alimentation','Arts & artisanat','Bétail, volaille & vétérinaire']
 };
 const CAT_NAMES = _catNamesInit;
-_rizqInitBuiltinCategories();
+/* كان الاستدعاء هنا يسبق تنفيذ rizq_categories_config.js (defer) فيبقى
+   #builtin-cats-mount فارغاً ولا تظهر إلا بطاقة «اقترح قسماً» — إصلاح السباق. */
+function _rizqBootCategoryGrid() {
+  try {
+    if (typeof RizqCategories !== 'undefined' && typeof RizqCategories.catNamesArrays === 'function') {
+      var names = RizqCategories.catNamesArrays();
+      if (names && names.ar && names.ar.length) {
+        CAT_NAMES.ar = names.ar;
+        CAT_NAMES.fr = names.fr || CAT_NAMES.fr;
+      }
+    }
+  } catch (eBootNames) { /* ignore */ }
+  try { if (typeof mergeSubFrFromConfig === 'function') mergeSubFrFromConfig(); } catch (eMerge) { /* ignore */ }
+  _rizqInitBuiltinCategories();
+  try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) { /* ignore */ }
+  try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSug) { /* ignore */ }
+  try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) { /* ignore */ }
+  /* بطاقات الأقسام تُبنى بالعربية دائماً — أعد تطبيق الترجمة إن كانت FR
+     محفوظة، حتى لا تبقى الفروع عربية بعد سباق DOMContentLoaded. */
+  try {
+    var bootLang = 'ar';
+    try { bootLang = localStorage.getItem('rizq_lang') || 'ar'; } catch (eL) {}
+    if (bootLang === 'fr' && typeof translateCatTaxonomy === 'function') {
+      translateCatTaxonomy(true);
+    }
+  } catch (eTxBoot) { /* ignore */ }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _rizqBootCategoryGrid);
+} else {
+  setTimeout(_rizqBootCategoryGrid, 0);
+}
 
 const QCAT_NAMES = {
   ar: ['عقارات','سيارات','شاحنات','إلكترونيات','أزياء','ذهب','صحة وجمال','وظائف','ماشية'],
@@ -5368,13 +5487,21 @@ const SUB_FR = {
   'تقييم أضرار وحوادث':'Expertise dommages & accidents',
   'استشارات ووساطة تأمين':'Conseil & courtage en assurance'
 };
-if (typeof RizqCategories !== 'undefined') {
-  if (RizqCategories.SUB_FR) Object.assign(SUB_FR, RizqCategories.SUB_FR);
-  if (RizqCategories.GROUP_FR) Object.assign(SUB_FR, RizqCategories.GROUP_FR);
+/* rizq_categories_config.js محمّل بـ defer فيُنفَّذ بعد السكربت المضمّن —
+   لذلك يجب دمج SUB_FR/GROUP_FR عند الاستعمال وليس عند التحليل. */
+function mergeSubFrFromConfig() {
+  try {
+    if (typeof RizqCategories === 'undefined') return;
+    if (RizqCategories.SUB_FR) Object.assign(SUB_FR, RizqCategories.SUB_FR);
+    if (RizqCategories.GROUP_FR) Object.assign(SUB_FR, RizqCategories.GROUP_FR);
+  } catch (eMergeSub) { /* ignore */ }
+  window._subFR = SUB_FR;
 }
+mergeSubFrFromConfig();
 window._subFR = SUB_FR;
 
 function translateCatTaxonomy(toFr) {
+  mergeSubFrFromConfig();
   document.querySelectorAll('.drop-link, .drop-group-title').forEach(function(el) {
     if (el.closest('[data-extra="1"], [data-suggest="1"]')) return;
     var current = (el.textContent || '').trim();
@@ -5409,6 +5536,7 @@ function applyLandingLang(toAr) {
   isAr = !!toAr;
   const lang = isAr ? 'ar' : 'fr';
   try { localStorage.setItem('rizq_lang', lang); } catch(e) {}
+  mergeSubFrFromConfig();
   const t = LANG[lang] || LANG.ar || {};
   if (!t || typeof t !== 'object') return;
 

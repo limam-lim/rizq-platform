@@ -1,19 +1,16 @@
 /* ════════════════════════════════════════════════════════════════
    rizq_footer_toggle.js — طيّ أعمدة الفوتر افتراضياً على كل الصفحات
    ────────────────────────────────────────────────────────────────
-   طلب Limam (2026-08-11): الفوتر (خصوصاً بخمسة أعمدة) طويل جداً على
-   الشاشات الصغيرة و"يغطي الصفحة كاملة" عند التمرير لأسفل. الحل المتفق
-   عليه بعد نقاش (hover لا يعمل على الجوال — الغالبية العظمى من الزوار):
-   زر نقر/لمس واحد يعمل بنفس الطريقة على كل الأجهزة، بدل تمييز حاسوب/
-   جوال. أعمدة الروابط (.footer-grid) مطوية افتراضياً، شريط الحقوق
-   والتوقيع (.footer-bottom) يبقى ظاهراً دائماً كما هو.
+   طلب Limam: الفوتر (خمسة أعمدة مثل الصفحة الرئيسية) طويل على
+   الشاشات الصغيرة. زر نقر واحد يطوي/يفتح أعمدة الروابط (.footer-grid)
+   مع الإبقاء على شريط الحقوق (.footer-bottom) ظاهراً دائماً.
 
-   ملف واحد مشترك بدل تكرار نفس الشيفرة CSS/JS في 15 صفحة عامة — يكفي
-   سطر واحد فقط في كل صفحة:
+   مهم: لا نحوّل الفوتر إلى «حبوب» مضغوطة (LIENS RAPIDES pills) —
+   الشكل الموحّد = نفس شبكة الصفحة الرئيسية (شعار + روابط + أقسام
+   + مساعدة + تواصل). التسجيل/البوابة تستدعي setOpen(true) لإظهاره.
+
+   ملف مشترك:
      <script src="rizq_footer_toggle.js" defer></script>
-   لا حاجة لأي تعديل آخر في HTML/CSS لكل صفحة؛ يبحث تلقائياً عن أول
-   .footer-grid في الصفحة ويحقنه بالكامل. صفحات بلا .footer-grid
-   (كالداشبوردات) — لا يفعل شيئاً (fail-safe صامت).
    ════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -48,11 +45,6 @@
       + '.rzq-ft-toggle-btn[aria-expanded="true"] .rzq-ft-chev{transform:rotate(180deg)}'
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
-      // الفوتر الأصلي في كل صفحة يُعرَّف بحشوة علوية سخية (padding-top) لأنها
-      // صُمِّمت لاستيعاب أعمدة الروابط الطويلة أسفلها. الآن بعد الطيّ الافتراضي
-      // يظهر هذا الفراغ فارغاً وغير جذّاب — نقلّصه فقط في الحالة المطوية
-      // (rzq-ft-compact) عبر !important لتجاوز أي padding!important محدَّد
-      // مسبقاً لكل صفحة على حدة، ونعيده تلقائياً للحجم الأصلي عند الفتح.
       + 'footer.rzq-ft-compact{padding-top:14px!important;transition:padding-top .35s ease}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
@@ -62,19 +54,16 @@
       + 'color:rgba(255,255,255,.82)!important}'
       + 'html body footer .footer-links a:hover{color:#C9A84C!important}'
       + 'html body footer .footer-links li a{white-space:nowrap}'
-      + 'html body .section-header,html body .sec-header,html body .cta-inner,'
-      + 'html body .price-ticker-wrap,html body .price-card,html body .cs-strip,'
-      + 'html body .rzq-disc-empty,html body .hero-stats-bar,html body .rn-topnav,'
-      + 'html body .ticker-wrap,html body .hero-eyebrow,html body .hero-title-card,'
-      + 'html body .hero-subtitle-card,html body .hero-vid-ph,'
-      + 'html body .listings-label>span,html body .ad-card,html body .listing-card,'
-      + 'html body #cat-portal,html body .why-card,html body .rvid-section,'
-      + 'html body nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav),'
-      + 'html body .rpkg-card[style*="#1B3A6B"],html body .pricing-card[style*="#1B3A6B"]{'
-      + 'background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),'
-      + 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Cg fill=\'%23C9A84C\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M30 0l30 30-30 30L0 30z\'/%3E%3C/g%3E%3C/svg%3E")!important;'
-      + 'background-size:auto,60px 60px!important;background-repeat:no-repeat,repeat!important;'
-      + 'background-blend-mode:overlay!important}';
+      /* شبكة الصفحة الرئيسية دائماً — لا نمط الحبوب المضغوط */
+      + 'footer.rizq-footer .footer-grid{display:grid!important;'
+      + 'grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:28px!important;'
+      + 'max-width:1200px!important;margin:0 auto!important;text-align:start!important}'
+      + 'footer.rizq-footer .footer-grid > div{display:block!important}'
+      + 'footer.rizq-footer .rzq-ft-pill-wrap{display:none!important}'
+      + '@media (max-width:900px){footer.rizq-footer .footer-grid{'
+      + 'grid-template-columns:1fr 1fr 1fr!important;gap:22px!important}}'
+      + '@media (max-width:600px){footer.rizq-footer .footer-grid{'
+      + 'grid-template-columns:1fr!important;gap:20px!important}}';
     var style = document.getElementById('rzq-ft-toggle-css');
     if (!style) {
       style = document.createElement('style');
@@ -103,13 +92,6 @@
     return open ? 'إخفاء الروابط' : 'روابط وأقسام';
   }
 
-  // تصغير شريط الحقوق/التوقيع (.footer-bottom) — طلب Limam بعد معاينة
-  // الشكل المطوي: "شريط الحقوق والشعار صغّر حجمه قليلاً، هذا يعطيه جاذبية
-  // أكثر". هذا الشريط يبقى ظاهراً دائماً (خارج نطاق الطيّ)، فتصغيره دائم
-  // وغير مرتبط بحالة فتح/إغلاق الأقسام. العناصر مُنسَّقة عبر inline style
-  // في كل صفحة (لا صنف مخصص للشارة) — بدل مطاردة كل صفحة بتعديل يدوي،
-  // نستهدفها هنا برمجياً عبر بصمة بنيتها الثابتة (نفس التصميم في كل مكان)
-  // ونضبط القيم مباشرة عبر JS، فتُطبَّق فوراً دون أي صراع أولوية CSS.
   function shrinkFooterBottom(scope) {
     var fb = (scope || document).querySelector('.footer-bottom');
     if (!fb || fb.dataset.rzqSlim) return;
@@ -132,18 +114,36 @@
     }
   }
 
+  /** أزل آثار التحويل القديم إلى حبوب إن وُجدت من جلسة سابقة / كاش */
+  function restoreFullFooterLayout(footerEl, grid) {
+    if (!footerEl || !grid) return;
+    footerEl.classList.remove('rzq-ft-compact-layout');
+    footerEl.removeAttribute('data-rzq-ft-compacted');
+    var pills = grid.querySelectorAll('.rzq-ft-pill-wrap');
+    for (var i = 0; i < pills.length; i++) {
+      try { pills[i].parentNode.removeChild(pills[i]); } catch (e) {}
+    }
+    var cols = grid.children;
+    for (var k = 0; k < cols.length; k++) {
+      cols[k].style.display = '';
+      var ul = cols[k].querySelector('.footer-links');
+      if (ul) {
+        ul.style.display = '';
+        ul.classList.remove('rzq-ft-contact-grid');
+      }
+    }
+  }
+
   function init() {
     var grid = document.querySelector('.footer-grid');
-    if (!grid || grid.closest('.rzq-ft-collapse-wrap')) return; // لا فوتر بهذا النمط، أو حُقن مسبقاً
+    if (!grid || grid.closest('.rzq-ft-collapse-wrap')) return;
 
     injectStyle();
 
-    var footerEl = grid.closest('footer'); // قبل أي نقل DOM — closest() يعمل من مكانه الأصلي
+    var footerEl = grid.closest('footer');
+    try { restoreFullFooterLayout(footerEl, grid); } catch (eRestore) { /* ignore */ }
     shrinkFooterBottom(footerEl);
 
-    // لفّ .footer-grid بغلاف قابل للطي دون المساس بأي display/grid خاص به
-    // (بعض الصفحات تُعرّف display:grid!important على .footer-grid نفسها —
-    // اللف بغلاف خارجي يتجاوز أي تعارض تخصيص CSS بدل محاولة كسره).
     var wrap = document.createElement('div');
     wrap.className = 'rzq-ft-collapse-wrap';
     grid.parentNode.insertBefore(wrap, grid);
@@ -153,7 +153,6 @@
     btn.type = 'button';
     btn.className = 'rzq-ft-toggle-btn';
     btn.setAttribute('aria-expanded', 'false');
-    btn.setAttribute('aria-controls', '');
     var idAttr = 'rzq-ft-panel-' + Math.random().toString(36).slice(2, 8);
     wrap.id = idAttr;
     btn.setAttribute('aria-controls', idAttr);
@@ -191,9 +190,8 @@
       btn.setAttribute('aria-expanded', String(open));
       var txt = btn.querySelector('.rzq-ft-txt');
       if (txt) txt.textContent = label(open);
-      /* استخدم صنفاً بدل !important خارجي حتى يعمل الإخفاء دائماً */
       wrap.classList.toggle('rzq-ft-open', open);
-      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 400) + 'px') : '0px';
+      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 520) + 'px') : '0px';
       wrap.style.overflow = open ? 'visible' : 'hidden';
       if (footerEl) footerEl.classList.toggle('rzq-ft-compact', !open);
     }
@@ -203,12 +201,9 @@
       open = !open;
       render();
     });
-    // إعادة حساب الارتفاع عند تغيير حجم النافذة (مثلاً تدوير الجوال) حتى لا
-    // يُقطَع المحتوى إن كانت القيمة المحسوبة سابقاً أصغر من الحقيقية الجديدة
     window.addEventListener('resize', function () {
-      if (open) wrap.style.maxHeight = Math.max(wrap.scrollHeight, 400) + 'px';
+      if (open) wrap.style.maxHeight = Math.max(wrap.scrollHeight, 520) + 'px';
     }, { passive: true });
-    // تحديث نص الزر عند تبديل اللغة (rizq_i18n.js يُصدر هذا الحدث)
     document.addEventListener('rizq:langchange', function () {
       var txt = btn.querySelector('.rzq-ft-txt');
       if (txt) txt.textContent = label(open);
@@ -269,7 +264,7 @@
       applyFooterStats();
     };
     window._rzqApplyFt._rizqDyn = true;
-    window._rizqApplyFooterStats = applyFooterStats;
+    window._rzqApplyFooterStats = applyFooterStats;
   }
 
   function boot() {
@@ -280,7 +275,6 @@
     setTimeout(hookFooterStats, 400);
   }
 
-  /* يُستدعى بعد حقن الفوتر الموحّد ديناميكياً (rizq_site_footer.js) */
   window.RizqFooterToggleRefresh = function () {
     try {
       injectStyle();
@@ -297,14 +291,13 @@
           return;
         }
       } catch (e) {}
-      /* احتياطي قبل اكتمال init */
       var wrap = document.querySelector('.rzq-ft-collapse-wrap');
       var btn = document.querySelector('.rzq-ft-toggle-btn');
       var footerEl = document.querySelector('footer.rizq-footer, body > footer');
       if (!wrap) return;
       var open = !!next;
       wrap.classList.toggle('rzq-ft-open', open);
-      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 400) + 'px') : '0px';
+      wrap.style.maxHeight = open ? (Math.max(wrap.scrollHeight, 520) + 'px') : '0px';
       wrap.style.overflow = open ? 'visible' : 'hidden';
       if (btn) {
         btn.setAttribute('aria-expanded', String(open));

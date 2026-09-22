@@ -258,7 +258,7 @@
         }
       });
     });
-    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders' };
+    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders', investments: 'virtual-investments' };
     Object.keys(SECTION_MAP).forEach(function (key) {
       if (flags[key] !== false) return;
       var sec = document.getElementById(SECTION_MAP[key]);
