@@ -305,8 +305,7 @@
   function renderAdsCard(p, idx, opts) {
     opts = opts || {};
     var lang = opts.lang || getLang();
-    var popular = p.id === 'vid-pro' || (p.id !== 'vid-single' && idx === 1 && !opts._popularSet);
-    if (popular) opts._popularSet = true;
+    var popular = p.id === 'vid-pro';
     var cls = popular ? 'p-card popular' : 'p-card';
     var badge = popular ? '<div class="p-badge">' + t2('⭐ الأكثر شعبية', '⭐ Le plus populaire') + '</div>' : '';
     var price = Number(p.price) ? Number(p.price).toLocaleString() : t2('مجاناً', 'Gratuit');
