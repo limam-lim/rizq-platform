@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>ADMINIA SARL — الشركة المالكة لمنصة رزق | Société propriétaire de Rizq</title>
+<meta name="description" content="ADMINIA SARL (S.A.R.L.U) — الشركة المالكة والمشغّلة لمنصة رزق. المقر: ازويرات، موريتانيا. direction@rizq.mr"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#0D1B2A; --navy-2:#112244; --royal:#1B3A6B;
+  --gold:#C9A84C; --gold-soft:rgba(201,168,76,.18);
+  --text:#e8edf5; --muted:rgba(255,255,255,.68);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Naskh Arabic',Georgia,serif;
+  background:radial-gradient(ellipse 120% 80% at 50% -10%, #163056 0%, var(--navy) 42%, #070f18 100%);
+  color:var(--text); min-height:100vh; line-height:1.7;
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+nav{
+  max-width:1100px;margin:0 auto;padding:18px 5%;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:12px;
+  border:1.5px solid rgba(201,168,76,.55); background:#0d0a04;
+  display:grid;place-items:center; color:var(--gold);
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:13px; letter-spacing:1px;
+}
+.brand-name{font-family:'Cormorant Garamond',Georgia,serif; font-size:20px; font-weight:700; color:#fff; letter-spacing:2px}
+.brand-name span{color:var(--gold)}
+.brand-sub{font-size:9px; color:rgba(201,168,76,.7); letter-spacing:1.5px; margin-top:2px}
+.nav-links{display:flex;gap:18px;font-size:13px}
+.nav-links a{color:var(--muted);text-decoration:none}
+.nav-links a:hover{color:var(--gold)}
+.lang{font-size:11px;border:1px solid rgba(201,168,76,.35);color:var(--gold);padding:6px 12px;border-radius:999px;background:transparent;cursor:pointer}
+
+/* HERO — brand first, one composition */
+.hero{
+  max-width:1100px;margin:0 auto;padding:42px 5% 28px;
+  display:grid; gap:28px; align-items:end;
+  min-height:72vh;
+}
+.hero-copy{max-width:640px}
+.eyebrow{
+  display:inline-block; font-size:11px; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--gold); border-bottom:1px solid rgba(201,168,76,.35); padding-bottom:6px; margin-bottom:18px;
+  font-family:'Cormorant Garamond',Georgia,serif;
+}
+.hero h1{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(40px,7vw,64px); font-weight:700; line-height:1.05;
+  color:#fff; margin-bottom:14px; letter-spacing:1px;
+}
+.hero h1 em{font-style:italic; color:var(--gold); font-weight:500}
+.hero-lead{font-size:15.5px; color:var(--muted); max-width:480px; margin-bottom:26px}
+.cta-row{display:flex; flex-wrap:wrap; gap:12px}
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 22px; border-radius:12px; font-size:13.5px; font-weight:700;
+  text-decoration:none; border:none; cursor:pointer; font-family:inherit;
+}
+.btn-gold{background:linear-gradient(135deg,#e8c96a,#C9A84C); color:#1a1200; transition:transform .2s,box-shadow .2s}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(201,168,76,.35)}
+.btn-ghost{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.22); transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:rgba(201,168,76,.5);background:rgba(255,255,255,.05)}
+.hero-visual{
+  position:relative; border-radius:0; /* full-bleed feel within column */
+  min-height:280px;
+  background:
+    linear-gradient(160deg, rgba(13,27,42,.15), rgba(13,27,42,.75)),
+    radial-gradient(circle at 70% 30%, rgba(201,168,76,.22), transparent 55%),
+    linear-gradient(145deg,#0a1525,#1B3A6B);
+  border:1px solid rgba(201,168,76,.28);
+  overflow:hidden;
+  display:flex; align-items:flex-end; padding:28px;
+}
+.hero-visual::before{
+  content:''; position:absolute; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60L60 0M30 60L60 30M0 30L30 0' stroke='rgba(201,168,76,0.06)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+}
+.aml-seal{
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:14px;
+  background:rgba(7,15,24,.72); backdrop-filter:blur(8px);
+  border:1px solid rgba(201,168,76,.3); border-radius:14px; padding:14px 18px;
+}
+.aml-seal .mark{
+  width:48px;height:48px;border-radius:10px;border:1.5px solid var(--gold);
+  display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:1px;
+  background:#0d0a04;
+}
+.aml-seal strong{display:block;font-size:16px;letter-spacing:2px;font-family:'Cormorant Garamond',Georgia,serif}
+.aml-seal span{font-size:11px;color:var(--muted)}
+
+/* ONE JOB SECTIONS */
+section{max-width:1100px;margin:0 auto;padding:56px 5%}
+.sec-head{margin-bottom:28px; max-width:560px}
+.sec-head h2{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(26px,4vw,34px); color:#fff; margin-bottom:8px; font-weight:700;
+}
+.sec-head p{font-size:14px; color:var(--muted)}
+.ids{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.2); border-radius:18px; overflow:hidden;
+}
+.ids article{
+  background:linear-gradient(160deg,#0e1e38,#0a1628); padding:28px 24px;
+}
+.ids h3{font-size:11px; color:var(--gold); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; font-weight:600}
+.ids p{font-size:16px; color:#fff; font-weight:700}
+.ids small{display:block;margin-top:6px;font-size:12px;color:var(--muted);font-weight:400}
+
+.owner{
+  display:grid; grid-template-columns:1.2fr .8fr; gap:28px; align-items:center;
+  padding:36px; border-radius:22px;
+  background:linear-gradient(145deg,#0a1525 0%, #0D1B2A 50%, #152a4a 100%);
+  border:1px solid rgba(201,168,76,.25);
+}
+.owner h2{font-family:'Cormorant Garamond',Georgia,serif; font-size:28px; margin-bottom:10px}
+.owner p{font-size:14px; color:var(--muted); margin-bottom:18px}
+.owner .name{
+  font-size:18px; color:var(--gold); font-weight:700;
+  font-family:'Cormorant Garamond',Georgia,serif; letter-spacing:.5px;
+}
+.owner .role{font-size:12.5px; color:var(--muted); margin-top:4px}
+.owner-aside{
+  text-align:center; padding:24px;
+  border:1px dashed rgba(201,168,76,.3); border-radius:16px;
+}
+.owner-aside .big{font-size:42px; color:var(--gold); font-family:'Cormorant Garamond',Georgia,serif; line-height:1}
+.owner-aside .lbl{font-size:11px; color:var(--muted); margin-top:8px; letter-spacing:1px}
+
+.purpose{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+.purpose li{
+  list-style:none; padding:20px 22px;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+  border-radius:14px; font-size:13.5px; color:var(--text);
+  border-inline-start:3px solid var(--gold);
+}
+
+.contact{
+  text-align:center; padding:48px 28px; border-radius:24px;
+  background:linear-gradient(160deg,#112244,#0D1B2A);
+  border:1px solid rgba(201,168,76,.28);
+}
+.contact a.mail{
+  display:inline-block; margin-top:14px;
+  font-size:clamp(20px,3vw,28px); color:var(--gold); text-decoration:none;
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; letter-spacing:1px;
+  border-bottom:1px solid rgba(201,168,76,.55); padding-bottom:4px;
+  cursor:pointer; transition:color .2s, border-color .2s, opacity .2s;
+}
+.contact a.mail:hover,
+.contact a.mail:focus-visible{
+  color:#e8d5a3; border-bottom-color:var(--gold); outline:none;
+}
+.contact .hint{margin-top:16px; font-size:12.5px; color:var(--muted)}
+.contact .hint a{color:rgba(201,168,76,.9); text-decoration:none; border-bottom:1px solid rgba(201,168,76,.35)}
+.contact .hint a:hover{color:var(--gold)}
+
+footer{
+  margin-top:40px; padding:28px 5% 40px; border-top:1px solid rgba(201,168,76,.12);
+  display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;
+  max-width:1100px; margin-inline:auto; font-size:12px; color:var(--muted);
+}
+.footer-aml{
+  display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:inherit;
+  padding:8px 14px; border-radius:12px; border:1px solid rgba(201,168,76,.25);
+  background:rgba(255,255,255,.03); transition:border-color .25s, background .25s;
+}
+.footer-aml:hover{border-color:rgba(201,168,76,.55); background:rgba(201,168,76,.08)}
+.footer-aml .m{
+  width:30px;height:30px;border-radius:8px;border:1px solid var(--gold);
+  display:grid;place-items:center;font-size:8px;font-weight:800;color:var(--gold);background:#0d0a04;
+}
+.footer-aml strong{color:#fff; font-size:12px; letter-spacing:1px; font-family:'Cormorant Garamond',Georgia,serif}
+.footer-aml strong span{color:var(--gold)}
+.note{font-size:11px;color:rgba(201,168,76,.75)}
+
+@media(max-width:800px){
+  .ids{grid-template-columns:1fr}
+  .owner,.purpose{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hero{min-height:auto; padding-top:24px}
+}
+[data-lang="fr"] [data-ar]{display:none}
+[data-lang="ar"] [data-fr]{display:none}
+html[data-lang="fr"]{direction:ltr}
+html[data-lang="fr"] body{font-family:'Cormorant Garamond','Noto Naskh Arabic',Georgia,serif}
+</style>
+</head>
+<body data-lang="ar" id="page">
+<nav>
+  <a class="brand" href="rizq_about.html">
+    <div class="brand-mark">AML</div>
+    <div>
+      <div class="brand-name">ADMINIA <span>SARL</span></div>
+      <div class="brand-sub">S.A.R.L.U · موريتانيا</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="rizq_landing_v8.html" data-ar>رزق</a><a href="rizq_landing_v8.html" data-fr>Rizq</a>
+    <a href="#ids" data-ar>التعريف</a><a href="#ids" data-fr>Identité</a>
+    <a href="#purpose" data-ar>النشاط</a><a href="#purpose" data-fr>Activités</a>
+    <a href="#contact" data-ar>التواصل</a><a href="#contact" data-fr>Contact</a>
+  </div>
+  <button class="lang" type="button" id="langBtn">FR</button>
+</nav>
+
+<header class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow" data-ar>الشركة المالكة لمنصة رزق</div>
+    <div class="eyebrow" data-fr>Société propriétaire de la plateforme Rizq</div>
+    <h1>ADMINIA <em>SARL</em></h1>
+    <p class="hero-lead" data-ar>شركة فردية ذات مسؤولية محدودة (S.A.R.L.U) تملك وتدير منصة رزق — السوق الرقمي والإعلانات والخدمات التقنية في موريتانيا.</p>
+    <p class="hero-lead" data-fr>Société Unipersonnelle à Responsabilité Limitée (S.A.R.L.U) propriétaire et opératrice de Rizq — marketplace, publicité et services numériques en Mauritanie.</p>
+    <div class="cta-row">
+      <a class="btn btn-gold" href="#contact" data-ar>تواصل رسمي</a>
+      <a class="btn btn-gold" href="#contact" data-fr>Contact officiel</a>
+      <a class="btn btn-ghost" href="rizq_legal.html" data-ar>المواد القانونية</a>
+      <a class="btn btn-ghost" href="rizq_legal.html" data-fr>Mentions légales</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="aml-seal">
+      <div class="mark">AML</div>
+      <div>
+        <strong>ADMINIA SARL</strong>
+        <span data-ar>ازويرات · موريتانيا</span>
+        <span data-fr>Zouérate · Mauritanie</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="ids">
+  <div class="sec-head">
+    <h2 data-ar>التعريف الرسمي</h2>
+    <h2 data-fr>Identité officielle</h2>
+    <p data-ar>بيانات الشركة كما في النظام الأساسي — للتحقق المؤسسي والشفافية.</p>
+    <p data-fr>Coordonnées statutaires — pour la vérification institutionnelle et la transparence.</p>
+  </div>
+  <div class="ids">
+    <article>
+      <h3 data-ar>المقر</h3><h3 data-fr>Siège</h3>
+      <p data-ar>ازويرات</p><p data-fr>Zouérate</p>
+      <small data-ar>موريتانيا</small><small data-fr>Mauritanie</small>
+    </article>
+    <article>
+      <h3 data-ar>مرجع الاشتراك</h3><h3 data-fr>Réf. abonné</h3>
+      <p dir="ltr">Abonné N° 15050</p>
+      <small data-ar>مرجع الاستغلال</small><small data-fr>Référence d'exploitation</small>
+    </article>
+    <article>
+      <h3 data-ar>رأس المال</h3><h3 data-fr>Capital</h3>
+      <p dir="ltr">10.000 MRU</p>
+      <small data-ar>رأس المال الاجتماعي</small><small data-fr>Capital social</small>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="owner">
+    <div>
+      <h2 data-ar>الإدارة والملكية</h2>
+      <h2 data-fr>Direction & propriété</h2>
+      <p data-ar>تملك الشركة وتُدار وتُوجَّه من قبل المالك والمدير:</p>
+      <p data-fr>La société est détenue, gérée et dirigée par le propriétaire et gérant :</p>
+      <div class="name">MOHAMED LIMAM MOHAMED AHMED</div>
+      <div class="role" data-ar>المالك والمدير — Propriétaire et Gérant</div>
+      <div class="role" data-fr>Propriétaire et Gérant</div>
+    </div>
+    <div class="owner-aside">
+      <div class="big">S.A.R.L.U</div>
+      <div class="lbl" data-ar>شكل قانوني</div>
+      <div class="lbl" data-fr>Forme juridique</div>
+    </div>
+  </div>
+</section>
+
+<section id="purpose">
+  <div class="sec-head">
+    <h2 data-ar>غرض الشركة وأنشطتها</h2>
+    <h2 data-fr>Objet social & activités</h2>
+    <p data-ar>نطاق النشاط المسجَّل — بما فيه تشغيل منصة رزق وRizq ADS.</p>
+    <p data-fr>Périmètre d'activité enregistré — y compris Rizq et Rizq ADS.</p>
+  </div>
+  <ul class="purpose">
+    <li data-ar>التجارة العامة والاستيراد والتصدير وخدمات الأعمال</li>
+    <li data-fr>Commerce général, import-export et services aux entreprises</li>
+    <li data-ar>توريد وتجارة المعدات الإلكترونية وتقنية المعلومات والاتصالات</li>
+    <li data-fr>Fourniture et commerce d'équipements électroniques, IT et télécoms</li>
+    <li data-ar>التجارة الإلكترونية والمنصات الرقمية والأسواق الافتراضية والوساطة التجارية</li>
+    <li data-fr>E-commerce, plateformes numériques, marketplaces et intermédiation</li>
+    <li data-ar>خدمات تقنية المعلومات، تطوير البرمجيات والويب، الأتمتة وحلول الذكاء الاصطناعي</li>
+    <li data-fr>Services IT, développement logiciel & web, automatisation et IA</li>
+    <li data-ar style="grid-column:1/-1">التسويق الرقمي وإدارة الإعلانات عبر الإنترنت ووكالة الإعلان الرقمي (Rizq ADS)</li>
+    <li data-fr style="grid-column:1/-1">Marketing digital, gestion publicitaire en ligne et agence (Rizq ADS)</li>
+  </ul>
+</section>
+
+<section id="contact">
+  <div class="contact">
+    <div class="sec-head" style="margin:0 auto 8px;text-align:center">
+      <h2 data-ar>تواصل وتحقّق</h2>
+      <h2 data-fr>Contact & vérification</h2>
+      <p data-ar>للتواصل الرسمي والامتثال للمنصات المؤسسية (مثل Twilio Trust Hub).</p>
+      <p data-fr>Contact officiel et conformité (ex. Twilio Trust Hub).</p>
+    </div>
+    <a class="mail" href="mailto:direction@rizq.mr" dir="ltr" title="إرسال بريد إلى direction@rizq.mr / Envoyer un e-mail">direction@rizq.mr</a>
+    <p class="hint" data-ar>منصة رزق · <a href="https://rizq.mr" dir="ltr" rel="noopener">rizq.mr</a> — مملوكة ومدارة من ADMINIA SARL</p>
+    <p class="hint" data-fr>Plateforme Rizq · <a href="https://rizq.mr" dir="ltr" rel="noopener">rizq.mr</a> — détenue et opérée par ADMINIA SARL</p>
+  </div>
+</section>
+
+<footer>
+  <a class="footer-aml" href="rizq_landing_v8.html" title="رزق — العودة للمنصة">
+    <span class="m">AML</span>
+    <span>
+      <strong>ADMINIA <span>SARL</span></strong><br/>
+      <span style="font-size:9px;opacity:.7" data-ar>الصفحة الرئيسية لرزق</span>
+      <span style="font-size:9px;opacity:.7" data-fr>Accueil Rizq</span>
+    </span>
+  </a>
+  <a href="rizq_landing_v8.html" style="color:rgba(201,168,76,.85);text-decoration:none;font-size:12px" data-ar>← العودة لمنصة رزق</a>
+  <a href="rizq_landing_v8.html" style="color:rgba(201,168,76,.85);text-decoration:none;font-size:12px" data-fr>← Retour à Rizq</a>
+</footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('langBtn');
+  var page=document.getElementById('page');
+  var html=document.documentElement;
+  btn.addEventListener('click',function(){
+    var fr=page.getAttribute('data-lang')!=='fr';
+    page.setAttribute('data-lang', fr?'fr':'ar');
+    html.setAttribute('data-lang', fr?'fr':'ar');
+    html.setAttribute('dir', fr?'ltr':'rtl');
+    html.setAttribute('lang', fr?'fr':'ar');
+    btn.textContent=fr?'AR':'FR';
+  });
+})();
+</script>
+</body>
+</html>

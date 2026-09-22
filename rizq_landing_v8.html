@@ -2246,30 +2246,31 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-styles .section-header{text-align:center;margin-bottom:28px}
 #rizq-styles .section-title{
   font-family:'Noto Naskh Arabic',Cairo,serif;
-  font-size:clamp(22px,3vw,34px);font-weight:800;color:var(--royal-dark,#0f2347);margin:0 0 10px;line-height:1.35
+  font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.35
 }
 #rizq-styles .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
 #rizq-styles .section-desc{
-  color:#3d4f6a;font-size:14.5px;max-width:560px;margin:0 auto;line-height:1.75
+  color:rgba(255,255,255,.9);font-size:14.5px;max-width:560px;margin:0 auto;line-height:1.75
 }
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
-  margin-top:14px;padding:8px 16px;
-  font-size:12.5px;font-weight:700;font-family:inherit;
-  color:#f5e6b8;background:rgba(201,168,76,.18);
-  border:1.5px solid rgba(201,168,76,.55);border-radius:999px;cursor:pointer;
-  transition:background .2s,border-color .2s,transform .2s,color .2s;
-  text-shadow:0 1px 2px rgba(0,0,0,.35);
+  margin-top:14px;padding:9px 18px;
+  font-size:13px;font-weight:800;font-family:inherit;
+  color:#0f2347;background:linear-gradient(135deg,#f5e6b8,#e8c96a);
+  border:1.5px solid rgba(255,255,255,.55);border-radius:999px;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s,color .2s,box-shadow .2s;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
 }
 .rizq-styles-reshuffle:hover{
-  color:#fff;background:rgba(201,168,76,.32);border-color:rgba(232,201,106,.85)
+  color:#0a1628;background:linear-gradient(135deg,#fff3cc,#f0d78a);
+  border-color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
 .rizq-styles-tick{
-  margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.9);min-height:1.2em
+  margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.92);min-height:1.2em
 }
 .rizq-style-from-view{
   display:inline-flex;align-self:flex-start;
@@ -2608,6 +2609,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المواد القانونية</strong></div></a>
         <a href="#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-t="dd-about">من نحن</strong></div></a>
+        <a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-t="dd-company">الشركة المالكة</strong></div></a>
       </div>
     </li>
   </ul>
@@ -3444,8 +3446,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
 
       <!-- Main description — translated by data-t engine -->
-      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا المتكاملة للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em></p>
-
+      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا المتكاملة للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em></p>
       <!-- Divider -->
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);margin-bottom:28px"></div>
 
@@ -3463,7 +3464,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div style="font-size:12.5px;color:#8fa0bc;letter-spacing:.3px;position:relative;z-index:1">
         <span data-t-fr="Développé par">طوّرته</span>
         &nbsp;
-        <strong style="color:var(--royal);font-weight:800;letter-spacing:.5px">ADMINIA SARL</strong>
+        <strong style="color:var(--royal);font-weight:800;letter-spacing:.5px"><a href="rizq_about.html" style="color:inherit;text-decoration:none">ADMINIA SARL</a></strong>
         &nbsp;·&nbsp;
         <span style="color:var(--gold);font-weight:700" data-t-fr="Mauritanie 🇲🇷">موريتانيا 🇲🇷</span>
       </div>
@@ -3688,7 +3689,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-quick">روابط سريعة</h4>
-      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="rizq_landing_v8.html#about" data-t="ft-q5">من نحن</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li><li><a href="rizq_landing_v8.html#about" data-t="ft-q5b">من نحن</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-topcats">أبرز الأقسام</h4>
@@ -3710,13 +3711,13 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" data-t="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <div class="adminia-ft" style="display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px">
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos">
       <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:var(--gold)">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.6);font-weight:700">M. LIMAM</span></div>
       </div>
-    </div>
+    </a>
     <!-- إصلاح: كان dir="rtl" مثبتاً يدوياً على هذا العنصر، فبقي يعكس ترتيب عناصر flex بصرياً
          حتى عند التبديل للفرنسية (حيث document.documentElement.dir يصبح 'ltr' بشكل صحيح في toggleLang()،
          لكن هذا الـdir المحلي كان يتجاوزه) فيظهر "ADMINIA — Powered by M. LIMAM ✍️ Signé par" بترتيب معكوس
@@ -6474,9 +6475,9 @@ const LANG = {
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
     'nav-account': 'حسابي', 'nav-post': 'نشر (+)', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
-    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا المتكاملة للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)">ADMINIA SARL</strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
+    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا المتكاملة للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
     'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
-    'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن',
+    'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.',
     'vsh-btn1': '🚘 انضم بمعرضك الآن', 'vsh-btn2': '👁 عرض نموذج معرض',
@@ -6549,7 +6550,7 @@ const LANG = {
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 الاستثمارات',
     'cta-note': '&nbsp;تسجيل آمن بالإيميل &nbsp;|&nbsp; مجاني تماماً',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
-    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5':'من نحن',
+    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5':'الشركة المالكة','ft-q5b':'من نحن',
     'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
     'ft-desc': 'منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.',
@@ -6573,9 +6574,9 @@ const LANG = {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
     'nav-account': 'Compte', 'nav-post': 'Publier (+)', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
-    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)">ADMINIA SARL</strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
+    'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
     'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms', 'nav-tenders': 'Appels d\'offres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
-    'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos',
+    'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Rizq</span> — catalogue premium, acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements — présentez chaque unité en détail et échangez en sécurité via la plateforme.',
     'vsh-btn1': '🚘 Rejoignez avec votre showroom', 'vsh-btn2': '👁 Voir un exemple',
@@ -6648,7 +6649,7 @@ const LANG = {
     'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Investissements',
     'cta-note': '&nbsp;Inscription sécurisée par e-mail &nbsp;|&nbsp; Totalement gratuit',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
-    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5':'À propos',
+    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5':'Société propriétaire','ft-q5b':'À propos',
     'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
     'ft-desc': 'La plateforme mauritanienne des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements.',
@@ -7845,7 +7846,7 @@ function applyFullTranslation(lang) {
   // ── Footer links (quick links + top cats + help) ──
   const ftLinks = document.querySelectorAll('.footer-links');
   const ftQuickFR = ['Accueil','Parcourir les annonces','Publier une annonce','Tarifs','À propos'];
-  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','الأسعار','من نحن'];
+  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','الأسعار','الشركة المالكة','من نحن'];
   const ftCatsFR  = ['🏠 Immobilier','🚗 Voitures & pièces','🚛 Camions & engins','📱 Téléphones & électronique','🐄 Bétail & animaux'];
   const ftCatsAR  = ['🏠 منازل وعقارات','🚗 سيارات وقطع غيار','🚛 شاحنات ومعدات','📱 هواتف وإلكترونيات','🐄 ماشية وحيوانات'];
   const ftHelpFR  = ['Centre d\'aide','Politique de confidentialité','Conditions d\'utilisation','Signaler une annonce','Contactez-nous'];
