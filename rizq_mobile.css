@@ -369,6 +369,13 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2){
   }
   .why-section .why-icon,
   #about .why-icon{margin-bottom:10px!important}
+  /* البطاقة الثالثة في صف منفرد — تتوسط لشكل متوازن */
+  .why-section .why-card:last-child:nth-child(odd),
+  #about .why-card:last-child:nth-child(odd){
+    grid-column:1 / -1!important;
+    max-width:72%!important;
+    justify-self:center!important;
+  }
 
   .quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
   .similar-grid,.dp-similar-grid,.cta-btns,
