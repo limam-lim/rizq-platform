@@ -595,6 +595,23 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     font-family:inherit;
     transition:color .18s,background .18s,transform .15s;
   }
+  /* FR labels longer — tighter padding to avoid Accueil/Compte overlap */
+  html[dir="ltr"].rizq-app-nav #nav .nav-center a,
+  html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    font-size:12.5px !important;
+    padding:7px 8px !important;
+    letter-spacing:0;
+  }
+  html[dir="ltr"].rizq-app-nav #nav > .nav-center,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
+    gap:2px;
+  }
+  html[dir="ltr"].rizq-app-nav #nav,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav{
+    grid-template-columns:auto minmax(8px,.6fr) auto minmax(8px,.6fr) auto;
+  }
   html.rizq-app-nav #nav .nav-center a:hover,
   html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
   html.rizq-app-nav #rizq-desk-nav .nav-center a:hover,
