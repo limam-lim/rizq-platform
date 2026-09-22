@@ -150,6 +150,22 @@ nav.scrolled{
 .nav-post-plus{color:var(--gold)!important;background:rgba(201,168,76,.12)!important;border:1px solid rgba(201,168,76,.28)!important}
 .nav-center a[style*="gold"]{color:var(--gold)!important;background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.25)}
 .nav-center a[style*="gold"]:hover{background:rgba(201,168,76,.20);border-color:rgba(201,168,76,.5)}
+/* شريط التنقل: عناصر flex فقط — list-item كان يسبب تداخل الأزرار */
+#nav .nav-center{
+  overflow-x:auto;overflow-y:visible;
+  -webkit-overflow-scrolling:touch;
+  gap:6px;
+  flex-wrap:nowrap;
+}
+#nav .nav-center > li{
+  display:flex;flex-shrink:0;align-items:center;
+  list-style:none;margin:0;padding:0;
+}
+#nav .nav-center > li.rizq-nav-extra{display:flex}
+@media (max-width:768px){
+  #nav .nav-center > li.rizq-nav-extra{display:none!important}
+  #nav .nav-center > li.nav-phone-post-li{display:none!important}
+}
 .nav-right{display:flex;align-items:center;gap:8px;direction:ltr}
 /* ══ MOBILE HAMBURGER + DRAWER ══ */
 .nav-hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:9px;cursor:pointer;padding:0;flex-shrink:0}
@@ -2472,7 +2488,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_terms_gate.js?v=18.2"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=16.4"></script>
+<script src="rizq_dynamic_nav.js?v=16.5"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
@@ -2569,18 +2585,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </button>
   </div>
   <ul class="nav-center">
+    <!-- ترتيب مطابق لتوالي أقسام الصفحة (من الأعلى للأسفل) -->
     <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home" data-t="nav-home">الرئيسية</a></li>
-    <li data-nav-order="2"><a href="#categories" data-hdr="cats" data-t="nav-cats">الأقسام</a></li>
-    <!-- معاينة IA: فصل الإعلانات المبوبة عن Rizq ADS (قابل للرجوع) -->
-    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2.5"><a href="#hero-listings" data-hdr="ads">الإعلانات</a></li>
-    <li class="rizq-nav-extra" data-rizq-nav-extra="rizqads" data-nav-order="2.6"><a href="rizq_ads_info.html" data-hdr="rizqads" style="color:var(--gold);background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.25)">Rizq ADS</a></li>
-    <li data-nav-order="3" class="nav-phone-post-li"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" data-t="nav-post">نشر (+)</a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="rizq_investments.html" data-hdr="investments" data-t="nav-investments">غرفة الاستثمارات</a></li>
-    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
+    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="#listings" data-hdr="ads">الإعلانات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="#virtual-stores" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="4"><a href="#virtual-offices" data-hdr="offices" data-t="nav-offices">المكاتب</a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5"><a href="#virtual-showrooms" data-hdr="showrooms" data-t="nav-showrooms">المعارض</a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="#virtual-tenders" data-hdr="tenders" data-t="nav-tenders">المناقصات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="#virtual-investments" data-hdr="investments" data-t="nav-investments">الاستثمارات</a></li>
+    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="8">
       <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
       <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
+        <a href="#categories" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📂</span><div><strong data-t="dd-cats">الأقسام</strong></div></a>
+        <a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>
+        <a href="rizq_post.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">➕</span><div><strong data-t="nav-post">نشر (+)</strong></div></a>
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المواد القانونية</strong></div></a>
         <a href="#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-t="dd-about">من نحن</strong></div></a>
@@ -2605,11 +2624,13 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ── Section jump bar (يظهر بعد 300px) ── -->
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع">
-  <a href="#categories" data-jump="#categories">الأقسام</a>
-  <a href="#hero-listings" data-jump="#hero-listings">الإعلانات</a>
-  <a href="#hero-vid-wrap" data-jump="#hero-vid-wrap">Rizq ADS</a>
+  <a href="#listings" data-jump="#listings">الإعلانات</a>
+  <a href="#virtual-stores" data-jump="#virtual-stores">المحلات</a>
+  <a href="#virtual-offices" data-jump="#virtual-offices">المكاتب</a>
+  <a href="#virtual-showrooms" data-jump="#virtual-showrooms">المعارض</a>
+  <a href="#virtual-tenders" data-jump="#virtual-tenders">المناقصات</a>
+  <a href="#virtual-investments" data-jump="#virtual-investments">الاستثمارات</a>
   <a href="#pricing" data-jump="#pricing">الباقات</a>
-  <a href="rizq_investments.html" data-jump="invest">غرفة الاستثمارات</a>
 </nav>
 
 <button type="button" id="back-to-top" aria-label="العودة للأعلى" title="العودة للأعلى">↑</button>
@@ -6894,8 +6915,8 @@ function applyLandingLang(toAr) {
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {
     var jumpMap = isAr
-      ? {'#categories':'الأقسام','#hero-listings':'الإعلانات','#hero-vid-wrap':'Rizq ADS','#pricing':'الباقات','invest':'غرفة الاستثمارات'}
-      : {'#categories':'Catégories','#hero-listings':'Annonces','#hero-vid-wrap':'Rizq ADS','#pricing':'Forfaits','invest':'Salle des investissements'};
+      ? {'#listings':'الإعلانات','#virtual-stores':'المحلات','#virtual-offices':'المكاتب','#virtual-showrooms':'المعارض','#virtual-tenders':'المناقصات','#virtual-investments':'الاستثمارات','#pricing':'الباقات'}
+      : {'#listings':'Annonces','#virtual-stores':'Boutiques','#virtual-offices':'Bureaux','#virtual-showrooms':'Showrooms','#virtual-tenders':'Appels d\'offres','#virtual-investments':'Investissements','#pricing':'Forfaits'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];
