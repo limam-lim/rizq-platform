@@ -96,7 +96,7 @@
       + '        <img class="logo-mark-img" src="rizq-mark-512.png?v=9.6" width="42" height="42" alt="رزق"/>'
       + '        <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>'
       + '      </a>'
-      + '      <p class="footer-desc" data-t="ft-desc">رزق — سوق موريتانيا اليومي: تسوّق، بع، وأدر عملك من منصة واحدة.</p>'
+      + '      <p class="footer-desc" data-t="ft-desc">منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'
       + '      <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">'
       + '        <span data-t="ft-net-label" style="color:rgba(255,255,255,.8);font-size:11px">شبكات مدعومة:</span>'
       + '        <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>'
