@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=6.14"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=6.15"/>
 <script>
 (function () {
   try {
@@ -6659,8 +6659,14 @@ function rizqMountAccountBars(modal){
       siteFooter.style.order='2';
     }
     /* افتح الأقسام عبر الـ API حتى يبقى زر «إخفاء الروابط» متزامناً ويعمل */
+    /* على الهاتف أثناء التسجيل: اترك الفوتر مطوياً حتى لا يغطي زر التالي */
     if (window.RizqFooterToggle && typeof window.RizqFooterToggle.setOpen === 'function') {
-      window.RizqFooterToggle.setOpen(true);
+      try {
+        var isPhone = window.matchMedia('(max-width: 768px)').matches;
+        window.RizqFooterToggle.setOpen(!isPhone);
+      } catch (eFt) {
+        window.RizqFooterToggle.setOpen(true);
+      }
     }
   }catch(e){}
 }
