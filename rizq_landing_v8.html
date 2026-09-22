@@ -2667,7 +2667,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in">
       <p class="section-tag">Style Ideas</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة</p>
+      <p class="section-desc" data-t="sty-desc">إطلالات ملهِمة من محلات رزق — اختر القطعة واطلب الإطلالة كاملة</p>
       <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
       <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
     </div>
@@ -4548,8 +4548,8 @@ function _styUpdateTick(fr){
   var secs = Math.floor((left % 60000) / 1000);
   var mm = mins + ':' + (secs < 10 ? '0' : '') + secs;
   el.textContent = fr
-    ? ('🔄 Prochain renouvellement dans ' + mm)
-    : ('🔄 التجديد التلقائي خلال ' + mm);
+    ? ('✨ Nouveaux looks dans ' + mm)
+    : ('✨ إطلالات جديدة خلال ' + mm);
 }
 function _styStartAutoRefresh(){
   if(_rizqStyleAutoTimer) clearInterval(_rizqStyleAutoTimer);
@@ -5860,7 +5860,7 @@ const LANG = {
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
     'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
-    'sty-desc': 'يتجدد تلقائياً كل 3 دقائق، أو عند فتح منتج (مثل دراعة من محل) فتظهر صوره مع الإطلالة',
+    'sty-desc': 'إطلالات ملهِمة من محلات رزق — اختر القطعة واطلب الإطلالة كاملة',
     'sty-reshuffle': '🔀 اقتراحات جديدة',
     'sty-men': 'رجالي',
     'sty-women': 'نسائي',
@@ -5954,7 +5954,7 @@ const LANG = {
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
     'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
-    'sty-desc': 'Se renouvelle toutes les 3 minutes, ou quand vous ouvrez un produit (ex. daraa en boutique) — ses photos apparaissent dans le look',
+    'sty-desc': 'Looks inspirés depuis les boutiques Rizq — choisissez une pièce et achetez le look complet',
     'sty-reshuffle': '🔀 Nouvelles suggestions',
     'sty-men': 'Homme',
     'sty-women': 'Femme',
