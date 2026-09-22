@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=17.1"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=17.1"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=17.2"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=17.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
@@ -4431,14 +4431,19 @@ function _styMatchGender(a, gender){
   var g = _styDetectGender(a);
   return g === gender || g === 'both';
 }
+function _styIsStyleCat(a){
+  var k = String((a && a.catKey) || '');
+  return /أزياء|موضة|ذهب|صحة|جمال|إلكترون/.test(k);
+}
 function _styPickCompanions(primary, pool, gender, n){
-  var same = pool.filter(function(a){
+  var stylePool = pool.filter(_styIsStyleCat);
+  var same = stylePool.filter(function(a){
     return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
       (a.catKey === primary.catKey || /ذهب|أزياء|صحة|إلكترون/.test(String(a.catKey||'')));
   });
   var picks = _styShuffle(same).slice(0, n);
   if(picks.length < n){
-    var rest = _styShuffle(pool.filter(function(a){
+    var rest = _styShuffle(stylePool.filter(function(a){
       return a !== primary && String(a.id) !== String(primary.id) && _styMatchGender(a, gender) &&
         !picks.some(function(p){ return String(p.id)===String(a.id); });
     }));
@@ -4485,15 +4490,16 @@ function buildStyleIdeas(reshuffle){
   var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
 
   tplList.forEach(function(tpl){
-    var catPool = gendered.filter(function(a){
+    var styleGendered = gendered.filter(_styIsStyleCat);
+    var catPool = styleGendered.filter(function(a){
       var k = String(a.catKey||'');
       return (tpl.cats||[]).some(function(c){ return k === c || k.indexOf(c)>=0 || c.indexOf(k)>=0; }) && !usedIds[String(a.id)];
     });
-    if(!catPool.length) catPool = gendered.filter(function(a){ return !usedIds[String(a.id)]; });
-    if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
+    if(!catPool.length) catPool = styleGendered.filter(function(a){ return !usedIds[String(a.id)]; });
+    if(!catPool.length) catPool = pool.filter(function(a){ return _styIsStyleCat(a) && !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
-    var companions = primary ? _styPickCompanions(primary, gendered.length ? gendered : pool, gender, 2) : [];
+    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool.filter(_styIsStyleCat), gender, 2) : [];
     companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
