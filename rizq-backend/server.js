@@ -116,7 +116,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // والمحلات فقط، بينما تبقى بقية الأقسام (مكاتب/شركات/مناقصات/فيديوهات
 // إعلانية) مبنية وجاهزة لكن مخفية خلف علم تفعيل، تُفتح لاحقاً من لوحة
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
-const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
+const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
 function getModuleFlags() {
   const cfg = repos.getSiteConfig();
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
@@ -150,6 +150,7 @@ const DEFAULT_SECTION_RULES = {
   office:      { extraBannedKeywords: ['علاج مضمون', 'كسب القضية أكيد', 'guérison garantie'], escalateAlways: true, requiredDocsNote: 'رخصة النشاط سارية + بطاقة وطنية' },
   corp:        { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'سجل تجاري/رخصة تأسيس + بطاقة وطنية للممثل القانوني' },
   tenders:     { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب شركة/مكتب موافَق عليه مسبقاً + باقة مدفوعة نشطة' },
+  investments: { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'مراجعة أوّلية للفرصة الاستثمارية — بلا ضمان عائد، وثائق المشروع عند الحاجة' },
   videoAds:    { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب مفتوح أصلاً (فرد/محل) — مراجعة الفيديو قبل النشر العام' },
 };
 function getSectionRules() {
@@ -1404,7 +1405,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // هذا الملف) فيراه كل زائر من أي جهاز فوراً. القيمة الافتراضية عند عدم
     // وجود الملف بعد: individual/store مفعَّلان، الباقي مغلق — راجع
     // DEFAULT_MODULE_FLAGS و getModuleFlags() أدناه. ──
-    const MODULE_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'videoAds'];
+    const MODULE_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'investments', 'videoAds'];
     const existingFlags = Object.assign({}, DEFAULT_MODULE_FLAGS, current.moduleFlags || {});
     MODULE_KEYS.forEach((key) => {
       if (key in body.moduleFlags) existingFlags[key] = body.moduleFlags[key] === true;
@@ -1417,7 +1418,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // قسم، وكيل واحد يقرأ "قواعد" مختلفة حسب نوع الحساب. تُدمَج هنا مفتاحاً
     // بمفتاح لكل قسم (لا يمسح قواعد أقسام أخرى محفوظة سابقاً)، بنفس مبدأ
     // moduleFlags أعلاه. راجع DEFAULT_SECTION_RULES/getSectionRules أعلاه. ──
-    const SECTION_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'videoAds'];
+    const SECTION_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'investments', 'videoAds'];
     const existingRules = getSectionRules(); // يبدأ من القيم الحالية (افتراضية+محفوظة) لا من الصفر
     SECTION_KEYS.forEach((key) => {
       if (!(key in body.sectionRules) || typeof body.sectionRules[key] !== 'object') return;

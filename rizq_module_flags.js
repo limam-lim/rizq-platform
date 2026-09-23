@@ -15,6 +15,7 @@
     'rizq_showroom_directory.html': 'corp',
     'rizq_corp.html': 'corp',
     'rizq_tenders.html': 'tenders',
+    'rizq_investments.html': 'investments',
     'rizq_ads_info.html': 'videoAds'
   };
 
@@ -22,11 +23,12 @@
     { key: 'office', icon: '📒', ar: 'المكاتب', fr: 'Bureaux' },
     { key: 'corp', icon: '🏢', ar: 'الشركات والمعارض', fr: 'Entreprises & showrooms' },
     { key: 'tenders', icon: '📋', ar: 'غرفة المناقصات', fr: 'Salle des appels d\'offres' },
+    { key: 'investments', icon: '📈', ar: 'غرفة الاستثمارات', fr: 'Salle des investissements' },
     { key: 'videoAds', icon: '🎬', ar: 'فيديوهات Rizq ADS', fr: 'Vidéos Rizq ADS' }
   ];
 
   function defaultFlags() {
-    return { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
+    return { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
   }
 
   function lang() {
@@ -73,6 +75,7 @@
       office: t('المكاتب', 'Bureaux'),
       corp: t('معارض الشو روم', 'Showrooms'),
       tenders: t('غرفة المناقصات', 'Appels d\'offres'),
+      investments: t('غرفة الاستثمارات', 'Investissements'),
       videoAds: t('Rizq ADS', 'Rizq ADS')
     };
     return map[key] || key;
@@ -298,7 +301,7 @@
     if (global.RizqDynamicNav && typeof global.RizqDynamicNav.apply === 'function') {
       global.RizqDynamicNav.apply(flags);
     } else {
-      var NAV_HREF = { store: 'rizq_store.html', office: 'rizq_office.html', corp: 'rizq_showroom.html', tenders: 'rizq_tenders.html' };
+      var NAV_HREF = { store: 'rizq_store.html', office: 'rizq_office.html', corp: 'rizq_showroom.html', tenders: 'rizq_tenders.html', investments: 'rizq_investments.html' };
       Object.keys(NAV_HREF).forEach(function (key) {
         if (key === 'store') return;
         if (flags[key] !== false) return;
