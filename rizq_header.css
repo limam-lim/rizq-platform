@@ -1142,15 +1142,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
   html.rizq-app-nav .hero{padding-top:8px !important}
   html.rizq-app-nav .hero-content{padding-top:12px !important}
-  /* تيكر ظاهر: تخطَّ النافبار+التيكر + فجوة حتى لا تلتصق شارة المنصة */
-  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 48px) !important;
-  }
+  /* Mobile: body already clears the fixed header. Do NOT re-add header+ticker
+     into .hero — that created a large white gap under the nav on phones.
+     Landing keeps the ticker in normal flow (relative), so only a small gap. */
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero,
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:48px !important;
+    padding-top:8px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:8px !important;
+    padding-top:12px !important;
   }
   html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
@@ -1424,10 +1425,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile .section-jump-bar{
     display:none !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile .hero{
+  html.rizq-app-nav body.landing-ux-mobile .hero,
+  html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero,
+  html.rizq-app-nav.rizq-landing-mobile body.landing-ux-mobile .hero,
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) body.landing-ux-mobile .hero{
     padding-top:8px !important;
   }
-  html.rizq-app-nav body.landing-ux-mobile .hero-content{
+  html.rizq-app-nav body.landing-ux-mobile .hero-content,
+  html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:12px !important;
   }
   /* تيكر مطلق كان يغطي بطاقة «رزق» — ضعه في التدفق تحت النافبار */
