@@ -3470,9 +3470,8 @@ function loadSiteConfigData(){
   return Object.assign({}, DEFAULT_SITE_CONFIG);
 }
 
-function loadSiteConfig(){
-  const cfg = loadSiteConfigData();
-  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.value = val; };
+function _applySiteConfigForm(cfg){
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.value = val == null ? '' : val; };
   set('cfg-sitename', cfg.sitename);
   set('cfg-tagline', cfg.tagline);
   set('cfg-phone', cfg.phone);
@@ -3486,6 +3485,24 @@ function loadSiteConfig(){
   set('cfg-banner-text', cfg.bannerText);
   const bannerSw = document.getElementById('cfg-banner-active');
   if(bannerSw) bannerSw.classList.toggle('on', !!cfg.bannerActive);
+}
+
+function loadSiteConfig(){
+  const local = loadSiteConfigData();
+  _applySiteConfigForm(local);
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  var base = (cfg.backendUrl || window.RIZQ_BACKEND_BASE || '').replace(/\/$/,'');
+  if(!base) return;
+  fetch(base + '/api/site-config')
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      var site = data && data.ok && data.config && data.config.site;
+      if(!site) return;
+      var merged = Object.assign({}, DEFAULT_SITE_CONFIG, local, site);
+      try{ localStorage.setItem('rizq_site_config', JSON.stringify(merged)); }catch(e){}
+      _applySiteConfigForm(merged);
+    })
+    .catch(function(){});
 }
 
 function saveSiteConfig(){

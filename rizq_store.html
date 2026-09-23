@@ -778,6 +778,7 @@ footer{
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
   <script src="rizq_backend_config.js"></script>
+  <script src="rizq_site_banner.js"></script>
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
@@ -1044,25 +1045,10 @@ footer{
   </section>
 
 <script>
-// ── مزامنة شريط الإشعار العلوي من إعدادات الموقع (rizq_site_config) ──
-(function syncSiteConfigToStore(){
-  try{
-    const raw = localStorage.getItem('rizq_site_config');
-    if(!raw) return;
-    const cfg = JSON.parse(raw);
-    if(cfg.bannerActive && cfg.bannerText){
-      const bar = document.createElement('div');
-      bar.id = 'rizq-announce-bar';
-      bar.style.cssText = 'background:linear-gradient(90deg,var(--gold),#e0c878);color:#16263d;font-size:13px;font-weight:700;text-align:center;padding:10px 16px;position:relative;z-index:999';
-      bar.textContent = cfg.bannerText;
-      document.body.insertBefore(bar, document.body.firstChild);
-    }
-  }catch(e){}
-})();
-
 /* ── المفضّلة (Wishlist) — خدمة جديدة للزائر، تعمل بالكامل محلياً في
    المتصفح (localStorage) بلا حساب وبلا أي خادم، بيانات حقيقية فقط (ما
-   يضيفه الزائر فعلاً) — لا أرقام وهمية. ── */
+   يضيفه الزائر فعلاً) — لا أرقام وهمية. ──
+   شريط الإشعار العلوي: rizq_site_banner.js (من /api/site-config). ── */
 function _wishKey(){
   var params = new URLSearchParams(location.search);
   var id = params.get('id') || params.get('store') || '';
