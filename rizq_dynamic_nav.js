@@ -11,7 +11,7 @@
     { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 4, landingHref: '#virtual-offices' },
     { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 5, landingHref: '#virtual-showrooms' },
     { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 6, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
-    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 7, always: true, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
+    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 7, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
   ];
 
   var DESKTOP_MORE = [
@@ -289,7 +289,7 @@
 
   function applyMoreMenus(flags) {
     flags = flags && typeof flags === 'object' ? flags : {
-      individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true
+      individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true
     };
     var mobileItems = getMobileMoreItems();
     document.querySelectorAll('#rizq-desk-more-li .nav-dropdown-menu, #nav-more-li .nav-dropdown-menu').forEach(function (menu) {
@@ -320,7 +320,7 @@
   }
 
   function applySectionHides(flags) {
-    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders' };
+    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders', investments: 'virtual-investments' };
     Object.keys(SECTION_MAP).forEach(function (key) {
       if (flags[key] !== false) return;
       var sec = document.getElementById(SECTION_MAP[key]);
@@ -372,7 +372,7 @@
     if (!flags || typeof flags !== 'object') {
       /* Keep modules navigable until /api/site-config arrives — closed-by-default
          made header links (مكاتب/معارض/مناقصات) vanish and feel “dead”. */
-      flags = { individual: true, store: true, office: true, corp: true, tenders: true, videoAds: true };
+      flags = { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
     }
     _lastApplied = flags;
     applyMainBar(flags);

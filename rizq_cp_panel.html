@@ -3611,6 +3611,7 @@ var MODULE_DEFS = [
   {key:'office',     icon:'📒', name:'المكاتب', name_fr:'Bureaux', desc:'تسجيل المكاتب (تأمين، خدمات مهنية...)', desc_fr:'Inscription des bureaux (assurance, services...)'},
   {key:'corp',       icon:'🏢', name:'الشركات', name_fr:'Entreprises', desc:'تسجيل الشركات والمعارض', desc_fr:'Inscription des entreprises et showrooms'},
   {key:'tenders',    icon:'📋', name:'غرفة المناقصات', name_fr:'Appels d\'offres', desc:'باقة المناقصات المدفوعة', desc_fr:'Forfait appels d\'offres payant'},
+  {key:'investments',icon:'📈', name:'غرفة الاستثمارات', name_fr:'Investissements', desc:'نشر ومراجعة فرص الاستثمار', desc_fr:'Publication et revue des opportunités d\'investissement'},
   {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
 var _moduleFlagsCache = null;
@@ -3633,7 +3634,7 @@ function renderModulesToggleList(flags){
 function loadModulesPanel(){
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
-    renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,videoAds:false});
+    renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
     return;
   }
   fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config')
@@ -3641,11 +3642,11 @@ function loadModulesPanel(){
     .then(function(data){
       var flags = (data && data.ok && data.config && data.config.moduleFlags)
         ? data.config.moduleFlags
-        : {individual:true,store:true,office:false,corp:false,tenders:false,videoAds:false};
+        : {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false};
       _moduleFlagsCache = flags;
       renderModulesToggleList(flags);
     }).catch(function(){
-      renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,videoAds:false});
+      renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
     });
 }
 
@@ -3691,6 +3692,7 @@ var DEFAULT_SECTION_RULES_ADMIN = {
   office:     { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'رخصة النشاط سارية + بطاقة وطنية' },
   corp:       { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'سجل تجاري/رخصة تأسيس + بطاقة وطنية للممثل القانوني' },
   tenders:    { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'حساب شركة/مكتب موافَق عليه مسبقاً + باقة مدفوعة نشطة' },
+  investments:{ extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'مراجعة أوّلية للفرصة الاستثمارية — بلا ضمان عائد، وثائق المشروع عند الحاجة' },
   videoAds:   { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'حساب مفتوح أصلاً (فرد/محل) — مراجعة الفيديو قبل النشر العام' },
 };
 
