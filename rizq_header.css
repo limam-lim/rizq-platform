@@ -480,22 +480,27 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    grid-column:3;
+    /* وسط العرض الحقيقي للنافبار (لا يتأثر بعرض الشعار أو أزرار الحساب) */
+    grid-column:1 / -1;
     justify-self:center;
     justify-content:center;
     overflow:visible !important;
-    display:flex;
+    display:flex !important;
     align-items:center;
     gap:6px;
     list-style:none;
     direction:inherit;
-    margin:0;padding:0;
-    max-width:min(720px, calc(100% - 360px));
-    /* وسط الشاشة فعلياً — لا يميل مع عرض الشعار أو شريط الحساب */
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:2;
+    margin:0;
+    padding:0;
+    width:max-content;
+    max-width:calc(100% - 400px);
+    position:absolute !important;
+    left:50% !important;
+    right:auto !important;
+    top:50% !important;
+    transform:translate(-50%, -50%) !important;
+    z-index:5;
+    pointer-events:auto;
   }
   html[dir="rtl"].rizq-app-nav #nav > .nav-center,
   html[dir="rtl"].rizq-app-nav #rizq-desk-nav > .nav-center{direction:rtl}
@@ -581,6 +586,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools{
     grid-column:3;
     justify-self:center;
+    /* لا تزاحم روابط الوسط — تظهر فقط في وضع nav-compact */
+    pointer-events:none;
+  }
+  html.rizq-app-nav #nav.nav-compact > .nav-sticky-tools,
+  html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-sticky-tools{
+    pointer-events:auto;
   }
   html.rizq-app-nav #nav.nav-compact > .nav-center,
   html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-center{display:none !important}
