@@ -340,8 +340,23 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box}
 .ticker-wrap.is-empty{display:none}
 html:has(#ticker-wrap:not(.is-empty)){--rizq-ticker-h:42px}
-html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar{top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px))!important}
-html:has(#ticker-wrap:not(.is-empty)) .hero{padding-top:calc(8px + var(--rizq-ticker-h,42px))!important}
+html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
+html.rizq-has-announce .section-jump-bar{
+  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,0px))!important
+}
+/* مسافة واضحة بين التيكر وشارة «المنصة الأولى» */
+html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
+html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
+  padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 24px)!important
+}
+html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
+  /* body مبطَّن مسبقاً بالنافبار+الإشعار+التيكر — هنا فجوة فقط */
+  padding-top:24px!important
+}
+html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content,
+html:has(#ticker-wrap:not(.is-empty)) .hero-content{
+  padding-top:8px!important
+}
 .ticker-inner{display:flex;gap:0;width:max-content;animation:ticker 35s linear infinite}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
@@ -363,7 +378,7 @@ html:has(#ticker-wrap:not(.is-empty)) .hero{padding-top:calc(8px + var(--rizq-ti
   .rizq-trio{grid-template-columns:1fr;gap:14px;max-width:100%}
 }
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
-.ticker-wrap{z-index:2}
+/* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
 
 .hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:9px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35);padding:9px 22px;border-radius:100px;margin:0 auto 20px;animation:fadeUp .8s ease both}
 .hero-eyebrow .pulse{width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(201,168,76,.6);animation:pulse 2s infinite}
@@ -6036,14 +6051,12 @@ function renderTickerFromAds(){
   if(items.length){
     html = items.map(row).join('');
   } else {
-    // لا إعلانات حية بعد — أظهر شريطاً ترويجياً بدل إخفاء التيكر تماماً
+    // لا إعلانات بعد — شريط ترويجي قصير (يُستبدل فور وصول إعلانات حية أو FEATURED)
     var isFr = (typeof isAr !== 'undefined' && !isAr);
     var fallback = [
       { emoji:'🔴', title: isFr ? 'En direct sur Rizq' : 'مباشر على رزق', price: isFr ? 'Publiez votre annonce' : 'انشر إعلانك الآن' },
       { emoji:'🏪', title: isFr ? 'Boutiques' : 'المحلات', price: isFr ? 'Ouvrez votre vitrine' : 'افتح واجهتك' },
-      { emoji:'💼', title: isFr ? 'Bureaux' : 'المكاتب', price: isFr ? 'Services pro' : 'خدمات مهنية' },
-      { emoji:'📈', title: isFr ? 'Investissements' : 'الاستثمارات', price: isFr ? 'Opportunités' : 'فرص نمو' },
-      { emoji:'🎬', title: 'Rizq ADS', price: isFr ? 'Emplacement premium' : 'موضع إعلاني مميز' }
+      { emoji:'💼', title: isFr ? 'Bureaux' : 'المكاتب', price: isFr ? 'Services pro' : 'خدمات مهنية' }
     ];
     try {
       var siteCfg = JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
@@ -6094,20 +6107,33 @@ function applyList(list){
     (list||[]).filter(function(a){ return a && !isDemoAd(a) && (a.status==='active' || !a.status); }).forEach(function(a){
       ADS.push(mapApiAdToHero(a));
     });
+    /* لا إعلانات حية على الخادم بعد — أظهر نوافذ العرض (FEATURED_ADS) بدل إخفاء القسم */
+    var usingShowcase = false;
+    if(!ADS.length && typeof FEATURED_ADS !== 'undefined' && FEATURED_ADS.length){
+      usingShowcase = true;
+      FEATURED_ADS.forEach(function(a){ ADS.push(a); });
+    }
     refreshAllAdsIndex();
     if(typeof buildCards==='function') buildCards();
     if(typeof buildLandingAds==='function') buildLandingAds(true);
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
+    var liveLabel = document.querySelector('.listings-label span');
+    if(liveLabel && usingShowcase){
+      var fr = (typeof isAr !== 'undefined' && !isAr);
+      liveLabel.innerHTML = fr
+        ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>Aperçu</strong> Exemples d’annonces — publiez la vôtre'
+        : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>عرض</strong> نماذج إعلانات — انشر إعلانك ليظهر هنا مباشرة';
+    }
     renderTickerFromAds();
     applyCatCountsFromAds();
     var adStat = document.querySelector('#platform-stats .h-stat-num');
     if(adStat){
-      adStat.dataset.target = String(ADS.length);
-      adStat.textContent = ADS.length.toLocaleString('en-US');
+      var liveCount = usingShowcase ? 0 : ADS.length;
+      adStat.dataset.target = String(liveCount);
+      adStat.textContent = liveCount.toLocaleString('en-US');
     }
-    // FEATURED_ADS restored for demo/showcase; live API still hydrates ADS carousel
   }
   applyList([]);
   var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');

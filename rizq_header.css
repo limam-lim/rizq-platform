@@ -853,6 +853,15 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     margin-top:0 !important;
     padding-top:56px !important;
   }
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 24px) !important;
+  }
+  html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
+    padding-top:24px !important;
+  }
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
+    padding-top:8px !important;
+  }
   html.rizq-app-nav #categories,
   html.rizq-app-nav .section{
     margin-top:0 !important;
@@ -1114,6 +1123,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
   html.rizq-app-nav .hero{padding-top:8px !important}
   html.rizq-app-nav .hero-content{padding-top:12px !important}
+  /* تيكر ظاهر: تخطَّ النافبار+التيكر + فجوة حتى لا تلتصق شارة المنصة */
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 24px) !important;
+  }
+  html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
+    padding-top:24px !important;
+  }
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
+    padding-top:8px !important;
+  }
   html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
   /* على الموبايل التبويبات ليست sticky — لا تُزح top (كان يقص شريط الإحصاءات) */
