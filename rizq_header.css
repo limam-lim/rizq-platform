@@ -854,10 +854,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-top:56px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 24px) !important;
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 48px) !important;
   }
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:24px !important;
+    padding-top:48px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:8px !important;
@@ -1125,10 +1125,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav .hero-content{padding-top:12px !important}
   /* تيكر ظاهر: تخطَّ النافبار+التيكر + فجوة حتى لا تلتصق شارة المنصة */
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 24px) !important;
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 48px) !important;
   }
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:24px !important;
+    padding-top:48px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:8px !important;
