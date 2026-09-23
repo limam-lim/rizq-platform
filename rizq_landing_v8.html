@@ -2490,6 +2490,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
 <script src="rizq_backend_config.js"></script>
+    <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=1.2"></script>
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_verification_policy.js"></script>
@@ -6025,11 +6026,30 @@ function renderTickerFromAds(){
   var inner = document.getElementById('ticker');
   if(!wrap || !inner) return;
   var items = ADS.slice(0, 12);
-  if(!items.length){ wrap.classList.add('is-empty'); inner.innerHTML=''; return; }
   function row(a){
     return '<div class="ticker-item"><div class="ticker-dot"></div>'+(a.emoji||'📦')+' '+(a.title||'')+' <strong>'+(a.price||'')+'</strong></div>';
   }
-  var html = items.map(row).join('');
+  var html = '';
+  if(items.length){
+    html = items.map(row).join('');
+  } else {
+    // لا إعلانات حية بعد — أظهر شريطاً ترويجياً بدل إخفاء التيكر تماماً
+    var isFr = (typeof isAr !== 'undefined' && !isAr);
+    var fallback = [
+      { emoji:'🔴', title: isFr ? 'En direct sur Rizq' : 'مباشر على رزق', price: isFr ? 'Publiez votre annonce' : 'انشر إعلانك الآن' },
+      { emoji:'🏪', title: isFr ? 'Boutiques' : 'المحلات', price: isFr ? 'Ouvrez votre vitrine' : 'افتح واجهتك' },
+      { emoji:'💼', title: isFr ? 'Bureaux' : 'المكاتب', price: isFr ? 'Services pro' : 'خدمات مهنية' },
+      { emoji:'📈', title: isFr ? 'Investissements' : 'الاستثمارات', price: isFr ? 'Opportunités' : 'فرص نمو' },
+      { emoji:'🎬', title: 'Rizq ADS', price: isFr ? 'Emplacement premium' : 'موضع إعلاني مميز' }
+    ];
+    try {
+      var siteCfg = JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+      if(siteCfg && siteCfg.bannerActive && siteCfg.bannerText){
+        fallback.unshift({ emoji:'📢', title: String(siteCfg.bannerText).slice(0, 80), price: '' });
+      }
+    } catch(e){}
+    html = fallback.map(row).join('');
+  }
   inner.innerHTML = html + html;
   wrap.classList.remove('is-empty');
 }
