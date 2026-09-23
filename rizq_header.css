@@ -1140,18 +1140,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     white-space:nowrap;
   }
 
-  html.rizq-app-nav .hero{padding-top:8px !important}
+  html.rizq-app-nav .hero{
+    padding-top:8px !important;
+    justify-content:flex-start !important;
+  }
   html.rizq-app-nav .hero-content{padding-top:12px !important}
-  /* Mobile: body already clears the fixed header. Do NOT re-add header+ticker
-     into .hero — that created a large white gap under the nav on phones.
-     Landing keeps the ticker in normal flow (relative), so only a small gap. */
+  /* Mobile: ticker in-flow under nav — flex-start (not center) or white gap returns */
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero,
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:8px !important;
+    justify-content:flex-start !important;
+    padding-top:0 !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:12px !important;
+    padding-top:16px !important;
   }
   html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
@@ -1429,24 +1431,36 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero,
   html.rizq-app-nav.rizq-landing-mobile body.landing-ux-mobile .hero,
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) body.landing-ux-mobile .hero{
-    padding-top:8px !important;
+    justify-content:flex-start !important;
+    padding-top:0 !important;
+    min-height:calc(100vh - 110px) !important;
   }
   html.rizq-app-nav body.landing-ux-mobile .hero-content,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:12px !important;
+    padding-top:16px !important;
+    flex:1 1 auto !important;
+    width:100%;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
   }
   /* إشعار علوي: لا تحسب ارتفاع التيكر في body — التيكر في التدفق على الهاتف */
   html.rizq-has-announce.rizq-app-nav body.landing-ux-mobile{
     padding-top:calc(110px + var(--rizq-announce-h,42px)) !important;
   }
-  /* تيكر مطلق كان يغطي بطاقة «رزق» — ضعه في التدفق تحت النافبار */
-  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
+  /* تيكر ملاصق لشريط الأقسام — بدون فراغ أبيض فوقه */
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap,
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap:not(.is-empty){
     position:relative !important;
     top:auto !important;
     left:auto !important;
     right:auto !important;
-    z-index:1 !important;
-    margin:0 0 12px !important;
+    z-index:2 !important;
+    margin:0 !important;
+    width:100% !important;
+    flex:0 0 auto !important;
+    align-self:stretch !important;
   }
 
   #rizq-app-header{

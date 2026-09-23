@@ -60,19 +60,23 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile{padding-top:110px!important}
   html.rizq-app-nav body.landing-ux-mobile>nav#nav{display:flex!important;visibility:visible!important;height:110px!important;position:fixed!important;top:0;left:0;right:0;z-index:1000!important;background:#0f172a!important;flex-wrap:wrap!important}
   html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
-  /* تيكر في التدفق الطبيعي — لا يغطي عنوان الهيرو «رزق» */
-  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap{
-    position:relative!important;top:auto!important;z-index:1!important;margin:0 0 12px!important;
-  }
-  /* امنع فراغ أبيض: لا تحسب ارتفاع النافبار داخل .hero مرة ثانية */
+  /* التيكر مباشرة تحت شريط الأقسام — لا توسيط عمودي يفتح فراغاً أبيض */
   html.rizq-app-nav body.landing-ux-mobile .hero,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero,
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) body.landing-ux-mobile .hero{
-    padding-top:8px!important
+    justify-content:flex-start!important;
+    padding-top:0!important;
+    min-height:calc(100vh - 110px)!important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap,
+  html.rizq-app-nav body.landing-ux-mobile .ticker-wrap:not(.is-empty){
+    position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+    z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   html.rizq-app-nav body.landing-ux-mobile .hero-content,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:12px!important
+    padding-top:16px!important;flex:1 1 auto!important;width:100%;
+    display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box!important;
   }
   html.rizq-has-announce.rizq-app-nav body.landing-ux-mobile{
     padding-top:calc(110px + var(--rizq-announce-h,42px))!important
@@ -372,18 +376,26 @@ html.rizq-has-announce .section-jump-bar{
     padding-top:8px!important
   }
 }
-/* Mobile: body يمسح النافبار والتيكر في التدفق — لا تضِف header+ticker مرة ثانية (فراغ أبيض) */
+/* Mobile: التيكر في التدفق تحت النافبار — flex-start يمنع الفراغ الأبيض */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero,
   html:has(#ticker-wrap:not(.is-empty)) .hero,
   html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero,
-  html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:8px!important
+  html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero,
+  html.rizq-app-nav body.landing-ux-mobile .hero{
+    justify-content:flex-start!important;
+    padding-top:0!important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html:has(#ticker-wrap:not(.is-empty)) .hero-content,
+  html.rizq-app-nav body.landing-ux-mobile .hero-content,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:12px!important
+    padding-top:16px!important;
+    flex:1 1 auto!important;width:100%!important;
+    display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box!important;
+  }
+  .ticker-wrap{
+    width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
 }
 .ticker-inner{display:flex;gap:0;width:max-content;animation:ticker 35s linear infinite}
@@ -1603,10 +1615,11 @@ html[dir="ltr"] .listings-section .section-desc{
     flex:0 0 158px!important;scroll-snap-align:none!important;
     direction:rtl!important;
   }
-  /* شريط التيكر كان absolute فيغطي كلمة «رزق» في الهيرو */
+  /* شريط التيكر ملاصق للنافبار — flex-start على .hero يمنع الفراغ الأبيض */
+  .hero{justify-content:flex-start!important;padding-top:0!important}
   .ticker-wrap{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    z-index:1!important;margin:0 0 12px!important;
+    z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   #hero-listings .cards-track .ad-card-img{
     height:100px!important;min-height:100px!important;max-height:100px!important;
