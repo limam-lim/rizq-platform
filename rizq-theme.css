@@ -348,10 +348,15 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   z-index: 999999 !important;
 }
 
-#rizq-announce-bar,
-.ticker-wrap,
+/* شريط الإشعار فوق النافبار؛ التيكر تحت النافبار فوق المحتوى */
+#rizq-announce-bar {
+  z-index: 100050 !important;
+}
+.ticker-wrap {
+  z-index: 9990 !important;
+}
 .section-jump-bar {
-  z-index: 100 !important;
+  z-index: 9980 !important;
 }
 
 /* ══ Rizq legal sidebar (fixed-disc-pill) — hidden until edge hover ══ */

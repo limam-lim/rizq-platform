@@ -1,7 +1,7 @@
 /**
  * rizq_site_banner.js — شريط الإشعار العلوي من إعدادات الموقع (site.banner*)
  * يُحمَّل على الصفحات العامة ويقرأ /api/site-config (وليس localStorage فقط).
- * يُثبَّت فوق النافبار الثابت حتى لا يُغطّى، ويدفع المحتوى للأسفل.
+ * يُثبَّت فوق النافبار الثابت ويدفع #nav / #rizq-desk-nav للأسفل.
  */
 (function (global) {
   'use strict';
@@ -13,24 +13,33 @@
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var css = [
-      'html.' + ROOT_CLASS + ' #' + BAR_ID + '{',
-      '  position:fixed;top:0;left:0;right:0;z-index:100050;',
-      '  background:linear-gradient(90deg,#C9A84C,#e8c96a);',
-      '  color:#0f2347;font-size:13px;font-weight:700;text-align:center;',
-      '  padding:10px 16px;line-height:1.5;',
-      '  box-shadow:0 2px 10px rgba(15,35,65,.18);',
-      '  font-family:Cairo,Tahoma,sans-serif;',
-      '}',
       'html.' + ROOT_CLASS + '{--rizq-announce-h:42px}',
-      'html.' + ROOT_CLASS + ' body{padding-top:var(--rizq-announce-h)!important}',
-      'html.' + ROOT_CLASS + ' nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome),',
+      'html.' + ROOT_CLASS + ' #' + BAR_ID + '{',
+      '  position:fixed!important;top:0!important;left:0!important;right:0!important;',
+      '  z-index:100050!important;',
+      '  background:linear-gradient(90deg,#C9A84C,#e8c96a)!important;',
+      '  color:#0f2347!important;font-size:13px!important;font-weight:700!important;',
+      '  text-align:center!important;padding:10px 16px!important;line-height:1.5!important;',
+      '  box-shadow:0 2px 10px rgba(15,35,65,.18)!important;',
+      '  font-family:Cairo,Tahoma,sans-serif!important;display:block!important;',
+      '}',
+      'html.' + ROOT_CLASS + ' body{padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h) + var(--rizq-ticker-h,0px))!important}',
+      /* النافبار يستخدم inset:0 — يجب إعادة ضبط inset مع top */
+      'html.' + ROOT_CLASS + ' #nav,',
+      'html.' + ROOT_CLASS + ' #rizq-desk-nav,',
       'html.' + ROOT_CLASS + ' nav.topnav,',
       'html.' + ROOT_CLASS + ' .topnav{',
-      '  top:var(--rizq-announce-h)!important',
+      '  top:var(--rizq-announce-h)!important;',
+      '  inset:var(--rizq-announce-h) 0 auto 0!important',
       '}',
-      /* العناصر المثبتة تحت النافبار فقط تحتاج إزاحة إضافية */
+      'html.' + ROOT_CLASS + ' .ticker-wrap:not(.is-empty){',
+      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h))!important',
+      '}',
+      'html.' + ROOT_CLASS + ' .section-jump-bar{',
+      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h) + var(--rizq-ticker-h,0px))!important',
+      '}',
       'html.' + ROOT_CLASS + ' #rizq-ads-preview-banner{',
-      '  top:calc(70px + var(--rizq-announce-h))!important',
+      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h))!important',
       '}'
     ].join('');
     var style = document.createElement('style');
@@ -103,31 +112,7 @@
     }
   }
 
-  function fetchAndApply() {
-    var local = fromLocal();
-    if (local.bannerActive && local.bannerText) applyBanner(local);
-
-    var base = backendBase();
-    if (!base) {
-      /* قد يُحمَّل الملف قبل rizq_backend_config — أعد المحاولة بعد تهيئة الصفحة */
-      setTimeout(function () {
-        var b2 = backendBase();
-        if (!b2) {
-          applyBanner(local);
-          return;
-        }
-        fetch(b2 + '/api/site-config')
-          .then(function (res) { return res.ok ? res.json() : null; })
-          .then(function (data) {
-            var site = data && data.ok && data.config && data.config.site;
-            if (site) applyBanner(site);
-            else applyBanner(local);
-          })
-          .catch(function () { applyBanner(local); });
-      }, 50);
-      return;
-    }
-
+  function fetchFromBase(base, local) {
     fetch(base + '/api/site-config')
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
@@ -135,9 +120,26 @@
         if (site) applyBanner(site);
         else applyBanner(local);
       })
-      .catch(function () {
-        applyBanner(local);
-      });
+      .catch(function () { applyBanner(local); });
+  }
+
+  function fetchAndApply() {
+    var local = fromLocal();
+    if (local.bannerActive && local.bannerText) applyBanner(local);
+
+    var base = backendBase();
+    if (!base) {
+      setTimeout(function () {
+        var b2 = backendBase();
+        if (!b2) {
+          applyBanner(local);
+          return;
+        }
+        fetchFromBase(b2, local);
+      }, 50);
+      return;
+    }
+    fetchFromBase(base, local);
   }
 
   global.RizqSiteBanner = { apply: applyBanner, fetchAndApply: fetchAndApply };
