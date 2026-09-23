@@ -74,6 +74,9 @@ document.documentElement.classList.add('rizq-app-nav');
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:12px!important
   }
+  html.rizq-has-announce.rizq-app-nav body.landing-ux-mobile{
+    padding-top:calc(110px + var(--rizq-announce-h,42px))!important
+  }
 }
 </style>
 <script src="rizq_packages_config.js?v=16.3"></script>
