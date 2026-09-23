@@ -1608,10 +1608,11 @@ html[dir="ltr"] .listings-section .section-desc{
     flex:0 0 158px!important;scroll-snap-align:none!important;
     direction:rtl!important;
   }
-  /* شريط التيكر كان absolute فيغطي كلمة «رزق» في الهيرو */
+  /* شريط التيكر ملاصق للنافبار — flex-start على .hero يمنع الفراغ الأبيض */
+  .hero{justify-content:flex-start!important;padding-top:0!important}
   .ticker-wrap{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    z-index:1!important;margin:0 0 12px!important;
+    z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   #hero-listings .cards-track .ad-card-img{
     height:100px!important;min-height:100px!important;max-height:100px!important;

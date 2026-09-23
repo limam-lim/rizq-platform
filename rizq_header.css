@@ -1440,6 +1440,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-top:16px !important;
     flex:1 1 auto !important;
     width:100%;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
   }
   /* إشعار علوي: لا تحسب ارتفاع التيكر في body — التيكر في التدفق على الهاتف */
   html.rizq-has-announce.rizq-app-nav body.landing-ux-mobile{
