@@ -1,5 +1,7 @@
 :root{
-  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
+  /* خلفية بطاقات رزق — أجواء نموذج الهيرو */
+  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.14'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E");
+  --rizq-navy-atmosphere:linear-gradient(145deg,#07111f 0%,#0D1B2A 38%,#163a6e 78%,#1B3A6B 100%);
   --text-on-navy:rgba(255,255,255,.88);
   --text-on-navy-muted:rgba(255,255,255,.88);
   --text-on-navy-soft:rgba(255,255,255,.72);
@@ -25,13 +27,21 @@
 #cat-portal,
 .why-card,
 .rvid-section,
+.store-card,
+.product-card,
+.rzq-disc-card,
+.hub-card,
+.cta-hub,
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome),
 .rpkg-card[style*="#1B3A6B"],
-.pricing-card[style*="#1B3A6B"]{
-  background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),var(--rizq-navy-grid)!important;
-  background-size:auto,60px 60px!important;
+.pricing-card[style*="#1B3A6B"],
+.rpkg-card.featured,
+.pricing-card.featured{
+  background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
+  background-size:cover,72px 72px!important;
   background-repeat:no-repeat,repeat!important;
   background-blend-mode:overlay;
+  border-color:rgba(201,168,76,.22);
 }
 
 html body footer,
@@ -755,8 +765,11 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 }
 #cards-track .ad-card{
   min-width:210px;
-  border:1px solid rgba(201,168,76,.22)!important;
-  background:linear-gradient(145deg,#0a1628,#122040)!important;
+  border:1px solid rgba(201,168,76,.24)!important;
+  background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
+  background-size:cover,72px 72px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-blend-mode:overlay!important;
 }
 #hero-listings .listings-label span{
   display:inline-flex;
