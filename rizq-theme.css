@@ -42,10 +42,11 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .pricing-card[style*="#1B3A6B"],
 .rpkg-card.featured,
 .pricing-card.featured {
+  background-color: #0D1B2A !important;
   background-image: var(--rizq-navy-atmosphere), var(--rizq-navy-grid) !important;
   background-size: cover, 72px 72px !important;
   background-repeat: no-repeat, repeat !important;
-  background-blend-mode: overlay;
+  background-blend-mode: normal;
   border-color: rgba(201, 168, 76, 0.22);
 }
 

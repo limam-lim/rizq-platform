@@ -219,12 +219,12 @@
           ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
           : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.25)';
     } else {
-      bg = dia ? 'linear-gradient(160deg,#0a1628,#1B3A6B)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : 'linear-gradient(160deg,#f8faff,#eff3ff)';
-      border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid #86efac' : '1.5px solid #bfcfef';
-      nameCol = dia ? '#f3de9c' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#15803d' : '#1B3A6B';
-      priceCol = dia ? '#e8c96a' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#16a34a' : '#1d4ed8';
-      featCol = dia ? 'rgba(255,255,255,.85)' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? '#166534' : '#3a4a63';
-      periodCol = dia ? 'rgba(243,222,156,.7)' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? '#4ade80' : '#5b6b8a';
+      bg = dia ? 'linear-gradient(160deg,#0a1628,#1B3A6B)' : year ? 'linear-gradient(160deg,#1B3A6B,#0f2347)' : highlight ? 'linear-gradient(160deg,#16263d,#0D1B2A)' : trial ? 'linear-gradient(160deg,#0a1628,#122a4a)' : 'linear-gradient(160deg,#0D1B2A,#1B3A6B)';
+      border = dia ? '2px solid rgba(201,168,76,.55)' : year ? '2px solid rgba(201,168,76,.6)' : highlight ? '2px solid var(--gold,#C9A84C)' : trial ? '1.5px solid rgba(134,239,172,.55)' : '1.5px solid rgba(201,168,76,.28)';
+      nameCol = dia ? '#f3de9c' : year ? '#fde68a' : highlight ? '#fff' : trial ? '#86efac' : '#ffffff';
+      priceCol = dia ? '#e8c96a' : year ? '#fbbf24' : highlight ? 'var(--gold,#C9A84C)' : trial ? '#4ade80' : '#e8c96a';
+      featCol = dia ? 'rgba(255,255,255,.85)' : year ? 'rgba(255,255,255,.85)' : highlight ? '#cdd7e8' : trial ? 'rgba(220,252,231,.9)' : 'rgba(255,255,255,.82)';
+      periodCol = dia ? 'rgba(243,222,156,.7)' : year ? 'rgba(255,255,255,.6)' : highlight ? '#9fb0cc' : trial ? 'rgba(134,239,172,.7)' : 'rgba(255,255,255,.55)';
       btnStyle = dia
         ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 6px 18px rgba(201,168,76,.4)'
         : year
@@ -232,8 +232,8 @@
           : highlight
             ? 'border:none;color:#16263d;background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));box-shadow:0 6px 18px rgba(201,168,76,.4)'
             : trial
-              ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
-              : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.35)';
+              ? 'border:none;color:#0f2347;background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 4px 14px rgba(16,185,129,.3)'
+              : 'border:none;color:#0f2347;background:linear-gradient(135deg,#e8c96a,#C9A84C);box-shadow:0 4px 14px rgba(201,168,76,.3)';
     }
     var priceTxt = trial ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
     var feats = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length)
@@ -339,35 +339,35 @@
     var bg = isBiz
       ? 'linear-gradient(145deg,#1B3A6B,#0f2347)'
       : isHL
-        ? 'linear-gradient(145deg,#fffbeb,#fef3c7)'
+        ? 'linear-gradient(145deg,#16263d,#0D1B2A)'
         : isSingle
-          ? 'linear-gradient(145deg,#f0fdf4,#dcfce7)'
-          : 'linear-gradient(145deg,#f8faff,#eff3ff)';
+          ? 'linear-gradient(145deg,#0a1628,#122a4a)'
+          : 'linear-gradient(145deg,#0D1B2A,#1B3A6B)';
     var border = isBiz
       ? '2px solid rgba(201,168,76,.55)'
       : isHL
         ? '2px solid #C9A84C'
         : isSingle
-          ? '1.5px solid #86efac'
-          : '1.5px solid #bfcfef';
+          ? '1.5px solid rgba(134,239,172,.55)'
+          : '1.5px solid rgba(201,168,76,.28)';
     var shadow = isBiz
       ? '0 8px 28px rgba(15,35,71,.28)'
       : isHL
-        ? '0 8px 28px rgba(201,168,76,.2)'
-        : '0 4px 16px rgba(27,58,107,.08)';
-    var nameCol = isBiz ? '#fde68a' : isHL ? '#92400e' : isSingle ? '#15803d' : '#1B3A6B';
-    var priceCol = isBiz ? '#fbbf24' : isHL ? '#C9A84C' : isSingle ? '#16a34a' : '#1d4ed8';
-    var mutedCol = isBiz ? 'rgba(255,255,255,.5)' : isSingle ? '#4ade80' : '#9ca3af';
-    var featCol = isBiz ? 'rgba(255,255,255,.85)' : isSingle ? '#166534' : '#4b5563';
-    var checkCol = isBiz ? '#fde68a' : isHL ? '#C9A84C' : isSingle ? '#22c55e' : '#10b981';
+        ? '0 8px 28px rgba(201,168,76,.22)'
+        : '0 6px 20px rgba(0,0,0,.28)';
+    var nameCol = isBiz ? '#fde68a' : isHL ? '#fde68a' : isSingle ? '#86efac' : '#ffffff';
+    var priceCol = isBiz ? '#fbbf24' : isHL ? '#C9A84C' : isSingle ? '#4ade80' : '#e8c96a';
+    var mutedCol = isBiz ? 'rgba(255,255,255,.5)' : isSingle ? 'rgba(134,239,172,.7)' : 'rgba(255,255,255,.55)';
+    var featCol = isBiz ? 'rgba(255,255,255,.85)' : isSingle ? 'rgba(220,252,231,.9)' : 'rgba(255,255,255,.82)';
+    var checkCol = isBiz ? '#fde68a' : isHL ? '#C9A84C' : isSingle ? '#4ade80' : '#C9A84C';
     var btnBg = isBiz
       ? 'linear-gradient(135deg,#e8c96a,#C9A84C)'
       : isHL
         ? 'linear-gradient(135deg,#C9A84C,#e8c96a)'
         : isSingle
           ? 'linear-gradient(135deg,#22c55e,#16a34a)'
-          : 'linear-gradient(135deg,#3b82f6,#1d4ed8)';
-    var btnCol = isBiz || isHL ? '#0f2347' : '#fff';
+          : 'linear-gradient(135deg,#C9A84C,#e8c96a)';
+    var btnCol = '#0f2347';
     var icon = isSingle ? '🎬' : isHL ? '🥇' : isBiz ? '💎' : '🥈';
     var cta = isBiz
       ? t2('تواصل معنا ←', 'Contactez-nous →')

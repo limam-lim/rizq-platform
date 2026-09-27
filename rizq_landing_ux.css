@@ -37,10 +37,11 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .pricing-card[style*="#1B3A6B"],
 .rpkg-card.featured,
 .pricing-card.featured{
+  background-color:#0D1B2A!important;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
   background-size:cover,72px 72px!important;
   background-repeat:no-repeat,repeat!important;
-  background-blend-mode:overlay;
+  background-blend-mode:normal;
   border-color:rgba(201,168,76,.22);
 }
 
@@ -766,10 +767,30 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 #cards-track .ad-card{
   min-width:210px;
   border:1px solid rgba(201,168,76,.24)!important;
+  background-color:#0D1B2A!important;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
   background-size:cover,72px 72px!important;
   background-repeat:no-repeat,repeat!important;
-  background-blend-mode:overlay!important;
+  background-blend-mode:normal!important;
+}
+/* باقات الصفحة الرئيسية: لا تترك بطاقات بيضاء حتى لو بقي style قديم */
+.pricing-section .rpkg-card.pricing-card{
+  color:#fff;
+}
+.pricing-section .rpkg-card.pricing-card[style*="#f8faff"],
+.pricing-section .rpkg-card.pricing-card[style*="#fffbeb"],
+.pricing-section .rpkg-card.pricing-card[style*="#f0fdf4"],
+.pricing-section .rpkg-card.pricing-card[style*="#eff3ff"],
+.pricing-section .rpkg-card.pricing-card[style*="#fef3c7"],
+.pricing-section .rpkg-card.pricing-card[style*="#dcfce7"],
+.pricing-section .rpkg-card.pricing-card[style*="#ffffff"]{
+  background-color:#0D1B2A!important;
+  background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
+  background-size:cover,72px 72px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-blend-mode:normal!important;
+  border-color:rgba(201,168,76,.28)!important;
+  color:#fff!important;
 }
 #hero-listings .listings-label span{
   display:inline-flex;

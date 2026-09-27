@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=17.4"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=17.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=21.0"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
@@ -1148,9 +1148,9 @@ html[dir="ltr"] #all-ads-title{
 .cards-track:hover{animation-play-state:paused}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-.ad-card{width:220px;flex-shrink:0;background:#fff;border:1px solid #e2e8f5;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;box-shadow:0 2px 12px rgba(15,35,65,.05)}
-.ad-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(15,35,65,.12),var(--s-gold)}
-.ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden}
+.ad-card{width:220px;flex-shrink:0;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.22);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.ad-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(0,0,0,.35),0 0 28px rgba(201,168,76,.12)}
+.ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden;background:rgba(7,17,31,.55)}
 .ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
 .ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .ad-card-img span{display:flex;align-items:center;justify-content:center}
@@ -10671,16 +10671,28 @@ function renderPricingSection(){
       var isQuart=/quart|trimestr|ربع/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) || (Number(p.durationDays)>=80 && Number(p.durationDays)<360);
       var isMonth=/month|mensuel|شهر/i.test(String(p.id||'')+String(p.name||'')+String(p.name_fr||'')) && !isYear && !isQuart;
       var isHL=p.highlight&&!isDiamond;
-      var bg=isDiamond?'linear-gradient(145deg,#3b0764,#6b21a8)':isYear?'linear-gradient(145deg,#1B3A6B,#0f2347)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':isHL?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
-      var border=isDiamond?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':isHL?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
-      var shadow=isDiamond?'0 8px 28px rgba(107,33,168,.5)':isYear?'0 8px 28px rgba(15,35,71,.35)':isHL?'0 8px 28px rgba(201,168,76,.2)':'0 4px 16px rgba(27,58,107,.08)';
-      var nameCol=isDiamond?'#e9d5ff':isYear?'#fde68a':isTrial?'#15803d':isHL?'#92400e':'#1B3A6B';
-      var priceCol=isDiamond?'#c084fc':isYear?'#fbbf24':isTrial?'#16a34a':isHL?'#C9A84C':'#1d4ed8';
-      var mutedCol=isDiamond?'rgba(233,213,255,.55)':isYear?'rgba(255,255,255,.45)':isTrial?'#4ade80':'#9ca3af';
-      var featCol=isDiamond?'rgba(233,213,255,.9)':isYear?'rgba(255,255,255,.8)':isTrial?'#166534':'#4b5563';
-      var checkCol=isDiamond?'#c084fc':isYear?'#fde68a':isTrial?'#22c55e':'#10b981';
-      var btnBg=isDiamond?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':isHL?'linear-gradient(135deg,#C9A84C,#e8c96a)':'linear-gradient(135deg,#3b82f6,#1d4ed8)';
-      var btnCol=isDiamond?'#fff':isYear?'#0f2347':'#fff';
+      /* كل بطاقات الباقات كحلية (نموذج 1) — لا خلفيات بيضاء/فاتحة */
+      var bg=isDiamond?'linear-gradient(145deg,#2e1065,#1B3A6B)'
+        :isYear?'linear-gradient(145deg,#1B3A6B,#0f2347)'
+        :isTrial?'linear-gradient(145deg,#0a1628,#122a4a)'
+        :isHL?'linear-gradient(145deg,#16263d,#0D1B2A)'
+        :'linear-gradient(145deg,#0D1B2A,#1B3A6B)';
+      var border=isDiamond?'2px solid rgba(192,132,252,.7)'
+        :isYear?'2px solid rgba(201,168,76,.6)'
+        :isHL?'2px solid #C9A84C'
+        :isTrial?'1.5px solid rgba(134,239,172,.55)'
+        :'1.5px solid rgba(201,168,76,.28)';
+      var shadow=isDiamond?'0 8px 28px rgba(107,33,168,.45)'
+        :isYear?'0 8px 28px rgba(15,35,71,.35)'
+        :isHL?'0 8px 28px rgba(201,168,76,.22)'
+        :'0 6px 20px rgba(0,0,0,.28)';
+      var nameCol=isDiamond?'#e9d5ff':isYear?'#fde68a':isTrial?'#86efac':isHL?'#fde68a':'#ffffff';
+      var priceCol=isDiamond?'#c084fc':isYear?'#fbbf24':isTrial?'#4ade80':isHL?'#C9A84C':'#e8c96a';
+      var mutedCol=isDiamond?'rgba(233,213,255,.55)':isYear?'rgba(255,255,255,.45)':isTrial?'rgba(134,239,172,.7)':'rgba(255,255,255,.55)';
+      var featCol=isDiamond?'rgba(233,213,255,.9)':isYear?'rgba(255,255,255,.8)':isTrial?'rgba(220,252,231,.9)':'rgba(255,255,255,.82)';
+      var checkCol=isDiamond?'#c084fc':isYear?'#fde68a':isTrial?'#4ade80':'#C9A84C';
+      var btnBg=isDiamond?'linear-gradient(135deg,#a855f7,#7c3aed)':isYear?'linear-gradient(135deg,#e8c96a,#C9A84C)':isTrial?'linear-gradient(135deg,#22c55e,#16a34a)':isHL?'linear-gradient(135deg,#C9A84C,#e8c96a)':'linear-gradient(135deg,#C9A84C,#e8c96a)';
+      var btnCol=isDiamond?'#fff':isYear||isHL?'#0f2347':'#0f2347';
       var icon=isTrial?'🎁':isMonth?'📅':isQuart?'🚀':isYear?'👑':isDiamond?'💎':'📦';
       var pJson=JSON.stringify(p).replace(/"/g,'&quot;');
       var lblPopular=_fr?'⭐ Le plus demandé':'⭐ الأكثر طلباً';
@@ -10689,7 +10701,7 @@ function renderPricingSection(){
       var lblFree=_fr?'Gratuit':'مجاناً';
       var lblStartFree=_fr?'Commencer gratuitement':'ابدأ مجاناً';
       var hasBadge=isHL||isYear||isDiamond;
-      return '<div class="rpkg-card pricing-card'+(hasBadge?' has-badge':'')+'" onclick="openPkgModal(this,\''+origin+'\')" data-pkg="'+pJson+'" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
+      return '<div class="rpkg-card pricing-card'+(hasBadge?' has-badge':'')+(isDiamond||isYear||isHL?' featured':'')+'" onclick="openPkgModal(this,\''+origin+'\')" data-pkg="'+pJson+'" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
         +(isHL?'<div class="pricing-card-badge pricing-card-badge--popular">'+lblPopular+'</div>':'')
         +(isDiamond?'<div class="pricing-card-badge pricing-card-badge--diamond">💎 '+lblDiamondTier+'</div>':'')
         +(isYear?'<div class="pricing-card-badge pricing-card-badge--year">'+lblBestValue+'</div>':'')
