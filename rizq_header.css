@@ -994,7 +994,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     flex-wrap:nowrap !important;
     justify-content:flex-start !important;
     align-items:center !important;
-    gap:8px !important;
+    gap:12px !important;
     overflow-x:auto !important;
     overflow-y:hidden !important;
     -webkit-overflow-scrolling:touch !important;
