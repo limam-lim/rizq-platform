@@ -1495,7 +1495,19 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     content:'+';font-size:20px;font-weight:900;line-height:1;display:block;color:#0f2347;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{display:flex!important}
-  html.rizq-app-nav body.landing-ux-mobile #nav-more-li{position:static!important;overflow:visible!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li{
+    position:sticky !important;
+    inset-inline-end:0 !important;
+    z-index:12 !important;
+    overflow:visible !important;
+    display:flex !important;
+    align-items:center !important;
+    background:linear-gradient(to left,#0f172a 55%,rgba(15,23,42,.95) 78%,rgba(15,23,42,0)) !important;
+    padding-inline-start:12px !important;
+  }
+  html[dir="ltr"].rizq-app-nav body.landing-ux-mobile #nav-more-li{
+    background:linear-gradient(to right,#0f172a 55%,rgba(15,23,42,.95) 78%,rgba(15,23,42,0)) !important;
+  }
   html.rizq-app-nav body.landing-ux-mobile #rizq-more-backdrop{
     display:none;
     position:fixed;

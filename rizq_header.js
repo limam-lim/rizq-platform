@@ -995,8 +995,31 @@
       + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 
+  function dockLandingPhoneMore() {
+    var nav = document.getElementById('nav');
+    var more = document.getElementById('nav-more-li');
+    var center = nav && nav.querySelector('.nav-center');
+    if (!nav || !more || !center) return;
+    var shouldDock = isLanding() && isMobileNav();
+    if (shouldDock) {
+      if (more.parentNode !== nav) {
+        more.__rizqMoreCenterHome = center;
+        nav.appendChild(more);
+      }
+      more.classList.add('rizq-more-docked');
+      center.classList.add('rizq-nav-has-docked-more');
+    } else {
+      more.classList.remove('rizq-more-docked');
+      if (center) center.classList.remove('rizq-nav-has-docked-more');
+      if (more.__rizqMoreCenterHome && more.parentNode !== more.__rizqMoreCenterHome) {
+        more.__rizqMoreCenterHome.appendChild(more);
+      }
+    }
+  }
+
   function bindLandingMobileMore() {
     /* Click handled by rizq_landing_ux.js → toggleNavDropdown (single path, no double-toggle). */
+    dockLandingPhoneMore();
   }
 
   window.positionNavDropdown = positionMoreDropdown;
