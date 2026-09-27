@@ -1425,6 +1425,7 @@
       removeHeader();
       if (document.body) document.body.classList.add('landing-ux-mobile');
       bindLandingMobileMore();
+      dockLandingPhoneMore();
       ensureLangListener();
       applyLabels();
       if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
@@ -1433,6 +1434,7 @@
         scheduleNavRefresh();
       }
       markActive();
+      enhanceModel3NavLinks();
       return;
     }
     if (!document.getElementById('rizq-app-header')) {

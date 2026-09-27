@@ -200,6 +200,8 @@
     opts = opts || {};
     var lang = opts.lang || getLang();
     var light = !!opts.light;
+    /* منصة رزق: باقات الصفحات الفرعية بنفس أجواء الصفحة الرئيسية (كحلي + نقش) */
+    light = false;
     var dia = isDiamond(p);
     var trial = isTrial(p);
     var year = isYearly(p);
@@ -454,7 +456,8 @@
       if (!key) return;
       var cols = Number(el.getAttribute('data-rizq-pkg-cols')) || 0;
       var ensureDiamond = el.getAttribute('data-rizq-pkg-diamond') === '1';
-      var light = el.getAttribute('data-rizq-pkg-light') === '1';
+      /* لا نستخدم الوضع الفاتح — توحيد مع الصفحة الرئيسية */
+      var light = false;
       mount(el.id || el, key, {
         columns: cols || undefined,
         ensureDiamond: ensureDiamond,

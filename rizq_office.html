@@ -16,7 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=22.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=22.2"/>
+<link rel="stylesheet" href="rizq-theme.css?v=22.2"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
@@ -397,7 +398,7 @@ html[dir="ltr"] #hours-card-el .hours-row{direction:ltr!important}
 .promo-card{background:linear-gradient(135deg,rgba(14,116,144,.06),rgba(201,168,76,.07));border:1px solid rgba(201,168,76,.22);border-radius:13px;padding:16px;text-align:center;margin-top:4px}
 
 /* ════════ PACKAGES SECTION ════════ */
-.pkg-section{padding:28px 16px 48px;background:linear-gradient(180deg,#f8faff 0%,#eef2fb 100%);border-top:1px solid #e0e8f0}
+.pkg-section{padding:28px 16px 48px;background-color:var(--rizq-navy-base,#143552);background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid);background-size:cover,72px 72px;background-repeat:no-repeat,repeat;background-blend-mode:overlay;border-top:1px solid rgba(201,168,76,.28)}
 .pkg-section-inner{max-width:1320px;margin:0 auto;width:100%}
 .pkg-section-head{text-align:center;margin-bottom:20px}
 .pkg-label{display:inline-block;font-size:11px;letter-spacing:2.5px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:10px;background:rgba(14,116,144,.08);padding:4px 16px;border-radius:20px;border:1px solid rgba(14,116,144,.2)}
@@ -1856,13 +1857,13 @@ window._rizqProfile = (function() {
 <section class="pkg-section" id="office-packages">
   <div class="pkg-section-inner">
     <div class="pkg-section-head">
-      <p style="font-size:12px;letter-spacing:2px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Office — الباقات</p>
-      <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--navy);margin-bottom:10px"><span data-t="pkg-h2-pre">طوّر مكتبك بالباقة</span> <span style="color:var(--teal2)" data-t="pkg-h2-gold">المناسبة لك</span></h2>
-      <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام (حتى 3 خدمات)، ثم اختر الباقة التي تناسب نشاطك</p>
-      <p style="font-size:12px;color:#3a5080;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
+      <p style="font-size:12px;letter-spacing:2px;color:var(--gold,#C9A84C);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Office — الباقات</p>
+      <h2 style="font-size:clamp(22px,3vw,34px);font-weight:700;color:rgba(255,255,255,.96);margin-bottom:10px"><span data-t="pkg-h2-pre">طوّر مكتبك بالباقة</span> <span style="color:var(--gold,#C9A84C)" data-t="pkg-h2-gold">المناسبة لك</span></h2>
+      <p style="color:rgba(255,255,255,.78);font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام (حتى 3 خدمات)، ثم اختر الباقة التي تناسب نشاطك</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.82);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600"><span style="background:rgba(7,17,31,.55);border:1px solid rgba(201,168,76,.4);color:#C9A84C;padding:3px 9px;border-radius:5px;font-weight:800;font-size:11px;letter-spacing:.5px">MRU</span><span data-t="mru-note-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span></p>
     </div>
 
-    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
+    <div class="pkg-grid" id="office-packages-grid" data-rizq-pkg-catalog="office" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1"></div>
   </div>
 </section>
 
