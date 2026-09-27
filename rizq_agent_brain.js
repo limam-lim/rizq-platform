@@ -224,6 +224,18 @@ async function executeTool(toolName, toolInput, meta) {
 //  context: { sender, name, subject, history[] }
 // ══════════════════════════════════════════════════════
 async function askAgent({ channel, message, context = {} }) {
+  try {
+    const ops = require('./rizq-backend/services/agentOps');
+    if (!ops.isAgentFamilyEnabled('brain')) {
+      return {
+        text: 'وكيل القنوات موقّف مؤقتاً من لوحة الإدارة. راسلوا direction@rizq.mr.',
+        model: null,
+        channel,
+        disabled: true,
+      };
+    }
+  } catch (eOps) { /* */ }
+
   if (!isAnthropicConfigured()) {
     throw new Error('ANTHROPIC_API_KEY / CLAUDE_API_KEY غير موجود في .env');
   }
@@ -336,12 +348,47 @@ async function askAgent({ channel, message, context = {} }) {
     }
   }
 
+  let qualityMeta = null;
+  try {
+    const aq = require('./rizq-backend/services/agentQuality');
+    const polished = aq.polishChannelReply(replyText, {
+      channel,
+      lang: 'ar',
+      fallback: 'شكراً لتواصلكم مع رزق. كيف نقدر نساعدكم؟',
+    });
+    replyText = polished.text;
+    qualityMeta = polished.quality;
+    if (packageFlow && (!toolResultsRaw.some((r) => r && r.source === 'live_catalog') || polished.scrubbedClaim)) {
+      aq.maybeRecordWeakReply({
+        message,
+        reply: replyText,
+        agent: 'brain',
+        channel,
+        lang: 'ar',
+        grounded: false,
+        scrubbedClaim: polished.scrubbedClaim,
+        reason: polished.scrubbedClaim ? 'forbidden_claim' : 'package_ungrounded',
+      });
+    } else if (polished.scrubbedClaim || (qualityMeta && !qualityMeta.pass)) {
+      aq.maybeRecordWeakReply({
+        message,
+        reply: replyText,
+        agent: 'brain',
+        channel,
+        lang: 'ar',
+        scrubbedClaim: polished.scrubbedClaim,
+        force: !!polished.scrubbedClaim,
+      });
+    }
+  } catch (eQ) { /* optional */ }
+
   return {
     text     : replyText,
     model,
     channel  : channel,
     usage    : response.usage,
-    stop_reason: response.stop_reason
+    stop_reason: response.stop_reason,
+    quality  : qualityMeta || undefined,
   };
 }
 

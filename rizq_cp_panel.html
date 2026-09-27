@@ -408,6 +408,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" data-admin-perm="channels" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
     <div class="sb-item" data-admin-perm="announcements" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
+    <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('agents-hub',this)" id="sb-agents-hub"><span class="sb-icon">🎛️</span><span class="sb-label" data-t="sb-agents-hub">مركز تسيير الوكلاء</span><span class="sb-badge" id="agents-hub-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" data-admin-perm="marketing" onclick="showPanel('marketing',this)"><span class="sb-icon">📣</span><span class="sb-label" data-t="sb-marketing">مدير التسويق</span></div>
     <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
     <div class="sb-item" data-admin-perm="quota-guard" onclick="showPanel('quota-guard',this)"><span class="sb-icon">📊</span><span class="sb-label" data-t="sb-quota-guard">مراقبة الاستهلاك 💎</span><span class="sb-badge" id="quota-over-badge" style="background:linear-gradient(135deg,#dc2626,#b91c1c);display:none">0</span></div>
@@ -1395,6 +1396,48 @@ main, .page-content.active, .main-content, .results-area,
             <tbody id="ads-requests-tbody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ AGENTS OPS HUB ══ -->
+    <div class="panel" id="panel-agents-hub">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="agents-hub-h">🎛️ مركز تسيير الوكلاء</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="agents-hub-sub">نظرة واحدة على كل الوكلاء — تفعيل، صحة الربط، والأسئلة الفائتة</p>
+        </div>
+        <button type="button" onclick="agentsHubRefresh()" style="padding:9px 16px;background:#fff;border:1.5px solid rgba(27,58,107,.2);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--navy)">🔄 تحديث</button>
+      </div>
+
+      <div id="agents-hub-status" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px"></div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:18px">
+        <div class="card" style="padding:16px 18px">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:12px;font-size:14px">⚡ تشغيل العائلات</div>
+          <div id="agents-hub-toggles" style="display:flex;flex-direction:column;gap:10px"></div>
+          <button type="button" onclick="agentsHubSaveToggles()" style="margin-top:14px;padding:9px 18px;background:linear-gradient(135deg,#1B3A6B,#0e7490);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ التفعيل</button>
+          <span id="agents-hub-save-msg" style="display:none;margin-right:10px;color:#059669;font-size:12px;font-weight:700">✅ تم الحفظ</span>
+        </div>
+        <div class="card" style="padding:16px 18px">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:12px;font-size:14px">🔗 اختصارات الإدارة</div>
+          <div id="agents-hub-links" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:18px">
+        <div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;font-weight:700;color:var(--navy);font-size:14px">📋 حالة الوكلاء</div>
+        <div id="agents-hub-families" style="padding:8px 16px;min-height:60px;color:#6b7280;font-size:13px">جارٍ التحميل...</div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div style="font-weight:700;color:var(--navy);font-size:14px">❓ آخر الأسئلة الفائتة / الردود الضعيفة</div>
+          <div style="display:flex;gap:8px">
+            <button type="button" onclick="showPanel('ai-manager'); setTimeout(function(){ if(window.switchAiTab) switchAiTab('missed'); },50)" style="padding:6px 12px;background:#fff;border:1px solid #d1d5db;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">فتح القائمة الكاملة</button>
+            <button type="button" onclick="agentsHubClearMisses()" style="padding:6px 12px;background:#fff1f1;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">مسح السجل</button>
+          </div>
+        </div>
+        <div id="agents-hub-misses" style="padding:12px 16px;min-height:60px;color:#6b7280;font-size:13px">—</div>
       </div>
     </div>
 
@@ -2545,7 +2588,7 @@ const PANEL_PERM_KEYS = {
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
   'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
-  marketing: 'marketing',
+  marketing: 'marketing', 'agents-hub': 'ai-manager',
 };
 
 function _adminHasPerm(required) {
@@ -2904,7 +2947,7 @@ async function saveOwnAdminPassword(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing','agents-hub':'topbar-agents-hub'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -2959,6 +3002,7 @@ function showPanel(id, navEl){
   if(id==='settings'){ loadSettingsPanel(); }
   if(id==='quota-guard'){ loadQuotaGuardPanel(); }
   if(id==='marketing'){ mktRefresh(); }
+  if(id==='agents-hub'){ agentsHubRefresh(); }
   if(window.innerWidth<900)closeSidebar();
 }
 
@@ -7818,56 +7862,85 @@ function switchAiTab(tab){
 
 // ══ الأسئلة التي لم يفهمها الوكيل الذكي — تُسجَّل من rizq_manager_agent_config.js ══
 function renderMissedQuestions(){
-  var list = [];
-  try { list = JSON.parse(localStorage.getItem('rizq_missed_questions') || '[]'); } catch(e){}
+  var localList = [];
+  try { localList = JSON.parse(localStorage.getItem('rizq_missed_questions') || '[]'); } catch(e){}
 
-  var tabBadge = document.getElementById('missed-q-badge');
-  if(tabBadge){
-    if(list.length>0){ tabBadge.textContent=list.length; tabBadge.style.display='inline-block'; }
-    else tabBadge.style.display='none';
-  }
-  var sbBadge = document.getElementById('ai-missed-badge');
-  if(sbBadge){
-    if(list.length>0){ sbBadge.textContent=list.length; sbBadge.style.display='inline-flex'; }
-    else sbBadge.style.display='none';
+  function paint(list){
+    var tabBadge = document.getElementById('missed-q-badge');
+    if(tabBadge){
+      if(list.length>0){ tabBadge.textContent=list.length; tabBadge.style.display='inline-block'; }
+      else tabBadge.style.display='none';
+    }
+    var sbBadge = document.getElementById('ai-missed-badge');
+    if(sbBadge){
+      if(list.length>0){ sbBadge.textContent=list.length; sbBadge.style.display='inline-flex'; }
+      else sbBadge.style.display='none';
+    }
+    var hubBadge = document.getElementById('agents-hub-badge');
+    if(hubBadge){
+      if(list.length>0){ hubBadge.textContent=list.length; hubBadge.style.display='inline-flex'; }
+      else hubBadge.style.display='none';
+    }
+    var box = document.getElementById('missed-q-list');
+    if(!box) return;
+    if(!list.length){
+      box.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">'+RizqI18n.t2('لا توجد أسئلة فائتة حالياً 🎉','Aucune question manquée pour le moment 🎉')+'</div>';
+      return;
+    }
+    var langLabel = {ar:RizqI18n.t2('عربي','Arabe'),fr:RizqI18n.t2('فرنسي','Français'),es:RizqI18n.t2('إسباني','Espagnol'),en:RizqI18n.t2('إنجليزي','Anglais'),hs:RizqI18n.t2('حسانية','Hassanya')};
+    var _mqLoc = (window.RizqI18n && RizqI18n.getLang()==='fr') ? 'fr-FR' : 'ar-MA-u-nu-latn';
+    var urgentLabel = {
+      urgent_fraud: RizqI18n.t2('⚠️ بلاغ احتيال/مشكلة','⚠️ Signalement fraude/problème'),
+      urgent_vip:   RizqI18n.t2('💎 طلب VIP (الماسية)','💎 Demande VIP (Diamant)'),
+      blocked:      RizqI18n.t2('🚫 محتوى محظور/محاولة اختراق','🚫 Contenu bloqué/tentative'),
+      ungrounded:   RizqI18n.t2('📉 رد غير مؤسس','📉 Réponse non fondée'),
+      claim_scrub:  RizqI18n.t2('🛡️ ادعاء محظور','🛡️ Affirmation interdite'),
+      weak_reply:   RizqI18n.t2('⚠️ رد ضعيف','⚠️ Réponse faible')
+    };
+    var sorted = list.slice().sort(function(a,b){
+      var au = a.type && a.type!=='missed' ? 1 : 0;
+      var bu = b.type && b.type!=='missed' ? 1 : 0;
+      return bu - au;
+    });
+    box.innerHTML = sorted.map(function(q){
+      var d = new Date(q.at);
+      var when = isNaN(d) ? '' : d.toLocaleString(_mqLoc);
+      var badge = urgentLabel[q.type] || '';
+      return '<div style="background:#fff;border:1px solid '+(badge?'rgba(220,38,38,.35)':'rgba(27,58,107,.1)')+';border-radius:12px;padding:14px;margin-bottom:10px'+(badge?';box-shadow:0 0 0 1px rgba(220,38,38,.08)':'')+'">' +
+        (badge ? '<div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:6px">'+badge+'</div>' : '') +
+        '<div style="font-size:14px;color:#1f2937;font-weight:600;margin-bottom:6px">' + String(q.text||'').replace(/</g,'&lt;') + '</div>' +
+        '<div style="font-size:11px;color:#9ca3af">' + (langLabel[q.lang]||q.lang||'') + (q.agent?' · '+q.agent:'') + (q.tier?' · '+q.tier:'') + (when?' · '+when:'') + '</div>' +
+      '</div>';
+    }).join('');
   }
 
-  var box = document.getElementById('missed-q-list');
-  if(!box) return;
-  if(!list.length){
-    box.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">'+RizqI18n.t2('لا توجد أسئلة فائتة حالياً 🎉','Aucune question manquée pour le moment 🎉')+'</div>';
-    return;
-  }
-  var langLabel = {ar:RizqI18n.t2('عربي','Arabe'),fr:RizqI18n.t2('فرنسي','Français'),es:RizqI18n.t2('إسباني','Espagnol'),en:RizqI18n.t2('إنجليزي','Anglais'),hs:RizqI18n.t2('حسانية','Hassanya')};
-  var _mqLoc = (window.RizqI18n && RizqI18n.getLang()==='fr') ? 'fr-FR' : 'ar-MA-u-nu-latn';
-  // شارات التصعيد — كانت رسائل الوكيل (احتيال/VIP/محتوى محظور) تُسجَّل هنا بنفس شكل
-  // "الأسئلة الفائتة" العادية دون أي تمييز؛ الآن نُبرز الحالات العاجلة أولاً بلون تحذيري
-  var urgentLabel = {
-    urgent_fraud: RizqI18n.t2('⚠️ بلاغ احتيال/مشكلة','⚠️ Signalement fraude/problème'),
-    urgent_vip:   RizqI18n.t2('💎 طلب VIP (الماسية)','💎 Demande VIP (Diamant)'),
-    blocked:      RizqI18n.t2('🚫 محتوى محظور/محاولة اختراق','🚫 Contenu bloqué/tentative')
-  };
-  var sorted = list.slice().sort(function(a,b){
-    var au = a.type && a.type!=='missed' ? 1 : 0;
-    var bu = b.type && b.type!=='missed' ? 1 : 0;
-    return bu - au;
-  });
-  box.innerHTML = sorted.map(function(q){
-    var d = new Date(q.at);
-    var when = isNaN(d) ? '' : d.toLocaleString(_mqLoc);
-    var badge = urgentLabel[q.type] || '';
-    return '<div style="background:#fff;border:1px solid '+(badge?'rgba(220,38,38,.35)':'rgba(27,58,107,.1)')+';border-radius:12px;padding:14px;margin-bottom:10px'+(badge?';box-shadow:0 0 0 1px rgba(220,38,38,.08)':'')+'">' +
-      (badge ? '<div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:6px">'+badge+'</div>' : '') +
-      '<div style="font-size:14px;color:#1f2937;font-weight:600;margin-bottom:6px">' + String(q.text||'').replace(/</g,'&lt;') + '</div>' +
-      '<div style="font-size:11px;color:#9ca3af">' + (langLabel[q.lang]||q.lang||'') + (q.tier?' · '+q.tier:'') + (when?' · '+when:'') + '</div>' +
-    '</div>';
-  }).join('');
+  paint(localList);
+  fetch(_adminBackendBase() + '/api/admin/agent-misses?limit=100', { headers: _adminAuthHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || !data.ok) return;
+      var seen = {};
+      var merged = [];
+      (data.misses || []).concat(localList).forEach(function(item){
+        var key = String(item.text||'') + '|' + String(item.at||'');
+        if(seen[key]) return;
+        seen[key] = 1;
+        merged.push(item);
+      });
+      paint(merged.slice(0, 200));
+    }).catch(function(){});
 }
 
 function clearMissedQuestions(){
   if(!confirm(RizqI18n.t2('مسح جميع الأسئلة الفائتة؟','Effacer toutes les questions manquées ?'))) return;
   localStorage.removeItem('rizq_missed_questions');
-  renderMissedQuestions();
+  fetch(_adminBackendBase() + '/api/admin/agent-misses', {
+    method: 'DELETE',
+    headers: _adminAuthHeaders()
+  }).catch(function(){}).finally(function(){
+    renderMissedQuestions();
+    if(typeof agentsHubRefresh==='function') agentsHubRefresh();
+  });
 }
 
 function _initAiTest(cfg){
@@ -8349,6 +8422,151 @@ function _quotaBar(pct, label){
     '<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px"><span>'+label+'</span><span style="font-weight:700;color:'+col+'">'+p+'%</span></div>'+
     '<div style="height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';border-radius:99px"></div></div>'+
     '</div>';
+}
+
+/* ══ مركز تسيير الوكلاء ══ */
+var _agentsHubData = null;
+var _AGENTS_HUB_TOGGLE_KEYS = [
+  { key: 'widgetEnabled', label: 'ويدجت الدردشة / مدير رزق' },
+  { key: 'brainEnabled', label: 'عقل القنوات (اتصال/واتساب/بريد)' },
+  { key: 'subscriberEnabled', label: 'وكلاء الباقة الماسية' },
+  { key: 'marketingEnabled', label: 'مدير التسويق' },
+  { key: 'inquiryAutoReplyEnabled', label: 'رد تلقائي على الاستفسارات' },
+  { key: 'investmentEnabled', label: 'غرفة الاستثمارات' },
+  { key: 'qualityLoggingEnabled', label: 'تسجيل الأسئلة الفائتة / جودة الردود' }
+];
+
+function agentsHubEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function agentsHubRefresh() {
+  return fetch(_adminBackendBase() + '/api/admin/agents-ops', { headers: _adminAuthHeaders() })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || !data.ok) throw new Error((data && data.error) || 'فشل التحميل');
+      _agentsHubData = data;
+      agentsHubRender(data);
+      if (typeof renderMissedQuestions === 'function') renderMissedQuestions();
+    })
+    .catch(function (err) {
+      var el = document.getElementById('agents-hub-families');
+      if (el) el.innerHTML = '<div style="color:#b91c1c;padding:12px">' + agentsHubEsc(err.message) + '</div>';
+    });
+}
+
+function agentsHubRender(data) {
+  var st = document.getElementById('agents-hub-status');
+  if (st) {
+    function card(v, l, ok) {
+      var col = ok === false ? '#b91c1c' : (ok === true ? '#059669' : '#1B3A6B');
+      return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:12px;padding:12px;text-align:center">' +
+        '<div style="font-size:16px;font-weight:800;color:' + col + '">' + v + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:3px">' + l + '</div></div>';
+    }
+    st.innerHTML =
+      card(data.claudeConfigured ? 'جاهز' : 'ناقص', 'Claude', !!data.claudeConfigured) +
+      card(data.sharedSecretConfigured ? 'جاهز' : 'ناقص', 'السر المشترك', !!data.sharedSecretConfigured) +
+      card(data.facebookConfigured ? 'جاهز' : 'اختياري', 'فيسبوك', data.facebookConfigured ? true : null) +
+      card(data.missCount || 0, 'أسئلة فائتة', (data.missCount || 0) > 0 ? false : true) +
+      card((data.model || '—').replace(/^claude-/, ''), 'النموذج');
+  }
+
+  var badge = document.getElementById('agents-hub-badge');
+  if (badge) {
+    var n = data.missCount || 0;
+    badge.textContent = n;
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+  }
+  var aiBadge = document.getElementById('ai-missed-badge');
+  if (aiBadge && (data.missCount || 0) > 0) {
+    aiBadge.textContent = data.missCount;
+    aiBadge.style.display = 'inline-flex';
+  }
+
+  var toggles = document.getElementById('agents-hub-toggles');
+  if (toggles) {
+    var s = data.settings || {};
+    toggles.innerHTML = _AGENTS_HUB_TOGGLE_KEYS.map(function (t) {
+      var on = s[t.key] !== false;
+      return '<label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;background:#f8faff;border:1px solid rgba(27,58,107,.08);border-radius:10px;cursor:pointer">' +
+        '<span style="font-size:13px;color:#1B3A6B;font-weight:600">' + agentsHubEsc(t.label) + '</span>' +
+        '<input type="checkbox" data-ops-key="' + t.key + '" ' + (on ? 'checked' : '') + ' style="width:18px;height:18px;accent-color:#0e7490"/></label>';
+    }).join('');
+  }
+
+  var links = document.getElementById('agents-hub-links');
+  if (links) {
+    links.innerHTML = (data.links || []).map(function (l) {
+      return '<button type="button" onclick="showPanel(\'' + agentsHubEsc(l.panel) + '\')" style="text-align:right;padding:10px 12px;background:#f8faff;border:1px solid rgba(27,58,107,.12);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#1B3A6B">' +
+        agentsHubEsc(l.labelAr) + ' ←</button>';
+    }).join('');
+  }
+
+  var fam = document.getElementById('agents-hub-families');
+  if (fam) {
+    fam.innerHTML = (data.families || []).map(function (f) {
+      var status = f.ready ? '<span style="color:#059669;font-weight:700">جاهز</span>' : (f.enabled === false ? '<span style="color:#b45309;font-weight:700">موقّف</span>' : '<span style="color:#b91c1c;font-weight:700">غير جاهز</span>');
+      var openBtn = f.panel
+        ? '<button type="button" onclick="showPanel(\'' + agentsHubEsc(f.panel) + '\')" style="padding:5px 10px;border:1px solid #d1d5db;background:#fff;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">فتح</button>'
+        : '';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 4px;border-bottom:1px solid #f1f5f9">' +
+        '<div><div style="font-weight:700;color:#1B3A6B;font-size:13.5px">' + agentsHubEsc(f.nameAr) + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:3px">' + agentsHubEsc(f.extra || f.note || (f.needsClaude ? 'يحتاج Claude' : 'قواعد محلية')) + '</div></div>' +
+        '<div style="display:flex;align-items:center;gap:10px">' + status + openBtn + '</div></div>';
+    }).join('') || '<div style="padding:16px">لا بيانات</div>';
+  }
+
+  var misses = document.getElementById('agents-hub-misses');
+  if (misses) {
+    var list = data.missesPreview || [];
+    if (!list.length) {
+      misses.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">لا توجد أسئلة فائتة على الخادم 🎉</div>';
+    } else {
+      misses.innerHTML = list.map(function (m) {
+        return '<div style="padding:10px 0;border-bottom:1px solid #f1f5f9">' +
+          '<div style="font-size:13px;color:#1B3A6B;font-weight:600">' + agentsHubEsc(m.text) + '</div>' +
+          '<div style="font-size:11px;color:#94a3b8;margin-top:4px">' + agentsHubEsc(m.agent || '') + ' · ' + agentsHubEsc(m.type || '') + ' · ' + agentsHubEsc(m.at || '') + '</div></div>';
+      }).join('');
+    }
+  }
+}
+
+function agentsHubSaveToggles() {
+  var body = {};
+  document.querySelectorAll('#agents-hub-toggles input[data-ops-key]').forEach(function (el) {
+    body[el.getAttribute('data-ops-key')] = !!el.checked;
+  });
+  fetch(_adminBackendBase() + '/api/admin/agents-ops', {
+    method: 'PATCH',
+    headers: _adminAuthHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(body),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && data.error) || 'فشل الحفظ');
+    _agentsHubData = data.dashboard || data;
+    if (data.dashboard) agentsHubRender(data.dashboard);
+    var msg = document.getElementById('agents-hub-save-msg');
+    if (msg) { msg.style.display = 'inline'; setTimeout(function () { msg.style.display = 'none'; }, 2000); }
+    if (typeof showToast === 'function') showToast('✅ تم حفظ إعدادات الوكلاء', 'success');
+  }).catch(function (err) {
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
+}
+
+function agentsHubClearMisses() {
+  if (!confirm('مسح كل الأسئلة الفائتة من الخادم؟')) return;
+  fetch(_adminBackendBase() + '/api/admin/agent-misses', {
+    method: 'DELETE',
+    headers: _adminAuthHeaders(),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && data.error) || 'فشل المسح');
+    try { localStorage.removeItem('rizq_missed_questions'); } catch (e) {}
+    agentsHubRefresh();
+    if (typeof renderMissedQuestions === 'function') renderMissedQuestions();
+    if (typeof showToast === 'function') showToast('🗑️ تم المسح', 'success');
+  }).catch(function (err) {
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
 }
 
 /* ══ مدير التسويق — لوحة الأدمن ══ */

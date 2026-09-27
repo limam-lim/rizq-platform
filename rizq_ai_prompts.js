@@ -225,13 +225,14 @@ const CORE_RULES = `
 1. رد دائماً بنفس لغة المستخدم (عربية، حسانية، فرنسية، إنجليزية، إسبانية) — كشف تلقائي من رسالته، لا من لغة الصفحة فقط
 2. افهم الطلبات المختصرة والعامية في سياق النشاط (كم، prix، price، شنو، كيفاش...)
 3. لا تشارك معلومات خاصة بمنشآت أخرى
-4. إذا لم تعرف الإجابة قل: "سأتحقق وأعود إليك" ثم أعطِ رقم التواصل
-5. لا تعطِ وعوداً لا تستطيع الوفاء بها
+4. إذا لم تعرف الإجابة قل بوضوح أنك ستتحقق، ثم أعطِ رقم/قناة التواصل الرسمية للمنشأة — ممنوع اختلاق أسعار أو مواعيد
+5. لا تعطِ وعوداً لا تستطيع الوفاء بها (لا عائد مضمون، لا خصم غير مصرّح، لا مخزون وهمي)
 6. عند الطلب أو الشراء، اجمع: الاسم + رقم الهاتف + التفاصيل
 7. إذا كان الزبون غاضباً: أعتذر أولاً ثم حل المشكلة
 8. لا تُفصح عن أنك AI إلا إذا سُئلت مباشرة — ولا تذكر أبداً أسماء نماذج أو مزوّدين تقنيين (Sonnet, Claude, Anthropic…)؛ استخدم «النائب الذكي» فقط
-9. الردود مختصرة وواضحة — لا إطالة غير ضرورية
-10. عند انتهاء المحادثة: "شكراً لتواصلك مع [اسم المنشأة] 🌟"
+9. الردود مختصرة وواضحة وحاسمة — ابدأ بالجواب ثم خطوة تالية واحدة
+10. اعتمد فقط على ملف المنشأة + المعرفة الديناميكية المعطاة لك؛ إن نقصت معلومة فلا تخمّن
+11. عند انتهاء المحادثة: "شكراً لتواصلك مع [اسم المنشأة] 🌟"
 `;
 
 function buildCommercialLoyaltyBlock(profile) {
@@ -346,8 +347,14 @@ function buildSystemPrompt(profile, opts) {
   var dynamicBlock = buildDynamicKnowledgeBlock(profile, opts.formatDynamicKnowledge);
   var customBlock = buildCustomInstructionsBlock(profile);
   var loyalty = buildCommercialLoyaltyBlock(profile);
+  var excellence = '';
+  try {
+    excellence = require('./rizq-backend/services/agentQuality').buildIntelligenceExcellenceBlock({ mode: 'merchant' });
+  } catch (e) {
+    excellence = '';
+  }
 
-  return [header, businessInfo, products, faqs, policies, channels, dynamicBlock, customBlock, loyalty, CORE_RULES]
+  return [header, businessInfo, products, faqs, policies, channels, dynamicBlock, customBlock, loyalty, excellence, CORE_RULES]
     .filter(Boolean).join('\n');
 }
 

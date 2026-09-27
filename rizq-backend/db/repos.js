@@ -170,6 +170,16 @@ const marketingSettings = createCollection('marketing_settings', {
   onBackup: singletonBackup,
 });
 
+const agentMisses = createCollection('agent_misses', {
+  backupFile: 'agent-misses.json',
+  onBackup: arrayBackup,
+});
+
+const agentOpsSettings = createCollection('agent_ops_settings', {
+  backupFile: 'agent-ops-settings.json',
+  onBackup: singletonBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -408,6 +418,8 @@ function migrateAllSecondaryStores() {
 
   marketingCampaigns.migrateFromArray(p('marketing-campaigns.json'), 'id');
   marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
+  agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
+  agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
 
   return {
     packages: packages.count(),
@@ -478,6 +490,8 @@ module.exports = {
   subscribers,
   marketingCampaigns,
   marketingSettings,
+  agentMisses,
+  agentOpsSettings,
 
   getSiteConfig,
   saveSiteConfig,

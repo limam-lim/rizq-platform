@@ -752,16 +752,32 @@ function _logMissedQuestion(text, lang, context, type){
   try {
     var KEY = 'rizq_missed_questions';
     var list = JSON.parse(localStorage.getItem(KEY) || '[]');
-    list.unshift({
+    var entry = {
       text: String(text || '').slice(0, 300),
       lang: lang || 'ar',
       tier: (context && context.tier) || '',
       type: type || 'missed',
       page: (typeof location !== 'undefined' ? location.pathname : ''),
-      at: new Date().toISOString()
-    });
+      at: new Date().toISOString(),
+      agent: 'manager_offline'
+    };
+    list.unshift(entry);
     if (list.length > 200) list = list.slice(0, 200);
     localStorage.setItem(KEY, JSON.stringify(list));
+    // مزامنة مع الخادم إن توفّر — تعلّم موحّد لكل الأجهزة
+    try {
+      var base = (typeof window !== 'undefined' && window.RIZQ_BACKEND_BASE)
+        ? String(window.RIZQ_BACKEND_BASE).replace(/\/$/, '')
+        : '';
+      if (base && typeof fetch === 'function') {
+        fetch(base + '/api/agent/miss', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry),
+          keepalive: true
+        }).catch(function () {});
+      }
+    } catch (eSync) {}
   } catch (e) {}
 }
 

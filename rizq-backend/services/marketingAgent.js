@@ -120,6 +120,15 @@ function scoreCreative(body, opts) {
     notes.push('عبارة محظورة: ' + forbiddenHit);
   }
 
+  try {
+    const aq = require('./agentQuality');
+    const claim = aq.findForbiddenClaim(text);
+    if (claim) {
+      score = Math.max(0, score - 20);
+      notes.push('ادعاء محظور (عائد/ضمان)');
+    }
+  } catch (e) { /* optional */ }
+
   const bangs = countMatches(text, /!/g);
   if (bangs <= rules.maxExclamationMarks) {
     score += w.noSpamPunctuation;
@@ -183,6 +192,10 @@ function countDraftsToday() {
 
 function buildSystemPrompt() {
   const b = cfg.BRAND;
+  let excellence = '';
+  try {
+    excellence = require('./agentQuality').buildIntelligenceExcellenceBlock({ mode: 'marketing' });
+  } catch (e) { excellence = ''; }
   return [
     'أنت مدير التسويق الرسمي لمنصة «رزق» (Rizq) التابعة لـ ' + b.legalName + '.',
     'السوق: ' + b.market + '. الموقع: ' + b.siteUrl,
@@ -193,8 +206,9 @@ function buildSystemPrompt() {
     '',
     'ممنوع تماماً: ' + b.forbidden.join(' · '),
     'يجب ذكر «رزق» أو Rizq في النص الرئيسي.',
+    excellence,
     'أرجع JSON فقط بالشكل المطلوب — بلا markdown.',
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 function buildUserPrompt(input) {
@@ -356,6 +370,16 @@ async function generateCreative(input) {
 }
 
 async function createDraftCampaign(input, adminUser) {
+  try {
+    const ops = require('./agentOps');
+    if (!ops.isAgentFamilyEnabled('marketing')) {
+      const err = new Error('مدير التسويق موقّف من مركز تسيير الوكلاء');
+      err.code = 'disabled';
+      throw err;
+    }
+  } catch (eOps) {
+    if (eOps && eOps.code === 'disabled') throw eOps;
+  }
   const settings = getSettings();
   if (!settings.enabled) {
     const err = new Error('مدير التسويق معطّل من الإعدادات');

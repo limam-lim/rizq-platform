@@ -457,6 +457,18 @@ function applyOfficialLeadConfirmation(replyText, toolResultsRaw, lang) {
 }
 
 async function handleWidgetChat(body) {
+  try {
+    const ops = require('./agentOps');
+    if (!ops.isAgentFamilyEnabled('widget')) {
+      const err = new Error('وكيل الدردشة موقّف مؤقتاً من لوحة الإدارة');
+      err.status = 503;
+      err.code = 'agent_disabled';
+      throw err;
+    }
+  } catch (eOps) {
+    if (eOps && eOps.code === 'agent_disabled') throw eOps;
+  }
+
   const { message, lang, profile, history, pageContext, attachment: attachmentRaw } = body || {};
   let attachment = attachmentRaw ? normalizeAttachment(attachmentRaw) : null;
   if (attachment && attachment.error) {
@@ -686,6 +698,35 @@ async function handleWidgetChat(body) {
     ? toolResultsRaw.concat([autoLead])
     : toolResultsRaw;
   validated.reply = formatPlainChatText(applyOfficialLeadConfirmation(validated.reply, leadResultsForReply, detectedLang));
+
+  try {
+    const aq = require('./agentQuality');
+    if (!validated.grounded && (isAdSpecificQuery(text) || isPlatformOrPackageQuery(text))) {
+      aq.maybeRecordWeakReply({
+        message: text,
+        reply: validated.reply,
+        agent: 'widget',
+        channel: 'widget',
+        lang: detectedLang,
+        grounded: false,
+        reason: 'ungrounded_widget',
+      });
+    }
+    const claim = aq.stripForbiddenClaims(validated.reply, detectedLang);
+    if (claim.scrubbed) {
+      validated.reply = claim.text;
+      validated.grounded = false;
+      aq.maybeRecordWeakReply({
+        message: text,
+        reply: validated.reply,
+        agent: 'widget',
+        channel: 'widget',
+        lang: detectedLang,
+        scrubbedClaim: true,
+        force: true,
+      });
+    }
+  } catch (eQ) { /* optional */ }
 
   return {
     ok: true,
