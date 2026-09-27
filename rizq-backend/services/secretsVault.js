@@ -143,7 +143,7 @@ function maskSecret(value, isSecret) {
   };
 }
 
-function applySecretsToEnv(map) {
+function applySecretsToEnv(map, clearedKeys) {
   const applied = [];
   Object.keys(map || {}).forEach((k) => {
     const v = String(map[k] == null ? '' : map[k]).trim();
@@ -151,6 +151,10 @@ function applySecretsToEnv(map) {
     if (!/^[A-Z][A-Z0-9_]*$/.test(k)) return;
     process.env[k] = v;
     applied.push(k);
+  });
+  (clearedKeys || []).forEach((k) => {
+    if (!/^[A-Z][A-Z0-9_]*$/.test(k)) return;
+    delete process.env[k];
   });
   // مزامنة بديل Claude
   if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
@@ -174,7 +178,7 @@ function escapeEnvValue(v) {
   return s;
 }
 
-function syncEnvFile(map) {
+function syncEnvFile(map, clearedKeys) {
   const envPath = path.join(__dirname, '..', '.env');
   let lines = [];
   if (fs.existsSync(envPath)) {
@@ -191,15 +195,26 @@ function syncEnvFile(map) {
     const v = String(map[k] == null ? '' : map[k]).trim();
     return v && /^[A-Z][A-Z0-9_]*$/.test(k);
   });
+  const keysToClear = new Set(
+    (clearedKeys || []).filter((k) => /^[A-Z][A-Z0-9_]*$/.test(k))
+  );
 
   const seen = new Set();
-  const out = lines.map((line) => {
+  const out = [];
+  lines.forEach((line) => {
     const m = line.match(/^([A-Z][A-Z0-9_]*)=(.*)$/);
-    if (!m) return line;
+    if (!m) {
+      out.push(line);
+      return;
+    }
     const key = m[1];
-    if (keysToWrite.indexOf(key) === -1) return line;
+    if (keysToClear.has(key)) return; // احذف السطر عند المسح الصريح
+    if (keysToWrite.indexOf(key) === -1) {
+      out.push(line);
+      return;
+    }
     seen.add(key);
-    return key + '=' + escapeEnvValue(String(map[key]).trim());
+    out.push(key + '=' + escapeEnvValue(String(map[key]).trim()));
   });
 
   keysToWrite.forEach((key) => {
@@ -333,10 +348,10 @@ function saveSecrets(body, adminUser) {
   };
   writeVaultStore(store);
 
-  const applied = applySecretsToEnv(map);
+  const applied = applySecretsToEnv(map, cleared);
   let envPath = null;
   try {
-    envPath = syncEnvFile(map);
+    envPath = syncEnvFile(map, cleared);
   } catch (e) {
     console.warn('[secretsVault] .env sync failed:', e.message);
   }
