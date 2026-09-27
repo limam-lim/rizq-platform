@@ -947,9 +947,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
 }
 
-/* ════════════ TABLET 769–1100: two-row nav — ALL buttons visible ════════════
-   Must come AFTER desktop grid (height:70 / 3-col) so it overrides.
-   الصفحة الرئيسية كما كانت قبل محاذاة الصف الواحد. */
+/* ════════════ TABLET 769–1100: صف تنقّل واحد قابل للتمرير (بدون تكديس) ════════════
+   Must come AFTER desktop grid (height:70 / 3-col) so it overrides. */
 @media (min-width:769px) and (max-width:1100px) and (min-height:501px){
   html.rizq-app-nav #nav,
   html.rizq-app-nav #rizq-desk-nav{
@@ -991,14 +990,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:100% !important;
     max-width:100% !important;
     display:flex !important;
-    flex-wrap:wrap !important;
-    justify-content:center !important;
+    /* صف واحد قابل للتمرير بدل تكديس الأزرار فوق بعضها */
+    flex-wrap:nowrap !important;
+    justify-content:flex-start !important;
     align-items:center !important;
-    gap:2px 4px !important;
-    overflow:visible !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:none !important;
     min-width:0 !important;
-    padding:4px 0 2px !important;
+    padding:6px 4px 4px !important;
   }
+  html.rizq-app-nav #nav > .nav-center::-webkit-scrollbar,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center::-webkit-scrollbar{display:none !important}
   html.rizq-app-nav #nav .nav-center > li,
   html.rizq-app-nav #rizq-desk-nav .nav-center > li,
   html.rizq-app-nav #nav .nav-center > li[data-nav-order="1"],
@@ -1017,21 +1022,22 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn,
   html.rizq-app-nav #rizq-desk-nav .nav-center a,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
-    padding:7px 10px !important;
-    font-size:13px !important;
+    padding:8px 12px !important;
+    font-size:13.5px !important;
     white-space:nowrap !important;
+    flex:0 0 auto !important;
   }
   html.rizq-app-nav #nav .nav-fav-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{
     display:inline !important;
   }
-  /* content clearance under taller tablet header — دون صفحات التسجيل */
+  /* content clearance تحت صفّ التنقّل — دون صفحات التسجيل */
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
-    padding-top:118px !important;
+    padding-top:108px !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:118px !important;
+    padding-top:108px !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,
@@ -1243,15 +1249,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
     order:3 !important;
     flex:0 0 100% !important;
-    width:calc(100% - 20px) !important;
+    width:calc(100% - 16px) !important;
     max-width:100% !important;
     display:flex !important;
+    flex-wrap:nowrap !important;
     align-items:center !important;
     justify-content:flex-start !important;
-    height:44px !important;
-    padding:3px 6px !important;
-    margin:4px 10px 6px !important;
-    gap:4px !important;
+    height:48px !important;
+    padding:4px 8px !important;
+    margin:4px 8px 8px !important;
+    gap:8px !important;
     direction:inherit !important;
     overflow-x:auto !important;
     overflow-y:hidden !important;
@@ -1278,6 +1285,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
     display:flex !important;
     flex:0 0 auto !important;
+    width:auto !important;
     min-width:0;
     list-style:none;
     justify-content:center;
@@ -1291,22 +1299,23 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     align-items:center !important;
     justify-content:center !important;
     gap:0 !important;
-    padding:7px 10px !important;
-    background:transparent !important;
-    border:none !important;
+    padding:8px 14px !important;
+    background:rgba(255,255,255,.04) !important;
+    border:1px solid rgba(255,255,255,.14) !important;
     cursor:pointer;
     color:rgba(255,255,255,.92) !important;
     text-decoration:none;
     font-family:inherit;
-    font-size:12px !important;
+    font-size:12.5px !important;
     font-weight:700 !important;
     letter-spacing:.15px;
     min-width:0;
     width:auto !important;
-    flex:1 1 0 !important;
+    /* لا تمدّد الأزرار حتى تتلاصق — حجم طبيعي + تمرير أفقي */
+    flex:0 0 auto !important;
     border-radius:999px !important;
     line-height:1.15 !important;
-    white-space:nowrap;
+    white-space:nowrap !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.is-active,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn.is-active,
