@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=21.4"/>
+<link rel="stylesheet" href="rizq_header.css?v=21.5"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -8099,9 +8099,21 @@ function positionNavDropdown(li){
     return;
   }
   if(menu.parentNode!==li && menu.parentNode!==document.body) li.appendChild(menu);
-  /* سطح المكتب/تابلت: القائمة تخرج من .nav-center (overflow يقصّها) → body + fixed */
-  var trigger=li.querySelector('.nav-dropdown-trigger,.nav-desktop-more-only,#nav-more-mobile-btn,.nav-link-btn')||li;
+  /* سطح المكتب/تابلت: القائمة تخرج من .nav-center (overflow يقصّها) → body + fixed.
+     لا تستخدم زر الهاتف المخفي (#nav-more-mobile-btn) لحساب الموضع — يأتي أولاً في DOM
+     وgetBoundingClientRect() يعطي 0 فيُثبَّت القائمة أعلى اليسار. */
+  var nodes=li.querySelectorAll('.nav-dropdown-trigger,.nav-desktop-more-only,#rizq-desk-more,#nav-more-mobile-btn,.nav-phone-more-only,.nav-link-btn');
+  var trigger=null,i,r;
+  for(i=0;i<nodes.length;i++){
+    r=nodes[i].getBoundingClientRect();
+    if(r.width>1 && r.height>1){ trigger=nodes[i]; break; }
+  }
+  if(!trigger) trigger=li.querySelector('.nav-dropdown-trigger,.nav-desktop-more-only')||li;
   var rect=trigger.getBoundingClientRect();
+  if(!(rect.width>1 && rect.height>1)){
+    var navRow=document.getElementById('nav')||li;
+    rect=navRow.getBoundingClientRect();
+  }
   if(menu.parentNode!==document.body){
     menu.__rizqMoreHome=li;
     menu.setAttribute('data-rizq-more-for',li.id||'nav-more-li');
@@ -8111,7 +8123,7 @@ function positionNavDropdown(li){
   menu.classList.add('rizq-more-menu-open');
   var top=Math.round(rect.bottom+6);
   var centerX=Math.round(rect.left+rect.width/2);
-  var menuW=Math.min(300,Math.max(240,window.innerWidth-24));
+  var menuW=Math.min(300,Math.max(240,Math.min(window.innerWidth-24,280)));
   var left=Math.max(12,Math.min(centerX-menuW/2,window.innerWidth-menuW-12));
   menu.style.cssText='position:fixed!important;top:'+top+'px!important;left:'+left+'px!important;right:auto!important;bottom:auto!important;transform:none!important;width:'+menuW+'px!important;max-width:min(300px,calc(100vw - 24px))!important;max-height:min(70vh,480px)!important;overflow-y:auto!important;overflow-x:hidden!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;border-radius:14px!important;padding:8px!important;box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
 }
@@ -8156,13 +8168,32 @@ window.closeNavDropdowns=closeNavDropdowns;
   if(!li) return;
   var closeT=null;
   function isDesk(){ try{ return window.matchMedia('(min-width:769px)').matches; }catch(e){ return true; } }
+  function menuEl(){
+    return li.querySelector('.nav-dropdown-menu')||document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'nav-more-li')+'"]');
+  }
   li.addEventListener('mouseenter',function(){
     if(!isDesk()) return;
     clearTimeout(closeT);
     positionNavDropdown(li);
   });
-  li.addEventListener('mouseleave',function(){
+  li.addEventListener('mouseleave',function(e){
     if(!isDesk()) return;
+    var m=menuEl();
+    if(m && e.relatedTarget && m.contains(e.relatedTarget)) return;
+    closeT=setTimeout(closeNavDropdowns,120);
+  });
+  document.addEventListener('mouseover',function(e){
+    if(!isDesk()) return;
+    var m=menuEl();
+    if(!m || !li.classList.contains('open')) return;
+    if(m.contains(e.target) || li.contains(e.target)) clearTimeout(closeT);
+  });
+  document.addEventListener('mouseout',function(e){
+    if(!isDesk()) return;
+    if(!li.classList.contains('open')) return;
+    var m=menuEl();
+    var to=e.relatedTarget;
+    if(to && (li.contains(to) || (m && m.contains(to)))) return;
     closeT=setTimeout(closeNavDropdowns,120);
   });
 })();

@@ -937,6 +937,25 @@
       + 'z-index:10052!important;display:block!important;';
   }
 
+  /* Prefer the visible trigger — on landing, #nav-more-mobile-btn comes first in
+     the DOM but is display:none on desk/tablet, so getBoundingClientRect() is 0
+     and the menu was pinned at top≈6 / left≈12. */
+  function visibleMoreTrigger(li) {
+    if (!li) return null;
+    var nodes = li.querySelectorAll(
+      '.nav-dropdown-trigger, #rizq-desk-more, .nav-desktop-more-only, #nav-more-mobile-btn, .nav-phone-more-only, .nav-link-btn'
+    );
+    var i;
+    var el;
+    var r;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      r = el.getBoundingClientRect();
+      if (r.width > 1 && r.height > 1) return el;
+    }
+    return li.querySelector('.nav-dropdown-trigger, #rizq-desk-more') || li;
+  }
+
   function positionMoreDropdown(li) {
     if (!li) return;
     if (isLanding() && isMobileNav() && li.id === 'nav-more-li') {
@@ -945,8 +964,13 @@
     }
     var menu = moreMenuFor(li);
     if (!menu) return;
-    var trigger = li.querySelector('.nav-dropdown-trigger, #rizq-desk-more, .nav-phone-more-only, .nav-link-btn') || li;
+    var trigger = visibleMoreTrigger(li);
     var rect = trigger.getBoundingClientRect();
+    if (!(rect.width > 1 && rect.height > 1)) {
+      /* Fallback: center under the nav row if trigger still has no box. */
+      var nav = document.getElementById('nav') || document.getElementById('rizq-desk-nav') || li;
+      rect = nav.getBoundingClientRect();
+    }
     if (menu.parentNode !== document.body) {
       menu.__rizqMoreHome = li;
       menu.setAttribute('data-rizq-more-for', li.id || 'more-li');
@@ -956,7 +980,7 @@
     menu.classList.add('rizq-more-menu-open');
     var top = Math.round(rect.bottom + 6);
     var centerX = Math.round(rect.left + rect.width / 2);
-    var menuW = Math.min(300, Math.max(240, window.innerWidth - 24));
+    var menuW = Math.min(300, Math.max(240, Math.min(window.innerWidth - 24, 280)));
     var left = Math.max(12, Math.min(centerX - menuW / 2, window.innerWidth - menuW - 12));
     menu.style.cssText = ''
       + 'position:fixed!important;top:' + top + 'px!important;'
