@@ -2624,9 +2624,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </style>
 <script>
 (function(){
+  /* شريط معاينة داخلي فقط — لا يظهر للزائر إلا بـ ?adsPreview=1 */
   try{
+    var q = new URLSearchParams(location.search || '');
+    if (q.get('adsPreview') !== '1') return;
     if(sessionStorage.getItem('rizq_ads_preview_hide')==='1') return;
-  }catch(e){}
+  }catch(e){ return; }
   var b=document.getElementById('rizq-ads-preview-banner');
   var t=document.getElementById('rizq-ads-preview-text');
   var d=document.getElementById('rizq-ads-preview-dismiss');
