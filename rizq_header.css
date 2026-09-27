@@ -336,8 +336,8 @@ body[data-t-ns="store"] .rizq-hdr-store-wish{
   color:#C9A84C !important;
   box-shadow:none;
 }
-.rizq-hdr-item.is-active .rizq-hdr-lbl,
-.rizq-hdr-item.is-active .rizq-hdr-ico{color:#C9A84C !important}
+.rizq-hdr-item.is-active .rizq-hdr-lbl{color:#C9A84C !important}
+.rizq-hdr-item.is-active .rizq-hdr-ico{filter:none !important;color:inherit}
 .rizq-hdr-post{
   display:flex;align-items:center;justify-content:center;
   background:#C9A84C;color:#0f172a;border:none;
@@ -647,9 +647,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:block !important;
     font-size:22px !important;
     line-height:1 !important;
-    color:#ffffff !important;
-    /* أبيض تقريبي للأيقونات الإيموجي */
-    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    /* ألوان الإيموجي الطبيعية — بدون grayscale/sepia */
+    filter:none !important;
+    color:inherit;
     pointer-events:none;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
@@ -737,8 +737,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico{
-    color:var(--rizq-almazdi,#C9A84C) !important;
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
+    filter:none !important;
+    color:inherit;
   }
   html.rizq-app-nav #nav .nav-center a.is-active:hover,
   html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active:hover,
@@ -1431,7 +1431,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:block !important;
     font-size:20px !important;
     line-height:1 !important;
-    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    filter:none !important;
+    color:inherit;
     pointer-events:none;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a .rizq-hdr-lbl,
@@ -1460,7 +1461,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.is-active .rizq-hdr-ico,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only.is-active .rizq-hdr-ico{
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
+    filter:none !important;
+    color:inherit;
   }
   /* نموذج 3: أيقونة فوق النص — لا نخفي الأيقونات */
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center li[data-nav-order="1"] > a::before,
@@ -1734,7 +1736,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   .rizq-hdr-item .rizq-hdr-ico{
     font-size:20px;
     line-height:1;
-    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    filter:none !important;
+    color:inherit;
     pointer-events:none;
   }
   .rizq-hdr-item .rizq-hdr-lbl{
@@ -1754,7 +1757,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     background:transparent !important;
   }
   .rizq-hdr-item.is-active .rizq-hdr-ico{
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
+    filter:none !important;
+    color:inherit;
   }
   .rizq-hdr-post{
     flex:0 0 34px !important;
