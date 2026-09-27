@@ -1333,24 +1333,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
     order:3 !important;
     flex:0 0 100% !important;
-    width:calc(100% - 16px) !important;
+    width:100% !important;
     max-width:100% !important;
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center !important;
     justify-content:flex-start !important;
-    height:48px !important;
-    padding:4px 8px !important;
-    margin:4px 8px 8px !important;
-    gap:8px !important;
+    height:52px !important;
+    padding:4px 10px !important;
+    margin:2px 0 6px !important;
+    gap:14px !important;
     direction:inherit !important;
     overflow-x:auto !important;
     overflow-y:hidden !important;
     -webkit-overflow-scrolling:touch !important;
     scrollbar-width:none !important;
-    background:rgba(255,255,255,.06) !important;
-    border:1px solid rgba(201,168,76,.22) !important;
-    border-radius:999px !important;
+    background:transparent !important;
+    border:none !important;
+    border-radius:0 !important;
     box-sizing:border-box !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center::-webkit-scrollbar{display:none !important}
