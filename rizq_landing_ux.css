@@ -773,6 +773,16 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   background-repeat:no-repeat,repeat!important;
   background-blend-mode:normal!important;
 }
+/* منطقة الإيموجي/الصورة في شريط أحدث الإعلانات — كحلي لا أبيض */
+#hero-listings .ad-card .ad-card-img,
+#cards-track .ad-card .ad-card-img{
+  background:linear-gradient(160deg,rgba(7,17,31,.92),rgba(27,58,107,.55))!important;
+  color:#C9A84C!important;
+}
+#hero-listings .ad-card .ad-card-img::before,
+#cards-track .ad-card .ad-card-img::before{
+  background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(201,168,76,.12),transparent 60%)!important;
+}
 /* باقات الصفحة الرئيسية: لا تترك بطاقات بيضاء حتى لو بقي style قديم */
 .pricing-section .rpkg-card.pricing-card{
   color:#fff;
