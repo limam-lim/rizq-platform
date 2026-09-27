@@ -408,6 +408,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" data-admin-perm="channels" onclick="showPanel('channels',this)"><span class="sb-icon">📞</span><span class="sb-label" data-t="sb-channels">الهاتف والبريد والواتساب</span></div>
     <div class="sb-item" data-admin-perm="announcements" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
+    <div class="sb-item" data-admin-perm="*" onclick="showPanel('secrets-vault',this)" id="sb-secrets-vault"><span class="sb-icon">🔐</span><span class="sb-label" data-t="sb-secrets-vault">خزنة المفاتيح</span></div>
     <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('agents-hub',this)" id="sb-agents-hub"><span class="sb-icon">🎛️</span><span class="sb-label" data-t="sb-agents-hub">مركز تسيير الوكلاء</span><span class="sb-badge" id="agents-hub-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" data-admin-perm="marketing" onclick="showPanel('marketing',this)"><span class="sb-icon">📣</span><span class="sb-label" data-t="sb-marketing">مدير التسويق</span></div>
     <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
@@ -1396,6 +1397,38 @@ main, .page-content.active, .main-content, .results-area,
             <tbody id="ads-requests-tbody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ SECRETS VAULT (Super Admin only) ══ -->
+    <div class="panel" id="panel-secrets-vault">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="secrets-vault-h">🔐 خزنة المفاتيح</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="secrets-vault-sub">سوبر أدمن فقط — إدخال مفاتيح Claude / Twilio / فيسبوك / تيليغرام وحفظها مشفّرة على الخادم</p>
+        </div>
+        <button type="button" onclick="secretsVaultRefresh()" style="padding:9px 16px;background:#fff;border:1.5px solid rgba(27,58,107,.2);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--navy)">🔄 تحديث</button>
+      </div>
+
+      <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:#9a3412;line-height:1.7">
+        ⚠️ المفاتيح لا تُعرض كاملة بعد الحفظ (قناع فقط). اترك الحقل فارغاً للإبقاء على القيمة الحالية. اكتب <code>__CLEAR__</code> لمسح مفتاح من الخزنة.
+      </div>
+
+      <div id="secrets-vault-ready" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px"></div>
+      <div id="secrets-vault-form" style="display:flex;flex-direction:column;gap:14px"></div>
+
+      <div class="card" style="padding:16px;margin-top:16px">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:10px;font-size:14px">➕ مفتاح مخصص جديد</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <input id="sv-custom-key" dir="ltr" placeholder="MY_SERVICE_API_KEY" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:13px;font-family:monospace;text-align:left"/>
+          <button type="button" onclick="secretsVaultAddCustom()" style="padding:9px 16px;background:#fff;border:1.5px solid #d1d5db;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إضافة الخانة</button>
+        </div>
+        <div id="secrets-vault-custom" style="margin-top:12px"></div>
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button type="button" onclick="secretsVaultSave()" style="padding:11px 22px;background:linear-gradient(135deg,#1B3A6B,#0e7490);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ المفاتيح</button>
+        <span id="secrets-vault-msg" style="font-size:12px;color:#6b7280"></span>
       </div>
     </div>
 
@@ -2588,7 +2621,7 @@ const PANEL_PERM_KEYS = {
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
   'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
-  marketing: 'marketing', 'agents-hub': 'ai-manager',
+  marketing: 'marketing', 'agents-hub': 'ai-manager', 'secrets-vault': '*',
 };
 
 function _adminHasPerm(required) {
@@ -2947,7 +2980,7 @@ async function saveOwnAdminPassword(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing','agents-hub':'topbar-agents-hub'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing','agents-hub':'topbar-agents-hub','secrets-vault':'topbar-secrets-vault'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -3003,6 +3036,7 @@ function showPanel(id, navEl){
   if(id==='quota-guard'){ loadQuotaGuardPanel(); }
   if(id==='marketing'){ mktRefresh(); }
   if(id==='agents-hub'){ agentsHubRefresh(); }
+  if(id==='secrets-vault'){ secretsVaultRefresh(); }
   if(window.innerWidth<900)closeSidebar();
 }
 
@@ -8422,6 +8456,151 @@ function _quotaBar(pct, label){
     '<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px"><span>'+label+'</span><span style="font-weight:700;color:'+col+'">'+p+'%</span></div>'+
     '<div style="height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';border-radius:99px"></div></div>'+
     '</div>';
+}
+
+/* ══ خزنة المفاتيح — سوبر أدمن ══ */
+var _secretsVaultData = null;
+
+function secretsVaultEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function secretsVaultRefresh() {
+  if (!_adminHasPerm('*')) {
+    var form = document.getElementById('secrets-vault-form');
+    if (form) form.innerHTML = '<div style="color:#b91c1c;padding:16px">هذا القسم للسوبر أدمن فقط</div>';
+    return Promise.resolve();
+  }
+  return fetch(_adminBackendBase() + '/api/admin/secrets-vault', { headers: _adminAuthHeaders() })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || !data.ok) throw new Error((data && (data.msg || data.error)) || 'فشل التحميل');
+      _secretsVaultData = data;
+      secretsVaultRender(data);
+    })
+    .catch(function (err) {
+      var form = document.getElementById('secrets-vault-form');
+      if (form) form.innerHTML = '<div style="color:#b91c1c;padding:12px">' + secretsVaultEsc(err.message) + '</div>';
+    });
+}
+
+function secretsVaultRender(data) {
+  var ready = document.getElementById('secrets-vault-ready');
+  if (ready && data.readiness) {
+    function card(ok, label) {
+      return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:12px;padding:12px;text-align:center">' +
+        '<div style="font-size:15px;font-weight:800;color:' + (ok ? '#059669' : '#b91c1c') + '">' + (ok ? 'جاهز' : 'ناقص') + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:3px">' + label + '</div></div>';
+    }
+    ready.innerHTML =
+      card(!!data.readiness.claude, 'Claude') +
+      card(!!data.readiness.twilio, 'Twilio') +
+      card(!!data.readiness.facebook, 'فيسبوك') +
+      card(!!data.readiness.telegram, 'تيليغرام');
+  }
+
+  var form = document.getElementById('secrets-vault-form');
+  if (form) {
+    form.innerHTML = (data.groups || []).map(function (g) {
+      var fields = (g.fields || []).map(function (f) {
+        var hint = f.set
+          ? ('مضبوط الآن: <code dir="ltr">' + secretsVaultEsc(f.masked) + '</code> · المصدر: ' + secretsVaultEsc(f.source))
+          : 'غير مضبوط';
+        return '<div style="margin-bottom:10px">' +
+          '<label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:5px">' + secretsVaultEsc(f.labelAr) +
+          ' <span style="font-weight:500;color:#94a3b8;font-family:monospace;direction:ltr" dir="ltr">(' + secretsVaultEsc(f.key) + ')</span></label>' +
+          '<input class="sv-input" data-sv-key="' + secretsVaultEsc(f.key) + '" type="' + (f.secret ? 'password' : 'text') + '" dir="ltr" autocomplete="off" placeholder="' + secretsVaultEsc(f.placeholder || (f.set ? 'اتركه فارغاً للإبقاء على الحالي' : '')) + '" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box;text-align:left"/>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:4px">' + hint + '</div></div>';
+      }).join('');
+      return '<div class="card" style="padding:16px 18px">' +
+        '<div style="font-weight:700;color:var(--navy);margin-bottom:12px;font-size:14px">' + secretsVaultEsc(g.groupLabelAr) + '</div>' +
+        fields + '</div>';
+    }).join('');
+  }
+
+  var customBox = document.getElementById('secrets-vault-custom');
+  if (customBox) {
+    var customs = data.customFields || [];
+    if (!customs.length) {
+      customBox.innerHTML = '<div style="font-size:12px;color:#9ca3af">لا مفاتيح مخصصة بعد</div>';
+    } else {
+      customBox.innerHTML = customs.map(function (f) {
+        return '<div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-bottom:8px">' +
+          '<div><label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:4px" dir="ltr">' + secretsVaultEsc(f.key) +
+          (f.set ? ' · ' + secretsVaultEsc(f.masked) : '') + '</label>' +
+          '<input class="sv-input" data-sv-key="' + secretsVaultEsc(f.key) + '" type="password" dir="ltr" autocomplete="off" placeholder="قيمة جديدة أو اترك فارغاً" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:12px;font-family:monospace;box-sizing:border-box;text-align:left"/></div>' +
+          '<button type="button" onclick="secretsVaultRemoveCustom(\'' + secretsVaultEsc(f.key) + '\')" style="padding:8px 10px;background:#fff1f1;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">حذف</button></div>';
+      }).join('');
+    }
+  }
+
+  var meta = data.meta || {};
+  var msg = document.getElementById('secrets-vault-msg');
+  if (msg && meta.updatedAt) {
+    msg.textContent = 'آخر تحديث: ' + meta.updatedAt + (meta.updatedBy ? ' · ' + meta.updatedBy : '');
+  }
+}
+
+function secretsVaultCollectValues() {
+  var values = {};
+  document.querySelectorAll('.sv-input[data-sv-key]').forEach(function (el) {
+    var key = el.getAttribute('data-sv-key');
+    var val = (el.value || '').trim();
+    if (val) values[key] = val;
+  });
+  return values;
+}
+
+function secretsVaultSave() {
+  var msg = document.getElementById('secrets-vault-msg');
+  if (msg) msg.textContent = 'جاري الحفظ...';
+  fetch(_adminBackendBase() + '/api/admin/secrets-vault', {
+    method: 'PUT',
+    headers: _adminAuthHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ values: secretsVaultCollectValues() }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && (data.msg || data.error)) || 'فشل الحفظ');
+    _secretsVaultData = data.status || data;
+    if (data.status) secretsVaultRender(data.status);
+    document.querySelectorAll('.sv-input').forEach(function (el) { el.value = ''; });
+    if (msg) msg.textContent = '✅ تم الحفظ وتطبيق المفاتيح على الخادم' + (data.envSynced ? ' + مزامنة .env' : '');
+    if (typeof showToast === 'function') showToast('✅ تم حفظ المفاتيح', 'success');
+    if (typeof agentsHubRefresh === 'function') agentsHubRefresh();
+  }).catch(function (err) {
+    if (msg) msg.textContent = err.message;
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
+}
+
+function secretsVaultAddCustom() {
+  var key = ((document.getElementById('sv-custom-key') || {}).value || '').trim();
+  if (!key) return;
+  fetch(_adminBackendBase() + '/api/admin/secrets-vault', {
+    method: 'PUT',
+    headers: _adminAuthHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ addCustomKey: key, values: secretsVaultCollectValues() }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && data.error) || 'فشل');
+    document.getElementById('sv-custom-key').value = '';
+    if (data.status) secretsVaultRender(data.status);
+    if (typeof showToast === 'function') showToast('تمت إضافة الخانة', 'success');
+  }).catch(function (err) {
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
+}
+
+function secretsVaultRemoveCustom(key) {
+  if (!confirm('حذف المفتاح المخصص ' + key + '؟')) return;
+  fetch(_adminBackendBase() + '/api/admin/secrets-vault', {
+    method: 'PUT',
+    headers: _adminAuthHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ removeCustomKey: key }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && data.error) || 'فشل');
+    if (data.status) secretsVaultRender(data.status);
+  }).catch(function (err) {
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
 }
 
 /* ══ مركز تسيير الوكلاء ══ */

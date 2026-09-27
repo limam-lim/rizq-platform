@@ -180,6 +180,11 @@ const agentOpsSettings = createCollection('agent_ops_settings', {
   onBackup: singletonBackup,
 });
 
+const secretsVault = createCollection('secrets_vault', {
+  backupFile: 'secrets-vault.json',
+  onBackup: singletonBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -420,6 +425,7 @@ function migrateAllSecondaryStores() {
   marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
   agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
   agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
+  secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
 
   return {
     packages: packages.count(),
@@ -492,6 +498,7 @@ module.exports = {
   marketingSettings,
   agentMisses,
   agentOpsSettings,
+  secretsVault,
 
   getSiteConfig,
   saveSiteConfig,

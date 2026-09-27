@@ -8,9 +8,9 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
-ensureAnthropicEnv();
-// ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
+try { require('./services/secretsVault').loadAndApplyOnBoot(); } catch (eVaultBoot) { console.warn('[secretsVault] boot:', eVaultBoot && eVaultBoot.message); }
+ensureAnthropicEnv();
 const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
@@ -320,7 +320,7 @@ if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNT
 if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
   adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
 }
-const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
+const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSuperAdmin, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,
 });
@@ -2635,6 +2635,25 @@ app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, r
     res.json({ ok: true, settings, dashboard: ops.buildDashboard() });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** GET/PUT خزنة أسرار السوبر أدمن — لا تُرجع قيم المفاتيح كاملة */
+app.get('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+  try {
+    res.json(require('./services/secretsVault').getPublicStatus());
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+app.put('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+  try {
+    const admin = (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'super';
+    const result = require('./services/secretsVault').saveSecrets(req.body || {}, admin);
+    res.json(result);
+  } catch (err) {
+    console.error('[secretsVault] save', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل الحفظ' });
   }
 });
 

@@ -67,6 +67,20 @@ function createAdminAuth(deps) {
     };
   }
 
+  /** سوبر أدمن فقط — خزنة المفاتيح وغيرها */
+  function requireSuperAdmin(req, res, next) {
+    requireAdminAuth(req, res, () => {
+      const perms = (req.adminUser && req.adminUser.permissions) || [];
+      const role = req.adminUser && req.adminUser.role;
+      if (perms.includes('*') || role === 'super') return next();
+      return res.status(403).json({
+        error: 'super_only',
+        msg: 'هذا القسم للسوبر أدمن فقط',
+        msg_fr: 'Réservé au Super Admin',
+      });
+    });
+  }
+
   /** سرّ خادمي فقط — لا يُقبل من المتصفح في الإنتاج */
   function requireSharedSecret(req, res, next) {
     const got = req.header('x-rizq-secret');
@@ -80,7 +94,7 @@ function createAdminAuth(deps) {
     next();
   }
 
-  return { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret };
+  return { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSuperAdmin, requireSharedSecret };
 }
 
 module.exports = { createAdminAuth };

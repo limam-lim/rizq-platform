@@ -91,22 +91,43 @@ async function createCachedMessage(client, params, options) {
   const prepared = applyPromptCache(params);
   const fast = getFastModel();
   const allowFallback = !!(options && options.fallbackToFast) && prepared.model && prepared.model !== fast;
+  const activeClient = client || getAnthropicClient();
   try {
-    const response = await client.messages.create(prepared);
+    const response = await activeClient.messages.create(prepared);
     return { response, model: prepared.model, fallback: false };
   } catch (err) {
     if (!allowFallback) throw err;
     console.warn('[claude] ' + prepared.model + ' فشل — تحويل احتياطي إلى ' + fast + ':', err && err.message);
     const retry = Object.assign({}, prepared, { model: fast });
-    const response = await client.messages.create(retry);
+    const response = await activeClient.messages.create(retry);
     return { response, model: fast, fallback: true };
   }
+}
+
+let _cachedClient = null;
+let _cachedKey = '';
+
+function invalidateAnthropicClient() {
+  _cachedClient = null;
+  _cachedKey = '';
+}
+
+function getAnthropicClient() {
+  const Anthropic = require('@anthropic-ai/sdk');
+  const key = getAnthropicApiKey();
+  if (!_cachedClient || _cachedKey !== key) {
+    _cachedClient = new Anthropic({ apiKey: key || 'missing-key' });
+    _cachedKey = key;
+  }
+  return _cachedClient;
 }
 
 module.exports = {
   ensureAnthropicEnv,
   getAnthropicApiKey,
   isAnthropicConfigured,
+  getAnthropicClient,
+  invalidateAnthropicClient,
   getFastModel,
   getAdvancedModel,
   getAgentModel,
