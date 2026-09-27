@@ -160,6 +160,16 @@ const subscribers = createCollection('subscribers', {
   onBackup: mapBackup,
 });
 
+const marketingCampaigns = createCollection('marketing_campaigns', {
+  backupFile: 'marketing-campaigns.json',
+  onBackup: arrayBackup,
+});
+
+const marketingSettings = createCollection('marketing_settings', {
+  backupFile: 'marketing-settings.json',
+  onBackup: singletonBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -396,12 +406,16 @@ function migrateAllSecondaryStores() {
     }
   }
 
+  marketingCampaigns.migrateFromArray(p('marketing-campaigns.json'), 'id');
+  marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
+
   return {
     packages: packages.count(),
     otp: otp.count(),
     adminTeam: adminTeam.count(),
     messages: messages.count(),
     siteConfig: siteConfig.count(),
+    marketingCampaigns: marketingCampaigns.count(),
   };
 }
 
@@ -462,6 +476,8 @@ module.exports = {
   contactFomo,
   maintenanceAudit,
   subscribers,
+  marketingCampaigns,
+  marketingSettings,
 
   getSiteConfig,
   saveSiteConfig,

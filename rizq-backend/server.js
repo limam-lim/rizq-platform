@@ -968,6 +968,11 @@ app.get('/api/ai/status', (req, res) => {
 });
 
 /** GET /api/admin/agents-health — حالة ربط كل الوكلاء بمفتاح Claude + السر المشترك */
+function isFacebookEnvReady() {
+  return !!(String(process.env.FACEBOOK_PAGE_ID || '').trim() &&
+    String(process.env.FACEBOOK_PAGE_ACCESS_TOKEN || '').trim());
+}
+
 app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
   const sharedConfigured = !!(process.env.BACKEND_SHARED_SECRET || '').trim();
   const apiSecretConfigured = !!(process.env.RIZQ_API_SECRET || '').trim();
@@ -990,6 +995,17 @@ app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
     { id: 'visual', name: 'الوكيل البصري', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'Canvas في المتصفح — بلا Claude' },
     { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'عدّاد حصص — بلا استدعاء Claude' },
     { id: 'secretary-gate', name: 'بوابة السكرتير (واجهة)', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'يُفعّل الويدجت فقط؛ الذكاء عبر widget/subscriber' },
+    {
+      id: 'marketing',
+      name: 'مدير التسويق',
+      needsClaude: true,
+      linkedToKeyLoader: true,
+      wired: claudeConfigured,
+      via: 'services/marketingAgent.js → getAnthropicApiKey() + Facebook Graph (اختياري)',
+      note: isFacebookEnvReady()
+        ? 'Claude + فيسبوك جاهزان'
+        : 'توليد مسودات بـ Claude؛ النشر لفيسبوك يحتاج FACEBOOK_PAGE_ID + FACEBOOK_PAGE_ACCESS_TOKEN',
+    },
   ];
   const blockers = [];
   if (!claudeConfigured) blockers.push('أضف ANTHROPIC_API_KEY (أو CLAUDE_API_KEY) في rizq-backend/.env ثم أعد تشغيل الخادم');
@@ -2539,6 +2555,14 @@ mountAdminCoreRoutes(app, {
   readLatestBackupMeta,
   backendRootDir: __dirname,
 });
+
+const { mountMarketingRoutes } = require('./routes/marketing');
+mountMarketingRoutes(app, { requireAdminPermission });
+try {
+  require('./services/marketingAgent').startScheduler();
+} catch (eMkt) {
+  console.warn('[marketingAgent] scheduler not started:', eMkt && eMkt.message);
+}
 
 // ── "قريباً + أعلمني عند التفعيل" — إشارة اهتمام حقيقية بدل التخمين (طلب
 // Limam 03/08/2026): بدل تخمين أي قسم مغلق (مكاتب/شركات/مناقصات/فيديو)
