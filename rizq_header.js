@@ -1031,8 +1031,26 @@
         if (!isDesk()) return;
         keepOpen();
       });
-      li.addEventListener('mouseleave', function () {
+      li.addEventListener('mouseleave', function (e) {
         if (!isDesk()) return;
+        var menu = moreMenuFor(li);
+        if (menu && e.relatedTarget && menu.contains(e.relatedTarget)) return;
+        scheduleClose();
+      });
+      document.addEventListener('mouseover', function (e) {
+        if (!isDesk()) return;
+        var menu = moreMenuFor(li);
+        if (!menu || !li.classList.contains('open')) return;
+        if (menu.contains(e.target) || li.contains(e.target)) {
+          clearTimeout(closeT);
+        }
+      });
+      document.addEventListener('mouseout', function (e) {
+        if (!isDesk()) return;
+        if (!li.classList.contains('open')) return;
+        var menu = moreMenuFor(li);
+        var to = e.relatedTarget;
+        if (to && (li.contains(to) || (menu && menu.contains(to)))) return;
         scheduleClose();
       });
       document.addEventListener('click', function (e) {
