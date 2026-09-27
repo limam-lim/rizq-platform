@@ -20,6 +20,12 @@ const SECRET_SLOTS = [
     keys: [
       { key: 'ANTHROPIC_API_KEY', labelAr: 'مفتاح Claude (Anthropic)', secret: true, placeholder: 'sk-ant-...' },
       { key: 'CLAUDE_API_KEY', labelAr: 'بديل CLAUDE_API_KEY (اختياري)', secret: true, placeholder: 'sk-ant-...' },
+      {
+        key: 'ANTHROPIC_WORKSPACE_ID',
+        labelAr: 'معرّف Workspace (إن طلبه Anthropic)',
+        secret: false,
+        placeholder: 'wrkspc_...',
+      },
     ],
   },
   {

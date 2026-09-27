@@ -112,12 +112,27 @@ function invalidateAnthropicClient() {
   _cachedKey = '';
 }
 
+function getAnthropicWorkspaceId() {
+  return String(
+    process.env.ANTHROPIC_WORKSPACE_ID ||
+    process.env.ANTHROPIC_WORKSPACE ||
+    ''
+  ).trim();
+}
+
 function getAnthropicClient() {
   const Anthropic = require('@anthropic-ai/sdk');
   const key = getAnthropicApiKey();
-  if (!_cachedClient || _cachedKey !== key) {
-    _cachedClient = new Anthropic({ apiKey: key || 'missing-key' });
-    _cachedKey = key;
+  const workspaceId = getAnthropicWorkspaceId();
+  const cacheToken = key + '|' + workspaceId;
+  if (!_cachedClient || _cachedKey !== cacheToken) {
+    const opts = { apiKey: key || 'missing-key' };
+    // مفاتيح Anthropic غير المقيّدة بـ workspace واحد تتطلب هذا الهيدر في كل طلب
+    if (workspaceId) {
+      opts.defaultHeaders = { 'anthropic-workspace-id': workspaceId };
+    }
+    _cachedClient = new Anthropic(opts);
+    _cachedKey = cacheToken;
   }
   return _cachedClient;
 }
@@ -125,6 +140,7 @@ function getAnthropicClient() {
 module.exports = {
   ensureAnthropicEnv,
   getAnthropicApiKey,
+  getAnthropicWorkspaceId,
   isAnthropicConfigured,
   getAnthropicClient,
   invalidateAnthropicClient,
