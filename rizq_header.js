@@ -943,8 +943,32 @@
       positionLandingMobileMore(li);
       return;
     }
-    restoreMoreMenu(li);
+    var menu = moreMenuFor(li);
+    if (!menu) return;
+    var trigger = li.querySelector('.nav-dropdown-trigger, #rizq-desk-more, .nav-phone-more-only, .nav-link-btn') || li;
+    var rect = trigger.getBoundingClientRect();
+    if (menu.parentNode !== document.body) {
+      menu.__rizqMoreHome = li;
+      menu.setAttribute('data-rizq-more-for', li.id || 'more-li');
+      document.body.appendChild(menu);
+    }
     li.classList.add('open');
+    menu.classList.add('rizq-more-menu-open');
+    var top = Math.round(rect.bottom + 6);
+    var centerX = Math.round(rect.left + rect.width / 2);
+    var menuW = Math.min(300, Math.max(240, window.innerWidth - 24));
+    var left = Math.max(12, Math.min(centerX - menuW / 2, window.innerWidth - menuW - 12));
+    menu.style.cssText = ''
+      + 'position:fixed!important;top:' + top + 'px!important;'
+      + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
+      + 'transform:none!important;width:' + menuW + 'px!important;'
+      + 'max-width:min(300px,calc(100vw - 24px))!important;'
+      + 'max-height:min(70vh,480px)!important;overflow-y:auto!important;overflow-x:hidden!important;'
+      + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
+      + 'z-index:10052!important;display:block!important;'
+      + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
+      + 'border-radius:14px!important;padding:8px!important;'
+      + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 
   function bindLandingMobileMore() {
@@ -998,6 +1022,10 @@
         var willOpen = !li.classList.contains('open');
         closeMoreDropdowns();
         if (willOpen) positionMoreDropdown(li);
+      });
+      /* نقر على الأيقونة/النص داخل الزر */
+      more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
+        child.style.pointerEvents = 'none';
       });
       li.addEventListener('mouseenter', function () {
         if (!isDesk()) return;

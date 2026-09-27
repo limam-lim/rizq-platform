@@ -621,10 +621,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:3px !important;
-    color:var(--rizq-almazdi,#C9A84C) !important;
+    gap:4px !important;
+    color:#ffffff !important;
     font-weight:700 !important;
-    font-size:11.5px !important;
+    font-size:13px !important;
     letter-spacing:.15px;
     padding:8px 12px !important;
     border-radius:10px;
@@ -636,19 +636,21 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     font-family:inherit;
     white-space:nowrap !important;
     flex:0 0 auto !important;
-    min-width:64px;
+    min-width:68px;
     line-height:1.15;
-    transition:color .18s,background .18s,transform .15s;
+    transition:color .18s,background .18s,filter .18s,transform .15s;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
     display:block !important;
-    font-size:18px !important;
+    font-size:22px !important;
     line-height:1 !important;
-    color:var(--rizq-almazdi,#C9A84C) !important;
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.05);
+    color:#ffffff !important;
+    /* أبيض تقريبي للأيقونات الإيموجي */
+    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    pointer-events:none;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
@@ -657,10 +659,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center a .nav-phone-more-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .nav-phone-more-lbl{
     display:block !important;
-    color:var(--rizq-almazdi,#C9A84C) !important;
-    font-size:11.5px !important;
+    color:#ffffff !important;
+    font-size:13px !important;
     font-weight:700 !important;
     line-height:1.15 !important;
+    pointer-events:none;
   }
   /* سطح المكتب: أخفِ المزيد الهاتفي — لا يظهر مرتين */
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
@@ -671,20 +674,34 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only{
     display:inline-flex !important;
   }
-  /* FR و AR بنفس الحجم تقريباً — المجموعة تبقى في الوسط (justify-content:center) */
+  /* FR و AR بنفس الحجم */
   html[dir="ltr"].rizq-app-nav #nav .nav-center a,
   html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
-    font-size:10.5px !important;
-    padding:6px 8px !important;
+    font-size:12.5px !important;
+    padding:8px 11px !important;
     letter-spacing:0;
     font-weight:700 !important;
-    min-width:48px;
+    min-width:64px;
+    color:#ffffff !important;
+  }
+  html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
+  html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
+    font-size:12.5px !important;
+    color:#ffffff !important;
+  }
+  html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
+  html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
+    font-size:22px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav > .nav-center,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
-    gap:4px;
+    gap:14px;
     justify-content:center;
     justify-self:center;
   }
@@ -696,16 +713,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
   html.rizq-app-nav #rizq-desk-nav .nav-center a:hover,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn:hover{
-    color:var(--rizq-almazdi-bright,#E8C96A) !important;
-    background:rgba(201,168,76,.12) !important;
+    color:rgba(255,255,255,.95) !important;
+    background:rgba(255,255,255,.08) !important;
   }
-  /* Active section: brighter Al-Mazdi gold */
+  /* القسم الحالي: أصفر المزدي بلا خلفية رمادية */
   html.rizq-app-nav #nav .nav-center a.is-active,
   html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active,
   html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active{
-    color:var(--rizq-almazdi-bright,#E8C96A) !important;
-    background:rgba(201,168,76,.16) !important;
+    color:var(--rizq-almazdi,#C9A84C) !important;
+    background:transparent !important;
     border:none !important;
     font-weight:800 !important;
     box-shadow:none;
@@ -714,14 +731,21 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active .rizq-hdr-lbl{
-    color:var(--rizq-almazdi-bright,#E8C96A) !important;
+    color:var(--rizq-almazdi,#C9A84C) !important;
+  }
+  html.rizq-app-nav #nav .nav-center a.is-active .rizq-hdr-ico,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico{
+    color:var(--rizq-almazdi,#C9A84C) !important;
+    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
   }
   html.rizq-app-nav #nav .nav-center a.is-active:hover,
   html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active:hover,
   html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active:hover,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active:hover{
     color:var(--rizq-almazdi-bright,#E8C96A) !important;
-    background:rgba(201,168,76,.2) !important;
+    background:rgba(201,168,76,.1) !important;
   }
   html.rizq-app-nav #nav .nav-post-plus.is-active,
   html.rizq-app-nav #rizq-desk-nav .nav-post-plus.is-active{
@@ -1382,21 +1406,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:2px !important;
-    padding:6px 10px !important;
+    gap:3px !important;
+    padding:6px 11px !important;
     background:transparent !important;
     border:none !important;
     box-shadow:none !important;
     cursor:pointer;
-    color:var(--rizq-almazdi,#C9A84C) !important;
+    color:#ffffff !important;
     text-decoration:none;
     font-family:inherit;
-    font-size:10.5px !important;
+    font-size:12px !important;
     font-weight:700 !important;
     letter-spacing:.15px;
-    min-width:48px;
+    min-width:56px;
     width:auto !important;
-    /* لا تمدّد الأزرار حتى تتلاصق — حجم طبيعي + تمرير أفقي */
     flex:0 0 auto !important;
     border-radius:10px !important;
     line-height:1.15 !important;
@@ -1406,26 +1429,38 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-ico{
     display:block !important;
-    font-size:16px !important;
+    font-size:20px !important;
     line-height:1 !important;
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.05);
+    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    pointer-events:none;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-lbl{
     display:block !important;
-    color:var(--rizq-almazdi,#C9A84C) !important;
-    font-size:10.5px !important;
+    color:#ffffff !important;
+    font-size:12px !important;
     font-weight:700 !important;
+    pointer-events:none;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.is-active,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn.is-active,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only.is-active{
-    color:var(--rizq-almazdi-bright,#E8C96A) !important;
-    background:rgba(201,168,76,.16) !important;
+    color:var(--rizq-almazdi,#C9A84C) !important;
+    background:transparent !important;
     border:none !important;
     font-weight:800 !important;
     box-shadow:none !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.is-active .rizq-hdr-lbl,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn.is-active .rizq-hdr-lbl,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only.is-active .rizq-hdr-lbl{
+    color:var(--rizq-almazdi,#C9A84C) !important;
+  }
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.is-active .rizq-hdr-ico,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only.is-active .rizq-hdr-ico{
+    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
   }
   /* نموذج 3: أيقونة فوق النص — لا نخفي الأيقونات */
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center li[data-nav-order="1"] > a::before,
@@ -1438,7 +1473,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-lbl,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn{
-    font-size:10.5px !important;
+    font-size:12px !important;
     line-height:1.2 !important;
     white-space:nowrap;
     overflow:visible !important;
@@ -1688,32 +1723,38 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:2px;
-    padding:4px 1px;
-    font-size:9px;
+    gap:3px;
+    padding:4px 2px;
+    font-size:11px;
     border-radius:8px;
-    color:var(--rizq-almazdi,#C9A84C) !important;
+    color:#ffffff !important;
     background:transparent !important;
     border:none !important;
   }
   .rizq-hdr-item .rizq-hdr-ico{
-    font-size:16px;
+    font-size:20px;
     line-height:1;
-    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.05);
+    filter:grayscale(1) brightness(2.2) contrast(1.05);
+    pointer-events:none;
   }
   .rizq-hdr-item .rizq-hdr-lbl{
-    font-size:9px !important;
+    font-size:11px !important;
     line-height:1.15;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
     max-width:100%;
-    color:var(--rizq-almazdi,#C9A84C) !important;
+    color:#ffffff !important;
     font-weight:700 !important;
+    pointer-events:none;
   }
   .rizq-hdr-item.is-active,
   .rizq-hdr-item.is-active .rizq-hdr-lbl{
-    color:var(--rizq-almazdi-bright,#E8C96A) !important;
+    color:var(--rizq-almazdi,#C9A84C) !important;
+    background:transparent !important;
+  }
+  .rizq-hdr-item.is-active .rizq-hdr-ico{
+    filter:sepia(1) saturate(4.2) hue-rotate(2deg) brightness(1.08);
   }
   .rizq-hdr-post{
     flex:0 0 34px !important;
