@@ -1367,10 +1367,11 @@ function buildDiamondTiersPromptBlock(lang) {
   return (
     '=== DIAMOND TIERS — LIVE DATA ONLY ===\n' +
     'When user asks about Diamond / الماسية / Pro vs Standard:\n' +
-    '- Call get_packages_info with lang AND catalog (store|office|corp) when user mentions محل/متجر, مكتب, or شركة.\n' +
-    '- Explain BOTH tiers from tool results for THAT catalog only — never quote store prices for office questions.\n' +
+    '- If business type unknown: ASK briefly محل / مكتب / شركة — do NOT quote prices yet.\n' +
+    '- Then call get_packages_info with catalog=store|office|corp for THAT type only.\n' +
+    '- Explain BOTH tiers from tool results for THAT catalog — never mix catalogs.\n' +
     '- Key difference: Pro includes interactive voice calls; Standard is text-only.\n' +
-    '- Never quote 5000 or 10000 unless those exact values appear in get_packages_info for that catalog.\n' +
+    '- FORBIDDEN: quoting 5000 or 10000 MRU (legacy general catalog). Those packages are retired for chat.\n' +
     '- Finish with a plain-text comparison (name — price — channels — voice yes/no).\n'
   );
 }
@@ -1378,13 +1379,14 @@ function buildDiamondTiersPromptBlock(lang) {
 function buildLiveCatalogPolicyBlock() {
   return (
     '=== LIVE CATALOG POLICY (MANDATORY — NO STATIC PRICES) ===\n' +
-    'You are STRICTLY FORBIDDEN from guessing or recalling package prices from memory or training data.\n' +
+    'You are STRICTLY FORBIDDEN from guessing or recalling package prices from memory, training data, or old chats.\n' +
     'For ANY question about packages, pricing, subscriptions, features, Diamond tiers, or "how much":\n' +
-    '1. You MUST call get_packages_info FIRST before stating any price, plan name, or feature list.\n' +
-    '2. Pass catalog=store when user says محل/متجر; catalog=office for مكتب/للمكاتب; catalog=corp for شركة.\n' +
-    '3. Quote ONLY prices returned by get_packages_info for the matched catalog (Western digits 0-9, plain text).\n' +
-    '4. Catalogs differ (general, store, office, corp) — NEVER mix or fallback store prices when office/corp was asked.\n' +
-    '5. If live tool data is missing in context, say you are fetching official data — NEVER invent MRU amounts.\n'
+    '1. If category unknown → ask محل/مكتب/شركة first (one short human question).\n' +
+    '2. Call get_packages_info with catalog=store|office|corp BEFORE stating any price or feature list.\n' +
+    '3. Quote ONLY prices returned by that live call (Western digits 0-9, plain text).\n' +
+    '4. NEVER use catalog=general and NEVER quote legacy 5000/10000 diamond prices.\n' +
+    '5. If live tool data is missing, say you need the business type / official catalog — NEVER invent MRU amounts.\n' +
+    '6. Sound like a sharp human manager: short, clear, commercially helpful — not a dumped brochure.\n'
   );
 }
 

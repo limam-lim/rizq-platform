@@ -1,11 +1,10 @@
 /**
  * مدير رزق الذكي — محادثة الويدجت مع function calling + مراجعة الرد
  */
-const Anthropic = require('@anthropic-ai/sdk');
 const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./widgetAgentTools');
 const { maybeAutoNotifyLead } = require('./leadEscalation');
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
-const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel, createCachedMessage } = require('../config/anthropic');
+const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAnthropicClient, createCachedMessage } = require('../config/anthropic');
 const { buildLiveCatalogPolicyBlock, buildDiamondTiersPromptBlock } = require('../../rizq_packages_config');
 const {
   buildDiamondCompletionFooter,
@@ -16,12 +15,15 @@ const {
   inferCatalogFromMessage,
   buildLivePackagesChatSummary,
   buildCategoryDiamondChatSummary,
+  buildAskBusinessCategoryReply,
   isDiamondPricingQuery,
   replyUsesUnknownPackagePrice,
+  replyQuotesLegacyGeneralDiamond,
 } = require('./packageCatalogLive');
 const { localizedName, priceLabel } = require('../../rizq_packages_config');
 const RizqAgent = require('../../rizq_agent');
 const RizqPrompts = require('../../rizq_ai_prompts');
+const { buildRizqKnowledgeBaseBlock } = require('./rizqKnowledgeBase');
 const { formatDynamicKnowledgeForPrompt } = require('./dynamicKnowledge');
 const { formatPlainChatText, sanitizeAgentText } = require('./widgetMarkdown');
 const {
@@ -32,7 +34,6 @@ const {
   attachmentPromptHint,
 } = require('./widgetMedia');
 
-const client = new Anthropic({ apiKey: getAnthropicApiKey() });
 const WIDGET_MAX_TOKENS = Number(process.env.WIDGET_CHAT_MAX_TOKENS) || 1400;
 
 function buildLanguageInstructions(detectedLang, uiLang) {
@@ -64,6 +65,9 @@ function buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) {
   let pkgs = liveCatalog.packages;
   if (catalogHint) {
     pkgs = pkgs.filter((p) => p.catalog === catalogHint);
+  } else {
+    // بلا فئة: لا نمرّر كتالوج general ولا نغرق النموذج بكل الباقات
+    pkgs = pkgs.filter((p) => p.catalog && p.catalog !== 'general' && p.catalog !== 'individual');
   }
   const rows = pkgs.map((p) => ({
     id: p.id,
@@ -74,7 +78,7 @@ function buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) {
   }));
   const hintLine = catalogHint
     ? ('STRICT catalog: ' + catalogHint + ' — quote ONLY these prices, never mix with other categories\n')
-    : '';
+    : ('NO category yet — do NOT quote any diamond price. Ask: محل / مكتب / شركة؟ then call get_packages_info with that catalog.\n');
   return (
     hintLine +
     '[LIVE CATALOG SNAPSHOT — fetched ' + liveCatalog.fetchedAt + ' — quote ONLY these prices]\n' +
@@ -117,15 +121,18 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
   } else {
     prompt +=
       `\n# Role\n` +
-      `You are "Rizq Smart Manager" (مدير رزق الذكي) — the official human-sounding AI deputy for Rizq (rizq.mr).\n` +
-      `Personality: warm, sharp, commercially helpful — like a real manager who knows the platform cold.\n` +
+      `You are "Rizq Smart Manager" (مدير رزق الذكي) — a sharp, warm human deputy for Rizq (rizq.mr), NOT a brochure bot.\n` +
+      `Talk like a real sales manager: short sentences, natural Arabic, one clear next step. No emoji spam. No Markdown tables.\n` +
+      `ZERO MEMORY PRICES: Never recall old packages (especially 5000/10000 MRU "general" diamond). Those are dead. Live catalog only.\n` +
       `CRITICAL: For any ad price, seller trust, or listing question — call tools first ` +
       `(get_ad_details, search_ads, get_seller_profile, get_seller_reputation) then answer ONLY from results.\n` +
       `If an ad id is open: call get_ad_details with that id before stating price or trust.\n` +
       `For trust questions: call get_seller_reputation after you know account_id from the ad.\n` +
       `Never guess prices or trust scores — if no data, say so clearly.\n` +
-      `For Rizq subscription/package/pricing questions: ALWAYS call get_packages_info (live catalog) and explain from that data ONLY — ` +
-      `never quote memorized/old prices, never invent MRU amounts, never mix store/office/corp catalogs.\n` +
+      `For Rizq subscription/package/pricing questions:\n` +
+      `1) If business type unknown (محل/مكتب/شركة) — ASK that first in one short question. Do NOT dump package lists.\n` +
+      `2) When type is known — call get_packages_info(catalog=store|office|corp) and quote ONLY that live result.\n` +
+      `3) Never invent MRU amounts; never mix catalogs; never use memorized training prices.\n` +
       `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free.\n` +
       `When explaining how to register or log in, use ONLY on-screen button labels the user can tap:\n` +
@@ -133,19 +140,21 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `- New business account: homepage «حساب جديد» or «سجّل الآن — مجاناً»\n` +
       `- Account login: homepage «دخول» or «حسابي» → «لدي حساب على رزق — دخول»\n` +
       `NEVER expose file names, .html paths, query parameters (?openRegister, ?openLogin), or internal technical URLs in replies.\n` +
-      `For general questions: keep replies concise (2-4 sentences) and actionable.\n` +
-      `For package/pricing questions (especially Diamond / الماسية): give a COMPLETE plain-text answer — ` +
-      `call get_packages_info first and explain BOTH diamond tiers from live data — never invent prices. ` +
-      `Finish with a plain comparison (Standard vs Pro: price, channels, voice) — no Markdown, no tables, no bullet symbols.\n` +
+      `Keep general answers concise (2-4 sentences). Sound human, not scripted.\n` +
       `Never use Unicode bidi control characters — quote prices only from get_packages_info, Western digits 0-9 only.\n`;
   }
 
+  prompt += `\n${buildRizqKnowledgeBaseBlock()}\n`;
   prompt += `\n${buildLiveCatalogPolicyBlock()}\n${buildDiamondTiersPromptBlock()}\n`;
   if (liveCatalog) {
     prompt += buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) + '\n';
   }
   prompt += 'You MUST call get_packages_info before quoting any Rizq plan price if snapshot is stale or user asks for another catalog.\n';
-  prompt += 'When user asks about diamond / ماسية / packages: you MUST cover Standard AND Pro in full before ending (plain text only).\n';
+  if (catalogHint) {
+    prompt += 'Catalog known (' + catalogHint + '): explain Standard AND Pro from live data for THIS catalog only (plain text).\n';
+  } else {
+    prompt += 'Catalog unknown: ASK محل/مكتب/شركة first — do NOT explain diamond tiers or prices yet.\n';
+  }
   prompt += 'For serious subscription interest or admin requests: collect business name, WhatsApp, and package — then call register_interest or escalate_to_human.\n';
   prompt += 'When user attaches image/receipt/screenshot: acknowledge professionally, confirm it was forwarded to management for verification — never claim payment is verified.\n';
   prompt += 'Understand Hassaniya/local Mauritanian terms but reply in simple fusaha Arabic (or French if user writes in French).\n';
@@ -344,6 +353,16 @@ function catalogUsedLiveTool(toolResultsRaw) {
 function enforceLivePackageReply(reply, userMessage, lang, toolResultsRaw, pageContext, catalogHint) {
   if (!isPackagePricingQuery(userMessage)) return reply;
   const hint = catalogHint || inferCatalogFromMessage(userMessage, { pageContext }) || inferCatalogFromRef(userMessage) || null;
+  const diamondQ = isDiamondPricingQuery(userMessage) || isDiamondPackageQuery(userMessage);
+  const legacy = replyQuotesLegacyGeneralDiamond(reply);
+  // سؤال ماسية بلا فئة نشاط → اسأل أولاً بدل إلقاء قائمة قديمة
+  if (diamondQ && !hint) {
+    return buildAskBusinessCategoryReply(lang);
+  }
+  if (legacy) {
+    if (hint) return buildCategoryDiamondChatSummary(lang, hint);
+    return buildAskBusinessCategoryReply(lang);
+  }
   const usedTool = catalogUsedLiveTool(toolResultsRaw);
   const badPrice = replyUsesUnknownPackagePrice(reply, lang, hint, userMessage);
   if (!usedTool || badPrice) {
@@ -352,9 +371,10 @@ function enforceLivePackageReply(reply, userMessage, lang, toolResultsRaw, pageC
       badPrice,
       catalogHint: hint,
     });
-    if (hint && (isDiamondPricingQuery(userMessage) || isDiamondPackageQuery(userMessage))) {
+    if (hint && diamondQ) {
       return buildCategoryDiamondChatSummary(lang, hint);
     }
+    if (diamondQ) return buildAskBusinessCategoryReply(lang);
     return buildLivePackagesChatSummary(lang, { catalogHint: hint });
   }
   return reply;
@@ -596,7 +616,7 @@ async function handleWidgetChat(body) {
       createParams.tool_choice = { type: 'tool', name: 'get_packages_info' };
     }
 
-    const created = await createCachedMessage(client, createParams);
+    const created = await createCachedMessage(getAnthropicClient(), createParams);
     response = created.response;
     lastModel = created.model || lastModel;
     const u = response.usage || {};

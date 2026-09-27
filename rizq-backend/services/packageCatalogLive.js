@@ -13,6 +13,8 @@ const {
 } = require('../../rizq_packages_config');
 
 const CATALOG_KEYS = ['general', 'store', 'office', 'corp', 'individual'];
+/** كتالوجات الوكيل الذكي — بلا general (أسعار عامة قديمة 5000/10000 لا تُعرض للزائر) */
+const AI_CATALOG_KEYS = ['store', 'office', 'corp'];
 
 function normRef(value) {
   return String(value || '')
@@ -408,6 +410,21 @@ function getLivePackagesForAI(lang, opts) {
   const packages = [];
 
   if (catalog) {
+    // لا نقدّم كتالوج general للوكيل — أسعار قديمة غير معتمدة للعرض
+    if (catalog === 'general') {
+      return {
+        ok: true,
+        source: 'live_catalog',
+        strictCategory: false,
+        catalog: null,
+        needsCategory: true,
+        fetchedAt: new Date().toISOString(),
+        catalogs: {},
+        packages: [],
+        instruction:
+          'Do NOT quote general/legacy prices. Ask the user: محل / مكتب / شركة؟ then call get_packages_info with catalog=store|office|corp.',
+      };
+    }
     const list = getPackagesForTool(lang, catalog);
     catalogs[catalog] = list;
     list.forEach((p) => {
@@ -422,11 +439,11 @@ function getLivePackagesForAI(lang, opts) {
       fetchedAt: new Date().toISOString(),
       catalogs,
       packages,
-      instruction: 'Quote ONLY prices from this catalog — do not mix store/office/corp prices.',
+      instruction: 'Quote ONLY prices from this catalog — do not mix store/office/corp prices. Never use memorized/old prices.',
     };
   }
 
-  CATALOG_KEYS.forEach((cat) => {
+  AI_CATALOG_KEYS.forEach((cat) => {
     const list = getPackagesForTool(lang, cat);
     catalogs[cat] = list;
     list.forEach((p) => {
@@ -438,11 +455,27 @@ function getLivePackagesForAI(lang, opts) {
     source: 'live_catalog',
     strictCategory: false,
     catalog: null,
+    needsCategory: true,
     fetchedAt: new Date().toISOString(),
     catalogs,
     packages,
-    instruction: 'Pass catalog=store|office|corp when user specifies business type — never guess category prices.',
+    instruction:
+      'Category unknown. Ask briefly: محل، مكتب، ولا شركة/معرض؟ Then call get_packages_info with that catalog. ' +
+      'Do NOT dump all catalogs or quote legacy general prices (5000/10000). Speak like a sharp human manager — short, clear, one question.',
   };
+}
+
+/** رد بشري قصير يطلب نوع النشاط قبل ذكر أي سعر ماسي */
+function buildAskBusinessCategoryReply(lang) {
+  lang = String(lang || 'ar').toLowerCase();
+  const replies = {
+    ar: 'تمام — باش نعطيك السعر الصحيح من كتالوج المنصة الحي، نشاطك شنو؟\nمحل / متجر، مكتب مهني، ولا شركة / معرض؟',
+    fr: 'Parfait — pour vous donner le tarif exact du catalogue live, c’est pour une boutique, un bureau, ou une entreprise / showroom ?',
+    en: 'Sure — to quote the live catalog price correctly: is it a store, an office, or a company / showroom?',
+    es: 'Perfecto — para darte el precio exacto del catálogo en vivo: ¿tienda, oficina o empresa / showroom?',
+    hs: 'تمام — باش نعطيك السعر الصحيح، نشاطك شنو؟ محل، مكتب، ولا شركة؟',
+  };
+  return replies[lang] || replies.ar;
 }
 
 function getDiamondTierPackages(lang, catalogHint) {
@@ -462,13 +495,27 @@ function getDiamondTierPackages(lang, catalogHint) {
 function collectLivePackagePrices(lang, catalogHint) {
   lang = String(lang || 'ar').toLowerCase();
   const digits = new Set();
-  const catalogs = catalogHint ? [catalogHint] : DIAMOND_LOOKUP_ORDER;
+  let catalogs;
+  if (catalogHint && catalogHint !== 'general') {
+    catalogs = [catalogHint];
+  } else {
+    // لا نعتبر أسعار general «مسموحة» — حتى لا يمرّ ردّ قديم 5000/10000
+    catalogs = AI_CATALOG_KEYS.slice();
+  }
   catalogs.forEach((cat) => {
     getPackagesForTool(lang, cat).forEach((p) => {
       if (p && p.price != null) digits.add(String(Number(p.price)));
     });
   });
   return digits;
+}
+
+function replyQuotesLegacyGeneralDiamond(reply) {
+  const text = String(reply || '');
+  // الأسعار العامة القديمة في CATALOGS.general — ممنوعة في ردود الوكيل
+  const hasLegacy = /(?:^|[^\d])(5000|10000)(?:[^\d]|$)/.test(text);
+  if (!hasLegacy) return false;
+  return /(?:ماس|diamond|diamant|أوقية|MRU|باق|forfait|package|أساس|متقد|\bPro\b)/i.test(text);
 }
 
 function replyUsesUnknownPackagePrice(reply, lang, catalogHint, userMessage) {
@@ -573,14 +620,18 @@ function buildLivePackagesChatSummary(lang, opts) {
   opts = opts || {};
   lang = String(lang || 'ar').toLowerCase();
   const catalogHint = opts.catalogHint;
-  const catalogs = catalogHint ? [catalogHint] : ['general', 'store', 'office', 'corp'];
+  const catalogs = catalogHint && catalogHint !== 'general'
+    ? [catalogHint]
+    : AI_CATALOG_KEYS.slice();
   const seen = new Set();
   const lines = [];
   catalogs.forEach((cat) => {
     getPackagesForTool(lang, cat).forEach((p) => {
       if (!p || !p.id || seen.has(p.id)) return;
+      // تجاهل معرفات general القديمة إن تسربت
+      if (p.id === 'diamond_standard' || p.id === 'diamond_pro') return;
       seen.add(p.id);
-      lines.push(p.name + ' — ' + p.priceLabel);
+      lines.push(p.name + ' — ' + p.priceLabel + ' (' + cat + ')');
     });
   });
   const header = {
@@ -602,6 +653,7 @@ function buildLivePackagesChatSummary(lang, opts) {
 
 module.exports = {
   CATALOG_KEYS,
+  AI_CATALOG_KEYS,
   DIAMOND_LOOKUP_ORDER,
   normalizeCatalogKey,
   resolveLivePackageQuote,
@@ -618,6 +670,8 @@ module.exports = {
   getDiamondTierPackages,
   collectLivePackagePrices,
   replyUsesUnknownPackagePrice,
+  replyQuotesLegacyGeneralDiamond,
+  buildAskBusinessCategoryReply,
   buildDiamondCompletionFooter,
   buildLivePackagesChatSummary,
   buildCategoryDiamondChatSummary,
