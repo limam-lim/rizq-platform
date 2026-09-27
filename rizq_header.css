@@ -491,7 +491,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center;
-    gap:14px;
+    gap:18px;
     list-style:none;
     direction:inherit;
     margin:0;
