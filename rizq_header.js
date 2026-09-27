@@ -14,6 +14,73 @@
       '<span class="lang-ar" dir="ltr">AR</span>';
   }
 
+  /* نموذج 3 — أيقونات الشريط (ذهبي المزدي عبر CSS) */
+  var NAV_ICOS = {
+    home: '🏠',
+    ads: '📢',
+    cats: '📂',
+    stores: '🏪',
+    offices: '🏢',
+    showrooms: '🏬',
+    tenders: '📋',
+    investments: '📈',
+    post: '➕',
+    more: '⋯',
+    packs: '💎',
+    legal: '⚖️',
+    about: 'ℹ️',
+    rizqads: '🎬'
+  };
+
+  function icoForHdr(hdr) {
+    if (!hdr) return '◇';
+    var k = String(hdr).toLowerCase().replace(/^nav-/, '').replace(/^hdr-/, '');
+    if (k === 'store' || k === 'boutiques') k = 'stores';
+    if (k === 'office' || k === 'bureaux') k = 'offices';
+    if (k === 'showroom' || k === 'corp') k = 'showrooms';
+    if (k.indexOf('invest') === 0) k = 'investments';
+    if (k.indexOf('tender') === 0 || k === 'appels') k = 'tenders';
+    if (k === 'categories' || k === 'cat') k = 'cats';
+    if (k === 'annonce' || k === 'annonces' || k === 'listings') k = 'ads';
+    return NAV_ICOS[k] || '◇';
+  }
+
+  function m3LinkInner(ico, labelHtml) {
+    return '<span class="rizq-hdr-ico" aria-hidden="true">' + ico + '</span>' +
+      '<span class="rizq-hdr-lbl">' + labelHtml + '</span>';
+  }
+
+  /** حوّل روابط الشريط النصية إلى نموذج 3 (أيقونة فوق النص) */
+  function enhanceModel3NavLinks(root) {
+    var scope = root || document;
+    var nodes = scope.querySelectorAll(
+      '#nav .nav-center a[data-hdr], #rizq-desk-nav .nav-center a[data-hdr], ' +
+      '#nav .nav-center .nav-link-btn[data-hdr], #rizq-desk-nav .nav-center .nav-link-btn[data-hdr], ' +
+      '#nav .nav-center .nav-dropdown-trigger[data-hdr], #rizq-desk-nav .nav-center .nav-dropdown-trigger[data-hdr], ' +
+      '#nav .nav-center .nav-phone-more-only'
+    );
+    nodes.forEach(function (a) {
+      if (a.querySelector('.rizq-hdr-ico') && a.querySelector('.rizq-hdr-lbl')) return;
+      if (a.classList.contains('nav-post-plus') && !a.getAttribute('data-hdr')) return;
+      var hdr = a.getAttribute('data-hdr') || (a.classList.contains('nav-phone-more-only') ? 'more' : '');
+      if (!hdr && a.classList.contains('nav-dropdown-trigger')) hdr = 'more';
+      var ico = icoForHdr(hdr);
+      var lbl = a.querySelector('.rizq-hdr-lbl, .nav-phone-more-lbl');
+      var text = lbl ? lbl.textContent : a.textContent;
+      text = (text || '').replace(/\s*▾\s*$/, '').trim();
+      if (!text) return;
+      var keepAttrs = a.getAttribute('data-hdr');
+      a.innerHTML = m3LinkInner(ico, text);
+      if (keepAttrs) {
+        var span = a.querySelector('.rizq-hdr-lbl');
+        if (span) span.setAttribute('data-hdr', keepAttrs);
+      }
+      if (hdr === 'more' && a.classList.contains('nav-dropdown-trigger')) {
+        /* keep trigger class; label without ▾ — icon conveys menu */
+      }
+    });
+  }
+
   function paintLangBtn(btn) {
     if (!btn) return;
     if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
@@ -376,8 +443,20 @@
     ).forEach(function (el) {
       var k = el.getAttribute('data-hdr');
       var text = hdrText(k, el);
-      if (text) el.textContent = text;
+      if (!text) return;
+      /* لا تمسح هيكل النموذج 3 — حدّث النص فقط داخل .rizq-hdr-lbl */
+      if (el.querySelector && el.querySelector('.rizq-hdr-ico')) {
+        var lbl = el.querySelector('.rizq-hdr-lbl') || el.querySelector('.nav-phone-more-lbl');
+        if (lbl) lbl.textContent = text.replace(/\s*▾\s*$/, '');
+        return;
+      }
+      if (el.classList && (el.classList.contains('rizq-hdr-lbl') || el.classList.contains('nav-phone-more-lbl'))) {
+        el.textContent = text.replace(/\s*▾\s*$/, '');
+        return;
+      }
+      el.textContent = text;
     });
+    enhanceModel3NavLinks();
     if (window.RizqI18n && typeof window.RizqI18n.applyStaticDom === 'function') {
       var nav = document.getElementById('nav');
       if (nav) window.RizqI18n.applyStaticDom(nav);
@@ -756,13 +835,13 @@
           deskFavHtml() +
         '</div>' +
         '<ul class="nav-center">' +
-          '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +
-          '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</a></li>' +
-          '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + t2('المحلات', 'Boutiques') + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="rizq_investments.html" data-hdr="investments">' + t2('الاستثمارات', 'Investissements') + '</a></li>' +
+          '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + m3LinkInner(NAV_ICOS.home, t2('الرئيسية', 'Accueil')) + '</a></li>' +
+          '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + m3LinkInner(NAV_ICOS.cats, t2('الأقسام', 'Catégories')) + '</a></li>' +
+          '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner(NAV_ICOS.post, t2('نشر (+)', 'Publier (+)')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="rizq_investments.html" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
-            '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
+            '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + m3LinkInner(NAV_ICOS.more, t2('المزيد', 'Plus')) + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +
           '</li>' +
         '</ul>' +
@@ -1279,6 +1358,7 @@
       scheduleNavRefresh();
     }
     markActive();
+    enhanceModel3NavLinks();
     if (window.RizqUx && typeof window.RizqUx.updateCommerceBadges === 'function') {
       window.RizqUx.updateCommerceBadges();
     } else if (window.RizqUx && typeof window.RizqUx.updateFavBadges === 'function') {
@@ -1298,7 +1378,10 @@
     markActive: markActive,
     resolveActiveNavKey: resolveActiveNavKey,
     positionMobileMoreMenu: positionMobileMoreMenu,
-    closeMobileMoreMenu: closeMobileMoreMenu
+    closeMobileMoreMenu: closeMobileMoreMenu,
+    enhanceModel3NavLinks: enhanceModel3NavLinks,
+    icoForHdr: icoForHdr,
+    NAV_ICOS: NAV_ICOS
   };
 
   if (document.body) inject();

@@ -666,12 +666,21 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 }
 
 @media(orientation:landscape) and (max-height:520px){
-  nav,.topnav{
+  nav:not(#nav):not(#rizq-desk-nav),.topnav{
     height:auto!important;min-height:48px;flex-wrap:wrap!important;
     padding:8px 12px!important;gap:8px!important;
   }
-  .nav-center{flex-wrap:wrap!important;overflow:visible!important;max-width:100%}
-  .nav-center a{padding:8px 10px!important;font-size:13px!important;white-space:normal}
+  /* الشريط الرئيسي: لا تكديس أبداً — صف واحد + تمرير */
+  #nav .nav-center,
+  #rizq-desk-nav .nav-center,
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    max-width:100%!important;
+  }
+  .nav-center a{padding:6px 8px!important;font-size:11px!important;white-space:nowrap!important}
   .hero-search,.search-bar,.nav-sticky-tools{
     flex-wrap:wrap!important;width:100%!important;
   }

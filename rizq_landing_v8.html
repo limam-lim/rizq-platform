@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=17.4"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=17.2"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=21.0"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=16.5"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=6.16"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=17.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=21.0"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -152,24 +152,25 @@ nav.scrolled{
 .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
 .logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4);direction:rtl;unicode-bidi:isolate}
 .logo-text .logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
-.nav-center{display:flex;align-items:center;gap:6px;list-style:none;direction:inherit;overflow:visible;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
+.nav-center{display:flex;align-items:center;gap:10px;list-style:none;direction:inherit;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
 .nav-center::-webkit-scrollbar{display:none}
 .nav-center a,.nav-center .nav-link-btn{
-  color:rgba(255,255,255,.88);
-  text-decoration:none;font-size:15.5px;font-weight:700;
-  padding:9px 15px;border-radius:10px;
+  color:#C9A84C;
+  text-decoration:none;font-size:11.5px;font-weight:700;
+  padding:6px 10px;border-radius:10px;
   transition:transform .15s ease,background .22s,color .22s;position:relative;
-  letter-spacing:.2px;white-space:nowrap;background:none;border:none;cursor:pointer;
+  letter-spacing:.2px;white-space:nowrap;background:transparent;border:none;cursor:pointer;
   font-family:inherit;
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
 }
-.nav-center a:hover,.nav-center .nav-link-btn:hover{color:#fff;background:rgba(255,255,255,.09)}
+.nav-center a:hover,.nav-center .nav-link-btn:hover{color:#E8C96A;background:rgba(201,168,76,.12)}
 .nav-center a:active,.nav-center .nav-link-btn:active,.nav-post-plus:active{transform:scale(0.98)}
-.nav-post-plus{color:var(--gold)!important;background:rgba(201,168,76,.12)!important;border:1px solid rgba(201,168,76,.28)!important}
+.nav-post-plus{color:#C9A84C!important;background:transparent!important;border:none!important}
 .nav-center a[style*="gold"]{color:var(--gold)!important;background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.25)}
 .nav-center a[style*="gold"]:hover{background:rgba(201,168,76,.20);border-color:rgba(201,168,76,.5)}
 /* شريط التنقل: عناصر flex فقط — list-item كان يسبب تداخل الأزرار */
 #nav .nav-center{
-  overflow-x:auto;overflow-y:visible;
+  overflow-x:auto;overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
   gap:10px;
   flex-wrap:nowrap;
@@ -180,8 +181,9 @@ nav.scrolled{
 }
 #nav .nav-center > li > a,
 #nav .nav-center > li > .nav-link-btn{
-  padding:9px 14px;
+  padding:6px 10px;
   white-space:nowrap;
+  flex-direction:column;
 }
 #nav .nav-center > li.rizq-nav-extra{display:flex}
 @media (max-width:768px){
@@ -1556,17 +1558,17 @@ html[dir="ltr"] .listings-section .section-desc{
    لأن nav-center + nav-right + logo كلها flex-shrink:0 فتتجاوز عرض النافبار.
    الحل: تصغير الشعار وروابط النافبار قليلاً في هذا المدى فقط (لا تغيير على الشاشات الواسعة). */
 @media(max-width:1400px) and (min-width:769px){
-  .nav-center{gap:1px}
-  .nav-center a{padding:6px 9px;font-size:12.5px}
-  .nav-dropdown-trigger{padding:6px 9px}
+  .nav-center{gap:6px}
+  .nav-center a{padding:5px 8px;font-size:11px}
+  .nav-dropdown-trigger{padding:5px 8px}
 }
 /* إصلاح 24/07: بعد إخراج المعارض/المناقصات من "المزيد" وإعادتهما كرابطين مباشرين،
    أصبح لدى nav-center 10 عناصر بدل 8 — ضغط إضافي عند الضيق الشديد كي لا يعتمد
    على التمرير الصامت (overflow-x:auto) الذي كان سبب اختفاء "من نحن" سابقاً. */
 @media(max-width:1250px) and (min-width:769px){
-  .nav-center{gap:0px}
-  .nav-center a{padding:5px 6px;font-size:11.5px}
-  .nav-dropdown-trigger{padding:5px 6px}
+  .nav-center{gap:4px}
+  .nav-center a{padding:4px 6px;font-size:10.5px}
+  .nav-dropdown-trigger{padding:4px 6px}
 }
 @media(max-width:768px){
   body:not(.landing-ux-mobile) .nav-center{display:none}
@@ -2573,7 +2575,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_terms_gate.js?v=18.3"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=16.6"></script>
+<script src="rizq_dynamic_nav.js?v=21.0"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
@@ -2674,16 +2676,16 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <ul class="nav-center">
     <!-- ترتيب مطابق لتوالي أقسام الصفحة (من الأعلى للأسفل) -->
-    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home" data-t="nav-home">الرئيسية</a></li>
-    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="#listings" data-hdr="ads">الإعلانات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="#virtual-stores" data-hdr="stores" data-t="nav-stores">المحلات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="4"><a href="#virtual-offices" data-hdr="offices" data-t="nav-offices">المكاتب</a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5"><a href="#virtual-showrooms" data-hdr="showrooms" data-t="nav-showrooms">المعارض</a></li>
-    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="#virtual-tenders" data-hdr="tenders" data-t="nav-tenders">المناقصات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="#virtual-investments" data-hdr="investments" data-t="nav-investments">الاستثمارات</a></li>
+    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🏠</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
+    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="4"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="8">
-      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
-      <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" data-t="nav-more" onclick="toggleNavDropdown(event,this)">المزيد ▾</a>
+      <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false" data-hdr="more"><span class="rizq-hdr-ico nav-phone-more-ico" aria-hidden="true">⋯</span><span class="rizq-hdr-lbl nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
+      <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" onclick="toggleNavDropdown(event,this)"><span class="rizq-hdr-ico" aria-hidden="true">⋯</span><span class="rizq-hdr-lbl" data-hdr="more" data-t="nav-more">المزيد</span></a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
         <a href="#categories" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📂</span><div><strong data-t="dd-cats">الأقسام</strong></div></a>
         <a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>
