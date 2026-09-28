@@ -2315,3 +2315,15 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
     gap:10px !important;
   }
 }
+
+/* RIZQ NAVY DIAMOND ATMOSPHERE ON HEADER */
+html.rizq-app-nav #rizq-app-header,
+html.rizq-app-nav #rizq-app-header .rizq-hdr-row1,
+html.rizq-app-nav #rizq-app-header nav.rizq-hdr-row2,
+html.rizq-app-nav #rizq-app-header .rizq-hdr-row2{
+  background-color:#0D1B2A !important;
+  background-image:var(--rizq-navy-atmosphere,linear-gradient(145deg,#07111f 0%,#0D1B2A 38%,#163a6e 78%,#1B3A6B 100%)),var(--rizq-navy-grid,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.28'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3Cpath d='M36 26l10 10-10 10-10-10z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.1'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E")) !important;
+  background-size:cover,56px 56px !important;
+  background-repeat:no-repeat,repeat !important;
+  background-blend-mode:overlay !important;
+}

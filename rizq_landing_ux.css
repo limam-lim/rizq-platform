@@ -1,6 +1,6 @@
 :root{
-  /* خلفية بطاقات رزق — أجواء نموذج الهيرو */
-  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.14'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E");
+  /* خلفية بطاقات رزق — كحلي عميق + نقش معين ذهبي واضح (نموذج 1) */
+  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.28'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3Cpath d='M36 26l10 10-10 10-10-10z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.1'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E");
   --rizq-navy-atmosphere:linear-gradient(145deg,#07111f 0%,#0D1B2A 38%,#163a6e 78%,#1B3A6B 100%);
   --text-on-navy:rgba(255,255,255,.88);
   --text-on-navy-muted:rgba(255,255,255,.88);
@@ -36,12 +36,14 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .rpkg-card[style*="#1B3A6B"],
 .pricing-card[style*="#1B3A6B"],
 .rpkg-card.featured,
-.pricing-card.featured{
+.pricing-card.featured,
+.rizq-pkg-card:not(.rizq-pkg-light),
+.store-pkg-card:not(.rizq-pkg-light){
   background-color:#0D1B2A!important;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
-  background-size:cover,72px 72px!important;
+  background-size:cover,64px 64px!important;
   background-repeat:no-repeat,repeat!important;
-  background-blend-mode:normal;
+  background-blend-mode:overlay;
   border-color:rgba(201,168,76,.22);
 }
 
@@ -769,9 +771,9 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   border:1px solid rgba(201,168,76,.28)!important;
   background-color:#0D1B2A!important;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
-  background-size:cover,72px 72px!important;
+  background-size:cover,64px 64px!important;
   background-repeat:no-repeat,repeat!important;
-  background-blend-mode:normal!important;
+  background-blend-mode:overlay!important;
 }
 /* منطقة الإيموجي/الصورة في شريط أحدث الإعلانات — كحلي لا أبيض */
 #hero-listings .ad-card .ad-card-img,
@@ -796,9 +798,9 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 .pricing-section .rpkg-card.pricing-card[style*="#ffffff"]{
   background-color:#0D1B2A!important;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid)!important;
-  background-size:cover,72px 72px!important;
+  background-size:cover,64px 64px!important;
   background-repeat:no-repeat,repeat!important;
-  background-blend-mode:normal!important;
+  background-blend-mode:overlay!important;
   border-color:rgba(201,168,76,.28)!important;
   color:#fff!important;
 }
@@ -810,9 +812,9 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   border-radius:999px;
   background-color:#0D1B2A;
   background-image:var(--rizq-navy-atmosphere),var(--rizq-navy-grid);
-  background-size:cover,72px 72px;
+  background-size:cover,64px 64px;
   background-repeat:no-repeat,repeat;
-  background-blend-mode:normal;
+  background-blend-mode:overlay;
   border:1px solid rgba(201,168,76,.35);
   color:#f3de9c;
   font-size:13px;
