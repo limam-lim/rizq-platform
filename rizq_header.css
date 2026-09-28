@@ -422,9 +422,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav.has-rizq-desk-nav .topnav,
   html.rizq-app-nav.has-rizq-desk-nav body > .btn-lang,
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav) .logo,
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-actions,
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-disclaimer,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs) .logo,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.cta-hubs) .nav-actions,
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.cta-hubs) .nav-disclaimer,
   html.rizq-app-nav.has-rizq-desk-nav #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn),
   #rizq-desk-nav ~ nav .logo,
   #rizq-desk-nav ~ nav .nav-actions,
@@ -448,6 +448,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     z-index:10000 !important;
     height:var(--rizq-header-h,78px) !important;
     max-height:var(--rizq-header-h,78px) !important;
+    position:fixed !important;
     bottom:auto !important;
     inset:0 0 auto 0 !important;
     pointer-events:auto !important;
@@ -458,15 +459,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     max-width:100% !important;
     left:0 !important;
     right:0 !important;
+    top:0 !important;
     padding-block:0 !important;
     padding-inline:max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) !important;
+    border-bottom:1px solid rgba(255,255,255,.08);
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
-  }
-  html.rizq-app-nav #rizq-desk-nav{
-    position:fixed !important;
-    left:0;right:0;top:0;
-    border-bottom:1px solid rgba(255,255,255,.08);
   }
   html.rizq-app-nav #nav .nav-hamburger,
   html.rizq-app-nav #rizq-desk-nav .nav-hamburger{display:none !important}
@@ -982,7 +980,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     left:0 !important;right:0 !important;
     z-index:9990 !important;
   }
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(:has(.nav-search)){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)){
     display:none !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
@@ -1164,7 +1162,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-bottom:0 !important;
   }
 
-  html.rizq-app-nav body > nav:not(.section-jump-bar):not(.hero-biz-nav):not(:has(.nav-search)):not(:has(.nav-search-mini)),
+  html.rizq-app-nav body > nav:not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav .topnav:not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav #nav,
   html.rizq-app-nav #rizq-desk-nav,

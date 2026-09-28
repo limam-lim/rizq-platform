@@ -40,7 +40,7 @@ html.rizq-app-nav body.landing-ux-mobile{--rzq-nav-clearance:110px}
   position:relative;z-index:var(--rzq-z-content);
 }
 #nav,.topnav,.mobile-bottom-nav,.mobile-bar,.section-jump-bar,
-nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-chrome){
+nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
   z-index:var(--rzq-z-header)!important;
 }
 #back-to-top,
@@ -666,7 +666,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 }
 
 @media(orientation:landscape) and (max-height:520px){
-  nav:not(#nav):not(#rizq-desk-nav),.topnav{
+  nav:not(#nav):not(#rizq-desk-nav):not(.cta-hubs):not(.section-jump-bar):not(.hero-biz-nav),.topnav{
     height:auto!important;min-height:48px;flex-wrap:wrap!important;
     padding:8px 12px!important;gap:8px!important;
   }

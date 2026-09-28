@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=23.0"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=23.0"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=23.1"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=23.0"/>
+<link rel="stylesheet" href="rizq_header.css?v=23.1"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -119,7 +119,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ══════════════════════════════════
    NAVBAR — Premium Redesign
 ══════════════════════════════════ */
-nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome){
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:0 max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));height:70px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -1764,7 +1764,12 @@ main, .page-content.active, .main-content, .results-area,
 .cta-section .btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(201,168,76,.55)}
 .cta-hubs{
   display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-  max-width:720px;margin:0 auto 28px;position:relative;z-index:2;
+  max-width:720px;margin:0 auto 28px;position:relative !important;
+  top:auto !important;left:auto !important;right:auto !important;bottom:auto !important;
+  inset:auto !important;height:auto !important;max-height:none !important;
+  z-index:2 !important;transform:none !important;
+  background:transparent !important;background-image:none !important;
+  border:none !important;padding:0 !important;overflow:visible !important;
 }
 .cta-hub{
   display:flex;flex-direction:column;align-items:center;gap:6px;
@@ -11125,7 +11130,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo2"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=23.0"></script>
+<script src="rizq_landing_ux.js?v=23.1"></script>
 <script src="rizq_disclaimer.js"></script>
 
 
