@@ -90,6 +90,7 @@ document.documentElement.classList.add('rizq-app-nav');
 <title>رزق | Rizq — سوقك الموريتاني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
+  --navy:#0D1B2A;
   --gold:#C9A84C;--gold-light:#d4bc72;--gold-pale:#ebe2c8;--gold-dim:rgba(201,168,76,0.12);
   --white:#FFFFFF;--dark:#0D1B2A;--dark-2:#111d2e;--dark-3:#162235;
   --bg-page:#fbfcff;--bg-section:#fbfcff;
@@ -1197,7 +1198,10 @@ html[dir="ltr"] #all-ads-title{
 .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(26px,4vw,48px);font-weight:700;line-height:1.2;margin-bottom:14px;color:#fff}
 .section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.2vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px;color:#fff!important}
 .section-title span{background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.section-desc{color:rgba(255,255,255,.88);font-size:14.5px;max-width:480px;margin:0 auto;line-height:1.75}
+.section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick){
+  color:rgba(255,255,255,.94)!important;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8;font-weight:600;
+  text-shadow:0 1px 2px rgba(0,0,0,.25);
+}
 html[dir="rtl"] .section-header .section-title,
 html[dir="ltr"] .section-header .section-title,
 html[dir="rtl"] .section-header .section-tag,
@@ -2326,7 +2330,7 @@ html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-icon{font-size:34px;margin-bottom:10px}
 .rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
-.rzq-disc-empty-desc{font-size:12.5px;color:rgba(255,255,255,.65);max-width:420px;margin:0 auto 16px;line-height:1.7}
+.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9);max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
@@ -3017,7 +3021,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="landing-ads-more" id="landing-ads-more"></div>
   <div style="text-align:center;margin-top:28px" class="fade-in landing-ads-footer-actions">
     <a class="btn-outline" href="rizq_browse.html" data-t="browse-full" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">📂 فتح صفحة الإعلانات كاملة ←</a>
-    <button type="button" class="btn-outline" data-t="view-all" onclick="openAllAds()" style="margin-inline-start:10px">عرض الكل في نافذة ←</button>
   </div>
 </section>
 
@@ -3027,7 +3030,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag">Rizq Stores</p>
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vs-title">افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك</h2>
-      <p style="color:rgba(255,255,255,.7);font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t="vs-desc">
+      <p class="section-desc" data-t="vs-desc">
         صفحة تجارية باسمك: اعرض منتجاتك، ابنِ ثقة الزبائن، وتابع الزيارات والتواصل من لوحة واحدة.
       </p>
     </div>
@@ -3056,7 +3059,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-store"></div>
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <a href="./?openRegister=1&regPage=1&preType=company&preBiz=store" onclick="openRegisterAs('company','store');return false" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">🏪 افتح محلك الآن</a>
-        <a href="rizq_store.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn2">👁 عرض نموذج محل</a>
       </div>
     </div>
   </div>
@@ -3097,7 +3099,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span style="color:#fff">مكتبك الاحترافي على رزق</span><br>
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">يصل لطالبي الخدمة كل يوم</span>
       </h2>
-      <p class="vo-desc-text" style="color:rgba(255,255,255,.7);font-size:15.5px;max-width:620px;margin:0 auto;line-height:1.9" data-t="vo-desc">
+      <p class="section-desc vo-desc-text" data-t="vo-desc">
         أنشئ مكتباً افتراضياً يعرض خدماتك بوضوح، يتيح التواصل المباشر، ويجلب طلبات مهنية جديدة.
       </p>
     </div>
@@ -3179,7 +3181,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-office"></div>
       <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">📒 أنشئ مكتبك الآن</button>
-        <a id="vo-view-btn" href="rizq_office.html" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px" data-t="vo-btn2">👁 عرض نموذج مكتب</a>
       </div>
     </div>
 
@@ -3200,7 +3201,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vsh-title">
         معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون
       </h2>
-      <p style="color:rgba(255,255,255,.75);font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t="vsh-desc">
+      <p class="section-desc" data-t="vsh-desc">
         سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.
       </p>
     </div>
@@ -3262,7 +3263,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
            class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
-        <a href="rizq_showroom.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
       </div>
     </div>
 
@@ -3289,8 +3289,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des appels d'offres</span> de Rizq">
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة المناقصات</span> على رزق
       </h2>
-      <p style="color:rgba(255,255,255,.75);font-size:15px;max-width:640px;margin:0 auto;line-height:1.8" data-t-fr="Publiez votre besoin (matériaux, services, équipements...) et recevez des offres de prix privées de commerçants réels — ou soumissionnez sur des appels d'offres ouverts. Un marché B2B privé, réservé aux abonnés.">
-        انشر احتياجك (مواد، خدمات، معدات...) واستقبل عروض أسعار خاصة من تجار حقيقيين — أو قدّم عرضك على مناقصات مفتوحة. سوق أعمال خاص، مخصّص للمشتركين فقط.
+      <p class="section-desc" data-t-fr="Publiez votre besoin et recevez des offres privées — marché B2B réservé aux abonnés.">
+        انشر احتياجك واستقبل عروض أسعار خاصة — سوق أعمال مخصّص للمشتركين.
       </p>
     </div>
 
@@ -3403,8 +3403,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
       </h2>
-      <p class="section-desc" style="color:rgba(255,255,255,.9);font-size:15px;max-width:640px;margin:0 auto;line-height:1.8;font-weight:600" data-t-fr="Présentez votre projet d'investissement, trouvez des partenaires, et connectez-vous dans un espace sérieux réservé aux opportunités réelles.">
-        اعرض مشروعك الاستثماري، ابحث عن شركاء، وتواصل في فضاء جاد مخصّص للفرص الحقيقية.
+      <p class="section-desc" data-t-fr="Présentez votre projet, trouvez des partenaires — espace sérieux pour opportunités réelles.">
+        اعرض مشروعك الاستثماري وابحث عن شركاء في فضاء جاد للفرص الحقيقية.
       </p>
     </div>
 
@@ -3426,41 +3426,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
 
-    <div class="fade-in" id="investments-empty-mount" style="max-width:720px;margin:0 auto 32px">
-      <div class="rzq-disc-empty">
-        <div class="rzq-disc-empty-icon">🌟</div>
-        <div class="rzq-disc-empty-title">كن أول من ينشر فرصة استثمار هنا</div>
-        <div class="rzq-disc-empty-desc">فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.</div>
-      </div>
-    </div>
-
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
       <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="📈 Entrer dans la salle des investissements">📈 ادخل غرفة الاستثمارات</a>
     </div>
 
   </div>
 </section>
-
-<script>
-(function(){
-  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
-  function paintInvestEmpty(){
-    var mount = document.getElementById('investments-empty-mount');
-    if(!mount) return;
-    var fr = isFr();
-    mount.innerHTML = '<div class="rzq-disc-empty">'
-      + '<div class="rzq-disc-empty-icon">🌟</div>'
-      + '<div class="rzq-disc-empty-title">'+(fr?'Soyez le premier à publier une opportunité ici':'كن أول من ينشر فرصة استثمار هنا')+'</div>'
-      + '<div class="rzq-disc-empty-desc">'+(fr?'Les opportunités apparaîtront ici dès leur publication.':'فرص الاستثمار ستظهر هنا فور نشرها — ابدأ الآن وكن في الواجهة.')+'</div>'
-      + '</div>';
-  }
-  document.addEventListener('DOMContentLoaded', paintInvestEmpty);
-  try{
-    var _si = Storage.prototype.setItem;
-    Storage.prototype.setItem = function(k,v){ _si.call(this,k,v); if(k==='rizq_lang') paintInvestEmpty(); };
-  }catch(e){}
-})();
-</script>
 
 <!-- ══ SECTION: نشِط الآن على رزق — مهام #234/#235/#237 (طلب "تحسينات
      Amazon-inspired": "ينتهي قريباً" + "بائعون موثوقون"). يعتمد فقط على
