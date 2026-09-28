@@ -1844,6 +1844,10 @@ html[dir="rtl"] .pricing-card-roi{text-align:right}
 html[dir="ltr"] .pricing-card-roi{text-align:left}
 .pricing-features{list-style:none;margin:0 0 12px;padding:0 4px;text-align:right}
 html[dir="ltr"] .pricing-features{text-align:left}
+.diamond-pitch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:right}
+html[dir="ltr"] .diamond-pitch-grid{text-align:left;direction:ltr}
+html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
+#diamond-pitch{direction:inherit}
 .pricing-card li,.pricing-features li{padding:3px 0;font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:7px;line-height:1.5;word-wrap:break-word}
 .pricing-card li span:last-child,.pricing-features li span:last-child{flex:1;min-width:0}
 .pricing-card-freebox{background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46;margin-top:auto;line-height:1.35}
@@ -3587,7 +3591,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <p class="section-desc" data-t="s-price-desc">ابدأ مجاناً وطوّر تجربتك متى شئت</p>
     <div id="diamond-pitch" style="max-width:920px;margin:18px auto 0;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#0a1628,#1B3A6B);border:1px solid rgba(201,168,76,.45);color:#f5f0e6;text-align:center">
       <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e8c96a;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
-      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:right">
+      <div class="diamond-pitch-grid">
         <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28)">
           <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية الأساسية 💎</div>
           <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:rgba(255,255,255,.85)">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
