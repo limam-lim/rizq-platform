@@ -6169,13 +6169,6 @@ function applyList(list){
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
-    var liveLabel = document.querySelector('.listings-label span');
-    if(liveLabel && usingShowcase){
-      var fr = (typeof isAr !== 'undefined' && !isAr);
-      liveLabel.innerHTML = fr
-        ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>Aperçu</strong> Exemples d’annonces — publiez la vôtre'
-        : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>عرض</strong> نماذج إعلانات — انشر إعلانك ليظهر هنا مباشرة';
-    }
     renderTickerFromAds();
     applyCatCountsFromAds();
     var adStat = document.querySelector('#platform-stats .h-stat-num');
