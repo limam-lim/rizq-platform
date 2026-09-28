@@ -1079,9 +1079,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:100% !important;
     max-width:100% !important;
     display:flex !important;
-    /* صف واحد قابل للتمرير بدل تكديس الأزرار فوق بعضها */
+    /* صف واحد قابل للتمرير — الأزرار في الوسط وليس ملتصقة بطرف */
     flex-wrap:nowrap !important;
-    justify-content:flex-start !important;
+    justify-content:center !important;
     align-items:center !important;
     gap:12px !important;
     overflow-x:auto !important;
@@ -1360,7 +1360,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center !important;
-    justify-content:flex-start !important;
+    justify-content:center !important;
     height:52px !important;
     padding:4px 10px !important;
     margin:2px 0 6px !important;
@@ -1514,7 +1514,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding:0 14px 0 6px !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center.rizq-nav-has-docked-more{
-    padding-inline-end:78px !important;
+    /* هامش متساوٍ يمين/يسار حتى تبقى الأزرار في الوسط مع المزيد المثبّت */
+    padding-inline:78px !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li{
     overflow:visible !important;
@@ -1729,10 +1730,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:flex !important;
     flex-direction:row !important;
     align-items:center;
-    justify-content:space-around;
-    gap:0;
+    justify-content:center;
+    gap:8px;
     height:56px !important;
-    padding:0 4px !important;
+    padding:0 8px !important;
     background:#0f172a !important;
     backdrop-filter:none !important;
     border:none !important;
@@ -1744,14 +1745,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html[dir="ltr"] #rizq-app-header nav.rizq-hdr-row2,
   html[dir="ltr"] #rizq-app-header .rizq-hdr-row2{direction:ltr}
   .rizq-hdr-item{
-    flex:1;
+    flex:0 0 auto;
     min-width:0;
     display:inline-flex !important;
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
     gap:3px;
-    padding:4px 2px;
+    padding:4px 8px;
     font-size:11px;
     border-radius:8px;
     color:#ffffff !important;
@@ -2301,8 +2302,8 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
 /* هاتف: صف أقسام أرحب وأوضح */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
   html.rizq-app-nav #rizq-app-header .rizq-hdr-row2{
-    gap:4px !important;
-    justify-content:space-between !important;
+    gap:6px !important;
+    justify-content:center !important;
     padding:6px 8px 10px !important;
     background:transparent !important;
   }
@@ -2378,7 +2379,7 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
     gap:12px !important;
-    justify-content:flex-start !important;
+    justify-content:center !important;
     padding:6px 8px 8px !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
