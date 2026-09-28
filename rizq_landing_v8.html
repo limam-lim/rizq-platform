@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=23.4"/>
+<link rel="stylesheet" href="rizq_header.css?v=23.5"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -59,7 +59,7 @@ document.documentElement.classList.add('rizq-app-nav');
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
   html.rizq-app-nav body.landing-ux-mobile{padding-top:110px!important}
   html.rizq-app-nav body.landing-ux-mobile>nav#nav{display:flex!important;visibility:visible!important;height:110px!important;position:fixed!important;top:0;left:0;right:0;z-index:1000!important;background:#0f172a!important;flex-wrap:wrap!important}
-  html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 100%!important;width:100%!important}
+  html.rizq-app-nav body.landing-ux-mobile #nav>.nav-center{display:flex!important;flex:0 0 auto!important;width:fit-content!important;max-width:calc(100% - 20px)!important;margin-inline:auto!important}
   /* التيكر مباشرة تحت شريط الأقسام — لا توسيط عمودي يفتح فراغاً أبيض */
   html.rizq-app-nav body.landing-ux-mobile .hero,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero,
