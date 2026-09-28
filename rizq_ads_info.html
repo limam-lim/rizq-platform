@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=22.5"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=22.6"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=22.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=22.6"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>رزق ADS — أعلن حيث يبحث الناس | رزق</title>
 <style>
@@ -208,17 +208,14 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
 .feat-mini h4{font-size:13px;font-weight:800;color:#1B3A6B;margin-bottom:4px}
 .feat-mini p{font-size:11.5px;color:#5B6478;line-height:1.55}
 
-/* ══ باقات — خلفية فاتحة مثل الرئيسية، الكحلي على البطاقات ══ */
+/* ══ باقات بنفس ألوان الصفحة الرئيسية ══ */
 .ads-pricing{
-  background:var(--rizq-pkg-section-bg,#fbfcff);
-  border-top:1px solid #e7ecf3;
+  background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
   position:relative;
 }
-.ads-pricing::before{display:none}
-.ads-pricing .sec-head h2{color:#1B3A6B}
-.ads-pricing .sec-head p{color:#5b6b8a}
-.ads-pricing .sec-head .tag{
-  color:var(--gold,#C9A84C);background:#fff;border-color:var(--line,#e7ecf3);
+.ads-pricing::before{
+  content:'';position:absolute;inset:0 0 auto 0;height:180px;pointer-events:none;
+  background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(201,168,76,.08),transparent 70%);
 }
 .pricing-grid{
   position:relative;z-index:1;
@@ -486,7 +483,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
 </footer>
 
 <script src="rizq_packages_config.js"></script>
-<script src="rizq_packages_ui.js?v=22.5"></script>
+<script src="rizq_packages_ui.js?v=22.6"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_lang_guard.js?v=1.0"></script>

@@ -14,8 +14,8 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="stylesheet" href="rizq-theme.css?v=22.5"/>
-<link rel="stylesheet" href="rizq_header.css?v=22.5"/>
+<link rel="stylesheet" href="rizq-theme.css?v=22.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=22.6"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
 <style>
@@ -208,7 +208,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .review-text{font-size:13px;color:#4a5364;line-height:1.7}
 
 /* ── PACKAGES — حاوية فقط؛ الشبكة من rizq_packages_ui (تجنّب تداخل grid داخل grid) ── */
-.pkg-section{padding:40px 4% 56px;background:var(--rizq-pkg-section-bg,#fbfcff);border-top:1px solid #e7ecf3;overflow:visible}
+.pkg-section{padding:40px 4% 56px;background:linear-gradient(180deg,#f7f9fc,#eef2fb);border-top:1px solid #e7ecf3;overflow:visible}
 .pkg-section-inner{max-width:1320px;margin:0 auto;width:100%}
 .pkg-grid{display:block;width:100%;max-width:100%;box-sizing:border-box}
 #pkg-grid{width:100%}
@@ -489,7 +489,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
         <span id="mru-note">الأسعار بالأوقية الجديدة · </span><span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
       </p>
     </div>
-    <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1"></div>
+    <div class="pkg-grid" id="pkg-grid" data-rizq-pkg-catalog="corp" data-rizq-pkg-cols="3" data-rizq-pkg-diamond="1" data-rizq-pkg-light="1"></div>
   </div>
 </section>
 
@@ -862,7 +862,7 @@ function applyAccountData(){
 function loadPackages(){
   if(window.RizqPackagesUI && typeof RizqPackagesUI.mount==='function'){
     var lang = (window.RizqI18n ? RizqI18n.getLang() : localStorage.getItem('rizq_lang')) || 'ar';
-    RizqPackagesUI.mount('pkg-grid','corp',{columns:3,ensureDiamond:true,light:false,lang:lang});
+    RizqPackagesUI.mount('pkg-grid','corp',{columns:3,ensureDiamond:true,light:true,lang:lang});
   }
 }
 
