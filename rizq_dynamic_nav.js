@@ -158,14 +158,16 @@
         el.className = 'rizq-nav-module';
         el.setAttribute('data-rizq-module', mod.key);
         el.setAttribute('data-nav-order', String(mod.order));
-        el.innerHTML = '<a href="' + resolveHref(mod, onLanding) + '" data-hdr="' + mod.hdr + '">' + labelFor(mod) + '</a>';
+        el.innerHTML = '<a href="' + resolveHref(mod, onLanding) + '" data-hdr="' + mod.hdr + '"><span class="rizq-hdr-ico" aria-hidden="true">' + mod.ico + '</span><span class="rizq-hdr-lbl" data-hdr="' + mod.hdr + '">' + labelFor(mod) + '</span></a>';
         if (moreLi && moreLi.parentNode) moreLi.parentNode.insertBefore(el, moreLi);
         else if (aiLi && aiLi.parentNode) aiLi.parentNode.insertBefore(el, aiLi);
         else container.appendChild(el);
       }
     });
     container.setAttribute('data-rizq-modules-ready', '1');
-  }
+    if (global.RizqHeader && typeof global.RizqHeader.enhanceModel3NavLinks === 'function') {
+      global.RizqHeader.enhanceModel3NavLinks(container);
+    }
 
   function ensureDesktopMainExtras(container) {
     if (!container || container.classList.contains('rizq-hdr-row2')) return;
@@ -188,7 +190,9 @@
       var a = document.createElement('a');
       a.href = resolveHref(item, onLanding);
       a.setAttribute('data-hdr', item.hdr);
-      a.textContent = labelFor(item);
+      var ico = item.ico || (global.RizqHeader && global.RizqHeader.icoForHdr
+        ? global.RizqHeader.icoForHdr(item.hdr) : '◇');
+      a.innerHTML = '<span class="rizq-hdr-ico" aria-hidden="true">' + ico + '</span><span class="rizq-hdr-lbl" data-hdr="' + item.hdr + '">' + labelFor(item) + '</span>';
       li.appendChild(a);
       if (insertAfter && insertAfter.parentNode) {
         insertAfter.parentNode.insertBefore(li, insertAfter.nextSibling);

@@ -106,26 +106,32 @@ function localPlan(input) {
 }
 
 function buildSystemPrompt(lang) {
+  let excellence = '';
+  try {
+    excellence = require('./agentQuality').buildIntelligenceExcellenceBlock({ mode: 'investment' });
+  } catch (e) { excellence = ''; }
   if (lang === 'fr') {
     return [
       'Tu es le conseiller de premier passage de la Salle des investissements Rizq (Mauritanie).',
       'Tu prépares un dossier clair pour des investisseurs — tu n\'es PAS un conseiller financier agréé et tu ne garantis aucun rendement.',
+      excellence,
       'Réponds UNIQUEMENT en JSON valide avec les clés:',
       'executiveSummary, businessModel, capitalUse, risks, ask, investorPitch, disclaimer.',
       'Ton: professionnel, prudent, concret, adapté au marché mauritanien.',
       'Mentionne que Rizq est un intermédiaire de publication et que le contact public est ' + PUBLIC_CONTACT + '.',
       'N\'invente pas de chiffres de rendement. Si l\'info manque, dis-le clairement.'
-    ].join('\n');
+    ].filter(Boolean).join('\n');
   }
   return [
     'أنت وكيل المراجعة الأوّلية في غرفة الاستثمارات بمنصة رزق (موريتانيا).',
     'تحوّل فكرة المشروع إلى ملف واضح للمستثمرين — ولست مستشاراً مالياً مرخّصاً ولا تضمن أي عائد.',
+    excellence,
     'أجب فقط بـ JSON صالح بالمفاتيح:',
     'executiveSummary, businessModel, capitalUse, risks, ask, investorPitch, disclaimer.',
     'الأسلوب: مهني، حذر، عملي، مناسب للسوق الموريتاني.',
     'اذكر أن رزق وسيط نشر وأن البريد العام هو ' + PUBLIC_CONTACT + '.',
     'لا تخترع أرقام عائد. إن نقصت المعلومة فقل ذلك بوضوح.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 function parsePlanJson(text) {
@@ -206,6 +212,19 @@ async function generatePlan(input, anthropicClient) {
       ? 'Avis de premier passage — non contractuel.'
       : 'مراجعة أولية — غير ملزمة.';
   }
+
+  try {
+    const aq = require('./agentQuality');
+    ['executiveSummary', 'businessModel', 'capitalUse', 'risks', 'ask', 'investorPitch', 'disclaimer'].forEach((k) => {
+      if (!plan[k]) return;
+      const cleaned = aq.stripForbiddenClaims(plan[k], lang);
+      if (cleaned.scrubbed) {
+        plan[k] = lang === 'fr'
+          ? 'Information prudente: aucun rendement n\'est garanti. Vérifiez avant tout engagement.'
+          : 'تنبيه: لا يوجد عائد مضمون. تحقّق قبل أي التزام.';
+      }
+    });
+  } catch (eQ) { /* optional */ }
 
   pushEvent('plan_ready', { lang, source });
   return { plan, source, lang };

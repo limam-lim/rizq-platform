@@ -159,6 +159,25 @@ function buildToneBlock() {
   );
 }
 
+function buildIntelligenceExcellenceBlock(opts) {
+  opts = opts || {};
+  var mode = opts.mode || (opts.agentTier === 'diamond' || opts.tier === 'diamond' ? 'merchant' : 'platform');
+  try {
+    var aq = require('./rizq-backend/services/agentQuality');
+    if (aq && typeof aq.buildIntelligenceExcellenceBlock === 'function') {
+      return aq.buildIntelligenceExcellenceBlock({ mode: mode });
+    }
+  } catch (e) { /* browser or early load */ }
+  return (
+    '## INTELLIGENCE EXCELLENCE (NON-NEGOTIABLE)\n' +
+    '- Prefer verified tools/data over memory for prices, packages, trust, and lead IDs.\n' +
+    '- Never invent numbers, discounts, inventory, or reference IDs.\n' +
+    '- Never promise guaranteed profits or unofficial discounts.\n' +
+    '- If unsure: say so briefly and offer a concrete next step.\n' +
+    '- Match the user language and keep answers decisive and useful.\n'
+  );
+}
+
 function buildGeneralAssistantRole() {
   return (
     '## ROLE: RIZQ SMART AGENT — CUSTOMER JOURNEY\n' +
@@ -205,6 +224,7 @@ function buildMasterSystemPrompt(opts) {
     buildPlainTextFormattingBlock(),
     buildSecurityBlock(),
     buildToneBlock(),
+    buildIntelligenceExcellenceBlock(opts),
     isDiamond ? buildDiamondAgentRole(profile) : buildGeneralAssistantRole()
   ].filter(Boolean).join('\n\n');
 }
@@ -222,6 +242,7 @@ var RizqAgent = {
   buildSecurityBlock: buildSecurityBlock,
   buildKnowledgeBaseBlock: buildKnowledgeBaseBlock,
   buildToneBlock: buildToneBlock,
+  buildIntelligenceExcellenceBlock: buildIntelligenceExcellenceBlock,
   buildGeneralAssistantRole: buildGeneralAssistantRole,
   buildDiamondAgentRole: buildDiamondAgentRole,
   isPromptInjection: isPromptInjection,

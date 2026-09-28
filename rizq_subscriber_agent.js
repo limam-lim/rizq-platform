@@ -329,6 +329,18 @@ function buildSubscriberSystemPrompt(profile, channel) {
 //  context: { sender, name, subject, history[] }
 // ══════════════════════════════════════════════════════════════
 async function askSubscriberAgent({ subscriberId, channel, message, context = {} }) {
+  try {
+    const ops = require('./rizq-backend/services/agentOps');
+    if (!ops.isAgentFamilyEnabled('subscriber')) {
+      return {
+        text: 'وكيل المنشأة موقّف مؤقتاً من إدارة المنصة.',
+        channel,
+        model: null,
+        disabled: true,
+      };
+    }
+  } catch (eOps) { /* */ }
+
   const { askAgent } = require('./rizq_agent_brain');
 
   // عزل صارم: بلا معرّف → مدير رزق العام فقط (لا تاجر عشوائي)
@@ -455,7 +467,30 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   const response = created.response;
 
   const textBlock = response.content.find(b => b.type === 'text');
-  const replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سيُتواصل معكم قريباً.';
+  let replyText = textBlock ? textBlock.text.trim() : 'شكراً لتواصلكم. سيُتواصل معكم قريباً.';
+
+  let qualityMeta = null;
+  try {
+    const aq = require('./rizq-backend/services/agentQuality');
+    const polished = aq.polishChannelReply(replyText, {
+      channel,
+      lang: 'ar',
+      fallback: 'شكراً لتواصلكم. سيُتواصل معكم قريباً.',
+    });
+    replyText = polished.text;
+    qualityMeta = polished.quality;
+    if (polished.scrubbedClaim) {
+      aq.maybeRecordWeakReply({
+        message,
+        reply: replyText,
+        agent: 'subscriber',
+        channel,
+        scrubbedClaim: true,
+        force: true,
+        tier: 'diamond',
+      });
+    }
+  } catch (eQ) { /* optional */ }
 
   console.log(`🎭 [${profile.businessName}] رد على ${context.sender || 'مجهول'}: ${replyText.substring(0,60)}...`);
 
@@ -485,6 +520,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     business  : profile.businessName,
     businessType: profile.businessType,
     usage     : response.usage,
+    quality   : qualityMeta || undefined,
     isolation : { subscriberId: canonicalId, mode: 'tenant' },
   };
 }

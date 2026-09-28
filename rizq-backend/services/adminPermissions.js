@@ -32,6 +32,7 @@ const PERMISSION_DEFS = [
   { key: 'quota-guard', group: 'ai', panel: 'quota-guard', labelAr: 'مراقبة الاستهلاك', labelFr: 'Quota guard' },
   { key: 'ai-manager', group: 'ai', panel: 'ai-manager', labelAr: 'مدير رزق الذكي', labelFr: 'AI Manager' },
   { key: 'moderator-config', group: 'ai', panel: 'moderator-config', labelAr: 'إعدادات المراقب الآلي', labelFr: 'Config. modérateur IA' },
+  { key: 'marketing', group: 'ai', panel: 'marketing', labelAr: 'مدير التسويق', labelFr: 'Marketing Manager' },
   { key: 'team.manage', group: 'system', panel: 'team', labelAr: 'إدارة فريق العمل (إضافة/تعديل)', labelFr: 'Gérer l\'équipe admin' },
 ];
 
@@ -64,7 +65,7 @@ const PERMISSION_PRESETS = {
   platform_config: {
     labelAr: '⚙️ إعدادات المنصة',
     labelFr: '⚙️ Configuration plateforme',
-    permissions: ['overview', 'siteconfig', 'modules', 'settings', 'packages', 'prices', 'channels'],
+    permissions: ['overview', 'siteconfig', 'modules', 'settings', 'packages', 'prices', 'channels', 'marketing', 'promo-video', 'announcements'],
   },
   deputy_admin: {
     labelAr: '🟣 نائب مدير (كل شيء ما عدا فريق الإدارة)',
@@ -105,7 +106,7 @@ function permissionsForLegacyRole(role) {
   if (role === 'moderator') {
     return ['overview', 'users', 'ads', 'reports', 'moderation', 'tenders', 'accounts',
       'packages', 'siteconfig', 'modules', 'legal', 'channels', 'announcements',
-      'ai-manager', 'moderator-config', 'subscriber-agents', 'quota-guard', 'analytics',
+      'ai-manager', 'moderator-config', 'marketing', 'subscriber-agents', 'quota-guard', 'analytics',
       'extra-categories', 'promo-video', 'legal-editor'];
   }
   if (role === 'finance') return ['overview', 'payments', 'analytics', 'accounts'];

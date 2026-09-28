@@ -76,6 +76,21 @@ const CLAUDE_CODE_PATHS = [
     must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/, /\/api\/admin\/agents-health/],
   },
   {
+    rel: 'services/investmentRoom.js',
+    base: BACKEND,
+    must: [/config\/anthropic|getAgentModel|createCachedMessage/, /isAnthropicConfigured|getAnthropicApiKey/],
+  },
+  {
+    rel: 'services/marketingAgent.js',
+    base: BACKEND,
+    must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/],
+  },
+  {
+    rel: 'services/agentQuality.js',
+    base: BACKEND,
+    must: [/buildIntelligenceExcellenceBlock/, /polishChannelReply/, /recordAgentMiss/],
+  },
+  {
     rel: 'rizq_call_handler.js',
     base: ROOT,
     must: [/rizq_agent_brain/, /rizq_subscriber_agent/, /config\/anthropic|isAnthropicConfigured/],

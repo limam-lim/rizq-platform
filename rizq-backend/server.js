@@ -8,9 +8,9 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
-ensureAnthropicEnv();
-// ���� SQLite (data/rizq.db) � �&شتر���  + �&فض�ة � ا��&رح�ة 3 ��������������������������
 require('./db');
+try { require('./services/secretsVault').loadAndApplyOnBoot(); } catch (eVaultBoot) { console.warn('[secretsVault] boot:', eVaultBoot && eVaultBoot.message); }
+ensureAnthropicEnv();
 const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
@@ -320,7 +320,7 @@ if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNT
 if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
   adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
 }
-const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSharedSecret } = createAdminAuth({
+const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSuperAdmin, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,
 });
@@ -968,6 +968,11 @@ app.get('/api/ai/status', (req, res) => {
 });
 
 /** GET /api/admin/agents-health — حالة ربط كل الوكلاء بمفتاح Claude + السر المشترك */
+function isFacebookEnvReady() {
+  return !!(String(process.env.FACEBOOK_PAGE_ID || '').trim() &&
+    String(process.env.FACEBOOK_PAGE_ACCESS_TOKEN || '').trim());
+}
+
 app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
   const sharedConfigured = !!(process.env.BACKEND_SHARED_SECRET || '').trim();
   const apiSecretConfigured = !!(process.env.RIZQ_API_SECRET || '').trim();
@@ -990,6 +995,19 @@ app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
     { id: 'visual', name: 'الوكيل البصري', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'Canvas في المتصفح — بلا Claude' },
     { id: 'quota-guard', name: 'حارس الحصص', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'عدّاد حصص — بلا استدعاء Claude' },
     { id: 'secretary-gate', name: 'بوابة السكرتير (واجهة)', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'يُفعّل الويدجت فقط؛ الذكاء عبر widget/subscriber' },
+    {
+      id: 'marketing',
+      name: 'مدير التسويق',
+      needsClaude: true,
+      linkedToKeyLoader: true,
+      wired: claudeConfigured,
+      via: 'services/marketingAgent.js → getAnthropicApiKey() + Facebook Graph (اختياري)',
+      note: isFacebookEnvReady()
+        ? 'Claude + فيسبوك جاهزان'
+        : 'توليد مسودات بـ Claude؛ النشر لفيسبوك يحتاج FACEBOOK_PAGE_ID + FACEBOOK_PAGE_ACCESS_TOKEN',
+    },
+    { id: 'investment', name: 'غرفة الاستثمارات (مخطط أولي)', needsClaude: true, linkedToKeyLoader: true, wired: claudeConfigured, via: 'services/investmentRoom.js → getAnthropicApiKey()' },
+    { id: 'agent-quality', name: 'طبقة جودة الردود (مشتركة)', needsClaude: false, linkedToKeyLoader: true, wired: true, note: 'services/agentQuality.js — فحص ادعاءات + تلميع قنوات + تسجيل فوائت' },
   ];
   const blockers = [];
   if (!claudeConfigured) blockers.push('أضف ANTHROPIC_API_KEY (أو CLAUDE_API_KEY) في rizq-backend/.env ثم أعد تشغيل الخادم');
@@ -2538,6 +2556,105 @@ mountAdminCoreRoutes(app, {
   DATA_DIR,
   readLatestBackupMeta,
   backendRootDir: __dirname,
+});
+
+const { mountMarketingRoutes } = require('./routes/marketing');
+mountMarketingRoutes(app, { requireAdminPermission });
+try {
+  require('./services/marketingAgent').startScheduler();
+} catch (eMkt) {
+  console.warn('[marketingAgent] scheduler not started:', eMkt && eMkt.message);
+}
+
+const agentMissLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'طلبات كثيرة' },
+});
+
+/** POST /api/agent/miss — تسجيل سؤال فائت/رد ضعيف من الواجهة (أوفلاين أو ويدجت) */
+app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
+  try {
+    const aq = require('./services/agentQuality');
+    const b = req.body || {};
+    const row = aq.recordAgentMiss({
+      text: b.text || b.message,
+      reply: b.reply,
+      lang: b.lang,
+      agent: b.agent || 'manager_offline',
+      channel: b.channel || 'browser',
+      type: b.type || 'missed',
+      reason: b.reason,
+      tier: b.tier,
+      page: b.page,
+    });
+    if (!row) return res.status(400).json({ ok: false, error: 'text مطلوب' });
+    res.json({ ok: true, id: row.id });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'فشل التسجيل' });
+  }
+});
+
+app.get('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, res) => {
+  try {
+    const aq = require('./services/agentQuality');
+    res.json({ ok: true, misses: aq.listAgentMisses(req.query.limit) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, res) => {
+  try {
+    const aq = require('./services/agentQuality');
+    const n = aq.clearAgentMisses();
+    res.json({ ok: true, cleared: n });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** GET /api/admin/agents-ops — مركز تسيير الوكلاء */
+app.get('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, res) => {
+  try {
+    const ops = require('./services/agentOps');
+    res.json(ops.buildDashboard());
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** PATCH /api/admin/agents-ops — تفعيل/إيقاف عائلات الوكلاء */
+app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, res) => {
+  try {
+    const ops = require('./services/agentOps');
+    const admin = (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'admin';
+    const settings = ops.saveSettings(req.body || {}, admin);
+    res.json({ ok: true, settings, dashboard: ops.buildDashboard() });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** GET/PUT خزنة أسرار السوبر أدمن — لا تُرجع قيم المفاتيح كاملة */
+app.get('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+  try {
+    res.json(require('./services/secretsVault').getPublicStatus());
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+app.put('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+  try {
+    const admin = (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'super';
+    const result = require('./services/secretsVault').saveSecrets(req.body || {}, admin);
+    res.json(result);
+  } catch (err) {
+    console.error('[secretsVault] save', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل الحفظ' });
+  }
 });
 
 // ── "قريباً + أعلمني عند التفعيل" — إشارة اهتمام حقيقية بدل التخمين (طلب

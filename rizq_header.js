@@ -14,6 +14,73 @@
       '<span class="lang-ar" dir="ltr">AR</span>';
   }
 
+  /* نموذج 3 — أيقونات الشريط (ذهبي المزدي عبر CSS) */
+  var NAV_ICOS = {
+    home: '🏠',
+    ads: '📢',
+    cats: '📂',
+    stores: '🏪',
+    offices: '🏢',
+    showrooms: '🏬',
+    tenders: '📋',
+    investments: '📈',
+    post: '➕',
+    more: '⋯',
+    packs: '💎',
+    legal: '⚖️',
+    about: 'ℹ️',
+    rizqads: '🎬'
+  };
+
+  function icoForHdr(hdr) {
+    if (!hdr) return '◇';
+    var k = String(hdr).toLowerCase().replace(/^nav-/, '').replace(/^hdr-/, '');
+    if (k === 'store' || k === 'boutiques') k = 'stores';
+    if (k === 'office' || k === 'bureaux') k = 'offices';
+    if (k === 'showroom' || k === 'corp') k = 'showrooms';
+    if (k.indexOf('invest') === 0) k = 'investments';
+    if (k.indexOf('tender') === 0 || k === 'appels') k = 'tenders';
+    if (k === 'categories' || k === 'cat') k = 'cats';
+    if (k === 'annonce' || k === 'annonces' || k === 'listings') k = 'ads';
+    return NAV_ICOS[k] || '◇';
+  }
+
+  function m3LinkInner(ico, labelHtml) {
+    return '<span class="rizq-hdr-ico" aria-hidden="true">' + ico + '</span>' +
+      '<span class="rizq-hdr-lbl">' + labelHtml + '</span>';
+  }
+
+  /** حوّل روابط الشريط النصية إلى نموذج 3 (أيقونة فوق النص) */
+  function enhanceModel3NavLinks(root) {
+    var scope = root || document;
+    var nodes = scope.querySelectorAll(
+      '#nav .nav-center a[data-hdr], #rizq-desk-nav .nav-center a[data-hdr], ' +
+      '#nav .nav-center .nav-link-btn[data-hdr], #rizq-desk-nav .nav-center .nav-link-btn[data-hdr], ' +
+      '#nav .nav-center .nav-dropdown-trigger[data-hdr], #rizq-desk-nav .nav-center .nav-dropdown-trigger[data-hdr], ' +
+      '#nav .nav-center .nav-phone-more-only'
+    );
+    nodes.forEach(function (a) {
+      if (a.querySelector('.rizq-hdr-ico') && a.querySelector('.rizq-hdr-lbl')) return;
+      if (a.classList.contains('nav-post-plus') && !a.getAttribute('data-hdr')) return;
+      var hdr = a.getAttribute('data-hdr') || (a.classList.contains('nav-phone-more-only') ? 'more' : '');
+      if (!hdr && a.classList.contains('nav-dropdown-trigger')) hdr = 'more';
+      var ico = icoForHdr(hdr);
+      var lbl = a.querySelector('.rizq-hdr-lbl, .nav-phone-more-lbl');
+      var text = lbl ? lbl.textContent : a.textContent;
+      text = (text || '').replace(/\s*▾\s*$/, '').trim();
+      if (!text) return;
+      var keepAttrs = a.getAttribute('data-hdr');
+      a.innerHTML = m3LinkInner(ico, text);
+      if (keepAttrs) {
+        var span = a.querySelector('.rizq-hdr-lbl');
+        if (span) span.setAttribute('data-hdr', keepAttrs);
+      }
+      if (hdr === 'more' && a.classList.contains('nav-dropdown-trigger')) {
+        /* keep trigger class; label without ▾ — icon conveys menu */
+      }
+    });
+  }
+
   function paintLangBtn(btn) {
     if (!btn) return;
     if (window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function') {
@@ -376,8 +443,20 @@
     ).forEach(function (el) {
       var k = el.getAttribute('data-hdr');
       var text = hdrText(k, el);
-      if (text) el.textContent = text;
+      if (!text) return;
+      /* لا تمسح هيكل النموذج 3 — حدّث النص فقط داخل .rizq-hdr-lbl */
+      if (el.querySelector && el.querySelector('.rizq-hdr-ico')) {
+        var lbl = el.querySelector('.rizq-hdr-lbl') || el.querySelector('.nav-phone-more-lbl');
+        if (lbl) lbl.textContent = text.replace(/\s*▾\s*$/, '');
+        return;
+      }
+      if (el.classList && (el.classList.contains('rizq-hdr-lbl') || el.classList.contains('nav-phone-more-lbl'))) {
+        el.textContent = text.replace(/\s*▾\s*$/, '');
+        return;
+      }
+      el.textContent = text;
     });
+    enhanceModel3NavLinks();
     if (window.RizqI18n && typeof window.RizqI18n.applyStaticDom === 'function') {
       var nav = document.getElementById('nav');
       if (nav) window.RizqI18n.applyStaticDom(nav);
@@ -756,13 +835,13 @@
           deskFavHtml() +
         '</div>' +
         '<ul class="nav-center">' +
-          '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + t2('الرئيسية', 'Accueil') + '</a></li>' +
-          '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</a></li>' +
-          '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + t2('المحلات', 'Boutiques') + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="rizq_investments.html" data-hdr="investments">' + t2('الاستثمارات', 'Investissements') + '</a></li>' +
+          '<li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">' + m3LinkInner(NAV_ICOS.home, t2('الرئيسية', 'Accueil')) + '</a></li>' +
+          '<li data-nav-order="2"><a href="' + catsHref() + '" data-hdr="cats">' + m3LinkInner(NAV_ICOS.cats, t2('الأقسام', 'Catégories')) + '</a></li>' +
+          '<li data-nav-order="3"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner(NAV_ICOS.post, t2('نشر (+)', 'Publier (+)')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4"><a href="rizq_store.html" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="rizq_investments.html" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
-            '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + t2('المزيد ▾', 'Plus ▾') + '</a>' +
+            '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + m3LinkInner(NAV_ICOS.more, t2('المزيد', 'Plus')) + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +
           '</li>' +
         '</ul>' +
@@ -858,18 +937,82 @@
       + 'z-index:10052!important;display:block!important;';
   }
 
+  /* Prefer the visible trigger — on landing, #nav-more-mobile-btn comes first in
+     the DOM but is display:none on desk/tablet, so getBoundingClientRect() is 0
+     and the menu was pinned at top≈6 / left≈12. */
+  function visibleMoreTrigger(li) {
+    if (!li) return null;
+    var nodes = li.querySelectorAll(
+      '.nav-dropdown-trigger, #rizq-desk-more, .nav-desktop-more-only, #nav-more-mobile-btn, .nav-phone-more-only, .nav-link-btn'
+    );
+    var i;
+    var el;
+    var r;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      r = el.getBoundingClientRect();
+      if (r.width > 1 && r.height > 1) return el;
+    }
+    return li.querySelector('.nav-dropdown-trigger, #rizq-desk-more') || li;
+  }
+
   function positionMoreDropdown(li) {
     if (!li) return;
     if (isLanding() && isMobileNav() && li.id === 'nav-more-li') {
       positionLandingMobileMore(li);
       return;
     }
-    restoreMoreMenu(li);
+    var menu = moreMenuFor(li);
+    if (!menu) return;
+    var trigger = visibleMoreTrigger(li);
+    var rect = trigger.getBoundingClientRect();
+    if (!(rect.width > 1 && rect.height > 1)) {
+      /* Fallback: center under the nav row if trigger still has no box. */
+      var nav = document.getElementById('nav') || document.getElementById('rizq-desk-nav') || li;
+      rect = nav.getBoundingClientRect();
+    }
+    if (menu.parentNode !== document.body) {
+      menu.__rizqMoreHome = li;
+      menu.setAttribute('data-rizq-more-for', li.id || 'more-li');
+      document.body.appendChild(menu);
+    }
     li.classList.add('open');
+    menu.classList.add('rizq-more-menu-open');
+    var top = Math.round(rect.bottom + 6);
+    var centerX = Math.round(rect.left + rect.width / 2);
+    var menuW = Math.min(300, Math.max(240, Math.min(window.innerWidth - 24, 280)));
+    var left = Math.max(12, Math.min(centerX - menuW / 2, window.innerWidth - menuW - 12));
+    menu.style.cssText = ''
+      + 'position:fixed!important;top:' + top + 'px!important;'
+      + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
+      + 'transform:none!important;width:' + menuW + 'px!important;'
+      + 'max-width:min(300px,calc(100vw - 24px))!important;'
+      + 'max-height:min(70vh,480px)!important;overflow-y:auto!important;overflow-x:hidden!important;'
+      + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
+      + 'z-index:10052!important;display:block!important;'
+      + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
+      + 'border-radius:14px!important;padding:8px!important;'
+      + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
+  }
+
+  function dockLandingPhoneMore() {
+    var nav = document.getElementById('nav');
+    var more = document.getElementById('nav-more-li');
+    var center = nav && nav.querySelector('.nav-center');
+    if (!nav || !more || !center) return;
+    /* لا نفصل «المزيد» عن صف الأزرار — يبقى في الوسط مع المجموعة */
+    more.classList.remove('rizq-more-docked');
+    if (center) center.classList.remove('rizq-nav-has-docked-more');
+    if (more.__rizqMoreCenterHome && more.parentNode !== more.__rizqMoreCenterHome) {
+      more.__rizqMoreCenterHome.appendChild(more);
+    } else if (more.parentNode !== center) {
+      center.appendChild(more);
+    }
   }
 
   function bindLandingMobileMore() {
     /* Click handled by rizq_landing_ux.js → toggleNavDropdown (single path, no double-toggle). */
+    dockLandingPhoneMore();
   }
 
   window.positionNavDropdown = positionMoreDropdown;
@@ -920,12 +1063,34 @@
         closeMoreDropdowns();
         if (willOpen) positionMoreDropdown(li);
       });
+      /* نقر على الأيقونة/النص داخل الزر */
+      more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
+        child.style.pointerEvents = 'none';
+      });
       li.addEventListener('mouseenter', function () {
         if (!isDesk()) return;
         keepOpen();
       });
-      li.addEventListener('mouseleave', function () {
+      li.addEventListener('mouseleave', function (e) {
         if (!isDesk()) return;
+        var menu = moreMenuFor(li);
+        if (menu && e.relatedTarget && menu.contains(e.relatedTarget)) return;
+        scheduleClose();
+      });
+      document.addEventListener('mouseover', function (e) {
+        if (!isDesk()) return;
+        var menu = moreMenuFor(li);
+        if (!menu || !li.classList.contains('open')) return;
+        if (menu.contains(e.target) || li.contains(e.target)) {
+          clearTimeout(closeT);
+        }
+      });
+      document.addEventListener('mouseout', function (e) {
+        if (!isDesk()) return;
+        if (!li.classList.contains('open')) return;
+        var menu = moreMenuFor(li);
+        var to = e.relatedTarget;
+        if (to && (li.contains(to) || (menu && menu.contains(to)))) return;
         scheduleClose();
       });
       document.addEventListener('click', function (e) {
@@ -1253,6 +1418,7 @@
       removeHeader();
       if (document.body) document.body.classList.add('landing-ux-mobile');
       bindLandingMobileMore();
+      dockLandingPhoneMore();
       ensureLangListener();
       applyLabels();
       if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
@@ -1261,6 +1427,7 @@
         scheduleNavRefresh();
       }
       markActive();
+      enhanceModel3NavLinks();
       return;
     }
     if (!document.getElementById('rizq-app-header')) {
@@ -1279,6 +1446,7 @@
       scheduleNavRefresh();
     }
     markActive();
+    enhanceModel3NavLinks();
     if (window.RizqUx && typeof window.RizqUx.updateCommerceBadges === 'function') {
       window.RizqUx.updateCommerceBadges();
     } else if (window.RizqUx && typeof window.RizqUx.updateFavBadges === 'function') {
@@ -1298,7 +1466,10 @@
     markActive: markActive,
     resolveActiveNavKey: resolveActiveNavKey,
     positionMobileMoreMenu: positionMobileMoreMenu,
-    closeMobileMoreMenu: closeMobileMoreMenu
+    closeMobileMoreMenu: closeMobileMoreMenu,
+    enhanceModel3NavLinks: enhanceModel3NavLinks,
+    icoForHdr: icoForHdr,
+    NAV_ICOS: NAV_ICOS
   };
 
   if (document.body) inject();

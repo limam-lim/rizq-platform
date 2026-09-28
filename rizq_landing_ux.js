@@ -203,7 +203,16 @@
   /* ── Mobile bottom nav ── */
   var bottomNav = document.getElementById('mobile-bottom-nav');
   if (bottomNav) {
-    document.body.classList.add('landing-ux-mobile');
+    var isPhoneUx = false;
+    try {
+      if (window.RizqViewport && typeof window.RizqViewport.isPhone === 'function') {
+        isPhoneUx = window.RizqViewport.isPhone();
+      } else {
+        isPhoneUx = window.matchMedia('(max-width:768px)').matches
+          || window.matchMedia('(orientation:landscape) and (max-height:520px)').matches;
+      }
+    } catch (e) { isPhoneUx = false; }
+    if (isPhoneUx) document.body.classList.add('landing-ux-mobile');
     bottomNav.querySelectorAll('[data-jump]').forEach(function (el) {
       el.addEventListener('click', function () {
         bottomNav.querySelectorAll('a,button').forEach(function (x) { x.classList.remove('active'); });
