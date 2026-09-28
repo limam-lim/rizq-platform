@@ -1385,14 +1385,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a.nav-desktop-more-only{
     display:none !important;
   }
-  /* على الهاتف: الأقسام (محلات/مكاتب…) في «المزيد» — الصف يبقى مريحاً */
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module="store"],
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center [data-rizq-module],
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-rizq-module],
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li.rizq-nav-module{
-    display:none !important;
-    visibility:hidden !important;
-  }
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li.rizq-nav-extra,
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
     display:flex !important;
@@ -1805,10 +1799,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   .rizq-hdr-post-lbl{display:none !important}
   .rizq-hdr-post-plus{display:block;font-size:17px}
   .rizq-hdr-more-wrap{flex:0 0 auto;min-width:0;display:flex}
-  /* على الجوال: الأقسام (المحلات…) في «المزيد» فقط — لا تبويب في الصف الثاني */
+  /* نفس شريط الصفحة الرئيسية: الرئيسية / الأقسام / نشر / المحلات / الاستثمارات / المزيد */
   html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > [data-rizq-module],
   html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > .rizq-nav-module{
-    display:none !important;
+    display:inline-flex !important;
+    visibility:visible !important;
   }
   .rizq-hdr-more-wrap > .rizq-hdr-item{flex:0 0 auto;width:auto}
   .rizq-hdr-account{
@@ -2294,24 +2289,30 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
   text-shadow:0 0 16px rgba(201,168,76,.3);
 }
 
-/* هاتف: كبسولة وسطية مدمجة — لا تمدّد لطرف الشاشة؛ المزيد داخل المجموعة */
+/* هاتف: نفس شريط الرئيسية — صف موحّد، المزيد داخل المجموعة بلا dock */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
   html.rizq-app-nav #rizq-app-header .rizq-hdr-row2{
-    gap:8px !important;
+    gap:10px !important;
     justify-content:center !important;
     align-items:center !important;
-    width:fit-content !important;
-    max-width:calc(100% - 24px) !important;
-    margin:4px auto 10px !important;
-    padding:8px 14px !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin:0 !important;
+    padding:4px 10px 8px !important;
     height:auto !important;
-    min-height:58px !important;
-    border-radius:18px !important;
-    background:rgba(255,255,255,.06) !important;
-    border:1px solid rgba(201,168,76,.28) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 8px 20px rgba(0,0,0,.22) !important;
+    min-height:56px !important;
+    border-radius:0 !important;
+    background:#0f172a !important;
+    border:none !important;
+    box-shadow:none !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
   }
-  html.rizq-app-nav #rizq-app-header .rizq-hdr-item{
+  html.rizq-app-nav #rizq-app-header .rizq-hdr-item,
+  html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > [data-rizq-module],
+  html.rizq-app-nav #rizq-app-header .rizq-hdr-row2 > .rizq-nav-module{
+    display:inline-flex !important;
+    visibility:visible !important;
     padding:4px 8px !important;
     gap:4px !important;
     min-width:0 !important;
@@ -2319,29 +2320,29 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
     max-width:none !important;
   }
   html.rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-ico{
-    width:42px !important;
-    height:42px !important;
-    font-size:21px !important;
+    width:40px !important;
+    height:40px !important;
+    font-size:20px !important;
     border-radius:14px !important;
     margin:0 auto 2px !important;
   }
   html.rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-lbl{
-    font-size:11px !important;
-    font-weight:800 !important;
+    font-size:11.5px !important;
+    font-weight:700 !important;
   }
   html.rizq-app-nav #rizq-app-header .rizq-hdr-post{
-    flex:0 0 44px !important;
-    width:44px !important;
-    height:44px !important;
+    flex:0 0 40px !important;
+    width:40px !important;
+    height:40px !important;
     margin:0 4px !important;
     border-radius:50% !important;
     background:linear-gradient(145deg,#E8C96A,#C9A84C) !important;
     color:#0D1B2A !important;
-    box-shadow:0 4px 14px rgba(201,168,76,.4) !important;
+    box-shadow:0 2px 12px rgba(201,168,76,.35) !important;
     align-self:center !important;
   }
   html.rizq-app-nav #rizq-app-header .rizq-hdr-post-plus{
-    font-size:22px !important;
+    font-size:20px !important;
     font-weight:900 !important;
     color:#0D1B2A !important;
   }
@@ -2359,74 +2360,7 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
     min-width:0 !important;
     padding:4px 8px !important;
   }
-  /* الهبوط: نفس الكبسولة — الأقسام داخل المزيد لا صف مزدحم */
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-rizq-module],
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li.rizq-nav-module{
-    display:none !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
-    gap:8px !important;
-    justify-content:center !important;
-    flex:0 0 auto !important;
-    width:fit-content !important;
-    max-width:calc(100% - 20px) !important;
-    margin:4px auto 8px !important;
-    padding:8px 14px !important;
-    height:auto !important;
-    min-height:58px !important;
-    border-radius:18px !important;
-    background:rgba(255,255,255,.06) !important;
-    border:1px solid rgba(201,168,76,.28) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 8px 20px rgba(0,0,0,.22) !important;
-    mask-image:none !important;
-    -webkit-mask-image:none !important;
-    overflow-x:visible !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li{
-    flex:0 0 auto !important;
-    max-width:none !important;
-    min-width:0 !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only{
-    padding:4px 8px !important;
-    min-width:0 !important;
-    width:auto !important;
-    gap:4px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a .rizq-hdr-ico,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn .rizq-hdr-ico,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-ico{
-    width:42px !important;
-    height:42px !important;
-    font-size:20px !important;
-    margin:0 auto 2px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center a .rizq-hdr-lbl,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-lbl{
-    font-size:11px !important;
-    font-weight:800 !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-post-li{
-    flex:0 0 44px !important;
-    width:44px !important;
-    max-width:44px !important;
-  }
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-post-li > a{
-    flex:0 0 44px !important;
-    width:44px !important;
-    height:44px !important;
-    border-radius:50% !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:linear-gradient(145deg,#E8C96A,#C9A84C) !important;
-    color:#0D1B2A !important;
-    border:none !important;
-    box-shadow:0 4px 14px rgba(201,168,76,.4) !important;
-    font-size:0 !important;
-  }
+  /* الرئيسية كما كانت: لا نغيّر شكل صف nav-center — فقط إبقاء المزيد داخل المجموعة */
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li.rizq-more-docked,
   html.rizq-app-nav body.landing-ux-mobile #nav-more-li{
     position:relative !important;
@@ -2439,11 +2373,9 @@ html.rizq-app-nav #rizq-app-header .logo-ar{
     padding:0 !important;
     order:unset !important;
     flex:0 0 auto !important;
-    max-width:none !important;
-    min-width:0 !important;
   }
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center.rizq-nav-has-docked-more{
-    padding-inline:14px !important;
+    padding-inline:10px !important;
   }
 }
 
