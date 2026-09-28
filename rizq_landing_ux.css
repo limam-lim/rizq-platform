@@ -1,8 +1,5 @@
 :root{
-  /* خلفية رزق كما كانت: كحلي عميق + نقوش معينة ظاهرة */
-  --rizq-navy-atmosphere:linear-gradient(145deg,#07111f 0%,#0D1B2A 38%,#163a6e 78%,#1B3A6B 100%);
-  --rizq-navy-grid:url("rizq-navy-diamond-tile.png");
-  --rizq-navy-motif-left:url("rizq-navy-motif-left.png");
+  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
   --text-on-navy:rgba(255,255,255,.88);
   --text-on-navy-muted:rgba(255,255,255,.88);
   --text-on-navy-soft:rgba(255,255,255,.72);
@@ -28,88 +25,13 @@
 #cat-portal,
 .why-card,
 .rvid-section,
-.store-card,
-.product-card,
-.rzq-disc-card,
-.hub-card,
-.cta-hub,
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome),
 .rpkg-card[style*="#1B3A6B"],
-.pricing-card[style*="#1B3A6B"],
-.rpkg-card.featured,
-.pricing-card.featured,
-.rizq-pkg-card:not(.rizq-pkg-light),
-.store-pkg-card:not(.rizq-pkg-light){
-  position:relative!important;
-  overflow:hidden!important;
-  background-color:#0D1B2A!important;
-  background-image:var(--rizq-navy-atmosphere)!important;
-  background-size:cover!important;
-  background-repeat:no-repeat!important;
-  background-blend-mode:normal!important;
-  border-color:rgba(201,168,76,.22);
-  isolation:isolate;
-}
-
-.section-header::before,
-.cta-inner::before,
-.price-ticker-wrap::before,
-.price-card::before,
-.cs-strip::before,
-.rzq-disc-empty::before,
-.hero-stats-bar::before,
-.ticker-wrap::before,
-.hero-eyebrow::before,
-.hero-title-card::before,
-.hero-subtitle-card::before,
-.hero-vid-ph::before,
-.listings-label > span::before,
-.ad-card::before,
-.listing-card::before,
-#cat-portal::before,
-.why-card::before,
-.rvid-section::before,
-.store-card::before,
-.product-card::before,
-.rzq-disc-card::before,
-.hub-card::before,
-.cta-hub::before,
-nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome)::before,
-.rpkg-card[style*="#1B3A6B"]::before,
-.pricing-card[style*="#1B3A6B"]::before,
-.rpkg-card.featured::before,
-.pricing-card.featured::before,
-.rizq-pkg-card:not(.rizq-pkg-light)::before,
-.store-pkg-card:not(.rizq-pkg-light)::before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  background-image:var(--rizq-navy-grid)!important;
-  background-size:72px 72px!important;
-  background-repeat:repeat!important;
-  opacity:.95!important;
-  pointer-events:none!important;
-  z-index:0!important;
-}
-
-.section-header::after,
-.cta-inner::after,
-.why-card::after,
-.hero-title-card::after,
-.hero-vid-ph::after,
-.rvid-section::after,
-.cta-hub::after,
-.hub-card::after{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:min(52%,460px)!important;
-  background:var(--rizq-navy-motif-left) left center / auto 115% no-repeat!important;
-  opacity:.65!important;
-  pointer-events:none!important;
-  z-index:0!important;
+.pricing-card[style*="#1B3A6B"]{
+  background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),var(--rizq-navy-grid)!important;
+  background-size:auto,60px 60px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-blend-mode:overlay;
 }
 
 html body footer,
@@ -833,41 +755,8 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 }
 #cards-track .ad-card{
   min-width:210px;
-  border:1px solid rgba(201,168,76,.28)!important;
-  background-color:#0D1B2A!important;
-  background-image:var(--rizq-navy-atmosphere)!important;
-  background-size:cover!important;
-  background-repeat:no-repeat,repeat!important;
-  background-blend-mode:normal!important;
-}
-/* منطقة الإيموجي/الصورة في شريط أحدث الإعلانات — كحلي لا أبيض */
-#hero-listings .ad-card .ad-card-img,
-#cards-track .ad-card .ad-card-img{
-  background:linear-gradient(160deg,rgba(7,17,31,.92),rgba(27,58,107,.55))!important;
-  color:#C9A84C!important;
-}
-#hero-listings .ad-card .ad-card-img::before,
-#cards-track .ad-card .ad-card-img::before{
-  background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(201,168,76,.12),transparent 60%)!important;
-}
-/* باقات الصفحة الرئيسية: لا تترك بطاقات بيضاء حتى لو بقي style قديم */
-.pricing-section .rpkg-card.pricing-card{
-  color:#fff;
-}
-.pricing-section .rpkg-card.pricing-card[style*="#f8faff"],
-.pricing-section .rpkg-card.pricing-card[style*="#fffbeb"],
-.pricing-section .rpkg-card.pricing-card[style*="#f0fdf4"],
-.pricing-section .rpkg-card.pricing-card[style*="#eff3ff"],
-.pricing-section .rpkg-card.pricing-card[style*="#fef3c7"],
-.pricing-section .rpkg-card.pricing-card[style*="#dcfce7"],
-.pricing-section .rpkg-card.pricing-card[style*="#ffffff"]{
-  background-color:#0D1B2A!important;
-  background-image:var(--rizq-navy-atmosphere)!important;
-  background-size:cover!important;
-  background-repeat:no-repeat,repeat!important;
-  background-blend-mode:normal!important;
-  border-color:rgba(201,168,76,.28)!important;
-  color:#fff!important;
+  border:1px solid rgba(201,168,76,.22)!important;
+  background:linear-gradient(145deg,#0a1628,#122040)!important;
 }
 #hero-listings .listings-label span{
   display:inline-flex;
@@ -875,8 +764,7 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   gap:8px;
   padding:8px 16px;
   border-radius:999px;
-  background-color:#0D1B2A;
-  background-image:var(--rizq-navy-atmosphere)!important;background-size:cover!important;background-repeat:no-repeat!important;background-blend-mode:normal!important;
+  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
   border:1px solid rgba(201,168,76,.35);
   color:#f3de9c;
   font-size:13px;
