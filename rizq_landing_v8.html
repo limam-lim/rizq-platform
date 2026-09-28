@@ -1536,7 +1536,10 @@ html[dir="ltr"] .listings-section .section-desc{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
   }
   .rizq-trio{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-  .cta-hubs{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .cta-hubs{grid-template-columns:repeat(6,minmax(0,1fr))!important;max-width:720px!important;gap:12px!important}
+  .cta-hub{grid-column:span 2}
+  .cta-hub:nth-child(4){grid-column:2 / 4}
+  .cta-hub:nth-child(5){grid-column:4 / 6}
   .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
 }
 /* موبايل ضيق: عمودان للإعلانات المميزة (لا بطاقة واحدة عملاقة) */
@@ -1554,7 +1557,6 @@ html[dir="ltr"] .listings-section .section-desc{
   .listings-grid .listing-card .lc-hover{display:none!important}
 }
 @media(max-width:640px){
-  .cta-hubs{grid-template-columns:repeat(2,1fr);gap:8px}
   .cta-btns{grid-template-columns:1fr}
   .cta-btns .btn-primary{grid-column:1}
 }
@@ -1762,9 +1764,26 @@ main, .page-content.active, .main-content, .results-area,
 .cta-section .btn-outline:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);transform:translateY(-2px)}
 .cta-section .btn-primary{box-shadow:0 10px 32px rgba(201,168,76,.45);transition:transform .25s,box-shadow .25s}
 .cta-section .btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(201,168,76,.55)}
+.cta-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));
+  border:1px solid rgba(201,168,76,.42);padding:8px 22px;border-radius:100px;
+  margin-bottom:18px;position:relative;z-index:2;
+}
+.cta-kicker-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;display:block;animation:pulse 1.5s infinite;flex-shrink:0}
+.cta-kicker-live{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.cta-kicker-sep{font-size:11px;color:rgba(255,255,255,.75)}
+.cta-kicker-txt{font-size:11px;font-weight:600;color:#e7ecf7}
+.cta-title{font-family:'Cairo',Georgia,'Times New Roman',serif;font-size:clamp(26px,4.2vw,46px);font-weight:800;line-height:1.25;margin:0 0 12px;color:#fff;position:relative;z-index:2}
+.cta-title span{background:linear-gradient(90deg,var(--gold),#fff8e0,var(--gold-light),var(--gold));background-size:300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 4s linear infinite}
+.cta-desc{color:rgba(255,255,255,.86);font-size:clamp(13.5px,1.8vw,15.5px);line-height:1.85;margin:0 auto 22px;position:relative;z-index:2;max-width:680px}
+.cta-hubs-label{
+  position:relative;z-index:2;margin:0 auto 12px;font-size:12px;font-weight:700;
+  letter-spacing:.04em;color:rgba(232,201,106,.88);text-align:center;
+}
 .cta-hubs{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-  max-width:720px;margin:0 auto 28px;position:relative !important;
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;
+  max-width:860px;margin:0 auto 26px;position:relative !important;
   top:auto !important;left:auto !important;right:auto !important;bottom:auto !important;
   inset:auto !important;height:auto !important;max-height:none !important;
   z-index:2 !important;transform:none !important;
@@ -1772,38 +1791,95 @@ main, .page-content.active, .main-content, .results-area,
   border:none !important;padding:0 !important;overflow:visible !important;
 }
 .cta-hub{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  padding:14px 8px;border-radius:16px;text-decoration:none;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  --cta-accent:rgba(201,168,76,.55);
+  --cta-glow:rgba(201,168,76,.18);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:18px 12px 16px;border-radius:18px;text-decoration:none;min-height:118px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,.03) 100%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .28s cubic-bezier(.4,0,.2,1),background .25s,border-color .25s,box-shadow .28s;
+  position:relative;overflow:hidden;
+}
+.cta-hub::before{
+  content:'';position:absolute;inset:auto 18% -18px 18%;height:36px;border-radius:50%;
+  background:radial-gradient(circle,var(--cta-glow),transparent 70%);
+  pointer-events:none;opacity:.9;transition:opacity .25s,inset .25s;
+}
+.cta-hub::after{
+  content:'';position:absolute;top:0;left:12%;right:12%;height:2px;border-radius:0 0 8px 8px;
+  background:linear-gradient(90deg,transparent,var(--cta-accent),transparent);
+  opacity:.85;pointer-events:none;
+}
+.cta-hub:hover{
+  transform:translateY(-6px);
+  background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
+  border-color:var(--cta-accent);
+  box-shadow:0 16px 36px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.04) inset;
+}
+.cta-hub:hover::before{opacity:1}
+.cta-hub:hover .cta-hub-ico-well{transform:scale(1.08);border-color:var(--cta-accent)}
+.cta-hub-ico-well{
+  width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(145deg,rgba(15,23,42,.55),rgba(27,58,107,.35));
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 6px 16px rgba(0,0,0,.22);
+  transition:transform .28s cubic-bezier(.4,0,.2,1),border-color .25s;
+  position:relative;z-index:1;
+}
+.cta-hub-ico{font-size:22px;line-height:1;display:block}
+.cta-hub-lbl{font-size:13px;font-weight:800;color:#fff;line-height:1.25;position:relative;z-index:1}
+.cta-hub-hint{font-size:10.5px;font-weight:600;color:rgba(231,236,247,.72);line-height:1.35;position:relative;z-index:1}
+.cta-hub-store{--cta-accent:rgba(251,146,60,.7);--cta-glow:rgba(251,146,60,.22)}
+.cta-hub-office{--cta-accent:rgba(96,165,250,.7);--cta-glow:rgba(96,165,250,.2)}
+.cta-hub-showroom{--cta-accent:rgba(56,189,248,.75);--cta-glow:rgba(56,189,248,.22)}
+.cta-hub-tender{--cta-accent:rgba(52,211,153,.75);--cta-glow:rgba(52,211,153,.22)}
+.cta-hub-tender .cta-hub-lbl{color:#a7f3d0}
+.cta-hub-gold{--cta-accent:rgba(201,168,76,.85);--cta-glow:rgba(201,168,76,.28)}
+.cta-hub-gold .cta-hub-lbl{color:#fde68a}
+.cta-btns{
+  display:grid;grid-template-columns:1fr;gap:10px;
+  max-width:420px;margin:0 auto 18px;position:relative;z-index:2;
+}
+.cta-btns .btn-primary{
+  padding:15px 24px;font-size:clamp(14px,2vw,16px);width:100%;
+  border-radius:14px;font-weight:800;
+}
+.cta-btns .cta-btn-secondary{
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 18px;border-radius:14px;font-size:14px;font-weight:700;font-family:inherit;
+  background:rgba(255,255,255,.07);color:#fff;border:1.5px solid rgba(201,168,76,.4);
   transition:transform .25s,background .25s,border-color .25s,box-shadow .25s;
 }
-.cta-hub:hover{transform:translateY(-4px);background:rgba(255,255,255,.11);border-color:rgba(201,168,76,.45);box-shadow:0 10px 28px rgba(0,0,0,.22)}
-.cta-hub-ico{font-size:22px;line-height:1}
-.cta-hub-lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.92);line-height:1.3}
-.cta-hub-tender{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
-.cta-hub-tender:hover{border-color:rgba(52,211,153,.65);box-shadow:0 10px 28px rgba(16,185,129,.25)}
-.cta-hub-tender .cta-hub-lbl{color:#a7f3d0}
-.cta-title{font-family:'Cairo',Georgia,'Times New Roman',serif;font-size:clamp(26px,4.2vw,46px);font-weight:800;line-height:1.25;margin-bottom:14px;color:#fff;position:relative;z-index:2}
-.cta-title span{background:linear-gradient(90deg,var(--gold),#fff8e0,var(--gold-light),var(--gold));background-size:300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 4s linear infinite}
-.cta-desc{color:rgba(255,255,255,.86);font-size:clamp(13.5px,1.8vw,15.5px);line-height:1.85;margin-bottom:28px;position:relative;z-index:2;max-width:680px;margin-left:auto;margin-right:auto}
-.cta-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin:0 auto 18px;position:relative;z-index:2}
-.cta-btns .btn-primary{grid-column:1/-1;padding:15px 24px;font-size:clamp(14px,2vw,16px)}
-.cta-btns .btn-tender{
-  background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(52,211,153,.12));
-  border:1.5px solid rgba(52,211,153,.55)!important;color:#a7f3d0!important;
-  font-weight:800;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:13px 18px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:14px;
-  transition:transform .25s,background .25s,box-shadow .25s;
+.cta-btns .cta-btn-secondary:hover{
+  background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.65);
+  transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.18);
 }
-.cta-btns .btn-tender:hover{background:linear-gradient(135deg,rgba(16,185,129,.35),rgba(52,211,153,.22));border-color:#34d399!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.28)}
-.cta-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;position:relative;z-index:2}
+.cta-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;position:relative;z-index:2}
 .cta-chip{
   font-size:11px;font-weight:700;color:rgba(255,255,255,.78);
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
   padding:5px 12px;border-radius:100px;
 }
 .cta-note{font-size:12px;color:rgba(255,255,255,.78);display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+@media(max-width:640px){
+  .cta-hubs{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .cta-hub{padding:14px 10px 12px!important;min-height:0!important;grid-column:auto!important}
+  .cta-hub:nth-child(4),
+  .cta-hub:nth-child(5){grid-column:auto!important}
+  .cta-hub:nth-child(5){grid-column:1 / -1!important;max-width:220px;justify-self:center;width:100%}
+  .cta-hub-hint{display:none!important}
+  .cta-btns{grid-template-columns:1fr;max-width:100%}
+  .cta-btns .btn-primary{grid-column:1}
+}
+@media(min-width:641px) and (max-width:900px){
+  .cta-hubs{grid-template-columns:repeat(6,minmax(0,1fr));max-width:720px;gap:12px}
+  .cta-hub{grid-column:span 2}
+  .cta-hub:nth-child(4){grid-column:2 / 4}
+  .cta-hub:nth-child(5){grid-column:4 / 6}
+}
 
 /* Pricing — بطاقات موحّدة */
 .pricing-section{padding:72px 4%;background:var(--bg-section);overflow-x:clip}
@@ -3698,44 +3774,48 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="cta-bg-brand" style="position:absolute;font-family:Georgia,'Times New Roman',serif;font-size:clamp(100px,16vw,200px);font-weight:900;color:rgba(201,168,76,.04);left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;letter-spacing:-6px">رزق</div>
     </div>
 
-    <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.42);padding:8px 22px;border-radius:100px;margin-bottom:22px;position:relative;z-index:2">
-      <span style="width:8px;height:8px;background:#ff4444;border-radius:50%;display:block;animation:pulse 1.5s infinite"></span>
-      <span style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px" data-t="cta-badge1">انضم الآن</span>
-      <span style="font-size:11px;color:rgba(255,255,255,.75)">•</span>
-      <span style="font-size:11px;font-weight:600;color:#e7ecf7" data-t="cta-badge2">أفراد · محلات · معارض · مكاتب · مناقصات</span>
+    <div class="cta-kicker">
+      <span class="cta-kicker-dot" aria-hidden="true"></span>
+      <span class="cta-kicker-live" data-t="cta-badge1">انضم الآن</span>
+      <span class="cta-kicker-sep" aria-hidden="true">•</span>
+      <span class="cta-kicker-txt" data-t="cta-badge2">أفراد · محلات · معارض · مكاتب · مناقصات</span>
     </div>
-
-    <nav class="cta-hubs" aria-label="أقسام رزق للأعمال">
-      <a href="rizq_store.html" class="cta-hub">
-        <span class="cta-hub-ico" aria-hidden="true">🏪</span>
-        <span class="cta-hub-lbl" data-t="cta-hub-stores">المحلات</span>
-      </a>
-      <a href="rizq_office.html" class="cta-hub">
-        <span class="cta-hub-ico" aria-hidden="true">💼</span>
-        <span class="cta-hub-lbl" data-t="cta-hub-offices">المكاتب</span>
-      </a>
-      <a href="rizq_showroom.html" class="cta-hub">
-        <span class="cta-hub-ico" aria-hidden="true">🏬</span>
-        <span class="cta-hub-lbl" data-t="cta-hub-showrooms">المعارض</span>
-      </a>
-      <a href="rizq_tenders.html" class="cta-hub cta-hub-tender">
-        <span class="cta-hub-ico" aria-hidden="true">📋</span>
-        <span class="cta-hub-lbl" data-t="cta-hub-tenders">المناقصات</span>
-      </a>
-      <a href="rizq_investments.html" class="cta-hub cta-hub-gold">
-        <span class="cta-hub-ico" aria-hidden="true">📈</span>
-        <span class="cta-hub-lbl" data-t="cta-hub-investments">الاستثمارات</span>
-      </a>
-    </nav>
 
     <h2 class="cta-title" data-t="cta-title">جاهز تبدأ على رزق؟<br/><span>بيع، تسوّق، وأدر عملك من منصة واحدة</span></h2>
     <p class="cta-desc" data-t="cta-desc">محلات، معارض، مكاتب، <strong style="color:#a7f3d0">مناقصات</strong>، و<strong style="color:#fde68a">استثمارات</strong> — سجّل مجاناً وانشر إعلانك الأول اليوم.</p>
 
+    <p class="cta-hubs-label" data-t="cta-hubs-label">اختر مساحتك على رزق</p>
+    <nav class="cta-hubs" aria-label="أقسام رزق للأعمال">
+      <a href="rizq_store.html" class="cta-hub cta-hub-store">
+        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">🏪</span></span>
+        <span class="cta-hub-lbl" data-t="cta-hub-stores">المحلات</span>
+        <span class="cta-hub-hint" data-t="cta-hub-hint-stores">بيع وتسوّق يومي</span>
+      </a>
+      <a href="rizq_office.html" class="cta-hub cta-hub-office">
+        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">💼</span></span>
+        <span class="cta-hub-lbl" data-t="cta-hub-offices">المكاتب</span>
+        <span class="cta-hub-hint" data-t="cta-hub-hint-offices">خدمات مهنية</span>
+      </a>
+      <a href="rizq_showroom.html" class="cta-hub cta-hub-showroom">
+        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">🏬</span></span>
+        <span class="cta-hub-lbl" data-t="cta-hub-showrooms">المعارض</span>
+        <span class="cta-hub-hint" data-t="cta-hub-hint-showrooms">عروض راقية</span>
+      </a>
+      <a href="rizq_tenders.html" class="cta-hub cta-hub-tender">
+        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">📋</span></span>
+        <span class="cta-hub-lbl" data-t="cta-hub-tenders">المناقصات</span>
+        <span class="cta-hub-hint" data-t="cta-hub-hint-tenders">فرص أعمال</span>
+      </a>
+      <a href="rizq_investments.html" class="cta-hub cta-hub-gold">
+        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">📈</span></span>
+        <span class="cta-hub-lbl" data-t="cta-hub-investments">الاستثمارات</span>
+        <span class="cta-hub-hint" data-t="cta-hub-hint-investments">نمو مدروس</span>
+      </a>
+    </nav>
+
     <div class="cta-btns">
       <button class="btn-primary" onclick="rizqOpenRegister(event)" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
-      <a href="rizq_investments.html" class="btn-tender" data-t="cta-btn-invest">📈 الاستثمارات</a>
-      <a href="rizq_tenders.html" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn4">📋 المناقصات</a>
-      <a href="./?openRegister=1&regPage=1&preType=company" onclick="openRegisterAs('company');return false" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
+      <a href="./?openRegister=1&regPage=1&preType=company" onclick="openRegisterAs('company');return false" class="cta-btn-secondary" data-t="cta-btn3">🏢 افتح محلك أو معرضك</a>
     </div>
 
     <div class="cta-chips">
@@ -6606,7 +6686,9 @@ const LANG = {
     'prices-note': 'الأسعار تقريبية وتعكس متوسط السوق المحلي — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">انشر منتجاتك على رزق الآن ←</a>',
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · معارض · مكاتب · مناقصات', 'cta-btn3': '🏢 افتح محلك أو معرضك',
     'cta-btn4': '📋 المناقصات',
+    'cta-hubs-label': 'اختر مساحتك على رزق',
     'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض', 'cta-hub-tenders': 'المناقصات', 'cta-hub-investments': 'الاستثمارات',
+    'cta-hub-hint-stores': 'بيع وتسوّق يومي', 'cta-hub-hint-offices': 'خدمات مهنية', 'cta-hub-hint-showrooms': 'عروض راقية', 'cta-hub-hint-tenders': 'فرص أعمال', 'cta-hub-hint-investments': 'نمو مدروس',
     'cta-chip1': '✓ مجاني للبدء', 'cta-chip2': '✓ مناقصات واستثمارات بحذر', 'cta-chip3': '✓ توثيق بالهاتف الموريتاني',
     'vs-title': 'افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك',
     'vs-desc': 'صفحة تجارية باسمك: اعرض منتجاتك، ابنِ ثقة الزبائن، وتابع الزيارات والتواصل من لوحة واحدة.',
@@ -6704,7 +6786,9 @@ const LANG = {
     'prices-note': 'Les prix sont indicatifs et reflètent la moyenne du marché local — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">Publiez vos produits sur Rizq →</a>',
     'cta-badge1': 'Rejoignez-nous', 'cta-badge2': 'Particuliers · Boutiques · Showrooms · Bureaux · Appels d\'offres', 'cta-btn3': '🏢 Ma boutique / showroom',
     'cta-btn4': '📋 Appels d\'offres',
+    'cta-hubs-label': 'Choisissez votre espace sur Rizq',
     'cta-hub-stores': 'Boutiques', 'cta-hub-offices': 'Bureaux', 'cta-hub-showrooms': 'Showrooms', 'cta-hub-tenders': 'Appels d\'offres', 'cta-hub-investments': 'Investissements',
+    'cta-hub-hint-stores': 'Vente au quotidien', 'cta-hub-hint-offices': 'Services pro', 'cta-hub-hint-showrooms': 'Offres premium', 'cta-hub-hint-tenders': 'Opportunités', 'cta-hub-hint-investments': 'Croissance',
     'cta-chip1': '✓ Gratuit pour commencer', 'cta-chip2': '✓ Appels d\'offres & investissements prudents', 'cta-chip3': '✓ Vérification par téléphone',
     'vs-title': 'Ouvrez <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">votre boutique sur Rizq</span> — une vitrine complète pour vos clients',
     'vs-desc': 'Une page commerciale à votre nom : présentez vos produits, gagnez la confiance, et suivez visites et contacts depuis un seul tableau de bord.',
