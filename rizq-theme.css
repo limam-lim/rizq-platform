@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
 :root {
-  /* خلفية بطاقات رزق — كحلي أفتح قليلاً + نقش ماس ذهبي أوضح */
+  /* خلفية رزق — كحلي الهوية مع تفتيح خفيف جداً + نقش ماس ذهبي */
   --rizq-navy-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.26'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.11'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E");
-  --rizq-navy-atmosphere: linear-gradient(145deg, #0c1a2e 0%, #143552 38%, #1c4a7a 78%, #234d8f 100%);
-  --rizq-navy-base: #143552;
+  --rizq-navy-atmosphere: linear-gradient(145deg, #0d1c32 0%, #153a58 38%, #1d4e7e 78%, #255595 100%);
+  --rizq-navy-base: #153a58;
+  --rizq-pkg-section-bg: #fbfcff;
   --text-on-navy: rgba(255, 255, 255, 0.9);
   --text-on-navy-muted: rgba(255, 255, 255, 0.88);
   --text-on-navy-soft: rgba(255, 255, 255, 0.74);
@@ -45,7 +46,7 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .pricing-card.featured,
 .rizq-pkg-card:not(.rizq-pkg-light),
 .store-pkg-card:not(.rizq-pkg-light) {
-  background-color: var(--rizq-navy-base, #143552) !important;
+  background-color: var(--rizq-navy-base, #153a58) !important;
   background-image: var(--rizq-navy-atmosphere), var(--rizq-navy-grid) !important;
   background-size: cover, 64px 64px !important;
   background-repeat: no-repeat, repeat !important;
@@ -53,7 +54,7 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   border-color: rgba(201, 168, 76, 0.28);
 }
 
-/* أقسام الباقات في الصفحات الفرعية — نفس أجواء الصفحة الرئيسية */
+/* أقسام الباقات: خلفية فاتحة مثل الصفحة الرئيسية — الكحلي على البطاقات فقط */
 .pkg-section,
 #store-packages,
 #corp-packages,
@@ -61,12 +62,10 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 #pkg-section,
 .tender-pkg-section,
 .ads-pricing {
-  background-color: var(--rizq-navy-base, #143552) !important;
-  background-image: var(--rizq-navy-atmosphere), var(--rizq-navy-grid) !important;
-  background-size: cover, 72px 72px !important;
-  background-repeat: no-repeat, repeat !important;
-  background-blend-mode: overlay !important;
-  border-top-color: rgba(201, 168, 76, 0.28) !important;
+  background: var(--rizq-pkg-section-bg, #fbfcff) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  border-top-color: #e7ecf3 !important;
 }
 
 .tender-pkg-section::before,
@@ -82,7 +81,7 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 #pkg-section h2,
 .tender-pkg-head h2,
 .ads-pricing .sec-head h2 {
-  color: rgba(255, 255, 255, 0.96) !important;
+  color: #16263d !important;
 }
 
 .pkg-section h2 span[style*="var(--gold)"],
@@ -105,7 +104,7 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 #pkg-section p,
 .tender-pkg-head p,
 .ads-pricing .sec-head p {
-  color: rgba(255, 255, 255, 0.78) !important;
+  color: #5b6b8a !important;
 }
 
 .pkg-section [style*="letter-spacing"],
@@ -117,30 +116,18 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .tender-pkg-head .eyebrow,
 .ads-pricing .sec-head .tag {
   color: var(--gold, #C9A84C) !important;
-  background: transparent !important;
-  border-color: rgba(201, 168, 76, 0.35) !important;
 }
 
 .pkg-section [id^="mru-note"],
 .pkg-section [id*="mru-note"],
 #store-packages #mru-note-store,
 #corp-packages #mru-note,
-#office-packages [data-t="mru-note-text"],
-.pkg-section p[style*="#3a5080"],
-#store-packages p[style*="#3a5080"],
-#corp-packages p[style*="#3a5080"],
-#office-packages p[style*="#3a5080"],
-#pkg-section p[style*="#3a5080"] {
-  color: rgba(255, 255, 255, 0.82) !important;
-}
-
-.pkg-section [style*="background:#1B3A6B"],
-#store-packages [style*="background:#1B3A6B"],
-#corp-packages [style*="background:#1B3A6B"],
-#office-packages [style*="background:#1B3A6B"],
-#pkg-section [style*="background:#1B3A6B"] {
-  background: rgba(7, 17, 31, 0.55) !important;
-  border: 1px solid rgba(201, 168, 76, 0.4);
+.pkg-section p[style*="rgba(255"],
+#store-packages p[style*="rgba(255"],
+#corp-packages p[style*="rgba(255"],
+#office-packages p[style*="rgba(255"],
+#pkg-section p[style*="rgba(255"] {
+  color: #3a5080 !important;
 }
 
 /* Navy section-header panels — keep copy readable on gradient bg above */
