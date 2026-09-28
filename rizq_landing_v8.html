@@ -766,6 +766,11 @@ html.rizq-has-announce .section-jump-bar{
 .btn-search-main:hover{background:linear-gradient(135deg,var(--gold-light),var(--gold));filter:brightness(1.1)}
 
 /* ── HERO BIZ NAV — محلات / مكاتب / معارض (بطاقات مميزة) ── */
+.hero-biz-label-top{
+  position:relative;z-index:61;margin:0 auto 10px;text-align:center;
+  font-size:12.5px;font-weight:700;letter-spacing:.03em;color:rgba(201,168,76,.95);
+  animation:fadeUp .8s .22s ease both;
+}
 .hero-biz-nav{
   display:grid!important;
   grid-template-columns:repeat(5,minmax(0,1fr));
@@ -1536,10 +1541,6 @@ html[dir="ltr"] .listings-section .section-desc{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
   }
   .rizq-trio{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-  .cta-hubs{grid-template-columns:repeat(6,minmax(0,1fr))!important;max-width:720px!important;gap:12px!important}
-  .cta-hub{grid-column:span 2}
-  .cta-hub:nth-child(4){grid-column:2 / 4}
-  .cta-hub:nth-child(5){grid-column:4 / 6}
   .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
 }
 /* موبايل ضيق: عمودان للإعلانات المميزة (لا بطاقة واحدة عملاقة) */
@@ -1777,68 +1778,6 @@ main, .page-content.active, .main-content, .results-area,
 .cta-title{font-family:'Cairo',Georgia,'Times New Roman',serif;font-size:clamp(26px,4.2vw,46px);font-weight:800;line-height:1.25;margin:0 0 12px;color:#fff;position:relative;z-index:2}
 .cta-title span{background:linear-gradient(90deg,var(--gold),#fff8e0,var(--gold-light),var(--gold));background-size:300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 4s linear infinite}
 .cta-desc{color:rgba(255,255,255,.86);font-size:clamp(13.5px,1.8vw,15.5px);line-height:1.85;margin:0 auto 22px;position:relative;z-index:2;max-width:680px}
-.cta-hubs-label{
-  position:relative;z-index:2;margin:0 auto 12px;font-size:12px;font-weight:700;
-  letter-spacing:.04em;color:rgba(232,201,106,.88);text-align:center;
-}
-.cta-hubs{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;
-  max-width:860px;margin:0 auto 26px;position:relative !important;
-  top:auto !important;left:auto !important;right:auto !important;bottom:auto !important;
-  inset:auto !important;height:auto !important;max-height:none !important;
-  z-index:2 !important;transform:none !important;
-  background:transparent !important;background-image:none !important;
-  border:none !important;padding:0 !important;overflow:visible !important;
-}
-.cta-hub{
-  --cta-accent:rgba(201,168,76,.55);
-  --cta-glow:rgba(201,168,76,.18);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  padding:18px 12px 16px;border-radius:18px;text-decoration:none;min-height:118px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,.03) 100%);
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow:0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  transition:transform .28s cubic-bezier(.4,0,.2,1),background .25s,border-color .25s,box-shadow .28s;
-  position:relative;overflow:hidden;
-}
-.cta-hub::before{
-  content:'';position:absolute;inset:auto 18% -18px 18%;height:36px;border-radius:50%;
-  background:radial-gradient(circle,var(--cta-glow),transparent 70%);
-  pointer-events:none;opacity:.9;transition:opacity .25s,inset .25s;
-}
-.cta-hub::after{
-  content:'';position:absolute;top:0;left:12%;right:12%;height:2px;border-radius:0 0 8px 8px;
-  background:linear-gradient(90deg,transparent,var(--cta-accent),transparent);
-  opacity:.85;pointer-events:none;
-}
-.cta-hub:hover{
-  transform:translateY(-6px);
-  background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
-  border-color:var(--cta-accent);
-  box-shadow:0 16px 36px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.04) inset;
-}
-.cta-hub:hover::before{opacity:1}
-.cta-hub:hover .cta-hub-ico-well{transform:scale(1.08);border-color:var(--cta-accent)}
-.cta-hub-ico-well{
-  width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
-  background:linear-gradient(145deg,rgba(15,23,42,.55),rgba(27,58,107,.35));
-  border:1px solid rgba(255,255,255,.16);
-  box-shadow:0 6px 16px rgba(0,0,0,.22);
-  transition:transform .28s cubic-bezier(.4,0,.2,1),border-color .25s;
-  position:relative;z-index:1;
-}
-.cta-hub-ico{font-size:22px;line-height:1;display:block}
-.cta-hub-lbl{font-size:13px;font-weight:800;color:#fff;line-height:1.25;position:relative;z-index:1}
-.cta-hub-hint{font-size:10.5px;font-weight:600;color:rgba(231,236,247,.72);line-height:1.35;position:relative;z-index:1}
-.cta-hub-store{--cta-accent:rgba(251,146,60,.7);--cta-glow:rgba(251,146,60,.22)}
-.cta-hub-office{--cta-accent:rgba(96,165,250,.7);--cta-glow:rgba(96,165,250,.2)}
-.cta-hub-showroom{--cta-accent:rgba(56,189,248,.75);--cta-glow:rgba(56,189,248,.22)}
-.cta-hub-tender{--cta-accent:rgba(52,211,153,.75);--cta-glow:rgba(52,211,153,.22)}
-.cta-hub-tender .cta-hub-lbl{color:#a7f3d0}
-.cta-hub-gold{--cta-accent:rgba(201,168,76,.85);--cta-glow:rgba(201,168,76,.28)}
-.cta-hub-gold .cta-hub-lbl{color:#fde68a}
 .cta-btns{
   display:grid;grid-template-columns:1fr;gap:10px;
   max-width:420px;margin:0 auto 18px;position:relative;z-index:2;
@@ -1865,20 +1804,8 @@ main, .page-content.active, .main-content, .results-area,
 }
 .cta-note{font-size:12px;color:rgba(255,255,255,.78);display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
 @media(max-width:640px){
-  .cta-hubs{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .cta-hub{padding:14px 10px 12px!important;min-height:0!important;grid-column:auto!important}
-  .cta-hub:nth-child(4),
-  .cta-hub:nth-child(5){grid-column:auto!important}
-  .cta-hub:nth-child(5){grid-column:1 / -1!important;max-width:220px;justify-self:center;width:100%}
-  .cta-hub-hint{display:none!important}
   .cta-btns{grid-template-columns:1fr;max-width:100%}
   .cta-btns .btn-primary{grid-column:1}
-}
-@media(min-width:641px) and (max-width:900px){
-  .cta-hubs{grid-template-columns:repeat(6,minmax(0,1fr));max-width:720px;gap:12px}
-  .cta-hub{grid-column:span 2}
-  .cta-hub:nth-child(4){grid-column:2 / 4}
-  .cta-hub:nth-child(5){grid-column:4 / 6}
 }
 
 /* Pricing — بطاقات موحّدة */
@@ -2929,31 +2856,31 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
 
-    <!-- Business hubs: stores / offices / showrooms — above the search box -->
+    <!-- Business hubs: اختيار المساحة مرة واحدة في الهيرو (لا تكرار في CTA السفلي) -->
+    <p class="hero-biz-label-top" data-t="hbiz-pick">اختر مساحتك على رزق</p>
     <nav class="hero-biz-nav" aria-label="أقسام الأعمال">
-      <a href="rizq_store.html" class="hero-biz-btn hero-biz-gold">
-        <span class="hero-biz-badge" data-t="hbiz-new">جديد</span>
+      <a href="#virtual-stores" class="hero-biz-btn hero-biz-gold">
         <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
         <span class="hero-biz-text">
           <span class="hero-biz-label" data-t="hbiz-stores">المحلات التجارية</span>
           <span class="hero-biz-hint" data-t="hbiz-stores-hint">تصفّح واشترِ</span>
         </span>
       </a>
-      <a href="rizq_office.html" class="hero-biz-btn hero-biz-royal">
+      <a href="#virtual-offices" class="hero-biz-btn hero-biz-royal">
         <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
         <span class="hero-biz-text">
           <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
           <span class="hero-biz-hint" data-t="hbiz-offices-hint">خدمات موثوقة</span>
         </span>
       </a>
-      <a href="rizq_showroom.html" class="hero-biz-btn hero-biz-diamond">
+      <a href="#virtual-showrooms" class="hero-biz-btn hero-biz-diamond">
         <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
         <span class="hero-biz-text">
           <span class="hero-biz-label" data-t="hbiz-showrooms">معارض الشو روم</span>
           <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عروض راقية</span>
         </span>
       </a>
-      <a href="rizq_tenders.html" class="hero-biz-btn hero-biz-tender">
+      <a href="#virtual-tenders" class="hero-biz-btn hero-biz-tender">
         <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
         <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
         <span class="hero-biz-text">
@@ -2961,7 +2888,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال</span>
         </span>
       </a>
-      <a href="rizq_investments.html" class="hero-biz-btn hero-biz-gold">
+      <a href="#virtual-investments" class="hero-biz-btn hero-biz-gold">
         <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
         <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
         <span class="hero-biz-text">
@@ -3395,7 +3322,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
       <a href="rizq_tenders.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="💼 Abonnez-vous à la salle des appels d'offres">💼 اشترك في غرفة المناقصات</a>
-      <a href="rizq_tenders.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</a>
     </div>
 
   </div>
@@ -3504,7 +3430,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
       <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="📈 Entrer dans la salle des investissements">📈 ادخل غرفة الاستثمارات</a>
-      <a href="rizq_investments.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="+ Publier une opportunité d'investissement">+ انشر فرصة استثمار</a>
     </div>
 
   </div>
@@ -3782,36 +3707,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <h2 class="cta-title" data-t="cta-title">جاهز تبدأ على رزق؟<br/><span>بيع، تسوّق، وأدر عملك من منصة واحدة</span></h2>
-    <p class="cta-desc" data-t="cta-desc">محلات، معارض، مكاتب، <strong style="color:#a7f3d0">مناقصات</strong>، و<strong style="color:#fde68a">استثمارات</strong> — سجّل مجاناً وانشر إعلانك الأول اليوم.</p>
-
-    <p class="cta-hubs-label" data-t="cta-hubs-label">اختر مساحتك على رزق</p>
-    <nav class="cta-hubs" aria-label="أقسام رزق للأعمال">
-      <a href="rizq_store.html" class="cta-hub cta-hub-store">
-        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">🏪</span></span>
-        <span class="cta-hub-lbl" data-t="cta-hub-stores">المحلات</span>
-        <span class="cta-hub-hint" data-t="cta-hub-hint-stores">بيع وتسوّق يومي</span>
-      </a>
-      <a href="rizq_office.html" class="cta-hub cta-hub-office">
-        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">💼</span></span>
-        <span class="cta-hub-lbl" data-t="cta-hub-offices">المكاتب</span>
-        <span class="cta-hub-hint" data-t="cta-hub-hint-offices">خدمات مهنية</span>
-      </a>
-      <a href="rizq_showroom.html" class="cta-hub cta-hub-showroom">
-        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">🏬</span></span>
-        <span class="cta-hub-lbl" data-t="cta-hub-showrooms">المعارض</span>
-        <span class="cta-hub-hint" data-t="cta-hub-hint-showrooms">عروض راقية</span>
-      </a>
-      <a href="rizq_tenders.html" class="cta-hub cta-hub-tender">
-        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">📋</span></span>
-        <span class="cta-hub-lbl" data-t="cta-hub-tenders">المناقصات</span>
-        <span class="cta-hub-hint" data-t="cta-hub-hint-tenders">فرص أعمال</span>
-      </a>
-      <a href="rizq_investments.html" class="cta-hub cta-hub-gold">
-        <span class="cta-hub-ico-well" aria-hidden="true"><span class="cta-hub-ico">📈</span></span>
-        <span class="cta-hub-lbl" data-t="cta-hub-investments">الاستثمارات</span>
-        <span class="cta-hub-hint" data-t="cta-hub-hint-investments">نمو مدروس</span>
-      </a>
-    </nav>
+    <p class="cta-desc" data-t="cta-desc">سجّل مجاناً وانشر إعلانك الأول اليوم — أو افتح محلك ومعرضك من حساب واحد.</p>
 
     <div class="cta-btns">
       <button class="btn-primary" onclick="rizqOpenRegister(event)" data-t="cta-btn1">🚀 سجّل الآن — مجاناً</button>
@@ -6712,6 +6608,7 @@ const LANG = {
     'hbiz-showrooms': 'معارض الشو روم',
     'hbiz-tenders': 'المناقصات',
     'hbiz-investments': 'الاستثمارات',
+    'hbiz-pick': 'اختر مساحتك على رزق',
     'hbiz-stores-hint': 'تصفّح واشترِ',
     'hbiz-offices-hint': 'خدمات موثوقة',
     'hbiz-showrooms-hint': 'عروض راقية',
@@ -6742,7 +6639,7 @@ const LANG = {
     's-price-title': 'خطط <span>شفافة وبسيطة</span>',
     's-price-desc': 'ابدأ مجاناً وطوّر تجربتك متى شئت',
     'cta-title': 'جاهز تبدأ على رزق؟<br/><span>بيع، تسوّق، وأدر عملك من منصة واحدة</span>',
-    'cta-desc': 'محلات، معارض، مكاتب، <strong style="color:#a7f3d0">مناقصات</strong>، و<strong style="color:#fde68a">استثمارات</strong> — سجّل مجاناً وانشر إعلانك الأول اليوم.',
+    'cta-desc': 'سجّل مجاناً وانشر إعلانك الأول اليوم — أو افتح محلك ومعرضك من حساب واحد.',
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 الاستثمارات',
     'cta-note': '&nbsp;تسجيل آمن بالإيميل &nbsp;|&nbsp; مجاني تماماً',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
@@ -6812,6 +6709,7 @@ const LANG = {
     'hbiz-showrooms': 'Showrooms',
     'hbiz-tenders': 'Appels d\'offres',
     'hbiz-investments': 'Investissements',
+    'hbiz-pick': 'Choisissez votre espace sur Rizq',
     'hbiz-stores-hint': 'Parcourir &amp; acheter',
     'hbiz-offices-hint': 'Services de confiance',
     'hbiz-showrooms-hint': 'Vitrines premium',
@@ -6842,7 +6740,7 @@ const LANG = {
     's-price-title': 'Offres <span>simples et transparentes</span>',
     's-price-desc': 'Commencez gratuitement, évoluez quand vous voulez',
     'cta-title': 'Prêt à commencer sur Rizq?<br/><span>Vendez, achetez et gérez depuis une seule plateforme</span>',
-    'cta-desc': 'Boutiques, showrooms, bureaux, <strong style="color:#a7f3d0">appels d\'offres</strong> et <strong style="color:#fde68a">investissements</strong> — inscrivez-vous gratuitement et publiez votre première annonce aujourd\'hui.',
+    'cta-desc': 'Inscrivez-vous gratuitement et publiez votre première annonce — ou ouvrez boutique et showroom depuis un seul compte.',
     'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Investissements',
     'cta-note': '&nbsp;Inscription sécurisée par e-mail &nbsp;|&nbsp; Totalement gratuit',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
