@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
 :root {
-  /* خلفية بطاقات رزق — كحلي عميق + نقش معين ذهبي واضح (نموذج 1) */
-  --rizq-navy-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.28'%3E%3Cpath d='M36 4l32 32-32 32L4 36z'/%3E%3Cpath d='M36 16l20 20-20 20-20-20z'/%3E%3Cpath d='M36 26l10 10-10 10-10-10z'/%3E%3C/g%3E%3Cg fill='%23C9A84C' fill-opacity='0.1'%3E%3Cpath d='M36 0l36 36-36 36L0 36z'/%3E%3C/g%3E%3C/svg%3E");
+  /* خلفية رزق كما كانت: كحلي عميق + نقوش معينة ظاهرة */
   --rizq-navy-atmosphere: linear-gradient(145deg, #07111f 0%, #0D1B2A 38%, #163a6e 78%, #1B3A6B 100%);
+  --rizq-navy-grid: url("rizq-navy-diamond-tile.png");
+  --rizq-navy-motif-left: url("rizq-navy-motif-left.png");
   --text-on-navy: rgba(255, 255, 255, 0.88);
   --text-on-navy-muted: rgba(255, 255, 255, 0.88);
   --text-on-navy-soft: rgba(255, 255, 255, 0.72);
@@ -44,12 +45,106 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
 .pricing-card.featured,
 .rizq-pkg-card:not(.rizq-pkg-light),
 .store-pkg-card:not(.rizq-pkg-light) {
+  position: relative !important;
+  overflow: hidden !important;
   background-color: #0D1B2A !important;
-  background-image: var(--rizq-navy-atmosphere), var(--rizq-navy-grid) !important;
-  background-size: cover, 64px 64px !important;
-  background-repeat: no-repeat, repeat !important;
-  background-blend-mode: overlay;
+  background-image: var(--rizq-navy-atmosphere) !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
   border-color: rgba(201, 168, 76, 0.22);
+  isolation: isolate;
+}
+
+/* نقش معين متكرر — طبقة مستقلة لا تُلغى بـ background shorthand */
+.section-header::before,
+.sec-header::before,
+.cta-inner::before,
+.price-ticker-wrap::before,
+.price-card::before,
+.cs-strip::before,
+.rzq-disc-empty::before,
+.hero-stats-bar::before,
+.rn-topnav::before,
+.ticker-wrap::before,
+.hero-eyebrow::before,
+.hero-title-card::before,
+.hero-subtitle-card::before,
+.hero-vid-ph::before,
+.listings-label > span::before,
+.ad-card::before,
+.listing-card::before,
+#cat-portal::before,
+.why-card::before,
+.rvid-section::before,
+.store-card::before,
+.product-card::before,
+.rzq-disc-card::before,
+.hub-card::before,
+.cta-hub::before,
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav)::before,
+.rpkg-card[style*="#1B3A6B"]::before,
+.pricing-card[style*="#1B3A6B"]::before,
+.rpkg-card.featured::before,
+.pricing-card.featured::before,
+.rizq-pkg-card:not(.rizq-pkg-light)::before,
+.store-pkg-card:not(.rizq-pkg-light)::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background-image: var(--rizq-navy-grid) !important;
+  background-size: 72px 72px !important;
+  background-repeat: repeat !important;
+  opacity: 0.95 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* نقش الزاوية اليسرى من نموذج الهيرو */
+.section-header::after,
+.sec-header::after,
+.cta-inner::after,
+.why-card::after,
+.hero-title-card::after,
+.hero-vid-ph::after,
+.rvid-section::after,
+.cta-hub::after,
+.hub-card::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: min(52%, 460px) !important;
+  background: var(--rizq-navy-motif-left) left center / auto 115% no-repeat !important;
+  opacity: 0.65 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+
+/* اجعل المحتوى فوق طبقات النقش */
+.section-header > *,
+.sec-header > *,
+.cta-inner > *,
+.hero-title-card > *,
+.hero-subtitle-card > *,
+.hero-eyebrow > *,
+.hero-vid-ph > *,
+.why-card > *,
+.ad-card > *,
+.listing-card > *,
+.store-card > *,
+.product-card > *,
+.rpkg-card > *,
+.pricing-card > *,
+.rizq-pkg-card > *,
+.store-pkg-card > *,
+.hub-card > *,
+.cta-hub > *,
+.rvid-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Navy section-header panels — keep copy readable on gradient bg above */
