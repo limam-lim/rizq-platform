@@ -1000,20 +1000,13 @@
     var more = document.getElementById('nav-more-li');
     var center = nav && nav.querySelector('.nav-center');
     if (!nav || !more || !center) return;
-    var shouldDock = isLanding() && isMobileNav();
-    if (shouldDock) {
-      if (more.parentNode !== nav) {
-        more.__rizqMoreCenterHome = center;
-        nav.appendChild(more);
-      }
-      more.classList.add('rizq-more-docked');
-      center.classList.add('rizq-nav-has-docked-more');
-    } else {
-      more.classList.remove('rizq-more-docked');
-      if (center) center.classList.remove('rizq-nav-has-docked-more');
-      if (more.__rizqMoreCenterHome && more.parentNode !== more.__rizqMoreCenterHome) {
-        more.__rizqMoreCenterHome.appendChild(more);
-      }
+    /* لا نفصل «المزيد» عن صف الأزرار — يبقى في الوسط مع المجموعة */
+    more.classList.remove('rizq-more-docked');
+    if (center) center.classList.remove('rizq-nav-has-docked-more');
+    if (more.__rizqMoreCenterHome && more.parentNode !== more.__rizqMoreCenterHome) {
+      more.__rizqMoreCenterHome.appendChild(more);
+    } else if (more.parentNode !== center) {
+      center.appendChild(more);
     }
   }
 
