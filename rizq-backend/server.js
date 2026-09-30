@@ -25,7 +25,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
-const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
+const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
@@ -1712,7 +1712,7 @@ function resolveOptionalAccountViewer(req) {
   return (acc
     && acc.status === 'approved'
     && !acc.suspended
-    && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
+    && tokenMatchesAccount(acc, token)) ? accountId : null;
 }
 
 function genAccountId() {
@@ -2028,6 +2028,7 @@ mountAccountsSessionRoutes(app, {
   extractAccountToken,
   extractDashToken,
   timingSafeEqualStr,
+  tokenMatchesAccount,
   canAutoApproveAccountType,
   consumeBuyerVerificationByEmail,
   sendSellerResetOtp,
@@ -2053,6 +2054,7 @@ mountAccountsManageRoutes(app, {
   writeAccounts,
   extractAccountToken,
   timingSafeEqualStr,
+  tokenMatchesAccount,
   stripToken,
   toAdminAccount,
   resolveOptionalAccountViewer,
@@ -2781,7 +2783,8 @@ function verifyAccountOwner(accountId, token) {
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
-  return (acc && acc.status === 'approved' && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? acc : null;
+  // dashToken أو accessToken كلاهما يثبت الملكية (انظر tokenMatchesAccount).
+  return (acc && acc.status === 'approved' && !acc.suspended && tokenMatchesAccount(acc, token)) ? acc : null;
 }
 
 const RizqPromptsServer = require('../rizq_ai_prompts');
@@ -3455,9 +3458,11 @@ app.post('/api/team', (req, res) => {
 
 /** GET /api/team?accountId=... — عرض عام (بلا هاتف) لصفحة المعرض العامة */
 app.get('/api/team', (req, res) => {
-  const accountId = req.query.accountId;
-  let list = readTeam().filter((m) => m.status === 'active');
-  if (accountId) list = list.filter((m) => m.accountId === accountId);
+  const accountId = String(req.query.accountId || '').trim();
+  if (!accountId) {
+    return res.status(400).json({ ok: false, error: 'accountId_required' });
+  }
+  const list = readTeam().filter((m) => m.status === 'active' && m.accountId === accountId);
   res.json({ ok: true, members: list.map((m) => ({ id: m.id, name: m.name, role: m.role, emoji: m.emoji })) });
 });
 

@@ -20,6 +20,7 @@ function mountAccountsSessionRoutes(app, deps) {
     extractAccountToken,
     extractDashToken,
     timingSafeEqualStr,
+    tokenMatchesAccount,
     canAutoApproveAccountType,
     consumeBuyerVerificationByEmail,
     sendSellerResetOtp,
@@ -30,6 +31,11 @@ function mountAccountsSessionRoutes(app, deps) {
     isProdEnv,
     stripToken,
   } = deps;
+
+  const ownerTokenOk = (acc, token) => {
+    if (typeof tokenMatchesAccount === 'function') return tokenMatchesAccount(acc, token);
+    return !!(token && timingSafeEqualStr(token, acc.accessToken));
+  };
 
   const sellerLoginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -269,7 +275,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
     const acc = list[idx];
     const token = extractAccountToken(req);
-    if (!token || !timingSafeEqualStr(token, acc.accessToken)) {
+    if (!token || !ownerTokenOk(acc, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });

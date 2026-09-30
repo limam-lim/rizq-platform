@@ -342,7 +342,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 </style>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -602,6 +602,16 @@ textarea.form-input{resize:vertical;min-height:90px}
           </div>
           <div class="form-grid">
             <div class="form-group">
+              <label class="form-label" data-t="prod-sku-label">رمز المنتج (SKU)</label>
+              <input class="form-input" id="prod-sku" data-ph="prod-sku-ph" placeholder="مثال: CLTH-BLK-M-001"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-t="prod-unit-label">وحدة القياس</label>
+              <input class="form-input" id="prod-unit" data-ph="prod-unit-ph" placeholder="قطعة / كغ / متر / كيس"/>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
               <label class="form-label" data-t="prod-variants-label">المقاسات / الأوزان (اختياري)</label>
               <input class="form-input" id="prod-variants" data-ph="prod-variants-ph" placeholder="مثال: S, M, L, XL أو 250غ، 500غ، 1كغ"/>
             </div>
@@ -634,6 +644,14 @@ textarea.form-input{resize:vertical;min-height:90px}
         <div class="card-header">
           <div class="card-title" data-t="my-products-title">📦 منتجاتي</div>
           <span id="products-count" style="font-size:12px;color:var(--text-muted)"></span>
+        </div>
+        <div id="inventory-summary" style="display:none;margin:0 16px 14px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(14,165,233,.05));border:1px solid rgba(27,58,107,.08)">
+          <div style="display:flex;flex-wrap:wrap;gap:10px 18px;font-size:12.5px;font-weight:600;color:var(--navy)">
+            <span id="inv-sum-total"></span>
+            <span id="inv-sum-low" style="color:#b45309"></span>
+            <span id="inv-sum-out" style="color:#dc2626"></span>
+            <span id="inv-sum-units" style="color:var(--text-muted);font-weight:500"></span>
+          </div>
         </div>
         <div id="products-grid" class="products-grid"></div>
       </div>
@@ -1291,12 +1309,14 @@ function _initWithAccount(acc){
   // الآن بعد حل window.REAL_ACCESS_TOKEN بدل التوازي معه.
   if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){
     _rizqMergeCatalogFromBackend();
+    if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
     if(typeof RizqAccountPayments !== 'undefined' && acc.id){
       RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || SESSION_TOKEN).then(function(methods){
         if(Array.isArray(methods) && typeof renderMyPayments === 'function') renderMyPayments();
       });
     }
   });
+  if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
 
   // Fill sidebar
   document.getElementById('sb-store-name').textContent = STORE.name || _t2('محلي','Ma boutique');
@@ -1743,9 +1763,61 @@ function renderChecklist(){
 }
 
 // ══ PRODUCTS ══
+function _storeInventoryPreset(){
+  try{
+    var act = (typeof STORE!=='undefined' && STORE && STORE.activityId) ? STORE.activityId : '';
+    if(typeof RizqMerchantActivities!=='undefined' && RizqMerchantActivities.inventoryPresetForActivity){
+      return RizqMerchantActivities.inventoryPresetForActivity(act);
+    }
+  }catch(e){}
+  return null;
+}
+function applyStoreInventoryPresets(){
+  var preset = _storeInventoryPreset();
+  if(!preset) return;
+  var fr = (typeof _storeDashLang==='function' ? _storeDashLang() : 'ar') === 'fr';
+  var variants = document.getElementById('prod-variants');
+  var unit = document.getElementById('prod-unit');
+  var sku = document.getElementById('prod-sku');
+  if(variants){
+    variants.placeholder = fr ? preset.variantsPhFr : preset.variantsPhAr;
+    variants.setAttribute('data-ph-fr', preset.variantsPhFr);
+  }
+  if(unit && !unit.value){
+    unit.placeholder = fr ? preset.unitDefaultFr : preset.unitDefault;
+    unit.setAttribute('data-ph-fr', preset.unitDefaultFr);
+  }
+  if(sku){
+    sku.placeholder = fr ? preset.skuHintFr : preset.skuHintAr;
+    sku.setAttribute('data-ph-fr', preset.skuHintFr);
+  }
+}
+function updateInventorySummary(){
+  var wrap = document.getElementById('inventory-summary');
+  if(!wrap) return;
+  if(!products.length){ wrap.style.display='none'; return; }
+  var LOW = 5;
+  var low=0, out=0, units=0;
+  products.forEach(function(p){
+    var n = parseInt(p.stock, 10);
+    if(p.status==='out' || (!isNaN(n) && n<=0)) out++;
+    else if(!isNaN(n) && n>0 && n<=LOW) low++;
+    if(!isNaN(n) && n>0) units += n;
+  });
+  var elT = document.getElementById('inv-sum-total');
+  var elL = document.getElementById('inv-sum-low');
+  var elO = document.getElementById('inv-sum-out');
+  var elU = document.getElementById('inv-sum-units');
+  if(elT) elT.textContent = _t2('📦 '+products.length+' صنف','📦 '+products.length+' article(s)');
+  if(elL) elL.textContent = low ? _t2('⚠️ '+low+' كمية منخفضة','⚠️ '+low+' stock bas') : '';
+  if(elO) elO.textContent = out ? _t2('❌ '+out+' نفذ','❌ '+out+' rupture') : '';
+  if(elU) elU.textContent = units ? _t2('إجمالي الوحدات: '+units,'Unités totales : '+units) : '';
+  wrap.style.display = 'block';
+}
 function renderProducts(){
   const cnt = document.getElementById('products-count');
   if(cnt) cnt.textContent = products.length + _t2(' منتج',' produit(s)');
+  updateInventorySummary();
   const grid = document.getElementById('products-grid');
   if(!products.length){
     grid.innerHTML='<div style="text-align:center;padding:48px;color:var(--text-muted)"><div style="font-size:48px;margin-bottom:12px">📦</div><p style="font-size:15px;font-weight:600">'+_t2('لا توجد منتجات بعد','Aucun produit pour le moment')+'</p><p style="font-size:13px;margin-top:6px">'+_t2('أضف أول منتج الآن','Ajoutez votre premier produit maintenant')+'</p></div>';
@@ -1765,10 +1837,11 @@ function renderProducts(){
     } else if(p.status==='limited'){
       badgeHtml = `<div class="product-stock" style="color:${STATUS_COLOR.limited}">${STATUS.limited}</div>`;
     } else {
-      badgeHtml = `<div class="product-stock" style="color:${STATUS_COLOR.available}">${STATUS.available}${hasStock?` · 📦 ${stockNum}`:''}</div>`;
+      badgeHtml = `<div class="product-stock" style="color:${STATUS_COLOR.available}">${STATUS.available}${hasStock?` · 📦 ${stockNum}`:''}${p.unit?` ${escapeHtml(p.unit)}`:''}</div>`;
     }
     const soldHtml = (p.sold && Number(p.sold)>0) ? `<div style="font-size:11px;color:#92400e;font-weight:600;margin-top:3px">${_t2(`🔥 تم بيع ${Number(p.sold).toLocaleString()}+ قطعة`,`🔥 ${Number(p.sold).toLocaleString()}+ unités vendues`)}</div>` : '';
     const variantsHtml = p.variants ? `<div style="font-size:11px;color:#2C3A4F;margin-top:3px">📏 ${escapeHtml(p.variants)}</div>` : '';
+    const skuHtml = p.sku ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">SKU: ${escapeHtml(p.sku)}</div>` : '';
     return `
     <div class="product-card">
       <div class="product-img">${p.imgData?`<img src="${p.imgData}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover"/>`:p.emoji||'📦'}</div>
@@ -1776,6 +1849,7 @@ function renderProducts(){
         <div class="product-name">${escapeHtml(p.name)}</div>
         <div class="product-price">${Number(p.price||0).toLocaleString()} MRU</div>
         ${badgeHtml}
+        ${skuHtml}
         ${soldHtml}
         ${variantsHtml}
       </div>
@@ -1811,7 +1885,7 @@ function openAddProduct(){
 }
 
 function clearProductForm(){
-  ['prod-name','prod-price','prod-cat','prod-desc','prod-stock','prod-variants','prod-sold'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['prod-name','prod-price','prod-cat','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('prod-status').value='available';
   const zone = document.getElementById('prod-upload-zone');
   zone.style.display='';
@@ -1820,6 +1894,7 @@ function clearProductForm(){
   renderProdImagesGrid();
   window._prodImgData = null;
   window._editingIdx = null;
+  if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
 }
 
 // معرض صور المنتج (حتى 6 صور) — يحل محل الصورة الواحدة السابقة لدعم
@@ -1872,7 +1947,7 @@ function _rizqSyncCatalogItem(prod){
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
     var body = {
       accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
-      desc: prod.desc, stock: prod.stock, variants: prod.variants, sold: prod.sold,
+      desc: prod.desc, stock: prod.stock, variants: prod.variants, sku: prod.sku||'', unit: prod.unit||'', sold: prod.sold,
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
     };
@@ -1915,7 +1990,7 @@ function _rizqMergeCatalogFromBackend(){
         products.forEach(function(p){ if(p._backendId) existingBackendIds[p._backendId]=true; });
         var toAdd = data.items.filter(function(it){ return !existingBackendIds[it.id]; }).map(function(it){
           return { id:'LP-'+it.id, _backendId: it.id, name: it.name, price: it.price, cat: it.cat, desc: it.desc,
-            stock: it.stock, variants: it.variants, sold: it.sold||0, status: it.status, imgData: it.image||null,
+            stock: it.stock, variants: it.variants, sku: it.sku||'', unit: it.unit||'', sold: it.sold||0, status: it.status, imgData: it.image||null,
             imgDataArr: Array.isArray(it.images) && it.images.length ? it.images : (it.image?[it.image]:[]),
             emoji: it.emoji||'📦', addedAt: it.createdAt };
         });
@@ -1975,6 +2050,8 @@ function saveProduct(){
       desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
       stock: document.getElementById('prod-stock') ? document.getElementById('prod-stock').value : '',
       variants: document.getElementById('prod-variants') ? document.getElementById('prod-variants').value.trim() : '',
+      sku: document.getElementById('prod-sku') ? document.getElementById('prod-sku').value.trim().slice(0,64) : '',
+      unit: document.getElementById('prod-unit') ? document.getElementById('prod-unit').value.trim().slice(0,40) : '',
       sold: document.getElementById('prod-sold') ? (parseInt(document.getElementById('prod-sold').value)||0) : 0,
       status: data._status || (document.getElementById('prod-status') ? document.getElementById('prod-status').value : 'active'),
       // imgDataArr: مصفوفة الصور (حتى 6) — imgData تبقى محدَّثة بالصورة
@@ -2019,11 +2096,14 @@ function editProduct(i){
   document.getElementById('prod-desc').value = p.desc||'';
   document.getElementById('prod-stock').value = p.stock||'';
   document.getElementById('prod-variants').value = p.variants||'';
+  var skuEl = document.getElementById('prod-sku'); if(skuEl) skuEl.value = p.sku||'';
+  var unitEl = document.getElementById('prod-unit'); if(unitEl) unitEl.value = p.unit||'';
   document.getElementById('prod-sold').value = p.sold||'';
   document.getElementById('prod-status').value = p.status||'available';
   window._prodImgData = p.imgData||null;
   window._prodImages = (p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr.slice() : (p.imgData ? [p.imgData] : []);
   renderProdImagesGrid();
+  if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
   openAddProduct();
 }
 
@@ -2047,7 +2127,9 @@ function renderStoreDashboardActivities(acc){
   RizqMerchantActivities.renderSelect(el, { accountType: 'store', packageId: pkgId, lang: _storeDashLang(), selected: (acc && acc.activityId) || '' });
   if(acc && acc.activityId) el.value = acc.activityId;
 }
-function onStoreActivityChange(){}
+function onStoreActivityChange(){
+  if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
+}
 function fillProfileForm(){
   if(!STORE) return;
   renderStoreDashboardActivities(STORE);
