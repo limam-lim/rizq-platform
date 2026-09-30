@@ -339,8 +339,16 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
   transition:all .2s;
 }
 .nav-dd-cta:hover{opacity:.88;transform:translateY(-1px)}
-.nav-more-menu{min-width:180px}
-.nav-more-menu .nav-dd-item strong{font-size:13.5px}
+/* قائمة «المزيد» — مدمجة أصغر من قائمة الباقات */
+.nav-more-menu{
+  min-width:148px!important;max-width:196px!important;width:max-content;
+  padding:5px!important;border-radius:12px!important;
+}
+.nav-more-menu .nav-dd-item{
+  gap:7px;padding:6px 8px;border-radius:8px;margin-bottom:1px;
+}
+.nav-more-menu .nav-dd-item strong{font-size:12.5px;line-height:1.25}
+.nav-more-menu .nav-dd-icon{font-size:15px;width:20px}
 .nav-dd-divider{height:1px;background:rgba(201,168,76,.18);margin:8px 4px}
 
 

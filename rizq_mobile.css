@@ -633,18 +633,39 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     border-radius:20px 20px 0 0!important;transform:none!important;
     z-index:var(--rzq-z-modal)!important;
   }
+  /* «المزيد» على الجوال: نافذة مدمجة بدل ورقة بعرض الشاشة */
+  .nav-dropdown-menu.nav-more-menu,
+  .nav-dropdown-menu.rizq-phone-more-panel{
+    left:50%!important;right:auto!important;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom,0px))!important;
+    width:min(210px,calc(100vw - 28px))!important;min-width:148px!important;max-width:210px!important;
+    max-height:min(62vh,380px)!important;
+    border-radius:14px!important;transform:translateX(-50%)!important;
+    padding:5px!important;
+  }
+  .nav-dropdown-menu.nav-more-menu .nav-dd-item,
+  .nav-dropdown-menu.rizq-phone-more-panel .nav-dd-item{
+    gap:7px;padding:6px 8px;border-radius:8px;margin-bottom:1px;
+  }
+  .nav-dropdown-menu.nav-more-menu .nav-dd-icon,
+  .nav-dropdown-menu.rizq-phone-more-panel .nav-dd-icon{font-size:15px;width:20px}
+  .nav-dropdown-menu.nav-more-menu .nav-dd-item strong,
+  .nav-dropdown-menu.rizq-phone-more-panel .nav-dd-item strong{font-size:12.5px}
   .rizq-hdr-more-menu,
   .rizq-hdr-more-menu.is-positioned,
   .rizq-hdr-more-menu.is-portaled{
     position:fixed!important;
     left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-    width:min(340px,calc(100vw - 16px))!important;
-    min-width:280px!important;
-    max-width:calc(100vw - 16px)!important;
-    border-radius:14px!important;
+    width:min(210px,calc(100vw - 24px))!important;
+    min-width:148px!important;
+    max-width:calc(100vw - 24px)!important;
+    border-radius:12px!important;
     transform:none!important;
     overflow:visible!important;
+    padding:5px!important;
   }
+  .rizq-hdr-more-menu .nav-dd-item{gap:7px;padding:6px 8px;border-radius:8px;margin-bottom:1px}
+  .rizq-hdr-more-menu .nav-dd-icon{font-size:15px;width:20px}
+  .rizq-hdr-more-menu .nav-dd-item strong{font-size:12.5px}
 
   #qcat-portal.rzq-sheet-mode,
   #cat-portal.rzq-sheet-mode{
