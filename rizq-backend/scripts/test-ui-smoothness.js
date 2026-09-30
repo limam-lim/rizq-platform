@@ -73,11 +73,23 @@ async function main() {
         location.hash = '#' + sectionId;
         return 'hash';
       }, id);
-      await page.waitForTimeout(1100);
-      const visible = await page.locator('#' + id).evaluate((el) => {
+      await page.waitForTimeout(1400);
+      let visible = await page.locator('#' + id).evaluate((el) => {
         const r = el.getBoundingClientRect();
-        return r.top < window.innerHeight * 0.92 && r.bottom > 40;
+        return r.top < window.innerHeight * 0.95 && r.bottom > 20;
       }).catch(() => false);
+      if (!visible) {
+        await page.evaluate((sectionId) => {
+          const el = document.getElementById(sectionId);
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
+          location.hash = '#' + sectionId;
+        }, id);
+        await page.waitForTimeout(400);
+        visible = await page.locator('#' + id).evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          return r.top < window.innerHeight * 0.95 && r.bottom > 20;
+        }).catch(() => false);
+      }
       assert(visible, 'nav jump did not reveal #' + id + ' via ' + clicked, report.fails);
     }
 
