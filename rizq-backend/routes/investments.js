@@ -66,6 +66,36 @@ function mountInvestmentsRoutes(app, deps) {
     }
   });
 
+  /**
+   * GET /api/investments/public-stats — عام، بلا تواصل حسّاس.
+   * نفس خوارزمية اكتشاف الرئيسية: عدد + عيّنات مرتّبة بالأحدث، عتبة 3.
+   */
+  app.get('/api/investments/public-stats', (req, res) => {
+    try {
+      const pub = investmentRoom.listPublic({ unlockContacts: false });
+      const list = Array.isArray(pub.opportunities) ? pub.opportunities : [];
+      const teasers = list.slice(0, 20).map((o) => ({
+        id: o.id,
+        title: o.title || '',
+        sector: o.sector || '',
+        wilaya: o.wilaya || '',
+        stage: o.stage || '',
+        createdAt: o.createdAt || null,
+      }));
+      const recentSectors = teasers.map((t) => t.sector).filter(Boolean).slice(0, 3);
+      res.json({
+        ok: true,
+        count: list.length,
+        recentSectors,
+        teasers,
+        minReady: 3,
+        maxCards: 20,
+      });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: 'stats_failed' });
+    }
+  });
+
   /** POST /api/investments/submit — إيداع فرصة (حساب موثّق فقط؛ لا نشر عام تلقائي بلا مراجعة) */
   app.post('/api/investments/submit', investmentSubmitLimiter, async (req, res) => {
     try {

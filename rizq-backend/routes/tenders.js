@@ -338,12 +338,33 @@ function mountTendersRoutes(app, deps) {
 
   /**
    * GET /api/tenders/public-stats — عام بالكامل، بلا مصادقة.
-   * يعرض عدد المناقصات المفتوحة + فئات آخر 3 مناقصات فقط (بلا حقول حسّاسة).
+   * يعرض عدد المناقصات المفتوحة + عيّنات آمنة (فئة/مدينة/موعد) مرتّبة بالأحدث.
+   * نفس عتبة الاكتشاف على الرئيسية: أقل من 3 → واجهة "كن أول من…".
    */
   app.get('/api/tenders/public-stats', (req, res) => {
-    const openList = filterPublicOpenTenders(readTenders());
-    const recentCategories = openList.slice(0, 3).map((t) => t.category).filter(Boolean);
-    res.json({ ok: true, count: openList.length, recentCategories });
+    const openList = filterPublicOpenTenders(readTenders())
+      .slice()
+      .sort((a, b) => {
+        const ta = new Date(a.createdAt || a.submittedAt || a.deadline || 0).getTime();
+        const tb = new Date(b.createdAt || b.submittedAt || b.deadline || 0).getTime();
+        return tb - ta;
+      });
+    const teasers = openList.slice(0, 20).map((t) => ({
+      id: t.id,
+      category: t.category || '',
+      city: t.city || '',
+      deadline: t.deadline || null,
+      createdAt: t.createdAt || t.submittedAt || null,
+    }));
+    const recentCategories = teasers.map((t) => t.category).filter(Boolean).slice(0, 3);
+    res.json({
+      ok: true,
+      count: openList.length,
+      recentCategories,
+      teasers,
+      minReady: 3,
+      maxCards: 20,
+    });
   });
 
   /**

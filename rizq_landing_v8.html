@@ -3330,8 +3330,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     </div>
 
-    <!-- ── عدّاد ديناميكي آمن: عدد المناقصات المفتوحة + فئة آخر 3 (بلا أي تفاصيل حسّاسة) ── -->
-    <div class="fade-in" id="tenders-stats-mount" style="max-width:720px;margin:0 auto 32px"></div>
+    <!-- ── عدّاد/شريط اكتشاف ديناميكي للمناقصات (نفس خوارزمية الأقسام الأخرى) ── -->
+    <div class="fade-in rzq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+      <div id="rzq-disc-tenders"></div>
+    </div>
 
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
       <a href="rizq_tenders.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t-fr="💼 Abonnez-vous à la salle des appels d'offres">💼 اشترك في غرفة المناقصات</a>
@@ -3342,61 +3344,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </section>
 
 <script>
-(function(){
-  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
-  var CAT_LABELS = {
-    'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
-    'إلكترونيات':{ar:'📱 إلكترونيات',fr:'📱 Électronique'},
-    'أثاث':{ar:'🛋️ أثاث',fr:'🛋️ Meubles'},
-    'معدات':{ar:'⚙️ معدات',fr:'⚙️ Équipements'},
-    'بناء':{ar:'🏗️ مواد بناء',fr:'🏗️ Matériaux de construction'},
-    'ذهب':{ar:'💎 مجوهرات',fr:'💎 Bijoux'},
-    'أخرى':{ar:'🏷️ أخرى',fr:'🏷️ Autre'}
-  };
-  function catLabel(cat, fr){ var l = CAT_LABELS[cat]; return l ? l[fr?'fr':'ar'] : (fr?'🏷️ Autre':'🏷️ أخرى'); }
-
-  function emptyStateHTML(fr){
-    return '<div style="background:#fff;border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:26px 20px;text-align:center">'
-      + '<div style="font-size:28px;margin-bottom:8px">🌟</div>'
-      + '<div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px">'+(fr?'Soyez le premier à publier un appel d\'offres':'كن أول من ينشر مناقصته هنا')+'</div>'
-      + '<div style="font-size:12px;color:#5b6472">'+(fr?'Les appels d\'offres ouverts apparaîtront ici dès leur publication.':'المناقصات المفتوحة ستظهر هنا فور نشرها.')+'</div>'
-      + '</div>';
-  }
-
-  function statsHTML(count, cats, fr){
-    var chips = cats.map(function(c){ return '<span style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600">'+esc(catLabel(c, fr))+'</span>'; }).join('');
-    return '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:22px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">'
-      + '<div style="font-size:22px;font-weight:900;color:var(--royal)">📊 '+(fr?(count+(count===1?' appel d\'offres ouvert':' appels d\'offres ouverts')):(count+' مناقصة مفتوحة الآن'))+'</div>'
-      + (chips ? '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center"><span style="font-size:11.5px;color:#9aa7bd;align-self:center">'+(fr?'Dernières catégories :':'أحدث الفئات:')+'</span>'+chips+'</div>' : '')
-      + '</div>';
-  }
-
-  function renderTenderStats(){
-    var mount = document.getElementById('tenders-stats-mount');
-    if(!mount) return;
-    var fr = isFr();
-    if(!window.RIZQ_BACKEND_BASE){ mount.innerHTML = emptyStateHTML(fr); return; }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/tenders/public-stats')
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(data){
-        if(data && data.ok && data.count > 0){
-          mount.innerHTML = statsHTML(data.count, Array.isArray(data.recentCategories)?data.recentCategories:[], fr);
-        } else {
-          mount.innerHTML = emptyStateHTML(fr);
-        }
-      }).catch(function(){ mount.innerHTML = emptyStateHTML(fr); });
-  }
-
-  document.addEventListener('DOMContentLoaded', renderTenderStats);
-  try{
-    var _origSetItem2 = Storage.prototype.setItem;
-    Storage.prototype.setItem = function(k, v){
-      _origSetItem2.call(this, k, v);
-      if(k === 'rizq_lang') renderTenderStats();
-    };
-  }catch(e){}
-})();
+/* مناقصات: شريط الاكتشاف الموحّد يُدار من سكربت DISCOVERY STRIPS أدناه (#rzq-disc-tenders) */
 </script>
 
 <!-- ══ SECTION: غرفة الاستثمارات — نفس نمط ترويج المحلات/المكاتب/المعارض/المناقصات ══ -->
@@ -3432,6 +3380,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <div style="font-size:16px;font-weight:800;color:#0D1B2A;margin-bottom:8px" data-t-fr="Opportunités mauritaniennes">فرص استثمار موريتانية</div>
         <div style="font-size:13.5px;font-weight:600;color:#1B3A6B;line-height:1.75" data-t-fr="Projets locaux en commerce, immobilier, agriculture et services.">مشاريع محلية في التجارة والعقار والزراعة والخدمات.</div>
       </div>
+    </div>
+
+    <div class="fade-in rizq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+      <div id="rzq-disc-investments"></div>
     </div>
 
     <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
@@ -11254,13 +11206,18 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 
 <!-- FIXED DISC PILL (left) -->
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
-  <!-- ══ DISCOVERY STRIPS — آخر المحلات/المكاتب/المعارض المفتوحة على رزق ══
-       تسحب من rizq_pending_accounts (نفس البيانات التي تديرها لوحات التحكم
-       والإدارة) — تعرض فقط الحسابات المُوافَق عليها التي أضاف صاحبها صورة
-       وجملة قصيرة من لوحة تحكمه. إن كان العدد أقل من 3 لكل فئة تُعرض حالة
-       فارغة أنيقة بدل شريط شبه فارغ. ── -->
+  <!-- ══ DISCOVERY STRIPS — خوارزمية موحّدة لكل الأقسام
+       المحلات / المكاتب / المعارض / المناقصات / الاستثمارات
+       قواعد واحدة:
+         1) عنصر جاهز للعرض فقط (حساب موافق + صورة + جملة، أو مناقصة/استثمار منشور)
+         2) ترتيب بالأحدث أولاً
+         3) إن قلّ العدد عن MIN_READY (3) → حالة فارغة «كن أول من…»
+         4) وإلا شريط حتى MAX_CARDS (20) مع تمرير تلقائي ── -->
   <script>
   (function(){
+    var DISCOVERY_MIN_READY = 3;
+    var DISCOVERY_MAX_CARDS = 20;
+
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
 
@@ -11279,7 +11236,27 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         emptyTitle:{ar:'🌟 كن أول من يفتح معرضه هنا',fr:'🌟 Soyez le premier à ouvrir votre showroom ici'},
         emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
         emptyCta:{ar:'🏬 أنشئ معرضك الآن',fr:'🏬 Créez votre showroom maintenant'},
-        bizType:'corp' }
+        bizType:'corp' },
+      tenders: { page:'rizq_tenders.html', icon:'📋', badge:{ar:'مناقصة',fr:'Appel d\'offres'},
+        emptyTitle:{ar:'🌟 كن أول من ينشر مناقصته هنا',fr:'🌟 Soyez le premier à publier un appel d\'offres'},
+        emptyDesc:{ar:'المناقصات المفتوحة ستظهر هنا فور نشرها — اشترك في الغرفة وابدأ.',fr:'Les appels d\'offres ouverts apparaîtront ici dès leur publication.'},
+        emptyCta:{ar:'📋 انشر مناقصة',fr:'📋 Publier un AO'},
+        bizType:'tenders' },
+      investments: { page:'rizq_investments.html', icon:'📈', badge:{ar:'استثمار',fr:'Investissement'},
+        emptyTitle:{ar:'🌟 كن أول من ينشر فرصته الاستثمارية هنا',fr:'🌟 Soyez le premier à publier une opportunité'},
+        emptyDesc:{ar:'فرص الاستثمار ستظهر هنا فور نشرها ومراجعتها — ادخل الغرفة وابدأ.',fr:'Les opportunités d\'investissement apparaîtront ici dès publication et revue.'},
+        emptyCta:{ar:'📈 انشر فرصة',fr:'📈 Publier une opportunité'},
+        bizType:'investments' }
+    };
+
+    var TENDER_CAT = {
+      'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
+      'إلكترونيات':{ar:'📱 إلكترونيات',fr:'📱 Électronique'},
+      'أثاث':{ar:'🛋️ أثاث',fr:'🛋️ Meubles'},
+      'معدات':{ar:'⚙️ معدات',fr:'⚙️ Équipements'},
+      'بناء':{ar:'🏗️ مواد بناء',fr:'🏗️ Matériaux'},
+      'ذهب':{ar:'💎 مجوهرات',fr:'💎 Bijoux'},
+      'أخرى':{ar:'🏷️ أخرى',fr:'🏷️ Autre'}
     };
 
     function cardHTML(acc, cfg, fr){
@@ -11296,12 +11273,53 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         + '</div></a>';
     }
 
+    function tenderCardHTML(t, fr){
+      var cfg = TYPE_CFG.tenders;
+      var cat = TENDER_CAT[t.category] ? TENDER_CAT[t.category][fr?'fr':'ar'] : (t.category || (fr?'Appel d\'offres':'مناقصة'));
+      var days = '';
+      if(t.deadline){
+        var d = Math.max(1, Math.ceil((new Date(t.deadline).getTime() - Date.now()) / 86400000));
+        days = fr ? (d + ' j restants') : ('متبقٍ ' + d + ' يوم');
+      }
+      return '<a class="rzq-disc-card" href="'+cfg.page+'">'
+        + '<div class="rzq-disc-img" style="display:flex;align-items:center;justify-content:center;font-size:34px">📋</div>'
+        + '<div class="rzq-disc-body">'
+        +   '<div class="rzq-disc-name">'+esc(cat)+'</div>'
+        +   '<div class="rzq-disc-tag">'+esc((t.city||'')+(t.city&&days?' · ':'')+days)+'</div>'
+        +   '<span class="rzq-disc-badge">'+cfg.icon+' '+esc(cfg.badge[fr?'fr':'ar'])+'</span>'
+        + '</div></a>';
+    }
+
+    function investmentCardHTML(o, fr){
+      var cfg = TYPE_CFG.investments;
+      var title = (o.title || '').slice(0, 48) || (fr ? 'Opportunité' : 'فرصة استثمارية');
+      var meta = [o.sector, o.wilaya, o.stage].filter(Boolean).join(' · ');
+      return '<a class="rzq-disc-card" href="'+cfg.page+'">'
+        + '<div class="rzq-disc-img" style="display:flex;align-items:center;justify-content:center;font-size:34px">📈</div>'
+        + '<div class="rzq-disc-body">'
+        +   '<div class="rzq-disc-name">'+esc(title)+'</div>'
+        +   (meta ? '<div class="rzq-disc-tag">'+esc(meta)+'</div>' : '')
+        +   '<span class="rzq-disc-badge">'+cfg.icon+' '+esc(cfg.badge[fr?'fr':'ar'])+'</span>'
+        + '</div></a>';
+    }
+
     function emptyHTML(cfg, fr){
       return '<div class="rzq-disc-empty">'
         + '<div class="rzq-disc-empty-icon">'+cfg.icon+'</div>'
         + '<div class="rzq-disc-empty-title">'+esc(cfg.emptyTitle[fr?'fr':'ar'])+'</div>'
         + '<div class="rzq-disc-empty-desc">'+esc(cfg.emptyDesc[fr?'fr':'ar'])+'</div>'
         + '</div>';
+    }
+
+    function mountStrip(mount, cardsHTML, cfg, fr){
+      if(!cardsHTML){
+        mount.innerHTML = emptyHTML(cfg, fr);
+        return;
+      }
+      mount.innerHTML = '<div class="rzq-disc-strip">'
+        + '<div class="rzq-disc-track">' + cardsHTML + cardsHTML + '</div>'
+        + '</div>';
+      initAutoScroll(mount.querySelector('.rzq-disc-strip'));
     }
 
     function initAutoScroll(strip){
@@ -11322,14 +11340,6 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       requestAnimationFrame(step);
     }
 
-    // ── إصلاح جوهري 29/07/2026: كانت هذه الأشرطة الثلاثة تقرأ حصرياً من
-    // localStorage['rizq_pending_accounts'] — يعني زائر حقيقي يفتح المنصة
-    // من جهاز لم يُسجَّل/يُعتمَد فيه أي حساب من قبل (الحالة الطبيعية لأي
-    // زائر جديد) كان يرى دائماً الحالة الفارغة، حتى لو كانت هناك عشرات
-    // المحلات/المكاتب/المعارض المعتمدة فعلياً على الخادم. الآن تُدمَج بيانات
-    // GET /api/accounts/public الحقيقية مع أي بيانات محلية (لا تكرار، بمعرّف
-    // id) قبل الفلترة والعرض — بنفس نمط "الدمج عند التحميل" المستخدم في كل
-    // صفحات المنصة الأخرى هذا الأسبوع.
     var _backendAccountsPromise = null;
     function _fetchBackendAccounts(){
       if(_backendAccountsPromise) return _backendAccountsPromise;
@@ -11343,6 +11353,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       return _backendAccountsPromise;
     }
 
+    /** حسابات (محل/مكتب/معرض): موافَق + اسم + صورة + جملة — الأحدث موافقة أولاً */
     function renderStrip(mountId, type){
       var mount = document.getElementById(mountId);
       if(!mount) return;
@@ -11361,16 +11372,43 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         });
         list.sort(function(a,b){ return new Date(b.approvedAt||0) - new Date(a.approvedAt||0); });
 
-        if(list.length < 3){
-          mount.innerHTML = emptyHTML(cfg, fr);
+        if(list.length < DISCOVERY_MIN_READY){
+          mountStrip(mount, '', cfg, fr);
           return;
         }
-        var cardsHTML = list.slice(0,20).map(function(a){ return cardHTML(a, cfg, fr); }).join('');
-        mount.innerHTML = '<div class="rzq-disc-strip">'
-          + '<div class="rzq-disc-track">' + cardsHTML + cardsHTML + '</div>'
-          + '</div>';
-        initAutoScroll(mount.querySelector('.rzq-disc-strip'));
+        var cardsHTML = list.slice(0, DISCOVERY_MAX_CARDS).map(function(a){ return cardHTML(a, cfg, fr); }).join('');
+        mountStrip(mount, cardsHTML, cfg, fr);
       });
+    }
+
+    /** مناقصات / استثمارات: نفس العتبة والترتيب من public-stats */
+    function renderFeedStrip(mountId, kind){
+      var mount = document.getElementById(mountId);
+      if(!mount) return;
+      var cfg = TYPE_CFG[kind];
+      var fr = isFr();
+      if(!window.RIZQ_BACKEND_BASE){
+        mountStrip(mount, '', cfg, fr);
+        return;
+      }
+      var url = window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + (kind==='tenders'
+        ? '/api/tenders/public-stats'
+        : '/api/investments/public-stats');
+      fetch(url)
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          var teasers = data && data.ok && Array.isArray(data.teasers) ? data.teasers : [];
+          var count = data && data.ok ? Number(data.count||teasers.length) : 0;
+          if(count < DISCOVERY_MIN_READY || teasers.length < DISCOVERY_MIN_READY){
+            mountStrip(mount, '', cfg, fr);
+            return;
+          }
+          var cardsHTML = teasers.slice(0, DISCOVERY_MAX_CARDS).map(function(row){
+            return kind==='tenders' ? tenderCardHTML(row, fr) : investmentCardHTML(row, fr);
+          }).join('');
+          mountStrip(mount, cardsHTML, cfg, fr);
+        })
+        .catch(function(){ mountStrip(mount, '', cfg, fr); });
     }
 
     // ── ⏳ "ينتهي قريباً" — إعلانات مثبَّتة + مناقصات مفتوحة قاربت الانتهاء
@@ -11585,6 +11623,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       renderStrip('rzq-disc-store', 'store');
       renderStrip('rzq-disc-office', 'office');
       renderStrip('rzq-disc-corp', 'corp');
+      renderFeedStrip('rzq-disc-tenders', 'tenders');
+      renderFeedStrip('rzq-disc-investments', 'investments');
       renderLiveActivitySection();
     }
 
