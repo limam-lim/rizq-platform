@@ -1296,12 +1296,19 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 .h-stat:last-child,.h-stat.h-stat-free{display:none}
 .h-stat[data-stat="wilayas"]{border-inline-end:none}
 .h-stat-ads{
-  background:linear-gradient(180deg,rgba(201,168,76,.16),rgba(201,168,76,.04));
-  box-shadow:inset 0 0 0 1px rgba(201,168,76,.18);
+  position:relative;
+  background:linear-gradient(180deg,rgba(201,168,76,.28),rgba(201,168,76,.08));
+  box-shadow:inset 0 0 0 1px rgba(201,168,76,.42);
+}
+.h-stat-ads::before{
+  content:'';position:absolute;inset-inline-start:0;top:18%;bottom:18%;width:3px;
+  border-radius:3px;background:linear-gradient(180deg,var(--gold-light),var(--gold));
+  box-shadow:0 0 10px rgba(201,168,76,.45);
 }
 .h-stat-num{font-size:22px;font-weight:900;color:var(--gold);line-height:1;display:block;font-variant-numeric:tabular-nums}
-.h-stat-ads .h-stat-num{font-size:24px;text-shadow:0 0 18px rgba(201,168,76,.35)}
+.h-stat-ads .h-stat-num{font-size:26px;letter-spacing:.02em;text-shadow:0 0 20px rgba(201,168,76,.45)}
 .h-stat-lbl{font-size:11px;color:rgba(255,255,255,.78);margin-top:5px;display:block;font-weight:600}
+.h-stat-ads .h-stat-lbl{color:#F5E6B8;font-weight:800}
 @media(max-width:520px){
   .hero-stats-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .h-stat:nth-child(2){border-inline-end:none}
