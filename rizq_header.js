@@ -186,16 +186,11 @@
     var anchor = btn.getBoundingClientRect();
     var vw = window.innerWidth;
     var margin = 8;
-    var menuW = Math.min(340, vw - margin * 2);
+    /* ضيّقة تحت زر المزيد — لا تغطي وسط الصفحة */
+    var menuW = Math.min(168, Math.max(148, vw - margin * 2));
     var gap = 4;
     var top = anchor.bottom + gap;
-    var left;
-
-    if (anchor.left + anchor.width / 2 < vw / 2) {
-      left = anchor.left;
-    } else {
-      left = anchor.right - menuW;
-    }
+    var left = Math.round(anchor.left + anchor.width / 2 - menuW / 2);
     left = Math.max(margin, Math.min(left, vw - menuW - margin));
 
     menu.classList.add('is-positioned');
@@ -211,12 +206,13 @@
       + 'width:' + menuW + 'px!important;'
       + 'min-width:' + menuW + 'px!important;'
       + 'max-width:' + menuW + 'px!important;'
-      + 'max-height:min(58vh,420px)!important;'
+      + 'max-height:min(58vh,380px)!important;'
       + 'overflow:visible!important;'
       + 'overflow-y:auto!important;'
       + '-webkit-overflow-scrolling:touch!important;'
       + 'transform:none!important;'
       + 'z-index:10049!important;'
+      + 'padding:5px!important;border-radius:12px!important;'
       + 'direction:inherit!important;';
   }
 
@@ -926,15 +922,22 @@
       menu.setAttribute('data-rizq-more-for', li.id || 'nav-more-li');
       document.body.appendChild(menu);
     }
+    var trig = visibleMoreTrigger(li);
+    var tRect = trig ? trig.getBoundingClientRect() : { left: 12, width: 48, bottom: top };
+    if (trig && tRect.height > 1) top = Math.round(tRect.bottom + 4);
+    var menuW = Math.min(168, Math.max(148, window.innerWidth - 24));
+    var left = Math.round(tRect.left + tRect.width / 2 - menuW / 2);
+    left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
     menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
     menu.style.cssText = ''
       + 'position:fixed!important;top:' + top + 'px!important;'
-      + 'left:10px!important;right:10px!important;bottom:auto!important;'
-      + 'transform:none!important;width:auto!important;'
-      + 'max-height:min(calc(100vh - ' + (top + 12) + 'px),520px)!important;'
+      + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
+      + 'transform:none!important;width:' + menuW + 'px!important;'
+      + 'min-width:' + menuW + 'px!important;max-width:' + menuW + 'px!important;'
+      + 'max-height:min(calc(100vh - ' + (top + 12) + 'px),380px)!important;'
       + 'overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;'
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
-      + 'z-index:10052!important;display:block!important;';
+      + 'z-index:10052!important;display:block!important;padding:5px!important;border-radius:12px!important;';
   }
 
   /* Prefer the visible trigger — on landing, #nav-more-mobile-btn comes first in
@@ -979,19 +982,19 @@
     li.classList.add('open');
     menu.classList.add('rizq-more-menu-open');
     var top = Math.round(rect.bottom + 6);
+    var menuW = Math.min(168, Math.max(148, Math.min(window.innerWidth - 24, 168)));
     var centerX = Math.round(rect.left + rect.width / 2);
-    var menuW = Math.min(300, Math.max(240, Math.min(window.innerWidth - 24, 280)));
-    var left = Math.max(12, Math.min(centerX - menuW / 2, window.innerWidth - menuW - 12));
+    var left = Math.max(8, Math.min(centerX - Math.round(menuW / 2), window.innerWidth - menuW - 8));
     menu.style.cssText = ''
       + 'position:fixed!important;top:' + top + 'px!important;'
       + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
       + 'transform:none!important;width:' + menuW + 'px!important;'
-      + 'max-width:min(300px,calc(100vw - 24px))!important;'
-      + 'max-height:min(70vh,480px)!important;overflow-y:auto!important;overflow-x:hidden!important;'
+      + 'min-width:' + menuW + 'px!important;max-width:' + menuW + 'px!important;'
+      + 'max-height:min(70vh,420px)!important;overflow-y:auto!important;overflow-x:hidden!important;'
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
       + 'z-index:10052!important;display:block!important;'
       + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
-      + 'border-radius:14px!important;padding:8px!important;'
+      + 'border-radius:12px!important;padding:5px!important;'
       + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 

@@ -339,16 +339,21 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
   transition:all .2s;
 }
 .nav-dd-cta:hover{opacity:.88;transform:translateY(-1px)}
-/* قائمة «المزيد» — مدمجة أصغر من قائمة الباقات */
-.nav-more-menu{
-  min-width:148px!important;max-width:196px!important;width:max-content;
-  padding:5px!important;border-radius:12px!important;
+/* قائمة «المزيد» — ضيّقة تحت الزر (لا تغطي شعار رزق) */
+.nav-more-menu,
+.nav-dropdown-menu.nav-more-menu,
+.nav-dropdown-menu.rizq-more-menu-open{
+  min-width:148px!important;max-width:168px!important;width:168px!important;
+  padding:5px!important;border-radius:12px!important;box-sizing:border-box!important;
 }
-.nav-more-menu .nav-dd-item{
+.nav-more-menu .nav-dd-item,
+.rizq-more-menu-open .nav-dd-item{
   gap:7px;padding:6px 8px;border-radius:8px;margin-bottom:1px;
 }
-.nav-more-menu .nav-dd-item strong{font-size:12.5px;line-height:1.25}
-.nav-more-menu .nav-dd-icon{font-size:15px;width:20px}
+.nav-more-menu .nav-dd-item strong,
+.rizq-more-menu-open .nav-dd-item strong{font-size:12.5px;line-height:1.25;white-space:nowrap}
+.nav-more-menu .nav-dd-icon,
+.rizq-more-menu-open .nav-dd-icon{font-size:15px;width:20px;flex-shrink:0}
 .nav-dd-divider{height:1px;background:rgba(201,168,76,.18);margin:8px 4px}
 
 
@@ -8199,12 +8204,21 @@ function positionNavDropdown(li){
       menu.setAttribute('data-rizq-more-for',li.id||'nav-more-li');
       document.body.appendChild(menu);
     }
+    var phoneNodes=li.querySelectorAll('#nav-more-mobile-btn,.nav-phone-more-only,.nav-dropdown-trigger,.nav-link-btn');
+    var phoneTrig=null,pi,pr;
+    for(pi=0;pi<phoneNodes.length;pi++){
+      pr=phoneNodes[pi].getBoundingClientRect();
+      if(pr.width>1 && pr.height>1){ phoneTrig=phoneNodes[pi]; break; }
+    }
     var navEl=document.getElementById('nav');
-    var panelTop=116;
-    if(navEl) panelTop=Math.round(navEl.getBoundingClientRect().bottom+4);
+    var phoneRect=phoneTrig?phoneTrig.getBoundingClientRect():(navEl?navEl.getBoundingClientRect():{left:12,width:48,bottom:116});
+    var panelTop=Math.round((phoneTrig?phoneRect.bottom:(navEl?navEl.getBoundingClientRect().bottom:112))+4);
+    var phoneMenuW=Math.min(168, Math.max(140, Math.min(window.innerWidth-24, 168)));
+    var phoneLeft=Math.round(phoneRect.left+phoneRect.width/2-phoneMenuW/2);
+    phoneLeft=Math.max(8, Math.min(phoneLeft, window.innerWidth-phoneMenuW-8));
     li.classList.add('open');
     menu.classList.add('rizq-more-menu-open','rizq-phone-more-panel');
-    menu.style.cssText='position:fixed!important;top:'+panelTop+'px!important;left:10px!important;right:10px!important;bottom:auto!important;transform:none!important;width:auto!important;max-height:min(calc(100vh - '+(panelTop+12)+'px),520px)!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;';
+    menu.style.cssText='position:fixed!important;top:'+panelTop+'px!important;left:'+phoneLeft+'px!important;right:auto!important;bottom:auto!important;transform:none!important;width:'+phoneMenuW+'px!important;min-width:'+phoneMenuW+'px!important;max-width:'+phoneMenuW+'px!important;max-height:min(calc(100vh - '+(panelTop+12)+'px),380px)!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;padding:5px!important;border-radius:12px!important;';
     var bd=ensureLandingMoreBackdrop();
     bd.classList.add('open');
     bd.setAttribute('aria-hidden','false');
@@ -8237,10 +8251,11 @@ function positionNavDropdown(li){
   li.classList.add('open');
   menu.classList.add('rizq-more-menu-open');
   var top=Math.round(rect.bottom+6);
+  /* ضيّقة ومتمركزة تحت زر المزيد — لا تغطي شعار «رزق» في الوسط */
+  var menuW=Math.min(168, Math.max(148, Math.min(window.innerWidth-24, 168)));
   var centerX=Math.round(rect.left+rect.width/2);
-  var menuW=Math.min(300,Math.max(240,Math.min(window.innerWidth-24,280)));
-  var left=Math.max(12,Math.min(centerX-menuW/2,window.innerWidth-menuW-12));
-  menu.style.cssText='position:fixed!important;top:'+top+'px!important;left:'+left+'px!important;right:auto!important;bottom:auto!important;transform:none!important;width:'+menuW+'px!important;max-width:min(300px,calc(100vw - 24px))!important;max-height:min(70vh,480px)!important;overflow-y:auto!important;overflow-x:hidden!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;border-radius:14px!important;padding:8px!important;box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
+  var left=Math.max(8, Math.min(centerX-Math.round(menuW/2), window.innerWidth-menuW-8));
+  menu.style.cssText='position:fixed!important;top:'+top+'px!important;left:'+left+'px!important;right:auto!important;bottom:auto!important;transform:none!important;width:'+menuW+'px!important;min-width:'+menuW+'px!important;max-width:'+menuW+'px!important;max-height:min(70vh,420px)!important;overflow-y:auto!important;overflow-x:hidden!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;z-index:10052!important;display:block!important;background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;border-radius:12px!important;padding:5px!important;box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
 }
 function closeNavDropdowns(){
   document.querySelectorAll('.nav-dropdown-li.open').forEach(function(o){
