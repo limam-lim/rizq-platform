@@ -26,7 +26,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -491,33 +491,116 @@ html.rizq-has-announce .section-jump-bar{
 }
 
 .hero-tagline{
-  font-size:clamp(13px,1.7vw,16px);
-  color:#1B3A6B;
-  letter-spacing:.3px;
+  font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
+  font-size:clamp(14px,1.85vw,17px);
+  color:#0F2347;
+  letter-spacing:.2px;
   text-align:center;
-  margin:4px 0 24px;
+  margin:6px auto 0;
+  max-width:36em;
   font-weight:700;
-  line-height:1.6;
+  line-height:1.65;
+  opacity:.92;
 }
 
-/* ══ HERO FEATURED VIDEO AD (Rizq ADS — الموضع الأول) ══ */
-.hero-vid-wrap{
-  width:min(760px,92%);
-  margin:0 auto 36px;
-  position:relative;
-  z-index:5;
-  animation:fadeUp .8s .25s ease both;
-  padding:14px 14px 10px;
+/* ══ HERO STAGE — تركيب الدخول الأول (فضاءات → تصفّح → تحويل → إعلان) ══ */
+.hero-stage{
+  width:min(1080px,96%);
+  margin:18px auto 0;
+  position:relative;z-index:55;
+  display:flex;flex-direction:column;align-items:stretch;gap:22px;
+  padding:22px 18px 10px;
   border-radius:28px;
   background:
-    linear-gradient(160deg,rgba(201,168,76,.18),rgba(27,58,107,.22) 45%,rgba(8,15,30,.55)),
-    linear-gradient(145deg,#0a1628,#132a4a 55%,#0c1830);
-  border:1px solid rgba(201,168,76,.34);
-  box-shadow:
-    0 28px 64px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.04) inset,
-    0 0 48px rgba(201,168,76,.10);
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.14),transparent 55%),
+    linear-gradient(180deg,rgba(255,255,255,.78) 0%,rgba(238,242,251,.92) 55%,rgba(255,255,255,.96) 100%);
+  border:1px solid rgba(27,58,107,.10);
+  box-shadow:0 18px 48px rgba(15,35,65,.10),inset 0 1px 0 rgba(255,255,255,.85);
+  animation:fadeUp .75s .18s ease both;
 }
+.hero-spaces{position:relative;z-index:2}
+.hero-spaces-head{text-align:center;margin:0 auto 14px;max-width:34em}
+.hero-spaces-kicker{
+  display:inline-block;margin:0 0 8px;padding:5px 14px;border-radius:999px;
+  font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#8a6f2a;
+  background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);
+  font-family:'Cairo','Noto Naskh Arabic',sans-serif;
+}
+.hero-spaces-title{
+  margin:0 0 6px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
+  font-size:clamp(20px,2.8vw,28px);font-weight:800;color:#0D1B2A;line-height:1.35;
+}
+.hero-spaces-sub{
+  margin:0;font-size:clamp(13px,1.5vw,14.5px);font-weight:600;color:#3d4f6f;line-height:1.55;
+  font-family:'Cairo',sans-serif;
+}
+.hero-browse-panel{
+  position:relative;z-index:60;isolation:isolate;
+  padding:16px 14px 14px;border-radius:22px;
+  background:linear-gradient(165deg,#0D1B2A 0%,#1B3A6B 58%,#152e58 100%);
+  border:1px solid rgba(201,168,76,.32);
+  box-shadow:0 14px 36px rgba(15,35,65,.22),inset 0 1px 0 rgba(255,255,255,.08);
+  animation:fadeUp .8s .28s ease both;
+}
+.hero-browse-head{text-align:center;margin:0 0 12px}
+.hero-browse-title{
+  margin:0 0 4px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
+  font-size:clamp(16px,2.2vw,19px);font-weight:800;color:#F5E6B8;line-height:1.35;
+}
+.hero-browse-sub{
+  margin:0;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.78);line-height:1.5;
+  font-family:'Cairo',sans-serif;
+}
+.hero-browse-panel .hero-search{margin:0 auto 12px;max-width:100%;animation:none}
+.hero-browse-panel .search-bar{
+  background:#fff;border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+.hero-browse-panel .quick-cats{margin-bottom:0;animation:none}
+.hero-browse-panel .qcat{
+  background:rgba(255,255,255,.08);border-color:rgba(201,168,76,.22);
+  box-shadow:none;
+}
+.hero-browse-panel .qcat:hover,
+.hero-browse-panel .qcat.qcat-open{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light))!important;
+}
+.hero-browse-panel .qcat-gold{
+  background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.10))!important;
+  border-color:rgba(232,201,106,.55)!important;
+}
+.hero-browse-panel .qcat-gold .qcat-name{color:#FFE7A0!important;font-weight:800}
+.hero-browse-panel #qcat-inline-panel{margin-top:10px}
+
+/* ══ HERO FEATURED VIDEO AD (مضغوط تحت مسار التصفح) ══ */
+.hero-vid-wrap{
+  width:100%;
+  max-width:760px;
+  margin:0 auto 8px;
+  position:relative;
+  z-index:5;
+  animation:fadeUp .8s .36s ease both;
+  padding:12px 12px 8px;
+  border-radius:22px;
+  background:
+    linear-gradient(160deg,rgba(201,168,76,.16),rgba(27,58,107,.20) 45%,rgba(8,15,30,.55)),
+    linear-gradient(145deg,#0a1628,#132a4a 55%,#0c1830);
+  border:1px solid rgba(201,168,76,.30);
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.32),
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 0 28px rgba(201,168,76,.08);
+}
+.hero-vid-compact .hero-vid-inner{aspect-ratio:21/9;max-height:220px}
+.hero-vid-compact .hero-vid-ph-body{gap:6px;padding:0 16px}
+.hero-vid-compact .hero-vid-ph-h1{font-size:clamp(15px,2.4vw,22px)}
+.hero-vid-compact .hero-vid-ph-sub{font-size:11px}
+.hero-vid-compact .hero-vid-ph-excl{font-size:9.5px;padding:4px 12px;margin-bottom:2px}
+.hero-vid-compact .hero-vid-ph-urgency{display:none}
+.hero-vid-compact .hero-vid-ph-film-bar{height:18px}
+.hero-vid-compact .hero-vid-ph-corner{width:22px;height:22px}
+.hero-vid-compact .hero-vid-ph-corner.tl,.hero-vid-compact .hero-vid-ph-corner.tr{top:24px}
+.hero-vid-compact .hero-vid-ph-corner.bl,.hero-vid-compact .hero-vid-ph-corner.br{bottom:24px}
 .hero-vid-wrap::before{
   content:'';position:absolute;inset:-1px;border-radius:29px;pointer-events:none;z-index:0;
   background:linear-gradient(135deg,rgba(201,168,76,.55),transparent 35%,transparent 65%,rgba(201,168,76,.28));
@@ -768,38 +851,32 @@ html.rizq-has-announce .section-jump-bar{
 .btn-search-main{background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;padding:0 26px;height:58px;cursor:pointer;font-size:17px;transition:all .3s;flex-shrink:0}
 .btn-search-main:hover{background:linear-gradient(135deg,var(--gold-light),var(--gold));filter:brightness(1.1)}
 
-/* ── HERO BIZ NAV — محلات / مكاتب / معارض (بطاقات مميزة) ── */
-.hero-biz-label-top{
-  position:relative;z-index:61;margin:0 auto 14px;text-align:center;
-  display:block;width:fit-content;max-width:92%;
-  font-size:clamp(14.5px,2.4vw,17px);font-weight:800;line-height:1.45;
-  letter-spacing:.02em;color:#0D1B2A;
-  padding:8px 20px;border-radius:999px;
-  background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(238,242,251,.95));
-  border:1px solid rgba(201,168,76,.55);
-  box-shadow:0 4px 14px rgba(15,35,65,.08),inset 0 1px 0 rgba(255,255,255,.9);
-  animation:fadeUp .8s .22s ease both;
-}
+/* ── HERO BIZ NAV — محلات / مكاتب / معارض / مناقصات / استثمارات ── */
+.hero-biz-label-top{display:none} /* استُبدل بـ .hero-spaces-head */
 .hero-biz-nav{
   display:grid!important;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;max-width:920px;margin:0 auto 20px;
-  animation:fadeUp .8s .28s ease both;z-index:61;position:relative;
-  padding:4px 2px 8px;
+  gap:11px;max-width:100%;margin:0 auto;
+  animation:heroSpacesIn .7s .22s ease both;z-index:61;position:relative;
+  padding:2px;
   flex-direction:unset!important;flex-wrap:unset!important;
+}
+@keyframes heroSpacesIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
 }
 
 .hero-biz-btn{
   position:relative;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  padding:18px 12px 16px;border-radius:18px;text-decoration:none;
+  padding:16px 10px 14px;border-radius:18px;text-decoration:none;
   font-weight:800;font-size:clamp(12px,1.35vw,13.5px);line-height:1.3;
-  color:#fff;font-family:'Cairo','Segoe UI','Arial',sans-serif;
+  color:#fff;font-family:'Cairo','Noto Naskh Arabic',sans-serif;
   background:linear-gradient(160deg,#2a5aa8 0%,#1B3A6B 55%,#152e58 100%);
-  border:2px solid #C9A84C;
-  box-shadow:0 8px 22px rgba(15,35,65,.22),inset 0 1px 0 rgba(255,255,255,.22);
+  border:1.5px solid rgba(201,168,76,.55);
+  box-shadow:0 8px 20px rgba(15,35,65,.18),inset 0 1px 0 rgba(255,255,255,.18);
   transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease,filter .28s ease,background .28s ease;
-  overflow:hidden;min-height:118px;text-align:center;
+  overflow:hidden;min-height:112px;text-align:center;
 }
 .hero-biz-btn::before{
   content:'';position:absolute;top:0;left:0;right:0;height:42%;
@@ -849,14 +926,14 @@ html.rizq-has-announce .section-jump-bar{
 .hero-biz-royal .hero-biz-ico-wrap{background:linear-gradient(145deg,#9ec5ff,#4a8adf,#2f6bc4);border-color:#e8f2ff}
 .hero-biz-royal .hero-biz-hint{color:#C8E0FF}
 .hero-biz-royal:hover{border-color:#b6d4ff;box-shadow:0 16px 36px rgba(30,79,154,.45),0 0 28px rgba(100,160,240,.45),inset 0 1px 0 rgba(255,255,255,.28)}
-/* شو روم — بنفسجي غني */
+/* شو روم — نيلي عميق (بدون بنفسجي صارخ) */
 .hero-biz-diamond{
-  background:linear-gradient(160deg,#7b6ae8 0%,#4c3db8 50%,#2e2680 100%);
-  border-color:#c4b5fd;
+  background:linear-gradient(160deg,#3d5a8a 0%,#1e3358 50%,#121f38 100%);
+  border-color:#8fb0d8;
 }
-.hero-biz-diamond .hero-biz-ico-wrap{background:linear-gradient(145deg,#ddd6fe,#a78bfa,#7c3aed);border-color:#f5f3ff}
-.hero-biz-diamond .hero-biz-hint{color:#E9DFFF}
-.hero-biz-diamond:hover{border-color:#e9e0ff;box-shadow:0 16px 36px rgba(76,61,184,.45),0 0 28px rgba(167,139,250,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+.hero-biz-diamond .hero-biz-ico-wrap{background:linear-gradient(145deg,#c5d8f0,#6b8fc4,#3a5f96);border-color:#eef4fb}
+.hero-biz-diamond .hero-biz-hint{color:#D7E6F8}
+.hero-biz-diamond:hover{border-color:#b7cee8;box-shadow:0 16px 36px rgba(30,51,88,.45),0 0 24px rgba(143,176,216,.35),inset 0 1px 0 rgba(255,255,255,.28)}
 /* مناقصات — أخضر زمردي */
 .hero-biz-tender{
   background:linear-gradient(160deg,#2dba8a 0%,#0f8f6a 50%,#0a5c46 100%);
@@ -865,6 +942,15 @@ html.rizq-has-announce .section-jump-bar{
 .hero-biz-tender .hero-biz-ico-wrap{background:linear-gradient(145deg,#a7f3d0,#34d399,#059669);border-color:#ecfdf5}
 .hero-biz-tender .hero-biz-hint{color:#C6FFE8}
 .hero-biz-tender:hover{border-color:#6ee7b7;box-shadow:0 16px 36px rgba(15,143,106,.45),0 0 28px rgba(52,211,153,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+/* استثمارات — كحلي داكن بلمسة ذهبية (مختلفة عن المحلات) */
+.hero-biz-invest{
+  background:linear-gradient(160deg,#243b5c 0%,#0f1c33 52%,#0a1424 100%);
+  border-color:#C9A84C;
+  box-shadow:0 8px 20px rgba(15,35,65,.22),0 0 14px rgba(201,168,76,.18),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.hero-biz-invest .hero-biz-ico-wrap{background:linear-gradient(145deg,#F0D78A,#C9A84C,#9a7a2e);border-color:#fff8e0}
+.hero-biz-invest .hero-biz-hint{color:#FFE7A0}
+.hero-biz-invest:hover{border-color:#E8C96A;box-shadow:0 16px 36px rgba(15,28,51,.5),0 0 26px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.22)}
 .hero-biz-badge{
   position:absolute;top:8px;inset-inline-end:8px;z-index:2;
   background:linear-gradient(135deg,#E8C96A,#C9A84C);
@@ -876,13 +962,13 @@ html.rizq-has-announce .section-jump-bar{
 /* ── HERO PRIMARY CTA (تحويل: متجر أو إعلان مجاني) ── */
 .hero-cta-wrap{
   display:flex;flex-direction:column;align-items:center;gap:8px;
-  max-width:780px;margin:0 auto 36px;
-  animation:fadeUp .8s .34s ease both;z-index:55;position:relative;
+  max-width:780px;margin:0 auto;width:100%;
+  animation:fadeUp .8s .32s ease both;z-index:55;position:relative;
 }
 .hero-cta-primary{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;max-width:640px;padding:15px 28px;border:none;border-radius:14px;
-  cursor:pointer;font-family:'Cairo','Segoe UI','Arial',sans-serif;
+  width:100%;max-width:640px;padding:16px 28px;border:none;border-radius:16px;
+  cursor:pointer;font-family:'Cairo','Noto Naskh Arabic',sans-serif;
   font-size:clamp(14px,2vw,17px);font-weight:900;line-height:1.35;
   color:var(--royal-dark);
   background:linear-gradient(135deg,#b89840 0%,var(--gold) 42%,var(--gold-light) 100%);
@@ -1534,9 +1620,10 @@ html[dir="ltr"] .listings-section .section-desc{
 @media(min-width:769px) and (max-width:1100px){
   .cats-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
   .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:22px!important}
-  .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px;gap:12px}
+  .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:100%;gap:12px}
   .hero-biz-nav .hero-biz-btn:nth-child(4){grid-column:1 / 2}
   .hero-biz-nav .hero-biz-btn:nth-child(5){grid-column:2 / 4;max-width:none}
+  .hero-stage{padding:18px 14px 8px}
   .rizq-type-row{
     grid-template-columns:repeat(6,minmax(0,1fr))!important;
     gap:10px!important;
@@ -1603,19 +1690,24 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-content{padding-top:44px;width:94%}
   .hero-headline{font-size:clamp(36px,12vw,52px)}
   .hero-title-card{padding:14px 24px;border-radius:20px;margin-bottom:12px}
-  .hero-vid-wrap{width:min(100%,96%);margin-bottom:24px}
+  .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
+  .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
+  .hero-spaces-sub{font-size:12.5px}
+  .hero-browse-panel{padding:14px 10px 12px;border-radius:18px}
+  .hero-vid-wrap{width:100%;max-width:100%;margin-bottom:4px}
+  .hero-vid-compact .hero-vid-inner{aspect-ratio:16/9;max-height:180px}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
   .hero-biz-nav{
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:10px;margin-bottom:16px;max-width:100%;
+    gap:10px;margin-bottom:0;max-width:100%;
     flex-direction:unset!important;flex-wrap:unset!important;
   }
-  .hero-biz-btn{min-height:108px;padding:14px 10px 12px}
+  .hero-biz-btn{min-height:100px;padding:14px 10px 12px}
   .hero-biz-label{white-space:normal;text-align:center;font-size:12.5px}
   .hero-biz-hint{white-space:normal;font-size:9.5px}
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
-  .hero-cta-wrap{margin:0 auto 28px}
+  .hero-cta-wrap{margin:0 auto}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
   /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
      direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
@@ -2294,7 +2386,10 @@ html[lang="fr"] .hero-pill-sep{display:none}
 /* طفو خفيف مستمر لبطاقة العنوان وبطاقة الفيديو المميز — حركة حيّة دائمة تُرى
    بسهولة دون الحاجة لتحريك الفأرة أو انتظار توقيت معيّن */
 .hero-title-card{animation:rzqFloat 4.5s ease-in-out infinite}
-.hero-vid-wrap{animation:rzqFloat 5.5s ease-in-out infinite .4s}
+.hero-vid-wrap:not(.hero-vid-compact){animation:rzqFloat 5.5s ease-in-out infinite .4s}
+.hero-spaces-title,.hero-browse-title,.hero-tagline{
+  font-family:'Noto Naskh Arabic','Cairo',Georgia,serif!important;
+}
 @keyframes rzqFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 
 /* ── تحسين استقرار عناصر fade-in — نفس الفئات المستخدمة بكل الصفحة (كل
@@ -2825,130 +2920,133 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span class="hero-pill-sep">·</span>
       <span class="hero-pill">تميّز</span>
     </div>
-    <p class="hero-tagline">متجرك الافتراضي &nbsp;·&nbsp; مكتبك المهني &nbsp;·&nbsp; إعلانك المؤسسي &nbsp;—&nbsp; كل شيء في مكان واحد</p>
+    <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
+    <div class="hero-stage">
+      <p class="hero-tagline" data-t="hero-tagline">متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد</p>
 
-    <!-- ══ FEATURED VIDEO AD (Rizq ADS — موضع واحد مميز فقط · معاينة IA) ══ -->
-    <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
-      <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
-      <div class="hero-vid-inner">
-        <video id="hero-featured-vid" autoplay muted loop playsinline></video>
-        <!-- placeholder: يُخفى تلقائياً حين يوجد فيديو -->
-        <div class="hero-vid-ph" id="hero-vid-ph">
-          <!-- أشرطة سينمائية -->
-          <div class="hero-vid-ph-film-bar top"></div>
-          <div class="hero-vid-ph-film-bar bot"></div>
-          <!-- حبيبات عائمة (JS يضيفها) -->
-          <!-- خطوط ركنية -->
-          <div class="hero-vid-ph-corner tl"></div>
-          <div class="hero-vid-ph-corner tr"></div>
-          <div class="hero-vid-ph-corner bl"></div>
-          <div class="hero-vid-ph-corner br"></div>
-          <!-- scan -->
-          <div class="hero-vid-ph-scan"></div>
-          <!-- شارة LIVE -->
-          <div class="hero-vid-ph-live"><div class="hero-vid-ph-live-dot"></div>🔴 LIVE · RIZQ ADS · الموضع الأول</div>
-          <!-- المحتوى -->
-          <div class="hero-vid-ph-body">
-            <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري · Premium Spot</div>
-            <div class="hero-vid-ph-h1">إعلانك هنا<em>أول ما يراه كل زائر</em></div>
-            <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS Premium Placement</div>
-            <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع الآن</a>
-            <div class="hero-vid-ph-urgency">⚡ موضع واحد فقط · متاح الآن</div>
+      <!-- 1) فضاءات الأعمال — خريطة واضحة للزائر الموريتاني -->
+      <section class="hero-spaces" aria-labelledby="hero-spaces-title">
+        <div class="hero-spaces-head">
+          <p class="hero-spaces-kicker" data-t="hbiz-kicker">منصة موريتانية للأعمال</p>
+          <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">اختر فضاءك على رزق</h2>
+          <p class="hero-spaces-sub" data-t="hbiz-pick-sub">خمسة مسارات واضحة — ادخل مباشرة لما تحتاجه</p>
+        </div>
+        <nav class="hero-biz-nav" aria-label="أقسام الأعمال">
+          <a href="#virtual-stores" class="hero-biz-btn hero-biz-gold">
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-stores">المحلات التجارية</span>
+              <span class="hero-biz-hint" data-t="hbiz-stores-hint">تصفّح واشترِ</span>
+            </span>
+          </a>
+          <a href="#virtual-offices" class="hero-biz-btn hero-biz-royal">
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
+              <span class="hero-biz-hint" data-t="hbiz-offices-hint">خدمات موثوقة</span>
+            </span>
+          </a>
+          <a href="#virtual-showrooms" class="hero-biz-btn hero-biz-diamond">
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-showrooms">معارض الشو روم</span>
+              <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عروض راقية</span>
+            </span>
+          </a>
+          <a href="#virtual-tenders" class="hero-biz-btn hero-biz-tender">
+            <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
+              <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال</span>
+            </span>
+          </a>
+          <a href="#virtual-investments" class="hero-biz-btn hero-biz-invest">
+            <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
+              <span class="hero-biz-hint" data-t="hbiz-investments-hint">نمو مدروس</span>
+            </span>
+          </a>
+        </nav>
+      </section>
+
+      <!-- 2) لوحة التصفح: بحث + أقسام سريعة في كتلة واحدة -->
+      <section class="hero-browse-panel" aria-labelledby="hero-browse-title">
+        <div class="hero-browse-head">
+          <h3 class="hero-browse-title" id="hero-browse-title" data-t="hbiz-browse">ابحث أو تصفّح الأقسام</h3>
+          <p class="hero-browse-sub" data-t="hbiz-browse-sub">عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ</p>
+        </div>
+        <div class="hero-search">
+          <div class="search-bar">
+            <select class="search-cat-select" id="hero-search-cat-select" aria-label="القسم">
+              <option value="">كل الأقسام</option>
+            </select>
+            <div class="search-input-wrap">
+              <input class="search-input" type="text" id="hero-search" data-ph-fr="Rechercher sur Rizq..." placeholder="البحث في رزق..." data-t="search-ph" autocomplete="off" oninput="showSugg(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();doMainSearch();}" onblur="setTimeout(()=>hideSugg(),200)"/>
+            </div>
+            <button class="btn-search-main" onclick="doMainSearch()" aria-label="بحث">🔍</button>
+          </div>
+          <div class="search-suggestions" id="suggestions"></div>
+        </div>
+        <div class="quick-cats">
+          <div class="qcat" data-qcat="عقارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🏠</div><div class="qcat-name" data-t="qc0">عقارات</div></div>
+          <div class="qcat" data-qcat="معدات-منزل" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🔌</div><div class="qcat-name" data-t="qc-home">معدات منزل</div></div>
+          <div class="qcat" data-qcat="طاقة" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">⚡</div><div class="qcat-name" data-t="qc-energy">طاقة</div></div>
+          <div class="qcat" data-qcat="سيارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🚗</div><div class="qcat-name" data-t="qc1">سيارات</div></div>
+          <div class="qcat" data-qcat="إلكترونيات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">📱</div><div class="qcat-name" data-t="qc3">إلكترونيات</div></div>
+          <div class="qcat qcat-gold" data-qcat="ذهب ومجوهرات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🪙</div><div class="qcat-name" data-t="qc8">ذهب</div></div>
+          <div class="qcat" data-qcat="رحلات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">✈️</div><div class="qcat-name" data-t="qc-travel">رحلات</div></div>
+          <div class="qcat" data-qcat="ماشية" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
+        </div>
+        <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
+      </section>
+
+      <!-- 3) تحويل أساسي -->
+      <div class="hero-cta-wrap">
+        <button type="button" class="hero-cta-primary" onclick="goToPost()">
+          <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
+        </button>
+        <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
+      </div>
+
+      <!-- 4) Rizq ADS — شريط سينمائي مضغوط (لا يسرق الانطباع الأول) -->
+      <div class="hero-vid-wrap hero-vid-compact" id="hero-vid-wrap" data-rizq-ads-preview="1">
+        <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
+        <div class="hero-vid-inner">
+          <video id="hero-featured-vid" autoplay muted loop playsinline></video>
+          <div class="hero-vid-ph" id="hero-vid-ph">
+            <div class="hero-vid-ph-film-bar top"></div>
+            <div class="hero-vid-ph-film-bar bot"></div>
+            <div class="hero-vid-ph-corner tl"></div>
+            <div class="hero-vid-ph-corner tr"></div>
+            <div class="hero-vid-ph-corner bl"></div>
+            <div class="hero-vid-ph-corner br"></div>
+            <div class="hero-vid-ph-scan"></div>
+            <div class="hero-vid-ph-live"><div class="hero-vid-ph-live-dot"></div>LIVE · RIZQ ADS</div>
+            <div class="hero-vid-ph-body">
+              <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري</div>
+              <div class="hero-vid-ph-h1">إعلانك هنا<em>أمام كل زائر</em></div>
+              <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS</div>
+              <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع</a>
+            </div>
+          </div>
+          <div class="hero-vid-ctrl">
+            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت">🔇</button>
+            <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
+              <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
+              <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
+            </div>
+            <div class="hero-vid-views" id="hero-vid-views"></div>
           </div>
         </div>
-        <div class="hero-vid-ctrl">
-          <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت">🔇</button>
-          <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
-            <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
-            <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
-          </div>
-          <div class="hero-vid-views" id="hero-vid-views"></div>
+        <div class="hero-vid-cta-bar">
+          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
+          <span class="hero-vid-cta-sep">·</span>
+          <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
         </div>
       </div>
-      <div class="hero-vid-cta-bar">
-        <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
-        <span class="hero-vid-cta-sep">·</span>
-        <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
-      </div>
-    </div>
-
-    <!-- Business hubs: اختيار المساحة مرة واحدة في الهيرو (لا تكرار في CTA السفلي) -->
-    <p class="hero-biz-label-top" data-t="hbiz-pick">اختر مساحتك على رزق</p>
-    <nav class="hero-biz-nav" aria-label="أقسام الأعمال">
-      <a href="#virtual-stores" class="hero-biz-btn hero-biz-gold">
-        <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
-        <span class="hero-biz-text">
-          <span class="hero-biz-label" data-t="hbiz-stores">المحلات التجارية</span>
-          <span class="hero-biz-hint" data-t="hbiz-stores-hint">تصفّح واشترِ</span>
-        </span>
-      </a>
-      <a href="#virtual-offices" class="hero-biz-btn hero-biz-royal">
-        <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
-        <span class="hero-biz-text">
-          <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
-          <span class="hero-biz-hint" data-t="hbiz-offices-hint">خدمات موثوقة</span>
-        </span>
-      </a>
-      <a href="#virtual-showrooms" class="hero-biz-btn hero-biz-diamond">
-        <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
-        <span class="hero-biz-text">
-          <span class="hero-biz-label" data-t="hbiz-showrooms">معارض الشو روم</span>
-          <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عروض راقية</span>
-        </span>
-      </a>
-      <a href="#virtual-tenders" class="hero-biz-btn hero-biz-tender">
-        <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
-        <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
-        <span class="hero-biz-text">
-          <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
-          <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال</span>
-        </span>
-      </a>
-      <a href="#virtual-investments" class="hero-biz-btn hero-biz-gold">
-        <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
-        <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
-        <span class="hero-biz-text">
-          <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
-          <span class="hero-biz-hint" data-t="hbiz-investments-hint">نمو مدروس</span>
-        </span>
-      </a>
-    </nav>
-
-    <!-- Search Amazon-style -->
-    <div class="hero-search">
-      <div class="search-bar">
-        <select class="search-cat-select" id="hero-search-cat-select" aria-label="القسم">
-          <option value="">كل الأقسام</option>
-        </select>
-        <div class="search-input-wrap">
-          <input class="search-input" type="text" id="hero-search" data-ph-fr="Rechercher sur Rizq..." placeholder="البحث في رزق..." data-t="search-ph" autocomplete="off" oninput="showSugg(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();doMainSearch();}" onblur="setTimeout(()=>hideSugg(),200)"/>
-        </div>
-        <button class="btn-search-main" onclick="doMainSearch()">🔍</button>
-      </div>
-      <div class="search-suggestions" id="suggestions"></div>
-    </div>
-
-    <!-- Quick Categories — directly under search for continuous browsing -->
-    <div class="quick-cats">
-      <div class="qcat" data-qcat="عقارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🏠</div><div class="qcat-name" data-t="qc0">عقارات</div></div>
-      <div class="qcat" data-qcat="معدات-منزل" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🔌</div><div class="qcat-name" data-t="qc-home">معدات منزل</div></div>
-      <div class="qcat" data-qcat="طاقة" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">⚡</div><div class="qcat-name" data-t="qc-energy">طاقة</div></div>
-      <div class="qcat" data-qcat="سيارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🚗</div><div class="qcat-name" data-t="qc1">سيارات</div></div>
-      <div class="qcat" data-qcat="إلكترونيات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">📱</div><div class="qcat-name" data-t="qc3">إلكترونيات</div></div>
-      <div class="qcat" data-qcat="ذهب ومجوهرات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()" style="background:linear-gradient(135deg,rgba(184,134,11,.15),rgba(255,215,0,.05));border-color:rgba(255,215,0,.25)"><div class="qcat-icon" style="font-size:26px">🪙</div><div class="qcat-name" data-t="qc8" style="color:#FFD700">ذهب</div></div>
-      <div class="qcat" data-qcat="رحلات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">✈️</div><div class="qcat-name" data-t="qc-travel">رحلات</div></div>
-      <div class="qcat" data-qcat="ماشية" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
-    </div>
-
-    <!-- بطاقة الفروع — تدفع المحتوى للأسفل (بيج/ذهبي) -->
-    <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
-
-    <!-- Primary conversion CTA — after browse path -->
-    <div class="hero-cta-wrap">
-      <button type="button" class="hero-cta-primary" onclick="goToPost()">
-        <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
-      </button>
-      <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
     </div>
   </div>
 
@@ -6543,7 +6641,12 @@ const LANG = {
     'hbiz-showrooms': 'معارض الشو روم',
     'hbiz-tenders': 'المناقصات',
     'hbiz-investments': 'الاستثمارات',
-    'hbiz-pick': 'اختر مساحتك على رزق',
+    'hbiz-pick': 'اختر فضاءك على رزق',
+    'hbiz-kicker': 'منصة موريتانية للأعمال',
+    'hbiz-pick-sub': 'خمسة مسارات واضحة — ادخل مباشرة لما تحتاجه',
+    'hbiz-browse': 'ابحث أو تصفّح الأقسام',
+    'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
+    'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'تصفّح واشترِ',
     'hbiz-offices-hint': 'خدمات موثوقة',
     'hbiz-showrooms-hint': 'عروض راقية',
@@ -6647,6 +6750,11 @@ const LANG = {
     'hbiz-tenders': 'Appels d\'offres',
     'hbiz-investments': 'Investissements',
     'hbiz-pick': 'Choisissez votre espace sur Rizq',
+    'hbiz-kicker': 'Plateforme mauritanienne pour les affaires',
+    'hbiz-pick-sub': 'Cinq parcours clairs — allez directement à ce dont vous avez besoin',
+    'hbiz-browse': 'Recherchez ou parcourez les catégories',
+    'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
+    'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Parcourir &amp; acheter',
     'hbiz-offices-hint': 'Services de confiance',
     'hbiz-showrooms-hint': 'Vitrines premium',
@@ -7022,29 +7130,29 @@ function applyLandingLang(toAr) {
   const pillsFR = ['Vendre 🛍️','Acheter 🔍','Briller ⭐'];
   pills.forEach((el,i)=>{ el.textContent = isAr ? (pillsAR[i]||el.textContent) : (pillsFR[i]||el.textContent); });
 
-  // Hero tagline
+  // Hero tagline — يُترجَم عبر data-t؛ هنا احتياط إن غاب المفتاح
   const heroTag = document.querySelector('.hero-tagline');
-  if(heroTag) heroTag.innerHTML = isAr
-    ? 'متجرك الافتراضي &nbsp;·&nbsp; مكتبك المهني &nbsp;·&nbsp; إعلانك المؤسسي &nbsp;—&nbsp; كل شيء في مكان واحد'
-    : 'Votre boutique virtuelle&nbsp;·&nbsp;Votre bureau pro&nbsp;·&nbsp;Votre annonce corporate&nbsp;—&nbsp;Tout en un seul endroit';
+  if(heroTag && !heroTag.getAttribute('data-t')) heroTag.textContent = isAr
+    ? 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد'
+    : 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit';
 
   // Hero featured-video placeholder slot (shown when no admin video is configured)
   const vidBadge = document.querySelector('.hero-vid-badge');
   if(vidBadge) vidBadge.textContent = isAr ? '🎬 موضع واحد · Rizq ADS' : '🎬 Emplacement unique · Rizq ADS';
   const vidPhLive = document.querySelector('.hero-vid-ph-live');
-  if(vidPhLive) vidPhLive.innerHTML = '<div class="hero-vid-ph-live-dot"></div>' + (isAr ? '🔴 LIVE · RIZQ ADS · الموضع الأول' : '🔴 LIVE · RIZQ ADS · 1ère position');
+  if(vidPhLive) vidPhLive.innerHTML = '<div class="hero-vid-ph-live-dot"></div>' + (isAr ? 'LIVE · RIZQ ADS' : 'LIVE · RIZQ ADS');
   const vidPhExcl = document.querySelector('.hero-vid-ph-excl');
-  if(vidPhExcl) vidPhExcl.textContent = isAr ? '⭐ موضع إعلاني حصري · Premium Spot' : '⭐ Emplacement publicitaire exclusif · Premium Spot';
+  if(vidPhExcl) vidPhExcl.textContent = isAr ? '⭐ موضع إعلاني حصري' : '⭐ Emplacement publicitaire exclusif';
   const vidPhStatLbls = document.querySelectorAll('.hero-vid-ph-stat-lbl');
   const statLblsAR = ['زائر / يوم','الموضع الأول','مشاهدة مضمونة'];
   const statLblsFR = ['Visiteurs / jour','1ère position','Vue garantie'];
   vidPhStatLbls.forEach((el,i)=>{ el.textContent = isAr ? (statLblsAR[i]||el.textContent) : (statLblsFR[i]||el.textContent); });
   const vidPhH1 = document.querySelector('.hero-vid-ph-h1');
-  if(vidPhH1) vidPhH1.innerHTML = isAr ? 'إعلانك هنا<em>أول ما يراه كل زائر</em>' : 'Votre annonce ici<em>La première chose que voit chaque visiteur</em>';
+  if(vidPhH1) vidPhH1.innerHTML = isAr ? 'إعلانك هنا<em>أمام كل زائر</em>' : 'Votre annonce ici<em>devant chaque visiteur</em>';
   const vidPhSub = document.querySelector('.hero-vid-ph-sub');
-  if(vidPhSub) vidPhSub.textContent = isAr ? 'موريتانيا · Rizq ADS Premium Placement' : 'Mauritanie · Rizq ADS Premium Placement';
+  if(vidPhSub) vidPhSub.textContent = isAr ? 'موريتانيا · Rizq ADS' : 'Mauritanie · Rizq ADS';
   const vidPhCta = document.querySelector('.hero-vid-ph-cta');
-  if(vidPhCta) vidPhCta.textContent = isAr ? '📢 احجز هذا الموضع الآن' : '📢 Réservez cet emplacement';
+  if(vidPhCta) vidPhCta.textContent = isAr ? '📢 احجز هذا الموضع' : '📢 Réservez cet emplacement';
   const vidPhUrgency = document.querySelector('.hero-vid-ph-urgency');
   if(vidPhUrgency) vidPhUrgency.textContent = isAr ? '⚡ موضع واحد فقط · متاح الآن' : '⚡ Un seul emplacement disponible · Réservez maintenant';
   const vidCtaLinks = document.querySelectorAll('.hero-vid-cta-link');
