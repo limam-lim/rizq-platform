@@ -2,11 +2,13 @@
  * Buyer (مشتري سريع) — Schema + عمليات DB
  */
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const { db } = require('../db');
 const { normalizeDisplayName, normalizeEmailSafe } = require('../lib/sanitizeText');
 
 const MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BCRYPT_ROUNDS = Math.max(8, Math.min(14, Number(process.env.BCRYPT_ROUNDS) || 10));
 
 function isFullName(name) {
   return /\S+\s+\S+/.test(String(name || '').trim());
@@ -63,11 +65,17 @@ function findByPhone(phone) {
 function findByEmail(email) {
   const em = normalizeEmailSafe(email);
   if (!em) return null;
-  return db.prepare('SELECT * FROM buyers WHERE lower(email) = ?').get(em);
+  return db.prepare('SELECT * FROM buyers WHERE lower(email) = ? OR email_lc = ?').get(em, em);
 }
 
 function findByIdAndToken(id, token) {
   return db.prepare('SELECT * FROM buyers WHERE id = ? AND token = ?').get(id, token);
+}
+
+function hashPassword(password) {
+  const pw = String(password || '');
+  if (pw.length < 6 || pw.length > 128) return null;
+  return bcrypt.hashSync(pw, BCRYPT_ROUNDS);
 }
 
 function registerOrLogin(payload) {
@@ -76,6 +84,8 @@ function registerOrLogin(payload) {
   const mr = normalizePhone(payload.phone || payload.phoneMr);
   const intl = normalizeIntlPhone(payload.phoneIntl || payload.phone_intl);
   const wa = normalizeIntlPhone(payload.whatsapp) || (MR_PHONE_RE.test(mr) ? '+222' + mr : intl);
+  const password = String(payload.password || '');
+  const passHash = password ? hashPassword(password) : null;
 
   if (!cleanName || !isFullName(cleanName)) {
     const err = new Error('يرجى إدخال الاسم الكامل (الاسم واللقب)');
@@ -101,12 +111,18 @@ function registerOrLogin(payload) {
     err.code = 'WHATSAPP_REQUIRED';
     throw err;
   }
+  if (!passHash) {
+    const err = new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    err.status = 400;
+    err.code = 'WEAK_PASSWORD';
+    throw err;
+  }
 
   const primaryPhone = MR_PHONE_RE.test(mr) ? mr : wa.replace(/\D/g, '').slice(-15);
   const now = new Date().toISOString();
+  const token = genBuyerToken();
 
   // تطابق بالبريد فقط بعد OTP — لا نربط بحساب موجود عبر الهاتف وحده
-  // (كان يسمح باختطاف حساب الضحية بمعرفة رقمه + OTP على بريد المهاجم).
   let row = findByEmail(cleanEmail);
   if (row) {
     const phoneOwner = MR_PHONE_RE.test(mr) ? findByPhone(mr) : null;
@@ -117,16 +133,12 @@ function registerOrLogin(payload) {
       throw err;
     }
     db.prepare(`
-      UPDATE buyers SET name = ?, email = ?, phone = ?, phone_intl = ?, whatsapp = ?, last_login_at = ?
+      UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
+        pass_hash = ?, token = ?, last_login_at = ?
       WHERE id = ?
-    `).run(cleanName, cleanEmail, primaryPhone, intl, wa, now, row.id);
-    if (!row.token) {
-      const token = genBuyerToken();
-      db.prepare('UPDATE buyers SET token = ? WHERE id = ?').run(token, row.id);
-      row.token = token;
-    }
+    `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, passHash, token, now, row.id);
     row = findById(row.id);
-    return { buyer: publicBuyer(row), token: row.token, created: false };
+    return { buyer: publicBuyer(row), token, created: false };
   }
 
   if (MR_PHONE_RE.test(mr)) {
@@ -140,13 +152,42 @@ function registerOrLogin(payload) {
   }
 
   const id = genBuyerId();
-  const token = genBuyerToken();
   db.prepare(`
-    INSERT INTO buyers (id, name, phone, phone_intl, whatsapp, email, token, created_at, last_login_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, cleanName, primaryPhone, intl, wa, cleanEmail, token, now, now);
+    INSERT INTO buyers (id, name, phone, phone_intl, whatsapp, email, email_lc, pass_hash, token, created_at, last_login_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, cleanName, primaryPhone, intl, wa, cleanEmail, cleanEmail, passHash, token, now, now);
   row = findById(id);
   return { buyer: publicBuyer(row), token, created: true };
+}
+
+async function loginByEmailPassword(email, password) {
+  const em = normalizeEmailSafe(email);
+  const pw = String(password || '');
+  if (!em || !EMAIL_RE.test(em) || !pw) {
+    const err = new Error('البريد وكلمة المرور مطلوبان');
+    err.status = 400;
+    err.code = 'MISSING_CREDENTIALS';
+    throw err;
+  }
+  const dummyHash = '$2a$10$Cr7J1rfztqkXC9ZpESd5qO2PLvx6D3SJKxfBjfX3DXVMuu3YBVDYy';
+  const row = findByEmail(em);
+  let ok = false;
+  try {
+    ok = row && row.pass_hash ? await bcrypt.compare(pw, row.pass_hash) : await bcrypt.compare(pw, dummyHash);
+  } catch (e) {
+    ok = false;
+  }
+  if (!row || !row.pass_hash || !ok) {
+    const err = new Error('بيانات الدخول غير صحيحة');
+    err.status = 401;
+    err.code = 'INVALID';
+    throw err;
+  }
+  const token = genBuyerToken();
+  const now = new Date().toISOString();
+  db.prepare('UPDATE buyers SET token = ?, last_login_at = ? WHERE id = ?').run(token, now, row.id);
+  const updated = findById(row.id);
+  return { buyer: publicBuyer(updated), token };
 }
 
 function loginByPhone(phone) {
@@ -180,5 +221,6 @@ module.exports = {
   findByEmail,
   findByIdAndToken,
   registerOrLogin,
+  loginByEmailPassword,
   loginByPhone,
 };

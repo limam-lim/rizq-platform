@@ -698,7 +698,7 @@ const {
 } = require('./services/contactGate');
 const { scanContactLeakFields } = require('./services/contactLeakGuard');
 const { canAutoApproveAccountType } = require('./config/verificationPolicy');
-const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, sendSellerResetOtp, verifySellerResetOtp, consumeSellerResetVerification, getPublicOtpConfig } = require('./services/otpService');
+const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, consumeVerification, sendSellerResetOtp, verifySellerResetOtp, consumeSellerResetVerification, getPublicOtpConfig } = require('./services/otpService');
 const {
   saveAdImages,
   saveCatalogImages,
@@ -1849,6 +1849,15 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
+  if (['individual', 'store'].includes(reqType) && sellerPassword) {
+    if (!sellerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail)) {
+      return res.status(400).json({
+        ok: false,
+        code: 'email_required',
+        error: 'البريد الإلكتروني مطلوب مع كلمة المرور لتسجيل الدخول لاحقاً',
+      });
+    }
+  }
   if (sellerEmail) {
     const emailTaken = list.some((a) => String(a.email || '').trim().toLowerCase() === sellerEmail);
     if (emailTaken) {
@@ -1867,8 +1876,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     });
   }
   const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
-  // فرد/محل: تفعيل فوري فقط بعد إثبات ملكية البريد بـ OTP (عند otpRequired)
-  // + كلمة مرور ≥8. لا يُقبل dashToken من العميل أبداً — الخادم يولّده.
+  // فرد/محل: تفعيل فوري بعد إثبات ملكية البريد (أو الهاتف) بـ OTP عند otpRequired
   const platformFlags = getPlatformFlags();
   let autoApproved = false;
   let otpGate = null;
@@ -1880,6 +1888,15 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
         otpGate = consumeBuyerVerificationByEmail(sellerEmail);
       } catch (eOtp) {
         otpGate = { ok: false, error: 'otp_required' };
+      }
+      if (!(otpGate && otpGate.ok)) {
+        const phoneForOtp = String(b.phone || '').replace(/\D/g, '').slice(-8);
+        if (phoneForOtp) {
+          try {
+            const phoneGate = consumeVerification(phoneForOtp);
+            if (phoneGate && phoneGate.ok) otpGate = phoneGate;
+          } catch (ePh) { /* ignore */ }
+        }
       }
       autoApproved = !!(otpGate && otpGate.ok);
     }

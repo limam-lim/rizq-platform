@@ -4151,7 +4151,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <select class="m-input merchant-activity-select" id="st-cat" data-account-type="store">
         <option value="">— اختر نشاط المحل —</option>
       </select>
-      <input class="m-input" id="st-email" type="email" data-ph-fr="E-mail (optionnel)" placeholder="البريد الإلكتروني (اختياري)"/>
+      <input class="m-input" id="st-email" type="email" required data-ph-fr="E-mail *" placeholder="البريد الإلكتروني *"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="st-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale (NNI)" placeholder="الرقم الوطني للتعريف (NNI)"/>
       <div class="m-pw-wrap"><input class="m-input" id="st-pw" type="password" data-ph-fr="Mot de passe (8 caractères+)" placeholder="كلمة المرور (8 أحرف+)"/><button class="m-eye" onclick="tp('st-pw')">👁</button></div>
       <div class="m-pw-wrap" style="margin-bottom:14px"><input class="m-input" id="st-pw2" type="password" data-ph-fr="Confirmer le mot de passe" placeholder="تأكيد كلمة المرور"/><button class="m-eye" onclick="tp('st-pw2')">👁</button></div>
@@ -8872,8 +8872,96 @@ function _syncAccountToBackend(acc){
         }
       }
     }catch(e){}
-    return { ok: true, autoApproved: !!data.autoApproved, status: data.status, type: data.type };
+    return {
+      ok: true,
+      autoApproved: !!data.autoApproved,
+      status: data.status,
+      type: data.type,
+      otpRequired: !!data.otpRequired,
+      accessToken: data.accessToken,
+      id: data.id || acc.id,
+    };
   }).catch(function(){ return { ok: true, localOnly: true }; });
+}
+
+/** بعد التسجيل: إن بقي الحساب معلّقاً بانتظار OTP — أرسل الرمز وفعّل فوراً حتى يدخل الزبون */
+function _completeEmailOtpActivation(acc, syncResult){
+  if(!window.RIZQ_BACKEND_BASE || !acc || !acc.email) return Promise.resolve({ ok: false });
+  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  var accessToken = (syncResult && syncResult.accessToken) || acc.backendAccessToken || '';
+  var accountId = (syncResult && syncResult.id) || acc.id;
+  if(!accessToken || !accountId) return Promise.resolve({ ok: false });
+
+  return fetch(base + '/api/otp/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      channel: 'buyer',
+      email: acc.email,
+      name: acc.name || acc.owner || '',
+      phoneMr: String(acc.phone || '').replace(/\D/g, '').slice(-8),
+      phoneIntl: acc.phoneIntl || '',
+      whatsapp: acc.whatsapp || ''
+    })
+  }).then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
+  .then(function(sendRes){
+    if(!sendRes.ok || !sendRes.data || !sendRes.data.ok){
+      return { ok: false, message: (sendRes.data && sendRes.data.message) || (isAr?'تعذّر إرسال رمز التفعيل':'Échec envoi du code') };
+    }
+    var hint = sendRes.data.devHint ? (isAr?('\n\nرمز التطوير: '+sendRes.data.devHint):('\n\nCode dev: '+sendRes.data.devHint)) : '';
+    var code = window.prompt(
+      (isAr?'أدخل رمز التفعيل المرسل إلى بريدك (6 أرقام) لتفعيل الدخول فوراً:':'Entrez le code à 6 chiffres envoyé à votre e-mail :') + hint,
+      sendRes.data.devHint || ''
+    );
+    if(!code || String(code).replace(/\D/g,'').length !== 6){
+      return { ok: false, message: isAr?'لم يُدخل رمز التفعيل — يمكنك تفعيله لاحقاً من صفحة الدخول':'Code manquant — activez plus tard depuis la connexion' };
+    }
+    return fetch(base + '/api/otp/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel: 'buyer', email: acc.email, code: String(code).replace(/\D/g,'').slice(0,6) })
+    }).then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
+    .then(function(verRes){
+      if(!verRes.ok || !verRes.data || !verRes.data.ok){
+        return { ok: false, message: (verRes.data && verRes.data.message) || (isAr?'رمز غير صحيح':'Code incorrect') };
+      }
+      return fetch(base + '/api/accounts/activate-by-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-account-token': accessToken },
+        body: JSON.stringify({ id: accountId, accessToken: accessToken })
+      }).then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
+      .then(function(actRes){
+        if(!actRes.ok || !actRes.data || !actRes.data.ok || !actRes.data.account){
+          return { ok: false, message: (actRes.data && actRes.data.error) || (isAr?'تعذّر التفعيل':'Activation impossible') };
+        }
+        var a = actRes.data.account;
+        acc.status = 'approved';
+        acc.autoVerified = true;
+        acc.token = a.dashToken || a.token;
+        acc.dashToken = a.dashToken || a.token;
+        acc.backendAccessToken = a.accessToken || accessToken;
+        try{
+          var list = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+          var idx = list.findIndex(function(x){ return x.id === acc.id; });
+          if(idx >= 0){
+            list[idx].status = 'approved';
+            list[idx].token = acc.token;
+            list[idx].dashToken = acc.dashToken;
+            list[idx].backendAccessToken = acc.backendAccessToken;
+            list[idx].autoVerified = true;
+            delete list[idx].password;
+            localStorage.setItem('rizq_pending_accounts', JSON.stringify(list));
+          }
+          if(window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function'){
+            window.RizqAccount.setActiveSession(acc);
+          }
+        }catch(e){}
+        return { ok: true, activated: true };
+      });
+    });
+  }).catch(function(){
+    return { ok: false, message: isAr?'تعذّر الاتصال بالخادم':'Connexion impossible' };
+  });
 }
 // ID upload handlers
 var _idCardB64 = null;
@@ -9140,10 +9228,24 @@ function ppFinalSubmit(){
       alert(result.message);
       return;
     }
+    var afterOtp = Promise.resolve(result);
+    if(result && result.otpRequired && data.email && (result.accessToken || data.backendAccessToken)){
+      afterOtp = _completeEmailOtpActivation(data, result).then(function(act){
+        if(act && act.ok && act.activated){
+          data.status = 'approved';
+          result.autoApproved = true;
+          result.status = 'approved';
+        } else if(act && act.message){
+          alert(act.message);
+        }
+        return result;
+      });
+    }
+    return afterOtp.then(function(result2){
     var okEl=document.getElementById('p-ok');
     if(okEl){
       var h3=okEl.querySelector('h3');
-      var autoApproved = data.status === 'approved';
+      var autoApproved = data.status === 'approved' || (result2 && result2.autoApproved);
       if(h3 && isTrial) h3.textContent=isAr?'🎉 مرحباً في رزق — ابدأ تجربتك المجانية!':'🎉 Bienvenue chez Rizq — commencez votre essai gratuit !';
       else if(h3 && autoApproved) h3.textContent=isAr?'🎉 حسابك مُفعَّل — ابدأ الآن!':'🎉 Compte activé — commencez maintenant !';
       else if(h3) h3.textContent=isAr?'🎉 طلبك قيد المراجعة!':'🎉 Votre demande est en cours de révision !';
@@ -9158,6 +9260,7 @@ function ppFinalSubmit(){
     if (data.status === 'approved' && data.token && window.RizqAccount && typeof window.RizqAccount.goAfterRegistration === 'function') {
       setTimeout(function () { window.RizqAccount.goAfterRegistration(data); }, 1400);
     }
+    });
   });
 }
 
@@ -9171,6 +9274,8 @@ function submitStoreReg(){
   const pw=document.getElementById('st-pw').value;
   const pw2=document.getElementById('st-pw2').value;
   if(!name||!owner||!phone||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  const stEmail=(document.getElementById('st-email')&&document.getElementById('st-email').value.trim().toLowerCase())||'';
+  if(!stEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stEmail)){alert(isAr?'البريد الإلكتروني مطلوب لتسجيل الدخول لاحقاً':'E-mail obligatoire pour vous connecter plus tard');return;}
   if(!NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}

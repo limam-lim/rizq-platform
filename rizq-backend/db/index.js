@@ -100,6 +100,14 @@ function migrateBuyerColumns() {
     if (!names.includes('whatsapp')) {
       db.exec("ALTER TABLE buyers ADD COLUMN whatsapp TEXT NOT NULL DEFAULT ''");
     }
+    if (!names.includes('pass_hash')) {
+      db.exec('ALTER TABLE buyers ADD COLUMN pass_hash TEXT');
+    }
+    if (!names.includes('email_lc')) {
+      db.exec("ALTER TABLE buyers ADD COLUMN email_lc TEXT NOT NULL DEFAULT ''");
+      db.exec("UPDATE buyers SET email_lc = lower(trim(email)) WHERE email_lc = '' AND email != ''");
+      try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_buyers_email_lc ON buyers(email_lc) WHERE email_lc != \'\''); } catch (eIdx) { /* optional */ }
+    }
   } catch (e) {
     console.warn('[rizq-db] buyer column migration:', e.message);
   }
