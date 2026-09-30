@@ -522,7 +522,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 
   <!-- ══ ويدجت رموز الدفع البنكي ══ -->
   <div id="bank-payment-widget" style="margin-bottom:20px;"></div>
-  <script>(function(){renderRizqPayment && renderRizqPayment("bank-payment-widget");})()</script>
+  <script>(function(){try{if(typeof renderRizqPayment==='function')renderRizqPayment("bank-payment-widget");}catch(e){}})()</script>
           <div class="card-header">
             <div class="card-title" data-t="recent-msgs-title">💬 آخر الرسائل</div>
             <button class="btn btn-outline btn-sm" onclick="showPanel('messages',null)" data-t="view-all">عرض الكل</button>

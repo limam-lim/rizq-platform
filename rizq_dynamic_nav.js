@@ -168,6 +168,7 @@
     if (global.RizqHeader && typeof global.RizqHeader.enhanceModel3NavLinks === 'function') {
       global.RizqHeader.enhanceModel3NavLinks(container);
     }
+  }
 
   function ensureDesktopMainExtras(container) {
     if (!container || container.classList.contains('rizq-hdr-row2')) return;
