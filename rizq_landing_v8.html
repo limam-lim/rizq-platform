@@ -409,6 +409,9 @@ html.rizq-has-announce .section-jump-bar{
 }
 .ticker-inner{display:flex;gap:0;width:max-content;animation:ticker 35s linear infinite}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* عربي: يسار→يمين | فرنسي: يمين→يسار */
+html[dir="rtl"] .ticker-inner{animation-direction:reverse}
+html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
 .ticker-item strong{color:var(--gold);font-weight:700}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
@@ -576,7 +579,7 @@ html.rizq-has-announce .section-jump-bar{
 .hero-vid-wrap{
   width:100%;
   max-width:760px;
-  margin:0 auto 8px;
+  margin:0 auto 0;
   position:relative;
   z-index:5;
   animation:fadeUp .8s .36s ease both;
@@ -1244,9 +1247,16 @@ html[dir="ltr"] #all-ads-title{
 .cards-track-wrap{position:relative}
 .cards-track-wrap{overflow:hidden;border-radius:18px}
 
-.cards-track{display:flex;gap:16px;width:max-content;animation:slide 40s linear infinite}
+.cards-track{display:flex;gap:16px;width:max-content;animation:slide 40s linear infinite;direction:ltr}
 .cards-track:hover{animation-play-state:paused}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* عربي: الإعلانات تظهر وتتحرك يسار→يمين | فرنسي: العكس يمين→يسار */
+html[dir="rtl"] .cards-track,
+html[dir="rtl"] #hero-listings .cards-track{animation-direction:reverse}
+html[dir="ltr"] .cards-track,
+html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal}
+html[dir="rtl"] .cards-track .ad-card{direction:rtl}
+html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 
 .ad-card{width:220px;flex-shrink:0;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.22);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.25)}
 .ad-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(0,0,0,.35),0 0 28px rgba(201,168,76,.12)}
@@ -1263,14 +1273,34 @@ html[dir="ltr"] #all-ads-title{
 .ad-price{font-size:14px;font-weight:900;color:var(--gold);font-family:'Segoe UI','Arial',sans-serif}
 .ad-loc{font-size:10px;color:rgba(255,255,255,.82)}
 
-/* ── HERO STATS BAR ── */
-.hero-stats-bar{position:relative;z-index:2;width:90%;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:0;max-height:140px;background:linear-gradient(135deg,var(--dark),var(--royal));border:1px solid rgba(201,168,76,.25);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.25);animation:fadeUp .8s .6s ease both}
-.h-stat{flex:1;text-align:center;padding:10px 8px;border-right:1px solid rgba(201,168,76,.12)}
-.h-stat:nth-child(2n){border-right:none}
-.h-stat:nth-child(n+3){border-top:1px solid rgba(201,168,76,.12)}
-.h-stat:last-child{display:none}
-.h-stat-num{font-size:22px;font-weight:900;color:var(--gold);line-height:1;display:block}
-.h-stat-lbl{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;display:block}
+/* ── HERO STATS BAR — مباشرة تحت إعلان الفيديو، بعرضه نفسه ── */
+.hero-stats-bar{
+  position:relative;z-index:2;width:100%;max-width:760px;margin:4px auto 0;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;
+  background:
+    linear-gradient(135deg,var(--dark),var(--royal)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-blend-mode:overlay;
+  border:1px solid rgba(201,168,76,.28);border-radius:16px;overflow:hidden;
+  box-shadow:0 8px 28px rgba(0,0,0,.22);animation:fadeUp .8s .42s ease both;
+}
+.h-stat{text-align:center;padding:12px 8px;border-inline-end:1px solid rgba(201,168,76,.14)}
+.h-stat:last-child,.h-stat.h-stat-free{display:none}
+.h-stat[data-stat="wilayas"]{border-inline-end:none}
+.h-stat-ads{
+  background:linear-gradient(180deg,rgba(201,168,76,.16),rgba(201,168,76,.04));
+  box-shadow:inset 0 0 0 1px rgba(201,168,76,.18);
+}
+.h-stat-num{font-size:22px;font-weight:900;color:var(--gold);line-height:1;display:block;font-variant-numeric:tabular-nums}
+.h-stat-ads .h-stat-num{font-size:24px;text-shadow:0 0 18px rgba(201,168,76,.35)}
+.h-stat-lbl{font-size:11px;color:rgba(255,255,255,.78);margin-top:5px;display:block;font-weight:600}
+@media(max-width:520px){
+  .hero-stats-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .h-stat:nth-child(2){border-inline-end:none}
+  .h-stat:nth-child(n+3){border-top:1px solid rgba(201,168,76,.14)}
+  .h-stat-num{font-size:20px}
+  .h-stat-ads .h-stat-num{font-size:22px}
+}
 
 /* ══════════════════════════════════
    SEARCH SECTION (secondary)
@@ -1723,11 +1753,14 @@ html[dir="ltr"] .listings-section .section-desc{
     animation:slide 36s linear infinite!important;
     will-change:transform;backface-visibility:hidden;transform:translateZ(0);
   }
+  html[dir="rtl"] #hero-listings .cards-track{animation-direction:reverse!important}
+  html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal!important}
   #hero-listings .cards-track .ad-card{
     width:158px!important;min-width:158px!important;max-width:158px!important;
     flex:0 0 158px!important;scroll-snap-align:none!important;
-    direction:rtl!important;
   }
+  html[dir="rtl"] #hero-listings .cards-track .ad-card{direction:rtl!important}
+  html[dir="ltr"] #hero-listings .cards-track .ad-card{direction:ltr!important}
   /* شريط التيكر ملاصق للنافبار — flex-start على .hero يمنع الفراغ الأبيض */
   .hero{justify-content:flex-start!important;padding-top:0!important}
   .ticker-wrap{
@@ -2415,14 +2448,17 @@ html[lang="fr"] .hero-pill-sep{display:none}
 }
 
 /* ── DISCOVERY STRIPS — "آخر المحلات/المكاتب/المعارض" (شريط اكتشاف حي) ── */
+/* المسار يبقى LTR لحساب scrollLeft؛ اتجاه الحركة يُقلَب في JS حسب اللغة */
 .rzq-disc-wrap{margin-top:44px;direction:ltr}
-.rzq-disc-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px}
+.rzq-disc-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;direction:ltr}
 .rzq-disc-strip::-webkit-scrollbar{display:none}
-.rzq-disc-track{display:inline-flex;gap:16px;padding:2px}
+.rzq-disc-track{display:inline-flex;gap:16px;padding:2px;direction:ltr}
 .rzq-disc-card{flex:0 0 auto;width:210px;background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:0 4px 18px rgba(27,58,107,.1);border:1px solid rgba(27,58,107,.08);transition:transform .25s,box-shadow .25s}
 .rzq-disc-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(27,58,107,.16)}
 .rzq-disc-img{width:100%;height:120px;background:linear-gradient(135deg,#1B3A6B,#0F2347);overflow:hidden}
 .rzq-disc-body{padding:12px 14px;text-align:left}
+html[dir="rtl"] .rzq-disc-body{text-align:right;direction:rtl}
+html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-name{font-size:13.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-disc-tag{font-size:11.5px;color:#5b6b85;margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:2px 9px;margin-top:6px}
@@ -3047,6 +3083,30 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
         </div>
       </div>
+
+      <!-- إحصائيات المنصة — مباشرة تحت إعلان الفيديو (ads بارزة للتنسيق مع Rizq ADS) -->
+      <div class="hero-stats-bar fade-in" id="platform-stats" aria-label="إحصائيات المنصة">
+        <div class="h-stat h-stat-ads" data-stat="ads">
+          <span class="h-stat-num" data-live="adsActive" data-target="0">0</span>
+          <span class="h-stat-lbl" data-t="stat-ads">إعلان نشط</span>
+        </div>
+        <div class="h-stat" data-stat="cats">
+          <span class="h-stat-num" data-target="0">0</span>
+          <span class="h-stat-lbl" data-t="stat-cats">قسماً رئيسياً</span>
+        </div>
+        <div class="h-stat" data-stat="subs">
+          <span class="h-stat-num" data-target="0" data-suffix="+">0</span>
+          <span class="h-stat-lbl" data-t="stat-subs">فرعاً متخصصاً</span>
+        </div>
+        <div class="h-stat" data-stat="wilayas">
+          <span class="h-stat-num" data-target="15">0</span>
+          <span class="h-stat-lbl" data-t="stat-wilayas">ولاية موريتانية</span>
+        </div>
+        <div class="h-stat h-stat-free" data-stat="free" hidden>
+          <span class="h-stat-num" data-count-text="1">مجاني</span>
+          <span class="h-stat-lbl" data-t="stat-free">النشر الأساسي</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3064,15 +3124,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
       </div>
     </div>
-  </div>
-
-  <!-- Stats Bar -->
-  <div class="hero-stats-bar fade-in" id="platform-stats">
-    <div class="h-stat"><span class="h-stat-num" data-target="0">0</span><span class="h-stat-lbl" data-t="stat-ads">إعلان نشط</span></div>
-    <div class="h-stat"><span class="h-stat-num" data-target="18">0</span><span class="h-stat-lbl" data-t="stat-cats">قسماً رئيسياً</span></div>
-    <div class="h-stat"><span class="h-stat-num" data-target="130" data-suffix="+">0</span><span class="h-stat-lbl" data-t="stat-subs">فرعاً متخصصاً</span></div>
-    <div class="h-stat"><span class="h-stat-num" data-target="15">0</span><span class="h-stat-lbl" data-t="stat-wilayas">ولاية موريتانية</span></div>
-    <div class="h-stat"><span class="h-stat-num" data-count-text="1">مجاني</span><span class="h-stat-lbl" data-t="stat-free">النشر الأساسي</span></div>
   </div>
 </section>
 
@@ -6209,11 +6260,15 @@ function applyList(list){
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
     renderTickerFromAds();
     applyCatCountsFromAds();
-    var adStat = document.querySelector('#platform-stats .h-stat-num');
-    if(adStat){
-      var liveCount = usingShowcase ? 0 : ADS.length;
-      adStat.dataset.target = String(liveCount);
-      adStat.textContent = liveCount.toLocaleString('en-US');
+    if(typeof window.refreshPlatformLiveStats === 'function') window.refreshPlatformLiveStats();
+    else {
+      var adStat = document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
+      if(adStat){
+        var liveCount = usingShowcase ? 0 : ADS.length;
+        adStat.dataset.target = String(liveCount);
+        adStat.dataset.counted = '1';
+        adStat.textContent = liveCount.toLocaleString('en-US');
+      }
     }
   }
   applyList([]);
@@ -7236,7 +7291,7 @@ function applyLandingLang(toAr) {
     : '<strong>🔴 En direct</strong> Dernières annonces — mise à jour automatique';
 
   // Stats bar "مجاني"
-  const freeStat = document.querySelector('.h-stat:last-child .h-stat-num');
+  const freeStat = document.querySelector('#platform-stats [data-stat="free"] .h-stat-num');
   if(freeStat) freeStat.textContent = isAr ? 'مجاني' : 'Gratuit';
 
   // CTA section tagline
@@ -10293,16 +10348,43 @@ function refreshCatStatsText(){
   ['s-cats-desc','why2-title','why2-desc','ft-desc'].forEach(function(key){
     document.querySelectorAll('[data-t="'+key+'"]').forEach(function(el){ el.innerHTML = LANG[lang][key]; });
   });
-  const catNum = document.querySelector('#platform-stats .h-stat:nth-child(2) .h-stat-num');
-  if(catNum){ catNum.setAttribute('data-target', String(n)); if(!catNum.getAttribute('data-count-text')) catNum.textContent = String(n); }
-  const subNum = document.querySelector('#platform-stats .h-stat:nth-child(3) .h-stat-num');
-  if(subNum){ subNum.setAttribute('data-target', String(m)); }
+  const catNum = document.querySelector('#platform-stats [data-stat="cats"] .h-stat-num');
+  if(catNum){ catNum.setAttribute('data-target', String(n)); catNum.dataset.counted = '1'; catNum.textContent = String(n); }
+  const subNum = document.querySelector('#platform-stats [data-stat="subs"] .h-stat-num');
+  if(subNum){ subNum.setAttribute('data-target', String(m)); subNum.dataset.counted = '1'; subNum.textContent = String(m) + (subNum.getAttribute('data-suffix') || ''); }
   const metaDesc = document.querySelector('meta[name="description"]');
   if(metaDesc) metaDesc.setAttribute('content','رزق — منصة الإعلانات المبوبة الأولى في موريتانيا. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر. '+n+' قسماً، '+m+'+ فرعاً، مجاناً.');
   if(typeof window._rizqApplyFooterStats === 'function') window._rizqApplyFooterStats();
 }
 refreshCatStatsText();
 window.addEventListener('storage',function(e){ if(e.key==='rizq_extra_categories'){ renderExtraCategories(); refreshCatStatsText(); } });
+
+/** إعلان نشط حي من الخادم — تحت شريط الفيديو مباشرة */
+(function(){
+  function applyAdsLive(n){
+    var num = document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
+    if(!num) return;
+    var v = Math.max(0, Number(n)||0);
+    num.setAttribute('data-target', String(v));
+    num.dataset.counted = '1';
+    num.textContent = v.toLocaleString('en-US');
+  }
+  function refreshPlatformLiveStats(){
+    var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
+    if(!base){ applyAdsLive(0); return; }
+    fetch(base + '/api/discovery/platform-stats', { credentials:'omit' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(data && data.ok) applyAdsLive(data.adsActive);
+        else applyAdsLive(0);
+      })
+      .catch(function(){ applyAdsLive(0); });
+  }
+  window.refreshPlatformLiveStats = refreshPlatformLiveStats;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refreshPlatformLiveStats);
+  else refreshPlatformLiveStats();
+  setInterval(refreshPlatformLiveStats, 60000);
+})();
 
 
 
@@ -11435,18 +11517,35 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     function initAutoScroll(strip){
       var track = strip.querySelector('.rzq-disc-track');
       if(!track) return;
+      if(strip._rzqScrollBound) return;
+      strip._rzqScrollBound = true;
       var paused = false;
       strip.addEventListener('mouseenter', function(){ paused = true; });
       strip.addEventListener('mouseleave', function(){ paused = false; });
       strip.addEventListener('touchstart', function(){ paused = true; }, {passive:true});
       strip.addEventListener('touchend', function(){ setTimeout(function(){ paused = false; }, 1600); }, {passive:true});
+      /* عربي (dir=rtl): حركة يسار→يمين | فرنسي (dir=ltr): يمين→يسار */
+      function flowSign(){
+        return document.documentElement.getAttribute('dir') === 'ltr' ? 1 : -1;
+      }
       function step(){
         if(!paused && track.scrollWidth > strip.clientWidth){
-          strip.scrollLeft += 0.45;
-          if(strip.scrollLeft >= track.scrollWidth/2) strip.scrollLeft = 0;
+          var half = track.scrollWidth / 2;
+          var sign = flowSign();
+          strip.scrollLeft += 0.45 * sign;
+          if(sign > 0){
+            if(strip.scrollLeft >= half) strip.scrollLeft = 0;
+          } else if(strip.scrollLeft <= 0){
+            strip.scrollLeft = half;
+          }
         }
         requestAnimationFrame(step);
       }
+      /* ابدأ من الطرف المناسب حتى يظهر أول بطاقة في جهة التدفق */
+      try {
+        if(flowSign() < 0) strip.scrollLeft = Math.max(0, track.scrollWidth / 2 - strip.clientWidth);
+        else strip.scrollLeft = 0;
+      } catch (e0) {}
       requestAnimationFrame(step);
     }
 

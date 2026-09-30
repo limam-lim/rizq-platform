@@ -3683,6 +3683,61 @@ app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), asyn
 //   الحقيقي #244)، بحقول عامة آمنة فقط (toPublicAccount).
 // ══════════════════════════════════════════════════════════════════
 
+/**
+ * GET /api/discovery/platform-stats — أرقام حية صادقة لشريط الإحصائيات تحت إعلان الفيديو.
+ * لا أرقام وهمية: قبل الإطلاق الحقيقي تبقى أصفار النشاط ظاهرة كما هي.
+ */
+app.get('/api/discovery/platform-stats', (req, res) => {
+  try {
+    const adsActive = readAds().filter((a) =>
+      a && a.status === 'active'
+      && !String(a.accountId || '').startsWith('acc_demo')
+      && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
+    ).length;
+
+    const businesses = readAccounts().filter((a) =>
+      a && a.status === 'approved' && !a.suspended
+      && !String(a.id || '').startsWith('acc_demo')
+      && (a.type === 'store' || a.type === 'office' || a.type === 'corp')
+    );
+    const businessesApproved = businesses.length;
+    const byType = { store: 0, office: 0, corp: 0 };
+    businesses.forEach((a) => { if (byType[a.type] != null) byType[a.type] += 1; });
+
+    const now = Date.now();
+    const tendersOpen = readTenders().filter((t) => {
+      if (!t || (t.status !== 'open' && t.status !== 'provisionally_approved')) return false;
+      const deadlineMs = new Date(t.deadline).getTime();
+      return !Number.isNaN(deadlineMs) && deadlineMs > now;
+    }).length;
+
+    let investmentsLive = 0;
+    try {
+      const inv = require('./services/investmentRoom').listPublic({ unlockContacts: false });
+      investmentsLive = Array.isArray(inv.opportunities) ? inv.opportunities.length : 0;
+    } catch (_) {
+      investmentsLive = 0;
+    }
+
+    const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
+    res.set('Cache-Control', 'public, max-age=20');
+    res.json({
+      ok: true,
+      live: true,
+      prelaunch: activityTotal === 0,
+      adsActive,
+      businessesApproved,
+      businessesByType: byType,
+      tendersOpen,
+      investmentsLive,
+      activityTotal,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'stats_failed' });
+  }
+});
+
 /** GET /api/discovery/ending-soon?hours=48 — إعلانات مثبّتة + مناقصات مفتوحة قاربت الانتهاء */
 app.get('/api/discovery/ending-soon', (req, res) => {
   const hours = Number(req.query.hours) > 0 ? Number(req.query.hours) : 48;
