@@ -1582,27 +1582,37 @@ html[dir="ltr"] .listings-section .section-desc{
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   min-height:2.5em
 }
-.landing-ads-more{
-  max-width:1200px;margin:18px auto 0;text-align:center;padding:0 8px
+/* صف واحد: حالة العرض + فتح صفحة الإعلانات — لتقليل طول الصفحة */
+.landing-ads-footer{
+  max-width:1200px;margin:18px auto 0;padding:0 8px;
+  display:flex;flex-wrap:wrap;gap:10px 12px;
+  justify-content:center;align-items:center;
 }
+.landing-ads-more{margin:0;padding:0;max-width:none;text-align:center;flex:0 1 auto}
+.landing-ads-more:empty{display:none}
 .landing-ads-more-inner{
-  display:inline-flex;flex-direction:column;align-items:center;gap:10px;
-  padding:14px 22px;border-radius:14px;
+  display:inline-flex;flex-direction:row;align-items:center;gap:10px;
+  padding:10px 16px;border-radius:999px;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18)
 }
-.landing-ads-more-lbl{font-size:12.5px;color:#5b6b85;font-weight:600}
+.landing-ads-more-lbl{font-size:12.5px;color:#5b6b85;font-weight:600;white-space:nowrap}
 .landing-ads-more-btn{
-  padding:10px 22px;border-radius:999px;cursor:pointer;font-family:inherit;
-  font-size:13px;font-weight:800;color:#0f2347;
+  padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:12.5px;font-weight:800;color:#0f2347;
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   border:1px solid rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(201,168,76,.25);
-  transition:transform .2s,box-shadow .2s
+  transition:transform .2s,box-shadow .2s;white-space:nowrap
 }
 .landing-ads-more-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(201,168,76,.35)}
 .landing-ads-more.is-done .landing-ads-more-inner{
   border-style:solid;background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.28)
 }
-.landing-ads-footer-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.landing-ads-browse-full{
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  white-space:nowrap;flex:0 0 auto;padding:10px 18px;border-radius:999px;
+  font-size:13px;font-weight:700
+}
+.landing-ads-footer-actions{display:contents}
 .lad-fav{
   position:absolute;top:10px;left:10px;z-index:3;
   width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
@@ -2646,8 +2656,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
   .landing-ads-filters{gap:6px;margin-bottom:14px}
   .landing-ads-filter{padding:6px 12px;font-size:11.5px}
-  .landing-ads-more-btn{padding:8px 16px;font-size:12px}
-  .landing-ads-footer-actions{flex-direction:column}
+  .landing-ads-more-btn{padding:7px 12px;font-size:11.5px}
+  .landing-ads-footer{gap:8px;margin-top:14px}
+  .landing-ads-more-inner{padding:8px 12px;gap:8px}
+  .landing-ads-more-lbl{font-size:11.5px;white-space:normal;text-align:center}
+  .landing-ads-browse-full{padding:9px 14px;font-size:12px}
   .rizq-styles-gender-tabs{gap:6px;margin-bottom:12px}
   .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
   .rizq-styles-rail{
@@ -3188,9 +3201,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="listings-grid landing-ads-grid" id="landing-ads-grid" role="list">
     <!-- يُملأ عبر buildLandingAds() -->
   </div>
-  <div class="landing-ads-more" id="landing-ads-more"></div>
-  <div style="text-align:center;margin-top:28px" class="fade-in landing-ads-footer-actions">
-    <a class="btn-outline" href="rizq_browse.html" data-t="browse-full" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">📂 فتح صفحة الإعلانات كاملة ←</a>
+  <div class="landing-ads-footer fade-in" id="landing-ads-footer">
+    <div class="landing-ads-more" id="landing-ads-more"></div>
+    <a class="btn-outline landing-ads-browse-full" href="rizq_browse.html" data-t="browse-full">📂 فتح صفحة الإعلانات كاملة ←</a>
   </div>
 </section>
 
