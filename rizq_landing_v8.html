@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.2"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.3"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -2594,18 +2594,46 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:rgba(138,58,92,.1);border-color:rgba(138,58,92,.22)
 }
+/* شريط أنماط/نماذج — نفس آلية «مباشر آخر الإعلانات» (marquee CSS) */
+.rizq-styles-track-wrap{
+  position:relative;
+  overflow:hidden;
+  border-radius:18px;
+  direction:ltr;
+}
 .rizq-styles-rail{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  display:flex;
+  flex-direction:row;
+  flex-wrap:nowrap;
   gap:16px;
+  width:max-content;
+  max-width:none;
+  direction:ltr;
+  animation:slide 40s linear infinite;
+  will-change:transform;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+.rizq-styles-rail:hover{animation-play-state:paused}
+html[dir="rtl"] .rizq-styles-rail{animation-direction:reverse}
+html[dir="ltr"] .rizq-styles-rail{animation-direction:normal}
+html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
+html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
+.rizq-styles-rail.is-empty{
+  display:block;
+  width:100%;
+  max-width:100%;
+  animation:none;
 }
 .rizq-styles-empty{
-  grid-column:1/-1;text-align:center;padding:28px 16px;
+  text-align:center;padding:28px 16px;
   color:#5b6b85;font-size:13.5px;line-height:1.7;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
 .rizq-style-card{
   display:flex;flex-direction:column;
+  width:220px;min-width:220px;max-width:220px;
+  flex:0 0 220px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
   border-radius:16px;
@@ -2614,7 +2642,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   color:inherit;
   box-shadow:0 4px 18px rgba(13,27,42,.06);
   transition:transform .28s cubic-bezier(.23,1,.32,1),box-shadow .28s,border-color .28s;
-  min-width:0;cursor:pointer;
+  cursor:pointer;
 }
 .rizq-style-card:hover{
   transform:translateY(-5px);
@@ -2626,7 +2654,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:3px;
-  height:168px;
+  height:130px;
   background:#0f2347;
   overflow:hidden;
 }
@@ -2667,10 +2695,6 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
 html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(3px)}
-@media(max-width:900px){
-  .rizq-styles-rail{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .rizq-style-mosaic{height:148px}
-}
 @media(max-width:640px){
   #rizq-styles,#rizq-showroom-models{padding:28px 3% 32px}
   #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
@@ -2686,29 +2710,29 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .landing-ads-browse-full{padding:9px 14px;font-size:12px}
   .rizq-styles-gender-tabs{gap:6px;margin-bottom:12px}
   .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
-  .rizq-styles-rail{
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    overflow-y:hidden;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    padding:2px 2px 8px;
-    margin-inline:-2%;
-    padding-inline:2%;
+  .rizq-styles-track-wrap{
+    overflow:hidden!important;
+    scroll-snap-type:none!important;
+    direction:ltr!important;
   }
-  .rizq-styles-rail::-webkit-scrollbar{display:none}
-  .rizq-styles-empty{flex:0 0 100%;min-width:100%;font-size:12px;padding:18px 12px}
+  .rizq-styles-rail{
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    width:max-content!important;max-width:none!important;gap:10px!important;
+    direction:ltr!important;
+    animation:slide 36s linear infinite!important;
+    overflow:visible!important;
+    scroll-snap-type:none!important;
+    margin:0!important;padding:0!important;
+  }
+  .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
-    flex:0 0 138px;
-    width:138px;
+    width:158px!important;min-width:158px!important;max-width:158px!important;
+    flex:0 0 158px!important;
     border-radius:12px;
-    scroll-snap-align:start;
     box-shadow:0 2px 10px rgba(13,27,42,.06);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 2px 10px rgba(13,27,42,.06)}
-  .rizq-style-mosaic{height:96px;gap:2px}
+  .rizq-style-mosaic{height:100px;gap:2px}
   .rizq-style-tile{font-size:20px}
   .rizq-style-tile:first-child{font-size:30px}
   .rizq-style-body{padding:8px 8px 10px;gap:3px}
@@ -3289,7 +3313,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="boys" id="sty-tab-boys" onclick="setStyleGender('boys')">👦 <span data-t="sty-boys">أولاد</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="girls" id="sty-tab-girls" onclick="setStyleGender('girls')">👧 <span data-t="sty-girls">بنات</span></button>
     </div>
-    <div class="rizq-styles-rail fade-in" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
+    <div class="rizq-styles-track-wrap fade-in">
+      <div class="rizq-styles-rail" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
+    </div>
   </div>
 </section>
 
@@ -3396,7 +3422,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
     </div>
-    <div class="rizq-styles-rail fade-in" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
+    <div class="rizq-styles-track-wrap fade-in">
+      <div class="rizq-styles-rail" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
+    </div>
   </div>
 </section>
 
@@ -5499,15 +5527,16 @@ function buildStyleIdeas(reshuffle){
   }
 
   if(!cards.length){
+    rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Pas encore assez d\'annonces pour suggérer des looks. Revenez bientôt.'
       : 'لا توجد إعلانات كافية بعد لاقتراح إطلالات. عد لاحقاً.')+'</div>';
     return;
   }
-  rail.innerHTML = cards.join('');
+  rail.classList.remove('is-empty');
+  /* تكرار البطاقات مثل شريط «مباشر» لحركة slide سلسة */
+  rail.innerHTML = cards.concat(cards).join('');
   if(reshuffle){
-    try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
-    catch(e2) { rail.scrollLeft = 0; }
     try { _styStartAutoRefresh(); } catch(e3) {}
   }
   _styUpdateTick(fr);
@@ -5755,15 +5784,15 @@ function buildShowroomModels(reshuffle){
   }
 
   if(!cards.length){
+    rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Pas encore assez d\'annonces pour suggérer des modèles. Explorez le guide des showrooms.'
       : 'لا توجد إعلانات كافية بعد لاقتراح نماذج. تصفّح دليل المعارض.')+'</div>';
     return;
   }
-  rail.innerHTML = cards.join('');
+  rail.classList.remove('is-empty');
+  rail.innerHTML = cards.concat(cards).join('');
   if(reshuffle){
-    try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
-    catch(e2) { rail.scrollLeft = 0; }
     try { _srmStartAutoRefresh(); } catch(e3) {}
   }
   _srmUpdateTick(fr);
