@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '24.1';
+  var ASSET_V = '25.1';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {

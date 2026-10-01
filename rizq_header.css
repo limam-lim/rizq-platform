@@ -163,8 +163,17 @@ html.rizq-app-nav{overflow-x:clip}
 html.rizq-app-nav body{overflow-x:clip}
 html.rizq-app-nav .rizq-hdr-more-menu.is-positioned{overflow:visible!important}
 
+/* قائمة المزيد مخفية دائماً حتى تُفتح — يمنع اختلاط عناصرها مع الشريط على الهاتف */
+html.rizq-app-nav #nav .nav-dropdown-menu,
+html.rizq-app-nav #rizq-desk-nav .nav-dropdown-menu,
+html.rizq-app-nav .nav-more-menu,
+html.rizq-app-nav body > .nav-dropdown-menu:not(.rizq-more-menu-open){
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
 body > .nav-dropdown-menu:not(.rizq-more-menu-open){
-  display:none;
   position:fixed !important;
   top:auto;left:auto;right:auto;bottom:auto;
   inset:auto !important;
@@ -181,6 +190,9 @@ body > .nav-dropdown-menu:not(.rizq-more-menu-open){
   box-shadow:0 16px 40px rgba(0,0,0,.45);
   z-index:10050 !important;
 }
+html.rizq-app-nav .nav-dropdown-li.open > .nav-dropdown-menu,
+html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open,
+html.rizq-app-nav body > .nav-dropdown-menu.rizq-more-menu-open,
 body > .nav-dropdown-menu.rizq-more-menu-open,
 .nav-dropdown-menu.rizq-more-menu-open{
   display:block !important;
@@ -2712,10 +2724,38 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     font-size:9px !important;
     line-height:1.1 !important;
   }
+  html.rizq-app-nav #nav .nav-center > li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li{
+    display:flex !important;
+    flex:0 0 auto !important;
+    list-style:none !important;
+    align-items:center !important;
+    position:relative !important;
+  }
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{display:none !important}
   html.rizq-app-nav #nav .nav-center .nav-desktop-more-only,
-  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only{display:inline-flex !important}
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only,
+  html.rizq-app-nav #rizq-desk-nav #rizq-desk-more{
+    display:inline-flex !important;
+  }
+  /* المزيد: زر نظيف داخل الرصيف — القائمة منفصلة أسفله عند الفتح */
+  html.rizq-app-nav #nav #rizq-desk-more-li,
+  html.rizq-app-nav #rizq-desk-nav #rizq-desk-more-li,
+  html.rizq-app-nav #nav #nav-more-li,
+  html.rizq-app-nav #rizq-desk-nav #nav-more-li{
+    position:relative !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav #nav #rizq-desk-more-li > .nav-dropdown-menu:not(.rizq-more-menu-open),
+  html.rizq-app-nav #rizq-desk-nav #rizq-desk-more-li > .nav-dropdown-menu:not(.rizq-more-menu-open),
+  html.rizq-app-nav #nav #nav-more-li > .nav-dropdown-menu:not(.rizq-more-menu-open),
+  html.rizq-app-nav #rizq-desk-nav #nav-more-li > .nav-dropdown-menu:not(.rizq-more-menu-open){
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
   html.rizq-app-nav #nav .nav-hamburger,
   html.rizq-app-nav #rizq-desk-nav .nav-hamburger,
   html.rizq-app-nav #nav > .nav-sticky-tools,

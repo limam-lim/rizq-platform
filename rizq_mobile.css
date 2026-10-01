@@ -633,20 +633,36 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .mobile-drawer ul a{padding:14px 12px!important;min-height:44px}
 
   .nav-dropdown-menu{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
     position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
     width:100%!important;max-width:none!important;min-width:0!important;
     max-height:min(80vh,560px)!important;overflow-y:auto!important;
     border-radius:20px 20px 0 0!important;transform:none!important;
     z-index:var(--rzq-z-modal)!important;
   }
-  /* «المزيد» على الجوال/التابلت: ضيّقة تحت الزر — لا ورقة بعرض الشاشة */
-  .nav-dropdown-menu.nav-more-menu,
-  .nav-dropdown-menu.rizq-phone-more-panel,
+  /* «المزيد» على الجوال: مخفية حتى .open / .rizq-more-menu-open */
+  .nav-dropdown-menu.nav-more-menu:not(.rizq-more-menu-open),
+  .nav-dropdown-li:not(.open) > .nav-dropdown-menu{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+  .nav-dropdown-li.open > .nav-dropdown-menu,
+  .nav-dropdown-menu.rizq-phone-more-panel.rizq-more-menu-open,
   .nav-dropdown-menu.rizq-more-menu-open{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
     width:168px!important;min-width:148px!important;max-width:168px!important;
     max-height:min(62vh,380px)!important;
     border-radius:12px!important;
     padding:5px!important;box-sizing:border-box!important;
+    left:auto!important;right:auto!important;bottom:auto!important;
   }
   .nav-dropdown-menu.nav-more-menu .nav-dd-item,
   .nav-dropdown-menu.rizq-phone-more-panel .nav-dd-item{

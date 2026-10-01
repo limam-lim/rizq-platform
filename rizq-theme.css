@@ -336,6 +336,15 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   position: absolute !important;
   z-index: 999999 !important;
 }
+/* Closed more-menu must never paint over the phone nav strip */
+html.rizq-app-nav #nav .nav-dropdown-menu:not(.rizq-more-menu-open),
+html.rizq-app-nav #rizq-desk-nav .nav-dropdown-menu:not(.rizq-more-menu-open),
+html.rizq-app-nav .nav-dropdown-li:not(.open) > .nav-dropdown-menu {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 .rizq-hdr-more-menu.is-portaled,
 .rizq-hdr-more-menu.is-portaled.open,
 .rizq-hdr-more-menu.is-positioned {
