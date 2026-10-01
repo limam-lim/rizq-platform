@@ -600,6 +600,7 @@ body{
   transform:translateY(-3px)!important;
 }
 .hero-eyebrow{
+  border-radius:12px!important; /* مستطيل بزوايا خفيفة بدل الكبسولة */
   box-shadow:0 6px 22px rgba(13,27,42,.25),0 0 0 1px rgba(201,168,76,.2);
 }
 .hero-title-card{

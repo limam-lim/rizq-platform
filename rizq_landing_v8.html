@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.7"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=24.4"/>
+<link rel="stylesheet" href="rizq_header.css?v=24.5"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -399,19 +399,19 @@ html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
 html.rizq-has-announce .section-jump-bar{
   top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,0px))!important
 }
-/* Desktop: تيكر ثابت — امسح ارتفاع النافبار+التيكر ثم فجوة للشارة */
+/* Desktop: تيكر ثابت — امسح ارتفاع النافبار+التيكر ثم فجوة خفيفة للشارة */
 @media (min-width:769px) and (min-height:501px){
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
   html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 48px)!important
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 14px)!important
   }
   html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
     /* body مبطَّن مسبقاً بالنافبار+الإشعار+التيكر — هنا فجوة فقط */
-    padding-top:48px!important
+    padding-top:14px!important
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:8px!important
+    padding-top:6px!important
   }
 }
 /* Mobile: التيكر في التدفق تحت النافبار — flex-start يمنع الفراغ الأبيض */
@@ -462,7 +462,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
 /* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
 
-.hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:9px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35);padding:9px 22px;border-radius:100px;margin:0 auto 20px;animation:fadeUp .8s ease both}
+.hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:9px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35);padding:9px 22px;border-radius:12px;margin:0 auto 16px;animation:fadeUp .8s ease both}
 .hero-eyebrow .pulse{width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(201,168,76,.6);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,168,76,.6)}70%{box-shadow:0 0 0 8px rgba(201,168,76,0)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 .hero-eyebrow span{color:var(--gold);font-size:13px;font-weight:600;letter-spacing:1px}

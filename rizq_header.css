@@ -1005,19 +1005,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     margin-top:0 !important;
     padding-top:var(--rizq-header-h,78px) !important;
     min-height:100vh !important;
+    justify-content:flex-start !important; /* قرّب الشارة من الشريط العلوي */
   }
   html.rizq-app-nav .hero-content{
     margin-top:0 !important;
-    padding-top:56px !important;
+    padding-top:18px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-ticker-h,42px) + 48px) !important;
+    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-ticker-h,42px) + 14px) !important;
   }
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:48px !important;
+    padding-top:14px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:8px !important;
+    padding-top:6px !important;
   }
   html.rizq-app-nav #categories,
   html.rizq-app-nav .section{
