@@ -7832,8 +7832,8 @@ function applyLandingLang(toAr) {
   // Live label
   const liveLabel = document.querySelector('.listings-label span');
   if(liveLabel) liveLabel.innerHTML = isAr
-    ? '<strong>🔴 مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً'
-    : '<strong>🔴 En direct</strong> Dernières annonces — mise à jour automatique';
+    ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً'
+    : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>En direct</strong> Dernières annonces — mise à jour automatique';
 
   // Stats bar "مجاني"
   const freeStat = document.querySelector('#platform-stats [data-stat="free"] .h-stat-num');
@@ -8628,10 +8628,10 @@ function applyFullTranslation(lang) {
   // ── Ticker label ──
   const tickerStrong = document.querySelector('.listings-label strong');
   const tickerSpan   = document.querySelector('.listings-label span');
-  if(tickerStrong) tickerStrong.textContent = fr ? '🔴 En direct' : '🔴 مباشر';
+  if(tickerStrong) tickerStrong.textContent = fr ? 'En direct' : 'مباشر';
   if(tickerSpan) tickerSpan.innerHTML = fr
-    ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>🔴 En direct</strong> Dernières annonces — mise à jour automatique'
-    : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>🔴 مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً';
+    ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>En direct</strong> Dernières annonces — mise à jour automatique'
+    : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً';
 
   // ── Modal direction ──
   const modalBox2 = document.querySelector('.modal-box');
