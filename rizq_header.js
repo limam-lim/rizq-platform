@@ -831,7 +831,7 @@
       t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +
       '<span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>' +
       '<span class="nav-fav-lbl" data-hdr="fav">' + t2('المفضلة', 'Favoris') + '</span>' +
-      '<span data-rizq-fav-count hidden>0</span></a></span>';
+      '<span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a></span>';
   }
 
   function deskNavHtml() {
