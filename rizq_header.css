@@ -1145,35 +1145,42 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
 }
 
-/* ════════════ TABLET 769–1100: صف واحد مضغوط — شعار صغير + كل الأزرار ظاهرة ════════════ */
+/* ════════════ TABLET 769–1100: شريطان مثل الهاتف (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (min-width:769px) and (max-width:1100px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:68px}
+  html.rizq-app-nav{--rizq-header-h:104px}
+  html.rizq-app-nav #rizq-app-header,
+  html.rizq-app-nav #rizq-app-header *{
+    display:none !important;visibility:hidden !important;pointer-events:none !important;
+    height:0 !important;overflow:hidden !important;
+  }
   html.rizq-app-nav #nav,
   html.rizq-app-nav #rizq-desk-nav{
     display:grid !important;
-    /* أدوات | رصيف مرن | شعار صغير — بلا أعمدة فارغة تضيق الوسط */
-    grid-template-columns:auto minmax(0,1fr) auto !important;
-    grid-template-rows:auto !important;
-    height:var(--rizq-header-h,68px) !important;
-    max-height:var(--rizq-header-h,68px) !important;
-    min-height:0 !important;
+    grid-template-columns:1fr auto !important;
+    grid-template-rows:auto auto !important;
+    height:var(--rizq-header-h,104px) !important;
+    max-height:var(--rizq-header-h,104px) !important;
+    min-height:var(--rizq-header-h,104px) !important;
     align-items:center !important;
-    column-gap:8px !important;
-    row-gap:0 !important;
-    padding-block:0 !important;
-    padding-inline:max(10px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) !important;
+    align-content:center !important;
+    column-gap:10px !important;
+    row-gap:6px !important;
+    padding:8px max(14px, env(safe-area-inset-left, 0px)) 10px max(14px, env(safe-area-inset-right, 0px)) !important;
     overflow:visible !important;
+    direction:ltr !important;
   }
+  /* الصف 1: أدوات + شعار */
   html.rizq-app-nav #nav > .nav-start,
   html.rizq-app-nav #rizq-desk-nav > .nav-start{
     grid-column:1 !important;
     grid-row:1 !important;
     justify-self:start !important;
-    gap:2px !important;
-    padding:3px 5px !important;
-    border-radius:10px !important;
+    gap:4px !important;
+    padding:4px 8px !important;
+    border-radius:12px !important;
     max-width:none !important;
     flex-shrink:0 !important;
+    overflow:visible !important;
   }
   html.rizq-app-nav #nav .nav-start .nav-account-btn,
   html.rizq-app-nav #nav .nav-start .nav-fav-btn,
@@ -1184,27 +1191,13 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:5px 8px !important;
-    font-size:11px !important;
-    min-width:34px !important;
-    min-height:32px !important;
+    padding:6px 10px !important;
+    font-size:12px !important;
+    min-width:36px !important;
+    min-height:34px !important;
     visibility:visible !important;
     opacity:1 !important;
   }
-  html.rizq-app-nav #nav .nav-start .nav-fav-btn,
-  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn{
-    min-width:36px !important;
-    padding:5px 9px !important;
-  }
-  html.rizq-app-nav #nav .nav-fav-ico,
-  html.rizq-app-nav #rizq-desk-nav .nav-fav-ico{
-    display:inline-block !important;
-    font-size:16px !important;
-    line-height:1 !important;
-    color:#E8C96A !important;
-    -webkit-text-fill-color:#E8C96A !important;
-  }
-  /* أخفِ نص «حسابي» فقط — لا تخفِ أيقونة المفضلة ♡ */
   html.rizq-app-nav #nav .nav-start .nav-account-btn:not(.nav-fav-btn) span:not(.nav-account-ico),
   html.rizq-app-nav #rizq-desk-nav .nav-start .nav-account-btn:not(.nav-fav-btn) span:not(.nav-account-ico),
   html.rizq-app-nav #nav .nav-fav-lbl,
@@ -1216,27 +1209,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-block !important;
     visibility:visible !important;
     opacity:1 !important;
-    font-size:17px !important;
+    font-size:18px !important;
     line-height:1 !important;
     color:#E8C96A !important;
     -webkit-text-fill-color:#E8C96A !important;
   }
-  html.rizq-app-nav #nav > .nav-center,
-  html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    grid-column:2 !important;
-    grid-row:1 !important;
-    justify-self:stretch !important;
-    justify-content:space-between !important;
-    width:100% !important;
-    max-width:none !important;
-    min-width:0 !important;
-    padding:2px 4px !important;
-    gap:0 !important;
-    border-radius:10px !important;
-    overflow:visible !important;
-    max-height:none !important;
-  }
-  /* تابلت: شارة الإشعار فوق أدوات الشريط */
   html.rizq-app-nav #nav .nav-start .nav-fav-btn .rizq-hdr-fav-count,
   html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn .rizq-hdr-fav-count,
   html.rizq-app-nav #nav .nav-start .nav-fav-btn [data-rizq-fav-count],
@@ -1246,10 +1223,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     justify-content:center !important;
     top:-4px !important;
     inset-inline-end:-4px !important;
-    min-width:15px !important;
-    height:15px !important;
-    font-size:8.5px !important;
-    line-height:15px !important;
+    min-width:16px !important;
+    height:16px !important;
+    font-size:9px !important;
+    line-height:16px !important;
     z-index:8 !important;
   }
   html.rizq-app-nav #nav .nav-start .nav-fav-btn .rizq-hdr-fav-count[hidden],
@@ -1262,14 +1239,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav > .logo,
   html.rizq-app-nav #rizq-desk-nav > .logo{
-    grid-column:3 !important;
+    grid-column:2 !important;
     grid-row:1 !important;
     justify-self:end !important;
     align-items:center !important;
     flex-direction:row !important;
     flex-wrap:nowrap !important;
-    gap:5px !important;
-    max-width:88px !important;
+    gap:8px !important;
+    max-width:none !important;
     min-width:0 !important;
     overflow:visible !important;
   }
@@ -1277,31 +1254,40 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo-mark,
   html.rizq-app-nav #rizq-desk-nav .logo-mark-img{
-    width:26px !important;
-    height:26px !important;
-    min-width:26px !important;
-    min-height:26px !important;
-    max-width:26px !important;
-    max-height:26px !important;
-    border-radius:8px !important;
-  }
-  html.rizq-app-nav #nav .logo-text,
-  html.rizq-app-nav #rizq-desk-nav .logo-text{
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:flex-end !important;
-    min-width:0 !important;
+    width:34px !important;
+    height:34px !important;
+    min-width:34px !important;
+    min-height:34px !important;
+    max-width:34px !important;
+    max-height:34px !important;
+    border-radius:10px !important;
   }
   html.rizq-app-nav #nav .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-ar{
-    font-size:14px !important;
-    line-height:1.05 !important;
+    font-size:18px !important;
+    line-height:1.1 !important;
     white-space:nowrap !important;
   }
-  /* أخفِ RIZQ PLATFORM على التابلت لتوفير عرض الأزرار */
   html.rizq-app-nav #nav .logo-sub,
   html.rizq-app-nav #rizq-desk-nav .logo-sub{
     display:none !important;
+  }
+  /* الصف 2: رصيف الأقسام بعرض كامل */
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    justify-self:stretch !important;
+    justify-content:center !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    padding:4px 10px !important;
+    gap:4px !important;
+    border-radius:12px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    max-height:none !important;
   }
   html.rizq-app-nav #nav > .nav-sticky-tools,
   html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools,
@@ -1324,7 +1310,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center > li,
   html.rizq-app-nav #rizq-desk-nav .nav-center > li{
     display:flex !important;
-    flex:1 1 0 !important;
+    flex:0 0 auto !important;
     min-width:0 !important;
     justify-content:center !important;
     list-style:none !important;
@@ -1336,12 +1322,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     flex-direction:column !important;
     align-items:center !important;
-    padding:1px 1px !important;
-    font-size:8px !important;
-    min-width:0 !important;
-    width:100% !important;
-    max-width:64px !important;
-    gap:1px !important;
+    padding:3px 8px 4px !important;
+    font-size:11px !important;
+    min-width:56px !important;
+    width:auto !important;
+    max-width:none !important;
+    gap:2px !important;
     max-height:none !important;
     visibility:visible !important;
   }
@@ -1349,24 +1335,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    font-size:12px !important;
-    width:22px !important;
-    height:22px !important;
-    line-height:22px !important;
+    font-size:15px !important;
+    width:28px !important;
+    height:28px !important;
+    line-height:28px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl{
-    font-size:8px !important;
-    line-height:1.1 !important;
+    font-size:11px !important;
+    line-height:1.15 !important;
     white-space:nowrap !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
-    padding-top:var(--rizq-header-h,68px) !important;
+    padding-top:var(--rizq-header-h,104px) !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:var(--rizq-header-h,68px) !important;
+    padding-top:var(--rizq-header-h,104px) !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,
@@ -2703,8 +2689,35 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   }
 }
 
-/* تابلت: منع المزيد المزدوج + إعادة ضغط الأيقونات بعد قواعد الآبار الدائرية */
+/* تابلت: تثبيت شريطين + منع المزيد المزدوج بعد قواعد الآبار الدائرية */
 @media (min-width:769px) and (max-width:1100px){
+  html.rizq-app-nav{--rizq-header-h:104px}
+  html.rizq-app-nav #nav,
+  html.rizq-app-nav #rizq-desk-nav{
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    grid-template-rows:auto auto !important;
+    height:var(--rizq-header-h,104px) !important;
+    max-height:var(--rizq-header-h,104px) !important;
+  }
+  html.rizq-app-nav #nav > .nav-start,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start{
+    grid-column:1 !important;grid-row:1 !important;
+  }
+  html.rizq-app-nav #nav > .logo,
+  html.rizq-app-nav #rizq-desk-nav > .logo{
+    grid-column:2 !important;grid-row:1 !important;
+  }
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    justify-content:center !important;
+    width:100% !important;
+    max-width:100% !important;
+    padding:4px 10px !important;
+    gap:4px !important;
+  }
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{
     display:none !important;
@@ -2713,41 +2726,22 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only{
     display:inline-flex !important;
   }
-  html.rizq-app-nav #nav > .nav-center,
-  html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    padding:2px 4px !important;
-    gap:0 !important;
-  }
-  html.rizq-app-nav #nav .nav-center a,
-  html.rizq-app-nav #nav .nav-center .nav-link-btn,
-  html.rizq-app-nav #rizq-desk-nav .nav-center a,
-  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
-    padding:1px 1px !important;
-    min-width:0 !important;
-    max-width:64px !important;
-    gap:1px !important;
-  }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    width:22px !important;
-    height:22px !important;
-    font-size:12px !important;
-    line-height:22px !important;
+    width:28px !important;
+    height:28px !important;
+    font-size:15px !important;
+    line-height:28px !important;
     margin:0 auto !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 6px rgba(0,0,0,.2) !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    font-size:8px !important;
-    line-height:1.1 !important;
-  }
-  html.rizq-app-nav #nav .nav-center a.is-active .rizq-hdr-ico,
-  html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-ico{
-    box-shadow:0 0 0 1.5px rgba(201,168,76,.18),0 3px 8px rgba(201,168,76,.28) !important;
+    font-size:11px !important;
+    line-height:1.15 !important;
   }
 }
 

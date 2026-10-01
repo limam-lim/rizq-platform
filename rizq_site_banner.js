@@ -19,11 +19,10 @@
       '  z-index:100050!important;',
       '  background:linear-gradient(90deg,#C9A84C,#e8c96a)!important;',
       '  color:#0f2347!important;font-size:13px!important;font-weight:700!important;',
-      '  text-align:center!important;padding:10px 16px!important;line-height:1.45!important;',
+      '  text-align:center!important;padding:10px 16px!important;line-height:1.5!important;',
       '  box-shadow:0 2px 10px rgba(15,35,65,.18)!important;',
       '  font-family:Cairo,Tahoma,sans-serif!important;display:block!important;',
-      '  box-sizing:border-box!important;max-width:100vw!important;',
-      '  overflow-wrap:anywhere!important;word-break:break-word!important;',
+      '  box-sizing:border-box!important;width:100%!important;max-width:100vw!important;',
       '}',
       'html.' + ROOT_CLASS + ' body{padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h) + var(--rizq-ticker-h,0px))!important}',
       /* النافبار يستخدم inset:0 — يجب إعادة ضبط inset مع top */
@@ -42,20 +41,8 @@
       '}',
       'html.' + ROOT_CLASS + ' #rizq-ads-preview-banner{',
       '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h))!important',
-      '}',
-      /* تابلت/هاتف: إشعار أقصر وأوضح بدون خروج عن العرض */
-      '@media (max-width:1100px){',
-      '  html.' + ROOT_CLASS + '{--rizq-announce-h:36px}',
-      '  html.' + ROOT_CLASS + ' #' + BAR_ID + '{',
-      '    font-size:12px!important;padding:7px 12px!important;line-height:1.35!important;',
-      '  }',
-      '}',
-      '@media (max-width:768px),(orientation:landscape) and (max-height:500px){',
-      '  html.' + ROOT_CLASS + '{--rizq-announce-h:34px}',
-      '  html.' + ROOT_CLASS + ' #' + BAR_ID + '{',
-      '    font-size:11px!important;padding:6px 10px!important;line-height:1.3!important;',
-      '  }',
       '}'
+      /* نفس مظهر الحاسوب على التابلت والهاتف — بلا تصغير */
     ].join('');
     var style = document.createElement('style');
     style.id = STYLE_ID;
