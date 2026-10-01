@@ -2120,11 +2120,10 @@ html.rizq-app-nav #rizq-app-header::before{
   position:absolute;
   inset:0;
   pointer-events:none;
-  opacity:.22;
-  background-image:
-    linear-gradient(135deg,rgba(201,168,76,.07) 1px,transparent 1px),
-    linear-gradient(45deg,rgba(201,168,76,.05) 1px,transparent 1px);
-  background-size:18px 18px;
+  opacity:.55;
+  background:
+    radial-gradient(ellipse 80% 90% at 80% 50%,rgba(201,168,76,.08),transparent 55%),
+    radial-gradient(ellipse 70% 80% at 18% 40%,rgba(27,58,107,.18),transparent 50%);
   z-index:0;
 }
 html.rizq-app-nav #nav::after,
