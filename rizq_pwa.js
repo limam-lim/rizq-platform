@@ -67,7 +67,16 @@
     var el = document.createElement('div');
     el.id = 'rizq-boot-banner';
     el.setAttribute('role', 'alert');
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:12px 16px;font:600 14px/1.45 Cairo,Segoe UI,sans-serif;text-align:center;'
+    var compact = false;
+    try {
+      compact = window.matchMedia('(max-width:1100px)').matches
+        || window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches;
+    } catch (eM) {}
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;box-sizing:border-box;max-width:100vw;'
+      + 'overflow-wrap:anywhere;word-break:break-word;text-align:center;'
+      + (compact
+        ? 'padding:7px 10px;font:600 11px/1.35 Cairo,Segoe UI,sans-serif;'
+        : 'padding:12px 16px;font:600 14px/1.45 Cairo,Segoe UI,sans-serif;')
       + (isError ? 'background:#7f1d1d;color:#fff;' : 'background:#1e3a5f;color:#fef3c7;');
     el.textContent = msg;
     (document.body || document.documentElement).appendChild(el);
