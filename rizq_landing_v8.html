@@ -2495,28 +2495,25 @@ html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:2px 9px;margin-top:6px}
 html body .rzq-disc-empty{
   direction:inherit;text-align:center;
-  background:linear-gradient(180deg,#fffef8,#f3faf6) !important;
-  background-image:linear-gradient(180deg,#fffef8,#f3faf6) !important;
-  background-size:auto !important;
-  background-repeat:no-repeat !important;
-  background-blend-mode:normal !important;
-  border:1.5px dashed rgba(201,168,76,.45);border-radius:16px;padding:32px 20px;
-  box-shadow:0 6px 20px rgba(27,58,107,.06)
+  background:linear-gradient(135deg,#0D1B2A,#1B3A6B) !important;
+  background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size:auto,60px 60px !important;
+  background-repeat:no-repeat,repeat !important;
+  background-blend-mode:overlay !important;
+  border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;
+  box-shadow:0 8px 28px rgba(0,0,0,.18)
 }
 html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-icon{font-size:34px;margin-bottom:10px}
-html body .rzq-disc-empty-title{font-size:15px;font-weight:700;color:var(--royal,#1B3A6B)!important;margin-bottom:6px}
-html body .rzq-disc-empty-desc{font-size:13.5px;color:#3d4f6a!important;max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600;text-shadow:none!important}
+html body .rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff!important;margin-bottom:6px}
+html body .rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9)!important;max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.25)!important}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
 #rizq-styles,#rizq-showroom-models{
   padding:48px 5%;
-  background:
-    radial-gradient(ellipse 70% 50% at 8% 0%,rgba(201,168,76,.14),transparent 55%),
-    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(27,58,107,.07),transparent 52%),
-    linear-gradient(180deg,#fbfaf6 0%,#f4f6fb 55%,#eef2f8 100%);
+  background:var(--bg-section,#fbfcff);
   position:relative;overflow:hidden;
 }
 .rizq-styles-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1}
@@ -2613,11 +2610,9 @@ html body #rizq-showroom-models .rizq-srm-tick{
   color:rgba(255,255,255,.78) !important;font-weight:600 !important;
   text-shadow:0 1px 2px rgba(0,0,0,.2) !important
 }
+/* أقسام المحاور: خلفية الصفحة النظيفة — بلا غسيل ترابي/أصفر */
 #virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments{
-  background:
-    radial-gradient(ellipse 70% 45% at 8% 0%,rgba(201,168,76,.12),transparent 55%),
-    radial-gradient(ellipse 55% 40% at 96% 100%,rgba(27,58,107,.06),transparent 50%),
-    linear-gradient(180deg,#fbfaf6 0%,#f3f6fb 100%) !important;
+  background:var(--bg-section,#fbfcff) !important;
 }
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
