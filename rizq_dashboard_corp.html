@@ -1190,7 +1190,16 @@ function loadActivatedPackage(acc) {
 var CORP_ACC = null;
 var IS_DEMO = false;
 
-var DEMO_ACC = { id: "demo-corp-001", name: "", phone: "", email: "", wilaya: "", type: "corp" };
+var DEMO_ACC = {
+  id: "demo-corp-001",
+  name: "معرض الأفق — بيانات ترويجية",
+  phone: "44 22 33 44",
+  email: "demo-corp@rizq.mr",
+  wilaya: "نواكشوط",
+  type: "corp",
+  status: "approved",
+  desc: "واجهة معرض تجريبية للترويج فقط — ليست بيانات حقيقية"
+};
 
 function initCorpAccess(){
   var p = new URLSearchParams(location.search);

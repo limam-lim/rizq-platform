@@ -991,11 +991,28 @@ const IS_DEMO = params.get('demo') === '1';
 })();
 
 
-const DEMO_ACCOUNT = { id: "demo", name: "", phone: "", email: "", wilaya: "", type: "store" };
+const DEMO_ACCOUNT = {
+  id: "demo",
+  name: "محل النجمة — بيانات ترويجية",
+  phone: "44 00 11 22",
+  email: "demo-store@rizq.mr",
+  wilaya: "نواكشوط",
+  type: "store",
+  status: "approved",
+  desc: "واجهة محل تجريبية للترويج فقط — ليست بيانات حقيقية"
+};
 
-const DEMO_PRODUCTS = [];
+const DEMO_PRODUCTS = [
+  { id:"DP1", name:"دراعة رجالية فاخرة", price:45000, cat:"أزياء", emoji:"👔", status:"available", stock:12, sold:48, unit:"قطعة", desc:"بيانات ترويجية فقط" },
+  { id:"DP2", name:"عطر شرقي 100مل", price:18000, cat:"عطور", emoji:"🧴", status:"available", stock:30, sold:120, unit:"قطعة", desc:"بيانات ترويجية فقط" },
+  { id:"DP3", name:"حذاء رياضي رجالي", price:22000, cat:"أحذية", emoji:"👟", status:"limited", stock:4, sold:65, unit:"زوج", desc:"بيانات ترويجية فقط" },
+  { id:"DP4", name:"ساعة كلاسيكية", price:35000, cat:"إكسسوارات", emoji:"⌚", status:"available", stock:8, sold:33, unit:"قطعة", desc:"بيانات ترويجية فقط" }
+];
 
-const DEMO_MESSAGES = [];
+const DEMO_MESSAGES = [
+  { id:"DM1", from:"زائر تجريبي", text:"هل يتوفر مقاس XL؟ (بيانات ترويجية)", date:new Date().toISOString(), read:false },
+  { id:"DM2", from:"عميل تجريبي", text:"ممكن التوصيل لنواذيبو؟ (بيانات ترويجية)", date:new Date().toISOString(), read:true }
+];
 
 function verifyAccess(){
   if(IS_DEMO) return DEMO_ACCOUNT;
