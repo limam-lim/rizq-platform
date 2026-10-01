@@ -7683,9 +7683,13 @@ function applyLandingLang(toAr) {
   var mbn = document.getElementById('mobile-bottom-nav');
   if (mbn) mbn.setAttribute('aria-label', isAr ? 'تنقل سفلي' : 'Navigation mobile');
 
-  // شعار «رزق» ثابت بالعربية — لا يُترجم أبداً
+  // عنوان البطل يتبع اللغة — شعار الشريط (.logo-ar) يبقى «رزق» عربياً دائماً
   const hl = document.querySelector('#hero-hl');
-  if (hl) hl.textContent = 'رزق';
+  if (hl) {
+    hl.textContent = isAr ? 'رزق' : 'Rizq';
+    hl.style.direction = isAr ? 'rtl' : 'ltr';
+    hl.style.unicodeBidi = 'isolate';
+  }
 
   document.querySelectorAll('.logo-ar').forEach(function(el) {
     el.textContent = 'رزق';
@@ -7693,9 +7697,9 @@ function applyLandingLang(toAr) {
     el.style.unicodeBidi = 'isolate';
   });
   var whyBg = document.querySelector('.why-bg-text');
-  if (whyBg) whyBg.textContent = 'رزق';
+  if (whyBg) whyBg.textContent = isAr ? 'رزق' : 'Rizq';
   var ctaBgBrand = document.getElementById('cta-bg-brand');
-  if (ctaBgBrand) ctaBgBrand.textContent = 'رزق';
+  if (ctaBgBrand) ctaBgBrand.textContent = isAr ? 'رزق' : 'Rizq';
 
   // Hero subtitles (primary tagline + secondary local-flavor line)
   const heroSubPrimary = document.querySelector('#hero-sub-primary');
@@ -11896,7 +11900,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo2"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=23.3"></script>
+<script src="rizq_landing_ux.js?v=23.4"></script>
 <script src="rizq_disclaimer.js"></script>
 
 
