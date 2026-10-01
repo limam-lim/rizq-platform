@@ -1399,3 +1399,41 @@ a.rizq-trust-card:hover {
 /* Help column title → مركز المساعدة */
 .rizq-help-title{cursor:pointer}
 .rizq-help-title:hover{color:var(--gold,#c9a84c)}
+
+/* هاتف: تصغير شعار رزق في الشريط العلوي */
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
+  html.rizq-app-nav #nav .logo-mark-img,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark-img,
+  html.rizq-app-nav #nav .logo-mark,
+  html.rizq-app-nav #rizq-desk-nav .logo-mark,
+  html.rizq-app-nav #nav .logo .logo-mark-img,
+  html.rizq-app-nav #rizq-desk-nav .logo .logo-mark-img{
+    width:28px !important;
+    height:28px !important;
+    min-width:28px !important;
+    min-height:28px !important;
+    max-width:28px !important;
+    max-height:28px !important;
+    border-radius:8px !important;
+  }
+  html.rizq-app-nav #nav .logo-ar,
+  html.rizq-app-nav #rizq-desk-nav .logo-ar,
+  html.rizq-app-nav #nav .logo-text .logo-ar,
+  html.rizq-app-nav #rizq-desk-nav .logo-text .logo-ar,
+  html.rizq-app-nav #nav .logo .logo-ar,
+  html.rizq-app-nav #rizq-desk-nav .logo .logo-ar{
+    font-size:14px !important;
+  }
+  html.rizq-app-nav #nav .logo-sub,
+  html.rizq-app-nav #rizq-desk-nav .logo-sub,
+  html.rizq-app-nav #nav .logo-text .logo-sub,
+  html.rizq-app-nav #rizq-desk-nav .logo-text .logo-sub{
+    font-size:6px !important;
+    letter-spacing:1px !important;
+  }
+  html.rizq-app-nav #nav > .logo,
+  html.rizq-app-nav #rizq-desk-nav > .logo{
+    max-width:min(32vw,120px) !important;
+    gap:6px !important;
+  }
+}
