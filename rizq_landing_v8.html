@@ -1336,7 +1336,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(26px,4vw,48px);font-weight:700;line-height:1.2;margin-bottom:14px;color:#fff}
 .section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.2vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px;color:#fff!important}
 .section-title span{background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick){
+.section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick):not(.rizq-srm-tick){
   color:rgba(255,255,255,.94)!important;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8;font-weight:600;
   text-shadow:0 1px 2px rgba(0,0,0,.25);
 }
@@ -2468,7 +2468,7 @@ html[lang="fr"] .hero-pill-sep{display:none}
 }
 
 /* Restore every landing block that fade-in had left invisible */
-#categories,#listings,#virtual-stores,#rizq-styles,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
+#categories,#listings,#virtual-stores,#rizq-styles,#virtual-showrooms,#rizq-showroom-models,#virtual-offices,#virtual-tenders,#virtual-investments,
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
@@ -2501,25 +2501,33 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
-#rizq-styles{
+#rizq-styles,#rizq-showroom-models{
   padding:48px 5%;
   background:
-    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(201,168,76,.10),transparent 55%),
-    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(27,58,107,.07),transparent 50%),
-    linear-gradient(180deg,#fff 0%,#f7f9fc 100%);
+    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(201,168,76,.14),transparent 55%),
+    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(201,168,76,.08),transparent 50%),
+    linear-gradient(165deg,#0a1628 0%,#122a4a 42%,#0f2347 100%);
   position:relative;overflow:hidden;
 }
+#rizq-styles::before,#rizq-showroom-models::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:linear-gradient(45deg,rgba(201,168,76,.12) 25%,transparent 25%),
+    linear-gradient(-45deg,rgba(201,168,76,.1) 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,rgba(201,168,76,.08) 75%),
+    linear-gradient(-45deg,transparent 75%,rgba(201,168,76,.08) 75%);
+  background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0
+}
 .rizq-styles-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
-#rizq-styles .section-header{text-align:center;margin-bottom:28px}
-#rizq-styles .section-title{
+#rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:28px}
+#rizq-styles .section-title,#rizq-showroom-models .section-title{
   font-family:'Noto Naskh Arabic',Cairo,serif;
   font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.35
 }
-#rizq-styles .section-title span{
+#rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
-#rizq-styles .section-desc{
+#rizq-styles .section-desc,#rizq-showroom-models .section-desc{
   color:rgba(255,255,255,.95);font-size:15px;font-weight:600;max-width:560px;margin:0 auto;line-height:1.75;
   text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
@@ -2538,8 +2546,22 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   border-color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
-.rizq-styles-tick{
+.rizq-styles-tick,.rizq-srm-tick{
   margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.92);min-height:1.2em
+}
+#rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
+  background:linear-gradient(135deg,#1B3A6B,#0f2347);
+  border-color:rgba(201,168,76,.5)
+}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="cars"]{background:linear-gradient(135deg,#1a4a6e,#0f2a40)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="electronics"]{background:linear-gradient(135deg,#2a3d6b,#152038)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="furniture"]{background:linear-gradient(135deg,#4a3a28,#2a2014)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="equipment"]{background:linear-gradient(135deg,#3a3a48,#1e1e28)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="building"]{background:linear-gradient(135deg,#5a3a22,#2e1e12)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="jewelry"]{background:linear-gradient(135deg,#6b5420,#3a2e10)}
+.rizq-style-card[data-srm-cat] .rizq-style-badge{
+  color:#8a6f2a;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.28)
 }
 .rizq-style-from-view{
   display:inline-flex;align-self:flex-start;
@@ -2654,10 +2676,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-style-mosaic{height:148px}
 }
 @media(max-width:640px){
-  #rizq-styles{padding:28px 3% 32px}
-  #rizq-styles .section-header{margin-bottom:16px}
-  #rizq-styles .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
-  #rizq-styles .section-desc{font-size:12px;line-height:1.6;max-width:100%}
+  #rizq-styles,#rizq-showroom-models{padding:28px 3% 32px}
+  #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
+  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
+  #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:12px;line-height:1.6;max-width:100%}
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
   .landing-ads-filters{gap:6px;margin-bottom:14px}
   .landing-ads-filter{padding:6px 12px;font-size:11.5px}
@@ -3352,6 +3374,28 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
 
+  </div>
+</section>
+
+<!-- ══ نماذج المعارض — اقتراحات رزق (سيارات / أثاث / إلكترونيات…) ══ -->
+<section id="rizq-showroom-models" class="rizq-styles-section" aria-labelledby="rizq-srm-title">
+  <div class="rizq-styles-inner">
+    <div class="section-header fade-in">
+      <p class="section-tag">Showroom Models</p>
+      <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">نماذج المعارض — <span>اقتراحات رزق</span></h2>
+      <p class="section-desc" data-t="srm-desc">سيارات، أثاث، إلكترونيات ومعدات — نماذج مقترحة تتجدد كل 3 دقائق، مع رابط لدليل المعارض</p>
+      <button type="button" class="rizq-styles-reshuffle" id="rizq-srm-reshuffle" onclick="buildShowroomModels(true)" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
+      <p class="rizq-srm-tick" id="rizq-srm-tick" aria-live="polite"></p>
+    </div>
+    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج المعارض">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-srm-cat="cars" id="srm-tab-cars" onclick="setShowroomModelCat('cars')">🚗 <span data-t="srm-cars">سيارات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="electronics" id="srm-tab-electronics" onclick="setShowroomModelCat('electronics')">📱 <span data-t="srm-electronics">إلكترونيات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="furniture" id="srm-tab-furniture" onclick="setShowroomModelCat('furniture')">🛋️ <span data-t="srm-furniture">أثاث ومفروشات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="equipment" id="srm-tab-equipment" onclick="setShowroomModelCat('equipment')">⚙️ <span data-t="srm-equipment">معدات ومكائن</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
+    </div>
+    <div class="rizq-styles-rail fade-in" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
   </div>
 </section>
 
@@ -5437,6 +5481,225 @@ function buildStyleIdeas(reshuffle){
 try { buildStyleIdeas(false); } catch(eSty) {}
 try { _styStartAutoRefresh(); } catch(eAuto) {}
 
+/* ── نماذج المعارض — نفس فكرة أفكار الأنماط لكن لسيارات/أثاث/إلكترونيات… ── */
+var _rizqSrmCat = 'cars';
+var RIZQ_SRM_CATS = {
+  cars: { ar:'سيارات', fr:'Voitures', dirCat:'سيارات', allow:/سيارات|سيارات\s*و|voiture|auto|sedan|suv|4x4|camionnette/i },
+  electronics: { ar:'إلكترونيات', fr:'Électronique', dirCat:'إلكترونيات', allow:/إلكترون|هواتف|لابتوب|تلفزيون|جوال|iphone|samsung|laptop|tv|électronique|electronique/i },
+  furniture: { ar:'أثاث ومفروشات', fr:'Meubles', dirCat:'أثاث', allow:/أثاث|مفروشات|كنب|سرير|طاولة|خزانة|meuble|canapé|sofa|armoire/i },
+  equipment: { ar:'معدات ومكائن', fr:'Équipements', dirCat:'معدات', allow:/معدات|مكائن|آلات|حفارة|مولد|équipement|equipement|machine|engin|générateur|generateur/i },
+  building: { ar:'مواد بناء', fr:'Matériaux', dirCat:'بناء', allow:/بناء|إسمنت|حديد|طوب|مواد\s*بناء|ciment|fer|construction|matériau|materiau/i },
+  jewelry: { ar:'مجوهرات', fr:'Bijoux', dirCat:'ذهب', allow:/ذهب|مجوهرات|خاتم|سوار|عقد|عيار|bijou|or\b|gold|joaill/i }
+};
+var RIZQ_SRM_TEMPLATES = {
+  cars: [
+    { ar:'موديل سيدان عائلي', fr:'Berline familiale', emoji:['🚗','🔑','🛡️'], cats:['سيارات'], browseSub:'سيارات للبيع', kind:'sedan' },
+    { ar:'SUV للطريق الطويل', fr:'SUV longue route', emoji:['🚙','🛞','🗺️'], cats:['سيارات'], browseSub:'سيارات للبيع', kind:'suv' },
+    { ar:'تشكيلة معرض اليوم', fr:'Sélection du showroom', emoji:['🚘','✨','🏷️'], cats:['سيارات'], browseSub:'', kind:'' }
+  ],
+  electronics: [
+    { ar:'هواتف ذكية مختارة', fr:'Smartphones sélectionnés', emoji:['📱','🔋','🎧'], cats:['إلكترونيات'], browseSub:'هواتف ذكية', kind:'phone' },
+    { ar:'لابتوب للعمل والترفيه', fr:'Laptops travail & loisir', emoji:['💻','🖱️','⌨️'], cats:['إلكترونيات'], browseSub:'لابتوب وحاسوب', kind:'laptop' },
+    { ar:'شاشات وتلفزيونات', fr:'Écrans & TV', emoji:['📺','🔊','📡'], cats:['إلكترونيات'], browseSub:'شاشات وتلفزيون', kind:'tv' }
+  ],
+  furniture: [
+    { ar:'صالون أنيق للبيت', fr:'Salon élégant', emoji:['🛋️','🪞','🪴'], cats:['أثاث'], browseSub:'', kind:'sofa' },
+    { ar:'غرفة نوم متكاملة', fr:'Chambre complète', emoji:['🛏️','🗄️','💡'], cats:['أثاث'], browseSub:'', kind:'bed' },
+    { ar:'مكتب ومنضدة عملية', fr:'Bureau & table', emoji:['🪑','📐','🗂️'], cats:['أثاث'], browseSub:'', kind:'desk' }
+  ],
+  equipment: [
+    { ar:'معدات ورشة جاهزة', fr:'Équipement d\'atelier', emoji:['⚙️','🔧','🧰'], cats:['معدات'], browseSub:'', kind:'tools' },
+    { ar:'مولدات وطاقة', fr:'Groupes & énergie', emoji:['⚡','🛢️','🔌'], cats:['معدات','طاقة'], browseSub:'', kind:'generator' },
+    { ar:'آليات خفيفة للمعرض', fr:'Engins légers', emoji:['🚜','🛞','🛡️'], cats:['معدات'], browseSub:'', kind:'' }
+  ],
+  building: [
+    { ar:'مواد بناء أساسية', fr:'Matériaux de base', emoji:['🏗️','🧱','📦'], cats:['بناء'], browseSub:'', kind:'cement' },
+    { ar:'حديد وتسليح', fr:'Fer & armature', emoji:['🔩','📏','🏭'], cats:['بناء'], browseSub:'', kind:'steel' },
+    { ar:'تشطيبات المعرض', fr:'Finitions showroom', emoji:['🪟','🪣','✨'], cats:['بناء'], browseSub:'', kind:'' }
+  ],
+  jewelry: [
+    { ar:'تشكيلة ذهب المعرض', fr:'Sélection or showroom', emoji:['🪙','💍','✨'], cats:['ذهب'], browseSub:'', kind:'gold' },
+    { ar:'خواتم وأساور', fr:'Bagues & bracelets', emoji:['💍','📿','💎'], cats:['ذهب'], browseSub:'', kind:'ring' },
+    { ar:'طقم فاخر للعرض', fr:'Parure premium', emoji:['💎','👑','✨'], cats:['ذهب'], browseSub:'', kind:'' }
+  ]
+};
+var RIZQ_SRM_AUTO_MS = 3 * 60 * 1000;
+var _rizqSrmAutoTimer = null;
+var _rizqSrmNextAt = 0;
+
+function _srmTemplatesFor(cat){
+  return RIZQ_SRM_TEMPLATES[cat] || RIZQ_SRM_TEMPLATES.cars;
+}
+function _srmCatMeta(cat){
+  return RIZQ_SRM_CATS[cat] || RIZQ_SRM_CATS.cars;
+}
+function _srmTabIdFor(cat){
+  return 'srm-tab-' + (RIZQ_SRM_CATS[cat] ? cat : 'cars');
+}
+function _srmIsModelCat(a, cat){
+  if(!a) return false;
+  var meta = _srmCatMeta(cat);
+  var k = String(a.catKey || a.cat || '');
+  var blob = (typeof _styAdBlob === 'function') ? _styAdBlob(a) : [a.title,a.cat,k].join(' ');
+  if(meta.allow.test(k) || meta.allow.test(blob)) return true;
+  if((meta.dirCat && (k.indexOf(meta.dirCat) >= 0 || String(meta.ar||'').indexOf(k) >= 0))) return true;
+  return false;
+}
+function _srmAdKind(a){
+  if(!a) return '';
+  var blob = [a.title||'', a.titleFR||'', a.subcat||'', a.cat||'', a.catKey||''].join(' ');
+  if(/suv|جيب|دفع\s*رباعي|4\s*x\s*4/i.test(blob)) return 'suv';
+  if(/سيدان|berline|sedan|صالون/i.test(blob)) return 'sedan';
+  if(/هاتف|iphone|samsung|phone|جوال|موبايل/i.test(blob)) return 'phone';
+  if(/لابتوب|laptop|حاسوب|ordinateur/i.test(blob)) return 'laptop';
+  if(/تلفزيون|tv|écran|شاشة/i.test(blob)) return 'tv';
+  if(/كنب|sofa|canapé|صالون/i.test(blob)) return 'sofa';
+  if(/سرير|bed|lit/i.test(blob)) return 'bed';
+  if(/مكتب|bureau|desk|طاولة/i.test(blob)) return 'desk';
+  if(/مولد|générateur|generateur|generator/i.test(blob)) return 'generator';
+  if(/عدة|أدوات|tools|atelier/i.test(blob)) return 'tools';
+  if(/إسمنت|ciment|cement/i.test(blob)) return 'cement';
+  if(/حديد|fer|acier|steel/i.test(blob)) return 'steel';
+  if(/خاتم|bague|ring/i.test(blob)) return 'ring';
+  if(/ذهب|or\b|gold|عيار/i.test(blob)) return 'gold';
+  return '';
+}
+function _srmUpdateTick(fr){
+  var el = document.getElementById('rizq-srm-tick');
+  if(!el) return;
+  if(!_rizqSrmNextAt){ el.textContent = ''; return; }
+  var left = Math.max(0, _rizqSrmNextAt - Date.now());
+  var mins = Math.floor(left / 60000);
+  var secs = Math.floor((left % 60000) / 1000);
+  var mm = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  el.textContent = fr ? ('✨ Nouveaux modèles dans ' + mm) : ('✨ نماذج جديدة خلال ' + mm);
+}
+function _srmStartAutoRefresh(){
+  if(_rizqSrmAutoTimer) clearInterval(_rizqSrmAutoTimer);
+  _rizqSrmNextAt = Date.now() + RIZQ_SRM_AUTO_MS;
+  _rizqSrmAutoTimer = setInterval(function(){
+    if(document.hidden) return;
+    _rizqSrmNextAt = Date.now() + RIZQ_SRM_AUTO_MS;
+    try { buildShowroomModels(true); } catch(e){}
+  }, RIZQ_SRM_AUTO_MS);
+  if(!_srmUpdateTick._bound){
+    _srmUpdateTick._bound = 1;
+    setInterval(function(){
+      var fr = false;
+      try {
+        if(typeof isAr !== 'undefined') fr = !isAr;
+        else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+      } catch(e){}
+      _srmUpdateTick(fr);
+    }, 1000);
+  }
+  try {
+    var fr0 = (typeof isAr !== 'undefined') ? !isAr : false;
+    _srmUpdateTick(fr0);
+  } catch(e2){}
+}
+function setShowroomModelCat(cat){
+  if(!RIZQ_SRM_CATS[cat]) cat = 'cars';
+  _rizqSrmCat = cat;
+  document.querySelectorAll('#rizq-showroom-models .rizq-styles-gtab[data-srm-cat]').forEach(function(btn){
+    var on = btn.getAttribute('data-srm-cat') === cat;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  var rail = document.getElementById('rizq-srm-rail');
+  if(rail) rail.setAttribute('aria-labelledby', _srmTabIdFor(cat));
+  buildShowroomModels(false);
+}
+function buildShowroomModels(reshuffle){
+  var rail = document.getElementById('rizq-srm-rail');
+  if(!rail) return;
+  var fr = false;
+  try {
+    if(typeof isAr !== 'undefined') fr = !isAr;
+    else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+  } catch(e) {}
+  var cat = RIZQ_SRM_CATS[_rizqSrmCat] ? _rizqSrmCat : 'cars';
+  var meta = _srmCatMeta(cat);
+  var templates = _srmTemplatesFor(cat);
+  var pool = (typeof _styPool === 'function' ? _styPool() : []).filter(function(a){ return _srmIsModelCat(a, cat); });
+  var tplList = (typeof _styShuffle === 'function' ? _styShuffle(templates) : templates.slice()).slice(0, 3);
+  var usedIds = {};
+  var cards = [];
+  var cta = fr ? 'Voir le modèle' : 'تصفّح النموذج';
+  var badge = fr ? meta.fr : meta.ar;
+  var esc = typeof _styEsc === 'function' ? _styEsc : function(s){ return String(s==null?'':s); };
+
+  tplList.forEach(function(tpl){
+    var kindPool = tpl.kind ? pool.filter(function(a){ return _srmAdKind(a) === tpl.kind && !usedIds[String(a.id)]; }) : [];
+    var catPool = pool.filter(function(a){
+      var k = String(a.catKey||a.cat||'');
+      return (tpl.cats||[]).some(function(c){ return typeof _styCatMatch==='function' ? _styCatMatch(k, c) : (k.indexOf(c)>=0); }) && !usedIds[String(a.id)];
+    });
+    if(kindPool.length) catPool = kindPool.concat(catPool.filter(function(a){
+      return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
+    }));
+    if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
+    var primary = catPool.length ? (typeof _styShuffle==='function' ? _styShuffle(catPool)[0] : catPool[0]) : null;
+    if(primary) usedIds[String(primary.id)] = 1;
+    var companions = [];
+    if(primary){
+      companions = (typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(
+        pool.filter(function(a){ return String(a.id) !== String(primary.id) && !usedIds[String(a.id)]; })
+      ).slice(0, 2);
+      companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
+    }
+    var items = primary ? [primary].concat(companions) : [];
+    while(items.length < 3) items.push(null);
+    var name = fr ? tpl.fr : tpl.ar;
+    var metaParts = items.filter(Boolean).map(function(a){
+      var d = (typeof trAd === 'function') ? trAd(a) : a;
+      return String((d && (d.title || a.title)) || '').slice(0, 28);
+    }).filter(Boolean);
+    if(!metaParts.length) metaParts = [fr ? 'Suggestion Rizq Showroom' : 'اقتراح معرض رزق'];
+    var href;
+    if(primary && primary.id){
+      href = 'rizq_browse.html?id=' + encodeURIComponent(primary.id);
+    } else if(tpl.browseSub){
+      href = 'rizq_browse.html?cat=' + encodeURIComponent((tpl.cats||[])[0] || meta.dirCat) + '&sub=' + encodeURIComponent(tpl.browseSub);
+    } else {
+      href = 'rizq_showroom_directory.html?cat=' + encodeURIComponent(meta.dirCat);
+    }
+    var tiles = '';
+    for(var ti=0; ti<3; ti++){
+      tiles += (typeof _styTileHtml === 'function')
+        ? _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg)
+        : '<div class="rizq-style-tile">'+(tpl.emoji||[])[ti]+'</div>';
+    }
+    var primaryIdAttr = primary && primary.id != null ? String(primary.id).replace(/'/g,'&#39;') : '';
+    cards.push(
+      '<a class="rizq-style-card" role="listitem" href="'+esc(href)+'" data-srm-cat="'+cat+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+esc(href).replace(/'/g,'&#39;')+'\')">'
+      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
+      + '<div class="rizq-style-body">'
+      +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
+      +   '<div class="rizq-style-name">'+esc(name)+'</div>'
+      +   '<div class="rizq-style-meta">'+esc(metaParts.join(' · '))+'</div>'
+      +   '<span class="rizq-style-cta">'+esc(cta)+'</span>'
+      + '</div></a>'
+    );
+  });
+
+  if(!cards.length){
+    rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
+      ? 'Pas encore assez d\'annonces pour suggérer des modèles. Explorez le guide des showrooms.'
+      : 'لا توجد إعلانات كافية بعد لاقتراح نماذج. تصفّح دليل المعارض.')+'</div>';
+    return;
+  }
+  rail.innerHTML = cards.join('');
+  if(reshuffle){
+    try { rail.scrollTo({ left: 0, behavior: 'smooth' }); }
+    catch(e2) { rail.scrollLeft = 0; }
+    try { _srmStartAutoRefresh(); } catch(e3) {}
+  }
+  _srmUpdateTick(fr);
+}
+try { buildShowroomModels(false); } catch(eSrm) {}
+try { _srmStartAutoRefresh(); } catch(eSrmAuto) {}
+
 // ── QCAT PORTAL ──
 var QCAT_DATA = (typeof RizqCategories !== 'undefined') ? RizqCategories.qcatData() : {
   'عقارات': {icon:'🏠', subs:['شقق للكراء','شقق للبيع','منازل وفيلات','أراضي','محلات تجارية','إيجار يومي']},
@@ -6290,6 +6553,7 @@ function applyList(list){
     if(typeof buildCards==='function') buildCards();
     if(typeof buildLandingAds==='function') buildLandingAds(true);
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
+    if(typeof buildShowroomModels==='function') buildShowroomModels(false);
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
     renderTickerFromAds();
@@ -6788,6 +7052,16 @@ const LANG = {
     'sty-girls': 'بنات',
     'sty-cta': 'تسوّق الإطلالة',
     'sty-from-view': 'من مشاهدتك',
+    'srm-title': 'نماذج المعارض — <span>اقتراحات رزق</span>',
+    'srm-desc': 'سيارات، أثاث، إلكترونيات ومعدات — نماذج مقترحة تتجدد كل 3 دقائق، مع رابط لدليل المعارض',
+    'srm-reshuffle': '🔀 نماذج جديدة',
+    'srm-cars': 'سيارات',
+    'srm-electronics': 'إلكترونيات',
+    'srm-furniture': 'أثاث ومفروشات',
+    'srm-equipment': 'معدات ومكائن',
+    'srm-building': 'مواد بناء',
+    'srm-jewelry': 'مجوهرات',
+    'srm-cta': 'تصفّح النموذج',
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
@@ -6896,6 +7170,16 @@ const LANG = {
     'sty-girls': 'Filles',
     'sty-cta': 'Voir le look',
     'sty-from-view': 'Vu récemment',
+    'srm-title': 'Modèles showroom — <span>suggestions Rizq</span>',
+    'srm-desc': 'Voitures, meubles, électronique et équipements — modèles suggérés toutes les 3 minutes, avec lien vers le guide des showrooms',
+    'srm-reshuffle': '🔀 Nouveaux modèles',
+    'srm-cars': 'Voitures',
+    'srm-electronics': 'Électronique',
+    'srm-furniture': 'Meubles & ameublement',
+    'srm-equipment': 'Équipements & machines',
+    'srm-building': 'Matériaux de construction',
+    'srm-jewelry': 'Bijoux',
+    'srm-cta': 'Voir le modèle',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
     'qc-home':'Électroménager','qc-energy':'Énergie','qc-travel':'Voyages',
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services','f-fashion':'Mode',
@@ -7280,6 +7564,10 @@ function applyLandingLang(toAr) {
   if(stylesTag) stylesTag.textContent = isAr ? 'أفكار الأنماط' : 'Idées de style';
   var styReshuffle = document.getElementById('rizq-styles-reshuffle');
   if(styReshuffle) styReshuffle.setAttribute('aria-label', isAr ? 'اقتراحات جديدة' : 'Nouvelles suggestions');
+  const srmTag = document.querySelector('#rizq-showroom-models .section-tag');
+  if(srmTag) srmTag.textContent = isAr ? 'نماذج المعارض' : 'Modèles showroom';
+  var srmReshuffle = document.getElementById('rizq-srm-reshuffle');
+  if(srmReshuffle) srmReshuffle.setAttribute('aria-label', isAr ? 'نماذج جديدة' : 'Nouveaux modèles');
 
   // Footer carrier labels (brand names — Latin transliteration in FR)
   const carrierFR = ['Mauritel:','Mattel:','Chinguitel:'];
@@ -7337,6 +7625,7 @@ function applyLandingLang(toAr) {
   if(track) { track.innerHTML=''; buildCards(); if(typeof renderPrices==='function') renderPrices(); }
   if(typeof buildFeaturedCards==='function') buildFeaturedCards();
   if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
+  if(typeof buildShowroomModels==='function') buildShowroomModels(false);
   // إصلاح حقيقي: شريط أسعار السوق المتحرك (#price-ticker) كان يُترجم في لوحة الأسعار
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
