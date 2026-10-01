@@ -688,6 +688,9 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     font-weight:700!important;
     white-space:nowrap!important;
     line-height:1.25!important;
+    color:rgba(255,255,255,.94)!important;
+    text-decoration:none!important;
+    background:transparent!important;
   }
   .nav-dropdown-menu.nav-more-menu .nav-dd-item:last-child,
   .nav-dropdown-menu.rizq-phone-more-panel .nav-dd-item:last-child,

@@ -2831,6 +2831,9 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     font-size:13px !important;
     line-height:1.25 !important;
     white-space:nowrap !important;
+    color:rgba(255,255,255,.94) !important;
+    text-decoration:none !important;
+    background:transparent !important;
   }
   html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open .nav-dd-item:last-child{margin-bottom:0 !important}
   html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open .rizq-hdr-ico,
@@ -2843,6 +2846,14 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open strong{
     font-size:12.5px !important;font-weight:700 !important;line-height:1.25 !important;
     white-space:nowrap !important;flex:1 1 auto !important;
+    color:rgba(255,255,255,.94) !important;
+    text-decoration:none !important;
+  }
+  html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open .nav-dd-item:hover,
+  html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open .nav-dd-item:hover .rizq-hdr-lbl,
+  html.rizq-app-nav .nav-dropdown-menu.rizq-more-menu-open .nav-dd-item:hover strong{
+    color:#E8C96A !important;
+    background:rgba(201,168,76,.14) !important;
   }
   html.rizq-app-nav #nav .nav-hamburger,
   html.rizq-app-nav #rizq-desk-nav .nav-hamburger,
