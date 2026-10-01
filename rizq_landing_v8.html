@@ -44,16 +44,7 @@
 <link rel="stylesheet" href="rizq_header.css?v=24.6"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
-(function(){
-  try{
-    var m=window.matchMedia('(max-width:768px), (orientation:landscape) and (max-height:500px)');
-    if(m.matches){
-      document.documentElement.classList.add('rizq-landing-mobile');
-      var mark=function(){ if(document.body) document.body.classList.add('landing-ux-mobile'); };
-      if(document.body) mark(); else document.addEventListener('DOMContentLoaded', mark);
-    }
-  }catch(e){}
-})();
+/* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
 </script>
 <style id="rizq-mobile-header-critical">
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
