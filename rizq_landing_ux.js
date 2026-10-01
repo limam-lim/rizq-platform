@@ -327,8 +327,8 @@
     }
     var liveWrap = document.querySelector('#hero-listings .listings-label > span');
     if (liveWrap) {
-      liveWrap.innerHTML = '<span class="live-pulse-dot" aria-hidden="true"></span><strong>🔴 '
-        + (fr ? 'Live' : 'مباشر') + '</strong> '
+      liveWrap.innerHTML = '<span class="live-pulse-dot" aria-hidden="true"></span><strong>'
+        + (fr ? 'En direct' : 'مباشر') + '</strong> '
         + (fr
           ? 'Dernières annonces publiées — mise à jour automatique'
           : 'أحدث الإعلانات المنشورة — تتحدث تلقائياً');
