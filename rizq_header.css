@@ -517,7 +517,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     pointer-events:auto;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
-    border-radius:999px !important;
+    border-radius:18px !important; /* مستطيل بزوايا ناعمة بدل الكبسولة الكاملة */
     background:
       linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
       rgba(4,10,20,.55) !important;
