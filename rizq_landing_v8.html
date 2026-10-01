@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.6"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=23.4"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.7"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=23.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -1262,12 +1262,7 @@ html[dir="ltr"] #all-ads-title{
   position:relative;z-index:2;width:100%;overflow:hidden;
   padding:8px 0 52px;
 }
-.hero-listings-section::before{
-  content:'';position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
-  width:min(920px,92%);height:220px;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse at center,rgba(201,168,76,.14),rgba(27,58,107,.06) 42%,transparent 72%);
-  filter:blur(2px);
-}
+.hero-listings-section::before{display:none;content:none}
 .listings-label{position:relative;z-index:2;text-align:center;margin-bottom:18px;animation:fadeUp .8s .5s ease both}
 .listings-label>span{
   display:inline-flex;align-items:center;gap:10px;
@@ -1297,25 +1292,15 @@ html[dir="ltr"] #all-ads-title{
 }
 
 .cards-track-wrap{
-  position:relative;z-index:1;overflow:hidden;border-radius:22px;
+  position:relative;z-index:1;overflow:hidden;border-radius:0;
   direction:ltr; /* يمنع انزياح RTL الذي يُخرج البطاقات عن الشاشة أثناء slide */
-  padding:14px 0 8px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%),
-    linear-gradient(145deg,rgba(7,17,31,.55),rgba(13,27,42,.35));
-  border:1px solid rgba(201,168,76,.22);
-  box-shadow:0 18px 48px rgba(7,17,31,.28),inset 0 1px 0 rgba(255,255,255,.06);
+  padding:8px 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
 }
 .cards-track-wrap::before,
-.cards-track-wrap::after{
-  content:'';position:absolute;top:0;bottom:0;width:72px;z-index:3;pointer-events:none;
-}
-.cards-track-wrap::before{
-  left:0;background:linear-gradient(90deg,rgba(7,17,31,.92),transparent);
-}
-.cards-track-wrap::after{
-  right:0;background:linear-gradient(270deg,rgba(7,17,31,.92),transparent);
-}
+.cards-track-wrap::after{display:none;content:none}
 
 .cards-track{display:flex;gap:18px;width:max-content;animation:slide 48s linear infinite;direction:ltr;padding:4px 18px}
 .cards-track:hover{animation-play-state:paused}
@@ -1359,10 +1344,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
     radial-gradient(circle at 30% 20%,rgba(201,168,76,.18),transparent 45%),
     linear-gradient(160deg,#102038,#0a1628);
 }
-.ad-card-img::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:48px;pointer-events:none;
-  background:linear-gradient(to top,rgba(10,21,40,.85),transparent);
-}
+.ad-card-img::after{display:none;content:none}
 .ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
 .ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s ease}
 .ad-card:hover .ad-card-img .rizq-img-wrap img{transform:scale(1.06)}
@@ -1877,10 +1859,11 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
-    direction:ltr!important;border-radius:16px!important;padding:10px 0 6px!important;
+    direction:ltr!important;border-radius:0!important;padding:6px 0!important;
+    background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
-  #hero-listings .cards-track-wrap::after{width:36px!important}
+  #hero-listings .cards-track-wrap::after{display:none!important;content:none!important}
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;
@@ -2716,21 +2699,15 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-styles-track-wrap{
   position:relative;
   overflow:hidden;
-  border-radius:22px;
+  border-radius:0;
   direction:ltr;
-  padding:12px 0 6px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.65),rgba(247,249,253,.9)),
-    linear-gradient(145deg,rgba(27,58,107,.04),rgba(201,168,76,.05));
-  border:1px solid rgba(201,168,76,.2);
-  box-shadow:0 16px 40px rgba(13,27,42,.08),inset 0 1px 0 rgba(255,255,255,.8);
+  padding:8px 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
 }
 .rizq-styles-track-wrap::before,
-.rizq-styles-track-wrap::after{
-  content:'';position:absolute;top:0;bottom:0;width:56px;z-index:3;pointer-events:none;
-}
-.rizq-styles-track-wrap::before{left:0;background:linear-gradient(90deg,#f7f9fd,transparent)}
-.rizq-styles-track-wrap::after{right:0;background:linear-gradient(270deg,#f7f9fd,transparent)}
+.rizq-styles-track-wrap::after{display:none;content:none}
 .rizq-styles-rail{
   display:flex;
   flex-direction:row;
@@ -2855,10 +2832,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     overflow:hidden!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
+    border-radius:0!important;padding:6px 0!important;
+    background:transparent!important;border:none!important;box-shadow:none!important;
   }
-  .rizq-styles-track-wrap{border-radius:16px!important;padding:8px 0 4px!important}
   .rizq-styles-track-wrap::before,
-  .rizq-styles-track-wrap::after{width:28px!important}
+  .rizq-styles-track-wrap::after{display:none!important;content:none!important}
   .rizq-styles-rail{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;

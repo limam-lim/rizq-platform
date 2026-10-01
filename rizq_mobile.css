@@ -534,12 +534,16 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     max-width:100%!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
-    border-radius:16px!important;
-    padding:10px 0 6px!important;
+    border-radius:0!important;
+    padding:6px 0!important;
     scrollbar-width:none;
     -webkit-overflow-scrolling:auto;
-    border:1px solid rgba(201,168,76,.22)!important;
+    border:none!important;
+    background:transparent!important;
+    box-shadow:none!important;
   }
+  .cards-track-wrap::before,
+  .cards-track-wrap::after{display:none!important;content:none!important}
   .cards-track-wrap::-webkit-scrollbar{display:none}
   .cards-track{
     display:flex!important;
