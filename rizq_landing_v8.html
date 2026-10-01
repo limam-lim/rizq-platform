@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.1"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.2"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -2502,22 +2502,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
+/* خلفية القسم فاتحة — الترويسة تبقى كحلية بالمعين، والبطاقات كما هي */
 #rizq-styles,#rizq-showroom-models{
   padding:48px 5%;
-  background:
-    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(201,168,76,.14),transparent 55%),
-    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(201,168,76,.08),transparent 50%),
-    linear-gradient(165deg,#0a1628 0%,#122a4a 42%,#0f2347 100%);
+  background:var(--bg-section,#fbfcff);
   position:relative;overflow:hidden;
 }
-#rizq-styles::before,#rizq-showroom-models::before{
-  content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;
-  background-image:linear-gradient(45deg,rgba(201,168,76,.12) 25%,transparent 25%),
-    linear-gradient(-45deg,rgba(201,168,76,.1) 25%,transparent 25%),
-    linear-gradient(45deg,transparent 75%,rgba(201,168,76,.08) 75%),
-    linear-gradient(-45deg,transparent 75%,rgba(201,168,76,.08) 75%);
-  background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0
-}
+#rizq-styles::before,#rizq-showroom-models::before{content:none;display:none}
 .rizq-styles-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
 #rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:28px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
@@ -2532,23 +2523,27 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   color:rgba(255,255,255,.95);font-size:15px;font-weight:600;max-width:560px;margin:0 auto;line-height:1.75;
   text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
+.rizq-styles-toolbar{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  margin:0 0 14px;text-align:center;
+}
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
-  margin-top:14px;padding:9px 18px;
+  margin-top:0;padding:9px 18px;
   font-size:13px;font-weight:800;font-family:inherit;
   color:#0f2347 !important;
   background:linear-gradient(135deg,#f5e6b8,#e8c96a) !important;
-  border:1.5px solid rgba(255,255,255,.55) !important;border-radius:999px;cursor:pointer;
+  border:1.5px solid rgba(201,168,76,.45) !important;border-radius:999px;cursor:pointer;
   transition:background .2s,border-color .2s,transform .2s,color .2s,box-shadow .2s;
-  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  box-shadow:0 4px 14px rgba(13,27,42,.12);
 }
 .rizq-styles-reshuffle:hover{
   color:#0a1628;background:linear-gradient(135deg,#fff3cc,#f0d78a);
-  border-color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)
+  border-color:rgba(201,168,76,.7);box-shadow:0 6px 18px rgba(13,27,42,.16)
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
 .rizq-styles-tick,.rizq-srm-tick{
-  margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.92);min-height:1.2em
+  margin:8px 0 0;font-size:11.5px;color:#5b6b85;min-height:1.2em
 }
 #rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
