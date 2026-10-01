@@ -471,15 +471,17 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .hero-title-card{
   display:block;
   width:fit-content;
+  min-width:min(420px,86vw);
   margin:0 auto 18px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
   border:1.5px solid rgba(201,168,76,.4);
   border-radius:28px;
-  padding:clamp(16px,3vw,28px) clamp(28px,6vw,64px);
+  padding:clamp(16px,3vw,28px) clamp(48px,10vw,110px);
   box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 32px rgba(201,168,76,.12);
   animation:fadeUp .8s .1s ease both;
   position:relative;
   overflow:hidden; /* يحصر أي توهج/لمعة داخل حدود البطاقة المستديرة فقط */
+  text-align:center;
 }
 .hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(36px,8.5vw,84px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px}
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
@@ -1830,7 +1832,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-stats-bar{flex-wrap:wrap}
   .hero-content{padding-top:44px;width:94%}
   .hero-headline{font-size:clamp(36px,12vw,52px)}
-  .hero-title-card{padding:14px 24px;border-radius:20px;margin-bottom:12px}
+  .hero-title-card{padding:14px 40px;border-radius:20px;margin-bottom:12px;min-width:min(280px,88vw)}
   .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
   .hero-spaces-sub{font-size:12.5px}
