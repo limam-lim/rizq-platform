@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=26.1"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.2"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -61,6 +61,18 @@ document.documentElement.classList.add('rizq-app-nav');
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   html.rizq-app-nav .hero-content{padding-top:12px!important}
+  /* شعار الهاتف: «رزق» كاملة بخط عربي واضح بلا تسطير الرابط */
+  html.rizq-app-nav #nav > .logo{
+    text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
+    display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
+  }
+  html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:17px!important;font-weight:800!important;
+    color:#F5E0A0!important;-webkit-text-fill-color:#F5E0A0!important;white-space:nowrap!important;
+    overflow:visible!important;min-width:max-content!important;text-decoration:none!important;
+    direction:rtl!important;unicode-bidi:isolate!important;line-height:1.15!important;
+  }
+  html.rizq-app-nav #nav .logo-sub{display:none!important}
 }
 </style>
 <script src="rizq_packages_config.js?v=23.0"></script>

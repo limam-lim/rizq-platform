@@ -2838,11 +2838,11 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   }
   html.rizq-app-nav #nav > .nav-center::-webkit-scrollbar,
   html.rizq-app-nav #rizq-desk-nav > .nav-center::-webkit-scrollbar{display:none !important}
-  html.rizq-app-nav #nav .nav-center > li > a,
-  html.rizq-app-nav #nav .nav-center > li > .nav-link-btn,
-  html.rizq-app-nav #rizq-desk-nav .nav-center > li > a,
-  html.rizq-app-nav #rizq-desk-nav .nav-center > li > .nav-link-btn,
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li > a{
+  html.rizq-app-nav #nav .nav-center > li > a:not(.nav-phone-more-only),
+  html.rizq-app-nav #nav .nav-center > li > .nav-link-btn:not(.nav-phone-more-only):not(#nav-more-mobile-btn),
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li > a:not(.nav-phone-more-only),
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li > .nav-link-btn:not(.nav-phone-more-only),
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li > a:not(.nav-phone-more-only){
     display:inline-flex !important;flex-direction:column !important;align-items:center !important;
     justify-content:flex-start !important;
     gap:2px !important;padding:3px 5px 4px !important;min-width:40px !important;
@@ -2894,13 +2894,40 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     align-items:center !important;
     position:relative !important;
   }
+  /* هاتف: زر المزيد مرة واحدة فقط — أخفِ نسخة الهاتف، أظهر نسخة سطح المكتب */
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
-  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{display:none !important}
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only,
+  html.rizq-app-nav #nav .nav-center > li > .nav-phone-more-only,
+  html.rizq-app-nav #nav .nav-center > li > #nav-more-mobile-btn,
+  html.rizq-app-nav #nav #nav-more-mobile-btn,
+  html.rizq-app-nav #nav #nav-more-li > .nav-phone-more-only,
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-phone-more-only{
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    height:0 !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+    position:absolute !important;
+    opacity:0 !important;
+  }
   html.rizq-app-nav #nav .nav-center .nav-desktop-more-only,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only,
+  html.rizq-app-nav #nav #nav-more-li > .nav-desktop-more-only,
   html.rizq-app-nav #rizq-desk-nav #rizq-desk-more{
     display:inline-flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
     flex-direction:column !important;
+    pointer-events:auto !important;
+    position:relative !important;
+    width:auto !important;
+    height:auto !important;
   }
   /* المزيد: زر نظيف داخل الرصيف — القائمة منفصلة أسفله عند الفتح */
   html.rizq-app-nav #nav #rizq-desk-more-li,
