@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.0"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -1331,7 +1331,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
    CATEGORIES
 ══════════════════════════════════ */
 .section{padding:80px 5%}
-.section-header{text-align:center;margin-bottom:52px;background-color:#234d8f;background-image:linear-gradient(45deg,rgba(255,255,255,.14) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.14) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.14) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.14) 75%),linear-gradient(145deg,#1e4f9a 0%,#234d8f 42%,#2f63b5 100%);background-size:32px 32px,32px 32px,32px 32px,32px 32px,cover;background-position:0 0,0 16px,16px -16px,-16px 0,center;background-repeat:repeat,repeat,repeat,repeat,no-repeat;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:40px 5%;box-shadow:0 8px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}
+.section-header{text-align:center;margin-bottom:52px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");background-blend-mode:overlay;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:40px 5%;box-shadow:0 8px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}
 .section-tag{display:inline-block;color:var(--gold);font-size:10.5px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:14px;font-family:Georgia,'Times New Roman',serif}
 .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(26px,4vw,48px);font-weight:700;line-height:1.2;margin-bottom:14px;color:#fff}
 .section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.2vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px;color:#fff!important}
@@ -2493,159 +2493,64 @@ html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-name{font-size:13.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-disc-tag{font-size:11.5px;color:#5b6b85;margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:2px 9px;margin-top:6px}
-html body .rzq-disc-empty{
-  direction:inherit;text-align:center;
-  background-color:#1B3A6B !important;
-  background-image:
-    linear-gradient(45deg,rgba(13,27,42,.42) 25%,transparent 25%),
-    linear-gradient(-45deg,rgba(13,27,42,.42) 25%,transparent 25%),
-    linear-gradient(45deg,transparent 75%,rgba(13,27,42,.42) 75%),
-    linear-gradient(-45deg,transparent 75%,rgba(13,27,42,.42) 75%),
-    linear-gradient(145deg,#0f2347 0%,#1B3A6B 42%,#234d8f 100%) !important;
-  background-size:28px 28px,28px 28px,28px 28px,28px 28px,cover !important;
-  background-position:0 0,0 14px,14px -14px,-14px 0,center !important;
-  background-repeat:repeat,repeat,repeat,repeat,no-repeat !important;
-  background-blend-mode:normal !important;
-  border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;
-  box-shadow:0 8px 28px rgba(0,0,0,.18)
-}
+.rzq-disc-empty{direction:inherit;text-align:center;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
 html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-icon{font-size:34px;margin-bottom:10px}
-html body .rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff!important;margin-bottom:6px}
-html body .rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9)!important;max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.25)!important}
+.rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9);max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
 #rizq-styles,#rizq-showroom-models{
   padding:48px 5%;
-  background:var(--bg-section,#fbfcff);
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(201,168,76,.14),transparent 55%),
+    radial-gradient(ellipse 55% 45% at 95% 100%,rgba(201,168,76,.08),transparent 50%),
+    linear-gradient(165deg,#0a1628 0%,#122a4a 42%,#0f2347 100%);
   position:relative;overflow:hidden;
 }
-.rizq-styles-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1}
-/* ترويسات الأقسام = أزرق ملكي بمربعات ظاهرة مثل «كل الإعلانات» — بلا كحلي */
-html body #rizq-styles .section-header,
-html body #rizq-showroom-models .section-header,
-html body #virtual-stores .section-header,
-html body #virtual-showrooms .section-header,
-html body #virtual-offices .section-header,
-html body #virtual-tenders .section-header,
-html body #virtual-investments .section-header,
-html body #listings .section-header,
-html body .listings-section .section-header{
-  text-align:center;
-  margin-bottom:28px;
-  background-color:#234d8f !important;
-  background-image:
-    linear-gradient(45deg,rgba(255,255,255,.14) 25%,transparent 25%),
-    linear-gradient(-45deg,rgba(255,255,255,.14) 25%,transparent 25%),
-    linear-gradient(45deg,transparent 75%,rgba(255,255,255,.14) 75%),
-    linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.14) 75%),
-    linear-gradient(145deg,#1e4f9a 0%,#234d8f 42%,#2f63b5 100%) !important;
-  background-size:32px 32px,32px 32px,32px 32px,32px 32px,cover !important;
-  background-position:0 0,0 16px,16px -16px,-16px 0,center !important;
-  background-repeat:repeat,repeat,repeat,repeat,no-repeat !important;
-  background-blend-mode:normal !important;
-  border:1px solid rgba(201,168,76,.2) !important;
-  border-radius:20px !important;
-  padding:40px 5% !important;
-  box-shadow:0 8px 28px rgba(0,0,0,.18) !important;
-  overflow:hidden !important;
+#rizq-styles::before,#rizq-showroom-models::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:linear-gradient(45deg,rgba(201,168,76,.12) 25%,transparent 25%),
+    linear-gradient(-45deg,rgba(201,168,76,.1) 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,rgba(201,168,76,.08) 75%),
+    linear-gradient(-45deg,transparent 75%,rgba(201,168,76,.08) 75%);
+  background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0
 }
-html body #rizq-styles .section-tag,
-html body #rizq-showroom-models .section-tag,
-html body #virtual-stores .section-header .section-tag,
-html body #virtual-showrooms .section-header .section-tag,
-html body #virtual-offices .section-header .section-tag,
-html body #virtual-tenders .section-header .section-tag,
-html body #virtual-investments .section-header .section-tag{
-  color:var(--gold,#C9A84C) !important;
-  letter-spacing:3.5px;
-  background:transparent !important;
-  background-image:none !important;
-  border:0 !important;
-  border-radius:0;
-  padding:0;
-  margin-bottom:14px;
+.rizq-styles-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+#rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:28px}
+#rizq-styles .section-title,#rizq-showroom-models .section-title{
+  font-family:'Noto Naskh Arabic',Cairo,serif;
+  font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.35
 }
-html body #rizq-styles .section-title,
-html body #rizq-styles .section-header h2,
-html body #rizq-styles .section-header .section-title,
-html body #rizq-showroom-models .section-title,
-html body #rizq-showroom-models .section-header h2,
-html body #rizq-showroom-models .section-header .section-title,
-html body #virtual-stores .section-header h2,
-html body #virtual-stores .section-header .section-title,
-html body #virtual-showrooms .section-header h2,
-html body #virtual-showrooms .section-header .section-title,
-html body #virtual-offices .section-header h2,
-html body #virtual-offices .section-header .section-title,
-html body #virtual-tenders .section-header h2,
-html body #virtual-tenders .section-header .section-title,
-html body #virtual-investments .section-header h2,
-html body #virtual-investments .section-header .section-title{
-  font-family:Georgia,'Times New Roman',serif;
-  font-size:clamp(24px,3.2vw,38px);font-weight:700;
-  color:#fff !important;
-  margin:0 0 10px;line-height:1.2;
-  -webkit-text-fill-color:#fff;
-}
-html body #rizq-styles .section-title span,
-html body #rizq-showroom-models .section-title span,
-html body #virtual-stores .section-header h2 span[style*="background"],
-html body #virtual-showrooms .section-header h2 span[style*="background"],
-html body #virtual-offices .section-header h2 span[style*="background"],
-html body #virtual-tenders .section-header h2 span[style*="background"],
-html body #virtual-investments .section-header h2 span[style*="background"]{
+#rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
-html body #rizq-styles .section-desc,
-html body #rizq-styles .section-header .section-desc,
-html body #rizq-styles .section-header>p:not(.section-tag):not(.rizq-styles-tick),
-html body #rizq-showroom-models .section-desc,
-html body #rizq-showroom-models .section-header .section-desc,
-html body #rizq-showroom-models .section-header>p:not(.section-tag):not(.rizq-srm-tick),
-html body #virtual-stores .section-header .section-desc,
-html body #virtual-stores .section-header > p:not(.section-tag),
-html body #virtual-showrooms .section-header .section-desc,
-html body #virtual-showrooms .section-header > p:not(.section-tag),
-html body #virtual-offices .section-header .section-desc,
-html body #virtual-offices .section-header > p:not(.section-tag),
-html body #virtual-tenders .section-header .section-desc,
-html body #virtual-tenders .section-header > p:not(.section-tag),
-html body #virtual-investments .section-header .section-desc,
-html body #virtual-investments .section-header > p:not(.section-tag){
-  color:rgba(255,255,255,.94) !important;font-size:15px;font-weight:600;max-width:640px;margin:0 auto;line-height:1.8;
-  text-shadow:0 1px 2px rgba(0,0,0,.25) !important
-}
-/* أقسام المحاور: خلفية الصفحة النظيفة — بلا غسيل ترابي/أصفر */
-#virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments{
-  background:var(--bg-section,#fbfcff) !important;
-}
-.rizq-styles-toolbar{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  margin:0 0 14px;text-align:center;
+#rizq-styles .section-desc,#rizq-showroom-models .section-desc{
+  color:rgba(255,255,255,.95);font-size:15px;font-weight:600;max-width:560px;margin:0 auto;line-height:1.75;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
-  margin-top:0;padding:9px 18px;
+  margin-top:14px;padding:9px 18px;
   font-size:13px;font-weight:800;font-family:inherit;
   color:#0f2347 !important;
   background:linear-gradient(135deg,#f5e6b8,#e8c96a) !important;
-  border:1.5px solid rgba(201,168,76,.45) !important;border-radius:999px;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,.55) !important;border-radius:999px;cursor:pointer;
   transition:background .2s,border-color .2s,transform .2s,color .2s,box-shadow .2s;
-  box-shadow:0 4px 14px rgba(13,27,42,.1);
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
 }
 .rizq-styles-reshuffle:hover{
   color:#0a1628;background:linear-gradient(135deg,#fff3cc,#f0d78a);
-  border-color:rgba(201,168,76,.7);box-shadow:0 6px 18px rgba(13,27,42,.14)
+  border-color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3)
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
 .rizq-styles-tick,.rizq-srm-tick{
-  margin:0;font-size:11.5px;color:#5b6b85;min-height:1.2em
+  margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.92);min-height:1.2em
 }
-#rizq-showroom-models .rizq-styles-reshuffle{margin-top:0}
+#rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
   background:linear-gradient(135deg,#1B3A6B,#0f2347);
   border-color:rgba(201,168,76,.5)
@@ -2677,7 +2582,7 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 .rizq-styles-gtab:hover{border-color:rgba(201,168,76,.45);color:var(--royal,#1B3A6B)}
 .rizq-styles-gtab.is-active{
   color:#fff;background:linear-gradient(135deg,#1B3A6B,#0f2347);
-  border-color:rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(13,27,42,.18)
+  border-color:rgba(201,168,76,.45);box-shadow:0 4px 14px rgba(13,27,42,.18)
 }
 .rizq-styles-gtab.is-active[data-sty-gender="women"]{
   background:linear-gradient(135deg,#6b2d4a,#3d1a2c)
@@ -2694,73 +2599,41 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:rgba(138,58,92,.1);border-color:rgba(138,58,92,.22)
 }
-/* شريط أفقي متصل — نفس أسلوب النماذج/الاكتشاف على كل الشاشات */
 .rizq-styles-rail{
-  display:flex;
-  flex-wrap:nowrap;
-  gap:14px;
-  overflow-x:auto;
-  overflow-y:hidden;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  padding:4px 2px 12px;
-  margin-inline:-2%;
-  padding-inline:2%;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
 }
-.rizq-styles-rail::-webkit-scrollbar{display:none}
 .rizq-styles-empty{
-  flex:0 0 100%;min-width:100%;text-align:center;padding:28px 16px;
+  grid-column:1/-1;text-align:center;padding:28px 16px;
   color:#5b6b85;font-size:13.5px;line-height:1.7;
-  background:rgba(120,196,160,.08);border:1.5px dashed rgba(120,160,120,.28);border-radius:14px
+  background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
 .rizq-style-card{
   display:flex;flex-direction:column;
-  flex:0 0 220px;
-  width:220px;
   background:#fff;
-  border:1px solid rgba(27,58,107,.12);
+  border:1px solid rgba(27,58,107,.08);
   border-radius:16px;
   overflow:hidden;
   text-decoration:none;
   color:inherit;
-  box-shadow:0 6px 22px rgba(13,27,42,.08);
+  box-shadow:0 4px 18px rgba(13,27,42,.06);
   transition:transform .28s cubic-bezier(.23,1,.32,1),box-shadow .28s,border-color .28s;
   min-width:0;cursor:pointer;
-  scroll-snap-align:start;
-  animation:rizqStyleCardIn .45s cubic-bezier(.23,1,.32,1) both;
-  position:relative;
-}
-.rizq-style-card::before{
-  content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:2;
-  box-shadow:inset 0 0 0 1px rgba(201,168,76,.12);
-}
-.rizq-style-card:nth-child(1){animation-delay:.02s}
-.rizq-style-card:nth-child(2){animation-delay:.08s}
-.rizq-style-card:nth-child(3){animation-delay:.14s}
-.rizq-style-card:nth-child(4){animation-delay:.2s}
-.rizq-style-card:nth-child(5){animation-delay:.26s}
-.rizq-style-card:nth-child(6){animation-delay:.32s}
-@keyframes rizqStyleCardIn{
-  from{opacity:0;transform:translateY(12px) scale(.97)}
-  to{opacity:1;transform:none}
 }
 .rizq-style-card:hover{
   transform:translateY(-5px);
-  box-shadow:0 16px 36px rgba(13,27,42,.16);
-  border-color:rgba(201,168,76,.55);
+  box-shadow:0 14px 32px rgba(13,27,42,.12);
+  border-color:rgba(201,168,76,.4);
 }
-.rizq-style-card:hover::before{box-shadow:inset 0 0 0 1.5px rgba(201,168,76,.4)}
 .rizq-style-mosaic{
   display:grid;
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:3px;
   height:168px;
-  background:linear-gradient(135deg,#eef2f8,#f4f7fb);
+  background:#0f2347;
   overflow:hidden;
-  border-bottom:1px solid rgba(27,58,107,.08);
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
@@ -2792,25 +2665,21 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 .rizq-style-meta{font-size:11.5px;color:#5b6b85;line-height:1.45;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .rizq-style-cta{
   margin-top:auto;padding-top:8px;
-  font-size:12px;font-weight:800;color:var(--gold-dk,#8a6f2a);
+  font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:4px;
-  letter-spacing:.2px;
 }
-.rizq-style-card:hover .rizq-style-cta{color:#6e571c}
 .rizq-style-cta::after{content:'←';font-size:11px;transition:transform .25s}
 html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
 html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(3px)}
 @media(max-width:900px){
-  .rizq-styles-rail{gap:12px}
-  .rizq-style-card{flex:0 0 200px;width:200px}
+  .rizq-styles-rail{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .rizq-style-mosaic{height:148px}
 }
 @media(max-width:640px){
   #rizq-styles,#rizq-showroom-models{padding:28px 3% 32px}
   #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
-  #rizq-styles .section-title,#rizq-styles .section-header h2,
-  #rizq-showroom-models .section-title,#rizq-showroom-models .section-header h2{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
+  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
   #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:12px;line-height:1.6;max-width:100%}
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
   .landing-ads-filters{gap:6px;margin-bottom:14px}
@@ -2822,12 +2691,25 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .landing-ads-browse-full{padding:9px 14px;font-size:12px}
   .rizq-styles-gender-tabs{gap:6px;margin-bottom:12px}
   .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
-  .rizq-styles-rail{gap:8px;padding:2px 2px 8px}
-  .rizq-styles-empty{font-size:12px;padding:18px 12px}
+  .rizq-styles-rail{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:2px 2px 8px;
+    margin-inline:-2%;
+    padding-inline:2%;
+  }
+  .rizq-styles-rail::-webkit-scrollbar{display:none}
+  .rizq-styles-empty{flex:0 0 100%;min-width:100%;font-size:12px;padding:18px 12px}
   .rizq-style-card{
-    flex:0 0 148px;
-    width:148px;
+    flex:0 0 138px;
+    width:138px;
     border-radius:12px;
+    scroll-snap-align:start;
     box-shadow:0 2px 10px rgba(13,27,42,.06);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 2px 10px rgba(13,27,42,.06)}
@@ -5317,17 +5199,8 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
-/* بلا كحلي داخل مربعات بطاقات الأنماط/النماذج — ترويسة القسم وحدها كـ«كل الإعلانات» */
-function _styCardTileBg(bg){
-  var s = String(bg || '');
-  if(!s) return 'linear-gradient(145deg,#e8eef8,#f5f8fc)';
-  if(/#0[fF]2347|#0[Dd]1[Bb]2[Aa]|#162235|#1[Bb]3[Aa]6[Bb]|#234d8f|#0a1628|#122a4a|#122040|#0e1e38|#112244|#3d1a2c|#6b2d4a|#3a2200|#7a4a00/i.test(s)){
-    return 'linear-gradient(145deg,#e8eef8,#f5f8fc)';
-  }
-  return s;
-}
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
-  var bg = _styCardTileBg((ad && ad.bg) || fallbackBg || '');
+  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
@@ -5342,7 +5215,7 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
-  var bg = _styCardTileBg(fallbackBg || '');
+  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var linked = adId != null && adId !== '';
   var openAttr = linked
     ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'

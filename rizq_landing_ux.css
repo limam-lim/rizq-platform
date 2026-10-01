@@ -1,13 +1,5 @@
 :root{
-  /* أزرق ملكي موحّد + مربعات أفتح ظاهرة — بلا كحلي نهائياً */
-  --rizq-navy-atmosphere:linear-gradient(145deg,#1e4f9a 0%,#234d8f 42%,#2f63b5 100%);
-  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-opacity='0.22'%3E%3Cpath d='M28 2l26 26-26 26L2 28z'/%3E%3Cpath d='M28 12l16 16-16 16-16-16z'/%3E%3C/g%3E%3Cg fill='%231B3A6B' fill-opacity='0.35'%3E%3Cpath d='M28 0l28 28-28 28L0 28z'/%3E%3C/g%3E%3Cg fill='%23234d8f' fill-opacity='0.35'%3E%3Cpath d='M0 0h28v28H0zm28 28h28v28H28z'/%3E%3C/g%3E%3C/svg%3E");
-  --rizq-blue-squares:
-    linear-gradient(45deg,rgba(255,255,255,.14) 25%,transparent 25%),
-    linear-gradient(-45deg,rgba(255,255,255,.14) 25%,transparent 25%),
-    linear-gradient(45deg,transparent 75%,rgba(255,255,255,.14) 75%),
-    linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.14) 75%),
-    var(--rizq-navy-atmosphere);
+  --rizq-navy-grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
   --text-on-navy:rgba(255,255,255,.88);
   --text-on-navy-muted:rgba(255,255,255,.88);
   --text-on-navy-soft:rgba(255,255,255,.72);
@@ -36,17 +28,11 @@
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs),
 .rpkg-card[style*="#1B3A6B"],
 .pricing-card[style*="#1B3A6B"]{
-  background-color:#234d8f!important;
-  background-image:var(--rizq-blue-squares)!important;
-  background-size:32px 32px,32px 32px,32px 32px,32px 32px,cover!important;
-  background-position:0 0,0 16px,16px -16px,-16px 0,center!important;
-  background-repeat:repeat,repeat,repeat,repeat,no-repeat!important;
-  background-blend-mode:normal!important;
+  background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),var(--rizq-navy-grid)!important;
+  background-size:auto,60px 60px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-blend-mode:overlay;
 }
-
-/* ترويسات الأقسام = نفس بطاقة «كل الإعلانات» (كحلي + معين ذهبي) */
-html body .rzq-disc-empty-title{color:#fff!important}
-html body .rzq-disc-empty-desc{color:rgba(255,255,255,.9)!important;text-shadow:0 1px 2px rgba(0,0,0,.25)!important}
 
 html body footer,
 html body footer.rizq-footer{
