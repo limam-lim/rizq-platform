@@ -2605,18 +2605,17 @@ html body #virtual-investments .section-header > p:not(.section-tag){
   color:rgba(255,255,255,.94) !important;font-size:15px;font-weight:600;max-width:640px;margin:0 auto;line-height:1.8;
   text-shadow:0 1px 2px rgba(0,0,0,.25) !important
 }
-html body #rizq-styles .rizq-styles-tick,
-html body #rizq-showroom-models .rizq-srm-tick{
-  color:rgba(255,255,255,.78) !important;font-weight:600 !important;
-  text-shadow:0 1px 2px rgba(0,0,0,.2) !important
-}
 /* أقسام المحاور: خلفية الصفحة النظيفة — بلا غسيل ترابي/أصفر */
 #virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments{
   background:var(--bg-section,#fbfcff) !important;
 }
+.rizq-styles-toolbar{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  margin:0 0 14px;text-align:center;
+}
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
-  margin-top:14px;padding:9px 18px;
+  margin-top:0;padding:9px 18px;
   font-size:13px;font-weight:800;font-family:inherit;
   color:#0f2347 !important;
   background:linear-gradient(135deg,#f5e6b8,#e8c96a) !important;
@@ -2630,9 +2629,9 @@ html body #rizq-showroom-models .rizq-srm-tick{
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
 .rizq-styles-tick,.rizq-srm-tick{
-  margin:8px 0 0;font-size:11.5px;color:rgba(255,255,255,.78);min-height:1.2em
+  margin:0;font-size:11.5px;color:#5b6b85;min-height:1.2em
 }
-#rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
+#rizq-showroom-models .rizq-styles-reshuffle{margin-top:0}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
   background:linear-gradient(135deg,#1B3A6B,#0f2347);
   border-color:rgba(201,168,76,.5)
@@ -2745,9 +2744,9 @@ html body #rizq-showroom-models .rizq-srm-tick{
   grid-template-rows:1fr 1fr;
   gap:3px;
   height:168px;
-  background:#0f2347;
+  background:linear-gradient(135deg,#eef2f8,#f4f7fb);
   overflow:hidden;
-  border-bottom:1px solid rgba(201,168,76,.28);
+  border-bottom:1px solid rgba(27,58,107,.08);
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
@@ -3387,7 +3386,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in">
       <p class="section-tag">Style Ideas</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة</p>      <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
+      <p class="section-desc" data-t="sty-desc">أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة</p>
+    </div>
+    <div class="rizq-styles-toolbar">
+      <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
       <p class="rizq-styles-tick" id="rizq-styles-tick" aria-live="polite"></p>
     </div>
     <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجال أو نساء أو أولاد أو بنات">
@@ -3490,6 +3492,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <p class="section-tag">Showroom Models</p>
       <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">نماذج المعارض — <span>اقتراحات رزق</span></h2>
       <p class="section-desc" data-t="srm-desc">سيارات، أثاث، إلكترونيات ومعدات — نماذج مقترحة تتجدد كل 3 دقائق، مع رابط لدليل المعارض</p>
+    </div>
+    <div class="rizq-styles-toolbar">
       <button type="button" class="rizq-styles-reshuffle" id="rizq-srm-reshuffle" onclick="buildShowroomModels(true)" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
       <p class="rizq-srm-tick" id="rizq-srm-tick" aria-live="polite"></p>
     </div>
@@ -5299,8 +5303,17 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+/* بلا كحلي داخل مربعات بطاقات الأنماط/النماذج — ترويسة القسم وحدها كـ«كل الإعلانات» */
+function _styCardTileBg(bg){
+  var s = String(bg || '');
+  if(!s) return 'linear-gradient(145deg,#e8eef8,#f5f8fc)';
+  if(/#0[fF]2347|#0[Dd]1[Bb]2[Aa]|#162235|#1[Bb]3[Aa]6[Bb]|#234d8f|#0a1628|#122a4a|#122040|#0e1e38|#112244|#3d1a2c|#6b2d4a|#3a2200|#7a4a00/i.test(s)){
+    return 'linear-gradient(145deg,#e8eef8,#f5f8fc)';
+  }
+  return s;
+}
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
-  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var bg = _styCardTileBg((ad && ad.bg) || fallbackBg || '');
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
@@ -5315,7 +5328,7 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
-  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var bg = _styCardTileBg(fallbackBg || '');
   var linked = adId != null && adId !== '';
   var openAttr = linked
     ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
@@ -5381,7 +5394,7 @@ function rizqFeedStyleSeed(item){
     images: images,
     gender: gender,
     href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
-    bg: item.bg || 'linear-gradient(145deg,#1B3A6B,#0f2347)',
+    bg: item.bg || 'linear-gradient(145deg,#e8eef8,#f5f8fc)',
     fromView: true,
     ts: Date.now()
   };
