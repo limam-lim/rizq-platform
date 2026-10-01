@@ -1,9 +1,9 @@
-# Rizq platform promo (Hero loop starter)
+# Rizq platform promo (Hero loop)
 
-Professional promotional cut (~27s) with branded stills + live product/dashboard shots and bilingual slogans.
+Promotional cut with branded title cards + live landing and subscriber dashboards (store / office / corp-showroom / individual).
 
-- `rizq-platform-promo.mp4` — master (higher bitrate)
-- `rizq-platform-promo-light.mp4` — Hero default (web-optimized)
+- `rizq-platform-promo.mp4` — master (1920×1080)
+- `rizq-platform-promo-light.mp4` — Hero default (1280×720, web-optimized)
 
 Playback order (`rizq_video_ads.js`):
 1. Platform promo
