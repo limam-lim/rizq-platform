@@ -3487,28 +3487,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     </div>
 
-    <!-- أنواع المعارض -->
-    <div class="fade-in" style="text-align:center;margin-bottom:28px">
-      <p style="font-size:13px;color:rgba(27,58,107,.55);margin-bottom:14px" data-t="vsh-types-label">مناسب لجميع أنواع المعارض</p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
-        <!-- إصلاح جوهري: هذه الوسوم كانت (1) نصاً عربياً ثابتاً لا يترجَم أبداً
-             للفرنسية، و(2) عناصر ميتة بلا رابط حقيقي. أول إصلاح ربطها بنتائج
-             تصفّح الإعلانات (rizq_browse.html) — لكن هذا القسم عنوانه "أنواع
-             المعارض"، والمستخدم (Limam) صحّح لاحقاً أن الضغط على "مجوهرات"
-             مثلاً يجب أن يأخذه لدليل المعارض/المحلات الحقيقية التي تبيع هذه
-             الفئة، وليس لقائمة إعلانات عامة. الآن كل وسم يقود إلى
-             rizq_showroom_directory.html?cat=... (دليل جديد يجلب الحسابات
-             التجارية الموافَق عليها من GET /api/accounts/public مفلترة حسب
-             حقل category الذي يُصرّح به التاجر عند التسجيل). -->
-        <a href="rizq_showroom_directory.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="🚗 Voitures" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🚗 سيارات</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="📱 Électronique" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">📱 إلكترونيات</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A3%D8%AB%D8%A7%D8%AB" class="showroom-type-tag" data-t-fr="🛋️ Meubles & ameublement" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🛋️ أثاث ومفروشات</a>
-        <a href="rizq_showroom_directory.html?cat=%D9%85%D8%B9%D8%AF%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="⚙️ Équipements & machines" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">⚙️ معدات ومكائن</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A8%D9%86%D8%A7%D8%A1" class="showroom-type-tag" data-t-fr="🏗️ Matériaux de construction" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🏗️ مواد بناء</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%B0%D9%87%D8%A8" class="showroom-type-tag" data-t-fr="💎 Bijoux" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">💎 مجوهرات</a>
-      </div>
-    </div>
-
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
@@ -7178,7 +7156,6 @@ const LANG = {
     'vsh-card1-title': 'كتالوج كامل بالتفاصيل', 'vsh-card1-desc': 'صور، موديل، سنة، وسعر — المشتري يطّلع ويقارن قبل أن يراسلَك',
     'vsh-card2-title': 'تواصل آمن عبر رزق', 'vsh-card2-desc': 'الرسائل تصلك في لوحة معرضك — أنت تختار من تتصل به، ورقمُك يبقى محمياً',
     'vsh-card3-title': 'شارة معرض موثّق', 'vsh-card3-desc': 'شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين',
-    'vsh-types-label': 'مناسب لجميع أنواع المعارض',
     's-prices-title': 'نبضة السوق — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">أسعار اليوم بوضوح</span>',
     's-prices-desc': 'تابع أسعار المواد والمحروقات والعملات في موريتانيا — مرجع يومي يساعدك على قرار أوضح',
     'prices-live': 'مباشر · آخر تحديث:',
@@ -7296,7 +7273,6 @@ const LANG = {
     'vsh-card1-title': 'Catalogue complet et détaillé', 'vsh-card1-desc': 'Photos, modèle, année et prix — l\'acheteur consulte et compare avant de vous écrire',
     'vsh-card2-title': 'Contact sécurisé via Rizq', 'vsh-card2-desc': 'Les messages arrivent sur votre tableau de bord — vous choisissez qui rappeler, votre numéro reste protégé',
     'vsh-card3-title': 'Badge Showroom vérifié', 'vsh-card3-desc': 'Un badge officiel sur Rizq visible sur vos offres pour renforcer la confiance',
-    'vsh-types-label': 'Adapté à tous types de showrooms',
     's-prices-title': 'Le Pouls du Marché — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">les prix du jour, clairement</span>',
     's-prices-desc': 'Suivez denrées, carburants et devises en Mauritanie — une référence quotidienne pour décider plus clairement',
     'prices-live': 'En direct · Dernière mise à jour :',
