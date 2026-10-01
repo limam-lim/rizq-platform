@@ -3,8 +3,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
 :root{
-  --rizq-header-navy:#0f172a;
-  --rizq-header-h:78px;
+  --rizq-header-navy:#0a1220;
+  --rizq-header-h:86px;
   --rizq-almazdi:#C9A84C;
   --rizq-almazdi-bright:#E8C96A;
 }
@@ -155,7 +155,7 @@ html,body{cursor:auto !important}
   width:0 !important;height:0 !important;
 }
 
-html.rizq-app-nav{--rizq-header-h:78px}
+html.rizq-app-nav{--rizq-header-h:86px}
 
 /* Keep position:fixed headers/menus viewport-relative (RTL + overflow-x:hidden
    otherwise clips حسابي / اللغة on the left and throws the المزيد menu off-screen). */
@@ -441,20 +441,20 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav,
   html.rizq-app-nav #rizq-desk-nav{
     display:grid !important;
-    /* toolbar | flex spacer | links | flex spacer | logo — equal gaps AR/FR */
-    grid-template-columns:auto minmax(12px,1fr) auto minmax(12px,1fr) auto;
+    /* toolbar | spacer | dock | spacer | logo */
+    grid-template-columns:auto minmax(10px,1fr) auto minmax(10px,1fr) auto;
     align-items:center !important;
     direction:ltr !important;
     z-index:10000 !important;
-    height:var(--rizq-header-h,78px) !important;
-    max-height:var(--rizq-header-h,78px) !important;
+    height:var(--rizq-header-h,86px) !important;
+    max-height:var(--rizq-header-h,86px) !important;
     position:fixed !important;
     bottom:auto !important;
     inset:0 0 auto 0 !important;
     pointer-events:auto !important;
     background:
-      linear-gradient(180deg,rgba(232,201,106,.08),transparent 42%),
-      linear-gradient(180deg,#0b1220 0%,#0f172a 55%,#0c1524 100%) !important;
+      radial-gradient(120% 140% at 50% -40%,rgba(232,201,106,.16),transparent 55%),
+      linear-gradient(180deg,#0d1830 0%,#0a1220 48%,#070e1a 100%) !important;
     overflow:visible !important;
     box-sizing:border-box !important;
     width:auto !important;
@@ -463,19 +463,19 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     right:0 !important;
     top:0 !important;
     padding-block:0 !important;
-    padding-inline:max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) !important;
-    border-bottom:1px solid rgba(201,168,76,.22) !important;
-    box-shadow:0 10px 28px rgba(3,8,18,.35),inset 0 1px 0 rgba(232,201,106,.14) !important;
+    padding-inline:max(28px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) !important;
+    border-bottom:1px solid rgba(201,168,76,.28) !important;
+    box-shadow:0 16px 40px rgba(2,6,14,.45),inset 0 1px 0 rgba(255,255,255,.08) !important;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
   html.rizq-app-nav #nav.scrolled,
   html.rizq-app-nav #rizq-desk-nav.scrolled{
     background:
-      linear-gradient(180deg,rgba(232,201,106,.1),transparent 40%),
-      linear-gradient(180deg,#07101c 0%,#0d1626 60%,#0a1320 100%) !important;
-    border-bottom:1px solid rgba(201,168,76,.28) !important;
-    box-shadow:0 14px 36px rgba(3,8,18,.45),inset 0 1px 0 rgba(232,201,106,.16) !important;
+      radial-gradient(120% 140% at 50% -40%,rgba(232,201,106,.12),transparent 50%),
+      linear-gradient(180deg,#0a1426 0%,#070e1a 55%,#050a14 100%) !important;
+    border-bottom:1px solid rgba(201,168,76,.34) !important;
+    box-shadow:0 18px 44px rgba(2,6,14,.55),inset 0 1px 0 rgba(255,255,255,.07) !important;
   }
   html.rizq-app-nav #nav .nav-hamburger,
   html.rizq-app-nav #rizq-desk-nav .nav-hamburger{display:none !important}
@@ -491,22 +491,22 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    /* نموذج 3: صف أفقي داخل الشبكة — بلا absolute حتى لا يتراكب مع الشعار/الأدوات */
-    grid-column:2 / 5;
-    justify-self:stretch;
+    /* رصيف تنقّل مركزي فاخر */
+    grid-column:3;
+    justify-self:center;
     justify-content:center;
     overflow-x:auto !important;
     overflow-y:hidden !important;
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center;
-    gap:18px;
+    gap:2px;
     list-style:none;
     direction:inherit;
     margin:0;
-    padding:0 4px;
-    width:100%;
-    max-width:100%;
+    padding:7px 10px !important;
+    width:auto;
+    max-width:min(720px,52vw);
     min-width:0;
     position:relative !important;
     left:auto !important;
@@ -517,6 +517,17 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     pointer-events:auto;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
+    border-radius:999px !important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
+      rgba(4,10,20,.55) !important;
+    border:1px solid rgba(201,168,76,.28) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.1),
+      0 10px 28px rgba(0,0,0,.28),
+      0 0 0 1px rgba(0,0,0,.2) !important;
+    backdrop-filter:blur(14px) saturate(1.15);
+    -webkit-backdrop-filter:blur(14px) saturate(1.15);
   }
   html.rizq-app-nav #nav > .nav-center::-webkit-scrollbar,
   html.rizq-app-nav #rizq-desk-nav > .nav-center::-webkit-scrollbar{display:none !important}
@@ -547,12 +558,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo-mark,
   html.rizq-app-nav #rizq-desk-nav .logo-mark-img{
-    width:42px !important;
-    height:42px !important;
+    width:48px !important;
+    height:48px !important;
     border:none !important;
-    box-shadow:0 0 0 1px rgba(201,168,76,.45),0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12) !important;
-    background:linear-gradient(160deg,#12203a,#0a1324) !important;
-    border-radius:12px !important;
+    box-shadow:
+      0 0 0 1.5px rgba(240,215,138,.55),
+      0 0 22px rgba(201,168,76,.28),
+      0 8px 18px rgba(0,0,0,.35),
+      inset 0 1px 0 rgba(255,255,255,.18) !important;
+    background:linear-gradient(160deg,#1a2d4d,#0a1324) !important;
+    border-radius:14px !important;
     padding:0 !important;
     overflow:hidden !important;
     object-fit:contain !important;
@@ -569,10 +584,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .logo-ar{
     font-family:Georgia,'Times New Roman',serif !important;
     font-weight:700 !important;
-    font-size:23px !important;
-    color:#F0D78A !important;
+    font-size:26px !important;
+    color:#F5E0A0 !important;
     line-height:1 !important;
-    text-shadow:0 0 20px rgba(201,168,76,.45) !important;
+    text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35) !important;
     white-space:nowrap;
     direction:rtl !important;
     unicode-bidi:isolate !important;
@@ -2094,100 +2109,128 @@ html.rizq-app-nav li:has(>#rizq-desk-assistant),
 html.rizq-app-nav #nav,
 html.rizq-app-nav #rizq-desk-nav,
 html.rizq-app-nav #rizq-app-header{
-  background:linear-gradient(180deg,#0c1526 0%,#0f172a 55%,#0d1524 100%) !important;
+  background:
+    radial-gradient(120% 140% at 50% -40%,rgba(232,201,106,.16),transparent 55%),
+    linear-gradient(180deg,#0d1830 0%,#0a1220 48%,#070e1a 100%) !important;
   border-bottom:1px solid rgba(201,168,76,.28) !important;
-  box-shadow:0 10px 28px rgba(0,0,0,.32) !important;
+  box-shadow:0 16px 40px rgba(2,6,14,.45),inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+html.rizq-app-nav #nav::before,
+html.rizq-app-nav #rizq-desk-nav::before,
+html.rizq-app-nav #rizq-app-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.22;
+  background-image:
+    linear-gradient(135deg,rgba(201,168,76,.07) 1px,transparent 1px),
+    linear-gradient(45deg,rgba(201,168,76,.05) 1px,transparent 1px);
+  background-size:18px 18px;
+  z-index:0;
 }
 html.rizq-app-nav #nav::after,
 html.rizq-app-nav #rizq-desk-nav::after,
 html.rizq-app-nav #rizq-app-header::after{
   content:"";
   position:absolute;
-  left:12%;
-  right:12%;
+  left:8%;
+  right:8%;
   bottom:0;
-  height:1px;
+  height:1.5px;
   pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(201,168,76,.55),transparent);
+  background:linear-gradient(90deg,transparent,rgba(240,215,138,.7),transparent);
   z-index:6;
 }
+html.rizq-app-nav #nav > *,
+html.rizq-app-nav #rizq-desk-nav > *{position:relative;z-index:1}
 
-/* روابط التنقل — أيقونة في بئر ناعم (بدون إطار ذهبي رفيع مزعج) */
+/* روابط التنقل — آبار دائرية داخل الرصيف */
 html.rizq-app-nav #nav .nav-center a,
 html.rizq-app-nav #nav .nav-center .nav-link-btn,
 html.rizq-app-nav #rizq-desk-nav .nav-center a,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item{
   position:relative !important;
-  border-radius:16px !important;
+  border-radius:18px !important;
   border:none !important;
   background:transparent !important;
   box-shadow:none !important;
-  transition:transform .18s ease, background .2s ease, color .18s ease !important;
+  padding:6px 10px 8px !important;
+  min-width:64px !important;
+  gap:5px !important;
+  transition:transform .22s cubic-bezier(.23,1,.32,1), background .2s ease, color .18s ease !important;
 }
 html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
 html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-ico{
-  width:40px !important;
-  height:40px !important;
-  margin:0 auto 4px !important;
+  width:36px !important;
+  height:36px !important;
+  margin:0 auto 2px !important;
   display:grid !important;
   place-items:center !important;
-  border-radius:14px !important;
+  border-radius:50% !important;
   background:
-    linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),
-    rgba(7,16,30,.45) !important;
-  border:1px solid rgba(255,255,255,.1) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 4px 12px rgba(0,0,0,.22) !important;
-  font-size:20px !important;
+    radial-gradient(circle at 35% 28%,rgba(255,255,255,.16),transparent 52%),
+    linear-gradient(160deg,rgba(255,255,255,.08),rgba(7,16,30,.55)) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 4px 10px rgba(0,0,0,.25) !important;
+  font-size:17px !important;
   line-height:1 !important;
   filter:none !important;
-  transition:background .2s, border-color .2s, box-shadow .2s, transform .18s !important;
+  transition:background .22s, border-color .22s, box-shadow .22s, transform .22s !important;
 }
 html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
 html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-lbl{
-  color:rgba(255,255,255,.92) !important;
+  color:rgba(255,255,255,.88) !important;
   font-weight:700 !important;
-  letter-spacing:.2px;
+  font-size:11.5px !important;
+  letter-spacing:.15px;
 }
 html.rizq-app-nav #nav .nav-center a:hover,
 html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
 html.rizq-app-nav #rizq-desk-nav .nav-center a:hover,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn:hover,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item:hover{
-  background:rgba(255,255,255,.05) !important;
-  transform:translateY(-1px);
+  background:rgba(255,255,255,.04) !important;
+  transform:translateY(-2px);
 }
 html.rizq-app-nav #nav .nav-center a:hover .rizq-hdr-ico,
 html.rizq-app-nav #nav .nav-center .nav-link-btn:hover .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center a:hover .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn:hover .rizq-hdr-ico,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item:hover .rizq-hdr-ico{
-  background:rgba(201,168,76,.14) !important;
-  border-color:rgba(201,168,76,.35) !important;
+  border-color:rgba(232,201,106,.45) !important;
+  box-shadow:0 6px 16px rgba(201,168,76,.22), inset 0 1px 0 rgba(255,255,255,.16) !important;
+  transform:scale(1.06);
+}
+html.rizq-app-nav #nav .nav-center a:hover .rizq-hdr-lbl,
+html.rizq-app-nav #nav .nav-center .nav-link-btn:hover .rizq-hdr-lbl,
+html.rizq-app-nav #rizq-desk-nav .nav-center a:hover .rizq-hdr-lbl,
+html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn:hover .rizq-hdr-lbl{
+  color:#F0D78A !important;
 }
 html.rizq-app-nav #nav .nav-center a.is-active,
 html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active,
 html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item.is-active{
-  background:
-    linear-gradient(160deg,rgba(232,201,106,.16),rgba(201,168,76,.06)) !important;
-  color:var(--rizq-almazdi-bright,#E8C96A) !important;
-  border:1px solid rgba(201,168,76,.55) !important;
-  box-shadow:0 0 0 1px rgba(201,168,76,.12),0 8px 20px rgba(201,168,76,.18),inset 0 1px 0 rgba(255,255,255,.1) !important;
+  background:rgba(201,168,76,.1) !important;
+  color:#F0D78A !important;
+  border:none !important;
+  box-shadow:none !important;
 }
 html.rizq-app-nav #nav .nav-center a.is-active .rizq-hdr-lbl,
 html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active .rizq-hdr-lbl,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item.is-active .rizq-hdr-lbl{
-  color:#F0D78A !important;
+  color:#F5E0A0 !important;
   font-weight:800 !important;
 }
 html.rizq-app-nav #nav .nav-center a.is-active .rizq-hdr-ico,
@@ -2195,9 +2238,11 @@ html.rizq-app-nav #nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center a.is-active .rizq-hdr-ico,
 html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active .rizq-hdr-ico,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item.is-active .rizq-hdr-ico{
-  border-color:rgba(232,201,106,.65) !important;
-  background:rgba(201,168,76,.22) !important;
-  box-shadow:0 6px 18px rgba(201,168,76,.28), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  border-color:rgba(240,215,138,.75) !important;
+  background:
+    radial-gradient(circle at 35% 28%,rgba(255,255,255,.22),transparent 50%),
+    linear-gradient(160deg,rgba(240,215,138,.35),rgba(201,168,76,.18)) !important;
+  box-shadow:0 0 0 3px rgba(201,168,76,.14),0 8px 20px rgba(201,168,76,.35), inset 0 1px 0 rgba(255,255,255,.2) !important;
   filter:none !important;
 }
 html.rizq-app-nav #nav .nav-center a.is-active::after,
@@ -2207,13 +2252,14 @@ html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn.is-active::after,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-item.is-active::after{
   content:"" !important;
   position:absolute !important;
-  left:18% !important;
-  right:18% !important;
+  left:28% !important;
+  right:28% !important;
   bottom:3px !important;
   height:2px !important;
-  border-radius:2px !important;
-  background:linear-gradient(90deg,transparent,#C9A84C,#F0D78A,#C9A84C,transparent) !important;
+  border-radius:999px !important;
+  background:linear-gradient(90deg,transparent,#C9A84C,#F5E0A0,#C9A84C,transparent) !important;
   display:block !important;
+  box-shadow:0 0 10px rgba(201,168,76,.45);
 }
 
 /* المزيد — نفس لغة الأزرار (بدون شريحة ذهبية ثقيلة) */
@@ -2278,7 +2324,20 @@ html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{
   opacity:1 !important;
 }
 
-/* أدوات الصف الأول — حبوب زجاجية ذهبية فاخرة */
+/* أدوات الصف الأول — صينية زجاجية موحّدة */
+html.rizq-app-nav #nav > .nav-start,
+html.rizq-app-nav #rizq-desk-nav > .nav-start{
+  gap:6px !important;
+  padding:6px 8px !important;
+  border-radius:999px !important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),
+    rgba(4,10,20,.45) !important;
+  border:1px solid rgba(201,168,76,.24) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.22) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
 html.rizq-app-nav #nav .nav-start .nav-account-btn,
 html.rizq-app-nav #nav .nav-start .nav-fav-btn,
 html.rizq-app-nav #nav .nav-start .btn-lang,
@@ -2289,12 +2348,22 @@ html.rizq-app-nav #rizq-app-header .rizq-hdr-account,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-fav,
 html.rizq-app-nav #rizq-app-header .rizq-hdr-back,
 html.rizq-app-nav #rizq-app-header #rizq-lang-btn{
-  border:1px solid rgba(201,168,76,.42) !important;
-  background:
-    linear-gradient(145deg,rgba(232,201,106,.14),transparent 55%),
-    rgba(255,255,255,.05) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 12px rgba(0,0,0,.18) !important;
-  color:#E8C96A !important;
+  border:1px solid transparent !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:#F0D78A !important;
+  padding:7px 12px !important;
+  border-radius:999px !important;
+}
+html.rizq-app-nav #nav .nav-start .nav-account-btn:hover,
+html.rizq-app-nav #nav .nav-start .nav-fav-btn:hover,
+html.rizq-app-nav #nav .nav-start .btn-lang:hover,
+html.rizq-app-nav #rizq-desk-nav .nav-start .nav-account-btn:hover,
+html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn:hover,
+html.rizq-app-nav #rizq-desk-nav .nav-start .btn-lang:hover{
+  background:rgba(201,168,76,.14) !important;
+  border-color:rgba(201,168,76,.35) !important;
+  color:#fff !important;
 }
 html.rizq-app-nav #nav .nav-start .btn-lang,
 html.rizq-app-nav #rizq-desk-nav .nav-start .btn-lang,
@@ -2311,8 +2380,19 @@ html.rizq-app-nav #rizq-app-header .rizq-hdr-fav{
 html.rizq-app-nav #nav > .logo .logo-ar,
 html.rizq-app-nav #rizq-desk-nav > .logo .logo-ar,
 html.rizq-app-nav #rizq-app-header .logo-ar{
-  color:#F0D78A !important;
-  text-shadow:0 0 20px rgba(201,168,76,.45) !important;
+  color:#F5E0A0 !important;
+  text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35) !important;
+}
+html.rizq-app-nav #nav > .logo .logo-sub,
+html.rizq-app-nav #rizq-desk-nav > .logo .logo-sub{
+  color:rgba(232,201,106,.82) !important;
+  letter-spacing:2.2px !important;
+  font-size:8.5px !important;
+}
+html.rizq-app-nav #nav > .logo:hover .logo-mark-img,
+html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
+  transform:translateY(-1px) scale(1.03);
+  transition:transform .25s ease;
 }
 
 /* هاتف: نفس شريط الرئيسية — صف موحّد، المزيد داخل المجموعة بلا dock */
