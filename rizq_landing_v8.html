@@ -5322,8 +5322,19 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+function _stySoftBg(bg){
+  var s = String(bg || '');
+  if(!s) return 'linear-gradient(145deg,#eef6ff,#f7f0e0)';
+  /* خلفيات كحلية داكنة → تدرج فاتح وإيجابي داخل بطاقات الأنماط/النماذج */
+  if(/#0[fF]2347|#0D1B2A|#162235|#1[Bb]3[Aa]6[Bb]|#234d8f/i.test(s)){
+    return 'linear-gradient(145deg,#eef6ff,#fff4d6)';
+  }
+  if(/#3d1a2c|#6b2d4a/i.test(s)) return 'linear-gradient(145deg,#fff0f5,#ffe4ee)';
+  if(/#3a2200|#7a4a00/i.test(s)) return 'linear-gradient(145deg,#fff8e8,#ffe9b8)';
+  return s;
+}
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
-  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var bg = _stySoftBg((ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#eef6ff,#fff4d6)');
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
@@ -5338,7 +5349,7 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
-  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+  var bg = _stySoftBg(fallbackBg || 'linear-gradient(145deg,#eef6ff,#fff4d6)');
   var linked = adId != null && adId !== '';
   var openAttr = linked
     ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
