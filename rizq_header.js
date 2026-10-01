@@ -163,8 +163,8 @@
     }
     return '' +
       item('rizq_store.html', 'stores', '🏪', 'المحلات', 'Boutiques') +
-      item('rizq_office.html', 'offices', '💼', 'المكاتب', 'Bureaux') +
       item('rizq_showroom.html', 'showrooms', '🏬', 'المعارض', 'Showrooms') +
+      item('rizq_office.html', 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
       item('rizq_tenders.html', 'tenders', '📋', 'المناقصات', 'Appels d\'offres') +
       item('rizq_investments.html', 'investments', '📈', 'الاستثمارات', 'Investissements') +

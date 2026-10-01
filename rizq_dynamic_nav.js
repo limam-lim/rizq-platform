@@ -6,10 +6,11 @@
   'use strict';
 
   var MODULES = [
-    /* الترتيب = توالي أقسام الصفحة الرئيسية من الأعلى للأسفل */
+    /* الترتيب = توالي أقسام الصفحة الرئيسية من الأعلى للأسفل
+       المحلات ثم المعارض (متقاربان تجارياً) ثم المكاتب */
     { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#virtual-stores' },
-    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 4, landingHref: '#virtual-offices' },
-    { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 5, landingHref: '#virtual-showrooms' },
+    { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#virtual-showrooms' },
+    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5, landingHref: '#virtual-offices' },
     { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 6, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
     { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 7, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
   ];

@@ -104,7 +104,7 @@ document.documentElement.classList.add('rizq-app-nav');
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
-#virtual-stores,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
+#virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
 #listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
 *,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif!important;-webkit-font-smoothing:antialiased}
@@ -1876,8 +1876,8 @@ main, .page-content.active, .main-content, .results-area,
 .btn-outline{background:transparent;color:var(--text-main);padding:13px 22px;border-radius:12px;font-weight:700;font-size:13.5px;border:1.5px solid #e2e8f5;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s}
 .btn-outline:hover{border-color:rgba(201,168,76,.4);background:var(--bg-section)}
 /* View-all CTA on light backgrounds: make border and text clearly visible */
-.listings-section .btn-outline,#virtual-stores .btn-outline,#virtual-offices .btn-outline,#virtual-showrooms .btn-outline,.why-section .btn-outline{border-color:var(--royal);color:var(--royal);font-size:14px;padding:14px 28px;box-shadow:0 2px 12px rgba(13,27,42,.1)}
-.listings-section .btn-outline:hover,#virtual-stores .btn-outline:hover,#virtual-offices .btn-outline:hover,.why-section .btn-outline:hover{background:var(--royal);color:#fff;border-color:var(--royal);box-shadow:0 6px 20px rgba(13,27,42,.2)}
+.listings-section .btn-outline,#virtual-stores .btn-outline,#virtual-showrooms .btn-outline,#virtual-offices .btn-outline,.why-section .btn-outline{border-color:var(--royal);color:var(--royal);font-size:14px;padding:14px 28px;box-shadow:0 2px 12px rgba(13,27,42,.1)}
+.listings-section .btn-outline:hover,#virtual-stores .btn-outline:hover,#virtual-showrooms .btn-outline:hover,#virtual-offices .btn-outline:hover,.why-section .btn-outline:hover{background:var(--royal);color:#fff;border-color:var(--royal);box-shadow:0 6px 20px rgba(13,27,42,.2)}
 
 /* Why section */
 .why-section{padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden}
@@ -2468,7 +2468,7 @@ html[lang="fr"] .hero-pill-sep{display:none}
 }
 
 /* Restore every landing block that fade-in had left invisible */
-#categories,#listings,#virtual-stores,#rizq-styles,#virtual-offices,#virtual-showrooms,#virtual-tenders,#virtual-investments,
+#categories,#listings,#virtual-stores,#rizq-styles,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
@@ -2767,7 +2767,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_terms_gate.js?v=23.0"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=23.1"></script>
+<script src="rizq_dynamic_nav.js?v=23.2"></script>
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
@@ -2871,8 +2871,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🏠</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
     <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="4"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="5"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="8">
@@ -2909,8 +2909,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع">
   <a href="#listings" data-jump="#listings">الإعلانات</a>
   <a href="#virtual-stores" data-jump="#virtual-stores">المحلات</a>
-  <a href="#virtual-offices" data-jump="#virtual-offices">المكاتب</a>
   <a href="#virtual-showrooms" data-jump="#virtual-showrooms">المعارض</a>
+  <a href="#virtual-offices" data-jump="#virtual-offices">المكاتب</a>
   <a href="#virtual-tenders" data-jump="#virtual-tenders">المناقصات</a>
   <a href="#virtual-investments" data-jump="#virtual-investments">الاستثمارات</a>
   <a href="#pricing" data-jump="#pricing">الباقات</a>
@@ -3008,18 +3008,18 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
               <span class="hero-biz-hint" data-t="hbiz-stores-hint">تصفّح واشترِ</span>
             </span>
           </a>
-          <a href="#virtual-offices" class="hero-biz-btn hero-biz-royal">
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
-              <span class="hero-biz-hint" data-t="hbiz-offices-hint">خدمات موثوقة</span>
-            </span>
-          </a>
           <a href="#virtual-showrooms" class="hero-biz-btn hero-biz-diamond">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-showrooms">معارض الشو روم</span>
               <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عروض راقية</span>
+            </span>
+          </a>
+          <a href="#virtual-offices" class="hero-biz-btn hero-biz-royal">
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-offices">المكاتب والخدمات</span>
+              <span class="hero-biz-hint" data-t="hbiz-offices-hint">خدمات موثوقة</span>
             </span>
           </a>
           <a href="#virtual-tenders" class="hero-biz-btn hero-biz-tender">
@@ -3272,6 +3272,89 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
+<!-- ══ SECTION: VIRTUAL SHOWROOMS / المعارض ══ -->
+<section id="virtual-showrooms" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
+
+  <!-- خلفية زخرفية -->
+  <div style="position:absolute;top:-60px;left:-60px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-80px;right:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
+
+  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
+
+    <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
+      <p class="section-tag" style="color:var(--gold)">Rizq Showrooms</p>
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vsh-title">
+        معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون
+      </h2>
+      <p class="section-desc" data-t="vsh-desc">
+        سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.
+      </p>
+    </div>
+
+    <!-- بطاقات الميزات -->
+    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 52px">
+
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
+           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
+           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🏬</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card1-title">كتالوج كامل بالتفاصيل</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card1-desc">صور، موديل، سنة، وسعر — المشتري يطّلع ويقارن قبل أن يراسلَك</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
+           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
+           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">💬</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card2-title">تواصل آمن عبر رزق</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card2-desc">الرسائل تصلك في لوحة معرضك — أنت تختار من تتصل به، ورقمُك يبقى محمياً</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
+           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
+           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
+        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">✅</div></div>
+        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card3-title">شارة معرض موثّق</div>
+        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card3-desc">شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين</div>
+      </div>
+
+    </div>
+
+    <!-- أنواع المعارض -->
+    <div class="fade-in" style="text-align:center;margin-bottom:28px">
+      <p style="font-size:13px;color:rgba(27,58,107,.55);margin-bottom:14px" data-t="vsh-types-label">مناسب لجميع أنواع المعارض</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <!-- إصلاح جوهري: هذه الوسوم كانت (1) نصاً عربياً ثابتاً لا يترجَم أبداً
+             للفرنسية، و(2) عناصر ميتة بلا رابط حقيقي. أول إصلاح ربطها بنتائج
+             تصفّح الإعلانات (rizq_browse.html) — لكن هذا القسم عنوانه "أنواع
+             المعارض"، والمستخدم (Limam) صحّح لاحقاً أن الضغط على "مجوهرات"
+             مثلاً يجب أن يأخذه لدليل المعارض/المحلات الحقيقية التي تبيع هذه
+             الفئة، وليس لقائمة إعلانات عامة. الآن كل وسم يقود إلى
+             rizq_showroom_directory.html?cat=... (دليل جديد يجلب الحسابات
+             التجارية الموافَق عليها من GET /api/accounts/public مفلترة حسب
+             حقل category الذي يُصرّح به التاجر عند التسجيل). -->
+        <a href="rizq_showroom_directory.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="🚗 Voitures" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🚗 سيارات</a>
+        <a href="rizq_showroom_directory.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="📱 Électronique" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">📱 إلكترونيات</a>
+        <a href="rizq_showroom_directory.html?cat=%D8%A3%D8%AB%D8%A7%D8%AB" class="showroom-type-tag" data-t-fr="🛋️ Meubles & ameublement" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🛋️ أثاث ومفروشات</a>
+        <a href="rizq_showroom_directory.html?cat=%D9%85%D8%B9%D8%AF%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="⚙️ Équipements & machines" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">⚙️ معدات ومكائن</a>
+        <a href="rizq_showroom_directory.html?cat=%D8%A8%D9%86%D8%A7%D8%A1" class="showroom-type-tag" data-t-fr="🏗️ Matériaux de construction" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🏗️ مواد بناء</a>
+        <a href="rizq_showroom_directory.html?cat=%D8%B0%D9%87%D8%A8" class="showroom-type-tag" data-t-fr="💎 Bijoux" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">💎 مجوهرات</a>
+      </div>
+    </div>
+
+    <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
+    <div class="fade-in rzq-disc-wrap">
+      <div id="rzq-disc-corp"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
+        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
+           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
+        <a href="rizq_showroom.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- ══ المكاتب الافتراضية ══ -->
 <section id="virtual-offices" style="padding:48px 20px;background:var(--bg-section);position:relative;overflow:hidden">
 
@@ -3377,89 +3460,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ SECTION: VIRTUAL SHOWROOMS / المعارض ══ -->
-<section id="virtual-showrooms" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
-
-  <!-- خلفية زخرفية -->
-  <div style="position:absolute;top:-60px;left:-60px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:-80px;right:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
-
-  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
-
-    <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
-      <p class="section-tag" style="color:var(--gold)">Rizq Showrooms</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vsh-title">
-        معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون
-      </h2>
-      <p class="section-desc" data-t="vsh-desc">
-        سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.
-      </p>
-    </div>
-
-    <!-- بطاقات الميزات -->
-    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 52px">
-
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🏬</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card1-title">كتالوج كامل بالتفاصيل</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card1-desc">صور، موديل، سنة، وسعر — المشتري يطّلع ويقارن قبل أن يراسلَك</div>
-      </div>
-
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">💬</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card2-title">تواصل آمن عبر رزق</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card2-desc">الرسائل تصلك في لوحة معرضك — أنت تختار من تتصل به، ورقمُك يبقى محمياً</div>
-      </div>
-
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">✅</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card3-title">شارة معرض موثّق</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card3-desc">شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين</div>
-      </div>
-
-    </div>
-
-    <!-- أنواع المعارض -->
-    <div class="fade-in" style="text-align:center;margin-bottom:28px">
-      <p style="font-size:13px;color:rgba(27,58,107,.55);margin-bottom:14px" data-t="vsh-types-label">مناسب لجميع أنواع المعارض</p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
-        <!-- إصلاح جوهري: هذه الوسوم كانت (1) نصاً عربياً ثابتاً لا يترجَم أبداً
-             للفرنسية، و(2) عناصر ميتة بلا رابط حقيقي. أول إصلاح ربطها بنتائج
-             تصفّح الإعلانات (rizq_browse.html) — لكن هذا القسم عنوانه "أنواع
-             المعارض"، والمستخدم (Limam) صحّح لاحقاً أن الضغط على "مجوهرات"
-             مثلاً يجب أن يأخذه لدليل المعارض/المحلات الحقيقية التي تبيع هذه
-             الفئة، وليس لقائمة إعلانات عامة. الآن كل وسم يقود إلى
-             rizq_showroom_directory.html?cat=... (دليل جديد يجلب الحسابات
-             التجارية الموافَق عليها من GET /api/accounts/public مفلترة حسب
-             حقل category الذي يُصرّح به التاجر عند التسجيل). -->
-        <a href="rizq_showroom_directory.html?cat=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="🚗 Voitures" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🚗 سيارات</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="📱 Électronique" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">📱 إلكترونيات</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A3%D8%AB%D8%A7%D8%AB" class="showroom-type-tag" data-t-fr="🛋️ Meubles & ameublement" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🛋️ أثاث ومفروشات</a>
-        <a href="rizq_showroom_directory.html?cat=%D9%85%D8%B9%D8%AF%D8%A7%D8%AA" class="showroom-type-tag" data-t-fr="⚙️ Équipements & machines" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">⚙️ معدات ومكائن</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%A8%D9%86%D8%A7%D8%A1" class="showroom-type-tag" data-t-fr="🏗️ Matériaux de construction" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">🏗️ مواد بناء</a>
-        <a href="rizq_showroom_directory.html?cat=%D8%B0%D9%87%D8%A8" class="showroom-type-tag" data-t-fr="💎 Bijoux" style="background:rgba(201,168,76,.12);color:var(--gold-dk);border:1px solid rgba(201,168,76,.35);padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .25s" onmouseover="this.style.background='rgba(201,168,76,.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(201,168,76,.12)';this.style.transform='translateY(0)'">💎 مجوهرات</a>
-      </div>
-    </div>
-
-    <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
-    <div class="fade-in rzq-disc-wrap">
-      <div id="rzq-disc-corp"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
-           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
-        <a href="rizq_showroom.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
-      </div>
-    </div>
-
-  </div>
-</section>
-
 <!-- ══ SECTION: TENDERS ROOM / غرفة المناقصات — طلب صريح من Limam بتاريخ
      24/07/2026: بما أن غرفة المناقصات محجوبة بالكامل خلف باقة فعّالة (لا
      تصفّح مجاني إطلاقاً — راجع requireTenderRoomAccess في server.js)، لا
@@ -3469,6 +3469,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
      آمن تماماً (فقط رقم إجمالي + فئة آخر 3 مناقصات — بلا عناوين ولا وصف ولا
      ميزانية ولا اسم صاحبها) عبر GET /api/tenders/public-stats العام الجديد،
      مع حالة بديلة أنيقة إن كانت الغرفة فارغة أو الخادم غير متاح. ══ -->
+
 <section id="virtual-tenders" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
 
   <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);pointer-events:none"></div>
