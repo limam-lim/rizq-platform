@@ -34,6 +34,41 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   background-blend-mode:overlay;
 }
 
+/* أفكار الأنماط + نماذج المعارض: بدون خلفية معين/كحلي — مظهر أخف */
+html body #rizq-styles .section-header,
+html body #rizq-showroom-models .section-header{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  background-size:auto!important;
+  background-repeat:no-repeat!important;
+  background-blend-mode:normal!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+html body #rizq-styles .section-header .section-title,
+html body #rizq-styles .section-header h2,
+html body #rizq-showroom-models .section-header .section-title,
+html body #rizq-showroom-models .section-header h2{
+  color:var(--royal,#1B3A6B)!important;
+}
+html body #rizq-styles .section-header .section-desc,
+html body #rizq-styles .section-header > p:not(.section-tag):not(.rizq-styles-tick),
+html body #rizq-showroom-models .section-header .section-desc,
+html body #rizq-showroom-models .section-header > p:not(.section-tag):not(.rizq-srm-tick){
+  color:#3d4f6a!important;
+  text-shadow:none!important;
+}
+html body #rizq-styles .section-header .section-tag,
+html body #rizq-showroom-models .section-header .section-tag{
+  color:#8a6f2a!important;
+}
+html body #rizq-styles .rizq-styles-tick,
+html body #rizq-showroom-models .rizq-srm-tick{
+  color:#5b6b85!important;
+}
+
 html body footer,
 html body footer.rizq-footer{
   background:linear-gradient(180deg,#0D1B2A,#071020)!important;
