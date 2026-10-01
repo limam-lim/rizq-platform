@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.3"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=23.2"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.5"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=23.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -1033,23 +1033,8 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 
 /* ── QCAT PORTAL — legacy (مُستبدَل بـ #qcat-inline-panel) ── */
 
-/* ── AD DETAIL TOOLTIP (hover on carousel card) ── */
-.ad-card{width:220px;flex-shrink:0;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.18);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-.ad-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(15,35,65,.12),var(--s-gold)}
-.ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden}
-.ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
-.ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.ad-card-img span{display:flex;align-items:center;justify-content:center}
-.ad-card-img span svg{width:38px;height:38px;display:block;stroke-width:1.6}
-.ad-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px}
-.ad-card-body{padding:12px}
-.ad-cat{font-size:10px;color:var(--gold);font-weight:600;margin-bottom:5px;letter-spacing:.5px}
-.ad-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.ad-footer{display:flex;justify-content:space-between;align-items:center}
-.ad-price{font-size:14px;font-weight:900;color:var(--gold);font-family:'Segoe UI','Arial',sans-serif}
-.ad-loc{font-size:10px;color:rgba(255,255,255,.82)}
-/* Hover detail overlay on carousel card */
-.ad-card .ad-hover-detail{position:absolute;inset:0;background:rgba(13,27,42,.92);border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+/* Hover detail overlay on carousel card — card chrome is defined with hero-listings strip */
+.ad-card .ad-hover-detail{position:absolute;inset:0;background:linear-gradient(165deg,rgba(7,17,31,.96),rgba(13,27,42,.94));border-radius:20px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);z-index:4;border:1px solid rgba(201,168,76,.28)}
 .ad-card:hover .ad-hover-detail{opacity:1;pointer-events:auto}
 .ad-hover-detail .ahd-cat{font-size:9.5px;color:var(--gold);font-weight:700;margin-bottom:6px;letter-spacing:.8px}
 .ad-hover-detail .ahd-title{font-size:12.5px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.4}
@@ -1252,15 +1237,66 @@ html[dir="ltr"] #all-ads-title{
   .all-ads-scroll{padding:14px 12px 22px}
 }
 @media(max-width:1024px){.all-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.hero-listings-section{position:relative;z-index:2;width:100%;overflow:hidden;padding-bottom:60px}
-.listings-label{text-align:center;margin-bottom:20px;animation:fadeUp .8s .5s ease both}
-.listings-label>span{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--dark),var(--royal));border:1px solid rgba(201,168,76,.25);border-radius:24px;padding:8px 20px;font-size:12px;color:rgba(255,255,255,.9);letter-spacing:1.5px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.listings-label strong{color:var(--gold);font-weight:700;margin-right:6px}
+/* ── شريط مباشر فاخر — أحدث الإعلانات ── */
+.hero-listings-section{
+  position:relative;z-index:2;width:100%;overflow:hidden;
+  padding:8px 0 52px;
+}
+.hero-listings-section::before{
+  content:'';position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+  width:min(920px,92%);height:220px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,rgba(201,168,76,.14),rgba(27,58,107,.06) 42%,transparent 72%);
+  filter:blur(2px);
+}
+.listings-label{position:relative;z-index:2;text-align:center;margin-bottom:18px;animation:fadeUp .8s .5s ease both}
+.listings-label>span{
+  display:inline-flex;align-items:center;gap:10px;
+  background:
+    linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
+    linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.42);
+  border-radius:999px;padding:10px 22px 10px 16px;
+  font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
+  font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
+  box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.listings-label strong{
+  color:#F0D78A;font-weight:800;margin-inline-end:2px;
+  text-shadow:0 0 18px rgba(201,168,76,.35);
+}
+.live-pulse-dot{
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,#ff8a8a,#e11d48 55%,#9f1239);
+  box-shadow:0 0 0 0 rgba(225,29,72,.55);
+  animation:livePulse 1.7s ease-out infinite;
+}
+@keyframes livePulse{
+  0%{box-shadow:0 0 0 0 rgba(225,29,72,.55)}
+  70%{box-shadow:0 0 0 10px rgba(225,29,72,0)}
+  100%{box-shadow:0 0 0 0 rgba(225,29,72,0)}
+}
 
-.cards-track-wrap{position:relative}
-.cards-track-wrap{overflow:hidden;border-radius:18px}
+.cards-track-wrap{
+  position:relative;z-index:1;overflow:hidden;border-radius:22px;
+  padding:14px 0 8px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%),
+    linear-gradient(145deg,rgba(7,17,31,.55),rgba(13,27,42,.35));
+  border:1px solid rgba(201,168,76,.22);
+  box-shadow:0 18px 48px rgba(7,17,31,.28),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.cards-track-wrap::before,
+.cards-track-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:72px;z-index:3;pointer-events:none;
+}
+.cards-track-wrap::before{
+  left:0;background:linear-gradient(90deg,rgba(7,17,31,.92),transparent);
+}
+.cards-track-wrap::after{
+  right:0;background:linear-gradient(270deg,rgba(7,17,31,.92),transparent);
+}
 
-.cards-track{display:flex;gap:16px;width:max-content;animation:slide 40s linear infinite;direction:ltr}
+.cards-track{display:flex;gap:18px;width:max-content;animation:slide 48s linear infinite;direction:ltr;padding:4px 18px}
 .cards-track:hover{animation-play-state:paused}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 /* عربي: الإعلانات تظهر وتتحرك يسار→يمين | فرنسي: العكس يمين→يسار */
@@ -1271,20 +1307,66 @@ html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal}
 html[dir="rtl"] .cards-track .ad-card{direction:rtl}
 html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 
-.ad-card{width:220px;flex-shrink:0;background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.22);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .35s;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-.ad-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-6px) scale(1.02);box-shadow:0 20px 44px rgba(0,0,0,.35),0 0 28px rgba(201,168,76,.12)}
-.ad-card-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border-radius:16px 16px 0 0;transform:translateZ(0);backface-visibility:hidden;background:rgba(7,17,31,.55)}
+.ad-card{
+  width:248px;flex-shrink:0;
+  background:
+    linear-gradient(160deg,rgba(201,168,76,.14),transparent 34%),
+    linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.32);
+  border-radius:20px;overflow:hidden;cursor:pointer;
+  transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s,border-color .35s;
+  position:relative;
+  box-shadow:0 10px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.ad-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.1) 48%,transparent 62%);
+  transform:translateX(-120%);
+  transition:transform .8s ease;
+}
+.ad-card:hover{
+  border-color:rgba(232,201,106,.7);
+  transform:translateY(-8px) scale(1.025);
+  box-shadow:0 26px 54px rgba(0,0,0,.42),0 0 0 1px rgba(201,168,76,.25),0 0 36px rgba(201,168,76,.18);
+}
+.ad-card:hover::after{transform:translateX(120%)}
+.ad-card-img{
+  height:158px;display:flex;align-items:center;justify-content:center;font-size:58px;
+  position:relative;overflow:hidden;border-radius:20px 20px 0 0;
+  transform:translateZ(0);backface-visibility:hidden;
+  background:
+    radial-gradient(circle at 30% 20%,rgba(201,168,76,.18),transparent 45%),
+    linear-gradient(160deg,#102038,#0a1628);
+}
+.ad-card-img::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:48px;pointer-events:none;
+  background:linear-gradient(to top,rgba(10,21,40,.85),transparent);
+}
 .ad-card-img .rizq-img-wrap{width:100%;height:100%;position:absolute;inset:0}
-.ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.ad-card-img span{display:flex;align-items:center;justify-content:center}
-.ad-card-img span svg{width:38px;height:38px;display:block;stroke-width:1.6}
-.ad-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px}
-.ad-card-body{padding:12px}
-.ad-cat{font-size:10px;color:var(--gold);font-weight:600;margin-bottom:5px;letter-spacing:.5px}
-.ad-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.ad-footer{display:flex;justify-content:space-between;align-items:center}
-.ad-price{font-size:14px;font-weight:900;color:var(--gold);font-family:'Segoe UI','Arial',sans-serif}
-.ad-loc{font-size:10px;color:rgba(255,255,255,.82)}
+.ad-card-img .rizq-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s ease}
+.ad-card:hover .ad-card-img .rizq-img-wrap img{transform:scale(1.06)}
+.ad-card-img span{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.ad-card-img span svg{width:40px;height:40px;display:block;stroke-width:1.6;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+.ad-badge{
+  position:absolute;top:10px;inset-inline-end:10px;z-index:2;
+  background:linear-gradient(135deg,#F0D78A,#C9A84C,#a8842f);
+  color:#0f2347;font-size:9.5px;font-weight:900;padding:4px 10px;border-radius:999px;
+  box-shadow:0 4px 14px rgba(201,168,76,.4);letter-spacing:.2px
+}
+.ad-card-body{padding:14px 14px 15px;position:relative;z-index:1}
+.ad-cat{font-size:10.5px;color:#E8C96A;font-weight:700;margin-bottom:6px;letter-spacing:.6px;opacity:.95}
+.ad-title{
+  font-size:14px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.35;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  text-shadow:0 1px 2px rgba(0,0,0,.25)
+}
+.ad-footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ad-price{
+  font-size:14.5px;font-weight:900;color:#0f2347;font-family:Cairo,'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#F0D78A,#C9A84C);padding:4px 10px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,168,76,.28);white-space:nowrap
+}
+.ad-loc{font-size:11px;color:rgba(255,255,255,.82);font-weight:600}
 
 /* ── HERO STATS BAR — مباشرة تحت إعلان الفيديو، بعرضه نفسه ── */
 .hero-stats-bar{
@@ -1774,20 +1856,22 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
-    direction:ltr!important;
+    direction:ltr!important;border-radius:16px!important;padding:10px 0 6px!important;
   }
+  #hero-listings .cards-track-wrap::before,
+  #hero-listings .cards-track-wrap::after{width:36px!important}
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-    width:max-content!important;max-width:none!important;gap:10px!important;
-    direction:ltr!important;
-    animation:slide 36s linear infinite!important;
+    width:max-content!important;max-width:none!important;gap:12px!important;
+    direction:ltr!important;padding:2px 12px!important;
+    animation:slide 40s linear infinite!important;
     will-change:transform;backface-visibility:hidden;transform:translateZ(0);
   }
   html[dir="rtl"] #hero-listings .cards-track{animation-direction:reverse!important}
   html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal!important}
   #hero-listings .cards-track .ad-card{
-    width:158px!important;min-width:158px!important;max-width:158px!important;
-    flex:0 0 158px!important;scroll-snap-align:none!important;
+    width:172px!important;min-width:172px!important;max-width:172px!important;
+    flex:0 0 172px!important;scroll-snap-align:none!important;border-radius:16px!important;
   }
   html[dir="rtl"] #hero-listings .cards-track .ad-card{direction:rtl!important}
   html[dir="ltr"] #hero-listings .cards-track .ad-card{direction:ltr!important}
@@ -1798,10 +1882,14 @@ html[dir="ltr"] .listings-section .section-desc{
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   #hero-listings .cards-track .ad-card-img{
-    height:100px!important;min-height:100px!important;max-height:100px!important;
-    aspect-ratio:auto!important;
+    height:112px!important;min-height:112px!important;max-height:112px!important;
+    aspect-ratio:auto!important;border-radius:16px 16px 0 0!important;
   }
+  #hero-listings .cards-track .ad-card-body{padding:10px!important}
+  #hero-listings .cards-track .ad-title{font-size:12px!important}
+  #hero-listings .cards-track .ad-price{font-size:11.5px!important;padding:3px 8px!important}
   #hero-listings .cards-track .ad-hover-detail{display:none!important}
+  .listings-label>span{font-size:11px!important;padding:8px 14px 8px 12px!important;gap:7px!important}
   .quick-cats{gap:8px}
   .qcat{min-width:60px;padding:10px 12px}
   .search-bar{flex-wrap:wrap}
@@ -2501,49 +2589,58 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9);max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
-/* ── Style Ideas — أفكار أنماط (Amazon-inspired shop-the-look) ── */
-/* خلفية القسم فاتحة — الترويسة تبقى كحلية بالمعين، والبطاقات كما هي */
+/* ── Style Ideas — شريط إطلالات فاخر (هوية رزق كحلي/ذهبي) ── */
 #rizq-styles,#rizq-showroom-models{
-  padding:48px 5%;
-  background:var(--bg-section,#fbfcff);
+  padding:56px 4%;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%,rgba(201,168,76,.08),transparent 58%),
+    radial-gradient(ellipse 50% 40% at 100% 100%,rgba(27,58,107,.05),transparent 55%),
+    linear-gradient(180deg,#f7f9fd 0%,#fbfcff 48%,#f4f7fc 100%);
   position:relative;overflow:hidden;
 }
-#rizq-styles::before,#rizq-showroom-models::before{content:none;display:none}
-.rizq-styles-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
-#rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:28px}
+#rizq-styles::before,#rizq-showroom-models::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;
+  background-image:
+    radial-gradient(circle at 18% 30%,rgba(201,168,76,.07) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 72% 65%,rgba(27,58,107,.05) 0 1px,transparent 1.5px);
+  background-size:28px 28px,36px 36px;
+}
+.rizq-styles-inner{max-width:1240px;margin:0 auto;position:relative;z-index:1}
+#rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:22px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
-  font-family:'Noto Naskh Arabic',Cairo,serif;
-  font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.35
+  font-family:Georgia,'Noto Naskh Arabic',serif;
+  font-size:clamp(24px,3.2vw,38px);font-weight:700;color:#fff;margin:0 0 10px;line-height:1.3
 }
 #rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
 #rizq-styles .section-desc,#rizq-showroom-models .section-desc{
-  color:rgba(255,255,255,.95);font-size:15px;font-weight:600;max-width:560px;margin:0 auto;line-height:1.75;
+  color:rgba(255,255,255,.95);font-size:15px;font-weight:600;max-width:620px;margin:0 auto;line-height:1.75;
   text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
 .rizq-styles-toolbar{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  margin:0 0 14px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  margin:0 0 16px;text-align:center;
 }
 .rizq-styles-reshuffle{
-  display:inline-flex;align-items:center;gap:6px;
-  margin-top:0;padding:9px 18px;
-  font-size:13px;font-weight:800;font-family:inherit;
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:0;padding:11px 22px;
+  font-size:13.5px;font-weight:800;font-family:inherit;letter-spacing:.2px;
   color:#0f2347 !important;
-  background:linear-gradient(135deg,#f5e6b8,#e8c96a) !important;
-  border:1.5px solid rgba(201,168,76,.45) !important;border-radius:999px;cursor:pointer;
-  transition:background .2s,border-color .2s,transform .2s,color .2s,box-shadow .2s;
-  box-shadow:0 4px 14px rgba(13,27,42,.12);
+  background:linear-gradient(135deg,#f3e2a8 0%,#e8c96a 45%,#c9a84c 100%) !important;
+  border:1px solid rgba(255,255,255,.55) !important;border-radius:999px;cursor:pointer;
+  transition:transform .25s,box-shadow .25s,filter .25s;
+  box-shadow:0 8px 22px rgba(201,168,76,.28),inset 0 1px 0 rgba(255,255,255,.55);
 }
 .rizq-styles-reshuffle:hover{
-  color:#0a1628;background:linear-gradient(135deg,#fff3cc,#f0d78a);
-  border-color:rgba(201,168,76,.7);box-shadow:0 6px 18px rgba(13,27,42,.16)
+  filter:brightness(1.04);
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(201,168,76,.38),inset 0 1px 0 rgba(255,255,255,.65)
 }
 .rizq-styles-reshuffle:active{transform:scale(.97)}
 .rizq-styles-tick,.rizq-srm-tick{
-  margin:8px 0 0;font-size:11.5px;color:#5b6b85;min-height:1.2em
+  margin:0;font-size:12px;font-weight:700;color:#6a7a92;min-height:1.2em;letter-spacing:.2px
 }
 #rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
@@ -2594,25 +2691,38 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:rgba(138,58,92,.1);border-color:rgba(138,58,92,.22)
 }
-/* شريط أنماط/نماذج — نفس آلية «مباشر آخر الإعلانات» (marquee CSS) */
+/* شريط أنماط/نماذج — حركة مثل المباشر + مظهر فاخر */
 .rizq-styles-track-wrap{
   position:relative;
   overflow:hidden;
-  border-radius:18px;
+  border-radius:22px;
   direction:ltr;
+  padding:12px 0 6px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.65),rgba(247,249,253,.9)),
+    linear-gradient(145deg,rgba(27,58,107,.04),rgba(201,168,76,.05));
+  border:1px solid rgba(201,168,76,.2);
+  box-shadow:0 16px 40px rgba(13,27,42,.08),inset 0 1px 0 rgba(255,255,255,.8);
 }
+.rizq-styles-track-wrap::before,
+.rizq-styles-track-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:56px;z-index:3;pointer-events:none;
+}
+.rizq-styles-track-wrap::before{left:0;background:linear-gradient(90deg,#f7f9fd,transparent)}
+.rizq-styles-track-wrap::after{right:0;background:linear-gradient(270deg,#f7f9fd,transparent)}
 .rizq-styles-rail{
   display:flex;
   flex-direction:row;
   flex-wrap:nowrap;
-  gap:16px;
+  gap:18px;
   width:max-content;
   max-width:none;
   direction:ltr;
-  animation:slide 40s linear infinite;
+  animation:slide 48s linear infinite;
   will-change:transform;
   backface-visibility:hidden;
   transform:translateZ(0);
+  padding:4px 16px;
 }
 .rizq-styles-rail:hover{animation-play-state:paused}
 html[dir="rtl"] .rizq-styles-rail{animation-direction:reverse}
@@ -2632,30 +2742,40 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 }
 .rizq-style-card{
   display:flex;flex-direction:column;
-  width:220px;min-width:220px;max-width:220px;
-  flex:0 0 220px;
-  background:#fff;
-  border:1px solid rgba(27,58,107,.08);
-  border-radius:16px;
+  width:248px;min-width:248px;max-width:248px;
+  flex:0 0 248px;
+  background:linear-gradient(180deg,#ffffff 0%,#f8faff 100%);
+  border:1px solid rgba(201,168,76,.28);
+  border-radius:20px;
   overflow:hidden;
   text-decoration:none;
   color:inherit;
-  box-shadow:0 4px 18px rgba(13,27,42,.06);
-  transition:transform .28s cubic-bezier(.23,1,.32,1),box-shadow .28s,border-color .28s;
+  position:relative;
+  box-shadow:0 10px 28px rgba(13,27,42,.1),inset 0 1px 0 rgba(255,255,255,.9);
+  transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s,border-color .35s;
   cursor:pointer;
 }
-.rizq-style-card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 14px 32px rgba(13,27,42,.12);
-  border-color:rgba(201,168,76,.4);
+.rizq-style-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 48%,transparent 62%);
+  transform:translateX(-120%);
+  transition:transform .8s ease;
 }
+.rizq-style-card:hover{
+  transform:translateY(-7px);
+  box-shadow:0 22px 44px rgba(13,27,42,.16),0 0 0 1px rgba(201,168,76,.25);
+  border-color:rgba(201,168,76,.55);
+}
+.rizq-style-card:hover::after{transform:translateX(120%)}
 .rizq-style-mosaic{
   display:grid;
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:3px;
-  height:130px;
-  background:#0f2347;
+  height:158px;
+  background:
+    radial-gradient(circle at 25% 20%,rgba(201,168,76,.2),transparent 45%),
+    linear-gradient(160deg,#102038,#0a1628);
   overflow:hidden;
 }
 .rizq-style-tile{
@@ -2715,24 +2835,27 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     scroll-snap-type:none!important;
     direction:ltr!important;
   }
+  .rizq-styles-track-wrap{border-radius:16px!important;padding:8px 0 4px!important}
+  .rizq-styles-track-wrap::before,
+  .rizq-styles-track-wrap::after{width:28px!important}
   .rizq-styles-rail{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-    width:max-content!important;max-width:none!important;gap:10px!important;
+    width:max-content!important;max-width:none!important;gap:12px!important;
     direction:ltr!important;
-    animation:slide 36s linear infinite!important;
+    animation:slide 40s linear infinite!important;
     overflow:visible!important;
     scroll-snap-type:none!important;
-    margin:0!important;padding:0!important;
+    margin:0!important;padding:2px 10px!important;
   }
   .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
-    width:158px!important;min-width:158px!important;max-width:158px!important;
-    flex:0 0 158px!important;
-    border-radius:12px;
-    box-shadow:0 2px 10px rgba(13,27,42,.06);
+    width:172px!important;min-width:172px!important;max-width:172px!important;
+    flex:0 0 172px!important;
+    border-radius:16px;
+    box-shadow:0 6px 18px rgba(13,27,42,.1);
   }
-  .rizq-style-card:hover{transform:none;box-shadow:0 2px 10px rgba(13,27,42,.06)}
-  .rizq-style-mosaic{height:100px;gap:2px}
+  .rizq-style-card:hover{transform:none;box-shadow:0 6px 18px rgba(13,27,42,.1)}
+  .rizq-style-mosaic{height:112px;gap:2px}
   .rizq-style-tile{font-size:20px}
   .rizq-style-tile:first-child{font-size:30px}
   .rizq-style-body{padding:8px 8px 10px;gap:3px}
@@ -3188,7 +3311,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- Live Listings Carousel -->
   <div class="hero-listings-section" id="hero-listings">
     <div class="listings-label">
-      <span><span class="live-pulse-dot" aria-hidden="true"></span><strong>🔴 مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>
+      <span><span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">

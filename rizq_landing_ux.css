@@ -186,15 +186,16 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 #back-to-top.visible{opacity:1;visibility:visible;transform:translateY(0)}
 #back-to-top:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(201,168,76,.35)}
 
-/* ── Live pulse dot ── */
+/* ── Live pulse dot (luxury live strip) ── */
 .live-pulse-dot{
-  width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;
-  box-shadow:0 0 0 0 rgba(34,197,94,.55);animation:livePulseDot 2s ease-out infinite;
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,#ff8a8a,#e11d48 55%,#9f1239);
+  box-shadow:0 0 0 0 rgba(225,29,72,.55);animation:livePulseDot 1.7s ease-out infinite;
 }
 @keyframes livePulseDot{
-  0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}
-  70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}
-  100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
+  0%{box-shadow:0 0 0 0 rgba(225,29,72,.55)}
+  70%{box-shadow:0 0 0 10px rgba(225,29,72,0)}
+  100%{box-shadow:0 0 0 0 rgba(225,29,72,0)}
 }
 
 /* ── Soft open/close for category → branches panels ── */
@@ -747,29 +748,38 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   background:linear-gradient(145deg,#1B3A6B,#0f2347)!important;
 }
 
-/* Hero carousel skeletons — larger / obvious shimmer */
+/* Hero carousel — luxury live strip */
 #cards-track .ad-card .rizq-skel-media,
 #cards-track .rizq-skel-media{
-  height:140px!important;
-  border-radius:16px 16px 0 0!important;
+  height:158px!important;
+  border-radius:20px 20px 0 0!important;
 }
 #cards-track .ad-card{
-  min-width:210px;
-  border:1px solid rgba(201,168,76,.22)!important;
-  background:linear-gradient(145deg,#0a1628,#122040)!important;
+  min-width:248px;
+  border:1px solid rgba(201,168,76,.32)!important;
+  background:
+    linear-gradient(160deg,rgba(201,168,76,.14),transparent 34%),
+    linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;
 }
 #hero-listings .listings-label span{
   display:inline-flex;
   align-items:center;
-  gap:8px;
-  padding:8px 16px;
+  gap:10px;
+  padding:10px 22px 10px 16px;
   border-radius:999px;
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
-  border:1px solid rgba(201,168,76,.35);
-  color:#f3de9c;
-  font-size:13px;
-  font-weight:700;
-  box-shadow:0 6px 20px rgba(13,27,42,.25);
+  background:
+    linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
+    linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.42);
+  color:rgba(255,255,255,.92);
+  font-size:12.5px;
+  font-weight:600;
+  box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+#hero-listings .cards-track-wrap{
+  border:1px solid rgba(201,168,76,.22)!important;
+  box-shadow:0 18px 48px rgba(7,17,31,.28),inset 0 1px 0 rgba(255,255,255,.06)!important;
 }
 
 /* Footer premium spacing */
