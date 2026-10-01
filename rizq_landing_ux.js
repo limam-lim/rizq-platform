@@ -289,6 +289,14 @@
   /* ── i18n labels for UX chrome ── */
   function applyUxLang() {
     var fr = lang() === 'fr';
+    /* شعار «رزق» ثابت بالعربية في كل اللغات */
+    document.querySelectorAll('.logo-ar, .rizq-hdr-brand-ar').forEach(function (el) {
+      el.textContent = 'رزق';
+      el.style.direction = 'rtl';
+      el.style.unicodeBidi = 'isolate';
+    });
+    var heroBrand = document.getElementById('hero-hl');
+    if (heroBrand) heroBrand.textContent = 'رزق';
     if (stickyInput) {
       stickyInput.placeholder = fr ? 'Rechercher sur Rizq...' : 'البحث في رزق...';
     }

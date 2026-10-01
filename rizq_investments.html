@@ -549,7 +549,9 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
       ? '⚖️ Rizq — intermédiaire de publication — inspectez avant paiement'
       : '⚖️ رزق وسيط نشر إلكتروني فقط — عاين قبل الدفع';
     document.querySelectorAll('.logo-ar').forEach(function (el) {
-      el.textContent = fr ? 'Rizq' : 'رزق';
+      el.textContent = 'رزق';
+      el.style.direction = 'rtl';
+      el.style.unicodeBidi = 'isolate';
     });
   }
 

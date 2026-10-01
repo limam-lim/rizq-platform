@@ -698,36 +698,54 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only{
     display:inline-flex !important;
   }
-  /* FR و AR بنفس الحجم */
+  /* الفرنسية: عناوين أخف وأصغر حتى لا تبدو خشنة بجانب العربية */
   html[dir="ltr"].rizq-app-nav #nav .nav-center a,
   html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
-    font-size:12.5px !important;
-    padding:8px 11px !important;
-    letter-spacing:0;
-    font-weight:700 !important;
-    min-width:64px;
+    font-size:10.5px !important;
+    padding:5px 7px 7px !important;
+    letter-spacing:-0.15px;
+    font-weight:600 !important;
+    min-width:54px;
     color:#ffffff !important;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    font-size:12.5px !important;
-    color:#ffffff !important;
+    font-size:10px !important;
+    font-weight:600 !important;
+    letter-spacing:-0.2px;
+    color:rgba(255,255,255,.9) !important;
+    line-height:1.15 !important;
+    max-width:5.6em;
+    white-space:normal !important;
+    text-align:center;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    font-size:22px !important;
+    font-size:16px !important;
+    width:32px !important;
+    height:32px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav > .nav-center,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
-    gap:14px;
+    gap:0;
     justify-content:center;
     justify-self:center;
+    max-width:min(760px,58vw);
+    padding:6px 8px !important;
+  }
+  html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-account-btn,
+  html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-fav-btn,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-start .nav-account-btn,
+  html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn{
+    font-size:11.5px !important;
+    font-weight:700 !important;
+    padding:6px 10px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav{
@@ -2189,6 +2207,16 @@ html.rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-lbl{
   font-size:11.5px !important;
   letter-spacing:.15px;
 }
+html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
+html[dir="ltr"].rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
+html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
+html[dir="ltr"].rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl,
+html[dir="ltr"].rizq-app-nav #rizq-app-header .rizq-hdr-item .rizq-hdr-lbl{
+  font-size:10px !important;
+  font-weight:600 !important;
+  letter-spacing:-0.2px;
+  color:rgba(255,255,255,.9) !important;
+}
 html.rizq-app-nav #nav .nav-center a:hover,
 html.rizq-app-nav #nav .nav-center .nav-link-btn:hover,
 html.rizq-app-nav #rizq-desk-nav .nav-center a:hover,
@@ -2376,9 +2404,21 @@ html.rizq-app-nav #rizq-app-header .rizq-hdr-fav{
 
 html.rizq-app-nav #nav > .logo .logo-ar,
 html.rizq-app-nav #rizq-desk-nav > .logo .logo-ar,
-html.rizq-app-nav #rizq-app-header .logo-ar{
+html.rizq-app-nav #rizq-app-header .logo-ar,
+html.rizq-app-nav .logo-ar,
+html.rizq-app-nav .rizq-hdr-brand-ar{
   color:#F5E0A0 !important;
   text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35) !important;
+  direction:rtl !important;
+  unicode-bidi:isolate !important;
+}
+/* شعار «رزق» لا يتأثر باتجاه الصفحة الفرنسية */
+html[dir="ltr"].rizq-app-nav #nav > .logo .logo-ar,
+html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .logo .logo-ar,
+html[dir="ltr"].rizq-app-nav #rizq-app-header .logo-ar,
+html[dir="ltr"].rizq-app-nav .logo-ar{
+  direction:rtl !important;
+  unicode-bidi:isolate !important;
 }
 html.rizq-app-nav #nav > .logo .logo-sub,
 html.rizq-app-nav #rizq-desk-nav > .logo .logo-sub{
