@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=23.1"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=23.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=23.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -2568,6 +2568,69 @@ html body #rizq-styles .rizq-styles-tick,
 html body #rizq-showroom-models .rizq-srm-tick{
   color:#5b6b85 !important;font-weight:600 !important;text-shadow:none !important
 }
+
+/* ترويسات المحلات/المعارض/المكاتب… بدون معين كحلي — مظهر إيجابي فاتح */
+html body #virtual-stores .section-header,
+html body #virtual-showrooms .section-header,
+html body #virtual-offices .section-header,
+html body #virtual-tenders .section-header,
+html body #virtual-investments .section-header{
+  background:transparent !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  background-size:auto !important;
+  background-repeat:no-repeat !important;
+  background-blend-mode:normal !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:8px 0 0 !important;
+  overflow:visible !important;
+}
+html body #virtual-stores .section-header .section-tag,
+html body #virtual-showrooms .section-header .section-tag,
+html body #virtual-offices .section-header .section-tag,
+html body #virtual-tenders .section-header .section-tag,
+html body #virtual-investments .section-header .section-tag{
+  color:#8a6f2a !important;
+  background:rgba(201,168,76,.12) !important;
+  background-image:none !important;
+  border:1px solid rgba(201,168,76,.28);
+  border-radius:999px;
+  padding:4px 12px;
+}
+html body #virtual-stores .section-header h2,
+html body #virtual-stores .section-header .section-title,
+html body #virtual-showrooms .section-header h2,
+html body #virtual-showrooms .section-header .section-title,
+html body #virtual-offices .section-header h2,
+html body #virtual-offices .section-header .section-title,
+html body #virtual-tenders .section-header h2,
+html body #virtual-tenders .section-header .section-title,
+html body #virtual-investments .section-header h2,
+html body #virtual-investments .section-header .section-title{
+  color:var(--royal,#1B3A6B) !important;
+  -webkit-text-fill-color:var(--royal,#1B3A6B);
+}
+html body #virtual-stores .section-header .section-desc,
+html body #virtual-stores .section-header > p:not(.section-tag),
+html body #virtual-showrooms .section-header .section-desc,
+html body #virtual-showrooms .section-header > p:not(.section-tag),
+html body #virtual-offices .section-header .section-desc,
+html body #virtual-offices .section-header > p:not(.section-tag),
+html body #virtual-tenders .section-header .section-desc,
+html body #virtual-tenders .section-header > p:not(.section-tag),
+html body #virtual-investments .section-header .section-desc,
+html body #virtual-investments .section-header > p:not(.section-tag){
+  color:#3d4f6a !important;
+  text-shadow:none !important;
+}
+#virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments{
+  background:
+    radial-gradient(ellipse 70% 45% at 8% 0%,rgba(255,214,120,.16),transparent 55%),
+    radial-gradient(ellipse 55% 40% at 96% 100%,rgba(120,196,160,.1),transparent 50%),
+    linear-gradient(180deg,#fffef9 0%,#f5faf7 100%) !important;
+}
 .rizq-styles-reshuffle{
   display:inline-flex;align-items:center;gap:6px;
   margin-top:14px;padding:9px 18px;
@@ -2658,8 +2721,8 @@ html body #rizq-showroom-models .rizq-srm-tick{
 }
 .rizq-style-card{
   display:flex;flex-direction:column;
-  flex:0 0 240px;
-  width:240px;
+  flex:0 0 220px;
+  width:220px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
   border-radius:16px;
@@ -3290,7 +3353,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag">Rizq Stores</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vs-title">افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك</h2>
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t="vs-title">افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك</h2>
       <p class="section-desc" data-t="vs-desc">
         صفحة تجارية باسمك: اعرض منتجاتك، ابنِ ثقة الزبائن، وتابع الزيارات والتواصل من لوحة واحدة.
       </p>
@@ -3356,7 +3419,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag" style="color:var(--gold)">Rizq Showrooms</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t="vsh-title">
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t="vsh-title">
         معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون
       </h2>
       <p class="section-desc" data-t="vsh-desc">
@@ -3573,7 +3636,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag" style="color:var(--gold)">Rizq Tenders</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des appels d'offres</span> de Rizq">
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des appels d'offres</span> de Rizq">
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة المناقصات</span> على رزق
       </h2>
       <p class="section-desc" data-t-fr="Publiez votre besoin et recevez des offres privées — marché B2B réservé aux abonnés.">
@@ -3636,7 +3699,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
       <p class="section-tag" style="color:var(--gold)">Rizq Investments</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:#fff" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
+      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
         <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
       </h2>
       <p class="section-desc" data-t-fr="Présentez votre projet, trouvez des partenaires — espace sérieux pour opportunités réelles.">

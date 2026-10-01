@@ -69,6 +69,54 @@ html body #rizq-showroom-models .rizq-srm-tick{
   color:#5b6b85!important;
 }
 
+html body #virtual-stores .section-header,
+html body #virtual-showrooms .section-header,
+html body #virtual-offices .section-header,
+html body #virtual-tenders .section-header,
+html body #virtual-investments .section-header{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  background-size:auto!important;
+  background-repeat:no-repeat!important;
+  background-blend-mode:normal!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:8px 0 0!important;
+}
+html body #virtual-stores .section-header h2,
+html body #virtual-stores .section-header .section-title,
+html body #virtual-showrooms .section-header h2,
+html body #virtual-showrooms .section-header .section-title,
+html body #virtual-offices .section-header h2,
+html body #virtual-offices .section-header .section-title,
+html body #virtual-tenders .section-header h2,
+html body #virtual-tenders .section-header .section-title,
+html body #virtual-investments .section-header h2,
+html body #virtual-investments .section-header .section-title{
+  color:var(--royal,#1B3A6B)!important;
+}
+html body #virtual-stores .section-header .section-desc,
+html body #virtual-stores .section-header > p:not(.section-tag),
+html body #virtual-showrooms .section-header .section-desc,
+html body #virtual-showrooms .section-header > p:not(.section-tag),
+html body #virtual-offices .section-header .section-desc,
+html body #virtual-offices .section-header > p:not(.section-tag),
+html body #virtual-tenders .section-header .section-desc,
+html body #virtual-tenders .section-header > p:not(.section-tag),
+html body #virtual-investments .section-header .section-desc,
+html body #virtual-investments .section-header > p:not(.section-tag){
+  color:#3d4f6a!important;
+  text-shadow:none!important;
+}
+html body #virtual-stores .section-header .section-tag,
+html body #virtual-showrooms .section-header .section-tag,
+html body #virtual-offices .section-header .section-tag,
+html body #virtual-tenders .section-header .section-tag,
+html body #virtual-investments .section-header .section-tag{
+  color:#8a6f2a!important;
+}
+
 html body footer,
 html body footer.rizq-footer{
   background:linear-gradient(180deg,#0D1B2A,#071020)!important;
