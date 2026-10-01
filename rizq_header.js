@@ -947,6 +947,7 @@
     var left = Math.round(tRect.left + tRect.width / 2 - menuW / 2);
     left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
     menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
+    if (nav) top = Math.max(top, Math.round(nav.getBoundingClientRect().bottom + 4));
     menu.style.cssText = ''
       + 'position:fixed!important;top:' + top + 'px!important;'
       + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
@@ -955,7 +956,8 @@
       + 'max-height:min(calc(100vh - ' + (top + 12) + 'px),380px)!important;'
       + 'overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;'
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
-      + 'z-index:10052!important;display:block!important;padding:5px!important;border-radius:12px!important;';
+      + 'z-index:10052!important;display:flex!important;flex-direction:column!important;'
+      + 'padding:6px!important;border-radius:12px!important;';
   }
 
   /* Prefer the visible trigger — on landing, #nav-more-mobile-btn comes first in
@@ -998,9 +1000,11 @@
       document.body.appendChild(menu);
     }
     li.classList.add('open');
-    menu.classList.add('rizq-more-menu-open');
-    var top = Math.round(rect.bottom + 6);
-    var menuW = Math.min(168, Math.max(148, Math.min(window.innerWidth - 24, 168)));
+    menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
+    var navEl = document.getElementById('rizq-desk-nav') || document.getElementById('nav');
+    var navBottom = navEl ? Math.round(navEl.getBoundingClientRect().bottom) : 0;
+    var top = Math.max(Math.round(rect.bottom + 6), navBottom + 4);
+    var menuW = Math.min(176, Math.max(156, Math.min(window.innerWidth - 24, 176)));
     var centerX = Math.round(rect.left + rect.width / 2);
     var left = Math.max(8, Math.min(centerX - Math.round(menuW / 2), window.innerWidth - menuW - 8));
     menu.style.cssText = ''
@@ -1008,11 +1012,12 @@
       + 'left:' + left + 'px!important;right:auto!important;bottom:auto!important;'
       + 'transform:none!important;width:' + menuW + 'px!important;'
       + 'min-width:' + menuW + 'px!important;max-width:' + menuW + 'px!important;'
-      + 'max-height:min(70vh,420px)!important;overflow-y:auto!important;overflow-x:hidden!important;'
+      + 'max-height:min(calc(100vh - ' + (top + 12) + 'px),420px)!important;'
+      + 'overflow-y:auto!important;overflow-x:hidden!important;'
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
-      + 'z-index:10052!important;display:block!important;'
+      + 'z-index:10052!important;display:flex!important;flex-direction:column!important;'
       + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
-      + 'border-radius:12px!important;padding:5px!important;'
+      + 'border-radius:12px!important;padding:6px!important;'
       + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 
