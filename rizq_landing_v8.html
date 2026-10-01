@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=23.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=23.7"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 (function(){
@@ -120,41 +120,51 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 ::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold),var(--gold-light));border-radius:2px}
 
 /* ══════════════════════════════════
-   NAVBAR — Premium Redesign
+   NAVBAR — Luxury top bar
 ══════════════════════════════════ */
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:0 max(40px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));height:70px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   direction:ltr;
-  transition:all .4s cubic-bezier(.4,0,.2,1);
-  background:#0f172a;
-  border-bottom:1px solid rgba(255,255,255,0.08);
+  transition:background .4s cubic-bezier(.4,0,.2,1),box-shadow .4s,border-color .35s;
+  background:
+    linear-gradient(180deg,rgba(232,201,106,.08),transparent 42%),
+    linear-gradient(180deg,#0b1220 0%,#0f172a 55%,#0c1524 100%);
+  border-bottom:1px solid rgba(201,168,76,.22);
+  box-shadow:0 10px 28px rgba(3,8,18,.35),inset 0 1px 0 rgba(232,201,106,.14);
   box-sizing:border-box;overflow:visible;
 }
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs)::before{
+  content:'';position:absolute;left:8%;right:8%;top:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(240,215,138,.55),transparent);
+}
 nav.scrolled{
-  background:#0f172a;
-  border-bottom:1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(180deg,rgba(232,201,106,.1),transparent 40%),
+    linear-gradient(180deg,#07101c 0%,#0d1626 60%,#0a1320 100%);
+  border-bottom:1px solid rgba(201,168,76,.28);
+  box-shadow:0 14px 36px rgba(3,8,18,.45),inset 0 1px 0 rgba(232,201,106,.16);
 }
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;height:auto;max-height:64px;direction:ltr}
 .logo-mark-img{
   width:42px;height:42px;flex-shrink:0;display:block;
-  background:#0f172a;
-  border:none;border-radius:10px;padding:0;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(201,168,76,.28);position:relative;
-  object-fit:contain;cursor:pointer;
+  background:linear-gradient(160deg,#12203a,#0a1324);
+  border:none;border-radius:12px;padding:0;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(201,168,76,.45),0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
+  position:relative;object-fit:contain;cursor:pointer;
 }
 .logo-mark:not(:has(img)){
   width:42px;height:42px;flex-shrink:0;display:block;
-  background:#0f172a url('rizq-mark-512.png') center / contain no-repeat;
-  border:none;border-radius:10px;padding:0;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(201,168,76,.28);
+  background:linear-gradient(160deg,#12203a,#0a1324) url('rizq-mark-512.png') center / contain no-repeat;
+  border:none;border-radius:12px;padding:0;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(201,168,76,.45),0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
 }
 .logo-mark svg,.logo-mark-img svg{display:none}
 .logo-mark::after{display:none}
 .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
-.logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4);direction:rtl;unicode-bidi:isolate}
-.logo-text .logo-sub{font-size:8px;color:rgba(201,168,76,.65);letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:23px;font-weight:700;color:#F0D78A;line-height:1;display:block;text-shadow:0 0 20px rgba(201,168,76,.45);direction:rtl;unicode-bidi:isolate}
+.logo-text .logo-sub{font-size:8px;color:rgba(232,201,106,.78);letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
 .nav-center{display:flex;align-items:center;gap:10px;list-style:none;direction:inherit;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
 .nav-center::-webkit-scrollbar{display:none}
 .nav-center a,.nav-center .nav-link-btn{
@@ -218,10 +228,13 @@ html[dir="ltr"] .mobile-drawer{right:auto;left:0;transform:translateX(-100%);bor
 html[dir="ltr"] .mobile-drawer-close{left:auto;right:22px}
 nav .btn-lang,nav .btn-lang-primary{
   position:static!important;top:auto!important;left:auto!important;bottom:auto!important;
-  background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));
-  border:1.5px solid rgba(201,168,76,.55);color:#fff;
+  background:
+    linear-gradient(145deg,rgba(232,201,106,.2),rgba(201,168,76,.06)),
+    rgba(7,16,30,.55);
+  border:1.5px solid rgba(201,168,76,.58);color:#fff;
   font-size:12.5px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:22px;
-  cursor:pointer;transition:transform .15s ease,background .2s;white-space:nowrap;flex-shrink:0;z-index:auto!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(0,0,0,.2);
+  cursor:pointer;transition:transform .15s ease,background .2s,border-color .2s;white-space:nowrap;flex-shrink:0;z-index:auto!important;
   direction:ltr!important;unicode-bidi:isolate;display:inline-flex!important;flex-direction:row!important;align-items:center;gap:.2em;
 }
 nav .btn-lang .lang-fr,nav .btn-lang-primary .lang-fr{order:1;color:#fff;opacity:.8}
@@ -249,12 +262,19 @@ nav>.nav-sticky-tools{order:1;flex-shrink:1}
 nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .nav-account-btn{
   display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.07);border:1px solid rgba(201,168,76,.4);
+  background:
+    linear-gradient(145deg,rgba(232,201,106,.14),transparent 55%),
+    rgba(255,255,255,.05);
+  border:1px solid rgba(201,168,76,.48);
   color:#E8C96A;padding:8px 14px;border-radius:22px;font-weight:800;font-size:13px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.18);
   cursor:pointer;font-family:'Cairo',system-ui,sans-serif;letter-spacing:.2px;
-  transition:background .2s,border-color .2s,color .2s,transform .15s;white-space:nowrap;
+  transition:background .2s,border-color .2s,color .2s,transform .15s,box-shadow .2s;white-space:nowrap;
 }
-.nav-account-btn:hover{background:rgba(201,168,76,.18);border-color:#C9A84C;color:#fff}
+.nav-account-btn:hover{
+  background:rgba(201,168,76,.2);border-color:#E8C96A;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 16px rgba(201,168,76,.18);
+}
 .nav-fav-btn{padding:8px 12px;min-width:auto;justify-content:center;gap:5px}
 .nav-fav-ico,.rizq-gold-heart{
   color:#E8C96A;font-size:21px;line-height:1;font-weight:800;
