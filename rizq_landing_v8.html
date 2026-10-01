@@ -2666,15 +2666,15 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 }
 #rizq-showroom-models .rizq-styles-reshuffle{margin-top:14px}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat]{
-  background:linear-gradient(135deg,#2f6fb0,#1f4f86);
-  border-color:rgba(201,168,76,.45)
+  background:linear-gradient(135deg,#1B3A6B,#0f2347);
+  border-color:rgba(201,168,76,.5)
 }
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="cars"]{background:linear-gradient(135deg,#3a7eb5,#245a88)}
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="electronics"]{background:linear-gradient(135deg,#4a6db8,#2f4a8a)}
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="furniture"]{background:linear-gradient(135deg,#b8895a,#8a6238)}
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="equipment"]{background:linear-gradient(135deg,#6a6a7e,#4a4a5c)}
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="building"]{background:linear-gradient(135deg,#c48a4a,#946332)}
-#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="jewelry"]{background:linear-gradient(135deg,#d4a84a,#a07a28)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="cars"]{background:linear-gradient(135deg,#1a4a6e,#0f2a40)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="electronics"]{background:linear-gradient(135deg,#2a3d6b,#152038)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="furniture"]{background:linear-gradient(135deg,#4a3a28,#2a2014)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="equipment"]{background:linear-gradient(135deg,#3a3a48,#1e1e28)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="building"]{background:linear-gradient(135deg,#5a3a22,#2e1e12)}
+#rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="jewelry"]{background:linear-gradient(135deg,#6b5420,#3a2e10)}
 .rizq-style-card[data-srm-cat] .rizq-style-badge{
   color:#8a6f2a;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.28)
 }
@@ -2695,17 +2695,17 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 }
 .rizq-styles-gtab:hover{border-color:rgba(201,168,76,.45);color:var(--royal,#1B3A6B)}
 .rizq-styles-gtab.is-active{
-  color:#fff;background:linear-gradient(135deg,#2f6fb0,#1f4f86);
-  border-color:rgba(201,168,76,.45);box-shadow:0 4px 14px rgba(47,111,176,.22)
+  color:#fff;background:linear-gradient(135deg,#1B3A6B,#0f2347);
+  border-color:rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(13,27,42,.18)
 }
 .rizq-styles-gtab.is-active[data-sty-gender="women"]{
-  background:linear-gradient(135deg,#c46a8e,#9a4066)
+  background:linear-gradient(135deg,#6b2d4a,#3d1a2c)
 }
 .rizq-styles-gtab.is-active[data-sty-gender="boys"]{
-  background:linear-gradient(135deg,#3a9ec4,#227a9a)
+  background:linear-gradient(135deg,#1a5a7a,#0f3548)
 }
 .rizq-styles-gtab.is-active[data-sty-gender="girls"]{
-  background:linear-gradient(135deg,#e07a9e,#b85078)
+  background:linear-gradient(135deg,#8a3a5c,#4a1f34)
 }
 .rizq-style-card[data-sty-gender="boys"] .rizq-style-badge{
   color:#1a5a7a;background:rgba(26,90,122,.1);border-color:rgba(26,90,122,.22)
@@ -2739,16 +2739,21 @@ html body #virtual-investments .section-header > p:not(.section-tag){
   flex:0 0 220px;
   width:220px;
   background:#fff;
-  border:1px solid rgba(27,58,107,.08);
+  border:1px solid rgba(27,58,107,.12);
   border-radius:16px;
   overflow:hidden;
   text-decoration:none;
   color:inherit;
-  box-shadow:0 4px 18px rgba(13,27,42,.06);
+  box-shadow:0 6px 22px rgba(13,27,42,.08);
   transition:transform .28s cubic-bezier(.23,1,.32,1),box-shadow .28s,border-color .28s;
   min-width:0;cursor:pointer;
   scroll-snap-align:start;
   animation:rizqStyleCardIn .45s cubic-bezier(.23,1,.32,1) both;
+  position:relative;
+}
+.rizq-style-card::before{
+  content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:2;
+  box-shadow:inset 0 0 0 1px rgba(201,168,76,.12);
 }
 .rizq-style-card:nth-child(1){animation-delay:.02s}
 .rizq-style-card:nth-child(2){animation-delay:.08s}
@@ -2762,17 +2767,19 @@ html body #virtual-investments .section-header > p:not(.section-tag){
 }
 .rizq-style-card:hover{
   transform:translateY(-5px);
-  box-shadow:0 14px 32px rgba(13,27,42,.12);
-  border-color:rgba(201,168,76,.4);
+  box-shadow:0 16px 36px rgba(13,27,42,.16);
+  border-color:rgba(201,168,76,.55);
 }
+.rizq-style-card:hover::before{box-shadow:inset 0 0 0 1.5px rgba(201,168,76,.4)}
 .rizq-style-mosaic{
   display:grid;
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:3px;
   height:168px;
-  background:linear-gradient(135deg,#eef6ff,#f7f0e0);
+  background:#0f2347;
   overflow:hidden;
+  border-bottom:1px solid rgba(201,168,76,.28);
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
@@ -5322,19 +5329,8 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
-function _stySoftBg(bg){
-  var s = String(bg || '');
-  if(!s) return 'linear-gradient(145deg,#eef6ff,#f7f0e0)';
-  /* خلفيات كحلية داكنة → تدرج فاتح وإيجابي داخل بطاقات الأنماط/النماذج */
-  if(/#0[fF]2347|#0D1B2A|#162235|#1[Bb]3[Aa]6[Bb]|#234d8f/i.test(s)){
-    return 'linear-gradient(145deg,#eef6ff,#fff4d6)';
-  }
-  if(/#3d1a2c|#6b2d4a/i.test(s)) return 'linear-gradient(145deg,#fff0f5,#ffe4ee)';
-  if(/#3a2200|#7a4a00/i.test(s)) return 'linear-gradient(145deg,#fff8e8,#ffe9b8)';
-  return s;
-}
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
-  var bg = _stySoftBg((ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#eef6ff,#fff4d6)');
+  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
@@ -5349,7 +5345,7 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
-  var bg = _stySoftBg(fallbackBg || 'linear-gradient(145deg,#eef6ff,#fff4d6)');
+  var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var linked = adId != null && adId !== '';
   var openAttr = linked
     ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
