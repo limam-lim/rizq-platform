@@ -12,7 +12,6 @@
 .price-ticker-wrap,
 .price-card,
 .cs-strip,
-.rzq-disc-empty,
 .hero-stats-bar,
 .ticker-wrap,
 .hero-eyebrow,
@@ -116,6 +115,18 @@ html body #virtual-tenders .section-header .section-tag,
 html body #virtual-investments .section-header .section-tag{
   color:#8a6f2a!important;
 }
+
+html body .rzq-disc-empty{
+  background:linear-gradient(180deg,#fffef8,#f3faf6)!important;
+  background-image:linear-gradient(180deg,#fffef8,#f3faf6)!important;
+  background-size:auto!important;
+  background-repeat:no-repeat!important;
+  background-blend-mode:normal!important;
+  border:1.5px dashed rgba(201,168,76,.45)!important;
+  box-shadow:0 6px 20px rgba(27,58,107,.06)!important;
+}
+html body .rzq-disc-empty-title{color:var(--royal,#1B3A6B)!important}
+html body .rzq-disc-empty-desc{color:#3d4f6a!important;text-shadow:none!important}
 
 html body footer,
 html body footer.rizq-footer{
