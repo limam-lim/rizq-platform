@@ -1408,13 +1408,13 @@ a.rizq-trust-card:hover {
   html.rizq-app-nav #rizq-desk-nav .logo-mark,
   html.rizq-app-nav #nav .logo .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo .logo-mark-img{
-    width:28px !important;
-    height:28px !important;
-    min-width:28px !important;
-    min-height:28px !important;
-    max-width:28px !important;
-    max-height:28px !important;
-    border-radius:8px !important;
+    width:26px !important;
+    height:26px !important;
+    min-width:26px !important;
+    min-height:26px !important;
+    max-width:26px !important;
+    max-height:26px !important;
+    border-radius:7px !important;
   }
   html.rizq-app-nav #nav .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-ar,
@@ -1422,18 +1422,18 @@ a.rizq-trust-card:hover {
   html.rizq-app-nav #rizq-desk-nav .logo-text .logo-ar,
   html.rizq-app-nav #nav .logo .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo .logo-ar{
-    font-size:14px !important;
+    font-size:13px !important;
   }
   html.rizq-app-nav #nav .logo-sub,
   html.rizq-app-nav #rizq-desk-nav .logo-sub,
   html.rizq-app-nav #nav .logo-text .logo-sub,
   html.rizq-app-nav #rizq-desk-nav .logo-text .logo-sub{
-    font-size:6px !important;
-    letter-spacing:1px !important;
+    font-size:5.5px !important;
+    letter-spacing:.9px !important;
   }
   html.rizq-app-nav #nav > .logo,
   html.rizq-app-nav #rizq-desk-nav > .logo{
-    max-width:min(32vw,120px) !important;
-    gap:6px !important;
+    max-width:min(42vw,150px) !important;
+    gap:5px !important;
   }
 }
