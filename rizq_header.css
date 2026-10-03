@@ -14,16 +14,20 @@ html.rizq-app-nav body,
 html.rizq-app-nav *:not(.logo-ar):not(.logo-sub):not(.logo-text):not(.rizq-hdr-brand-ar):not(.rizq-hdr-brand-sub):not(.logo-mark):not(.logo-mark-img):not(.rizq-hdr-brand-mark):not(.rizq-splash-brand):not(.rn-logo-ar):not(.rn-logo-sub):not(.sb-logo-ar):not(.sb-logo-sub){
   font-family:'Cairo',sans-serif !important;
 }
+/* كلمة «رزق» = Cairo مثل كبسولة الهيرو؛ PLATFORM يبقى Georgia مائل */
 html.rizq-app-nav .logo-ar,
+html.rizq-app-nav .rizq-hdr-brand-ar,
+html.rizq-app-nav .rn-logo-ar,
+html.rizq-app-nav .sb-logo-ar{
+  font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+}
 html.rizq-app-nav .logo-sub,
 html.rizq-app-nav .logo-text,
-html.rizq-app-nav .rizq-hdr-brand-ar,
 html.rizq-app-nav .rizq-hdr-brand-sub,
 html.rizq-app-nav .logo-mark,
 html.rizq-app-nav .logo-mark-img,
 html.rizq-app-nav .rizq-hdr-brand-mark,
 html.rizq-app-nav .rizq-splash-brand,
-html.rizq-app-nav .rn-logo-ar,
 html.rizq-app-nav .rn-logo-sub,
 html.rizq-app-nav .sb-logo-text,
 html.rizq-app-nav .sb-logo-sub{
@@ -53,9 +57,9 @@ html.rizq-app-nav .rizq-hdr-brand:visited{
 html.rizq-app-nav .logo-ar,
 html.rizq-app-nav .rizq-hdr-brand-ar,
 html.rizq-app-nav .rn-logo-ar{
-  font-family:Georgia,'Times New Roman',serif !important;
+  font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
   font-size:22px !important;
-  font-weight:700 !important;
+  font-weight:900 !important;
   color:#C9A84C !important;
   line-height:1 !important;
   text-shadow:0 0 16px rgba(201,168,76,.4) !important;
@@ -641,8 +645,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .logo-mark::after{display:none !important}
   html.rizq-app-nav #nav .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-ar{
-    font-family:Georgia,'Times New Roman',serif !important;
-    font-weight:700 !important;
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+    font-weight:900 !important;
     font-size:26px !important;
     color:#F5E0A0 !important;
     line-height:1 !important;
@@ -1147,7 +1151,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* ════════════ TABLET 769–1100: شريطان مثل الهاتف (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (min-width:769px) and (max-width:1100px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:104px}
+  html.rizq-app-nav{--rizq-header-h:112px}
   html.rizq-app-nav #rizq-app-header,
   html.rizq-app-nav #rizq-app-header *{
     display:none !important;visibility:hidden !important;pointer-events:none !important;
@@ -1158,14 +1162,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:grid !important;
     grid-template-columns:1fr auto !important;
     grid-template-rows:auto auto !important;
-    height:var(--rizq-header-h,104px) !important;
-    max-height:var(--rizq-header-h,104px) !important;
-    min-height:var(--rizq-header-h,104px) !important;
+    height:var(--rizq-header-h,112px) !important;
+    max-height:var(--rizq-header-h,112px) !important;
+    min-height:var(--rizq-header-h,112px) !important;
     align-items:center !important;
     align-content:center !important;
-    column-gap:10px !important;
-    row-gap:6px !important;
-    padding:8px max(14px, env(safe-area-inset-left, 0px)) 10px max(14px, env(safe-area-inset-right, 0px)) !important;
+    column-gap:12px !important;
+    row-gap:8px !important;
+    padding:10px max(16px, env(safe-area-inset-left, 0px)) 10px max(16px, env(safe-area-inset-right, 0px)) !important;
     overflow:visible !important;
     direction:ltr !important;
   }
@@ -1250,27 +1254,58 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     min-width:0 !important;
     overflow:visible !important;
   }
+  /* تابلت: نفس شعار الكمبيوتر (علامة + رزق Cairo + PLATFORM) بحجم مناسب */
   html.rizq-app-nav #nav .logo-mark,
   html.rizq-app-nav #nav .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo-mark,
   html.rizq-app-nav #rizq-desk-nav .logo-mark-img{
-    width:34px !important;
-    height:34px !important;
-    min-width:34px !important;
-    min-height:34px !important;
-    max-width:34px !important;
-    max-height:34px !important;
-    border-radius:10px !important;
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    min-height:42px !important;
+    max-width:42px !important;
+    max-height:42px !important;
+    border-radius:12px !important;
+    box-shadow:
+      0 0 0 1.5px rgba(240,215,138,.55),
+      0 0 18px rgba(201,168,76,.26),
+      0 6px 14px rgba(0,0,0,.32),
+      inset 0 1px 0 rgba(255,255,255,.18) !important;
+    background:linear-gradient(160deg,#1a2d4d,#0a1324) !important;
+  }
+  html.rizq-app-nav #nav .logo-mark:not(:has(img)),
+  html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
+    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  }
+  html.rizq-app-nav #nav .logo-text,
+  html.rizq-app-nav #rizq-desk-nav .logo-text{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-end !important;
+    justify-content:center !important;
+    gap:1px !important;
   }
   html.rizq-app-nav #nav .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-ar{
-    font-size:18px !important;
-    line-height:1.1 !important;
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+    font-weight:900 !important;
+    font-size:22px !important;
+    line-height:1 !important;
     white-space:nowrap !important;
+    color:#F5E0A0 !important;
   }
   html.rizq-app-nav #nav .logo-sub,
   html.rizq-app-nav #rizq-desk-nav .logo-sub{
-    display:none !important;
+    display:block !important;
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-style:italic !important;
+    font-size:7.5px !important;
+    font-weight:700 !important;
+    letter-spacing:1.8px !important;
+    color:rgba(232,201,106,.82) !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+    line-height:1.1 !important;
   }
   /* الصف 2: رصيف الأقسام بعرض كامل */
   html.rizq-app-nav #nav > .nav-center,
@@ -1322,9 +1357,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     flex-direction:column !important;
     align-items:center !important;
-    padding:3px 8px 4px !important;
-    font-size:11px !important;
-    min-width:56px !important;
+    padding:4px 6px 5px !important;
+    font-size:10.5px !important;
+    min-width:52px !important;
     width:auto !important;
     max-width:none !important;
     gap:2px !important;
@@ -1335,24 +1370,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    font-size:15px !important;
-    width:28px !important;
-    height:28px !important;
-    line-height:28px !important;
+    font-size:16px !important;
+    width:30px !important;
+    height:30px !important;
+    line-height:30px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl{
-    font-size:11px !important;
+    font-size:10.5px !important;
     line-height:1.15 !important;
     white-space:nowrap !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
-    padding-top:var(--rizq-header-h,104px) !important;
+    padding-top:var(--rizq-header-h,112px) !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:var(--rizq-header-h,104px) !important;
+    padding-top:var(--rizq-header-h,112px) !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,
@@ -1916,9 +1951,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   .rizq-hdr-brand .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
   .rizq-hdr-brand-ar,
   #rizq-app-header .logo-ar{
-    font-family:Georgia,'Times New Roman',serif !important;
-    font-weight:700 !important;font-size:18px !important;line-height:1 !important;
-    color:#C9A84C !important;
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+    font-weight:900 !important;font-size:20px !important;line-height:1 !important;
+    color:#F5E0A0 !important;
     text-shadow:0 0 16px rgba(201,168,76,.4) !important;
     direction:rtl !important;unicode-bidi:isolate !important;display:block !important;
   }
@@ -2690,16 +2725,16 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   }
 }
 
-/* تابلت: تثبيت شريطين + منع المزيد المزدوج بعد قواعد الآبار الدائرية */
+/* تابلت: تثبيت شريطين + شعار كامل + منع المزيد المزدوج بعد قواعد الآبار الدائرية */
 @media (min-width:769px) and (max-width:1100px){
-  html.rizq-app-nav{--rizq-header-h:104px}
+  html.rizq-app-nav{--rizq-header-h:112px}
   html.rizq-app-nav #nav,
   html.rizq-app-nav #rizq-desk-nav{
     display:grid !important;
     grid-template-columns:1fr auto !important;
     grid-template-rows:auto auto !important;
-    height:var(--rizq-header-h,104px) !important;
-    max-height:var(--rizq-header-h,104px) !important;
+    height:var(--rizq-header-h,112px) !important;
+    max-height:var(--rizq-header-h,112px) !important;
   }
   html.rizq-app-nav #nav > .nav-start,
   html.rizq-app-nav #rizq-desk-nav > .nav-start{
@@ -2709,6 +2744,15 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav > .logo{
     grid-column:2 !important;grid-row:1 !important;
   }
+  html.rizq-app-nav #nav .logo-ar,
+  html.rizq-app-nav #rizq-desk-nav .logo-ar{
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+    font-weight:900 !important;
+  }
+  html.rizq-app-nav #nav .logo-sub,
+  html.rizq-app-nav #rizq-desk-nav .logo-sub{
+    display:block !important;
+  }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
     grid-column:1 / -1 !important;
@@ -2716,8 +2760,8 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     justify-content:center !important;
     width:100% !important;
     max-width:100% !important;
-    padding:4px 10px !important;
-    gap:4px !important;
+    padding:5px 10px !important;
+    gap:3px !important;
   }
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{
@@ -2731,17 +2775,17 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    width:28px !important;
-    height:28px !important;
-    font-size:15px !important;
-    line-height:28px !important;
+    width:30px !important;
+    height:30px !important;
+    font-size:16px !important;
+    line-height:30px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    font-size:11px !important;
+    font-size:10.5px !important;
     line-height:1.15 !important;
   }
 }
@@ -2749,7 +2793,7 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
 
 /* ════════════ PHONE — شريطان مضغوطان (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav{--rizq-header-h:96px}
+  html.rizq-app-nav{--rizq-header-h:102px}
   html.rizq-app-nav #rizq-app-header,
   html.rizq-app-nav #rizq-app-header *{
     display:none !important;visibility:hidden !important;pointer-events:none !important;
@@ -2819,13 +2863,14 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav .nav-account-btn:not(.nav-fav-btn) span:not(.nav-account-ico),
   html.rizq-app-nav #nav .nav-fav-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{display:none !important}
+  /* هاتف: نفس شعار الكمبيوتر (علامة + رزق Cairo + PLATFORM) */
   html.rizq-app-nav #nav > .logo,
   html.rizq-app-nav #rizq-desk-nav > .logo,
   html.rizq-app-nav body.landing-ux-mobile #nav > .logo{
     grid-column:2 !important;grid-row:1 !important;order:unset !important;
     justify-self:end !important;align-self:center !important;
     margin:0 !important;height:auto !important;
-    max-width:min(48vw,180px) !important;min-width:0 !important;
+    max-width:none !important;min-width:0 !important;
     flex-shrink:0 !important;
     display:inline-flex !important;
     flex-direction:row !important;
@@ -2847,16 +2892,25 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav .logo-mark-img,
   html.rizq-app-nav #nav .logo .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo .logo-mark-img{
-    width:30px !important;
-    height:30px !important;
-    min-width:30px !important;
-    min-height:30px !important;
-    max-width:30px !important;
-    max-height:30px !important;
-    border-radius:8px !important;
-    flex:0 0 30px !important;
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    min-height:38px !important;
+    max-width:38px !important;
+    max-height:38px !important;
+    border-radius:11px !important;
+    flex:0 0 38px !important;
     object-fit:contain !important;
-    box-shadow:0 0 0 1px rgba(240,215,138,.45),0 3px 8px rgba(0,0,0,.28) !important;
+    box-shadow:
+      0 0 0 1.5px rgba(240,215,138,.55),
+      0 0 16px rgba(201,168,76,.24),
+      0 5px 12px rgba(0,0,0,.3),
+      inset 0 1px 0 rgba(255,255,255,.16) !important;
+    background:linear-gradient(160deg,#1a2d4d,#0a1324) !important;
+  }
+  html.rizq-app-nav #nav .logo-mark:not(:has(img)),
+  html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
+    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
   }
   html.rizq-app-nav #nav .logo-text,
   html.rizq-app-nav #rizq-desk-nav .logo-text{
@@ -2864,20 +2918,20 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     flex-direction:column !important;
     align-items:flex-end !important;
     justify-content:center !important;
-    min-width:2.6em !important;
+    min-width:0 !important;
     max-width:none !important;
     overflow:visible !important;
     flex:0 0 auto !important;
+    gap:1px !important;
   }
-  /* هاتف: خط عربي واضح لكلمة «رزق» كاملة — بدون قص أو تسطير الرابط */
   html.rizq-app-nav #nav .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-ar,
   html.rizq-app-nav #nav .logo-text .logo-ar,
   html.rizq-app-nav #rizq-desk-nav .logo-text .logo-ar{
     font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
-    font-size:17px !important;
-    font-weight:800 !important;
-    line-height:1.15 !important;
+    font-size:20px !important;
+    font-weight:900 !important;
+    line-height:1 !important;
     letter-spacing:0 !important;
     white-space:nowrap !important;
     overflow:visible !important;
@@ -2889,7 +2943,7 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     -webkit-text-fill-color:#F5E0A0 !important;
     text-decoration:none !important;
     border:none !important;
-    text-shadow:0 0 10px rgba(201,168,76,.35),0 1px 0 rgba(0,0,0,.35) !important;
+    text-shadow:0 0 18px rgba(201,168,76,.45),0 1px 0 rgba(0,0,0,.35) !important;
     direction:rtl !important;
     unicode-bidi:isolate !important;
   }
@@ -2897,7 +2951,18 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav .logo-sub,
   html.rizq-app-nav #nav .logo-text .logo-sub,
   html.rizq-app-nav #rizq-desk-nav .logo-text .logo-sub{
-    display:none !important;
+    display:block !important;
+    font-family:Georgia,'Times New Roman',serif !important;
+    font-style:italic !important;
+    font-size:7px !important;
+    font-weight:700 !important;
+    letter-spacing:1.6px !important;
+    color:rgba(232,201,106,.82) !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+    line-height:1.1 !important;
+    direction:ltr !important;
+    unicode-bidi:isolate !important;
   }
   /* الصف 2: كبسولة الأقسام بعرض كامل ومضغوطة أكثر */
   html.rizq-app-nav #nav > .nav-center,

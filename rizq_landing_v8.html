@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=26.7"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.8"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -61,18 +61,22 @@ document.documentElement.classList.add('rizq-app-nav');
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   html.rizq-app-nav .hero-content{padding-top:12px!important}
-  /* شعار الهاتف: «رزق» كاملة بخط عربي واضح بلا تسطير الرابط */
+  /* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
   html.rizq-app-nav #nav > .logo{
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
     display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
   }
   html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{
-    font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:17px!important;font-weight:800!important;
+    font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:20px!important;font-weight:900!important;
     color:#F5E0A0!important;-webkit-text-fill-color:#F5E0A0!important;white-space:nowrap!important;
     overflow:visible!important;min-width:max-content!important;text-decoration:none!important;
-    direction:rtl!important;unicode-bidi:isolate!important;line-height:1.15!important;
+    direction:rtl!important;unicode-bidi:isolate!important;line-height:1!important;
   }
-  html.rizq-app-nav #nav .logo-sub{display:none!important}
+  html.rizq-app-nav #nav .logo-sub{
+    display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;
+    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(232,201,106,.82)!important;
+    text-transform:uppercase!important;white-space:nowrap!important;
+  }
 }
 </style>
 <script src="rizq_packages_config.js?v=23.0"></script>
@@ -101,7 +105,8 @@ html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + 
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
 *,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif!important;-webkit-font-smoothing:antialiased}
 .logo-mark,.rizq-splash-brand{font-family:Georgia,'Times New Roman',serif!important}
-.logo-ar,.logo-sub,.logo-text{font-family:Georgia,'Times New Roman',serif!important}
+.logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important}
+.logo-sub,.logo-text{font-family:Georgia,'Times New Roman',serif!important}
 
 /* ── GRAIN ── */
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none!important;z-index:0;opacity:.5}
@@ -151,7 +156,7 @@ nav.scrolled{
 .logo-mark svg,.logo-mark-img svg{display:none}
 .logo-mark::after{display:none}
 .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
-.logo-text .logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:700;color:#F5E0A0;line-height:1;display:block;text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35);direction:rtl;unicode-bidi:isolate}
+.logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-size:26px;font-weight:900;color:#F5E0A0;line-height:1;display:block;text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35);direction:rtl;unicode-bidi:isolate}
 .logo-text .logo-sub{font-size:8.5px;color:rgba(232,201,106,.82);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
 .nav-center{display:flex;align-items:center;gap:10px;list-style:none;direction:inherit;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
 .nav-center::-webkit-scrollbar{display:none}
@@ -2512,8 +2517,8 @@ html[lang="fr"] .hero-pill-sep{display:block}
 /* ══ LOGO GOLD UNIVERSAL ══ */
 .logo-ar,.rizq-logo-text .logo-ar,.logo-text .logo-ar{font-size:22px!important;
   color:#C9A84C!important;
-  font-family:Georgia,'Times New Roman',serif!important;
-  font-weight:700!important;
+  font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;
+  font-weight:900!important;
   text-shadow:0 0 16px rgba(201,168,76,.4)
 }
 .logo-sub,.rizq-logo-text .logo-sub,.logo-text .logo-sub{
