@@ -778,8 +778,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     letter-spacing:-0.2px;
     color:rgba(255,255,255,.9) !important;
     line-height:1.15 !important;
-    max-width:5.6em;
-    white-space:normal !important;
+    max-width:none;
+    white-space:nowrap !important; /* سطر واحد — لا تقسيم Appels/d'offres */
     text-align:center;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-center a .rizq-hdr-ico,

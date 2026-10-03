@@ -180,7 +180,7 @@
       item('rizq_showroom.html', 'showrooms', '🏬', 'المعارض', 'Showrooms') +
       item('rizq_office.html', 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
-      item('rizq_tenders.html', 'tenders', '📋', 'المناقصات', 'Appels d\'offres') +
+      item('rizq_tenders.html', 'tenders', '📋', 'المناقصات', 'A-doffres') +
       item('rizq_investments.html', 'investments', '📈', 'الاستثمارات', 'Investissements') +
       item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
       item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
@@ -430,7 +430,7 @@
       offices: t2('المكاتب', 'Bureaux'),
       showrooms: t2('المعارض', 'Showrooms'),
       ads: t2('الإعلانات', 'Annonces'),
-      tenders: t2('المناقصات', 'Appels d\'offres'),
+      tenders: t2('المناقصات', 'A-doffres'),
       investments: t2('الاستثمارات', 'Investissements'),
       packs: t2('الباقات', 'Forfaits'),
       legal: t2('المواد القانونية', 'Mentions légales'),
@@ -852,7 +852,7 @@
           '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض', 'Showrooms')) + '</a></li>' +
           '<li class="rizq-nav-post" data-nav-order="5"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner('➕', t2('نشر', 'Publier')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6"><a href="' + moduleHref('office') + '" data-hdr="offices">' + m3LinkInner(NAV_ICOS.offices, t2('المكاتب', 'Bureaux')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'Appels d\'offres')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'A-doffres')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="' + moduleHref('investments') + '" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
           '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + m3LinkInner(NAV_ICOS.more, t2('المزيد', 'Plus')) + '</a>' +

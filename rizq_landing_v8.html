@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.7"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -7356,7 +7356,7 @@ const LANG = {
     'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
-    'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms', 'nav-tenders': 'Appels d\'offres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
+    'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms', 'nav-tenders': 'A-doffres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Rizq</span> — catalogue premium, acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements — présentez chaque unité en détail et échangez en sécurité via la plateforme.',
@@ -7731,7 +7731,7 @@ function applyLandingLang(toAr) {
   if (jumpBar) {
     var jumpMap = isAr
       ? {'#listings':'الإعلانات','#virtual-stores':'المحلات','#virtual-offices':'المكاتب','#virtual-showrooms':'المعارض','#virtual-tenders':'المناقصات','#virtual-investments':'الاستثمارات','#pricing':'الباقات'}
-      : {'#listings':'Annonces','#virtual-stores':'Boutiques','#virtual-offices':'Bureaux','#virtual-showrooms':'Showrooms','#virtual-tenders':'Appels d\'offres','#virtual-investments':'Investissements','#pricing':'Forfaits'};
+      : {'#listings':'Annonces','#virtual-stores':'Boutiques','#virtual-offices':'Bureaux','#virtual-showrooms':'Showrooms','#virtual-tenders':'A-doffres','#virtual-investments':'Investissements','#pricing':'Forfaits'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];
