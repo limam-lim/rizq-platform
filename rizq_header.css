@@ -2230,12 +2230,13 @@ body::after,.rizq-splash,.rizq-splash.is-done{
   visibility:visible !important;
 }
 #categories,#listings,#virtual-stores,#virtual-offices,#virtual-showrooms,
-#virtual-tenders,#about,#prices,#pricing,.listings-section,.why-section,
+#virtual-tenders,#virtual-investments,#about,#prices,#pricing,.listings-section,.why-section,
 .pricing-section,.cta-section,.section{
   visibility:visible !important;
   opacity:1 !important;
   height:auto !important;
   max-height:none !important;
+  scroll-margin-top:96px;
 }
 
 /* Footer ADMINIA powered-by — readable on navy (pages without rizq-theme.css) */

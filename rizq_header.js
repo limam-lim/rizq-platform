@@ -152,7 +152,6 @@
     return '' +
       '<a href="' + catsHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📂</span><div><strong data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</strong></div></a>' +
       '<a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>' +
-      '<a href="rizq_post.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">➕</span><div><strong data-hdr="post">' + t2('نشر (+)', 'Publier (+)') + '</strong></div></a>' +
       '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">' + t2('الباقات', 'Forfaits') + '</strong></div></a>' +
       '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">' + t2('المواد القانونية', 'Mentions légales') + '</strong></div></a>' +
       '<a href="' + aboutHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-hdr="about">' + t2('من نحن', 'À propos') + '</strong></div></a>' +
@@ -424,7 +423,7 @@
     var fallback = {
       home: t2('الرئيسية', 'Accueil'),
       cats: t2('الأقسام', 'Catégories'),
-      post: t2('نشر (+)', 'Publier (+)'),
+      post: t2('نشر', 'Publier'),
       ai: t2('✨ رزق ذكي', '✨ Rizq IA'),
       more: t2('المزيد', 'Plus'),
       stores: t2('المحلات', 'Boutiques'),
@@ -851,10 +850,11 @@
           '<li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="' + adsHref() + '" data-hdr="ads">' + m3LinkInner(NAV_ICOS.ads, t2('الإعلانات', 'Annonces')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="' + moduleHref('store') + '" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض', 'Showrooms')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="office" data-nav-order="5"><a href="' + moduleHref('office') + '" data-hdr="offices">' + m3LinkInner(NAV_ICOS.offices, t2('المكاتب', 'Bureaux')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'Appels d\'offres')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="' + moduleHref('investments') + '" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
-          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="8">' +
+          '<li class="rizq-nav-post" data-nav-order="5"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner('➕', t2('نشر', 'Publier')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6"><a href="' + moduleHref('office') + '" data-hdr="offices">' + m3LinkInner(NAV_ICOS.offices, t2('المكاتب', 'Bureaux')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'Appels d\'offres')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="' + moduleHref('investments') + '" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
+          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + m3LinkInner(NAV_ICOS.more, t2('المزيد', 'Plus')) + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +
           '</li>' +
