@@ -1044,7 +1044,7 @@
         var sw = window.RizqManager.detectLangSwitchRequest(t);
         if (sw) return sw;
       }
-      if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|ما\s*كاين|دراري|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|حسانية|شنهي/.test(t)) return 'hs';
+      if (/كيفاش|كيفاه|شنهو|شنو|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|ماكو|كاين|نعاونك|راك|الزين|شنهي|حسانية|وش\s*راك|ماشي\s*مشكل|أهلين/.test(t)) return 'hs';
       if (/[\u0600-\u06FF]/.test(t)) return 'ar';
       if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonjour/.test(lower)) return 'fr';
       if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
@@ -1110,7 +1110,7 @@
           _ctx.chatLang = sw;
           var ls = {
             ar: 'بكل سرور! 😊 اكتب سؤالك بالعربية — كيف أساعدك؟',
-            hs: 'واخا! 😊 شنو بغيتي؟',
+            hs: 'زين! 😊 اكتب بالحسانية — شنهو تبي؟',
             fr: 'Bien sûr ! 😊 Comment puis-je vous aider ?',
             en: 'Of course! 😊 What would you like to know?',
             es: '¡Claro! 😊 ¿En qué puedo ayudarte?'

@@ -469,11 +469,11 @@ function getLivePackagesForAI(lang, opts) {
 function buildAskBusinessCategoryReply(lang) {
   lang = String(lang || 'ar').toLowerCase();
   const replies = {
-    ar: 'تمام — باش نعطيك السعر الصحيح من كتالوج المنصة الحي، نشاطك شنو؟\nمحل / متجر، مكتب مهني، ولا شركة / معرض؟',
+    ar: 'تمام — لأعطيك السعر الصحيح من كتالوج المنصة الحي، ما نوع نشاطك؟\nمحل / متجر، مكتب مهني، أو شركة / معرض؟',
     fr: 'Parfait — pour vous donner le tarif exact du catalogue live, c’est pour une boutique, un bureau, ou une entreprise / showroom ?',
     en: 'Sure — to quote the live catalog price correctly: is it a store, an office, or a company / showroom?',
     es: 'Perfecto — para darte el precio exacto del catálogo en vivo: ¿tienda, oficina o empresa / showroom?',
-    hs: 'تمام — باش نعطيك السعر الصحيح، نشاطك شنو؟ محل، مكتب، ولا شركة؟',
+    hs: 'زين — باش نعطيك السعر الصحيح، نشاطك شنهو؟ محل، مكتب، ولا شركة؟',
   };
   return replies[lang] || replies.ar;
 }

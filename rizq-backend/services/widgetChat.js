@@ -36,24 +36,40 @@ const {
 
 const WIDGET_MAX_TOKENS = Number(process.env.WIDGET_CHAT_MAX_TOKENS) || 1400;
 
+function buildHassaniyaDialectBlock() {
+  return (
+    `\n## اللهجة الحسانية الموريتانية — إلزامي عند hs (CRITICAL)\n` +
+    `- إذا كانت لغة الرسالة hs أو تكلّم الزبون بالحسانية: ردّ بالحسانية الموريتانية فقط.\n` +
+    `- ممنوع منعاً باتاً اللهجة المغربية (الدارجة): لا تستخدم واخا، دابا، يلاه، ديال، حيت، بزاف (بمعنى مغربي)، واش خدام، كاين غير، ف هاد، ماشي هكاك بأسلوب مغربي.\n` +
+    `- استخدم حسانية موريتانيا: زين، أيوه، شنهو، تبي، حابّ، كيفاه، شحّال، أهلين، ماشي مشكل، تاع/متاع، إن شاء الله، رزق معاك.\n` +
+    `- أمثلة ردود صحيحة: «أهلين! شنهو تبي؟» · «زين، نوضّح لك.» · «الباقة هاذي تناسبك إن شاء الله.»\n` +
+    `- أمثلة ممنوعة: «واخا شنو بغيتي؟» · «دابا نعاونك» · «سياسة الخصوصية ديال رزق».\n` +
+    `- لا ترجع للفصحى إلا إذا كتب الزبون بالفصحى صراحةً.\n`
+  );
+}
+
 function buildLanguageInstructions(detectedLang, uiLang) {
   const label = getLangLabel(detectedLang);
   const ui = normalizeUiLang(uiLang);
-  return (
+  let block = (
     `\n## اللغة — إلزامي (Language — CRITICAL)\n` +
     `- كشف تلقائي: ردّ حصرياً بنفس لغة رسالة المستخدم الأخيرة.\n` +
     `- لغة هذه الرسالة المكتشفة: ${label} (${detectedLang}).\n` +
-    `- مدعوم: العربية، الحسانية، الفرنسية، الإنجليزية، الإسبانية — طابق المستخدم حرفياً.\n` +
+    `- مدعوم: العربية الفصحى، الحسانية الموريتانية، الفرنسية، الإنجليزية، الإسبانية — طابق المستخدم حرفياً.\n` +
     `- إذا خلط لغات، استخدم اللغة السائدة في رسالته.\n` +
     `- لغة واجهة الصفحة الافتراضية: ${getLangLabel(ui)} — استخدمها فقط إن كانت الرسالة غامضة (؟ أو emoji فقط).\n` +
     `\n## فهم مختصر ومبتور (Rizq slang)\n` +
     `افهم الطلبات القصيرة والعامية في سياق منصة رزق:\n` +
-    `- عربي/حسانية: كم، ثمن، موثوق، نشر، باقة، إعلان، محل، شنو، كيفاش، بغيت، شحال\n` +
+    `- عربي/حسانية موريتانية: كم، ثمن، موثوق، نشر، باقة، إعلان، محل، شنهو، تبي، كيفاه، شحّال، حابّ\n` +
     `- FR: prix, pub, annonce, forfait, fiabilité, combien, vendeur\n` +
     `- EN: price, post, package, trust, seller, how much, reliable\n` +
     `- ES: precio, publicar, paquete, confianza, vendedor, cuánto\n` +
     `لا تطلب إعادة صياغة إن كان القصد واضحاً في سياق الإعلانات/المتاجر/الباقات.\n`
   );
+  if (detectedLang === 'hs') {
+    block += buildHassaniyaDialectBlock();
+  }
+  return block;
 }
 
 function buildDiamondSystemBlock() {
@@ -157,7 +173,7 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
   }
   prompt += 'For serious subscription interest or admin requests: collect business name, WhatsApp, and package — then call register_interest or escalate_to_human.\n';
   prompt += 'When user attaches image/receipt/screenshot: acknowledge professionally, confirm it was forwarded to management for verification — never claim payment is verified.\n';
-  prompt += 'Understand Hassaniya/local Mauritanian terms but reply in simple fusaha Arabic (or French if user writes in French).\n';
+  prompt += 'If the user writes in Mauritanian Hassaniya (hs): reply in Mauritanian Hassaniya only — NEVER Moroccan Darija, NEVER switch to fusaha unless they wrote fusaha. If French/English/Spanish: match that language.\n';
 
   const openAdId = pageContext && (pageContext.urlAdId || (pageContext.ad && pageContext.ad.id));
   if (pageContext && pageContext.page) {
@@ -272,7 +288,7 @@ function buildFactReply(mergedFacts, lang, message) {
   if (/موثوق|ثقة|trust|fiab|بائع|seller|confian|vendedor|reliable/i.test(q) && ad.seller_trust_score != null) {
     return pickLang({
       ar: `درجة ثقة البائع على «${ad.title}»: ${ad.seller_trust_score}/100 (من بيانات الإعلان).`,
-      hs: `درجة الثقة ديال البائع ف «${ad.title}»: ${ad.seller_trust_score}/100.`,
+      hs: `درجة ثقة البائع ف «${ad.title}»: ${ad.seller_trust_score}/100.`,
       fr: `Score de confiance du vendeur pour «${ad.title}» : ${ad.seller_trust_score}/100.`,
       en: `Seller trust score for "${ad.title}": ${ad.seller_trust_score}/100 (from listing data).`,
       es: `Puntuación de confianza del vendedor para «${ad.title}»: ${ad.seller_trust_score}/100.`,
@@ -282,7 +298,7 @@ function buildFactReply(mergedFacts, lang, message) {
   if (/سعر|ثمن|price|prix|combien|كم|precio|cu[aá]nto|how much/i.test(q) && ad.price) {
     return pickLang({
       ar: `السعر المعروض لـ«${ad.title}»: ${ad.price} (من بيانات الإعلان).`,
-      hs: `الثمن ديال «${ad.title}»: ${ad.price}.`,
+      hs: `ثمن «${ad.title}»: ${ad.price}.`,
       fr: `Prix affiché pour «${ad.title}» : ${ad.price}.`,
       en: `Listed price for "${ad.title}": ${ad.price}.`,
       es: `Precio publicado de «${ad.title}»: ${ad.price}.`,
@@ -551,7 +567,7 @@ async function handleWidgetChat(body) {
       : getLivePackagesForAI(detectedLang);
   }
   const extraInstruction = body.autoLang === true
-    ? 'Detect the user language automatically (Arabic, Hassaniya/Darija, French, English, or Spanish) and reply only in that language.'
+    ? 'Detect the user language automatically (Arabic fusaha, Mauritanian Hassaniya, French, English, or Spanish) and reply only in that language. For Hassaniya: Mauritanian Hassaniya only — never Moroccan Darija.'
     : (body.systemInstruction
       ? String(body.systemInstruction).slice(0, 400)
       : '');

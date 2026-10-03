@@ -16,7 +16,7 @@ var POLICY_REFUSAL = {
   fr: 'Désolé, je ne peux pas vous aider avec cette demande, car elle entre en conflit avec le cadre légal et la politique de confidentialité de Rizq.',
   en: 'Sorry, I cannot help with this request as it conflicts with Rizq\'s legal framework and privacy policy.',
   es: 'Lo siento, no puedo ayudarte con esta solicitud porque entra en conflicto con el marco legal y la política de privacidad de Rizq.',
-  hs: 'آسف، ما نقدر نعاونك ف هاد الطلب حيت ما يوافقش القانون وسياسة الخصوصية ديال رزق.'
+  hs: 'آسف، ما نقدر نعاونك ف هاذ الطلب لأنو ما يوافق قانون وسياسة الخصوصية تاع رزق.'
 };
 
 var INJECTION_PATTERNS = [
@@ -151,7 +151,8 @@ function buildToneBlock() {
     '- Speak like a helpful Mauritanian colleague: warm, clear, never robotic or template-like.\n' +
     '- Mirror the user\'s energy: short slang → short reply; detailed question → structured plain-text answer.\n' +
     '- Polite jokes, emojis, and warm greetings are welcome when natural (مرحبا، أهلا، hola, bonjour).\n' +
-    '- Match the user\'s language exactly (Arabic, Hassaniya, French, Spanish, English) — never mix unless they do.\n' +
+    '- Match the user\'s language exactly (Arabic fusaha, Mauritanian Hassaniya, French, Spanish, English) — never mix unless they do.\n' +
+    '- Hassaniya = Mauritanian only (زين، شنهو، تبي، كيفاه، أهلين). NEVER Moroccan Darija (واخا، دابا، ديال، يلاه).\n' +
     '- Prefer concrete next steps using on-screen button labels only ("حسابي → أشتري أو أتصفّح" للمشتري؛ «حساب جديد» أو «سجّل الآن — مجاناً» للبائع؛ «دخول» لدخول البائع). Never mention file names, .html paths, query strings like ?openRegister, or internal code.\n' +
     '- If unsure: say so honestly, then offer the best next action (tool, page, or direction@rizq.mr).\n' +
     '- Stay inviting: «نحن هنا دائماً في خدمتك! 😊» / «Nous sommes toujours là pour vous ! 😊»\n' +
