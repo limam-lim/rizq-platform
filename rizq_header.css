@@ -3194,3 +3194,17 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     justify-content:flex-start !important;
   }
 }
+
+/* ── شعار رزق: Cairo دائماً (مثل كبسولة الهيرو) على كل العروض ── */
+html.rizq-app-nav #nav .logo-ar,
+html.rizq-app-nav #rizq-desk-nav .logo-ar,
+html.rizq-app-nav #nav .logo-text .logo-ar,
+html.rizq-app-nav #rizq-desk-nav .logo-text .logo-ar,
+html.rizq-app-nav #rizq-app-header .logo-ar,
+html.rizq-app-nav .rizq-hdr-brand-ar,
+html.rizq-app-nav .logo-ar{
+  font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
+  font-weight:900 !important;
+  font-style:normal !important;
+  letter-spacing:0 !important;
+}
