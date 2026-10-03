@@ -895,6 +895,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <div id="calc-price" style="font-size:22px;font-weight:900;color:var(--teal)"></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px" id="calc-note" data-t="calc-note">تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة</div>
           <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">📤 اطلب عرض سعر دقيق لهذا الاختيار</button>
+          <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
 
@@ -917,6 +918,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           </select>
           <textarea class="req-input" id="rf-msg" placeholder="تفاصيل إضافية..." style="min-height:70px;resize:none" data-ph="rf-msg"></textarea>
           <button class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب</button>
+          <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
         </div>
       </div>
     </div>
@@ -1117,6 +1119,84 @@ function calcToRequest(){
   }
   var nameEl = document.getElementById('rf-name');
   if(nameEl) nameEl.focus();
+}
+
+function _officePrefactureSeller(){
+  var sid = '';
+  try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
+  var sname = (document.getElementById('office-name') || document.getElementById('hc-name') || {}).textContent || _t2('مكتب رزق','Bureau Rizq');
+  var phone = '';
+  try {
+    var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa');
+    if (wa && wa.href) phone = wa.href.replace(/.*wa\.me\//,'').split('?')[0];
+  } catch (e2) {}
+  return { id: sid, name: sname, phone: phone };
+}
+
+function _runPrefacture(fn){
+  if (!window.RizqPrefacture) {
+    var s = document.createElement('script');
+    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.onload = fn;
+    document.head.appendChild(s);
+    return;
+  }
+  fn();
+}
+
+function issueOfficePrefactureFromCalc(){
+  var typeEl = document.getElementById('calc-type');
+  var priceEl = document.getElementById('calc-price');
+  if (!typeEl || !typeEl.value) {
+    showToast(_t2('اختر خدمة أولاً','Choisissez d’abord un service'), 'error');
+    return;
+  }
+  var opt = typeEl.options[typeEl.selectedIndex];
+  var label = opt ? opt.textContent : _t2('خدمة مكتبية','Service de bureau');
+  var mid = 0;
+  if (priceEl && priceEl.textContent) {
+    var parts = priceEl.textContent.replace(/[^\d—\-]/g,'').split(/[—\-]/);
+    var a = parseFloat(String(parts[0]||'').replace(/\D/g,'')) || 0;
+    var b = parseFloat(String(parts[1]||'').replace(/\D/g,'')) || a;
+    mid = Math.round((a + b) / 2) || a;
+  }
+  _runPrefacture(function(){
+    var s = _officePrefactureSeller();
+    RizqPrefacture.issueAndOpen({
+      module: 'office',
+      sellerAccountId: s.id,
+      sellerName: s.name,
+      sellerPhone: s.phone,
+      lines: [{ name: label, qty: 1, unitPrice: mid }],
+      buyerNote: _t2('تقدير أولي من مقدّر التكلفة — قابل للتأكيد','Estimation initiale — à confirmer'),
+      meta: { source: 'office-calc' }
+    });
+  });
+}
+
+function issueOfficePrefactureFromRequest(){
+  var name = ((document.getElementById('rf-name') || {}).value || '').trim();
+  var phone = ((document.getElementById('rf-phone') || {}).value || '').trim();
+  var svcEl = document.getElementById('rf-service');
+  var svc = svcEl && svcEl.value ? svcEl.value : ((svcEl && svcEl.options[svcEl.selectedIndex]) ? svcEl.options[svcEl.selectedIndex].textContent : '');
+  if (!svc) {
+    showToast(_t2('اختر الخدمة لإصدار فاتورة قبل','Choisissez le service pour la préfacture'), 'error');
+    return;
+  }
+  _runPrefacture(function(){
+    var s = _officePrefactureSeller();
+    RizqPrefacture.issueAndOpen({
+      module: 'office',
+      sellerAccountId: s.id,
+      sellerName: s.name,
+      sellerPhone: s.phone,
+      buyerName: name,
+      buyerPhone: phone,
+      lines: [{ name: svc, qty: 1, unitPrice: 0 }],
+      buyerNote: _t2('فاتورة قبل الخدمة — يُحدَّث المبلغ عند التأكيد','Préfacture de service — montant à confirmer'),
+      meta: { source: 'office-request' }
+    });
+  });
 }
 
 // ── toggleReqForm ──────────────────────────

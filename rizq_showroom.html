@@ -824,6 +824,9 @@ function renderCatalog(){
       +'<button class="btn-inquire" onclick="event.stopPropagation();openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
       +'✉️ '+_t('استفسار آمن','Demande sécurisée')
       +'</button>'
+      +'<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueShowroomPrefacture(\''+esc(item.id)+'\')">'
+      +'PREFACTUR · '+_t('فاتورة قبل','Préfacture')
+      +'</button>'
       +'</div></div>';
   }).join('');
 }
@@ -936,6 +939,42 @@ function openItemChat(itemId, itemName){
     adId      : itemId || _showroomId,
     adEmoji   : '🏛️'
   });
+}
+
+function _parsePriceMRU(v){
+  if (typeof v === 'number') return v;
+  var n = parseFloat(String(v || '').replace(/[^\d.]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+
+function issueShowroomPrefacture(itemId){
+  var item = (_allItems || []).find(function(it){ return String(it.id) === String(itemId); });
+  if (!item) return showToast(_t('❌ العرض غير موجود','❌ Article introuvable'));
+  function run(){
+    var name = (_lang==='fr' && item.nameFr) ? item.nameFr : (item.name || '');
+    var seller = _acc ? _acc.name : ((document.getElementById('showroom-name')||{}).textContent || '');
+    var phone = '';
+    try {
+      var wa = document.getElementById('wa-btn');
+      if (wa && wa.href) phone = wa.href.replace(/.*wa\.me\//,'').split('?')[0];
+    } catch (e) {}
+    RizqPrefacture.issueAndOpen({
+      module: 'showroom',
+      sellerAccountId: _showroomId || '',
+      sellerName: seller,
+      sellerPhone: phone,
+      lines: [{ id: item.id, name: name, qty: 1, unitPrice: _parsePriceMRU(item.price) }],
+      meta: { source: 'showroom-item' }
+    });
+  }
+  if (!window.RizqPrefacture) {
+    var s = document.createElement('script');
+    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.onload = run;
+    document.head.appendChild(s);
+    return;
+  }
+  run();
 }
 
 /* ── Share ── */

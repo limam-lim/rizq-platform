@@ -574,6 +574,10 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <button type="button" class="order-btn rizq-prf-trigger-gold" id="cart-prefacture-btn" onclick="issueCartPrefacture()" style="width:100%;margin-bottom:10px;border:none;cursor:pointer;font-family:inherit">
+      <span data-t-fr="PREFACTUR · Voir avant paiement">PREFACTUR · فاتورة قبل الدفع</span>
+    </button>
+
     <button class="order-btn" onclick="document.getElementById('checkout-form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))">
       <span data-t-fr="✅ Commander">✅ تأكيد الطلب</span>
     </button>
@@ -818,6 +822,31 @@ function buildWALink() {
     : `🛒 Nouvelle commande depuis Boutique Al-Nour via Rizq\n\n${items}\n\n${deliveryType==='delivery'?'🚚 Livraison':'🏪 Retrait en boutique'}\nTotal: ${total.toLocaleString()} MRU\nPaiement: à la livraison, en espèces`;
   const el = document.getElementById('wa-order-btn');
   if (el) el.href = `https://wa.me/22244882212?text=${encodeURIComponent(msg)}`;
+}
+
+function issueCartPrefacture(){
+  const isAr = document.documentElement.lang !== 'fr';
+  if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
+  if (!window.RizqPrefacture) {
+    showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
+    var s = document.createElement('script');
+    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.onload = function(){ issueCartPrefacture(); };
+    document.head.appendChild(s);
+    return;
+  }
+  var nameEl = document.getElementById('f-name');
+  var phoneEl = document.getElementById('f-phone');
+  var doc = RizqPrefacture.createFromCart({
+    module: 'store',
+    sellerName: (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
+    sellerAccountId: (cart[0] && (cart[0].storeId || cart[0].accountId)) || '',
+    buyerName: nameEl ? nameEl.value.trim() : '',
+    buyerPhone: phoneEl ? phoneEl.value.trim() : '',
+    buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement'
+  });
+  if (!doc) { showToast(isAr ? '❌ تعذّر إنشاء فاتورة قبل' : '❌ Impossible de créer la préfacture'); return; }
+  RizqPrefacture.openModal(doc.id);
 }
 
 function submitOrder(e) {
