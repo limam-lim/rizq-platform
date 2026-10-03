@@ -474,54 +474,63 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
 /* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
 
-.hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:9px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35);padding:8px 18px;border-radius:12px;margin:0;animation:fadeUp .8s ease both;min-height:40px;box-sizing:border-box}
+.hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:9px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35);padding:8px 20px;border-radius:12px;margin:0 auto;animation:fadeUp .8s ease both;min-height:38px;box-sizing:border-box}
 .hero-eyebrow .pulse{width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(201,168,76,.6);animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,168,76,.6)}70%{box-shadow:0 0 0 8px rgba(201,168,76,0)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 .hero-eyebrow span{color:var(--gold);font-size:12.5px;font-weight:700;letter-spacing:.6px;line-height:1.2}
 
-/* شارة المنصة + كبسولة رزق في صف واحد ومتوازيين بالحجم */
+/* عمودي متناسق: المنصة أولاً ثم رزق تحتها */
 .hero-brand-row{
-  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
-  gap:10px;margin:0 auto 16px;width:fit-content;max-width:96%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;margin:0 auto 18px;width:fit-content;max-width:96%;
 }
 .hero-title-card{
   display:flex;align-items:center;justify-content:center;
   width:fit-content;
-  min-width:0;
-  margin:0;
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
-  border:1px solid rgba(201,168,76,.4);
-  border-radius:12px;
-  padding:4px 16px;
-  min-height:40px;
+  min-width:min(220px,70vw);
+  margin:0 auto;
+  background:
+    linear-gradient(145deg,rgba(201,168,76,.12),transparent 42%),
+    linear-gradient(135deg,#0D1B2A,#1B3A6B 55%,#152e58);
+  border:1.5px solid rgba(201,168,76,.48);
+  border-radius:16px;
+  padding:10px 36px 8px;
   box-sizing:border-box;
-  box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 14px rgba(201,168,76,.1);
+  box-shadow:0 10px 28px rgba(0,0,0,.22),0 0 20px rgba(201,168,76,.12),inset 0 1px 0 rgba(255,255,255,.08);
   animation:fadeUp .8s .1s ease both;
   position:relative;
   overflow:hidden;
   text-align:center;
 }
-.hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(34px,5.2vw,52px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px}
+.hero-title-card::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background-image:linear-gradient(45deg,rgba(201,168,76,.35) 1px,transparent 1px),linear-gradient(-45deg,rgba(201,168,76,.28) 1px,transparent 1px);
+  background-size:18px 18px;
+}
+.hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(44px,7vw,68px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px;position:relative;z-index:1;text-shadow:0 2px 18px rgba(201,168,76,.28)}
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
 @keyframes shine{to{background-position:200%}}
 
-/* صف: خيارك الأول + كبسولة بيع/اشتر/تميز الزجاجية — متوازيان على سطح المكتب */
+/* عمودي: خيارك الأول ثم كبسولة بيع/اشتر/تميز المستطيلة تحتها */
 .hero-lead-row{
-  display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;
-  gap:14px 16px;margin:0 auto 10px;width:100%;max-width:1100px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;margin:0 auto 12px;width:100%;max-width:720px;
 }
 .hero-subtitle-card{
   display:block;
-  width:fit-content;
-  max-width:min(520px,58%);
-  margin:0;
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);
-  border:1px solid rgba(201,168,76,.22);
+  width:100%;
+  max-width:640px;
+  margin:0 auto;
+  background:
+    linear-gradient(145deg,rgba(201,168,76,.1),transparent 40%),
+    linear-gradient(135deg,#0D1B2A,#1B3A6B);
+  border:1px solid rgba(201,168,76,.28);
   border-radius:18px;
-  padding:12px 22px 10px;
-  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  padding:18px 28px 16px;
+  box-shadow:0 10px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.06);
   animation:fadeUp .8s .16s ease both;
-  flex:0 1 auto;
+  flex:none;
+  box-sizing:border-box;
 }
 .hero-subtitle-primary{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
@@ -2251,28 +2260,29 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 .price-tab.active{background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(27,58,107,.25)}
 .price-pane{display:none;overflow:visible;padding-top:4px}.price-pane.active{display:block;animation:fadeUp .35s ease}
 .hero-pills{
-  display:inline-flex!important;
+  display:flex!important;
   flex-direction:row!important;
   align-items:stretch;
   justify-content:center;
   gap:0;
-  margin:0;
+  margin:0 auto;
   flex-wrap:nowrap!important;
-  padding:5px;
-  border-radius:999px;
+  padding:6px;
+  width:100%;
+  max-width:520px;
+  border-radius:14px; /* مستطيل جذاب بدل الحبة الدائرية */
   background:
-    linear-gradient(145deg,rgba(255,255,255,.34),rgba(255,255,255,.08) 42%,rgba(13,27,42,.12)),
-    rgba(255,255,255,.14);
-  border:1.5px solid rgba(201,168,76,.55);
+    linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,.12) 45%,rgba(13,27,42,.08)),
+    linear-gradient(135deg,rgba(27,58,107,.08),rgba(201,168,76,.1));
+  border:1.5px solid rgba(201,168,76,.5);
   box-shadow:
-    0 10px 30px rgba(13,27,42,.16),
-    inset 0 1px 0 rgba(255,255,255,.55),
-    inset 0 -1px 0 rgba(13,27,42,.08);
-  backdrop-filter:blur(18px) saturate(1.35);
-  -webkit-backdrop-filter:blur(18px) saturate(1.35);
+    0 12px 32px rgba(13,27,42,.14),
+    inset 0 1px 0 rgba(255,255,255,.65),
+    inset 0 -1px 0 rgba(13,27,42,.06);
+  backdrop-filter:blur(16px) saturate(1.25);
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);
   animation:fadeUp .8s .2s ease both;
-  flex:0 0 auto;
-  max-width:100%;
+  flex:none;
   box-sizing:border-box;
 }
 .hero-pill{
@@ -2280,80 +2290,84 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   border:none;
   color:#0F2347;
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
-  font-size:clamp(14px,1.7vw,17px);
+  font-size:clamp(15px,1.8vw,18px);
   font-weight:800;
-  padding:11px 26px;
-  border-radius:999px;
+  padding:12px 28px;
+  border-radius:10px;
   letter-spacing:.2px;
-  transition:background .22s ease,color .22s ease,box-shadow .22s ease;
+  transition:background .22s ease,color .22s ease,box-shadow .22s ease,transform .22s ease;
   cursor:default;
   box-shadow:none;
   text-shadow:none;
   position:relative;
   overflow:hidden;
   min-width:0;
+  flex:1 1 0;
   text-align:center;
   box-sizing:border-box;
   white-space:nowrap;
 }
 .hero-pill::before{display:none}
 .hero-pill:hover{
-  background:linear-gradient(135deg,rgba(27,58,107,.92),rgba(13,27,42,.94));
+  background:linear-gradient(135deg,#1B3A6B,#0D1B2A);
   border:none;
-  transform:none;
-  box-shadow:0 4px 14px rgba(13,27,42,.22);
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(13,27,42,.24);
   color:#FFE279;
 }
 .hero-pill-sep{
   align-self:center;
   width:1px;
-  height:18px;
-  background:rgba(201,168,76,.45);
+  height:22px;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,.55),transparent);
   color:transparent;
   font-size:0;
   line-height:0;
   opacity:1;
-  margin:0;
+  margin:0 2px;
   flex:0 0 1px;
 }
 /* فرنسية: نفس الحجم والوزن، بدون فراغ زائد بين الأزرار */
-html[lang="fr"] .hero-pills{gap:0}
+html[lang="fr"] .hero-pills{gap:0;max-width:560px}
 html[lang="fr"] .hero-pill{
-  font-size:clamp(13px,1.6vw,16px);
-  padding:11px 20px;
+  font-size:clamp(14px,1.7vw,17px);
+  padding:12px 18px;
   min-width:0;
   letter-spacing:0;
 }
 html[lang="fr"] .hero-pill-sep{display:block}
-/* على الجوال: صف عمودي ثم كبسولة بعرض كامل */
+/* على الجوال: نفس الترتيب العمودي المتناسق */
 @media(max-width:768px){
-  .hero-brand-row{gap:8px;margin-bottom:12px}
-  .hero-title-card{padding:3px 14px;min-height:36px}
-  .hero-eyebrow{padding:7px 14px;min-height:36px}
+  .hero-brand-row{gap:8px;margin-bottom:14px}
+  .hero-title-card{padding:8px 28px 6px;min-width:min(200px,72vw);border-radius:14px}
+  .hero-headline{font-size:clamp(40px,12vw,56px)}
+  .hero-eyebrow{padding:7px 14px;min-height:34px}
   .hero-eyebrow span{font-size:11.5px}
-  .hero-lead-row{flex-direction:column;gap:12px;align-items:stretch}
-  .hero-subtitle-card{max-width:100%;width:100%;padding:12px 16px 10px;flex:none}
+  .hero-lead-row{gap:12px;max-width:100%}
+  .hero-subtitle-card{max-width:100%;width:100%;padding:14px 16px 12px;flex:none}
   .hero-pills{
     flex-direction:row!important;
     flex-wrap:nowrap!important;
     gap:0;
-    padding:4px;
+    padding:5px;
     margin:0 auto;
     width:100%;
     max-width:100%;
+    border-radius:12px;
     box-sizing:border-box;
   }
   .hero-pill{
     flex:1 1 0;
     min-width:0;
-    padding:10px 4px;
+    padding:11px 6px;
     font-size:clamp(13px,3.5vw,15px);
     text-align:center;
+    border-radius:8px;
   }
-  .hero-pill-sep{height:16px}
+  .hero-pill-sep{height:18px}
   html[lang="fr"] .hero-pill{
     font-size:clamp(12px,3.2vw,14px);
-    padding:12px 6px;
+    padding:11px 4px;
     min-width:0;
   }
 }
