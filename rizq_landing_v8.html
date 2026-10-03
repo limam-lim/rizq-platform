@@ -474,28 +474,31 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
 /* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
 
-.hero-eyebrow{display:flex;width:fit-content;align-items:center;gap:10px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px solid rgba(201,168,76,.42);padding:11px 26px;border-radius:14px;margin:0 auto;animation:fadeUp .8s ease both;min-height:46px;box-sizing:border-box;box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)}
+.hero-eyebrow{display:flex;width:max-content;max-width:100%;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px solid rgba(201,168,76,.42);padding:11px 26px;border-radius:14px;margin:0;animation:fadeUp .8s ease both;min-height:46px;box-sizing:border-box;box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)}
 .hero-eyebrow .pulse{width:9px;height:9px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(201,168,76,.6);animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,168,76,.6)}70%{box-shadow:0 0 0 8px rgba(201,168,76,0)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 .hero-eyebrow span{color:var(--gold);font-size:clamp(13.5px,1.5vw,15px);font-weight:800;letter-spacing:.5px;line-height:1.25}
 
-/* عمودي متناسق: الشارة ثم رزق — أحجام متقاربة وجذابة */
+/* الشارة تحدد العرض — كبسولة رزق بنفس الطول تماماً */
 .hero-brand-row{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;margin:0 auto 20px;width:100%;max-width:680px;
+  display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;
+  gap:12px;margin:0 auto 20px;width:max-content;max-width:96%;
 }
 .hero-title-card{
   display:flex;align-items:center;justify-content:center;
   width:100%;
-  max-width:420px;
-  min-width:min(260px,78vw);
-  margin:0 auto;
+  min-width:0;
+  max-width:none;
+  margin:0;
+  /* يمنع كلمة رزق الكبيرة من توسيع الصف — العرض = عرض الشارة فقط */
+  contain:inline-size;
   background:
     linear-gradient(145deg,rgba(201,168,76,.14),transparent 42%),
     linear-gradient(135deg,#0D1B2A,#1B3A6B 55%,#152e58);
   border:1.5px solid rgba(201,168,76,.52);
   border-radius:16px;
-  padding:14px 42px 12px;
+  padding:18px 16px; /* متساوٍ من كل الجهات لتوسيط رزق في الوسط تماماً */
+  min-height:92px;
   box-sizing:border-box;
   box-shadow:0 12px 32px rgba(0,0,0,.24),0 0 22px rgba(201,168,76,.14),inset 0 1px 0 rgba(255,255,255,.1);
   animation:fadeUp .8s .1s ease both;
@@ -504,24 +507,33 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   text-align:center;
 }
 .hero-title-card::before{
-  content:'';position:absolute;inset:0;pointer-events:none;opacity:.18;
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.14;
   background-image:linear-gradient(45deg,rgba(201,168,76,.35) 1px,transparent 1px),linear-gradient(-45deg,rgba(201,168,76,.28) 1px,transparent 1px);
   background-size:18px 18px;
 }
-.hero-headline{font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;font-size:clamp(48px,7.4vw,74px);font-weight:900;color:var(--gold);line-height:1;margin:0;letter-spacing:.5px;position:relative;z-index:1;text-shadow:0 2px 18px rgba(201,168,76,.3)}
+.hero-title-card::after{display:none!important;content:none!important}
+.hero-headline{
+  font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
+  font-size:clamp(52px,7.8vw,78px);font-weight:900;color:var(--gold);
+  line-height:1;margin:0;padding:0;letter-spacing:.5px;
+  position:relative;z-index:1;
+  width:100%;text-align:center;
+  display:flex;align-items:center;justify-content:center;
+  text-shadow:0 2px 18px rgba(201,168,76,.3);
+}
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
 @keyframes shine{to{background-position:200%}}
 
-/* عمودي: خيارك الأول ثم كبسولة بيع/اشتر/تميز — نفس عرض المجموعة */
+/* خيارك الأول + بيع/اشتر — نفس طول بطاقة متجرك الافتراضي (hero-stage) */
 .hero-lead-row{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:16px;margin:0 auto 14px;width:100%;max-width:680px;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:center;
+  gap:16px;margin:0 auto 14px;width:min(1080px,96%);
 }
 .hero-subtitle-card{
   display:block;
   width:100%;
-  max-width:680px;
-  margin:0 auto;
+  max-width:none;
+  margin:0;
   background:
     linear-gradient(145deg,rgba(201,168,76,.1),transparent 40%),
     linear-gradient(135deg,#0D1B2A,#1B3A6B);
@@ -1865,8 +1877,9 @@ html[dir="ltr"] .listings-section .section-desc{
   .footer-grid{grid-template-columns:1fr}
   .hero-stats-bar{flex-wrap:wrap}
   .hero-content{padding-top:44px;width:94%}
-  .hero-headline{font-size:clamp(40px,12vw,56px)}
-  .hero-title-card{padding:8px 28px 6px;border-radius:14px;margin:0;min-width:min(200px,72vw)}
+  .hero-headline{font-size:clamp(46px,13vw,64px)}
+  .hero-title-card{padding:16px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
+  .hero-lead-row{width:100%}
   .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
   .hero-spaces-sub{font-size:12.5px}
@@ -2270,7 +2283,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   flex-wrap:nowrap!important;
   padding:9px;
   width:100%;
-  max-width:680px; /* نفس عرض بطاقة «خيارك الأول» والشارة */
+  max-width:none; /* يطابق عرض hero-lead-row = عرض hero-stage */
   min-height:64px;
   border-radius:14px;
   background:
@@ -2330,7 +2343,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   flex:0 0 1.5px;
 }
 /* فرنسية: نفس الحجم والوزن */
-html[lang="fr"] .hero-pills{gap:0;max-width:680px}
+html[lang="fr"] .hero-pills{gap:0;max-width:none}
 html[lang="fr"] .hero-pill{
   font-size:clamp(16px,2vw,20px);
   padding:16px 18px;
@@ -2340,13 +2353,13 @@ html[lang="fr"] .hero-pill{
 html[lang="fr"] .hero-pill-sep{display:block}
 /* على الجوال: نفس الترتيب العمودي بأحجام أوضح */
 @media(max-width:768px){
-  .hero-brand-row{gap:10px;margin-bottom:16px;max-width:100%}
-  .hero-title-card{padding:12px 32px 10px;min-width:min(220px,78vw);max-width:92%;border-radius:14px}
-  .hero-headline{font-size:clamp(44px,13vw,60px)}
-  .hero-eyebrow{padding:10px 16px;min-height:42px}
+  .hero-brand-row{gap:10px;margin-bottom:16px;max-width:96%;width:max-content}
+  .hero-title-card{padding:16px 18px;min-width:0;min-height:76px;border-radius:14px;width:100%}
+  .hero-headline{font-size:clamp(46px,13vw,64px)}
+  .hero-eyebrow{padding:10px 16px;min-height:42px;width:max-content;max-width:100%}
   .hero-eyebrow span{font-size:clamp(12.5px,3.4vw,14px)}
-  .hero-lead-row{gap:14px;max-width:100%}
-  .hero-subtitle-card{max-width:100%;width:100%;padding:18px 18px 16px;flex:none}
+  .hero-lead-row{gap:14px;width:min(1080px,96%);max-width:100%}
+  .hero-subtitle-card{max-width:none;width:100%;padding:18px 18px 16px;flex:none}
   .hero-subtitle-primary{font-size:clamp(22px,5.6vw,28px)}
   .hero-subtitle-secondary{font-size:clamp(17px,4.4vw,22px)}
   .hero-pills{
