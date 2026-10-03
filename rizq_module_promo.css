@@ -1,5 +1,7 @@
-/* rizq_module_promo.css — شريط ترويج موحّد لواجهات المحلات/المعارض/المكاتب/المناقصات/الاستثمارات */
-.rizq-mod-promo{
+/* rizq_module_promo.css — retired: promo strip removed (no promotional value / distraction) */
+.rizq-mod-promo,
+#rizq-mod-promo{display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;margin:0!important;padding:0!important;border:0!important}
+.rizq-mod-promo-retired{
   --rmp-navy:#0D1B2A;
   --rmp-navy2:#0F2347;
   --rmp-gold:#C9A84C;

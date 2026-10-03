@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '27.8';
+  var ASSET_V = '27.9';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -136,17 +136,6 @@
       var css = document.createElement('link');
       css.rel = 'stylesheet';
       css.href = 'rizq_mobile.css?v=' + ASSET_V;
-      // Module promo strip on public interface pages
-      try {
-        var path = (location.pathname || '').split('/').pop() || '';
-        if (/^rizq_(store|showroom|office|tenders|investments)\.html$/i.test(path)) {
-          var mpc = document.createElement('link');
-          mpc.rel = 'stylesheet';
-          mpc.href = 'rizq_module_promo.css?v=' + ASSET_V;
-          document.head.appendChild(mpc);
-          appendScript('rizq_module_promo.js?v=' + ASSET_V, { defer: true });
-        }
-      } catch (eModPromo) {}
       document.head.appendChild(css);
     }
     /* Assistant: floating #rizq-chat-toggle is created by rizq_widget_embed.js.
