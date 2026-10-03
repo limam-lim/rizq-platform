@@ -25,7 +25,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
-const { isProdEnv, extractAccountToken, extractDashToken } = require('./middleware/accountAuth');
+const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
@@ -698,7 +698,7 @@ const {
 } = require('./services/contactGate');
 const { scanContactLeakFields } = require('./services/contactLeakGuard');
 const { canAutoApproveAccountType } = require('./config/verificationPolicy');
-const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, sendSellerResetOtp, verifySellerResetOtp, consumeSellerResetVerification, getPublicOtpConfig } = require('./services/otpService');
+const { sendOtp, verifyOtp, sendBuyerOtp, verifyBuyerOtp, consumeBuyerVerificationByEmail, consumeVerification, sendSellerResetOtp, verifySellerResetOtp, consumeSellerResetVerification, getPublicOtpConfig } = require('./services/otpService');
 const {
   saveAdImages,
   saveCatalogImages,
@@ -1712,7 +1712,7 @@ function resolveOptionalAccountViewer(req) {
   return (acc
     && acc.status === 'approved'
     && !acc.suspended
-    && timingSafeEqualStr(acc.accessToken, token)) ? accountId : null;
+    && tokenMatchesAccount(acc, token)) ? accountId : null;
 }
 
 function genAccountId() {
@@ -1849,6 +1849,15 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
+  if (['individual', 'store'].includes(reqType) && sellerPassword) {
+    if (!sellerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail)) {
+      return res.status(400).json({
+        ok: false,
+        code: 'email_required',
+        error: 'البريد الإلكتروني مطلوب مع كلمة المرور لتسجيل الدخول لاحقاً',
+      });
+    }
+  }
   if (sellerEmail) {
     const emailTaken = list.some((a) => String(a.email || '').trim().toLowerCase() === sellerEmail);
     if (emailTaken) {
@@ -1867,8 +1876,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     });
   }
   const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
-  // فرد/محل: تفعيل فوري فقط بعد إثبات ملكية البريد بـ OTP (عند otpRequired)
-  // + كلمة مرور ≥8. لا يُقبل dashToken من العميل أبداً — الخادم يولّده.
+  // فرد/محل: تفعيل فوري بعد إثبات ملكية البريد (أو الهاتف) بـ OTP عند otpRequired
   const platformFlags = getPlatformFlags();
   let autoApproved = false;
   let otpGate = null;
@@ -1880,6 +1888,15 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
         otpGate = consumeBuyerVerificationByEmail(sellerEmail);
       } catch (eOtp) {
         otpGate = { ok: false, error: 'otp_required' };
+      }
+      if (!(otpGate && otpGate.ok)) {
+        const phoneForOtp = String(b.phone || '').replace(/\D/g, '').slice(-8);
+        if (phoneForOtp) {
+          try {
+            const phoneGate = consumeVerification(phoneForOtp);
+            if (phoneGate && phoneGate.ok) otpGate = phoneGate;
+          } catch (ePh) { /* ignore */ }
+        }
       }
       autoApproved = !!(otpGate && otpGate.ok);
     }
@@ -2028,6 +2045,7 @@ mountAccountsSessionRoutes(app, {
   extractAccountToken,
   extractDashToken,
   timingSafeEqualStr,
+  tokenMatchesAccount,
   canAutoApproveAccountType,
   consumeBuyerVerificationByEmail,
   sendSellerResetOtp,
@@ -2053,6 +2071,7 @@ mountAccountsManageRoutes(app, {
   writeAccounts,
   extractAccountToken,
   timingSafeEqualStr,
+  tokenMatchesAccount,
   stripToken,
   toAdminAccount,
   resolveOptionalAccountViewer,
@@ -2781,7 +2800,8 @@ function verifyAccountOwner(accountId, token) {
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
-  return (acc && acc.status === 'approved' && !acc.suspended && timingSafeEqualStr(acc.accessToken, token)) ? acc : null;
+  // dashToken أو accessToken كلاهما يثبت الملكية (انظر tokenMatchesAccount).
+  return (acc && acc.status === 'approved' && !acc.suspended && tokenMatchesAccount(acc, token)) ? acc : null;
 }
 
 const RizqPromptsServer = require('../rizq_ai_prompts');
@@ -3455,9 +3475,11 @@ app.post('/api/team', (req, res) => {
 
 /** GET /api/team?accountId=... — عرض عام (بلا هاتف) لصفحة المعرض العامة */
 app.get('/api/team', (req, res) => {
-  const accountId = req.query.accountId;
-  let list = readTeam().filter((m) => m.status === 'active');
-  if (accountId) list = list.filter((m) => m.accountId === accountId);
+  const accountId = String(req.query.accountId || '').trim();
+  if (!accountId) {
+    return res.status(400).json({ ok: false, error: 'accountId_required' });
+  }
+  const list = readTeam().filter((m) => m.status === 'active' && m.accountId === accountId);
   res.json({ ok: true, members: list.map((m) => ({ id: m.id, name: m.name, role: m.role, emoji: m.emoji })) });
 });
 
@@ -3660,6 +3682,61 @@ app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), asyn
 // - "بائعون موثوقون": أعلى الحسابات تقييماً فعلياً (من نظام المراجعات
 //   الحقيقي #244)، بحقول عامة آمنة فقط (toPublicAccount).
 // ══════════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/discovery/platform-stats — أرقام حية صادقة لشريط الإحصائيات تحت إعلان الفيديو.
+ * لا أرقام وهمية: قبل الإطلاق الحقيقي تبقى أصفار النشاط ظاهرة كما هي.
+ */
+app.get('/api/discovery/platform-stats', (req, res) => {
+  try {
+    const adsActive = readAds().filter((a) =>
+      a && a.status === 'active'
+      && !String(a.accountId || '').startsWith('acc_demo')
+      && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
+    ).length;
+
+    const businesses = readAccounts().filter((a) =>
+      a && a.status === 'approved' && !a.suspended
+      && !String(a.id || '').startsWith('acc_demo')
+      && (a.type === 'store' || a.type === 'office' || a.type === 'corp')
+    );
+    const businessesApproved = businesses.length;
+    const byType = { store: 0, office: 0, corp: 0 };
+    businesses.forEach((a) => { if (byType[a.type] != null) byType[a.type] += 1; });
+
+    const now = Date.now();
+    const tendersOpen = readTenders().filter((t) => {
+      if (!t || (t.status !== 'open' && t.status !== 'provisionally_approved')) return false;
+      const deadlineMs = new Date(t.deadline).getTime();
+      return !Number.isNaN(deadlineMs) && deadlineMs > now;
+    }).length;
+
+    let investmentsLive = 0;
+    try {
+      const inv = require('./services/investmentRoom').listPublic({ unlockContacts: false });
+      investmentsLive = Array.isArray(inv.opportunities) ? inv.opportunities.length : 0;
+    } catch (_) {
+      investmentsLive = 0;
+    }
+
+    const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
+    res.set('Cache-Control', 'public, max-age=20');
+    res.json({
+      ok: true,
+      live: true,
+      prelaunch: activityTotal === 0,
+      adsActive,
+      businessesApproved,
+      businessesByType: byType,
+      tendersOpen,
+      investmentsLive,
+      activityTotal,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'stats_failed' });
+  }
+});
 
 /** GET /api/discovery/ending-soon?hours=48 — إعلانات مثبّتة + مناقصات مفتوحة قاربت الانتهاء */
 app.get('/api/discovery/ending-soon', (req, res) => {

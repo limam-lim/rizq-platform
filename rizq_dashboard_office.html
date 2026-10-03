@@ -413,7 +413,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 
   <!-- ══ ويدجت رموز الدفع البنكي ══ -->
   <div id="bank-payment-widget" style="margin-bottom:20px;"></div>
-  <script>(function(){renderRizqPayment && renderRizqPayment("bank-payment-widget");})()</script>
+  <script>(function(){try{if(typeof renderRizqPayment==='function')renderRizqPayment("bank-payment-widget");}catch(e){}})()</script>
           <div class="card-header"><div class="card-title" data-t="ov-latest-requests">📩 آخر الطلبات</div><button class="btn btn-outline btn-sm" onclick="showPanel('requests',null)" data-t="ov-view-all">الكل</button></div>
           <div id="ov-requests"></div>
         </div>
@@ -705,15 +705,22 @@ const IS_DEMO=params.get('demo')==='1';
 
 
 const DEMO_ACC={id:'DEMO_OFF',token:'DEMO',status:'approved',type:'office',
-  name:'مكتب المستقبل للخدمات الإدارية',owner:'أحمد ولد محمد',
-  phone:'+222 33 44 55 66',email:'future@office.mr',city:'نواكشوط',
+  name:'مكتب المستقبل — بيانات ترويجية',owner:'أحمد ولد محمد',
+  phone:'+222 33 44 55 66',email:'demo-office@rizq.mr',city:'نواكشوط',
   ninea:'MR12345',activity:'خدمات إدارية',
-  desc:'نقدم خدمات إدارية متكاملة: استخراج وثائق، تسجيل شركات، استشارات قانونية',
+  desc:'واجهة مكتب تجريبية للترويج فقط — ليست بيانات حقيقية',
   trial_ends:new Date(Date.now()+2*86400000).toISOString()};
 
-const DEMO_SERVICES=[];
+const DEMO_SERVICES=[
+  {id:'DS1',name:'استخراج وثائق إدارية',price:5000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS2',name:'تسجيل شركات',price:25000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS3',name:'استشارة قانونية أولية',price:8000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')}
+];
 
-const DEMO_REQS=[];
+const DEMO_REQS=[
+  {id:'DR1',name:'زائر تجريبي',service:'استخراج وثائق إدارية',phone:'44XXXXXX',note:'طلب تجريبي — بيانات ترويجية',date:new Date().toLocaleDateString('ar-MR-u-nu-latn'),status:'new'},
+  {id:'DR2',name:'عميل تجريبي',service:'تسجيل شركات',phone:'45XXXXXX',note:'طلب تجريبي — بيانات ترويجية',date:new Date().toLocaleDateString('ar-MR-u-nu-latn'),status:'done'}
+];
 
 let OFFICE=null, services=[], renewalFile=null;
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];

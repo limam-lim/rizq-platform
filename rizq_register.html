@@ -666,23 +666,51 @@
         return;
       }
       if (seller && seller.code === 'not_approved') {
-        setStatus(t('حسابك قيد المراجعة.', 'Compte en cours de validation.'), 'bad');
+        setStatus(t('حسابك قيد المراجعة أو يحتاج تفعيل رمز البريد.', 'Compte en validation ou activation e-mail requise.'), 'bad');
         return;
       }
     }
 
-    /* ثانياً: مشتري محلي (بصمة كلمة المرور — بلا نص صريح) */
+    /* ثانياً: مشتري عبر الخادم (بريد + كلمة مرور) — يعمل من أي جهاز */
+    var base = api();
+    if (base) {
+      try {
+        var r = await fetchJson(base + '/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: pw })
+        }, 8000);
+        if (r.ok && r.body && r.body.ok && r.body.buyer && r.body.token) {
+          var session = {
+            id: r.body.buyer.id,
+            token: r.body.token,
+            name: r.body.buyer.name || email.split('@')[0],
+            email: r.body.buyer.email || email,
+            phone: r.body.buyer.phone || '',
+            phoneIntl: r.body.buyer.phoneIntl || '',
+            whatsapp: r.body.buyer.whatsapp || ''
+          };
+          saveCreds(email, pw, session);
+          saveSession(session);
+          setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
+          setTimeout(function () { location.href = 'index.html'; }, 400);
+          return;
+        }
+      } catch (eLogin) { /* سقوط للتوافق المحلي */ }
+    }
+
+    /* ثالثاً: مشتري محلي (بصمة كلمة المرور — توافق رجعي لنفس المتصفح) */
     var creds = loadCreds()[email];
     var fpOk = creds && (
       (creds.passwordHash && creds.passwordHash === localPwFingerprint(pw)) ||
-      (creds.password && String(creds.password) === String(pw)) /* توافق رجعي لجلسات قديمة */
+      (creds.password && String(creds.password) === String(pw))
     );
     if (fpOk) {
-      var session = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
+      var sessionLocal = creds.session || { id: 'local', token: 'local', email: email, name: email.split('@')[0] };
       if (creds.password && !creds.passwordHash) {
-        try { saveCreds(email, pw, session); } catch (eMig) {}
+        try { saveCreds(email, pw, sessionLocal); } catch (eMig) {}
       }
-      saveSession(session);
+      saveSession(sessionLocal);
       setStatus(t('تم الدخول بنجاح.', 'Connexion réussie.'), 'ok');
       setTimeout(function () { location.href = 'index.html'; }, 400);
       return;

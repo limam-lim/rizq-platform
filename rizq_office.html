@@ -16,7 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=23.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_module_promo.css?v=26.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
@@ -640,6 +641,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <!-- مطلوب لحساب شارة "موثّق"/"مميّز" الحقيقية (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
+<script src="rizq_module_promo.js?v=26.5" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_site_banner.js"></script>
@@ -1671,6 +1673,12 @@ function openMaps(){
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr); }
+                if(acc.thumb){
+                  var logoEl = document.getElementById('hc-logo');
+                  if(logoEl){
+                    logoEl.innerHTML = '<img src="'+esc(acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
+                  }
+                }
                 if(typeof RizqSub!=='undefined'){
                   var b = RizqSub.getBadges(id);
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';

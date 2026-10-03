@@ -15,7 +15,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css"/>
-<link rel="stylesheet" href="rizq_header.css?v=23.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_module_promo.css?v=26.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
 <style>
@@ -240,6 +241,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 /* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
 </style>
 <script src="rizq_pwa.js" defer></script>
+<script src="rizq_module_promo.js?v=26.5" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
 </head>
 <body>
@@ -743,6 +745,31 @@ function loadData(){
         if(found){ _acc = found; applyAccountData(); }
       }).catch(function(){});
   }
+
+  /* كتالوج الخادم — لزائر يفتح رابط المعرض بدون localStorage صاحب الحساب */
+  if(_showroomId && window.RIZQ_BACKEND_BASE && (!_allItems || !_allItems.length)){
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/catalog?accountId=' + encodeURIComponent(_showroomId) + '&kind=product')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        var items = (data && Array.isArray(data.items)) ? data.items : [];
+        if(!items.length) return;
+        _allItems = items.map(function(p){
+          return {
+            id: p.id,
+            name: p.name,
+            nameFr: p.nameFr || '',
+            cat: p.cat || '',
+            price: p.price ? (String(p.price).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' MRU') : '',
+            specs: p.desc || '',
+            image: (Array.isArray(p.images) && p.images[0]) || p.image || '',
+            emoji: p.emoji || '📦',
+            featured: false
+          };
+        });
+        applyAccountData();
+        renderCatalog();
+      }).catch(function(){});
+  }
 }
 
 /* ── Render Catalog ── */
@@ -849,8 +876,14 @@ function applyAccountData(){
     _iaEl.textContent = _acc.address;
     _iaEl.setAttribute('data-acc','1');
   }
-  if(_acc.logo_emoji || _acc.logo)
+  if(_acc.thumb){
+    var _logoEl = document.getElementById('showroom-logo');
+    if(_logoEl){
+      _logoEl.innerHTML = '<img src="'+esc(_acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+    }
+  } else if(_acc.logo_emoji || _acc.logo) {
     document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏛️';
+  }
   if(_acc.desc || _acc.about){
     var _atEl = document.getElementById('about-text');
     _atEl.textContent = _acc.desc || _acc.about;

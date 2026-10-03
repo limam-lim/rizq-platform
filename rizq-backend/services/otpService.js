@@ -174,12 +174,17 @@ function generateCode() {
 }
 
 function getPublicOtpConfig() {
+  const emailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+  const smsConfigured = !!(process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER);
+  // في التطوير: إن لم يُضبط بريد/SMS نُظهر رمز التطوير تلقائياً حتى لا يُعلَّق الزبون
+  const autoDevHint = !isProduction() && !emailConfigured && !smsConfigured;
   return {
     production: isProduction(),
     demoOtpAllowed: isDemoOtpAllowed(),
-    smsConfigured: !!(process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER),
-    emailConfigured: !!(process.env.EMAIL_USER && process.env.EMAIL_PASS),
-    devHintEnabled: !isProduction() && process.env.OTP_DEV_HINT === 'true',
+    smsConfigured,
+    emailConfigured,
+    deliveryAvailable: emailConfigured || smsConfigured || autoDevHint || (!isProduction() && process.env.OTP_DEV_HINT === 'true'),
+    devHintEnabled: autoDevHint || (!isProduction() && process.env.OTP_DEV_HINT === 'true'),
   };
 }
 
@@ -238,7 +243,14 @@ async function sendOtp(phone, opts) {
   if (cfg.devHintEnabled && !sentViaSms && !sentViaEmail) {
     out.devHint = code;
   }
-  if (email && !sentViaEmail && !cfg.devHintEnabled) {
+  if (!sentViaSms && !sentViaEmail && !out.devHint) {
+    return {
+      ok: false,
+      error: 'delivery_unavailable',
+      message: 'تعذّر إرسال رمز التحقق — البريد أو الرسائل غير مُعدّة على الخادم',
+    };
+  }
+  if (email && !sentViaEmail && !out.devHint) {
     out.emailWarning = 'تعذّر إرسال البريد — تحقق من العنوان أو حاول لاحقاً';
   }
   return out;
@@ -358,7 +370,14 @@ async function sendBuyerOtp(payload) {
   const out = { ok: true, expiresIn: Math.floor(TTL_MS / 1000), sentViaSms, sentViaEmail, channel: 'buyer' };
   const cfg = getPublicOtpConfig();
   if (cfg.devHintEnabled && !sentViaSms && !sentViaEmail) out.devHint = code;
-  if (!sentViaEmail && !cfg.devHintEnabled) {
+  if (!sentViaSms && !sentViaEmail && !out.devHint) {
+    return {
+      ok: false,
+      error: 'delivery_unavailable',
+      message: 'تعذّر إرسال رمز التحقق — البريد أو الرسائل غير مُعدّة على الخادم',
+    };
+  }
+  if (!sentViaEmail && !out.devHint) {
     out.emailWarning = 'تعذّر إرسال البريد — تحقق من العنوان أو حاول لاحقاً';
   }
   return out;

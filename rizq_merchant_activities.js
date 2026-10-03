@@ -81,6 +81,9 @@
     { id: 'st_tv_audio', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'شاشات وصوتيات', nameFr: 'Écrans & audio', icon: '📺' },
     { id: 'st_appliances', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'أجهزة منزلية', nameFr: 'Électroménager', icon: '🔌' },
     { id: 'st_accessories', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'إكسسوارات إلكترونية', nameFr: 'Accessoires électroniques', icon: '🎧' },
+    { id: 'st_gaming', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'ألعاب وأجهزة ترفيه', nameFr: 'Jeux & divertissement', icon: '🎮' },
+    { id: 'st_solar_tech', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'طاقة شمسية وتقنية', nameFr: 'Solaire & tech', icon: '☀️' },
+    { id: 'st_phone_repair', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'صيانة هواتف وإلكترونيات', nameFr: 'Réparation téléphones & électronique', icon: '🛠️' },
     { id: 'st_furniture', sectorId: 'home', accountTypes: ['store'], nameAr: 'أثاث منزلي', nameFr: 'Meubles maison', icon: '🛋️' },
     { id: 'st_decor', sectorId: 'home', accountTypes: ['store'], nameAr: 'ديكور وإضاءة', nameFr: 'Déco & éclairage', icon: '💡' },
     { id: 'st_curtains', sectorId: 'home', accountTypes: ['store'], nameAr: 'ستائر وسجاد', nameFr: 'Rideaux & tapis', icon: '🪟' },
@@ -90,14 +93,23 @@
     { id: 'st_plumbing', sectorId: 'construction', accountTypes: ['store'], nameAr: 'سباكة وكهرباء', nameFr: 'Plomberie & électricité', icon: '🔩' },
     { id: 'st_paint', sectorId: 'construction', accountTypes: ['store'], nameAr: 'دهانات وعزل', nameFr: 'Peintures & isolation', icon: '🎨' },
     { id: 'st_tools', sectorId: 'construction', accountTypes: ['store'], nameAr: 'أدوات بناء', nameFr: 'Outils de construction', icon: '🛠️' },
+    { id: 'st_wood', sectorId: 'construction', accountTypes: ['store'], nameAr: 'أخشاب ومواد نجارة', nameFr: 'Bois & menuiserie', icon: '🪵' },
+    { id: 'st_hardware', sectorId: 'construction', accountTypes: ['store'], nameAr: 'أدوات حديدية وتجزئة', nameFr: 'Quincaillerie & détail', icon: '🧰' },
+    { id: 'st_sand_gravel', sectorId: 'construction', accountTypes: ['store'], nameAr: 'رمل وحصى ومواد دُكمة', nameFr: 'Sable, gravier & vrac', icon: '⛏️' },
     { id: 'st_gold_retail', sectorId: 'jewelry', accountTypes: ['store'], nameAr: 'بيع ذهب بالتجزئة', nameFr: 'Vente d\'or au détail', icon: '💎' },
     { id: 'st_jewelry', sectorId: 'jewelry', accountTypes: ['store'], nameAr: 'مجوهرات واكسسوارات', nameFr: 'Bijoux & accessoires', icon: '💍' },
     { id: 'st_clothing', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'ملابس وأحذية', nameFr: 'Vêtements & chaussures', icon: '👗' },
+    { id: 'st_menswear', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'ملابس رجالية', nameFr: 'Mode homme', icon: '👔' },
+    { id: 'st_womenswear', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'ملابس نسائية', nameFr: 'Mode femme', icon: '👗' },
+    { id: 'st_kidswear', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'ملابس أطفال', nameFr: 'Mode enfant', icon: '🧒' },
+    { id: 'st_shoes', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'أحذية وحقائب', nameFr: 'Chaussures & sacs', icon: '👟' },
+    { id: 'st_traditional', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'أزياء تقليدية ومطرّزات', nameFr: 'Tenues traditionnelles', icon: '🥻' },
     { id: 'st_perfume', sectorId: 'fashion', accountTypes: ['store'], nameAr: 'عطور ومستحضرات', nameFr: 'Parfums & cosmétiques', icon: '🧴' },
     { id: 'st_grocery', sectorId: 'food', accountTypes: ['store'], nameAr: 'بقالة وتموين', nameFr: 'Épicerie & alimentation', icon: '🛒' },
     { id: 'st_restaurant', sectorId: 'food', accountTypes: ['store'], nameAr: 'مطعم أو كافيه', nameFr: 'Restaurant ou café', icon: '🍽️' },
     { id: 'st_machinery', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'معدات ومكائن', nameFr: 'Machines & équipements', icon: '⚙️' },
     { id: 'st_wholesale', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'بيع بالجملة', nameFr: 'Vente en gros', icon: '📦' },
+    { id: 'st_retail_general', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'تجزئة متعددة الأصناف', nameFr: 'Commerce de détail multi-rayons', icon: '🏪' },
     { id: 'st_livestock', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'ماشية ودواجن', nameFr: 'Bétail & volaille', icon: '🐄' },
     { id: 'st_feed', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'أعلاف ومستلزمات زراعية', nameFr: 'Aliments & fournitures agricoles', icon: '🌾' },
     { id: 'st_realty_sale', sectorId: 'realty_retail', accountTypes: ['store', 'corp'], nameAr: 'بيع عقارات وأراضي', nameFr: 'Vente immobilière & terrains', icon: '🏠' },
@@ -314,11 +326,80 @@
       home: 'أثاث',
       construction: 'بناء',
       jewelry: 'ذهب',
+      fashion: 'أزياء',
+      food: 'أغذية',
       equipment: 'معدات',
+      agriculture: 'زراعة',
+      realty_retail: 'عقارات',
+      pro_retail: 'مهن',
+      services_retail: 'خدمات',
       showroom: 'سيارات',
       industrial: 'معدات',
     };
     return map[a.sectorId] || 'أخرى';
+  }
+
+  /** إعدادات مخزون مقترحة حسب النشاط (واجهة الداشبورد) */
+  function inventoryPresetForActivity(activityId) {
+    var a = findById(activityId);
+    var sector = a ? a.sectorId : '';
+    if (sector === 'fashion' || activityId === 'st_clothing' || activityId === 'st_shoes'
+      || activityId === 'st_menswear' || activityId === 'st_womenswear' || activityId === 'st_kidswear'
+      || activityId === 'st_traditional') {
+      return {
+        sector: 'fashion',
+        unitDefault: 'قطعة',
+        unitDefaultFr: 'pièce',
+        variantsPhAr: 'مثال: مقاس S/M/L/XL · لون أسود/أبيض',
+        variantsPhFr: 'Ex: taille S/M/L/XL · couleur noir/blanc',
+        skuHintAr: 'رمز SKU للموديل والمقاس',
+        skuHintFr: 'SKU modèle + taille',
+      };
+    }
+    if (sector === 'electronics' || String(activityId || '').indexOf('st_phone') === 0
+      || activityId === 'st_computers' || activityId === 'st_gaming' || activityId === 'st_solar_tech') {
+      return {
+        sector: 'electronics',
+        unitDefault: 'قطعة',
+        unitDefaultFr: 'pièce',
+        variantsPhAr: 'مثال: 128GB / 256GB · أسود / فضي',
+        variantsPhFr: 'Ex: 128Go / 256Go · noir / argent',
+        skuHintAr: 'رمز SKU للطراز والتخزين',
+        skuHintFr: 'SKU modèle + capacité',
+      };
+    }
+    if (sector === 'construction' || activityId === 'st_cement' || activityId === 'st_wood'
+      || activityId === 'st_sand_gravel' || activityId === 'st_hardware') {
+      return {
+        sector: 'construction',
+        unitDefault: 'كيس/طن',
+        unitDefaultFr: 'sac/tonne',
+        variantsPhAr: 'مثال: 50كغ · 25كغ · متر طولي',
+        variantsPhFr: 'Ex: 50kg · 25kg · mètre linéaire',
+        skuHintAr: 'رمز الصنف والوحدة',
+        skuHintFr: 'Code article + unité',
+      };
+    }
+    if (sector === 'food' || activityId === 'st_grocery') {
+      return {
+        sector: 'food',
+        unitDefault: 'علبة/كغ',
+        unitDefaultFr: 'boîte/kg',
+        variantsPhAr: 'مثال: 1كغ · 5كغ · علبة 12',
+        variantsPhFr: 'Ex: 1kg · 5kg · carton 12',
+        skuHintAr: 'رمز الصنف',
+        skuHintFr: 'Code article',
+      };
+    }
+    return {
+      sector: sector || 'general',
+      unitDefault: 'قطعة',
+      unitDefaultFr: 'pièce',
+      variantsPhAr: 'مثال: S, M, L أو 250غ، 500غ، 1كغ',
+      variantsPhFr: 'Ex: S, M, L ou 250g, 500g, 1kg',
+      skuHintAr: 'رمز المنتج (اختياري)',
+      skuHintFr: 'Code produit (optionnel)',
+    };
   }
 
   var LEGACY_DIR_LABELS = {
@@ -327,7 +408,13 @@
     'أثاث': { ar: '🛋️ أثاث ومفروشات', fr: '🛋️ Meubles & ameublement' },
     'معدات': { ar: '⚙️ معدات ومكائن', fr: '⚙️ Équipements & machines' },
     'بناء': { ar: '🏗️ مواد بناء', fr: '🏗️ Matériaux de construction' },
-    'ذهب': { ar: '💎 مجوهرات', fr: '💎 Bijoux' },
+    'ذهب': { ar: '💎 ذهب ومجوهرات', fr: '💎 Or & bijoux' },
+    'أزياء': { ar: '👗 أزياء وملابس', fr: '👗 Mode & vêtements' },
+    'أغذية': { ar: '🛒 أغذية وتموين', fr: '🛒 Alimentation' },
+    'زراعة': { ar: '🐄 ماشية وزراعة', fr: '🐄 Bétail & agriculture' },
+    'عقارات': { ar: '🏠 عقارات', fr: '🏠 Immobilier' },
+    'مهن': { ar: '🧰 مهن متخصصة', fr: '🧰 Métiers spécialisés' },
+    'خدمات': { ar: '🏷️ خدمات تجارية', fr: '🏷️ Services commerciaux' },
     'أخرى': { ar: '🏷️ أخرى', fr: '🏷️ Autre' },
   };
 
@@ -336,7 +423,7 @@
     ACTIVITIES.forEach(function (a) {
       seen[legacyCategoryFromActivity(a.id)] = true;
     });
-    var order = ['سيارات', 'إلكترونيات', 'أثاث', 'معدات', 'بناء', 'ذهب', 'أخرى'];
+    var order = ['سيارات', 'إلكترونيات', 'أثاث', 'أزياء', 'بناء', 'أغذية', 'معدات', 'ذهب', 'زراعة', 'عقارات', 'مهن', 'خدمات', 'أخرى'];
     var out = order.filter(function (c) { return seen[c]; });
     Object.keys(seen).forEach(function (c) {
       if (out.indexOf(c) === -1) out.push(c);
@@ -442,6 +529,7 @@
     findById: findById,
     isAllowed: isAllowed,
     legacyCategoryFromActivity: legacyCategoryFromActivity,
+    inventoryPresetForActivity: inventoryPresetForActivity,
     legacyCategoryLabel: legacyCategoryLabel,
     listDirectoryFilterCategories: listDirectoryFilterCategories,
     LEGACY_DIR_LABELS: LEGACY_DIR_LABELS,

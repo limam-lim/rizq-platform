@@ -77,6 +77,7 @@ async function main() {
       phone: victimPhone,
       email: victimEmail,
       whatsapp: '+222' + victimPhone,
+      password: 'VictimPass9!',
     });
     victimTok = v.token;
     let blocked = false;
@@ -86,6 +87,7 @@ async function main() {
         phone: victimPhone,
         email: attackerEmail,
         whatsapp: '+222' + victimPhone,
+        password: 'AttackerPass9!',
       });
     } catch (e) {
       blocked = e.code === 'PHONE_IN_USE' || e.status === 409;

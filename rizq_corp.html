@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=23.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>واجهة المعرض — رزق</title>
 <style>
@@ -1398,6 +1398,12 @@ function rebuildCorpCatTabs(cats){
                 var metaEl = document.getElementById('corp-meta');
                 if(metaEl && metaEl.firstElementChild) metaEl.firstElementChild.textContent = '📍 ' + addr;
                 setText('info-address', addr); setText('map-addr', addr);
+              }
+              if(acc.thumb){
+                var logoWrap = document.getElementById('corp-logo-wrap');
+                if(logoWrap){
+                  logoWrap.innerHTML = '<img src="'+esc(acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+                }
               }
               if(acc.whatsapp){
                 var waNum = String(acc.whatsapp).replace(/[^0-9]/g,'');

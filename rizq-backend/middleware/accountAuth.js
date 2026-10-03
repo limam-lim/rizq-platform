@@ -3,6 +3,10 @@
  * dashToken يُقبل كدليل ملكية على مسارات المالك حتى لا نحتاج لإرجاع accessToken
  * من verify-dash (تصعيد صلاحيات عبر رابط الداشبورد).
  */
+'use strict';
+
+const { timingSafeEqualStr } = require('../lib/secureCompare');
+
 function isProdEnv() {
   return process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
 }
@@ -35,8 +39,8 @@ function tokenMatchesAccount(acc, token) {
   if (!acc || !token) return false;
   const t = String(token).trim();
   if (!t) return false;
-  if (acc.accessToken && t === acc.accessToken) return true;
-  if (acc.dashToken && t === acc.dashToken) return true;
+  if (acc.accessToken && timingSafeEqualStr(t, acc.accessToken)) return true;
+  if (acc.dashToken && timingSafeEqualStr(t, acc.dashToken)) return true;
   return false;
 }
 

@@ -48,9 +48,22 @@ router.get('/preview', authLimiter, asyncHandler(async (req, res) => {
   return res.json({ ok: true, exists: null, check: 'accepted' });
 }));
 
-/** POST /api/auth/login — مُعطَّل: الدخول يتطلب OTP عبر /api/auth/register */
+/** POST /api/auth/login — دخول المشتري بالبريد وكلمة المرور (بعد تفعيل OTP مرة واحدة) */
 router.post('/login', authLimiter, asyncHandler(async (req, res) => {
-  return sendError(res, 410, 'الدخول يتطلب رمز OTP — استخدم /api/auth/register', 'OTP_REQUIRED');
+  const body = req.body || {};
+  const email = String(body.email || '').trim().toLowerCase();
+  const password = String(body.password || '');
+  if (!email || !password) {
+    return sendError(res, 400, 'البريد وكلمة المرور مطلوبان', 'MISSING_CREDENTIALS');
+  }
+  try {
+    const result = await Buyer.loginByEmailPassword(email, password);
+    res.set('Cache-Control', 'no-store');
+    res.json({ ok: true, buyer: result.buyer, token: result.token });
+  } catch (err) {
+    const status = err.status || 401;
+    return sendError(res, status, err.message || 'بيانات الدخول غير صحيحة', err.code || 'INVALID');
+  }
 }));
 
 /** GET /api/auth/me — التحقق من الجلسة */

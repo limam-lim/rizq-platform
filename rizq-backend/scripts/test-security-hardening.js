@@ -57,8 +57,8 @@ async function main() {
   ok('GET /health', health.status === 200 && health.body && health.body.ok);
 
   // ── 2. Auth: login disabled ──
-  const login = await req('POST', '/api/auth/login', { phone: '22123456' });
-  ok('POST /api/auth/login blocked', login.status === 410, 'status=' + login.status);
+  const login = await req('POST', '/api/auth/login', { email: 'nobody@rizq.test', password: 'wrong-pass' });
+  ok('POST /api/auth/login rejects bad credentials', login.status === 401 || login.status === 400, 'status=' + login.status);
 
   // ── 3. Legacy buyers/register disabled ──
   const legacy = await req('POST', '/api/buyers/register', { name: 'X', phone: '22123456' });
@@ -66,14 +66,14 @@ async function main() {
 
   // ── 4. Preview: no PII ──
   const email = 'sectest_' + Date.now() + '@rizq.test';
-  const regBody = { name: 'Test User', phone: '44112233', email };
+  const regBody = { name: 'Test User', phone: '44112233', email, password: 'TestPass9!', whatsapp: '+22244112233' };
   // register buyer for preview test (bypass OTP in lite path — direct DB)
   const Buyer = require('../models/buyer');
   try {
     Buyer.registerOrLogin(regBody);
   } catch (e) { /* may fail name validation — use full name */ }
   try {
-    Buyer.registerOrLogin({ name: 'Test User Sec', phone: '44' + String(Date.now()).slice(-6), email });
+    Buyer.registerOrLogin({ name: 'Test User Sec', phone: '44' + String(Date.now()).slice(-6), email, password: 'TestPass9!', whatsapp: '+22244112233' });
   } catch (e) { /* ignore */ }
 
   const preview = await req('GET', '/api/auth/preview?email=' + encodeURIComponent(email));
@@ -180,8 +180,12 @@ async function main() {
     const mineOk = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': accessToken });
     ok('mine approved account readable', mineOk.status === 200 && mineOk.body && mineOk.body.ok, 'status=' + mineOk.status);
 
-    const mineDash = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': dashToken });
+    // بعد exchange-dash-token أصبح dashToken القديم باطلاً — نستخدم الرمز المُدوَّر
+    const mineDash = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': newDash });
     ok('mine accepts dashToken as owner proof', mineDash.status === 200 && mineDash.body && mineDash.body.ok, 'status=' + mineDash.status);
+
+    const mineOldDash = await req('GET', '/api/accounts/mine/' + id, null, { 'x-account-token': dashToken });
+    ok('mine rejects rotated-away dashToken', mineOldDash.status === 401, 'status=' + mineOldDash.status);
 
     const mineQuery = await req('GET', '/api/accounts/mine/' + id + '?token=' + accessToken);
     ok('mine query token works in dev', mineQuery.status === 200, 'status=' + mineQuery.status);
@@ -265,6 +269,7 @@ async function main() {
       email: testEmail,
       phone: testPhone,
       whatsapp: '+222' + testPhone,
+      password: 'OtpSecPass9!',
     });
     ok('POST /api/auth/register after OTP', (reg.status === 200 || reg.status === 201) && reg.body && reg.body.ok && reg.body.token,
       reg.body ? JSON.stringify({ status: reg.status, error: reg.body.error, message: reg.body.message }) : 'status=' + reg.status);

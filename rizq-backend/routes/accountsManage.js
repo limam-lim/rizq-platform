@@ -17,6 +17,7 @@ function mountAccountsManageRoutes(app, deps) {
     writeAccounts,
     extractAccountToken,
     timingSafeEqualStr,
+    tokenMatchesAccount,
     stripToken,
     toAdminAccount,
     resolveOptionalAccountViewer,
@@ -31,6 +32,11 @@ function mountAccountsManageRoutes(app, deps) {
   } = deps;
 
   const adminView = typeof toAdminAccount === 'function' ? toAdminAccount : stripToken;
+
+  const ownerTokenOk = (acc, token) => {
+    if (typeof tokenMatchesAccount === 'function') return tokenMatchesAccount(acc, token);
+    return !!(token && timingSafeEqualStr(token, acc.accessToken));
+  };
 
   const requireAccountsAdmin = typeof requireAdminPermission === 'function'
     ? requireAdminPermission('accounts')
@@ -76,7 +82,7 @@ function mountAccountsManageRoutes(app, deps) {
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractAccountToken(req);
-    if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
+    if (!token || !ownerTokenOk(acc, token)) return res.status(401).json({ error: 'unauthorized' });
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
     res.json({ ok: true, account: stripToken(acc) });
   });
@@ -92,7 +98,7 @@ function mountAccountsManageRoutes(app, deps) {
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractAccountToken(req);
-    if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
+    if (!token || !ownerTokenOk(acc, token)) return res.status(401).json({ error: 'unauthorized' });
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
     const count = list.filter((a) => a.referredBy === req.params.id && a.referralBonusGranted).length;
     res.json({ ok: true, count, bonusDaysPerReferral: REFERRAL_BONUS_DAYS, bonusDaysTotal: count * REFERRAL_BONUS_DAYS });
@@ -109,7 +115,7 @@ function mountAccountsManageRoutes(app, deps) {
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
     const token = extractAccountToken(req);
-    if (!token || !timingSafeEqualStr(token, acc.accessToken)) return res.status(401).json({ error: 'unauthorized' });
+    if (!token || !ownerTokenOk(acc, token)) return res.status(401).json({ error: 'unauthorized' });
     // حساب مُعلَّق من الأدمن (suspended) لا يستطيع تعديل ملفه الشخصي أيضاً —
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });

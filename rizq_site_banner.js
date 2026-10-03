@@ -22,6 +22,7 @@
       '  text-align:center!important;padding:10px 16px!important;line-height:1.5!important;',
       '  box-shadow:0 2px 10px rgba(15,35,65,.18)!important;',
       '  font-family:Cairo,Tahoma,sans-serif!important;display:block!important;',
+      '  box-sizing:border-box!important;width:100%!important;max-width:100vw!important;',
       '}',
       'html.' + ROOT_CLASS + ' body{padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h) + var(--rizq-ticker-h,0px))!important}',
       /* النافبار يستخدم inset:0 — يجب إعادة ضبط inset مع top */
@@ -41,6 +42,7 @@
       'html.' + ROOT_CLASS + ' #rizq-ads-preview-banner{',
       '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h))!important',
       '}'
+      /* نفس مظهر الحاسوب على التابلت والهاتف — بلا تصغير */
     ].join('');
     var style = document.createElement('style');
     style.id = STYLE_ID;
