@@ -16,7 +16,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css"/>
 <link rel="stylesheet" href="rizq_header.css?v=26.5"/>
-<link rel="stylesheet" href="rizq_module_promo.css?v=26.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
 <style>
@@ -122,6 +121,22 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 .page-sec-btn:hover{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.5)}
 @media(max-width:800px){
   .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
+}
+@media(max-width:768px){
+  .actions-bar{padding:0 12px}
+  .actions-bar-inner{flex-direction:column;align-items:stretch;padding:10px 0 12px;gap:10px}
+  .action-btns{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+  .action-btn{
+    flex:1 1 calc(50% - 4px);
+    justify-content:center;
+    width:auto;min-width:0;max-width:100%;
+    min-height:46px;padding:10px 8px;font-size:12.5px;border-radius:12px;
+    box-sizing:border-box;text-align:center;
+  }
+  .showroom-rating{justify-content:center;width:100%}
+}
+@media(max-width:480px){
+  .action-btn{font-size:12px;gap:4px;padding:9px 6px;min-height:44px}
 }
 .action-btns{display:flex;gap:10px;flex-wrap:wrap}
 .action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .25s}
@@ -241,7 +256,6 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;c
 /* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
 </style>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_module_promo.js?v=26.5" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
 </head>
 <body>
@@ -810,6 +824,9 @@ function renderCatalog(){
       +'<button class="btn-inquire" onclick="event.stopPropagation();openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
       +'✉️ '+_t('استفسار آمن','Demande sécurisée')
       +'</button>'
+      +'<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueShowroomPrefacture(\''+esc(item.id)+'\')">'
+      +'PREFACTUR · '+_t('فاتورة قبل','Préfacture')
+      +'</button>'
       +'</div></div>';
   }).join('');
 }
@@ -922,6 +939,42 @@ function openItemChat(itemId, itemName){
     adId      : itemId || _showroomId,
     adEmoji   : '🏛️'
   });
+}
+
+function _parsePriceMRU(v){
+  if (typeof v === 'number') return v;
+  var n = parseFloat(String(v || '').replace(/[^\d.]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+
+function issueShowroomPrefacture(itemId){
+  var item = (_allItems || []).find(function(it){ return String(it.id) === String(itemId); });
+  if (!item) return showToast(_t('❌ العرض غير موجود','❌ Article introuvable'));
+  function run(){
+    var name = (_lang==='fr' && item.nameFr) ? item.nameFr : (item.name || '');
+    var seller = _acc ? _acc.name : ((document.getElementById('showroom-name')||{}).textContent || '');
+    var phone = '';
+    try {
+      var wa = document.getElementById('wa-btn');
+      if (wa && wa.href) phone = wa.href.replace(/.*wa\.me\//,'').split('?')[0];
+    } catch (e) {}
+    RizqPrefacture.issueAndOpen({
+      module: 'showroom',
+      sellerAccountId: _showroomId || '',
+      sellerName: seller,
+      sellerPhone: phone,
+      lines: [{ id: item.id, name: name, qty: 1, unitPrice: _parsePriceMRU(item.price) }],
+      meta: { source: 'showroom-item' }
+    });
+  }
+  if (!window.RizqPrefacture) {
+    var s = document.createElement('script');
+    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.onload = run;
+    document.head.appendChild(s);
+    return;
+  }
+  run();
 }
 
 /* ── Share ── */

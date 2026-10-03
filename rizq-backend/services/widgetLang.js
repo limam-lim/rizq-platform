@@ -2,8 +2,8 @@
  * Widget agent — automatic language detection (AR / HS / FR / EN / ES)
  */
 const LANG_LABELS = {
-  ar: 'Arabic',
-  hs: 'Hassaniya/Darija Arabic',
+  ar: 'Arabic (Fusaha)',
+  hs: 'Mauritanian Hassaniya (NOT Moroccan Darija)',
   fr: 'French',
   en: 'English',
   es: 'Spanish',
@@ -27,7 +27,9 @@ function detectUserLanguage(text, uiLangHint) {
 
   const lower = t.toLowerCase();
 
-  if (/كيفاش|شنهو|شنو|واش|بغيت|شحال|ماكو|كاين|نعاونك|راك|الزين|بزاف|واخا|علاش|فين|دابا|يلاه|ماشي|هادشي|شنهي/.test(t)) return 'hs';
+  // Mauritanian Hassaniya markers (and shared Maghrebi slang used locally).
+  // Reply language for hs MUST be Mauritanian Hassaniya — never Moroccan Darija.
+  if (/كيفاش|كيفاه|شنهو|شنو|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|ماكو|كاين|نعاونك|راك|الزين|شنهي|حسانية|وش\s*راك|ماشي\s*مشكل|أهلين/.test(t)) return 'hs';
 
   if (/[\u0600-\u06FF]/.test(t)) return 'ar';
 

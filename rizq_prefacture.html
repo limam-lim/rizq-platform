@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>PREFACTUR · فاتورة قبل — رزق</title>
+<link rel="stylesheet" href="rizq-theme.css?v=28.1"/>
+<link rel="stylesheet" href="rizq_prefacture.css?v=28.1"/>
+<style>
+  body{
+    margin:0;min-height:100vh;
+    background:
+      radial-gradient(120% 80% at 50% -10%,rgba(201,168,76,.18),transparent 50%),
+      linear-gradient(180deg,#0a1628,#07101c 40%,#f4f1ea);
+    font-family:"Cairo","Segoe UI",Tahoma,sans-serif;color:#0d1b2a;
+  }
+  .prf-page{max-width:640px;margin:0 auto;padding:28px 16px 48px}
+  .prf-hero{text-align:center;color:#fff;margin-bottom:18px}
+  .prf-hero .mark{
+    display:inline-block;padding:6px 12px;border-radius:999px;
+    background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0d1b2a;
+    font-size:12px;font-weight:900;letter-spacing:2px;margin-bottom:10px;
+  }
+  .prf-hero h1{margin:0;font-size:26px;font-weight:900}
+  .prf-hero p{margin:8px auto 0;max-width:34ch;font-size:13px;line-height:1.65;color:rgba(255,255,255,.72)}
+  .prf-empty{
+    background:#fff;border-radius:16px;padding:28px 18px;text-align:center;
+    box-shadow:0 12px 36px rgba(0,0,0,.12);
+  }
+  .prf-empty a{color:#0f2347;font-weight:800}
+</style>
+</head>
+<body>
+  <div class="prf-page">
+    <div class="prf-hero">
+      <div class="mark">PREFACTUR</div>
+      <h1 data-ar="فاتورة قبل" data-fr="Préfacture">فاتورة قبل</h1>
+      <p data-ar="راجع البنود قبل الدفع. بعد التسليم أو تقديم الخدمة يمكنك التنزيل أو الموافقة."
+         data-fr="Consultez avant paiement. Après livraison ou service, téléchargez ou approuvez.">
+        راجع البنود قبل الدفع. بعد التسليم أو تقديم الخدمة يمكنك التنزيل أو الموافقة.
+      </p>
+    </div>
+    <div id="prf-host"></div>
+  </div>
+  <script src="rizq_prefacture_engine.js?v=28.1"></script>
+  <script>
+  (function(){
+    var p = new URLSearchParams(location.search);
+    var id = p.get('id') || p.get('prf') || p.get('prefacture');
+    var host = document.getElementById('prf-host');
+    var isFr = (document.documentElement.lang || '').indexOf('fr') === 0;
+    if (isFr) {
+      document.querySelectorAll('[data-fr]').forEach(function(el){ el.textContent = el.getAttribute('data-fr'); });
+      document.documentElement.lang = 'fr';
+      document.documentElement.dir = 'ltr';
+    }
+    if (!id || !window.RizqPrefacture || !RizqPrefacture.get(id)) {
+      host.innerHTML = '<div class="prf-empty"><p>' + (isFr
+        ? 'Préfacture introuvable. Ouvrez le lien reçu du vendeur ou générez-en une depuis le magasin / showroom / bureau.'
+        : 'فاتورة قبل غير موجودة. افتح الرابط من البائع أو أنشئ واحدة من المحل / المعرض / المكتب.')
+        + '</p><p><a href="rizq_landing_v8.html">← Rizq</a></p></div>';
+      return;
+    }
+    RizqPrefacture.openModal(id);
+  })();
+  </script>
+</body>
+</html>

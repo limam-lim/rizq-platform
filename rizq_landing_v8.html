@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=23.5"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.1"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -41,26 +41,33 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=26.9"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.8"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
 </script>
 <style id="rizq-mobile-header-critical">
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  /* شريطان مضغوطان — أدوات+شعار / رصيف الأقسام */
-  html.rizq-app-nav{--rizq-header-h:102px}
-  html.rizq-app-nav body{padding-top:var(--rizq-header-h,102px)!important}
+  /* هاتف: ثانوي أعلى + شريط إبهام سفلي */
+  html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
+  html.rizq-app-nav body{
+    padding-top:var(--rizq-header-h,98px)!important;
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + env(safe-area-inset-bottom,0px))!important;
+  }
   html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{
-    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,102px)!important;
+    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,98px)!important;
     position:fixed!important;top:0;left:0;right:0;z-index:10000!important;
   }
-  html.rizq-app-nav .hero{justify-content:flex-start!important;padding-top:0!important;min-height:calc(100vh - var(--rizq-header-h,102px))!important}
+  /* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
+  html.rizq-app-nav .hero{
+    justify-content:flex-start!important;padding-top:0!important;padding-bottom:10px!important;
+    min-height:0!important;height:auto!important;
+  }
   html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
-  html.rizq-app-nav .hero-content{padding-top:12px!important}
+  html.rizq-app-nav .hero-content{padding-top:8px!important;padding-bottom:4px!important}
   /* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
   html.rizq-app-nav #nav > .logo{
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
@@ -119,7 +126,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ══════════════════════════════════
    NAVBAR — Peak luxury entry bar
 ══════════════════════════════════ */
-nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:0 max(28px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));height:86px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -445,9 +452,9 @@ html.rizq-has-announce .section-jump-bar{
   html:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html.rizq-app-nav body.landing-ux-mobile .hero-content,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:16px!important;
-    flex:1 1 auto!important;width:100%!important;
-    display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box!important;
+    padding-top:8px!important;
+    flex:0 0 auto!important;width:100%!important;
+    display:flex!important;flex-direction:column!important;justify-content:flex-start!important;box-sizing:border-box!important;
   }
   .ticker-wrap{
     width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
@@ -484,10 +491,11 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,168,76,.6)}70%{box-shadow:0 0 0 8px rgba(201,168,76,0)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 .hero-eyebrow span{color:var(--gold);font-size:clamp(13.5px,1.5vw,15px);font-weight:800;letter-spacing:.5px;line-height:1.25}
 
-/* الشارة تحدد العرض — كبسولة رزق بنفس الطول تماماً */
+/* رزق بارزة أولاً — ثم شارة السوق الإلكتروني بنفس العرض تحتها */
 .hero-brand-row{
   display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;
-  gap:12px;margin:0 auto 20px;width:max-content;max-width:96%;
+  gap:10px;margin:0 auto 18px;width:max-content;max-width:96%;
+  min-width:min(300px,92vw);
 }
 .hero-title-card{
   display:flex;align-items:center;justify-content:center;
@@ -495,22 +503,29 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   min-width:0;
   max-width:none;
   margin:0;
-  /* يمنع كلمة رزق الكبيرة من توسيع الصف — العرض = عرض الشارة فقط */
-  contain:inline-size;
   background:
     linear-gradient(145deg,rgba(201,168,76,.14),transparent 42%),
     linear-gradient(135deg,#0D1B2A,#1B3A6B 55%,#152e58);
   border:1.5px solid rgba(201,168,76,.52);
   border-radius:16px;
-  padding:18px 16px; /* متساوٍ من كل الجهات لتوسيط رزق في الوسط تماماً */
-  min-height:92px;
+  padding:20px 28px;
+  min-height:96px;
   box-sizing:border-box;
   box-shadow:0 12px 32px rgba(0,0,0,.24),0 0 22px rgba(201,168,76,.14),inset 0 1px 0 rgba(255,255,255,.1);
-  animation:fadeUp .8s .1s ease both;
+  animation:fadeUp .8s ease both;
   position:relative;
   overflow:hidden;
   text-align:center;
 }
+.hero-brand-row .hero-eyebrow{
+  width:100%;
+  max-width:100%;
+  margin:0;
+  padding:10px 18px;
+  min-height:40px;
+  animation:fadeUp .8s .08s ease both;
+}
+.hero-brand-row .hero-eyebrow span{font-size:clamp(12.5px,1.4vw,14px)}
 .hero-title-card::before{
   content:'';position:absolute;inset:0;pointer-events:none;opacity:.14;
   background-image:linear-gradient(45deg,rgba(201,168,76,.35) 1px,transparent 1px),linear-gradient(-45deg,rgba(201,168,76,.28) 1px,transparent 1px);
@@ -552,11 +567,12 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 }
 .hero-subtitle-primary{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
-  font-size:clamp(28px,3.1vw,34px);
+  font-size:clamp(20px,2.35vw,28px);
   font-weight:700;
-  line-height:1.4;
+  line-height:1.35;
   text-align:center;
-  margin:0 0 6px;
+  margin:0 0 4px;
+  white-space:nowrap;
   background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);
   background-size:200%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -564,11 +580,12 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 }
 .hero-subtitle-secondary{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
-  font-size:clamp(22px,2.35vw,26px);
+  font-size:clamp(16px,1.9vw,22px);
   font-weight:600;
-  line-height:1.5;
+  line-height:1.4;
   text-align:center;
   margin:0;
+  white-space:nowrap;
   background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);
   background-size:200%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -588,16 +605,30 @@ html[lang="fr"] .hero-subtitle-secondary{
 }
 
 .hero-tagline{
-  font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
-  font-size:clamp(14px,1.85vw,17px);
+  font-family:'Cairo','Noto Naskh Arabic',Georgia,serif;
+  font-size:clamp(11px,1.35vw,14.5px);
   color:#0F2347;
-  letter-spacing:.2px;
+  letter-spacing:0;
   text-align:center;
   margin:6px auto 0;
-  max-width:36em;
+  max-width:100%;
+  width:100%;
   font-weight:700;
-  line-height:1.65;
+  line-height:1.35;
   opacity:.92;
+  white-space:nowrap;
+  overflow:visible;
+  text-overflow:clip;
+  box-sizing:border-box;
+  padding-inline:2px;
+}
+@media(max-width:768px){
+  .hero-tagline{
+    font-size:clamp(8.5px,2.2vw,11px)!important;
+    letter-spacing:-.15px!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
 }
 
 /* ══ HERO STAGE — تركيب الدخول الأول (فضاءات → تصفّح → تحويل → إعلان) ══ */
@@ -2390,21 +2421,21 @@ html[lang="fr"] .hero-pill{
 html[lang="fr"] .hero-pill-sep{display:block}
 /* على الجوال: نفس الترتيب العمودي بأحجام أوضح */
 @media(max-width:768px){
-  .hero-brand-row{gap:10px;margin-bottom:16px;max-width:96%;width:max-content}
-  .hero-title-card{padding:16px 18px;min-width:0;min-height:76px;border-radius:14px;width:100%}
+  .hero-brand-row{gap:8px;margin-bottom:14px;max-width:96%;width:max-content;min-width:min(260px,92vw)}
+  .hero-title-card{padding:16px 22px;min-width:0;min-height:80px;border-radius:14px;width:100%}
   .hero-headline{font-size:clamp(46px,13vw,64px)}
-  .hero-eyebrow{padding:10px 16px;min-height:42px;width:max-content;max-width:100%}
-  .hero-eyebrow span{font-size:clamp(12.5px,3.4vw,14px)}
+  .hero-brand-row .hero-eyebrow{padding:9px 14px;min-height:38px;width:100%;max-width:100%}
+  .hero-brand-row .hero-eyebrow span{font-size:clamp(12px,3.2vw,13.5px)}
   .hero-lead-row{gap:14px;width:min(1080px,96%);max-width:100%}
-  .hero-subtitle-card{max-width:none;width:100%;padding:18px 18px 16px;flex:none}
-  .hero-subtitle-primary{font-size:clamp(22px,5.6vw,28px)}
-  .hero-subtitle-secondary{font-size:clamp(17px,4.4vw,22px)}
+  .hero-subtitle-card{max-width:none;width:100%;padding:16px 12px 14px;flex:none}
+  .hero-subtitle-primary{font-size:clamp(13px,3.6vw,18px);white-space:nowrap}
+  .hero-subtitle-secondary{font-size:clamp(11px,3vw,15px);white-space:nowrap}
   html[lang="fr"] .hero-subtitle-primary{
-    font-size:clamp(12.5px,3.2vw,16px);
+    font-size:clamp(11px,2.9vw,15px);
     white-space:nowrap;
   }
   html[lang="fr"] .hero-subtitle-secondary{
-    font-size:clamp(11px,2.8vw,14px);
+    font-size:clamp(10px,2.6vw,13px);
     white-space:nowrap;
   }
   .hero-pills{
@@ -3160,15 +3191,17 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <ul class="nav-center">
     <!-- ترتيب مطابق لتوالي أقسام الصفحة (من الأعلى للأسفل) -->
-    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🏠</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
-    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
-    <li class="rizq-nav-post nav-phone-post-li" data-nav-order="5"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
-    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9">
+    <!-- هاتف: secondary أعلى / thumb أسفل (إعلانات·نشر·محلات·معارض) — الترتيب عبر CSS order -->
+    <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🏠</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
+    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
+    <li class="rizq-nav-post nav-phone-post-li" data-nav-order="3" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4" data-nav-tier="thumb"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5" data-nav-tier="thumb"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
+    <li class="rizq-nav-packs nav-phone-packs-li" data-nav-order="8b" data-nav-tier="secondary"><a href="#pricing" data-hdr="packs"><span class="rizq-hdr-ico" aria-hidden="true">💎</span><span class="rizq-hdr-lbl" data-hdr="packs" data-t="nav-packs">الباقات</span></a></li>
+    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="9" data-nav-tier="secondary">
       <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false" data-hdr="more"><span class="rizq-hdr-ico nav-phone-more-ico" aria-hidden="true">⋯</span><span class="rizq-hdr-lbl nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
       <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" onclick="toggleNavDropdown(event,this)"><span class="rizq-hdr-ico" aria-hidden="true">⋯</span><span class="rizq-hdr-lbl" data-hdr="more" data-t="nav-more">المزيد</span></a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
@@ -3264,12 +3297,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- Hero Content -->
   <div class="hero-content">
     <div class="hero-brand-row">
-      <div class="hero-eyebrow">
-        <div class="pulse"></div>
-        <span data-t="hero-badge">السوق الإلكتروني الأول في موريتانيا</span>
-      </div>
       <div class="hero-title-card">
         <h1 class="hero-headline" id="hero-hl">رزق</h1>
+      </div>
+      <div class="hero-eyebrow">
+        <div class="pulse"></div>
+        <span data-t="hero-badge">السوق الإلكتروني الموريتاني</span>
       </div>
     </div>
     <div class="hero-lead-row">
@@ -7279,7 +7312,7 @@ const LANG = {
     'qc-home':'معدات منزل','qc-energy':'طاقة','qc-travel':'رحلات',
     'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات','f-fashion':'موضة',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
-    'nav-account': 'حسابي', 'nav-post': 'نشر', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
+    'nav-account': 'حسابي', 'nav-post': 'نشر', 'nav-packs': 'الباقات', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
     'hero-pill-sell': 'بيع', 'hero-pill-buy': 'اشتر', 'hero-pill-feat': 'تميّز',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — منصة موريتانيا المتكاملة للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
@@ -7319,7 +7352,7 @@ const LANG = {
     'vo-btn1': '📒 أنشئ مكتبك الآن', 'vo-btn2': '👁 عرض نموذج مكتب',
     'vt-btn2': '👁 عرض نموذج غرفة المناقصات',
     'vi-btn2': '👁 عرض نموذج غرفة الاستثمارات',
-    'hero-badge': 'السوق الإلكتروني الأول في موريتانيا',
+    'hero-badge': 'السوق الإلكتروني الموريتاني',
     'search-ph': 'البحث في رزق...',
     'hbiz-stores': 'المحلات',
     'hbiz-offices': 'المكاتب',
@@ -7397,7 +7430,7 @@ const LANG = {
   },
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
-    'nav-account': 'Compte', 'nav-post': 'Publier', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
+    'nav-account': 'Compte', 'nav-post': 'Publier', 'nav-packs': 'Forfaits', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
     'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — la plateforme mauritanienne complète des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
@@ -7437,7 +7470,7 @@ const LANG = {
     'vo-btn1': '📒 Créez votre bureau maintenant', 'vo-btn2': '👁 Voir un exemple de bureau',
     'vt-btn2': '👁 Voir un aperçu de la salle des appels d\'offres',
     'vi-btn2': '👁 Voir un aperçu de la salle des investissements',
-    'hero-badge': 'Le 1er marché en ligne en Mauritanie',
+    'hero-badge': 'Le marché en ligne mauritanien',
     'search-ph': 'Rechercher sur Rizq...',
     'hbiz-stores': 'Boutiques',
     'hbiz-offices': 'Bureaux',

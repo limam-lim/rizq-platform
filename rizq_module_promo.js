@@ -1,5 +1,5 @@
 /**
- * rizq_module_promo.js — inject branded promo header (video + banners)
+ * rizq_module_promo.js — retired: promo strip disabled (no promotional value)
  * under entity heroes on store / showroom / office / tenders / investments pages.
  */
 (function () {
@@ -169,34 +169,20 @@
       + '</section>';
   }
 
-  function inject() {
-    if (document.getElementById('rizq-mod-promo')) return;
-    var key = PAGE_MAP[pageFile()];
-    if (!key || !MODULES[key]) return;
-    var mod = MODULES[key];
-    mod.key = key;
-    var hero = document.querySelector(mod.hero);
-    if (!hero || !hero.parentNode) return;
-
-    var wrap = document.createElement('div');
-    wrap.innerHTML = buildHtml(mod);
-    var node = wrap.firstChild;
-    if (hero.nextSibling) hero.parentNode.insertBefore(node, hero.nextSibling);
-    else hero.parentNode.appendChild(node);
-
-    var vid = node.querySelector('.rizq-mod-promo-player');
-    if (vid) {
-      var play = function () {
-        var p = vid.play();
-        if (p && typeof p.catch === 'function') p.catch(function () {});
-      };
-      if (vid.readyState >= 2) play();
-      else vid.addEventListener('loadeddata', play, { once: true });
+  /* Disabled: promo strip distracted users and had no meaningful promotional value. */
+  function removePromo() {
+    var nodes = document.querySelectorAll('#rizq-mod-promo, .rizq-mod-promo');
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i] && nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
     }
   }
 
+  function inject() {
+    removePromo();
+  }
+
   function boot() {
-    inject();
+    removePromo();
   }
 
   if (document.readyState === 'loading') {

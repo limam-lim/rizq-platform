@@ -16,7 +16,7 @@ var RIZQ_IDENTITY = {
   greeting: {
     ar: 'وعليكم السلام! أهلاً وسهلاً 😊\nكيف أقدر أساعدك اليوم؟',
     fr: 'Wa alaykum assalam! Bienvenue 😊\nComment puis-je vous aider?',
-    hs: 'وعليكم السلام! مرحبا بيك 😊\nكيفاش نعاونك؟',
+    hs: 'وعليكم السلام! أهلين بيك 😊\nشنهو تبي؟ نعاونك إن شاء الله',
     en: 'Welcome to Rizq! 😊\nHow can I help you today?'
   }
 };
@@ -444,7 +444,7 @@ var SECRECY_RULES = {
     fr: 'Désolé, je ne peux pas vous aider avec cette demande, car elle entre en conflit avec le cadre légal et la politique de confidentialité de Rizq.',
     en: 'Sorry, I cannot help with this request as it conflicts with Rizq\'s legal framework and privacy policy.',
     es: 'Lo siento, no puedo ayudarte con esta solicitud porque entra en conflicto con el marco legal y la política de privacidad de Rizq.',
-    hs: 'آسف، ما نقدر نعاونك ف هاد الطلب حيت ما يوافقش القانون وسياسة الخصوصية ديال رزق.'
+    hs: 'آسف، ما نقدر نعاونك ف هاذ الطلب لأنو ما يوافق قانون وسياسة الخصوصية تاع رزق.'
   }
 };
 
@@ -468,7 +468,7 @@ function _detectLangSwitchRequest(text) {
 function _langSwitchReply(targetLang) {
   var ls = {
     ar: 'بكل سرور! 😊 اكتب سؤالك بالعربية — كيف أساعدك؟',
-    hs: 'واخا! 😊 شنو بغيتي؟',
+    hs: 'زين! 😊 اكتب بالحسانية — شنهو تبي؟',
     fr: 'Bien sûr ! 😊 Comment puis-je vous aider ?',
     en: 'Of course! 😊 What would you like to know?',
     es: '¡Claro! 😊 ¿En qué puedo ayudarte?'
@@ -479,7 +479,7 @@ function _langSwitchReply(targetLang) {
 function _detectLang(text) {
   if (!text) return 'ar';
   var lower = text.toLowerCase();
-  var hs = ['كيفاش','شنهو','شنو هو','وش راك','الزين','نعاونك','بغيت','شحال','ماكو','كاين'];
+  var hs = ['كيفاش','كيفاه','شنهو','شنو هو','تبي','حابّ','وش راك','الزين','نعاونك','بغيت','شحال','شحّال','ماكو','كاين','أهلين','ماشي مشكل'];
   for (var i=0;i<hs.length;i++) if (text.indexOf(hs[i])!==-1) return 'hs';
   if (/bonjour|merci|comment|je veux|pouvez|svp|qu est|acheter|vendre|prix|annonce|forfait|combien/.test(lower)) return 'fr';
   if (/hello|thanks|how|what|can you|please|help|buy|sell|register|price|trust|seller/.test(lower)) return 'en';
@@ -622,7 +622,7 @@ function processMessage(userMessage, context) {
   if (socialGreet) {
     return { reply: {
       ar: '\u0628\u062E\u064A\u0631 \u0648\u0627\u0644\u062D\u0645\u062F \u0644\u0644\u0647! \uD83D\uDE0A \u0648\u0623\u0646\u062A\u061F\n\u0643\u064A\u0641 \u0623\u0642\u062F\u0631 \u0623\u062E\u062F\u0645\u0643 \u0627\u0644\u064A\u0648\u0645\u061F',
-      hs: '\u0644\u0628\u0627\u0633 \u0648\u0627\u0644\u062D\u0645\u062F \u0644\u0644\u0647! \uD83D\uDE0A \u0648\u0623\u0646\u062A\u061F\n\u0634\u0646\u0648 \u062A\u0628\u063A\u064A\u061F',
+      hs: '\u0623\u0647\u0644\u064A\u0646! \uD83D\uDE0A \u0634\u0646\u0647\u0648 \u062A\u0628\u064A\u061F',
       fr: 'Je vais bien, merci! \uD83D\uDE0A Et vous?\nComment puis-je vous aider?',
       en: 'Doing well, thanks! \uD83D\uDE0A And you?\nHow can I help today?'
     }[lang] || '\u0628\u062E\u064A\u0631! \u0643\u064A\u0641 \u0623\u0633\u0627\u0639\u062F\u0643\u061F', lang: lang };
@@ -633,7 +633,7 @@ function processMessage(userMessage, context) {
     if (isSalam) dR = '\u0648\u0639\u0644\u064A\u0643\u0645 \u0627\u0644\u0633\u0644\u0627\u0645 \u0648\u0631\u062D\u0645\u0629 \u0627\u0644\u0644\u0647! \uD83D\uDE0A \u0623\u0647\u0644\u0627\u064B \u0628\u0643 \u0641\u064A \u0631\u0632\u0642. \u0634\u0648 \u0623\u0642\u062F\u0631 \u0623\u0633\u0627\u0639\u062F\u0643\u061F';
     else if (isMorning) dR = {ar:'\u0635\u0628\u0627\u062D \u0627\u0644\u0646\u0648\u0631! \u2600\uFE0F \u0634\u0648 \u0623\u062E\u062F\u0645\u0643 \u0647\u0630\u0627 \u0627\u0644\u0635\u0628\u0627\u062D\u061F',fr:'Bonjour! \u2600\uFE0F Comment puis-je vous aider?',en:'Good morning! \u2600\uFE0F How can I help?'}[lang]||'\u0635\u0628\u0627\u062D \u0627\u0644\u0646\u0648\u0631!';
     else if (isEvening) dR = {ar:'\u0645\u0633\u0627\u0621 \u0627\u0644\u0646\u0648\u0631! \uD83C\uDF19 \u0634\u0648 \u0623\u0642\u062F\u0631 \u0623\u0641\u064A\u062F\u0643\u061F',fr:'Bonsoir! \uD83C\uDF19 Comment puis-je vous aider?',en:'Good evening! \uD83C\uDF19 How can I help?'}[lang]||'\u0645\u0633\u0627\u0621 \u0627\u0644\u0646\u0648\u0631!';
-    else dR = {ar:'\u0623\u0647\u0644\u064B\u0627! \uD83D\uDE0A \u0643\u064A\u0641 \u0623\u0633\u0627\u0639\u062F\u0643 \u0641\u064A \u0631\u0632\u0642\u061F',hs:'\u0645\u0631\u062D\u0628\u0627! \uD83D\uDE0A \u0634\u0646\u0648 \u062A\u0628\u063A\u064A\u061F',fr:'Bonjour! \uD83D\uDE0A Comment puis-je vous aider?',en:'Hey! \uD83D\uDE0A How can I help you today?',es:'\u00A1Hola! \uD83D\uDE0A \u00BFEn qu\u00E9 puedo ayudarte?'}[lang]||'\u0623\u0647\u0644\u064B\u0627! \uD83D\uDE0A';
+    else dR = {ar:'\u0623\u0647\u0644\u064B\u0627! \uD83D\uDE0A \u0643\u064A\u0641 \u0623\u0633\u0627\u0639\u062F\u0643 \u0641\u064A \u0631\u0632\u0642\u061F',hs:'\u0623\u0647\u0644\u064A\u0646! \uD83D\uDE0A \u0634\u0646\u0647\u0648 \u062A\u0628\u064A\u061F',fr:'Bonjour! \uD83D\uDE0A Comment puis-je vous aider?',en:'Hey! \uD83D\uDE0A How can I help you today?',es:'\u00A1Hola! \uD83D\uDE0A \u00BFEn qu\u00E9 puedo ayudarte?'}[lang]||'\u0623\u0647\u0644\u064B\u0627! \uD83D\uDE0A';
     return { reply: dR, lang: lang };
   }
 
@@ -741,7 +741,7 @@ function processMessage(userMessage, context) {
       : 'ar';
     return { reply: _langSwitchReply(legacyLang), lang: legacyLang, langSwitch: true };
   }
-  var cf = {ar:'\u0645\u0627 \u0641\u0647\u0645\u062A \uD83D\uDE0A \u0645\u0645\u0643\u0646 \u062A\u0648\u0636\u062D\u061F',es:'No entend\u00ED \uD83D\uDE0A \u00BFPuedes explicar m\u00E1s?',fr:'Je n ai pas compris \uD83D\uDE0A Pouvez-vous pr\u00E9ciser?',en:'Didn\'t catch that \uD83D\uDE0A Could you clarify?',hs:'\u0645\u0627 \u0641\u0647\u0645\u062A\u0634 \uD83D\uDE0A \u0648\u0636\u062D \u0644\u064A.'};
+  var cf = {ar:'\u0645\u0627 \u0641\u0647\u0645\u062A \uD83D\uDE0A \u0645\u0645\u0643\u0646 \u062A\u0648\u0636\u062D\u061F',es:'No entend\u00ED \uD83D\uDE0A \u00BFPuedes explicar m\u00E1s?',fr:'Je n ai pas compris \uD83D\uDE0A Pouvez-vous pr\u00E9ciser?',en:'Didn\'t catch that \uD83D\uDE0A Could you clarify?',hs:'\u0645\u0627 \u0641\u0647\u0645\u062A\u0647\u0627 \uD83D\uDE0A \u0648\u0636\u0651\u062D \u0644\u064A \u0623\u0643\u062B\u0631.'};
   _logMissedQuestion(userMessage, lang, context);
   return { reply: cf[lang]||cf.ar, lang: lang };
 }

@@ -1093,7 +1093,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     left:0 !important;right:0 !important;
     z-index:9990 !important;
   }
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)){
     display:none !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
@@ -1151,7 +1151,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* ════════════ TABLET 769–1280: شريطان مثل الهاتف (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (min-width:769px) and (max-width:1280px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:112px}
+  html.rizq-app-nav{--rizq-header-h:98px}
   html.rizq-app-nav #rizq-app-header,
   html.rizq-app-nav #rizq-app-header *{
     display:none !important;visibility:hidden !important;pointer-events:none !important;
@@ -1162,15 +1162,15 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:grid !important;
     grid-template-columns:1fr auto !important;
     grid-template-rows:auto auto !important;
-    height:var(--rizq-header-h,112px) !important;
-    max-height:var(--rizq-header-h,112px) !important;
-    min-height:var(--rizq-header-h,112px) !important;
+    height:var(--rizq-header-h,98px) !important;
+    max-height:var(--rizq-header-h,98px) !important;
+    min-height:var(--rizq-header-h,98px) !important;
     align-items:center !important;
     align-content:center !important;
-    column-gap:12px !important;
-    row-gap:8px !important;
-    padding:10px max(16px, env(safe-area-inset-left, 0px)) 10px max(16px, env(safe-area-inset-right, 0px)) !important;
-    overflow:visible !important;
+    column-gap:10px !important;
+    row-gap:4px !important;
+    padding:6px max(14px, env(safe-area-inset-left, 0px)) 6px max(14px, env(safe-area-inset-right, 0px)) !important;
+    overflow:hidden !important;
     direction:ltr !important;
   }
   /* الصف 1: أدوات + شعار */
@@ -1195,10 +1195,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:6px 10px !important;
-    font-size:12px !important;
-    min-width:36px !important;
-    min-height:34px !important;
+    padding:4px 8px !important;
+    font-size:11px !important;
+    min-width:32px !important;
+    min-height:30px !important;
     visibility:visible !important;
     opacity:1 !important;
   }
@@ -1259,13 +1259,13 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .logo-mark-img,
   html.rizq-app-nav #rizq-desk-nav .logo-mark,
   html.rizq-app-nav #rizq-desk-nav .logo-mark-img{
-    width:42px !important;
-    height:42px !important;
-    min-width:42px !important;
-    min-height:42px !important;
-    max-width:42px !important;
-    max-height:42px !important;
-    border-radius:12px !important;
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    min-height:36px !important;
+    max-width:36px !important;
+    max-height:36px !important;
+    border-radius:10px !important;
     box-shadow:
       0 0 0 1.5px rgba(240,215,138,.55),
       0 0 18px rgba(201,168,76,.26),
@@ -1289,7 +1289,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .logo-ar{
     font-family:'Cairo','Segoe UI',Tahoma,sans-serif !important;
     font-weight:900 !important;
-    font-size:22px !important;
+    font-size:20px !important;
     line-height:1 !important;
     white-space:nowrap !important;
     color:#F5E0A0 !important;
@@ -1299,15 +1299,15 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:block !important;
     font-family:Georgia,'Times New Roman',serif !important;
     font-style:italic !important;
-    font-size:7.5px !important;
+    font-size:7px !important;
     font-weight:700 !important;
-    letter-spacing:1.8px !important;
+    letter-spacing:1.6px !important;
     color:rgba(232,201,106,.82) !important;
     text-transform:uppercase !important;
     white-space:nowrap !important;
     line-height:1.1 !important;
   }
-  /* الصف 2: رصيف الأقسام بعرض كامل */
+  /* الصف 2: رصيف الأقسام بعرض كامل — مضغوط قليلاً حتى لا يغطي أزرار الصفحة */
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
     grid-column:1 / -1 !important;
@@ -1317,19 +1317,23 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
-    padding:4px 10px !important;
-    gap:4px !important;
-    border-radius:12px !important;
+    padding:2px 8px !important;
+    gap:2px !important;
+    border-radius:999px !important;
     overflow-x:auto !important;
     overflow-y:hidden !important;
-    max-height:none !important;
+    max-height:48px !important;
   }
   html.rizq-app-nav #nav > .nav-sticky-tools,
   html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools,
   html.rizq-app-nav #nav .nav-hamburger,
   html.rizq-app-nav #rizq-desk-nav .nav-hamburger,
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
-  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only,
+  html.rizq-app-nav #nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #nav .nav-center > li.rizq-nav-packs,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.rizq-nav-packs{
     display:none !important;
   }
   html.rizq-app-nav #nav .nav-center .nav-desktop-more-only,
@@ -1350,6 +1354,13 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     justify-content:center !important;
     list-style:none !important;
   }
+  /* بعد display:flex العام — أخفِ الباقات (تبقى داخل المزيد) */
+  html.rizq-app-nav #nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #nav .nav-center > li.rizq-nav-packs,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.rizq-nav-packs{
+    display:none !important;
+  }
   html.rizq-app-nav #nav .nav-center a,
   html.rizq-app-nav #nav .nav-center .nav-link-btn,
   html.rizq-app-nav #rizq-desk-nav .nav-center a,
@@ -1357,37 +1368,39 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     flex-direction:column !important;
     align-items:center !important;
-    padding:4px 6px 5px !important;
-    font-size:10.5px !important;
-    min-width:52px !important;
+    padding:2px 4px 3px !important;
+    font-size:9px !important;
+    min-width:44px !important;
     width:auto !important;
     max-width:none !important;
-    gap:2px !important;
-    max-height:none !important;
+    gap:1px !important;
+    max-height:44px !important;
     visibility:visible !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    font-size:16px !important;
-    width:30px !important;
-    height:30px !important;
-    line-height:30px !important;
+    font-size:14px !important;
+    width:26px !important;
+    height:26px !important;
+    line-height:26px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
-  html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl{
-    font-size:10.5px !important;
-    line-height:1.15 !important;
+  html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
+    font-size:9px !important;
+    line-height:1.1 !important;
     white-space:nowrap !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
-    padding-top:var(--rizq-header-h,112px) !important;
+    padding-top:var(--rizq-header-h,98px) !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:var(--rizq-header-h,112px) !important;
+    padding-top:var(--rizq-header-h,98px) !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,
@@ -1400,7 +1413,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* ════════════ MOBILE ≤768px — قاعدة عامة (التفاصيل في بلوك الشريطين أدناه) ════════════ */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav{--rizq-header-h:102px}
+  html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
   html.rizq-app-nav body{
     padding-top:var(--rizq-header-h) !important;
     padding-bottom:0 !important;
@@ -1415,7 +1428,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     height:0 !important;
     overflow:hidden !important;
   }
-  html.rizq-app-nav body > nav:not(#nav):not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)):not(:has(.nav-search-mini)),
+  html.rizq-app-nav body > nav:not(#nav):not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav .topnav:not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav .mobile-bottom-nav,
   html.rizq-app-nav .nav-hamburger,
@@ -1609,16 +1622,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:100% !important;
     max-width:100% !important;
     display:flex !important;
-    flex-wrap:nowrap !important;
+    flex-wrap:wrap !important;
     align-items:center !important;
     justify-content:center !important;
-    height:52px !important;
-    padding:4px 10px !important;
-    margin:2px 0 6px !important;
-    gap:14px !important;
+    height:auto !important;
+    padding:4px 6px !important;
+    margin:2px 0 4px !important;
+    gap:3px 2px !important;
     direction:inherit !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
+    overflow-x:visible !important;
+    overflow-y:visible !important;
     -webkit-overflow-scrolling:touch !important;
     scrollbar-width:none !important;
     background:transparent !important;
@@ -2727,14 +2740,15 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
 
 /* تابلت: تثبيت شريطين + شعار كامل + منع المزيد المزدوج بعد قواعد الآبار الدائرية */
 @media (min-width:769px) and (max-width:1280px){
-  html.rizq-app-nav{--rizq-header-h:112px}
+  html.rizq-app-nav{--rizq-header-h:98px}
   html.rizq-app-nav #nav,
   html.rizq-app-nav #rizq-desk-nav{
     display:grid !important;
     grid-template-columns:1fr auto !important;
     grid-template-rows:auto auto !important;
-    height:var(--rizq-header-h,112px) !important;
-    max-height:var(--rizq-header-h,112px) !important;
+    height:var(--rizq-header-h,98px) !important;
+    max-height:var(--rizq-header-h,98px) !important;
+    overflow:hidden !important;
   }
   html.rizq-app-nav #nav > .nav-start,
   html.rizq-app-nav #rizq-desk-nav > .nav-start{
@@ -2760,40 +2774,62 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     justify-content:center !important;
     width:100% !important;
     max-width:100% !important;
-    padding:5px 10px !important;
-    gap:3px !important;
+    padding:2px 8px !important;
+    gap:2px !important;
+    max-height:48px !important;
   }
   html.rizq-app-nav #nav .nav-center .nav-phone-more-only,
-  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only{
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-phone-more-only,
+  html.rizq-app-nav #nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #nav .nav-center > li.rizq-nav-packs,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.rizq-nav-packs{
     display:none !important;
   }
   html.rizq-app-nav #nav .nav-center .nav-desktop-more-only,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-desktop-more-only{
     display:inline-flex !important;
   }
+  html.rizq-app-nav #nav .nav-center a,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    padding:2px 4px 3px !important;
+    min-width:44px !important;
+    gap:1px !important;
+    max-height:44px !important;
+  }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    width:30px !important;
-    height:30px !important;
-    font-size:16px !important;
-    line-height:30px !important;
+    width:26px !important;
+    height:26px !important;
+    font-size:14px !important;
+    line-height:26px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    font-size:10.5px !important;
-    line-height:1.15 !important;
+    font-size:9px !important;
+    line-height:1.1 !important;
   }
 }
 
 
+/* سطح المكتب/تابلت: الباقات تبقى داخل المزيد فقط */
+@media (min-width:769px) and (min-height:501px){
+  html.rizq-app-nav #nav .nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-phone-packs-li{
+    display:none !important;
+  }
+}
+
 /* ════════════ PHONE — شريطان مضغوطان (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav{--rizq-header-h:102px}
+  html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
   html.rizq-app-nav #rizq-app-header,
   html.rizq-app-nav #rizq-app-header *{
     display:none !important;visibility:hidden !important;pointer-events:none !important;
@@ -2964,7 +3000,7 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     direction:ltr !important;
     unicode-bidi:isolate !important;
   }
-  /* الصف 2: كبسولة الأقسام بعرض كامل ومضغوطة أكثر */
+  /* الصف 2: رصيف ثانوي فقط — الإبهام+الرئيسية في الشريط السفلي */
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center,
   html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
@@ -2973,10 +3009,11 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     flex:unset !important;width:100% !important;max-width:100% !important;
     height:auto !important;min-width:0 !important;
     display:flex !important;flex-wrap:nowrap !important;align-items:center !important;
-    gap:1px !important;padding:2px 4px !important;margin:0 !important;
+    align-content:center !important;
+    gap:2px !important;padding:3px 4px !important;margin:0 !important;
     overflow-x:auto !important;overflow-y:hidden !important;
     -webkit-overflow-scrolling:touch !important;scrollbar-width:none !important;
-    border-radius:10px !important;
+    border-radius:12px !important;
     background:
       linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
       rgba(4,10,20,.55) !important;
@@ -2984,6 +3021,29 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 16px rgba(0,0,0,.22) !important;
     backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     position:relative !important;left:auto !important;right:auto !important;top:auto !important;transform:none !important;
+  }
+  html.rizq-app-nav #nav > .nav-center::after,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center::after,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center::after{
+    content:none !important;
+    display:none !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="home"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="home"],
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="thumb"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="thumb"]{
+    display:none !important;
+  }
+  html.rizq-app-nav #nav .nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-phone-packs-li{
+    display:flex !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="secondary"]{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    max-width:20% !important;
+    justify-content:center !important;
   }
   html.rizq-app-nav #nav > .nav-center::-webkit-scrollbar,
   html.rizq-app-nav #rizq-desk-nav > .nav-center::-webkit-scrollbar{display:none !important}
@@ -3185,14 +3245,346 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav .mobile-bottom-nav{display:none !important}
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open){
-    padding-top:var(--rizq-header-h,102px) !important;
+    padding-top:var(--rizq-header-h,98px) !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero,
   html.rizq-app-nav body.landing-ux-mobile .hero{
     padding-top:0 !important;
-    min-height:calc(100vh - var(--rizq-header-h,102px)) !important;
+    padding-bottom:10px !important;
+    min-height:0 !important;
+    height:auto !important;
     justify-content:flex-start !important;
   }
+}
+
+/* ════════════ PHONE ONLY — ثانوي أعلى + شريط إبهام سفلي ثابت ════════════ */
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
+  html.rizq-app-nav{
+    --rizq-header-h:98px;
+    --rizq-thumb-dock-h:72px;
+  }
+
+  html.rizq-app-nav #nav,
+  html.rizq-app-nav #rizq-desk-nav,
+  html.rizq-app-nav body.landing-ux-mobile > nav#nav{
+    height:var(--rizq-header-h,98px) !important;
+    min-height:var(--rizq-header-h,98px) !important;
+    max-height:var(--rizq-header-h,98px) !important;
+  }
+
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-content:center !important;
+    justify-content:center !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:48px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    gap:2px !important;
+    padding:3px 6px !important;
+    row-gap:0 !important;
+  }
+
+  html[dir="rtl"].rizq-app-nav #nav > .nav-center,
+  html[dir="rtl"].rizq-app-nav #rizq-desk-nav > .nav-center,
+  html[dir="rtl"].rizq-app-nav body.landing-ux-mobile #nav > .nav-center{
+    direction:rtl !important;
+  }
+
+  /* لم يعد هناك صفّان في الأعلى */
+  html.rizq-app-nav #nav > .nav-center::after,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center::after,
+  html.rizq-app-nav body.landing-ux-mobile #nav > .nav-center::after{
+    content:none !important;
+    display:none !important;
+  }
+
+  /* الرئيسية + الإبهام تُنقل للشريط السفلي — أخفِهما من الرصيف العلوي فقط */
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="home"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="home"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="home"],
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="thumb"],
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="thumb"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="thumb"],
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="ads"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="home"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="post"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="stores"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="showrooms"]),
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li:has(a[data-hdr="ads"]){
+    display:none !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li[data-nav-tier="home"],
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li[data-nav-tier="thumb"]{
+    display:flex !important;
+  }
+
+  html.rizq-app-nav #nav .nav-center > li[data-rizq-module="office"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-rizq-module="office"]{order:11 !important}
+  html.rizq-app-nav #nav .nav-center > li[data-rizq-module="tenders"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-rizq-module="tenders"]{order:12 !important}
+  html.rizq-app-nav #nav .nav-center > li[data-rizq-module="investments"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-rizq-module="investments"]{order:13 !important}
+  html.rizq-app-nav #nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #nav .nav-center > li.rizq-nav-packs,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li.nav-phone-packs-li{order:14 !important;display:flex !important}
+  html.rizq-app-nav #nav .nav-center > li.nav-dropdown-li,
+  html.rizq-app-nav #nav .nav-center > #nav-more-li,
+  html.rizq-app-nav body.landing-ux-mobile #nav #nav-more-li,
+  html.rizq-app-nav body.landing-ux-mobile #nav-more-li.rizq-more-docked{
+    order:15 !important;
+    display:flex !important;
+    flex:1 1 0 !important;
+    max-width:20% !important;
+  }
+
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"],
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="secondary"]{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    max-width:20% !important;
+    justify-content:center !important;
+    display:flex !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"] > a,
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"] > .nav-link-btn,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="secondary"] > a,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="secondary"] > .nav-link-btn{
+    min-width:0 !important;
+    width:100% !important;
+    min-height:34px !important;
+    max-height:40px !important;
+    padding:3px 2px 4px !important;
+    gap:1px !important;
+    opacity:.92 !important;
+    background:transparent !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"] .rizq-hdr-ico,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="secondary"] .rizq-hdr-ico{
+    font-size:13px !important;
+    width:22px !important;
+    height:22px !important;
+    line-height:22px !important;
+  }
+  html.rizq-app-nav #nav .nav-center > li[data-nav-tier="secondary"] .rizq-hdr-lbl,
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="secondary"] .rizq-hdr-lbl{
+    font-size:7.5px !important;
+    font-weight:700 !important;
+    color:rgba(255,255,255,.88) !important;
+  }
+
+  html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
+  html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open){
+    padding-top:var(--rizq-header-h,98px) !important;
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero,
+  html.rizq-app-nav body.landing-ux-mobile .hero{
+    padding-top:0 !important;
+    padding-bottom:8px !important;
+    min-height:0 !important;
+    height:auto !important;
+    justify-content:flex-start !important;
+  }
+  html.rizq-app-nav .hero-content,
+  html.rizq-app-nav body.landing-ux-mobile .hero-content{
+    padding-top:4px !important;
+    padding-bottom:0 !important;
+    flex:0 0 auto !important;
+    justify-content:flex-start !important;
+    gap:0 !important;
+  }
+  html.rizq-app-nav .hero-brand-row{
+    margin:0 auto 8px !important;
+    gap:6px !important;
+    min-width:min(260px,90vw) !important;
+  }
+  html.rizq-app-nav .hero-title-card{
+    min-height:0 !important;
+    padding:10px 18px !important;
+    border-radius:14px !important;
+  }
+  html.rizq-app-nav .hero-headline{
+    font-size:clamp(40px,11vw,52px) !important;
+  }
+  html.rizq-app-nav .hero-brand-row .hero-eyebrow{
+    min-height:0 !important;
+    padding:7px 12px !important;
+  }
+  html.rizq-app-nav .hero-lead-row{
+    gap:8px !important;
+    margin:0 auto 8px !important;
+  }
+  html.rizq-app-nav .hero-subtitle-card{
+    padding:12px 14px 10px !important;
+    border-radius:14px !important;
+  }
+  html.rizq-app-nav .hero-subtitle-primary{
+    font-size:clamp(15px,4.2vw,18px) !important;
+    margin:0 0 2px !important;
+  }
+  html.rizq-app-nav .hero-subtitle-secondary{
+    font-size:clamp(12px,3.4vw,15px) !important;
+  }
+  html.rizq-app-nav .hero-pills{
+    margin:0 auto 8px !important;
+  }
+  html.rizq-app-nav .hero-stage{
+    margin-top:6px !important;
+    padding:12px 10px 8px !important;
+    gap:10px !important;
+    border-radius:18px !important;
+  }
+  html.rizq-app-nav .hero-spaces-title{
+    margin:0 0 4px !important;
+  }
+  html.rizq-app-nav .hero-spaces-sub{
+    margin:0 0 8px !important;
+  }
+  html.rizq-app-nav footer{
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* ── شريط الإبهام السفلي ── */
+  html.rizq-app-nav.rizq-phone-thumb-dock #rizq-thumb-dock,
+  html.rizq-app-nav.rizq-phone-thumb-dock .rizq-thumb-dock,
+  html.rizq-app-nav #rizq-thumb-dock,
+  html.rizq-app-nav .rizq-thumb-dock{
+    display:flex !important;
+    flex-direction:column !important;
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    top:auto !important;
+    bottom:0 !important;
+    z-index:10020 !important;
+    width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    min-height:var(--rizq-thumb-dock-h,72px) !important;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+    background:
+      linear-gradient(180deg,rgba(13,24,48,.96),rgba(7,14,26,.98)) !important;
+    border-top:1px solid rgba(201,168,76,.38) !important;
+    box-shadow:0 -10px 28px rgba(2,6,14,.45) !important;
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+  }
+  html.rizq-app-nav #rizq-thumb-dock[hidden]{display:none !important}
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list{
+    list-style:none !important;
+    display:flex !important;
+    flex-direction:row !important;
+    flex-wrap:nowrap !important;
+    align-items:stretch !important;
+    justify-content:space-between !important;
+    gap:4px !important;
+    width:100% !important;
+    max-width:560px !important;
+    margin:0 auto !important;
+    padding:0 !important;
+    direction:rtl !important;
+  }
+  html[dir="ltr"].rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list{direction:ltr !important}
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    max-width:20% !important;
+    display:flex !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li > a,
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li > .nav-link-btn{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+    width:100% !important;
+    min-height:54px !important;
+    padding:5px 2px 6px !important;
+    border-radius:12px !important;
+    text-decoration:none !important;
+    color:#F5E0A0 !important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+      rgba(8,14,26,.88) !important;
+    border:1px solid rgba(201,168,76,.42) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      0 2px 10px rgba(0,0,0,.28) !important;
+    -webkit-tap-highlight-color:transparent;
+  }
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li > a:active,
+  html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li > .nav-link-btn:active{
+    transform:scale(.97);
+    background:rgba(201,168,76,.16) !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock .rizq-hdr-ico{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:16px !important;
+    width:26px !important;
+    height:26px !important;
+    line-height:26px !important;
+    margin:0 !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock .rizq-hdr-lbl{
+    display:block !important;
+    font-size:8.5px !important;
+    font-weight:800 !important;
+    line-height:1.1 !important;
+    color:#F5E0A0 !important;
+    white-space:nowrap !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock li[data-nav-tier="home"] > a{
+    border-color:rgba(232,201,106,.55) !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock li.rizq-nav-post > a,
+  html.rizq-app-nav #rizq-thumb-dock li.nav-phone-post-li > a{
+    background:linear-gradient(160deg,rgba(232,201,106,.3),rgba(201,168,76,.14)) !important;
+    border-color:rgba(232,201,106,.55) !important;
+    box-shadow:0 2px 12px rgba(201,168,76,.3), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  }
+  html.rizq-app-nav #rizq-thumb-dock li.nav-phone-post-li > a::before{content:none !important;display:none !important}
+  html.rizq-app-nav #rizq-thumb-dock .rizq-hdr-ico::before{display:none !important}
+}
+
+/* شريط الإبهام: يظهر فقط عندما يضع JS الصنف rizq-phone-thumb-dock */
+html.rizq-app-nav:not(.rizq-phone-thumb-dock) #rizq-thumb-dock{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+html.rizq-app-nav.rizq-phone-thumb-dock #rizq-thumb-dock:not([hidden]){
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  position:fixed !important;
+  left:0 !important;right:0 !important;
+  top:auto !important;
+  bottom:0 !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  min-height:var(--rizq-thumb-dock-h,72px) !important;
+  z-index:10020 !important;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  margin:0 !important;
+  inset-inline:0 !important;
+  transform:none !important;
+  overflow:visible !important;
 }
 
 /* ── شعار رزق: Cairo دائماً (مثل كبسولة الهيرو) على كل العروض ── */

@@ -20,7 +20,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.5"/>
-<link rel="stylesheet" href="rizq_module_promo.css?v=26.5"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -559,14 +558,17 @@ footer{
     padding:10px 0 12px;gap:10px;
   }
   .action-btns{
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;
+    flex-wrap:wrap;
     gap:8px;
     width:100%;
   }
   .action-btn{
+    flex:1 1 calc(50% - 4px);
     justify-content:center;
-    width:100%;
+    width:auto;
+    min-width:0;
+    max-width:100%;
     min-height:46px;
     padding:10px 8px;
     font-size:12.5px;
@@ -777,7 +779,6 @@ footer{
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_module_promo.js?v=26.5" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_site_banner.js"></script>
@@ -1746,6 +1747,7 @@ function rizqShare(title, url) {
                   + '<div class="product-name">' + esc(p.name) + '</div>'
                   + '<div class="product-price">' + priceTxt + '</div>'
                   + '<button class="add-cart-btn" onclick="event.stopPropagation();addToCartStore(' + pid + ')">🛒 ' + (isFr()?'Ajouter':'أضف للسلة') + '</button>'
+                  + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueStorePrefacture(' + pid + ')">PREFACTUR · ' + (isFr()?'Préfacture':'فاتورة قبل') + '</button>'
                   + '</div></div>';
               }).join('');
               window.STORE_FEATURED_PRODUCTS = featured;
@@ -1915,6 +1917,7 @@ function rizqShare(title, url) {
                     + '<div class="product-name">'+esc(p.name)+'</div>'
                     + '<div class="product-price">'+priceTxt+'</div>'
                     + '<button class="add-cart-btn" onclick="event.stopPropagation();addToCartStore(\''+pid+'\')">🛒 '+(isFr()?'Ajouter':'أضف للسلة')+'</button>'
+                    + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueStorePrefacture(\''+pid+'\')">PREFACTUR · '+(isFr()?'Préfacture':'فاتورة قبل')+'</button>'
                     + '</div></div>';
                 });
                 if(addedHtml){
@@ -2151,14 +2154,50 @@ function addToCartStore(id){
   var fr = (localStorage.getItem('rizq_lang') === 'fr');
   var cart = _storeLoadCart();
   var ex = cart.find(function(c){ return c.id === 'store-prod-' + id; });
+  var sid = '';
+  try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
+  var sname = (document.getElementById('store-name') || {}).textContent || '';
   if (ex) ex.qty++;
   // إصلاح تسرب اللغة: كنا نخزّن اسماً واحداً محسوماً وقت الإضافة فقط (name أو
   // nameF)، فإذا بدّل المستخدم اللغة لاحقاً في rizq_cart.html يبقى الاسم القديم
   // ظاهراً. الآن نخزّن كلا الاسمين ليختار cart.html الاسم الصحيح دائماً.
-  else cart.push({id:'store-prod-'+id, name:p.name, nameF:p.nameF, price:p.price, qty:1, emoji:p.emoji});
+  else cart.push({id:'store-prod-'+id, name:p.name, nameF:p.nameF, price:p.price, qty:1, emoji:p.emoji, storeId:sid, accountId:sid, storeName:sname});
   _storeSaveCart(cart);
   updateCartCount();
   showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + (fr?p.nameF:p.name));
+}
+
+function issueStorePrefacture(id){
+  var fr = (localStorage.getItem('rizq_lang') === 'fr');
+  var catalog = window.STORE_FEATURED_PRODUCTS || {};
+  var p = catalog[id];
+  if (!p) { showToast(fr ? '❌ Produit introuvable' : '❌ المنتج غير موجود', 'error'); return; }
+  function run(){
+    var sid = '';
+    try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
+    var sname = (document.getElementById('store-name') || {}).textContent || (fr ? 'Magasin Rizq' : 'محل رزق');
+    var phone = '';
+    try {
+      var wa = document.getElementById('store-wa-top');
+      if (wa && wa.href) phone = wa.href.replace(/.*wa\.me\//,'').split('?')[0];
+    } catch (e2) {}
+    RizqPrefacture.issueAndOpen({
+      module: 'store',
+      sellerAccountId: sid,
+      sellerName: sname,
+      sellerPhone: phone,
+      lines: [{ id: id, name: fr ? (p.nameF || p.name) : p.name, qty: 1, unitPrice: Number(p.price) || 0 }],
+      meta: { source: 'store-product' }
+    });
+  }
+  if (!window.RizqPrefacture) {
+    var s = document.createElement('script');
+    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.onload = run;
+    document.head.appendChild(s);
+    return;
+  }
+  run();
 }
 document.addEventListener('DOMContentLoaded', updateCartCount);
 if (document.readyState !== 'loading') updateCartCount();
