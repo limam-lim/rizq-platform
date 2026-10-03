@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=27.6"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=27.8"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=27.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.8"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -58,12 +58,16 @@ document.documentElement.classList.add('rizq-app-nav');
     display:grid!important;visibility:visible!important;height:var(--rizq-header-h,98px)!important;
     position:fixed!important;top:0;left:0;right:0;z-index:10000!important;
   }
-  html.rizq-app-nav .hero{justify-content:flex-start!important;padding-top:0!important;min-height:calc(100vh - var(--rizq-header-h,98px) - var(--rizq-thumb-dock-h,72px))!important}
+  /* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
+  html.rizq-app-nav .hero{
+    justify-content:flex-start!important;padding-top:0!important;padding-bottom:10px!important;
+    min-height:0!important;height:auto!important;
+  }
   html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
-  html.rizq-app-nav .hero-content{padding-top:12px!important}
+  html.rizq-app-nav .hero-content{padding-top:8px!important;padding-bottom:4px!important}
   /* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
   html.rizq-app-nav #nav > .logo{
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
@@ -448,9 +452,9 @@ html.rizq-has-announce .section-jump-bar{
   html:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html.rizq-app-nav body.landing-ux-mobile .hero-content,
   html.rizq-app-nav body.landing-ux-mobile:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:16px!important;
-    flex:1 1 auto!important;width:100%!important;
-    display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box!important;
+    padding-top:8px!important;
+    flex:0 0 auto!important;width:100%!important;
+    display:flex!important;flex-direction:column!important;justify-content:flex-start!important;box-sizing:border-box!important;
   }
   .ticker-wrap{
     width:100%!important;flex:0 0 auto!important;align-self:stretch!important;

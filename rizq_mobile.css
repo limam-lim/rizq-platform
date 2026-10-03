@@ -776,7 +776,8 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .search-cat-select,.search-input-wrap,.btn-search-main{
     width:auto;min-width:0;flex:1 1 140px;
   }
-  .hero-content{padding-top:24px!important}
+  html.rizq-app-nav .hero-content{padding-top:6px!important;padding-bottom:2px!important}
+  html.rizq-app-nav .hero{min-height:0!important;height:auto!important;padding-bottom:8px!important}
   .hero-vid-wrap{max-height:48vh;overflow:hidden}
   .cats-grid,.listings-grid,.ads-grid,.products-grid,.prices-grid{
     display:grid!important;
