@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=27.1"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=27.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -41,21 +41,21 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=27.2"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.3"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
 </script>
 <style id="rizq-mobile-header-critical">
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  /* شريطان مضغوطان — أدوات+شعار / رصيف الأقسام */
-  html.rizq-app-nav{--rizq-header-h:128px}
-  html.rizq-app-nav body{padding-top:var(--rizq-header-h,128px)!important}
+  /* هاتف: أدوات+شعار ثم رصيف ثنائي (ثانوي أعلى / إبهام أسفل) */
+  html.rizq-app-nav{--rizq-header-h:152px}
+  html.rizq-app-nav body{padding-top:var(--rizq-header-h,152px)!important}
   html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{
-    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,128px)!important;
+    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,152px)!important;
     position:fixed!important;top:0;left:0;right:0;z-index:10000!important;
   }
-  html.rizq-app-nav .hero{justify-content:flex-start!important;padding-top:0!important;min-height:calc(100vh - var(--rizq-header-h,128px))!important}
+  html.rizq-app-nav .hero{justify-content:flex-start!important;padding-top:0!important;min-height:calc(100vh - var(--rizq-header-h,152px))!important}
   html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
@@ -3184,11 +3184,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <ul class="nav-center">
     <!-- ترتيب مطابق لتوالي أقسام الصفحة (من الأعلى للأسفل) -->
+    <!-- هاتف: secondary أعلى / thumb أسفل (إعلانات·نشر·محلات·معارض) — الترتيب عبر CSS order -->
     <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🏠</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
     <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
-    <li class="rizq-nav-post nav-phone-post-li" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
+    <li class="rizq-nav-post nav-phone-post-li" data-nav-order="3" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4" data-nav-tier="thumb"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5" data-nav-tier="thumb"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>

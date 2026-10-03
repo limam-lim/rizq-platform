@@ -759,14 +759,14 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     height:auto!important;min-height:48px;flex-wrap:wrap!important;
     padding:8px 12px!important;gap:8px!important;
   }
-  /* الشريط الرئيسي: لا تكديس أبداً — صف واحد + تمرير */
+  /* هاتف: رصيف ثنائي الصفوف (ثانوي / إبهام) — لا نفرض nowrap */
   #nav .nav-center,
   #rizq-desk-nav .nav-center,
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    flex-wrap:nowrap!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
+    flex-wrap:wrap!important;
+    overflow-x:visible!important;
+    overflow-y:visible!important;
     max-width:100%!important;
   }
   .nav-center a{padding:6px 8px!important;font-size:11px!important;white-space:nowrap!important}
