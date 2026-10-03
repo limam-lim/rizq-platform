@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=27.4"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=27.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=27.4"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.6"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -122,7 +122,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ══════════════════════════════════
    NAVBAR — Peak luxury entry bar
 ══════════════════════════════════ */
-nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
+nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs){
   position:fixed;top:0;left:0;right:0;z-index:1000;
   padding:0 max(28px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));height:86px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;

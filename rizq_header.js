@@ -1294,19 +1294,41 @@
     }
     /* RTL يمين→يسار: الرئيسية · الإعلانات · نشر · المحلات · المعارض */
     var thumbOrd = { home: 1, ads: 2, post: 3, stores: 4, showrooms: 5 };
-    var dockSel = ':scope > li[data-nav-tier="thumb"], :scope > li[data-nav-tier="home"]';
+    function collectDockItems(root, into) {
+      if (!root) return;
+      root.querySelectorAll(':scope > li').forEach(function (li) {
+        var tier = li.getAttribute('data-nav-tier');
+        var key = thumbHdrKey(li);
+        if (tier === 'thumb' || tier === 'home' || thumbOrd[key] != null) {
+          if (into.indexOf(li) < 0) into.push(li);
+        }
+      });
+    }
     if (phone) {
       var pool = [];
-      center.querySelectorAll(dockSel).forEach(function (li) { pool.push(li); });
-      list.querySelectorAll(dockSel).forEach(function (li) {
-        if (pool.indexOf(li) < 0) pool.push(li);
+      collectDockItems(center, pool);
+      collectDockItems(list, pool);
+      /* إزالة تكرارات بنفس المفتاح — أبقِ أول عنصر */
+      var seen = {};
+      pool = pool.filter(function (li) {
+        var k = thumbHdrKey(li) || li.getAttribute('data-nav-tier') || '';
+        if (!k || seen[k]) {
+          if (seen[k] && li.parentNode) li.parentNode.removeChild(li);
+          return false;
+        }
+        seen[k] = true;
+        return true;
       });
       pool.sort(function (a, b) {
-        var ka = thumbHdrKey(a);
-        var kb = thumbHdrKey(b);
-        return (thumbOrd[ka] || 50) - (thumbOrd[kb] || 50);
+        return (thumbOrd[thumbHdrKey(a)] || 50) - (thumbOrd[thumbHdrKey(b)] || 50);
       });
-      pool.forEach(function (li) { list.appendChild(li); });
+      pool.forEach(function (li) {
+        if (!li.getAttribute('data-nav-tier')) {
+          var k = thumbHdrKey(li);
+          li.setAttribute('data-nav-tier', k === 'home' ? 'home' : 'thumb');
+        }
+        list.appendChild(li);
+      });
       dock.hidden = pool.length === 0;
     } else {
       list.querySelectorAll(':scope > li').forEach(function (li) { center.appendChild(li); });

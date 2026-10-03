@@ -1093,7 +1093,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     left:0 !important;right:0 !important;
     z-index:9990 !important;
   }
-  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)){
     display:none !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
@@ -1428,7 +1428,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     height:0 !important;
     overflow:hidden !important;
   }
-  html.rizq-app-nav body > nav:not(#nav):not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)):not(:has(.nav-search-mini)),
+  html.rizq-app-nav body > nav:not(#nav):not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rizq-thumb-dock):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs):not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav .topnav:not(:has(.nav-search)):not(:has(.nav-search-mini)),
   html.rizq-app-nav .mobile-bottom-nav,
   html.rizq-app-nav .nav-hamburger,
@@ -3307,7 +3307,13 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="home"],
   html.rizq-app-nav #nav .nav-center > li[data-nav-tier="thumb"],
   html.rizq-app-nav #rizq-desk-nav .nav-center > li[data-nav-tier="thumb"],
-  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="thumb"]{
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li[data-nav-tier="thumb"],
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="ads"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="home"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="post"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="stores"]),
+  html.rizq-app-nav #nav .nav-center > li:has(a[data-hdr="showrooms"]),
+  html.rizq-app-nav body.landing-ux-mobile #nav .nav-center > li:has(a[data-hdr="ads"]){
     display:none !important;
   }
   html.rizq-app-nav #rizq-thumb-dock .rizq-thumb-dock-list > li[data-nav-tier="home"],
@@ -3384,16 +3390,22 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   }
 
   /* ── شريط الإبهام السفلي ── */
+  html.rizq-app-nav.rizq-phone-thumb-dock #rizq-thumb-dock,
+  html.rizq-app-nav.rizq-phone-thumb-dock .rizq-thumb-dock,
   html.rizq-app-nav #rizq-thumb-dock,
   html.rizq-app-nav .rizq-thumb-dock{
-    display:block !important;
+    display:flex !important;
+    flex-direction:column !important;
     position:fixed !important;
     left:0 !important;
     right:0 !important;
+    top:auto !important;
     bottom:0 !important;
     z-index:10020 !important;
+    width:100% !important;
     height:auto !important;
-    min-height:var(--rizq-thumb-dock-h,68px) !important;
+    max-height:none !important;
+    min-height:var(--rizq-thumb-dock-h,72px) !important;
     padding:8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
     margin:0 !important;
     box-sizing:border-box !important;
@@ -3486,9 +3498,33 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-thumb-dock .rizq-hdr-ico::before{display:none !important}
 }
 
-/* أخفِ شريط الإبهام خارج الهاتف */
-@media (min-width:769px) and (min-height:501px){
-  html.rizq-app-nav #rizq-thumb-dock{display:none !important}
+/* شريط الإبهام: يظهر فقط عندما يضع JS الصنف rizq-phone-thumb-dock */
+html.rizq-app-nav:not(.rizq-phone-thumb-dock) #rizq-thumb-dock{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+html.rizq-app-nav.rizq-phone-thumb-dock #rizq-thumb-dock:not([hidden]){
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  position:fixed !important;
+  left:0 !important;right:0 !important;
+  top:auto !important;
+  bottom:0 !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  min-height:var(--rizq-thumb-dock-h,72px) !important;
+  z-index:10020 !important;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  margin:0 !important;
+  inset-inline:0 !important;
+  transform:none !important;
+  overflow:visible !important;
 }
 
 /* ── شعار رزق: Cairo دائماً (مثل كبسولة الهيرو) على كل العروض ── */
