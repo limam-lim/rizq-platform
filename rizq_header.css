@@ -1413,7 +1413,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* ════════════ MOBILE ≤768px — قاعدة عامة (التفاصيل في بلوك الشريطين أدناه) ════════════ */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav{--rizq-header-h:128px}
+  html.rizq-app-nav{--rizq-header-h:152px}
   html.rizq-app-nav body{
     padding-top:var(--rizq-header-h) !important;
     padding-bottom:0 !important;
@@ -1622,16 +1622,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:100% !important;
     max-width:100% !important;
     display:flex !important;
-    flex-wrap:nowrap !important;
+    flex-wrap:wrap !important;
     align-items:center !important;
     justify-content:center !important;
-    height:52px !important;
-    padding:4px 10px !important;
-    margin:2px 0 6px !important;
-    gap:14px !important;
+    height:auto !important;
+    padding:4px 6px !important;
+    margin:2px 0 4px !important;
+    gap:3px 2px !important;
     direction:inherit !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
+    overflow-x:visible !important;
+    overflow-y:visible !important;
     -webkit-overflow-scrolling:touch !important;
     scrollbar-width:none !important;
     background:transparent !important;
