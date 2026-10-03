@@ -599,22 +599,24 @@ html[lang="fr"] .hero-subtitle-secondary{
 
 .hero-tagline{
   font-family:'Cairo','Noto Naskh Arabic',Georgia,serif;
-  font-size:clamp(12px,1.55vw,16px);
+  font-size:clamp(11px,1.35vw,14.5px);
   color:#0F2347;
-  letter-spacing:.15px;
+  letter-spacing:0;
   text-align:center;
   margin:6px auto 0;
   max-width:100%;
   width:100%;
   font-weight:700;
-  line-height:1.4;
+  line-height:1.35;
   opacity:.92;
   white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  overflow:visible;
+  text-overflow:clip;
+  box-sizing:border-box;
+  padding-inline:2px;
 }
 @media(max-width:768px){
-  .hero-tagline{font-size:clamp(10px,2.7vw,12.5px);letter-spacing:0}
+  .hero-tagline{font-size:clamp(9px,2.35vw,11.5px);letter-spacing:-.1px}
 }
 
 /* ══ HERO STAGE — تركيب الدخول الأول (فضاءات → تصفّح → تحويل → إعلان) ══ */
