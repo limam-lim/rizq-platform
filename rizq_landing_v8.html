@@ -569,6 +569,18 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   animation:shine 4s linear infinite .3s,fadeUp .8s .28s ease both;
 }
+/* فرنسية: تصغير الخط فقط — نفس قياسات الكبسولة/البطاقة كالعربية، سطران */
+html[lang="fr"] .hero-subtitle-primary{
+  font-size:clamp(17px,1.85vw,22px);
+  line-height:1.35;
+  margin:0 0 4px;
+  white-space:nowrap;
+}
+html[lang="fr"] .hero-subtitle-secondary{
+  font-size:clamp(14px,1.55vw,18px);
+  line-height:1.4;
+  white-space:nowrap;
+}
 
 .hero-tagline{
   font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
@@ -2362,6 +2374,14 @@ html[lang="fr"] .hero-pill-sep{display:block}
   .hero-subtitle-card{max-width:none;width:100%;padding:18px 18px 16px;flex:none}
   .hero-subtitle-primary{font-size:clamp(22px,5.6vw,28px)}
   .hero-subtitle-secondary{font-size:clamp(17px,4.4vw,22px)}
+  html[lang="fr"] .hero-subtitle-primary{
+    font-size:clamp(12.5px,3.2vw,16px);
+    white-space:nowrap;
+  }
+  html[lang="fr"] .hero-subtitle-secondary{
+    font-size:clamp(11px,2.8vw,14px);
+    white-space:nowrap;
+  }
   .hero-pills{
     flex-direction:row!important;
     flex-wrap:nowrap!important;
