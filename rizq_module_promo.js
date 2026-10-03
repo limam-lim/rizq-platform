@@ -1,5 +1,5 @@
 /**
- * rizq_module_promo.js — inject branded promo header (video + banners)
+ * rizq_module_promo.js — retired: promo strip disabled (no promotional value)
  * under entity heroes on store / showroom / office / tenders / investments pages.
  */
 (function () {
