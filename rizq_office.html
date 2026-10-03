@@ -200,6 +200,25 @@ body.rizq-empty-office #act-browse-offices{display:inline-flex!important}
 body.rizq-empty-office .rating-inline{display:none!important}
 #act-browse-offices{display:none}
 
+/* Phone: equal action buttons in two columns (no orphan gap after browse/share) */
+@media(max-width:768px){
+  .actions-bar{padding:0 12px}
+  .actions-bar-inner{flex-direction:column;align-items:stretch;padding:10px 0 12px;gap:10px}
+  .action-btns{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+  .act-btn{
+    flex:1 1 calc(50% - 4px);
+    justify-content:center;
+    width:auto;min-width:0;max-width:100%;
+    min-height:46px;padding:10px 8px;font-size:12.5px;border-radius:12px;
+    box-sizing:border-box;text-align:center;
+  }
+  body.rizq-empty-office #act-browse-offices{display:inline-flex!important;flex:1 1 calc(50% - 4px)!important}
+  .rating-inline{justify-content:center;width:100%}
+}
+@media(max-width:480px){
+  .act-btn{font-size:12px;gap:4px;padding:9px 6px;min-height:44px}
+}
+
 /* ════════ STATS STRIP ════════ */
 .stats-strip{background:linear-gradient(135deg,var(--teal),var(--teal2));padding:0 24px;box-shadow:0 4px 20px rgba(14,116,144,.35)}
 .stats-strip-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
