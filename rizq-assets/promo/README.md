@@ -2,7 +2,8 @@
 
 ## Hero loop (existing)
 - `rizq-platform-promo.mp4` — master (1920×1080)
-- `rizq-platform-promo-light.mp4` — Hero default (1280×720, web-optimized)
+- `rizq-platform-promo-light.mp4` — legacy Hero cut (may include burned-in headlines)
+- `rizq-platform-promo-clean-light.mp4` — Hero default (1280×720): visuals only, no captions covering icons/ads
 
 Playback order (`rizq_video_ads.js`):
 1. Platform promo
