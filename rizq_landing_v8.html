@@ -5463,6 +5463,38 @@ function _styPickCompanions(primary, pool, gender, n){
   }
   return picks;
 }
+/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) لا نسخ من نفس القطعة */
+function _styPickLookCompanions(primary, pool, gender, n){
+  n = n || 2;
+  var stylePool = (pool || []).filter(_styIsStyleCat);
+  var primaryKind = typeof _styAdKind === 'function' ? _styAdKind(primary) : '';
+  var used = {};
+  if(primary && primary.id != null) used[String(primary.id)] = 1;
+  var picks = [];
+  var prefer = ['watch','shoe','bag','gold','shirt','daraa','melhfa','phone'].filter(function(k){
+    return k && k !== primaryKind;
+  });
+  for(var ki=0; ki<prefer.length && picks.length < n; ki++){
+    var kind = prefer[ki];
+    var cand = _styShuffle(stylePool.filter(function(a){
+      return a && !used[String(a.id)] && _styMatchGender(a, gender) && _styAdKind(a) === kind;
+    }));
+    if(cand.length){
+      picks.push(cand[0]);
+      used[String(cand[0].id)] = 1;
+    }
+  }
+  if(picks.length < n){
+    var rest = _styPickCompanions(primary, stylePool, gender, n + 4).filter(function(a){
+      return a && !used[String(a.id)];
+    });
+    for(var ri=0; ri<rest.length && picks.length < n; ri++){
+      picks.push(rest[ri]);
+      used[String(rest[ri].id)] = 1;
+    }
+  }
+  return picks.slice(0, n);
+}
 function _styFindAdById(id){
   if(id == null || id === '') return null;
   var sid = String(id);
@@ -5789,15 +5821,14 @@ function buildStyleIdeas(reshuffle){
     if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
-    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool, gender, 2) : [];
-    if(primary && tpl.kind && typeof _styAdKind==='function'){
-      var sameKind = styleGendered.filter(function(a){
-        return String(a.id) !== String(primary.id) && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)];
-      });
-      if(sameKind.length){
-        companions = _styShuffle(sameKind).slice(0, 2);
-      }
-    }
+    var companionPool = (styleGendered.length ? styleGendered : pool).filter(function(a){
+      return a && !usedIds[String(a.id)];
+    });
+    var companions = primary
+      ? (typeof _styPickLookCompanions === 'function'
+          ? _styPickLookCompanions(primary, companionPool, gender, 2)
+          : _styPickCompanions(primary, companionPool, gender, 2))
+      : [];
     companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
@@ -5840,9 +5871,14 @@ function buildStyleIdeas(reshuffle){
   for(var ex=0; cards.length < 6 && ex < extras.length; ex++){
     var adEx = extras[ex];
     usedIds[String(adEx.id)] = 1;
-    var companionsEx = (typeof _styPickCompanions === 'function')
-      ? _styPickCompanions(adEx, gendered.length ? gendered : pool, gender, 2)
-      : [];
+    var companionPoolEx = (gendered.length ? gendered : pool).filter(function(a){
+      return a && !usedIds[String(a.id)];
+    });
+    var companionsEx = (typeof _styPickLookCompanions === 'function')
+      ? _styPickLookCompanions(adEx, companionPoolEx, gender, 2)
+      : ((typeof _styPickCompanions === 'function')
+          ? _styPickCompanions(adEx, companionPoolEx, gender, 2)
+          : []);
     companionsEx.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var itemsEx = [adEx].concat(companionsEx);
     while(itemsEx.length < 3) itemsEx.push(null);
@@ -6046,9 +6082,10 @@ function buildShowroomModels(reshuffle){
     if(primary) usedIds[String(primary.id)] = 1;
     var companions = [];
     if(primary){
-      companions = (typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(
-        pool.filter(function(a){ return String(a.id) !== String(primary.id) && !usedIds[String(a.id)]; })
-      ).slice(0, 2);
+      var srmPool = pool.filter(function(a){ return a && !usedIds[String(a.id)]; });
+      companions = (typeof _styPickLookCompanions === 'function')
+        ? _styPickLookCompanions(primary, srmPool, 'both', 2)
+        : ((typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(srmPool).slice(0, 2));
       companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     }
     var items = primary ? [primary].concat(companions) : [];
