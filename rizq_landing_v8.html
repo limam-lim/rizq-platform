@@ -9181,69 +9181,30 @@ window.closeNavDropdowns=closeNavDropdowns;
 (function bindDesktopMoreHover(){
   var li=document.querySelector('#nav .nav-dropdown-li');
   if(!li) return;
-  var closeT=null;
-  var menuBound=null;
   function isDesk(){ try{ return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; }catch(e){ return true; } }
-  function menuEl(){
-    return li.querySelector('.nav-dropdown-menu')||document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'nav-more-li')+'"]');
-  }
-  function ptrOverMore(x,y){
-    var m=menuEl();
-    var nodes=[li,m];
-    for(var i=0;i<nodes.length;i++){
-      var n=nodes[i]; if(!n) continue;
-      var r=n.getBoundingClientRect();
-      /* وسّع منطقة الأمان 12px حول الزر والقائمة */
-      if(x>=r.left-12 && x<=r.right+12 && y>=r.top-12 && y<=r.bottom+12) return true;
-    }
-    return false;
-  }
   function keepOpen(){
-    clearTimeout(closeT);
-    positionNavDropdown(li);
-    bindMenuHover();
+    var positioner=(typeof window.positionNavDropdown==='function')?window.positionNavDropdown:positionNavDropdown;
+    positioner(li);
   }
-  function scheduleClose(){
-    clearTimeout(closeT);
-    closeT=setTimeout(function(){
-      /* لا تُغلق إن كان المؤشر ما زال فوق الزر/القائمة */
-      try{
-        var last=window.__rizqMorePtr;
-        if(last && ptrOverMore(last.x, last.y)) return;
-      }catch(e){}
-      closeNavDropdowns();
-    },500);
-  }
-  function onMenuEnter(){ if(!isDesk()) return; clearTimeout(closeT); }
-  function onMenuLeave(){
-    if(!isDesk()) return;
-    scheduleClose();
-  }
-  function bindMenuHover(){
-    var m=menuEl();
-    if(!m || m===menuBound) return;
-    if(menuBound){
-      menuBound.removeEventListener('mouseenter', onMenuEnter);
-      menuBound.removeEventListener('mouseleave', onMenuLeave);
-    }
-    menuBound=m;
-    m.addEventListener('mouseenter', onMenuEnter);
-    m.addEventListener('mouseleave', onMenuLeave);
-  }
+  /* سطح المكتب: افتح عند المرور — لا تُغلق عند مغادرة الزر (القائمة portaled).
+     الإغلاق فقط بنقرة خارجية أو Escape (أدناه). */
   li.addEventListener('mouseenter',function(){
     if(!isDesk()) return;
     keepOpen();
   });
-  li.addEventListener('mouseleave',function(){
-    if(!isDesk()) return;
-    scheduleClose();
-  });
-  document.addEventListener('mousemove',function(e){
-    window.__rizqMorePtr={x:e.clientX,y:e.clientY};
-    if(!isDesk() || !li.classList.contains('open')) return;
-    if(ptrOverMore(e.clientX, e.clientY)) clearTimeout(closeT);
-    else scheduleClose();
-  }, true);
+  var trigger=li.querySelector('.nav-dropdown-trigger,.nav-desktop-more-only');
+  if(trigger){
+    trigger.addEventListener('click',function(e){
+      if(!isDesk()) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if(li.classList.contains('open')||document.querySelector('.nav-dropdown-menu.rizq-more-menu-open')){
+        closeNavDropdowns();
+      } else {
+        keepOpen();
+      }
+    });
+  }
 })();
 document.addEventListener('click',function(e){
   if(e.target.closest('#rizq-more-backdrop')) return;

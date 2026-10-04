@@ -1072,53 +1072,11 @@
     if (more && li && !more.getAttribute('data-rizq-bound')) {
       more.setAttribute('data-rizq-bound', '1');
       restoreMoreMenu(li);
-      var closeT = null;
-      var menuBound = null;
       function isDesk() {
         try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
       }
-      function ptrOverMore(x, y) {
-        var menu = moreMenuFor(li);
-        var nodes = [li, menu];
-        var i, n, r;
-        for (i = 0; i < nodes.length; i++) {
-          n = nodes[i];
-          if (!n) continue;
-          r = n.getBoundingClientRect();
-          if (x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12) return true;
-        }
-        return false;
-      }
       function keepOpen() {
-        clearTimeout(closeT);
         positionMoreDropdown(li);
-        bindPortaledMenuHover();
-      }
-      function scheduleClose() {
-        clearTimeout(closeT);
-        closeT = setTimeout(function () {
-          try {
-            var last = window.__rizqMorePtr;
-            if (last && ptrOverMore(last.x, last.y)) return;
-          } catch (eL) { /* ignore */ }
-          closeMoreDropdowns();
-        }, 500);
-      }
-      function onMenuEnter() { if (!isDesk()) return; clearTimeout(closeT); }
-      function onMenuLeave() {
-        if (!isDesk()) return;
-        scheduleClose();
-      }
-      function bindPortaledMenuHover() {
-        var menu = moreMenuFor(li);
-        if (!menu || menu === menuBound) return;
-        if (menuBound) {
-          menuBound.removeEventListener('mouseenter', onMenuEnter);
-          menuBound.removeEventListener('mouseleave', onMenuLeave);
-        }
-        menuBound = menu;
-        menu.addEventListener('mouseenter', onMenuEnter);
-        menu.addEventListener('mouseleave', onMenuLeave);
       }
       more.addEventListener('click', function (e) {
         e.preventDefault();
@@ -1131,20 +1089,12 @@
       more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
         child.style.pointerEvents = 'none';
       });
+      /* desk: افتح عند المرور — لا تُغلق بمغادرة الزر (القائمة على body).
+         الإغلاق بنقرة خارجية فقط. */
       li.addEventListener('mouseenter', function () {
         if (!isDesk()) return;
         keepOpen();
       });
-      li.addEventListener('mouseleave', function () {
-        if (!isDesk()) return;
-        scheduleClose();
-      });
-      document.addEventListener('mousemove', function (e) {
-        window.__rizqMorePtr = { x: e.clientX, y: e.clientY };
-        if (!isDesk() || !li.classList.contains('open')) return;
-        if (ptrOverMore(e.clientX, e.clientY)) clearTimeout(closeT);
-        else scheduleClose();
-      }, true);
       document.addEventListener('click', function (e) {
         if (e.target.closest('.nav-dropdown-li') || e.target.closest('.nav-dropdown-menu')) return;
         closeMoreDropdowns();
