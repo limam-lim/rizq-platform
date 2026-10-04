@@ -163,52 +163,53 @@ function getSectionRules() {
   return out;
 }
 
-// ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
-// (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-// مرفقات المناقصات والاستثمارات — لا تُخدم مباشرة عبر static
-app.use('/uploads/tenders', (req, res) => {
-  res.status(403).json({
-    error: 'tender_assets_forbidden',
-    msg: 'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
-    msg_fr: 'Pièces jointes protégées — abonnement requis',
-  });
-});
-app.use('/uploads/investments', (req, res) => {
-  res.status(403).json({
-    error: 'investment_assets_forbidden',
-    msg: 'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
-    msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
-  });
-});
-// وسائط الإعلانات/الكتالوج — عامة فقط إن كانت الحالة منشورة/نشطة
-app.use('/uploads/ads', (req, res, next) => {
-  try {
-    const adId = String(req.path || '').split('/').filter(Boolean)[0] || '';
-    const ad = adId ? repos.ads.getById(adId) : null;
-    const st = String(ad && ad.status || '');
-    if (!ad || !['active', 'approved', 'published'].includes(st)) {
-      return res.status(403).json({ error: 'ad_media_forbidden', msg: 'وسائط الإعلان غير متاحة' });
+// ── ملفات /uploads: حظر المسارات الحساسة + بوابة حالة للوسائط العامة ────
+function forbidUploadPath(error, msg, msgFr) {
+  return function _forbidUpload(_req, res) {
+    res.status(403).json({ error: error, msg: msg, msg_fr: msgFr });
+  };
+}
+function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
+  const allowed = new Set(allowedStatuses);
+  return function _gateUpload(req, res, next) {
+    try {
+      const entityId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+      const entity = entityId ? resolveEntity(entityId) : null;
+      const st = String((entity && entity.status) || '');
+      if (!entity || !allowed.has(st)) {
+        return res.status(403).json({ error: error, msg: 'الوسائط غير متاحة' });
+      }
+      return next();
+    } catch (e) {
+      return res.status(403).json({ error: error });
     }
-    return next();
-  } catch (e) {
-    return res.status(403).json({ error: 'ad_media_forbidden' });
-  }
-});
-app.use('/uploads/catalog', (req, res, next) => {
-  try {
-    const itemId = String(req.path || '').split('/').filter(Boolean)[0] || '';
-    const item = itemId
-      ? (repos.catalog.list().find((c) => c && c.id === itemId) || null)
-      : null;
-    const st = String(item && item.status || '');
-    if (!item || st !== 'active') {
-      return res.status(403).json({ error: 'catalog_media_forbidden', msg: 'وسائط الكتالوج غير متاحة' });
-    }
-    return next();
-  } catch (e) {
-    return res.status(403).json({ error: 'catalog_media_forbidden' });
-  }
-});
+  };
+}
+app.use('/uploads/tenders', forbidUploadPath(
+  'tender_assets_forbidden',
+  'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
+  'Pièces jointes protégées — abonnement requis'
+));
+app.use('/uploads/investments', forbidUploadPath(
+  'investment_assets_forbidden',
+  'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
+  'Pièces jointes d\'investissement protégées — revue interne uniquement'
+));
+app.use('/uploads/receipts', forbidUploadPath(
+  'receipts_forbidden',
+  'وصول الدفع محمية — للمراجعة الإدارية فقط',
+  'Reçus de paiement protégés — revue administrative uniquement'
+));
+app.use('/uploads/ads', gateUploadByStatus(
+  (adId) => repos.ads.getById(adId),
+  ['active', 'approved', 'published'],
+  'ad_media_forbidden'
+));
+app.use('/uploads/catalog', gateUploadByStatus(
+  (itemId) => repos.catalog.list().find((c) => c && c.id === itemId) || null,
+  ['active'],
+  'catalog_media_forbidden'
+));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── CORS: أصول مسموحة (ALLOWED_ORIGIN قائمة مفصولة بفواصل)
@@ -498,10 +499,19 @@ app.post('/api/agent/toggle', (req, res) => {
   const active = b.active;
   const accountId = b.accountId;
   const token = extractAccountToken(req);
-  // السرّ من الرأس فقط في الإنتاج؛ body مسموح في التطوير للتوافق مع خوادم المكالمات
+  // السرّ من الرأس فقط؛ body مسموح في التطوير فقط. في الإنتاج يُرفض من المتصفح.
   const secretHdr = req.header('x-rizq-secret') || '';
   const secretBody = (!isProdEnv() && b.secret) ? b.secret : '';
-  let authorized = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  const secretOk = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  let authorized = false;
+  if (secretOk) {
+    if (isProdEnv() && isBrowserLikeRequest(req)) {
+      // لا نسمح بتمرير BACKEND_SHARED_SECRET من المتصفح في الإنتاج
+      authorized = false;
+    } else {
+      authorized = true;
+    }
+  }
   if (!authorized && accountId && token) {
     const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
@@ -1099,6 +1109,40 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
 
 
 /**
+ * روابط «تابعنا» على المنصات — تُفعَّل واحدة تلو الأخرى من سوبر أدمن.
+ * الافتراضي: معطّلة كلها حتى يضبط المالك الرابط ويفعّل الزر.
+ */
+const SITE_SOCIAL_KEYS = ['facebook', 'x', 'instagram', 'youtube', 'tiktok', 'linkedin', 'snapchat', 'telegram', 'whatsapp'];
+const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
+
+function defaultSiteSocial() {
+  const out = {};
+  for (const key of SITE_SOCIAL_KEYS) {
+    out[key] = { enabled: false, url: '' };
+  }
+  return out;
+}
+
+function normalizeSiteSocial(raw) {
+  const out = defaultSiteSocial();
+  if (!raw || typeof raw !== 'object') return out;
+  for (const key of SITE_SOCIAL_KEYS) {
+    const item = raw[key];
+    if (!item || typeof item !== 'object') continue;
+    out[key] = {
+      enabled: !!item.enabled,
+      url: sanitizeSafeUrl(item.url || '', 500),
+    };
+  }
+  return out;
+}
+
+/** للعامة: نفس الحقول (الروابط ليست سرّاً) — الواجهة تعرض المفعّل فقط. */
+function normalizeSiteSocialPublic(raw) {
+  return normalizeSiteSocial(raw);
+}
+
+/**
  * GET /api/site-config
  * عام — تقرأه صفحات الزوار (الفيديو الترويجي: popup + قسم ثابت) لتعرض
  * نفس الإعداد فعلياً لكل زائر، بدل أن يكون محصوراً بمتصفح الأدمن فقط.
@@ -1108,7 +1152,8 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
  */
 app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
-  res.set('Cache-Control', 'public, max-age=10');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
   const raw = repos.getSiteConfig() || {};
   const publicCfg = {
     moduleFlags: getModuleFlags(),
@@ -1143,6 +1188,7 @@ app.get('/api/site-config', (req, res) => {
       wilayasCount: raw.site.wilayasCount,
       bannerActive: !!raw.site.bannerActive,
       bannerText: String(raw.site.bannerText || '').slice(0, 300),
+      social: normalizeSiteSocialPublic(raw.site.social),
     } : undefined,
     legalOverrides: raw.legalOverrides || undefined,
     currency: raw.currency || undefined,
@@ -1179,7 +1225,6 @@ app.get('/api/site-config', (req, res) => {
 const LEGAL_KEYS_AR = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
 const LEGAL_KEYS_FR = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11'];
 const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني كامل بصياغة HTML بسيطة
-const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
 
 /**
  * POST /api/site-config
@@ -1488,6 +1533,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
 
   if (body.site && typeof body.site === 'object') {
     const s = body.site;
+    const prevSocial = (current.site && current.site.social) || {};
     next.site = {
       sitename: String(s.sitename || '').slice(0, 80),
       tagline: String(s.tagline || '').slice(0, 200),
@@ -1501,6 +1547,9 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       wilayasCount: Math.max(0, Number(s.wilayasCount) || 0),
       bannerActive: !!s.bannerActive,
       bannerText: String(s.bannerText || '').slice(0, 300),
+      social: normalizeSiteSocial(
+        Object.prototype.hasOwnProperty.call(s, 'social') ? s.social : prevSocial
+      ),
       updatedAt: new Date().toISOString(),
     };
   }
@@ -2226,7 +2275,11 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     category: ['video', 'tender', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
-    receiptImage: b.receiptImage ? String(b.receiptImage).slice(0, 2_500_000) : null,
+    // لا نخزّن base64 الوصل في JSON — الملف على القرص فقط تحت uploads/receipts
+    // (محجوب عن static) ويُعاد تحميله للأدمين عبر loadReceiptDataUrl.
+    receiptImage: null,
+    receiptPath: receiptPath || null,
+    receiptMeta: receiptMeta || null,
     // لا نخزّن riskLevel/flags من العميل — السيرفر فقط يحدّدهما بعد التحليل
     riskLevel: 'unreviewed',
     flags: [],
@@ -2280,9 +2333,21 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
 /**
  * GET /api/sub-requests/admin — أدمين فقط (سرّ مشترك) — قائمة كل الطلبات
  * ليراها أي جهاز أدمن، وليس فقط جهاز المشترك الذي أرسل الطلب.
+ * نُعيد receiptImage كـ data-URL محمّل من القرص عند الحاجة (لا base64 مخزَّن).
  */
 app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res) => {
-  res.json({ ok: true, requests: readSubRequests().reverse() });
+  let loadReceiptDataUrl = null;
+  try {
+    loadReceiptDataUrl = require('./services/telegramAdmin').loadReceiptDataUrl;
+  } catch (_) { /* optional */ }
+  const requests = readSubRequests().reverse().map((r) => {
+    const copy = Object.assign({}, r);
+    if (!copy.receiptImage && copy.receiptPath && typeof loadReceiptDataUrl === 'function') {
+      try { copy.receiptImage = loadReceiptDataUrl(copy); } catch (_) { copy.receiptImage = null; }
+    }
+    return copy;
+  });
+  res.json({ ok: true, requests });
 });
 
 /**
@@ -3200,6 +3265,9 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission(
     if (aidx !== -1) {
       accs[aidx].suspended = true;
       accs[aidx].suspendedAt = new Date().toISOString();
+      // نفس تعليق الأدمن المباشر: تدوير التوكنات حتى لا يبقى جلسة معلّقة فعّالة
+      accs[aidx].dashToken = genDashToken();
+      accs[aidx].accessToken = genAccessToken();
       writeAccounts(accs);
     }
   }
@@ -3845,7 +3913,21 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     }
     next();
   });
-  app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore', extensions: ['html'] }));
+  app.use(express.static(FRONTEND_ROOT, {
+    index: false,
+    dotfiles: 'ignore',
+    extensions: ['html'],
+    etag: false,
+    lastModified: false,
+    setHeaders(res, filePath) {
+      // تطوير/معاينة: لا كاش لـ HTML/JS/CSS حتى تظهر تعديلات تابعنا فوراً
+      if (/\.(html?|js|css)$/i.test(String(filePath || ''))) {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      }
+    },
+  }));
   console.log('[rizq-backend] dev static files → ' + FRONTEND_ROOT);
 }
 

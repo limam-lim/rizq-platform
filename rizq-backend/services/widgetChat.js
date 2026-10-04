@@ -53,22 +53,26 @@ function buildLanguageInstructions(detectedLang, uiLang) {
   const ui = normalizeUiLang(uiLang);
   let block = (
     `\n## اللغة — إلزامي (Language — CRITICAL)\n` +
-    `- كشف تلقائي: ردّ حصرياً بنفس لغة رسالة المستخدم الأخيرة.\n` +
+    `- كشف تلقائي لكل رسالة: ردّ حصرياً بنفس لغة/لهجة رسالة المستخدم الأخيرة — لا تثبت على لغة سابقة.\n` +
     `- لغة هذه الرسالة المكتشفة: ${label} (${detectedLang}).\n` +
-    `- مدعوم: العربية الفصحى، الحسانية الموريتانية، الفرنسية، الإنجليزية، الإسبانية — طابق المستخدم حرفياً.\n` +
-    `- إذا خلط لغات، استخدم اللغة السائدة في رسالته.\n` +
-    `- لغة واجهة الصفحة الافتراضية: ${getLangLabel(ui)} — استخدمها فقط إن كانت الرسالة غامضة (؟ أو emoji فقط).\n` +
+    `- مدعوم: العربية الفصحى (ar)، الحسانية الموريتانية (hs)، الفرنسية (fr)، الإنجليزية (en)، الإسبانية (es).\n` +
+    `- إذا سأل بالحسانية → أجب بالحسانية. بالفصحى → فصحى. بالفرنسية/الإنجليزية/الإسبانية → نفس اللغة.\n` +
+    `- إذا خلط لغات، استخدم اللغة السائدة في رسالته الأخيرة فقط.\n` +
+    `- لغة واجهة الصفحة (${getLangLabel(ui)}) احتياطية فقط عند الرسائل الغامضة (؟ / أرقام / emoji).\n` +
+    `\n## فهم الحسانية دائماً (CRITICAL)\n` +
+    `افهم اللهجة الحسانية الموريتانية في كل الرسائل (شنهو، تبي، كيفاه، شحّال، أهلين، زين، تاع/متاع، نبي ننشر، اش بيك).\n` +
+    `لا تخلطها مع الدارجة المغربية. إذا ظهرت علامات حسانية فاللغة = hs.\n` +
+    `ممنوع منعاً باتاً أن تقول إنك لا تفهم الحسانية أو «ما فهمت» أو «لم أفهم اللهجة» — افهم القصد وردّ بمساعدة عملية فوراً.\n` +
     `\n## فهم مختصر ومبتور (Rizq slang)\n` +
     `افهم الطلبات القصيرة والعامية في سياق منصة رزق:\n` +
-    `- عربي/حسانية موريتانية: كم، ثمن، موثوق، نشر، باقة، إعلان، محل، شنهو، تبي، كيفاه، شحّال، حابّ\n` +
+    `- عربي/حسانية موريتانية: كم، ثمن، موثوق، نشر، باقة، إعلان، محل، شنهو، تبي، كيفاه، شحّال، حابّ، نبي\n` +
     `- FR: prix, pub, annonce, forfait, fiabilité, combien, vendeur\n` +
     `- EN: price, post, package, trust, seller, how much, reliable\n` +
     `- ES: precio, publicar, paquete, confianza, vendedor, cuánto\n` +
     `لا تطلب إعادة صياغة إن كان القصد واضحاً في سياق الإعلانات/المتاجر/الباقات.\n`
   );
-  if (detectedLang === 'hs') {
-    block += buildHassaniyaDialectBlock();
-  }
+  // دائماً نمرّر قواعد اللهجة — حتى لو الكشف ar — حتى لا يرفض النموذج الحسانية
+  block += buildHassaniyaDialectBlock();
   return block;
 }
 
@@ -173,7 +177,7 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
   }
   prompt += 'For serious subscription interest or admin requests: collect business name, WhatsApp, and package — then call register_interest or escalate_to_human.\n';
   prompt += 'When user attaches image/receipt/screenshot: acknowledge professionally, confirm it was forwarded to management for verification — never claim payment is verified.\n';
-  prompt += 'If the user writes in Mauritanian Hassaniya (hs): reply in Mauritanian Hassaniya only — NEVER Moroccan Darija, NEVER switch to fusaha unless they wrote fusaha. If French/English/Spanish: match that language.\n';
+  prompt += 'If the user writes in Mauritanian Hassaniya (hs): reply in Mauritanian Hassaniya only — NEVER Moroccan Darija, NEVER switch to fusaha unless they wrote fusaha. NEVER say you do not understand Hassaniya — always help. If French/English/Spanish: match that language.\n';
 
   const openAdId = pageContext && (pageContext.urlAdId || (pageContext.ad && pageContext.ad.id));
   if (pageContext && pageContext.page) {
@@ -409,9 +413,24 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
     return {
       reply: pickLang({
         ar: 'آسف، لم أستطع الإجابة — حاول إعادة صياغة سؤالك.',
+        hs: 'زين، عيد السؤال بطريقة ثانية ونوضّح لك فوراً — شنهو تبي بالضبط؟',
         fr: 'Désolé, je n\'ai pas pu répondre — reformulez votre question.',
         en: 'Sorry, I could not answer — please rephrase your question.',
         es: 'Lo siento, no pude responder — reformule su pregunta.',
+      }, lang),
+      grounded: false,
+      reviewed: true,
+    };
+  }
+  // لا نسمح بردود «ما فهمت الحسانية» حتى لو ولّدها النموذج
+  if (/(?:لا\s*أفهم|لم\s*أفهم|ما\s*فهمت|مانفهم|ما\s*نفهم|don't\s*understand|do\s*not\s*understand|je\s*ne\s*comprends).{0,40}(?:حسان|hassan|اللهج|dialecte)/i.test(reply)) {
+    return {
+      reply: pickLang({
+        ar: 'فهمتك. قل لي شنهو تبي بالضبط: باقة، نشر إعلان، أو مساعدة على رزق؟',
+        hs: 'زين فهمتك! شنهو تبي بالضبط: باقة، نشر إعلان، ولا مساعدة على رزق؟',
+        fr: 'Je vous ai compris. Que souhaitez-vous : forfait, publier une annonce, ou de l\'aide sur Rizq ?',
+        en: 'Got it. What do you need: a package, posting an ad, or help on Rizq?',
+        es: 'Entendido. ¿Qué necesita: un paquete, publicar un anuncio o ayuda en Rizq?',
       }, lang),
       grounded: false,
       reviewed: true,

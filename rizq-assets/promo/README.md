@@ -2,12 +2,15 @@
 
 ## Hero loop (existing)
 - `rizq-platform-promo.mp4` — master (1920×1080)
-- `rizq-platform-promo-light.mp4` — Hero default (1280×720, web-optimized)
+- `rizq-platform-promo-light.mp4` — Hero default (web cut; previous preferred promo)
+- `rizq-platform-promo-clean-light.mp4` — alternate caption-free cut (not the default)
 
 Playback order (`rizq_video_ads.js`):
 1. Platform promo
 2. Paid Rizq ADS hero advertisers
 3. Back to platform promo
+
+Presentation: full-bleed 16:9 on the hero stage + fullscreen control (`⛶`).
 
 Config: `site-config.videoAds.platformPromoUrl` / `platformPromoEnabled` / `adSlotSeconds`.
 

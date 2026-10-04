@@ -7,9 +7,18 @@ const cases = [
   ['How much is this ad?', 'ar', 'en'],
   ['¿Cuánto cuesta?', 'ar', 'es'],
   ['كيفاش ننشر إعلان؟', 'ar', 'hs'],
+  ['شنهو تبي؟', 'ar', 'hs'],
+  ['أهلين، شحّال الباقة؟', 'fr', 'hs'],
+  ['زين عطيني سعر المحل', 'ar', 'hs'],
+  ['نبي ننشر إعلان', 'ar', 'hs'],
+  ['اش بيك شحّال الباقة', 'fr', 'hs'],
+  ['وين راك عطيني مساعدة', 'ar', 'hs'],
+  ['Hello, how do I post?', 'ar', 'en'],
+  ['Bonjour, je veux publier', 'ar', 'fr'],
+  ['Hola, quiero vender', 'ar', 'es'],
   ['', 'fr', 'fr'],
   ['???', 'en', 'en'],
-  ['5000 MRU', 'fr', 'en'],
+  ['أريد بالعربية الفصحى', 'hs', 'ar'],
 ];
 
 let ok = 0;

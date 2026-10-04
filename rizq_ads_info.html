@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.9"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>رزق ADS — أعلن حيث يبحث الناس | رزق</title>
 <style>
@@ -270,9 +270,9 @@ html[dir="ltr"] .pricing-features{text-align:left}
 </style>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_site_banner.js"></script>
-<script src="rizq_dynamic_nav.js?v=23.0"></script>
+<script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js"></script>
-<script src="rizq_pwa.js" defer></script>
+<script src="rizq_pwa.js?v=28.5" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 </head>
@@ -297,20 +297,20 @@ html[dir="ltr"] .pricing-features{text-align:left}
     </button>
   </div>
   <ul class="nav-center">
-    <li data-nav-order="1"><a href="rizq_landing_v8.html" data-hdr="home">الرئيسية</a></li>
-    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2"><a href="rizq_browse.html" data-hdr="ads">الإعلانات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3"><a href="rizq_store.html" data-hdr="stores">المحلات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="4"><a href="rizq_office.html" data-hdr="offices">المكاتب</a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5"><a href="rizq_showroom.html" data-hdr="showrooms">المعارض</a></li>
-    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="6"><a href="rizq_tenders.html" data-hdr="tenders">المناقصات</a></li>
-    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="7"><a href="rizq_investments.html" data-hdr="investments">الاستثمارات</a></li>
-    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="8">
+    <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home">الرئيسية</a></li>
+    <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="rizq_browse.html" data-hdr="ads">الإعلانات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="rizq_store.html" data-hdr="stores">المحلات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="rizq_showroom.html" data-hdr="showrooms">المعارض</a></li>
+    <li class="rizq-nav-post" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">نشر (+)</a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="rizq_office.html" data-hdr="offices">المكاتب</a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="rizq_tenders.html" data-hdr="tenders">المناقصات</a></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="rizq_investments.html" data-hdr="investments">الاستثمارات</a></li>
+    <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="10" data-nav-tier="secondary">
       <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false"><span class="nav-phone-more-ico" aria-hidden="true">⋯</span><span class="nav-phone-more-lbl" data-hdr="more">المزيد</span></button>
       <a href="#" class="nav-dropdown-trigger nav-desktop-more-only" data-hdr="more" onclick="event.preventDefault();typeof toggleNavDropdown==='function'&&toggleNavDropdown(event,this)">المزيد ▾</a>
       <div class="nav-dropdown-menu nav-more-menu" id="nav-more-menu-mobile" role="menu" data-rizq-more-variant="desktop">
         <a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>
-        <a href="rizq_post.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">➕</span><div><strong>نشر (+)</strong></div></a>
-        <a href="rizq_landing_v8.html#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong>الباقات</strong></div></a>
+        <a href="rizq_landing_v8.html#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong>المواد القانونية</strong></div></a>
         <a href="rizq_landing_v8.html#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong>من نحن</strong></div></a>
       </div>
