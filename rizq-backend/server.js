@@ -1142,7 +1142,8 @@ function normalizeSiteSocialPublic(raw) {
  */
 app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
-  res.set('Cache-Control', 'public, max-age=10');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
   const raw = repos.getSiteConfig() || {};
   const publicCfg = {
     moduleFlags: getModuleFlags(),
@@ -3883,7 +3884,21 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     }
     next();
   });
-  app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore', extensions: ['html'] }));
+  app.use(express.static(FRONTEND_ROOT, {
+    index: false,
+    dotfiles: 'ignore',
+    extensions: ['html'],
+    etag: false,
+    lastModified: false,
+    setHeaders(res, filePath) {
+      // تطوير/معاينة: لا كاش لـ HTML/JS/CSS حتى تظهر تعديلات تابعنا فوراً
+      if (/\.(html?|js|css)$/i.test(String(filePath || ''))) {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      }
+    },
+  }));
   console.log('[rizq-backend] dev static files → ' + FRONTEND_ROOT);
 }
 
