@@ -193,8 +193,9 @@ html .rn-logo-ar {
   font-size: 22px !important;
   font-weight: 700 !important;
   color: #C9A84C !important;
+  -webkit-text-fill-color: #C9A84C !important;
   line-height: 1 !important;
-  text-shadow: 0 0 16px rgba(201,168,76,.4) !important;
+  text-shadow: 0 0 12px rgba(201,168,76,.28) !important;
   direction: rtl !important;
   unicode-bidi: isolate !important;
   display: block !important;
@@ -210,6 +211,7 @@ html .rizq-hdr-brand .logo-text {
   text-align: right !important;
   direction: ltr !important;
   line-height: 1.05 !important;
+  gap: 4px !important;
 }
 html .logo-sub,
 html .rizq-hdr-brand-sub,
@@ -221,12 +223,13 @@ html .sb-logo-sub {
   font-weight: 700 !important;
   letter-spacing: 1.6px !important;
   text-transform: uppercase !important;
-  color: rgba(201,168,76,.65) !important;
+  color: rgba(201,168,76,.82) !important;
   direction: ltr !important;
   unicode-bidi: isolate !important;
   display: block !important;
   white-space: nowrap !important;
   overflow: visible !important;
+  margin-top: 0 !important;
 }
 
 .logo-mark,
