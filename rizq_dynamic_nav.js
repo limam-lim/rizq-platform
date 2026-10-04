@@ -6,14 +6,15 @@
   'use strict';
 
   var MODULES = [
-    /* الترتيب = توالي أقسام الصفحة الرئيسية من الأعلى للأسفل
-       المحلات ثم المعارض (متقاربان تجارياً) ثم المكاتب */
+    /* سطح المكتب/تابلت: المحلات → المعارض → نشر → المكاتب → … */
     { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#virtual-stores' },
     { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#virtual-showrooms' },
-    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 5, landingHref: '#virtual-offices' },
-    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 6, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
-    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 7, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
+    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 6, landingHref: '#virtual-offices' },
+    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
+    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
   ];
+  /** زر نشر بين المعارض والمكاتب على الشريط الرئيسي (سطح المكتب/تابلت) */
+  var POST_NAV_ORDER = 5;
 
   var DESKTOP_MORE = [
     { href: 'rizq_landing_v8.html#categories', hdr: 'cats', key: 'cats', ico: '📂', landingHref: '#categories' },
@@ -223,16 +224,25 @@
           else el.style.display = 'none';
         });
       });
+      container.querySelectorAll('.rizq-nav-post, #rizq-hdr-post, a.rizq-hdr-post').forEach(function (el) {
+        var target = el.id === 'rizq-hdr-post' || el.classList.contains('rizq-hdr-post')
+          ? el
+          : (el.closest('li') || el);
+        if (target && target.setAttribute) target.setAttribute('data-nav-order', String(POST_NAV_ORDER));
+      });
       container.querySelectorAll('[data-rizq-nav-extra]').forEach(function (el) {
         el.style.removeProperty('display');
       });
       container.querySelectorAll('#rizq-hdr-assistant, #rizq-desk-assistant, #nav-assistant-btn').forEach(function (ai) {
         var li = ai.closest('li') || ai;
-        if (li.setAttribute) li.setAttribute('data-nav-order', '9');
+        if (li.setAttribute) li.setAttribute('data-nav-order', '11');
+      });
+      container.querySelectorAll('.rizq-nav-packs, .nav-phone-packs-li').forEach(function (packs) {
+        if (packs.setAttribute) packs.setAttribute('data-nav-order', '9');
       });
       container.querySelectorAll('#rizq-hdr-more-wrap, #rizq-desk-more-li, #nav-more-li').forEach(function (more) {
         more.style.display = '';
-        if (more.setAttribute) more.setAttribute('data-nav-order', '8');
+        if (more.setAttribute) more.setAttribute('data-nav-order', '10');
       });
     });
   }
