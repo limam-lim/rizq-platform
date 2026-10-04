@@ -308,7 +308,7 @@
     var jumpLabels = {
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
-      '#pricing': fr ? 'Forfaits' : 'الباقات',
+      post: fr ? '+ Publier' : '+ نشر',
       invest: fr ? 'Investissements' : 'الاستثمارات'
     };
     Object.keys(jumpLabels).forEach(function (sel) {

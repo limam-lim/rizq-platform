@@ -1004,7 +1004,8 @@
     menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
     var navEl = document.getElementById('rizq-desk-nav') || document.getElementById('nav');
     var navBottom = navEl ? Math.round(navEl.getBoundingClientRect().bottom) : 0;
-    var top = Math.max(Math.round(rect.bottom + 6), navBottom + 4);
+    /* تداخل 8px مع الزر حتى لا تنقطع الـ hover عند عبور الفجوة للـ portal */
+    var top = Math.max(Math.round(rect.bottom - 8), navBottom - 2);
     var menuW = Math.min(176, Math.max(156, Math.min(window.innerWidth - 24, 176)));
     var centerX = Math.round(rect.left + rect.width / 2);
     var left = Math.max(8, Math.min(centerX - Math.round(menuW / 2), window.innerWidth - menuW - 8));
@@ -1018,7 +1019,7 @@
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
       + 'z-index:10052!important;display:flex!important;flex-direction:column!important;'
       + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
-      + 'border-radius:12px!important;padding:6px!important;'
+      + 'border-radius:12px!important;padding:14px 6px 6px!important;'
       + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 
@@ -1072,23 +1073,45 @@
       more.setAttribute('data-rizq-bound', '1');
       restoreMoreMenu(li);
       var closeT = null;
+      var menuBound = null;
       function isDesk() {
         try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
+      }
+      function ptrInside(node, related) {
+        try { return !!(node && related && (node === related || node.contains(related))); } catch (eP) { return false; }
       }
       function keepOpen() {
         clearTimeout(closeT);
         positionMoreDropdown(li);
+        bindPortaledMenuHover();
       }
       function scheduleClose() {
         clearTimeout(closeT);
-        closeT = setTimeout(closeMoreDropdowns, 120);
+        closeT = setTimeout(closeMoreDropdowns, 320);
+      }
+      function onMenuEnter() { if (!isDesk()) return; clearTimeout(closeT); }
+      function onMenuLeave(e) {
+        if (!isDesk()) return;
+        if (ptrInside(li, e.relatedTarget)) return;
+        scheduleClose();
+      }
+      function bindPortaledMenuHover() {
+        var menu = moreMenuFor(li);
+        if (!menu || menu === menuBound) return;
+        if (menuBound) {
+          menuBound.removeEventListener('mouseenter', onMenuEnter);
+          menuBound.removeEventListener('mouseleave', onMenuLeave);
+        }
+        menuBound = menu;
+        menu.addEventListener('mouseenter', onMenuEnter);
+        menu.addEventListener('mouseleave', onMenuLeave);
       }
       more.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         var willOpen = !li.classList.contains('open');
         closeMoreDropdowns();
-        if (willOpen) positionMoreDropdown(li);
+        if (willOpen) keepOpen();
       });
       /* نقر على الأيقونة/النص داخل الزر */
       more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
@@ -1101,25 +1124,16 @@
       li.addEventListener('mouseleave', function (e) {
         if (!isDesk()) return;
         var menu = moreMenuFor(li);
-        if (menu && e.relatedTarget && menu.contains(e.relatedTarget)) return;
+        if (ptrInside(menu, e.relatedTarget)) return;
         scheduleClose();
       });
-      document.addEventListener('mouseover', function (e) {
-        if (!isDesk()) return;
+      /* جسر فجوة الـ portal: طالما المؤشر فوق الزر أو القائمة لا تُغلق */
+      document.addEventListener('mousemove', function (e) {
+        if (!isDesk() || !li.classList.contains('open')) return;
         var menu = moreMenuFor(li);
-        if (!menu || !li.classList.contains('open')) return;
-        if (menu.contains(e.target) || li.contains(e.target)) {
-          clearTimeout(closeT);
-        }
-      });
-      document.addEventListener('mouseout', function (e) {
-        if (!isDesk()) return;
-        if (!li.classList.contains('open')) return;
-        var menu = moreMenuFor(li);
-        var to = e.relatedTarget;
-        if (to && (li.contains(to) || (menu && menu.contains(to)))) return;
-        scheduleClose();
-      });
+        var t = e.target;
+        if ((li.contains(t)) || (menu && menu.contains(t))) clearTimeout(closeT);
+      }, true);
       document.addEventListener('click', function (e) {
         if (e.target.closest('.nav-dropdown-li') || e.target.closest('.nav-dropdown-menu')) return;
         closeMoreDropdowns();

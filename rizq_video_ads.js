@@ -194,39 +194,39 @@
 
     if (phEl) phEl.style.display = 'none';
     wrapEl.style.display = '';
+    wrapEl.classList.add('is-playing');
+    try { host.classList.add('is-playing'); } catch (ePlay) { /* ignore */ }
 
-    var paidCount = heroAds.length;
+    /* لا نصوص/شارات على مساحة الفيديو — حتى عدّاد المعلنين */
     if (viewsEl) {
-      if (paidCount) {
-        viewsEl.textContent = '👁 مُعلنون نشطون: ' + paidCount;
-        viewsEl.style.display = 'block';
-      } else {
-        /* لا شارة «فيديو المنصة» على/قرب مساحة الإعلان */
+      viewsEl.textContent = '';
+      viewsEl.style.display = 'none';
+    }
+    if (phEl) phEl.style.display = 'none';
+
+    function paintMeta(ad) {
+      /* بلا كتابات على/فوق مساحة الإعلان — البيانات الاختيارية تحت الإطار فقط لاحقاً إن لزم */
+      if (advBar && advName) {
+        advName.textContent = '';
+        if (advLoc) advLoc.textContent = '';
+        advBar.style.display = 'none';
+        advBar.onclick = null;
+      }
+      if (viewsEl) {
         viewsEl.textContent = '';
         viewsEl.style.display = 'none';
       }
-    }
-
-    function paintMeta(ad) {
-      /* النصوص تحت الفيديو فقط — لا تُرسم فوق مساحة الإعلان */
-      if (advBar && advName) {
-        if (ad.isPlatform) {
-          /* أثناء فيديو المنصة: بلا عنوان كبير يغطي الشاشة */
-          advName.textContent = '';
-          if (advLoc) advLoc.textContent = '';
-          advBar.style.display = 'none';
-          advBar.onclick = null;
-        } else {
-          advName.innerHTML = esc(ad.advertiser || 'Rizq ADS') + badgeHtml(ad);
-          if (advLoc) advLoc.textContent = '';
-          advBar.style.display = 'block';
-          advBar.style.cursor = 'pointer';
-          advBar.onclick = function () {
-            if (!ad.accountId) return;
-            trackEvent(ad.accountId, 'click');
-          };
-        }
-      }
+      if (phEl) phEl.style.display = 'none';
+      /* أخفِ أي طبقة عنوان داخل إطار الفيديو */
+      try {
+        host.querySelectorAll('.rzq-hero-caption, .hero-vid-ph-body, .hero-vid-adv-name').forEach(function (el) {
+          if (el && el.closest && el.closest('.hero-vid-inner')) {
+            el.style.display = 'none';
+            el.textContent = '';
+          }
+        });
+      } catch (eCap) { /* ignore */ }
+      void ad;
     }
 
     function clearMount() {

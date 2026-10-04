@@ -696,8 +696,18 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-sticky-tools{
     pointer-events:auto;
   }
+  /* أبقِ شريط الأقسام (+ نشر بين المعارض/المكاتب) ظاهراً على desk/tablet */
   html.rizq-app-nav #nav.nav-compact > .nav-center,
-  html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-center{display:none !important}
+  html.rizq-app-nav #rizq-desk-nav.nav-compact > .nav-center{
+    display:flex !important;
+    visibility:visible !important;
+  }
+  html.rizq-app-nav #nav .nav-sticky-post,
+  html.rizq-app-nav #rizq-desk-nav .nav-sticky-post,
+  html.rizq-app-nav nav.nav-compact .nav-sticky-post,
+  html.rizq-app-nav #nav-sticky-post{
+    display:none !important;
+  }
 
   /* نموذج 3 — أيقونة ذهبية فوق نص ذهبي (المزدي) بلا إطارات متراكمة */
   html.rizq-app-nav #nav .nav-center > li,

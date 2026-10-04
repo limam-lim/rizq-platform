@@ -140,12 +140,19 @@ nav.nav-compact .nav-center{display:none}
 }
 .nav-sticky-search-wrap button:hover{background:rgba(201,168,76,.4)}
 .nav-sticky-post{
-  display:none;white-space:nowrap;padding:8px 16px;border-radius:9px;font-size:12.5px;
+  display:none!important;white-space:nowrap;padding:8px 16px;border-radius:9px;font-size:12.5px;
   font-weight:800;border:none;cursor:pointer;font-family:inherit;
   background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-light,#e8c96a));
   color:var(--royal-dark,#0f2347);box-shadow:0 4px 14px rgba(201,168,76,.35);
 }
-nav.nav-compact .nav-sticky-post{display:inline-flex;align-items:center;gap:4px}
+/* desk/tablet: نشر في شريط الأقسام فقط — لا زر لاصق منفصل */
+@media (min-width:769px) and (min-height:501px){
+  nav.nav-compact .nav-sticky-post,
+  #nav-sticky-post{display:none!important}
+}
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
+  nav.nav-compact .nav-sticky-post{display:none!important}
+}
 
 /* ── Section jump bar — أخفّ بصرياً، لا ينافس الشريط الرئيسي ── */
 .section-jump-bar{
@@ -169,6 +176,11 @@ nav.nav-compact .nav-sticky-post{display:inline-flex;align-items:center;gap:4px}
 .section-jump-bar a:hover,.section-jump-bar button:hover,
 .section-jump-bar a.active{
   background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.35);color:var(--gold-light,#e8c96a);
+}
+.section-jump-bar a.jump-post{
+  background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-light,#e8c96a));
+  color:var(--royal-dark,#0f2347)!important;border-color:rgba(255,248,224,.35);
+  font-weight:800;
 }
 
 /* ── Back to top ── */
