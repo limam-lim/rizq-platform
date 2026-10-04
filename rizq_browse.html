@@ -311,6 +311,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-main-img .rizq-img-wrap,.dp-main-img .rizq-ad-frame{width:100%!important;height:100%!important;aspect-ratio:auto!important}
 .dp-main-img img{width:100%;height:100%;object-fit:cover;background:#0b1628;transition:transform .25s ease}
 .dp-main-img:hover img{transform:scale(1.02)}
+.dp-emoji-stage{
+  width:100%;height:100%;min-height:inherit;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;border-radius:inherit;
+}
+.dp-emoji-xl{
+  font-size:clamp(96px,16vw,168px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));transform:scale(1);transform-origin:center;
+}
+.dp-emoji-xl svg{width:clamp(96px,16vw,168px)!important;height:clamp(96px,16vw,168px)!important;opacity:1}
+#lightbox-content .lb-emoji-stage{
+  width:min(920px,92vw);height:min(70vh,640px);border-radius:18px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;box-shadow:0 16px 48px rgba(0,0,0,.45);
+  border:1px solid rgba(201,168,76,.35);cursor:default;
+}
+#lightbox-content .lb-emoji-xl{
+  font-size:clamp(140px,26vw,260px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 12px 32px rgba(0,0,0,.4));
+}
+#lightbox-content .lb-emoji-xl svg{width:clamp(140px,26vw,260px)!important;height:clamp(140px,26vw,260px)!important}
+#lightbox-content .lb-emoji-title{
+  color:#fff;font-size:clamp(16px,2.4vw,22px);font-weight:800;text-align:center;padding:0 20px;
+  text-shadow:0 2px 12px rgba(0,0,0,.45);max-width:90%;
+}
 .dp-thumbs-wrap{width:100%;max-width:none}
 .dp-thumbs-label{font-size:12px;font-weight:700;color:var(--text-muted);margin:2px 0 8px}
 .dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;max-width:100%;scrollbar-width:thin}
@@ -2357,19 +2380,20 @@ function renderDetailPanel(ad){
   const titleFallbackNote=titlePick.isFallback?_langFallbackNoteHtml(titlePick.sourceLang,true):'';
   const descFallbackNote=descPick.isFallback?_langFallbackNoteHtml(descPick.sourceLang,true):'';
 
-  // Gallery — real photos only (no fake emoji "gallery")
+  // Gallery — صور حقيقية إن وُجدت؛ وإلا معاينة كبيرة قابلة للتكبير (إيموجي/خلفية)
   const hasImages=Array.isArray(ad.images)&&ad.images.length>0;
   const totalGallery=hasImages?ad.images.length:1;
   window._dpCurrentIdx=0;
   ad._catEmojis=[]; // disable emoji photo strip
 
   let mainImgHTML;
-  const zoomHintHTML=hasImages?`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`:'';
+  const zoomHintHTML=`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`;
   const counterHTML=hasImages&&totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1'" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1';this.closest('.dp-main-img')&&this.closest('.dp-main-img').classList.add('dp-img-broken')" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
   } else {
-    mainImgHTML=`<span style="display:flex;width:72px;height:72px">${iconHTML(ad.emoji||'🏠')}</span>`;
+    const emoBg=escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
+    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true" style="font-size:clamp(96px,16vw,168px);line-height:1">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
   }
 
   const thumbsHTML=hasImages&&ad.images.length>1
@@ -2780,32 +2804,57 @@ function _dpGalleryImages(){
   // مسارات صالحة فقط (نص غير فارغ)
   return raw.map(function(s){return String(s||'').trim();}).filter(Boolean);
 }
+function _dpEmojiLightboxHtml(ad, fr){
+  const emo=ad && ad.emoji ? ad.emoji : '🏠';
+  const bg=escapeHtml((ad && ad.bg) || 'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
+  const title=escapeHtml((ad && (fr ? (ad.titleFr||ad.title) : (ad.title||ad.titleFr))) || '');
+  return '<div class="lb-emoji-stage" style="background:'+bg+'" onclick="event.stopPropagation()">'
+    + '<span class="lb-emoji-xl" aria-hidden="true" style="font-size:clamp(140px,26vw,260px);line-height:1">'+iconHTML(emo)+'</span>'
+    + (title ? '<div class="lb-emoji-title">'+title+'</div>' : '')
+    + '</div>';
+}
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;
   const imgs=_dpGalleryImages();
-  if(!imgs.length){
-    try{ showToast(_rizqLang()==='fr'?'Pas de photo à agrandir':'لا توجد صورة للتكبير'); }catch(e){}
-    return;
-  }
-  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
-  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   const lb=document.getElementById('lightbox');
   if(!lb)return;
-  // ارفع اللايت بوكس فوق كل الطبقات (تفاصيل/أوفرلاي)
   if(lb.parentElement!==document.body) document.body.appendChild(lb);
+  if(!imgs.length){
+    window._lbIdx=0;
+    window._lbEmojiOnly=true;
+    dpRenderLightbox();
+    lb.classList.add('open');
+    document.body.classList.add('rizq-lightbox-open');
+    return;
+  }
+  window._lbEmojiOnly=false;
+  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
+  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   dpRenderLightbox();
   lb.classList.add('open');
   document.body.classList.add('rizq-lightbox-open');
 }
 function dpRenderLightbox(){
   const imgs=_dpGalleryImages();
-  if(!imgs.length)return;
-  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
-  window._lbIdx=idx;
   const fr=_rizqLang()==='fr';
   const lbc=document.getElementById('lightbox-content');
   const meta=document.getElementById('lightbox-meta');
   const thumbs=document.getElementById('lightbox-thumbs');
+  const prev=document.querySelector('.lb-prev');
+  const next=document.querySelector('.lb-next');
+  if(!imgs.length || window._lbEmojiOnly){
+    if(lbc) lbc.innerHTML=_dpEmojiLightboxHtml(window._currentAd, fr);
+    if(meta){
+      const tip=fr?' — Click outside to close':' — انقر خارج الصورة للإغلاق';
+      meta.innerHTML='<span dir="auto">'+(fr?'Aperçu agrandi':'معاينة مكبّرة')+'</span><span dir="auto">'+tip+'</span>';
+    }
+    if(thumbs){ thumbs.innerHTML=''; thumbs.style.display='none'; }
+    if(prev)prev.style.display='none';
+    if(next)next.style.display='none';
+    return;
+  }
+  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
+  window._lbIdx=idx;
   const src=imgs[idx];
   if(lbc){
     lbc.innerHTML='<img src="'+escapeHtml(src)+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()" onerror="this.alt=(window._rizqLang&&_rizqLang()===\'fr\'?\'Image indisponible\':\'الصورة غير متاحة\');this.style.opacity=.4">';
@@ -2818,8 +2867,6 @@ function dpRenderLightbox(){
     thumbs.innerHTML=imgs.map((s,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(s)+'" alt=""></button>').join('');
     thumbs.style.display=imgs.length>1?'flex':'none';
   }
-  const prev=document.querySelector('.lb-prev');
-  const next=document.querySelector('.lb-next');
   if(prev)prev.style.display=imgs.length>1?'flex':'none';
   if(next)next.style.display=imgs.length>1?'flex':'none';
 }
