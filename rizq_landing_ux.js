@@ -79,6 +79,9 @@
       jumpBar.setAttribute('aria-hidden', 'true');
       jumpBar.hidden = true;
     }
+    if (typeof window.__rizqSyncSearchTheater === 'function') {
+      window.__rizqSyncSearchTheater();
+    }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -481,8 +484,124 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      if (typeof window.closeRizqSearchTheater === 'function' && window.closeRizqSearchTheater()) return;
       closeRizqSheet();
       if (typeof window.closeQcatPortal === 'function') window.closeQcatPortal(true);
     }
   });
+
+  /* ── Search theater C: قرص تحت الهيدر → منبثق أثناء التصفح ── */
+  (function initSearchTheater() {
+    var root = document.getElementById('rizq-search-theater');
+    if (!root) return;
+    var pill = document.getElementById('rizq-search-pill');
+    var panel = document.getElementById('rizq-search-panel');
+    var backdrop = document.getElementById('rizq-search-backdrop');
+    var input = document.getElementById('rizq-theater-search-input');
+    var form = document.getElementById('rizq-theater-search-form');
+    var heroBrowse = document.querySelector('.hero-browse-panel');
+    var isOpen = false;
+
+    function headerBottom() {
+      var n = document.getElementById('nav');
+      var h = n ? Math.round(n.getBoundingClientRect().bottom) : 70;
+      document.documentElement.style.setProperty('--rizq-search-top', h + 'px');
+      return h;
+    }
+
+    function setOpen(next) {
+      isOpen = !!next;
+      root.classList.toggle('is-open', isOpen);
+      root.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      document.documentElement.classList.toggle('rizq-search-theater-open', isOpen);
+      if (panel) {
+        if (isOpen) panel.removeAttribute('hidden');
+        else panel.setAttribute('hidden', '');
+      }
+      if (pill) pill.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      headerBottom();
+      if (isOpen && input) {
+        try {
+          var hero = document.getElementById('hero-search');
+          if (hero && hero.value && !input.value) input.value = hero.value;
+        } catch (e) {}
+        setTimeout(function () {
+          try { input.focus(); input.select(); } catch (e2) {}
+        }, 90);
+      }
+      syncPill();
+    }
+
+    function syncPill() {
+      headerBottom();
+      if (!pill) return;
+      if (isOpen) {
+        pill.classList.remove('is-visible');
+        return;
+      }
+      if (!heroBrowse) {
+        pill.classList.add('is-visible');
+        return;
+      }
+      var past = heroBrowse.getBoundingClientRect().bottom < headerBottom() + 4;
+      pill.classList.toggle('is-visible', past);
+    }
+
+    window.__rizqSyncSearchTheater = syncPill;
+    window.closeRizqSearchTheater = function () {
+      if (!isOpen) return false;
+      setOpen(false);
+      return true;
+    };
+    window.openRizqSearchTheater = function () {
+      setOpen(true);
+    };
+
+    document.querySelectorAll('[data-rizq-open-search]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        setOpen(true);
+      });
+    });
+    document.querySelectorAll('[data-rizq-close-search]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        setOpen(false);
+      });
+    });
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = input ? String(input.value || '').trim() : '';
+        var hero = document.getElementById('hero-search');
+        if (hero) hero.value = q;
+        if (typeof window.doMainSearch === 'function') {
+          window.doMainSearch();
+        } else if (q) {
+          window.location.href = 'rizq_browse.html?q=' + encodeURIComponent(q);
+        } else {
+          window.location.href = 'rizq_browse.html';
+        }
+        setOpen(false);
+      });
+    }
+
+    if (input && window.RizqUx && typeof window.RizqUx.attachSearchSuggestions === 'function') {
+      try {
+        window.RizqUx.attachSearchSuggestions({
+          input: input,
+          getAds: function () { return window.ADS || []; },
+          onPickExpr: 'document.getElementById("rizq-theater-search-form") && document.getElementById("rizq-theater-search-form").requestSubmit()'
+        });
+      } catch (eS) {}
+    }
+
+    root.querySelectorAll('.rizq-search-cat[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () { setOpen(false); });
+    });
+
+    window.addEventListener('resize', syncPill, { passive: true });
+    syncPill();
+  })();
 })();

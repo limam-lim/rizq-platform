@@ -844,4 +844,194 @@ html body footer .footer-grid{
   .qcat:hover:not(.qcat-open),.why-card:hover,.hero-cta-primary:hover{
     transform:none!important;
   }
+  .rizq-search-pill,
+  .rizq-search-panel,
+  .rizq-search-backdrop{
+    transition:none!important;
+    animation:none!important;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   Search theater C — قرص تحت الهيدر → منبثق فاخر
+   لا يمسّ لوحة الهيرو ولا شريط الأقسام
+   ══════════════════════════════════════════════ */
+:root{
+  --rizq-search-top: calc(var(--rizq-header-h, 70px) + var(--rizq-announce-h, 0px));
+}
+.nav-search-launch{
+  gap:6px!important;
+}
+.nav-search-launch-ico{
+  font-size:16px;line-height:1;font-weight:700;color:var(--gold,#C9A84C);
+}
+.nav-search-launch-lbl{font-weight:700}
+
+.rizq-search-theater{
+  position:fixed;
+  inset:0;
+  z-index:9970;
+  pointer-events:none;
+}
+.rizq-search-theater.is-open{pointer-events:auto}
+.rizq-search-theater.is-open .rizq-search-pill{opacity:0;transform:translate(-50%,-8px) scale(.96);pointer-events:none}
+
+.rizq-search-backdrop{
+  position:absolute;inset:0;
+  background:rgba(7,16,32,.48);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  opacity:0;
+  transition:opacity .28s ease;
+}
+.rizq-search-theater.is-open .rizq-search-backdrop{opacity:1}
+
+.rizq-search-pill{
+  position:fixed;
+  top:calc(var(--rizq-search-top) + 8px);
+  left:50%;
+  transform:translate(-50%,-12px) scale(.98);
+  z-index:9972;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  min-width:min(420px, calc(100vw - 28px));
+  max-width:min(560px, calc(100vw - 28px));
+  padding:11px 18px;
+  border-radius:999px;
+  border:1px solid rgba(201,168,76,.45);
+  background:linear-gradient(135deg,rgba(13,27,42,.94),rgba(27,58,107,.92));
+  box-shadow:0 14px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+  color:#fff;
+  font:inherit;
+  cursor:pointer;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .28s ease, transform .28s cubic-bezier(.22,1,.36,1), box-shadow .2s ease;
+}
+.rizq-search-pill.is-visible{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,0) scale(1);
+}
+.rizq-search-pill:hover{
+  border-color:rgba(232,201,106,.7);
+  box-shadow:0 16px 40px rgba(0,0,0,.34), 0 0 0 1px rgba(201,168,76,.2);
+}
+.rizq-search-pill-ico{
+  width:28px;height:28px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(201,168,76,.22);color:#FFE7A0;font-size:15px;font-weight:800;
+}
+.rizq-search-pill-brand{
+  font-weight:900;font-size:15px;color:#C9A84C;letter-spacing:.02em;
+}
+.rizq-search-pill-label{
+  flex:1;text-align:start;font-size:13.5px;font-weight:600;
+  color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.rizq-search-panel{
+  position:fixed;
+  top:calc(var(--rizq-search-top) + 6px);
+  left:50%;
+  transform:translate(-50%,-10px) scale(.985);
+  width:min(720px, calc(100vw - 20px));
+  z-index:9973;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .28s ease, transform .32s cubic-bezier(.22,1,.36,1);
+}
+.rizq-search-theater.is-open .rizq-search-panel[hidden]{display:block!important}
+.rizq-search-theater.is-open .rizq-search-panel{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,0) scale(1);
+}
+.rizq-search-panel-inner{
+  position:relative;
+  padding:22px 22px 16px;
+  border-radius:0 0 22px 22px;
+  border:1px solid rgba(201,168,76,.38);
+  border-top:2px solid rgba(201,168,76,.55);
+  background:
+    linear-gradient(165deg, rgba(13,27,42,.97) 0%, rgba(27,58,107,.94) 55%, rgba(10,22,40,.98) 100%);
+  box-shadow:0 22px 48px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+  color:#fff;
+}
+.rizq-search-close{
+  position:absolute;top:12px;inset-inline-start:12px;
+  width:34px;height:34px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);color:#fff;
+  cursor:pointer;font-size:15px;line-height:1;
+}
+.rizq-search-close:hover{background:rgba(255,255,255,.12)}
+.rizq-search-brand{
+  margin:0 0 2px;text-align:center;
+  font-size:28px;font-weight:900;letter-spacing:.04em;
+  color:#C9A84C;
+  text-shadow:0 2px 18px rgba(201,168,76,.35);
+  font-family:'Noto Naskh Arabic','Cairo',serif;
+}
+.rizq-search-heading{
+  margin:0 0 14px;text-align:center;
+  font-size:14px;font-weight:700;color:rgba(255,255,255,.78);
+}
+.rizq-search-form{
+  display:flex;align-items:stretch;gap:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(201,168,76,.32);
+  border-radius:14px;padding:6px 6px 6px 10px;
+}
+.rizq-search-input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;
+  color:#fff;font:inherit;font-size:15px;font-weight:600;padding:10px 6px;
+}
+.rizq-search-input::placeholder{color:rgba(255,255,255,.42);font-weight:500}
+.rizq-search-submit{
+  border:0;border-radius:11px;cursor:pointer;font:inherit;
+  font-weight:800;font-size:14px;padding:0 18px;
+  color:#0f2347;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);
+  box-shadow:0 6px 16px rgba(201,168,76,.35);
+}
+.rizq-search-submit:hover{filter:brightness(1.05)}
+.rizq-search-cats{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+  margin-top:14px;
+}
+.rizq-search-cat{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 12px;border-radius:999px;
+  border:1px solid rgba(201,168,76,.28);
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.9);
+  text-decoration:none;font-size:12.5px;font-weight:700;
+  transition:background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.rizq-search-cat:hover{
+  background:rgba(201,168,76,.16);
+  border-color:rgba(201,168,76,.5);
+  transform:translateY(-1px);
+}
+.rizq-search-hint{
+  margin:12px 0 0;text-align:center;
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,.45);
+}
+
+@media (max-width:768px){
+  .rizq-search-pill{
+    min-width:calc(100vw - 24px);
+    padding:10px 14px;
+    top:calc(var(--rizq-search-top) + 6px);
+  }
+  .rizq-search-pill-brand{display:none}
+  .rizq-search-panel{
+    width:calc(100vw - 12px);
+    top:calc(var(--rizq-search-top) + 4px);
+  }
+  .rizq-search-panel-inner{padding:18px 14px 14px;border-radius:0 0 18px 18px}
+  .rizq-search-brand{font-size:24px}
+  .nav-search-launch-lbl{display:none}
 }

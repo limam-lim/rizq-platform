@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=29.2"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=29.3"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.2"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -3350,6 +3350,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span data-t="nav-account">حسابي</span>
     </button>
     <span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="أدوات">
+    <button type="button" class="nav-account-btn nav-search-launch" id="nav-search-launch" data-rizq-open-search aria-haspopup="dialog" aria-controls="rizq-search-panel" aria-label="بحث" title="ابحث في رزق">
+      <span class="nav-search-launch-ico" aria-hidden="true">⌕</span>
+      <span class="nav-search-launch-lbl" data-t="nav-search-lbl">بحث</span>
+    </button>
     <a href="#wishlist-block" class="nav-account-btn nav-fav-btn" id="nav-fav-btn" data-rizq-fav-wrap data-t-nav-fav="المفضلة" data-t-nav-fav-fr="Favoris" aria-label="المفضلة" title="المفضلة" style="text-decoration:none">
       <span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>
       <span class="nav-fav-lbl" data-t="nav-fav-lbl">المفضلة</span>
@@ -3400,6 +3404,38 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
   </a>
 </nav>
+
+<!-- ── مسرح البحث (نموذج ج): قرص تحت الهيدر ينسدل كمنبثق أثناء التصفح ── -->
+<div id="rizq-search-theater" class="rizq-search-theater" aria-hidden="true">
+  <div class="rizq-search-backdrop" id="rizq-search-backdrop" data-rizq-close-search tabindex="-1"></div>
+  <button type="button" class="rizq-search-pill" id="rizq-search-pill" data-rizq-open-search aria-haspopup="dialog" aria-controls="rizq-search-panel" aria-expanded="false">
+    <span class="rizq-search-pill-ico" aria-hidden="true">⌕</span>
+    <span class="rizq-search-pill-brand">رزق</span>
+    <span class="rizq-search-pill-label" data-t="search-theater-pill">ابحث في رزق…</span>
+  </button>
+  <div class="rizq-search-panel" id="rizq-search-panel" role="dialog" aria-modal="true" aria-labelledby="rizq-search-panel-title" hidden>
+    <div class="rizq-search-panel-inner">
+      <button type="button" class="rizq-search-close" data-rizq-close-search aria-label="إغلاق">✕</button>
+      <p class="rizq-search-brand" id="rizq-search-panel-title">رزق</p>
+      <p class="rizq-search-heading" data-t="search-theater-heading">ابحث في رزق</p>
+      <form class="rizq-search-form" id="rizq-theater-search-form" action="rizq_browse.html" method="get">
+        <input class="rizq-search-input" type="search" name="q" id="rizq-theater-search-input" autocomplete="off" placeholder="عقارات، سيارات، ذهب…" data-ph-fr="Immobilier, voitures, or…" aria-label="ابحث في رزق"/>
+        <button class="rizq-search-submit" type="submit" data-t="search-theater-go">بحث</button>
+      </form>
+      <div class="rizq-search-cats" role="list">
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">🏠 عقارات</a>
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA">🚗 سيارات</a>
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B0%D9%87%D8%A8">🪙 ذهب</a>
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA">📱 إلكترونيات</a>
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B7%D8%A7%D9%82%D8%A9">⚡ طاقة</a>
+        <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B1%D8%AD%D9%84%D8%A7%D8%AA">✈️ رحلات</a>
+        <a class="rizq-search-cat" role="listitem" href="#virtual-tenders">📋 مناقصات</a>
+        <a class="rizq-search-cat" role="listitem" href="#virtual-investments">📈 استثمار</a>
+      </div>
+      <p class="rizq-search-hint" data-t="search-theater-hint">Esc للإغلاق · اكتب ثم Enter</p>
+    </div>
+  </div>
+</div>
 
 <!-- ── Section jump bar — مخفي (كان يختلط مع الشريط الرئيسي عند التمرير) ── -->
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="true" hidden>
@@ -12514,7 +12550,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo7"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=23.5"></script>
+<script src="rizq_landing_ux.js?v=23.7"></script>
 <script src="rizq_disclaimer.js"></script>
 
 
