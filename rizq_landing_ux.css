@@ -857,7 +857,8 @@ html body footer .footer-grid{
    لا يمسّ لوحة الهيرو ولا شريط الأقسام
    ══════════════════════════════════════════════ */
 :root{
-  --rizq-search-top: calc(var(--rizq-header-h, 70px) + var(--rizq-announce-h, 0px));
+  /* تحت الهيدر + شريط الأخبار الرقيق */
+  --rizq-search-top: calc(var(--rizq-header-h, 70px) + var(--rizq-announce-h, 0px) + var(--rizq-ticker-h, 0px));
 }
 .nav-search-launch{
   gap:6px!important;
@@ -889,7 +890,7 @@ html body footer .footer-grid{
 
 .rizq-search-pill{
   position:fixed;
-  top:calc(var(--rizq-search-top) + 8px);
+  top:calc(var(--rizq-search-top) + 10px);
   left:50%;
   transform:translate(-50%,-12px) scale(.98);
   z-index:10042;
@@ -898,8 +899,8 @@ html body footer .footer-grid{
   gap:10px;
   min-width:min(420px, calc(100vw - 28px));
   max-width:min(560px, calc(100vw - 28px));
-  padding:11px 18px;
-  border-radius:999px;
+  padding:11px 16px;
+  border-radius:12px; /* مستطيل بزوايا خفيفة بدل الدائري */
   border:1px solid rgba(201,168,76,.45);
   background:linear-gradient(135deg,rgba(13,27,42,.94),rgba(27,58,107,.92));
   box-shadow:0 14px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
@@ -920,7 +921,7 @@ html body footer .footer-grid{
   box-shadow:0 16px 40px rgba(0,0,0,.34), 0 0 0 1px rgba(201,168,76,.2);
 }
 .rizq-search-pill-ico{
-  width:28px;height:28px;border-radius:50%;
+  width:28px;height:28px;border-radius:8px;
   display:inline-flex;align-items:center;justify-content:center;
   background:rgba(201,168,76,.22);color:#FFE7A0;font-size:15px;font-weight:800;
 }

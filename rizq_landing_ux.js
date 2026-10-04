@@ -505,6 +505,16 @@
     function headerBottom() {
       var n = document.getElementById('nav');
       var h = n ? Math.round(n.getBoundingClientRect().bottom) : 70;
+      /* اهبط تحت شريط الأخبار الرقيق إن وُجد */
+      var ticker = document.getElementById('ticker-wrap')
+        || document.querySelector('.ticker-wrap:not(.is-empty)');
+      if (ticker && !ticker.classList.contains('is-empty')) {
+        var style = window.getComputedStyle(ticker);
+        if (style.display !== 'none' && style.visibility !== 'hidden') {
+          var tb = Math.round(ticker.getBoundingClientRect().bottom);
+          if (tb > h) h = tb;
+        }
+      }
       document.documentElement.style.setProperty('--rizq-search-top', h + 'px');
       return h;
     }
