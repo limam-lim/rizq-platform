@@ -564,6 +564,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   animation:fadeUp .8s .16s ease both;
   flex:none;
   box-sizing:border-box;
+  overflow:visible;
 }
 .hero-subtitle-primary{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
@@ -7817,7 +7818,7 @@ function applyLandingLang(toAr) {
   const heroSubPrimary = document.querySelector('#hero-sub-primary');
   if (heroSubPrimary) heroSubPrimary.textContent = isAr
     ? 'خيارك الأول لفتح آفاق جديدة لأعمالك'
-    : 'Votre premier choix pour ouvrir de nouveaux horizons à votre activité';
+    : 'Votre premier choix pour de nouveaux horizons';
 
   const heroSubSecondary = document.querySelector('#hero-sub-secondary');
   if (heroSubSecondary) heroSubSecondary.textContent = isAr
