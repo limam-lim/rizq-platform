@@ -512,7 +512,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
     linear-gradient(135deg,#0D1B2A,#1B3A6B 55%,#152e58);
   border:1.5px solid rgba(201,168,76,.52);
   border-radius:16px;
-  padding:6px 28px 34px;
+  padding:18px 28px 22px;
   min-height:96px;
   box-sizing:border-box;
   box-shadow:0 12px 32px rgba(0,0,0,.24),0 0 22px rgba(201,168,76,.14),inset 0 1px 0 rgba(255,255,255,.1);
@@ -544,8 +544,8 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   width:100%;text-align:center;
   display:flex;align-items:center;justify-content:center;
   text-shadow:0 2px 18px rgba(201,168,76,.3);
-  /* رفع بصري: حبر القاهرة يجلس منخفضاً داخل الـ em-box */
-  transform:translateY(-0.35em) !important;
+  /* رفع بصري طفيف لتوسيط حبر العربية داخل البطاقة */
+  transform:translateY(-0.1em);
 }
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
 @keyframes shine{to{background-position:200%}}
@@ -1948,7 +1948,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-stats-bar{flex-wrap:wrap}
   .hero-content{padding-top:44px;width:94%}
   .hero-headline{font-size:clamp(46px,13vw,64px)}
-  .hero-title-card{padding:4px 18px 26px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
+  .hero-title-card{padding:14px 18px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
   .hero-lead-row{width:100%}
   .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
@@ -2428,8 +2428,8 @@ html[lang="fr"] .hero-pill-sep{display:block}
 /* على الجوال: نفس الترتيب العمودي بأحجام أوضح */
 @media(max-width:768px){
   .hero-brand-row{gap:8px;margin-bottom:14px;max-width:96%;width:max-content;min-width:min(260px,92vw)}
-  .hero-title-card{padding:4px 22px 26px;min-width:0;min-height:80px;border-radius:14px;width:100%}
-  .hero-headline{font-size:clamp(46px,13vw,64px);transform:translateY(-0.35em)!important}
+  .hero-title-card{padding:14px 22px 18px;min-width:0;min-height:80px;border-radius:14px;width:100%}
+  .hero-headline{font-size:clamp(46px,13vw,64px);transform:translateY(-0.1em)}
   .hero-brand-row .hero-eyebrow{padding:9px 14px;min-height:38px;width:100%;max-width:100%}
   .hero-brand-row .hero-eyebrow span{font-size:clamp(12px,3.2vw,13.5px)}
   .hero-lead-row{gap:14px;width:min(1080px,96%);max-width:100%}
