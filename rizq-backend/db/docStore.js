@@ -34,6 +34,10 @@ const stmtUpsert = db.prepare(`
     data = excluded.data,
     updated_at = excluded.updated_at
 `);
+const stmtInsertIgnore = db.prepare(`
+  INSERT OR IGNORE INTO documents (collection, id, data, updated_at)
+  VALUES (@collection, @id, @data, @updated_at)
+`);
 const stmtRemove = db.prepare(
   'DELETE FROM documents WHERE collection = ? AND id = ?'
 );
@@ -155,6 +159,24 @@ function createCollection(collection, opts) {
     return data;
   }
 
+  /** إدراج ذرّي فقط إن لم يوجد الصف — يمنع سباق إصدار الرموز */
+  function insertIfAbsent(id, data, opts) {
+    const key = String(id || '');
+    if (!key) return { inserted: false, data: null };
+    const now = new Date().toISOString();
+    const r = stmtInsertIgnore.run({
+      collection: name,
+      id: key,
+      data: JSON.stringify(data),
+      updated_at: now,
+    });
+    if (r.changes > 0) {
+      if (!(opts && opts.skipBackup)) writeBackup();
+      return { inserted: true, data };
+    }
+    return { inserted: false, data: get(key) };
+  }
+
   function remove(id, opts) {
     const key = String(id || '');
     if (!key) return false;
@@ -266,6 +288,7 @@ function createCollection(collection, opts) {
     asMap,
     count,
     upsert,
+    insertIfAbsent,
     remove,
     upsertMany,
     replaceAll,

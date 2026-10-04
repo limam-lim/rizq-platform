@@ -62,8 +62,8 @@ async function liveTests() {
   const victimTok = m1.guestThreadToken;
   const threadKey = m1.threadKey;
 
-  // Attacker tries to hijack by same phone
-  const m2 = await fetch(BASE + '/api/messages', {
+  // Attacker tries to inject + hijack by same phone (no token)
+  const m2res = await fetch(BASE + '/api/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -72,15 +72,16 @@ async function liveTests() {
       buyerPhone: phone,
       body: 'hijack attempt',
     }),
-  }).then((r) => r.json());
-  ok('attacker follow-up does NOT get new guest token',
-    !!(m2 && m2.ok && !m2.guestThreadToken && m2.guestThreadTokenRequired === true),
-    m2 ? JSON.stringify({ tok: !!m2.guestThreadToken, req: m2.guestThreadTokenRequired }) : 'no');
+  });
+  const m2 = await m2res.json().catch(() => ({}));
+  ok('attacker follow-up without token is rejected',
+    m2res.status === 401 && m2.guestThreadTokenRequired === true && !m2.guestThreadToken,
+    'status=' + m2res.status + ' body=' + JSON.stringify({ ok: m2.ok, req: m2.guestThreadTokenRequired }));
 
   const hijackRead = await fetch(BASE + '/api/messages/thread/' + encodeURIComponent(threadKey), {
     headers: {
       'x-guest-phone': phone,
-      'x-guest-thread-token': m2.guestThreadToken || 'forged',
+      'x-guest-thread-token': 'forged',
     },
   });
   ok('attacker cannot read thread without victim token', hijackRead.status === 401, 'status=' + hijackRead.status);
@@ -92,7 +93,8 @@ async function liveTests() {
     },
   }).then(async (r) => ({ status: r.status, body: await r.json() }));
   ok('victim token still reads thread',
-    victimRead.status === 200 && Array.isArray(victimRead.body.messages) && victimRead.body.messages.length >= 2,
+    victimRead.status === 200 && Array.isArray(victimRead.body.messages) && victimRead.body.messages.length >= 1
+      && !victimRead.body.messages.some((m) => m.body === 'hijack attempt'),
     'status=' + victimRead.status + ' n=' + (victimRead.body && victimRead.body.messages && victimRead.body.messages.length));
 
   // Legitimate follow-up with token reuses same token

@@ -753,7 +753,7 @@ app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[widget/lead] error:', err.message);
-    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+    res.status(500).json({ ok: false, error: 'lead_save_failed' });
   }
 });
 
@@ -776,7 +776,7 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[api/leads] error:', err.message);
-    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+    res.status(500).json({ ok: false, error: 'lead_save_failed' });
   }
 });
 
@@ -850,6 +850,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
     const accountId = String(
       (body.profile && body.profile.accountId) || body.accountId || ''
     ).trim();
+    let merchantAcc = null;
 
     if (accountId) {
       let acc = null;
@@ -874,6 +875,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
           code: e.code || ent.subscriptionStatus,
         });
       }
+      merchantAcc = acc;
       body.accountId = accountId;
       body.profile = buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
@@ -892,6 +894,28 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
     }
 
     const result = await handleWidgetChat(body);
+    if (merchantAcc && result && result.reply) {
+      try {
+        await recordUsage({
+          subscriberId: merchantAcc.phone || merchantAcc.whatsapp || accountId,
+          accountId,
+          businessName: merchantAcc.name || '',
+          phone: merchantAcc.phone || merchantAcc.whatsapp || '',
+          channel: 'widget',
+          model: result.model,
+          usage: result.usage,
+        });
+      } catch (qErr) {
+        console.warn('[quota-guard] widget/chat:', qErr && qErr.message);
+        if (qErr && qErr.code === 'quota_exhausted') {
+          return res.status(403).json({
+            ok: false,
+            error: qErr.message || 'تم استنفاد الحصة',
+            code: 'quota_exhausted',
+          });
+        }
+      }
+    }
     res.json(result);
   } catch (err) {
     console.error('[widget/chat] error:', err.message);
@@ -912,6 +936,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
     const accountId = String(
       (body.profile && body.profile.accountId) || body.accountId || ''
     ).trim();
+    let merchantAcc = null;
 
     if (accountId) {
       let acc = null;
@@ -935,6 +960,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
           code: e.code || ent.subscriptionStatus,
         });
       }
+      merchantAcc = acc;
       body.accountId = accountId;
       body.profile = buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
@@ -952,6 +978,28 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
     }
 
     const result = await handleWidgetChat(body);
+    if (merchantAcc && result && result.reply) {
+      try {
+        await recordUsage({
+          subscriberId: merchantAcc.phone || merchantAcc.whatsapp || accountId,
+          accountId,
+          businessName: merchantAcc.name || '',
+          phone: merchantAcc.phone || merchantAcc.whatsapp || '',
+          channel: 'widget',
+          model: result.model,
+          usage: result.usage,
+        });
+      } catch (qErr) {
+        console.warn('[quota-guard] ai/chat:', qErr && qErr.message);
+        if (qErr && qErr.code === 'quota_exhausted') {
+          return res.status(403).json({
+            ok: false,
+            error: qErr.message || 'تم استنفاد الحصة',
+            code: 'quota_exhausted',
+          });
+        }
+      }
+    }
     res.json(result);
   } catch (err) {
     console.error('[ai/chat] error:', err.message);
@@ -2110,7 +2158,7 @@ app.use('/api/auth', authRouter);
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 8,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { ok: false, error: 'عدد كبير من طلبات OTP — حاول لاحقاً' },
