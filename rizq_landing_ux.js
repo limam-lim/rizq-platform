@@ -539,11 +539,19 @@
         pill.classList.remove('is-visible');
         return;
       }
-      if (!heroBrowse) {
-        pill.classList.add('is-visible');
-        return;
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var past = false;
+      if (heroBrowse) {
+        var hb = headerBottom();
+        past = heroBrowse.getBoundingClientRect().bottom < hb + 12;
+        if (!past && y > 0) {
+          /* احتياطي: إن تجاوز التمرير منتصف لوحة التصفح */
+          var topDoc = heroBrowse.getBoundingClientRect().top + y;
+          past = y + hb > topDoc + Math.min(heroBrowse.offsetHeight * 0.55, 140);
+        }
+      } else {
+        past = y > 220;
       }
-      var past = heroBrowse.getBoundingClientRect().bottom < headerBottom() + 4;
       pill.classList.toggle('is-visible', past);
     }
 
