@@ -570,6 +570,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   animation:fadeUp .8s .16s ease both;
   flex:none;
   box-sizing:border-box;
+  overflow:visible;
 }
 .hero-subtitle-primary{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
@@ -597,19 +598,6 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   animation:shine 4s linear infinite .3s,fadeUp .8s .28s ease both;
 }
-/* فرنسية: تصغير الخط فقط — نفس قياسات الكبسولة/البطاقة كالعربية، سطران */
-html[lang="fr"] .hero-subtitle-primary{
-  font-size:clamp(17px,1.85vw,22px);
-  line-height:1.35;
-  margin:0 0 4px;
-  white-space:nowrap;
-}
-html[lang="fr"] .hero-subtitle-secondary{
-  font-size:clamp(14px,1.55vw,18px);
-  line-height:1.4;
-  white-space:nowrap;
-}
-
 .hero-tagline{
   font-family:'Cairo','Noto Naskh Arabic',Georgia,serif;
   font-size:clamp(11px,1.35vw,14.5px);
@@ -2437,16 +2425,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   margin:0 4px;
   flex:0 0 1.5px;
 }
-/* فرنسية: نفس الحجم والوزن */
-html[lang="fr"] .hero-pills{gap:0;max-width:none}
-html[lang="fr"] .hero-pill{
-  font-size:clamp(16px,2vw,20px);
-  padding:16px 18px;
-  min-width:0;
-  letter-spacing:0;
-}
-html[lang="fr"] .hero-pill-sep{display:block}
-/* على الجوال: نفس الترتيب العمودي بأحجام أوضح */
+/* على الجوال: نفس الترتيب والقياسات للعربية والفرنسية */
 @media(max-width:768px){
   .hero-brand-row{gap:8px;margin-bottom:14px;max-width:96%;width:max-content;min-width:min(260px,92vw)}
   .hero-title-card{padding:14px 22px 18px;min-width:0;min-height:80px;border-radius:14px;width:100%}
@@ -2457,14 +2436,6 @@ html[lang="fr"] .hero-pill-sep{display:block}
   .hero-subtitle-card{max-width:none;width:100%;padding:16px 12px 14px;flex:none}
   .hero-subtitle-primary{font-size:clamp(13px,3.6vw,18px);white-space:nowrap}
   .hero-subtitle-secondary{font-size:clamp(11px,3vw,15px);white-space:nowrap}
-  html[lang="fr"] .hero-subtitle-primary{
-    font-size:clamp(11px,2.9vw,15px);
-    white-space:nowrap;
-  }
-  html[lang="fr"] .hero-subtitle-secondary{
-    font-size:clamp(10px,2.6vw,13px);
-    white-space:nowrap;
-  }
   .hero-pills{
     flex-direction:row!important;
     flex-wrap:nowrap!important;
@@ -2486,11 +2457,6 @@ html[lang="fr"] .hero-pill-sep{display:block}
     border-radius:9px;
   }
   .hero-pill-sep{height:22px}
-  html[lang="fr"] .hero-pill{
-    font-size:clamp(13px,3.4vw,16px);
-    padding:14px 4px;
-    min-width:0;
-  }
 }
 
 
@@ -8022,19 +7988,16 @@ function applyLandingLang(toAr) {
   const heroSubPrimary = document.querySelector('#hero-sub-primary');
   if (heroSubPrimary) heroSubPrimary.textContent = isAr
     ? 'خيارك الأول لفتح آفاق جديدة لأعمالك'
-    : 'Votre premier choix pour ouvrir de nouveaux horizons à votre activité';
+    : 'Votre premier choix pour de nouveaux horizons';
 
   const heroSubSecondary = document.querySelector('#hero-sub-secondary');
   if (heroSubSecondary) heroSubSecondary.textContent = isAr
     ? 'حيث يلتقي كل الموريتانيين'
     : 'Là où tous les Mauritaniens se retrouvent';
 
-  // Cat-name & qcat-name font size — smaller in FR
-  document.querySelectorAll('.cat-name').forEach(el => {
-    el.style.fontSize = isAr ? '' : '11px';
-  });
-  document.querySelectorAll('.qcat-name').forEach(el => {
-    el.style.fontSize = isAr ? '' : '8.5px';
+  // Cat-name & qcat-name: نفس قياسات CSS للعربية والفرنسية (لا تصغير FR)
+  document.querySelectorAll('.cat-name, .qcat-name').forEach(el => {
+    el.style.fontSize = '';
   });
 
   // Hero pills (Sell · Buy · Stand out) — أزرار روابط داخل الشريط
@@ -8267,9 +8230,9 @@ try { /* remaining-static-i18n */
     if(statLast) statLast.textContent = 'Publication de base';
   }
 
-  // CTA title font size
+  // CTA title: نفس مقياس CSS للعربية والفرنسية
   const ctaTitle = document.querySelector('.cta-title');
-  if(ctaTitle) ctaTitle.style.fontSize = isAr ? '' : 'clamp(20px,2.8vw,34px)';
+  if(ctaTitle) ctaTitle.style.fontSize = '';
 
   // Pricing tabs labels
   const ptabLabels = document.querySelectorAll('#pricing .ptab-lbl');
