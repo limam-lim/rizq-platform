@@ -2931,7 +2931,7 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   position:relative;
   box-shadow:0 10px 28px rgba(13,27,42,.1),inset 0 1px 0 rgba(255,255,255,.9);
   transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s,border-color .35s;
-  cursor:pointer;
+  cursor:default;
 }
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
@@ -2958,15 +2958,18 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
-  font-size:34px;line-height:1;position:relative;overflow:hidden;
+  font-size:34px;line-height:1;position:relative;overflow:hidden;z-index:1;
   transition:transform .35s ease, box-shadow .25s;
-  cursor:pointer;border:0;padding:0;appearance:none;-webkit-appearance:none;
-  color:inherit;font-family:inherit;
+  cursor:default;border:0;padding:0;appearance:none;-webkit-appearance:none;
+  color:inherit;font-family:inherit;pointer-events:none;
 }
-.rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:2}
-.rizq-style-tile.is-linked:hover{z-index:1;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55)}
+.rizq-style-tile.is-linked{
+  cursor:pointer;pointer-events:auto;
+}
+.rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:3}
+.rizq-style-tile.is-linked:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55);transform:scale(1.04)}
 .rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.rizq-style-card:hover .rizq-style-tile{transform:scale(1.06)}
+.rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
 .rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .rizq-style-badge{
@@ -2988,7 +2991,11 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   margin-top:auto;padding-top:8px;
   font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:4px;
+  text-decoration:none;cursor:pointer;align-self:flex-start;
+  position:relative;z-index:1;
 }
+.rizq-style-cta:hover{color:var(--gold,#C9A84C);text-decoration:none}
+.rizq-style-cta:focus-visible{outline:2px solid rgba(201,168,76,.75);outline-offset:2px;border-radius:4px}
 .rizq-style-cta::after{content:'←';font-size:11px;transition:transform .25s}
 html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
@@ -5477,10 +5484,16 @@ function _styFindAdById(id){
   return null;
 }
 function rizqOpenStyleItem(ev, adId){
-  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  /* فتح المنتج المضغوط عليه فقط — لا تسريب لنقر بطاقة الإطلالة */
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+  }
+  if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
   if(!ad){
-    if(adId != null && String(adId).indexOf('store-') !== 0){
+    if(String(adId).indexOf('store-') !== 0){
       window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(adId);
     }
     return false;
@@ -5494,9 +5507,14 @@ function rizqOpenStyleItem(ev, adId){
   return false;
 }
 function rizqOpenStyleLook(ev, primaryId, fallbackHref){
+  /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
   if(ev){
     var t = ev.target;
-    if(t && t.closest && t.closest('.rizq-style-tile.is-linked')) return true;
+    if(t && t.closest && t.closest('.rizq-style-tile')){
+      ev.preventDefault();
+      ev.stopPropagation();
+      return false;
+    }
     ev.preventDefault();
   }
   if(primaryId){
@@ -5508,31 +5526,70 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+function _styBuildCardHtml(opts){
+  opts = opts || {};
+  var attrs = ' class="rizq-style-card" role="listitem"';
+  if(opts.gender) attrs += ' data-sty-gender="'+_styEsc(opts.gender)+'"';
+  if(opts.srmCat) attrs += ' data-srm-cat="'+_styEsc(opts.srmCat)+'"';
+  if(opts.seed) attrs += ' data-sty-seed="1"';
+  var idAttr = opts.primaryId != null && opts.primaryId !== ''
+    ? String(opts.primaryId).replace(/'/g,'&#39;')
+    : '';
+  var href = opts.href || 'rizq_browse.html';
+  var hrefEsc = _styEsc(href).replace(/'/g,'&#39;');
+  var fromView = opts.fromViewLbl
+    ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
+    : '';
+  return '<article'+attrs+'>'
+    + '<div class="rizq-style-mosaic">'+ (opts.tilesHtml || '') +'</div>'
+    + '<div class="rizq-style-body">'
+    +   fromView
+    +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
+    +   '<div class="rizq-style-name">'+_styEsc(opts.name || '')+'</div>'
+    +   '<div class="rizq-style-meta">'+_styEsc(opts.meta || '')+'</div>'
+    +   '<a class="rizq-style-cta" href="'+_styEsc(href)+'" onclick="return rizqOpenStyleLook(event,\''+idAttr+'\',\''+hrefEsc+'\')">'+_styEsc(opts.cta || '')+'</a>'
+    + '</div></article>';
+}
+
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
+  var title = '';
+  if(ad){
+    try {
+      var d = (typeof trAd === 'function') ? trAd(ad) : ad;
+      title = String((d && (d.title || ad.title)) || '').trim();
+    } catch(e){ title = String(ad.title || '').trim(); }
+  }
+  var aria = linked
+    ? ' aria-label="'+_styEsc(title || String(ad.id))+'"'
+    : ' aria-hidden="true"';
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
-    : ' class="rizq-style-tile"';
+    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    : ' class="rizq-style-tile"'+aria;
   var tag = linked ? 'button type="button"' : 'div';
   var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
   }
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
-function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var linked = adId != null && adId !== '';
+  var title = String(titleHint || '').trim();
+  var aria = linked
+    ? ' aria-label="'+_styEsc(title || String(adId))+'"'
+    : ' aria-hidden="true"';
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
-    : ' class="rizq-style-tile"';
+    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    : ' class="rizq-style-tile"'+aria;
   var tag = linked ? 'button type="button"' : 'div';
   var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
   }
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</'+close+'>';
 }
@@ -5696,25 +5753,26 @@ function buildStyleIdeas(reshuffle){
     usedIds[String(seed.id)] = 1;
     var seedImgs = (seed.images || []).slice(0, 3);
     while(seedImgs.length < 3) seedImgs.push(null);
+    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
     var seedTiles = '';
     for(var si=0; si<3; si++){
-      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id);
-      else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true }, templates[0].emoji[si], seed.bg);
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id, seedName);
+      else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true, title: seed.title, titleFR: seed.titleFR }, (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seed.emoji, seed.bg);
     }
-    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
     var genderBadge0 = _styGenderBadge(gender, fr);
     var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seedHref)+'" data-sty-gender="'+gender+'" data-sty-seed="1" onclick="return rizqOpenStyleLook(event,\''+_styEsc(String(seed.id)).replace(/'/g,'&#39;')+'\',\''+_styEsc(seedHref).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+seedTiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-from-view">'+_styEsc(fromViewLbl)+'</div>'
-      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge0)+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(seedName)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك')+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      seed: true,
+      tilesHtml: seedTiles,
+      fromViewLbl: fromViewLbl,
+      badge: genderBadge0,
+      name: seedName,
+      meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
+      cta: cta,
+      href: seedHref,
+      primaryId: seed.id
+    }));
   }
 
   tplList.forEach(function(tpl){
@@ -5764,19 +5822,16 @@ function buildStyleIdeas(reshuffle){
     for(var ti=0; ti<3; ti++){
       tiles += _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg);
     }
-    var primaryIdAttr = primary && primary.id != null
-      ? String(primary.id).replace(/'/g,'&#39;')
-      : '';
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(href)+'" data-sty-gender="'+gender+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+_styEsc(href).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge)+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(name)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(metaParts.join(' · '))+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      tilesHtml: tiles,
+      badge: genderBadge,
+      name: name,
+      meta: metaParts.join(' · '),
+      cta: cta,
+      href: href,
+      primaryId: primary && primary.id != null ? primary.id : ''
+    }));
   });
 
   /* بطاقات إضافية لسلسلة أفقية أطول (مثل النماذج) */
@@ -5799,17 +5854,16 @@ function buildStyleIdeas(reshuffle){
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
     var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق')).slice(0, 42);
     var hrefEx = 'rizq_browse.html?id=' + encodeURIComponent(adEx.id);
-    var idEx = String(adEx.id).replace(/'/g,'&#39;');
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(hrefEx)+'" data-sty-gender="'+gender+'" onclick="return rizqOpenStyleLook(event,\''+idEx+'\',\''+_styEsc(hrefEx).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tilesEx+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+_styEsc(_styGenderBadge(gender, fr))+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(nameEx)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Suggestion continue' : 'اقتراح متواصل')+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      tilesHtml: tilesEx,
+      badge: _styGenderBadge(gender, fr),
+      name: nameEx,
+      meta: fr ? 'Suggestion continue' : 'اقتراح متواصل',
+      cta: cta,
+      href: hrefEx,
+      primaryId: adEx.id
+    }));
   }
 
   if(!cards.length){
@@ -6019,16 +6073,25 @@ function buildShowroomModels(reshuffle){
         ? _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg)
         : '<div class="rizq-style-tile">'+(tpl.emoji||[])[ti]+'</div>';
     }
-    var primaryIdAttr = primary && primary.id != null ? String(primary.id).replace(/'/g,'&#39;') : '';
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+esc(href)+'" data-srm-cat="'+cat+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+esc(href).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
-      +   '<div class="rizq-style-name">'+esc(name)+'</div>'
-      +   '<div class="rizq-style-meta">'+esc(metaParts.join(' · '))+'</div>'
-      +   '<span class="rizq-style-cta">'+esc(cta)+'</span>'
-      + '</div></a>'
+    cards.push((typeof _styBuildCardHtml === 'function')
+      ? _styBuildCardHtml({
+          srmCat: cat,
+          tilesHtml: tiles,
+          badge: badge,
+          name: name,
+          meta: metaParts.join(' · '),
+          cta: cta,
+          href: href,
+          primaryId: primary && primary.id != null ? primary.id : ''
+        })
+      : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
+        + '<div class="rizq-style-mosaic">'+tiles+'</div>'
+        + '<div class="rizq-style-body">'
+        +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
+        +   '<div class="rizq-style-name">'+esc(name)+'</div>'
+        +   '<div class="rizq-style-meta">'+esc(metaParts.join(' · '))+'</div>'
+        +   '<a class="rizq-style-cta" href="'+esc(href)+'">'+esc(cta)+'</a>'
+        + '</div></article>'
     );
   });
 
@@ -6056,16 +6119,25 @@ function buildShowroomModels(reshuffle){
     var dS = (typeof trAd === 'function') ? trAd(adS) : adS;
     var nameS = String((dS && (dS.title || adS.title)) || (fr ? 'Modèle Rizq' : 'نموذج رزق')).slice(0, 42);
     var hrefS = 'rizq_browse.html?id=' + encodeURIComponent(adS.id);
-    var idS = String(adS.id).replace(/'/g,'&#39;');
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+esc(hrefS)+'" data-srm-cat="'+cat+'" onclick="return rizqOpenStyleLook(event,\''+idS+'\',\''+esc(hrefS).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tilesS+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
-      +   '<div class="rizq-style-name">'+esc(nameS)+'</div>'
-      +   '<div class="rizq-style-meta">'+esc(fr ? 'Sélection continue' : 'اقتراح متواصل')+'</div>'
-      +   '<span class="rizq-style-cta">'+esc(cta)+'</span>'
-      + '</div></a>'
+    cards.push((typeof _styBuildCardHtml === 'function')
+      ? _styBuildCardHtml({
+          srmCat: cat,
+          tilesHtml: tilesS,
+          badge: badge,
+          name: nameS,
+          meta: fr ? 'Sélection continue' : 'اقتراح متواصل',
+          cta: cta,
+          href: hrefS,
+          primaryId: adS.id
+        })
+      : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
+        + '<div class="rizq-style-mosaic">'+tilesS+'</div>'
+        + '<div class="rizq-style-body">'
+        +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
+        +   '<div class="rizq-style-name">'+esc(nameS)+'</div>'
+        +   '<div class="rizq-style-meta">'+esc(fr ? 'Sélection continue' : 'اقتراح متواصل')+'</div>'
+        +   '<a class="rizq-style-cta" href="'+esc(hrefS)+'">'+esc(cta)+'</a>'
+        + '</div></article>'
     );
   }
 
