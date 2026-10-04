@@ -7,21 +7,24 @@
 
 const fs = require('fs');
 const path = require('path');
+const Module = require('module');
 
 global.localStorage = {
   _d: {},
-  getItem(k) { return this._d[k] == null ? null : this._d[k]; },
+  getItem(k) { return Object.prototype.hasOwnProperty.call(this._d, k) ? this._d[k] : null; },
   setItem(k, v) { this._d[k] = String(v); },
   removeItem(k) { delete this._d[k]; },
 };
 global.window = global;
 global.location = { pathname: '/' };
 
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_manager_agent_config.js'), 'utf8');
-eval(src);
-
-const pm = (global.RizqManager && global.RizqManager.processMessage)
-  || (typeof RizqManager !== 'undefined' && RizqManager.processMessage);
+const file = path.join(__dirname, '..', '..', 'rizq_manager_agent_config.js');
+const mod = new Module(file, module);
+mod.filename = file;
+mod.paths = Module._nodeModulePaths(path.dirname(file));
+mod._compile(fs.readFileSync(file, 'utf8'), file);
+const api = mod.exports;
+const pm = api && api.processMessage;
 if (typeof pm !== 'function') {
   console.error('RizqManager.processMessage not found');
   process.exit(1);
