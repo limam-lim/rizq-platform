@@ -298,7 +298,7 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 /* ── Section centering (clean — no glass overrides) ── */
 .hero-content{
   width:100%;
-  max-width:min(1080px,92vw);
+  max-width:min(960px,86vw);
   margin:0 auto;
   text-align:center;
   display:flex;
@@ -314,7 +314,7 @@ html[dir="rtl"] .hero-content,
 html[lang="ar"] .hero-content,
 body.rizq-lang-ar .hero-content{
   width:100%;
-  max-width:min(1080px,92vw);
+  max-width:min(960px,86vw);
 }
 
 .why-section > .section-header,
