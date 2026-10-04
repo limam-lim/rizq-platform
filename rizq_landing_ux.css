@@ -154,33 +154,21 @@ nav.nav-compact .nav-center{display:none}
   nav.nav-compact .nav-sticky-post{display:none!important}
 }
 
-/* ── Section jump bar — أخفّ بصرياً، لا ينافس الشريط الرئيسي ── */
+/* ── Section jump bar — مُلغى على desk/tablet (يسبب اختلاط مع شريط الأقسام) ── */
 .section-jump-bar{
-  position:fixed !important;top:72px;left:0;right:0;z-index:800;
-  display:flex;justify-content:center;gap:8px;flex-wrap:nowrap;
-  padding:6px 14px;background:rgba(7,13,30,.88);
-  border-bottom:1px solid rgba(201,168,76,.12);
-  backdrop-filter:blur(12px);
-  transform:translateY(-110%);opacity:0;pointer-events:none;
-  transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .3s;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  height:0 !important;
+  overflow:hidden !important;
+  transform:none !important;
 }
-.section-jump-bar::-webkit-scrollbar{display:none}
-.section-jump-bar.visible{transform:translateY(0);opacity:1;pointer-events:auto}
-.section-jump-bar a,.section-jump-bar button{
-  color:rgba(255,255,255,.82);text-decoration:none;font-size:11.5px;font-weight:650;
-  padding:5px 12px;border-radius:999px;white-space:nowrap;
-  background:transparent;border:1px solid transparent;
-  cursor:pointer;font-family:inherit;transition:all .22s;
-}
-.section-jump-bar a:hover,.section-jump-bar button:hover,
-.section-jump-bar a.active{
-  background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.35);color:var(--gold-light,#e8c96a);
-}
-.section-jump-bar a.jump-post{
-  background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-light,#e8c96a));
-  color:var(--royal-dark,#0f2347)!important;border-color:rgba(255,248,224,.35);
-  font-weight:800;
+.section-jump-bar.visible{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  opacity:0 !important;
 }
 
 /* ── Back to top ── */

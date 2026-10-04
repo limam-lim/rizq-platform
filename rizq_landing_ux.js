@@ -73,7 +73,12 @@
     if (nav) nav.classList.toggle('nav-compact', y > SCROLL_COMPACT);
     if (nav) nav.classList.toggle('scrolled', y > 30);
     if (backBtn) backBtn.classList.toggle('visible', y > SCROLL_TOP);
-    if (jumpBar) jumpBar.classList.toggle('visible', y > SCROLL_TOP);
+    /* لا تُظهر شريط القفز المكرر — الشريط الرئيسي يبقى وحده (نشر بين المعارض/المكاتب) */
+    if (jumpBar) {
+      jumpBar.classList.remove('visible');
+      jumpBar.setAttribute('aria-hidden', 'true');
+      jumpBar.hidden = true;
+    }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
