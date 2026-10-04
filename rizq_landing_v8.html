@@ -11910,20 +11910,24 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
         var vid  = document.getElementById('hero-featured-vid');
         var ph   = document.getElementById('hero-vid-ph');
         if (wrap && vid) {
-          vid.src = pv.heroUrl || pv.url;
+          var heroSrc = String(pv.heroUrl || pv.url || '');
+          /* لا تستخدم نسخ المنصة ذات العناوين المحروقة فوق الأيقونات */
+          if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(heroSrc)) {
+            heroSrc = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+          }
+          vid.src = heroSrc;
           vid.play().catch(function(){});
-          wrap.style.display = '';          // أظهر الـ wrapper
-          if (ph) ph.style.display = 'none'; // أخفِ الـ placeholder
-          // اسم المُعلِن
+          wrap.style.display = '';
+          if (ph) ph.style.display = 'none';
+          /* بيانات المعلن تحت الإطار فقط — بلا كتابات على مساحة الإعلان */
           if (pv.heroAdvertiser) {
             var advBar = document.getElementById('hero-vid-adv-bar');
             var advName = document.getElementById('hero-vid-adv-name');
             var advLoc  = document.getElementById('hero-vid-adv-loc');
             if (advName) advName.textContent = pv.heroAdvertiser;
-            if (advLoc && pv.heroAdvertiserLoc) advLoc.textContent = pv.heroAdvertiserLoc;
+            if (advLoc) advLoc.textContent = pv.heroAdvertiserLoc || '';
             if (advBar) advBar.style.display = 'block';
           }
-          // عداد المشاهدات
           if (pv.heroViews) {
             var vb = document.getElementById('hero-vid-views');
             if (vb) { vb.textContent = '👁 ' + pv.heroViews + ' مشاهدة/يوم'; vb.style.display = 'block'; }
