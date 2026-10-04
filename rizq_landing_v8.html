@@ -73,16 +73,20 @@ document.documentElement.classList.add('rizq-app-nav');
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
     display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
   }
+  html.rizq-app-nav #nav .logo-text{
+    gap:4px!important;
+  }
   html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{
     font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:20px!important;font-weight:900!important;
-    color:#F5E0A0!important;-webkit-text-fill-color:#F5E0A0!important;white-space:nowrap!important;
+    color:#C9A84C!important;-webkit-text-fill-color:#C9A84C!important;white-space:nowrap!important;
     overflow:visible!important;min-width:max-content!important;text-decoration:none!important;
     direction:rtl!important;unicode-bidi:isolate!important;line-height:1!important;
+    text-shadow:0 0 12px rgba(201,168,76,.28)!important;
   }
   html.rizq-app-nav #nav .logo-sub{
     display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;
-    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(232,201,106,.82)!important;
-    text-transform:uppercase!important;white-space:nowrap!important;
+    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(201,168,76,.82)!important;
+    text-transform:uppercase!important;white-space:nowrap!important;margin-top:0!important;
   }
 }
 </style>
@@ -162,9 +166,9 @@ nav.scrolled{
 }
 .logo-mark svg,.logo-mark-img svg{display:none}
 .logo-mark::after{display:none}
-.logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
-.logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-size:26px;font-weight:900;color:#F5E0A0;line-height:1;display:block;text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35);direction:rtl;unicode-bidi:isolate}
-.logo-text .logo-sub{font-size:8.5px;color:rgba(232,201,106,.82);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05;gap:4px}
+.logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-size:26px;font-weight:900;color:#C9A84C;-webkit-text-fill-color:#C9A84C;line-height:1;display:block;text-shadow:0 0 12px rgba(201,168,76,.28);direction:rtl;unicode-bidi:isolate}
+.logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.82);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:0;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
 .nav-center{display:flex;align-items:center;gap:10px;list-style:none;direction:inherit;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
 .nav-center::-webkit-scrollbar{display:none}
 .nav-center a,.nav-center .nav-link-btn{
