@@ -165,9 +165,8 @@
     var b = String(global.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
     if (b) return b;
     try {
-      if (location.port === '3000' || /rizq\.mr$/i.test(location.hostname)) {
-        return location.origin.replace(/\/$/, '');
-      }
+      var origin = String(location.origin || '').replace(/\/$/, '');
+      if (/^https?:\/\//i.test(origin)) return origin;
     } catch (e) {}
     return '';
   }
@@ -176,19 +175,41 @@
     var base = backendBase();
     if (!base) {
       render(null);
-      return;
+      return Promise.resolve(false);
     }
-    fetch(base + '/api/site-config', { cache: 'no-store' })
+    return fetch(base + '/api/site-config', { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
-        var social = data && data.ok && data.config && data.config.site && data.config.site.social;
-        render(social || null);
+        var social = data && data.ok && data.config && data.config.site
+          ? (data.config.site.social || null)
+          : null;
+        var wanted = activeItems(social).length;
+        render(social);
+        var root = document.getElementById(ROOT_ID);
+        if (!root && wanted > 0) return { mounted: false, wanted: wanted };
+        if (wanted > 0) {
+          return {
+            mounted: !!root.querySelector('.rzq-soc-btn'),
+            wanted: wanted
+          };
+        }
+        return { mounted: true, wanted: 0 };
       })
-      .catch(function () { render(null); });
+      .catch(function () {
+        render(null);
+        return { mounted: false, wanted: -1 };
+      });
   }
 
+  var _bootTries = 0;
   function boot() {
-    loadAndRender();
+    _bootTries += 1;
+    loadAndRender().then(function (state) {
+      // إعادة المحاولة إن تأخر حقن الفوتر بينما توجد روابط مفعّلة
+      if (state && state.wanted > 0 && !state.mounted && _bootTries < 8) {
+        setTimeout(boot, 350 * _bootTries);
+      }
+    });
   }
 
   global.RizqSocialLinksRefresh = loadAndRender;
@@ -198,4 +219,7 @@
   } else {
     boot();
   }
+  document.addEventListener('rizq:langchange', function () {
+    loadAndRender();
+  });
 })(typeof window !== 'undefined' ? window : this);
