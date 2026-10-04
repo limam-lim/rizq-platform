@@ -5414,9 +5414,11 @@ function buildFeaturedCards(){
 }
 
 var LANDING_ADS_MAX = 1000;
-var LANDING_ADS_PAGE = 24;
+/* نافذة ثابتة على الصفحة الرئيسية: 15 إعلان — «المزيد» يزيح +5/−5 */
+var LANDING_ADS_WINDOW = 15;
+var LANDING_ADS_STEP = 5;
 var _landingAdsCat = 'all';
-var _landingAdsVisible = LANDING_ADS_PAGE;
+var _landingAdsOffset = 0;
 var _landingAdsLoading = false;
 
 function _landingAdsPool(){
@@ -5446,9 +5448,13 @@ function _landingAdsFiltered(){
     return k.indexOf(cat) >= 0 || cat.indexOf(k) >= 0;
   });
 }
+function _landingAdsMaxOffset(total){
+  if(total <= LANDING_ADS_WINDOW) return 0;
+  return Math.max(0, total - LANDING_ADS_WINDOW);
+}
 function filterLandingAds(cat, btn){
   _landingAdsCat = cat || 'all';
-  _landingAdsVisible = LANDING_ADS_PAGE;
+  _landingAdsOffset = 0;
   document.querySelectorAll('.landing-ads-filter').forEach(function(b){
     var on = b.getAttribute('data-lad-cat') === _landingAdsCat;
     b.classList.toggle('is-active', on);
@@ -5459,9 +5465,12 @@ function filterLandingAds(cat, btn){
 function loadMoreLandingAds(){
   if(_landingAdsLoading) return;
   var filtered = _landingAdsFiltered();
-  if(_landingAdsVisible >= filtered.length) return;
+  var total = Math.min(filtered.length, LANDING_ADS_MAX);
+  var maxOff = _landingAdsMaxOffset(total);
+  if(_landingAdsOffset >= maxOff) return;
   _landingAdsLoading = true;
-  _landingAdsVisible = Math.min(_landingAdsVisible + LANDING_ADS_PAGE, filtered.length, LANDING_ADS_MAX);
+  /* نافذة منزلقة: +5 إعلانات جديدة وتختفي 5 قديمة */
+  _landingAdsOffset = Math.min(_landingAdsOffset + LANDING_ADS_STEP, maxOff);
   buildLandingAds(false);
   setTimeout(function(){ _landingAdsLoading = false; }, 120);
 }
@@ -5503,22 +5512,30 @@ function _landingAdCardHtml(a, fr){
 function buildLandingAds(resetVisible){
   var grid = document.getElementById('landing-ads-grid') || document.querySelector('#listings .listings-grid');
   if(!grid) return;
-  if(resetVisible) _landingAdsVisible = LANDING_ADS_PAGE;
+  if(resetVisible) _landingAdsOffset = 0;
   var fr = typeof isAr !== 'undefined' && !isAr;
   var filtered = _landingAdsFiltered();
   var total = Math.min(filtered.length, LANDING_ADS_MAX);
-  if(_landingAdsVisible < LANDING_ADS_PAGE) _landingAdsVisible = LANDING_ADS_PAGE;
-  if(_landingAdsVisible > total) _landingAdsVisible = Math.max(total, 0);
-  var items = filtered.slice(0, _landingAdsVisible);
+  var maxOff = _landingAdsMaxOffset(total);
+  if(_landingAdsOffset < 0) _landingAdsOffset = 0;
+  if(_landingAdsOffset > maxOff) _landingAdsOffset = maxOff;
+  var items = filtered.slice(_landingAdsOffset, _landingAdsOffset + LANDING_ADS_WINDOW);
+  var from = total ? (_landingAdsOffset + 1) : 0;
+  var to = _landingAdsOffset + items.length;
+  var atEnd = !total || _landingAdsOffset >= maxOff;
 
   var countEl = document.getElementById('landing-ads-count');
   if(countEl){
     if(!total){
       countEl.textContent = fr ? 'Aucune annonce pour le moment' : 'لا توجد إعلانات بعد';
+    } else if(total <= LANDING_ADS_WINDOW){
+      countEl.textContent = fr
+        ? (items.length + ' annonce' + (items.length > 1 ? 's' : '') + ' sur la page')
+        : (items.length + ' إعلان على الصفحة');
     } else {
       countEl.textContent = fr
-        ? ('Affichage ' + items.length + ' / ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : '') + ' annonces')
-        : ('عرض ' + items.length + ' من ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : '') + ' إعلان');
+        ? ('Fenêtre ' + from + '–' + to + ' / ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : ''))
+        : ('نافذة ' + from + '–' + to + ' من ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : ''));
     }
   }
 
@@ -5541,19 +5558,23 @@ function buildLandingAds(resetVisible){
     if(!total){
       more.innerHTML = '';
       more.classList.remove('is-done');
-    } else if(items.length >= total){
+    } else if(atEnd){
       more.classList.add('is-done');
       more.innerHTML = '<div class="landing-ads-more-inner"><span class="landing-ads-more-lbl">'
-        + (fr ? ('Fin — ' + total + ' annonces') : ('تم عرض كل الإعلانات الظاهرة — ' + total))
+        + (fr
+          ? ('Fenêtre d’accueil limitée à ' + Math.min(LANDING_ADS_WINDOW, total) + ' — voir tout via Annonces')
+          : ('نافذة الصفحة الرئيسية محدودة بـ ' + Math.min(LANDING_ADS_WINDOW, total) + ' — الباقي عبر صفحة الإعلانات'))
         + '</span></div>';
     } else {
       more.classList.remove('is-done');
       more.innerHTML = '<div class="landing-ads-more-inner">'
         + '<span class="landing-ads-more-lbl">'
-        + (fr ? ('Affichage ' + items.length + ' / ' + total + ' — chargez plus') : ('عرض ' + items.length + ' من ' + total + ' — حمّل المزيد'))
+        + (fr
+          ? (items.length + ' visibles — +' + LANDING_ADS_STEP + '/−' + LANDING_ADS_STEP)
+          : (items.length + ' ظاهرة — +' + LANDING_ADS_STEP + ' جدد / −' + LANDING_ADS_STEP + ' قديمة'))
         + '</span>'
         + '<button type="button" class="landing-ads-more-btn" onclick="loadMoreLandingAds()">'
-        + (fr ? 'Charger plus' : 'تحميل المزيد')
+        + (fr ? 'Afficher plus' : 'عرض المزيد')
         + '</button></div>';
     }
   }
