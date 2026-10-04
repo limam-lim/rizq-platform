@@ -862,8 +862,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     gap:4px;
     justify-content:space-evenly;
     justify-self:center;
-    width:min(1280px, calc(100vw - 56px)) !important;
-    max-width:calc(100% - 40px) !important;
+    width:min(1400px, calc(100vw - 72px)) !important;
+    max-width:calc(100% - 24px) !important;
     padding:7px 22px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-account-btn,
