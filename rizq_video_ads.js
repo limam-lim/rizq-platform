@@ -199,21 +199,24 @@
     }
 
     function paintMeta(ad) {
+      /* النصوص تحت الفيديو فقط — لا تُرسم فوق مساحة الإعلان */
       if (advBar && advName) {
-        advName.innerHTML = ad.isPlatform
-          ? 'رزق · فيديو المنصة'
-          : (esc(ad.advertiser || 'Rizq ADS') + badgeHtml(ad));
-        if (advLoc) {
-          advLoc.textContent = ad.isPlatform
-            ? 'يبدأ الحلقة · ويعود بعد إعلانات المعلنين'
-            : '';
+        if (ad.isPlatform) {
+          /* أثناء فيديو المنصة: بلا عنوان كبير يغطي الشاشة */
+          advName.textContent = '';
+          if (advLoc) advLoc.textContent = '';
+          advBar.style.display = 'none';
+          advBar.onclick = null;
+        } else {
+          advName.innerHTML = esc(ad.advertiser || 'Rizq ADS') + badgeHtml(ad);
+          if (advLoc) advLoc.textContent = '';
+          advBar.style.display = 'block';
+          advBar.style.cursor = 'pointer';
+          advBar.onclick = function () {
+            if (!ad.accountId) return;
+            trackEvent(ad.accountId, 'click');
+          };
         }
-        advBar.style.display = 'block';
-        advBar.style.cursor = ad.isPlatform ? 'default' : 'pointer';
-        advBar.onclick = function () {
-          if (ad.isPlatform || !ad.accountId) return;
-          trackEvent(ad.accountId, 'click');
-        };
       }
     }
 

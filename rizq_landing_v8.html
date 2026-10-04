@@ -913,30 +913,33 @@ html[lang="fr"] .hero-subtitle-secondary{
   .hero-vid-ph-film-bar{height:20px}
   .hero-vid-ph-corner{width:26px;height:26px}
 }
-/* controls overlay */
+/* controls: mute only on video — لا كتابات تغطي مساحة الإعلان */
 .hero-vid-ctrl{position:absolute;inset:0;z-index:5;pointer-events:none}
 .hero-vid-sound-btn{
-  position:absolute;top:14px;right:14px;
+  position:absolute;top:10px;right:10px;
   background:rgba(5,10,22,.72);backdrop-filter:blur(10px);
   border:1px solid rgba(201,168,76,.35);color:#fff;
-  width:40px;height:40px;border-radius:50%;cursor:pointer;
-  font-size:16px;display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  font-size:15px;display:flex;align-items:center;justify-content:center;
   transition:all .25s;pointer-events:auto;
   box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
 .hero-vid-sound-btn:hover{background:rgba(201,168,76,.88);border-color:var(--gold);color:var(--royal-dark);transform:scale(1.06)}
-.hero-vid-adv-bar{
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(transparent,rgba(5,10,22,.92));
-  padding:48px 18px 16px;pointer-events:auto;display:none;
+/* بيانات المعلن تحت الفيديو — خارج مساحة الصورة */
+.hero-vid-meta{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-top:10px;padding:0 4px;position:relative;z-index:2;min-height:0;
 }
-.hero-vid-adv-name{font-size:15px;font-weight:800;color:#fff;margin-bottom:2px}
-.hero-vid-adv-loc{font-size:11.5px;color:rgba(255,255,255,.65)}
+.hero-vid-adv-bar{
+  position:static;background:none;padding:0;pointer-events:auto;display:none;flex:1;min-width:0;
+}
+.hero-vid-adv-name{font-size:13px;font-weight:800;color:rgba(255,248,224,.95);margin-bottom:2px}
+.hero-vid-adv-loc{font-size:11px;color:rgba(232,214,160,.72)}
 .hero-vid-views{
-  position:absolute;bottom:16px;left:16px;
+  position:static;
   background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);
-  font-size:11px;font-weight:800;padding:6px 14px;border-radius:100px;
-  pointer-events:auto;display:none;
+  font-size:11px;font-weight:800;padding:5px 12px;border-radius:100px;
+  pointer-events:auto;display:none;flex-shrink:0;
   font-family:'Cairo','Segoe UI','Arial',sans-serif;
   box-shadow:0 4px 14px rgba(201,168,76,.35);
 }
@@ -3431,13 +3434,15 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             </div>
           </div>
           <div class="hero-vid-ctrl">
-            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت">🔇</button>
-            <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
-              <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
-              <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
-            </div>
-            <div class="hero-vid-views" id="hero-vid-views"></div>
+            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
           </div>
+        </div>
+        <div class="hero-vid-meta" id="hero-vid-meta">
+          <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
+            <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
+            <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
+          </div>
+          <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
         <div class="hero-vid-cta-bar">
           <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
