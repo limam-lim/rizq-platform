@@ -1364,9 +1364,10 @@
         var mod = el.getAttribute('data-rizq-module');
         hdr = mod === 'store' ? 'stores' : mod === 'corp' ? 'showrooms' : mod === 'office' ? 'offices' : mod;
       }
-      if (el.classList.contains('nav-dropdown-li') || el.id === 'rizq-hdr-more-wrap' || el.querySelector('.nav-dropdown-trigger, .nav-phone-more-only, #rizq-hdr-more')) hdr = 'more';
-      if (el.classList.contains('rizq-nav-post') || el.id === 'rizq-hdr-post' || el.classList.contains('rizq-hdr-post') || el.querySelector('.nav-post-plus')) hdr = 'post';
-      if (el.classList.contains('rizq-nav-packs') || el.querySelector('[data-hdr="packs"]')) hdr = 'packs';
+      if (el.classList.contains('nav-dropdown-li') || el.id === 'rizq-hdr-more-wrap' || el.querySelector(':scope > .nav-dropdown-trigger, :scope > .nav-phone-more-only, :scope > #rizq-hdr-more')) hdr = 'more';
+      if (el.classList.contains('rizq-nav-post') || el.id === 'rizq-hdr-post' || el.classList.contains('rizq-hdr-post') || el.querySelector(':scope > .nav-post-plus, :scope > a.nav-post-plus')) hdr = 'post';
+      /* لا تستخدم querySelector داخل القائمة المنسدلة — يخلط المزيد مع الباقات */
+      if (el.classList.contains('rizq-nav-packs') || el.classList.contains('nav-phone-packs-li')) hdr = 'packs';
       if (el.getAttribute('data-rizq-nav-extra') === 'ads') hdr = 'ads';
       return hdr;
     }
@@ -1385,7 +1386,7 @@
       }
       if (!phoneSplit) {
         if (hdr === 'packs' || el.classList.contains('rizq-nav-packs') || el.classList.contains('nav-phone-packs-li')) {
-          el.style.display = 'none';
+          el.style.setProperty('display', 'none', 'important');
           return;
         }
         if (deskOrder[hdr] != null) {

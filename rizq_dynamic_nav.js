@@ -241,7 +241,7 @@
         if (packs.setAttribute) packs.setAttribute('data-nav-order', '9');
         /* سطح المكتب/تابلت: أخفِ من الشريط — تبقى في قائمة المزيد */
         if (!phone) {
-          packs.style.display = 'none';
+          packs.style.setProperty('display', 'none', 'important');
           packs.setAttribute('data-nav-desk-hidden', '1');
         } else {
           packs.style.removeProperty('display');
