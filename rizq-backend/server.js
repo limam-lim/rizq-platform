@@ -499,10 +499,19 @@ app.post('/api/agent/toggle', (req, res) => {
   const active = b.active;
   const accountId = b.accountId;
   const token = extractAccountToken(req);
-  // السرّ من الرأس فقط في الإنتاج؛ body مسموح في التطوير للتوافق مع خوادم المكالمات
+  // السرّ من الرأس فقط؛ body مسموح في التطوير فقط. في الإنتاج يُرفض من المتصفح.
   const secretHdr = req.header('x-rizq-secret') || '';
   const secretBody = (!isProdEnv() && b.secret) ? b.secret : '';
-  let authorized = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  const secretOk = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  let authorized = false;
+  if (secretOk) {
+    if (isProdEnv() && isBrowserLikeRequest(req)) {
+      // لا نسمح بتمرير BACKEND_SHARED_SECRET من المتصفح في الإنتاج
+      authorized = false;
+    } else {
+      authorized = true;
+    }
+  }
   if (!authorized && accountId && token) {
     const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {

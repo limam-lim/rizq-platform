@@ -483,10 +483,10 @@ const { requireSatelliteSecret, timingSafeEqualStr } = require('./rizq-backend/l
 //  { subscriberPhone, active: true|false, secret: 'xxx' }
 // ══════════════════════════════════════════════════════════
 app.post('/api/agent/toggle', (req, res) => {
-  const { subscriberPhone, active, secret } = req.body || {};
-  const expectedSecret = process.env.RIZQ_API_SECRET || '';
-  const headerSecret = req.header('x-rizq-secret') || '';
-  const got = headerSecret || secret || '';
+  const { subscriberPhone, active } = req.body || {};
+  // رأس فقط — لا body/query حتى لا يتسرب السر في السجلات أو Referer
+  const expectedSecret = process.env.RIZQ_API_SECRET || process.env.BACKEND_SHARED_SECRET || '';
+  const got = req.header('x-rizq-secret') || req.header('x-api-secret') || '';
   if (!expectedSecret || !got || !timingSafeEqualStr(got, expectedSecret)) {
     return res.status(403).json({ ok: false, error: 'غير مصرّح' });
   }
