@@ -768,7 +768,7 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   align-items:center;
   gap:10px;
   padding:10px 22px 10px 16px;
-  border-radius:999px;
+  border-radius:8px;
   background:
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
