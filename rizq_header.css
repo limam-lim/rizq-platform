@@ -991,21 +991,29 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .nav-fav-btn,
   html.rizq-app-nav #nav .nav-fav-btn{
     display:inline-flex !important;
-    align-items:center;gap:5px;
-    min-width:auto;justify-content:center;
+    align-items:center;
+    gap:0 !important;
+    min-width:36px !important;
+    justify-content:center;
     text-decoration:none !important;
+    padding:7px 9px !important;
+    border-radius:999px !important;
   }
   html.rizq-app-nav .nav-fav-ico,
   html.rizq-app-nav .rizq-hdr-fav-ico{
     color:#E8C96A;font-weight:800;-webkit-text-fill-color:#E8C96A;
     text-shadow:0 0 10px rgba(201,168,76,.55);
+    font-size:15px !important;
   }
   html.rizq-app-nav .nav-fav-btn.has-favs .nav-fav-ico,
   html.rizq-app-nav .rizq-hdr-fav.has-favs .rizq-hdr-fav-ico{
     color:#FFD700;-webkit-text-fill-color:#FFD700;
     text-shadow:0 0 14px rgba(255,215,0,.6);
   }
-  html.rizq-app-nav .nav-fav-lbl{font-size:13px;font-weight:800;color:#E8C96A}
+  html.rizq-app-nav .nav-fav-lbl{
+    display:none !important;
+    font-size:13px;font-weight:800;color:#E8C96A;
+  }
   @media (max-width:520px){
     html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{display:none}
     html.rizq-app-nav #rizq-desk-nav .nav-fav-btn{padding:8px 11px;min-width:38px}
