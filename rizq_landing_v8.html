@@ -5837,15 +5837,15 @@ function buildStyleIdeas(reshuffle){
     if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
+    /* المرافقون يُعاد استخدامهم بين البطاقات — المهم أن كل بلاطة في البطاقة منتج مختلف */
     var companionPool = (styleGendered.length ? styleGendered : pool).filter(function(a){
-      return a && !usedIds[String(a.id)];
+      return a && !(primary && String(a.id) === String(primary.id));
     });
     var companions = primary
       ? (typeof _styPickLookCompanions === 'function'
           ? _styPickLookCompanions(primary, companionPool, gender, 2)
           : _styPickCompanions(primary, companionPool, gender, 2))
       : [];
-    companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
     var name = fr ? tpl.fr : tpl.ar;
@@ -5888,14 +5888,13 @@ function buildStyleIdeas(reshuffle){
     var adEx = extras[ex];
     usedIds[String(adEx.id)] = 1;
     var companionPoolEx = (gendered.length ? gendered : pool).filter(function(a){
-      return a && !usedIds[String(a.id)];
+      return a && String(a.id) !== String(adEx.id);
     });
     var companionsEx = (typeof _styPickLookCompanions === 'function')
       ? _styPickLookCompanions(adEx, companionPoolEx, gender, 2)
       : ((typeof _styPickCompanions === 'function')
           ? _styPickCompanions(adEx, companionPoolEx, gender, 2)
           : []);
-    companionsEx.forEach(function(c){ usedIds[String(c.id)] = 1; });
     var itemsEx = [adEx].concat(companionsEx);
     while(itemsEx.length < 3) itemsEx.push(null);
     var emEx = emojiSets[ex % emojiSets.length];
