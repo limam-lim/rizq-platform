@@ -115,6 +115,29 @@
     }
   }
 
+  function dockBrowsePanel(off) {
+    if (!browsePanel || !browseSpacer) return;
+    browseSpacer.style.height = browsePanel.offsetHeight + 'px';
+    browseSpacer.classList.add('is-active');
+    // أخرج اللوحة من .hero-stage (فيه transform من fadeUp) وإلا fixed لا يثبت للمتصفح
+    document.body.appendChild(browsePanel);
+    browsePanel.classList.add('is-stuck');
+    browsePanel.style.top = off + 'px';
+    browseStuck = true;
+  }
+
+  function undockBrowsePanel() {
+    if (!browsePanel || !browseSpacer) return;
+    browsePanel.classList.remove('is-stuck');
+    browsePanel.style.top = '';
+    if (browseSpacer.parentNode) {
+      browseSpacer.parentNode.insertBefore(browsePanel, browseSpacer.nextSibling);
+    }
+    browseSpacer.classList.remove('is-active');
+    browseSpacer.style.height = '0px';
+    browseStuck = false;
+  }
+
   function syncBrowseSticky() {
     if (!browsePanel) return;
     ensureBrowseSpacer();
@@ -123,26 +146,14 @@
     if (!browseStuck) {
       measureBrowseAnchor();
       if (y + off >= browseAnchorY - 1) {
-        if (browseSpacer) {
-          browseSpacer.style.height = browsePanel.offsetHeight + 'px';
-          browseSpacer.classList.add('is-active');
-        }
-        browsePanel.classList.add('is-stuck');
-        browsePanel.style.top = off + 'px';
-        browseStuck = true;
+        dockBrowsePanel(off);
       }
     } else if (y + off < browseAnchorY - 1) {
-      browsePanel.classList.remove('is-stuck');
-      browsePanel.style.top = '';
-      if (browseSpacer) {
-        browseSpacer.classList.remove('is-active');
-        browseSpacer.style.height = '0px';
-      }
-      browseStuck = false;
+      undockBrowsePanel();
       measureBrowseAnchor();
     } else {
       browsePanel.style.top = off + 'px';
-      if (browseSpacer) browseSpacer.style.height = browsePanel.offsetHeight + 'px';
+      if (browseSpacer) browseSpacer.style.height = Math.max(browsePanel.offsetHeight, 1) + 'px';
     }
   }
 
@@ -150,13 +161,7 @@
   window.addEventListener('scroll', syncBrowseSticky, { passive: true });
   window.addEventListener('resize', function () {
     if (browsePanel && browseStuck) {
-      browseStuck = false;
-      browsePanel.classList.remove('is-stuck');
-      browsePanel.style.top = '';
-      if (browseSpacer) {
-        browseSpacer.classList.remove('is-active');
-        browseSpacer.style.height = '0px';
-      }
+      undockBrowsePanel();
     }
     measureBrowseAnchor();
     syncBrowseSticky();
