@@ -5988,14 +5988,16 @@ function buildShowroomModels(reshuffle){
       return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
     }));
     if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
+    /* إن نفدت غير المستخدمة — أعد من نفس الصنف فقط (لا عقارات في السيارات) */
+    if(!catPool.length) catPool = pool.slice();
     var primary = catPool.length ? (typeof _styShuffle==='function' ? _styShuffle(catPool)[0] : catPool[0]) : null;
     if(primary) usedIds[String(primary.id)] = 1;
     var companions = [];
     if(primary){
       companions = (typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(
-        pool.filter(function(a){ return String(a.id) !== String(primary.id) && !usedIds[String(a.id)]; })
+        pool.filter(function(a){ return String(a.id) !== String(primary.id); })
       ).slice(0, 2);
-      companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
+      /* المرافقون لا يُستهلكون من usedIds حتى تبقى بلاطة لكل بطاقة قابلة للفتح */
     }
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
