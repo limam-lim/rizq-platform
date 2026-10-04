@@ -75,10 +75,19 @@ function setupVisitTrackingAPI(app, trackVisitLimiter, getAccountRecord, getMain
     const mainAcc = getMainAccount ? getMainAccount(id) : null;
     const pkgRec = getAccountRecord ? getAccountRecord(id) : null;
     if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
-    const validToken = (mainAcc && mainAcc.accessToken) || (pkgRec && pkgRec.accessToken) || null;
+    if (!token) return res.status(401).json({ error: 'unauthorized' });
     const { timingSafeEqualStr } = require('./lib/secureCompare');
-    if (!token || !validToken || !timingSafeEqualStr(token, validToken)) {
-      return res.status(401).json({ error: 'unauthorized' });
+    const { activeOwnerMatches } = require('./middleware/accountAuth');
+    // حساب معلّق/غير معتمد: لا إحصائيات حتى لو بقي توكن قديم عند العميل
+    if (mainAcc) {
+      if (!activeOwnerMatches(mainAcc, token)) {
+        return res.status(401).json({ error: 'unauthorized' });
+      }
+    } else {
+      const validToken = (pkgRec && pkgRec.accessToken) || null;
+      if (!validToken || !timingSafeEqualStr(token, validToken)) {
+        return res.status(401).json({ error: 'unauthorized' });
+      }
     }
     res.json({ ok: true, stats: getVisitStats(id) });
   });

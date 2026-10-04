@@ -193,6 +193,9 @@ async function main() {
     const staticTenderAsset = await req('GET', '/uploads/tenders/test/0.webp');
     ok('tender static assets blocked', staticTenderAsset.status === 403, 'status=' + staticTenderAsset.status);
 
+    const staticReceiptAsset = await req('GET', '/uploads/receipts/ACC_t_sub_t_deadbeef.jpg');
+    ok('receipt static assets blocked', staticReceiptAsset.status === 403, 'status=' + staticReceiptAsset.status);
+
     repos.setPackage(tenderPkgKey, {
       accountId: tenderPkgKey,
       accountType: 'store',

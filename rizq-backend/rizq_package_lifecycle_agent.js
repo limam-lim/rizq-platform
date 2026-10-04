@@ -657,28 +657,30 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     const rec = getAccountRecord(req.params.id);
     if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
     const token = String(req.header('x-account-token') || '').trim();
+    if (!token) return res.status(401).json({ error: 'unauthorized' });
     const { timingSafeEqualStr } = require('./lib/secureCompare');
-    const pkgTokenOk = !!(token && rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
-    let ownerOk = false;
+    const { activeOwnerMatches, isAccountActive, tokenMatchesAccount } = require('./middleware/accountAuth');
     const baseId = String(req.params.id).split('::')[0];
-    if (!pkgTokenOk && token) {
-      const mainRec = getAccountRecord(baseId);
-      if (mainRec && mainRec.accessToken && timingSafeEqualStr(token, mainRec.accessToken)) {
-        ownerOk = true;
-      }
-      if (!ownerOk && accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
-        try {
-          const list = accountsHelpers.readAccounts();
-          const acc = list.find((a) => a && a.id === baseId);
-          if (acc && acc.accessToken && timingSafeEqualStr(token, String(acc.accessToken))) {
-            ownerOk = true;
-          }
-        } catch (e) { /* ignore */ }
-      }
+    let mainAcc = null;
+    if (accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
+      try {
+        mainAcc = accountsHelpers.readAccounts().find((a) => a && a.id === baseId) || null;
+      } catch (e) { /* ignore */ }
     }
-    if (!token || (!pkgTokenOk && !ownerOk)) {
+    // حساب معلّق/غير معتمد: لا فواتير حتى مع توكن سجل الباقة القديم
+    if (mainAcc && !isAccountActive(mainAcc)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
+    const pkgTokenOk = !!(rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
+    const mainRec = !pkgTokenOk ? getAccountRecord(baseId) : null;
+    const ownerOk = pkgTokenOk
+      || !!(mainRec && mainRec.accessToken && timingSafeEqualStr(token, mainRec.accessToken))
+      || !!(mainAcc && tokenMatchesAccount(mainAcc, token));
+    if (!ownerOk) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
+    // activeOwnerMatches محفوظ للاستخدام المستقبلي/الاختبارات — لا نكسر مسار توكن سجل الباقة
+    void activeOwnerMatches;
     const { accessToken, ...safe } = rec;
     let entitlements = null;
     try {

@@ -124,7 +124,7 @@ function scorePackageRequest(req, aiResult) {
   const flags = [].concat((aiResult && aiResult.notes) || []);
   let tier = tierFromPlausibility(level, flags);
   const reasons = [];
-  if (!req || !req.receiptImage) {
+  if (!req || (!req.receiptImage && !req.receiptPath)) {
     reasons.push('no_receipt');
     tier = TIER.RED;
   }

@@ -44,4 +44,21 @@ function tokenMatchesAccount(acc, token) {
   return false;
 }
 
-module.exports = { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount };
+/** حساب معتمد وغير معلّق — شرط مشترك لمسارات المالك. */
+function isAccountActive(acc) {
+  return !!(acc && acc.status === 'approved' && !acc.suspended);
+}
+
+/** ملكية فعّالة: حساب نشط + توكن مطابق (access أو dash). */
+function activeOwnerMatches(acc, token) {
+  return isAccountActive(acc) && tokenMatchesAccount(acc, token);
+}
+
+module.exports = {
+  isProdEnv,
+  extractAccountToken,
+  extractDashToken,
+  tokenMatchesAccount,
+  isAccountActive,
+  activeOwnerMatches,
+};
