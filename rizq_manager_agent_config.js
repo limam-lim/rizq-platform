@@ -479,11 +479,13 @@ function _langSwitchReply(targetLang) {
 function _detectLang(text) {
   if (!text) return 'ar';
   var lower = text.toLowerCase();
-  var hs = ['كيفاش','كيفاه','شنهو','شنو هو','تبي','حابّ','وش راك','الزين','نعاونك','بغيت','شحال','شحّال','ماكو','كاين','أهلين','ماشي مشكل'];
-  for (var i=0;i<hs.length;i++) if (text.indexOf(hs[i])!==-1) return 'hs';
-  if (/bonjour|merci|comment|je veux|pouvez|svp|qu est|acheter|vendre|prix|annonce|forfait|combien/.test(lower)) return 'fr';
-  if (/hello|thanks|how|what|can you|please|help|buy|sell|register|price|trust|seller/.test(lower)) return 'en';
-  if (/hola|como est|buenos|gracias|por favor|qu[eé] es|quiero|vender|comprar|ayuda|precio|cu[aá]nto/.test(lower)) return 'es';
+  // حسانية موريتانية — قبل الفصحى
+  if (/كيفاش|كيفاه|كيفة|شنهو|شنهوا|شنهي|شنو\s*هو|اشنو|اش\s*تبي|تبيها|تبيه|نبيه|نبي\s|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|اشحال|ماكو|ماكاش|كاين|نعاونك|راهي|راهو|الزين|حسانية|hassani|وش\s*راك|ماشي\s*مشكل|أهلين|اهلين|أيوه|ايوه|تاع|متاع|هاذي|هذاك|صايي|برك|خلّيني|خليني|مانعرف|عطيني|وين |فين |نواكشوط|انواكشوط|موريتان|رزق\s*معاك|شنو /.test(text)) return 'hs';
+  if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+  if (/bonjour|merci|comment|je veux|pouvez|svp|qu est|acheter|vendre|prix|annonce|forfait|combien|salut|bonsoir/.test(lower)) return 'fr';
+  if (/hola|como est|buenos|gracias|por favor|qu[eé] es|quiero|vender|comprar|ayuda|precio|cu[aá]nto|anuncio/.test(lower)) return 'es';
+  if (/hello|thanks|how|what|can you|please|help|buy|sell|register|price|trust|seller|hi\b|hey\b/.test(lower)) return 'en';
+  if (/[a-z]/i.test(text)) return 'en';
   return 'ar';
 }
 
@@ -572,13 +574,12 @@ function processMessage(userMessage, context) {
   context = context || {};
   var text  = (userMessage || '').trim();
   var lower = text.toLowerCase().replace(/[\u064B-\u0652]/g,'').replace(/[\u0623\u0625\u0622]/g,'\u0627').replace(/\u0629/g,'\u0647');
-  // كشف اللغة: من النص أولاً، ثم من إعداد الواجهة كاحتياطي
-  var lang = (context.lang && ['ar', 'hs', 'fr', 'en', 'es'].indexOf(String(context.lang)) !== -1)
-    ? String(context.lang)
-    : _detectLang(text);
-  if (lang === 'ar' && /^[\d\s?.!،,]+$/.test(text) && (context.uiLang || context.lang)) {
-    lang = context.uiLang || context.lang;
+  // كشف اللغة من رسالة المستخدم الحالية — لا تثبت على لغة جلسة سابقة
+  var lang = _detectLang(text);
+  if (!text || /^[\d\s?.!،,؟]+$/.test(text)) {
+    lang = context.uiLang || context.lang || lang;
   }
+  if (['ar', 'hs', 'fr', 'en', 'es'].indexOf(String(lang)) === -1) lang = 'ar';
 
   if (_isBlocked(text)) {
     _escalateToHuman(text, lang, context, 'blocked');
