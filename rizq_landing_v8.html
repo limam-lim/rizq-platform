@@ -2385,9 +2385,10 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   border-radius:10px;
   letter-spacing:.25px;
   transition:background .22s ease,color .22s ease,box-shadow .22s ease,transform .22s ease;
-  cursor:default;
+  cursor:pointer;
   box-shadow:none;
   text-shadow:none;
+  text-decoration:none;
   position:relative;
   overflow:hidden;
   min-width:0;
@@ -2395,6 +2396,10 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   text-align:center;
   box-sizing:border-box;
   white-space:nowrap;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  -webkit-tap-highlight-color:transparent;
 }
 .hero-pill::before{display:none}
 .hero-pill:hover{
@@ -2403,6 +2408,16 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   transform:translateY(-1px);
   box-shadow:0 6px 16px rgba(13,27,42,.24);
   color:#FFE279;
+  text-decoration:none;
+}
+.hero-pill:focus-visible{
+  outline:2px solid rgba(201,168,76,.85);
+  outline-offset:2px;
+  color:#0F2347;
+}
+.hero-pill:active{
+  transform:translateY(0);
+  box-shadow:0 2px 8px rgba(13,27,42,.2);
 }
 .hero-pill-sep{
   align-self:center;
@@ -3316,12 +3331,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <p class="hero-subtitle-primary" id="hero-sub-primary">خيارك الأول لفتح آفاق جديدة لأعمالك</p>
         <p class="hero-subtitle-secondary" id="hero-sub-secondary">حيث يلتقي كل الموريتانيين</p>
       </div>
-      <div class="hero-pills" role="group" aria-label="بيع · اشتر · تميّز">
-        <span class="hero-pill" data-t="hero-pill-sell">بيع</span>
+      <div class="hero-pills" role="navigation" aria-label="بيع · اشتر · تميّز" id="hero-pills-nav">
+        <a class="hero-pill" href="rizq_post.html" data-t="hero-pill-sell" data-pill="sell" aria-label="بيع — انشر إعلانك">بيع</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <span class="hero-pill" data-t="hero-pill-buy">اشتر</span>
+        <a class="hero-pill" href="rizq_browse.html" data-t="hero-pill-buy" data-pill="buy" aria-label="اشتر — تصفّح الإعلانات">اشتر</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <span class="hero-pill" data-t="hero-pill-feat">تميّز</span>
+        <a class="hero-pill" href="#pricing" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
       </div>
     </div>
     <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
@@ -7873,11 +7888,18 @@ function applyLandingLang(toAr) {
     el.style.fontSize = isAr ? '' : '8.5px';
   });
 
-  // Hero pills (Sell · Buy · Stand out) — نصوص نظيفة داخل الكبسولة الزجاجية
+  // Hero pills (Sell · Buy · Stand out) — أزرار روابط داخل الشريط
   const pills = document.querySelectorAll('.hero-pill');
   const pillsAR = ['بيع','اشتر','تميّز'];
   const pillsFR = ['Vendre','Acheter','Briller'];
-  pills.forEach((el,i)=>{ el.textContent = isAr ? (pillsAR[i]||el.textContent) : (pillsFR[i]||el.textContent); });
+  const pillsAriaAR = ['بيع — انشر إعلانك','اشتر — تصفّح الإعلانات','تميّز — باقات التمييز'];
+  const pillsAriaFR = ['Vendre — publier une annonce','Acheter — parcourir les annonces','Briller — forfaits premium'];
+  pills.forEach((el,i)=>{
+    el.textContent = isAr ? (pillsAR[i]||el.textContent) : (pillsFR[i]||el.textContent);
+    if (pillsAriaAR[i]) el.setAttribute('aria-label', isAr ? pillsAriaAR[i] : pillsAriaFR[i]);
+  });
+  const pillsNav = document.getElementById('hero-pills-nav');
+  if (pillsNav) pillsNav.setAttribute('aria-label', isAr ? 'بيع · اشتر · تميّز' : 'Vendre · Acheter · Briller');
 
   // Hero tagline — يُترجَم عبر data-t؛ هنا احتياط إن غاب المفتاح
   const heroTag = document.querySelector('.hero-tagline');
