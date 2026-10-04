@@ -1063,6 +1063,21 @@ main, .page-content.active, .main-content, .results-area,
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:20px;max-width:920px">
+        <div class="card-header">
+          <div class="card-title" data-t="cfg-social-title">🔗 تابعنا — روابط المنصات</div>
+        </div>
+        <div style="padding:14px 18px 18px">
+          <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;line-height:1.7" data-t="cfg-social-desc">
+            ضع رابط كل منصة وفعّلها عندما يكون الحساب جاهزاً. الأزرار المعطّلة لا تظهر للزوار بجانب «تواصل معنا».
+          </p>
+          <div id="cfg-social-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div style="margin-top:12px">
+            <button class="btn-sm btn-primary" onclick="saveSiteConfig()" data-t="cfg-save-btn">💾 حفظ</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ══ إدارة الأقسام — إطلاق تدريجي (طلب Limam 03/08/2026) ══
@@ -3637,21 +3652,90 @@ function resetExtraCategories(){
 }
 
 // ══ SITE CONFIG ══
+const SITE_SOCIAL_DEFS = [
+  { key:'facebook',  label:'Facebook',  label_fr:'Facebook',  ph:'https://facebook.com/…' },
+  { key:'x',         label:'X (تويتر)', label_fr:'X (Twitter)', ph:'https://x.com/…' },
+  { key:'instagram', label:'Instagram', label_fr:'Instagram', ph:'https://instagram.com/…' },
+  { key:'youtube',   label:'YouTube',   label_fr:'YouTube',   ph:'https://youtube.com/…' },
+  { key:'tiktok',    label:'TikTok',    label_fr:'TikTok',    ph:'https://tiktok.com/@…' },
+  { key:'linkedin',  label:'LinkedIn',  label_fr:'LinkedIn',  ph:'https://linkedin.com/company/…' }
+];
+
+function defaultSiteSocial(){
+  var o = {};
+  SITE_SOCIAL_DEFS.forEach(function(d){ o[d.key] = { enabled:false, url:'' }; });
+  return o;
+}
+
+function normalizeSiteSocialLocal(raw){
+  var out = defaultSiteSocial();
+  if(!raw || typeof raw !== 'object') return out;
+  SITE_SOCIAL_DEFS.forEach(function(d){
+    var item = raw[d.key];
+    if(!item || typeof item !== 'object') return;
+    out[d.key] = {
+      enabled: !!item.enabled,
+      url: String(item.url || '').trim().slice(0, 500)
+    };
+  });
+  return out;
+}
+
 const DEFAULT_SITE_CONFIG = {
   sitename:'رزق | Rizq', tagline:'منصة الإعلانات المبوبة الأولى في موريتانيا',
   phone:'', whatsapp:'',
   email:'', reportEmail:'',
   address:'',
   adsCount:0, usersCount:0, wilayasCount:15,
-  bannerActive:false, bannerText:''
+  bannerActive:false, bannerText:'',
+  social: defaultSiteSocial()
 };
 
 function loadSiteConfigData(){
   try{
     const raw = localStorage.getItem('rizq_site_config');
-    if(raw) return Object.assign({}, DEFAULT_SITE_CONFIG, JSON.parse(raw));
+    if(raw){
+      var parsed = JSON.parse(raw);
+      var merged = Object.assign({}, DEFAULT_SITE_CONFIG, parsed);
+      merged.social = normalizeSiteSocialLocal(parsed && parsed.social);
+      return merged;
+    }
   }catch(e){}
-  return Object.assign({}, DEFAULT_SITE_CONFIG);
+  return Object.assign({}, DEFAULT_SITE_CONFIG, { social: defaultSiteSocial() });
+}
+
+function _readSocialFromForm(){
+  var social = defaultSiteSocial();
+  SITE_SOCIAL_DEFS.forEach(function(d){
+    var sw = document.getElementById('cfg-social-' + d.key + '-sw');
+    var url = document.getElementById('cfg-social-' + d.key + '-url');
+    social[d.key] = {
+      enabled: !!(sw && sw.classList.contains('on')),
+      url: url ? String(url.value || '').trim().slice(0, 500) : ''
+    };
+  });
+  return social;
+}
+
+function _renderSocialForm(social){
+  var list = document.getElementById('cfg-social-list');
+  if(!list) return;
+  var fr = false;
+  try{ fr = !!(window.RizqI18n && RizqI18n.getLang && RizqI18n.getLang() === 'fr'); }catch(e){}
+  var data = normalizeSiteSocialLocal(social);
+  list.innerHTML = SITE_SOCIAL_DEFS.map(function(d){
+    var item = data[d.key] || { enabled:false, url:'' };
+    var on = item.enabled ? ' on' : '';
+    var label = fr ? d.label_fr : d.label;
+    return ''
+      + '<div class="cfg-social-row" style="display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:center">'
+      +   '<div style="font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap">' + label + '</div>'
+      +   '<input class="form-input" id="cfg-social-' + d.key + '-url" dir="ltr" placeholder="' + d.ph + '" value="'
+      +     String(item.url || '').replace(/"/g, '&quot;') + '" style="padding:7px 10px;font-size:12.5px;margin:0"/>'
+      +   '<button type="button" class="toggle-sw' + on + '" id="cfg-social-' + d.key + '-sw" onclick="this.classList.toggle(\'on\')" title="'
+      +     (fr ? 'Activer / désactiver' : 'تفعيل / تعطيل') + '" aria-label="' + label + '"></button>'
+      + '</div>';
+  }).join('');
 }
 
 function _applySiteConfigForm(cfg){
@@ -3669,6 +3753,7 @@ function _applySiteConfigForm(cfg){
   set('cfg-banner-text', cfg.bannerText);
   const bannerSw = document.getElementById('cfg-banner-active');
   if(bannerSw) bannerSw.classList.toggle('on', !!cfg.bannerActive);
+  _renderSocialForm(cfg.social);
 }
 
 function loadSiteConfig(){
@@ -3683,6 +3768,9 @@ function loadSiteConfig(){
       var site = data && data.ok && data.config && data.config.site;
       if(!site) return;
       var merged = Object.assign({}, DEFAULT_SITE_CONFIG, local, site);
+      merged.social = normalizeSiteSocialLocal(
+        (site && site.social) || (local && local.social) || defaultSiteSocial()
+      );
       try{ localStorage.setItem('rizq_site_config', JSON.stringify(merged)); }catch(e){}
       _applySiteConfigForm(merged);
     })
@@ -3703,7 +3791,8 @@ function saveSiteConfig(){
     usersCount: +get('cfg-users-count') || 0,
     wilayasCount: +get('cfg-wilayas-count') || 0,
     bannerActive: document.getElementById('cfg-banner-active')?.classList.contains('on') || false,
-    bannerText: get('cfg-banner-text')
+    bannerText: get('cfg-banner-text'),
+    social: _readSocialFromForm()
   };
   localStorage.setItem('rizq_site_config', JSON.stringify(cfg));
   _adminPostSiteConfig({ site: cfg }, function(){

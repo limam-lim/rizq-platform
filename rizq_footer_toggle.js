@@ -281,11 +281,26 @@
     setTimeout(hookFooterStats, 400);
   }
 
+  function ensureSocialLinks() {
+    try {
+      if (typeof window.RizqSocialLinksRefresh === 'function') {
+        window.RizqSocialLinksRefresh();
+        return;
+      }
+    } catch (e) {}
+    if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
+    var s = document.createElement('script');
+    s.src = 'rizq_social_links.js?v=23.3';
+    s.defer = true;
+    (document.head || document.documentElement).appendChild(s);
+  }
+
   window.RizqFooterToggleRefresh = function () {
     try {
       injectStyle();
       init();
       hookFooterStats();
+      ensureSocialLinks();
     } catch (e) {}
   };
 
@@ -330,9 +345,14 @@
     }
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
+  function bootWithSocial() {
     boot();
+    ensureSocialLinks();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootWithSocial);
+  } else {
+    bootWithSocial();
   }
 })();

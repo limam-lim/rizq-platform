@@ -73,16 +73,20 @@ document.documentElement.classList.add('rizq-app-nav');
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
     display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
   }
+  html.rizq-app-nav #nav .logo-text{
+    gap:4px!important;
+  }
   html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{
     font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:20px!important;font-weight:900!important;
-    color:#F5E0A0!important;-webkit-text-fill-color:#F5E0A0!important;white-space:nowrap!important;
+    color:#C9A84C!important;-webkit-text-fill-color:#C9A84C!important;white-space:nowrap!important;
     overflow:visible!important;min-width:max-content!important;text-decoration:none!important;
     direction:rtl!important;unicode-bidi:isolate!important;line-height:1!important;
+    text-shadow:0 0 12px rgba(201,168,76,.28)!important;
   }
   html.rizq-app-nav #nav .logo-sub{
     display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;
-    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(232,201,106,.82)!important;
-    text-transform:uppercase!important;white-space:nowrap!important;
+    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(201,168,76,.82)!important;
+    text-transform:uppercase!important;white-space:nowrap!important;margin-top:0!important;
   }
 }
 </style>
@@ -162,9 +166,9 @@ nav.scrolled{
 }
 .logo-mark svg,.logo-mark-img svg{display:none}
 .logo-mark::after{display:none}
-.logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05}
-.logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-size:26px;font-weight:900;color:#F5E0A0;line-height:1;display:block;text-shadow:0 0 24px rgba(201,168,76,.5),0 1px 0 rgba(0,0,0,.35);direction:rtl;unicode-bidi:isolate}
-.logo-text .logo-sub{font-size:8.5px;color:rgba(232,201,106,.82);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:2px;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr;line-height:1.05;gap:4px}
+.logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-size:26px;font-weight:900;color:#C9A84C;-webkit-text-fill-color:#C9A84C;line-height:1;display:block;text-shadow:0 0 12px rgba(201,168,76,.28);direction:rtl;unicode-bidi:isolate}
+.logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.82);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-top:0;font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap}
 .nav-center{display:flex;align-items:center;gap:10px;list-style:none;direction:inherit;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-ms-overflow-style:none;min-width:0}
 .nav-center::-webkit-scrollbar{display:none}
 .nav-center a,.nav-center .nav-link-btn{
@@ -508,7 +512,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
     linear-gradient(135deg,#0D1B2A,#1B3A6B 55%,#152e58);
   border:1.5px solid rgba(201,168,76,.52);
   border-radius:16px;
-  padding:20px 28px;
+  padding:18px 28px 22px;
   min-height:96px;
   box-sizing:border-box;
   box-shadow:0 12px 32px rgba(0,0,0,.24),0 0 22px rgba(201,168,76,.14),inset 0 1px 0 rgba(255,255,255,.1);
@@ -540,6 +544,8 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   width:100%;text-align:center;
   display:flex;align-items:center;justify-content:center;
   text-shadow:0 2px 18px rgba(201,168,76,.3);
+  /* رفع بصري طفيف لتوسيط حبر العربية داخل البطاقة */
+  transform:translateY(-0.1em);
 }
 .hero-headline em{display:block;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 40%,#fff8e0 60%,var(--gold-light) 80%,var(--gold) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 4s linear infinite,fadeUp .8s .15s ease both}
 @keyframes shine{to{background-position:200%}}
@@ -1378,7 +1384,7 @@ html[dir="ltr"] #all-ads-title{
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
   border:1px solid rgba(201,168,76,.42);
-  border-radius:999px;padding:10px 22px 10px 16px;
+  border-radius:8px;padding:10px 22px 10px 16px;
   font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
   font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
@@ -1942,7 +1948,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-stats-bar{flex-wrap:wrap}
   .hero-content{padding-top:44px;width:94%}
   .hero-headline{font-size:clamp(46px,13vw,64px)}
-  .hero-title-card{padding:16px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
+  .hero-title-card{padding:14px 18px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
   .hero-lead-row{width:100%}
   .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
@@ -2379,9 +2385,10 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   border-radius:10px;
   letter-spacing:.25px;
   transition:background .22s ease,color .22s ease,box-shadow .22s ease,transform .22s ease;
-  cursor:default;
+  cursor:pointer;
   box-shadow:none;
   text-shadow:none;
+  text-decoration:none;
   position:relative;
   overflow:hidden;
   min-width:0;
@@ -2389,6 +2396,10 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   text-align:center;
   box-sizing:border-box;
   white-space:nowrap;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  -webkit-tap-highlight-color:transparent;
 }
 .hero-pill::before{display:none}
 .hero-pill:hover{
@@ -2397,6 +2408,16 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   transform:translateY(-1px);
   box-shadow:0 6px 16px rgba(13,27,42,.24);
   color:#FFE279;
+  text-decoration:none;
+}
+.hero-pill:focus-visible{
+  outline:2px solid rgba(201,168,76,.85);
+  outline-offset:2px;
+  color:#0F2347;
+}
+.hero-pill:active{
+  transform:translateY(0);
+  box-shadow:0 2px 8px rgba(13,27,42,.2);
 }
 .hero-pill-sep{
   align-self:center;
@@ -2422,8 +2443,8 @@ html[lang="fr"] .hero-pill-sep{display:block}
 /* على الجوال: نفس الترتيب العمودي بأحجام أوضح */
 @media(max-width:768px){
   .hero-brand-row{gap:8px;margin-bottom:14px;max-width:96%;width:max-content;min-width:min(260px,92vw)}
-  .hero-title-card{padding:16px 22px;min-width:0;min-height:80px;border-radius:14px;width:100%}
-  .hero-headline{font-size:clamp(46px,13vw,64px)}
+  .hero-title-card{padding:14px 22px 18px;min-width:0;min-height:80px;border-radius:14px;width:100%}
+  .hero-headline{font-size:clamp(46px,13vw,64px);transform:translateY(-0.1em)}
   .hero-brand-row .hero-eyebrow{padding:9px 14px;min-height:38px;width:100%;max-width:100%}
   .hero-brand-row .hero-eyebrow span{font-size:clamp(12px,3.2vw,13.5px)}
   .hero-lead-row{gap:14px;width:min(1080px,96%);max-width:100%}
@@ -2910,7 +2931,7 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   position:relative;
   box-shadow:0 10px 28px rgba(13,27,42,.1),inset 0 1px 0 rgba(255,255,255,.9);
   transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s,border-color .35s;
-  cursor:pointer;
+  cursor:default;
 }
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
@@ -2937,15 +2958,18 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
-  font-size:34px;line-height:1;position:relative;overflow:hidden;
+  font-size:34px;line-height:1;position:relative;overflow:hidden;z-index:1;
   transition:transform .35s ease, box-shadow .25s;
-  cursor:pointer;border:0;padding:0;appearance:none;-webkit-appearance:none;
-  color:inherit;font-family:inherit;
+  cursor:default;border:0;padding:0;appearance:none;-webkit-appearance:none;
+  color:inherit;font-family:inherit;pointer-events:none;
 }
-.rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:2}
-.rizq-style-tile.is-linked:hover{z-index:1;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55)}
+.rizq-style-tile.is-linked{
+  cursor:pointer;pointer-events:auto;
+}
+.rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:3}
+.rizq-style-tile.is-linked:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55);transform:scale(1.04)}
 .rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.rizq-style-card:hover .rizq-style-tile{transform:scale(1.06)}
+.rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
 .rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .rizq-style-badge{
@@ -2967,7 +2991,11 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   margin-top:auto;padding-top:8px;
   font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:4px;
+  text-decoration:none;cursor:pointer;align-self:flex-start;
+  position:relative;z-index:1;
 }
+.rizq-style-cta:hover{color:var(--gold,#C9A84C);text-decoration:none}
+.rizq-style-cta:focus-visible{outline:2px solid rgba(201,168,76,.75);outline-offset:2px;border-radius:4px}
 .rizq-style-cta::after{content:'←';font-size:11px;transition:transform .25s}
 html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
@@ -3094,6 +3122,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_module_flags.js"></script>
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
+<script src="rizq_social_links.js?v=23.3" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
@@ -3310,12 +3339,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <p class="hero-subtitle-primary" id="hero-sub-primary">خيارك الأول لفتح آفاق جديدة لأعمالك</p>
         <p class="hero-subtitle-secondary" id="hero-sub-secondary">حيث يلتقي كل الموريتانيين</p>
       </div>
-      <div class="hero-pills" role="group" aria-label="بيع · اشتر · تميّز">
-        <span class="hero-pill" data-t="hero-pill-sell">بيع</span>
+      <div class="hero-pills" role="navigation" aria-label="بيع · اشتر · تميّز" id="hero-pills-nav">
+        <a class="hero-pill" href="rizq_post.html" data-t="hero-pill-sell" data-pill="sell" aria-label="بيع — انشر إعلانك">بيع</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <span class="hero-pill" data-t="hero-pill-buy">اشتر</span>
+        <a class="hero-pill" href="rizq_browse.html" data-t="hero-pill-buy" data-pill="buy" aria-label="اشتر — تصفّح الإعلانات">اشتر</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <span class="hero-pill" data-t="hero-pill-feat">تميّز</span>
+        <a class="hero-pill" href="#pricing" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
       </div>
     </div>
     <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
@@ -4236,6 +4265,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:var(--gold)">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>
         <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>
       </ul>
+      <div id="rizq-social-follow" hidden></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -5072,7 +5102,16 @@ const FEATURED_ADS=[
   {id:207,emoji:'🚗',bg:'linear-gradient(135deg,#0e1d2e,#1d3a5e)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'Toyota Land Cruiser 2020 — خليجي',titleFR:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. لون أبيض لؤلؤي، تجهيز فل كامل، فتحة سقف. الوثائق الجمركية والتسجيل متوفرة.',descFR:'Land Cruiser 2020 import Golfe authentique, 48 000 km. Blanc nacré, full options, toit ouvrant. Documents douane et immatriculation disponibles.',price:'9,500,000 MRU',priceFR:'9,500,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['48,000 km','خليجي','فل كامل','2020'],tagsFR:['48 000 km','Import Golfe','Full options','2020'],seller:'وكالة السيارات الأولى',sellerFR:'Première Auto MR',sellerEmoji:'🚗',sellerMeta:'★★★★★ (51 تقييم) — موثّق',sellerMetaFR:'★★★★★ (51 avis) — Vérifié',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée',pin:true},
   {id:208,emoji:'🌍',bg:'linear-gradient(135deg,#163012,#2a5a20)',cat:'🏠 منازل وعقارات — أراضي',catKey:'عقارات',title:'أرض سكنية — 600 م² — نواذيبو',titleFR:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة، مسوّرة، جاهزة للبناء فوراً.',descFR:'Terrain résidentiel bien situé près de la zone économique. Titre foncier clair, clôturé, prêt à construire immédiatement.',price:'2,200,000 MRU',priceFR:'2,200,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['600م²','موقع استراتيجي','وثيقة نظيفة','مسوّرة'],tagsFR:['600m²','Emplacement stratégique','Titre clair','Clôturé'],seller:'الوطنية للعقار',sellerFR:'Nationale Immobilier',sellerEmoji:'🌍',sellerMeta:'★★★★☆ (9 تقييم) — موثّق',sellerMetaFR:'★★★★☆ (9 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
   {id:209,emoji:'🐄',bg:'linear-gradient(135deg,#1a1000,#3d2800)',cat:'🐄 ماشية — بقر للبيع',catKey:'ماشية',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFR:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. مع شهادة صحية بيطرية حديثة. السعر قابل للتفاوض على الجملة.',descFR:'Vaches laitières de race pure, production journalière 15-20L par tête. Avec certificat sanitaire vétérinaire récent. Prix négociable en gros.',price:'960,000 MRU',priceFR:'960,000 MRU',loc:'📍 ترارزة',locFR:'📍 Trarza',tags:['8 رؤوس','حلوب','شهادة بيطرية','قابل للتفاوض'],tagsFR:['8 têtes','Laitière','Certificat vétérinaire','Négociable'],seller:'مزرعة البركة',sellerFR:'Ferme Al Baraka',sellerEmoji:'🐄',sellerMeta:'★★★☆☆ (5 تقييم) — مربّي',sellerMetaFR:'★★★☆☆ (5 avis) — Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
-  {id:210,emoji:'🌿',bg:'linear-gradient(135deg,#0d1e12,#1a3d22)',cat:'🔧 خدمات — تصميم وبرمجة',catKey:'خدمات',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFR:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام، لوحة تحكم سهلة، دعم تقني 30 يوماً.',descFR:'Spécialiste en création de sites vitrines et boutiques e-commerce. Livraison en 7 jours, panneau d\'administration facile, support technique 30 jours.',price:'85,000 MRU',priceFR:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['تسليم 7 أيام','دعم تقني','متجر إلكتروني','موثّق'],tagsFR:['Livraison 7 jours','Support technique','Boutique en ligne','Vérifié'],seller:'محمد ليمام | ADMINIA',sellerFR:'Mohamed Limam | ADMINIA',sellerEmoji:'💻',sellerMeta:'★★★★★ (28 تقييم) — موثّق',sellerMetaFR:'★★★★★ (28 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true}
+  {id:210,emoji:'🌿',bg:'linear-gradient(135deg,#0d1e12,#1a3d22)',cat:'🔧 خدمات — تصميم وبرمجة',catKey:'خدمات',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFR:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام، لوحة تحكم سهلة، دعم تقني 30 يوماً.',descFR:'Spécialiste en création de sites vitrines et boutiques e-commerce. Livraison en 7 jours, panneau d\'administration facile, support technique 30 jours.',price:'85,000 MRU',priceFR:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['تسليم 7 أيام','دعم تقني','متجر إلكتروني','موثّق'],tagsFR:['Livraison 7 jours','Support technique','Boutique en ligne','Vérifié'],seller:'محمد ليمام | ADMINIA',sellerFR:'Mohamed Limam | ADMINIA',sellerEmoji:'💻',sellerMeta:'★★★★★ (28 تقييم) — موثّق',sellerMetaFR:'★★★★★ (28 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  /* منتجات أناقة لإطلالات رزق — بلاطة لكل منتج عند النقر */
+  {id:211,emoji:'👔',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',title:'دراعة موريتانية فاخرة مطرزة',titleFR:'Daraa mauritanienne de luxe brodée',desc:'دراعة رجالية من أفضل أقمشة الجاكار، تطريز يدوي أصيل، مقاسات متعددة.',descFR:'Daraa homme en jacquard, broderie artisanale, plusieurs tailles.',price:'45,000 MRU',priceFR:'45,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['دراعة','رجالي','تطريز','جاكار'],tagsFR:['Daraa','Homme','Broderie','Jacquard'],seller:'مرتضى حبيب',sellerFR:'Mortada Habib',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط محترف',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:212,emoji:'⌚',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'👗 أزياء — إكسسوارات',catKey:'أزياء',title:'ساعة رجالية كلاسيكية — ستيل',titleFR:'Montre homme classique — acier',desc:'ساعة يد رجالية أنيقة، مقاومة للماء، سوار ستيل قابل للتعديل.',descFR:'Montre homme élégante, étanche, bracelet acier ajustable.',price:'28,000 MRU',priceFR:'28,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ساعة','رجالي','ستيل','إكسسوار'],tagsFR:['Montre','Homme','Acier','Accessoire'],seller:'ساعة الوقت',sellerFR:'L\'Heure MR',sellerEmoji:'⌚',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:213,emoji:'👟',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'👗 أزياء — أحذية',catKey:'أزياء',title:'حذاء رياضي رجالي — مقاس 43',titleFR:'Baskets homme — pointure 43',desc:'حذاء رياضي مريح للمشي اليومي، خفيف ومقاوم، لون أسود/أبيض.',descFR:'Baskets confortables pour le quotidien, légères, noir/blanc.',price:'12,500 MRU',priceFR:'12,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حذاء','رياضي','رجالي','43'],tagsFR:['Chaussure','Sport','Homme','43'],seller:'ستيب موريتانيا',sellerFR:'Step Mauritanie',sellerEmoji:'👟',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:214,emoji:'🩴',bg:'linear-gradient(135deg,#1a2d4d,#0a1324)',cat:'👗 أزياء — أحذية',catKey:'أزياء',title:'صندل رجالي جلد — صناعة محلية',titleFR:'Sandale homme scuir — fabrication locale',desc:'صندل جلد طبيعي، مريح للصيف، مقاسات من 40 إلى 45.',descFR:'Sandale en cuir naturel, confort été, pointures 40 à 45.',price:'6,500 MRU',priceFR:'6,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['صندل','جلد','رجالي','محلي'],tagsFR:['Sandale','Cuir','Homme','Local'],seller:'سوق الجلد',sellerFR:'Marché du Cuir',sellerEmoji:'🩴',sellerMeta:'★★★☆☆ — حرفي',sellerMetaFR:'★★★☆☆ — Artisan',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours',pin:false},
+  {id:215,emoji:'📿',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',cat:'🪙 ذهب ومجوهرات — إكسسوار',catKey:'ذهب',title:'سبحة كهرمان رجالية فاخرة',titleFR:'Chapelet ambre homme — luxe',desc:'سبحة كهرمان طبيعي، 33 حبة، مناسبة للإهداء والمناسبات.',descFR:'Chapelet en ambre naturel, 33 grains, idéal cadeau.',price:'18,000 MRU',priceFR:'18,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['سبحة','كهرمان','رجالي','إكسسوار'],tagsFR:['Chapelet','Ambre','Homme','Accessoire'],seller:'ورشة الكنوز',sellerFR:'Atelier Trésors',sellerEmoji:'📿',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:216,emoji:'🧕',bg:'linear-gradient(135deg,#6b2d4a,#3d1a2c)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',title:'ملحفة حريرية فاخرة — نقش تقليدي',titleFR:'Melhfa soie de luxe — motif traditionnel',desc:'ملحفة نسائية حرير ناعم، ألوان زاهية ونقش موريتاني أصيل.',descFR:'Melhfa femme en soie, couleurs vives, motif mauritanien.',price:'38,000 MRU',priceFR:'38,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ملحفة','حرير','نسائي','تقليدي'],tagsFR:['Melhfa','Soie','Femme','Traditionnel'],seller:'ورشة الأناقة',sellerFR:'Atelier Élégance',sellerEmoji:'🧕',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:217,emoji:'💍',bg:'linear-gradient(135deg,#7a4a00,#3a2200)',cat:'🪙 ذهب ومجوهرات',catKey:'ذهب',title:'أسورة ذهب عيار 21 — تصميم نسائي',titleFR:'Bracelet or 21 carats — design femme',desc:'أسورة ذهب نسائية عيار 21، وزن 12 غرام، مع شهادة أصالة.',descFR:'Bracelet femme or 21 carats, 12g, certificat d\'authenticité.',price:'110,000 MRU',priceFR:'110,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أسورة','ذهب','نسائي','21 عيار'],tagsFR:['Bracelet','Or','Femme','21 carats'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'💍',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:218,emoji:'👜',bg:'linear-gradient(135deg,#4a1942,#1B3A6B)',cat:'👗 أزياء — حقائب',catKey:'أزياء',title:'حقيبة نسائية أنيقة — جلد صناعي',titleFR:'Sac femme élégant — simili cuir',desc:'حقيبة يومية عملية، جيوب داخلية، ألوان متعددة.',descFR:'Sac quotidien pratique, poches intérieures, plusieurs couleurs.',price:'9,800 MRU',priceFR:'9,800 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حقيبة','نسائي','يومي','أنيق'],tagsFR:['Sac','Femme','Quotidien','Élégant'],seller:'بوتيك لمسة',sellerFR:'Boutique Touche',sellerEmoji:'👜',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false}
 ];
 
 // ── رسالة واتساب التواصل — تُقيَّم وقت الضغط حسب اللغة الحالية ──
@@ -5435,6 +5474,45 @@ function _styPickCompanions(primary, pool, gender, n){
   }
   return picks;
 }
+/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) لا نسخ من نفس القطعة */
+function _styPickLookCompanions(primary, pool, gender, n){
+  n = n || 2;
+  var stylePool = (pool || []).filter(_styIsStyleCat);
+  var primaryKind = typeof _styAdKind === 'function' ? _styAdKind(primary) : '';
+  var looseGender = !gender || gender === 'both' || gender === 'all';
+  var used = {};
+  if(primary && primary.id != null) used[String(primary.id)] = 1;
+  var picks = [];
+  var prefer = ['watch','shoe','bag','gold','shirt','daraa','melhfa','phone'].filter(function(k){
+    return k && k !== primaryKind;
+  });
+  function genderOk(a){
+    return looseGender ? true : _styMatchGender(a, gender);
+  }
+  for(var ki=0; ki<prefer.length && picks.length < n; ki++){
+    var kind = prefer[ki];
+    var cand = _styShuffle(stylePool.filter(function(a){
+      return a && !used[String(a.id)] && genderOk(a) && _styAdKind(a) === kind;
+    }));
+    if(cand.length){
+      picks.push(cand[0]);
+      used[String(cand[0].id)] = 1;
+    }
+  }
+  if(picks.length < n){
+    var restPool = looseGender
+      ? stylePool.filter(function(a){ return a && !used[String(a.id)]; })
+      : _styPickCompanions(primary, stylePool, gender, n + 4);
+    var rest = _styShuffle(restPool).filter(function(a){
+      return a && !used[String(a.id)];
+    });
+    for(var ri=0; ri<rest.length && picks.length < n; ri++){
+      picks.push(rest[ri]);
+      used[String(rest[ri].id)] = 1;
+    }
+  }
+  return picks.slice(0, n);
+}
 function _styFindAdById(id){
   if(id == null || id === '') return null;
   var sid = String(id);
@@ -5456,10 +5534,16 @@ function _styFindAdById(id){
   return null;
 }
 function rizqOpenStyleItem(ev, adId){
-  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  /* فتح المنتج المضغوط عليه فقط — لا تسريب لنقر بطاقة الإطلالة */
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+  }
+  if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
   if(!ad){
-    if(adId != null && String(adId).indexOf('store-') !== 0){
+    if(String(adId).indexOf('store-') !== 0){
       window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(adId);
     }
     return false;
@@ -5473,9 +5557,14 @@ function rizqOpenStyleItem(ev, adId){
   return false;
 }
 function rizqOpenStyleLook(ev, primaryId, fallbackHref){
+  /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
   if(ev){
     var t = ev.target;
-    if(t && t.closest && t.closest('.rizq-style-tile.is-linked')) return true;
+    if(t && t.closest && t.closest('.rizq-style-tile')){
+      ev.preventDefault();
+      ev.stopPropagation();
+      return false;
+    }
     ev.preventDefault();
   }
   if(primaryId){
@@ -5487,31 +5576,70 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+function _styBuildCardHtml(opts){
+  opts = opts || {};
+  var attrs = ' class="rizq-style-card" role="listitem"';
+  if(opts.gender) attrs += ' data-sty-gender="'+_styEsc(opts.gender)+'"';
+  if(opts.srmCat) attrs += ' data-srm-cat="'+_styEsc(opts.srmCat)+'"';
+  if(opts.seed) attrs += ' data-sty-seed="1"';
+  var idAttr = opts.primaryId != null && opts.primaryId !== ''
+    ? String(opts.primaryId).replace(/'/g,'&#39;')
+    : '';
+  var href = opts.href || 'rizq_browse.html';
+  var hrefEsc = _styEsc(href).replace(/'/g,'&#39;');
+  var fromView = opts.fromViewLbl
+    ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
+    : '';
+  return '<article'+attrs+'>'
+    + '<div class="rizq-style-mosaic">'+ (opts.tilesHtml || '') +'</div>'
+    + '<div class="rizq-style-body">'
+    +   fromView
+    +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
+    +   '<div class="rizq-style-name">'+_styEsc(opts.name || '')+'</div>'
+    +   '<div class="rizq-style-meta">'+_styEsc(opts.meta || '')+'</div>'
+    +   '<a class="rizq-style-cta" href="'+_styEsc(href)+'" onclick="return rizqOpenStyleLook(event,\''+idAttr+'\',\''+hrefEsc+'\')">'+_styEsc(opts.cta || '')+'</a>'
+    + '</div></article>';
+}
+
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
   var linked = !!(ad && ad.id != null);
+  var title = '';
+  if(ad){
+    try {
+      var d = (typeof trAd === 'function') ? trAd(ad) : ad;
+      title = String((d && (d.title || ad.title)) || '').trim();
+    } catch(e){ title = String(ad.title || '').trim(); }
+  }
+  var aria = linked
+    ? ' aria-label="'+_styEsc(title || String(ad.id))+'"'
+    : ' aria-hidden="true"';
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
-    : ' class="rizq-style-tile"';
+    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    : ' class="rizq-style-tile"'+aria;
   var tag = linked ? 'button type="button"' : 'div';
   var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
   }
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
 }
-function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId){
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var linked = adId != null && adId !== '';
+  var title = String(titleHint || '').trim();
+  var aria = linked
+    ? ' aria-label="'+_styEsc(title || String(adId))+'"'
+    : ' aria-hidden="true"';
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'
-    : ' class="rizq-style-tile"';
+    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    : ' class="rizq-style-tile"'+aria;
   var tag = linked ? 'button type="button"' : 'div';
   var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="" loading="lazy" decoding="async"/></'+close+'>';
+    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
   }
   return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</'+close+'>';
 }
@@ -5675,25 +5803,26 @@ function buildStyleIdeas(reshuffle){
     usedIds[String(seed.id)] = 1;
     var seedImgs = (seed.images || []).slice(0, 3);
     while(seedImgs.length < 3) seedImgs.push(null);
+    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
     var seedTiles = '';
     for(var si=0; si<3; si++){
-      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id);
-      else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true }, templates[0].emoji[si], seed.bg);
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id, seedName);
+      else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true, title: seed.title, titleFR: seed.titleFR }, (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seed.emoji, seed.bg);
     }
-    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
     var genderBadge0 = _styGenderBadge(gender, fr);
     var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(seedHref)+'" data-sty-gender="'+gender+'" data-sty-seed="1" onclick="return rizqOpenStyleLook(event,\''+_styEsc(String(seed.id)).replace(/'/g,'&#39;')+'\',\''+_styEsc(seedHref).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+seedTiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-from-view">'+_styEsc(fromViewLbl)+'</div>'
-      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge0)+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(seedName)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك')+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      seed: true,
+      tilesHtml: seedTiles,
+      fromViewLbl: fromViewLbl,
+      badge: genderBadge0,
+      name: seedName,
+      meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
+      cta: cta,
+      href: seedHref,
+      primaryId: seed.id
+    }));
   }
 
   tplList.forEach(function(tpl){
@@ -5710,16 +5839,15 @@ function buildStyleIdeas(reshuffle){
     if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
     if(primary) usedIds[String(primary.id)] = 1;
-    var companions = primary ? _styPickCompanions(primary, styleGendered.length ? styleGendered : pool, gender, 2) : [];
-    if(primary && tpl.kind && typeof _styAdKind==='function'){
-      var sameKind = styleGendered.filter(function(a){
-        return String(a.id) !== String(primary.id) && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)];
-      });
-      if(sameKind.length){
-        companions = _styShuffle(sameKind).slice(0, 2);
-      }
-    }
-    companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
+    /* المرافقون يُعاد استخدامهم بين البطاقات — المهم أن كل بلاطة في البطاقة منتج مختلف */
+    var companionPool = (styleGendered.length ? styleGendered : pool).filter(function(a){
+      return a && !(primary && String(a.id) === String(primary.id));
+    });
+    var companions = primary
+      ? (typeof _styPickLookCompanions === 'function'
+          ? _styPickLookCompanions(primary, companionPool, gender, 2)
+          : _styPickCompanions(primary, companionPool, gender, 2))
+      : [];
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
     var name = fr ? tpl.fr : tpl.ar;
@@ -5743,19 +5871,16 @@ function buildStyleIdeas(reshuffle){
     for(var ti=0; ti<3; ti++){
       tiles += _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg);
     }
-    var primaryIdAttr = primary && primary.id != null
-      ? String(primary.id).replace(/'/g,'&#39;')
-      : '';
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(href)+'" data-sty-gender="'+gender+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+_styEsc(href).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+_styEsc(genderBadge)+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(name)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(metaParts.join(' · '))+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      tilesHtml: tiles,
+      badge: genderBadge,
+      name: name,
+      meta: metaParts.join(' · '),
+      cta: cta,
+      href: href,
+      primaryId: primary && primary.id != null ? primary.id : ''
+    }));
   });
 
   /* بطاقات إضافية لسلسلة أفقية أطول (مثل النماذج) */
@@ -5764,10 +5889,14 @@ function buildStyleIdeas(reshuffle){
   for(var ex=0; cards.length < 6 && ex < extras.length; ex++){
     var adEx = extras[ex];
     usedIds[String(adEx.id)] = 1;
-    var companionsEx = (typeof _styPickCompanions === 'function')
-      ? _styPickCompanions(adEx, gendered.length ? gendered : pool, gender, 2)
-      : [];
-    companionsEx.forEach(function(c){ usedIds[String(c.id)] = 1; });
+    var companionPoolEx = (gendered.length ? gendered : pool).filter(function(a){
+      return a && String(a.id) !== String(adEx.id);
+    });
+    var companionsEx = (typeof _styPickLookCompanions === 'function')
+      ? _styPickLookCompanions(adEx, companionPoolEx, gender, 2)
+      : ((typeof _styPickCompanions === 'function')
+          ? _styPickCompanions(adEx, companionPoolEx, gender, 2)
+          : []);
     var itemsEx = [adEx].concat(companionsEx);
     while(itemsEx.length < 3) itemsEx.push(null);
     var emEx = emojiSets[ex % emojiSets.length];
@@ -5778,17 +5907,16 @@ function buildStyleIdeas(reshuffle){
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
     var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق')).slice(0, 42);
     var hrefEx = 'rizq_browse.html?id=' + encodeURIComponent(adEx.id);
-    var idEx = String(adEx.id).replace(/'/g,'&#39;');
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+_styEsc(hrefEx)+'" data-sty-gender="'+gender+'" onclick="return rizqOpenStyleLook(event,\''+idEx+'\',\''+_styEsc(hrefEx).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tilesEx+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+_styEsc(_styGenderBadge(gender, fr))+'</div>'
-      +   '<div class="rizq-style-name">'+_styEsc(nameEx)+'</div>'
-      +   '<div class="rizq-style-meta">'+_styEsc(fr ? 'Suggestion continue' : 'اقتراح متواصل')+'</div>'
-      +   '<span class="rizq-style-cta">'+_styEsc(cta)+'</span>'
-      + '</div></a>'
-    );
+    cards.push(_styBuildCardHtml({
+      gender: gender,
+      tilesHtml: tilesEx,
+      badge: _styGenderBadge(gender, fr),
+      name: nameEx,
+      meta: fr ? 'Suggestion continue' : 'اقتراح متواصل',
+      cta: cta,
+      href: hrefEx,
+      primaryId: adEx.id
+    }));
   }
 
   if(!cards.length){
@@ -5971,9 +6099,10 @@ function buildShowroomModels(reshuffle){
     if(primary) usedIds[String(primary.id)] = 1;
     var companions = [];
     if(primary){
-      companions = (typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(
-        pool.filter(function(a){ return String(a.id) !== String(primary.id) && !usedIds[String(a.id)]; })
-      ).slice(0, 2);
+      var srmPool = pool.filter(function(a){ return a && !usedIds[String(a.id)]; });
+      companions = (typeof _styPickLookCompanions === 'function')
+        ? _styPickLookCompanions(primary, srmPool, 'both', 2)
+        : ((typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(srmPool).slice(0, 2));
       companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
     }
     var items = primary ? [primary].concat(companions) : [];
@@ -5998,16 +6127,25 @@ function buildShowroomModels(reshuffle){
         ? _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg)
         : '<div class="rizq-style-tile">'+(tpl.emoji||[])[ti]+'</div>';
     }
-    var primaryIdAttr = primary && primary.id != null ? String(primary.id).replace(/'/g,'&#39;') : '';
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+esc(href)+'" data-srm-cat="'+cat+'" onclick="return rizqOpenStyleLook(event,\''+primaryIdAttr+'\',\''+esc(href).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tiles+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
-      +   '<div class="rizq-style-name">'+esc(name)+'</div>'
-      +   '<div class="rizq-style-meta">'+esc(metaParts.join(' · '))+'</div>'
-      +   '<span class="rizq-style-cta">'+esc(cta)+'</span>'
-      + '</div></a>'
+    cards.push((typeof _styBuildCardHtml === 'function')
+      ? _styBuildCardHtml({
+          srmCat: cat,
+          tilesHtml: tiles,
+          badge: badge,
+          name: name,
+          meta: metaParts.join(' · '),
+          cta: cta,
+          href: href,
+          primaryId: primary && primary.id != null ? primary.id : ''
+        })
+      : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
+        + '<div class="rizq-style-mosaic">'+tiles+'</div>'
+        + '<div class="rizq-style-body">'
+        +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
+        +   '<div class="rizq-style-name">'+esc(name)+'</div>'
+        +   '<div class="rizq-style-meta">'+esc(metaParts.join(' · '))+'</div>'
+        +   '<a class="rizq-style-cta" href="'+esc(href)+'">'+esc(cta)+'</a>'
+        + '</div></article>'
     );
   });
 
@@ -6035,16 +6173,25 @@ function buildShowroomModels(reshuffle){
     var dS = (typeof trAd === 'function') ? trAd(adS) : adS;
     var nameS = String((dS && (dS.title || adS.title)) || (fr ? 'Modèle Rizq' : 'نموذج رزق')).slice(0, 42);
     var hrefS = 'rizq_browse.html?id=' + encodeURIComponent(adS.id);
-    var idS = String(adS.id).replace(/'/g,'&#39;');
-    cards.push(
-      '<a class="rizq-style-card" role="listitem" href="'+esc(hrefS)+'" data-srm-cat="'+cat+'" onclick="return rizqOpenStyleLook(event,\''+idS+'\',\''+esc(hrefS).replace(/'/g,'&#39;')+'\')">'
-      + '<div class="rizq-style-mosaic">'+tilesS+'</div>'
-      + '<div class="rizq-style-body">'
-      +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
-      +   '<div class="rizq-style-name">'+esc(nameS)+'</div>'
-      +   '<div class="rizq-style-meta">'+esc(fr ? 'Sélection continue' : 'اقتراح متواصل')+'</div>'
-      +   '<span class="rizq-style-cta">'+esc(cta)+'</span>'
-      + '</div></a>'
+    cards.push((typeof _styBuildCardHtml === 'function')
+      ? _styBuildCardHtml({
+          srmCat: cat,
+          tilesHtml: tilesS,
+          badge: badge,
+          name: nameS,
+          meta: fr ? 'Sélection continue' : 'اقتراح متواصل',
+          cta: cta,
+          href: hrefS,
+          primaryId: adS.id
+        })
+      : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
+        + '<div class="rizq-style-mosaic">'+tilesS+'</div>'
+        + '<div class="rizq-style-body">'
+        +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
+        +   '<div class="rizq-style-name">'+esc(nameS)+'</div>'
+        +   '<div class="rizq-style-meta">'+esc(fr ? 'Sélection continue' : 'اقتراح متواصل')+'</div>'
+        +   '<a class="rizq-style-cta" href="'+esc(hrefS)+'">'+esc(cta)+'</a>'
+        + '</div></article>'
     );
   }
 
@@ -7867,11 +8014,18 @@ function applyLandingLang(toAr) {
     el.style.fontSize = isAr ? '' : '8.5px';
   });
 
-  // Hero pills (Sell · Buy · Stand out) — نصوص نظيفة داخل الكبسولة الزجاجية
+  // Hero pills (Sell · Buy · Stand out) — أزرار روابط داخل الشريط
   const pills = document.querySelectorAll('.hero-pill');
   const pillsAR = ['بيع','اشتر','تميّز'];
   const pillsFR = ['Vendre','Acheter','Briller'];
-  pills.forEach((el,i)=>{ el.textContent = isAr ? (pillsAR[i]||el.textContent) : (pillsFR[i]||el.textContent); });
+  const pillsAriaAR = ['بيع — انشر إعلانك','اشتر — تصفّح الإعلانات','تميّز — باقات التمييز'];
+  const pillsAriaFR = ['Vendre — publier une annonce','Acheter — parcourir les annonces','Briller — forfaits premium'];
+  pills.forEach((el,i)=>{
+    el.textContent = isAr ? (pillsAR[i]||el.textContent) : (pillsFR[i]||el.textContent);
+    if (pillsAriaAR[i]) el.setAttribute('aria-label', isAr ? pillsAriaAR[i] : pillsAriaFR[i]);
+  });
+  const pillsNav = document.getElementById('hero-pills-nav');
+  if (pillsNav) pillsNav.setAttribute('aria-label', isAr ? 'بيع · اشتر · تميّز' : 'Vendre · Acheter · Briller');
 
   // Hero tagline — يُترجَم عبر data-t؛ هنا احتياط إن غاب المفتاح
   const heroTag = document.querySelector('.hero-tagline');

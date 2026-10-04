@@ -1099,6 +1099,40 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
 
 
 /**
+ * روابط «تابعنا» على المنصات — تُفعَّل واحدة تلو الأخرى من سوبر أدمن.
+ * الافتراضي: معطّلة كلها حتى يضبط المالك الرابط ويفعّل الزر.
+ */
+const SITE_SOCIAL_KEYS = ['facebook', 'x', 'instagram', 'youtube', 'tiktok', 'linkedin'];
+const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
+
+function defaultSiteSocial() {
+  const out = {};
+  for (const key of SITE_SOCIAL_KEYS) {
+    out[key] = { enabled: false, url: '' };
+  }
+  return out;
+}
+
+function normalizeSiteSocial(raw) {
+  const out = defaultSiteSocial();
+  if (!raw || typeof raw !== 'object') return out;
+  for (const key of SITE_SOCIAL_KEYS) {
+    const item = raw[key];
+    if (!item || typeof item !== 'object') continue;
+    out[key] = {
+      enabled: !!item.enabled,
+      url: sanitizeSafeUrl(item.url || '', 500),
+    };
+  }
+  return out;
+}
+
+/** للعامة: نفس الحقول (الروابط ليست سرّاً) — الواجهة تعرض المفعّل فقط. */
+function normalizeSiteSocialPublic(raw) {
+  return normalizeSiteSocial(raw);
+}
+
+/**
  * GET /api/site-config
  * عام — تقرأه صفحات الزوار (الفيديو الترويجي: popup + قسم ثابت) لتعرض
  * نفس الإعداد فعلياً لكل زائر، بدل أن يكون محصوراً بمتصفح الأدمن فقط.
@@ -1143,6 +1177,7 @@ app.get('/api/site-config', (req, res) => {
       wilayasCount: raw.site.wilayasCount,
       bannerActive: !!raw.site.bannerActive,
       bannerText: String(raw.site.bannerText || '').slice(0, 300),
+      social: normalizeSiteSocialPublic(raw.site.social),
     } : undefined,
     legalOverrides: raw.legalOverrides || undefined,
     currency: raw.currency || undefined,
@@ -1179,7 +1214,6 @@ app.get('/api/site-config', (req, res) => {
 const LEGAL_KEYS_AR = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
 const LEGAL_KEYS_FR = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11'];
 const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني كامل بصياغة HTML بسيطة
-const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
 
 /**
  * POST /api/site-config
@@ -1488,6 +1522,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
 
   if (body.site && typeof body.site === 'object') {
     const s = body.site;
+    const prevSocial = (current.site && current.site.social) || {};
     next.site = {
       sitename: String(s.sitename || '').slice(0, 80),
       tagline: String(s.tagline || '').slice(0, 200),
@@ -1501,6 +1536,9 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       wilayasCount: Math.max(0, Number(s.wilayasCount) || 0),
       bannerActive: !!s.bannerActive,
       bannerText: String(s.bannerText || '').slice(0, 300),
+      social: normalizeSiteSocial(
+        Object.prototype.hasOwnProperty.call(s, 'social') ? s.social : prevSocial
+      ),
       updatedAt: new Date().toISOString(),
     };
   }
