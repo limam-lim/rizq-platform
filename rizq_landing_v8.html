@@ -5469,9 +5469,19 @@ function loadMoreLandingAds(){
   var maxOff = _landingAdsMaxOffset(total);
   if(_landingAdsOffset >= maxOff) return;
   _landingAdsLoading = true;
+  /* ثبّت موضع التذييل حتى لا تقفز الصفحة عند استبدال البطاقات */
+  var footer = document.getElementById('landing-ads-footer') || document.getElementById('landing-ads-more');
+  var anchorTop = footer ? footer.getBoundingClientRect().top : null;
   /* نافذة منزلقة: +5 إعلانات جديدة وتختفي 5 قديمة */
   _landingAdsOffset = Math.min(_landingAdsOffset + LANDING_ADS_STEP, maxOff);
   buildLandingAds(false);
+  if(anchorTop != null){
+    var footer2 = document.getElementById('landing-ads-footer') || document.getElementById('landing-ads-more');
+    if(footer2){
+      var delta = footer2.getBoundingClientRect().top - anchorTop;
+      if(Math.abs(delta) > 1) window.scrollBy(0, delta);
+    }
+  }
   setTimeout(function(){ _landingAdsLoading = false; }, 120);
 }
 function _landingAdCardHtml(a, fr){
