@@ -659,7 +659,7 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     const token = String(req.header('x-account-token') || '').trim();
     if (!token) return res.status(401).json({ error: 'unauthorized' });
     const { timingSafeEqualStr } = require('./lib/secureCompare');
-    const { activeOwnerMatches, isAccountActive, tokenMatchesAccount } = require('./middleware/accountAuth');
+    const { isAccountActive, tokenMatchesAccount } = require('./middleware/accountAuth');
     const baseId = String(req.params.id).split('::')[0];
     let mainAcc = null;
     if (accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
@@ -679,8 +679,6 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     if (!ownerOk) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    // activeOwnerMatches محفوظ للاستخدام المستقبلي/الاختبارات — لا نكسر مسار توكن سجل الباقة
-    void activeOwnerMatches;
     const { accessToken, ...safe } = rec;
     let entitlements = null;
     try {
