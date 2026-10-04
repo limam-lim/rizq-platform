@@ -1160,7 +1160,7 @@ main, .page-content.active, .main-content, .results-area,
           </label>
           <div>
             <label style="font-size:11px;font-weight:600;color:#1B3A6B;display:block;margin-bottom:4px">مسار الفيديو (خادم المنصة)</label>
-            <input class="form-input" id="rzv-platform-url" dir="ltr" value="/rizq-assets/promo/rizq-platform-promo-clean-light.mp4" style="font-size:11px;font-family:monospace"/>
+            <input class="form-input" id="rzv-platform-url" dir="ltr" value="/rizq-assets/promo/rizq-platform-promo-light.mp4" style="font-size:11px;font-family:monospace"/>
           </div>
           <div>
             <label style="font-size:11px;font-weight:600;color:#1B3A6B;display:block;margin-bottom:4px">مدة إعلان المعلن الواحد (ثوانٍ) قبل الانتقال للتالي</label>
@@ -1168,7 +1168,7 @@ main, .page-content.active, .main-content, .results-area,
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button type="button" onclick="rzqVidSavePlatformPromo(true)" style="background:linear-gradient(135deg,#C9A84C,#a07820);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">💾 حفظ إعداد المنصة</button>
-            <a id="rzv-platform-preview-link" href="/rizq-assets/promo/rizq-platform-promo-clean-light.mp4" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#1B3A6B;align-self:center">▶️ معاينة الفيديو</a>
+            <a id="rzv-platform-preview-link" href="/rizq-assets/promo/rizq-platform-promo-light.mp4" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#1B3A6B;align-self:center">▶️ معاينة الفيديو</a>
           </div>
           <div id="rzv-platform-status" style="font-size:11px;color:#64748b"></div>
         </div>
@@ -6592,7 +6592,7 @@ function clearPromoVideoConfig(){
 var _rzqVidData = {
   hero: [],
   popup: [],
-  platformPromoUrl: '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4',
+  platformPromoUrl: '/rizq-assets/promo/rizq-platform-promo-light.mp4',
   platformPromoEnabled: true,
   adSlotSeconds: 25
 };
@@ -6604,7 +6604,7 @@ function rzqVidLoadPanel() {
   _rzqVidData.hero  = _rzqVidData.hero  || [];
   _rzqVidData.popup = _rzqVidData.popup || [];
   if (!_rzqVidData.platformPromoUrl) {
-    _rzqVidData.platformPromoUrl = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+    _rzqVidData.platformPromoUrl = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   }
   if (_rzqVidData.platformPromoEnabled == null) _rzqVidData.platformPromoEnabled = true;
   if (!_rzqVidData.adSlotSeconds) _rzqVidData.adSlotSeconds = 25;
@@ -6651,7 +6651,7 @@ function rzqVidRenderPlatformPromo() {
   var st = document.getElementById('rzv-platform-status');
   var link = document.getElementById('rzv-platform-preview-link');
   if (en) en.checked = _rzqVidData.platformPromoEnabled !== false;
-  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   if (slot) slot.value = String(_rzqVidData.adSlotSeconds || 25);
   if (link && url) link.href = url.value;
   if (st) {
@@ -6665,7 +6665,7 @@ function rzqVidSavePlatformPromo(showToastMsg) {
   var url = document.getElementById('rzv-platform-url');
   var slot = document.getElementById('rzv-ad-slot');
   _rzqVidData.platformPromoEnabled = !!(en && en.checked);
-  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   _rzqVidData.adSlotSeconds = Math.max(8, Math.min(120, Number(slot && slot.value) || 25));
   localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
   _syncVideoAdsToBackend(_rzqVidData);
@@ -6761,7 +6761,7 @@ function rzqVidRenderPlatformPromo() {
   var st = document.getElementById('rzv-platform-status');
   var link = document.getElementById('rzv-platform-preview-link');
   if (en) en.checked = _rzqVidData.platformPromoEnabled !== false;
-  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  if (url) url.value = _rzqVidData.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   if (slot) slot.value = String(_rzqVidData.adSlotSeconds || 25);
   if (link && url) link.href = url.value;
   if (st) {
@@ -6776,7 +6776,7 @@ function rzqVidSavePlatformPromo(showToastMsg) {
   var url = document.getElementById('rzv-platform-url');
   var slot = document.getElementById('rzv-ad-slot');
   _rzqVidData.platformPromoEnabled = !!(en && en.checked);
-  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  _rzqVidData.platformPromoUrl = (url && url.value.trim()) || '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   _rzqVidData.adSlotSeconds = Math.max(8, Math.min(120, Number(slot && slot.value) || 25));
   localStorage.setItem('rizq_video_ads', JSON.stringify(_rzqVidData));
   _syncVideoAdsToBackend(_rzqVidData);

@@ -106,8 +106,7 @@
   }
 
   // فيديو المنصة المزروع — بداية الحلقة وبعد انتهاء إعلانات المعلنين
-  /* نسخة نظيفة بلا عناوين كبيرة تغطي الأيقونات/الإعلانات */
-  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   var DEFAULT_AD_SLOT_SEC = 25;
   var _heroAdvanceTimer = null;
   var _heroPlaylist = [];
@@ -124,14 +123,19 @@
     }
   }
 
+  function normalizePlatformPromoUrl(url) {
+    var u = String(url || '').trim() || DEFAULT_PLATFORM_PROMO;
+    /* أعد النسخة السابقة — لا تستخدم clean-light */
+    if (/rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) {
+      return DEFAULT_PLATFORM_PROMO;
+    }
+    return u;
+  }
+
   function buildHeroPlaylist() {
     var list = [];
     var promoEnabled = config.platformPromoEnabled !== false;
-    var promoUrl = String(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO).trim();
-    /* استبدال النسخ ذات العناوين المحروقة التي تغطي الأيقونات */
-    if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(promoUrl)) {
-      promoUrl = DEFAULT_PLATFORM_PROMO;
-    }
+    var promoUrl = normalizePlatformPromoUrl(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO);
     if (promoEnabled && promoUrl) {
       list.push({
         advertiser: 'رزق · Rizq Platform',
@@ -277,6 +281,33 @@
             v.muted = !v.muted;
             sndBtn.textContent = v.muted ? '🔇' : '🔊';
           };
+        }
+        var fsBtn = document.getElementById('hero-vid-fs-btn');
+        if (fsBtn) {
+          fsBtn.style.display = '';
+          fsBtn.onclick = function (ev) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            if (typeof window.toggleHeroVidFullscreen === 'function') {
+              window.toggleHeroVidFullscreen();
+              return;
+            }
+            var inner = host;
+            var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            try {
+              if (fsEl) {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+              } else if (inner.requestFullscreen) inner.requestFullscreen();
+              else if (inner.webkitRequestFullscreen) inner.webkitRequestFullscreen();
+            } catch (eFs2) { /* ignore */ }
+          };
+        }
+        /* عند أول تفاعل: ادخل شاشة كاملة للفيديو الترويجي */
+        if (ad.isPlatform && wrapEl && !wrapEl.getAttribute('data-fs-bound')) {
+          wrapEl.setAttribute('data-fs-bound', '1');
+          wrapEl.addEventListener('dblclick', function () {
+            if (typeof window.toggleHeroVidFullscreen === 'function') window.toggleHeroVidFullscreen();
+          });
         }
         v.play().catch(function () { /* autoplay policies */ });
         if (!v.loop) {

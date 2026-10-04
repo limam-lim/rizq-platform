@@ -785,13 +785,13 @@ body.rizq-lang-ar .hero-browse-panel .qcat-name{
 /* ══ HERO FEATURED VIDEO AD (مضغوط تحت مسار التصفح) ══ */
 .hero-vid-wrap{
   width:100%;
-  max-width:min(960px,100%);
+  max-width:min(1320px,98vw);
   margin:0 auto 0;
   position:relative;
   z-index:5;
   animation:fadeUp .8s .36s ease both;
-  padding:12px 12px 8px;
-  border-radius:22px;
+  padding:10px 10px 8px;
+  border-radius:18px;
   display:flex;flex-direction:column;align-items:stretch;
   box-sizing:border-box;
   background:
@@ -805,18 +805,15 @@ body.rizq-lang-ar .hero-browse-panel .qcat-name{
 }
 html[dir="ltr"] .hero-vid-wrap,
 html[lang="fr"] .hero-vid-wrap{
-  width:100%;max-width:min(960px,100%);
+  width:100%;max-width:min(1320px,98vw);
 }
-.hero-vid-compact .hero-vid-inner{aspect-ratio:21/9;max-height:220px}
-.hero-vid-compact .hero-vid-ph-body{gap:6px;padding:0 16px}
-.hero-vid-compact .hero-vid-ph-h1{font-size:clamp(15px,2.4vw,22px)}
-.hero-vid-compact .hero-vid-ph-sub{font-size:11px}
-.hero-vid-compact .hero-vid-ph-excl{font-size:9.5px;padding:4px 12px;margin-bottom:2px}
-.hero-vid-compact .hero-vid-ph-urgency{display:none}
-.hero-vid-compact .hero-vid-ph-film-bar{height:18px}
-.hero-vid-compact .hero-vid-ph-corner{width:22px;height:22px}
-.hero-vid-compact .hero-vid-ph-corner.tl,.hero-vid-compact .hero-vid-ph-corner.tr{top:24px}
-.hero-vid-compact .hero-vid-ph-corner.bl,.hero-vid-compact .hero-vid-ph-corner.br{bottom:24px}
+/* عرض ترويجي بملء عرض المسرح — 16:9 بدون ضغط الارتفاع */
+.hero-vid-compact .hero-vid-inner,
+.hero-vid-wrap .hero-vid-inner{
+  aspect-ratio:16/9;
+  max-height:min(72vh,720px);
+  width:100%;
+}
 .hero-vid-wrap::before{
   content:'';position:absolute;inset:-1px;border-radius:29px;pointer-events:none;z-index:0;
   background:linear-gradient(135deg,rgba(201,168,76,.55),transparent 35%,transparent 65%,rgba(201,168,76,.28));
@@ -878,7 +875,21 @@ html[lang="fr"] .hero-vid-wrap{
   background:linear-gradient(180deg,rgba(255,255,255,.10) 0%,transparent 18%,transparent 78%,rgba(0,0,0,.28) 100%);
   border-radius:inherit;
 }
-.hero-vid-inner video{width:100%;height:100%;object-fit:cover;display:block}
+.hero-vid-inner video,
+.hero-vid-inner iframe.rzq-hero-player{width:100%;height:100%;object-fit:cover;display:block}
+/* ملء الشاشة الحقيقي للفيديوهات الترويجية */
+.hero-vid-inner:fullscreen,
+.hero-vid-inner:-webkit-full-screen{
+  width:100vw!important;height:100vh!important;max-height:none!important;
+  aspect-ratio:auto!important;border-radius:0!important;border:none!important;
+  background:#000!important;
+}
+.hero-vid-inner:fullscreen video,
+.hero-vid-inner:-webkit-full-screen video,
+.hero-vid-inner:fullscreen iframe,
+.hero-vid-inner:-webkit-full-screen iframe{
+  width:100%!important;height:100%!important;object-fit:contain!important;background:#000;
+}
 /* ══ HERO VIDEO PLACEHOLDER — PREMIUM BILLBOARD ══ */
 .hero-vid-ph{
   position:absolute;inset:0;z-index:1;overflow:hidden;
@@ -1012,10 +1023,11 @@ html[lang="fr"] .hero-vid-wrap{
   .hero-vid-ph-film-bar{height:20px}
   .hero-vid-ph-corner{width:26px;height:26px}
 }
-/* controls: mute only on video — لا كتابات تغطي مساحة الإعلان */
+/* controls: mute + fullscreen — لا كتابات تغطي مساحة الإعلان */
 .hero-vid-ctrl{position:absolute;inset:0;z-index:5;pointer-events:none}
-.hero-vid-sound-btn{
-  position:absolute;top:10px;right:10px;
+.hero-vid-sound-btn,
+.hero-vid-fs-btn{
+  position:absolute;top:10px;
   background:rgba(5,10,22,.72);backdrop-filter:blur(10px);
   border:1px solid rgba(201,168,76,.35);color:#fff;
   width:36px;height:36px;border-radius:50%;cursor:pointer;
@@ -1023,7 +1035,14 @@ html[lang="fr"] .hero-vid-wrap{
   transition:all .25s;pointer-events:auto;
   box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
-.hero-vid-sound-btn:hover{background:rgba(201,168,76,.88);border-color:var(--gold);color:var(--royal-dark);transform:scale(1.06)}
+.hero-vid-sound-btn{right:10px}
+.hero-vid-fs-btn{right:54px}
+html[dir="ltr"] .hero-vid-sound-btn,
+html[lang="fr"] .hero-vid-sound-btn{right:auto;left:10px}
+html[dir="ltr"] .hero-vid-fs-btn,
+html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
+.hero-vid-sound-btn:hover,
+.hero-vid-fs-btn:hover{background:rgba(201,168,76,.88);border-color:var(--gold);color:var(--royal-dark);transform:scale(1.06)}
 /* بيانات المعلن تحت الفيديو — خارج مساحة الصورة */
 .hero-vid-meta{
   display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
@@ -2059,8 +2078,9 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-browse-panel .hero-search{margin:0 auto 4px!important}
   .hero-browse-panel .search-cat-select{height:32px!important;min-width:84px!important;font-size:11px!important}
   .hero-browse-panel .btn-search-main{height:32px!important;padding:0 12px!important;font-size:12.5px!important}
-  .hero-vid-wrap{width:100%;max-width:100%;margin-bottom:4px}
-  .hero-vid-compact .hero-vid-inner{aspect-ratio:16/9;max-height:180px}
+  .hero-vid-wrap{width:100%;max-width:100%;margin-bottom:4px;padding:8px}
+  .hero-vid-compact .hero-vid-inner,
+  .hero-vid-wrap .hero-vid-inner{aspect-ratio:16/9;max-height:min(56vh,420px)}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
   .hero-biz-nav{
     display:grid!important;
@@ -3554,10 +3574,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
       </div>
 
-      <!-- 4) Rizq ADS — شريط سينمائي مضغوط (لا يسرق الانطباع الأول) -->
-      <div class="hero-vid-wrap hero-vid-compact" id="hero-vid-wrap" data-rizq-ads-preview="1">
+      <!-- 4) Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
+      <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
         <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
-        <div class="hero-vid-inner">
+        <div class="hero-vid-inner" id="hero-vid-inner">
           <video id="hero-featured-vid" autoplay muted loop playsinline></video>
           <div class="hero-vid-ph" id="hero-vid-ph">
             <div class="hero-vid-ph-film-bar top"></div>
@@ -3576,7 +3596,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             </div>
           </div>
           <div class="hero-vid-ctrl">
-            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
+            <button type="button" class="hero-vid-fs-btn" id="hero-vid-fs-btn" onclick="toggleHeroVidFullscreen()" title="شاشة كاملة" aria-label="شاشة كاملة">⛶</button>
+            <button type="button" class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
           </div>
         </div>
         <div class="hero-vid-meta" id="hero-vid-meta">
@@ -12254,9 +12275,9 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
         var ph   = document.getElementById('hero-vid-ph');
         if (wrap && vid) {
           var heroSrc = String(pv.heroUrl || pv.url || '');
-          /* لا تستخدم نسخ المنصة ذات العناوين المحروقة فوق الأيقونات */
-          if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(heroSrc)) {
-            heroSrc = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+          /* أعد الفيديو السابق — لا تستخدم clean-light */
+          if (/rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(heroSrc) || !heroSrc) {
+            heroSrc = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
           }
           vid.src = heroSrc;
           vid.play().catch(function(){});
@@ -12387,7 +12408,7 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
   setInterval(make,1200);
 })();
 
-// ── Hero Featured Video: تحكم الصوت ──
+// ── Hero Featured Video: تحكم الصوت + شاشة كاملة ──
 function toggleHeroVidSound(){
   var vid = document.getElementById('hero-featured-vid');
   var btn = document.getElementById('hero-vid-sound-btn');
@@ -12395,6 +12416,38 @@ function toggleHeroVidSound(){
   vid.muted = !vid.muted;
   if (btn) btn.textContent = vid.muted ? '🔇' : '🔊';
 }
+function toggleHeroVidFullscreen(){
+  var inner = document.getElementById('hero-vid-inner') || document.querySelector('.hero-vid-inner');
+  if (!inner) return;
+  var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+  try {
+    if (fsEl) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } else if (inner.requestFullscreen) {
+      inner.requestFullscreen();
+    } else if (inner.webkitRequestFullscreen) {
+      inner.webkitRequestFullscreen();
+    } else {
+      /* fallback: وسّع الإطار داخل الصفحة */
+      var wrap = document.getElementById('hero-vid-wrap');
+      if (wrap) wrap.classList.toggle('hero-vid-page-full');
+    }
+  } catch (eFs) { /* ignore */ }
+  var btn = document.getElementById('hero-vid-fs-btn');
+  if (btn) {
+    var nowFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    btn.textContent = nowFs ? '✕' : '⛶';
+    btn.title = nowFs ? 'خروج من الشاشة الكاملة' : 'شاشة كاملة';
+  }
+}
+document.addEventListener('fullscreenchange', function(){
+  var btn = document.getElementById('hero-vid-fs-btn');
+  if (!btn) return;
+  var nowFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  btn.textContent = nowFs ? '✕' : '⛶';
+  btn.title = nowFs ? 'خروج من الشاشة الكاملة' : 'شاشة كاملة';
+});
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeRvidPopup(); });
 </script>
 
@@ -12405,7 +12458,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo6"></script>
+<script src="rizq_video_ads.js?v=promo7"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=23.5"></script>
 <script src="rizq_disclaimer.js"></script>
