@@ -1102,7 +1102,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
  * روابط «تابعنا» على المنصات — تُفعَّل واحدة تلو الأخرى من سوبر أدمن.
  * الافتراضي: معطّلة كلها حتى يضبط المالك الرابط ويفعّل الزر.
  */
-const SITE_SOCIAL_KEYS = ['facebook', 'x', 'instagram', 'youtube', 'tiktok', 'linkedin'];
+const SITE_SOCIAL_KEYS = ['facebook', 'x', 'instagram', 'youtube', 'tiktok', 'linkedin', 'snapchat', 'telegram', 'whatsapp'];
 const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
 
 function defaultSiteSocial() {
