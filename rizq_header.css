@@ -598,21 +598,21 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     /* سطح المكتب: تمديد الكبسولة بعرض المحتوى تقريباً (نقاط الإشارة) */
     grid-column:1 / -1;
     justify-self:center;
-    justify-content:space-evenly;
+    justify-content:center;
     overflow-x:auto !important;
     overflow-y:hidden !important;
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center;
-    gap:4px;
+    gap:6px;
     list-style:none;
     direction:inherit;
     margin:0;
-    padding:5px 22px !important;
+    padding:5px 18px !important;
     box-sizing:border-box !important;
-    /* نقاط الإشارة الحمراء ≈ حافّتا الشريط مع هامش صغير */
-    width:calc(100% - 20px) !important;
-    max-width:none !important;
+    /* وسط معتدل — أضيق من التمديد الكامل وأوسع من النسخة الضيقة */
+    width:max-content !important;
+    max-width:min(1040px, calc(100vw - 280px)) !important;
     min-width:0;
     position:absolute !important;
     left:50% !important;
@@ -860,12 +860,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html[dir="ltr"].rizq-app-nav #nav > .nav-center,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
-    gap:4px;
-    justify-content:space-evenly;
+    gap:6px;
+    justify-content:center;
     justify-self:center;
-    width:calc(100% - 20px) !important;
-    max-width:none !important;
-    padding:7px 22px !important;
+    width:max-content !important;
+    max-width:min(1040px, calc(100vw - 280px)) !important;
+    padding:7px 18px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-account-btn,
   html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-fav-btn,
