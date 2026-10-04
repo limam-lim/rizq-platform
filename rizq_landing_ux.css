@@ -117,12 +117,13 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
 
 /* rizq_landing_ux.css — تحسينات UX للصفحة الرئيسية */
 
-/* ── Sticky compact nav (بحث + CTA عند التمرير) ── */
+/* ── Sticky compact nav — ملغى على desk/tablet (كان يختلط مع شريط الأقسام) ── */
 .nav-sticky-tools{
-  display:none;align-items:center;gap:10px;flex:1;max-width:480px;min-width:0;margin:0 12px;
+  display:none!important;align-items:center;gap:10px;flex:1;max-width:480px;min-width:0;margin:0 12px;
 }
-nav.nav-compact .nav-sticky-tools{display:flex}
-nav.nav-compact .nav-center{display:none}
+nav.nav-compact .nav-sticky-tools{display:none!important}
+/* أبقِ شريط الأقسام ظاهراً دائماً — لا تستبدله ببحث لاصق */
+nav.nav-compact .nav-center{display:flex!important}
 .nav-sticky-search-wrap{
   display:flex;flex:1;align-items:center;background:rgba(255,255,255,.08);
   border:1px solid rgba(201,168,76,.28);border-radius:10px;overflow:visible;min-width:0;
