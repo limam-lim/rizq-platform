@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=25.3"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=25.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.1"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -432,9 +432,10 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box}
 .ticker-wrap.is-empty{display:none}
 html:has(#ticker-wrap:not(.is-empty)){--rizq-ticker-h:42px}
+/* شريط القفز الثانوي مُلغى — لا يعيد ضبط موضعه فوق التيكر */
 html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
 html.rizq-has-announce .section-jump-bar{
-  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,0px))!important
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
 }
 /* Desktop: تيكر ثابت — امسح ارتفاع النافبار+التيكر ثم فجوة خفيفة للشارة */
 @media (min-width:769px) and (min-height:501px){
@@ -688,75 +689,79 @@ body.rizq-lang-ar .hero-stage{
 .hero-browse-panel{
   position:relative;z-index:60;isolation:isolate;
   width:100%;max-width:100%;box-sizing:border-box;
-  padding:10px 12px 10px;border-radius:18px;
+  /* بطاقة مضغوطة بوضوح — نفس القياسات AR/FR */
+  padding:6px 10px 6px!important;border-radius:14px;
   background:linear-gradient(165deg,#0D1B2A 0%,#1B3A6B 58%,#152e58 100%);
   border:1px solid rgba(201,168,76,.32);
-  box-shadow:0 10px 28px rgba(15,35,65,.18),inset 0 1px 0 rgba(255,255,255,.08);
+  box-shadow:0 8px 22px rgba(15,35,65,.16),inset 0 1px 0 rgba(255,255,255,.08);
   animation:fadeUp .8s .28s ease both;
 }
-/* AR/FR — نفس قياسات بطاقة البحث/الأقسام */
 html[dir="ltr"] .hero-browse-panel,
 html[lang="fr"] .hero-browse-panel,
 body.rizq-lang-fr .hero-browse-panel,
 html[dir="rtl"] .hero-browse-panel,
 html[lang="ar"] .hero-browse-panel,
 body.rizq-lang-ar .hero-browse-panel{
-  width:100%;max-width:100%;padding:10px 12px 10px;
+  width:100%;max-width:100%;padding:6px 10px 6px!important;
 }
-.hero-browse-head{text-align:center;margin:0 0 8px}
+.hero-browse-head{text-align:center;margin:0 0 4px!important}
 .hero-browse-title{
-  margin:0 0 2px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
-  font-size:clamp(14px,1.9vw,16.5px);font-weight:800;color:#F5E6B8;line-height:1.3;
+  margin:0!important;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
+  font-size:clamp(12.5px,1.6vw,14.5px)!important;font-weight:800;color:#F5E6B8;line-height:1.25;
 }
 .hero-browse-sub{
-  margin:0;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.78);line-height:1.4;
-  font-family:'Cairo',sans-serif;
+  display:none!important; /* أخفِ السطر الثاني لتصغير البطاقة */
 }
-.hero-browse-panel .hero-search{margin:0 auto 8px;max-width:100%;animation:none}
+.hero-browse-panel .hero-search{margin:0 auto 5px!important;max-width:100%;animation:none}
 .hero-browse-panel .search-bar{
   background:#fff;border:1px solid rgba(201,168,76,.28);
-  box-shadow:0 6px 18px rgba(0,0,0,.14);
-  border-radius:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,.12)!important;
+  border-radius:10px!important;
+  min-height:0!important;
 }
 .hero-browse-panel .search-cat-select{
-  height:44px;min-width:110px;padding:0 12px;font-size:12px;
-  border-radius:0 12px 12px 0;
+  height:34px!important;min-width:96px!important;padding:0 10px!important;font-size:11.5px!important;
+  border-radius:0 10px 10px 0!important;
 }
-.hero-browse-panel .search-input-wrap{padding:0 12px;gap:8px}
-.hero-browse-panel .search-input{font-size:14px}
-.hero-browse-panel .btn-search-main{height:44px;padding:0 18px;font-size:15px}
+.hero-browse-panel .search-input-wrap{padding:0 10px!important;gap:6px!important}
+.hero-browse-panel .search-input{font-size:13px!important}
+.hero-browse-panel .btn-search-main{height:34px!important;padding:0 14px!important;font-size:13px!important}
 .hero-browse-panel .quick-cats{
-  margin-bottom:0;animation:none;
-  display:flex;flex-wrap:nowrap;justify-content:stretch;align-items:stretch;
-  gap:4px;width:100%;
+  margin-bottom:0!important;animation:none;
+  display:flex!important;flex-wrap:nowrap!important;justify-content:stretch;align-items:center;
+  gap:3px!important;width:100%;
 }
 .hero-browse-panel .qcat{
-  background:rgba(255,255,255,.08);border-color:rgba(201,168,76,.22);
-  box-shadow:none;
+  background:rgba(255,255,255,.08)!important;border-color:rgba(201,168,76,.22)!important;
+  box-shadow:none!important;
   flex:1 1 0;
   min-width:0;
-  /* كبسولات أقصر — مع عرض البطاقة ونفس الخط */
-  padding:3px 2px 3px;
-  gap:1px;
-  border-radius:9px;
-  min-height:0;
+  /* كبسولة أفقية قصيرة — أيقونة + نص في صف واحد */
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:3px 4px!important;
+  gap:3px!important;
+  border-radius:999px!important;
+  min-height:0!important;
+  height:26px!important;
 }
 .hero-browse-panel .qcat:hover,
 .hero-browse-panel .qcat.qcat-open{
   background:linear-gradient(135deg,var(--gold),var(--gold-light))!important;
-  transform:translateY(-2px);
+  transform:translateY(-1px)!important;
 }
 .hero-browse-panel .qcat-gold{
   background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.10))!important;
   border-color:rgba(232,201,106,.55)!important;
 }
 .hero-browse-panel .qcat-gold .qcat-name{color:#FFE7A0!important;font-weight:800}
-.hero-browse-panel .qcat-icon{font-size:14px;line-height:1}
+.hero-browse-panel .qcat-icon{font-size:12px!important;line-height:1;flex-shrink:0}
 .hero-browse-panel .qcat-name{
-  font-size:9px;line-height:1.15;font-weight:600;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px!important;line-height:1!important;font-weight:650!important;
+  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;
   max-width:100%;
-  display:block;-webkit-line-clamp:unset;
+  display:block!important;-webkit-line-clamp:unset;
 }
 html[dir="ltr"] .hero-browse-panel .qcat,
 html[lang="fr"] .hero-browse-panel .qcat,
@@ -764,7 +769,8 @@ body.rizq-lang-fr .hero-browse-panel .qcat,
 html[dir="rtl"] .hero-browse-panel .qcat,
 html[lang="ar"] .hero-browse-panel .qcat,
 body.rizq-lang-ar .hero-browse-panel .qcat{
-  padding:3px 2px 3px;gap:1px;border-radius:9px;
+  flex-direction:row!important;padding:3px 4px!important;gap:3px!important;
+  height:26px!important;border-radius:999px!important;
 }
 html[dir="ltr"] .hero-browse-panel .qcat-name,
 html[lang="fr"] .hero-browse-panel .qcat-name,
@@ -772,9 +778,9 @@ body.rizq-lang-fr .hero-browse-panel .qcat-name,
 html[dir="rtl"] .hero-browse-panel .qcat-name,
 html[lang="ar"] .hero-browse-panel .qcat-name,
 body.rizq-lang-ar .hero-browse-panel .qcat-name{
-  font-size:9px;line-height:1.15;
+  font-size:9px!important;line-height:1!important;
 }
-.hero-browse-panel #qcat-inline-panel{margin-top:8px}
+.hero-browse-panel #qcat-inline-panel{margin-top:6px}
 
 /* ══ HERO FEATURED VIDEO AD (مضغوط تحت مسار التصفح) ══ */
 .hero-vid-wrap{
@@ -1106,15 +1112,15 @@ body.rizq-lang-fr .hero-biz-nav{
 
 .hero-biz-btn{
   position:relative;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  padding:16px 10px 14px;border-radius:18px;text-decoration:none;
-  font-weight:800;font-size:clamp(12px,1.35vw,13.5px);line-height:1.3;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:10px 8px 9px;border-radius:14px;text-decoration:none;
+  font-weight:800;font-size:clamp(11px,1.2vw,12.5px);line-height:1.25;
   color:#fff;font-family:'Cairo','Noto Naskh Arabic',sans-serif;
   background:linear-gradient(160deg,#2a5aa8 0%,#1B3A6B 55%,#152e58 100%);
   border:1.5px solid rgba(201,168,76,.55);
-  box-shadow:0 8px 20px rgba(15,35,65,.18),inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow:0 6px 16px rgba(15,35,65,.16),inset 0 1px 0 rgba(255,255,255,.18);
   transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease,filter .28s ease,background .28s ease;
-  overflow:hidden;min-height:112px;text-align:center;
+  overflow:hidden;min-height:78px;text-align:center;
   width:100%;min-width:0;box-sizing:border-box;
 }
 .hero-biz-btn::before{
@@ -1129,11 +1135,11 @@ body.rizq-lang-fr .hero-biz-nav{
   box-shadow:0 16px 36px rgba(15,35,65,.32),0 0 24px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.28);
 }
 .hero-biz-ico-wrap{
-  width:50px;height:50px;border-radius:15px;
+  width:36px;height:36px;border-radius:11px;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(145deg,#E8C96A,#C9A84C);
-  border:2px solid #fff8e0;
-  box-shadow:0 4px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5);
+  border:1.5px solid #fff8e0;
+  box-shadow:0 3px 10px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.5);
   position:relative;z-index:1;
   transition:transform .28s ease,box-shadow .28s ease;
 }
@@ -2047,13 +2053,12 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
   .hero-spaces-sub{font-size:12.5px}
-  .hero-browse-panel{padding:8px 10px 8px;border-radius:16px}
-  .hero-browse-head{margin:0 0 6px}
-  .hero-browse-title{font-size:clamp(13px,3.6vw,15px)}
-  .hero-browse-sub{font-size:11px}
-  .hero-browse-panel .hero-search{margin:0 auto 6px}
-  .hero-browse-panel .search-cat-select{height:40px;min-width:96px;font-size:11.5px}
-  .hero-browse-panel .btn-search-main{height:40px;padding:0 14px;font-size:14px}
+  .hero-browse-panel{padding:5px 8px!important;border-radius:12px}
+  .hero-browse-head{margin:0 0 3px!important}
+  .hero-browse-title{font-size:clamp(12px,3.2vw,13.5px)!important}
+  .hero-browse-panel .hero-search{margin:0 auto 4px!important}
+  .hero-browse-panel .search-cat-select{height:32px!important;min-width:84px!important;font-size:11px!important}
+  .hero-browse-panel .btn-search-main{height:32px!important;padding:0 12px!important;font-size:12.5px!important}
   .hero-vid-wrap{width:100%;max-width:100%;margin-bottom:4px}
   .hero-vid-compact .hero-vid-inner{aspect-ratio:16/9;max-height:180px}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
@@ -2111,10 +2116,10 @@ html[dir="ltr"] .listings-section .section-desc{
   .listings-label>span{font-size:11px!important;padding:8px 14px 8px 12px!important;gap:7px!important}
   .quick-cats{gap:5px}
   .qcat{min-width:0;padding:7px 5px}
-  .hero-browse-panel .quick-cats{flex-wrap:nowrap;gap:3px}
-  .hero-browse-panel .qcat{padding:2px 1px 2px;border-radius:8px;gap:0}
-  .hero-browse-panel .qcat-icon{font-size:13px}
-  .hero-browse-panel .qcat-name{font-size:8px;line-height:1.1;white-space:nowrap}
+  .hero-browse-panel .quick-cats{flex-wrap:nowrap;gap:2px!important}
+  .hero-browse-panel .qcat{padding:2px 3px!important;height:24px!important;gap:2px!important;border-radius:999px!important;flex-direction:row!important}
+  .hero-browse-panel .qcat-icon{font-size:11px!important}
+  .hero-browse-panel .qcat-name{font-size:8px!important;line-height:1!important;white-space:nowrap!important}
   .search-bar{flex-wrap:wrap}
   .search-cat-select{width:100%;border-right:none;border-bottom:1px solid #dde3ea;border-radius:14px 14px 0 0}
   .btn-search-main{width:100%;height:50px}
@@ -3051,6 +3056,21 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile img{transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
+/* سعر أمازوني على كل بلاطة منتج (ستايل + معارض) */
+.rizq-style-tile-price{
+  position:absolute;inset-inline-start:5px;bottom:5px;z-index:4;
+  max-width:calc(100% - 10px);
+  padding:2px 7px;border-radius:6px;
+  background:rgba(255,255,255,.94);
+  color:#0f172a;font-size:10px;font-weight:800;line-height:1.2;
+  font-family:'Cairo','Segoe UI',sans-serif;
+  box-shadow:0 2px 8px rgba(0,0,0,.28);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;direction:ltr;unicode-bidi:isolate;
+}
+.rizq-style-tile:first-child .rizq-style-tile-price{font-size:11.5px;padding:3px 8px}
+#rizq-showroom-models .rizq-style-tile.is-linked,
+#rizq-style-looks .rizq-style-tile.is-linked{cursor:zoom-in}
 /* بلاطات المعارض تتحرك — ليست جامدة (إيموجي وصور) */
 .rizq-style-tile{animation:rizqTileFloat 4.8s ease-in-out infinite}
 .rizq-style-tile:nth-child(2){animation-delay:.4s}
@@ -3355,8 +3375,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </a>
 </nav>
 
-<!-- ── Section jump bar (يظهر بعد 300px) ── -->
-<nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع">
+<!-- ── Section jump bar — مخفي (كان يختلط مع الشريط الرئيسي عند التمرير) ── -->
+<nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="true" hidden>
   <a href="#listings" data-jump="#listings">الإعلانات</a>
   <a href="#virtual-stores" data-jump="#virtual-stores">المحلات</a>
   <a href="#virtual-showrooms" data-jump="#virtual-showrooms">المعارض</a>
@@ -5701,6 +5721,25 @@ function _styBuildCardHtml(opts){
     + '</div></article>';
 }
 
+function _styTilePriceHtml(ad){
+  if(!ad) return '';
+  var price = '';
+  try {
+    var d = (typeof trAd === 'function') ? trAd(ad) : ad;
+    price = String((d && (d.price || d.priceFR || d.priceFr)) || ad.price || ad.priceFR || ad.priceFr || '').trim();
+  } catch(eP){
+    price = String(ad.price || '').trim();
+  }
+  if(!price && ad.priceNum != null && isFinite(Number(ad.priceNum))){
+    try { price = Number(ad.priceNum).toLocaleString('fr-FR') + ' MRU'; }
+    catch(eN){ price = String(ad.priceNum) + ' MRU'; }
+  }
+  if(!price) return '';
+  /* اختصار بصري مثل أمازون على الصورة */
+  var short = price.replace(/\s*MRU\s*/i,' MRU').trim();
+  if(short.length > 18) short = short.slice(0, 16) + '…';
+  return '<span class="rizq-style-tile-price" dir="ltr">'+_styEsc(short)+'</span>';
+}
 function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
@@ -5713,22 +5752,29 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
       title = String((d && (d.title || ad.title)) || '').trim();
     } catch(e){ title = String(ad.title || '').trim(); }
   }
+  var priceBadge = _styTilePriceHtml(ad);
   var aria = linked
-    ? ' aria-label="'+_styEsc(title || String(ad.id))+'"'
+    ? ' aria-label="'+_styEsc((title ? title + ' — ' : '') + (priceBadge ? String(ad.price||'') : '') || String(ad.id))+'"'
     : ' aria-hidden="true"';
   /* span قابل للنقر — يعمل داخل الموزاييك ويفتح إعلان البلاطة */
   var openAttr = linked
     ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
     : ' class="rizq-style-tile"'+aria;
   if(src){
-    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></span>';
+    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/>'+priceBadge+'</span>';
   }
-  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</span>';
+  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+priceBadge+'</span>';
 }
-function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
+function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint, priceHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
   var linked = adId != null && adId !== '';
   var title = String(titleHint || '').trim();
+  var priceBadge = '';
+  if(priceHint){
+    priceBadge = '<span class="rizq-style-tile-price" dir="ltr">'+_styEsc(String(priceHint).slice(0,18))+'</span>';
+  } else if(linked && typeof _styFindAdById === 'function'){
+    priceBadge = _styTilePriceHtml(_styFindAdById(adId));
+  }
   var aria = linked
     ? ' aria-label="'+_styEsc(title || String(adId))+'"'
     : ' aria-hidden="true"';
@@ -5736,9 +5782,9 @@ function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
     ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
     : ' class="rizq-style-tile"'+aria;
   if(src){
-    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></span>';
+    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/>'+priceBadge+'</span>';
   }
-  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</span>';
+  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+priceBadge+'</span>';
 }
 
 /* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
@@ -5903,7 +5949,7 @@ function buildStyleIdeas(reshuffle){
     var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
     var seedTiles = '';
     for(var si=0; si<3; si++){
-      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id, seedName);
+      if(seedImgs[si]) seedTiles += _styTileFromSrc(seedImgs[si], seed.emoji, seed.bg, seed.id, seedName, seed.price || seed.priceFR || '');
       else seedTiles += _styTileHtml({ id: seed.id, emoji: seed.emoji, bg: seed.bg, images: [], href: seed.href, fromView: true, title: seed.title, titleFR: seed.titleFR }, (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seed.emoji, seed.bg);
     }
     var genderBadge0 = _styGenderBadge(gender, fr);
