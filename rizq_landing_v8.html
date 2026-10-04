@@ -2974,7 +2974,8 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 }
 .rizq-style-tile:focus-visible{outline:2px solid var(--gold,#C9A84C);outline-offset:-2px;z-index:3}
 .rizq-style-tile.is-linked:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(201,168,76,.55);transform:scale(1.04)}
-.rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.rizq-style-tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transition:transform .35s ease}
+.rizq-style-tile.is-linked:hover img{transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
 .rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
@@ -5087,6 +5088,8 @@ function animateCount(el,target){
 const ADS=[
   {id:101,emoji:'🏠',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🏠 عقارات',catKey:'عقارات',title:'شقة 3 غرف للكراء — نواكشوط',titleFR:'Appartement 3 pièces à louer — Nouakchott',desc:'تشطيب عالي الجودة، تكييف مركزي، حراسة 24/7، موقف سيارات، إطلالة بانورامية على المدينة.',descFR:'Finition haut de gamme, climatisation centrale, sécurité 24/7, parking, vue panoramique sur la ville.',price:'150,000 MRU/شهر',priceFR:'150,000 MRU/mois',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',pin:true,tags:['3 غرف','مفروشة','طابق 4','مصعد'],tagsFR:['3 pièces','Meublé','4ème étage','Ascenseur'],seller:'محمد الأمين',sellerFR:'Mohamed El Amine',sellerMeta:'★★★★★ — بائع موثّق منذ 2023',sellerMetaFR:'★★★★★ — Vendeur vérifié depuis 2023',sellerEmoji:'🏠',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:102,emoji:'🚗',bg:'linear-gradient(135deg,#234d8f,#1B3A6B)',cat:'🚗 سيارات',catKey:'سيارات',title:'Toyota Hilux 2022 بحالة ممتازة',titleFR:'Toyota Hilux 2022 en excellent état',desc:'سيارة ديزل 4WD، ممشى 45,000 كم فقط، بدون حوادث، صيانة دورية كاملة في الوكيل المعتمد.',descFR:'Véhicule diesel 4x4, seulement 45 000 km, sans accident, entretien régulier complet chez le concessionnaire agréé.',price:'8,000,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['2022','ديزل','4WD','45K كم'],tagsFR:['2022','Diesel','4x4','45K km'],seller:'عبد الله محمد',sellerFR:'Abdallah Mohamed',sellerMeta:'★★★★☆ — تاجر معتمد',sellerMetaFR:'★★★★☆ — Commerçant agréé',sellerEmoji:'🚗',status:'✅ موثّق',statusFR:'✅ Vérifié'},
+  {id:123,emoji:'🚗',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'تويوتا كامري 2021 — سيدان عائلية',titleFR:'Toyota Camry 2021 — berline familiale',desc:'كامري سيدان بحالة ممتازة، بنزين، صيانة دورية، مناسبة للعائلة.',descFR:'Camry berline en excellent état, essence, entretien régulier, idéale famille.',price:'4,200,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['سيدان','2021','كامري','عائلي'],tagsFR:['Berline','2021','Camry','Familiale'],seller:'وكالة النجمة',sellerFR:'Agence Najma',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',sellerEmoji:'🚗',status:'✅ موثّق',statusFR:'✅ Vérifié'},
+  {id:124,emoji:'🚙',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'هيونداي توسان 2022 — SUV',titleFR:'Hyundai Tucson 2022 — SUV',desc:'SUV مريح للطريق الطويل، تكييف، شاشة، حالة وكالة.',descFR:'SUV confortable longue route, clim, écran, état concessionnaire.',price:'5,800,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['SUV','2022','توسان','عائلي'],tagsFR:['SUV','2022','Tucson','Familial'],seller:'أوتو موريتانيا',sellerFR:'Auto Mauritanie',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',sellerEmoji:'🚙',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:103,emoji:'📱',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'📱 إلكترونيات',catKey:'إلكترونيات',title:'iPhone 15 Pro Max 256GB جديد',titleFR:'iPhone 15 Pro Max 256 Go neuf',desc:'جديد لم يُستعمل، مشتراة من دبي، مع ضمان عالمي سنة كاملة، الكرتون والملحقات الأصلية.',descFR:'Neuf jamais utilisé, acheté à Dubaï, garantie internationale d\'un an, boîte et accessoires d\'origine.',price:'380,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['256GB','جديد','ضمان 1 سنة','iPhone 15'],tagsFR:['256 Go','Neuf','Garantie 1 an','iPhone 15'],seller:'عيشة باه',sellerFR:'Aicha Bah',sellerMeta:'★★★★★ — بائعة موثّقة',sellerMetaFR:'★★★★★ — Vendeuse vérifiée',sellerEmoji:'📱',status:'✅ موثّق',statusFR:'✅ Vérifié'},
   {id:104,emoji:'🐪',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'🐄 ماشية',catKey:'ماشية',title:'إبل للبيع — 5 رؤوس أصيلة',titleFR:'Chameaux à vendre — 5 têtes pur-sang',desc:'إبل أصيلة من منطقة أدرار، بصحة ممتازة وشهادة بيطرية، مستعدة للتسليم الفوري.',descFR:'Chameaux pur-sang de la région d\'Adrar, en excellente santé avec certificat vétérinaire, prêts à livrer immédiatement.',price:'1,200,000 MRU',loc:'📍 أدرار',locFR:'📍 Adrar',tags:['5 رؤوس','أصيلة','شهادة بيطرية','أدرار'],tagsFR:['5 têtes','Pur-sang','Certificat vétérinaire','Adrar'],seller:'احمد ولد يحيى',sellerFR:'Ahmed Ould Yahya',sellerMeta:'★★★★☆ — مربّي معتمد',sellerMetaFR:'★★★★☆ — Éleveur agréé',sellerEmoji:'🐪',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification'},
   {id:105,emoji:'🚛',bg:'linear-gradient(135deg,#0f2347,#162235)',cat:'🚛 شاحنات',catKey:'شاحنات',title:'شاحنة مرسيدس Actros 2020',titleFR:'Camion Mercedes Actros 2020',desc:'شاحنة نقل ثقيل، محرك 500 حصان، جاهزة للعمل الفوري، وثائق كاملة وسجل صيانة متكامل.',descFR:'Camion de transport lourd, moteur 500 chevaux, prêt à l\'emploi immédiat, documents complets et carnet d\'entretien intégral.',price:'18,000,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['2020','500 HP','Actros','صيانة كاملة'],tagsFR:['2020','500 ch','Actros','Entretien complet'],seller:'شركة النقل الموريتانية',sellerFR:'Société de Transport Mauritanienne',sellerMeta:'★★★★★ — شركة موثّقة',sellerMetaFR:'★★★★★ — Entreprise vérifiée',sellerEmoji:'🏢',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée'},
@@ -5544,9 +5547,9 @@ function _styFindAdById(id){
 function rizqOpenStyleItem(ev, adId){
   /* فتح المنتج المضغوط عليه فقط — لا تسريب لنقر بطاقة الإطلالة */
   if(ev){
-    ev.preventDefault();
-    ev.stopPropagation();
-    if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+    try { ev.preventDefault(); } catch(e0){}
+    try { ev.stopPropagation(); } catch(e1){}
+    if(ev.stopImmediatePropagation) try { ev.stopImmediatePropagation(); } catch(e2){}
   }
   if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
@@ -5568,12 +5571,12 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
   /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
   if(ev){
     var t = ev.target;
-    if(t && t.closest && t.closest('.rizq-style-tile')){
-      ev.preventDefault();
-      ev.stopPropagation();
+    /* بلاطة مرتبطة بإعلانها — لا تسرق النقرة لبطاقة الإطلالة */
+    if(t && t.closest && t.closest('.rizq-style-tile.is-linked')){
+      try { ev.preventDefault(); } catch(eP){}
       return false;
     }
-    ev.preventDefault();
+    try { ev.preventDefault(); } catch(e2){}
   }
   if(primaryId){
     return rizqOpenStyleItem(null, primaryId);
@@ -5624,15 +5627,14 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var aria = linked
     ? ' aria-label="'+_styEsc(title || String(ad.id))+'"'
     : ' aria-hidden="true"';
+  /* span قابل للنقر — يعمل داخل الموزاييك ويفتح إعلان البلاطة */
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
     : ' class="rizq-style-tile"'+aria;
-  var tag = linked ? 'button type="button"' : 'div';
-  var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
+    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></span>';
   }
-  return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</'+close+'>';
+  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+'</span>';
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
@@ -5642,14 +5644,12 @@ function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint){
     ? ' aria-label="'+_styEsc(title || String(adId))+'"'
     : ' aria-hidden="true"';
   var openAttr = linked
-    ? ' data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" class="rizq-style-tile is-linked"'+aria
+    ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
     : ' class="rizq-style-tile"'+aria;
-  var tag = linked ? 'button type="button"' : 'div';
-  var close = linked ? 'button' : 'div';
   if(src){
-    return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></'+close+'>';
+    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/></span>';
   }
-  return '<'+tag+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</'+close+'>';
+  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+'</span>';
 }
 
 /* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
@@ -5948,12 +5948,21 @@ try { _styStartAutoRefresh(); } catch(eAuto) {}
 /* ── نماذج المعارض — نفس فكرة أفكار الأنماط لكن لسيارات/أثاث/إلكترونيات… ── */
 var _rizqSrmCat = 'cars';
 var RIZQ_SRM_CATS = {
-  cars: { ar:'سيارات', fr:'Voitures', dirCat:'سيارات', allow:/سيارات|سيارات\s*و|voiture|auto|sedan|suv|4x4|camionnette/i },
-  electronics: { ar:'إلكترونيات', fr:'Électronique', dirCat:'إلكترونيات', allow:/إلكترون|هواتف|لابتوب|تلفزيون|جوال|iphone|samsung|laptop|tv|électronique|electronique/i },
-  furniture: { ar:'أثاث ومفروشات', fr:'Meubles', dirCat:'أثاث', allow:/أثاث|مفروشات|كنب|سرير|طاولة|خزانة|meuble|canapé|sofa|armoire/i },
-  equipment: { ar:'معدات ومكائن', fr:'Équipements', dirCat:'معدات', allow:/معدات|مكائن|آلات|حفارة|مولد|équipement|equipement|machine|engin|générateur|generateur/i },
-  building: { ar:'مواد بناء', fr:'Matériaux', dirCat:'بناء', allow:/بناء|إسمنت|حديد|طوب|مواد\s*بناء|ciment|fer|construction|matériau|materiau/i },
-  jewelry: { ar:'مجوهرات', fr:'Bijoux', dirCat:'ذهب', allow:/ذهب|مجوهرات|خاتم|سوار|عقد|عيار|bijou|or\b|gold|joaill/i }
+  /* allow يُطبَّق على cat/catKey فقط — لا على الوصف (تفادي «موقف سيارات» في الشقق) */
+  cars: { ar:'سيارات', fr:'Voitures', dirCat:'سيارات', allow:/^(?=.*(?:سيارات|voiture|\bauto\b|sedan|suv|4x4|camionnette|moto))/i, block:/عقارات|شقق|أراضي|أثاث|إلكترون|ذهب|ماشية|خدمات|أزياء|appartement|terrain/i },
+  electronics: { ar:'إلكترونيات', fr:'Électronique', dirCat:'إلكترونيات', allow:/إلكترون|هواتف|لابتوب|تلفزيون|جوال|iphone|samsung|laptop|\btv\b|électronique|electronique/i, block:/عقارات|سيارات|شاحن(?:ات)?\b|أثاث|ذهب|ماشية|appartement|voiture/i },
+  furniture: { ar:'أثاث ومفروشات', fr:'Meubles', dirCat:'أثاث', allow:/أثاث|مفروشات|كنب|سرير|طاولة|خزانة|meuble|canapé|sofa|armoire/i, block:/عقارات|سيارات|إلكترون|ذهب|ماشية|شاحن/i },
+  equipment: { ar:'معدات ومكائن', fr:'Équipements', dirCat:'معدات', allow:/معدات|مكائن|آلات|حفارة|مولد|équipement|equipement|\bmachine\b|\bengin\b|générateur|generateur|caterpillar/i, block:/عقارات|شقق|أزياء|ذهب|ماشية|إلكترون.*هاتف/i },
+  building: { ar:'مواد بناء', fr:'Matériaux', dirCat:'بناء', allow:/بناء|إسمنت|حديد|طوب|مواد\s*بناء|ciment|fer\b|construction|matériau|materiau|ألواح\s*شمسي/i, block:/عقارات|شقق|سيارات|أزياء|ذهب/i },
+  jewelry: { ar:'مجوهرات', fr:'Bijoux', dirCat:'ذهب', allow:/ذهب|مجوهرات|خاتم|سوار|عقد|عيار|bijou|\bgold\b|joaill/i, block:/عقارات|سيارات|إلكترون|أثاث|ماشية|شاحن/i }
+};
+var RIZQ_SRM_EMOJI_SETS = {
+  cars: [['🚗','🔑','🛡️'],['🚙','🛞','🗺️'],['🚘','✨','🏷️']],
+  electronics: [['📱','🔋','🎧'],['💻','🖱️','⌨️'],['📺','🔊','📡']],
+  furniture: [['🛋️','🪞','🪴'],['🛏️','🗄️','💡'],['🪑','📐','🗂️']],
+  equipment: [['⚙️','🔧','🧰'],['⚡','🛢️','🔌'],['🚜','🛞','🛡️']],
+  building: [['🏗️','🧱','📦'],['🔩','📏','🏭'],['🪟','🪣','✨']],
+  jewelry: [['🪙','💍','✨'],['💍','📿','💎'],['💎','👑','✨']]
 };
 var RIZQ_SRM_TEMPLATES = {
   cars: [
@@ -6003,21 +6012,25 @@ function _srmTabIdFor(cat){
 function _srmIsModelCat(a, cat){
   if(!a) return false;
   var meta = _srmCatMeta(cat);
-  var k = String(a.catKey || a.cat || '');
-  var blob = (typeof _styAdBlob === 'function') ? _styAdBlob(a) : [a.title,a.cat,k].join(' ');
-  if(meta.allow.test(k) || meta.allow.test(blob)) return true;
-  if((meta.dirCat && (k.indexOf(meta.dirCat) >= 0 || String(meta.ar||'').indexOf(k) >= 0))) return true;
+  var k = String(a.catKey || '').trim();
+  var catStr = String(a.cat || '').trim();
+  var head = (k + ' ' + catStr).trim();
+  if(!head) return false;
+  /* استبعاد صريح للأصناف الدخيلة */
+  if(meta.block && meta.block.test(head)) return false;
+  if(meta.dirCat && (k === meta.dirCat || k.indexOf(meta.dirCat) >= 0 || catStr.indexOf(meta.dirCat) >= 0)) return true;
+  if(meta.allow && (meta.allow.test(k) || meta.allow.test(catStr) || meta.allow.test(head))) return true;
   return false;
 }
 function _srmAdKind(a){
   if(!a) return '';
   var blob = [a.title||'', a.titleFR||'', a.subcat||'', a.cat||'', a.catKey||''].join(' ');
-  if(/suv|جيب|دفع\s*رباعي|4\s*x\s*4/i.test(blob)) return 'suv';
-  if(/سيدان|berline|sedan|صالون/i.test(blob)) return 'sedan';
+  if(/suv|جيب|دفع\s*رباعي|4\s*x\s*4|land\s*cruiser|تويوتا\s*لاند/i.test(blob)) return 'suv';
+  if(/سيدان|berline|\bsedan\b|كامري|corolla|فيينا/i.test(blob)) return 'sedan';
   if(/هاتف|iphone|samsung|phone|جوال|موبايل/i.test(blob)) return 'phone';
   if(/لابتوب|laptop|حاسوب|ordinateur/i.test(blob)) return 'laptop';
-  if(/تلفزيون|tv|écran|شاشة/i.test(blob)) return 'tv';
-  if(/كنب|sofa|canapé|صالون/i.test(blob)) return 'sofa';
+  if(/تلفزيون|\btv\b|écran|شاشة/i.test(blob)) return 'tv';
+  if(/كنب|sofa|canapé|صالون\s*(?:أنيق|بيت|منزل|غرفة)?/i.test(blob)) return 'sofa';
   if(/سرير|bed|lit/i.test(blob)) return 'bed';
   if(/مكتب|bureau|desk|طاولة/i.test(blob)) return 'desk';
   if(/مولد|générateur|generateur|generator/i.test(blob)) return 'generator';
@@ -6103,15 +6116,17 @@ function buildShowroomModels(reshuffle){
       return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
     }));
     if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
+    /* إن نفدت غير المستخدمة — أعد من نفس الصنف فقط (لا عقارات في السيارات) */
+    if(!catPool.length) catPool = pool.slice();
     var primary = catPool.length ? (typeof _styShuffle==='function' ? _styShuffle(catPool)[0] : catPool[0]) : null;
     if(primary) usedIds[String(primary.id)] = 1;
     var companions = [];
     if(primary){
-      var srmPool = pool.filter(function(a){ return a && !usedIds[String(a.id)]; });
+      var srmPool = pool.filter(function(a){ return a && String(a.id) !== String(primary.id); });
       companions = (typeof _styPickLookCompanions === 'function')
         ? _styPickLookCompanions(primary, srmPool, 'both', 2)
         : ((typeof _styShuffle==='function' ? _styShuffle : function(a){return a;})(srmPool).slice(0, 2));
-      companions.forEach(function(c){ usedIds[String(c.id)] = 1; });
+      /* المرافقون لا يُستهلكون من usedIds حتى تبقى بلاطة لكل بطاقة قابلة للفتح */
     }
     var items = primary ? [primary].concat(companions) : [];
     while(items.length < 3) items.push(null);
@@ -6161,7 +6176,7 @@ function buildShowroomModels(reshuffle){
   var extrasSrm = (typeof _styShuffle === 'function' ? _styShuffle : function(a){return a.slice();})(
     pool.filter(function(a){ return !usedIds[String(a.id)]; })
   );
-  var emojiSrm = [['✨','🏷️','📦'],['🔍','⭐','🛒'],['📸','💎','🧭']];
+  var emojiSrm = (RIZQ_SRM_EMOJI_SETS && RIZQ_SRM_EMOJI_SETS[cat]) || RIZQ_SRM_EMOJI_SETS.cars;
   for(var sx=0; cards.length < 6 && sx < extrasSrm.length; sx++){
     var adS = extrasSrm[sx];
     usedIds[String(adS.id)] = 1;
