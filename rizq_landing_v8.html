@@ -725,6 +725,7 @@ html[lang="fr"] .hero-subtitle-secondary{
   animation:fadeUp .8s .36s ease both;
   padding:12px 12px 8px;
   border-radius:22px;
+  display:flex;flex-direction:column;align-items:stretch;
   background:
     linear-gradient(160deg,rgba(201,168,76,.16),rgba(27,58,107,.20) 45%,rgba(8,15,30,.55)),
     linear-gradient(145deg,#0a1628,#132a4a 55%,#0c1830);
@@ -757,11 +758,13 @@ html[lang="fr"] .hero-subtitle-secondary{
   filter:blur(8px);pointer-events:none;
 }
 .hero-vid-badge{
-  position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+  position:relative;display:inline-flex;align-self:center;
+  top:auto;left:auto;transform:none;
+  margin:0 auto 10px;max-width:100%;
   background:linear-gradient(135deg,#b89840,var(--gold),var(--gold-light));
   color:var(--royal-dark);font-size:11px;font-weight:900;
   padding:7px 22px;border-radius:100px;
-  letter-spacing:.6px;z-index:6;white-space:nowrap;
+  letter-spacing:.6px;z-index:2;white-space:nowrap;
   box-shadow:0 6px 20px rgba(201,168,76,.42),0 0 0 3px rgba(8,15,30,.55);
   font-family:'Cairo','Segoe UI','Arial',sans-serif;
   animation:heroVidBadgePulse 3.2s ease-in-out infinite;
@@ -919,30 +922,33 @@ html[lang="fr"] .hero-subtitle-secondary{
   .hero-vid-ph-film-bar{height:20px}
   .hero-vid-ph-corner{width:26px;height:26px}
 }
-/* controls overlay */
+/* controls: mute only on video — لا كتابات تغطي مساحة الإعلان */
 .hero-vid-ctrl{position:absolute;inset:0;z-index:5;pointer-events:none}
 .hero-vid-sound-btn{
-  position:absolute;top:14px;right:14px;
+  position:absolute;top:10px;right:10px;
   background:rgba(5,10,22,.72);backdrop-filter:blur(10px);
   border:1px solid rgba(201,168,76,.35);color:#fff;
-  width:40px;height:40px;border-radius:50%;cursor:pointer;
-  font-size:16px;display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  font-size:15px;display:flex;align-items:center;justify-content:center;
   transition:all .25s;pointer-events:auto;
   box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
 .hero-vid-sound-btn:hover{background:rgba(201,168,76,.88);border-color:var(--gold);color:var(--royal-dark);transform:scale(1.06)}
-.hero-vid-adv-bar{
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(transparent,rgba(5,10,22,.92));
-  padding:48px 18px 16px;pointer-events:auto;display:none;
+/* بيانات المعلن تحت الفيديو — خارج مساحة الصورة */
+.hero-vid-meta{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-top:10px;padding:0 4px;position:relative;z-index:2;min-height:0;
 }
-.hero-vid-adv-name{font-size:15px;font-weight:800;color:#fff;margin-bottom:2px}
-.hero-vid-adv-loc{font-size:11.5px;color:rgba(255,255,255,.65)}
+.hero-vid-adv-bar{
+  position:static;background:none;padding:0;pointer-events:auto;display:none;flex:1;min-width:0;
+}
+.hero-vid-adv-name{font-size:13px;font-weight:800;color:rgba(255,248,224,.95);margin-bottom:2px}
+.hero-vid-adv-loc{font-size:11px;color:rgba(232,214,160,.72)}
 .hero-vid-views{
-  position:absolute;bottom:16px;left:16px;
+  position:static;
   background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);
-  font-size:11px;font-weight:800;padding:6px 14px;border-radius:100px;
-  pointer-events:auto;display:none;
+  font-size:11px;font-weight:800;padding:5px 12px;border-radius:100px;
+  pointer-events:auto;display:none;flex-shrink:0;
   font-family:'Cairo','Segoe UI','Arial',sans-serif;
   box-shadow:0 4px 14px rgba(201,168,76,.35);
 }
@@ -3460,13 +3466,15 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             </div>
           </div>
           <div class="hero-vid-ctrl">
-            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت">🔇</button>
-            <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
-              <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
-              <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
-            </div>
-            <div class="hero-vid-views" id="hero-vid-views"></div>
+            <button class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
           </div>
+        </div>
+        <div class="hero-vid-meta" id="hero-vid-meta">
+          <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
+            <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
+            <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
+          </div>
+          <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
         <div class="hero-vid-cta-bar">
           <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
@@ -12056,20 +12064,24 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
         var vid  = document.getElementById('hero-featured-vid');
         var ph   = document.getElementById('hero-vid-ph');
         if (wrap && vid) {
-          vid.src = pv.heroUrl || pv.url;
+          var heroSrc = String(pv.heroUrl || pv.url || '');
+          /* لا تستخدم نسخ المنصة ذات العناوين المحروقة فوق الأيقونات */
+          if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(heroSrc)) {
+            heroSrc = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+          }
+          vid.src = heroSrc;
           vid.play().catch(function(){});
-          wrap.style.display = '';          // أظهر الـ wrapper
-          if (ph) ph.style.display = 'none'; // أخفِ الـ placeholder
-          // اسم المُعلِن
+          wrap.style.display = '';
+          if (ph) ph.style.display = 'none';
+          /* بيانات المعلن تحت الإطار فقط — بلا كتابات على مساحة الإعلان */
           if (pv.heroAdvertiser) {
             var advBar = document.getElementById('hero-vid-adv-bar');
             var advName = document.getElementById('hero-vid-adv-name');
             var advLoc  = document.getElementById('hero-vid-adv-loc');
             if (advName) advName.textContent = pv.heroAdvertiser;
-            if (advLoc && pv.heroAdvertiserLoc) advLoc.textContent = pv.heroAdvertiserLoc;
+            if (advLoc) advLoc.textContent = pv.heroAdvertiserLoc || '';
             if (advBar) advBar.style.display = 'block';
           }
-          // عداد المشاهدات
           if (pv.heroViews) {
             var vb = document.getElementById('hero-vid-views');
             if (vb) { vb.textContent = '👁 ' + pv.heroViews + ' مشاهدة/يوم'; vb.style.display = 'block'; }
@@ -12204,7 +12216,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo2"></script>
+<script src="rizq_video_ads.js?v=promo4"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=23.4"></script>
 <script src="rizq_disclaimer.js"></script>
