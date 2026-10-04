@@ -117,12 +117,13 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
 
 /* rizq_landing_ux.css — تحسينات UX للصفحة الرئيسية */
 
-/* ── Sticky compact nav (بحث + CTA عند التمرير) ── */
+/* ── Sticky compact nav — ملغى على desk/tablet (كان يختلط مع شريط الأقسام) ── */
 .nav-sticky-tools{
-  display:none;align-items:center;gap:10px;flex:1;max-width:480px;min-width:0;margin:0 12px;
+  display:none!important;align-items:center;gap:10px;flex:1;max-width:480px;min-width:0;margin:0 12px;
 }
-nav.nav-compact .nav-sticky-tools{display:flex}
-nav.nav-compact .nav-center{display:none}
+nav.nav-compact .nav-sticky-tools{display:none!important}
+/* أبقِ شريط الأقسام ظاهراً دائماً — لا تستبدله ببحث لاصق */
+nav.nav-compact .nav-center{display:flex!important}
 .nav-sticky-search-wrap{
   display:flex;flex:1;align-items:center;background:rgba(255,255,255,.08);
   border:1px solid rgba(201,168,76,.28);border-radius:10px;overflow:visible;min-width:0;
@@ -140,35 +141,35 @@ nav.nav-compact .nav-center{display:none}
 }
 .nav-sticky-search-wrap button:hover{background:rgba(201,168,76,.4)}
 .nav-sticky-post{
-  display:none;white-space:nowrap;padding:8px 16px;border-radius:9px;font-size:12.5px;
+  display:none!important;white-space:nowrap;padding:8px 16px;border-radius:9px;font-size:12.5px;
   font-weight:800;border:none;cursor:pointer;font-family:inherit;
   background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-light,#e8c96a));
   color:var(--royal-dark,#0f2347);box-shadow:0 4px 14px rgba(201,168,76,.35);
 }
-nav.nav-compact .nav-sticky-post{display:inline-flex;align-items:center;gap:4px}
+/* desk/tablet: نشر في شريط الأقسام فقط — لا زر لاصق منفصل */
+@media (min-width:769px) and (min-height:501px){
+  nav.nav-compact .nav-sticky-post,
+  #nav-sticky-post{display:none!important}
+}
+@media (max-width:768px), (orientation:landscape) and (max-height:500px){
+  nav.nav-compact .nav-sticky-post{display:none!important}
+}
 
-/* ── Section jump bar — أخفّ بصرياً، لا ينافس الشريط الرئيسي ── */
+/* ── Section jump bar — مُلغى على desk/tablet (يسبب اختلاط مع شريط الأقسام) ── */
 .section-jump-bar{
-  position:fixed !important;top:72px;left:0;right:0;z-index:800;
-  display:flex;justify-content:center;gap:8px;flex-wrap:nowrap;
-  padding:6px 14px;background:rgba(7,13,30,.88);
-  border-bottom:1px solid rgba(201,168,76,.12);
-  backdrop-filter:blur(12px);
-  transform:translateY(-110%);opacity:0;pointer-events:none;
-  transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .3s;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  height:0 !important;
+  overflow:hidden !important;
+  transform:none !important;
 }
-.section-jump-bar::-webkit-scrollbar{display:none}
-.section-jump-bar.visible{transform:translateY(0);opacity:1;pointer-events:auto}
-.section-jump-bar a,.section-jump-bar button{
-  color:rgba(255,255,255,.82);text-decoration:none;font-size:11.5px;font-weight:650;
-  padding:5px 12px;border-radius:999px;white-space:nowrap;
-  background:transparent;border:1px solid transparent;
-  cursor:pointer;font-family:inherit;transition:all .22s;
-}
-.section-jump-bar a:hover,.section-jump-bar button:hover,
-.section-jump-bar a.active{
-  background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.35);color:var(--gold-light,#e8c96a);
+.section-jump-bar.visible{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  opacity:0 !important;
 }
 
 /* ── Back to top ── */
@@ -296,12 +297,24 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 
 /* ── Section centering (clean — no glass overrides) ── */
 .hero-content{
-  max-width:1200px;
+  width:100%;
+  max-width:min(960px,86vw);
   margin:0 auto;
   text-align:center;
   display:flex;
   flex-direction:column;
   align-items:center;
+  box-sizing:border-box;
+}
+/* AR/FR parity — نفس عرض المحتوى على الشاشة */
+html[dir="ltr"] .hero-content,
+html[lang="fr"] .hero-content,
+body.rizq-lang-fr .hero-content,
+html[dir="rtl"] .hero-content,
+html[lang="ar"] .hero-content,
+body.rizq-lang-ar .hero-content{
+  width:100%;
+  max-width:min(960px,86vw);
 }
 
 .why-section > .section-header,
@@ -752,23 +765,30 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 /* Hero carousel — luxury live strip */
 #cards-track .ad-card .rizq-skel-media,
 #cards-track .rizq-skel-media{
-  height:158px!important;
-  border-radius:20px 20px 0 0!important;
+  height:122px!important;
+  border-radius:16px 16px 0 0!important;
 }
-#cards-track .ad-card{
-  min-width:248px;
+#cards-track .ad-card,
+#hero-listings .ad-card{
+  width:208px!important;
+  min-width:208px!important;
+  max-width:208px!important;
   border:1px solid rgba(201,168,76,.32)!important;
+  border-radius:16px!important;
   background:
     linear-gradient(160deg,rgba(201,168,76,.14),transparent 34%),
     linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%)!important;
-  box-shadow:0 10px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+#hero-listings .ad-card-img{
+  height:122px!important;
 }
 #hero-listings .listings-label span{
   display:inline-flex;
   align-items:center;
   gap:10px;
   padding:10px 22px 10px 16px;
-  border-radius:999px;
+  border-radius:8px;
   background:
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);

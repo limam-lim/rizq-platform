@@ -141,6 +141,7 @@
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>'
       + '        <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>'
       + '      </ul>'
+      + '      <div id="rizq-social-follow" hidden></div>'
       + '    </div>'
       + '  </div>'
       + '  <div class="footer-bottom">'
@@ -171,15 +172,31 @@
     document.head.appendChild(s);
   }
 
+  function ensureSocialLinks() {
+    try {
+      if (typeof window.RizqSocialLinksRefresh === 'function') {
+        window.RizqSocialLinksRefresh();
+        return;
+      }
+    } catch (e) {}
+    if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
+    var s = document.createElement('script');
+    s.src = 'rizq_social_links.js?v=23.5';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+
   function boot() {
     if (shouldSkip()) return;
     if (hasCompleteFooter()) {
       ensureToggle();
+      ensureSocialLinks();
       return;
     }
     removeIncompleteFooters();
     if (hasCompleteFooter()) {
       ensureToggle();
+      ensureSocialLinks();
       return;
     }
     injectCss();
@@ -187,6 +204,7 @@
     if (!mount) return;
     mount.insertAdjacentHTML('beforeend', footerHtml());
     ensureToggle();
+    ensureSocialLinks();
     try {
       if (typeof window._rzqApplyFooterStats === 'function') window._rzqApplyFooterStats();
     } catch (e2) {}
