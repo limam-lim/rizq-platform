@@ -239,6 +239,14 @@
       });
       container.querySelectorAll('.rizq-nav-packs, .nav-phone-packs-li').forEach(function (packs) {
         if (packs.setAttribute) packs.setAttribute('data-nav-order', '9');
+        /* سطح المكتب/تابلت: أخفِ من الشريط — تبقى في قائمة المزيد */
+        if (!phone) {
+          packs.style.display = 'none';
+          packs.setAttribute('data-nav-desk-hidden', '1');
+        } else {
+          packs.style.removeProperty('display');
+          packs.removeAttribute('data-nav-desk-hidden');
+        }
       });
       container.querySelectorAll('#rizq-hdr-more-wrap, #rizq-desk-more-li, #nav-more-li').forEach(function (more) {
         more.style.display = '';

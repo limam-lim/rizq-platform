@@ -1383,10 +1383,16 @@
         if (el.getAttribute('data-nav-tier') === 'thumb') { el.style.order = '55'; return; }
         if (el.getAttribute('data-nav-tier') === 'home') { el.style.order = '99'; return; }
       }
-      if (!phoneSplit && deskOrder[hdr] != null) {
-        el.style.order = String(deskOrder[hdr]);
-        el.setAttribute('data-nav-order', String(deskOrder[hdr]));
-        return;
+      if (!phoneSplit) {
+        if (hdr === 'packs' || el.classList.contains('rizq-nav-packs') || el.classList.contains('nav-phone-packs-li')) {
+          el.style.display = 'none';
+          return;
+        }
+        if (deskOrder[hdr] != null) {
+          el.style.order = String(deskOrder[hdr]);
+          el.setAttribute('data-nav-order', String(deskOrder[hdr]));
+          return;
+        }
       }
       var o = el.getAttribute('data-nav-order');
       if (o) {

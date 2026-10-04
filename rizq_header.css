@@ -2832,10 +2832,12 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
 }
 
 
-/* سطح المكتب/تابلت: الباقات تبقى داخل المزيد فقط */
+/* سطح المكتب/تابلت: الباقات داخل المزيد فقط — نفس خصوصية li العامة أعلاه */
 @media (min-width:769px) and (min-height:501px){
-  html.rizq-app-nav #nav .nav-phone-packs-li,
-  html.rizq-app-nav #rizq-desk-nav .nav-phone-packs-li{
+  html.rizq-app-nav #nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.nav-phone-packs-li,
+  html.rizq-app-nav #nav .nav-center > li.rizq-nav-packs,
+  html.rizq-app-nav #rizq-desk-nav .nav-center > li.rizq-nav-packs{
     display:none !important;
   }
 }
