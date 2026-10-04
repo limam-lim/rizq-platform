@@ -61,10 +61,45 @@
       var u = new URL(s);
       var p = String(u.protocol || '').toLowerCase();
       if (p !== 'http:' && p !== 'https:') return '';
+      // ارفض جذر النطاق فقط (instagram.com/) — يلزم مسار حساب حقيقي
+      var path = String(u.pathname || '').replace(/\/+$/, '');
+      if (!path) return '';
       return s;
     } catch (e) {
       return '';
     }
+  }
+
+  function waMeFromPhone(phone) {
+    var d = String(phone == null ? '' : phone).replace(/\D/g, '');
+    if (!d) return '';
+    if (d.length === 8) d = '222' + d;
+    if (d.length < 10) return '';
+    return 'https://wa.me/' + d;
+  }
+
+  /** يدمج site.social مع واتساب الدعم إن لم يُضبط/يُعطَّل صراحةً في سوبر أدمن */
+  function enrichSocial(site) {
+    var raw = site && typeof site.social === 'object' ? site.social : {};
+    var social = {};
+    for (var i = 0; i < ORDER.length; i++) {
+      var key = ORDER[i];
+      var item = raw[key];
+      social[key] =
+        item && typeof item === 'object'
+          ? { enabled: !!item.enabled, url: String(item.url || '') }
+          : { enabled: false, url: '' };
+    }
+    var cur = social.whatsapp || { enabled: false, url: '' };
+    var explicitOff = cur.enabled === false && String(cur.url || '').trim() !== '';
+    if (!explicitOff) {
+      var fromUrl = isSafeUrl(cur.url);
+      var fromPhone = waMeFromPhone(site && site.whatsapp);
+      if (fromUrl || fromPhone) {
+        social.whatsapp = { enabled: true, url: fromUrl || fromPhone };
+      }
+    }
+    return social;
   }
 
   function ensureStyle() {
@@ -189,9 +224,8 @@
     return fetch(base + '/api/site-config', { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
-        var social = data && data.ok && data.config && data.config.site
-          ? (data.config.site.social || null)
-          : null;
+        var site = data && data.ok && data.config ? data.config.site : null;
+        var social = site ? enrichSocial(site) : null;
         var wanted = activeItems(social).length;
         render(social);
         var root = document.getElementById(ROOT_ID);
