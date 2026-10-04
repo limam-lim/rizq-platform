@@ -595,34 +595,34 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    /* وسط حقيقي لصفحة العرض + تمدد خفيف نحو اليمين (الشعار) */
+    /* سطح المكتب: تمديد الكبسولة بعرض المحتوى تقريباً (نقاط الإشارة) */
     grid-column:1 / -1;
     justify-self:center;
-    justify-content:center;
+    justify-content:space-evenly;
     overflow-x:auto !important;
     overflow-y:hidden !important;
     display:flex !important;
     flex-wrap:nowrap !important;
     align-items:center;
-    gap:6px;
+    gap:4px;
     list-style:none;
     direction:inherit;
     margin:0;
-    padding:5px 16px !important;
-    width:max-content;
-    max-width:min(900px,72vw);
+    padding:5px 22px !important;
+    box-sizing:border-box !important;
+    width:min(1280px, calc(100vw - 56px)) !important;
+    max-width:calc(100% - 40px) !important;
     min-width:0;
     position:absolute !important;
     left:50% !important;
     right:auto !important;
     top:50% !important;
-    /* انزياح بصري لليمين نحو الشعار حتى تبدو وسط الصفحة */
-    transform:translate(calc(-50% + 56px), -50%) !important;
+    transform:translate(-50%, -50%) !important;
     z-index:5;
     pointer-events:auto;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
-    border-radius:12px !important;
+    border-radius:14px !important;
     background:
       linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
       rgba(4,10,20,.55) !important;
@@ -859,11 +859,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html[dir="ltr"].rizq-app-nav #nav > .nav-center,
   html[dir="ltr"].rizq-app-nav #rizq-desk-nav > .nav-center{
-    gap:8px;
-    justify-content:center;
+    gap:4px;
+    justify-content:space-evenly;
     justify-self:center;
-    max-width:min(920px,68vw);
-    padding:7px 16px !important;
+    width:min(1280px, calc(100vw - 56px)) !important;
+    max-width:calc(100% - 40px) !important;
+    padding:7px 22px !important;
   }
   html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-account-btn,
   html[dir="ltr"].rizq-app-nav #nav .nav-start .nav-fav-btn,
