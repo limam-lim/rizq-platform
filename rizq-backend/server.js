@@ -2669,16 +2669,17 @@ app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
   try {
     const aq = require('./services/agentQuality');
     const b = req.body || {};
+    const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
     const row = aq.recordAgentMiss({
-      text: b.text || b.message,
-      reply: b.reply,
-      lang: b.lang,
-      agent: b.agent || 'manager_offline',
-      channel: b.channel || 'browser',
-      type: b.type || 'missed',
-      reason: b.reason,
-      tier: b.tier,
-      page: b.page,
+      text: clip(b.text || b.message, 500),
+      reply: clip(b.reply, 800),
+      lang: clip(b.lang, 16),
+      agent: clip(b.agent || 'manager_offline', 64),
+      channel: clip(b.channel || 'browser', 32),
+      type: clip(b.type || 'missed', 32),
+      reason: clip(b.reason, 120),
+      tier: clip(b.tier, 32),
+      page: clip(b.page, 200),
     });
     if (!row) return res.status(400).json({ ok: false, error: 'text مطلوب' });
     res.json({ ok: true, id: row.id });
@@ -2692,7 +2693,8 @@ app.get('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, r
     const aq = require('./services/agentQuality');
     res.json({ ok: true, misses: aq.listAgentMisses(req.query.limit) });
   } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
+    console.error('[admin/agent-misses]', err && err.message);
+    res.status(500).json({ ok: false, error: 'list_failed' });
   }
 });
 
@@ -2702,7 +2704,8 @@ app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req
     const n = aq.clearAgentMisses();
     res.json({ ok: true, cleared: n });
   } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
+    console.error('[admin/agent-misses delete]', err && err.message);
+    res.status(500).json({ ok: false, error: 'clear_failed' });
   }
 });
 
