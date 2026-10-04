@@ -616,8 +616,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     left:50% !important;
     right:auto !important;
     top:50% !important;
-    /* انزياح طفيف لليمين ليملأ الفراغ نحو الشعار بعد تصغير المفضلة */
-    transform:translate(calc(-50% + 18px), -50%) !important;
+    /* انزياح بصري لليمين نحو الشعار حتى تبدو وسط الصفحة */
+    transform:translate(calc(-50% + 56px), -50%) !important;
     z-index:5;
     pointer-events:auto;
     scrollbar-width:none;
