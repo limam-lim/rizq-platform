@@ -308,11 +308,20 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 
 /* ── Section centering (clean — no glass overrides) ── */
 .hero-content{
-  max-width:1200px;
+  width:100%;
+  max-width:min(1200px,96vw);
   margin:0 auto;
   text-align:center;
   display:flex;
   flex-direction:column;
+  box-sizing:border-box;
+}
+html[dir="ltr"] .hero-content,
+html[lang="fr"] .hero-content,
+body.rizq-lang-fr .hero-content{
+  width:100%;
+  max-width:min(1200px,96vw);
+}
   align-items:center;
 }
 
