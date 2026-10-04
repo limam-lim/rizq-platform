@@ -6514,7 +6514,7 @@ function goToListing(a) {
   const imgs = Array.isArray(a.images) ? a.images.filter(Boolean) : [];
   const handoff = {
     id: a.id, title: a.title, titleFr: a.titleFR || a.titleFr || '', desc: a.desc, descFr: a.descFR || a.descFr || '',
-    price: a.price, loc: a.loc, locFr: a.locFR || a.locFr || '', emoji: a.emoji, cat: a.cat, catKey: a.catKey,
+    price: a.price, loc: a.loc, locFr: a.locFR || a.locFr || '', emoji: a.emoji, bg: a.bg || '', cat: a.cat, catKey: a.catKey,
     tags: a.tags || [], tagsFr: a.tagsFR || a.tagsFr || [], seller: a.seller, sellerFr: a.sellerFR || a.sellerFr || '',
     phone: a.phone || '', verified, images: imgs,
     wilaya: a.wilaya || '', subcat: a.subcat || '', accountId: a.accountId || ''

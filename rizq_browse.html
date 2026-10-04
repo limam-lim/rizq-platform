@@ -313,23 +313,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-main-img:hover img{transform:scale(1.02)}
 .dp-emoji-stage{
   width:100%;height:100%;min-height:inherit;display:flex;align-items:center;justify-content:center;
-  pointer-events:none;
+  pointer-events:none;border-radius:inherit;
 }
 .dp-emoji-xl{
-  font-size:clamp(72px,12vw,128px);line-height:1;display:flex;align-items:center;justify-content:center;
-  filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));
+  font-size:clamp(96px,16vw,168px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));transform:scale(1);transform-origin:center;
 }
-.dp-emoji-xl svg{width:clamp(72px,12vw,128px)!important;height:clamp(72px,12vw,128px)!important;opacity:1}
+.dp-emoji-xl svg{width:clamp(96px,16vw,168px)!important;height:clamp(96px,16vw,168px)!important;opacity:1}
 #lightbox-content .lb-emoji-stage{
   width:min(920px,92vw);height:min(70vh,640px);border-radius:18px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:18px;box-shadow:0 16px 48px rgba(0,0,0,.45);
   border:1px solid rgba(201,168,76,.35);cursor:default;
 }
 #lightbox-content .lb-emoji-xl{
-  font-size:clamp(120px,22vw,220px);line-height:1;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(140px,26vw,260px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
   filter:drop-shadow(0 12px 32px rgba(0,0,0,.4));
 }
-#lightbox-content .lb-emoji-xl svg{width:clamp(120px,22vw,220px)!important;height:clamp(120px,22vw,220px)!important}
+#lightbox-content .lb-emoji-xl svg{width:clamp(140px,26vw,260px)!important;height:clamp(140px,26vw,260px)!important}
 #lightbox-content .lb-emoji-title{
   color:#fff;font-size:clamp(16px,2.4vw,22px);font-weight:800;text-align:center;padding:0 20px;
   text-shadow:0 2px 12px rgba(0,0,0,.45);max-width:90%;
@@ -2393,7 +2393,7 @@ function renderDetailPanel(ad){
     mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1';this.closest('.dp-main-img')&&this.closest('.dp-main-img').classList.add('dp-img-broken')" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
   } else {
     const emoBg=escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
-    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
+    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true" style="font-size:clamp(96px,16vw,168px);line-height:1">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
   }
 
   const thumbsHTML=hasImages&&ad.images.length>1
@@ -2809,7 +2809,7 @@ function _dpEmojiLightboxHtml(ad, fr){
   const bg=escapeHtml((ad && ad.bg) || 'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
   const title=escapeHtml((ad && (fr ? (ad.titleFr||ad.title) : (ad.title||ad.titleFr))) || '');
   return '<div class="lb-emoji-stage" style="background:'+bg+'" onclick="event.stopPropagation()">'
-    + '<span class="lb-emoji-xl" aria-hidden="true">'+iconHTML(emo)+'</span>'
+    + '<span class="lb-emoji-xl" aria-hidden="true" style="font-size:clamp(140px,26vw,260px);line-height:1">'+iconHTML(emo)+'</span>'
     + (title ? '<div class="lb-emoji-title">'+title+'</div>' : '')
     + '</div>';
 }
