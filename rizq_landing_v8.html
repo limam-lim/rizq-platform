@@ -9187,6 +9187,17 @@ window.closeNavDropdowns=closeNavDropdowns;
   function menuEl(){
     return li.querySelector('.nav-dropdown-menu')||document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'nav-more-li')+'"]');
   }
+  function ptrOverMore(x,y){
+    var m=menuEl();
+    var nodes=[li,m];
+    for(var i=0;i<nodes.length;i++){
+      var n=nodes[i]; if(!n) continue;
+      var r=n.getBoundingClientRect();
+      /* وسّع منطقة الأمان 12px حول الزر والقائمة */
+      if(x>=r.left-12 && x<=r.right+12 && y>=r.top-12 && y<=r.bottom+12) return true;
+    }
+    return false;
+  }
   function keepOpen(){
     clearTimeout(closeT);
     positionNavDropdown(li);
@@ -9194,15 +9205,18 @@ window.closeNavDropdowns=closeNavDropdowns;
   }
   function scheduleClose(){
     clearTimeout(closeT);
-    closeT=setTimeout(closeNavDropdowns,320);
-  }
-  function ptrInside(node, related){
-    try{ return !!(node && related && (node===related || node.contains(related))); }catch(e){ return false; }
+    closeT=setTimeout(function(){
+      /* لا تُغلق إن كان المؤشر ما زال فوق الزر/القائمة */
+      try{
+        var last=window.__rizqMorePtr;
+        if(last && ptrOverMore(last.x, last.y)) return;
+      }catch(e){}
+      closeNavDropdowns();
+    },500);
   }
   function onMenuEnter(){ if(!isDesk()) return; clearTimeout(closeT); }
-  function onMenuLeave(e){
+  function onMenuLeave(){
     if(!isDesk()) return;
-    if(ptrInside(li, e.relatedTarget)) return;
     scheduleClose();
   }
   function bindMenuHover(){
@@ -9220,17 +9234,15 @@ window.closeNavDropdowns=closeNavDropdowns;
     if(!isDesk()) return;
     keepOpen();
   });
-  li.addEventListener('mouseleave',function(e){
+  li.addEventListener('mouseleave',function(){
     if(!isDesk()) return;
-    var m=menuEl();
-    if(ptrInside(m, e.relatedTarget)) return;
     scheduleClose();
   });
   document.addEventListener('mousemove',function(e){
+    window.__rizqMorePtr={x:e.clientX,y:e.clientY};
     if(!isDesk() || !li.classList.contains('open')) return;
-    var m=menuEl();
-    var t=e.target;
-    if(li.contains(t) || (m && m.contains(t))) clearTimeout(closeT);
+    if(ptrOverMore(e.clientX, e.clientY)) clearTimeout(closeT);
+    else scheduleClose();
   }, true);
 })();
 document.addEventListener('click',function(e){

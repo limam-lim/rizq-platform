@@ -1077,8 +1077,17 @@
       function isDesk() {
         try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
       }
-      function ptrInside(node, related) {
-        try { return !!(node && related && (node === related || node.contains(related))); } catch (eP) { return false; }
+      function ptrOverMore(x, y) {
+        var menu = moreMenuFor(li);
+        var nodes = [li, menu];
+        var i, n, r;
+        for (i = 0; i < nodes.length; i++) {
+          n = nodes[i];
+          if (!n) continue;
+          r = n.getBoundingClientRect();
+          if (x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12) return true;
+        }
+        return false;
       }
       function keepOpen() {
         clearTimeout(closeT);
@@ -1087,12 +1096,17 @@
       }
       function scheduleClose() {
         clearTimeout(closeT);
-        closeT = setTimeout(closeMoreDropdowns, 320);
+        closeT = setTimeout(function () {
+          try {
+            var last = window.__rizqMorePtr;
+            if (last && ptrOverMore(last.x, last.y)) return;
+          } catch (eL) { /* ignore */ }
+          closeMoreDropdowns();
+        }, 500);
       }
       function onMenuEnter() { if (!isDesk()) return; clearTimeout(closeT); }
-      function onMenuLeave(e) {
+      function onMenuLeave() {
         if (!isDesk()) return;
-        if (ptrInside(li, e.relatedTarget)) return;
         scheduleClose();
       }
       function bindPortaledMenuHover() {
@@ -1121,18 +1135,15 @@
         if (!isDesk()) return;
         keepOpen();
       });
-      li.addEventListener('mouseleave', function (e) {
+      li.addEventListener('mouseleave', function () {
         if (!isDesk()) return;
-        var menu = moreMenuFor(li);
-        if (ptrInside(menu, e.relatedTarget)) return;
         scheduleClose();
       });
-      /* جسر فجوة الـ portal: طالما المؤشر فوق الزر أو القائمة لا تُغلق */
       document.addEventListener('mousemove', function (e) {
+        window.__rizqMorePtr = { x: e.clientX, y: e.clientY };
         if (!isDesk() || !li.classList.contains('open')) return;
-        var menu = moreMenuFor(li);
-        var t = e.target;
-        if ((li.contains(t)) || (menu && menu.contains(t))) clearTimeout(closeT);
+        if (ptrOverMore(e.clientX, e.clientY)) clearTimeout(closeT);
+        else scheduleClose();
       }, true);
       document.addEventListener('click', function (e) {
         if (e.target.closest('.nav-dropdown-li') || e.target.closest('.nav-dropdown-menu')) return;
