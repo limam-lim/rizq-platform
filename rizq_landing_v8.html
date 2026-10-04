@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=24.8"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=24.9"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.1"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -669,7 +669,32 @@ html[lang="fr"] .hero-subtitle-secondary{
   border:1px solid rgba(201,168,76,.32);
   box-shadow:0 14px 36px rgba(15,35,65,.22),inset 0 1px 0 rgba(255,255,255,.08);
   animation:fadeUp .8s .28s ease both;
+  width:100%;
+  max-width:min(920px,100%);
+  box-sizing:border-box;
 }
+/* يثبت تحت الهيدر (والتيكر إن وُجد) أثناء التمرير لتسهيل البحث */
+.hero-browse-spacer{display:none;width:100%;pointer-events:none}
+.hero-browse-spacer.is-active{display:block}
+.hero-browse-panel.is-stuck{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-stuck-h,0px));
+  z-index:9985;
+  width:min(920px,calc(100% - 16px));
+  max-width:min(920px,calc(100% - 16px));
+  margin:0;
+  border-radius:0 0 16px 16px;
+  padding:8px 10px 10px;
+  box-shadow:0 12px 32px rgba(0,0,0,.35),0 0 0 1px rgba(201,168,76,.28);
+  animation:none;
+}
+.hero-browse-panel.is-stuck .hero-browse-head{display:none}
+.hero-browse-panel.is-stuck .hero-search{margin:0 auto 8px!important}
+.hero-browse-panel.is-stuck .quick-cats{gap:4px}
+.hero-browse-panel.is-stuck .qcat{padding:5px 2px 4px}
+.hero-browse-panel.is-stuck #qcat-inline-panel{max-height:40vh;overflow:auto}
 .hero-browse-head{text-align:center;margin:0 0 12px}
 .hero-browse-title{
   margin:0 0 4px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
@@ -12052,7 +12077,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo2"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=23.4"></script>
+<script src="rizq_landing_ux.js?v=23.5"></script>
 <script src="rizq_disclaimer.js"></script>
 
 

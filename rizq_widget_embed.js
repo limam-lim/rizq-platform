@@ -1039,15 +1039,16 @@
     function _detectMessageLang(userText) {
       var t = String(userText || '').trim();
       var lower = t.toLowerCase();
-      if (!t) return _ctx.chatLang || _ctx.lang || 'ar';
+      if (!t || /^[\d\s?.!،,؟]+$/.test(t)) return _ctx.chatLang || _ctx.lang || 'ar';
       if (window.RizqManager && typeof window.RizqManager.detectLangSwitchRequest === 'function') {
         var sw = window.RizqManager.detectLangSwitchRequest(t);
         if (sw) return sw;
       }
-      if (/كيفاش|كيفاه|شنهو|شنو|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|ماكو|كاين|نعاونك|راك|الزين|شنهي|حسانية|وش\s*راك|ماشي\s*مشكل|أهلين/.test(t)) return 'hs';
+      // حسانية موريتانية قبل الفصحى
+      if (/كيفاش|كيفاه|كيفة|شنهو|شنهوا|شنهي|شنو\s*هو|اشنو|اش\s*تبي|اش\s*بيك|تبيها|تبيه|نبيه|نبي\s|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|شحالك|اشحال|ماكو|ماكاش|كاين|نعاونك|راهي|راهو|راه |الزين|حسانية|hassani|وش\s*راك|وين\s*راك|ماشي\s*مشكل|أهلين|اهلين|أيوه|ايوه|تاع|متاع|هاذي|هذاك|هاذاك|هذايا|صايي|برك|خلّيني|خليني|مانعرف|ما\s*نعرف|مانفهم|ما\s*نفهم|عطيني|وين |فين |نواكشوط|انواكشوط|موريتان|رزق\s*معاك|نوضّح|نوضح|شنو |نبي\s*ننشر|نبي\s*محل|نبي\s*باقة|شحال\s*ثمن|كيفاه\s*ن|\bزين\b|صاي\b|صايي|لبّاس|لباس|اشلونك|شلونك/.test(t)) return 'hs';
       if (/[\u0600-\u06FF]/.test(t)) return 'ar';
-      if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonjour/.test(lower)) return 'fr';
-      if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza/.test(lower)) return 'es';
+      if (/bonjour|merci|comment|prix|acheter|vendre|combien|annonce|forfait|svp|je\s+veux|puis-je|salut|bonsoir/.test(lower)) return 'fr';
+      if (/hola|gracias|precio|quiero|vender|comprar|cu[aá]nto|anuncio|confianza|buenos|ayuda/.test(lower)) return 'es';
       if (/hello|thanks|how|what|price|buy|sell|help|please|trust|seller|package|hi\b|hey\b/.test(lower)) return 'en';
       if (/[a-z]/i.test(t)) return 'en';
       return _ctx.chatLang || _ctx.lang || 'ar';
@@ -1085,11 +1086,12 @@
         try {
           var result = mgr.processMessage(userText, Object.assign({}, _ctx, {
             uiLang: _ctx.lang,
-            lang: _ctx.chatLang || msgLang,
+            lang: msgLang,
             pageContext: pageCtx
           }));
           var reply = result && (result.reply != null ? result.reply : result);
           if (result && result.lang) _ctx.chatLang = result.lang;
+          else _ctx.chatLang = msgLang;
           if (reply) return String(reply);
         } catch (eMgr) {
           console.error('Widget Chat Error: offline RizqManager fallback failed', eMgr);
@@ -1100,9 +1102,9 @@
 
     function _inlineOfflineReply(text, lang) {
       var lower = String(text || '').toLowerCase();
-      var L = lang === 'fr' ? 'fr' : lang === 'es' ? 'es' : lang === 'en' ? 'en' : 'ar';
+      var L = (lang === 'fr' || lang === 'es' || lang === 'en' || lang === 'hs') ? lang : 'ar';
       var pick = function (map) {
-        return map[L] || map.ar || map.en;
+        return map[L] || (L === 'hs' ? map.ar : null) || map.ar || map.en;
       };
       if (window.RizqManager && typeof window.RizqManager.detectLangSwitchRequest === 'function') {
         var sw = window.RizqManager.detectLangSwitchRequest(text);
@@ -1118,20 +1120,22 @@
           return ls[sw] || ls.ar;
         }
       }
-      if (/^(hi|hello|hey|hola|bonjour|salut|مرحب|اهلا|أهلا|السلام)/.test(lower)) {
+      if (/^(hi|hello|hey|hola|bonjour|salut|مرحب|اهلا|أهلا|السلام|أهلين|اهلين|زين)/.test(lower) || /أهلين|اهلين|شنهو\s*تبي/.test(text || '')) {
         return pick({
           ar: 'أهلاً! 👋 أنا مدير رزق الذكي (وضع محلي — الخادم غير متصل). كيف أساعدك؟',
+          hs: 'أهلين! 👋 أنا مدير رزق (وضع محلي — السيرفر ما متصل). شنهو تبي؟',
           fr: 'Bonjour ! 👋 Je suis le Gestionnaire Rizq (mode local — serveur hors ligne). Comment puis-je vous aider ?',
           es: '¡Hola! 👋 Soy el Gestor Inteligente de Rizq (modo local — servidor sin conexión). ¿En qué puedo ayudarte?',
           en: 'Hello! 👋 I\'m the Rizq Smart Manager (local mode — server offline). How can I help?'
         });
       }
-      if (/نشر|إعلان|publier|annonce|post|publicar|sell|vender/.test(lower)) {
+      if (/نشر|إعلان|publier|annonce|post|publicar|sell|vender|تبي\s*ننشر|نبي\s*ننشر/.test(lower) || /نشر|إعلان/.test(text || '')) {
         return pick({
-          ar: 'لنشر إعلان مجاني: افتح rizq_post.html ← اختر القسم ← أضف الصور والسعر ← انشر.\nالنشر الأساسي مجاني على رزق.',
-          fr: 'Pour publier: ouvrez rizq_post.html → choisissez la catégorie → ajoutez photos et prix → publiez.\nL\'annonce de base est gratuite sur Rizq.',
-          es: 'Para publicar: abra rizq_post.html → elija categoría → añada fotos y precio → publique.\nPublicar en Rizq es gratis.',
-          en: 'To post an ad: open rizq_post.html → pick a category → add photos & price → publish.\nBasic posting is free on Rizq.'
+          ar: 'لنشر إعلان مجاني: من الصفحة الرئيسية اضغط «انشر» ← اختر القسم ← أضف الصور والسعر ← انشر.\nالنشر الأساسي مجاني على رزق.',
+          hs: 'زين! باش تنشر إعلان مجاني: من الصفحة اضغط «انشر» ← اختار القسم ← زيد الصور والثمن ← انشر.\nالنشر الأساسي مجاني على رزق.',
+          fr: 'Pour publier: depuis l\'accueil, cliquez « Publier » → catégorie → photos et prix → publiez.\nL\'annonce de base est gratuite sur Rizq.',
+          es: 'Para publicar: en la página principal pulse «Publicar» → categoría → fotos y precio → publique.\nPublicar en Rizq es gratis.',
+          en: 'To post an ad: from the home page tap «Post» → pick a category → add photos & price → publish.\nBasic posting is free on Rizq.'
         });
       }
       if (/باق|forfait|package|plan|abonn|precio|pricing|tarif/.test(lower)) {
@@ -1203,9 +1207,11 @@
     function _callDiamondAgent(userText, attachData) {
       var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
       var timeoutId = controller ? setTimeout(function () { controller.abort(); }, 45000) : null;
+      var msgLang = _detectMessageLang(userText || _dict().attachOnly);
+      _ctx.chatLang = msgLang;
       var payload = {
         message: userText,
-        lang: _ctx.chatLang || _detectMessageLang(userText || _dict().attachOnly),
+        lang: msgLang,
         uiLang: _ctx.lang,
         autoLang: true,
         agentTier: _resolveAgentTier(),
@@ -1238,6 +1244,7 @@
               e2.code = 'empty_reply';
               throw e2;
             }
+            if (data.lang) _ctx.chatLang = data.lang;
             return String(data.reply);
           })
           .catch(function (err) {

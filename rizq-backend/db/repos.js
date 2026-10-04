@@ -62,6 +62,12 @@ const messages = createCollection('messages', {
   onBackup: arrayBackup,
 });
 
+/** أسرار قراءة محادثات الضيوف — id = threadKey، data = { hash, phoneDigits, createdAt } */
+const guestThreadSecrets = createCollection('guest_thread_secrets', {
+  backupFile: 'guest-thread-secrets.json',
+  onBackup: mapBackup,
+});
+
 const reviews = createCollection('reviews', {
   backupFile: 'reviews.json',
   onBackup: mapBackup,
@@ -365,6 +371,7 @@ function migrateAllSecondaryStores() {
 
   adBoosts.migrateFromMap(p('ad_boosts.json'));
   messages.migrateFromArray(p('messages.json'), 'id');
+  guestThreadSecrets.migrateFromMap(p('guest-thread-secrets.json'));
   reviews.migrateFromMap(p('reviews.json'));
   leads.migrateFromArray(p('leads.json'), 'id');
   supportTickets.migrateFromArray(p('support-tickets.json'), 'id');
@@ -477,6 +484,7 @@ module.exports = {
   siteConfig,
   adBoosts,
   messages,
+  guestThreadSecrets,
   reviews,
   leads,
   supportTickets,

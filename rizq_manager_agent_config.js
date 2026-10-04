@@ -479,11 +479,13 @@ function _langSwitchReply(targetLang) {
 function _detectLang(text) {
   if (!text) return 'ar';
   var lower = text.toLowerCase();
-  var hs = ['كيفاش','كيفاه','شنهو','شنو هو','تبي','حابّ','وش راك','الزين','نعاونك','بغيت','شحال','شحّال','ماكو','كاين','أهلين','ماشي مشكل'];
-  for (var i=0;i<hs.length;i++) if (text.indexOf(hs[i])!==-1) return 'hs';
-  if (/bonjour|merci|comment|je veux|pouvez|svp|qu est|acheter|vendre|prix|annonce|forfait|combien/.test(lower)) return 'fr';
-  if (/hello|thanks|how|what|can you|please|help|buy|sell|register|price|trust|seller/.test(lower)) return 'en';
-  if (/hola|como est|buenos|gracias|por favor|qu[eé] es|quiero|vender|comprar|ayuda|precio|cu[aá]nto/.test(lower)) return 'es';
+  // حسانية موريتانية — قبل الفصحى
+  if (/كيفاش|كيفاه|كيفة|شنهو|شنهوا|شنهي|شنو\s*هو|اشنو|اش\s*تبي|اش\s*بيك|تبيها|تبيه|نبيه|نبي\s|تبي|حابّ|حاب |واش|بغيت|شحال|شحّال|شحالك|اشحال|ماكو|ماكاش|كاين|نعاونك|راهي|راهو|راه |الزين|حسانية|hassani|وش\s*راك|وين\s*راك|ماشي\s*مشكل|أهلين|اهلين|أيوه|ايوه|تاع|متاع|هاذي|هذاك|هاذاك|هذايا|صايي|برك|خلّيني|خليني|مانعرف|ما\s*نعرف|مانفهم|ما\s*نفهم|عطيني|وين |فين |نواكشوط|انواكشوط|موريتان|رزق\s*معاك|نوضّح|نوضح|شنو |نبي\s*ننشر|نبي\s*محل|نبي\s*باقة|شحال\s*ثمن|كيفاه\s*ن|\bزين\b|صاي\b|صايي|لبّاس|لباس|اشلونك|شلونك/.test(text)) return 'hs';
+  if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+  if (/bonjour|merci|comment|je veux|pouvez|svp|qu est|acheter|vendre|prix|annonce|forfait|combien|salut|bonsoir/.test(lower)) return 'fr';
+  if (/hola|como est|buenos|gracias|por favor|qu[eé] es|quiero|vender|comprar|ayuda|precio|cu[aá]nto|anuncio/.test(lower)) return 'es';
+  if (/hello|thanks|how|what|can you|please|help|buy|sell|register|price|trust|seller|hi\b|hey\b/.test(lower)) return 'en';
+  if (/[a-z]/i.test(text)) return 'en';
   return 'ar';
 }
 
@@ -511,9 +513,15 @@ function _blockedReply(text, lang) {
 function _getPackagesSummary(lang) {
   var cfg = _pkgCfg();
   if (cfg && typeof cfg.buildPublicSummary === 'function') {
-    return cfg.buildPublicSummary(lang);
+    // الحسانية تستخدم ملخص عربي إن لم يتوفر hs في كتالوج الباقات
+    return cfg.buildPublicSummary(lang === 'hs' ? 'ar' : lang);
   }
-  return lang === 'fr' ? 'Consultez les forfaits sur rizq.mr' : 'راجع الباقات على rizq.mr';
+  return _pickReply({
+    ar: 'راجع الباقات على rizq.mr',
+    hs: 'شوف الباقات على rizq.mr — محل / مكتب / شركة',
+    fr: 'Consultez les forfaits sur rizq.mr',
+    en: 'See packages on rizq.mr',
+  }, lang);
 }
 
 function _getDiscountsSummary(lang) {
@@ -535,9 +543,21 @@ function _norm(s) {
 // المناسب للغة lang — هذا هو الإصلاح الجذري لمشكلة "رد بالعربية على سؤال بالفرنسية".
 function _resolveFAQAnswer(a, lang) {
   if (a && typeof a === 'object') {
-    return (lang === 'fr' ? a.fr : a.ar) || a.ar || a.fr || '';
+    if (lang === 'hs') return a.hs || a.ar || a.fr || a.en || '';
+    if (lang === 'fr') return a.fr || a.ar || '';
+    if (lang === 'en') return a.en || a.fr || a.ar || '';
+    if (lang === 'es') return a.es || a.en || a.fr || a.ar || '';
+    return a.ar || a.fr || '';
   }
   return a;
+}
+
+/** ردّ متعدد اللغات مع تفضيل الحسانية عند hs */
+function _pickReply(map, lang) {
+  if (!map) return '';
+  if (map[lang]) return map[lang];
+  if (lang === 'hs' && map.ar) return map.ar;
+  return map.ar || map.fr || map.en || '';
 }
 
 function _matchFAQ(text, lang) {
@@ -572,13 +592,12 @@ function processMessage(userMessage, context) {
   context = context || {};
   var text  = (userMessage || '').trim();
   var lower = text.toLowerCase().replace(/[\u064B-\u0652]/g,'').replace(/[\u0623\u0625\u0622]/g,'\u0627').replace(/\u0629/g,'\u0647');
-  // كشف اللغة: من النص أولاً، ثم من إعداد الواجهة كاحتياطي
-  var lang = (context.lang && ['ar', 'hs', 'fr', 'en', 'es'].indexOf(String(context.lang)) !== -1)
-    ? String(context.lang)
-    : _detectLang(text);
-  if (lang === 'ar' && /^[\d\s?.!،,]+$/.test(text) && (context.uiLang || context.lang)) {
-    lang = context.uiLang || context.lang;
+  // كشف اللغة من رسالة المستخدم الحالية — لا تثبت على لغة جلسة سابقة
+  var lang = _detectLang(text);
+  if (!text || /^[\d\s?.!،,؟]+$/.test(text)) {
+    lang = context.uiLang || context.lang || lang;
   }
+  if (['ar', 'hs', 'fr', 'en', 'es'].indexOf(String(lang)) === -1) lang = 'ar';
 
   if (_isBlocked(text)) {
     _escalateToHuman(text, lang, context, 'blocked');
@@ -612,8 +631,11 @@ function processMessage(userMessage, context) {
     }
   }
 
-  var socialGreet = /^(\u0643\u064A\u0641 \u0627\u0644\u062D\u0627\u0644|\u0643\u064A\u0641\u0643|\u0643\u064A\u0641 \u062D\u0627\u0644\u0643|\u0643\u064A\u0641\u0627\u0634|\u0634\u0644\u0648\u0646\u0643|\u0643\u064A\u0641 \u0627\u0644\u0627\u062D\u0648\u0627\u0644)/.test(lower);
-    var isSalam = /\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064A\u0643\u0645|\u0633\u0644\u0627\u0645\u0648 \u0639\u0644\u064A\u0643\u0645/.test(lower);
+  // كيفاش/كيفاه لوحدها = تحية؛ إن تبعها قصد (نشر/باقة/ثمن…) لا تُعامل كتحية
+  var socialGreetBare = /^(\u0643\u064A\u0641 \u0627\u0644\u062D\u0627\u0644|\u0643\u064A\u0641\u0643|\u0643\u064A\u0641 \u062D\u0627\u0644\u0643|\u0643\u064A\u0641\u0627\u0634|\u0643\u064A\u0641\u0627\u0647|\u0634\u0644\u0648\u0646\u0643|\u0627\u0634\u0644\u0648\u0646\u0643|\u0643\u064A\u0641 \u0627\u0644\u0627\u062D\u0648\u0627\u0644)(\s*[!?؟.]*)?$/.test(lower);
+  var hasIntentAfterKayfash = /(?:\u0643\u064A\u0641\u0627\u0634|\u0643\u064A\u0641\u0627\u0647).{0,40}(?:\u0646\u0646\u0634\u0631|\u0646\u0634\u0631|\u0628\u0627\u0642|\u0627\u0634\u062A\u0631\u0627\u0643|\u062B\u0645\u0646|\u0633\u0639\u0631|\u062F\u0641\u0639|\u062A\u0633\u062C|\u062D\u0633\u0627\u0628)/.test(lower);
+  var socialGreet = socialGreetBare && !hasIntentAfterKayfash;
+  var isSalam = /\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064A\u0643\u0645|\u0633\u0644\u0627\u0645\u0648 \u0639\u0644\u064A\u0643\u0645/.test(lower);
   var isMorning = /^\u0635\u0628\u0627\u062D/.test(lower);
   var isEvening = /^\u0645\u0633\u0627\u0621/.test(lower);
   var directGreet = isSalam||isMorning||isEvening||/^(\u0647\u0644\u0627|\u0633\u0644\u0627\u0645|\u0645\u0631\u062D\u0628|\u0627\u0647\u0644\u0627|\u0645\u0631\u062D\u0628\u0627|hi |hi$|hello|hey|hola|buenos|bonjour|bonsoir|salut|ciao)/.test(lower);
@@ -676,12 +698,45 @@ function processMessage(userMessage, context) {
     return { reply: lang==='fr' ? 'L\'inscription est simple! \uD83D\uDE0A\nSeulement 2 minutes.\n\nD\'abord \u2014 quel type de compte?\n\uD83E\uDDD1 Particulier (achat et vente)\n\uD83C\uDFEA Boutique (pour les commer\u00E7ants)\n\uD83D\uDCBB Bureau virtuel (pour les services)\n\uD83C\uDFE2 Entreprise (pour les institutions)' : '\u0627\u0644\u062A\u0633\u062C\u064A\u0644 \u0633\u0647\u0644 \u062C\u062F\u064B\u0627! \uD83D\uDE0A\n\u062A\u062D\u062A\u0627\u062C \u062F\u0642\u064A\u0642\u062A\u064A\u0646 \u0641\u0642\u0637.\n\n\u0623\u0648\u0644\u0627\u064B \u2014 \u0645\u0627 \u0646\u0648\u0639 \u0627\u0644\u062D\u0633\u0627\u0628 \u0627\u0644\u0630\u064A \u062A\u0631\u064A\u062F\u0647\u061F\n\uD83E\uDDD1 \u0641\u0631\u062F (\u0644\u0644\u0628\u064A\u0639 \u0648\u0627\u0644\u0634\u0631\u0627\u0621)\n\uD83C\uDFEA \u0645\u062A\u062C\u0631 (\u0644\u0623\u0635\u062D\u0627\u0628 \u0627\u0644\u0645\u062D\u0644\u0627\u062A)\n\uD83D\uDCBB \u0645\u0643\u062A\u0628 \u0627\u0641\u062A\u0631\u0627\u0636\u064A (\u0644\u0644\u062E\u062F\u0645\u0627\u062A)\n\uD83C\uDFE2 \u0634\u0631\u0643\u0629 (\u0644\u0644\u0645\u0624\u0633\u0633\u0627\u062A)', lang: lang };
   }
 
+  // حسانية شائعة: شنهو/شحّال/تبي/نبي + باقة أو نشر → قصد واضح قبل الـ miss
+  if (/(?:\u0634\u0646\u0647\u0648|\u0634\u0646\u0647\u064A|\u0634\u062D[\u0651]?\u0627\u0644|\u062A\u0628\u064A|\u0646\u0628\u064A).{0,40}(?:\u0628\u0627\u0642|\u0627\u0634\u062A\u0631\u0627\u0643|\u0645\u0627\u0633|\u062B\u0645\u0646|\u0633\u0639\u0631)/.test(lower)
+      || /(?:\u0628\u0627\u0642|\u0627\u0634\u062A\u0631\u0627\u0643|\u0645\u0627\u0633).{0,20}(?:\u0634\u0646\u0647\u0648|\u0634\u062D)/.test(lower)) {
+    return { reply: _getPackagesSummary(lang), lang: lang };
+  }
+  if (/(?:\u0643\u064A\u0641\u0627\u0634|\u0643\u064A\u0641\u0627\u0647|\u0646\u0628\u064A|\u062A\u0628\u064A|\u0634\u0646\u0647\u0648).{0,40}(?:\u0646\u0646\u0634\u0631|\u0646\u0634\u0631|\u0625\u0639\u0644\u0627\u0646|\u0627\u0639\u0644\u0627\u0646)/.test(lower)) {
+    return {
+      reply: _pickReply({
+        ar: 'رائع! 🎉\n\nما الذي تريد بيعه؟ أخبرني بالمنتج والسعر وسأساعدك تكتب وصفاً يجذب المشترين.',
+        hs: 'زين! 🎉\n\nشنهو تبي تبيع؟ عطيني المنتج والسعر ونساعدوك تكتب إعلان يشدّ الزبائن.',
+        fr: 'Super! 🎉\n\nQue souhaitez-vous vendre? Dites-moi le produit et le prix, je vous aide à rédiger une annonce qui attire les acheteurs.',
+        en: 'Great! 🎉\n\nWhat do you want to sell? Tell me the product and price — I\'ll help write an ad that attracts buyers.',
+      }, lang),
+      lang: lang,
+    };
+  }
+
   if (/\u0646\u0634\u0631|\u0625\u0639\u0644\u0627\u0646|\u0628\u064A\u0639|publier|sell|vender/.test(lower)) {
-    return { reply: lang==='fr' ? 'Super! \uD83C\uDF89\n\nQue souhaitez-vous vendre? Dites-moi le produit et le prix, je vous aide \u00E0 r\u00E9diger une annonce qui attire les acheteurs.' : '\u0631\u0627\u0626\u0639! \uD83C\uDF89\n\n\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0631\u064A\u062F \u0628\u064A\u0639\u0647\u061F \u0623\u062E\u0628\u0631\u0646\u064A \u0628\u0627\u0644\u0645\u0646\u062A\u062C \u0648\u0627\u0644\u0633\u0639\u0631 \u0648\u0633\u0623\u0633\u0627\u0639\u062F\u0643 \u062A\u0643\u062A\u0628 \u0648\u0635\u0641\u064B\u0627 \u064A\u062C\u0630\u0628 \u0627\u0644\u0645\u0634\u062A\u0631\u064A\u0646.', lang: lang };
+    return {
+      reply: _pickReply({
+        ar: 'رائع! 🎉\n\nما الذي تريد بيعه؟ أخبرني بالمنتج والسعر وسأساعدك تكتب وصفاً يجذب المشترين.',
+        hs: 'زين! 🎉\n\nشنهو تبي تبيع؟ عطيني المنتج والسعر ونساعدوك تكتب إعلان يشدّ الزبائن.',
+        fr: 'Super! 🎉\n\nQue souhaitez-vous vendre? Dites-moi le produit et le prix, je vous aide à rédiger une annonce qui attire les acheteurs.',
+        en: 'Great! 🎉\n\nWhat do you want to sell? Tell me the product and price — I\'ll help write an ad that attracts buyers.',
+      }, lang),
+      lang: lang,
+    };
   }
 
   if (/\u0627\u0634\u062A\u0631\u064A|\u0634\u0631\u0627\u0621|acheter|buy/.test(lower)) {
-    return { reply: lang==='fr' ? 'Avec plaisir! \uD83D\uDE0A\nQue recherchez-vous exactement?' : '\u064A\u0633\u0639\u062F\u0646\u064A \u0623\u0633\u0627\u0639\u062F\u0643! \uD83D\uDE0A\n\u0645\u0627\u0630\u0627 \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u062A\u062D\u062F\u064A\u062F\u064B\u0627\u061F', lang: lang };
+    return {
+      reply: _pickReply({
+        ar: 'يسعدني أساعدك! 😊\nماذا تبحث عنه تحديداً؟',
+        hs: 'زين نعاونك! 😊\nشنهو تبي تدور عليه بالضبط؟',
+        fr: 'Avec plaisir! 😊\nQue recherchez-vous exactement?',
+        en: 'Happy to help! 😊\nWhat are you looking for exactly?',
+      }, lang),
+      lang: lang,
+    };
   }
 
   if (/\u0628\u0627\u0642\u0629|\u0627\u0634\u062A\u0631\u0627\u0643|\u0645\u0627\u0633\u064A|\u0630\u0647\u0628\u064A|\u0641\u0636\u064A|abonnement|plan|subscri/.test(lower)) {
@@ -741,9 +796,16 @@ function processMessage(userMessage, context) {
       : 'ar';
     return { reply: _langSwitchReply(legacyLang), lang: legacyLang, langSwitch: true };
   }
-  var cf = {ar:'\u0645\u0627 \u0641\u0647\u0645\u062A \uD83D\uDE0A \u0645\u0645\u0643\u0646 \u062A\u0648\u0636\u062D\u061F',es:'No entend\u00ED \uD83D\uDE0A \u00BFPuedes explicar m\u00E1s?',fr:'Je n ai pas compris \uD83D\uDE0A Pouvez-vous pr\u00E9ciser?',en:'Didn\'t catch that \uD83D\uDE0A Could you clarify?',hs:'\u0645\u0627 \u0641\u0647\u0645\u062A\u0647\u0627 \uD83D\uDE0A \u0648\u0636\u0651\u062D \u0644\u064A \u0623\u0643\u062B\u0631.'};
+  // عند الحسانية: لا نقول «ما فهمتها» — نقدّم خيارات عملية مباشرة
+  var cf = {
+    ar: 'ما فهمت 😊 ممكن توضح؟',
+    es: 'No entendí 😊 ¿Puedes explicar más?',
+    fr: 'Je n ai pas compris 😊 Pouvez-vous préciser?',
+    en: 'Didn\'t catch that 😊 Could you clarify?',
+    hs: 'زين نعاونك! شنهو تبي بالضبط؟\n• باقة / اشتراك\n• نشر إعلان\n• دفع Bankily/Sedad\n• مساعدة عامة على رزق',
+  };
   _logMissedQuestion(userMessage, lang, context);
-  return { reply: cf[lang]||cf.ar, lang: lang };
+  return { reply: cf[lang] || cf.ar, lang: lang };
 }
 
 // \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062A\u064A \u0644\u0645 \u064A\u0641\u0647\u0645\u0647\u0627 \u0627\u0644\u0648\u0643\u064A\u0644 \u2014 \u062A\u064F\u0639\u0631\u0636 \u0644\u0644\u0623\u062F\u0645\u064A\u0646 \u0644\u062A\u062D\u0633\u064A\u0646 \u0627\u0644\u0631\u062F\u0648\u062F \u0644\u0627\u062D\u0642\u0627\u064B

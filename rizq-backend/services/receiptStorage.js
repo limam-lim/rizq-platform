@@ -22,7 +22,7 @@ function ensureReceiptsDir() {
   if (!fs.existsSync(RECEIPTS_DIR)) {
     fs.mkdirSync(RECEIPTS_DIR, { recursive: true, mode: 0o750 });
   }
-  // Deny directory listing via static server — receipts are never mounted publicly.
+  // Deny directory listing — Express also blocks /uploads/receipts before static.
   const deny = path.join(RECEIPTS_DIR, '.htaccess');
   if (!fs.existsSync(deny)) {
     try { fs.writeFileSync(deny, 'Deny from all\n', 'utf8'); } catch (_) { /* optional */ }

@@ -1017,4 +1017,5 @@ module.exports = {
   buildAlertChatCandidates,
   canPromoteAdminChat,
   isAuthorizedChat,
+  loadReceiptDataUrl,
 };

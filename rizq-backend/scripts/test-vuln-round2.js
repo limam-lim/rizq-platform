@@ -116,6 +116,16 @@ async function liveTests() {
   // Public reviews scrub reviewerAccountId
   const reviews = await fetch(BASE + '/api/reviews/acc_nonexistent_target').then((r) => r.json());
   ok('reviews public endpoint responds', !!(reviews && reviews.ok && Array.isArray(reviews.reviews)));
+
+  // Guest secret persists in SQLite (survives process Map wipe / restart)
+  const repos = require('../db/repos');
+  const persisted = repos.guestThreadSecrets.get(threadKey);
+  ok('guest thread secret persisted to SQLite', !!(persisted && persisted.hash && persisted.phoneDigits === phone.replace(/\D/g, '')));
+
+  // messages/mine must not match accountId as prefix of another buyer's id
+  const { threadBelongsToBuyer } = require('../routes/messages');
+  ok('threadBelongsToBuyer exact match', threadBelongsToBuyer('SELL::acc:ACC_1234567890', 'ACC_1234567890') === true);
+  ok('threadBelongsToBuyer rejects prefix IDOR', threadBelongsToBuyer('SELL::acc:ACC_12345678901234', 'ACC_1234567890') === false);
 }
 
 async function main() {

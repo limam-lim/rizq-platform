@@ -76,7 +76,100 @@
     if (jumpBar) jumpBar.classList.toggle('visible', y > SCROLL_TOP);
   }
 
+  /* ── تثبيت لوحة البحث + تصفّح الأقسام تحت الهيدر ── */
+  var browsePanel = document.querySelector('.hero-browse-panel');
+  var browseSpacer = null;
+  var browseAnchorY = 0;
+  var browseStuck = false;
+
+  function readCssPx(name, fallback) {
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+    var n = parseFloat(raw);
+    return isFinite(n) ? n : fallback;
+  }
+
+  function browseHeaderOffset() {
+    var h = readCssPx('--rizq-header-h', 70);
+    var a = readCssPx('--rizq-announce-h', 0);
+    var ticker = document.getElementById('ticker-wrap');
+    var t = 0;
+    if (ticker && !ticker.classList.contains('is-empty') && ticker.offsetParent !== null) {
+      t = ticker.offsetHeight || readCssPx('--rizq-ticker-h', 42);
+    }
+    document.documentElement.style.setProperty('--rizq-ticker-stuck-h', t + 'px');
+    return h + a + t;
+  }
+
+  function measureBrowseAnchor() {
+    if (!browsePanel || browseStuck) return;
+    browseAnchorY = browsePanel.getBoundingClientRect().top + (window.scrollY || window.pageYOffset || 0);
+  }
+
+  function ensureBrowseSpacer() {
+    if (!browsePanel || browseSpacer) return;
+    browseSpacer = document.createElement('div');
+    browseSpacer.className = 'hero-browse-spacer';
+    browseSpacer.setAttribute('aria-hidden', 'true');
+    if (browsePanel.parentNode) {
+      browsePanel.parentNode.insertBefore(browseSpacer, browsePanel);
+    }
+  }
+
+  function syncBrowseSticky() {
+    if (!browsePanel) return;
+    ensureBrowseSpacer();
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    var off = browseHeaderOffset();
+    if (!browseStuck) {
+      measureBrowseAnchor();
+      if (y + off >= browseAnchorY - 1) {
+        if (browseSpacer) {
+          browseSpacer.style.height = browsePanel.offsetHeight + 'px';
+          browseSpacer.classList.add('is-active');
+        }
+        browsePanel.classList.add('is-stuck');
+        browsePanel.style.top = off + 'px';
+        browseStuck = true;
+      }
+    } else if (y + off < browseAnchorY - 1) {
+      browsePanel.classList.remove('is-stuck');
+      browsePanel.style.top = '';
+      if (browseSpacer) {
+        browseSpacer.classList.remove('is-active');
+        browseSpacer.style.height = '0px';
+      }
+      browseStuck = false;
+      measureBrowseAnchor();
+    } else {
+      browsePanel.style.top = off + 'px';
+      if (browseSpacer) browseSpacer.style.height = browsePanel.offsetHeight + 'px';
+    }
+  }
+
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', syncBrowseSticky, { passive: true });
+  window.addEventListener('resize', function () {
+    if (browsePanel && browseStuck) {
+      browseStuck = false;
+      browsePanel.classList.remove('is-stuck');
+      browsePanel.style.top = '';
+      if (browseSpacer) {
+        browseSpacer.classList.remove('is-active');
+        browseSpacer.style.height = '0px';
+      }
+    }
+    measureBrowseAnchor();
+    syncBrowseSticky();
+  }, { passive: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      measureBrowseAnchor();
+      syncBrowseSticky();
+    });
+  } else {
+    measureBrowseAnchor();
+    syncBrowseSticky();
+  }
   onScroll();
 
   if (backBtn) {
