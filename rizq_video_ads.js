@@ -106,7 +106,8 @@
   }
 
   // فيديو المنصة المزروع — بداية الحلقة وبعد انتهاء إعلانات المعلنين
-  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  /* نسخة نظيفة بلا عناوين كبيرة تغطي الأيقونات/الإعلانات */
+  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
   var DEFAULT_AD_SLOT_SEC = 25;
   var _heroAdvanceTimer = null;
   var _heroPlaylist = [];
@@ -127,6 +128,10 @@
     var list = [];
     var promoEnabled = config.platformPromoEnabled !== false;
     var promoUrl = String(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO).trim();
+    /* استبدال النسخ ذات العناوين المحروقة التي تغطي الأيقونات */
+    if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(promoUrl)) {
+      promoUrl = DEFAULT_PLATFORM_PROMO;
+    }
     if (promoEnabled && promoUrl) {
       list.push({
         advertiser: 'رزق · Rizq Platform',
@@ -192,10 +197,14 @@
 
     var paidCount = heroAds.length;
     if (viewsEl) {
-      viewsEl.textContent = paidCount
-        ? ('👁 مُعلنون نشطون: ' + paidCount)
-        : '🎬 Rizq · فيديو المنصة';
-      viewsEl.style.display = 'block';
+      if (paidCount) {
+        viewsEl.textContent = '👁 مُعلنون نشطون: ' + paidCount;
+        viewsEl.style.display = 'block';
+      } else {
+        /* لا شارة «فيديو المنصة» على/قرب مساحة الإعلان */
+        viewsEl.textContent = '';
+        viewsEl.style.display = 'none';
+      }
     }
 
     function paintMeta(ad) {

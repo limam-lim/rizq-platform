@@ -719,6 +719,7 @@ html[lang="fr"] .hero-subtitle-secondary{
   animation:fadeUp .8s .36s ease both;
   padding:12px 12px 8px;
   border-radius:22px;
+  display:flex;flex-direction:column;align-items:stretch;
   background:
     linear-gradient(160deg,rgba(201,168,76,.16),rgba(27,58,107,.20) 45%,rgba(8,15,30,.55)),
     linear-gradient(145deg,#0a1628,#132a4a 55%,#0c1830);
@@ -751,11 +752,13 @@ html[lang="fr"] .hero-subtitle-secondary{
   filter:blur(8px);pointer-events:none;
 }
 .hero-vid-badge{
-  position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+  position:relative;display:inline-flex;align-self:center;
+  top:auto;left:auto;transform:none;
+  margin:0 auto 10px;max-width:100%;
   background:linear-gradient(135deg,#b89840,var(--gold),var(--gold-light));
   color:var(--royal-dark);font-size:11px;font-weight:900;
   padding:7px 22px;border-radius:100px;
-  letter-spacing:.6px;z-index:6;white-space:nowrap;
+  letter-spacing:.6px;z-index:2;white-space:nowrap;
   box-shadow:0 6px 20px rgba(201,168,76,.42),0 0 0 3px rgba(8,15,30,.55);
   font-family:'Cairo','Segoe UI','Arial',sans-serif;
   animation:heroVidBadgePulse 3.2s ease-in-out infinite;
@@ -12055,7 +12058,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo3"></script>
+<script src="rizq_video_ads.js?v=promo4"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=23.4"></script>
 <script src="rizq_disclaimer.js"></script>
