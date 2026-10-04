@@ -554,11 +554,49 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     max-width:100%;
     overflow:visible !important;
     flex-shrink:0;
+    z-index:8;
+    /* لغة في أقصى اليسار ثم حسابي ثم أدوات */
+    direction:ltr !important;
+  }
+  html.rizq-app-nav #nav > .nav-start .rizq-toolbar-lang,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start .rizq-toolbar-lang,
+  html.rizq-app-nav #nav > .nav-start [data-rizq-toolbar="lang"],
+  html.rizq-app-nav #rizq-desk-nav > .nav-start [data-rizq-toolbar="lang"]{
+    order:1 !important;
+  }
+  html.rizq-app-nav #nav > .nav-start .rizq-toolbar-account,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start .rizq-toolbar-account,
+  html.rizq-app-nav #nav > .nav-start [data-rizq-toolbar="account"],
+  html.rizq-app-nav #rizq-desk-nav > .nav-start [data-rizq-toolbar="account"]{
+    order:2 !important;
+  }
+  html.rizq-app-nav #nav > .nav-start .rizq-toolbar-tools,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start .rizq-toolbar-tools,
+  html.rizq-app-nav #nav > .nav-start [data-rizq-toolbar="tools"],
+  html.rizq-app-nav #rizq-desk-nav > .nav-start [data-rizq-toolbar="tools"]{
+    order:3 !important;
+  }
+  /* المفضلة مضغوطة — أيقونة فقط على المكتب */
+  html.rizq-app-nav #nav .nav-fav-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-btn{
+    padding:7px 9px !important;
+    min-width:36px !important;
+    gap:0 !important;
+    border-radius:999px !important;
+  }
+  html.rizq-app-nav #nav .nav-fav-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-lbl{
+    display:none !important;
+  }
+  html.rizq-app-nav #nav .nav-fav-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-fav-ico{
+    font-size:15px !important;
+    line-height:1 !important;
   }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
-    /* رصيف تنقّل مركزي فاخر — مضغوط قليلاً حتى لا يخرج عن الشريط */
-    grid-column:3;
+    /* وسط حقيقي لصفحة العرض + تمدد خفيف نحو اليمين (الشعار) */
+    grid-column:1 / -1;
     justify-self:center;
     justify-content:center;
     overflow-x:auto !important;
@@ -570,20 +608,21 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     list-style:none;
     direction:inherit;
     margin:0;
-    padding:5px 12px !important;
-    width:auto;
-    max-width:min(720px,56vw);
+    padding:5px 16px !important;
+    width:max-content;
+    max-width:min(900px,72vw);
     min-width:0;
-    position:relative !important;
-    left:auto !important;
+    position:absolute !important;
+    left:50% !important;
     right:auto !important;
-    top:auto !important;
-    transform:none !important;
+    top:50% !important;
+    /* انزياح طفيف لليمين ليملأ الفراغ نحو الشعار بعد تصغير المفضلة */
+    transform:translate(calc(-50% + 18px), -50%) !important;
     z-index:5;
     pointer-events:auto;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
-    border-radius:12px !important; /* مستطيل بزوايا خفيفة بدل الكبسولة */
+    border-radius:12px !important;
     background:
       linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
       rgba(4,10,20,.55) !important;
@@ -619,6 +658,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     direction:ltr;
     min-width:0;
     max-width:100%;
+    z-index:8;
+    position:relative;
   }
   html.rizq-app-nav #nav .logo-mark,
   html.rizq-app-nav #nav .logo-mark-img,
