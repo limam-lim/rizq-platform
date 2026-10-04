@@ -318,23 +318,26 @@ html[lang="fr"] #detail-content{
   min-height:100%!important;aspect-ratio:auto!important;margin:0!important;
   display:flex!important;align-items:center;justify-content:center;
 }
-.dp-main-img svg{width:64px;height:64px;stroke-width:1.2;opacity:.9}
+.dp-main-img > svg{width:64px;height:64px;stroke-width:1.2;opacity:.9}
 .dp-main-img img{
   width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
-  object-fit:cover!important;object-position:center;display:block;
+  min-width:100%!important;min-height:100%!important;
+  object-fit:cover!important;object-position:center;display:block!important;
   background:#0b1628;transition:transform .25s ease;
 }
 .dp-main-img:hover img{transform:scale(1.03)}
 .dp-emoji-stage{
   pointer-events:none;border-radius:inherit;
   background:inherit;
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  display:flex!important;align-items:center;justify-content:center;
 }
 .dp-emoji-xl{
-  font-size:clamp(120px,22vw,220px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  font-size:clamp(120px,22vw,220px)!important;line-height:1;display:inline-flex!important;align-items:center;justify-content:center;
   filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));transform:scale(1);transform-origin:center;
 }
 .dp-main-img .dp-emoji-xl svg,
-.dp-emoji-xl svg{width:clamp(120px,22vw,220px)!important;height:clamp(120px,22vw,220px)!important;opacity:1}
+.dp-emoji-xl svg{width:clamp(120px,22vw,220px)!important;height:clamp(120px,22vw,220px)!important;opacity:1;max-width:none!important;max-height:none!important}
 #lightbox-content .lb-emoji-stage{
   width:min(920px,92vw);height:min(70vh,640px);border-radius:18px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:18px;box-shadow:0 16px 48px rgba(0,0,0,.45);
@@ -2396,9 +2399,14 @@ function renderDetailPanel(ad){
   const titleFallbackNote=titlePick.isFallback?_langFallbackNoteHtml(titlePick.sourceLang,true):'';
   const descFallbackNote=descPick.isFallback?_langFallbackNoteHtml(descPick.sourceLang,true):'';
 
-  // Gallery — صور حقيقية إن وُجدت؛ وإلا معاينة كبيرة قابلة للتكبير (إيموجي/خلفية)
-  const hasImages=Array.isArray(ad.images)&&ad.images.length>0;
-  const totalGallery=hasImages?ad.images.length:1;
+  // Gallery — صور حقيقية صالحة فقط؛ وإلا معاينة كبيرة قابلة للتكبير (إيموجي)
+  const _rawImgs=Array.isArray(ad.images)?ad.images:[];
+  const _validImgs=_rawImgs.map(function(s){return String(s||'').trim();}).filter(function(s){
+    return s && s!=='undefined' && s!=='null' && !/^data:,?$/i.test(s);
+  });
+  ad.images=_validImgs;
+  const hasImages=_validImgs.length>0;
+  const totalGallery=hasImages?_validImgs.length:1;
   window._dpCurrentIdx=0;
   ad._catEmojis=[]; // disable emoji photo strip
 
@@ -2406,10 +2414,10 @@ function renderDetailPanel(ad){
   const zoomHintHTML=`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`;
   const counterHTML=hasImages&&totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1';this.closest('.dp-main-img')&&this.closest('.dp-main-img').classList.add('dp-img-broken')" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="position:absolute;inset:0;width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(_validImgs[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="dpMainImgBroken(this)" style="width:100%!important;height:100%!important;object-fit:cover!important;pointer-events:none;display:block"></div>${zoomHintHTML}${counterHTML}`;
   } else {
     const emoBg=escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
-    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true" style="font-size:clamp(120px,22vw,220px);line-height:1">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
+    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true" style="font-size:clamp(120px,22vw,220px)!important;line-height:1;display:inline-flex">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
   }
 
   const thumbsHTML=hasImages&&ad.images.length>1
@@ -2542,7 +2550,7 @@ function renderDetailPanel(ad){
     <div class="dp-hero">
       <div class="dp-gallery">
         <div class="dp-gal-wrap">
-          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
+          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" data-emo="${escapeHtml(ad.emoji||'🏠')}" data-emo-bg="${escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)')}" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
           ${galNavHTML}
         </div>
         ${thumbsBlock}
@@ -2828,6 +2836,24 @@ function _dpEmojiLightboxHtml(ad, fr){
     + '<span class="lb-emoji-xl" aria-hidden="true" style="font-size:clamp(140px,26vw,260px);line-height:1">'+iconHTML(emo)+'</span>'
     + (title ? '<div class="lb-emoji-title">'+title+'</div>' : '')
     + '</div>';
+}
+function dpMainImgBroken(img){
+  try{
+    if(!img) return;
+    img.dataset.broken='1';
+    var box=img.closest('.dp-main-img');
+    if(!box) return;
+    box.classList.add('dp-img-broken');
+    var fr=_rizqLang()==='fr';
+    var bg=box.getAttribute('data-emo-bg')||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)';
+    var emo=box.getAttribute('data-emo')||'🏠';
+    var zoom='<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>'+(fr?'Agrandir':'تكبير')+'</span></button>';
+    box.innerHTML='<div class="dp-emoji-stage" style="background:'+escapeHtml(bg)+'"><span class="dp-emoji-xl" aria-hidden="true">'+iconHTML(emo)+'</span></div>'+zoom;
+    if(window._currentAd){
+      window._currentAd.images=[];
+      window._lbEmojiOnly=true;
+    }
+  }catch(eBr){ /* ignore */ }
 }
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;

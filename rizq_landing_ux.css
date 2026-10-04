@@ -309,7 +309,7 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 /* ── Section centering (clean — no glass overrides) ── */
 .hero-content{
   width:100%;
-  max-width:min(1200px,96vw);
+  max-width:min(1320px,98vw);
   margin:0 auto;
   text-align:center;
   display:flex;
@@ -317,11 +317,15 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
   align-items:center;
   box-sizing:border-box;
 }
+/* AR/FR parity — نفس عرض المحتوى على الشاشة */
 html[dir="ltr"] .hero-content,
 html[lang="fr"] .hero-content,
-body.rizq-lang-fr .hero-content{
+body.rizq-lang-fr .hero-content,
+html[dir="rtl"] .hero-content,
+html[lang="ar"] .hero-content,
+body.rizq-lang-ar .hero-content{
   width:100%;
-  max-width:min(1200px,96vw);
+  max-width:min(1320px,98vw);
 }
 
 .why-section > .section-header,

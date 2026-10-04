@@ -267,6 +267,9 @@
         v.src = ad.url;
         v.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000';
         host.insertBefore(v, host.firstChild);
+        host.classList.add('is-playing');
+        var wrapEl = host.closest('.hero-vid-wrap');
+        if (wrapEl) wrapEl.classList.add('is-playing');
         if (sndBtn) {
           sndBtn.style.display = '';
           sndBtn.textContent = '🔇';
@@ -296,6 +299,9 @@
       var iframe = makeIframe(embedSrc, '100%', '100%');
       iframe.className = 'rzq-hero-player';
       host.insertBefore(iframe, host.firstChild);
+      host.classList.add('is-playing');
+      var wrapEl2 = host.closest('.hero-vid-wrap');
+      if (wrapEl2) wrapEl2.classList.add('is-playing');
       if (sndBtn) sndBtn.style.display = 'none';
       var slotSec = Math.max(8, Math.min(120, Number(config.adSlotSeconds) || DEFAULT_AD_SLOT_SEC));
       _heroAdvanceTimer = setTimeout(advance, slotSec * 1000);

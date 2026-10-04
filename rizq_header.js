@@ -1075,8 +1075,17 @@
       function isDesk() {
         try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
       }
+      function menuEl() {
+        return moreMenuFor(li) || document.querySelector('.nav-dropdown-menu.rizq-more-menu-open');
+      }
       function keepOpen() {
         positionMoreDropdown(li);
+        var m = menuEl();
+        if (m && !m.getAttribute('data-rizq-more-stay')) {
+          m.setAttribute('data-rizq-more-stay', '1');
+          m.addEventListener('mouseenter', function () { if (isDesk()) keepOpen(); });
+          m.addEventListener('click', function (e) { e.stopPropagation(); });
+        }
       }
       more.addEventListener('click', function (e) {
         e.preventDefault();

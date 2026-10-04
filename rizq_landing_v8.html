@@ -562,12 +562,15 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 /* خيارك الأول + بيع/اشتر — نفس طول بطاقة متجرك الافتراضي (hero-stage) */
 .hero-lead-row{
   display:flex;flex-direction:column;align-items:stretch;justify-content:center;
-  gap:16px;margin:0 auto 14px;width:100%;max-width:min(1200px,96vw);box-sizing:border-box;
+  gap:16px;margin:0 auto 14px;width:100%;max-width:min(1320px,98vw);box-sizing:border-box;
 }
 html[dir="ltr"] .hero-lead-row,
 html[lang="fr"] .hero-lead-row,
-body.rizq-lang-fr .hero-lead-row{
-  width:100%;max-width:min(1200px,96vw);
+body.rizq-lang-fr .hero-lead-row,
+html[dir="rtl"] .hero-lead-row,
+html[lang="ar"] .hero-lead-row,
+body.rizq-lang-ar .hero-lead-row{
+  width:100%;max-width:min(1320px,98vw);
 }
 .hero-subtitle-card{
   display:block;
@@ -642,26 +645,29 @@ body.rizq-lang-fr .hero-lead-row{
 /* ══ HERO STAGE — تركيب الدخول الأول (فضاءات → تصفّح → تحويل → إعلان) ══ */
 .hero-stage{
   width:100%;
-  max-width:min(1200px,96vw);
+  max-width:min(1320px,98vw);
   margin:18px auto 0;
   position:relative;z-index:55;
   display:flex;flex-direction:column;align-items:stretch;gap:22px;
   padding:22px 18px 10px;
   border-radius:28px;
   box-sizing:border-box;
-}
-html[dir="ltr"] .hero-stage,
-html[lang="fr"] .hero-stage,
-body.rizq-lang-fr .hero-stage{
-  width:100%;
-  max-width:min(1200px,96vw);
-}
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.14),transparent 55%),
     linear-gradient(180deg,rgba(255,255,255,.78) 0%,rgba(238,242,251,.92) 55%,rgba(255,255,255,.96) 100%);
   border:1px solid rgba(27,58,107,.10);
   box-shadow:0 18px 48px rgba(15,35,65,.10),inset 0 1px 0 rgba(255,255,255,.85);
   animation:fadeUp .75s .18s ease both;
+}
+/* AR/FR — نفس قياسات الشاشة بالكامل */
+html[dir="ltr"] .hero-stage,
+html[lang="fr"] .hero-stage,
+body.rizq-lang-fr .hero-stage,
+html[dir="rtl"] .hero-stage,
+html[lang="ar"] .hero-stage,
+body.rizq-lang-ar .hero-stage{
+  width:100%;
+  max-width:min(1320px,98vw);
 }
 .hero-spaces{position:relative;z-index:2}
 .hero-spaces-head{text-align:center;margin:0 auto 14px;max-width:34em}
@@ -801,8 +807,22 @@ html[lang="fr"] .hero-vid-wrap{
 }
 /* أثناء التشغيل: لا طبقات نص فوق مساحة الفيديو */
 .hero-vid-inner.is-playing .hero-vid-ph,
-.hero-vid-wrap.is-playing .hero-vid-ph{display:none!important}
-.hero-vid-inner > .rzq-hero-caption{display:none!important}
+.hero-vid-wrap.is-playing .hero-vid-ph,
+.hero-vid-inner:has(video) .hero-vid-ph,
+.hero-vid-inner:has(iframe) .hero-vid-ph,
+.hero-vid-wrap:has(video) .hero-vid-ph,
+.hero-vid-wrap:has(iframe) .hero-vid-ph{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+.hero-vid-inner > .rzq-hero-caption,
+.hero-vid-inner .rzq-hero-caption,
+.hero-vid-inner .hero-vid-adv-name,
+.hero-vid-inner .hero-vid-adv-bar,
+.hero-vid-inner .hero-vid-views,
+.hero-vid-inner .hero-vid-ph-body,
+.hero-vid-inner .hero-vid-ph-h1,
+.hero-vid-inner .hero-vid-ph-sub{display:none!important;visibility:hidden!important;opacity:0!important}
+.hero-vid-inner.is-playing::after,
+.hero-vid-inner:has(video)::after,
+.hero-vid-inner:has(iframe)::after{display:none!important}
 .hero-vid-inner::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:4;
   background:linear-gradient(180deg,rgba(255,255,255,.10) 0%,transparent 18%,transparent 78%,rgba(0,0,0,.28) 100%);
@@ -2983,16 +3003,21 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile img{transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:52px}
-/* بلاطات الإيموجي تتحرك مع البطاقة — ليست جامدة */
-.rizq-style-tile:not(:has(img)){animation:rizqTileFloat 4.8s ease-in-out infinite}
-.rizq-style-tile:nth-child(2):not(:has(img)){animation-delay:.4s}
-.rizq-style-tile:nth-child(3):not(:has(img)){animation-delay:.8s}
+/* بلاطات المعارض تتحرك — ليست جامدة (إيموجي وصور) */
+.rizq-style-tile{animation:rizqTileFloat 4.8s ease-in-out infinite}
+.rizq-style-tile:nth-child(2){animation-delay:.4s}
+.rizq-style-tile:nth-child(3){animation-delay:.8s}
+.rizq-style-tile.is-linked{animation-name:rizqTileFloatLinked}
 @keyframes rizqTileFloat{
   0%,100%{transform:translateY(0) scale(1)}
   50%{transform:translateY(-3px) scale(1.04)}
 }
+@keyframes rizqTileFloatLinked{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-4px) scale(1.05)}
+}
 @media (prefers-reduced-motion:reduce){
-  .rizq-style-tile:not(:has(img)){animation:none}
+  .rizq-style-tile{animation:none}
 }
 .rizq-style-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .rizq-style-badge{
@@ -9180,11 +9205,24 @@ window.positionNavDropdown=positionNavDropdown;
 window.closeNavDropdowns=closeNavDropdowns;
 (function bindDesktopMoreHover(){
   var li=document.querySelector('#nav .nav-dropdown-li');
-  if(!li) return;
+  if(!li || li.getAttribute('data-rizq-more-hover')==='1') return;
+  li.setAttribute('data-rizq-more-hover','1');
   function isDesk(){ try{ return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; }catch(e){ return true; } }
+  function menuEl(){
+    return li.querySelector('.nav-dropdown-menu')
+      || document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'nav-more-li')+'"]')
+      || document.querySelector('.nav-dropdown-menu.rizq-more-menu-open');
+  }
   function keepOpen(){
     var positioner=(typeof window.positionNavDropdown==='function')?window.positionNavDropdown:positionNavDropdown;
     positioner(li);
+    var m=menuEl();
+    if(m && !m.getAttribute('data-rizq-more-stay')){
+      m.setAttribute('data-rizq-more-stay','1');
+      /* القائمة على body — أبقِها مفتوحة عند دخول الماوس لعناصرها */
+      m.addEventListener('mouseenter',function(){ if(isDesk()) keepOpen(); });
+      m.addEventListener('click',function(e){ e.stopPropagation(); });
+    }
   }
   /* سطح المكتب: افتح عند المرور — لا تُغلق عند مغادرة الزر (القائمة portaled).
      الإغلاق فقط بنقرة خارجية أو Escape (أدناه). */
@@ -9194,10 +9232,15 @@ window.closeNavDropdowns=closeNavDropdowns;
   });
   var trigger=li.querySelector('.nav-dropdown-trigger,.nav-desktop-more-only');
   if(trigger){
+    /* أزل onclick المضمّن لتجنّب فتح+إغلاق مزدوج مع المستمع */
+    trigger.removeAttribute('onclick');
     trigger.addEventListener('click',function(e){
-      if(!isDesk()) return;
       e.preventDefault();
       e.stopPropagation();
+      if(!isDesk()){
+        toggleNavDropdown(e, trigger);
+        return;
+      }
       if(li.classList.contains('open')||document.querySelector('.nav-dropdown-menu.rizq-more-menu-open')){
         closeNavDropdowns();
       } else {
