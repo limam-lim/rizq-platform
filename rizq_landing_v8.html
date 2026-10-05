@@ -2310,10 +2310,20 @@ main, .page-content.active, .main-content, .results-area,
 
 /* بوابات تخصص المكاتب — وسوم دخول مباشرة لكل نشاط */
 .vo-specialty-portals{
-  display:grid;
+  position:relative!important;
+  top:auto!important;left:auto!important;right:auto!important;
+  z-index:1!important;
+  height:auto!important;
+  padding:0!important;
+  display:grid!important;
   grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
   gap:12px;
-  margin-bottom:40px;
+  margin:0 0 40px!important;
+  background:none!important;
+  border:none!important;
+  box-shadow:none!important;
+  direction:inherit!important;
+  overflow:visible!important;
 }
 .vo-spec-portal{
   position:relative;
