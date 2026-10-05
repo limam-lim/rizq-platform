@@ -1100,7 +1100,7 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 .hero-vid-cta-sep{display:none}
 @media(max-width:640px){
-  .hero-vid-wrap{margin:0 auto 12px;padding:6px;border-radius:14px;max-width:min(92%,520px)}
+  .hero-vid-wrap{margin:0 auto 12px;padding:6px;border-radius:14px;max-width:100%;width:100%}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
   .hero-vid-ph-icon{font-size:38px}
   .hero-vid-ph-line1{font-size:13px}
@@ -2088,7 +2088,8 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:100%;gap:12px}
   .hero-biz-nav .hero-biz-btn:nth-child(4){grid-column:1 / 2}
   .hero-biz-nav .hero-biz-btn:nth-child(5){grid-column:2 / 4;max-width:none}
-  .hero-stage{padding:18px 14px 8px}
+  .hero-stage{padding:18px 14px 8px;max-width:min(820px,82vw)}
+  .hero-lead-row{max-width:min(820px,82vw)}
   .vo-specialty-portals{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
     gap:10px!important;
@@ -2171,7 +2172,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-browse-panel .hero-search{margin:0 auto 4px!important}
   .hero-browse-panel .search-cat-select{height:32px!important;min-width:84px!important;font-size:11px!important}
   .hero-browse-panel .btn-search-main{height:32px!important;padding:0 12px!important;font-size:12.5px!important}
-  .hero-vid-wrap{width:100%;max-width:min(92%,520px);margin:0 auto 4px;padding:6px}
+  .hero-vid-wrap{width:100%;max-width:100%;margin:0 auto 4px;padding:6px}
   .hero-vid-compact .hero-vid-inner,
   .hero-vid-wrap .hero-vid-inner{aspect-ratio:16/9;max-height:min(42vh,320px)}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
@@ -2185,8 +2186,9 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-label{white-space:normal;text-align:center;font-size:12.5px}
   .hero-biz-hint{white-space:normal;font-size:9.5px}
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
-  .hero-cta-wrap{margin:0 auto}
+  .hero-cta-wrap{margin:0 auto;width:100%;max-width:none}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
+  .hero-cta-micro{text-align:center;max-width:100%;padding:0 4px}
   /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
      direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
   #hero-listings .cards-track-wrap{

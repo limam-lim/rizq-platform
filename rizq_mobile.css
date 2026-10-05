@@ -853,10 +853,10 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 /* ── Mobile portrait — larger immersive hero / video modal ── */
 @media(max-width:768px) and (orientation:portrait){
   .hero-vid-wrap{
-    width:min(100%,96%)!important;
-    max-width:96vw!important;
-    margin-left:auto!important;
-    margin-right:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
   }
   .hero-vid-inner{
     min-height:min(52vw,240px);
@@ -922,13 +922,13 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
   }
 }
 
-/* ── موبايل: مسافة أمان للبانر الإعلاني والعدادات وخلفية الأقسام ── */
+/* ── موبايل: شاشة الإعلان تبقى داخل بطاقة الهيرو (لا خروج بـ 92vw) ── */
 @media(max-width:768px){
   .hero-vid-wrap{
-    width:92vw !important;
-    max-width:calc(100vw - 32px) !important;
-    margin-left:calc(50% - min(46vw, calc(50vw - 16px))) !important;
-    margin-right:calc(50% - min(46vw, calc(50vw - 16px))) !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
     box-sizing:border-box !important;
   }
   .hero-vid-inner{
