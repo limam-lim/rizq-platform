@@ -2314,16 +2314,19 @@ main, .page-content.active, .main-content, .results-area,
   top:auto!important;left:auto!important;right:auto!important;
   z-index:1!important;
   height:auto!important;
+  min-height:0!important;
   padding:0!important;
   display:grid!important;
   grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
-  gap:12px;
+  gap:14px;
   margin:0 0 40px!important;
-  background:none!important;
+  background:transparent!important;
+  background-image:none!important;
   border:none!important;
   box-shadow:none!important;
   direction:inherit!important;
   overflow:visible!important;
+  align-items:stretch;
 }
 .vo-spec-portal{
   position:relative;
@@ -4081,8 +4084,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </p>
     </div>
 
-    <!-- بوابات التخصص — كل وسم يدخل تسجيل مكتب بنشاطه جاهزاً -->
-    <nav class="fade-in vo-specialty-portals" aria-label="بوابات تخصص المكاتب">
+    <!-- بوابات التخصص — كل وسم يدخل تسجيل مكتب بنشاطه جاهزاً (div لا nav لتفادي CSS الشريط العلوي) -->
+    <div class="fade-in vo-specialty-portals" role="navigation" aria-label="بوابات تخصص المكاتب">
       <a class="vo-spec-portal" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_insurance_auto" onclick="openRegisterAs('company','office','of_insurance_auto');return false" data-specialty="insurance" aria-label="وكالات التأمين">
         <div class="cat-icon-box" aria-hidden="true">🛡️</div>
         <span class="vo-spec-label" data-t="vo-cat1">وكالات التأمين</span>
@@ -4119,7 +4122,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span class="vo-spec-hint" data-t="vo-cat6-hint">قرارات أوضح لنموك</span>
         <span class="vo-spec-enter"><span data-t="vo-spec-enter">ادخل تخصصك</span> <span class="vo-spec-arrow" aria-hidden="true">←</span></span>
       </a>
-    </nav>
+    </div>
 
     <!-- مزايا المكتب الافتراضي -->
     <div class="fade-in rizq-feat-row" style="background:#fff;border-radius:24px;padding:36px 32px;box-shadow:0 6px 32px rgba(27,58,107,.08);border:1px solid rgba(201,168,76,.15);margin-bottom:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px">
