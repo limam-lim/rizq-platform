@@ -1946,24 +1946,24 @@ html[dir="ltr"] .listings-section .section-desc{
 }
 .listings-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:14px;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
   max-width:1200px !important;
   width:100% !important;
   margin:0 auto !important;
   justify-items:stretch;
 }
 .landing-ads-count{
-  margin:10px 0 0;font-size:13px;font-weight:700;
+  margin:10px 0 0;font-size:12.5px;font-weight:700;
   color:rgba(255,255,255,.88);letter-spacing:.2px
 }
 .landing-ads-filters{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
-  max-width:1200px;margin:0 auto 22px;padding:0 4px
+  display:flex;flex-wrap:wrap;justify-content:center;gap:7px;
+  max-width:1200px;margin:0 auto 16px;padding:0 4px
 }
 .landing-ads-filter{
-  padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;
-  font-size:12.5px;font-weight:700;
+  padding:6px 13px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:11.5px;font-weight:700;
   color:#3d4f6a;background:#fff;border:1.5px solid rgba(27,58,107,.14);
   transition:all .2s;box-shadow:0 2px 8px rgba(13,27,42,.05)
 }
@@ -1972,43 +1972,46 @@ html[dir="ltr"] .listings-section .section-desc{
   color:#0f2347;background:linear-gradient(135deg,var(--gold),var(--gold-light));
   border-color:rgba(201,168,76,.55);box-shadow:0 4px 14px rgba(201,168,76,.28)
 }
+/* بطاقات أصغر — واجهة الإعلانات المميزة */
 .landing-ads-grid .listing-card{
-  display:flex;flex-direction:column;min-height:0
+  display:flex;flex-direction:column;min-height:0;border-radius:14px!important
 }
-.landing-ads-grid .l-img{height:150px}
+.landing-ads-grid .l-img{height:96px!important;font-size:34px}
+.landing-ads-grid .l-body{padding:8px 9px 10px!important}
+.landing-ads-grid .l-cat{font-size:9.5px!important;margin-bottom:2px!important}
 .landing-ads-grid .l-title{
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  min-height:2.5em
+  min-height:2.2em;font-size:12px!important;line-height:1.3!important;margin:0 0 4px!important
 }
-/* صف واحد: حالة العرض + فتح صفحة الإعلانات — لتقليل طول الصفحة */
+.landing-ads-grid .l-meta{font-size:10.5px!important;gap:4px!important}
+.landing-ads-grid .l-price{font-size:11.5px!important}
+.landing-ads-grid .l-badge{font-size:9px!important;padding:3px 7px!important;top:7px!important;right:7px!important}
+.landing-ads-grid .lad-fav{width:26px!important;height:26px!important;font-size:12px!important;top:7px!important;left:7px!important}
+.landing-ads-grid .lc-hover{padding:12px!important}
+.landing-ads-grid .lc-hover-title{font-size:12.5px!important}
+.landing-ads-grid .lc-hover-desc{font-size:11px!important;-webkit-line-clamp:2}
+.landing-ads-grid .listing-card:hover{transform:translateY(-4px)!important}
+/* زر واحد فقط → صفحة كل الإعلانات */
 .landing-ads-footer{
-  max-width:1200px;margin:18px auto 0;padding:0 8px;
-  display:flex;flex-wrap:wrap;gap:10px 12px;
+  max-width:1200px;margin:16px auto 0;padding:0 8px;
+  display:flex;flex-wrap:wrap;gap:10px;
   justify-content:center;align-items:center;
 }
-.landing-ads-more{margin:0;padding:0;max-width:none;text-align:center;flex:0 1 auto}
-.landing-ads-more:empty{display:none}
-.landing-ads-more-inner{
-  display:inline-flex;flex-direction:row;align-items:center;gap:10px;
-  padding:10px 16px;border-radius:999px;
-  background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18)
-}
-.landing-ads-more-lbl{font-size:12.5px;color:#5b6b85;font-weight:600;white-space:nowrap}
-.landing-ads-more-btn{
-  padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;
-  font-size:12.5px;font-weight:800;color:#0f2347;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  border:1px solid rgba(201,168,76,.5);box-shadow:0 4px 14px rgba(201,168,76,.25);
-  transition:transform .2s,box-shadow .2s;white-space:nowrap
-}
-.landing-ads-more-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(201,168,76,.35)}
-.landing-ads-more.is-done .landing-ads-more-inner{
-  border-style:solid;background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.28)
-}
+.landing-ads-more{display:none!important}
 .landing-ads-browse-full{
-  text-decoration:none;display:inline-flex;align-items:center;gap:8px;
-  white-space:nowrap;flex:0 0 auto;padding:10px 18px;border-radius:999px;
-  font-size:13px;font-weight:700
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  white-space:nowrap;flex:0 1 auto;min-width:min(100%,280px);
+  padding:12px 28px;border-radius:999px;
+  font-size:13.5px;font-weight:800;color:#0f2347!important;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border:1px solid rgba(201,168,76,.55)!important;
+  box-shadow:0 6px 18px rgba(201,168,76,.28);
+  transition:transform .2s,box-shadow .2s
+}
+.landing-ads-browse-full:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(201,168,76,.38);
+  color:#0f2347!important
 }
 .landing-ads-footer-actions{display:contents}
 .lad-fav{
@@ -2057,10 +2060,10 @@ html[dir="ltr"] .listings-section .section-desc{
 
 /* RESPONSIVE */
 @media(max-width:1440px){
-  .listings-grid{grid-template-columns:repeat(4,1fr)}
+  .listings-grid{grid-template-columns:repeat(5,1fr)}
 }
 @media(max-width:1100px){
-  .listings-grid{grid-template-columns:repeat(3,1fr)}
+  .listings-grid{grid-template-columns:repeat(4,1fr)}
 }
 @media(max-width:1024px){
   .cats-grid{grid-template-columns:repeat(3,1fr)}
@@ -3795,12 +3798,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ كل الإعلانات — شبكة غنية مثل صفحة التصفح (حتى 1000) ══ -->
+<!-- ══ الإعلانات المميزة — بطاقات أصغر + المميّز ثابت حسب الباقة + زر واحد لكل الإعلانات ══ -->
 <section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
   <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-lst-tag">كل الإعلانات</p>
-    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">كل <span>الإعلانات</span> على رزق</h2>
-    <p class="section-desc" data-t="s-lst-desc">تصفّح عروض السوق الحيّة — صوّر، فلتر، وافتح التفاصيل كما في صفحة الإعلانات</p>
+    <p class="section-tag" data-t="s-lst-tag">الإعلانات المميزة</p>
+    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">الإعلانات <span>المميزة</span> على رزق</h2>
+    <p class="section-desc" data-t="s-lst-desc">المميزة تظهر أولاً وتثبت لمدة الباقة — مع إعلانات حيّة. الكل عبر صفحة الإعلانات.</p>
     <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
   </div>
   <div class="landing-ads-filters" id="landing-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
@@ -3817,8 +3820,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- يُملأ عبر buildLandingAds() -->
   </div>
   <div class="landing-ads-footer fade-in" id="landing-ads-footer">
-    <div class="landing-ads-more" id="landing-ads-more"></div>
-    <a class="btn-outline landing-ads-browse-full" href="rizq_browse.html" data-t="browse-full">📂 فتح صفحة الإعلانات كاملة ←</a>
+    <div class="landing-ads-more" id="landing-ads-more" hidden aria-hidden="true"></div>
+    <a class="landing-ads-browse-full" href="rizq_browse.html" data-t="browse-full">📂 عرض كل الإعلانات ←</a>
   </div>
 </section>
 
@@ -5445,18 +5448,24 @@ function buildCards(){
 buildCards();
 
 function buildFeaturedCards(){
-  /* توافق خلفي — القسم أصبح «كل الإعلانات» عبر buildLandingAds */
+  /* توافق خلفي — قسم الإعلانات المميزة */
   buildLandingAds(false);
 }
 
 var LANDING_ADS_MAX = 1000;
-/* نافذة ثابتة على الصفحة الرئيسية: 15 إعلان — «المزيد» يزيح +5/−5 */
-var LANDING_ADS_WINDOW = 15;
-var LANDING_ADS_STEP = 5;
+/* واجهة المميزة: بطاقات أصغر — المميّز ثابت في المقدّمة حسب مدة الباقة */
+var LANDING_ADS_WINDOW = 18;
 var _landingAdsCat = 'all';
-var _landingAdsOffset = 0;
-var _landingAdsLoading = false;
 
+function _isLandingFeatured(a){
+  if(!a) return false;
+  var until = a.pinUntil || a.boostUntil || a.featuredUntil || a.pin_until || a.boost_until;
+  if(until){
+    var t = Date.parse(until);
+    if(!isNaN(t)) return t > Date.now();
+  }
+  return !!(a.pin || a.boosted || a.featured);
+}
 function _landingAdsPool(){
   var seen = {};
   var out = [];
@@ -5469,8 +5478,8 @@ function _landingAdsPool(){
       out.push(a);
     });
   }
-  if(typeof ADS !== 'undefined') add(ADS);
   if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  if(typeof ADS !== 'undefined') add(ADS);
   if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
   if(out.length > LANDING_ADS_MAX) out = out.slice(0, LANDING_ADS_MAX);
   return out;
@@ -5478,19 +5487,20 @@ function _landingAdsPool(){
 function _landingAdsFiltered(){
   var pool = _landingAdsPool();
   var cat = _landingAdsCat || 'all';
-  if(cat === 'all') return pool;
-  return pool.filter(function(a){
+  var list = cat === 'all' ? pool.slice() : pool.filter(function(a){
     var k = String(a.catKey || a.cat || '');
     return k.indexOf(cat) >= 0 || cat.indexOf(k) >= 0;
   });
-}
-function _landingAdsMaxOffset(total){
-  if(total <= LANDING_ADS_WINDOW) return 0;
-  return Math.max(0, total - LANDING_ADS_WINDOW);
+  /* المميزة أولاً وتثبت في الواجهة طوال مدة الباقة */
+  list.sort(function(a, b){
+    var fa = _isLandingFeatured(a) ? 1 : 0;
+    var fb = _isLandingFeatured(b) ? 1 : 0;
+    return fb - fa;
+  });
+  return list;
 }
 function filterLandingAds(cat, btn){
   _landingAdsCat = cat || 'all';
-  _landingAdsOffset = 0;
   document.querySelectorAll('.landing-ads-filter').forEach(function(b){
     var on = b.getAttribute('data-lad-cat') === _landingAdsCat;
     b.classList.toggle('is-active', on);
@@ -5499,46 +5509,28 @@ function filterLandingAds(cat, btn){
   buildLandingAds(false);
 }
 function loadMoreLandingAds(){
-  if(_landingAdsLoading) return;
-  var filtered = _landingAdsFiltered();
-  var total = Math.min(filtered.length, LANDING_ADS_MAX);
-  var maxOff = _landingAdsMaxOffset(total);
-  if(_landingAdsOffset >= maxOff) return;
-  _landingAdsLoading = true;
-  /* ثبّت موضع التذييل حتى لا تقفز الصفحة عند استبدال البطاقات */
-  var footer = document.getElementById('landing-ads-footer') || document.getElementById('landing-ads-more');
-  var anchorTop = footer ? footer.getBoundingClientRect().top : null;
-  /* نافذة منزلقة: +5 إعلانات جديدة وتختفي 5 قديمة */
-  _landingAdsOffset = Math.min(_landingAdsOffset + LANDING_ADS_STEP, maxOff);
-  buildLandingAds(false);
-  if(anchorTop != null){
-    var footer2 = document.getElementById('landing-ads-footer') || document.getElementById('landing-ads-more');
-    if(footer2){
-      var delta = footer2.getBoundingClientRect().top - anchorTop;
-      if(Math.abs(delta) > 1) window.scrollBy(0, delta);
-    }
-  }
-  setTimeout(function(){ _landingAdsLoading = false; }, 120);
+  /* أُلغي من الواجهة — الكل عبر صفحة الإعلانات */
+  try { window.location.href = 'rizq_browse.html'; } catch (e) {}
 }
 function _landingAdCardHtml(a, fr){
   function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   var d = typeof trAd === 'function' ? trAd(a) : a;
   var idAttr = esc(String(a.id));
   var title = esc(d.title || '');
-  var desc = esc(String(d.desc || '').slice(0, 90));
+  var desc = esc(String(d.desc || '').slice(0, 70));
   var cat = esc(d.cat || '');
   var price = esc(d.price || '');
   var loc = esc(d.loc || '');
   var bg = d.bg || 'linear-gradient(145deg,#111d2e,#1B3A6B)';
-  var pin = !!d.pin || !!a.boosted;
+  var pin = _isLandingFeatured(a) || !!d.pin || !!a.boosted;
   var badge = pin ? ('<span class="l-badge">' + (fr ? '⭐ Vedette' : '⭐ مميز') + '</span>') : '';
   var fav = typeof isFavorited === 'function' ? isFavorited(a.id) : false;
   var idJs = String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var favBtn = '<button type="button" class="lad-fav" onclick="event.stopPropagation();quickToggleFavorite(\'' + idJs + '\',this)" aria-label="favorite">' + (fav ? '❤️' : '🤍') + '</button>';
   var openFn = 'openAdById(\'' + idJs + '\')';
-  var photo = typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 150) : ('<span>' + esc(d.emoji || '📦') + '</span>');
+  var photo = typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 96) : ('<span>' + esc(d.emoji || '📦') + '</span>');
   return ''
-    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" onclick="' + openFn + '">'
+    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="' + openFn + '">'
     + badge + favBtn
     + '<div class="lc-hover">'
     +   '<div class="lc-hover-title">' + title + '</div>'
@@ -5558,30 +5550,22 @@ function _landingAdCardHtml(a, fr){
 function buildLandingAds(resetVisible){
   var grid = document.getElementById('landing-ads-grid') || document.querySelector('#listings .listings-grid');
   if(!grid) return;
-  if(resetVisible) _landingAdsOffset = 0;
   var fr = typeof isAr !== 'undefined' && !isAr;
   var filtered = _landingAdsFiltered();
-  var total = Math.min(filtered.length, LANDING_ADS_MAX);
-  var maxOff = _landingAdsMaxOffset(total);
-  if(_landingAdsOffset < 0) _landingAdsOffset = 0;
-  if(_landingAdsOffset > maxOff) _landingAdsOffset = maxOff;
-  var items = filtered.slice(_landingAdsOffset, _landingAdsOffset + LANDING_ADS_WINDOW);
-  var from = total ? (_landingAdsOffset + 1) : 0;
-  var to = _landingAdsOffset + items.length;
-  var atEnd = !total || _landingAdsOffset >= maxOff;
+  var featuredCount = 0;
+  for(var i = 0; i < filtered.length; i++){ if(_isLandingFeatured(filtered[i])) featuredCount++; }
+  var items = filtered.slice(0, LANDING_ADS_WINDOW);
+  var shownFeat = 0;
+  for(var j = 0; j < items.length; j++){ if(_isLandingFeatured(items[j])) shownFeat++; }
 
   var countEl = document.getElementById('landing-ads-count');
   if(countEl){
-    if(!total){
+    if(!filtered.length){
       countEl.textContent = fr ? 'Aucune annonce pour le moment' : 'لا توجد إعلانات بعد';
-    } else if(total <= LANDING_ADS_WINDOW){
-      countEl.textContent = fr
-        ? (items.length + ' annonce' + (items.length > 1 ? 's' : '') + ' sur la page')
-        : (items.length + ' إعلان على الصفحة');
     } else {
       countEl.textContent = fr
-        ? ('Fenêtre ' + from + '–' + to + ' / ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : ''))
-        : ('نافذة ' + from + '–' + to + ' من ' + total + (filtered.length >= LANDING_ADS_MAX ? '+' : ''));
+        ? (shownFeat + ' vedette' + (shownFeat > 1 ? 's' : '') + ' · ' + items.length + ' affichées — durée selon forfait')
+        : (shownFeat + ' مميزة · ' + items.length + ' ظاهرة — ثبات المميز حسب الباقة');
     }
   }
 
@@ -5600,30 +5584,7 @@ function buildLandingAds(resetVisible){
   }
 
   var more = document.getElementById('landing-ads-more');
-  if(more){
-    if(!total){
-      more.innerHTML = '';
-      more.classList.remove('is-done');
-    } else if(atEnd){
-      more.classList.add('is-done');
-      more.innerHTML = '<div class="landing-ads-more-inner"><span class="landing-ads-more-lbl">'
-        + (fr
-          ? ('Fenêtre d’accueil limitée à ' + Math.min(LANDING_ADS_WINDOW, total) + ' — voir tout via Annonces')
-          : ('نافذة الصفحة الرئيسية محدودة بـ ' + Math.min(LANDING_ADS_WINDOW, total) + ' — الباقي عبر صفحة الإعلانات'))
-        + '</span></div>';
-    } else {
-      more.classList.remove('is-done');
-      more.innerHTML = '<div class="landing-ads-more-inner">'
-        + '<span class="landing-ads-more-lbl">'
-        + (fr
-          ? (items.length + ' visibles — +' + LANDING_ADS_STEP + '/−' + LANDING_ADS_STEP)
-          : (items.length + ' ظاهرة — +' + LANDING_ADS_STEP + ' جدد / −' + LANDING_ADS_STEP + ' قديمة'))
-        + '</span>'
-        + '<button type="button" class="landing-ads-more-btn" onclick="loadMoreLandingAds()">'
-        + (fr ? 'Afficher plus' : 'عرض المزيد')
-        + '</button></div>';
-    }
-  }
+  if(more){ more.innerHTML = ''; more.hidden = true; }
 }
 try { buildLandingAds(true); } catch(eLad) {}
 
@@ -7926,11 +7887,11 @@ const LANG = {
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'أقسام دقيقة تغطي السوق الموريتاني — من الدراعة إلى السيارة',
-    's-lst-tag': 'كل الإعلانات',
-    's-lst-title': 'كل <span>الإعلانات</span> على رزق',
-    's-lst-desc': 'تصفّح عروض السوق الحيّة — صوّر، فلتر، وافتح التفاصيل كما في صفحة الإعلانات',
+    's-lst-tag': 'الإعلانات المميزة',
+    's-lst-title': 'الإعلانات <span>المميزة</span> على رزق',
+    's-lst-desc': 'المميزة تظهر أولاً وتثبت لمدة الباقة — مع إعلانات حيّة. الكل عبر صفحة الإعلانات.',
     'view-all': 'عرض الكل في نافذة ←',
-    'browse-full': '📂 فتح صفحة الإعلانات كاملة ←',
+    'browse-full': '📂 عرض كل الإعلانات ←',
     'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'منصة متكاملة للإعلانات والمحلات والمعارض والمناقصات والاستثمارات — بمعايير واضحة وثقة موريتانية',
@@ -8046,11 +8007,11 @@ const LANG = {
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'Des catégories précises pour le marché mauritanien — de la daraa à la voiture',
-    's-lst-tag': 'Toutes les annonces',
-    's-lst-title': 'Toutes les <span>annonces</span> sur Rizq',
-    's-lst-desc': 'Parcourez les offres du marché en direct — filtrez et ouvrez les détails comme sur la page Annonces',
+    's-lst-tag': 'Annonces en vedette',
+    's-lst-title': 'Annonces <span>en vedette</span> sur Rizq',
+    's-lst-desc': 'Les vedettes restent en tête selon la durée du forfait — avec des offres live. Tout voir sur la page Annonces.',
     'view-all': 'Tout voir en fenêtre →',
-    'browse-full': '📂 Ouvrir la page Annonces complète →',
+    'browse-full': '📂 Voir toutes les annonces →',
     'f-fashion': 'Mode',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Une plateforme complète pour annonces, boutiques, showrooms, appels d\'offres et investissements — avec des règles claires et une confiance mauritanienne',
