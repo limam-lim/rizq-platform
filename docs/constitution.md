@@ -1,7 +1,8 @@
 # Project Constitution
 
-This file is the project-facing copy of the AI Harness Engineering constitution.
-Full text: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
+Full universal text: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
+
+**Applies to all future work and all projects.** Read the harness file before any implementation.
 
 ## Absolute laws
 
@@ -13,7 +14,7 @@ Full text: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
 
 ## Mandatory 7-step SDD lifecycle
 
-1. Read `AGENTS.md`, `MEMORY.md`, `docs/constitution.md`
+1. Read `AGENTS.md`, `MEMORY.md`, `docs/constitution.md`, and `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
 2. Write `spec.md` (EARS)
 3. Clarify ambiguities — wait for resolution
 4. Write `plan.md`
