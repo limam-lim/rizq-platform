@@ -96,7 +96,7 @@
       + '        <img class="logo-mark-img" src="rizq-mark-512.png?v=9.6" width="42" height="42" alt="رزق"/>'
       + '        <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>'
       + '      </a>'
-      + '      <p class="footer-desc" data-t="ft-desc">منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'
+      + '      <p class="footer-desc" data-t="ft-desc">سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'
       + '      <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">'
       + '        <span data-t="ft-net-label" style="color:rgba(255,255,255,.8);font-size:11px">على رزق:</span>'
       + '        <span class="telecom-tag" data-t="ft-trust1">ثقة</span><span class="telecom-tag" data-t="ft-trust2">أمان</span><span class="telecom-tag" data-t="ft-trust3">شفافية</span>'

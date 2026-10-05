@@ -242,8 +242,8 @@
     var st = catStats();
     var fr = lang() === 'fr';
     var desc = fr
-      ? ('La plateforme mauritanienne des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
-      : ('منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
+      ? ('Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
+      : ('سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
     document.querySelectorAll('#rzq-ft-desc, footer .footer-desc, [data-t="ft-desc"]').forEach(function (el) {
       el.textContent = desc;
     });
