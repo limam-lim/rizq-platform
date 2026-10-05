@@ -168,7 +168,7 @@
     '.rw-prompt-bubble::after{content:"";position:absolute;bottom:-6px;right:18px;width:10px;height:10px;',
     'background:#fff;border-right:1.5px solid rgba(201,168,76,.3);border-bottom:1.5px solid rgba(201,168,76,.3);transform:rotate(45deg)}',
     'html[dir="ltr"] .rw-prompt-bubble::after{right:auto;left:18px}',
-    '@media(max-width:768px){#rizq-chat-toggle{width:52px;height:52px;bottom:calc(88px + env(safe-area-inset-bottom,0))!important;right:12px!important}',
+    '@media(max-width:768px){#rizq-chat-toggle{width:52px;height:52px;bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;right:12px!important;z-index:10020!important}',
     '#rizq-prompt-bubbles{bottom:calc(148px + env(safe-area-inset-bottom,0));right:12px;max-width:calc(100vw - 80px)}',
     '.rw-prompt-bubble{font-size:11px;padding:8px 12px;max-width:min(200px,calc(100vw - 96px));pointer-events:auto}}'
   ].join('');

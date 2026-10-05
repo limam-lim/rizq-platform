@@ -297,10 +297,19 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
   nav.nav-compact .nav-sticky-tools{max-width:none;margin:0 8px}
   nav.nav-compact .nav-sticky-post{display:none}
   .section-jump-bar{display:none!important}
-}
-
-@media(max-width:768px){
-  nav.nav-compact .nav-center{display:none}
+  /* الشريط الرقيق (أقسام النافبار) يبقى ظاهراً أثناء التصفح — لا يُخفى مع nav-compact */
+  #nav.nav-compact > .nav-center,
+  #nav > .nav-center,
+  html.rizq-app-nav #nav.nav-compact > .nav-center,
+  html.rizq-app-nav #nav > .nav-center{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-x:auto!important;
+  }
 }
 
 /* ── Section centering (clean — no glass overrides) ── */
@@ -1031,17 +1040,49 @@ html body footer .footer-grid{
 }
 
 @media (max-width:768px){
+  /* كبسولة بحث مضغوطة على الهاتف — ليست شريطاً بعرض الشاشة */
   .rizq-search-pill{
-    min-width:calc(100vw - 24px);
-    padding:10px 14px;
-    top:calc(var(--rizq-search-top) + 6px);
+    min-width:0;
+    width:min(280px, calc(100vw - 72px));
+    max-width:min(300px, calc(100vw - 64px));
+    padding:7px 12px;
+    gap:7px;
+    top:calc(var(--rizq-search-top) + 4px);
+    border-radius:999px;
+    box-shadow:0 8px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .rizq-search-pill-ico{
+    width:22px;height:22px;border-radius:50%;font-size:12px;
   }
   .rizq-search-pill-brand{display:none}
+  .rizq-search-pill-label{font-size:12px}
   .rizq-search-panel{
-    width:calc(100vw - 12px);
+    width:calc(100vw - 16px);
     top:calc(var(--rizq-search-top) + 4px);
   }
-  .rizq-search-panel-inner{padding:18px 14px 14px;border-radius:0 0 18px 18px}
-  .rizq-search-brand{font-size:24px}
+  .rizq-search-panel-inner{padding:16px 12px 12px;border-radius:0 0 16px 16px}
+  .rizq-search-brand{font-size:22px}
   .nav-search-launch-lbl{display:none}
+
+  /* بطاقة البحث في الهيرو أصغر أيضاً */
+  .hero-browse-panel{
+    padding:4px 8px 4px!important;
+    border-radius:12px!important;
+  }
+  .hero-browse-panel .search-bar{
+    border-radius:999px!important;
+    min-height:0!important;
+  }
+  .hero-browse-panel .search-cat-select{
+    height:28px!important;min-width:72px!important;font-size:10.5px!important;
+    padding:0 8px!important;
+  }
+  .hero-browse-panel .btn-search-main{
+    height:28px!important;padding:0 10px!important;font-size:11.5px!important;
+  }
+  .hero-browse-panel .search-input{font-size:12px!important}
+  .hero-browse-panel .qcat{height:22px!important;padding:2px 3px!important}
+  .hero-browse-panel .qcat-icon{font-size:10px!important}
+  .hero-browse-panel .qcat-name{font-size:7.5px!important}
+  .hero-browse-title{font-size:clamp(11px,3vw,12.5px)!important}
 }

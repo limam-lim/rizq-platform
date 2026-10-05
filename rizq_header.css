@@ -2246,8 +2246,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     text-align:center;
     line-height:1.2;
   }
-  html.rizq-app-nav #rizq-chat-toggle{bottom:16px !important}
-  html.rizq-app-nav #rizq-chat-window{bottom:88px !important}
+  /* ويدجت المساعد فوق شريط الإبهام — لا يختبئ خلفه */
+  html.rizq-app-nav #rizq-chat-toggle{
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0px)) !important;
+    z-index:10020 !important;
+  }
+  html.rizq-app-nav #rizq-chat-window{
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 78px + env(safe-area-inset-bottom,0px)) !important;
+  }
   #rizq-app-header,#rizq-app-header *{pointer-events:auto !important}
 
   /* زر العودة للأعلى: هوامش متناسقة، وفي الوضع الفرنسي ينتقل لليمين
@@ -2255,11 +2261,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #back-to-top{
     left:16px !important;
     right:auto !important;
-    bottom:96px !important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0px)) !important;
     width:44px !important;
     height:44px !important;
     margin:0 !important;
-    z-index:900 !important;
+    z-index:10015 !important;
   }
   html.rizq-app-nav[dir="ltr"] #back-to-top{
     left:auto !important;
