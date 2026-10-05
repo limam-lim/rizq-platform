@@ -848,14 +848,14 @@
         '<ul class="nav-center">' +
           '<li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home">' + m3LinkInner(NAV_ICOS.home, t2('الرئيسية', 'Accueil')) + '</a></li>' +
           '<li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="' + adsHref() + '" data-hdr="ads">' + m3LinkInner(NAV_ICOS.ads, t2('الإعلانات', 'Annonces')) + '</a></li>' +
-          '<li class="rizq-nav-post" data-nav-order="3" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner('➕', t2('نشر', 'Publier')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="4" data-nav-tier="thumb"><a href="' + moduleHref('store') + '" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="5" data-nav-tier="thumb"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض', 'Showrooms')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="' + moduleHref('store') + '" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض', 'Showrooms')) + '</a></li>' +
+          '<li class="rizq-nav-post" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner('➕', t2('نشر', 'Publier')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="' + moduleHref('office') + '" data-hdr="offices">' + m3LinkInner(NAV_ICOS.offices, t2('المكاتب', 'Bureaux')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'A-doffres')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="' + moduleHref('investments') + '" data-hdr="investments">' + m3LinkInner(NAV_ICOS.investments, t2('الاستثمارات', 'Investissements')) + '</a></li>' +
-          '<li class="rizq-nav-packs nav-phone-packs-li" data-nav-order="8b" data-nav-tier="secondary"><a href="' + packagesHref() + '" data-hdr="packs">' + m3LinkInner(NAV_ICOS.packs, t2('الباقات', 'Forfaits')) + '</a></li>' +
-          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="9" data-nav-tier="secondary">' +
+          '<li class="rizq-nav-packs nav-phone-packs-li" data-nav-order="9" data-nav-tier="secondary"><a href="' + packagesHref() + '" data-hdr="packs">' + m3LinkInner(NAV_ICOS.packs, t2('الباقات', 'Forfaits')) + '</a></li>' +
+          '<li class="nav-dropdown-li" id="rizq-desk-more-li" data-nav-order="10" data-nav-tier="secondary">' +
             '<a href="#" class="nav-dropdown-trigger" id="rizq-desk-more" data-hdr="more">' + m3LinkInner(NAV_ICOS.more, t2('المزيد', 'Plus')) + '</a>' +
             '<div class="nav-dropdown-menu nav-more-menu" role="menu" data-rizq-more-variant="desktop">' + desktopMoreMenuHtml() + '</div>' +
           '</li>' +
@@ -1004,7 +1004,8 @@
     menu.classList.add('rizq-more-menu-open', 'rizq-phone-more-panel');
     var navEl = document.getElementById('rizq-desk-nav') || document.getElementById('nav');
     var navBottom = navEl ? Math.round(navEl.getBoundingClientRect().bottom) : 0;
-    var top = Math.max(Math.round(rect.bottom + 6), navBottom + 4);
+    /* تداخل 8px مع الزر حتى لا تنقطع الـ hover عند عبور الفجوة للـ portal */
+    var top = Math.max(Math.round(rect.bottom - 8), navBottom - 2);
     var menuW = Math.min(176, Math.max(156, Math.min(window.innerWidth - 24, 176)));
     var centerX = Math.round(rect.left + rect.width / 2);
     var left = Math.max(8, Math.min(centerX - Math.round(menuW / 2), window.innerWidth - menuW - 8));
@@ -1018,7 +1019,7 @@
       + 'opacity:1!important;visibility:visible!important;pointer-events:auto!important;'
       + 'z-index:10052!important;display:flex!important;flex-direction:column!important;'
       + 'background:rgba(15,23,42,.96)!important;border:1px solid rgba(201,168,76,.42)!important;'
-      + 'border-radius:12px!important;padding:6px!important;'
+      + 'border-radius:12px!important;padding:14px 6px 6px!important;'
       + 'box-shadow:0 16px 40px rgba(0,0,0,.55)!important;';
   }
 
@@ -1071,54 +1072,37 @@
     if (more && li && !more.getAttribute('data-rizq-bound')) {
       more.setAttribute('data-rizq-bound', '1');
       restoreMoreMenu(li);
-      var closeT = null;
       function isDesk() {
         try { return window.matchMedia('(min-width:769px) and (min-height:501px)').matches; } catch (eH) { return true; }
       }
-      function keepOpen() {
-        clearTimeout(closeT);
-        positionMoreDropdown(li);
+      function menuEl() {
+        return moreMenuFor(li) || document.querySelector('.nav-dropdown-menu.rizq-more-menu-open');
       }
-      function scheduleClose() {
-        clearTimeout(closeT);
-        closeT = setTimeout(closeMoreDropdowns, 120);
+      function keepOpen() {
+        positionMoreDropdown(li);
+        var m = menuEl();
+        if (m && !m.getAttribute('data-rizq-more-stay')) {
+          m.setAttribute('data-rizq-more-stay', '1');
+          m.addEventListener('mouseenter', function () { if (isDesk()) keepOpen(); });
+          m.addEventListener('click', function (e) { e.stopPropagation(); });
+        }
       }
       more.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         var willOpen = !li.classList.contains('open');
         closeMoreDropdowns();
-        if (willOpen) positionMoreDropdown(li);
+        if (willOpen) keepOpen();
       });
       /* نقر على الأيقونة/النص داخل الزر */
       more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
         child.style.pointerEvents = 'none';
       });
+      /* desk: افتح عند المرور — لا تُغلق بمغادرة الزر (القائمة على body).
+         الإغلاق بنقرة خارجية فقط. */
       li.addEventListener('mouseenter', function () {
         if (!isDesk()) return;
         keepOpen();
-      });
-      li.addEventListener('mouseleave', function (e) {
-        if (!isDesk()) return;
-        var menu = moreMenuFor(li);
-        if (menu && e.relatedTarget && menu.contains(e.relatedTarget)) return;
-        scheduleClose();
-      });
-      document.addEventListener('mouseover', function (e) {
-        if (!isDesk()) return;
-        var menu = moreMenuFor(li);
-        if (!menu || !li.classList.contains('open')) return;
-        if (menu.contains(e.target) || li.contains(e.target)) {
-          clearTimeout(closeT);
-        }
-      });
-      document.addEventListener('mouseout', function (e) {
-        if (!isDesk()) return;
-        if (!li.classList.contains('open')) return;
-        var menu = moreMenuFor(li);
-        var to = e.relatedTarget;
-        if (to && (li.contains(to) || (menu && menu.contains(to)))) return;
-        scheduleClose();
       });
       document.addEventListener('click', function (e) {
         if (e.target.closest('.nav-dropdown-li') || e.target.closest('.nav-dropdown-menu')) return;
@@ -1350,20 +1334,32 @@
       offices: 1, tenders: 2, investments: 3, packs: 4, more: 5,
       home: 50, ads: 51, post: 52, stores: 53, showrooms: 54
     };
+    /* سطح المكتب/تابلت: … المعارض → نشر → المكاتب … */
+    var deskOrder = {
+      home: 1, ads: 2, stores: 3, showrooms: 4, post: 5,
+      offices: 6, tenders: 7, investments: 8, packs: 9, more: 10
+    };
+    function hdrKeyForNavEl(el) {
+      var hdr = '';
+      var link = el.querySelector('a[data-hdr], button[data-hdr], .nav-link-btn[data-hdr], .nav-dropdown-trigger[data-hdr]');
+      if (link) hdr = link.getAttribute('data-hdr') || '';
+      if (!hdr && el.getAttribute('data-hdr')) hdr = el.getAttribute('data-hdr') || '';
+      if (!hdr && el.getAttribute('data-rizq-module')) {
+        var mod = el.getAttribute('data-rizq-module');
+        hdr = mod === 'store' ? 'stores' : mod === 'corp' ? 'showrooms' : mod === 'office' ? 'offices' : mod;
+      }
+      if (el.classList.contains('nav-dropdown-li') || el.id === 'rizq-hdr-more-wrap' || el.querySelector(':scope > .nav-dropdown-trigger, :scope > .nav-phone-more-only, :scope > #rizq-hdr-more')) hdr = 'more';
+      if (el.classList.contains('rizq-nav-post') || el.id === 'rizq-hdr-post' || el.classList.contains('rizq-hdr-post') || el.querySelector(':scope > .nav-post-plus, :scope > a.nav-post-plus')) hdr = 'post';
+      /* لا تستخدم querySelector داخل القائمة المنسدلة — يخلط المزيد مع الباقات */
+      if (el.classList.contains('rizq-nav-packs') || el.classList.contains('nav-phone-packs-li')) hdr = 'packs';
+      if (el.getAttribute('data-rizq-nav-extra') === 'ads') hdr = 'ads';
+      return hdr;
+    }
     document.querySelectorAll(
       '#nav .nav-center > li, #rizq-desk-nav .nav-center > li, #rizq-thumb-dock .rizq-thumb-dock-list > li, #rizq-app-header .rizq-hdr-row2 > *'
     ).forEach(function (el) {
+      var hdr = hdrKeyForNavEl(el);
       if (phoneSplit && el.closest && (el.closest('.nav-center') || el.closest('#rizq-thumb-dock'))) {
-        var hdr = '';
-        var link = el.querySelector('a[data-hdr], button[data-hdr], .nav-link-btn[data-hdr], .nav-dropdown-trigger[data-hdr]');
-        if (link) hdr = link.getAttribute('data-hdr') || '';
-        if (!hdr && el.getAttribute('data-rizq-module')) {
-          var mod = el.getAttribute('data-rizq-module');
-          hdr = mod === 'store' ? 'stores' : mod === 'corp' ? 'showrooms' : mod === 'office' ? 'offices' : mod;
-        }
-        if (el.classList.contains('nav-dropdown-li') || el.querySelector('.nav-dropdown-trigger, .nav-phone-more-only')) hdr = 'more';
-        if (el.classList.contains('rizq-nav-post') || el.querySelector('.nav-post-plus')) hdr = 'post';
-        if (el.classList.contains('rizq-nav-packs') || el.querySelector('[data-hdr="packs"]')) hdr = 'packs';
         if (phoneOrder[hdr] != null) {
           el.style.order = String(phoneOrder[hdr]);
           return;
@@ -1372,10 +1368,21 @@
         if (el.getAttribute('data-nav-tier') === 'thumb') { el.style.order = '55'; return; }
         if (el.getAttribute('data-nav-tier') === 'home') { el.style.order = '99'; return; }
       }
+      if (!phoneSplit) {
+        if (hdr === 'packs' || el.classList.contains('rizq-nav-packs') || el.classList.contains('nav-phone-packs-li')) {
+          el.style.setProperty('display', 'none', 'important');
+          return;
+        }
+        if (deskOrder[hdr] != null) {
+          el.style.order = String(deskOrder[hdr]);
+          el.setAttribute('data-nav-order', String(deskOrder[hdr]));
+          return;
+        }
+      }
       var o = el.getAttribute('data-nav-order');
       if (o) {
         var n = parseInt(o, 10);
-        el.style.order = String(isNaN(n) ? (o === '8b' ? 85 : 50) : n);
+        el.style.order = String(isNaN(n) ? 50 : n);
       }
     });
     document.querySelectorAll('#nav .nav-center > li, #rizq-desk-nav .nav-center > li').forEach(function (li, i) {

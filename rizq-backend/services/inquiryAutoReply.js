@@ -1,12 +1,12 @@
 /**
  * رد تلقائي على استفسارات الداشبورد (/api/messages) عبر Claude
  * يُفعَّل فقط للباقة الماسية + الوكيل غير موقوف (agent-status.json)
+ * الحصة تُفحص قبل استدعاء النموذج — لا حرق Claude بعد نفاد الحصة.
  */
 const { handleWidgetChat } = require('./widgetChat');
 const { isActive } = require('./agentStatus');
 const { isAnthropicConfigured } = require('../config/anthropic');
-const { getEntitlements } = require('./entitlements');
-const { accountHasAiAgentStrict } = require('./packageAccessGuard');
+const { accountHasAiAgentStrict, assertAiAgentAccess } = require('./packageAccessGuard');
 const { recordUsage } = require('../../rizq_quota_guard_agent');
 const { getSubscriberProfileByAccountId } = require('../../rizq_subscriber_agent');
 const RizqPrompts = require('../../rizq_ai_prompts');
@@ -67,6 +67,13 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
   const phone = sellerAccount.phone || sellerAccount.whatsapp || '';
   if (phone && !isActive(phone)) return null;
 
+  try {
+    assertAiAgentAccess(sellerAccount, { channel: 'inquiry' });
+  } catch (e) {
+    console.warn('[inquiry-auto-reply] skip (access/quota):', e && (e.code || e.message));
+    return null;
+  }
+
   const all = readMessagesFn();
   const threadMsgs = all
     .filter((m) => m.threadKey === threadKey)
@@ -99,6 +106,8 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     });
   } catch (qErr) {
     console.warn('[quota-guard] inquiry:', qErr && qErr.message);
+    // لا نخزّن رد الوكيل إن فشلت محاسبة الحصة بعد الإنفاق
+    return null;
   }
 
   const rec = {

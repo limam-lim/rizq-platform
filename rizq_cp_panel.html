@@ -1032,7 +1032,7 @@ main, .page-content.active, .main-content, .results-area,
             <div class="card-header"><div class="card-title" data-t="cfg-contact-title">📞 معلومات التواصل والهوية</div></div>
             <div style="padding:18px">
               <div class="form-group"><label class="form-label" data-t="cfg-sitename-label">اسم الموقع</label><input class="form-input" id="cfg-sitename" placeholder="رزق | Rizq"/></div>
-              <div class="form-group"><label class="form-label" data-t="cfg-tagline-label">الشعار الفرعي (Tagline)</label><input class="form-input" id="cfg-tagline" data-ph="cfg-tagline-ph" placeholder="منصة الإعلانات المبوبة الأولى في موريتانيا"/></div>
+              <div class="form-group"><label class="form-label" data-t="cfg-tagline-label">الشعار الفرعي (Tagline)</label><input class="form-input" id="cfg-tagline" data-ph="cfg-tagline-ph" placeholder="رزق — سوق موريتانيا الإلكتروني"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-phone-label">رقم الهاتف</label><input class="form-input" id="cfg-phone" dir="ltr" placeholder="+222…"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-whatsapp-label">رقم واتساب</label><input class="form-input" id="cfg-whatsapp" dir="ltr" placeholder="+222…"/></div>
               <div class="form-group"><label class="form-label" data-t="cfg-email-label">البريد الإلكتروني</label><input class="form-input" id="cfg-email" dir="ltr" placeholder="direction@rizq.mr"/></div>
@@ -1060,6 +1060,22 @@ main, .page-content.active, .main-content, .results-area,
               <div class="form-group" style="margin-top:10px"><label class="form-label" data-t="cfg-banner-text-label">نص الشريط</label><input class="form-input" id="cfg-banner-text" data-ph="cfg-banner-text-ph" placeholder="🎉 عروض إطلاق رزق — سجّل الآن واستفد من مزايا حصرية"/></div>
               <button class="btn-sm btn-primary" onclick="saveSiteConfig()" data-t="cfg-save-btn">💾 حفظ</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px;max-width:920px">
+        <div class="card-header">
+          <div class="card-title" data-t="cfg-social-title">🔗 تابعنا — روابط المنصات</div>
+        </div>
+        <div style="padding:14px 18px 18px">
+          <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;line-height:1.7" data-t="cfg-social-desc">
+            تسعة منصات متاحة. الزوار يرون فقط الصفوف ذات المفتاح الأخضر + رابط حساب كامل (مثل facebook.com/rizq.mr). المفتاح الرمادي = مخفي من الفوتر. واتساب يُؤخذ تلقائياً من رقم الدعم إن وُجد.
+          </p>
+          <div id="cfg-social-visible-hint" style="font-size:12px;font-weight:700;color:#0F2347;margin:0 0 10px"></div>
+          <div id="cfg-social-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div style="margin-top:12px">
+            <button class="btn-sm btn-primary" onclick="saveSiteConfig()" data-t="cfg-save-btn">💾 حفظ</button>
           </div>
         </div>
       </div>
@@ -3637,21 +3653,145 @@ function resetExtraCategories(){
 }
 
 // ══ SITE CONFIG ══
+const SITE_SOCIAL_DEFS = [
+  { key:'facebook',  label:'Facebook',  label_fr:'Facebook',  ph:'https://facebook.com/…' },
+  { key:'x',         label:'X (تويتر)', label_fr:'X (Twitter)', ph:'https://x.com/…' },
+  { key:'instagram', label:'Instagram', label_fr:'Instagram', ph:'https://instagram.com/…' },
+  { key:'youtube',   label:'YouTube',   label_fr:'YouTube',   ph:'https://youtube.com/…' },
+  { key:'tiktok',    label:'TikTok',    label_fr:'TikTok',    ph:'https://tiktok.com/@…' },
+  { key:'linkedin',  label:'LinkedIn',  label_fr:'LinkedIn',  ph:'https://linkedin.com/company/…' },
+  { key:'snapchat',  label:'Snapchat',  label_fr:'Snapchat',  ph:'https://snapchat.com/add/…' },
+  { key:'telegram',  label:'Telegram',  label_fr:'Telegram',  ph:'https://t.me/…' },
+  { key:'whatsapp',  label:'WhatsApp',  label_fr:'WhatsApp',  ph:'https://wa.me/222…' }
+];
+
+function defaultSiteSocial(){
+  var o = {};
+  SITE_SOCIAL_DEFS.forEach(function(d){ o[d.key] = { enabled:false, url:'' }; });
+  return o;
+}
+
+function normalizeSiteSocialLocal(raw){
+  var out = defaultSiteSocial();
+  if(!raw || typeof raw !== 'object') return out;
+  SITE_SOCIAL_DEFS.forEach(function(d){
+    var item = raw[d.key];
+    if(!item || typeof item !== 'object') return;
+    out[d.key] = {
+      enabled: !!item.enabled,
+      url: String(item.url || '').trim().slice(0, 500)
+    };
+  });
+  return out;
+}
+
 const DEFAULT_SITE_CONFIG = {
-  sitename:'رزق | Rizq', tagline:'منصة الإعلانات المبوبة الأولى في موريتانيا',
-  phone:'', whatsapp:'',
+  sitename:'رزق | Rizq', tagline:'رزق — سوق موريتانيا الإلكتروني',
+  phone:'', whatsapp:'+22244882212',
   email:'', reportEmail:'',
   address:'',
   adsCount:0, usersCount:0, wilayasCount:15,
-  bannerActive:false, bannerText:''
+  bannerActive:false, bannerText:'',
+  social: defaultSiteSocial()
 };
 
 function loadSiteConfigData(){
   try{
     const raw = localStorage.getItem('rizq_site_config');
-    if(raw) return Object.assign({}, DEFAULT_SITE_CONFIG, JSON.parse(raw));
+    if(raw){
+      var parsed = JSON.parse(raw);
+      var merged = Object.assign({}, DEFAULT_SITE_CONFIG, parsed);
+      merged.social = normalizeSiteSocialLocal(parsed && parsed.social);
+      return merged;
+    }
   }catch(e){}
-  return Object.assign({}, DEFAULT_SITE_CONFIG);
+  return Object.assign({}, DEFAULT_SITE_CONFIG, { social: defaultSiteSocial() });
+}
+
+function _readSocialFromForm(){
+  var social = defaultSiteSocial();
+  SITE_SOCIAL_DEFS.forEach(function(d){
+    var sw = document.getElementById('cfg-social-' + d.key + '-sw');
+    var url = document.getElementById('cfg-social-' + d.key + '-url');
+    social[d.key] = {
+      enabled: !!(sw && sw.classList.contains('on')),
+      url: url ? String(url.value || '').trim().slice(0, 500) : ''
+    };
+  });
+  return social;
+}
+
+function _waMeFromPhone(phone){
+  var d = String(phone == null ? '' : phone).replace(/\D/g, '');
+  if(!d) return '';
+  if(d.length === 8) d = '222' + d;
+  if(d.length < 10) return '';
+  return 'https://wa.me/' + d;
+}
+
+function _socialUrlLooksReady(url){
+  var s = String(url || '').trim();
+  if(!s) return false;
+  try{
+    var u = new URL(s);
+    if(u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    return !!String(u.pathname || '').replace(/\/+$/, '');
+  }catch(e){ return false; }
+}
+
+function _refreshSocialVisibleHint(){
+  var hint = document.getElementById('cfg-social-visible-hint');
+  if(!hint) return;
+  var fr = false;
+  try{ fr = !!(window.RizqI18n && RizqI18n.getLang && RizqI18n.getLang() === 'fr'); }catch(e){}
+  var visible = [];
+  SITE_SOCIAL_DEFS.forEach(function(d){
+    var sw = document.getElementById('cfg-social-' + d.key + '-sw');
+    var url = document.getElementById('cfg-social-' + d.key + '-url');
+    if(sw && sw.classList.contains('on') && url && _socialUrlLooksReady(url.value)){
+      visible.push(fr ? d.label_fr : d.label);
+    }
+  });
+  hint.textContent = fr
+    ? (visible.length ? ('Visibles dans le footer : ' + visible.join(' · ')) : 'Aucune icône visible — activez un réseau avec une URL complète.')
+    : (visible.length ? ('الظاهرة في الفوتر الآن: ' + visible.join(' · ')) : 'لا أيقونة ظاهرة — فعّل منصة برابط حساب كامل.');
+}
+
+function _renderSocialForm(social){
+  var list = document.getElementById('cfg-social-list');
+  if(!list) return;
+  var fr = false;
+  try{ fr = !!(window.RizqI18n && RizqI18n.getLang && RizqI18n.getLang() === 'fr'); }catch(e){}
+  var data = normalizeSiteSocialLocal(social);
+  // واتساب: املأ من رقم الدعم إن كان الصف فارغاً وفعّله
+  try{
+    var waPhoneEl = document.getElementById('cfg-whatsapp');
+    var waPhone = waPhoneEl ? waPhoneEl.value : '';
+    var waAuto = _waMeFromPhone(waPhone);
+    if(waAuto && data.whatsapp && !String(data.whatsapp.url || '').trim()){
+      data.whatsapp = { enabled:true, url: waAuto };
+    }
+  }catch(eWa){}
+  list.innerHTML = SITE_SOCIAL_DEFS.map(function(d){
+    var item = data[d.key] || { enabled:false, url:'' };
+    var on = item.enabled ? ' on' : '';
+    var label = fr ? d.label_fr : d.label;
+    var ready = item.enabled && _socialUrlLooksReady(item.url);
+    var status = ready
+      ? (fr ? 'Visible' : 'ظاهر')
+      : (fr ? 'Masqué' : 'مخفي');
+    var statusColor = ready ? '#15803d' : '#94a3b8';
+    return ''
+      + '<div class="cfg-social-row" style="display:grid;grid-template-columns:110px 1fr 52px auto;gap:8px;align-items:center">'
+      +   '<div style="font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap">' + label + '</div>'
+      +   '<input class="form-input" id="cfg-social-' + d.key + '-url" dir="ltr" placeholder="' + d.ph + '" value="'
+      +     String(item.url || '').replace(/"/g, '&quot;') + '" style="padding:7px 10px;font-size:12.5px;margin:0" oninput="_refreshSocialVisibleHint()"/>'
+      +   '<button type="button" class="toggle-sw' + on + '" id="cfg-social-' + d.key + '-sw" onclick="this.classList.toggle(\'on\');_refreshSocialVisibleHint()" title="'
+      +     (fr ? 'Activer / désactiver' : 'تفعيل / تعطيل') + '" aria-label="' + label + '"></button>'
+      +   '<span style="font-size:11px;font-weight:800;color:' + statusColor + ';min-width:44px;text-align:center">' + status + '</span>'
+      + '</div>';
+  }).join('');
+  _refreshSocialVisibleHint();
 }
 
 function _applySiteConfigForm(cfg){
@@ -3669,6 +3809,7 @@ function _applySiteConfigForm(cfg){
   set('cfg-banner-text', cfg.bannerText);
   const bannerSw = document.getElementById('cfg-banner-active');
   if(bannerSw) bannerSw.classList.toggle('on', !!cfg.bannerActive);
+  _renderSocialForm(cfg.social);
 }
 
 function loadSiteConfig(){
@@ -3683,6 +3824,9 @@ function loadSiteConfig(){
       var site = data && data.ok && data.config && data.config.site;
       if(!site) return;
       var merged = Object.assign({}, DEFAULT_SITE_CONFIG, local, site);
+      merged.social = normalizeSiteSocialLocal(
+        (site && site.social) || (local && local.social) || defaultSiteSocial()
+      );
       try{ localStorage.setItem('rizq_site_config', JSON.stringify(merged)); }catch(e){}
       _applySiteConfigForm(merged);
     })
@@ -3691,6 +3835,14 @@ function loadSiteConfig(){
 
 function saveSiteConfig(){
   const get=(id)=>{ const el=document.getElementById(id); return el?el.value:''; };
+  var social = _readSocialFromForm();
+  // إن بقي صف واتساب فارغاً: اربطه برقم الدعم وفعّله عند الحفظ
+  try{
+    var waAuto = _waMeFromPhone(get('cfg-whatsapp'));
+    if(waAuto && social.whatsapp && !String(social.whatsapp.url || '').trim()){
+      social.whatsapp = { enabled:true, url: waAuto };
+    }
+  }catch(eSyncWa){}
   const cfg = {
     sitename: get('cfg-sitename'),
     tagline: get('cfg-tagline'),
@@ -3703,7 +3855,8 @@ function saveSiteConfig(){
     usersCount: +get('cfg-users-count') || 0,
     wilayasCount: +get('cfg-wilayas-count') || 0,
     bannerActive: document.getElementById('cfg-banner-active')?.classList.contains('on') || false,
-    bannerText: get('cfg-banner-text')
+    bannerText: get('cfg-banner-text'),
+    social: social
   };
   localStorage.setItem('rizq_site_config', JSON.stringify(cfg));
   _adminPostSiteConfig({ site: cfg }, function(){
@@ -6450,7 +6603,7 @@ function rzqVidLoadPanel() {
   } catch(e) { _rzqVidData = {}; }
   _rzqVidData.hero  = _rzqVidData.hero  || [];
   _rzqVidData.popup = _rzqVidData.popup || [];
-  if (!_rzqVidData.platformPromoUrl) {
+  if (!_rzqVidData.platformPromoUrl || /rizq-platform-promo-clean-light\.mp4/i.test(_rzqVidData.platformPromoUrl)) {
     _rzqVidData.platformPromoUrl = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   }
   if (_rzqVidData.platformPromoEnabled == null) _rzqVidData.platformPromoEnabled = true;

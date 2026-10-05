@@ -546,7 +546,8 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
   app.post('/api/subscriber/quota/topup', (req, res) => {
     const body = req.body || {};
     const accountId = String(body.accountId || '').trim();
-    const token = req.header('x-account-token') || body.token || '';
+    const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
+    const token = req.header('x-account-token') || (!isProd ? (body.token || '') : '') || '';
     const acc = ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
     const type = String(body.type || 'text').toLowerCase() === 'voice' ? 'voice' : 'text';

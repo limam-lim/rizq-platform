@@ -7,17 +7,38 @@
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const { isProdEnv } = require('../middleware/accountAuth');
+const repos = require('../db/repos');
 
 function buildThreadKey(sellerAccountId, buyerAccountId, buyerPhone) {
   const buyerPart = buyerAccountId ? ('acc:' + buyerAccountId) : ('guest:' + String(buyerPhone || '').replace(/\D/g, ''));
   return sellerAccountId + '::' + buyerPart;
 }
 
-/** أسرار قراءة محادثات الضيوف — threadKey → { hash, phoneDigits } */
-const _guestThreadSecrets = new Map();
+/** تطابق محادثة مشتري مسجّل — بدون prefix IDOR على accountId */
+function threadBelongsToBuyer(threadKey, accountId) {
+  const id = String(accountId || '');
+  if (!id || !threadKey) return false;
+  return String(threadKey).endsWith('::acc:' + id);
+}
+
+function getGuestSecretRec(threadKey) {
+  try {
+    return repos.guestThreadSecrets.get(threadKey) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function setGuestSecretRec(threadKey, rec) {
+  try {
+    repos.guestThreadSecrets.upsert(threadKey, rec);
+  } catch (e) {
+    console.warn('[messages] guest secret persist failed:', e.message);
+  }
+}
 
 function verifyGuestThreadToken(threadKey, token, phoneDigits) {
-  const rec = _guestThreadSecrets.get(threadKey);
+  const rec = getGuestSecretRec(threadKey);
   if (!rec || !token) return false;
   const hash = crypto.createHash('sha256').update(String(token)).digest('hex');
   try {
@@ -32,13 +53,13 @@ function verifyGuestThreadToken(threadKey, token, phoneDigits) {
 
 /**
  * إصدار أو إعادة استخدام رمز قراءة الضيف.
+ * السرّ مُصرّ عليه في SQLite — لا يُعاد إصداره بعد إعادة تشغيل الخادم.
  * لا يُستبدَل رمز قائم أبداً — يمنع اختطاف المحادثة بمعرفة رقم الهاتف فقط.
- * إن وُجد سرّ سابق: يُعاد نفس الرمز فقط عند تقديمه صحيحاً؛ وإلا null
- * (الرسالة تُحفظ للبائع، لكن المهاجم لا يحصل على حق القراءة).
+ * الإصدار الأول ذرّي (insertIfAbsent) لمنع سباق سرقة الرمز.
  */
 function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
   const ph = String(phoneDigits || '').replace(/\D/g, '');
-  const existing = _guestThreadSecrets.get(threadKey);
+  const existing = getGuestSecretRec(threadKey);
   if (existing) {
     if (presentedToken && verifyGuestThreadToken(threadKey, presentedToken, ph)) {
       return String(presentedToken);
@@ -47,12 +68,24 @@ function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
   }
   const token = crypto.randomBytes(24).toString('hex');
   const hash = crypto.createHash('sha256').update(token).digest('hex');
-  _guestThreadSecrets.set(threadKey, {
+  const rec = {
     hash,
     phoneDigits: ph,
     createdAt: Date.now(),
-  });
-  return token;
+  };
+  try {
+    const result = repos.guestThreadSecrets.insertIfAbsent(threadKey, rec);
+    if (result && result.inserted) return token;
+  } catch (e) {
+    console.warn('[messages] guest secret insertIfAbsent failed:', e.message);
+    setGuestSecretRec(threadKey, rec);
+    return token;
+  }
+  // خسر السباق — صف موجود؛ لا نُرجع رمزاً جديداً
+  if (presentedToken && verifyGuestThreadToken(threadKey, presentedToken, ph)) {
+    return String(presentedToken);
+  }
+  return null;
 }
 
 /**
@@ -98,6 +131,39 @@ function mountMessagesRoutes(app, deps) {
       return res.status(400).json({ error: 'رقم الهاتف مطلوب للزائر غير المسجَّل' });
     }
     const threadKey = buildThreadKey(b.sellerAccountId, buyerAccountId, b.buyerPhone);
+
+    // ضيف على محادثة قائمة: ارفض الكتابة بدون رمز صالح (يمنع حقن الرسائل + حرق Claude)
+    let guestTok = null;
+    if (!buyerAccountId) {
+      const phoneDigits = String(b.buyerPhone || '').replace(/\D/g, '');
+      const presented = String(
+        req.header('x-guest-thread-token')
+        || b.guestThreadToken
+        || (!isProdEnv() ? req.query.guestThreadToken : '')
+        || ''
+      ).trim();
+      const existing = getGuestSecretRec(threadKey);
+      if (existing) {
+        if (!presented || !verifyGuestThreadToken(threadKey, presented, phoneDigits)) {
+          return res.status(401).json({
+            ok: false,
+            error: 'guest_thread_token_required',
+            guestThreadTokenRequired: true,
+          });
+        }
+        guestTok = presented;
+      } else {
+        guestTok = issueOrReuseGuestThreadToken(threadKey, phoneDigits, presented);
+        if (!guestTok) {
+          return res.status(401).json({
+            ok: false,
+            error: 'guest_thread_token_required',
+            guestThreadTokenRequired: true,
+          });
+        }
+      }
+    }
+
     const list = readMessages();
     const rec = {
       id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
@@ -116,22 +182,11 @@ function mountMessagesRoutes(app, deps) {
     list.push(rec);
     writeMessages(list);
     const out = { ok: true, threadKey, message: rec };
-    if (!buyerAccountId) {
-      const phoneDigits = String(b.buyerPhone || '').replace(/\D/g, '');
-      const presented = String(
-        req.header('x-guest-thread-token')
-        || b.guestThreadToken
-        || (!isProdEnv() ? req.query.guestThreadToken : '')
-        || ''
-      ).trim();
-      const tok = issueOrReuseGuestThreadToken(threadKey, phoneDigits, presented);
-      if (tok) out.guestThreadToken = tok;
-      else out.guestThreadTokenRequired = true;
-    }
+    if (!buyerAccountId && guestTok) out.guestThreadToken = guestTok;
     res.json(out);
 
     const sellerAcc = readAccounts().find((a) => a.id === b.sellerAccountId);
-    if (sellerAcc) {
+    if (sellerAcc && typeof maybeAutoReplyToInquiry === 'function') {
       setImmediate(() => {
         maybeAutoReplyToInquiry({
           sellerAccount: sellerAcc,
@@ -193,9 +248,6 @@ function mountMessagesRoutes(app, deps) {
     const threads = Array.from(byThread.entries()).map(([threadKey, msgs]) => {
       msgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       const lastMessage = msgs[msgs.length - 1];
-      // نجمع اسم/هاتف/إعلان المشتري من أي رسالة تحمله في المحادثة (لا نعتمد
-      // فقط على آخر رسالة، لأن ردود البائع أو رسائل المشتري اللاحقة لا تحمل
-      // هذه الحقول من الأساس) — ولحساب مسجَّل نعرض اسمه الحقيقي من accounts.json.
       const buyerAccountId = msgs.find((m) => m.buyerAccountId)?.buyerAccountId || null;
       const buyerAcc = buyerAccountId ? accountsById.get(buyerAccountId) : null;
       const buyerName = buyerAcc ? (buyerAcc.name || '') : (msgs.find((m) => m.buyerName)?.buyerName || '');
@@ -215,13 +267,15 @@ function mountMessagesRoutes(app, deps) {
     res.json({ ok: true, threads });
   });
 
-  /** GET /api/messages/mine?accountId=...&token=... — صندوق وارد المشتري صاحب حساب فردي: كل محادثاته عبر كل البائعين */
+  /** GET /api/messages/mine — صندوق وارد المشتري (تطابق حساب دقيق فقط — لا prefix) */
   app.get('/api/messages/mine', (req, res) => {
     const accountId = req.query.accountId;
     const token = extractAccountToken(req) || '';
     const acc = verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readMessages().filter((m) => m.buyerAccountId === accountId || (m.threadKey && m.threadKey.indexOf('::acc:' + accountId) !== -1));
+    const list = readMessages().filter((m) =>
+      m.buyerAccountId === accountId || threadBelongsToBuyer(m.threadKey, accountId)
+    );
     const byThread = new Map();
     list.forEach((m) => {
       const existing = byThread.get(m.threadKey);
@@ -234,9 +288,8 @@ function mountMessagesRoutes(app, deps) {
   });
 
   /**
-   * GET /api/messages/thread/:threadKey — كل رسائل محادثة واحدة. مسموح
-   * للبائع (صاحب threadKey) أو للمشتري صاحب الحساب (إن كانت محادثة مرتبطة
-   * بحساب لا بضيف) — عبر x-account-token يطابق أحد الطرفين.
+   * GET /api/messages/thread/:threadKey — كل رسائل محادثة واحدة.
+   * البائع أو المشتري المسجّل أو الضيف برمز القراءة الصادر.
    */
   app.get('/api/messages/thread/:threadKey', (req, res) => {
     const threadKey = req.params.threadKey;
@@ -251,7 +304,6 @@ function mountMessagesRoutes(app, deps) {
     if (!asSeller && !asBuyer && guestMatch) {
       const phoneDigits = String(req.header('x-guest-phone') || (!isProdEnv() ? req.query.buyerPhone : '') || '').replace(/\D/g, '');
       const guestTok = String(req.header('x-guest-thread-token') || (!isProdEnv() ? req.query.guestThreadToken : '') || '');
-      // هاتف alone لم يعد كافياً — يلزم رمز صدر عند أول إرسال
       if (phoneDigits && phoneDigits === guestMatch[1] && verifyGuestThreadToken(threadKey, guestTok, phoneDigits)) {
         asGuest = true;
       }
@@ -276,4 +328,10 @@ function mountMessagesRoutes(app, deps) {
   });
 }
 
-module.exports = { mountMessagesRoutes };
+module.exports = {
+  mountMessagesRoutes,
+  buildThreadKey,
+  threadBelongsToBuyer,
+  issueOrReuseGuestThreadToken,
+  verifyGuestThreadToken,
+};

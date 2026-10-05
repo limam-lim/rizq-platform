@@ -44,4 +44,30 @@ function tokenMatchesAccount(acc, token) {
   return false;
 }
 
-module.exports = { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount };
+/** حساب معتمد وغير معلّق — شرط مشترك لمسارات المالك. */
+function isAccountActive(acc) {
+  return !!(acc && acc.status === 'approved' && !acc.suspended);
+}
+
+/** ملكية فعّالة: حساب نشط + توكن مطابق (access أو dash). */
+function activeOwnerMatches(acc, token) {
+  return isAccountActive(acc) && tokenMatchesAccount(acc, token);
+}
+
+/** طلب يبدو من متصفح (Origin / Sec-Fetch-Site) — لرفض الأسرار الخادمية في الإنتاج. */
+function isBrowserOrigin(req) {
+  const origin = req && req.header ? req.header('origin') : '';
+  if (origin && origin !== 'null') return true;
+  const secFetchSite = String((req && req.header && req.header('sec-fetch-site')) || '').toLowerCase();
+  return secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'cross-site';
+}
+
+module.exports = {
+  isProdEnv,
+  extractAccountToken,
+  extractDashToken,
+  tokenMatchesAccount,
+  isAccountActive,
+  activeOwnerMatches,
+  isBrowserOrigin,
+};

@@ -73,7 +73,15 @@
     if (nav) nav.classList.toggle('nav-compact', y > SCROLL_COMPACT);
     if (nav) nav.classList.toggle('scrolled', y > 30);
     if (backBtn) backBtn.classList.toggle('visible', y > SCROLL_TOP);
-    if (jumpBar) jumpBar.classList.toggle('visible', y > SCROLL_TOP);
+    /* لا تُظهر شريط القفز المكرر — الشريط الرئيسي يبقى وحده (نشر بين المعارض/المكاتب) */
+    if (jumpBar) {
+      jumpBar.classList.remove('visible');
+      jumpBar.setAttribute('aria-hidden', 'true');
+      jumpBar.hidden = true;
+    }
+    if (typeof window.__rizqSyncSearchTheater === 'function') {
+      window.__rizqSyncSearchTheater();
+    }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -308,7 +316,7 @@
     var jumpLabels = {
       '#categories': fr ? 'Sections' : 'الأقسام',
       '#hero-listings': fr ? 'Annonces' : 'الإعلانات',
-      '#pricing': fr ? 'Forfaits' : 'الباقات',
+      post: fr ? '+ Publier' : '+ نشر',
       invest: fr ? 'Investissements' : 'الاستثمارات'
     };
     Object.keys(jumpLabels).forEach(function (sel) {
@@ -476,8 +484,142 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      if (typeof window.closeRizqSearchTheater === 'function' && window.closeRizqSearchTheater()) return;
       closeRizqSheet();
       if (typeof window.closeQcatPortal === 'function') window.closeQcatPortal(true);
     }
   });
+
+  /* ── Search theater C: قرص تحت الهيدر → منبثق أثناء التصفح ── */
+  (function initSearchTheater() {
+    var root = document.getElementById('rizq-search-theater');
+    if (!root) return;
+    var pill = document.getElementById('rizq-search-pill');
+    var panel = document.getElementById('rizq-search-panel');
+    var backdrop = document.getElementById('rizq-search-backdrop');
+    var input = document.getElementById('rizq-theater-search-input');
+    var form = document.getElementById('rizq-theater-search-form');
+    var heroBrowse = document.querySelector('.hero-browse-panel');
+    var isOpen = false;
+
+    function headerBottom() {
+      var n = document.getElementById('nav');
+      var h = n ? Math.round(n.getBoundingClientRect().bottom) : 70;
+      /* اهبط تحت شريط الأخبار الرقيق إن وُجد */
+      var ticker = document.getElementById('ticker-wrap')
+        || document.querySelector('.ticker-wrap:not(.is-empty)');
+      if (ticker && !ticker.classList.contains('is-empty')) {
+        var style = window.getComputedStyle(ticker);
+        if (style.display !== 'none' && style.visibility !== 'hidden') {
+          var tb = Math.round(ticker.getBoundingClientRect().bottom);
+          if (tb > h) h = tb;
+        }
+      }
+      document.documentElement.style.setProperty('--rizq-search-top', h + 'px');
+      return h;
+    }
+
+    function setOpen(next) {
+      isOpen = !!next;
+      root.classList.toggle('is-open', isOpen);
+      root.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      document.documentElement.classList.toggle('rizq-search-theater-open', isOpen);
+      if (panel) {
+        if (isOpen) panel.removeAttribute('hidden');
+        else panel.setAttribute('hidden', '');
+      }
+      if (pill) pill.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      headerBottom();
+      if (isOpen && input) {
+        try {
+          var hero = document.getElementById('hero-search');
+          if (hero && hero.value && !input.value) input.value = hero.value;
+        } catch (e) {}
+        setTimeout(function () {
+          try { input.focus(); input.select(); } catch (e2) {}
+        }, 90);
+      }
+      syncPill();
+    }
+
+    function syncPill() {
+      headerBottom();
+      if (!pill) return;
+      if (isOpen) {
+        pill.classList.remove('is-visible');
+        return;
+      }
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var past = false;
+      if (heroBrowse) {
+        var hb = headerBottom();
+        past = heroBrowse.getBoundingClientRect().bottom < hb + 12;
+        if (!past && y > 0) {
+          /* احتياطي: إن تجاوز التمرير منتصف لوحة التصفح */
+          var topDoc = heroBrowse.getBoundingClientRect().top + y;
+          past = y + hb > topDoc + Math.min(heroBrowse.offsetHeight * 0.55, 140);
+        }
+      } else {
+        past = y > 220;
+      }
+      pill.classList.toggle('is-visible', past);
+    }
+
+    window.__rizqSyncSearchTheater = syncPill;
+    window.closeRizqSearchTheater = function () {
+      if (!isOpen) return false;
+      setOpen(false);
+      return true;
+    };
+    window.openRizqSearchTheater = function () {
+      setOpen(true);
+    };
+
+    document.querySelectorAll('[data-rizq-open-search]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        setOpen(true);
+      });
+    });
+    document.querySelectorAll('[data-rizq-close-search]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        setOpen(false);
+      });
+    });
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = input ? String(input.value || '').trim() : '';
+        var hero = document.getElementById('hero-search');
+        if (hero) hero.value = q;
+        if (typeof window.doMainSearch === 'function') {
+          window.doMainSearch();
+        } else if (q) {
+          window.location.href = 'rizq_browse.html?q=' + encodeURIComponent(q);
+        } else {
+          window.location.href = 'rizq_browse.html';
+        }
+        setOpen(false);
+      });
+    }
+
+    if (input && window.RizqUx && typeof window.RizqUx.attachSearchSuggestions === 'function') {
+      try {
+        window.RizqUx.attachSearchSuggestions({
+          input: input,
+          getAds: function () { return window.ADS || []; },
+          onPickExpr: 'document.getElementById("rizq-theater-search-form") && document.getElementById("rizq-theater-search-form").requestSubmit()'
+        });
+      } catch (eS) {}
+    }
+
+    root.querySelectorAll('.rizq-search-cat[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () { setOpen(false); });
+    });
+
+    window.addEventListener('resize', syncPill, { passive: true });
+    syncPill();
+  })();
 })();

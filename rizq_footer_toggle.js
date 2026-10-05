@@ -242,8 +242,8 @@
     var st = catStats();
     var fr = lang() === 'fr';
     var desc = fr
-      ? ('La plateforme mauritanienne des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
-      : ('منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
+      ? ('Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements — ' + st.n + ' catégories, +' + st.m + ' sous-catégories.')
+      : ('سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً.');
     document.querySelectorAll('#rzq-ft-desc, footer .footer-desc, [data-t="ft-desc"]').forEach(function (el) {
       el.textContent = desc;
     });
@@ -281,11 +281,26 @@
     setTimeout(hookFooterStats, 400);
   }
 
+  function ensureSocialLinks() {
+    try {
+      if (typeof window.RizqSocialLinksRefresh === 'function') {
+        window.RizqSocialLinksRefresh();
+        return;
+      }
+    } catch (e) {}
+    if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
+    var s = document.createElement('script');
+    s.src = 'rizq_social_links.js?v=23.5';
+    s.defer = true;
+    (document.head || document.documentElement).appendChild(s);
+  }
+
   window.RizqFooterToggleRefresh = function () {
     try {
       injectStyle();
       init();
       hookFooterStats();
+      ensureSocialLinks();
     } catch (e) {}
   };
 
@@ -330,9 +345,14 @@
     }
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
+  function bootWithSocial() {
     boot();
+    ensureSocialLinks();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootWithSocial);
+  } else {
+    bootWithSocial();
   }
 })();

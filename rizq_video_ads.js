@@ -123,10 +123,19 @@
     }
   }
 
+  function normalizePlatformPromoUrl(url) {
+    var u = String(url || '').trim() || DEFAULT_PLATFORM_PROMO;
+    /* أعد النسخة السابقة — لا تستخدم clean-light */
+    if (/rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) {
+      return DEFAULT_PLATFORM_PROMO;
+    }
+    return u;
+  }
+
   function buildHeroPlaylist() {
     var list = [];
     var promoEnabled = config.platformPromoEnabled !== false;
-    var promoUrl = String(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO).trim();
+    var promoUrl = normalizePlatformPromoUrl(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO);
     if (promoEnabled && promoUrl) {
       list.push({
         advertiser: 'رزق · Rizq Platform',
@@ -189,32 +198,39 @@
 
     if (phEl) phEl.style.display = 'none';
     wrapEl.style.display = '';
+    wrapEl.classList.add('is-playing');
+    try { host.classList.add('is-playing'); } catch (ePlay) { /* ignore */ }
 
-    var paidCount = heroAds.length;
+    /* لا نصوص/شارات على مساحة الفيديو — حتى عدّاد المعلنين */
     if (viewsEl) {
-      viewsEl.textContent = paidCount
-        ? ('👁 مُعلنون نشطون: ' + paidCount)
-        : '🎬 Rizq · فيديو المنصة';
-      viewsEl.style.display = 'block';
+      viewsEl.textContent = '';
+      viewsEl.style.display = 'none';
     }
+    if (phEl) phEl.style.display = 'none';
 
     function paintMeta(ad) {
+      /* بلا كتابات على/فوق مساحة الإعلان — البيانات الاختيارية تحت الإطار فقط لاحقاً إن لزم */
       if (advBar && advName) {
-        advName.innerHTML = ad.isPlatform
-          ? 'رزق · فيديو المنصة'
-          : (esc(ad.advertiser || 'Rizq ADS') + badgeHtml(ad));
-        if (advLoc) {
-          advLoc.textContent = ad.isPlatform
-            ? 'يبدأ الحلقة · ويعود بعد إعلانات المعلنين'
-            : '';
-        }
-        advBar.style.display = 'block';
-        advBar.style.cursor = ad.isPlatform ? 'default' : 'pointer';
-        advBar.onclick = function () {
-          if (ad.isPlatform || !ad.accountId) return;
-          trackEvent(ad.accountId, 'click');
-        };
+        advName.textContent = '';
+        if (advLoc) advLoc.textContent = '';
+        advBar.style.display = 'none';
+        advBar.onclick = null;
       }
+      if (viewsEl) {
+        viewsEl.textContent = '';
+        viewsEl.style.display = 'none';
+      }
+      if (phEl) phEl.style.display = 'none';
+      /* أخفِ أي طبقة عنوان داخل إطار الفيديو */
+      try {
+        host.querySelectorAll('.rzq-hero-caption, .hero-vid-ph-body, .hero-vid-adv-name').forEach(function (el) {
+          if (el && el.closest && el.closest('.hero-vid-inner')) {
+            el.style.display = 'none';
+            el.textContent = '';
+          }
+        });
+      } catch (eCap) { /* ignore */ }
+      void ad;
     }
 
     function clearMount() {
@@ -255,6 +271,9 @@
         v.src = ad.url;
         v.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000';
         host.insertBefore(v, host.firstChild);
+        host.classList.add('is-playing');
+        var wrapEl = host.closest('.hero-vid-wrap');
+        if (wrapEl) wrapEl.classList.add('is-playing');
         if (sndBtn) {
           sndBtn.style.display = '';
           sndBtn.textContent = '🔇';
@@ -262,6 +281,33 @@
             v.muted = !v.muted;
             sndBtn.textContent = v.muted ? '🔇' : '🔊';
           };
+        }
+        var fsBtn = document.getElementById('hero-vid-fs-btn');
+        if (fsBtn) {
+          fsBtn.style.display = '';
+          fsBtn.onclick = function (ev) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            if (typeof window.toggleHeroVidFullscreen === 'function') {
+              window.toggleHeroVidFullscreen();
+              return;
+            }
+            var inner = host;
+            var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            try {
+              if (fsEl) {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+              } else if (inner.requestFullscreen) inner.requestFullscreen();
+              else if (inner.webkitRequestFullscreen) inner.webkitRequestFullscreen();
+            } catch (eFs2) { /* ignore */ }
+          };
+        }
+        /* عند أول تفاعل: ادخل شاشة كاملة للفيديو الترويجي */
+        if (ad.isPlatform && wrapEl && !wrapEl.getAttribute('data-fs-bound')) {
+          wrapEl.setAttribute('data-fs-bound', '1');
+          wrapEl.addEventListener('dblclick', function () {
+            if (typeof window.toggleHeroVidFullscreen === 'function') window.toggleHeroVidFullscreen();
+          });
         }
         v.play().catch(function () { /* autoplay policies */ });
         if (!v.loop) {
@@ -284,6 +330,9 @@
       var iframe = makeIframe(embedSrc, '100%', '100%');
       iframe.className = 'rzq-hero-player';
       host.insertBefore(iframe, host.firstChild);
+      host.classList.add('is-playing');
+      var wrapEl2 = host.closest('.hero-vid-wrap');
+      if (wrapEl2) wrapEl2.classList.add('is-playing');
       if (sndBtn) sndBtn.style.display = 'none';
       var slotSec = Math.max(8, Math.min(120, Number(config.adSlotSeconds) || DEFAULT_AD_SLOT_SEC));
       _heroAdvanceTimer = setTimeout(advance, slotSec * 1000);

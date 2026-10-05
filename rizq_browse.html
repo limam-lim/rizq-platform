@@ -7,11 +7,11 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.3"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+  <link rel="stylesheet" href="rizq_header.css?v=29.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -285,9 +285,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 /* DETAIL PANEL — overlay sheet with large gallery */
 .empty-detail{display:none}
 #detail-content{
-  width:min(980px,100%);margin:0 auto;background:#fff;border-radius:18px;
+  width:min(1100px,100%);margin:0 auto;background:#fff;border-radius:18px;
   box-shadow:0 24px 64px rgba(0,0,0,.35);overflow:hidden;position:relative;
   max-height:none;min-height:min(90vh,920px);
+}
+html[dir="ltr"] #detail-content,
+html[lang="fr"] #detail-content{
+  width:min(1100px,100%);
 }
 .dp-wrap{padding:18px 22px 36px;max-width:none;margin:0}
 .dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:8px 14px;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:9px;font-size:13px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
@@ -301,16 +305,53 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .dp-hero-info .dp-price-box{margin-bottom:0}
 .dp-gal-wrap{position:relative;max-width:none;width:100%}
 .dp-main-img{
-  width:100%!important;aspect-ratio:16/10;max-height:min(52vh,480px)!important;height:auto!important;
+  width:100%!important;aspect-ratio:16/10;max-height:min(58vh,560px)!important;min-height:240px;height:auto!important;
   border-radius:14px;background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
-  display:flex;align-items:center;justify-content:center;color:var(--gold);
+  display:block;color:var(--gold);
   overflow:hidden;cursor:zoom-in;position:relative;
   box-shadow:0 10px 28px rgba(15,31,61,.16);border:1px solid rgba(27,58,107,.1);
 }
-.dp-main-img svg{width:64px;height:64px;stroke-width:1.2;opacity:.9}
-.dp-main-img .rizq-img-wrap,.dp-main-img .rizq-ad-frame{width:100%!important;height:100%!important;aspect-ratio:auto!important}
-.dp-main-img img{width:100%;height:100%;object-fit:cover;background:#0b1628;transition:transform .25s ease}
-.dp-main-img:hover img{transform:scale(1.02)}
+.dp-main-img > .rizq-img-wrap,
+.dp-main-img > .rizq-ad-frame,
+.dp-main-img > .dp-emoji-stage{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  min-height:100%!important;aspect-ratio:auto!important;margin:0!important;
+  display:flex!important;align-items:center;justify-content:center;
+}
+.dp-main-img > svg{width:64px;height:64px;stroke-width:1.2;opacity:.9}
+.dp-main-img img{
+  width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
+  min-width:100%!important;min-height:100%!important;
+  object-fit:cover!important;object-position:center;display:block!important;
+  background:#0b1628;transition:transform .25s ease;
+}
+.dp-main-img:hover img{transform:scale(1.03)}
+.dp-emoji-stage{
+  pointer-events:none;border-radius:inherit;
+  background:inherit;
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  display:flex!important;align-items:center;justify-content:center;
+}
+.dp-emoji-xl{
+  font-size:clamp(120px,22vw,220px)!important;line-height:1;display:inline-flex!important;align-items:center;justify-content:center;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.35));transform:scale(1);transform-origin:center;
+}
+.dp-main-img .dp-emoji-xl svg,
+.dp-emoji-xl svg{width:clamp(120px,22vw,220px)!important;height:clamp(120px,22vw,220px)!important;opacity:1;max-width:none!important;max-height:none!important}
+#lightbox-content .lb-emoji-stage{
+  width:min(920px,92vw);height:min(70vh,640px);border-radius:18px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;box-shadow:0 16px 48px rgba(0,0,0,.45);
+  border:1px solid rgba(201,168,76,.35);cursor:default;
+}
+#lightbox-content .lb-emoji-xl{
+  font-size:clamp(140px,26vw,260px)!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 12px 32px rgba(0,0,0,.4));
+}
+#lightbox-content .lb-emoji-xl svg{width:clamp(140px,26vw,260px)!important;height:clamp(140px,26vw,260px)!important}
+#lightbox-content .lb-emoji-title{
+  color:#fff;font-size:clamp(16px,2.4vw,22px);font-weight:800;text-align:center;padding:0 20px;
+  text-shadow:0 2px 12px rgba(0,0,0,.45);max-width:90%;
+}
 .dp-thumbs-wrap{width:100%;max-width:none}
 .dp-thumbs-label{font-size:12px;font-weight:700;color:var(--text-muted);margin:2px 0 8px}
 .dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;max-width:100%;scrollbar-width:thin}
@@ -735,6 +776,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right{
     position:fixed!important;inset:0!important;z-index:5200!important;
     height:auto;min-height:0;padding:12px;
+    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة */
+    padding-top:calc(var(--rizq-header-h,98px) + 14px)!important;
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 18px + env(safe-area-inset-bottom,0px))!important;
     display:none;overflow-y:auto!important;
     background:rgba(8,15,30,.6)!important;backdrop-filter:blur(6px);
   }
@@ -742,6 +786,13 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-wrap.has-detail .browse-right.tab-active,
   .browse-wrap.has-detail .browse-right.tab-hidden{
     display:flex!important;
+  }
+  .browse-wrap.has-detail .browse-right #detail-content,
+  .browse-wrap.has-detail .browse-right .dp-wrap{
+    margin-top:0;
+  }
+  .browse-wrap.has-detail .browse-right .dp-main-img{
+    scroll-margin-top:calc(var(--rizq-header-h,98px) + 14px);
   }
   .browse-right.tab-hidden{display:none}
   .browse-wrap.has-detail .browse-right.tab-hidden{display:flex!important}
@@ -921,9 +972,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     z-index:20 !important;
   }
   .nav-search select{display:none}
-  .dp-wrap{padding:14px 14px 32px}
+  .dp-wrap{padding:10px 12px 28px}
   .dp-gallery,.dp-gal-wrap{max-width:100%}
-  .dp-main-img{max-height:210px;aspect-ratio:16/10}
+  .dp-main-img{max-height:230px;aspect-ratio:16/10;margin-top:2px}
   .dp-title{font-size:18px}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
@@ -1719,7 +1770,8 @@ const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
     {id:207,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط',title:'Toyota Land Cruiser 2020 — خليجي',titleFr:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. فل كامل، فتحة سقف. الوثائق متوفرة.',descFr:'Land Cruiser 2020 import Golfe, 48 000 km, full options.',price:'9,500,000 MRU',priceNum:9500000,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة السيارات الأولى'},
     {id:208,subcat:'أراضي',cat:'عقارات',wilaya:'نواذيبو',title:'أرض سكنية — 600 م² — نواذيبو',titleFr:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة.',descFr:'Terrain résidentiel près de la zone économique, titre clair.',price:'2,200,000 MRU',priceNum:2200000,verified:true,pin:false,emoji:'🌍',loc:'📍 نواذيبو',seller:'الوطنية للعقار'},
     {id:209,subcat:'بقر',cat:'ماشية',wilaya:'ترارزة',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFr:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. شهادة بيطرية.',descFr:'Vaches laitières de race pure, 15-20L/jour, certificat vétérinaire.',price:'960,000 MRU',priceNum:960000,verified:false,pin:false,emoji:'🐄',loc:'📍 ترارزة',seller:'مزرعة البركة'},
-    {id:210,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFr:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام.',descFr:'Sites vitrines et e-commerce. Livraison en 7 jours.',price:'85,000 MRU',priceNum:85000,verified:true,pin:true,emoji:'💻',loc:'📍 نواكشوط',seller:'محمد ليمام | ADMINIA'}
+    {id:210,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFr:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام.',descFr:'Sites vitrines et e-commerce. Livraison en 7 jours.',price:'85,000 MRU',priceNum:85000,verified:true,pin:true,emoji:'💻',loc:'📍 نواكشوط',seller:'محمد ليمام | ADMINIA'},
+    {id:215,subcat:'إكسسوار',cat:'ذهب',wilaya:'نواكشوط',title:'سبحة كهرمان رجالية فاخرة',titleFr:'Chapelet ambre homme — luxe',desc:'سبحة كهرمان طبيعي، 33 حبة، مناسبة للإهداء والمناسبات.',descFr:'Chapelet en ambre naturel, 33 grains, idéal cadeau.',price:'18,000 MRU',priceNum:18000,verified:true,pin:false,emoji:'📿',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',loc:'📍 نواكشوط',seller:'ورشة الكنوز'}
   ];
   showcase.forEach(function(s){
     if(!ALL_ADS.some(function(a){ return String(a.id)===String(s.id); })) ALL_ADS.push(s);
@@ -2357,19 +2409,25 @@ function renderDetailPanel(ad){
   const titleFallbackNote=titlePick.isFallback?_langFallbackNoteHtml(titlePick.sourceLang,true):'';
   const descFallbackNote=descPick.isFallback?_langFallbackNoteHtml(descPick.sourceLang,true):'';
 
-  // Gallery — real photos only (no fake emoji "gallery")
-  const hasImages=Array.isArray(ad.images)&&ad.images.length>0;
-  const totalGallery=hasImages?ad.images.length:1;
+  // Gallery — صور حقيقية صالحة فقط؛ وإلا معاينة كبيرة قابلة للتكبير (إيموجي)
+  const _rawImgs=Array.isArray(ad.images)?ad.images:[];
+  const _validImgs=_rawImgs.map(function(s){return String(s||'').trim();}).filter(function(s){
+    return s && s!=='undefined' && s!=='null' && !/^data:,?$/i.test(s);
+  });
+  ad.images=_validImgs;
+  const hasImages=_validImgs.length>0;
+  const totalGallery=hasImages?_validImgs.length:1;
   window._dpCurrentIdx=0;
   ad._catEmojis=[]; // disable emoji photo strip
 
   let mainImgHTML;
-  const zoomHintHTML=hasImages?`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`:'';
+  const zoomHintHTML=`<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>${fr?'Agrandir':'تكبير'}</span></button>`;
   const counterHTML=hasImages&&totalGallery>1?`<span class="dp-gal-counter" id="dp-gal-counter">1 / ${totalGallery}</span>`:'';
   if(hasImages){
-    mainImgHTML=`<div class="rizq-img-wrap" style="width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(ad.images[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="this.dataset.broken='1'" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>${zoomHintHTML}${counterHTML}`;
+    mainImgHTML=`<div class="rizq-img-wrap" style="position:absolute;inset:0;width:100%;height:100%"><img id="dp-main-img-el" src="${escapeHtml(_validImgs[0])}" alt="${escapeHtml(adTitle)}" onload="this.closest('.rizq-img-wrap').classList.add('loaded')" onerror="dpMainImgBroken(this)" style="width:100%!important;height:100%!important;object-fit:cover!important;pointer-events:none;display:block"></div>${zoomHintHTML}${counterHTML}`;
   } else {
-    mainImgHTML=`<span style="display:flex;width:72px;height:72px">${iconHTML(ad.emoji||'🏠')}</span>`;
+    const emoBg=escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
+    mainImgHTML=`<div class="dp-emoji-stage" style="background:${emoBg}"><span class="dp-emoji-xl" aria-hidden="true" style="font-size:clamp(120px,22vw,220px)!important;line-height:1;display:inline-flex">${iconHTML(ad.emoji||'🏠')}</span></div>${zoomHintHTML}`;
   }
 
   const thumbsHTML=hasImages&&ad.images.length>1
@@ -2502,7 +2560,7 @@ function renderDetailPanel(ad){
     <div class="dp-hero">
       <div class="dp-gallery">
         <div class="dp-gal-wrap">
-          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
+          <div class="dp-main-img" id="dp-main-img" role="button" tabindex="0" data-emo="${escapeHtml(ad.emoji||'🏠')}" data-emo-bg="${escapeHtml(ad.bg||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)')}" onclick="dpOpenLightbox()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();dpOpenLightbox();}" title="${fr?'Cliquer pour agrandir':'انقر للتكبير'}">${mainImgHTML}</div>
           ${galNavHTML}
         </div>
         ${thumbsBlock}
@@ -2780,32 +2838,75 @@ function _dpGalleryImages(){
   // مسارات صالحة فقط (نص غير فارغ)
   return raw.map(function(s){return String(s||'').trim();}).filter(Boolean);
 }
+function _dpEmojiLightboxHtml(ad, fr){
+  const emo=ad && ad.emoji ? ad.emoji : '🏠';
+  const bg=escapeHtml((ad && ad.bg) || 'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)');
+  const title=escapeHtml((ad && (fr ? (ad.titleFr||ad.title) : (ad.title||ad.titleFr))) || '');
+  return '<div class="lb-emoji-stage" style="background:'+bg+'" onclick="event.stopPropagation()">'
+    + '<span class="lb-emoji-xl" aria-hidden="true" style="font-size:clamp(140px,26vw,260px);line-height:1">'+iconHTML(emo)+'</span>'
+    + (title ? '<div class="lb-emoji-title">'+title+'</div>' : '')
+    + '</div>';
+}
+function dpMainImgBroken(img){
+  try{
+    if(!img) return;
+    img.dataset.broken='1';
+    var box=img.closest('.dp-main-img');
+    if(!box) return;
+    box.classList.add('dp-img-broken');
+    var fr=_rizqLang()==='fr';
+    var bg=box.getAttribute('data-emo-bg')||'linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f)';
+    var emo=box.getAttribute('data-emo')||'🏠';
+    var zoom='<button type="button" class="dp-zoom-hint" onclick="event.stopPropagation();dpOpenLightbox()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg><span>'+(fr?'Agrandir':'تكبير')+'</span></button>';
+    box.innerHTML='<div class="dp-emoji-stage" style="background:'+escapeHtml(bg)+'"><span class="dp-emoji-xl" aria-hidden="true">'+iconHTML(emo)+'</span></div>'+zoom;
+    if(window._currentAd){
+      window._currentAd.images=[];
+      window._lbEmojiOnly=true;
+    }
+  }catch(eBr){ /* ignore */ }
+}
 function dpOpenLightbox(idx){
   if(!window._currentAd)return;
   const imgs=_dpGalleryImages();
-  if(!imgs.length){
-    try{ showToast(_rizqLang()==='fr'?'Pas de photo à agrandir':'لا توجد صورة للتكبير'); }catch(e){}
-    return;
-  }
-  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
-  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   const lb=document.getElementById('lightbox');
   if(!lb)return;
-  // ارفع اللايت بوكس فوق كل الطبقات (تفاصيل/أوفرلاي)
   if(lb.parentElement!==document.body) document.body.appendChild(lb);
+  if(!imgs.length){
+    window._lbIdx=0;
+    window._lbEmojiOnly=true;
+    dpRenderLightbox();
+    lb.classList.add('open');
+    document.body.classList.add('rizq-lightbox-open');
+    return;
+  }
+  window._lbEmojiOnly=false;
+  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
+  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
   dpRenderLightbox();
   lb.classList.add('open');
   document.body.classList.add('rizq-lightbox-open');
 }
 function dpRenderLightbox(){
   const imgs=_dpGalleryImages();
-  if(!imgs.length)return;
-  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
-  window._lbIdx=idx;
   const fr=_rizqLang()==='fr';
   const lbc=document.getElementById('lightbox-content');
   const meta=document.getElementById('lightbox-meta');
   const thumbs=document.getElementById('lightbox-thumbs');
+  const prev=document.querySelector('.lb-prev');
+  const next=document.querySelector('.lb-next');
+  if(!imgs.length || window._lbEmojiOnly){
+    if(lbc) lbc.innerHTML=_dpEmojiLightboxHtml(window._currentAd, fr);
+    if(meta){
+      const tip=fr?' — Click outside to close':' — انقر خارج الصورة للإغلاق';
+      meta.innerHTML='<span dir="auto">'+(fr?'Aperçu agrandi':'معاينة مكبّرة')+'</span><span dir="auto">'+tip+'</span>';
+    }
+    if(thumbs){ thumbs.innerHTML=''; thumbs.style.display='none'; }
+    if(prev)prev.style.display='none';
+    if(next)next.style.display='none';
+    return;
+  }
+  const idx=Math.max(0,Math.min(window._lbIdx||0,imgs.length-1));
+  window._lbIdx=idx;
   const src=imgs[idx];
   if(lbc){
     lbc.innerHTML='<img src="'+escapeHtml(src)+'" alt="'+(fr?'Photo':'صورة')+' '+(idx+1)+'" onclick="event.stopPropagation()" onerror="this.alt=(window._rizqLang&&_rizqLang()===\'fr\'?\'Image indisponible\':\'الصورة غير متاحة\');this.style.opacity=.4">';
@@ -2818,8 +2919,6 @@ function dpRenderLightbox(){
     thumbs.innerHTML=imgs.map((s,i)=>'<button type="button" class="lb-thumb'+(i===idx?' active':'')+'" onclick="event.stopPropagation();dpLightboxGoto('+i+')"><img src="'+escapeHtml(s)+'" alt=""></button>').join('');
     thumbs.style.display=imgs.length>1?'flex':'none';
   }
-  const prev=document.querySelector('.lb-prev');
-  const next=document.querySelector('.lb-next');
   if(prev)prev.style.display=imgs.length>1?'flex':'none';
   if(next)next.style.display=imgs.length>1?'flex':'none';
 }
@@ -3420,10 +3519,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div style="background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
         <div style="display:flex;flex-direction:column;justify-content:center;text-align:right"><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C9A84C;line-height:1">رزق</span><span style="font-size:9px;color:rgba(201,168,76,.6);letter-spacing:2.5px;font-style:italic">RIZQ PLATFORM</span></div>
       </a>
-      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="La première plateforme d'annonces classées en Mauritanie. 22 sections, 268 branches, des millions d'opportunités.">منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
+      <p class="footer-desc" id="rzq-ft-desc" data-t-fr="Rizq — le marché électronique mauritanien. 22 sections, 268 branches, des millions d'opportunités.">رزق — سوق موريتانيا الإلكتروني. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
-        <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px" data-t-fr="Réseaux supportés :">شبكات مدعومة:</span>
-        <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>
+        <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px" data-t-fr="Sur Rizq :">على رزق:</span>
+        <span class="telecom-tag">ثقة</span><span class="telecom-tag">أمان</span><span class="telecom-tag">شفافية</span>
       </div>
     </div>
     <div>
@@ -3480,8 +3579,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script>
 (function(){
   var FR={
-    desc:"La première plateforme de petites annonces en Mauritanie. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
-    netlabel:"Réseaux pris en charge :",
+    desc:"Rizq — le marché électronique mauritanien. 22 catégories, 268 sous-catégories, des millions d'opportunités.",
+    netlabel:"Sur Rizq :",
     quick:"Liens rapides",topcats:"Meilleures catégories",help:"Aide",contact:"Contactez-nous",
     c1:"🏠 Immobilier",c2:"🚗 Voitures et pièces",c3:"🚛 Camions et engins",c4:"📱 Téléphones & électronique",c5:"🐄 Bétail et animaux",
     l1:"Accueil",l2:"Parcourir les annonces",l3:"Publier une annonce",l4:"Tarifs",l5:"À propos",
@@ -3490,8 +3589,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     copy:"© 2026 رزق | Rizq — Tous droits réservés 🇲🇷",sig:"Signé par"
   };
   var AR={
-    desc:"منصة الإعلانات المبوبة الأولى في موريتانيا. 22 قسماً، 268 فرعاً، ملايين الفرص.",
-    netlabel:"شبكات مدعومة:",
+    desc:"رزق — سوق موريتانيا الإلكتروني. 22 قسماً، 268 فرعاً، ملايين الفرص.",
+    netlabel:"على رزق:",
     quick:"روابط سريعة",topcats:"أبرز الأقسام",help:"المساعدة",contact:"تواصل معنا",
     c1:"🏠 منازل وعقارات",c2:"🚗 سيارات وقطع غيار",c3:"🚛 شاحنات ومعدات",c4:"📱 هواتف وإلكترونيات",c5:"🐄 ماشية وحيوانات",
     l1:"الرئيسية",l2:"تصفّح الإعلانات",l3:"انشر إعلانك",l4:"الأسعار",l5:"من نحن",

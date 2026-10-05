@@ -270,20 +270,20 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .cats-grid,.quick-cats,.hero-biz-nav,.cat-card,.qcat{
     position:relative;z-index:520;
   }
-  #rizq-chat-toggle{z-index:950!important}
+  #rizq-chat-toggle{z-index:10020!important}
 
   #back-to-top{
-    bottom:calc(84px + env(safe-area-inset-bottom,0))!important;
-    left:12px!important;z-index:var(--rzq-z-fab)!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
+    left:12px!important;z-index:10015!important;
   }
   html[dir="ltr"] #back-to-top{left:auto!important;right:12px!important}
   #rizq-chat-toggle{
-    bottom:calc(84px + env(safe-area-inset-bottom,0))!important;
-    right:12px!important;z-index:950!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
+    right:12px!important;z-index:10020!important;
   }
   html[dir="ltr"] #rizq-chat-toggle{right:auto!important;left:12px!important}
   #rizq-chat-window{
-    bottom:calc(100px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 78px + env(safe-area-inset-bottom,0))!important;
     width:min(340px,calc(100vw - 24px))!important;
     max-height:min(480px,calc(100vh - 220px))!important;
     z-index:var(--rzq-z-modal)!important;
@@ -564,27 +564,27 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     .cards-track:hover{animation-play-state:paused!important}
   }
   .cards-track .ad-card{
-    width:172px!important;
-    min-width:172px!important;
-    max-width:172px!important;
-    flex:0 0 172px!important;
+    width:152px!important;
+    min-width:152px!important;
+    max-width:152px!important;
+    flex:0 0 152px!important;
     height:auto!important;
     scroll-snap-align:none!important;
     direction:rtl!important;
-    border-radius:16px!important;
+    border-radius:14px!important;
   }
   .cards-track .ad-card .ad-card-img{
-    height:112px!important;
-    min-height:112px!important;
-    max-height:112px!important;
+    height:96px!important;
+    min-height:96px!important;
+    max-height:96px!important;
     aspect-ratio:auto!important;
-    font-size:36px!important;
-    border-radius:16px 16px 0 0!important;
+    font-size:32px!important;
+    border-radius:14px 14px 0 0!important;
   }
-  .cards-track .ad-card .ad-card-body{padding:10px!important}
-  .cards-track .ad-card .ad-title{font-size:12px!important;margin-bottom:6px!important;-webkit-line-clamp:2}
-  .cards-track .ad-card .ad-cat{font-size:9.5px!important;margin-bottom:4px!important}
-  .cards-track .ad-card .ad-price{font-size:11.5px!important;padding:3px 8px!important}
+  .cards-track .ad-card .ad-card-body{padding:8px!important}
+  .cards-track .ad-card .ad-title{font-size:11px!important;margin-bottom:6px!important;-webkit-line-clamp:2}
+  .cards-track .ad-card .ad-cat{font-size:9px!important;margin-bottom:4px!important}
+  .cards-track .ad-card .ad-price{font-size:10.5px!important;padding:2px 7px!important}
   .cards-track .ad-card .ad-loc{font-size:10px!important}
   /* على اللمس: لا تغطية بتفاصيل hover التي كانت تبدو كبطاقة عملاقة */
   .cards-track .ad-card .ad-hover-detail{

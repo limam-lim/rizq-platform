@@ -527,6 +527,22 @@
         } else {
           payload.buyerPhone = phone || '';
           payload.buyerName = name;
+          var gTokSend = _state.guestThreadToken || '';
+          if (!gTokSend) {
+            var tokKeys = [];
+            if (_state.threadKey) tokKeys.push(_state.threadKey);
+            var phDigits = String(phone || _state.buyerPhone || '').replace(/\D/g, '');
+            if (_state.sellerAccountId && phDigits) {
+              tokKeys.push(_state.sellerAccountId + '::guest:' + phDigits);
+            }
+            for (var ti = 0; ti < tokKeys.length && !gTokSend; ti++) {
+              try { gTokSend = sessionStorage.getItem('rzq_guest_tok_' + tokKeys[ti]) || ''; } catch (eTokR) {}
+            }
+          }
+          if (gTokSend) {
+            payload.guestThreadToken = gTokSend;
+            headers['x-guest-thread-token'] = gTokSend;
+          }
         }
         return fetch(base + '/api/messages', {
           method: 'POST', headers: headers, body: JSON.stringify(payload)

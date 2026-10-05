@@ -96,10 +96,10 @@
       + '        <img class="logo-mark-img" src="rizq-mark-512.png?v=9.6" width="42" height="42" alt="رزق"/>'
       + '        <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>'
       + '      </a>'
-      + '      <p class="footer-desc" data-t="ft-desc">منصة موريتانيا للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'
+      + '      <p class="footer-desc" data-t="ft-desc">سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'
       + '      <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">'
-      + '        <span data-t="ft-net-label" style="color:rgba(255,255,255,.8);font-size:11px">شبكات مدعومة:</span>'
-      + '        <span class="telecom-tag">Mauritel</span><span class="telecom-tag">Mattel</span><span class="telecom-tag">Chinguitel</span>'
+      + '        <span data-t="ft-net-label" style="color:rgba(255,255,255,.8);font-size:11px">على رزق:</span>'
+      + '        <span class="telecom-tag" data-t="ft-trust1">ثقة</span><span class="telecom-tag" data-t="ft-trust2">أمان</span><span class="telecom-tag" data-t="ft-trust3">شفافية</span>'
       + '      </div>'
       + '    </div>'
       + '    <div>'
@@ -141,6 +141,7 @@
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>'
       + '        <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>'
       + '      </ul>'
+      + '      <div id="rizq-social-follow" hidden></div>'
       + '    </div>'
       + '  </div>'
       + '  <div class="footer-bottom">'
@@ -171,15 +172,31 @@
     document.head.appendChild(s);
   }
 
+  function ensureSocialLinks() {
+    try {
+      if (typeof window.RizqSocialLinksRefresh === 'function') {
+        window.RizqSocialLinksRefresh();
+        return;
+      }
+    } catch (e) {}
+    if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
+    var s = document.createElement('script');
+    s.src = 'rizq_social_links.js?v=23.5';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+
   function boot() {
     if (shouldSkip()) return;
     if (hasCompleteFooter()) {
       ensureToggle();
+      ensureSocialLinks();
       return;
     }
     removeIncompleteFooters();
     if (hasCompleteFooter()) {
       ensureToggle();
+      ensureSocialLinks();
       return;
     }
     injectCss();
@@ -187,6 +204,7 @@
     if (!mount) return;
     mount.insertAdjacentHTML('beforeend', footerHtml());
     ensureToggle();
+    ensureSocialLinks();
     try {
       if (typeof window._rzqApplyFooterStats === 'function') window._rzqApplyFooterStats();
     } catch (e2) {}

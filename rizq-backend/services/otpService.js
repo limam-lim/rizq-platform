@@ -10,10 +10,18 @@ const TTL_MS = 5 * 60 * 1000;
 const VERIFY_WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 const RESEND_COOLDOWN_MS = 60 * 1000;
+/** سقف يومي لكل وجهة — يحدّ من قصف SMS عبر عدة IPs */
+const MAX_OTP_PER_DEST_PER_DAY = 5;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** destination key → last send timestamp (anti-bombing) */
 const _otpLastSend = new Map();
+/** destination key → { day: 'YYYY-MM-DD', count } */
+const _otpDailyCount = new Map();
+
+function utcDayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function assertOtpCooldown(destKey) {
   const key = String(destKey || '').toLowerCase();
@@ -28,12 +36,28 @@ function assertOtpCooldown(destKey) {
       retryAfterSec: Math.ceil(wait / 1000),
     };
   }
+  const day = utcDayKey();
+  const bucket = _otpDailyCount.get(key);
+  const count = bucket && bucket.day === day ? bucket.count : 0;
+  if (count >= MAX_OTP_PER_DEST_PER_DAY) {
+    return {
+      ok: false,
+      error: 'daily_limit',
+      message: 'تم بلوغ الحد اليومي لطلب رمز التحقق لهذا الرقم',
+      retryAfterSec: 3600,
+    };
+  }
   return { ok: true };
 }
 
 function markOtpSent(destKey) {
   const key = String(destKey || '').toLowerCase();
-  if (key) _otpLastSend.set(key, Date.now());
+  if (!key) return;
+  _otpLastSend.set(key, Date.now());
+  const day = utcDayKey();
+  const bucket = _otpDailyCount.get(key);
+  if (bucket && bucket.day === day) bucket.count += 1;
+  else _otpDailyCount.set(key, { day, count: 1 });
 }
 
 let _mailer = null;

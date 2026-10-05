@@ -163,52 +163,53 @@ function getSectionRules() {
   return out;
 }
 
-// ── ملفات إعلانات رزق الحقيقية تُخدَّم كملفات ثابتة عبر /uploads ────────
-// (انظر قسم "إعلانات رزق الحقيقية" أسفل الملف لتفاصيل saveAdImages)
-// مرفقات المناقصات والاستثمارات — لا تُخدم مباشرة عبر static
-app.use('/uploads/tenders', (req, res) => {
-  res.status(403).json({
-    error: 'tender_assets_forbidden',
-    msg: 'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
-    msg_fr: 'Pièces jointes protégées — abonnement requis',
-  });
-});
-app.use('/uploads/investments', (req, res) => {
-  res.status(403).json({
-    error: 'investment_assets_forbidden',
-    msg: 'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
-    msg_fr: 'Pièces jointes d\'investissement protégées — revue interne uniquement',
-  });
-});
-// وسائط الإعلانات/الكتالوج — عامة فقط إن كانت الحالة منشورة/نشطة
-app.use('/uploads/ads', (req, res, next) => {
-  try {
-    const adId = String(req.path || '').split('/').filter(Boolean)[0] || '';
-    const ad = adId ? repos.ads.getById(adId) : null;
-    const st = String(ad && ad.status || '');
-    if (!ad || !['active', 'approved', 'published'].includes(st)) {
-      return res.status(403).json({ error: 'ad_media_forbidden', msg: 'وسائط الإعلان غير متاحة' });
+// ── ملفات /uploads: حظر المسارات الحساسة + بوابة حالة للوسائط العامة ────
+function forbidUploadPath(error, msg, msgFr) {
+  return function _forbidUpload(_req, res) {
+    res.status(403).json({ error: error, msg: msg, msg_fr: msgFr });
+  };
+}
+function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
+  const allowed = new Set(allowedStatuses);
+  return function _gateUpload(req, res, next) {
+    try {
+      const entityId = String(req.path || '').split('/').filter(Boolean)[0] || '';
+      const entity = entityId ? resolveEntity(entityId) : null;
+      const st = String((entity && entity.status) || '');
+      if (!entity || !allowed.has(st)) {
+        return res.status(403).json({ error: error, msg: 'الوسائط غير متاحة' });
+      }
+      return next();
+    } catch (e) {
+      return res.status(403).json({ error: error });
     }
-    return next();
-  } catch (e) {
-    return res.status(403).json({ error: 'ad_media_forbidden' });
-  }
-});
-app.use('/uploads/catalog', (req, res, next) => {
-  try {
-    const itemId = String(req.path || '').split('/').filter(Boolean)[0] || '';
-    const item = itemId
-      ? (repos.catalog.list().find((c) => c && c.id === itemId) || null)
-      : null;
-    const st = String(item && item.status || '');
-    if (!item || st !== 'active') {
-      return res.status(403).json({ error: 'catalog_media_forbidden', msg: 'وسائط الكتالوج غير متاحة' });
-    }
-    return next();
-  } catch (e) {
-    return res.status(403).json({ error: 'catalog_media_forbidden' });
-  }
-});
+  };
+}
+app.use('/uploads/tenders', forbidUploadPath(
+  'tender_assets_forbidden',
+  'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
+  'Pièces jointes protégées — abonnement requis'
+));
+app.use('/uploads/investments', forbidUploadPath(
+  'investment_assets_forbidden',
+  'مرفقات الاستثمار محمية — للمراجعة الداخلية فقط',
+  'Pièces jointes d\'investissement protégées — revue interne uniquement'
+));
+app.use('/uploads/receipts', forbidUploadPath(
+  'receipts_forbidden',
+  'وصول الدفع محمية — للمراجعة الإدارية فقط',
+  'Reçus de paiement protégés — revue administrative uniquement'
+));
+app.use('/uploads/ads', gateUploadByStatus(
+  (adId) => repos.ads.getById(adId),
+  ['active', 'approved', 'published'],
+  'ad_media_forbidden'
+));
+app.use('/uploads/catalog', gateUploadByStatus(
+  (itemId) => repos.catalog.list().find((c) => c && c.id === itemId) || null,
+  ['active'],
+  'catalog_media_forbidden'
+));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── CORS: أصول مسموحة (ALLOWED_ORIGIN قائمة مفصولة بفواصل)
@@ -498,10 +499,18 @@ app.post('/api/agent/toggle', (req, res) => {
   const active = b.active;
   const accountId = b.accountId;
   const token = extractAccountToken(req);
-  // السرّ من الرأس فقط في الإنتاج؛ body مسموح في التطوير للتوافق مع خوادم المكالمات
+  // السرّ من الرأس فقط؛ body مسموح في التطوير فقط. في الإنتاج يُرفض من المتصفح.
   const secretHdr = req.header('x-rizq-secret') || '';
   const secretBody = (!isProdEnv() && b.secret) ? b.secret : '';
-  let authorized = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  const secretOk = verifyAgentToggleSecret(secretHdr) || verifyAgentToggleSecret(secretBody);
+  let authorized = false;
+  if (secretOk) {
+    if (isProdEnv() && isBrowserLikeRequest(req)) {
+      authorized = false;
+    } else {
+      authorized = true;
+    }
+  }
   if (!authorized && accountId && token) {
     const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
@@ -744,7 +753,7 @@ app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[widget/lead] error:', err.message);
-    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+    res.status(500).json({ ok: false, error: 'lead_save_failed' });
   }
 });
 
@@ -767,7 +776,7 @@ app.post('/api/leads', widgetChatLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[api/leads] error:', err.message);
-    res.status(500).json({ ok: false, error: err.message || 'lead_save_failed' });
+    res.status(500).json({ ok: false, error: 'lead_save_failed' });
   }
 });
 
@@ -841,6 +850,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
     const accountId = String(
       (body.profile && body.profile.accountId) || body.accountId || ''
     ).trim();
+    let merchantAcc = null;
 
     if (accountId) {
       let acc = null;
@@ -865,6 +875,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
           code: e.code || ent.subscriptionStatus,
         });
       }
+      merchantAcc = acc;
       body.accountId = accountId;
       body.profile = buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
@@ -883,6 +894,28 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
     }
 
     const result = await handleWidgetChat(body);
+    if (merchantAcc && result && result.reply) {
+      try {
+        await recordUsage({
+          subscriberId: merchantAcc.phone || merchantAcc.whatsapp || accountId,
+          accountId,
+          businessName: merchantAcc.name || '',
+          phone: merchantAcc.phone || merchantAcc.whatsapp || '',
+          channel: 'widget',
+          model: result.model,
+          usage: result.usage,
+        });
+      } catch (qErr) {
+        console.warn('[quota-guard] widget/chat:', qErr && qErr.message);
+        if (qErr && qErr.code === 'quota_exhausted') {
+          return res.status(403).json({
+            ok: false,
+            error: qErr.message || 'تم استنفاد الحصة',
+            code: 'quota_exhausted',
+          });
+        }
+      }
+    }
     res.json(result);
   } catch (err) {
     console.error('[widget/chat] error:', err.message);
@@ -903,6 +936,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
     const accountId = String(
       (body.profile && body.profile.accountId) || body.accountId || ''
     ).trim();
+    let merchantAcc = null;
 
     if (accountId) {
       let acc = null;
@@ -926,6 +960,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
           code: e.code || ent.subscriptionStatus,
         });
       }
+      merchantAcc = acc;
       body.accountId = accountId;
       body.profile = buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
@@ -943,6 +978,28 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
     }
 
     const result = await handleWidgetChat(body);
+    if (merchantAcc && result && result.reply) {
+      try {
+        await recordUsage({
+          subscriberId: merchantAcc.phone || merchantAcc.whatsapp || accountId,
+          accountId,
+          businessName: merchantAcc.name || '',
+          phone: merchantAcc.phone || merchantAcc.whatsapp || '',
+          channel: 'widget',
+          model: result.model,
+          usage: result.usage,
+        });
+      } catch (qErr) {
+        console.warn('[quota-guard] ai/chat:', qErr && qErr.message);
+        if (qErr && qErr.code === 'quota_exhausted') {
+          return res.status(403).json({
+            ok: false,
+            error: qErr.message || 'تم استنفاد الحصة',
+            code: 'quota_exhausted',
+          });
+        }
+      }
+    }
     res.json(result);
   } catch (err) {
     console.error('[ai/chat] error:', err.message);
@@ -2101,7 +2158,7 @@ app.use('/api/auth', authRouter);
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 8,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { ok: false, error: 'عدد كبير من طلبات OTP — حاول لاحقاً' },
@@ -2226,7 +2283,10 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     category: ['video', 'tender', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
-    receiptImage: b.receiptImage ? String(b.receiptImage).slice(0, 2_500_000) : null,
+    // لا نخزّن base64 الوصل في JSON — الملف على القرص فقط تحت uploads/receipts
+    receiptImage: null,
+    receiptPath: receiptPath || null,
+    receiptMeta: receiptMeta || null,
     // لا نخزّن riskLevel/flags من العميل — السيرفر فقط يحدّدهما بعد التحليل
     riskLevel: 'unreviewed',
     flags: [],
@@ -2282,7 +2342,18 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
  * ليراها أي جهاز أدمن، وليس فقط جهاز المشترك الذي أرسل الطلب.
  */
 app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res) => {
-  res.json({ ok: true, requests: readSubRequests().reverse() });
+  let loadReceiptDataUrl = null;
+  try {
+    loadReceiptDataUrl = require('./services/telegramAdmin').loadReceiptDataUrl;
+  } catch (_) { /* optional */ }
+  const requests = readSubRequests().reverse().map((r) => {
+    const copy = Object.assign({}, r);
+    if (!copy.receiptImage && copy.receiptPath && typeof loadReceiptDataUrl === 'function') {
+      try { copy.receiptImage = loadReceiptDataUrl(copy); } catch (_) { copy.receiptImage = null; }
+    }
+    return copy;
+  });
+  res.json({ ok: true, requests });
 });
 
 /**
@@ -2598,16 +2669,17 @@ app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
   try {
     const aq = require('./services/agentQuality');
     const b = req.body || {};
+    const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
     const row = aq.recordAgentMiss({
-      text: b.text || b.message,
-      reply: b.reply,
-      lang: b.lang,
-      agent: b.agent || 'manager_offline',
-      channel: b.channel || 'browser',
-      type: b.type || 'missed',
-      reason: b.reason,
-      tier: b.tier,
-      page: b.page,
+      text: clip(b.text || b.message, 500),
+      reply: clip(b.reply, 800),
+      lang: clip(b.lang, 16),
+      agent: clip(b.agent || 'manager_offline', 64),
+      channel: clip(b.channel || 'browser', 32),
+      type: clip(b.type || 'missed', 32),
+      reason: clip(b.reason, 120),
+      tier: clip(b.tier, 32),
+      page: clip(b.page, 200),
     });
     if (!row) return res.status(400).json({ ok: false, error: 'text مطلوب' });
     res.json({ ok: true, id: row.id });
@@ -2621,7 +2693,8 @@ app.get('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, r
     const aq = require('./services/agentQuality');
     res.json({ ok: true, misses: aq.listAgentMisses(req.query.limit) });
   } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
+    console.error('[admin/agent-misses]', err && err.message);
+    res.status(500).json({ ok: false, error: 'list_failed' });
   }
 });
 
@@ -2631,7 +2704,8 @@ app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req
     const n = aq.clearAgentMisses();
     res.json({ ok: true, cleared: n });
   } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
+    console.error('[admin/agent-misses delete]', err && err.message);
+    res.status(500).json({ ok: false, error: 'clear_failed' });
   }
 });
 
@@ -3200,6 +3274,8 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission(
     if (aidx !== -1) {
       accs[aidx].suspended = true;
       accs[aidx].suspendedAt = new Date().toISOString();
+      accs[aidx].dashToken = genDashToken();
+      accs[aidx].accessToken = genAccessToken();
       writeAccounts(accs);
     }
   }
