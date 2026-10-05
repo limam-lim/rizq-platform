@@ -1,30 +1,22 @@
-# AI Harness Engineering — Universal Agent Constitution
+# AI Harness Engineering — Spec-Driven Development (SDD) Prompt
 
-**Status:** BINDING for ALL future work — any feature, fix, audit, or project (Rizq or otherwise)  
+**What this is:** Operating prompt for intelligent models inside development environments (Cursor, VS Code, and similar IDEs) to enforce high-quality software engineering under Spec-Driven Development (SDD).
+
+**Status:** BINDING for ALL future work — any feature, fix, audit, or project  
 **Read before:** any implementation, planning, or code change  
 **Saved:** 2026-10-05  
 **Canonical path:** `docs/ai-harness/AI_HARNESS_ENGINEERING.md`  
-**User settings store (persistent):** `/cursor/stores/user/ai-harness/AI_HARNESS_ENGINEERING.md`  
+**User settings store:** `/cursor/stores/user/ai-harness/AI_HARNESS_ENGINEERING.md`  
 **Agent store mirror:** `/cursor/stores/self/ai-harness/AI_HARNESS_ENGINEERING.md`
 
-## Scope (confirmed)
+## Purpose
 
-This constitution applies to **every future task and every project**, not only Rizq.  
+Guide the AI coding agent so that every change follows SDD (plus DDD and Defensive Programming): specify first, plan second, task third, implement one atomic task at a time — never impulsive code.
+
+## Scope
+
+Applies to **every future task and every project** (not only Rizq).  
 Suspend only if the user explicitly overrides it for a specific request.
-
-## Settings & prior-document search (2026-10-05)
-
-User asked to look in agent **settings** (where they previously requested storage).
-
-| Location | Result |
-|----------|--------|
-| `/cursor/stores/user/` (persistent user settings store) | **Was empty** — no prior harness file |
-| Cursor User Rules injected into this session | Present (frontend/comms/name) — **no** AI Harness text |
-| Agent notes / shared notes | Empty / not created |
-| Workspace / Rizq files, git history | Not found (except this session) |
-| Cloud agent transcripts | No prior harness constitution session |
-
-**Conclusion:** Nothing was stored in settings from the earlier request. This session’s constitution is now written into the user settings store at `/cursor/stores/user/ai-harness/AI_HARNESS_ENGINEERING.md`. If a longer prior harness document exists in Cursor Desktop Rules or another chat, paste it to merge.
 
 ---
 

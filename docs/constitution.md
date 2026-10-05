@@ -1,8 +1,10 @@
 # Project Constitution
 
-Full universal text: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
+Full SDD prompt: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
 
-**Applies to all future work and all projects.** Read the harness file before any implementation.
+**What it is:** Operating prompt for intelligent models in IDEs (Cursor, VS Code) to enforce Spec-Driven Development (SDD).
+
+**Applies to all future work and all projects.** Read that file before any implementation.
 
 ## Absolute laws
 

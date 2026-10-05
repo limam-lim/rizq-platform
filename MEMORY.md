@@ -2,9 +2,9 @@
 
 Architectural and harness decisions. Update immediately when decisions change.
 
-## 2026-10-05 — AI Harness Engineering adopted (universal)
+## 2026-10-05 — SDD IDE prompt adopted (universal)
 
-- **Decision:** All future work on any project follows SDD + DDD + Defensive Programming per `docs/ai-harness/AI_HARNESS_ENGINEERING.md`.
-- **Scope:** Confirmed by user — applies to all future work, any project.
+- **What it is:** Operating prompt for intelligent models inside development environments (Cursor, VS Code) to enforce Spec-Driven Development (SDD), DDD, and Defensive Programming.
+- **File:** `docs/ai-harness/AI_HARNESS_ENGINEERING.md` (+ user settings store `/cursor/stores/user/ai-harness/`).
+- **Scope:** All future work, any project.
 - **Workflow:** Context → `spec.md` → clarification → `plan.md` → `tasks.md` → one task at a time → RF validation.
-- **Prior Harness search:** Exhaustive search of Rizq repo, git history, docs, agent configs, and accessible cloud-agent sessions found **no earlier separate AI Harness Engineering document**. Current file holds the constitution from this session; user may paste any older text to merge.

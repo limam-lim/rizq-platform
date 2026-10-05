@@ -2,9 +2,9 @@
 
 ## Operating mode
 
-Governed by **AI Harness Engineering / Spec-Driven Development**.
+Governed by the **AI Harness Engineering / Spec-Driven Development (SDD)** prompt for intelligent models in IDEs (Cursor, VS Code).
 
-**Universal scope:** this constitution binds every future task and every project unless the user explicitly suspends it.
+**Universal scope:** binds every future task and every project unless the user explicitly suspends it.
 
 Before any feature or change request:
 
