@@ -54,14 +54,14 @@ Break into micro-tasks T1, T2, T3… Each task must be independently testable.
 ### 6. Isolated Task Execution
 
 - Implement **exactly one** task
-- Run validation (`node --test` or project equivalent)
-- Capture stdout/stderr
-- Mark the task complete in `tasks.md`
+- Run `/testing-validation` (empirical tests; capture stdout/stderr; RF mapping)
+- Run `/memory-guard` shutdown update when decisions/state changed
+- Mark the task complete in `tasks.md` **only after** validation passes
 - **STOP** and wait for the user before the next task
 
 ### 7. Comprehensive Validation
 
-Map every completed task back to RF ids. Verify UI with browser/devtools when applicable. No silent failures.
+Map every completed task back to RF ids (via `/testing-validation` evidence). Verify UI with `/frontend-design` when applicable. No silent failures.
 
 ## Hard stops
 

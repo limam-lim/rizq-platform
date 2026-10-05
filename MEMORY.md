@@ -8,6 +8,12 @@ Architectural and harness decisions. Update immediately when decisions change.
 - **Mirrors:** `~/.cursor/skills/` (enable Sync Skills for Cloud Agents in Cursor Settings) and `/cursor/stores/user/skills/`
 - **Invoke:** `/sovereign-preflight`, `/sdd-lifecycle`, `/circuit-breakers`, `/security-data-shield`
 
+## 2026-10-05 — `.agents/skills` domain guards
+
+- **`frontend-design`:** mobile-first from 375px; design tokens via project SSOT (Rizq = CSS variables, not forced Tailwind); no overflow/z-index/clipping; respects SDD + Zero Unsanitized Dependencies.
+- **`memory-guard`:** startup reads Master/L1/`AGENTS.md`/`MEMORY.md`/`docs/constitution.md`; shutdown updates `MEMORY.md` after each atomic task; no secrets in memory; aligns with `/sovereign-preflight`.
+- **`testing-validation`:** never mark T# complete without empirical run (`node --test` or project harness); capture stdout/stderr; map evidence to `spec.md` RF; no new test frameworks without approval.
+
 ## 2026-10-05 — Master Constitution adopted (L0) + SDD IDE prompt (L1)
 
 - **L0:** `MASTER_CONSTITUTION.md` — Universal Enterprise & Engineering Master Constitution.

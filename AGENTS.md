@@ -9,7 +9,9 @@ Governed by a two-layer constitution:
 | **L0 Master** | Universal Enterprise & Engineering Master Constitution (`SOVEREIGN_FRAMEWORK`) | `MASTER_CONSTITUTION.md` |
 | **L1 IDE SDD** | AI Harness Engineering / Spec-Driven Development prompt | `docs/ai-harness/AI_HARNESS_ENGINEERING.md` |
 
-**Skills (installed):** `.cursor/skills/`
+**Skills (installed):**
+
+`.cursor/skills/` (sovereign stack) and `.agents/skills/` (domain guards)
 
 | Skill | Use |
 |-------|-----|
@@ -17,6 +19,9 @@ Governed by a two-layer constitution:
 | `/sdd-lifecycle` | Full 7-step SDD pipeline |
 | `/circuit-breakers` | `HALT` / `REVERT` / `AUDIT ONLY` |
 | `/security-data-shield` | Zero Trust, RBAC, validation, secrets |
+| `/frontend-design` | Mobile-first UI, tokens, visual integrity |
+| `/memory-guard` | Startup constitution reads + MEMORY.md shutdown updates |
+| `/testing-validation` | Empirical tests + RF acceptance mapping before task complete |
 
 **Universal scope:** binds every future task and every project unless the user explicitly suspends it.
 
