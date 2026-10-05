@@ -891,18 +891,23 @@ html body footer .footer-grid{
   html.rizq-app-nav #nav .nav-start .nav-search-launch,
   html.rizq-app-nav #nav .nav-start .nav-fav-btn,
   html.rizq-app-nav #nav .nav-start #nav-account-btn{
-    border:1.5px solid rgba(201,168,76,.58)!important;
-    background:
-      linear-gradient(145deg,rgba(232,201,106,.16),transparent 55%),
-      rgba(15,23,42,.9)!important;
+    border:1.5px solid #C9A84C!important;
+    background:linear-gradient(145deg,#C9A84C 0%,#E8C96A 55%,#b89840 100%)!important;
+    box-shadow:0 2px 10px rgba(201,168,76,.35), inset 0 1px 0 rgba(255,255,255,.35)!important;
+    color:#0F2347!important;
   }
-  html.rizq-app-nav #nav .nav-search-launch .nav-search-launch-ico{
+  html.rizq-app-nav #nav .nav-search-launch .nav-search-launch-ico,
+  html.rizq-app-nav #nav .nav-fav-btn .nav-fav-ico,
+  html.rizq-app-nav #nav #nav-account-btn .nav-account-ico{
     display:inline-block!important;
     visibility:visible!important;
     opacity:1!important;
-    font-size:17px!important;
-    color:#E8C96A!important;
-    -webkit-text-fill-color:#E8C96A!important;
+    font-size:15px!important;
+    line-height:1!important;
+    color:#0F2347!important;
+    -webkit-text-fill-color:#0F2347!important;
+    filter:none!important;
+    text-shadow:none!important;
   }
 }
 
