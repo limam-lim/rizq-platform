@@ -323,7 +323,15 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .rizq-hdr-fav-count.is-empty,
 [data-rizq-fav-count].is-empty{display:none!important}
 @media (max-width:520px){.nav-fav-lbl{display:none}.nav-fav-btn{padding:8px 11px;min-width:38px}}
-.nav-account-ico{font-size:15px;line-height:1}
+.nav-account-ico{
+  font-size:15px;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:inherit;
+}
+.nav-account-ico svg{
+  width:15px;height:15px;display:block;
+  fill:currentColor;
+}
 .btn-login{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.92);padding:8px 18px;border-radius:9px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .25s}
 .btn-login:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.38);color:#fff}
 .btn-register{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:9px 22px;border-radius:9px;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;box-shadow:0 4px 18px rgba(201,168,76,.40)}
@@ -3665,7 +3673,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="nav-start">
     <button class="btn-lang btn-lang-primary rizq-toolbar-lang" id="nav-lang-btn" data-rizq-toolbar="lang" type="button" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button type="button" class="nav-account-btn rizq-toolbar-account" id="nav-account-btn" data-rizq-toolbar="account" onclick="goToAccount()" aria-label="حسابي">
-      <span class="nav-account-ico" aria-hidden="true">👤</span>
+      <span class="nav-account-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2.25c-3.6 0-8.25 1.8-8.25 5.4V21h16.5v-1.35c0-3.6-4.65-5.4-8.25-5.4Z"/></svg></span>
       <span data-t="nav-account">حسابي</span>
     </button>
     <span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="أدوات">
