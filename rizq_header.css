@@ -1246,16 +1246,17 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     overflow:visible !important;
     direction:ltr !important;
   }
-  /* الصف 1: أدوات + شعار — أصغر قليلاً حتى تتسع كبسولة الأقسام */
+  /* الصف 1: أدوات + شعار — كبسولة أدوات أقصر */
   html.rizq-app-nav #nav > .nav-start,
   html.rizq-app-nav #rizq-desk-nav > .nav-start{
     grid-column:1 !important;
     grid-row:1 !important;
     justify-self:start !important;
     align-self:center !important;
-    gap:3px !important;
-    padding:3px 6px !important;
+    gap:2px !important;
+    padding:2px 5px !important;
     border-radius:10px !important;
+    width:max-content !important;
     max-width:none !important;
     flex-shrink:0 !important;
     overflow:visible !important;
@@ -1480,19 +1481,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     line-height:24px !important;
     margin:0 auto !important;
   }
+  /* تابلت: أيقونات فقط — الكبسولة أقصر */
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    display:block !important;
-    font-size:8px !important;
-    line-height:1.1 !important;
-    white-space:nowrap !important;
-    overflow:visible !important;
-    max-width:none !important;
-    max-height:none !important;
-    opacity:1 !important;
-    visibility:visible !important;
+    display:none !important;
   }
   /* تابلت: أخفِ خط التسطير تحت النشط ليقل ارتفاع الكبسولة */
   html.rizq-app-nav #nav .nav-center a.is-active::after,
@@ -2953,9 +2947,13 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
     font-size:8px !important;
     line-height:1.1 !important;
-    max-width:none !important;
-    overflow:visible !important;
-    text-overflow:clip !important;
+    display:block !important;
+  }
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    max-width:min(480px, calc(100vw - 100px)) !important;
+    padding:3px 8px !important;
+    border-radius:999px !important;
   }
   /* كبسولة الأدوات العلوية أقصر على التابلت */
   html.rizq-app-nav #nav > .nav-start,
