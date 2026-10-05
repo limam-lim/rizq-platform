@@ -2,6 +2,12 @@
 
 Architectural and harness decisions. Update immediately when decisions change.
 
+## 2026-10-05 — Cursor Skills installed (sovereign stack)
+
+- **Project skills:** `.cursor/skills/{sovereign-preflight,sdd-lifecycle,circuit-breakers,security-data-shield}/SKILL.md`
+- **Mirrors:** `~/.cursor/skills/` (enable Sync Skills for Cloud Agents in Cursor Settings) and `/cursor/stores/user/skills/`
+- **Invoke:** `/sovereign-preflight`, `/sdd-lifecycle`, `/circuit-breakers`, `/security-data-shield`
+
 ## 2026-10-05 — Master Constitution adopted (L0) + SDD IDE prompt (L1)
 
 - **L0:** `MASTER_CONSTITUTION.md` — Universal Enterprise & Engineering Master Constitution.
