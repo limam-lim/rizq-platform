@@ -516,6 +516,33 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .hero-eyebrow span{color:var(--gold);font-size:clamp(13.5px,1.5vw,15px);font-weight:800;letter-spacing:.5px;line-height:1.25}
 
 /* رزق بارزة أولاً — ثم شارة السوق الإلكتروني بنفس العرض تحتها */
+/* لوحة رأس الهيرو: تلف العلامة + بطاقة الإعلان + بيع/اشتر بنفس الحواف */
+.hero-head-panel{
+  width:100%;
+  max-width:min(960px,86vw);
+  margin:0 auto 10px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:12px;
+  padding:16px 14px 14px;
+  border-radius:22px;
+  background:
+    radial-gradient(ellipse 85% 70% at 50% 0%,rgba(255,248,224,.55),transparent 55%),
+    linear-gradient(165deg,#efe0b4 0%,#e4ce96 45%,#d6be82 100%);
+  border:1.5px solid rgba(201,168,76,.5);
+  box-shadow:
+    0 12px 32px rgba(120,90,30,.14),
+    inset 0 1px 0 rgba(255,255,255,.6);
+}
+.hero-head-panel .hero-brand-row,
+.hero-head-panel .hero-lead-row{
+  width:100%;
+  max-width:100%;
+  margin:0;
+  min-width:0;
+}
 .hero-brand-row{
   display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;
   gap:10px;margin:0 auto 18px;width:max-content;max-width:96%;
@@ -1284,16 +1311,16 @@ body.rizq-lang-fr .hero-biz-nav{
   display:flex;
   flex-direction:column;
   align-items:stretch;
-  gap:12px;
-  padding:14px 12px 12px;
-  border-radius:20px;
+  gap:14px;
+  padding:16px 14px 14px;
+  border-radius:22px;
   background:
-    radial-gradient(ellipse 90% 70% at 50% 0%,rgba(255,248,224,.55),transparent 60%),
-    linear-gradient(165deg,#f0e0b8 0%,#e6d09a 42%,#dcc48a 100%);
-  border:1.5px solid rgba(201,168,76,.42);
+    radial-gradient(ellipse 90% 55% at 50% 0%,rgba(255,248,224,.7),transparent 58%),
+    linear-gradient(165deg,#f2e4c0 0%,#e8d4a0 38%,#ddc48c 100%);
+  border:1.5px solid rgba(201,168,76,.48);
   box-shadow:
-    0 10px 28px rgba(120,90,30,.12),
-    inset 0 1px 0 rgba(255,255,255,.55);
+    0 12px 30px rgba(120,90,30,.14),
+    inset 0 1px 0 rgba(255,255,255,.62);
   position:relative;
   z-index:55;
   animation:fadeUp .8s .32s ease both;
@@ -1309,8 +1336,9 @@ body.rizq-lang-fr .hero-biz-nav{
   color:#3a2e12;
   opacity:1;
   text-align:center;
-  padding:0 6px;
+  padding:2px 8px 4px;
   max-width:100%;
+  font-weight:800;
 }
 .hero-earth-band .hero-vid-wrap{
   width:100%;
@@ -2217,9 +2245,15 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-headline{font-size:clamp(46px,13vw,64px)}
   .hero-title-card{padding:14px 18px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
   /* صف العلامة + البطاقة الإعلانية + المسرح — نفس العرض والحواف على الهاتف */
+  .hero-head-panel{
+    width:100%!important;max-width:100%!important;
+    margin:0 auto 10px!important;
+    padding:12px 10px 10px;gap:10px;border-radius:18px;
+    box-sizing:border-box;
+  }
   .hero-brand-row{
     width:100%!important;max-width:100%!important;min-width:0!important;
-    margin:0 auto 12px!important;box-sizing:border-box;
+    margin:0!important;box-sizing:border-box;
   }
   .hero-brand-row .hero-eyebrow{
     width:100%!important;max-width:100%!important;
@@ -2233,7 +2267,7 @@ html[dir="ltr"] .listings-section .section-desc{
   }
   .hero-lead-row{
     width:100%!important;max-width:100%!important;
-    margin:0 auto 12px!important;box-sizing:border-box;
+    margin:0!important;box-sizing:border-box;
   }
   .hero-subtitle-card{padding:16px 14px 14px!important;overflow:hidden}
   .hero-subtitle-primary,
@@ -2265,14 +2299,16 @@ html[dir="ltr"] .listings-section .section-desc{
   /* الشريط الترابي + شاشة الإعلان — حواف موحّدة بعرض المسرح كاملاً */
   .hero-earth-band{
     width:100%!important;max-width:100%!important;
-    padding:12px 10px 10px;gap:10px;border-radius:16px;
+    padding:16px 14px 16px;gap:14px;border-radius:18px;
     box-sizing:border-box;
+    overflow:visible;
   }
   .hero-earth-band .hero-vid-wrap,
   .hero-vid-wrap{
     width:100%!important;max-width:none!important;
     margin:0!important;padding:6px;border-radius:14px;
     box-sizing:border-box;
+    max-height:none!important;
   }
   .hero-vid-compact .hero-vid-inner,
   .hero-vid-wrap .hero-vid-inner{aspect-ratio:16/9;max-height:min(42vh,320px)}
@@ -2826,15 +2862,16 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 /* على الجوال: نفس الترتيب والقياسات للعربية والفرنسية */
 @media(max-width:768px){
-  .hero-brand-row{gap:8px;margin-bottom:14px;max-width:96%;width:max-content;min-width:min(260px,92vw)}
-  .hero-title-card{padding:14px 22px 18px;min-width:0;min-height:80px;border-radius:14px;width:100%}
+  .hero-head-panel{width:100%!important;max-width:100%!important;margin:0 auto 10px!important;padding:12px 10px 10px;box-sizing:border-box}
+  .hero-brand-row{gap:8px;margin:0!important;max-width:100%!important;width:100%!important;min-width:0!important;box-sizing:border-box}
+  .hero-title-card{padding:14px 18px 18px;min-width:0;min-height:76px;border-radius:14px;width:100%}
   .hero-headline{font-size:clamp(46px,13vw,64px);transform:translateY(-0.1em)}
-  .hero-brand-row .hero-eyebrow{padding:9px 14px;min-height:38px;width:100%;max-width:100%}
-  .hero-brand-row .hero-eyebrow span{font-size:clamp(12px,3.2vw,13.5px)}
-  .hero-lead-row{gap:14px;width:min(1080px,96%);max-width:100%}
-  .hero-subtitle-card{max-width:none;width:100%;padding:16px 12px 14px;flex:none}
-  .hero-subtitle-primary{font-size:clamp(13px,3.6vw,18px);white-space:nowrap}
-  .hero-subtitle-secondary{font-size:clamp(11px,3vw,15px);white-space:nowrap}
+  .hero-brand-row .hero-eyebrow{padding:9px 12px;min-height:0;width:100%;max-width:100%;box-sizing:border-box;overflow:hidden}
+  .hero-brand-row .hero-eyebrow span{font-size:clamp(11.5px,3.2vw,13.5px);white-space:normal;line-height:1.35;text-align:center}
+  .hero-lead-row{gap:12px;width:100%!important;max-width:100%!important;margin:0!important;box-sizing:border-box}
+  .hero-subtitle-card{max-width:none;width:100%;padding:16px 12px 14px;flex:none;overflow:hidden;box-sizing:border-box}
+  .hero-subtitle-primary{font-size:clamp(13px,3.6vw,18px);white-space:normal!important}
+  .hero-subtitle-secondary{font-size:clamp(11px,3vw,15px);white-space:normal!important}
   .hero-pills{
     flex-direction:row!important;
     flex-wrap:nowrap!important;
@@ -3766,6 +3803,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
   <!-- Hero Content -->
   <div class="hero-content">
+    <div class="hero-head-panel">
     <div class="hero-brand-row">
       <div class="hero-title-card">
         <h1 class="hero-headline" id="hero-hl">رزق</h1>
@@ -3787,6 +3825,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span class="hero-pill-sep" aria-hidden="true">·</span>
         <a class="hero-pill" href="#pricing" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
       </div>
+    </div>
     </div>
     <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
     <div class="hero-stage">
