@@ -2171,7 +2171,20 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:100%;gap:12px}
   .hero-biz-nav .hero-biz-btn:nth-child(4){grid-column:1 / 2}
   .hero-biz-nav .hero-biz-btn:nth-child(5){grid-column:2 / 4;max-width:none}
-  .hero-stage{padding:18px 14px 8px}
+  /* الخلفية الترابية أضيق قليلاً على التابلت */
+  .hero-head-panel,
+  .hero-stage,
+  .hero-earth-band,
+  .hero-lead-row{
+    width:100%!important;
+    max-width:min(720px,78vw)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box;
+  }
+  .hero-head-panel{padding:14px 14px 12px!important;border-radius:18px}
+  .hero-stage{padding:16px 14px 8px!important;border-radius:20px}
+  .hero-earth-band{padding:14px 12px 12px!important;border-radius:16px}
   .vo-specialty-portals{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
     gap:10px!important;
@@ -2191,9 +2204,15 @@ html[dir="ltr"] .listings-section .section-desc{
   .rizq-trio{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
   .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
 }
-@media (max-width:480px){
-  .vo-specialty-portals{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+/* هاتف عريض / تابلت صغير بالطول: ضيّق الخلفية الترابية قليلاً */
+@media(min-width:600px) and (max-width:768px){
+  .hero-head-panel,
+  .hero-stage,
+  .hero-earth-band,
+  .hero-lead-row{
+    max-width:min(560px,86vw)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
   }
 }
 /* موبايل ضيق: عمودان للإعلانات المميزة (لا بطاقة واحدة عملاقة) */
@@ -2248,7 +2267,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-head-panel{
     width:100%!important;max-width:100%!important;
     margin:0 auto 10px!important;
-    padding:12px 10px 10px;gap:10px;border-radius:18px;
+    padding:14px 12px 12px;gap:10px;border-radius:18px;
     box-sizing:border-box;
   }
   .hero-brand-row{
@@ -2862,7 +2881,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 }
 /* على الجوال: نفس الترتيب والقياسات للعربية والفرنسية */
 @media(max-width:768px){
-  .hero-head-panel{width:100%!important;max-width:100%!important;margin:0 auto 10px!important;padding:14px 12px 12px;box-sizing:border-box}
+  .hero-head-panel{width:100%!important;max-width:100%!important;margin:0 auto 10px!important;padding:12px 10px 10px;box-sizing:border-box}
   .hero-brand-row{gap:8px;margin:0!important;max-width:100%!important;width:100%!important;min-width:0!important;box-sizing:border-box}
   .hero-title-card{padding:14px 18px 18px;min-width:0;min-height:76px;border-radius:14px;width:100%}
   .hero-headline{font-size:clamp(46px,13vw,64px);transform:translateY(-0.1em)}

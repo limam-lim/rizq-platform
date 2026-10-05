@@ -881,9 +881,30 @@ html body footer .footer-grid{
   gap:6px!important;
 }
 .nav-search-launch-ico{
-  font-size:16px;line-height:1;font-weight:700;color:var(--gold,#C9A84C);
+  font-size:16px;line-height:1;font-weight:800;color:var(--gold,#C9A84C);
+  -webkit-text-fill-color:var(--gold,#C9A84C);
 }
 .nav-search-launch-lbl{font-weight:700}
+
+/* هاتف/تابلت: أيقونات الأدوات أوضح (بحث · مفضلة · حسابي) */
+@media (max-width:1100px){
+  html.rizq-app-nav #nav .nav-start .nav-search-launch,
+  html.rizq-app-nav #nav .nav-start .nav-fav-btn,
+  html.rizq-app-nav #nav .nav-start #nav-account-btn{
+    border:1.5px solid rgba(201,168,76,.58)!important;
+    background:
+      linear-gradient(145deg,rgba(232,201,106,.16),transparent 55%),
+      rgba(15,23,42,.9)!important;
+  }
+  html.rizq-app-nav #nav .nav-search-launch .nav-search-launch-ico{
+    display:inline-block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    font-size:17px!important;
+    color:#E8C96A!important;
+    -webkit-text-fill-color:#E8C96A!important;
+  }
+}
 
 .rizq-search-theater{
   position:fixed;
