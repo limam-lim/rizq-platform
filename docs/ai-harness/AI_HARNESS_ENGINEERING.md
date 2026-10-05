@@ -4,6 +4,7 @@
 **Read before:** any implementation, planning, or code change  
 **Saved:** 2026-10-05  
 **Canonical path:** `docs/ai-harness/AI_HARNESS_ENGINEERING.md`  
+**User settings store (persistent):** `/cursor/stores/user/ai-harness/AI_HARNESS_ENGINEERING.md`  
 **Agent store mirror:** `/cursor/stores/self/ai-harness/AI_HARNESS_ENGINEERING.md`
 
 ## Scope (confirmed)
@@ -11,18 +12,19 @@
 This constitution applies to **every future task and every project**, not only Rizq.  
 Suspend only if the user explicitly overrides it for a specific request.
 
-## Prior-document search (2026-10-05)
+## Settings & prior-document search (2026-10-05)
 
-Searched for an earlier “AI Harness Engineering” document the user said was sent before:
+User asked to look in agent **settings** (where they previously requested storage).
 
 | Location | Result |
 |----------|--------|
-| Workspace / Rizq files (`docs/`, `*.md`, agent configs, prompts) | Not found |
-| Git history / branches / main tree | Only this session’s constitution commit |
-| Cloud agent transcripts / agent names | No prior harness constitution session found |
-| Agent store from earlier runs | Empty / unavailable |
+| `/cursor/stores/user/` (persistent user settings store) | **Was empty** — no prior harness file |
+| Cursor User Rules injected into this session | Present (frontend/comms/name) — **no** AI Harness text |
+| Agent notes / shared notes | Empty / not created |
+| Workspace / Rizq files, git history | Not found (except this session) |
+| Cloud agent transcripts | No prior harness constitution session |
 
-**Conclusion:** No earlier separate harness file was recoverable. This file is the single merged source of truth from the constitution the user sent in this session. If a longer prior harness document exists elsewhere (desktop chat, local notes), paste it and it will be merged here without replacing the SDD rules below.
+**Conclusion:** Nothing was stored in settings from the earlier request. This session’s constitution is now written into the user settings store at `/cursor/stores/user/ai-harness/AI_HARNESS_ENGINEERING.md`. If a longer prior harness document exists in Cursor Desktop Rules or another chat, paste it to merge.
 
 ---
 
