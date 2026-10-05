@@ -1224,7 +1224,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
 /* ════════════ TABLET 769–1280: شريطان مثل الهاتف (أدوات+شعار / رصيف الأقسام) ════════════ */
 @media (min-width:769px) and (max-width:1280px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:108px}
+  html.rizq-app-nav{--rizq-header-h:118px}
   html.rizq-app-nav #rizq-app-header,
   html.rizq-app-nav #rizq-app-header *{
     display:none !important;visibility:hidden !important;pointer-events:none !important;
@@ -1235,14 +1235,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:grid !important;
     grid-template-columns:1fr auto !important;
     grid-template-rows:auto auto !important;
-    height:var(--rizq-header-h,108px) !important;
-    max-height:var(--rizq-header-h,108px) !important;
-    min-height:var(--rizq-header-h,108px) !important;
+    height:auto !important;
+    max-height:none !important;
+    min-height:var(--rizq-header-h,118px) !important;
     align-items:center !important;
     align-content:center !important;
     column-gap:10px !important;
-    row-gap:6px !important;
-    padding:8px max(14px, env(safe-area-inset-left, 0px)) 8px max(14px, env(safe-area-inset-right, 0px)) !important;
+    row-gap:8px !important;
+    padding:10px max(14px, env(safe-area-inset-left, 0px)) 10px max(14px, env(safe-area-inset-right, 0px)) !important;
     overflow:visible !important;
     direction:ltr !important;
   }
@@ -1288,7 +1288,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-block !important;
     visibility:visible !important;
     opacity:1 !important;
-    font-size:18px !important;
+    font-size:15px !important;
     line-height:1 !important;
     color:#E8C96A !important;
     -webkit-text-fill-color:#E8C96A !important;
@@ -1395,16 +1395,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     grid-row:2 !important;
     justify-self:stretch !important;
     justify-content:center !important;
+    align-self:center !important;
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
-    padding:4px 10px !important;
+    padding:5px 10px 6px !important;
     gap:3px !important;
     border-radius:14px !important;
     overflow-x:auto !important;
     overflow-y:visible !important;
     max-height:none !important;
-    min-height:52px !important;
+    min-height:56px !important;
+    height:auto !important;
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    top:auto !important;
+    transform:none !important;
+    z-index:2 !important;
   }
   html.rizq-app-nav #nav > .nav-sticky-tools,
   html.rizq-app-nav #rizq-desk-nav > .nav-sticky-tools,
@@ -1487,10 +1495,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
-    padding-top:var(--rizq-header-h,108px) !important;
+    padding-top:var(--rizq-header-h,118px) !important;
   }
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:var(--rizq-header-h,108px) !important;
+    padding-top:var(--rizq-header-h,118px) !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,
