@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=28.1"/>
+  <link rel="stylesheet" href="rizq_header.css?v=29.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -776,6 +776,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right{
     position:fixed!important;inset:0!important;z-index:5200!important;
     height:auto;min-height:0;padding:12px;
+    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة */
+    padding-top:calc(var(--rizq-header-h,98px) + 14px)!important;
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 18px + env(safe-area-inset-bottom,0px))!important;
     display:none;overflow-y:auto!important;
     background:rgba(8,15,30,.6)!important;backdrop-filter:blur(6px);
   }
@@ -783,6 +786,13 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-wrap.has-detail .browse-right.tab-active,
   .browse-wrap.has-detail .browse-right.tab-hidden{
     display:flex!important;
+  }
+  .browse-wrap.has-detail .browse-right #detail-content,
+  .browse-wrap.has-detail .browse-right .dp-wrap{
+    margin-top:0;
+  }
+  .browse-wrap.has-detail .browse-right .dp-main-img{
+    scroll-margin-top:calc(var(--rizq-header-h,98px) + 14px);
   }
   .browse-right.tab-hidden{display:none}
   .browse-wrap.has-detail .browse-right.tab-hidden{display:flex!important}
@@ -962,9 +972,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     z-index:20 !important;
   }
   .nav-search select{display:none}
-  .dp-wrap{padding:14px 14px 32px}
+  .dp-wrap{padding:10px 12px 28px}
   .dp-gallery,.dp-gal-wrap{max-width:100%}
-  .dp-main-img{max-height:210px;aspect-ratio:16/10}
+  .dp-main-img{max-height:230px;aspect-ratio:16/10;margin-top:2px}
   .dp-title{font-size:18px}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
