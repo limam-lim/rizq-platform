@@ -2,16 +2,23 @@
 
 ## Operating mode
 
-Governed by the **AI Harness Engineering / Spec-Driven Development (SDD)** prompt for intelligent models in IDEs (Cursor, VS Code).
+Governed by a two-layer constitution:
+
+| Layer | Name | File |
+|-------|------|------|
+| **L0 Master** | Universal Enterprise & Engineering Master Constitution (`SOVEREIGN_FRAMEWORK`) | `MASTER_CONSTITUTION.md` |
+| **L1 IDE SDD** | AI Harness Engineering / Spec-Driven Development prompt | `docs/ai-harness/AI_HARNESS_ENGINEERING.md` |
 
 **Universal scope:** binds every future task and every project unless the user explicitly suspends it.
 
 Before any feature or change request:
 
-1. Read `docs/ai-harness/AI_HARNESS_ENGINEERING.md` (single source of truth)
-2. Read this file, `MEMORY.md`, and `docs/constitution.md`
-3. Do not write or modify application code until `spec.md`, `plan.md`, and `tasks.md` are approved
-4. Implement only one atomic task at a time, then stop and wait for the user
+1. Read `MASTER_CONSTITUTION.md` (L0)
+2. Read `docs/ai-harness/AI_HARNESS_ENGINEERING.md` (L1)
+3. Read this file, `MEMORY.md`, and `docs/constitution.md`
+4. Do not write or modify application code until `spec.md`, `plan.md`, and `tasks.md` are approved
+5. Implement only one atomic task at a time, then stop and wait for the user
+6. Obey circuit breakers immediately: `HALT`, `REVERT`, `AUDIT ONLY`
 
 ## Required artifacts (per change)
 
@@ -27,4 +34,5 @@ Before any feature or change request:
 - No premature implementation
 - No unsanitized new dependencies
 - No silent failures
+- No forced TypeScript migration on JS stacks without approval
 - No multi-task batches without user go-ahead after each task

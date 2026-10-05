@@ -1,10 +1,12 @@
 # Project Constitution
 
-Full SDD prompt: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
+**L0 Master:** `MASTER_CONSTITUTION.md` (alias: `SOVEREIGN_FRAMEWORK`)  
+**L1 IDE SDD prompt:** `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
 
-**What it is:** Operating prompt for intelligent models in IDEs (Cursor, VS Code) to enforce Spec-Driven Development (SDD).
+L0 = sovereign business + security + ops umbrella.  
+L1 = Spec-Driven Development operating prompt for intelligent models in Cursor / VS Code.
 
-**Applies to all future work and all projects.** Read that file before any implementation.
+**Applies to all future work and all projects.** Read both before any implementation.
 
 ## Absolute laws
 
@@ -13,10 +15,12 @@ Full SDD prompt: `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
 3. Separate presentation, pure business logic, and state/storage.
 4. Prefer pure, testable functions with explicit inputs/outputs.
 5. Do not install dependencies without constitution authorization or user approval.
+6. Problem-First + DDD + SSOT + Zero Trust + RBAC + secret isolation (see Master).
+7. Obey `HALT` / `REVERT` / `AUDIT ONLY` immediately.
 
 ## Mandatory 7-step SDD lifecycle
 
-1. Read `AGENTS.md`, `MEMORY.md`, `docs/constitution.md`, and `docs/ai-harness/AI_HARNESS_ENGINEERING.md`
+1. Read Master + L1 + `AGENTS.md` + `MEMORY.md` + this file
 2. Write `spec.md` (EARS)
 3. Clarify ambiguities — wait for resolution
 4. Write `plan.md`
