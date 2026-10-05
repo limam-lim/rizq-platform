@@ -2335,48 +2335,44 @@ main, .page-content.active, .main-content, .results-area,
   color:inherit;
   padding:20px 12px 16px;
   border-radius:16px;
-  background:linear-gradient(165deg,#0F2347 0%,#1B3A6B 55%,#0D1B2A 100%);
-  border:1.5px solid rgba(201,168,76,.28);
-  box-shadow:0 8px 22px rgba(13,27,42,.22);
-  transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease;
-  overflow:hidden;
+  background:transparent;
+  border:1.5px solid rgba(201,168,76,.45);
+  box-shadow:none;
+  transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease, background .28s ease;
+  overflow:visible;
   min-height:132px;
 }
-.vo-spec-portal::before{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(145deg,rgba(232,201,106,.1),transparent 55%);
-  pointer-events:none;
-}
+.vo-spec-portal::before{display:none}
 .vo-spec-portal:hover,
 .vo-spec-portal:focus-visible{
-  transform:translateY(-5px);
-  border-color:rgba(232,201,106,.7);
-  box-shadow:0 16px 36px rgba(13,27,42,.32),0 0 0 1px rgba(201,168,76,.35);
+  transform:translateY(-4px);
+  border-color:rgba(201,168,76,.85);
+  background:rgba(255,255,255,.55);
+  box-shadow:0 12px 28px rgba(13,27,42,.1),0 0 0 1px rgba(201,168,76,.2);
   outline:none;
 }
 .vo-spec-portal .cat-icon-box{
   margin:0 auto 10px;
   position:relative;
   z-index:1;
-  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  box-shadow:0 4px 14px rgba(27,58,107,.14);
 }
 .vo-spec-label{
   position:relative;z-index:1;
-  font-size:13px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:4px;
+  font-size:13px;font-weight:800;color:#0F2347;line-height:1.35;margin-bottom:4px;
 }
 .vo-spec-hint{
   position:relative;z-index:1;
-  font-size:11px;font-weight:600;color:#E8C96A;line-height:1.4;
+  font-size:11px;font-weight:700;color:#B8963E;line-height:1.4;
 }
 .vo-spec-enter{
   position:relative;z-index:1;
   margin-top:8px;
   font-size:10.5px;font-weight:700;letter-spacing:.3px;
-  color:rgba(255,255,255,.72);
+  color:rgba(15,35,71,.55);
   transition:color .2s ease;
 }
-.vo-spec-portal:hover .vo-spec-enter{color:#E8C96A}
+.vo-spec-portal:hover .vo-spec-enter{color:#0F2347}
 html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:scaleX(-1)}
 
 /* Why section */
