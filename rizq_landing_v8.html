@@ -2335,20 +2335,22 @@ main, .page-content.active, .main-content, .results-area,
   color:inherit;
   padding:20px 12px 16px;
   border-radius:16px;
-  background:transparent;
-  border:1.5px solid rgba(201,168,76,.45);
-  box-shadow:none;
+  background:transparent!important;
+  background-image:none!important;
+  border:1.5px solid rgba(201,168,76,.5)!important;
+  box-shadow:none!important;
   transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease, background .28s ease;
   overflow:visible;
   min-height:132px;
 }
-.vo-spec-portal::before{display:none}
+.vo-spec-portal::before,
+.vo-spec-portal::after{display:none!important;content:none!important}
 .vo-spec-portal:hover,
 .vo-spec-portal:focus-visible{
   transform:translateY(-4px);
-  border-color:rgba(201,168,76,.85);
-  background:rgba(255,255,255,.55);
-  box-shadow:0 12px 28px rgba(13,27,42,.1),0 0 0 1px rgba(201,168,76,.2);
+  border-color:rgba(201,168,76,.9)!important;
+  background:rgba(255,255,255,.65)!important;
+  box-shadow:0 12px 28px rgba(13,27,42,.1)!important;
   outline:none;
 }
 .vo-spec-portal .cat-icon-box{
