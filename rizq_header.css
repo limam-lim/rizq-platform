@@ -3716,6 +3716,65 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #rizq-thumb-dock .rizq-hdr-ico::before{display:none !important}
 }
 
+
+/* تابلت 769–1100: كبسولة الشريط أوضح وأصغر + أدوات أوضح */
+@media (min-width:769px) and (max-width:1100px) and (min-height:501px){
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    max-width:min(520px,72vw) !important;
+    width:auto !important;
+    margin-inline:auto !important;
+    justify-self:center !important;
+    gap:4px !important;
+    padding:4px 8px !important;
+    border-radius:999px !important;
+    border:1px solid rgba(201,168,76,.4) !important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),
+      rgba(8,14,28,.72) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(0,0,0,.2) !important;
+  }
+  html.rizq-app-nav #nav .nav-center a,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a,
+  html.rizq-app-nav #nav .nav-center .nav-link-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
+    padding:5px 8px !important;
+    font-size:11px !important;
+    gap:2px !important;
+  }
+  html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico{
+    font-size:14px !important;
+  }
+  html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl{
+    font-size:10px !important;
+    font-weight:800 !important;
+    color:rgba(255,255,255,.95) !important;
+  }
+  html.rizq-app-nav #nav .nav-start .nav-search-launch,
+  html.rizq-app-nav #nav .nav-start .nav-fav-btn,
+  html.rizq-app-nav #nav .nav-start #nav-account-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-search-launch,
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-start #nav-account-btn{
+    min-width:38px !important;
+    min-height:34px !important;
+    border:1.5px solid rgba(201,168,76,.58) !important;
+    border-radius:999px !important;
+    background:
+      linear-gradient(145deg,rgba(232,201,106,.16),transparent 55%),
+      rgba(15,23,42,.9) !important;
+  }
+  html.rizq-app-nav #nav .nav-search-launch .nav-search-launch-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-search-launch .nav-search-launch-ico{
+    display:inline-block !important;
+    font-size:16px !important;
+    color:#E8C96A !important;
+    -webkit-text-fill-color:#E8C96A !important;
+  }
+}
+
 /* شريط الإبهام: يظهر فقط عندما يضع JS الصنف rizq-phone-thumb-dock */
 html.rizq-app-nav:not(.rizq-phone-thumb-dock) #rizq-thumb-dock{
   display:none !important;
