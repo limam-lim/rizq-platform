@@ -54,6 +54,14 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   font-weight: 600 !important;
 }
 .section-header .section-tag {
+  color: #fff !important;
+}
+.section-header .section-tag span,
+.section-header h2 span {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light, #E8C96A));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent !important;
   color: var(--gold, #C9A84C) !important;
 }
 

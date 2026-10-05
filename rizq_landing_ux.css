@@ -103,6 +103,14 @@ html body footer .adminia-ft span[style*="font-weight:700"]{
   color:var(--text-on-navy-muted,rgba(255,255,255,.88))!important;
 }
 .section-header .section-tag{
+  color:#fff!important;
+}
+.section-header .section-tag span,
+.section-header h2 span{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light,#E8C96A));
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent!important;
   color:var(--gold,#C9A84C)!important;
 }
 .section-header h2{
