@@ -1719,10 +1719,17 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 ══════════════════════════════════ */
 .section{padding:80px 5%}
 .section-header{text-align:center;margin-bottom:52px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");background-blend-mode:overlay;border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:40px 5%;box-shadow:0 8px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}
-.section-tag{display:inline-block;color:var(--gold);font-size:10.5px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:14px;font-family:Georgia,'Times New Roman',serif}
-.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(26px,4vw,48px);font-weight:700;line-height:1.2;margin-bottom:14px;color:#fff}
-.section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.2vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px;color:#fff!important}
-.section-title span{background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-tag{display:inline-block;color:#fff;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:16px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
+.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,4.2vw,50px);font-weight:700;line-height:1.25;margin-bottom:14px;color:#fff}
+.section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,3.8vw,46px)!important;font-weight:700;line-height:1.3;margin-bottom:12px;color:#fff!important}
+.section-title span,
+.section-header h2 span,
+.section-tag span,
+.rzq-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  color:var(--gold);
+}
 .section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick):not(.rizq-srm-tick){
   color:rgba(255,255,255,.94)!important;font-size:15px;max-width:640px;margin:0 auto;line-height:1.8;font-weight:600;
   text-shadow:0 1px 2px rgba(0,0,0,.25);
@@ -3802,7 +3809,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
   <div class="section-header fade-in">
     <p class="section-tag" data-t="s-lst-tag">الإعلانات المميزة</p>
-    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">الإعلانات <span>المميزة</span> على رزق</h2>
+    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">الإعلانات المميزة على <span>رزق</span></h2>
     <p class="section-desc" data-t="s-lst-desc">المميزة تظهر أولاً وتثبت لمدة الباقة — مع إعلانات حيّة. الكل عبر صفحة الإعلانات.</p>
     <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
   </div>
@@ -3829,8 +3836,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <section id="virtual-stores" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
-      <p class="section-tag">Rizq Stores</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t="vs-title">افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك</h2>
+      <p class="section-tag">محلات <span>رزق</span></p>
+      <h2 data-t="vs-title">افتح محلك على <span>رزق</span> — واجهة كاملة لعملائك</h2>
       <p class="section-desc" data-t="vs-desc">
         صفحة تجارية باسمك: اعرض منتجاتك، ابنِ ثقة الزبائن، وتابع الزيارات والتواصل من لوحة واحدة.
       </p>
@@ -3871,7 +3878,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="rizq-styles-inner">
     <div class="section-header fade-in">
       <p class="section-tag">Style Ideas</p>
-      <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — <span>اقتراحات رزق</span></h2>
+      <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">أفكار أنماط — اقتراحات <span>رزق</span></h2>
       <p class="section-desc" data-t="sty-desc">أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة</p>
     </div>
     <div class="rizq-styles-toolbar">
@@ -3900,9 +3907,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
-      <p class="section-tag" style="color:var(--gold)">Rizq Showrooms</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t="vsh-title">
-        معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون
+      <p class="section-tag">معارض <span>رزق</span></p>
+      <h2 data-t="vsh-title">
+        معرضك على <span>رزق</span> — كتالوج فاخر ومشترون جادّون
       </h2>
       <p class="section-desc" data-t="vsh-desc">
         سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.
@@ -3956,7 +3963,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="rizq-styles-inner">
     <div class="section-header fade-in">
       <p class="section-tag">Showroom Models</p>
-      <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">نماذج المعارض — <span>اقتراحات رزق</span></h2>
+      <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">نماذج المعارض — اقتراحات <span>رزق</span></h2>
       <p class="section-desc" data-t="srm-desc">سيارات، أثاث، إلكترونيات ومعدات — نماذج مقترحة تتجدد كل 3 دقائق، مع رابط لدليل المعارض</p>
     </div>
     <div class="rizq-styles-toolbar">
@@ -3988,10 +3995,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <!-- شارة + عنوان + وصف -->
     <div class="section-header fade-in" style="text-align:center;margin-bottom:52px">
-      <p class="section-tag">Rizq Office</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(30px,4vw,52px);font-weight:800;margin-bottom:16px;line-height:1.25" data-t="vo-title">
-        <span style="color:#fff">مكتبك الاحترافي على رزق</span><br>
-        <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">يصل لطالبي الخدمة كل يوم</span>
+      <p class="section-tag">مكاتب <span>رزق</span></p>
+      <h2 data-t="vo-title">
+        مكتبك الاحترافي على <span>رزق</span> — يصل لطالبي الخدمة كل يوم
       </h2>
       <p class="section-desc vo-desc-text" data-t="vo-desc">
         أنشئ مكتباً افتراضياً يعرض خدماتك بوضوح، يتيح التواصل المباشر، ويجلب طلبات مهنية جديدة.
@@ -4099,9 +4105,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
-      <p class="section-tag" style="color:var(--gold)">Rizq Tenders</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des appels d'offres</span> de Rizq">
-        <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة المناقصات</span> على رزق
+      <p class="section-tag">مناقصات <span>رزق</span></p>
+      <h2 data-t="vt-title">
+        غرفة المناقصات على <span>رزق</span>
       </h2>
       <p class="section-desc" data-t-fr="Publiez votre besoin et recevez des offres privées — marché B2B réservé aux abonnés.">
         انشر احتياجك واستقبل عروض أسعار خاصة — سوق أعمال مخصّص للمشتركين.
@@ -4162,9 +4168,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:48px">
-      <p class="section-tag" style="color:var(--gold)">Rizq Investments</p>
-      <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(26px,3.4vw,42px);font-weight:700;margin-bottom:14px;color:var(--royal,#1B3A6B)" data-t-fr="La <span style='background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text'>salle des investissements</span>">
-        <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">غرفة الاستثمارات</span> على رزق
+      <p class="section-tag">استثمارات <span>رزق</span></p>
+      <h2 data-t="vi-title">
+        غرفة الاستثمارات على <span>رزق</span>
       </h2>
       <p class="section-desc" data-t-fr="Présentez votre projet, trouvez des partenaires — espace sérieux pour opportunités réelles.">
         اعرض مشروعك الاستثماري وابحث عن شركاء في فضاء جاد للفرص الحقيقية.
@@ -4211,8 +4217,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
     <div class="section-header fade-in" style="text-align:center;margin-bottom:36px">
-      <p class="section-tag" style="color:var(--gold)">Live on Rizq</p>
-      <h2 data-t-fr="🔥 Actif maintenant sur Rizq">🔥 نشِط الآن على رزق</h2>
+      <p class="section-tag">نشط على <span>رزق</span></p>
+      <h2 data-t-fr="🔥 Actif maintenant sur <span>Rizq</span>">🔥 نشِط الآن على <span>رزق</span></h2>
     </div>
 
     <!-- ⏳ ينتهي قريباً -->
@@ -4310,7 +4316,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
   </div>
   <div class="section-header fade-in">
-    <p class="section-tag">لماذا رزق؟</p>
+    <p class="section-tag">لماذا <span>رزق</span>؟</p>
     <h2 class="section-title" data-t="s-why-title">لماذا يثق الناس بـ<span>رزق؟</span></h2>
     <p class="section-desc" data-t="s-why-desc">منصة متكاملة للإعلانات والمحلات والمعارض والمناقصات والاستثمارات — بمعايير واضحة وثقة موريتانية</p>
   </div>
@@ -7826,7 +7832,7 @@ const LANG = {
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
     'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-company': 'الشركة المالكة',
-    'vsh-title': 'معرضك على <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">رزق</span> — كتالوج فاخر ومشترون جادّون',
+    'vsh-title': 'معرضك على <span>رزق</span> — كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات، إلكترونيات، أثاث ومعدات — اعرض وحداتك بالتفصيل وتواصل مع المشترين بأمان عبر المنصة.',
     'vsh-btn1': '🚘 انضم بمعرضك الآن', 'vsh-btn2': '👁 عرض نموذج معرض',
     'vsh-card1-title': 'كتالوج كامل بالتفاصيل', 'vsh-card1-desc': 'صور، موديل، سنة، وسعر — المشتري يطّلع ويقارن قبل أن يراسلَك',
@@ -7844,13 +7850,13 @@ const LANG = {
     'cta-hub-hint-stores': 'بيع وتسوّق يومي', 'cta-hub-hint-offices': 'خدمات مهنية', 'cta-hub-hint-showrooms': 'عروض راقية', 'cta-hub-hint-tenders': 'فرص أعمال', 'cta-hub-hint-investments': 'نمو مدروس',
     'cta-chip1': '✓ مجاني للبدء', 'cta-chip2': '✓ مناقصات واستثمارات بحذر', 'cta-chip3': '✓ ثقة وأمان من أول خطوة',
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
-    'vs-title': 'افتح <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محلك على رزق</span> — واجهة كاملة لعملائك',
+    'vs-title': 'افتح محلك على <span>رزق</span> — واجهة كاملة لعملائك',
     'vs-desc': 'صفحة تجارية باسمك: اعرض منتجاتك، ابنِ ثقة الزبائن، وتابع الزيارات والتواصل من لوحة واحدة.',
     'vs-btn1': '🏪 افتح محلك الآن', 'vs-btn2': '👁 عرض نموذج محل',
     'vs-card1-title': 'واجهة احترافية لمحلك', 'vs-card1-desc': 'شعار، اسم تجاري، وموقعك — حضور واضح يبني ثقة الزبون من أول زيارة',
     'vs-card2-title': 'كتالوج منظم بالصور', 'vs-card2-desc': 'منتجاتك بأسعار وصور واضحة — يتصفّحها الزبون بسهولة قبل التواصل',
     'vs-card3-title': 'متابعة واضحة لنمو محلك', 'vs-card3-desc': 'زيارات وتواصلات في مكان واحد — لتعرف ما ينجح وتطوّر عرضك',
-    'vo-title': '<span style="color:#fff">مكتبك الاحترافي على رزق</span><br><span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">يصل لطالبي الخدمة كل يوم</span>',
+    'vo-title': 'مكتبك الاحترافي على <span>رزق</span> — يصل لطالبي الخدمة كل يوم',
     'vo-desc': 'أنشئ مكتباً افتراضياً يعرض خدماتك بوضوح، يتيح التواصل المباشر، ويجلب طلبات مهنية جديدة.',
     'vo-cat1': 'وكالات التأمين', 'vo-cat2': 'الإجراءات الإدارية', 'vo-cat3': 'المكاتب العقارية',
     'vo-cat4': 'المحامون والموثقون', 'vo-cat5': 'الخدمات الإدارية', 'vo-cat6': 'استشارات أعمال',
@@ -7859,6 +7865,8 @@ const LANG = {
     'vo-feat3-title': 'شارة مكتب موثّق', 'vo-feat3-desc': 'شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك',
     'vo-feat4-title': 'خدماتك معروضة بوضوح', 'vo-feat4-desc': 'قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة',
     'vo-btn1': '📒 أنشئ مكتبك الآن', 'vo-btn2': '👁 عرض نموذج مكتب',
+    'vt-title': 'غرفة المناقصات على <span>رزق</span>',
+    'vi-title': 'غرفة الاستثمارات على <span>رزق</span>',
     'vt-btn2': '👁 عرض نموذج غرفة المناقصات',
     'vi-btn2': '👁 عرض نموذج غرفة الاستثمارات',
     'hero-badge': 'السوق الإلكتروني الموريتاني',
@@ -7888,7 +7896,7 @@ const LANG = {
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'أقسام دقيقة تغطي السوق الموريتاني — من الدراعة إلى السيارة',
     's-lst-tag': 'الإعلانات المميزة',
-    's-lst-title': 'الإعلانات <span>المميزة</span> على رزق',
+    's-lst-title': 'الإعلانات المميزة على <span>رزق</span>',
     's-lst-desc': 'المميزة تظهر أولاً وتثبت لمدة الباقة — مع إعلانات حيّة. الكل عبر صفحة الإعلانات.',
     'view-all': 'عرض الكل في نافذة ←',
     'browse-full': '📂 عرض كل الإعلانات ←',
@@ -7919,7 +7927,7 @@ const LANG = {
     'ft-sig': '<span>بتوقيع</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
-    'sty-title': 'أفكار أنماط — <span>اقتراحات رزق</span>',
+    'sty-title': 'أفكار أنماط — اقتراحات <span>رزق</span>',
     'sty-desc': 'أزياء وملابس وإكسسوارات فقط — يتجدد كل 3 دقائق، أو عند فتح منتج أناقة فتظهر صوره مع الإطلالة',    'sty-reshuffle': '🔀 اقتراحات جديدة',
     'sty-men': 'رجال',
     'sty-women': 'نساء',
@@ -7927,7 +7935,7 @@ const LANG = {
     'sty-girls': 'بنات',
     'sty-cta': 'تسوّق الإطلالة',
     'sty-from-view': 'من مشاهدتك',
-    'srm-title': 'نماذج المعارض — <span>اقتراحات رزق</span>',
+    'srm-title': 'نماذج المعارض — اقتراحات <span>رزق</span>',
     'srm-desc': 'سيارات، أثاث، إلكترونيات ومعدات — نماذج مقترحة تتجدد كل 3 دقائق، مع رابط لدليل المعارض',
     'srm-reshuffle': '🔀 نماذج جديدة',
     'srm-cars': 'سيارات',
@@ -7946,7 +7954,7 @@ const LANG = {
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — le marché électronique mauritanien des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
     'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms', 'nav-tenders': 'A-doffres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
-    'vsh-title': 'Votre showroom sur <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Rizq</span> — catalogue premium, acheteurs sérieux',
+    'vsh-title': 'Votre showroom sur <span>Rizq</span> — catalogue premium, acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements — présentez chaque unité en détail et échangez en sécurité via la plateforme.',
     'vsh-btn1': '🚘 Rejoignez avec votre showroom', 'vsh-btn2': '👁 Voir un exemple',
     'vsh-card1-title': 'Catalogue complet et détaillé', 'vsh-card1-desc': 'Photos, modèle, année et prix — l\'acheteur consulte et compare avant de vous écrire',
@@ -7964,13 +7972,13 @@ const LANG = {
     'cta-hub-hint-stores': 'Vente au quotidien', 'cta-hub-hint-offices': 'Services pro', 'cta-hub-hint-showrooms': 'Offres premium', 'cta-hub-hint-tenders': 'Opportunités', 'cta-hub-hint-investments': 'Croissance',
     'cta-chip1': '✓ Gratuit pour commencer', 'cta-chip2': '✓ Appels d\'offres & investissements prudents', 'cta-chip3': '✓ Confiance et sécurité dès le départ',
     'cta-trust1': 'Confiance', 'cta-trust2': 'Sécurité', 'cta-trust3': 'Transparence',
-    'vs-title': 'Ouvrez <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">votre boutique sur Rizq</span> — une vitrine complète pour vos clients',
+    'vs-title': 'Ouvrez votre boutique sur <span>Rizq</span> — une vitrine complète pour vos clients',
     'vs-desc': 'Une page commerciale à votre nom : présentez vos produits, gagnez la confiance, et suivez visites et contacts depuis un seul tableau de bord.',
     'vs-btn1': '🏪 Ouvrez votre boutique maintenant', 'vs-btn2': '👁 Voir un exemple de boutique',
     'vs-card1-title': 'Une vitrine professionnelle', 'vs-card1-desc': 'Logo, nom commercial et emplacement — une présence claire qui inspire confiance dès la première visite',
     'vs-card2-title': 'Catalogue photo organisé', 'vs-card2-desc': 'Vos produits avec prix et photos — le client consulte facilement avant de vous contacter',
     'vs-card3-title': 'Un suivi clair pour progresser', 'vs-card3-desc': 'Visites et contacts au même endroit — comprenez ce qui marche et améliorez votre offre',
-    'vo-title': '<span style="color:#fff">Votre bureau pro sur Rizq</span><br><span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">atteint ceux qui cherchent un service</span>',
+    'vo-title': 'Votre bureau pro sur <span>Rizq</span> — atteint ceux qui cherchent un service',
     'vo-desc': 'Créez un bureau virtuel qui présente clairement vos services, facilite le contact direct et attire de nouvelles demandes professionnelles.',
     'vo-cat1': "Agences d'assurance", 'vo-cat2': 'Démarches admin.', 'vo-cat3': 'Agences immobilières',
     'vo-cat4': 'Avocats & notaires', 'vo-cat5': 'Services admin.', 'vo-cat6': 'Conseil aux entreprises',
@@ -7979,6 +7987,8 @@ const LANG = {
     'vo-feat3-title': 'Badge Bureau certifié', 'vo-feat3-desc': 'Un badge or sur Rizq qui inspire immédiatement confiance à vos clients',
     'vo-feat4-title': 'Vos services bien présentés', 'vo-feat4-desc': 'Une liste claire de ce que vous offrez — le client choisit et vous contacte directement',
     'vo-btn1': '📒 Créez votre bureau maintenant', 'vo-btn2': '👁 Voir un exemple de bureau',
+    'vt-title': 'La salle des appels d\'offres sur <span>Rizq</span>',
+    'vi-title': 'La salle des investissements sur <span>Rizq</span>',
     'vt-btn2': '👁 Voir un aperçu de la salle des appels d\'offres',
     'vi-btn2': '👁 Voir un aperçu de la salle des investissements',
     'hero-badge': 'Le marché en ligne mauritanien',
@@ -8008,7 +8018,7 @@ const LANG = {
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'Des catégories précises pour le marché mauritanien — de la daraa à la voiture',
     's-lst-tag': 'Annonces en vedette',
-    's-lst-title': 'Annonces <span>en vedette</span> sur Rizq',
+    's-lst-title': 'Annonces en vedette sur <span>Rizq</span>',
     's-lst-desc': 'Les vedettes restent en tête selon la durée du forfait — avec des offres live. Tout voir sur la page Annonces.',
     'view-all': 'Tout voir en fenêtre →',
     'browse-full': '📂 Voir toutes les annonces →',
@@ -8039,7 +8049,7 @@ const LANG = {
     'ft-sig': '<span>Signé par</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
-    'sty-title': 'Idées de style — <span>suggestions Rizq</span>',
+    'sty-title': 'Idées de style — suggestions <span>Rizq</span>',
     'sty-desc': 'Mode, vêtements et accessoires uniquement — se renouvelle toutes les 3 minutes, ou quand vous ouvrez un article de style',    'sty-reshuffle': '🔀 Nouvelles suggestions',
     'sty-men': 'Hommes',
     'sty-women': 'Femmes',
@@ -8047,7 +8057,7 @@ const LANG = {
     'sty-girls': 'Filles',
     'sty-cta': 'Voir le look',
     'sty-from-view': 'Vu récemment',
-    'srm-title': 'Modèles showroom — <span>suggestions Rizq</span>',
+    'srm-title': 'Modèles showroom — suggestions <span>Rizq</span>',
     'srm-desc': 'Voitures, meubles, électronique et équipements — modèles suggérés toutes les 3 minutes, avec lien vers le guide des showrooms',
     'srm-reshuffle': '🔀 Nouveaux modèles',
     'srm-cars': 'Voitures',
@@ -8429,21 +8439,23 @@ function applyLandingLang(toAr) {
   const catsTag = document.querySelector('#categories .section-tag');
   if(catsTag) catsTag.textContent = isAr ? 'جميع الأقسام' : 'Toutes les Catégories';
   const whyTag = document.querySelector('.why-section .section-tag');
-  if(whyTag) whyTag.textContent = isAr ? 'لماذا رزق؟' : 'Pourquoi Rizq?';
+  if(whyTag) whyTag.innerHTML = isAr ? 'لماذا <span>رزق</span>؟' : 'Pourquoi <span>Rizq</span>?';
   const priceTag = document.querySelector('.pricing-section .section-tag');
   if(priceTag) priceTag.textContent = isAr ? 'خطط الاشتراك' : 'Nos Offres';
   const pulseTag = document.querySelector('#prices .section-tag');
   if(pulseTag) pulseTag.textContent = isAr ? '📊 نبضة السوق · Rizq Market Pulse' : '📊 Rizq Market Pulse';
   const storesTag = document.querySelector('#virtual-stores .section-tag');
-  if(storesTag) storesTag.textContent = isAr ? 'محلات رزق' : 'Boutiques Rizq';
+  if(storesTag) storesTag.innerHTML = isAr ? 'محلات <span>رزق</span>' : 'Boutiques <span>Rizq</span>';
   const officesTag = document.querySelector('#virtual-offices .section-tag');
-  if(officesTag) officesTag.textContent = isAr ? 'مكاتب رزق' : 'Bureaux Rizq';
+  if(officesTag) officesTag.innerHTML = isAr ? 'مكاتب <span>رزق</span>' : 'Bureaux <span>Rizq</span>';
   const showroomsTag = document.querySelector('#virtual-showrooms .section-tag');
-  if(showroomsTag) showroomsTag.textContent = isAr ? 'معارض رزق' : 'Showrooms Rizq';
+  if(showroomsTag) showroomsTag.innerHTML = isAr ? 'معارض <span>رزق</span>' : 'Showrooms <span>Rizq</span>';
   const tendersTag = document.querySelector('#virtual-tenders .section-tag');
-  if(tendersTag) tendersTag.textContent = isAr ? 'مناقصات رزق' : 'Appels d\'offres Rizq';
+  if(tendersTag) tendersTag.innerHTML = isAr ? 'مناقصات <span>رزق</span>' : 'Appels d\'offres <span>Rizq</span>';
+  const investmentsTag = document.querySelector('#virtual-investments .section-tag');
+  if(investmentsTag) investmentsTag.innerHTML = isAr ? 'استثمارات <span>رزق</span>' : 'Investissements <span>Rizq</span>';
   const liveTag = document.querySelector('#rizq-live-activity .section-tag');
-  if(liveTag) liveTag.textContent = isAr ? 'نشط على رزق' : 'Actif sur Rizq';
+  if(liveTag) liveTag.innerHTML = isAr ? 'نشط على <span>رزق</span>' : 'Actif sur <span>Rizq</span>';
   const allAdsTag = document.querySelector('#all-ads-modal .section-tag');
   if(allAdsTag) allAdsTag.textContent = isAr ? 'كل الإعلانات' : 'Toutes les annonces';
   const stylesTag = document.querySelector('#rizq-styles .section-tag');
@@ -8693,7 +8705,7 @@ try { /* remaining-static-i18n */
   const viewAllBtn = document.querySelector('[data-t="view-all"]');
   if(viewAllBtn) viewAllBtn.textContent = isAr ? 'عرض الكل في نافذة ←' : 'Tout voir en fenêtre →';
   const browseFullBtn = document.querySelector('[data-t="browse-full"]');
-  if(browseFullBtn) browseFullBtn.textContent = isAr ? '📂 فتح صفحة الإعلانات كاملة ←' : '📂 Ouvrir la page Annonces complète →';
+  if(browseFullBtn) browseFullBtn.textContent = isAr ? '📂 عرض كل الإعلانات ←' : '📂 Voir toutes les annonces →';
   if(typeof buildLandingAds === 'function') buildLandingAds(false);
 
   // Featured listing hover copy — only translate nodes that exist from live data
