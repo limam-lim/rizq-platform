@@ -646,10 +646,11 @@ body.rizq-lang-ar .hero-lead-row{
 }
 @media(max-width:768px){
   .hero-tagline{
-    font-size:clamp(8.5px,2.2vw,11px)!important;
-    letter-spacing:-.15px!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
+    font-size:clamp(11px,3.1vw,13px)!important;
+    letter-spacing:0!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    line-height:1.45!important;
   }
 }
 
@@ -1100,7 +1101,8 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 .hero-vid-cta-sep{display:none}
 @media(max-width:640px){
-  .hero-vid-wrap{margin:0 auto 12px;padding:6px;border-radius:14px;max-width:min(92%,520px)}
+  .hero-earth-band .hero-vid-wrap,
+  .hero-vid-wrap{margin:0;padding:6px;border-radius:14px;max-width:none;width:100%}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
   .hero-vid-ph-icon{font-size:38px}
   .hero-vid-ph-line1{font-size:13px}
@@ -1274,6 +1276,59 @@ body.rizq-lang-fr .hero-biz-nav{
 }
 
 /* ── HERO PRIMARY CTA (تحويل: متجر أو إعلان مجاني) ── */
+/* شريط ترابي يوحّد زر التحويل + النص المصغّر + شاشة Rizq ADS بنفس الحواف */
+.hero-earth-band{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:12px;
+  padding:14px 12px 12px;
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%,rgba(255,248,224,.55),transparent 60%),
+    linear-gradient(165deg,#f0e0b8 0%,#e6d09a 42%,#dcc48a 100%);
+  border:1.5px solid rgba(201,168,76,.42);
+  box-shadow:
+    0 10px 28px rgba(120,90,30,.12),
+    inset 0 1px 0 rgba(255,255,255,.55);
+  position:relative;
+  z-index:55;
+  animation:fadeUp .8s .32s ease both;
+}
+.hero-earth-band .hero-cta-wrap{
+  max-width:none;
+  width:100%;
+  margin:0;
+  animation:none;
+  gap:10px;
+}
+.hero-earth-band .hero-cta-micro{
+  color:#3a2e12;
+  opacity:1;
+  text-align:center;
+  padding:0 6px;
+  max-width:100%;
+}
+.hero-earth-band .hero-vid-wrap{
+  width:100%;
+  max-width:none;
+  margin:0;
+  animation:none;
+}
+/* تغلب على قيود 78vw/92% حتى تبقى شاشة الإعلان داخل الشريط الترابي */
+html[dir="ltr"] .hero-earth-band .hero-vid-wrap,
+html[lang="fr"] .hero-earth-band .hero-vid-wrap,
+body.rizq-lang-fr .hero-earth-band .hero-vid-wrap,
+html[dir="rtl"] .hero-earth-band .hero-vid-wrap,
+html[lang="ar"] .hero-earth-band .hero-vid-wrap,
+body.rizq-lang-ar .hero-earth-band .hero-vid-wrap{
+  width:100%;
+  max-width:none;
+  margin:0;
+}
 .hero-cta-wrap{
   display:flex;flex-direction:column;align-items:center;gap:8px;
   max-width:780px;margin:0 auto;width:100%;
@@ -2161,8 +2216,44 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-content{padding-top:44px;width:94%}
   .hero-headline{font-size:clamp(46px,13vw,64px)}
   .hero-title-card{padding:14px 18px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
-  .hero-lead-row{width:100%}
-  .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
+  /* صف العلامة + البطاقة الإعلانية + المسرح — نفس العرض والحواف على الهاتف */
+  .hero-brand-row{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    margin:0 auto 12px!important;box-sizing:border-box;
+  }
+  .hero-brand-row .hero-eyebrow{
+    width:100%!important;max-width:100%!important;
+    box-sizing:border-box;overflow:hidden;
+    padding:9px 12px!important;min-height:0;
+  }
+  .hero-brand-row .hero-eyebrow span{
+    font-size:clamp(11.5px,3.2vw,13.5px)!important;
+    white-space:normal!important;line-height:1.35!important;
+    text-align:center;
+  }
+  .hero-lead-row{
+    width:100%!important;max-width:100%!important;
+    margin:0 auto 12px!important;box-sizing:border-box;
+  }
+  .hero-subtitle-card{padding:16px 14px 14px!important;overflow:hidden}
+  .hero-subtitle-primary,
+  .hero-subtitle-secondary{
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+  }
+  .hero-stage{
+    width:100%!important;max-width:100%!important;
+    margin-top:10px;padding:14px 10px 10px;gap:14px;border-radius:20px;
+    box-sizing:border-box;
+  }
+  .hero-tagline{
+    white-space:normal!important;
+    overflow:hidden!important;
+    font-size:clamp(11px,3.1vw,13px)!important;
+    line-height:1.45!important;
+    letter-spacing:0!important;
+    padding-inline:4px;
+  }
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
   .hero-spaces-sub{font-size:12.5px}
   .hero-browse-panel{padding:5px 8px!important;border-radius:12px}
@@ -2171,7 +2262,18 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-browse-panel .hero-search{margin:0 auto 4px!important}
   .hero-browse-panel .search-cat-select{height:32px!important;min-width:84px!important;font-size:11px!important}
   .hero-browse-panel .btn-search-main{height:32px!important;padding:0 12px!important;font-size:12.5px!important}
-  .hero-vid-wrap{width:100%;max-width:min(92%,520px);margin:0 auto 4px;padding:6px}
+  /* الشريط الترابي + شاشة الإعلان — حواف موحّدة بعرض المسرح كاملاً */
+  .hero-earth-band{
+    width:100%!important;max-width:100%!important;
+    padding:12px 10px 10px;gap:10px;border-radius:16px;
+    box-sizing:border-box;
+  }
+  .hero-earth-band .hero-vid-wrap,
+  .hero-vid-wrap{
+    width:100%!important;max-width:none!important;
+    margin:0!important;padding:6px;border-radius:14px;
+    box-sizing:border-box;
+  }
   .hero-vid-compact .hero-vid-inner,
   .hero-vid-wrap .hero-vid-inner{aspect-ratio:16/9;max-height:min(42vh,320px)}
   .hero-vid-badge{font-size:9.5px;padding:5px 14px}
@@ -2185,7 +2287,8 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-label{white-space:normal;text-align:center;font-size:12.5px}
   .hero-biz-hint{white-space:normal;font-size:9.5px}
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
-  .hero-cta-wrap{margin:0 auto}
+  .hero-earth-band .hero-cta-wrap,
+  .hero-cta-wrap{margin:0;width:100%;max-width:none}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
   /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
      direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
@@ -3769,51 +3872,53 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
       </section>
 
-      <!-- 3) تحويل أساسي -->
-      <div class="hero-cta-wrap">
-        <button type="button" class="hero-cta-primary" onclick="goToPost()">
-          <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
-        </button>
-        <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
-      </div>
+      <!-- 3–4) شريط ترابي موحّد: التحويل + النص + شاشة Rizq ADS بنفس الحواف -->
+      <div class="hero-earth-band">
+        <div class="hero-cta-wrap">
+          <button type="button" class="hero-cta-primary" onclick="goToPost()">
+            <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
+          </button>
+          <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
+        </div>
 
-      <!-- 4) Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
-      <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
-        <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
-        <div class="hero-vid-inner" id="hero-vid-inner">
-          <video id="hero-featured-vid" autoplay muted loop playsinline></video>
-          <div class="hero-vid-ph" id="hero-vid-ph">
-            <div class="hero-vid-ph-film-bar top"></div>
-            <div class="hero-vid-ph-film-bar bot"></div>
-            <div class="hero-vid-ph-corner tl"></div>
-            <div class="hero-vid-ph-corner tr"></div>
-            <div class="hero-vid-ph-corner bl"></div>
-            <div class="hero-vid-ph-corner br"></div>
-            <div class="hero-vid-ph-scan"></div>
-            <div class="hero-vid-ph-live"><div class="hero-vid-ph-live-dot"></div>LIVE · RIZQ ADS</div>
-            <div class="hero-vid-ph-body">
-              <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري</div>
-              <div class="hero-vid-ph-h1">إعلانك هنا<em>أمام كل زائر</em></div>
-              <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS</div>
-              <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع</a>
+        <!-- Rizq ADS — عرض ترويجي بملء عرض الشريط الترابي -->
+        <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
+          <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
+          <div class="hero-vid-inner" id="hero-vid-inner">
+            <video id="hero-featured-vid" autoplay muted loop playsinline></video>
+            <div class="hero-vid-ph" id="hero-vid-ph">
+              <div class="hero-vid-ph-film-bar top"></div>
+              <div class="hero-vid-ph-film-bar bot"></div>
+              <div class="hero-vid-ph-corner tl"></div>
+              <div class="hero-vid-ph-corner tr"></div>
+              <div class="hero-vid-ph-corner bl"></div>
+              <div class="hero-vid-ph-corner br"></div>
+              <div class="hero-vid-ph-scan"></div>
+              <div class="hero-vid-ph-live"><div class="hero-vid-ph-live-dot"></div>LIVE · RIZQ ADS</div>
+              <div class="hero-vid-ph-body">
+                <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري</div>
+                <div class="hero-vid-ph-h1">إعلانك هنا<em>أمام كل زائر</em></div>
+                <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS</div>
+                <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع</a>
+              </div>
+            </div>
+            <div class="hero-vid-ctrl">
+              <button type="button" class="hero-vid-fs-btn" id="hero-vid-fs-btn" onclick="toggleHeroVidFullscreen()" title="شاشة كاملة" aria-label="شاشة كاملة">⛶</button>
+              <button type="button" class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
             </div>
           </div>
-          <div class="hero-vid-ctrl">
-            <button type="button" class="hero-vid-fs-btn" id="hero-vid-fs-btn" onclick="toggleHeroVidFullscreen()" title="شاشة كاملة" aria-label="شاشة كاملة">⛶</button>
-            <button type="button" class="hero-vid-sound-btn" id="hero-vid-sound-btn" onclick="toggleHeroVidSound()" title="تشغيل / إيقاف الصوت" aria-label="الصوت">🔇</button>
+          <div class="hero-vid-meta" id="hero-vid-meta">
+            <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
+              <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
+              <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
+            </div>
+            <div class="hero-vid-views" id="hero-vid-views"></div>
           </div>
-        </div>
-        <div class="hero-vid-meta" id="hero-vid-meta">
-          <div class="hero-vid-adv-bar" id="hero-vid-adv-bar">
-            <div class="hero-vid-adv-name" id="hero-vid-adv-name"></div>
-            <div class="hero-vid-adv-loc" id="hero-vid-adv-loc"></div>
+          <div class="hero-vid-cta-bar">
+            <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
+            <span class="hero-vid-cta-sep">·</span>
+            <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
           </div>
-          <div class="hero-vid-views" id="hero-vid-views"></div>
-        </div>
-        <div class="hero-vid-cta-bar">
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
-          <span class="hero-vid-cta-sep">·</span>
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
         </div>
       </div>
 
