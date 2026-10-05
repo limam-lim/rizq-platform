@@ -45,7 +45,231 @@
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
+/* وضع تحريري فاخر للرئيسية — قابل للرجوع بـ ?classic=1 دون حذف البناء السابق */
+(function () {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('classic') === '1' || p.get('classic') === 'true') {
+      document.documentElement.classList.remove('landing-editorial');
+      document.documentElement.classList.add('landing-classic');
+    } else {
+      document.documentElement.classList.add('landing-editorial');
+    }
+  } catch (e) {
+    document.documentElement.classList.add('landing-editorial');
+  }
+})();
 </script>
+<style id="rizq-editorial-landing">
+/* ══ أقصى فخامة تحريرية — الكحلي الملكي (#1B3A6B) والذهبي ثابتان؛ البناء الطويل يبقى عبر ?classic=1 ══ */
+html.landing-editorial #virtual-stores,
+html.landing-editorial #virtual-showrooms,
+html.landing-editorial #virtual-offices,
+html.landing-editorial #virtual-tenders,
+html.landing-editorial #virtual-investments,
+html.landing-editorial #rizq-styles,
+html.landing-editorial #rizq-showroom-models,
+html.landing-editorial #prices,
+html.landing-editorial #pricing,
+html.landing-editorial #categories,
+html.landing-editorial #rvid-section,
+html.landing-editorial #rizq-live-activity,
+html.landing-editorial #hero-listings,
+html.landing-editorial .hero-spaces,
+html.landing-editorial #about .why-grid,
+html.landing-editorial #about .section-header{
+  display:none!important;
+}
+html:not(.landing-editorial) #rizq-portals{display:none!important}
+
+/* هيرو أكثر حضوراً وفخامة */
+html.landing-editorial .hero{
+  min-height:92vh;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, rgba(27,58,107,.14), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 80%, rgba(201,168,76,.06), transparent 50%),
+    var(--bg-page);
+}
+html.landing-editorial .hero-headline{
+  font-size:clamp(64px,9vw,96px)!important;
+  letter-spacing:-1px;
+  text-shadow:0 8px 40px rgba(27,58,107,.12);
+}
+html.landing-editorial .hero-title-card{
+  padding:8px 0 4px;
+}
+html.landing-editorial .hero-browse-panel{
+  margin-top:8px!important;
+  border:1px solid rgba(27,58,107,.12)!important;
+  box-shadow:0 18px 50px rgba(13,27,42,.08)!important;
+  background:linear-gradient(180deg,#fff,rgba(248,250,255,.96))!important;
+}
+html.landing-editorial .hero-vid-wrap{
+  margin-top:18px!important;
+  border-radius:20px!important;
+  overflow:hidden;
+  box-shadow:0 24px 60px rgba(13,27,42,.18);
+  border:1px solid rgba(201,168,76,.28);
+}
+
+/* معرض الإعلانات — إيقاع أوسع */
+html.landing-editorial #listings{
+  padding:48px 5% 36px!important;
+  background:
+    linear-gradient(180deg, #fff 0%, #f7f9fd 100%);
+}
+html.landing-editorial #listings .section-header{margin-bottom:20px!important}
+html.landing-editorial #listings .section-title{
+  font-family:'Noto Naskh Arabic',serif!important;
+  font-size:clamp(26px,3.2vw,40px)!important;
+  color:var(--royal)!important;
+}
+html.landing-editorial #listings .landing-ads-filters{margin-bottom:18px!important}
+html.landing-editorial #listings .landing-ads-grid{
+  gap:16px!important;
+}
+html.landing-editorial #listings .listing-card{
+  border:1px solid rgba(27,58,107,.1)!important;
+  box-shadow:0 10px 28px rgba(13,27,42,.06)!important;
+  transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease!important;
+}
+html.landing-editorial #listings .listing-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(201,168,76,.45)!important;
+  box-shadow:0 18px 40px rgba(13,27,42,.12)!important;
+}
+
+/* من نحن — ختم واحد فاخر */
+html.landing-editorial #about.why-section,
+html.landing-editorial .why-section{
+  padding:56px 5% 48px!important;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(27,58,107,.06), transparent 60%),
+    #fff!important;
+}
+html.landing-editorial #about .about-intro{
+  margin:0 auto!important;
+  max-width:760px!important;
+}
+html.landing-editorial #about .about-intro > div[style*="border-radius:28px"],
+html.landing-editorial #about .about-intro > div{
+  border:1px solid rgba(201,168,76,.28)!important;
+  box-shadow:0 20px 60px rgba(27,58,107,.08)!important;
+  background:linear-gradient(165deg,#fffdf5,#fff)!important;
+}
+html.landing-editorial .cta-section{padding:48px 5% 56px!important}
+
+/* بوابات القصر — كحلي ملكي + ذهب */
+.rizq-portals{
+  position:relative;
+  padding:64px 5% 72px;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(201,168,76,.14), transparent 50%),
+    radial-gradient(ellipse 40% 40% at 0% 100%, rgba(35,77,143,.35), transparent 55%),
+    radial-gradient(ellipse 40% 40% at 100% 100%, rgba(201,168,76,.08), transparent 50%),
+    linear-gradient(165deg, #080f1e 0%, #0f2347 38%, #1B3A6B 72%, #0D1B2A 100%);
+  overflow:hidden;
+}
+.rizq-portals::before,
+.rizq-portals::after{
+  content:'';position:absolute;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg, transparent, rgba(201,168,76,.55), transparent);
+  pointer-events:none;z-index:2;
+}
+.rizq-portals::before{top:0}
+.rizq-portals::after{bottom:0}
+.rizq-portals-ornament{
+  position:absolute;inset:0;pointer-events:none;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 2 L34 26 L58 30 L34 34 L30 58 L26 34 L2 30 L26 26 Z' fill='none' stroke='%23C9A84C' stroke-width='0.6'/%3E%3C/svg%3E");
+}
+.rizq-portals-inner{max-width:1180px;margin:0 auto;position:relative;z-index:1}
+.rizq-portals-head{text-align:center;margin-bottom:34px}
+.rizq-portals-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  color:var(--gold);font-size:11px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:14px;
+}
+.rizq-portals-kicker::before,.rizq-portals-kicker::after{
+  content:'';width:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.75),transparent);
+}
+.rizq-portals-title{
+  font-family:'Noto Naskh Arabic',serif!important;
+  font-size:clamp(28px,3.8vw,44px);font-weight:700;color:#fff;margin:0 0 12px;line-height:1.3;
+  text-shadow:0 10px 40px rgba(0,0,0,.35);
+}
+.rizq-portals-title span{
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 45%,#fff3c4 70%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.rizq-portals-sub{
+  color:rgba(255,255,255,.74);font-size:14.5px;line-height:1.85;max-width:34em;margin:0 auto;
+  font-weight:500;
+}
+.rizq-portals-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:14px;
+  margin-top:28px;
+}
+@media (max-width:980px){
+  .rizq-portals-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .rizq-portals-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .rizq-portals{padding:44px 4% 52px}
+  html.landing-editorial .hero{min-height:0}
+}
+.rizq-portal{
+  position:relative;
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  min-height:188px;
+  padding:22px 18px 18px;
+  border-radius:18px;
+  text-decoration:none!important;
+  color:#fff!important;
+  background:
+    linear-gradient(165deg, rgba(255,255,255,.09) 0%, rgba(255,255,255,.02) 55%, rgba(201,168,76,.05) 100%);
+  border:1px solid rgba(201,168,76,.32);
+  box-shadow:0 14px 36px rgba(0,0,0,.22);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:transform .4s cubic-bezier(.22,.61,.36,1), border-color .35s ease, box-shadow .4s ease, background .35s ease;
+  overflow:hidden;
+}
+.rizq-portal::before{
+  content:'';position:absolute;top:0;left:18%;right:18%;height:2px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:.85;
+}
+.rizq-portal:hover{
+  transform:translateY(-7px) scale(1.015);
+  border-color:rgba(201,168,76,.85);
+  background:
+    linear-gradient(165deg, rgba(201,168,76,.2) 0%, rgba(27,58,107,.35) 45%, rgba(255,255,255,.04) 100%);
+  box-shadow:0 22px 48px rgba(0,0,0,.35), 0 0 0 1px rgba(201,168,76,.25);
+}
+.rizq-portal-ico{
+  width:46px;height:46px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  background:linear-gradient(145deg, rgba(27,58,107,.75), rgba(13,27,42,.9));
+  border:1px solid rgba(201,168,76,.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.rizq-portal-name{
+  font-family:'Noto Naskh Arabic',serif!important;
+  font-size:17px;font-weight:700;color:#fff;line-height:1.25;
+}
+.rizq-portal-desc{
+  font-size:12px;line-height:1.65;color:rgba(255,255,255,.7);flex:1;font-weight:500;
+}
+.rizq-portal-go{
+  margin-top:2px;
+  font-size:12px;font-weight:800;color:var(--gold);
+  letter-spacing:.3px;
+}
+.rizq-portal:hover .rizq-portal-go{color:var(--gold-light)}
+</style>
 <style id="rizq-mobile-header-critical">
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
   /* هاتف: ثانوي أعلى + شريط إبهام سفلي */
@@ -3786,6 +4010,50 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
+<!-- ══ بوابات الفضاءات — الوضع التحريري (الأقسام الطويلة الأصلية محفوظة أدناه) ══ -->
+<section id="rizq-portals" class="rizq-portals" aria-labelledby="rizq-portals-title">
+  <div class="rizq-portals-ornament" aria-hidden="true"></div>
+  <div class="rizq-portals-inner">
+    <div class="rizq-portals-head fade-in">
+      <p class="rizq-portals-kicker" data-t="portals-kicker">سوق موريتانيا الإلكتروني</p>
+      <h2 class="rizq-portals-title" id="rizq-portals-title" data-t="portals-title">بوابات <span>رزق</span> الفاخرة</h2>
+      <p class="rizq-portals-sub" data-t="portals-sub">خمسة فضاءات بروح واحدة — محلات، معارض، مكاتب، مناقصات واستثمارات.</p>
+    </div>
+    <div class="rizq-portals-grid fade-in" role="navigation" aria-label="فضاءات رزق">
+      <a class="rizq-portal" href="rizq_store.html">
+        <span class="rizq-portal-ico" aria-hidden="true">🏪</span>
+        <span class="rizq-portal-name" data-t="portal-stores">المحلات</span>
+        <span class="rizq-portal-desc" data-t="portal-stores-d">واجهة تجارية كاملة لعملائك</span>
+        <span class="rizq-portal-go" data-t="portal-go">ادخل ←</span>
+      </a>
+      <a class="rizq-portal" href="rizq_showroom.html">
+        <span class="rizq-portal-ico" aria-hidden="true">🏛️</span>
+        <span class="rizq-portal-name" data-t="portal-show">المعارض</span>
+        <span class="rizq-portal-desc" data-t="portal-show-d">عرض راقٍ للمنتجات المميزة</span>
+        <span class="rizq-portal-go" data-t="portal-go">ادخل ←</span>
+      </a>
+      <a class="rizq-portal" href="rizq_office.html">
+        <span class="rizq-portal-ico" aria-hidden="true">🏢</span>
+        <span class="rizq-portal-name" data-t="portal-offices">المكاتب</span>
+        <span class="rizq-portal-desc" data-t="portal-offices-d">خدمات مهنية بحضور دائم</span>
+        <span class="rizq-portal-go" data-t="portal-go">ادخل ←</span>
+      </a>
+      <a class="rizq-portal" href="rizq_tenders.html">
+        <span class="rizq-portal-ico" aria-hidden="true">📋</span>
+        <span class="rizq-portal-name" data-t="portal-tenders">المناقصات</span>
+        <span class="rizq-portal-desc" data-t="portal-tenders-d">سوق B2B بثقة ووضوح</span>
+        <span class="rizq-portal-go" data-t="portal-go">ادخل ←</span>
+      </a>
+      <a class="rizq-portal" href="rizq_investments.html">
+        <span class="rizq-portal-ico" aria-hidden="true">📈</span>
+        <span class="rizq-portal-name" data-t="portal-invest">الاستثمارات</span>
+        <span class="rizq-portal-desc" data-t="portal-invest-d">فرص جادّة في غرفة مخصّصة</span>
+        <span class="rizq-portal-go" data-t="portal-go">ادخل ←</span>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ══ المحلات الافتراضية ══ -->
 <section id="virtual-stores" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
@@ -5415,7 +5683,8 @@ function buildFeaturedCards(){
 
 var LANDING_ADS_MAX = 1000;
 /* نافذة ثابتة على الصفحة الرئيسية: 15 إعلان — «المزيد» يزيح +5/−5 */
-var LANDING_ADS_WINDOW = 15;
+/* في الوضع التحريري: معرض أضيق وأكثر فخامة — الكلاسيكي يبقى 15 */
+var LANDING_ADS_WINDOW = (typeof document !== 'undefined' && document.documentElement.classList.contains('landing-editorial')) ? 10 : 15;
 var LANDING_ADS_STEP = 5;
 var _landingAdsCat = 'all';
 var _landingAdsOffset = 0;
@@ -7896,6 +8165,15 @@ const LANG = {
     'view-all': 'عرض الكل في نافذة ←',
     'browse-full': '📂 فتح صفحة الإعلانات كاملة ←',
     'f-fashion': 'موضة',
+    'portals-kicker': 'سوق موريتانيا الإلكتروني',
+    'portals-title': 'بوابات <span>رزق</span> الفاخرة',
+    'portals-sub': 'خمسة فضاءات بروح واحدة — محلات، معارض، مكاتب، مناقصات واستثمارات.',
+    'portal-stores': 'المحلات', 'portal-stores-d': 'واجهة تجارية كاملة لعملائك',
+    'portal-show': 'المعارض', 'portal-show-d': 'عرض راقٍ للمنتجات المميزة',
+    'portal-offices': 'المكاتب', 'portal-offices-d': 'خدمات مهنية بحضور دائم',
+    'portal-tenders': 'المناقصات', 'portal-tenders-d': 'سوق B2B بثقة ووضوح',
+    'portal-invest': 'الاستثمارات', 'portal-invest-d': 'فرص جادّة في غرفة مخصّصة',
+    'portal-go': 'ادخل ←',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'منصة متكاملة للإعلانات والمحلات والمعارض والمناقصات والاستثمارات — بمعايير واضحة وثقة موريتانية',
     'why1-title': 'ثقة تليق بسوق موريتانيا',
@@ -8016,6 +8294,15 @@ const LANG = {
     'view-all': 'Tout voir en fenêtre →',
     'browse-full': '📂 Ouvrir la page Annonces complète →',
     'f-fashion': 'Mode',
+    'portals-kicker': 'Le marché électronique mauritanien',
+    'portals-title': 'Les portes luxueuses de <span>Rizq</span>',
+    'portals-sub': 'Cinq espaces, une même âme — boutiques, showrooms, bureaux, appels d\'offres et investissements.',
+    'portal-stores': 'Boutiques', 'portal-stores-d': 'Vitrine commerciale complète',
+    'portal-show': 'Showrooms', 'portal-show-d': 'Présentation raffinée',
+    'portal-offices': 'Bureaux', 'portal-offices-d': 'Services pro en continu',
+    'portal-tenders': 'Appels d\'offres', 'portal-tenders-d': 'Marché B2B de confiance',
+    'portal-invest': 'Investissements', 'portal-invest-d': 'Opportunités dans une salle dédiée',
+    'portal-go': 'Entrer →',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Une plateforme complète pour annonces, boutiques, showrooms, appels d\'offres et investissements — avec des règles claires et une confiance mauritanienne',
     'why1-title': 'Une confiance digne du marché mauritanien',
