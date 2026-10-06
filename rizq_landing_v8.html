@@ -1828,7 +1828,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1080px;margin:0 auto;position:relative;z-index:1;overflow:visible}
 @media (min-width:1280px){.cats-grid{grid-template-columns:repeat(6,1fr);max-width:min(1020px,100%);gap:11px}}
 .cat-card{
-  background:#ffffff;
+  background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
   padding:13px 9px 11px;
@@ -1916,7 +1916,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 
 /* cat-drop — مخزن بيانات فقط (القوائم المنبثقة الصغيرة مُلغاة) */
 .cat-drop{display:none!important;visibility:hidden;pointer-events:none;height:0;overflow:hidden;position:absolute}
-.cat-card.open,.cat-card.pinned{border:2px solid var(--gold)!important;transform:translateY(-3px) scale(1.04)!important;box-shadow:0 0 0 5px rgba(201,168,76,.14),0 16px 48px rgba(201,168,76,.26),0 4px 20px rgba(0,0,0,.18)!important;background:linear-gradient(155deg,rgba(201,168,76,.07) 0%,rgba(255,255,255,.99) 60%)!important;z-index:5}
+.cat-card.open,.cat-card.pinned{border:2px solid var(--gold)!important;transform:translateY(-3px) scale(1.04)!important;box-shadow:0 0 0 5px rgba(201,168,76,.14),0 16px 48px rgba(201,168,76,.26),0 4px 20px rgba(0,0,0,.18)!important;background:#ffffff!important;z-index:5}
 .cat-card.open::after,.cat-card.pinned::after{content:'';position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);width:2px;height:28px;background:#C9A84C;z-index:10;pointer-events:none}
 .cat-card.open .cat-icon-box,.cat-card.pinned .cat-icon-box{background:linear-gradient(135deg,var(--gold),var(--gold-light))!important;box-shadow:0 8px 30px rgba(201,168,76,.5)!important;transform:scale(1.12)!important}
 .cat-card.open .cat-name,.cat-card.pinned .cat-name{color:var(--text-strong)!important;font-weight:900!important}
@@ -3182,13 +3182,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   background:#ffffff;
   position:relative;overflow:hidden;
 }
-#rizq-styles::before,#rizq-showroom-models::before{
-  content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;
-  background-image:
-    radial-gradient(circle at 18% 30%,rgba(201,168,76,.07) 0 1px,transparent 1.5px),
-    radial-gradient(circle at 72% 65%,rgba(27,58,107,.05) 0 1px,transparent 1.5px);
-  background-size:28px 28px,36px 36px;
-}
+#rizq-styles::before,#rizq-showroom-models::before{display:none;content:none}
 .rizq-styles-inner{max-width:1240px;margin:0 auto;position:relative;z-index:1}
 #rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:22px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
@@ -3238,13 +3232,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="building"]{background:linear-gradient(135deg,#5a3a22,#2e1e12)}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="jewelry"]{background:linear-gradient(135deg,#6b5420,#3a2e10)}
 .rizq-style-card[data-srm-cat] .rizq-style-badge{
-  color:#8a6f2a;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.28)
+  color:var(--royal,#1B3A6B);background:#ffffff;border-color:rgba(27,58,107,.16)
 }
 .rizq-style-from-view{
   display:inline-flex;align-self:flex-start;
   font-size:9.5px;font-weight:800;
-  color:#8a6f2a;background:rgba(201,168,76,.14);
-  border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:2px 8px;margin-bottom:2px
+  color:var(--royal,#1B3A6B);background:#ffffff;
+  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:2px 8px;margin-bottom:2px
 }
 .rizq-styles-gender-tabs{
   display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
@@ -3318,12 +3312,12 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   color:#5b6b85;font-size:13.5px;line-height:1.7;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر قليلاً + حواف ذهبية + أبيض ناصع */
+/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر + حواف ذهبية + جسم أبيض ناصع */
 .rizq-style-card{
   display:flex;flex-direction:column;
   width:214px;min-width:214px;max-width:214px;
   flex:0 0 214px;
-  background:#ffffff;
+  background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
   overflow:hidden;
@@ -3405,12 +3399,15 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 @media (prefers-reduced-motion:reduce){
   .rizq-style-tile{animation:none}
 }
-.rizq-style-body{padding:11px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.rizq-style-body{
+  padding:11px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1;
+  background:#ffffff!important;
+}
 .rizq-style-badge{
   display:inline-flex;align-self:flex-start;
   font-size:9px;font-weight:800;letter-spacing:.25px;
-  color:var(--royal,#1B3A6B);background:rgba(27,58,107,.08);
-  border:1px solid rgba(27,58,107,.14);border-radius:10px;padding:2px 7px;margin-bottom:1px
+  color:var(--royal,#1B3A6B);background:#ffffff;
+  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:2px 7px;margin-bottom:1px
 }
 .rizq-style-card[data-sty-gender="women"] .rizq-style-badge{
   color:#6b2d4a;background:rgba(107,45,74,.08);border-color:rgba(107,45,74,.2)
