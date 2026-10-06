@@ -11,6 +11,7 @@ const {
   PERMISSION_DEFS,
   PERMISSION_PRESETS,
   normalizePermissions,
+  filterGrantablePermissions,
   hasAdminPermission,
   permissionsForLegacyRole,
 } = require('./adminPermissions');
@@ -254,13 +255,8 @@ async function createMember(payload, actorUser, actorPerms) {
     err.code = 'user_exists';
     throw err;
   }
-  let perms = normalizePermissions(payload.permissions);
-  // team.manage alone لا يمنح Super (*) — يلزم أن يكون الفاعل Super أصلاً
-  if (perms.includes('*') && !hasAdminPermission(actorPerms, '*')) {
-    const err = new Error('cannot_grant_super');
-    err.code = 'cannot_grant_super';
-    throw err;
-  }
+  // لا يُسمح بمنح صلاحيات أوسع مما يملكه الفاعل (تقاطع) — إلا لـ Super
+  const perms = filterGrantablePermissions(payload.permissions, actorPerms);
   const now = new Date().toISOString();
   const member = {
     id: genAdminId(),
@@ -291,13 +287,11 @@ async function updateMember(id, payload, actorPerms) {
   if (payload.email != null) row.email = String(payload.email).slice(0, 120);
   if (payload.phone != null) row.phone = String(payload.phone).slice(0, 40);
   if (payload.notes != null) row.notes = String(payload.notes).slice(0, 300);
+  let permsChanged = false;
+  let passChanged = false;
+  let deactivated = false;
   if (payload.permissions != null) {
-    const next = normalizePermissions(payload.permissions);
-    if (next.includes('*') && !hasAdminPermission(actorPerms, '*')) {
-      const err = new Error('cannot_grant_super');
-      err.code = 'cannot_grant_super';
-      throw err;
-    }
+    const next = filterGrantablePermissions(payload.permissions, actorPerms);
     // منع إسقاط آخر Super
     const wasSuper = (row.permissions || []).includes('*');
     if (wasSuper && !next.includes('*')) {
@@ -308,16 +302,29 @@ async function updateMember(id, payload, actorPerms) {
         throw err;
       }
     }
+    const prev = normalizePermissions(row.permissions).slice().sort().join(',');
+    const sortedNext = next.slice().sort().join(',');
+    permsChanged = prev !== sortedNext;
     row.permissions = next;
   }
-  if (payload.active != null) row.active = !!payload.active;
+  if (payload.active != null) {
+    const nextActive = !!payload.active;
+    if (row.active !== false && !nextActive) deactivated = true;
+    row.active = nextActive;
+  }
   if (payload.pass && String(payload.pass).length >= 6) {
     row.passHash = await bcrypt.hash(String(payload.pass), 10);
+    passChanged = true;
   }
   row.updatedAt = new Date().toISOString();
   list[idx] = row;
   writeTeam(list);
-  return publicMember(row);
+  const pub = publicMember(row);
+  if (permsChanged || passChanged || deactivated) {
+    pub._invalidateSessions = true;
+    pub._invalidateUser = row.user;
+  }
+  return pub;
 }
 
 async function deactivateMember(id) {
@@ -341,6 +348,7 @@ module.exports = {
   updateMember,
   deactivateMember,
   normalizePermissions,
+  filterGrantablePermissions,
   hasAdminPermission,
   publicMember,
 };

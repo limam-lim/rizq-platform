@@ -81,7 +81,8 @@ function mountCatalogRoutes(app, deps) {
       image: catImages[0] || null,
       emoji: String(b.emoji || '').slice(0, 8),
       status: 'pending_review',
-      sold: Number.isFinite(Number(b.sold)) ? Number(b.sold) : 0,
+      // sold يُدار من الخادم/الأدمن فقط — لا يقبل تضخيماً من العميل عند الإنشاء
+      sold: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

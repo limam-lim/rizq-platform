@@ -510,16 +510,33 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   max-width:560px!important;
   margin:0 auto 32px!important;
 }
-/* حواف ذهبية خفيفة — نفس درجة بوابات المكاتب rgba(201,168,76,.5) */
+.rizq-feat-row.rizq-feat-row-4{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:12px!important;
+  max-width:960px!important;
+  margin:0 auto 40px!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+@media(max-width:900px){
+  .rizq-feat-row.rizq-feat-row-4{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:560px!important}
+}
+@media(max-width:520px){
+  .rizq-feat-row.rizq-feat-row-4{grid-template-columns:1fr!important;max-width:280px!important}
+}
+/* حواف ذهبية رقيقة — مثل بطاقة خطط شفافة */
 .rizq-feat-card{
   position:relative;
   background:#fff;
-  border:1.5px solid rgba(201,168,76,.5)!important;
-  border-radius:12px;
-  padding:12px 10px 12px;
+  border:1px solid rgba(201,168,76,.62)!important;
+  border-radius:14px;
+  padding:14px 12px 14px;
   text-align:center;
   transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
-  box-shadow:0 3px 12px rgba(27,58,107,.06);
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   box-sizing:border-box;min-height:148px;
   overflow:hidden;
@@ -528,13 +545,30 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .rizq-feat-card:hover{
   transform:translateY(-3px);
   border-color:rgba(201,168,76,.9)!important;
-  box-shadow:0 10px 24px rgba(13,27,42,.1);
+  box-shadow:0 10px 24px rgba(13,27,42,.1),0 0 0 1px rgba(232,201,106,.35);
 }
 .rizq-feat-card .rizq-feat-ico{margin-bottom:8px;display:flex;justify-content:center;position:relative;z-index:1}
 .rizq-feat-card .cat-icon-box{
   width:34px;height:34px;border-radius:9px;font-size:15px;
-  border:1.5px solid rgba(201,168,76,.5)!important;
+  border:1px solid rgba(201,168,76,.55)!important;
 }
+/* بطاقة ميزة أفقية (أيقونة + نص) — للمكاتب */
+.rizq-feat-card.rizq-feat-card--row{
+  flex-direction:row;align-items:flex-start;text-align:start;
+  min-height:0;padding:16px 14px;gap:12px;
+}
+html[dir="rtl"] .rizq-feat-card.rizq-feat-card--row{text-align:right}
+html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico{margin:0;flex-shrink:0}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico .cat-icon-box,
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico-span{
+  width:42px;height:42px;min-width:42px;border-radius:12px;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(201,168,76,.55)!important;
+  box-sizing:border-box;
+}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-title{font-size:13px;margin-bottom:4px}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-desc{font-size:11.5px;line-height:1.65}
 .rizq-feat-title{
   font-size:11.5px;font-weight:700;color:var(--navy,#0D1B2A);
   margin:0 0 5px;line-height:1.3;letter-spacing:.12px;position:relative;z-index:1;
@@ -546,8 +580,10 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 #virtual-showrooms .rizq-feat-card,
 #virtual-stores .rizq-feat-card,
 #virtual-tenders .rizq-feat-card,
+#virtual-offices .rizq-feat-card,
 .rizq-trio .rizq-feat-card{
-  border:1.5px solid rgba(201,168,76,.5)!important;
+  border:1px solid rgba(201,168,76,.62)!important;
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22);
 }
 @media(max-width:640px){
   .rizq-feat-row.rizq-feat-row-3{grid-template-columns:1fr!important;max-width:280px!important}
@@ -1778,10 +1814,11 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   margin:0 auto 22px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-blend-mode:overlay;
-  border:1px solid rgba(201,168,76,.28);
+  /* حافة ذهبية رقيقة موحّدة لكل بطاقات عناوين الأقسام (مثل خطط شفافة) */
+  border:1px solid rgba(201,168,76,.62);
   border-radius:14px;
   padding:12px 18px;
-  box-shadow:0 6px 20px rgba(0,0,0,.16);
+  box-shadow:0 6px 20px rgba(0,0,0,.16),0 0 0 1px rgba(232,201,106,.28);
   position:relative;overflow:hidden;
   box-sizing:border-box;
   display:flex;
@@ -2521,25 +2558,29 @@ html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:sca
   gap:12px;max-width:720px;margin:0 auto;padding:4px 0 10px;direction:inherit;
   justify-content:center;scrollbar-width:thin;
 }
+/* بطاقات «لماذا رزق؟» — خلفية بيضاء كنوافذ صغيرة + حافة ذهبية */
 .why-card{
   flex:0 0 min(220px,78vw);scroll-snap-align:start;
   min-height:210px;height:auto;
-  background:linear-gradient(160deg,#0e1e38 0%,#112244 55%,#0a1628 100%);border:1px solid rgba(201,168,76,.18);border-radius:16px;padding:18px 14px 16px;position:relative;overflow:hidden;transition:all .45s cubic-bezier(.25,.8,.25,1);box-shadow:0 8px 22px -8px rgba(0,0,0,.08),0 6px 24px rgba(10,22,42,.32);text-align:center;
+  background:#fff!important;
+  background-image:none!important;
+  border:1px solid rgba(201,168,76,.62);border-radius:14px;padding:18px 14px 16px;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.25,.8,.25,1);
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22);text-align:center;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;box-sizing:border-box;
 }
-.why-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.65;transition:opacity .4s}
-.why-card::after{content:'';position:absolute;bottom:-24px;right:-24px;width:min(140px,36vw);height:min(140px,36vw);border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.07),transparent 70%);pointer-events:none}
-.why-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,.55);box-shadow:0 14px 36px rgba(10,22,42,.45),0 0 0 1px rgba(201,168,76,.22)}
+.why-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7;transition:opacity .35s}
+.why-card::after{display:none;content:none}
+.why-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,.9);box-shadow:0 10px 24px rgba(13,27,42,.1),0 0 0 1px rgba(232,201,106,.35)}
 .why-card:hover::before{opacity:1}
 .why-card-line{display:none}
 .why-num{display:none}
 .why-icon{margin-bottom:12px;text-align:center}
-.why-icon .cat-icon-box{margin:0 auto;width:44px;height:44px;border-radius:12px;font-size:20px;box-shadow:none;transition:all .45s cubic-bezier(.25,.8,.25,1)}
-.why-card:hover .why-icon .cat-icon-box{transform:scale(1.1) rotate(-4deg);box-shadow:none}
+.why-icon .cat-icon-box{margin:0 auto;width:44px;height:44px;border-radius:12px;font-size:20px;box-shadow:none;transition:all .35s cubic-bezier(.25,.8,.25,1);border:1px solid rgba(201,168,76,.55)!important}
+.why-card:hover .why-icon .cat-icon-box{transform:scale(1.08) rotate(-3deg);box-shadow:none}
 .why-icon-badge{display:none}
 .why-icon-badge svg{display:none}
-.why-title{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3;letter-spacing:.15px}
-.why-desc{font-size:11px;color:rgba(255,255,255,.8);line-height:1.65;font-weight:500}
+.why-title{font-size:13.5px;font-weight:700;color:var(--navy,#0D1B2A);margin-bottom:8px;line-height:1.3;letter-spacing:.15px}
+.why-desc{font-size:11px;color:#3d4f6a;line-height:1.65;font-weight:500}
 
 /* CTA section */
 .cta-section{padding:64px 5% 84px;position:relative;overflow:hidden;background:#ffffff}
@@ -4247,41 +4288,36 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </a>
     </div>
 
-    <!-- مزايا المكتب الافتراضي -->
-    <div class="fade-in rizq-feat-row" style="background:#fff;border-radius:24px;padding:36px 32px;box-shadow:0 6px 32px rgba(27,58,107,.08);border:1px solid rgba(201,168,76,.15);margin-bottom:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px">
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📍</span>
+    <!-- مزايا المكتب الافتراضي — بطاقات بحواف ذهبية رقيقة -->
+    <div class="fade-in rizq-feat-row rizq-feat-row-4">
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">📍</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat1-title">حضور دائم على المنصة</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat1-desc">مكتبك مفتوح على رزق طوال الوقت — يستكشفه الزبائن وتتلقى طلباتهم في أي وقت</div>
+          <div class="rizq-feat-title" data-t="vo-feat1-title">حضور دائم على المنصة</div>
+          <div class="rizq-feat-desc" data-t="vo-feat1-desc">مكتبك مفتوح على رزق طوال الوقت — يستكشفه الزبائن وتتلقى طلباتهم في أي وقت</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">💬</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">💬</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat2-title">تواصل مباشر وسهل</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat2-desc">واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة</div>
+          <div class="rizq-feat-title" data-t="vo-feat2-title">تواصل مباشر وسهل</div>
+          <div class="rizq-feat-desc" data-t="vo-feat2-desc">واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(22,163,74,.04));display:flex;align-items:center;justify-content:center;font-size:18px">✅</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,rgba(22,163,74,.14),rgba(22,163,74,.06))">✅</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat3-title">شارة مكتب موثّق</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat3-desc">شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك</div>
+          <div class="rizq-feat-title" data-t="vo-feat3-title">شارة مكتب موثّق</div>
+          <div class="rizq-feat-desc" data-t="vo-feat3-desc">شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📊</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">📊</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat4-title">خدماتك معروضة بوضوح</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat4-desc">قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة</div>
+          <div class="rizq-feat-title" data-t="vo-feat4-title">خدماتك معروضة بوضوح</div>
+          <div class="rizq-feat-desc" data-t="vo-feat4-desc">قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة</div>
         </div>
       </div>
-
     </div>
 
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
@@ -5622,29 +5658,31 @@ function buildCards(){
   }
   var heroSec=document.getElementById('hero-listings');
   if(heroSec) heroSec.style.display='';
+  function _escCard(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   const all=[...ADS,...ADS];
   all.forEach((a,idx)=>{
     const realIdx = idx % ADS.length;
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
+    const bgSafe = _escCard(d.bg || '');
     c.innerHTML=`
-      <div class="ad-card-img" style="background:${d.bg}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
+      <div class="ad-card-img" style="background:${bgSafe}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
         ${_adPhotoHtml(a, d, 130)}
       </div>
       <div class="ad-card-body">
-        <div class="ad-cat">${d.cat}</div>
-        <div class="ad-title">${d.title}</div>
+        <div class="ad-cat">${_escCard(d.cat)}</div>
+        <div class="ad-title">${_escCard(d.title)}</div>
         <div class="ad-footer">
-          <span class="ad-price">${d.price}</span>
-          <span class="ad-loc">${d.loc}</span>
+          <span class="ad-price">${_escCard(d.price)}</span>
+          <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
       </div>
       <div class="ad-hover-detail">
-        <div class="ahd-cat">${d.cat}</div>
-        <div class="ahd-title">${d.title}</div>
-        <div class="ahd-desc">${d.desc}</div>
-        <div class="ahd-price">${d.price}</div>\n        <div class="ahd-meta"><span>${d.loc}</span><span>${d.status||''}</span></div>\n        <button class="ahd-btn" onclick="openCarouselAdById(${JSON.stringify(String(a.id))})">📋 ${isAr?'عرض الإعلان كاملاً':'Voir l\'annonce'}</button>
+        <div class="ahd-cat">${_escCard(d.cat)}</div>
+        <div class="ahd-title">${_escCard(d.title)}</div>
+        <div class="ahd-desc">${_escCard(d.desc)}</div>
+        <div class="ahd-price">${_escCard(d.price)}</div>\n        <div class="ahd-meta"><span>${_escCard(d.loc)}</span><span>${_escCard(d.status||'')}</span></div>\n        <button class="ahd-btn" onclick="openCarouselAdById(${JSON.stringify(String(a.id))})">📋 ${isAr?'عرض الإعلان كاملاً':'Voir l\'annonce'}</button>
       </div>`;
     c.addEventListener('click',()=>openCarouselAdById(a.id));
     track.appendChild(c);
@@ -6012,12 +6050,26 @@ function rizqOpenStyleItem(ev, adId){
     return false;
   }
   if(ad.href && (ad.fromView || String(ad.id).indexOf('store-') === 0)){
-    window.location.href = ad.href;
+    var safeHref = _rizqSafeNavHref(ad.href);
+    if(safeHref) window.location.href = safeHref;
     return false;
   }
   if(typeof goToListing === 'function') goToListing(ad);
   else window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(ad.id);
   return false;
+}
+/** روابط تنقّل داخل المنصة فقط — يمنع javascript: وhttp://خارجي */
+function _rizqSafeNavHref(href){
+  try {
+    var raw = String(href || '').trim();
+    if(!raw) return '';
+    if(/^\s*javascript:/i.test(raw) || /^\s*data:/i.test(raw)) return '';
+    if(raw.charAt(0) === '/' || raw.charAt(0) === '?' || raw.charAt(0) === '#') return raw;
+    if(/^[a-z0-9_\-]+\.html(\?|#|$)/i.test(raw)) return raw;
+    var u = new URL(raw, window.location.href);
+    if(u.origin !== window.location.origin) return '';
+    return u.pathname + u.search + u.hash;
+  } catch(e){ return ''; }
 }
 function rizqOpenStyleLook(ev, primaryId, fallbackHref){
   /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
@@ -6033,7 +6085,8 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
   if(primaryId){
     return rizqOpenStyleItem(null, primaryId);
   }
-  if(fallbackHref) window.location.href = fallbackHref;
+  var safeFb = _rizqSafeNavHref(fallbackHref);
+  if(safeFb) window.location.href = safeFb;
   return false;
 }
 window.rizqOpenStyleItem = rizqOpenStyleItem;
@@ -7099,14 +7152,15 @@ function openCarouselAdById(id) {
 }
 function populateAdModal(a) {
   const d = trAd(a);
+  function _escM(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   document.getElementById('amd-img').style.background = d.bg || '#1B3A6B';
-  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${d.emoji}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميّز':'Vedette')+'</div>':''}`;
+  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${_escM(d.emoji)}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميّز':'Vedette')+'</div>':''}`;
   document.getElementById('amd-cat').textContent = d.cat;
   const locEl = document.getElementById('amd-loc');
   if (locEl) locEl.textContent = d.loc || '';
   document.getElementById('amd-title').textContent = d.title;
   document.getElementById('amd-desc').textContent = d.desc;
-  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(t=>`<span class="amd-tag">${t}</span>`).join('');
+  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(t=>`<span class="amd-tag">${_escM(t)}</span>`).join('');
   document.getElementById('amd-price').textContent = d.price;
   document.getElementById('amd-status').textContent = d.status;
   document.getElementById('amd-seller-av').textContent = d.sellerEmoji||'👤';
@@ -7550,7 +7604,8 @@ function renderTickerFromAds(){
   if(!wrap || !inner) return;
   var items = ADS.slice(0, 12);
   function row(a){
-    return '<div class="ticker-item"><div class="ticker-dot"></div>'+(a.emoji||'📦')+' '+(a.title||'')+' <strong>'+(a.price||'')+'</strong></div>';
+    function _escT(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    return '<div class="ticker-item"><div class="ticker-dot"></div>'+_escT(a.emoji||'📦')+' '+_escT(a.title||'')+' <strong>'+_escT(a.price||'')+'</strong></div>';
   }
   var html = '';
   if(items.length){
