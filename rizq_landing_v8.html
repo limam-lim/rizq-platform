@@ -4557,7 +4557,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <div class="why-grid">
     <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🛡️</div></div><h3 class="why-title" data-t="why1-title">ثقة تليق بسوق موريتانيا</h3><p class="why-desc" data-t="why1-desc">رزق سوق جادّ للبيع والشراء — وضوح في التعامل، طمأنينة في التجربة، وسوق واحد يجمعك بالمشترين والبائعين.</p></div>
-    <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🗂️</div></div><h3 class="why-title" data-t="why2-title">سوق يغطي كل حاجة</h3><p class="why-desc" data-t="why2-desc">من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.</p></div>
+    <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🛒</div></div><h3 class="why-title" data-t="why2-title">سوق يغطي كل حاجة</h3><p class="why-desc" data-t="why2-desc">من السيارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.</p></div>
     <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">⚡</div></div><h3 class="why-title" data-t="why3-title">انشر في أقل من دقيقة</h3><p class="why-desc" data-t="why3-desc">صوّر، ضع السعر، انشر — إعلانك يصل لمشترين يبحثون الآن على رزق.</p></div>
   </div>
 </section>
@@ -8155,7 +8155,7 @@ const LANG = {
     'why1-title': 'ثقة تليق بسوق موريتانيا',
     'why1-desc': 'رزق سوق جادّ للبيع والشراء — وضوح في التعامل، طمأنينة في التجربة، وسوق واحد يجمعك بالمشترين والبائعين.',
     'why2-title': 'سوق يغطي كل حاجة',
-    'why2-desc': 'من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.',
+    'why2-desc': 'من السيارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.',
     'why3-title': 'انشر في أقل من دقيقة',
     'why3-desc': 'صوّر، ضع السعر، انشر — إعلانك يصل لمشترين يبحثون الآن على رزق.',
     's-price-title': 'خطط <span>شفافة وبسيطة</span>',
@@ -8281,7 +8281,7 @@ const LANG = {
     'why1-title': 'Une confiance digne du marché mauritanien',
     'why1-desc': 'Rizq, un marché sérieux pour acheter et vendre — clarté dans les échanges, sérénité dans l\'expérience, et un marché qui relie vendeurs et acheteurs.',
     'why2-title': 'Un marché pour chaque besoin',
-    'why2-desc': 'De l\'immobilier aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit.',
+    'why2-desc': 'Des voitures aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit.',
     'why3-title': 'Publiez en moins d\'une minute',
     'why3-desc': 'Photographiez, fixez le prix, publiez — votre annonce atteint des acheteurs déjà actifs sur Rizq.',
     's-price-title': 'Offres <span>simples et transparentes</span>',
@@ -9505,12 +9505,12 @@ function applyFullTranslation(lang) {
     const __catM = __catsGridWhy ? __catsGridWhy.querySelectorAll('.cat-card .drop-link').length : 120;
     const whyDataFR = [
       { title:'Une confiance digne du marché mauritanien', desc:"Rizq, un marché sérieux pour acheter et vendre — clarté dans les échanges, sérénité dans l'expérience, et un marché qui relie vendeurs et acheteurs." },
-      { title:'Un marché pour chaque besoin', desc:"De l'immobilier aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit." },
+      { title:'Un marché pour chaque besoin', desc:"Des voitures aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit." },
       { title:"Publiez en moins d'une minute", desc:"Photographiez, fixez le prix, publiez — votre annonce atteint des acheteurs déjà actifs sur Rizq." }
     ];
     const whyDataAR = [
       { title:'ثقة تليق بسوق موريتانيا', desc:'رزق سوق جادّ للبيع والشراء — وضوح في التعامل، طمأنينة في التجربة، وسوق واحد يجمعك بالمشترين والبائعين.' },
-      { title:'سوق يغطي كل حاجة', desc:'من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.' },
+      { title:'سوق يغطي كل حاجة', desc:'من السيارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.' },
       { title:'انشر في أقل من دقيقة', desc:'صوّر، ضع السعر، انشر — إعلانك يصل لمشترين يبحثون الآن على رزق.' }
     ];
     const wData = fr ? whyDataFR : whyDataAR;
@@ -11891,11 +11891,11 @@ function refreshCatStatsText(){
   try { localStorage.setItem('rizq_cat_stats', JSON.stringify({n:n,m:m,cats:cats})); } catch(e){}
   LANG.ar['s-cats-desc'] = 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد';
   LANG.ar['why2-title']  = 'سوق يغطي كل حاجة';
-  LANG.ar['why2-desc']   = 'من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.';
+  LANG.ar['why2-desc']   = 'من السيارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.';
   LANG.ar['ft-desc']     = 'سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.';
   LANG.fr['s-cats-desc'] = 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit';
   LANG.fr['why2-title']  = 'Un marché pour chaque besoin';
-  LANG.fr['why2-desc']   = "De l'immobilier aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit.";
+  LANG.fr['why2-desc']   = "Des voitures aux chameaux, de la daraa aux engins — tout ce que vous cherchez au même endroit.";
   LANG.fr['ft-desc']     = 'Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements.';
   const lang = (typeof isAr!=='undefined' && !isAr) ? 'fr' : 'ar';
   ['s-cats-desc','why2-title','why2-desc','ft-desc'].forEach(function(key){
