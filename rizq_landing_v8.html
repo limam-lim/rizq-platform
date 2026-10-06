@@ -510,16 +510,33 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
   max-width:560px!important;
   margin:0 auto 32px!important;
 }
-/* حواف ذهبية خفيفة — نفس درجة بوابات المكاتب rgba(201,168,76,.5) */
+.rizq-feat-row.rizq-feat-row-4{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:12px!important;
+  max-width:960px!important;
+  margin:0 auto 40px!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+@media(max-width:900px){
+  .rizq-feat-row.rizq-feat-row-4{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-width:560px!important}
+}
+@media(max-width:520px){
+  .rizq-feat-row.rizq-feat-row-4{grid-template-columns:1fr!important;max-width:280px!important}
+}
+/* حواف ذهبية رقيقة — مثل بطاقة خطط شفافة */
 .rizq-feat-card{
   position:relative;
   background:#fff;
-  border:1.5px solid rgba(201,168,76,.5)!important;
-  border-radius:12px;
-  padding:12px 10px 12px;
+  border:1px solid rgba(201,168,76,.62)!important;
+  border-radius:14px;
+  padding:14px 12px 14px;
   text-align:center;
   transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
-  box-shadow:0 3px 12px rgba(27,58,107,.06);
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   box-sizing:border-box;min-height:148px;
   overflow:hidden;
@@ -528,13 +545,30 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .rizq-feat-card:hover{
   transform:translateY(-3px);
   border-color:rgba(201,168,76,.9)!important;
-  box-shadow:0 10px 24px rgba(13,27,42,.1);
+  box-shadow:0 10px 24px rgba(13,27,42,.1),0 0 0 1px rgba(232,201,106,.35);
 }
 .rizq-feat-card .rizq-feat-ico{margin-bottom:8px;display:flex;justify-content:center;position:relative;z-index:1}
 .rizq-feat-card .cat-icon-box{
   width:34px;height:34px;border-radius:9px;font-size:15px;
-  border:1.5px solid rgba(201,168,76,.5)!important;
+  border:1px solid rgba(201,168,76,.55)!important;
 }
+/* بطاقة ميزة أفقية (أيقونة + نص) — للمكاتب */
+.rizq-feat-card.rizq-feat-card--row{
+  flex-direction:row;align-items:flex-start;text-align:start;
+  min-height:0;padding:16px 14px;gap:12px;
+}
+html[dir="rtl"] .rizq-feat-card.rizq-feat-card--row{text-align:right}
+html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico{margin:0;flex-shrink:0}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico .cat-icon-box,
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-ico-span{
+  width:42px;height:42px;min-width:42px;border-radius:12px;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(201,168,76,.55)!important;
+  box-sizing:border-box;
+}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-title{font-size:13px;margin-bottom:4px}
+.rizq-feat-card.rizq-feat-card--row .rizq-feat-desc{font-size:11.5px;line-height:1.65}
 .rizq-feat-title{
   font-size:11.5px;font-weight:700;color:var(--navy,#0D1B2A);
   margin:0 0 5px;line-height:1.3;letter-spacing:.12px;position:relative;z-index:1;
@@ -546,8 +580,10 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 #virtual-showrooms .rizq-feat-card,
 #virtual-stores .rizq-feat-card,
 #virtual-tenders .rizq-feat-card,
+#virtual-offices .rizq-feat-card,
 .rizq-trio .rizq-feat-card{
-  border:1.5px solid rgba(201,168,76,.5)!important;
+  border:1px solid rgba(201,168,76,.62)!important;
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22);
 }
 @media(max-width:640px){
   .rizq-feat-row.rizq-feat-row-3{grid-template-columns:1fr!important;max-width:280px!important}
@@ -3657,7 +3693,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <ul class="nav-center">
     <!-- ترتيب مطابق لتوالي أقسام الصفحة (من الأعلى للأسفل) -->
     <!-- هاتف: secondary أعلى / thumb أسفل (إعلانات·نشر·محلات·معارض) — الترتيب عبر CSS order -->
-    <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">⭐</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
+    <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🧭</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
     <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
@@ -3743,7 +3779,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <!-- ── Mobile bottom navigation ── -->
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="تنقل سفلي">
   <div class="mobile-bottom-nav-inner">
-    <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">⭐</span><span class="mbn-label">الرئيسية</span></a>
+    <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🧭</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>
     <a href="rizq_post.html" id="mbn-post" class="mbn-post"><span><span class="mbn-icon">+</span></span><span class="mbn-label">نشر</span></a>
     <a href="rizq_investments.html" id="mbn-invest"><span class="mbn-icon">📈</span><span class="mbn-label">استثمار</span></a>
@@ -4247,41 +4283,36 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </a>
     </div>
 
-    <!-- مزايا المكتب الافتراضي -->
-    <div class="fade-in rizq-feat-row" style="background:#fff;border-radius:24px;padding:36px 32px;box-shadow:0 6px 32px rgba(27,58,107,.08);border:1px solid rgba(201,168,76,.15);margin-bottom:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px">
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📍</span>
+    <!-- مزايا المكتب الافتراضي — بطاقات بحواف ذهبية رقيقة -->
+    <div class="fade-in rizq-feat-row rizq-feat-row-4">
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">📍</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat1-title">حضور دائم على المنصة</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat1-desc">مكتبك مفتوح على رزق طوال الوقت — يستكشفه الزبائن وتتلقى طلباتهم في أي وقت</div>
+          <div class="rizq-feat-title" data-t="vo-feat1-title">حضور دائم على المنصة</div>
+          <div class="rizq-feat-desc" data-t="vo-feat1-desc">مكتبك مفتوح على رزق طوال الوقت — يستكشفه الزبائن وتتلقى طلباتهم في أي وقت</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">💬</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">💬</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat2-title">تواصل مباشر وسهل</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat2-desc">واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة</div>
+          <div class="rizq-feat-title" data-t="vo-feat2-title">تواصل مباشر وسهل</div>
+          <div class="rizq-feat-desc" data-t="vo-feat2-desc">واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(22,163,74,.04));display:flex;align-items:center;justify-content:center;font-size:18px">✅</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,rgba(22,163,74,.14),rgba(22,163,74,.06))">✅</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat3-title">شارة مكتب موثّق</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat3-desc">شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك</div>
+          <div class="rizq-feat-title" data-t="vo-feat3-title">شارة مكتب موثّق</div>
+          <div class="rizq-feat-desc" data-t="vo-feat3-desc">شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك</div>
         </div>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <span style="width:42px;height:42px;min-width:42px;border-radius:12px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;border:1px solid rgba(201,168,76,.3)">📊</span>
+      <div class="rizq-feat-card rizq-feat-card--row">
+        <div class="rizq-feat-ico"><span class="rizq-feat-ico-span" style="background:linear-gradient(135deg,var(--royal),var(--royal-light));color:#fff">📊</span></div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="vo-feat4-title">خدماتك معروضة بوضوح</div>
-          <div style="font-size:12.5px;color:#2C3A4F;line-height:1.7" data-t="vo-feat4-desc">قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة</div>
+          <div class="rizq-feat-title" data-t="vo-feat4-title">خدماتك معروضة بوضوح</div>
+          <div class="rizq-feat-desc" data-t="vo-feat4-desc">قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة</div>
         </div>
       </div>
-
     </div>
 
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
