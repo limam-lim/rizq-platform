@@ -250,14 +250,14 @@
     var why2 = document.querySelector('[data-t="why2-title"]');
     if (why2) {
       why2.textContent = fr
-        ? 'Des catégories pour tout le marché'
-        : 'أقسام تغطي السوق كاملاً';
+        ? 'Un marché pour chaque besoin'
+        : 'سوق يغطي كل حاجة';
     }
     var why2desc = document.querySelector('[data-t="why2-desc"]');
     if (why2desc) {
       why2desc.textContent = fr
-        ? ("De l'immobilier aux chameaux, de la daraa aux engins — " + st.n + ' catégories et +' + st.m + ' sous-catégories pour chercher mieux et décider plus clairement.')
-        : ('من العقارات إلى الإبل، من الدراعة إلى الحفارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً لتنظيم أدق وبحث أوضح.');
+        ? ("Des voitures aux chameaux, de la daraa aux engins — " + st.n + ' catégories et +' + st.m + ' sous-catégories pour chercher mieux et décider plus clairement.')
+        : ('من السيارات إلى الإبل، من الدراعة إلى الحفارات — ' + st.n + ' قسماً و' + st.m + '+ فرعاً لتنظيم أدق وبحث أوضح.');
     }
   }
 
