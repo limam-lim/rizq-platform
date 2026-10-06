@@ -252,7 +252,8 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 }
 .cat-card:hover:not(.open){
   transform:translateY(-4px)!important;
-  box-shadow:0 14px 36px rgba(201,168,76,.22),0 8px 24px rgba(27,58,107,.15)!important;
+  border-color:rgba(201,168,76,.85)!important;
+  box-shadow:0 10px 26px rgba(13,27,42,.12),0 0 0 1px rgba(201,168,76,.22)!important;
 }
 .qcat:hover{
   transform:translateY(-4px);
