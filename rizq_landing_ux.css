@@ -337,10 +337,9 @@ body.rizq-lang-ar .hero-content{
 
 .why-section > .section-header,
 #prices > .section-header,
-.pricing-section > .section-header,
 #rizq-live-activity .section-header,
 #categories > .section-header{
-  max-width:1200px;
+  max-width:var(--rizq-section-header-w,560px);
   margin-left:auto;
   margin-right:auto;
   text-align:center;
@@ -405,7 +404,23 @@ html[dir="ltr"] .section-header .section-desc{
   overflow-y:visible;
 }
 
-.pricing-section > .section-header,
+/* بطاقة عنوان الباقات — نفس مقاس بقية عناوين الأقسام + حافة ذهبية رقيقة */
+.pricing-section > .section-header{
+  width:min(100%,var(--rizq-section-header-w,560px)) !important;
+  max-width:var(--rizq-section-header-w,560px) !important;
+  height:var(--rizq-section-header-h,118px);
+  min-height:var(--rizq-section-header-h,118px);
+  max-height:var(--rizq-section-header-h,118px);
+  margin-left:auto;
+  margin-right:auto;
+  margin-bottom:22px;
+  box-sizing:border-box;
+  border:1px solid rgba(201,168,76,.58) !important;
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.16),
+    0 0 0 1px rgba(232,201,106,.22);
+  overflow:hidden;
+}
 .pricing-section > .pricing-container{
   max-width:min(1140px,100%);
   margin-left:auto;
