@@ -744,7 +744,7 @@ window.RIZQ_I18N_AR = {
     "modcfg-disabled": "معطّل"
   },
   "cart": {
-    "nav-home": "🌐 رزق",
+    "nav-home": "⭐ رزق",
     "nav-store": "المحل",
     "nav-products": "المنتجات",
     "bc-store": "المحل",
@@ -1012,7 +1012,7 @@ window.RIZQ_I18N_AR = {
     "denied-home": "الصفحة الرئيسية"
   },
   "products": {
-    "nav-home": "🌐 رزق",
+    "nav-home": "⭐ رزق",
     "nav-store": "الرئيسية",
     "nav-products": "المنتجات",
     "nav-ads": "لوحة الإعلانات",
@@ -2452,7 +2452,7 @@ window.RIZQ_I18N_FR = {
     "modcfg-disabled": "Désactivé"
   },
   "cart": {
-    "nav-home": "🌐 Accueil",
+    "nav-home": "⭐ Accueil",
     "nav-store": "Boutique",
     "nav-products": "Produits",
     "bc-store": "Boutique",
@@ -2720,7 +2720,7 @@ window.RIZQ_I18N_FR = {
     "denied-home": "Page d'accueil"
   },
   "products": {
-    "nav-home": "🌐 Accueil",
+    "nav-home": "⭐ Accueil",
     "nav-store": "Boutique",
     "nav-products": "Produits",
     "nav-ads": "Panneau ADS",
