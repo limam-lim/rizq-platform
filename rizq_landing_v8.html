@@ -1718,11 +1718,32 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
    CATEGORIES
 ══════════════════════════════════ */
 .section{padding:80px 5%}
-/* نموذج ب — بطاقة متوسطة مضغوطة: عرض 760px + حشو أقل (يحافظ على الهوية ويخفّف طول الصفحة) */
-.section-header{text-align:center;max-width:760px;width:100%;margin:0 auto 28px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");background-blend-mode:overlay;border:1px solid rgba(201,168,76,.2);border-radius:16px;padding:22px 28px;box-shadow:0 8px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}
+/* نموذج ب — عرض موحّد أضيق لكل خلفيات عناوين الأقسام + عنوان بسطر واحد */
+:root{--rizq-section-header-w:680px}
+.section-header{
+  text-align:center;
+  width:min(100%,var(--rizq-section-header-w));
+  max-width:var(--rizq-section-header-w);
+  margin:0 auto 28px;
+  background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-blend-mode:overlay;
+  border:1px solid rgba(201,168,76,.2);
+  border-radius:16px;
+  padding:20px 22px;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  position:relative;overflow:hidden;
+  box-sizing:border-box;
+}
 .section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
-.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,3vw,34px);font-weight:700;line-height:1.3;margin-bottom:8px;color:#fff}
-.section-header h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,3vw,34px)!important;font-weight:700;line-height:1.3;margin-bottom:8px;color:#fff!important}
+.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(15px,2.05vw,22px);font-weight:700;line-height:1.25;margin-bottom:8px;color:#fff}
+.section-header h2,.section-header .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(15px,2.05vw,22px)!important;font-weight:700;line-height:1.25;margin-bottom:8px;color:#fff!important}
+/* عنوان القسم في سطر واحد على الشاشات المتوسطة+ — أصغر حجماً لتفادي الالتفاف */
+@media(min-width:700px){
+  .section-header h2,.section-header .section-title{white-space:nowrap}
+}
+@media(max-width:699px){
+  .section-header h2,.section-header .section-title{font-size:clamp(14px,4.2vw,18px)!important;white-space:normal}
+}
 .section-title span,
 .section-header h2 span,
 .section-tag span,
@@ -1933,8 +1954,8 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   align-items:center !important;
   justify-content:center !important;
   text-align:center !important;
-  width:100% !important;
-  max-width:760px !important;
+  width:min(100%,var(--rizq-section-header-w)) !important;
+  max-width:var(--rizq-section-header-w) !important;
   margin-left:auto !important;
   margin-right:auto !important;
   margin-inline:auto !important;
@@ -3068,7 +3089,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:22px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
   font-family:Georgia,'Noto Naskh Arabic',serif;
-  font-size:clamp(24px,3.2vw,38px);font-weight:700;color:#fff;margin:0 0 10px;line-height:1.3
+  font-size:clamp(15px,2.05vw,22px);font-weight:700;color:#fff;margin:0 0 8px;line-height:1.25
 }
 #rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
