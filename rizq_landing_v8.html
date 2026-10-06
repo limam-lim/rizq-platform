@@ -496,16 +496,56 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 /* ── HERO CONTENT ── */
 .rizq-trio{
   display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:20px;max-width:960px;margin:0 auto;
+  gap:12px;max-width:680px;margin:0 auto 36px;
 }
-.rizq-trio > div{
-  padding:28px 22px !important;min-height:100%;
-  display:flex;flex-direction:column;align-items:center;
-  text-align:center;
-}
-.rizq-trio > div > div:last-child{margin-top:auto}
+.rizq-trio > div{min-height:100%}
 @media(max-width:768px){
-  .rizq-trio{grid-template-columns:1fr;gap:14px;max-width:100%}
+  .rizq-trio{grid-template-columns:1fr;gap:12px;max-width:100%}
+}
+/* بطاقات الميزات البيضاء — أصغر + حواف ذهبية بارزة */
+.rizq-feat-row.rizq-feat-row-3{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+  max-width:680px!important;
+  margin:0 auto 36px!important;
+}
+.rizq-feat-card{
+  background:#fff;
+  border:1.5px solid rgba(201,168,76,.58);
+  border-radius:14px;
+  padding:16px 12px 14px;
+  text-align:center;
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+  box-shadow:
+    0 4px 14px rgba(27,58,107,.07),
+    0 0 0 1px rgba(201,168,76,.14),
+    inset 0 0 0 1px rgba(201,168,76,.22);
+  display:flex;flex-direction:column;align-items:center;
+  box-sizing:border-box;min-height:168px;
+}
+.rizq-feat-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(201,168,76,.92);
+  box-shadow:
+    0 10px 26px rgba(201,168,76,.2),
+    0 0 0 2px rgba(201,168,76,.28),
+    inset 0 0 0 1px rgba(232,201,106,.35);
+}
+.rizq-feat-card .rizq-feat-ico{margin-bottom:10px;display:flex;justify-content:center}
+.rizq-feat-card .cat-icon-box{
+  width:40px;height:40px;border-radius:11px;font-size:18px;
+  border:1px solid rgba(201,168,76,.45);
+}
+.rizq-feat-title{
+  font-size:12.5px;font-weight:700;color:var(--navy,#0D1B2A);
+  margin:0 0 6px;line-height:1.3;letter-spacing:.15px;
+}
+.rizq-feat-desc{
+  font-size:11px;font-weight:500;color:#3d4f6a;line-height:1.6;margin:0;
+}
+@media(max-width:640px){
+  .rizq-feat-row.rizq-feat-row-3{grid-template-columns:1fr!important;max-width:320px!important}
 }
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
 /* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
@@ -2140,15 +2180,12 @@ html[dir="ltr"] .listings-section .section-desc{
   .vo-spec-portal .cat-icon-box{width:44px!important;height:44px!important;font-size:18px!important;margin-bottom:6px!important}
   .vo-spec-label{font-size:12px!important}
   .vo-spec-hint{font-size:10px!important}
-  .rizq-feat-row{
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    gap:16px!important;
-    padding:28px 20px!important;
-  }
   .rizq-feat-row.rizq-feat-row-3{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:12px!important;
+    max-width:680px!important;
   }
-  .rizq-trio{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+  .rizq-trio{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;max-width:680px!important}
   .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
 }
 @media (max-width:480px){
@@ -3974,20 +4011,20 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 
     <div class="fade-in rizq-trio">
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)" onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🏪</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vs-card1-title">واجهة احترافية لمحلك</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vs-card1-desc">شعار، اسم تجاري، وموقعك — حضور واضح يبني ثقة الزبون من أول زيارة</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">🏪</div></div>
+        <div class="rizq-feat-title" data-t="vs-card1-title">واجهة احترافية لمحلك</div>
+        <div class="rizq-feat-desc" data-t="vs-card1-desc">شعار، اسم تجاري، وموقعك — حضور واضح يبني ثقة الزبون من أول زيارة</div>
       </div>
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)" onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🖼️</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vs-card2-title">كتالوج منظم بالصور</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vs-card2-desc">منتجاتك بأسعار وصور واضحة — يتصفّحها الزبون بسهولة قبل التواصل</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">🖼️</div></div>
+        <div class="rizq-feat-title" data-t="vs-card2-title">كتالوج منظم بالصور</div>
+        <div class="rizq-feat-desc" data-t="vs-card2-desc">منتجاتك بأسعار وصور واضحة — يتصفّحها الزبون بسهولة قبل التواصل</div>
       </div>
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)" onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📊</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vs-card3-title">نمو يُرى كل يوم</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vs-card3-desc">زبائن أكثر وطلبات أوضح — محلك يكبر بثقة على رزق</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">📊</div></div>
+        <div class="rizq-feat-title" data-t="vs-card3-title">نمو يُرى كل يوم</div>
+        <div class="rizq-feat-desc" data-t="vs-card3-desc">زبائن أكثر وطلبات أوضح — محلك يكبر بثقة على رزق</div>
       </div>
     </div>
 
@@ -4046,30 +4083,23 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <!-- بطاقات الميزات -->
-    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 52px">
-
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🏬</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card1-title">عرض يبيع قبل الرسالة</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card1-desc">صور وأسعار تُقنع المشتري من أول نظرة — قبل أن يراسلك</div>
+    <div class="fade-in rizq-feat-row rizq-feat-row-3">
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">🏬</div></div>
+        <div class="rizq-feat-title" data-t="vsh-card1-title">عرض يبيع قبل الرسالة</div>
+        <div class="rizq-feat-desc" data-t="vsh-card1-desc">صور وأسعار تُقنع المشتري من أول نظرة — قبل أن يراسلك</div>
       </div>
 
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">💬</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card2-title">تواصل بثقة عبر رزق</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card2-desc">مشترون جادّون يصلون إليك — وخصوصيتك محمية دائماً</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">💬</div></div>
+        <div class="rizq-feat-title" data-t="vsh-card2-title">تواصل بثقة عبر رزق</div>
+        <div class="rizq-feat-desc" data-t="vsh-card2-desc">مشترون جادّون يصلون إليك — وخصوصيتك محمية دائماً</div>
       </div>
 
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">✅</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t="vsh-card3-title">شارة معرض موثّق</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t="vsh-card3-desc">شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">✅</div></div>
+        <div class="rizq-feat-title" data-t="vsh-card3-title">شارة معرض موثّق</div>
+        <div class="rizq-feat-desc" data-t="vsh-card3-desc">شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين</div>
       </div>
 
     </div>
@@ -4249,30 +4279,23 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <!-- بطاقات الميزات -->
-    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 40px">
-
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📋</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Des besoins qui trouvent réponse">احتياجك يجد أفضل عرض</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Atteignez des fournisseurs sérieux et recevez des offres à la hauteur de votre projet">صل إلى موردين جادّين واستقبل عروضاً تليق بمشروعك</div>
+    <div class="fade-in rizq-feat-row rizq-feat-row-3">
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">📋</div></div>
+        <div class="rizq-feat-title" data-t-fr="Des besoins qui trouvent réponse">احتياجك يجد أفضل عرض</div>
+        <div class="rizq-feat-desc" data-t-fr="Atteignez des fournisseurs sérieux et recevez des offres à la hauteur de votre projet">صل إلى موردين جادّين واستقبل عروضاً تليق بمشروعك</div>
       </div>
 
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🔒</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Des offres exclusives pour vous">عروض حصرية لك وحدك</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Comparez en toute sérénité — vos négociations restent discrètes et professionnelles">قارن بثقة — مفاوضاتك تبقى خاصة واحترافية</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">🔒</div></div>
+        <div class="rizq-feat-title" data-t-fr="Des offres exclusives pour vous">عروض حصرية لك وحدك</div>
+        <div class="rizq-feat-desc" data-t-fr="Comparez en toute sérénité — vos négociations restent discrètes et professionnelles">قارن بثقة — مفاوضاتك تبقى خاصة واحترافية</div>
       </div>
 
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;transition:all .3s;box-shadow:0 4px 18px rgba(27,58,107,.08)"
-           onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.transform='translateY(-4px)'"
-           onmouseout="this.style.borderColor='rgba(27,58,107,.1)';this.style.transform='translateY(0)'">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">✅</div></div>
-        <div style="font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:6px" data-t-fr="Un cercle d'affaires engagé">دائرة أعمال جادّة</div>
-        <div style="font-size:12px;color:#2C3A4F;line-height:1.7" data-t-fr="Des professionnels motivés — un espace pensé pour des échanges sérieux">محترفون ملتزمون — فضاء صُمم لصفقات تُحترم</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">✅</div></div>
+        <div class="rizq-feat-title" data-t-fr="Un cercle d'affaires engagé">دائرة أعمال جادّة</div>
+        <div class="rizq-feat-desc" data-t-fr="Des professionnels motivés — un espace pensé pour des échanges sérieux">محترفون ملتزمون — فضاء صُمم لصفقات تُحترم</div>
       </div>
 
     </div>
@@ -4310,21 +4333,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </p>
     </div>
 
-    <div class="fade-in rizq-feat-row rizq-feat-row-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto 40px">
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📈</div></div>
-        <div style="font-size:16px;font-weight:800;color:#0D1B2A;margin-bottom:8px" data-t-fr="Votre opportunité mérite d'être vue">فرصتك تستحق أن تُرى</div>
-        <div style="font-size:13.5px;font-weight:600;color:#1B3A6B;line-height:1.75" data-t-fr="Présentez votre vision et attirez des investisseurs prêts à s'engager.">اعرض رؤيتك واجذب مستثمرين مستعدين للالتزام.</div>
+    <div class="fade-in rizq-feat-row rizq-feat-row-3">
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">📈</div></div>
+        <div class="rizq-feat-title" data-t-fr="Votre opportunité mérite d'être vue">فرصتك تستحق أن تُرى</div>
+        <div class="rizq-feat-desc" data-t-fr="Présentez votre vision et attirez des investisseurs prêts à s'engager.">اعرض رؤيتك واجذب مستثمرين مستعدين للالتزام.</div>
       </div>
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">🤝</div></div>
-        <div style="font-size:16px;font-weight:800;color:#0D1B2A;margin-bottom:8px" data-t-fr="Des partenaires de confiance">شركاء يُوثق بهم</div>
-        <div style="font-size:13.5px;font-weight:600;color:#1B3A6B;line-height:1.75" data-t-fr="Un espace pensé pour des alliances sérieuses et durables.">فضاء صُمم لتحالفات جادّة ومستدامة.</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">🤝</div></div>
+        <div class="rizq-feat-title" data-t-fr="Des partenaires de confiance">شركاء يُوثق بهم</div>
+        <div class="rizq-feat-desc" data-t-fr="Un espace pensé pour des alliances sérieuses et durables.">فضاء صُمم لتحالفات جادّة ومستدامة.</div>
       </div>
-      <div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 4px 18px rgba(27,58,107,.08)">
-        <div style="margin-bottom:14px;display:flex;justify-content:center"><div class="cat-icon-box">📍</div></div>
-        <div style="font-size:16px;font-weight:800;color:#0D1B2A;margin-bottom:8px" data-t-fr="Opportunités mauritaniennes">فرص استثمار موريتانية</div>
-        <div style="font-size:13.5px;font-weight:600;color:#1B3A6B;line-height:1.75" data-t-fr="Projets locaux en commerce, immobilier, agriculture et services.">مشاريع محلية في التجارة والعقار والزراعة والخدمات.</div>
+      <div class="rizq-feat-card">
+        <div class="rizq-feat-ico"><div class="cat-icon-box">📍</div></div>
+        <div class="rizq-feat-title" data-t-fr="Opportunités mauritaniennes">فرص استثمار موريتانية</div>
+        <div class="rizq-feat-desc" data-t-fr="Projets locaux en commerce, immobilier, agriculture et services.">مشاريع محلية في التجارة والعقار والزراعة والخدمات.</div>
       </div>
     </div>
 
