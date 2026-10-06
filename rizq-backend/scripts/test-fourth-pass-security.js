@@ -278,6 +278,20 @@ async function main() {
   }
   ok('team.manage cannot grant Super', grantBlocked);
 
+  // 9b. team.manage cannot grant payments/accounts beyond own perms
+  let beyondBlocked = false;
+  try {
+    await adminTeam.createMember({
+      user: 'fp_esc_' + Date.now(),
+      name: 'FP Esc',
+      pass: 'password123',
+      permissions: ['payments', 'accounts', 'siteconfig'],
+    }, 'actor', ['team.manage', 'overview']);
+  } catch (e) {
+    beyondBlocked = e.code === 'cannot_grant_beyond_actor';
+  }
+  ok('team.manage cannot grant beyond actor perms', beyondBlocked);
+
   // 10. Agent toggle phone mismatch
   const togAcc = 'acc_fp_tog_' + Date.now();
   const togTok = crypto.randomBytes(20).toString('hex');

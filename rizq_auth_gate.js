@@ -260,7 +260,12 @@
   }
   function isLoggedIn() {
     var s = getSession();
-    return !!(s && s.id && s.token);
+    if (!s || !s.id || !s.token) return false;
+    // توكنات الخادم ≥ 20 حرفاً (randomBytes) — ارفض الجلسات المزوّرة القصيرة
+    var tok = String(s.token);
+    var id = String(s.id);
+    if (tok.length < 20 || id.length < 4) return false;
+    return true;
   }
   function saveDraft(data) {
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
@@ -1253,14 +1258,38 @@
   }
 
   function requireAuth(actionFn, reasonKey) {
-    if (isLoggedIn()) {
-      if (typeof actionFn === 'function') actionFn();
+    if (!isLoggedIn()) {
+      _pendingAction = actionFn;
+      rememberAfterAuthHref();
+      openModal(reasonKey);
+      return false;
+    }
+    var s = getSession();
+    var base = apiBase();
+    // عند توفر الخادم: تحقّق من الجلسة قبل كشف الهاتف/الاتصال (يمنع تزوير localStorage)
+    if (base && s && s.token) {
+      fetch(base + '/api/auth/me', {
+        headers: {
+          'Authorization': 'Bearer ' + s.token,
+          'X-Buyer-Id': s.id
+        }
+      }).then(function (res) {
+        if (res.status === 401) {
+          clearSession();
+          _pendingAction = actionFn;
+          rememberAfterAuthHref();
+          openModal(reasonKey);
+          return;
+        }
+        if (typeof actionFn === 'function') actionFn();
+      }).catch(function () {
+        // شبكة معطّلة — اسمح إن كانت الجلسة المحلية تبدو صالحة
+        if (typeof actionFn === 'function') actionFn();
+      });
       return true;
     }
-    _pendingAction = actionFn;
-    rememberAfterAuthHref();
-    openModal(reasonKey);
-    return false;
+    if (typeof actionFn === 'function') actionFn();
+    return true;
   }
 
   function gateLink(el, ev, reasonKey) {
