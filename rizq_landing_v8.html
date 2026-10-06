@@ -1719,20 +1719,30 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 ══════════════════════════════════ */
 .section{padding:80px 5%}
 /* نموذج ب — عرض موحّد أضيق لكل خلفيات عناوين الأقسام + عنوان بسطر واحد */
-:root{--rizq-section-header-w:680px}
+:root{
+  --rizq-section-header-w:680px;
+  --rizq-section-header-h:148px; /* عرض وارتفاع موحّدان لكل بطاقات عناوين الأقسام */
+}
 .section-header{
   text-align:center;
   width:min(100%,var(--rizq-section-header-w));
   max-width:var(--rizq-section-header-w);
+  height:var(--rizq-section-header-h);
+  min-height:var(--rizq-section-header-h);
+  max-height:var(--rizq-section-header-h);
   margin:0 auto 28px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-blend-mode:overlay;
   border:1px solid rgba(201,168,76,.2);
   border-radius:16px;
-  padding:20px 22px;
+  padding:16px 22px;
   box-shadow:0 8px 28px rgba(0,0,0,.18);
   position:relative;overflow:hidden;
   box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 .section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
 .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(15px,2.05vw,22px);font-weight:700;line-height:1.25;margin-bottom:8px;color:#fff}
@@ -1742,6 +1752,9 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   .section-header h2,.section-header .section-title{white-space:nowrap}
 }
 @media(max-width:699px){
+  .section-header{
+    height:auto;min-height:0;max-height:none;padding:16px 18px;
+  }
   .section-header h2,.section-header .section-title{font-size:clamp(14px,4.2vw,18px)!important;white-space:normal}
 }
 .section-title span,
@@ -1956,6 +1969,9 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   text-align:center !important;
   width:min(100%,var(--rizq-section-header-w)) !important;
   max-width:var(--rizq-section-header-w) !important;
+  height:var(--rizq-section-header-h) !important;
+  min-height:var(--rizq-section-header-h) !important;
+  max-height:var(--rizq-section-header-h) !important;
   margin-left:auto !important;
   margin-right:auto !important;
   margin-inline:auto !important;
@@ -2537,11 +2553,6 @@ html[dir="ltr"] .pricing-features{text-align:left}
 html[dir="ltr"] .diamond-pitch-grid{text-align:left;direction:ltr}
 html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
 #diamond-pitch{direction:inherit}
-/* عنوان قسم الأسعار أوسع قليلاً ليستوعب بطاقة الماسية كما كانت — مع عرض أضيق من 920 */
-.pricing-section .section-header{
-  width:min(100%,800px);
-  max-width:800px;
-}
 .pricing-card li,.pricing-features li{padding:3px 0;font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:7px;line-height:1.5;word-wrap:break-word}
 .pricing-card li span:last-child,.pricing-features li span:last-child{flex:1;min-width:0}
 .pricing-card-freebox{background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46;margin-top:auto;line-height:1.35}
@@ -3927,8 +3938,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <p class="section-tag" data-t="s-lst-tag">مختارات السوق</p>
     <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">أبرز العروض على <span>رزق</span></h2>
     <p class="section-desc" data-t="s-lst-desc">فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن</p>
-    <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
   </div>
+  <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
   <div class="landing-ads-filters" id="landing-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
     <button type="button" class="landing-ads-filter is-active" role="tab" aria-selected="true" data-lad-cat="all" onclick="filterLandingAds('all',this)" data-t="f-all">الكل</button>
     <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="عقارات" onclick="filterLandingAds('عقارات',this)" data-t="f-re">عقارات</button>
@@ -4478,20 +4489,20 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <p class="section-tag" data-t="s-price-tag">خطط الأسعار</p>
     <h2 class="section-title" data-t="s-price-title">خطط <span>شفافة وبسيطة</span></h2>
     <p class="section-desc" data-t="s-price-desc">ابدأ مجاناً وطوّر تجربتك متى شئت</p>
-    <div id="diamond-pitch" style="max-width:760px;width:100%;margin:18px auto 0;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#0a1628,#1B3A6B);border:1px solid rgba(201,168,76,.45);color:#f5f0e6;text-align:center;box-sizing:border-box">
-      <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e8c96a;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
-      <div class="diamond-pitch-grid">
-        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28)">
-          <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية الأساسية 💎</div>
-          <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:rgba(255,255,255,.85)">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
-        </div>
-        <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.4)">
-          <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية Pro 💎</div>
-          <div id="diamond-pitch-pro-desc" data-t-fr="Système de vente et service client — texte + appels vocaux · 10 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
-        </div>
+  </div>
+  <div id="diamond-pitch" style="max-width:760px;width:100%;margin:0 auto 28px;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#0a1628,#1B3A6B);border:1px solid rgba(201,168,76,.45);color:#f5f0e6;text-align:center;box-sizing:border-box">
+    <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e8c96a;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
+    <div class="diamond-pitch-grid">
+      <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28)">
+        <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية الأساسية 💎</div>
+        <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:rgba(255,255,255,.85)">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
       </div>
-      <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.88)">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
+      <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.4)">
+        <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية Pro 💎</div>
+        <div id="diamond-pitch-pro-desc" data-t-fr="Système de vente et service client — texte + appels vocaux · 10 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
+      </div>
     </div>
+    <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.88)">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
   </div>
 
   <div class="pricing-container">
