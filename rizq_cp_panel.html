@@ -128,7 +128,7 @@ select option{background:#fff !important;color:#1a2535 !important}
 .tbl tr:hover td{background:#f8faff}
 
 /* Badges */
-.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}
 .pill-active{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.25)}
 .pill-pending{background:rgba(245,158,11,.12);color:#b45309;border:1px solid rgba(245,158,11,.3)}
 .pill-banned{background:rgba(220,38,38,.1);color:var(--red);border:1px solid rgba(220,38,38,.25)}
@@ -195,7 +195,7 @@ select option{background:#fff !important;color:#1a2535 !important}
 .team-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;border:2px solid #e2e8f5}
 .team-card.super .team-av{border-color:rgba(201,168,76,.5)}
 .team-name{font-size:14px;font-weight:700;color:#1a2535;margin-bottom:4px}
-.team-role-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
+.team-role-tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:8px}
 .team-contact{font-size:11.5px;color:var(--text-muted);line-height:1.8}
 .team-contact a{color:var(--gold-dk);transition:opacity .2s}
 .team-contact a:hover{opacity:.7}
@@ -689,7 +689,7 @@ main, .page-content.active, .main-content, .results-area,
             <span id="subagent-status-label">يعمل</span>
             <span style="position:relative;display:inline-block;width:42px;height:22px">
               <input type="checkbox" id="subagent-enabled-toggle" onchange="toggleSubAgent(this)" style="opacity:0;width:0;height:0">
-              <span id="subagent-toggle-track" style="position:absolute;inset:0;background:#059669;border-radius:22px;transition:.2s;cursor:pointer" onclick="document.getElementById('subagent-enabled-toggle').click()"></span>
+              <span id="subagent-toggle-track" style="position:absolute;inset:0;background:#059669;border-radius:10px;transition:.2s;cursor:pointer" onclick="document.getElementById('subagent-enabled-toggle').click()"></span>
               <span id="subagent-toggle-knob" style="position:absolute;top:2px;left:22px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></span>
             </span>
           </label>
@@ -740,7 +740,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="card" style="margin-top:20px">
         <div class="card-header">
           <div class="card-title">📬 طلبات الاشتراك المعلقة</div>
-          <span id="sub-req-badge" style="background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;display:none">0</span>
+          <span id="sub-req-badge" style="background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;display:none">0</span>
         </div>
         <div id="sub-requests-list" style="margin-top:12px">
           <p style="color:#9aa7bd;font-size:13px;text-align:center;padding:20px">لا توجد طلبات معلقة</p>
@@ -751,7 +751,7 @@ main, .page-content.active, .main-content, .results-area,
       <div class="card" style="margin-top:20px">
         <div class="card-header">
           <div class="card-title">🧾 إيصالات الدفع المُولَّدة تلقائياً</div>
-          <span id="invoices-count-badge" style="background:#1B3A6B;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">0</span>
+          <span id="invoices-count-badge" style="background:#1B3A6B;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px">0</span>
         </div>
         <p style="font-size:11px;color:#9ca3af;margin:-6px 0 12px">يُولَّد إيصال تلقائياً عند كل تفعيل/تجديد باقة (تأكيد دفع داخلي بعد مراجعة الوصل — ليس فاتورة ضريبية رسمية).</p>
         <div id="invoices-list" style="margin-top:4px">
@@ -2398,12 +2398,12 @@ main, .page-content.active, .main-content, .results-area,
       <div style="margin-bottom:14px">
         <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:7px">نوع الإشعار</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap" id="ann-type-pills">
-          <button type="button" data-type="congrats" onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #C9A84C;background:#fef9ec;color:#7a5200">🎉 تهنئة</button>
-          <button type="button" data-type="discount" onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #10b981;background:#ecfdf5;color:#065f46">✂️ خصم / عرض</button>
-          <button type="button" data-type="alert"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #ef4444;background:#fef2f2;color:#7f1d1d">⚠️ تنبيه</button>
-          <button type="button" data-type="event"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1B3A6B;background:#eff6ff;color:#1e3a5f">📅 فعالية / حدث</button>
-          <button type="button" data-type="promo"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #7c3aed;background:#f5f3ff;color:#4c1d95">📣 ترويج</button>
-          <button type="button" data-type="info"     onclick="annSelectType(this)" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #4f46e5;background:#eef2ff;color:#312e81">ℹ️ معلومة</button>
+          <button type="button" data-type="congrats" onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #C9A84C;background:#fef9ec;color:#7a5200">🎉 تهنئة</button>
+          <button type="button" data-type="discount" onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #10b981;background:#ecfdf5;color:#065f46">✂️ خصم / عرض</button>
+          <button type="button" data-type="alert"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #ef4444;background:#fef2f2;color:#7f1d1d">⚠️ تنبيه</button>
+          <button type="button" data-type="event"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1B3A6B;background:#eff6ff;color:#1e3a5f">📅 فعالية / حدث</button>
+          <button type="button" data-type="promo"    onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #7c3aed;background:#f5f3ff;color:#4c1d95">📣 ترويج</button>
+          <button type="button" data-type="info"     onclick="annSelectType(this)" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #4f46e5;background:#eef2ff;color:#312e81">ℹ️ معلومة</button>
         </div>
         <input type="hidden" id="ann-type" value="congrats" />
       </div>
@@ -5200,7 +5200,7 @@ function refreshUnifiedReviewPanel(){
         return '<button type="button" data-ur-panel="'+c.panel+'" onclick="openUnifiedReviewTarget(this.getAttribute(\'data-ur-panel\'))" style="text-align:inherit;cursor:pointer;border:1px solid rgba(27,58,107,.12);background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 4px 14px rgba(15,35,65,.04);font-family:inherit;display:flex;flex-direction:column;gap:8px">'
           +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
           +'<span style="font-size:22px">'+c.icon+'</span>'
-          +'<span style="background:'+c.color+';color:#fff;font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;min-width:28px;text-align:center">'+c.count+'</span>'
+          +'<span style="background:'+c.color+';color:#fff;font-weight:800;font-size:13px;padding:3px 10px;border-radius:10px;min-width:28px;text-align:center">'+c.count+'</span>'
           +'</div>'
           +'<div style="font-size:15px;font-weight:800;color:var(--navy)">'+c.title+'</div>'
           +'<div style="font-size:12px;color:#64748b">'+c.hint+'</div>'
@@ -5650,7 +5650,7 @@ function renderPendingAccounts(){
         <div style="flex:1;min-width:200px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
             <span style="font-size:12.5px;font-weight:700;background:rgba(27,58,107,.08);color:var(--navy);padding:3px 10px;border-radius:20px">${ACC_TYPE_LABELS[acc.type]||acc.type}</span>
-            <span style="font-size:12px;font-weight:700;color:${sc};background:${sc}20;padding:3px 10px;border-radius:20px">${ACC_STATUS_LABELS[acc.status]||acc.status}</span>
+            <span style="font-size:12px;font-weight:700;color:${sc};background:${sc}20;padding:3px 10px;border-radius:10px">${ACC_STATUS_LABELS[acc.status]||acc.status}</span>
             <span style="font-size:11px;color:#9aa5b8">${date}</span>
           </div>
           <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px">${escapeHtml(acc.name||'')}</div>

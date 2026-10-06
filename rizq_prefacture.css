@@ -41,7 +41,7 @@
   display:inline-block;
   font-size:11px;font-weight:900;letter-spacing:2.2px;
   color:#0d1b2a;background:linear-gradient(135deg,#C9A84C,#E8C96A);
-  padding:5px 10px;border-radius:999px;margin-bottom:10px;
+  padding:5px 10px;border-radius:10px;margin-bottom:10px;
 }
 .rizq-prf-head h2{
   margin:0;font-size:22px;font-weight:900;color:#fff;
@@ -49,7 +49,7 @@
 .rizq-prf-num{margin-top:4px;font-size:13px;color:#E8C96A;font-weight:800}
 .rizq-prf-status{
   display:inline-block;margin-top:10px;
-  padding:4px 10px;border-radius:999px;
+  padding:4px 10px;border-radius:10px;
   font-size:11px;font-weight:800;
   background:rgba(255,255,255,.1);
   color:var(--prf-st,#E8C96A);

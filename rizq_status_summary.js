@@ -47,7 +47,7 @@
       total: { bg: '#eff6ff', border: '#93c5fd', text: '#1e40af' }
     };
     var c = colors[tone] || colors.total;
-    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';font-size:12px;font-weight:700">' +
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';font-size:12px;font-weight:700">' +
       '<span>' + label + '</span><strong>' + value + '</strong></span>';
   }
 

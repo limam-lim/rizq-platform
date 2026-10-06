@@ -464,7 +464,7 @@ textarea.form-input{resize:vertical;min-height:90px}
           <div style="font-size:10px;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:8px" data-t="wb-kicker">لوحة تحكم · منصة <span style="color:#e8c96a;font-weight:800">رزق</span></div>
           <div id="wb-name" style="font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:4px">...</div>
           <div id="wb-sub" style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:14px">...</div>
-          <div id="wb-plan-badge" style="display:inline-block;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;margin-bottom:14px">...</div>
+          <div id="wb-plan-badge" style="display:inline-block;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:11px;font-weight:800;padding:4px 14px;border-radius:10px;margin-bottom:14px">...</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button onclick="previewMyPage()" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;color:#0f2347;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit" data-t="wb-preview">👁 عاين واجهة محلك</button>
             <button onclick="openShareModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" data-t="wb-share">📤 شارك</button>
@@ -920,7 +920,7 @@ textarea.form-input{resize:vertical;min-height:90px}
       <div class="card">
         <div class="card-header">
           <div class="card-title" data-t="agent-moderator-title">🛡️ مراقب المحتوى الآلي</div>
-          <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px" data-t="agent-active-badge">✅ نشط</span>
+          <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px" data-t="agent-active-badge">✅ نشط</span>
         </div>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px" data-t="agent-moderator-desc">يراجع كل منتج تضيفه تلقائياً قبل نشره — يحمي محلك من المخالفات.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="mod-stats">
@@ -943,7 +943,7 @@ textarea.form-input{resize:vertical;min-height:90px}
       <div class="card">
         <div class="card-header">
           <div class="card-title" data-t="agent-manager-title">🤖 مدير <span style="color:#e8c96a;font-weight:900">رزق</span> الذكي</div>
-          <span style="background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px" data-t="agent-247-badge">🟣 متاح 24/7</span>
+          <span style="background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px" data-t="agent-247-badge">🟣 متاح 24/7</span>
         </div>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px" data-t="agent-manager-desc">يرد على استفسارات زبائنك تلقائياً في ويدجت الشات — يشرح المنصة ويوجّههم لك.</p>
         <div style="background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(201,168,76,.05));border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px">
@@ -959,7 +959,7 @@ textarea.form-input{resize:vertical;min-height:90px}
       <div class="card" id="auto-reply-card">
         <div class="card-header">
           <div class="card-title" data-t="agent-autoreply-title">📞 الرد التلقائي على المكالمات والبريد</div>
-          <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px"></span>
+          <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px"></span>
         </div>
         <div id="auto-reply-content"></div>
       </div>
@@ -2888,7 +2888,7 @@ function renderAgents(){
   if(!badge||!content) return;
   if(isDiamond){
     badge.textContent=_t2('✅ مفعّل','✅ Activé');
-    badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+    badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
     content.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'+
       '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px">'+
         '<div style="font-size:18px;margin-bottom:6px">📞</div>'+
@@ -2912,7 +2912,7 @@ function renderAgents(){
     }
   } else {
     badge.textContent=_t2('🔒 ماسية فقط','🔒 Diamant uniquement');
-    badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+    badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
     content.innerHTML='<div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div>'+
       '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">'+_t2('ميزة حصرية للباقة الماسية','Fonctionnalité exclusive au forfait Diamant')+'</p>'+
       '<p style="font-size:12.5px;color:var(--text-muted);max-width:300px;margin:0 auto 16px">'+_t2('اشترك في باقة ماسية لتفعيل الرد التلقائي على المكالمات والبريد الإلكتروني','Abonnez-vous au forfait Diamant pour activer la réponse automatique aux appels et e-mails')+'</p>'+

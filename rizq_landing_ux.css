@@ -252,7 +252,8 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
 }
 .cat-card:hover:not(.open){
   transform:translateY(-4px)!important;
-  box-shadow:0 14px 36px rgba(201,168,76,.22),0 8px 24px rgba(27,58,107,.15)!important;
+  border-color:rgba(201,168,76,.85)!important;
+  box-shadow:0 10px 26px rgba(13,27,42,.12),0 0 0 1px rgba(201,168,76,.22)!important;
 }
 .qcat:hover{
   transform:translateY(-4px);
@@ -503,7 +504,7 @@ body{
   font-size:9px;
   font-weight:900;
   padding:5px 11px;
-  border-radius:20px;
+  border-radius:10px;
   line-height:1.35;
   text-align:center;
   white-space:normal;
@@ -575,11 +576,7 @@ body{
   position:relative;
 }
 .hero-bg{
-  background:
-    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(201,168,76,.14), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 85% 30%, rgba(27,58,107,.08), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 10% 60%, rgba(27,58,107,.07), transparent 55%),
-    linear-gradient(180deg,#e8eef8 0%,#f4f7fc 45%,#fbfcff 100%)!important;
+  background:#ffffff!important;
 }
 .hero-content.rizq-hero-enter > .hero-eyebrow,
 .hero-content.rizq-hero-enter > .hero-title-card,
@@ -721,7 +718,7 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   padding:64px 5% 72px!important;
   background:
     radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,.08), transparent 60%),
-    var(--bg-section,#fbfcff)!important;
+    var(--bg-section,#ffffff)!important;
 }
 #about .section-header{
   margin-bottom:36px!important;
@@ -752,29 +749,36 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   line-height:1.75!important;
 }
 #about .why-grid{
-  gap:20px!important;
-  padding-top:8px!important;
+  gap:12px!important;
+  padding-top:6px!important;
+  max-width:720px!important;
 }
 #about .why-card{
-  padding:44px 30px 40px!important;
+  flex-basis:min(220px,78vw)!important;
+  padding:18px 14px 16px!important;
+  min-height:210px!important;
+  border-radius:16px!important;
   border-color:rgba(201,168,76,.28)!important;
-  box-shadow:0 14px 40px rgba(10,22,42,.32)!important;
+  box-shadow:0 8px 22px rgba(10,22,42,.28)!important;
 }
 #about .why-card::before{
-  height:4px!important;
-  opacity:.9!important;
+  height:2px!important;
+  opacity:.85!important;
   background:linear-gradient(90deg,transparent,var(--gold),#e8c96a,var(--gold),transparent)!important;
 }
 #about .why-title{
-  font-size:19px!important;
-  margin-bottom:14px!important;
+  font-size:13.5px!important;
+  margin-bottom:8px!important;
+  font-weight:700!important;
 }
 #about .why-desc{
-  font-size:13.5px!important;
-  line-height:1.9!important;
-  color:rgba(255,255,255,.88)!important;
+  font-size:11px!important;
+  line-height:1.65!important;
+  color:rgba(255,255,255,.82)!important;
 }
+#about .why-icon{margin-bottom:12px!important}
 #about .why-icon .cat-icon-box{
+  width:44px!important;height:44px!important;border-radius:12px!important;font-size:20px!important;
   border:1.5px solid rgba(201,168,76,.4)!important;
   background:linear-gradient(145deg,#1B3A6B,#0f2347)!important;
 }
@@ -913,14 +917,14 @@ html body footer .footer-grid{
   z-index:10042;
   display:inline-flex;
   align-items:center;
-  gap:10px;
-  min-width:min(420px, calc(100vw - 28px));
-  max-width:min(560px, calc(100vw - 28px));
-  padding:11px 16px;
-  border-radius:12px; /* مستطيل بزوايا خفيفة بدل الدائري */
-  border:1px solid rgba(201,168,76,.45);
+  gap:8px;
+  min-width:min(340px, calc(100vw - 28px));
+  max-width:min(440px, calc(100vw - 28px));
+  padding:8px 12px;
+  border-radius:10px; /* مستطيل موحّد مع كبسولات المنصة */
+  border:1px solid rgba(201,168,76,.42);
   background:linear-gradient(135deg,rgba(13,27,42,.94),rgba(27,58,107,.92));
-  box-shadow:0 14px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+  box-shadow:0 12px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
   color:#fff;
   font:inherit;
   cursor:pointer;
@@ -934,20 +938,22 @@ html body footer .footer-grid{
   transform:translate(-50%,0) scale(1);
 }
 .rizq-search-pill:hover{
-  border-color:rgba(232,201,106,.7);
-  box-shadow:0 16px 40px rgba(0,0,0,.34), 0 0 0 1px rgba(201,168,76,.2);
+  border-color:rgba(232,201,106,.68);
+  box-shadow:0 14px 32px rgba(0,0,0,.32), 0 0 0 1px rgba(201,168,76,.18);
 }
 .rizq-search-pill-ico{
-  width:28px;height:28px;border-radius:8px;
+  width:22px;height:22px;border-radius:7px;
   display:inline-flex;align-items:center;justify-content:center;
-  background:rgba(201,168,76,.22);color:#FFE7A0;font-size:15px;font-weight:800;
+  background:rgba(201,168,76,.2);color:#FFE7A0;font-size:12px;font-weight:700;
 }
 .rizq-search-pill-brand{
-  font-weight:900;font-size:15px;color:#C9A84C;letter-spacing:.02em;
+  font-weight:700;font-size:12px;color:#C9A84C;letter-spacing:.04em;
+  font-family:Georgia,'Times New Roman',serif;
 }
 .rizq-search-pill-label{
-  flex:1;text-align:start;font-size:13.5px;font-weight:600;
-  color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:1;text-align:start;font-size:11.5px;font-weight:500;
+  color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:.15px;
 }
 
 .rizq-search-panel{
@@ -1022,7 +1028,7 @@ html body footer .footer-grid{
 }
 .rizq-search-cat{
   display:inline-flex;align-items:center;gap:5px;
-  padding:7px 12px;border-radius:999px;
+  padding:7px 12px;border-radius:10px;
   border:1px solid rgba(201,168,76,.28);
   background:rgba(255,255,255,.05);
   color:rgba(255,255,255,.9);
@@ -1048,14 +1054,14 @@ html body footer .footer-grid{
     padding:5px 11px;
     gap:6px;
     top:calc(var(--rizq-search-top) + 4px);
-    border-radius:999px;
+    border-radius:10px;
     box-shadow:0 6px 18px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
   }
   .rizq-search-pill-ico{
     width:20px;height:20px;border-radius:50%;font-size:11px;
   }
   .rizq-search-pill-brand{display:none}
-  .rizq-search-pill-label{font-size:11.5px}
+  .rizq-search-pill-label{font-size:10.5px;font-weight:500}
   .rizq-search-panel{
     width:calc(100vw - 16px);
     top:calc(var(--rizq-search-top) + 4px);
@@ -1070,7 +1076,7 @@ html body footer .footer-grid{
     border-radius:12px!important;
   }
   .hero-browse-panel .search-bar{
-    border-radius:999px!important;
+    border-radius:10px!important;
     min-height:0!important;
   }
   .hero-browse-panel .search-cat-select{

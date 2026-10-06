@@ -75,7 +75,7 @@
       + 'footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important;margin:0}'
       + 'footer.rizq-footer .telecom-tag{display:inline-block;background:rgba(201,168,76,.14);'
       + 'border:1px solid rgba(201,168,76,.4);color:rgba(201,168,76,.95);font-size:10px;'
-      + 'padding:4px 10px;border-radius:20px;font-weight:700}'
+      + 'padding:4px 10px;border-radius:10px;font-weight:700}'
       + 'body.rizq-dash footer.rizq-footer,body.rizq-dash .main > footer.rizq-footer,'
       + 'body.rizq-dash .main-content > footer.rizq-footer{margin-top:auto}'
       + '@media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}'
