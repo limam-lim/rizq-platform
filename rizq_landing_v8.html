@@ -5622,29 +5622,31 @@ function buildCards(){
   }
   var heroSec=document.getElementById('hero-listings');
   if(heroSec) heroSec.style.display='';
+  function _escCard(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   const all=[...ADS,...ADS];
   all.forEach((a,idx)=>{
     const realIdx = idx % ADS.length;
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
+    const bgSafe = _escCard(d.bg || '');
     c.innerHTML=`
-      <div class="ad-card-img" style="background:${d.bg}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
+      <div class="ad-card-img" style="background:${bgSafe}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
         ${_adPhotoHtml(a, d, 130)}
       </div>
       <div class="ad-card-body">
-        <div class="ad-cat">${d.cat}</div>
-        <div class="ad-title">${d.title}</div>
+        <div class="ad-cat">${_escCard(d.cat)}</div>
+        <div class="ad-title">${_escCard(d.title)}</div>
         <div class="ad-footer">
-          <span class="ad-price">${d.price}</span>
-          <span class="ad-loc">${d.loc}</span>
+          <span class="ad-price">${_escCard(d.price)}</span>
+          <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
       </div>
       <div class="ad-hover-detail">
-        <div class="ahd-cat">${d.cat}</div>
-        <div class="ahd-title">${d.title}</div>
-        <div class="ahd-desc">${d.desc}</div>
-        <div class="ahd-price">${d.price}</div>\n        <div class="ahd-meta"><span>${d.loc}</span><span>${d.status||''}</span></div>\n        <button class="ahd-btn" onclick="openCarouselAdById(${JSON.stringify(String(a.id))})">📋 ${isAr?'عرض الإعلان كاملاً':'Voir l\'annonce'}</button>
+        <div class="ahd-cat">${_escCard(d.cat)}</div>
+        <div class="ahd-title">${_escCard(d.title)}</div>
+        <div class="ahd-desc">${_escCard(d.desc)}</div>
+        <div class="ahd-price">${_escCard(d.price)}</div>\n        <div class="ahd-meta"><span>${_escCard(d.loc)}</span><span>${_escCard(d.status||'')}</span></div>\n        <button class="ahd-btn" onclick="openCarouselAdById(${JSON.stringify(String(a.id))})">📋 ${isAr?'عرض الإعلان كاملاً':'Voir l\'annonce'}</button>
       </div>`;
     c.addEventListener('click',()=>openCarouselAdById(a.id));
     track.appendChild(c);
@@ -6012,12 +6014,26 @@ function rizqOpenStyleItem(ev, adId){
     return false;
   }
   if(ad.href && (ad.fromView || String(ad.id).indexOf('store-') === 0)){
-    window.location.href = ad.href;
+    var safeHref = _rizqSafeNavHref(ad.href);
+    if(safeHref) window.location.href = safeHref;
     return false;
   }
   if(typeof goToListing === 'function') goToListing(ad);
   else window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(ad.id);
   return false;
+}
+/** روابط تنقّل داخل المنصة فقط — يمنع javascript: وhttp://خارجي */
+function _rizqSafeNavHref(href){
+  try {
+    var raw = String(href || '').trim();
+    if(!raw) return '';
+    if(/^\s*javascript:/i.test(raw) || /^\s*data:/i.test(raw)) return '';
+    if(raw.charAt(0) === '/' || raw.charAt(0) === '?' || raw.charAt(0) === '#') return raw;
+    if(/^[a-z0-9_\-]+\.html(\?|#|$)/i.test(raw)) return raw;
+    var u = new URL(raw, window.location.href);
+    if(u.origin !== window.location.origin) return '';
+    return u.pathname + u.search + u.hash;
+  } catch(e){ return ''; }
 }
 function rizqOpenStyleLook(ev, primaryId, fallbackHref){
   /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
@@ -6033,7 +6049,8 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
   if(primaryId){
     return rizqOpenStyleItem(null, primaryId);
   }
-  if(fallbackHref) window.location.href = fallbackHref;
+  var safeFb = _rizqSafeNavHref(fallbackHref);
+  if(safeFb) window.location.href = safeFb;
   return false;
 }
 window.rizqOpenStyleItem = rizqOpenStyleItem;
@@ -7099,14 +7116,15 @@ function openCarouselAdById(id) {
 }
 function populateAdModal(a) {
   const d = trAd(a);
+  function _escM(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   document.getElementById('amd-img').style.background = d.bg || '#1B3A6B';
-  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${d.emoji}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميّز':'Vedette')+'</div>':''}`;
+  document.getElementById('amd-img').innerHTML = `<span style="font-size:80px">${_escM(d.emoji)}</span>${d.pin?'<div class="amd-badge">⭐ '+( isAr?'مميّز':'Vedette')+'</div>':''}`;
   document.getElementById('amd-cat').textContent = d.cat;
   const locEl = document.getElementById('amd-loc');
   if (locEl) locEl.textContent = d.loc || '';
   document.getElementById('amd-title').textContent = d.title;
   document.getElementById('amd-desc').textContent = d.desc;
-  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(t=>`<span class="amd-tag">${t}</span>`).join('');
+  document.getElementById('amd-tags').innerHTML = (d.tags||[]).map(t=>`<span class="amd-tag">${_escM(t)}</span>`).join('');
   document.getElementById('amd-price').textContent = d.price;
   document.getElementById('amd-status').textContent = d.status;
   document.getElementById('amd-seller-av').textContent = d.sellerEmoji||'👤';
@@ -7550,7 +7568,8 @@ function renderTickerFromAds(){
   if(!wrap || !inner) return;
   var items = ADS.slice(0, 12);
   function row(a){
-    return '<div class="ticker-item"><div class="ticker-dot"></div>'+(a.emoji||'📦')+' '+(a.title||'')+' <strong>'+(a.price||'')+'</strong></div>';
+    function _escT(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    return '<div class="ticker-item"><div class="ticker-dot"></div>'+_escT(a.emoji||'📦')+' '+_escT(a.title||'')+' <strong>'+_escT(a.price||'')+'</strong></div>';
   }
   var html = '';
   if(items.length){
