@@ -100,8 +100,8 @@ document.documentElement.classList.add('rizq-app-nav');
   --navy:#0D1B2A;
   --gold:#C9A84C;--gold-light:#d4bc72;--gold-pale:#ebe2c8;--gold-dim:rgba(201,168,76,0.12);
   --white:#FFFFFF;--dark:#0D1B2A;--dark-2:#111d2e;--dark-3:#162235;
-  --bg-page:#fbfcff;--bg-section:#fbfcff;
-  --beige-1:#fefefc;--beige-2:#fcfbfa;--beige-3:#f8f7f4;
+  --bg-page:#ffffff;--bg-section:#ffffff;
+  --beige-1:#ffffff;--beige-2:#ffffff;--beige-3:#ffffff;
   --text-main:#0c1220;--text-strong:#070d18;
   --text-muted:#1a2438;--text-soft:#222d3f;
   --green:#16a34a;--gold-dk:#a07820;
@@ -416,7 +416,7 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .hero{min-height:100vh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-x:hidden;overflow-y:visible;padding-top:86px}
 
 /* خلفية متحركة */
-.hero-bg{position:absolute;inset:0;background:linear-gradient(180deg,#eef2fb 0%,#f8faff 55%,#fff 100%);pointer-events:none}
+.hero-bg{position:absolute;inset:0;background:#ffffff;pointer-events:none}
 .hero-orb1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite;pointer-events:none}
 .hero-orb2{position:absolute;width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite;pointer-events:none}
 .hero-orb3{position:absolute;width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite;pointer-events:none}
@@ -1757,7 +1757,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 /* ══════════════════════════════════
    SEARCH SECTION (secondary)
 ══════════════════════════════════ */
-.search-section{padding:70px 5%;background:linear-gradient(180deg,#f8faff 0%,#eef2fb 100%)}
+.search-section{padding:70px 5%;background:#ffffff}
 
 /* ══════════════════════════════════
    CATEGORIES
@@ -1828,7 +1828,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1080px;margin:0 auto;position:relative;z-index:1;overflow:visible}
 @media (min-width:1280px){.cats-grid{grid-template-columns:repeat(6,1fr);max-width:min(1020px,100%);gap:11px}}
 .cat-card{
-  background:linear-gradient(165deg,#ffffff 0%,#fbfaf7 72%,#f7f3e8 100%);
+  background:#ffffff;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
   padding:13px 9px 11px;
@@ -1836,7 +1836,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s,background .32s;
   position:relative;overflow:visible;text-decoration:none;
   display:flex;flex-direction:column;align-items:center;gap:6px;
-  box-shadow:0 2px 12px rgba(15,35,65,.08),inset 0 1px 0 rgba(255,255,255,.85);
+  box-shadow:0 2px 12px rgba(15,35,65,.08);
   backdrop-filter:blur(6px);
   min-height:0;
 }
@@ -1900,7 +1900,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   border-color:rgba(201,168,76,.85);
   transform:translateY(-4px);
   box-shadow:0 10px 26px rgba(13,27,42,.12),0 0 0 1px rgba(201,168,76,.22);
-  background:linear-gradient(165deg,#ffffff 0%,#fffef8 100%);
+  background:#ffffff;
 }
 .cat-card:hover::before{opacity:1}
 .cat-icon-box{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(201,168,76,.3);transition:all .4s;position:relative;z-index:1;box-shadow:0 3px 12px rgba(27,58,107,.2)}
@@ -2542,7 +2542,7 @@ html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:sca
 .why-desc{font-size:11px;color:rgba(255,255,255,.8);line-height:1.65;font-weight:500}
 
 /* CTA section */
-.cta-section{padding:64px 5% 84px;position:relative;overflow:hidden;background:linear-gradient(180deg,#eef2fa 0%,#f8faff 50%,#eef2fa 100%)}
+.cta-section{padding:64px 5% 84px;position:relative;overflow:hidden;background:#ffffff}
 .cta-orb{position:absolute;border-radius:50%;pointer-events:none}
 .cta-inner{
   max-width:min(720px,100%);margin:0 auto;text-align:center;position:relative;z-index:2;
@@ -3179,10 +3179,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 /* ── Style Ideas — شريط إطلالات فاخر (هوية رزق كحلي/ذهبي) ── */
 #rizq-styles,#rizq-showroom-models{
   padding:56px 4%;
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 0%,rgba(201,168,76,.08),transparent 58%),
-    radial-gradient(ellipse 50% 40% at 100% 100%,rgba(27,58,107,.05),transparent 55%),
-    linear-gradient(180deg,#f7f9fd 0%,#fbfcff 48%,#f4f7fc 100%);
+  background:#ffffff;
   position:relative;overflow:hidden;
 }
 #rizq-styles::before,#rizq-showroom-models::before{
@@ -3321,19 +3318,19 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   color:#5b6b85;font-size:13.5px;line-height:1.7;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر قليلاً + حواف ذهبية فخمة */
+/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر قليلاً + حواف ذهبية + أبيض ناصع */
 .rizq-style-card{
   display:flex;flex-direction:column;
   width:214px;min-width:214px;max-width:214px;
   flex:0 0 214px;
-  background:linear-gradient(165deg,#ffffff 0%,#fbfaf7 72%,#f7f3e8 100%);
+  background:#ffffff;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
   overflow:hidden;
   text-decoration:none;
   color:inherit;
   position:relative;
-  box-shadow:0 4px 16px rgba(13,27,42,.08),inset 0 1px 0 rgba(255,255,255,.9);
+  box-shadow:0 4px 16px rgba(13,27,42,.08);
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s;
   cursor:default;
 }

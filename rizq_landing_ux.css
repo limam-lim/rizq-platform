@@ -722,7 +722,7 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   padding:64px 5% 72px!important;
   background:
     radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,.08), transparent 60%),
-    var(--bg-section,#fbfcff)!important;
+    var(--bg-section,#ffffff)!important;
 }
 #about .section-header{
   margin-bottom:36px!important;
