@@ -576,11 +576,7 @@ body{
   position:relative;
 }
 .hero-bg{
-  background:
-    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(201,168,76,.14), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 85% 30%, rgba(27,58,107,.08), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 10% 60%, rgba(27,58,107,.07), transparent 55%),
-    linear-gradient(180deg,#e8eef8 0%,#f4f7fc 45%,#fbfcff 100%)!important;
+  background:#ffffff!important;
 }
 .hero-content.rizq-hero-enter > .hero-eyebrow,
 .hero-content.rizq-hero-enter > .hero-title-card,
