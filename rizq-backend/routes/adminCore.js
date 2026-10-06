@@ -37,6 +37,20 @@ function mountAdminCoreRoutes(app, deps) {
     for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
   }
 
+  /** إبطال كل جلسات عضو عند تغيير صلاحياته / كلمة السر / التعطيل */
+  function invalidateAdminSessionsForUser(user) {
+    const u = String(user || '').trim().toLowerCase();
+    if (!u) return 0;
+    let n = 0;
+    for (const [tok, sess] of adminSessions) {
+      if (sess && String(sess.user || '').toLowerCase() === u) {
+        adminSessions.delete(tok);
+        n += 1;
+      }
+    }
+    return n;
+  }
+
   const adminLoginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -122,6 +136,9 @@ function mountAdminCoreRoutes(app, deps) {
       if (e.code === 'user_exists') return res.status(409).json({ error: e.code, msg: 'اسم المستخدم موجود' });
       if (e.code === 'missing_fields') return res.status(400).json({ error: e.code, msg: 'الاسم واسم المستخدم وكلمة المرور مطلوبة' });
       if (e.code === 'cannot_grant_super') return res.status(403).json({ error: e.code, msg: 'منح صلاحية Super يتطلب أن تكون Super Admin' });
+      if (e.code === 'cannot_grant_beyond_actor') {
+        return res.status(403).json({ error: e.code, msg: 'لا يمكنك منح صلاحيات أوسع مما تملك', denied: e.denied || [] });
+      }
       res.status(500).json({ error: 'create_failed' });
     }
   });
@@ -132,9 +149,17 @@ function mountAdminCoreRoutes(app, deps) {
       const actorPerms = (req.adminUser && req.adminUser.permissions) || [];
       const member = await adminTeamService.updateMember(req.params.id, req.body || {}, actorPerms);
       if (!member) return res.status(404).json({ error: 'member_not_found' });
+      if (member._invalidateSessions) {
+        invalidateAdminSessionsForUser(member._invalidateUser || member.user);
+        delete member._invalidateSessions;
+        delete member._invalidateUser;
+      }
       res.json({ ok: true, member });
     } catch (e) {
       if (e.code === 'cannot_grant_super') return res.status(403).json({ error: e.code, msg: 'منح صلاحية Super يتطلب أن تكون Super Admin' });
+      if (e.code === 'cannot_grant_beyond_actor') {
+        return res.status(403).json({ error: e.code, msg: 'لا يمكنك منح صلاحيات أوسع مما تملك', denied: e.denied || [] });
+      }
       if (e.code === 'last_super_admin') return res.status(400).json({ error: e.code, msg: 'لا يمكن إزالة آخر Super Admin' });
       res.status(500).json({ error: 'update_failed' });
     }
@@ -150,6 +175,11 @@ function mountAdminCoreRoutes(app, deps) {
       return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
     }
     const member = await adminTeamService.deactivateMember(req.params.id);
+    invalidateAdminSessionsForUser(target.user);
+    if (member) {
+      delete member._invalidateSessions;
+      delete member._invalidateUser;
+    }
     res.json({ ok: true, member });
   });
 
@@ -162,6 +192,14 @@ function mountAdminCoreRoutes(app, deps) {
         b.currentPass || b.current || b.oldPass,
         b.newPass || b.pass || b.password
       );
+      // بعد تغيير كلمة السر: أبطل كل الجلسات الأخرى وأبقِ الجلسة الحالية فقط
+      const keep = req.header('x-admin-token');
+      const u = req.adminUser && req.adminUser.user;
+      for (const [tok, sess] of adminSessions) {
+        if (sess && String(sess.user || '').toLowerCase() === String(u || '').toLowerCase() && tok !== keep) {
+          adminSessions.delete(tok);
+        }
+      }
       res.set('Cache-Control', 'no-store');
       res.json({ ok: true, member });
     } catch (e) {

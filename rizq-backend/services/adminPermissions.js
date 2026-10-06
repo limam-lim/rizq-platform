@@ -90,6 +90,29 @@ function normalizePermissions(list) {
   return unique;
 }
 
+/**
+ * قيّد الصلاحيات الممنوحة بما يملكه الفاعل أصلاً.
+ * Super (*) يمنح أي شيء. غير ذلك: كل صلاحية مطلوبة يجب أن تكون ضمن صلاحيات الفاعل.
+ */
+function filterGrantablePermissions(requested, actorPerms) {
+  const next = normalizePermissions(requested);
+  const actor = normalizePermissions(actorPerms);
+  if (actor.includes('*')) return next;
+  if (next.includes('*')) {
+    const err = new Error('cannot_grant_super');
+    err.code = 'cannot_grant_super';
+    throw err;
+  }
+  const denied = next.filter((k) => !actor.includes(k));
+  if (denied.length) {
+    const err = new Error('cannot_grant_beyond_actor');
+    err.code = 'cannot_grant_beyond_actor';
+    err.denied = denied;
+    throw err;
+  }
+  return next;
+}
+
 function hasAdminPermission(userPerms, required) {
   const perms = normalizePermissions(userPerms);
   if (!required) return perms.length > 0;
@@ -120,6 +143,7 @@ module.exports = {
   PERMISSION_PRESETS,
   PANEL_PERMISSION_MAP,
   normalizePermissions,
+  filterGrantablePermissions,
   hasAdminPermission,
   permissionsForLegacyRole,
 };

@@ -3726,9 +3726,12 @@ setTelegramDeps({
 app.post('/api/telegram/webhook', handleTelegramWebhook);
 
 /**
- * POST /api/telegram/webhook/:secret — مسار قديم (توافق خلفي)
+ * POST /api/telegram/webhook/:secret — مسار قديم (سرّ في الـURL — خطر تسريب عبر السجلات/Referer).
+ * في الإنتاج يُرفض؛ في التطوير يبقى للتوافق الخلفي فقط.
  */
-app.post('/api/telegram/webhook/:secret', handleTelegramWebhook);
+if (!isProdEnv()) {
+  app.post('/api/telegram/webhook/:secret', handleTelegramWebhook);
+}
 
 /**
  * POST /api/telegram/setup-webhook — أدمين فقط — يسجّل webhook لدى Telegram
