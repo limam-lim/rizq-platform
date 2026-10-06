@@ -166,8 +166,8 @@
   function badgeHtml(ad) {
     if (!ad || ad.isPlatform) return '';
     var parts = [];
-    if (ad.vipBadge) parts.push('<span style="background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0f2347;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-inline-start:6px">VIP</span>');
-    else if (ad.featuredBadge) parts.push('<span style="background:#1B3A6B;color:#fde68a;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-inline-start:6px">مميّز برزق</span>');
+    if (ad.vipBadge) parts.push('<span style="background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0f2347;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-inline-start:6px">VIP</span>');
+    else if (ad.featuredBadge) parts.push('<span style="background:#1B3A6B;color:#fde68a;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-inline-start:6px">مميّز برزق</span>');
     return parts.join('');
   }
 

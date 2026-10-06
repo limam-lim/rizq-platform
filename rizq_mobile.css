@@ -824,7 +824,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 /* ── «قريباً» — نافذة وشريط (كل الصفحات العامة) ── */
 .cs-strip{background:linear-gradient(135deg,#0D1B2A,#1B3A6B);padding:18px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
 .cs-strip-title{width:100%;text-align:center;color:#fff;font-size:13px;font-weight:700;margin-bottom:2px}
-.cs-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);border-radius:30px;padding:7px 14px}
+.cs-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:7px 14px}
 .cs-item-label{font-size:12px;color:#fff;font-weight:600;white-space:nowrap}
 .cs-item-soon{font-size:10px;color:#c9a84c;background:rgba(201,168,76,.16);border-radius:20px;padding:2px 8px;font-weight:700}
 .cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:#c9a84c;border:none;border-radius:20px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-family:inherit}

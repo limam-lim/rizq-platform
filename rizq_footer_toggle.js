@@ -36,7 +36,7 @@
       + 'width:auto;max-width:100%;margin:0;padding:0;position:relative;z-index:2}'
       + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:5px;'
       + 'margin:0;padding:5px 16px;background:rgba(201,168,76,.08);'
-      + 'border:1px solid rgba(201,168,76,.32);border-radius:100px;color:#C9A84C;'
+      + 'border:1px solid rgba(201,168,76,.32);border-radius:10px;color:#C9A84C;'
       + 'font-size:10.5px;font-weight:700;cursor:pointer;transition:all .25s ease;'
       + 'font-family:inherit;width:max-content;max-width:100%;text-align:center;'
       + 'position:relative;z-index:2}'

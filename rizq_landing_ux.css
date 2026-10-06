@@ -1031,7 +1031,7 @@ html body footer .footer-grid{
 }
 .rizq-search-cat{
   display:inline-flex;align-items:center;gap:5px;
-  padding:7px 12px;border-radius:999px;
+  padding:7px 12px;border-radius:10px;
   border:1px solid rgba(201,168,76,.28);
   background:rgba(255,255,255,.05);
   color:rgba(255,255,255,.9);
@@ -1057,7 +1057,7 @@ html body footer .footer-grid{
     padding:5px 11px;
     gap:6px;
     top:calc(var(--rizq-search-top) + 4px);
-    border-radius:999px;
+    border-radius:10px;
     box-shadow:0 6px 18px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
   }
   .rizq-search-pill-ico{
@@ -1079,7 +1079,7 @@ html body footer .footer-grid{
     border-radius:12px!important;
   }
   .hero-browse-panel .search-bar{
-    border-radius:999px!important;
+    border-radius:10px!important;
     min-height:0!important;
   }
   .hero-browse-panel .search-cat-select{

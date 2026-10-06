@@ -315,7 +315,7 @@
       + '<div style="font-size:12px;opacity:.7">' + _esc(_t('الرقم', 'N°')) + '</div>'
       + '<div style="font-weight:800;color:#E8C96A">' + _esc(doc.number) + '</div>'
       + '<div style="font-size:12px;margin-top:6px">' + _esc(_fmtDate(doc.createdAt)) + '</div>'
-      + '<div style="margin-top:8px;display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;font-weight:700;color:' + st[1] + '">' + _esc(st[0]) + '</div>'
+      + '<div style="margin-top:8px;display:inline-block;padding:4px 10px;border-radius:10px;background:rgba(255,255,255,.1);font-size:11px;font-weight:700;color:' + st[1] + '">' + _esc(st[0]) + '</div>'
       + '</div></div>'
       + '<div style="padding:22px 24px">'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">'

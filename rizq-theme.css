@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
 :root {
+  /* كبسولات المنصة مستطيلة موحّدة — لا أسطواني 999/100px */
+  --rizq-chip-radius: 10px;
   --rizq-navy-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23C9A84C' fill-opacity='0.07'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/svg%3E");
   --text-on-navy: rgba(255, 255, 255, 0.88);
   --text-on-navy-muted: rgba(255, 255, 255, 0.88);
@@ -629,7 +631,7 @@ input, textarea, select, [contenteditable="true"] { cursor: text !important; }
   -webkit-backdrop-filter: none !important;
   border: 1.5px solid #C9A84C !important;
   color: #E8C96A !important;
-  border-radius: 999px !important;
+  border-radius:10px !important;
   padding: 5px 10px !important;
   font-weight: 800 !important;
   font-size: 11px !important;
@@ -1357,7 +1359,7 @@ a.rizq-trust-card:hover {
   font-size: 10.5px;
   font-weight: 700;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius:10px;
   background: rgba(27, 58, 107, 0.06);
   color: #1B3A6B;
 }
