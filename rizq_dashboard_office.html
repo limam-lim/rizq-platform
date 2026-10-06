@@ -32,7 +32,7 @@ a{text-decoration:none;color:inherit}
 .sb-av .av-letter{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:#C9A84C;font-size:18px;line-height:1}
 .sb-av .av-svg{width:70%;height:70%;display:block}
 .sb-office-name{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sb-type-badge{font-size:11px;color:var(--gold);background:rgba(201,168,76,.15);padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.sb-type-badge{font-size:11px;color:var(--gold);background:rgba(201,168,76,.15);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
 .sb-sub-row{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.5)}
 .sub-dot{width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0}
 .sub-dot.warn{background:#f59e0b}.sub-dot.exp{background:#ef4444}
@@ -355,8 +355,8 @@ textarea.form-input{min-height:80px;resize:vertical}
           <div id="wb-name" style="font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.3)">...</div>
           <div id="wb-sub" style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px">...</div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
-            <div id="wb-plan-badge" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:11px;font-weight:900;padding:5px 14px;border-radius:20px">...</div>
-            <div id="wb-status-badge" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px" data-t="hero-active">● نشط</div>
+            <div id="wb-plan-badge" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:11px;font-weight:900;padding:5px 14px;border-radius:10px">...</div>
+            <div id="wb-status-badge" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:11px;font-weight:700;padding:5px 12px;border-radius:10px" data-t="hero-active">● نشط</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button onclick="previewMyPage()" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;color:#0f2347;padding:10px 20px;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(201,168,76,.35);transition:transform .15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'" data-t="hero-preview">👁 عاين واجهتي</button>
@@ -675,7 +675,7 @@ textarea.form-input{min-height:80px;resize:vertical}
       <div class="card" id="auto-reply-card">
         <div class="card-header">
           <div class="card-title" data-t="ag-card-title">🤖 الوكيل الذكي</div>
-          <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px"></span>
+          <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px"></span>
         </div>
         <div id="auto-reply-content"></div>
       </div>
@@ -2628,7 +2628,7 @@ var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwi
     if(!badge||!content) return;
     if(isDiamond){
       badge.textContent=_t2('✅ مفعّل','✅ Activé');
-      badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+      badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
       var phone=acc.phone||'';
       var toggleKey='rizq_agent_active_'+phone;
       var active=localStorage.getItem(toggleKey)!=='false';
@@ -2660,7 +2660,7 @@ var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwi
       }
     } else {
       badge.textContent=_t2('🔒 ماسية فقط','🔒 Diamant uniquement');
-      badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px';
+      badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
       content.innerHTML='<div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div>'+
         '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">'+_t2('ميزة حصرية للباقة الماسية','Fonctionnalité exclusive au forfait Diamant')+'</p>'+
         '<button onclick="showPanel(\'subscription\',null)" class="btn btn-gold">'+_t2('📦 الترقية للماسية','📦 Passer au forfait Diamant')+'</button></div>';

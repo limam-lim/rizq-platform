@@ -12,6 +12,43 @@
   --rizq-ad-aspect: 4 / 3;
 }
 
+/* ══ Unified rectangular chips (no cylindrical capsules) ══ */
+.badge,
+.status-pill,
+.prices-updated,
+.price-tab,
+.about-stat-chip,
+.hero-eyebrow,
+.hero-spaces-kicker,
+.hero-pill,
+.hero-pills,
+.telecom-tag,
+.rzq-telecom-tag,
+.amd-tag,
+.nav-pill,
+.rizq-promo-pill,
+.rizq-search-pill,
+.activity-tag,
+.t-cat-tag,
+.opp-tag,
+.section-sub,
+.pkg-label,
+.svc-price,
+.pricing-card-badge,
+.sb-type-badge,
+.sb-store-type,
+.cf-btn,
+.sf-btn,
+.chart-tab,
+.cat-tab,
+.nav-lang-btn,
+.nav-disclaimer,
+.rzq-disc-badge,
+.corp-meta span {
+  border-radius: var(--rizq-chip-radius) !important;
+}
+
+
 .section-header,
 .sec-header,
 .cta-inner,

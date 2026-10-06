@@ -271,7 +271,7 @@ html[lang="ar"] nav .btn-lang .lang-ar,html[lang="ar"] nav .btn-lang-primary .la
 html[lang="fr"] nav .btn-lang .lang-fr,html[lang="fr"] nav .btn-lang-primary .lang-fr{color:#E8C96A;opacity:1;font-weight:900}
 nav .btn-lang:hover,nav .btn-lang-primary:hover{background:rgba(201,168,76,.28)}
 nav .btn-lang:active,nav .btn-lang-primary:active{transform:scale(0.98)}
-.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;direction:ltr}
+.btn-lang{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:10px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;direction:ltr}
 .btn-lang:hover{background:rgba(201,168,76,.22)}
 /* إصلاح جوهري: nav-center (8 روابط + قائمة الباقات) و nav-right (الإشعار
    القانوني + 3 أزرار) كانا كلاهما flex-shrink:0 مع logo أيضاً flex-shrink:0
@@ -555,7 +555,7 @@ html[dir="ltr"] .ticker-inner{animation-direction:normal}
 .cats-grid,.qcat-portal,#cat-inline-panel,#qcat-portal,#qcat-inline-panel{position:relative;z-index:6}
 /* لا تخفّض z-index التيكر الثابت — كان يُلغى بـ z-index:2 */
 
-.hero-eyebrow{display:flex;width:max-content;max-width:100%;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px solid rgba(201,168,76,.42);padding:11px 26px;border-radius:14px;margin:0;animation:fadeUp .8s ease both;min-height:46px;box-sizing:border-box;box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)}
+.hero-eyebrow{display:flex;width:max-content;max-width:100%;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px solid rgba(201,168,76,.42);padding:11px 26px;border-radius:10px;margin:0;animation:fadeUp .8s ease both;min-height:46px;box-sizing:border-box;box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)}
 .hero-eyebrow .pulse{width:9px;height:9px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 0 rgba(201,168,76,.6);animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,168,76,.6)}70%{box-shadow:0 0 0 8px rgba(201,168,76,0)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 .hero-eyebrow span{color:var(--gold);font-size:clamp(13.5px,1.5vw,15px);font-weight:800;letter-spacing:.5px;line-height:1.25}
@@ -1382,7 +1382,7 @@ body.rizq-lang-fr .hero-biz-nav{
 /* ── QCAT PORTAL — legacy (مُستبدَل بـ #qcat-inline-panel) ── */
 
 /* Hover detail overlay on carousel card — card chrome is defined with hero-listings strip */
-.ad-card .ad-hover-detail{position:absolute;inset:0;background:linear-gradient(165deg,rgba(7,17,31,.96),rgba(13,27,42,.94));border-radius:20px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);z-index:4;border:1px solid rgba(201,168,76,.28)}
+.ad-card .ad-hover-detail{position:absolute;inset:0;background:linear-gradient(165deg,rgba(7,17,31,.96),rgba(13,27,42,.94));border-radius:10px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);z-index:4;border:1px solid rgba(201,168,76,.28)}
 .ad-card:hover .ad-hover-detail{opacity:1;pointer-events:auto}
 .ad-hover-detail .ahd-cat{font-size:9.5px;color:var(--gold);font-weight:700;margin-bottom:6px;letter-spacing:.8px}
 .ad-hover-detail .ahd-title{font-size:12.5px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.4}
@@ -1408,7 +1408,7 @@ body.rizq-lang-fr .hero-biz-nav{
 .amd-title{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:700;color:var(--royal-dark);margin-bottom:10px;line-height:1.3}
 .amd-desc{font-size:13.5px;color:var(--text-muted);line-height:1.85;margin-bottom:18px}
 .amd-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-.amd-tag{background:#eef2fb;border:1px solid #e2e8f5;border-radius:20px;padding:5px 14px;font-size:11.5px;color:var(--text-soft);font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.amd-tag{background:#eef2fb;border:1px solid #e2e8f5;border-radius:10px;padding:5px 14px;font-size:11.5px;color:var(--text-soft);font-weight:600;display:inline-flex;align-items:center;gap:6px}
 .amd-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
 .amd-price-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.3);border-radius:12px;margin-bottom:16px;box-shadow:0 4px 16px rgba(201,168,76,.1)}
 .amd-price{font-size:26px;font-weight:900;color:var(--gold-dk);font-family:'Segoe UI','Arial',sans-serif}
@@ -1827,7 +1827,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 #builtin-cats-mount{display:contents}
 .cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;max-width:1200px;margin:0 auto;position:relative;z-index:1;overflow:visible}
 @media (min-width:1280px){.cats-grid{grid-template-columns:repeat(6,1fr);max-width:min(1140px,100%);gap:14px}}
-.cat-card{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.3);border-radius:18px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .4s cubic-bezier(.23,1,.32,1);position:relative;overflow:visible;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.18);backdrop-filter:blur(6px)}
+.cat-card{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .4s cubic-bezier(.23,1,.32,1);position:relative;overflow:visible;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.18);backdrop-filter:blur(6px)}
 /* ── Daily Prices Board ── */
 .prices-board{max-width:1140px;margin:0 auto;position:relative;z-index:1}
 .prices-meta{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
@@ -1851,7 +1851,7 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .prices-updated{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.35);color:var(--gold);font-size:11.5px;font-weight:700;padding:7px 18px;border-radius:10px}
 .prices-updated b{color:var(--dark);font-weight:800}
 .prices-tabs{display:flex;justify-content:center;gap:10px;margin-bottom:26px}
-.ptab-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:2px solid #e2e8f5;color:var(--text-soft);font-weight:700;font-size:12px;padding:16px 10px 14px;border-radius:18px;cursor:pointer;transition:all .25s;font-family:'Segoe UI','Arial',sans-serif;flex:1;box-sizing:border-box}
+.ptab-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:2px solid #e2e8f5;color:var(--text-soft);font-weight:700;font-size:12px;padding:16px 10px 14px;border-radius:10px;cursor:pointer;transition:all .25s;font-family:'Segoe UI','Arial',sans-serif;flex:1;box-sizing:border-box}
 .ptab-card .ptab-icon{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(201,168,76,.3);box-shadow:0 3px 12px rgba(27,58,107,.2);transition:all .25s;flex-shrink:0}
 .ptab-card .ptab-lbl{color:#4a5568;font-size:12px;font-weight:700;transition:color .25s;text-align:center;line-height:1.3}
 /* إصلاح: كان هذا العنصر يستخدم class="price-tab" نفسه المستخدم في تبويبات "مواد غذائية/محروقات"
@@ -2247,7 +2247,7 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-headline{font-size:clamp(46px,13vw,64px)}
   .hero-title-card{padding:14px 18px 18px;border-radius:14px;margin:0;min-width:0;min-height:76px;width:100%}
   .hero-lead-row{width:100%}
-  .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:22px}
+  .hero-stage{width:100%;margin-top:12px;padding:16px 12px 8px;gap:16px;border-radius:10px}
   .hero-spaces-title{font-size:clamp(18px,5.2vw,22px)}
   .hero-spaces-sub{font-size:12.5px}
   .hero-browse-panel{padding:5px 8px!important;border-radius:12px}
@@ -2359,7 +2359,7 @@ main, .page-content.active, .main-content, .results-area,
 .fade-in,.fade-in.visible{opacity:1!important;transform:none!important;visibility:visible!important}
 
 /* Telecom tags */
-.telecom-tag{display:inline-block;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.4);color:var(--gold-light);font-size:10px;padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.3px}
+.telecom-tag{display:inline-block;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.4);color:var(--gold-light);font-size:10px;padding:4px 12px;border-radius:10px;font-weight:700;letter-spacing:.3px}
 
 /* sline / sdot */
 .sline{width:32px;height:2px;background:rgba(201,168,76,.35);border-radius:2px;flex-shrink:0;margin:0}
@@ -2594,7 +2594,7 @@ html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:sca
 .rpkg-card,.rpkg-card.pricing-card,.pricing-card{position:relative;border-radius:20px;padding:24px 16px 18px;text-align:center;transition:transform .22s,box-shadow .22s;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-width:0;max-width:100%;box-sizing:border-box;overflow:visible}
 .pricing-card.has-badge{padding-top:30px}
 .rpkg-card:hover,.pricing-card:hover,.rpkg-card.pricing-card:hover{transform:translateY(-7px)!important}
-.pricing-card-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:900;padding:5px 11px;border-radius:20px;line-height:1.35;text-align:center;white-space:normal;max-width:calc(100% - 10px);z-index:2;box-sizing:border-box}
+.pricing-card-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:900;padding:5px 11px;border-radius:10px;line-height:1.35;text-align:center;white-space:normal;max-width:calc(100% - 10px);z-index:2;box-sizing:border-box}
 .pricing-card-badge--popular{background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347}
 .pricing-card-badge--diamond{background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;box-shadow:0 3px 10px rgba(168,85,247,.45)}
 .pricing-card-badge--year{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
@@ -2761,7 +2761,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   width:100%;
   max-width:none; /* يطابق عرض hero-lead-row = عرض hero-stage */
   min-height:64px;
-  border-radius:14px;
+  border-radius:10px;
   background:
     linear-gradient(160deg,rgba(255,255,255,.48),rgba(255,255,255,.14) 45%,rgba(13,27,42,.08)),
     linear-gradient(135deg,rgba(27,58,107,.1),rgba(201,168,76,.12));
@@ -2901,7 +2901,7 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 /* ═══ RIZQ PROMO POPUP ═══ */
 .rizq-promo-overlay{position:fixed;inset:0;z-index:8000;background:rgba(6,17,28,.78);backdrop-filter:blur(9px);display:none;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .rizq-promo-overlay.active{display:flex;opacity:1;pointer-events:auto}
-.rizq-promo-modal{background:linear-gradient(160deg,#0d1f3c,#1a3560);border:1px solid rgba(201,168,76,.28);border-radius:22px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.55);transform:translateY(22px) scale(.96);transition:transform .35s}
+.rizq-promo-modal{background:linear-gradient(160deg,#0d1f3c,#1a3560);border:1px solid rgba(201,168,76,.28);border-radius:10px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.55);transform:translateY(22px) scale(.96);transition:transform .35s}
 .rizq-promo-overlay.active .rizq-promo-modal{transform:none}
 .rizq-promo-top{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(14,116,144,.1));padding:34px 30px 26px;text-align:center;position:relative;border-bottom:1px solid rgba(201,168,76,.1)}
 .rizq-promo-close{position:absolute;top:13px;left:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.45);font-size:15px;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center}
@@ -3144,7 +3144,7 @@ html[dir="rtl"] .rzq-disc-body{text-align:right;direction:rtl}
 html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-name{font-size:13.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-disc-tag{font-size:11.5px;color:#5b6b85;margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:2px 9px;margin-top:6px}
+.rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:2px 9px;margin-top:6px}
 .rzq-disc-empty{direction:inherit;text-align:center;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
 html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
@@ -3471,7 +3471,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 .cs-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:8px 16px}
 .cs-item-label{font-size:12px;color:#fff;font-weight:600;white-space:nowrap}
 .cs-item-soon{font-size:10px;color:var(--gold-dk,#c9a84c);background:rgba(201,168,76,.16);border-radius:20px;padding:2px 8px;font-weight:700}
-.cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:var(--gold-dk,#c9a84c);border:none;border-radius:20px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:var(--gold-dk,#c9a84c);border:none;border-radius:10px;padding:5px 12px;cursor:pointer;white-space:nowrap}
 .cs-item-btn:hover{filter:brightness(1.08)}
 .cs-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:16px}
 .cs-modal-overlay.active{display:flex}
@@ -4775,7 +4775,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ══ SUGGEST-A-CATEGORY MODAL (بطاقة "اقترح قسماً جديداً 💡" في شبكة الأقسام) ══ -->
 <div id="suggest-cat-overlay" onclick="closeSuggestCatModal()" style="display:none;position:fixed;inset:0;z-index:999998;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)"></div>
-<div id="suggest-cat-modal" style="display:none;position:fixed;z-index:9999999;background:#0a1628;border:2px solid #C9A84C;border-radius:20px;padding:28px 24px;width:90%;max-width:340px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.9),0 0 40px rgba(201,168,76,.15);left:50%;top:50%;transform:translate(-50%,-50%)">
+<div id="suggest-cat-modal" style="display:none;position:fixed;z-index:9999999;background:#0a1628;border:2px solid #C9A84C;border-radius:10px;padding:28px 24px;width:90%;max-width:340px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.9),0 0 40px rgba(201,168,76,.15);left:50%;top:50%;transform:translate(-50%,-50%)">
   <div style="font-size:40px;margin-bottom:10px">💡</div>
   <h3 id="suggest-cat-title" data-t-fr="Proposer une nouvelle section" style="font-family:'Amiri','Noto Naskh Arabic',serif;font-size:21px;font-weight:700;color:#C9A84C;margin-bottom:8px;line-height:1.3">اقترح قسماً جديداً</h3>
   <p id="suggest-cat-desc" data-t-fr="La nouvelle section, c'est vous qui la choisissez — écrivez le nom de la section que vous voulez, et l'administrateur ajoutera les plus demandées avec leurs sous-catégories." style="font-size:12px;color:rgba(255,255,255,.78);margin-bottom:18px;line-height:1.6">القسم الجديد هو من اختياركم — اكتب اسم القسم الذي تريده، وسيضيف الأدمن الأكثر طلباً مع فروعه.</p>
@@ -12563,7 +12563,7 @@ function openPkgModal(cardEl,origin){
 
   document.getElementById('pkg-modal-content').innerHTML=
     '<div style="text-align:center;margin-bottom:18px">'
-    +(isDiamond?'<div style="display:inline-block;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:20px;margin-bottom:10px">💎 '+pBadge+'</div>':'')
+    +(isDiamond?'<div style="display:inline-block;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:10px;margin-bottom:10px">💎 '+pBadge+'</div>':'')
     +'<div style="font-size:52px;margin-bottom:8px">'+icon+'</div>'
     +'<div style="font-size:22px;font-weight:900;color:'+nameCol+'">'+pName+'</div>'
     +(pDesc?'<div style="font-size:12.5px;color:'+featCol+';line-height:1.6;margin:8px 0 0;text-align:'+(_fr?'left':'right')+'">'+pDesc+'</div>':'')

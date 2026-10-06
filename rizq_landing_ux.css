@@ -503,7 +503,7 @@ body{
   font-size:9px;
   font-weight:900;
   padding:5px 11px;
-  border-radius:20px;
+  border-radius:10px;
   line-height:1.35;
   text-align:center;
   white-space:normal;
@@ -924,7 +924,7 @@ html body footer .footer-grid{
   min-width:min(340px, calc(100vw - 28px));
   max-width:min(440px, calc(100vw - 28px));
   padding:8px 12px;
-  border-radius:11px; /* مستطيل بزوايا خفيفة بدل الدائري */
+  border-radius:10px; /* مستطيل موحّد مع كبسولات المنصة */
   border:1px solid rgba(201,168,76,.42);
   background:linear-gradient(135deg,rgba(13,27,42,.94),rgba(27,58,107,.92));
   box-shadow:0 12px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);

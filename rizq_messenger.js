@@ -260,7 +260,7 @@
 .rzq-bubble .rzq-ts{font-size:10px;opacity:.5;margin-top:4px;text-align:end}
 .rzq-suggest{display:flex;gap:6px;padding:6px 12px 8px;overflow-x:auto;flex-shrink:0}
 .rzq-suggest::-webkit-scrollbar{display:none}
-.rzq-sq{padding:7px 12px;background:#fff;border:1.5px solid rgba(27,58,107,.15);border-radius:20px;font-size:12.5px;color:#1B3A6B;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.2s;flex-shrink:0}
+.rzq-sq{padding:7px 12px;background:#fff;border:1.5px solid rgba(27,58,107,.15);border-radius:10px;font-size:12.5px;color:#1B3A6B;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.2s;flex-shrink:0}
 .rzq-sq:hover{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,.06)}
 .rzq-typing{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#fff;border-radius:16px;border-bottom-right-radius:3px;align-self:flex-start;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 4px rgba(0,0,0,.06);width:60px}
 .rzq-typing span{width:7px;height:7px;background:#9ca3af;border-radius:50%;animation:rzq-blink 1.2s infinite}.rzq-typing span:nth-child(2){animation-delay:.2s}.rzq-typing span:nth-child(3){animation-delay:.4s}

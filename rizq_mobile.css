@@ -827,7 +827,7 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 .cs-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:7px 14px}
 .cs-item-label{font-size:12px;color:#fff;font-weight:600;white-space:nowrap}
 .cs-item-soon{font-size:10px;color:#c9a84c;background:rgba(201,168,76,.16);border-radius:20px;padding:2px 8px;font-weight:700}
-.cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:#c9a84c;border:none;border-radius:20px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.cs-item-btn{font-size:11px;font-weight:700;color:#0D1B2A;background:#c9a84c;border:none;border-radius:10px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-family:inherit}
 .cs-modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,10,22,.78);z-index:10050;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .cs-modal-overlay.active{display:flex!important;pointer-events:auto!important}
 .cs-modal-box{background:linear-gradient(165deg,#0a1628 0%,#122040 55%,#0d1a30 100%);border:1px solid rgba(201,168,76,.22);border-radius:16px;padding:20px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.45);color:rgba(255,255,255,.94)}

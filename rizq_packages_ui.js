@@ -245,11 +245,11 @@
       || (dia ? t2('الأكثر اختياراً للشركات', 'Le plus choisi') : '');
     var badge = '';
     if (dia && badgeTxt) {
-      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.45)">💎 ' + esc(badgeTxt) + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 14px;border-radius:10px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.45)">💎 ' + esc(badgeTxt) + '</div>';
     } else if (year) {
-      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏆 ' + t2('الأفضل قيمة', 'Meilleur rapport') + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:10px;font-weight:900;padding:5px 16px;border-radius:10px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏆 ' + t2('الأفضل قيمة', 'Meilleur rapport') + '</div>';
     } else if (highlight) {
-      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
+      badge = '<div class="rizq-feat-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8c96a,var(--gold,#C9A84C));color:#16263d;font-size:10px;font-weight:900;padding:5px 16px;border-radius:10px;white-space:nowrap;box-shadow:0 4px 14px rgba(201,168,76,.4)">⭐ ' + t2('الأكثر اختياراً', 'Le plus demandé') + '</div>';
     }
     var roiCol = light ? '#8a6c1f' : '#fde68a';
     var descBlock = desc
