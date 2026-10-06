@@ -1774,8 +1774,8 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 .section{padding:80px 5%}
 /* نموذج ب — عرض موحّد أضيق لكل خلفيات عناوين الأقسام + عنوان بسطر واحد */
 :root{
-  --rizq-section-header-w:680px;
-  --rizq-section-header-h:148px; /* عرض وارتفاع موحّدان لكل بطاقات عناوين الأقسام */
+  --rizq-section-header-w:560px;
+  --rizq-section-header-h:118px; /* عرض وارتفاع موحّدان أصغر لكل بطاقات عناوين الأقسام */
 }
 .section-header{
   text-align:center;
@@ -1784,13 +1784,13 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   height:var(--rizq-section-header-h);
   min-height:var(--rizq-section-header-h);
   max-height:var(--rizq-section-header-h);
-  margin:0 auto 28px;
+  margin:0 auto 22px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.05'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-blend-mode:overlay;
-  border:1px solid rgba(201,168,76,.2);
-  border-radius:16px;
-  padding:16px 22px;
-  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  border:1px solid rgba(201,168,76,.28);
+  border-radius:14px;
+  padding:12px 18px;
+  box-shadow:0 6px 20px rgba(0,0,0,.16);
   position:relative;overflow:hidden;
   box-sizing:border-box;
   display:flex;
@@ -1798,18 +1798,18 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   align-items:center;
   justify-content:center;
 }
-.section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
-.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(15px,2.05vw,22px);font-weight:700;line-height:1.25;margin-bottom:8px;color:#fff}
-.section-header h2,.section-header .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(15px,2.05vw,22px)!important;font-weight:700;line-height:1.25;margin-bottom:8px;color:#fff!important}
+.section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
+.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(14px,1.8vw,18px);font-weight:700;line-height:1.25;margin-bottom:5px;color:#fff}
+.section-header h2,.section-header .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(14px,1.8vw,18px)!important;font-weight:700;line-height:1.25;margin-bottom:5px;color:#fff!important}
 /* عنوان القسم في سطر واحد على الشاشات المتوسطة+ — أصغر حجماً لتفادي الالتفاف */
 @media(min-width:700px){
   .section-header h2,.section-header .section-title{white-space:nowrap}
 }
 @media(max-width:699px){
   .section-header{
-    height:auto;min-height:0;max-height:none;padding:16px 18px;
+    height:auto;min-height:0;max-height:none;padding:12px 14px;
   }
-  .section-header h2,.section-header .section-title{font-size:clamp(14px,4.2vw,18px)!important;white-space:normal}
+  .section-header h2,.section-header .section-title{font-size:clamp(13px,3.8vw,16px)!important;white-space:normal}
 }
 .section-title span,
 .section-header h2 span,
@@ -1822,7 +1822,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   color:var(--gold)!important;
 }
 .section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick):not(.rizq-srm-tick){
-  color:rgba(255,255,255,.94)!important;font-size:14px;max-width:640px;margin:0 auto;line-height:1.65;font-weight:600;
+  color:rgba(255,255,255,.92)!important;font-size:12px;max-width:520px;margin:0 auto;line-height:1.5;font-weight:600;
   text-shadow:0 1px 2px rgba(0,0,0,.25);
 }
 html[dir="rtl"] .section-header .section-title,
@@ -2479,6 +2479,32 @@ html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:sca
 .why-section{padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden}
 .about-card-inner{padding:48px 52px 38px}
 @media(max-width:640px){.about-card-inner{padding:36px 24px 28px}}
+/* أوسمة قسم من نحن — أصغر + حواف ذهبية + سطر واحد (الاستثمارات بعد B2B) */
+.about-stat-chips{
+  display:flex;justify-content:center;align-items:center;
+  gap:7px;flex-wrap:nowrap;margin-bottom:24px;
+  max-width:100%;overflow-x:auto;padding:2px 0 4px;
+  scrollbar-width:thin;
+}
+.about-stat-chip{
+  display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;
+  border-radius:100px;
+  padding:5px 11px;
+  font-size:10.5px;font-weight:700;letter-spacing:.15px;
+  color:#1B3A6B;line-height:1.2;white-space:nowrap;
+  background:
+    linear-gradient(180deg,#fffef8,#fff) padding-box,
+    linear-gradient(135deg,#F0D78C 0%,#C9A84C 35%,#8a6f2a 55%,#C9A84C 75%,#F0D78C 100%) border-box;
+  border:1.5px solid transparent;
+  box-shadow:
+    0 2px 8px rgba(27,58,107,.06),
+    0 0 0 1px rgba(201,168,76,.35),
+    inset 0 0 0 1px rgba(240,215,140,.5);
+}
+@media(max-width:720px){
+  .about-stat-chips{gap:6px}
+  .about-stat-chip{font-size:10px;padding:4px 9px}
+}
 .why-bg-text{position:absolute;font-family:Georgia,serif;font-size:200px;font-weight:900;color:rgba(27,58,107,.03);left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;z-index:0}
 .why-grid{
   display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
@@ -3161,7 +3187,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:22px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
   font-family:Georgia,'Noto Naskh Arabic',serif;
-  font-size:clamp(15px,2.05vw,22px);font-weight:700;color:#fff;margin:0 0 8px;line-height:1.25
+  font-size:clamp(14px,1.8vw,18px);font-weight:700;color:#fff;margin:0 0 5px;line-height:1.25
 }
 #rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
@@ -3404,8 +3430,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 @media(max-width:640px){
   #rizq-styles,#rizq-showroom-models{padding:28px 3% 32px}
   #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
-  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(18px,5vw,22px);margin-bottom:6px}
-  #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:12px;line-height:1.6;max-width:100%}
+  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(13px,3.8vw,16px);margin-bottom:5px}
+  #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:11px;line-height:1.5;max-width:100%}
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
   .landing-ads-filters{gap:6px;margin-bottom:14px}
   .landing-ads-filter{padding:6px 12px;font-size:11.5px}
@@ -4463,14 +4489,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <!-- Divider -->
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);margin-bottom:28px"></div>
 
-      <!-- Stat chips -->
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px">
-        <span data-t-fr="🏪 +17 catégories" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(27,58,107,.03));border:1px solid rgba(27,58,107,.14);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--royal)">🏪 +17 قسم</span>
-        <span data-t-fr="🛡️ 100% sécurisé" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(22,163,74,.07),rgba(22,163,74,.03));border:1px solid rgba(22,163,74,.18);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:#15803d">🛡️ آمن 100%</span>
-        <span data-t-fr="📍 Toutes les wilayas" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.10),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--gold-dk)">📍 كل الولايات</span>
-        <span data-t-fr="⚡ Gratuit pour démarrer" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(99,102,241,.07),rgba(99,102,241,.03));border:1px solid rgba(99,102,241,.16);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:#4338ca">⚡ مجاني للبدء</span>
-        <span data-t-fr="📋 Salle des appels d'offres B2B" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(27,58,107,.03));border:1px solid rgba(27,58,107,.14);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--royal)">📋 غرفة مناقصات B2B</span>
-        <span data-t-fr="📈 Salle des investissements" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.10),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--gold-dk)">📈 غرفة الاستثمارات</span>
+      <!-- Stat chips — سطر واحد: الاستثمارات مباشرة بعد B2B -->
+      <div class="about-stat-chips">
+        <span class="about-stat-chip" data-t-fr="🏪 +17 catégories">🏪 +17 قسم</span>
+        <span class="about-stat-chip" data-t-fr="🛡️ 100% sécurisé">🛡️ آمن 100%</span>
+        <span class="about-stat-chip" data-t-fr="📍 Toutes les wilayas">📍 كل الولايات</span>
+        <span class="about-stat-chip" data-t-fr="⚡ Gratuit pour démarrer">⚡ مجاني للبدء</span>
+        <span class="about-stat-chip" data-t-fr="📋 Salle des appels d'offres B2B">📋 غرفة مناقصات B2B</span>
+        <span class="about-stat-chip" data-t-fr="📈 Salle des investissements">📈 غرفة الاستثمارات</span>
       </div>
 
       <!-- ADMINIA signature line -->
