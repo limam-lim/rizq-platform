@@ -16,7 +16,7 @@
 
   /* نموذج 3 — أيقونات الشريط (ذهبي المزدي عبر CSS) */
   var NAV_ICOS = {
-    home: '⭐',
+    home: '🧭',
     ads: '📢',
     cats: '📂',
     stores: '🏪',
@@ -350,7 +350,7 @@
         '</div>' +
         '<nav class="rizq-hdr-row2" aria-label="التنقل الرئيسي">' +
           '<a class="rizq-hdr-item" id="rizq-hdr-home" href="rizq_landing_v8.html" data-nav-order="1">' +
-            '<span class="rizq-hdr-ico">⭐</span><span class="rizq-hdr-lbl" data-hdr="home">الرئيسية</span>' +
+            '<span class="rizq-hdr-ico">🧭</span><span class="rizq-hdr-lbl" data-hdr="home">الرئيسية</span>' +
           '</a>' +
           '<a class="rizq-hdr-item" id="rizq-hdr-cats" href="' + catsHref() + '" data-nav-order="2">' +
             '<span class="rizq-hdr-ico">📂</span><span class="rizq-hdr-lbl" data-hdr="cats">الأقسام</span>' +
