@@ -23,7 +23,6 @@
 .ad-card,
 .listing-card,
 #cat-portal,
-.why-card,
 .rvid-section,
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs),
 .rpkg-card[style*="#1B3A6B"],
@@ -757,29 +756,32 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   flex-basis:min(220px,78vw)!important;
   padding:18px 14px 16px!important;
   min-height:210px!important;
-  border-radius:16px!important;
-  border-color:rgba(201,168,76,.28)!important;
-  box-shadow:0 8px 22px rgba(10,22,42,.28)!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  background-image:none!important;
+  border:1px solid rgba(201,168,76,.62)!important;
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22)!important;
 }
 #about .why-card::before{
   height:2px!important;
-  opacity:.85!important;
+  opacity:.75!important;
   background:linear-gradient(90deg,transparent,var(--gold),#e8c96a,var(--gold),transparent)!important;
 }
 #about .why-title{
   font-size:13.5px!important;
   margin-bottom:8px!important;
   font-weight:700!important;
+  color:var(--navy,#0D1B2A)!important;
 }
 #about .why-desc{
   font-size:11px!important;
   line-height:1.65!important;
-  color:rgba(255,255,255,.82)!important;
+  color:#3d4f6a!important;
 }
 #about .why-icon{margin-bottom:12px!important}
 #about .why-icon .cat-icon-box{
   width:44px!important;height:44px!important;border-radius:12px!important;font-size:20px!important;
-  border:1.5px solid rgba(201,168,76,.4)!important;
+  border:1px solid rgba(201,168,76,.55)!important;
   background:linear-gradient(145deg,#1B3A6B,#0f2347)!important;
 }
 
