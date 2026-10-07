@@ -455,11 +455,11 @@ html[dir="ltr"] .section-header .section-desc{
   margin-right:auto;
 }
 
-/* ── 6 تبويبات باقات ── */
+/* ── 7 تبويبات باقات — سطر واحد على الشاشات العريضة ── */
 .pricing-tabs{
   display:grid !important;
   grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:12px !important;
+  gap:10px !important;
   max-width:min(900px,100%) !important;
   margin:0 auto 32px !important;
   width:100% !important;
@@ -468,8 +468,9 @@ html[dir="ltr"] .section-header .section-desc{
 
 @media(min-width:960px){
   .pricing-tabs{
-    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    max-width:min(1140px,100%) !important;
+    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    max-width:min(1200px,100%) !important;
+    gap:8px !important;
   }
 }
 
