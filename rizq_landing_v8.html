@@ -8711,8 +8711,8 @@ function applyLandingLang(toAr) {
   // /* early pricing lang sync */ — قبل ترجمة النوافذ حتى لا يوقفها أي خطأ لاحق
   try {
     var _ptabLabelsEarly = document.querySelectorAll('#pricing .ptab-lbl, .pricing-tabs .ptab-lbl');
-    var _ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','الإعلانات'];
-    var _ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Annonces'];
+    var _ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','غرفة الاستثمارات','الإعلانات'];
+    var _ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Investissements','Annonces'];
     _ptabLabelsEarly.forEach(function(el,i){ if(_ptabAR[i]) el.textContent = isAr ? _ptabAR[i] : _ptabFR[i]; });
     if (typeof renderPricingSection === 'function') renderPricingSection();
   } catch (eEarlyPkg) { console.warn('early pricing lang sync failed', eEarlyPkg); }
@@ -9050,8 +9050,8 @@ try { /* remaining-static-i18n */
 
   // Pricing tabs labels
   const ptabLabels = document.querySelectorAll('#pricing .ptab-lbl');
-  const ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','الإعلانات'];
-  const ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Annonces'];
+  const ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','غرفة الاستثمارات','الإعلانات'];
+  const ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Investissements','Annonces'];
   ptabLabels.forEach((el,i)=>{ if(ptabAR[i]) el.textContent = isAr ? ptabAR[i] : ptabFR[i]; });
 
   // Navbar dropdown — same order as mobile (stores → about)
