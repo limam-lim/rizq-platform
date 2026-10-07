@@ -484,7 +484,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-bottom:0 !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav body{
-    padding-top:var(--rizq-header-h,78px) !important;
+    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-jump-h,0px)) !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav .topnav,
   html.rizq-app-nav.has-rizq-desk-nav body > .btn-lang,
@@ -610,15 +610,16 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     margin:0;
     padding:5px 18px !important;
     box-sizing:border-box !important;
-    /* وسط معتدل — أضيق من التمديد الكامل وأوسع من النسخة الضيقة */
+    /* وسط معتدل — أضيق قليلاً ومُزاح لليمين ليفصل عن المفضلة/حسابي */
     width:max-content !important;
-    max-width:min(1040px, calc(100vw - 280px)) !important;
+    max-width:min(980px, calc(100vw - 340px)) !important;
     min-width:0;
     position:absolute !important;
     left:50% !important;
     right:auto !important;
     top:50% !important;
-    transform:translate(-50%, -50%) !important;
+    /* +36px نحو اليمين البصري يبعد الكبسولة عن أدوات اليسار */
+    transform:translate(calc(-50% + 36px), -50%) !important;
     z-index:5;
     pointer-events:auto;
     scrollbar-width:none;
@@ -1139,7 +1140,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 
   html.rizq-app-nav .hero{
     margin-top:0 !important;
-    padding-top:var(--rizq-header-h,78px) !important;
+    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-jump-h,0px)) !important;
     min-height:100vh !important;
     justify-content:flex-start !important; /* قرّب الشارة من الشريط العلوي */
   }
@@ -1148,7 +1149,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     padding-top:18px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-ticker-h,42px) + 14px) !important;
+    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-ticker-h,42px) + var(--rizq-jump-h,0px) + 14px) !important;
   }
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
     padding-top:14px !important;
@@ -1642,7 +1643,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:16px !important;
   }
-  html.rizq-app-nav .section-jump-bar{top:var(--rizq-header-h) !important}
+  html.rizq-app-nav .section-jump-bar{
+    top:calc(var(--rizq-header-h) + var(--rizq-ticker-h,0px)) !important;
+  }
   html.rizq-app-nav .mobile-tabs{top:var(--rizq-header-h) !important}
   /* على الموبايل التبويبات ليست sticky — لا تُزح top (كان يقص شريط الإحصاءات) */
   html.rizq-app-nav body .mobile-tabs{

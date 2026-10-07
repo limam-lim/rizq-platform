@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=29.8"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=29.9"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=29.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=29.7"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -110,10 +110,10 @@ document.documentElement.classList.add('rizq-app-nav');
   --r:20px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + var(--rizq-jump-h,0px) + 12px)}
 #virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
 #rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
-#listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
+#wishlist-block,#listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + var(--rizq-jump-h,0px) + 12px)}
 /* ارتفاع أدنى لمراسي الاكتشاف قبل ملء JS حتى لا يفشل تمرير الهاش من صفحات أخرى */
 #rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments{min-height:1px}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
@@ -435,16 +435,16 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box}
 .ticker-wrap.is-empty{display:none}
 html:has(#ticker-wrap:not(.is-empty)){--rizq-ticker-h:42px}
-/* شريط القفز الثانوي مُلغى — لا يعيد ضبط موضعه فوق التيكر */
-html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
-html.rizq-has-announce .section-jump-bar{
-  display:none!important;visibility:hidden!important;pointer-events:none!important;
-}
+/* شريط القفز الرقيق يبقى ظاهراً تحت النافبار/التيكر (موضعه في rizq_landing_ux.css) */
 /* Desktop: تيكر ثابت — امسح ارتفاع النافبار+التيكر ثم فجوة خفيفة للشارة */
 @media (min-width:769px) and (min-height:501px){
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
   html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 14px)!important
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + var(--rizq-jump-h,0px) + 14px)!important
+  }
+  html.rizq-app-nav:not(:has(#ticker-wrap:not(.is-empty))) .hero,
+  html:not(:has(#ticker-wrap:not(.is-empty))) .hero{
+    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-jump-h,0px) + 14px)!important
   }
   html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
     /* body مبطَّن مسبقاً بالنافبار+الإشعار+التيكر — هنا فجوة فقط */
@@ -3901,8 +3901,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </div>
 
-<!-- ── Section jump bar — مخفي (كان يختلط مع الشريط الرئيسي عند التمرير) ── -->
-<nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="true" hidden>
+<!-- ── Section jump bar — شريط رقيق دائم تحت النافبار للأقسام ── -->
+<nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="false">
   <a href="#listings" data-jump="#listings">الإعلانات</a>
   <a href="#rzq-disc-store" data-jump="#rzq-disc-store">المحلات</a>
   <a href="#rzq-disc-corp" data-jump="#rzq-disc-corp">المعارض</a>

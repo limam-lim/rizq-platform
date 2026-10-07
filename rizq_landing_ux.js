@@ -73,11 +73,11 @@
     if (nav) nav.classList.toggle('nav-compact', y > SCROLL_COMPACT);
     if (nav) nav.classList.toggle('scrolled', y > 30);
     if (backBtn) backBtn.classList.toggle('visible', y > SCROLL_TOP);
-    /* لا تُظهر شريط القفز المكرر — الشريط الرئيسي يبقى وحده (نشر بين المعارض/المكاتب) */
+    /* شريط القفز الرقيق يظهر دائماً على desk/tablet (CSS يُخفيه على الهاتف) */
     if (jumpBar) {
-      jumpBar.classList.remove('visible');
-      jumpBar.setAttribute('aria-hidden', 'true');
-      jumpBar.hidden = true;
+      jumpBar.hidden = false;
+      jumpBar.classList.add('visible');
+      jumpBar.setAttribute('aria-hidden', 'false');
     }
     if (typeof window.__rizqSyncSearchTheater === 'function') {
       window.__rizqSyncSearchTheater();
