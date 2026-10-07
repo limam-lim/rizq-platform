@@ -286,12 +286,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </nav>
 
-<!-- تنبيه عند فتح صفحة المعرض بدون معرف — الزر في شريط الإجراءات أسفل الهيرو -->
-<div id="showroom-empty-banner" style="display:none;max-width:1280px;margin:12px auto 0;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid rgba(201,168,76,.35);color:#1a2a3a;font-size:13.5px;line-height:1.55;text-align:center">
-  <strong style="color:#1B3A6B" id="showroom-empty-title">لم يُحدَّد معرض بعد</strong>
-  <div style="margin-top:6px;color:#5a6a7a" id="showroom-empty-desc">اختر معرضاً من قائمة المعارض أو افتح رابط المعرض المباشر.</div>
-</div>
-
 <!-- ══ HERO ══ -->
 <div class="showroom-hero">
   <div class="hero-pattern"></div>
@@ -725,20 +719,12 @@ document.addEventListener('rizq:langchange', function (e) {
 var _params = new URLSearchParams(location.search);
 var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || '';
 
-(function showShowroomEmptyBanner(){
+(function showShowroomEmptyBrowse(){
   if(_showroomId) return;
   document.body.classList.add('rizq-empty-showroom');
-  var ban = document.getElementById('showroom-empty-banner');
-  if(ban) ban.style.display = 'block';
   var fr = false;
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
-  var t = document.getElementById('showroom-empty-title');
-  var d = document.getElementById('showroom-empty-desc');
   var c = document.getElementById('showroom-browse-cta');
-  if(t) t.textContent = fr ? 'Aucun showroom sélectionné' : 'لم يُحدَّد معرض بعد';
-  if(d) d.textContent = fr
-    ? 'Choisissez un showroom dans la liste ou ouvrez le lien direct.'
-    : 'اختر معرضاً من قائمة المعارض أو افتح رابط المعرض المباشر.';
   if(c) c.textContent = fr ? '🏬 Parcourir les showrooms' : '🏬 تصفّح المعارض';
 })();
 
