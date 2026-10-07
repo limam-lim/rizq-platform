@@ -725,12 +725,63 @@ body.rizq-lang-ar .hero-lead-row{
   box-sizing:border-box;
   padding-inline:2px;
 }
+/* ذيل «كل شيء في مكان واحد» داخل الشارة الترابية على الهاتف فقط */
+.hero-kicker-place{display:none}
 @media(max-width:768px){
   .hero-tagline{
     font-size:clamp(8.5px,2.2vw,11px)!important;
     letter-spacing:-.15px!important;
-    white-space:nowrap!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    max-width:100%!important;
+    line-height:1.4!important;
+  }
+  .hero-tagline-place{display:none!important}
+  .hero-kicker-place{display:inline!important}
+  .hero-spaces-kicker{
+    white-space:normal!important;
+    max-width:100%!important;
+    line-height:1.45!important;
+    padding:6px 12px!important;
+    font-size:clamp(9.5px,2.4vw,11.5px)!important;
+  }
+  /* الفرنسية على الهاتف — تصغير الخط لإظهار الجملة كاملة تحت رزق / marché */
+  html[lang="fr"] .hero-subtitle-primary,
+  html[dir="ltr"] .hero-subtitle-primary,
+  body.rizq-lang-fr .hero-subtitle-primary{
+    font-size:clamp(10px,2.55vw,13px)!important;
+    white-space:normal!important;
+    line-height:1.35!important;
+  }
+  html[lang="fr"] .hero-subtitle-secondary,
+  html[dir="ltr"] .hero-subtitle-secondary,
+  body.rizq-lang-fr .hero-subtitle-secondary{
+    font-size:clamp(9.5px,2.3vw,12px)!important;
+    white-space:normal!important;
+    line-height:1.35!important;
+  }
+  html[lang="fr"] .hero-subtitle-card,
+  html[dir="ltr"] .hero-subtitle-card,
+  body.rizq-lang-fr .hero-subtitle-card{
+    padding:12px 10px 12px!important;
     overflow:visible!important;
+  }
+  html[lang="fr"] .hero-brand-row .hero-eyebrow span,
+  html[dir="ltr"] .hero-brand-row .hero-eyebrow span,
+  body.rizq-lang-fr .hero-brand-row .hero-eyebrow span{
+    font-size:clamp(10px,2.5vw,12px)!important;
+    white-space:normal!important;
+    text-align:center;
+    line-height:1.3!important;
+  }
+  html[lang="fr"] .hero-brand-row .hero-eyebrow,
+  html[dir="ltr"] .hero-brand-row .hero-eyebrow,
+  body.rizq-lang-fr .hero-brand-row .hero-eyebrow{
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:8px 10px!important;
   }
 }
 
@@ -2907,6 +2958,13 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   .hero-subtitle-card{max-width:none;width:100%;padding:16px 12px 14px;flex:none}
   .hero-subtitle-primary{font-size:clamp(13px,3.6vw,18px);white-space:nowrap}
   .hero-subtitle-secondary{font-size:clamp(11px,3vw,15px);white-space:nowrap}
+  /* الفرنسية أطول — كسر السطر + خط أصغر حتى تظهر الجملة كاملة */
+  html[lang="fr"] .hero-subtitle-primary,
+  html[dir="ltr"] .hero-subtitle-primary,
+  body.rizq-lang-fr .hero-subtitle-primary{font-size:clamp(10px,2.55vw,13px)!important;white-space:normal!important}
+  html[lang="fr"] .hero-subtitle-secondary,
+  html[dir="ltr"] .hero-subtitle-secondary,
+  body.rizq-lang-fr .hero-subtitle-secondary{font-size:clamp(9.5px,2.3vw,12px)!important;white-space:normal!important}
   .hero-pills{
     flex-direction:row!important;
     flex-wrap:nowrap!important;
@@ -3857,12 +3915,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
     <div class="hero-stage">
-      <p class="hero-tagline" data-t="hero-tagline">متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد</p>
+      <p class="hero-tagline"><span class="hero-tagline-lead" data-t="hero-tagline-lead">متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي</span><span class="hero-tagline-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
 
       <!-- 1) فضاءات الأعمال — خريطة واضحة للزائر الموريتاني -->
       <section class="hero-spaces" aria-labelledby="hero-spaces-title">
         <div class="hero-spaces-head">
-          <p class="hero-spaces-kicker" data-t="hbiz-kicker">منصة موريتانية للأعمال</p>
+          <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
           <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">اختر فضاءك على رزق</h2>
           <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
         </div>
@@ -8126,6 +8184,8 @@ const LANG = {
     'hbiz-investments': 'الاستثمارات',
     'hbiz-pick': 'اختر فضاءك على رزق',
     'hbiz-kicker': 'منصة موريتانية للأعمال',
+    'hero-tagline-lead': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي',
+    'hero-one-place': ' — كل شيء في مكان واحد',
     'hbiz-pick-sub': 'من محلك إلى استثمارك — حضورك المهني يبدأ من هنا',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
@@ -8252,6 +8312,8 @@ const LANG = {
     'hbiz-investments': 'Investissements',
     'hbiz-pick': 'Choisissez votre espace sur Rizq',
     'hbiz-kicker': 'Plateforme mauritanienne pour les affaires',
+    'hero-tagline-lead': 'Boutique virtuelle · Bureau pro · Pub institutionnelle',
+    'hero-one-place': ' — tout en un seul endroit',
     'hbiz-pick-sub': 'De votre boutique à votre investissement — votre présence pro commence ici',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
@@ -8652,11 +8714,7 @@ function applyLandingLang(toAr) {
   const pillsNav = document.getElementById('hero-pills-nav');
   if (pillsNav) pillsNav.setAttribute('aria-label', isAr ? 'بيع · اشتر · تميّز' : 'Vendre · Acheter · Briller');
 
-  // Hero tagline — يُترجَم عبر data-t؛ هنا احتياط إن غاب المفتاح
-  const heroTag = document.querySelector('.hero-tagline');
-  if(heroTag && !heroTag.getAttribute('data-t')) heroTag.textContent = isAr
-    ? 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد'
-    : 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit';
+  // Hero tagline — يُترجَم عبر data-t على الأجزاء (lead / one-place)
 
   // Hero featured-video placeholder slot (shown when no admin video is configured)
   const vidBadge = document.querySelector('.hero-vid-badge');
