@@ -58,7 +58,10 @@
   }
 
   function moduleKeyFromHref(href) {
-    if (!href || href.charAt(0) === '#') return null;
+    if (!href) return null;
+    var disc = href.match(/#rzq-disc-(store|corp|office|tenders|investments)\b/);
+    if (disc) return disc[1];
+    if (href.charAt(0) === '#') return null;
     var path = href.split('?')[0].split('#')[0];
     var file = path.split('/').pop().toLowerCase();
     if (!file) return null;

@@ -463,11 +463,11 @@ main, .page-content.active, .main-content, .results-area,
     <div class="nav-item" onclick="showPanel('verifiedplus',this)"><span class="nav-icon">🛡️</span><span class="nav-label" data-t="verifiedplus">شارة موثّق⁺</span></div>
 
     <div class="nav-section-title" data-t="nav-section-site">الموقع</div>
-    <div class="nav-item" onclick="location.href='rizq_landing_v8.html'"><span class="nav-icon">🌐</span><span class="nav-label" data-t="nav-home">الرئيسية</span></div>
+    <div class="nav-item" onclick="location.href='rizq_landing_v8.html'"><span class="nav-icon">🧭</span><span class="nav-label" data-t="nav-home">الرئيسية</span></div>
     <div class="nav-item" onclick="location.href='rizq_browse.html'"><span class="nav-icon">🔍</span><span class="nav-label" data-t="nav-browse">تصفح الإعلانات</span></div>
     <div class="nav-item" onclick="location.href='rizq_post.html'"><span class="nav-icon">➕</span><span class="nav-label" data-t="nav-post-ad">نشر إعلان</span></div>
     <div class="nav-item" onclick="location.href='rizq_ads_info.html'"><span class="nav-icon">📹</span><span class="nav-label">Rizq ADS</span></div>
-    <div class="nav-item" onclick="location.href='rizq_store.html'"><span class="nav-icon">🏪</span><span class="nav-label" data-t="nav-shops">المحلات</span></div>
+    <div class="nav-item" onclick="location.href='rizq_landing_v8.html#rzq-disc-store'"><span class="nav-icon">🏪</span><span class="nav-label" data-t="nav-shops">المحلات</span></div>
   </nav>
 
   <div class="sidebar-footer">
@@ -2676,6 +2676,7 @@ function _initDashboardWithAccount(acc){
         if(Array.isArray(data.config.packages.general))     localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
         if(Array.isArray(data.config.packages.video))       localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
         if(Array.isArray(data.config.packages.tender))      localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.investment)) localStorage.setItem('rizq_investment_packages', JSON.stringify(data.config.packages.investment));
         if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
       }
       if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){

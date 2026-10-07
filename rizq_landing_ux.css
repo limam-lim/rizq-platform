@@ -23,7 +23,6 @@
 .ad-card,
 .listing-card,
 #cat-portal,
-.why-card,
 .rvid-section,
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs),
 .rpkg-card[style*="#1B3A6B"],
@@ -337,13 +336,30 @@ body.rizq-lang-ar .hero-content{
 
 .why-section > .section-header,
 #prices > .section-header,
-.pricing-section > .section-header,
 #rizq-live-activity .section-header,
 #categories > .section-header{
-  max-width:1200px;
+  max-width:var(--rizq-section-header-w,560px);
   margin-left:auto;
   margin-right:auto;
   text-align:center;
+}
+
+/* حواف ذهبية رقيقة — كل خلفيات العناوين الرئيسية (مثل «خطط شفافة») */
+.section-header,
+.why-section > .section-header,
+#prices > .section-header,
+.pricing-section > .section-header,
+#rizq-live-activity .section-header,
+#categories > .section-header,
+#about .section-header,
+.listings-section .section-header,
+#rizq-styles .section-header,
+#rizq-showroom-models .section-header{
+  border:1px solid rgba(201,168,76,.62) !important;
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.16),
+    0 0 0 1px rgba(232,201,106,.28) !important;
+  border-radius:14px;
 }
 
 /* Banners: titles stay centered (rizq-theme aligns .section-title right/left in RTL/LTR) */
@@ -405,7 +421,19 @@ html[dir="ltr"] .section-header .section-desc{
   overflow-y:visible;
 }
 
-.pricing-section > .section-header,
+/* بطاقة عنوان الباقات — نفس مقاس بقية عناوين الأقسام + حافة ذهبية */
+.pricing-section > .section-header{
+  width:min(100%,var(--rizq-section-header-w,560px)) !important;
+  max-width:var(--rizq-section-header-w,560px) !important;
+  height:var(--rizq-section-header-h,118px);
+  min-height:var(--rizq-section-header-h,118px);
+  max-height:var(--rizq-section-header-h,118px);
+  margin-left:auto;
+  margin-right:auto;
+  margin-bottom:22px;
+  box-sizing:border-box;
+  overflow:hidden;
+}
 .pricing-section > .pricing-container{
   max-width:min(1140px,100%);
   margin-left:auto;
@@ -427,11 +455,11 @@ html[dir="ltr"] .section-header .section-desc{
   margin-right:auto;
 }
 
-/* ── 6 تبويبات باقات ── */
+/* ── 7 تبويبات باقات — سطر واحد على الشاشات العريضة ── */
 .pricing-tabs{
   display:grid !important;
   grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:12px !important;
+  gap:10px !important;
   max-width:min(900px,100%) !important;
   margin:0 auto 32px !important;
   width:100% !important;
@@ -440,8 +468,9 @@ html[dir="ltr"] .section-header .section-desc{
 
 @media(min-width:960px){
   .pricing-tabs{
-    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    max-width:min(1140px,100%) !important;
+    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    max-width:min(1200px,100%) !important;
+    gap:8px !important;
   }
 }
 
@@ -757,29 +786,32 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   flex-basis:min(220px,78vw)!important;
   padding:18px 14px 16px!important;
   min-height:210px!important;
-  border-radius:16px!important;
-  border-color:rgba(201,168,76,.28)!important;
-  box-shadow:0 8px 22px rgba(10,22,42,.28)!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  background-image:none!important;
+  border:1px solid rgba(201,168,76,.62)!important;
+  box-shadow:0 4px 14px rgba(27,58,107,.07),0 0 0 1px rgba(232,201,106,.22)!important;
 }
 #about .why-card::before{
   height:2px!important;
-  opacity:.85!important;
+  opacity:.75!important;
   background:linear-gradient(90deg,transparent,var(--gold),#e8c96a,var(--gold),transparent)!important;
 }
 #about .why-title{
   font-size:13.5px!important;
   margin-bottom:8px!important;
   font-weight:700!important;
+  color:var(--navy,#0D1B2A)!important;
 }
 #about .why-desc{
   font-size:11px!important;
   line-height:1.65!important;
-  color:rgba(255,255,255,.82)!important;
+  color:#3d4f6a!important;
 }
 #about .why-icon{margin-bottom:12px!important}
 #about .why-icon .cat-icon-box{
   width:44px!important;height:44px!important;border-radius:12px!important;font-size:20px!important;
-  border:1.5px solid rgba(201,168,76,.4)!important;
+  border:1px solid rgba(201,168,76,.55)!important;
   background:linear-gradient(145deg,#1B3A6B,#0f2347)!important;
 }
 

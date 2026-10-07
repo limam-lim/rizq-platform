@@ -6,12 +6,13 @@
   'use strict';
 
   var MODULES = [
-    /* سطح المكتب/تابلت: المحلات → المعارض → نشر → المكاتب → … */
-    { key: 'store', href: 'rizq_store.html', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#virtual-stores' },
-    { key: 'corp', href: 'rizq_showroom.html', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#virtual-showrooms' },
-    { key: 'office', href: 'rizq_office.html', hdr: 'offices', ico: '💼', order: 6, landingHref: '#virtual-offices' },
-    { key: 'tenders', href: 'rizq_tenders.html', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#virtual-tenders' },
-    { key: 'investments', href: 'rizq_investments.html', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#virtual-investments' }
+    /* سطح المكتب/تابلت: المحلات → المعارض → نشر → المكاتب → …
+       خارج الرئيسية: اذهب لشريط الاكتشاف (كن أول من…) لا لصفحة فارغة بلا معرف */
+    { key: 'store', href: 'rizq_landing_v8.html#rzq-disc-store', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#rzq-disc-store' },
+    { key: 'corp', href: 'rizq_landing_v8.html#rzq-disc-corp', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#rzq-disc-corp' },
+    { key: 'office', href: 'rizq_landing_v8.html#rzq-disc-office', hdr: 'offices', ico: '💼', order: 6, landingHref: '#rzq-disc-office' },
+    { key: 'tenders', href: 'rizq_landing_v8.html#rzq-disc-tenders', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#rzq-disc-tenders' },
+    { key: 'investments', href: 'rizq_landing_v8.html#rzq-disc-investments', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#rzq-disc-investments' }
   ];
   /** زر نشر بين المعارض والمكاتب على الشريط الرئيسي (سطح المكتب/تابلت) */
   var POST_NAV_ORDER = 5;

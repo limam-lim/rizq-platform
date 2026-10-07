@@ -1455,7 +1455,11 @@ const ICON_SVG = {
   '💼':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="12" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   '🔆':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>'
 };
-function iconHTML(e){ return ICON_SVG[e]||e; }
+function iconHTML(e){
+  if (ICON_SVG[e]) return ICON_SVG[e];
+  // لا نمرّر HTML خام من حقل emoji — نص/إيموجي فقط بعد تهريب
+  return String(e == null ? '' : e).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 // ══════════ WILAYA COORDS (correct +lat for Mauritania ~18°N) ══════════
 const WILAYA_COORDS = {

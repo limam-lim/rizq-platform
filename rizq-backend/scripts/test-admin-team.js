@@ -85,7 +85,7 @@ async function testModules() {
       name: 'Reviewer',
       pass: 'secret123',
       permissions: ['overview', 'tenders'],
-    }, 'testadmin');
+    }, 'testadmin', ['*']);
     ok('createMember stores permissions', member.permissions.join() === 'overview,tenders');
 
     const authOk = await adminTeam.authenticate('reviewer1', 'secret123');

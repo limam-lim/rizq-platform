@@ -24,6 +24,7 @@ var LS_KEYS = {
   corp: 'rizq_corp_packages',
   video: 'rizq_video_packages',
   tender: 'rizq_tender_packages',
+  investment: 'rizq_investment_packages',
   verified_plus: 'rizq_verified_plus_packages'
 };
 
@@ -68,6 +69,10 @@ var NAMES = {
   'tnd-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
   'tnd-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
   'tnd-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
+  'inv-trial': { ar: 'تجريبية', fr: 'Essai', en: 'Trial', es: 'Prueba', hs: 'تجريبية' },
+  'inv-month': { ar: 'شهرية', fr: 'Mensuelle', en: 'Monthly', es: 'Mensual', hs: 'شهرية' },
+  'inv-quart': { ar: 'ربعية', fr: 'Trimestrielle', en: 'Quarterly', es: 'Trimestral', hs: 'ربعية' },
+  'inv-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
   'vp-year':   { ar: 'موثّق⁺ سنوية', fr: 'Vérifié⁺ annuel', en: 'Verified+ yearly', es: 'Verificado⁺ anual', hs: 'موثّق⁺ سنوية' }
 };
 
@@ -631,6 +636,13 @@ var CATALOGS = {
     { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'], features_fr: ['Accès aux coordonnées du donneur d\'ordre', 'Soumissions d\'offres illimitées', 'Publication d\'appels d\'offres'] },
     { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos offres'] },
     { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres'] }
+  ],
+  /* باقات غرفة الاستثمارات — هيكل المناقصات؛ الأسعار الافتراضية قابلة للتعديل من الأدمن */
+  investment: [
+    { id: 'inv-trial', price: 0,     durationDays: 10,  discountPct: 0, period: 'مجان / 10 أيام', period_fr: 'Gratuit / 10 jours', features: ['تصفّح فرص الاستثمار المنشورة', 'بيانات التواصل مخفية/ضبابية', 'إيداع الفرص مقفول'], features_fr: ['Parcourir les opportunités publiées', 'Coordonnées masquées / floutées', 'Dépôt d\'opportunités verrouillé'] },
+    { id: 'inv-month', price: 5000,  durationDays: 30,  discountPct: 0, period: 'MRU / شهر', period_fr: 'MRU / mois', features: ['كشف بيانات تواصل صاحب الفرصة', 'إيداع فرص استثمار غير محدود', 'التواصل مع المستثمرين المهتمين'], features_fr: ['Accès aux coordonnées du porteur', 'Dépôt illimité d\'opportunités', 'Contact avec investisseurs intéressés'] },
+    { id: 'inv-quart', price: 13500, durationDays: 90,  discountPct: 10, period: 'MRU / 3 أشهر', period_fr: 'MRU / 3 mois', features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور فرصك للمستثمرين'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos opportunités'] },
+    { id: 'inv-year',  price: 45000, durationDays: 365, discountPct: 25, period: 'MRU / 12 شهر', period_fr: 'MRU / 12 mois', features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية للفرص الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes pour les nouvelles opportunités'] }
   ],
   verified_plus: [
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }

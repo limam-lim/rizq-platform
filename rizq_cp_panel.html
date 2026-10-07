@@ -956,9 +956,10 @@ main, .page-content.active, .main-content, .results-area,
           <button class="btn-sm btn-primary" onclick="addPkg()" data-t="pkg-add-btn">➕ إضافة باقة</button>
         </div>
         <div style="padding:18px">
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px" data-t="pkg-desc">اختر فئة النشاط، ثم عدّل/أضف/احذف باقاتها. كل فئة مستقلة وتُطبَّق فوراً على صفحاتها المرتبطة (المحلات، الشركات، المكاتب، الأفراد، الفيديو الإعلاني، والعام الافتراضي).</p>
-          <div id="pkg-cat-tabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px"></div>
-          <div id="packages-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px"></div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px" data-t="pkg-desc">اختر فئة واحدة، عدّل الأسعار والمزايا كما تريد، ثم احفظ. كل فئة مستقلة — الأسعار تحت تحكمك دائماً وتُطبَّق فوراً على الموقع.</p>
+          <div id="pkg-cat-tabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+          <div id="pkg-cat-heading" style="display:none;margin:0 0 16px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1px solid rgba(201,168,76,.35)"></div>
+          <div id="packages-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px"></div>
           <div style="margin-top:18px;display:flex;gap:10px">
             <button class="btn-sm btn-primary" onclick="savePkgCategory()" data-t="pkg-save-btn">💾 حفظ كل التغييرات</button>
             <button class="btn-sm btn-outline" onclick="resetPkgCategory()" data-t="pkg-reset-btn">↺ استعادة الباقات الافتراضية لهذه الفئة</button>
@@ -3132,6 +3133,14 @@ const PKG_DEFAULTS = {
     {id:'tnd-quart', name:'ربعية', price:13500, period:'MRU / 3 أشهر', durationDays:90,  features:['كل مزايا الشهرية','توفير 10% عن الشهري','أولوية ظهور عروضك لأصحاب المناقصات'], active:true},
     {id:'tnd-year',  name:'سنوية', price:45000, period:'MRU / 12 شهر', durationDays:365, features:['كل مزايا الربعية','توفير 25% عن الشهري','دعم VIP','تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], active:true},
   ],
+  // باقات غرفة الاستثمارات — على غرار المناقصات. الأسعار أدناه افتراضية فقط؛
+  // الأدمن يتحكم فيها دائماً من هذا المحرّر (حفظ → site-config / localStorage).
+  investment: [
+    {id:'inv-trial', name:'تجريبية', price:0,     period:'مجان / 10 أيام', durationDays:10,  features:['تصفّح فرص الاستثمار المنشورة','بيانات التواصل مخفية/ضبابية','إيداع الفرص مقفول'], active:true},
+    {id:'inv-month', name:'شهرية',   price:5000,  period:'MRU / شهر',      durationDays:30,  features:['كشف بيانات تواصل صاحب الفرصة','إيداع فرص استثمار غير محدود','التواصل مع المستثمرين المهتمين'], active:true},
+    {id:'inv-quart', name:'ربعية',   price:13500, period:'MRU / 3 أشهر',   durationDays:90,  features:['كل مزايا الشهرية','توفير 10% عن الشهري','أولوية ظهور فرصك للمستثمرين'], active:true},
+    {id:'inv-year',  name:'سنوية',   price:45000, period:'MRU / 12 شهر',   durationDays:365, features:['كل مزايا الربعية','توفير 25% عن الشهري','دعم VIP','تنبيهات فورية للفرص الجديدة'], active:true},
+  ],
   // شارة "موثّق⁺" — ميزة جديدة #232 (28/07/2026): تحقق هوية مُعزَّز مدفوع،
   // منفصل تماماً عن شارة "موثّق" المجانية (acc.status==='approved') وعن
   // شارة "مميّز برزق" المدفوعة (vip_badge). عمداً بلا أي مستوى "تجريبي/مجاني"
@@ -3143,18 +3152,20 @@ const PKG_DEFAULTS = {
   ],
 };
 
+/* ترتيب واضح بلا تكرار بصري: النشاطات أولاً، ثم الغرف، ثم الإضافات، ثم الاحتياطي */
 const PKG_CATS = [
-  {key:'general',    label:'عام (الافتراضي)',  icon:'📦', ls:'rizq_packages'},
-  {key:'individual',  label:'الأفراد',           icon:'🙋', ls:'rizq_individual_packages'},
-  {key:'office',      label:'المكاتب الافتراضية', icon:'💼', ls:'rizq_office_packages'},
-  {key:'store',       label:'المحلات',            icon:'🏬', ls:'rizq_store_packages'},
-  {key:'corp',        label:'الشركات',            icon:'🏢', ls:'rizq_corp_packages'},
-  {key:'video',       label:'الفيديو الإعلاني',   icon:'🎬', ls:'rizq_video_packages'},
-  {key:'tender',      label:'باقة المناقصة',      icon:'📋', ls:'rizq_tender_packages'},
-  {key:'verified_plus', label:'شارة موثّق⁺',       icon:'🛡️', ls:'rizq_verified_plus_packages'},
+  {key:'individual',    label:'الأفراد',              icon:'🙋', ls:'rizq_individual_packages', hint:'إعلانات الأفراد'},
+  {key:'store',         label:'المحلات',              icon:'🏬', ls:'rizq_store_packages',      hint:'متاجر ومنتجات'},
+  {key:'office',        label:'المكاتب',              icon:'💼', ls:'rizq_office_packages',     hint:'مكاتب وخدمات'},
+  {key:'corp',          label:'الشركات والمعارض',     icon:'🏢', ls:'rizq_corp_packages',       hint:'شركات ومعارض'},
+  {key:'tender',        label:'غرفة المناقصات',       icon:'📋', ls:'rizq_tender_packages',     hint:'باقات المناقصة'},
+  {key:'investment',    label:'غرفة الاستثمارات',     icon:'📈', ls:'rizq_investment_packages', hint:'باقات الاستثمار — الأسعار تحت تحكمك'},
+  {key:'video',         label:'إعلانات الفيديو',      icon:'🎬', ls:'rizq_video_packages',      hint:'فيديو إعلاني'},
+  {key:'verified_plus', label:'شارة موثّق⁺',           icon:'🛡️', ls:'rizq_verified_plus_packages', hint:'تحقق هوية مُعزَّز'},
+  {key:'general',       label:'عام — احتياطي',         icon:'📦', ls:'rizq_packages',            hint:'كتالوج احتياطي قديم — لا تخلطه مع الفئات أعلاه'},
 ];
 
-let currentPkgCat = 'general';
+let currentPkgCat = 'individual';
 
 function pkgCatInfo(key){ return PKG_CATS.find(c=>c.key===key) || PKG_CATS[0]; }
 function pkgCatLabel(key){
@@ -3228,21 +3239,33 @@ function renderPackages(){
   if(!grid) return;
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   const pkgs = loadPkgCategory(currentPkgCat);
-  const icon = pkgCatInfo(currentPkgCat).icon;
+  const cat = pkgCatInfo(currentPkgCat);
+  const icon = cat.icon;
+  const _pe = (s)=> escapeHtml(s);
+  const heading = document.getElementById('pkg-cat-heading');
+  if(heading){
+    heading.style.display = 'block';
+    heading.innerHTML =
+      '<div style="font-size:22px;font-weight:900;color:#E8C96A;line-height:1.3;margin-bottom:4px">'+_pe(icon)+' '+_pe(pkgCatLabel(currentPkgCat))+'</div>'
+      +'<div style="font-size:12px;color:rgba(255,255,255,.72);font-weight:600">'+_pe(cat.hint||'')+' · '+pkgs.length+' باقة · الأسعار قابلة للتعديل ثم احفظ</div>';
+  }
   grid.innerHTML = pkgs.map((p,i)=>`
-    <div class="card" data-idx="${i}" style="margin:0">
-      <div class="card-header">
-        <div class="card-title" style="font-size:13px">${icon} ${p.name||t('pkg-noname','باقة بدون اسم')}</div>
-        <button class="toggle-sw ${p.active!==false?'on':''}" onclick="this.classList.toggle('on')" title="${t('pkg-toggle-title','تفعيل/إيقاف الباقة')}"></button>
+    <div class="card" data-idx="${i}" style="margin:0;border:1px solid rgba(201,168,76,.22)">
+      <div class="card-header" style="align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="card-title" style="font-size:20px;font-weight:900;line-height:1.25;color:var(--navy,#1B3A6B)">${_pe(p.name||t('pkg-noname','باقة بدون اسم'))}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-weight:700;letter-spacing:.3px">${_pe(icon)} ${_pe(pkgCatLabel(currentPkgCat))} · <span dir="ltr">${_pe(p.id||('#'+(i+1)))}</span></div>
+        </div>
+        <button class="toggle-sw ${p.active!==false?'on':''}" onclick="this.classList.toggle('on')" title="${_pe(t('pkg-toggle-title','تفعيل/إيقاف الباقة'))}"></button>
       </div>
       <div style="padding:14px">
-        <div class="form-group"><label class="form-label">${t('pkg-name-label','اسم الباقة')}</label><input class="form-input pkg-name-input" value="${(p.name||'').replace(/"/g,'&quot;')}"/></div>
+        <div class="form-group"><label class="form-label">${t('pkg-name-label','اسم الباقة')}</label><input class="form-input pkg-name-input" value="${_pe(p.name||'')}" oninput="var t=this.closest('.card').querySelector('.card-title');if(t)t.textContent=this.value||'باقة بدون اسم'"/></div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-          <div class="form-group"><label class="form-label">${t('pkg-price-label','السعر (MRU، 0 = مجاناً)')}</label><input class="form-input pkg-price-input" type="number" value="${p.price||0}" dir="ltr"/></div>
-          <div class="form-group"><label class="form-label">${t('pkg-period-label','المدة / الوصف')}</label><input class="form-input pkg-period-input" value="${(p.period||'').replace(/"/g,'&quot;')}"/></div>
-          <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" value="${p.durationDays||30}" dir="ltr"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-price-label','السعر (MRU، 0 = مجاناً)')}</label><input class="form-input pkg-price-input" type="number" value="${Number(p.price)||0}" dir="ltr"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-period-label','المدة / الوصف')}</label><input class="form-input pkg-period-input" value="${_pe(p.period||'')}"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
         </div>
-        <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${(p.features||[]).join('\n')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
       </div>
     </div>
