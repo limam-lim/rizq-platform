@@ -360,6 +360,7 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
+  <script src="rizq_stock.js"></script>
 <script src="rizq_site_banner.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -906,6 +907,13 @@ function submitOrder(e) {
 
   // حفظ نسخة من الطلب قبل تفريغ السلة — تُستخدم لاحقاً في "🔁 كرر آخر طلب"
   saveLastOrderSnapshot();
+
+  // استقطاع المخزون: 20 → بيع 1 → يبقى 19 (محلياً + محاولة مزامنة الخادم)
+  try {
+    if (window.RizqStock && typeof RizqStock.decrementCartItems === 'function') {
+      RizqStock.decrementCartItems(cart.slice());
+    }
+  } catch (stockErr) {}
 
   // Clear and show success
   cart = [];

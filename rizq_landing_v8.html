@@ -1349,63 +1349,54 @@ body.rizq-lang-fr .hero-biz-nav{
   color:#FFE7A0;letter-spacing:.15px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
-/* محلات — بوابة كحلي ذهبي */
-.hero-biz-gold{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 30%),
-    linear-gradient(165deg,#2f5aa0 0%,#1B3A6B 52%,#0f2347 100%);
-  border-color:#C9A84C;
-  box-shadow:0 10px 24px rgba(15,35,65,.24),0 0 16px rgba(201,168,76,.22),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -10px 18px rgba(8,15,30,.25);
-}
-.hero-biz-gold .hero-biz-ico-wrap{background:linear-gradient(145deg,#F0D78A,#C9A84C,#b89840);border-color:#fff8e0}
-.hero-biz-gold:hover{border-color:#E8C96A;box-shadow:0 18px 40px rgba(15,35,65,.36),0 0 28px rgba(201,168,76,.38),inset 0 1px 0 rgba(255,255,255,.26),inset 0 -10px 18px rgba(8,15,30,.18)}
-/* مكاتب — أزرق ملكي */
-.hero-biz-royal{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 30%),
-    linear-gradient(165deg,#2f6fbf 0%,#1B3A6B 55%,#12305c 100%);
-  border-color:rgba(201,168,76,.45);
-}
-.hero-biz-royal .hero-biz-ico-wrap{background:linear-gradient(145deg,#d7e8ff,#6ea0e0,#1B3A6B);border-color:#e8f2ff}
-.hero-biz-royal .hero-biz-hint{color:#C8E0FF}
-.hero-biz-royal:hover{border-color:#E8C96A;box-shadow:0 18px 40px rgba(27,58,107,.42),0 0 24px rgba(201,168,76,.28),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -10px 18px rgba(8,15,30,.18)}
-/* معارض — نيلي ملكي عميق */
-.hero-biz-diamond{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 30%),
-    linear-gradient(165deg,#2a4570 0%,#1B3A6B 50%,#0d1b2a 100%);
-  border-color:rgba(201,168,76,.4);
-}
-.hero-biz-diamond .hero-biz-ico-wrap{background:linear-gradient(145deg,#c5d8f0,#6b8fc4,#1B3A6B);border-color:#eef4fb}
-.hero-biz-diamond .hero-biz-hint{color:#D7E6F8}
-.hero-biz-diamond:hover{border-color:#E8C96A;box-shadow:0 18px 40px rgba(13,27,42,.45),0 0 22px rgba(201,168,76,.28),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -10px 18px rgba(8,15,30,.2)}
-/* مناقصات — إطار ملكي بلمسة زمرد */
-.hero-biz-tender{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 30%),
-    linear-gradient(165deg,#1a6b56 0%,#0f4a3c 45%,#0D1B2A 100%);
-  border-color:rgba(201,168,76,.42);
-}
-.hero-biz-tender .hero-biz-ico-wrap{background:linear-gradient(145deg,#a7f3d0,#34d399,#0f8f6a);border-color:#ecfdf5}
-.hero-biz-tender .hero-biz-hint{color:#C6FFE8}
-.hero-biz-tender:hover{border-color:#E8C96A;box-shadow:0 18px 40px rgba(15,74,60,.42),0 0 24px rgba(201,168,76,.28),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -10px 18px rgba(8,15,30,.2)}
-/* استثمارات — كحلي عميق وذهبي */
+/* عائلة موحّدة كحلي/ذهبي — التميّز بلون خفيف على إطار الأيقونة فقط */
+.hero-biz-gold,
+.hero-biz-royal,
+.hero-biz-diamond,
+.hero-biz-tender,
 .hero-biz-invest{
   background:
-    linear-gradient(180deg, rgba(255,255,255,.07) 0%, transparent 30%),
-    linear-gradient(165deg,#1e3358 0%,#0f1c33 52%,#080f1e 100%);
-  border-color:#C9A84C;
-  box-shadow:0 10px 22px rgba(15,35,65,.26),0 0 14px rgba(201,168,76,.18),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -10px 18px rgba(0,0,0,.28);
+    linear-gradient(180deg, rgba(255,255,255,.09) 0%, transparent 30%),
+    linear-gradient(165deg,#2a4f8f 0%,#1B3A6B 52%,#0f2347 100%);
+  border-color:rgba(201,168,76,.55);
+  box-shadow:0 10px 24px rgba(15,35,65,.24),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -10px 18px rgba(8,15,30,.25);
 }
-.hero-biz-invest .hero-biz-ico-wrap{background:linear-gradient(145deg,#F0D78A,#C9A84C,#9a7a2e);border-color:#fff8e0}
+.hero-biz-gold .hero-biz-ico-wrap,
+.hero-biz-royal .hero-biz-ico-wrap,
+.hero-biz-diamond .hero-biz-ico-wrap,
+.hero-biz-tender .hero-biz-ico-wrap,
+.hero-biz-invest .hero-biz-ico-wrap{
+  background:linear-gradient(145deg,#F0D78A,#C9A84C,#b89840);
+  border-color:#fff8e0;
+}
+.hero-biz-gold .hero-biz-hint,
+.hero-biz-royal .hero-biz-hint,
+.hero-biz-diamond .hero-biz-hint,
+.hero-biz-tender .hero-biz-hint,
 .hero-biz-invest .hero-biz-hint{color:#FFE7A0}
-.hero-biz-invest:hover{border-color:#E8C96A;box-shadow:0 18px 40px rgba(8,15,30,.5),0 0 26px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -10px 18px rgba(0,0,0,.22)}
+.hero-biz-gold:hover,
+.hero-biz-royal:hover,
+.hero-biz-diamond:hover,
+.hero-biz-tender:hover,
+.hero-biz-invest:hover{
+  border-color:#E8C96A;
+  box-shadow:0 16px 34px rgba(15,35,65,.34),0 0 18px rgba(201,168,76,.22),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -10px 18px rgba(8,15,30,.18);
+}
+/* لمسة تمييز خفيفة دون كسر العائلة */
+.hero-biz-tender .hero-biz-ico-wrap{box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1.5px rgba(52,211,153,.45),inset 0 1px 0 rgba(255,255,255,.5)}
+.hero-biz-invest .hero-biz-ico-wrap{box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1.5px rgba(232,201,106,.65),inset 0 1px 0 rgba(255,255,255,.5)}
+.hero-biz-btn:hover{transform:translateY(-5px);filter:brightness(1.04)}
 .hero-biz-badge{
   position:absolute;top:10px;inset-inline-end:10px;z-index:3;
   background:linear-gradient(135deg,#E8C96A,#C9A84C);
   color:#0f2347;font-size:8.5px;font-weight:900;
   padding:3px 8px;border-radius:10px;letter-spacing:.3px;
-  box-shadow:0 2px 10px rgba(201,168,76,.55);
+  box-shadow:0 2px 8px rgba(201,168,76,.4);
+}
+.hero-spaces-trust{
+  margin:14px auto 0;max-width:720px;text-align:center;
+  font-size:12px;font-weight:700;line-height:1.55;
+  color:rgba(232,201,106,.88);letter-spacing:.2px;
 }
 
 /* ── HERO PRIMARY CTA (تحويل: متجر أو إعلان مجاني) ── */
@@ -3967,6 +3958,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             </span>
           </a>
         </nav>
+        <p class="hero-spaces-trust" data-t="hbiz-trust">وسيط نشر · تواصل مباشر · معاينة قبل الدفع</p>
       </section>
 
       <!-- 2) لوحة التصفح: بحث + أقسام سريعة في كتلة واحدة -->
@@ -8190,6 +8182,7 @@ const LANG = {
     'hero-tagline-lead': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي',
     'hero-one-place': ' — كل شيء في مكان واحد',
     'hbiz-pick-sub': 'من محلك إلى استثمارك — حضورك المهني يبدأ من هنا',
+    'hbiz-trust': 'وسيط نشر · تواصل مباشر · معاينة قبل الدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
@@ -8318,6 +8311,7 @@ const LANG = {
     'hero-tagline-lead': 'Boutique virtuelle · Bureau pro · Pub institutionnelle',
     'hero-one-place': ' — tout en un seul endroit',
     'hbiz-pick-sub': 'De votre boutique à votre investissement — votre présence pro commence ici',
+    'hbiz-trust': 'Intermédiaire de publication · Contact direct · Vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',

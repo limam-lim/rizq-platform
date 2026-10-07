@@ -606,6 +606,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 
 <!-- ══ SCRIPTS ══ -->
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_stock.js"></script>
 <script src="rizq_site_banner.js"></script>
 <script src="rizq_auth_gate.js"></script>
 <script src="rizq_contact_gate.js"></script>
@@ -790,6 +791,7 @@ function loadData(){
             specs: p.desc || '',
             image: (Array.isArray(p.images) && p.images[0]) || p.image || '',
             emoji: p.emoji || '📦',
+            stock: p.stock,
             featured: false
           };
         });
@@ -823,16 +825,29 @@ function renderCatalog(){
     var name  = (_lang==='fr' && item.nameFr)  ? item.nameFr  : (item.name  || '');
     var specs = (_lang==='fr' && item.specsFr) ? item.specsFr : (item.specs || '');
     var num = String(idx+1).padStart(2,'0');
+    var stockBadge = (window.RizqStock && RizqStock.buyerBadgeHtml)
+      ? RizqStock.buyerBadgeHtml(item.stock, _lang==='fr')
+      : '';
+    var stockLine = '';
+    if(window.RizqStock && RizqStock.buyerLabel){
+      var si = RizqStock.buyerLabel(item.stock, _lang==='fr');
+      if(si){
+        var col = si.level==='out' ? '#e57373' : si.level==='low' ? '#e0a940' : '#5fce9a';
+        stockLine = '<div class="item-stock" style="font-size:12px;font-weight:800;color:'+col+';margin:4px 0 2px">'+(si.level==='out'?'❌ ':si.level==='low'?'⚡ ':'📦 ')+esc(si.text)+'</div>';
+      }
+    }
     return '<div class="item-card" data-cat="'+esc(item.cat||'')+'" onclick="openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
       +'<div class="item-index">'+num+'</div>'
       +'<div class="item-img">'
       +(item.image ? '<img src="'+esc(item.image)+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">' : '<div class="item-medallion">'+esc(item.emoji||'📦')+'</div>')
       +(item.featured ? '<span class="item-badge">'+_t('مميز','Vedette')+'</span>' : '')
+      +(stockBadge ? '<span style="position:absolute;top:8px;inset-inline-start:8px;z-index:2">'+stockBadge+'</span>' : '')
       +'</div>'
       +'<div class="item-info">'
       +'<span class="item-cat-label">'+esc(_srCatLabel(item.cat||''))+'</span>'
       +'<div class="item-name">'+esc(name)+'</div>'
       +(specs ? '<div class="item-specs">'+esc(specs)+'</div>' : '')
+      +stockLine
       +'<div class="item-price">'+esc(item.price||'')+(item.priceNote ? ' <small>'+esc(item.priceNote)+'</small>' : '')+'</div>'
       +'<button class="btn-inquire" onclick="event.stopPropagation();openItemChat(\''+esc(item.id)+'\',\''+esc(name)+'\')">'
       +'✉️ '+_t('استفسار آمن','Demande sécurisée')
