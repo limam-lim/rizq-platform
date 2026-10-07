@@ -375,10 +375,10 @@ main, .page-content.active, .main-content, .results-area,
   <div class="topnav-inner">
     <div class="nav-brand" style="cursor:default;display:flex;align-items:center;gap:10px">
       <button class="rizq-promo-mark" onclick="openRizqPromo()" title="Rizq Platform"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></button>
-      <a href="rizq_store.html" style="text-decoration:none"><div class="rizq-logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div></a>
+      <a href="rizq_landing_v8.html#rzq-disc-store" style="text-decoration:none"><div class="rizq-logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div></a>
     </div>
     <div class="nav-links">
-      <a class="nav-link" href="rizq_store.html" data-t="nav-store">المحل</a>
+      <a class="nav-link" href="rizq_landing_v8.html#rzq-disc-store" data-t="nav-store">المحل</a>
       <a class="nav-link" href="rizq_products.html" data-t="nav-products">المنتجات</a>
     </div>
     <div class="nav-cart-badge" style="display:flex;align-items:center;gap:8px;color:var(--gold);font-size:14px;font-weight:700">
@@ -391,7 +391,7 @@ main, .page-content.active, .main-content, .results-area,
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
   <div class="bc-inner">
-    <a href="rizq_store.html" data-t-fr="Boutique">المحل</a>
+    <a href="rizq_landing_v8.html#rzq-disc-store" data-t-fr="Boutique">المحل</a>
     <span class="bc-sep">›</span>
     <a href="rizq_products.html" data-t-fr="Produits">المنتجات</a>
     <span class="bc-sep">›</span>
@@ -599,6 +599,32 @@ main, .page-content.active, .main-content, .results-area,
 <script>
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
+
+// روابط المحل/المنتجات: احتفظ بمعرّف المحل أو اذهب للاكتشاف بدل صفحة فارغة
+(function bindStoreContextLinks(){
+  try{
+    var params = new URLSearchParams(location.search);
+    var storeId = params.get('id') || params.get('store') || '';
+    if(!storeId){
+      try{
+        var c = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
+        if(c[0]) storeId = c[0].storeId || c[0].accountId || '';
+      }catch(e){}
+    }
+    var storeHref = storeId
+      ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
+      : 'rizq_landing_v8.html#rzq-disc-store';
+    var productsHref = storeId
+      ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
+      : 'rizq_products.html';
+    document.querySelectorAll('a[href="rizq_store.html"], a[href="rizq_landing_v8.html#rzq-disc-store"]').forEach(function(a){
+      a.setAttribute('href', storeHref);
+    });
+    document.querySelectorAll('a[href="rizq_products.html"], a[href^="rizq_products.html?"]').forEach(function(a){
+      a.setAttribute('href', productsHref);
+    });
+  }catch(e){}
+})();
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========
 function loadCart(){

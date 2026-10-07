@@ -3818,8 +3818,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA">📱 إلكترونيات</a>
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B7%D8%A7%D9%82%D8%A9">⚡ طاقة</a>
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B1%D8%AD%D9%84%D8%A7%D8%AA">✈️ رحلات</a>
-        <a class="rizq-search-cat" role="listitem" href="#virtual-tenders">📋 مناقصات</a>
-        <a class="rizq-search-cat" role="listitem" href="#virtual-investments">📈 استثمار</a>
+        <a class="rizq-search-cat" role="listitem" href="#rzq-disc-tenders">📋 مناقصات</a>
+        <a class="rizq-search-cat" role="listitem" href="#rzq-disc-investments">📈 استثمار</a>
       </div>
       <p class="rizq-search-hint" data-t="search-theater-hint">Esc للإغلاق · اكتب ثم Enter</p>
     </div>
@@ -3925,30 +3925,30 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">اختر فضاءك على رزق</h2>
           <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
         </div>
-        <!-- بوابات دخول مباشرة للنماذج/الصفحات — الشريط العلوي يبقى للقفز داخل الرئيسية -->
-        <nav class="hero-biz-nav" aria-label="بوابات الدخول إلى النماذج">
-          <a href="rizq_store.html" class="hero-biz-btn hero-biz-gold" data-space-portal="store" aria-label="المحلات">
+        <!-- بوابات الفضاءات → شريط الاكتشاف على الرئيسية (لا صفحات فارغة بلا معرف) -->
+        <nav class="hero-biz-nav" aria-label="بوابات الدخول إلى الفضاءات">
+          <a href="#rzq-disc-store" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="المحلات">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
               <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
             </span>
           </a>
-          <a href="rizq_showroom.html" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" aria-label="المعارض">
+          <a href="#rzq-disc-corp" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="المعارض">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض</span>
               <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
             </span>
           </a>
-          <a href="rizq_office.html" class="hero-biz-btn hero-biz-royal" data-space-portal="office" aria-label="المكاتب">
+          <a href="#rzq-disc-office" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="المكاتب">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
               <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
             </span>
           </a>
-          <a href="rizq_tenders.html" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" aria-label="المناقصات">
+          <a href="#rzq-disc-tenders" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="المناقصات">
             <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
             <span class="hero-biz-text">
@@ -3956,7 +3956,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
               <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
             </span>
           </a>
-          <a href="rizq_investments.html" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" aria-label="الاستثمارات">
+          <a href="#rzq-disc-investments" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="الاستثمارات">
             <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
             <span class="hero-biz-text">
@@ -4176,7 +4176,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-store"></div>
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <a href="./?openRegister=1&regPage=1&preType=company&preBiz=store" onclick="openRegisterAs('company','store');return false" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">🏪 افتح محلك الآن</a>
-        <a href="rizq_store.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn2">👁 عرض نموذج محل</a>
+        <a href="rizq_store.html?id=acc_promo_store_rizq" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn2">👁 عرض نموذج محل</a>
       </div>
     </div>
   </div>
@@ -4253,7 +4253,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
            class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
-        <a href="rizq_showroom.html" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
+        <a href="rizq_showroom.html?id=acc_promo_corp_rizq" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
       </div>
     </div>
 
@@ -4383,7 +4383,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-office"></div>
       <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
         <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">📒 أنشئ مكتبك الآن</button>
-        <a id="vo-view-btn" href="rizq_office.html" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px" data-t="vo-btn2">👁 عرض نموذج مكتب</a>
+        <a id="vo-view-btn" href="rizq_office.html?id=acc_promo_office_rizq" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px" data-t="vo-btn2">👁 عرض نموذج مكتب</a>
       </div>
     </div>
 
