@@ -1274,8 +1274,9 @@
           'X-Buyer-Id': s.id
         }
       }).then(function (res) {
-        if (res.status === 401) {
-          clearSession();
+        if (!res.ok) {
+          // أي فشل تحقق (401 أو غيره) — لا نكشف اتصالاً على جلسة مزوّرة
+          if (res.status === 401) clearSession();
           _pendingAction = actionFn;
           rememberAfterAuthHref();
           openModal(reasonKey);
@@ -1283,8 +1284,10 @@
         }
         if (typeof actionFn === 'function') actionFn();
       }).catch(function () {
-        // شبكة معطّلة — اسمح إن كانت الجلسة المحلية تبدو صالحة
-        if (typeof actionFn === 'function') actionFn();
+        // شبكة معطّلة: أغلق المسار بدل fail-open (الخادم هو مصدر الحقيقة للتواصل)
+        _pendingAction = actionFn;
+        rememberAfterAuthHref();
+        openModal(reasonKey);
       });
       return true;
     }
