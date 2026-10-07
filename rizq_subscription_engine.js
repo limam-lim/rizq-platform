@@ -340,7 +340,7 @@
 
   // ── قوائم الباقات الست — مصدر الحقيقة الوحيد (تُدار من لوحة التحكم) ──
   // أي إضافة فئة جديدة مستقبلاً تكفي بإضافتها هنا فقط (نقطة واحدة، بلا تكرار)
-  var PKG_LISTS = ['rizq_packages','rizq_video_packages','rizq_individual_packages','rizq_office_packages','rizq_store_packages','rizq_corp_packages','rizq_tender_packages'];
+  var PKG_LISTS = ['rizq_packages','rizq_video_packages','rizq_individual_packages','rizq_office_packages','rizq_store_packages','rizq_corp_packages','rizq_tender_packages','rizq_investment_packages'];
 
   // ── البحث عن تعريف الباقة الكامل عبر كل الفئات (بالاسم) ─────────
   // يُرجع: { price, durationDays, active, list, siblings } أو null إن لم توجد
@@ -922,6 +922,7 @@
         corp: 'corp',
         video: 'video',
         tender: 'tender',
+        investment: 'investment',
         verified_plus: 'verified_plus'
       },
       TYPE_TO_LS: {
@@ -932,6 +933,7 @@
         corp: 'rizq_corp_packages',
         video: 'rizq_video_packages',
         tender: 'rizq_tender_packages',
+        investment: 'rizq_investment_packages',
         verified_plus: 'rizq_verified_plus_packages'
       }
     };

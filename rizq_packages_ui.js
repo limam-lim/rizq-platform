@@ -12,6 +12,7 @@
     corp: 'rizq_corp_packages',
     video: 'rizq_video_packages',
     tender: 'rizq_tender_packages',
+    investment: 'rizq_investment_packages',
     verified_plus: 'rizq_verified_plus_packages'
   };
 

@@ -4784,6 +4784,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span class="ptab-icon">💼</span>
       <span class="ptab-lbl" data-t-fr="Appels d'offres">غرفة المناقصة</span>
     </button>
+    <button class="ptab-card" data-ptab="investment" onclick="switchPriceTab('investment',this)">
+      <span class="ptab-icon">📈</span>
+      <span class="ptab-lbl" data-t-fr="Investissements">غرفة الاستثمارات</span>
+    </button>
     <button class="ptab-card" data-ptab="ads" onclick="switchPriceTab('ads',this)">
       <span class="ptab-icon">🎬</span>
       <span class="ptab-lbl" data-t-fr="Annonces">الإعلانات</span>
@@ -4808,6 +4812,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <div class="price-pane" id="pane-tender">
     <div class="pricing-grid" id="grid-tender" data-rizq-pkg-skel="1"></div>
+  </div>
+  <div class="price-pane" id="pane-investment">
+    <div class="pricing-grid" id="grid-investment" data-rizq-pkg-skel="1"></div>
   </div>
   <div class="price-pane" id="pane-ads">
     <div class="pricing-grid" id="grid-ads" data-rizq-pkg-skel="1"></div>
@@ -12547,6 +12554,7 @@ function renderPricingSection(){
   var off = catalogPackages('office', true);
   var corp = catalogPackages('corp', true);
   var tender = catalogPackages('tender', false);
+  var investment = catalogPackages('investment', false);
   var ads = catalogPackages('video', false);
   if (!ind.length) ind = DEF_IND.slice();
   if (!sto.length) sto = DEF_STO.slice();
@@ -12561,13 +12569,15 @@ function renderPricingSection(){
   }
   if (!corp.length) corp = rawCat('corp');
   if (!tender.length) tender = rawCat('tender');
+  if (!investment.length) investment = rawCat('investment');
   if (!ads.length) ads = rawCat('video');
 
   function renderGrid(pkgs, gridId){
     var el=document.getElementById(gridId); if(!el)return;
     pkgs = pkgs || [];
-    var origin = gridId==='grid-individual'?'individual':gridId==='grid-stores'?'stores':gridId==='grid-offices'?'offices':gridId==='grid-corp'?'corp':gridId==='grid-tender'?'tender':gridId==='grid-ads'?'ads':'';
+    var origin = gridId==='grid-individual'?'individual':gridId==='grid-stores'?'stores':gridId==='grid-offices'?'offices':gridId==='grid-corp'?'corp':gridId==='grid-tender'?'tender':gridId==='grid-investment'?'investment':gridId==='grid-ads'?'ads':'';
     var _fr = (typeof isAr!=='undefined' && !isAr);
+    var _xe = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
     el.innerHTML=pkgs.map(function(p){
       if(isDiaName(p) || (window.RizqPackagesConfig && typeof RizqPackagesConfig.isDiamondPackage==='function' && RizqPackagesConfig.isDiamondPackage(p))){
         var _lang = _fr?'fr':'ar';
@@ -12639,20 +12649,20 @@ function renderPricingSection(){
       var lblStartFree=_fr?'Commencer gratuitement':'ابدأ مجاناً';
       var hasBadge=isHL||isYear||isDiamond;
       return '<div class="rpkg-card pricing-card'+(hasBadge?' has-badge':'')+(isDiamond||isYear||isHL?' featured':'')+'" onclick="openPkgModal(this,\''+origin+'\')" data-pkg="'+pJson+'" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
-        +(isHL?'<div class="pricing-card-badge pricing-card-badge--popular">'+lblPopular+'</div>':'')
-        +(isDiamond?'<div class="pricing-card-badge pricing-card-badge--diamond">💎 '+lblDiamondTier+'</div>':'')
-        +(isYear?'<div class="pricing-card-badge pricing-card-badge--year">'+lblBestValue+'</div>':'')
-        +'<div class="pricing-card-icon">'+icon+'</div>'
-        +'<div class="pricing-card-name" style="color:'+nameCol+'">'+pName+'</div>'
-        +(pDesc?'<div class="pricing-card-desc" style="color:'+featCol+'">'+pDesc+'</div>':'')
-        +'<div class="pricing-card-period" style="color:'+mutedCol+'">'+pPeriod+'</div>'
+        +(isHL?'<div class="pricing-card-badge pricing-card-badge--popular">'+_xe(lblPopular)+'</div>':'')
+        +(isDiamond?'<div class="pricing-card-badge pricing-card-badge--diamond">💎 '+_xe(lblDiamondTier)+'</div>':'')
+        +(isYear?'<div class="pricing-card-badge pricing-card-badge--year">'+_xe(lblBestValue)+'</div>':'')
+        +'<div class="pricing-card-icon">'+_xe(icon)+'</div>'
+        +'<div class="pricing-card-name" style="color:'+nameCol+'">'+_xe(pName)+'</div>'
+        +(pDesc?'<div class="pricing-card-desc" style="color:'+featCol+'">'+_xe(pDesc)+'</div>':'')
+        +'<div class="pricing-card-period" style="color:'+mutedCol+'">'+_xe(pPeriod)+'</div>'
         +'<div class="pricing-card-divider" style="background:'+(isYear||isDiamond?'rgba(255,255,255,.12)':'rgba(27,58,107,.08)')+'"></div>'
-        +'<div class="pricing-card-price-wrap"><span class="price" style="color:'+priceCol+'">'+(isFree?lblFree:Number(p.price).toLocaleString())+'</span>'
-        +(!isFree?'<div class="pricing-card-price-unit" style="color:'+mutedCol+'">MRU / '+pPeriod+'</div>':'')+'</div>'
-        +(isDiamond && pRoi ? '<div class="pricing-card-roi" style="color:#fde68a">💼 '+pRoi+'</div>' : '')
-        +'<ul class="pricing-features">'+pFeats.map(function(f){return'<li><span style="color:'+checkCol+';font-size:13px;flex-shrink:0">✓</span><span style="color:'+featCol+'">'+f+'</span></li>';}).join('')+'</ul>'
-        +(isFree?'<div class="pricing-card-freebox">'+lblStartFree+'</div>'
-          :'<button onclick="event.stopPropagation();openPkgModal(this.closest(\'.pricing-card\'),\''+origin+'\')" style="background:'+btnBg+';color:'+btnCol+'">'+pCta+'</button>')
+        +'<div class="pricing-card-price-wrap"><span class="price" style="color:'+priceCol+'">'+(isFree?_xe(lblFree):Number(p.price).toLocaleString())+'</span>'
+        +(!isFree?'<div class="pricing-card-price-unit" style="color:'+mutedCol+'">MRU / '+_xe(pPeriod)+'</div>':'')+'</div>'
+        +(isDiamond && pRoi ? '<div class="pricing-card-roi" style="color:#fde68a">💼 '+_xe(pRoi)+'</div>' : '')
+        +'<ul class="pricing-features">'+pFeats.map(function(f){return'<li><span style="color:'+checkCol+';font-size:13px;flex-shrink:0">✓</span><span style="color:'+featCol+'">'+_xe(f)+'</span></li>';}).join('')+'</ul>'
+        +(isFree?'<div class="pricing-card-freebox">'+_xe(lblStartFree)+'</div>'
+          :'<button onclick="event.stopPropagation();openPkgModal(this.closest(\'.pricing-card\'),\''+origin+'\')" style="background:'+btnBg+';color:'+btnCol+'">'+_xe(pCta)+'</button>')
         +'</div>';
     }).join('');
   }
@@ -12664,6 +12674,7 @@ function renderPricingSection(){
   renderGrid(off, 'grid-offices');
   renderGrid(corp, 'grid-corp');
   renderGrid(tender, 'grid-tender');
+  renderGrid(investment, 'grid-investment');
   renderGrid(ads, 'grid-ads');
 
   // ── package tab switcher (overrides food/fuel one for pkg tabs only) ──
@@ -12799,21 +12810,22 @@ function openPkgModal(cardEl,origin){
   var box=document.getElementById('pkg-modal-box');
   box.style.background=bg; box.style.border=border;
 
+  var _xm = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
   document.getElementById('pkg-modal-content').innerHTML=
     '<div style="text-align:center;margin-bottom:18px">'
-    +(isDiamond?'<div style="display:inline-block;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:10px;margin-bottom:10px">💎 '+pBadge+'</div>':'')
-    +'<div style="font-size:52px;margin-bottom:8px">'+icon+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:'+nameCol+'">'+pName+'</div>'
-    +(pDesc?'<div style="font-size:12.5px;color:'+featCol+';line-height:1.6;margin:8px 0 0;text-align:'+(_fr?'left':'right')+'">'+pDesc+'</div>':'')
-    +'<div style="font-size:12px;color:'+mutedCol+';font-weight:600;margin-top:4px">'+pPeriod+'</div>'
+    +(isDiamond?'<div style="display:inline-block;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:10px;margin-bottom:10px">💎 '+_xm(pBadge)+'</div>':'')
+    +'<div style="font-size:52px;margin-bottom:8px">'+_xm(icon)+'</div>'
+    +'<div style="font-size:22px;font-weight:900;color:'+nameCol+'">'+_xm(pName)+'</div>'
+    +(pDesc?'<div style="font-size:12.5px;color:'+featCol+';line-height:1.6;margin:8px 0 0;text-align:'+(_fr?'left':'right')+'">'+_xm(pDesc)+'</div>':'')
+    +'<div style="font-size:12px;color:'+mutedCol+';font-weight:600;margin-top:4px">'+_xm(pPeriod)+'</div>'
     +'</div>'
     +'<div style="text-align:center;margin-bottom:20px">'
-    +'<span style="font-size:40px;font-weight:900;color:'+priceCol+'">'+(isFree?lblFree:Number(p.price).toLocaleString()+' MRU')+'</span>'
-    +(!isFree?'<div style="font-size:11px;color:'+mutedCol+';font-weight:600">/ '+pPeriod+'</div>':'')
+    +'<span style="font-size:40px;font-weight:900;color:'+priceCol+'">'+(isFree?_xm(lblFree):Number(p.price).toLocaleString()+' MRU')+'</span>'
+    +(!isFree?'<div style="font-size:11px;color:'+mutedCol+';font-weight:600">/ '+_xm(pPeriod)+'</div>':'')
     +'</div>'
-    +(isDiamond && pRoi ? '<div style="margin:0 0 16px;padding:12px 14px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:12.5px;line-height:1.6;color:#fde68a;text-align:'+(_fr?'left':'right')+'">💼 '+pRoi+'</div>' : '')
+    +(isDiamond && pRoi ? '<div style="margin:0 0 16px;padding:12px 14px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:12.5px;line-height:1.6;color:#fde68a;text-align:'+(_fr?'left':'right')+'">💼 '+_xm(pRoi)+'</div>' : '')
     +'<div style="background:rgba(255,255,255,.08);border-radius:14px;padding:16px">'
-    +pFeats.map(function(f){ return '<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px"><span style="color:'+checkCol+';font-size:15px;flex-shrink:0">✓</span><span style="color:'+featCol+'">'+f+'</span></div>'; }).join('')
+    +pFeats.map(function(f){ return '<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px"><span style="color:'+checkCol+';font-size:15px;flex-shrink:0">✓</span><span style="color:'+featCol+'">'+_xm(f)+'</span></div>'; }).join('')
     +'</div>';
 
   var ctaBtn=document.getElementById('pkg-modal-cta');
@@ -12974,6 +12986,7 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
     if (Array.isArray(pkgs.corp))       localStorage.setItem('rizq_corp_packages', JSON.stringify(pkgs.corp));
     if (Array.isArray(pkgs.video))      localStorage.setItem('rizq_video_packages', JSON.stringify(pkgs.video));
     if (Array.isArray(pkgs.tender))     localStorage.setItem('rizq_tender_packages', JSON.stringify(pkgs.tender));
+    if (Array.isArray(pkgs.investment)) localStorage.setItem('rizq_investment_packages', JSON.stringify(pkgs.investment));
     if (Array.isArray(pkgs.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(pkgs.verified_plus));
     if (typeof renderPricingSection === 'function') renderPricingSection();
   }

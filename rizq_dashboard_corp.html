@@ -1270,6 +1270,7 @@ function verifyCorpAccessRemote(id, tok){
         if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
         if(Array.isArray(data.config.packages.general)) localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
         if(Array.isArray(data.config.packages.tender))  localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.investment)) localStorage.setItem('rizq_investment_packages', JSON.stringify(data.config.packages.investment));
         if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
       }
       if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
