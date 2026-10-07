@@ -517,7 +517,17 @@
     listings: 'ads',
     pricing: 'packs',
     packages: 'packs',
-    about: 'about'
+    about: 'about',
+    'rzq-disc-store': 'stores',
+    'virtual-stores': 'stores',
+    'rzq-disc-corp': 'showrooms',
+    'virtual-showrooms': 'showrooms',
+    'rzq-disc-office': 'offices',
+    'virtual-offices': 'offices',
+    'rzq-disc-tenders': 'tenders',
+    'virtual-tenders': 'tenders',
+    'rzq-disc-investments': 'investments',
+    'virtual-investments': 'investments'
   };
 
   /* Keys under «Plus» on phone (modules + packs/legal/about) — also light More trigger. */

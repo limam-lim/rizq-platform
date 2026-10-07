@@ -114,6 +114,8 @@ html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + 
 #virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
 #rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
 #listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
+/* ارتفاع أدنى لمراسي الاكتشاف قبل ملء JS حتى لا يفشل تمرير الهاش من صفحات أخرى */
+#rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments{min-height:1px}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
 *,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif!important;-webkit-font-smoothing:antialiased}
 .logo-mark,.rizq-splash-brand{font-family:Georgia,'Times New Roman',serif!important}
@@ -13482,6 +13484,9 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       renderFeedStrip('rzq-disc-tenders', 'tenders');
       renderFeedStrip('rzq-disc-investments', 'investments');
       renderLiveActivitySection();
+      /* بعد ملء الشرائط: أعد التمرير لهاش الصفحة — وإلا يفشل التمرير الأصلي
+         لأن #rzq-disc-* تكون فارغة عند وصول الرابط من صفحة أخرى */
+      if(typeof window.rizqScrollLandingHash === 'function') window.rizqScrollLandingHash(true);
     }
 
     document.addEventListener('DOMContentLoaded', renderAllStrips);
@@ -13492,5 +13497,74 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         if(k === 'rizq_lang' || k === 'rizq_pending_accounts' || k === 'rizq_wishlist') renderAllStrips();
       };
     }catch(e){}
+  })();
+
+  /* تمرير موثوق لهاش أقسام الاكتشاف / الفضاءات (من أزرار تصفّح المحلات/المكاتب/…) */
+  (function(){
+    var DISC_TO_SECTION = {
+      'rzq-disc-store': 'virtual-stores',
+      'rzq-disc-corp': 'virtual-showrooms',
+      'rzq-disc-office': 'virtual-offices',
+      'rzq-disc-tenders': 'virtual-tenders',
+      'rzq-disc-investments': 'virtual-investments'
+    };
+    var _scrollTimer = null;
+    function resolveTarget(hash){
+      var id = String(hash || '').replace(/^#/, '');
+      if(!id) return null;
+      var disc = DISC_TO_SECTION[id] ? document.getElementById(id) : null;
+      /* بعد ملء الشريط: مرّر إلى بطاقة الاكتشاف نفسها (كن أول من…) */
+      if(disc && disc.offsetHeight > 40) return disc;
+      var sectionId = DISC_TO_SECTION[id];
+      if(sectionId){
+        var sec = document.getElementById(sectionId);
+        if(sec) return sec;
+      }
+      return disc || document.getElementById(id);
+    }
+    function rizqScrollLandingHash(force){
+      var el = resolveTarget(location.hash);
+      if(!el) return false;
+      var top = el.getBoundingClientRect().top + window.pageYOffset;
+      var headerPad = 0;
+      try{
+        headerPad = (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
+      }catch(e){}
+      var y = Math.max(0, top - headerPad);
+      var near = Math.abs((window.pageYOffset || 0) - y) < 48;
+      if(!force && near) return true;
+      try{ el.scrollIntoView({ behavior: force ? 'auto' : 'smooth', block: 'start' }); }
+      catch(e2){ window.scrollTo(0, y); }
+      return true;
+    }
+    window.rizqScrollLandingHash = rizqScrollLandingHash;
+    function scheduleScroll(){
+      if(_scrollTimer) clearTimeout(_scrollTimer);
+      rizqScrollLandingHash(true);
+      _scrollTimer = setTimeout(function(){ rizqScrollLandingHash(true); }, 120);
+      setTimeout(function(){ rizqScrollLandingHash(true); }, 400);
+      setTimeout(function(){ rizqScrollLandingHash(true); }, 900);
+    }
+    window.addEventListener('hashchange', function(){ scheduleScroll(); });
+    window.addEventListener('pageshow', function(){ if(location.hash) scheduleScroll(); });
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', function(){ if(location.hash) scheduleScroll(); });
+    } else if(location.hash){
+      scheduleScroll();
+    }
+    /* نقر داخلي على روابط الهاش: فرض التمرير حتى لو كان الهاش نفسه */
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a[href*="#"]') : null;
+      if(!a) return;
+      var href = a.getAttribute('href') || '';
+      var m = href.match(/#(rzq-disc-[a-z]+|virtual-[a-z-]+|listings|categories|pricing|about)\b/i);
+      if(!m) return;
+      var hash = '#' + m[1];
+      var samePage = href.charAt(0) === '#' || /rizq_landing_v8\.html|\/(?:index\.html)?$/i.test(href.split('#')[0]);
+      if(!samePage && href.indexOf('rizq_landing_v8.html') === -1) return;
+      setTimeout(function(){
+        if(location.hash.toLowerCase() === hash.toLowerCase()) scheduleScroll();
+      }, 0);
+    }, true);
   })();
   </script>
