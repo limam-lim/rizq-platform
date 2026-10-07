@@ -159,12 +159,13 @@
   }
 
   function moduleHref(key) {
+    /* شريط الاكتشاف على الرئيسية — حيث تظهر «كن أول من…» / البطاقات */
     var map = {
-      store: isLanding() ? '#virtual-stores' : 'rizq_store.html',
-      corp: isLanding() ? '#virtual-showrooms' : 'rizq_showroom.html',
-      office: isLanding() ? '#virtual-offices' : 'rizq_office.html',
-      tenders: isLanding() ? '#virtual-tenders' : 'rizq_tenders.html',
-      investments: isLanding() ? '#virtual-investments' : 'rizq_investments.html'
+      store: isLanding() ? '#rzq-disc-store' : 'rizq_landing_v8.html#rzq-disc-store',
+      corp: isLanding() ? '#rzq-disc-corp' : 'rizq_landing_v8.html#rzq-disc-corp',
+      office: isLanding() ? '#rzq-disc-office' : 'rizq_landing_v8.html#rzq-disc-office',
+      tenders: isLanding() ? '#rzq-disc-tenders' : 'rizq_landing_v8.html#rzq-disc-tenders',
+      investments: isLanding() ? '#rzq-disc-investments' : 'rizq_landing_v8.html#rzq-disc-investments'
     };
     return map[key] || '#';
   }
@@ -176,12 +177,12 @@
         '<span class="nav-dd-icon">' + ico + '</span><div><strong data-hdr="' + hdr + '">' + label + '</strong></div></a>';
     }
     return '' +
-      item('rizq_store.html', 'stores', '🏪', 'المحلات', 'Boutiques') +
-      item('rizq_showroom.html', 'showrooms', '🏬', 'المعارض', 'Showrooms') +
-      item('rizq_office.html', 'offices', '💼', 'المكاتب', 'Bureaux') +
+      item(moduleHref('store'), 'stores', '🏪', 'المحلات', 'Boutiques') +
+      item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض', 'Showrooms') +
+      item(moduleHref('office'), 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
-      item('rizq_tenders.html', 'tenders', '📋', 'المناقصات', 'A-doffres') +
-      item('rizq_investments.html', 'investments', '📈', 'الاستثمارات', 'Investissements') +
+      item(moduleHref('tenders'), 'tenders', '📋', 'المناقصات', 'A-doffres') +
+      item(moduleHref('investments'), 'investments', '📈', 'الاستثمارات', 'Investissements') +
       item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
       item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
       item(aboutHref(), 'about', 'ℹ️', 'من نحن', 'À propos');
@@ -359,10 +360,10 @@
             '<span class="rizq-hdr-post-plus">+</span>' +
             '<span class="rizq-hdr-lbl rizq-hdr-post-lbl" data-hdr="post">نشر (+)</span>' +
           '</a>' +
-          '<a class="rizq-hdr-item rizq-nav-module" href="rizq_store.html" data-rizq-module="store" data-nav-order="4">' +
+          '<a class="rizq-hdr-item rizq-nav-module" href="' + moduleHref('store') + '" data-rizq-module="store" data-nav-order="4">' +
             '<span class="rizq-hdr-ico">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores">المحلات</span>' +
           '</a>' +
-          '<a class="rizq-hdr-item rizq-nav-module" href="rizq_investments.html" data-rizq-module="investments" data-nav-order="8">' +
+          '<a class="rizq-hdr-item rizq-nav-module" href="' + moduleHref('investments') + '" data-rizq-module="investments" data-nav-order="8">' +
             '<span class="rizq-hdr-ico">📈</span><span class="rizq-hdr-lbl" data-hdr="investments">الاستثمارات</span>' +
           '</a>' +
           '<div class="rizq-hdr-more-wrap" id="rizq-hdr-more-wrap" data-nav-order="9">' +

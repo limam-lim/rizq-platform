@@ -112,6 +112,7 @@ document.documentElement.classList.add('rizq-app-nav');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 #virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
+#rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
 #listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
 *,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif!important;-webkit-font-smoothing:antialiased}
@@ -3757,12 +3758,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- هاتف: secondary أعلى / thumb أسفل (إعلانات·نشر·محلات·معارض) — الترتيب عبر CSS order -->
     <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🧭</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
     <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="#virtual-stores" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#virtual-showrooms" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="#rzq-disc-store" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#rzq-disc-corp" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
     <li class="rizq-nav-post nav-phone-post-li" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#virtual-offices" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#virtual-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="#virtual-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#rzq-disc-office" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#rzq-disc-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="#rzq-disc-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
     <li class="rizq-nav-packs nav-phone-packs-li" data-nav-order="9" data-nav-tier="secondary"><a href="#pricing" data-hdr="packs"><span class="rizq-hdr-ico" aria-hidden="true">💎</span><span class="rizq-hdr-lbl" data-hdr="packs" data-t="nav-packs">الباقات</span></a></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="10" data-nav-tier="secondary">
       <button type="button" class="nav-link-btn nav-phone-more-only" id="nav-more-mobile-btn" aria-haspopup="true" aria-controls="nav-more-menu-mobile" aria-expanded="false" data-hdr="more"><span class="rizq-hdr-ico nav-phone-more-ico" aria-hidden="true">⋯</span><span class="rizq-hdr-lbl nav-phone-more-lbl" data-hdr="more" data-t="nav-more">المزيد</span></button>
@@ -3828,12 +3829,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <!-- ── Section jump bar — مخفي (كان يختلط مع الشريط الرئيسي عند التمرير) ── -->
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="true" hidden>
   <a href="#listings" data-jump="#listings">الإعلانات</a>
-  <a href="#virtual-stores" data-jump="#virtual-stores">المحلات</a>
-  <a href="#virtual-showrooms" data-jump="#virtual-showrooms">المعارض</a>
+  <a href="#rzq-disc-store" data-jump="#rzq-disc-store">المحلات</a>
+  <a href="#rzq-disc-corp" data-jump="#rzq-disc-corp">المعارض</a>
   <a href="rizq_post.html" data-jump="post" class="jump-post">+ نشر</a>
-  <a href="#virtual-offices" data-jump="#virtual-offices">المكاتب</a>
-  <a href="#virtual-tenders" data-jump="#virtual-tenders">المناقصات</a>
-  <a href="#virtual-investments" data-jump="#virtual-investments">الاستثمارات</a>
+  <a href="#rzq-disc-office" data-jump="#rzq-disc-office">المكاتب</a>
+  <a href="#rzq-disc-tenders" data-jump="#rzq-disc-tenders">المناقصات</a>
+  <a href="#rzq-disc-investments" data-jump="#rzq-disc-investments">الاستثمارات</a>
 </nav>
 
 <button type="button" id="back-to-top" aria-label="العودة للأعلى" title="العودة للأعلى">↑</button>
@@ -3844,7 +3845,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🧭</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>
     <a href="rizq_post.html" id="mbn-post" class="mbn-post"><span><span class="mbn-icon">+</span></span><span class="mbn-label">نشر</span></a>
-    <a href="rizq_investments.html" id="mbn-invest"><span class="mbn-icon">📈</span><span class="mbn-label">استثمار</span></a>
+    <a href="#rzq-disc-investments" id="mbn-invest"><span class="mbn-icon">📈</span><span class="mbn-label">استثمار</span></a>
     <button type="button" id="mbn-more" aria-haspopup="true" aria-controls="mobile-drawer"><span class="mbn-icon">⋯</span><span class="mbn-label">المزيد</span></button>
   </div>
 </nav>
@@ -8645,8 +8646,8 @@ function applyLandingLang(toAr) {
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {
     var jumpMap = isAr
-      ? {'#listings':'الإعلانات','#virtual-stores':'المحلات','#virtual-showrooms':'المعارض','post':'+ نشر','#virtual-offices':'المكاتب','#virtual-tenders':'المناقصات','#virtual-investments':'الاستثمارات'}
-      : {'#listings':'Annonces','#virtual-stores':'Boutiques','#virtual-showrooms':'Showrooms','post':'+ Publier','#virtual-offices':'Bureaux','#virtual-tenders':'A-doffres','#virtual-investments':'Investissements'};
+      ? {'#listings':'الإعلانات','#rzq-disc-store':'المحلات','#rzq-disc-corp':'المعارض','post':'+ نشر','#rzq-disc-office':'المكاتب','#rzq-disc-tenders':'المناقصات','#rzq-disc-investments':'الاستثمارات'}
+      : {'#listings':'Annonces','#rzq-disc-store':'Boutiques','#rzq-disc-corp':'Showrooms','post':'+ Publier','#rzq-disc-office':'Bureaux','#rzq-disc-tenders':'A-doffres','#rzq-disc-investments':'Investissements'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];

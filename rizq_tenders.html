@@ -772,7 +772,8 @@ function renderTenders(){
     grid.innerHTML = '<div class="t-empty"><div class="emo-ring"><div class="emo">📋</div></div>'
       + '<p>'+(fr?'Aucun appel d\'offres dans cette catégorie pour le moment.':'لا توجد مناقصات في هذه الفئة حالياً.')+'</p>'
       + '<div class="t-empty-actions">'
-      + '<button type="button" class="tea-primary" onclick="openPostModal()">'+(fr?'+ Publier un appel d\'offres':'+ انشر مناقصتك')+'</button>'
+      + '<a class="tea-primary" href="rizq_landing_v8.html#rzq-disc-tenders">'+(fr?'🔍 Voir les appels d\'offres sur Rizq':'🔍 تصفّح المناقصات على رزق')+'</a>'
+      + '<button type="button" class="tea-secondary" onclick="openPostModal()">'+(fr?'+ Publier un appel d\'offres':'+ انشر مناقصتك')+'</button>'
       + '<a class="tea-secondary" href="#tender-packages">'+(fr?'💼 Voir les forfaits':'💼 باقات الغرفة')+'</a>'
       + '</div></div>';
     return;
