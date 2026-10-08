@@ -383,7 +383,7 @@
   /** ألبومات تجريبية — صور عمودية فاخرة مطابقة للنموذج */
   function seedDemoGalleries(list) {
     if (!list || !list.length) return;
-    var fashionV = 'v2'; /* وجوه وهمية مرسومة — كسر كاش الصور القديمة */
+    var fashionV = 'v3'; /* وجوه كرتونية مرسومة بوضوح — لا وجوه واقعية */
     var fashion = {
       melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.jpg?' + fashionV,
       melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.jpg?' + fashionV,
