@@ -600,9 +600,21 @@ body{
    v16.2 — Visible premium polish (landing)
 ══════════════════════════════════════════ */
 
-/* Hero atmosphere + entrance */
+/* Hero atmosphere + entrance — سطح المكتب: لا توسّط المحتوى الطويل فوق الشاشة */
 .hero{
   position:relative;
+  justify-content:flex-start;
+  min-height:0;
+  height:auto;
+}
+@media (min-width:769px) and (min-height:501px){
+  .hero-vid-wrap .hero-vid-inner,
+  .hero-vid-compact .hero-vid-inner{
+    max-height:min(24vh,220px)!important;
+  }
+  .hero-vid-wrap{max-width:min(560px,54vw)!important}
+  .hero-content{max-width:min(860px,82vw)}
+  .hero-headline{font-size:clamp(40px,5.2vw,58px)!important}
 }
 .hero-bg{
   background:#ffffff!important;
