@@ -976,18 +976,26 @@ footer{
         <div id="store-payment-methods" style="display:none"></div>
       </div>
 
-      <!-- غرفة الطلبات — هوية المحل -->
-      <div class="info-card" id="store-service-desk" style="border-top:3px solid var(--gold)">
-        <div class="info-card-title" data-desk="title" id="store-req-title">📩 طلب من المحل</div>
-        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:12px;line-height:1.55" data-desk="hint" id="store-req-hint">أدخل بياناتك وسيتواصل معك المحل مباشرة. الوثائق عبر واتساب أو الإيميل — خارج سيرفر رزق.</p>
-        <div id="store-req-form">
-          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-          <input dir="ltr" class="req-input" id="rf-phone" placeholder="الهاتف *" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" placeholder="واتساب (إن اختلف)" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" placeholder="البريد (اختياري)" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-          <input class="req-input" id="rf-service" placeholder="المنتج / الموضوع" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-          <textarea class="req-input" id="rf-msg" placeholder="رسالتك للمحل…" style="width:100%;min-height:70px;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;resize:none;box-sizing:border-box"></textarea>
-          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:13.5px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
+      <!-- غرفة الطلبات — حقول ظاهرة دائماً -->
+      <div class="info-card" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important">
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:6px">📩 طلب من المحل</div>
+        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. الوثائق عبر واتساب أو الإيميل — خارج سيرفر رزق.</p>
+        <div id="store-req-form" style="display:block!important">
+          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
+          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
+          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
+          <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
+          <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمحل</label>
+          <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
+          <p style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 الوثائق عبر واتساب أو إيميل المحل بعد الإرسال — لا تُرفع على سيرفر رزق.</p>
+          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمحل</button>
         </div>
       </div>
     </aside>
@@ -1623,7 +1631,14 @@ function rizqShare(title, url) {
       if(window.RizqServiceDesk){
         var root = document.getElementById('store-service-desk');
         RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, acc.name || '');
-        if(acc.serviceDesk && acc.serviceDesk.enabled === false && root) root.style.display = 'none';
+        // النموذج يبقى ظاهراً دائماً على الواجهة العامة — لا إخفاء
+        if(root) root.style.display = 'block';
+      }
+      if(window._rizqStoreIsDemo || accountId === 'demo_store'){
+        locked = false;
+        phone = acc.phone || phone || '+222 44 55 66 77';
+        email = acc.email || email || 'store-demo@rizq.mr';
+        wa = acc.whatsapp || wa || '22244556677';
       }
       renderStorePaymentMethods(acc);
       if(locked || (!phone && !email && !wa)){
@@ -1660,6 +1675,18 @@ function rizqShare(title, url) {
 
     window._rizqLoadStoreContacts = async function(accountId){
       if(!accountId){ return; }
+      if(window._rizqStoreIsDemo || accountId === 'demo_store'){
+        applyGatedStoreContacts(accountId, {
+          contactsLocked: false,
+          name: 'محل النور',
+          phone: '+222 44 55 66 77',
+          whatsapp: '22244556677',
+          email: 'store-demo@rizq.mr',
+          paymentMethods: window._rizqStorePaymentMethods || [],
+          serviceDesk: window._rizqStoreServiceDesk || {}
+        });
+        return;
+      }
       if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE){
         applyGatedStoreContacts(accountId, { contactsLocked: true });
         return;
@@ -1690,31 +1717,83 @@ function rizqShare(title, url) {
     function setText(id, val){ if(val==null || val==='') return; var el=document.getElementById(id); if(el) el.textContent = val; }
     function setHref(id, val){ if(!val) return; var el=document.getElementById(id); if(el) el.setAttribute('href', val); }
 
+    function applyDemoStore(){
+      var id = 'demo_store';
+      var fr = isFr();
+      var acc = {
+        id: id, type: 'store', status: 'approved',
+        name: fr ? 'Boutique Al-Nour' : 'محل النور',
+        desc: fr
+          ? 'Boutique démo (projet de fin d’études) — espace marchand prêt avec panier et salle de demandes.'
+          : 'محل تجريبي (معاينة مشروع تخرج) — واجهة جاهزة بسلة وطلب وغرفة طلبات ظاهرة.',
+        city: fr ? 'Nouakchott' : 'نواكشوط',
+        address: fr ? 'Ksar — Nouakchott' : 'لكصر — نواكشوط',
+        phone: '+222 44 55 66 77', whatsapp: '22244556677', email: 'store-demo@rizq.mr',
+        serviceDesk: {
+          enabled: true,
+          formTitle: fr ? 'Commande — Boutique Al-Nour' : 'طلب شراء — محل النور',
+          formHint: fr ? 'Vos coordonnées restent chez le magasin. Documents via WhatsApp/e-mail.' : 'بياناتك تصل للمحل مباشرة. الوثائق عبر واتساب أو الإيميل.',
+          docsChannel: 'whatsapp'
+        },
+        paymentMethods: [
+          { type: 'bankily', bank: 'Bankily', code: '44556677', note: fr ? 'Indiquez votre nom' : 'اذكر اسمك بعد التحويل' },
+          { type: 'cash', bank: fr ? 'Paiement à la livraison' : 'الدفع عند التسليم', code: '', note: '' }
+        ]
+      };
+      var products = [
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: 'بيانات عرض' },
+        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, desc: 'بيانات عرض' },
+        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, desc: 'بيانات عرض' },
+        { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: 'بيانات عرض' }
+      ];
+      try{
+        localStorage.setItem('store_products_' + id, JSON.stringify(products));
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        accs = accs.filter(function(a){ return a && a.id !== id; });
+        accs.push(acc);
+        localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+      }catch(e){}
+      window._rizqStoreAccountId = id;
+      window._rizqStoreServiceDesk = acc.serviceDesk;
+      window._rizqStorePaymentMethods = acc.paymentMethods;
+      window._rizqStoreIsDemo = true;
+      window.STORE_FEATURED_PRODUCTS = {};
+      products.forEach(function(p, i){ window.STORE_FEATURED_PRODUCTS[String(i+1)] = p; window.STORE_FEATURED_PRODUCTS[p.id] = p; });
+      if(!document.getElementById('rizq-demo-ribbon')){
+        var rib = document.createElement('div');
+        rib.id = 'rizq-demo-ribbon';
+        rib.style.cssText = 'position:sticky;top:0;z-index:90;background:linear-gradient(90deg,#0F2347,#1B3A6B);color:#E8C96A;text-align:center;padding:8px 14px;font-size:12.5px;font-weight:800';
+        rib.textContent = fr
+          ? '🎓 Démonstration projet — Boutique fictive (données de présentation)'
+          : '🎓 معاينة مشروع تخرج — محل وهمي (بيانات عرض فقط، ليست حقيقية)';
+        document.body.insertBefore(rib, document.body.firstChild);
+      }
+      try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=' + id); }catch(e2){}
+      return acc;
+    }
+
     function apply(){
       try{
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('store') || '';
         var emptyBanner = document.getElementById('store-empty-banner');
-        if(!id){
-          if(emptyBanner) emptyBanner.style.display = 'block';
-          var nameEl = document.getElementById('store-name-el');
-          if(nameEl && (!nameEl.textContent || nameEl.textContent === '—')){
-            nameEl.textContent = isFr() ? 'Boutique Rizq' : 'محل رزق';
-          }
-          return;
+        if(!id || params.get('demo') === '1' || id === 'demo_store'){
+          var demoAcc = applyDemoStore();
+          id = demoAcc.id;
         }
         if(emptyBanner) emptyBanner.style.display = 'none';
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'store'; });
+        if(!acc && (id === 'demo_store' || window._rizqStoreIsDemo)) acc = applyDemoStore();
         if(!acc){
           if(emptyBanner){
             emptyBanner.style.display = 'block';
             var desc = emptyBanner.querySelector('[data-t="store-empty-desc"]');
             if(desc) desc.textContent = isFr()
-              ? 'Cette boutique n’est pas encore disponible ou n’est pas approuvée.'
-              : 'هذا المحل غير متاح حالياً أو لم يُعتمد بعد.';
+              ? 'Boutique introuvable — ouvrez rizq_store.html?demo=1 pour la démo.'
+              : 'المحل غير موجود — للمعاينة افتح rizq_store.html?demo=1';
           }
-          return; // لا حساب حقيقي مطابق — تبقى الحالة الفارغة
+          return;
         }
 
         // ── الهوية الأساسية ──

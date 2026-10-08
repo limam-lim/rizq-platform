@@ -310,23 +310,35 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .svc-price{font-size:13px;font-weight:800;color:var(--teal);background:rgba(14,116,144,.08);border:1px solid rgba(14,116,144,.18);border-radius:10px;padding:4px 13px}
 .svc-tag{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
 
-/* Request form */
+/* Request form — الحقول ظاهرة دائماً (لا طيّ) */
 .req-box{margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(14,116,144,.04),rgba(201,168,76,.04));border-radius:14px;border:1px solid rgba(14,116,144,.18)}
-.req-form{display:block;margin-top:14px}
-.req-form.collapsed{display:none}
-/* غرفة الطلبات — هوية المشترك ظاهرة دائماً */
+.req-form{display:none;margin-top:14px}
+.req-form.open{display:block!important;visibility:visible!important}
 #office-service-desk{
   margin-top:18px;padding:22px 20px;
   background:linear-gradient(145deg,rgba(15,35,71,.04),rgba(201,168,76,.1));
   border:1.5px solid rgba(201,168,76,.35);
   border-radius:16px;
   box-shadow:0 10px 28px rgba(15,35,71,.06);
+  transition:box-shadow .35s,border-color .35s;
+}
+#office-service-desk.is-active{
+  border-color:rgba(14,116,144,.55);
+  box-shadow:0 0 0 3px rgba(14,116,144,.12),0 12px 32px rgba(15,35,71,.1);
 }
 #office-service-desk #req-title{font-size:16px;font-weight:900;color:#0F2347;margin-bottom:6px}
 #office-service-desk #req-sub{font-size:13px;color:#4a5568;line-height:1.55;margin-bottom:14px}
-.req-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;margin-bottom:10px;transition:border .2s}
-.req-input:focus{outline:none;border-color:var(--teal)}
-.req-btn{padding:11px 24px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s}
+.desk-step{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:900;letter-spacing:.4px;
+  color:#0F2347;background:rgba(201,168,76,.15);
+  border:1px solid rgba(201,168,76,.35);border-radius:999px;
+  padding:4px 10px;margin-bottom:10px;
+}
+.req-field-lbl{display:block;font-size:12px;font-weight:800;color:#0F2347;margin:0 0 5px}
+.req-input{display:block!important;width:100%;padding:11px 14px;border:1.5px solid #c5d0e0;border-radius:10px;font-size:13.5px;font-family:inherit;color:#0D1B2A;background:#fff;margin-bottom:12px;transition:border .2s;box-sizing:border-box;min-height:44px}
+.req-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,116,144,.12)}
+.req-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;width:100%}
 .req-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(14,116,144,.35)}
 .req-btn.ghost{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
 .req-btn.ghost:hover{background:rgba(14,116,144,.06)}
@@ -891,9 +903,11 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
            بالذات (svc1..svc6)، وليس نصاً ثابتاً خاصاً بالتأمين. إن كانت
            الخدمة المختارة بلا سعر رقمي (مثل "استشارة مجانية") يُعرض ذلك
            بصدق بدل اختلاق رقم. -->
-      <div class="req-box" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(14,116,144,.06));border-color:rgba(201,168,76,.25)">
+      <!-- الخطوة 1: اختيار الخدمة -->
+      <div class="req-box" id="office-calc-box" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(14,116,144,.06));border-color:rgba(201,168,76,.25)">
+        <div class="desk-step" id="calc-step-lbl">① الخطوة 1 — اختر الخدمة</div>
         <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:5px" id="calc-title" data-t="calc-title">🧮 احسب تكلفة خدمتك تقريبياً</div>
-        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="calc-sub" data-t="calc-sub">اختر الخدمة والمستوى المطلوب لمعرفة نطاق السعر التقريبي فوراً</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="calc-sub" data-t="calc-sub">اختر الخدمة والخيار (أساسي / موسّع) — ثم يفتح نموذج بياناتك تلقائياً</div>
         <select class="req-input" id="calc-type" onchange="calcEstimate()">
           <option value="" data-t="calc-opt0">اختر الخدمة...</option>
         </select>
@@ -905,28 +919,37 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px" id="calc-result-lbl" data-t="calc-result-lbl">💰 النطاق التقريبي</div>
           <div id="calc-price" style="font-size:22px;font-weight:900;color:var(--teal)"></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px" id="calc-note" data-t="calc-note">تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة</div>
-          <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">📤 اطلب عرض سعر دقيق لهذا الاختيار</button>
+          <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">② التالي — أدخل اسمك ورقم هاتفك</button>
           <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
 
-      <!-- Request Box — غرفة الطلبات الموحّدة (هوية المشترك) -->
+      <!-- الخطوة 2: بيانات الزبون (تُفتح بعد اختيار الخدمة) -->
       <div class="req-box" id="office-service-desk">
+        <div class="desk-step" id="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
         <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
-        <div id="req-sub" data-desk="hint" data-t="req-sub">أدخل بياناتك وسنتواصل معك — الوثائق عبر واتساب أو إيميل المكتب</div>
-        <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn" style="display:none">إخفاء النموذج ↑</button>
-        <div class="req-form open" id="req-form">
-          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="margin-top:4px" data-ph="rf-name"/>
-          <input dir="ltr" class="req-input" id="rf-phone" placeholder="الهاتف *" data-ph="rf-phone-ph"/>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" placeholder="واتساب (إن اختلف عن الهاتف)" data-ph="rf-whatsapp"/>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" placeholder="البريد الإلكتروني (اختياري)" data-ph="rf-email"/>
-          <select class="req-input" id="rf-service">
+        <div id="req-sub" data-desk="hint" data-t="req-sub">بعد اختيار الخدمة أعلاه: أدخل اسمك ورقم هاتفك وسنتواصل معك</div>
+        <div id="desk-wait-hint" style="padding:14px 12px;border-radius:12px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.2);font-size:13px;color:#4a5568;line-height:1.55;margin-top:10px">
+          ⬆️ اختر أولاً <strong>الخدمة</strong> و<strong>الخيار الأساسي/الموسّع</strong> في المقدّر أعلاه — ثم يفتح هنا حقول الاسم والهاتف والإيميل تلقائياً.
+        </div>
+        <div class="req-form" id="req-form" style="margin-top:16px">
+          <label class="req-field-lbl" for="rf-name">الاسم الكامل *</label>
+          <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name"/>
+          <label class="req-field-lbl" for="rf-phone">رقم الهاتف *</label>
+          <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
+          <label class="req-field-lbl" for="rf-whatsapp">واتساب (إن اختلف عن الهاتف)</label>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp"/>
+          <label class="req-field-lbl" for="rf-email">البريد الإلكتروني (اختياري)</label>
+          <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
+          <label class="req-field-lbl" for="rf-service">الخدمة المطلوبة</label>
+          <select class="req-input" id="rf-service" name="service">
             <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
           </select>
-          <textarea class="req-input" id="rf-msg" placeholder="تفاصيل الطلب..." style="min-height:70px;resize:none" data-ph="rf-msg"></textarea>
-          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 الوثائق تُرسل عبر واتساب أو إيميل المكتب بعد الإرسال — لا تُرفع على سيرفر رزق.</div>
-          <button class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب</button>
+          <label class="req-field-lbl" for="rf-msg">تفاصيل الطلب</label>
+          <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." style="min-height:80px;resize:vertical" data-ph="rf-msg"></textarea>
+          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 بعد الإرسال يمكنك إرفاق الوثائق عبر واتساب أو إيميل المكتب — لا تُرفع الملفات على سيرفر رزق.</div>
+          <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
           <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
         </div>
       </div>
@@ -1091,6 +1114,44 @@ function initCalcServices(){
 document.addEventListener('DOMContentLoaded', initCalcServices);
 document.addEventListener('rizq:langchange', initCalcServices); // إعادة بناء القائمة بأسماء الخدمات المترجمة عند تبديل اللغة
 
+function openBuyerFieldsStep(opts){
+  opts = opts || {};
+  var desk = document.getElementById('office-service-desk');
+  var form = document.getElementById('req-form');
+  var wait = document.getElementById('desk-wait-hint');
+  if(wait) wait.style.display = 'none';
+  if(form){
+    form.classList.add('open');
+    form.style.display = 'block';
+  }
+  if(desk){
+    desk.classList.add('is-active');
+    if(opts.scroll !== false){
+      setTimeout(function(){
+        desk.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 80);
+    }
+  }
+  var typeIdx = opts.typeIdx || ((document.getElementById('calc-type')||{}).value || '');
+  var svcSel = document.getElementById('rf-service');
+  if(svcSel && typeIdx !== ''){
+    var idx = parseInt(typeIdx, 10);
+    if(!isNaN(idx) && svcSel.options[idx]) svcSel.selectedIndex = idx;
+  }
+  var msgEl = document.getElementById('rf-msg');
+  var priceEl = document.getElementById('calc-price');
+  if(msgEl && !msgEl.value.trim() && priceEl && priceEl.textContent){
+    msgEl.value = _t2(
+      'مهتم بعد استخدام مقدّر التكلفة (' + priceEl.textContent + ') — أرجو تأكيد السعر النهائي.',
+      'Intéressé après l\'estimateur (' + priceEl.textContent + ') — merci de confirmer le tarif final.'
+    );
+  }
+  if(opts.focus !== false){
+    var nameEl = document.getElementById('rf-name');
+    if(nameEl) setTimeout(function(){ nameEl.focus(); }, 200);
+  }
+}
+
 function calcEstimate(){
   var typeIdx = (document.getElementById('calc-type')||{}).value || '';
   var cov  = (document.getElementById('calc-cov')||{}).value || 'basic';
@@ -1111,23 +1172,18 @@ function calcEstimate(){
     if(priceEl) priceEl.textContent = lo.toLocaleString('en-US') + ' — ' + hi.toLocaleString('en-US') + ' MRU';
   }
   resultBox.style.display = 'block';
+  // بعد اختيار الخدمة + الخيار: افتح خطوة بيانات الزبون تلقائياً
+  openBuyerFieldsStep({ typeIdx: typeIdx, focus: false, scroll: true });
 }
 function calcToRequest(){
   var typeIdx = (document.getElementById('calc-type')||{}).value || '';
-  var form = document.getElementById('req-form');
-  if(form && !form.classList.contains('open')) toggleReqForm();
-  var svcSel = document.getElementById('rf-service');
-  if(svcSel && typeIdx) svcSel.selectedIndex = parseInt(typeIdx, 10);
-  var msgEl = document.getElementById('rf-msg');
-  var priceEl = document.getElementById('calc-price');
-  if(msgEl && !msgEl.value.trim() && priceEl){
-    msgEl.value = _t2(
-      'مهتم بعد استخدام مقدّر التكلفة (' + priceEl.textContent + ') — أرجو تأكيد السعر النهائي.',
-      'Intéressé après l\'estimateur (' + priceEl.textContent + ') — merci de confirmer le tarif final.'
-    );
+  if(!typeIdx){
+    showToast(_t2('اختر الخدمة أولاً من القائمة','Choisissez d’abord un service'), 'error');
+    var calc = document.getElementById('calc-type');
+    if(calc) calc.focus();
+    return;
   }
-  var nameEl = document.getElementById('rf-name');
-  if(nameEl) nameEl.focus();
+  openBuyerFieldsStep({ typeIdx: typeIdx, focus: true, scroll: true });
 }
 
 function _officePrefactureSeller(){
@@ -1225,20 +1281,7 @@ function issueOfficePrefactureFromRequest(){
 
 // ── toggleReqForm ──────────────────────────
 function toggleReqForm(){
-  var form = document.getElementById('req-form');
-  var btn = document.getElementById('req-toggle-btn');
-  if(!form) return;
-  var open = form.classList.contains('open') || !form.classList.contains('collapsed');
-  if(open && form.classList.contains('open')){
-    form.classList.remove('open');
-    form.classList.add('collapsed');
-    if(btn){ btn.style.display=''; btn.textContent = _t2('إرسال طلب ←','Envoyer une demande ←'); }
-  } else {
-    form.classList.add('open');
-    form.classList.remove('collapsed');
-    if(btn){ btn.style.display=''; btn.textContent = _t2('إخفاء النموذج ↑','Masquer ↑'); }
-    form.scrollIntoView({ behavior:'smooth', block:'nearest' });
-  }
+  openBuyerFieldsStep({ focus: true, scroll: true });
 }
 
 // ── submitReq — غرفة الطلبات الموحّدة (خادم + قناة وثائق خارجية) ──
@@ -1268,8 +1311,7 @@ function submitReq(){
     });
     var sel = document.getElementById('rf-service');
     if(sel) sel.selectedIndex = 0;
-    var form = document.getElementById('req-form');
-    if(form) setTimeout(function(){ form.classList.remove('open'); }, 1600);
+    // أبقِ النموذج ظاهراً بعد الإرسال حتى يرى الزائر الحقول دائماً
   }).catch(function(err){
     showToast((err && err.message) || _t2('تعذّر إرسال الطلب','Échec de l\'envoi'), 'error');
   }).finally(function(){
@@ -1748,9 +1790,7 @@ function openMaps(){
               ? 'Cette page est vide sans ?id=. Ouvrez votre bureau depuis le tableau de bord (Partager / Voir la page) pour voir votre formulaire personnalisé.'
               : 'هذه الصفحة فارغة بدون رابط مكتبك (?id=). افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
             var form = document.getElementById('req-form');
-            if(form){ form.classList.add('collapsed'); form.classList.remove('open'); }
-            var toggle = document.getElementById('req-toggle-btn');
-            if(toggle) toggle.style.display = 'none';
+            if(form){ form.style.display = 'block'; form.classList.add('open'); form.classList.remove('collapsed'); }
           }
           var svcs = document.getElementById('svc-list');
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
@@ -1836,6 +1876,16 @@ function openMaps(){
             var formOpen = document.getElementById('req-form');
             if(formOpen){ formOpen.classList.add('open'); formOpen.classList.remove('collapsed'); }
           }
+          // أرقام عرض واقعية للأساتذة (وهمية ومُعلَّمة في الشريط العلوي)
+          setText('stat-clients', '240+');
+          setText('ab-clients', '240+');
+          setText('stat-exp', '12');
+          setText('ab-years', '2014');
+          setText('hero-tag2', isFr() ? '⚖️ Cabinet d’avocats' : '⚖️ مكتب محاماة');
+          setText('hero-tag3', isFr() ? '🔒 Confidentialité' : '🔒 سرية المهنة');
+          setText('hero-tag4', isFr() ? '📍 Nouakchott' : '📍 نواكشوط');
+          var respEl = document.getElementById('stat-resp');
+          if(respEl) respEl.textContent = isFr() ? '< 2h' : '< ساعتان';
         }
 
         // ── الخدمات — إعادة بناء القائمة من بيانات حقيقية إن وُجدت ──
