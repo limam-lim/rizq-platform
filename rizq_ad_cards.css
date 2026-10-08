@@ -140,9 +140,9 @@
 .rzq-adx-next{inset-inline-end:8px}
 .rzq-adx-media:not(.has-multi) .rzq-adx-nav{display:none!important}
 
-/* مفضلة ذهبية أعلى اليسار — فقط */
+/* مفضلة ذهبية أعلى اليسار البصري (مثل النموذج) */
 .rzq-adx-fav{
-  position:absolute;z-index:6;top:10px;inset-inline-start:10px;
+  position:absolute;z-index:6;top:10px;left:10px;right:auto;
   width:32px;height:32px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   border:1px solid rgba(201,168,76,.55);
@@ -195,7 +195,7 @@
   text-align:center;
 }
 .rzq-adx-badge{
-  position:absolute;z-index:5;top:10px;inset-inline-end:10px;
+  position:absolute;z-index:5;top:10px;right:10px;left:auto;
   padding:3px 8px;border-radius:8px;font-size:9px;font-weight:900;
   color:#0f2347;background:linear-gradient(135deg,#F0D78A,#C9A84C);
   box-shadow:0 3px 10px rgba(201,168,76,.32);
@@ -406,7 +406,12 @@
   }
 }
 
-@media (hover:none),(max-width:768px){
+@media (hover:none){
+  .rzq-adx-media.has-multi .rzq-adx-nav{
+    opacity:.8;pointer-events:auto;
+  }
+}
+@media (max-width:768px){
   .rzq-adx-media.has-multi .rzq-adx-nav{
     opacity:.8;pointer-events:auto;
   }
