@@ -948,7 +948,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           </select>
           <label class="req-field-lbl" for="rf-msg">تفاصيل الطلب</label>
           <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." style="min-height:80px;resize:vertical" data-ph="rf-msg"></textarea>
-          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 بعد الإرسال يمكنك إرفاق الوثائق عبر واتساب أو إيميل المكتب — لا تُرفع الملفات على سيرفر رزق.</div>
+          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
           <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
           <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
         </div>
@@ -1676,8 +1676,8 @@ function openMaps(){
           enabled: true,
           formTitle: isFr() ? 'Demande — Cabinet Al-Adala' : 'طلب استشارة — مكتب العدالة للمحاماة',
           formHint: isFr()
-            ? 'Vos données restent confidentielles. Les pièces jointes partent via WhatsApp ou e-mail du cabinet — jamais stockées sur Rizq.'
-            : 'بياناتك سرية. الوثائق تُرسل عبر واتساب أو إيميل المكتب فقط — لا تُحفظ على سيرفر رزق.',
+            ? 'Vos données restent confidentielles. Vous pouvez envoyer les documents via WhatsApp ou e-mail après l\'envoi.'
+            : 'بياناتك سرية. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
           docsChannel: 'whatsapp'
         },
         paymentMethods: [

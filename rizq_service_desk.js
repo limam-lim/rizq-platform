@@ -2,7 +2,7 @@
  * rizq_service_desk.js — غرفة الطلبات الموحّدة (مكتب / محل / معرض)
  * - نموذج موحّد: اسم كامل، هاتف، واتساب، إيميل، خدمة، رسالة
  * - القالب/العنوان اختياري يسمّيه المشترك
- * - الوثائق خارج السيرفر: واتساب / إيميل واجهة المشترك
+ * - الوثائق عبر واتساب / إيميل واجهة المشترك (بدون رفع ملفات في النموذج)
  */
 (function (global) {
   'use strict';
@@ -95,8 +95,8 @@
       note.setAttribute('data-desk', 'docs-hint');
       note.style.cssText = 'font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)';
       note.textContent = t(
-        '📎 لإرسال وثائق: استخدم زر واتساب أو الإيميل في صفحة المكتب بعد إرسال الطلب — لا تُرفع الملفات على سيرفر رزق.',
-        '📎 Pour les documents: utilisez WhatsApp ou l’e-mail de la page après l’envoi — aucun fichier n’est stocké sur Rizq.'
+        '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
+        '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l\'envoi.'
       );
       var btn = form.querySelector('#req-submit-btn');
       if (btn) form.insertBefore(note, btn);
