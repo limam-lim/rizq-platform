@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.4"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.5"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=3.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -1742,6 +1742,8 @@ html[dir="ltr"] #all-ads-title{
 .hero-listings-section{
   position:relative;z-index:2;width:100%;overflow:hidden;
   padding:8px 0 52px;
+  /* ابعد عنوان «مباشر» عن قرص البحث الثابت عند التمرير */
+  scroll-margin-top:calc(var(--rizq-search-top, 110px) + 56px);
 }
 .hero-listings-section::before{display:none;content:none}
 .listings-label{position:relative;z-index:2;text-align:center;margin-bottom:18px;animation:fadeUp .8s .5s ease both}
@@ -5979,10 +5981,13 @@ function trAd(a){
   };
 }
 
-/** محرّك شريط متحرك — حلقة rAF واحدة + قياس نصف الدورة من منتصف الأبناء (بلا قفزة) */
+/** محرّك شريط متحرك — rAF + اتجاه حسب اللغة (عربي RTL / فرنسي LTR) كما كان سابقاً */
 var _rzqMarquees = [];
 var _rzqMarqueeRaf = 0;
 var _rzqMarqueeLast = 0;
+function _rzqIsRtl(){
+  return (document.documentElement.getAttribute('dir') || 'rtl') !== 'ltr';
+}
 function _rzqMarqueeMeasureHalf(el){
   if(!el) return 0;
   var kids = el.children;
@@ -6031,12 +6036,18 @@ function bindRafMarquee(el, opts){
     half: 0,
     paused: false,
     pxPerSec: opts.pxPerSec || 42,
-    raf: 1, /* علامة تشخيص: المحرّك مربوط بالحلقة المشتركة */
+    raf: 1,
+    rtl: _rzqIsRtl(),
     remeasure: function(){
       try{
         el.style.setProperty('animation', 'none', 'important');
         el.style.setProperty('animation-name', 'none', 'important');
       }catch(eAnim){ el.style.animation = 'none'; }
+      var nextRtl = _rzqIsRtl();
+      if(state.rtl !== nextRtl){
+        state.rtl = nextRtl;
+        state.pos = 0; /* عند تبديل العربية/الفرنسية أعد الموضع لاتجاه الحركة الصحيح */
+      }
       state.half = _rzqMarqueeMeasureHalf(el);
       if(state.half > 1 && state.pos >= state.half) state.pos = state.pos % state.half;
       state.apply();
@@ -6046,8 +6057,9 @@ function bindRafMarquee(el, opts){
         el.style.transform = 'translate3d(0px,0,0)';
         return;
       }
-      /* المسارات LTR دائماً — حركة يساراً مستمرة بلا فرع RTL يسبب قفزاً */
-      el.style.transform = 'translate3d(' + (-state.pos) + 'px,0,0)';
+      /* عربي (RTL): من -half نحو 0 (يمين) · فرنسي (LTR): من 0 نحو -half (يسار) — كما keyframes السابقة */
+      var x = state.rtl ? (-state.half + state.pos) : (-state.pos);
+      el.style.transform = 'translate3d(' + x + 'px,0,0)';
     },
     setPaused: function(on){ state.paused = !!on; },
     destroy: function(){
@@ -6057,7 +6069,6 @@ function bindRafMarquee(el, opts){
       state.raf = 0;
     }
   };
-  /* لا إيقاف عند الهوفر — كان يسبب توقفاً لحظياً/رعدة عند مرور المؤشر */
   el._rzqMarquee = state;
   _rzqMarquees.push(state);
   state.remeasure();
@@ -9261,6 +9272,8 @@ function applyLandingLang(toAr) {
     const liveLabel = document.querySelector('.listings-label > span');
     if(liveLabel) liveLabel.innerHTML = liveListingsLabelHtml(!isAr);
   }
+  /* أعد قياس الشرائط بعد تبديل dir — اتجاه عربي ≠ فرنسي */
+  if(typeof syncAllMarquees === 'function') setTimeout(syncAllMarquees, 40);
 
   // Stats bar "مجاني"
   const freeStat = document.querySelector('#platform-stats [data-stat="free"] .h-stat-num');
@@ -10058,6 +10071,7 @@ function applyFullTranslation(lang) {
     const tickerSpan = document.querySelector('.listings-label > span');
     if(tickerSpan) tickerSpan.innerHTML = liveListingsLabelHtml(fr);
   }
+  if(typeof syncAllMarquees === 'function') setTimeout(syncAllMarquees, 40);
 
   // ── Modal direction ──
   const modalBox2 = document.querySelector('.modal-box');
@@ -13453,7 +13467,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo7"></script>
 <script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=24.0"></script>
+<script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
 
 
