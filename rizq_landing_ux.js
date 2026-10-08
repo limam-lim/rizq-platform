@@ -569,7 +569,7 @@
       var liveLabel = document.querySelector('#hero-listings .listings-label');
       if (past && liveLabel) {
         var lr = liveLabel.getBoundingClientRect();
-        if (lr.top < hb + 72 && lr.bottom > hb - 4) past = false;
+        if (lr.top < hb + 100 && lr.bottom > hb - 8) past = false;
       }
       pill.classList.toggle('is-visible', past);
     }
