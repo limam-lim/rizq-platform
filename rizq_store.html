@@ -1799,6 +1799,15 @@ function rizqShare(title, url) {
           return;
         }
 
+        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي — الباقات في الداشبورد فقط
+        (function hidePlatformUpsellOnBoundStore(){
+          var pkg = document.getElementById('store-packages');
+          if(pkg) pkg.style.display = 'none';
+          document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
+            el.style.display = 'none';
+          });
+        })();
+
         // ── الهوية الأساسية ──
         setText('store-name-el', acc.name);
         if(acc.desc) setText('store-tagline-el', acc.desc);

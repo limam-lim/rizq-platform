@@ -1829,6 +1829,18 @@ function openMaps(){
 
         document.body.classList.remove('rizq-empty-office');
 
+        // باقات اشتراك المنصة (رزق) للمشترك فقط — تختفي من صفحة المكتب الحقيقي/المعاينة
+        // حتى يشعر الزائر أنه داخل منصة المكتب الخاصة، لا سوق باقات رزق.
+        (function hidePlatformUpsellOnBoundOffice(){
+          ['office-packages','sec-packages-btn'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(el) el.style.display = 'none';
+          });
+          document.querySelectorAll('.promo-card').forEach(function(el){ el.style.display = 'none'; });
+          var promoOv = document.getElementById('promo-overlay');
+          if(promoOv) promoOv.style.display = 'none';
+        })();
+
         // ── الهوية الأساسية ──
         clearMock(['hero-office-name','hero-office-spec','hero-desc','hc-name','hc-type']);
         setText('hero-office-name', acc.name);
@@ -2037,6 +2049,11 @@ function openMaps(){
                 });
                 var ratingStrip = document.querySelector('.rating-strip');
                 if(ratingStrip && ratingStrip.style.display === 'none') ratingStrip.style.display = '';
+                // إخفاء باقات المنصة أيضاً عند التحميل من الخادم
+                ['office-packages','sec-packages-btn'].forEach(function(hid){
+                  var hEl = document.getElementById(hid); if(hEl) hEl.style.display = 'none';
+                });
+                document.querySelectorAll('.promo-card').forEach(function(el){ el.style.display = 'none'; });
                 window._rizqOfficeAccountId = id;
                 if(acc.serviceDesk) window._rizqOfficeServiceDesk = acc.serviceDesk;
                 if(Array.isArray(acc.paymentMethods)) window._rizqOfficePaymentMethods = acc.paymentMethods;

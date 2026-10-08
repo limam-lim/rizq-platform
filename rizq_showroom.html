@@ -808,6 +808,12 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
   }
   try{ history.replaceState(null, '', 'rizq_showroom.html'); }catch(e2){}
   document.body.classList.remove('rizq-empty-showroom');
+  // باقات اشتراك المنصة تختفي من صفحة المعرض الحقيقي/المعاينة
+  (function hidePlatformUpsellOnBoundShowroom(){
+    var pkg = document.getElementById('pkg-section');
+    if(pkg) pkg.style.display = 'none';
+    document.querySelectorAll('.promo-card, .rizq-promo-card').forEach(function(el){ el.style.display = 'none'; });
+  })();
 })();
 
 (function showShowroomEmptyBrowse(){
