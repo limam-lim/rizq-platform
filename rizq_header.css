@@ -952,7 +952,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     display:inline-flex !important;
     flex-direction:row !important;
     align-items:center;
-    gap:0.2em;
+    gap:0.15em;
     visibility:visible !important;
     pointer-events:auto !important;
     position:static !important;
@@ -962,12 +962,14 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     background:transparent !important;
     border:1px solid transparent !important;
     color:#F0D78A !important;
-    font-weight:800 !important;
-    font-size:12px !important;
-    padding:7px 12px !important;
-    border-radius:10px !important;
+    font-weight:700 !important;
+    font-size:10.5px !important;
+    padding:3px 6px !important;
+    border-radius:8px !important;
     box-shadow:none !important;
     cursor:pointer;
+    min-height:26px !important;
+    letter-spacing:0 !important;
   }
   html.rizq-app-nav #nav-lang-btn .lang-fr,
   html.rizq-app-nav #rizq-desk-lang-btn .lang-fr,
@@ -983,14 +985,23 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #rizq-desk-nav .btn-lang-primary .lang-ar{order:3}
   html.rizq-app-nav .nav-account-btn{
     display:inline-flex !important;
-    align-items:center;gap:6px;
-    background:
-      linear-gradient(145deg,rgba(232,201,106,.14),transparent 55%),
-      rgba(255,255,255,.05) !important;
-    border:1px solid rgba(201,168,76,.48) !important;
-    color:#E8C96A;padding:8px 14px;border-radius:10px;font-weight:800;font-size:13px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.18) !important;
+    align-items:center;gap:4px;
+    background:transparent !important;
+    border:1px solid transparent !important;
+    color:#E8C96A;padding:4px 7px;border-radius:8px;font-weight:700;font-size:11px;
+    box-shadow:none !important;
     cursor:pointer;font-family:'Cairo',system-ui,sans-serif;white-space:nowrap;
+    min-height:28px;
+  }
+  html.rizq-app-nav .nav-account-ico{font-size:12px !important;line-height:1}
+  html.rizq-app-nav #nav .nav-search-launch-lbl,
+  html.rizq-app-nav #rizq-desk-nav .nav-search-launch-lbl{
+    font-size:11px !important;
+    font-weight:700 !important;
+  }
+  html.rizq-app-nav #nav .nav-search-launch-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-search-launch-ico{
+    font-size:12px !important;
   }
   html.rizq-app-nav #rizq-desk-nav .nav-fav-btn,
   html.rizq-app-nav #nav .nav-fav-btn{
@@ -2698,12 +2709,13 @@ html.rizq-app-nav body.landing-ux-mobile #nav-more-mobile-btn{
   opacity:1 !important;
 }
 
-/* أدوات الصف الأول — صينية زجاجية مستطيلة مثل رصيف التنقّل */
+/* أدوات الصف الأول — صينية زجاجية مضغوطة (لا تتضخم فوق كبسولة التنقّل) */
 html.rizq-app-nav #nav > .nav-start,
 html.rizq-app-nav #rizq-desk-nav > .nav-start{
-  gap:6px !important;
-  padding:6px 8px !important;
-  border-radius:12px !important;
+  gap:3px !important;
+  padding:3px 6px !important;
+  border-radius:11px !important;
+  max-width:min(420px,34vw) !important;
   background:
     linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),
     rgba(4,10,20,.45) !important;
@@ -2726,8 +2738,12 @@ html.rizq-app-nav #rizq-app-header #rizq-lang-btn{
   background:transparent !important;
   box-shadow:none !important;
   color:#F0D78A !important;
-  padding:7px 12px !important;
-  border-radius:10px !important;
+  padding:4px 7px !important;
+  border-radius:8px !important;
+  min-height:28px !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  gap:4px !important;
 }
 html.rizq-app-nav #nav .nav-start .nav-account-btn:hover,
 html.rizq-app-nav #nav .nav-start .nav-fav-btn:hover,
@@ -3895,18 +3911,93 @@ html[dir="ltr"] .rizq-help-dd-menu{direction:ltr}
 .rizq-help-dd-item:hover .rizq-help-dd-item-ico{color:#C9A84C}
 .rizq-help-dd-item-lbl{line-height:1.2}
 
-/* على الشريط الداكن: الزر الأبيض يبقى واضحاً */
+/* داخل كبسولة الأدوات: زر المساعدة مضغوط ومتناسق (ذهبي شفاف لا أبيض ضخم) */
+html.rizq-app-nav #nav .rizq-help-dd,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd,
+html.rizq-app-nav #rizq-app-header .rizq-help-dd{
+  order:4 !important;
+}
 html.rizq-app-nav #nav .rizq-help-dd-btn,
 html.rizq-app-nav #rizq-desk-nav .rizq-help-dd-btn,
 html.rizq-app-nav #rizq-app-header .rizq-help-dd-btn{
-  background:#fff !important;
-  border-color:rgba(226,232,240,.9) !important;
+  min-height:26px !important;
+  height:26px !important;
+  padding:0 7px !important;
+  gap:4px !important;
+  border-radius:8px !important;
+  background:rgba(255,255,255,.08) !important;
+  border:1px solid rgba(201,168,76,.35) !important;
+  color:#E8C96A !important;
+  box-shadow:none !important;
+}
+html.rizq-app-nav #nav .rizq-help-dd-chev,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd-chev,
+html.rizq-app-nav #rizq-app-header .rizq-help-dd-chev{
+  color:#93c5fd !important;
+  font-size:9px !important;
+}
+html.rizq-app-nav #nav .rizq-help-dd-ico,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd-ico,
+html.rizq-app-nav #rizq-app-header .rizq-help-dd-ico{
+  color:#E8C96A !important;
+}
+html.rizq-app-nav #nav .rizq-help-dd-ico .rizq-help-svg,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd-ico .rizq-help-svg,
+html.rizq-app-nav #rizq-app-header .rizq-help-dd-ico .rizq-help-svg{
+  width:14px !important;
+  height:14px !important;
+}
+html.rizq-app-nav #nav .rizq-help-dd-btn:hover,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd-btn:hover,
+html.rizq-app-nav #rizq-app-header .rizq-help-dd-btn:hover,
+html.rizq-app-nav #nav .rizq-help-dd.open .rizq-help-dd-btn,
+html.rizq-app-nav #rizq-desk-nav .rizq-help-dd.open .rizq-help-dd-btn{
+  background:rgba(201,168,76,.16) !important;
+  border-color:rgba(201,168,76,.55) !important;
+  color:#fff !important;
+}
+
+/* سطح المكتب: كبسولة أدوات أصغر ومنفصلة عن كبسولة الروابط الرئيسية */
+@media (min-width:769px) and (min-height:501px){
+  html.rizq-app-nav #nav > .nav-start,
+  html.rizq-app-nav #rizq-desk-nav > .nav-start{
+    gap:2px !important;
+    padding:2px 5px !important;
+    border-radius:10px !important;
+    max-width:min(380px,32vw) !important;
+    margin-inline-end:8px !important;
+    z-index:8 !important;
+  }
+  html.rizq-app-nav #nav .nav-start .nav-account-btn:not(.nav-fav-btn):not(.nav-search-launch),
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-account-btn:not(.nav-fav-btn):not(.nav-search-launch){
+    padding:3px 6px !important;
+    font-size:10.5px !important;
+    font-weight:700 !important;
+    gap:3px !important;
+    min-height:26px !important;
+  }
+  html.rizq-app-nav #nav .nav-start .nav-account-ico,
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-account-ico{
+    font-size:11px !important;
+  }
+  html.rizq-app-nav #nav .nav-start .nav-search-launch,
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-search-launch,
+  html.rizq-app-nav #nav .nav-start .nav-fav-btn,
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn{
+    padding:3px 6px !important;
+    min-width:28px !important;
+    min-height:26px !important;
+  }
+  html.rizq-app-nav #nav > .nav-center,
+  html.rizq-app-nav #rizq-desk-nav > .nav-center{
+    max-width:min(920px, calc(100vw - 420px)) !important;
+  }
 }
 @media (max-width:768px){
   .rizq-help-dd-btn{
-    min-height:30px;
-    padding:4px 9px;
-    gap:5px;
+    min-height:28px;
+    padding:3px 8px;
+    gap:4px;
   }
   .rizq-help-dd-menu{min-width:156px}
   .rizq-help-dd-item{font-size:12.5px;padding:8px 10px}
