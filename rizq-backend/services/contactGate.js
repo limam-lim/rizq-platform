@@ -207,6 +207,17 @@ function toPublicAccountGated(acc, gate) {
   if (gate && gate.contactsUnlocked && Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
     out.paymentMethods = acc.paymentMethods.slice(0, 10);
   }
+  // عنوان نموذج الطلب الاختياري — عام وآمن (بلا أسرار)
+  if (acc.serviceDesk && typeof acc.serviceDesk === 'object') {
+    out.serviceDesk = {
+      enabled: acc.serviceDesk.enabled !== false,
+      formTitle: String(acc.serviceDesk.formTitle || '').slice(0, 120),
+      formHint: String(acc.serviceDesk.formHint || '').slice(0, 240),
+      docsChannel: ['whatsapp', 'email', 'both'].includes(acc.serviceDesk.docsChannel)
+        ? acc.serviceDesk.docsChannel
+        : 'whatsapp',
+    };
+  }
   return out;
 }
 

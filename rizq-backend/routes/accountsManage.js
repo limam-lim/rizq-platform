@@ -189,6 +189,17 @@ function mountAccountsManageRoutes(app, deps) {
       if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
     }
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
+    // إعدادات غرفة الطلبات (عنوان النموذج الاختياري + قناة الوثائق)
+    if (b.serviceDesk !== undefined && b.serviceDesk && typeof b.serviceDesk === 'object') {
+      const sd = b.serviceDesk;
+      const channel = String(sd.docsChannel || 'whatsapp').toLowerCase();
+      acc.serviceDesk = {
+        enabled: sd.enabled === undefined ? true : !!sd.enabled,
+        formTitle: String(sd.formTitle || '').trim().slice(0, 120),
+        formHint: String(sd.formHint || '').trim().slice(0, 240),
+        docsChannel: ['whatsapp', 'email', 'both'].includes(channel) ? channel : 'whatsapp',
+      };
+    }
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);

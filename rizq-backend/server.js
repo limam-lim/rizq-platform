@@ -3405,6 +3405,14 @@ mountMessagesRoutes(app, {
   maybeAutoReplyToInquiry,
 });
 
+const { mountServiceRequestRoutes } = require('./routes/serviceRequests');
+mountServiceRequestRoutes(app, {
+  verifyAccountOwner,
+  extractAccountToken,
+  readAccounts,
+  serviceRequests: repos.serviceRequests,
+});
+
 // ══════════════════════════════════════════════════════════════════
 // التقييمات/المراجعات (rizq_reviews_engine.js سابقاً) — بنية حقيقية
 // ══════════════════════════════════════════════════════════════════

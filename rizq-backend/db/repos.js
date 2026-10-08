@@ -191,6 +191,11 @@ const secretsVault = createCollection('secrets_vault', {
   onBackup: singletonBackup,
 });
 
+const serviceRequests = createCollection('service_requests', {
+  backupFile: 'service-requests.json',
+  onBackup: arrayBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -431,6 +436,7 @@ function migrateAllSecondaryStores() {
   marketingCampaigns.migrateFromArray(p('marketing-campaigns.json'), 'id');
   marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
   agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
+  serviceRequests.migrateFromArray(p('service-requests.json'), 'id');
   agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
   secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
 
@@ -507,6 +513,7 @@ module.exports = {
   agentMisses,
   agentOpsSettings,
   secretsVault,
+  serviceRequests,
 
   getSiteConfig,
   saveSiteConfig,
