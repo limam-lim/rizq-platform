@@ -8,7 +8,7 @@
   --rzq-adx-ink:#0a1424;
 }
 
-/* ── بطاقة عمودية (أطول من عرضها — ليست مربعة) ── */
+/* ── بطاقة شبه مربّعة (أقصر عمودياً) ── */
 .ad-card:has(.rzq-adx-media),
 .listing-card:has(.rzq-adx-media),
 .rc:has(.rzq-adx-media){
@@ -23,38 +23,38 @@
     0 10px 28px rgba(0,0,0,.32),
     inset 0 1px 0 rgba(255,255,255,.07)!important;
 }
-/* إلغاء قيود الشبكة القديمة (صور قصيرة مربّعة) */
+/* إلغاء قيود الشبكة القديمة — صورة أقرب للمربع */
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media,
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .rzq-adx-media{
   height:auto!important;
-  min-height:176px!important;
-  aspect-ratio:5 / 5.2!important;
+  min-height:140px!important;
+  aspect-ratio:1 / 1!important;
   font-size:inherit!important;
 }
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{
-  padding:22px 14px 14px!important;
+  padding:14px 10px 10px!important;
 }
 .listings-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
   height:auto!important;
-  min-height:160px!important;
+  min-height:132px!important;
 }
 .ad-card:has(.rzq-adx-media){
-  width:212px;
-  border-radius:18px!important;
+  width:200px;
+  border-radius:16px!important;
 }
 .listing-card:has(.rzq-adx-media){
-  border-radius:18px!important;
+  border-radius:16px!important;
   min-height:0;
 }
 .rc:has(.rzq-adx-media){
-  border-radius:18px!important;
+  border-radius:16px!important;
   background:
     linear-gradient(165deg,rgba(201,168,76,.08),transparent 30%),
     linear-gradient(180deg,#0e1a30,#0a1424)!important;
   color:#fff;
 }
 
-/* ── منطقة الصورة (نصف البطاقة تقريباً — نسبة عمودية) ── */
+/* ── منطقة الصورة — مربّعة تقريباً ── */
 .rzq-adx-media{
   position:relative;
   overflow:hidden;
@@ -67,24 +67,24 @@
 .ad-card .rzq-adx-media,
 .ad-card-img.rzq-adx-media{
   height:auto;
-  aspect-ratio:5 / 5.4;
-  min-height:188px;
-  border-radius:17px 17px 0 0;
+  aspect-ratio:1 / 1;
+  min-height:148px;
+  border-radius:15px 15px 0 0;
 }
 .listing-card .rzq-adx-media,
 .l-img.rzq-adx-media{
   height:auto!important;
-  aspect-ratio:5 / 5.2;
-  min-height:176px;
-  border-radius:17px 17px 0 0!important;
+  aspect-ratio:1 / 1;
+  min-height:140px;
+  border-radius:15px 15px 0 0!important;
 }
 .rc .rzq-adx-media,
 .rc-thumb.rzq-adx-media{
   width:100%!important;
   height:auto!important;
-  min-height:168px;
-  aspect-ratio:5 / 5.2!important;
-  border-radius:17px 17px 0 0!important;
+  min-height:136px;
+  aspect-ratio:1 / 1!important;
+  border-radius:15px 15px 0 0!important;
 }
 
 .rzq-adx-slides{
