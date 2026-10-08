@@ -1,0 +1,202 @@
+/* rizq_ad_cards.css — بطاقة إعلان ملكية موحّدة (مباشر / أبرز العروض / تصفّح) */
+:root{
+  --rzq-adx-gold:#C9A84C;
+  --rzq-adx-gold-soft:#F0D78A;
+  --rzq-adx-gold-light:#E8C96A;
+  --rzq-adx-navy:#0D1B2A;
+  --rzq-adx-royal:#1B3A6B;
+}
+
+/* ── Media stage ── */
+.rzq-adx-media{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 30% 20%,rgba(201,168,76,.16),transparent 45%),
+    linear-gradient(160deg,#102038,#0a1628);
+  transform:translateZ(0);
+}
+.ad-card .rzq-adx-media,
+.ad-card-img.rzq-adx-media{
+  height:148px;
+  border-radius:16px 16px 0 0;
+}
+.listing-card .rzq-adx-media,
+.l-img.rzq-adx-media{
+  height:128px;
+  border-radius:14px 14px 0 0;
+}
+.rc .rzq-adx-media,
+.rc-thumb.rzq-adx-media{
+  width:100%!important;
+  min-height:150px;
+  aspect-ratio:4/3;
+  height:auto!important;
+  border-radius:0!important;
+}
+
+.rzq-adx-slides{
+  position:absolute;inset:0;
+  display:flex;direction:ltr;
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+  will-change:transform;
+}
+.rzq-adx-slide{
+  flex:0 0 100%;
+  width:100%;height:100%;
+  background-size:cover;
+  background-position:center;
+  display:flex;align-items:center;justify-content:center;
+}
+.rzq-adx-slide img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.rzq-adx-emoji{
+  font-size:42px;line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.35));
+}
+.rzq-adx-grad{
+  position:absolute;inset:auto 0 0 0;height:70px;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,rgba(7,17,31,.88),transparent);
+}
+
+/* Arrows — delicate glass */
+.rzq-adx-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(8,15,30,.32);
+  border:1px solid rgba(255,255,255,.28);
+  color:#fff;font-size:15px;font-weight:700;line-height:1;
+  cursor:pointer;padding:0;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;
+  transition:opacity .22s,background .2s,border-color .2s,transform .2s,color .2s;
+}
+.rzq-adx-media:hover .rzq-adx-nav,
+.rzq-adx-media.is-touch .rzq-adx-nav,
+.rzq-adx-media.has-multi:focus-within .rzq-adx-nav{
+  opacity:1;pointer-events:auto;
+}
+.rzq-adx-nav:hover{
+  background:rgba(201,168,76,.88);
+  border-color:var(--rzq-adx-gold);
+  color:#0f2347;
+  transform:translateY(-50%) scale(1.06);
+}
+.rzq-adx-prev{inset-inline-start:7px}
+.rzq-adx-next{inset-inline-end:7px}
+.rzq-adx-media:not(.has-multi) .rzq-adx-nav{display:none!important}
+
+/* Micro actions */
+.rzq-adx-fav,
+.rzq-adx-wa{
+  position:absolute;z-index:6;top:8px;
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(8,15,30,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#fff;font-size:13px;line-height:1;cursor:pointer;padding:0;
+  transition:transform .2s,background .2s,border-color .2s,color .2s;
+}
+.rzq-adx-fav{inset-inline-start:8px}
+.rzq-adx-wa{inset-inline-end:8px;font-size:14px}
+.rzq-adx-fav:hover,
+.rzq-adx-fav.is-on{
+  background:linear-gradient(145deg,var(--rzq-adx-gold-soft),var(--rzq-adx-gold));
+  border-color:#fff8e0;color:#0f2347;transform:scale(1.06);
+}
+.rzq-adx-wa:hover{
+  background:#128C7E;border-color:rgba(201,168,76,.55);transform:scale(1.06);
+}
+
+/* Dots */
+.rzq-adx-dots{
+  position:absolute;z-index:4;left:0;right:0;bottom:32px;
+  display:flex;justify-content:center;gap:5px;pointer-events:none;
+}
+.rzq-adx-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.35);
+  border:1px solid rgba(255,255,255,.18);
+  transition:width .2s,background .2s,border-radius .2s;
+}
+.rzq-adx-dot.is-on{
+  width:13px;border-radius:999px;
+  background:linear-gradient(135deg,var(--rzq-adx-gold-soft),var(--rzq-adx-gold));
+  border-color:rgba(255,248,224,.45);
+}
+.rzq-adx-media:not(.has-multi) .rzq-adx-dots{display:none!important}
+
+/* Gold price pill on media */
+.rzq-adx-price{
+  position:absolute;z-index:5;bottom:8px;inset-inline-start:8px;
+  max-width:calc(100% - 70px);
+  padding:4px 10px;border-radius:999px;
+  font-size:11.5px;font-weight:900;letter-spacing:.15px;color:#0f2347;
+  background:linear-gradient(135deg,#F0D78A,#C9A84C,#b89840);
+  box-shadow:0 4px 12px rgba(201,168,76,.38),0 0 0 1px rgba(255,248,224,.22);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rzq-adx-badge{
+  position:absolute;z-index:5;bottom:8px;inset-inline-end:8px;
+  padding:3px 7px;border-radius:8px;font-size:9px;font-weight:900;
+  color:#0f2347;background:linear-gradient(135deg,#F0D78A,#C9A84C);
+  box-shadow:0 3px 10px rgba(201,168,76,.32);
+}
+
+/* Hide legacy overlays that block carousel controls */
+.ad-card:has(.rzq-adx-media) .ad-hover-detail{display:none!important}
+.listing-card:has(.rzq-adx-media) .lc-hover{display:none!important}
+.listing-card:has(.rzq-adx-media) > .lad-fav,
+.listing-card:has(.rzq-adx-media) > .l-badge{display:none!important}
+
+/* Price already on media — keep body price subtle or hide duplicate in strip/grid */
+.ad-card:has(.rzq-adx-media) .ad-price{display:none}
+.landing-ads-grid .listing-card:has(.rzq-adx-media) .l-price{
+  color:var(--rzq-adx-gold-light)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:0!important;
+  font-size:12px!important;
+}
+.rc:has(.rzq-adx-media) .rc-price{
+  color:#a07820;
+  font-weight:900;
+}
+
+/* Pause live strip while interacting with a card carousel */
+.cards-track:has(.rzq-adx-media.is-holding),
+.cards-track:has(.rzq-adx-media:hover){
+  animation-play-state:paused!important;
+}
+
+/* Compact luxury polish */
+.ad-card:has(.rzq-adx-media){
+  border-color:rgba(201,168,76,.38);
+}
+.listing-card:has(.rzq-adx-media){
+  border-color:rgba(201,168,76,.28);
+}
+.rc:has(.rzq-adx-media){
+  border-color:rgba(27,58,107,.12);
+}
+.rc:has(.rzq-adx-media):hover{
+  border-color:rgba(201,168,76,.5);
+}
+
+@media (hover:none),(max-width:768px){
+  .rzq-adx-media.has-multi .rzq-adx-nav{
+    opacity:.78;pointer-events:auto;
+  }
+  .ad-card .rzq-adx-media{height:132px}
+  .listing-card .rzq-adx-media{height:118px}
+  .rzq-adx-fav,.rzq-adx-wa{width:32px;height:32px}
+  .rzq-adx-nav{width:30px;height:30px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rzq-adx-slides{transition:none}
+}

@@ -28,6 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.1"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=1.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -3842,6 +3843,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
+<script src="rizq_ad_cards.js?v=1.0"></script>
 </head>
 <body>
 
@@ -5916,6 +5918,9 @@ function trAd(a){
 function buildCards(){
   const track=document.getElementById('cards-track');
   if(!track) return;
+  if(window.RizqAdCards && typeof RizqAdCards.seedDemoGalleries === 'function'){
+    try{ RizqAdCards.seedDemoGalleries(ADS); RizqAdCards.seedDemoGalleries(FEATURED_ADS); }catch(eSeed){}
+  }
   track.innerHTML='';
   if(!ADS.length){
     track.innerHTML='';
@@ -5932,11 +5937,11 @@ function buildCards(){
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
-    const bgSafe = _escCard(d.bg || '');
+    const media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
+      ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title })
+      : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130)+'</div>');
     c.innerHTML=`
-      <div class="ad-card-img" style="background:${bgSafe}">\n        ${d.pin?'<div class="ad-badge">⭐ '+(isAr?'مميّز':'Vedette')+'</div>':''}
-        ${_adPhotoHtml(a, d, 130)}
-      </div>
+      ${media}
       <div class="ad-card-body">
         <div class="ad-cat">${_escCard(d.cat)}</div>
         <div class="ad-title">${_escCard(d.title)}</div>
@@ -5944,16 +5949,14 @@ function buildCards(){
           <span class="ad-price">${_escCard(d.price)}</span>
           <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
-      </div>
-      <div class="ad-hover-detail">
-        <div class="ahd-cat">${_escCard(d.cat)}</div>
-        <div class="ahd-title">${_escCard(d.title)}</div>
-        <div class="ahd-desc">${_escCard(d.desc)}</div>
-        <div class="ahd-price">${_escCard(d.price)}</div>\n        <div class="ahd-meta"><span>${_escCard(d.loc)}</span><span>${_escCard(d.status||'')}</span></div>\n        <button class="ahd-btn" onclick="openCarouselAdById(${JSON.stringify(String(a.id))})">📋 ${isAr?'عرض الإعلان كاملاً':'Voir l\'annonce'}</button>
       </div>`;
-    c.addEventListener('click',()=>openCarouselAdById(a.id));
+    c.addEventListener('click',function(ev){
+      if(ev.target && ev.target.closest && ev.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa')) return;
+      openCarouselAdById(a.id);
+    });
     track.appendChild(c);
   });
+  if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(track);
 }
 buildCards();
 
@@ -6027,30 +6030,18 @@ function _landingAdCardHtml(a, fr){
   var d = typeof trAd === 'function' ? trAd(a) : a;
   var idAttr = esc(String(a.id));
   var title = esc(d.title || '');
-  var desc = esc(String(d.desc || '').slice(0, 70));
   var cat = esc(d.cat || '');
   var price = esc(d.price || '');
   var loc = esc(d.loc || '');
-  var bg = d.bg || 'linear-gradient(145deg,#111d2e,#1B3A6B)';
   var pin = _isLandingFeatured(a) || !!d.pin || !!a.boosted;
-  var badge = pin ? ('<span class="l-badge">' + (fr ? '⭐ Vedette' : '⭐ مميز') + '</span>') : '';
-  var fav = typeof isFavorited === 'function' ? isFavorited(a.id) : false;
   var idJs = String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  var favBtn = '<button type="button" class="lad-fav" onclick="event.stopPropagation();quickToggleFavorite(\'' + idJs + '\',this)" aria-label="favorite">' + (fav ? '❤️' : '🤍') + '</button>';
   var openFn = 'openAdById(\'' + idJs + '\')';
-  var photo = typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 96) : ('<span>' + esc(d.emoji || '📦') + '</span>');
+  var media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
+    ? RizqAdCards.mediaHtml(a, { fr: !!fr, price: d.price, pin: pin, emoji: d.emoji, bg: d.bg, title: d.title })
+    : ('<div class="l-img" style="background:' + esc(d.bg || 'linear-gradient(145deg,#111d2e,#1B3A6B)') + '">' + (typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 96) : ('<span>' + esc(d.emoji || '📦') + '</span>')) + '</div>');
   return ''
-    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="' + openFn + '">'
-    + badge + favBtn
-    + '<div class="lc-hover">'
-    +   '<div class="lc-hover-title">' + title + '</div>'
-    +   '<div class="lc-hover-desc">' + desc + '</div>'
-    +   '<div class="lc-hover-price">' + price + '</div>'
-    +   '<div class="lc-hover-btns">'
-    +     '<button type="button" class="lc-hover-btn-open" onclick="event.stopPropagation();' + openFn + '">' + (fr ? '📋 Voir tout' : '📋 عرض كامل') + '</button>'
-    +   '</div>'
-    + '</div>'
-    + '<div class="l-img" style="background:' + esc(bg) + '">' + photo + '</div>'
+    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa\')) return; ' + openFn + '">'
+    + media
     + '<div class="l-body">'
     +   '<p class="l-cat">' + cat + '</p>'
     +   '<h3 class="l-title">' + title + '</h3>'
@@ -6091,6 +6082,7 @@ function buildLandingAds(resetVisible){
     }
   } else {
     grid.innerHTML = items.map(function(a){ return _landingAdCardHtml(a, fr); }).join('');
+    if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(grid);
   }
 
   var more = document.getElementById('landing-ads-more');
