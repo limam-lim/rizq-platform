@@ -334,6 +334,117 @@
     return '<span class="rizq-toolbar-tools rizq-hdr-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' + inner + '</span>';
   }
 
+  /* قائمة المساعدة المنسدلة — سماعة + شارة ▼ ثم اتصل بنا / مركز المساعدة */
+  function helpIcoHeadset() {
+    return '<svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3a8 8 0 0 0-8 8v2.2a2.2 2.2 0 0 0 2.2 2.2H7.5a1.3 1.3 0 0 0 1.3-1.3V12a1.3 1.3 0 0 0-1.3-1.3H6.1A5.9 5.9 0 0 1 12 5a5.9 5.9 0 0 1 5.9 5.7h-1.4A1.3 1.3 0 0 0 15.2 12v2.1a1.3 1.3 0 0 0 1.3 1.3h1.3A2.2 2.2 0 0 0 20 13.2V11a8 8 0 0 0-8-8zm-1.2 14.6c0-.5.4-.9.9-.9h.6c2.1 0 3.4 1 3.4 2.5v.4c0 .4-.3.7-.7.7h-5c-.7 0-1.2-.5-1.2-1.2v-1.5z"/></svg>';
+  }
+  function helpIcoChat() {
+    return '<svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-.7 0-1.4-.1-2.1-.2L6 19.2c-.4.2-.8-.2-.6-.6l1.1-3.1C4.7 14.5 3.5 12.4 3.5 10c0-3.9 3.8-7 8.5-7zm-3.2 6.2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>';
+  }
+  function helpIcoInfo() {
+    return '<svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2zm0 4.2a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM10.8 11h2.4v6.2h-2.4V11z"/></svg>';
+  }
+  function helpDropdownHtml(idPrefix) {
+    var p = idPrefix || 'rizq-help';
+    var contactLbl = t2('اتصل بنا', 'Contactez-nous');
+    var helpLbl = t2('مركز المساعدة', "Centre d'aide");
+    var aria = t2('المساعدة والدعم', 'Aide et support');
+    return '' +
+      '<div class="rizq-help-dd" id="' + p + '-wrap" data-rizq-toolbar="help">' +
+        '<button type="button" class="rizq-help-dd-btn" id="' + p + '-btn" aria-haspopup="true" aria-expanded="false" aria-controls="' + p + '-menu" aria-label="' + aria + '" title="' + aria + '">' +
+          '<span class="rizq-help-dd-chev" aria-hidden="true">▾</span>' +
+          '<span class="rizq-help-dd-ico" aria-hidden="true">' + helpIcoHeadset() + '</span>' +
+        '</button>' +
+        '<div class="rizq-help-dd-menu" id="' + p + '-menu" role="menu" hidden>' +
+          '<a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10">' +
+            '<span class="rizq-help-dd-item-ico" aria-hidden="true">' + helpIcoChat() + '</span>' +
+            '<span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="contact">' + contactLbl + '</span>' +
+          '</a>' +
+          '<a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html">' +
+            '<span class="rizq-help-dd-item-ico" aria-hidden="true">' + helpIcoInfo() + '</span>' +
+            '<span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="help">' + helpLbl + '</span>' +
+          '</a>' +
+        '</div>' +
+      '</div>';
+  }
+  function closeHelpDropdowns() {
+    document.querySelectorAll('.rizq-help-dd.open').forEach(function (wrap) {
+      wrap.classList.remove('open');
+      var btn = wrap.querySelector('.rizq-help-dd-btn');
+      var menu = wrap.querySelector('.rizq-help-dd-menu');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+      if (menu) menu.hidden = true;
+    });
+  }
+  function paintHelpLabels() {
+    document.querySelectorAll('[data-rizq-help-lbl="contact"]').forEach(function (el) {
+      el.textContent = t2('اتصل بنا', 'Contactez-nous');
+    });
+    document.querySelectorAll('[data-rizq-help-lbl="help"]').forEach(function (el) {
+      el.textContent = t2('مركز المساعدة', "Centre d'aide");
+    });
+    document.querySelectorAll('.rizq-help-dd-btn').forEach(function (btn) {
+      var aria = t2('المساعدة والدعم', 'Aide et support');
+      btn.setAttribute('aria-label', aria);
+      btn.setAttribute('title', aria);
+    });
+  }
+  function bindHelpDropdown(wrap) {
+    if (!wrap || wrap.getAttribute('data-rizq-help-bound') === '1') return;
+    wrap.setAttribute('data-rizq-help-bound', '1');
+    var btn = wrap.querySelector('.rizq-help-dd-btn');
+    var menu = wrap.querySelector('.rizq-help-dd-menu');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var willOpen = !wrap.classList.contains('open');
+      closeHelpDropdowns();
+      if (typeof closeMoreDropdowns === 'function') closeMoreDropdowns();
+      if (typeof closeMobileMoreMenu === 'function') closeMobileMoreMenu();
+      if (willOpen) {
+        wrap.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        menu.hidden = false;
+      }
+    });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
+  function ensureHelpDropdown() {
+    if (isDashPage()) return;
+    var starts = [];
+    var navStart = document.querySelector('#nav > .nav-start');
+    var deskStart = document.querySelector('#rizq-desk-nav > .nav-start');
+    var hdrStart = document.querySelector('#rizq-app-header .rizq-hdr-start');
+    if (navStart) starts.push({ el: navStart, id: 'rizq-help-nav' });
+    if (deskStart) starts.push({ el: deskStart, id: 'rizq-help-desk' });
+    if (hdrStart) starts.push({ el: hdrStart, id: 'rizq-help-hdr' });
+    starts.forEach(function (s) {
+      if (s.el.querySelector('.rizq-help-dd')) return;
+      var tools = s.el.querySelector('[data-rizq-toolbar="tools"]');
+      var html = helpDropdownHtml(s.id);
+      if (tools && tools.parentNode === s.el) {
+        tools.insertAdjacentHTML('beforebegin', html);
+      } else {
+        var acc = s.el.querySelector('[data-rizq-toolbar="account"]');
+        if (acc) acc.insertAdjacentHTML('afterend', html);
+        else s.el.insertAdjacentHTML('beforeend', html);
+      }
+    });
+    document.querySelectorAll('.rizq-help-dd').forEach(bindHelpDropdown);
+    paintHelpLabels();
+    if (!window.__rizqHelpDocBound) {
+      window.__rizqHelpDocBound = true;
+      document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('.rizq-help-dd')) return;
+        closeHelpDropdowns();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeHelpDropdowns();
+      });
+    }
+  }
+
   function headerHtml() {
     return '' +
       '<header id="rizq-app-header" role="banner">' +
@@ -342,6 +453,7 @@
             '<button type="button" class="rizq-hdr-back rizq-toolbar-back" id="rizq-hdr-back" data-rizq-toolbar="back" aria-label="' + t2('رجوع', 'Retour') + '" title="' + t2('رجوع', 'Retour') + '">←</button>' +
             '<button type="button" class="btn-lang btn-lang-primary rizq-toolbar-lang" id="rizq-lang-btn" data-rizq-toolbar="lang" dir="ltr" aria-label="FR | AR">' + langBtnHtml() + '</button>' +
             '<button type="button" class="rizq-hdr-account rizq-toolbar-account" id="rizq-hdr-account" data-rizq-toolbar="account" aria-label="حسابي" title="حسابي">👤</button>' +
+            helpDropdownHtml('rizq-help-hdr') +
             commerceToolbarHtml() +
           '</div>' +
           '<a class="rizq-hdr-brand logo" href="rizq_landing_v8.html" aria-label="رزق">' +
@@ -480,6 +592,7 @@
     paintLangBtn(document.getElementById('rizq-lang-btn'));
     paintLangBtn(document.getElementById('rizq-desk-lang-btn'));
     paintLangBtn(document.getElementById('nav-lang-btn'));
+    paintHelpLabels();
     var pill = document.getElementById('fixed-disc-pill');
     if (pill) {
       pill.textContent = t2('⚖️ رزق وسيط إلكتروني — عاين قبل الدفع', '⚖️ Rizq — inspectez avant paiement');
@@ -854,6 +967,7 @@
             '<span class="nav-account-ico" aria-hidden="true">👤</span>' +
             '<span data-hdr="account">' + t2('حسابي', 'Compte') + '</span>' +
           '</button>' +
+          helpDropdownHtml('rizq-help-desk') +
           deskFavHtml() +
         '</div>' +
         '<ul class="nav-center">' +
@@ -886,6 +1000,7 @@
   }
 
   function closeMoreDropdowns() {
+    closeHelpDropdowns();
     if (isLanding() && isMobileNav() && typeof window.closeNavDropdowns === 'function') {
       window.closeNavDropdowns();
       return;
@@ -1557,6 +1672,7 @@
     }
     if (!isDashPage()) {
       ensureMediatorPill();
+      ensureHelpDropdown();
       ensureLangListener();
       applyLabels();
       initRLogoSidebar();
@@ -1606,7 +1722,9 @@
     closeMobileMoreMenu: closeMobileMoreMenu,
     enhanceModel3NavLinks: enhanceModel3NavLinks,
     icoForHdr: icoForHdr,
-    NAV_ICOS: NAV_ICOS
+    NAV_ICOS: NAV_ICOS,
+    ensureHelpDropdown: ensureHelpDropdown,
+    closeHelpDropdowns: closeHelpDropdowns
   };
 
   if (document.body) inject();
