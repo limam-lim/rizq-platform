@@ -338,6 +338,10 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .req-field-lbl{display:block;font-size:12px;font-weight:800;color:#0F2347;margin:0 0 5px}
 .req-input{display:block!important;width:100%;padding:11px 14px;border:1.5px solid #c5d0e0;border-radius:10px;font-size:13.5px;font-family:inherit;color:#0D1B2A;background:#fff;margin-bottom:12px;transition:border .2s;box-sizing:border-box;min-height:44px}
 .req-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,116,144,.12)}
+/* مؤشر اليد على كل تفاعل: أزرار وقوائم منسدلة وروابط */
+button,a,[onclick],[role="button"],.req-btn,.page-sec-btn,.act-btn,.cta-btn,.s-btn,.pkg-cta,
+select,select.req-input,.nav-lang-btn,.desk-step{cursor:pointer!important}
+input[type="text"],input[type="tel"],input[type="email"],input[type="number"],textarea,.req-input:not(select){cursor:text}
 .req-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s;width:100%}
 .req-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(14,116,144,.35)}
 .req-btn.ghost{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
@@ -1735,7 +1739,8 @@ function openMaps(){
         if(forceDemo){
           applyDemoLawOffice();
           id = DEMO_LAW_ID;
-          try{ history.replaceState(null, '', 'rizq_office.html?demo=1&id=' + DEMO_LAW_ID); }catch(eHist){}
+          /* رابط نظيف للعرض أمام الأساتذة — بلا رموز تقنية في شريط العنوان */
+          try{ history.replaceState(null, '', 'rizq_office.html'); }catch(eHist){}
         }
         function clearMock(ids){
           ids.forEach(function(fid){
@@ -1787,8 +1792,8 @@ function openMaps(){
             var subEl = document.getElementById('req-sub');
             if(titleEl) titleEl.textContent = isFr() ? '📩 Service Desk — ouvrir votre bureau' : '📩 غرفة الطلبات — افتح مكتبك الحقيقي';
             if(subEl) subEl.textContent = isFr()
-              ? 'Cette page est vide sans ?id=. Ouvrez votre bureau depuis le tableau de bord (Partager / Voir la page) pour voir votre formulaire personnalisé.'
-              : 'هذه الصفحة فارغة بدون رابط مكتبك (?id=). افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
+              ? 'Ouvrez votre page depuis le tableau de bord (Partager / Voir la page) pour afficher votre formulaire personnalisé.'
+              : 'افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
             var form = document.getElementById('req-form');
             if(form){ form.style.display = 'block'; form.classList.add('open'); form.classList.remove('collapsed'); }
           }
@@ -1803,10 +1808,9 @@ function openMaps(){
           setText('stat-svcs', '—');
         }
         if(!id){
-          // يفترض أن wantDemo عبّأ demo_law — إن وصلنا هنا بلا id فمعاينة فارغة
           showEmptyOffice(
-            'لم يُحدَّد مكتب. للمعاينة الواقعية افتح: rizq_office.html?demo=1',
-            'Aucun bureau. Démo réaliste : rizq_office.html?demo=1'
+            'لم يُحدَّد مكتب بعد. افتح صفحتك من لوحة التحكم ← مشاركة / عرض الصفحة.',
+            'Aucun bureau sélectionné. Ouvrez votre page depuis le tableau de bord → Partager / Voir la page.'
           );
           return;
         }
@@ -1816,10 +1820,9 @@ function openMaps(){
           acc = applyDemoLawOffice();
         }
         if(!acc){
-          // لا نُخفي الواجهة فوراً — احتياط الخادم قد يجد المكتب بعد لحظات
           showEmptyOffice(
-            'جاري تحميل المكتب من الخادم… إن استمر الفراغ جرّب المعاينة: rizq_office.html?demo=1',
-            'Chargement… Sinon ouvrez la démo : rizq_office.html?demo=1'
+            'جاري تحميل المكتب… إن استمر الفراغ افتح صفحتك من لوحة التحكم.',
+            'Chargement du bureau… Sinon ouvrez votre page depuis le tableau de bord.'
           );
           return;
         }
@@ -1873,9 +1876,15 @@ function openMaps(){
           }
           if(window.RizqServiceDesk){
             RizqServiceDesk.enhanceOfficeForm({ desk: demoAcc.serviceDesk, accountName: demoAcc.name });
-            var formOpen = document.getElementById('req-form');
-            if(formOpen){ formOpen.classList.add('open'); formOpen.classList.remove('collapsed'); }
           }
+          // للمعاينة أمام الأساتذة: اختيار أول خدمة يفتح خطوة بيانات الزبون تلقائياً
+          setTimeout(function(){
+            var calc = document.getElementById('calc-type');
+            if(calc && calc.options.length > 1){
+              calc.selectedIndex = 1;
+              if(typeof calcEstimate === 'function') calcEstimate();
+            }
+          }, 350);
           // أرقام عرض واقعية للأساتذة (وهمية ومُعلَّمة في الشريط العلوي)
           setText('stat-clients', '240+');
           setText('ab-clients', '240+');

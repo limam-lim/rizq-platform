@@ -28,6 +28,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#FBF8F2;color:#26303F;min-height:100vh}
+/* مؤشر اليد = الزر يعمل */
+button,a,[onclick],[role="button"],select,.nav-lang-btn,.nav-link,.cat-tab,.action-btn,.btn-inquire{cursor:pointer!important}
+input[type="text"],input[type="tel"],input[type="email"],input[type="number"],textarea{cursor:text}
 
 /* ── TOPNAV ── */
 .topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
@@ -803,7 +806,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
       : '🎓 معاينة مشروع تخرج — معرض وهمي (بيانات عرض فقط، ليست حقيقية)';
     document.body.insertBefore(rib, document.body.firstChild);
   }
-  try{ history.replaceState(null, '', 'rizq_showroom.html?demo=1&id=' + _showroomId); }catch(e2){}
+  try{ history.replaceState(null, '', 'rizq_showroom.html'); }catch(e2){}
   document.body.classList.remove('rizq-empty-showroom');
 })();
 

@@ -41,6 +41,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#eef2f7 0%,#f5f7fb 40%,#f0f3f8 100%);color:#1a2a3a;min-height:100vh}
+/* مؤشر اليد = الزر يعمل */
+button,a,[onclick],[role="button"],select,.nav-lang-btn,.nav-link,.cat-btn,.s-btn{cursor:pointer!important}
+input[type="text"],input[type="tel"],input[type="email"],input[type="number"],textarea{cursor:text}
 
 /* ====== TOPNAV ====== */
 .topnav{
@@ -1768,7 +1771,7 @@ function rizqShare(title, url) {
           : '🎓 معاينة مشروع تخرج — محل وهمي (بيانات عرض فقط، ليست حقيقية)';
         document.body.insertBefore(rib, document.body.firstChild);
       }
-      try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=' + id); }catch(e2){}
+      try{ history.replaceState(null, '', 'rizq_store.html'); }catch(e2){}
       return acc;
     }
 
@@ -1790,8 +1793,8 @@ function rizqShare(title, url) {
             emptyBanner.style.display = 'block';
             var desc = emptyBanner.querySelector('[data-t="store-empty-desc"]');
             if(desc) desc.textContent = isFr()
-              ? 'Boutique introuvable — ouvrez rizq_store.html?demo=1 pour la démo.'
-              : 'المحل غير موجود — للمعاينة افتح rizq_store.html?demo=1';
+              ? 'Boutique introuvable — ouvrez votre page depuis le tableau de bord.'
+              : 'المحل غير موجود — افتح صفحتك من لوحة التحكم.';
           }
           return;
         }
