@@ -122,10 +122,11 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s;
 }
 .page-sec-btn:hover{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.5)}
-/* فيديو تعريفي — قسم هادئ تحت الهيرو، بهوية الصفحة لا شريط داكن */
-.video-intro-section{padding:28px 16px 32px;background:linear-gradient(180deg,#F5F0E6 0%,#FBF8F2 100%);border-bottom:1px solid rgba(38,48,63,.1)}
+/* فيديو تعريفي — داخل قسم «عن المعرض»، هادئ بلا شريط داكن */
+.video-intro-section{margin-top:16px;padding:0;background:transparent;border:none}
 .video-intro-section .rzq-iv-src{color:rgba(38,48,63,.55)}
 .video-intro-section .rzq-iv-src:hover{color:#1B3A6B}
+.video-intro-section .rzq-iv-wrap{max-width:100%}
 @media(max-width:800px){
   .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
 }
@@ -366,12 +367,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </div>
 
-<!-- ═══ INTRO VIDEO — تحت الهيرو/شريط الأقسام (لا فوق الواجهة) ═══
-     يظهر فقط عند وجود account.promo_video عبر rizq_intro_video.js -->
-<section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
-  <div id="intro-video-mount"></div>
-</section>
-
 <!-- ══ MAIN ══ -->
 <div class="main-wrap">
 
@@ -453,12 +448,15 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         </div>
       </div>
 
-      <!-- About -->
+      <!-- About — الفيديو التعريفي يعيش هنا مع نص «عن المعرض» -->
       <div class="info-card" id="about-section">
         <div class="info-card-title" id="about-title-lbl">📖 عن المعرض</div>
         <div style="font-size:13px;color:#4a5364;line-height:1.75" id="about-text">
           معرض متخصص في بيع وعرض السيارات والمعدات والإلكترونيات — جميع المعروضات موثّقة ومفحوصة ومصحوبة بضمان.
         </div>
+        <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+          <div id="intro-video-mount"></div>
+        </section>
         <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" id="tags-container">
           <span style="background:#eef2ff;color:#3730a3;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🚗 سيارات</span>
           <span style="background:#fff7ed;color:#c2410c;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">💻 إلكترونيات</span>
@@ -1464,7 +1462,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js"></script>
 <script>
-/* فيديو تعريفي مضمَّن — تحت الهيرو عند وجود promo_video على الحساب */
+/* فيديو تعريفي مضمَّن — داخل قسم «عن المعرض» عند وجود promo_video */
 (function mountShowroomIntroVideo(){
   try{
     var url = (_acc && _acc.promo_video) || '';

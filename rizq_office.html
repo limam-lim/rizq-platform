@@ -240,10 +240,11 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .page-sec-btn{flex:0 0 auto;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(14,116,144,.35);color:#67e8f9;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
 .page-sec-btn:hover{background:rgba(14,116,144,.2);border-color:rgba(103,232,249,.5)}
 .page-sec-btn-reviews{margin-inline-start:auto}
-/* فيديو تعريفي — قسم هادئ تحت الهيرو، بهوية الصفحة لا شريط داكن */
-.video-intro-section{padding:28px 16px 32px;background:linear-gradient(180deg,#eef4fb 0%,var(--bg,#f4f7fd) 100%);border-bottom:1px solid rgba(14,116,144,.12)}
+/* فيديو تعريفي — داخل قسم «عن المكتب»، هادئ بلا شريط داكن */
+.video-intro-section{margin-top:18px;padding:0;background:transparent;border:none}
 .video-intro-section .rzq-iv-src{color:rgba(27,58,107,.55)}
 .video-intro-section .rzq-iv-src:hover{color:var(--teal2,#0e7490)}
+.video-intro-section .rzq-iv-wrap{max-width:100%}
 .actions-bar{background:linear-gradient(135deg,#0F2347,#0D1B2A);border-bottom:1px solid rgba(201,168,76,.28);padding:14px 20px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .actions-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media(max-width:800px){.actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}}
@@ -792,12 +793,6 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   </div>
 </div>
 
-<!-- ═══ INTRO VIDEO — تحت الهيرو/شريط الأقسام (لا فوق الواجهة) ═══
-     يظهر فقط عند وجود account.promo_video عبر rizq_intro_video.js -->
-<section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
-  <div id="intro-video-mount"></div>
-</section>
-
 <!-- ════ STATS STRIP ════ -->
 <div class="stats-strip">
   <div class="stats-strip-inner">
@@ -974,13 +969,16 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       </div>
     </div>
 
-    <!-- ABOUT -->
+    <!-- ABOUT — الفيديو التعريفي يعيش هنا مع نص «عن المكتب» -->
     <div class="card fade-in" id="about-section">
       <div class="section-head">
         <div class="section-bar"></div>
         <div class="section-ttl" id="about-section-ttl" data-t="about-section-ttl">عن المكتب</div>
       </div>
       <p class="about-text" id="about-txt" data-t="about-txt">تُعرض بيانات المكتب من الحساب الحقيقي فقط بعد اختيار مكتب من الدليل.</p>
+      <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+        <div id="intro-video-mount"></div>
+      </section>
       <div class="about-stats">
         <div class="about-stat"><div class="about-stat-val">2010</div><div class="about-stat-lbl" id="ab-year-lbl" data-t="ab-year-lbl">سنة التأسيس</div></div>
         <div class="about-stat"><div class="about-stat-val" id="ab-clients">—</div><div class="about-stat-lbl" id="ab-clients-lbl" data-t="ab-clients-lbl">زبون مخدوم</div></div>
@@ -1686,7 +1684,7 @@ function openMaps(){
           { type: 'bankily', bank: 'Bankily', code: '36112233', note: isFr() ? 'Mentionnez votre nom après virement' : 'اذكر اسمك بعد التحويل' },
           { type: 'bank', bank: 'BCI', code: 'MR13 0001 2200 3344', note: isFr() ? 'Virement — honoraires' : 'تحويل — أتعاب المهنة' }
         ],
-        /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة — يظهر تحت الهيرو */
+        /* فيديو تعريفي تجريبي — يظهر داخل قسم «عن المكتب» */
         promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: '45 د' },
