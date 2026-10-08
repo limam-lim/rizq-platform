@@ -1137,21 +1137,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     z-index:-1 !important;
   }
 
+  /* body مبطَّن أصلاً بارتفاع الهيدر — لا نكرّر padding على .hero (كان يضاعف الفراغ الأبيض) */
   html.rizq-app-nav .hero{
     margin-top:0 !important;
-    padding-top:var(--rizq-header-h,78px) !important;
-    min-height:100vh !important;
-    justify-content:flex-start !important; /* قرّب الشارة من الشريط العلوي */
+    padding-top:10px !important;
+    min-height:0 !important;
+    height:auto !important;
+    justify-content:flex-start !important;
   }
   html.rizq-app-nav .hero-content{
     margin-top:0 !important;
-    padding-top:18px !important;
+    padding-top:8px !important;
   }
+  /* التيكر ثابت فوق المحتوى — body مبطَّن بالهيدر فقط، نزيد فجوة التيكر دون إعادة ارتفاع الهيدر */
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,78px) + var(--rizq-ticker-h,42px) + 14px) !important;
+    padding-top:calc(var(--rizq-ticker-h,42px) + 12px) !important;
   }
   html.rizq-app-nav.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    padding-top:14px !important;
+    padding-top:12px !important;
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content{
     padding-top:6px !important;
@@ -1510,8 +1513,12 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav:not(.rizq-reg-page) body:has(#nav):not(.rizq-reg-open){
     padding-top:var(--rizq-header-h,102px) !important;
   }
+  /* تابلت: نفس إصلاح المضاعفة — فجوة خفيفة فقط تحت الهيدر */
   html.rizq-app-nav:not(.rizq-reg-page) body:not(.rizq-reg-open) .hero{
-    padding-top:var(--rizq-header-h,102px) !important;
+    padding-top:8px !important;
+    min-height:0 !important;
+    height:auto !important;
+    justify-content:flex-start !important;
   }
   html.rizq-app-nav body.rizq-reg-open,
   html.rizq-reg-page body,

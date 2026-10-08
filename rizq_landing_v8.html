@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.0"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -41,7 +41,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=29.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=29.7"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -441,19 +441,18 @@ html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
 html.rizq-has-announce .section-jump-bar{
   display:none!important;visibility:hidden!important;pointer-events:none!important;
 }
-/* Desktop: تيكر ثابت — امسح ارتفاع النافبار+التيكر ثم فجوة خفيفة للشارة */
+/* Desktop: تيكر ثابت — body مبطَّن بالهيدر؛ هنا فجوة التيكر فقط */
 @media (min-width:769px) and (min-height:501px){
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
   html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
-    padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-ticker-h,42px) + 14px)!important
+    padding-top:calc(var(--rizq-ticker-h,42px) + 12px)!important
   }
   html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
-    /* body مبطَّن مسبقاً بالنافبار+الإشعار+التيكر — هنا فجوة فقط */
-    padding-top:14px!important
+    padding-top:12px!important
   }
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html:has(#ticker-wrap:not(.is-empty)) .hero-content{
-    padding-top:6px!important
+    padding-top:4px!important
   }
 }
 /* Mobile: التيكر في التدفق تحت النافبار — flex-start يمنع الفراغ الأبيض */
@@ -982,55 +981,57 @@ body.rizq-lang-ar .hero-vid-wrap{
     max-width:min(860px,82vw);
   }
   .hero-brand-row{
-    gap:8px;
-    margin:0 auto 10px;
-    min-width:min(240px,70vw);
+    gap:6px!important;
+    margin:0 auto 6px!important;
+    min-width:min(220px,64vw)!important;
   }
   .hero-title-card{
-    padding:12px 22px 14px;
-    min-height:72px;
-    border-radius:14px;
-    box-shadow:0 10px 26px rgba(0,0,0,.2),0 0 18px rgba(201,168,76,.1),inset 0 1px 0 rgba(255,255,255,.1);
+    padding:8px 18px 10px!important;
+    min-height:58px!important;
+    border-radius:12px!important;
+    box-shadow:0 8px 22px rgba(0,0,0,.18),0 0 14px rgba(201,168,76,.08),inset 0 1px 0 rgba(255,255,255,.1)!important;
   }
   .hero-headline{
-    font-size:clamp(40px,5.2vw,58px)!important;
-    letter-spacing:.4px;
+    font-size:clamp(34px,4.4vw,48px)!important;
+    letter-spacing:.35px!important;
   }
   .hero-brand-row .hero-eyebrow{
-    padding:8px 16px;
-    min-height:34px;
+    padding:6px 14px!important;
+    min-height:30px!important;
   }
-  .hero-brand-row .hero-eyebrow span{font-size:clamp(11.5px,1.2vw,13px)}
+  .hero-brand-row .hero-eyebrow span{font-size:clamp(11px,1.1vw,12.5px)!important}
   .hero-lead-row{
-    gap:10px;
-    margin:0 auto 8px;
-    max-width:min(860px,82vw);
+    gap:8px!important;
+    margin:0 auto 6px!important;
+    max-width:min(820px,78vw)!important;
   }
   .hero-subtitle-card{
-    padding:14px 22px 12px;
-    border-radius:14px;
+    padding:10px 18px 9px!important;
+    border-radius:12px!important;
   }
-  .hero-subtitle-primary{font-size:clamp(17px,1.85vw,22px)!important}
-  .hero-subtitle-secondary{font-size:clamp(14px,1.5vw,17px)!important}
+  .hero-subtitle-primary{font-size:clamp(15px,1.6vw,19px)!important}
+  .hero-subtitle-secondary{font-size:clamp(13px,1.35vw,15.5px)!important}
   .hero-stage{
-    gap:12px;
-    margin-top:6px;
-    padding:12px 14px 6px;
-    max-width:min(860px,82vw);
-    border-radius:22px;
+    gap:10px!important;
+    margin-top:4px!important;
+    padding:10px 12px 4px!important;
+    max-width:min(820px,78vw)!important;
+    border-radius:18px!important;
   }
-  .hero-spaces-title{font-size:clamp(17px,2.1vw,22px)!important}
-  .hero-spaces-sub{font-size:clamp(12px,1.25vw,13.5px)!important}
-  .hero-spaces-head{margin:0 auto 10px}
+  .hero-spaces-title{font-size:clamp(15px,1.85vw,19px)!important}
+  .hero-spaces-sub{font-size:clamp(11.5px,1.15vw,13px)!important}
+  .hero-spaces-head{margin:0 auto 8px!important}
+  .hero-spaces-kicker{font-size:10.5px!important;padding:4px 12px!important;margin-bottom:6px!important}
   .hero-biz-btn{
-    min-height:84px;
-    padding:10px 6px 10px;
-    border-radius:14px 14px 10px 10px;
-    font-size:clamp(11px,1.1vw,12.5px);
+    min-height:72px!important;
+    padding:8px 5px 8px!important;
+    border-radius:12px 12px 9px 9px!important;
+    font-size:clamp(10.5px,1.05vw,12px)!important;
+    gap:5px!important;
   }
-  .hero-biz-ico-wrap{width:32px;height:32px;border-radius:10px;margin-top:2px}
-  .hero-biz-ico{font-size:1.15em}
-  .hero-biz-hint{font-size:9.5px}
+  .hero-biz-ico-wrap{width:28px!important;height:28px!important;border-radius:9px!important;margin-top:0!important}
+  .hero-biz-ico{font-size:1.05em!important}
+  .hero-biz-hint{font-size:9px!important}
   .hero-biz-label{font-size:inherit}
   .hero-vid-wrap,
   html[dir="ltr"] .hero-vid-wrap,
