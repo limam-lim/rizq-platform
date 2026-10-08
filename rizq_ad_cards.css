@@ -179,32 +179,37 @@
 }
 .rzq-adx-media:not(.has-multi) .rzq-adx-dots{display:none!important}
 
-/* شارة السعر — كاملة فوق الصورة (تغطي أسفل الأيقونة، لا تُقصّ) */
+/* كبسولة السعر — مستطيلة ذهبية شفافة، في الوسط */
 .rzq-adx-price{
   position:absolute;z-index:8;
   left:50%;bottom:10px;transform:translateX(-50%);
   inset-inline-start:auto;inset-inline-end:auto;
-  max-width:calc(100% - 20px);
-  padding:7px 14px;border-radius:999px;
-  font-size:13px;font-weight:900;letter-spacing:.2px;color:#0a1424;
-  background:linear-gradient(180deg,#FFE9A8 0%,#F0D078 55%,#D4A84A 100%);
-  border:1px solid rgba(255,248,220,.75);
+  max-width:calc(100% - 24px);
+  padding:5px 10px;border-radius:5px;
+  font-size:11px;font-weight:800;letter-spacing:.15px;color:#FFF8E0;
+  background:rgba(201,168,76,.28);
+  border:1px solid rgba(240,215,138,.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   box-shadow:
-    0 8px 18px rgba(0,0,0,.28),
-    0 0 0 1px rgba(201,168,76,.45),
-    inset 0 1px 0 rgba(255,255,255,.65);
+    0 4px 12px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,248,224,.18);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-family:'Cairo','Segoe UI',sans-serif;
   text-align:center;
-  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
   -webkit-font-smoothing:antialiased;
   pointer-events:none;
 }
+/* كبسولة مميز — مستطيلة ذهبية شفافة */
 .rzq-adx-badge{
   position:absolute;z-index:5;top:10px;right:10px;left:auto;
-  padding:3px 8px;border-radius:8px;font-size:9px;font-weight:900;
-  color:#0f2347;background:linear-gradient(135deg,#F0D78A,#C9A84C);
-  box-shadow:0 3px 10px rgba(201,168,76,.32);
+  padding:3px 7px;border-radius:5px;font-size:9px;font-weight:800;
+  color:#FFF8E0;
+  background:rgba(201,168,76,.28);
+  border:1px solid rgba(240,215,138,.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 3px 10px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,248,224,.16);
+  text-shadow:0 1px 2px rgba(0,0,0,.4);
 }
 
 /* علامة رزق شفافة — فوق السعر حتى لا تغطيه */
