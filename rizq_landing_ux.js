@@ -345,13 +345,15 @@
     if (heroSearch && heroSearch.dataset.t === 'search-ph') {
       heroSearch.placeholder = fr ? 'Rechercher sur Rizq...' : 'البحث في رزق...';
     }
-    var liveWrap = document.querySelector('#hero-listings .listings-label > span');
-    if (liveWrap) {
-      liveWrap.innerHTML = '<span class="live-pulse-dot" aria-hidden="true"></span><strong>'
-        + (fr ? 'En direct' : 'مباشر') + '</strong> '
-        + (fr
-          ? 'Dernières annonces publiées — mise à jour automatique'
-          : 'أحدث الإعلانات المنشورة — تتحدث تلقائياً');
+    if (typeof paintLiveListingsLabel === 'function') {
+      paintLiveListingsLabel();
+    } else {
+      var liveWrap = document.querySelector('#hero-listings .listings-label > span');
+      if (liveWrap) {
+        liveWrap.innerHTML = fr
+          ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub">Dernières annonces — mise à jour automatique</span>'
+          : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>';
+      }
     }
 
     var hamburger = document.getElementById('nav-hamburger');
