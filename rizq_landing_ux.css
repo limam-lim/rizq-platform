@@ -875,7 +875,9 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   padding:3px 10px 3px 7px!important;
   border-radius:999px!important;
   background:linear-gradient(135deg,#2a0d14 0%,#1a0a10 55%,#12080c 100%)!important;
-  background-image:none!important;
+  background-image:linear-gradient(135deg,#2a0d14 0%,#1a0a10 55%,#12080c 100%)!important;
+  background-size:auto!important;
+  background-blend-mode:normal!important;
   border:1px solid rgba(225,29,72,.55)!important;
   box-shadow:0 0 10px rgba(225,29,72,.22),inset 0 1px 0 rgba(255,255,255,.08)!important;
   color:#fecaca!important;
