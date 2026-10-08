@@ -251,8 +251,9 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_account_payments.js"></script>
-<script src="rizq_invoice_engine.js"></script>
+  <script src="rizq_account_payments.js"></script>
+  <script src="rizq_service_desk.js?v=1.0"></script>
+  <script src="rizq_invoice_engine.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 
@@ -426,6 +427,33 @@ textarea.form-input{min-height:80px;resize:vertical}
 
     <!-- REQUESTS -->
     <div class="panel" id="panel-requests">
+      <div class="card" style="margin-bottom:16px;border:1px solid rgba(201,168,76,.22);background:linear-gradient(135deg,rgba(15,35,71,.02),rgba(201,168,76,.05))">
+        <div class="card-header">
+          <div class="card-title">✨ غرفة طلباتي — هويتي</div>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55">سمِّ نموذج الطلب باسم مكتبك. الزائر يشعر أنه على منصتك — والوثائق تبقى عبر واتساب أو إيميلك فقط، خارج سيرفر رزق.</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">عنوان النموذج (اختياري)</label>
+          <input class="form-input" id="desk-form-title" maxlength="120" placeholder="مثال: طلب استشارة لدى مكتب …"/>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">نص توضيحي قصير</label>
+          <input class="form-input" id="desk-form-hint" maxlength="240" placeholder="كيف تريد أن يفهم الزائر خطوات الطلب"/>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label class="form-label">قناة الوثائق بعد الإرسال</label>
+          <select class="form-input" id="desk-docs-channel">
+            <option value="whatsapp">واتساب</option>
+            <option value="email">إيميل</option>
+            <option value="both">واتساب + إيميل</option>
+          </select>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:14px;cursor:pointer">
+          <input type="checkbox" id="desk-enabled" checked/>
+          <span>تفعيل غرفة الطلبات على صفحتي العامة</span>
+        </label>
+        <button class="btn btn-primary" type="button" onclick="saveOfficeServiceDesk()">💾 حفظ هوية غرفة الطلبات</button>
+      </div>
       <div class="card">
         <div class="card-header"><div class="card-title" data-t="req-panel-title">📩 طلبات التواصل</div></div>
         <div id="requests-list"></div>
@@ -817,7 +845,7 @@ function showPanel(id,el){
   const t=document.getElementById('topbar-title');
   if(t)t.textContent=(typeof _officeLang!=='undefined'&&_officeLang==='fr'?TITLES_FR[id]:TITLES[id])||'';
   if(id==='overview')renderOverview();
-  if(id==='requests'){ _rizqMergeRequestsFromBackend(); renderRequests(); }
+  if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
   if(id==='services')renderServices();
   if(id==='hours')renderHours();
   if(id==='subscription'){renderSubPanel();renderPackagesDisplay();renderVideoPackagesDisplay();}
@@ -1206,9 +1234,12 @@ function _initWithAccount(acc){
   renderPackagesDisplay();
   renderVideoPackagesDisplay();
   if(!IS_DEMO) _rizqRenderAdsStatus(acc);
-  // req badge + notif bell
+  // req badge + notif bell (+ غرفة الطلبات من الخادم)
+  if(!IS_DEMO){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
   const reqs=IS_DEMO?DEMO_REQS:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
-  const unread=reqs.filter(r=>!r.read).length;
+  const serviceUnread=(!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests))
+    ? window._rizqOfficeServiceRequests.filter(function(r){ return r.status==='new'; }).length : 0;
+  const unread=reqs.filter(r=>!r.read).length + serviceUnread;
   const rb=document.getElementById('req-badge');
   if(rb&&unread>0){rb.textContent=unread;rb.style.display='';}
   const nc=document.getElementById('notif-count');
@@ -1236,14 +1267,15 @@ function _initWithAccount(acc){
 
 function renderOverview(){
   const reqs=IS_DEMO?DEMO_REQS:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
-  const unread=reqs.filter(r=>!r.read).length;
+  const serviceReqs=(!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests)) ? window._rizqOfficeServiceRequests : [];
+  const totalReqs = reqs.length + serviceReqs.length;
   // إصلاح: "زيارات هذا الأسبوع" كانت Math.random()*300+80 — رقم عشوائي
   // مختلف كل مرة يُفتح فيها الداشبورد، بلا أي علاقة بزيارة حقيقية. الآن
   // تبدأ بـ"…" ثم renderRealVisits() تملأها برقم حقيقي من الخادم.
   document.getElementById('ov-stats').innerHTML=[
     {icon:'👁',val:'…',id:'ov-stat-visits',label:_t2('زيارات هذا الأسبوع','Visites cette semaine'),accent:'#1B3A6B'},
     {icon:'📋',val:services.length,label:_t2('خدمات معروضة','Services proposés'),accent:'#C9A84C'},
-    {icon:'📩',val:reqs.length,label:_t2('طلبات تواصل','Demandes de contact'),accent:'#10b981'},
+    {icon:'📩',val:totalReqs,label:_t2('طلبات تواصل','Demandes de contact'),accent:'#10b981'},
     {icon:'⭐',val:'…',id:'ov-stat-rating',label:_t2('تقييم المكتب','Note du cabinet'),accent:'#f59e0b'},
   ].map(s=>`<div class="stat-card" style="--accent:${s.accent}"><div style="font-size:22px;margin-bottom:8px">${s.icon}</div><div class="stat-val"${s.id?` id="${s.id}"`:''}>${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
   // إصلاح جوهري 29/07/2026: كان تقييم "4.9" ثابتاً مزيَّفاً دائماً.
@@ -1281,8 +1313,15 @@ function renderOverview(){
   renderRealVisits();
   renderAdvancedStats();
 
-  const rl=reqs.slice(-3).reverse();
-  document.getElementById('ov-requests').innerHTML=rl.length?rl.map(r=>`
+  const mergedPreview = serviceReqs.slice(0, 3).map(function(r){
+    return {
+      name: r.buyerName,
+      service: r.service || r.templateName || '',
+      time: r.createdAt ? new Date(r.createdAt).toLocaleDateString(localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '',
+      read: r.status !== 'new'
+    };
+  }).concat(reqs.slice(-3).reverse()).slice(0, 3);
+  document.getElementById('ov-requests').innerHTML=mergedPreview.length?mergedPreview.map(r=>`
     <div style="padding:10px 0;border-bottom:1px solid rgba(27,58,107,.05);display:flex;gap:10px;align-items:flex-start">
       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">${r.name?r.name[0].toUpperCase():_t2('ز','C')}</div>
       <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">${escapeHtml(r.name)}</div>
@@ -1363,6 +1402,16 @@ function renderSubOverview(){
   </div>`;
 }
 
+function _serviceReqStatusLabel(st){
+  var map = {
+    new: _t2('جديد','Nouveau'),
+    in_progress: _t2('قيد المعالجة','En cours'),
+    done: _t2('منجز','Terminé'),
+    rejected: _t2('مرفوض','Refusé')
+  };
+  return map[st] || st || '';
+}
+
 function renderRequests(){
   const offReqs=IS_DEMO?[...DEMO_REQS]:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
   offReqs.forEach(r=>{ if(!r._fromBackend) r.read=true; });
@@ -1371,9 +1420,11 @@ function renderRequests(){
   }
 
   const backendThreads = (!IS_DEMO && Array.isArray(window._rizqOfficeBackendThreads)) ? window._rizqOfficeBackendThreads : [];
+  const serviceReqs = (!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests)) ? window._rizqOfficeServiceRequests : [];
   const unreadLocal = offReqs.filter(r=>!r.read).length;
   const unreadBackend = backendThreads.reduce(function(s,t){ return s+(t.unreadCount||0); }, 0);
-  const unreadTotal = unreadLocal + unreadBackend;
+  const unreadService = serviceReqs.filter(function(r){ return r.status === 'new'; }).length;
+  const unreadTotal = unreadLocal + unreadBackend + unreadService;
 
   document.getElementById('req-badge').style.display = unreadTotal > 0 ? '' : 'none';
   if(unreadTotal > 0) document.getElementById('req-badge').textContent = unreadTotal;
@@ -1382,10 +1433,36 @@ function renderRequests(){
 
   const el=document.getElementById('requests-list');if(!el)return;
 
-  if(!offReqs.length && !backendThreads.length){
+  if(!offReqs.length && !backendThreads.length && !serviceReqs.length){
     el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text-muted)"><div style="font-size:48px;margin-bottom:10px">📩</div><p>'+_t2('لا توجد طلبات بعد','Aucune demande pour le moment')+'</p></div>';
     return;
   }
+
+  var statusColors = { new:'#1B3A6B', in_progress:'#f59e0b', done:'#10b981', rejected:'#dc2626' };
+  var serviceHtml = serviceReqs.map(function(r){
+    var phone = r.buyerWhatsapp || r.buyerPhone || '';
+    var timeStr = r.createdAt ? new Date(r.createdAt).toLocaleString(localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '';
+    var st = r.status || 'new';
+    return '<div class="req-item" style="--rc:'+(st==='new'?'var(--royal)':'rgba(27,58,107,.2)')+'">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--navy)">'+escapeHtml(r.buyerName||_t2('زبون','Client'))+'</span>'
+      + (r.service?'<span style="font-size:11px;background:rgba(27,58,107,.08);color:var(--navy);padding:2px 8px;border-radius:10px">'+escapeHtml(r.service)+'</span>':'')
+      + (r.templateName?'<span style="font-size:10px;background:rgba(201,168,76,.15);color:#8a6a1a;padding:2px 8px;border-radius:10px">'+escapeHtml(r.templateName)+'</span>':'')
+      + '<span style="font-size:10px;font-weight:800;color:#fff;background:'+(statusColors[st]||'#64748b')+';padding:2px 8px;border-radius:10px">'+_serviceReqStatusLabel(st)+'</span>'
+      + '<span style="font-size:11px;color:#9aa5b8;margin-right:auto">'+timeStr+'</span>'
+      + '</div>'
+      + '<div class="req-meta">'+escapeHtml(r.message||'')+'</div>'
+      + '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;font-size:12px">'
+      + (phone?'<a href="https://wa.me/'+String(phone).replace(/\D/g,'')+'" target="_blank" rel="noopener" style="color:#10b981;font-weight:600">📞 WhatsApp '+escapeHtml(phone)+'</a>':'')
+      + (r.buyerEmail?'<a href="mailto:'+escapeHtml(r.buyerEmail)+'" style="color:#1B3A6B;font-weight:600">✉️ '+escapeHtml(r.buyerEmail)+'</a>':'')
+      + (r.id?'<span style="color:#9aa5b8;font-family:monospace">'+escapeHtml(r.id)+'</span>':'')
+      + '</div>'
+      + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'in_progress\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('قيد المعالجة','En cours')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'done\')" style="padding:6px 10px;border:none;border-radius:8px;background:#d1fae5;color:#065f46;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('منجز','Terminé')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'rejected\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fee2e2;color:#991b1b;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('رفض','Refuser')+'</button>'
+      + '</div></div>';
+  }).join('');
 
   var localHtml = offReqs.slice().reverse().map(function(r){
     return '<div class="req-item" style="--rc:'+(r.read?'rgba(27,58,107,.2)':'var(--royal)')+'">'
@@ -1419,7 +1496,7 @@ function renderRequests(){
       + '</div></div>';
   }).join('');
 
-  el.innerHTML = localHtml + threadsHtml;
+  el.innerHTML = serviceHtml + localHtml + threadsHtml;
 
   if(!IS_DEMO && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_TOKEN){
     backendThreads.forEach(function(t){
@@ -1443,6 +1520,84 @@ function _rizqMergeRequestsFromBackend(){
       if(typeof renderOverview==='function') renderOverview();
     }).catch(function(){});
   }catch(e){}
+}
+
+function _rizqMergeServiceRequests(){
+  try{
+    if(IS_DEMO || !SESSION_ID) return;
+    var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+    if(window.RizqServiceDesk && token){
+      RizqServiceDesk.listMine(SESSION_ID, token).then(function(list){
+        window._rizqOfficeServiceRequests = Array.isArray(list) ? list : [];
+        if(typeof renderRequests==='function') renderRequests();
+        if(typeof renderOverview==='function') renderOverview();
+      });
+      return;
+    }
+    try{
+      var local = JSON.parse(localStorage.getItem('rizq_service_requests_local')||'[]');
+      window._rizqOfficeServiceRequests = local.filter(function(r){ return r && r.accountId === SESSION_ID; });
+    }catch(e2){ window._rizqOfficeServiceRequests = []; }
+  }catch(e){}
+}
+
+function _rizqSetServiceReqStatus(id, status){
+  if(!id || !status) return;
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  if(window.RizqServiceDesk && token){
+    RizqServiceDesk.setStatus(id, status, token).then(function(){
+      _rizqMergeServiceRequests();
+      showToast(_t2('تم تحديث حالة الطلب','Statut mis à jour'), 'success');
+    }).catch(function(){
+      showToast(_t2('تعذّر تحديث الحالة','Échec de la mise à jour'), 'error');
+    });
+    return;
+  }
+  try{
+    var key = 'rizq_service_requests_local';
+    var list = JSON.parse(localStorage.getItem(key)||'[]');
+    list = list.map(function(r){ if(r && r.id===id) r.status = status; return r; });
+    localStorage.setItem(key, JSON.stringify(list));
+    _rizqMergeServiceRequests();
+    if(typeof renderRequests==='function') renderRequests();
+  }catch(e){}
+}
+
+function loadOfficeServiceDeskForm(){
+  var desk = { enabled: true, formTitle: '', formHint: '', docsChannel: 'whatsapp' };
+  try{
+    var saved = JSON.parse(localStorage.getItem('rizq_service_desk_'+SESSION_ID)||'null');
+    if(saved) desk = Object.assign(desk, saved);
+  }catch(e){}
+  if(OFFICE && OFFICE.serviceDesk) desk = Object.assign(desk, OFFICE.serviceDesk);
+  var t = document.getElementById('desk-form-title');
+  var h = document.getElementById('desk-form-hint');
+  var c = document.getElementById('desk-docs-channel');
+  var en = document.getElementById('desk-enabled');
+  if(t) t.value = desk.formTitle || '';
+  if(h) h.value = desk.formHint || '';
+  if(c) c.value = desk.docsChannel || 'whatsapp';
+  if(en) en.checked = desk.enabled !== false;
+}
+
+function saveOfficeServiceDesk(){
+  var desk = {
+    enabled: !!(document.getElementById('desk-enabled') && document.getElementById('desk-enabled').checked),
+    formTitle: ((document.getElementById('desk-form-title')||{}).value||'').trim(),
+    formHint: ((document.getElementById('desk-form-hint')||{}).value||'').trim(),
+    docsChannel: ((document.getElementById('desk-docs-channel')||{}).value||'whatsapp')
+  };
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  var done = function(out){
+    if(OFFICE) OFFICE.serviceDesk = out || desk;
+    showToast(_t2('✅ تم حفظ هوية غرفة الطلبات','✅ Identité du bureau de demandes enregistrée'), 'success');
+  };
+  if(window.RizqServiceDesk){
+    RizqServiceDesk.saveDeskSettings(SESSION_ID, token, desk).then(done).catch(function(){ done(desk); });
+  } else {
+    try{ localStorage.setItem('rizq_service_desk_'+SESSION_ID, JSON.stringify(desk)); }catch(e){}
+    done(desk);
+  }
 }
 
 function _rizqSendOfficeThreadReply(threadKey){

@@ -664,6 +664,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_site_banner.js"></script>
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
+  <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 </head>
@@ -899,24 +900,21 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         </div>
       </div>
 
-      <!-- Request Box -->
-      <div class="req-box">
-        <div style="font-size:14px;font-weight:800;color:var(--teal);margin-bottom:5px" id="req-title" data-t="req-title">📩 طلب استشارة مجانية</div>
-        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="req-sub" data-t="req-sub">أرسل تفاصيلك وسنتواصل معك خلال ساعتين</div>
+      <!-- Request Box — غرفة الطلبات الموحّدة -->
+      <div class="req-box" id="office-service-desk">
+        <div style="font-size:14px;font-weight:800;color:var(--teal);margin-bottom:5px" id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="req-sub" data-desk="hint" data-t="req-sub">أدخل بياناتك وسنتواصل معك — الوثائق عبر واتساب أو إيميل المكتب</div>
         <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn">إرسال طلب ←</button>
         <div class="req-form" id="req-form">
-          <input class="req-input" id="rf-name" placeholder="اسمك الكامل *" style="margin-top:14px"/ data-ph="rf-name">
-          <input dir="ltr" class="req-input" id="rf-phone" placeholder="+222…" data-ph="rf-phone-ph"/>
+          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="margin-top:14px" data-ph="rf-name"/>
+          <input dir="ltr" class="req-input" id="rf-phone" placeholder="الهاتف *" data-ph="rf-phone-ph"/>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" placeholder="واتساب (إن اختلف عن الهاتف)" data-ph="rf-whatsapp"/>
+          <input dir="ltr" class="req-input" id="rf-email" type="email" placeholder="البريد الإلكتروني (اختياري)" data-ph="rf-email"/>
           <select class="req-input" id="rf-service">
             <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
-            <option id="rf-svc-opt1" data-t="rf-svc-opt1">تأمين السيارات الخاصة</option>
-            <option id="rf-svc-opt2" data-t="rf-svc-opt2">تأمين الشاحنات والنقل</option>
-            <option id="rf-svc-opt3" data-t="rf-svc-opt3">تأمين الآلات الثقيلة</option>
-            <option id="rf-svc-opt4" data-t="rf-svc-opt4">تجديد رخص التسيير</option>
-            <option id="rf-svc-opt5" data-t="rf-svc-opt5">خبرة الأضرار والحوادث</option>
-            <option id="rf-svc-opt6" data-t="rf-svc-opt6">تأمين الدراجات النارية</option>
           </select>
-          <textarea class="req-input" id="rf-msg" placeholder="تفاصيل إضافية..." style="min-height:70px;resize:none" data-ph="rf-msg"></textarea>
+          <textarea class="req-input" id="rf-msg" placeholder="تفاصيل الطلب..." style="min-height:70px;resize:none" data-ph="rf-msg"></textarea>
+          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 الوثائق تُرسل عبر واتساب أو إيميل المكتب بعد الإرسال — لا تُرفع على سيرفر رزق.</div>
           <button class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب</button>
           <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
         </div>
@@ -1123,14 +1121,19 @@ function calcToRequest(){
 
 function _officePrefactureSeller(){
   var sid = '';
-  try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
+  try { sid = new URLSearchParams(location.search).get('id') || window._rizqOfficeAccountId || ''; } catch (e) { sid = window._rizqOfficeAccountId || ''; }
   var sname = (document.getElementById('office-name') || document.getElementById('hc-name') || {}).textContent || _t2('مكتب رزق','Bureau Rizq');
   var phone = '';
   try {
     var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa');
     if (wa && wa.href) phone = wa.href.replace(/.*wa\.me\//,'').split('?')[0];
   } catch (e2) {}
-  return { id: sid, name: sname, phone: phone };
+  return {
+    id: sid,
+    name: sname,
+    phone: phone,
+    paymentMethods: Array.isArray(window._rizqOfficePaymentMethods) ? window._rizqOfficePaymentMethods : []
+  };
 }
 
 function _runPrefacture(fn){
@@ -1167,6 +1170,11 @@ function issueOfficePrefactureFromCalc(){
       sellerAccountId: s.id,
       sellerName: s.name,
       sellerPhone: s.phone,
+      paymentMethods: s.paymentMethods,
+      paymentTerms: _t2(
+        'الدفع مباشرة لحساب مقدّم الخدمة عبر الطرق أدناه — رزق وسيط نشر فقط.',
+        'Paiement direct au prestataire via les moyens ci-dessous — Rizq est uniquement un intermédiaire de publication.'
+      ),
       lines: [{ name: label, qty: 1, unitPrice: mid }],
       buyerNote: _t2('تقدير أولي من مقدّر التكلفة — قابل للتأكيد','Estimation initiale — à confirmer'),
       meta: { source: 'office-calc' }
@@ -1190,6 +1198,11 @@ function issueOfficePrefactureFromRequest(){
       sellerAccountId: s.id,
       sellerName: s.name,
       sellerPhone: s.phone,
+      paymentMethods: s.paymentMethods,
+      paymentTerms: _t2(
+        'الدفع مباشرة لحساب مقدّم الخدمة عبر الطرق أدناه — رزق وسيط نشر فقط.',
+        'Paiement direct au prestataire via les moyens ci-dessous — Rizq est uniquement un intermédiaire de publication.'
+      ),
       buyerName: name,
       buyerPhone: phone,
       lines: [{ name: svc, qty: 1, unitPrice: 0 }],
@@ -1209,36 +1222,40 @@ function toggleReqForm(){
   }
 }
 
-// ── submitReq ──────────────────────────────
+// ── submitReq — غرفة الطلبات الموحّدة (خادم + قناة وثائق خارجية) ──
 function submitReq(){
-  var name  = (document.getElementById('rf-name')  || {}).value || '';
-  var phone = (document.getElementById('rf-phone') || {}).value || '';
-  var svc   = (document.getElementById('rf-service')||{}).value || '';
-  var msg   = (document.getElementById('rf-msg')   || {}).value || '';
-  if(!name.trim() || !phone.trim()){
-    showToast(_t2('يرجى ملء الاسم والهاتف على الأقل ✋','Veuillez remplir au moins le nom et le téléphone ✋'), 'error');
+  var btn = document.getElementById('req-submit-btn');
+  if(btn) btn.disabled = true;
+  var accountId = '';
+  try{
+    var p = new URLSearchParams(location.search);
+    accountId = p.get('id') || p.get('office') || window._rizqOfficeAccountId || '';
+  }catch(e){ accountId = window._rizqOfficeAccountId || ''; }
+  var desk = window._rizqOfficeServiceDesk || {};
+  if(!window.RizqServiceDesk){
+    showToast(_t2('تعذّر تحميل نموذج الطلب','Impossible de charger le formulaire'), 'error');
+    if(btn) btn.disabled = false;
     return;
   }
-  // Save to localStorage for office dashboard to review
-  var reqs = [];
-  try{ reqs = JSON.parse(localStorage.getItem('rizq_office_requests') || '[]'); }catch(e){}
-  reqs.unshift({ name:name, phone:phone, service:svc, msg:msg, date:new Date().toISOString() });
-  localStorage.setItem('rizq_office_requests', JSON.stringify(reqs.slice(0,100)));
-  // WhatsApp fallback
-  var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa');
-  var waNum = wa && wa.href ? wa.href.replace('https://wa.me/','').split('?')[0] : '';
-  var waText = _t2('طلب استشارة - ','Demande de consultation - ') + name + ' - ' + phone + (svc ? ' - ' + svc : '') + (msg ? ' - ' + msg : '');
-  window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(waText), '_blank', 'noopener');
-  showToast(_t2('تم إرسال طلبك بنجاح! سنتواصل معك قريباً ✅','✅ Votre demande a été envoyée avec succès ! Nous vous contacterons bientôt'), 'success');
-  // reset form
-  ['rf-name','rf-phone','rf-msg'].forEach(function(id){
-    var el = document.getElementById(id);
-    if(el) el.value = '';
+  RizqServiceDesk.submit({
+    accountId: accountId,
+    source: 'office',
+    desk: desk,
+  }).then(function(res){
+    showToast(res.message || _t2('تم إرسال طلبك بنجاح ✅','✅ Demande envoyée'), 'success');
+    ['rf-name','rf-phone','rf-whatsapp','rf-email','rf-msg'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    var sel = document.getElementById('rf-service');
+    if(sel) sel.selectedIndex = 0;
+    var form = document.getElementById('req-form');
+    if(form) setTimeout(function(){ form.classList.remove('open'); }, 1600);
+  }).catch(function(err){
+    showToast((err && err.message) || _t2('تعذّر إرسال الطلب','Échec de l\'envoi'), 'error');
+  }).finally(function(){
+    if(btn) btn.disabled = false;
   });
-  var sel = document.getElementById('rf-service');
-  if(sel) sel.selectedIndex = 0;
-  var form = document.getElementById('req-form');
-  if(form) setTimeout(function(){ form.classList.remove('open'); }, 1800);
 }
 
 // ── openMaps ───────────────────────────────
@@ -1476,6 +1493,15 @@ function openMaps(){
     function applyGatedOfficeContacts(accountId, acc){
       acc = acc || { contactsLocked: true };
       renderOfficePaymentMethods(acc);
+      window._rizqOfficeAccountId = accountId || window._rizqOfficeAccountId || '';
+      if(acc.serviceDesk) window._rizqOfficeServiceDesk = acc.serviceDesk;
+      if(Array.isArray(acc.paymentMethods)) window._rizqOfficePaymentMethods = acc.paymentMethods;
+      if(window.RizqServiceDesk){
+        RizqServiceDesk.enhanceOfficeForm({
+          desk: window._rizqOfficeServiceDesk || acc.serviceDesk || {},
+          accountName: acc.name || ((document.getElementById('hc-name') || {}).textContent || '')
+        });
+      }
       var locked = !!acc.contactsLocked;
       var phone = acc.phone || '';
       var email = acc.email || '';
@@ -1721,6 +1747,18 @@ function openMaps(){
           }
         }catch(e){}
 
+        window._rizqOfficeAccountId = id;
+        try{
+          var localDesk = JSON.parse(localStorage.getItem('rizq_service_desk_' + id) || 'null');
+          if(localDesk) window._rizqOfficeServiceDesk = localDesk;
+        }catch(eDesk){}
+        if(window.RizqServiceDesk){
+          RizqServiceDesk.enhanceOfficeForm({
+            desk: window._rizqOfficeServiceDesk || {},
+            accountName: acc.name || ''
+          });
+        }
+
         if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
       }catch(e){}
     }
@@ -1763,10 +1801,33 @@ function openMaps(){
               var acc = (pdata.accounts||[]).find(function(a){ return a.id===id && a.type==='office'; });
               if(acc){
                 var fr = isFr();
+                // استعادة الواجهة إن كان bind المحلي قد أخفاها قبل وصول الخادم
+                document.body.classList.remove('rizq-empty-office');
+                ['trust-grid','about-stats','req-box','hero-tags','stats-strip','rating-inline'].forEach(function(cls){
+                  document.querySelectorAll('.'+cls).forEach(function(el){
+                    if(el.style.display === 'none') el.style.display = '';
+                  });
+                });
+                var ratingStrip = document.querySelector('.rating-strip');
+                if(ratingStrip && ratingStrip.style.display === 'none') ratingStrip.style.display = '';
+                window._rizqOfficeAccountId = id;
+                if(acc.serviceDesk) window._rizqOfficeServiceDesk = acc.serviceDesk;
+                if(Array.isArray(acc.paymentMethods)) window._rizqOfficePaymentMethods = acc.paymentMethods;
                 setText('hero-office-name', acc.name);
                 setText('hc-name', acc.name);
-                if(acc.category){ setText('hero-office-spec', acc.category); setText('hc-type', '🏢 '+acc.category); }
+                if(acc.category || acc.activity){
+                  var spec = acc.category || acc.activity;
+                  setText('hero-office-spec', spec);
+                  setText('hc-type', '🏢 '+spec);
+                }
                 if(acc.desc){ setText('hero-desc', acc.desc); setText('about-txt', acc.desc); }
+                else {
+                  var welcome = fr
+                    ? 'Bienvenue sur l’espace professionnel de '+acc.name+' — confiance, qualité et suivi personnalisé.'
+                    : 'مرحباً بك في المساحة المهنية لـ «'+acc.name+'» — ثقة، جودة، ومتابعة خاصة.';
+                  setText('hero-desc', welcome);
+                  setText('about-txt', welcome);
+                }
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr); }
@@ -1781,6 +1842,12 @@ function openMaps(){
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
+                }
+                if(window.RizqServiceDesk){
+                  RizqServiceDesk.enhanceOfficeForm({
+                    desk: window._rizqOfficeServiceDesk || {},
+                    accountName: acc.name || ''
+                  });
                 }
               }
             }
@@ -1894,6 +1961,13 @@ function openMaps(){
           }
         }catch(e){}
 
+        window._rizqOfficeAccountId = id;
+        if(window.RizqServiceDesk){
+          RizqServiceDesk.enhanceOfficeForm({
+            desk: window._rizqOfficeServiceDesk || {},
+            accountName: ((document.getElementById('hc-name') || {}).textContent || '')
+          });
+        }
         if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
       }catch(e){}
     }
