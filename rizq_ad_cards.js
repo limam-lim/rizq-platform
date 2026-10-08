@@ -252,7 +252,7 @@
       +   '<button type="button" class="rzq-adx-fav' + (favOn ? ' is-on' : '') + '" data-ad-id="' + esc(id) + '" aria-label="' + (fr ? 'Favoris' : 'المفضلة') + '" aria-pressed="' + (favOn ? 'true' : 'false') + '">' + (favOn ? '♥' : '♡') + '</button>'
       +   nav
       +   dots
-      +   (price ? '<div class="rzq-adx-price">' + esc(price) + '</div>' : '')
+      +   (price ? '<div class="rzq-adx-price"><span class="rzq-adx-price-pill">' + esc(price) + '</span></div>' : '')
       +   (pin ? '<div class="rzq-adx-badge">' + (fr ? 'Vedette' : 'مميّز') + '</div>' : '')
       +   (viewed ? seenHtml(fr) : '')
       + '</div>';
