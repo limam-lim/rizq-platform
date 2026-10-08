@@ -414,10 +414,14 @@
   padding-top:2px;
 }
 
-/* إيقاف شريط المباشر أثناء التفاعل */
-.cards-track:has(.rzq-adx-media.is-holding),
-.cards-track:has(.rzq-adx-media:hover){
+/* إيقاف شريط المباشر أثناء الضغط فقط — :hover على اللمس يسبب رعدة stop/start */
+.cards-track:has(.rzq-adx-media.is-holding){
   animation-play-state:paused!important;
+}
+@media (hover:hover) and (pointer:fine){
+  .cards-track:has(.rzq-adx-media:hover){
+    animation-play-state:paused!important;
+  }
 }
 
 /* سطح المكتب — بطاقات أقرب للمربع */

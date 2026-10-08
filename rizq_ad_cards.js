@@ -311,11 +311,19 @@
       x0 = e.changedTouches[0].clientX;
     }, { passive: true });
     media.addEventListener('touchend', function (e) {
-      if (x0 == null) return;
-      var dx = e.changedTouches[0].clientX - x0;
+      var startX = x0;
       x0 = null;
+      hold(false);
+      media.classList.remove('is-touch');
+      if (startX == null) return;
+      var dx = e.changedTouches[0].clientX - startX;
       if (Math.abs(dx) < 34) return;
       go(media, dx < 0 ? 1 : -1);
+    }, { passive: true });
+    media.addEventListener('touchcancel', function () {
+      x0 = null;
+      hold(false);
+      media.classList.remove('is-touch');
     }, { passive: true });
 
     media.addEventListener('mouseleave', function () { hold(false); });

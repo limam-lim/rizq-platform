@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.3"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.1"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.2"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -484,15 +484,24 @@ html.rizq-has-announce .section-jump-bar{
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
+  /* مسافة الحلقة بالبكسل بعد القياس — يمنع قفزة/رعدة عند إغلاق الدورة */
+  --rzq-marquee-x:-50%;
 }
-.ticker-wrap:hover .ticker-inner{animation-play-state:paused}
+/* إيقاف عند الهوفر فقط للفأرة الدقيقة — على اللمس :hover اللزج يسبب رعدة stop/start */
+@media (hover:hover) and (pointer:fine){
+  .ticker-wrap:hover .ticker-inner{animation-play-state:paused}
+}
 @keyframes ticker{
   from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-50%,0,0)}
+  to{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
 }
-/* عربي: يسار→يمين | فرنسي: يمين→يسار */
-html[dir="rtl"] .ticker-inner{animation-direction:reverse}
-html[dir="ltr"] .ticker-inner{animation-direction:normal}
+@keyframes ticker-rtl{
+  from{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
+  to{transform:translate3d(0,0,0)}
+}
+/* عربي: يسار→يمين عبر keyframes مخصّصة (بدون animation-direction:reverse) */
+html[dir="rtl"] .ticker-inner{animation-name:ticker-rtl}
+html[dir="ltr"] .ticker-inner{animation-name:ticker}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
 .ticker-item strong{color:var(--gold);font-weight:700}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
@@ -1796,17 +1805,24 @@ html[dir="ltr"] #all-ads-title{
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
+  --rzq-marquee-x:-50%;
 }
-.cards-track:hover{animation-play-state:paused}
+@media (hover:hover) and (pointer:fine){
+  .cards-track:hover{animation-play-state:paused}
+}
 @keyframes slide{
   from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-50%,0,0)}
+  to{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
 }
-/* عربي: الإعلانات تظهر وتتحرك يسار→يمين | فرنسي: العكس يمين→يسار */
+@keyframes slide-rtl{
+  from{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
+  to{transform:translate3d(0,0,0)}
+}
+/* عربي: يسار→يمين | فرنسي: يمين→يسار — بدون reverse لتفادي رعدة إغلاق الدورة */
 html[dir="rtl"] .cards-track,
-html[dir="rtl"] #hero-listings .cards-track{animation-direction:reverse}
+html[dir="rtl"] #hero-listings .cards-track{animation-name:slide-rtl;animation-direction:normal}
 html[dir="ltr"] .cards-track,
-html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal}
+html[dir="ltr"] #hero-listings .cards-track{animation-name:slide;animation-direction:normal}
 html[dir="rtl"] .cards-track .ad-card{direction:rtl}
 html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 /* أثناء الحركة: لا translateY على البطاقة — يقلل الارتعاش */
@@ -1814,8 +1830,10 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   transform:translateZ(0);
   backface-visibility:hidden;
 }
-.cards-track .ad-card:hover{
-  transform:translateZ(0) scale(1.015);
+@media (hover:hover) and (pointer:fine){
+  .cards-track .ad-card:hover{
+    transform:translateZ(0) scale(1.015);
+  }
 }
 
 /* نوافذ مباشر — أصغر قليلاً */
@@ -2082,8 +2100,13 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
+  --rzq-marquee-x:-50%;
 }
-.price-ticker-wrap:hover .price-ticker-inner{animation-play-state:paused}
+@media (hover:hover) and (pointer:fine){
+  .price-ticker-wrap:hover .price-ticker-inner{animation-play-state:paused}
+}
+html[dir="rtl"] .price-ticker-inner{animation-name:ticker-rtl}
+html[dir="ltr"] .price-ticker-inner{animation-name:ticker}
 .price-ticker-item{display:flex;align-items:center;gap:9px;padding:0 30px;white-space:nowrap;font-size:13px;font-weight:700;color:#fff}
 .price-ticker-item .pt-arrow{font-weight:900;font-size:12px}
 .price-ticker-item .pt-up{color:#6ee7a8}
@@ -2617,8 +2640,8 @@ html[dir="ltr"] .listings-section .section-desc{
     animation:slide 55s linear infinite!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
-  html[dir="rtl"] #hero-listings .cards-track{animation-direction:reverse!important}
-  html[dir="ltr"] #hero-listings .cards-track{animation-direction:normal!important}
+  html[dir="rtl"] #hero-listings .cards-track{animation-name:slide-rtl!important;animation-direction:normal!important}
+  html[dir="ltr"] #hero-listings .cards-track{animation-name:slide!important;animation-direction:normal!important}
   #hero-listings .cards-track .ad-card{
     width:152px!important;min-width:152px!important;max-width:152px!important;
     flex:0 0 152px!important;scroll-snap-align:none!important;border-radius:14px!important;
@@ -3622,10 +3645,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
   padding:4px 14px;
+  --rzq-marquee-x:-50%;
 }
-.rizq-styles-rail:hover{animation-play-state:paused}
-html[dir="rtl"] .rizq-styles-rail{animation-direction:reverse}
-html[dir="ltr"] .rizq-styles-rail{animation-direction:normal}
+@media (hover:hover) and (pointer:fine){
+  .rizq-styles-rail:hover{animation-play-state:paused}
+}
+html[dir="rtl"] .rizq-styles-rail{animation-name:slide-rtl;animation-direction:normal}
+html[dir="ltr"] .rizq-styles-rail{animation-name:slide;animation-direction:normal}
 html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
 html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-styles-rail.is-empty{
@@ -3792,6 +3818,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     margin:0!important;padding:2px 10px!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
+  html[dir="rtl"] .rizq-styles-rail{animation-name:slide-rtl!important;animation-direction:normal!important}
+  html[dir="ltr"] .rizq-styles-rail{animation-name:slide!important;animation-direction:normal!important}
   .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
     width:156px!important;min-width:156px!important;max-width:156px!important;
@@ -3885,7 +3913,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
-<script src="rizq_ad_cards.js?v=2.2"></script>
+<script src="rizq_ad_cards.js?v=2.3"></script>
 </head>
 <body>
 
@@ -5957,6 +5985,27 @@ function trAd(a){
   };
 }
 
+/** قياس نصف المسار بالبكسل لحلقة سلسة بلا قفزة عند إغلاق الدورة */
+function syncMarqueeShift(el){
+  if(!el || el.classList.contains('is-empty')) return;
+  try{
+    var w = el.scrollWidth || 0;
+    if(w < 40) return;
+    var half = Math.round(w / 2);
+    if(half < 20) return;
+    el.style.setProperty('--rzq-marquee-x', (-half) + 'px');
+  }catch(e){}
+}
+function syncAllMarquees(){
+  [
+    document.getElementById('cards-track'),
+    document.getElementById('ticker'),
+    document.getElementById('price-ticker'),
+    document.getElementById('rizq-styles-rail'),
+    document.getElementById('rizq-srm-rail')
+  ].forEach(syncMarqueeShift);
+}
+
 function buildCards(){
   const track=document.getElementById('cards-track');
   if(!track) return;
@@ -6002,8 +6051,17 @@ function buildCards(){
     track.appendChild(c);
   });
   if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(track);
+  requestAnimationFrame(function(){
+    syncMarqueeShift(track);
+    requestAnimationFrame(function(){ syncMarqueeShift(track); });
+  });
 }
 buildCards();
+window.addEventListener('load', function(){ setTimeout(syncAllMarquees, 120); });
+window.addEventListener('resize', function(){
+  if(syncAllMarquees._t) clearTimeout(syncAllMarquees._t);
+  syncAllMarquees._t = setTimeout(syncAllMarquees, 180);
+});
 
 function buildFeaturedCards(){
   /* توافق خلفي — قسم الإعلانات المميزة */
@@ -6796,6 +6854,7 @@ function buildStyleIdeas(reshuffle){
     try { _styStartAutoRefresh(); } catch(e3) {}
   }
   _styUpdateTick(fr);
+  requestAnimationFrame(function(){ syncMarqueeShift(rail); });
 }
 try { buildStyleIdeas(false); } catch(eSty) {}
 try { _styStartAutoRefresh(); } catch(eAuto) {}
@@ -7126,6 +7185,7 @@ function buildShowroomModels(reshuffle){
     try { _srmStartAutoRefresh(); } catch(e3) {}
   }
   _srmUpdateTick(fr);
+  requestAnimationFrame(function(){ syncMarqueeShift(rail); });
 }
 try { buildShowroomModels(false); } catch(eSrm) {}
 try { _srmStartAutoRefresh(); } catch(eSrmAuto) {}
@@ -7944,6 +8004,10 @@ function renderTickerFromAds(){
     var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
     document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
   } catch (e) {}
+  requestAnimationFrame(function(){
+    syncMarqueeShift(inner);
+    requestAnimationFrame(function(){ syncMarqueeShift(inner); });
+  });
 }
 function applyCatCountsFromAds(){
   var counts = {};
@@ -12010,6 +12074,7 @@ function renderPriceTicker(){
     const un = it.cat==='currencies' ? it.unit : trPriceUnit(it.unit);
     return `<span class="ticker-item">${escapeHtml(nm)} <strong>${Number(it.price||0).toLocaleString('en-US')}</strong> ${escapeHtml(un)} ${priceTrendHTML(it.trend)}</span>`;
   }).join('');
+  requestAnimationFrame(function(){ syncMarqueeShift(track); });
 }
 function updatePriceTimestamp(){
   const el = document.getElementById('prices-updated-date');
@@ -13439,8 +13504,13 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(strip._rzqScrollBound) return;
       strip._rzqScrollBound = true;
       var paused = false;
-      strip.addEventListener('mouseenter', function(){ paused = true; });
-      strip.addEventListener('mouseleave', function(){ paused = false; });
+      var pos = 0; /* تراكم عشري — scrollLeft الصحيح يسبب رعدة عند += 0.45 */
+      var finePointer = false;
+      try { finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches; } catch(eM){}
+      if(finePointer){
+        strip.addEventListener('mouseenter', function(){ paused = true; });
+        strip.addEventListener('mouseleave', function(){ paused = false; });
+      }
       strip.addEventListener('touchstart', function(){ paused = true; }, {passive:true});
       strip.addEventListener('touchend', function(){ setTimeout(function(){ paused = false; }, 1600); }, {passive:true});
       /* عربي (dir=rtl): حركة يسار→يمين | فرنسي (dir=ltr): يمين→يسار */
@@ -13450,20 +13520,28 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       function step(){
         if(!paused && track.scrollWidth > strip.clientWidth){
           var half = track.scrollWidth / 2;
-          var sign = flowSign();
-          strip.scrollLeft += 0.45 * sign;
-          if(sign > 0){
-            if(strip.scrollLeft >= half) strip.scrollLeft = 0;
-          } else if(strip.scrollLeft <= 0){
-            strip.scrollLeft = half;
+          if(half > 1){
+            var sign = flowSign();
+            pos += 0.45 * sign;
+            if(sign > 0){
+              if(pos >= half) pos -= half;
+            } else {
+              if(pos <= 0) pos += half;
+            }
+            strip.scrollLeft = pos;
           }
         }
         requestAnimationFrame(step);
       }
       /* ابدأ من الطرف المناسب حتى يظهر أول بطاقة في جهة التدفق */
       try {
-        if(flowSign() < 0) strip.scrollLeft = Math.max(0, track.scrollWidth / 2 - strip.clientWidth);
-        else strip.scrollLeft = 0;
+        if(flowSign() < 0){
+          pos = Math.max(0, track.scrollWidth / 2 - strip.clientWidth);
+          strip.scrollLeft = pos;
+        } else {
+          pos = 0;
+          strip.scrollLeft = 0;
+        }
       } catch (e0) {}
       requestAnimationFrame(step);
     }
