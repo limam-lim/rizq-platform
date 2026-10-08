@@ -57,6 +57,8 @@ a{text-decoration:none;color:inherit}
 .sb-icon{font-size:17px;width:22px;text-align:center}
 .sb-badge{margin-right:auto;background:var(--gold);color:var(--royal-dark);font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px}
 .sb-badge.red{background:#ef4444;color:#fff}
+.req-item{border:1px solid rgba(27,58,107,.08);border-right:3px solid var(--rc,var(--royal));border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.req-meta{font-size:12px;color:var(--text-muted)}
 
 .sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
 .sb-logout{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;transition:color .2s}
@@ -348,6 +350,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_account_payments.js"></script>
+<script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
 
   <script src="rizq_i18n_data.js"></script>
@@ -413,6 +416,7 @@ textarea.form-input{resize:vertical;min-height:90px}
   <nav class="sb-nav">
     <div class="sb-section" data-t="sb-sec-main">الرئيسية</div>
     <div class="sb-item active" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span data-t="sb-overview">نظرة عامة</span></div>
+    <div class="sb-item" onclick="showPanel('requests',this)"><span class="sb-icon">📩</span><span data-t="sb-requests">طلبات التواصل</span><span class="sb-badge" id="req-badge" style="display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('messages',this)"><span class="sb-icon">💬</span><span data-t="sb-messages">الرسائل</span><span class="sb-badge red" id="msg-badge" style="display:none">0</span></div>
 
     <div class="sb-section" data-t="sb-sec-store">المحل</div>
@@ -486,6 +490,10 @@ textarea.form-input{resize:vertical;min-height:90px}
           <div class="qa-icon" style="background:linear-gradient(135deg,#0f9960,#16a34a)"><span>📤</span></div>
           <div class="qa-label" data-t="qa-share-store">مشاركة المحل</div>
         </div>
+        <div class="qa-card" onclick="showPanel('requests',null)">
+          <div class="qa-icon" style="background:linear-gradient(135deg,#1B3A6B,#234d8f)"><span>📩</span></div>
+          <div class="qa-label" data-t="qa-requests">الطلبات</div>
+        </div>
         <div class="qa-card" onclick="showPanel('messages',null)">
           <div class="qa-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><span>💬</span></div>
           <div class="qa-label" data-t="qa-messages">الرسائل</div>
@@ -554,6 +562,41 @@ textarea.form-input{resize:vertical;min-height:90px}
           <div class="card-title" data-t="messages-panel-title">💬 الرسائل والاستفسارات</div>
         </div>
         <div id="messages-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ SERVICE DESK / REQUESTS ══ -->
+    <div class="panel" id="panel-requests">
+      <div class="card" style="margin-bottom:16px;border:1px solid rgba(201,168,76,.22);background:linear-gradient(135deg,rgba(15,35,71,.02),rgba(201,168,76,.05))">
+        <div class="card-header">
+          <div class="card-title">✨ غرفة طلباتي — هويتي</div>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55">سمِّ نموذج الطلب باسم محلك. الزائر يشعر أنه على منصتك — والوثائق تبقى عبر واتساب أو إيميلك فقط، خارج سيرفر رزق.</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">عنوان النموذج (اختياري)</label>
+          <input class="form-input" id="desk-form-title" maxlength="120" placeholder="مثال: طلب خدمة لدى محل …"/>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">نص توضيحي قصير</label>
+          <input class="form-input" id="desk-form-hint" maxlength="240" placeholder="كيف تريد أن يفهم الزائر خطوات الطلب"/>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label class="form-label">قناة الوثائق بعد الإرسال</label>
+          <select class="form-input" id="desk-docs-channel">
+            <option value="whatsapp">واتساب</option>
+            <option value="email">إيميل</option>
+            <option value="both">واتساب + إيميل</option>
+          </select>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:14px;cursor:pointer">
+          <input type="checkbox" id="desk-enabled" checked/>
+          <span>تفعيل غرفة الطلبات على صفحتي العامة</span>
+        </label>
+        <button class="btn btn-primary" type="button" onclick="saveStoreServiceDesk()">💾 حفظ هوية غرفة الطلبات</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" data-t="req-panel-title">📩 طلبات التواصل</div></div>
+        <div id="requests-list"></div>
       </div>
     </div>
 
@@ -999,7 +1042,13 @@ const DEMO_ACCOUNT = {
   wilaya: "نواكشوط",
   type: "store",
   status: "approved",
-  desc: "واجهة محل تجريبية للترويج فقط — ليست بيانات حقيقية"
+  desc: "واجهة محل تجريبية للترويج فقط — ليست بيانات حقيقية",
+  serviceDesk: {
+    enabled: true,
+    formTitle: 'طلب خدمة — محل النجمة',
+    formHint: 'بياناتك سرية. الوثائق عبر واتساب أو إيميل المحل فقط — لا تُحفظ على سيرفر رزق.',
+    docsChannel: 'whatsapp'
+  }
 };
 
 const DEMO_PRODUCTS = [
@@ -1326,6 +1375,7 @@ function _initWithAccount(acc){
   // الآن بعد حل window.REAL_ACCESS_TOKEN بدل التوازي معه.
   if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){
     _rizqMergeCatalogFromBackend();
+    _rizqMergeServiceRequests();
     if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
     if(typeof RizqAccountPayments !== 'undefined' && acc.id){
       RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || SESSION_TOKEN).then(function(methods){
@@ -1352,6 +1402,13 @@ function _initWithAccount(acc){
   renderPackagesDisplay();
   renderVideoPackagesDisplay();
   if(!IS_DEMO) _rizqRenderAdsStatus(acc);
+  // غرفة الطلبات — هوية + صندوق الوارد
+  _rizqMergeServiceRequests();
+  loadStoreServiceDeskForm();
+  var serviceUnread = (Array.isArray(window._rizqStoreServiceRequests))
+    ? window._rizqStoreServiceRequests.filter(function(r){ return r.status === 'new'; }).length : 0;
+  var rb = document.getElementById('req-badge');
+  if(rb && serviceUnread > 0){ rb.textContent = serviceUnread; rb.style.display = ''; }
   // Welcome banner
   var wbn=document.getElementById('wb-name'); var wbs=document.getElementById('wb-sub');
   if(wbn) wbn.textContent=acc.name||_t2('محلي','Ma boutique');
@@ -1376,7 +1433,7 @@ function _initWithAccount(acc){
 
 // ══ PANELS ══
 const TITLES = {
-  overview:'📊 نظرة عامة', messages:'💬 الرسائل',
+  overview:'📊 نظرة عامة', requests:'📩 طلبات التواصل', messages:'💬 الرسائل',
   products:'📦 منتجاتي', profile:'🏪 معلومات المحل',
   hours:'🕐 ساعات العمل', photos:'📸 صور المحل',
   subscription:'💳 اشتراكي', settings:'⚙️ الإعدادات',
@@ -1385,7 +1442,7 @@ const TITLES = {
   verifiedplus:'🛡️ شارة موثّق⁺'
 };
 const TITLES_FR = {
-  overview:'📊 Vue d\'ensemble', messages:'💬 Messages',
+  overview:'📊 Vue d\'ensemble', requests:'📩 Demandes de contact', messages:'💬 Messages',
   products:'📦 Mes produits', profile:'🏪 Infos boutique',
   hours:'🕐 Horaires', photos:'📸 Photos boutique',
   subscription:'💳 Mon abonnement', settings:'⚙️ Paramètres',
@@ -1408,6 +1465,7 @@ function showPanel(id, el){
   if(id==='overview') renderOverview();
   if(id==='products') renderProducts();
   if(id==='messages') renderMessages();
+  if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
   if(id==='photos') renderPhotos();
   if(id==='subscription'){ renderSubscriptionPanel(); renderPackagesDisplay(); renderVideoPackagesDisplay(); }
   if(id==='mypayments'){renderRizqPayment('rzq-pay-section');if(typeof renderMyPayments==='function')renderMyPayments();}
@@ -2534,6 +2592,161 @@ function submitRenewal(){
   var el = document.getElementById('packages-display');
   if(el) el.scrollIntoView({behavior:'smooth'});
   else showToast(_t2('اختر باقة من القائمة أدناه للتجديد','Choisissez un forfait ci-dessous pour renouveler'),'error');
+}
+
+// ══ SERVICE DESK (غرفة الطلبات) ══
+function _serviceReqStatusLabel(st){
+  var map = {
+    new: _t2('جديد','Nouveau'),
+    in_progress: _t2('قيد المعالجة','En cours'),
+    done: _t2('منجز','Terminé'),
+    rejected: _t2('مرفوض','Refusé')
+  };
+  return map[st] || st || '';
+}
+
+function renderStoreServiceRequests(){
+  var serviceReqs = Array.isArray(window._rizqStoreServiceRequests) ? window._rizqStoreServiceRequests : [];
+  var unreadService = serviceReqs.filter(function(r){ return r.status === 'new'; }).length;
+  var rb = document.getElementById('req-badge');
+  if(rb){
+    if(unreadService > 0){ rb.textContent = unreadService; rb.style.display = ''; }
+    else rb.style.display = 'none';
+  }
+  var el = document.getElementById('requests-list');
+  if(!el) return;
+  if(!serviceReqs.length){
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text-muted)"><div style="font-size:48px;margin-bottom:10px">📩</div><p>'+_t2('لا توجد طلبات بعد','Aucune demande pour le moment')+'</p></div>';
+    return;
+  }
+  var statusColors = { new:'#1B3A6B', in_progress:'#f59e0b', done:'#10b981', rejected:'#dc2626' };
+  el.innerHTML = serviceReqs.map(function(r){
+    var phone = r.buyerWhatsapp || r.buyerPhone || '';
+    var timeStr = r.createdAt ? new Date(r.createdAt).toLocaleString(localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '';
+    var st = r.status || 'new';
+    return '<div class="req-item" style="--rc:'+(st==='new'?'var(--royal)':'rgba(27,58,107,.2)')+'">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--navy)">'+escapeHtml(r.buyerName||_t2('زبون','Client'))+'</span>'
+      + (r.service?'<span style="font-size:11px;background:rgba(27,58,107,.08);color:var(--navy);padding:2px 8px;border-radius:10px">'+escapeHtml(r.service)+'</span>':'')
+      + (r.templateName?'<span style="font-size:10px;background:rgba(201,168,76,.15);color:#8a6a1a;padding:2px 8px;border-radius:10px">'+escapeHtml(r.templateName)+'</span>':'')
+      + '<span style="font-size:10px;font-weight:800;color:#fff;background:'+(statusColors[st]||'#64748b')+';padding:2px 8px;border-radius:10px">'+_serviceReqStatusLabel(st)+'</span>'
+      + '<span style="font-size:11px;color:#9aa5b8;margin-right:auto">'+timeStr+'</span>'
+      + '</div>'
+      + '<div class="req-meta">'+escapeHtml(r.message||'')+'</div>'
+      + '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;font-size:12px">'
+      + (phone?'<a href="https://wa.me/'+String(phone).replace(/\D/g,'')+'" target="_blank" rel="noopener" style="color:#10b981;font-weight:600">📞 WhatsApp '+escapeHtml(phone)+'</a>':'')
+      + (r.buyerEmail?'<a href="mailto:'+escapeHtml(r.buyerEmail)+'" style="color:#1B3A6B;font-weight:600">✉️ '+escapeHtml(r.buyerEmail)+'</a>':'')
+      + (r.id?'<span style="color:#9aa5b8;font-family:monospace">'+escapeHtml(r.id)+'</span>':'')
+      + '</div>'
+      + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'in_progress\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('قيد المعالجة','En cours')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'done\')" style="padding:6px 10px;border:none;border-radius:8px;background:#d1fae5;color:#065f46;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('منجز','Terminé')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'rejected\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fee2e2;color:#991b1b;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('رفض','Refuser')+'</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function _rizqMergeServiceRequests(){
+  try{
+    if(IS_DEMO){
+      window._rizqStoreServiceRequests = [
+        {id:'SRQ-STORE-01',buyerName:'محمد ولد أحمد',buyerPhone:'22244115566',buyerWhatsapp:'22244115566',buyerEmail:'mohamed.demo@example.mr',service:'استفسار عن منتج',message:'هل يتوفر مقاس XL من الدراعة؟',templateName:'طلب خدمة — محل النجمة',status:'new',createdAt:new Date().toISOString()},
+        {id:'SRQ-STORE-02',buyerName:'مريم بنت سالم',buyerPhone:'22233778899',buyerWhatsapp:'22233778899',buyerEmail:'',service:'طلب توصيل',message:'أرغب بالتوصيل لنواذيبو — الوثائق عبر واتساب',templateName:'طلب خدمة — محل النجمة',status:'in_progress',createdAt:new Date(Date.now()-864e5).toISOString()},
+        {id:'SRQ-STORE-03',buyerName:'عبد الرحمن',buyerPhone:'22236554433',buyerWhatsapp:'22236554433',buyerEmail:'abdou.demo@example.mr',service:'حجز كمية',message:'أحتاج 10 عطور شرقية للجملة',templateName:'طلب خدمة — محل النجمة',status:'done',createdAt:new Date(Date.now()-2*864e5).toISOString()}
+      ];
+      if(typeof renderStoreServiceRequests==='function') renderStoreServiceRequests();
+      return;
+    }
+    if(!SESSION_ID) return;
+    var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+    if(window.RizqServiceDesk && token){
+      RizqServiceDesk.listMine(SESSION_ID, token).then(function(list){
+        window._rizqStoreServiceRequests = Array.isArray(list) ? list : [];
+        if(typeof renderStoreServiceRequests==='function') renderStoreServiceRequests();
+      });
+      return;
+    }
+    try{
+      var local = JSON.parse(localStorage.getItem('rizq_service_requests_local')||'[]');
+      window._rizqStoreServiceRequests = local.filter(function(r){ return r && r.accountId === SESSION_ID; });
+    }catch(e2){ window._rizqStoreServiceRequests = []; }
+    if(typeof renderStoreServiceRequests==='function') renderStoreServiceRequests();
+  }catch(e){}
+}
+
+function _rizqSetServiceReqStatus(id, status){
+  if(!id || !status) return;
+  if(IS_DEMO){
+    var list = Array.isArray(window._rizqStoreServiceRequests) ? window._rizqStoreServiceRequests : [];
+    window._rizqStoreServiceRequests = list.map(function(r){ if(r && r.id===id) r.status = status; return r; });
+    if(typeof renderStoreServiceRequests==='function') renderStoreServiceRequests();
+    showToast(_t2('تم تحديث حالة الطلب','Statut mis à jour'), 'success');
+    return;
+  }
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  if(window.RizqServiceDesk && token){
+    RizqServiceDesk.setStatus(id, status, token).then(function(){
+      _rizqMergeServiceRequests();
+      showToast(_t2('تم تحديث حالة الطلب','Statut mis à jour'), 'success');
+    }).catch(function(){
+      showToast(_t2('تعذّر تحديث الحالة','Échec de la mise à jour'), 'error');
+    });
+    return;
+  }
+  try{
+    var key = 'rizq_service_requests_local';
+    var localList = JSON.parse(localStorage.getItem(key)||'[]');
+    localList = localList.map(function(r){ if(r && r.id===id) r.status = status; return r; });
+    localStorage.setItem(key, JSON.stringify(localList));
+    _rizqMergeServiceRequests();
+  }catch(e){}
+}
+
+function loadStoreServiceDeskForm(){
+  var desk = { enabled: true, formTitle: '', formHint: '', docsChannel: 'whatsapp' };
+  var deskKey = SESSION_ID || (STORE && STORE.id) || 'demo';
+  try{
+    var saved = JSON.parse(localStorage.getItem('rizq_service_desk_'+deskKey)||'null');
+    if(saved) desk = Object.assign(desk, saved);
+  }catch(e){}
+  if(STORE && STORE.serviceDesk) desk = Object.assign(desk, STORE.serviceDesk);
+  var t = document.getElementById('desk-form-title');
+  var h = document.getElementById('desk-form-hint');
+  var c = document.getElementById('desk-docs-channel');
+  var en = document.getElementById('desk-enabled');
+  if(t) t.value = desk.formTitle || '';
+  if(h) h.value = desk.formHint || '';
+  if(c) c.value = desk.docsChannel || 'whatsapp';
+  if(en) en.checked = desk.enabled !== false;
+}
+
+function saveStoreServiceDesk(){
+  var desk = {
+    enabled: !!(document.getElementById('desk-enabled') && document.getElementById('desk-enabled').checked),
+    formTitle: ((document.getElementById('desk-form-title')||{}).value||'').trim(),
+    formHint: ((document.getElementById('desk-form-hint')||{}).value||'').trim(),
+    docsChannel: ((document.getElementById('desk-docs-channel')||{}).value||'whatsapp')
+  };
+  var deskId = SESSION_ID || (STORE && STORE.id) || 'demo';
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  var done = function(out){
+    if(STORE) STORE.serviceDesk = out || desk;
+    try{
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      var idx = accs.findIndex(function(a){ return a && a.id === deskId; });
+      if(idx >= 0){
+        accs[idx].serviceDesk = out || desk;
+        localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+      }
+    }catch(e){}
+    showToast(_t2('✅ تم حفظ هوية غرفة الطلبات','✅ Identité du bureau de demandes enregistrée'), 'success');
+  };
+  if(window.RizqServiceDesk){
+    RizqServiceDesk.saveDeskSettings(deskId, token, desk).then(done).catch(function(){ done(desk); });
+  } else {
+    try{ localStorage.setItem('rizq_service_desk_'+deskId, JSON.stringify(desk)); }catch(e){}
+    done(desk);
+  }
 }
 
 // ══ MESSAGES ══
