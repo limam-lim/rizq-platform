@@ -732,22 +732,31 @@ const IS_DEMO=params.get('demo')==='1';
 })();
 
 
-const DEMO_ACC={id:'DEMO_OFF',token:'DEMO',status:'approved',type:'office',
-  name:'مكتب المستقبل — بيانات ترويجية',owner:'أحمد ولد محمد',
-  phone:'+222 33 44 55 66',email:'demo-office@rizq.mr',city:'نواكشوط',
-  ninea:'MR12345',activity:'خدمات إدارية',
-  desc:'واجهة مكتب تجريبية للترويج فقط — ليست بيانات حقيقية',
-  trial_ends:new Date(Date.now()+2*86400000).toISOString()};
+const DEMO_ACC={id:'demo_law',token:'DEMO',status:'approved',type:'office',
+  name:'مكتب العدالة للمحاماة',owner:'الأستاذ محمد ولد ابراهيم',
+  phone:'+222 36 11 22 33',email:'contact@aladala-demo.mr',city:'نواكشوط',
+  address:'تفرغ زينة — نواكشوط',
+  ninea:'MR-DEMO-LAW',activity:'محاماة واستشارات قانونية',
+  desc:'مكتب محاماة (بيانات تجريبية لمعاينة مشروع التخرج) — مساحة مهنية خاصة بغرفة طلبات باسم المكتب.',
+  serviceDesk:{
+    enabled:true,
+    formTitle:'طلب استشارة — مكتب العدالة للمحاماة',
+    formHint:'بياناتك سرية. الوثائق عبر واتساب أو إيميل المكتب فقط — لا تُحفظ على سيرفر رزق.',
+    docsChannel:'whatsapp'
+  },
+  trial_ends:new Date(Date.now()+8*86400000).toISOString()};
 
 const DEMO_SERVICES=[
-  {id:'DS1',name:'استخراج وثائق إدارية',price:5000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
-  {id:'DS2',name:'تسجيل شركات',price:25000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
-  {id:'DS3',name:'استشارة قانونية أولية',price:8000,desc:'بيانات ترويجية فقط',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')}
+  {id:'DS1',name:'استشارة قانونية',price:15000,desc:'جلسة سرية 45 دقيقة',emoji:'⚖️',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS2',name:'صياغة عقد',price:45000,desc:'عقود مدنية وتجارية',emoji:'📜',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS3',name:'تمثيل أمام المحكمة',price:0,desc:'متابعة قضايا ومرافعات — حسب القضية',emoji:'🏛️',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS4',name:'تأسيس شركة',price:85000,desc:'النظام الأساسي + الإيداع القانوني',emoji:'🏢',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')}
 ];
 
 const DEMO_REQS=[
-  {id:'DR1',name:'زائر تجريبي',service:'استخراج وثائق إدارية',phone:'44XXXXXX',note:'طلب تجريبي — بيانات ترويجية',date:new Date().toLocaleDateString('ar-MR-u-nu-latn'),status:'new'},
-  {id:'DR2',name:'عميل تجريبي',service:'تسجيل شركات',phone:'45XXXXXX',note:'طلب تجريبي — بيانات ترويجية',date:new Date().toLocaleDateString('ar-MR-u-nu-latn'),status:'done'}
+  {id:'DR1',name:'فاطمة منت أحمد',service:'استشارة قانونية',phone:'22244112233',msg:'أحتاج استشارة حول عقد إيجار تجاري',time:'اليوم 10:20',read:false},
+  {id:'DR2',name:'سيدي محمد',service:'تأسيس شركة',phone:'22233998877',msg:'أرغب في تأسيس SARL — الوثائق جاهزة عبر واتساب',time:'أمس',read:true},
+  {id:'DR3',name:'آمنة بنت عبدالله',service:'صياغة عقد',phone:'22236655443',msg:'عقد شراكة بين طرفين — مستعجل',time:'منذ يومين',read:true}
 ];
 
 let OFFICE=null, services=[], renewalFile=null;
@@ -1234,10 +1243,11 @@ function _initWithAccount(acc){
   renderPackagesDisplay();
   renderVideoPackagesDisplay();
   if(!IS_DEMO) _rizqRenderAdsStatus(acc);
-  // req badge + notif bell (+ غرفة الطلبات من الخادم)
-  if(!IS_DEMO){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
+  // req badge + notif bell (+ غرفة الطلبات)
+  if(IS_DEMO){ _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
+  else { _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
   const reqs=IS_DEMO?DEMO_REQS:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
-  const serviceUnread=(!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests))
+  const serviceUnread=(Array.isArray(window._rizqOfficeServiceRequests))
     ? window._rizqOfficeServiceRequests.filter(function(r){ return r.status==='new'; }).length : 0;
   const unread=reqs.filter(r=>!r.read).length + serviceUnread;
   const rb=document.getElementById('req-badge');
@@ -1524,7 +1534,15 @@ function _rizqMergeRequestsFromBackend(){
 
 function _rizqMergeServiceRequests(){
   try{
-    if(IS_DEMO || !SESSION_ID) return;
+    if(IS_DEMO){
+      window._rizqOfficeServiceRequests = [
+        {id:'SRQ-DEMO-01',buyerName:'فاطمة منت أحمد',buyerPhone:'22244112233',buyerWhatsapp:'22244112233',buyerEmail:'fatima.demo@example.mr',service:'استشارة قانونية',message:'أحتاج استشارة حول عقد إيجار تجاري',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'new',createdAt:new Date().toISOString()},
+        {id:'SRQ-DEMO-02',buyerName:'سيدي محمد',buyerPhone:'22233998877',buyerWhatsapp:'22233998877',buyerEmail:'',service:'تأسيس شركة',message:'أرغب في تأسيس SARL — الوثائق جاهزة عبر واتساب',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'in_progress',createdAt:new Date(Date.now()-864e5).toISOString()},
+        {id:'SRQ-DEMO-03',buyerName:'آمنة بنت عبدالله',buyerPhone:'22236655443',buyerWhatsapp:'22236655443',buyerEmail:'amina.demo@example.mr',service:'صياغة عقد',message:'عقد شراكة بين طرفين — مستعجل',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'done',createdAt:new Date(Date.now()-2*864e5).toISOString()}
+      ];
+      return;
+    }
+    if(!SESSION_ID) return;
     var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
     if(window.RizqServiceDesk && token){
       RizqServiceDesk.listMine(SESSION_ID, token).then(function(list){
@@ -2565,7 +2583,10 @@ document.getElementById('pay-modal') && document.getElementById('pay-modal').add
 // ══ MY PAYMENT METHODS ══
 function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof OFFICE_ACC!=='undefined'&&OFFICE_ACC)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{}; return 'rizq_my_payments_'+(acc.id||'demo'); }
 
-var DEMO_PAYMENTS=[];
+var DEMO_PAYMENTS=[
+  {type:'bankily',bank:'Bankily',code:'36112233',note:'اذكر اسمك بعد التحويل',addedAt:new Date().toISOString()},
+  {type:'bank',bank:'BCI',code:'MR13 0001 2200 3344',note:'تحويل — أتعاب المهنة',addedAt:new Date().toISOString()}
+];
 function getMyPayments(){
   var accId = (typeof OFFICE_ACC !== 'undefined' && OFFICE_ACC && OFFICE_ACC.id) || SESSION_ID || 'demo';
   if(typeof RizqAccountPayments !== 'undefined') return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);

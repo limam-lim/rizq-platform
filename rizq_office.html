@@ -312,8 +312,18 @@ body.rizq-empty-office .rating-inline{display:none!important}
 
 /* Request form */
 .req-box{margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(14,116,144,.04),rgba(201,168,76,.04));border-radius:14px;border:1px solid rgba(14,116,144,.18)}
-.req-form{display:none;margin-top:14px}
-.req-form.open{display:block}
+.req-form{display:block;margin-top:14px}
+.req-form.collapsed{display:none}
+/* غرفة الطلبات — هوية المشترك ظاهرة دائماً */
+#office-service-desk{
+  margin-top:18px;padding:22px 20px;
+  background:linear-gradient(145deg,rgba(15,35,71,.04),rgba(201,168,76,.1));
+  border:1.5px solid rgba(201,168,76,.35);
+  border-radius:16px;
+  box-shadow:0 10px 28px rgba(15,35,71,.06);
+}
+#office-service-desk #req-title{font-size:16px;font-weight:900;color:#0F2347;margin-bottom:6px}
+#office-service-desk #req-sub{font-size:13px;color:#4a5568;line-height:1.55;margin-bottom:14px}
 .req-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;margin-bottom:10px;transition:border .2s}
 .req-input:focus{outline:none;border-color:var(--teal)}
 .req-btn{padding:11px 24px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .25s}
@@ -900,13 +910,14 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         </div>
       </div>
 
-      <!-- Request Box — غرفة الطلبات الموحّدة -->
+      <!-- Request Box — غرفة الطلبات الموحّدة (هوية المشترك) -->
       <div class="req-box" id="office-service-desk">
-        <div style="font-size:14px;font-weight:800;color:var(--teal);margin-bottom:5px" id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
-        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="req-sub" data-desk="hint" data-t="req-sub">أدخل بياناتك وسنتواصل معك — الوثائق عبر واتساب أو إيميل المكتب</div>
-        <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn">إرسال طلب ←</button>
-        <div class="req-form" id="req-form">
-          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="margin-top:14px" data-ph="rf-name"/>
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
+        <div id="req-sub" data-desk="hint" data-t="req-sub">أدخل بياناتك وسنتواصل معك — الوثائق عبر واتساب أو إيميل المكتب</div>
+        <button class="req-btn ghost" onclick="toggleReqForm()" id="req-toggle-btn" data-t="req-toggle-btn" style="display:none">إخفاء النموذج ↑</button>
+        <div class="req-form open" id="req-form">
+          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="margin-top:4px" data-ph="rf-name"/>
           <input dir="ltr" class="req-input" id="rf-phone" placeholder="الهاتف *" data-ph="rf-phone-ph"/>
           <input dir="ltr" class="req-input" id="rf-whatsapp" placeholder="واتساب (إن اختلف عن الهاتف)" data-ph="rf-whatsapp"/>
           <input dir="ltr" class="req-input" id="rf-email" type="email" placeholder="البريد الإلكتروني (اختياري)" data-ph="rf-email"/>
@@ -1215,9 +1226,17 @@ function issueOfficePrefactureFromRequest(){
 // ── toggleReqForm ──────────────────────────
 function toggleReqForm(){
   var form = document.getElementById('req-form');
+  var btn = document.getElementById('req-toggle-btn');
   if(!form) return;
-  form.classList.toggle('open');
-  if(form.classList.contains('open')){
+  var open = form.classList.contains('open') || !form.classList.contains('collapsed');
+  if(open && form.classList.contains('open')){
+    form.classList.remove('open');
+    form.classList.add('collapsed');
+    if(btn){ btn.style.display=''; btn.textContent = _t2('إرسال طلب ←','Envoyer une demande ←'); }
+  } else {
+    form.classList.add('open');
+    form.classList.remove('collapsed');
+    if(btn){ btn.style.display=''; btn.textContent = _t2('إخفاء النموذج ↑','Masquer ↑'); }
     form.scrollIntoView({ behavior:'smooth', block:'nearest' });
   }
 }
@@ -1544,6 +1563,19 @@ function openMaps(){
 
     window._rizqLoadOfficeContacts = async function(accountId){
       if(!accountId){ return; }
+      // معاينة مشروع التخرج — لا تُطمَس بيانات التواصل الوهمية
+      if(window._rizqOfficeIsDemo || accountId === 'demo_law'){
+        applyGatedOfficeContacts(accountId, {
+          contactsLocked: false,
+          name: 'مكتب العدالة للمحاماة',
+          phone: '+222 36 11 22 33',
+          whatsapp: '22236112233',
+          email: 'contact@aladala-demo.mr',
+          paymentMethods: window._rizqOfficePaymentMethods || [],
+          serviceDesk: window._rizqOfficeServiceDesk || {}
+        });
+        return;
+      }
       if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE){
         applyGatedOfficeContacts(accountId, { contactsLocked: true });
         return;
@@ -1578,10 +1610,91 @@ function openMaps(){
     function setText(id, val){ if(val==null || val==='') return; var el=document.getElementById(id); if(el) el.textContent = val; }
     function setHref(id, val){ if(!val) return; var el=document.getElementById(id); if(el) el.setAttribute('href', val); }
 
+    /** مكتب محاماة وهمي للمعاينة — ?demo=1 أو ?id=demo_law */
+    var DEMO_LAW_ID = 'demo_law';
+    function getDemoLawOffice(){
+      return {
+        id: DEMO_LAW_ID,
+        type: 'office',
+        status: 'approved',
+        name: isFr() ? 'Cabinet Al-Adala — Avocats' : 'مكتب العدالة للمحاماة',
+        activity: isFr() ? 'Cabinet d’avocats' : 'محاماة واستشارات قانونية',
+        desc: isFr()
+          ? 'Cabinet d’avocats (données de démonstration). Espace professionnel privé avec salle de demandes personnalisée — confiance et confidentialité.'
+          : 'مكتب محاماة (بيانات تجريبية للمعاينة). مساحة مهنية خاصة بغرفة طلبات باسم المكتب — ثقة، سرية، ومتابعة راقية لموكّليك.',
+        city: isFr() ? 'Nouakchott' : 'نواكشوط',
+        address: isFr() ? 'Tevragh Zeina — Nouakchott' : 'تفرغ زينة — نواكشوط',
+        phone: '+222 36 11 22 33',
+        whatsapp: '22236112233',
+        email: 'contact@aladala-demo.mr',
+        serviceDesk: {
+          enabled: true,
+          formTitle: isFr() ? 'Demande — Cabinet Al-Adala' : 'طلب استشارة — مكتب العدالة للمحاماة',
+          formHint: isFr()
+            ? 'Vos données restent confidentielles. Les pièces jointes partent via WhatsApp ou e-mail du cabinet — jamais stockées sur Rizq.'
+            : 'بياناتك سرية. الوثائق تُرسل عبر واتساب أو إيميل المكتب فقط — لا تُحفظ على سيرفر رزق.',
+          docsChannel: 'whatsapp'
+        },
+        paymentMethods: [
+          { type: 'bankily', bank: 'Bankily', code: '36112233', note: isFr() ? 'Mentionnez votre nom après virement' : 'اذكر اسمك بعد التحويل' },
+          { type: 'bank', bank: 'BCI', code: 'MR13 0001 2200 3344', note: isFr() ? 'Virement — honoraires' : 'تحويل — أتعاب المهنة' }
+        ],
+        services: [
+          { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: '45 د' },
+          { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: '3–5 أيام' },
+          { name: isFr() ? 'Défense devant tribunal' : 'تمثيل أمام المحكمة', desc: isFr() ? 'Suivi de dossier contentieux' : 'متابعة قضايا ومرافعات', price: 0, emoji: '🏛️', duration: isFr() ? 'Sur devis' : 'حسب القضية' },
+          { name: isFr() ? 'Création de société' : 'تأسيس شركة', desc: isFr() ? 'Statuts + dépôt légal' : 'النظام الأساسي + الإيداع القانوني', price: 85000, emoji: '🏢', duration: '7–10 أيام' }
+        ],
+        hours: [
+          { day: 'الأحد', open: true, from: '09:00', to: '17:00' },
+          { day: 'الاثنين', open: true, from: '09:00', to: '17:00' },
+          { day: 'الثلاثاء', open: true, from: '09:00', to: '17:00' },
+          { day: 'الأربعاء', open: true, from: '09:00', to: '17:00' },
+          { day: 'الخميس', open: true, from: '09:00', to: '16:00' },
+          { day: 'الجمعة', open: false, from: '', to: '' },
+          { day: 'السبت', open: true, from: '10:00', to: '14:00' }
+        ]
+      };
+    }
+
+    function applyDemoLawOffice(){
+      var acc = getDemoLawOffice();
+      var id = acc.id;
+      window._rizqOfficeAccountId = id;
+      window._rizqOfficeServiceDesk = acc.serviceDesk;
+      window._rizqOfficePaymentMethods = acc.paymentMethods;
+      window._rizqOfficeIsDemo = true;
+      try{
+        localStorage.setItem('office_services_' + id, JSON.stringify(acc.services));
+        localStorage.setItem('office_hours_' + id, JSON.stringify(acc.hours));
+        localStorage.setItem('rizq_service_desk_' + id, JSON.stringify(acc.serviceDesk));
+        // حقن مؤقت في قائمة الحسابات المحلية حتى يمر bind كحساب معتمد
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        accs = accs.filter(function(a){ return a && a.id !== id; });
+        accs.push({
+          id: id, type: 'office', status: 'approved', name: acc.name,
+          activity: acc.activity, desc: acc.desc, city: acc.city, address: acc.address,
+          phone: acc.phone, whatsapp: acc.whatsapp, email: acc.email,
+          serviceDesk: acc.serviceDesk, paymentMethods: acc.paymentMethods,
+          _demo: true
+        });
+        localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+      }catch(e){}
+      return acc;
+    }
+
     function apply(){
       try{
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('office') || '';
+        // بلا مكتب حقيقي → معاينة مكتب محاماة وهمي (عرض مشروع تخرج للأساتذة)
+        var forceDemo = params.get('demo') === '1' || params.get('sample') === 'law'
+          || id === DEMO_LAW_ID || id === 'DEMO_OFF' || !id;
+        if(forceDemo){
+          applyDemoLawOffice();
+          id = DEMO_LAW_ID;
+          try{ history.replaceState(null, '', 'rizq_office.html?demo=1&id=' + DEMO_LAW_ID); }catch(eHist){}
+        }
         function clearMock(ids){
           ids.forEach(function(fid){
             var el = document.getElementById(fid);
@@ -1621,9 +1734,24 @@ function openMaps(){
           if(badge) badge.style.display = 'none';
           var ratingStrip = document.querySelector('.rating-strip');
           if(ratingStrip) ratingStrip.style.display = 'none';
-          ['trust-grid','about-stats','req-box','hero-tags','stats-strip','rating-inline'].forEach(function(cls){
+          // لا نخفي غرفة الطلبات بالكامل — نُبقيها ظاهرة مع تنبيه واضح
+          ['trust-grid','about-stats','hero-tags','stats-strip','rating-inline'].forEach(function(cls){
             document.querySelectorAll('.'+cls).forEach(function(el){ el.style.display='none'; });
           });
+          var desk = document.getElementById('office-service-desk');
+          if(desk){
+            desk.style.display = '';
+            var titleEl = document.getElementById('req-title');
+            var subEl = document.getElementById('req-sub');
+            if(titleEl) titleEl.textContent = isFr() ? '📩 Service Desk — ouvrir votre bureau' : '📩 غرفة الطلبات — افتح مكتبك الحقيقي';
+            if(subEl) subEl.textContent = isFr()
+              ? 'Cette page est vide sans ?id=. Ouvrez votre bureau depuis le tableau de bord (Partager / Voir la page) pour voir votre formulaire personnalisé.'
+              : 'هذه الصفحة فارغة بدون رابط مكتبك (?id=). افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
+            var form = document.getElementById('req-form');
+            if(form){ form.classList.add('collapsed'); form.classList.remove('open'); }
+            var toggle = document.getElementById('req-toggle-btn');
+            if(toggle) toggle.style.display = 'none';
+          }
           var svcs = document.getElementById('svc-list');
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
           var revs = document.getElementById('office-reviews-body');
@@ -1635,16 +1763,24 @@ function openMaps(){
           setText('stat-svcs', '—');
         }
         if(!id){
+          // يفترض أن wantDemo عبّأ demo_law — إن وصلنا هنا بلا id فمعاينة فارغة
           showEmptyOffice(
-            'لم يُحدَّد مكتب. افتح مكتباً من الدليل أو من قسم المكاتب في الصفحة الرئيسية.',
-            'Aucun bureau sélectionné. Ouvrez un bureau depuis l’annuaire.'
+            'لم يُحدَّد مكتب. للمعاينة الواقعية افتح: rizq_office.html?demo=1',
+            'Aucun bureau. Démo réaliste : rizq_office.html?demo=1'
           );
           return;
         }
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'office'; });
+        if(!acc && (id === DEMO_LAW_ID || window._rizqOfficeIsDemo)){
+          acc = applyDemoLawOffice();
+        }
         if(!acc){
-          showEmptyOffice('تعذر العثور على هذا المكتب.', 'Fiche introuvable.');
+          // لا نُخفي الواجهة فوراً — احتياط الخادم قد يجد المكتب بعد لحظات
+          showEmptyOffice(
+            'جاري تحميل المكتب من الخادم… إن استمر الفراغ جرّب المعاينة: rizq_office.html?demo=1',
+            'Chargement… Sinon ouvrez la démo : rizq_office.html?demo=1'
+          );
           return;
         }
 
@@ -1669,6 +1805,38 @@ function openMaps(){
         }
 
         // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
+        // استثناء المعاينة التجريبية: نفتح التواصل وطرق الدفع محلياً لعرض واقعي
+        if(window._rizqOfficeIsDemo || id === DEMO_LAW_ID){
+          var demoAcc = getDemoLawOffice();
+          var phoneEl = document.getElementById('contact-info-phone');
+          var emailEl = document.getElementById('contact-info-email');
+          if(phoneEl){ phoneEl.textContent = demoAcc.phone; phoneEl.classList.remove('rzq-contact-masked'); phoneEl.onclick = null; }
+          if(emailEl){ emailEl.textContent = demoAcc.email; emailEl.classList.remove('rzq-contact-masked'); emailEl.onclick = null; }
+          setHref('act-wa-top', 'https://wa.me/' + demoAcc.whatsapp);
+          setHref('sticky-wa', 'https://wa.me/' + demoAcc.whatsapp);
+          setHref('act-call-top', 'tel:' + demoAcc.phone.replace(/\s/g,''));
+          setHref('sticky-call', 'tel:' + demoAcc.phone.replace(/\s/g,''));
+          setHref('act-email-top', 'mailto:' + demoAcc.email);
+          if(typeof RizqAccountPayments !== 'undefined'){
+            RizqAccountPayments.renderPublic(document.getElementById('office-payment-methods'), demoAcc.paymentMethods, { fr: isFr() });
+          }
+          // شريط معاينة للأساتذة
+          if(!document.getElementById('rizq-demo-ribbon')){
+            var rib = document.createElement('div');
+            rib.id = 'rizq-demo-ribbon';
+            rib.setAttribute('role', 'status');
+            rib.style.cssText = 'position:sticky;top:0;z-index:90;background:linear-gradient(90deg,#0F2347,#1B3A6B);color:#E8C96A;text-align:center;padding:8px 14px;font-size:12.5px;font-weight:800;letter-spacing:.3px;border-bottom:1px solid rgba(201,168,76,.35)';
+            rib.textContent = isFr()
+              ? '🎓 Démonstration projet — Cabinet d’avocats fictif (données de présentation)'
+              : '🎓 معاينة مشروع تخرج — مكتب محاماة وهمي (بيانات عرض فقط، ليست حقيقية)';
+            document.body.insertBefore(rib, document.body.firstChild);
+          }
+          if(window.RizqServiceDesk){
+            RizqServiceDesk.enhanceOfficeForm({ desk: demoAcc.serviceDesk, accountName: demoAcc.name });
+            var formOpen = document.getElementById('req-form');
+            if(formOpen){ formOpen.classList.add('open'); formOpen.classList.remove('collapsed'); }
+          }
+        }
 
         // ── الخدمات — إعادة بناء القائمة من بيانات حقيقية إن وُجدت ──
         try{
