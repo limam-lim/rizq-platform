@@ -433,7 +433,7 @@
   .listing-card .rzq-adx-media{min-height:114px}
   .rzq-adx-fav{width:26px;height:26px}
   .rzq-adx-nav{width:24px;height:24px}
-  .rzq-adx-price{font-size:12px;padding:6px 12px}
+  .rzq-adx-price{font-size:10px;padding:4px 8px;border-radius:4px}
   .rzq-adx-tel,
   .rzq-adx-actions .rzq-adx-wa{width:26px;height:26px}
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media){
