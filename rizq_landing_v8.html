@@ -976,23 +976,27 @@ body.rizq-lang-ar .hero-vid-wrap{
     padding-bottom:36px!important;
   }
   .hero-content{
-    padding-top:10px!important;
+    padding-top:14px!important;
     padding-bottom:12px!important;
+    overflow:visible!important;
   }
-  /* كبسولة «رزق» + شارة السوق — بالحجم السابق (لا تُصغَّر) */
+  /* كبسولة «رزق» + شارة السوق — بالحجم السابق (لا تُصغَّر) وظاهرة كاملة */
   .hero-brand-row{
     gap:10px!important;
-    margin:0 auto 14px!important;
+    margin:4px auto 14px!important;
     min-width:min(300px,92vw)!important;
+    overflow:visible!important;
   }
   .hero-title-card{
     padding:18px 28px 22px!important;
     min-height:96px!important;
     border-radius:16px!important;
+    overflow:visible!important;
   }
   .hero-headline{
     font-size:clamp(52px,7.8vw,78px)!important;
     letter-spacing:.5px!important;
+    transform:none!important;
   }
   .hero-brand-row .hero-eyebrow{
     padding:10px 18px!important;
@@ -3361,14 +3365,25 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   transform:skewX(-20deg);animation:rzqShine 4s ease-in-out infinite;mix-blend-mode:overlay;pointer-events:none}
 @keyframes rzqShine{0%,40%{left:-45%}70%,100%{left:115%}}
 
-/* طفو خفيف مستمر لبطاقة العنوان وبطاقة الفيديو المميز — حركة حيّة دائمة تُرى
-   بسهولة دون الحاجة لتحريك الفأرة أو انتظار توقيت معيّن */
+/* طفو خفيف — للأسفل فقط حتى لا تُقصّ كبسولة رزق تحت الهيدر الثابت */
 .hero-title-card{animation:rzqFloat 4.5s ease-in-out infinite}
 .hero-vid-wrap:not(.hero-vid-compact){animation:rzqFloat 5.5s ease-in-out infinite .4s}
 .hero-spaces-title,.hero-browse-title,.hero-tagline{
   font-family:'Noto Naskh Arabic','Cairo',Georgia,serif!important;
 }
-@keyframes rzqFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes rzqFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+/* كبسولة رزق كاملة تحت الهيدر — لا قص من overflow أو الطفو */
+.hero-brand-row{
+  position:relative;
+  z-index:2;
+  overflow:visible!important;
+}
+.hero-title-card{
+  overflow:visible!important;
+}
+.hero-headline{
+  transform:none!important;
+}
 
 /* ── تحسين استقرار عناصر fade-in — نفس الفئات المستخدمة بكل الصفحة (كل
    البطاقات/الأقسام)، فقط تحسين بصري للانتقال نفسه دون لمس منطق JS ── */

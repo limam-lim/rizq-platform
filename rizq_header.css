@@ -481,12 +481,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     opacity:0 !important;
   }
 
-  html.rizq-app-nav body{
-    padding-top:0 !important;
-    padding-bottom:0 !important;
-  }
+  /* هبوط + صفحات المكتب: body دائماً تحت الهيدر الثابت (كان 0 على الهبوط فيقصّ كبسولة رزق) */
+  html.rizq-app-nav body,
   html.rizq-app-nav.has-rizq-desk-nav body{
-    padding-top:var(--rizq-header-h,78px) !important;
+    padding-top:var(--rizq-header-h,86px) !important;
+    padding-bottom:0 !important;
   }
   html.rizq-app-nav.has-rizq-desk-nav .topnav,
   html.rizq-app-nav.has-rizq-desk-nav body > .btn-lang,
@@ -1151,17 +1150,24 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     z-index:-1 !important;
   }
 
-  /* body مبطَّن أصلاً بارتفاع الهيدر — لا نكرّر padding على .hero (كان يضاعف الفراغ الأبيض) */
+  /* body مبطَّن بالهيدر — فجوة صغيرة تحت الشريط + مساحة لطفو كبسولة رزق (−9px) دون قص */
   html.rizq-app-nav .hero{
     margin-top:0 !important;
-    padding-top:10px !important;
+    padding-top:16px !important;
     min-height:0 !important;
     height:auto !important;
     justify-content:flex-start !important;
+    overflow-x:hidden !important;
+    overflow-y:visible !important;
   }
   html.rizq-app-nav .hero-content{
     margin-top:0 !important;
-    padding-top:8px !important;
+    padding-top:12px !important;
+    overflow:visible !important;
+  }
+  html.rizq-app-nav .hero-brand-row,
+  html.rizq-app-nav .hero-title-card{
+    overflow:visible !important;
   }
   /* التيكر ثابت فوق المحتوى — body مبطَّن بالهيدر فقط، نزيد فجوة التيكر دون إعادة ارتفاع الهيدر */
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
