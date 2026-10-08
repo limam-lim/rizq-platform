@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.2"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=1.1"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=2.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -3798,7 +3798,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
-<script src="rizq_ad_cards.js?v=1.1"></script>
+<script src="rizq_ad_cards.js?v=2.0"></script>
 </head>
 <body>
 
@@ -5895,18 +5895,21 @@ function buildCards(){
     const media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
       ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title })
       : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130)+'</div>');
+    const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
+      ? RizqAdCards.actionsHtml(a, { fr: !isAr })
+      : '';
     c.innerHTML=`
       ${media}
       <div class="ad-card-body">
         <div class="ad-cat">${_escCard(d.cat)}</div>
         <div class="ad-title">${_escCard(d.title)}</div>
         <div class="ad-footer">
-          <span class="ad-price">${_escCard(d.price)}</span>
           <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
+        ${actions}
       </div>`;
     c.addEventListener('click',function(ev){
-      if(ev.target && ev.target.closest && ev.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa')) return;
+      if(ev.target && ev.target.closest && ev.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions')) return;
       openCarouselAdById(a.id);
     });
     track.appendChild(c);
@@ -5994,13 +5997,17 @@ function _landingAdCardHtml(a, fr){
   var media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
     ? RizqAdCards.mediaHtml(a, { fr: !!fr, price: d.price, pin: pin, emoji: d.emoji, bg: d.bg, title: d.title })
     : ('<div class="l-img" style="background:' + esc(d.bg || 'linear-gradient(145deg,#111d2e,#1B3A6B)') + '">' + (typeof _adPhotoHtml === 'function' ? _adPhotoHtml(a, d, 96) : ('<span>' + esc(d.emoji || '📦') + '</span>')) + '</div>');
+  var actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
+    ? RizqAdCards.actionsHtml(a, { fr: !!fr })
+    : '';
   return ''
-    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa\')) return; ' + openFn + '">'
+    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions\')) return; ' + openFn + '">'
     + media
     + '<div class="l-body">'
     +   '<p class="l-cat">' + cat + '</p>'
     +   '<h3 class="l-title">' + title + '</h3>'
-    +   '<div class="l-meta"><span class="l-price">' + price + '</span><span class="l-loc">' + loc + '</span></div>'
+    +   '<span class="l-loc">' + loc + '</span>'
+    +   actions
     + '</div></div>';
 }
 function buildLandingAds(resetVisible){

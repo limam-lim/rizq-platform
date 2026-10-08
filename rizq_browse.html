@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=30.0"/>
-  <link rel="stylesheet" href="rizq_ad_cards.css?v=1.1"/>
+  <link rel="stylesheet" href="rizq_ad_cards.css?v=2.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -1128,7 +1128,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
-<script src="rizq_ad_cards.js?v=1.1"></script>
+<script src="rizq_ad_cards.js?v=2.0"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
@@ -2216,17 +2216,22 @@ function _adCardHtml(a, fr){
         title:_title
       })
     : `<div class="rc-thumb">${(a.images&&a.images[0])?`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy">`:iconHTML(a.emoji)}</div>`;
-  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="if(event.target.closest&&event.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa'))return;selectAd('${idJs}')">
+  const actions=(window.RizqAdCards&&typeof RizqAdCards.actionsHtml==='function')
+    ? RizqAdCards.actionsHtml(a,{fr:!!fr})
+    : '';
+  const catLabel=escapeHtml(fr?(a.catFR||a.cat||''):(a.cat||''));
+  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="if(event.target.closest&&event.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions'))return;selectAd('${idJs}')">
     ${media}
     <div class="rc-body">
+      ${catLabel?`<div class="rc-cat">${catLabel}</div>`:''}
       <div class="rc-title">${escapeHtml(_title)}</div>
-      <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
       <div class="rc-meta">
         <span class="rc-loc">${escapeHtml(_loc)}</span>
         ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
         ${a.verified?`<span class="rc-verified">✓</span>`:''}
         ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
       </div>
+      ${actions}
     </div>
   </div>`;
 }
