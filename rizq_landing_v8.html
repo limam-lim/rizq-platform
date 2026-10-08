@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.3"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.2"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.3"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
@@ -480,28 +480,12 @@ html.rizq-has-announce .section-jump-bar{
 }
 .ticker-inner{
   display:flex;gap:0;width:max-content;
-  animation:ticker 50s linear infinite;
+  /* حركة rAF بالبكسل — بلا CSS animation (كانت ترتعد عند إغلاق الدورة/الهوفر) */
+  animation:none!important;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  /* مسافة الحلقة بالبكسل بعد القياس — يمنع قفزة/رعدة عند إغلاق الدورة */
-  --rzq-marquee-x:-50%;
 }
-/* إيقاف عند الهوفر فقط للفأرة الدقيقة — على اللمس :hover اللزج يسبب رعدة stop/start */
-@media (hover:hover) and (pointer:fine){
-  .ticker-wrap:hover .ticker-inner{animation-play-state:paused}
-}
-@keyframes ticker{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
-}
-@keyframes ticker-rtl{
-  from{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
-  to{transform:translate3d(0,0,0)}
-}
-/* عربي: يسار→يمين عبر keyframes مخصّصة (بدون animation-direction:reverse) */
-html[dir="rtl"] .ticker-inner{animation-name:ticker-rtl}
-html[dir="ltr"] .ticker-inner{animation-name:ticker}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
 .ticker-item strong{color:var(--gold);font-weight:700}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
@@ -1761,36 +1745,63 @@ html[dir="ltr"] #all-ads-title{
 .hero-listings-section::before{display:none;content:none}
 .listings-label{position:relative;z-index:2;text-align:center;margin-bottom:18px;animation:fadeUp .8s .5s ease both}
 .listings-label>span{
-  display:inline-flex;align-items:center;gap:10px;
+  display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
   background:
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
   border:1px solid rgba(201,168,76,.42);
-  border-radius:8px;padding:10px 22px 10px 16px;
+  border-radius:8px;padding:8px 16px 8px 12px;
   font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
   font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
 }
-.listings-label strong{
-  color:#F0D78A;font-weight:800;margin-inline-end:2px;
-  text-shadow:0 0 18px rgba(201,168,76,.35);
+.live-label-sub{color:rgba(255,255,255,.88);font-weight:600}
+/* كبسولة «مباشر» — ضوء أحمر خفي يتحرك داخل الكبسولة للتنبيه */
+.live-capsule{
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px 3px 7px;border-radius:999px;flex-shrink:0;
+  background:linear-gradient(135deg,#2a0d14 0%,#1a0a10 55%,#12080c 100%);
+  border:1px solid rgba(225,29,72,.55);
+  box-shadow:0 0 10px rgba(225,29,72,.22),inset 0 1px 0 rgba(255,255,255,.08);
 }
-.live-pulse-dot{
-  width:9px;height:9px;border-radius:50%;flex-shrink:0;
-  background:radial-gradient(circle at 35% 30%,#ff8a8a,#e11d48 55%,#9f1239);
-  box-shadow:0 0 0 0 rgba(225,29,72,.55);
-  animation:livePulse 1.7s ease-out infinite;
+.live-capsule::before{
+  content:'';position:absolute;inset:-1px;pointer-events:none;z-index:0;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,60,60,.06) 28%,
+    rgba(255,80,80,.38) 48%,
+    rgba(255,120,120,.22) 58%,
+    transparent 78%);
+  width:55%;
+  animation:liveCapsuleSweep 2.2s linear infinite;
 }
-@keyframes livePulse{
-  0%{box-shadow:0 0 0 0 rgba(225,29,72,.55)}
-  70%{box-shadow:0 0 0 10px rgba(225,29,72,0)}
-  100%{box-shadow:0 0 0 0 rgba(225,29,72,0)}
+@keyframes liveCapsuleSweep{
+  0%{transform:translateX(-120%)}
+  100%{transform:translateX(280%)}
 }
+.live-capsule-light{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;position:relative;z-index:1;
+  background:radial-gradient(circle at 35% 30%,#ffc9c9,#ef4444 48%,#991b1b 100%);
+  box-shadow:0 0 0 0 rgba(239,68,68,.5),0 0 7px rgba(239,68,68,.7);
+  animation:liveCapsulePulse 1.4s ease-out infinite;
+}
+@keyframes liveCapsulePulse{
+  0%{box-shadow:0 0 0 0 rgba(239,68,68,.55),0 0 7px rgba(239,68,68,.7);opacity:1}
+  70%{box-shadow:0 0 0 6px rgba(239,68,68,0),0 0 5px rgba(239,68,68,.35);opacity:.85}
+  100%{box-shadow:0 0 0 0 rgba(239,68,68,0),0 0 7px rgba(239,68,68,.7);opacity:1}
+}
+.live-capsule-txt{
+  position:relative;z-index:1;
+  color:#fecaca;font-size:11px;font-weight:800;letter-spacing:.2px;
+  font-family:'Cairo','Segoe UI',sans-serif;line-height:1;
+}
+.live-pulse-dot{display:none!important}
 
 .cards-track-wrap{
   position:relative;z-index:1;overflow:hidden;border-radius:0;
   direction:ltr; /* يمنع انزياح RTL الذي يُخرج البطاقات عن الشاشة أثناء slide */
-  padding:8px 0;
+  padding:8px 14px;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -1800,29 +1811,13 @@ html[dir="ltr"] #all-ads-title{
 
 .cards-track{
   display:flex;gap:14px;width:max-content;
-  animation:slide 65s linear infinite;
-  direction:ltr;padding:4px 14px;
+  animation:none!important;
+  direction:ltr;padding:4px 0; /* بلا padding أفقي — يمنع قفزة عند إغلاق دورة الـ marquee */
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  --rzq-marquee-x:-50%;
+  contain:layout style;
 }
-@media (hover:hover) and (pointer:fine){
-  .cards-track:hover{animation-play-state:paused}
-}
-@keyframes slide{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
-}
-@keyframes slide-rtl{
-  from{transform:translate3d(var(--rzq-marquee-x,-50%),0,0)}
-  to{transform:translate3d(0,0,0)}
-}
-/* عربي: يسار→يمين | فرنسي: يمين→يسار — بدون reverse لتفادي رعدة إغلاق الدورة */
-html[dir="rtl"] .cards-track,
-html[dir="rtl"] #hero-listings .cards-track{animation-name:slide-rtl;animation-direction:normal}
-html[dir="ltr"] .cards-track,
-html[dir="ltr"] #hero-listings .cards-track{animation-name:slide;animation-direction:normal}
 html[dir="rtl"] .cards-track .ad-card{direction:rtl}
 html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 /* أثناء الحركة: لا translateY على البطاقة — يقلل الارتعاش */
@@ -1835,6 +1830,11 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
     transform:translateZ(0) scale(1.015);
   }
 }
+/* توافق خلفي إن وُجدت قواعد قديمة تعتمد slide */
+@keyframes slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@keyframes slide-rtl{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes ticker{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@keyframes ticker-rtl{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
 
 /* نوافذ مباشر — أصغر قليلاً */
 .ad-card{
@@ -2096,17 +2096,11 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .price-ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,#0D1B2A,#1B3A6B,#0D1B2A);border:1px solid rgba(201,168,76,.22);border-radius:14px;padding:13px 0;margin-bottom:22px;position:relative;box-shadow:0 6px 20px rgba(15,35,65,.18)}
 .price-ticker-inner{
   display:flex;gap:0;width:max-content;
-  animation:ticker 45s linear infinite;
+  animation:none!important;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  --rzq-marquee-x:-50%;
 }
-@media (hover:hover) and (pointer:fine){
-  .price-ticker-wrap:hover .price-ticker-inner{animation-play-state:paused}
-}
-html[dir="rtl"] .price-ticker-inner{animation-name:ticker-rtl}
-html[dir="ltr"] .price-ticker-inner{animation-name:ticker}
 .price-ticker-item{display:flex;align-items:center;gap:9px;padding:0 30px;white-space:nowrap;font-size:13px;font-weight:700;color:#fff}
 .price-ticker-item .pt-arrow{font-weight:900;font-size:12px}
 .price-ticker-item .pt-up{color:#6ee7a8}
@@ -2628,7 +2622,7 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
-    direction:ltr!important;border-radius:0!important;padding:6px 0!important;
+    direction:ltr!important;border-radius:0!important;padding:6px 12px!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
@@ -2636,12 +2630,10 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;
-    direction:ltr!important;padding:2px 12px!important;
-    animation:slide 55s linear infinite!important;
+    direction:ltr!important;padding:2px 0!important;
+    animation:none!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
-  html[dir="rtl"] #hero-listings .cards-track{animation-name:slide-rtl!important;animation-direction:normal!important}
-  html[dir="ltr"] #hero-listings .cards-track{animation-name:slide!important;animation-direction:normal!important}
   #hero-listings .cards-track .ad-card{
     width:152px!important;min-width:152px!important;max-width:152px!important;
     flex:0 0 152px!important;scroll-snap-align:none!important;border-radius:14px!important;
@@ -2662,7 +2654,11 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track .ad-title{font-size:11px!important}
   #hero-listings .cards-track .ad-price{font-size:10.5px!important;padding:2px 7px!important}
   #hero-listings .cards-track .ad-hover-detail{display:none!important}
-  .listings-label>span{font-size:11px!important;padding:8px 14px 8px 12px!important;gap:7px!important}
+  .listings-label>span{font-size:11px!important;padding:7px 12px 7px 10px!important;gap:7px!important}
+  .live-capsule{padding:2px 8px 2px 6px!important;gap:5px!important}
+  .live-capsule-txt{font-size:10px!important}
+  .live-capsule-light{width:6px!important;height:6px!important}
+  .live-label-sub{font-size:11px!important}
   .quick-cats{gap:5px}
   .qcat{min-width:0;padding:7px 5px}
   .hero-browse-panel .quick-cats{flex-wrap:nowrap;gap:2px!important}
@@ -3625,7 +3621,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   overflow:hidden;
   border-radius:0;
   direction:ltr;
-  padding:8px 0;
+  padding:8px 14px;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -3640,18 +3636,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   width:max-content;
   max-width:none;
   direction:ltr;
-  animation:slide 65s linear infinite;
+  animation:none!important;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  padding:4px 14px;
-  --rzq-marquee-x:-50%;
+  padding:4px 0;
+  contain:layout style;
 }
-@media (hover:hover) and (pointer:fine){
-  .rizq-styles-rail:hover{animation-play-state:paused}
-}
-html[dir="rtl"] .rizq-styles-rail{animation-name:slide-rtl;animation-direction:normal}
-html[dir="ltr"] .rizq-styles-rail{animation-name:slide;animation-direction:normal}
 html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
 html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-styles-rail.is-empty{
@@ -3803,7 +3794,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     overflow:hidden!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
-    border-radius:0!important;padding:6px 0!important;
+    border-radius:0!important;padding:6px 10px!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   .rizq-styles-track-wrap::before,
@@ -3812,14 +3803,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;
     direction:ltr!important;
-    animation:slide 55s linear infinite!important;
+    animation:none!important;
     overflow:visible!important;
     scroll-snap-type:none!important;
-    margin:0!important;padding:2px 10px!important;
+    margin:0!important;padding:2px 0!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
-  html[dir="rtl"] .rizq-styles-rail{animation-name:slide-rtl!important;animation-direction:normal!important}
-  html[dir="ltr"] .rizq-styles-rail{animation-name:slide!important;animation-direction:normal!important}
   .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
     width:156px!important;min-width:156px!important;max-width:156px!important;
@@ -3913,7 +3902,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
-<script src="rizq_ad_cards.js?v=2.3"></script>
+<script src="rizq_ad_cards.js?v=2.4"></script>
 </head>
 <body>
 
@@ -4333,7 +4322,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- Live Listings Carousel -->
   <div class="hero-listings-section" id="hero-listings">
     <div class="listings-label">
-      <span><span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -5985,26 +5974,126 @@ function trAd(a){
   };
 }
 
-/** قياس نصف المسار بالبكسل لحلقة سلسة بلا قفزة عند إغلاق الدورة */
+/** محرّك شريط متحرك — حلقة rAF واحدة + قياس نصف الدورة من منتصف الأبناء (بلا قفزة) */
+var _rzqMarquees = [];
+var _rzqMarqueeRaf = 0;
+var _rzqMarqueeLast = 0;
+function _rzqMarqueeMeasureHalf(el){
+  if(!el) return 0;
+  var kids = el.children;
+  var n = kids ? kids.length : 0;
+  if(n >= 2 && (n % 2 === 0)){
+    var mid = kids[n / 2];
+    /* المسارات direction:ltr — offsetLeft لمنتصف النسخة الثانية = عرض نصف الدورة بدقة */
+    var half = mid && typeof mid.offsetLeft === 'number' ? mid.offsetLeft : 0;
+    if(half > 20) return half;
+  }
+  var w = el.scrollWidth || 0;
+  return w > 40 ? w / 2 : 0;
+}
+function _rzqMarqueeTick(now){
+  if(!_rzqMarqueeLast) _rzqMarqueeLast = now;
+  var dt = Math.min(0.048, (now - _rzqMarqueeLast) / 1000);
+  _rzqMarqueeLast = now;
+  if(!document.hidden && dt > 0){
+    for(var i = 0; i < _rzqMarquees.length; i++){
+      var state = _rzqMarquees[i];
+      if(!state || !state.el || !state.el.isConnected) continue;
+      if(state.paused || state.half <= 1) continue;
+      state.pos += state.pxPerSec * dt;
+      if(state.pos >= state.half) state.pos -= state.half;
+      if(state.pos < 0) state.pos += state.half;
+      state.apply();
+    }
+  }
+  _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+}
+function _rzqEnsureMarqueeLoop(){
+  if(!_rzqMarqueeRaf) _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+}
+function bindRafMarquee(el, opts){
+  if(!el || el.classList.contains('is-empty')) return null;
+  opts = opts || {};
+  if(el._rzqMarquee){
+    if(opts.pxPerSec) el._rzqMarquee.pxPerSec = opts.pxPerSec;
+    el._rzqMarquee.remeasure();
+    _rzqEnsureMarqueeLoop();
+    return el._rzqMarquee;
+  }
+  var state = {
+    el: el,
+    pos: 0,
+    half: 0,
+    paused: false,
+    pxPerSec: opts.pxPerSec || 42,
+    raf: 1, /* علامة تشخيص: المحرّك مربوط بالحلقة المشتركة */
+    remeasure: function(){
+      try{
+        el.style.setProperty('animation', 'none', 'important');
+        el.style.setProperty('animation-name', 'none', 'important');
+      }catch(eAnim){ el.style.animation = 'none'; }
+      state.half = _rzqMarqueeMeasureHalf(el);
+      if(state.half > 1 && state.pos >= state.half) state.pos = state.pos % state.half;
+      state.apply();
+    },
+    apply: function(){
+      if(state.half <= 0){
+        el.style.transform = 'translate3d(0px,0,0)';
+        return;
+      }
+      /* المسارات LTR دائماً — حركة يساراً مستمرة بلا فرع RTL يسبب قفزاً */
+      el.style.transform = 'translate3d(' + (-state.pos) + 'px,0,0)';
+    },
+    setPaused: function(on){ state.paused = !!on; },
+    destroy: function(){
+      var idx = _rzqMarquees.indexOf(state);
+      if(idx >= 0) _rzqMarquees.splice(idx, 1);
+      el._rzqMarquee = null;
+      state.raf = 0;
+    }
+  };
+  /* لا إيقاف عند الهوفر — كان يسبب توقفاً لحظياً/رعدة عند مرور المؤشر */
+  el._rzqMarquee = state;
+  _rzqMarquees.push(state);
+  state.remeasure();
+  _rzqEnsureMarqueeLoop();
+  return state;
+}
 function syncMarqueeShift(el){
-  if(!el || el.classList.contains('is-empty')) return;
-  try{
-    var w = el.scrollWidth || 0;
-    if(w < 40) return;
-    var half = Math.round(w / 2);
-    if(half < 20) return;
-    el.style.setProperty('--rzq-marquee-x', (-half) + 'px');
-  }catch(e){}
+  if(!el) return;
+  bindRafMarquee(el);
+  if(el._rzqMarquee) el._rzqMarquee.remeasure();
 }
 function syncAllMarquees(){
   [
-    document.getElementById('cards-track'),
-    document.getElementById('ticker'),
-    document.getElementById('price-ticker'),
-    document.getElementById('rizq-styles-rail'),
-    document.getElementById('rizq-srm-rail')
-  ].forEach(syncMarqueeShift);
+    {el: document.getElementById('cards-track'), px: 40},
+    {el: document.getElementById('ticker'), px: 38},
+    {el: document.getElementById('price-ticker'), px: 34},
+    {el: document.getElementById('rizq-styles-rail'), px: 36},
+    {el: document.getElementById('rizq-srm-rail'), px: 36}
+  ].forEach(function(cfg){
+    if(!cfg.el || cfg.el.classList.contains('is-empty')) return;
+    bindRafMarquee(cfg.el, {pxPerSec: cfg.px});
+    if(cfg.el._rzqMarquee) cfg.el._rzqMarquee.remeasure();
+  });
+  _rzqEnsureMarqueeLoop();
 }
+function liveListingsLabelHtml(fr){
+  return fr
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub">Dernières annonces — mise à jour automatique</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>';
+}
+function paintLiveListingsLabel(){
+  var el = document.querySelector('.listings-label > span');
+  if(!el) return;
+  var fr = false;
+  try{
+    if(typeof isAr !== 'undefined') fr = !isAr;
+    else fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr';
+  }catch(e){}
+  el.innerHTML = liveListingsLabelHtml(fr);
+}
+paintLiveListingsLabel();
 
 function buildCards(){
   const track=document.getElementById('cards-track');
@@ -6052,15 +6141,22 @@ function buildCards(){
   });
   if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(track);
   requestAnimationFrame(function(){
-    syncMarqueeShift(track);
+    bindRafMarquee(track, {pxPerSec:40});
     requestAnimationFrame(function(){ syncMarqueeShift(track); });
   });
 }
 buildCards();
-window.addEventListener('load', function(){ setTimeout(syncAllMarquees, 120); });
+window.addEventListener('load', function(){ setTimeout(syncAllMarquees, 160); });
 window.addEventListener('resize', function(){
   if(syncAllMarquees._t) clearTimeout(syncAllMarquees._t);
   syncAllMarquees._t = setTimeout(syncAllMarquees, 180);
+});
+document.addEventListener('visibilitychange', function(){
+  _rzqMarqueeLast = 0;
+  if(!document.hidden){
+    _rzqEnsureMarqueeLoop();
+    syncAllMarquees();
+  }
 });
 
 function buildFeaturedCards(){
@@ -9146,11 +9242,12 @@ function applyLandingLang(toAr) {
 
   // Section tags handled above
 
-  // Live label
-  const liveLabel = document.querySelector('.listings-label span');
-  if(liveLabel) liveLabel.innerHTML = isAr
-    ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً'
-    : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>En direct</strong> Dernières annonces — mise à jour automatique';
+  // Live label — كبسولة مباشر بضوء أحمر
+  if(typeof paintLiveListingsLabel === 'function') paintLiveListingsLabel();
+  else {
+    const liveLabel = document.querySelector('.listings-label > span');
+    if(liveLabel) liveLabel.innerHTML = liveListingsLabelHtml(!isAr);
+  }
 
   // Stats bar "مجاني"
   const freeStat = document.querySelector('#platform-stats [data-stat="free"] .h-stat-num');
@@ -9942,13 +10039,12 @@ function applyFullTranslation(lang) {
   const lastStat = statNums[statNums.length-1];
   if(lastStat && lastStat.hasAttribute('data-count-text')) lastStat.textContent = fr ? 'Gratuit' : 'مجاني';
 
-  // ── Ticker label ──
-  const tickerStrong = document.querySelector('.listings-label strong');
-  const tickerSpan   = document.querySelector('.listings-label span');
-  if(tickerStrong) tickerStrong.textContent = fr ? 'En direct' : 'مباشر';
-  if(tickerSpan) tickerSpan.innerHTML = fr
-    ? '<span class="live-pulse-dot" aria-hidden="true"></span><strong>En direct</strong> Dernières annonces — mise à jour automatique'
-    : '<span class="live-pulse-dot" aria-hidden="true"></span><strong>مباشر</strong> أحدث الإعلانات المنشورة — تتحدث تلقائياً';
+  // ── Ticker label — كبسولة مباشر ──
+  if(typeof paintLiveListingsLabel === 'function') paintLiveListingsLabel();
+  else {
+    const tickerSpan = document.querySelector('.listings-label > span');
+    if(tickerSpan) tickerSpan.innerHTML = liveListingsLabelHtml(fr);
+  }
 
   // ── Modal direction ──
   const modalBox2 = document.querySelector('.modal-box');

@@ -282,18 +282,24 @@
 
     function hold(on) {
       media.classList.toggle('is-holding', !!on);
+      var track = media.closest('.cards-track');
+      if (track && track._rzqMarquee && typeof track._rzqMarquee.setPaused === 'function') {
+        track._rzqMarquee.setPaused(!!on || !!(track.querySelector && track.querySelector('.rzq-adx-media.is-holding')));
+      }
     }
 
     if (prev) {
       prev.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
         hold(true); go(media, -1);
+        setTimeout(function () { hold(false); }, 450);
       });
     }
     if (next) {
       next.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
         hold(true); go(media, 1);
+        setTimeout(function () { hold(false); }, 450);
       });
     }
     if (fav) {

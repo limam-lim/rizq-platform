@@ -414,15 +414,7 @@
   padding-top:2px;
 }
 
-/* إيقاف شريط المباشر أثناء الضغط فقط — :hover على اللمس يسبب رعدة stop/start */
-.cards-track:has(.rzq-adx-media.is-holding){
-  animation-play-state:paused!important;
-}
-@media (hover:hover) and (pointer:fine){
-  .cards-track:has(.rzq-adx-media:hover){
-    animation-play-state:paused!important;
-  }
-}
+/* إيقاف شريط المباشر يتم عبر track._rzqMarquee.setPaused في rizq_ad_cards.js */
 
 /* سطح المكتب — بطاقات أقرب للمربع */
 @media (min-width:769px){
