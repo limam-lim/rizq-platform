@@ -785,6 +785,7 @@ footer{
   <script src="rizq_site_banner.js"></script>
   <script src="rizq_contact_gate.js"></script>
   <script src="rizq_account_payments.js"></script>
+  <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.0"></script>
@@ -973,6 +974,21 @@ footer{
           <span data-t="payment-note">💰 الدفع عند التسليم فقط — نقداً أو عبر بنكك المحلي</span>
         </div>
         <div id="store-payment-methods" style="display:none"></div>
+      </div>
+
+      <!-- غرفة الطلبات — هوية المحل -->
+      <div class="info-card" id="store-service-desk" style="border-top:3px solid var(--gold)">
+        <div class="info-card-title" data-desk="title" id="store-req-title">📩 طلب من المحل</div>
+        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:12px;line-height:1.55" data-desk="hint" id="store-req-hint">أدخل بياناتك وسيتواصل معك المحل مباشرة. الوثائق عبر واتساب أو الإيميل — خارج سيرفر رزق.</p>
+        <div id="store-req-form">
+          <input class="req-input" id="rf-name" placeholder="الاسم الكامل *" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+          <input dir="ltr" class="req-input" id="rf-phone" placeholder="الهاتف *" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" placeholder="واتساب (إن اختلف)" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+          <input dir="ltr" class="req-input" id="rf-email" type="email" placeholder="البريد (اختياري)" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+          <input class="req-input" id="rf-service" placeholder="المنتج / الموضوع" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+          <textarea class="req-input" id="rf-msg" placeholder="رسالتك للمحل…" style="width:100%;min-height:70px;margin-bottom:8px;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13px;font-family:inherit;resize:none;box-sizing:border-box"></textarea>
+          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:13.5px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
+        </div>
       </div>
     </aside>
 
@@ -1601,6 +1617,14 @@ function rizqShare(title, url) {
           RizqContactGate.onMaskedContactClick(accountId, 'store', { lang: fr ? 'fr' : 'ar' });
         }
       }
+      window._rizqStoreAccountId = accountId || '';
+      if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
+      if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
+      if(window.RizqServiceDesk){
+        var root = document.getElementById('store-service-desk');
+        RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, acc.name || '');
+        if(acc.serviceDesk && acc.serviceDesk.enabled === false && root) root.style.display = 'none';
+      }
       renderStorePaymentMethods(acc);
       if(locked || (!phone && !email && !wa)){
         var phoneEl = document.getElementById('info-value-phone-el');
@@ -1878,6 +1902,12 @@ function rizqShare(title, url) {
                 }
                 if(typeof RizqAccountPayments !== 'undefined'){
                   RizqAccountPayments.renderPublic(document.getElementById('store-payment-methods'), acc.paymentMethods, { fr: isFr() });
+                }
+                window._rizqStoreAccountId = id;
+                if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
+                if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
+                if(window.RizqServiceDesk){
+                  RizqServiceDesk.applyPublicLabels(document.getElementById('store-service-desk'), acc.serviceDesk || {}, acc.name || '');
                 }
               }
             }
@@ -2174,6 +2204,34 @@ function addToCartStore(id){
   showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + (fr?p.nameF:p.name));
 }
 
+function submitStoreServiceReq(){
+  var fr = (localStorage.getItem('rizq_lang') === 'fr');
+  var btn = document.getElementById('store-req-submit');
+  if(btn) btn.disabled = true;
+  var accountId = window._rizqStoreAccountId || '';
+  try{
+    if(!accountId) accountId = new URLSearchParams(location.search).get('id') || '';
+  }catch(e){}
+  if(!window.RizqServiceDesk){
+    showToast(fr ? 'Formulaire indisponible' : 'تعذّر تحميل نموذج الطلب', 'error');
+    if(btn) btn.disabled = false;
+    return;
+  }
+  RizqServiceDesk.submit({
+    accountId: accountId,
+    source: 'store',
+    desk: window._rizqStoreServiceDesk || {},
+    form: document.getElementById('store-req-form')
+  }).then(function(res){
+    showToast(res.message || (fr ? '✅ Demande envoyée' : '✅ تم إرسال طلبك'), 'success');
+    ['rf-name','rf-phone','rf-whatsapp','rf-email','rf-service','rf-msg'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+  }).catch(function(err){
+    showToast((err && err.message) || (fr ? 'Échec' : 'تعذّر الإرسال'), 'error');
+  }).finally(function(){ if(btn) btn.disabled = false; });
+}
+
 function issueStorePrefacture(id){
   var fr = (localStorage.getItem('rizq_lang') === 'fr');
   var catalog = window.STORE_FEATURED_PRODUCTS || {};
@@ -2181,7 +2239,7 @@ function issueStorePrefacture(id){
   if (!p) { showToast(fr ? '❌ Produit introuvable' : '❌ المنتج غير موجود', 'error'); return; }
   function run(){
     var sid = '';
-    try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
+    try { sid = new URLSearchParams(location.search).get('id') || window._rizqStoreAccountId || ''; } catch (e) { sid = window._rizqStoreAccountId || ''; }
     var sname = (document.getElementById('store-name') || {}).textContent || (fr ? 'Magasin Rizq' : 'محل رزق');
     var phone = '';
     try {
@@ -2193,6 +2251,10 @@ function issueStorePrefacture(id){
       sellerAccountId: sid,
       sellerName: sname,
       sellerPhone: phone,
+      paymentMethods: window._rizqStorePaymentMethods || [],
+      paymentTerms: fr
+        ? 'Paiement direct au magasin — Rizq n’encaisse pas vos achats.'
+        : 'الدفع مباشرة لحساب المحل — رزق لا يستلم ثمن مشترياتك.',
       lines: [{ id: id, name: fr ? (p.nameF || p.name) : p.name, qty: 1, unitPrice: Number(p.price) || 0 }],
       meta: { source: 'store-product' }
     });

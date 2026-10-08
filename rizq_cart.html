@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -361,6 +361,8 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_stock.js"></script>
+  <script src="rizq_account_payments.js"></script>
+  <script src="rizq_contact_gate.js"></script>
 <script src="rizq_site_banner.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -573,6 +575,10 @@ main, .page-content.active, .main-content, .results-area,
           </div>
         </label>
       </div>
+      <div id="cart-seller-payments" style="margin-top:12px;display:none"></div>
+      <p style="font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5" id="cart-pay-trust-note">
+        التحويل يتم لحساب المحل مباشرة — رزق وسيط نشر فقط ولا يستلم ثمن مشترياتك.
+      </p>
     </div>
 
     <button type="button" class="order-btn rizq-prf-trigger-gold" id="cart-prefacture-btn" onclick="issueCartPrefacture()" style="width:100%;margin-bottom:10px;border:none;cursor:pointer;font-family:inherit">
@@ -675,6 +681,7 @@ let deliveryType = 'delivery';
 let deliveryFee  = 500;
 let promoDiscount = 0;
 let paymentMethod = 'cod';
+try{ loadCartSellerPayments(); }catch(e){}
 
 function renderCart() {
   const list = document.getElementById('cart-items-list');
@@ -851,6 +858,45 @@ function buildWALink() {
   if (el) el.href = `https://wa.me/22244882212?text=${encodeURIComponent(msg)}`;
 }
 
+function _cartSellerId(){
+  try{
+    var p = new URLSearchParams(location.search);
+    var sid = p.get('id') || p.get('store') || '';
+    if(sid) return sid;
+  }catch(e){}
+  if(cart[0]) return cart[0].storeId || cart[0].accountId || '';
+  return '';
+}
+
+function loadCartSellerPayments(){
+  var box = document.getElementById('cart-seller-payments');
+  if(!box) return;
+  var storeId = _cartSellerId();
+  if(!storeId || !window.RIZQ_BACKEND_BASE){
+    box.style.display = 'none';
+    return;
+  }
+  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+  var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};
+  fetch(base + '/api/accounts/public', { headers: headers })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      var acc = (data && data.accounts || []).find(function(a){ return a && a.id === storeId; });
+      window._rizqCartSellerPayments = (acc && Array.isArray(acc.paymentMethods)) ? acc.paymentMethods : [];
+      window._rizqCartSellerName = (acc && acc.name) || '';
+      var isFr = document.documentElement.lang === 'fr';
+      if(typeof RizqAccountPayments !== 'undefined'){
+        RizqAccountPayments.renderPublic(box, window._rizqCartSellerPayments, { fr: isFr });
+      }
+      var note = document.getElementById('cart-pay-trust-note');
+      if(note && window._rizqCartSellerName){
+        note.textContent = isFr
+          ? ('Le virement va directement à « ' + window._rizqCartSellerName + ' » — Rizq n’encaisse pas vos achats.')
+          : ('التحويل يصل مباشرة إلى « ' + window._rizqCartSellerName + ' » — رزق لا يستلم ثمن مشترياتك.');
+      }
+    }).catch(function(){ box.style.display = 'none'; });
+}
+
 function issueCartPrefacture(){
   const isAr = document.documentElement.lang !== 'fr';
   if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
@@ -865,12 +911,16 @@ function issueCartPrefacture(){
   var nameEl = document.getElementById('f-name');
   var phoneEl = document.getElementById('f-phone');
   var doc = RizqPrefacture.createFromCart({
-    module: 'store',
-    sellerName: (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
-    sellerAccountId: (cart[0] && (cart[0].storeId || cart[0].accountId)) || '',
+    module: (cart[0] && cart[0].module) || 'store',
+    sellerName: window._rizqCartSellerName || (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
+    sellerAccountId: _cartSellerId(),
     buyerName: nameEl ? nameEl.value.trim() : '',
     buyerPhone: phoneEl ? phoneEl.value.trim() : '',
-    buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement'
+    buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement',
+    paymentMethods: window._rizqCartSellerPayments || [],
+    paymentTerms: isAr
+      ? 'الدفع مباشرة لحساب المحل عبر الطرق أدناه — رزق وسيط نشر فقط.'
+      : 'Paiement direct au magasin via les moyens ci-dessous — Rizq est uniquement un intermédiaire.'
   });
   if (!doc) { showToast(isAr ? '❌ تعذّر إنشاء فاتورة قبل' : '❌ Impossible de créer la préfacture'); return; }
   RizqPrefacture.openModal(doc.id);

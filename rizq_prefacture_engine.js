@@ -133,12 +133,68 @@
     return { subtotal: sub, total: sub, currency: 'MRU' };
   }
 
+  function _normalizePaymentMethods(list) {
+    if (!Array.isArray(list)) return [];
+    return list.slice(0, 10).map(function (m) {
+      return {
+        type: String((m && m.type) || 'bank').slice(0, 40),
+        bank: String((m && m.bank) || '').slice(0, 120),
+        code: String((m && m.code) || '').slice(0, 120),
+        note: String((m && m.note) || '').slice(0, 300)
+      };
+    }).filter(function (m) {
+      return m.bank || m.code || m.type === 'cash' || m.type === 'instore';
+    });
+  }
+
+  function _payTypeLabel(type) {
+    var map = {
+      bank: _t('تحويل بنكي', 'Virement bancaire'),
+      bankily: 'Bankily',
+      sedad: 'Sedad',
+      bimbam: 'Bimbam',
+      mobile: _t('محفظة رقمية', 'Portefeuille mobile'),
+      cash: _t('نقداً عند الاستلام', 'Espèces à la livraison'),
+      instore: _t('الدفع في المحل', 'Paiement en magasin'),
+      custom: _t('طريقة أخرى', 'Autre moyen')
+    };
+    return map[type] || _t('دفع', 'Paiement');
+  }
+
+  function _renderPaymentBlock(doc, forPrint) {
+    var methods = _normalizePaymentMethods(doc.paymentMethods);
+    var terms = String(doc.paymentTerms || '').trim();
+    if (!methods.length && !terms) return '';
+    var pad = forPrint ? '14px' : '12px';
+    var rows = methods.map(function (m) {
+      return '<div style="padding:10px 12px;border:1px solid rgba(201,168,76,.28);border-radius:10px;background:linear-gradient(135deg,rgba(15,35,71,.03),rgba(201,168,76,.06));margin-bottom:8px">'
+        + '<div style="font-size:11px;font-weight:800;color:#C9A84C;margin-bottom:3px">' + _esc(_payTypeLabel(m.type)) + '</div>'
+        + (m.bank ? '<div style="font-size:13px;font-weight:800;color:#0F2347">' + _esc(m.bank) + '</div>' : '')
+        + (m.code ? '<div style="font-family:ui-monospace,monospace;font-size:14px;font-weight:800;color:#0F2347;margin-top:4px;direction:ltr;text-align:inherit">' + _esc(m.code) + '</div>' : '')
+        + (m.note ? '<div style="font-size:11px;color:#6b7280;margin-top:4px">' + _esc(m.note) + '</div>' : '')
+        + '</div>';
+    }).join('');
+    return '<div style="margin-top:18px;padding:' + pad + ';border-radius:12px;border:1px solid rgba(15,35,71,.1);background:#fbfcff">'
+      + '<div style="font-size:11px;letter-spacing:1.5px;font-weight:900;color:#0F2347;margin-bottom:8px">'
+      + _esc(_t('طرق الدفع — حساب البائع مباشرة', 'Moyens de paiement — compte vendeur'))
+      + '</div>'
+      + (terms ? '<p style="font-size:12px;color:#4b5563;line-height:1.55;margin:0 0 10px">' + _esc(terms) + '</p>' : '')
+      + rows
+      + '<p style="font-size:10px;color:#9aa3b2;margin:8px 0 0;line-height:1.5">'
+      + _esc(_t(
+        'هذه رموز البائع/مقدّم الخدمة — وليست حسابات اشتراك منصة رزق.',
+        'Ces coordonnées appartiennent au vendeur/prestataire — pas aux comptes d’abonnement Rizq.'
+      ))
+      + '</p></div>';
+  }
+
   /**
    * create({
    *   module: 'store'|'showroom'|'office'|'tender',
    *   sellerAccountId, sellerName, sellerPhone,
    *   buyerName, buyerPhone, buyerNote,
    *   lines: [{name, qty, unitPrice}],
+   *   paymentMethods?, paymentTerms?,
    *   status?, meta?
    * })
    */
@@ -161,6 +217,8 @@
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
       buyerNote: opts.buyerNote || '',
+      paymentMethods: _normalizePaymentMethods(opts.paymentMethods),
+      paymentTerms: String(opts.paymentTerms || '').slice(0, 500),
       lines: lines,
       subtotal: tot.subtotal,
       total: tot.total,
@@ -239,6 +297,8 @@
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
       buyerNote: opts.buyerNote || '',
+      paymentMethods: opts.paymentMethods,
+      paymentTerms: opts.paymentTerms,
       lines: lines,
       status: STATUS.sent,
       meta: { source: 'cart' }
@@ -255,6 +315,8 @@
       sellerPhone: opts.sellerPhone || '',
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
+      paymentMethods: opts.paymentMethods,
+      paymentTerms: opts.paymentTerms,
       lines: [{
         id: opts.id,
         name: opts.name || opts.title,
@@ -276,6 +338,8 @@
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
       buyerNote: opts.buyerNote || '',
+      paymentMethods: opts.paymentMethods,
+      paymentTerms: opts.paymentTerms,
       lines: [{
         id: opts.id,
         name: opts.name || opts.title || _t('خدمة مكتبية', 'Service de bureau'),
@@ -343,6 +407,7 @@
       + '</div>'
       + '<div style="font-size:18px;font-weight:900;color:#0F2347">' + _esc(_t('الإجمالي', 'Total')) + ': <span style="color:#C9A84C">' + _esc(_fmtMoney(doc.total)) + '</span></div>'
       + '</div>'
+      + _renderPaymentBlock(doc, true)
       + (showStamp
         ? '<div style="margin-top:22px;padding:14px;border:2px dashed #C9A84C;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(15,35,71,.04));text-align:center">'
           + '<div style="font-size:10px;letter-spacing:2px;color:#C9A84C;font-weight:800">' + BRAND + ' · RIZQ</div>'
@@ -478,6 +543,7 @@
       + '</div>'
       + '<div class="rizq-prf-lines">' + linesHtml + '</div>'
       + '<div class="rizq-prf-total">' + _esc(_t('الإجمالي', 'Total')) + ' <strong>' + _esc(_fmtMoney(doc.total)) + '</strong></div>'
+      + _renderPaymentBlock(doc, false)
       + stampBlock
       + '<div class="rizq-prf-actions">' + actions + '</div>'
       + '<p class="rizq-prf-disc">' + _esc(_t(
