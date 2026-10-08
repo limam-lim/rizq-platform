@@ -90,6 +90,73 @@
     global.open('https://wa.me/' + phone.replace(/[^\d]/g, '') + '?text=' + encodeURIComponent(msg), '_blank');
   }
 
+  var VIEWED_KEY = 'rizq_recently_viewed';
+  var VIEWED_MAX = 80;
+
+  function viewedIds() {
+    try {
+      var v = JSON.parse(localStorage.getItem(VIEWED_KEY) || '[]');
+      return Array.isArray(v) ? v.map(String) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function isViewed(id) {
+    if (id == null || id === '') return false;
+    return viewedIds().indexOf(String(id)) !== -1;
+  }
+
+  function seenLabel(fr) {
+    return fr ? 'Déjà vu' : 'شاهدته من قبل';
+  }
+
+  function seenHtml(fr) {
+    return '<div class="rzq-adx-seen" aria-label="' + esc(seenLabel(fr)) + '">' +
+      '<span class="rzq-adx-seen-ico" aria-hidden="true">👁</span>' +
+      '<span class="rzq-adx-seen-txt">' + esc(seenLabel(fr)) + '</span>' +
+      '</div>';
+  }
+
+  function syncSeenOnMedia(media, fr) {
+    if (!media) return;
+    var id = media.getAttribute('data-ad-id');
+    if (!id) return;
+    var on = isViewed(id);
+    media.classList.toggle('has-seen', on);
+    var existing = media.querySelector('.rzq-adx-seen');
+    if (on && !existing) {
+      media.insertAdjacentHTML('beforeend', seenHtml(!!fr));
+    } else if (!on && existing) {
+      existing.parentNode.removeChild(existing);
+    } else if (on && existing) {
+      var t = existing.querySelector('.rzq-adx-seen-txt');
+      if (t) t.textContent = seenLabel(!!fr);
+    }
+  }
+
+  function refreshSeenBadges(root) {
+    root = root || document;
+    var fr = document.documentElement.lang === 'fr' ||
+      (document.body && document.body.classList.contains('rizq-lang-fr'));
+    var nodes = root.querySelectorAll('.rzq-adx-media[data-ad-id]');
+    for (var i = 0; i < nodes.length; i++) syncSeenOnMedia(nodes[i], fr);
+  }
+
+  /** سجّل مشاهدة إعلان — يظهر «شاهدته من قبل» عند العودة للقوائم */
+  function markViewed(id) {
+    if (id == null || id === '') return;
+    var sid = String(id);
+    var ids = viewedIds().filter(function (x) { return x !== sid; });
+    ids.unshift(sid);
+    if (ids.length > VIEWED_MAX) ids = ids.slice(0, VIEWED_MAX);
+    try { localStorage.setItem(VIEWED_KEY, JSON.stringify(ids)); } catch (e) {}
+    refreshSeenBadges(document);
+    try {
+      global.dispatchEvent(new CustomEvent('rizq_recently_viewed', { detail: { ids: ids, id: sid } }));
+    } catch (e2) {}
+  }
+
   /**
    * @param {object} ad
    * @param {object} opts
@@ -110,6 +177,7 @@
     var accountId = (ad && ad.accountId) || '';
     var locked = !!(ad && ad.contactsLocked);
     var favOn = id ? isFav(id) : false;
+    var viewed = id ? isViewed(id) : false;
 
     var slides = '';
     if (imgs.length) {
@@ -133,16 +201,20 @@
         '<button type="button" class="rzq-adx-nav rzq-adx-next" aria-label="' + (fr ? 'Suivante' : 'التالي') + '">‹</button>'
       : '';
 
+    var cls = 'rzq-adx-media' + (multi ? ' has-multi' : '') + (viewed ? ' has-seen' : '') + (pin ? ' has-pin' : '');
+
     return ''
-      + '<div class="rzq-adx-media' + (multi ? ' has-multi' : '') + '" data-ad-id="' + esc(id) + '" data-idx="0" data-count="' + (imgs.length || 1) + '">'
+      + '<div class="' + cls + '" data-ad-id="' + esc(id) + '" data-idx="0" data-count="' + (imgs.length || 1) + '">'
       +   '<div class="rzq-adx-slides">' + slides + '</div>'
       +   '<div class="rzq-adx-grad"></div>'
+      +   '<span class="rzq-adx-wm" aria-hidden="true">' + (fr ? 'Rizq' : 'رزق') + '</span>'
       +   '<button type="button" class="rzq-adx-fav' + (favOn ? ' is-on' : '') + '" data-ad-id="' + esc(id) + '" aria-label="' + (fr ? 'Favoris' : 'المفضلة') + '" aria-pressed="' + (favOn ? 'true' : 'false') + '">' + (favOn ? '♥' : '♡') + '</button>'
       +   '<button type="button" class="rzq-adx-wa" data-ad-id="' + esc(id) + '" data-phone="' + esc(phone) + '" data-account="' + esc(accountId) + '" data-locked="' + (locked ? '1' : '0') + '" aria-label="WhatsApp">✆</button>'
       +   nav
       +   dots
       +   (price ? '<div class="rzq-adx-price">' + esc(price) + '</div>' : '')
       +   (pin ? '<div class="rzq-adx-badge">' + (fr ? 'Vedette' : 'مميّز') + '</div>' : '')
+      +   (viewed ? seenHtml(fr) : '')
       + '</div>';
   }
 
@@ -274,9 +346,15 @@
     go: go,
     toggleFav: toggleFav,
     openWhatsApp: openWhatsApp,
-    seedDemoGalleries: seedDemoGalleries
+    seedDemoGalleries: seedDemoGalleries,
+    isViewed: isViewed,
+    markViewed: markViewed,
+    viewedIds: viewedIds,
+    refreshSeenBadges: refreshSeenBadges
   };
 
   global.RizqAdCards = api;
+  /* توافق خلفي — مسارات الفتح تستدعيه مباشرة */
+  global.rizqMarkAdViewed = markViewed;
   observe();
 })(typeof window !== 'undefined' ? window : this);

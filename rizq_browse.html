@@ -2341,6 +2341,10 @@ function selectAd(id){
   const ad=getAdById(id);
   window._currentAd=ad;
   _phoneRevealed=false;
+  try{
+    if(window.RizqAdCards && typeof RizqAdCards.markViewed==='function') RizqAdCards.markViewed(ad && ad.id);
+    else if(typeof window.rizqMarkAdViewed==='function') window.rizqMarkAdViewed(ad && ad.id);
+  }catch(eView){}
   try { window.dispatchEvent(new CustomEvent('rizq:ad-context', { detail: { id: ad.id, ad: ad } })); } catch(e){}
   /* غذِّ أفكار الأنماط من المنتج المعروض (قميص، هاتف، حذاء، ساعة…) */
   try {

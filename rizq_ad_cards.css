@@ -147,6 +147,45 @@
   box-shadow:0 3px 10px rgba(201,168,76,.32);
 }
 
+/* علامة رزق شفافة في الركن — لا تغطي وسط الصورة */
+.rzq-adx-wm{
+  position:absolute;z-index:3;pointer-events:none;
+  inset-inline-end:7px;bottom:7px;
+  font-family:'Cairo','Segoe UI',sans-serif;
+  font-size:10px;font-weight:800;letter-spacing:.2px;
+  color:rgba(255,255,255,.42);
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
+  line-height:1;user-select:none;
+}
+.rzq-adx-media.has-seen .rzq-adx-wm,
+.rzq-adx-media.has-pin .rzq-adx-wm{
+  bottom:34px;
+  color:rgba(255,255,255,.34);
+}
+
+/* شارة «شاهدته من قبل» */
+.rzq-adx-seen{
+  position:absolute;z-index:6;
+  bottom:8px;inset-inline-end:8px;
+  display:inline-flex;align-items:center;gap:5px;
+  max-width:calc(100% - 16px);
+  padding:4px 9px;border-radius:999px;
+  background:rgba(15,23,42,.62);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#fff;font-size:10px;font-weight:800;line-height:1;
+  font-family:'Cairo','Segoe UI',sans-serif;
+  white-space:nowrap;pointer-events:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.22);
+}
+.rzq-adx-seen-ico{font-size:11px;line-height:1;opacity:.95}
+.rzq-adx-seen-txt{overflow:hidden;text-overflow:ellipsis}
+
+/* عند وجود «شاهدته» انقل شارة مميّز بعيداً عن الركن السفلي */
+.rzq-adx-media.has-seen .rzq-adx-badge{
+  bottom:auto;top:42px;inset-inline-end:8px;
+}
+
 /* Hide legacy overlays that block carousel controls */
 .ad-card:has(.rzq-adx-media) .ad-hover-detail{display:none!important}
 .listing-card:has(.rzq-adx-media) .lc-hover{display:none!important}
