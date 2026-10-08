@@ -182,10 +182,10 @@
 /* كبسولة السعر — مستطيلة ذهبية شفافة، في الوسط */
 .rzq-adx-price{
   position:absolute;z-index:8;
-  left:0;right:0;bottom:10px;
+  left:50%;right:auto;bottom:10px;
   width:max-content;max-width:calc(100% - 24px);
-  margin-inline:auto;
-  transform:none;
+  margin:0;
+  transform:translateX(-50%);
   inset-inline-start:auto;inset-inline-end:auto;
   padding:4px 9px;border-radius:3px;
   font-size:11px;font-weight:800;letter-spacing:.12px;color:#FFF6D6;
