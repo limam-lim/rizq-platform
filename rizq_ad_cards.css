@@ -387,13 +387,26 @@
 .listing-card:has(.rzq-adx-media) > .lad-fav,
 .listing-card:has(.rzq-adx-media) > .l-badge{display:none!important}
 
+/* «مميّز» على الصورة فقط — لا تُخلط مع أزرار الاتصال في الأسفل */
 .rc:has(.rzq-adx-media) .rc-meta .rc-pin,
-.rc:has(.rzq-adx-media) .rc-meta .rc-sponsored{
-  margin-top:4px;
+.rc:has(.rzq-adx-media) .rc-meta .rc-sponsored,
+.rc:has(.rzq-adx-media) .rc-meta .rc-stock-badge{
+  display:none!important;
 }
 .rc:has(.rzq-adx-media) .rc-meta{
   justify-content:center;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
+  margin:0 0 6px!important;
+  gap:4px;
+}
+.rc:has(.rzq-adx-media) .rc-meta .rc-verified{
+  display:none!important;
+}
+/* أزرار الاتصال — صف منفصل بمسافة واضحة */
+.rc:has(.rzq-adx-media) .rzq-adx-actions{
+  margin-top:2px;
+  gap:14px;
+  padding-top:2px;
 }
 
 /* إيقاف شريط المباشر أثناء التفاعل */

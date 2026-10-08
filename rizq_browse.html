@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=30.2"/>
-  <link rel="stylesheet" href="rizq_ad_cards.css?v=2.9"/>
+  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.0"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -2270,9 +2270,10 @@ function _adCardHtml(a, fr){
       <div class="rc-title">${escapeHtml(_title)}</div>
       <div class="rc-meta">
         <span class="rc-loc">${escapeHtml(_loc)}</span>
-        ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
-        ${a.verified?`<span class="rc-verified">✓</span>`:''}
-        ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
+        ${/* شارة مميّز على الصورة (rzq-adx-badge) — لا تُكرر بجانب أزرار الاتصال */''}
+        ${(!media.includes('rzq-adx-media') && a.boosted)?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:((!media.includes('rzq-adx-media') && a.pin)?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
+        ${(!media.includes('rzq-adx-media') && a.verified)?`<span class="rc-verified">✓</span>`:''}
+        ${(!media.includes('rzq-adx-media') && a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
       </div>
       ${actions}
     </div>
