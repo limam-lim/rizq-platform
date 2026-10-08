@@ -147,7 +147,8 @@ nav .nav-disclaimer{flex-shrink:0}
   inset:var(--rizq-header-h,86px) 0 0 0;
   z-index:5200;
   background:rgba(8,15,30,.58);backdrop-filter:blur(6px);
-  padding:12px;overflow-y:auto;align-items:flex-start;justify-content:center;
+  padding:10px 12px 12px;overflow-y:auto;
+  flex-direction:column;align-items:center;justify-content:flex-start;
 }
 .browse-wrap.has-detail .browse-left{flex:1;overflow:hidden;filter:none}
 .browse-wrap.has-detail .browse-right{display:flex}
@@ -295,6 +296,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
   box-shadow:0 18px 48px rgba(8,15,30,.36),inset 0 1px 0 rgba(255,255,255,.7);
   overflow-x:hidden;overflow-y:auto;position:relative;
   max-height:calc(100dvh - var(--rizq-header-h,86px) - 24px);min-height:0;
+  flex:0 1 auto;align-self:center;
 }
 html[dir="ltr"] #detail-content,
 html[lang="fr"] #detail-content{
@@ -790,8 +792,10 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-wrap.has-detail .bs-sidebar{width:260px;flex:0 0 260px}
   .browse-right{
     inset:var(--rizq-header-h,86px) 0 0 0!important;
-    padding:12px!important;
-    align-items:flex-start!important;
+    padding:10px 12px 12px!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
   }
   .dp-wrap{padding:12px 16px 18px}
   /* الصورة تمتد للأسفل لتغطي فراغ العمود عند قصر الصورة */
