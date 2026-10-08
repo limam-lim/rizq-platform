@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=30.6"/>
+  <link rel="stylesheet" href="rizq_header.css?v=30.8"/>
   <link rel="stylesheet" href="rizq_ad_cards.css?v=3.4"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -155,6 +155,56 @@ nav .nav-disclaimer{flex-shrink:0}
 .browse-right::-webkit-scrollbar{width:4px}
 .browse-right::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
 body.rizq-detail-open{overflow:hidden}
+
+/* واجهة التفاصيل: لا شريط بحث/مسار/فوتر فوق اللوحة */
+html.rizq-app-nav body.rizq-detail-open > #nav-browse-search,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > #nav-browse-search,
+html.rizq-app-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
+html.rizq-app-nav body.rizq-detail-open > nav:has(.nav-search),
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav:not(#rizq-desk-nav):has(.nav-search),
+html.rizq-app-nav body.rizq-detail-open > .breadcrumb,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > .breadcrumb,
+body.rizq-detail-open > #nav-browse-search,
+body.rizq-detail-open > nav.rizq-search-strip-nav,
+body.rizq-detail-open > .breadcrumb,
+body.rizq-detail-open > #mobile-tabs,
+body.rizq-detail-open > #mobile-stats-slot,
+body.rizq-detail-open > footer.rizq-footer,
+body.rizq-detail-open .rzq-ft-toggle-row,
+body.rizq-detail-open .rzq-ft-adminia-stack,
+body.rizq-detail-open .rzq-ft-toggle-btn,
+body.rizq-detail-open .fixed-disc-pill{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  height:0!important;
+  max-height:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  border:none!important;
+  box-shadow:none!important;
+}
+/* اخرج من stacking context حتى تغطي اللوحة الصفحة ولا يطفو البحث فوقها */
+html.rizq-app-nav .browse-wrap.has-detail,
+html.rizq-app-nav.has-rizq-desk-nav .browse-wrap.has-detail,
+.browse-wrap.has-detail{
+  isolation:auto!important;
+  position:relative;
+  z-index:1;
+}
+.browse-wrap.has-detail .browse-right,
+body.rizq-detail-open .browse-right,
+html.rizq-app-nav body.rizq-detail-open .browse-right{
+  position:fixed!important;
+  inset:var(--rizq-header-h,68px) 0 0 0!important;
+  z-index:12000!important;
+  background:linear-gradient(160deg,#e8eef8 0%,#f4f7fc 45%,#eef2fa 100%)!important;
+  backdrop-filter:none!important;
+}
 
 /* LEFT SIDEBAR (FILTERS) — إعادة تصميم بصري (2026-08-11): تسلسل هرمي أوضح
    بين الأقسام، عناصر تحكم مخصصة بدل عناصر المتصفح الافتراضية الصغيرة،
@@ -727,7 +777,7 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 .ed-shimmer-bar{height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);background-size:200% auto;animation:shimmer 2.5s linear infinite;border-radius:2px;margin:20px auto;width:80px;opacity:.7}
 
 /* BROWSE RIGHT background */
-.browse-right{background:linear-gradient(160deg,#f3f6ff 0%,#f8faff 100%)}
+.browse-right{background:linear-gradient(160deg,#eef2fa 0%,#f7f9fc 55%,#f3f6ff 100%)!important}
 
 /* FOOTER */
 footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#0a1628);border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 0;color:rgba(255,255,255,.72)}
@@ -1217,11 +1267,11 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=20" defer></script>
+<script src="rizq_footer_toggle.js?v=22" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
-<script src="rizq_ad_cards.js?v=2.8"></script>
+<script src="rizq_ad_cards.js?v=2.9"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
@@ -2435,6 +2485,55 @@ function gotoPage(p){
   if(body) body.scrollTop=0;
 }
 
+/** أخفِ شريط البحث/المسار/فوتر الروابط أثناء لوحة التفاصيل — لا تقطع الصورة ولا تطفو فوقها */
+function syncDetailChrome(open){
+  var hide = !!open;
+  var nodes = [
+    document.getElementById('nav-browse-search'),
+    document.querySelector('nav.rizq-search-strip-nav'),
+    document.querySelector('.breadcrumb'),
+    document.getElementById('mobile-tabs'),
+    document.getElementById('mobile-stats-slot'),
+    document.querySelector('footer.rizq-footer'),
+    document.querySelector('.rzq-ft-toggle-row'),
+    document.querySelector('.rzq-ft-adminia-stack'),
+    document.querySelector('.rzq-ft-toggle-btn'),
+    document.getElementById('fixed-disc-pill')
+  ];
+  for(var i=0;i<nodes.length;i++){
+    var el=nodes[i];
+    if(!el) continue;
+    if(hide){
+      if(el.dataset.rzqDetailPrevDisplay==null) el.dataset.rzqDetailPrevDisplay = el.style.display || '';
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+      el.setAttribute('aria-hidden','true');
+    } else {
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('pointer-events');
+      if(el.dataset.rzqDetailPrevDisplay!=null){
+        if(el.dataset.rzqDetailPrevDisplay) el.style.display = el.dataset.rzqDetailPrevDisplay;
+        delete el.dataset.rzqDetailPrevDisplay;
+      }
+      el.removeAttribute('aria-hidden');
+    }
+  }
+  document.querySelectorAll('.rzq-ft-toggle-row, .rzq-ft-toggle-btn, .rzq-ft-adminia-stack').forEach(function(el){
+    if(!el) return;
+    if(hide){
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+    } else {
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('pointer-events');
+    }
+  });
+}
+
 // ══════════ CORE SPA: selectAd ══════════
 function selectAd(id){
   const ad=getAdById(id);
@@ -2492,6 +2591,7 @@ function selectAd(id){
   // Show detail overlay sheet
   document.querySelector('.browse-wrap').classList.add('has-detail');
   document.body.classList.add('rizq-detail-open');
+  try{ syncDetailChrome(true); }catch(eChrome){}
   const ed=document.getElementById('empty-detail');
   if(ed) ed.style.display='none';
   const dc=document.getElementById('detail-content');
@@ -3081,6 +3181,7 @@ function rizqTagClick(el){
   if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
   document.body.classList.remove('rizq-detail-open');
+  try{ syncDetailChrome(false); }catch(eChrome){}
   window._currentAd=null;
   // على الموبايل: switchTab
   switchTab('list');
@@ -3095,6 +3196,7 @@ function closeAdDetail(){
   if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
   document.body.classList.remove('rizq-detail-open');
+  try{ syncDetailChrome(false); }catch(eChrome){}
   document.querySelectorAll('.rc').forEach(el=>el.classList.remove('active'));
   window._currentAd=null;
   if(window.innerWidth<=900) switchTab('list');
@@ -3202,13 +3304,19 @@ function switchTab(tab){
     right.classList.add('tab-hidden');right.classList.remove('tab-active');
     if(window.innerWidth<=900 && wrap && !window._currentAd){
       wrap.classList.remove('has-detail');
+      document.body.classList.remove('rizq-detail-open');
+      try{ syncDetailChrome(false); }catch(e){}
     }
     if(btnList){btnList.classList.add('active');}
     if(btnDetail){btnDetail.classList.remove('active');}
   } else {
     right.classList.remove('tab-hidden');right.classList.add('tab-active');
     left.classList.add('tab-hidden');left.classList.remove('tab-active');
-    if(window.innerWidth<=900 && wrap) wrap.classList.add('has-detail');
+    if(window.innerWidth<=900 && wrap){
+      wrap.classList.add('has-detail');
+      document.body.classList.add('rizq-detail-open');
+      try{ syncDetailChrome(true); }catch(e){}
+    }
     if(btnDetail){btnDetail.classList.add('active');}
     if(btnList){btnList.classList.remove('active');}
   }

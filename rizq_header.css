@@ -1228,6 +1228,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     max-width:100%;
     isolation:isolate;
   }
+  /* مع لوحة التفاصيل: لا تحبس position:fixed داخل stacking context وإلا يطفو شريط البحث فوقها */
+  html.rizq-app-nav.has-rizq-desk-nav .browse-wrap.has-detail{
+    isolation:auto !important;
+    z-index:5200;
+  }
   html.rizq-app-nav.has-rizq-desk-nav .browse-left,
   html.rizq-app-nav.has-rizq-desk-nav .bs-sidebar,
   html.rizq-app-nav.has-rizq-desk-nav #result-list-body{
