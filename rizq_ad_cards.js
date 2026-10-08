@@ -383,13 +383,14 @@
   /** ألبومات تجريبية — صور عمودية فاخرة مطابقة للنموذج */
   function seedDemoGalleries(list) {
     if (!list || !list.length) return;
+    var fashionV = 'v2'; /* وجوه وهمية مرسومة — كسر كاش الصور القديمة */
     var fashion = {
-      melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.jpg',
-      melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.jpg',
-      melhafaLilac: 'rizq-assets/demo-fashion/demo-melhafa-street-lilac.jpg',
-      daraaStreet: 'rizq-assets/demo-fashion/demo-daraa-street-dark.jpg',
-      daraaShop: 'rizq-assets/demo-fashion/demo-daraa-shop-olive.jpg',
-      daraaBoutique: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg'
+      melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.jpg?' + fashionV,
+      melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.jpg?' + fashionV,
+      melhafaLilac: 'rizq-assets/demo-fashion/demo-melhafa-street-lilac.jpg?' + fashionV,
+      daraaStreet: 'rizq-assets/demo-fashion/demo-daraa-street-dark.jpg?' + fashionV,
+      daraaShop: 'rizq-assets/demo-fashion/demo-daraa-shop-olive.jpg?' + fashionV,
+      daraaBoutique: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg?' + fashionV
     };
     var map = {
       '101': ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=70'],
