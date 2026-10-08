@@ -1996,7 +1996,7 @@ function rizqShare(title, url) {
                 var pkgHide = document.getElementById('store-packages');
                 if(pkgHide) pkgHide.style.display = 'none';
                 setText('store-name-el', acc.name);
-                if(acc.desc) setText('store-tagline-el', acc.desc);
+                if(acc.desc){ setText('store-tagline-el', acc.desc); setText('about-txt', acc.desc); }
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr); }
