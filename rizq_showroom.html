@@ -122,6 +122,10 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s;
 }
 .page-sec-btn:hover{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.5)}
+/* فيديو تعريفي — قسم هادئ تحت الهيرو، بهوية الصفحة لا شريط داكن */
+.video-intro-section{padding:28px 16px 32px;background:linear-gradient(180deg,#F5F0E6 0%,#FBF8F2 100%);border-bottom:1px solid rgba(38,48,63,.1)}
+.video-intro-section .rzq-iv-src{color:rgba(38,48,63,.55)}
+.video-intro-section .rzq-iv-src:hover{color:#1B3A6B}
 @media(max-width:800px){
   .actions-bar{position:sticky;top:calc(var(--rizq-header-h,0px) + 44px);z-index:43}
 }
@@ -266,13 +270,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 </head>
 <body>
 
-<!-- ═══ INTRO VIDEO SECTION ═══
-     نفس نمط المكتب/المحل: يظهر عند وجود account.promo_video عبر rizq_intro_video.js
-     أعلى الصفحة (فوق الشريط والهيرو). -->
-<section class="video-intro-section" id="video-intro-section" style="display:none;padding:36px 16px;background:#0D1B2A">
-  <div id="intro-video-mount"></div>
-</section>
-
 <!-- ══ TOPNAV ══ -->
 <nav class="topnav" id="main-nav">
   <div class="topnav-inner">
@@ -369,7 +366,11 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </div>
 
-
+<!-- ═══ INTRO VIDEO — تحت الهيرو/شريط الأقسام (لا فوق الواجهة) ═══
+     يظهر فقط عند وجود account.promo_video عبر rizq_intro_video.js -->
+<section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+  <div id="intro-video-mount"></div>
+</section>
 
 <!-- ══ MAIN ══ -->
 <div class="main-wrap">
@@ -1463,7 +1464,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js"></script>
 <script>
-/* فيديو تعريفي مضمَّن — يظهر أعلى الصفحة عند وجود promo_video على الحساب */
+/* فيديو تعريفي مضمَّن — تحت الهيرو عند وجود promo_video على الحساب */
 (function mountShowroomIntroVideo(){
   try{
     var url = (_acc && _acc.promo_video) || '';
