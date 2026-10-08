@@ -754,11 +754,13 @@ var _params = new URLSearchParams(location.search);
 var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || '';
 
 (function applyDemoShowroomBootstrap(){
-  var want = !_showroomId || _params.get('demo') === '1' || _showroomId === 'demo_showroom';
+  var want = !_showroomId || _params.get('demo') === '1'
+    || _showroomId === 'demo_showroom' || _showroomId === 'demo-corp-001';
   if(!want) return;
   var fr = false;
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
-  _showroomId = 'demo_showroom';
+  // نفس معرّف داشبورد الشركات التجريبي حتى تصل الطلبات لصندوق الوارد
+  _showroomId = 'demo-corp-001';
   var acc = {
     id: _showroomId, type: 'corp', status: 'approved',
     name: fr ? 'Showroom Prestige' : 'معرض بريستيج',
@@ -987,6 +989,9 @@ function applyAccountData(){
   }
 
   if(!_acc) return;
+  // باقات اشتراك المنصة — للمشترك في الداشبورد فقط، ليست لزائر المعرض
+  var _pkgSec = document.getElementById('pkg-section');
+  if(_pkgSec) _pkgSec.style.display = 'none';
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
   if(window.RizqServiceDesk){

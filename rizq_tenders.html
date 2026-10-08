@@ -104,7 +104,9 @@ body{
 .tender-cta-strip .tcs-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:inherit;text-decoration:none;box-shadow:0 6px 16px rgba(201,168,76,.28)}
 .tender-cta-strip .tcs-btn.ghost{background:rgba(255,255,255,.06);color:#E8C96A;border:1px solid rgba(201,168,76,.35);box-shadow:none}
 .tender-cta-strip .tcs-btn.ghost:hover{background:rgba(201,168,76,.14)}
-/* باقات غرفة المناقصات */
+/* باقات غرفة المناقصات — مخفية من غرفة الزائر؛ الاشتراك من الداشبورد/التسجيل فقط */
+#tender-packages,.tender-pkg-section{display:none!important}
+a[href="#tender-packages"]{display:none!important}
 .tender-pkg-section{padding:40px 5% 52px;background:linear-gradient(180deg,#fbfcff 0%,#eef2fb 100%);border-top:1px solid #e7ecf3;position:relative;overflow:hidden}
 .tender-pkg-section::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%);pointer-events:none}
 .tender-pkg-head{position:relative;z-index:1;text-align:center;margin-bottom:24px;max-width:720px;margin-left:auto;margin-right:auto}
@@ -287,7 +289,6 @@ body{
   <div class="tender-cta-strip-inner">
     <span class="tcs-label" data-t-fr="Publiez votre besoin et recevez des devis privés">انشر احتياجك واستقبل عروض أسعار خاصة</span>
     <div class="tcs-actions">
-      <a class="tcs-btn ghost" href="#tender-packages" data-t-fr="💼 Forfaits">💼 الباقات</a>
       <a class="tcs-btn" href="#td-submit" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</a>
     </div>
   </div>
@@ -747,14 +748,11 @@ function renderTenders(){
     if(_tenderAccess.contactsUnlocked){
       bannerEl.innerHTML = '<div class="t-access-banner info">✅ '+(fr?'Votre abonnement est actif — contacts débloqués et soumission d\'offres activée.':'اشتراكك فعّال — بيانات التواصل مكشوفة ويمكنك تقديم العروض.')+'</div>';
     } else if(_tenderAccess.isTrial){
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. ':'باقتك التجريبية فعّالة — للتصفّح فقط. ')
-        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'Voir les forfaits →':'عرض الباقات ←')+'</a></div>';
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. Gérez l\'abonnement depuis votre tableau de bord.':'باقتك التجريبية فعّالة — للتصفّح فقط. إدارة الاشتراك من لوحة التحكم.')+'</div>';
     } else if(!_getSession()){
-      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — ':'تصفّح مجاني — ')
-        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'abonnez-vous pour débloquer contacts et offres →':'اشترك لكشف التواصل وتقديم العروض ←')+'</a></div>';
+      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — connectez-vous depuis votre tableau de bord pour débloquer contacts et offres.':'تصفّح مجاني — سجّل دخولك من لوحة التحكم لكشف التواصل وتقديم العروض.')+'</div>';
     } else {
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis — ':'يلزم اشتراك مدفوع — ')
-        + '<a href="#tender-packages" style="color:inherit;font-weight:800">'+(fr?'voir les forfaits →':'عرض الباقات ←')+'</a></div>';
+      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis — activez-le depuis votre tableau de bord (Abonnement).':'يلزم اشتراك مدفوع — فعّله من لوحة التحكم ← اشتراكي.')+'</div>';
     }
   }
 
@@ -774,7 +772,6 @@ function renderTenders(){
       + '<div class="t-empty-actions">'
       + '<a class="tea-primary" href="rizq_landing_v8.html#rzq-disc-tenders">'+(fr?'🔍 Voir les appels d\'offres sur Rizq':'🔍 تصفّح المناقصات على رزق')+'</a>'
       + '<button type="button" class="tea-secondary" onclick="openPostModal()">'+(fr?'+ Publier un appel d\'offres':'+ انشر مناقصتك')+'</button>'
-      + '<a class="tea-secondary" href="#tender-packages">'+(fr?'💼 Voir les forfaits':'💼 باقات الغرفة')+'</a>'
       + '</div></div>';
     return;
   }
@@ -1048,7 +1045,7 @@ function openBidModal(tenderId){
       + '<div class="login-notice">'+(fr
         ? 'Un abonnement payant (mensuel ou plus) est requis pour soumettre une offre. L\'essai permet la consultation uniquement.'
         : 'يلزم اشتراك مدفوع (شهرية فأعلى) لتقديم العروض — الباقة التجريبية للتصفّح فقط.')
-      + '<br><a href="rizq_landing_v8.html">'+(fr?'Voir les forfaits':'عرض الباقات')+'</a></div>';
+      + '<br><a href="rizq_dashboard.html">'+(fr?'Ouvrir mon tableau de bord':'فتح لوحة التحكم')+'</a></div>';
     document.getElementById('bid-modal').classList.add('open');
     return;
   }
@@ -1132,9 +1129,7 @@ function applyLang(){
   renderCatChips();
   renderTenders();
   if (typeof refreshTdSubmitGate === 'function') refreshTdSubmitGate();
-  if (window.RizqPackagesUI && typeof RizqPackagesUI.mount === 'function') {
-    try { RizqPackagesUI.mount('tender-packages-grid', 'tender', { columns: 4, lang: l }); } catch (ePkg) {}
-  }
+  /* باقات الغرفة مخفية عن واجهة الزائر — الاشتراك من الداشبورد فقط */
   try {
     document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: l } }));
   } catch (eEv) {}

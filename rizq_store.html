@@ -1974,6 +1974,8 @@ function rizqShare(title, url) {
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
+                var pkgHide = document.getElementById('store-packages');
+                if(pkgHide) pkgHide.style.display = 'none';
                 setText('store-name-el', acc.name);
                 if(acc.desc) setText('store-tagline-el', acc.desc);
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');

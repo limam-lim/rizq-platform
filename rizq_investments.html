@@ -85,6 +85,9 @@ body{
 .inv-cta-strip .tcs-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;font-size:13px;font-weight:800;border:none;cursor:pointer;font-family:inherit;text-decoration:none;box-shadow:0 6px 16px rgba(201,168,76,.28)}
 .inv-cta-strip .tcs-btn.ghost{background:rgba(255,255,255,.06);color:#E8C96A;border:1px solid rgba(201,168,76,.35);box-shadow:none}
 
+/* باقات الغرفة — مخفية من واجهة الزائر؛ الاشتراك من الداشبورد/التسجيل فقط */
+#investment-packages,.inv-pkg-section{display:none!important}
+a[href="#investment-packages"]{display:none!important}
 .inv-pkg-section{padding:40px 5% 52px;background:linear-gradient(180deg,#fbfcff 0%,#eef2fb 100%);border-top:1px solid #e7ecf3;position:relative;overflow:hidden}
 .inv-pkg-section::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%);pointer-events:none}
 .inv-pkg-head{position:relative;z-index:1;text-align:center;margin-bottom:24px;max-width:720px;margin-left:auto;margin-right:auto}
@@ -209,7 +212,6 @@ body{
     <span class="tcs-label" data-t-fr="Préparez un dossier clair avant de parler aux investisseurs">جهّز ملفاً واضحاً قبل مخاطبة المستثمرين</span>
     <div class="tcs-actions">
       <a class="tcs-btn ghost" href="#inv-opportunities" data-t-fr="📂 Opportunités">📂 الفرص</a>
-      <a class="tcs-btn ghost" href="#investment-packages" data-t-fr="💼 Forfaits">💼 الباقات</a>
       <a class="tcs-btn" href="#inv-agent" data-t-fr="✨ Conseiller investissement">✨ وكيل الاستثمار</a>
     </div>
   </div>
@@ -743,22 +745,14 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     });
   }
 
-  function mountInvPackages() {
-    if (!window.RizqPackagesUI || typeof RizqPackagesUI.mount !== 'function') return;
-    try {
-      RizqPackagesUI.mount('investment-packages-grid', 'investment', { columns: 4, lang: lang() });
-    } catch (ePkg) {}
-  }
-
   document.addEventListener('DOMContentLoaded', function () {
     applyDataTFr();
     loadOpps();
     bindSubmit();
-    mountInvPackages();
+    /* باقات الغرفة مخفية عن واجهة الزائر — الاشتراك من الداشبورد فقط */
     document.addEventListener('rizq:langchange', function () {
       applyDataTFr();
       loadOpps();
-      mountInvPackages();
     });
   });
 })();
