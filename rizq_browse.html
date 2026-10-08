@@ -3220,8 +3220,19 @@ function openLightbox(src){
   const lb=document.getElementById('lightbox');
   const lbc=document.getElementById('lightbox-content');
   if(!lb||!lbc)return;
-  if(src&&src.startsWith('http')){const _lbFr=(_rizqLang&&_rizqLang()==='fr');lbc.innerHTML=`<img src="${src}" alt="${_lbFr?'Photo':'صورة'}">`;}
-  else{lbc.innerHTML=`<span style="font-size:80px">${src||'🏠'}</span>`;}
+  // DOM آمن — لا innerHTML بقيم قد تأتي من بيانات إعلان/رابط
+  while(lbc.firstChild) lbc.removeChild(lbc.firstChild);
+  if(src&&/^https?:\/\//i.test(String(src))){
+    const img=document.createElement('img');
+    img.src=String(src);
+    img.alt=(_rizqLang&&_rizqLang()==='fr')?'Photo':'صورة';
+    lbc.appendChild(img);
+  }else{
+    const span=document.createElement('span');
+    span.style.fontSize='80px';
+    span.textContent=src?String(src):'🏠';
+    lbc.appendChild(span);
+  }
   lb.classList.add('open');
 }
 function closeLightbox(){

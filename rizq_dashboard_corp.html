@@ -3150,7 +3150,11 @@ function saveMyPayment(){
     var catEl = document.getElementById('p-category');
     if(!actEl || !catEl || !window.RizqMerchantActivities || !actEl.value) return;
     var legacy = RizqMerchantActivities.legacyCategoryFromActivity(actEl.value);
-    catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+    catEl.textContent = '';
+    var opt = document.createElement('option');
+    opt.value = String(legacy || '');
+    opt.textContent = String(legacy || '');
+    catEl.appendChild(opt);
     catEl.value = legacy;
   }
   function toggleCorpActivityOther(){ onCorpDashboardActivityChange(); }
@@ -3314,7 +3318,7 @@ function saveMyPayment(){
     window._pThumbData = aL2&&aL2.thumb?aL2.thumb:null;
     if(window._pThumbData){
       var innerL=document.getElementById('p-thumb-inner');
-      if(innerL) innerL.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
+      if(innerL) innerL.innerHTML = '<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
     }
     applySbThumb();
   }
@@ -3341,7 +3345,7 @@ function saveMyPayment(){
         var ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
         window._pThumbData=canvas.toDataURL('image/jpeg',0.82);
         var inner=document.getElementById('p-thumb-inner');
-        if(inner) inner.innerHTML='<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
+        if(inner) inner.innerHTML='<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
         applySbThumb();
       };
       img.src=e.target.result;

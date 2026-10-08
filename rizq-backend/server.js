@@ -3911,14 +3911,20 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
   });
   app.use((req, res, next) => {
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
-    // أدلة تقنية داخلية — لا تُعرض للزوّار عبر الملفات الثابتة
+    // أدلة/سكربتات/ميتا داخلية — لا تُعرض عبر الملفات الثابتة حتى في التطوير
     const p = String(req.path || '').toLowerCase();
+    const base = p.split('/').pop() || '';
     if (
-      p === '/rizq_platform_manual.md' ||
-      p.endsWith('/rizq_platform_manual.md') ||
+      p === '/docs' || p.startsWith('/docs/') ||
+      p === '/scripts' || p.startsWith('/scripts/') ||
+      p.endsWith('.md') ||
+      p.endsWith('.bat') || p.endsWith('.sh') || p.endsWith('.ps1') ||
+      p.endsWith('.yml') || p.endsWith('.yaml') ||
+      base === 'package.json' || base === 'package-lock.json' ||
       p.includes('platform_manual') ||
-      p.includes('dashboard-guide.md') ||
-      (p.endsWith('.md') && (p.includes('manual') || p.includes('audit') || p.includes('rules')))
+      p.includes('session_context') ||
+      p.includes('section_management') ||
+      decodeURIComponent(p).includes('تعليمات')
     ) {
       return notFoundHandler(req, res);
     }
