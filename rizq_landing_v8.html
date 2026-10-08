@@ -7443,16 +7443,16 @@ function renderRelatedAds(current) {
   if (!entries.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
   wrap.style.display = 'block';
   const title = isAr ? '✨ قد يهمك أيضاً — استمر في التصفح' : '✨ Vous aimerez aussi';
-  wrap.innerHTML = `<div class="amd-related-title">${title}</div>
+  wrap.innerHTML = `<div class="amd-related-title">${escapeHtml(title)}</div>
     <div class="amd-related-grid">
       ${entries.map(({ad:x,sameSeller:ss})=>{
         const xd = trAd(x);
         const badge = ss ? (isAr?'🔥 نفس البائع':'🔥 Même vendeur') : (isAr?'📂 نفس الفئة':'📂 Même catégorie');
         return `<div class="amd-rel-card" onclick="openAdById('${String(x.id).replace(/'/g,"\\'")}')">
-          <div class="amd-rel-img" style="background:${xd.bg}"><span>${xd.emoji}</span><span class="amd-rel-badge">${badge}</span></div>
+          <div class="amd-rel-img" style="background:${escapeHtml(xd.bg||'')}"><span>${escapeHtml(xd.emoji||'')}</span><span class="amd-rel-badge">${escapeHtml(badge)}</span></div>
           <div class="amd-rel-body">
-            <div class="amd-rel-title">${xd.title}</div>
-            <div class="amd-rel-price">${xd.price}</div>
+            <div class="amd-rel-title">${escapeHtml(xd.title||'')}</div>
+            <div class="amd-rel-price">${escapeHtml(xd.price||'')}</div>
           </div>
         </div>`;
       }).join('')}
@@ -7705,13 +7705,37 @@ function showSugg(v){
   const res=(ADS||[]).filter(function(s){
     return String(s.title||'').toLowerCase().indexOf(q)>=0 || String(s.cat||'').toLowerCase().indexOf(q)>=0;
   }).slice(0,5);
+  // DOM آمن — عناوين الإعلانات الحية قد تحتوي HTML خبيث (stored XSS)
+  while(box.firstChild) box.removeChild(box.firstChild);
   if(!res.length){
-    box.innerHTML='<div class="sugg-item" style="cursor:default;color:#6a7a8a">'+(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج')+'</div>';
+    var empty=document.createElement('div');
+    empty.className='sugg-item';
+    empty.style.cursor='default';
+    empty.style.color='#6a7a8a';
+    empty.textContent=(typeof isAr!=='undefined'&&!isAr)?'Aucun résultat':'لا توجد نتائج';
+    box.appendChild(empty);
   } else {
-    box.innerHTML=res.map(function(s){
-      var t=(s.title||'').replace(/'/g,'\\\'');
-      return '<div class="sugg-item" onclick="document.getElementById(\'hero-search\').value=\''+t+'\';doMainSearch()"><span class="sugg-icon">'+(s.emoji||'📦')+'</span><span>'+(s.title||'')+'</span><span class="sugg-price">'+(s.price||'')+'</span></div>';
-    }).join('');
+    res.forEach(function(s){
+      var item=document.createElement('div');
+      item.className='sugg-item';
+      var icon=document.createElement('span');
+      icon.className='sugg-icon';
+      icon.textContent=s.emoji||'📦';
+      var titleEl=document.createElement('span');
+      titleEl.textContent=s.title||'';
+      var priceEl=document.createElement('span');
+      priceEl.className='sugg-price';
+      priceEl.textContent=s.price||'';
+      item.appendChild(icon);
+      item.appendChild(titleEl);
+      item.appendChild(priceEl);
+      item.addEventListener('click', function(){
+        var inp=document.getElementById('hero-search');
+        if(inp) inp.value=s.title||'';
+        doMainSearch();
+      });
+      box.appendChild(item);
+    });
   }
   box.style.display='block';
 }

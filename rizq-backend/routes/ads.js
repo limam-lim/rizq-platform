@@ -307,7 +307,31 @@ function mountAdsRoutes(app, deps) {
     const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
+    const contentKeys = ['title', 'desc', 'titleFr', 'descFr'];
+    const nextTitle = typeof b.title === 'string' ? b.title : ad.title;
+    const nextDesc = typeof b.desc === 'string' ? b.desc : ad.desc;
+    const nextTitleFr = typeof b.titleFr === 'string' ? b.titleFr : ad.titleFr;
+    const nextDescFr = typeof b.descFr === 'string' ? b.descFr : ad.descFr;
+    // نفس فحص تسرّب التواصل المفروض على POST — كان PATCH يتجاوزه فيبقى
+    // رقم هاتف/واتساب في عنوان إعلان نشط علني.
+    const leakScan = scanContactLeakFields([
+      { key: 'title', val: nextTitle },
+      { key: 'desc', val: nextDesc },
+      { key: 'titleFr', val: nextTitleFr },
+      { key: 'descFr', val: nextDescFr },
+    ]);
+    if (leakScan && leakScan.hasLeak) {
+      return res.status(422).json({
+        ok: false,
+        error: 'contact_in_text_forbidden',
+        field: leakScan.fields && leakScan.fields[0] && leakScan.fields[0].field,
+        hits: leakScan.hits || [],
+        msg: leakScan.messageAr,
+        msg_fr: leakScan.messageFr,
+      });
+    }
     const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition'];
+    const contentTouched = contentKeys.some((k) => typeof b[k] === 'string');
     editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
     if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
       ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
@@ -316,7 +340,11 @@ function mountAdsRoutes(app, deps) {
     if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
     if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
     if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
-    if (Array.isArray(b.images)) ad.images = await saveAdImages(ad.id, b.images);
+    let imagesTouched = false;
+    if (Array.isArray(b.images)) {
+      ad.images = await saveAdImages(ad.id, b.images);
+      imagesTouched = true;
+    }
     // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
     // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
     // 'active' بعد رفضه من الأدمن — نفس قرار المراجعة (POST
@@ -328,6 +356,12 @@ function mountAdsRoutes(app, deps) {
       const adminAllowedStatus = ['active', 'pending', 'rejected', 'sold', 'inactive', 'removed'];
       const allowedStatus = isAdmin ? adminAllowedStatus : ownerAllowedStatus;
       if (allowedStatus.includes(b.status)) ad.status = b.status;
+    }
+    // إصلاح (2026-10-08): تعديل محتوى/صور إعلان نشط من المالك كان يبقى
+    // status=active بلا إعادة مراجعة — مسار stored XSS + تجاوز حارس التواصل.
+    if (!isAdmin && isOwner && (contentTouched || imagesTouched)
+        && (ad.status === 'active' || ad.status === 'rejected')) {
+      ad.status = 'pending';
     }
     ad.updatedAt = new Date().toISOString();
     list[idx] = ad;

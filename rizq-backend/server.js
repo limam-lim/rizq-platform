@@ -2658,15 +2658,37 @@ try {
 
 const agentMissLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'طلبات كثيرة' },
 });
 
+/** قبول تسجيل miss فقط من أصول المنصة (أو بلا Origin خارج الإنتاج للأدوات المحلية) */
+function isAllowedAgentMissCaller(req) {
+  const origin = String(req.header('origin') || '').trim();
+  if (origin) {
+    if (origin === 'null') return !isProdEnv();
+    return ALLOWED_ORIGINS.includes(origin) || isDevPreviewOrigin(origin);
+  }
+  const referer = String(req.header('referer') || '').trim();
+  if (referer) {
+    try {
+      const o = new URL(referer).origin;
+      return ALLOWED_ORIGINS.includes(o) || isDevPreviewOrigin(o);
+    } catch (e) {
+      return false;
+    }
+  }
+  return !isProdEnv();
+}
+
 /** POST /api/agent/miss — تسجيل سؤال فائت/رد ضعيف من الواجهة (أوفلاين أو ويدجت) */
 app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
   try {
+    if (!isAllowedAgentMissCaller(req)) {
+      return res.status(403).json({ ok: false, error: 'origin_forbidden' });
+    }
     const aq = require('./services/agentQuality');
     const b = req.body || {};
     const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
