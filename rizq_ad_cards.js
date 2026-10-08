@@ -383,7 +383,7 @@
   /** ألبومات تجريبية — صور عمودية فاخرة مطابقة للنموذج */
   function seedDemoGalleries(list) {
     if (!list || !list.length) return;
-    var fashionV = 'v6'; /* نفس صور المستخدم الأصلية بوجوه مختلفة فقط */
+    var fashionV = 'v7'; /* ملحفة/دراعة موريتانية عربية — وجوه مرسومة خيالية (ليست صور أشخاص حقيقيين) */
     var fashion = {
       melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.jpg?' + fashionV,
       melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.jpg?' + fashionV,
