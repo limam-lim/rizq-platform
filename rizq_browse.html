@@ -684,6 +684,8 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .browse-wrap{animation:rizqIn .45s ease both}
+/* animation-fill-mode:both يترك transform على الحاوية فيجعل position:fixed نسبياً لها */
+.browse-wrap.has-detail{animation:none!important;transform:none!important}
 
 /* STATS STRIP */
 .stats-strip{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:0;background:linear-gradient(135deg,#0f1f3d,#1B3A6B);border-bottom:1px solid rgba(201,168,76,.15);overflow:visible;flex-shrink:0;min-height:48px;height:48px;padding:0;box-sizing:border-box;width:100%}
@@ -798,16 +800,33 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     justify-content:flex-start!important;
   }
   .dp-wrap{padding:12px 16px 18px}
-  /* الصورة تمتد للأسفل لتغطي فراغ العمود عند قصر الصورة */
+  /* الصورة تكبر للأسفل لتغطي فراغ العمود عند قصر الصورة */
   .dp-hero{display:grid;grid-template-columns:1.15fr .95fr;gap:12px;align-items:stretch}
-  .dp-gallery{height:100%;min-height:100%;display:flex;flex-direction:column}
-  .dp-gal-wrap{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .dp-gallery{
+    align-self:stretch;
+    height:100%;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+  .dp-gal-wrap{
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    height:100%;
+  }
   .dp-main-img{
     flex:1 1 auto;
     aspect-ratio:auto!important;
-    min-height:220px;
+    min-height:min(48vh,420px);
     max-height:none!important;
     height:100%!important;
+    align-self:stretch;
+  }
+  .dp-main-img img{
+    object-fit:cover!important;
+    object-position:center 35%;
   }
   .dp-thumbs-wrap{flex:0 0 auto;margin-top:6px}
   .dp-hero-info .dp-title{font-size:16.5px}
@@ -2482,9 +2501,16 @@ function selectAd(id){
   // Mobile: also mark detail tab
   if(window.innerWidth<=900) switchTab('detail');
 
-  // Scroll sheet to top
+  // Scroll sheet to top — تحت الهيدر مباشرة بلا قص
   const br=document.getElementById('browse-right');
-  if(br) br.scrollTop=0;
+  if(br){ br.scrollTop=0; }
+  if(dc){ dc.scrollTop=0; }
+  requestAnimationFrame(function(){
+    const r=document.getElementById('browse-right');
+    const c=document.getElementById('detail-content');
+    if(r) r.scrollTop=0;
+    if(c) c.scrollTop=0;
+  });
 }
 
 function renderDetailPanel(ad){
