@@ -1973,11 +1973,6 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .pulse-brand-row{
   display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;
 }
-.pulse-free-badge{
-  display:inline-flex;align-items:center;padding:4px 11px;border-radius:999px;
-  font-size:11px;font-weight:900;letter-spacing:.3px;color:#0D1B2A;
-  background:linear-gradient(135deg,#E8C96A,#C9A84C);box-shadow:0 2px 8px rgba(201,168,76,.35);
-}
 .pulse-live-badge{
   display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
   font-size:11px;font-weight:800;color:#fff;
@@ -4707,11 +4702,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div class="pulse-brand-text">
       <div class="pulse-brand-row">
-        <span class="pulse-free-badge" id="pulse-free-badge">مجاناً</span>
         <span class="pulse-live-badge"><span class="live-dot" aria-hidden="true"></span><span id="pulse-live-lbl">مباشر</span></span>
       </div>
       <h2 class="pulse-brand-title" id="pulse-brand-title">نبضة السوق <span>اليوم</span></h2>
-      <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار الغذاء · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
+      <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
       <p class="pulse-brand-en" id="pulse-brand-en">Rizq Market Pulse</p>
     </div>
   </div>
@@ -8859,16 +8853,14 @@ function applyLandingLang(toAr) {
   if(priceTag) priceTag.textContent = isAr ? 'خطط الاشتراك' : 'Nos Offres';
   const pulseTag = document.querySelector('#prices .section-tag');
   if(pulseTag) pulseTag.textContent = isAr ? '📊 نبضة السوق · Rizq Market Pulse' : '📊 Rizq Market Pulse';
-  const pulseFree = document.getElementById('pulse-free-badge');
-  if(pulseFree) pulseFree.textContent = isAr ? 'مجاناً' : 'Gratuit';
   const pulseLive = document.getElementById('pulse-live-lbl');
   if(pulseLive) pulseLive.textContent = isAr ? 'مباشر' : 'En direct';
   const pulseTitle = document.getElementById('pulse-brand-title');
   if(pulseTitle) pulseTitle.innerHTML = isAr ? 'نبضة السوق <span>اليوم</span>' : 'Le Pouls du Marché <span>aujourd\'hui</span>';
   const pulseSub = document.getElementById('pulse-brand-sub');
   if(pulseSub) pulseSub.textContent = isAr
-    ? 'أسعار الغذاء · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع'
-    : 'Alimentation · carburants · devises — clairement avant d\'acheter ou de vendre';
+    ? 'أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع'
+    : 'Denrées alimentaires de base · carburants · devises — clairement avant d\'acheter ou de vendre';
   const pulseEn = document.getElementById('pulse-brand-en');
   if(pulseEn) pulseEn.textContent = 'Rizq Market Pulse';
   const storesTag = document.querySelector('#virtual-stores .section-tag');
