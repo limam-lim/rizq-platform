@@ -373,7 +373,16 @@
       var btn = wrap.querySelector('.rizq-help-dd-btn');
       var menu = wrap.querySelector('.rizq-help-dd-menu');
       if (btn) btn.setAttribute('aria-expanded', 'false');
-      if (menu) menu.hidden = true;
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('is-positioned');
+        menu.style.removeProperty('position');
+        menu.style.removeProperty('left');
+        menu.style.removeProperty('right');
+        menu.style.removeProperty('top');
+        menu.style.removeProperty('transform');
+        menu.style.removeProperty('z-index');
+      }
     });
   }
   function paintHelpLabels() {
@@ -395,6 +404,44 @@
     var btn = wrap.querySelector('.rizq-help-dd-btn');
     var menu = wrap.querySelector('.rizq-help-dd-menu');
     if (!btn || !menu) return;
+    var leaveTimer = null;
+    function positionHelpMenu() {
+      /* ثبّت القائمة تحت الزر مباشرة (تفادي انحراف RTL/absolute) */
+      function place() {
+        var br = btn.getBoundingClientRect();
+        var menuW = Math.max(168, Math.round(menu.getBoundingClientRect().width || menu.offsetWidth || 168));
+        var left = Math.round(br.left + br.width / 2 - menuW / 2);
+        left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+        var top = Math.round(br.bottom + 8);
+        menu.classList.add('is-positioned');
+        menu.style.setProperty('position', 'fixed', 'important');
+        menu.style.setProperty('left', left + 'px', 'important');
+        menu.style.setProperty('right', 'auto', 'important');
+        menu.style.setProperty('top', top + 'px', 'important');
+        menu.style.setProperty('transform', 'none', 'important');
+        menu.style.setProperty('z-index', '10060', 'important');
+      }
+      place();
+      requestAnimationFrame(place);
+    }
+    function openHelp() {
+      closeHelpDropdowns();
+      if (typeof closeMoreDropdowns === 'function') closeMoreDropdowns();
+      if (typeof closeMobileMoreMenu === 'function') closeMobileMoreMenu();
+      if (typeof window.closeNavDropdowns === 'function') window.closeNavDropdowns();
+      wrap.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+      positionHelpMenu();
+    }
+    function scheduleHelpClose() {
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(function () {
+        if (wrap.matches(':hover') || menu.matches(':hover')) return;
+        closeHelpDropdowns();
+      }, 140);
+    }
+    function cancelHelpClose() { clearTimeout(leaveTimer); }
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -402,11 +449,22 @@
       closeHelpDropdowns();
       if (typeof closeMoreDropdowns === 'function') closeMoreDropdowns();
       if (typeof closeMobileMoreMenu === 'function') closeMobileMoreMenu();
-      if (willOpen) {
-        wrap.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-        menu.hidden = false;
-      }
+      if (willOpen) openHelp();
+    });
+    /* سطح المكتب: افتح عند المرور واختفِ عند مغادرة الزر/القائمة */
+    wrap.addEventListener('mouseenter', function () {
+      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (eH) { return; }
+      cancelHelpClose();
+      openHelp();
+    });
+    wrap.addEventListener('mouseleave', function () {
+      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (eH) { return; }
+      scheduleHelpClose();
+    });
+    menu.addEventListener('mouseenter', cancelHelpClose);
+    menu.addEventListener('mouseleave', function () {
+      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (eH) { return; }
+      scheduleHelpClose();
     });
     menu.addEventListener('click', function (e) { e.stopPropagation(); });
   }
@@ -519,7 +577,8 @@
   function hdrText(key, el) {
     if (key === 'rizqads') {
       var adsLabel = rizqT(HDR_I18N_KEYS.rizqads) || 'Rizq ADS';
-      return adsLabel.indexOf('📹') >= 0 ? adsLabel : '📹 ' + adsLabel;
+      /* الإيموجي في .nav-dd-icon فقط — لا تكرّر 📹/🎬 داخل النص */
+      return String(adsLabel).replace(/^[📹🎬🎥\s]+/, '').trim() || 'Rizq ADS';
     }
     if (key === 'ai') {
       if (el && el.closest('#rizq-desk-nav')) {
@@ -1204,12 +1263,31 @@
       function menuEl() {
         return moreMenuFor(li) || document.querySelector('.nav-dropdown-menu.rizq-more-menu-open');
       }
+      var moreLeaveTimer = null;
+      function scheduleMoreClose() {
+        clearTimeout(moreLeaveTimer);
+        moreLeaveTimer = setTimeout(function () {
+          if (!isDesk()) return;
+          var m = menuEl();
+          if (li.matches(':hover') || (m && m.matches(':hover'))) return;
+          closeMoreDropdowns();
+        }, 140);
+      }
+      function cancelMoreClose() { clearTimeout(moreLeaveTimer); }
       function keepOpen() {
+        cancelMoreClose();
         positionMoreDropdown(li);
         var m = menuEl();
         if (m && !m.getAttribute('data-rizq-more-stay')) {
           m.setAttribute('data-rizq-more-stay', '1');
-          m.addEventListener('mouseenter', function () { if (isDesk()) keepOpen(); });
+          m.addEventListener('mouseenter', function () {
+            if (!isDesk()) return;
+            cancelMoreClose();
+            keepOpen();
+          });
+          m.addEventListener('mouseleave', function () {
+            if (isDesk()) scheduleMoreClose();
+          });
           m.addEventListener('click', function (e) { e.stopPropagation(); });
         }
       }
@@ -1224,11 +1302,14 @@
       more.querySelectorAll('.rizq-hdr-ico, .rizq-hdr-lbl').forEach(function (child) {
         child.style.pointerEvents = 'none';
       });
-      /* desk: افتح عند المرور — لا تُغلق بمغادرة الزر (القائمة على body).
-         الإغلاق بنقرة خارجية فقط. */
+      /* desk: افتح عند المرور واختفِ عند مغادرة الزر/القائمة */
       li.addEventListener('mouseenter', function () {
         if (!isDesk()) return;
         keepOpen();
+      });
+      li.addEventListener('mouseleave', function () {
+        if (!isDesk()) return;
+        scheduleMoreClose();
       });
       document.addEventListener('click', function (e) {
         if (e.target.closest('.nav-dropdown-li') || e.target.closest('.nav-dropdown-menu')) return;

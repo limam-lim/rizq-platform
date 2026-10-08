@@ -3868,7 +3868,10 @@ html.rizq-app-nav .rizq-hdr-brand-sub{
 .rizq-help-dd-menu{
   position:absolute;
   top:calc(100% + 8px);
-  inset-inline-start:50%;
+  /* left الفيزيائي فقط — لا تستخدم inset-inline هنا لأنه يلغي left في RTL.
+     بدون !important حتى يتمكن JS من تثبيتها تحت الزر بـ position:fixed */
+  left:50%;
+  right:auto;
   transform:translateX(-50%);
   min-width:168px;
   padding:6px;
@@ -3878,6 +3881,11 @@ html.rizq-app-nav .rizq-hdr-brand-sub{
   box-shadow:0 10px 28px rgba(15,23,42,.16),0 2px 6px rgba(15,23,42,.06);
   z-index:10060;
   direction:rtl;
+}
+.rizq-help-dd-menu.is-positioned{
+  left:auto;
+  right:auto;
+  transform:none;
 }
 html[dir="ltr"] .rizq-help-dd-menu{direction:ltr}
 .rizq-help-dd-menu[hidden]{display:none!important}

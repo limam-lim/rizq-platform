@@ -42,7 +42,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=30.2"/>
+<link rel="stylesheet" href="rizq_header.css?v=30.5"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -10139,22 +10139,38 @@ window.closeNavDropdowns=closeNavDropdowns;
       || document.querySelector('.nav-dropdown-menu[data-rizq-more-for="'+(li.id||'nav-more-li')+'"]')
       || document.querySelector('.nav-dropdown-menu.rizq-more-menu-open');
   }
+  var leaveTimer=null;
+  function scheduleClose(){
+    clearTimeout(leaveTimer);
+    leaveTimer=setTimeout(function(){
+      if(!isDesk()) return;
+      var m=menuEl();
+      if(li.matches(':hover') || (m && m.matches(':hover'))) return;
+      closeNavDropdowns();
+    },140);
+  }
+  function cancelClose(){ clearTimeout(leaveTimer); }
   function keepOpen(){
+    cancelClose();
     var positioner=(typeof window.positionNavDropdown==='function')?window.positionNavDropdown:positionNavDropdown;
     positioner(li);
     var m=menuEl();
     if(m && !m.getAttribute('data-rizq-more-stay')){
       m.setAttribute('data-rizq-more-stay','1');
-      /* القائمة على body — أبقِها مفتوحة عند دخول الماوس لعناصرها */
-      m.addEventListener('mouseenter',function(){ if(isDesk()) keepOpen(); });
+      /* القائمة على body — ابقَ مفتوحة داخلها واختفِ عند المغادرة */
+      m.addEventListener('mouseenter',function(){ if(isDesk()){ cancelClose(); keepOpen(); } });
+      m.addEventListener('mouseleave',function(){ if(isDesk()) scheduleClose(); });
       m.addEventListener('click',function(e){ e.stopPropagation(); });
     }
   }
-  /* سطح المكتب: افتح عند المرور — لا تُغلق عند مغادرة الزر (القائمة portaled).
-     الإغلاق فقط بنقرة خارجية أو Escape (أدناه). */
+  /* سطح المكتب: افتح عند المرور واختفِ تلقائياً عند مغادرة الزر/القائمة */
   li.addEventListener('mouseenter',function(){
     if(!isDesk()) return;
     keepOpen();
+  });
+  li.addEventListener('mouseleave',function(){
+    if(!isDesk()) return;
+    scheduleClose();
   });
   var trigger=li.querySelector('.nav-dropdown-trigger,.nav-desktop-more-only');
   if(trigger){
