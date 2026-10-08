@@ -32,7 +32,7 @@
   font-size:inherit!important;
 }
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{
-  padding:12px 8px 8px!important;
+  padding:10px 8px 8px!important;
 }
 .listings-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
   height:auto!important;
@@ -106,10 +106,12 @@
 .rzq-adx-emoji{
   font-size:40px;line-height:1;
   filter:drop-shadow(0 4px 12px rgba(0,0,0,.35));
+  /* ارفع الأيقونة قليلاً حتى تغطيها شارة السعر من الأسفل */
+  transform:translateY(-10px);
 }
 .rzq-adx-grad{
-  position:absolute;inset:auto 0 0 0;height:56%;z-index:2;pointer-events:none;
-  background:linear-gradient(to top,rgba(7,17,31,.72) 0%,rgba(7,17,31,.2) 45%,transparent 100%);
+  position:absolute;inset:auto 0 0 0;height:48%;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,rgba(7,17,31,.78) 0%,rgba(7,17,31,.22) 50%,transparent 100%);
 }
 
 /* أسهم الكاروسيل — دوائر داكنة رقيقة */
@@ -159,9 +161,9 @@
 /* واتساب لم يعد على الصورة — في أسفل البطاقة */
 .rzq-adx-media > .rzq-adx-wa{display:none!important}
 
-/* نقاط الكاروسيل فوق السعر */
+/* نقاط الكاروسيل فوق شارة السعر */
 .rzq-adx-dots{
-  position:absolute;z-index:4;left:0;right:0;bottom:28px;
+  position:absolute;z-index:4;left:0;right:0;bottom:46px;
   display:flex;justify-content:center;gap:5px;pointer-events:none;
 }
 .rzq-adx-dot{
@@ -177,12 +179,12 @@
 }
 .rzq-adx-media:not(.has-multi) .rzq-adx-dots{display:none!important}
 
-/* شارة السعر الذهبية — أوضح وأكبر قليلاً */
+/* شارة السعر — كاملة فوق الصورة (تغطي أسفل الأيقونة، لا تُقصّ) */
 .rzq-adx-price{
-  position:absolute;z-index:7;
-  left:50%;bottom:-13px;transform:translateX(-50%);
+  position:absolute;z-index:8;
+  left:50%;bottom:10px;transform:translateX(-50%);
   inset-inline-start:auto;inset-inline-end:auto;
-  max-width:calc(100% - 18px);
+  max-width:calc(100% - 20px);
   padding:7px 14px;border-radius:999px;
   font-size:13px;font-weight:900;letter-spacing:.2px;color:#0a1424;
   background:linear-gradient(180deg,#FFE9A8 0%,#F0D078 55%,#D4A84A 100%);
@@ -196,6 +198,7 @@
   text-align:center;
   text-shadow:0 1px 0 rgba(255,255,255,.35);
   -webkit-font-smoothing:antialiased;
+  pointer-events:none;
 }
 .rzq-adx-badge{
   position:absolute;z-index:5;top:10px;right:10px;left:auto;
@@ -204,22 +207,22 @@
   box-shadow:0 3px 10px rgba(201,168,76,.32);
 }
 
-/* علامة رزق شفافة */
+/* علامة رزق شفافة — فوق السعر حتى لا تغطيه */
 .rzq-adx-wm{
   position:absolute;z-index:3;pointer-events:none;
-  inset-inline-end:8px;bottom:22px;
+  inset-inline-end:8px;bottom:52px;
   font-family:'Cairo','Segoe UI',sans-serif;
   font-size:10px;font-weight:800;letter-spacing:.2px;
   color:rgba(255,255,255,.36);
   text-shadow:0 1px 2px rgba(0,0,0,.35);
   line-height:1;user-select:none;
 }
-.rzq-adx-media.has-seen .rzq-adx-wm{bottom:40px}
+.rzq-adx-media.has-seen .rzq-adx-wm{bottom:70px}
 
-/* شارة «شاهدته من قبل» */
+/* شارة «شاهدته من قبل» — فوق السعر */
 .rzq-adx-seen{
   position:absolute;z-index:6;
-  bottom:22px;inset-inline-end:8px;
+  bottom:52px;inset-inline-end:8px;
   display:inline-flex;align-items:center;gap:5px;
   max-width:calc(100% - 16px);
   padding:4px 9px;border-radius:999px;
@@ -247,7 +250,7 @@
   align-items:center;
   text-align:center;
   gap:0;
-  padding:16px 8px 8px!important;
+  padding:10px 8px 8px!important;
   position:relative;
   z-index:1;
   background:transparent!important;
@@ -443,7 +446,7 @@
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:14px 7px 7px!important;
+    padding:10px 7px 7px!important;
   }
 }
 
