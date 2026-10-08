@@ -266,6 +266,13 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 </head>
 <body>
 
+<!-- ═══ INTRO VIDEO SECTION ═══
+     نفس نمط المكتب/المحل: يظهر عند وجود account.promo_video عبر rizq_intro_video.js
+     أعلى الصفحة (فوق الشريط والهيرو). -->
+<section class="video-intro-section" id="video-intro-section" style="display:none;padding:36px 16px;background:#0D1B2A">
+  <div id="intro-video-mount"></div>
+</section>
+
 <!-- ══ TOPNAV ══ -->
 <nav class="topnav" id="main-nav">
   <div class="topnav-inner">
@@ -779,7 +786,9 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     paymentMethods: [
       { type: 'bankily', bank: 'Bankily', code: '33221100', note: fr ? 'Votre nom après virement' : 'اذكر اسمك بعد التحويل' },
       { type: 'instore', bank: fr ? 'Paiement au showroom' : 'الدفع في المعرض', code: '', note: '' }
-    ]
+    ],
+    /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة */
+    promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -1452,5 +1461,25 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
+<script src="rizq_intro_video.js"></script>
+<script>
+/* فيديو تعريفي مضمَّن — يظهر أعلى الصفحة عند وجود promo_video على الحساب */
+(function mountShowroomIntroVideo(){
+  try{
+    var url = (_acc && _acc.promo_video) || '';
+    if(!url && _showroomId){
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      var a = accs.find(function(x){ return x && x.id === _showroomId; });
+      if(a) url = a.promo_video || '';
+    }
+    if(!url || !window.RizqIntroVideo) return;
+    var sec = document.getElementById('video-intro-section');
+    var mount = document.getElementById('intro-video-mount');
+    if(!sec || !mount) return;
+    var ok = RizqIntroVideo.mount(mount, url, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
+    if(ok) sec.style.display = '';
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

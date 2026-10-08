@@ -1685,6 +1685,8 @@ function openMaps(){
           { type: 'bankily', bank: 'Bankily', code: '36112233', note: isFr() ? 'Mentionnez votre nom après virement' : 'اذكر اسمك بعد التحويل' },
           { type: 'bank', bank: 'BCI', code: 'MR13 0001 2200 3344', note: isFr() ? 'Virement — honoraires' : 'تحويل — أتعاب المهنة' }
         ],
+        /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة — يظهر أعلى الصفحة */
+        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: '45 د' },
           { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: '3–5 أيام' },
@@ -1722,10 +1724,22 @@ function openMaps(){
           activity: acc.activity, desc: acc.desc, city: acc.city, address: acc.address,
           phone: acc.phone, whatsapp: acc.whatsapp, email: acc.email,
           serviceDesk: acc.serviceDesk, paymentMethods: acc.paymentMethods,
+          promo_video: acc.promo_video || '',
           _demo: true
         });
         localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }catch(e){}
+      // إظهار قسم الفيديو التعريفي بعد حقن الحساب (السكربت المبكر يحتاج ?id=)
+      try{
+        if(acc.promo_video && window.RizqIntroVideo){
+          var sec = document.getElementById('video-intro-section');
+          var mount = document.getElementById('intro-video-mount');
+          if(sec && mount){
+            var ok = RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
+            if(ok) sec.style.display = '';
+          }
+        }
+      }catch(eVid){}
       return acc;
     }
 

@@ -796,6 +796,13 @@ footer{
 <body data-t-ns="store">
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
+<!-- ═══ INTRO VIDEO SECTION ═══
+     فيديو تعريفي مضمَّن عبر rizq_intro_video.js عند وجود account.promo_video.
+     يظهر أعلى الصفحة (فوق الشريط والهيرو) مثل صفحة المكتب. -->
+<section class="video-intro-section" id="video-intro-section" style="display:none;padding:36px 16px;background:#0D1B2A">
+  <div id="intro-video-mount"></div>
+</section>
+
 <!-- TOPNAV -->
 <nav class="topnav">
   <div class="topnav-inner">
@@ -1066,14 +1073,6 @@ footer{
     <div id="store-packages-grid" data-rizq-pkg-catalog="store" data-rizq-pkg-cols="5" data-rizq-pkg-diamond="1"></div>
   </div>
 </section>
-  <!-- ═══ INTRO VIDEO SECTION ═══
-       إصلاح: كان هذا القسم مجرد زر "مشاهدة الفيديو ↗" يفتح تبويباً خارجياً —
-       لا فيديو متحرك فعلي بالصفحة. الآن يُضمَّن (embed) الفيديو مباشرة عبر
-       rizq_intro_video.js بنفس تقنية rizq_video_ads.js (لا رفع ملفات على
-       خادمنا)، بحد أقصى 20 ثانية تشغيل تلقائي (مفروض فعلياً على يوتيوب). -->
-  <section class="video-intro-section" id="video-intro-section" style="display:none;padding:36px 16px;background:#0D1B2A">
-    <div id="intro-video-mount"></div>
-  </section>
 
 <script>
 /* ── المفضّلة (Wishlist) — خدمة جديدة للزائر، تعمل بالكامل محلياً في
@@ -1741,7 +1740,9 @@ function rizqShare(title, url) {
         paymentMethods: [
           { type: 'bankily', bank: 'Bankily', code: '44556677', note: fr ? 'Indiquez votre nom' : 'اذكر اسمك بعد التحويل' },
           { type: 'cash', bank: fr ? 'Paiement à la livraison' : 'الدفع عند التسليم', code: '', note: '' }
-        ]
+        ],
+        /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة */
+        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: 'بيانات عرض' },
@@ -1762,6 +1763,17 @@ function rizqShare(title, url) {
       window._rizqStoreIsDemo = true;
       window.STORE_FEATURED_PRODUCTS = {};
       products.forEach(function(p, i){ window.STORE_FEATURED_PRODUCTS[String(i+1)] = p; window.STORE_FEATURED_PRODUCTS[p.id] = p; });
+      // إظهار قسم الفيديو التعريفي بعد حقن الحساب (السكربت المبكر يحتاج ?id=)
+      try{
+        if(acc.promo_video && window.RizqIntroVideo){
+          var vSec = document.getElementById('video-intro-section');
+          var vMount = document.getElementById('intro-video-mount');
+          if(vSec && vMount){
+            var vOk = RizqIntroVideo.mount(vMount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
+            if(vOk) vSec.style.display = '';
+          }
+        }
+      }catch(eVid){}
       if(!document.getElementById('rizq-demo-ribbon')){
         var rib = document.createElement('div');
         rib.id = 'rizq-demo-ribbon';
