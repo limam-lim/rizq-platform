@@ -600,21 +600,12 @@ body{
    v16.2 — Visible premium polish (landing)
 ══════════════════════════════════════════ */
 
-/* Hero atmosphere + entrance — سطح المكتب: لا توسّط المحتوى الطويل فوق الشاشة */
+/* Hero atmosphere + entrance — لا توسّط عمودياً (إصلاح الفراغ)، دون تصغير شاشة ADS أو كبسولة رزق */
 .hero{
   position:relative;
   justify-content:flex-start;
   min-height:0;
   height:auto;
-}
-@media (min-width:769px) and (min-height:501px){
-  .hero-vid-wrap .hero-vid-inner,
-  .hero-vid-compact .hero-vid-inner{
-    max-height:min(24vh,220px)!important;
-  }
-  .hero-vid-wrap{max-width:min(560px,54vw)!important}
-  .hero-content{max-width:min(820px,78vw)}
-  .hero-headline{font-size:clamp(34px,4.4vw,48px)!important}
 }
 .hero-bg{
   background:#ffffff!important;

@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.1"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.2"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=1.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -949,20 +949,20 @@ body.rizq-lang-ar .hero-browse-panel .qcat-name{
     0 0 0 1px rgba(255,255,255,.04) inset,
     0 0 22px rgba(201,168,76,.07);
 }
-/* AR/FR — شاشة الإعلان أصغر من المسرح بنفس القياس (لا تبتلع سطح المكتب) */
+/* AR/FR — نفس عرض شاشة Rizq ADS كما كان (لا تصغير) */
 html[dir="ltr"] .hero-vid-wrap,
 html[lang="fr"] .hero-vid-wrap,
 body.rizq-lang-fr .hero-vid-wrap,
 html[dir="rtl"] .hero-vid-wrap,
 html[lang="ar"] .hero-vid-wrap,
 body.rizq-lang-ar .hero-vid-wrap{
-  width:100%;max-width:min(640px,62vw);
+  width:100%;max-width:min(780px,78vw);
 }
-/* شاشة إعلان مضغوطة — 16:9 بارتفاع لا يبتلع شاشة الكمبيوتر */
+/* شاشة إعلان — 16:9 بالحجم السابق المعتمد */
 .hero-vid-compact .hero-vid-inner,
 .hero-vid-wrap .hero-vid-inner{
   aspect-ratio:16/9;
-  max-height:min(32vh,300px);
+  max-height:min(48vh,460px);
   width:100%;
 }
 /* سطح المكتب — مقياس أفخم: أصغر قليلاً مع فراغ أنيق */
@@ -978,62 +978,28 @@ body.rizq-lang-ar .hero-vid-wrap{
   .hero-content{
     padding-top:10px!important;
     padding-bottom:12px!important;
-    gap:8px;
-    max-width:min(860px,82vw);
   }
+  /* كبسولة «رزق» + شارة السوق — بالحجم السابق (لا تُصغَّر) */
   .hero-brand-row{
-    gap:6px!important;
-    margin:0 auto 6px!important;
-    min-width:min(220px,64vw)!important;
+    gap:10px!important;
+    margin:0 auto 14px!important;
+    min-width:min(300px,92vw)!important;
   }
   .hero-title-card{
-    padding:8px 18px 10px!important;
-    min-height:58px!important;
-    border-radius:12px!important;
-    box-shadow:0 8px 22px rgba(0,0,0,.18),0 0 14px rgba(201,168,76,.08),inset 0 1px 0 rgba(255,255,255,.1)!important;
+    padding:18px 28px 22px!important;
+    min-height:96px!important;
+    border-radius:16px!important;
   }
   .hero-headline{
-    font-size:clamp(34px,4.4vw,48px)!important;
-    letter-spacing:.35px!important;
+    font-size:clamp(52px,7.8vw,78px)!important;
+    letter-spacing:.5px!important;
   }
   .hero-brand-row .hero-eyebrow{
-    padding:6px 14px!important;
-    min-height:30px!important;
+    padding:10px 18px!important;
+    min-height:40px!important;
   }
-  .hero-brand-row .hero-eyebrow span{font-size:clamp(11px,1.1vw,12.5px)!important}
-  .hero-lead-row{
-    gap:8px!important;
-    margin:0 auto 6px!important;
-    max-width:min(820px,78vw)!important;
-  }
-  .hero-subtitle-card{
-    padding:10px 18px 9px!important;
-    border-radius:12px!important;
-  }
-  .hero-subtitle-primary{font-size:clamp(15px,1.6vw,19px)!important}
-  .hero-subtitle-secondary{font-size:clamp(13px,1.35vw,15.5px)!important}
-  .hero-stage{
-    gap:10px!important;
-    margin-top:4px!important;
-    padding:10px 12px 4px!important;
-    max-width:min(820px,78vw)!important;
-    border-radius:18px!important;
-  }
-  .hero-spaces-title{font-size:clamp(15px,1.85vw,19px)!important}
-  .hero-spaces-sub{font-size:clamp(11.5px,1.15vw,13px)!important}
-  .hero-spaces-head{margin:0 auto 8px!important}
-  .hero-spaces-kicker{font-size:10.5px!important;padding:4px 12px!important;margin-bottom:6px!important}
-  .hero-biz-btn{
-    min-height:72px!important;
-    padding:8px 5px 8px!important;
-    border-radius:12px 12px 9px 9px!important;
-    font-size:clamp(10.5px,1.05vw,12px)!important;
-    gap:5px!important;
-  }
-  .hero-biz-ico-wrap{width:28px!important;height:28px!important;border-radius:9px!important;margin-top:0!important}
-  .hero-biz-ico{font-size:1.05em!important}
-  .hero-biz-hint{font-size:9px!important}
-  .hero-biz-label{font-size:inherit}
+  .hero-brand-row .hero-eyebrow span{font-size:clamp(12.5px,1.4vw,14px)!important}
+  /* شاشة Rizq ADS + كبسولة الموضع — بالحجم السابق المعتمد */
   .hero-vid-wrap,
   html[dir="ltr"] .hero-vid-wrap,
   html[lang="fr"] .hero-vid-wrap,
@@ -1041,35 +1007,24 @@ body.rizq-lang-ar .hero-vid-wrap{
   html[dir="rtl"] .hero-vid-wrap,
   html[lang="ar"] .hero-vid-wrap,
   body.rizq-lang-ar .hero-vid-wrap{
-    max-width:min(560px,54vw)!important;
-    margin:0 auto 2px;
-    padding:5px;
-    border-radius:14px;
+    max-width:min(780px,78vw)!important;
+    margin:0 auto;
+    padding:8px 8px 6px!important;
+    border-radius:16px!important;
+    overflow:visible!important;
   }
   .hero-vid-compact .hero-vid-inner,
   .hero-vid-wrap .hero-vid-inner{
-    max-height:min(24vh,220px)!important;
+    max-height:min(48vh,460px)!important;
   }
   .hero-vid-badge{
-    font-size:10px;
-    padding:5px 16px;
-    margin:0 auto 6px;
+    display:inline-flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    font-size:11px!important;
+    padding:7px 22px!important;
+    margin:0 auto 10px!important;
   }
-  .hero-vid-cta-bar{margin-top:8px;gap:8px}
-  .hero-vid-cta-link{font-size:11px;padding:7px 14px}
-  .hero-pills{
-    margin:4px auto 0!important;
-    padding:6px!important;
-    min-height:0!important;
-    border-radius:12px!important;
-    box-shadow:0 8px 22px rgba(13,27,42,.12),inset 0 1px 0 rgba(255,255,255,.7)!important;
-  }
-  .hero-pill{
-    font-size:clamp(14px,1.55vw,16.5px)!important;
-    padding:8px 14px!important;
-  }
-  .hero-pill-sep{height:18px!important}
-  .hero-tagline{font-size:clamp(10.5px,1.15vw,13px)!important;margin:2px auto 0}
   /* صورة نافذة الإعلان: ارتفاع محدود حتى يبقى العنوان والسعر ظاهرين */
   .amd-img{
     height:min(28vh,200px)!important;
