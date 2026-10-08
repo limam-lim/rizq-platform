@@ -301,7 +301,7 @@ html[lang="fr"] #detail-content{
 .dp-wrap{padding:16px 20px 28px;max-width:none;margin:0}
 .dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;padding:7px 12px;background:#fff;border:1px solid rgba(201,168,76,.28);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
 .dp-back-btn:hover{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.45)}
-.dp-gallery{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;max-width:none;flex:1 1 100%;width:100%}
+.dp-gallery{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;max-width:none;flex:1 1 100%;width:100%;min-height:0}
 .dp-hero{display:flex;flex-direction:column;align-items:stretch;gap:14px;margin-bottom:16px}
 .dp-hero-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:0}
 .dp-hero-info .dp-listing-cat{margin-bottom:6px}
@@ -451,13 +451,13 @@ html[lang="fr"] #detail-content{
 .dp-phone-hint{font-size:10.5px;color:var(--text-muted);margin-top:3px}
 .dp-phone-reveal.shown .dp-phone-hint{color:var(--green);font-weight:700}
 
-/* أزرار اتصال قصيرة — شبكة متماسكة بدل شرائط عريضة */
-.dp-contact-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+/* أزرار اتصال مدمجة — ثلاثة في صف واحد، ليست شرائط عريضة */
+.dp-contact-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
 .dp-btn-call,.dp-btn-wa,.dp-btn-msg{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
   width:auto;min-width:0;margin:0;
-  padding:9px 10px;border-radius:6px;
-  font-size:12.5px;font-weight:800;cursor:pointer;
+  padding:8px 6px;border-radius:5px;
+  font-size:11.5px;font-weight:800;cursor:pointer;line-height:1.2;
   font-family:'Cairo','Segoe UI',sans-serif;
   transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;
 }
@@ -466,12 +466,12 @@ html[lang="fr"] #detail-content{
 .dp-btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:1px solid rgba(255,255,255,.18)}
 .dp-btn-wa:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(37,211,102,.3)}
 .dp-btn-msg{
-  grid-column:1 / -1;
-  background:linear-gradient(180deg,rgba(240,215,138,.2),rgba(201,168,76,.1));
+  background:linear-gradient(180deg,rgba(240,215,138,.22),rgba(201,168,76,.12));
   color:var(--royal-dark,#0f2347);
-  border:1px solid rgba(201,168,76,.45);
+  border:1px solid rgba(201,168,76,.48);
 }
-.dp-btn-msg:hover{background:rgba(201,168,76,.2);border-color:rgba(201,168,76,.65)}
+.dp-btn-msg:hover{background:rgba(201,168,76,.22);border-color:rgba(201,168,76,.7)}
+.dp-btn-call svg,.dp-btn-wa svg,.dp-btn-msg svg{width:13px;height:13px;flex-shrink:0}
 .dp-actions-row{display:flex;gap:6px;margin-top:2px}
 .dp-btn-action{flex:1;padding:7px 5px;background:rgba(255,255,255,.75);border:1px solid rgba(201,168,76,.22);border-radius:6px;color:var(--text-muted);cursor:pointer;font-size:11px;font-family:'Cairo','Segoe UI',sans-serif;transition:all .2s}
 .dp-btn-action:hover{border-color:rgba(201,168,76,.5);color:var(--gold-dk)}
@@ -772,10 +772,19 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-wrap.has-detail .browse-left{flex:1}
   .browse-wrap.has-detail .bs-sidebar{width:260px;flex:0 0 260px}
   .dp-wrap{padding:18px 22px 32px}
-  .dp-hero{display:grid;grid-template-columns:1.2fr .9fr;gap:18px;align-items:start}
-  .dp-main-img{max-height:min(46vh,420px)}
+  .dp-hero{display:grid;grid-template-columns:1.2fr .9fr;gap:18px;align-items:stretch}
+  .dp-gallery{height:100%}
+  .dp-gal-wrap{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .dp-main-img{
+    flex:1 1 auto;
+    aspect-ratio:auto!important;
+    min-height:300px;
+    max-height:none!important;
+    height:100%!important;
+  }
   .dp-hero-info .dp-title{font-size:20px}
-  .dp-hero-info .dp-contact{position:sticky;top:12px}
+  .dp-hero-info .dp-contact{margin-top:auto}
+  .dp-contact-btns{max-width:100%}
 }
 
 @media(max-width:1080px) and (min-width:901px){
