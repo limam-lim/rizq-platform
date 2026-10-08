@@ -224,6 +224,19 @@ html[dir="ltr"] #back-to-top{left:auto;right:28px}
   animation:rizq-iep-out .22s cubic-bezier(.4,0,.2,1) both!important;
   pointer-events:none!important;
 }
+/* نافذة الأقسام — حافة ذهبية رقيقة + سطح فاخر مرتّب */
+#cat-inline-panel.visible,
+#qcat-inline-panel.visible,
+#cat-inline-panel.pinned,
+#qcat-inline-panel.pinned{
+  border:1px solid rgba(201,168,76,.4)!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,#fffefb 0%,#faf8f3 55%,#f7f4ec 100%)!important;
+  box-shadow:
+    0 20px 50px rgba(15,31,61,.10),
+    0 2px 0 rgba(255,255,255,.85) inset,
+    0 0 0 0.5px rgba(201,168,76,.14)!important;
+}
 @media (prefers-reduced-motion:reduce){
   #cat-inline-panel.visible,
   #qcat-inline-panel.visible,

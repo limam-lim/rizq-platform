@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.2"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.3"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=2.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -2160,59 +2160,131 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 #cat-portal .drop-link:hover::after{content:'›';color:rgba(201,168,76,.6);font-size:14px;margin-right:auto}
 #cat-portal .drop-viewall{display:block;text-align:center;font-size:12.5px;font-weight:700;color:#0f2347;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:9px;padding:9px 10px;margin-bottom:12px;text-decoration:none;transition:all .25s}
 #cat-portal .drop-viewall:hover{filter:brightness(1.08);transform:translateY(-1px)}
-/* ── CAT / QCAT INLINE EXPAND PANEL — بيج/ذهبي ── */
+/* ── CAT / QCAT INLINE EXPAND PANEL — نافذة فاخرة بحافة ذهبية رقيقة ── */
 #cat-inline-panel,
 #qcat-inline-panel{
   display:none;
-  background:linear-gradient(145deg,var(--beige-1) 0%,var(--beige-2) 52%,var(--beige-3) 100%);
-  border:1.5px solid rgba(201,168,76,.20);border-radius:22px;
-  padding:28px 32px 24px;
-  box-shadow:0 18px 48px rgba(27,58,107,.07),0 0 0 1px rgba(201,168,76,.10);
+  background:
+    linear-gradient(180deg,#fffefb 0%,#faf8f3 55%,#f7f4ec 100%);
+  border:1px solid rgba(201,168,76,.38);
+  border-radius:18px;
+  padding:22px 26px 20px;
+  box-shadow:
+    0 20px 50px rgba(15,31,61,.10),
+    0 2px 0 rgba(255,255,255,.85) inset,
+    0 0 0 0.5px rgba(201,168,76,.14);
   position:relative;overflow:visible;
+  box-sizing:border-box;
 }
-#cat-inline-panel{grid-column:1/-1;margin:6px 0}
-#qcat-inline-panel{width:100%;max-width:100%;margin:4px auto 14px;box-sizing:border-box}
+#cat-inline-panel{grid-column:1/-1;margin:8px 0}
+#qcat-inline-panel{width:100%;max-width:100%;margin:6px auto 16px;box-sizing:border-box}
 #cat-inline-panel.pinned,
 #qcat-inline-panel.pinned{
-  border-color:rgba(201,168,76,.42);
-  box-shadow:0 22px 56px rgba(27,58,107,.10),0 0 0 2px rgba(201,168,76,.16);
+  border-color:rgba(201,168,76,.48);
+  box-shadow:
+    0 24px 56px rgba(15,31,61,.12),
+    0 2px 0 rgba(255,255,255,.9) inset,
+    0 0 0 0.5px rgba(201,168,76,.2);
 }
+/* خط ذهبي رفيع أعلى النافذة */
 #cat-inline-panel::before,
-#qcat-inline-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent 0%,rgba(201,168,76,.55) 25%,rgba(232,201,106,.65) 50%,rgba(201,168,76,.55) 75%,transparent 100%);border-radius:22px 22px 0 0}
+#qcat-inline-panel::before{
+  content:'';position:absolute;top:0;left:18px;right:18px;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(201,168,76,.55) 18%,rgba(240,215,138,.75) 50%,rgba(201,168,76,.55) 82%,transparent 100%);
+  border-radius:0;
+}
 #cat-inline-panel::after,
-#qcat-inline-panel::after{content:'';position:absolute;top:-18px;left:0;right:0;height:18px;background:linear-gradient(to bottom,rgba(254,254,252,0) 0%,rgba(254,254,252,.85) 100%)}
-/* Triangle pointer removed — connector is only the gold line on .qcat-open / .cat-card.open */
+#qcat-inline-panel::after{
+  content:'';position:absolute;top:-14px;left:0;right:0;height:14px;
+  background:linear-gradient(to bottom,rgba(255,254,251,0) 0%,rgba(255,254,251,.7) 100%);
+  pointer-events:none;
+}
 #cat-inline-panel .iep-arrow,
 #qcat-inline-panel .iep-arrow{display:none!important}
 #cat-inline-panel .iep-header,
-#qcat-inline-panel .iep-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+#qcat-inline-panel .iep-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:0 0 18px;padding:0 0 14px;
+  flex-wrap:wrap;gap:12px;
+  border-bottom:1px solid rgba(201,168,76,.16);
+}
 #cat-inline-panel .iep-title,
-#qcat-inline-panel .iep-title{font-size:18px;font-weight:900;color:var(--text-strong);display:flex;align-items:center;gap:10px}
+#qcat-inline-panel .iep-title{
+  font-size:17px;font-weight:800;color:#142033;
+  display:flex;align-items:center;gap:10px;letter-spacing:.1px;
+}
 #cat-inline-panel .iep-actions,
 #qcat-inline-panel .iep-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 #cat-inline-panel .iep-viewall,
-#qcat-inline-panel .iep-viewall{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;font-size:12px;font-weight:800;border-radius:10px;padding:8px 14px;text-decoration:none;transition:all .25s;white-space:nowrap;border:none;cursor:pointer}
+#qcat-inline-panel .iep-viewall{
+  background:linear-gradient(135deg,#E8C96A,#C9A84C);
+  color:#0f2347;font-size:12px;font-weight:800;
+  border-radius:999px;padding:8px 16px;text-decoration:none;
+  transition:filter .2s,transform .2s,box-shadow .2s;white-space:nowrap;
+  border:1px solid rgba(255,248,224,.45);cursor:pointer;
+  box-shadow:0 4px 12px rgba(201,168,76,.28);
+}
 #cat-inline-panel .iep-viewall:hover,
-#qcat-inline-panel .iep-viewall:hover{filter:brightness(1.08);transform:translateY(-1px)}
+#qcat-inline-panel .iep-viewall:hover{
+  filter:brightness(1.06);transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(201,168,76,.36);
+}
 #cat-inline-panel .iep-close,
-#qcat-inline-panel .iep-close{background:rgba(27,58,107,.05);border:1px solid rgba(27,58,107,.12);border-radius:9px;padding:7px 12px;cursor:pointer;color:var(--royal);font-size:15px;transition:all .2s;line-height:1}
+#qcat-inline-panel .iep-close{
+  width:34px;height:34px;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#fff;border:1px solid rgba(201,168,76,.28);
+  border-radius:50%;cursor:pointer;color:#3a4a63;font-size:15px;
+  transition:background .2s,border-color .2s,color .2s,box-shadow .2s;line-height:1;
+  box-shadow:0 2px 8px rgba(15,31,61,.06);
+}
 #cat-inline-panel .iep-close:hover,
-#qcat-inline-panel .iep-close:hover{background:rgba(27,58,107,.10);color:var(--royal-dark)}
+#qcat-inline-panel .iep-close:hover{
+  background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.5);color:#0f2347;
+}
 #cat-inline-panel .iep-groups,
-#qcat-inline-panel .iep-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#qcat-inline-panel .iep-groups{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:18px 28px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  align-items:start;
+}
+#cat-inline-panel .iep-group,
+#qcat-inline-panel .iep-group{
+  min-width:0;
+  padding:4px 2px 2px;
+}
 #cat-inline-panel .iep-group-title,
-#qcat-inline-panel .iep-group-title{font-size:13.5px;font-weight:800;color:var(--text-strong);letter-spacing:.3px;text-transform:none;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(201,168,76,.20);border-inline-start:3px solid rgba(201,168,76,.42);padding-inline-start:8px}
+#qcat-inline-panel .iep-group-title{
+  font-size:12.5px;font-weight:800;color:#1a2740;
+  letter-spacing:.35px;text-transform:none;
+  margin:0 0 10px;padding:0 0 8px 0;
+  border-bottom:1px solid rgba(201,168,76,.18);
+  border-inline-start:2px solid rgba(201,168,76,.55);
+  padding-inline-start:10px;
+}
 #cat-inline-panel .iep-link,
-#qcat-inline-panel .iep-link{display:block;font-size:13.5px;font-weight:700;color:var(--text-main);padding:7px 10px;border-radius:8px;text-decoration:none;transition:all .18s;border:1px solid transparent;cursor:pointer}
+#qcat-inline-panel .iep-link{
+  display:block;font-size:13px;font-weight:600;color:#3a4a63;
+  padding:7px 10px;border-radius:8px;text-decoration:none;
+  transition:background .16s,border-color .16s,color .16s,padding-inline-start .16s;
+  border:1px solid transparent;cursor:pointer;line-height:1.35;
+}
 #cat-inline-panel .iep-link:hover,
-#qcat-inline-panel .iep-link:hover{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.22);color:var(--text-strong)}
-@keyframes iep-slide-in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+#qcat-inline-panel .iep-link:hover{
+  background:rgba(201,168,76,.08);
+  border-color:rgba(201,168,76,.2);
+  color:#142033;
+  padding-inline-start:12px;
+}
+@keyframes iep-slide-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 #cat-inline-panel.visible,
 #qcat-inline-panel.visible{animation:iep-slide-in .28s cubic-bezier(.23,1,.32,1) both}
 @media(max-width:640px){
-  #cat-inline-panel,#qcat-inline-panel{padding:20px 16px 18px}
+  #cat-inline-panel,#qcat-inline-panel{padding:16px 14px 14px;border-radius:16px}
+  #cat-inline-panel .iep-header,
+  #qcat-inline-panel .iep-header{margin-bottom:14px;padding-bottom:12px}
   #cat-inline-panel .iep-groups,
-  #qcat-inline-panel .iep-groups{grid-template-columns:repeat(2,1fr);gap:14px 16px}
+  #qcat-inline-panel .iep-groups{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 14px}
 }
 
 /* Sub-action modal */
