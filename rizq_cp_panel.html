@@ -2510,12 +2510,21 @@ main, .page-content.active, .main-content, .results-area,
           <h2 style="font-size:18px;font-weight:700;color:var(--navy)">🏛️ شريط الخدمة العامة</h2>
           <p style="font-size:12.5px;color:var(--text-muted);margin-top:4px;line-height:1.55">
             الشريط الرفيع تحت كبسولة الهيدر — طوارئ، تنبيهات كوارث، مفقودين، توعية، مناسبات وطنية.
-            <strong style="color:#b91c1c">الأحمر = عاجل</strong>. منفصل عن شريط «مباشر» (أحدث الإعلانات).
+            خلفية الشريط تبقى كما هي؛ <strong style="color:#b91c1c">لون النص فقط</strong> يتغيّر (أحمر = عاجل).
+            منفصل عن شريط «مباشر» (أحدث الإعلانات).
           </p>
         </div>
-        <button type="button" onclick="civicOpenForm(null)" style="background:#7f1d1d;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
-          ＋ بند خدمة عامة
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button type="button" id="civic-strip-toggle-btn" onclick="civicToggleStrip()" style="background:#0f172a;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+            👁 إخفاء الشريط
+          </button>
+          <button type="button" onclick="civicOpenForm(null)" style="background:#7f1d1d;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+            ＋ بند خدمة عامة
+          </button>
+        </div>
+      </div>
+      <div id="civic-strip-status" style="margin-bottom:14px;padding:10px 14px;border-radius:10px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.22);font-size:12.5px;color:#047857;font-weight:600">
+        الشريط ظاهر للزوّار
       </div>
 
       <div id="civic-form-wrap" style="display:none;background:#fff7f7;border:1.5px solid rgba(185,28,28,.2);border-radius:14px;padding:18px;margin-bottom:18px">
@@ -2532,7 +2541,7 @@ main, .page-content.active, .main-content, .results-area,
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px">
           <div>
-            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">اللون</label>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">لون النص فقط</label>
             <select id="civic-color" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff">
               <option value="#C9A84C">ذهبي (عادي)</option>
               <option value="#ef4444">🔴 أحمر عاجل</option>
@@ -9650,13 +9659,24 @@ function resolveQuotaAddon(id, status){
 ══════════════════════════════════════════════════════════════ */
 (function(){
   var CIVIC_KEY = 'rizq_civic_ticker';
+  var CIVIC_HIDDEN_KEY = 'rizq_civic_ticker_hidden';
 
   function getAll(){
     try{ return JSON.parse(localStorage.getItem(CIVIC_KEY)||'[]'); }catch(e){ return []; }
   }
   function saveAll(list){
     localStorage.setItem(CIVIC_KEY, JSON.stringify(list||[]));
-    _syncCivicToBackend(list||[]);
+    _syncCivicToBackend({ civicTicker: list || [] });
+  }
+
+  function isStripHidden(){
+    try {
+      var v = localStorage.getItem(CIVIC_HIDDEN_KEY);
+      return v === '1' || v === 'true';
+    } catch(e){ return false; }
+  }
+  function setStripHiddenLocal(hidden){
+    try { localStorage.setItem(CIVIC_HIDDEN_KEY, hidden ? '1' : '0'); } catch(e){}
   }
 
   function _civicBackendBase(){
@@ -9667,7 +9687,7 @@ function resolveQuotaAddon(id, status){
     } catch(e){ return ''; }
   }
 
-  function _syncCivicToBackend(list){
+  function _syncCivicToBackend(payload){
     var base = _civicBackendBase();
     if (!base) return;
     var headers = { 'Content-Type':'application/json' };
@@ -9677,7 +9697,7 @@ function resolveQuotaAddon(id, status){
     fetch(base + '/api/site-config', {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ civicTicker: list || [] })
+      body: JSON.stringify(payload || {})
     }).catch(function(){});
   }
 
@@ -9687,11 +9707,52 @@ function resolveQuotaAddon(id, status){
     return fetch(base + '/api/site-config', { cache: 'no-store' })
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
-        if (!data || !data.ok || !data.config || !Array.isArray(data.config.civicTicker)) return false;
-        localStorage.setItem(CIVIC_KEY, JSON.stringify(data.config.civicTicker));
+        if (!data || !data.ok || !data.config) return false;
+        if (Array.isArray(data.config.civicTicker)) {
+          localStorage.setItem(CIVIC_KEY, JSON.stringify(data.config.civicTicker));
+        }
+        if (typeof data.config.civicTickerHidden === 'boolean') {
+          setStripHiddenLocal(data.config.civicTickerHidden === true);
+        }
         return true;
       }).catch(function(){ return false; });
   }
+
+  function refreshStripToggleUI(){
+    var hidden = isStripHidden();
+    var btn = document.getElementById('civic-strip-toggle-btn');
+    var status = document.getElementById('civic-strip-status');
+    if (btn) {
+      btn.textContent = hidden ? '👁 إظهار الشريط' : '👁 إخفاء الشريط';
+      btn.style.background = hidden ? '#047857' : '#0f172a';
+    }
+    if (status) {
+      if (hidden) {
+        status.textContent = 'الشريط مخفي عن الزوّار — اضغط «إظهار الشريط» لإعادته';
+        status.style.background = 'rgba(245,158,11,.1)';
+        status.style.borderColor = 'rgba(245,158,11,.28)';
+        status.style.color = '#b45309';
+      } else {
+        status.textContent = 'الشريط ظاهر للزوّار — خلفية الشريط ثابتة؛ لون النص من إعداد كل بند';
+        status.style.background = 'rgba(16,185,129,.08)';
+        status.style.borderColor = 'rgba(16,185,129,.22)';
+        status.style.color = '#047857';
+      }
+    }
+  }
+
+  window.civicToggleStrip = function(){
+    var next = !isStripHidden();
+    setStripHiddenLocal(next);
+    _syncCivicToBackend({ civicTickerHidden: next });
+    if (window.RizqCivicTicker && typeof RizqCivicTicker.setHidden === 'function') {
+      RizqCivicTicker.setHidden(next);
+    }
+    refreshStripToggleUI();
+    if (typeof showToast === 'function') {
+      showToast(next ? 'تم إخفاء شريط الخدمة العامة' : 'تم إظهار شريط الخدمة العامة', 'success');
+    }
+  };
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -9860,13 +9921,14 @@ function resolveQuotaAddon(id, status){
   window.showPanel = function(id, el){
     if (typeof _prevShow === 'function') _prevShow(id, el);
     if (id === 'announcements') {
-      syncCivicFromBackend().then(function(){ renderCivicList(); });
+      syncCivicFromBackend().then(function(){ renderCivicList(); refreshStripToggleUI(); });
     }
   };
 
   setTimeout(function(){
-    syncCivicFromBackend().then(function(){ renderCivicList(); });
+    syncCivicFromBackend().then(function(){ renderCivicList(); refreshStripToggleUI(); });
   }, 700);
+  refreshStripToggleUI();
 })();
 </script>
 

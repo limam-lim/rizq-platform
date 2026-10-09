@@ -1188,6 +1188,8 @@ app.get('/api/site-config', (req, res) => {
     announcements: raw.announcements || undefined,
     // شريط الخدمة العامة تحت الهيدر (طوارئ / تنبيهات / مناسبات) — منفصل عن مباشر الإعلانات
     civicTicker: Array.isArray(raw.civicTicker) ? raw.civicTicker : undefined,
+    // إخفاء/إظهار الشريط بالكامل من لوحة السوبر أدمن (لون الخلفية يبقى كما هو)
+    civicTickerHidden: raw.civicTickerHidden === true,
     // شريط الإشعار العلوي (إعدادات الموقع) — حقول عامة فقط
     site: raw.site ? {
       sitename: raw.site.sitename,
@@ -1438,6 +1440,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
   if (Array.isArray(body.civicTicker)) {
     // شريط الخدمة العامة تحت كبسولة الهيدر — طوارئ / كوارث / مفقودين / توعية / مناسبات.
     // منفصل عن شريط «مباشر» (أحدث الإعلانات) وعن إشعارات الترويج.
+    // اللون هنا = لون النص فقط؛ خلفية الشريط تبقى التدرج الأصلي للهيدر.
     const COLOR_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
     next.civicTicker = body.civicTicker.slice(0, 30).map((item, idx) => {
       const rawColor = String(item.color || '').trim();
@@ -1463,6 +1466,11 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
         updatedAt: String(item.updatedAt || new Date().toISOString()).slice(0, 40),
       };
     });
+    next.civicTickerUpdatedAt = new Date().toISOString();
+  }
+
+  if (typeof body.civicTickerHidden === 'boolean') {
+    next.civicTickerHidden = body.civicTickerHidden === true;
     next.civicTickerUpdatedAt = new Date().toISOString();
   }
 

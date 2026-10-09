@@ -57,16 +57,27 @@ const fs = require('fs');
 const civicJs = fs.readFileSync(path.join(__dirname, '../../rizq_civic_ticker.js'), 'utf8');
 assert.ok(civicJs.includes('FALLBACK'));
 assert.ok(civicJs.includes('civicTicker'));
-assert.ok(civicJs.includes('ticker-has-urgent'));
+assert.ok(civicJs.includes('HIDDEN_KEY'));
+assert.ok(civicJs.includes('setHidden'));
+assert.ok(civicJs.includes('civicTickerHidden'));
+// خلفية الشريط لا تُعاد تلوينها عند العاجل — لون النص فقط
+assert.ok(!/ticker-has-urgent\{[^}]*background:/s.test(civicJs));
 
 const panel = fs.readFileSync(path.join(__dirname, '../../rizq_cp_panel.html'), 'utf8');
 assert.ok(panel.includes('شريط الخدمة العامة'));
 assert.ok(panel.includes('civicSaveForm'));
 assert.ok(panel.includes('civicTicker'));
+assert.ok(panel.includes('civicToggleStrip'));
+assert.ok(panel.includes('civicTickerHidden'));
+assert.ok(panel.includes('لون النص فقط'));
 
 const landing = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
 assert.ok(landing.includes('rizq_civic_ticker.js'));
 assert.ok(landing.includes('civic-ticker-wrap'));
 assert.ok(landing.includes('مباشر')); // live ads preserved
+assert.ok(landing.includes('linear-gradient(90deg,var(--dark),var(--royal),var(--dark))'));
+
+const server = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
+assert.ok(server.includes('civicTickerHidden'));
 
 console.log('OK: civic ticker sanitize + wiring checks passed');

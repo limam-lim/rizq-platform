@@ -10,6 +10,7 @@
   'use strict';
 
   var STORAGE_KEY = 'rizq_civic_ticker';
+  var HIDDEN_KEY = 'rizq_civic_ticker_hidden';
   var STYLE_ID = 'rizq-civic-ticker-css';
   var POLL_MS = 15000;
 
@@ -104,21 +105,13 @@
     var s = document.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
-      '/* شريط خدمة عامة — أبطأ من مباشر الإعلانات */',
+      '/* شريط خدمة عامة — خلفية الشريط كما كانت؛ لون النص فقط من الأدمن */',
       '#ticker-wrap.civic-ticker-wrap .ticker-inner{',
       '  --rzq-mq-dur:62s;',
       '  animation-duration:var(--rzq-mq-dur,62s)!important',
       '}',
-      '#ticker-wrap.civic-ticker-wrap.ticker-has-urgent{',
-      '  background:linear-gradient(90deg,#3b0a0a,#7f1d1d,#3b0a0a)!important;',
-      '  border-top-color:rgba(239,68,68,.45)!important;',
-      '  border-bottom-color:rgba(239,68,68,.45)!important',
-      '}',
-      '#ticker-wrap.civic-ticker-wrap .ticker-item{',
-      '  color:rgba(255,255,255,.88)',
-      '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-item.is-urgent{',
-      '  color:#fecaca;font-weight:600',
+      '  font-weight:600',
       '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-item a{',
       '  color:inherit;text-decoration:underline;text-underline-offset:2px',
@@ -128,6 +121,19 @@
       '}'
     ].join('');
     (document.head || document.documentElement).appendChild(s);
+  }
+
+  function isStripHidden() {
+    try {
+      var v = localStorage.getItem(HIDDEN_KEY);
+      if (v === '1' || v === 'true') return true;
+      if (v === '0' || v === 'false') return false;
+    } catch (e) {}
+    return false;
+  }
+
+  function setStripHidden(hidden) {
+    try { localStorage.setItem(HIDDEN_KEY, hidden ? '1' : '0'); } catch (e) {}
   }
 
   function backendBase() {
@@ -172,29 +178,44 @@
       + '</div>';
   }
 
+  function hideStrip(wrap) {
+    if (!wrap) return;
+    wrap.classList.add('is-empty', 'civic-ticker-wrap');
+    wrap.classList.remove('ticker-has-urgent');
+    try { document.documentElement.style.setProperty('--rizq-ticker-h', '0px'); } catch (e) {}
+  }
+
   function render(list) {
     injectCSS();
     var wrap = document.getElementById('ticker-wrap');
     var inner = document.getElementById('ticker');
     if (!wrap || !inner) return;
 
+    wrap.classList.add('civic-ticker-wrap');
+
+    // إخفاء الشريط بالكامل من لوحة السوبر أدمن — بدون تغيير لون الخلفية
+    if (isStripHidden()) {
+      hideStrip(wrap);
+      return;
+    }
+
     var active = sortedActive(list);
     if (!active.length) active = FALLBACK.slice();
 
     var html = active.map(buildItemHtml).filter(Boolean).join('');
     if (!html) {
-      wrap.classList.add('is-empty');
+      hideStrip(wrap);
       return;
     }
 
     inner.innerHTML = html + html;
     wrap.classList.remove('is-empty');
-    wrap.classList.add('civic-ticker-wrap');
     wrap.setAttribute('role', 'marquee');
     wrap.setAttribute('aria-label', getLang() === 'fr'
       ? 'Annonces de service public'
       : 'إعلانات خدمة عامة');
 
+    // علامة عاجل للنص فقط — لا نعيد تلوين خلفية الشريط
     wrap.classList.toggle('ticker-has-urgent', active.some(isUrgent));
 
     try {
@@ -216,6 +237,11 @@
     render(safe);
   }
 
+  function applyHidden(hidden) {
+    setStripHidden(!!hidden);
+    render(fromCache());
+  }
+
   function fetchRemote() {
     var base = backendBase();
     if (!base || typeof fetch === 'undefined') return Promise.resolve(null);
@@ -223,7 +249,10 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data || !data.ok || !data.config) return null;
-        return Array.isArray(data.config.civicTicker) ? data.config.civicTicker : null;
+        return {
+          list: Array.isArray(data.config.civicTicker) ? data.config.civicTicker : null,
+          hidden: data.config.civicTickerHidden === true
+        };
       })
       .catch(function () { return null; });
   }
@@ -231,8 +260,23 @@
   var _pollTimer = null;
   var _lastSig = '';
 
-  function sig(list) {
-    try { return JSON.stringify(list || []); } catch (e) { return ''; }
+  function sig(payload) {
+    try {
+      return JSON.stringify({
+        list: (payload && payload.list) || [],
+        hidden: !!(payload && payload.hidden)
+      });
+    } catch (e) { return ''; }
+  }
+
+  function applyRemote(remote) {
+    if (!remote) return;
+    if (typeof remote.hidden === 'boolean') setStripHidden(remote.hidden);
+    if (Array.isArray(remote.list)) {
+      applyList(remote.list);
+    } else {
+      render(fromCache());
+    }
   }
 
   function init() {
@@ -242,7 +286,13 @@
     fetchRemote().then(function (remote) {
       if (remote) {
         _lastSig = sig(remote);
-        applyList(remote);
+        if (remote.list) {
+          applyRemote(remote);
+        } else {
+          if (typeof remote.hidden === 'boolean') setStripHidden(remote.hidden);
+          if (!cached.length) applyList([]);
+          else render(cached);
+        }
       } else if (!cached.length) {
         applyList([]);
       }
@@ -255,18 +305,21 @@
         var next = sig(remote);
         if (next === _lastSig) return;
         _lastSig = next;
-        applyList(remote);
+        applyRemote(remote);
       });
     }, POLL_MS);
   }
 
   global.RizqCivicTicker = {
     STORAGE_KEY: STORAGE_KEY,
+    HIDDEN_KEY: HIDDEN_KEY,
     FALLBACK: FALLBACK,
     render: render,
     apply: applyList,
     reload: init,
     getAll: fromCache,
+    isHidden: isStripHidden,
+    setHidden: applyHidden,
     saveAll: function (list) {
       applyList(Array.isArray(list) ? list : []);
     }
