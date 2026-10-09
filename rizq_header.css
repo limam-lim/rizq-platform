@@ -1453,8 +1453,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     width:max-content !important;
     max-width:100% !important;
     min-width:0 !important;
-    padding:4px 10px !important;
-    gap:2px !important;
+    padding:3px 4px !important;
+    gap:0 !important;
     border-radius:14px !important;
     overflow-x:auto !important;
     overflow-y:visible !important;
@@ -1515,13 +1515,13 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:4px 6px 5px !important;
-    font-size:10px !important;
-    min-width:48px !important;
+    padding:3px 2px 4px !important;
+    font-size:9px !important;
+    min-width:38px !important;
     flex:0 0 auto !important;
     width:auto !important;
     max-width:none !important;
-    gap:2px !important;
+    gap:1px !important;
     max-height:none !important;
     min-height:0 !important;
     visibility:visible !important;
@@ -1531,10 +1531,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    font-size:16px !important;
-    width:28px !important;
-    height:28px !important;
-    line-height:28px !important;
+    font-size:14px !important;
+    width:24px !important;
+    height:24px !important;
+    line-height:24px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
@@ -1542,7 +1542,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
     display:block !important;
-    font-size:10px !important;
+    font-size:9px !important;
     line-height:1.15 !important;
     white-space:nowrap !important;
     overflow:hidden !important;
@@ -3006,8 +3006,8 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
     justify-content:center !important;
     width:max-content !important;
     max-width:100% !important;
-    padding:4px 10px !important;
-    gap:2px !important;
+    padding:3px 4px !important;
+    gap:0 !important;
     max-height:none !important;
     min-height:0 !important;
     height:auto !important;
@@ -3041,37 +3041,37 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #nav .nav-center .nav-link-btn,
   html.rizq-app-nav #rizq-desk-nav .nav-center a,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn{
-    padding:4px 6px 5px !important;
-    min-width:48px !important;
+    padding:3px 2px 4px !important;
+    min-width:38px !important;
     width:auto !important;
     max-width:none !important;
-    gap:2px !important;
+    gap:1px !important;
     max-height:none !important;
     min-height:0 !important;
-    font-size:10px !important;
+    font-size:9px !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-ico,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-ico{
-    width:28px !important;
-    height:28px !important;
-    font-size:16px !important;
-    line-height:28px !important;
+    width:24px !important;
+    height:24px !important;
+    font-size:14px !important;
+    line-height:24px !important;
     margin:0 auto !important;
   }
   html.rizq-app-nav #nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #nav .nav-center .nav-link-btn .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center a .rizq-hdr-lbl,
   html.rizq-app-nav #rizq-desk-nav .nav-center .nav-link-btn .rizq-hdr-lbl{
-    font-size:10px !important;
+    font-size:9px !important;
     line-height:1.15 !important;
     display:block !important;
   }
   html.rizq-app-nav #nav > .nav-center,
   html.rizq-app-nav #rizq-desk-nav > .nav-center{
     max-width:100% !important;
-    padding:4px 10px !important;
+    padding:3px 4px !important;
     border-radius:14px !important;
   }
   /* بحث ظاهر على التابلت (أيقونة فقط) */
