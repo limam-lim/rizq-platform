@@ -345,14 +345,17 @@
     if (heroSearch && heroSearch.dataset.t === 'search-ph') {
       heroSearch.placeholder = fr ? 'Rechercher sur Rizq...' : 'البحث في رزق...';
     }
-    var liveWrap = document.querySelector('#hero-listings .listings-label > span');
-    if (liveWrap) {
-      liveWrap.innerHTML = '<span class="live-pulse-dot" aria-hidden="true"></span><strong>'
-        + (fr ? 'En direct' : 'مباشر') + '</strong> '
-        + (fr
-          ? 'Dernières annonces publiées — mise à jour automatique'
-          : 'أحدث الإعلانات المنشورة — تتحدث تلقائياً');
+    if (typeof paintLiveListingsLabel === 'function') {
+      paintLiveListingsLabel();
+    } else {
+      var liveWrap = document.querySelector('#hero-listings .listings-label > span');
+      if (liveWrap) {
+        liveWrap.innerHTML = fr
+          ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub">Dernières annonces — mise à jour automatique</span>'
+          : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>';
+      }
     }
+    if (typeof syncAllMarquees === 'function') setTimeout(syncAllMarquees, 40);
 
     var hamburger = document.getElementById('nav-hamburger');
     if (hamburger) {
@@ -551,8 +554,8 @@
       }
       var y = window.scrollY || document.documentElement.scrollTop || 0;
       var past = false;
+      var hb = headerBottom();
       if (heroBrowse) {
-        var hb = headerBottom();
         past = heroBrowse.getBoundingClientRect().bottom < hb + 12;
         if (!past && y > 0) {
           /* احتياطي: إن تجاوز التمرير منتصف لوحة التصفح */
@@ -561,6 +564,12 @@
         }
       } else {
         past = y > 220;
+      }
+      /* لا تُظهر قرص البحث فوق كبسولة «مباشر» — كان يغطيها ويبدو كتداخل */
+      var liveLabel = document.querySelector('#hero-listings .listings-label');
+      if (past && liveLabel) {
+        var lr = liveLabel.getBoundingClientRect();
+        if (lr.top < hb + 100 && lr.bottom > hb - 8) past = false;
       }
       pill.classList.toggle('is-visible', past);
     }
