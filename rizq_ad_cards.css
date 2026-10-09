@@ -515,4 +515,5 @@
 
 @media (prefers-reduced-motion:reduce){
   .rzq-adx-slides{transition:none}
+  /* التشغيل التلقائي يُوقف من JS عند reduce */
 }

@@ -1,9 +1,67 @@
 /**
  * rizq_ad_cards.js — بطاقة إعلان عمودية فاخرة (نموذج رزق)
- * كاروسيل + سعر ذهبي + مفضلة على الصورة + اتصال/واتساب أسفل البطاقة
+ * كاروسيل تلقائي داخل الإعلان (1→2→3… ثم يعود) + سعر ذهبي + مفضلة + اتصال/واتساب
  */
 (function (global) {
   'use strict';
+
+  var AUTO_MS = 3200;
+  var _rzqAdxAutoIo = null;
+
+  function prefersReducedMotion() {
+    try {
+      return !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function ensureAutoIo() {
+    if (_rzqAdxAutoIo || typeof IntersectionObserver === 'undefined') return _rzqAdxAutoIo;
+    _rzqAdxAutoIo = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var en = entries[i];
+        var media = en.target;
+        if (!media || !media.classList || !media.classList.contains('rzq-adx-media')) continue;
+        media._rzqAdxOffscreen = !en.isIntersecting;
+        syncAuto(media);
+      }
+    }, { root: null, rootMargin: '40px 0px', threshold: 0.2 });
+    return _rzqAdxAutoIo;
+  }
+
+  function clearAutoTimer(media) {
+    if (!media) return;
+    if (media._rzqAdxAutoTimer) {
+      clearTimeout(media._rzqAdxAutoTimer);
+      media._rzqAdxAutoTimer = 0;
+    }
+  }
+
+  function scheduleAuto(media) {
+    clearAutoTimer(media);
+    if (!media || !media.classList.contains('has-multi')) return;
+    if (prefersReducedMotion()) return;
+    if (document.hidden) return;
+    if (media._rzqAdxOffscreen) return;
+    if (media.classList.contains('is-holding') || media.classList.contains('is-touch')) return;
+    media._rzqAdxAutoTimer = setTimeout(function () {
+      media._rzqAdxAutoTimer = 0;
+      if (!media.isConnected) return;
+      go(media, 1);
+      scheduleAuto(media);
+    }, AUTO_MS);
+  }
+
+  function syncAuto(media) {
+    if (!media || !media.classList.contains('has-multi')) return;
+    if (prefersReducedMotion() || document.hidden || media._rzqAdxOffscreen ||
+        media.classList.contains('is-holding') || media.classList.contains('is-touch')) {
+      clearAutoTimer(media);
+      return;
+    }
+    if (!media._rzqAdxAutoTimer) scheduleAuto(media);
+  }
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -279,6 +337,8 @@
     var prev = media.querySelector('.rzq-adx-prev');
     var next = media.querySelector('.rzq-adx-next');
     var fav = media.querySelector('.rzq-adx-fav');
+    var multi = media.classList.contains('has-multi');
+    var holdReleaseTimer = 0;
 
     function hold(on) {
       media.classList.toggle('is-holding', !!on);
@@ -286,20 +346,34 @@
       if (track && track._rzqMarquee && typeof track._rzqMarquee.setPaused === 'function') {
         track._rzqMarquee.setPaused(!!on || !!(track.querySelector && track.querySelector('.rzq-adx-media.is-holding')));
       }
+      if (on) {
+        if (holdReleaseTimer) { clearTimeout(holdReleaseTimer); holdReleaseTimer = 0; }
+        clearAutoTimer(media);
+      } else {
+        syncAuto(media);
+      }
+    }
+
+    function bumpManual(dir) {
+      hold(true);
+      go(media, dir);
+      if (holdReleaseTimer) clearTimeout(holdReleaseTimer);
+      holdReleaseTimer = setTimeout(function () {
+        holdReleaseTimer = 0;
+        hold(false);
+      }, 450);
     }
 
     if (prev) {
       prev.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
-        hold(true); go(media, -1);
-        setTimeout(function () { hold(false); }, 450);
+        bumpManual(-1);
       });
     }
     if (next) {
       next.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
-        hold(true); go(media, 1);
-        setTimeout(function () { hold(false); }, 450);
+        bumpManual(1);
       });
     }
     if (fav) {
@@ -319,20 +393,40 @@
     media.addEventListener('touchend', function (e) {
       var startX = x0;
       x0 = null;
-      hold(false);
       media.classList.remove('is-touch');
-      if (startX == null) return;
+      if (startX == null) {
+        hold(false);
+        return;
+      }
       var dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) < 34) return;
-      go(media, dx < 0 ? 1 : -1);
+      if (Math.abs(dx) >= 34) go(media, dx < 0 ? 1 : -1);
+      hold(false);
     }, { passive: true });
     media.addEventListener('touchcancel', function () {
       x0 = null;
-      hold(false);
       media.classList.remove('is-touch');
+      hold(false);
     }, { passive: true });
 
-    media.addEventListener('mouseleave', function () { hold(false); });
+    media.addEventListener('mouseenter', function () {
+      if (!multi) return;
+      clearAutoTimer(media);
+    });
+    media.addEventListener('mouseleave', function () {
+      hold(false);
+      syncAuto(media);
+    });
+
+    if (multi && !prefersReducedMotion()) {
+      media._rzqAdxOffscreen = false;
+      var io = ensureAutoIo();
+      if (io) {
+        try { io.observe(media); } catch (eIo) {}
+      }
+      /* تأخير بدء متدرّج حتى لا تتبدّل كل البطاقات معاً */
+      var stagger = 400 + ((parseInt(media.getAttribute('data-ad-id'), 10) || 0) % 7) * 180;
+      setTimeout(function () { syncAuto(media); }, stagger);
+    }
   }
 
   function bindActions(root) {
@@ -378,6 +472,10 @@
     } else {
       bindAll(document);
     }
+    document.addEventListener('visibilitychange', function () {
+      var nodes = document.querySelectorAll('.rzq-adx-media.has-multi');
+      for (var i = 0; i < nodes.length; i++) syncAuto(nodes[i]);
+    });
   }
 
   /** ألبومات تجريبية — صور عمودية فاخرة مطابقة للنموذج */
