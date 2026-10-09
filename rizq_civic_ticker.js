@@ -1,10 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════
-   rizq_civic_ticker.js  v1.0
+   rizq_civic_ticker.js  v1.1
    شريط الخدمة العامة تحت كبسولة الهيدر (طارئ / تنبيه / توعية / مناسبة)
    ───────────────────────────────────────────────────────────────────
    يملأ #ticker-wrap — منفصل تماماً عن شريط «مباشر» (أحدث الإعلانات).
    يُدار من لوحة السوبر أدمن: الإشعارات → شريط الخدمة العامة.
    مصدر البيانات: /api/site-config → config.civicTicker
+   مظهر الشريط الافتراضي = كما كان قبل الخدمة العامة: نص أبيض ناعم + نقطة ذهبية.
    ═══════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
@@ -39,7 +40,7 @@
       id: 'civic_fb_fest',
       textAr: 'مناسبات وطنية ومجتمعية — تابع الإعلانات الرسمية على رزق',
       textFr: 'Fêtes nationales et communautaires — suivez les avis officiels sur Rizq',
-      color: '#7dd3fc',
+      color: '#C9A84C',
       priority: 'normal',
       link: '',
       active: true,
@@ -94,6 +95,12 @@
     return '#C9A84C';
   }
 
+  /** اللون الذهبي/الافتراضي = مظهر الشريط السابق (نص أبيض ناعم، بدون غسلة صفراء) */
+  function isDefaultAccent(color) {
+    var c = String(color || '').toLowerCase();
+    return !c || c === '#c9a84c' || c === '#e8c96a' || c === 'gold' || c === 'default';
+  }
+
   function pickText(item) {
     var lang = getLang();
     if (lang === 'fr') return item.textFr || item.textAr || '';
@@ -105,7 +112,7 @@
     var s = document.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
-      '/* شريط خدمة عامة — خلفية الكروم الأصلية دائماً؛ لا أحمر على الشريط */',
+      '/* شريط خدمة عامة — كروم كحلي أصلي + نص أبيض ناعم كما قبل ساعة */',
       '#ticker-wrap.civic-ticker-wrap,',
       '#ticker-wrap.civic-ticker-wrap.ticker-has-urgent{',
       '  background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark))!important;',
@@ -115,6 +122,9 @@
       '#ticker-wrap.civic-ticker-wrap .ticker-inner{',
       '  animation:none!important',
       '}',
+      '#ticker-wrap.civic-ticker-wrap .ticker-item{',
+      '  color:rgba(255,255,255,.82)',
+      '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-item.is-urgent{',
       '  font-weight:600',
       '}',
@@ -122,7 +132,7 @@
       '  color:inherit;text-decoration:underline;text-underline-offset:2px',
       '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-dot{',
-      '  opacity:.95',
+      '  background:var(--gold,#C9A84C);opacity:.7',
       '}'
     ].join('');
     (document.head || document.documentElement).appendChild(s);
@@ -171,15 +181,20 @@
     var text = pickText(item);
     if (!text) return '';
     var color = normalizeColor(item.color);
+    var accentDefault = isDefaultAccent(color);
     var urgent = isUrgent(item);
     var href = safeUrl(item.link);
     var body = esc(text);
     if (href) {
       body = '<a href="' + esc(href) + '" rel="noopener">' + body + '</a>';
     }
+    // الافتراضي: نص أبيض ناعم + نقطة ذهبية (مظهر الشريط قبل غسلة الأصفر)
+    // الألوان المخصّصة من الأدمن تُطبَّق على النص فقط — دون تغيير خلفية الشريط
+    var dotStyle = accentDefault ? '' : ' style="background:' + esc(color) + ';opacity:.95"';
+    var textStyle = accentDefault ? '' : ' style="color:' + esc(color) + '"';
     return '<div class="ticker-item' + (urgent ? ' is-urgent' : '') + '">'
-      + '<div class="ticker-dot" style="background:' + esc(color) + '"></div>'
-      + '<span style="color:' + esc(color) + '">' + body + '</span>'
+      + '<div class="ticker-dot"' + dotStyle + '></div>'
+      + '<span' + textStyle + '>' + body + '</span>'
       + '</div>';
   }
 

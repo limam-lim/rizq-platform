@@ -64,7 +64,9 @@ assert.ok(civicJs.includes('civicTickerHidden'));
 assert.ok(civicJs.includes('background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark))!important'));
 assert.ok(!civicJs.includes('#3b0a0a'));
 assert.ok(!civicJs.includes('#7f1d1d'));
-// العيّنة الافتراضية للطوارئ ذهبية وليست حمراء
+// المظهر الافتراضي: نص أبيض ناعم (بلا غسلة صفراء) + نقطة ذهبية
+assert.ok(civicJs.includes('color:rgba(255,255,255,.82)'));
+assert.ok(civicJs.includes('isDefaultAccent'));
 assert.ok(/id: 'civic_fb_emergency'[\s\S]*?color: '#C9A84C'/.test(civicJs));
 assert.ok(!/id: 'civic_fb_emergency'[\s\S]*?color: '#ef4444'/.test(civicJs));
 // حركة الشريط عبر rAF في الصفحة — بلا CSS animation-duration من حقبة الـ compositor
@@ -78,7 +80,8 @@ assert.ok(panel.includes('civicTicker'));
 assert.ok(panel.includes('civicToggleStrip'));
 assert.ok(panel.includes('civicTickerHidden'));
 assert.ok(panel.includes('لون النص فقط'));
-assert.ok(panel.includes('خلفية الشريط تبقى باللون الأصلي'));
+assert.ok(panel.includes('نص أبيض ناعم'));
+assert.ok(panel.includes('خلفية الشريط تبقى كحلية'));
 
 const landing = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
 assert.ok(landing.includes('rizq_civic_ticker.js'));
