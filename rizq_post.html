@@ -106,6 +106,16 @@ html[dir="ltr"] .progress-steps .step:not(:last-child)::after{
 /* Grid form */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+/* موقع GPS اختياري على الخريطة */
+.ad-loc-box{border:1.5px solid #e2e8f5;border-radius:14px;padding:14px 14px 12px;background:linear-gradient(160deg,#f8faff 0%,#eef3fb 100%);margin-top:4px}
+.ad-loc-box .ad-loc-hint{font-size:11.5px;color:var(--text-muted);line-height:1.65;margin:0 0 10px}
+#ad-loc-map{height:220px;border-radius:12px;overflow:hidden;border:1px solid rgba(13,27,42,.1);background:linear-gradient(135deg,#e8eef8,#dce6f5);z-index:1}
+.ad-loc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ad-loc-btn{padding:8px 14px;border-radius:10px;border:1.5px solid rgba(27,58,107,.18);background:#fff;color:var(--royal);font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;transition:border-color .2s,background .2s}
+.ad-loc-btn:hover{border-color:rgba(201,168,76,.55);background:#fffdf6}
+.ad-loc-btn.primary{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));border-color:rgba(201,168,76,.4);color:var(--royal-dark)}
+.ad-loc-btn.danger{color:#b91c1c;border-color:rgba(185,28,28,.25)}
+.ad-loc-status{font-size:11.5px;color:var(--text-muted);margin-top:8px;min-height:1.2em}
 
 /* Cat grid — vertical icon + label, centered (RTL/LTR) */
 .cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
@@ -530,6 +540,28 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <div class="form-group ad-loc-box" id="ad-precise-loc-wrap">
+      <label class="form-label" data-t-fr='Emplacement précis <span class="opt-tag" style="font-weight:600;color:var(--text-muted);font-size:11px">(optionnel)</span>'>الموقع الدقيق على الخريطة <span class="opt-tag" style="font-weight:600;color:var(--text-muted);font-size:11px">(اختياري)</span></label>
+      <p class="ad-loc-hint" data-t-fr="Placez l'épingle sur votre magasin ou entrez latitude/longitude. Sans cela, la carte affichera le centre de la wilaya.">ضع الدبوس على موقع المحل أو أدخل خط العرض/الطول. بدون ذلك تُعرض خريطة مركز الولاية فقط.</p>
+      <div id="ad-loc-map" aria-label="خريطة اختيار الموقع"></div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label" data-t-fr="Latitude">خط العرض (lat)</label>
+          <input class="form-input" type="number" id="ad-lat" step="0.000001" min="14" max="28" dir="ltr" placeholder="18.0735" inputmode="decimal"/>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label" data-t-fr="Longitude">خط الطول (lon)</label>
+          <input class="form-input" type="number" id="ad-lon" step="0.000001" min="-18" max="-4" dir="ltr" placeholder="-15.9582" inputmode="decimal"/>
+        </div>
+      </div>
+      <div class="ad-loc-actions">
+        <button type="button" class="ad-loc-btn primary" id="ad-loc-gps" data-t-fr="📍 Ma position">📍 موقعي الحالي</button>
+        <button type="button" class="ad-loc-btn" id="ad-loc-apply-wilaya" data-t-fr="Centrer sur la wilaya">تمركز على الولاية</button>
+        <button type="button" class="ad-loc-btn danger" id="ad-loc-clear" data-t-fr="Effacer">مسح الموقع</button>
+      </div>
+      <div class="ad-loc-status" id="ad-loc-status"></div>
+    </div>
+
     <div class="form-group" id="ad-condition-wrap">
       <label class="form-label" data-t-fr='État du produit <span class="req">*</span>'>حالة المنتج <span class="req">*</span></label>
       <div id="condition-btns" style="display:flex;gap:10px;flex-wrap:wrap">
@@ -931,10 +963,222 @@ function resolveCityField(){
   if(city&&city.indexOf(mough)!==-1) return city;
   return city ? (mough+' — '+city) : mough;
 }
+
+/* ── موقع GPS اختياري (دبوس خريطة + lat/lon) ── */
+var POST_WILAYA_COORDS = {
+  'نواكشوط الغربية':{lat:18.08,lon:-15.97},
+  'نواكشوط الشمالية':{lat:18.10,lon:-15.95},
+  'نواكشوط الجنوبية':{lat:18.04,lon:-15.96},
+  'نواكشوط':{lat:18.07,lon:-15.96},
+  'نواذيبو':{lat:20.93,lon:-17.04},
+  'أطار':{lat:20.52,lon:-13.05},
+  'كيفة':{lat:16.62,lon:-11.40},
+  'روصو':{lat:16.51,lon:-15.80},
+  'ترارزة':{lat:17.55,lon:-15.60},
+  'تيرس زمور':{lat:22.75,lon:-12.50},
+  'براكنة':{lat:17.50,lon:-14.25},
+  'العيون':{lat:16.69,lon:-9.61},
+  'تيجيكجة':{lat:18.55,lon:-11.43},
+  'ألاك':{lat:17.05,lon:-13.92},
+  'نعمة':{lat:16.62,lon:-7.27},
+  'سيلبابي':{lat:15.17,lon:-12.18}
+};
+var _postLocMap = null;
+var _postLocMarker = null;
+var _postLocPrecise = false;
+var _postLocSyncing = false;
+
+function _postLocStatus(msg){
+  var el = document.getElementById('ad-loc-status');
+  if(el) el.textContent = msg || '';
+}
+function _postWilayaCenter(){
+  var w = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value : '');
+  if(w && POST_WILAYA_COORDS[w]) return POST_WILAYA_COORDS[w];
+  return {lat:18.07,lon:-15.96};
+}
+function _postReadLatLonInputs(){
+  var latEl = document.getElementById('ad-lat');
+  var lonEl = document.getElementById('ad-lon');
+  var lat = latEl && latEl.value !== '' ? Number(latEl.value) : NaN;
+  var lon = lonEl && lonEl.value !== '' ? Number(lonEl.value) : NaN;
+  if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if(lat < 14 || lat > 28 || lon < -18 || lon > -4) return null;
+  return {lat: Math.round(lat*1e6)/1e6, lon: Math.round(lon*1e6)/1e6};
+}
+function collectAdCoords(){
+  var c = _postReadLatLonInputs();
+  if(!c) return {lat: null, lon: null};
+  return c;
+}
+function _postSetLatLonInputs(lat, lon, precise){
+  _postLocSyncing = true;
+  var latEl = document.getElementById('ad-lat');
+  var lonEl = document.getElementById('ad-lon');
+  if(latEl) latEl.value = (lat != null && Number.isFinite(lat)) ? String(lat) : '';
+  if(lonEl) lonEl.value = (lon != null && Number.isFinite(lon)) ? String(lon) : '';
+  _postLocPrecise = !!(precise && lat != null && lon != null);
+  _postLocSyncing = false;
+}
+function _ensurePostLeaflet(cb){
+  if(window.L && window.L.map){ cb(); return; }
+  if(window._rizqPostLeafletLoading){ window._rizqPostLeafletLoading.push(cb); return; }
+  window._rizqPostLeafletLoading = [cb];
+  var done = function(){
+    var q = window._rizqPostLeafletLoading || [];
+    window._rizqPostLeafletLoading = null;
+    q.forEach(function(fn){ try{ fn(); }catch(e){} });
+  };
+  if(!document.getElementById('rizq-post-leaflet-css')){
+    var link = document.createElement('link');
+    link.id = 'rizq-post-leaflet-css';
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+  }
+  var s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload = done;
+  s.onerror = function(){ window._rizqPostLeafletLoading = null; };
+  document.head.appendChild(s);
+}
+function _postPlaceMarker(lat, lon){
+  if(!_postLocMap || !window.L) return;
+  if(_postLocMarker){
+    _postLocMarker.setLatLng([lat, lon]);
+  } else {
+    _postLocMarker = L.marker([lat, lon], {draggable: true}).addTo(_postLocMap);
+    _postLocMarker.on('dragend', function(){
+      var ll = _postLocMarker.getLatLng();
+      _postSetLatLonInputs(Math.round(ll.lat*1e6)/1e6, Math.round(ll.lng*1e6)/1e6, true);
+      _postLocStatus(_postLangFr()
+        ? '✓ Emplacement précis enregistré (épingle déplacée)'
+        : '✓ تم حفظ الموقع الدقيق (تم تحريك الدبوس)');
+    });
+  }
+  _postLocMap.setView([lat, lon], _postLocPrecise ? 15 : 12);
+}
+function initPostLocMap(){
+  var el = document.getElementById('ad-loc-map');
+  if(!el || _postLocMap) return;
+  _ensurePostLeaflet(function(){
+    if(!window.L || _postLocMap) return;
+    try{
+      var center = _postReadLatLonInputs() || _postWilayaCenter();
+      _postLocMap = L.map(el, {scrollWheelZoom: false, attributionControl: true}).setView([center.lat, center.lon], 12);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(_postLocMap);
+      if(_postReadLatLonInputs()){
+        _postLocPrecise = true;
+        _postPlaceMarker(center.lat, center.lon);
+      }
+      _postLocMap.on('click', function(e){
+        var lat = Math.round(e.latlng.lat*1e6)/1e6;
+        var lon = Math.round(e.latlng.lng*1e6)/1e6;
+        if(lat < 14 || lat > 28 || lon < -18 || lon > -4){
+          _postLocStatus(_postLangFr() ? '⚠️ Emplacement hors Mauritanie' : '⚠️ الموقع خارج موريتانيا');
+          return;
+        }
+        _postSetLatLonInputs(lat, lon, true);
+        _postPlaceMarker(lat, lon);
+        _postLocStatus(_postLangFr()
+          ? '✓ Emplacement précis : ' + lat + ', ' + lon
+          : '✓ الموقع الدقيق: ' + lat + '، ' + lon);
+      });
+      setTimeout(function(){ try{ _postLocMap.invalidateSize(); }catch(e){} }, 120);
+    }catch(err){ console.warn('[post-loc]', err); }
+  });
+}
+function applyPostLocFromInputs(){
+  if(_postLocSyncing) return;
+  var c = _postReadLatLonInputs();
+  var latEl = document.getElementById('ad-lat');
+  var lonEl = document.getElementById('ad-lon');
+  var hasAny = (latEl && latEl.value !== '') || (lonEl && lonEl.value !== '');
+  if(!c){
+    if(hasAny){
+      _postLocStatus(_postLangFr()
+        ? '⚠️ Entrez lat (14–28) et lon (−18…−4) valides'
+        : '⚠️ أدخل lat (14–28) و lon (−18…−4) صالحين');
+    }
+    return;
+  }
+  _postLocPrecise = true;
+  if(_postLocMap) _postPlaceMarker(c.lat, c.lon);
+  _postLocStatus(_postLangFr()
+    ? '✓ Emplacement précis : ' + c.lat + ', ' + c.lon
+    : '✓ الموقع الدقيق: ' + c.lat + '، ' + c.lon);
+}
+function clearPostLoc(){
+  _postSetLatLonInputs(null, null, false);
+  if(_postLocMarker && _postLocMap){
+    try{ _postLocMap.removeLayer(_postLocMarker); }catch(e){}
+    _postLocMarker = null;
+  }
+  var c = _postWilayaCenter();
+  if(_postLocMap) _postLocMap.setView([c.lat, c.lon], 12);
+  _postLocStatus(_postLangFr()
+    ? 'Emplacement précis effacé — la carte utilisera le centre de la wilaya'
+    : 'تم مسح الموقع الدقيق — ستُستخدم خريطة مركز الولاية');
+}
+function centerPostLocOnWilaya(){
+  var c = _postWilayaCenter();
+  if(_postLocMap) _postLocMap.setView([c.lat, c.lon], 12);
+  if(!_postLocPrecise){
+    _postLocStatus(_postLangFr()
+      ? 'Carte centrée sur la wilaya — cliquez pour fixer un point précis'
+      : 'تم تمركز الخريطة على الولاية — انقر لتثبيت موقع دقيق');
+  }
+}
+function usePostGps(){
+  var _fr = _postLangFr();
+  if(!navigator.geolocation){
+    _postLocStatus(_fr ? '⚠️ Géolocalisation non supportée' : '⚠️ تحديد الموقع غير مدعوم في هذا المتصفح');
+    return;
+  }
+  _postLocStatus(_fr ? '… Localisation en cours' : '… جاري تحديد موقعك');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat = Math.round(pos.coords.latitude*1e6)/1e6;
+    var lon = Math.round(pos.coords.longitude*1e6)/1e6;
+    if(lat < 14 || lat > 28 || lon < -18 || lon > -4){
+      _postLocStatus(_fr ? '⚠️ Position hors Mauritanie' : '⚠️ موقعك خارج موريتانيا');
+      return;
+    }
+    _postSetLatLonInputs(lat, lon, true);
+    if(!_postLocMap) initPostLocMap();
+    else _postPlaceMarker(lat, lon);
+    _postLocStatus(_fr
+      ? '✓ Position GPS : ' + lat + ', ' + lon
+      : '✓ موقع GPS: ' + lat + '، ' + lon);
+  }, function(){
+    _postLocStatus(_fr
+      ? '⚠️ Impossible d\'obtenir la position — placez l\'épingle manuellement'
+      : '⚠️ تعذّر الحصول على الموقع — ضع الدبوس يدوياً');
+  }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
+}
+function setPostLocFromAd(ad){
+  if(!ad) return;
+  var lat = ad.lat != null ? Number(ad.lat) : NaN;
+  var lon = ad.lon != null ? Number(ad.lon) : NaN;
+  if(Number.isFinite(lat) && Number.isFinite(lon)){
+    _postSetLatLonInputs(lat, lon, true);
+    if(_postLocMap) _postPlaceMarker(lat, lon);
+    else initPostLocMap();
+    _postLocStatus(_postLangFr()
+      ? '✓ Emplacement précis chargé'
+      : '✓ تم تحميل الموقع الدقيق');
+  }
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   var wSel=document.getElementById('ad-wilaya');
   if(wSel){
-    wSel.addEventListener('change',toggleMoughataaField);
+    wSel.addEventListener('change',function(){
+      toggleMoughataaField();
+      centerPostLocOnWilaya();
+    });
     toggleMoughataaField();
   }
   var condWrap=document.getElementById('condition-btns');
@@ -943,6 +1187,18 @@ document.addEventListener('DOMContentLoaded',function(){
       b.addEventListener('click', function(){ selectCondition(b, b.getAttribute('data-cond')); });
     });
   }
+  var latEl = document.getElementById('ad-lat');
+  var lonEl = document.getElementById('ad-lon');
+  if(latEl) latEl.addEventListener('change', applyPostLocFromInputs);
+  if(lonEl) lonEl.addEventListener('change', applyPostLocFromInputs);
+  var gpsBtn = document.getElementById('ad-loc-gps');
+  var clearBtn = document.getElementById('ad-loc-clear');
+  var wilayaBtn = document.getElementById('ad-loc-apply-wilaya');
+  if(gpsBtn) gpsBtn.addEventListener('click', usePostGps);
+  if(clearBtn) clearBtn.addEventListener('click', clearPostLoc);
+  if(wilayaBtn) wilayaBtn.addEventListener('click', centerPostLocOnWilaya);
+  // أخّر تهيئة الخريطة قليلاً حتى يظهر اللوحة (أو عند الدخول للخطوة 2)
+  setTimeout(initPostLocMap, 400);
 });
 
 function goStep(n){
@@ -957,6 +1213,12 @@ function goStep(n){
     if(i<n)s.classList.add('done');
     if(i===n)s.classList.add('active');
     s.querySelector('.step-circle').textContent = i<n ? '✓' : i;
+  }
+  if(n===2){
+    setTimeout(function(){
+      initPostLocMap();
+      if(_postLocMap){ try{ _postLocMap.invalidateSize(); }catch(e){} }
+    }, 80);
   }
   if(n===5) updatePreview();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1180,6 +1442,7 @@ function publishAd(){
   var categoryLabel = catMeta ? catMeta.nameAr : (selCatBtn ? selCatBtn.querySelector('.cat-name').textContent : '');
   var catEmoji = selCatBtn ? (selCatBtn.querySelector('.cat-icon-badge') ? selCatBtn.querySelector('.cat-icon-badge').textContent.trim() : '📦') : '📦';
   var wilaya   = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '');
+  var coords   = (typeof collectAdCoords === 'function') ? collectAdCoords() : {lat:null,lon:null};
 
   var cityLine = resolveCityField();
   var optFlags = _collectPostOptionFlags();
@@ -1199,6 +1462,8 @@ function publishAd(){
     subcat:   selSubcat || '',
     emoji:    catEmoji,
     wilaya:   wilaya,
+    lat:      coords.lat,
+    lon:      coords.lon,
     loc:      cityLine ? (wilaya+' — '+cityLine) : wilaya,
     city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
@@ -1416,6 +1681,7 @@ var _editAdId = null;
           var opt = Array.from(wilayaSel.options).find(function(o){ return o.textContent.trim()===ad.wilaya || o.value===ad.wilaya; });
           if(opt) wilayaSel.value = opt.value || opt.textContent;
         }
+        if(typeof setPostLocFromAd === 'function') setPostLocFromAd(ad);
         selCat = (typeof RizqCategories !== 'undefined') ? RizqCategories.normalize(ad.category || '') : (ad.category || selCat);
         selSubcat = ad.subcat || selSubcat;
         if(typeof renderPostCategories === 'function') renderPostCategories();
@@ -1472,6 +1738,7 @@ function saveAdEdit(){
   var stockQtyRaw = document.getElementById('ad-stock-qty') ? document.getElementById('ad-stock-qty').value.trim() : '';
   var stockQty = (stockQtyRaw !== '' && Number.isFinite(Number(stockQtyRaw)) && Number(stockQtyRaw) >= 0) ? Math.floor(Number(stockQtyRaw)) : null;
   var wilaya   = normalizeWilaya(document.getElementById('ad-wilaya') ? document.getElementById('ad-wilaya').value.trim() : '');
+  var coords   = (typeof collectAdCoords === 'function') ? collectAdCoords() : {lat:null,lon:null};
 
   if(!wilaya){ showToast(_postLangFr() ? '⚠️ Wilaya requise' : '⚠️ الولاية مطلوبة'); return; }
 
@@ -1479,6 +1746,7 @@ function saveAdEdit(){
     title: title, desc: desc, titleFr: titleFr, descFr: descFr,
     price: price, originalPrice: priceOriginal, stockQty: stockQty,
     subcat: selSubcat || '', wilaya: wilaya,
+    lat: coords.lat, lon: coords.lon,
     images: photosData.filter(function(p){ return !!p; }),
     condition: selCondition || '',
     hidePhone: !!_collectPostOptionFlags().hidePhone,

@@ -10,6 +10,45 @@ function genAdId() {
   return 'RZQ-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random() * 90000));
 }
 
+/** حدود تقريبية لموريتانيا — رفض إحداثيات عشوائية خارج البلد */
+const MR_LAT_MIN = 14.0;
+const MR_LAT_MAX = 28.0;
+const MR_LON_MIN = -18.0;
+const MR_LON_MAX = -4.0;
+
+/**
+ * parseOptionalCoords(body, { allowClear })
+ * - إن لم تُرسل lat/lon: { ok:true, unset:true }
+ * - إن أُرسل null لكليهما (عند التعديل): { ok:true, clear:true }
+ * - زوج صالح: { ok:true, lat, lon }
+ * - غير صالح: { ok:false, error }
+ */
+function parseOptionalCoords(b, opts) {
+  const allowClear = !!(opts && opts.allowClear);
+  if (!b || typeof b !== 'object') return { ok: true, unset: true };
+  const hasLat = Object.prototype.hasOwnProperty.call(b, 'lat');
+  const hasLon = Object.prototype.hasOwnProperty.call(b, 'lon');
+  if (!hasLat && !hasLon) return { ok: true, unset: true };
+  if (allowClear && b.lat === null && b.lon === null) return { ok: true, clear: true };
+  if ((b.lat === '' || b.lat === null || b.lat === undefined)
+    && (b.lon === '' || b.lon === null || b.lon === undefined)) {
+    return allowClear ? { ok: true, clear: true } : { ok: true, unset: true };
+  }
+  const lat = Number(b.lat);
+  const lon = Number(b.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return { ok: false, error: 'invalid_coords', message: 'إحداثيات الموقع غير صالحة' };
+  }
+  if (lat < MR_LAT_MIN || lat > MR_LAT_MAX || lon < MR_LON_MIN || lon > MR_LON_MAX) {
+    return { ok: false, error: 'coords_out_of_range', message: 'الموقع خارج حدود موريتانيا' };
+  }
+  return {
+    ok: true,
+    lat: Math.round(lat * 1e6) / 1e6,
+    lon: Math.round(lon * 1e6) / 1e6,
+  };
+}
+
 /**
  * @param {import('express').Application} app
  * @param {object} deps
@@ -160,6 +199,10 @@ function mountAdsRoutes(app, deps) {
         msg_fr: leakScan.messageFr,
       });
     }
+    const coords = parseOptionalCoords(b);
+    if (!coords.ok) {
+      return res.status(400).json({ ok: false, error: coords.error, message: coords.message });
+    }
     const list = readAds();
     let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
     while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
@@ -179,6 +222,9 @@ function mountAdsRoutes(app, deps) {
       subcat: String(b.subcat || '').slice(0, 80),
       emoji: String(b.emoji || '').slice(0, 8),
       wilaya: String(b.wilaya || '').slice(0, 60),
+      // موقع GPS اختياري — إن وُجد يُفضَّل على مركز الولاية في خريطة التفاصيل
+      lat: coords.unset ? null : coords.lat,
+      lon: coords.unset ? null : coords.lon,
       condition: String(b.condition || '').slice(0, 40),
       hidePhone: !!b.hidePhone,
       negotiable: b.negotiable !== undefined ? !!b.negotiable : true,
@@ -313,6 +359,17 @@ function mountAdsRoutes(app, deps) {
       ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
         ? Math.floor(Number(b.stockQty)) : null;
     }
+    const coords = parseOptionalCoords(b, { allowClear: true });
+    if (!coords.ok) {
+      return res.status(400).json({ ok: false, error: coords.error, message: coords.message });
+    }
+    if (coords.clear) {
+      ad.lat = null;
+      ad.lon = null;
+    } else if (!coords.unset) {
+      ad.lat = coords.lat;
+      ad.lon = coords.lon;
+    }
     if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
     if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
     if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
@@ -375,4 +432,4 @@ function mountAdsRoutes(app, deps) {
   });
 }
 
-module.exports = { mountAdsRoutes };
+module.exports = { mountAdsRoutes, parseOptionalCoords };
