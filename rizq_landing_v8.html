@@ -6035,7 +6035,7 @@ function bindRafMarquee(el, opts){
     pos: 0,
     half: 0,
     paused: false,
-    pxPerSec: opts.pxPerSec || 42,
+    pxPerSec: opts.pxPerSec || 56,
     raf: 1,
     rtl: _rzqIsRtl(),
     remeasure: function(){
@@ -6082,11 +6082,11 @@ function syncMarqueeShift(el){
 }
 function syncAllMarquees(){
   [
-    {el: document.getElementById('cards-track'), px: 40},
-    {el: document.getElementById('ticker'), px: 38},
-    {el: document.getElementById('price-ticker'), px: 34},
-    {el: document.getElementById('rizq-styles-rail'), px: 36},
-    {el: document.getElementById('rizq-srm-rail'), px: 36}
+    {el: document.getElementById('cards-track'), px: 56},
+    {el: document.getElementById('ticker'), px: 62},
+    {el: document.getElementById('price-ticker'), px: 52},
+    {el: document.getElementById('rizq-styles-rail'), px: 52},
+    {el: document.getElementById('rizq-srm-rail'), px: 52}
   ].forEach(function(cfg){
     if(!cfg.el || cfg.el.classList.contains('is-empty')) return;
     bindRafMarquee(cfg.el, {pxPerSec: cfg.px});
@@ -6157,7 +6157,7 @@ function buildCards(){
   });
   if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(track);
   requestAnimationFrame(function(){
-    bindRafMarquee(track, {pxPerSec:40});
+    bindRafMarquee(track, {pxPerSec:56});
     requestAnimationFrame(function(){ syncMarqueeShift(track); });
   });
 }
