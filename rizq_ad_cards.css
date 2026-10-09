@@ -434,18 +434,47 @@
   .landing-ads-grid{
     grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;
   }
+  /* تصفح الإعلانات: بطاقات أقصر قليلاً ≈ صفين في أول شاشة سطح مكتب */
   #result-list-body{
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+    grid-template-columns:repeat(auto-fill,minmax(196px,1fr))!important;
+    gap:12px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rzq-adx-media,
+  #result-list-body .rc-thumb.rzq-adx-media{
+    aspect-ratio:1.32 / 1!important;
+    min-height:100px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rc-body{
+    padding:7px 7px 6px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rc-title{
+    -webkit-line-clamp:1;
+    font-size:10.5px!important;
+    margin:0 0 2px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rc-cat{
+    margin:0 0 2px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rc-loc{
+    margin:0 0 4px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rc-meta{
+    margin:0 0 4px!important;
+  }
+  #result-list-body .rc:has(.rzq-adx-media) .rzq-adx-actions{
+    margin-top:0;
+    padding-top:0;
+    gap:12px;
   }
 }
 @media (min-width:1280px){
   #result-list-body{
-    grid-template-columns:repeat(auto-fill,minmax(230px,1fr))!important;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;
   }
 }
 @media (min-width:1600px){
   #result-list-body{
-    grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;
   }
 }
 
