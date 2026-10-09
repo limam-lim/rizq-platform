@@ -2510,7 +2510,7 @@ main, .page-content.active, .main-content, .results-area,
           <h2 style="font-size:18px;font-weight:700;color:var(--navy)">🏛️ شريط الخدمة العامة</h2>
           <p style="font-size:12.5px;color:var(--text-muted);margin-top:4px;line-height:1.55">
             الشريط الرفيع تحت كبسولة الهيدر — طوارئ، تنبيهات كوارث، مفقودين، توعية، مناسبات وطنية.
-            خلفية الشريط تبقى كما هي؛ <strong style="color:#b91c1c">لون النص فقط</strong> يتغيّر (أحمر = عاجل).
+            خلفية الشريط تبقى باللون الأصلي (كحلي/ذهبي) دائماً؛ يمكن اختيار <strong>لون النص فقط</strong> اختيارياً.
             منفصل عن شريط «مباشر» (أحدث الإعلانات).
           </p>
         </div>
@@ -2518,7 +2518,7 @@ main, .page-content.active, .main-content, .results-area,
           <button type="button" id="civic-strip-toggle-btn" onclick="civicToggleStrip()" style="background:#0f172a;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
             👁 إخفاء الشريط
           </button>
-          <button type="button" onclick="civicOpenForm(null)" style="background:#7f1d1d;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+          <button type="button" onclick="civicOpenForm(null)" style="background:#1B3A6B;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
             ＋ بند خدمة عامة
           </button>
         </div>
@@ -2527,8 +2527,8 @@ main, .page-content.active, .main-content, .results-area,
         الشريط ظاهر للزوّار
       </div>
 
-      <div id="civic-form-wrap" style="display:none;background:#fff7f7;border:1.5px solid rgba(185,28,28,.2);border-radius:14px;padding:18px;margin-bottom:18px">
-        <h3 style="font-size:15px;font-weight:700;color:#7f1d1d;margin-bottom:14px" id="civic-form-title">📝 بند جديد</h3>
+      <div id="civic-form-wrap" style="display:none;background:#f8fafc;border:1.5px solid rgba(27,58,107,.18);border-radius:14px;padding:18px;margin-bottom:18px">
+        <h3 style="font-size:15px;font-weight:700;color:#1B3A6B;margin-bottom:14px" id="civic-form-title">📝 بند جديد</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">النص (عربي) *</label>
@@ -2550,7 +2550,7 @@ main, .page-content.active, .main-content, .results-area,
               <option value="#f59e0b">برتقالي تنبيه</option>
               <option value="custom">مخصص…</option>
             </select>
-            <input id="civic-color-custom" type="color" value="#ef4444" style="display:none;margin-top:6px;width:100%;height:34px;border:none;background:transparent;cursor:pointer" />
+            <input id="civic-color-custom" type="color" value="#C9A84C" style="display:none;margin-top:6px;width:100%;height:34px;border:none;background:transparent;cursor:pointer" />
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">الأولوية</label>
@@ -2577,7 +2577,7 @@ main, .page-content.active, .main-content, .results-area,
         <input type="hidden" id="civic-edit-id" value="" />
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button type="button" onclick="civicCancelForm()" style="background:#fff;color:var(--text-muted);border:1px solid rgba(27,58,107,.2);padding:9px 20px;border-radius:9px;font-size:13px;cursor:pointer">إلغاء</button>
-          <button type="button" onclick="civicSaveForm()" style="background:#7f1d1d;color:#fff;border:none;padding:9px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer" id="civic-save-btn">💾 حفظ ونشر</button>
+          <button type="button" onclick="civicSaveForm()" style="background:#1B3A6B;color:#fff;border:none;padding:9px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer" id="civic-save-btn">💾 حفظ ونشر</button>
         </div>
       </div>
 
@@ -9761,7 +9761,7 @@ function resolveQuotaAddon(id, status){
     if (!sel) return '#C9A84C';
     if (sel.value === 'custom') {
       var c = document.getElementById('civic-color-custom');
-      return (c && c.value) || '#ef4444';
+      return (c && c.value) || '#C9A84C';
     }
     return sel.value || '#C9A84C';
   }
