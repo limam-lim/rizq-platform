@@ -107,8 +107,7 @@
     s.textContent = [
       '/* شريط خدمة عامة — خلفية الشريط كما كانت؛ لون النص فقط من الأدمن */',
       '#ticker-wrap.civic-ticker-wrap .ticker-inner{',
-      '  --rzq-mq-dur:62s;',
-      '  animation-duration:var(--rzq-mq-dur,62s)!important',
+      '  animation:none!important',
       '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-item.is-urgent{',
       '  font-weight:600',

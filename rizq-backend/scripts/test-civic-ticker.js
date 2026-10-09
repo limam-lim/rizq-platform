@@ -62,6 +62,9 @@ assert.ok(civicJs.includes('setHidden'));
 assert.ok(civicJs.includes('civicTickerHidden'));
 // خلفية الشريط لا تُعاد تلوينها عند العاجل — لون النص فقط
 assert.ok(!/ticker-has-urgent\{[^}]*background:/s.test(civicJs));
+// حركة الشريط عبر rAF في الصفحة — بلا CSS animation-duration من حقبة الـ compositor
+assert.ok(civicJs.includes("animation:none!important"));
+assert.ok(!civicJs.includes('--rzq-mq-dur'));
 
 const panel = fs.readFileSync(path.join(__dirname, '../../rizq_cp_panel.html'), 'utf8');
 assert.ok(panel.includes('شريط الخدمة العامة'));
@@ -76,6 +79,12 @@ assert.ok(landing.includes('rizq_civic_ticker.js'));
 assert.ok(landing.includes('civic-ticker-wrap'));
 assert.ok(landing.includes('مباشر')); // live ads preserved
 assert.ok(landing.includes('linear-gradient(90deg,var(--dark),var(--royal),var(--dark))'));
+// ماركي سلس كما في 5adaec2 — حلقة rAF مستمرة بلا IntersectionObserver/CSS compositor
+assert.ok(landing.includes('_rzqMarqueeTick'));
+assert.ok(!landing.includes('_rzqMarqueeIo'));
+assert.ok(!landing.includes('rzq-mq-ltr'));
+assert.ok(landing.includes("cards-track'), px: 40"));
+assert.ok(landing.includes("ticker'), px: 38"));
 
 const server = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
 assert.ok(server.includes('civicTickerHidden'));
