@@ -19,8 +19,8 @@
       id: 'civic_fb_emergency',
       textAr: 'أرقام الطوارئ: إطفاء ١٨ · إسعاف ١٧ · شرطة ١٧',
       textFr: 'Urgences: Pompiers 18 · SAMU 17 · Police 17',
-      color: '#ef4444',
-      priority: 'urgent',
+      color: '#C9A84C',
+      priority: 'normal',
       link: '',
       active: true,
       order: 0
@@ -105,7 +105,13 @@
     var s = document.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
-      '/* شريط خدمة عامة — خلفية الشريط كما كانت؛ لون النص فقط من الأدمن */',
+      '/* شريط خدمة عامة — خلفية الكروم الأصلية دائماً؛ لا أحمر على الشريط */',
+      '#ticker-wrap.civic-ticker-wrap,',
+      '#ticker-wrap.civic-ticker-wrap.ticker-has-urgent{',
+      '  background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark))!important;',
+      '  border-top-color:rgba(201,168,76,.2)!important;',
+      '  border-bottom-color:rgba(201,168,76,.2)!important',
+      '}',
       '#ticker-wrap.civic-ticker-wrap .ticker-inner{',
       '  animation:none!important',
       '}',

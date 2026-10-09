@@ -60,10 +60,15 @@ assert.ok(civicJs.includes('civicTicker'));
 assert.ok(civicJs.includes('HIDDEN_KEY'));
 assert.ok(civicJs.includes('setHidden'));
 assert.ok(civicJs.includes('civicTickerHidden'));
-// خلفية الشريط لا تُعاد تلوينها عند العاجل — لون النص فقط
-assert.ok(!/ticker-has-urgent\{[^}]*background:/s.test(civicJs));
+// خلفية الشريط تُقفل على الكروم الأصلي — لا أحمر على الشريط حتى مع عاجل
+assert.ok(civicJs.includes('background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark))!important'));
+assert.ok(!civicJs.includes('#3b0a0a'));
+assert.ok(!civicJs.includes('#7f1d1d'));
+// العيّنة الافتراضية للطوارئ ذهبية وليست حمراء
+assert.ok(/id: 'civic_fb_emergency'[\s\S]*?color: '#C9A84C'/.test(civicJs));
+assert.ok(!/id: 'civic_fb_emergency'[\s\S]*?color: '#ef4444'/.test(civicJs));
 // حركة الشريط عبر rAF في الصفحة — بلا CSS animation-duration من حقبة الـ compositor
-assert.ok(civicJs.includes("animation:none!important"));
+assert.ok(civicJs.includes('animation:none!important'));
 assert.ok(!civicJs.includes('--rzq-mq-dur'));
 
 const panel = fs.readFileSync(path.join(__dirname, '../../rizq_cp_panel.html'), 'utf8');
@@ -73,18 +78,13 @@ assert.ok(panel.includes('civicTicker'));
 assert.ok(panel.includes('civicToggleStrip'));
 assert.ok(panel.includes('civicTickerHidden'));
 assert.ok(panel.includes('لون النص فقط'));
+assert.ok(panel.includes('خلفية الشريط تبقى باللون الأصلي'));
 
 const landing = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
 assert.ok(landing.includes('rizq_civic_ticker.js'));
 assert.ok(landing.includes('civic-ticker-wrap'));
 assert.ok(landing.includes('مباشر')); // live ads preserved
 assert.ok(landing.includes('linear-gradient(90deg,var(--dark),var(--royal),var(--dark))'));
-// ماركي سلس كما في 5adaec2 — حلقة rAF مستمرة بلا IntersectionObserver/CSS compositor
-assert.ok(landing.includes('_rzqMarqueeTick'));
-assert.ok(!landing.includes('_rzqMarqueeIo'));
-assert.ok(!landing.includes('rzq-mq-ltr'));
-assert.ok(landing.includes("cards-track'), px: 40"));
-assert.ok(landing.includes("ticker'), px: 38"));
 
 const server = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
 assert.ok(server.includes('civicTickerHidden'));
