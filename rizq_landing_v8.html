@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.5"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=3.4"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -42,7 +42,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=30.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=30.9"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
@@ -480,13 +480,16 @@ html.rizq-has-announce .section-jump-bar{
 }
 .ticker-inner{
   display:flex;gap:0;width:max-content;
-  /* حركة rAF بالبكسل — بلا CSS animation (كانت ترتعد عند إغلاق الدورة/الهوفر) */
-  animation:none!important;
+  /* حركة CSS على الـ compositor (سلسة حتى مع ثِقل الصفحة) — نصف الدورة عبر --rzq-mq-half */
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style;
+  contain:paint;
+  animation:rzq-mq-ltr var(--rzq-mq-dur,40s) linear infinite;
+  animation-play-state:running;
 }
+html[dir="rtl"] .ticker-inner{animation-name:rzq-mq-rtl}
+.ticker-inner.is-mq-paused{animation-play-state:paused!important}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
 .ticker-item strong{color:var(--gold);font-weight:700}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
@@ -1814,13 +1817,16 @@ html[dir="ltr"] #all-ads-title{
 
 .cards-track{
   display:flex;gap:14px;width:max-content;
-  animation:none!important;
   direction:ltr;padding:4px 0; /* بلا padding أفقي — يمنع قفزة عند إغلاق دورة الـ marquee */
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style;
+  contain:paint;
+  animation:rzq-mq-ltr var(--rzq-mq-dur,48s) linear infinite;
+  animation-play-state:running;
 }
+html[dir="rtl"] .cards-track{animation-name:rzq-mq-rtl}
+.cards-track.is-mq-paused{animation-play-state:paused!important}
 html[dir="rtl"] .cards-track .ad-card{direction:rtl}
 html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 /* أثناء الحركة: لا translateY على البطاقة — يقلل الارتعاش */
@@ -2099,10 +2105,23 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .price-ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,#0D1B2A,#1B3A6B,#0D1B2A);border:1px solid rgba(201,168,76,.22);border-radius:14px;padding:13px 0;margin-bottom:22px;position:relative;box-shadow:0 6px 20px rgba(15,35,65,.18)}
 .price-ticker-inner{
   display:flex;gap:0;width:max-content;
-  animation:none!important;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
+  contain:paint;
+  animation:rzq-mq-ltr var(--rzq-mq-dur,42s) linear infinite;
+  animation-play-state:running;
+}
+html[dir="rtl"] .price-ticker-inner{animation-name:rzq-mq-rtl}
+.price-ticker-inner.is-mq-paused{animation-play-state:paused!important}
+/* مفاتيح ماركي compositor — نصف الدورة بالبكسل المقاس (بدون قفزة عند الإغلاق) */
+@keyframes rzq-mq-ltr{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(calc(-1 * var(--rzq-mq-half,50%)),0,0)}
+}
+@keyframes rzq-mq-rtl{
+  from{transform:translate3d(calc(-1 * var(--rzq-mq-half,50%)),0,0)}
+  to{transform:translate3d(0,0,0)}
 }
 .price-ticker-item{display:flex;align-items:center;gap:9px;padding:0 30px;white-space:nowrap;font-size:13px;font-weight:700;color:#fff}
 .price-ticker-item .pt-arrow{font-weight:900;font-size:12px}
@@ -2634,7 +2653,6 @@ html[dir="ltr"] .listings-section .section-desc{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;
     direction:ltr!important;padding:2px 0!important;
-    animation:none!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
   #hero-listings .cards-track .ad-card{
@@ -3639,13 +3657,15 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   width:max-content;
   max-width:none;
   direction:ltr;
-  animation:none!important;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
   padding:4px 0;
-  contain:layout style;
+  contain:paint;
+  animation:rzq-mq-ltr var(--rzq-mq-dur,48s) linear infinite;
 }
+html[dir="rtl"] .rizq-styles-rail{animation-name:rzq-mq-rtl}
+.rizq-styles-rail.is-mq-paused{animation-play-state:paused!important}
 html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
 html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-styles-rail.is-empty{
@@ -3806,7 +3826,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     width:max-content!important;max-width:none!important;gap:12px!important;
     direction:ltr!important;
-    animation:none!important;
     overflow:visible!important;
     scroll-snap-type:none!important;
     margin:0!important;padding:2px 0!important;
@@ -5981,10 +6000,9 @@ function trAd(a){
   };
 }
 
-/** محرّك شريط متحرك — rAF + اتجاه حسب اللغة (عربي RTL / فرنسي LTR) كما كان سابقاً */
+/** محرّك شريط متحرك — CSS compositor + نصف دورة مقاس بالبكسل (عربي RTL ≠ فرنسي LTR) */
 var _rzqMarquees = [];
-var _rzqMarqueeRaf = 0;
-var _rzqMarqueeLast = 0;
+var _rzqMarqueeIo = null;
 function _rzqIsRtl(){
   return (document.documentElement.getAttribute('dir') || 'rtl') !== 'ltr';
 }
@@ -6001,78 +6019,98 @@ function _rzqMarqueeMeasureHalf(el){
   var w = el.scrollWidth || 0;
   return w > 40 ? w / 2 : 0;
 }
-function _rzqMarqueeTick(now){
-  if(!_rzqMarqueeLast) _rzqMarqueeLast = now;
-  var dt = Math.min(0.048, (now - _rzqMarqueeLast) / 1000);
-  _rzqMarqueeLast = now;
-  if(!document.hidden && dt > 0){
-    for(var i = 0; i < _rzqMarquees.length; i++){
-      var state = _rzqMarquees[i];
-      if(!state || !state.el || !state.el.isConnected) continue;
-      if(state.paused || state.half <= 1) continue;
-      state.pos += state.pxPerSec * dt;
-      if(state.pos >= state.half) state.pos -= state.half;
-      if(state.pos < 0) state.pos += state.half;
-      state.apply();
-    }
-  }
-  _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+function _rzqEnsureMarqueeIo(){
+  if(_rzqMarqueeIo || typeof IntersectionObserver === 'undefined') return _rzqMarqueeIo;
+  _rzqMarqueeIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      var target = en.target;
+      /* قد نراقب الغلاف؛ ابحث عن حالة الماركي على العنصر أو أول ابن متحرك */
+      var st = target && target._rzqMarquee;
+      if(!st && target && target.querySelector){
+        var inner = target.querySelector('.ticker-inner, .cards-track, .price-ticker-inner, .rizq-styles-rail');
+        st = inner && inner._rzqMarquee;
+      }
+      if(!st) return;
+      st.offscreen = !en.isIntersecting;
+      st.applyPlayState();
+    });
+  }, {root:null, rootMargin:'80px 0px', threshold:0});
+  return _rzqMarqueeIo;
 }
-function _rzqEnsureMarqueeLoop(){
-  if(!_rzqMarqueeRaf) _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
-}
+function _rzqEnsureMarqueeLoop(){ /* توافق خلفي — الحركة عبر CSS animation */ }
 function bindRafMarquee(el, opts){
   if(!el || el.classList.contains('is-empty')) return null;
   opts = opts || {};
   if(el._rzqMarquee){
     if(opts.pxPerSec) el._rzqMarquee.pxPerSec = opts.pxPerSec;
     el._rzqMarquee.remeasure();
-    _rzqEnsureMarqueeLoop();
     return el._rzqMarquee;
   }
   var state = {
     el: el,
-    pos: 0,
     half: 0,
     paused: false,
+    offscreen: false,
     pxPerSec: opts.pxPerSec || 42,
-    raf: 1,
+    raf: 0, /* لم نعد نستخدم rAF لكل إطار — يثقل الصفحة ويسبب «قطرة قطرة» */
     rtl: _rzqIsRtl(),
+    applyPlayState: function(){
+      var stop = !!(state.paused || state.offscreen || document.hidden || state.half <= 1);
+      el.classList.toggle('is-mq-paused', stop);
+      try{
+        el.style.animationPlayState = stop ? 'paused' : 'running';
+      }catch(ePs){}
+    },
     remeasure: function(){
+      var nextRtl = _rzqIsRtl();
+      state.rtl = nextRtl;
+      /* أوقف الـ animation لحظياً لقياس offsetLeft بدقة دون إزاحة transform */
       try{
         el.style.setProperty('animation', 'none', 'important');
-        el.style.setProperty('animation-name', 'none', 'important');
+        el.style.transform = 'translate3d(0,0,0)';
       }catch(eAnim){ el.style.animation = 'none'; }
-      var nextRtl = _rzqIsRtl();
-      if(state.rtl !== nextRtl){
-        state.rtl = nextRtl;
-        state.pos = 0; /* عند تبديل العربية/الفرنسية أعد الموضع لاتجاه الحركة الصحيح */
-      }
+      void el.offsetWidth;
       state.half = _rzqMarqueeMeasureHalf(el);
-      if(state.half > 1 && state.pos >= state.half) state.pos = state.pos % state.half;
-      state.apply();
-    },
-    apply: function(){
-      if(state.half <= 0){
-        el.style.transform = 'translate3d(0px,0,0)';
-        return;
+      if(state.half > 1){
+        var dur = Math.max(12, state.half / Math.max(12, state.pxPerSec));
+        el.style.setProperty('--rzq-mq-half', state.half + 'px');
+        el.style.setProperty('--rzq-mq-dur', dur.toFixed(2) + 's');
+        var name = state.rtl ? 'rzq-mq-rtl' : 'rzq-mq-ltr';
+        var animVal = name + ' ' + dur.toFixed(2) + 's linear infinite';
+        el.style.setProperty('animation', 'none', 'important');
+        void el.offsetWidth;
+        el.style.setProperty('animation', animVal, 'important');
+        el.style.transform = '';
+      } else {
+        el.style.setProperty('--rzq-mq-half', '0px');
+        el.style.setProperty('animation', 'none', 'important');
+        el.style.transform = 'translate3d(0,0,0)';
       }
-      /* عربي (RTL): من -half نحو 0 (يمين) · فرنسي (LTR): من 0 نحو -half (يسار) — كما keyframes السابقة */
-      var x = state.rtl ? (-state.half + state.pos) : (-state.pos);
-      el.style.transform = 'translate3d(' + x + 'px,0,0)';
+      state.applyPlayState();
     },
-    setPaused: function(on){ state.paused = !!on; },
+    apply: function(){ state.applyPlayState(); },
+    setPaused: function(on){
+      state.paused = !!on;
+      state.applyPlayState();
+    },
     destroy: function(){
       var idx = _rzqMarquees.indexOf(state);
       if(idx >= 0) _rzqMarquees.splice(idx, 1);
+      if(_rzqMarqueeIo) try{ _rzqMarqueeIo.unobserve(el); }catch(eU){}
       el._rzqMarquee = null;
-      state.raf = 0;
+      el.classList.remove('is-mq-paused');
     }
   };
   el._rzqMarquee = state;
   _rzqMarquees.push(state);
+  var io = _rzqEnsureMarqueeIo();
+  if(io){
+    try{
+      var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || el.parentElement || el;
+      io.observe(root);
+    }catch(eIo){ try{ io.observe(el); }catch(e2){} }
+  }
   state.remeasure();
-  _rzqEnsureMarqueeLoop();
   return state;
 }
 function syncMarqueeShift(el){
@@ -6082,17 +6120,16 @@ function syncMarqueeShift(el){
 }
 function syncAllMarquees(){
   [
-    {el: document.getElementById('cards-track'), px: 40},
-    {el: document.getElementById('ticker'), px: 38},
-    {el: document.getElementById('price-ticker'), px: 34},
-    {el: document.getElementById('rizq-styles-rail'), px: 36},
-    {el: document.getElementById('rizq-srm-rail'), px: 36}
+    {el: document.getElementById('cards-track'), px: 44},
+    {el: document.getElementById('ticker'), px: 48},
+    {el: document.getElementById('price-ticker'), px: 40},
+    {el: document.getElementById('rizq-styles-rail'), px: 40},
+    {el: document.getElementById('rizq-srm-rail'), px: 40}
   ].forEach(function(cfg){
     if(!cfg.el || cfg.el.classList.contains('is-empty')) return;
     bindRafMarquee(cfg.el, {pxPerSec: cfg.px});
     if(cfg.el._rzqMarquee) cfg.el._rzqMarquee.remeasure();
   });
-  _rzqEnsureMarqueeLoop();
 }
 function liveListingsLabelHtml(fr){
   return fr
@@ -6127,9 +6164,11 @@ function buildCards(){
   var heroSec=document.getElementById('hero-listings');
   if(heroSec) heroSec.style.display='';
   function _escCard(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  const all=[...ADS,...ADS];
+  /* خفّف DOM الشريط الحي: 12 بطاقة×2 يكفي للماركي السلس بدل عشرات البطاقات الثقيلة */
+  var livePool = ADS.slice(0, 12);
+  const all=[...livePool,...livePool];
   all.forEach((a,idx)=>{
-    const realIdx = idx % ADS.length;
+    const realIdx = idx % livePool.length;
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
@@ -6168,9 +6207,8 @@ window.addEventListener('resize', function(){
   syncAllMarquees._t = setTimeout(syncAllMarquees, 180);
 });
 document.addEventListener('visibilitychange', function(){
-  _rzqMarqueeLast = 0;
+  _rzqMarquees.forEach(function(st){ if(st && st.applyPlayState) st.applyPlayState(); });
   if(!document.hidden){
-    _rzqEnsureMarqueeLoop();
     syncAllMarquees();
   }
 });
