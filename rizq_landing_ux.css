@@ -32,6 +32,18 @@ nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bo
   background-repeat:no-repeat,repeat!important;
   background-blend-mode:overlay;
 }
+/* أخفّ للشرائط المتحركة: بلا blend/نمط SVG على كل إطار — يقلل تقطّع الماركي */
+.ticker-wrap,
+.price-ticker-wrap{
+  background-image:linear-gradient(90deg,#0D1B2A,#1B3A6B,#0D1B2A)!important;
+  background-blend-mode:normal!important;
+  background-size:auto!important;
+}
+.cards-track .ad-card{
+  background-image:linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%)!important;
+  background-blend-mode:normal!important;
+  background-size:auto!important;
+}
 
 html body footer,
 html body footer.rizq-footer{
