@@ -1681,7 +1681,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav .browse-wrap{
     height:auto !important;
-    min-height:calc(100vh - var(--rizq-header-h) - 44px) !important;
+    min-height:calc(100vh - var(--rizq-header-h)) !important;
     overflow:visible !important;
   }
   html.rizq-app-nav .sidebar,
