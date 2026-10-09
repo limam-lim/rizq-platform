@@ -937,11 +937,21 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right{
     position:fixed!important;inset:0!important;z-index:5200!important;
     height:auto;min-height:0;padding:12px;
-    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة */
+    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة
+       (عند فتح التفاصيل يُلغى هذا عبر inset تحت الهيدر — انظر أدناه) */
     padding-top:calc(var(--rizq-header-h,98px) + 14px)!important;
     padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 18px + env(safe-area-inset-bottom,0px))!important;
     display:none;overflow-y:auto!important;
     background:rgba(8,15,30,.6)!important;backdrop-filter:blur(6px);
+  }
+  /* التفاصيل مفتوحة: inset يبدأ تحت الهيدر — لا تضاعف فراغ الهيدر بـ padding-top */
+  body.rizq-detail-open .browse-right,
+  .browse-wrap.has-detail .browse-right,
+  html.rizq-app-nav body.rizq-detail-open .browse-right,
+  html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open .browse-right{
+    padding-top:10px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
   }
   .browse-wrap.has-detail .browse-right,
   .browse-wrap.has-detail .browse-right.tab-active,
@@ -953,7 +963,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     margin-top:0;
   }
   .browse-wrap.has-detail .browse-right .dp-main-img{
-    scroll-margin-top:calc(var(--rizq-header-h,98px) + 14px);
+    scroll-margin-top:calc(var(--rizq-header-h,98px) + 10px);
   }
   .browse-right.tab-hidden{display:none}
   .browse-wrap.has-detail .browse-right.tab-hidden{display:flex!important}
