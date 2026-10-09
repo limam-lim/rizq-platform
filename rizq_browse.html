@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=30.8"/>
-  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.4"/>
+  <link rel="stylesheet" href="rizq_header.css?v=30.9"/>
+  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.5"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -52,13 +52,13 @@ select option{background:#fff!important;color:#1a2535!important}
     position:relative!important;top:auto!important;inset:auto!important;
     height:56px!important;max-height:56px!important;z-index:20!important;
     display:flex!important;align-items:center;justify-content:center;gap:12px;
-    padding:8px 24px!important;background:#fff!important;
+    padding:8px clamp(12px,1.5vw,28px)!important;background:#fff!important;
     border-bottom:1px solid #e2e8f5!important;box-shadow:none!important;
     backdrop-filter:none!important;
   }
   html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .nav-search,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-search{
-    flex:1 1 auto!important;max-width:720px!important;margin:0 auto;
+    flex:1 1 auto!important;max-width:min(1520px,calc(100% - 32px))!important;margin:0 auto;
   }
 }
 
@@ -81,7 +81,7 @@ nav.rizq-search-strip-nav .nav-disclaimer,nav.rizq-search-strip-nav #lang-btn{di
 .logo-text{display:flex;flex-direction:column;justify-content:center}
 .logo-text .logo-ar{font-family:Georgia,serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
 .logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,serif;font-style:italic;margin-top:2px;white-space:nowrap}
-.nav-search{flex:1;max-width:600px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative}
+.nav-search{flex:1;max-width:min(1400px,100%);display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative}
 .nav-search.rizq-sugg-host{overflow:visible;position:relative}
 .nav-search:focus-within{border-color:var(--gold)}
 .rc-thumb .rizq-img-wrap,.rc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -127,7 +127,7 @@ nav .nav-disclaimer{flex-shrink:0}
 .btn-lang .lang-sep,.btn-lang-primary .lang-sep{opacity:.85}
 
 /* BREADCRUMB */
-.breadcrumb{padding:7px 4%;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);border-bottom:1px solid #e2e8f5;flex-wrap:wrap;background:#fff}
+.breadcrumb{padding:7px clamp(12px,1.5vw,24px);display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);border-bottom:1px solid #e2e8f5;flex-wrap:wrap;background:#fff}
 .breadcrumb a{color:var(--text-muted);transition:color .2s}
 .breadcrumb a:hover{color:var(--gold)}
 .breadcrumb .sep{color:rgba(13,27,42,.2)}
@@ -139,9 +139,12 @@ nav .nav-disclaimer{flex-shrink:0}
 .mtab{flex:1;padding:11px;background:none;border:none;cursor:pointer;font-size:13.5px;font-weight:700;font-family:'Segoe UI',sans-serif;color:var(--text-muted);border-bottom:3px solid transparent;transition:all .2s}
 .mtab.active{color:var(--gold-dk);border-bottom-color:var(--gold)}
 
-/* BROWSE LAYOUT — full-width grid; detail opens as overlay sheet */
-.browse-wrap{display:flex;height:calc(100vh - var(--rizq-header-h,68px) - 48px - 34px);overflow:hidden;position:relative}
-.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1}
+/* BROWSE LAYOUT — fluid wide desktop shell (Avito-like horizontal use); detail as overlay */
+.browse-wrap{
+  display:flex;width:100%;max-width:100%;
+  height:calc(100vh - var(--rizq-header-h,68px) - 48px - 34px);overflow:hidden;position:relative;
+}
+.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1;width:100%}
 .browse-right{
   display:none;position:fixed;
   inset:var(--rizq-header-h,68px) 0 0 0;
@@ -269,8 +272,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .rl-sort select{background:#f8faff;border:1px solid #e2e8f5;border-radius:8px;padding:6px 10px;font-size:12px;color:#1a2535;outline:none;cursor:pointer;font-family:'Cairo',sans-serif}
 #result-list-body{
   overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-  gap:14px;padding:14px 16px 20px;align-content:start;align-items:start;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:14px;padding:14px clamp(12px,1.2vw,20px) 20px;align-content:start;align-items:start;
   grid-auto-rows:min-content;
   background:
     radial-gradient(ellipse 80% 50% at 100% 0%,rgba(201,168,76,.08),transparent 55%),
@@ -781,7 +784,7 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 
 /* FOOTER */
 footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#0a1628);border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 0;color:rgba(255,255,255,.72)}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:50px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:min(1600px,100%);margin:0 auto;padding-bottom:50px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
 .telecom-tag{display:inline-block;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.4);color:rgba(201,168,76,.9);font-size:10px;padding:4px 12px;border-radius:10px;font-weight:700;letter-spacing:.3px}
@@ -800,7 +803,7 @@ footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#0a1628);border-top
 .footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
 .footer-links li a{font-size:13px;color:rgba(255,255,255,.82);text-decoration:none;transition:color .3s}
 .footer-links li a:hover{color:var(--gold)}
-footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding:22px 0;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding:22px 0;max-width:min(1600px,100%);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .footer-copy{font-size:12px;color:rgba(255,255,255,.8)}
 footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 .footer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:4px 12px;font-size:10.5px;color:rgba(201,168,76,.7)}
@@ -814,10 +817,11 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     display:flex;
     flex-direction:row;
     align-items:stretch;
+    width:100%;
   }
   .bs-sidebar{
-    width:280px;
-    flex:0 0 280px;
+    width:260px;
+    flex:0 0 260px;
     border-bottom:none;
     border-inline-end:1px solid #e2e8f5;
     display:flex;
@@ -841,7 +845,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .mobile-filter-btn{display:none!important}
   /* Detail is a centered overlay sheet — keep the grid full-width */
   .browse-wrap.has-detail .browse-left{flex:1}
-  .browse-wrap.has-detail .bs-sidebar{width:260px;flex:0 0 260px}
+  .browse-wrap.has-detail .bs-sidebar{width:240px;flex:0 0 240px}
   .browse-right{
     inset:var(--rizq-header-h,68px) 0 0 0!important;
     padding:8px 12px 18px!important;
@@ -889,6 +893,30 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 
 @media(max-width:1080px) and (min-width:901px){
   .bs-sidebar{width:220px;flex-basis:220px}
+}
+/* Wide desktop: use nearly full viewport like modern classifieds */
+@media(min-width:1280px){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
+  #rizq-desk-nav ~ nav,
+  nav.rizq-search-strip-nav,
+  #nav-browse-search.rizq-search-strip-nav{
+    padding:8px clamp(12px,1.5vw,28px)!important;
+  }
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:16px;
+    padding:16px clamp(14px,1.4vw,24px) 24px;
+  }
+  .rl-header{padding:10px clamp(14px,1.4vw,24px)}
+  .bs-sidebar{width:250px;flex-basis:250px}
+}
+@media(min-width:1600px){
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  }
+  .bs-sidebar{width:260px;flex-basis:260px}
+  footer.rizq-footer .footer-grid,
+  footer.rizq-footer .footer-bottom{max-width:1600px}
 }
 
 @media(max-width:900px){
@@ -3852,14 +3880,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <style id="rzq-footer-css">
 footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;border-top:1px solid rgba(201,168,76,.1)!important;padding:60px 5% 0!important;color:rgba(255,255,255,.72)!important;margin:0!important;padding-bottom:0!important}
-footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:1200px!important;margin:0 auto!important;padding-bottom:50px!important}
+footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:min(1600px,100%)!important;margin:0 auto!important;padding-bottom:50px!important}
 footer.rizq-footer .footer-col-title{font-size:12px!important;font-weight:700!important;color:#C9A84C!important;letter-spacing:2px!important;text-transform:uppercase!important;margin-bottom:18px!important;font-family:Georgia,serif!important}
 footer.rizq-footer .footer-desc{font-size:13px!important;color:rgba(255,255,255,.85)!important;line-height:1.85!important;margin-top:14px!important;max-width:280px!important}
 footer.rizq-footer .footer-links{list-style:none!important;display:flex!important;flex-direction:column!important;padding:0!important;margin:0!important}
 footer.rizq-footer .footer-links li{padding:0!important;line-height:1.6!important}
 footer.rizq-footer .footer-links li a{font-size:13px!important;color:#e0e0e0!important;text-decoration:none!important;transition:color .3s!important}
 footer.rizq-footer .footer-links li a:hover{color:#C9A84C!important}
-footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:min(1600px,100%)!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
 footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important}
 .telecom-tag{display:inline-block!important;background:rgba(201,168,76,.14)!important;border:1px solid rgba(201,168,76,.4)!important;color:rgba(201,168,76,.95)!important;font-size:10px!important;padding:4px 12px!important;border-radius:10px!important;font-weight:700!important;letter-spacing:.3px!important}
 @media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}

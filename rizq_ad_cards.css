@@ -435,7 +435,17 @@
     grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;
   }
   #result-list-body{
-    grid-template-columns:repeat(auto-fill,minmax(196px,1fr))!important;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+  }
+}
+@media (min-width:1280px){
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr))!important;
+  }
+}
+@media (min-width:1600px){
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;
   }
 }
 
