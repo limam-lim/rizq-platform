@@ -484,9 +484,10 @@ html.rizq-has-announce .section-jump-bar{
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style;
+  contain:layout style paint;
   animation:none!important;
 }
+.ticker-inner.is-mq-paused{will-change:auto}
 .ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;white-space:nowrap;font-size:12.5px;color:rgba(255,255,255,.82)}
 .ticker-item strong{color:var(--gold);font-weight:700}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
@@ -1818,9 +1819,10 @@ html[dir="ltr"] #all-ads-title{
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style;
+  contain:layout style paint;
   animation:none!important;
 }
+.cards-track.is-mq-paused{will-change:auto}
 html[dir="rtl"] .cards-track .ad-card{direction:rtl}
 html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 /* أثناء الحركة: لا translateY على البطاقة — يقلل الارتعاش */
@@ -2102,9 +2104,10 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style;
+  contain:layout style paint;
   animation:none!important;
 }
+.price-ticker-inner.is-mq-paused{will-change:auto}
 .price-ticker-item{display:flex;align-items:center;gap:9px;padding:0 30px;white-space:nowrap;font-size:13px;font-weight:700;color:#fff}
 .price-ticker-item .pt-arrow{font-weight:900;font-size:12px}
 .price-ticker-item .pt-up{color:#6ee7a8}
@@ -3643,9 +3646,10 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
   padding:4px 0;
-  contain:layout style;
+  contain:layout style paint;
   animation:none!important;
 }
+.rizq-styles-rail.is-mq-paused{will-change:auto}
 html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
 html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-styles-rail.is-empty{
@@ -5981,10 +5985,11 @@ function trAd(a){
   };
 }
 
-/** محرّك شريط متحرك — rAF + اتجاه حسب اللغة (عربي RTL / فرنسي LTR) كما كان سابقاً */
+/** محرّك شريط انسيابي كالماء — rAF مشترك + بكسل فرعي + إيقاف خارج الشاشة (بلا تقطيع) */
 var _rzqMarquees = [];
 var _rzqMarqueeRaf = 0;
 var _rzqMarqueeLast = 0;
+var _rzqMarqueeIo = null;
 function _rzqIsRtl(){
   return (document.documentElement.getAttribute('dir') || 'rtl') !== 'ltr';
 }
@@ -6001,25 +6006,57 @@ function _rzqMarqueeMeasureHalf(el){
   var w = el.scrollWidth || 0;
   return w > 40 ? w / 2 : 0;
 }
+function _rzqMarqueeAnyActive(){
+  if(document.hidden) return false;
+  for(var i = 0; i < _rzqMarquees.length; i++){
+    var s = _rzqMarquees[i];
+    if(s && s.el && s.el.isConnected && !s.paused && !s.offscreen && s.half > 1) return true;
+  }
+  return false;
+}
 function _rzqMarqueeTick(now){
   if(!_rzqMarqueeLast) _rzqMarqueeLast = now;
-  var dt = Math.min(0.048, (now - _rzqMarqueeLast) / 1000);
+  var dt = Math.min(0.032, Math.max(0, (now - _rzqMarqueeLast) / 1000));
   _rzqMarqueeLast = now;
-  if(!document.hidden && dt > 0){
+  if(dt > 0){
     for(var i = 0; i < _rzqMarquees.length; i++){
       var state = _rzqMarquees[i];
       if(!state || !state.el || !state.el.isConnected) continue;
-      if(state.paused || state.half <= 1) continue;
+      if(state.paused || state.offscreen || state.half <= 1) continue;
       state.pos += state.pxPerSec * dt;
       if(state.pos >= state.half) state.pos -= state.half;
       if(state.pos < 0) state.pos += state.half;
       state.apply();
     }
   }
+  if(!_rzqMarqueeAnyActive()){
+    _rzqMarqueeRaf = 0;
+    _rzqMarqueeLast = 0;
+    return;
+  }
   _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
 }
 function _rzqEnsureMarqueeLoop(){
-  if(!_rzqMarqueeRaf) _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+  if(_rzqMarqueeRaf || !_rzqMarqueeAnyActive()) return;
+  _rzqMarqueeLast = 0;
+  _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+}
+function _rzqEnsureMarqueeIo(){
+  if(_rzqMarqueeIo || typeof IntersectionObserver === 'undefined') return _rzqMarqueeIo;
+  _rzqMarqueeIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      var target = en.target;
+      var st = target && target._rzqMarquee;
+      if(!st && target && target.querySelector){
+        var inner = target.querySelector('.ticker-inner, .cards-track, .price-ticker-inner, .rizq-styles-rail');
+        st = inner && inner._rzqMarquee;
+      }
+      if(!st) return;
+      st.offscreen = !en.isIntersecting;
+      st.applyPlayState();
+    });
+  }, {root:null, rootMargin:'120px 0px', threshold:0});
+  return _rzqMarqueeIo;
 }
 function bindRafMarquee(el, opts){
   if(!el || el.classList.contains('is-empty')) return null;
@@ -6035,9 +6072,15 @@ function bindRafMarquee(el, opts){
     pos: 0,
     half: 0,
     paused: false,
+    offscreen: false,
     pxPerSec: opts.pxPerSec || 56,
     raf: 1,
     rtl: _rzqIsRtl(),
+    applyPlayState: function(){
+      var stop = !!(state.paused || state.offscreen || document.hidden || state.half <= 1);
+      el.classList.toggle('is-mq-paused', stop);
+      if(!stop) _rzqEnsureMarqueeLoop();
+    },
     remeasure: function(){
       try{
         el.style.setProperty('animation', 'none', 'important');
@@ -6046,31 +6089,54 @@ function bindRafMarquee(el, opts){
       var nextRtl = _rzqIsRtl();
       if(state.rtl !== nextRtl){
         state.rtl = nextRtl;
-        state.pos = 0; /* عند تبديل العربية/الفرنسية أعد الموضع لاتجاه الحركة الصحيح */
+        state.pos = 0;
       }
+      /* قياس بلا إزاحة — احفظ الموضع ثم أعده بعد القياس */
+      var saved = state.pos;
+      el.style.transform = 'translate3d(0,0,0)';
+      void el.offsetWidth;
       state.half = _rzqMarqueeMeasureHalf(el);
-      if(state.half > 1 && state.pos >= state.half) state.pos = state.pos % state.half;
+      if(state.half > 1 && saved >= state.half) saved = saved % state.half;
+      state.pos = state.half > 1 ? saved : 0;
       state.apply();
+      state.applyPlayState();
     },
     apply: function(){
       if(state.half <= 0){
         el.style.transform = 'translate3d(0px,0,0)';
         return;
       }
-      /* عربي (RTL): من -half نحو 0 (يمين) · فرنسي (LTR): من 0 نحو -half (يسار) — كما keyframes السابقة */
+      /* عربي RTL: من -half نحو 0 · فرنسي LTR: من 0 نحو -half — بكسل فرعي سلس */
       var x = state.rtl ? (-state.half + state.pos) : (-state.pos);
-      el.style.transform = 'translate3d(' + x + 'px,0,0)';
+      el.style.transform = 'translate3d(' + x.toFixed(3) + 'px,0,0)';
     },
-    setPaused: function(on){ state.paused = !!on; },
+    setPaused: function(on){
+      state.paused = !!on;
+      state.applyPlayState();
+    },
     destroy: function(){
       var idx = _rzqMarquees.indexOf(state);
       if(idx >= 0) _rzqMarquees.splice(idx, 1);
+      if(_rzqMarqueeIo){
+        try{ _rzqMarqueeIo.unobserve(el); }catch(eU){}
+        try{
+          var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap');
+          if(root) _rzqMarqueeIo.unobserve(root);
+        }catch(eU2){}
+      }
       el._rzqMarquee = null;
-      state.raf = 0;
+      el.classList.remove('is-mq-paused');
     }
   };
   el._rzqMarquee = state;
   _rzqMarquees.push(state);
+  var io = _rzqEnsureMarqueeIo();
+  if(io){
+    try{
+      var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || el.parentElement || el;
+      io.observe(root);
+    }catch(eIo){ try{ io.observe(el); }catch(e2){} }
+  }
   state.remeasure();
   _rzqEnsureMarqueeLoop();
   return state;
@@ -6079,6 +6145,7 @@ function syncMarqueeShift(el){
   if(!el) return;
   bindRafMarquee(el);
   if(el._rzqMarquee) el._rzqMarquee.remeasure();
+  _rzqEnsureMarqueeLoop();
 }
 function syncAllMarquees(){
   [
@@ -6127,9 +6194,11 @@ function buildCards(){
   var heroSec=document.getElementById('hero-listings');
   if(heroSec) heroSec.style.display='';
   function _escCard(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  const all=[...ADS,...ADS];
+  /* خفّف DOM الشريط الحي: 12 بطاقة×2 يكفي للماركي السلس بدل عشرات البطاقات الثقيلة */
+  var livePool = ADS.slice(0, 12);
+  const all=[...livePool,...livePool];
   all.forEach((a,idx)=>{
-    const realIdx = idx % ADS.length;
+    const realIdx = idx % livePool.length;
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
@@ -6170,8 +6239,9 @@ window.addEventListener('resize', function(){
 document.addEventListener('visibilitychange', function(){
   _rzqMarqueeLast = 0;
   if(!document.hidden){
+    /* أعد الحلقة فقط — بلا إعادة قياس فورية تسبب تقطيعاً */
+    _rzqMarquees.forEach(function(st){ if(st && st.applyPlayState) st.applyPlayState(); });
     _rzqEnsureMarqueeLoop();
-    syncAllMarquees();
   }
 });
 
