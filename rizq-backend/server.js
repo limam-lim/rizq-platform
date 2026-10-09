@@ -1186,6 +1186,8 @@ app.get('/api/site-config', (req, res) => {
       adSlotSeconds: raw.videoAds.adSlotSeconds,
     } : undefined,
     announcements: raw.announcements || undefined,
+    // شريط الخدمة العامة تحت الهيدر (طوارئ / تنبيهات / مناسبات) — منفصل عن مباشر الإعلانات
+    civicTicker: Array.isArray(raw.civicTicker) ? raw.civicTicker : undefined,
     // شريط الإشعار العلوي (إعدادات الموقع) — حقول عامة فقط
     site: raw.site ? {
       sitename: raw.site.sitename,
@@ -1431,6 +1433,37 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       createdAt: String(a.createdAt || new Date().toISOString()).slice(0, 40),
     }));
     next.announcementsUpdatedAt = new Date().toISOString();
+  }
+
+  if (Array.isArray(body.civicTicker)) {
+    // شريط الخدمة العامة تحت كبسولة الهيدر — طوارئ / كوارث / مفقودين / توعية / مناسبات.
+    // منفصل عن شريط «مباشر» (أحدث الإعلانات) وعن إشعارات الترويج.
+    const COLOR_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+    next.civicTicker = body.civicTicker.slice(0, 30).map((item, idx) => {
+      const rawColor = String(item.color || '').trim();
+      let color = '#C9A84C';
+      if (rawColor === 'urgent' || rawColor === 'red') color = '#ef4444';
+      else if (rawColor === 'gold' || rawColor === 'default') color = '#C9A84C';
+      else if (rawColor === 'navy') color = '#7dd3fc';
+      else if (COLOR_RE.test(rawColor)) color = rawColor.length === 4
+        ? ('#' + rawColor[1] + rawColor[1] + rawColor[2] + rawColor[2] + rawColor[3] + rawColor[3])
+        : rawColor;
+      const orderNum = Number(item.order);
+      return {
+        id: String(item.id || ('civic_' + Date.now() + '_' + idx)).slice(0, 60),
+        textAr: String(item.textAr || '').slice(0, 220),
+        textFr: String(item.textFr || '').slice(0, 220),
+        color: color,
+        priority: item.priority === 'urgent' || item.priority === 'high' || color === '#ef4444'
+          ? 'urgent'
+          : 'normal',
+        link: sanitizeSafeUrl(item.link || '', 500),
+        active: item.active !== false,
+        order: Number.isFinite(orderNum) ? Math.max(0, Math.min(999, Math.round(orderNum))) : idx,
+        updatedAt: String(item.updatedAt || new Date().toISOString()).slice(0, 40),
+      };
+    });
+    next.civicTickerUpdatedAt = new Date().toISOString();
   }
 
   if (body.moderatorConfig && typeof body.moderatorConfig === 'object') {

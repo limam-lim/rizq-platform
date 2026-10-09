@@ -3903,6 +3903,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 })();
 </script>
     <script src="rizq_announcements.js"></script>
+    <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.0"></script>
@@ -4146,8 +4147,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </svg>
   </div>
 
-  <!-- Ticker — filled from live ads; hidden when empty -->
-  <div class="ticker-wrap is-empty" id="ticker-wrap">
+  <!-- Civic / public-service ticker (admin-managed). Live ads stay in «مباشر» below. -->
+  <div class="ticker-wrap is-empty civic-ticker-wrap" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">
     <div class="ticker-inner" id="ticker"></div>
   </div>
 
@@ -8160,44 +8161,15 @@ function refreshAllAdsIndex(){
     ALL_ADS_DATA.push(Object.assign({}, a, { catKey: a.catKey || (a.cat||'').split(' ')[1] || '' }));
   });
 }
+/* شريط تحت الهيدر = خدمة عامة (rizq_civic_ticker.js) — لا تملأه بعناوين الإعلانات.
+   شريط «مباشر» أسفل يبقى لأحدث الإعلانات. */
 function renderTickerFromAds(){
-  var wrap = document.getElementById('ticker-wrap');
-  var inner = document.getElementById('ticker');
-  if(!wrap || !inner) return;
-  var items = ADS.slice(0, 12);
-  function row(a){
-    function _escT(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    return '<div class="ticker-item"><div class="ticker-dot"></div>'+_escT(a.emoji||'📦')+' '+_escT(a.title||'')+' <strong>'+_escT(a.price||'')+'</strong></div>';
-  }
-  var html = '';
-  if(items.length){
-    html = items.map(row).join('');
-  } else {
-    // لا إعلانات بعد — شريط ترويجي قصير (يُستبدل فور وصول إعلانات حية أو FEATURED)
-    var isFr = (typeof isAr !== 'undefined' && !isAr);
-    var fallback = [
-      { emoji:'🔴', title: isFr ? 'En direct sur Rizq' : 'مباشر على رزق', price: isFr ? 'Publiez votre annonce' : 'انشر إعلانك الآن' },
-      { emoji:'🏪', title: isFr ? 'Boutiques' : 'المحلات', price: isFr ? 'Ouvrez votre vitrine' : 'افتح واجهتك' },
-      { emoji:'💼', title: isFr ? 'Bureaux' : 'المكاتب', price: isFr ? 'Services pro' : 'خدمات مهنية' }
-    ];
+  if (window.RizqCivicTicker) {
     try {
-      var siteCfg = JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
-      if(siteCfg && siteCfg.bannerActive && siteCfg.bannerText){
-        fallback.unshift({ emoji:'📢', title: String(siteCfg.bannerText).slice(0, 80), price: '' });
-      }
-    } catch(e){}
-    html = fallback.map(row).join('');
+      var list = typeof RizqCivicTicker.getAll === 'function' ? RizqCivicTicker.getAll() : [];
+      if (typeof RizqCivicTicker.render === 'function') RizqCivicTicker.render(list && list.length ? list : RizqCivicTicker.FALLBACK || []);
+    } catch (e) {}
   }
-  inner.innerHTML = html + html;
-  wrap.classList.remove('is-empty');
-  try {
-    var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
-    document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
-  } catch (e) {}
-  requestAnimationFrame(function(){
-    syncMarqueeShift(inner);
-    requestAnimationFrame(function(){ syncMarqueeShift(inner); });
-  });
 }
 function applyCatCountsFromAds(){
   var counts = {};
@@ -9481,7 +9453,7 @@ try { /* remaining-static-i18n */
   const allAdsTitle = document.getElementById('all-ads-title');
   if(allAdsTitle) allAdsTitle.innerHTML = RizqI18n.t2('كل <span>الإعلانات</span>','Toutes les <span>annonces</span>');
 
-  // Ticker is rebuilt from live ADS — no hardcoded dummy pairs
+  // Civic ticker (public-service) — not ad titles; live ads stay in «مباشر»
   if(typeof renderTickerFromAds==='function') renderTickerFromAds();
 
   // Virtual Offices section: translated via data-t="vo-*" + LANG (same as vs-/vsh-)

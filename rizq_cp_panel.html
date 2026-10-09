@@ -2503,6 +2503,82 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
+    <!-- ══ Civic / public-service ticker (thin strip under header) ══ -->
+    <div style="margin-top:36px;padding-top:28px;border-top:1.5px solid rgba(27,58,107,.12)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:18px;font-weight:700;color:var(--navy)">🏛️ شريط الخدمة العامة</h2>
+          <p style="font-size:12.5px;color:var(--text-muted);margin-top:4px;line-height:1.55">
+            الشريط الرفيع تحت كبسولة الهيدر — طوارئ، تنبيهات كوارث، مفقودين، توعية، مناسبات وطنية.
+            <strong style="color:#b91c1c">الأحمر = عاجل</strong>. منفصل عن شريط «مباشر» (أحدث الإعلانات).
+          </p>
+        </div>
+        <button type="button" onclick="civicOpenForm(null)" style="background:#7f1d1d;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+          ＋ بند خدمة عامة
+        </button>
+      </div>
+
+      <div id="civic-form-wrap" style="display:none;background:#fff7f7;border:1.5px solid rgba(185,28,28,.2);border-radius:14px;padding:18px;margin-bottom:18px">
+        <h3 style="font-size:15px;font-weight:700;color:#7f1d1d;margin-bottom:14px" id="civic-form-title">📝 بند جديد</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">النص (عربي) *</label>
+            <input id="civic-text-ar" type="text" maxlength="220" placeholder="مثال: أرقام الطوارئ: إطفاء ١٨ · إسعاف ١٧" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Texte (français)</label>
+            <input id="civic-text-fr" type="text" maxlength="220" placeholder="Ex: Urgences: Pompiers 18 · SAMU 17" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff" />
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">اللون</label>
+            <select id="civic-color" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff">
+              <option value="#C9A84C">ذهبي (عادي)</option>
+              <option value="#ef4444">🔴 أحمر عاجل</option>
+              <option value="#7dd3fc">أزرق معلومات</option>
+              <option value="#10b981">أخضر توعية</option>
+              <option value="#f59e0b">برتقالي تنبيه</option>
+              <option value="custom">مخصص…</option>
+            </select>
+            <input id="civic-color-custom" type="color" value="#ef4444" style="display:none;margin-top:6px;width:100%;height:34px;border:none;background:transparent;cursor:pointer" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">الأولوية</label>
+            <select id="civic-priority" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff">
+              <option value="normal">عادي</option>
+              <option value="urgent">عاجل</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">الترتيب</label>
+            <input id="civic-order" type="number" min="0" max="999" value="0" style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">رابط (اختياري)</label>
+            <input id="civic-link" type="url" placeholder="https://..." style="width:100%;padding:8px 11px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font-size:13px;background:#fff" />
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="civic-active" checked style="width:16px;height:16px;accent-color:#10b981" />
+            نشط فور الحفظ
+          </label>
+        </div>
+        <input type="hidden" id="civic-edit-id" value="" />
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" onclick="civicCancelForm()" style="background:#fff;color:var(--text-muted);border:1px solid rgba(27,58,107,.2);padding:9px 20px;border-radius:9px;font-size:13px;cursor:pointer">إلغاء</button>
+          <button type="button" onclick="civicSaveForm()" style="background:#7f1d1d;color:#fff;border:none;padding:9px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer" id="civic-save-btn">💾 حفظ ونشر</button>
+        </div>
+      </div>
+
+      <div id="civic-list">
+        <div style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">
+          لا بنود بعد — الزوّار سيرون عيّنات افتراضية حتى تضيف بنودك.
+        </div>
+      </div>
+    </div>
+
   </div><!-- /panel-announcements -->
 
 
@@ -9567,6 +9643,230 @@ function resolveQuotaAddon(id, status){
   setTimeout(function(){
     syncAnnouncementsFromBackend().then(function(){ renderAnnList(); });
   }, 600);
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   CIVIC TICKER PANEL — شريط الخدمة العامة تحت الهيدر
+══════════════════════════════════════════════════════════════ */
+(function(){
+  var CIVIC_KEY = 'rizq_civic_ticker';
+
+  function getAll(){
+    try{ return JSON.parse(localStorage.getItem(CIVIC_KEY)||'[]'); }catch(e){ return []; }
+  }
+  function saveAll(list){
+    localStorage.setItem(CIVIC_KEY, JSON.stringify(list||[]));
+    _syncCivicToBackend(list||[]);
+  }
+
+  function _civicBackendBase(){
+    try {
+      if (typeof _adminBackendBase === 'function') return _adminBackendBase();
+      var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+      return (c.backendUrl || window.RIZQ_BACKEND_BASE || '').replace(/\/$/,'');
+    } catch(e){ return ''; }
+  }
+
+  function _syncCivicToBackend(list){
+    var base = _civicBackendBase();
+    if (!base) return;
+    var headers = { 'Content-Type':'application/json' };
+    try {
+      if (typeof _adminAuthHeaders === 'function') headers = _adminAuthHeaders(headers);
+    } catch(e){}
+    fetch(base + '/api/site-config', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ civicTicker: list || [] })
+    }).catch(function(){});
+  }
+
+  function syncCivicFromBackend(){
+    var base = _civicBackendBase();
+    if (!base) return Promise.resolve(false);
+    return fetch(base + '/api/site-config', { cache: 'no-store' })
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config || !Array.isArray(data.config.civicTicker)) return false;
+        localStorage.setItem(CIVIC_KEY, JSON.stringify(data.config.civicTicker));
+        return true;
+      }).catch(function(){ return false; });
+  }
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function resolveColor(){
+    var sel = document.getElementById('civic-color');
+    if (!sel) return '#C9A84C';
+    if (sel.value === 'custom') {
+      var c = document.getElementById('civic-color-custom');
+      return (c && c.value) || '#ef4444';
+    }
+    return sel.value || '#C9A84C';
+  }
+
+  var colorSel = document.getElementById('civic-color');
+  if (colorSel) {
+    colorSel.addEventListener('change', function(){
+      var custom = document.getElementById('civic-color-custom');
+      if (custom) custom.style.display = colorSel.value === 'custom' ? 'block' : 'none';
+    });
+  }
+
+  window.civicOpenForm = function(item){
+    var wrap = document.getElementById('civic-form-wrap');
+    var title = document.getElementById('civic-form-title');
+    if (!wrap) return;
+    document.getElementById('civic-text-ar').value = '';
+    document.getElementById('civic-text-fr').value = '';
+    document.getElementById('civic-link').value = '';
+    document.getElementById('civic-order').value = String(getAll().length);
+    document.getElementById('civic-priority').value = 'normal';
+    document.getElementById('civic-color').value = '#C9A84C';
+    document.getElementById('civic-color-custom').style.display = 'none';
+    document.getElementById('civic-active').checked = true;
+    document.getElementById('civic-edit-id').value = '';
+    document.getElementById('civic-save-btn').textContent = '💾 حفظ ونشر';
+    title.textContent = '📝 بند جديد';
+
+    if (item) {
+      title.textContent = '✏️ تعديل البند';
+      document.getElementById('civic-edit-id').value = item.id || '';
+      document.getElementById('civic-text-ar').value = item.textAr || '';
+      document.getElementById('civic-text-fr').value = item.textFr || '';
+      document.getElementById('civic-link').value = item.link || '';
+      document.getElementById('civic-order').value = String(item.order != null ? item.order : 0);
+      document.getElementById('civic-priority').value = (item.priority === 'urgent' || item.priority === 'high') ? 'urgent' : 'normal';
+      document.getElementById('civic-active').checked = item.active !== false;
+      document.getElementById('civic-save-btn').textContent = '💾 حفظ التعديلات';
+      var col = String(item.color || '#C9A84C');
+      var presets = ['#C9A84C','#ef4444','#7dd3fc','#10b981','#f59e0b'];
+      if (presets.indexOf(col) >= 0) {
+        document.getElementById('civic-color').value = col;
+        document.getElementById('civic-color-custom').style.display = 'none';
+      } else {
+        document.getElementById('civic-color').value = 'custom';
+        document.getElementById('civic-color-custom').value = col;
+        document.getElementById('civic-color-custom').style.display = 'block';
+      }
+    }
+    wrap.style.display = 'block';
+    wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+  };
+
+  window.civicCancelForm = function(){
+    var wrap = document.getElementById('civic-form-wrap');
+    if (wrap) wrap.style.display = 'none';
+  };
+
+  window.civicSaveForm = function(){
+    var textAr = (document.getElementById('civic-text-ar').value || '').trim();
+    if (!textAr) { alert('النص بالعربية مطلوب'); return; }
+    var editId = document.getElementById('civic-edit-id').value;
+    var color = resolveColor();
+    var priority = document.getElementById('civic-priority').value || 'normal';
+    if (color === '#ef4444') priority = 'urgent';
+    var item = {
+      textAr: textAr,
+      textFr: (document.getElementById('civic-text-fr').value || '').trim(),
+      color: color,
+      priority: priority,
+      link: (document.getElementById('civic-link').value || '').trim(),
+      active: document.getElementById('civic-active').checked,
+      order: Math.max(0, parseInt(document.getElementById('civic-order').value, 10) || 0),
+      updatedAt: new Date().toISOString()
+    };
+    var list = getAll();
+    if (editId) {
+      var i = list.findIndex(function(a){ return a.id === editId; });
+      if (i >= 0) { item.id = editId; list[i] = item; }
+    } else {
+      item.id = 'civic_' + Date.now();
+      list.push(item);
+    }
+    list.sort(function(a,b){ return (Number(a.order)||0) - (Number(b.order)||0); });
+    saveAll(list);
+    civicCancelForm();
+    renderCivicList();
+    if (typeof showToast === 'function') showToast('✅ تم حفظ بند الخدمة العامة','success');
+  };
+
+  window.civicDelete = function(id){
+    if (!confirm('حذف هذا البند؟')) return;
+    saveAll(getAll().filter(function(a){ return a.id !== id; }));
+    renderCivicList();
+    if (typeof showToast === 'function') showToast('🗑️ تم الحذف','success');
+  };
+
+  window.civicToggle = function(id){
+    var list = getAll();
+    var i = list.findIndex(function(a){ return a.id === id; });
+    if (i >= 0) { list[i].active = !list[i].active; saveAll(list); renderCivicList(); }
+  };
+
+  window.civicEdit = function(id){
+    var item = getAll().find(function(a){ return a.id === id; });
+    if (item) civicOpenForm(item);
+  };
+
+  window.civicMove = function(id, dir){
+    var list = getAll().slice().sort(function(a,b){ return (Number(a.order)||0)-(Number(b.order)||0); });
+    var i = list.findIndex(function(a){ return a.id === id; });
+    if (i < 0) return;
+    var j = i + (dir < 0 ? -1 : 1);
+    if (j < 0 || j >= list.length) return;
+    var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+    list.forEach(function(it, idx){ it.order = idx; });
+    saveAll(list);
+    renderCivicList();
+  };
+
+  function renderCivicList(){
+    var list = getAll().slice().sort(function(a,b){ return (Number(a.order)||0)-(Number(b.order)||0); });
+    var el = document.getElementById('civic-list');
+    if (!el) return;
+    if (!list.length) {
+      el.innerHTML = '<div style="text-align:center;padding:28px;color:#94a3b8;font-size:13px">'
+        + 'لا بنود بعد — الزوّار سيرون عيّنات افتراضية (طوارئ / توعية / مناسبات) حتى تضيف بنودك.</div>';
+      return;
+    }
+    el.innerHTML = list.map(function(it){
+      var urgent = it.priority === 'urgent' || it.priority === 'high' || it.color === '#ef4444';
+      var col = esc(it.color || '#C9A84C');
+      return '<div style="background:#fff;border:1.5px solid '+(urgent?'rgba(239,68,68,.28)':'rgba(27,58,107,.1)')
+        +';border-radius:12px;padding:14px 16px;margin-bottom:10px">'
+        + '<div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">'
+        + '<div style="width:14px;height:14px;border-radius:50%;background:'+col+';margin-top:4px;flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,.04)"></div>'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13.5px;font-weight:700;color:#1a2535;line-height:1.45">'+esc(it.textAr||'')+'</div>'
+        +(it.textFr?'<div style="font-size:12px;color:#64748b;margin-top:3px">'+esc(it.textFr)+'</div>':'')
+        + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">'
+        + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.04);color:'+(it.active?'#10b981':'#f59e0b')+'">● '+(it.active?'نشط':'متوقف')+'</span>'
+        +(urgent?'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(239,68,68,.12);color:#b91c1c">🔴 عاجل</span>':'')
+        + '<span style="font-size:10px;color:#94a3b8">ترتيب '+(it.order!=null?it.order:0)+'</span>'
+        +(it.link?'<span style="font-size:10px;color:#64748b">🔗 رابط</span>':'')
+        + '</div></div>'
+        + '<div style="display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap">'
+        + '<button type="button" onclick="civicMove(\''+esc(it.id)+'\',-1)" title="أعلى" style="background:rgba(27,58,107,.06);border:none;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:12px">↑</button>'
+        + '<button type="button" onclick="civicMove(\''+esc(it.id)+'\',1)" title="أسفل" style="background:rgba(27,58,107,.06);border:none;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:12px">↓</button>'
+        + '<button type="button" onclick="civicToggle(\''+esc(it.id)+'\')" style="background:'+(it.active?'rgba(16,185,129,.1)':'rgba(245,158,11,.1)')+';color:'+(it.active?'#10b981':'#f59e0b')+';border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-weight:600">'+(it.active?'⏸':'▶')+'</button>'
+        + '<button type="button" onclick="civicEdit(\''+esc(it.id)+'\')" style="background:rgba(27,58,107,.07);color:#1B3A6B;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">✏️</button>'
+        + '<button type="button" onclick="civicDelete(\''+esc(it.id)+'\')" style="background:rgba(239,68,68,.08);color:#dc2626;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">🗑️</button>'
+        + '</div></div></div>';
+    }).join('');
+  }
+
+  var _prevShow = window.showPanel;
+  window.showPanel = function(id, el){
+    if (typeof _prevShow === 'function') _prevShow(id, el);
+    if (id === 'announcements') {
+      syncCivicFromBackend().then(function(){ renderCivicList(); });
+    }
+  };
+
+  setTimeout(function(){
+    syncCivicFromBackend().then(function(){ renderCivicList(); });
+  }, 700);
 })();
 </script>
 
