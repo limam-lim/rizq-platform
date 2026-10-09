@@ -126,14 +126,6 @@ nav .nav-disclaimer{flex-shrink:0}
 .btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar{font-weight:800}
 .btn-lang .lang-sep,.btn-lang-primary .lang-sep{opacity:.85}
 
-/* BREADCRUMB */
-.breadcrumb{padding:7px clamp(12px,1.5vw,24px);display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);border-bottom:1px solid #e2e8f5;flex-wrap:wrap;background:#fff}
-.breadcrumb a{color:var(--text-muted);transition:color .2s}
-.breadcrumb a:hover{color:var(--gold)}
-.breadcrumb .sep{color:rgba(13,27,42,.2)}
-.breadcrumb .cur{color:#1a2535;font-weight:600;text-decoration:none}
-.breadcrumb a.cur:hover{color:var(--gold)}
-
 /* MOBILE TABS */
 .mobile-tabs{display:none;background:#fff;border-bottom:2px solid #e2e8f5;position:sticky;top:62px;z-index:100}
 .mtab{flex:1;padding:11px;background:none;border:none;cursor:pointer;font-size:13.5px;font-weight:700;font-family:'Segoe UI',sans-serif;color:var(--text-muted);border-bottom:3px solid transparent;transition:all .2s}
@@ -142,7 +134,7 @@ nav .nav-disclaimer{flex-shrink:0}
 /* BROWSE LAYOUT — fluid wide desktop shell (Avito-like horizontal use); detail as overlay */
 .browse-wrap{
   display:flex;width:100%;max-width:100%;
-  height:calc(100vh - var(--rizq-header-h,68px) - 48px - 34px);overflow:hidden;position:relative;
+  height:calc(100vh - var(--rizq-header-h,68px) - 48px);overflow:hidden;position:relative;
 }
 .browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1;width:100%}
 .browse-right{
@@ -159,18 +151,15 @@ nav .nav-disclaimer{flex-shrink:0}
 .browse-right::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
 body.rizq-detail-open{overflow:hidden}
 
-/* واجهة التفاصيل: لا شريط بحث/مسار/فوتر فوق اللوحة */
+/* واجهة التفاصيل: لا شريط بحث/فوتر فوق اللوحة */
 html.rizq-app-nav body.rizq-detail-open > #nav-browse-search,
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > #nav-browse-search,
 html.rizq-app-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
 html.rizq-app-nav body.rizq-detail-open > nav:has(.nav-search),
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav:not(#rizq-desk-nav):has(.nav-search),
-html.rizq-app-nav body.rizq-detail-open > .breadcrumb,
-html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > .breadcrumb,
 body.rizq-detail-open > #nav-browse-search,
 body.rizq-detail-open > nav.rizq-search-strip-nav,
-body.rizq-detail-open > .breadcrumb,
 body.rizq-detail-open > #mobile-tabs,
 body.rizq-detail-open > #mobile-stats-slot,
 body.rizq-detail-open > footer.rizq-footer,
@@ -1126,7 +1115,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   }
   .rc-empty{padding:48px 20px;min-height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
   .empty-detail{min-height:50vh;padding:28px 16px}
-  .breadcrumb{position:relative;z-index:2;flex-shrink:0}
   #rizq-prompt-bubbles{
     bottom:calc(110px + env(safe-area-inset-bottom,0))!important;
     right:12px!important;
@@ -1154,14 +1142,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     bottom:calc(16px + env(safe-area-inset-bottom,0));
     padding:11px 22px;
     font-size:13px;
-  }
-  .breadcrumb{
-    padding:8px 3%;
-    font-size:11px;
-    flex-wrap:wrap;
-    position:relative !important;
-    z-index:10 !important;
-    background:#fff !important;
   }
 }
 
@@ -1343,13 +1323,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     <button class="btn-lang-primary btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   </div>
 </nav>
-
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a><span class="sep">›</span>
-  <a href="rizq_browse.html" id="bc-cat" data-t="all-cats" onclick="filterByCat('');return false;">كل الأقسام</a><span class="sep">›</span>
-  <a class="cur" id="bc-current" href="rizq_browse.html" data-t="browse-ads">تصفح الإعلانات</a>
-</div>
 
 <!-- MOBILE TABS + STATS (على الموبايل تُنقل الإحصاءات هنا لتفادي القص) -->
 <div class="mobile-tabs" id="mobile-tabs">
@@ -2513,13 +2486,12 @@ function gotoPage(p){
   if(body) body.scrollTop=0;
 }
 
-/** أخفِ شريط البحث/المسار/فوتر الروابط أثناء لوحة التفاصيل — لا تقطع الصورة ولا تطفو فوقها */
+/** أخفِ شريط البحث/فوتر الروابط أثناء لوحة التفاصيل — لا تقطع الصورة ولا تطفو فوقها */
 function syncDetailChrome(open){
   var hide = !!open;
   var nodes = [
     document.getElementById('nav-browse-search'),
     document.querySelector('nav.rizq-search-strip-nav'),
-    document.querySelector('.breadcrumb'),
     document.getElementById('mobile-tabs'),
     document.getElementById('mobile-stats-slot'),
     document.querySelector('footer.rizq-footer'),
