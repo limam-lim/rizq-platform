@@ -11,7 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rizq_header.css?v=29.6"/>
+  <link rel="stylesheet" href="rizq_header.css?v=30.9"/>
+  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -51,13 +52,13 @@ select option{background:#fff!important;color:#1a2535!important}
     position:relative!important;top:auto!important;inset:auto!important;
     height:56px!important;max-height:56px!important;z-index:20!important;
     display:flex!important;align-items:center;justify-content:center;gap:12px;
-    padding:8px 24px!important;background:#fff!important;
+    padding:8px clamp(12px,1.5vw,28px)!important;background:#fff!important;
     border-bottom:1px solid #e2e8f5!important;box-shadow:none!important;
     backdrop-filter:none!important;
   }
   html.rizq-app-nav:has(#rizq-desk-nav) body > nav:not(#rizq-desk-nav) .nav-search,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav) .nav-search{
-    flex:1 1 auto!important;max-width:720px!important;margin:0 auto;
+    flex:1 1 auto!important;max-width:min(1520px,calc(100% - 32px))!important;margin:0 auto;
   }
 }
 
@@ -68,9 +69,9 @@ body>nav:not(#rizq-desk-nav):not(.rizq-search-strip-nav){
   padding:0 4%;gap:16px;direction:ltr;justify-content:flex-start
 }
 #rizq-desk-nav~nav,nav.rizq-search-strip-nav{
-  position:relative!important;top:auto!important;height:56px!important;max-height:56px!important;
+  position:relative!important;top:auto!important;height:48px!important;max-height:48px!important;
   background:#fff!important;border-bottom:1px solid #e2e8f5!important;box-shadow:none!important;
-  backdrop-filter:none!important;z-index:20!important;padding:8px 24px!important
+  backdrop-filter:none!important;z-index:20!important;padding:6px 20px!important
 }
 #rizq-desk-nav~nav .logo,#rizq-desk-nav~nav .nav-actions,#rizq-desk-nav~nav .nav-disclaimer,
 #rizq-desk-nav~nav #lang-btn,nav.rizq-search-strip-nav .logo,nav.rizq-search-strip-nav .nav-actions,
@@ -80,7 +81,7 @@ nav.rizq-search-strip-nav .nav-disclaimer,nav.rizq-search-strip-nav #lang-btn{di
 .logo-text{display:flex;flex-direction:column;justify-content:center}
 .logo-text .logo-ar{font-family:Georgia,serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
 .logo-text .logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-family:Georgia,serif;font-style:italic;margin-top:2px;white-space:nowrap}
-.nav-search{flex:1;max-width:600px;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative}
+.nav-search{flex:1;max-width:min(1400px,100%);display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:border-color .3s;box-shadow:0 4px 16px rgba(0,0,0,.25);position:relative}
 .nav-search.rizq-sugg-host{overflow:visible;position:relative}
 .nav-search:focus-within{border-color:var(--gold)}
 .rc-thumb .rizq-img-wrap,.rc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -125,32 +126,77 @@ nav .nav-disclaimer{flex-shrink:0}
 .btn-lang .lang-fr,.btn-lang .lang-ar,.btn-lang-primary .lang-fr,.btn-lang-primary .lang-ar{font-weight:800}
 .btn-lang .lang-sep,.btn-lang-primary .lang-sep{opacity:.85}
 
-/* BREADCRUMB */
-.breadcrumb{padding:10px 4%;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);border-bottom:1px solid #e2e8f5;flex-wrap:wrap;background:#fff}
-.breadcrumb a{color:var(--text-muted);transition:color .2s}
-.breadcrumb a:hover{color:var(--gold)}
-.breadcrumb .sep{color:rgba(13,27,42,.2)}
-.breadcrumb .cur{color:#1a2535;font-weight:600;text-decoration:none}
-.breadcrumb a.cur:hover{color:var(--gold)}
-
 /* MOBILE TABS */
 .mobile-tabs{display:none;background:#fff;border-bottom:2px solid #e2e8f5;position:sticky;top:62px;z-index:100}
 .mtab{flex:1;padding:11px;background:none;border:none;cursor:pointer;font-size:13.5px;font-weight:700;font-family:'Segoe UI',sans-serif;color:var(--text-muted);border-bottom:3px solid transparent;transition:all .2s}
 .mtab.active{color:var(--gold-dk);border-bottom-color:var(--gold)}
 
-/* BROWSE LAYOUT — full-width grid; detail opens as overlay sheet */
-.browse-wrap{display:flex;height:calc(100vh - 62px - 41px);overflow:hidden;position:relative}
-.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1}
+/* BROWSE LAYOUT — fluid wide desktop shell (Avito-like horizontal use); detail as overlay */
+.browse-wrap{
+  display:flex;width:100%;max-width:100%;
+  height:calc(100vh - var(--rizq-header-h,68px) - 48px);overflow:hidden;position:relative;
+}
+.browse-left{flex:1;display:flex;flex-direction:column;border-left:1px solid #e2e8f5;background:#fff;overflow:hidden;min-width:0;position:relative;z-index:1;width:100%}
 .browse-right{
-  display:none;position:fixed;inset:0;z-index:5200;
+  display:none;position:fixed;
+  inset:var(--rizq-header-h,68px) 0 0 0;
+  z-index:5200;
   background:rgba(8,15,30,.58);backdrop-filter:blur(6px);
-  padding:max(16px,2vh) 16px;overflow-y:auto;align-items:flex-start;justify-content:center;
+  padding:8px 12px 16px;overflow-y:auto;
+  flex-direction:column;align-items:center;justify-content:flex-start;
 }
 .browse-wrap.has-detail .browse-left{flex:1;overflow:hidden;filter:none}
 .browse-wrap.has-detail .browse-right{display:flex}
 .browse-right::-webkit-scrollbar{width:4px}
 .browse-right::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
 body.rizq-detail-open{overflow:hidden}
+
+/* واجهة التفاصيل: لا شريط بحث/فوتر فوق اللوحة */
+html.rizq-app-nav body.rizq-detail-open > #nav-browse-search,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > #nav-browse-search,
+html.rizq-app-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav.rizq-search-strip-nav,
+html.rizq-app-nav body.rizq-detail-open > nav:has(.nav-search),
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open > nav:not(#rizq-desk-nav):has(.nav-search),
+body.rizq-detail-open > #nav-browse-search,
+body.rizq-detail-open > nav.rizq-search-strip-nav,
+body.rizq-detail-open > #mobile-tabs,
+body.rizq-detail-open > #mobile-stats-slot,
+body.rizq-detail-open > footer.rizq-footer,
+body.rizq-detail-open .rzq-ft-toggle-row,
+body.rizq-detail-open .rzq-ft-adminia-stack,
+body.rizq-detail-open .rzq-ft-toggle-btn,
+body.rizq-detail-open .fixed-disc-pill{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  height:0!important;
+  max-height:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  border:none!important;
+  box-shadow:none!important;
+}
+/* اخرج من stacking context حتى تغطي اللوحة الصفحة ولا يطفو البحث فوقها */
+html.rizq-app-nav .browse-wrap.has-detail,
+html.rizq-app-nav.has-rizq-desk-nav .browse-wrap.has-detail,
+.browse-wrap.has-detail{
+  isolation:auto!important;
+  position:relative;
+  z-index:1;
+}
+.browse-wrap.has-detail .browse-right,
+body.rizq-detail-open .browse-right,
+html.rizq-app-nav body.rizq-detail-open .browse-right{
+  position:fixed!important;
+  inset:var(--rizq-header-h,68px) 0 0 0!important;
+  z-index:12000!important;
+  background:linear-gradient(160deg,#e8eef8 0%,#f4f7fc 45%,#eef2fa 100%)!important;
+  backdrop-filter:none!important;
+}
 
 /* LEFT SIDEBAR (FILTERS) — إعادة تصميم بصري (2026-08-11): تسلسل هرمي أوضح
    بين الأقسام، عناصر تحكم مخصصة بدل عناصر المتصفح الافتراضية الصغيرة،
@@ -215,8 +261,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 .rl-sort select{background:#f8faff;border:1px solid #e2e8f5;border-radius:8px;padding:6px 10px;font-size:12px;color:#1a2535;outline:none;cursor:pointer;font-family:'Cairo',sans-serif}
 #result-list-body{
   overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-  gap:14px;padding:14px 16px 20px;align-content:start;align-items:start;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));
+  gap:12px;padding:12px clamp(12px,1.2vw,20px) 18px;align-content:start;align-items:start;
   grid-auto-rows:min-content;
   background:
     radial-gradient(ellipse 80% 50% at 100% 0%,rgba(201,168,76,.08),transparent 55%),
@@ -285,31 +331,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
 /* DETAIL PANEL — overlay sheet with large gallery */
 .empty-detail{display:none}
 #detail-content{
-  width:min(1100px,100%);margin:0 auto;background:#fff;border-radius:18px;
-  box-shadow:0 24px 64px rgba(0,0,0,.35);overflow:hidden;position:relative;
-  max-height:none;min-height:min(90vh,920px);
+  width:min(980px,100%);margin:0 auto;
+  background:linear-gradient(180deg,#fffefb 0%,#fff 40%,#fbfaf6 100%);
+  border-radius:14px;
+  border:1px solid rgba(201,168,76,.38);
+  box-shadow:0 18px 48px rgba(8,15,30,.36),inset 0 1px 0 rgba(255,255,255,.7);
+  overflow-x:hidden;overflow-y:auto;position:relative;
+  max-height:calc(100dvh - var(--rizq-header-h,68px) - 20px);min-height:0;
+  flex:0 1 auto;align-self:center;
 }
 html[dir="ltr"] #detail-content,
 html[lang="fr"] #detail-content{
-  width:min(1100px,100%);
+  width:min(980px,100%);
 }
-.dp-wrap{padding:18px 22px 36px;max-width:none;margin:0}
-.dp-back-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:8px 14px;background:#fff;border:1px solid rgba(27,58,107,.15);border-radius:9px;font-size:13px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
-.dp-back-btn:hover{background:rgba(27,58,107,.06);border-color:rgba(27,58,107,.3)}
-.dp-gallery{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:0;max-width:none;flex:1 1 100%;width:100%}
-.dp-hero{display:flex;flex-direction:column;align-items:stretch;gap:16px;margin-bottom:18px}
-.dp-hero-info{flex:1;min-width:0}
-.dp-hero-info .dp-listing-cat{margin-bottom:6px}
-.dp-hero-info .dp-title{font-size:24px;margin-bottom:6px}
-.dp-hero-info .dp-meta-row{margin-bottom:12px}
-.dp-hero-info .dp-price-box{margin-bottom:0}
+.dp-wrap{padding:10px 14px 28px;max-width:none;margin:0}
+.dp-back-btn{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;padding:5px 10px;background:#fff;border:1px solid rgba(201,168,76,.28);border-radius:7px;font-size:12px;font-weight:700;color:var(--royal);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
+.dp-back-btn:hover{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.45)}
+.dp-gallery{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-bottom:0;max-width:none;flex:1 1 100%;width:100%;min-height:0}
+.dp-hero{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:12px}
+.dp-hero-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:0}
+.dp-hero-info .dp-listing-cat{margin-bottom:3px}
+.dp-hero-info .dp-title{font-size:17px;margin-bottom:3px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dp-hero-info .dp-meta-row{margin-bottom:6px;gap:8px;font-size:11px}
+.dp-hero-info .dp-price-box{margin-bottom:8px}
+.dp-hero-info .dp-contact{margin-bottom:0;margin-top:0}
 .dp-gal-wrap{position:relative;max-width:none;width:100%}
 .dp-main-img{
-  width:100%!important;aspect-ratio:16/10;max-height:min(58vh,560px)!important;min-height:240px;height:auto!important;
-  border-radius:14px;background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
+  width:100%!important;aspect-ratio:4/3;max-height:min(48vh,400px)!important;min-height:180px;height:auto!important;
+  border-radius:12px;background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
   display:block;color:var(--gold);
   overflow:hidden;cursor:zoom-in;position:relative;
-  box-shadow:0 10px 28px rgba(15,31,61,.16);border:1px solid rgba(27,58,107,.1);
+  box-shadow:0 8px 22px rgba(15,31,61,.14);border:1px solid rgba(27,58,107,.1);
 }
 .dp-main-img > .rizq-img-wrap,
 .dp-main-img > .rizq-ad-frame,
@@ -353,37 +405,43 @@ html[lang="fr"] #detail-content{
   text-shadow:0 2px 12px rgba(0,0,0,.45);max-width:90%;
 }
 .dp-thumbs-wrap{width:100%;max-width:none}
-.dp-thumbs-label{font-size:12px;font-weight:700;color:var(--text-muted);margin:2px 0 8px}
-.dp-thumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;max-width:100%;scrollbar-width:thin}
+.dp-thumbs-label{display:none}
+.dp-thumbs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 4px;max-width:100%;scrollbar-width:thin}
 .dp-thumbs::-webkit-scrollbar{height:3px}
 .dp-thumbs::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:2px}
-.dp-thumb{width:72px;height:58px;border-radius:10px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden}
+.dp-thumb{width:52px;height:42px;border-radius:8px;background:linear-gradient(135deg,#1B3A6B,#0f2347);display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden}
 .dp-thumb:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(15,31,61,.15)}
 .dp-thumb:hover,.dp-thumb.active{border-color:var(--gold)}
 .dp-thumb.active{box-shadow:0 0 0 1px rgba(201,168,76,.35)}
 .dp-thumb svg{width:20px;height:20px;stroke-width:1.5}
 .dp-thumb img{width:100%;height:100%;object-fit:cover}
 
-.dp-listing-cat{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);margin-bottom:8px}
+.dp-listing-cat{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text-muted);margin-bottom:4px}
 .dp-listing-cat a{color:var(--text-muted);transition:color .2s}
 .dp-listing-cat a:hover{color:var(--gold)}
 .dp-listing-cat .sep{color:rgba(13,27,42,.2)}
 
-.dp-title{font-size:22px;font-weight:900;color:#1a2535;line-height:1.3;margin-bottom:8px}
-.dp-meta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:12px;color:var(--text-muted)}
+.dp-title{font-size:17px;font-weight:900;color:#1a2535;line-height:1.25;margin-bottom:4px}
+.dp-meta-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:11px;color:var(--text-muted)}
 .dp-meta-row .dp-loc{font-weight:600;color:#1a2535}
 .dp-meta-row .dp-date{}
-.dp-verified-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--green);font-weight:700}
+.dp-verified-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--green);font-weight:700}
 
-.dp-price-box{background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(201,168,76,.06));border:1.5px solid rgba(201,168,76,.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.dp-price-main{font-size:28px;font-weight:900;color:var(--gold)}
-.dp-price-period{font-size:12px;color:var(--text-muted);margin-top:2px}
-.dp-pin-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.35);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;color:var(--gold-dk)}
+.dp-price-box{
+  background:linear-gradient(180deg,rgba(240,215,138,.22),rgba(201,168,76,.1));
+  border:1px solid rgba(201,168,76,.42);
+  border-radius:5px;padding:8px 10px;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  box-shadow:inset 0 1px 0 rgba(255,248,224,.35);
+}
+.dp-price-main{font-size:20px;font-weight:900;color:#a07820;letter-spacing:.15px}
+.dp-price-period{font-size:10px;color:var(--text-muted);margin-top:1px}
+.dp-pin-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:3px;padding:3px 8px;font-size:10px;font-weight:800;color:var(--gold-dk)}
 .dp-price-orig{font-size:15px;font-weight:700;color:var(--text-muted);text-decoration:line-through;margin-inline-start:6px}
 .dp-discount-badge{display:inline-block;background:#dc2626;color:#fff;font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px;margin-inline-start:8px;vertical-align:middle}
 
-.section-block{background:#fff;border-radius:12px;border:1px solid #e8eef8;padding:16px 20px;margin-bottom:14px}
-.section-block-title{font-size:14px;font-weight:800;color:#1a2535;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f0f4f8}
+.section-block{background:rgba(255,255,255,.92);border-radius:10px;border:1px solid rgba(201,168,76,.16);padding:14px 16px;margin-bottom:12px}
+.section-block-title{font-size:13.5px;font-weight:800;color:#1a2535;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(201,168,76,.14)}
 .desc-text{font-size:13.5px;color:var(--text-soft);line-height:1.75;white-space:pre-line;max-height:120px;overflow:hidden;transition:max-height .4s}
 .desc-text.open{max-height:999px}
 .btn-read-more{background:none;border:none;color:var(--gold-dk);font-size:12.5px;cursor:pointer;font-family:'Segoe UI',sans-serif;margin-top:8px;padding:0;font-weight:700}
@@ -415,37 +473,73 @@ html[lang="fr"] #detail-content{
 .dp-map-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12px;font-weight:700;color:var(--gold-dk);margin-top:8px;text-decoration:none;padding:7px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08)}
 .dp-map-link:hover{background:rgba(201,168,76,.16)}
 
-/* CONTACT CARD */
-.dp-contact{background:#fff;border:1.5px solid rgba(201,168,76,.2);border-radius:14px;padding:18px;margin-bottom:14px}
-.dp-seller-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.dp-seller-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.dp-seller-name{font-size:14px;font-weight:800;color:#1a2535}
-.dp-seller-badge{font-size:11px;color:var(--green);margin-top:2px}
-.dp-stars{display:flex;align-items:center;gap:2px;margin-top:3px}
-.dp-star{font-size:13px;color:#ddd}
+/* CONTACT CARD — مضغوط بجانب الصورة */
+.dp-contact{
+  background:linear-gradient(165deg,rgba(15,31,61,.04),rgba(201,168,76,.06));
+  border:1px solid rgba(201,168,76,.32);
+  border-radius:8px;padding:10px;margin-bottom:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+}
+.dp-seller-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dp-seller-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dp-seller-name{font-size:12.5px;font-weight:800;color:#1a2535}
+.dp-seller-badge{font-size:10px;color:var(--green);margin-top:1px}
+.dp-stars{display:flex;align-items:center;gap:1px;margin-top:2px}
+.dp-star{font-size:11px;color:#ddd}
 .dp-star.on{color:#f59e0b}
 
+/* بطاقة الثقة داخل التفاصيل — أصغر */
+.dp-contact .rizq-trust-card{
+  padding:8px 10px!important;margin-bottom:8px!important;border-radius:8px!important;gap:8px!important;
+}
+.dp-contact .rizq-trust-av{width:34px!important;height:34px!important;font-size:14px!important}
+.dp-contact .rizq-trust-name{font-size:12.5px!important}
+.dp-contact .rizq-trust-stars{font-size:10.5px!important;margin-top:1px!important}
+
 /* PHONE REVEAL */
-.dp-phone-reveal{background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(27,58,107,.03));border:1.5px dashed rgba(27,58,107,.2);border-radius:10px;padding:12px 16px;cursor:pointer;text-align:center;margin-bottom:10px;transition:all .3s;user-select:none}
-.dp-phone-reveal:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06)}
-.dp-phone-reveal.shown{border-style:solid;border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.04)}
-.dp-phone-num{font-size:17px;font-weight:900;color:#1a2535;letter-spacing:1px;filter:blur(5px);transition:filter .3s;direction:ltr;text-align:left}
+.dp-phone-reveal{background:rgba(255,255,255,.72);border:1px dashed rgba(201,168,76,.4);border-radius:5px;padding:7px 8px;cursor:pointer;text-align:center;margin-bottom:7px;transition:all .25s;user-select:none}
+.dp-phone-reveal:hover{border-color:rgba(201,168,76,.65);background:rgba(201,168,76,.08)}
+.dp-phone-reveal.shown{border-style:solid;border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.05)}
+.dp-phone-num{font-size:13.5px;font-weight:900;color:#1a2535;letter-spacing:.6px;filter:blur(5px);transition:filter .3s;direction:ltr;text-align:center}
 .dp-phone-reveal.shown .dp-phone-num{filter:none}
-.dp-phone-hint{font-size:11px;color:var(--text-muted);margin-top:3px}
+.dp-phone-hint{font-size:10px;color:var(--text-muted);margin-top:2px}
 .dp-phone-reveal.shown .dp-phone-hint{color:var(--green);font-weight:700}
 
-.dp-btn-call{display:block;width:100%;padding:12px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Segoe UI',sans-serif;margin-bottom:8px;transition:all .3s}
-.dp-btn-call:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(22,163,74,.35)}
-.dp-btn-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Segoe UI',sans-serif;margin-bottom:8px;transition:all .3s}
-.dp-btn-wa:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.35)}
-.dp-btn-msg{display:block;width:100%;padding:11px;background:linear-gradient(135deg,rgba(27,58,107,.08),rgba(27,58,107,.04));color:var(--royal);border:1.5px solid rgba(27,58,107,.2);border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Segoe UI',sans-serif;margin-bottom:8px;transition:all .3s}
-.dp-btn-msg:hover{background:rgba(27,58,107,.12);border-color:rgba(27,58,107,.35)}
-.dp-actions-row{display:flex;gap:6px;margin-top:4px}
-.dp-btn-action{flex:1;padding:8px 6px;background:#f8faff;border:1px solid #e2e8f5;border-radius:8px;color:var(--text-muted);cursor:pointer;font-size:12px;font-family:'Segoe UI',sans-serif;transition:all .2s}
-.dp-btn-action:hover{border-color:rgba(201,168,76,.4);color:var(--gold-dk)}
+/* أزرار اتصال مدمجة — ثلاثة في صف واحد */
+.dp-contact-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.dp-btn-call,.dp-btn-wa,.dp-btn-msg{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  width:auto;min-width:0;margin:0;
+  padding:7px 4px;border-radius:5px;
+  font-size:11px;font-weight:800;cursor:pointer;line-height:1.15;
+  font-family:'Cairo','Segoe UI',sans-serif;
+  transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;
+}
+.dp-btn-call{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.dp-btn-call:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(22,163,74,.32)}
+.dp-btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.dp-btn-wa:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(37,211,102,.3)}
+.dp-btn-msg{
+  background:linear-gradient(180deg,rgba(240,215,138,.22),rgba(201,168,76,.12));
+  color:var(--royal-dark,#0f2347);
+  border:1px solid rgba(201,168,76,.48);
+}
+.dp-btn-msg:hover{background:rgba(201,168,76,.22);border-color:rgba(201,168,76,.7)}
+.dp-btn-call svg,.dp-btn-wa svg,.dp-btn-msg svg{width:13px;height:13px;flex-shrink:0}
+.dp-actions-row{display:flex;gap:5px;margin-top:2px}
+.dp-btn-action{flex:1;padding:5px 4px;background:rgba(255,255,255,.75);border:1px solid rgba(201,168,76,.22);border-radius:5px;color:var(--text-muted);cursor:pointer;font-size:10px;font-family:'Cairo','Segoe UI',sans-serif;transition:all .2s}
+.dp-btn-action:hover{border-color:rgba(201,168,76,.5);color:var(--gold-dk)}
 .dp-btn-action.on{color:var(--red);border-color:rgba(220,38,38,.3)}
-.dp-report{text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px;cursor:pointer;text-decoration:underline}
+.dp-report{text-align:center;font-size:10px;color:var(--text-muted);margin-top:8px;margin-bottom:4px;padding-bottom:2px;cursor:pointer;text-decoration:underline;line-height:1.4}
 .dp-report:hover{color:var(--red)}
+.dp-hero-info .dp-store-cta{margin-top:0;margin-bottom:6px;padding:7px 9px;border-radius:7px;gap:8px}
+.dp-hero-info .dp-store-cta-ico{font-size:16px}
+.dp-hero-info .dp-store-cta-title{font-size:11.5px}
+.dp-hero-info .dp-store-cta-sub{font-size:10px;margin-top:1px}
+/* أقسام أسفل الهيرو — بعد رؤية الصورة والسعر والاتصال */
+.dp-wrap > .section-block{padding:11px 13px;margin-bottom:10px}
+.dp-wrap > .rizq-disclaimer{padding:10px 12px;margin:10px 0;font-size:11px}
+.dp-wrap > .safety-box{padding:11px 13px;margin-bottom:10px;font-size:11.5px}
 
 /* SAFETY BOX */
 .safety-box{background:linear-gradient(135deg,#fff8e8,#fffbf0);border:2px solid #C9A84C;border-radius:12px;padding:16px 20px;margin-bottom:14px;font-size:12.5px;color:#1a2535;box-shadow:0 2px 12px rgba(201,168,76,.18)}
@@ -632,6 +726,8 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .browse-wrap{animation:rizqIn .45s ease both}
+/* animation-fill-mode:both يترك transform على الحاوية فيجعل position:fixed نسبياً لها */
+.browse-wrap.has-detail{animation:none!important;transform:none!important}
 
 /* STATS STRIP */
 .stats-strip{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:0;background:linear-gradient(135deg,#0f1f3d,#1B3A6B);border-bottom:1px solid rgba(201,168,76,.15);overflow:visible;flex-shrink:0;min-height:48px;height:48px;padding:0;box-sizing:border-box;width:100%}
@@ -673,11 +769,11 @@ input[type="tel"],.dp-phone-num{direction:ltr!important;text-align:left!importan
 .ed-shimmer-bar{height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);background-size:200% auto;animation:shimmer 2.5s linear infinite;border-radius:2px;margin:20px auto;width:80px;opacity:.7}
 
 /* BROWSE RIGHT background */
-.browse-right{background:linear-gradient(160deg,#f3f6ff 0%,#f8faff 100%)}
+.browse-right{background:linear-gradient(160deg,#eef2fa 0%,#f7f9fc 55%,#f3f6ff 100%)!important}
 
 /* FOOTER */
 footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#0a1628);border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 0;color:rgba(255,255,255,.72)}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:50px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:min(1600px,100%);margin:0 auto;padding-bottom:50px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
 .telecom-tag{display:inline-block;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.4);color:rgba(201,168,76,.9);font-size:10px;padding:4px 12px;border-radius:10px;font-weight:700;letter-spacing:.3px}
@@ -696,7 +792,7 @@ footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#0a1628);border-top
 .footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
 .footer-links li a{font-size:13px;color:rgba(255,255,255,.82);text-decoration:none;transition:color .3s}
 .footer-links li a:hover{color:var(--gold)}
-footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding:22px 0;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding:22px 0;max-width:min(1600px,100%);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .footer-copy{font-size:12px;color:rgba(255,255,255,.8)}
 footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 .footer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:4px 12px;font-size:10.5px;color:rgba(201,168,76,.7)}
@@ -710,10 +806,11 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     display:flex;
     flex-direction:row;
     align-items:stretch;
+    width:100%;
   }
   .bs-sidebar{
-    width:280px;
-    flex:0 0 280px;
+    width:260px;
+    flex:0 0 260px;
     border-bottom:none;
     border-inline-end:1px solid #e2e8f5;
     display:flex;
@@ -737,14 +834,78 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .mobile-filter-btn{display:none!important}
   /* Detail is a centered overlay sheet — keep the grid full-width */
   .browse-wrap.has-detail .browse-left{flex:1}
-  .browse-wrap.has-detail .bs-sidebar{width:260px;flex:0 0 260px}
-  .dp-wrap{padding:20px 24px 40px}
-  .dp-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
-  .dp-main-img{max-height:min(48vh,440px)}
+  .browse-wrap.has-detail .bs-sidebar{width:240px;flex:0 0 240px}
+  .browse-right{
+    inset:var(--rizq-header-h,68px) 0 0 0!important;
+    padding:8px 12px 18px!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+  }
+  .dp-wrap{padding:12px 16px 32px}
+  /* الصورة تكبر للأسفل لتملأ فراغ العمود حتى حد القص تقريباً — مع سقف حتى تبقى أزرار الاتصال/الإبلاغ ظاهرة */
+  .dp-hero{display:grid;grid-template-columns:1fr 1.05fr;gap:14px;align-items:stretch}
+  .dp-gallery{
+    align-self:stretch;
+    height:100%;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .dp-gal-wrap{
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    height:100%;
+  }
+  .dp-main-img{
+    flex:1 1 auto;
+    aspect-ratio:auto!important;
+    min-height:min(44vh,380px);
+    max-height:min(56vh,460px)!important;
+    height:100%!important;
+    align-self:stretch;
+  }
+  .dp-main-img img{
+    object-fit:cover!important;
+    object-position:center 35%;
+  }
+  .dp-thumbs-wrap{flex:0 0 auto;margin-top:6px}
+  .dp-hero-info{min-width:0;overflow:visible}
+  .dp-hero-info .dp-title{font-size:16.5px}
+  .dp-hero-info .dp-contact{margin-top:0;margin-bottom:0}
+  .dp-contact-btns{max-width:100%}
+  .dp-report{margin-bottom:2px}
+  #detail-content{max-height:calc(100dvh - var(--rizq-header-h,68px) - 20px)}
 }
 
 @media(max-width:1080px) and (min-width:901px){
   .bs-sidebar{width:220px;flex-basis:220px}
+}
+/* Wide desktop: use nearly full viewport like modern classifieds */
+@media(min-width:1280px){
+  html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):has(.nav-search),
+  #rizq-desk-nav ~ nav,
+  nav.rizq-search-strip-nav,
+  #nav-browse-search.rizq-search-strip-nav{
+    padding:8px clamp(12px,1.5vw,28px)!important;
+  }
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:12px;
+    padding:12px clamp(14px,1.4vw,24px) 20px;
+  }
+  .rl-header{padding:10px clamp(14px,1.4vw,24px)}
+  .bs-sidebar{width:250px;flex-basis:250px}
+}
+@media(min-width:1600px){
+  #result-list-body{
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  }
+  .bs-sidebar{width:260px;flex-basis:260px}
+  footer.rizq-footer .footer-grid,
+  footer.rizq-footer .footer-bottom{max-width:1600px}
 }
 
 @media(max-width:900px){
@@ -776,11 +937,21 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .browse-right{
     position:fixed!important;inset:0!important;z-index:5200!important;
     height:auto;min-height:0;padding:12px;
-    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة */
+    /* انزل محتوى الإعلان تحت الهيدر الثابت حتى تظهر صورة الإعلان كاملة
+       (عند فتح التفاصيل يُلغى هذا عبر inset تحت الهيدر — انظر أدناه) */
     padding-top:calc(var(--rizq-header-h,98px) + 14px)!important;
     padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 18px + env(safe-area-inset-bottom,0px))!important;
     display:none;overflow-y:auto!important;
     background:rgba(8,15,30,.6)!important;backdrop-filter:blur(6px);
+  }
+  /* التفاصيل مفتوحة: inset يبدأ تحت الهيدر — لا تضاعف فراغ الهيدر بـ padding-top */
+  body.rizq-detail-open .browse-right,
+  .browse-wrap.has-detail .browse-right,
+  html.rizq-app-nav body.rizq-detail-open .browse-right,
+  html.rizq-app-nav.has-rizq-desk-nav body.rizq-detail-open .browse-right{
+    padding-top:10px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
   }
   .browse-wrap.has-detail .browse-right,
   .browse-wrap.has-detail .browse-right.tab-active,
@@ -792,7 +963,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     margin-top:0;
   }
   .browse-wrap.has-detail .browse-right .dp-main-img{
-    scroll-margin-top:calc(var(--rizq-header-h,98px) + 14px);
+    scroll-margin-top:calc(var(--rizq-header-h,98px) + 10px);
   }
   .browse-right.tab-hidden{display:none}
   .browse-wrap.has-detail .browse-right.tab-hidden{display:flex!important}
@@ -954,7 +1125,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   }
   .rc-empty{padding:48px 20px;min-height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
   .empty-detail{min-height:50vh;padding:28px 16px}
-  .breadcrumb{position:relative;z-index:2;flex-shrink:0}
   #rizq-prompt-bubbles{
     bottom:calc(110px + env(safe-area-inset-bottom,0))!important;
     right:12px!important;
@@ -982,14 +1152,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     bottom:calc(16px + env(safe-area-inset-bottom,0));
     padding:11px 22px;
     font-size:13px;
-  }
-  .breadcrumb{
-    padding:8px 3%;
-    font-size:11px;
-    flex-wrap:wrap;
-    position:relative !important;
-    z-index:10 !important;
-    background:#fff !important;
   }
 }
 
@@ -1123,10 +1285,11 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=20" defer></script>
+<script src="rizq_footer_toggle.js?v=22" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
+<script src="rizq_ad_cards.js?v=3.7"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
@@ -1170,13 +1333,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     <button class="btn-lang-primary btn-lang" id="lang-btn" type="button" onclick="toggleLangPage()" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   </div>
 </nav>
-
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="rizq_landing_v8.html" data-t="nav-home">الرئيسية</a><span class="sep">›</span>
-  <a href="rizq_browse.html" id="bc-cat" data-t="all-cats" onclick="filterByCat('');return false;">كل الأقسام</a><span class="sep">›</span>
-  <a class="cur" id="bc-current" href="rizq_browse.html" data-t="browse-ads">تصفح الإعلانات</a>
-</div>
 
 <!-- MOBILE TABS + STATS (على الموبايل تُنقل الإحصاءات هنا لتفادي القص) -->
 <div class="mobile-tabs" id="mobile-tabs">
@@ -1488,10 +1644,21 @@ function _wilayaCoords(ad){
   const hit=Object.keys(WILAYA_COORDS).find(k=>k!=='default'&&(w.includes(k)||k.includes(w)));
   return WILAYA_COORDS[hit]||WILAYA_COORDS['default'];
 }
+/** يفضّل إحداثيات GPS المحفوظة على الإعلان؛ وإلا مركز الولاية */
+function _adCoords(ad){
+  const lat=ad!=null?Number(ad.lat):NaN;
+  const lon=ad!=null?Number(ad.lon):NaN;
+  if(Number.isFinite(lat)&&Number.isFinite(lon)){
+    return {lat:lat,lon:lon,precise:true};
+  }
+  const w=_wilayaCoords(ad);
+  return {lat:w.lat,lon:w.lon,precise:false};
+}
 function buildMapHTML(ad){
   const fr=_rizqLang()==='fr';
-  const coords=_wilayaCoords(ad);
+  const coords=_adCoords(ad);
   const {lat,lon}=coords;
+  const zoom=coords.precise?15:12;
   const label=escapeHtml(ad.wilaya||ad.loc||(fr?'Mauritanie':'موريتانيا'));
   // خريطة ذاتية (بلا iframe) — صور البلاط مسموحة عبر img-src https:
   // مع طبقة Leaflet عند توفّرها لتكبير/تحريك تفاعلي.
@@ -1499,7 +1666,7 @@ function buildMapHTML(ad){
       <strong>📍 ${label}</strong>
       <span>${fr?'Chargement de la carte…':'جاري تحميل الخريطة…'}</span>
     </div>
-    <div id="dp-leaflet-map" style="width:100%;height:100%" data-lat="${lat}" data-lon="${lon}" data-label="${label}"></div>`;
+    <div id="dp-leaflet-map" style="width:100%;height:100%" data-lat="${lat}" data-lon="${lon}" data-zoom="${zoom}" data-label="${label}"></div>`;
 }
 function _ensureLeaflet(cb){
   if(window.L && window.L.map){ cb(); return; }
@@ -1532,7 +1699,7 @@ function _dpRenderStaticMap(){
   const fb=document.getElementById('dp-map-fallback');
   if(!el) return;
   const lat=parseFloat(el.dataset.lat), lon=parseFloat(el.dataset.lon);
-  const zoom=12;
+  const zoom=parseInt(el.dataset.zoom,10)||12;
   const n=Math.pow(2,zoom);
   const x=Math.floor((lon+180)/360*n);
   const latRad=lat*Math.PI/180;
@@ -1552,12 +1719,13 @@ function dpInitMap(){
   const el=document.getElementById('dp-leaflet-map');
   if(!el) return;
   const lat=parseFloat(el.dataset.lat), lon=parseFloat(el.dataset.lon);
+  const zoom=parseInt(el.dataset.zoom,10)||12;
   const label=el.dataset.label||'';
   if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
   _ensureLeaflet(function(){
     try{
       if(window._dpMap){ try{ window._dpMap.remove(); }catch(e){} window._dpMap=null; }
-      const map=L.map(el, {scrollWheelZoom:false, attributionControl:true}).setView([lat,lon], 12);
+      const map=L.map(el, {scrollWheelZoom:false, attributionControl:true}).setView([lat,lon], zoom);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap'
@@ -1576,7 +1744,7 @@ function dpInitMap(){
 
 // ══════════ DEMO_ADS ══════════
 const DEMO_ADS = [
-  {id:1,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appart. luxueux 3 ch. — Nouakchott Ouest',desc:'تشطيب عالي الجودة، تكييف مركزي، إطلالة بانورامية، موقف سيارات، حراسة 24/7',descFr:'Finition haut de gamme, clim. centrale, vue panoramique, parking, gardiennage 24/24',price:'150,000 MRU/شهر',priceNum:150000,rooms:3,verified:true,pin:true,emoji:'🏠',loc:'📍 نواكشوط الغربية',seller:'محمد الأمين',date:'منذ ساعتين'},
+  {id:1,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appart. luxueux 3 ch. — Nouakchott Ouest',desc:'تشطيب عالي الجودة، تكييف مركزي، إطلالة بانورامية، موقف سيارات، حراسة 24/7',descFr:'Finition haut de gamme, clim. centrale, vue panoramique, parking, gardiennage 24/24',price:'150,000 MRU/شهر',priceNum:150000,rooms:3,verified:true,pin:true,emoji:'🏠',loc:'📍 نواكشوط الغربية',lat:18.0855,lon:-15.9620,seller:'محمد الأمين',date:'منذ ساعتين'},
   {id:2,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الشمالية',title:'شقة 2 غرف — حي تفرغ زينة',titleFr:'Appart. 2 ch. — Quartier Tevragh-Zeina',desc:'قريبة من المدارس والمستشفيات، هادئة، مفروشة بالكامل',descFr:'Proche écoles et hôpitaux, calme, entièrement meublé',price:'80,000 MRU/شهر',priceNum:80000,rooms:2,verified:true,pin:false,emoji:'🏠',loc:'📍 نواكشوط الشمالية',seller:'فاطمة بنت احمد',date:'منذ 4 ساعات'},
   {id:3,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الجنوبية',title:'شقة راقية مع حديقة — حي الصداقة',titleFr:'Appart. haut de gamme avec jardin — Hay Sadaqa',desc:'الطابق الأرضي، حديقة خاصة، مطبخ مجهز، 3 حمامات',descFr:'Rez-de-chaussée, jardin privé, cuisine équipée, 3 salles de bain',price:'220,000 MRU/شهر',priceNum:220000,rooms:4,verified:false,pin:true,emoji:'🏡',loc:'📍 نواكشوط الجنوبية',seller:'شركة العقارات الذهبية',date:'أمس'},
   {id:4,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط',title:'استوديو مؤثث — وسط المدينة',titleFr:'Studio meublé — Centre-ville',desc:'مثالي للطلاب والعزاب، قريب من الجامعة، إنترنت مجاني',descFr:'Idéal pour étudiants et célibataires, proche université, internet gratuit',price:'35,000 MRU/شهر',priceNum:35000,rooms:0,verified:true,pin:false,emoji:'🛏️',loc:'📍 نواكشوط',seller:'خديجة منت محمد',date:'منذ يومين'},
@@ -1604,6 +1772,11 @@ const DEMO_ADS = [
   {id:26,subcat:'أسمنت وحديد',cat:'بناء',wilaya:'نواكشوط',title:'حديد تسليح وأسمنت — أسعار الجملة',titleFr:'Fer à béton & ciment — Prix de gros',desc:'توريد مباشر من المصنع، جودة مضمونة',descFr:'Fourniture directe d\'usine, qualité garantie',price:'يبدأ من 4,500 MRU/طن',priceNum:4500,rooms:0,verified:true,pin:false,emoji:'🧱',loc:'📍 نواكشوط',seller:'مواد البناء الحديثة',date:'منذ 6 أيام'},
   {id:27,subcat:'ألواح شمسية',cat:'بناء',wilaya:'نواذيبو',title:'ألواح طاقة شمسية — تركيب وصيانة',titleFr:'Panneaux solaires — Installation & maintenance',desc:'حلول طاقة متكاملة للمنازل والشركات',descFr:'Solutions énergétiques complètes pour maisons et entreprises',price:'تفاوض',priceNum:0,rooms:0,verified:true,pin:true,emoji:'🔆',loc:'📍 نواذيبو',seller:'الطاقة الخضراء موريتانيا',date:'منذ 3 أيام'},
 ];
+
+// ألبومات تجريبية لبطاقة الكاروسيل الفاخرة (إن لم توجد صور حقيقية)
+if(window.RizqAdCards && typeof RizqAdCards.seedDemoGalleries==='function'){
+  try{ RizqAdCards.seedDemoGalleries(DEMO_ADS); }catch(eSeed){}
+}
 
 // ══════════ ALL_ADS_DATA (phone numbers) ══════════
 const ALL_ADS_DATA = [];
@@ -1680,6 +1853,8 @@ function _mapRawAdsToDisplay(rawList){
         negotiable:!!a.negotiable,urgent:!!a.urgent,hidePhone:!!a.hidePhone,
         seller_trust_score:(a.seller_trust_score!=null)?Number(a.seller_trust_score):undefined,
         stockQty:(a.stockQty!=null && Number.isFinite(Number(a.stockQty)))?Number(a.stockQty):null,
+        lat:(a.lat!=null && Number.isFinite(Number(a.lat)))?Number(a.lat):null,
+        lon:(a.lon!=null && Number.isFinite(Number(a.lon)))?Number(a.lon):null,
         loc:a.wilaya?('📍 '+a.wilaya):noLoc,seller:sellerLbl,date:a.date||'',
         createdAt:a.createdAt||a.date||a.updatedAt||'',
         accountId:a.accountId||'', phone:'', contactsLocked:!!a.contactsLocked,
@@ -2194,35 +2369,38 @@ function _syncBrowseFiltersToUrl(opts){
 }
 
 function _adCardHtml(a, fr){
-  const svgIcon=iconHTML(a.emoji);
   const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
   const _title=adTitleLocalized(a);
   const _price=fr?priceFr(a.price||''):(a.price||'');
   const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
-  const _disc=a.discountPct>0?`<span class="rc-discount-badge">-${a.discountPct}%</span>`:'';
-  const nImg=(a.images&&a.images.length)||0;
-  const photoCount=nImg>1?`<span class="rc-photo-count">📷 ${nImg}</span>`:'';
-  let thumbInner;
-  if(a.images&&a.images[0]){
-    if(window.RizqUx&&typeof RizqUx.imgHtml==='function'){
-      thumbInner=RizqUx.imgHtml(a.images[0],{alt:_title});
-    } else {
-      thumbInner=`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">`;
-    }
-  } else {
-    thumbInner=svgIcon;
-  }
-  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="selectAd('${String(a.id).replace(/'/g,"\\'")}')">
-    <div class="rc-thumb">${thumbInner}${_disc}${photoCount}</div>
+  const idJs=String(a.id).replace(/'/g,"\\'");
+  const media=(window.RizqAdCards&&typeof RizqAdCards.mediaHtml==='function')
+    ? RizqAdCards.mediaHtml(a,{
+        fr:!!fr,
+        price:_price,
+        pin:!!(a.pin||a.boosted||a.featured),
+        emoji:a.emoji,
+        bg:a.bg||'linear-gradient(145deg,#12284a,#1B3A6B)',
+        title:_title
+      })
+    : `<div class="rc-thumb">${(a.images&&a.images[0])?`<img src="${escapeHtml(a.images[0])}" alt="${escapeHtml(_title)}" loading="lazy">`:iconHTML(a.emoji)}</div>`;
+  const actions=(window.RizqAdCards&&typeof RizqAdCards.actionsHtml==='function')
+    ? RizqAdCards.actionsHtml(a,{fr:!!fr})
+    : '';
+  const catLabel=escapeHtml(fr?(a.catFR||a.cat||''):(a.cat||''));
+  return `<div class="rc ${isActive}" data-ad-id="${escapeHtml(String(a.id))}" onclick="if(event.target.closest&&event.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions'))return;selectAd('${idJs}')">
+    ${media}
     <div class="rc-body">
+      ${catLabel?`<div class="rc-cat">${catLabel}</div>`:''}
       <div class="rc-title">${escapeHtml(_title)}</div>
-      <div class="rc-price">${escapeHtml(_price)}${a.originalPriceNum>0?` <span class="rc-price-orig">${a.originalPriceNum.toLocaleString()} MRU</span>`:''}</div>
       <div class="rc-meta">
         <span class="rc-loc">${escapeHtml(_loc)}</span>
-        ${a.boosted?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:(a.pin?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
-        ${a.verified?`<span class="rc-verified">✓</span>`:''}
-        ${(a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
+        ${/* شارة مميّز على الصورة (rzq-adx-badge) — لا تُكرر بجانب أزرار الاتصال */''}
+        ${(!media.includes('rzq-adx-media') && a.boosted)?`<span class="rc-sponsored">⭐ ${fr?'Sponsorisé':'مُموَّل'}</span>`:((!media.includes('rzq-adx-media') && a.pin)?`<span class="rc-pin">⭐ ${fr?'Vedette':'مميّز'}</span>`:'')}
+        ${(!media.includes('rzq-adx-media') && a.verified)?`<span class="rc-verified">✓</span>`:''}
+        ${(!media.includes('rzq-adx-media') && a.stockQty!=null && a.stockQty<=5)?`<span class="rc-stock-badge">⚡ ${fr?('Il ne reste que '+a.stockQty+' !'):('متبقي '+a.stockQty+' فقط')}</span>`:''}
       </div>
+      ${actions}
     </div>
   </div>`;
 }
@@ -2268,6 +2446,7 @@ function renderResultList(){
   }
 
   body.innerHTML=items.map(a=>_adCardHtml(a,fr)).join('') + _infiniteStatusHtml(fr);
+  if(window.RizqAdCards && typeof RizqAdCards.bindAll==='function') RizqAdCards.bindAll(body);
   if(pagEl) pagEl.innerHTML='';
   _bindInfiniteScroll();
 }
@@ -2331,11 +2510,63 @@ function gotoPage(p){
   if(body) body.scrollTop=0;
 }
 
+/** أخفِ شريط البحث/فوتر الروابط أثناء لوحة التفاصيل — لا تقطع الصورة ولا تطفو فوقها */
+function syncDetailChrome(open){
+  var hide = !!open;
+  var nodes = [
+    document.getElementById('nav-browse-search'),
+    document.querySelector('nav.rizq-search-strip-nav'),
+    document.getElementById('mobile-tabs'),
+    document.getElementById('mobile-stats-slot'),
+    document.querySelector('footer.rizq-footer'),
+    document.querySelector('.rzq-ft-toggle-row'),
+    document.querySelector('.rzq-ft-adminia-stack'),
+    document.querySelector('.rzq-ft-toggle-btn'),
+    document.getElementById('fixed-disc-pill')
+  ];
+  for(var i=0;i<nodes.length;i++){
+    var el=nodes[i];
+    if(!el) continue;
+    if(hide){
+      if(el.dataset.rzqDetailPrevDisplay==null) el.dataset.rzqDetailPrevDisplay = el.style.display || '';
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+      el.setAttribute('aria-hidden','true');
+    } else {
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('pointer-events');
+      if(el.dataset.rzqDetailPrevDisplay!=null){
+        if(el.dataset.rzqDetailPrevDisplay) el.style.display = el.dataset.rzqDetailPrevDisplay;
+        delete el.dataset.rzqDetailPrevDisplay;
+      }
+      el.removeAttribute('aria-hidden');
+    }
+  }
+  document.querySelectorAll('.rzq-ft-toggle-row, .rzq-ft-toggle-btn, .rzq-ft-adminia-stack').forEach(function(el){
+    if(!el) return;
+    if(hide){
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+    } else {
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('pointer-events');
+    }
+  });
+}
+
 // ══════════ CORE SPA: selectAd ══════════
 function selectAd(id){
   const ad=getAdById(id);
   window._currentAd=ad;
   _phoneRevealed=false;
+  try{
+    if(window.RizqAdCards && typeof RizqAdCards.markViewed==='function') RizqAdCards.markViewed(ad && ad.id);
+    else if(typeof window.rizqMarkAdViewed==='function') window.rizqMarkAdViewed(ad && ad.id);
+  }catch(eView){}
   try { window.dispatchEvent(new CustomEvent('rizq:ad-context', { detail: { id: ad.id, ad: ad } })); } catch(e){}
   /* غذِّ أفكار الأنماط من المنتج المعروض (قميص، هاتف، حذاء، ساعة…) */
   try {
@@ -2384,6 +2615,7 @@ function selectAd(id){
   // Show detail overlay sheet
   document.querySelector('.browse-wrap').classList.add('has-detail');
   document.body.classList.add('rizq-detail-open');
+  try{ syncDetailChrome(true); }catch(eChrome){}
   const ed=document.getElementById('empty-detail');
   if(ed) ed.style.display='none';
   const dc=document.getElementById('detail-content');
@@ -2395,9 +2627,16 @@ function selectAd(id){
   // Mobile: also mark detail tab
   if(window.innerWidth<=900) switchTab('detail');
 
-  // Scroll sheet to top
+  // Scroll sheet to top — تحت الهيدر مباشرة بلا قص
   const br=document.getElementById('browse-right');
-  if(br) br.scrollTop=0;
+  if(br){ br.scrollTop=0; }
+  if(dc){ dc.scrollTop=0; }
+  requestAnimationFrame(function(){
+    const r=document.getElementById('browse-right');
+    const c=document.getElementById('detail-content');
+    if(r) r.scrollTop=0;
+    if(c) c.scrollTop=0;
+  });
 }
 
 function renderDetailPanel(ad){
@@ -2470,10 +2709,11 @@ function renderDetailPanel(ad){
     ad.verified?`<span class="tag tag-link" onclick="rizqTagClick(this)" data-filter="verified" data-value="true" title="${fr?'Vendeurs vérifiés seulement':'الموثّقون فقط'}">✅ ${fr?'Vérifié':'موثّق'}</span>`:'',
   ].filter(Boolean).join('');
 
-  // Map
+  // Map — GPS محفوظ إن وُجد، وإلا مركز الولاية
   const mapHTML=buildMapHTML(ad);
-  const _mc=_wilayaCoords(ad);
-  const mapLink=`https://www.openstreetmap.org/?mlat=${_mc.lat}&mlon=${_mc.lon}#map=13/${_mc.lat}/${_mc.lon}`;
+  const _mc=_adCoords(ad);
+  const _mapZ=_mc.precise?16:13;
+  const mapLink=`https://www.openstreetmap.org/?mlat=${_mc.lat}&mlon=${_mc.lon}#map=${_mapZ}/${_mc.lat}/${_mc.lon}`;
 
   // Similar / also-liked / same-type recommendation rails
   function _adKind(a){
@@ -2589,6 +2829,46 @@ function renderDetailPanel(ad){
           ${ad.boosted?`<div class="dp-pin-badge">⭐ ${fr?'Sponsorisé':'مُموَّل'}</div>`:(ad.pin?`<div class="dp-pin-badge">${_t('dp-featured')}</div>`:'')}
           ${(ad.stockQty!=null && ad.stockQty<=5)?`<div class="dp-stock-badge">⚡ ${fr?('Il ne reste que '+ad.stockQty+' !'):('متبقي '+ad.stockQty+' فقط')}</div>`:''}
         </div>
+
+        <!-- Contact beside gallery — fills the former empty column gap -->
+        <div class="dp-contact">
+          ${window.RizqUx&&typeof RizqUx.trustCardHtml==='function'
+            ? RizqUx.trustCardHtml(ad)
+            : `<div class="dp-seller-row">
+            <div class="dp-seller-av">${ad.emoji||'🏠'}</div>
+            <div style="flex:1">
+              <div class="dp-seller-name">${escapeHtml(ad.seller||(fr?'Vendeur':'البائع'))}</div>
+              ${ad.verified?`<div class="dp-seller-badge">${_t('dp-seller-verified')}</div>`:''}
+              <div class="dp-stars">
+                <span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star">★</span>
+                <span style="font-size:10px;color:var(--text-muted);margin-right:4px">4.0</span>
+              </div>
+            </div>
+          </div>`}
+          ${storeCtaHTML}
+
+          <!-- بوابة تسجيل: كشف الرقم/اتصال/واتساب/رسالة عبر rizqRequireAuth() -->
+          <div class="dp-phone-reveal" id="dp-phone-reveal" onclick="rizqRequireAuth(function(){dpRevealPhone()},'reasonPhone')">
+            <div class="dp-phone-num" id="dp-phone-num" dir="ltr">${ad.phone?escapeHtml(ad.phone):(fr?'N° disponible':'الرقم متاح')}</div>
+            <div class="dp-phone-hint" id="dp-phone-hint">${_t('dp-phone-hint')}</div>
+          </div>
+
+          <div class="dp-contact-btns">
+            <button class="dp-btn-call" onclick="rizqRequireAuth(function(){dpCallNow()},'reasonPhone')">${_t('dp-call')}</button>
+            <button class="dp-btn-wa" onclick="rizqRequireAuth(function(){dpOpenWhatsApp()},'reasonWhatsapp')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span>${_t('dp-whatsapp')}</span>
+            </button>
+            <button class="dp-btn-msg" onclick="rizqRequireAuth(function(){openChat()},'reasonMsg')">${_t('dp-msg')}</button>
+          </div>
+
+          <div class="dp-actions-row">
+            <button class="dp-btn-action ${favs.has(String(ad.id))?'on':''}" id="dp-fav-btn" onclick="var _b=this;rizqRequireAuth(function(){dpToggleFav(_b)},'reasonFav')">${_t('save-ad')}</button>
+            <button class="dp-btn-action" onclick="dpShareAd()">${_t('share-ad')}</button>
+            <button class="dp-btn-action" onclick="showToast('${fr?'🖨️ Impression...':'🖨️ طباعة الإعلان...'}');window.print()">${_t('dp-print')}</button>
+          </div>
+          <div class="dp-report" onclick="dpReport()">${_t('dp-report')}</div>
+        </div>
       </div>
     </div>
 
@@ -2617,48 +2897,6 @@ function renderDetailPanel(ad){
       <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:10px">${escapeHtml(adLoc)}</p>
       <div class="dp-map-wrap">${mapHTML}</div>
       <a href="${mapLink}" target="_blank" rel="noopener" class="dp-map-link">${_t('dp-map-link')}</a>
-    </div>
-
-    <!-- Contact Card -->
-    <div class="dp-contact">
-      ${window.RizqUx&&typeof RizqUx.trustCardHtml==='function'
-        ? RizqUx.trustCardHtml(ad)
-        : `<div class="dp-seller-row">
-        <div class="dp-seller-av">${ad.emoji||'🏠'}</div>
-        <div style="flex:1">
-          <div class="dp-seller-name">${escapeHtml(ad.seller||(fr?'Vendeur':'البائع'))}</div>
-          ${ad.verified?`<div class="dp-seller-badge">${_t('dp-seller-verified')}</div>`:''}
-          <div class="dp-stars">
-            <span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star on">★</span><span class="dp-star">★</span>
-            <span style="font-size:10px;color:var(--text-muted);margin-right:4px">4.0</span>
-          </div>
-        </div>
-      </div>`}
-      ${storeCtaHTML}
-
-      <!-- Phone reveal -->
-      <!-- بوابة تسجيل (طلب Limam 13/08/2026): كشف الرقم/اتصال/واتساب/رسالة/
-           مفضلة تتطلب تسجيلاً سريعاً للزائر — rizqRequireAuth() (من
-           rizq_auth_gate.js) تُنفِّذ الفعل فوراً إن كان مسجَّلاً، وإلا
-           تفتح نافذة التسجيل وتُنفِّذه تلقائياً بعد النجاح. -->
-      <div class="dp-phone-reveal" id="dp-phone-reveal" onclick="rizqRequireAuth(function(){dpRevealPhone()},'reasonPhone')">
-        <div class="dp-phone-num" id="dp-phone-num" dir="ltr">${ad.phone?escapeHtml(ad.phone):(fr?'N° disponible':'الرقم متاح')}</div>
-        <div class="dp-phone-hint" id="dp-phone-hint">${_t('dp-phone-hint')}</div>
-      </div>
-
-      <button class="dp-btn-call" onclick="rizqRequireAuth(function(){dpCallNow()},'reasonPhone')">${_t('dp-call')}</button>
-      <button class="dp-btn-wa" onclick="rizqRequireAuth(function(){dpOpenWhatsApp()},'reasonWhatsapp')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        <span>${_t('dp-whatsapp')}</span>
-      </button>
-      <button class="dp-btn-msg" onclick="rizqRequireAuth(function(){openChat()},'reasonMsg')">${_t('dp-msg')}</button>
-
-      <div class="dp-actions-row">
-        <button class="dp-btn-action ${favs.has(String(ad.id))?'on':''}" id="dp-fav-btn" onclick="var _b=this;rizqRequireAuth(function(){dpToggleFav(_b)},'reasonFav')">${_t('save-ad')}</button>
-        <button class="dp-btn-action" onclick="dpShareAd()">${_t('share-ad')}</button>
-        <button class="dp-btn-action" onclick="showToast('${fr?'🖨️ Impression...':'🖨️ طباعة الإعلان...'}');window.print()">${_t('dp-print')}</button>
-      </div>
-      <div class="dp-report" onclick="dpReport()">${_t('dp-report')}</div>
     </div>
 
     <!-- Intermediary Disclaimer -->
@@ -2968,6 +3206,7 @@ function rizqTagClick(el){
   if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
   document.body.classList.remove('rizq-detail-open');
+  try{ syncDetailChrome(false); }catch(eChrome){}
   window._currentAd=null;
   // على الموبايل: switchTab
   switchTab('list');
@@ -2982,6 +3221,7 @@ function closeAdDetail(){
   if(ed) ed.style.display='none';
   document.querySelector('.browse-wrap').classList.remove('has-detail');
   document.body.classList.remove('rizq-detail-open');
+  try{ syncDetailChrome(false); }catch(eChrome){}
   document.querySelectorAll('.rc').forEach(el=>el.classList.remove('active'));
   window._currentAd=null;
   if(window.innerWidth<=900) switchTab('list');
@@ -3089,13 +3329,19 @@ function switchTab(tab){
     right.classList.add('tab-hidden');right.classList.remove('tab-active');
     if(window.innerWidth<=900 && wrap && !window._currentAd){
       wrap.classList.remove('has-detail');
+      document.body.classList.remove('rizq-detail-open');
+      try{ syncDetailChrome(false); }catch(e){}
     }
     if(btnList){btnList.classList.add('active');}
     if(btnDetail){btnDetail.classList.remove('active');}
   } else {
     right.classList.remove('tab-hidden');right.classList.add('tab-active');
     left.classList.add('tab-hidden');left.classList.remove('tab-active');
-    if(window.innerWidth<=900 && wrap) wrap.classList.add('has-detail');
+    if(window.innerWidth<=900 && wrap){
+      wrap.classList.add('has-detail');
+      document.body.classList.add('rizq-detail-open');
+      try{ syncDetailChrome(true); }catch(e){}
+    }
     if(btnDetail){btnDetail.classList.add('active');}
     if(btnList){btnList.classList.remove('active');}
   }
@@ -3631,14 +3877,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <style id="rzq-footer-css">
 footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;border-top:1px solid rgba(201,168,76,.1)!important;padding:60px 5% 0!important;color:rgba(255,255,255,.72)!important;margin:0!important;padding-bottom:0!important}
-footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:1200px!important;margin:0 auto!important;padding-bottom:50px!important}
+footer.rizq-footer .footer-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:32px!important;max-width:min(1600px,100%)!important;margin:0 auto!important;padding-bottom:50px!important}
 footer.rizq-footer .footer-col-title{font-size:12px!important;font-weight:700!important;color:#C9A84C!important;letter-spacing:2px!important;text-transform:uppercase!important;margin-bottom:18px!important;font-family:Georgia,serif!important}
 footer.rizq-footer .footer-desc{font-size:13px!important;color:rgba(255,255,255,.85)!important;line-height:1.85!important;margin-top:14px!important;max-width:280px!important}
 footer.rizq-footer .footer-links{list-style:none!important;display:flex!important;flex-direction:column!important;padding:0!important;margin:0!important}
 footer.rizq-footer .footer-links li{padding:0!important;line-height:1.6!important}
 footer.rizq-footer .footer-links li a{font-size:13px!important;color:#e0e0e0!important;text-decoration:none!important;transition:color .3s!important}
 footer.rizq-footer .footer-links li a:hover{color:#C9A84C!important}
-footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:min(1600px,100%)!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
 footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important}
 .telecom-tag{display:inline-block!important;background:rgba(201,168,76,.14)!important;border:1px solid rgba(201,168,76,.4)!important;color:rgba(201,168,76,.95)!important;font-size:10px!important;padding:4px 12px!important;border-radius:10px!important;font-weight:700!important;letter-spacing:.3px!important}
 @media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}
