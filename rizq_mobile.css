@@ -552,16 +552,13 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     width:max-content!important;
     max-width:none!important;
     direction:ltr!important;
-    animation:slide 40s linear infinite!important;
+    /* rAF + translate3d في الصفحة — لا تُجبِر animation:slide (كانت تقطّر) */
+    animation:none!important;
     will-change:transform;
     backface-visibility:hidden;
-    transform:translateZ(0);
+    transform:translate3d(0,0,0);
     gap:12px!important;
     padding-inline:12px!important;
-  }
-  /* Pause only on real hover (fine pointer) — touch :hover was sticking paused */
-  @media (hover:hover) and (pointer:fine){
-    .cards-track:hover{animation-play-state:paused!important}
   }
   .cards-track .ad-card{
     width:152px!important;
