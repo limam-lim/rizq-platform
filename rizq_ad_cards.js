@@ -6,7 +6,6 @@
   'use strict';
 
   var AUTO_MS = 3200;
-  var _rzqAdxAutoIo = null;
 
   function prefersReducedMotion() {
     try {
@@ -14,20 +13,6 @@
     } catch (e) {
       return false;
     }
-  }
-
-  function ensureAutoIo() {
-    if (_rzqAdxAutoIo || typeof IntersectionObserver === 'undefined') return _rzqAdxAutoIo;
-    _rzqAdxAutoIo = new IntersectionObserver(function (entries) {
-      for (var i = 0; i < entries.length; i++) {
-        var en = entries[i];
-        var media = en.target;
-        if (!media || !media.classList || !media.classList.contains('rzq-adx-media')) continue;
-        media._rzqAdxOffscreen = !en.isIntersecting;
-        syncAuto(media);
-      }
-    }, { root: null, rootMargin: '40px 0px', threshold: 0.2 });
-    return _rzqAdxAutoIo;
   }
 
   function clearAutoTimer(media) {
@@ -43,8 +28,8 @@
     if (!media || !media.classList.contains('has-multi')) return;
     if (prefersReducedMotion()) return;
     if (document.hidden) return;
-    if (media._rzqAdxOffscreen) return;
     if (media.classList.contains('is-holding') || media.classList.contains('is-touch')) return;
+    /* لا نوقف بسبب off-screen: بطاقات الماركي تخرج/تدخل بسرعة؛ التكلفة خفيفة */
     media._rzqAdxAutoTimer = setTimeout(function () {
       media._rzqAdxAutoTimer = 0;
       if (!media.isConnected) return;
@@ -55,7 +40,7 @@
 
   function syncAuto(media) {
     if (!media || !media.classList.contains('has-multi')) return;
-    if (prefersReducedMotion() || document.hidden || media._rzqAdxOffscreen ||
+    if (prefersReducedMotion() || document.hidden ||
         media.classList.contains('is-holding') || media.classList.contains('is-touch')) {
       clearAutoTimer(media);
       return;
@@ -418,11 +403,6 @@
     });
 
     if (multi && !prefersReducedMotion()) {
-      media._rzqAdxOffscreen = false;
-      var io = ensureAutoIo();
-      if (io) {
-        try { io.observe(media); } catch (eIo) {}
-      }
       /* تأخير بدء متدرّج حتى لا تتبدّل كل البطاقات معاً */
       var stagger = 400 + ((parseInt(media.getAttribute('data-ad-id'), 10) || 0) % 7) * 180;
       setTimeout(function () { syncAuto(media); }, stagger);
