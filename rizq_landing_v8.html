@@ -807,11 +807,24 @@ body.rizq-lang-ar .hero-lead-row{
   padding:16px 16px 12px;
   margin-bottom:0;
 }
-.hero-promo-strip{
+/* شريط الإبهار بعرض الشاشة تقريباً (خارج .hero-content الضيّق) */
+.hero-promo-strip,
+.hero > #hero-listings.hero-promo-strip{
+  align-self:stretch;
+  width:100vw;
+  max-width:100vw;
   margin-top:6px;
-  padding-top:10px;
-  padding-bottom:28px;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  padding:10px 0 28px;
+  box-sizing:border-box;
   animation:fadeUp .8s .28s ease both;
+}
+.hero-promo-strip .cards-track-wrap{
+  width:100%;
+  max-width:none;
+  padding:8px clamp(6px,1.2vw,14px);
+  box-sizing:border-box;
 }
 .categories-after-promo{
   width:100%;
@@ -4254,7 +4267,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </section>
     </div><!-- /hero-stage-intent -->
 
-  <!-- Live Listings Carousel -->
+  </div><!-- /hero-content — الهوية + البحث فقط؛ الشريط بعرض الشاشة -->
+
+  <!-- شريط العروض — عرض كامل تقريباً من يسار الشاشة إلى يمينها -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
       <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض تخطف الأنظار — سيارات، عقارات، ذهب…</span></span>
@@ -4269,9 +4284,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
   </div>
-
-  </div><!-- /hero-content -->
-</section><!-- /hero — هوية + بحث + شريط الإبهار -->
+</section><!-- /hero — هوية + بحث + شريط الإبهار بعرض الشاشة -->
 
 <!-- ══ CATEGORIES — بعد شريط الإبهار مباشرة ══ -->
 <section class="section categories-after-promo" id="categories" style="background:var(--bg-section)">
