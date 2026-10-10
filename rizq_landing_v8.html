@@ -2721,6 +2721,10 @@ main, .page-content.active, .main-content, .results-area,
 
 /* Buttons */
 .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:13px 22px;border-radius:12px;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:inline-block;text-decoration:none}
+/* زر اشتراك فخم + سطر ترويجي تحته */
+.rizq-sub-cta{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:420px;margin:0 auto}
+.rizq-sub-cta .btn-primary{box-shadow:0 10px 28px rgba(201,168,76,.38)}
+.rizq-sub-cta-sub{margin:0;font-size:13.5px;font-weight:700;color:var(--royal,#1B3A6B);line-height:1.55;opacity:.92}
 .cat-card,.listing-card,.ad-card,.product-card,.price-card{
   border:1px solid rgba(226,232,240,0.8);
   box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
@@ -4428,8 +4432,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المحلات المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="#pricing" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك فضاءك المهني</a>
+      <div class="rizq-sub-cta" style="margin-top:24px">
+        <a href="#pricing" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
+        <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن — سوقك الإلكتروني يبدأ من هنا</p>
       </div>
     </div>
   </div>
@@ -4503,9 +4508,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
+      <div class="rizq-sub-cta" style="margin-top:24px">
         <a href="#pricing" onclick="return goSubscribePackage('corp')"
-           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك معرضك الفاخر</a>
+           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
+        <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن — عرضك يصل حيث يبحث الجادّون</p>
       </div>
     </div>
 
@@ -4633,8 +4639,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
-      <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a id="vo-create-btn" href="#pricing" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك مكتبك المهني</a>
+      <div class="rizq-sub-cta" style="margin-top:24px">
+        <a id="vo-create-btn" href="#pricing" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
+        <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن — حضورك المهني لا يتوقف</p>
       </div>
     </div>
 
@@ -4694,8 +4701,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-tenders"></div>
     </div>
 
-    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
-      <a href="#pricing" onclick="return goSubscribePackage('tender')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">✨ اشترك وادخل غرفة المناقصات</a>
+    <div class="fade-in rizq-sub-cta">
+      <a href="#pricing" onclick="return goSubscribePackage('tender')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">✨ امتلك مقعدك في غرفة المناقصات</a>
+      <p class="rizq-sub-cta-sub" data-t="vt-btn-sub">اشترك الآن وافتح غرفة المناقصات</p>
     </div>
 
   </div>
@@ -4744,8 +4752,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-investments"></div>
     </div>
 
-    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
-      <a href="#pricing" onclick="return goSubscribePackage('investment')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">✨ اشترك وابدأ استثمارك</a>
+    <div class="fade-in rizq-sub-cta">
+      <a href="#pricing" onclick="return goSubscribePackage('investment')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">✨ امتلك حضورك في غرفة الاستثمارات</a>
+      <p class="rizq-sub-cta-sub" data-t="vi-btn-sub">اشترك الآن وابدأ مسار النمو</p>
     </div>
 
   </div>
@@ -8680,7 +8689,8 @@ const LANG = {
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span>رزق</span> — كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات، إلكترونيات، أثاث ومعدات — معرضك يصل لمشترين جادّين يبحثون الآن.',
-    'vsh-btn1': '✨ امتلك معرضك الفاخر',
+    'vsh-btn1': '✨ امتلك واجهة كتالوج معرضك الإلكتروني',
+    'vsh-btn1-sub': 'اشترك الآن — عرضك يصل حيث يبحث الجادّون',
     'vsh-card1-title': 'عرض يبيع قبل الرسالة', 'vsh-card1-desc': 'صور وأسعار تُقنع المشتري من أول نظرة — قبل أن يراسلك',
     'vsh-card2-title': 'تواصل بثقة عبر رزق', 'vsh-card2-desc': 'مشترون جادّون يصلون إليك — وخصوصيتك محمية دائماً',
     'vsh-card3-title': 'شارة معرض موثّق', 'vsh-card3-desc': 'شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين',
@@ -8698,7 +8708,8 @@ const LANG = {
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
     'vs-title': 'افتح محلك على <span>رزق</span> — واجهة كاملة لعملائك',
     'vs-desc': 'واجهتك التجارية باسمك — منتجاتك وثقة زبائنك في مكان يليق بمحلك.',
-    'vs-btn1': '✨ امتلك فضاءك المهني',
+    'vs-btn1': '✨ امتلك واجهة محلك الإلكترونية',
+    'vs-btn1-sub': 'اشترك الآن — سوقك الإلكتروني يبدأ من هنا',
     'vs-card1-title': 'واجهة احترافية لمحلك', 'vs-card1-desc': 'شعار، اسم تجاري، وموقعك — حضور واضح يبني ثقة الزبون من أول زيارة',
     'vs-card2-title': 'كتالوج منظم بالصور', 'vs-card2-desc': 'منتجاتك بأسعار وصور واضحة — يتصفّحها الزبون بسهولة قبل التواصل',
     'vs-card3-title': 'نمو يُرى كل يوم', 'vs-card3-desc': 'زبائن أكثر وطلبات أوضح — محلك يكبر بثقة على رزق',
@@ -8713,11 +8724,14 @@ const LANG = {
     'vo-feat2-title': 'تواصل مباشر وسهل', 'vo-feat2-desc': 'واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة',
     'vo-feat3-title': 'شارة مكتب موثّق', 'vo-feat3-desc': 'شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك',
     'vo-feat4-title': 'خدماتك معروضة بوضوح', 'vo-feat4-desc': 'قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة',
-    'vo-btn1': '✨ امتلك مكتبك المهني',
+    'vo-btn1': '✨ امتلك واجهتك المهنية الإلكترونية',
+    'vo-btn1-sub': 'اشترك الآن — حضورك المهني لا يتوقف',
     'vt-title': 'غرفة المناقصات على <span>رزق</span>',
     'vi-title': 'غرفة الاستثمارات على <span>رزق</span>',
-    'vt-btn': '✨ اشترك وادخل غرفة المناقصات',
-    'vi-btn': '✨ اشترك وابدأ استثمارك',
+    'vt-btn': '✨ امتلك مقعدك في غرفة المناقصات',
+    'vt-btn-sub': 'اشترك الآن وافتح غرفة المناقصات',
+    'vi-btn': '✨ امتلك حضورك في غرفة الاستثمارات',
+    'vi-btn-sub': 'اشترك الآن وابدأ مسار النمو',
     'hero-badge': 'السوق الإلكتروني الموريتاني',
     'search-ph': 'البحث في رزق...',
     'hbiz-stores': 'المحلات',
@@ -8809,7 +8823,8 @@ const LANG = {
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span>Rizq</span> — catalogue premium, acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements — votre showroom atteint des acheteurs sérieux, dès maintenant.',
-    'vsh-btn1': '✨ Possédez votre showroom premium',
+    'vsh-btn1': '✨ Possédez la vitrine catalogue de votre showroom',
+    'vsh-btn1-sub': 'Abonnez-vous — votre offre atteint les acheteurs sérieux',
     'vsh-card1-title': 'Une offre qui convainc avant le message', 'vsh-card1-desc': 'Photos et prix qui séduisent au premier regard — avant même qu\'on vous contacte',
     'vsh-card2-title': 'Contactez en confiance via Rizq', 'vsh-card2-desc': 'Des acheteurs sérieux vous rejoignent — votre confidentialité reste protégée',
     'vsh-card3-title': 'Badge Showroom vérifié', 'vsh-card3-desc': 'Un badge officiel sur Rizq visible sur vos offres pour renforcer la confiance',
@@ -8827,7 +8842,8 @@ const LANG = {
     'cta-trust1': 'Confiance', 'cta-trust2': 'Sécurité', 'cta-trust3': 'Transparence',
     'vs-title': 'Ouvrez votre boutique sur <span>Rizq</span> — une vitrine complète pour vos clients',
     'vs-desc': 'Votre vitrine commerciale à votre nom — produits et confiance clients dans un espace digne de votre boutique.',
-    'vs-btn1': '✨ Possédez votre espace pro',
+    'vs-btn1': '✨ Possédez la vitrine électronique de votre boutique',
+    'vs-btn1-sub': 'Abonnez-vous — votre marché électronique commence ici',
     'vs-card1-title': 'Une vitrine professionnelle', 'vs-card1-desc': 'Logo, nom commercial et emplacement — une présence claire qui inspire confiance dès la première visite',
     'vs-card2-title': 'Catalogue photo organisé', 'vs-card2-desc': 'Vos produits avec prix et photos — le client consulte facilement avant de vous contacter',
     'vs-card3-title': 'Une croissance visible chaque jour', 'vs-card3-desc': 'Plus de clients, des demandes plus claires — votre boutique grandit sur Rizq',
@@ -8842,11 +8858,14 @@ const LANG = {
     'vo-feat2-title': 'Contact direct et simple', 'vo-feat2-desc': 'WhatsApp, e-mail et téléphone — le client vous joint en un clic',
     'vo-feat3-title': 'Badge Bureau certifié', 'vo-feat3-desc': 'Un badge or sur Rizq qui inspire immédiatement confiance à vos clients',
     'vo-feat4-title': 'Vos services bien présentés', 'vo-feat4-desc': 'Une liste claire de ce que vous offrez — le client choisit et vous contacte directement',
-    'vo-btn1': '✨ Possédez votre bureau pro',
+    'vo-btn1': '✨ Possédez votre vitrine professionnelle en ligne',
+    'vo-btn1-sub': 'Abonnez-vous — votre présence pro ne s\'arrête pas',
     'vt-title': 'La salle des appels d\'offres sur <span>Rizq</span>',
     'vi-title': 'La salle des investissements sur <span>Rizq</span>',
-    'vt-btn': '✨ Abonnez-vous à la salle des appels d\'offres',
-    'vi-btn': '✨ Abonnez-vous et démarrez votre investissement',
+    'vt-btn': '✨ Réservez votre place dans la salle des appels d\'offres',
+    'vt-btn-sub': 'Abonnez-vous et ouvrez la salle des appels d\'offres',
+    'vi-btn': '✨ Affirmez votre présence dans la salle des investissements',
+    'vi-btn-sub': 'Abonnez-vous et démarrez votre trajectoire de croissance',
     'hero-badge': 'Le marché en ligne mauritanien',
     'search-ph': 'Rechercher sur Rizq...',
     'hbiz-stores': 'Boutiques',
