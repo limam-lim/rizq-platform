@@ -807,7 +807,7 @@ body.rizq-lang-ar .hero-lead-row{
   padding:16px 16px 12px;
   margin-bottom:0;
 }
-/* شريط الإبهار: الحاوية نفسها تدخل 2سم من كل حافة (padding لا يقصّ translate) */
+/* شريط الإبهار: الحاوية تدخل 0.5سم من كل حافة (padding لا يقصّ translate) */
 .hero > #hero-listings.hero-promo-strip{
   align-self:stretch;
   width:100%;
@@ -820,10 +820,10 @@ body.rizq-lang-ar .hero-lead-row{
 }
 .hero > #hero-listings .cards-track-wrap,
 #hero-listings.hero-promo-strip .cards-track-wrap{
-  /* قصّ حقيقي عند ~2سم من يسار/يمين الشاشة — margin وليس padding */
-  width:calc(100% - 4cm)!important;
+  /* قصّ حقيقي عند ~0.5سم من يسار/يمين الشاشة — margin وليس padding */
+  width:calc(100% - 1cm)!important;
   max-width:none!important;
-  margin:0 2cm!important;
+  margin:0 0.5cm!important;
   padding:8px 0!important;
   box-sizing:border-box!important;
   overflow:hidden!important;
@@ -2693,7 +2693,7 @@ html[dir="ltr"] .listings-section .section-desc{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
     direction:ltr!important;border-radius:0!important;
-    width:calc(100% - 4cm)!important;margin:0 2cm!important;padding:6px 0!important;
+    width:calc(100% - 1cm)!important;margin:0 0.5cm!important;padding:6px 0!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
