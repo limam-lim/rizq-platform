@@ -923,6 +923,33 @@ body.rizq-lang-ar .hero-browse-panel .qcat-name{
 }
 .hero-browse-panel #qcat-inline-panel{margin-top:6px}
 
+/* البحث مباشرة فوق جميع الأقسام — وحدة اكتشاف واحدة */
+.categories-after-browse{
+  width:100%;
+  max-width:min(1080px,94vw);
+  margin:10px auto 8px;
+  padding:28px 4% 36px!important;
+  border-radius:22px;
+  box-sizing:border-box;
+  position:relative;
+  z-index:50;
+}
+.categories-after-browse .section-header{margin-bottom:16px}
+.hero-after-cats{
+  width:100%;
+  max-width:min(960px,86vw);
+  margin:8px auto 0;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:18px;
+  box-sizing:border-box;
+}
+@media(max-width:699px){
+  .categories-after-browse{padding:18px 3% 24px!important;margin-top:6px;border-radius:16px}
+  .hero-after-cats{max-width:94vw;gap:14px}
+}
+
 /* ══ HERO FEATURED VIDEO AD (مضغوط تحت مسار التصفح) ══ */
 .hero-vid-wrap{
   width:100%;
@@ -4255,7 +4282,22 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </div>
         <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
       </section>
+    </div><!-- /hero-stage — ينتهي بعد البحث ليليَه قسم الأقسام بعرض كامل -->
 
+    <!-- اكتشاف السوق: البحث أعلاه، ثم جميع الأقسام مباشرة -->
+    <section class="section categories-after-browse" id="categories" style="background:var(--bg-section)">
+      <div class="section-header fade-in">
+        <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
+        <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
+        <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
+      </div>
+      <div class="cats-grid">
+        <div id="builtin-cats-mount"></div>
+        <div id="cat-inline-panel"></div>
+      </div>
+    </section>
+
+    <div class="hero-after-cats">
       <!-- 3) تحويل أساسي -->
       <div class="hero-cta-wrap">
         <button type="button" class="hero-cta-primary" onclick="goToPost()">
@@ -4327,8 +4369,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <span class="h-stat-lbl" data-t="stat-free">النشر الأساسي</span>
         </div>
       </div>
-    </div>
-  </div>
+    </div><!-- /hero-after-cats -->
+  </div><!-- /hero-content -->
 
   <!-- Live Listings Carousel -->
   <div class="hero-listings-section" id="hero-listings">
@@ -4355,20 +4397,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div class="rvid-section-title" id="rvid-section-title"></div>
       <div class="rvid-section-sub" id="rvid-section-sub"></div>
     </div>
-  </div>
-</section>
-
-<!-- ══ CATEGORIES ══ -->
-<section class="section" id="categories" style="background:var(--bg-section)">
-  <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
-    <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
-    <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
-  </div>
-  <div class="cats-grid">
-    <div id="builtin-cats-mount"></div>
-    <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
-    <div id="cat-inline-panel"></div>
   </div>
 </section>
 
