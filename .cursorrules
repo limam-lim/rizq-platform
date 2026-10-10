@@ -26,8 +26,18 @@ Goal: Ensure zero vulnerabilities, data leaks, or architectural security flaws i
 - Sanitize user inputs fed into LLMs or AI Agents.
 - Prevent Prompt Injections by separating instructions from user context explicitly.
 
-## 5. Automated Audit Task
-Whenever asked to "Audit Security" or before making a production build/deployment:
-- Scan the diffs for security smells.
-- Highlight potential vulnerabilities with severity levels: [CRITICAL], [HIGH], [MEDIUM], [LOW].
-- Provide the exact secure code fix immediately.
+## 5. Automated Audit Task (MANDATORY — NO USER ASK REQUIRED)
+
+**Standing order — always active without the user typing it:**
+> «قم بإجراء فحص أمني شامل (Security Audit) المشروع بأسلوب الهكر الأخلاقي واكتشف أي ثغرات قبل الرفع.»
+
+### Automatic gates
+1. Before any `git push` / PR / deploy / publish / production build — full ethical-hacking Security Audit.
+2. During all feature/fix work — enforce OWASP, multi-tenant, secrets, prompt-injection in real time.
+3. Session start — quick smoke check (auth, secrets, XSS, new endpoints).
+
+### Procedure
+- Scan diffs; tag `[CRITICAL]` / `[HIGH]` / `[MEDIUM]` / `[LOW]`.
+- Fix immediately with exact secure code.
+- Block push/deploy until CRITICAL/HIGH are fixed (unless explicit user override).
+- Report: سليم / وُجد وأُصلح … with the push summary.

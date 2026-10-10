@@ -1,5 +1,5 @@
 ---
-description: Security & Ethical Hacking Auditor — always-on OWASP, multi-tenant, secrets, and AI agent protections
+description: Always-on Security & Ethical Hacking Auditor — auto audit before every push/deploy without user ask
 alwaysApply: true
 ---
 
@@ -10,27 +10,27 @@ Goal: Ensure zero vulnerabilities, data leaks, or architectural security flaws i
 
 **Layering:** Adds to (does not replace) Master Constitution, AI Harness/SDD, and sovereign skills in `/cursor/stores/user/`.
 
-## 1. OWASP Top 10 Protections
-- **SQL/NoSQL Injection:** Always use parameterized queries, ORM sanitization, or prepared statements. Never concatenate user input into database queries.
-- **XSS (Cross-Site Scripting):** Sanitize and encode all user-generated content before rendering.
-- **Authentication & JWT:** Ensure strong hashing (Argon2/Bcrypt) for passwords. Validate JWT signatures and expiration strictly on every protected route.
-- **CSRF:** Enforce anti-CSRF tokens for state-changing HTTP requests.
+## Standing order (automatic — user does NOT need to ask)
 
-## 2. Multi-Tenant & API Security
-- **Data Isolation:** Ensure queries explicitly check tenant/user IDs (e.g., `where store_id = current_store_id`) to avoid data leaks across accounts.
-- **Rate Limiting:** Recommend and implement rate limiters on sensitive endpoints (Login, Register, Payment, AI Agent requests).
-- **Access Control:** Enforce Role-Based Access Control (RBAC) on both Frontend & Backend API routes.
+Always treat this as active:
+> «قم بإجراء فحص أمني شامل (Security Audit) المشروع بأسلوب الهكر الأخلاقي واكتشف أي ثغرات قبل الرفع.»
 
-## 3. Secrets & Environment Management
-- NEVER allow API keys, private tokens, passwords, or credentials directly in code.
-- Always check if secrets are stored in `.env` files and added to `.gitignore`.
+### MUST run automatically
+1. **Before** any `git push`, PR create/update, deploy, publish, or production build.
+2. **During** every feature/fix (OWASP, multi-tenant, secrets, prompt injection).
+3. **Session start** smoke check on auth, client secrets, XSS sinks, new endpoints.
 
-## 4. AI Agent Security (Prompt Injection)
-- Sanitize user inputs fed into LLMs or AI Agents.
-- Prevent Prompt Injections by separating instructions from user context explicitly.
+### Procedure
+- Scan diffs + sensitive paths; tag `[CRITICAL]` / `[HIGH]` / `[MEDIUM]` / `[LOW]`.
+- Apply the exact secure fix immediately (do not only report).
+- **Block push/deploy** until CRITICAL/HIGH are cleared (unless explicit written override).
+- Brief: سليم / وُجد وأُصلح … with the push summary.
 
-## 5. Automated Audit Task
-Whenever asked to "Audit Security" or before making a production build/deployment:
-- Scan the diffs for security smells.
-- Highlight potential vulnerabilities with severity levels: [CRITICAL], [HIGH], [MEDIUM], [LOW].
-- Provide the exact secure code fix immediately.
+## OWASP / API / Secrets / AI (always)
+- Parameterized queries only; never concatenate user input into DB queries.
+- Sanitize/encode all user-generated content before render (XSS).
+- Argon2/Bcrypt passwords; validate JWT signature + expiry on every protected route.
+- Anti-CSRF on state-changing requests.
+- Tenant/user ID isolation on every query; RBAC on FE + BE; rate-limit Login/Register/Payment/AI.
+- Never commit secrets; `.env` + `.gitignore` only.
+- Separate LLM system instructions from user context; sanitize agent inputs.

@@ -47,8 +47,26 @@ Goal: Ensure zero vulnerabilities, data leaks, or architectural security flaws i
 - Sanitize user inputs fed into LLMs or AI Agents.
 - Prevent Prompt Injections by separating instructions from user context explicitly.
 
-## 5. Automated Audit Task
-Whenever asked to "Audit Security" or before making a production build/deployment:
-- Scan the diffs for security smells.
-- Highlight potential vulnerabilities with severity levels: [CRITICAL], [HIGH], [MEDIUM], [LOW].
-- Provide the exact secure code fix immediately.
+## 5. Automated Audit Task (MANDATORY — NO USER ASK REQUIRED)
+
+**Standing order — apply on EVERY future task automatically.**
+
+Treat this intent as always active (user does NOT need to type it):
+> «قم بإجراء فحص أمني شامل (Security Audit) المشروع بأسلوب الهكر الأخلاقي واكتشف أي ثغرات قبل الرفع.»
+
+Also triggers on English: "Audit Security", "security audit", "ethical hack", or equivalent.
+
+### Automatic gates (no waiting for a request)
+1. **Before any `git push`, PR create/update, deploy, publish, or production build** — run the full ethical-hacking Security Audit of the changes and sensitive touched surfaces.
+2. **During any feature/fix work** — enforce OWASP / multi-tenant / secrets / prompt-injection in real time.
+3. **At session start** — quick smoke check: auth still server-backed, no new plaintext secrets in client HTML/JS, no new XSS sinks (`innerHTML` with unsanitized input), new endpoints authenticated/authorized.
+
+### Audit procedure
+- Scan diffs + related auth/API/render/AI paths for security smells.
+- Tag every finding: `[CRITICAL]`, `[HIGH]`, `[MEDIUM]`, `[LOW]`.
+- Provide and **apply** the exact secure code fix immediately.
+- **Block push/deploy** until `[CRITICAL]` and `[HIGH]` are fixed (unless the user explicitly overrides in writing).
+- Report briefly: سليم / وُجد وأُصلح … before or with the push summary.
+
+### Hard rule
+Never push, open a ship-ready PR, or deploy without this automatic Security Audit gate.

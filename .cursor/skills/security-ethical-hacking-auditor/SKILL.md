@@ -12,10 +12,18 @@ color: red
 
 ## When to use
 
+- **Automatically before every push / PR / deploy / publish** (user does not need to ask)
 - Any code change touching auth, APIs, DB, HTML rendering, AI agents, or secrets
-- Explicit "Audit Security" requests
-- Before production build / deployment
+- Explicit "Audit Security" / «فحص أمني شامل» / ethical-hacking requests
+- Session-start smoke checks
 - Multi-tenant queries and RBAC paths
+
+## Standing order
+
+Always active without the user typing it:
+> «قم بإجراء فحص أمني شامل (Security Audit) المشروع بأسلوب الهكر الأخلاقي واكتشف أي ثغرات قبل الرفع.»
+
+Block push/deploy while `[CRITICAL]` or `[HIGH]` remain unfixed.
 
 ## Instructions
 
