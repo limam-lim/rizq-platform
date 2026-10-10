@@ -2699,15 +2699,37 @@ try {
 
 const agentMissLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'طلبات كثيرة' },
 });
 
+/** قبول تسجيل miss فقط من أصول المنصة (أو بلا Origin خارج الإنتاج للأدوات المحلية) */
+function isAllowedAgentMissCaller(req) {
+  const origin = String(req.header('origin') || '').trim();
+  if (origin) {
+    if (origin === 'null') return !isProdEnv();
+    return ALLOWED_ORIGINS.includes(origin) || isDevPreviewOrigin(origin);
+  }
+  const referer = String(req.header('referer') || '').trim();
+  if (referer) {
+    try {
+      const o = new URL(referer).origin;
+      return ALLOWED_ORIGINS.includes(o) || isDevPreviewOrigin(o);
+    } catch (e) {
+      return false;
+    }
+  }
+  return !isProdEnv();
+}
+
 /** POST /api/agent/miss — تسجيل سؤال فائت/رد ضعيف من الواجهة (أوفلاين أو ويدجت) */
 app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
   try {
+    if (!isAllowedAgentMissCaller(req)) {
+      return res.status(403).json({ ok: false, error: 'origin_forbidden' });
+    }
     const aq = require('./services/agentQuality');
     const b = req.body || {};
     const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
@@ -3960,14 +3982,20 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
   });
   app.use((req, res, next) => {
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
-    // أدلة تقنية داخلية — لا تُعرض للزوّار عبر الملفات الثابتة
+    // أدلة/سكربتات/ميتا داخلية — لا تُعرض عبر الملفات الثابتة حتى في التطوير
     const p = String(req.path || '').toLowerCase();
+    const base = p.split('/').pop() || '';
     if (
-      p === '/rizq_platform_manual.md' ||
-      p.endsWith('/rizq_platform_manual.md') ||
+      p === '/docs' || p.startsWith('/docs/') ||
+      p === '/scripts' || p.startsWith('/scripts/') ||
+      p.endsWith('.md') ||
+      p.endsWith('.bat') || p.endsWith('.sh') || p.endsWith('.ps1') ||
+      p.endsWith('.yml') || p.endsWith('.yaml') ||
+      base === 'package.json' || base === 'package-lock.json' ||
       p.includes('platform_manual') ||
-      p.includes('dashboard-guide.md') ||
-      (p.endsWith('.md') && (p.includes('manual') || p.includes('audit') || p.includes('rules')))
+      p.includes('session_context') ||
+      p.includes('section_management') ||
+      decodeURIComponent(p).includes('تعليمات')
     ) {
       return notFoundHandler(req, res);
     }

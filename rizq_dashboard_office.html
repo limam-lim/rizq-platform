@@ -1823,7 +1823,11 @@ function renderDashboardActivities(accountType, acc){
   }
   if(catEl && selected){
     var legacy = RizqMerchantActivities.legacyCategoryFromActivity(selected);
-    catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+    catEl.textContent = '';
+    var opt = document.createElement('option');
+    opt.value = String(legacy || '');
+    opt.textContent = String(legacy || '');
+    catEl.appendChild(opt);
     catEl.value = legacy;
   }
 }
@@ -1832,7 +1836,11 @@ function onDashboardActivityChange(accountType){
   var catEl = document.getElementById('p-category');
   if(!actEl || !catEl || !window.RizqMerchantActivities) return;
   var legacy = RizqMerchantActivities.legacyCategoryFromActivity(actEl.value);
-  catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+  catEl.textContent = '';
+  var opt = document.createElement('option');
+  opt.value = String(legacy || '');
+  opt.textContent = String(legacy || '');
+  catEl.appendChild(opt);
   catEl.value = legacy;
 }
 function toggleActivityOther(){ onDashboardActivityChange('office'); }
@@ -1846,7 +1854,7 @@ function fillProfile(){
   window._pThumbData = OFFICE.thumb || null;
   if(window._pThumbData){
     const inner=document.getElementById('p-thumb-inner');
-    if(inner) inner.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
+    if(inner) inner.innerHTML = '<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
   }
   applySbThumb();
   const act=document.getElementById('p-activity');
@@ -1920,7 +1928,7 @@ function previewStripThumb(input){
       const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
       window._pThumbData=canvas.toDataURL('image/jpeg',0.82);
       const inner=document.getElementById('p-thumb-inner');
-      if(inner) inner.innerHTML='<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
+      if(inner) inner.innerHTML='<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
       applySbThumb();
     };
     img.src=e.target.result;

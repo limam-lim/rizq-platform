@@ -2224,7 +2224,7 @@ function fillProfileForm(){
   window._pThumbData = STORE.thumb || null;
   if(window._pThumbData){
     var inner = document.getElementById('p-thumb-inner');
-    if(inner) inner.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
+    if(inner) inner.innerHTML = '<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
   }
   applySbThumb();
 }
@@ -2255,7 +2255,7 @@ function previewStripThumb(input){
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       window._pThumbData = canvas.toDataURL('image/jpeg', 0.82);
       var inner = document.getElementById('p-thumb-inner');
-      if(inner) inner.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
+      if(inner) inner.innerHTML = '<img src="'+escapeHtml(window._pThumbData)+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
       applySbThumb();
     };
     img.src = e.target.result;
