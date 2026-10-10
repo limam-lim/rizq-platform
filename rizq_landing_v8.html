@@ -6232,8 +6232,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub">Dernières annonces — mise à jour automatique</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Offres qui impressionnent — voitures, immobilier, or…</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض تخطف الأنظار — سيارات، عقارات، ذهب…</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
