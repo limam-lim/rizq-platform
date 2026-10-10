@@ -2931,9 +2931,16 @@ var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwi
   }
 
 
-// Auto-navigate from URL hash
+// Auto-navigate from URL hash / نية الاشتراك من زر الصفحة الرئيسية
 window.addEventListener('load', function(){
   var h = location.hash.replace('#','');
+  try{
+    if(!h && sessionStorage.getItem('rizq_open_panel') === 'subscription'){
+      h = 'subscription';
+      sessionStorage.removeItem('rizq_open_panel');
+      try{ history.replaceState(null, '', location.pathname + location.search + '#subscription'); }catch(eH){}
+    }
+  }catch(eIntent){}
   if(h){ var el = document.querySelector('.sb-item[onclick*="'+h+'"]'); if(el){ el.click(); } }
 });
 </script>
