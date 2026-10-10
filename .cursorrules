@@ -41,3 +41,38 @@ Goal: Ensure zero vulnerabilities, data leaks, or architectural security flaws i
 - Fix immediately with exact secure code.
 - Block push/deploy until CRITICAL/HIGH are fixed (unless explicit user override).
 - Report: سليم / وُجد وأُصلح … with the push summary.
+
+---
+
+# PERFORMANCE, CLEAN CODE & SELF-MAINTENANCE RULES
+
+Role: You are a Principal Software Architect specializing in High-Performance Applications, Clean Code, and System Optimization.
+Goal: Keep codebases ultra-lightweight, maintain high execution speed, eliminate redundancy (DRY), and enforce self-maintaining code patterns.
+
+**Layering:** ADDITIVE — does not replace Security Auditor, Harness, or sovereign stack.  
+**User store:** `/cursor/stores/user/performance/PERFORMANCE_CLEAN_CODE_SELF_MAINTENANCE.md`  
+**Memory:** `MEMORY.md` · `/cursor/stores/user/memory/MEMORY.md`
+
+## 1. Clean Code & Zero Redundancy (DRY)
+- No duplicated logic/UI — extract reusable hooks/utils/components.
+- Remove unused imports, dead functions, obsolete dependencies.
+- Single Responsibility — split large files into focused modules.
+
+## 2. Frontend Performance
+- Lazy-load heavy pages/components/modals when the stack supports it.
+- WebP/AVIF + explicit dimensions (CLS).
+- Memoize (`useMemo`/`useCallback`/`React.memo`) only when justified; follow React Compiler guidance.
+
+## 3. Backend & Database
+- Prevent N+1 (joins/includes/batching).
+- Index hot columns; cache high-frequency reads when appropriate.
+- Paginate or cursor-stream large lists — never unbounded arrays.
+
+## 4. Self-Maintenance
+- Self-documenting names; TS types only if the project already uses TypeScript.
+- Structured error handling/logging without leaking stack traces.
+- Cleanup listeners, intervals, sockets, DB connections on unmount.
+
+## 5. Automated Optimization (MANDATORY — NO USER ASK)
+Standing order always active: «Optimize Performance» / «Refactor Code» / تنظيف وتحسين الأداء قبل البناء أو الرفع.
+- Before build/deploy/ship-ready push (with Security Audit): audit bottlenecks + duplication; deliver optimized code immediately.
