@@ -4433,7 +4433,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
       <div class="rizq-sub-cta" style="margin-top:24px">
-        <a href="#pricing" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
         <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن — سوقك الإلكتروني يبدأ من هنا</p>
       </div>
     </div>
@@ -4509,7 +4509,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
       <div class="rizq-sub-cta" style="margin-top:24px">
-        <a href="#pricing" onclick="return goSubscribePackage('corp')"
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
            class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
         <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن — عرضك يصل حيث يبحث الجادّون</p>
       </div>
@@ -4640,7 +4640,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
       <div class="rizq-sub-cta" style="margin-top:24px">
-        <a id="vo-create-btn" href="#pricing" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
+        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
         <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن — حضورك المهني لا يتوقف</p>
       </div>
     </div>
@@ -4702,7 +4702,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <div class="fade-in rizq-sub-cta">
-      <a href="#pricing" onclick="return goSubscribePackage('tender')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">✨ امتلك مقعدك في غرفة المناقصات</a>
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company" onclick="return goSubscribePackage('tender')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">✨ امتلك مقعدك في غرفة المناقصات</a>
       <p class="rizq-sub-cta-sub" data-t="vt-btn-sub">اشترك الآن وافتح غرفة المناقصات</p>
     </div>
 
@@ -4753,7 +4753,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <div class="fade-in rizq-sub-cta">
-      <a href="#pricing" onclick="return goSubscribePackage('investment')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">✨ امتلك حضورك في غرفة الاستثمارات</a>
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company" onclick="return goSubscribePackage('investment')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">✨ امتلك حضورك في غرفة الاستثمارات</a>
       <p class="rizq-sub-cta-sub" data-t="vi-btn-sub">اشترك الآن وابدأ مسار النمو</p>
     </div>
 
@@ -12354,20 +12354,27 @@ function goNavPackage(tab){
   var pane = document.getElementById('pane-' + tab);
   if (pane) pane.classList.add('active');
 }
-/** زر الاشتراك الفاخم: ينقل إلى باقات القسم المناسب */
+/**
+ * زر الاشتراك الفاخم: يفتح إنشاء حساب مباشرة بنوع الفضاء
+ * (محل/معرض/مكتب…) دون المرور بالباقات حتى لا يتردد الزائر.
+ */
 function goSubscribePackage(tab){
+  try{
+    if(typeof openRegisterAs === 'function'){
+      if(tab === 'stores'){ openRegisterAs('company', 'store'); return false; }
+      if(tab === 'corp'){ openRegisterAs('company', 'corp'); return false; }
+      if(tab === 'offices'){ openRegisterAs('company', 'office'); return false; }
+      if(tab === 'tender'){ openRegisterAs('company'); return false; }
+      if(tab === 'investment'){ openRegisterAs('company'); return false; }
+      if(tab === 'individual'){ openRegisterAs('private'); return false; }
+    }
+  }catch(eSub){}
+  /* احتياطي نادر إن لم يتوفر مسار التسجيل */
   try{
     var btn = document.querySelector('#pricing .ptab-card[data-ptab="'+tab+'"]');
     if(typeof switchPriceTab === 'function' && btn) switchPriceTab(tab, btn);
-    else if(typeof goNavPackage === 'function') goNavPackage(tab);
-  }catch(eSub){}
-  var el = document.getElementById('pricing');
-  if(el){
-    try{ history.replaceState(null, '', '#pricing'); }catch(eH){}
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    location.href = '#pricing';
-  }
+  }catch(eFall){}
+  location.href = '#pricing';
   return false;
 }
 window.goSubscribePackage = goSubscribePackage;
