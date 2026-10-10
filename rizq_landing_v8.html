@@ -807,7 +807,7 @@ body.rizq-lang-ar .hero-lead-row{
   padding:16px 16px 12px;
   margin-bottom:0;
 }
-/* شريط الإبهار بعرض الشاشة تقريباً (خارج .hero-content الضيّق) */
+/* شريط الإبهار: مسار بعرض الشاشة مع هامش ~2سم يمين/يسار قبل حافة الشاشة */
 .hero > #hero-listings.hero-promo-strip{
   align-self:stretch;
   width:100%;
@@ -820,7 +820,8 @@ body.rizq-lang-ar .hero-lead-row{
 .hero > #hero-listings .cards-track-wrap{
   width:100%;
   max-width:none;
-  padding:8px clamp(6px,1.2vw,14px);
+  /* الإعلانات تظهر/تختفي قبل حافة الشاشة بـ ~2سم */
+  padding:8px 2cm;
   box-sizing:border-box;
 }
 .categories-after-promo{
@@ -2686,7 +2687,7 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
-    direction:ltr!important;border-radius:0!important;padding:6px 12px!important;
+    direction:ltr!important;border-radius:0!important;padding:6px 2cm!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
@@ -4266,10 +4267,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
   </div><!-- /hero-content — الهوية + البحث فقط؛ الشريط بعرض الشاشة -->
 
-  <!-- شريط العروض — عرض كامل تقريباً من يسار الشاشة إلى يمينها -->
+  <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض تخطف الأنظار — سيارات، عقارات، ذهب…</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
