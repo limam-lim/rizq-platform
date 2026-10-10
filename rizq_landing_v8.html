@@ -808,19 +808,16 @@ body.rizq-lang-ar .hero-lead-row{
   margin-bottom:0;
 }
 /* شريط الإبهار بعرض الشاشة تقريباً (خارج .hero-content الضيّق) */
-.hero-promo-strip,
 .hero > #hero-listings.hero-promo-strip{
   align-self:stretch;
-  width:100vw;
-  max-width:100vw;
-  margin-top:6px;
-  margin-left:calc(50% - 50vw);
-  margin-right:calc(50% - 50vw);
+  width:100%;
+  max-width:none;
+  margin:6px 0 0;
   padding:10px 0 28px;
   box-sizing:border-box;
   animation:fadeUp .8s .28s ease both;
 }
-.hero-promo-strip .cards-track-wrap{
+.hero > #hero-listings .cards-track-wrap{
   width:100%;
   max-width:none;
   padding:8px clamp(6px,1.2vw,14px);
@@ -6245,8 +6242,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Offres qui impressionnent — voitures, immobilier, or…</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض تخطف الأنظار — سيارات، عقارات، ذهب…</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -8812,7 +8809,7 @@ const LANG = {
     'hbiz-trust': 'وسيط نشر · تواصل مباشر · معاينة قبل الدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
-    'promo-strip-sub': 'عروض تخطف الأنظار — سيارات، عقارات، ذهب…',
+    'promo-strip-sub': 'آخر الإعلانات على رزق — عروض تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -8947,7 +8944,7 @@ const LANG = {
     'hbiz-trust': 'Intermédiaire de publication · Contact direct · Vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
-    'promo-strip-sub': 'Offres qui impressionnent — voitures, immobilier, or…',
+    'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Vendez plus fort chaque jour',
     'hbiz-offices-hint': 'Des clients vous cherchent',
