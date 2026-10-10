@@ -617,7 +617,65 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     }).join('');
   }
 
+  function isInvestDemoMode() {
+    try { return new URLSearchParams(location.search).get('demo') === '1'; } catch (e) { return false; }
+  }
+  function promoDemoOpps() {
+    var fr = isFr();
+    return [
+      {
+        title: fr ? 'Boutique urbaine' : 'مشروع متجر حيوي',
+        titleFr: 'Boutique urbaine',
+        sector: fr ? 'Commerce' : 'تجارة',
+        wilaya: fr ? 'Nouakchott' : 'نواكشوط',
+        summary: fr ? 'Exemple promotionnel — données fictives' : 'فرصة ترويجية — بيانات وهمية للمعاينة',
+        capital: '800000 MRU',
+        provisionalTier: 'green',
+        _demo: true
+      },
+      {
+        title: fr ? 'Petit immobilier' : 'استثمار عقاري صغير',
+        titleFr: 'Petit immobilier',
+        sector: fr ? 'Immobilier' : 'عقارات',
+        wilaya: fr ? 'Nouakchott' : 'نواكشوط',
+        summary: fr ? 'Exemple promotionnel — données fictives' : 'فرصة ترويجية — بيانات وهمية للمعاينة',
+        capital: '2500000 MRU',
+        provisionalTier: 'green',
+        _demo: true
+      },
+      {
+        title: fr ? 'Atelier léger' : 'وحدة تصنيع خفيفة',
+        titleFr: 'Atelier léger',
+        sector: fr ? 'Industrie' : 'صناعة',
+        wilaya: fr ? 'Nouakchott' : 'نواكشوط',
+        summary: fr ? 'Exemple promotionnel — données fictives' : 'فرصة ترويجية — بيانات وهمية للمعاينة',
+        capital: '1200000 MRU',
+        provisionalTier: '',
+        _demo: true
+      }
+    ];
+  }
+  function showInvestDemoBanner() {
+    var notice = document.querySelector('.inv-notice');
+    if (!notice) return;
+    var fr = isFr();
+    notice.innerHTML = (fr
+      ? '👁 Mode modèle — opportunités fictives pour découvrir la salle. '
+      : '👁 وضع نموذج — فرص وهمية لمعاينة الغرفة. ')
+      + '<a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">'
+      + (fr ? 'Abonnez-vous pour entrer' : 'اشترك للدخول الحقيقي')
+      + '</a>';
+  }
   function loadOpps() {
+    if (isInvestDemoMode()) {
+      showInvestDemoBanner();
+      renderOpps(promoDemoOpps());
+      try {
+        var head = document.getElementById('inv-opportunities');
+        if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {}
+      return;
+    }
     var base = apiBase();
     if (!base) return;
     fetch(base + '/api/investments').then(function (r) { return r.json(); }).then(function (data) {
