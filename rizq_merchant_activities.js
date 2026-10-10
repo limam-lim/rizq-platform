@@ -434,7 +434,8 @@
   function legacyCategoryLabel(cat, lang) {
     var l = LEGACY_DIR_LABELS[cat];
     if (!l) {
-      return (resolveLang(lang) === 'fr' ? '🏷️ ' : '🏷️ ') + String(cat || (resolveLang(lang) === 'fr' ? 'Autre' : 'أخرى'));
+      // لا نُعيد قيمة ?cat الخام أبداً — كانت تُحقن في innerHTML بدليل المعارض
+      return resolveLang(lang) === 'fr' ? '🏷️ Autre' : '🏷️ أخرى';
     }
     return resolveLang(lang) === 'fr' ? l.fr : l.ar;
   }

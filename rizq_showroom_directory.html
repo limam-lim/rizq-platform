@@ -211,7 +211,10 @@ var TYPE_LABELS = {
 };
 
 var _params = new URLSearchParams(location.search);
-var _catFilter = _params.get('cat') || '';
+// قائمة بيضاء فقط — منع XSS انعكاسي عبر ?cat= (legacyCategoryLabel كان يعيد
+// القيمة الخام إلى innerHTML عند فئة غير معروفة).
+var _catRaw = _params.get('cat') || '';
+var _catFilter = _dirCatOrder().indexOf(_catRaw) !== -1 ? _catRaw : '';
 var _accounts = [];
 var _loaded = false; // إصلاح: قبل وصول رد /api/accounts/public كانت الصفحة تعرض
                       // "0 نتيجة" وحالة "لا توجد معارض" لمدة لحظة مضلِّلة (تبدو
@@ -228,7 +231,7 @@ function renderCatChips(){
   var allChip = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="rizq_showroom_directory.html">'+(fr?'📋 Toutes':'📋 الكل')+'</a>';
   wrap.innerHTML = allChip + order.map(function(c){
     var active = _catFilter===c ? ' active' : '';
-    return '<a class="dir-cat-chip'+active+'" href="rizq_showroom_directory.html?cat='+encodeURIComponent(c)+'">'+_dirCatLabel(c, fr)+'</a>';
+    return '<a class="dir-cat-chip'+active+'" href="rizq_showroom_directory.html?cat='+encodeURIComponent(c)+'">'+escapeHtml(_dirCatLabel(c, fr))+'</a>';
   }).join('');
 }
 
@@ -236,7 +239,8 @@ function renderHero(){
   var fr = _rizqLang()==='fr';
   var t = document.getElementById('dir-title');
   if(_catFilter){
-    t.innerHTML = fr ? ('Showrooms — <span>'+_dirCatLabel(_catFilter, true).replace(/^[^\s]+\s/,'')+'</span>') : ('دليل المعارض — <span>'+_dirCatLabel(_catFilter, false).replace(/^[^\s]+\s/,'')+'</span>');
+    var label = escapeHtml(_dirCatLabel(_catFilter, fr).replace(/^[^\s]+\s/,''));
+    t.innerHTML = fr ? ('Showrooms — <span>'+label+'</span>') : ('دليل المعارض — <span>'+label+'</span>');
   } else {
     t.innerHTML = fr ? 'Annuaire des <span>showrooms</span>' : 'دليل <span>المعارض</span>';
   }
