@@ -2,7 +2,8 @@
  * /api/auth — تسجيل/دخول المشتري السريع (Guest Gate)
  */
 const express = require('express');
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../lib/rateLimitRedis');
+const rateLimit = createLimiter;
 const Buyer = require('../models/buyer');
 const { consumeBuyerVerificationByEmail } = require('../services/otpService');
 const { asyncHandler, sendError } = require('../middleware/errors');
