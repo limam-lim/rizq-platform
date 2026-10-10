@@ -818,14 +818,16 @@ body.rizq-lang-ar .hero-lead-row{
   animation:fadeUp .8s .28s ease both;
   overflow:visible;
 }
-.hero > #hero-listings .cards-track-wrap{
-  /* قصّ حقيقي عند ~2سم من يسار/يمين الشاشة */
-  width:calc(100% - 4cm);
-  max-width:none;
-  margin:0 2cm;
-  padding:8px 0;
-  box-sizing:border-box;
-  overflow:hidden;
+.hero > #hero-listings .cards-track-wrap,
+#hero-listings.hero-promo-strip .cards-track-wrap{
+  /* قصّ حقيقي عند ~2سم من يسار/يمين الشاشة — margin وليس padding */
+  width:calc(100% - 4cm)!important;
+  max-width:none!important;
+  margin:0 2cm!important;
+  padding:8px 0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  overflow-x:hidden!important;
 }
 .categories-after-promo{
   width:100%;
