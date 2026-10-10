@@ -20,6 +20,10 @@ const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('./lib/rateLimitRedis');
+const redis = require('./lib/redis');
+const { createSessionStore } = require('./services/sessionStore');
+const cacheService = require('./services/cacheService');
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
@@ -269,7 +273,7 @@ app.use(cors({
 // الإنتاج يبقى صارماً (60 / 15 دقيقة). يمكن تجاوز السقف بـ API_RATE_LIMIT_MAX.
 const API_RATE_MAX = Number(process.env.API_RATE_LIMIT_MAX)
   || (isProdEnv() ? 60 : 5000);
-app.use('/api/', rateLimit({
+app.use('/api/', createLimiter({
   windowMs: 15 * 60 * 1000,
   max: API_RATE_MAX,
   standardHeaders: true,
@@ -314,7 +318,7 @@ const ADMIN_ACCOUNTS = OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.
   ? [OWNER_SUPER_ADMIN]
   : [];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
-const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
+const adminSessions = createSessionStore(); // Redis + memory — token -> { user, name, role, expiresAt }
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
 if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
@@ -667,7 +671,7 @@ app.post('/api/translate', requireAdminPermission('ai-manager'), async (req, res
  * Rate limit مخصص لمحادثة الويدجت — عام بلا مصادقة (كل زوار الموقع)، لذا
  * يحتاج حداً أشد من الحد العام (60/15د) لمنع استنزاف حصة Claude من IP واحد.
  */
-const widgetChatLimiter = rateLimit({
+const widgetChatLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 30,
   standardHeaders: true,
@@ -1085,7 +1089,7 @@ app.get('/api/admin/agents-health', requireAdminSession, (req, res) => {
   });
 });
 
-const subscriberChatLimiter = rateLimit({
+const subscriberChatLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 25,
   standardHeaders: true,
@@ -1163,10 +1167,15 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
  * إعادة تحميل نفس الإعداد عند كل تنقل بين الصفحات على شبكة ضعيفة — أي
  * تعديل من الأدمن يظهر للزوار الجدد في أقل من دقيقة كحد أقصى.
  */
-app.get('/api/site-config', (req, res) => {
+app.get('/api/site-config', async (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
-  const raw = repos.getSiteConfig() || {};
+  let raw = await cacheService.cacheGet(cacheService.KEYS.SITE_CONFIG);
+  if (!raw) {
+    raw = repos.getSiteConfig() || {};
+    await cacheService.cacheSet(cacheService.KEYS.SITE_CONFIG, raw, 30);
+  }
+  raw = raw || {};
   const publicCfg = {
     moduleFlags: getModuleFlags(),
     platformFlags: getPlatformFlags(),
@@ -1649,7 +1658,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     };
   }
 
-  repos.saveSiteConfig(next);
+  repos.saveSiteConfig(next); cacheService.invalidateSiteConfig().catch(function(){});
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -1680,7 +1689,7 @@ app.post('/api/currency-rates/refresh', requireAdminPermission('prices'), async 
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    repos.saveSiteConfig(next);
+    repos.saveSiteConfig(next); cacheService.invalidateSiteConfig().catch(function(){});
     res.json({ ok: true, currencies: result.currencies, errors: result.errors, updatedAt: result.updatedAt, config: next });
   } catch (err) {
     console.error('[currency-rates] refresh failed:', err.message);
@@ -1707,7 +1716,7 @@ async function autoRefreshCurrencyRatesIfStale() {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    repos.saveSiteConfig(next);
+    repos.saveSiteConfig(next); cacheService.invalidateSiteConfig().catch(function(){});
     if (result.errors && result.errors.length) {
       console.warn('[currency-rates] partial refresh:', result.errors.map((e) => e.code).join(', '));
     } else {
@@ -1875,7 +1884,7 @@ function toAdminAccount(acc) {
   return safe;
 }
 
-const accountsRegisterLimiter = rateLimit({
+const accountsRegisterLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 8,
   standardHeaders: true,
@@ -2187,7 +2196,7 @@ mountAccountsManageRoutes(app, {
 // حسابات "المشتري السريع" — SQLite عبر /api/auth + /api/wishlist
 // (توافق رجعي: /api/buyers/register و /api/buyers/me)
 // ═══════════════════════════════════════════════════════════════
-const buyersRegisterLimiter = rateLimit({
+const buyersRegisterLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 15,
   standardHeaders: true,
@@ -2197,7 +2206,7 @@ const buyersRegisterLimiter = rateLimit({
 
 app.use('/api/auth', authRouter);
 
-const otpLimiter = rateLimit({
+const otpLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
   standardHeaders: true,
@@ -2270,7 +2279,7 @@ function writeSubRequests(list) {
   repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 
-const subRequestsLimiter = rateLimit({
+const subRequestsLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
@@ -2510,7 +2519,7 @@ app.get('/api/pay-methods', (req, res) => {
 });
 
 /** POST /api/video-ads/event — تسجيل مشاهدة/نقرة لإعلان فيديو (عام محدود) */
-const videoAdsEventLimiter = rateLimit({
+const videoAdsEventLimiter = createLimiter({
   windowMs: 60 * 1000,
   max: 40,
   standardHeaders: true,
@@ -2567,7 +2576,7 @@ app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
     row.updatedAt = new Date().toISOString();
     stats[accountId] = row;
     const nextVideoAds = Object.assign({}, videoAds, { stats });
-    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds }));
+    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds })); cacheService.invalidateSiteConfig().catch(function(){});
     res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks } });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -2601,7 +2610,7 @@ app.get('/api/video-ads/stats/:accountId', (req, res) => {
   });
 });
 
-const contactGateLimiter = rateLimit({
+const contactGateLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 30,
   standardHeaders: true,
@@ -2644,7 +2653,7 @@ app.post('/api/contact-gate/attempt', contactGateLimiter, async (req, res) => {
 //    تعتمد عليه كل نداءات الداشبورد الأخرى) — راجع تعليق setupVisitTrackingAPI
 //    بذلك الملف لتفاصيل سبب استبدال الاعتماد على سجل الباقة المنفصل. ──────
 const { setupVisitTrackingAPI } = require('./rizq_visit_tracker');
-const trackVisitLimiter = rateLimit({
+const trackVisitLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 200, // عام بلا مصادقة (كل زوار المنصة) — حد سخي لأنه مجرد ping عند تحميل الصفحة
   standardHeaders: true,
@@ -2697,7 +2706,7 @@ try {
   console.warn('[marketingAgent] scheduler not started:', eMkt && eMkt.message);
 }
 
-const agentMissLimiter = rateLimit({
+const agentMissLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 60,
   standardHeaders: true,
@@ -2804,7 +2813,7 @@ function writeInterest(list) {
 }
 const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'videoAds'];
 
-const interestLimiter = rateLimit({
+const interestLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 20, // عام بلا مصادقة — سخي بما يكفي لزائر حقيقي، يمنع إغراق آلي بسيط
   standardHeaders: true,
@@ -3153,7 +3162,7 @@ function genReportId() { return 'RPT-' + Date.now() + '-' + Math.floor(Math.rand
 
 const REPORT_REASONS = ['fake_photos', 'suspicious_item', 'fraud', 'banned_content', 'misleading_price', 'other'];
 
-const reportsLimiter = rateLimit({
+const reportsLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
@@ -3248,7 +3257,7 @@ function writeDeactivationRequests(list) {
 }
 function genDeactivationRequestId() { return 'DEACT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
-const deactivationRequestsLimiter = rateLimit({
+const deactivationRequestsLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
@@ -3470,7 +3479,7 @@ function writeReviews(obj) {
 }
 function genReviewId() { return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 
-const reviewsLimiter = rateLimit({
+const reviewsLimiter = createLimiter({
   windowMs: 60 * 60 * 1000,
   max: 20,
   standardHeaders: true,
@@ -4019,7 +4028,18 @@ function assertProductionSecrets() {
 }
 assertProductionSecrets();
 
-app.listen(PORT, HOST, async () => {
+async function startServer() {
+  try {
+    await require('./db').ready;
+    const redisStatus = await redis.ready();
+    console.log('[rizq-backend] db driver=' + (require('./db').DRIVER) + ' redis=' + (redisStatus && redisStatus.ok ? 'on' : 'memory-fallback'));
+  } catch (eBoot) {
+    console.error('[rizq-backend] boot infrastructure failed:', eBoot && eBoot.message);
+    if (String(process.env.DB_DRIVER || '').match(/postgres|pg/i)) {
+      process.exit(1);
+    }
+  }
+  app.listen(PORT, HOST, async () => {
   console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
   console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
   if (isAnthropicConfigured()) {
@@ -4055,4 +4075,6 @@ app.listen(PORT, HOST, async () => {
 });
 
 process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });
+}
+startServer().catch((e) => { console.error('[rizq-backend] fatal start:', e); process.exit(1); });
 process.on('SIGTERM', () => { stopTelegramPolling(); process.exit(0); });

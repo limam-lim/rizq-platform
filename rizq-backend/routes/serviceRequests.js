@@ -6,7 +6,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../lib/rateLimitRedis');
+const rateLimit = createLimiter;
 
 const STATUSES = ['new', 'in_progress', 'done', 'rejected'];
 const ACCOUNT_TYPES = ['office', 'store', 'corp', 'individual'];
