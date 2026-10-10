@@ -849,16 +849,20 @@ body.rizq-lang-ar .hero-lead-row{
     linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
 }
 .hero-after-promo-inner{
-  /* الأقسام الخمسة — نفس هامش 1سم */
-  width:calc(100% - (2 * var(--rizq-strip-inset)));
-  max-width:none;
-  margin:0 var(--rizq-strip-inset);
+  /* نوافذ الأقسام الخمسة — عرض مضيّق كما كانت (ليست بعرض الشاشة) */
+  width:100%;
+  max-width:min(960px,86vw);
+  margin:0 auto;
   display:flex;
   flex-direction:column;
   align-items:stretch;
   gap:22px;
-  padding:18px 0 8px;
+  padding:18px 14px 8px;
   box-sizing:border-box;
+}
+.hero-after-promo-inner .hero-spaces,
+.hero-after-promo-inner .hero-biz-nav{
+  max-width:100%;
 }
 /* محلات / معارض / مكاتب / مناقصات / استثمارات — هامش 1سم */
 #virtual-stores,
@@ -928,12 +932,7 @@ body.rizq-lang-ar .hero-lead-row{
   .hero-stage-intent{padding:12px 10px 10px;gap:10px}
   .hero-promo-strip{padding-bottom:18px}
   .categories-after-promo{padding:18px 3% 24px!important;margin-top:4px;border-radius:16px}
-  .hero-after-promo-inner{
-    width:calc(100% - (2 * var(--rizq-strip-inset)));
-    max-width:none;
-    margin:0 var(--rizq-strip-inset);
-    gap:16px;padding:12px 0 4px;
-  }
+  .hero-after-promo-inner{max-width:94vw;gap:16px;padding:12px 8px 4px}
 }
 /* AR/FR — نفس قياسات الشاشة بالكامل */
 html[dir="ltr"] .hero-stage,
