@@ -874,11 +874,11 @@ body.rizq-lang-ar .hero-lead-row{
 #virtual-offices > div[style*="max-width"],
 #virtual-tenders > div[style*="max-width"],
 #virtual-investments > div[style*="max-width"],
-#virtual-stores .rzq-disc-wrap[style*="max-width"],
-#virtual-showrooms .rzq-disc-wrap[style*="max-width"],
-#virtual-offices .rzq-disc-wrap[style*="max-width"],
-#virtual-tenders .rzq-disc-wrap[style*="max-width"],
-#virtual-investments .rzq-disc-wrap[style*="max-width"]{
+#virtual-stores .rzq-disc-wrap,
+#virtual-showrooms .rzq-disc-wrap,
+#virtual-offices .rzq-disc-wrap,
+#virtual-tenders .rzq-disc-wrap,
+#virtual-investments .rzq-disc-wrap{
   max-width:none!important;
   width:100%!important;
   margin-left:0!important;
@@ -4807,7 +4807,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <!-- ── عدّاد/شريط اكتشاف ديناميكي للمناقصات (نفس خوارزمية الأقسام الأخرى) ── -->
-    <div class="fade-in rzq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+    <div class="fade-in rzq-disc-wrap" style="margin:0 0 32px">
       <div id="rzq-disc-tenders"></div>
     </div>
 
@@ -4858,7 +4858,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
 
-    <div class="fade-in rizq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+    <div class="fade-in rizq-disc-wrap" style="margin:0 0 32px">
       <div id="rzq-disc-investments"></div>
     </div>
 
