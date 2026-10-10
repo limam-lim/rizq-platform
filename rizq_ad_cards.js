@@ -96,14 +96,30 @@
   }
 
   function toggleFav(id, btn) {
+    function applyBtn() {
+      if (!btn) return;
+      var on = isFav(id);
+      btn.classList.toggle('is-on', on);
+      btn.textContent = on ? '♥' : '♡';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    // بوابة الحساب داخل quickToggleFavorite / RizqUx.wishlistToggle
     if (typeof global.quickToggleFavorite === 'function') {
       global.quickToggleFavorite(id, btn);
-      if (btn) {
-        var on = isFav(id);
-        btn.classList.toggle('is-on', on);
-        btn.textContent = on ? '♥' : '♡';
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      }
+      applyBtn();
+      return;
+    }
+    if (global.RizqUx && typeof global.RizqUx.wishlistToggle === 'function') {
+      var before = isFav(id);
+      var had = !(global.RizqUx.hasWishlistAccount) || global.RizqUx.hasWishlistAccount();
+      global.RizqUx.wishlistToggle(id);
+      if (!had) return;
+      applyBtn();
+      if (global.RizqUx.toastFav && isFav(id) !== before) global.RizqUx.toastFav(isFav(id));
+      return;
+    }
+    if (typeof global.rizqRequireAuth === 'function') {
+      global.rizqRequireAuth(function () { toggleFav(id, btn); }, 'reasonFav');
       return;
     }
     try {
@@ -113,12 +129,7 @@
       var i = ids.indexOf(sid);
       if (i === -1) ids.push(sid); else ids.splice(i, 1);
       localStorage.setItem('rizq_wishlist', JSON.stringify(ids));
-      var on2 = i === -1;
-      if (btn) {
-        btn.classList.toggle('is-on', on2);
-        btn.textContent = on2 ? '♥' : '♡';
-        btn.setAttribute('aria-pressed', on2 ? 'true' : 'false');
-      }
+      applyBtn();
       try {
         global.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids } }));
       } catch (e2) {}

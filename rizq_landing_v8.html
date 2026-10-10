@@ -3908,8 +3908,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_social_links.js?v=23.5" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
-<script src="rizq_ux_polish.js?v=23.0"></script>
-<script src="rizq_ad_cards.js?v=3.9"></script>
+<script src="rizq_ux_polish.js?v=23.1"></script>
+<script src="rizq_ad_cards.js?v=3.10"></script>
 </head>
 <body>
 
@@ -7768,7 +7768,19 @@ let currentAdRef = null;
 // ── مفضلة موحّدة (rizq_wishlist) — نفس المفتاح في browse/search/listing/dashboard ──
 function _wishlistIds(){ try{ var v=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 function _wishlistHas(id){ return _wishlistIds().indexOf(String(id))!==-1; }
-function _wishlistToggle(id){
+function _wishlistToggle(id, opts){
+  // المفضلة تتطلب حساب زائر/أعمال — لا تُحفظ لزائر مجهول
+  if (window.RizqUx && typeof RizqUx.wishlistToggle === 'function') {
+    return RizqUx.wishlistToggle(id, opts);
+  }
+  if (window.RizqUx && typeof RizqUx.hasWishlistAccount === 'function' && !RizqUx.hasWishlistAccount()) {
+    if (typeof RizqUx.requireWishlistAuth === 'function') {
+      RizqUx.requireWishlistAuth(function () { _wishlistToggle(id, opts); });
+    } else if (typeof rizqRequireAuth === 'function') {
+      rizqRequireAuth(function () { _wishlistToggle(id, opts); }, 'reasonFav');
+    }
+    return false;
+  }
   var sid=String(id);
   var ids=_wishlistIds();
   var i=ids.indexOf(sid);
@@ -7780,10 +7792,14 @@ function getFavorites(){ return _wishlistIds(); }
 function isFavorited(id){ return _wishlistHas(id); }
 function toggleFavoriteAd(){
   if(!currentAdRef || currentAdRef.id==null) return;
-  var added = _wishlistToggle(currentAdRef.id);
-  updateFavBtnUI();
-  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
-  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+  _wishlistToggle(currentAdRef.id, {
+    afterAuthToast: false,
+    onDone: function (added) {
+      updateFavBtnUI();
+      if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(!!added);
+      if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+    }
+  });
 }
 function updateFavBtnUI(){
   if(!currentAdRef) return;
@@ -8084,11 +8100,15 @@ function renderAllAds(resetVisible) {
   _allAdsBindInfinite();
 }
 function quickToggleFavorite(adId, btn) {
-  var added = _wishlistToggle(adId);
-  if (btn) btn.textContent = added ? '❤️' : '🤍';
-  if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
-  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
-  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+  _wishlistToggle(adId, {
+    afterAuthToast: false,
+    onDone: function (added) {
+      if (btn) btn.textContent = added ? '❤️' : '🤍';
+      if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
+      if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(!!added);
+      if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+    }
+  });
 }
 
 // ── SEARCH SUGGESTIONS — from live ADS, not dummy queries ──
@@ -13950,6 +13970,18 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var block = document.getElementById('wishlist-block');
       var mount = document.getElementById('wishlist-mount');
       if(!block || !mount) return Promise.resolve(false);
+      // بدون حساب: لا مفضلة محلية — يمنع عداد 2 مع قائمة فارغة
+      if (window.RizqUx && typeof RizqUx.hasWishlistAccount === 'function' && !RizqUx.hasWishlistAccount()) {
+        if (typeof RizqUx.clearGuestWishlist === 'function') RizqUx.clearGuestWishlist();
+        if (typeof RizqUx.updateFavBadges === 'function') RizqUx.updateFavBadges();
+        if(forceReveal) {
+          mount.innerHTML = (window.RizqUx && RizqUx.wishlistEmptyHtml) ? RizqUx.wishlistEmptyHtml() : '<p class="rzq-empty">—</p>';
+          block.style.display = '';
+          return Promise.resolve(true);
+        }
+        block.style.display = 'none';
+        return Promise.resolve(false);
+      }
       var ids = [];
       try{ ids = JSON.parse(localStorage.getItem('rizq_wishlist') || '[]'); }catch(e){}
       if(!Array.isArray(ids) || ids.length < 1) {
@@ -13973,6 +14005,10 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         .then(function(r){ return r.ok ? r.json() : null; })
         .then(function(data){
           var ads = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
+          // مزامنة العداد مع الإعلانات الموجودة فعلياً فقط
+          if (window.RizqUx && typeof RizqUx.pruneWishlistToExisting === 'function') {
+            RizqUx.pruneWishlistToExisting(ads.map(function (a) { return a && a.id; }).filter(Boolean));
+          }
           if(!ads.length) {
             if(forceReveal) {
               mount.innerHTML = (window.RizqUx && RizqUx.wishlistEmptyHtml) ? RizqUx.wishlistEmptyHtml() : '<p class="rzq-empty">—</p>';

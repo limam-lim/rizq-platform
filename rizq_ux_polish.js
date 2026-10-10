@@ -42,7 +42,88 @@
     return wishlistIds().indexOf(String(id)) !== -1;
   }
 
-  function wishlistToggle(id) {
+  /** حساب زائر (مشتري) أو جلسة أعمال — بدون أي منهما لا تُحفظ مفضلة */
+  function hasWishlistAccount() {
+    try {
+      if (global.RizqAuthGate && typeof global.RizqAuthGate.isLoggedIn === 'function' && global.RizqAuthGate.isLoggedIn()) {
+        return true;
+      }
+    } catch (e) {}
+    // rizq_auth_gate قد يكون defer — اقرأ الجلسة مباشرة حتى لا نمسح المفضلة عند الإقلاع
+    try {
+      var b = JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null');
+      if (b && b.id && b.token && String(b.token).length >= 20 && String(b.id).length >= 4) return true;
+    } catch (eB) {}
+    try {
+      var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
+      if (s && s.id && (s.token || s.dashToken || s.accessToken)) return true;
+    } catch (e2) {}
+    return false;
+  }
+
+  function clearGuestWishlist() {
+    try {
+      var raw = localStorage.getItem('rizq_wishlist');
+      if (!raw || raw === '[]') return false;
+      localStorage.setItem('rizq_wishlist', '[]');
+      try {
+        document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: [], clearedGuest: true, count: 0 } }));
+      } catch (e) {}
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+
+  function setWishlistIds(ids) {
+    ids = Array.isArray(ids) ? ids.map(String).filter(Boolean) : [];
+    try {
+      localStorage.setItem('rizq_wishlist', JSON.stringify(ids));
+    } catch (e) {}
+    try {
+      document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids, count: ids.length } }));
+    } catch (e2) {}
+    updateFavBadges();
+  }
+
+  /** احذف معرّفات لم تُرجعها /api/ads/batch (إعلانات وهمية/محذوفة) حتى لا يبقى العداد كاذباً */
+  function pruneWishlistToExisting(foundIds) {
+    var keep = {};
+    (foundIds || []).forEach(function (id) { keep[String(id)] = true; });
+    var prev = wishlistIds();
+    var next = prev.filter(function (id) { return keep[id]; });
+    if (next.length !== prev.length) setWishlistIds(next);
+    return next;
+  }
+
+  function requireWishlistAuth(actionFn) {
+    if (hasWishlistAccount()) {
+      if (typeof actionFn === 'function') actionFn();
+      return true;
+    }
+    clearGuestWishlist();
+    updateFavBadges();
+    if (typeof global.rizqRequireAuth === 'function') {
+      return global.rizqRequireAuth(function () {
+        if (typeof actionFn === 'function') actionFn();
+      }, 'reasonFav');
+    }
+    showToast(t('سجّل حساب زائر لحفظ المفضلة', 'Créez un compte visiteur pour enregistrer des favoris'));
+    return false;
+  }
+
+  function wishlistToggle(id, opts) {
+    opts = opts || {};
+    if (!opts.force && !hasWishlistAccount()) {
+      requireWishlistAuth(function () {
+        var added = wishlistToggle(id, { force: true, _authResume: true });
+        if (opts.afterAuthToast !== false) toastFav(!!added);
+        if (typeof opts.onDone === 'function') {
+          try { opts.onDone(added); } catch (eDone) {}
+        }
+      });
+      return false;
+    }
     id = String(id);
     var ids = wishlistIds();
     var i = ids.indexOf(id);
@@ -61,6 +142,9 @@
       document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { id: id, added: added, count: ids.length } }));
     } catch (e2) {}
     updateFavBadges();
+    if (typeof opts.onDone === 'function' && !opts._authResume) {
+      try { opts.onDone(added); } catch (eDone2) {}
+    }
     return added;
   }
 
@@ -101,7 +185,9 @@
   }
 
   function updateFavBadges() {
-    var n = wishlistIds().length;
+    // بلا حساب: أخفِ العداد فقط — المسح يتم عند محاولة الإضافة/فتح المفضلة
+    // (تجنّب سباق تحميل rizq_auth_gate المؤجّل)
+    var n = hasWishlistAccount() ? wishlistIds().length : 0;
     var heart = n > 0 ? '♥' : '♡';
     var wlBlock = document.getElementById('wishlist-block');
     if (wlBlock) wlBlock.classList.toggle('has-favs', n > 0);
@@ -141,6 +227,12 @@
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+    }
+    if (!hasWishlistAccount()) {
+      clearGuestWishlist();
+      updateFavBadges();
+      requireWishlistAuth(function () { openWishlist(); });
+      return;
     }
     var block = document.getElementById('wishlist-block');
     if (!block) {
@@ -829,6 +921,11 @@
     wishlistIds: wishlistIds,
     wishlistHas: wishlistHas,
     wishlistToggle: wishlistToggle,
+    hasWishlistAccount: hasWishlistAccount,
+    requireWishlistAuth: requireWishlistAuth,
+    clearGuestWishlist: clearGuestWishlist,
+    pruneWishlistToExisting: pruneWishlistToExisting,
+    setWishlistIds: setWishlistIds,
     showToast: showToast,
     toastFav: toastFav,
     updateFavBadges: updateFavBadges,
