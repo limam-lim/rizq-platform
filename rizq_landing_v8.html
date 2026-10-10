@@ -784,7 +784,7 @@ body.rizq-lang-ar .hero-lead-row{
   }
 }
 
-/* ══ HERO STAGE — تركيب الدخول الأول (فضاءات → تصفّح → تحويل → إعلان) ══ */
+/* ══ HERO STAGE — دخول خفيف (نية بحث) ثم شريط الإبهار ══ */
 .hero-stage{
   width:100%;
   max-width:min(960px,86vw);
@@ -800,6 +800,139 @@ body.rizq-lang-ar .hero-lead-row{
   border:1px solid rgba(27,58,107,.10);
   box-shadow:0 18px 48px rgba(15,35,65,.10),inset 0 1px 0 rgba(255,255,255,.85);
   animation:fadeUp .75s .18s ease both;
+}
+/* هيرو النية: أخف وأقرب لشريط العروض */
+.hero-stage-intent{
+  gap:14px;
+  padding:16px 16px 12px;
+  margin-bottom:0;
+}
+/* هوامش موحّدة لكل الأشرطة — 1سم من كل حافة */
+:root{--rizq-strip-inset:1cm}
+/* شريط الإبهار: قصّ حقيقي بـ margin (padding لا يقصّ translate) */
+.hero > #hero-listings.hero-promo-strip{
+  align-self:stretch;
+  width:100%;
+  max-width:none;
+  margin:6px 0 0;
+  padding:10px 0 28px;
+  box-sizing:border-box;
+  animation:fadeUp .8s .28s ease both;
+  overflow:visible;
+}
+.hero > #hero-listings .cards-track-wrap,
+#hero-listings.hero-promo-strip .cards-track-wrap{
+  width:calc(100% - (2 * var(--rizq-strip-inset)))!important;
+  max-width:none!important;
+  margin:0 var(--rizq-strip-inset)!important;
+  padding:8px 0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  overflow-x:hidden!important;
+}
+.categories-after-promo{
+  width:100%;
+  max-width:min(1080px,94vw);
+  margin:8px auto 12px;
+  padding:28px 4% 36px!important;
+  border-radius:22px;
+  box-sizing:border-box;
+  position:relative;
+  z-index:50;
+}
+.categories-after-promo .section-header{margin-bottom:16px}
+.hero-after-promo{
+  width:100%;
+  padding:8px 0 28px;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,168,76,.08),transparent 55%),
+    linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
+}
+.hero-after-promo-inner{
+  /* نوافذ الأقسام الخمسة — عرض مضيّق كما كانت (ليست بعرض الشاشة) */
+  width:100%;
+  max-width:min(960px,86vw);
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:22px;
+  padding:18px 14px 8px;
+  box-sizing:border-box;
+}
+.hero-after-promo-inner .hero-spaces,
+.hero-after-promo-inner .hero-biz-nav{
+  max-width:100%;
+}
+/* محلات / معارض / مكاتب / مناقصات / استثمارات — هامش 1سم */
+#virtual-stores,
+#virtual-showrooms,
+#virtual-offices,
+#virtual-tenders,
+#virtual-investments{
+  padding-left:var(--rizq-strip-inset)!important;
+  padding-right:var(--rizq-strip-inset)!important;
+  box-sizing:border-box!important;
+}
+#virtual-stores > div[style*="max-width"],
+#virtual-showrooms > div[style*="max-width"],
+#virtual-offices > div[style*="max-width"],
+#virtual-tenders > div[style*="max-width"],
+#virtual-investments > div[style*="max-width"],
+#virtual-stores .rzq-disc-wrap,
+#virtual-showrooms .rzq-disc-wrap,
+#virtual-offices .rzq-disc-wrap,
+#virtual-tenders .rzq-disc-wrap,
+#virtual-investments .rzq-disc-wrap{
+  max-width:none!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+}
+#virtual-stores .rzq-disc-empty,
+#virtual-showrooms .rzq-disc-empty,
+#virtual-offices .rzq-disc-empty,
+#virtual-tenders .rzq-disc-empty,
+#virtual-investments .rzq-disc-empty,
+#virtual-stores .rzq-disc-strip,
+#virtual-showrooms .rzq-disc-strip,
+#virtual-offices .rzq-disc-strip,
+#virtual-tenders .rzq-disc-strip,
+#virtual-investments .rzq-disc-strip{
+  width:100%;
+  max-width:none;
+  box-sizing:border-box;
+}
+/* إطلالات الموضة + نماذج المعارض — نفس هامش 1سم */
+#rizq-styles,
+#rizq-showroom-models{
+  padding-left:var(--rizq-strip-inset)!important;
+  padding-right:var(--rizq-strip-inset)!important;
+  box-sizing:border-box!important;
+}
+#rizq-styles .rizq-styles-inner,
+#rizq-showroom-models .rizq-styles-inner{
+  max-width:none!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+}
+#rizq-styles .rizq-styles-track-wrap,
+#rizq-showroom-models .rizq-styles-track-wrap{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+@media(max-width:699px){
+  .hero-stage-intent{padding:12px 10px 10px;gap:10px}
+  .hero-promo-strip{padding-bottom:18px}
+  .categories-after-promo{padding:18px 3% 24px!important;margin-top:4px;border-radius:16px}
+  .hero-after-promo-inner{max-width:94vw;gap:16px;padding:12px 8px 4px}
 }
 /* AR/FR — نفس قياسات الشاشة بالكامل */
 html[dir="ltr"] .hero-stage,
@@ -2629,7 +2762,8 @@ html[dir="ltr"] .listings-section .section-desc{
   #hero-listings .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
-    direction:ltr!important;border-radius:0!important;padding:6px 12px!important;
+    direction:ltr!important;border-radius:0!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset)))!important;margin:0 var(--rizq-strip-inset)!important;padding:6px 0!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
@@ -3787,7 +3921,7 @@ html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
 html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(3px)}
 @media(max-width:640px){
-  #rizq-styles,#rizq-showroom-models{padding:28px 3% 32px}
+  #rizq-styles,#rizq-showroom-models{padding:28px var(--rizq-strip-inset) 32px!important}
   #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
   #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(13px,3.8vw,16px);margin-bottom:5px}
   #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:11px;line-height:1.5;max-width:100%}
@@ -4171,11 +4305,79 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <a class="hero-pill" href="#pricing" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
       </div>
     </div>
-    <!-- ══ مسرح الدخول الأول: علامة → فضاءات → تصفّح → تحويل → إعلان مضغوط ══ -->
-    <div class="hero-stage">
+    <!-- ══ دخول خفيف: هوية + نية بحث — ثم شريط الإبهار مباشرة ══ -->
+    <div class="hero-stage hero-stage-intent">
       <p class="hero-tagline"><span class="hero-tagline-lead" data-t="hero-tagline-lead">متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي</span><span class="hero-tagline-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
 
-      <!-- 1) فضاءات الأعمال — خريطة واضحة للزائر الموريتاني -->
+      <!-- 2) لوحة التصفح: بحث + أقسام سريعة في كتلة واحدة -->
+      <section class="hero-browse-panel" aria-labelledby="hero-browse-title">
+        <div class="hero-browse-head">
+          <h3 class="hero-browse-title" id="hero-browse-title" data-t="hbiz-browse">ابحث أو تصفّح الأقسام</h3>
+          <p class="hero-browse-sub" data-t="hbiz-browse-sub">عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ</p>
+        </div>
+        <div class="hero-search">
+          <div class="search-bar">
+            <select class="search-cat-select" id="hero-search-cat-select" aria-label="القسم">
+              <option value="">كل الأقسام</option>
+            </select>
+            <div class="search-input-wrap">
+              <input class="search-input" type="text" id="hero-search" data-ph-fr="Rechercher sur Rizq..." placeholder="البحث في رزق..." data-t="search-ph" autocomplete="off" oninput="showSugg(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();doMainSearch();}" onblur="setTimeout(()=>hideSugg(),200)"/>
+            </div>
+            <button class="btn-search-main" onclick="doMainSearch()" aria-label="بحث">🔍</button>
+          </div>
+          <div class="search-suggestions" id="suggestions"></div>
+        </div>
+        <div class="quick-cats">
+          <div class="qcat" data-qcat="عقارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🏠</div><div class="qcat-name" data-t="qc0">عقارات</div></div>
+          <div class="qcat" data-qcat="معدات-منزل" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🔌</div><div class="qcat-name" data-t="qc-home">معدات منزل</div></div>
+          <div class="qcat" data-qcat="طاقة" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">⚡</div><div class="qcat-name" data-t="qc-energy">طاقة</div></div>
+          <div class="qcat" data-qcat="سيارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🚗</div><div class="qcat-name" data-t="qc1">سيارات</div></div>
+          <div class="qcat" data-qcat="إلكترونيات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">📱</div><div class="qcat-name" data-t="qc3">إلكترونيات</div></div>
+          <div class="qcat qcat-gold" data-qcat="ذهب ومجوهرات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🪙</div><div class="qcat-name" data-t="qc8">ذهب</div></div>
+          <div class="qcat" data-qcat="رحلات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">✈️</div><div class="qcat-name" data-t="qc-travel">رحلات</div></div>
+          <div class="qcat" data-qcat="ماشية" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
+        </div>
+        <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
+      </section>
+    </div><!-- /hero-stage-intent -->
+
+  </div><!-- /hero-content — الهوية + البحث فقط؛ الشريط بعرض الشاشة -->
+
+  <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
+  <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
+    <div class="listings-label">
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span></span>
+    </div>
+    <div class="cards-track-wrap">
+      <div class="cards-track" id="cards-track">
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section><!-- /hero — هوية + بحث + شريط الإبهار بعرض الشاشة -->
+
+<!-- ══ CATEGORIES — بعد شريط الإبهار مباشرة ══ -->
+<section class="section categories-after-promo" id="categories" style="background:var(--bg-section)">
+  <div class="section-header fade-in">
+    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
+    <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
+    <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
+  </div>
+  <div class="cats-grid">
+    <div id="builtin-cats-mount"></div>
+    <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
+    <div id="cat-inline-panel"></div>
+  </div>
+</section>
+
+<!-- ══ بعد الإبهار: فضاءات الأعمال + تحويل + Rizq ADS ══ -->
+<section class="hero-after-promo" aria-label="فضاءات الأعمال على رزق">
+  <div class="hero-after-promo-inner">
+      <!-- فضاءات الأعمال — بعد نية البحث وشريط العروض -->
       <section class="hero-spaces" aria-labelledby="hero-spaces-title">
         <div class="hero-spaces-head">
           <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
@@ -4224,39 +4426,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </nav>
         <p class="hero-spaces-trust" data-t="hbiz-trust">وسيط نشر · تواصل مباشر · معاينة قبل الدفع</p>
       </section>
-
-      <!-- 2) لوحة التصفح: بحث + أقسام سريعة في كتلة واحدة -->
-      <section class="hero-browse-panel" aria-labelledby="hero-browse-title">
-        <div class="hero-browse-head">
-          <h3 class="hero-browse-title" id="hero-browse-title" data-t="hbiz-browse">ابحث أو تصفّح الأقسام</h3>
-          <p class="hero-browse-sub" data-t="hbiz-browse-sub">عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ</p>
-        </div>
-        <div class="hero-search">
-          <div class="search-bar">
-            <select class="search-cat-select" id="hero-search-cat-select" aria-label="القسم">
-              <option value="">كل الأقسام</option>
-            </select>
-            <div class="search-input-wrap">
-              <input class="search-input" type="text" id="hero-search" data-ph-fr="Rechercher sur Rizq..." placeholder="البحث في رزق..." data-t="search-ph" autocomplete="off" oninput="showSugg(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();doMainSearch();}" onblur="setTimeout(()=>hideSugg(),200)"/>
-            </div>
-            <button class="btn-search-main" onclick="doMainSearch()" aria-label="بحث">🔍</button>
-          </div>
-          <div class="search-suggestions" id="suggestions"></div>
-        </div>
-        <div class="quick-cats">
-          <div class="qcat" data-qcat="عقارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🏠</div><div class="qcat-name" data-t="qc0">عقارات</div></div>
-          <div class="qcat" data-qcat="معدات-منزل" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🔌</div><div class="qcat-name" data-t="qc-home">معدات منزل</div></div>
-          <div class="qcat" data-qcat="طاقة" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">⚡</div><div class="qcat-name" data-t="qc-energy">طاقة</div></div>
-          <div class="qcat" data-qcat="سيارات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🚗</div><div class="qcat-name" data-t="qc1">سيارات</div></div>
-          <div class="qcat" data-qcat="إلكترونيات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">📱</div><div class="qcat-name" data-t="qc3">إلكترونيات</div></div>
-          <div class="qcat qcat-gold" data-qcat="ذهب ومجوهرات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🪙</div><div class="qcat-name" data-t="qc8">ذهب</div></div>
-          <div class="qcat" data-qcat="رحلات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">✈️</div><div class="qcat-name" data-t="qc-travel">رحلات</div></div>
-          <div class="qcat" data-qcat="ماشية" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
-        </div>
-        <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
-      </section>
-
-      <!-- 3) تحويل أساسي -->
+      <!-- تحويل أساسي -->
       <div class="hero-cta-wrap">
         <button type="button" class="hero-cta-primary" onclick="goToPost()">
           <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
@@ -4264,7 +4434,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
       </div>
 
-      <!-- 4) Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
+      <!-- Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
       <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
         <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
         <div class="hero-vid-inner" id="hero-vid-inner">
@@ -4304,7 +4474,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </div>
       </div>
 
-      <!-- إحصائيات المنصة — مباشرة تحت إعلان الفيديو (ads بارزة للتنسيق مع Rizq ADS) -->
+      <!-- إحصائيات المنصة — مباشرة تحت إعلان الفيديو -->
       <div class="hero-stats-bar fade-in" id="platform-stats" aria-label="إحصائيات المنصة">
         <div class="h-stat h-stat-ads" data-stat="ads">
           <span class="h-stat-num" data-live="adsActive" data-target="0">0</span>
@@ -4327,23 +4497,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <span class="h-stat-lbl" data-t="stat-free">النشر الأساسي</span>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Live Listings Carousel -->
-  <div class="hero-listings-section" id="hero-listings">
-    <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span></span>
-    </div>
-    <div class="cards-track-wrap">
-      <div class="cards-track" id="cards-track">
-        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
-        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
-        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
-        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
-        <div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true"><div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div><div style="padding:12px;display:flex;flex-direction:column;gap:8px"><div class="rizq-skel rizq-skel-line mid" style="margin:0"></div><div class="rizq-skel rizq-skel-line short" style="margin:0"></div></div></div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -4355,20 +4508,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div class="rvid-section-title" id="rvid-section-title"></div>
       <div class="rvid-section-sub" id="rvid-section-sub"></div>
     </div>
-  </div>
-</section>
-
-<!-- ══ CATEGORIES ══ -->
-<section class="section" id="categories" style="background:var(--bg-section)">
-  <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
-    <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
-    <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
-  </div>
-  <div class="cats-grid">
-    <div id="builtin-cats-mount"></div>
-    <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
-    <div id="cat-inline-panel"></div>
   </div>
 </section>
 
@@ -4697,7 +4836,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <!-- ── عدّاد/شريط اكتشاف ديناميكي للمناقصات (نفس خوارزمية الأقسام الأخرى) ── -->
-    <div class="fade-in rzq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+    <div class="fade-in rzq-disc-wrap" style="margin:0 0 32px">
       <div id="rzq-disc-tenders"></div>
     </div>
 
@@ -4748,7 +4887,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
 
-    <div class="fade-in rizq-disc-wrap" style="max-width:1100px;margin:0 auto 32px">
+    <div class="fade-in rizq-disc-wrap" style="margin:0 0 32px">
       <div id="rzq-disc-investments"></div>
     </div>
 
@@ -6180,8 +6319,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub">Dernières annonces — mise à jour automatique</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub">أحدث الإعلانات المنشورة — تتحدث تلقائياً</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -8747,6 +8886,7 @@ const LANG = {
     'hbiz-trust': 'وسيط نشر · تواصل مباشر · معاينة قبل الدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
+    'promo-strip-sub': 'آخر الإعلانات على رزق — عروض تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -8881,6 +9021,7 @@ const LANG = {
     'hbiz-trust': 'Intermédiaire de publication · Contact direct · Vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
+    'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Vendez plus fort chaque jour',
     'hbiz-offices-hint': 'Des clients vous cherchent',
