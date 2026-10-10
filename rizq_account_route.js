@@ -226,6 +226,11 @@
   function redirectAfterAuth(defaultUrl) {
     var after = consumeAfterAuthHref();
     var target = sanitizeAfterAuthHref(after || defaultUrl || '');
+    try {
+      if (target && sessionStorage.getItem('rizq_open_panel') === 'subscription' && target.indexOf('#') === -1) {
+        target = target + '#subscription';
+      }
+    } catch (eSub) {}
     if (target) location.href = target;
     return target;
   }

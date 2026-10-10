@@ -745,7 +745,11 @@ function renderTenders(){
   if(catsEl) catsEl.style.display='';
 
   if(bannerEl){
-    if(_tenderAccess.contactsUnlocked){
+    if(_isTenderDemoMode()){
+      bannerEl.innerHTML = '<div class="t-access-banner info">👁 '+(fr
+        ? 'Mode modèle — données fictives pour découvrir la salle. <a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">Abonnez-vous pour entrer</a>'
+        : 'وضع نموذج — بيانات وهمية لمعاينة الغرفة. <a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">اشترك للدخول الحقيقي</a>')+'</div>';
+    } else if(_tenderAccess.contactsUnlocked){
       bannerEl.innerHTML = '<div class="t-access-banner info">✅ '+(fr?'Votre abonnement est actif — contacts débloqués et soumission d\'offres activée.':'اشتراكك فعّال — بيانات التواصل مكشوفة ويمكنك تقديم العروض.')+'</div>';
     } else if(_tenderAccess.isTrial){
       bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. Gérez l\'abonnement depuis votre tableau de bord.':'باقتك التجريبية فعّالة — للتصفّح فقط. إدارة الاشتراك من لوحة التحكم.')+'</div>';
@@ -814,8 +818,79 @@ function renderTenders(){
   });
 }
 
+function _isTenderDemoMode(){
+  try{ return new URLSearchParams(location.search).get('demo') === '1'; }catch(e){ return false; }
+}
+function _promoDemoTenders(){
+  var fr = _rizqLang()==='fr';
+  var soon = function(days){ return new Date(Date.now() + days * 86400000).toISOString(); };
+  return [
+    {
+      id: 'TND_PROMO_001',
+      title: fr ? 'Fourniture d’ordinateurs pour écoles' : 'توريد أجهزة حاسوب للمدارس',
+      desc: fr ? 'Exemple promotionnel — données fictives' : 'مناقصة ترويجية — بيانات وهمية للمعاينة',
+      category: fr ? 'Fourniture' : 'توريد',
+      city: fr ? 'Nouakchott' : 'نواكشوط',
+      wilaya: fr ? 'Nouakchott' : 'نواكشوط',
+      budget: '3200000',
+      status: 'open',
+      deadline: soon(20),
+      ownerName: fr ? 'Organisme démo' : 'جهة ترويجية',
+      bidsCount: 3,
+      _demo: true
+    },
+    {
+      id: 'TND_PROMO_002',
+      title: fr ? 'Maintenance de flotte automobile' : 'صيانة أسطول سيارات',
+      desc: fr ? 'Exemple promotionnel — données fictives' : 'مناقصة ترويجية — بيانات وهمية للمعاينة',
+      category: fr ? 'Services' : 'خدمات',
+      city: fr ? 'Nouadhibou' : 'نواذيبو',
+      wilaya: fr ? 'Nouadhibou' : 'نواذيبو',
+      budget: '1800000',
+      status: 'open',
+      deadline: soon(14),
+      ownerName: fr ? 'Organisme démo' : 'جهة ترويجية',
+      bidsCount: 5,
+      _demo: true
+    },
+    {
+      id: 'TND_PROMO_003',
+      title: fr ? 'Équipement de bureau administratif' : 'تجهيز مكتب إداري',
+      desc: fr ? 'Exemple promotionnel — données fictives' : 'مناقصة ترويجية — بيانات وهمية للمعاينة',
+      category: fr ? 'Mobilier' : 'أثاث',
+      city: fr ? 'Kiffa' : 'كيفة',
+      wilaya: fr ? 'Kiffa' : 'كيفة',
+      budget: '950000',
+      status: 'open',
+      deadline: soon(10),
+      ownerName: fr ? 'Organisme démo' : 'جهة ترويجية',
+      bidsCount: 2,
+      _demo: true
+    }
+  ];
+}
+function _showTenderDemoBanner(){
+  var banner = document.getElementById('t-access-banner');
+  if(!banner) return;
+  var fr = _rizqLang()==='fr';
+  banner.className = 't-access-banner info';
+  banner.innerHTML = (fr
+    ? '👁 Mode modèle — données fictives pour découvrir la salle. '
+    : '👁 وضع نموذج — بيانات وهمية لمعاينة الغرفة. ')
+    + '<a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">'
+    + (fr ? 'Abonnez-vous pour entrer' : 'اشترك للدخول الحقيقي')
+    + '</a>';
+}
 function loadTenders(){
   _gateState = null;
+  if(_isTenderDemoMode()){
+    _tenderAccess = { canBrowse: true, canContact: false, demo: true };
+    _tenders = _promoDemoTenders();
+    _loaded = true;
+    _showTenderDemoBanner();
+    renderTenders();
+    return;
+  }
   var session = _getSession();
   var url = _backendBase().replace(/\/$/,'') + '/api/tenders' + (_catFilter ? ('?cat='+encodeURIComponent(_catFilter)) : '');
   function doFetch(headers){
