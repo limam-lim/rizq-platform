@@ -654,8 +654,6 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   // للحساب الأساسي (أو توكن سجل الباقة نفسه). يدعم مفاتيح معزولة مثل
   // accountId::video و accountId::tender عبر التحقق من الحساب الأساسي.
   app.get('/api/account-package/:id', (req, res) => {
-    const rec = getAccountRecord(req.params.id);
-    if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
     const token = String(req.header('x-account-token') || '').trim();
     if (!token) return res.status(401).json({ error: 'unauthorized' });
     const { timingSafeEqualStr } = require('./lib/secureCompare');
@@ -671,14 +669,17 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     if (mainAcc && !isAccountActive(mainAcc)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    const pkgTokenOk = !!(rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
-    const mainRec = !pkgTokenOk ? getAccountRecord(baseId) : null;
+    const rec = getAccountRecord(req.params.id);
+    const mainRec = getAccountRecord(baseId);
+    // الملكية أولاً — ثم 404 إن لم يوجد سجل (لا تعداد بدون توكن صالح)
+    const pkgTokenOk = !!(rec && rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
     const ownerOk = pkgTokenOk
       || !!(mainRec && mainRec.accessToken && timingSafeEqualStr(token, mainRec.accessToken))
       || !!(mainAcc && tokenMatchesAccount(mainAcc, token));
     if (!ownerOk) {
       return res.status(401).json({ error: 'unauthorized' });
     }
+    if (!rec) return res.status(404).json({ error: 'لا يوجد سجل باقة لهذا الحساب' });
     const { accessToken, ...safe } = rec;
     let entitlements = null;
     try {

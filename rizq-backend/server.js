@@ -1105,10 +1105,10 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     if (!accountId || !message) {
       return res.status(400).json({ ok: false, error: 'accountId و message مطلوبان' });
     }
-    const acc = readAccounts().find((a) => a.id === accountId);
-    if (!acc) return res.status(404).json({ ok: false, error: 'account_not_found' });
+    // التحقق من الملكية قبل كشف وجود الحساب (منع تعداد الحسابات)
     const token = extractAccountToken(req) || req.header('x-account-token') || '';
-    if (!verifyAccountOwner(accountId, token)) {
+    const acc = verifyAccountOwner(accountId, token);
+    if (!acc) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     try {

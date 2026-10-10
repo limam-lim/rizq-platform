@@ -2721,6 +2721,10 @@ main, .page-content.active, .main-content, .results-area,
 
 /* Buttons */
 .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);padding:13px 22px;border-radius:12px;font-weight:800;font-size:13.5px;border:none;cursor:pointer;font-family:'Segoe UI','Arial',sans-serif;transition:all .3s;display:inline-block;text-decoration:none}
+/* زر اشتراك فخم + سطر ترويجي تحته */
+.rizq-sub-cta{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:420px;margin:0 auto}
+.rizq-sub-cta .btn-primary{box-shadow:0 10px 28px rgba(201,168,76,.38)}
+.rizq-sub-cta-sub{margin:0;font-size:13.5px;font-weight:700;color:var(--royal,#1B3A6B);line-height:1.55;opacity:.92}
 .cat-card,.listing-card,.ad-card,.product-card,.price-card{
   border:1px solid rgba(226,232,240,0.8);
   box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
@@ -3908,8 +3912,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_social_links.js?v=23.5" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
-<script src="rizq_ux_polish.js?v=23.0"></script>
-<script src="rizq_ad_cards.js?v=3.9"></script>
+<script src="rizq_ux_polish.js?v=23.1"></script>
+<script src="rizq_ad_cards.js?v=3.10"></script>
 </head>
 <body>
 
@@ -4175,33 +4179,33 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <section class="hero-spaces" aria-labelledby="hero-spaces-title">
         <div class="hero-spaces-head">
           <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
-          <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">اختر فضاءك على رزق</h2>
+          <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">شاهد النماذج على رزق</h2>
           <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
         </div>
-        <!-- بوابات الفضاءات → شريط الاكتشاف على الرئيسية (لا صفحات فارغة بلا معرف) -->
-        <nav class="hero-biz-nav" aria-label="بوابات الدخول إلى الفضاءات">
-          <a href="#rzq-disc-store" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="المحلات">
+        <!-- بوابات النماذج: معاينة واجهات جاهزة ببيانات ترويجية (الكبسولة تبقى للتصفّح) -->
+        <nav class="hero-biz-nav" aria-label="بوابات النماذج الجاهزة">
+          <a href="rizq_store.html?id=acc_promo_store_rizq" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="نموذج محل">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
               <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
             </span>
           </a>
-          <a href="#rzq-disc-corp" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="المعارض">
+          <a href="rizq_showroom.html?id=acc_promo_corp_rizq" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض</span>
               <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
             </span>
           </a>
-          <a href="#rzq-disc-office" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="المكاتب">
+          <a href="rizq_office.html?id=acc_promo_office_rizq" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
               <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
             </span>
           </a>
-          <a href="#rzq-disc-tenders" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="المناقصات">
+          <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
             <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
             <span class="hero-biz-text">
@@ -4209,7 +4213,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
               <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
             </span>
           </a>
-          <a href="#rzq-disc-investments" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="الاستثمارات">
+          <a href="rizq_investments.html?demo=1" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="نموذج غرفة الاستثمارات">
             <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
             <span class="hero-biz-text">
@@ -4428,9 +4432,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المحلات المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=store" onclick="openRegisterAs('company','store');return false" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">🏪 افتح محلك الآن</a>
-        <a href="rizq_store.html?id=acc_promo_store_rizq" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn2">👁 عرض نموذج محل</a>
+      <div class="rizq-sub-cta" style="margin-top:24px">
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
+        <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن — سوقك الإلكتروني يبدأ من هنا</p>
       </div>
     </div>
   </div>
@@ -4504,10 +4508,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <a href="./?openRegister=1&regPage=1&preType=company&preBiz=corp" onclick="openRegisterAs('company','corp');return false"
-           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">🚘 انضم بمعرضك الآن</a>
-        <a href="rizq_showroom.html?id=acc_promo_corp_rizq" class="btn-outline" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn2">👁 عرض نموذج معرض</a>
+      <div class="rizq-sub-cta" style="margin-top:24px">
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
+           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
+        <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن — عرضك يصل حيث يبحث الجادّون</p>
       </div>
     </div>
 
@@ -4635,9 +4639,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
-      <div style="text-align:center;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px">
-        <button id="vo-create-btn" onclick="openRegisterAs('company','office')" class="btn-primary" style="font-size:15px;padding:16px 36px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">📒 أنشئ مكتبك الآن</button>
-        <a id="vo-view-btn" href="rizq_office.html?id=acc_promo_office_rizq" class="btn-outline" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px" data-t="vo-btn2">👁 عرض نموذج مكتب</a>
+      <div class="rizq-sub-cta" style="margin-top:24px">
+        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
+        <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن — حضورك المهني لا يتوقف</p>
       </div>
     </div>
 
@@ -4697,8 +4701,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-tenders"></div>
     </div>
 
-    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
-      <a href="rizq_tenders.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">💼 ادخل غرفة المناقصات</a>
+    <div class="fade-in rizq-sub-cta">
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company" onclick="return goSubscribePackage('tender')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vt-btn">✨ امتلك مقعدك في غرفة المناقصات</a>
+      <p class="rizq-sub-cta-sub" data-t="vt-btn-sub">اشترك الآن وافتح غرفة المناقصات</p>
     </div>
 
   </div>
@@ -4747,8 +4752,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="rzq-disc-investments"></div>
     </div>
 
-    <div class="fade-in" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
-      <a href="rizq_investments.html" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">📈 ادخل غرفة الاستثمارات</a>
+    <div class="fade-in rizq-sub-cta">
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company" onclick="return goSubscribePackage('investment')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vi-btn">✨ امتلك حضورك في غرفة الاستثمارات</a>
+      <p class="rizq-sub-cta-sub" data-t="vi-btn-sub">اشترك الآن وابدأ مسار النمو</p>
     </div>
 
   </div>
@@ -5937,18 +5943,29 @@ const FEATURED_ADS=[
   {id:209,emoji:'🐄',bg:'linear-gradient(135deg,#1a1000,#3d2800)',cat:'🐄 ماشية — بقر للبيع',catKey:'ماشية',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFR:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. مع شهادة صحية بيطرية حديثة. السعر قابل للتفاوض على الجملة.',descFR:'Vaches laitières de race pure, production journalière 15-20L par tête. Avec certificat sanitaire vétérinaire récent. Prix négociable en gros.',price:'960,000 MRU',priceFR:'960,000 MRU',loc:'📍 ترارزة',locFR:'📍 Trarza',tags:['8 رؤوس','حلوب','شهادة بيطرية','قابل للتفاوض'],tagsFR:['8 têtes','Laitière','Certificat vétérinaire','Négociable'],seller:'مزرعة البركة',sellerFR:'Ferme Al Baraka',sellerEmoji:'🐄',sellerMeta:'★★★☆☆ (5 تقييم) — مربّي',sellerMetaFR:'★★★☆☆ (5 avis) — Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
   {id:210,emoji:'🌿',bg:'linear-gradient(135deg,#0d1e12,#1a3d22)',cat:'🔧 خدمات — تصميم وبرمجة',catKey:'خدمات',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFR:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام، لوحة تحكم سهلة، دعم تقني 30 يوماً.',descFR:'Spécialiste en création de sites vitrines et boutiques e-commerce. Livraison en 7 jours, panneau d\'administration facile, support technique 30 jours.',price:'85,000 MRU',priceFR:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['تسليم 7 أيام','دعم تقني','متجر إلكتروني','موثّق'],tagsFR:['Livraison 7 jours','Support technique','Boutique en ligne','Vérifié'],seller:'محمد ليمام | ADMINIA',sellerFR:'Mohamed Limam | ADMINIA',sellerEmoji:'💻',sellerMeta:'★★★★★ (28 تقييم) — موثّق',sellerMetaFR:'★★★★★ (28 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
   /* منتجات أناقة لإطلالات رزق — بلاطة لكل منتج عند النقر */
-  {id:211,emoji:'👔',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',title:'دراعة موريتانية فاخرة مطرزة — أزرق سماوي',titleFR:'Daraa mauritanienne brodée — bleu ciel',desc:'دراعة رجالية من قماش فاخر بتطريز يدوي على الصدر، مناسبة للمناسبات والخروج. صورة تجريبية: شارع موريتاني.',descFR:'Daraa homme en tissu premium, broderie artisanale poitrine. Visuel démo : rue mauritanienne.',price:'45,000 MRU',priceFR:'45,000 MRU',loc:'📍 نواكشوط — السوق الكبير',locFR:'📍 Nouakchott — Grand marché',tags:['دراعة','رجالي','تطريز','شارع'],tagsFR:['Daraa','Homme','Broderie','Rue'],seller:'مرتضى حبيب',sellerFR:'Mortada Habib',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط محترف',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:212,emoji:'⌚',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'👗 أزياء — إكسسوارات',catKey:'أزياء',title:'ساعة رجالية كلاسيكية — ستيل',titleFR:'Montre homme classique — acier',desc:'ساعة يد رجالية أنيقة، مقاومة للماء، سوار ستيل قابل للتعديل.',descFR:'Montre homme élégante, étanche, bracelet acier ajustable.',price:'28,000 MRU',priceFR:'28,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ساعة','رجالي','ستيل','إكسسوار'],tagsFR:['Montre','Homme','Acier','Accessoire'],seller:'ساعة الوقت',sellerFR:'L\'Heure MR',sellerEmoji:'⌚',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:213,emoji:'👟',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'👗 أزياء — أحذية',catKey:'أزياء',title:'حذاء رياضي رجالي — مقاس 43',titleFR:'Baskets homme — pointure 43',desc:'حذاء رياضي مريح للمشي اليومي، خفيف ومقاوم، لون أسود/أبيض.',descFR:'Baskets confortables pour le quotidien, légères, noir/blanc.',price:'12,500 MRU',priceFR:'12,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حذاء','رياضي','رجالي','43'],tagsFR:['Chaussure','Sport','Homme','43'],seller:'ستيب موريتانيا',sellerFR:'Step Mauritanie',sellerEmoji:'👟',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:214,emoji:'🩴',bg:'linear-gradient(135deg,#1a2d4d,#0a1324)',cat:'👗 أزياء — أحذية',catKey:'أزياء',title:'صندل رجالي جلد — صناعة محلية',titleFR:'Sandale homme scuir — fabrication locale',desc:'صندل جلد طبيعي، مريح للصيف، مقاسات من 40 إلى 45.',descFR:'Sandale en cuir naturel, confort été, pointures 40 à 45.',price:'6,500 MRU',priceFR:'6,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['صندل','جلد','رجالي','محلي'],tagsFR:['Sandale','Cuir','Homme','Local'],seller:'سوق الجلد',sellerFR:'Marché du Cuir',sellerEmoji:'🩴',sellerMeta:'★★★☆☆ — حرفي',sellerMetaFR:'★★★☆☆ — Artisan',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours',pin:false},
-  {id:215,emoji:'📿',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',cat:'🪙 ذهب ومجوهرات — إكسسوار',catKey:'ذهب',title:'سبحة كهرمان رجالية فاخرة',titleFR:'Chapelet ambre homme — luxe',desc:'سبحة كهرمان طبيعي، 33 حبة، مناسبة للإهداء والمناسبات.',descFR:'Chapelet en ambre naturel, 33 grains, idéal cadeau.',price:'18,000 MRU',priceFR:'18,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['سبحة','كهرمان','رجالي','إكسسوار'],tagsFR:['Chapelet','Ambre','Homme','Accessoire'],seller:'ورشة الكنوز',sellerFR:'Atelier Trésors',sellerEmoji:'📿',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:216,emoji:'🧕',bg:'linear-gradient(135deg,#6b2d4a,#3d1a2c)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',title:'ملحفة حريرية فاخرة — زمرد وذهب',titleFR:'Melhfa soie de luxe — émeraude et or',desc:'ملحفة نسائية حرير ناعم بألوان زاهية. صورة تجريبية: شارع موريتاني بإضاءة نهارية.',descFR:'Melhfa femme en soie, couleurs vives. Visuel démo : rue mauritanienne en journée.',price:'38,000 MRU',priceFR:'38,000 MRU',loc:'📍 نواكشوط — تفرغ زينة',locFR:'📍 Nouakchott — Tevragh Zeina',tags:['ملحفة','حرير','نسائي','شارع'],tagsFR:['Melhfa','Soie','Femme','Rue'],seller:'ورشة الأناقة',sellerFR:'Atelier Élégance',sellerEmoji:'🧕',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:231,emoji:'🧕',bg:'linear-gradient(135deg,#7a3a1a,#3a1a10)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',title:'ملحفة نقش تقليدي — تراكوتا',titleFR:'Melhfa motif traditionnel — terracotta',desc:'ملحفة بنقش موريتاني أصيل بألوان ترابية. صورة تجريبية داخل محل أقمشة تقليدي.',descFR:'Melhfa à motif mauritanien, tons terre. Visuel démo : boutique de tissus traditionnelle.',price:'42,000 MRU',priceFR:'42,000 MRU',loc:'📍 نواكشوط — محل الأقمشة',locFR:'📍 Nouakchott — boutique tissus',tags:['ملحفة','تقليدي','محل','نسائي'],tagsFR:['Melhfa','Traditionnel','Boutique','Femme'],seller:'دار الملحفة',sellerFR:'Maison Melhfa',sellerEmoji:'🧕',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:232,emoji:'👔',bg:'linear-gradient(135deg,#0f2347,#1B3A6B)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',title:'دراعة كحلي مطرزة — محل رجالي',titleFR:'Daraa marine brodée — boutique homme',desc:'دراعة كحلي فاخرة بتطريز فضي وذهبي. صورة تجريبية داخل محل ألبسة رجالية موريتاني.',descFR:'Daraa marine premium, broderie argent/or. Visuel démo : boutique homme mauritanienne.',price:'52,000 MRU',priceFR:'52,000 MRU',loc:'📍 نواكشوط — محل الدراعات',locFR:'📍 Nouakchott — boutique Daraa',tags:['دراعة','كحلي','محل','رجالي'],tagsFR:['Daraa','Marine','Boutique','Homme'],seller:'خياطة الأصالة',sellerFR:'Couture Aṣāla',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:233,emoji:'🧕',bg:'linear-gradient(135deg,#5a3a5a,#2a1a30)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',title:'ملحفة ليلكية وبورغندي — سهرة',titleFR:'Melhfa lilas & bordeaux — soirée',desc:'ملحفة ثنائية اللون للمناسبات مع حقيبة وإكسسوارات ذهبية. صورة تجريبية: شارع سكني مساءً.',descFR:'Melhfa bicolore pour soirées, sac et bijoux. Visuel démo : rue résidentielle le soir.',price:'55,000 MRU',priceFR:'55,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ملحفة','سهرة','نسائي','أنيق'],tagsFR:['Melhfa','Soirée','Femme','Élégant'],seller:'بوتيك لمسة',sellerFR:'Boutique Touche',sellerEmoji:'🧕',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:234,emoji:'👔',bg:'linear-gradient(135deg,#234d8f,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',title:'دراعة سماوية بتطريز ذهبي — جلسة محل',titleFR:'Daraa ciel broderie or — en boutique',desc:'دراعة أنيقة مع قميص أبيض وساعة ذهبية. صورة تجريبية داخل محل تقليدي.',descFR:'Daraa élégante, polo blanc et montre. Visuel démo en boutique traditionnelle.',price:'48,000 MRU',priceFR:'48,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['دراعة','ذهبي','محل','رجالي'],tagsFR:['Daraa','Or','Boutique','Homme'],seller:'الأناقة الرجالية',sellerFR:'Élégance Homme',sellerEmoji:'👔',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:217,emoji:'💍',bg:'linear-gradient(135deg,#7a4a00,#3a2200)',cat:'🪙 ذهب ومجوهرات',catKey:'ذهب',title:'أسورة ذهب عيار 21 — تصميم نسائي',titleFR:'Bracelet or 21 carats — design femme',desc:'أسورة ذهب نسائية عيار 21، وزن 12 غرام، مع شهادة أصالة.',descFR:'Bracelet femme or 21 carats, 12g, certificat d\'authenticité.',price:'110,000 MRU',priceFR:'110,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أسورة','ذهب','نسائي','21 عيار'],tagsFR:['Bracelet','Or','Femme','21 carats'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'💍',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:218,emoji:'👜',bg:'linear-gradient(135deg,#4a1942,#1B3A6B)',cat:'👗 أزياء — حقائب',catKey:'أزياء',title:'حقيبة نسائية أنيقة — جلد صناعي',titleFR:'Sac femme élégant — simili cuir',desc:'حقيبة يومية عملية، جيوب داخلية، ألوان متعددة.',descFR:'Sac quotidien pratique, poches intérieures, plusieurs couleurs.',price:'9,800 MRU',priceFR:'9,800 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حقيبة','نسائي','يومي','أنيق'],tagsFR:['Sac','Femme','Quotidien','Élégant'],seller:'بوتيك لمسة',sellerFR:'Boutique Touche',sellerEmoji:'👜',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:211,emoji:'👔',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',subcat:'دراعة رجالية',gender:'men',title:'دراعة موريتانية فاخرة مطرزة — أزرق سماوي',titleFR:'Daraa mauritanienne brodée — bleu ciel',desc:'دراعة رجالية من قماش فاخر بتطريز يدوي على الصدر، مناسبة للمناسبات والخروج. صورة تجريبية: شارع موريتاني.',descFR:'Daraa homme en tissu premium, broderie artisanale poitrine. Visuel démo : rue mauritanienne.',price:'45,000 MRU',priceFR:'45,000 MRU',loc:'📍 نواكشوط — السوق الكبير',locFR:'📍 Nouakchott — Grand marché',tags:['دراعة','رجالي','تطريز','شارع'],tagsFR:['Daraa','Homme','Broderie','Rue'],seller:'مرتضى حبيب',sellerFR:'Mortada Habib',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط محترف',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:212,emoji:'⌚',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'👗 أزياء — إكسسوارات',catKey:'أزياء',subcat:'ملابس رجالية',gender:'men',title:'ساعة رجالية كلاسيكية — ستيل',titleFR:'Montre homme classique — acier',desc:'ساعة يد رجالية أنيقة، مقاومة للماء، سوار ستيل قابل للتعديل.',descFR:'Montre homme élégante, étanche, bracelet acier ajustable.',price:'28,000 MRU',priceFR:'28,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ساعة','رجالي','ستيل','إكسسوار'],tagsFR:['Montre','Homme','Acier','Accessoire'],seller:'ساعة الوقت',sellerFR:'L\'Heure MR',sellerEmoji:'⌚',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:213,emoji:'👟',bg:'linear-gradient(135deg,#0f2347,#234d8f)',cat:'👗 أزياء — أحذية',catKey:'أزياء',subcat:'ملابس رجالية',gender:'men',title:'حذاء رياضي رجالي — مقاس 43',titleFR:'Baskets homme — pointure 43',desc:'حذاء رياضي مريح للمشي اليومي، خفيف ومقاوم، لون أسود/أبيض.',descFR:'Baskets confortables pour le quotidien, légères, noir/blanc.',price:'12,500 MRU',priceFR:'12,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حذاء','رياضي','رجالي','43'],tagsFR:['Chaussure','Sport','Homme','43'],seller:'ستيب موريتانيا',sellerFR:'Step Mauritanie',sellerEmoji:'👟',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:214,emoji:'🩴',bg:'linear-gradient(135deg,#1a2d4d,#0a1324)',cat:'👗 أزياء — أحذية',catKey:'أزياء',subcat:'ملابس رجالية',gender:'men',title:'صندل رجالي جلد — صناعة محلية',titleFR:'Sandale homme scuir — fabrication locale',desc:'صندل جلد طبيعي، مريح للصيف، مقاسات من 40 إلى 45.',descFR:'Sandale en cuir naturel, confort été, pointures 40 à 45.',price:'6,500 MRU',priceFR:'6,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['صندل','جلد','رجالي','محلي'],tagsFR:['Sandale','Cuir','Homme','Local'],seller:'سوق الجلد',sellerFR:'Marché du Cuir',sellerEmoji:'🩴',sellerMeta:'★★★☆☆ — حرفي',sellerMetaFR:'★★★☆☆ — Artisan',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours',pin:false},
+  {id:215,emoji:'📿',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',cat:'🪙 ذهب ومجوهرات — إكسسوار',catKey:'ذهب',subcat:'ملابس رجالية',gender:'men',title:'سبحة كهرمان رجالية فاخرة',titleFR:'Chapelet ambre homme — luxe',desc:'سبحة كهرمان طبيعي، 33 حبة، مناسبة للإهداء والمناسبات.',descFR:'Chapelet en ambre naturel, 33 grains, idéal cadeau.',price:'18,000 MRU',priceFR:'18,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['سبحة','كهرمان','رجالي','إكسسوار'],tagsFR:['Chapelet','Ambre','Homme','Accessoire'],seller:'ورشة الكنوز',sellerFR:'Atelier Trésors',sellerEmoji:'📿',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:216,emoji:'🧕',bg:'linear-gradient(135deg,#6b2d4a,#3d1a2c)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',subcat:'ملحفة نسائية',gender:'women',title:'ملحفة حريرية فاخرة — زمرد وذهب',titleFR:'Melhfa soie de luxe — émeraude et or',desc:'ملحفة نسائية حرير ناعم بألوان زاهية. صورة تجريبية: شارع موريتاني بإضاءة نهارية.',descFR:'Melhfa femme en soie, couleurs vives. Visuel démo : rue mauritanienne en journée.',price:'38,000 MRU',priceFR:'38,000 MRU',loc:'📍 نواكشوط — تفرغ زينة',locFR:'📍 Nouakchott — Tevragh Zeina',tags:['ملحفة','حرير','نسائي','شارع'],tagsFR:['Melhfa','Soie','Femme','Rue'],seller:'ورشة الأناقة',sellerFR:'Atelier Élégance',sellerEmoji:'🧕',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:231,emoji:'🧕',bg:'linear-gradient(135deg,#7a3a1a,#3a1a10)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',subcat:'ملحفة نسائية',gender:'women',title:'ملحفة نقش تقليدي — تراكوتا',titleFR:'Melhfa motif traditionnel — terracotta',desc:'ملحفة بنقش موريتاني أصيل بألوان ترابية. صورة تجريبية داخل محل أقمشة تقليدي.',descFR:'Melhfa à motif mauritanien, tons terre. Visuel démo : boutique de tissus traditionnelle.',price:'42,000 MRU',priceFR:'42,000 MRU',loc:'📍 نواكشوط — محل الأقمشة',locFR:'📍 Nouakchott — boutique tissus',tags:['ملحفة','تقليدي','محل','نسائي'],tagsFR:['Melhfa','Traditionnel','Boutique','Femme'],seller:'دار الملحفة',sellerFR:'Maison Melhfa',sellerEmoji:'🧕',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:232,emoji:'👔',bg:'linear-gradient(135deg,#0f2347,#1B3A6B)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',subcat:'دراعة رجالية',gender:'men',title:'دراعة كحلي مطرزة — محل رجالي',titleFR:'Daraa marine brodée — boutique homme',desc:'دراعة كحلي فاخرة بتطريز فضي وذهبي. صورة تجريبية داخل محل ألبسة رجالية موريتاني.',descFR:'Daraa marine premium, broderie argent/or. Visuel démo : boutique homme mauritanienne.',price:'52,000 MRU',priceFR:'52,000 MRU',loc:'📍 نواكشوط — محل الدراعات',locFR:'📍 Nouakchott — boutique Daraa',tags:['دراعة','كحلي','محل','رجالي'],tagsFR:['Daraa','Marine','Boutique','Homme'],seller:'خياطة الأصالة',sellerFR:'Couture Aṣāla',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:233,emoji:'🧕',bg:'linear-gradient(135deg,#5a3a5a,#2a1a30)',cat:'👗 أزياء — ملحفة نسائية',catKey:'أزياء',subcat:'ملحفة نسائية',gender:'women',title:'ملحفة ليلكية وبورغندي — سهرة',titleFR:'Melhfa lilas & bordeaux — soirée',desc:'ملحفة ثنائية اللون للمناسبات مع حقيبة وإكسسوارات ذهبية. صورة تجريبية: شارع سكني مساءً.',descFR:'Melhfa bicolore pour soirées, sac et bijoux. Visuel démo : rue résidentielle le soir.',price:'55,000 MRU',priceFR:'55,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ملحفة','سهرة','نسائي','أنيق'],tagsFR:['Melhfa','Soirée','Femme','Élégant'],seller:'بوتيك لمسة',sellerFR:'Boutique Touche',sellerEmoji:'🧕',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:234,emoji:'👔',bg:'linear-gradient(135deg,#234d8f,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',subcat:'دراعة رجالية',gender:'men',title:'دراعة سماوية بتطريز ذهبي — جلسة محل',titleFR:'Daraa ciel broderie or — en boutique',desc:'دراعة أنيقة مع قميص أبيض وساعة ذهبية. صورة تجريبية داخل محل تقليدي.',descFR:'Daraa élégante, polo blanc et montre. Visuel démo en boutique traditionnelle.',price:'48,000 MRU',priceFR:'48,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['دراعة','ذهبي','محل','رجالي'],tagsFR:['Daraa','Or','Boutique','Homme'],seller:'الأناقة الرجالية',sellerFR:'Élégance Homme',sellerEmoji:'👔',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:217,emoji:'💍',bg:'linear-gradient(135deg,#7a4a00,#3a2200)',cat:'🪙 ذهب ومجوهرات',catKey:'ذهب',subcat:'مجوهرات وذهب',gender:'women',title:'أسورة ذهب عيار 21 — تصميم نسائي',titleFR:'Bracelet or 21 carats — design femme',desc:'أسورة ذهب نسائية عيار 21، وزن 12 غرام، مع شهادة أصالة.',descFR:'Bracelet femme or 21 carats, 12g, certificat d\'authenticité.',price:'110,000 MRU',priceFR:'110,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أسورة','ذهب','نسائي','21 عيار'],tagsFR:['Bracelet','Or','Femme','21 carats'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'💍',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:219,emoji:'📿',bg:'linear-gradient(135deg,#5a3a10,#2a1a00)',cat:'🪙 ذهب ومجوهرات',catKey:'ذهب',subcat:'مجوهرات وذهب',gender:'women',title:'عقد لؤلؤ فاخر — تصميم نسائي',titleFR:'Collier perles — design femme',desc:'عقد لؤلؤ أنيق للمناسبات، تصميم نسائي راقٍ.',descFR:'Collier de perles élégant pour occasions, design femme.',price:'450,000 MRU',priceFR:'450,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['لؤلؤ','عقد','نسائي','ذهب'],tagsFR:['Perles','Collier','Femme','Or'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'📿',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:218,emoji:'👜',bg:'linear-gradient(135deg,#4a1942,#1B3A6B)',cat:'👗 أزياء — حقائب',catKey:'أزياء',subcat:'أحذية وحقائب',title:'حقيبة نسائية أنيقة — جلد صناعي',titleFR:'Sac femme élégant — simili cuir',desc:'حقيبة يومية عملية، جيوب داخلية، ألوان متعددة.',descFR:'Sac quotidien pratique, poches intérieures, plusieurs couleurs.',price:'9,800 MRU',priceFR:'9,800 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['حقيبة','نسائي','يومي','أنيق'],tagsFR:['Sac','Femme','Quotidien','Élégant'],seller:'بوتيك لمسة',sellerFR:'Boutique Touche',sellerEmoji:'👜',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  /* إطلالات أولاد — منتجات حقيقية التصنيف (لا خلط مع رجالي/نسائي) */
+  {id:241,emoji:'👦',bg:'linear-gradient(135deg,#1B3A6B,#234d8f)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'boys',title:'طقم أولاد يومي — قميص وبنطلون',titleFR:'Ensemble garçon quotidien — chemise & pantalon',desc:'طقم ملابس أولاد مريح للمدرسة واللعب، مقاسات 4–12 سنة.',descFR:'Ensemble garçon confortable pour école et jeux, tailles 4–12 ans.',price:'8,500 MRU',priceFR:'8,500 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أولاد','قميص','مدرسة','أطفال'],tagsFR:['Garçon','Chemise','École','Enfant'],seller:'عالم الأطفال',sellerFR:'Monde Enfants',sellerEmoji:'👦',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:242,emoji:'👟',bg:'linear-gradient(135deg,#0f2347,#1B3A6B)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'boys',title:'حذاء رياضي للأولاد — مقاس 32',titleFR:'Baskets garçon — pointure 32',desc:'حذاء رياضي خفيف للأولاد، مناسب للمدرسة والرياضة.',descFR:'Baskets légères pour garçons, école et sport.',price:'5,200 MRU',priceFR:'5,200 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أولاد','حذاء','رياضي','أطفال'],tagsFR:['Garçon','Chaussure','Sport','Enfant'],seller:'ستيب كيدز',sellerFR:'Step Kids',sellerEmoji:'👟',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:243,emoji:'🎒',bg:'linear-gradient(135deg,#162235,#234d8f)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'boys',title:'حقيبة مدرسية للأولاد — مقاومة',titleFR:'Cartable garçon — résistant',desc:'حقيبة ظهر مدرسية للأولاد مع جيوب متعددة.',descFR:'Sac à dos scolaire garçon avec plusieurs poches.',price:'4,800 MRU',priceFR:'4,800 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أولاد','مدرسة','حقيبة','أطفال'],tagsFR:['Garçon','École','Sac','Enfant'],seller:'عالم الأطفال',sellerFR:'Monde Enfants',sellerEmoji:'🎒',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:244,emoji:'🧢',bg:'linear-gradient(135deg,#1a2d4d,#0f2347)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'boys',title:'قبعة وكاب أولاد — صيفي',titleFR:'Casquette garçon — été',desc:'كاب خفيف للأولاد لحماية من الشمس.',descFR:'Casquette légère garçon anti-soleil.',price:'1,900 MRU',priceFR:'1,900 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['أولاد','قبعة','صيفي','أطفال'],tagsFR:['Garçon','Casquette','Été','Enfant'],seller:'كيدز ستايل',sellerFR:'Kids Style',sellerEmoji:'🧢',sellerMeta:'★★★☆☆',sellerMetaFR:'★★★☆☆',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  /* إطلالات بنات */
+  {id:245,emoji:'👧',bg:'linear-gradient(135deg,#6b2d4a,#3d1a2c)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'girls',title:'فستان يومي للبنات — قطن ناعم',titleFR:'Robe fille quotidienne — coton doux',desc:'فستان بنات مريح للمدرسة والمنزل، مقاسات 4–12 سنة.',descFR:'Robe fille confortable école/maison, tailles 4–12 ans.',price:'7,800 MRU',priceFR:'7,800 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['بنات','فستان','قطن','أطفال'],tagsFR:['Fille','Robe','Coton','Enfant'],seller:'زهرة البنات',sellerFR:'Fleur Filles',sellerEmoji:'👧',sellerMeta:'★★★★★ — موثّق',sellerMetaFR:'★★★★★ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:246,emoji:'👟',bg:'linear-gradient(135deg,#5a3a5a,#2a1a30)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'girls',title:'حذاء أنيق للبنات — مقاس 30',titleFR:'Chaussures fille élégantes — pointure 30',desc:'حذاء بنات مريح للمدرسة والمناسبات الخفيفة.',descFR:'Chaussures fille confortables école et sorties.',price:'4,600 MRU',priceFR:'4,600 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['بنات','حذاء','أنيق','أطفال'],tagsFR:['Fille','Chaussure','Élégant','Enfant'],seller:'زهرة البنات',sellerFR:'Fleur Filles',sellerEmoji:'👟',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:247,emoji:'🎀',bg:'linear-gradient(135deg,#7a3a5a,#3a1a30)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'girls',title:'طقم إكسسوارات بنات — فيونكات',titleFR:'Accessoires fille — nœuds',desc:'طقم فيونكات وأكسسوارات شعر للبنات.',descFR:'Lot de nœuds et accessoires cheveux pour filles.',price:'2,400 MRU',priceFR:'2,400 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['بنات','فيونكة','إكسسوار','أطفال'],tagsFR:['Fille','Nœud','Accessoire','Enfant'],seller:'كيدز ستايل',sellerFR:'Kids Style',sellerEmoji:'🎀',sellerMeta:'★★★★☆',sellerMetaFR:'★★★★☆',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:248,emoji:'👒',bg:'linear-gradient(135deg,#4a1942,#1B3A6B)',cat:'👗 أزياء — ملابس أطفال ورضع',catKey:'أزياء',subcat:'ملابس أطفال ورضع',gender:'girls',title:'قبعة صيفية للبنات',titleFR:'Chapeau d\'été fille',desc:'قبعة خفيفة للبنات للخروج في الشمس.',descFR:'Chapeau léger fille pour le soleil.',price:'2,100 MRU',priceFR:'2,100 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['بنات','قبعة','صيفي','أطفال'],tagsFR:['Fille','Chapeau','Été','Enfant'],seller:'زهرة البنات',sellerFR:'Fleur Filles',sellerEmoji:'👒',sellerMeta:'★★★☆☆',sellerMetaFR:'★★★☆☆',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
   /* كتالوج موزاييك المعارض/الأناقة — معرّفات عالية لتفادي التعارض مع إعلانات API */
   {id:220,emoji:'🚗',bg:'linear-gradient(135deg,#234d8f,#1B3A6B)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'Toyota Hilux 2022 بحالة ممتازة',titleFR:'Toyota Hilux 2022 excellent état',desc:'ديزل 4WD، ممشى منخفض، صيانة وكيل.',descFR:'Diesel 4x4, faible kilométrage, entretien concessionnaire.',price:'8,000,000 MRU',priceFR:'8,000,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['Hilux','ديزل','4WD'],tagsFR:['Hilux','Diesel','4x4'],seller:'عبد الله محمد',sellerFR:'Abdallah Mohamed',sellerEmoji:'🚗',sellerMeta:'★★★★☆',sellerMetaFR:'★★★★☆',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
   {id:221,emoji:'🚗',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'تويوتا كامري 2021 — سيدان عائلية',titleFR:'Toyota Camry 2021 — berline',desc:'سيدان عائلية مريحة بحالة ممتازة.',descFR:'Berline familiale confortable.',price:'4,200,000 MRU',priceFR:'4,200,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['سيدان','كامري','2021'],tagsFR:['Berline','Camry','2021'],seller:'وكالة النجمة',sellerFR:'Agence Najma',sellerEmoji:'🚗',sellerMeta:'★★★★★',sellerMetaFR:'★★★★★',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
@@ -6383,11 +6400,16 @@ try { buildLandingAds(true); } catch(eLad) {}
 /* ── Style Ideas: أزياء وملابس وإكسسوارات فقط (لا سيارات/شاحنات/إلكترونيات…) ── */
 var _rizqStyleGender = 'men';
 var RIZQ_STYLE_GENDERS = { men:1, women:1, boys:1, girls:1 };
-var RIZQ_STYLE_MEN_HINTS = /دراعة|رجالي|رجل|رجال|homme|men'?s?|daraa|قميص|بدلة|حذاء\s*رجالي|ملابس\s*رجالي/i;
-var RIZQ_STYLE_WOMEN_HINTS = /ملحفة|نسائي|نساء|امرأة|femme|women|melhfa|عباية|فستان|حقيبة|طرح|حجاب|مكياج|عطر|مجوهرات\s*نسائي|ملابس\s*نسائي/i;
-var RIZQ_STYLE_BOYS_HINTS = /أولاد|ولد|صبي|فتى|طفل\s*ذكر|garçon|boy|boys|ملابس\s*أولاد|حذاء\s*ولد|تي.?شيرت\s*أولاد/i;
-var RIZQ_STYLE_GIRLS_HINTS = /بنات|بنت|طفلة|فتاة|fille|girl|girls|ملابس\s*بنات|حذاء\s*بنت|فستان\s*بنات/i;
+var RIZQ_STYLE_MEN_HINTS = /دراعة|رجالي|رجل|رجال|homme|men'?s?|daraa|قميص\s*رجالي|بدلة|حذاء\s*رجالي|ملابس\s*رجالي|سبحة|ساعة\s*رجالي/i;
+var RIZQ_STYLE_WOMEN_HINTS = /ملحفة|نسائي|نساء|امرأة|femme|women|melhfa|عباية|فستان(?!\s*بنات)|حقيبة\s*نسائي|طرح|حجاب|مكياج|عطر\s*نسائي|مجوهرات\s*نسائي|ملابس\s*نسائي|أسورة|عقد|لؤلؤ|خلخال/i;
+var RIZQ_STYLE_BOYS_HINTS = /أولاد|ولد|صبي|فتى|طفل\s*ذكر|garçon|boy|boys|ملابس\s*أولاد|حذاء\s*ولد|تي.?شيرت\s*أولاد|مدرسة\s*أولاد/i;
+var RIZQ_STYLE_GIRLS_HINTS = /بنات|بنت|طفلة|فتاة|fille|girl|girls|ملابس\s*بنات|حذاء\s*بنت|فستان\s*بنات|مدرسة\s*بنات/i;
 var RIZQ_STYLE_KIDS_HINTS = /أطفال|طفل|رضيع|رضيعة|أطفال\s*و?\s*رضّع|kids?|enfant|bébé|bebe|baby|مدرسة|مدرسي|لعب\s*أطفال|ألعاب|حذاء\s*أطفال|ملابس\s*أطفال|تي.?شيرت\s*أطفال/i;
+/* أقسام فرعية رسمية من كتالوج الأزياء — مصدر حقيقة أقوى من تلميحات النص */
+var RIZQ_STYLE_SUB_MEN = /دراعة\s*رجالية|ملابس\s*رجالية|عطور\s*رجالية/i;
+var RIZQ_STYLE_SUB_WOMEN = /ملحفة\s*نسائية|طرح|عباية|مجوهرات\s*وذهب|عطور\s*ومستحضرات/i;
+var RIZQ_STYLE_SUB_KIDS = /ملابس\s*أطفال|رضع|أطفال\s*ورضع/i;
+var RIZQ_STYLE_SUB_MIXED_WOMEN_KIDS = /ملابس\s*نسائية\s*وأطفال/i;
 /* فئات وأنماط مسموحة: أزياء، ملابس، ذهب/مجوهرات، إكسسوارات، أحذية، حقائب، عطور */
 var RIZQ_STYLE_ALLOW_CAT = /أزياء|موضة|ذهب|مجوهرات|إكسسوار|أحذية|حقائب|عطور|fashion|mode|bijou|accessoire|chaussure|sac|parfum/i;
 var RIZQ_STYLE_ALLOW_HINTS = /دراعة|ملحفة|قميص|فستان|عباية|حجاب|طرح|حذاء|حقيبة|أسورة|خلخال|خاتم|عقد|ساعة(?:\s|$)|مجوهرات|ذهب\s*عيار|ملابس|ثوب|بدلة|جاكيت|معطف|حقيبة|إكسسوار|daraa|melhfa|robe|bijou|bracelet|bague|chaussure|vêtement|montre|sac|accessoire/i;
@@ -6406,14 +6428,14 @@ var RIZQ_STYLE_WOMEN_TEMPLATES = [
   { ar:'أناقة نسائية يومية', fr:'Look femme du quotidien', emoji:['👗','👜','👠'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' }
 ];
 var RIZQ_STYLE_BOYS_TEMPLATES = [
-  { ar:'إطلالة يومية للأولاد', fr:'Look garçon du quotidien', emoji:['👦','👕','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
-  { ar:'حذاء وأناقة للأولاد', fr:'Chaussures & style garçon', emoji:['👟','🧢','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
-  { ar:'إطلالة مدرسية للأولاد', fr:'Look scolaire garçon', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' }
+  { ar:'إطلالة يومية للأولاد', fr:'Look garçon du quotidien', emoji:['👦','👕','👟'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'shirt' },
+  { ar:'حذاء وأناقة للأولاد', fr:'Chaussures & style garçon', emoji:['👟','🧢','🎒'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'shoe' },
+  { ar:'إطلالة مدرسية للأولاد', fr:'Look scolaire garçon', emoji:['🎒','📗','✏️'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'' }
 ];
 var RIZQ_STYLE_GIRLS_TEMPLATES = [
-  { ar:'إطلالة يومية للبنات', fr:'Look fille du quotidien', emoji:['👧','👗','👟'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shirt' },
-  { ar:'حذاء وأناقة للبنات', fr:'Chaussures & style fille', emoji:['👟','🎀','🎒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'shoe' },
-  { ar:'فستان أنيق للبنات', fr:'Robe fille élégante', emoji:['👗','✨','👒'], cats:['أزياء'], browseSub:'ملابس نسائية وأطفال', kind:'' }
+  { ar:'إطلالة يومية للبنات', fr:'Look fille du quotidien', emoji:['👧','👗','👟'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'shirt' },
+  { ar:'حذاء وأناقة للبنات', fr:'Chaussures & style fille', emoji:['👟','🎀','🎒'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'shoe' },
+  { ar:'فستان أنيق للبنات', fr:'Robe fille élégante', emoji:['👗','✨','👒'], cats:['أزياء'], browseSub:'ملابس أطفال ورضع', kind:'' }
 ];
 function _styTemplatesFor(gender){
   if(gender === 'women') return RIZQ_STYLE_WOMEN_TEMPLATES;
@@ -6447,23 +6469,46 @@ function _styEsc(s){
 }
 function _styAdBlob(a){
   if(!a) return '';
-  return [a.title,a.titleFR,a.desc,a.descFR,a.cat,a.catKey,(a.tags||[]).join(' '),(a.tagsFR||[]).join(' ')].join(' ');
+  return [a.title,a.titleFR,a.titleFr,a.desc,a.descFR,a.cat,a.catKey,a.subcat,a.category,(a.tags||[]).join(' '),(a.tagsFR||[]).join(' ')].join(' ');
 }
 function _styDetectGender(a){
+  if(!a) return 'neutral';
+  /* جنس محفوظ من بذرة مشاهدة / متجر */
+  if(a.gender && RIZQ_STYLE_GENDERS[a.gender]) return a.gender;
+  if(a.gender === 'kids') return 'kids';
+  var sub = String(a.subcat || '');
+  var cat = String(a.cat || a.category || '');
   var blob = _styAdBlob(a);
+  var section = sub + ' ' + cat;
+
+  /* 1) القسم الفرعي الرسمي أولاً — لا خلط رجال/نساء/أطفال */
+  if(RIZQ_STYLE_SUB_MEN.test(section)) return 'men';
+  if(RIZQ_STYLE_SUB_WOMEN.test(section) && !RIZQ_STYLE_SUB_KIDS.test(section)) return 'women';
+  if(RIZQ_STYLE_SUB_KIDS.test(section) || RIZQ_STYLE_SUB_MIXED_WOMEN_KIDS.test(section)) {
+    var boysInKids = RIZQ_STYLE_BOYS_HINTS.test(blob);
+    var girlsInKids = RIZQ_STYLE_GIRLS_HINTS.test(blob);
+    if(boysInKids && !girlsInKids) return 'boys';
+    if(girlsInKids && !boysInKids) return 'girls';
+    /* قسم أطفال بلا تلميح جنس صريح — لا يُعرض في رجال/نساء */
+    return 'kids';
+  }
+
   var boys = RIZQ_STYLE_BOYS_HINTS.test(blob);
   var girls = RIZQ_STYLE_GIRLS_HINTS.test(blob);
-  var kids = RIZQ_STYLE_KIDS_HINTS.test(blob);
   if(boys && !girls) return 'boys';
   if(girls && !boys) return 'girls';
-  if(kids || (boys && girls)) return 'kids';
+
   var men = RIZQ_STYLE_MEN_HINTS.test(blob);
   var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
   if(men && !women) return 'men';
   if(women && !men) return 'women';
-  if(men && women) return 'both';
-  /* منتج أناقة بلا تلميح جنس → يظهر في الرجالي والنسائي */
-  if(_styIsStyleCat(a)) return 'both';
+
+  /* ذهب/لؤلؤ بلا تلميح رجالي → نسائي (لا يظهر تحت رجال) */
+  if(/ذهب|لؤلؤ|أسورة|عقد|خلخال|خاتم|bracelet|collier|bijou|\bgold\b/i.test(blob) && !men) {
+    return 'women';
+  }
+
+  /* بلا جنس صريح: لا نُسقطه في كل التبويبات (كان يسبب خلط رجال↔نساء↔أولاد) */
   return 'neutral';
 }
 function _styPool(){
@@ -6485,11 +6530,12 @@ function _styPool(){
 }
 function _styMatchGender(a, gender){
   var g = _styDetectGender(a);
-  if(gender === 'boys') return g === 'boys' || g === 'kids';
-  if(gender === 'girls') return g === 'girls' || g === 'kids';
-  if(gender === 'men') return g === 'men' || g === 'both';
-  if(gender === 'women') return g === 'women' || g === 'both';
-  return g === gender || g === 'both';
+  /* تطابق صارم — لا both/kids العامة ولا المنتجات المحايدة */
+  if(gender === 'boys') return g === 'boys';
+  if(gender === 'girls') return g === 'girls';
+  if(gender === 'men') return g === 'men';
+  if(gender === 'women') return g === 'women';
+  return g === gender;
 }
 /** إطلالة أزياء/ملابس/إكسسوارات فقط — يرفض السيارات والشاحنات والإلكترونيات وغيرها */
 function _styIsStyleCat(a){
@@ -6526,22 +6572,21 @@ function _styPickCompanions(primary, pool, gender, n){
 /** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) لا نسخ من نفس القطعة */
 function _styPickLookCompanions(primary, pool, gender, n){
   n = n || 2;
-  var stylePool = (pool || []).filter(_styIsStyleCat);
+  /* المرافقون من نفس الجنس فقط — لا looseGender الذي كان يخلط الأقسام */
+  var stylePool = (pool || []).filter(function(a){
+    return _styIsStyleCat(a) && (!gender || _styMatchGender(a, gender));
+  });
   var primaryKind = typeof _styAdKind === 'function' ? _styAdKind(primary) : '';
-  var looseGender = !gender || gender === 'both' || gender === 'all';
   var used = {};
   if(primary && primary.id != null) used[String(primary.id)] = 1;
   var picks = [];
-  var prefer = ['watch','shoe','bag','gold','shirt','daraa','melhfa','phone'].filter(function(k){
+  var prefer = ['watch','shoe','bag','gold','shirt','daraa','melhfa'].filter(function(k){
     return k && k !== primaryKind;
   });
-  function genderOk(a){
-    return looseGender ? true : _styMatchGender(a, gender);
-  }
   for(var ki=0; ki<prefer.length && picks.length < n; ki++){
     var kind = prefer[ki];
     var cand = _styShuffle(stylePool.filter(function(a){
-      return a && !used[String(a.id)] && genderOk(a) && _styAdKind(a) === kind;
+      return a && !used[String(a.id)] && _styAdKind(a) === kind;
     }));
     if(cand.length){
       picks.push(cand[0]);
@@ -6549,12 +6594,9 @@ function _styPickLookCompanions(primary, pool, gender, n){
     }
   }
   if(picks.length < n){
-    var restPool = looseGender
-      ? stylePool.filter(function(a){ return a && !used[String(a.id)]; })
-      : _styPickCompanions(primary, stylePool, gender, n + 4);
-    var rest = _styShuffle(restPool).filter(function(a){
+    var rest = _styShuffle(stylePool.filter(function(a){
       return a && !used[String(a.id)];
-    });
+    }));
     for(var ri=0; ri<rest.length && picks.length < n; ri++){
       picks.push(rest[ri]);
       used[String(rest[ri].id)] = 1;
@@ -6759,18 +6801,13 @@ function rizqFeedStyleSeed(item){
   if(!title) return;
   /* لا بذور من سيارات/شاحنات/إلكترونيات — أزياء وملابس وإكسسوارات فقط */
   if(!_styIsStyleCat(item)) return;
-  var blob = [title, item.titleFR || item.nameF || '', item.desc || '', item.cat || '', item.catKey || ''].join(' ');
-  var boys = RIZQ_STYLE_BOYS_HINTS.test(blob);
-  var girls = RIZQ_STYLE_GIRLS_HINTS.test(blob);
-  var kids = RIZQ_STYLE_KIDS_HINTS.test(blob);
-  var men = RIZQ_STYLE_MEN_HINTS.test(blob);
-  var women = RIZQ_STYLE_WOMEN_HINTS.test(blob);
-  var gender = 'both';
-  if(boys && !girls) gender = 'boys';
-  else if(girls && !boys) gender = 'girls';
-  else if(kids || (boys && girls)) gender = 'kids';
-  else if(men && !women) gender = 'men';
-  else if(women && !men) gender = 'women';
+  var gender = (typeof _styDetectGender === 'function')
+    ? _styDetectGender(Object.assign({}, item, { title: title }))
+    : 'neutral';
+  if(gender === 'neutral' || gender === 'both' || gender === 'kids') {
+    /* لا بذور بلا جنس واضح — تمنع خلط التبويبات */
+    return;
+  }
   var images = [];
   if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
   else if(item.image) images = [item.image];
@@ -6781,6 +6818,7 @@ function rizqFeedStyleSeed(item){
     emoji: item.emoji || '✨',
     cat: item.cat || '',
     catKey: item.catKey || item.cat || 'أزياء',
+    subcat: item.subcat || '',
     images: images,
     gender: gender,
     href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
@@ -6793,7 +6831,6 @@ function rizqFeedStyleSeed(item){
   _stySaveSeeds(list);
   if(typeof buildStyleIdeas === 'function' && document.getElementById('rizq-styles-rail')){
     if(RIZQ_STYLE_GENDERS[seed.gender]) setStyleGender(seed.gender);
-    else if(seed.gender === 'kids') setStyleGender(_rizqStyleGender === 'girls' ? 'girls' : 'boys');
     else buildStyleIdeas(true);
   }
 }
@@ -6868,9 +6905,7 @@ function buildStyleIdeas(reshuffle){
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
   var seeds = _styLoadSeeds().filter(function(s){
     if(!_styIsStyleCat(s)) return false;
-    if(gender === 'boys') return s.gender === 'boys' || s.gender === 'kids';
-    if(gender === 'girls') return s.gender === 'girls' || s.gender === 'kids';
-    return s.gender === gender || s.gender === 'both';
+    return _styMatchGender(s, gender);
   });
   /* سلسلة كاملة مثل النماذج — كل القوالب في شريط أفقي */
   var tplList = _styShuffle(templates);
@@ -6879,50 +6914,55 @@ function buildStyleIdeas(reshuffle){
   /* لا نلمس معرف LANG هنا — يُعرَّف لاحقاً بـ const ويسبب TDZ إن استُدعي buildStyleIdeas مبكراً */
   var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
   var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
+  /* مصدر المنتجات لهذا التبويب فقط — ممنوع السقوط إلى أزياء جنس آخر */
+  var styleGendered = gendered.slice();
 
   /* بطاقة أولى من آخر منتج أزياء/إكسسوار شاهدته — بلاطات مرافقة مختلفة بأسعارها */
-  if(seeds.length){
+  if(seeds.length && styleGendered.length >= 2){
     var seed = seeds[0];
     usedIds[String(seed.id)] = 1;
     var seedAsAd = Object.assign({}, seed, {
       price: seed.price || seed.priceFR || '',
       priceFR: seed.priceFR || seed.price || '',
-      catKey: seed.catKey || 'أزياء'
+      catKey: seed.catKey || 'أزياء',
+      gender: seed.gender || gender
     });
     var seedComps = (typeof _styPickLookCompanions === 'function')
-      ? _styPickLookCompanions(seedAsAd, gendered.length ? gendered : pool, gender, 2)
+      ? _styPickLookCompanions(seedAsAd, styleGendered, gender, 2)
       : [];
     var seedItems = [seedAsAd].concat(seedComps);
     while(seedItems.length < 3){
-      var fillSeed = (gendered.length ? gendered : pool).find(function(a){
+      var fillSeed = styleGendered.find(function(a){
         return a && !seedItems.some(function(x){ return x && String(x.id)===String(a.id); });
       });
       if(!fillSeed) break;
       seedItems.push(fillSeed);
     }
-    var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
-    var seedTiles = '';
-    for(var si=0; si<seedItems.length && si<3; si++){
-      seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
+    if(seedItems.length >= 3){
+      var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
+      var seedTiles = '';
+      for(var si=0; si<seedItems.length && si<3; si++){
+        seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
+      }
+      var genderBadge0 = _styGenderBadge(gender, fr);
+      var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
+      cards.push(_styBuildCardHtml({
+        gender: gender,
+        seed: true,
+        tilesHtml: seedTiles,
+        fromViewLbl: fromViewLbl,
+        badge: genderBadge0,
+        name: seedName,
+        meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
+        cta: cta,
+        href: seedHref,
+        primaryId: seed.id
+      }));
     }
-    var genderBadge0 = _styGenderBadge(gender, fr);
-    var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
-    cards.push(_styBuildCardHtml({
-      gender: gender,
-      seed: true,
-      tilesHtml: seedTiles,
-      fromViewLbl: fromViewLbl,
-      badge: genderBadge0,
-      name: seedName,
-      meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
-      cta: cta,
-      href: seedHref,
-      primaryId: seed.id
-    }));
   }
 
   tplList.forEach(function(tpl){
-    var styleGendered = gendered;
+    if(styleGendered.length < 3) return;
     var kindPool = (tpl.kind ? styleGendered.filter(function(a){ return typeof _styAdKind==='function' && _styAdKind(a) === tpl.kind && !usedIds[String(a.id)]; }) : []);
     var catPool = styleGendered.filter(function(a){
       var k = String(a.catKey||a.cat||'');
@@ -6932,19 +6972,17 @@ function buildStyleIdeas(reshuffle){
       return !kindPool.some(function(k){ return String(k.id)===String(a.id); });
     }));
     if(!catPool.length) catPool = styleGendered.filter(function(a){ return !usedIds[String(a.id)]; });
-    if(!catPool.length) catPool = pool.filter(function(a){ return !usedIds[String(a.id)]; });
+    /* لا fallback إلى pool العام — يمنع ظهور رجال تحت أولاد/بنات */
     var primary = catPool.length ? _styShuffle(catPool)[0] : null;
-    if(primary) usedIds[String(primary.id)] = 1;
-    /* المرافقون يُعاد استخدامهم بين البطاقات — المهم أن كل بلاطة في البطاقة منتج مختلف */
-    var companionPool = (styleGendered.length ? styleGendered : pool).filter(function(a){
-      return a && !(primary && String(a.id) === String(primary.id));
+    if(!primary) return;
+    usedIds[String(primary.id)] = 1;
+    var companionPool = styleGendered.filter(function(a){
+      return a && String(a.id) !== String(primary.id);
     });
-    var companions = primary
-      ? (typeof _styPickLookCompanions === 'function'
+    var companions = (typeof _styPickLookCompanions === 'function'
           ? _styPickLookCompanions(primary, companionPool, gender, 2)
-          : _styPickCompanions(primary, companionPool, gender, 2))
-      : [];
-    var items = primary ? [primary].concat(companions) : [];
+          : _styPickCompanions(primary, companionPool, gender, 2));
+    var items = [primary].concat(companions);
     while(items.length < 3){
       var fillSty = companionPool.find(function(a){
         return a && !items.some(function(x){ return x && String(x.id)===String(a.id); });
@@ -6952,7 +6990,7 @@ function buildStyleIdeas(reshuffle){
       if(!fillSty) break;
       items.push(fillSty);
     }
-    if(items.length < 3) return; /* لا بطاقة ببلاطات جامدة بلا سعر */
+    if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
     var name = fr ? tpl.fr : tpl.ar;
     var metaParts = items.map(function(a){
       var d = (typeof trAd === 'function') ? trAd(a) : a;
@@ -6986,13 +7024,19 @@ function buildStyleIdeas(reshuffle){
     }));
   });
 
-  /* بطاقات إضافية لسلسلة أفقية أطول (مثل النماذج) */
-  var extras = _styShuffle((gendered.length ? gendered : pool).filter(function(a){ return !usedIds[String(a.id)]; }));
-  var emojiSets = [['👔','⌚','👟'],['🧥','📿','👞'],['👗','👜','👠'],['🪙','💍','✨'],['🧒','👕','🎒'],['👧','🎀','👟']];
+  /* بطاقات إضافية لسلسلة أفقية أطول — من نفس الجنس فقط */
+  var extras = _styShuffle(styleGendered.filter(function(a){ return !usedIds[String(a.id)]; }));
+  var emojiSets = {
+    men: [['👔','⌚','👟'],['🧥','📿','👞']],
+    women: [['👗','👜','👠'],['🪙','💍','✨']],
+    boys: [['👦','👕','🎒'],['🧢','👟','📗']],
+    girls: [['👧','🎀','👟'],['👗','✨','👒']]
+  };
+  var emSet = emojiSets[gender] || emojiSets.men;
   for(var ex=0; cards.length < 6 && ex < extras.length; ex++){
     var adEx = extras[ex];
     usedIds[String(adEx.id)] = 1;
-    var companionPoolEx = (gendered.length ? gendered : pool).filter(function(a){
+    var companionPoolEx = styleGendered.filter(function(a){
       return a && String(a.id) !== String(adEx.id);
     });
     var companionsEx = (typeof _styPickLookCompanions === 'function')
@@ -7001,8 +7045,15 @@ function buildStyleIdeas(reshuffle){
           ? _styPickCompanions(adEx, companionPoolEx, gender, 2)
           : []);
     var itemsEx = [adEx].concat(companionsEx);
-    while(itemsEx.length < 3) itemsEx.push(null);
-    var emEx = emojiSets[ex % emojiSets.length];
+    while(itemsEx.length < 3){
+      var fillEx = companionPoolEx.find(function(a){
+        return a && !itemsEx.some(function(x){ return x && String(x.id)===String(a.id); });
+      });
+      if(!fillEx) break;
+      itemsEx.push(fillEx);
+    }
+    if(itemsEx.length < 3) continue;
+    var emEx = emSet[ex % emSet.length];
     var tilesEx = '';
     for(var tj=0; tj<3; tj++){
       tilesEx += _styTileHtml(itemsEx[tj], emEx[tj], itemsEx[tj] && itemsEx[tj].bg);
@@ -7024,9 +7075,10 @@ function buildStyleIdeas(reshuffle){
 
   if(!cards.length){
     rail.classList.add('is-empty');
+    var emptyGender = _styGenderBadge(gender, fr);
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
-      ? 'Pas encore assez d\'annonces pour suggérer des looks. Revenez bientôt.'
-      : 'لا توجد إعلانات كافية بعد لاقتراح إطلالات. عد لاحقاً.')+'</div>';
+      ? ('Pas encore assez d\'annonces « '+emptyGender+' » pour suggérer des looks. Parcourez la mode ou revenez bientôt.')
+      : ('لا توجد إعلانات كافية لقسم « '+emptyGender+' » لاقتراح إطلالات. تصفّح الأزياء أو عد لاحقاً.'))+'</div>';
     return;
   }
   rail.classList.remove('is-empty');
@@ -7768,7 +7820,19 @@ let currentAdRef = null;
 // ── مفضلة موحّدة (rizq_wishlist) — نفس المفتاح في browse/search/listing/dashboard ──
 function _wishlistIds(){ try{ var v=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 function _wishlistHas(id){ return _wishlistIds().indexOf(String(id))!==-1; }
-function _wishlistToggle(id){
+function _wishlistToggle(id, opts){
+  // المفضلة تتطلب حساب زائر/أعمال — لا تُحفظ لزائر مجهول
+  if (window.RizqUx && typeof RizqUx.wishlistToggle === 'function') {
+    return RizqUx.wishlistToggle(id, opts);
+  }
+  if (window.RizqUx && typeof RizqUx.hasWishlistAccount === 'function' && !RizqUx.hasWishlistAccount()) {
+    if (typeof RizqUx.requireWishlistAuth === 'function') {
+      RizqUx.requireWishlistAuth(function () { _wishlistToggle(id, opts); });
+    } else if (typeof rizqRequireAuth === 'function') {
+      rizqRequireAuth(function () { _wishlistToggle(id, opts); }, 'reasonFav');
+    }
+    return false;
+  }
   var sid=String(id);
   var ids=_wishlistIds();
   var i=ids.indexOf(sid);
@@ -7780,10 +7844,14 @@ function getFavorites(){ return _wishlistIds(); }
 function isFavorited(id){ return _wishlistHas(id); }
 function toggleFavoriteAd(){
   if(!currentAdRef || currentAdRef.id==null) return;
-  var added = _wishlistToggle(currentAdRef.id);
-  updateFavBtnUI();
-  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
-  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+  _wishlistToggle(currentAdRef.id, {
+    afterAuthToast: false,
+    onDone: function (added) {
+      updateFavBtnUI();
+      if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(!!added);
+      if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+    }
+  });
 }
 function updateFavBtnUI(){
   if(!currentAdRef) return;
@@ -8084,11 +8152,15 @@ function renderAllAds(resetVisible) {
   _allAdsBindInfinite();
 }
 function quickToggleFavorite(adId, btn) {
-  var added = _wishlistToggle(adId);
-  if (btn) btn.textContent = added ? '❤️' : '🤍';
-  if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
-  if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(added);
-  if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+  _wishlistToggle(adId, {
+    afterAuthToast: false,
+    onDone: function (added) {
+      if (btn) btn.textContent = added ? '❤️' : '🤍';
+      if (currentAdRef && String(currentAdRef.id) === String(adId)) updateFavBtnUI();
+      if(window.RizqUx&&typeof RizqUx.toastFav==='function') RizqUx.toastFav(!!added);
+      if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
+    }
+  });
 }
 
 // ── SEARCH SUGGESTIONS — from live ADS, not dummy queries ──
@@ -8617,7 +8689,8 @@ const LANG = {
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span>رزق</span> — كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات، إلكترونيات، أثاث ومعدات — معرضك يصل لمشترين جادّين يبحثون الآن.',
-    'vsh-btn1': '🚘 انضم بمعرضك الآن', 'vsh-btn2': '👁 عرض نموذج معرض',
+    'vsh-btn1': '✨ امتلك واجهة كتالوج معرضك الإلكتروني',
+    'vsh-btn1-sub': 'اشترك الآن — عرضك يصل حيث يبحث الجادّون',
     'vsh-card1-title': 'عرض يبيع قبل الرسالة', 'vsh-card1-desc': 'صور وأسعار تُقنع المشتري من أول نظرة — قبل أن يراسلك',
     'vsh-card2-title': 'تواصل بثقة عبر رزق', 'vsh-card2-desc': 'مشترون جادّون يصلون إليك — وخصوصيتك محمية دائماً',
     'vsh-card3-title': 'شارة معرض موثّق', 'vsh-card3-desc': 'شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين',
@@ -8635,7 +8708,8 @@ const LANG = {
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
     'vs-title': 'افتح محلك على <span>رزق</span> — واجهة كاملة لعملائك',
     'vs-desc': 'واجهتك التجارية باسمك — منتجاتك وثقة زبائنك في مكان يليق بمحلك.',
-    'vs-btn1': '🏪 افتح محلك الآن', 'vs-btn2': '👁 عرض نموذج محل',
+    'vs-btn1': '✨ امتلك واجهة محلك الإلكترونية',
+    'vs-btn1-sub': 'اشترك الآن — سوقك الإلكتروني يبدأ من هنا',
     'vs-card1-title': 'واجهة احترافية لمحلك', 'vs-card1-desc': 'شعار، اسم تجاري، وموقعك — حضور واضح يبني ثقة الزبون من أول زيارة',
     'vs-card2-title': 'كتالوج منظم بالصور', 'vs-card2-desc': 'منتجاتك بأسعار وصور واضحة — يتصفّحها الزبون بسهولة قبل التواصل',
     'vs-card3-title': 'نمو يُرى كل يوم', 'vs-card3-desc': 'زبائن أكثر وطلبات أوضح — محلك يكبر بثقة على رزق',
@@ -8650,11 +8724,14 @@ const LANG = {
     'vo-feat2-title': 'تواصل مباشر وسهل', 'vo-feat2-desc': 'واتساب وإيميل وهاتف — الزبون يصل إليك بنقرة واحدة',
     'vo-feat3-title': 'شارة مكتب موثّق', 'vo-feat3-desc': 'شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك',
     'vo-feat4-title': 'خدماتك معروضة بوضوح', 'vo-feat4-desc': 'قائمة مرتّبة بما تقدّمه — يختار الزبون ما يناسبه ويتواصل مباشرة',
-    'vo-btn1': '📒 أنشئ مكتبك الآن', 'vo-btn2': '👁 عرض نموذج مكتب',
+    'vo-btn1': '✨ امتلك واجهتك المهنية الإلكترونية',
+    'vo-btn1-sub': 'اشترك الآن — حضورك المهني لا يتوقف',
     'vt-title': 'غرفة المناقصات على <span>رزق</span>',
     'vi-title': 'غرفة الاستثمارات على <span>رزق</span>',
-    'vt-btn': '💼 ادخل غرفة المناقصات',
-    'vi-btn': '📈 ادخل غرفة الاستثمارات',
+    'vt-btn': '✨ امتلك مقعدك في غرفة المناقصات',
+    'vt-btn-sub': 'اشترك الآن وافتح غرفة المناقصات',
+    'vi-btn': '✨ امتلك حضورك في غرفة الاستثمارات',
+    'vi-btn-sub': 'اشترك الآن وابدأ مسار النمو',
     'hero-badge': 'السوق الإلكتروني الموريتاني',
     'search-ph': 'البحث في رزق...',
     'hbiz-stores': 'المحلات',
@@ -8662,7 +8739,7 @@ const LANG = {
     'hbiz-showrooms': 'المعارض',
     'hbiz-tenders': 'المناقصات',
     'hbiz-investments': 'الاستثمارات',
-    'hbiz-pick': 'اختر فضاءك على رزق',
+    'hbiz-pick': 'شاهد النماذج على رزق',
     'hbiz-kicker': 'منصة موريتانية للأعمال',
     'hero-tagline-lead': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي',
     'hero-one-place': ' — كل شيء في مكان واحد',
@@ -8746,7 +8823,8 @@ const LANG = {
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span>Rizq</span> — catalogue premium, acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements — votre showroom atteint des acheteurs sérieux, dès maintenant.',
-    'vsh-btn1': '🚘 Rejoignez avec votre showroom', 'vsh-btn2': '👁 Voir un exemple',
+    'vsh-btn1': '✨ Possédez la vitrine catalogue de votre showroom',
+    'vsh-btn1-sub': 'Abonnez-vous — votre offre atteint les acheteurs sérieux',
     'vsh-card1-title': 'Une offre qui convainc avant le message', 'vsh-card1-desc': 'Photos et prix qui séduisent au premier regard — avant même qu\'on vous contacte',
     'vsh-card2-title': 'Contactez en confiance via Rizq', 'vsh-card2-desc': 'Des acheteurs sérieux vous rejoignent — votre confidentialité reste protégée',
     'vsh-card3-title': 'Badge Showroom vérifié', 'vsh-card3-desc': 'Un badge officiel sur Rizq visible sur vos offres pour renforcer la confiance',
@@ -8764,7 +8842,8 @@ const LANG = {
     'cta-trust1': 'Confiance', 'cta-trust2': 'Sécurité', 'cta-trust3': 'Transparence',
     'vs-title': 'Ouvrez votre boutique sur <span>Rizq</span> — une vitrine complète pour vos clients',
     'vs-desc': 'Votre vitrine commerciale à votre nom — produits et confiance clients dans un espace digne de votre boutique.',
-    'vs-btn1': '🏪 Ouvrez votre boutique maintenant', 'vs-btn2': '👁 Voir un exemple de boutique',
+    'vs-btn1': '✨ Possédez la vitrine électronique de votre boutique',
+    'vs-btn1-sub': 'Abonnez-vous — votre marché électronique commence ici',
     'vs-card1-title': 'Une vitrine professionnelle', 'vs-card1-desc': 'Logo, nom commercial et emplacement — une présence claire qui inspire confiance dès la première visite',
     'vs-card2-title': 'Catalogue photo organisé', 'vs-card2-desc': 'Vos produits avec prix et photos — le client consulte facilement avant de vous contacter',
     'vs-card3-title': 'Une croissance visible chaque jour', 'vs-card3-desc': 'Plus de clients, des demandes plus claires — votre boutique grandit sur Rizq',
@@ -8779,11 +8858,14 @@ const LANG = {
     'vo-feat2-title': 'Contact direct et simple', 'vo-feat2-desc': 'WhatsApp, e-mail et téléphone — le client vous joint en un clic',
     'vo-feat3-title': 'Badge Bureau certifié', 'vo-feat3-desc': 'Un badge or sur Rizq qui inspire immédiatement confiance à vos clients',
     'vo-feat4-title': 'Vos services bien présentés', 'vo-feat4-desc': 'Une liste claire de ce que vous offrez — le client choisit et vous contacte directement',
-    'vo-btn1': '📒 Créez votre bureau maintenant', 'vo-btn2': '👁 Voir un exemple de bureau',
+    'vo-btn1': '✨ Possédez votre vitrine professionnelle en ligne',
+    'vo-btn1-sub': 'Abonnez-vous — votre présence pro ne s\'arrête pas',
     'vt-title': 'La salle des appels d\'offres sur <span>Rizq</span>',
     'vi-title': 'La salle des investissements sur <span>Rizq</span>',
-    'vt-btn': '💼 Entrez dans la salle des appels d\'offres',
-    'vi-btn': '📈 Entrez dans la salle des investissements',
+    'vt-btn': '✨ Réservez votre place dans la salle des appels d\'offres',
+    'vt-btn-sub': 'Abonnez-vous et ouvrez la salle des appels d\'offres',
+    'vi-btn': '✨ Affirmez votre présence dans la salle des investissements',
+    'vi-btn-sub': 'Abonnez-vous et démarrez votre trajectoire de croissance',
     'hero-badge': 'Le marché en ligne mauritanien',
     'search-ph': 'Rechercher sur Rizq...',
     'hbiz-stores': 'Boutiques',
@@ -8791,7 +8873,7 @@ const LANG = {
     'hbiz-showrooms': 'Showrooms',
     'hbiz-tenders': 'Appels d\'offres',
     'hbiz-investments': 'Investissements',
-    'hbiz-pick': 'Choisissez votre espace sur Rizq',
+    'hbiz-pick': 'Découvrez les modèles sur Rizq',
     'hbiz-kicker': 'Plateforme mauritanienne pour les affaires',
     'hero-tagline-lead': 'Boutique virtuelle · Bureau pro · Pub institutionnelle',
     'hero-one-place': ' — tout en un seul endroit',
@@ -12264,16 +12346,61 @@ function updatePriceTimestamp(){
 }
 function goNavPackage(tab){
   var cards = document.querySelectorAll('#pricing .ptab-card');
-  var map = {individual:0, stores:1, offices:2, corp:3, tender:4, ads:5};
-  var btn = cards[map[tab]];
+  var map = {individual:0, stores:1, offices:2, corp:3, tender:4, investment:5, ads:6};
+  var btn = cards[map[tab]] || document.querySelector('#pricing .ptab-card[data-ptab="'+tab+'"]');
   document.querySelectorAll('#pricing .ptab-card').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.price-pane').forEach(function(p){ p.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   var pane = document.getElementById('pane-' + tab);
   if (pane) pane.classList.add('active');
 }
+/**
+ * زر الاشتراك الفاخم: يفتح تسجيل حساب القسم مباشرة
+ * (محل / معرض / مكتب…) جاهزاً للاشتراك — بلا مرور بالباقات أولاً.
+ * إن وُجدت جلسة بنفس النوع → لوحة اشتراكي مباشرة.
+ */
+function goSubscribePackage(tab){
+  var typeMap = { stores:'store', corp:'corp', offices:'office', tender:null, investment:null, individual:'individual' };
+  var wantType = typeMap[tab];
+  try{ sessionStorage.setItem('rizq_open_panel', 'subscription'); }catch(eIntent){}
+
+  /* جلسة بائع قائمة من نفس النوع → اشتراكي في لوحته */
+  try{
+    var dashUrl = (window.RizqAccount && typeof window.RizqAccount.resolveDashboardUrl === 'function')
+      ? (window.RizqAccount.resolveDashboardUrl() || '')
+      : '';
+    var sessType = '';
+    try{
+      var sess = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
+      sessType = (sess && sess.type) ? String(sess.type) : '';
+    }catch(eS){}
+    if(dashUrl && wantType && sessType === wantType){
+      location.href = String(dashUrl).split('#')[0] + '#subscription';
+      return false;
+    }
+    if(dashUrl && (tab === 'tender' || tab === 'investment')){
+      location.href = String(dashUrl).split('#')[0] + '#subscription';
+      return false;
+    }
+  }catch(eDash){}
+
+  /* فتح تسجيل حساب بالقسم المناسب مباشرة */
+  try{
+    if(typeof openRegisterAs === 'function'){
+      if(tab === 'stores'){ openRegisterAs('company', 'store'); return false; }
+      if(tab === 'corp'){ openRegisterAs('company', 'corp'); return false; }
+      if(tab === 'offices'){ openRegisterAs('company', 'office'); return false; }
+      if(tab === 'tender' || tab === 'investment'){ openRegisterAs('company'); return false; }
+      if(tab === 'individual'){ openRegisterAs('private'); return false; }
+    }
+  }catch(eReg){}
+
+  openModal('register');
+  return false;
+}
+window.goSubscribePackage = goSubscribePackage;
 function switchPriceTab(tab, btn){
-  if(tab==='individual'||tab==='stores'||tab==='offices'||tab==='corp'||tab==='tender'||tab==='ads'){
+  if(tab==='individual'||tab==='stores'||tab==='offices'||tab==='corp'||tab==='tender'||tab==='investment'||tab==='ads'){
     document.querySelectorAll('#pricing .ptab-card').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.price-pane').forEach(function(p){p.classList.remove('active');});
     if(btn) btn.classList.add('active');
@@ -13950,6 +14077,18 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var block = document.getElementById('wishlist-block');
       var mount = document.getElementById('wishlist-mount');
       if(!block || !mount) return Promise.resolve(false);
+      // بدون حساب: لا مفضلة محلية — يمنع عداد 2 مع قائمة فارغة
+      if (window.RizqUx && typeof RizqUx.hasWishlistAccount === 'function' && !RizqUx.hasWishlistAccount()) {
+        if (typeof RizqUx.clearGuestWishlist === 'function') RizqUx.clearGuestWishlist();
+        if (typeof RizqUx.updateFavBadges === 'function') RizqUx.updateFavBadges();
+        if(forceReveal) {
+          mount.innerHTML = (window.RizqUx && RizqUx.wishlistEmptyHtml) ? RizqUx.wishlistEmptyHtml() : '<p class="rzq-empty">—</p>';
+          block.style.display = '';
+          return Promise.resolve(true);
+        }
+        block.style.display = 'none';
+        return Promise.resolve(false);
+      }
       var ids = [];
       try{ ids = JSON.parse(localStorage.getItem('rizq_wishlist') || '[]'); }catch(e){}
       if(!Array.isArray(ids) || ids.length < 1) {
@@ -13973,6 +14112,10 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         .then(function(r){ return r.ok ? r.json() : null; })
         .then(function(data){
           var ads = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
+          // مزامنة العداد مع الإعلانات الموجودة فعلياً فقط
+          if (window.RizqUx && typeof RizqUx.pruneWishlistToExisting === 'function') {
+            RizqUx.pruneWishlistToExisting(ads.map(function (a) { return a && a.id; }).filter(Boolean));
+          }
           if(!ads.length) {
             if(forceReveal) {
               mount.innerHTML = (window.RizqUx && RizqUx.wishlistEmptyHtml) ? RizqUx.wishlistEmptyHtml() : '<p class="rzq-empty">—</p>';
