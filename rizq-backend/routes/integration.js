@@ -4,7 +4,8 @@
  */
 'use strict';
 
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../lib/rateLimitRedis');
+const rateLimit = createLimiter;
 const { asyncHandler, sendError } = require('../middleware/errors');
 const { requireCorpApiKey } = require('../middleware/apiKeyAuth');
 const {

@@ -10,15 +10,22 @@ function createAdminAuth(deps) {
   const sharedSecret = () => process.env.BACKEND_SHARED_SECRET || '';
   const hasAdminPermission = deps.hasAdminPermission || (() => true);
 
-  function requireAdminSession(req, res, next) {
-    const token = req.header('x-admin-token');
-    const sess = token && adminSessions.get(token);
-    if (!sess || sess.expiresAt < Date.now()) {
-      if (token) adminSessions.delete(token);
+  async function requireAdminSession(req, res, next) {
+    try {
+      const token = req.header('x-admin-token');
+      let sess = token && adminSessions.get(token);
+      if (!sess && token && typeof adminSessions.getAsync === 'function') {
+        sess = await adminSessions.getAsync(token);
+      }
+      if (!sess || sess.expiresAt < Date.now()) {
+        if (token) adminSessions.delete(token);
+        return res.status(401).json({ error: 'session_expired' });
+      }
+      req.adminUser = sess;
+      next();
+    } catch (e) {
       return res.status(401).json({ error: 'session_expired' });
     }
-    req.adminUser = sess;
-    next();
   }
 
   function isBrowserOrigin(req) {
@@ -29,26 +36,33 @@ function createAdminAuth(deps) {
   }
 
   /** للوحة الأدmin + السكربتات الخلفية — لا يُخزَّن السر في المتصفح */
-  function requireAdminAuth(req, res, next) {
-    const adminTok = req.header('x-admin-token');
-    if (adminTok) {
-      const sess = adminSessions.get(adminTok);
-      if (sess && sess.expiresAt >= Date.now()) {
-        req.adminUser = sess;
+  async function requireAdminAuth(req, res, next) {
+    try {
+      const adminTok = req.header('x-admin-token');
+      if (adminTok) {
+        let sess = adminSessions.get(adminTok);
+        if (!sess && typeof adminSessions.getAsync === 'function') {
+          sess = await adminSessions.getAsync(adminTok);
+        }
+        if (sess && sess.expiresAt >= Date.now()) {
+          req.adminUser = sess;
+          return next();
+        }
+        adminSessions.delete(adminTok);
+      }
+      const got = req.header('x-rizq-secret');
+      const secret = sharedSecret();
+      if (secret && got && timingSafeEqualStr(got, secret)) {
+        if (isProdEnv() && isBrowserOrigin(req)) {
+          return res.status(403).json({ error: 'server_secret_browser_forbidden' });
+        }
+        req.adminUser = { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
         return next();
       }
-      adminSessions.delete(adminTok);
+      return res.status(401).json({ error: 'unauthorized' });
+    } catch (e) {
+      return res.status(401).json({ error: 'unauthorized' });
     }
-    const got = req.header('x-rizq-secret');
-    const secret = sharedSecret();
-    if (secret && got && timingSafeEqualStr(got, secret)) {
-      if (isProdEnv() && isBrowserOrigin(req)) {
-        return res.status(403).json({ error: 'server_secret_browser_forbidden' });
-      }
-      req.adminUser = { user: 'server', name: 'Server', role: 'super', permissions: ['*'] };
-      return next();
-    }
-    return res.status(401).json({ error: 'unauthorized' });
   }
 
   /** يتطلب صلاحية (أو *) بعد requireAdminAuth */

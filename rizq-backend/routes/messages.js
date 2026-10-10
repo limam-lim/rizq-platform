@@ -5,7 +5,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../lib/rateLimitRedis');
+const rateLimit = createLimiter;
 const { isProdEnv } = require('../middleware/accountAuth');
 const repos = require('../db/repos');
 

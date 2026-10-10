@@ -1,0 +1,106 @@
+# Rizq production stack — nginx + api + PostgreSQL 16 + Redis 7
+# Usage:
+#   cp .env.example .env && cp rizq-backend/.env.example rizq-backend/.env
+#   # fill secrets, then:
+#   docker compose up -d --build
+
+name: rizq
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - uploads_data:/var/rizq/uploads:ro
+      # - ./deploy/certs:/etc/nginx/certs:ro
+    restart: unless-stopped
+    networks: [rizq_net]
+
+  api:
+    build:
+      context: ./rizq-backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./rizq-backend/.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_DRIVER: postgres
+      DATABASE_URL: postgres://${POSTGRES_USER:-rizq}:${POSTGRES_PASSWORD:-rizq_change_me}@postgres:5432/${POSTGRES_DB:-rizq}
+      REDIS_URL: redis://redis:6379
+      REDIS_ENABLED: "1"
+      REDIS_KEY_PREFIX: "rizq:"
+      PG_POOL_MAX: "20"
+      RIZQ_STORAGE_DRIVER: local
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-https://rizq.mr,https://www.rizq.mr,https://rizqsmart.com,https://www.rizqsmart.com}
+    volumes:
+      - uploads_data:/app/uploads
+      - api_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+    networks: [rizq_net]
+    # Single writer process — scale API only after shared Postgres+Redis are confirmed
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rizq}
+      POSTGRES_USER: ${POSTGRES_USER:-rizq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rizq_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./rizq-backend/db/schema.postgres.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [rizq_net]
+    # Do not expose 5432 publicly in production
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [rizq_net]
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:
+  api_data:
+
+networks:
+  rizq_net:
+    driver: bridge
