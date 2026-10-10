@@ -807,7 +807,9 @@ body.rizq-lang-ar .hero-lead-row{
   padding:16px 16px 12px;
   margin-bottom:0;
 }
-/* شريط الإبهار: الحاوية تدخل 0.5سم من كل حافة (padding لا يقصّ translate) */
+/* هوامش موحّدة لكل الأشرطة — 1سم من كل حافة */
+:root{--rizq-strip-inset:1cm}
+/* شريط الإبهار: قصّ حقيقي بـ margin (padding لا يقصّ translate) */
 .hero > #hero-listings.hero-promo-strip{
   align-self:stretch;
   width:100%;
@@ -820,10 +822,9 @@ body.rizq-lang-ar .hero-lead-row{
 }
 .hero > #hero-listings .cards-track-wrap,
 #hero-listings.hero-promo-strip .cards-track-wrap{
-  /* قصّ حقيقي عند ~0.5سم من يسار/يمين الشاشة — margin وليس padding */
-  width:calc(100% - 1cm)!important;
+  width:calc(100% - (2 * var(--rizq-strip-inset)))!important;
   max-width:none!important;
-  margin:0 0.5cm!important;
+  margin:0 var(--rizq-strip-inset)!important;
   padding:8px 0!important;
   box-sizing:border-box!important;
   overflow:hidden!important;
@@ -848,10 +849,10 @@ body.rizq-lang-ar .hero-lead-row{
     linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
 }
 .hero-after-promo-inner{
-  /* الأقسام الخمسة بعرض شبه كامل — هامش 0.5سم مثل شريط العروض */
-  width:calc(100% - 1cm);
+  /* الأقسام الخمسة — نفس هامش 1سم */
+  width:calc(100% - (2 * var(--rizq-strip-inset)));
   max-width:none;
-  margin:0 0.5cm;
+  margin:0 var(--rizq-strip-inset);
   display:flex;
   flex-direction:column;
   align-items:stretch;
@@ -859,14 +860,14 @@ body.rizq-lang-ar .hero-lead-row{
   padding:18px 0 8px;
   box-sizing:border-box;
 }
-/* محلات / معارض / مكاتب / مناقصات / استثمارات — نفس هامش 0.5سم */
+/* محلات / معارض / مكاتب / مناقصات / استثمارات — هامش 1سم */
 #virtual-stores,
 #virtual-showrooms,
 #virtual-offices,
 #virtual-tenders,
 #virtual-investments{
-  padding-left:0.5cm!important;
-  padding-right:0.5cm!important;
+  padding-left:var(--rizq-strip-inset)!important;
+  padding-right:var(--rizq-strip-inset)!important;
   box-sizing:border-box!important;
 }
 #virtual-stores > div[style*="max-width"],
@@ -899,11 +900,40 @@ body.rizq-lang-ar .hero-lead-row{
   max-width:none;
   box-sizing:border-box;
 }
+/* إطلالات الموضة + نماذج المعارض — نفس هامش 1سم */
+#rizq-styles,
+#rizq-showroom-models{
+  padding-left:var(--rizq-strip-inset)!important;
+  padding-right:var(--rizq-strip-inset)!important;
+  box-sizing:border-box!important;
+}
+#rizq-styles .rizq-styles-inner,
+#rizq-showroom-models .rizq-styles-inner{
+  max-width:none!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+}
+#rizq-styles .rizq-styles-track-wrap,
+#rizq-showroom-models .rizq-styles-track-wrap{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
 @media(max-width:699px){
   .hero-stage-intent{padding:12px 10px 10px;gap:10px}
   .hero-promo-strip{padding-bottom:18px}
   .categories-after-promo{padding:18px 3% 24px!important;margin-top:4px;border-radius:16px}
-  .hero-after-promo-inner{width:calc(100% - 1cm);max-width:none;margin:0 0.5cm;gap:16px;padding:12px 0 4px}
+  .hero-after-promo-inner{
+    width:calc(100% - (2 * var(--rizq-strip-inset)));
+    max-width:none;
+    margin:0 var(--rizq-strip-inset);
+    gap:16px;padding:12px 0 4px;
+  }
 }
 /* AR/FR — نفس قياسات الشاشة بالكامل */
 html[dir="ltr"] .hero-stage,
@@ -2734,7 +2764,7 @@ html[dir="ltr"] .listings-section .section-desc{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
     direction:ltr!important;border-radius:0!important;
-    width:calc(100% - 1cm)!important;margin:0 0.5cm!important;padding:6px 0!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset)))!important;margin:0 var(--rizq-strip-inset)!important;padding:6px 0!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
