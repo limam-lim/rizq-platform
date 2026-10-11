@@ -305,6 +305,8 @@ a[href="#investment-packages"]{display:none!important}
     </div>
   </div>
 
+  <div id="inv-protocol-panel" aria-label="توثيق إداري للاستثمار"></div>
+
   <div class="inv-section-head" id="inv-opportunities">
     <div class="eyebrow" data-t-fr="Opportunités">الفرص</div>
     <h2 data-t-fr="Projets en revue / publiés">مشاريع قيد المراجعة / منشورة</h2>
@@ -516,6 +518,7 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
 <script src="rizq_packages_config.js?v=23.1"></script>
 <script src="rizq_packages_ui.js?v=23.1"></script>
 <script src="rizq_investment_agent.js?v=20.0"></script>
+<script src="rizq_room_protocol.js?v=1.0"></script>
 <script>
 (function () {
   function lang() {
@@ -597,7 +600,8 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
         + '</a></p></div>';
       return;
     }
-    grid.innerHTML = list.map(function (o) {
+    window._invOppList = list || [];
+    grid.innerHTML = list.map(function (o, idx) {
       var title = fr && o.titleFr ? o.titleFr : o.title;
       var summary = fr && o.summaryFr ? o.summaryFr : (o.summary || '');
       var tier = o.provisionalTier || '';
@@ -611,10 +615,32 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
         + '<p class="opp-desc">' + escapeHtml(summary) + '</p>'
         + '<div class="opp-meta">'
         + '<span>💰 ' + escapeHtml(o.capital || (fr ? 'N/D' : 'غير محدد')) + '</span>'
-        + '<span>📍 ' + escapeHtml(o.wilaya || (fr ? 'Mauritanie' : 'موريتانيا')) + '</span>'
+        + '<span>📍 ' + escapeHtml(o.wilaya || (fr ? 'Mauritanie' : 'موريتania')) + '</span>'
         + '<span>🔒 ' + (fr ? 'Contacts protégés' : 'تواصل محمي') + '</span>'
-        + '</div></article>';
+        + '</div>'
+        + '<button type="button" class="f-submit" style="margin-top:12px;max-width:100%;padding:10px 12px;font-size:12.5px" data-inv-proto="' + idx + '">'
+        + (fr ? '📄 Protocole admin' : '📄 توثيق إداري')
+        + '</button></article>';
     }).join('');
+    grid.querySelectorAll('[data-inv-proto]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!window.RizqRoomProtocol) return;
+        var i = Number(btn.getAttribute('data-inv-proto'));
+        var o = (window._invOppList || [])[i];
+        if (!o) { RizqRoomProtocol.issueDemo('investment'); return; }
+        RizqRoomProtocol.issueInvestmentProtocol({
+          id: o.id || '',
+          title: fr && o.titleFr ? o.titleFr : o.title,
+          description: fr && o.summaryFr ? o.summaryFr : (o.summary || o.description || ''),
+          sector: o.sector,
+          city: o.wilaya || o.city,
+          capital: o.capital,
+          ownerName: o.ownerName || (fr ? 'Porteur du projet' : 'صاحب المشروع')
+        }, {
+          name: fr ? 'Partenaire intéressé (à compléter)' : 'شريك مهتم (يُستكمل)'
+        });
+      });
+    });
   }
 
   function isInvestDemoMode() {
@@ -788,6 +814,24 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
           var text = data.message || (fr ? 'Dossier reçu.' : 'تم استلام الملف.');
           if (msg) { msg.hidden = false; msg.textContent = text; }
           showToast(text);
+          try {
+            if (window.RizqRoomProtocol) {
+              setTimeout(function () {
+                RizqRoomProtocol.issueInvestmentProtocol({
+                  title: body.title,
+                  description: body.description,
+                  sector: body.sector,
+                  capital: body.capital,
+                  ownerName: fr ? 'Porteur du projet' : 'صاحب المشروع'
+                }, {
+                  name: fr ? 'Partenaire intéressé (à compléter)' : 'شريك مهتم (يُستكمل)',
+                  notes: fr
+                    ? 'Protocole administratif émis après dépôt du dossier.'
+                    : 'وثيقة إدارية صادرة بعد إيداع الملف.'
+                });
+              }, 400);
+            }
+          } catch (eProto) {}
           form.reset();
           window._invImages = [];
           window._invPdf = null;
@@ -807,10 +851,20 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     applyDataTFr();
     loadOpps();
     bindSubmit();
+    try {
+      if (window.RizqRoomProtocol) {
+        RizqRoomProtocol.mountPanel(document.getElementById('inv-protocol-panel'), 'investment');
+      }
+    } catch (eMount) {}
     /* باقات الغرفة مخفية عن واجهة الزائر — الاشتراك من الداشبورد فقط */
     document.addEventListener('rizq:langchange', function () {
       applyDataTFr();
       loadOpps();
+      try {
+        if (window.RizqRoomProtocol) {
+          RizqRoomProtocol.mountPanel(document.getElementById('inv-protocol-panel'), 'investment');
+        }
+      } catch (e2) {}
     });
   });
 })();

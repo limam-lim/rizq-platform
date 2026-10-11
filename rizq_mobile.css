@@ -378,14 +378,46 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
 
   .quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
-  .similar-grid,.dp-similar-grid,.cta-btns,
-  .store-badges,.store-meta{
+  .similar-grid,.dp-similar-grid,.cta-btns{
     display:flex!important;flex-direction:column!important;
     flex-wrap:nowrap!important;overflow-x:hidden!important;
     width:100%!important;max-width:100%!important;
     gap:12px!important;
   }
-  /* بطاقات ترويجية كبيرة → نوافذ صغيرة عمودين */
+  /* شارات المحل/المعرض/المكتب تبقى صفاً مضغوطاً لا عموداً طويلاً */
+  .store-meta,
+  .store-badges,
+  .showroom-meta,
+  .showroom-badges,
+  .office-meta,
+  .office-badges{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    justify-content:center!important;
+    gap:6px!important;
+    margin-top:6px!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  .store-meta span,
+  .showroom-meta span,
+  .office-meta span{
+    font-size:10.5px!important;
+    white-space:nowrap!important;
+  }
+  .store-badges .badge,
+  .showroom-badges .badge,
+  .office-badges .badge{
+    font-size:10px!important;
+    padding:3px 7px!important;
+  }
+  .store-tagline,
+  .showroom-tagline{
+    margin-top:4px!important;
+    padding-top:6px!important;
+  }
+  /* بطاقات ترويجية → أصغر على الهاتف (عمودين مدمجين) */
   .rizq-feat-row,
   .rizq-feat-row.rizq-feat-row-3,
   .rizq-trio,
@@ -397,22 +429,41 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     flex-direction:unset!important;
-    gap:8px!important;
-    padding:12px 8px!important;
+    gap:6px!important;
+    padding:6px 2px!important;
     max-width:100%!important;
     width:100%!important;
+    margin-bottom:16px!important;
   }
   .rizq-feat-row > div,
-  .rizq-trio > div{
-    padding:14px 10px!important;
-    border-radius:12px!important;
+  .rizq-trio > div,
+  .rizq-feat-card,
+  #virtual-stores .rizq-feat-card,
+  #virtual-offices .rizq-feat-card,
+  #virtual-showrooms .rizq-feat-card,
+  #virtual-tenders .rizq-feat-card,
+  #virtual-investments .rizq-feat-card{
+    padding:10px 8px!important;
+    border-radius:10px!important;
     min-width:0!important;
     width:auto!important;
     max-width:100%!important;
+    min-height:0!important;
+    box-shadow:0 2px 8px rgba(27,58,107,.06)!important;
   }
   .rizq-feat-row .cat-icon-box,
-  .rizq-trio .cat-icon-box{
-    width:40px!important;height:40px!important;font-size:18px!important;margin-bottom:8px!important;
+  .rizq-trio .cat-icon-box,
+  .rizq-feat-card .cat-icon-box{
+    width:28px!important;height:28px!important;font-size:13px!important;
+    border-radius:8px!important;margin-bottom:0!important;
+  }
+  .rizq-feat-card .rizq-feat-ico{margin-bottom:5px!important}
+  .rizq-feat-title{
+    font-size:11px!important;line-height:1.25!important;margin-bottom:3px!important;
+  }
+  .rizq-feat-desc{
+    font-size:9.5px!important;line-height:1.4!important;
+    display:-webkit-box!important;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden!important;
   }
   .products-grid,
   .ads-grid,
@@ -470,7 +521,28 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .listings-grid .listing-card .l-loc{font-size:8.5px!important;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .listings-grid .listing-card .lc-hover{display:none!important}
   .listings-grid .listing-card .l-badge{font-size:8px!important;padding:2px 6px!important;top:6px!important;right:6px!important}
-  .listings-grid .listing-card .l-body > div:last-child{display:none!important}
+  /* أزرار اتصال/واتساب تبقى ظاهرة على الهاتف — لا تُخفَ كآخر عنصر في البطاقة */
+  .listings-grid .listing-card .rzq-adx-actions,
+  .landing-ads-grid .listing-card .rzq-adx-actions,
+  .ad-card .rzq-adx-actions,
+  .rc .rzq-adx-actions{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    margin-top:6px!important;
+    padding-top:2px!important;
+  }
+  .listings-grid .listing-card .rzq-adx-tel,
+  .listings-grid .listing-card .rzq-adx-wa,
+  .landing-ads-grid .listing-card .rzq-adx-tel,
+  .landing-ads-grid .listing-card .rzq-adx-wa{
+    display:inline-flex!important;
+    width:30px!important;
+    height:30px!important;
+  }
   .pricing-grid{
     display:grid!important;
     grid-template-columns:1fr!important;
@@ -520,22 +592,39 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     flex:none!important;width:100%!important;max-width:none!important;
   }
 
+  :root{--rizq-strip-inset:0px}
   .hero-listings-section{
-    padding-bottom:28px!important;
+    padding-bottom:18px!important;
     overflow:hidden!important;
+    width:100%!important;
+    margin-inline:0!important;
+  }
+  #hero-listings .listings-label,
+  .listings-label{
+    margin:0 0 8px!important;padding:0!important;width:100%!important;
+  }
+  #hero-listings .listings-label > span,
+  .listings-label > span{
+    display:flex!important;width:100%!important;max-width:none!important;
+    border-radius:0!important;box-sizing:border-box!important;
+    justify-content:center!important;padding:7px 12px!important;
+    font-size:11px!important;gap:7px!important;
   }
   /* Marquee: overflow:hidden + CSS transform only — no scroll/snap (was jittering).
-     direction:ltr so translateX(-50%) stays on-screen under page RTL. */
-  .cards-track-wrap{
+     direction:ltr so translateX(-50%) stays on-screen under page RTL.
+     على الهاتف: بعرض الشاشة من الحافة بلا هامش سطح مكتب. */
+  .cards-track-wrap,
+  #hero-listings .cards-track-wrap{
     overflow:hidden!important;
     overflow-x:hidden!important;
     overflow-y:hidden!important;
     width:100%!important;
     max-width:100%!important;
+    margin:0!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
     border-radius:0!important;
-    padding:6px 0!important;
+    padding:4px 0!important;
     scrollbar-width:none;
     -webkit-overflow-scrolling:auto;
     border:none!important;
@@ -557,26 +646,26 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     will-change:transform;
     backface-visibility:hidden;
     transform:translate3d(0,0,0);
-    gap:12px!important;
-    padding-inline:12px!important;
+    gap:8px!important;
+    padding-inline:0!important;
   }
   .cards-track .ad-card{
-    width:152px!important;
-    min-width:152px!important;
-    max-width:152px!important;
-    flex:0 0 152px!important;
+    width:138px!important;
+    min-width:138px!important;
+    max-width:138px!important;
+    flex:0 0 138px!important;
     height:auto!important;
     scroll-snap-align:none!important;
     direction:rtl!important;
-    border-radius:14px!important;
+    border-radius:12px!important;
   }
   .cards-track .ad-card .ad-card-img{
-    height:96px!important;
-    min-height:96px!important;
-    max-height:96px!important;
+    height:84px!important;
+    min-height:84px!important;
+    max-height:84px!important;
     aspect-ratio:auto!important;
-    font-size:32px!important;
-    border-radius:14px 14px 0 0!important;
+    font-size:28px!important;
+    border-radius:12px 12px 0 0!important;
   }
   .cards-track .ad-card .ad-card-body{padding:8px!important}
   .cards-track .ad-card .ad-title{font-size:11px!important;margin-bottom:6px!important;-webkit-line-clamp:2}
@@ -603,8 +692,48 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .cards-track .ad-card{padding:0!important}
   .cat-name,.l-title,.ad-title,.product-name{font-size:15px!important;line-height:1.4}
   .cards-track .ad-card .ad-title{font-size:11.5px!important;line-height:1.3!important}
-  .section-title,.hero-subtitle-primary{font-size:clamp(18px,5.4vw,26px)!important}
-  .section-desc{font-size:14px!important;line-height:1.6}
+  /* عناوين الأقسام (اللافتات الزرقاء) — أصغر على الهاتف */
+  .hero-subtitle-primary{font-size:clamp(16px,4.6vw,22px)!important}
+  .section-header,
+  #rizq-styles .section-header,
+  #rizq-showroom-models .section-header,
+  #virtual-stores .section-header,
+  #virtual-offices .section-header,
+  #virtual-showrooms .section-header,
+  #virtual-tenders .section-header,
+  #virtual-investments .section-header,
+  .listings-section .section-header,
+  #categories .section-header,
+  #about .section-header,
+  .pricing-section > .section-header{
+    width:min(92%,420px)!important;
+    max-width:420px!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:6px 10px!important;
+    margin:0 auto 10px!important;
+    border-radius:8px!important;
+    box-shadow:0 3px 10px rgba(0,0,0,.12)!important;
+  }
+  .section-header .section-tag,
+  .section-tag{
+    font-size:8px!important;
+    letter-spacing:1px!important;
+    margin-bottom:2px!important;
+  }
+  .section-header h2,
+  .section-header .section-title{
+    font-size:clamp(10.5px,2.9vw,12.5px)!important;
+    line-height:1.25!important;
+    margin-bottom:2px!important;
+    white-space:normal!important;
+  }
+  .section-header .section-desc,
+  .section-header > p:not(.section-tag){
+    font-size:9.5px!important;
+    line-height:1.3!important;
+  }
   /* تاغلاين الهيرو: سطر واحد كامل بدون قص «في مكان واحد» */
   .hero-tagline{
     font-size:clamp(8.5px,2.2vw,11px)!important;
@@ -958,12 +1087,51 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
     padding-right:16px !important;
   }
   #categories .section-header{
-    width:100% !important;
-    max-width:100% !important;
+    width:min(92%,420px) !important;
+    max-width:420px !important;
     margin-left:auto !important;
     margin-right:auto !important;
-    padding:32px 16px !important;
+    padding:6px 10px !important;
     box-sizing:border-box !important;
+  }
+}
+
+/* هاتف ضيق: عناوين الأقسام أصغر أكثر */
+@media(max-width:480px){
+  .section-header,
+  #rizq-showroom-models .section-header,
+  #rizq-styles .section-header{
+    padding:5px 8px!important;
+    margin-bottom:8px!important;
+    border-radius:7px!important;
+    width:min(94%,360px)!important;
+    max-width:360px!important;
+  }
+  .section-header h2,
+  .section-header .section-title{
+    font-size:clamp(10px,2.8vw,12px)!important;
+  }
+  .section-header .section-desc{
+    font-size:9px!important;
+    line-height:1.28!important;
+  }
+  .rizq-feat-card,
+  .rizq-feat-row > div,
+  .rizq-trio > div,
+  #virtual-stores .rizq-feat-card,
+  #virtual-offices .rizq-feat-card,
+  #virtual-showrooms .rizq-feat-card,
+  #virtual-tenders .rizq-feat-card,
+  #virtual-investments .rizq-feat-card{
+    padding:8px 6px!important;
+    border-radius:9px!important;
+  }
+  .rizq-feat-title{font-size:10.5px!important}
+  .rizq-feat-desc{font-size:9px!important;-webkit-line-clamp:2}
+  .rizq-feat-card .cat-icon-box,
+  .rizq-trio .cat-icon-box,
+  #virtual-stores .rizq-feat-card .cat-icon-box{
+    width:24px!important;height:24px!important;font-size:11px!important;
   }
 }
 
@@ -1031,4 +1199,114 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
     padding:9px 6px!important;
     min-height:44px!important;
   }
+}
+
+/* ── محلات / مكاتب / معارض: هيدر ومساحات مضغوطة على الهاتف ── */
+@media(max-width:768px){
+  .store-hero,
+  .office-hero,
+  .showroom-hero{
+    min-height:0!important;
+    height:auto!important;
+  }
+  .store-hero .hero-cover,
+  .office-hero .hero-cover,
+  .showroom-hero .hero-cover,
+  .hero-cover{
+    padding:16px 12px 12px!important;
+    min-height:0!important;
+  }
+  .store-logo-wrap,
+  .office-logo,
+  .showroom-logo{
+    width:48px!important;
+    height:48px!important;
+    font-size:22px!important;
+  }
+  .store-profile,
+  .showroom-profile,
+  .office-profile{
+    gap:6px!important;
+    padding:4px 8px!important;
+  }
+  .store-name,
+  #store-name-el,
+  #hero-office-name,
+  .showroom-name,
+  #sr-name{
+    font-size:16px!important;
+    line-height:1.2!important;
+    margin:0!important;
+  }
+  .store-tagline,
+  #store-tagline-el,
+  #hero-office-spec,
+  .showroom-tagline{
+    font-size:11px!important;
+    margin-top:2px!important;
+    padding-top:4px!important;
+  }
+  .store-eyebrow,
+  .showroom-eyebrow,
+  .office-eyebrow{
+    margin-bottom:2px!important;
+    font-size:9.5px!important;
+  }
+  .store-hero .hero-floor,
+  .store-hero .hero-scroll-cue,
+  .store-hero .hero-glints,
+  .office-hero .hero-floor,
+  .office-hero .hero-scroll-cue,
+  .office-hero .hero-glints,
+  .showroom-hero .hero-floor,
+  .showroom-hero .hero-scroll-cue,
+  .showroom-hero .hero-glints,
+  .hero-floor,
+  .hero-scroll-cue,
+  .hero-glints{
+    display:none!important;
+  }
+  #store-packages,
+  .pkg-section,
+  #office-packages,
+  #pkg-section{
+    padding:22px 12px 28px!important;
+  }
+  #store-packages h2,
+  .pkg-section h2,
+  #office-packages h2,
+  #pkg-section h2{
+    font-size:clamp(15px,4vw,19px)!important;
+    margin-bottom:6px!important;
+  }
+  .portal-pkg-head,
+  .pkg-section-head,
+  #store-packages > div > div:first-child{
+    margin-bottom:14px!important;
+  }
+  #store-packages .rpkg-card,
+  #store-packages .pricing-card,
+  .pkg-section .rpkg-card,
+  .pkg-section .pricing-card,
+  .pkg-section .pkg-card,
+  .pkg-section .rizq-pkg-card{
+    padding:12px 10px!important;
+    border-radius:11px!important;
+    min-height:0!important;
+  }
+  .info-card{
+    padding:12px!important;
+    margin-bottom:8px!important;
+    border-radius:12px!important;
+  }
+  .info-card-title{
+    font-size:12.5px!important;
+    margin-bottom:8px!important;
+    padding-bottom:7px!important;
+  }
+  .main-wrap{
+    padding-top:10px!important;
+    padding-bottom:72px!important;
+  }
+  #rizq-demo-ribbon{display:none!important}
 }

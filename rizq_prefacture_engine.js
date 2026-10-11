@@ -44,12 +44,12 @@
       fr: 'Service rendu via la plateforme électronique Rizq'
     },
     tender: {
-      ar: 'تمت المناقصة عبر منصة رزق الإلكترونية',
-      fr: 'Appel d’offres clôturé via la plateforme électronique Rizq'
+      ar: 'تم عن طريق منصة رزق',
+      fr: 'Établi via la plateforme Rizq'
     },
     investment: {
-      ar: 'تمت الصفقة الاستثمارية عبر منصة رزق الإلكترونية',
-      fr: 'Opération d’investissement conclue via Rizq'
+      ar: 'تم عن طريق منصة رزق',
+      fr: 'Établi via la plateforme Rizq'
     }
   };
 

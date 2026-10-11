@@ -282,6 +282,39 @@ html.rizq-reg-page #modal.reg-wizard-mode.auth-login-mode .modal-header {
   margin:0 0 8px;
   text-align:center;
 }
+/* تسميات الحقول ظاهرة دائماً — لا تعتمد على placeholder (يُقصّ على الهاتف / أيقونات مدير كلمات المرور) */
+#modal.reg-wizard-mode .m-field-lbl,
+#modal.auth-login-mode .m-field-lbl {
+  display: block !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  color: #0f2347 !important;
+  margin: 0 0 6px !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-width: 100% !important;
+}
+#modal.reg-wizard-mode .m-field-lbl + .m-input,
+#modal.reg-wizard-mode .m-field-lbl + .m-pw-wrap {
+  margin-top: 0 !important;
+}
+/* مساحة لأيقونات مدير كلمات المرور حتى لا تغطي النص */
+#modal.reg-wizard-mode input[type="email"].m-input,
+#modal.reg-wizard-mode input[type="password"].m-input,
+#modal.auth-login-mode input[type="email"].m-input,
+#modal.auth-login-mode input[type="password"].m-input {
+  padding-inline-start: 16px !important;
+  padding-inline-end: 48px !important;
+  text-overflow: ellipsis !important;
+}
+html[dir="rtl"] #modal.reg-wizard-mode input[type="email"].m-input,
+html[dir="rtl"] #modal.auth-login-mode input[type="email"].m-input {
+  /* في RTL أيقونة الملء غالباً على يمين الحقل — اترك فراغاً كافياً */
+  padding-inline-start: 48px !important;
+  padding-inline-end: 16px !important;
+}
 @media (max-width:768px){
   #modal.reg-wizard-mode.auth-login-mode .modal-header,
   #modal.auth-login-mode .modal-header,
@@ -293,6 +326,31 @@ html.rizq-reg-page #modal.reg-wizard-mode.auth-login-mode .modal-header {
   #modal.auth-login-mode .modal-auth-tabs { margin-top:4px; }
   #modal.auth-login-mode .rizq-reg-trust { gap:10px; }
   #modal.auth-login-mode .rizq-reg-trust-card { padding:14px !important; }
+  #modal.auth-login-mode .modal-auth-heading {
+    font-size: 1.35rem !important;
+    text-align: start !important;
+    padding-inline: 2px;
+  }
+  #modal.auth-login-mode .modal-auth-sub {
+    text-align: start !important;
+    font-size: 13px !important;
+    color: #475569 !important;
+    margin-bottom: 14px !important;
+  }
+  #modal.reg-wizard-mode .m-field-lbl,
+  #modal.auth-login-mode .m-field-lbl {
+    font-size: 13px !important;
+  }
+  #modal.reg-wizard-mode #p-login,
+  #modal.reg-wizard-mode #p-forgot {
+    overflow: visible !important;
+  }
+  #modal.reg-wizard-mode #p-login .m-input,
+  #modal.reg-wizard-mode #p-forgot .m-input {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /* ── RTL: الكتابة العربية من اليمين في معالج التسجيل ── */
@@ -759,6 +817,15 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     min-height: 48px !important;
     font-size: 16px !important; /* يمنع تكبير iOS */
     padding: 12px 14px !important;
+    box-sizing: border-box !important;
+  }
+  #modal.reg-wizard-mode input[type="email"].m-input,
+  #modal.reg-wizard-mode input[type="password"].m-input {
+    padding-inline-end: 48px !important;
+  }
+  html[dir="rtl"] #modal.reg-wizard-mode input[type="email"].m-input {
+    padding-inline-start: 48px !important;
+    padding-inline-end: 14px !important;
   }
   #modal.reg-wizard-mode .m-btn-main {
     min-height: 52px !important;
@@ -786,9 +853,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     white-space: nowrap !important;
     color: rgba(255,255,255,0.9) !important;
   }
-  /* إخفاء الرئيسية/التصفح فقط — الإبقاء على الشروط + الخصوصية + الأمان */
+  /* إخفاء الرئيسية/التصفح/الأمان على الهاتف — الشروط + الخصوصية فقط (لا قصّ) */
   .rizq-reg-chrome-links a:nth-child(1),
-  .rizq-reg-chrome-links a:nth-child(2) {
+  .rizq-reg-chrome-links a:nth-child(2),
+  .rizq-reg-chrome-links a:nth-child(5) {
     display: none !important;
   }
   .rizq-reg-chrome-lang {
@@ -807,7 +875,17 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     width: 32px !important; height: 32px !important;
   }
   #modal .rizq-reg-chrome .logo-ar { font-size: 16px !important; }
-  #modal .rizq-reg-chrome .logo-sub { display: none !important; }
+  /* أظهر «رجوع» على الهاتف — الزر يعود للصفحة السابقة */
+  #modal .rizq-reg-chrome .logo-sub {
+    display: block !important;
+    font-size: 9px !important;
+    letter-spacing: .5px !important;
+    color: rgba(232,201,106,.9) !important;
+  }
+  .rizq-reg-chrome-links a {
+    font-size: 10.5px !important;
+    padding: 5px 6px !important;
+  }
 
   #modal.reg-wizard-mode .modal-box {
     background:#fff !important; width:100% !important;

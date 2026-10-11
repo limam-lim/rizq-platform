@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="rizq_header.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
@@ -145,9 +146,22 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 .store-load-more:hover{filter:brightness(1.06)}
 @media(max-width:900px){
+  .store-video-spotlight{margin:10px auto 0;padding:0 10px}
   .store-video-spotlight-inner,
   .store-video-spotlight-inner.has-dual{grid-template-columns:1fr}
   .store-video-spotlight-inner.has-dual .store-video-frames{grid-template-columns:1fr}
+  .store-video-copy{padding:14px 14px 8px}
+  .store-video-copy h2{font-size:16px;margin-bottom:6px}
+  .store-video-copy p{font-size:12px;line-height:1.5}
+  .store-video-frames{min-height:0;padding:8px;gap:8px}
+  .store-video-frame{min-height:0;overflow:visible;border-radius:10px}
+  .store-video-frame .rzq-iv-wrap{height:auto;max-width:none}
+  .store-video-frame .rzq-iv-frame{min-height:0;aspect-ratio:16/9;border-radius:10px}
+  .store-video-frame .rzq-iv-play{width:48px;height:48px;font-size:20px}
+  /* على الهاتف: زر ▶ يكفي — إخفاء شريط النص الطويل يقلّل الإحساس بالحجم الزائد */
+  .store-video-frame .rzq-iv-play-label{display:none}
+  .store-video-frame .rzq-iv-badge{font-size:10px;padding:4px 9px}
+  .store-video-frame .rzq-iv-src{font-size:10.5px;margin-top:6px}
 }
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
@@ -180,7 +194,17 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .badge-pickup{background:rgba(27,58,107,.4);color:#7aa0e0;border:1px solid rgba(122,160,224,.35)}
 .store-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzStBounce 2s ease-in-out infinite}
 @keyframes rzStBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
-@media(max-width:640px){.store-hero{min-height:clamp(240px,48vh,320px)}.hero-cover{padding:40px 16px 32px}.store-logo-wrap{width:76px;height:76px;font-size:34px}.store-hero .hero-floor{display:none}}
+@media(max-width:640px){
+  .store-hero{min-height:0!important;height:auto!important}
+  .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .store-logo-wrap{width:56px;height:56px;font-size:26px}
+  .store-name{font-size:18px!important}
+  .store-tagline{font-size:12px!important;margin-top:2px!important}
+  .store-eyebrow{font-size:10px!important}
+  .store-meta{font-size:11px!important;gap:6px!important}
+  .store-hero .hero-floor,.store-hero .hero-scroll-cue,.store-hero .hero-glints{display:none!important}
+  .store-badges .badge{font-size:10px;padding:3px 7px}
+}
 @media(max-width:900px){.store-profile{flex-direction:column;text-align:center}.store-info{text-align:center}.store-badges,.store-meta{justify-content:center}}
 
 
@@ -248,26 +272,22 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
-/* شريط ختامي فاخر يملأ فراغ العمود تحت التقييمات عندما يكون الشريط الجانبي أطول */
+/* شريط ختامي — بعد معلومات المحل وساعات العمل (قبل الباقات) */
 .store-close-band{
-  margin-top:auto;
-  flex:1 1 auto;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  margin-inline:-4px;
-  margin-bottom:-4px;
-  padding:22px 18px 18px;
-  border-radius:16px;
+  max-width:1280px;
+  width:calc(100% - 24px);
+  margin:14px auto 0;
+  padding:16px 14px 14px;
+  border-radius:14px;
   background:
     radial-gradient(ellipse at 80% 0%, rgba(201,168,76,.18), transparent 55%),
     linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
   border:1px solid rgba(201,168,76,.32);
-  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 10px 28px rgba(13,27,42,.18);
+  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 8px 22px rgba(13,27,42,.14);
   color:#fff;
   position:relative;
   overflow:hidden;
-  min-height:180px;
+  box-sizing:border-box;
 }
 .store-close-band::before{
   content:'';
@@ -315,8 +335,13 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   background:transparent;color:#E8C96A;border:1px solid rgba(201,168,76,.55);
 }
 @media(max-width:800px){
-  .store-close-band{min-height:0;margin-top:22px;flex:0 0 auto}
-  .store-close-pillars{grid-template-columns:1fr}
+  .store-close-band{margin:10px 12px 0;width:auto;padding:12px 12px 12px}
+  .store-close-title{font-size:15px!important}
+  .store-close-desc{font-size:11.5px!important;line-height:1.5}
+  .store-close-pillars{grid-template-columns:1fr;gap:6px}
+  .store-close-pillar{padding:8px 8px}
+  .store-close-pillar-ttl{font-size:11.5px}
+  .store-close-pillar-txt{font-size:10px}
 }
 .content-grid > aside#info-section{
   grid-area:side;
@@ -667,25 +692,41 @@ footer{
   .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
-  .store-hero{height:auto;min-height:clamp(240px,48vh,320px);padding:0;overflow:hidden}
-  .hero-cover{padding:40px 16px 32px}
-  .store-logo-wrap{width:76px;height:76px;font-size:34px;border-radius:50%}
-  .store-name{font-size:22px}
-  .store-tagline{font-size:13px}
-  .store-profile{flex-direction:column;text-align:center;gap:14px;padding:12px 16px}
+  .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
+  .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .store-logo-wrap{width:56px;height:56px;font-size:26px;border-radius:50%}
+  .store-name{font-size:18px!important}
+  .store-tagline{font-size:12px!important}
+  .store-profile{flex-direction:column;text-align:center;gap:8px;padding:6px 10px}
   .store-info{text-align:center}
   .store-meta{justify-content:center}
-  .store-badges{justify-content:center}
+  .store-badges{justify-content:center;gap:4px}
   .nav-links{display:none}
-  .main-wrap{padding:16px 12px 96px;background:none}
-  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .product-img{height:130px;font-size:44px}
-  .products-header{padding:12px 14px;border-radius:12px}
-  .section-title{font-size:15px}
-  .view-all-btn{padding:6px 10px;font-size:12px}
-  .info-card{padding:16px;margin-bottom:12px}
+  .main-wrap{padding:10px 10px 72px;background:none}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .product-img{height:100px;font-size:32px}
+  #products-grid .product-img .rzq-adx-media{min-height:100px}
+  .products-header{padding:10px 12px;border-radius:10px}
+  .section-title{font-size:14px}
+  .view-all-btn{padding:5px 8px;font-size:11.5px}
+  .info-card{padding:12px;margin-bottom:8px}
+  .info-card-title{font-size:12.5px;margin-bottom:8px;padding-bottom:7px}
+  #store-packages{padding:28px 4%!important}
+  #store-packages .portal-pkg-head,
+  #store-packages > div > div:first-child{margin-bottom:18px!important}
+  #store-packages h2{font-size:clamp(16px,4.2vw,20px)!important;margin-bottom:6px!important}
+  #store-packages .rpkg-card,#store-packages .pricing-card,#store-packages-grid .rizq-pkg-card{
+    padding:14px 12px!important;border-radius:12px!important;
+  }
   .map-placeholder{height:130px}
   .rzq-empty,.products-grid > .rzq-empty{min-height:160px;padding:28px 16px!important}
+  .cat-tabs{flex-wrap:wrap;gap:8px;align-items:stretch}
+  .cat-tabs-shop{
+    width:100%;margin-inline-start:0;justify-content:stretch;
+    order:-1;border-radius:14px;padding:6px;
+  }
+  .cat-tabs-shop .sss-btn{flex:1 1 0;min-width:0;padding:8px 10px;font-size:12px}
+  .cat-tabs-cats{width:100%;min-width:0}
   .actions-bar{
     position:sticky;top:var(--rizq-header-h,0);z-index:40;
     padding:0 12px;
@@ -698,7 +739,7 @@ footer{
   .action-btns{
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
+    gap:6px;
     width:100%;
   }
   .action-btn{
@@ -707,9 +748,9 @@ footer{
     width:auto;
     min-width:0;
     max-width:100%;
-    min-height:46px;
-    padding:10px 8px;
-    font-size:12.5px;
+    min-height:42px;
+    padding:9px 6px;
+    font-size:12px;
     border-radius:12px;
     box-sizing:border-box;
   }
@@ -927,7 +968,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=28.5" defer></script>
+  <script src="rizq_store_commerce.js?v=28.8" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1178,7 +1219,7 @@ footer{
       <div class="products-header">
         <div>
           <div class="section-title" style="color:#fff" data-t="products-title">مختارات من واجهة المحل</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px" data-t="products-role-hint">معاينة سريعة — للبحث والفلترة وكل المنتجات افتح الكتالوج</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px" data-t="products-role-hint">مختارات من المحل — للكتالوج الكامل والفلاتر اضغط «كل المنتجات»</div>
         </div>
         <a class="view-all-btn" id="store-view-all-products" href="rizq_products.html" data-t="view-all-products">كل المنتجات والفلاتر ←</a>
       </div>
@@ -1190,59 +1231,59 @@ footer{
       <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 15 منتجاً التالية</button>
 
       <!-- Reviews -->
-      <div style="margin-top:28px" id="reviews-section">
-        <div class="section-title" style="margin-bottom:14px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-        <div style="padding:22px 20px">
-          <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;flex-wrap:wrap">
-            <div style="text-align:center;min-width:110px">
-              <div style="font-size:44px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
-              <div style="color:#F5A623;font-size:18px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
-              <div style="font-size:12px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+      <div style="margin-top:20px" id="reviews-section">
+        <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+        <div style="padding:14px 12px">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+            <div style="text-align:center;min-width:90px">
+              <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
+              <div style="color:#F5A623;font-size:15px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
+              <div style="font-size:11px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
             </div>
-            <div style="flex:1;min-width:160px" id="store-rating-breakdown"></div>
+            <div style="flex:1;min-width:140px" id="store-rating-breakdown"></div>
           </div>
           <div id="reviews-list"></div>
-          <button class="view-all-btn" style="margin-top:14px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+          <button class="view-all-btn" style="margin-top:10px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
         </div>
       </div>
-
-      <!-- ختام فاخر يملأ الفراغ تحت التقييمات بدل المساحة البيضاء الفارغة -->
-      <section class="store-close-band" id="store-close-band" aria-label="ضمانات الشراء">
-        <div class="store-close-inner">
-          <p class="store-close-eyebrow" data-t="close-eyebrow">RIZQ · تجربة شراء آمنة</p>
-          <h3 class="store-close-title"><span data-t="close-title-gold">تسوّق بثقة</span> <span data-t="close-title-rest">من واجهة هذا المحل</span></h3>
-          <p class="store-close-desc" data-t="close-desc">رزق وسيط نشر فقط — الدفع والتسليم يتمان مباشرة مع المحل. عاين المنتج قبل أي تحويل، وتواصل عبر غرفة الطلبات أو واتساب.</p>
-          <div class="store-close-pillars">
-            <div class="store-close-pillar">
-              <div class="store-close-pillar-ico" aria-hidden="true">👁</div>
-              <div class="store-close-pillar-ttl" data-t="close-p1-ttl">معاينة قبل الدفع</div>
-              <div class="store-close-pillar-txt" data-t="close-p1-txt">افحص السلعة مع المحل قبل التحويل</div>
-            </div>
-            <div class="store-close-pillar">
-              <div class="store-close-pillar-ico" aria-hidden="true">💬</div>
-              <div class="store-close-pillar-ttl" data-t="close-p2-ttl">تواصل مباشر</div>
-              <div class="store-close-pillar-txt" data-t="close-p2-txt">طلب، واتساب، أو محادثة داخل رزق</div>
-            </div>
-            <div class="store-close-pillar">
-              <div class="store-close-pillar-ico" aria-hidden="true">🚚</div>
-              <div class="store-close-pillar-ttl" data-t="close-p3-ttl">توصيل أو استلام</div>
-              <div class="store-close-pillar-txt" data-t="close-p3-txt">اختر الطريقة الأنسب لك مع المحل</div>
-            </div>
-          </div>
-          <div class="store-close-ctas">
-            <a class="store-close-cta primary" id="store-close-catalog" href="rizq_products.html" data-t="close-cta-catalog">تصفّح كل المنتجات ←</a>
-            <button type="button" class="store-close-cta ghost" onclick="document.getElementById('store-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})" data-t="close-cta-desk">📩 غرفة الطلبات</button>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 </div>
 
+<!-- بطاقة الشراء الآمن — بعد معلومات المحل وساعات العمل (أسفل الواجهة قبل الباقات) -->
+<section class="store-close-band" id="store-close-band" aria-label="ضمانات الشراء">
+  <div class="store-close-inner">
+    <p class="store-close-eyebrow" data-t="close-eyebrow">RIZQ · تجربة شراء آمنة</p>
+    <h3 class="store-close-title"><span data-t="close-title-gold">تسوّق بثقة</span> <span data-t="close-title-rest">من واجهة هذا المحل</span></h3>
+    <p class="store-close-desc" data-t="close-desc">رزق وسيط نشر فقط — الدفع والتسليم يتمان مباشرة مع المحل. عاين المنتج قبل أي تحويل، وتواصل عبر غرفة الطلبات أو واتساب.</p>
+    <div class="store-close-pillars">
+      <div class="store-close-pillar">
+        <div class="store-close-pillar-ico" aria-hidden="true">👁</div>
+        <div class="store-close-pillar-ttl" data-t="close-p1-ttl">معاينة قبل الدفع</div>
+        <div class="store-close-pillar-txt" data-t="close-p1-txt">افحص السلعة مع المحل قبل التحويل</div>
+      </div>
+      <div class="store-close-pillar">
+        <div class="store-close-pillar-ico" aria-hidden="true">💬</div>
+        <div class="store-close-pillar-ttl" data-t="close-p2-ttl">تواصل مباشر</div>
+        <div class="store-close-pillar-txt" data-t="close-p2-txt">طلب، واتساب، أو محادثة داخل رزق</div>
+      </div>
+      <div class="store-close-pillar">
+        <div class="store-close-pillar-ico" aria-hidden="true">🚚</div>
+        <div class="store-close-pillar-ttl" data-t="close-p3-ttl">توصيل أو استلام</div>
+        <div class="store-close-pillar-txt" data-t="close-p3-txt">اختر الطريقة الأنسب لك مع المحل</div>
+      </div>
+    </div>
+    <div class="store-close-ctas">
+      <a class="store-close-cta primary" id="store-close-catalog" href="rizq_products.html" data-t="close-cta-catalog">تصفّح كل المنتجات ←</a>
+      <button type="button" class="store-close-cta ghost" onclick="document.getElementById('store-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})" data-t="close-cta-desk">📩 غرفة الطلبات</button>
+    </div>
+  </div>
+</section>
+
 <!-- ══ باقات المحلات ══ -->
 <section id="store-packages" style="padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
   <div style="max-width:1380px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:42px">
+    <div class="portal-pkg-head" style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Stores — الباقات</p>
       <h2 style="font-family:'Noto Naskh Arabic',serif;font-size:clamp(24px,3vw,36px);font-weight:700;color:#16263d;margin-bottom:10px"><span data-t="pkg-title-pre">افتح محلك بالباقة</span> <span style="color:var(--gold)" data-t="pkg-title-gold">المناسبة لك</span></h2>
       <p style="color:#6a7a8a;font-size:14px" data-t="pkg-desc">جرّب مجاناً 10 أيام، ثم اختر الباقة التي تناسب نشاطك — الأسعار والمميزات قابلة للتحديث من لوحة التحكم</p>
@@ -1536,7 +1577,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.7"></script>
+  <script src="rizq_intro_video.js?v=28.8"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1841,9 +1882,10 @@ function rizqShare(title, url) {
       var acc = {
         id: id, type: 'store', status: 'approved',
         name: fr ? 'Boutique Al-Nour' : 'محل النور',
+        tagline: fr ? 'Mode, parfums et accessoires' : 'أزياء وعطور وإكسسوارات',
         desc: fr
-          ? 'Boutique démo (projet de fin d’études) — espace marchand prêt avec panier et salle de demandes.'
-          : 'محل تجريبي (معاينة مشروع تخرج) — واجهة جاهزة بسلة وطلب وغرفة طلبات ظاهرة.',
+          ? 'Boutique modèle sur Rizq — catalogue, panier et salle de demandes prêts pour vos clients.'
+          : 'محل نموذجي على رزق — كتالوج وسلة وغرفة طلبات جاهزة لزبائنك.',
         city: fr ? 'Nouakchott' : 'نواكشوط',
         address: fr ? 'Ksar — Nouakchott' : 'لكصر — نواكشوط',
         phone: '+222 44 55 66 77', whatsapp: '22244556677', email: 'store-demo@rizq.mr',
@@ -1895,6 +1937,16 @@ function rizqShare(title, url) {
       acc.storeTopics = demoTopics;
       try{
         localStorage.setItem('store_products_' + id, JSON.stringify(products));
+        var demoHours = [
+          { day: 'الأحد', open: true, from: '09:00', to: '21:00' },
+          { day: 'الاثنين', open: true, from: '09:00', to: '21:00' },
+          { day: 'الثلاثاء', open: true, from: '09:00', to: '21:00' },
+          { day: 'الأربعاء', open: true, from: '09:00', to: '21:00' },
+          { day: 'الخميس', open: true, from: '09:00', to: '21:00' },
+          { day: 'الجمعة', open: true, from: '16:00', to: '21:00' },
+          { day: 'السبت', open: true, from: '09:00', to: '21:00' }
+        ];
+        localStorage.setItem('store_hours_' + id, JSON.stringify(demoHours));
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         accs = accs.filter(function(a){ return a && a.id !== id; });
         accs.push(acc);
@@ -1908,47 +1960,61 @@ function rizqShare(title, url) {
       window.STORE_FEATURED_PRODUCTS = {};
       products.forEach(function(p, i){ window.STORE_FEATURED_PRODUCTS[String(i+1)] = p; window.STORE_FEATURED_PRODUCTS[p.id] = p; });
       mountStorePromoVideo(acc);
-      if(!document.getElementById('rizq-demo-ribbon')){
-        var rib = document.createElement('div');
-        rib.id = 'rizq-demo-ribbon';
-        rib.style.cssText = 'position:sticky;top:0;z-index:90;background:linear-gradient(90deg,#0F2347,#1B3A6B);color:#E8C96A;text-align:center;padding:8px 14px;font-size:12.5px;font-weight:800';
-        rib.textContent = fr
-          ? '🎓 Démonstration projet — Boutique fictive (données de présentation)'
-          : '🎓 معاينة مشروع تخرج — محل وهمي (بيانات عرض فقط، ليست حقيقية)';
-        document.body.insertBefore(rib, document.body.firstChild);
-      }
-      /* أبقِ ?id=demo_store لربط صفحة المنتجات */
-      try{ history.replaceState(null, '', 'rizq_store.html?id=demo_store'); }catch(e2){}
+      /* بدون شريط تقني — النموذج يبدو كمحل حقيقي */
+      var oldRib = document.getElementById('rizq-demo-ribbon');
+      if(oldRib) oldRib.remove();
+      /* أبقِ ?demo=1 لربط صفحة المنتجات وإظهار كل الخدمات */
+      try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=demo_store'); }catch(e2){}
       return acc;
+    }
+
+    function isStorePreviewPortal(id, params){
+      params = params || new URLSearchParams(location.search);
+      id = String(id || '');
+      return params.get('demo') === '1' || !id
+        || id === 'demo_store'
+        || id === 'acc_promo_store_rizq'
+        || /^acc_promo_store/.test(id);
     }
 
     function mountStorePromoVideo(acc){
       /* شريط واحد: فيديو تعريفي + فيديو إضافي (لبعض الباقات) — بلا تكرار في أماكن أخرى */
       if(!acc || !window.RizqIntroVideo) return;
-      var videos = (window.RizqStoreCommerce && RizqStoreCommerce.promoVideosOf)
-        ? RizqStoreCommerce.promoVideosOf(acc)
-        : (acc.promo_video ? [{ url: acc.promo_video, kind: 'intro' }] : []);
+      var videos;
+      if(window.RizqStoreCommerce && typeof RizqStoreCommerce.promoVideosOf === 'function'){
+        videos = RizqStoreCommerce.promoVideosOf(acc);
+      } else {
+        videos = [];
+        if(acc.promo_video) videos.push({ url: String(acc.promo_video).trim(), kind: 'intro' });
+        if(acc.promo_video_extra) videos.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
+        videos = videos.filter(function(v){ return !!v.url; });
+      }
       var spot = document.getElementById('store-video-spotlight');
       var inner = document.getElementById('store-video-spotlight-inner');
       var introMount = document.getElementById('spotlight-intro-video-mount');
       var extraMount = document.getElementById('spotlight-extra-video-mount');
+      var introFrame = document.getElementById('spotlight-intro-frame');
       var extraFrame = document.getElementById('spotlight-extra-frame');
       var spotName = document.getElementById('spotlight-store-name');
       var heading = document.getElementById('spotlight-video-heading');
       var blurb = document.getElementById('spotlight-store-blurb');
-      if(spotName && acc.name) spotName.textContent = acc.name;
+      if(spotName && (acc.name || acc.businessName)) spotName.textContent = acc.name || acc.businessName;
       if(!spot || !introMount || !videos.length){
         if(spot) spot.style.display = 'none';
         return;
       }
       var fr = isFr();
-      var intro = videos.find(function(v){ return v.kind === 'intro'; }) || videos[0];
+      var intro = videos.find(function(v){ return v.kind === 'intro'; });
       var extra = videos.find(function(v){ return v.kind === 'extra'; });
+      /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
+      if(!intro && extra){ intro = extra; extra = null; }
+      if(!intro) intro = videos[0];
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
         linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
         playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
       });
+      if(introFrame) introFrame.style.display = okIntro ? '' : 'none';
       var okExtra = false;
       if(extra && extraMount && extraFrame){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
@@ -1959,6 +2025,7 @@ function rizqShare(title, url) {
         extraFrame.style.display = okExtra ? '' : 'none';
       } else if(extraFrame){
         extraFrame.style.display = 'none';
+        if(extraMount) extraMount.innerHTML = '';
       }
       if(inner) inner.classList.toggle('has-dual', !!(okIntro && okExtra));
       if(heading) heading.textContent = (okIntro && okExtra)
@@ -1967,7 +2034,7 @@ function rizqShare(title, url) {
       if(blurb) blurb.textContent = (okIntro && okExtra)
         ? (fr ? 'Vidéo de présentation et vidéo supplémentaire de la boutique.' : 'فيديو تعريفي وفيديو إضافي من المحل.')
         : (fr ? 'Découvrez la boutique en moins de 20 secondes.' : 'تعرّف على المحل ومنتجاته في أقل من 20 ثانية.');
-      spot.style.display = okIntro ? '' : 'none';
+      spot.style.display = (okIntro || okExtra) ? '' : 'none';
     }
 
     function paintStoreProductsGrid(products, storeId){
@@ -2047,14 +2114,14 @@ function rizqShare(title, url) {
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('store') || '';
         var emptyBanner = document.getElementById('store-empty-banner');
-        if(!id || params.get('demo') === '1' || id === 'demo_store'){
+        if(isStorePreviewPortal(id, params)){
           var demoAcc = applyDemoStore();
           id = demoAcc.id;
         }
         if(emptyBanner) emptyBanner.style.display = 'none';
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'store'; });
-        if(!acc && (id === 'demo_store' || window._rizqStoreIsDemo)) acc = applyDemoStore();
+        if(!acc && (id === 'demo_store' || window._rizqStoreIsDemo || isStorePreviewPortal(id, params))) acc = applyDemoStore();
         if(!acc){
           if(emptyBanner){
             emptyBanner.style.display = 'block';
@@ -2067,8 +2134,14 @@ function rizqShare(title, url) {
         }
         window._rizqStoreProfile = acc;
 
-        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي — الباقات في الداشبورد فقط
+        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي فقط.
+        // نماذج المعاينة (?demo / demo_store / acc_promo_*): كل الخدمات ظاهرة بدون استثناء.
         (function hidePlatformUpsellOnBoundStore(){
+          if(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params)){
+            var pkgDemo = document.getElementById('store-packages');
+            if(pkgDemo) pkgDemo.style.display = '';
+            return;
+          }
           var pkg = document.getElementById('store-packages');
           if(pkg) pkg.style.display = 'none';
           document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
@@ -2229,8 +2302,11 @@ function rizqShare(title, url) {
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
-                var pkgHide = document.getElementById('store-packages');
-                if(pkgHide) pkgHide.style.display = 'none';
+                /* لا نخفي باقات المعاينة — فقط الحسابات الحقيقية */
+                if(!(window._rizqStoreIsDemo || id === 'demo_store' || /^acc_promo_/.test(id))){
+                  var pkgHide = document.getElementById('store-packages');
+                  if(pkgHide) pkgHide.style.display = 'none';
+                }
                 setText('store-name-el', acc.name);
                 var taglineApi = acc.tagline || acc.desc || '';
                 if(taglineApi) setText('store-tagline-el', taglineApi);
@@ -2926,10 +3002,11 @@ if(typeof _t2 === 'undefined'){
     if(typeof window._rzqApplyFt === 'function') window._rzqApplyFt();
     // إعادة رسم التقييمات الحقيقية بلغة العرض الحالية (لا تأثير إن لم يوجد حساب حقيقي مطابق)
     if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
-    // أعد تركيب الفيديو التعريفي بعناوين FR/AR الصحيحة
+    // أعد تركيب فيديوهات المحل بعناوين FR/AR — من ملف المحل لا من ملف الوكيل الذكي
     try{
-      if(typeof mountStorePromoVideo === 'function' && window._rizqProfile){
-        mountStorePromoVideo(window._rizqProfile);
+      var storeProf = window._rizqStoreProfile;
+      if(typeof window.mountStorePromoVideo === 'function' && storeProf){
+        window.mountStorePromoVideo(storeProf);
       }
     }catch(eVid){}
   }

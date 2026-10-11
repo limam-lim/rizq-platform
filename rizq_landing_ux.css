@@ -448,14 +448,14 @@ html[dir="ltr"] .section-header .section-desc{
 
 /* بطاقة عنوان الباقات — نفس مقاس بقية عناوين الأقسام + حافة ذهبية */
 .pricing-section > .section-header{
-  width:min(100%,var(--rizq-section-header-w,560px)) !important;
-  max-width:var(--rizq-section-header-w,560px) !important;
-  height:var(--rizq-section-header-h,118px);
-  min-height:var(--rizq-section-header-h,118px);
-  max-height:var(--rizq-section-header-h,118px);
+  width:min(100%,var(--rizq-section-header-w,480px)) !important;
+  max-width:var(--rizq-section-header-w,480px) !important;
+  height:var(--rizq-section-header-h,86px);
+  min-height:var(--rizq-section-header-h,86px);
+  max-height:var(--rizq-section-header-h,86px);
   margin-left:auto;
   margin-right:auto;
-  margin-bottom:22px;
+  margin-bottom:16px;
   box-sizing:border-box;
   overflow:hidden;
 }
@@ -879,6 +879,27 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   font-size:12.5px;
   font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+@media (max-width:768px){
+  /* هاتف: شريط «مباشر» بعرض الشاشة من الحافة — ليس كبسولة سطح مكتب */
+  #hero-listings .listings-label{margin:0 0 8px;padding:0;width:100%}
+  #hero-listings .listings-label > span{
+    display:flex!important;
+    width:100%!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+    justify-content:center!important;
+    border-radius:0!important;
+    padding:7px 12px!important;
+    gap:7px!important;
+    font-size:11px!important;
+  }
+  #hero-listings .cards-track-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:4px 0!important;
+  }
 }
 #hero-listings .live-capsule{
   display:inline-flex!important;

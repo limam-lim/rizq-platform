@@ -487,33 +487,83 @@
   .rzq-adx-media.has-multi .rzq-adx-nav{
     opacity:.8;pointer-events:auto;
   }
-  .ad-card .rzq-adx-media{min-height:118px}
-  .listing-card .rzq-adx-media{min-height:114px}
-  .rzq-adx-fav{width:26px;height:26px}
-  .rzq-adx-nav{width:24px;height:24px}
-  .rzq-adx-price-pill{font-size:11px;padding:4px 8px;border-radius:3px;font-weight:900}
+  .ad-card .rzq-adx-media{min-height:96px}
+  .listing-card .rzq-adx-media{min-height:96px}
+  .rzq-adx-fav{width:24px;height:24px}
+  .rzq-adx-nav{width:22px;height:22px}
+  .rzq-adx-price-pill{font-size:10px;padding:3px 7px;border-radius:3px;font-weight:900}
   .rzq-adx-tel,
-  .rzq-adx-actions .rzq-adx-wa{width:26px;height:26px}
+  .rzq-adx-actions .rzq-adx-wa{width:24px;height:24px}
+  /* شريط المباشر على الهاتف: بطاقات أصغر وبعرض الشاشة (بدون هامش سطح مكتب) */
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media){
-    width:164px!important;
-    min-width:164px!important;
-    max-width:164px!important;
-    flex:0 0 164px!important;
+    width:138px!important;
+    min-width:138px!important;
+    max-width:138px!important;
+    flex:0 0 138px!important;
+    border-radius:12px!important;
   }
   #hero-listings .cards-track .ad-card .rzq-adx-media{
-    min-height:114px!important;
+    min-height:96px!important;
     height:auto!important;
     max-height:none!important;
-    aspect-ratio:1.15 / 1!important;
+    aspect-ratio:1.12 / 1!important;
   }
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:10px 7px 7px!important;
+    padding:7px 6px 6px!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{
+    font-size:10.5px!important;
   }
 }
 
 @media (prefers-reduced-motion:reduce){
   .rzq-adx-slides{transition:none}
   /* التشغيل التلقائي يُوقف من JS عند reduce */
+}
+
+/* ── تابلت فقط: الخلفية الزرقاء خلف اتصال/واتساب لا تُفقد ──
+   السبب: overflow:visible + background-blend/repeat من قواعد عامة قد تترك
+   أسفل البطاقة شفافاً أو يمرّ منه جزء من صورة الإعلان أثناء التحريك. */
+@media (min-width:769px) and (max-width:1280px){
+  #hero-listings .ad-card:has(.rzq-adx-media),
+  .cards-track .ad-card:has(.rzq-adx-media),
+  .landing-ads-grid .listing-card:has(.rzq-adx-media),
+  .listings-grid .listing-card:has(.rzq-adx-media),
+  .rc:has(.rzq-adx-media){
+    overflow:hidden!important;
+    background-color:#0a1528!important;
+    background-image:
+      linear-gradient(160deg,rgba(201,168,76,.14),transparent 34%),
+      linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%)!important;
+    background-blend-mode:normal!important;
+    background-repeat:no-repeat!important;
+    background-size:auto!important;
+  }
+  .ad-card:has(.rzq-adx-media) .ad-card-body,
+  .listing-card:has(.rzq-adx-media) .l-body,
+  .rc:has(.rzq-adx-media) .rc-body{
+    background:transparent!important;
+    background-image:none!important;
+  }
+  #hero-listings .ad-card .rzq-adx-actions,
+  .cards-track .ad-card .rzq-adx-actions,
+  .landing-ads-grid .listing-card .rzq-adx-actions,
+  .listings-grid .listing-card .rzq-adx-actions,
+  .rc .rzq-adx-actions{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin-top:4px!important;
+    padding:8px 6px 10px!important;
+    border-radius:0 0 12px 12px!important;
+    background:
+      linear-gradient(180deg,#0e1c34 0%,#0a1528 55%,#081020 100%)!important;
+    background-color:#0a1528!important;
+    border-top:1px solid rgba(201,168,76,.18)!important;
+  }
 }

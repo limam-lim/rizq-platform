@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="rizq_product_detail.css?v=2"/>
 <link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="stylesheet" href="rizq_prefacture.css?v=2"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
@@ -99,7 +100,20 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
 .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzBounce 2s ease-in-out infinite}
 @keyframes rzBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
-@media(max-width:640px){.showroom-hero{min-height:clamp(240px,48vh,320px)}.hero-cover{padding:40px 16px 32px}.showroom-logo{width:76px;height:76px;font-size:34px}.hero-floor{display:none}}
+@media(max-width:640px){
+  .showroom-hero{min-height:0!important;height:auto!important}
+  .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .showroom-logo{width:56px;height:56px;font-size:26px}
+  .hero-floor,.hero-scroll-cue,.hero-glints{display:none!important}
+  .showroom-name,#sr-name,.sr-name{font-size:18px!important}
+  .showroom-tagline,.sr-tagline{font-size:12px!important}
+  .pkg-section{padding:22px 12px 32px!important}
+  .pkg-section-head{margin-bottom:14px!important}
+  .pkg-section-head h2,.pkg-section h2,.section-title{font-size:clamp(14px,4vw,18px)!important}
+  .info-card,.side-card{padding:12px!important;margin-bottom:8px!important}
+  .main-wrap,.content-wrap{padding:10px 10px 72px!important}
+  .pkg-card,.rizq-pkg-card{padding:14px 12px!important;border-radius:12px!important}
+}
 
 
 
@@ -553,25 +567,26 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         </div>
       </div>
 
-  
-      <section class="rizq-close-band" id="showroom-close-band" aria-label="ضمانات المعرض">
-        <div class="rizq-close-inner">
-          <p class="rizq-close-eyebrow">RIZQ · تجربة آمنة</p>
-          <h3 class="rizq-close-title"><span>تصفّح بثقة</span> من واجهة هذا المعرض</h3>
-          <p class="rizq-close-desc">رزق وسيط نشر فقط — المعاينة والدفع والتسليم تتم مباشرة مع المعرض. تواصل عبر غرفة الطلبات أو المحادثة الآمنة.</p>
-          <div class="rizq-close-pillars">
-            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt">افحص العرض مع المعرض قبل أي تحويل</div></div>
-            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">طلب أو محادثة داخل رزق</div></div>
-            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏛️</div><div class="rizq-close-pillar-ttl">استلام أو توصيل</div><div class="rizq-close-pillar-txt">اتفق مع المعرض على الأنسب لك</div></div>
-          </div>
-          <div class="rizq-close-ctas">
-            <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('catalog-section')?.scrollIntoView({behavior:'smooth'})">تصفّح الكتالوج</button>
-            <button type="button" class="rizq-close-cta ghost" onclick="document.getElementById('showroom-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
-          </div>
-        </div>
-      </section>
 </main>
 </div>
+
+<!-- بطاقة الضمان — بعد الموقع وساعات العمل (أسفل الواجهة قبل الباقات) -->
+<section class="rizq-close-band" id="showroom-close-band" aria-label="ضمانات المعرض">
+  <div class="rizq-close-inner">
+    <p class="rizq-close-eyebrow">RIZQ · تجربة آمنة</p>
+    <h3 class="rizq-close-title"><span>تصفّح بثقة</span> من واجهة هذا المعرض</h3>
+    <p class="rizq-close-desc">رزق وسيط نشر فقط — المعاينة والدفع والتسليم تتم مباشرة مع المعرض. تواصل عبر غرفة الطلبات أو المحادثة الآمنة.</p>
+    <div class="rizq-close-pillars">
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt">افحص العرض مع المعرض قبل أي تحويل</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">طلب أو محادثة داخل رزق</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏛️</div><div class="rizq-close-pillar-ttl">استلام أو توصيل</div><div class="rizq-close-pillar-txt">اتفق مع المعرض على الأنسب لك</div></div>
+    </div>
+    <div class="rizq-close-ctas">
+      <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('catalog-section')?.scrollIntoView({behavior:'smooth'})">تصفّح الكتالوج</button>
+      <button type="button" class="rizq-close-cta ghost" onclick="document.getElementById('showroom-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+    </div>
+  </div>
+</section>
 
 <!-- ══ PACKAGES ══ -->
 <section class="pkg-section" id="pkg-section">
@@ -803,7 +818,8 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
 
 (function applyDemoShowroomBootstrap(){
   var want = !_showroomId || _params.get('demo') === '1'
-    || _showroomId === 'demo_showroom' || _showroomId === 'demo-corp-001';
+    || _showroomId === 'demo_showroom' || _showroomId === 'demo-corp-001'
+    || _showroomId === 'acc_promo_corp_rizq' || /^acc_promo_corp/.test(_showroomId);
   if(!want) return;
   var fr = false;
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
@@ -813,8 +829,8 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     id: _showroomId, type: 'corp', status: 'approved',
     name: fr ? 'Showroom Prestige' : 'معرض بريستيج',
     desc: fr
-      ? 'Showroom démo (projet de fin d’études) — catalogue, panier et salle de demandes visibles.'
-      : 'معرض تجريبي (معاينة مشروع تخرج) — كتالوج وسلة وغرفة طلبات ظاهرة وجاهزة.',
+      ? 'Showroom modèle sur Rizq — catalogue, panier et salle de demandes prêts.'
+      : 'معرض نموذجي على رزق — كتالوج وسلة وغرفة طلبات جاهزة.',
     city: fr ? 'Nouakchott' : 'نواكشوط',
     address: fr ? 'Tevragh Zeina' : 'تفرغ زينة',
     phone: '+222 33 22 11 00', whatsapp: '22233221100', email: 'showroom-demo@rizq.mr',
@@ -828,8 +844,11 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
       { type: 'bankily', bank: 'Bankily', code: '33221100', note: fr ? 'Votre nom après virement' : 'اذكر اسمك بعد التحويل' },
       { type: 'instore', bank: fr ? 'Paiement au showroom' : 'الدفع في المعرض', code: '', note: '' }
     ],
-    /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة */
-    promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    /* فيديوهات تجريبية للمعاينة — تعريفي + إضافي */
+    plan: 'سنوية',
+    planName: 'سنوية',
+    promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+    promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -849,22 +868,14 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
   window._rizqShowroomPaymentMethods = acc.paymentMethods;
   _acc = acc;
   _allItems = items;
-  if(!document.getElementById('rizq-demo-ribbon')){
-    var rib = document.createElement('div');
-    rib.id = 'rizq-demo-ribbon';
-    rib.style.cssText = 'position:sticky;top:0;z-index:90;background:linear-gradient(90deg,#0F2347,#1B3A6B);color:#E8C96A;text-align:center;padding:8px 14px;font-size:12.5px;font-weight:800';
-    rib.textContent = fr
-      ? '🎓 Démonstration projet — Showroom fictif (données de présentation)'
-      : '🎓 معاينة مشروع تخرج — معرض وهمي (بيانات عرض فقط، ليست حقيقية)';
-    document.body.insertBefore(rib, document.body.firstChild);
-  }
-  try{ history.replaceState(null, '', 'rizq_showroom.html'); }catch(e2){}
+  var oldRib = document.getElementById('rizq-demo-ribbon');
+  if(oldRib) oldRib.remove();
+  try{ history.replaceState(null, '', 'rizq_showroom.html?demo=1&id=demo-corp-001'); }catch(e2){}
   document.body.classList.remove('rizq-empty-showroom');
-  // باقات اشتراك المنصة تختفي من صفحة المعرض الحقيقي/المعاينة
-  (function hidePlatformUpsellOnBoundShowroom(){
+  // نموذج المعاينة: كل الخدمات ظاهرة (باقات، فيديو، طلبات…) — لا نخفي شيئاً
+  (function keepDemoShowroomServicesVisible(){
     var pkg = document.getElementById('pkg-section');
-    if(pkg) pkg.style.display = 'none';
-    document.querySelectorAll('.promo-card, .rizq-promo-card').forEach(function(el){ el.style.display = 'none'; });
+    if(pkg) pkg.style.display = '';
   })();
 })();
 
@@ -1042,9 +1053,15 @@ function applyAccountData(){
   }
 
   if(!_acc) return;
-  // باقات اشتراك المنصة — للمشترك في الداشبورد فقط، ليست لزائر المعرض
+  // باقات المنصة: تُخفى عن زائر المعرض الحقيقي فقط — نماذج المعاينة تُظهر كل الخدمات
   var _pkgSec = document.getElementById('pkg-section');
-  if(_pkgSec) _pkgSec.style.display = 'none';
+  if(_pkgSec){
+    if(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom' || /^acc_promo_/.test(_showroomId)){
+      _pkgSec.style.display = '';
+    } else {
+      _pkgSec.style.display = 'none';
+    }
+  }
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
   if(window.RizqServiceDesk){
