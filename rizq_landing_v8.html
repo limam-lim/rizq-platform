@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.8"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.6"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.7"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.2"/>
@@ -3885,15 +3885,17 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile img{transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:42px}
-/* سعر أمازوني على كل بلاطة منتج (ستايل + معارض) */
+/* سعر على كل بلاطة منتج (ستايل + معارض) — ذهب معتم واضح فوق أي صورة */
 .rizq-style-tile-price{
   position:absolute;inset-inline-start:4px;bottom:4px;z-index:4;
   max-width:calc(100% - 8px);
-  padding:2px 6px;border-radius:6px;
-  background:rgba(255,255,255,.94);
-  color:#0f172a;font-size:9px;font-weight:800;line-height:1.2;
+  padding:2px 6px;border-radius:4px;
+  background:linear-gradient(180deg,#FFE9A8 0%,#F0D078 55%,#D4A84A 100%);
+  color:#0a1424;font-size:9px;font-weight:900;line-height:1.2;
   font-family:'Cairo','Segoe UI',sans-serif;
-  box-shadow:0 2px 8px rgba(0,0,0,.28);
+  border:1px solid rgba(255,248,220,.9);
+  box-shadow:0 2px 10px rgba(0,0,0,.4),0 0 0 1px rgba(201,168,76,.4),inset 0 1px 0 rgba(255,255,255,.55);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   pointer-events:none;direction:ltr;unicode-bidi:isolate;
 }
@@ -8076,16 +8078,18 @@ function renderRelatedAds(current) {
   if (!entries.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
   wrap.style.display = 'block';
   const title = isAr ? '✨ قد يهمك أيضاً — استمر في التصفح' : '✨ Vous aimerez aussi';
-  wrap.innerHTML = `<div class="amd-related-title">${title}</div>
+  wrap.innerHTML = `<div class="amd-related-title">${escapeHtml(title)}</div>
     <div class="amd-related-grid">
       ${entries.map(({ad:x,sameSeller:ss})=>{
         const xd = trAd(x);
         const badge = ss ? (isAr?'🔥 نفس البائع':'🔥 Même vendeur') : (isAr?'📂 نفس الفئة':'📂 Même catégorie');
-        return `<div class="amd-rel-card" onclick="openAdById('${String(x.id).replace(/'/g,"\\'")}')">
-          <div class="amd-rel-img" style="background:${xd.bg}"><span>${xd.emoji}</span><span class="amd-rel-badge">${badge}</span></div>
+        const safeId = String(x.id == null ? '' : x.id).replace(/[^a-zA-Z0-9_-]/g, '');
+        const bg = String(xd.bg || '').replace(/[<>"']/g, '');
+        return `<div class="amd-rel-card" onclick="openAdById('${safeId}')">
+          <div class="amd-rel-img" style="background:${escapeHtml(bg)}"><span>${escapeHtml(xd.emoji||'')}</span><span class="amd-rel-badge">${escapeHtml(badge)}</span></div>
           <div class="amd-rel-body">
-            <div class="amd-rel-title">${xd.title}</div>
-            <div class="amd-rel-price">${xd.price}</div>
+            <div class="amd-rel-title">${escapeHtml(xd.title||'')}</div>
+            <div class="amd-rel-price">${escapeHtml(xd.price||'')}</div>
           </div>
         </div>`;
       }).join('')}
@@ -8342,13 +8346,34 @@ function showSugg(v){
   const res=(ADS||[]).filter(function(s){
     return String(s.title||'').toLowerCase().indexOf(q)>=0 || String(s.cat||'').toLowerCase().indexOf(q)>=0;
   }).slice(0,5);
+  box.replaceChildren();
   if(!res.length){
-    box.innerHTML='<div class="sugg-item" style="cursor:default;color:#6a7a8a">'+(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج')+'</div>';
+    var empty=document.createElement('div');
+    empty.className='sugg-item';
+    empty.style.cursor='default';
+    empty.style.color='#6a7a8a';
+    empty.textContent=(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج');
+    box.appendChild(empty);
   } else {
-    box.innerHTML=res.map(function(s){
-      var t=(s.title||'').replace(/'/g,'\\\'');
-      return '<div class="sugg-item" onclick="document.getElementById(\'hero-search\').value=\''+t+'\';doMainSearch()"><span class="sugg-icon">'+(s.emoji||'📦')+'</span><span>'+(s.title||'')+'</span><span class="sugg-price">'+(s.price||'')+'</span></div>';
-    }).join('');
+    res.forEach(function(s){
+      var row=document.createElement('div');
+      row.className='sugg-item';
+      row.addEventListener('click', function(){
+        var inp=document.getElementById('hero-search');
+        if(inp) inp.value=String(s.title||'');
+        doMainSearch();
+      });
+      var ico=document.createElement('span');
+      ico.className='sugg-icon';
+      ico.textContent=s.emoji||'📦';
+      var ttl=document.createElement('span');
+      ttl.textContent=s.title||'';
+      var pr=document.createElement('span');
+      pr.className='sugg-price';
+      pr.textContent=s.price||'';
+      row.appendChild(ico); row.appendChild(ttl); row.appendChild(pr);
+      box.appendChild(row);
+    });
   }
   box.style.display='block';
 }
@@ -8381,6 +8406,14 @@ function mapApiAdToHero(a){
 function _adPhotoHtml(a, d, h){
   h = h || 130;
   var src = (a && Array.isArray(a.images) && a.images[0]) ? String(a.images[0]) : '';
+  if(window.RizqStoreCommerce && typeof RizqStoreCommerce.safeMediaUrl === 'function'){
+    src = RizqStoreCommerce.safeMediaUrl(src) || '';
+  } else {
+    var raw = String(src||'').trim();
+    if(!raw || /[\s<>"']/.test(raw) || /javascript:/i.test(raw)) src = '';
+    else if(!(/^https?:\/\//i.test(raw) || raw.charAt(0)==='/' || /^data:image\//i.test(raw))) src = '';
+    else src = raw;
+  }
   var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
   if(src){
     return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"></div>';

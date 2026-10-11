@@ -921,7 +921,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
            بصدق بدل اختلاق رقم. -->
       <!-- الخطوة 1: اختيار الخدمة -->
       <div class="req-box" id="office-calc-box" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(14,116,144,.06));border-color:rgba(201,168,76,.25)">
-        <div class="desk-step" id="calc-step-lbl">① الخطوة 1 — اختر الخدمة</div>
+        <div class="desk-step" id="calc-step-lbl" data-t="calc-step-lbl">① الخطوة 1 — اختر الخدمة</div>
         <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:5px" id="calc-title" data-t="calc-title">🧮 احسب تكلفة خدمتك تقريبياً</div>
         <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="calc-sub" data-t="calc-sub">اختر الخدمة والخيار (أساسي / موسّع) — ثم يفتح نموذج بياناتك تلقائياً</div>
         <select class="req-input" id="calc-type" onchange="calcEstimate()">
@@ -936,37 +936,37 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <div id="calc-price" style="font-size:22px;font-weight:900;color:var(--teal)"></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px" id="calc-note" data-t="calc-note">تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة</div>
           <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">② التالي — أدخل اسمك ورقم هاتفك</button>
-          <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
+          <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
 
       <!-- الخطوة 2: بيانات الزبون (تُفتح بعد اختيار الخدمة) -->
       <div class="req-box" id="office-service-desk">
-        <div class="desk-step" id="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="desk-step" id="desk-step-lbl" data-t="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
         <div id="req-sub" data-desk="hint" data-t="req-sub">بعد اختيار الخدمة أعلاه: أدخل اسمك ورقم هاتفك وسنتواصل معك</div>
-        <div id="desk-wait-hint" style="padding:14px 12px;border-radius:12px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.2);font-size:13px;color:#4a5568;line-height:1.55;margin-top:10px">
+        <div id="desk-wait-hint" data-t="desk-wait-hint" style="padding:14px 12px;border-radius:12px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.2);font-size:13px;color:#4a5568;line-height:1.55;margin-top:10px">
           ⬆️ اختر أولاً <strong>الخدمة</strong> و<strong>الخيار الأساسي/الموسّع</strong> في المقدّر أعلاه — ثم يفتح هنا حقول الاسم والهاتف والإيميل تلقائياً.
         </div>
         <div class="req-form" id="req-form" style="margin-top:16px">
-          <label class="req-field-lbl" for="rf-name">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name"/>
-          <label class="req-field-lbl" for="rf-phone">رقم الهاتف *</label>
+          <label class="req-field-lbl" for="rf-name" data-t="rf-lbl-name">الاسم الكامل *</label>
+          <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name-ph"/>
+          <label class="req-field-lbl" for="rf-phone" data-t="rf-lbl-phone">رقم الهاتف *</label>
           <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
-          <label class="req-field-lbl" for="rf-whatsapp">واتساب (إن اختلف عن الهاتف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp"/>
-          <label class="req-field-lbl" for="rf-email">البريد الإلكتروني (اختياري)</label>
+          <label class="req-field-lbl" for="rf-whatsapp" data-t="rf-lbl-whatsapp">واتساب (إن اختلف عن الهاتف)</label>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp-ph"/>
+          <label class="req-field-lbl" for="rf-email" data-t="rf-lbl-email">البريد الإلكتروني (اختياري)</label>
           <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
-          <label class="req-field-lbl" for="rf-service">الخدمة المطلوبة</label>
+          <label class="req-field-lbl" for="rf-service" data-t="rf-lbl-service">الخدمة المطلوبة</label>
           <select class="req-input" id="rf-service" name="service">
             <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
           </select>
-          <label class="req-field-lbl" for="rf-msg">تفاصيل الطلب</label>
+          <label class="req-field-lbl" for="rf-msg" data-t="rf-lbl-msg">تفاصيل الطلب</label>
           <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." style="min-height:80px;resize:vertical" data-ph="rf-msg"></textarea>
-          <div id="rf-docs-hint" data-desk="docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
+          <div id="rf-docs-hint" data-desk="docs-hint" data-t="rf-docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
           <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
-          <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
+          <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
         </div>
       </div>
     </div>
@@ -1011,17 +1011,17 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 <!-- بطاقة الضمان — بعد الموقع وساعات العمل (أسفل الواجهة قبل الباقات) -->
 <section class="rizq-close-band" id="office-close-band" aria-label="ضمانات المكتب">
   <div class="rizq-close-inner">
-    <p class="rizq-close-eyebrow">RIZQ · خدمة مهنية</p>
-    <h3 class="rizq-close-title"><span>اطلب بثقة</span> من هذا المكتب</h3>
-    <p class="rizq-close-desc">رزق وسيط نشر فقط — الاتفاق والدفع وتنفيذ الخدمة تتم مباشرة مع المكتب. عبّئ غرفة الطلبات أو تواصل عبر المحادثة الآمنة.</p>
+    <p class="rizq-close-eyebrow" id="off-close-eyebrow" data-t="close-eyebrow">RIZQ · خدمة مهنية</p>
+    <h3 class="rizq-close-title"><span id="off-close-title-gold" data-t="close-title-gold">اطلب بثقة</span> <span id="off-close-title-rest" data-t="close-title-rest">من هذا المكتب</span></h3>
+    <p class="rizq-close-desc" id="off-close-desc" data-t="close-desc">رزق وسيط نشر فقط — الاتفاق والدفع وتنفيذ الخدمة تتم مباشرة مع المكتب. عبّئ غرفة الطلبات أو تواصل عبر المحادثة الآمنة.</p>
     <div class="rizq-close-pillars">
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">📋</div><div class="rizq-close-pillar-ttl">طلب واضح</div><div class="rizq-close-pillar-txt">صف حاجتك بدقة قبل الاتفاق</div></div>
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">غرفة الطلبات أو محادثة رزق</div></div>
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🧾</div><div class="rizq-close-pillar-ttl">فاتورة قبل</div><div class="rizq-close-pillar-txt">اطّلع على PREFACTUR قبل الدفع</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">📋</div><div class="rizq-close-pillar-ttl" id="off-close-p1-ttl" data-t="close-p1-ttl">طلب واضح</div><div class="rizq-close-pillar-txt" id="off-close-p1-txt" data-t="close-p1-txt">صف حاجتك بدقة قبل الاتفاق</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl" id="off-close-p2-ttl" data-t="close-p2-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt" id="off-close-p2-txt" data-t="close-p2-txt">غرفة الطلبات أو محادثة رزق</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🧾</div><div class="rizq-close-pillar-ttl" id="off-close-p3-ttl" data-t="close-p3-ttl">فاتورة قبل</div><div class="rizq-close-pillar-txt" id="off-close-p3-txt" data-t="close-p3-txt">اطّلع على PREFACTUR قبل الدفع</div></div>
     </div>
     <div class="rizq-close-ctas">
-      <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('req-form')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
-      <button type="button" class="rizq-close-cta ghost" onclick="typeof openChat==='function'&&openChat()">💬 محادثة آمنة</button>
+      <button type="button" class="rizq-close-cta primary" id="off-close-cta-desk" data-t="close-cta-desk" onclick="document.getElementById('req-form')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+      <button type="button" class="rizq-close-cta ghost" id="off-close-cta-chat" data-t="close-cta-chat" onclick="typeof openChat==='function'&&openChat()">💬 محادثة آمنة</button>
     </div>
   </div>
 </section>
@@ -1087,9 +1087,52 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeProm
 // ── office i18n bridge — data-t géré par RizqI18n via data-t-ns="office" ──
 function toggleLang(){ if(window.RizqI18n) RizqI18n.toggle(); }
 function _t2(ar, fr){ return (window.RizqI18n ? RizqI18n.getLang() : localStorage.getItem('rizq_lang')||'ar') === 'fr' ? fr : ar; }
+function applyOfficePortalExtras(lang){
+  var isFr = lang === 'fr';
+  var t = function(key, fallback){
+    try {
+      if(window.RizqI18n && typeof RizqI18n.t === 'function'){
+        var v = RizqI18n.t(key, 'office');
+        if(v && v !== key) return v;
+      }
+    } catch(e){}
+    return fallback;
+  };
+  var setTxt = function(id, ar, fr){
+    var el = document.getElementById(id);
+    if(el) el.textContent = isFr ? fr : ar;
+  };
+  setTxt('sticky-wa', '📲 واتساب', '📲 WhatsApp');
+  setTxt('sticky-call', '📞 اتصال', '📞 Appel');
+  setTxt('sticky-msg', '💬 مراسلة', '💬 Message');
+  var sticky = document.getElementById('sticky-cta-bar');
+  if(sticky) sticky.setAttribute('aria-label', isFr ? 'Contact rapide' : 'تواصل سريع');
+  var closeBand = document.getElementById('office-close-band');
+  if(closeBand) closeBand.setAttribute('aria-label', isFr ? 'Garanties du bureau' : 'ضمانات المكتب');
+  var vidSec = document.getElementById('video-intro-section');
+  if(vidSec) vidSec.setAttribute('aria-label', isFr ? 'Vidéo de présentation' : 'فيديو تعريفي');
+  setTxt('ft-tag-trust', 'ثقة', 'Confiance');
+  setTxt('ft-tag-safe', 'أمان', 'Sécurité');
+  setTxt('ft-tag-clear', 'شفافية', 'Transparence');
+  // Re-seed demo services so duration/labels follow language
+  try {
+    var params = new URLSearchParams(location.search);
+    var id = params.get('id') || params.get('office') || '';
+    if((params.get('demo') === '1' || id === 'demo_office') && typeof window.applyOfficeDemo === 'function'){
+      /* demo re-applied by main apply() on langchange */
+    }
+  } catch(e){}
+  try {
+    if(typeof window.mountOfficeIntroVideo === 'function'){
+      var oid = new URLSearchParams(location.search).get('id') || new URLSearchParams(location.search).get('office') || '';
+      var acc = null;
+      try { acc = JSON.parse(localStorage.getItem('rizq_account_' + oid) || 'null'); } catch(eA){}
+      window.mountOfficeIntroVideo((acc && acc.promo_video) || '', oid);
+    }
+  } catch(eV){}
+}
 document.addEventListener('rizq:langchange', function(e){
   var lang = e.detail && e.detail.lang || 'ar';
-  var ar = lang !== 'fr';
   // Open badge dynamic text
   var badge = document.getElementById('open-badge');
   if(badge && !badge.hasAttribute('data-t')){
@@ -1098,6 +1141,10 @@ document.addEventListener('rizq:langchange', function(e){
   // ── إصلاح: الفوتر (rzq-ft-*) كان يترجَم فقط عند تحميل الصفحة أو من تبويب آخر (حدث storage)،
   //    ولا يتحدّث عند الضغط على زر AR/FR في نفس الصفحة. الآن يُعاد تطبيقه فوراً هنا. ──
   if(window._rzqApplyFt) window._rzqApplyFt();
+  applyOfficePortalExtras(lang);
+});
+document.addEventListener('DOMContentLoaded', function(){
+  applyOfficePortalExtras((window.RizqI18n ? RizqI18n.getLang() : localStorage.getItem('rizq_lang')) || 'ar');
 });
 
 // ── shareOffice ────────────────────────────
@@ -1401,7 +1448,16 @@ function openMaps(){
         || new URLSearchParams(location.search).get('office')
         || '';
       if(!id || !window.RizqIntroVideo) return;
-      var opts = { mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' } };
+      var fr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
+      var opts = {
+        mountOpts: {
+          title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
+          linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
+          playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
+          mutedLabel: fr ? 'Activer le son' : 'اضغط لتفعيل الصوت',
+          unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+        }
+      };
       if(url) opts.url = url;
       RizqIntroVideo.loadAndMountForAccount(id, opts);
     }catch(e){}
@@ -1729,10 +1785,10 @@ function openMaps(){
         /* فيديو تعريفي تجريبي — يظهر داخل قسم «عن المكتب» */
         promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         services: [
-          { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: '45 د' },
-          { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: '3–5 أيام' },
+          { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: isFr() ? '45 min' : '45 د' },
+          { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: isFr() ? '3–5 jours' : '3–5 أيام' },
           { name: isFr() ? 'Défense devant tribunal' : 'تمثيل أمام المحكمة', desc: isFr() ? 'Suivi de dossier contentieux' : 'متابعة قضايا ومرافعات', price: 0, emoji: '🏛️', duration: isFr() ? 'Sur devis' : 'حسب القضية' },
-          { name: isFr() ? 'Création de société' : 'تأسيس شركة', desc: isFr() ? 'Statuts + dépôt légal' : 'النظام الأساسي + الإيداع القانوني', price: 85000, emoji: '🏢', duration: '7–10 أيام' }
+          { name: isFr() ? 'Création de société' : 'تأسيس شركة', desc: isFr() ? 'Statuts + dépôt légal' : 'النظام الأساسي + الإيداع القانوني', price: 85000, emoji: '🏢', duration: isFr() ? '7–10 jours' : '7–10 أيام' }
         ],
         hours: [
           { day: 'الأحد', open: true, from: '09:00', to: '17:00' },
@@ -2140,7 +2196,12 @@ function openMaps(){
                 if(acc.thumb){
                   var logoEl = document.getElementById('hc-logo');
                   if(logoEl){
-                    logoEl.innerHTML = '<img src="'+esc(acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
+                    var safeThumb = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl) ? RizqStoreCommerce.safeMediaUrl(acc.thumb) : '';
+                    if(!safeThumb){
+                      var _tu = String(acc.thumb||'').trim();
+                      if(_tu && !/[\s<>"']/.test(_tu) && !/javascript:/i.test(_tu) && (/^https?:\/\//i.test(_tu) || _tu.charAt(0)==='/' || /^data:image\//i.test(_tu))) safeThumb = _tu;
+                    }
+                    if(safeThumb) logoEl.innerHTML = '<img src="'+esc(safeThumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
                   }
                 }
                 if(typeof RizqSub!=='undefined'){
@@ -2370,7 +2431,7 @@ window._rizqProfile = (function() {
       <p class="footer-desc" id="rzq-ft-desc">رزق — سوق موريتانيا الإلكتروني. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">على رزق:</span>
-        <span class="telecom-tag">ثقة</span><span class="telecom-tag">أمان</span><span class="telecom-tag">شفافية</span>
+        <span class="telecom-tag" id="ft-tag-trust">ثقة</span><span class="telecom-tag" id="ft-tag-safe">أمان</span><span class="telecom-tag" id="ft-tag-clear">شفافية</span>
       </div>
     </div>
     <div>
@@ -2459,6 +2520,12 @@ window._rizqProfile = (function() {
       'rzq-ft-copy':'copy','rzq-sig-pre':'sig'
     };
     for(var id in m){var el=document.getElementById(id);if(el)el.textContent=d[m[id]];}
+    var tags = isFr
+      ? { 'ft-tag-trust':'Confiance', 'ft-tag-safe':'Sécurité', 'ft-tag-clear':'Transparence' }
+      : { 'ft-tag-trust':'ثقة', 'ft-tag-safe':'أمان', 'ft-tag-clear':'شفافية' };
+    Object.keys(tags).forEach(function(tid){
+      var tel = document.getElementById(tid); if(tel) tel.textContent = tags[tid];
+    });
   }
   document.addEventListener('DOMContentLoaded',applyFt);
   window.addEventListener('storage',function(e){if(e.key==='rizq_lang')applyFt();});
@@ -2571,10 +2638,10 @@ html{background:#071020!important}
 </style>
 
 <!-- شريط تواصل ثابت على الجوال — يمنع اختفاء واتساب/اتصال عند التمرير -->
-<div class="sticky-cta" aria-label="تواصل سريع">
+<div class="sticky-cta" id="sticky-cta-bar" aria-label="تواصل سريع">
   <a class="s-btn s-wa" id="sticky-wa" href="https://wa.me/" target="_blank" rel="noopener" onclick="return rizqGateLink(this,event,'reasonWhatsapp')">📲 واتساب</a>
   <a class="s-btn s-call" id="sticky-call" href="tel:#" dir="ltr" onclick="return rizqGateLink(this,event,'reasonPhone')">📞 اتصال</a>
-  <button type="button" class="s-btn s-mail" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">💬 مراسلة</button>
+  <button type="button" class="s-btn s-mail" id="sticky-msg" onclick="rizqRequireAuth(function(){openChat(null)},'reasonMsg')">💬 مراسلة</button>
 </div>
 
 <!-- FIXED RIZQ LOGO (right) -->

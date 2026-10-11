@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.7"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
@@ -1347,7 +1347,11 @@ function _renderWishUI(){
         + '<div style="flex:1"><div style="font-weight:700;color:#fff;font-size:13.5px">'+safeName+'</div><div style="color:#C9A84C;font-size:12.5px;font-weight:700">'+safePrice+'</div></div>'
         + '<button onclick="toggleWish('+p.id+',\''+safeName.replace(/'/g,"\\'")+'\',\''+safePrice.replace(/'/g,"\\'")+'\',\''+safeEmoji.replace(/'/g,"\\'")+'\')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer">✕</button>'
         + '</div>';
-    }).join('') : '<p style="color:rgba(255,255,255,.55);font-size:13px;text-align:center;padding:20px 0">لا توجد منتجات في المفضّلة بعد — اضغط ♡ على أي منتج لإضافته هنا</p>';
+    }).join('') : '<p style="color:rgba(255,255,255,.55);font-size:13px;text-align:center;padding:20px 0">'+(
+      (localStorage.getItem('rizq_lang')||'ar')==='fr'
+        ? 'Aucun favori pour le moment — appuyez sur ♡ pour en ajouter'
+        : 'لا توجد منتجات في المفضّلة بعد — اضغط ♡ على أي منتج لإضافته هنا'
+    )+'</p>';
   }
 }
 function toggleWishPanel(){
@@ -1480,7 +1484,7 @@ function rizqShare(title, url) {
       <p class="footer-desc" id="rzq-ft-desc">رزق — سوق موريتانيا الإلكتروني. 22 قسماً، 268 فرعاً، ملايين الفرص.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="rzq-ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">على رزق:</span>
-        <span class="telecom-tag">ثقة</span><span class="telecom-tag">أمان</span><span class="telecom-tag">شفافية</span>
+        <span class="telecom-tag" id="ft-tag-trust">ثقة</span><span class="telecom-tag" id="ft-tag-safe">أمان</span><span class="telecom-tag" id="ft-tag-clear">شفافية</span>
       </div>
     </div>
     <div>
@@ -1569,6 +1573,12 @@ function rizqShare(title, url) {
       'rzq-ft-copy':'copy','rzq-sig-pre':'sig'
     };
     for(var id in m){var el=document.getElementById(id);if(el)el.textContent=d[m[id]];}
+    var tags = isFr
+      ? { 'ft-tag-trust':'Confiance', 'ft-tag-safe':'Sécurité', 'ft-tag-clear':'Transparence' }
+      : { 'ft-tag-trust':'ثقة', 'ft-tag-safe':'أمان', 'ft-tag-clear':'شفافية' };
+    Object.keys(tags).forEach(function(tid){
+      var tel = document.getElementById(tid); if(tel) tel.textContent = tags[tid];
+    });
   }
   document.addEventListener('DOMContentLoaded',applyFt);
   window.addEventListener('storage',function(e){if(e.key==='rizq_lang')applyFt();});
@@ -2072,12 +2082,13 @@ function rizqShare(title, url) {
         var tagHtml = (window.RizqStock && RizqStock.buyerBadgeHtml)
           ? RizqStock.buyerBadgeHtml(p.stock, isFr())
           : '';
-        var safeName = esc(p.name).replace(/'/g, "\\'");
+        var displayName = (isFr() && p.nameF) ? p.nameF : (p.name || '');
+        var safeName = esc(displayName).replace(/'/g, "\\'");
         var safeCat = esc(p.cat||'').replace(/'/g, "\\'");
         return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" data-topic="'+esc(topicKey)+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
           + '<div class="product-img">'+media+tagHtml+'</div>'
           + '<div class="product-info">'
-          + '<div class="product-name">'+esc(p.name)+'</div>'
+          + '<div class="product-name">'+esc(displayName)+'</div>'
           + '<div class="product-price">'+priceTxt+'</div>'
           + '<button class="add-cart-btn" onclick="event.stopPropagation();addToCartStore(\''+pid+'\')">🛒 '+(isFr()?'Ajouter':'أضف للسلة')+'</button>'
           + '</div></div>';
@@ -2096,7 +2107,14 @@ function rizqShare(title, url) {
           shown += next.length;
         }
         window.STORE_FEATURED_PRODUCTS = featured;
-        if(moreBtn) moreBtn.style.display = shown < list.length ? 'block' : 'none';
+        if(moreBtn){
+          moreBtn.style.display = shown < list.length ? 'block' : 'none';
+          var left = Math.max(0, list.length - shown);
+          var n = Math.min(pageSize, left);
+          moreBtn.textContent = isFr()
+            ? ('Afficher les ' + n + ' produits suivants')
+            : ('عرض ' + n + ' منتجاً التالية');
+        }
         if(window.RizqStoreCommerce && RizqStoreCommerce.bindMedia) RizqStoreCommerce.bindMedia(grid);
         var tabsEl = document.getElementById('cat-tabs-el');
         if(tabsEl && typeof renderStoreCatTabs === 'function') renderStoreCatTabs(tabsEl, buyerTopics, isFr());
@@ -2158,7 +2176,8 @@ function rizqShare(title, url) {
         if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(document.getElementById('store-logo-wrap'), acc.thumb, '🏪');
         else if(acc.thumb){
           var logoWrap0 = document.getElementById('store-logo-wrap');
-          if(logoWrap0) logoWrap0.innerHTML = '<img src="'+esc(acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
+          var safeThumb0 = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl) ? RizqStoreCommerce.safeMediaUrl(acc.thumb) : '';
+          if(logoWrap0 && safeThumb0) logoWrap0.innerHTML = '<img src="'+esc(safeThumb0)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
         }
         mountStorePromoVideo(acc);
         if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(id);
@@ -2318,7 +2337,8 @@ function rizqShare(title, url) {
                 else if(acc.thumb){
                   var logoWrap = document.getElementById('store-logo-wrap');
                   if(logoWrap){
-                    logoWrap.innerHTML = '<img src="'+esc(acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
+                    var safeThumb = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl) ? RizqStoreCommerce.safeMediaUrl(acc.thumb) : '';
+                    if(safeThumb) logoWrap.innerHTML = '<img src="'+esc(safeThumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
                   }
                 }
                 if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(acc);
@@ -2858,6 +2878,7 @@ if(typeof _t2 === 'undefined'){
     'close-p3-txt':'Choisissez le mode qui vous convient',
     'close-cta-catalog':'Voir tous les produits →',
     'close-cta-desk':'📩 Service Desk',
+    'disc-footer-note':'Rizq Platform · Mauritanie · Tous droits réservés ©',
     /* Packages */
     'pkg-eyebrow':'ABONNEMENTS','pkg-title-pre':'Rejoignez','pkg-title-gold':'Rizq',
     'pkg-desc':'Choisissez la formule qui correspond à votre boutique',
@@ -2975,12 +2996,21 @@ if(typeof _t2 === 'undefined'){
     applyStoreDeskLang(isFr);
     var wishTitle = document.querySelector('#wish-panel-overlay h2');
     if(wishTitle) wishTitle.textContent = isFr ? '❤ Mes favoris' : '❤ منتجاتي المفضّلة';
+    try { if(typeof _renderWishUI === 'function') _renderWishUI(); } catch(eW){}
     var shopCluster = document.getElementById('cat-tabs-shop');
     if(shopCluster) shopCluster.setAttribute('aria-label', isFr ? 'Favoris et panier' : 'المفضلة والسلة');
     var closeBand = document.getElementById('store-close-band');
     if(closeBand) closeBand.setAttribute('aria-label', isFr ? 'Garanties d’achat' : 'ضمانات الشراء');
     var videoSpot = document.getElementById('store-video-spotlight');
     if(videoSpot) videoSpot.setAttribute('aria-label', isFr ? 'Vidéos de la boutique' : 'فيديوهات المحل');
+    try {
+      if(typeof window.paintStoreProductsGrid === 'function' && window._rizqStoreProfile){
+        var sid = window._rizqStoreProfile.id || '';
+        var plist = [];
+        try { plist = JSON.parse(localStorage.getItem('store_products_' + sid) || '[]'); } catch(eP){}
+        if(Array.isArray(plist) && plist.length) window.paintStoreProductsGrid(plist, sid);
+      }
+    } catch(eRepaint){}
     // Lang button
     var btn = document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
     if(btn && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
@@ -3071,7 +3101,7 @@ if(typeof _t2 === 'undefined'){
       <div id="disc-footer-main" style="font-size:12.5px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.8">
         باستخدامك لمنصة رزق، فإنك تقرّ بقراءة هذا الإشعار والموافقة الضمنية على جميع بنوده.
       </div>
-      <div style="font-size:11px;color:rgba(201,168,76,.6)">Rizq Platform · موريتانيا · جميع الحقوق محفوظة ©</div>
+      <div style="font-size:11px;color:rgba(201,168,76,.6)" id="disc-footer-note" data-t="disc-footer-note">Rizq Platform · موريتانيا · جميع الحقوق محفوظة ©</div>
       <br><span class="disc-close-btn" id="disc-close-lbl" onclick="closeDisc()">فهمت — أغلق</span>
     </div>
   </div>
