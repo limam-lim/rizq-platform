@@ -20,6 +20,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=2"/>
+<link rel="stylesheet" href="rizq_close_band.css?v=1"/>
+<link rel="stylesheet" href="rizq_prefacture.css?v=2"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>واجهة المعرض — رزق</title>
@@ -171,7 +174,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .cat-tab.active,.cat-tab:hover{background:var(--navy);color:var(--white)}
 
 /* Items grid */
-.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+@media(min-width:1100px){.items-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:700px){.items-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .item-card{background:var(--white);border-radius:var(--radius);border:1px solid #e0e8f0;overflow:hidden;transition:all .3s;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
 .item-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#c0d0e0}
 .item-img{height:170px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;overflow:hidden}
@@ -647,6 +652,46 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
       <div style="margin-top:28px;display:none;background:#0D1B2A;border-radius:var(--radius);padding:36px 16px" id="video-intro-section">
         <div id="intro-video-mount"></div>
       </div>
+
+
+      <!-- غرفة الطلبات -->
+      <div class="info-card" id="corp-service-desk" style="margin-top:28px;background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;padding:20px;border-top:3px solid #C9A84C;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
+        <div class="section-title" data-desk="title" id="corp-req-title" style="margin-bottom:6px;font-size:16px;color:var(--navy)">📩 طلب من المعرض</div>
+        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="corp-req-hint">أدخل بياناتك وسيتواصل معك المعرض مباشرة.</p>
+        <div id="corp-req-form">
+          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
+          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
+          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد (اختياري)</label>
+          <input dir="ltr" class="req-input" id="rf-email" type="email" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الموضوع / المنتج</label>
+          <input class="req-input" id="rf-service" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك</label>
+          <textarea class="req-input" id="rf-msg" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
+          <button type="button" id="corp-req-submit" onclick="submitCorpServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
+        </div>
+      </div>
+
+      <section class="rizq-close-band" id="corp-close-band" style="margin-top:28px" aria-label="ضمانات المعرض">
+        <div class="rizq-close-inner">
+          <p class="rizq-close-eyebrow">RIZQ · تجربة آمنة</p>
+          <h3 class="rizq-close-title"><span>تعامل بثقة</span> مع هذا المعرض</h3>
+          <p class="rizq-close-desc">رزق وسيط نشر فقط — المعاينة والدفع تتم مباشرة مع المعرض/الشركة. استخدم غرفة الطلبات أو المحادثة الآمنة.</p>
+          <div class="rizq-close-pillars">
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt">افحص العرض قبل التحويل</div></div>
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">طلب أو محادثة داخل رزق</div></div>
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏢</div><div class="rizq-close-pillar-ttl">عرض وتوريد</div><div class="rizq-close-pillar-txt">اتفق على التسليم مع المعرض</div></div>
+          </div>
+          <div class="rizq-close-ctas">
+            <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('items-section')?.scrollIntoView({behavior:'smooth'})">تصفّح المعروضات</button>
+            <button type="button" class="rizq-close-cta ghost" onclick="document.getElementById('corp-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+          </div>
+        </div>
+      </section>
 
       <!-- Reviews -->
       <div style="margin-top:28px" id="reviews-section">
@@ -1262,15 +1307,19 @@ function renderCorpItems(items){
     var priceTxt = /\d/.test(it.price) ? (String(it.price).replace(/[^\d]/g,'').length ? Number(String(it.price).replace(/[^\d,]/g,'').replace(/,/g,'')).toLocaleString('en-US') + ' MRU' : it.price) : it.price;
     var badge = it.tag === 'hot' ? '<div class="item-badge-hot">🔥 ' + (isFr?'Populaire':'الأكثر طلباً') + '</div>'
               : it.tag === 'new' ? '<div class="item-badge-new">✨ ' + (isFr?'Nouveau':'جديد') + '</div>' : '';
-    return '<div class="item-card" data-cat="' + _corpEsc(it.cat) + '">'
+    var iid = it.id != null ? String(it.id) : ('corp-' + Math.random().toString(36).slice(2, 8));
+    it.id = iid;
+    return '<div class="item-card" data-cat="' + _corpEsc(it.cat) + '" onclick="openCorpItemDetail(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">'
       + '<div class="item-img">' + corpCatIcon(it.cat) + badge + '</div>'
       + '<div class="item-body">'
       + '<div class="item-name">' + _corpEsc(it.name) + '</div>'
       + '<div class="item-cat">' + _corpEsc(_corpCatLabel(it.cat)) + '</div>'
       + '<div class="item-price-row"><span class="item-price">' + _corpEsc(priceTxt) + '</span>'
-      + '<button class="contact-item-btn" onclick="contactAboutItem(\'' + _corpEsc(it.name).replace(/'/g,"\\'") + '\')">' + (isFr?'📩 Contact':'📩 تواصل') + '</button></div>'
+      + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">' + (isFr?'👁 Fiche':'👁 تفاصيل') + '</button></div>'
+      + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">PREFACTUR</button>'
       + '</div></div>';
   }).join('');
+  try { window._corpItemsCache = items; } catch (e) {}
 }
 function rebuildCorpCatTabs(cats){
   window._corpCachedCats = cats || [];
@@ -1288,7 +1337,22 @@ function rebuildCorpCatTabs(cats){
     if(acc && id){
       // ── الهوية الأساسية ──
       var nameEl = document.getElementById('corp-name'); if(nameEl && acc.name) nameEl.textContent = acc.name;
-      if(acc.desc){ var tagEl = document.getElementById('corp-tagline'); if(tagEl) tagEl.textContent = acc.desc; var aboutEl=document.getElementById('about-text'); if(aboutEl) aboutEl.textContent = acc.desc; }
+      if(acc.desc){
+        var tagEl = document.getElementById('corp-tagline'); if(tagEl) tagEl.textContent = acc.desc;
+        var aboutEl=document.getElementById('about-text');
+        if(aboutEl){
+          aboutEl.textContent = (window.RizqStoreCommerce && RizqStoreCommerce.cleanDesc)
+            ? (RizqStoreCommerce.cleanDesc(acc.desc) || acc.desc)
+            : acc.desc;
+        }
+      }
+      if(acc.serviceDesk) window._rizqCorpServiceDesk = acc.serviceDesk;
+      if(window.RizqServiceDesk){
+        RizqServiceDesk.applyPublicLabels(document.getElementById('corp-service-desk'), acc.serviceDesk || {}, acc.name || '');
+        if(typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+          RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
+        }
+      }
       if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
 
       // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
@@ -1790,6 +1854,10 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_intro_video.js?v=28.6"></script>
+<script src="rizq_store_commerce.js?v=2"></script>
+<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_prefacture_engine.js?v=2"></script>
+<script src="rizq_account_payments.js"></script>
 <script>
 // ══ فيديو تعريفي مضمَّن — انظر تعليق قسم video-intro-section أعلاه ══
 (function(){
@@ -1836,8 +1904,97 @@ window._rizqProfile = (function() {
       adTitle    : name,
       adId       : corpId,
       adEmoji    : '🏢',
+      context    : 'showroom',
+      module     : 'corp'
     });
   };
+
+  window.openCorpItemDetail = function(itemId){
+    var items = window._corpItemsCache || [];
+    var item = items.find(function(it){ return String(it.id) === String(itemId); });
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var nameEl = document.getElementById('corp-name');
+    var sname = nameEl ? nameEl.textContent.trim() : (isFr ? 'Galerie' : 'المعرض');
+    if(!item){
+      if(typeof contactAboutItem === 'function') contactAboutItem(itemId);
+      return;
+    }
+    if(window.RizqStoreCommerce && typeof RizqStoreCommerce.openProductDetail === 'function'){
+      RizqStoreCommerce.openProductDetail(item, {
+        fr: isFr,
+        catalog: items,
+        storeName: sname,
+        moduleLabel: isFr ? 'Fiche article' : 'بطاقة عرض',
+        pricePeriod: isFr ? 'Prix galerie' : 'سعر المعرض',
+        showCart: false,
+        onAsk: function(p){
+          if(typeof contactAboutItem === 'function') contactAboutItem(p.name || p.id);
+          else if(typeof openChat === 'function') openChat(p);
+        }
+      });
+      return;
+    }
+    if(typeof contactAboutItem === 'function') contactAboutItem(item.name || itemId);
+  };
+
+  window.issueCorpPrefacture = function(itemId){
+    var items = window._corpItemsCache || [];
+    var item = items.find(function(it){ return String(it.id) === String(itemId); });
+    if(!item || !window.RizqPrefacture) return;
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var nameEl = document.getElementById('corp-name');
+    var sname = nameEl ? nameEl.textContent.trim() : (isFr ? 'Galerie' : 'المعرض');
+    var params = new URLSearchParams(location.search);
+    var corpId = params.get('id') || params.get('corp') || '';
+    var price = (window.RizqStoreCommerce && RizqStoreCommerce.parsePriceNum)
+      ? RizqStoreCommerce.parsePriceNum(item.price)
+      : (parseFloat(String(item.price||'').replace(/[^\d.]/g,''))||0);
+    RizqPrefacture.issueAndOpen({
+      module: 'showroom',
+      sellerAccountId: corpId,
+      sellerName: sname,
+      buyerName: '',
+      buyerPhone: '',
+      lines: [{ name: item.name || 'Item', qty: 1, unitPrice: price }],
+      deliveryType: 'pickup',
+      deliveryFee: 0
+    });
+  };
+
+  window.submitCorpServiceReq = function(){
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var btn = document.getElementById('corp-req-submit');
+    if(btn) btn.disabled = true;
+    var params = new URLSearchParams(location.search);
+    var corpId = params.get('id') || params.get('corp') || '';
+    if(!window.RizqServiceDesk){
+      alert(isFr ? 'Formulaire indisponible' : 'تعذّر تحميل النموذج');
+      if(btn) btn.disabled = false;
+      return;
+    }
+    RizqServiceDesk.submit({
+      accountId: corpId,
+      source: 'corp',
+      desk: window._rizqCorpServiceDesk || {},
+      form: document.getElementById('corp-req-form')
+    }).then(function(res){
+      alert(res.message || (isFr ? 'Demande envoyée' : 'تم إرسال الطلب'));
+      if(typeof RizqServiceDesk.clearRequestMessageFields === 'function'){
+        RizqServiceDesk.clearRequestMessageFields(document.getElementById('corp-req-form'));
+      }
+      if(typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+        RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form'), force: true });
+      }
+    }).catch(function(err){
+      alert((err && err.message) || (isFr ? 'Échec' : 'تعذّر الإرسال'));
+    }).finally(function(){ if(btn) btn.disabled = false; });
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    if(window.RizqServiceDesk && typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+      RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
+    }
+  });
 })();
 </script>
 

@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
@@ -970,6 +971,23 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <div class="trust-item"><div class="trust-icon ti-teal">🏠</div><div><div class="trust-val" id="trust4-val" data-t="trust4-val">خدمة منزلية</div><div class="trust-lbl" id="trust4-lbl" data-t="trust4-lbl">عند الطلب</div></div></div>
       </div>
     </div>
+
+    <section class="rizq-close-band" id="office-close-band" aria-label="ضمانات المكتب">
+      <div class="rizq-close-inner">
+        <p class="rizq-close-eyebrow">RIZQ · خدمة مهنية</p>
+        <h3 class="rizq-close-title"><span>اطلب بثقة</span> من هذا المكتب</h3>
+        <p class="rizq-close-desc">رزق وسيط نشر فقط — الاتفاق والدفع وتنفيذ الخدمة تتم مباشرة مع المكتب. عبّئ غرفة الطلبات أو تواصل عبر المحادثة الآمنة.</p>
+        <div class="rizq-close-pillars">
+          <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">📋</div><div class="rizq-close-pillar-ttl">طلب واضح</div><div class="rizq-close-pillar-txt">صف حاجتك بدقة قبل الاتفاق</div></div>
+          <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">غرفة الطلبات أو محادثة رزق</div></div>
+          <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🧾</div><div class="rizq-close-pillar-ttl">فاتورة قبل</div><div class="rizq-close-pillar-txt">اطّلع على PREFACTUR قبل الدفع</div></div>
+        </div>
+        <div class="rizq-close-ctas">
+          <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('req-form')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+          <button type="button" class="rizq-close-cta ghost" onclick="typeof openChat==='function'&&openChat()">💬 محادثة آمنة</button>
+        </div>
+      </div>
+    </section>
 
     <!-- ABOUT — الفيديو التعريفي يعيش هنا مع نص «عن المكتب» -->
     <div class="card fade-in" id="about-section">
@@ -2563,6 +2581,8 @@ html{background:#071020!important}
       adTitle    : name,
       adId       : offId,
       adEmoji    : '💼',
+      context    : 'office',
+      module     : 'office'
     });
   };
 })();
