@@ -511,7 +511,7 @@
     var fr = !!opts.fr;
     var imgs = imagesOf(p);
     var title = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
-    var tip = fr ? ' — Click outside to close' : ' — انقر خارج الصورة للإغلاق';
+    var tip = fr ? 'Click outside to close' : 'انقر خارج الصورة للإغلاق';
 
     if (!imgs.length) {
       var emoji = p.emoji || '📦';
@@ -521,8 +521,10 @@
         + (title ? '<div class="rzq-pd-lb-emoji-title">' + esc(title) + '</div>' : '')
         + '</div>';
       if (meta) {
-        meta.innerHTML = '<span dir="auto">' + (fr ? 'Aperçu agrandi' : 'معاينة مكبّرة') + '</span>'
-          + '<span dir="auto">' + tip + '</span>';
+        meta.setAttribute('dir', 'rtl');
+        meta.innerHTML = '<span>' + (fr ? 'Aperçu agrandi' : 'معاينة مكبّرة') + '</span>'
+          + '<span aria-hidden="true">—</span>'
+          + '<span>' + tip + '</span>';
       }
       return box;
     }
@@ -534,8 +536,10 @@
       + ' onclick="event.stopPropagation()"'
       + ' onerror="RizqStoreCommerce.onLightboxImgError(this)"/>';
     if (meta) {
+      meta.setAttribute('dir', 'rtl');
       meta.innerHTML = '<span dir="ltr">' + (idx + 1) + ' / ' + imgs.length + '</span>'
-        + '<span dir="auto">' + tip + '</span>';
+        + '<span aria-hidden="true">—</span>'
+        + '<span>' + tip + '</span>';
     }
     return box;
   }
