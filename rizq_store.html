@@ -2639,9 +2639,14 @@ function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
         var lab = (item && typeof item === 'object')
           ? (item.label || (fr ? (item.nameFr || item.nameAr) : (item.nameAr || item.nameFr)) || id)
           : item;
-        var safe = String(id).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'");
-        var safeLab = String(lab).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+safeLab+'</button>';
+        var raw = String(id || '');
+        // معرّف موضوع: اسمح فقط بـ [A-Za-z0-9_-]؛ أسماء التصنيف النصية تُهرَّب لـ JS
+        var safe = (item && typeof item === 'object' && item.id)
+          ? raw.replace(/[^a-zA-Z0-9_\-]/g, '').slice(0, 48)
+          : raw.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        if(!safe) return '';
+        var safeLab = String(lab).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return '<button type="button" class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+safeLab+'</button>';
       }).join('');
   tabsEl.innerHTML =
     '<div class="cat-tabs-cats" id="cat-tabs-cats">'+catsHtml+'</div>'
@@ -2727,6 +2732,17 @@ if(typeof _t2 === 'undefined'){
     'store-empty-title':'Aucune boutique sélectionnée',
     'store-empty-desc':'Choisissez une boutique dans la liste ou ouvrez le lien direct pour voir les produits et les contacts.',
     'store-empty-cta':'Parcourir les boutiques',
+    'about-section-ttl':'📖 À propos',
+    'about-txt':'Les informations de la boutique s’affichent après sélection depuis l’annuaire.',
+    'products-empty':'Aucun produit pour le moment',
+    'store-promo':'Boutique sur Rizq',
+    'desk-eyebrow':'SERVICE DESK · Demandes',
+    'desk-submit':'📤 Envoyer la demande',
+    'desk-docs-hint':'📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l’envoi.',
+    'wish-panel-title':'❤ Mes favoris',
+    'shop-cluster-lbl':'Favoris et panier',
+    'video-spotlight-aria':'Vidéos de la boutique',
+    'close-band-aria':'Garanties d’achat',
     /* Info */
     'info-title-location':'📍 Localisation',
     'info-label-address':'Adresse :','info-label-phone':'Téléphone :','info-label-email':'E-mail :',
@@ -2814,6 +2830,46 @@ if(typeof _t2 === 'undefined'){
     }
   }
 
+  function applyStoreDeskLang(isFr){
+    var root = document.getElementById('store-service-desk');
+    if(!root) return;
+    var eyebrow = root.querySelector('div[style*="letter-spacing"]');
+    if(eyebrow && /SERVICE DESK/i.test(eyebrow.textContent || '')){
+      eyebrow.textContent = isFr ? 'SERVICE DESK · Demandes' : 'SERVICE DESK · غرفة الطلبات';
+    }
+    var map = isFr ? {
+      'rf-name': ['Nom complet *', 'Ex. : Ahmed Ould Mohamed'],
+      'rf-phone': ['Téléphone *', 'Ex. : 22244112233'],
+      'rf-whatsapp': ['WhatsApp (si différent)', 'Même numéro ou autre WhatsApp'],
+      'rf-email': ['E-mail (optionnel)', 'name@email.com'],
+      'rf-service': ['Produit / objet', 'Ex. : demande produit ou devis'],
+      'rf-msg': ['Votre message', 'Décrivez brièvement votre besoin…']
+    } : {
+      'rf-name': ['الاسم الكامل *', 'مثال: أحمد ولد محمد'],
+      'rf-phone': ['رقم الهاتف *', 'مثال: 22244112233'],
+      'rf-whatsapp': ['واتساب (إن اختلف)', 'نفس الرقم أو رقم واتساب آخر'],
+      'rf-email': ['البريد الإلكتروني (اختياري)', 'name@email.com'],
+      'rf-service': ['المنتج / الموضوع', 'مثال: طلب منتج أو عرض سعر'],
+      'rf-msg': ['رسالتك للمحل', 'اكتب باختصار ماذا تحتاج…']
+    };
+    Object.keys(map).forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      var lab = root.querySelector('label[for="'+id+'"]');
+      if(lab) lab.textContent = map[id][0];
+      if(el.placeholder !== undefined) el.placeholder = map[id][1];
+    });
+    var docs = root.querySelector('#store-req-form > p');
+    if(docs) docs.textContent = isFr
+      ? '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l’envoi.'
+      : '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.';
+    var btn = document.getElementById('store-req-submit');
+    if(btn) btn.textContent = isFr ? '📤 Envoyer la demande' : '📤 إرسال الطلب للمحل';
+    if(window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function'){
+      RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
+    }
+  }
+
   function applyStoreLang(lang){
     var isFr = lang === 'fr';
     _setNavOrder(isFr);
@@ -2840,6 +2896,15 @@ if(typeof _t2 === 'undefined'){
         el.innerHTML = el.getAttribute('data-t-ar');
       }
     });
+    applyStoreDeskLang(isFr);
+    var wishTitle = document.querySelector('#wish-panel-overlay h2');
+    if(wishTitle) wishTitle.textContent = isFr ? '❤ Mes favoris' : '❤ منتجاتي المفضّلة';
+    var shopCluster = document.getElementById('cat-tabs-shop');
+    if(shopCluster) shopCluster.setAttribute('aria-label', isFr ? 'Favoris et panier' : 'المفضلة والسلة');
+    var closeBand = document.getElementById('store-close-band');
+    if(closeBand) closeBand.setAttribute('aria-label', isFr ? 'Garanties d’achat' : 'ضمانات الشراء');
+    var videoSpot = document.getElementById('store-video-spotlight');
+    if(videoSpot) videoSpot.setAttribute('aria-label', isFr ? 'Vidéos de la boutique' : 'فيديوهات المحل');
     // Lang button
     var btn = document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
     if(btn && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
@@ -2861,6 +2926,12 @@ if(typeof _t2 === 'undefined'){
     if(typeof window._rzqApplyFt === 'function') window._rzqApplyFt();
     // إعادة رسم التقييمات الحقيقية بلغة العرض الحالية (لا تأثير إن لم يوجد حساب حقيقي مطابق)
     if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
+    // أعد تركيب الفيديو التعريفي بعناوين FR/AR الصحيحة
+    try{
+      if(typeof mountStorePromoVideo === 'function' && window._rizqProfile){
+        mountStorePromoVideo(window._rizqProfile);
+      }
+    }catch(eVid){}
   }
 
   function toggleStoreLang(){

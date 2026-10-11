@@ -43,6 +43,27 @@ function mountAccountsManageRoutes(app, deps) {
     : requireAdminAuth;
 
   /** موضوعات المحل — فلاتر ديناميكية للصفحة العامة (حتى 30) */
+  function sanitizePromoVideoUrl(raw) {
+    const s = String(raw || '').trim().slice(0, 500);
+    if (!s) return '';
+    if (/[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+    try {
+      const u = new URL(s);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      const host = String(u.hostname || '').toLowerCase();
+      const ok =
+        host === 'youtu.be' ||
+        host.endsWith('youtube.com') ||
+        host.endsWith('youtube-nocookie.com') ||
+        host.endsWith('facebook.com') ||
+        host.endsWith('fb.watch') ||
+        host === 'fb.watch';
+      return ok ? s : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   function sanitizeStoreTopics(raw) {
     const arr = Array.isArray(raw) ? raw : [];
     const out = [];
@@ -53,6 +74,10 @@ function mountAccountsManageRoutes(app, deps) {
       const nameFr = String(item.nameFr || '').replace(/\s+/g, ' ').trim().slice(0, 80);
       if (!nameAr && !nameFr) return;
       let id = String(item.id || '').trim().slice(0, 48);
+      // معرّف آمن فقط — يمنع حقن onclick عبر id في واجهة المحل
+      if (!/^[a-zA-Z0-9_-]{1,48}$/.test(id)) {
+        id = 't_' + Date.now().toString(36) + '_' + i;
+      }
       if (!id || seen[id]) id = 't_' + Date.now().toString(36) + '_' + i;
       if (seen[id]) return;
       seen[id] = true;
@@ -186,6 +211,16 @@ function mountAccountsManageRoutes(app, deps) {
           val = stripBidiControls(val).normalize('NFC');
         } catch (eSan) { /* ignore */ }
       }
+      if (k === 'promo_video' || k === 'promo_video_extra') {
+        acc[k] = sanitizePromoVideoUrl(val);
+        return;
+      }
+      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+        // اسمح فقط بمسارات نسبية أو data:image أو http(s) — لا javascript:
+        const t = String(val || '').trim();
+        if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
+        if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
+      }
       acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
@@ -287,6 +322,15 @@ function mountAccountsManageRoutes(app, deps) {
           const { normalizeEmailSafe } = require('../lib/sanitizeText');
           val = normalizeEmailSafe(val);
         } catch (eSan) { /* ignore */ }
+      }
+      if (k === 'promo_video' || k === 'promo_video_extra') {
+        acc[k] = sanitizePromoVideoUrl(val);
+        return;
+      }
+      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+        const t = String(val || '').trim();
+        if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
+        if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
       acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });

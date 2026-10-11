@@ -191,12 +191,34 @@
     });
   }
 
+  /** روابط صور آمنة فقط — يمنع javascript:/data:text XSS عبر src */
+  function safeMediaUrl(u) {
+    if (!u) return '';
+    var s = String(u).trim();
+    if (!s) return '';
+    if (/[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+    if (s.charAt(0) === '/' || s.indexOf('./') === 0 || s.indexOf('../') === 0) {
+      return s;
+    }
+    if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,/i.test(s)) return s;
+    try {
+      var p = new URL(s, (typeof location !== 'undefined' && location.href) || 'https://local.invalid/');
+      if (p.protocol !== 'http:' && p.protocol !== 'https:') return '';
+      return s;
+    } catch (e) {
+      return '';
+    }
+  }
+
   function setLogo(el, thumb, emoji) {
     if (!el) return;
-    if (thumb) {
-      el.innerHTML = '<img src="' + esc(thumb) + '" alt="" width="88" height="88" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+    var safe = safeMediaUrl(thumb);
+    if (safe) {
+      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
     } else if (emoji) {
       el.textContent = emoji;
+    } else {
+      el.textContent = '';
     }
   }
 
@@ -659,6 +681,7 @@
   global.RizqStoreCommerce = {
     PAGE_SIZE: PAGE_SIZE,
     esc: esc,
+    safeMediaUrl: safeMediaUrl,
     imagesOf: imagesOf,
     productMediaHtml: productMediaHtml,
     bindMedia: bindMedia,

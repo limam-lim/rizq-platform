@@ -959,8 +959,13 @@ function renderCart() {
     var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
       ? RizqStoreCommerce.imagesOf(item)
       : (item.imgDataArr || (item.imgData ? [item.imgData] : []) || []);
-    var thumb = imgs[0]
-      ? ('<img src="'+sanitize(imgs[0])+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
+    var safeImg = imgs[0]
+      ? ((window.RizqStoreCommerce && typeof RizqStoreCommerce.safeMediaUrl === 'function')
+          ? RizqStoreCommerce.safeMediaUrl(imgs[0])
+          : (/^(https?:|data:image\/|\/|\.\/)/i.test(String(imgs[0])) && !/javascript:/i.test(String(imgs[0])) ? imgs[0] : ''))
+      : '';
+    var thumb = safeImg
+      ? ('<img src="'+sanitize(safeImg)+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
       : sanitize(item.emoji || '📦');
     var safeId = sanitize(String(item.id));
     return `

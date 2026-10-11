@@ -8873,6 +8873,13 @@ const LANG = {
     'vi-btn-sub': 'اشترك الآن وابدأ مسار النمو',
     'hero-badge': 'السوق الإلكتروني الموريتاني',
     'search-ph': 'البحث في رزق...',
+    'nav-search-lbl': 'بحث',
+    'search-theater-pill': 'ابحث في رزق…',
+    'search-theater-heading': 'ابحث في رزق',
+    'search-theater-go': 'بحث',
+    'search-theater-hint': 'Esc للإغلاق · اكتب ثم Entrée',
+    'search-theater-ph': 'عقارات، سيارات، ذهب…',
+    'search-theater-close': 'إغلاق',
     'hbiz-stores': 'المحلات',
     'hbiz-offices': 'المكاتب',
     'hbiz-showrooms': 'المعارض',
@@ -9008,6 +9015,13 @@ const LANG = {
     'vi-btn-sub': 'Abonnez-vous et démarrez votre trajectoire de croissance',
     'hero-badge': 'Le marché en ligne mauritanien',
     'search-ph': 'Rechercher sur Rizq...',
+    'nav-search-lbl': 'Recherche',
+    'search-theater-pill': 'Rechercher sur Rizq…',
+    'search-theater-heading': 'Rechercher sur Rizq',
+    'search-theater-go': 'Rechercher',
+    'search-theater-hint': 'Échap pour fermer · Entrée pour lancer',
+    'search-theater-ph': 'Immobilier, voitures, or…',
+    'search-theater-close': 'Fermer',
     'hbiz-stores': 'Boutiques',
     'hbiz-offices': 'Bureaux',
     'hbiz-showrooms': 'Showrooms',
@@ -9346,6 +9360,29 @@ function applyLandingLang(toAr) {
   }
   var stSearchBtn = document.querySelector('#nav-sticky-tools .nav-sticky-search-wrap button');
   if (stSearchBtn) stSearchBtn.setAttribute('aria-label', isAr ? 'بحث' : 'Rechercher');
+  /* زر ونافذة البحث — كانت تبقى عربية في الواجهة الفرنسية */
+  var searchLaunch = document.getElementById('nav-search-launch');
+  if (searchLaunch) {
+    var slLbl = isAr ? 'بحث' : 'Recherche';
+    var slTitle = isAr ? 'ابحث في رزق' : 'Rechercher sur Rizq';
+    searchLaunch.setAttribute('aria-label', slLbl);
+    searchLaunch.setAttribute('title', slTitle);
+  }
+  var theaterInput = document.getElementById('rizq-theater-search-input');
+  if (theaterInput) {
+    theaterInput.placeholder = isAr ? 'عقارات، سيارات، ذهب…' : 'Immobilier, voitures, or…';
+    theaterInput.setAttribute('aria-label', isAr ? 'ابحث في رزق' : 'Rechercher sur Rizq');
+  }
+  var theaterClose = document.querySelector('#rizq-search-panel [data-rizq-close-search]');
+  if (theaterClose) theaterClose.setAttribute('aria-label', isAr ? 'إغلاق' : 'Fermer');
+  var theaterCats = {
+    ar: ['🏠 عقارات','🚗 سيارات','🪙 ذهب','📱 إلكترونيات','⚡ طاقة','✈️ رحلات','📋 مناقصات','📈 استثمار'],
+    fr: ['🏠 Immobilier','🚗 Voitures','🪙 Or','📱 Électronique','⚡ Énergie','✈️ Voyages','📋 Appels d\'offres','📈 Investissement']
+  };
+  var catLabels = isAr ? theaterCats.ar : theaterCats.fr;
+  document.querySelectorAll('#rizq-search-panel .rizq-search-cat').forEach(function(a, i){
+    if (catLabels[i]) a.textContent = catLabels[i];
+  });
   var jumpBar = document.getElementById('section-jump-bar');
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {

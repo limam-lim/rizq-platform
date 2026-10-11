@@ -55,6 +55,19 @@
     });
   }
 
+  /** رابط المصدر الأصلي — http(s) فقط؛ يمنع javascript: click-XSS */
+  function safeExternalUrl(url) {
+    var s = String(url || '').trim();
+    if (!s || /[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+    try {
+      var p = new URL(s);
+      if (p.protocol !== 'http:' && p.protocol !== 'https:') return '';
+      return s;
+    } catch (e) {
+      return '';
+    }
+  }
+
   var CSS_INJECTED = false;
   function injectCSS() {
     if (CSS_INJECTED) return; CSS_INJECTED = true;
@@ -110,6 +123,7 @@
       ? ("background-image:url('" + String(thumb).replace(/'/g, '%27') + "')")
       : 'background:linear-gradient(145deg,#0f1f3d,#1B3A6B)';
 
+    var safeHref = safeExternalUrl(url);
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
         '<div class="rzq-iv-frame" id="' + uid + '-frame">' +
@@ -120,9 +134,11 @@
           '</button>' +
           '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound">🔇 ' + esc(opts.mutedLabel || 'اضغط لتفعيل الصوت') + '</button>' +
         '</div>' +
-        '<a class="rzq-iv-src" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' +
-          esc(opts.linkLabel || 'شاهد على المصدر الأصلي ↗') +
-        '</a>' +
+        (safeHref
+          ? ('<a class="rzq-iv-src" href="' + esc(safeHref) + '" target="_blank" rel="noopener noreferrer">' +
+              esc(opts.linkLabel || 'شاهد على المصدر الأصلي ↗') +
+            '</a>')
+          : '') +
       '</div>';
 
     var frame = hostEl.querySelector('#' + uid + '-frame');
