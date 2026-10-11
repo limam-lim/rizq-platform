@@ -15,11 +15,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>المنتجات — متجر النور | Rizq</title>
 <style>
@@ -33,7 +35,46 @@
   --radius:14px;--shadow:0 6px 24px rgba(0,0,0,.35);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;color:#1a2a3a}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#e8eef6 0%,#f4f6fb 40%,#eef2f8 100%);color:#1a2a3a}
+
+/* شريط هوية المحل الفاخر */
+.store-lux-strip{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
+    linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
+  border-bottom:1px solid rgba(201,168,76,.35);
+  color:#fff;
+}
+.store-lux-inner{
+  max-width:1100px;margin:0 auto;padding:22px 16px 20px;
+  display:grid;grid-template-columns:auto 1fr minmax(220px,320px);
+  gap:20px;align-items:center;
+}
+.store-lux-logo{
+  width:84px;height:84px;border-radius:22px;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.45),rgba(27,58,107,.7));
+  border:2px solid rgba(201,168,76,.7);
+  box-shadow:0 0 0 5px rgba(201,168,76,.12),0 12px 28px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;
+}
+.store-lux-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.store-lux-name{font-size:clamp(22px,3vw,30px);font-weight:900;letter-spacing:.2px;line-height:1.15;margin:0 0 6px}
+.store-lux-name span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.store-lux-tag{font-size:13.5px;color:rgba(255,255,255,.72);line-height:1.55;max-width:42ch}
+.store-lux-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.store-lux-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
+  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
+}
+.store-lux-video{border-radius:14px;overflow:hidden;border:1px solid rgba(201,168,76,.35);background:#06111C;min-height:120px}
+.store-lux-video #lux-intro-video-mount .rzq-iv-wrap{max-width:none;margin:0}
+.store-lux-video #lux-intro-video-mount .rzq-iv-frame{border-radius:0;aspect-ratio:16/9}
+@media(max-width:900px){
+  .store-lux-inner{grid-template-columns:auto 1fr;gap:14px}
+  .store-lux-video{grid-column:1/-1}
+}
 
 /* NAV */
 .topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
@@ -120,13 +161,23 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .cat-tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .cat-tab{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .25s;background:#fff;color:#4a5a6a;border:1px solid #d0d8e8;font-family:inherit}
 .cat-tab.active,.cat-tab:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* Grid */
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+/* Grid — بطاقات فاخرة بأسلوب إعلانات الصفحة الرئيسية */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
 .products-grid.list-view{grid-template-columns:1fr}
-/* Product card */
-.product-card{background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;overflow:hidden;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#b0c8e0}
-.product-img{height:180px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;overflow:hidden;cursor:pointer}
+.product-card{
+  background:linear-gradient(180deg,#fff,#f7f9fc);
+  border-radius:16px;border:1px solid rgba(27,58,107,.12);
+  overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;
+  box-shadow:0 8px 22px rgba(15,35,71,.08);
+}
+.product-card:hover{transform:translateY(-5px);box-shadow:0 16px 36px rgba(15,35,71,.16);border-color:rgba(201,168,76,.45)}
+.product-img{
+  height:auto;aspect-ratio:1.12/1;min-height:168px;
+  background:linear-gradient(145deg,#0d1b2a,#1B3A6B);
+  position:relative;overflow:hidden;cursor:pointer;padding:0;
+}
+.product-img .rzq-adx-media{width:100%;height:100%;min-height:168px;aspect-ratio:1.12/1;border-radius:0}
+.product-img .rzq-adx-fav{display:none}
 .product-discount{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
 .product-new{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
 .product-body{padding:14px}
@@ -156,8 +207,14 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .fav-btn:hover,.fav-btn.active{background:#fff0f0;color:var(--red);border-color:#ffcccc}
 /* List view card */
 .products-grid.list-view .product-card{display:flex;gap:0}
-.products-grid.list-view .product-img{width:140px;height:140px;flex-shrink:0}
+.products-grid.list-view .product-img{width:168px;height:168px;min-height:168px;aspect-ratio:auto;flex-shrink:0}
+.products-grid.list-view .product-img .rzq-adx-media{min-height:168px;aspect-ratio:auto}
 .products-grid.list-view .product-body{flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-btn.wide{width:auto;padding:0 14px;min-width:72px}
+#cat-filters-box .filter-opt input{accent-color:var(--navy)}
+@media(max-width:768px){
+  .filters-sidebar{display:block;position:static;margin-bottom:8px}
+}
 /* Product modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
@@ -204,7 +261,7 @@ footer{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:32px
 /* Responsive */
 @media(max-width:768px){
   .page-wrap{grid-template-columns:1fr}
-  .filters-sidebar{display:none}
+  .filters-sidebar{position:static;top:auto}
   .nav-links{display:none}
   .products-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
   .search-box input{width:160px}
@@ -380,19 +437,22 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
-<script src="rizq_site_banner.js"></script>
-  <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=1.0"></script>
-  <!-- مطلوب لتحميل منتجات المحل الحقيقي وشارتَي "موثّق"/"مميّز" (RizqSub.getBadges) -->
-  <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=20" defer></script>
-<script src="rizq_terms_gate.js"></script>
-<script src="rizq_auth_gate.js" defer></script>
-<script src="rizq_ux_polish.js?v=17.0"></script>
+  <script src="rizq_ad_cards.js?v=26.6" defer></script>
+  <script src="rizq_store_commerce.js?v=26.6" defer></script>
+  <script src="rizq_intro_video.js" defer></script>
+  <script src="rizq_site_banner.js" defer></script>
+  <script src="rizq_i18n_data.js" defer></script>
+  <script src="rizq_i18n.js" defer></script>
+  <script src="rizq_lang_guard.js?v=1.0" defer></script>
+  <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_pwa.js" defer></script>
+  <script src="rizq_footer_toggle.js?v=20" defer></script>
+  <script src="rizq_terms_gate.js" defer></script>
+  <script src="rizq_auth_gate.js" defer></script>
+  <script src="rizq_ux_polish.js?v=17.0" defer></script>
 </head>
 <body data-t-ns="products">
+<script src="rizq_header.js?v=26.6"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- NAV -->
@@ -426,6 +486,24 @@ main, .page-content.active, .main-content, .results-area,
   </div>
 </div>
 
+<!-- هوية المحل — صورة + اسم + فيديو تعريفي -->
+<section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
+  <div class="store-lux-inner">
+    <div class="store-lux-logo" id="lux-store-logo">🏪</div>
+    <div>
+      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
+      <p class="store-lux-tag" id="lux-store-tag">كتالوج فاخر — صور المنتجات تتحرك كإعلانات الصفحة الرئيسية</p>
+      <div class="store-lux-meta" id="lux-store-meta">
+        <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
+        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html" style="text-decoration:none">↩ واجهة المحل</a>
+      </div>
+    </div>
+    <div class="store-lux-video" id="lux-video-wrap" style="display:none">
+      <div id="lux-intro-video-mount"></div>
+    </div>
+  </div>
+</section>
+
 <div class="page-wrap">
   <!-- FILTERS -->
   <aside class="filters-sidebar">
@@ -435,11 +513,9 @@ main, .page-content.active, .main-content, .results-area,
 
     <div class="filter-section">
       <div class="filter-section-title" data-t="filter-cat">الفئة / Catégorie</div>
-      <div class="filter-opt"><input type="checkbox" id="f-all" checked onchange="filterChange()"><label for="f-all" data-t="cat-all">الكل</label><span class="filter-count">8</span></div>
-      <div class="filter-opt"><input type="checkbox" id="f-cloths" onchange="filterChange()"><label for="f-cloths" data-t="cat-clothes">👗 ملابس</label><span class="filter-count">2</span></div>
-      <div class="filter-opt"><input type="checkbox" id="f-shoes" onchange="filterChange()"><label for="f-shoes" data-t="cat-shoes">👟 أحذية</label><span class="filter-count">2</span></div>
-      <div class="filter-opt"><input type="checkbox" id="f-acc" onchange="filterChange()"><label for="f-acc" data-t="cat-acc">💍 إكسسوار</label><span class="filter-count">2</span></div>
-      <div class="filter-opt"><input type="checkbox" id="f-kids" onchange="filterChange()"><label for="f-kids" data-t="cat-kids">🧸 أطفال</label><span class="filter-count">2</span></div>
+      <div id="cat-filters-box">
+        <div class="filter-opt"><input type="checkbox" id="f-all" checked onchange="filterChange()"><label for="f-all" data-t="cat-all">الكل</label><span class="filter-count" id="fc-all">0</span></div>
+      </div>
     </div>
 
     <div class="filter-section">
@@ -523,6 +599,7 @@ function sanitize(s){ const d=document.createElement('div');d.appendChild(docume
 const CAT_FR={'ملابس':'Vêtements','أحذية':'Chaussures','إكسسوار':'Accessoires','أطفال':'Enfants'};
 
 const allProducts = [];
+const PAGE_SIZE = (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15;
 
 // السلة تُحفظ فعلياً في localStorage (مفتاح rizq_cart) لتبقى متزامنة مع rizq_cart.html
 function loadCart(){
@@ -535,25 +612,47 @@ let cart = loadCart();
 let currentView = 'grid';
 let displayedProducts = [...allProducts];
 let currentCat = 'all';
+let currentPage = 1;
 let modalQty = 1;
+let selectedSidebarCats = [];
 
 function _wishlistIds(){ try{ var v=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 function _wishlistHas(id){ return _wishlistIds().indexOf(String(id))!==-1; }
 
+function _pidAttr(id){
+  return JSON.stringify(String(id));
+}
+
 function renderProducts(products) {
-  const grid = document.getElementById('products-grid');
-  document.getElementById('no-results').style.display = products.length ? 'none' : 'block';
-  document.getElementById('results-count').textContent = products.length + (window.isAr===false ? ' produits' : ' منتج');
-  if (!products.length) { grid.innerHTML=''; return; }
+  displayedProducts = products || [];
+  const total = displayedProducts.length;
   const ar = window.isAr !== false;
-  grid.innerHTML = products.map(p => {
+  const slice = (window.RizqStoreCommerce && RizqStoreCommerce.pageSlice)
+    ? RizqStoreCommerce.pageSlice(displayedProducts, currentPage, PAGE_SIZE)
+    : { items: displayedProducts.slice(0, PAGE_SIZE), page: 1, pages: 1, total: total };
+  currentPage = slice.page;
+  const pageItems = slice.items;
+
+  const grid = document.getElementById('products-grid');
+  document.getElementById('no-results').style.display = total ? 'none' : 'block';
+  document.getElementById('results-count').textContent = total + (ar === false ? ' produits' : ' منتج');
+  var luxChip = document.getElementById('lux-count-chip');
+  if (luxChip) luxChip.textContent = total + (ar === false ? ' produits' : ' منتج');
+
+  if (!total) { grid.innerHTML=''; renderPagination(0); return; }
+
+  grid.innerHTML = pageItems.map(p => {
     const isFav = _wishlistHas(p.id);
+    const media = (window.RizqStoreCommerce && RizqStoreCommerce.productMediaHtml)
+      ? RizqStoreCommerce.productMediaHtml(p, { fr: !ar, showPrice: false })
+      : '<span style="user-select:none;font-size:64px">' + sanitize(p.emoji||'📦') + '</span>';
+    const openId = _pidAttr(p.id);
     return `
-    <div class="product-card" id="product-${p.id}">
-      <div class="product-img" onclick="openModal(${p.id})" style="cursor:pointer">
+    <div class="product-card" id="product-${sanitize(String(p.id))}">
+      <div class="product-img" onclick="openModal(${openId})" style="cursor:pointer">
         ${p.discount ? `<div class="product-discount">${ar?'عرض':'Promo'}</div>` : ''}
         ${p.isNew ? `<div class="product-new">${ar?'جديد':'Nouveau'}</div>` : ''}
-        <span style="user-select:none">${p.emoji}</span>
+        ${media}
       </div>
       <div class="product-body">
         <div class="product-name">${sanitize(ar ? p.name : p.nameF)}</div>
@@ -561,51 +660,124 @@ function renderProducts(products) {
         <div class="product-cat-tag">${sanitize(ar ? p.cat : (CAT_FR[p.cat]||p.cat))}</div>
         <div class="product-price-row">
           <div class="price-block">
-            <div class="product-price">${p.price.toLocaleString()} <small style="font-size:10px;font-weight:400">MRU</small></div>
-            ${p.oldPrice ? `<div class="product-price-old">${p.oldPrice.toLocaleString()} MRU</div>` : ''}
+            <div class="product-price">${Number(p.price||0).toLocaleString()} <small style="font-size:10px;font-weight:400">MRU</small></div>
+            ${p.oldPrice ? `<div class="product-price-old">${Number(p.oldPrice).toLocaleString()} MRU</div>` : ''}
           </div>
           <div class="card-actions">
-            <button class="fav-btn${isFav?' active':''}" onclick="var _b=this,_id=${p.id};rizqRequireAuth(function(){toggleFav(_b,_id)},'reasonFav')" title="${ar?'المفضلة':'Favoris'}" aria-label="${ar?'إضافة للمفضلة':'Ajouter aux favoris'}">${isFav?'❤':'♡'}</button>
-            <button class="add-btn" onclick="addToCart(${p.id})" title="${ar?'أضف للسلة':'Ajouter au panier'}" aria-label="${ar?'أضف':'Ajouter'} ${sanitize(ar?p.name:p.nameF)} ${ar?'للسلة':'au panier'}">+</button>
+            <button class="fav-btn${isFav?' active':''}" onclick="var _b=this,_id=${openId};rizqRequireAuth(function(){toggleFav(_b,_id)},'reasonFav')" title="${ar?'المفضلة':'Favoris'}" aria-label="${ar?'إضافة للمفضلة':'Ajouter aux favoris'}">${isFav?'❤':'♡'}</button>
+            <button class="add-btn" onclick="addToCart(${openId})" title="${ar?'أضف للسلة':'Ajouter au panier'}" aria-label="${ar?'أضف':'Ajouter'} ${sanitize(ar?p.name:p.nameF)} ${ar?'للسلة':'au panier'}">+</button>
           </div>
         </div>
       </div>
     </div>
   `; }).join('');
-  renderPagination(products.length);
+  renderPagination(total);
+  if (window.RizqStoreCommerce && typeof RizqStoreCommerce.bindMedia === 'function') {
+    RizqStoreCommerce.bindMedia(grid);
+  }
 }
 
 function renderPagination(count) {
-  const pages = Math.ceil(count / 8);
-  if (pages <= 1) { document.getElementById('pagination').innerHTML=''; return; }
+  const pages = Math.ceil((count || 0) / PAGE_SIZE);
+  const box = document.getElementById('pagination');
+  if (!box) return;
+  if (pages <= 1) { box.innerHTML=''; return; }
   const ar = window.isAr !== false;
-  document.getElementById('pagination').innerHTML = Array.from({length:pages},(_,i) =>
-    `<button class="page-btn${i===0?' active':''}" onclick="goPage(this)">${i+1}</button>`
-  ).join('') + `<button class="page-btn" onclick="goPage(this,true)">${ar?'التالي ›':'‹ Suivant'}</button>`;
+  let html = `<button class="page-btn wide" onclick="goPageNum(${Math.max(1, currentPage-1)})" ${currentPage<=1?'disabled':''}>${ar?'› السابق':'‹ Préc.'}</button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 8 && Math.abs(i - currentPage) > 2 && i !== 1 && i !== pages) {
+      if (i === 2 || i === pages - 1) html += '<span style="padding:0 4px;color:#9aa">…</span>';
+      continue;
+    }
+    html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPageNum(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn wide" onclick="goPageNum(${Math.min(pages, currentPage+1)})" ${currentPage>=pages?'disabled':''}>${ar?'التالي ‹':'Suiv. ›'}</button>`;
+  box.innerHTML = html;
+}
+
+function goPageNum(n) {
+  currentPage = Math.max(1, n|0);
+  renderProducts(displayedProducts);
+  var strip = document.getElementById('store-lux-strip');
+  window.scrollTo({ top: strip ? strip.offsetTop + strip.offsetHeight - 8 : 120, behavior: 'smooth' });
 }
 
 function goPage(btn, next) {
-  document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  window.scrollTo(0,120);
+  if (next) goPageNum(currentPage + 1);
+  else {
+    var n = parseInt(btn.textContent, 10);
+    if (!isNaN(n)) goPageNum(n);
+  }
 }
 
 function filterCat(btn, cat) {
   document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   currentCat = cat;
+  selectedSidebarCats = [];
+  var fall = document.getElementById('f-all');
+  if (fall) fall.checked = true;
+  document.querySelectorAll('#cat-filters-box input[data-cat]').forEach(function(i){ i.checked = false; });
+  currentPage = 1;
   applyFilters();
 }
 
 function doSearch() {
+  currentPage = 1;
   applyFilters();
 }
 
 function doSort() {
+  currentPage = 1;
+  applyFilters();
+}
+
+function syncSidebarCatsFromDom() {
+  selectedSidebarCats = [];
+  document.querySelectorAll('#cat-filters-box input[data-cat]:checked').forEach(function(inp){
+    selectedSidebarCats.push(inp.getAttribute('data-cat'));
+  });
+  var fall = document.getElementById('f-all');
+  if (selectedSidebarCats.length) {
+    if (fall) fall.checked = false;
+    currentCat = 'all';
+  } else if (fall) {
+    fall.checked = true;
+  }
+}
+
+function rebuildSidebarCats(products) {
+  var box = document.getElementById('cat-filters-box');
+  if (!box) return;
+  var ar = window.isAr !== false;
+  var counts = {};
+  (products || []).forEach(function(p){
+    var c = p.cat || 'عام';
+    counts[c] = (counts[c] || 0) + 1;
+  });
+  var cats = Object.keys(counts);
+  var total = (products || []).length;
+  var html = '<div class="filter-opt"><input type="checkbox" id="f-all" '+(selectedSidebarCats.length?'':'checked')+' onchange="onSidebarAll()"><label for="f-all">'+(ar?'الكل':'Tout')+'</label><span class="filter-count" id="fc-all">'+total+'</span></div>';
+  cats.forEach(function(c, i){
+    var id = 'f-cat-' + i;
+    var checked = selectedSidebarCats.indexOf(c) !== -1 ? ' checked' : '';
+    html += '<div class="filter-opt"><input type="checkbox" id="'+id+'" data-cat="'+sanitize(c)+'"'+checked+' onchange="filterChange()"><label for="'+id+'">'+sanitize(ar?c:(CAT_FR[c]||c))+'</label><span class="filter-count">'+counts[c]+'</span></div>';
+  });
+  box.innerHTML = html;
+}
+
+function onSidebarAll() {
+  selectedSidebarCats = [];
+  document.querySelectorAll('#cat-filters-box input[data-cat]').forEach(function(i){ i.checked = false; });
+  var fall = document.getElementById('f-all');
+  if (fall) fall.checked = true;
+  currentCat = 'all';
+  currentPage = 1;
   applyFilters();
 }
 
 function applyFilters() {
+  syncSidebarCatsFromDom();
   const query = document.getElementById('search-input').value.trim().toLowerCase();
   const sort  = document.getElementById('sort-select').value;
   const minP  = parseFloat(document.getElementById('price-min').value) || 0;
@@ -615,7 +787,8 @@ function applyFilters() {
 
   let filtered = allProducts.filter(p => {
     if (currentCat !== 'all' && p.cat !== currentCat) return false;
-    if (query && !p.name.toLowerCase().includes(query) && !p.nameF.toLowerCase().includes(query)) return false;
+    if (selectedSidebarCats.length && selectedSidebarCats.indexOf(p.cat) === -1) return false;
+    if (query && !String(p.name||'').toLowerCase().includes(query) && !String(p.nameF||'').toLowerCase().includes(query)) return false;
     if (p.price < minP || p.price > maxP) return false;
     if (fDisc && !p.discount) return false;
     if (fNew && !p.isNew) return false;
@@ -632,22 +805,27 @@ function applyFilters() {
 }
 
 function filterChange() {
+  currentPage = 1;
   applyFilters();
 }
 
 function applyPriceFilter() {
+  currentPage = 1;
   applyFilters();
 }
 
 function clearFilters() {
-  document.querySelectorAll('.filter-opt input').forEach(i => i.checked = false);
-  document.getElementById('f-all').checked = true;
+  selectedSidebarCats = [];
   document.getElementById('price-min').value = '';
   document.getElementById('price-max').value = '';
   document.getElementById('search-input').value = '';
   document.getElementById('sort-select').value = 'default';
+  var fd = document.getElementById('f-discount'); if (fd) fd.checked = false;
+  var fn = document.getElementById('f-new'); if (fn) fn.checked = false;
   currentCat = 'all';
+  currentPage = 1;
   document.querySelectorAll('.cat-tab').forEach((t,i) => t.classList.toggle('active',i===0));
+  rebuildSidebarCats(allProducts);
   applyFilters();
 }
 
@@ -675,13 +853,18 @@ function toggleFav(btn, id) {
   if(window.RizqUx&&typeof RizqUx.updateFavBadges==='function') RizqUx.updateFavBadges();
 }
 
+function _findProduct(id) {
+  const sid = String(id);
+  return allProducts.find(x => String(x.id) === sid);
+}
+
 function addToCart(id) {
   const ar = window.isAr !== false;
-  const p = allProducts.find(x => x.id===id);
+  const p = _findProduct(id);
   if (!p) return;
-  const ex = cart.find(c => c.id===id);
+  const ex = cart.find(c => String(c.id) === String(id));
   if (ex) ex.qty++;
-  else cart.push({...p, qty:1});
+  else cart.push(Object.assign({}, p, { qty:1, storeId: p.storeId || (window._rizqProductsStoreId || '') }));
   saveCart();
   updateCartCount();
   showToast((ar ? '✅ تمت الإضافة: ' : '✅ Ajouté : ') + (ar ? p.name : p.nameF));
@@ -697,27 +880,30 @@ function updateCartCount() {
 
 // Modal
 function openModal(id) {
-  const p = allProducts.find(x => x.id===id);
+  const p = _findProduct(id);
   if (!p) return;
   const ar = window.isAr !== false;
   modalQty = 1;
+  const media = (window.RizqStoreCommerce && RizqStoreCommerce.productMediaHtml)
+    ? RizqStoreCommerce.productMediaHtml(p, { fr: !ar, showPrice: false })
+    : '<span style="user-select:none">' + sanitize(p.emoji||'📦') + '</span>';
   document.getElementById('modal-title-text').textContent = ar ? p.name : p.nameF;
   document.getElementById('modal-body').innerHTML = `
-    <div class="modal-img"><span style="user-select:none">${p.emoji}</span></div>
+    <div class="modal-img" style="padding:0;overflow:hidden;background:#0d1b2a">${media}</div>
     <div class="modal-info">
       <div class="modal-name">${sanitize(ar ? p.name : p.nameF)}</div>
       <div class="modal-name-fr">${sanitize(ar ? p.nameF : p.name)}</div>
-      <div class="modal-price">${p.price.toLocaleString()} <small style="font-size:14px;font-weight:400">MRU</small></div>
-      ${p.oldPrice ? `<div class="modal-price-old">${p.oldPrice.toLocaleString()} MRU</div>` : ''}
+      <div class="modal-price">${Number(p.price||0).toLocaleString()} <small style="font-size:14px;font-weight:400">MRU</small></div>
+      ${p.oldPrice ? `<div class="modal-price-old">${Number(p.oldPrice).toLocaleString()} MRU</div>` : ''}
       <div class="modal-desc">${sanitize(ar ? p.desc : (p.descF||p.desc))}</div>
       <div class="qty-row">
         <span style="font-size:13px;color:#6a7a8a">${ar?'الكمية:':'Quantité :'}</span>
         <button class="qty-btn" onclick="changeQty(-1)" aria-label="${ar?'تقليل الكمية':'Diminuer la quantité'}">−</button>
         <span class="qty-val" id="modal-qty">1</span>
         <button class="qty-btn" onclick="changeQty(1)" aria-label="${ar?'زيادة الكمية':'Augmenter la quantité'}">+</button>
-        <span style="font-size:13px;color:var(--navy);font-weight:700" id="modal-total">${p.price.toLocaleString()} MRU</span>
+        <span style="font-size:13px;color:var(--navy);font-weight:700" id="modal-total">${Number(p.price||0).toLocaleString()} MRU</span>
       </div>
-      <button class="modal-add-btn" onclick="addModalToCart(${p.id})">🛒 ${ar?'أضف للسلة':'Ajouter au panier'}</button>
+      <button class="modal-add-btn" onclick="addModalToCart(${_pidAttr(p.id)})">🛒 ${ar?'أضف للسلة':'Ajouter au panier'}</button>
       <div style="margin-top:10px;text-align:center">
         <a href="#"
            target="_blank" rel="noopener"
@@ -731,6 +917,9 @@ function openModal(id) {
   window._modalProduct = p;
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (window.RizqStoreCommerce && typeof RizqStoreCommerce.bindMedia === 'function') {
+    RizqStoreCommerce.bindMedia(document.getElementById('modal-body'));
+  }
 }
 
 function closeModal() {
@@ -747,11 +936,11 @@ function changeQty(delta) {
 }
 
 function addModalToCart(id) {
-  const p = allProducts.find(x => x.id===id);
+  const p = _findProduct(id);
   if (!p) return;
-  const ex = cart.find(c => c.id===id);
+  const ex = cart.find(c => String(c.id) === String(id));
   if (ex) ex.qty += modalQty;
-  else cart.push({...p, qty: modalQty});
+  else cart.push(Object.assign({}, p, { qty: modalQty, storeId: p.storeId || (window._rizqProductsStoreId || '') }));
   saveCart();
   updateCartCount();
   const ar = window.isAr !== false;
@@ -802,65 +991,161 @@ if (anchor && anchor.startsWith('#product-')) {
   }catch(e){}
 })();
 
-(function loadRealStoreProducts(){
+function _demoCatalog(fr){
+  var base = [
+    { name:'دراعة رجالية فاخرة', nameF:'Boubou homme premium', price:45000, cat:'أزياء', emoji:'👔' },
+    { name:'عطر شرقي 100مل', nameF:'Parfum oriental 100ml', price:18000, cat:'عطور', emoji:'🧴' },
+    { name:'حذاء رياضي', nameF:'Baskets sport', price:22000, cat:'أحذية', emoji:'👟' },
+    { name:'ساعة كلاسيكية', nameF:'Montre classique', price:35000, cat:'إكسسوارات', emoji:'⌚' },
+    { name:'حقيبة جلدية', nameF:'Sac en cuir', price:28000, cat:'إكسسوارات', emoji:'👜' },
+    { name:'نظارة شمسية', nameF:'Lunettes de soleil', price:9000, cat:'إكسسوارات', emoji:'🕶️' },
+    { name:'قميص قطني', nameF:'Chemise coton', price:12000, cat:'أزياء', emoji:'👔' },
+    { name:'فستان سهرة', nameF:'Robe de soirée', price:55000, cat:'أزياء', emoji:'👗' },
+    { name:'صندل صيفي', nameF:'Sandales été', price:8000, cat:'أحذية', emoji:'🩴' },
+    { name:'عطر نسائي', nameF:'Parfum femme', price:21000, cat:'عطور', emoji:'🌸' },
+    { name:'سوار ذهب مظهر', nameF:'Bracelet doré', price:15000, cat:'إكسسوارات', emoji:'💍' },
+    { name:'طقم أطفال', nameF:'Ensemble enfant', price:11000, cat:'أطفال', emoji:'🧸' },
+    { name:'حذاء رسمي', nameF:'Chaussures formal', price:32000, cat:'أحذية', emoji:'👞' },
+    { name:'معطف خفيف', nameF:'Manteau léger', price:40000, cat:'أزياء', emoji:'🧥' },
+    { name:'كريم عناية', nameF:'Crème soin', price:7000, cat:'عطور', emoji:'🧴' },
+    { name:'لعبة تعليمية', nameF:'Jouet éducatif', price:6500, cat:'أطفال', emoji:'🧩' },
+    { name:'قبعة أنيقة', nameF:'Casquette chic', price:4500, cat:'إكسسوارات', emoji:'🧢' },
+    { name:'تيشيرت قطن', nameF:'T-shirt coton', price:5000, cat:'أزياء', emoji:'👕' }
+  ];
+  return base.map(function(p, i){
+    return {
+      id: 'D'+(i+1), name: p.name, nameF: p.nameF, cat: p.cat, emoji: p.emoji,
+      price: p.price, oldPrice: i % 4 === 0 ? Math.round(p.price * 1.18) : null,
+      discount: i % 4 === 0, isNew: i < 3, desc: fr ? 'Article démo' : 'منتج عرض',
+      descF: 'Article démo', imgDataArr: [], storeId: 'demo_store'
+    };
+  });
+}
+
+function applyStoreBrand(acc, storeId, fr){
+  window._rizqProductsStoreId = storeId || '';
+  var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
+  var tag = (acc && (acc.tagline || acc.desc)) || (fr
+    ? 'Catalogue premium — photos animées comme les annonces Rizq'
+    : 'كتالوج فاخر — صور المنتجات تتحرك كإعلانات الصفحة الرئيسية');
+  var luxName = document.getElementById('lux-store-name');
+  var luxTag = document.getElementById('lux-store-tag');
+  var luxLogo = document.getElementById('lux-store-logo');
+  var bcLink = document.getElementById('bc-store-link');
+  var back = document.getElementById('lux-back-store');
+  if(luxName) luxName.textContent = name;
+  if(luxTag) luxTag.textContent = tag;
+  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, '🏪');
+  if(bcLink){
+    bcLink.textContent = name;
+    bcLink.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_landing_v8.html#rzq-disc-store';
+  }
+  if(back) back.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_store.html';
+  if(name) document.title = name + (fr ? ' — Produits — Rizq' : ' — المنتجات — رزق');
+  if(typeof RizqSub !== 'undefined' && storeId){
+    var b = RizqSub.getBadges(storeId);
+    var badgesEl = document.getElementById('bc-badges-inline');
+    if(badgesEl){
+      badgesEl.innerHTML = (b.verified?'<span style="font-size:11px;font-weight:700;color:#16a34a">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
+        + (b.premium?' <span style="font-size:11px;font-weight:700;color:#a07820">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
+    }
+  }
+  if(acc && acc.promo_video && window.RizqIntroVideo){
+    var wrap = document.getElementById('lux-video-wrap');
+    var mount = document.getElementById('lux-intro-video-mount');
+    if(wrap && mount){
+      var ok = RizqIntroVideo.mount(mount, acc.promo_video, { title: fr ? '🎬 Vidéo' : '🎬 فيديو تعريفي', linkLabel: fr ? 'Source ↗' : 'المصدر ↗' });
+      wrap.style.display = ok ? '' : 'none';
+    }
+  }
+  if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
+}
+
+function commitCatalog(mapped, acc, storeId, fr){
+  allProducts.length = 0;
+  Array.prototype.push.apply(allProducts, mapped || []);
+  var cats = allProducts.reduce(function(acc2,p){ if(p.cat && acc2.indexOf(p.cat)===-1) acc2.push(p.cat); return acc2; }, []);
+  var tabsWrap = document.querySelector('.cat-tabs');
+  if(tabsWrap){
+    tabsWrap.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">'+(fr?'Tout':'الكل')+'</button>'
+      + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\''+String(c).replace(/'/g,"\\'")+'\')">'+sanitize(fr?(CAT_FR[c]||c):c)+'</button>'; }).join('');
+  }
+  selectedSidebarCats = [];
+  currentCat = 'all';
+  currentPage = 1;
+  rebuildSidebarCats(allProducts);
+  applyStoreBrand(acc || { name: fr ? 'Boutique Al-Nour' : 'متجر النور' }, storeId, fr);
+  applyFilters();
+  updateCartCount();
+}
+
+async function loadRealStoreProducts(){
+  var fr = false;
+  try{ fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e){}
+  var params = new URLSearchParams(location.search);
+  var storeId = params.get('id') || params.get('store') || '';
+  if(!storeId || storeId === 'demo_store' || params.get('demo') === '1'){
+    commitCatalog(_demoCatalog(fr), {
+      id: 'demo_store', name: fr ? 'Boutique Al-Nour' : 'متجر النور',
+      tagline: fr ? 'Espace marchand démo' : 'واجهة محل تجريبية',
+      promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      status: 'approved', type: 'store'
+    }, 'demo_store', fr);
+    return;
+  }
+
+  var acc = null;
   try{
-    var _lrpFr = false;
-    try{ _lrpFr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e){}
-    var params = new URLSearchParams(location.search);
-    var storeId = params.get('id') || params.get('store') || '';
-    if(!storeId) return;
     var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-    var acc = accs.find(function(a){ return a.id === storeId && a.status === 'approved' && a.type === 'store'; });
-    if(!acc) return;
-    var real = JSON.parse(localStorage.getItem('store_products_' + storeId) || '[]');
-    if(!Array.isArray(real) || !real.length) return;
+    acc = accs.find(function(a){ return a.id === storeId && a.status === 'approved' && (a.type === 'store' || a.type === 'shop'); });
+  }catch(e){}
 
-    var mapped = real.map(function(p, i){
-      var priceNum = parseFloat(String(p.price||'0').replace(/[^\d.]/g,'')) || 0;
-      var isNew = false;
-      try{ isNew = p.addedAt && (Date.now() - new Date(p.addedAt).getTime()) < 3*86400000; }catch(e){}
-      return {
-        id: i+1, name: p.name||'', nameF: p.name||'',
-        cat: p.cat || 'عام', emoji: p.emoji || '📦',
-        price: priceNum, oldPrice: null, discount: false, isNew: isNew,
-        desc: p.desc || '', descF: p.desc || ''
-      };
-    });
-    allProducts.length = 0;
-    Array.prototype.push.apply(allProducts, mapped);
+  var real = [];
+  try{ real = JSON.parse(localStorage.getItem('store_products_' + storeId) || '[]'); }catch(e2){}
+  if(!Array.isArray(real)) real = [];
 
-    // إعادة بناء تبويبات الفئة حسب الفئات الحقيقية الفعلية بدل القائمة
-    // التجريبية الثابتة (ملابس/أحذية/إكسسوار/أطفال) — قد لا تطابق فئات المحل الحقيقي.
-    var cats = mapped.reduce(function(acc2,p){ if(p.cat && acc2.indexOf(p.cat)===-1) acc2.push(p.cat); return acc2; }, []);
-    var tabsWrap = document.querySelector('.cat-tabs');
-    if(tabsWrap && cats.length){
-      tabsWrap.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">'+ (_lrpFr?'Tout':'الكل') +'</button>'
-        + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\''+String(c).replace(/'/g,"\\'")+'\')">'+ c +'</button>'; }).join('');
-    }
-
-    // تحديث شريط التنقل ليعكس اسم المحل الحقيقي
-    var bcLink = document.getElementById('bc-store-link');
-    if(bcLink){ bcLink.textContent = acc.name || bcLink.textContent; bcLink.href = 'rizq_store.html?id='+encodeURIComponent(storeId); }
-    if(acc.name) document.title = acc.name + ' — المنتجات — رزق';
-
-    // شارتا "موثّق"/"مميّز" الحقيقيتان بجانب اسم المحل
-    if(typeof RizqSub !== 'undefined'){
-      var b = RizqSub.getBadges(storeId);
-      var badgesEl = document.getElementById('bc-badges-inline');
-      if(badgesEl){
-        badgesEl.innerHTML = (b.verified?'<span style="font-size:11px;font-weight:700;color:#16a34a">✅ '+(_lrpFr?'Vérifié':'موثّق')+'</span>':'')
-          + (b.premium?' <span style="font-size:11px;font-weight:700;color:#a07820">🏅 '+(_lrpFr?'Premium':'مميّز')+'</span>':'');
+  if((!acc || !real.length) && window.RIZQ_BACKEND_BASE){
+    try{
+      var base = String(window.RIZQ_BACKEND_BASE).replace(/\/$/,'');
+      if(!acc && window.RizqApi && RizqApi.publicAccounts){
+        var pdata = await RizqApi.publicAccounts();
+        acc = (pdata && pdata.accounts || []).find(function(a){ return a.id === storeId && (a.type === 'store' || a.type === 'shop'); }) || acc;
       }
-    }
-  }catch(e){ /* أي خلل هنا يبقي الكتالوج التجريبي كما هو دون كسر الصفحة */ }
-})();
+      if(!real.length){
+        var cr = await fetch(base + '/api/catalog?accountId=' + encodeURIComponent(storeId) + '&kind=product');
+        if(cr.ok){
+          var cdata = await cr.json();
+          real = Array.isArray(cdata.items) ? cdata.items : [];
+        }
+      }
+    }catch(e3){}
+  }
 
-// ── window.isAr was never initialized — renderProducts()/openModal() etc. all
-//    read `window.isAr !== false`, so with it left undefined they always
-//    rendered Arabic-primary regardless of the actually saved language. ──
+  var mapped = (real || []).map(function(p, i){
+    var m = (window.RizqStoreCommerce && RizqStoreCommerce.mapRawProduct)
+      ? RizqStoreCommerce.mapRawProduct(p, i)
+      : { id: i+1, name: p.name||'', nameF: p.name||'', cat: p.cat||'عام', emoji: p.emoji||'📦', price: Number(p.price)||0, desc: p.desc||'', imgDataArr: [] };
+    m.storeId = storeId;
+    return m;
+  });
+
+  if(!mapped.length){
+    commitCatalog([], acc || { name: storeId, type: 'store' }, storeId, fr);
+    return;
+  }
+  commitCatalog(mapped, acc || { name: storeId, type: 'store' }, storeId, fr);
+}
+
 window.isAr = (function(){ try{ return (localStorage.getItem('rizq_lang')||'ar') !== 'fr'; }catch(e){ return true; } })();
-renderProducts(allProducts);
-updateCartCount();
+
+function bootProductsCatalog(){
+  loadRealStoreProducts().catch(function(){
+    var fr = !window.isAr;
+    commitCatalog(_demoCatalog(fr), { name: fr ? 'Boutique Al-Nour' : 'متجر النور' }, 'demo_store', fr);
+  });
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootProductsCatalog);
+else bootProductsCatalog();
 </script>
 
 <script>

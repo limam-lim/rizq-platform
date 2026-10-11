@@ -3680,10 +3680,10 @@ function saveMyPayment(){
   // ══ PREVIEW & SERVICES SHOWCASE ══
   function previewMyPage(){
     var acc=(typeof STORE!=='undefined'&&STORE)||{};
-    var id=acc.id||'demo';
+    var id=acc.id||'demo_store';
     var base=location.href.replace(/[^\/]+$/,'');
-    var url=base+'rizq_products.html?id='+id;
-    window.open(url,'_blank');
+    /* الواجهة العامة أولاً ثم الكتالوج — نفس ترتيب الزائر */
+    window.open(base+'rizq_store.html?id='+encodeURIComponent(id),'_blank');
   }
 
   function renderServicesShowcase(){

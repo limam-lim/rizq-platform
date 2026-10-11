@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="سلة المشتريات | رزق" data-t-fr="Mon panier | Rizq">سلة المشتريات | رزق</title>
 <style>
@@ -56,6 +57,39 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .bc-inner a:hover{color:var(--gold)}
 .bc-sep{color:#c0d0e0}
 
+/* شريط هوية المحل */
+.store-lux-strip{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
+    linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
+  border-bottom:1px solid rgba(201,168,76,.35);
+  color:#fff;
+}
+.store-lux-inner{
+  max-width:1100px;margin:0 auto;padding:18px 16px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.store-lux-logo{
+  width:64px;height:64px;border-radius:18px;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.45),rgba(27,58,107,.7));
+  border:2px solid rgba(201,168,76,.7);
+  box-shadow:0 0 0 4px rgba(201,168,76,.12),0 10px 22px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;
+}
+.store-lux-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.store-lux-name{font-size:clamp(18px,2.6vw,24px);font-weight:900;letter-spacing:.2px;line-height:1.15;margin:0 0 4px}
+.store-lux-name span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.store-lux-tag{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.5}
+.store-lux-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.store-lux-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
+  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
+  text-decoration:none;
+}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+
 /* STEPS INDICATOR */
 .steps-bar{background:#fff;border-bottom:1px solid #e0e8f0;padding:16px 20px}
 .steps-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0}
@@ -89,7 +123,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
   box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .3s;
 }
 .cart-item:hover{border-color:#b0c8e0;box-shadow:var(--shadow)}
-.cart-item-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+.cart-item-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden}
 .cart-item-info{flex:1}
 .cart-item-name{font-size:15px;font-weight:700;color:#1a2a3a;margin-bottom:3px}
 .cart-item-cat{font-size:12px;color:#9aabbb;margin-bottom:10px}
@@ -360,17 +394,19 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
-  <script src="rizq_stock.js"></script>
-  <script src="rizq_account_payments.js"></script>
-  <script src="rizq_contact_gate.js"></script>
-<script src="rizq_site_banner.js"></script>
-  <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=1.0"></script>
-<script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=20" defer></script>
+  <script src="rizq_store_commerce.js?v=26.6" defer></script>
+  <script src="rizq_stock.js" defer></script>
+  <script src="rizq_account_payments.js" defer></script>
+  <script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_site_banner.js" defer></script>
+  <script src="rizq_i18n_data.js" defer></script>
+  <script src="rizq_i18n.js" defer></script>
+  <script src="rizq_lang_guard.js?v=1.0" defer></script>
+  <script src="rizq_pwa.js" defer></script>
+  <script src="rizq_footer_toggle.js?v=20" defer></script>
 </head>
 <body data-t-ns="cart">
+<script src="rizq_header.js?v=26.6"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- NAV -->
@@ -394,13 +430,29 @@ main, .page-content.active, .main-content, .results-area,
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
   <div class="bc-inner">
-    <a href="rizq_landing_v8.html#rzq-disc-store" data-t-fr="Boutique">المحل</a>
+    <a href="rizq_landing_v8.html#rzq-disc-store" id="bc-store-link" data-t-fr="Boutique">المحل</a>
     <span class="bc-sep">›</span>
-    <a href="rizq_products.html" data-t-fr="Produits">المنتجات</a>
+    <a href="rizq_products.html" id="bc-products-link" data-t-fr="Produits">المنتجات</a>
     <span class="bc-sep">›</span>
     <span data-t-fr="Panier">السلة</span>
   </div>
 </div>
+
+<!-- هوية المحل -->
+<section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
+  <div class="store-lux-inner">
+    <div class="store-lux-logo" id="lux-store-logo">🏪</div>
+    <div style="flex:1;min-width:180px">
+      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
+      <p class="store-lux-tag" id="lux-store-tag">سلة طلباتك — صورة المحل واسمه كما في الواجهة</p>
+      <div class="store-lux-meta">
+        <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
+        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html">↩ واجهة المحل</a>
+        <a class="store-lux-chip" id="lux-to-products" href="rizq_products.html">🛍 المنتجات</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- STEPS -->
 <div class="steps-bar">
@@ -607,8 +659,8 @@ main, .page-content.active, .main-content, .results-area,
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
 
-// روابط المحل/المنتجات: احتفظ بمعرّف المحل أو اذهب للاكتشاف بدل صفحة فارغة
-(function bindStoreContextLinks(){
+// روابط المحل/المنتجات + شريط الهوية
+(function bindStoreContext(){
   try{
     var params = new URLSearchParams(location.search);
     var storeId = params.get('id') || params.get('store') || '';
@@ -618,20 +670,60 @@ function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
         if(c[0]) storeId = c[0].storeId || c[0].accountId || '';
       }catch(e){}
     }
-    var storeHref = storeId
-      ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
-      : 'rizq_landing_v8.html#rzq-disc-store';
-    var productsHref = storeId
-      ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
-      : 'rizq_products.html';
-    document.querySelectorAll('a[href="rizq_store.html"], a[href="rizq_landing_v8.html#rzq-disc-store"]').forEach(function(a){
-      a.setAttribute('href', storeHref);
-    });
-    document.querySelectorAll('a[href="rizq_products.html"], a[href^="rizq_products.html?"]').forEach(function(a){
-      a.setAttribute('href', productsHref);
-    });
+    var fr = false;
+    try{ fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e2){}
+    var acc = null;
+    if(storeId && storeId !== 'demo_store'){
+      try{
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        acc = (accs || []).find(function(a){ return String(a.id) === String(storeId); }) || null;
+      }catch(e3){}
+      if(!acc && window.RizqApi && typeof RizqApi.get === 'function'){
+        RizqApi.get('/api/accounts/' + encodeURIComponent(storeId)).then(function(a){
+          if(a) applyCartStoreBrand(a, storeId, fr);
+        }).catch(function(){});
+      }
+    }
+    if(!acc && (storeId === 'demo_store' || !storeId)){
+      acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك' };
+      if(!storeId) storeId = 'demo_store';
+    }
+    applyCartStoreBrand(acc || {}, storeId, fr);
   }catch(e){}
 })();
+
+function applyCartStoreBrand(acc, storeId, fr){
+  var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
+  var tag = (acc && (acc.tagline || acc.desc)) || (fr
+    ? 'Votre panier — identité du magasin comme la vitrine'
+    : 'سلة طلباتك — صورة المحل واسمه كما في الواجهة');
+  var luxName = document.getElementById('lux-store-name');
+  var luxTag = document.getElementById('lux-store-tag');
+  var luxLogo = document.getElementById('lux-store-logo');
+  var bcLink = document.getElementById('bc-store-link');
+  var bcProd = document.getElementById('bc-products-link');
+  var back = document.getElementById('lux-back-store');
+  var toProd = document.getElementById('lux-to-products');
+  if(luxName) luxName.textContent = name;
+  if(luxTag) luxTag.textContent = tag;
+  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, '🏪');
+  else if(luxLogo && acc && acc.thumb){
+    var t = String(acc.thumb).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    luxLogo.innerHTML = '<img src="'+t+'" alt=""/>';
+  }
+  var storeHref = storeId && storeId !== 'demo_store'
+    ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
+    : (storeId === 'demo_store' ? 'rizq_store.html?id=demo_store' : 'rizq_landing_v8.html#rzq-disc-store');
+  var productsHref = storeId
+    ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
+    : 'rizq_products.html';
+  if(bcLink){ bcLink.textContent = name; bcLink.href = storeHref; }
+  if(bcProd) bcProd.href = productsHref;
+  if(back) back.href = storeHref;
+  if(toProd) toProd.href = productsHref;
+  if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
+  window._rizqCartStoreName = name;
+}
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========
 function loadCart(){
@@ -702,32 +794,37 @@ function renderCart() {
   document.getElementById('nav-cart-count').textContent = totalQty;
 
   var __isAr = document.documentElement.lang !== 'fr';
-  var __storeName = __isAr ? 'متجر النور' : 'Boutique Al-Nour';
+  var __storeName = window._rizqCartStoreName || (__isAr ? 'متجر النور' : 'Boutique Al-Nour');
   var __lblDec = __isAr ? 'تقليل' : 'Diminuer';
   var __lblInc = __isAr ? 'زيادة' : 'Augmenter';
   var __lblDel = __isAr ? 'حذف' : 'Supprimer';
-  // إصلاح تسرب اللغة: عناصر السلة المضافة من rizq_products.html/rizq_store.html
-  // تُخزَّن بكامل الكائن (name عربي + nameF فرنسي) لكن هذا الملف كان يعرض
-  // item.name دائماً بغض النظر عن لغة الصفحة الحالية — فتظهر أسماء المنتجات
-  // بالعربية حتى في وضع الفرنسية. الحل: اختيار الاسم المناسب للغة الحالية،
-  // مع بقاء item.name كاحتياطي إذا لم يوجد nameF (منتجات قديمة أحادية اللغة).
+  var luxChip = document.getElementById('lux-count-chip');
+  if(luxChip) luxChip.textContent = totalQty + (__isAr ? ' في السلة' : ' dans le panier');
+  // إصلاح تسرب اللغة: اختيار الاسم المناسب للغة الحالية + صورة المنتج إن وُجدت
   list.innerHTML = cart.map(item => {
     var __itemName = __isAr ? (item.name || item.nameF) : (item.nameF || item.name);
+    var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
+      ? RizqStoreCommerce.imagesOf(item)
+      : (item.imgDataArr || (item.imgData ? [item.imgData] : []) || []);
+    var thumb = imgs[0]
+      ? ('<img src="'+sanitize(imgs[0])+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
+      : sanitize(item.emoji || '📦');
+    var idAttr = JSON.stringify(String(item.id));
     return `
-    <div class="cart-item" id="cart-item-${item.id}">
-      <div class="cart-item-img">${item.emoji}</div>
+    <div class="cart-item" id="cart-item-${sanitize(String(item.id))}">
+      <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${sanitize(__itemName)}</div>
-        <div class="cart-item-cat">${__storeName}</div>
-        <div class="cart-item-price">${item.price.toLocaleString()} MRU</div>
+        <div class="cart-item-cat">${sanitize(__storeName)}</div>
+        <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
         <div class="qty-controls">
-          <button class="qty-btn" onclick="changeQty(${item.id},-1)" aria-label="${__lblDec}">−</button>
-          <span class="qty-val" id="qty-${item.id}">${item.qty}</span>
-          <button class="qty-btn" onclick="changeQty(${item.id},1)" aria-label="${__lblInc}">+</button>
-          <span class="item-subtotal">= ${(item.price*item.qty).toLocaleString()} MRU</span>
+          <button class="qty-btn" onclick="changeQty(${idAttr},-1)" aria-label="${__lblDec}">−</button>
+          <span class="qty-val" id="qty-${sanitize(String(item.id))}">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${idAttr},1)" aria-label="${__lblInc}">+</button>
+          <span class="item-subtotal">= ${(Number(item.price||0)*item.qty).toLocaleString()} MRU</span>
         </div>
       </div>
-      <button class="cart-item-del" onclick="removeItem(${item.id})" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
+      <button class="cart-item-del" onclick="removeItem(${idAttr})" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
     </div>
   `;
   }).join('');
@@ -737,7 +834,7 @@ function renderCart() {
 }
 
 function changeQty(id, delta) {
-  const item = cart.find(c => c.id===id);
+  const item = cart.find(c => String(c.id) === String(id));
   if (!item) return;
   item.qty = Math.max(1, Math.min(99, item.qty + delta));
   saveCart();
@@ -746,7 +843,7 @@ function changeQty(id, delta) {
 
 function removeItem(id) {
   const isAr = document.documentElement.lang !== 'fr';
-  cart = cart.filter(c => c.id !== id);
+  cart = cart.filter(c => String(c.id) !== String(id));
   saveCart();
   renderCart();
   showToast(isAr ? '🗑 تم حذف المنتج' : '🗑 Produit supprimé');
