@@ -8346,13 +8346,34 @@ function showSugg(v){
   const res=(ADS||[]).filter(function(s){
     return String(s.title||'').toLowerCase().indexOf(q)>=0 || String(s.cat||'').toLowerCase().indexOf(q)>=0;
   }).slice(0,5);
+  box.replaceChildren();
   if(!res.length){
-    box.innerHTML='<div class="sugg-item" style="cursor:default;color:#6a7a8a">'+(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج')+'</div>';
+    var empty=document.createElement('div');
+    empty.className='sugg-item';
+    empty.style.cursor='default';
+    empty.style.color='#6a7a8a';
+    empty.textContent=(typeof isAr!=='undefined'&&!isAr?'Aucun résultat':'لا توجد نتائج');
+    box.appendChild(empty);
   } else {
-    box.innerHTML=res.map(function(s){
-      var t=(s.title||'').replace(/'/g,'\\\'');
-      return '<div class="sugg-item" onclick="document.getElementById(\'hero-search\').value=\''+t+'\';doMainSearch()"><span class="sugg-icon">'+(s.emoji||'📦')+'</span><span>'+(s.title||'')+'</span><span class="sugg-price">'+(s.price||'')+'</span></div>';
-    }).join('');
+    res.forEach(function(s){
+      var row=document.createElement('div');
+      row.className='sugg-item';
+      row.addEventListener('click', function(){
+        var inp=document.getElementById('hero-search');
+        if(inp) inp.value=String(s.title||'');
+        doMainSearch();
+      });
+      var ico=document.createElement('span');
+      ico.className='sugg-icon';
+      ico.textContent=s.emoji||'📦';
+      var ttl=document.createElement('span');
+      ttl.textContent=s.title||'';
+      var pr=document.createElement('span');
+      pr.className='sugg-price';
+      pr.textContent=s.price||'';
+      row.appendChild(ico); row.appendChild(ttl); row.appendChild(pr);
+      box.appendChild(row);
+    });
   }
   box.style.display='block';
 }
@@ -8385,6 +8406,14 @@ function mapApiAdToHero(a){
 function _adPhotoHtml(a, d, h){
   h = h || 130;
   var src = (a && Array.isArray(a.images) && a.images[0]) ? String(a.images[0]) : '';
+  if(window.RizqStoreCommerce && typeof RizqStoreCommerce.safeMediaUrl === 'function'){
+    src = RizqStoreCommerce.safeMediaUrl(src) || '';
+  } else {
+    var raw = String(src||'').trim();
+    if(!raw || /[\s<>"']/.test(raw) || /javascript:/i.test(raw)) src = '';
+    else if(!(/^https?:\/\//i.test(raw) || raw.charAt(0)==='/' || /^data:image\//i.test(raw))) src = '';
+    else src = raw;
+  }
   var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
   if(src){
     return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"></div>';
