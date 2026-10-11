@@ -630,7 +630,7 @@ function renderProducts(products) {
     const openId = _pidAttr(p.id);
     return `
     <div class="product-card" id="product-${sanitize(String(p.id))}">
-      <div class="product-img" onclick="openModal(${openId})" style="cursor:pointer">
+      <div class="product-img" onclick='openModal(${openId})' style="cursor:pointer">
         ${p.discount ? `<div class="product-discount">${ar?'عرض':'Promo'}</div>` : ''}
         ${p.isNew ? `<div class="product-new">${ar?'جديد':'Nouveau'}</div>` : ''}
         ${media}
@@ -645,8 +645,8 @@ function renderProducts(products) {
             ${p.oldPrice ? `<div class="product-price-old">${Number(p.oldPrice).toLocaleString()} MRU</div>` : ''}
           </div>
           <div class="card-actions">
-            <button class="fav-btn${isFav?' active':''}" onclick="var _b=this,_id=${openId};rizqRequireAuth(function(){toggleFav(_b,_id)},'reasonFav')" title="${ar?'المفضلة':'Favoris'}" aria-label="${ar?'إضافة للمفضلة':'Ajouter aux favoris'}">${isFav?'❤':'♡'}</button>
-            <button class="add-btn" onclick="addToCart(${openId})" title="${ar?'أضف للسلة':'Ajouter au panier'}" aria-label="${ar?'أضف':'Ajouter'} ${sanitize(ar?p.name:p.nameF)} ${ar?'للسلة':'au panier'}">+</button>
+            <button class="fav-btn${isFav?' active':''}" onclick='var _b=this,_id=${openId};rizqRequireAuth(function(){toggleFav(_b,_id)},"reasonFav")' title="${ar?'المفضلة':'Favoris'}" aria-label="${ar?'إضافة للمفضلة':'Ajouter aux favoris'}">${isFav?'❤':'♡'}</button>
+            <button class="add-btn" onclick='addToCart(${openId})' title="${ar?'أضف للسلة':'Ajouter au panier'}" aria-label="${ar?'أضف':'Ajouter'} ${sanitize(ar?p.name:p.nameF)} ${ar?'للسلة':'au panier'}">+</button>
           </div>
         </div>
       </div>
