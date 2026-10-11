@@ -523,3 +523,47 @@
   .rzq-adx-slides{transition:none}
   /* التشغيل التلقائي يُوقف من JS عند reduce */
 }
+
+/* ── تابلت فقط: الخلفية الزرقاء خلف اتصال/واتساب لا تُفقد ──
+   السبب: overflow:visible + background-blend/repeat من قواعد عامة قد تترك
+   أسفل البطاقة شفافاً أو يمرّ منه جزء من صورة الإعلان أثناء التحريك. */
+@media (min-width:769px) and (max-width:1280px){
+  #hero-listings .ad-card:has(.rzq-adx-media),
+  .cards-track .ad-card:has(.rzq-adx-media),
+  .landing-ads-grid .listing-card:has(.rzq-adx-media),
+  .listings-grid .listing-card:has(.rzq-adx-media),
+  .rc:has(.rzq-adx-media){
+    overflow:hidden!important;
+    background-color:#0a1528!important;
+    background-image:
+      linear-gradient(160deg,rgba(201,168,76,.14),transparent 34%),
+      linear-gradient(165deg,#0a1528 0%,#122a4a 48%,#1B3A6B 100%)!important;
+    background-blend-mode:normal!important;
+    background-repeat:no-repeat!important;
+    background-size:auto!important;
+  }
+  .ad-card:has(.rzq-adx-media) .ad-card-body,
+  .listing-card:has(.rzq-adx-media) .l-body,
+  .rc:has(.rzq-adx-media) .rc-body{
+    background:transparent!important;
+    background-image:none!important;
+  }
+  #hero-listings .ad-card .rzq-adx-actions,
+  .cards-track .ad-card .rzq-adx-actions,
+  .landing-ads-grid .listing-card .rzq-adx-actions,
+  .listings-grid .listing-card .rzq-adx-actions,
+  .rc .rzq-adx-actions{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin-top:4px!important;
+    padding:8px 6px 10px!important;
+    border-radius:0 0 12px 12px!important;
+    background:
+      linear-gradient(180deg,#0e1c34 0%,#0a1528 55%,#081020 100%)!important;
+    background-color:#0a1528!important;
+    border-top:1px solid rgba(201,168,76,.18)!important;
+  }
+}
