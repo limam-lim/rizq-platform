@@ -26,8 +26,8 @@
       ctaHref: 'rizq_ads_info.html',
       video: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4',
       banners: [
-        { ico: '🛒', tAr: 'بضائع ترويجية', tFr: 'Marchandises promo', dAr: 'عينات منتجات للمحلات', dFr: 'Échantillons produits', href: 'rizq_store.html?id=acc_promo_store_rizq' },
-        { ico: '🚚', tAr: 'خدمات التوصيل', tFr: 'Livraison', dAr: 'توصيل واستلام ترويجي', dFr: 'Livraison & retrait', href: 'rizq_store.html?id=acc_promo_store_rizq' },
+        { ico: '🛒', tAr: 'بضائع ترويجية', tFr: 'Marchandises promo', dAr: 'عينات منتجات للمحلات', dFr: 'Échantillons produits', href: 'rizq_store.html?demo=1' },
+        { ico: '🚚', tAr: 'خدمات التوصيل', tFr: 'Livraison', dAr: 'توصيل واستلام ترويجي', dFr: 'Livraison & retrait', href: 'rizq_store.html?demo=1' },
         { ico: '⭐', tAr: 'عروض مميزة', tFr: 'Offres vedettes', dAr: 'بانرات ذهبية للبضاعة', dFr: 'Bannières produits', href: 'rizq_ads_info.html' },
         { ico: '🏪', tAr: 'انضم كمحل', tFr: 'Devenir boutique', dAr: 'افتح واجهتك على رزق', dFr: 'Ouvrez votre vitrine', href: 'rizq_landing_v8.html#pricing' }
       ]
@@ -44,8 +44,8 @@
       ctaHref: 'rizq_ads_info.html',
       video: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4',
       banners: [
-        { ico: '🏬', tAr: 'مجموعات ترويجية', tFr: 'Collections promo', dAr: 'عروض واجهة المعرض', dFr: 'Vitrine showroom', href: 'rizq_showroom.html?id=acc_promo_corp_rizq' },
-        { ico: '🛋️', tAr: 'قطع مميزة', tFr: 'Pièces vedettes', dAr: 'بانرات للمنتجات المعروضة', dFr: 'Bannières exposées', href: 'rizq_showroom.html?id=acc_promo_corp_rizq' },
+        { ico: '🏬', tAr: 'مجموعات ترويجية', tFr: 'Collections promo', dAr: 'عروض واجهة المعرض', dFr: 'Vitrine showroom', href: 'rizq_showroom.html?demo=1' },
+        { ico: '🛋️', tAr: 'قطع مميزة', tFr: 'Pièces vedettes', dAr: 'بانرات للمنتجات المعروضة', dFr: 'Bannières exposées', href: 'rizq_showroom.html?demo=1' },
         { ico: '🎬', tAr: 'فيديو ترويجي', tFr: 'Vidéo promo', dAr: 'موضع Rizq ADS للمعارض', dFr: 'Slot Rizq ADS', href: 'rizq_ads_info.html' },
         { ico: '✨', tAr: 'انضم كمعرض', tFr: 'Devenir showroom', dAr: 'واجهة ذهبية لمعرضك', dFr: 'Vitrine premium', href: 'rizq_landing_v8.html#pricing' }
       ]
@@ -62,8 +62,8 @@
       ctaHref: 'rizq_ads_info.html',
       video: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4',
       banners: [
-        { ico: '🏢', tAr: 'خدمات مكتبية', tFr: 'Services bureau', dAr: 'عروض ترويجية للخدمات', dFr: 'Services en promo', href: 'rizq_office.html?id=acc_promo_office_rizq' },
-        { ico: '📋', tAr: 'استشارات', tFr: 'Conseil', dAr: 'بانرات للخدمات المهنية', dFr: 'Bannières services', href: 'rizq_office.html?id=acc_promo_office_rizq' },
+        { ico: '🏢', tAr: 'خدمات مكتبية', tFr: 'Services bureau', dAr: 'عروض ترويجية للخدمات', dFr: 'Services en promo', href: 'rizq_office.html?demo=1' },
+        { ico: '📋', tAr: 'استشارات', tFr: 'Conseil', dAr: 'بانرات للخدمات المهنية', dFr: 'Bannières services', href: 'rizq_office.html?demo=1' },
         { ico: '🤝', tAr: 'شراكات', tFr: 'Partenariats', dAr: 'ترويج للشركات والمكاتب', dFr: 'Promo entreprises', href: 'rizq_ads_info.html' },
         { ico: '💼', tAr: 'انضم كمكتب', tFr: 'Devenir bureau', dAr: 'افتح مكتبك على رزق', dFr: 'Ouvrez votre bureau', href: 'rizq_landing_v8.html#pricing' }
       ]

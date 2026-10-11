@@ -1,24 +1,20 @@
-/* شريط ختامي فاخر يملأ فراغ العمود تحت المحتوى (محل / معرض / مكتب / شركة) */
+/* شريط ختامي — أسفل معلومات الواجهة وساعات العمل (قبل الباقات) */
 .rizq-close-band,
 .store-close-band{
-  margin-top:auto;
-  flex:1 1 auto;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  margin-inline:-4px;
-  margin-bottom:-4px;
-  padding:22px 18px 18px;
-  border-radius:16px;
+  max-width:1280px;
+  width:calc(100% - 24px);
+  margin:14px auto 0;
+  padding:16px 14px 14px;
+  border-radius:14px;
   background:
     radial-gradient(ellipse at 80% 0%, rgba(201,168,76,.18), transparent 55%),
     linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
   border:1px solid rgba(201,168,76,.32);
-  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 10px 28px rgba(13,27,42,.18);
+  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 8px 22px rgba(13,27,42,.14);
   color:#fff;
   position:relative;
   overflow:hidden;
-  min-height:180px;
+  box-sizing:border-box;
 }
 .rizq-close-band::before,
 .store-close-band::before{
@@ -82,7 +78,13 @@
 }
 @media(max-width:800px){
   .rizq-close-band,
-  .store-close-band{min-height:0;margin-top:22px;flex:0 0 auto}
+  .store-close-band{margin:10px 12px 0;width:auto;padding:12px}
+  .rizq-close-title,
+  .store-close-title{font-size:15px!important}
+  .rizq-close-desc,
+  .store-close-desc{font-size:11.5px!important;line-height:1.5}
   .rizq-close-pillars,
-  .store-close-pillars{grid-template-columns:1fr}
+  .store-close-pillars{grid-template-columns:1fr;gap:6px}
+  .rizq-close-pillar,
+  .store-close-pillar{padding:8px}
 }

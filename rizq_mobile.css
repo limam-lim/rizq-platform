@@ -378,12 +378,44 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
 
   .quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
-  .similar-grid,.dp-similar-grid,.cta-btns,
-  .store-badges,.store-meta{
+  .similar-grid,.dp-similar-grid,.cta-btns{
     display:flex!important;flex-direction:column!important;
     flex-wrap:nowrap!important;overflow-x:hidden!important;
     width:100%!important;max-width:100%!important;
     gap:12px!important;
+  }
+  /* شارات المحل/المعرض/المكتب تبقى صفاً مضغوطاً لا عموداً طويلاً */
+  .store-meta,
+  .store-badges,
+  .showroom-meta,
+  .showroom-badges,
+  .office-meta,
+  .office-badges{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    justify-content:center!important;
+    gap:6px!important;
+    margin-top:6px!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  .store-meta span,
+  .showroom-meta span,
+  .office-meta span{
+    font-size:10.5px!important;
+    white-space:nowrap!important;
+  }
+  .store-badges .badge,
+  .showroom-badges .badge,
+  .office-badges .badge{
+    font-size:10px!important;
+    padding:3px 7px!important;
+  }
+  .store-tagline,
+  .showroom-tagline{
+    margin-top:4px!important;
+    padding-top:6px!important;
   }
   /* بطاقات ترويجية → أصغر على الهاتف (عمودين مدمجين) */
   .rizq-feat-row,
@@ -1134,4 +1166,114 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
     padding:9px 6px!important;
     min-height:44px!important;
   }
+}
+
+/* ── محلات / مكاتب / معارض: هيدر ومساحات مضغوطة على الهاتف ── */
+@media(max-width:768px){
+  .store-hero,
+  .office-hero,
+  .showroom-hero{
+    min-height:0!important;
+    height:auto!important;
+  }
+  .store-hero .hero-cover,
+  .office-hero .hero-cover,
+  .showroom-hero .hero-cover,
+  .hero-cover{
+    padding:16px 12px 12px!important;
+    min-height:0!important;
+  }
+  .store-logo-wrap,
+  .office-logo,
+  .showroom-logo{
+    width:48px!important;
+    height:48px!important;
+    font-size:22px!important;
+  }
+  .store-profile,
+  .showroom-profile,
+  .office-profile{
+    gap:6px!important;
+    padding:4px 8px!important;
+  }
+  .store-name,
+  #store-name-el,
+  #hero-office-name,
+  .showroom-name,
+  #sr-name{
+    font-size:16px!important;
+    line-height:1.2!important;
+    margin:0!important;
+  }
+  .store-tagline,
+  #store-tagline-el,
+  #hero-office-spec,
+  .showroom-tagline{
+    font-size:11px!important;
+    margin-top:2px!important;
+    padding-top:4px!important;
+  }
+  .store-eyebrow,
+  .showroom-eyebrow,
+  .office-eyebrow{
+    margin-bottom:2px!important;
+    font-size:9.5px!important;
+  }
+  .store-hero .hero-floor,
+  .store-hero .hero-scroll-cue,
+  .store-hero .hero-glints,
+  .office-hero .hero-floor,
+  .office-hero .hero-scroll-cue,
+  .office-hero .hero-glints,
+  .showroom-hero .hero-floor,
+  .showroom-hero .hero-scroll-cue,
+  .showroom-hero .hero-glints,
+  .hero-floor,
+  .hero-scroll-cue,
+  .hero-glints{
+    display:none!important;
+  }
+  #store-packages,
+  .pkg-section,
+  #office-packages,
+  #pkg-section{
+    padding:22px 12px 28px!important;
+  }
+  #store-packages h2,
+  .pkg-section h2,
+  #office-packages h2,
+  #pkg-section h2{
+    font-size:clamp(15px,4vw,19px)!important;
+    margin-bottom:6px!important;
+  }
+  .portal-pkg-head,
+  .pkg-section-head,
+  #store-packages > div > div:first-child{
+    margin-bottom:14px!important;
+  }
+  #store-packages .rpkg-card,
+  #store-packages .pricing-card,
+  .pkg-section .rpkg-card,
+  .pkg-section .pricing-card,
+  .pkg-section .pkg-card,
+  .pkg-section .rizq-pkg-card{
+    padding:12px 10px!important;
+    border-radius:11px!important;
+    min-height:0!important;
+  }
+  .info-card{
+    padding:12px!important;
+    margin-bottom:8px!important;
+    border-radius:12px!important;
+  }
+  .info-card-title{
+    font-size:12.5px!important;
+    margin-bottom:8px!important;
+    padding-bottom:7px!important;
+  }
+  .main-wrap{
+    padding-top:10px!important;
+    padding-bottom:72px!important;
+  }
+  #rizq-demo-ribbon{display:none!important}
 }
