@@ -448,14 +448,14 @@ html[dir="ltr"] .section-header .section-desc{
 
 /* بطاقة عنوان الباقات — نفس مقاس بقية عناوين الأقسام + حافة ذهبية */
 .pricing-section > .section-header{
-  width:min(100%,var(--rizq-section-header-w,560px)) !important;
-  max-width:var(--rizq-section-header-w,560px) !important;
-  height:var(--rizq-section-header-h,118px);
-  min-height:var(--rizq-section-header-h,118px);
-  max-height:var(--rizq-section-header-h,118px);
+  width:min(100%,var(--rizq-section-header-w,480px)) !important;
+  max-width:var(--rizq-section-header-w,480px) !important;
+  height:var(--rizq-section-header-h,86px);
+  min-height:var(--rizq-section-header-h,86px);
+  max-height:var(--rizq-section-header-h,86px);
   margin-left:auto;
   margin-right:auto;
-  margin-bottom:22px;
+  margin-bottom:16px;
   box-sizing:border-box;
   overflow:hidden;
 }
