@@ -27,9 +27,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.6"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.4"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=28.3"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=30.7"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.5"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
 <script>
@@ -2757,26 +2757,44 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-cta-wrap{margin:0 auto;width:100%;max-width:none}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
   .hero-cta-micro{text-align:center;max-width:100%;padding:0 4px}
-  /* إعلانات مباشرة: شريط أفقي بنوافذ صغيرة — حركة CSS فقط بلا scroll-snap (كان يرتعد).
-     direction:ltr حتى لا يختفي المسار تحت RTL الصفحة. */
-  #hero-listings .cards-track-wrap{
+  /* هاتف: الأشرطة من حافة الشاشة (بدون هامش سطح المكتب 1سم) + تصغير خفيف */
+  :root{--rizq-strip-inset:0px}
+  .hero > #hero-listings.hero-promo-strip{
+    margin:4px 0 0!important;padding:6px 0 16px!important;width:100%!important;
+  }
+  /* كبسولة «مباشر» — شريط بعرض الهاتف من الحافة إلى الحافة */
+  #hero-listings .listings-label,
+  .hero-listings-section .listings-label{
+    margin:0 0 8px!important;padding:0!important;width:100%!important;
+  }
+  #hero-listings .listings-label > span,
+  .listings-label > span{
+    display:flex!important;width:100%!important;max-width:none!important;
+    box-sizing:border-box!important;justify-content:center!important;
+    border-radius:0!important;font-size:11px!important;
+    padding:7px 12px!important;gap:7px!important;
+  }
+  /* إعلانات مباشرة: شريط أفقي بنوافذ أصغر — من حافة الهاتف */
+  #hero-listings .cards-track-wrap,
+  .hero > #hero-listings .cards-track-wrap,
+  #hero-listings.hero-promo-strip .cards-track-wrap{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
     direction:ltr!important;border-radius:0!important;
-    width:calc(100% - (2 * var(--rizq-strip-inset)))!important;margin:0 var(--rizq-strip-inset)!important;padding:6px 0!important;
+    width:100%!important;max-width:100%!important;margin:0!important;padding:4px 0!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
   #hero-listings .cards-track-wrap::after{display:none!important;content:none!important}
   #hero-listings .cards-track{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-    width:max-content!important;max-width:none!important;gap:12px!important;
+    width:max-content!important;max-width:none!important;gap:8px!important;
     direction:ltr!important;padding:2px 0!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
   #hero-listings .cards-track .ad-card{
-    width:152px!important;min-width:152px!important;max-width:152px!important;
-    flex:0 0 152px!important;scroll-snap-align:none!important;border-radius:14px!important;
+    width:138px!important;min-width:138px!important;max-width:138px!important;
+    flex:0 0 138px!important;scroll-snap-align:none!important;border-radius:12px!important;
   }
   html[dir="rtl"] #hero-listings .cards-track .ad-card{direction:rtl!important}
   html[dir="ltr"] #hero-listings .cards-track .ad-card{direction:ltr!important}
@@ -2787,14 +2805,13 @@ html[dir="ltr"] .listings-section .section-desc{
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
   #hero-listings .cards-track .ad-card-img{
-    height:96px!important;min-height:96px!important;max-height:96px!important;
-    aspect-ratio:auto!important;border-radius:14px 14px 0 0!important;
+    height:84px!important;min-height:84px!important;max-height:84px!important;
+    aspect-ratio:auto!important;border-radius:12px 12px 0 0!important;
   }
-  #hero-listings .cards-track .ad-card-body{padding:8px!important}
-  #hero-listings .cards-track .ad-title{font-size:11px!important}
-  #hero-listings .cards-track .ad-price{font-size:10.5px!important;padding:2px 7px!important}
+  #hero-listings .cards-track .ad-card-body{padding:6px 7px!important}
+  #hero-listings .cards-track .ad-title{font-size:10.5px!important}
+  #hero-listings .cards-track .ad-price{font-size:10px!important;padding:2px 6px!important}
   #hero-listings .cards-track .ad-hover-detail{display:none!important}
-  .listings-label>span{font-size:11px!important;padding:7px 12px 7px 10px!important;gap:7px!important}
   .live-capsule{padding:2px 8px 2px 6px!important;gap:5px!important}
   .live-capsule-txt{font-size:10px!important}
   .live-capsule-light{width:6px!important;height:6px!important}

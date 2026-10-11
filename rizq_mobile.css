@@ -520,22 +520,39 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     flex:none!important;width:100%!important;max-width:none!important;
   }
 
+  :root{--rizq-strip-inset:0px}
   .hero-listings-section{
-    padding-bottom:28px!important;
+    padding-bottom:18px!important;
     overflow:hidden!important;
+    width:100%!important;
+    margin-inline:0!important;
+  }
+  #hero-listings .listings-label,
+  .listings-label{
+    margin:0 0 8px!important;padding:0!important;width:100%!important;
+  }
+  #hero-listings .listings-label > span,
+  .listings-label > span{
+    display:flex!important;width:100%!important;max-width:none!important;
+    border-radius:0!important;box-sizing:border-box!important;
+    justify-content:center!important;padding:7px 12px!important;
+    font-size:11px!important;gap:7px!important;
   }
   /* Marquee: overflow:hidden + CSS transform only — no scroll/snap (was jittering).
-     direction:ltr so translateX(-50%) stays on-screen under page RTL. */
-  .cards-track-wrap{
+     direction:ltr so translateX(-50%) stays on-screen under page RTL.
+     على الهاتف: بعرض الشاشة من الحافة بلا هامش سطح مكتب. */
+  .cards-track-wrap,
+  #hero-listings .cards-track-wrap{
     overflow:hidden!important;
     overflow-x:hidden!important;
     overflow-y:hidden!important;
     width:100%!important;
     max-width:100%!important;
+    margin:0!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
     border-radius:0!important;
-    padding:6px 0!important;
+    padding:4px 0!important;
     scrollbar-width:none;
     -webkit-overflow-scrolling:auto;
     border:none!important;
@@ -557,26 +574,26 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     will-change:transform;
     backface-visibility:hidden;
     transform:translate3d(0,0,0);
-    gap:12px!important;
-    padding-inline:12px!important;
+    gap:8px!important;
+    padding-inline:0!important;
   }
   .cards-track .ad-card{
-    width:152px!important;
-    min-width:152px!important;
-    max-width:152px!important;
-    flex:0 0 152px!important;
+    width:138px!important;
+    min-width:138px!important;
+    max-width:138px!important;
+    flex:0 0 138px!important;
     height:auto!important;
     scroll-snap-align:none!important;
     direction:rtl!important;
-    border-radius:14px!important;
+    border-radius:12px!important;
   }
   .cards-track .ad-card .ad-card-img{
-    height:96px!important;
-    min-height:96px!important;
-    max-height:96px!important;
+    height:84px!important;
+    min-height:84px!important;
+    max-height:84px!important;
     aspect-ratio:auto!important;
-    font-size:32px!important;
-    border-radius:14px 14px 0 0!important;
+    font-size:28px!important;
+    border-radius:12px 12px 0 0!important;
   }
   .cards-track .ad-card .ad-card-body{padding:8px!important}
   .cards-track .ad-card .ad-title{font-size:11px!important;margin-bottom:6px!important;-webkit-line-clamp:2}

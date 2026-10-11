@@ -880,6 +880,27 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
 }
+@media (max-width:768px){
+  /* هاتف: شريط «مباشر» بعرض الشاشة من الحافة — ليس كبسولة سطح مكتب */
+  #hero-listings .listings-label{margin:0 0 8px;padding:0;width:100%}
+  #hero-listings .listings-label > span{
+    display:flex!important;
+    width:100%!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+    justify-content:center!important;
+    border-radius:0!important;
+    padding:7px 12px!important;
+    gap:7px!important;
+    font-size:11px!important;
+  }
+  #hero-listings .cards-track-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:4px 0!important;
+  }
+}
 #hero-listings .live-capsule{
   display:inline-flex!important;
   align-items:center!important;

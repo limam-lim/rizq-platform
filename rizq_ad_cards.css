@@ -487,29 +487,35 @@
   .rzq-adx-media.has-multi .rzq-adx-nav{
     opacity:.8;pointer-events:auto;
   }
-  .ad-card .rzq-adx-media{min-height:118px}
-  .listing-card .rzq-adx-media{min-height:114px}
-  .rzq-adx-fav{width:26px;height:26px}
-  .rzq-adx-nav{width:24px;height:24px}
-  .rzq-adx-price-pill{font-size:11px;padding:4px 8px;border-radius:3px;font-weight:900}
+  .ad-card .rzq-adx-media{min-height:96px}
+  .listing-card .rzq-adx-media{min-height:96px}
+  .rzq-adx-fav{width:24px;height:24px}
+  .rzq-adx-nav{width:22px;height:22px}
+  .rzq-adx-price-pill{font-size:10px;padding:3px 7px;border-radius:3px;font-weight:900}
   .rzq-adx-tel,
-  .rzq-adx-actions .rzq-adx-wa{width:26px;height:26px}
+  .rzq-adx-actions .rzq-adx-wa{width:24px;height:24px}
+  /* شريط المباشر على الهاتف: بطاقات أصغر وبعرض الشاشة (بدون هامش سطح مكتب) */
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media){
-    width:164px!important;
-    min-width:164px!important;
-    max-width:164px!important;
-    flex:0 0 164px!important;
+    width:138px!important;
+    min-width:138px!important;
+    max-width:138px!important;
+    flex:0 0 138px!important;
+    border-radius:12px!important;
   }
   #hero-listings .cards-track .ad-card .rzq-adx-media{
-    min-height:114px!important;
+    min-height:96px!important;
     height:auto!important;
     max-height:none!important;
-    aspect-ratio:1.15 / 1!important;
+    aspect-ratio:1.12 / 1!important;
   }
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:10px 7px 7px!important;
+    padding:7px 6px 6px!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{
+    font-size:10.5px!important;
   }
 }
 
