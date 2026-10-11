@@ -948,7 +948,7 @@ footer{
   <div class="store-video-spotlight-inner" id="store-video-spotlight-inner">
     <div class="store-video-copy">
       <h2><span id="spotlight-store-name">المحّل</span> — <span id="spotlight-video-heading">فيديو تعريفي</span></h2>
-      <p id="spotlight-store-blurb">تعرّف على المحل ومنتجاته — الفيديوهات المحفوظة من لوحة التحكم حسب باقتك.</p>
+      <p id="spotlight-store-blurb">تعرّف على المحل ومنتجاته في مقاطع قصيرة.</p>
     </div>
     <div class="store-video-frames" id="store-video-frames">
       <div class="store-video-frame" id="spotlight-intro-frame"><div id="spotlight-intro-video-mount"></div></div>
@@ -1824,7 +1824,7 @@ function rizqShare(title, url) {
         ? (fr ? 'vidéos de la boutique' : 'فيديوهات المحل')
         : (fr ? 'vidéo de présentation' : 'فيديو تعريفي');
       if(blurb) blurb.textContent = (okIntro && okExtra)
-        ? (fr ? 'Vidéo de présentation + vidéo supplémentaire incluses dans votre forfait.' : 'فيديو تعريفي + فيديو إضافي حسب باقتك — مقطعان مختلفان من لوحة التحكم.')
+        ? (fr ? 'Vidéo de présentation et vidéo supplémentaire de la boutique.' : 'فيديو تعريفي وفيديو إضافي من المحل.')
         : (fr ? 'Découvrez la boutique en moins de 20 secondes.' : 'تعرّف على المحل ومنتجاته في أقل من 20 ثانية.');
       spot.style.display = okIntro ? '' : 'none';
     }

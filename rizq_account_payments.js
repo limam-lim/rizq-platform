@@ -272,7 +272,7 @@
 
       sheet.innerHTML =
         '<div class="rzq-pay-head"><div><h3>' + (fr ? 'Choisir un moyen de paiement' : 'اختر وسيلة الدفع') + '</h3>'
-        + '<p>' + (fr ? ('Banques et portefeuilles de « ' + esc(seller) + ' »') : ('بنوك ومحافظ « ' + esc(seller) + ' » من داشبورده')) + '</p></div>'
+        + '<p>' + (fr ? ('Banques et portefeuilles de « ' + esc(seller) + ' »') : ('بنوك ومحافظ « ' + esc(seller) + ' »')) + '</p></div>'
         + '<button type="button" class="rzq-pay-x" data-pay-close aria-label="close">✕</button></div>'
         + '<div class="rzq-pay-body"><div class="rzq-pay-step">' + (fr ? 'Étape 1 — Choisissez la banque / le portefeuille' : 'الخطوة 1 — اختر البنك أو المحفظة') + '</div>'
         + listHtml
