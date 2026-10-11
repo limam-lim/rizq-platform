@@ -451,29 +451,29 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       </div>
 
       <div class="info-card" id="showroom-payment-methods" style="display:block">
-        <div class="info-card-title">🏦 طرق الدفع</div>
+        <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
         <div id="showroom-pay-box"></div>
       </div>
 
       <div class="info-card" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:block!important">
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:6px">📩 طلب من المعرض</div>
         <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.</p>
         <div id="sr-req-form" style="display:block!important">
-          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
+          <label for="rf-name" id="sr-lbl-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
           <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
+          <label for="rf-phone" id="sr-lbl-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
           <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
+          <label for="rf-whatsapp" id="sr-lbl-wa" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
           <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
+          <label for="rf-email" id="sr-lbl-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
           <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
+          <label for="rf-service" id="sr-lbl-svc" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
           <input class="req-input" id="rf-service" placeholder="مثال: استفسار عن سيارة أو جهاز" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمعرض</label>
+          <label for="rf-msg" id="sr-lbl-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمعرض</label>
           <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
-          <p style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-          <button type="button" onclick="submitShowroomServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمعرض</button>
+          <p id="sr-docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+          <button type="button" id="sr-req-submit" onclick="submitShowroomServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمعرض</button>
         </div>
       </div>
 
@@ -509,12 +509,12 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
           <button class="cat-tab" onclick="filterCat(this,'معدات')" id="cat-equip">⚙️ معدات</button>
           <button class="cat-tab" onclick="filterCat(this,'مجوهرات')" id="cat-jewel">💎 مجوهرات</button>
         </div>
-        <div class="cat-tabs-shop" aria-label="المفضلة والسلة">
+        <div class="cat-tabs-shop" id="sr-shop-cluster" aria-label="المفضلة والسلة">
           <button type="button" class="sss-btn sss-wish" onclick="toggleShowroomWish()" id="sr-wish-btn">
-            <span>❤</span><span>المفضلة</span><span class="sss-count" id="sr-wish-count" hidden>0</span>
+            <span>❤</span><span id="sr-wish-lbl">المفضلة</span><span class="sss-count" id="sr-wish-count" hidden>0</span>
           </button>
           <a class="sss-btn sss-cart" href="rizq_cart.html" id="sr-cart-btn">
-            <span>🛒</span><span>السلة</span><span class="sss-count" id="sr-cart-count" hidden>0</span>
+            <span>🛒</span><span id="sr-cart-lbl">السلة</span><span class="sss-count" id="sr-cart-count" hidden>0</span>
           </a>
         </div>
       </div>
@@ -573,17 +573,17 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <!-- بطاقة الضمان — بعد الموقع وساعات العمل (أسفل الواجهة قبل الباقات) -->
 <section class="rizq-close-band" id="showroom-close-band" aria-label="ضمانات المعرض">
   <div class="rizq-close-inner">
-    <p class="rizq-close-eyebrow">RIZQ · تجربة آمنة</p>
-    <h3 class="rizq-close-title"><span>تصفّح بثقة</span> من واجهة هذا المعرض</h3>
-    <p class="rizq-close-desc">رزق وسيط نشر فقط — المعاينة والدفع والتسليم تتم مباشرة مع المعرض. تواصل عبر غرفة الطلبات أو المحادثة الآمنة.</p>
+    <p class="rizq-close-eyebrow" id="sr-close-eyebrow">RIZQ · تجربة آمنة</p>
+    <h3 class="rizq-close-title"><span id="sr-close-title-gold">تصفّح بثقة</span> <span id="sr-close-title-rest">من واجهة هذا المعرض</span></h3>
+    <p class="rizq-close-desc" id="sr-close-desc">رزق وسيط نشر فقط — المعاينة والدفع والتسليم تتم مباشرة مع المعرض. تواصل عبر غرفة الطلبات أو المحادثة الآمنة.</p>
     <div class="rizq-close-pillars">
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt">افحص العرض مع المعرض قبل أي تحويل</div></div>
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">طلب أو محادثة داخل رزق</div></div>
-      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏛️</div><div class="rizq-close-pillar-ttl">استلام أو توصيل</div><div class="rizq-close-pillar-txt">اتفق مع المعرض على الأنسب لك</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl" id="sr-close-p1-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt" id="sr-close-p1-txt">افحص العرض مع المعرض قبل أي تحويل</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl" id="sr-close-p2-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt" id="sr-close-p2-txt">طلب أو محادثة داخل رزق</div></div>
+      <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏛️</div><div class="rizq-close-pillar-ttl" id="sr-close-p3-ttl">استلام أو توصيل</div><div class="rizq-close-pillar-txt" id="sr-close-p3-txt">اتفق مع المعرض على الأنسب لك</div></div>
     </div>
     <div class="rizq-close-ctas">
-      <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('catalog-section')?.scrollIntoView({behavior:'smooth'})">تصفّح الكتالوج</button>
-      <button type="button" class="rizq-close-cta ghost" onclick="document.getElementById('showroom-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+      <button type="button" class="rizq-close-cta primary" id="sr-close-cta-cat" onclick="document.getElementById('catalog-section')?.scrollIntoView({behavior:'smooth'})">تصفّح الكتالوج</button>
+      <button type="button" class="rizq-close-cta ghost" id="sr-close-cta-desk" onclick="document.getElementById('showroom-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
     </div>
   </div>
 </section>
@@ -618,7 +618,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       <p class="footer-desc" id="ft-desc">رزق — سوق موريتانيا الإلكتروني. نربط المعارض الراقية بالمشترين بسهولة وأمان.</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap">
         <span id="ft-netlabel" style="color:rgba(255,255,255,.85);font-size:11px">على رزق:</span>
-        <span class="telecom-tag">ثقة</span><span class="telecom-tag">أمان</span><span class="telecom-tag">شفافية</span>
+        <span class="telecom-tag" id="ft-tag-trust">ثقة</span><span class="telecom-tag" id="ft-tag-safe">أمان</span><span class="telecom-tag" id="ft-tag-clear">شفافية</span>
       </div>
     </div>
     <div>
@@ -1118,8 +1118,16 @@ function applyAccountData(){
   }
   if(_acc.thumb){
     var _logoEl = document.getElementById('showroom-logo');
-    if(_logoEl){
-      _logoEl.innerHTML = '<img src="'+esc(_acc.thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+    var _thumb = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl)
+      ? RizqStoreCommerce.safeMediaUrl(_acc.thumb) : '';
+    if(!_thumb){
+      try {
+        var _tu = String(_acc.thumb||'').trim();
+        if(_tu && !/[\s<>"']/.test(_tu) && !/javascript:/i.test(_tu) && (/^https?:\/\//i.test(_tu) || _tu.charAt(0)==='/' || /^data:image\//i.test(_tu))) _thumb = _tu;
+      } catch(eT){}
+    }
+    if(_logoEl && _thumb){
+      _logoEl.innerHTML = '<img src="'+esc(_thumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
     }
   } else if(_acc.logo_emoji || _acc.logo) {
     document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏛️';
@@ -1139,8 +1147,15 @@ function applyAccountData(){
 /* فيديو تعريفي — يُستدعى عند التحميل وبعد applyAccountData */
 function mountShowroomIntroVideo(){
   if(!_showroomId || !window.RizqIntroVideo) return;
+  var fr = _lang === 'fr';
   var opts = {
-    mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+    mountOpts: {
+      title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
+      linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
+      playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
+      mutedLabel: fr ? 'Activer le son' : 'اضغط لتفعيل الصوت',
+      unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+    }
   };
   if(_acc && _acc.promo_video) opts.url = _acc.promo_video;
   RizqIntroVideo.loadAndMountForAccount(_showroomId, opts);
@@ -1536,14 +1551,72 @@ function applyLang(){
   var discP1 = document.getElementById('disc-p1');
   var discP2 = document.getElementById('disc-p2');
   var discClose = document.getElementById('disc-close-btn');
-  if (discP1) discP1.style.display = isFr ? 'none' : 'block';
-  if (discP2) discP2.style.display = isFr ? 'block' : 'none';
+  if (discP1) {
+    discP1.style.display = isFr ? 'none' : 'block';
+    discP1.setAttribute('aria-hidden', isFr ? 'true' : 'false');
+    if (isFr) discP1.setAttribute('hidden', ''); else discP1.removeAttribute('hidden');
+  }
+  if (discP2) {
+    discP2.style.display = isFr ? 'block' : 'none';
+    discP2.setAttribute('aria-hidden', isFr ? 'false' : 'true');
+    if (!isFr) discP2.setAttribute('hidden', ''); else discP2.removeAttribute('hidden');
+  }
   if (discClose) discClose.textContent = isFr ? "J'ai compris — Fermer" : 'فهمت — أغلق';
   var discH2 = document.querySelector('#disc-overlay h2[data-t-fr]');
   if (discH2) {
     if (!discH2.hasAttribute('data-t-ar')) discH2.setAttribute('data-t-ar', discH2.innerHTML);
     discH2.innerHTML = isFr ? discH2.getAttribute('data-t-fr') : discH2.getAttribute('data-t-ar');
   }
+  // Nav cart + shop cluster
+  _setTxt('sr-cart-link', '🛒 السلة', '🛒 Panier');
+  _setTxt('sr-wish-lbl', 'المفضلة', 'Favoris');
+  _setTxt('sr-cart-lbl', 'السلة', 'Panier');
+  var shopCl = document.getElementById('sr-shop-cluster');
+  if (shopCl) shopCl.setAttribute('aria-label', isFr ? 'Favoris et panier' : 'المفضلة والسلة');
+  // Payments + service desk
+  _setTxt('sr-pay-title', '🏦 طرق الدفع', '🏦 Moyens de paiement');
+  _setTxt('sr-desk-eyebrow', 'SERVICE DESK · غرفة الطلبات', 'SERVICE DESK · Demandes');
+  _setTxt('sr-req-title', '📩 طلب من المعرض', '📩 Demande au showroom');
+  _setTxt('sr-req-hint', 'أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.', 'Entrez votre nom et téléphone — vos données vont au showroom. Documents via WhatsApp ou e-mail.');
+  _setTxt('sr-lbl-name', 'الاسم الكامل *', 'Nom complet *');
+  _setTxt('sr-lbl-phone', 'رقم الهاتف *', 'Téléphone *');
+  _setTxt('sr-lbl-wa', 'واتساب (إن اختلف)', 'WhatsApp (si différent)');
+  _setTxt('sr-lbl-email', 'البريد الإلكتروني (اختياري)', 'E-mail (optionnel)');
+  _setTxt('sr-lbl-svc', 'المنتج / الموضوع', 'Produit / objet');
+  _setTxt('sr-lbl-msg', 'رسالتك للمعرض', 'Votre message');
+  _setTxt('sr-docs-hint', '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.', '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l’envoi.');
+  _setTxt('sr-req-submit', '📤 إرسال الطلب للمعرض', '📤 Envoyer la demande');
+  var ph = isFr ? {
+    'rf-name':'Ex. : Ahmed Ould Mohamed','rf-phone':'Ex. : 22244112233',
+    'rf-whatsapp':'Même numéro ou autre WhatsApp','rf-service':'Ex. : demande voiture ou appareil',
+    'rf-msg':'Décrivez brièvement votre besoin…'
+  } : {
+    'rf-name':'مثال: أحمد ولد محمد','rf-phone':'مثال: 22244112233',
+    'rf-whatsapp':'نفس الرقم أو رقم واتساب آخر','rf-service':'مثال: استفسار عن سيارة أو جهاز',
+    'rf-msg':'اكتب باختصار ماذا تحتاج…'
+  };
+  Object.keys(ph).forEach(function(id){ var el=document.getElementById(id); if(el) el.placeholder=ph[id]; });
+  // Close band (recent luxury UX)
+  var closeBand = document.getElementById('showroom-close-band');
+  if (closeBand) closeBand.setAttribute('aria-label', isFr ? 'Garanties showroom' : 'ضمانات المعرض');
+  _setTxt('sr-close-eyebrow', 'RIZQ · تجربة آمنة', 'RIZQ · Expérience sûre');
+  _setTxt('sr-close-title-gold', 'تصفّح بثقة', 'Parcourez en confiance');
+  _setTxt('sr-close-title-rest', 'من واجهة هذا المعرض', 'depuis ce showroom');
+  _setTxt('sr-close-desc', 'رزق وسيط نشر فقط — المعاينة والدفع والتسليم تتم مباشرة مع المعرض. تواصل عبر غرفة الطلبات أو المحادثة الآمنة.', 'Rizq est uniquement une plateforme de diffusion — visite, paiement et livraison se font directement avec le showroom.');
+  _setTxt('sr-close-p1-ttl', 'معاينة قبل الدفع', 'Vérifier avant de payer');
+  _setTxt('sr-close-p1-txt', 'افحص العرض مع المعرض قبل أي تحويل', 'Inspectez l’offre avec le showroom avant tout transfert');
+  _setTxt('sr-close-p2-ttl', 'تواصل مباشر', 'Contact direct');
+  _setTxt('sr-close-p2-txt', 'طلب أو محادثة داخل رزق', 'Demande ou messagerie Rizq');
+  _setTxt('sr-close-p3-ttl', 'استلام أو توصيل', 'Retrait ou livraison');
+  _setTxt('sr-close-p3-txt', 'اتفق مع المعرض على الأنسب لك', 'Convenez du mode avec le showroom');
+  _setTxt('sr-close-cta-cat', 'تصفّح الكتالوج', 'Voir le catalogue');
+  _setTxt('sr-close-cta-desk', '📩 غرفة الطلبات', '📩 Service Desk');
+  _setTxt('ft-tag-trust', 'ثقة', 'Confiance');
+  _setTxt('ft-tag-safe', 'أمان', 'Sécurité');
+  _setTxt('ft-tag-clear', 'شفافية', 'Transparence');
+  var vidSec = document.getElementById('video-intro-section');
+  if (vidSec) vidSec.setAttribute('aria-label', isFr ? 'Vidéo de présentation' : 'فيديو تعريفي');
+  try { mountShowroomIntroVideo(); } catch (eVid) {}
 }
 
 /* ══ INIT ══ */
