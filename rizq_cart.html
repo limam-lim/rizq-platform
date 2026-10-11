@@ -396,7 +396,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_store_commerce.js?v=26.6" defer></script>
   <script src="rizq_stock.js" defer></script>
-  <script src="rizq_account_payments.js" defer></script>
+  <script src="rizq_account_payments.js?v=26.8" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
@@ -877,6 +877,61 @@ function selectPayment(method) {
     document.getElementById('pay-'+m)?.classList.toggle('selected', m===method);
   });
   updateOrderTerms();
+  var box = document.getElementById('cart-seller-payments');
+  if(method === 'bank'){
+    openCartBankPicker();
+    if(box) box.style.display = '';
+  } else if(box){
+    box.style.display = 'none';
+  }
+}
+
+function _demoCartPayments(){
+  return [
+    { type:'bankily', bank:'Bankily', code:'44556677', phone:'+22244882212', account:'', note:'اذكر اسمك بعد التحويل' },
+    { type:'sedad', bank:'Sedad', code:'998877', phone:'+22233001122', account:'' },
+    { type:'bank', bank:'BCI', code:'', phone:'', account:'MR13 0001 2345 6789 0123 4567 890', note:'تحويل بنكي باسم المحل' }
+  ];
+}
+
+function openCartBankPicker(){
+  var isFr = document.documentElement.lang === 'fr';
+  var methods = window._rizqCartSellerPayments;
+  if(!methods || !methods.length){
+    var sid = _cartSellerId();
+    if(sid && window.RizqAccountPayments){
+      methods = RizqAccountPayments.getLocal(sid) || [];
+    }
+  }
+  if(!methods || !methods.length){
+    try{
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      var acc = accs.find(function(a){ return a && String(a.id) === String(_cartSellerId()); });
+      if(acc && Array.isArray(acc.paymentMethods)) methods = acc.paymentMethods;
+    }catch(e){}
+  }
+  if(!methods || !methods.length) methods = _demoCartPayments();
+  window._rizqCartSellerPayments = methods;
+  if(window.RizqAccountPayments && typeof RizqAccountPayments.openBuyerPicker === 'function'){
+    RizqAccountPayments.openBuyerPicker(methods, {
+      fr: isFr,
+      sellerName: window._rizqCartSellerName || (isFr ? 'Boutique Al-Nour' : 'متجر النور'),
+      onSelect: function(m){
+        window._rizqCartSelectedPay = m || null;
+        var box = document.getElementById('cart-seller-payments');
+        if(box && m){
+          RizqAccountPayments.renderPublic(box, [m], { fr: isFr });
+          box.style.display = '';
+        }
+        var isAr = !isFr;
+        if(typeof showToast === 'function'){
+          showToast(isAr
+            ? ('✅ تم اختيار: ' + (m.bank || m.type))
+            : ('✅ Moyen choisi : ' + (m.bank || m.type)));
+        }
+      }
+    });
+  }
 }
 
 const ORDER_TERMS_TEXT = {
@@ -968,30 +1023,51 @@ function _cartSellerId(){
 function loadCartSellerPayments(){
   var box = document.getElementById('cart-seller-payments');
   if(!box) return;
-  var storeId = _cartSellerId();
-  if(!storeId || !window.RIZQ_BACKEND_BASE){
-    box.style.display = 'none';
-    return;
+  box.style.display = 'none';
+  var storeId = _cartSellerId() || 'demo_store';
+  var isFr = document.documentElement.lang === 'fr';
+
+  function applyPayments(methods, name){
+    window._rizqCartSellerPayments = Array.isArray(methods) ? methods : [];
+    if(name) window._rizqCartSellerName = name;
+    var note = document.getElementById('cart-pay-trust-note');
+    if(note && window._rizqCartSellerName){
+      note.textContent = isFr
+        ? ('Le virement va directement à « ' + window._rizqCartSellerName + ' » — Rizq n’encaisse pas vos achats.')
+        : ('التحويل يصل مباشرة إلى « ' + window._rizqCartSellerName + ' » — رزق لا يستلم ثمن مشترياتك.');
+    }
   }
+
+  /* مصادر محلية أولاً (داشبورد المشترك) ثم API إن وُجد */
+  if(window.RizqAccountPayments){
+    var local = RizqAccountPayments.getLocal(storeId);
+    if(local && local.length) applyPayments(local, window._rizqCartSellerName || '');
+  }
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    var acc = accs.find(function(a){ return a && String(a.id) === String(storeId); });
+    if(acc){
+      if(Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) applyPayments(acc.paymentMethods, acc.name || '');
+      else if(acc.name) window._rizqCartSellerName = acc.name;
+    }
+  }catch(e){}
+  if((!window._rizqCartSellerPayments || !window._rizqCartSellerPayments.length) && (storeId === 'demo_store' || !storeId)){
+    applyPayments(_demoCartPayments(), isFr ? 'Boutique Al-Nour' : 'متجر النور');
+  }
+
+  if(!window.RIZQ_BACKEND_BASE) return;
   var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
   var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};
   fetch(base + '/api/accounts/public', { headers: headers })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
-      var acc = (data && data.accounts || []).find(function(a){ return a && a.id === storeId; });
-      window._rizqCartSellerPayments = (acc && Array.isArray(acc.paymentMethods)) ? acc.paymentMethods : [];
-      window._rizqCartSellerName = (acc && acc.name) || '';
-      var isFr = document.documentElement.lang === 'fr';
-      if(typeof RizqAccountPayments !== 'undefined'){
-        RizqAccountPayments.renderPublic(box, window._rizqCartSellerPayments, { fr: isFr });
+      var a = (data && data.accounts || []).find(function(x){ return x && String(x.id) === String(storeId); });
+      if(a && Array.isArray(a.paymentMethods) && a.paymentMethods.length){
+        applyPayments(a.paymentMethods, a.name || '');
+      } else if(a && a.name){
+        window._rizqCartSellerName = a.name;
       }
-      var note = document.getElementById('cart-pay-trust-note');
-      if(note && window._rizqCartSellerName){
-        note.textContent = isFr
-          ? ('Le virement va directement à « ' + window._rizqCartSellerName + ' » — Rizq n’encaisse pas vos achats.')
-          : ('التحويل يصل مباشرة إلى « ' + window._rizqCartSellerName + ' » — رزق لا يستلم ثمن مشترياتك.');
-      }
-    }).catch(function(){ box.style.display = 'none'; });
+    }).catch(function(){});
 }
 
 function issueCartPrefacture(){

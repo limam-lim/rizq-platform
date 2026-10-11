@@ -1740,6 +1740,8 @@ function normalizeAccountPaymentMethods(arr) {
     type: ACCOUNT_PAYMENT_TYPES.includes(m && m.type) ? m.type : 'bank',
     bank: String((m && m.bank) || '').slice(0, 120),
     code: String((m && m.code) || '').slice(0, 120),
+    phone: String((m && m.phone) || '').slice(0, 40),
+    account: String((m && (m.account || m.iban || m.accountNumber)) || '').slice(0, 80),
     note: String((m && m.note) || '').slice(0, 300),
     addedAt: String((m && m.addedAt) || new Date().toISOString()).slice(0, 30),
   })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');

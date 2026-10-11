@@ -350,7 +350,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_store_commerce.js?v=26.8"></script>
-<script src="rizq_account_payments.js"></script>
+<script src="rizq_account_payments.js?v=26.8"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
 
@@ -917,12 +917,21 @@ textarea.form-input{resize:vertical;min-height:90px}
             <div id="mypay-bank-fields">
               <div style="margin-bottom:10px">
                 <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / الخدمة</label>
-                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بيماه..."/>
+                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بنكيلي، سداد..."/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">🔢 رمز الدفع (إن وُجد)</label>
+                <input id="mypay-code" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" data-ph="mypay-code-ph" placeholder="مثال: 44556677" dir="ltr"/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-phone-label">📞 رقم الهاتف المرتبط بالدفع</label>
+                <input id="mypay-phone" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="+222 …" dir="ltr"/>
               </div>
               <div>
-                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">الرمز / رقم الحساب</label>
-                <input id="mypay-code" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" data-ph="mypay-code-ph" placeholder="مثال: 12345678" dir="ltr"/>
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-account-label">🏦 رقم الحساب البنكي</label>
+                <input id="mypay-account" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="رقم الحساب / IBAN" dir="ltr"/>
               </div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5">املأ ما ينطبق — الزبون يرى فقط الحقول التي تملؤها (رمز / هاتف / حساب).</div>
             </div>
             <div>
               <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-note-label">ملاحظة للزبون (اختياري)</label>
@@ -3568,14 +3577,17 @@ function renderMyPayments(){
   el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' +
     methods.map(function(m,i){
       var lbl = typeLabels[m.type] || m.type;
-      var showCode = m.type==='bank'||m.type==='mobile'||m.type==='custom';
+      var bits = [];
+      if(m.code) bits.push('🔢 '+escapeHtml(m.code));
+      if(m.phone) bits.push('📞 '+escapeHtml(m.phone));
+      if(m.account) bits.push('🏦 '+escapeHtml(m.account));
       return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
         '<div style="flex:1">' +
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
             '<span style="font-size:13px;font-weight:700;color:#1B3A6B">'+escapeHtml(m.bank||lbl)+'</span>' +
             '<span style="background:#e0e8ff;color:#1B3A6B;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">'+lbl+'</span>' +
           '</div>' +
-          (showCode && m.code ? '<div style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e8f0fe;display:inline-block;padding:4px 10px;border-radius:7px;margin-bottom:4px">'+escapeHtml(m.code)+'</div>' : '') +
+          (bits.length ? '<div style="font-family:monospace;font-size:12.5px;font-weight:700;color:#0f2347;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'+bits.map(function(b){return '<span style="background:#e8f0fe;padding:4px 10px;border-radius:7px">'+b+'</span>';}).join('')+'</div>' : '') +
           (m.note ? '<div style="font-size:11.5px;color:#2C3A4F">'+escapeHtml(m.note)+'</div>' : '') +
         '</div>' +
         '<div style="display:flex;gap:6px">' +
@@ -3590,6 +3602,8 @@ function showAddMyPayModal(){
   document.getElementById('my-pay-modal-title').textContent = _t2('إضافة طريقة دفع','Ajouter un moyen de paiement');
   document.getElementById('mypay-bank').value='';
   document.getElementById('mypay-code').value='';
+  var ph = document.getElementById('mypay-phone'); if(ph) ph.value='';
+  var ac = document.getElementById('mypay-account'); if(ac) ac.value='';
   document.getElementById('mypay-note').value='';
   document.getElementById('mypay-type').value='bank';
   document.getElementById('mypay-edit-idx').value='';
@@ -3611,6 +3625,8 @@ function editMyPayment(btn){
   document.getElementById('mypay-type').value = m.type||'bank';
   document.getElementById('mypay-bank').value = m.bank||'';
   document.getElementById('mypay-code').value = m.code||'';
+  var ph = document.getElementById('mypay-phone'); if(ph) ph.value = m.phone||'';
+  var ac = document.getElementById('mypay-account'); if(ac) ac.value = m.account||'';
   document.getElementById('mypay-note').value = m.note||'';
   document.getElementById('mypay-edit-idx').value = idx;
   document.getElementById('my-pay-modal').style.display='flex';
@@ -3631,9 +3647,15 @@ function saveMyPayment(){
   var type = document.getElementById('mypay-type').value;
   var bank = document.getElementById('mypay-bank').value.trim();
   var code = document.getElementById('mypay-code').value.trim();
+  var phone = (document.getElementById('mypay-phone')||{}).value?.trim()||'';
+  var account = (document.getElementById('mypay-account')||{}).value?.trim()||'';
   var note = document.getElementById('mypay-note').value.trim();
   if(!bank && type!=='cash' && type!=='instore'){ alert(_t2('يرجى إدخال اسم البنك/الخدمة','Veuillez saisir le nom de la banque / du service')); return; }
-  var entry = {type:type, bank:bank||type, code:code, note:note, addedAt: new Date().toISOString()};
+  if(type!=='cash' && type!=='instore' && !code && !phone && !account){
+    alert(_t2('أدخل على الأقل: رمز أو هاتف أو رقم حساب','Saisissez au moins : code, téléphone ou n° de compte'));
+    return;
+  }
+  var entry = {type:type, bank:bank||type, code:code, phone:phone, account:account, note:note, addedAt: new Date().toISOString()};
   var methods = getMyPayments();
   var editIdx = document.getElementById('mypay-edit-idx').value;
   if(editIdx!=='') methods[parseInt(editIdx)] = entry;

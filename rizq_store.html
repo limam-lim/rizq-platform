@@ -1724,7 +1724,9 @@ function rizqShare(title, url) {
           docsChannel: 'whatsapp'
         },
         paymentMethods: [
-          { type: 'bankily', bank: 'Bankily', code: '44556677', note: fr ? 'Indiquez votre nom' : 'اذكر اسمك بعد التحويل' },
+          { type: 'bankily', bank: 'Bankily', code: '44556677', phone: '+22244882212', account: '', note: fr ? 'Indiquez votre nom' : 'اذكر اسمك بعد التحويل' },
+          { type: 'sedad', bank: 'Sedad', code: '998877', phone: '+22233001122', account: '' },
+          { type: 'bank', bank: 'BCI', code: '', phone: '', account: 'MR13 0001 2345 6789 0123 4567 890', note: fr ? 'Virement au nom du magasin' : 'تحويل باسم المحل' },
           { type: 'cash', bank: fr ? 'Paiement à la livraison' : 'الدفع عند التسليم', code: '', note: '' }
         ],
         /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي (مقطعان مختلفان) */
