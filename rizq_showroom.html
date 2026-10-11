@@ -828,8 +828,11 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
       { type: 'bankily', bank: 'Bankily', code: '33221100', note: fr ? 'Votre nom après virement' : 'اذكر اسمك بعد التحويل' },
       { type: 'instore', bank: fr ? 'Paiement au showroom' : 'الدفع في المعرض', code: '', note: '' }
     ],
-    /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة */
-    promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    /* فيديوهات تجريبية للمعاينة — تعريفي + إضافي */
+    plan: 'سنوية',
+    planName: 'سنوية',
+    promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+    promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -858,13 +861,12 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
       : '🎓 معاينة مشروع تخرج — معرض وهمي (بيانات عرض فقط، ليست حقيقية)';
     document.body.insertBefore(rib, document.body.firstChild);
   }
-  try{ history.replaceState(null, '', 'rizq_showroom.html'); }catch(e2){}
+  try{ history.replaceState(null, '', 'rizq_showroom.html?id=demo-corp-001&demo=1'); }catch(e2){}
   document.body.classList.remove('rizq-empty-showroom');
-  // باقات اشتراك المنصة تختفي من صفحة المعرض الحقيقي/المعاينة
-  (function hidePlatformUpsellOnBoundShowroom(){
+  // نموذج المعاينة: كل الخدمات ظاهرة (باقات، فيديو، طلبات…) — لا نخفي شيئاً
+  (function keepDemoShowroomServicesVisible(){
     var pkg = document.getElementById('pkg-section');
-    if(pkg) pkg.style.display = 'none';
-    document.querySelectorAll('.promo-card, .rizq-promo-card').forEach(function(el){ el.style.display = 'none'; });
+    if(pkg) pkg.style.display = '';
   })();
 })();
 
@@ -1042,9 +1044,15 @@ function applyAccountData(){
   }
 
   if(!_acc) return;
-  // باقات اشتراك المنصة — للمشترك في الداشبورد فقط، ليست لزائر المعرض
+  // باقات المنصة: تُخفى عن زائر المعرض الحقيقي فقط — نماذج المعاينة تُظهر كل الخدمات
   var _pkgSec = document.getElementById('pkg-section');
-  if(_pkgSec) _pkgSec.style.display = 'none';
+  if(_pkgSec){
+    if(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom'){
+      _pkgSec.style.display = '';
+    } else {
+      _pkgSec.style.display = 'none';
+    }
+  }
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
   if(window.RizqServiceDesk){

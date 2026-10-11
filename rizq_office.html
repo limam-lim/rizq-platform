@@ -1870,11 +1870,18 @@ function openMaps(){
 
         document.body.classList.remove('rizq-empty-office');
 
-        // باقات اشتراك المنصة (رزق) للمشترك فقط — تختفي من صفحة المكتب الحقيقي/المعاينة
-        // حتى يشعر الزائر أنه داخل منصة المكتب الخاصة، لا سوق باقات رزق.
+        // باقات المنصة تختفي من صفحة المكتب الحقيقي فقط.
+        // نموذج المعاينة الثابت (demo_law): كل الخدمات ظاهرة بدون استثناء.
         (function hidePlatformUpsellOnBoundOffice(){
-          ['office-packages','sec-packages-btn'].forEach(function(id){
-            var el = document.getElementById(id);
+          if(window._rizqOfficeIsDemo || id === DEMO_LAW_ID){
+            ['office-packages','sec-packages-btn'].forEach(function(oid){
+              var el = document.getElementById(oid);
+              if(el) el.style.display = '';
+            });
+            return;
+          }
+          ['office-packages','sec-packages-btn'].forEach(function(oid){
+            var el = document.getElementById(oid);
             if(el) el.style.display = 'none';
           });
           document.querySelectorAll('.promo-card').forEach(function(el){ el.style.display = 'none'; });

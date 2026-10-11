@@ -145,9 +145,20 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 .store-load-more:hover{filter:brightness(1.06)}
 @media(max-width:900px){
+  .store-video-spotlight{margin:10px auto 0;padding:0 10px}
   .store-video-spotlight-inner,
   .store-video-spotlight-inner.has-dual{grid-template-columns:1fr}
   .store-video-spotlight-inner.has-dual .store-video-frames{grid-template-columns:1fr}
+  .store-video-copy{padding:14px 14px 8px}
+  .store-video-copy h2{font-size:16px;margin-bottom:6px}
+  .store-video-copy p{font-size:12px;line-height:1.5}
+  .store-video-frames{min-height:0;padding:8px;gap:8px}
+  .store-video-frame{min-height:0;overflow:visible;border-radius:10px}
+  .store-video-frame .rzq-iv-wrap{height:auto;max-width:none}
+  .store-video-frame .rzq-iv-frame{min-height:0;aspect-ratio:16/9;border-radius:10px}
+  .store-video-frame .rzq-iv-play{width:52px;height:52px;font-size:22px}
+  .store-video-frame .rzq-iv-play-label{font-size:11px;bottom:10px;padding:5px 10px}
+  .store-video-frame .rzq-iv-src{font-size:10.5px;margin-top:6px}
 }
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
@@ -678,14 +689,22 @@ footer{
   .store-badges{justify-content:center}
   .nav-links{display:none}
   .main-wrap{padding:16px 12px 96px;background:none}
-  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .product-img{height:130px;font-size:44px}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .product-img{height:110px;font-size:36px}
+  #products-grid .product-img .rzq-adx-media{min-height:110px}
   .products-header{padding:12px 14px;border-radius:12px}
   .section-title{font-size:15px}
   .view-all-btn{padding:6px 10px;font-size:12px}
   .info-card{padding:16px;margin-bottom:12px}
   .map-placeholder{height:130px}
   .rzq-empty,.products-grid > .rzq-empty{min-height:160px;padding:28px 16px!important}
+  .cat-tabs{flex-wrap:wrap;gap:8px;align-items:stretch}
+  .cat-tabs-shop{
+    width:100%;margin-inline-start:0;justify-content:stretch;
+    order:-1;border-radius:14px;padding:6px;
+  }
+  .cat-tabs-shop .sss-btn{flex:1 1 0;min-width:0;padding:8px 10px;font-size:12px}
+  .cat-tabs-cats{width:100%;min-width:0}
   .actions-bar{
     position:sticky;top:var(--rizq-header-h,0);z-index:40;
     padding:0 12px;
@@ -698,7 +717,7 @@ footer{
   .action-btns{
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
+    gap:6px;
     width:100%;
   }
   .action-btn{
@@ -707,9 +726,9 @@ footer{
     width:auto;
     min-width:0;
     max-width:100%;
-    min-height:46px;
-    padding:10px 8px;
-    font-size:12.5px;
+    min-height:42px;
+    padding:9px 6px;
+    font-size:12px;
     border-radius:12px;
     box-sizing:border-box;
   }
@@ -927,7 +946,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=28.5" defer></script>
+  <script src="rizq_store_commerce.js?v=28.8" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1536,7 +1555,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.7"></script>
+  <script src="rizq_intro_video.js?v=28.8"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1925,30 +1944,41 @@ function rizqShare(title, url) {
     function mountStorePromoVideo(acc){
       /* شريط واحد: فيديو تعريفي + فيديو إضافي (لبعض الباقات) — بلا تكرار في أماكن أخرى */
       if(!acc || !window.RizqIntroVideo) return;
-      var videos = (window.RizqStoreCommerce && RizqStoreCommerce.promoVideosOf)
-        ? RizqStoreCommerce.promoVideosOf(acc)
-        : (acc.promo_video ? [{ url: acc.promo_video, kind: 'intro' }] : []);
+      var videos;
+      if(window.RizqStoreCommerce && typeof RizqStoreCommerce.promoVideosOf === 'function'){
+        videos = RizqStoreCommerce.promoVideosOf(acc);
+      } else {
+        videos = [];
+        if(acc.promo_video) videos.push({ url: String(acc.promo_video).trim(), kind: 'intro' });
+        if(acc.promo_video_extra) videos.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
+        videos = videos.filter(function(v){ return !!v.url; });
+      }
       var spot = document.getElementById('store-video-spotlight');
       var inner = document.getElementById('store-video-spotlight-inner');
       var introMount = document.getElementById('spotlight-intro-video-mount');
       var extraMount = document.getElementById('spotlight-extra-video-mount');
+      var introFrame = document.getElementById('spotlight-intro-frame');
       var extraFrame = document.getElementById('spotlight-extra-frame');
       var spotName = document.getElementById('spotlight-store-name');
       var heading = document.getElementById('spotlight-video-heading');
       var blurb = document.getElementById('spotlight-store-blurb');
-      if(spotName && acc.name) spotName.textContent = acc.name;
+      if(spotName && (acc.name || acc.businessName)) spotName.textContent = acc.name || acc.businessName;
       if(!spot || !introMount || !videos.length){
         if(spot) spot.style.display = 'none';
         return;
       }
       var fr = isFr();
-      var intro = videos.find(function(v){ return v.kind === 'intro'; }) || videos[0];
+      var intro = videos.find(function(v){ return v.kind === 'intro'; });
       var extra = videos.find(function(v){ return v.kind === 'extra'; });
+      /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
+      if(!intro && extra){ intro = extra; extra = null; }
+      if(!intro) intro = videos[0];
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
         linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
         playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
       });
+      if(introFrame) introFrame.style.display = okIntro ? '' : 'none';
       var okExtra = false;
       if(extra && extraMount && extraFrame){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
@@ -1959,6 +1989,7 @@ function rizqShare(title, url) {
         extraFrame.style.display = okExtra ? '' : 'none';
       } else if(extraFrame){
         extraFrame.style.display = 'none';
+        if(extraMount) extraMount.innerHTML = '';
       }
       if(inner) inner.classList.toggle('has-dual', !!(okIntro && okExtra));
       if(heading) heading.textContent = (okIntro && okExtra)
@@ -1967,7 +1998,7 @@ function rizqShare(title, url) {
       if(blurb) blurb.textContent = (okIntro && okExtra)
         ? (fr ? 'Vidéo de présentation et vidéo supplémentaire de la boutique.' : 'فيديو تعريفي وفيديو إضافي من المحل.')
         : (fr ? 'Découvrez la boutique en moins de 20 secondes.' : 'تعرّف على المحل ومنتجاته في أقل من 20 ثانية.');
-      spot.style.display = okIntro ? '' : 'none';
+      spot.style.display = (okIntro || okExtra) ? '' : 'none';
     }
 
     function paintStoreProductsGrid(products, storeId){
@@ -2067,8 +2098,14 @@ function rizqShare(title, url) {
         }
         window._rizqStoreProfile = acc;
 
-        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي — الباقات في الداشبورد فقط
+        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي فقط.
+        // نماذج المعاينة الثابتة (?demo / demo_store): كل الخدمات ظاهرة بدون استثناء.
         (function hidePlatformUpsellOnBoundStore(){
+          if(window._rizqStoreIsDemo || id === 'demo_store'){
+            var pkgDemo = document.getElementById('store-packages');
+            if(pkgDemo) pkgDemo.style.display = '';
+            return;
+          }
           var pkg = document.getElementById('store-packages');
           if(pkg) pkg.style.display = 'none';
           document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
@@ -2229,8 +2266,11 @@ function rizqShare(title, url) {
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
-                var pkgHide = document.getElementById('store-packages');
-                if(pkgHide) pkgHide.style.display = 'none';
+                /* لا نخفي باقات المعاينة — فقط الحسابات الحقيقية */
+                if(!(window._rizqStoreIsDemo || id === 'demo_store')){
+                  var pkgHide = document.getElementById('store-packages');
+                  if(pkgHide) pkgHide.style.display = 'none';
+                }
                 setText('store-name-el', acc.name);
                 var taglineApi = acc.tagline || acc.desc || '';
                 if(taglineApi) setText('store-tagline-el', taglineApi);
@@ -2926,10 +2966,11 @@ if(typeof _t2 === 'undefined'){
     if(typeof window._rzqApplyFt === 'function') window._rzqApplyFt();
     // إعادة رسم التقييمات الحقيقية بلغة العرض الحالية (لا تأثير إن لم يوجد حساب حقيقي مطابق)
     if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
-    // أعد تركيب الفيديو التعريفي بعناوين FR/AR الصحيحة
+    // أعد تركيب فيديوهات المحل بعناوين FR/AR — من ملف المحل لا من ملف الوكيل الذكي
     try{
-      if(typeof mountStorePromoVideo === 'function' && window._rizqProfile){
-        mountStorePromoVideo(window._rizqProfile);
+      var storeProf = window._rizqStoreProfile;
+      if(typeof window.mountStorePromoVideo === 'function' && storeProf){
+        window.mountStorePromoVideo(storeProf);
       }
     }catch(eVid){}
   }

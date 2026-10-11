@@ -302,15 +302,50 @@ footer{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:22px
 .afl-powered strong{color:var(--gold)}
 /* Responsive */
 @media(max-width:768px){
-  .page-wrap{grid-template-columns:1fr;gap:12px;margin:10px auto 16px}
-  .filters-sidebar{position:static;top:auto;max-height:none;overflow:visible}
+  html,body{overflow-x:clip;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .page-wrap{
+    grid-template-columns:1fr;gap:10px;margin:8px auto 16px;
+    overflow:visible;min-height:0;
+  }
+  .products-main{min-width:0;overflow:visible}
+  .filters-sidebar{
+    position:static;top:auto;max-height:none;overflow:visible;
+    padding:10px 12px;order:2;
+  }
+  .products-main{order:1}
+  .page-wrap{display:flex;flex-direction:column}
+  .filters-sidebar.is-collapsed .filter-section{display:none}
+  .filters-mobile-toggle{
+    display:flex;width:100%;align-items:center;justify-content:space-between;
+    margin-bottom:8px;padding:10px 12px;border-radius:11px;cursor:pointer;
+    border:1px solid rgba(27,58,107,.18);background:#fff;color:#1B3A6B;
+    font:inherit;font-size:13px;font-weight:800;
+  }
+  .prod-shop-cluster{margin-top:10px}
   .prod-shop-btns{flex-direction:row}
-  .sss-btn{flex:1}
+  .sss-btn{flex:1;min-height:38px;font-size:12.5px}
   .nav-links{display:none}
-  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .search-box input{width:160px}
+  .products-toolbar{flex-direction:column;align-items:stretch;gap:8px}
+  .toolbar-left{width:100%}
+  .search-box{width:100%}
+  .search-box input{width:100%;min-width:0}
+  .sort-select{width:100%}
+  .cat-tabs{gap:6px;margin-bottom:10px}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .product-img{min-height:100px}
+  .product-img .rzq-adx-media{min-height:100px}
+  .product-body{padding:8px}
+  .product-name{font-size:12px}
+  .product-price{font-size:13px}
+  .store-lux-inner{padding:10px 12px;gap:10px}
+  .store-lux-logo{width:48px;height:48px;font-size:22px;border-radius:12px}
+  .store-lux-name{font-size:17px}
+  .store-lux-tag{font-size:11.5px;max-width:none}
   .products-grid.list-view .product-card{flex-direction:column}
   .products-grid.list-view .product-img{width:100%;height:140px}
+}
+@media(min-width:769px){
+  .filters-mobile-toggle{display:none!important}
 }
 
 main, .page-content.active, .main-content, .results-area,
@@ -483,7 +518,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=28.5" defer></script>
+  <script src="rizq_store_commerce.js?v=28.8" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -547,7 +582,11 @@ main, .page-content.active, .main-content, .results-area,
 
 <div class="page-wrap">
   <!-- FILTERS -->
-  <aside class="filters-sidebar">
+  <aside class="filters-sidebar is-collapsed" id="filters-sidebar">
+    <button type="button" class="filters-mobile-toggle" id="filters-mobile-toggle" onclick="toggleProductsFilters()" aria-expanded="false">
+      <span data-t="filter-title">التصفية والترتيب</span>
+      <span id="filters-toggle-chevron" aria-hidden="true">▾</span>
+    </button>
     <div class="filter-title">
       <span data-t="filter-title">التصفية</span> <button class="filter-clear" onclick="clearFilters()" data-t="filter-clear">مسح الكل</button>
     </div>
@@ -748,6 +787,18 @@ function goPageNum(n) {
   var strip = document.getElementById('store-lux-strip');
   window.scrollTo({ top: strip ? strip.offsetTop + strip.offsetHeight - 8 : 120, behavior: 'smooth' });
 }
+
+function toggleProductsFilters(){
+  var side = document.getElementById('filters-sidebar');
+  var btn = document.getElementById('filters-mobile-toggle');
+  var chev = document.getElementById('filters-toggle-chevron');
+  if(!side) return;
+  side.classList.toggle('is-collapsed');
+  var open = !side.classList.contains('is-collapsed');
+  if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(chev) chev.textContent = open ? '▴' : '▾';
+}
+window.toggleProductsFilters = toggleProductsFilters;
 
 function goPage(btn, next) {
   if (next) goPageNum(currentPage + 1);
