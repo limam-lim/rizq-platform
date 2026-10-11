@@ -191,6 +191,11 @@
       return ok;
     }
 
+    // رابط صريح من الصفحة (حساب محمّل مسبقاً) — يتجنّب سباق التخزين المحلي
+    if (opts.url && tryShow(opts.url)) {
+      return Promise.resolve(true);
+    }
+
     try {
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
       var local = accs.find(function (a) { return a && a.id === accountId; });
@@ -207,7 +212,7 @@
     } catch (e2) {}
     if (!base) return Promise.resolve(false);
 
-    return fetch(base + '/api/accounts/public/' + encodeURIComponent(accountId))
+    var byId = fetch(base + '/api/accounts/public/' + encodeURIComponent(accountId))
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (data && data.account && data.account.promo_video) {
@@ -216,6 +221,22 @@
         return false;
       })
       .catch(function () { return false; });
+
+    return byId.then(function (ok) {
+      if (ok) return true;
+      // احتياط: قائمة الحسابات العامة (نفس مصدر دليل المعارض/المكاتب)
+      return fetch(base + '/api/accounts/public')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          var list = (data && Array.isArray(data.accounts))
+            ? data.accounts
+            : (data && data.ok && Array.isArray(data.accounts) ? data.accounts : []);
+          var found = list.find(function (a) { return a && a.id === accountId; });
+          if (found && found.promo_video) return tryShow(found.promo_video);
+          return false;
+        })
+        .catch(function () { return false; });
+    });
   }
 
   global.RizqIntroVideo = {

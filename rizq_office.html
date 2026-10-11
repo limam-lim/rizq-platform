@@ -1378,23 +1378,21 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=28.6"></script>
+  <script src="rizq_intro_video.js?v=28.7"></script>
   <script>
-  (function(){
-    var params=new URLSearchParams(location.search);
-    var officeId=params.get('id')||params.get('office');
-    if(!officeId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===officeId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
-    }
-  })();
+  window.mountOfficeIntroVideo = function(url, officeId){
+    try{
+      var id = officeId
+        || new URLSearchParams(location.search).get('id')
+        || new URLSearchParams(location.search).get('office')
+        || '';
+      if(!id || !window.RizqIntroVideo) return;
+      var opts = { mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' } };
+      if(url) opts.url = url;
+      RizqIntroVideo.loadAndMountForAccount(id, opts);
+    }catch(e){}
+  };
+  window.mountOfficeIntroVideo();
   </script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المكتب (RizqReviews) ═══
@@ -1758,15 +1756,15 @@ function openMaps(){
         });
         localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }catch(e){}
-      // إظهار قسم الفيديو التعريفي بعد حقن الحساب (السكربت المبكر يحتاج ?id=)
+      // إظهار قسم الفيديو التعريفي بعد حقن الحساب التجريبي
       try{
-        if(acc.promo_video && window.RizqIntroVideo){
-          var sec = document.getElementById('video-intro-section');
-          var mount = document.getElementById('intro-video-mount');
-          if(sec && mount){
-            var ok = RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-            if(ok) sec.style.display = '';
-          }
+        if(typeof window.mountOfficeIntroVideo === 'function'){
+          window.mountOfficeIntroVideo(acc.promo_video || '', id);
+        } else if(acc.promo_video && window.RizqIntroVideo){
+          RizqIntroVideo.loadAndMountForAccount(id, {
+            url: acc.promo_video,
+            mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+          });
         }
       }catch(eVid){}
       return acc;
@@ -2040,6 +2038,9 @@ function openMaps(){
             accountName: acc.name || ''
           });
         }
+        if(typeof window.mountOfficeIntroVideo === 'function'){
+          window.mountOfficeIntroVideo(acc.promo_video || '', id);
+        }
 
         if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
       }catch(e){}
@@ -2137,6 +2138,14 @@ function openMaps(){
                   RizqServiceDesk.enhanceOfficeForm({
                     desk: window._rizqOfficeServiceDesk || {},
                     accountName: acc.name || ''
+                  });
+                }
+                if(typeof window.mountOfficeIntroVideo === 'function'){
+                  window.mountOfficeIntroVideo(acc.promo_video || '', id);
+                } else if(window.RizqIntroVideo){
+                  RizqIntroVideo.loadAndMountForAccount(id, {
+                    url: acc.promo_video || '',
+                    mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
                   });
                 }
               }

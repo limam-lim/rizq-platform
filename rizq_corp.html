@@ -158,6 +158,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 
 /* ──── ABOUT CARD ──── */
 .about-text{font-size:13px;color:#4a5a6a;line-height:1.8}
+.video-intro-section{margin-top:16px;padding:0;background:transparent;border:none}
+.video-intro-section .rzq-iv-src{color:rgba(38,48,63,.55)}
+.video-intro-section .rzq-iv-src:hover{color:#1B3A6B}
+.video-intro-section .rzq-iv-wrap{max-width:100%}
 .activity-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .activity-tag{padding:5px 12px;background:#f0f5ff;border:1px solid #d0ddf5;border-radius:10px;font-size:11px;font-weight:600;color:var(--navy)}
 
@@ -614,6 +618,9 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <p class="about-text" id="about-text">
             معرض الريادة — شركة موريتانية متخصصة في تقديم أفضل المنتجات والخدمات بجودة عالية وأسعار تنافسية. نعمل منذ سنوات على بناء ثقة عملائنا من خلال الشفافية والاحترافية في كل تعامل.
           </p>
+          <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+            <div id="intro-video-mount"></div>
+          </section>
           <div class="activity-tags" id="activity-tags">
             <span class="activity-tag" id="act-tag1">🚗 سيارات جديدة ومستعملة</span>
             <span class="activity-tag" id="act-tag2">🏠 عقارات</span>
@@ -642,17 +649,6 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           </div>
         </div>
       </div>
-
-      <!-- ═══ INTRO VIDEO SECTION ═══
-           إصلاح: هذا القسم لم يكن موجوداً إطلاقاً بصفحة الشركة العامة، رغم
-           أن داشبورد الشركة (rizq_dashboard_corp.html) يحفظ حقل promo_video
-           فعلياً منذ البداية — أي شركة تضيف رابط فيديو تعريفي من داشبوردها
-           كانت لن تراه أبداً في صفحتها العامة. الآن مُضمَّن (embed) فعلياً
-           عبر rizq_intro_video.js?v=28.6، بحد أقصى 20 ثانية تشغيل تلقائي. -->
-      <div style="margin-top:28px;display:none;background:#0D1B2A;border-radius:var(--radius);padding:36px 16px" id="video-intro-section">
-        <div id="intro-video-mount"></div>
-      </div>
-
 
       <!-- غرفة الطلبات -->
       <div class="info-card" id="corp-service-desk" style="margin-top:28px;background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;padding:20px;border-top:3px solid #C9A84C;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
@@ -1353,6 +1349,14 @@ function rebuildCorpCatTabs(cats){
           RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
         }
       }
+      if(typeof window.mountCorpIntroVideo === 'function'){
+        window.mountCorpIntroVideo(acc.promo_video || '');
+      } else if(acc.promo_video && window.RizqIntroVideo){
+        RizqIntroVideo.loadAndMountForAccount(id, {
+          url: acc.promo_video,
+          mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+        });
+      }
       if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
 
       // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
@@ -1501,6 +1505,14 @@ function rebuildCorpCatTabs(cats){
                 var pe=document.getElementById('plan-badge'); if(pe) pe.style.display=b.premium?'':'none';
                 var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
               }
+              if(typeof window.mountCorpIntroVideo === 'function'){
+                window.mountCorpIntroVideo(acc.promo_video || '');
+              } else if(window.RizqIntroVideo){
+                RizqIntroVideo.loadAndMountForAccount(id, {
+                  url: acc.promo_video || '',
+                  mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+                });
+              }
             }
           }
         }catch(e){}
@@ -1533,22 +1545,29 @@ function rebuildCorpCatTabs(cats){
             var tabsEl = document.getElementById('cat-tabs');
             var cats = [];
             if(tabsEl) tabsEl.querySelectorAll('.cat-tab').forEach(function(b){ var t=b.textContent.replace(/^\S+\s*/,'').trim(); if(t && t!=='الكل' && t!=='Tout') cats.push(t); });
+            var cache = Array.isArray(window._corpItemsCache) ? window._corpItemsCache.slice() : [];
             var addedHtml = '';
+            var frUi = isFr();
             items.forEach(function(p){
               if(existingNames[p.name]) return;
               if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
+              var iid = p.id != null ? String(p.id) : ('corp-' + Math.random().toString(36).slice(2, 8));
+              var norm = Object.assign({}, p, { id: iid });
+              cache.push(norm);
               var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
-              addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'">'
+              addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'" onclick="openCorpItemDetail(\''+esc(iid).replace(/'/g,"\\'")+'\')">'
                 + '<div class="item-img">'+(typeof corpCatIcon==='function'?corpCatIcon(p.cat||''):(p.emoji||'📦'))+'</div>'
                 + '<div class="item-body">'
                 + '<div class="item-name">'+esc(p.name)+'</div>'
-                + '<div class="item-cat">'+esc(p.cat||'')+'</div>'
+                + '<div class="item-cat">'+esc(typeof _corpCatLabel==='function'?_corpCatLabel(p.cat||''):(p.cat||''))+'</div>'
                 + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
-                + '<button class="contact-item-btn" onclick="contactAboutItem(\''+esc(p.name).replace(/'/g,"\\'")+'\')">'+(isFr()?'📩 Contact':'📩 تواصل')+'</button></div>'
+                + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\''+esc(iid).replace(/'/g,"\\'")+'\')">'+(frUi?'👁 Fiche':'👁 تفاصيل')+'</button></div>'
+                + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\''+esc(iid).replace(/'/g,"\\'")+'\')">PREFACTUR</button>'
                 + '</div></div>';
             });
             if(addedHtml){
               grid.insertAdjacentHTML('beforeend', addedHtml);
+              try { window._corpItemsCache = cache; } catch (eC) {}
               if(tabsEl && cats.length && typeof rebuildCorpCatTabs==='function') rebuildCorpCatTabs(cats);
             }
           }
@@ -1853,30 +1872,29 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_intro_video.js?v=28.6"></script>
+<script src="rizq_intro_video.js?v=28.7"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script src="rizq_account_payments.js"></script>
 <script>
-// ══ فيديو تعريفي مضمَّن — انظر تعليق قسم video-intro-section أعلاه ══
-(function(){
+/* فيديو تعريفي — localStorage + خادم عام عبر loadAndMountForAccount */
+window.mountCorpIntroVideo = function(url){
   try{
-    var p=new URLSearchParams(location.search);
-    var corpId=p.get('id')||p.get('corp')||'';
-    if(!corpId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===corpId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
+    var corpId = (typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID)
+      || new URLSearchParams(location.search).get('id')
+      || new URLSearchParams(location.search).get('corp')
+      || '';
+    if(!corpId || !window.RizqIntroVideo) return;
+    var opts = { mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' } };
+    if(url) opts.url = url;
+    else if(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video){
+      opts.url = RIZQ_CORP_ACCOUNT.promo_video;
     }
+    RizqIntroVideo.loadAndMountForAccount(corpId, opts);
   }catch(e){}
-})();
+};
+window.mountCorpIntroVideo();
 </script>
 <script src="rizq_packages_config.js"></script>
 <script src="rizq_packages_ui.js?v=23.0"></script>

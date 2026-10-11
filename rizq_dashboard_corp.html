@@ -304,7 +304,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
-<script src="rizq_intro_video.js?v=28.6"></script>
+<script src="rizq_intro_video.js?v=28.7"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -4125,6 +4125,8 @@ function previewDashPromoVideo(){
   var el = document.getElementById('p-promo-video');
   _mountDashVideoPreview('p-promo-video-preview', el && el.value, '🎬 معاينة الفيديو التعريفي', '🎬 Aperçu vidéo de présentation');
 }
+/* loadProfile قد يسبق تعريف المعاينة — أعد التركيب بعد توفر الدوال */
+try { if(typeof previewDashPromoVideo === 'function') previewDashPromoVideo(); } catch(ePv){}
 </script>
 </body>
 </html>

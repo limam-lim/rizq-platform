@@ -253,7 +253,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_subscription_engine.js"></script>
   <script src="rizq_account_payments.js"></script>
   <script src="rizq_service_desk.js?v=1.1"></script>
-  <script src="rizq_intro_video.js?v=28.6"></script>
+  <script src="rizq_intro_video.js?v=28.7"></script>
   <script src="rizq_invoice_engine.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -3066,6 +3066,8 @@ function previewDashPromoVideo(){
   var el = document.getElementById('p-promo-video');
   _mountDashVideoPreview('p-promo-video-preview', el && el.value, '🎬 معاينة الفيديو التعريفي', '🎬 Aperçu vidéo de présentation');
 }
+/* fillProfile قد يعمل قبل تعريف هذه الدوال (سكربت سابق) — أعد المعاينة الآن */
+try { if(typeof previewDashPromoVideo === 'function') previewDashPromoVideo(); } catch(ePv){}
 </script>
 
 </body>
