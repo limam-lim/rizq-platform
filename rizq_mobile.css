@@ -521,7 +521,28 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   .listings-grid .listing-card .l-loc{font-size:8.5px!important;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .listings-grid .listing-card .lc-hover{display:none!important}
   .listings-grid .listing-card .l-badge{font-size:8px!important;padding:2px 6px!important;top:6px!important;right:6px!important}
-  .listings-grid .listing-card .l-body > div:last-child{display:none!important}
+  /* أزرار اتصال/واتساب تبقى ظاهرة على الهاتف — لا تُخفَ كآخر عنصر في البطاقة */
+  .listings-grid .listing-card .rzq-adx-actions,
+  .landing-ads-grid .listing-card .rzq-adx-actions,
+  .ad-card .rzq-adx-actions,
+  .rc .rzq-adx-actions{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    margin-top:6px!important;
+    padding-top:2px!important;
+  }
+  .listings-grid .listing-card .rzq-adx-tel,
+  .listings-grid .listing-card .rzq-adx-wa,
+  .landing-ads-grid .listing-card .rzq-adx-tel,
+  .landing-ads-grid .listing-card .rzq-adx-wa{
+    display:inline-flex!important;
+    width:30px!important;
+    height:30px!important;
+  }
   .pricing-grid{
     display:grid!important;
     grid-template-columns:1fr!important;
