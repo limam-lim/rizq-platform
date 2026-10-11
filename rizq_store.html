@@ -156,8 +156,10 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   .store-video-frame{min-height:0;overflow:visible;border-radius:10px}
   .store-video-frame .rzq-iv-wrap{height:auto;max-width:none}
   .store-video-frame .rzq-iv-frame{min-height:0;aspect-ratio:16/9;border-radius:10px}
-  .store-video-frame .rzq-iv-play{width:52px;height:52px;font-size:22px}
-  .store-video-frame .rzq-iv-play-label{font-size:11px;bottom:10px;padding:5px 10px}
+  .store-video-frame .rzq-iv-play{width:48px;height:48px;font-size:20px}
+  /* على الهاتف: زر ▶ يكفي — إخفاء شريط النص الطويل يقلّل الإحساس بالحجم الزائد */
+  .store-video-frame .rzq-iv-play-label{display:none}
+  .store-video-frame .rzq-iv-badge{font-size:10px;padding:4px 9px}
   .store-video-frame .rzq-iv-src{font-size:10.5px;margin-top:6px}
 }
 
