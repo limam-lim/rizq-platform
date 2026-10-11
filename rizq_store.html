@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=26.7"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
@@ -828,7 +829,7 @@ footer{
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
-  <script src="rizq_store_commerce.js?v=26.6" defer></script>
+  <script src="rizq_store_commerce.js?v=26.7" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -869,20 +870,7 @@ footer{
   </div>
 </div>
 
-<!-- نافذة "عرض سريع" لمنتج -->
-<div class="disc-overlay" id="qv-modal-overlay" onclick="if(event.target===this)closeQuickView()">
-  <div class="disc-modal" style="max-width:420px;font-family:inherit;text-align:center">
-    <button class="disc-modal-close" onclick="closeQuickView()">✕</button>
-    <div class="qv-gallery-main" id="qv-gallery-main"><div id="qv-modal-img" style="font-size:70px"></div></div>
-    <div class="qv-gallery-thumbs" id="qv-gallery-thumbs"></div>
-    <h2 id="qv-modal-name" style="font-family:inherit;font-size:18px;margin-bottom:8px"></h2>
-    <div id="qv-modal-price" style="font-size:22px;font-weight:900;color:#C9A84C;margin-bottom:10px"></div>
-    <div id="qv-modal-stock" class="qv-stock"></div>
-    <div id="qv-modal-desc" class="qv-desc"></div>
-    <button class="disc-close-btn" style="width:100%;box-sizing:border-box" id="qv-modal-add" onclick="">🛒 أضف للسلة</button>
-    <button class="disc-close-btn" style="width:100%;box-sizing:border-box;margin-top:8px;background:transparent;border:1.5px solid #C9A84C;color:#C9A84C" id="qv-modal-ask" onclick="">💬 استفسر عن هذا المنتج</button>
-  </div>
-</div>
+<!-- تفاصيل المنتج تُبنى ديناميكياً عبر RizqStoreCommerce (هوية عرض الإعلان) -->
 
 <!-- STORE HERO -->
 <div class="store-hero" id="store-hero">
@@ -972,13 +960,10 @@ footer{
 
     <!-- LEFT: INFO SIDEBAR -->
     <aside id="info-section">
-      <!-- About — الفيديو التعريفي يعيش هنا مع نص «عن المحل» -->
+      <!-- About — الفيديو التعريفي يظهر مرة واحدة فقط في الشريط البارز أعلى الصفحة -->
       <div class="info-card" id="about-section">
         <div class="info-card-title" data-t="about-section-ttl">📖 عن المحل</div>
         <div style="font-size:13px;color:#4a5364;line-height:1.75" id="about-txt" data-t="about-txt">تُعرض بيانات المحل من الحساب الحقيقي بعد اختيار محل من الدليل.</div>
-        <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
-          <div id="intro-video-mount"></div>
-        </section>
       </div>
 
       <!-- Location -->
@@ -1084,10 +1069,13 @@ footer{
         </a>
       </div>
 
-      <!-- Products — filled from store_products_{id} / API -->
+      <!-- مختارات الواجهة — الكتالوج الكامل مع الفلاتر في rizq_products.html -->
       <div class="products-header">
-        <div class="section-title" style="color:#fff" data-t="products-title">المنتجات المميزة</div>
-        <a class="view-all-btn" id="store-view-all-products" href="rizq_products.html" data-t="view-all-products">عرض الكل ←</a>
+        <div>
+          <div class="section-title" style="color:#fff" data-t="products-title">مختارات من واجهة المحل</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px" data-t="products-role-hint">معاينة سريعة — للبحث والفلترة وكل المنتجات افتح الكتالوج</div>
+        </div>
+        <a class="view-all-btn" id="store-view-all-products" href="rizq_products.html" data-t="view-all-products">كل المنتجات والفلاتر ←</a>
       </div>
       <div class="products-grid" id="products-grid">
         <div class="rzq-empty" id="products-empty" data-t="products-empty">
@@ -1191,129 +1179,84 @@ function toggleWishPanel(){
 }
 document.addEventListener('DOMContentLoaded', _renderWishUI);
 
-/* ── عرض سريع (Quick View) لمنتج بدون مغادرة الصفحة ── */
-function _qvEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* ── تفاصيل منتج بهوية عرض الإعلان (لوحة فاخرة) ── */
 function openQuickView(id, name, price, emoji, cat){
   var fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   var extra = (window._qvProductsMap && window._qvProductsMap[id]) || {};
   var images = (Array.isArray(extra.images) ? extra.images : []).filter(Boolean);
-  window._qvGalleryImages = images;
-  window._qvGalleryIndex = 0;
-
-  var mainEl = document.getElementById('qv-gallery-main');
-  var thumbsEl = document.getElementById('qv-gallery-thumbs');
-  if(images.length){
-    mainEl.innerHTML = '<img id="qv-modal-img" src="'+_qvEsc(images[0])+'"/>'
-      + (images.length>1 ? '<button type="button" class="qv-gallery-nav prev" onclick="_qvNav(-1)">‹</button><button type="button" class="qv-gallery-nav next" onclick="_qvNav(1)">›</button>' : '');
-    if(images.length>1){
-      thumbsEl.style.display = 'flex';
-      thumbsEl.innerHTML = images.map(function(src,i){
-        return '<div class="qv-thumb'+(i===0?' active':'')+'" onclick="_qvGoto('+i+')"><img src="'+_qvEsc(src)+'"/></div>';
-      }).join('');
-    } else { thumbsEl.style.display = 'none'; thumbsEl.innerHTML = ''; }
-  } else {
-    mainEl.innerHTML = '<div id="qv-modal-img" style="font-size:70px">'+_qvEsc(emoji||'📦')+'</div>';
-    thumbsEl.style.display = 'none';
-    thumbsEl.innerHTML = '';
-  }
-
-  document.getElementById('qv-modal-name').textContent = name;
-  document.getElementById('qv-modal-price').textContent = price;
-
-  var descEl = document.getElementById('qv-modal-desc');
-  var descPick = (typeof RizqLocale !== 'undefined')
-    ? RizqLocale.pickBilingual({ ar: extra.desc, fr: extra.descFr, lang: fr ? 'fr' : 'ar' })
-    : { text: fr ? (extra.descFr || extra.desc || '') : (extra.desc || ''), isFallback: false, sourceLang: null };
-  var descTxt = descPick.text;
-  if(descTxt){
-    descEl.textContent = descTxt;
-    descEl.style.display = 'block';
-    var qvNote = document.getElementById('qv-modal-desc-fallback');
-    if(qvNote) qvNote.remove();
-    if(descPick.isFallback && typeof RizqLocale !== 'undefined'){
-      var noteEl = document.createElement('div');
-      noteEl.id = 'qv-modal-desc-fallback';
-      noteEl.innerHTML = RizqLocale.fallbackNoteHtml(descPick.sourceLang, fr ? 'fr' : 'ar', true);
-      descEl.insertAdjacentElement('afterend', noteEl);
-    }
-  }
-  else {
-    descEl.style.display = 'none';
-    var qvNote2 = document.getElementById('qv-modal-desc-fallback');
-    if(qvNote2) qvNote2.remove();
-  }
-
-  var stockEl = document.getElementById('qv-modal-stock');
-  var stockRaw = extra.stock;
-  var stockInfo = (window.RizqStock && RizqStock.buyerLabel)
-    ? RizqStock.buyerLabel(stockRaw, fr)
-    : null;
-  if(stockInfo){
-    stockEl.textContent = stockInfo.text;
-    stockEl.className = 'qv-stock '+stockInfo.level;
-    stockEl.style.display = 'block';
-  } else if(stockRaw !== undefined && stockRaw !== null && String(stockRaw).trim() !== ''){
-    stockEl.textContent = String(stockRaw);
-    stockEl.className = 'qv-stock in';
-    stockEl.style.display = 'block';
-  } else { stockEl.style.display = 'none'; }
-
-  var addBtn = document.getElementById('qv-modal-add');
-  addBtn.onclick = function(){ addToCartStore(id); closeQuickView(); };
-  // زر "استفسر عن هذا المنتج" — يفتح المراسلة مع سياق هذا المنتج تحديداً
-  // (اسمه + فئته) بدل زر "تواصل مع المحل" العام فقط، فتظهر الأسئلة السريعة
-  // المناسبة لفئة المنتج (مثال: أزياء → "هل يمكن غسله بالغسالة؟").
-  var askBtn = document.getElementById('qv-modal-ask');
-  if(askBtn){
-    askBtn.onclick = function(){
-      closeQuickView();
-      if(!window.RizqMessenger) return;
-      var params = new URLSearchParams(location.search);
-      var storeId = params.get('id') || params.get('store') || '';
-      var nameEl = document.querySelector('.store-name, h1, [data-store-name]');
-      var fr = (localStorage.getItem('rizq_lang') === 'fr');
-      var storeName = nameEl ? nameEl.textContent.trim() : (fr ? 'La boutique' : 'المحل');
-      RizqMessenger.open({
-        sellerKey : storeId,
-        sellerAccountId: storeId,
-        sellerName: storeName,
-        adTitle   : name,
-        adId      : storeId + '-p' + id,
-        adEmoji   : emoji || '📦',
-        category  : cat || ''
+  var feat = (window.STORE_FEATURED_PRODUCTS && window.STORE_FEATURED_PRODUCTS[id]) || {};
+  var storeNameEl = document.getElementById('store-name-el');
+  var storeName = storeNameEl ? storeNameEl.textContent.trim() : (fr ? 'Boutique' : 'المحل');
+  var catalog = [];
+  try {
+    Object.keys(window.STORE_FEATURED_PRODUCTS || {}).forEach(function(k){
+      var f = window.STORE_FEATURED_PRODUCTS[k] || {};
+      var ex = (window._qvProductsMap && window._qvProductsMap[k]) || {};
+      catalog.push({
+        id: k, name: f.name || '', nameF: f.nameF || f.name || '', price: f.price || 0,
+        emoji: f.emoji || '📦', cat: f.cat || '',
+        images: ex.images || [], imgDataArr: ex.images || [],
+        desc: ex.desc || '', descF: ex.descFr || '', stock: ex.stock
       });
-    };
+    });
+  } catch(eCat){}
+
+  var product = {
+    id: id,
+    name: name || feat.name || '',
+    nameF: feat.nameF || name || '',
+    price: parseFloat(String(price||'').replace(/[^\d.]/g,'')) || feat.price || 0,
+    emoji: emoji || feat.emoji || '📦',
+    cat: cat || feat.cat || '',
+    images: images, imgDataArr: images,
+    desc: extra.desc || '', descF: extra.descFr || '',
+    stock: extra.stock
+  };
+
+  if(window.RizqStoreCommerce && typeof RizqStoreCommerce.openProductDetail === 'function'){
+    RizqStoreCommerce.openProductDetail(product, {
+      fr: fr,
+      storeName: storeName,
+      catalog: catalog,
+      onAdd: function(p, qty){
+        for(var i=0;i<(qty||1);i++) addToCartStore(p.id);
+      },
+      onAsk: function(p){
+        RizqStoreCommerce.closeProductDetail();
+        if(!window.RizqMessenger) return;
+        var params = new URLSearchParams(location.search);
+        var storeId = params.get('id') || params.get('store') || '';
+        RizqMessenger.open({
+          sellerKey: storeId, sellerAccountId: storeId, sellerName: storeName,
+          adTitle: fr ? (p.nameF || p.name) : p.name,
+          adId: storeId + '-p' + p.id,
+          adEmoji: p.emoji || '📦',
+          category: p.cat || ''
+        });
+      }
+    });
   }
-  document.getElementById('qv-modal-overlay').classList.add('open');
+
   try {
     var seedImages = images.slice();
     var storeHref = location.pathname.split('/').pop() + location.search;
     var feed = {
-      id: 'store-' + id,
-      title: name,
-      titleFR: name,
-      emoji: emoji || '📦',
-      cat: cat || '',
-      catKey: cat || '',
-      images: seedImages,
+      id: 'store-' + id, title: name, titleFR: name, emoji: emoji || '📦',
+      cat: cat || '', catKey: cat || '', images: seedImages,
       href: storeHref || ('rizq_store.html' + location.search)
     };
-    /* أفكار الأنماط: أزياء/ملابس/إكسسوارات فقط — لا سيارات ولا شاحنات ولا غير ذلك */
     var fashionCat = /أزياء|موضة|ذهب|مجوهرات|إكسسوار|أحذية|حقائب|عطور|fashion|mode|bijou|accessoire/i;
     var fashionHint = /دراعة|ملحفة|قميص|فستان|عباية|حذاء|حقيبة|أسورة|خاتم|ملابس|ذهب|مجوهرات|daraa|melhfa|robe|bijou/i;
     var fashionBlock = /سيارات|شاحنة|حفارة|عقارات|ماشية|إلكترون|هواتف|caterpillar|excavator|truck|voiture|iphone/i;
     var blob = [name, cat || ''].join(' ');
-    if(fashionBlock.test(blob) || (!fashionCat.test(cat || '') && !fashionHint.test(blob))){
-      /* تجاهل — ليس منتج أناقة */
-    } else {
+    if(!(fashionBlock.test(blob) || (!fashionCat.test(cat || '') && !fashionHint.test(blob)))){
       var KEY = 'rizq_style_seeds';
       var list = [];
       try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if(!Array.isArray(list)) list = []; } catch(e0){ list = []; }
       var men = /دراعة|رجالي|homme|daraa|قميص/i.test(blob);
       var women = /ملحفة|نسائي|femme|melhfa|عباية|فستان/i.test(blob);
       feed.gender = men && !women ? 'men' : (women && !men ? 'women' : 'both');
-      feed.ts = Date.now();
-      feed.fromView = true;
+      feed.ts = Date.now(); feed.fromView = true;
       feed.bg = 'linear-gradient(145deg,#1B3A6B,#0f2347)';
       if(!feed.catKey) feed.catKey = 'أزياء';
       list = list.filter(function(s){ return s && String(s.id) !== String(feed.id); });
@@ -1324,17 +1267,8 @@ function openQuickView(id, name, price, emoji, cat){
   } catch(eSeed) {}
 }
 function closeQuickView(){
-  document.getElementById('qv-modal-overlay').classList.remove('open');
+  if(window.RizqStoreCommerce) RizqStoreCommerce.closeProductDetail();
 }
-function _qvGoto(i){
-  var images = window._qvGalleryImages || [];
-  if(!images.length) return;
-  window._qvGalleryIndex = ((i % images.length) + images.length) % images.length;
-  var img = document.querySelector('#qv-gallery-main img');
-  if(img) img.src = images[window._qvGalleryIndex];
-  document.querySelectorAll('.qv-thumb').forEach(function(t, idx){ t.classList.toggle('active', idx === window._qvGalleryIndex); });
-}
-function _qvNav(dir){ _qvGoto((window._qvGalleryIndex || 0) + dir); }
 
 /* ── Universal Share ── */
 function rizqShare(title, url) {
@@ -1466,23 +1400,6 @@ function rizqShare(title, url) {
 
 
   <script src="rizq_intro_video.js"></script>
-  <script>
-  (function(){
-    var params=new URLSearchParams(location.search);
-    var storeId=params.get('id')||params.get('store');
-    if(!storeId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===storeId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
-    }
-  })();
-  </script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1852,6 +1769,7 @@ function rizqShare(title, url) {
     }
 
     function mountStorePromoVideo(acc){
+      /* موضع واحد فقط: الشريط البارز — لا تكرار في الشريط الجانبي ولا في صفحة المنتجات */
       if(!acc || !acc.promo_video || !window.RizqIntroVideo) return;
       var spot = document.getElementById('store-video-spotlight');
       var spotMount = document.getElementById('spotlight-intro-video-mount');
@@ -1860,12 +1778,6 @@ function rizqShare(title, url) {
       if(spot && spotMount){
         var okSpot = RizqIntroVideo.mount(spotMount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
         spot.style.display = okSpot ? '' : 'none';
-      }
-      var vSec = document.getElementById('video-intro-section');
-      var vMount = document.getElementById('intro-video-mount');
-      if(vSec && vMount){
-        var vOk = RizqIntroVideo.mount(vMount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(vOk) vSec.style.display = '';
       }
     }
 
@@ -1884,7 +1796,7 @@ function rizqShare(title, url) {
         var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
           ? RizqStoreCommerce.imagesOf(p)
           : ((p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []));
-        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦' };
+        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦', cat: p.cat || '' };
         window._qvProductsMap[pid] = { images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock };
         if(p.cat && cats.indexOf(p.cat) === -1) cats.push(p.cat);
         var priceTxt = (Number(p.price)||0).toLocaleString('en-US') + ' MRU';
@@ -2595,7 +2507,7 @@ if(typeof _t2 === 'undefined'){
     'cat-all':'Tout','cat-clothes':'👗 Vêtements','cat-shoes':'👟 Chaussures',
     'cat-accessories':'💍 Accessoires','cat-kids':'🧸 Enfants',
     /* Products */
-    'products-title':'🛍️ Produits vedettes','view-all-products':'Voir tout →',
+    'products-title':'✦ Sélection de la vitrine','products-role-hint':'Aperçu rapide — catalogue + filtres sur la page Produits','view-all-products':'Tous les produits & filtres →',
     'prod1-name':'Robe de soirée','prod2-name':'Basket sport',
     'prod3-name':'Bague dorée','prod4-name':'Peluche douce',
     'prod5-name':'Chemise homme','prod6-name':'Sac à main',

@@ -157,6 +157,287 @@
     }
   }
 
+  /* ── لوحة تفاصيل منتج بهوية عرض الإعلان ── */
+  var _pdState = { product: null, idx: 0, qty: 1, opts: null, similar: [] };
+
+  function ensureDetailHost() {
+    var root = document.getElementById('rzq-pd-root');
+    if (root) return root;
+    root = document.createElement('div');
+    root.id = 'rzq-pd-root';
+    root.className = 'rzq-pd-root';
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.innerHTML =
+      '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>'
+      + '<div class="rzq-pd-lightbox" id="rzq-pd-lightbox" onclick="if(event.target===this)RizqStoreCommerce.closeLightbox()">'
+      + '<button type="button" class="rzq-pd-lightbox-close" onclick="RizqStoreCommerce.closeLightbox()">✕</button>'
+      + '<img id="rzq-pd-lightbox-img" alt=""/>'
+      + '</div>';
+    root.addEventListener('click', function (e) {
+      if (e.target === root) closeProductDetail();
+    });
+    document.body.appendChild(root);
+    return root;
+  }
+
+  function stockBadge(p, fr) {
+    var info = null;
+    if (global.RizqStock && typeof RizqStock.buyerLabel === 'function') {
+      info = RizqStock.buyerLabel(p.stock, fr);
+    }
+    if (info) return '<span class="rzq-pd-badge ' + esc(info.level || 'in') + '">' + esc(info.text) + '</span>';
+    if (p.stock != null && String(p.stock).trim() !== '') {
+      return '<span class="rzq-pd-badge in">' + esc(String(p.stock)) + '</span>';
+    }
+    return '<span class="rzq-pd-badge in">' + (fr ? 'En stock' : 'موجود في الاستوك') + '</span>';
+  }
+
+  function renderDetailHtml(p, opts) {
+    opts = opts || {};
+    var fr = !!opts.fr;
+    var storeName = opts.storeName || (fr ? 'Boutique' : 'المحل');
+    var imgs = imagesOf(p);
+    var title = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
+    var titleAlt = fr ? (p.name || '') : (p.nameF || '');
+    var desc = fr ? (p.descF || p.desc || '') : (p.desc || p.descF || '');
+    var priceNum = Number(p.price) || 0;
+    var priceTxt = priceNum.toLocaleString('en-US') + ' MRU';
+    var oldTxt = p.oldPrice ? Number(p.oldPrice).toLocaleString('en-US') + ' MRU' : '';
+    var cat = p.cat || (fr ? 'Produit' : 'منتج');
+    var emoji = p.emoji || '📦';
+    var qty = _pdState.qty || 1;
+
+    var mainInner;
+    if (imgs.length) {
+      mainInner = '<img id="rzq-pd-main-img" src="' + esc(imgs[0]) + '" alt="' + esc(title) + '"/>';
+    } else {
+      mainInner = '<div class="rzq-pd-emoji-stage"><span class="rzq-pd-emoji-xl" aria-hidden="true">' + esc(emoji) + '</span></div>';
+    }
+    var nav = imgs.length > 1
+      ? '<button type="button" class="rzq-pd-gal-btn prev" onclick="RizqStoreCommerce.navPhoto(-1)" aria-label="' + (fr ? 'Précédente' : 'السابقة') + '">‹</button>'
+        + '<button type="button" class="rzq-pd-gal-btn next" onclick="RizqStoreCommerce.navPhoto(1)" aria-label="' + (fr ? 'Suivante' : 'التالية') + '">›</button>'
+        + '<span class="rzq-pd-counter" id="rzq-pd-counter">1 / ' + imgs.length + '</span>'
+      : '';
+    var thumbs = '';
+    if (imgs.length > 1) {
+      thumbs = '<div class="rzq-pd-thumbs">' + imgs.map(function (src, i) {
+        return '<div class="rzq-pd-thumb' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" onclick="RizqStoreCommerce.setPhoto(' + i + ')">'
+          + '<img src="' + esc(src) + '" alt="" loading="lazy"/></div>';
+      }).join('') + '</div>';
+    } else if (!imgs.length) {
+      thumbs = '<div class="rzq-pd-thumbs"><div class="rzq-pd-thumb active"><span>' + esc(emoji) + '</span></div></div>';
+    }
+
+    var similar = (_pdState.similar || []).slice(0, 4);
+    var similarHtml = similar.length
+      ? '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '✦ Produits similaires' : '✦ منتجات مشابهة') + '</div>'
+        + '<div class="rzq-pd-similar">' + similar.map(function (s) {
+          var sid = JSON.stringify(String(s.id));
+          var sn = fr ? (s.nameF || s.name) : (s.name || s.nameF);
+          var simImgs = imagesOf(s);
+          var media = simImgs[0]
+            ? '<img src="' + esc(simImgs[0]) + '" alt="" loading="lazy"/>'
+            : esc(s.emoji || '📦');
+          return '<div class="rzq-pd-sim" onclick="RizqStoreCommerce.openProductDetail(' + sid + ')">'
+            + '<div class="rzq-pd-sim-media">' + media + '</div>'
+            + '<div class="rzq-pd-sim-body"><div class="rzq-pd-sim-title">' + esc(sn) + '</div>'
+            + '<div class="rzq-pd-sim-price">' + (Number(s.price) || 0).toLocaleString('en-US') + ' MRU</div></div></div>';
+        }).join('') + '</div></div>'
+      : '';
+
+    return ''
+      + '<div class="rzq-pd-topbar">'
+      + '<button type="button" class="rzq-pd-back" onclick="RizqStoreCommerce.closeProductDetail()">← ' + (fr ? 'Retour' : 'رجوع') + '</button>'
+      + '<span class="rzq-pd-eyebrow">RIZQ · ' + (fr ? 'Fiche produit' : 'بطاقة منتج') + '</span>'
+      + '<button type="button" class="rzq-pd-x" onclick="RizqStoreCommerce.closeProductDetail()" aria-label="' + (fr ? 'Fermer' : 'إغلاق') + '">✕</button>'
+      + '</div>'
+      + '<div class="rzq-pd-body">'
+      + '<div class="rzq-pd-hero">'
+      + '<div class="rzq-pd-gallery">'
+      + '<div class="rzq-pd-main" id="rzq-pd-main" onclick="RizqStoreCommerce.openLightbox()" title="' + (fr ? 'Agrandir' : 'تكبير') + '">' + mainInner + nav + '</div>'
+      + thumbs
+      + '</div>'
+      + '<div class="rzq-pd-info">'
+      + '<div class="rzq-pd-cat"><span>🏪 ' + esc(storeName) + '</span><span class="sep">›</span><span>📂 ' + esc(cat) + '</span>'
+      + (p.isNew ? '<span class="rzq-pd-badge">✨ ' + (fr ? 'Nouveau' : 'جديد') + '</span>' : '')
+      + (p.discount || p.oldPrice ? '<span class="rzq-pd-badge">🏷 ' + (fr ? 'Offre' : 'عرض') + '</span>' : '')
+      + '</div>'
+      + '<h1 class="rzq-pd-title">' + esc(title) + '</h1>'
+      + (titleAlt && titleAlt !== title ? '<div class="rzq-pd-sub">' + esc(titleAlt) + '</div>' : '')
+      + '<div class="rzq-pd-price-box">'
+      + '<div><div class="rzq-pd-price">' + esc(priceTxt)
+      + (oldTxt ? '<span class="rzq-pd-price-old">' + esc(oldTxt) + '</span>' : '')
+      + '</div><div class="rzq-pd-period">' + (fr ? 'Prix magasin' : 'سعر المحل') + '</div></div>'
+      + stockBadge(p, fr)
+      + '</div>'
+      + '<div class="rzq-pd-qty"><span>' + (fr ? 'Quantité' : 'الكمية') + '</span>'
+      + '<button type="button" onclick="RizqStoreCommerce.changeQty(-1)" aria-label="-">−</button>'
+      + '<span id="rzq-pd-qty">' + qty + '</span>'
+      + '<button type="button" onclick="RizqStoreCommerce.changeQty(1)" aria-label="+">+</button>'
+      + '<strong id="rzq-pd-total" style="color:#E8C96A;margin-inline-start:6px">' + (priceNum * qty).toLocaleString('en-US') + ' MRU</strong>'
+      + '</div>'
+      + '<div class="rzq-pd-actions">'
+      + '<button type="button" class="rzq-pd-btn rzq-pd-btn-cart" onclick="RizqStoreCommerce.addFromDetail()">🛒 ' + (fr ? 'Ajouter au panier' : 'أضف للسلة') + '</button>'
+      + '<button type="button" class="rzq-pd-btn rzq-pd-btn-ask" onclick="RizqStoreCommerce.askFromDetail()">💬 ' + (fr ? 'Demander' : 'استفسر') + '</button>'
+      + '<button type="button" class="rzq-pd-btn rzq-pd-btn-ghost" onclick="RizqStoreCommerce.shareFromDetail()">↗ ' + (fr ? 'Partager ce produit' : 'مشاركة هذا المنتج') + '</button>'
+      + '</div>'
+      + '</div></div>'
+      + (desc
+        ? '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '📝 Description' : '📝 الوصف') + '</div>'
+          + '<div class="rzq-pd-desc">' + esc(desc) + '</div></div>'
+        : '')
+      + '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '📋 Fiche' : '📋 المواصفات') + '</div>'
+      + '<div class="rzq-pd-specs">'
+      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📂</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Catégorie' : 'الفئة') + '</div><div class="rzq-pd-spec-val">' + esc(cat) + '</div></div></div>'
+      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">💰</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Prix' : 'السعر') + '</div><div class="rzq-pd-spec-val">' + esc(priceTxt) + '</div></div></div>'
+      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">🏪</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Magasin' : 'المحل') + '</div><div class="rzq-pd-spec-val">' + esc(storeName) + '</div></div></div>'
+      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📦</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Disponibilité' : 'التوفر') + '</div><div class="rzq-pd-spec-val">' + esc((global.RizqStock && RizqStock.buyerLabel) ? (RizqStock.buyerLabel(p.stock, fr) || {}).text || (fr ? 'En stock' : 'متوفر') : (fr ? 'En stock' : 'متوفر')) + '</div></div></div>'
+      + '</div></div>'
+      + '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '🏷 Étiquettes' : '🏷 الوسوم') + '</div>'
+      + '<div class="rzq-pd-tags">'
+      + '<span class="rzq-pd-tag">📂 ' + esc(cat) + '</span>'
+      + '<span class="rzq-pd-tag">🏪 ' + esc(storeName) + '</span>'
+      + (p.isNew ? '<span class="rzq-pd-tag">✨ ' + (fr ? 'Nouveau' : 'جديد') + '</span>' : '')
+      + (p.discount || p.oldPrice ? '<span class="rzq-pd-tag">🏷 ' + (fr ? 'Promo' : 'تخفيض') + '</span>' : '')
+      + '</div></div>'
+      + '<div class="rzq-pd-disclaimer">⚖️ <strong>رزق</strong> '
+      + (fr
+        ? "est une plateforme de mise en relation uniquement — paiement et livraison se font directement avec le magasin. <span>Vérifiez avant de payer</span>."
+        : 'وسيط نشر إلكتروني فقط — الدفع والتسليم يتمان مباشرة مع المحل. <span>عاين المنتج قبل أي دفع</span>.')
+      + '</div>'
+      + similarHtml
+      + '</div>';
+  }
+
+  function findProductById(id, catalog) {
+    var list = catalog || (_pdState.opts && _pdState.opts.catalog) || [];
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(id)) return list[i];
+    }
+    return null;
+  }
+
+  function openProductDetail(idOrProduct, opts) {
+    opts = opts || _pdState.opts || {};
+    var p = (idOrProduct && typeof idOrProduct === 'object')
+      ? idOrProduct
+      : findProductById(idOrProduct, opts.catalog);
+    if (!p && _pdState.product && String(_pdState.product.id) === String(idOrProduct)) p = _pdState.product;
+    if (!p) return false;
+
+    var catalog = opts.catalog || [];
+    _pdState.product = p;
+    _pdState.opts = opts;
+    _pdState.idx = 0;
+    _pdState.qty = 1;
+    _pdState.similar = catalog.filter(function (x) {
+      return String(x.id) !== String(p.id) && (!p.cat || x.cat === p.cat);
+    });
+    if (_pdState.similar.length < 2) {
+      _pdState.similar = catalog.filter(function (x) { return String(x.id) !== String(p.id); });
+    }
+
+    var root = ensureDetailHost();
+    var sheet = document.getElementById('rzq-pd-sheet');
+    if (sheet) sheet.innerHTML = renderDetailHtml(p, opts);
+    root.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    return true;
+  }
+
+  function closeProductDetail() {
+    var root = document.getElementById('rzq-pd-root');
+    if (root) root.classList.remove('open');
+    document.body.style.overflow = '';
+    closeLightbox();
+  }
+
+  function setPhoto(i) {
+    var imgs = imagesOf(_pdState.product);
+    if (!imgs.length) return;
+    _pdState.idx = ((i % imgs.length) + imgs.length) % imgs.length;
+    var img = document.getElementById('rzq-pd-main-img');
+    if (img) img.src = imgs[_pdState.idx];
+    var c = document.getElementById('rzq-pd-counter');
+    if (c) c.textContent = (_pdState.idx + 1) + ' / ' + imgs.length;
+    document.querySelectorAll('.rzq-pd-thumb').forEach(function (t, n) {
+      t.classList.toggle('active', n === _pdState.idx);
+    });
+  }
+
+  function navPhoto(dir) { setPhoto((_pdState.idx || 0) + dir); }
+
+  function openLightbox() {
+    var imgs = imagesOf(_pdState.product);
+    var box = document.getElementById('rzq-pd-lightbox');
+    var img = document.getElementById('rzq-pd-lightbox-img');
+    if (!box || !img) return;
+    if (imgs.length) {
+      img.src = imgs[_pdState.idx || 0];
+      img.style.display = '';
+    } else {
+      img.style.display = 'none';
+    }
+    box.classList.add('open');
+  }
+
+  function closeLightbox() {
+    var box = document.getElementById('rzq-pd-lightbox');
+    if (box) box.classList.remove('open');
+  }
+
+  function changeQty(delta) {
+    _pdState.qty = Math.max(1, Math.min(99, (_pdState.qty || 1) + delta));
+    var q = document.getElementById('rzq-pd-qty');
+    var t = document.getElementById('rzq-pd-total');
+    if (q) q.textContent = _pdState.qty;
+    if (t && _pdState.product) {
+      t.textContent = ((Number(_pdState.product.price) || 0) * _pdState.qty).toLocaleString('en-US') + ' MRU';
+    }
+  }
+
+  function addFromDetail() {
+    var p = _pdState.product;
+    var opts = _pdState.opts || {};
+    if (!p) return;
+    if (typeof opts.onAdd === 'function') {
+      opts.onAdd(p, _pdState.qty || 1);
+    }
+    closeProductDetail();
+  }
+
+  function askFromDetail() {
+    var p = _pdState.product;
+    var opts = _pdState.opts || {};
+    if (!p) return;
+    if (typeof opts.onAsk === 'function') opts.onAsk(p);
+    else closeProductDetail();
+  }
+
+  function shareFromDetail() {
+    var p = _pdState.product;
+    var opts = _pdState.opts || {};
+    if (!p) return;
+    var fr = !!(opts.fr);
+    var title = fr ? (p.nameF || p.name) : (p.name || p.nameF);
+    var url = location.href.split('#')[0] + '#product-' + encodeURIComponent(String(p.id));
+    if (navigator.share) {
+      navigator.share({ title: title, text: title, url: url }).catch(function () {});
+    } else if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).catch(function () {});
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var lb = document.getElementById('rzq-pd-lightbox');
+      if (lb && lb.classList.contains('open')) { closeLightbox(); return; }
+      var root = document.getElementById('rzq-pd-root');
+      if (root && root.classList.contains('open')) closeProductDetail();
+    }
+  });
+
   global.RizqStoreCommerce = {
     PAGE_SIZE: PAGE_SIZE,
     esc: esc,
@@ -168,6 +449,16 @@
     storeIdFromUrl: storeIdFromUrl,
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
-    setLogo: setLogo
+    setLogo: setLogo,
+    openProductDetail: openProductDetail,
+    closeProductDetail: closeProductDetail,
+    setPhoto: setPhoto,
+    navPhoto: navPhoto,
+    openLightbox: openLightbox,
+    closeLightbox: closeLightbox,
+    changeQty: changeQty,
+    addFromDetail: addFromDetail,
+    askFromDetail: askFromDetail,
+    shareFromDetail: shareFromDetail
   };
 })(window);

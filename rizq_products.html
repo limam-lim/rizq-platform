@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=26.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=26.7"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>المنتجات — متجر النور | Rizq</title>
@@ -48,8 +49,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 }
 .store-lux-inner{
   max-width:1100px;margin:0 auto;padding:22px 16px 20px;
-  display:grid;grid-template-columns:auto 1fr minmax(220px,320px);
-  gap:20px;align-items:center;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
 }
 .store-lux-logo{
   width:84px;height:84px;border-radius:22px;flex-shrink:0;
@@ -68,13 +68,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
   padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
   background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
 }
-.store-lux-video{border-radius:14px;overflow:hidden;border:1px solid rgba(201,168,76,.35);background:#06111C;min-height:120px}
-.store-lux-video #lux-intro-video-mount .rzq-iv-wrap{max-width:none;margin:0}
-.store-lux-video #lux-intro-video-mount .rzq-iv-frame{border-radius:0;aspect-ratio:16/9}
-@media(max-width:900px){
-  .store-lux-inner{grid-template-columns:auto 1fr;gap:14px}
-  .store-lux-video{grid-column:1/-1}
-}
+/* الفيديو التعريفي يظهر مرة واحدة فقط في واجهة المحل الرسمية — لا تكرار هنا */
 
 /* NAV */
 .topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
@@ -438,8 +432,7 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
-  <script src="rizq_store_commerce.js?v=26.6" defer></script>
-  <script src="rizq_intro_video.js" defer></script>
+  <script src="rizq_store_commerce.js?v=26.7" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -486,20 +479,17 @@ main, .page-content.active, .main-content, .results-area,
   </div>
 </div>
 
-<!-- هوية المحل — صورة + اسم + فيديو تعريفي -->
+<!-- هوية المحل — الكتالوج الكامل (الفيديو فقط في الواجهة الرسمية) -->
 <section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
   <div class="store-lux-inner">
     <div class="store-lux-logo" id="lux-store-logo">🏪</div>
-    <div>
+    <div style="flex:1;min-width:200px">
       <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
-      <p class="store-lux-tag" id="lux-store-tag">كتالوج فاخر — صور المنتجات تتحرك كإعلانات الصفحة الرئيسية</p>
+      <p class="store-lux-tag" id="lux-store-tag">كتالوج كامل — بحث وفلترة وترقيم · الفيديو التعريفي في واجهة المحل</p>
       <div class="store-lux-meta" id="lux-store-meta">
         <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
-        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html" style="text-decoration:none">↩ واجهة المحل</a>
+        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html" style="text-decoration:none">↩ واجهة المحل + الفيديو</a>
       </div>
-    </div>
-    <div class="store-lux-video" id="lux-video-wrap" style="display:none">
-      <div id="lux-intro-video-mount"></div>
     </div>
   </div>
 </section>
@@ -581,16 +571,7 @@ main, .page-content.active, .main-content, .results-area,
   </main>
 </div>
 
-<!-- PRODUCT MODAL -->
-<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title-text" data-t="modal-title">تفاصيل المنتج</div>
-      <button class="modal-close" onclick="closeModal()" aria-label="إغلاق">×</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
-</div>
+<!-- تفاصيل المنتج: لوحة فاخرة عبر RizqStoreCommerce (هوية عرض الإعلان) -->
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
@@ -878,61 +859,49 @@ function updateCartCount() {
   try { document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); } catch (e) {}
 }
 
-// Modal
+// تفاصيل منتج — لوحة فاخرة بهوية عرض الإعلان
 function openModal(id) {
   const p = _findProduct(id);
   if (!p) return;
   const ar = window.isAr !== false;
   modalQty = 1;
-  const media = (window.RizqStoreCommerce && RizqStoreCommerce.productMediaHtml)
-    ? RizqStoreCommerce.productMediaHtml(p, { fr: !ar, showPrice: false })
-    : '<span style="user-select:none">' + sanitize(p.emoji||'📦') + '</span>';
-  document.getElementById('modal-title-text').textContent = ar ? p.name : p.nameF;
-  document.getElementById('modal-body').innerHTML = `
-    <div class="modal-img" style="padding:0;overflow:hidden;background:#0d1b2a">${media}</div>
-    <div class="modal-info">
-      <div class="modal-name">${sanitize(ar ? p.name : p.nameF)}</div>
-      <div class="modal-name-fr">${sanitize(ar ? p.nameF : p.name)}</div>
-      <div class="modal-price">${Number(p.price||0).toLocaleString()} <small style="font-size:14px;font-weight:400">MRU</small></div>
-      ${p.oldPrice ? `<div class="modal-price-old">${Number(p.oldPrice).toLocaleString()} MRU</div>` : ''}
-      <div class="modal-desc">${sanitize(ar ? p.desc : (p.descF||p.desc))}</div>
-      <div class="qty-row">
-        <span style="font-size:13px;color:#6a7a8a">${ar?'الكمية:':'Quantité :'}</span>
-        <button class="qty-btn" onclick="changeQty(-1)" aria-label="${ar?'تقليل الكمية':'Diminuer la quantité'}">−</button>
-        <span class="qty-val" id="modal-qty">1</span>
-        <button class="qty-btn" onclick="changeQty(1)" aria-label="${ar?'زيادة الكمية':'Augmenter la quantité'}">+</button>
-        <span style="font-size:13px;color:var(--navy);font-weight:700" id="modal-total">${Number(p.price||0).toLocaleString()} MRU</span>
-      </div>
-      <button class="modal-add-btn" onclick="addModalToCart(${_pidAttr(p.id)})">🛒 ${ar?'أضف للسلة':'Ajouter au panier'}</button>
-      <div style="margin-top:10px;text-align:center">
-        <a href="#"
-           target="_blank" rel="noopener"
-           onclick="return rizqGateLink(this,event,'reasonWhatsapp')"
-           style="font-size:13px;color:#25D366;font-weight:600;text-decoration:none">
-          📲 ${ar?'اسأل البائع على واتساب':'Contacter le vendeur sur WhatsApp'}
-        </a>
-      </div>
-    </div>
-  `;
   window._modalProduct = p;
-  document.getElementById('modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  if (window.RizqStoreCommerce && typeof RizqStoreCommerce.bindMedia === 'function') {
-    RizqStoreCommerce.bindMedia(document.getElementById('modal-body'));
+  var storeName = (document.getElementById('lux-store-name') || {}).textContent || (ar ? 'المحل' : 'Boutique');
+  if (window.RizqStoreCommerce && typeof RizqStoreCommerce.openProductDetail === 'function') {
+    RizqStoreCommerce.openProductDetail(p, {
+      fr: !ar,
+      storeName: storeName.trim(),
+      catalog: allProducts.slice(),
+      onAdd: function (prod, qty) {
+        modalQty = qty || 1;
+        addModalToCart(prod.id);
+      },
+      onAsk: function (prod) {
+        RizqStoreCommerce.closeProductDetail();
+        if (window.RizqMessenger) {
+          var sid = window._rizqProductsStoreId || '';
+          RizqMessenger.open({
+            sellerKey: sid, sellerAccountId: sid, sellerName: storeName.trim(),
+            adTitle: ar ? prod.name : (prod.nameF || prod.name),
+            adId: sid + '-p' + prod.id,
+            adEmoji: prod.emoji || '📦',
+            category: prod.cat || ''
+          });
+        }
+      }
+    });
+    return;
   }
 }
 
 function closeModal() {
-  document.getElementById('modal').classList.remove('open');
+  if (window.RizqStoreCommerce) RizqStoreCommerce.closeProductDetail();
   document.body.style.overflow = '';
 }
 
 function changeQty(delta) {
-  const p = window._modalProduct;
-  if (!p) return;
-  modalQty = Math.max(1, Math.min(99, modalQty + delta));
-  document.getElementById('modal-qty').textContent = modalQty;
-  document.getElementById('modal-total').textContent = (p.price * modalQty).toLocaleString() + ' MRU';
+  if (window.RizqStoreCommerce) RizqStoreCommerce.changeQty(delta);
+  modalQty = Math.max(1, Math.min(99, (modalQty || 1) + delta));
 }
 
 function addModalToCart(id) {
@@ -963,8 +932,8 @@ function showToast(msg) {
 // Check anchor for product deep-link
 const anchor = window.location.hash;
 if (anchor && anchor.startsWith('#product-')) {
-  const id = parseInt(anchor.replace('#product-',''));
-  if (id) setTimeout(() => openModal(id), 300);
+  const id = decodeURIComponent(anchor.replace('#product-',''));
+  if (id) setTimeout(() => openModal(id), 400);
 }
 
 // ── تحميل منتجات المحل الحقيقي — تصحيح 25/07/2026 ──
@@ -1025,9 +994,9 @@ function _demoCatalog(fr){
 function applyStoreBrand(acc, storeId, fr){
   window._rizqProductsStoreId = storeId || '';
   var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
-  var tag = (acc && (acc.tagline || acc.desc)) || (fr
-    ? 'Catalogue premium — photos animées comme les annonces Rizq'
-    : 'كتالوج فاخر — صور المنتجات تتحرك كإعلانات الصفحة الرئيسية');
+  var tag = fr
+    ? 'Catalogue complet — recherche, filtres, pagination · la vidéo est sur la vitrine'
+    : 'كتالوج كامل — بحث وفلترة وترقيم · الفيديو التعريفي في واجهة المحل';
   var luxName = document.getElementById('lux-store-name');
   var luxTag = document.getElementById('lux-store-tag');
   var luxLogo = document.getElementById('lux-store-logo');
@@ -1040,7 +1009,10 @@ function applyStoreBrand(acc, storeId, fr){
     bcLink.textContent = name;
     bcLink.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_landing_v8.html#rzq-disc-store';
   }
-  if(back) back.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_store.html';
+  if(back){
+    back.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_store.html';
+    back.textContent = fr ? '↩ Vitrine + vidéo' : '↩ واجهة المحل + الفيديو';
+  }
   if(name) document.title = name + (fr ? ' — Produits — Rizq' : ' — المنتجات — رزق');
   if(typeof RizqSub !== 'undefined' && storeId){
     var b = RizqSub.getBadges(storeId);
@@ -1048,14 +1020,6 @@ function applyStoreBrand(acc, storeId, fr){
     if(badgesEl){
       badgesEl.innerHTML = (b.verified?'<span style="font-size:11px;font-weight:700;color:#16a34a">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
         + (b.premium?' <span style="font-size:11px;font-weight:700;color:#a07820">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
-    }
-  }
-  if(acc && acc.promo_video && window.RizqIntroVideo){
-    var wrap = document.getElementById('lux-video-wrap');
-    var mount = document.getElementById('lux-intro-video-mount');
-    if(wrap && mount){
-      var ok = RizqIntroVideo.mount(mount, acc.promo_video, { title: fr ? '🎬 Vidéo' : '🎬 فيديو تعريفي', linkLabel: fr ? 'Source ↗' : 'المصدر ↗' });
-      wrap.style.display = ok ? '' : 'none';
     }
   }
   if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
