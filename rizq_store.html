@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -116,24 +116,26 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   max-width:1280px;margin:14px auto 0;padding:0 16px;
 }
 .store-video-spotlight-inner{
-  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
-  gap:16px;align-items:stretch;
+  display:grid;grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);
+  gap:0;align-items:stretch;
   background:linear-gradient(135deg,#06111C,#0F2347 55%,#1B3A6B);
   border:1px solid rgba(201,168,76,.35);border-radius:18px;overflow:hidden;
   box-shadow:0 14px 34px rgba(15,35,71,.18);
 }
 .store-video-spotlight-inner.has-dual{
-  grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);
+  grid-template-columns:minmax(200px,.55fr) minmax(0,1.45fr);
 }
-.store-video-copy{padding:22px 20px;color:#fff}
+.store-video-copy{padding:22px 20px;color:#fff;display:flex;flex-direction:column;justify-content:center}
 .store-video-copy h2{margin:0 0 8px;font-size:clamp(18px,2.4vw,24px);font-weight:900}
 .store-video-copy h2 span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .store-video-copy p{margin:0;color:rgba(255,255,255,.72);font-size:13.5px;line-height:1.65}
-.store-video-frames{display:grid;grid-template-columns:1fr;gap:10px;padding:10px;background:#040a12;min-height:180px}
+.store-video-frames{display:grid;grid-template-columns:1fr;gap:10px;padding:12px;background:#040a12;min-height:240px}
 .store-video-spotlight-inner.has-dual .store-video-frames{grid-template-columns:1fr 1fr}
-.store-video-frame{min-height:160px;background:#040a12;border-radius:10px;overflow:hidden;border:1px solid rgba(201,168,76,.2)}
-.store-video-frame .rzq-iv-wrap{max-width:none;margin:0}
-.store-video-frame .rzq-iv-frame{border-radius:0;aspect-ratio:16/9}
+.store-video-frame{min-height:220px;background:#040a12;border-radius:12px;overflow:hidden;border:1px solid rgba(201,168,76,.28)}
+.store-video-frame .rzq-iv-wrap{max-width:none;margin:0;height:100%}
+.store-video-frame .rzq-iv-frame{border-radius:12px;aspect-ratio:16/9;min-height:220px;animation:none;box-shadow:0 0 0 1px rgba(201,168,76,.35)}
+.store-video-frame .rzq-iv-badge{font-size:11px;padding:6px 12px}
+.store-video-frame .rzq-iv-src{color:rgba(232,201,106,.75);margin-top:8px}
 #products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:160px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
 .store-load-more{
@@ -1412,7 +1414,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=26.8"></script>
+  <script src="rizq_intro_video.js?v=28.3"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1732,11 +1734,11 @@ function rizqShare(title, url) {
           { type: 'bank', bank: 'BCI', code: '', phone: '', account: 'MR13 0001 2345 6789 0123 4567 890', note: fr ? 'Virement au nom du magasin' : 'تحويل باسم المحل' },
           { type: 'cash', bank: fr ? 'Paiement à la livraison' : 'الدفع عند التسليم', code: '', note: '' }
         ],
-        /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي (مقطعان مختلفان) */
+        /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي واضحان (نفس حقل الداشبورد) */
         plan: 'سنوية',
         planName: 'سنوية',
-        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        promo_video_extra: 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
+        promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: '' },
@@ -2065,8 +2067,8 @@ function rizqShare(title, url) {
         }catch(e){}
 
         // 1) هوية المحل — كاش مشترك لـ /api/accounts/public
-        if(!hasLocalMatch){
-          try{
+        // حتى مع تطابق محلي: نُحدّث الفيديو التعريفي من الخادم (حقل الداشبورد)
+        try{
             var pdata = window.RizqApi && typeof window.RizqApi.publicAccounts === 'function'
               ? await window.RizqApi.publicAccounts()
               : null;
@@ -2077,6 +2079,15 @@ function rizqShare(title, url) {
             if(pdata){
               var acc = (pdata.accounts||[]).find(function(a){ return a.id===id && a.type==='store'; });
               if(acc){
+                var localProf = window._rizqStoreProfile || {};
+                if(hasLocalMatch && localProf){
+                  if(acc.promo_video) localProf.promo_video = acc.promo_video;
+                  if(acc.promo_video_extra) localProf.promo_video_extra = acc.promo_video_extra;
+                  if(acc.thumb && !localProf.thumb) localProf.thumb = acc.thumb;
+                  if(acc.tagline && !localProf.tagline) localProf.tagline = acc.tagline;
+                  window._rizqStoreProfile = localProf;
+                  if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(localProf);
+                } else {
                 window._rizqStoreProfile = acc;
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
@@ -2114,10 +2125,10 @@ function rizqShare(title, url) {
                 if(window.RizqServiceDesk){
                   RizqServiceDesk.applyPublicLabels(document.getElementById('store-service-desk'), acc.serviceDesk || {}, acc.name || '');
                 }
+                }
               }
             }
           }catch(e){}
-        }
 
         // 2–4) كتالوج + ساعات + تقييمات بالتوازي (بدل انتظار تسلسلي)
         var needHours = true;
