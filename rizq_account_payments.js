@@ -290,7 +290,7 @@
         + '<div class="rzq-pay-step">' + (fr ? 'Étape 2 — Coordonnées de paiement' : 'الخطوة 2 — طرق الدفع لهذه الوسيلة') + '</div>'
         + detailRowsHtml(m, fr)
         + (m.note ? '<div class="rzq-pay-note">📝 ' + esc(m.note) + '</div>' : '')
-        + '<button type="button" class="rzq-pay-confirm" data-pay-confirm">✅ ' + (fr ? 'Utiliser ce moyen' : 'اعتماد هذه الطريقة') + '</button>'
+        + '<button type="button" class="rzq-pay-confirm" data-pay-confirm="1">✅ ' + (fr ? 'Utiliser ce moyen' : 'اعتماد هذه الطريقة') + '</button>'
         + '<div class="rzq-pay-trust">⚖️ ' + (fr
           ? 'Vérifiez le montant avant d’envoyer — Rizq n’est pas partie à la transaction.'
           : 'تحقق من المبلغ قبل الإرسال — رزق ليس طرفاً في المعاملة.') + '</div></div>';
