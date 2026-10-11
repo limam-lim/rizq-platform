@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.7"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.5"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=28.7"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.7"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.8"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.2"/>
 <script>
@@ -2568,17 +2568,24 @@ html[dir="ltr"] .listings-section .section-desc{
 .landing-ads-grid .listing-card{
   display:flex;flex-direction:column;min-height:0;border-radius:14px!important
 }
-.landing-ads-grid .l-img{height:96px!important;font-size:34px}
-.landing-ads-grid .l-body{padding:8px 9px 10px!important}
-.landing-ads-grid .l-cat{font-size:9.5px!important;margin-bottom:2px!important}
+.landing-ads-grid .l-img{height:72px!important;font-size:28px}
+.landing-ads-grid .l-body{padding:6px 7px 7px!important}
+.landing-ads-grid .l-cat{font-size:8.5px!important;margin-bottom:1px!important}
 .landing-ads-grid .l-title{
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  min-height:2.2em;font-size:12px!important;line-height:1.3!important;margin:0 0 4px!important
+  min-height:0;font-size:12px!important;line-height:1.3!important;margin:0 0 4px!important
 }
 .landing-ads-grid .l-meta{font-size:10.5px!important;gap:4px!important}
 .landing-ads-grid .l-price{font-size:11.5px!important}
 .landing-ads-grid .l-badge{font-size:9px!important;padding:3px 7px!important;top:7px!important;right:7px!important}
 .landing-ads-grid .lad-fav{width:26px!important;height:26px!important;font-size:12px!important;top:7px!important;left:7px!important}
+@media(max-width:768px){
+  .landing-ads-grid .listing-card{border-radius:10px!important}
+  .landing-ads-grid .l-title{font-size:10px!important;margin:0 0 2px!important;line-height:1.25!important}
+  .landing-ads-grid .l-body{padding:5px 6px 6px!important}
+  .landing-ads-grid .lad-fav{width:22px!important;height:22px!important;font-size:11px!important;top:5px!important;left:5px!important}
+  .landing-ads-grid .l-badge{font-size:7.5px!important;padding:2px 5px!important;top:5px!important;right:5px!important}
+}
 .landing-ads-grid .lc-hover{padding:12px!important}
 .landing-ads-grid .lc-hover-title{font-size:12.5px!important}
 .landing-ads-grid .lc-hover-desc{font-size:11px!important;-webkit-line-clamp:2}
