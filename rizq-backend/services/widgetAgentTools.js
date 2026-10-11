@@ -14,6 +14,7 @@ function readAdBoosts() { return repos.adBoosts.asMap(); }
 
 const ACCOUNT_PUBLIC = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
+  'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 

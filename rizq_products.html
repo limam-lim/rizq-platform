@@ -433,7 +433,8 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
-  <script src="rizq_store_commerce.js?v=26.9" defer></script>
+  <script src="rizq_store_topics.js?v=27.0" defer></script>
+  <script src="rizq_store_commerce.js?v=27.0" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -553,13 +554,9 @@ main, .page-content.active, .main-content, .results-area,
       </div>
     </div>
 
-    <!-- Cat tabs -->
-    <div class="cat-tabs" role="tablist">
+    <!-- Cat tabs — تُبنى ديناميكياً من موضوعات المحل -->
+    <div class="cat-tabs" role="tablist" id="cat-tabs">
       <button class="cat-tab active" onclick="filterCat(this,'all')" data-t="cat-all">الكل</button>
-      <button class="cat-tab" onclick="filterCat(this,'ملابس')" data-t="cat-clothes">👗 ملابس</button>
-      <button class="cat-tab" onclick="filterCat(this,'أحذية')" data-t="cat-shoes">👟 أحذية</button>
-      <button class="cat-tab" onclick="filterCat(this,'إكسسوار')" data-t="cat-acc">💍 إكسسوار</button>
-      <button class="cat-tab" onclick="filterCat(this,'أطفال')" data-t="cat-kids">🧸 أطفال</button>
     </div>
 
     <div class="products-grid" id="products-grid"></div>
@@ -579,6 +576,8 @@ main, .page-content.active, .main-content, .results-area,
 <script>
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 const CAT_FR={'ملابس':'Vêtements','أحذية':'Chaussures','إكسسوار':'Accessoires','أطفال':'Enfants'};
+var _storeTopics = [];
+var _buyerTopicIndex = {};
 
 const allProducts = [];
 const PAGE_SIZE = (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15;
@@ -728,22 +727,31 @@ function syncSidebarCatsFromDom() {
   }
 }
 
+function _productMatchesTopicKey(p, key) {
+  if (!key || key === 'all') return true;
+  if (window.RizqStoreTopics && _buyerTopicIndex[key]) {
+    return RizqStoreTopics.matchProduct(_buyerTopicIndex[key], p);
+  }
+  if (p.topicId && String(p.topicId) === String(key)) return true;
+  return String(p.cat || '') === String(key);
+}
+
 function rebuildSidebarCats(products) {
   var box = document.getElementById('cat-filters-box');
   if (!box) return;
   var ar = window.isAr !== false;
-  var counts = {};
-  (products || []).forEach(function(p){
-    var c = p.cat || 'عام';
-    counts[c] = (counts[c] || 0) + 1;
-  });
-  var cats = Object.keys(counts);
+  var fr = !ar;
+  var topics = (window.RizqStoreTopics)
+    ? RizqStoreTopics.buyerTopics(_storeTopics, products, fr)
+    : [];
+  _buyerTopicIndex = {};
+  topics.forEach(function(t){ _buyerTopicIndex[t.id] = t; });
   var total = (products || []).length;
   var html = '<div class="filter-opt"><input type="checkbox" id="f-all" '+(selectedSidebarCats.length?'':'checked')+' onchange="onSidebarAll()"><label for="f-all">'+(ar?'الكل':'Tout')+'</label><span class="filter-count" id="fc-all">'+total+'</span></div>';
-  cats.forEach(function(c, i){
+  topics.forEach(function(t, i){
     var id = 'f-cat-' + i;
-    var checked = selectedSidebarCats.indexOf(c) !== -1 ? ' checked' : '';
-    html += '<div class="filter-opt"><input type="checkbox" id="'+id+'" data-cat="'+sanitize(c)+'"'+checked+' onchange="filterChange()"><label for="'+id+'">'+sanitize(ar?c:(CAT_FR[c]||c))+'</label><span class="filter-count">'+counts[c]+'</span></div>';
+    var checked = selectedSidebarCats.indexOf(t.id) !== -1 ? ' checked' : '';
+    html += '<div class="filter-opt"><input type="checkbox" id="'+id+'" data-cat="'+sanitize(t.id)+'"'+checked+' onchange="filterChange()"><label for="'+id+'">'+sanitize(t.label)+'</label><span class="filter-count">'+t.count+'</span></div>';
   });
   box.innerHTML = html;
 }
@@ -768,8 +776,8 @@ function applyFilters() {
   const fNew  = document.getElementById('f-new')?.checked;
 
   let filtered = allProducts.filter(p => {
-    if (currentCat !== 'all' && p.cat !== currentCat) return false;
-    if (selectedSidebarCats.length && selectedSidebarCats.indexOf(p.cat) === -1) return false;
+    if (currentCat !== 'all' && !_productMatchesTopicKey(p, currentCat)) return false;
+    if (selectedSidebarCats.length && !selectedSidebarCats.some(function(k){ return _productMatchesTopicKey(p, k); })) return false;
     if (query && !String(p.name||'').toLowerCase().includes(query) && !String(p.nameF||'').toLowerCase().includes(query)) return false;
     if (p.price < minP || p.price > maxP) return false;
     if (fDisc && !p.discount) return false;
@@ -1029,11 +1037,19 @@ function applyStoreBrand(acc, storeId, fr){
 function commitCatalog(mapped, acc, storeId, fr){
   allProducts.length = 0;
   Array.prototype.push.apply(allProducts, mapped || []);
-  var cats = allProducts.reduce(function(acc2,p){ if(p.cat && acc2.indexOf(p.cat)===-1) acc2.push(p.cat); return acc2; }, []);
+  _storeTopics = (acc && Array.isArray(acc.storeTopics)) ? acc.storeTopics : [];
+  var topics = (window.RizqStoreTopics)
+    ? RizqStoreTopics.buyerTopics(_storeTopics, allProducts, fr)
+    : [];
+  _buyerTopicIndex = {};
+  topics.forEach(function(t){ _buyerTopicIndex[t.id] = t; });
   var tabsWrap = document.querySelector('.cat-tabs');
   if(tabsWrap){
     tabsWrap.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')">'+(fr?'Tout':'الكل')+'</button>'
-      + cats.map(function(c){ return '<button class="cat-tab" onclick="filterCat(this,\''+String(c).replace(/'/g,"\\'")+'\')">'+sanitize(fr?(CAT_FR[c]||c):c)+'</button>'; }).join('');
+      + topics.map(function(t){
+          var safe = String(t.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+sanitize(t.label)+'</button>';
+        }).join('');
   }
   selectedSidebarCats = [];
   currentCat = 'all';
@@ -1050,11 +1066,20 @@ async function loadRealStoreProducts(){
   var params = new URLSearchParams(location.search);
   var storeId = params.get('id') || params.get('store') || '';
   if(!storeId || storeId === 'demo_store' || params.get('demo') === '1'){
-    commitCatalog(_demoCatalog(fr), {
+    var demoMapped = _demoCatalog(fr);
+    var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(demoMapped) : [];
+    // أسماء فرنسية أوضح للعرض التجريبي
+    var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };
+    demoTopics.forEach(function(t){ if(frMap[t.nameAr]) t.nameFr = frMap[t.nameAr]; });
+    demoMapped.forEach(function(p){
+      var t = window.RizqStoreTopics ? RizqStoreTopics.findByName(demoTopics, p.cat) : null;
+      if(t) p.topicId = t.id;
+    });
+    commitCatalog(demoMapped, {
       id: 'demo_store', name: fr ? 'Boutique Al-Nour' : 'متجر النور',
       tagline: fr ? 'Espace marchand démo' : 'واجهة محل تجريبية',
       promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      status: 'approved', type: 'store'
+      status: 'approved', type: 'store', storeTopics: demoTopics
     }, 'demo_store', fr);
     return;
   }

@@ -1828,6 +1828,7 @@ function genDashToken() {
 // الحقول الآمنة للعرض العام — بدون phone/email/whatsapp (Contact Gate يتحكم)
 const ACCOUNT_PUBLIC_FIELDS = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
+  'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 function toPublicAccount(acc) {

@@ -86,6 +86,7 @@
       name: p.name || '',
       nameF: p.nameF || p.name || '',
       cat: p.cat || 'عام',
+      topicId: p.topicId || '',
       emoji: p.emoji || '📦',
       price: priceNum,
       oldPrice: p.oldPrice || null,

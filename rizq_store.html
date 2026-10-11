@@ -836,7 +836,8 @@ footer{
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
-  <script src="rizq_store_commerce.js?v=26.9" defer></script>
+  <script src="rizq_store_topics.js?v=27.0" defer></script>
+  <script src="rizq_store_commerce.js?v=27.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1755,6 +1756,14 @@ function rizqShare(title, url) {
         { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: 'بيانات عرض' },
         { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, desc: 'بيانات عرض' }
       ];
+      var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
+      var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };
+      demoTopics.forEach(function(t){ if(frMap[t.nameAr]) t.nameFr = frMap[t.nameAr]; });
+      products.forEach(function(p){
+        var t = window.RizqStoreTopics ? RizqStoreTopics.findByName(demoTopics, p.cat) : null;
+        if(t) p.topicId = t.id;
+      });
+      acc.storeTopics = demoTopics;
       try{
         localStorage.setItem('store_products_' + id, JSON.stringify(products));
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
@@ -1763,6 +1772,7 @@ function rizqShare(title, url) {
         localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }catch(e){}
       window._rizqStoreAccountId = id;
+      window._rizqStoreProfile = acc;
       window._rizqStoreServiceDesk = acc.serviceDesk;
       window._rizqStorePaymentMethods = acc.paymentMethods;
       window._rizqStoreIsDemo = true;
@@ -1836,7 +1846,13 @@ function rizqShare(title, url) {
       var list = Array.isArray(products) ? products.slice() : [];
       var shown = 0;
       var featured = {};
-      var cats = [];
+      var storeTopics = (window._rizqStoreProfile && Array.isArray(window._rizqStoreProfile.storeTopics))
+        ? window._rizqStoreProfile.storeTopics : [];
+      var buyerTopics = (window.RizqStoreTopics)
+        ? RizqStoreTopics.buyerTopics(storeTopics, list, isFr())
+        : [];
+      var topicById = {};
+      buyerTopics.forEach(function(t){ topicById[t.id] = t; });
       window._qvProductsMap = window._qvProductsMap || {};
 
       function cardHtml(p, i){
@@ -1844,9 +1860,11 @@ function rizqShare(title, url) {
         var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
           ? RizqStoreCommerce.imagesOf(p)
           : ((p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []));
-        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦', cat: p.cat || '' };
+        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '' };
         window._qvProductsMap[pid] = { images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock };
-        if(p.cat && cats.indexOf(p.cat) === -1) cats.push(p.cat);
+        var topic = null;
+        if(window.RizqStoreTopics) topic = RizqStoreTopics.resolveProductTopic(storeTopics, p);
+        var topicKey = topic ? topic.id : (p.topicId || p.cat || '');
         var priceTxt = (Number(p.price)||0).toLocaleString('en-US') + ' MRU';
         var media = (window.RizqStoreCommerce && RizqStoreCommerce.productMediaHtml)
           ? RizqStoreCommerce.productMediaHtml(Object.assign({}, p, { id: pid, images: imgs }), { fr: isFr(), showPrice: false })
@@ -1858,7 +1876,7 @@ function rizqShare(title, url) {
           : '';
         var safeName = esc(p.name).replace(/'/g, "\\'");
         var safeCat = esc(p.cat||'').replace(/'/g, "\\'");
-        return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
+        return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" data-topic="'+esc(topicKey)+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
           + '<div class="product-img">'+media+tagHtml+'</div>'
           + '<div class="product-info">'
           + '<div class="product-name">'+esc(p.name)+'</div>'
@@ -1883,7 +1901,7 @@ function rizqShare(title, url) {
         if(moreBtn) moreBtn.style.display = shown < list.length ? 'block' : 'none';
         if(window.RizqStoreCommerce && RizqStoreCommerce.bindMedia) RizqStoreCommerce.bindMedia(grid);
         var tabsEl = document.getElementById('cat-tabs-el');
-        if(tabsEl && cats.length && typeof renderStoreCatTabs === 'function') renderStoreCatTabs(tabsEl, cats, isFr());
+        if(tabsEl && typeof renderStoreCatTabs === 'function') renderStoreCatTabs(tabsEl, buyerTopics, isFr());
       }
 
       window._rizqStoreShowMoreProducts = renderMore;
@@ -1916,6 +1934,7 @@ function rizqShare(title, url) {
           }
           return;
         }
+        window._rizqStoreProfile = acc;
 
         // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي — الباقات في الداشبورد فقط
         (function hidePlatformUpsellOnBoundStore(){
@@ -2056,6 +2075,7 @@ function rizqShare(title, url) {
             if(pdata){
               var acc = (pdata.accounts||[]).find(function(a){ return a.id===id && a.type==='store'; });
               if(acc){
+                window._rizqStoreProfile = acc;
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
@@ -2126,7 +2146,7 @@ function rizqShare(title, url) {
               if(names[p.name]) return;
               merged.push({
                 id: 'B'+p.id, name: p.name, nameF: p.name, price: Number(p.price)||0,
-                cat: p.cat||'', emoji: p.emoji||'📦', desc: p.desc||'', stock: p.stock,
+                cat: p.cat||'', topicId: p.topicId||'', emoji: p.emoji||'📦', desc: p.desc||'', stock: p.stock,
                 imgDataArr: (Array.isArray(p.images)&&p.images.length)?p.images:(p.image?[p.image]:[])
               });
             });
@@ -2448,27 +2468,32 @@ function storeShopBtnsHtml(fr){
     + '<span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>'
     + '</a>';
 }
-function renderStoreCatTabs(tabsEl, cats, fr){
+function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
   if(!tabsEl) return;
   var allLbl = fr ? 'Tout' : 'الكل';
-  var list = Array.isArray(cats) ? cats : [];
+  var list = Array.isArray(topicsOrCats) ? topicsOrCats : [];
   tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')" data-t="cat-all">'+allLbl+'</button>'
     + storeShopBtnsHtml(!!fr)
-    + list.map(function(c){
-        var safe = String(c).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'");
-        return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+String(c).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</button>';
+    + list.map(function(item){
+        var id = (item && typeof item === 'object') ? (item.id || item.nameAr || '') : item;
+        var lab = (item && typeof item === 'object')
+          ? (item.label || (fr ? (item.nameFr || item.nameAr) : (item.nameAr || item.nameFr)) || id)
+          : item;
+        var safe = String(id).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'");
+        var safeLab = String(lab).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+safeLab+'</button>';
       }).join('');
   if(typeof updateCartCount === 'function') updateCartCount();
   if(typeof _renderWishUI === 'function') _renderWishUI();
 }
 function filterCat(btn, cat){
-  // Update tab active state
   document.querySelectorAll('.cat-tab').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
-  // Show/hide product cards
   document.querySelectorAll('#products-grid .product-card').forEach(function(card){
-    var cardCat = card.getAttribute('data-cat') || 'all';
-    card.style.display = (cat === 'all' || cardCat === cat) ? '' : 'none';
+    var topic = card.getAttribute('data-topic') || '';
+    var cardCat = card.getAttribute('data-cat') || '';
+    var show = (cat === 'all' || topic === cat || cardCat === cat);
+    card.style.display = show ? '' : 'none';
   });
 }
 

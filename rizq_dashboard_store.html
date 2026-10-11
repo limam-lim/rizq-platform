@@ -349,7 +349,8 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_store_commerce.js?v=26.9"></script>
+<script src="rizq_store_topics.js?v=27.0"></script>
+<script src="rizq_store_commerce.js?v=27.0"></script>
 <script src="rizq_account_payments.js?v=27.0"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
@@ -604,6 +605,31 @@ textarea.form-input{resize:vertical;min-height:90px}
     <!-- ══ PRODUCTS ══ -->
     <div class="panel" id="panel-products">
 
+      <!-- موضوعات المحل — فلاتر ديناميكية لصفحة المشتري -->
+      <div class="card" id="store-topics-card" style="margin-bottom:16px;border:1px solid rgba(201,168,76,.28);background:#fff">
+        <div class="card-header">
+          <div class="card-title" data-t="topics-title">🗂️ موضوعات المحل (فلاتر الصفحة العامة)</div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="saveStoreTopics()" data-t="topics-save">💾 حفظ الموضوعات</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;line-height:1.6" data-t="topics-hint">
+          عرّف موضوعات محلك بالعربية والفرنسية — تظهر كتبوبيات وفلاتر عند الزائر فقط إن وُجدت منتجات فيها.
+        </p>
+        <div id="store-topics-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+        <div class="form-grid" style="align-items:end">
+          <div class="form-group" style="margin:0">
+            <label class="form-label" data-t="topics-ar-label">اسم الموضوع (عربي)</label>
+            <input class="form-input" id="topic-name-ar" maxlength="80" placeholder="مثال: ملابس رجالية"/>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label" data-t="topics-fr-label">Nom (FR)</label>
+            <input class="form-input" id="topic-name-fr" maxlength="80" placeholder="Ex: Hommes"/>
+          </div>
+          <div class="form-group" style="margin:0">
+            <button type="button" class="btn btn-primary" style="width:100%" onclick="addStoreTopic()" data-t="topics-add">➕ إضافة موضوع</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Add product form — always visible at top -->
       <div class="card" id="add-product-form" style="border:2px dashed rgba(27,58,107,.15);background:#fafcff">
         <div class="card-header">
@@ -623,8 +649,11 @@ textarea.form-input{resize:vertical;min-height:90px}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" data-t="prod-cat-label">فئة المنتج (تظهر كتصنيف في صفحتك العامة)</label>
-            <input class="form-input" id="prod-cat" data-ph="prod-cat-ph" placeholder="مثال: ملابس، إلكترونيات، أثاث، مواد غذائية..."/>
+            <label class="form-label" data-t="prod-cat-label">موضوع المنتج (من قائمة محلك)</label>
+            <select class="form-input" id="prod-cat" aria-label="موضوع المنتج">
+              <option value="">— اختر موضوعاً —</option>
+            </select>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:6px" data-t="prod-cat-hint">إن لم تجد الموضوع المناسب، أضفه أعلاه أولاً ثم اختره هنا.</p>
           </div>
           <div class="form-group">
             <label class="form-label" data-t="prod-desc-label">الوصف</label>
@@ -1409,6 +1438,12 @@ function _initWithAccount(acc){
   var _wpb=document.getElementById('wb-plan-badge');if(_wpb)_wpb.textContent=_t2('💎 باقة ','💎 Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
   var _wsub=document.getElementById('wb-sub');if(_wsub)_wsub.textContent=(acc.activity||acc.type||_t2('متجر','Commerce'))+' · '+(acc.city||'موريتانيا');
   updateSubBadge();
+  try{
+    if(Array.isArray(acc.storeTopics)) STORE.storeTopics = acc.storeTopics;
+    else if(Array.isArray(STORE.storeTopics)) { /* keep */ }
+    else STORE.storeTopics = [];
+  }catch(eTop){ STORE.storeTopics = []; }
+  renderStoreTopicsUI();
 
   // Render initial panel
   showPanel('overview', document.querySelector('.sb-item'));
@@ -1481,7 +1516,7 @@ function showPanel(id, el){
     title.textContent = titleMap[id]||'';
   }
   if(id==='overview') renderOverview();
-  if(id==='products') renderProducts();
+  if(id==='products'){ renderStoreTopicsUI(); renderProducts(); }
   if(id==='messages') renderMessages();
   if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
   if(id==='photos') renderPhotos();
@@ -1978,7 +2013,8 @@ function openAddProduct(){
 }
 
 function clearProductForm(){
-  ['prod-name','prod-price','prod-cat','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['prod-name','prod-price','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  fillProductTopicSelect('');
   document.getElementById('prod-status').value='available';
   const zone = document.getElementById('prod-upload-zone');
   zone.style.display='';
@@ -2040,6 +2076,7 @@ function _rizqSyncCatalogItem(prod){
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
     var body = {
       accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
+      topicId: prod.topicId || '',
       desc: prod.desc, stock: prod.stock, variants: prod.variants, sku: prod.sku||'', unit: prod.unit||'', sold: prod.sold,
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
@@ -2082,7 +2119,7 @@ function _rizqMergeCatalogFromBackend(){
         var existingBackendIds = {};
         products.forEach(function(p){ if(p._backendId) existingBackendIds[p._backendId]=true; });
         var toAdd = data.items.filter(function(it){ return !existingBackendIds[it.id]; }).map(function(it){
-          return { id:'LP-'+it.id, _backendId: it.id, name: it.name, price: it.price, cat: it.cat, desc: it.desc,
+          return { id:'LP-'+it.id, _backendId: it.id, name: it.name, price: it.price, cat: it.cat, topicId: it.topicId||'', desc: it.desc,
             stock: it.stock, variants: it.variants, sku: it.sku||'', unit: it.unit||'', sold: it.sold||0, status: it.status, imgData: it.image||null,
             imgDataArr: Array.isArray(it.images) && it.images.length ? it.images : (it.image?[it.image]:[]),
             emoji: it.emoji||'📦', addedAt: it.createdAt };
@@ -2093,6 +2130,124 @@ function _rizqMergeCatalogFromBackend(){
         if(typeof renderProductsList === 'function') renderProductsList();
       }).catch(function(){});
   }catch(e){}
+}
+
+/* ══ موضوعات المحل (فلاتر ديناميكية) ══ */
+function _storeTopicsList(){
+  if(!STORE) STORE = {};
+  if(!Array.isArray(STORE.storeTopics)) STORE.storeTopics = [];
+  if(window.RizqStoreTopics) STORE.storeTopics = RizqStoreTopics.normalizeList(STORE.storeTopics);
+  return STORE.storeTopics;
+}
+function _ensureStoreTopicsSeeded(){
+  var list = _storeTopicsList();
+  if(list.length) return list;
+  if(window.RizqStoreTopics && products && products.length){
+    STORE.storeTopics = RizqStoreTopics.seedFromProducts(products);
+  }
+  return _storeTopicsList();
+}
+function renderStoreTopicsUI(){
+  var box = document.getElementById('store-topics-list');
+  if(!box) return;
+  var fr = _storeDashLang() === 'fr';
+  var list = _ensureStoreTopicsSeeded();
+  if(!list.length){
+    box.innerHTML = '<div style="padding:14px;border:1px dashed #d5deea;border-radius:10px;color:var(--text-muted);font-size:13px;text-align:center">'
+      + (fr ? 'Aucun thème — ajoutez vos catégories ci-dessous.' : 'لا موضوعات بعد — أضف تصنيفات محلك بالأسفل.')
+      + '</div>';
+  } else {
+    box.innerHTML = list.map(function(t, i){
+      return '<div class="hours-row" style="grid-template-columns:1fr 1fr auto auto auto;gap:8px;align-items:center;padding:8px;border:1px solid #e8edf5;border-radius:10px;background:#fafcff" data-topic-i="'+i+'">'
+        + '<input class="form-input" style="padding:7px 10px;font-size:12.5px" value="'+String(t.nameAr||'').replace(/"/g,'&quot;')+'" onchange="updateStoreTopicField('+i+',\'nameAr\',this.value)" placeholder="عربي"/>'
+        + '<input class="form-input" style="padding:7px 10px;font-size:12.5px" value="'+String(t.nameFr||'').replace(/"/g,'&quot;')+'" onchange="updateStoreTopicField('+i+',\'nameFr\',this.value)" placeholder="FR" dir="ltr"/>'
+        + '<label style="display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap;cursor:pointer">'
+        + '<input type="checkbox" '+(t.active?'checked':'')+' onchange="updateStoreTopicField('+i+',\'active\',this.checked)"/>'
+        + '<span>'+(fr?'Actif':'مفعّل')+'</span></label>'
+        + '<div style="display:flex;gap:4px">'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px" onclick="moveStoreTopic('+i+',-1)" title="↑">↑</button>'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px" onclick="moveStoreTopic('+i+',1)" title="↓">↓</button>'
+        + '</div>'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px;color:#b91c1c" onclick="removeStoreTopic('+i+')" title="'+(fr?'Supprimer':'حذف')+'">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+  fillProductTopicSelect();
+}
+function updateStoreTopicField(i, key, val){
+  var list = _storeTopicsList();
+  if(!list[i]) return;
+  if(key === 'active') list[i].active = !!val;
+  else list[i][key] = String(val||'').trim().slice(0,80);
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  fillProductTopicSelect();
+}
+function addStoreTopic(){
+  var arEl = document.getElementById('topic-name-ar');
+  var frEl = document.getElementById('topic-name-fr');
+  var ar = (arEl && arEl.value || '').trim();
+  var fr = (frEl && frEl.value || '').trim();
+  if(!ar && !fr){ showToast(_t2('أدخل اسم الموضوع','Saisissez un nom de thème'),'error'); return; }
+  var list = _storeTopicsList();
+  if(list.length >= (window.RizqStoreTopics ? RizqStoreTopics.MAX : 30)){
+    showToast(_t2('وصلت للحد الأقصى من الموضوعات','Limite de thèmes atteinte'),'error'); return;
+  }
+  list.push({
+    id: window.RizqStoreTopics ? RizqStoreTopics.genId() : ('t_'+Date.now()),
+    nameAr: ar || fr, nameFr: fr || ar, order: list.length, active: true
+  });
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  if(arEl) arEl.value = '';
+  if(frEl) frEl.value = '';
+  renderStoreTopicsUI();
+}
+function removeStoreTopic(i){
+  var list = _storeTopicsList();
+  if(!list[i]) return;
+  if(!confirm(_t2('حذف هذا الموضوع؟ المنتجات المرتبطة تبقى لكن الفلتر يختفي إن لم يُستبدل.','Supprimer ce thème ? Les produits restent, mais le filtre disparaît s\'il n\'est pas remplacé.'))) return;
+  list.splice(i,1);
+  list.forEach(function(t,n){ t.order = n; });
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  renderStoreTopicsUI();
+}
+function moveStoreTopic(i, dir){
+  var list = _storeTopicsList();
+  var j = i + dir;
+  if(j < 0 || j >= list.length) return;
+  var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+  list.forEach(function(t,n){ t.order = n; });
+  STORE.storeTopics = list;
+  renderStoreTopicsUI();
+}
+function saveStoreTopics(){
+  var list = _storeTopicsList();
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    var idx = accs.findIndex(function(a){ return a.id === SESSION_ID; });
+    if(idx !== -1){
+      accs[idx].storeTopics = STORE.storeTopics;
+      localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+      STORE = accs[idx];
+    }
+  }catch(e){}
+  _syncProfileToBackend(STORE);
+  renderStoreTopicsUI();
+  showToast(_t2('تم حفظ موضوعات المحل ✅','Thèmes de la boutique enregistrés ✅'),'success');
+}
+function fillProductTopicSelect(selectedId){
+  var sel = document.getElementById('prod-cat');
+  if(!sel) return;
+  var fr = _storeDashLang() === 'fr';
+  var list = _storeTopicsList().filter(function(t){ return t.active; });
+  var cur = selectedId != null ? String(selectedId) : String(sel.value || '');
+  var html = '<option value="">'+(fr?'— Choisir un thème —':'— اختر موضوعاً —')+'</option>';
+  list.forEach(function(t){
+    var lab = fr ? (t.nameFr||t.nameAr) : (t.nameAr||t.nameFr);
+    html += '<option value="'+String(t.id).replace(/"/g,'&quot;')+'"'+(cur===String(t.id)?' selected':'')+'>'+lab.replace(/</g,'&lt;')+'</option>';
+  });
+  sel.innerHTML = html;
+  if(cur) sel.value = cur;
 }
 
 function saveProduct(){
@@ -2131,6 +2286,16 @@ function saveProduct(){
   };
   function doSave(data){
     var _editing = window._editingIdx!=null ? products[window._editingIdx] : null;
+    var topicId = document.getElementById('prod-cat') ? document.getElementById('prod-cat').value.trim() : '';
+    var topic = (window.RizqStoreTopics && topicId)
+      ? RizqStoreTopics.findById(_storeTopicsList(), topicId)
+      : null;
+    var activeTopics = _storeTopicsList().filter(function(t){ return t.active; });
+    if(activeTopics.length && !topic){
+      showToast(_t2('اختر موضوعاً من قائمة محلك أو أضف موضوعاً أولاً','Choisissez un thème de votre boutique ou ajoutez-en un d\'abord'),'error');
+      return;
+    }
+    var catName = topic ? topic.nameAr : (_editing && _editing.cat ? _editing.cat : '');
     const prod = {
       // إصلاح جوهري 29/07/2026: معرّف ثابت لكل منتج (كان الاعتماد فقط على
       // ترتيب المصفوفة/index، هش وغير كافٍ للمزامنة مع الخادم الحقيقي) —
@@ -2139,7 +2304,8 @@ function saveProduct(){
       id: _editing ? (_editing.id || ('LP-'+Date.now())) : ('LP-'+Date.now()+'-'+Math.floor(Math.random()*10000)),
       _backendId: _editing ? (_editing._backendId||null) : null,
       name, price,
-      cat: document.getElementById('prod-cat') ? document.getElementById('prod-cat').value.trim() : '',
+      topicId: topic ? topic.id : (topicId || (_editing && _editing.topicId) || ''),
+      cat: catName || (topic ? topic.nameAr : ''),
       desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
       stock: document.getElementById('prod-stock') ? document.getElementById('prod-stock').value : '',
       variants: document.getElementById('prod-variants') ? document.getElementById('prod-variants').value.trim() : '',
@@ -2185,7 +2351,10 @@ function editProduct(i){
   window._editingIdx = i;
   document.getElementById('prod-name').value = p.name||'';
   document.getElementById('prod-price').value = p.price||'';
-  document.getElementById('prod-cat').value = p.cat||'';
+  var topicSel = (window.RizqStoreTopics)
+    ? (RizqStoreTopics.resolveProductTopic(_storeTopicsList(), p) || null)
+    : null;
+  fillProductTopicSelect(topicSel ? topicSel.id : (p.topicId || ''));
   document.getElementById('prod-desc').value = p.desc||'';
   document.getElementById('prod-stock').value = p.stock||'';
   document.getElementById('prod-variants').value = p.variants||'';
@@ -2360,7 +2529,8 @@ function _syncProfileToBackend(acc){
       category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
       address: acc.address||'', desc: acc.desc||'',
       promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
-      tagline: acc.tagline||'', thumb: acc.thumb||''
+      tagline: acc.tagline||'', thumb: acc.thumb||'',
+      storeTopics: Array.isArray(acc.storeTopics) ? acc.storeTopics : []
     })
   }).catch(function(){ /* فشل صامت — البيانات محفوظة محلياً على الأقل */ });
 }
