@@ -1006,6 +1006,15 @@
   }
 
   function deskFavHtml() {
+    // على المحل/المنتجات/السلة: نفس أدوات التجارة (مفضلة المحل أو المنصّة + السلة)
+    // كانت مفضلة المكتب تشير دائماً لـ landing#wishlist-block حتى من صفحة المحل
+    var commerce = commerceToolbarHtml();
+    if (commerce) {
+      return commerce.replace(
+        'class="rizq-toolbar-tools rizq-hdr-tools"',
+        'class="rizq-toolbar-tools rizq-hdr-tools nav-toolbar-tools"'
+      );
+    }
     return '<span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' +
       '<a href="rizq_landing_v8.html#wishlist-block" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
       t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +

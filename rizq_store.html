@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
-<link rel="preload" href="rizq_header.js?v=26.8" as="script"/>
+<link rel="preload" href="rizq_header.js?v=26.9" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -886,7 +886,7 @@ footer{
 .disc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
 .disc-overlay.open{display:flex}
 /* فوق الهيدر الموحّد (z-index ~10000) حتى تُفتح لوحة المفضلة بوضوح */
-#wish-panel-overlay.disc-overlay{z-index:11050}
+#wish-panel-overlay.disc-overlay{z-index:11050 !important}
 .disc-modal{
   background:linear-gradient(160deg,#0a1628,#122040);
   border:1.5px solid rgba(201,168,76,.45);
@@ -979,7 +979,7 @@ footer{
 </head>
 <body data-t-ns="store">
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو -->
-<script src="rizq_header.js?v=26.8"></script>
+<script src="rizq_header.js?v=26.9"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- TOPNAV -->
@@ -1303,6 +1303,14 @@ footer{
    المتصفح (localStorage) بلا حساب وبلا أي خادم، بيانات حقيقية فقط (ما
    يضيفه الزائر فعلاً) — لا أرقام وهمية. ──
    شريط الإشعار العلوي: rizq_site_banner.js (من /api/site-config). ── */
+function _qvEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 function _wishKey(){
   var params = new URLSearchParams(location.search);
   var id = params.get('id') || params.get('store') || '';
@@ -2154,8 +2162,9 @@ function rizqShare(title, url) {
         var wishLbl = isFr() ? 'Favoris' : 'المفضلة';
         return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" data-topic="'+esc(topicKey)+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
           + '<div class="product-img">'+media+tagHtml
-          + '<button type="button" class="wish-btn" data-wish-id="'+esc(pid)+'" title="'+wishLbl+'" aria-label="'+wishLbl+'" aria-pressed="false"'
-          + ' onclick="event.stopPropagation();_wishAuthToggle('+idJs+','+nameJs+','+priceJs+','+emojiJs+')">♡</button>'
+          + '<button type="button" class="wish-btn" data-wish-id="'+esc(pid)+'" title="'+esc(wishLbl)+'" aria-label="'+esc(wishLbl)+'" aria-pressed="false"'
+          // JSON.stringify يُنتج "..." — لذلك onclick بعلامات مفردة حتى لا يُقطع الـ attribute
+          + " onclick='event.stopPropagation();_wishAuthToggle("+idJs+","+nameJs+","+priceJs+","+emojiJs+")'>♡</button>"
           + '</div>'
           + '<div class="product-info">'
           + '<div class="product-name">'+esc(displayName)+'</div>'
