@@ -1673,6 +1673,28 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     margin-top:0 !important;
     clear:both !important;
   }
+  /* وضوح مسار التنقل (breadcrumb) على كل صفحات التطبيق */
+  html.rizq-app-nav .breadcrumb,
+  html.rizq-app-nav .breadcrumb .bc-inner{
+    background:#fff !important;
+    font-size:15px !important;
+    font-weight:800 !important;
+    color:#0D1B2A !important;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  html.rizq-app-nav .breadcrumb a{
+    color:#0F2347 !important;
+    font-weight:800 !important;
+    text-decoration:none;
+  }
+  html.rizq-app-nav .breadcrumb a:hover{color:#C9A84C !important}
+  html.rizq-app-nav .breadcrumb .bc-sep,
+  html.rizq-app-nav .breadcrumb .sep{color:#4a5f78 !important;font-weight:800 !important;font-size:16px !important}
+  html.rizq-app-nav .breadcrumb .bc-inner > span:not(.bc-sep):not(.sep){
+    color:#0D1B2A !important;
+    font-weight:900 !important;
+  }
   html.rizq-app-nav body > nav:has(.nav-search) > .logo,
   html.rizq-app-nav body > nav:has(.nav-search-mini) > .logo,
   html.rizq-app-nav body > nav:has(.nav-search) > .nav-disclaimer,

@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=17.1"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.6"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=26.7"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
@@ -86,12 +86,13 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .cart-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,0.4)}
 .cart-count{background:#0D1B2A;color:var(--gold);border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
 
-/* BREADCRUMB */
-.breadcrumb{background:#fff;border-bottom:1px solid #e0e8f0;padding:0 20px}
-.bc-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;height:40px;font-size:13px;color:#6a7a8a}
-.bc-inner a{color:var(--navy);text-decoration:none;font-weight:500}
-.bc-inner a:hover{color:var(--gold)}
-.bc-sep{color:#c0d0e0}
+/* BREADCRUMB — تباين أوضح للنص العربي */
+.breadcrumb{background:#fff !important;border-bottom:1px solid #c8d2e0;padding:0 20px}
+.bc-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:46px;font-size:15px;color:#0D1B2A;font-weight:800;-webkit-font-smoothing:antialiased}
+.bc-inner a{color:#0F2347 !important;text-decoration:none;font-weight:800}
+.bc-inner a:hover{color:#C9A84C !important}
+.bc-inner > span:not(.bc-sep){color:#0D1B2A !important;font-weight:900}
+.bc-sep{color:#4a5f78 !important;font-weight:800;font-size:16px}
 
 /* PAGE LAYOUT */
 .page-wrap{max-width:1100px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start}
