@@ -1536,7 +1536,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.3"></script>
+  <script src="rizq_intro_video.js?v=28.6"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1943,13 +1943,15 @@ function rizqShare(title, url) {
       var extra = videos.find(function(v){ return v.kind === 'extra'; });
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
-        linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗'
+        linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
+        playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
       });
       var okExtra = false;
       if(extra && extraMount && extraFrame){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
           title: fr ? '🎬 Vidéo supplémentaire' : '🎬 فيديو إضافي',
-          linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗'
+          linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
+          playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو الإضافي'
         });
         extraFrame.style.display = okExtra ? '' : 'none';
       } else if(extraFrame){
@@ -2203,8 +2205,18 @@ function rizqShare(title, url) {
               if(acc){
                 var localProf = window._rizqStoreProfile || {};
                 if(hasLocalMatch && localProf){
-                  if(acc.promo_video) localProf.promo_video = acc.promo_video;
-                  if(acc.promo_video_extra) localProf.promo_video_extra = acc.promo_video_extra;
+                  /* أولوية: فيديو الداشبورد المحلي إن وُجد، ثم الخادم */
+                  try{
+                    var localAccs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+                    var localAcc = localAccs.find(function(a){ return a && a.id === id; });
+                    if(localAcc && localAcc.promo_video) localProf.promo_video = localAcc.promo_video;
+                    else if(acc.promo_video) localProf.promo_video = acc.promo_video;
+                    if(localAcc && localAcc.promo_video_extra) localProf.promo_video_extra = localAcc.promo_video_extra;
+                    else if(acc.promo_video_extra) localProf.promo_video_extra = acc.promo_video_extra;
+                  }catch(eMergeVid){
+                    if(acc.promo_video) localProf.promo_video = acc.promo_video;
+                    if(acc.promo_video_extra) localProf.promo_video_extra = acc.promo_video_extra;
+                  }
                   if(acc.thumb && !localProf.thumb) localProf.thumb = acc.thumb;
                   if(acc.tagline && !localProf.tagline) localProf.tagline = acc.tagline;
                   window._rizqStoreProfile = localProf;
