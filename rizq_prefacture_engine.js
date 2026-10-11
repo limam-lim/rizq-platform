@@ -367,6 +367,8 @@
       sellerPhone: opts.sellerPhone || '',
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
+      buyerAddress: opts.buyerAddress || '',
+      buyerCity: opts.buyerCity || '',
       buyerNote: opts.buyerNote || '',
       selectedPayment: selected,
       paymentMethods: methods,
@@ -450,6 +452,8 @@
       sellerPhone: opts.sellerPhone || '',
       buyerName: opts.buyerName || '',
       buyerPhone: opts.buyerPhone || '',
+      buyerAddress: opts.buyerAddress || '',
+      buyerCity: opts.buyerCity || '',
       buyerNote: opts.buyerNote || '',
       selectedPayment: opts.selectedPayment,
       paymentMethods: opts.paymentMethods,
@@ -547,6 +551,13 @@
       + '<div style="background:#f8faff;border-radius:12px;padding:12px"><div style="font-size:11px;color:#6b7280;margin-bottom:4px">' + _esc(_t('الزبون', 'Client')) + '</div>'
       + '<div style="font-weight:800;color:#0F2347">' + _esc(doc.buyerName || _t('زبون رزق', 'Client Rizq')) + '</div>'
       + (doc.buyerPhone ? '<div style="font-size:12px;margin-top:4px;direction:ltr;text-align:inherit">' + _esc(doc.buyerPhone) + '</div>' : '')
+      + (doc.buyerCity || doc.buyerAddress
+        ? '<div style="font-size:12px;margin-top:4px;color:#475569;line-height:1.5">'
+          + (doc.buyerCity ? _esc(doc.buyerCity) : '')
+          + (doc.buyerCity && doc.buyerAddress ? ' — ' : '')
+          + (doc.buyerAddress ? _esc(doc.buyerAddress) : '')
+          + '</div>'
+        : '')
       + '</div></div>'
       + (function () {
         var d = _deliveryMeta(doc);

@@ -161,6 +161,24 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(27,58,107,.08)}
 .form-group input::placeholder,.form-group textarea::placeholder{color:#b0b8c8}
 .form-err{font-size:11px;color:var(--red);margin-top:4px;display:none}
+.delivery-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.delivery-actions .deliv-btn{
+  flex:1;min-width:140px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;
+  font-family:inherit;cursor:pointer;border:none;transition:all .25s;min-height:46px
+}
+.delivery-actions .deliv-btn-confirm{background:var(--navy);color:#fff}
+.delivery-actions .deliv-btn-confirm:hover{background:#0a1a36}
+.delivery-actions .deliv-btn-edit{background:#fff;color:var(--navy);border:1.5px solid #c5d0e0}
+.delivery-actions .deliv-btn-edit:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.delivery-confirmed{
+  display:none;margin-top:14px;padding:14px 16px;border-radius:12px;
+  border:1.5px solid rgba(46,204,113,.35);background:rgba(46,204,113,.06)
+}
+.delivery-confirmed.is-on{display:block}
+.delivery-confirmed .dc-title{font-size:13px;font-weight:800;color:var(--green);margin-bottom:8px}
+.delivery-confirmed .dc-line{font-size:13.5px;color:#1a2a3a;line-height:1.65;margin:2px 0}
+.address-form.is-locked .form-grid{opacity:.55;pointer-events:none}
+.address-form.is-locked .delivery-actions .deliv-btn-confirm{display:none}
 
 /* ORDER SUMMARY */
 .order-summary{background:linear-gradient(145deg,#fff,#f8fafc);border-radius:var(--radius);border:1px solid #e0e8f0;padding:24px;position:sticky;top:84px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
@@ -535,8 +553,15 @@ main, .page-content.active, .main-content, .results-area,
       <!-- ADDRESS FORM -->
       <div class="address-form" id="address-form-section">
         <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px" data-t-fr="📍 Informations de livraison">📍 معلومات التوصيل</div>
+        <div class="delivery-confirmed" id="delivery-confirmed-box" aria-live="polite">
+          <div class="dc-title" data-t-fr="✓ Informations confirmées">✓ تم تأكيد المعلومات</div>
+          <div class="dc-line" id="dc-name"></div>
+          <div class="dc-line" id="dc-phone" dir="ltr" style="text-align:inherit"></div>
+          <div class="dc-line" id="dc-address"></div>
+          <div class="dc-line" id="dc-city"></div>
+        </div>
         <form id="checkout-form" onsubmit="submitOrder(event)" novalidate>
-          <div class="form-grid">
+          <div class="form-grid" id="delivery-form-grid">
             <div class="form-group">
               <label data-t-fr="Nom complet *">الاسم الكامل *</label>
               <input type="text" id="f-name" placeholder="محمد السالك" data-ph-fr="Mohamed Salk" required maxlength="80"/>
@@ -553,7 +578,7 @@ main, .page-content.active, .main-content, .results-area,
               <div class="form-err" id="f-address-err" data-t-fr="L'adresse est requise">العنوان مطلوب</div>
             </div>
             <div class="form-group">
-              <label data-t-fr="Ville">المدينة</label>
+              <label data-t-fr="Ville *">المدينة *</label>
               <select id="f-city">
                 <option value="نواكشوط" data-t-fr="Nouakchott">نواكشوط</option>
                 <option value="نواذيبو" data-t-fr="Nouadhibou">نواذيبو</option>
@@ -570,6 +595,14 @@ main, .page-content.active, .main-content, .results-area,
               <label data-t-fr="Remarques pour le vendeur">ملاحظات للبائع</label>
               <textarea id="f-notes" rows="3" placeholder="أي تعليمات خاصة للتوصيل..." data-ph-fr="Instructions spéciales pour la livraison..." maxlength="500" style="resize:vertical"></textarea>
             </div>
+          </div>
+          <div class="delivery-actions">
+            <button type="button" class="deliv-btn deliv-btn-confirm" id="btn-confirm-delivery" onclick="confirmDeliveryInfo()">
+              <span data-t-fr="✓ Confirmer les informations">✓ تأكيد المعلومات</span>
+            </button>
+            <button type="button" class="deliv-btn deliv-btn-edit" id="btn-edit-delivery" onclick="editDeliveryInfo()">
+              <span data-t-fr="✎ Modifier / Mettre à jour">✎ تغيير / تحديث</span>
+            </button>
           </div>
         </form>
       </div>
@@ -660,6 +693,124 @@ main, .page-content.active, .main-content, .results-area,
 <script>
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
+
+var DELIVERY_KEY = 'rizq_buyer_delivery';
+var deliveryConfirmed = false;
+
+function _loadBuyerSession() {
+  try { return JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null'); } catch (e) { return null; }
+}
+function _loadSavedDelivery() {
+  try { return JSON.parse(localStorage.getItem(DELIVERY_KEY) || 'null'); } catch (e) { return null; }
+}
+function _saveDeliveryInfo(info) {
+  try { localStorage.setItem(DELIVERY_KEY, JSON.stringify(info)); } catch (e) {}
+  try {
+    var s = _loadBuyerSession();
+    if (s && s.id) {
+      s.name = info.name || s.name;
+      s.phone = info.phone || s.phone;
+      s.city = info.city || s.city;
+      s.address = info.address || s.address;
+      localStorage.setItem('rizq_buyer_session', JSON.stringify(s));
+    }
+  } catch (e2) {}
+}
+function readDeliveryForm() {
+  return {
+    name: (document.getElementById('f-name').value || '').trim(),
+    phone: (document.getElementById('f-phone').value || '').trim(),
+    address: (document.getElementById('f-address').value || '').trim(),
+    city: (document.getElementById('f-city').value || '').trim(),
+    district: (document.getElementById('f-district').value || '').trim(),
+    notes: (document.getElementById('f-notes').value || '').trim(),
+    confirmed: true,
+    savedAt: new Date().toISOString()
+  };
+}
+function validateDeliveryFields() {
+  var isAr = document.documentElement.lang !== 'fr';
+  var name = (document.getElementById('f-name').value || '').trim();
+  var phone = (document.getElementById('f-phone').value || '').trim();
+  var address = (document.getElementById('f-address').value || '').trim();
+  var valid = true;
+  document.getElementById('f-name-err').style.display = name ? 'none' : 'block';
+  if (!name) valid = false;
+  var phoneOk = validatePhone(phone);
+  document.getElementById('f-phone-err').style.display = phoneOk ? 'none' : 'block';
+  if (!phoneOk) valid = false;
+  document.getElementById('f-address-err').style.display = address ? 'none' : 'block';
+  if (!address) valid = false;
+  if (!valid) {
+    showToast(isAr ? '❌ يرجى تعبئة الاسم والهاتف والعنوان' : '❌ Remplissez nom, téléphone et adresse');
+  }
+  return valid;
+}
+function paintDeliveryConfirmed(info) {
+  var box = document.getElementById('delivery-confirmed-box');
+  var section = document.getElementById('address-form-section');
+  if (!box || !section) return;
+  var isAr = document.documentElement.lang !== 'fr';
+  document.getElementById('dc-name').textContent = (isAr ? 'الاسم: ' : 'Nom : ') + (info.name || '—');
+  document.getElementById('dc-phone').textContent = (isAr ? 'الهاتف: ' : 'Tél. : ') + (info.phone || '—');
+  document.getElementById('dc-address').textContent = (isAr ? 'العنوان: ' : 'Adresse : ') + (info.address || '—');
+  var cityLine = info.city || '';
+  if (info.district) cityLine += (cityLine ? ' — ' : '') + info.district;
+  document.getElementById('dc-city').textContent = cityLine
+    ? ((isAr ? 'المدينة: ' : 'Ville : ') + cityLine)
+    : '';
+  box.classList.add('is-on');
+  section.classList.add('is-locked');
+  deliveryConfirmed = true;
+}
+function clearDeliveryConfirmedView() {
+  var box = document.getElementById('delivery-confirmed-box');
+  var section = document.getElementById('address-form-section');
+  if (box) box.classList.remove('is-on');
+  if (section) section.classList.remove('is-locked');
+  deliveryConfirmed = false;
+}
+function confirmDeliveryInfo() {
+  if (!validateDeliveryFields()) return;
+  var info = readDeliveryForm();
+  _saveDeliveryInfo(info);
+  paintDeliveryConfirmed(info);
+  var isAr = document.documentElement.lang !== 'fr';
+  showToast(isAr ? '✅ تم تأكيد معلومات التوصيل' : '✅ Informations de livraison confirmées');
+}
+function editDeliveryInfo() {
+  clearDeliveryConfirmedView();
+  var nameEl = document.getElementById('f-name');
+  if (nameEl) nameEl.focus();
+  var isAr = document.documentElement.lang !== 'fr';
+  showToast(isAr ? '✎ يمكنك تحديث المعلومات ثم التأكيد' : '✎ Modifiez puis confirmez');
+}
+function autofillDeliveryFromAccount() {
+  var saved = _loadSavedDelivery();
+  var session = _loadBuyerSession();
+  var src = saved || session || null;
+  if (!src) return;
+  var nameEl = document.getElementById('f-name');
+  var phoneEl = document.getElementById('f-phone');
+  var addrEl = document.getElementById('f-address');
+  var cityEl = document.getElementById('f-city');
+  var distEl = document.getElementById('f-district');
+  if (nameEl && !nameEl.value && src.name) nameEl.value = src.name;
+  if (phoneEl && !phoneEl.value) {
+    var ph = src.phone || src.whatsapp || src.phoneIntl || '';
+    if (ph && /^\d{8}$/.test(String(ph))) ph = '+222' + ph;
+    phoneEl.value = ph;
+  }
+  if (addrEl && !addrEl.value && src.address) addrEl.value = src.address;
+  if (cityEl && src.city) {
+    var opt = Array.prototype.find.call(cityEl.options, function (o) { return o.value === src.city; });
+    if (opt) cityEl.value = src.city;
+  }
+  if (distEl && !distEl.value && src.district) distEl.value = src.district;
+  if (saved && saved.confirmed && saved.name && saved.phone && saved.address) {
+    paintDeliveryConfirmed(saved);
+  }
+}
 
 // روابط المحل/المنتجات + شريط الهوية
 (function bindStoreContext(){
@@ -1153,14 +1304,39 @@ function issueCartPrefacture(){
     };
   }
 
+  if (deliveryType === 'delivery') {
+    if (!deliveryConfirmed) {
+      if (!validateDeliveryFields()) return;
+      showToast(isAr ? '⚠️ أكّد معلومات التوصيل أولاً' : '⚠️ Confirmez d\'abord les infos de livraison');
+      return;
+    }
+  } else {
+    var nPick = (document.getElementById('f-name') || {}).value || '';
+    var pPick = (document.getElementById('f-phone') || {}).value || '';
+    if (!nPick.trim() || !validatePhone(pPick)) {
+      var saved = _loadSavedDelivery() || _loadBuyerSession();
+      if (saved) {
+        if (!nPick.trim() && saved.name) document.getElementById('f-name').value = saved.name;
+        if ((!pPick || !validatePhone(pPick)) && (saved.phone || saved.whatsapp)) {
+          var ph = saved.phone || saved.whatsapp;
+          if (/^\d{8}$/.test(String(ph))) ph = '+222' + ph;
+          document.getElementById('f-phone').value = ph;
+        }
+      }
+    }
+  }
   var nameEl = document.getElementById('f-name');
   var phoneEl = document.getElementById('f-phone');
+  var addrEl = document.getElementById('f-address');
+  var cityEl = document.getElementById('f-city');
   var doc = RizqPrefacture.createFromCart({
     module: (cart[0] && cart[0].module) || 'store',
     sellerName: window._rizqCartSellerName || (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
     sellerAccountId: _cartSellerId(),
     buyerName: nameEl ? nameEl.value.trim() : '',
     buyerPhone: phoneEl ? phoneEl.value.trim() : '',
+    buyerAddress: addrEl ? addrEl.value.trim() : '',
+    buyerCity: cityEl ? cityEl.value.trim() : '',
     buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement',
     selectedPayment: selectedPay,
     paymentMethods: selectedPay ? [selectedPay] : [],
@@ -1179,24 +1355,14 @@ function submitOrder(e) {
   const isAr = document.documentElement.lang !== 'fr';
   if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
 
-  // Validate only if delivery (address needed)
+  // Validate + require confirm for delivery
   if (deliveryType === 'delivery') {
-    const name    = document.getElementById('f-name').value.trim();
-    const phone   = document.getElementById('f-phone').value.trim();
-    const address = document.getElementById('f-address').value.trim();
-    let valid = true;
-
-    document.getElementById('f-name-err').style.display = name ? 'none' : 'block';
-    if (!name) valid = false;
-
-    const phoneOk = validatePhone(phone);
-    document.getElementById('f-phone-err').style.display = phoneOk ? 'none' : 'block';
-    if (!phoneOk) valid = false;
-
-    document.getElementById('f-address-err').style.display = address ? 'none' : 'block';
-    if (!address) valid = false;
-
-    if (!valid) { showToast(isAr ? '❌ يرجى تعبئة جميع الحقول المطلوبة' : '❌ Veuillez remplir tous les champs requis'); return; }
+    if (!validateDeliveryFields()) return;
+    if (!deliveryConfirmed) {
+      showToast(isAr ? '⚠️ اضغط «تأكيد المعلومات» قبل إرسال الطلب' : '⚠️ Appuyez sur « Confirmer » avant d\'envoyer');
+      return;
+    }
+    _saveDeliveryInfo(readDeliveryForm());
   }
 
   // Generate order number (client-side only — not secure for production)
@@ -1249,6 +1415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('empty-cart').style.display = 'block';
     document.getElementById('cart-content').style.display = 'none';
   }
+  try { autofillDeliveryFromAccount(); } catch (eFill) {}
 });
 </script>
 

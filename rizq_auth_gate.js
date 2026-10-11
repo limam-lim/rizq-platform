@@ -50,13 +50,13 @@
       titleAccount: 'حسابي',
       titleOtp: 'تأكيد بريدك الإلكتروني',
       titleChoice: 'حسابي على رزق',
-      subGate: 'سجّل مجاناً للتواصل وحفظ المفضلة واستخدام غرف المنصة — أقل من دقيقة',
-      subAccount: 'حسابك على رزق — للتصفح والتواصل والمفضلة',
+      subGate: 'سجّل مجاناً بمعلومات صحيحة تُستخدم للتوصيل والفاتورة والخدمات — أقل من دقيقة',
+      subAccount: 'حسابك على رزق — للتصفح والشراء والتوصيل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
       subReturning: 'مرحباً بعودتك! أكّد بريدك برمز التحقق',
       subChoice: 'اختر بوضوح: حساب شخصي، أو حساب أعمال جديد، أو دخول لحساب موجود',
       choiceBuyer: '👤 أتصفّح وأتواصل',
-      choiceBuyerSub: 'حساب شخصي للتواصل والمفضلة والمناقصات — أقل من دقيقة',
+      choiceBuyerSub: 'حساب شخصي — تواصل ومفضلة وتوصيل وفاتورة وخدمات',
       choiceSeller: '🏢 أنشر وأدير — حساب أعمال جديد',
       choiceSellerSub: 'إعلانات · محل · مكتب · معرض · مناقصات · استثمارات',
       choiceSellerLogin: '🔑 لدي حساب على رزق — دخول',
@@ -80,7 +80,13 @@
       backEdit: '← تعديل البيانات',
       resend: 'إعادة إرسال الرمز',
       resendIn: 'إعادة الإرسال خلال',
-      privacy: '🔒 بياناتك محمية — للتواصل والمفضلة ومكافحة الحسابات الوهمية فقط.',
+      privacy: '🔒 بياناتك محمية — تُستخدم للتواصل والتوصيل وفاتورة الشراء وتقديم الخدمات، وليس لأي غرض آخر.',
+      cityLabel: 'المدينة *',
+      addressLabel: 'عنوان التوصيل / السكن *',
+      addressPh: 'الحي، الشارع، أقرب معلم',
+      addressHint: 'يُستخدم لاحقاً للتوصيل والفاتورة وطلبات الخدمات دون إعادة كتابته',
+      errCity: 'اختر المدينة',
+      errAddress: 'أدخل عنواناً واضحاً للتوصيل (الحي والشارع)',
       backBtn: '← رجوع',
       linkPrivacy: 'الخصوصية',
       linkTerms: 'الشروط',
@@ -112,13 +118,13 @@
       titleAccount: 'Mon compte',
       titleOtp: 'Confirmez votre e-mail',
       titleChoice: 'Mon compte Rizq',
-      subGate: 'Inscrivez-vous gratuitement pour contacter, sauvegarder vos favoris et utiliser les salles Rizq',
-      subAccount: 'Votre compte Rizq — navigation, contact et favoris',
+      subGate: 'Inscrivez-vous avec des infos exactes (livraison, facture, services) — moins d’une minute',
+      subAccount: 'Votre compte Rizq — navigation, achats, livraison et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
       subReturning: 'Bon retour ! Confirmez votre e-mail avec le code',
       subChoice: 'Choisissez clairement : compte personnel, nouveau compte pro, ou connexion',
       choiceBuyer: '👤 Je parcours et je contacte',
-      choiceBuyerSub: 'Compte personnel — contact, favoris et salles Rizq',
+      choiceBuyerSub: 'Compte personnel — contact, favoris, livraison et facture',
       choiceSeller: '🏢 Je publie et gère — nouveau compte pro',
       choiceSellerSub: 'Annonces · boutique · bureau · showroom · appels d\'offres · investissements',
       choiceSellerLogin: '🔑 J\'ai un compte Rizq — Connexion',
@@ -142,13 +148,19 @@
       backEdit: '← Modifier les données',
       resend: 'Renvoyer le code',
       resendIn: 'Renvoi dans',
-      privacy: '🔒 Vos données sont protégées — contact, favoris et lutte anti-fraude uniquement.',
+      privacy: '🔒 Vos données sont protégées — utilisées pour le contact, la livraison, la facture d\'achat et les services, et pour rien d\'autre.',
+      cityLabel: 'Ville *',
+      addressLabel: 'Adresse de livraison / domicile *',
+      addressPh: 'Quartier, rue, point de repère',
+      addressHint: 'Réutilisée ensuite pour la livraison, la facture et les demandes de services',
+      errCity: 'Choisissez la ville',
+      errAddress: 'Saisissez une adresse claire (quartier et rue)',
       backBtn: '← Retour',
       linkPrivacy: 'Confidentialité',
       linkTerms: 'Conditions',
       linkHelp: 'Aide',
       reasonBadgePrefix: 'Requis',
-      formIntro: 'Renseignez vos infos puis confirmez votre e-mail avec un code court',
+      formIntro: 'Renseignez vos infos exactes puis confirmez votre e-mail avec un code court',
       errName: 'Veuillez saisir votre nom complet',
       errPhone: 'Numéro mauritanien (8 chiffres) ou international valide requis',
       errWhatsapp: 'Numéro WhatsApp valide requis',
@@ -454,6 +466,20 @@
       '      <label class="rag-label" id="rag-whatsapp-label" for="rag-whatsapp"></label>',
       '      <input class="rag-input" id="rag-whatsapp" type="tel" dir="ltr"/>',
       '      <div class="rag-errmsg" id="rag-whatsapp-err"></div>',
+      '      <label class="rag-label" id="rag-city-label" for="rag-city"></label>',
+      '      <select class="rag-input" id="rag-city" style="cursor:pointer">',
+      '        <option value="">—</option>',
+      '        <option value="نواكشوط">نواكشوط / Nouakchott</option>',
+      '        <option value="نواذيبو">نواذيبو / Nouadhibou</option>',
+      '        <option value="روصو">روصو / Rosso</option>',
+      '        <option value="كيفة">كيفة / Kiffa</option>',
+      '        <option value="أخرى">أخرى / Autre</option>',
+      '      </select>',
+      '      <div class="rag-errmsg" id="rag-city-err"></div>',
+      '      <label class="rag-label" id="rag-address-label" for="rag-address"></label>',
+      '      <input class="rag-input" id="rag-address" type="text" dir="auto" autocomplete="street-address"/>',
+      '      <p class="rag-hint" id="rag-address-hint"></p>',
+      '      <div class="rag-errmsg" id="rag-address-err"></div>',
       '      <button class="rag-btn" id="rag-send-otp-btn" type="button"></button>',
       '      <div class="rag-privacy" id="rag-privacy-form"></div>',
       '    </div>',
@@ -718,6 +744,14 @@
     document.getElementById('rag-wa-same-label').textContent = dict.waSame;
     document.getElementById('rag-email-label').textContent = dict.emailLabel;
     document.getElementById('rag-email').placeholder = dict.emailPh;
+    var cityLbl = document.getElementById('rag-city-label');
+    var addrLbl = document.getElementById('rag-address-label');
+    var addrPh = document.getElementById('rag-address');
+    var addrHint = document.getElementById('rag-address-hint');
+    if (cityLbl) cityLbl.textContent = dict.cityLabel;
+    if (addrLbl) addrLbl.textContent = dict.addressLabel;
+    if (addrPh) addrPh.placeholder = dict.addressPh;
+    if (addrHint) addrHint.textContent = dict.addressHint;
     document.getElementById('rag-send-otp-btn').textContent = dict.sendOtp;
     document.getElementById('rag-verify-btn').textContent = dict.verifyBtn;
     document.getElementById('rag-back-btn').textContent = dict.backEdit;
@@ -742,6 +776,10 @@
     document.getElementById('rag-phone-err').textContent = dict.errPhone;
     document.getElementById('rag-whatsapp-err').textContent = dict.errWhatsapp;
     document.getElementById('rag-email-err').textContent = dict.errEmail;
+    var cityErr = document.getElementById('rag-city-err');
+    var addrErr = document.getElementById('rag-address-err');
+    if (cityErr) cityErr.textContent = dict.errCity;
+    if (addrErr) addrErr.textContent = dict.errAddress;
     document.getElementById('rag-otp-err').textContent = dict.errOtp;
     document.getElementById('rag-logout-btn').textContent = dict.logout;
     document.getElementById('rag-seller-link').textContent = dict.sellerCta;
@@ -761,7 +799,9 @@
       phoneMr: phoneMr,
       phoneIntl: phoneIntl,
       phone: MR_PHONE_RE.test(phoneMr) ? phoneMr : '',
-      whatsapp: whatsapp
+      whatsapp: whatsapp,
+      city: (document.getElementById('rag-city') || {}).value || '',
+      address: ((document.getElementById('rag-address') || {}).value || '').trim()
     };
   }
 
@@ -803,6 +843,30 @@
     } else {
       document.getElementById('rag-whatsapp').classList.remove('err');
       document.getElementById('rag-whatsapp-err').classList.remove('show');
+    }
+    var cityEl = document.getElementById('rag-city');
+    var cityErr = document.getElementById('rag-city-err');
+    if (cityEl && cityErr) {
+      if (!data.city) {
+        cityEl.classList.add('err');
+        cityErr.classList.add('show');
+        ok = false;
+      } else {
+        cityEl.classList.remove('err');
+        cityErr.classList.remove('show');
+      }
+    }
+    var addrEl = document.getElementById('rag-address');
+    var addrErr = document.getElementById('rag-address-err');
+    if (addrEl && addrErr) {
+      if (!data.address || data.address.length < 6) {
+        addrEl.classList.add('err');
+        addrErr.classList.add('show');
+        ok = false;
+      } else {
+        addrEl.classList.remove('err');
+        addrErr.classList.remove('show');
+      }
     }
     if (!ok) return null;
     return data;
@@ -1033,6 +1097,8 @@
         phoneIntl: data.phoneIntl,
         whatsapp: data.whatsapp,
         email: data.email,
+        city: data.city || '',
+        address: data.address || '',
         token: 'local'
       });
       return;
@@ -1086,6 +1152,8 @@
           phoneIntl: reg.body.buyer.phoneIntl,
           whatsapp: reg.body.buyer.whatsapp,
           email: reg.body.buyer.email,
+          city: data.city || '',
+          address: data.address || '',
           token: reg.body.token
         });
       }).catch(function () {
@@ -1112,6 +1180,8 @@
     if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
     if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
     lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
+    if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
+    if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');
     document.getElementById('rag-acc-meta').innerHTML = lines.join('');
     showStep('account');
   }
@@ -1125,6 +1195,10 @@
     document.getElementById('rag-phone-mr').value = (src && (src.phoneMr || src.phone)) || '';
     document.getElementById('rag-phone-intl').value = (src && src.phoneIntl) || '';
     document.getElementById('rag-whatsapp').value = (src && src.whatsapp) || '';
+    var cityEl = document.getElementById('rag-city');
+    var addrEl = document.getElementById('rag-address');
+    if (cityEl && src && src.city) cityEl.value = src.city;
+    if (addrEl && src && src.address) addrEl.value = src.address;
     document.getElementById('rag-wa-same').checked = true;
     syncWhatsappFromPhones();
     clearOtpBoxes();

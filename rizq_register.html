@@ -239,6 +239,22 @@
     <input class="inp" id="b-whatsapp" type="tel" dir="ltr"/>
     <div class="err" id="e-whatsapp"></div>
 
+    <label class="lbl" for="b-city" id="l-city">المدينة *</label>
+    <select class="inp" id="b-city" style="cursor:pointer">
+      <option value="">—</option>
+      <option value="نواكشوط">نواكشوط / Nouakchott</option>
+      <option value="نواذيبو">نواذيبو / Nouadhibou</option>
+      <option value="روصو">روصو / Rosso</option>
+      <option value="كيفة">كيفة / Kiffa</option>
+      <option value="أخرى">أخرى / Autre</option>
+    </select>
+    <div class="err" id="e-city"></div>
+
+    <label class="lbl" for="b-address" id="l-address">عنوان التوصيل / السكن *</label>
+    <input class="inp" id="b-address" type="text" dir="auto" autocomplete="street-address" placeholder="الحي، الشارع، أقرب معلم"/>
+    <p class="hint" id="t-address-hint">يُستخدم لاحقاً للتوصيل والفاتورة وطلبات الخدمات دون إعادة كتابته</p>
+    <div class="err" id="e-address"></div>
+
     <div class="terms">
       <label class="check">
         <input type="checkbox" id="b-terms"/>
@@ -382,6 +398,8 @@
     if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
     if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
     lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
+    if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
+    if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');
     document.getElementById('acc-meta').innerHTML = lines.join('');
     show('panel-account');
   }
@@ -400,6 +418,8 @@
         document.getElementById('b-phone-mr').value = d.phoneMr || d.phone || '';
         document.getElementById('b-phone-intl').value = d.phoneIntl || '';
         document.getElementById('b-whatsapp').value = d.whatsapp || '';
+        if (d.city) document.getElementById('b-city').value = d.city;
+        if (d.address) document.getElementById('b-address').value = d.address;
       }
     } catch (e) {}
     syncWa();
@@ -501,11 +521,16 @@
     if (pw !== pw2) { document.getElementById('e-pw2').classList.add('show'); ok = false; }
     if (!MR.test(phoneMr) && !phoneIntl) { document.getElementById('e-phone').classList.add('show'); ok = false; }
     if (!whatsapp) { document.getElementById('e-whatsapp').classList.add('show'); ok = false; }
+    var city = (document.getElementById('b-city') || {}).value || '';
+    var address = ((document.getElementById('b-address') || {}).value || '').trim();
+    if (!city) { document.getElementById('e-city').classList.add('show'); ok = false; }
+    if (!address || address.length < 6) { document.getElementById('e-address').classList.add('show'); ok = false; }
     if (!ok) return null;
     return {
       name: name, email: email, password: pw,
       phoneMr: MR.test(phoneMr) ? phoneMr : '', phoneIntl: phoneIntl,
       whatsapp: whatsapp, phone: MR.test(phoneMr) ? phoneMr : '',
+      city: city, address: address,
       termsAccepted: true
     };
   }
@@ -514,8 +539,11 @@
     var s = session || {
       id: 'local_' + Date.now(), token: 'local',
       name: data.name, email: data.email,
-      phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
+      phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || '',
+      city: data.city || '', address: data.address || ''
     };
+    if (!s.city && data.city) s.city = data.city;
+    if (!s.address && data.address) s.address = data.address;
     saveCreds(data.email, data.password, s);
     saveSession(s);
     setStatus(t('تم التفعيل بنجاح. استخدم بريدك وكلمة المرور للدخول لاحقاً.', 'Compte activé.'), 'ok');
@@ -633,7 +661,8 @@
           token: r2.body.token,
           name: (r2.body.buyer && r2.body.buyer.name) || data.name,
           email: data.email,
-          phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || ''
+          phone: data.phoneMr || '', phoneIntl: data.phoneIntl || '', whatsapp: data.whatsapp || '',
+          city: data.city || '', address: data.address || ''
         });
       });
     }).catch(function () {
@@ -681,6 +710,7 @@
           body: JSON.stringify({ email: email, password: pw })
         }, 8000);
         if (r.ok && r.body && r.body.ok && r.body.buyer && r.body.token) {
+          var prevCred = (loadCreds()[email] || {}).session || {};
           var session = {
             id: r.body.buyer.id,
             token: r.body.token,
@@ -688,7 +718,9 @@
             email: r.body.buyer.email || email,
             phone: r.body.buyer.phone || '',
             phoneIntl: r.body.buyer.phoneIntl || '',
-            whatsapp: r.body.buyer.whatsapp || ''
+            whatsapp: r.body.buyer.whatsapp || '',
+            city: r.body.buyer.city || prevCred.city || '',
+            address: r.body.buyer.address || prevCred.address || ''
           };
           saveCreds(email, pw, session);
           saveSession(session);
@@ -733,12 +765,12 @@
     document.getElementById('btn-do-login').textContent = t('دخول ←', 'Connexion ←');
     document.getElementById('t-choice').textContent = t('كيف تريد استخدام رزق؟', 'Comment utiliser Rizq ?');
     document.getElementById('t-choice-sub').textContent = t('اختر نوع الحساب للمتابعة.', 'Choisissez le type de compte.');
-    document.getElementById('t-buyer').textContent = t('أتصفّح وأتواصل — حساب شخصي', 'Je parcours et contacte — compte personnel');
-    document.getElementById('t-buyer-sub').textContent = t('تصفّح ومفضلة وتواصل ومناقصات', 'Parcourir, favoris, contact et salles');
+    document.getElementById('t-buyer').textContent = t('أتصفّح وأشتري — حساب شخصي', 'Je parcours et j\'achète — compte personnel');
+    document.getElementById('t-buyer-sub').textContent = t('تصفّح وشراء وتوصيل وفاتورة وخدمات', 'Parcourir, acheter, livraison, facture et services');
     document.getElementById('t-seller').textContent = t('أنشر وأدير — حساب أعمال', 'Je publie et gère — compte pro');
     document.getElementById('t-seller-sub').textContent = t('محل · مكتب · معرض · مناقصات · استثمارات', 'Boutique · Bureau · Showroom · AO · Invest.');
     document.getElementById('t-buyer-title').textContent = t('حساب شخصي جديد', 'Nouveau compte personnel');
-    document.getElementById('t-buyer-lead').textContent = t('فعّل حسابك مرة واحدة برمز البريد، ثم ادخل لاحقاً بكلمة المرور فقط.', 'Activez une fois par e-mail, puis connectez-vous par mot de passe.');
+    document.getElementById('t-buyer-lead').textContent = t('أدخل معلومات صحيحة للتوصيل والفاتورة والخدمات — تُفعَّل مرة واحدة برمز البريد.', 'Infos exactes pour livraison, facture et services — activation une fois par e-mail.');
     document.getElementById('l-name').textContent = t('الاسم الكامل *', 'Nom complet *');
     document.getElementById('l-email').textContent = t('البريد الإلكتروني *', 'E-mail *');
     document.getElementById('l-pw').innerHTML = t('كلمة المرور * <span style="font-weight:600;color:var(--muted)">(للدخول لاحقاً)</span>', 'Mot de passe * <span style="font-weight:600;color:var(--muted)">(pour plus tard)</span>');
@@ -748,6 +780,10 @@
     document.getElementById('t-phone-hint').textContent = t('رقم موريتاني أو دولي — واحد على الأقل.', 'Au moins un numéro.');
     document.getElementById('t-wa-same').textContent = t('نفس الرقم للواتساب', 'Même numéro WhatsApp');
     document.getElementById('l-whatsapp').textContent = t('واتساب *', 'WhatsApp *');
+    document.getElementById('l-city').textContent = t('المدينة *', 'Ville *');
+    document.getElementById('l-address').textContent = t('عنوان التوصيل / السكن *', 'Adresse de livraison / domicile *');
+    document.getElementById('b-address').placeholder = t('الحي، الشارع، أقرب معلم', 'Quartier, rue, point de repère');
+    document.getElementById('t-address-hint').textContent = t('يُستخدم لاحقاً للتوصيل والفاتورة وطلبات الخدمات دون إعادة كتابته', 'Réutilisée pour livraison, facture et services');
     document.getElementById('b-terms-label').innerHTML = t('أوافق على <a href="rizq_legal.html#s2" target="_blank" rel="noopener">شروط منصة رزق</a> و<a href="rizq_legal.html#s3" target="_blank" rel="noopener">سياسة الخصوصية</a>', 'J\'accepte les <a href="rizq_legal.html#s2" target="_blank" rel="noopener">conditions</a> et la <a href="rizq_legal.html#s3" target="_blank" rel="noopener">confidentialité</a>');
     document.getElementById('btn-send-otp').textContent = t('إرسال رمز التفعيل', 'Envoyer le code');
     document.getElementById('btn-back-choice').textContent = t('← رجوع', '← Retour');
@@ -759,7 +795,7 @@
     document.getElementById('t-ok-sub').textContent = t('يمكنك الآن الدخول ببريدك وكلمة المرور في أي وقت.', 'Connectez-vous ensuite avec e-mail et mot de passe.');
     document.getElementById('btn-home').textContent = t('العودة للرئيسية', 'Retour');
     document.getElementById('t-acc').textContent = t('حسابي', 'Mon compte');
-    document.getElementById('t-acc-sub').textContent = t('حسابك على رزق — للتصفح والتواصل والمفضلة', 'Votre compte Rizq — navigation, contact et favoris');
+    document.getElementById('t-acc-sub').textContent = t('حسابك على رزق — للتصفح والشراء والتوصيل والفاتورة', 'Votre compte Rizq — navigation, achats, livraison et facture');
     document.getElementById('btn-acc-home').textContent = t('العودة للرئيسية', 'Retour à l\'accueil');
     document.getElementById('btn-logout').textContent = t('تسجيل الخروج', 'Se déconnecter');
     document.getElementById('acc-seller-link').textContent = t('🏢 أفتح حساب أعمال على رزق', '🏢 Ouvrir un compte pro sur Rizq');
@@ -772,6 +808,8 @@
     document.getElementById('e-pw2').textContent = t('كلمتا المرور غير متطابقتين', 'Mots de passe différents');
     document.getElementById('e-phone').textContent = t('أدخل هاتفاً موريتانياً أو دولياً', 'Numéro requis');
     document.getElementById('e-whatsapp').textContent = t('واتساب مطلوب', 'WhatsApp requis');
+    document.getElementById('e-city').textContent = t('اختر المدينة', 'Choisissez la ville');
+    document.getElementById('e-address').textContent = t('أدخل عنواناً واضحاً للتوصيل', 'Adresse de livraison requise');
     document.getElementById('e-otp').textContent = t('أدخل الرمز كاملاً (6 أرقام)', 'Code à 6 chiffres');
     document.getElementById('e-li-email').textContent = t('بريد صالح مطلوب', 'E-mail requis');
     document.getElementById('e-li-pw').textContent = t('كلمة المرور مطلوبة', 'Mot de passe requis');
