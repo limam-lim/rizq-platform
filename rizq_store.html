@@ -239,11 +239,84 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .content-grid > main{
   grid-area:main;
   min-width:0;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
   border-radius:20px;
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+/* شريط ختامي فاخر يملأ فراغ العمود تحت التقييمات عندما يكون الشريط الجانبي أطول */
+.store-close-band{
+  margin-top:auto;
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  margin-inline:-4px;
+  margin-bottom:-4px;
+  padding:22px 18px 18px;
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(201,168,76,.18), transparent 55%),
+    linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
+  border:1px solid rgba(201,168,76,.32);
+  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 10px 28px rgba(13,27,42,.18);
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+  min-height:180px;
+}
+.store-close-band::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 40%,rgba(201,168,76,.06) 50%,transparent 60%);
+  pointer-events:none;
+}
+.store-close-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px}
+.store-close-eyebrow{
+  margin:0;font-size:11px;letter-spacing:1.6px;font-weight:800;
+  color:rgba(232,201,106,.9);text-transform:uppercase;
+}
+.store-close-title{
+  margin:0;font-size:clamp(17px,2.2vw,21px);font-weight:900;line-height:1.35;
+  color:#fff;
+}
+.store-close-title span{
+  background:linear-gradient(90deg,#E8C96A,#C9A84C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.store-close-desc{
+  margin:0;font-size:13px;line-height:1.7;color:rgba(255,255,255,.72);max-width:46ch;
+}
+.store-close-pillars{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px;
+}
+.store-close-pillar{
+  padding:12px 10px;border-radius:12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(201,168,76,.22);
+  text-align:center;
+}
+.store-close-pillar-ico{font-size:18px;line-height:1;margin-bottom:6px}
+.store-close-pillar-ttl{font-size:12.5px;font-weight:800;color:#E8C96A;margin-bottom:3px}
+.store-close-pillar-txt{font-size:11px;color:rgba(255,255,255,.62);line-height:1.45}
+.store-close-ctas{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.store-close-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 14px;border-radius:10px;font:inherit;font-size:12.5px;font-weight:800;
+  cursor:pointer;text-decoration:none;border:none;transition:transform .15s,filter .15s,background .2s;
+}
+.store-close-cta:hover{transform:translateY(-1px);filter:brightness(1.04)}
+.store-close-cta.primary{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A}
+.store-close-cta.ghost{
+  background:transparent;color:#E8C96A;border:1px solid rgba(201,168,76,.55);
+}
+@media(max-width:800px){
+  .store-close-band{min-height:0;margin-top:22px;flex:0 0 auto}
+  .store-close-pillars{grid-template-columns:1fr}
 }
 .content-grid > aside#info-section{
   grid-area:side;
@@ -1113,6 +1186,36 @@ footer{
           <button class="view-all-btn" style="margin-top:14px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
         </div>
       </div>
+
+      <!-- ختام فاخر يملأ الفراغ تحت التقييمات بدل المساحة البيضاء الفارغة -->
+      <section class="store-close-band" id="store-close-band" aria-label="ضمانات الشراء">
+        <div class="store-close-inner">
+          <p class="store-close-eyebrow" data-t="close-eyebrow">RIZQ · تجربة شراء آمنة</p>
+          <h3 class="store-close-title"><span data-t="close-title-gold">تسوّق بثقة</span> <span data-t="close-title-rest">من واجهة هذا المحل</span></h3>
+          <p class="store-close-desc" data-t="close-desc">رزق وسيط نشر فقط — الدفع والتسليم يتمان مباشرة مع المحل. عاين المنتج قبل أي تحويل، وتواصل عبر غرفة الطلبات أو واتساب.</p>
+          <div class="store-close-pillars">
+            <div class="store-close-pillar">
+              <div class="store-close-pillar-ico" aria-hidden="true">👁</div>
+              <div class="store-close-pillar-ttl" data-t="close-p1-ttl">معاينة قبل الدفع</div>
+              <div class="store-close-pillar-txt" data-t="close-p1-txt">افحص السلعة مع المحل قبل التحويل</div>
+            </div>
+            <div class="store-close-pillar">
+              <div class="store-close-pillar-ico" aria-hidden="true">💬</div>
+              <div class="store-close-pillar-ttl" data-t="close-p2-ttl">تواصل مباشر</div>
+              <div class="store-close-pillar-txt" data-t="close-p2-txt">طلب، واتساب، أو محادثة داخل رزق</div>
+            </div>
+            <div class="store-close-pillar">
+              <div class="store-close-pillar-ico" aria-hidden="true">🚚</div>
+              <div class="store-close-pillar-ttl" data-t="close-p3-ttl">توصيل أو استلام</div>
+              <div class="store-close-pillar-txt" data-t="close-p3-txt">اختر الطريقة الأنسب لك مع المحل</div>
+            </div>
+          </div>
+          <div class="store-close-ctas">
+            <a class="store-close-cta primary" id="store-close-catalog" href="rizq_products.html" data-t="close-cta-catalog">تصفّح كل المنتجات ←</a>
+            <button type="button" class="store-close-cta ghost" onclick="document.getElementById('store-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})" data-t="close-cta-desk">📩 غرفة الطلبات</button>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -2601,6 +2704,19 @@ if(typeof _t2 === 'undefined'){
     'tag-hot':'🔥 Meilleure vente','tag-new':'✨ Nouveau','qv-text':'👁 Aperçu rapide',
     /* Reviews */
     'reviews-title':'⭐ Avis clients','review-count-txt':'Note globale','view-all-reviews':'Voir tous les avis',
+    /* Closing band */
+    'close-eyebrow':'RIZQ · Achat en confiance',
+    'close-title-gold':'Achetez en confiance',
+    'close-title-rest':'depuis cette boutique',
+    'close-desc':'Rizq est uniquement une plateforme de mise en relation — paiement et livraison se font directement avec le magasin. Vérifiez le produit avant tout transfert.',
+    'close-p1-ttl':'Vérifier avant de payer',
+    'close-p1-txt':'Inspectez l’article avec le magasin',
+    'close-p2-ttl':'Contact direct',
+    'close-p2-txt':'Demande, WhatsApp ou messagerie Rizq',
+    'close-p3-ttl':'Livraison ou retrait',
+    'close-p3-txt':'Choisissez le mode qui vous convient',
+    'close-cta-catalog':'Voir tous les produits →',
+    'close-cta-desk':'📩 Service Desk',
     /* Packages */
     'pkg-eyebrow':'ABONNEMENTS','pkg-title-pre':'Rejoignez','pkg-title-gold':'Rizq',
     'pkg-desc':'Choisissez la formule qui correspond à votre boutique',
