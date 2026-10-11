@@ -1,17 +1,20 @@
-/* rizq_product_detail.css — لوحة تفاصيل منتج بهوية عرض الإعلان (dp) */
+/* rizq_product_detail.css — لوحة تفاصيل منتج بهوية عرض الإعلان (dp)
+   العربية (RTL): اللوحة ونافذة المنتج على اليمين
+   الفرنسية (LTR): اللوحة ونافذة المنتج على اليسار */
 .rzq-pd-root{
   position:fixed;inset:0;z-index:9200;
-  display:none;align-items:stretch;justify-content:flex-end;
+  display:none;align-items:stretch;justify-content:flex-start;
   background:rgba(6,17,28,.72);backdrop-filter:blur(8px);
 }
 .rzq-pd-root.open{display:flex}
 .rzq-pd-sheet{
   width:min(720px,100%);max-height:100%;overflow:auto;
   background:linear-gradient(180deg,#0a1628 0%,#0F2347 40%,#122a52 100%);
-  color:#E8EDF5;border-inline-start:1px solid rgba(201,168,76,.35);
+  color:#E8EDF5;border-inline-end:1px solid rgba(201,168,76,.35);
   box-shadow:-18px 0 48px rgba(0,0,0,.45);
   animation:rzqPdIn .35s cubic-bezier(.16,1,.3,1) both;
 }
+[dir="ltr"] .rzq-pd-sheet{box-shadow:18px 0 48px rgba(0,0,0,.45)}
 @keyframes rzqPdIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
 [dir="ltr"] .rzq-pd-sheet{animation-name:rzqPdInLtr}
 @keyframes rzqPdInLtr{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
@@ -35,42 +38,51 @@
 .rzq-pd-body{padding:14px 16px 28px}
 .rzq-pd-hero{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
 .rzq-pd-gallery{display:flex;flex-direction:column;gap:8px}
+/* نافذة المنتج — خلفية بيضاء ناصعة لإبراز صورة المنتج */
 .rzq-pd-main{
   position:relative;border-radius:14px;overflow:hidden;
-  background:linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
+  background:#ffffff;
   aspect-ratio:4/3;min-height:220px;
-  border:1px solid rgba(201,168,76,.28);
-  box-shadow:0 0 0 1px rgba(201,168,76,.08),0 16px 40px rgba(0,0,0,.35);
+  border:1px solid rgba(201,168,76,.4);
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 40px rgba(0,0,0,.28);
   cursor:zoom-in;
 }
-.rzq-pd-main img{width:100%;height:100%;object-fit:cover;display:block}
+.rzq-pd-main img{
+  width:100%;height:100%;object-fit:contain;display:block;
+  background:#ffffff;padding:10px;box-sizing:border-box;
+}
 .rzq-pd-emoji-stage{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.28),transparent 50%),
-    linear-gradient(145deg,#0f1f3d,#1B3A6B 55%,#234d8f);
+  background:#ffffff;
 }
-.rzq-pd-emoji-xl{font-size:clamp(96px,18vw,180px);line-height:1;filter:drop-shadow(0 12px 28px rgba(0,0,0,.4))}
+.rzq-pd-emoji-xl{font-size:clamp(96px,18vw,180px);line-height:1;filter:drop-shadow(0 8px 18px rgba(15,35,71,.18))}
 .rzq-pd-gal-btn{
   position:absolute;top:50%;transform:translateY(-50%);
-  width:36px;height:36px;border-radius:50%;border:1px solid rgba(201,168,76,.45);
-  background:rgba(6,17,28,.7);color:#E8C96A;font-size:20px;cursor:pointer;
+  width:36px;height:36px;border-radius:50%;border:1px solid rgba(15,35,71,.18);
+  background:rgba(255,255,255,.92);color:#0F2347;font-size:20px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;z-index:2;
+  box-shadow:0 2px 10px rgba(15,35,71,.12);
 }
 .rzq-pd-gal-btn.prev{inset-inline-start:10px}
 .rzq-pd-gal-btn.next{inset-inline-end:10px}
-.rzq-pd-gal-btn:hover{background:rgba(201,168,76,.28)}
+.rzq-pd-gal-btn:hover{background:#fff;border-color:rgba(201,168,76,.65);color:#C9A84C}
 .rzq-pd-counter{
   position:absolute;bottom:10px;inset-inline-end:10px;z-index:2;
-  background:rgba(6,17,28,.75);border:1px solid rgba(201,168,76,.35);
-  color:#E8C96A;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;
+  background:rgba(255,255,255,.94);border:1px solid rgba(15,35,71,.12);
+  color:#0F2347;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;
+  box-shadow:0 2px 8px rgba(15,35,71,.1);
 }
 .rzq-pd-thumbs{display:flex;gap:8px;flex-wrap:wrap}
 .rzq-pd-thumb{
   width:56px;height:56px;border-radius:10px;overflow:hidden;cursor:pointer;
-  border:2px solid transparent;opacity:.65;background:#0d1b2a;flex-shrink:0;
+  border:2px solid transparent;opacity:.7;background:#ffffff;flex-shrink:0;
   transition:opacity .15s,border-color .15s,transform .15s;
+  box-shadow:0 0 0 1px rgba(15,35,71,.08);
 }
-.rzq-pd-thumb img,.rzq-pd-thumb span{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:26px}
+.rzq-pd-thumb img,.rzq-pd-thumb span{
+  width:100%;height:100%;object-fit:contain;display:flex;align-items:center;justify-content:center;
+  font-size:26px;background:#ffffff;padding:4px;box-sizing:border-box;
+}
 .rzq-pd-thumb.active{border-color:#C9A84C;opacity:1;transform:translateY(-1px)}
 
 .rzq-pd-info{display:flex;flex-direction:column;gap:8px}
@@ -155,8 +167,8 @@
   transition:border-color .2s,transform .15s;
 }
 .rzq-pd-sim:hover{border-color:rgba(201,168,76,.45);transform:translateY(-2px)}
-.rzq-pd-sim-media{aspect-ratio:1;background:linear-gradient(145deg,#111d2e,#1B3A6B);display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden}
-.rzq-pd-sim-media img{width:100%;height:100%;object-fit:cover}
+.rzq-pd-sim-media{aspect-ratio:1;background:#ffffff;display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden}
+.rzq-pd-sim-media img{width:100%;height:100%;object-fit:contain;background:#ffffff;padding:6px;box-sizing:border-box}
 .rzq-pd-sim-body{padding:8px 10px}
 .rzq-pd-sim-title{font-size:12px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-pd-sim-price{font-size:12px;font-weight:900;color:#E8C96A;margin-top:3px}
@@ -173,7 +185,14 @@
 }
 
 @media(min-width:860px){
-  .rzq-pd-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+  /* العمود الأول = نافذة المنتج (gallery): يمين في RTL / يسار في LTR */
+  .rzq-pd-hero{
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    gap:18px;align-items:start;
+  }
+  .rzq-pd-gallery{grid-column:1;grid-row:1}
+  .rzq-pd-info{grid-column:2;grid-row:1}
   .rzq-pd-main{aspect-ratio:1;min-height:280px}
 }
 @media(max-width:560px){
