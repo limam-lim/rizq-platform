@@ -3885,16 +3885,17 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile img{transform:scale(1.06)}
 .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:42px}
-/* سعر أمازوني على كل بلاطة منتج (ستايل + معارض) — خلفية معتمة واضحة */
+/* سعر على كل بلاطة منتج (ستايل + معارض) — ذهب معتم واضح فوق أي صورة */
 .rizq-style-tile-price{
   position:absolute;inset-inline-start:4px;bottom:4px;z-index:4;
   max-width:calc(100% - 8px);
-  padding:2px 6px;border-radius:6px;
-  background:#ffffff;
-  color:#0f172a;font-size:9px;font-weight:800;line-height:1.2;
+  padding:2px 6px;border-radius:4px;
+  background:linear-gradient(180deg,#FFE9A8 0%,#F0D078 55%,#D4A84A 100%);
+  color:#0a1424;font-size:9px;font-weight:900;line-height:1.2;
   font-family:'Cairo','Segoe UI',sans-serif;
-  border:1px solid rgba(15,23,42,.14);
-  box-shadow:0 2px 10px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.55);
+  border:1px solid rgba(255,248,220,.9);
+  box-shadow:0 2px 10px rgba(0,0,0,.4),0 0 0 1px rgba(201,168,76,.4),inset 0 1px 0 rgba(255,255,255,.55);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   pointer-events:none;direction:ltr;unicode-bidi:isolate;
 }
