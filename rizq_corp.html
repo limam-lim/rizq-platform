@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>واجهة المعرض — رزق</title>
 <style>
@@ -407,22 +408,23 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
 .nav-lang-btn:hover{background:rgba(201,168,76,.22);border-color:#C9A84C}
 </style>
 
-  <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=23.0"></script>
-  <script src="rizq_announcements.js"></script>
-  <script src="rizq_reviews_engine.js"></script>
-  <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
-  <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_backend_config.js"></script>
-<script src="rizq_site_banner.js"></script>
-<script src="rizq_terms_gate.js"></script>
-<script src="rizq_auth_gate.js" defer></script>
-<script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_i18n_data.js" defer></script>
+  <script src="rizq_i18n.js" defer></script>
+  <script src="rizq_lang_guard.js?v=23.0" defer></script>
+  <script src="rizq_announcements.js" defer></script>
+  <script src="rizq_reviews_engine.js" defer></script>
+  <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_site_banner.js" defer></script>
+  <script src="rizq_terms_gate.js" defer></script>
+  <script src="rizq_pwa.js" defer></script>
+  <script src="rizq_footer_toggle.js?v=23.0" defer></script>
+  <script src="rizq_auth_gate.js" defer></script>
+  <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
+<!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
+<script src="rizq_header.js?v=26.6"></script>
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -1397,12 +1399,17 @@ function rebuildCorpCatTabs(cats){
       if(!id) return;
       var hasLocalMatch = !!(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT);
 
-      // 1) هوية المعرض — احتياط عبر /api/accounts/public
+      // 1) هوية المعرض — كاش مشترك لـ /api/accounts/public
       if(!hasLocalMatch){
         try{
-          var pr = await fetch(base+'/api/accounts/public');
-          if(pr.ok){
-            var pdata = await pr.json();
+          var pdata = window.RizqApi && typeof window.RizqApi.publicAccounts === 'function'
+            ? await window.RizqApi.publicAccounts()
+            : null;
+          if(!pdata){
+            var pr = await fetch(base+'/api/accounts/public');
+            if(pr.ok) pdata = await pr.json();
+          }
+          if(pdata){
             var acc = (pdata.accounts||[]).find(function(a){ return a.id===id && a.type==='corp'; });
             if(acc){
               setText('corp-name', acc.name);
@@ -1435,91 +1442,90 @@ function rebuildCorpCatTabs(cats){
         }catch(e){}
       }
 
-      // 2) المعروضات الحقيقية — إضافة لما هو معروض دون تكرار (لا نستبدل الشبكة كي لا نمحو ما عرضه apply() محلياً)
+      // 2–4) معروضات + ساعات + تقييمات بالتوازي
+      var needHours = true;
       try{
-        var cr = await fetch(base+'/api/catalog?accountId='+encodeURIComponent(id)+'&kind=product');
-        if(cr.ok){
-          var cdata = await cr.json();
-          var items = Array.isArray(cdata.items) ? cdata.items : [];
-          if(items.length){
-            var grid = document.getElementById('items-grid');
-            if(grid){
-              var existingNames = {};
-              grid.querySelectorAll('.item-name').forEach(function(n){ existingNames[n.textContent.trim()] = true; });
-              var tabsEl = document.getElementById('cat-tabs');
-              var cats = [];
-              if(tabsEl) tabsEl.querySelectorAll('.cat-tab').forEach(function(b){ var t=b.textContent.replace(/^\S+\s*/,'').trim(); if(t && t!=='الكل' && t!=='Tout') cats.push(t); });
-              var addedHtml = '';
-              items.forEach(function(p){
-                if(existingNames[p.name]) return;
-                if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
-                var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
-                addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'">'
-                  + '<div class="item-img">'+(typeof corpCatIcon==='function'?corpCatIcon(p.cat||''):(p.emoji||'📦'))+'</div>'
-                  + '<div class="item-body">'
-                  + '<div class="item-name">'+esc(p.name)+'</div>'
-                  + '<div class="item-cat">'+esc(p.cat||'')+'</div>'
-                  + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
-                  + '<button class="contact-item-btn" onclick="contactAboutItem(\''+esc(p.name).replace(/'/g,"\\'")+'\')">'+(isFr()?'📩 Contact':'📩 تواصل')+'</button></div>'
-                  + '</div></div>';
-              });
-              if(addedHtml){
-                grid.insertAdjacentHTML('beforeend', addedHtml);
-                if(tabsEl && cats.length && typeof rebuildCorpCatTabs==='function') rebuildCorpCatTabs(cats);
-              }
+        var localHours = JSON.parse(localStorage.getItem('corp_hours_'+id)||'null');
+        needHours = !(Array.isArray(localHours) && localHours.length);
+      }catch(eH){}
+      var settled = await Promise.all([
+        fetch(base+'/api/catalog?accountId='+encodeURIComponent(id)+'&kind=product').then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
+        needHours
+          ? fetch(base+'/api/business-hours/'+encodeURIComponent(id)).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+          : Promise.resolve(null),
+        fetch(base+'/api/reviews/'+encodeURIComponent(id)).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+      ]);
+      var cdata = settled[0];
+      var hdata = settled[1];
+      var rdata = settled[2];
+
+      try{
+        var items = cdata && Array.isArray(cdata.items) ? cdata.items : [];
+        if(items.length){
+          var grid = document.getElementById('items-grid');
+          if(grid){
+            var existingNames = {};
+            grid.querySelectorAll('.item-name').forEach(function(n){ existingNames[n.textContent.trim()] = true; });
+            var tabsEl = document.getElementById('cat-tabs');
+            var cats = [];
+            if(tabsEl) tabsEl.querySelectorAll('.cat-tab').forEach(function(b){ var t=b.textContent.replace(/^\S+\s*/,'').trim(); if(t && t!=='الكل' && t!=='Tout') cats.push(t); });
+            var addedHtml = '';
+            items.forEach(function(p){
+              if(existingNames[p.name]) return;
+              if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
+              var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
+              addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'">'
+                + '<div class="item-img">'+(typeof corpCatIcon==='function'?corpCatIcon(p.cat||''):(p.emoji||'📦'))+'</div>'
+                + '<div class="item-body">'
+                + '<div class="item-name">'+esc(p.name)+'</div>'
+                + '<div class="item-cat">'+esc(p.cat||'')+'</div>'
+                + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
+                + '<button class="contact-item-btn" onclick="contactAboutItem(\''+esc(p.name).replace(/'/g,"\\'")+'\')">'+(isFr()?'📩 Contact':'📩 تواصل')+'</button></div>'
+                + '</div></div>';
+            });
+            if(addedHtml){
+              grid.insertAdjacentHTML('beforeend', addedHtml);
+              if(tabsEl && cats.length && typeof rebuildCorpCatTabs==='function') rebuildCorpCatTabs(cats);
             }
           }
         }
       }catch(e){}
 
-      // 3) ساعات العمل الحقيقية — فقط إن لم توجد أصلاً محلياً
       try{
-        var localHours = null;
-        try{ localHours = JSON.parse(localStorage.getItem('corp_hours_'+id)||'null'); }catch(e){}
-        if(!Array.isArray(localHours) || !localHours.length){
-          var hr = await fetch(base+'/api/business-hours/'+encodeURIComponent(id));
-          if(hr.ok){
-            var hdata = await hr.json();
-            if(hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
-              var frFlag = isFr();
-              var dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
-              var ids = ['hd-sun','hd-mon','hd-tue','hd-wed','hd-thu','hd-fri','hd-sat'];
-              var arDays = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-              hdata.hours.forEach(function(h){
-                var i = arDays.indexOf(h.day);
-                if(i === -1) return;
-                var row = document.getElementById(ids[i]);
-                if(!row) return;
-                var wrap = row.closest('.hours-row');
-                if(!wrap) return;
-                var timeEl = wrap.querySelector('.hours-time, .hours-closed');
-                if(!timeEl) return;
-                if(h.open){ timeEl.className='hours-time'; timeEl.textContent = h.from + ' — ' + h.to; }
-                else { timeEl.className='hours-closed'; timeEl.textContent = frFlag ? 'Fermé' : 'مغلق'; }
-              });
-              var now = new Date();
-              var today = hdata.hours.find(function(h){ return h.day === arDays[now.getDay()]; });
-              if(today){
-                function toMin(t){ var p=(t||'0:0').split(':'); return (+p[0])*60+(+p[1]); }
-                var nowMin = now.getHours()*60 + now.getMinutes();
-                var isOpen = !!today.open && nowMin >= toMin(today.from) && nowMin < toMin(today.to);
-                var lbl = document.getElementById('open-now-lbl');
-                if(lbl){
-                  lbl.textContent = isOpen ? (frFlag?('🟢 Ouvert maintenant — ferme à '+today.to):('🟢 مفتوح الآن — يغلق عند الساعة '+today.to)) : (frFlag?'🔴 Fermé actuellement':'🔴 مغلق حالياً');
-                  var box = lbl.closest('div');
-                  if(box){ box.style.background = isOpen ? '#f0fbf4' : '#fdf0f0'; box.style.borderColor = isOpen ? 'rgba(46,204,113,0.3)' : 'rgba(220,38,38,0.25)'; }
-                }
-              }
+        if(hdata && hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
+          var frFlag = isFr();
+          var ids = ['hd-sun','hd-mon','hd-tue','hd-wed','hd-thu','hd-fri','hd-sat'];
+          var arDays = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+          hdata.hours.forEach(function(h){
+            var i = arDays.indexOf(h.day);
+            if(i === -1) return;
+            var row = document.getElementById(ids[i]);
+            if(!row) return;
+            var wrap = row.closest('.hours-row');
+            if(!wrap) return;
+            var timeEl = wrap.querySelector('.hours-time, .hours-closed');
+            if(!timeEl) return;
+            if(h.open){ timeEl.className='hours-time'; timeEl.textContent = h.from + ' — ' + h.to; }
+            else { timeEl.className='hours-closed'; timeEl.textContent = frFlag ? 'Fermé' : 'مغلق'; }
+          });
+          var now = new Date();
+          var today = hdata.hours.find(function(h){ return h.day === arDays[now.getDay()]; });
+          if(today){
+            function toMin(t){ var p=(t||'0:0').split(':'); return (+p[0])*60+(+p[1]); }
+            var nowMin = now.getHours()*60 + now.getMinutes();
+            var isOpen = !!today.open && nowMin >= toMin(today.from) && nowMin < toMin(today.to);
+            var lbl = document.getElementById('open-now-lbl');
+            if(lbl){
+              lbl.textContent = isOpen ? (frFlag?('🟢 Ouvert maintenant — ferme à '+today.to):('🟢 مفتوح الآن — يغلق عند الساعة '+today.to)) : (frFlag?'🔴 Fermé actuellement':'🔴 مغلق حالياً');
+              var box = lbl.closest('div');
+              if(box){ box.style.background = isOpen ? '#f0fbf4' : '#fdf0f0'; box.style.borderColor = isOpen ? 'rgba(46,204,113,0.3)' : 'rgba(220,38,38,0.25)'; }
             }
           }
         }
       }catch(e){}
 
-      // 4) التقييمات الحقيقية — دمج في كاش RizqReviews المحلي ثم إعادة الرسم
       try{
-        var rr = await fetch(base+'/api/reviews/'+encodeURIComponent(id));
-        if(rr.ok){
-          var rdata = await rr.json();
+        if(rdata){
           var remote = Array.isArray(rdata.reviews) ? rdata.reviews : [];
           if(remote.length){
             var all = {};

@@ -15,7 +15,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css"/>
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
 <style>
@@ -270,6 +271,8 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_footer_toggle.js?v=23.0" defer></script>
 </head>
 <body>
+<!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
+<script src="rizq_header.js?v=26.6"></script>
 
 <!-- ══ TOPNAV ══ -->
 <nav class="topnav" id="main-nav">
@@ -641,22 +644,21 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </div>
 
-<!-- ══ SCRIPTS ══ -->
+<!-- ══ SCRIPTS — defer غير الحرج لتسريع التفاعل بعد رسم الهيكل ══ -->
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_stock.js"></script>
-<script src="rizq_site_banner.js"></script>
-<script src="rizq_auth_gate.js"></script>
-<script src="rizq_contact_gate.js"></script>
-<script src="rizq_account_payments.js"></script>
-<script src="rizq_service_desk.js?v=1.0"></script>
-<script src="rizq_packages_config.js"></script>
-<script src="rizq_packages_ui.js?v=23.0"></script>
-<script src="rizq_i18n_data.js"></script>
-<script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=23.0"></script>
-<script src="rizq_announcements.js"></script>
-<!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
-<script src="rizq_subscription_engine.js"></script>
+<script src="rizq_stock.js" defer></script>
+<script src="rizq_site_banner.js" defer></script>
+<script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_contact_gate.js" defer></script>
+<script src="rizq_account_payments.js" defer></script>
+<script src="rizq_service_desk.js?v=1.0" defer></script>
+<script src="rizq_packages_config.js" defer></script>
+<script src="rizq_packages_ui.js?v=23.0" defer></script>
+<script src="rizq_i18n_data.js" defer></script>
+<script src="rizq_i18n.js" defer></script>
+<script src="rizq_lang_guard.js?v=23.0" defer></script>
+<script src="rizq_announcements.js" defer></script>
+<script src="rizq_subscription_engine.js" defer></script>
 <script>
 // إصلاح جوهري: هذه الصفحة كانت تستخدم نظام إشعار قانوني محلي منفصل تماماً
 // (openDisc/closeDisc خاصة بها، بلا أي دعم لنص الأدمن المخصص rizq_disc_nav_ar/fr
@@ -682,16 +684,17 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   function lang(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } }
   try{ apply(getCustom(lang())); }catch(e){}
   if(window.RIZQ_BACKEND_BASE){
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(data){
-        var dn = data && data.ok && data.config && data.config.discNav;
-        if(!dn) return;
-        if(dn.ar) localStorage.setItem('rizq_disc_nav_ar', dn.ar);
-        if(dn.fr) localStorage.setItem('rizq_disc_nav_fr', dn.fr);
-        var l = lang();
-        apply(l==='fr' ? (dn.fr||dn.ar) : (dn.ar||dn.fr));
-      }).catch(function(){});
+    var siteReq = (window.RizqApi && typeof window.RizqApi.siteConfig === 'function')
+      ? window.RizqApi.siteConfig()
+      : fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config').then(function(res){ return res.ok ? res.json() : null; });
+    siteReq.then(function(data){
+      var dn = data && data.ok && data.config && data.config.discNav;
+      if(!dn) return;
+      if(dn.ar) localStorage.setItem('rizq_disc_nav_ar', dn.ar);
+      if(dn.fr) localStorage.setItem('rizq_disc_nav_fr', dn.fr);
+      var l = lang();
+      apply(l==='fr' ? (dn.fr||dn.ar) : (dn.ar||dn.fr));
+    }).catch(function(){});
   }
   try{
     var _o = Storage.prototype.setItem;

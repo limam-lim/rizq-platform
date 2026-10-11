@@ -481,8 +481,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
     opacity:0 !important;
   }
 
-  /* هبوط + صفحات المكتب: body دائماً تحت الهيدر الثابت (كان 0 على الهبوط فيقصّ كبسولة رزق) */
-  html.rizq-app-nav body,
+  /* هبوط + صفحات المكتب: احجز مساحة الهيدر فقط بعد وجوده في DOM.
+     سابقاً: padding-top على html.rizq-app-nav قبل حقن #rizq-desk-nav → شريط أبيض
+     فوق الهيرو على المحلات/المكاتب/المعارض (الـ.topnav المحلي ما زال ظاهراً). */
+  html.rizq-app-nav:has(#nav) body,
+  html.rizq-app-nav:has(#rizq-desk-nav) body,
   html.rizq-app-nav.has-rizq-desk-nav body{
     padding-top:var(--rizq-header-h,68px) !important;
     padding-bottom:0 !important;
@@ -1612,7 +1615,10 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
 /* ════════════ MOBILE ≤768px — قاعدة عامة (التفاصيل في بلوك الشريطين أدناه) ════════════ */
 @media (max-width:768px), (orientation:landscape) and (max-height:500px){
   html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
-  html.rizq-app-nav body{
+  /* نفس قاعدة المكتب: لا padding أبيض قبل وصول الهيدر الموحّد */
+  html.rizq-app-nav:has(#nav) body,
+  html.rizq-app-nav:has(#rizq-desk-nav) body,
+  html.rizq-app-nav.has-rizq-desk-nav body{
     padding-top:var(--rizq-header-h) !important;
     padding-bottom:0 !important;
   }
