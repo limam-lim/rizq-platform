@@ -55,4 +55,47 @@
     demoDashboardAllowed: !!isLocal,
   });
   if (!isLocal) window.__RIZQ_ALLOW_DEMO_DASH = false;
+
+  /* كاش طلبات عامة مشتركة — يمنع تكرار /api/site-config و /api/accounts/public عند فتح المحل/المكتب */
+  var _siteConfigPromise = null;
+  var _publicAccountsByKey = Object.create(null);
+
+  function _apiBase() {
+    try { return String(window.RIZQ_BACKEND_BASE || '').replace(/\/$/, ''); }
+    catch (e3) { return ''; }
+  }
+
+  window.RizqApi = window.RizqApi || {};
+  window.RizqApi.siteConfig = function (opts) {
+    opts = opts || {};
+    if (_siteConfigPromise && !opts.force) return _siteConfigPromise;
+    var base = _apiBase();
+    if (!base || typeof fetch === 'undefined') {
+      return Promise.resolve(null);
+    }
+    var init = opts.cache === 'no-store' ? { cache: 'no-store' } : undefined;
+    _siteConfigPromise = fetch(base + '/api/site-config', init)
+      .then(function (r) { return r && r.ok ? r.json() : null; })
+      .catch(function () { return null; });
+    return _siteConfigPromise;
+  };
+  window.RizqApi.publicAccounts = function (headers) {
+    var base = _apiBase();
+    if (!base || typeof fetch === 'undefined') return Promise.resolve(null);
+    var key = 'default';
+    try {
+      if (headers && typeof headers === 'object') key = JSON.stringify(headers);
+    } catch (e4) { key = 'default'; }
+    if (_publicAccountsByKey[key]) return _publicAccountsByKey[key];
+    _publicAccountsByKey[key] = fetch(base + '/api/accounts/public', headers ? { headers: headers } : undefined)
+      .then(function (r) {
+        if (!r || !r.ok) return null;
+        return r.json();
+      })
+      .catch(function () { return null; });
+    return _publicAccountsByKey[key];
+  };
+  window.RizqApi.invalidatePublicAccounts = function () {
+    _publicAccountsByKey = Object.create(null);
+  };
 })();

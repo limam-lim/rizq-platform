@@ -288,7 +288,18 @@
     }
   }
 
+  function isMerchantShellPage() {
+    try {
+      var p = String(location.pathname || '').toLowerCase();
+      return /rizq_store\.html|rizq_office\.html|rizq_corp\.html|rizq_showroom\.html/.test(p);
+    } catch (e0) {
+      return false;
+    }
+  }
+
   function shouldSplash() {
+    /* صفحات المحل/المكتب/المعرض: لا شاشة افتتاح — تؤخر الإحساس بفتح الصفحة */
+    if (isMerchantShellPage()) return false;
     try {
       if (sessionStorage.getItem('rizq_splash_shown') === '1') return false;
     } catch (e) {}

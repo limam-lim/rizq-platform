@@ -302,22 +302,24 @@
     }
   }
 
-  function fetchAnnouncementsFromBackend() {
+  function fetchAnnouncementsFromBackend(forceRefresh) {
     var base = _backendBase();
     if (!base || typeof fetch === 'undefined') return Promise.resolve(null);
-    return fetch(base + '/api/site-config', { cache: 'no-store' })
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(data){
-        if (!data || !data.ok || !data.config) return null;
-        var list = data.config.announcements;
-        return Array.isArray(list) ? list : null;
-      })
-      .catch(function(){ return null; });
+    var req = (window.RizqApi && typeof window.RizqApi.siteConfig === 'function')
+      ? window.RizqApi.siteConfig({ cache: 'no-store', force: !!forceRefresh })
+      : fetch(base + '/api/site-config', { cache: 'no-store' })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .catch(function(){ return null; });
+    return req.then(function(data){
+      if (!data || !data.ok || !data.config) return null;
+      var list = data.config.announcements;
+      return Array.isArray(list) ? list : null;
+    }).catch(function(){ return null; });
   }
 
   function init() {
     // Live from server first (cross-device), fallback to localStorage cache.
-    fetchAnnouncementsFromBackend().then(function(remote){
+    fetchAnnouncementsFromBackend(false).then(function(remote){
       if (remote && remote.length) {
         applyAnnouncements(remote);
         return;
@@ -330,7 +332,7 @@
 
     // Fast refresh so admin publishes reach visitors within seconds.
     setInterval(function(){
-      fetchAnnouncementsFromBackend().then(function(remote){
+      fetchAnnouncementsFromBackend(true).then(function(remote){
         if (!remote) return;
         try {
           var prev = localStorage.getItem(STORAGE_KEY) || '[]';
