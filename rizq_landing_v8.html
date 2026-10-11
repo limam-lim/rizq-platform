@@ -29,9 +29,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.7"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=3.5"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=28.4"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=23.0"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=23.2"/>
 <script>
 (function () {
   try {
@@ -2113,9 +2113,20 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 }
 @media(max-width:699px){
   .section-header{
-    height:auto;min-height:0;max-height:none;padding:12px 14px;
+    height:auto;min-height:0;max-height:none;padding:10px 12px;
+    margin-bottom:14px;
   }
-  .section-header h2,.section-header .section-title{font-size:clamp(13px,3.8vw,16px)!important;white-space:normal}
+  .section-header h2,.section-header .section-title{font-size:clamp(12px,3.4vw,14.5px)!important;white-space:normal}
+  .section-header .section-tag,.section-tag{font-size:9px;margin-bottom:3px;letter-spacing:1.2px}
+  .section-header .section-desc,.section-desc{font-size:11px;line-height:1.4}
+}
+@media(max-width:480px){
+  .rizq-feat-card{
+    padding:8px 6px;min-height:0;border-radius:9px;
+  }
+  .rizq-feat-card .cat-icon-box{width:24px;height:24px;font-size:11px;border-radius:7px}
+  .rizq-feat-title{font-size:10.5px;margin-bottom:3px}
+  .rizq-feat-desc{font-size:9px;line-height:1.35}
 }
 .section-title span,
 .section-header h2 span,
@@ -5434,7 +5445,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <a href="rizq_legal.html#s3" target="_blank" rel="noopener"><span class="ar-only">سياسة الخصوصية</span><span class="fr-only">Confidentialité</span></a>
       <a href="rizq_legal.html#s1" target="_blank" rel="noopener"><span class="ar-only">الأمان</span><span class="fr-only">Sécurité</span></a>
     </div>
-    <a href="./" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="closeModal(true)" aria-label="رجوع">
+    <a href="#" class="logo rizq-reg-chrome-logo" id="rizq-reg-brand" onclick="return rizqAuthGoBack(event)" aria-label="رجوع">
       <img class="logo-mark-img" src="rizq-mark-512.png?v=23.0" width="42" height="42" alt="رزق"/>
       <div class="logo-text">
         <span class="logo-ar">رزق</span>
@@ -5444,7 +5455,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </a>
   </nav>
   <div class="modal-box">
-    <button class="modal-close" onclick="if(!this.closest('#modal').classList.contains('reg-wizard-arming'))closeModal(true)" aria-label="إغلاق">✕</button>
+    <button class="modal-close" onclick="if(!this.closest('#modal').classList.contains('reg-wizard-arming'))rizqAuthGoBack(event)" aria-label="إغلاق">✕</button>
     <div class="modal-header">
       <div class="modal-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="84" height="84" alt="رزق"/></div>
       <div id="modal-auth-tabs" class="modal-auth-tabs" style="display:none" role="tablist" aria-label="تسجيل الدخول أو إنشاء حساب">
@@ -5471,8 +5482,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div id="p-login" style="display:none">
       <h3 class="modal-auth-heading" data-t="auth-login-heading">تسجيل الدخول</h3>
       <p class="modal-auth-sub">أهلاً بعودتك إلى رزق 🎉</p>
-      <input class="m-input" id="li-em" type="email" data-ph-fr="Adresse e-mail" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email" required/>
-      <div class="m-pw-wrap"><input class="m-input" id="li-pw" type="password" data-ph-fr="Mot de passe" placeholder="كلمة المرور" autocomplete="current-password" minlength="6" required/><button class="m-eye" type="button" onclick="tp('li-pw')" aria-label="إظهار كلمة المرور">👁</button></div>
+      <label class="m-field-lbl" for="li-em" data-t="li-email-lbl">البريد الإلكتروني</label>
+      <input class="m-input" id="li-em" type="email" data-ph-fr="name@email.com" placeholder="name@email.com" autocomplete="username" inputmode="email" required/>
+      <label class="m-field-lbl" for="li-pw" data-t="li-pw-lbl">كلمة المرور</label>
+      <div class="m-pw-wrap"><input class="m-input" id="li-pw" type="password" data-ph-fr="Mot de passe" placeholder="••••••••" autocomplete="current-password" minlength="6" required/><button class="m-eye" type="button" onclick="tp('li-pw')" aria-label="إظهار كلمة المرور">👁</button></div>
       <div style="text-align:left;margin-bottom:18px"><a href="#" id="li-forgot-link" onclick="event.preventDefault();openForgotPassword();" style="color:var(--gold);font-size:12px;text-decoration:none">نسيت كلمة المرور؟</a></div>
       <button class="m-btn-main" type="button" onclick="doLogin()">دخول ←</button>
       <p class="modal-auth-switch"><span data-t="auth-no-account">ليس لديك حساب؟</span> <button type="button" class="m-link-btn" onclick="openModal('register')" data-t="auth-create-free">أنشئ حسابك مجاناً</button></p>
@@ -5498,7 +5511,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <p class="modal-auth-sub" id="forgot-sub">أدخل بريد حسابك على رزق لإرسال رمز التحقق</p>
 
       <div id="forgot-step-email">
-        <input class="m-input" id="fg-em" type="email" placeholder="البريد الإلكتروني" autocomplete="username" inputmode="email"/>
+        <label class="m-field-lbl" for="fg-em" data-t="li-email-lbl">البريد الإلكتروني</label>
+        <input class="m-input" id="fg-em" type="email" placeholder="name@email.com" autocomplete="username" inputmode="email"/>
         <button class="m-btn-main" type="button" id="fg-send-btn" onclick="forgotSendCode()">إرسال الرمز ←</button>
       </div>
 
@@ -9625,10 +9639,16 @@ try { /* remaining-static-i18n */
   // Login panel
   const liSub = document.querySelector('#p-login .modal-auth-sub');
   if(liSub) liSub.textContent = RizqI18n.t2('أهلاً بعودتك إلى رزق 🎉','Bon retour sur Rizq 🎉');
+  const liEmLbl = document.querySelector('label[for="li-em"], label[data-t="li-email-lbl"]');
+  if(liEmLbl) liEmLbl.textContent = RizqI18n.t2('البريد الإلكتروني','Adresse e-mail');
+  const liPwLbl = document.querySelector('label[for="li-pw"], label[data-t="li-pw-lbl"]');
+  if(liPwLbl) liPwLbl.textContent = RizqI18n.t2('كلمة المرور','Mot de passe');
   const liEm = document.getElementById('li-em');
-  if(liEm) liEm.placeholder = RizqI18n.t2('البريد الإلكتروني','Adresse e-mail');
+  if(liEm) liEm.placeholder = RizqI18n.t2('name@email.com','name@email.com');
   const liPw = document.getElementById('li-pw');
-  if(liPw) liPw.placeholder = RizqI18n.t2('كلمة المرور','Mot de passe');
+  if(liPw) liPw.placeholder = '••••••••';
+  const fgEmLbl = document.querySelector('label[for="fg-em"]');
+  if(fgEmLbl) fgEmLbl.textContent = RizqI18n.t2('البريد الإلكتروني','Adresse e-mail');
   const liForgot = document.getElementById('li-forgot-link') || document.querySelector('#p-login a');
   if(liForgot) liForgot.textContent = RizqI18n.t2('نسيت كلمة المرور؟','Mot de passe oublié?');
   const liBtn = document.querySelector('#p-login .m-btn-main');
@@ -9881,8 +9901,10 @@ const TR = {
     'auth-no-account': 'ليس لديك حساب؟',
     'auth-create-free':'أنشئ حسابك مجاناً',
     'li-sub':          'أهلاً بعودتك إلى رزق 🎉',
-    'li-email-ph':     'البريد الإلكتروني',
-    'li-pw-ph':        'كلمة المرور',
+    'li-email-lbl':    'البريد الإلكتروني',
+    'li-pw-lbl':       'كلمة المرور',
+    'li-email-ph':     'name@email.com',
+    'li-pw-ph':        '••••••••',
     'li-forgot':       'نسيت كلمة المرور؟',
     'li-btn':          'دخول ←',
     'li-divider':      'أو',
@@ -9997,8 +10019,10 @@ const TR = {
     'auth-no-account': 'Pas encore de compte ?',
     'auth-create-free':'Créez votre compte gratuitement',
     'li-sub':          'Bienvenue de retour sur Rizq 🎉',
-    'li-email-ph':     'Adresse e-mail',
-    'li-pw-ph':        'Mot de passe',
+    'li-email-lbl':    'Adresse e-mail',
+    'li-pw-lbl':       'Mot de passe',
+    'li-email-ph':     'name@email.com',
+    'li-pw-ph':        '••••••••',
     'li-forgot':       'Mot de passe oublié ?',
     'li-btn':          'Se connecter →',
     'li-divider':      'ou',
@@ -10155,8 +10179,13 @@ function applyFullTranslation(lang) {
   const authNoAcc = q('#p-login [data-t="auth-no-account"]');
   const authCreate = q('#p-login [data-t="auth-create-free"]');
   if(liSub)    liSub.textContent    = t['li-sub'];
-  if(liEmail)  liEmail.placeholder  = t['li-email-ph'];
-  if(liPw)     liPw.placeholder     = t['li-pw-ph'];
+  const liEmLblI18n = q('label[for="li-em"]');
+  const liPwLblI18n = q('label[for="li-pw"]');
+  if(liEmLblI18n) liEmLblI18n.textContent = t['li-email-lbl'] || 'البريد الإلكتروني';
+  if(liPwLblI18n) liPwLblI18n.textContent = t['li-pw-lbl'] || 'كلمة المرور';
+  /* placeholder قصير — التسمية فوق الحقل هي النص الكامل */
+  if(liEmail)  liEmail.placeholder  = t['li-email-ph'] || 'name@email.com';
+  if(liPw)     liPw.placeholder     = t['li-pw-ph'] || '••••••••';
   if(liForgot) liForgot.textContent = t['li-forgot'];
   if(liBtn)    liBtn.textContent    = t['li-btn'];
   if(authTabLogin) authTabLogin.textContent = t['auth-tab-login'];
@@ -10811,15 +10840,42 @@ function openModal(mode){
   }
 }
 
+/** رجوع من شاشة الحساب/التسجيل → الصفحة السابقة (لا الرئيسية دائماً) */
+function rizqAuthGoBack(e){
+  if(e){
+    try{ e.preventDefault(); e.stopPropagation(); }catch(_e){}
+  }
+  var modal=document.getElementById('modal');
+  var inAuth=modal && (modal.classList.contains('reg-wizard-mode') || modal.classList.contains('auth-login-mode') || modal.classList.contains('open'));
+  if(inAuth && !rizqIsRegPageMode()){
+    closeModal(true);
+    return false;
+  }
+  try{
+    var stored='';
+    try{ stored=sessionStorage.getItem('rizq_after_auth_href')||''; }catch(_s){}
+    if(stored && stored !== (location.pathname+location.search+(location.hash||'')) && !/openRegister=1|regPage=1/.test(stored)){
+      try{ sessionStorage.removeItem('rizq_after_auth_href'); }catch(_c){}
+      location.href=stored;
+      return false;
+    }
+  }catch(_a){}
+  if(window.history && history.length > 1){
+    history.back();
+    return false;
+  }
+  location.href='rizq_landing_v8.html';
+  return false;
+}
+window.rizqAuthGoBack = rizqAuthGoBack;
+
 function closeModal(force){
   const modal=document.getElementById('modal');
   if(modal && modal.classList.contains('reg-wizard-mode') && !force && Date.now()-(window._rizqModalOpenedAt||0)<900){
     return;
   }
-  if(rizqIsRegPageMode() && modal && modal.classList.contains('reg-wizard-mode')){
-    location.href = 'index.html';
-    return;
-  }
+  /* في وضع صفحة الحساب: نُنظّف الحالة فقط — الرجوع للصفحة السابقة عبر rizqAuthGoBack
+     حتى لا نقطع إعادة التوجيه بعد تسجيل الدخول الناجح. */
   if(window.RizqTermsGate && typeof RizqTermsGate.resetSession==='function') RizqTermsGate.resetSession();
   if(modal){
     modal.classList.remove('reg-wizard-mode');
