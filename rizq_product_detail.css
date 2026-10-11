@@ -241,7 +241,7 @@
 }
 @media(max-width:560px){
   .rzq-pd-root{
-    padding:calc(var(--rizq-header-h, 68px) + 8px) 0 0;
+    padding:calc(var(--rizq-header-h, 68px) + 12px) 0 0;
     align-items:flex-end;
   }
   .rzq-pd-sheet{
