@@ -81,7 +81,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 .cart-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,0.4)}
 /* شريط تسوق ثابت — بين الهيرو وأزرار التواصل، يلتصق بالهيدر عند التمرير */
-/* أزرار المفضلة/السلة داخل صف التصنيفات — مباشرة بعد «الكل» */
+/* أزرار المفضلة/السلة داخل صف التصنيفات — معزولة في أقصى اليسار (RTL) */
 .sss-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   flex:0 0 auto;min-height:36px;padding:8px 14px;border-radius:20px;
@@ -426,7 +426,22 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 .view-all-btn:hover{background:var(--gold);color:#0D1B2A}
 /* Category tabs */
-.cat-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.cat-tabs{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;width:100%;
+}
+.cat-tabs-cats{
+  display:flex;gap:8px;overflow-x:auto;flex:1 1 auto;min-width:0;
+  padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+.cat-tabs-cats::-webkit-scrollbar{height:3px}
+.cat-tabs-cats::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:2px}
+.cat-tabs-shop{
+  display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+  margin-inline-start:auto;padding:5px 6px;border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(248,250,253,.92));
+  border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 4px 14px rgba(15,35,65,.06);
+}
 .cat-tab{
   padding:8px 16px;border-radius:20px;font-size:12.5px;font-weight:700;
   cursor:pointer;white-space:nowrap;transition:all .25s;
@@ -1140,19 +1155,23 @@ footer{
     <main>
 <!-- Rizq Intermediary Notice -->
 
-      <!-- Category tabs — الكل ثم المفضلة ثم السلة -->
+      <!-- Category tabs — التصنيفات يميناً | المفضلة والسلة معزولتان يساراً -->
       <div class="cat-tabs" id="cat-tabs-el" role="tablist">
-        <button class="cat-tab active" onclick="filterCat(this,'all')" data-t="cat-all">الكل</button>
-        <button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="المفضلة" data-t="nav-wish">
-          <span class="sss-ico" aria-hidden="true">❤</span>
-          <span data-t="nav-wish-label">المفضلة</span>
-          <span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>
-        </button>
-        <a class="sss-btn sss-cart" href="rizq_cart.html" title="السلة" data-t="cart-label">
-          <span class="sss-ico" aria-hidden="true">🛒</span>
-          <span data-t="cart-label-text">السلة</span>
-          <span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>
-        </a>
+        <div class="cat-tabs-cats" id="cat-tabs-cats">
+          <button class="cat-tab active" onclick="filterCat(this,'all')" data-t="cat-all">الكل</button>
+        </div>
+        <div class="cat-tabs-shop" id="cat-tabs-shop" aria-label="المفضلة والسلة">
+          <button type="button" class="sss-btn sss-wish" onclick="toggleWishPanel()" title="المفضلة" data-t="nav-wish">
+            <span class="sss-ico" aria-hidden="true">❤</span>
+            <span data-t="nav-wish-label">المفضلة</span>
+            <span class="sss-count" id="ab-wish-count" data-rizq-store-wish-count hidden>0</span>
+          </button>
+          <a class="sss-btn sss-cart" href="rizq_cart.html" title="السلة" data-t="cart-label">
+            <span class="sss-ico" aria-hidden="true">🛒</span>
+            <span data-t="cart-label-text">السلة</span>
+            <span class="sss-count" id="ab-cart-count" data-rizq-cart-count hidden>0</span>
+          </a>
+        </div>
       </div>
 
       <!-- مختارات الواجهة — الكتالوج الكامل مع الفلاتر في rizq_products.html -->
@@ -2568,7 +2587,7 @@ function showToast(msg, type){
   setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.parentNode&&t.parentNode.removeChild(t);},300);},2800);
 }
 
-/* Filter products by category tab — أزرار المفضلة/السلة تبقى مباشرة بعد «الكل» */
+/* Filter products by category tab — المفضلة/السلة معزولتان يساراً */
 function storeShopBtnsHtml(fr){
   var wishLbl = fr ? 'Favoris' : 'المفضلة';
   var cartLbl = fr ? 'Panier' : 'السلة';
@@ -2588,8 +2607,7 @@ function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
   if(!tabsEl) return;
   var allLbl = fr ? 'Tout' : 'الكل';
   var list = Array.isArray(topicsOrCats) ? topicsOrCats : [];
-  tabsEl.innerHTML = '<button class="cat-tab active" onclick="filterCat(this,\'all\')" data-t="cat-all">'+allLbl+'</button>'
-    + storeShopBtnsHtml(!!fr)
+  var catsHtml = '<button class="cat-tab active" onclick="filterCat(this,\'all\')" data-t="cat-all">'+allLbl+'</button>'
     + list.map(function(item){
         var id = (item && typeof item === 'object') ? (item.id || item.nameAr || '') : item;
         var lab = (item && typeof item === 'object')
@@ -2599,6 +2617,11 @@ function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
         var safeLab = String(lab).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         return '<button class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+safeLab+'</button>';
       }).join('');
+  tabsEl.innerHTML =
+    '<div class="cat-tabs-cats" id="cat-tabs-cats">'+catsHtml+'</div>'
+    + '<div class="cat-tabs-shop" id="cat-tabs-shop" aria-label="'+(fr ? 'Favoris et panier' : 'المفضلة والسلة')+'">'
+    + storeShopBtnsHtml(!!fr)
+    + '</div>';
   if(typeof updateCartCount === 'function') updateCartCount();
   if(typeof _renderWishUI === 'function') _renderWishUI();
 }
