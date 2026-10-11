@@ -282,25 +282,31 @@
       var chLbl = _channelLabel(pay);
       var icon = pay.channelIcon || (pay.channelKey === 'phone' ? '📞' : pay.channelKey === 'account' ? '🏦' : pay.channelKey === 'code' ? '🔢' : '💳');
       var isCashLike = pay.type === 'cash' || pay.type === 'instore' || pay.channelKey === 'cash' || pay.channelKey === 'instore';
-      body = '<div class="rizq-prf-pay-card"' + (forPrint ? ' style="padding:14px 16px;border-radius:14px;border:1.5px solid rgba(201,168,76,.45);background:linear-gradient(135deg,#fffdf6,#f7f9fc)"' : '') + '>'
-        + '<div class="rizq-prf-pay-card-top"' + (forPrint ? ' style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px"' : '') + '>'
+      var bankName = pay.bank || _payTypeLabel(pay.type);
+      var typeLbl = _payTypeLabel(pay.type);
+      var showBadge = !!(bankName && typeLbl && String(bankName).toLowerCase() !== String(typeLbl).toLowerCase());
+      var sCard = forPrint ? ' style="padding:14px;border-radius:14px;border:2px solid #C9A84C;background:linear-gradient(160deg,#fffef8,#f8fafc)"' : '';
+      var sTop = forPrint ? ' style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"' : '';
+      var sKick = forPrint ? ' style="font-size:10px;font-weight:900;letter-spacing:1.2px;color:#C9A84C;margin-bottom:3px"' : '';
+      var sBank = forPrint ? ' style="font-size:16px;font-weight:900;color:#0F2347"' : '';
+      var sBadge = forPrint ? ' style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:#0F2347;color:#E8C96A"' : '';
+      var sCh = forPrint ? ' style="font-size:13px;font-weight:700;color:#475569;margin-bottom:8px"' : '';
+      var sVal = forPrint ? ' style="display:block;font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:900;color:#0F2347;background:#fff;border:1.5px solid #d5deea;border-radius:11px;padding:13px 14px;letter-spacing:.8px;text-align:center"' : '';
+      var sCash = forPrint ? ' style="font-size:14px;font-weight:800;color:#0F2347;padding:12px;border-radius:11px;background:rgba(15,35,71,.05);text-align:center"' : '';
+      var sNote = forPrint ? ' style="font-size:12px;color:#64748b;margin-top:8px;line-height:1.5;text-align:center"' : '';
+      body = '<div class="rizq-prf-pay-card"' + sCard + '>'
+        + '<div class="rizq-prf-pay-card-top"' + sTop + '>'
         + '<div>'
-        + '<div class="rizq-prf-pay-kicker"' + (forPrint ? ' style="font-size:10px;font-weight:900;letter-spacing:1.4px;color:#C9A84C;margin-bottom:4px"' : '') + '>'
-        + _esc(_t('قناة الدفع المختارة', 'Canal de paiement choisi')) + '</div>'
-        + '<div class="rizq-prf-pay-bank"' + (forPrint ? ' style="font-size:15px;font-weight:900;color:#0F2347"' : '') + '>'
-        + _esc(pay.bank || _payTypeLabel(pay.type)) + '</div>'
+        + '<div class="rizq-prf-pay-kicker"' + sKick + '>' + _esc(_t('ادفع عبر', 'Payez via')) + '</div>'
+        + '<div class="rizq-prf-pay-bank"' + sBank + '>' + _esc(bankName) + '</div>'
         + '</div>'
-        + '<span class="rizq-prf-pay-badge"' + (forPrint ? ' style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:#0F2347;color:#E8C96A;white-space:nowrap"' : '') + '>'
-        + _esc(_payTypeLabel(pay.type)) + '</span>'
+        + (showBadge ? '<span class="rizq-prf-pay-badge"' + sBadge + '>' + _esc(typeLbl) + '</span>' : '')
         + '</div>'
-        + '<div class="rizq-prf-pay-channel"' + (forPrint ? ' style="font-size:12.5px;font-weight:700;color:#4b5563;margin-bottom:8px"' : '') + '>'
-        + icon + ' ' + _esc(chLbl) + '</div>'
+        + '<div class="rizq-prf-pay-channel"' + sCh + '>' + icon + ' ' + _esc(chLbl) + '</div>'
         + (!isCashLike && pay.channelValue
-          ? '<code class="rizq-prf-pay-value" dir="ltr"' + (forPrint ? ' style="display:block;font-family:ui-monospace,Menlo,monospace;font-size:17px;font-weight:900;color:#0F2347;background:#fff;border:1px solid #d8e2f0;border-radius:10px;padding:12px 14px;letter-spacing:.6px"' : '') + '>'
-            + _esc(pay.channelValue) + '</code>'
-          : '<div class="rizq-prf-pay-cash"' + (forPrint ? ' style="font-size:13px;font-weight:700;color:#0F2347;padding:10px 12px;border-radius:10px;background:rgba(15,35,71,.04)"' : '') + '>'
-            + _esc(chLbl) + '</div>')
-        + (pay.note ? '<div class="rizq-prf-pay-note"' + (forPrint ? ' style="font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5"' : '') + '>📝 ' + _esc(pay.note) + '</div>' : '')
+          ? '<code class="rizq-prf-pay-value" dir="ltr"' + sVal + '>' + _esc(pay.channelValue) + '</code>'
+          : '<div class="rizq-prf-pay-cash"' + sCash + '>' + _esc(chLbl) + '</div>')
+        + (pay.note ? '<div class="rizq-prf-pay-note"' + sNote + '>📝 ' + _esc(pay.note) + '</div>' : '')
         + '</div>';
     } else {
       /* توافق قديم: قائمة وسائل دون قناة محددة */
@@ -316,18 +322,13 @@
       }).join('');
     }
 
-    return '<div class="rizq-prf-payblock" style="margin-top:16px;padding:' + pad + ';border-radius:16px;border:1px solid rgba(15,35,71,.08);background:#fff">'
-      + '<div style="font-size:11px;letter-spacing:1.5px;font-weight:900;color:#0F2347;margin-bottom:10px">'
-      + _esc(_t('الدفع — حساب البائع مباشرة', 'Paiement — compte vendeur'))
+    return '<div class="rizq-prf-payblock"' + (forPrint ? ' style="margin-top:16px;padding:' + pad + ';border-radius:14px;border:1px solid rgba(15,35,71,.08);background:#fff"' : '') + '>'
+      + '<div class="rizq-prf-pay-title"' + (forPrint ? ' style="font-size:12px;font-weight:900;color:#0F2347;margin-bottom:10px"' : '') + '>'
+      + _esc(_t('الدفع للمحل', 'Paiement au magasin'))
       + '</div>'
-      + (terms ? '<p style="font-size:12px;color:#4b5563;line-height:1.55;margin:0 0 10px">' + _esc(terms) + '</p>' : '')
       + body
-      + '<p style="font-size:10px;color:#9aa3b2;margin:10px 0 0;line-height:1.5">'
-      + _esc(_t(
-        'قناة واحدة فقط على الفاتورة — إحداثيات البائع وليست حسابات اشتراك رزق.',
-        'Un seul canal sur la facture — coordonnées du vendeur, pas les comptes d’abonnement Rizq.'
-      ))
-      + '</p></div>';
+      + (terms ? '<p class="rizq-prf-pay-hint"' + (forPrint ? ' style="font-size:11px;color:#94a3b8;margin:8px 0 0;line-height:1.45"' : '') + '>' + _esc(terms) + '</p>' : '')
+      + '</div>';
   }
 
   /**
@@ -619,7 +620,7 @@
     var link = document.createElement('link');
     link.id = 'rizq-prefacture-css';
     link.rel = 'stylesheet';
-    link.href = 'rizq_prefacture.css?v=28.2';
+    link.href = 'rizq_prefacture.css?v=28.4';
     document.head.appendChild(link);
   }
 
@@ -658,23 +659,23 @@
 
     var actions = '';
     if (_canPay(doc)) {
-      actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-pay" data-prf-act="pay">'
-        + _esc(_t('ادفع · PREFACTUR', 'Payer · PREFACTUR')) + '</button>';
+      actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-pay rizq-prf-btn-primary" data-prf-act="pay">'
+        + _esc(_t('تأكيد الدفع', 'Confirmer le paiement')) + '</button>';
     }
     if (_canFulfill(doc)) {
       actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-fulfill" data-prf-act="fulfill">'
-        + _esc(_t('تأكيد التسليم / الخدمة', 'Confirmer livraison / service')) + '</button>';
+        + _esc(_t('تم التسليم', 'Livré')) + '</button>';
     }
     if (_canApprove(doc)) {
       actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-approve" data-prf-act="approve">'
-        + _esc(_t('موافقة الزبون', 'Approbation client')) + '</button>';
+        + _esc(_t('موافقة', 'Approuver')) + '</button>';
     }
     if (_canDownload(doc) || doc.status === STATUS.sent || doc.status === STATUS.awaiting_payment) {
       actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-dl" data-prf-act="download">'
-        + _esc(_t('تنزيل / طباعة', 'Télécharger / Imprimer')) + '</button>';
+        + _esc(_t('طباعة', 'Imprimer')) + '</button>';
     }
     actions += '<button type="button" class="rizq-prf-btn rizq-prf-btn-wa" data-prf-act="wa">'
-      + _esc(_t('مشاركة واتساب', 'Partager WhatsApp')) + '</button>';
+      + _esc(_t('واتساب', 'WhatsApp')) + '</button>';
 
     var stampBlock = '';
     if (doc.status === STATUS.fulfilled || doc.status === STATUS.approved) {
@@ -709,9 +710,10 @@
       + '<div class="rizq-prf-num">' + _esc(doc.number) + '</div>'
       + '<span class="rizq-prf-status" style="--prf-st:' + st[1] + '">' + _esc(st[0]) + '</span>'
       + '</div>'
+      + '<div class="rizq-prf-scroll">'
       + '<p class="rizq-prf-lead">' + _esc(_t(
-        'راجع البنود وقناة الدفع المختارة قبل التحويل. الفاتورة تعرض طريقة واحدة فقط — توصيل أو استلام من المحل.',
-        'Vérifiez les lignes et le canal de paiement choisi. La facture affiche un seul canal — livraison ou retrait.'
+        'راجع البنود ثم ادفع عبر القناة المختارة أدناه.',
+        'Vérifiez les lignes puis payez via le canal choisi ci-dessous.'
       )) + '</p>'
       + '<div class="rizq-prf-parties">'
       + '<div><span>' + _esc(_t('البائع', 'Vendeur')) + '</span><strong>' + _esc(doc.sellerName || '—') + '</strong></div>'
@@ -720,18 +722,25 @@
       + _renderFulfillmentBlock(doc)
       + '<div class="rizq-prf-lines">' + linesHtml + '</div>'
       + totalsMid
-      + '<div class="rizq-prf-total">' + _esc(_t('الإجمالي', 'Total')) + ' <strong>' + _esc(_fmtMoney(doc.total)) + '</strong></div>'
+      + '<div class="rizq-prf-total"><span>' + _esc(_t('الإجمالي', 'Total')) + '</span> <strong>' + _esc(_fmtMoney(doc.total)) + '</strong></div>'
       + _renderPaymentBlock(doc, false)
       + stampBlock
+      + '</div>'
+      + '<div class="rizq-prf-footer">'
       + '<div class="rizq-prf-actions">' + actions + '</div>'
       + '<p class="rizq-prf-disc">' + _esc(_t(
-        'PREFACTUR هو المسار التجاري لإتمام الصفقات على رزق — محلات، معارض، مكاتب.',
-        'PREFACTUR est le parcours commercial pour conclure sur Rizq — magasins, showrooms, bureaux.'
+        'ادفع للمحل مباشرة — رزق وسيط نشر فقط.',
+        'Payez directement le magasin — Rizq est uniquement un intermédiaire.'
       )) + '</p>'
+      + '</div>'
       + '</div>';
 
     document.body.appendChild(overlay);
-    requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+    requestAnimationFrame(function () {
+      overlay.classList.add('is-open');
+      var sc = overlay.querySelector('.rizq-prf-scroll');
+      if (sc) sc.scrollTop = 0;
+    });
 
     overlay.addEventListener('click', function (e) {
       if (e.target === overlay) closeModal();

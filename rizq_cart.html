@@ -1113,7 +1113,7 @@ function issueCartPrefacture(){
   if (!window.RizqPrefacture) {
     showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
     var s = document.createElement('script');
-    s.src = 'rizq_prefacture_engine.js?v=28.2';
+    s.src = 'rizq_prefacture_engine.js?v=28.4';
     s.onload = function(){ issueCartPrefacture(); };
     document.head.appendChild(s);
     return;
@@ -1167,8 +1167,8 @@ function issueCartPrefacture(){
     deliveryType: deliveryType,
     deliveryFee: Number(deliveryFee) || 0,
     paymentTerms: isAr
-      ? 'الدفع مباشرة لحساب المحل عبر القناة المختارة — رزق وسيط نشر فقط.'
-      : 'Paiement direct au magasin via le canal choisi — Rizq est uniquement un intermédiaire.'
+      ? 'حوّل المبلغ ثم اذكر اسمك.'
+      : 'Transférez le montant puis indiquez votre nom.'
   });
   if (!doc) { showToast(isAr ? '❌ تعذّر إنشاء فاتورة قبل' : '❌ Impossible de créer la préfacture'); return; }
   RizqPrefacture.openModal(doc.id);

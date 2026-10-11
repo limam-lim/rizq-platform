@@ -1,119 +1,130 @@
-/* rizq_prefacture.css — PREFACTUR · فاتورة قبل (تصميم حديث) */
+/* rizq_prefacture.css — PREFACTUR · فاتورة قبل (واضحة + أزرار ثابتة) */
 .rizq-prf-overlay{
   position:fixed;inset:0;z-index:12000;
-  background:rgba(6,14,28,.74);
-  backdrop-filter:blur(10px);
+  background:rgba(6,14,28,.78);
+  backdrop-filter:blur(12px);
   display:flex;align-items:flex-end;justify-content:center;
   padding:0;opacity:0;pointer-events:none;
   transition:opacity .28s ease;
   overflow:hidden;
+  box-sizing:border-box;
 }
 .rizq-prf-overlay.is-open{opacity:1;pointer-events:auto}
 @media(min-width:720px){
-  .rizq-prf-overlay{align-items:center;padding:24px}
+  .rizq-prf-overlay{align-items:center;padding:20px}
 }
 
 .rizq-prf-sheet{
   position:relative;
-  width:min(540px,100%);
-  max-height:min(94dvh,920px);
-  overflow:auto;
-  background:
-    radial-gradient(120% 80% at 100% 0%,rgba(201,168,76,.18),transparent 55%),
-    linear-gradient(180deg,#0f2347 0%,#122b52 38%,#f4f6fb 38%,#f4f6fb 100%);
+  width:min(520px,100%);
+  max-height:min(92dvh,900px);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  background:#f3f5f9;
   border-radius:22px 22px 0 0;
-  box-shadow:0 28px 70px rgba(0,0,0,.48);
-  padding:0 0 calc(18px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 28px 70px rgba(0,0,0,.5);
   transform:translateY(22px);
   transition:transform .28s ease;
   color:#0d1b2a;
   font-family:"Cairo","Segoe UI",Tahoma,sans-serif;
-  -webkit-overflow-scrolling:touch;
 }
 .rizq-prf-overlay.is-open .rizq-prf-sheet{transform:none}
 @media(min-width:720px){
-  .rizq-prf-sheet{border-radius:22px}
+  .rizq-prf-sheet{border-radius:20px;max-height:min(88dvh,860px)}
 }
 
 .rizq-prf-close{
   position:absolute;top:12px;inset-inline-end:12px;
   width:36px;height:36px;border:0;border-radius:50%;
-  background:rgba(255,255,255,.12);color:#fff;
-  font-size:22px;cursor:pointer;line-height:1;z-index:2;
+  background:rgba(255,255,255,.14);color:#fff;
+  font-size:22px;cursor:pointer;line-height:1;z-index:3;
 }
+.rizq-prf-close:hover{background:rgba(255,255,255,.22)}
+
+/* رأس ثابت */
 .rizq-prf-head{
-  padding:24px 22px 18px;color:#fff;
+  flex-shrink:0;
+  padding:20px 22px 16px;
+  background:linear-gradient(135deg,#0f2347 0%,#1b3a6b 100%);
+  color:#fff;
 }
 .rizq-prf-brand{
   display:inline-block;
-  font-size:11px;font-weight:900;letter-spacing:2.2px;
+  font-size:10.5px;font-weight:900;letter-spacing:2px;
   color:#0d1b2a;background:linear-gradient(135deg,#C9A84C,#E8C96A);
-  padding:5px 11px;border-radius:999px;margin-bottom:12px;
+  padding:4px 10px;border-radius:999px;margin-bottom:10px;
 }
 .rizq-prf-head h2{
-  margin:0;font-size:23px;font-weight:900;color:#fff;letter-spacing:-.2px;
+  margin:0;font-size:21px;font-weight:900;color:#fff;letter-spacing:-.2px;
 }
-.rizq-prf-num{margin-top:5px;font-size:13px;color:#E8C96A;font-weight:800}
+.rizq-prf-num{margin-top:4px;font-size:13px;color:#E8C96A;font-weight:800}
 .rizq-prf-status{
-  display:inline-block;margin-top:12px;
-  padding:5px 12px;border-radius:999px;
+  display:inline-block;margin-top:10px;
+  padding:4px 11px;border-radius:999px;
   font-size:11px;font-weight:800;
-  background:rgba(255,255,255,.1);
+  background:rgba(255,255,255,.12);
   color:var(--prf-st,#E8C96A);
-  border:1px solid rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.18);
 }
+
+/* جسم قابل للتمرير */
+.rizq-prf-scroll{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 16px 8px;
+}
+.rizq-prf-scroll::-webkit-scrollbar{width:4px}
+.rizq-prf-scroll::-webkit-scrollbar-thumb{background:rgba(15,35,71,.18);border-radius:4px}
+
 .rizq-prf-lead{
-  margin:0 18px 12px;padding:12px 14px;border-radius:14px;
-  background:#fff;font-size:12.5px;line-height:1.65;color:#334155;
-  box-shadow:0 6px 18px rgba(15,35,71,.06);
-  border:1px solid rgba(15,35,71,.04);
+  margin:0 0 12px;padding:11px 13px;border-radius:12px;
+  background:#fff;font-size:12.5px;line-height:1.6;color:#475569;
+  border:1px solid rgba(15,35,71,.06);
 }
 .rizq-prf-parties{
   display:grid;grid-template-columns:1fr 1fr;gap:8px;
-  margin:0 18px 12px;
+  margin:0 0 12px;
 }
 .rizq-prf-parties > div{
-  background:#fff;border-radius:14px;padding:12px 13px;
-  box-shadow:0 6px 18px rgba(15,35,71,.05);
-  border:1px solid rgba(15,35,71,.04);
+  background:#fff;border-radius:12px;padding:11px 12px;
+  border:1px solid rgba(15,35,71,.06);
 }
-.rizq-prf-parties span{display:block;font-size:10px;color:#64748b;margin-bottom:4px;font-weight:700;letter-spacing:.4px}
+.rizq-prf-parties span{display:block;font-size:10px;color:#64748b;margin-bottom:3px;font-weight:700}
 .rizq-prf-parties strong{font-size:13.5px;color:#0f2347}
 
-/* توصيل / استلام */
 .rizq-prf-fulfill{
-  margin:0 18px 12px;padding:12px 14px;border-radius:14px;
+  margin:0 0 12px;padding:12px 13px;border-radius:12px;
   background:#fff;display:flex;align-items:center;gap:12px;
   border:1.5px solid rgba(15,35,71,.08);
-  box-shadow:0 6px 18px rgba(15,35,71,.05);
 }
-.rizq-prf-fulfill[data-fulfill="delivery"]{border-color:rgba(14,165,233,.28);background:linear-gradient(135deg,#f0f9ff,#fff)}
-.rizq-prf-fulfill[data-fulfill="pickup"]{border-color:rgba(201,168,76,.35);background:linear-gradient(135deg,#fffdf6,#fff)}
+.rizq-prf-fulfill[data-fulfill="delivery"]{border-color:rgba(14,165,233,.3);background:#f0f9ff}
+.rizq-prf-fulfill[data-fulfill="pickup"]{border-color:rgba(201,168,76,.4);background:#fffdf6}
 .rizq-prf-fulfill-icon{
-  width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;background:rgba(15,35,71,.06);flex-shrink:0;
+  width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;background:rgba(15,35,71,.06);flex-shrink:0;
 }
 .rizq-prf-fulfill[data-fulfill="delivery"] .rizq-prf-fulfill-icon{background:rgba(14,165,233,.12)}
 .rizq-prf-fulfill[data-fulfill="pickup"] .rizq-prf-fulfill-icon{background:rgba(201,168,76,.16)}
 .rizq-prf-fulfill-body{flex:1;min-width:0}
 .rizq-prf-fulfill-label{font-size:13.5px;font-weight:900;color:#0f2347}
-.rizq-prf-fulfill-detail{font-size:11.5px;color:#64748b;margin-top:2px;line-height:1.45}
+.rizq-prf-fulfill-detail{font-size:11.5px;color:#64748b;margin-top:2px}
 .rizq-prf-fulfill-fee{font-size:12.5px;font-weight:900;color:#0f2347;white-space:nowrap}
 
-.rizq-prf-lines{margin:0 18px;display:flex;flex-direction:column;gap:8px}
+.rizq-prf-lines{margin:0 0 10px;display:flex;flex-direction:column;gap:7px}
 .rizq-prf-line{
   display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;
-  gap:2px 10px;background:#fff;border-radius:14px;padding:12px 13px;
-  box-shadow:0 6px 18px rgba(15,35,71,.05);
-  border:1px solid rgba(15,35,71,.04);
+  gap:2px 10px;background:#fff;border-radius:12px;padding:11px 12px;
+  border:1px solid rgba(15,35,71,.06);
 }
 .rizq-prf-line-name{grid-column:1;font-size:13.5px;font-weight:800;color:#0f2347}
 .rizq-prf-line-meta{grid-column:1;font-size:11px;color:#64748b}
-.rizq-prf-line-total{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:13.5px;font-weight:900;color:#C9A84C}
+.rizq-prf-line-total{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:13.5px;font-weight:900;color:#0f2347}
 
 .rizq-prf-totals{
-  margin:12px 18px 0;padding:12px 14px;border-radius:14px;background:#fff;
-  border:1px solid rgba(15,35,71,.06);box-shadow:0 6px 18px rgba(15,35,71,.04);
+  margin:0 0 8px;padding:11px 13px;border-radius:12px;background:#fff;
+  border:1px solid rgba(15,35,71,.06);
 }
 .rizq-prf-totals-row{
   display:flex;justify-content:space-between;align-items:center;
@@ -121,71 +132,89 @@
 }
 .rizq-prf-totals-row strong{color:#0f2347;font-weight:800}
 .rizq-prf-total{
-  margin:10px 18px 0;padding:14px 16px;border-radius:14px;
+  margin:0 0 12px;padding:13px 15px;border-radius:12px;
   background:linear-gradient(135deg,#0f2347,#1b3a6b);color:#fff;
   display:flex;justify-content:space-between;align-items:center;
   font-size:14px;font-weight:700;
 }
-.rizq-prf-total strong{font-size:19px;color:#E8C96A}
+.rizq-prf-total strong{font-size:18px;color:#E8C96A}
 
-/* قناة دفع واحدة */
-.rizq-prf-payblock{margin:14px 18px 0 !important}
+/* قناة دفع — تركيز على الرقم */
+.rizq-prf-payblock{
+  margin:0 0 4px !important;
+  padding:14px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(15,35,71,.08) !important;
+  background:#fff !important;
+}
+.rizq-prf-pay-title{
+  font-size:12px;font-weight:900;color:#0F2347;margin-bottom:10px;letter-spacing:.3px;
+}
 .rizq-prf-pay-card{
-  padding:14px 16px;border-radius:14px;
-  border:1.5px solid rgba(201,168,76,.45);
-  background:linear-gradient(135deg,#fffdf6,#f7f9fc);
+  padding:14px 14px 12px;border-radius:14px;
+  border:2px solid #C9A84C;
+  background:linear-gradient(160deg,#fffef8,#f8fafc);
 }
 .rizq-prf-pay-card-top{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;
 }
 .rizq-prf-pay-kicker{
-  font-size:10px;font-weight:900;letter-spacing:1.4px;color:#C9A84C;margin-bottom:4px;
+  font-size:10px;font-weight:900;letter-spacing:1.2px;color:#C9A84C;margin-bottom:3px;
 }
-.rizq-prf-pay-bank{font-size:15px;font-weight:900;color:#0F2347}
+.rizq-prf-pay-bank{font-size:16px;font-weight:900;color:#0F2347}
 .rizq-prf-pay-badge{
   font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;
   background:#0F2347;color:#E8C96A;white-space:nowrap;
 }
-.rizq-prf-pay-channel{font-size:12.5px;font-weight:700;color:#4b5563;margin-bottom:8px}
+.rizq-prf-pay-channel{font-size:13px;font-weight:700;color:#475569;margin-bottom:8px}
 .rizq-prf-pay-value{
-  display:block;font-family:ui-monospace,Menlo,monospace;font-size:17px;font-weight:900;
-  color:#0F2347;background:#fff;border:1px solid #d8e2f0;border-radius:10px;
-  padding:12px 14px;letter-spacing:.6px;
+  display:block;font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:900;
+  color:#0F2347;background:#fff;border:1.5px solid #d5deea;border-radius:11px;
+  padding:13px 14px;letter-spacing:.8px;text-align:center;
 }
 .rizq-prf-pay-cash{
-  font-size:13px;font-weight:700;color:#0F2347;padding:10px 12px;border-radius:10px;
-  background:rgba(15,35,71,.04);
+  font-size:14px;font-weight:800;color:#0F2347;padding:12px;border-radius:11px;
+  background:rgba(15,35,71,.05);text-align:center;
 }
-.rizq-prf-pay-note{font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5}
+.rizq-prf-pay-note{font-size:12px;color:#64748b;margin-top:8px;line-height:1.5;text-align:center}
+.rizq-prf-pay-hint{font-size:11px;color:#94a3b8;margin:8px 0 0;line-height:1.45}
 
 .rizq-prf-stamp{
-  margin:12px 18px 0;padding:14px;border-radius:14px;text-align:center;
+  margin:10px 0 0;padding:12px;border-radius:12px;text-align:center;
   border:2px dashed #C9A84C;
-  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(15,35,71,.04));
+  background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(15,35,71,.03));
 }
 .rizq-prf-stamp-brand{
   display:block;font-size:10px;letter-spacing:2px;font-weight:900;color:#C9A84C;margin-bottom:4px;
 }
-.rizq-prf-stamp strong{display:block;font-size:14px;color:#0f2347}
+.rizq-prf-stamp strong{display:block;font-size:13.5px;color:#0f2347}
 
+/* شريط أزرار ثابت في الأسفل — لا يختفي */
+.rizq-prf-footer{
+  flex-shrink:0;
+  padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));
+  background:#fff;
+  border-top:1px solid rgba(15,35,71,.08);
+  box-shadow:0 -8px 24px rgba(15,35,71,.06);
+  z-index:2;
+}
 .rizq-prf-actions{
-  margin:14px 18px 0;
+  margin:0;
   display:flex;flex-wrap:wrap;gap:8px;
 }
 .rizq-prf-btn{
   flex:1 1 calc(50% - 4px);
-  min-height:46px;border:0;border-radius:12px;
-  font-family:inherit;font-size:12.5px;font-weight:800;
-  cursor:pointer;padding:10px 12px;
+  min-height:48px;border:0;border-radius:12px;
+  font-family:inherit;font-size:13px;font-weight:800;
+  cursor:pointer;padding:11px 12px;
 }
 .rizq-prf-btn-pay{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0d1b2a}
 .rizq-prf-btn-fulfill{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff}
 .rizq-prf-btn-approve{background:linear-gradient(135deg,#0f2347,#1b3a6b);color:#E8C96A}
-.rizq-prf-btn-dl{background:#fff;color:#0f2347;border:1.5px solid rgba(15,35,71,.18)}
+.rizq-prf-btn-dl{background:#f8fafc;color:#0f2347;border:1.5px solid rgba(15,35,71,.16)}
 .rizq-prf-btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
-
 .rizq-prf-disc{
-  margin:12px 18px 0;font-size:11px;line-height:1.55;color:#64748b;text-align:center;
+  margin:8px 0 0;font-size:10.5px;line-height:1.45;color:#94a3b8;text-align:center;
 }
 
 /* Trigger chips on module pages */
@@ -204,10 +233,13 @@
 }
 
 @media(max-width:480px){
-  .rizq-prf-btn{flex:1 1 100%}
+  .rizq-prf-sheet{max-height:min(94dvh,960px);border-radius:18px 18px 0 0}
   .rizq-prf-parties{grid-template-columns:1fr}
-  .rizq-prf-sheet{max-height:min(96dvh,960px)}
+  .rizq-prf-btn{flex:1 1 calc(50% - 4px);min-height:46px;font-size:12.5px}
+  .rizq-prf-btn-primary{flex:1 1 100%;min-height:50px;font-size:14px}
+  .rizq-prf-pay-value{font-size:18px}
+  .rizq-prf-footer{padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px))}
 }
 @supports not (height:1dvh){
-  .rizq-prf-sheet{max-height:min(94vh,920px)}
+  .rizq-prf-sheet{max-height:min(92vh,900px)}
 }
