@@ -71,6 +71,7 @@ function mountCatalogRoutes(app, deps) {
       nameFr: String(b.nameFr || '').slice(0, 200),
       price: String(b.price || '').slice(0, 40),
       cat: String(b.cat || '').slice(0, 80),
+      topicId: String(b.topicId || '').slice(0, 48),
       desc: String(b.desc || '').slice(0, 3000),
       descFr: String(b.descFr || '').slice(0, 3000),
       stock: String(b.stock || '').slice(0, 20),
@@ -140,10 +141,10 @@ function mountCatalogRoutes(app, deps) {
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
-    const editable = ['name', 'nameFr', 'price', 'cat', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji'];
+    const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji'];
     editable.forEach((k) => {
       if (typeof b[k] !== 'string') return;
-      const max = (k === 'desc' || k === 'descFr') ? 3000 : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : 200)));
+      const max = (k === 'desc' || k === 'descFr') ? 3000 : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : (k === 'topicId' ? 48 : (k === 'cat' ? 80 : 200)))));
       item[k] = b[k].slice(0, max);
     });
     // لا نسمح للمالك بتضخيم sold — للأدمن فقط

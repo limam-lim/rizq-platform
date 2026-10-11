@@ -1055,14 +1055,27 @@ body.page-light .filters-sidebar {
   box-shadow: var(--shadow) !important;
 }
 
-/* Breadcrumb */
+/* Breadcrumb — تباين عالٍ للنص العربي (لا رمادي فاتح على خلفية رمادية) */
 body.page-light .breadcrumb,
 body.page-light .bc-inner {
-  background: var(--light2) !important;
-  border-bottom: 1px solid var(--border) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #c8d2e0 !important;
+  color: #0D1B2A !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  -webkit-font-smoothing: antialiased;
 }
-body.page-light .bc-inner a      { color: var(--bd2) !important; }
+body.page-light .bc-inner a      { color: #0F2347 !important; font-weight: 800 !important; }
 body.page-light .bc-inner a:hover { color: var(--gold) !important; }
+body.page-light .bc-inner > span:not(.bc-sep):not(.sep) {
+  color: #0D1B2A !important;
+  font-weight: 900 !important;
+}
+body.page-light .bc-sep,
+body.page-light .sep {
+  color: #4a5f78 !important;
+  font-weight: 800 !important;
+}
 
 /* Steps */
 body.page-light .steps-bar { background: var(--light2) !important; border-bottom:1px solid var(--border) !important; }

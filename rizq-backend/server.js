@@ -1740,6 +1740,8 @@ function normalizeAccountPaymentMethods(arr) {
     type: ACCOUNT_PAYMENT_TYPES.includes(m && m.type) ? m.type : 'bank',
     bank: String((m && m.bank) || '').slice(0, 120),
     code: String((m && m.code) || '').slice(0, 120),
+    phone: String((m && m.phone) || '').slice(0, 40),
+    account: String((m && (m.account || m.iban || m.accountNumber)) || '').slice(0, 80),
     note: String((m && m.note) || '').slice(0, 300),
     addedAt: String((m && m.addedAt) || new Date().toISOString()).slice(0, 30),
   })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');
@@ -1825,7 +1827,8 @@ function genDashToken() {
 
 // الحقول الآمنة للعرض العام — بدون phone/email/whatsapp (Contact Gate يتحكم)
 const ACCOUNT_PUBLIC_FIELDS = [
-  'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'category',
+  'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
+  'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 function toPublicAccount(acc) {
@@ -2016,6 +2019,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     address: stripBidiControls(String(b.address || '')).normalize('NFC').slice(0, 200),
     desc: stripBidiControls(String(b.desc || '')).normalize('NFC').slice(0, 1000),
     promo_video: String(b.promo_video || '').slice(0, 500),
+    promo_video_extra: String(b.promo_video_extra || '').slice(0, 500),
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
     thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة

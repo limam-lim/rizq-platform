@@ -292,6 +292,116 @@
       });
   }
 
+  function loadBuyerProfile() {
+    var session = null;
+    var delivery = null;
+    try { session = JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null'); } catch (e) { session = null; }
+    try { delivery = JSON.parse(localStorage.getItem('rizq_buyer_delivery') || 'null'); } catch (e2) { delivery = null; }
+    if ((!session || !session.id) && !delivery) return null;
+    var phone = (delivery && delivery.phone) || (session && (session.phone || session.phoneIntl || session.whatsapp)) || '';
+    phone = String(phone || '').trim();
+    if (/^\d{8}$/.test(phone)) phone = '+222' + phone;
+    return {
+      name: (delivery && delivery.name) || (session && session.name) || '',
+      phone: phone,
+      whatsapp: (session && session.whatsapp) || phone,
+      email: (session && session.email) || '',
+      city: (delivery && delivery.city) || (session && session.city) || '',
+      address: (delivery && delivery.address) || (session && session.address) || '',
+      fromAccount: !!(session && session.id)
+    };
+  }
+
+  function formatPhoneForInput(raw) {
+    var phone = String(raw || '').trim();
+    if (/^\d{8}$/.test(phone)) return '+222' + phone;
+    return phone;
+  }
+
+  function showBuyerAutofillHint(root, profile) {
+    if (!root || !profile) return;
+    var hintId = 'rf-buyer-autofill-hint';
+    var existing = root.querySelector('#' + hintId) || document.getElementById(hintId);
+    if (!profile.fromAccount && !profile.name) {
+      if (existing) existing.remove();
+      return;
+    }
+    var text = t(
+      'تم تعبئة بياناتك من حسابك على رزق — يمكنك تعديلها قبل الإرسال.',
+      'Vos infos Rizq ont été préremplies — vous pouvez les modifier avant l\'envoi.'
+    );
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = hintId;
+      existing.setAttribute('data-desk', 'buyer-autofill');
+      existing.style.cssText = 'font-size:11.5px;color:#0F766E;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(15,118,110,.06);border:1px solid rgba(15,118,110,.18)';
+      var nameEl = root.querySelector('#rf-name') || document.getElementById('rf-name');
+      if (nameEl && nameEl.parentNode) {
+        var before = nameEl.previousElementSibling;
+        if (before && before.tagName === 'LABEL') {
+          before.insertAdjacentElement('beforebegin', existing);
+        } else {
+          nameEl.insertAdjacentElement('beforebegin', existing);
+        }
+      } else {
+        root.insertBefore(existing, root.firstChild);
+      }
+    }
+    existing.textContent = '✓ ' + text;
+  }
+
+  /**
+   * يملأ حقول غرفة الطلبات من جلسة المشتري / معلومات التوصيل المؤكّدة.
+   * لا يستبدل قيمة أدخلها المستخدم يدوياً إلا إذا force=true.
+   */
+  function autofillBuyerFields(opts) {
+    opts = opts || {};
+    var force = !!opts.force;
+    var root = opts.root
+      || document.getElementById('store-req-form')
+      || document.getElementById('req-form')
+      || document.getElementById('showroom-service-desk')
+      || document;
+    var profile = loadBuyerProfile();
+    if (!profile) return null;
+
+    var nameEl = root.querySelector ? (root.querySelector('#rf-name') || document.getElementById('rf-name')) : document.getElementById('rf-name');
+    var phoneEl = root.querySelector ? (root.querySelector('#rf-phone') || document.getElementById('rf-phone')) : document.getElementById('rf-phone');
+    var waEl = root.querySelector ? (root.querySelector('#rf-whatsapp') || document.getElementById('rf-whatsapp')) : document.getElementById('rf-whatsapp');
+    var emailEl = root.querySelector ? (root.querySelector('#rf-email') || document.getElementById('rf-email')) : document.getElementById('rf-email');
+    var cityEl = root.querySelector ? (root.querySelector('#rf-city') || document.getElementById('rf-city')) : document.getElementById('rf-city');
+    var addrEl = root.querySelector ? (root.querySelector('#rf-address') || document.getElementById('rf-address')) : document.getElementById('rf-address');
+
+    var filled = false;
+    function apply(el, val) {
+      if (!el || !val) return;
+      if (force || !String(el.value || '').trim()) {
+        el.value = val;
+        filled = true;
+      }
+    }
+    apply(nameEl, profile.name);
+    apply(phoneEl, formatPhoneForInput(profile.phone));
+    apply(waEl, formatPhoneForInput(profile.whatsapp));
+    apply(emailEl, profile.email);
+    apply(cityEl, profile.city);
+    apply(addrEl, profile.address);
+
+    if (filled || profile.fromAccount) {
+      var hintRoot = (nameEl && nameEl.closest && (nameEl.closest('#store-req-form') || nameEl.closest('#req-form') || nameEl.closest('.info-card') || nameEl.closest('.req-box'))) || root;
+      showBuyerAutofillHint(hintRoot, profile);
+    }
+    return profile;
+  }
+
+  function clearRequestMessageFields(root) {
+    root = root || document;
+    ['rf-service', 'rf-msg'].forEach(function (id) {
+      var el = (root.querySelector && root.querySelector('#' + id)) || document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+
   function enhanceOfficeForm(opts) {
     opts = opts || {};
     var form = document.getElementById('req-form');
@@ -300,12 +410,25 @@
     applyPublicLabels(box || document, opts.desk, opts.accountName);
     var nameEl = document.getElementById('rf-name');
     if (nameEl) nameEl.placeholder = t('الاسم الكامل *', 'Nom complet *');
+    autofillBuyerFields({ root: form || document, force: !!opts.forceAutofill });
+  }
+
+  function bootAutofill() {
+    try { autofillBuyerFields({ force: false }); } catch (e) { /* ignore */ }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootAutofill);
+  } else {
+    setTimeout(bootAutofill, 0);
   }
 
   global.RizqServiceDesk = {
     normalizeDesk: normalizeDesk,
     enhanceOfficeForm: enhanceOfficeForm,
     applyPublicLabels: applyPublicLabels,
+    autofillBuyerFields: autofillBuyerFields,
+    loadBuyerProfile: loadBuyerProfile,
+    clearRequestMessageFields: clearRequestMessageFields,
     collectForm: collectForm,
     validate: validate,
     submit: submit,

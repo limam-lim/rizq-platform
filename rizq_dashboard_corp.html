@@ -303,7 +303,8 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
-<script src="rizq_service_desk.js?v=1.0"></script>
+<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_intro_video.js?v=28.7"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -702,8 +703,9 @@ textarea.form-input{min-height:80px;resize:vertical}
             <label class="form-label" style="display:flex;align-items:center;gap:8px">
               <span data-t="pf-promo-video-label">🎬 فيديو تعريفي للمعرض / الشركة</span> <span style="font-size:11px;background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:12px;font-weight:600" data-t="pf-optional">اختياري</span>
             </label>
-            <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px"/>
-            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pf-promo-video-hint">رابط YouTube أو Facebook — يفتح للزوار خارج المنصة بضغطة واحدة</div>
+            <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px" oninput="previewDashPromoVideo()"/>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pf-promo-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً وواضحاً في صفحة معرضك/شركتك. يُفضَّل 15–20 ثانية.</div>
+            <div id="p-promo-video-preview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(27,58,107,.12);background:#0D1B2A"></div>
           </div>
         </div>
 
@@ -3518,6 +3520,7 @@ function saveMyPayment(){
     }
     onCorpDashboardActivityChange();
     var pvElL=document.getElementById('p-promo-video'); if(pvElL){ var SESSION_CORP_ID2=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id'); var accsL=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]'); var aL=accsL.find(function(a){return a.id===SESSION_CORP_ID2;}); pvElL.value=aL&&aL.promo_video?aL.promo_video:''; }
+    if(typeof previewDashPromoVideo==='function') previewDashPromoVideo();
     var tlElLoad=document.getElementById('p-tagline');
     var SESSION_CORP_ID4=(CORP_ACC&&CORP_ACC.id)||localStorage.getItem('rizq_session_id');
     var accsL2=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
@@ -4092,5 +4095,38 @@ window.addEventListener('load', function(){
     </div>
   </div>
 </div>
+<script>
+/* معاينة الفيديو التعريفي — نفس سلوك داشبورد المحل */
+function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
+  var host = document.getElementById(hostId);
+  if(!host) return;
+  var link = String(url || '').trim();
+  if(!link || !window.RizqIntroVideo){
+    host.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  var fr = false;
+  try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
+  host.innerHTML = '';
+  var ok = RizqIntroVideo.mount(host, link, {
+    title: fr ? titleFr : titleAr,
+    linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
+    playLabel: fr ? "Lire l’aperçu" : 'تشغيل المعاينة',
+    mutedLabel: fr ? 'Activer le son' : 'تفعيل الصوت',
+    unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+  });
+  host.style.display = ok ? 'block' : 'none';
+  if(!ok) host.innerHTML = '<div style="padding:12px;color:#fca5a5;font-size:12px;font-weight:700">'
+    + (fr ? 'Lien non pris en charge — utilisez YouTube ou Facebook.' : 'رابط غير مدعوم — استخدم YouTube أو Facebook.')
+    + '</div>';
+}
+function previewDashPromoVideo(){
+  var el = document.getElementById('p-promo-video');
+  _mountDashVideoPreview('p-promo-video-preview', el && el.value, '🎬 معاينة الفيديو التعريفي', '🎬 Aperçu vidéo de présentation');
+}
+/* loadProfile قد يسبق تعريف المعاينة — أعد التركيب بعد توفر الدوال */
+try { if(typeof previewDashPromoVideo === 'function') previewDashPromoVideo(); } catch(ePv){}
+</script>
 </body>
 </html>

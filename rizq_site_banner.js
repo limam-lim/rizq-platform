@@ -114,14 +114,22 @@
     }
   }
 
+  function applyFromSiteConfigData(data, local) {
+    var site = data && data.ok && data.config && data.config.site;
+    if (site) applyBanner(site);
+    else applyBanner(local);
+  }
+
   function fetchFromBase(base, local) {
+    if (global.RizqApi && typeof global.RizqApi.siteConfig === 'function') {
+      global.RizqApi.siteConfig()
+        .then(function (data) { applyFromSiteConfigData(data, local); })
+        .catch(function () { applyBanner(local); });
+      return;
+    }
     fetch(base + '/api/site-config')
       .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (data) {
-        var site = data && data.ok && data.config && data.config.site;
-        if (site) applyBanner(site);
-        else applyBanner(local);
-      })
+      .then(function (data) { applyFromSiteConfigData(data, local); })
       .catch(function () { applyBanner(local); });
   }
 

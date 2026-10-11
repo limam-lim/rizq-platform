@@ -15,11 +15,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=2"/>
+<link rel="stylesheet" href="rizq_close_band.css?v=1"/>
+<link rel="stylesheet" href="rizq_prefacture.css?v=2"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>واجهة المعرض — رزق</title>
 <style>
@@ -154,6 +158,10 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 
 /* ──── ABOUT CARD ──── */
 .about-text{font-size:13px;color:#4a5a6a;line-height:1.8}
+.video-intro-section{margin-top:16px;padding:0;background:transparent;border:none}
+.video-intro-section .rzq-iv-src{color:rgba(38,48,63,.55)}
+.video-intro-section .rzq-iv-src:hover{color:#1B3A6B}
+.video-intro-section .rzq-iv-wrap{max-width:100%}
 .activity-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .activity-tag{padding:5px 12px;background:#f0f5ff;border:1px solid #d0ddf5;border-radius:10px;font-size:11px;font-weight:600;color:var(--navy)}
 
@@ -170,7 +178,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .cat-tab.active,.cat-tab:hover{background:var(--navy);color:var(--white)}
 
 /* Items grid */
-.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+@media(min-width:1100px){.items-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:700px){.items-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .item-card{background:var(--white);border-radius:var(--radius);border:1px solid #e0e8f0;overflow:hidden;transition:all .3s;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
 .item-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#c0d0e0}
 .item-img{height:170px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;overflow:hidden}
@@ -407,22 +417,23 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
 .nav-lang-btn:hover{background:rgba(201,168,76,.22);border-color:#C9A84C}
 </style>
 
-  <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=23.0"></script>
-  <script src="rizq_announcements.js"></script>
-  <script src="rizq_reviews_engine.js"></script>
-  <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
-  <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_backend_config.js"></script>
-<script src="rizq_site_banner.js"></script>
-<script src="rizq_terms_gate.js"></script>
-<script src="rizq_auth_gate.js" defer></script>
-<script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_i18n_data.js" defer></script>
+  <script src="rizq_i18n.js" defer></script>
+  <script src="rizq_lang_guard.js?v=23.0" defer></script>
+  <script src="rizq_announcements.js" defer></script>
+  <script src="rizq_reviews_engine.js" defer></script>
+  <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_site_banner.js" defer></script>
+  <script src="rizq_terms_gate.js" defer></script>
+  <script src="rizq_pwa.js" defer></script>
+  <script src="rizq_footer_toggle.js?v=23.0" defer></script>
+  <script src="rizq_auth_gate.js" defer></script>
+  <script src="rizq_contact_gate.js" defer></script>
 </head>
 <body>
+<!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
+<script src="rizq_header.js?v=26.6"></script>
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -607,6 +618,9 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <p class="about-text" id="about-text">
             معرض الريادة — شركة موريتانية متخصصة في تقديم أفضل المنتجات والخدمات بجودة عالية وأسعار تنافسية. نعمل منذ سنوات على بناء ثقة عملائنا من خلال الشفافية والاحترافية في كل تعامل.
           </p>
+          <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+            <div id="intro-video-mount"></div>
+          </section>
           <div class="activity-tags" id="activity-tags">
             <span class="activity-tag" id="act-tag1">🚗 سيارات جديدة ومستعملة</span>
             <span class="activity-tag" id="act-tag2">🏠 عقارات</span>
@@ -636,15 +650,44 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
         </div>
       </div>
 
-      <!-- ═══ INTRO VIDEO SECTION ═══
-           إصلاح: هذا القسم لم يكن موجوداً إطلاقاً بصفحة الشركة العامة، رغم
-           أن داشبورد الشركة (rizq_dashboard_corp.html) يحفظ حقل promo_video
-           فعلياً منذ البداية — أي شركة تضيف رابط فيديو تعريفي من داشبوردها
-           كانت لن تراه أبداً في صفحتها العامة. الآن مُضمَّن (embed) فعلياً
-           عبر rizq_intro_video.js، بحد أقصى 20 ثانية تشغيل تلقائي. -->
-      <div style="margin-top:28px;display:none;background:#0D1B2A;border-radius:var(--radius);padding:36px 16px" id="video-intro-section">
-        <div id="intro-video-mount"></div>
+      <!-- غرفة الطلبات -->
+      <div class="info-card" id="corp-service-desk" style="margin-top:28px;background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;padding:20px;border-top:3px solid #C9A84C;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
+        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
+        <div class="section-title" data-desk="title" id="corp-req-title" style="margin-bottom:6px;font-size:16px;color:var(--navy)">📩 طلب من المعرض</div>
+        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="corp-req-hint">أدخل بياناتك وسيتواصل معك المعرض مباشرة.</p>
+        <div id="corp-req-form">
+          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
+          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
+          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
+          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد (اختياري)</label>
+          <input dir="ltr" class="req-input" id="rf-email" type="email" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الموضوع / المنتج</label>
+          <input class="req-input" id="rf-service" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
+          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك</label>
+          <textarea class="req-input" id="rf-msg" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
+          <button type="button" id="corp-req-submit" onclick="submitCorpServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
+        </div>
       </div>
+
+      <section class="rizq-close-band" id="corp-close-band" style="margin-top:28px" aria-label="ضمانات المعرض">
+        <div class="rizq-close-inner">
+          <p class="rizq-close-eyebrow">RIZQ · تجربة آمنة</p>
+          <h3 class="rizq-close-title"><span>تعامل بثقة</span> مع هذا المعرض</h3>
+          <p class="rizq-close-desc">رزق وسيط نشر فقط — المعاينة والدفع تتم مباشرة مع المعرض/الشركة. استخدم غرفة الطلبات أو المحادثة الآمنة.</p>
+          <div class="rizq-close-pillars">
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">👁</div><div class="rizq-close-pillar-ttl">معاينة قبل الدفع</div><div class="rizq-close-pillar-txt">افحص العرض قبل التحويل</div></div>
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">💬</div><div class="rizq-close-pillar-ttl">تواصل مباشر</div><div class="rizq-close-pillar-txt">طلب أو محادثة داخل رزق</div></div>
+            <div class="rizq-close-pillar"><div class="rizq-close-pillar-ico">🏢</div><div class="rizq-close-pillar-ttl">عرض وتوريد</div><div class="rizq-close-pillar-txt">اتفق على التسليم مع المعرض</div></div>
+          </div>
+          <div class="rizq-close-ctas">
+            <button type="button" class="rizq-close-cta primary" onclick="document.getElementById('items-section')?.scrollIntoView({behavior:'smooth'})">تصفّح المعروضات</button>
+            <button type="button" class="rizq-close-cta ghost" onclick="document.getElementById('corp-service-desk')?.scrollIntoView({behavior:'smooth',block:'center'})">📩 غرفة الطلبات</button>
+          </div>
+        </div>
+      </section>
 
       <!-- Reviews -->
       <div style="margin-top:28px" id="reviews-section">
@@ -1260,15 +1303,19 @@ function renderCorpItems(items){
     var priceTxt = /\d/.test(it.price) ? (String(it.price).replace(/[^\d]/g,'').length ? Number(String(it.price).replace(/[^\d,]/g,'').replace(/,/g,'')).toLocaleString('en-US') + ' MRU' : it.price) : it.price;
     var badge = it.tag === 'hot' ? '<div class="item-badge-hot">🔥 ' + (isFr?'Populaire':'الأكثر طلباً') + '</div>'
               : it.tag === 'new' ? '<div class="item-badge-new">✨ ' + (isFr?'Nouveau':'جديد') + '</div>' : '';
-    return '<div class="item-card" data-cat="' + _corpEsc(it.cat) + '">'
+    var iid = it.id != null ? String(it.id) : ('corp-' + Math.random().toString(36).slice(2, 8));
+    it.id = iid;
+    return '<div class="item-card" data-cat="' + _corpEsc(it.cat) + '" onclick="openCorpItemDetail(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">'
       + '<div class="item-img">' + corpCatIcon(it.cat) + badge + '</div>'
       + '<div class="item-body">'
       + '<div class="item-name">' + _corpEsc(it.name) + '</div>'
       + '<div class="item-cat">' + _corpEsc(_corpCatLabel(it.cat)) + '</div>'
       + '<div class="item-price-row"><span class="item-price">' + _corpEsc(priceTxt) + '</span>'
-      + '<button class="contact-item-btn" onclick="contactAboutItem(\'' + _corpEsc(it.name).replace(/'/g,"\\'") + '\')">' + (isFr?'📩 Contact':'📩 تواصل') + '</button></div>'
+      + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">' + (isFr?'👁 Fiche':'👁 تفاصيل') + '</button></div>'
+      + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">PREFACTUR</button>'
       + '</div></div>';
   }).join('');
+  try { window._corpItemsCache = items; } catch (e) {}
 }
 function rebuildCorpCatTabs(cats){
   window._corpCachedCats = cats || [];
@@ -1286,7 +1333,30 @@ function rebuildCorpCatTabs(cats){
     if(acc && id){
       // ── الهوية الأساسية ──
       var nameEl = document.getElementById('corp-name'); if(nameEl && acc.name) nameEl.textContent = acc.name;
-      if(acc.desc){ var tagEl = document.getElementById('corp-tagline'); if(tagEl) tagEl.textContent = acc.desc; var aboutEl=document.getElementById('about-text'); if(aboutEl) aboutEl.textContent = acc.desc; }
+      if(acc.desc){
+        var tagEl = document.getElementById('corp-tagline'); if(tagEl) tagEl.textContent = acc.desc;
+        var aboutEl=document.getElementById('about-text');
+        if(aboutEl){
+          aboutEl.textContent = (window.RizqStoreCommerce && RizqStoreCommerce.cleanDesc)
+            ? (RizqStoreCommerce.cleanDesc(acc.desc) || acc.desc)
+            : acc.desc;
+        }
+      }
+      if(acc.serviceDesk) window._rizqCorpServiceDesk = acc.serviceDesk;
+      if(window.RizqServiceDesk){
+        RizqServiceDesk.applyPublicLabels(document.getElementById('corp-service-desk'), acc.serviceDesk || {}, acc.name || '');
+        if(typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+          RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
+        }
+      }
+      if(typeof window.mountCorpIntroVideo === 'function'){
+        window.mountCorpIntroVideo(acc.promo_video || '');
+      } else if(acc.promo_video && window.RizqIntroVideo){
+        RizqIntroVideo.loadAndMountForAccount(id, {
+          url: acc.promo_video,
+          mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+        });
+      }
       if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
 
       // ── شارتا "موثّق"/"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
@@ -1397,12 +1467,17 @@ function rebuildCorpCatTabs(cats){
       if(!id) return;
       var hasLocalMatch = !!(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT);
 
-      // 1) هوية المعرض — احتياط عبر /api/accounts/public
+      // 1) هوية المعرض — كاش مشترك لـ /api/accounts/public
       if(!hasLocalMatch){
         try{
-          var pr = await fetch(base+'/api/accounts/public');
-          if(pr.ok){
-            var pdata = await pr.json();
+          var pdata = window.RizqApi && typeof window.RizqApi.publicAccounts === 'function'
+            ? await window.RizqApi.publicAccounts()
+            : null;
+          if(!pdata){
+            var pr = await fetch(base+'/api/accounts/public');
+            if(pr.ok) pdata = await pr.json();
+          }
+          if(pdata){
             var acc = (pdata.accounts||[]).find(function(a){ return a.id===id && a.type==='corp'; });
             if(acc){
               setText('corp-name', acc.name);
@@ -1430,96 +1505,110 @@ function rebuildCorpCatTabs(cats){
                 var pe=document.getElementById('plan-badge'); if(pe) pe.style.display=b.premium?'':'none';
                 var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
               }
+              if(typeof window.mountCorpIntroVideo === 'function'){
+                window.mountCorpIntroVideo(acc.promo_video || '');
+              } else if(window.RizqIntroVideo){
+                RizqIntroVideo.loadAndMountForAccount(id, {
+                  url: acc.promo_video || '',
+                  mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
+                });
+              }
             }
           }
         }catch(e){}
       }
 
-      // 2) المعروضات الحقيقية — إضافة لما هو معروض دون تكرار (لا نستبدل الشبكة كي لا نمحو ما عرضه apply() محلياً)
+      // 2–4) معروضات + ساعات + تقييمات بالتوازي
+      var needHours = true;
       try{
-        var cr = await fetch(base+'/api/catalog?accountId='+encodeURIComponent(id)+'&kind=product');
-        if(cr.ok){
-          var cdata = await cr.json();
-          var items = Array.isArray(cdata.items) ? cdata.items : [];
-          if(items.length){
-            var grid = document.getElementById('items-grid');
-            if(grid){
-              var existingNames = {};
-              grid.querySelectorAll('.item-name').forEach(function(n){ existingNames[n.textContent.trim()] = true; });
-              var tabsEl = document.getElementById('cat-tabs');
-              var cats = [];
-              if(tabsEl) tabsEl.querySelectorAll('.cat-tab').forEach(function(b){ var t=b.textContent.replace(/^\S+\s*/,'').trim(); if(t && t!=='الكل' && t!=='Tout') cats.push(t); });
-              var addedHtml = '';
-              items.forEach(function(p){
-                if(existingNames[p.name]) return;
-                if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
-                var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
-                addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'">'
-                  + '<div class="item-img">'+(typeof corpCatIcon==='function'?corpCatIcon(p.cat||''):(p.emoji||'📦'))+'</div>'
-                  + '<div class="item-body">'
-                  + '<div class="item-name">'+esc(p.name)+'</div>'
-                  + '<div class="item-cat">'+esc(p.cat||'')+'</div>'
-                  + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
-                  + '<button class="contact-item-btn" onclick="contactAboutItem(\''+esc(p.name).replace(/'/g,"\\'")+'\')">'+(isFr()?'📩 Contact':'📩 تواصل')+'</button></div>'
-                  + '</div></div>';
-              });
-              if(addedHtml){
-                grid.insertAdjacentHTML('beforeend', addedHtml);
-                if(tabsEl && cats.length && typeof rebuildCorpCatTabs==='function') rebuildCorpCatTabs(cats);
-              }
+        var localHours = JSON.parse(localStorage.getItem('corp_hours_'+id)||'null');
+        needHours = !(Array.isArray(localHours) && localHours.length);
+      }catch(eH){}
+      var settled = await Promise.all([
+        fetch(base+'/api/catalog?accountId='+encodeURIComponent(id)+'&kind=product').then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
+        needHours
+          ? fetch(base+'/api/business-hours/'+encodeURIComponent(id)).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+          : Promise.resolve(null),
+        fetch(base+'/api/reviews/'+encodeURIComponent(id)).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+      ]);
+      var cdata = settled[0];
+      var hdata = settled[1];
+      var rdata = settled[2];
+
+      try{
+        var items = cdata && Array.isArray(cdata.items) ? cdata.items : [];
+        if(items.length){
+          var grid = document.getElementById('items-grid');
+          if(grid){
+            var existingNames = {};
+            grid.querySelectorAll('.item-name').forEach(function(n){ existingNames[n.textContent.trim()] = true; });
+            var tabsEl = document.getElementById('cat-tabs');
+            var cats = [];
+            if(tabsEl) tabsEl.querySelectorAll('.cat-tab').forEach(function(b){ var t=b.textContent.replace(/^\S+\s*/,'').trim(); if(t && t!=='الكل' && t!=='Tout') cats.push(t); });
+            var cache = Array.isArray(window._corpItemsCache) ? window._corpItemsCache.slice() : [];
+            var addedHtml = '';
+            var frUi = isFr();
+            items.forEach(function(p){
+              if(existingNames[p.name]) return;
+              if(p.cat && cats.indexOf(p.cat)===-1) cats.push(p.cat);
+              var iid = p.id != null ? String(p.id) : ('corp-' + Math.random().toString(36).slice(2, 8));
+              var norm = Object.assign({}, p, { id: iid });
+              cache.push(norm);
+              var priceTxt = (Number(p.price)||0).toLocaleString('en-US')+' MRU';
+              addedHtml += '<div class="item-card" data-cat="'+esc(p.cat||'')+'" onclick="openCorpItemDetail(\''+esc(iid).replace(/'/g,"\\'")+'\')">'
+                + '<div class="item-img">'+(typeof corpCatIcon==='function'?corpCatIcon(p.cat||''):(p.emoji||'📦'))+'</div>'
+                + '<div class="item-body">'
+                + '<div class="item-name">'+esc(p.name)+'</div>'
+                + '<div class="item-cat">'+esc(typeof _corpCatLabel==='function'?_corpCatLabel(p.cat||''):(p.cat||''))+'</div>'
+                + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
+                + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\''+esc(iid).replace(/'/g,"\\'")+'\')">'+(frUi?'👁 Fiche':'👁 تفاصيل')+'</button></div>'
+                + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\''+esc(iid).replace(/'/g,"\\'")+'\')">PREFACTUR</button>'
+                + '</div></div>';
+            });
+            if(addedHtml){
+              grid.insertAdjacentHTML('beforeend', addedHtml);
+              try { window._corpItemsCache = cache; } catch (eC) {}
+              if(tabsEl && cats.length && typeof rebuildCorpCatTabs==='function') rebuildCorpCatTabs(cats);
             }
           }
         }
       }catch(e){}
 
-      // 3) ساعات العمل الحقيقية — فقط إن لم توجد أصلاً محلياً
       try{
-        var localHours = null;
-        try{ localHours = JSON.parse(localStorage.getItem('corp_hours_'+id)||'null'); }catch(e){}
-        if(!Array.isArray(localHours) || !localHours.length){
-          var hr = await fetch(base+'/api/business-hours/'+encodeURIComponent(id));
-          if(hr.ok){
-            var hdata = await hr.json();
-            if(hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
-              var frFlag = isFr();
-              var dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
-              var ids = ['hd-sun','hd-mon','hd-tue','hd-wed','hd-thu','hd-fri','hd-sat'];
-              var arDays = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-              hdata.hours.forEach(function(h){
-                var i = arDays.indexOf(h.day);
-                if(i === -1) return;
-                var row = document.getElementById(ids[i]);
-                if(!row) return;
-                var wrap = row.closest('.hours-row');
-                if(!wrap) return;
-                var timeEl = wrap.querySelector('.hours-time, .hours-closed');
-                if(!timeEl) return;
-                if(h.open){ timeEl.className='hours-time'; timeEl.textContent = h.from + ' — ' + h.to; }
-                else { timeEl.className='hours-closed'; timeEl.textContent = frFlag ? 'Fermé' : 'مغلق'; }
-              });
-              var now = new Date();
-              var today = hdata.hours.find(function(h){ return h.day === arDays[now.getDay()]; });
-              if(today){
-                function toMin(t){ var p=(t||'0:0').split(':'); return (+p[0])*60+(+p[1]); }
-                var nowMin = now.getHours()*60 + now.getMinutes();
-                var isOpen = !!today.open && nowMin >= toMin(today.from) && nowMin < toMin(today.to);
-                var lbl = document.getElementById('open-now-lbl');
-                if(lbl){
-                  lbl.textContent = isOpen ? (frFlag?('🟢 Ouvert maintenant — ferme à '+today.to):('🟢 مفتوح الآن — يغلق عند الساعة '+today.to)) : (frFlag?'🔴 Fermé actuellement':'🔴 مغلق حالياً');
-                  var box = lbl.closest('div');
-                  if(box){ box.style.background = isOpen ? '#f0fbf4' : '#fdf0f0'; box.style.borderColor = isOpen ? 'rgba(46,204,113,0.3)' : 'rgba(220,38,38,0.25)'; }
-                }
-              }
+        if(hdata && hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
+          var frFlag = isFr();
+          var ids = ['hd-sun','hd-mon','hd-tue','hd-wed','hd-thu','hd-fri','hd-sat'];
+          var arDays = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+          hdata.hours.forEach(function(h){
+            var i = arDays.indexOf(h.day);
+            if(i === -1) return;
+            var row = document.getElementById(ids[i]);
+            if(!row) return;
+            var wrap = row.closest('.hours-row');
+            if(!wrap) return;
+            var timeEl = wrap.querySelector('.hours-time, .hours-closed');
+            if(!timeEl) return;
+            if(h.open){ timeEl.className='hours-time'; timeEl.textContent = h.from + ' — ' + h.to; }
+            else { timeEl.className='hours-closed'; timeEl.textContent = frFlag ? 'Fermé' : 'مغلق'; }
+          });
+          var now = new Date();
+          var today = hdata.hours.find(function(h){ return h.day === arDays[now.getDay()]; });
+          if(today){
+            function toMin(t){ var p=(t||'0:0').split(':'); return (+p[0])*60+(+p[1]); }
+            var nowMin = now.getHours()*60 + now.getMinutes();
+            var isOpen = !!today.open && nowMin >= toMin(today.from) && nowMin < toMin(today.to);
+            var lbl = document.getElementById('open-now-lbl');
+            if(lbl){
+              lbl.textContent = isOpen ? (frFlag?('🟢 Ouvert maintenant — ferme à '+today.to):('🟢 مفتوح الآن — يغلق عند الساعة '+today.to)) : (frFlag?'🔴 Fermé actuellement':'🔴 مغلق حالياً');
+              var box = lbl.closest('div');
+              if(box){ box.style.background = isOpen ? '#f0fbf4' : '#fdf0f0'; box.style.borderColor = isOpen ? 'rgba(46,204,113,0.3)' : 'rgba(220,38,38,0.25)'; }
             }
           }
         }
       }catch(e){}
 
-      // 4) التقييمات الحقيقية — دمج في كاش RizqReviews المحلي ثم إعادة الرسم
       try{
-        var rr = await fetch(base+'/api/reviews/'+encodeURIComponent(id));
-        if(rr.ok){
-          var rdata = await rr.json();
+        if(rdata){
           var remote = Array.isArray(rdata.reviews) ? rdata.reviews : [];
           if(remote.length){
             var all = {};
@@ -1783,26 +1872,29 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_intro_video.js"></script>
+<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_store_commerce.js?v=2"></script>
+<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_prefacture_engine.js?v=2"></script>
+<script src="rizq_account_payments.js"></script>
 <script>
-// ══ فيديو تعريفي مضمَّن — انظر تعليق قسم video-intro-section أعلاه ══
-(function(){
+/* فيديو تعريفي — localStorage + خادم عام عبر loadAndMountForAccount */
+window.mountCorpIntroVideo = function(url){
   try{
-    var p=new URLSearchParams(location.search);
-    var corpId=p.get('id')||p.get('corp')||'';
-    if(!corpId) return;
-    var accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-    var acc=accs.find(function(a){return a.id===corpId;});
-    if(acc&&acc.promo_video){
-      var sec=document.getElementById('video-intro-section');
-      var mount=document.getElementById('intro-video-mount');
-      if(sec&&mount&&window.RizqIntroVideo){
-        var ok=RizqIntroVideo.mount(mount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        if(ok) sec.style.display='';
-      }
+    var corpId = (typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID)
+      || new URLSearchParams(location.search).get('id')
+      || new URLSearchParams(location.search).get('corp')
+      || '';
+    if(!corpId || !window.RizqIntroVideo) return;
+    var opts = { mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' } };
+    if(url) opts.url = url;
+    else if(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video){
+      opts.url = RIZQ_CORP_ACCOUNT.promo_video;
     }
+    RizqIntroVideo.loadAndMountForAccount(corpId, opts);
   }catch(e){}
-})();
+};
+window.mountCorpIntroVideo();
 </script>
 <script src="rizq_packages_config.js"></script>
 <script src="rizq_packages_ui.js?v=23.0"></script>
@@ -1830,8 +1922,97 @@ window._rizqProfile = (function() {
       adTitle    : name,
       adId       : corpId,
       adEmoji    : '🏢',
+      context    : 'showroom',
+      module     : 'corp'
     });
   };
+
+  window.openCorpItemDetail = function(itemId){
+    var items = window._corpItemsCache || [];
+    var item = items.find(function(it){ return String(it.id) === String(itemId); });
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var nameEl = document.getElementById('corp-name');
+    var sname = nameEl ? nameEl.textContent.trim() : (isFr ? 'Galerie' : 'المعرض');
+    if(!item){
+      if(typeof contactAboutItem === 'function') contactAboutItem(itemId);
+      return;
+    }
+    if(window.RizqStoreCommerce && typeof RizqStoreCommerce.openProductDetail === 'function'){
+      RizqStoreCommerce.openProductDetail(item, {
+        fr: isFr,
+        catalog: items,
+        storeName: sname,
+        moduleLabel: isFr ? 'Fiche article' : 'بطاقة عرض',
+        pricePeriod: isFr ? 'Prix galerie' : 'سعر المعرض',
+        showCart: false,
+        onAsk: function(p){
+          if(typeof contactAboutItem === 'function') contactAboutItem(p.name || p.id);
+          else if(typeof openChat === 'function') openChat(p);
+        }
+      });
+      return;
+    }
+    if(typeof contactAboutItem === 'function') contactAboutItem(item.name || itemId);
+  };
+
+  window.issueCorpPrefacture = function(itemId){
+    var items = window._corpItemsCache || [];
+    var item = items.find(function(it){ return String(it.id) === String(itemId); });
+    if(!item || !window.RizqPrefacture) return;
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var nameEl = document.getElementById('corp-name');
+    var sname = nameEl ? nameEl.textContent.trim() : (isFr ? 'Galerie' : 'المعرض');
+    var params = new URLSearchParams(location.search);
+    var corpId = params.get('id') || params.get('corp') || '';
+    var price = (window.RizqStoreCommerce && RizqStoreCommerce.parsePriceNum)
+      ? RizqStoreCommerce.parsePriceNum(item.price)
+      : (parseFloat(String(item.price||'').replace(/[^\d.]/g,''))||0);
+    RizqPrefacture.issueAndOpen({
+      module: 'showroom',
+      sellerAccountId: corpId,
+      sellerName: sname,
+      buyerName: '',
+      buyerPhone: '',
+      lines: [{ name: item.name || 'Item', qty: 1, unitPrice: price }],
+      deliveryType: 'pickup',
+      deliveryFee: 0
+    });
+  };
+
+  window.submitCorpServiceReq = function(){
+    var isFr = (localStorage.getItem('rizq_lang') === 'fr');
+    var btn = document.getElementById('corp-req-submit');
+    if(btn) btn.disabled = true;
+    var params = new URLSearchParams(location.search);
+    var corpId = params.get('id') || params.get('corp') || '';
+    if(!window.RizqServiceDesk){
+      alert(isFr ? 'Formulaire indisponible' : 'تعذّر تحميل النموذج');
+      if(btn) btn.disabled = false;
+      return;
+    }
+    RizqServiceDesk.submit({
+      accountId: corpId,
+      source: 'corp',
+      desk: window._rizqCorpServiceDesk || {},
+      form: document.getElementById('corp-req-form')
+    }).then(function(res){
+      alert(res.message || (isFr ? 'Demande envoyée' : 'تم إرسال الطلب'));
+      if(typeof RizqServiceDesk.clearRequestMessageFields === 'function'){
+        RizqServiceDesk.clearRequestMessageFields(document.getElementById('corp-req-form'));
+      }
+      if(typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+        RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form'), force: true });
+      }
+    }).catch(function(err){
+      alert((err && err.message) || (isFr ? 'Échec' : 'تعذّر الإرسال'));
+    }).finally(function(){ if(btn) btn.disabled = false; });
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    if(window.RizqServiceDesk && typeof RizqServiceDesk.autofillBuyerFields === 'function'){
+      RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
+    }
+  });
 })();
 </script>
 

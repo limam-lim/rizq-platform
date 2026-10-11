@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.5"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.7"/>
+<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="سلة المشتريات | رزق" data-t-fr="Mon panier | Rizq">سلة المشتريات | رزق</title>
 <style>
@@ -49,12 +50,46 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .nav-link{padding:8px 14px;border-radius:8px;color:var(--text);font-size:13px;text-decoration:none;transition:all .25s;cursor:pointer;border:none;background:none;font-family:inherit}
 .nav-link:hover{background:rgba(201,168,76,0.1);color:var(--gold)}
 
-/* BREADCRUMB */
-.breadcrumb{background:#fff;border-bottom:1px solid #e0e8f0;padding:0 20px}
-.bc-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;height:40px;font-size:13px;color:#6a7a8a}
-.bc-inner a{color:var(--navy);text-decoration:none;font-weight:500}
-.bc-inner a:hover{color:var(--gold)}
-.bc-sep{color:#c0d0e0}
+/* BREADCRUMB — تباين أوضح للنص العربي */
+.breadcrumb{background:#fff !important;border-bottom:1px solid #c8d2e0;padding:0 20px}
+.bc-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:46px;font-size:15px;color:#0D1B2A;font-weight:800;-webkit-font-smoothing:antialiased}
+.bc-inner a{color:#0F2347 !important;text-decoration:none;font-weight:800}
+.bc-inner a:hover{color:#C9A84C !important}
+.bc-inner > span:not(.bc-sep){color:#0D1B2A !important;font-weight:900}
+.bc-sep{color:#4a5f78 !important;font-weight:800;font-size:16px}
+
+/* شريط هوية المحل */
+.store-lux-strip{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
+    linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
+  border-bottom:1px solid rgba(201,168,76,.35);
+  color:#fff;
+}
+.store-lux-inner{
+  max-width:1100px;margin:0 auto;padding:18px 16px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.store-lux-logo{
+  width:64px;height:64px;border-radius:18px;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.45),rgba(27,58,107,.7));
+  border:2px solid rgba(201,168,76,.7);
+  box-shadow:0 0 0 4px rgba(201,168,76,.12),0 10px 22px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;
+}
+.store-lux-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.store-lux-name{font-size:clamp(18px,2.6vw,24px);font-weight:900;letter-spacing:.2px;line-height:1.15;margin:0 0 4px}
+.store-lux-name span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.store-lux-tag{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.5}
+.store-lux-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.store-lux-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
+  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
+  text-decoration:none;
+}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
 /* STEPS INDICATOR */
 .steps-bar{background:#fff;border-bottom:1px solid #e0e8f0;padding:16px 20px}
@@ -89,7 +124,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
   box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .3s;
 }
 .cart-item:hover{border-color:#b0c8e0;box-shadow:var(--shadow)}
-.cart-item-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+.cart-item-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden}
 .cart-item-info{flex:1}
 .cart-item-name{font-size:15px;font-weight:700;color:#1a2a3a;margin-bottom:3px}
 .cart-item-cat{font-size:12px;color:#9aabbb;margin-bottom:10px}
@@ -126,6 +161,24 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(27,58,107,.08)}
 .form-group input::placeholder,.form-group textarea::placeholder{color:#b0b8c8}
 .form-err{font-size:11px;color:var(--red);margin-top:4px;display:none}
+.delivery-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.delivery-actions .deliv-btn{
+  flex:1;min-width:140px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;
+  font-family:inherit;cursor:pointer;border:none;transition:all .25s;min-height:46px
+}
+.delivery-actions .deliv-btn-confirm{background:var(--navy);color:#fff}
+.delivery-actions .deliv-btn-confirm:hover{background:#0a1a36}
+.delivery-actions .deliv-btn-edit{background:#fff;color:var(--navy);border:1.5px solid #c5d0e0}
+.delivery-actions .deliv-btn-edit:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.delivery-confirmed{
+  display:none;margin-top:14px;padding:14px 16px;border-radius:12px;
+  border:1.5px solid rgba(46,204,113,.35);background:rgba(46,204,113,.06)
+}
+.delivery-confirmed.is-on{display:block}
+.delivery-confirmed .dc-title{font-size:13px;font-weight:800;color:var(--green);margin-bottom:8px}
+.delivery-confirmed .dc-line{font-size:13.5px;color:#1a2a3a;line-height:1.65;margin:2px 0}
+.address-form.is-locked .form-grid{opacity:.55;pointer-events:none}
+.address-form.is-locked .delivery-actions .deliv-btn-confirm{display:none}
 
 /* ORDER SUMMARY */
 .order-summary{background:linear-gradient(145deg,#fff,#f8fafc);border-radius:var(--radius);border:1px solid #e0e8f0;padding:24px;position:sticky;top:84px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
@@ -360,17 +413,20 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
-  <script src="rizq_stock.js"></script>
-  <script src="rizq_account_payments.js"></script>
-  <script src="rizq_contact_gate.js"></script>
-<script src="rizq_site_banner.js"></script>
-  <script src="rizq_i18n_data.js"></script>
-  <script src="rizq_i18n.js"></script>
-<script src="rizq_lang_guard.js?v=1.0"></script>
-<script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=20" defer></script>
+  <script src="rizq_store_topics.js?v=27.0" defer></script>
+  <script src="rizq_store_commerce.js?v=28.5" defer></script>
+  <script src="rizq_stock.js" defer></script>
+  <script src="rizq_account_payments.js?v=28.2" defer></script>
+  <script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_site_banner.js" defer></script>
+  <script src="rizq_i18n_data.js" defer></script>
+  <script src="rizq_i18n.js" defer></script>
+  <script src="rizq_lang_guard.js?v=1.0" defer></script>
+  <script src="rizq_pwa.js" defer></script>
+  <script src="rizq_footer_toggle.js?v=20" defer></script>
 </head>
 <body data-t-ns="cart">
+<script src="rizq_header.js?v=26.6"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- NAV -->
@@ -394,13 +450,29 @@ main, .page-content.active, .main-content, .results-area,
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
   <div class="bc-inner">
-    <a href="rizq_landing_v8.html#rzq-disc-store" data-t-fr="Boutique">المحل</a>
+    <a href="rizq_landing_v8.html#rzq-disc-store" id="bc-store-link" data-t-fr="Boutique">المحل</a>
     <span class="bc-sep">›</span>
-    <a href="rizq_products.html" data-t-fr="Produits">المنتجات</a>
+    <a href="rizq_products.html" id="bc-products-link" data-t-fr="Produits">المنتجات</a>
     <span class="bc-sep">›</span>
     <span data-t-fr="Panier">السلة</span>
   </div>
 </div>
+
+<!-- هوية المحل -->
+<section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
+  <div class="store-lux-inner">
+    <div class="store-lux-logo" id="lux-store-logo">🏪</div>
+    <div style="flex:1;min-width:180px">
+      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
+      <p class="store-lux-tag" id="lux-store-tag">سلة طلباتك — صورة المحل واسمه كما في الواجهة</p>
+      <div class="store-lux-meta">
+        <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
+        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html">↩ واجهة المحل</a>
+        <a class="store-lux-chip" id="lux-to-products" href="rizq_products.html">🛍 المنتجات</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- STEPS -->
 <div class="steps-bar">
@@ -481,8 +553,15 @@ main, .page-content.active, .main-content, .results-area,
       <!-- ADDRESS FORM -->
       <div class="address-form" id="address-form-section">
         <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px" data-t-fr="📍 Informations de livraison">📍 معلومات التوصيل</div>
+        <div class="delivery-confirmed" id="delivery-confirmed-box" aria-live="polite">
+          <div class="dc-title" data-t-fr="✓ Informations confirmées">✓ تم تأكيد المعلومات</div>
+          <div class="dc-line" id="dc-name"></div>
+          <div class="dc-line" id="dc-phone" dir="ltr" style="text-align:inherit"></div>
+          <div class="dc-line" id="dc-address"></div>
+          <div class="dc-line" id="dc-city"></div>
+        </div>
         <form id="checkout-form" onsubmit="submitOrder(event)" novalidate>
-          <div class="form-grid">
+          <div class="form-grid" id="delivery-form-grid">
             <div class="form-group">
               <label data-t-fr="Nom complet *">الاسم الكامل *</label>
               <input type="text" id="f-name" placeholder="محمد السالك" data-ph-fr="Mohamed Salk" required maxlength="80"/>
@@ -499,7 +578,7 @@ main, .page-content.active, .main-content, .results-area,
               <div class="form-err" id="f-address-err" data-t-fr="L'adresse est requise">العنوان مطلوب</div>
             </div>
             <div class="form-group">
-              <label data-t-fr="Ville">المدينة</label>
+              <label data-t-fr="Ville *">المدينة *</label>
               <select id="f-city">
                 <option value="نواكشوط" data-t-fr="Nouakchott">نواكشوط</option>
                 <option value="نواذيبو" data-t-fr="Nouadhibou">نواذيبو</option>
@@ -516,6 +595,14 @@ main, .page-content.active, .main-content, .results-area,
               <label data-t-fr="Remarques pour le vendeur">ملاحظات للبائع</label>
               <textarea id="f-notes" rows="3" placeholder="أي تعليمات خاصة للتوصيل..." data-ph-fr="Instructions spéciales pour la livraison..." maxlength="500" style="resize:vertical"></textarea>
             </div>
+          </div>
+          <div class="delivery-actions">
+            <button type="button" class="deliv-btn deliv-btn-confirm" id="btn-confirm-delivery" onclick="confirmDeliveryInfo()">
+              <span data-t-fr="✓ Confirmer les informations">✓ تأكيد المعلومات</span>
+            </button>
+            <button type="button" class="deliv-btn deliv-btn-edit" id="btn-edit-delivery" onclick="editDeliveryInfo()">
+              <span data-t-fr="✎ Modifier / Mettre à jour">✎ تغيير / تحديث</span>
+            </button>
           </div>
         </form>
       </div>
@@ -607,8 +694,126 @@ main, .page-content.active, .main-content, .results-area,
 function sanitize(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s||'')));return d.innerHTML; }
 function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
 
-// روابط المحل/المنتجات: احتفظ بمعرّف المحل أو اذهب للاكتشاف بدل صفحة فارغة
-(function bindStoreContextLinks(){
+var DELIVERY_KEY = 'rizq_buyer_delivery';
+var deliveryConfirmed = false;
+
+function _loadBuyerSession() {
+  try { return JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null'); } catch (e) { return null; }
+}
+function _loadSavedDelivery() {
+  try { return JSON.parse(localStorage.getItem(DELIVERY_KEY) || 'null'); } catch (e) { return null; }
+}
+function _saveDeliveryInfo(info) {
+  try { localStorage.setItem(DELIVERY_KEY, JSON.stringify(info)); } catch (e) {}
+  try {
+    var s = _loadBuyerSession();
+    if (s && s.id) {
+      s.name = info.name || s.name;
+      s.phone = info.phone || s.phone;
+      s.city = info.city || s.city;
+      s.address = info.address || s.address;
+      localStorage.setItem('rizq_buyer_session', JSON.stringify(s));
+    }
+  } catch (e2) {}
+}
+function readDeliveryForm() {
+  return {
+    name: (document.getElementById('f-name').value || '').trim(),
+    phone: (document.getElementById('f-phone').value || '').trim(),
+    address: (document.getElementById('f-address').value || '').trim(),
+    city: (document.getElementById('f-city').value || '').trim(),
+    district: (document.getElementById('f-district').value || '').trim(),
+    notes: (document.getElementById('f-notes').value || '').trim(),
+    confirmed: true,
+    savedAt: new Date().toISOString()
+  };
+}
+function validateDeliveryFields() {
+  var isAr = document.documentElement.lang !== 'fr';
+  var name = (document.getElementById('f-name').value || '').trim();
+  var phone = (document.getElementById('f-phone').value || '').trim();
+  var address = (document.getElementById('f-address').value || '').trim();
+  var valid = true;
+  document.getElementById('f-name-err').style.display = name ? 'none' : 'block';
+  if (!name) valid = false;
+  var phoneOk = validatePhone(phone);
+  document.getElementById('f-phone-err').style.display = phoneOk ? 'none' : 'block';
+  if (!phoneOk) valid = false;
+  document.getElementById('f-address-err').style.display = address ? 'none' : 'block';
+  if (!address) valid = false;
+  if (!valid) {
+    showToast(isAr ? '❌ يرجى تعبئة الاسم والهاتف والعنوان' : '❌ Remplissez nom, téléphone et adresse');
+  }
+  return valid;
+}
+function paintDeliveryConfirmed(info) {
+  var box = document.getElementById('delivery-confirmed-box');
+  var section = document.getElementById('address-form-section');
+  if (!box || !section) return;
+  var isAr = document.documentElement.lang !== 'fr';
+  document.getElementById('dc-name').textContent = (isAr ? 'الاسم: ' : 'Nom : ') + (info.name || '—');
+  document.getElementById('dc-phone').textContent = (isAr ? 'الهاتف: ' : 'Tél. : ') + (info.phone || '—');
+  document.getElementById('dc-address').textContent = (isAr ? 'العنوان: ' : 'Adresse : ') + (info.address || '—');
+  var cityLine = info.city || '';
+  if (info.district) cityLine += (cityLine ? ' — ' : '') + info.district;
+  document.getElementById('dc-city').textContent = cityLine
+    ? ((isAr ? 'المدينة: ' : 'Ville : ') + cityLine)
+    : '';
+  box.classList.add('is-on');
+  section.classList.add('is-locked');
+  deliveryConfirmed = true;
+}
+function clearDeliveryConfirmedView() {
+  var box = document.getElementById('delivery-confirmed-box');
+  var section = document.getElementById('address-form-section');
+  if (box) box.classList.remove('is-on');
+  if (section) section.classList.remove('is-locked');
+  deliveryConfirmed = false;
+}
+function confirmDeliveryInfo() {
+  if (!validateDeliveryFields()) return;
+  var info = readDeliveryForm();
+  _saveDeliveryInfo(info);
+  paintDeliveryConfirmed(info);
+  var isAr = document.documentElement.lang !== 'fr';
+  showToast(isAr ? '✅ تم تأكيد معلومات التوصيل' : '✅ Informations de livraison confirmées');
+}
+function editDeliveryInfo() {
+  clearDeliveryConfirmedView();
+  var nameEl = document.getElementById('f-name');
+  if (nameEl) nameEl.focus();
+  var isAr = document.documentElement.lang !== 'fr';
+  showToast(isAr ? '✎ يمكنك تحديث المعلومات ثم التأكيد' : '✎ Modifiez puis confirmez');
+}
+function autofillDeliveryFromAccount() {
+  var saved = _loadSavedDelivery();
+  var session = _loadBuyerSession();
+  var src = saved || session || null;
+  if (!src) return;
+  var nameEl = document.getElementById('f-name');
+  var phoneEl = document.getElementById('f-phone');
+  var addrEl = document.getElementById('f-address');
+  var cityEl = document.getElementById('f-city');
+  var distEl = document.getElementById('f-district');
+  if (nameEl && !nameEl.value && src.name) nameEl.value = src.name;
+  if (phoneEl && !phoneEl.value) {
+    var ph = src.phone || src.whatsapp || src.phoneIntl || '';
+    if (ph && /^\d{8}$/.test(String(ph))) ph = '+222' + ph;
+    phoneEl.value = ph;
+  }
+  if (addrEl && !addrEl.value && src.address) addrEl.value = src.address;
+  if (cityEl && src.city) {
+    var opt = Array.prototype.find.call(cityEl.options, function (o) { return o.value === src.city; });
+    if (opt) cityEl.value = src.city;
+  }
+  if (distEl && !distEl.value && src.district) distEl.value = src.district;
+  if (saved && saved.confirmed && saved.name && saved.phone && saved.address) {
+    paintDeliveryConfirmed(saved);
+  }
+}
+
+// روابط المحل/المنتجات + شريط الهوية
+(function bindStoreContext(){
   try{
     var params = new URLSearchParams(location.search);
     var storeId = params.get('id') || params.get('store') || '';
@@ -618,20 +823,60 @@ function validatePhone(p){ return /^\+?[0-9\s\-]{8,20}$/.test(p.trim()); }
         if(c[0]) storeId = c[0].storeId || c[0].accountId || '';
       }catch(e){}
     }
-    var storeHref = storeId
-      ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
-      : 'rizq_landing_v8.html#rzq-disc-store';
-    var productsHref = storeId
-      ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
-      : 'rizq_products.html';
-    document.querySelectorAll('a[href="rizq_store.html"], a[href="rizq_landing_v8.html#rzq-disc-store"]').forEach(function(a){
-      a.setAttribute('href', storeHref);
-    });
-    document.querySelectorAll('a[href="rizq_products.html"], a[href^="rizq_products.html?"]').forEach(function(a){
-      a.setAttribute('href', productsHref);
-    });
+    var fr = false;
+    try{ fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e2){}
+    var acc = null;
+    if(storeId && storeId !== 'demo_store'){
+      try{
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        acc = (accs || []).find(function(a){ return String(a.id) === String(storeId); }) || null;
+      }catch(e3){}
+      if(!acc && window.RizqApi && typeof RizqApi.get === 'function'){
+        RizqApi.get('/api/accounts/' + encodeURIComponent(storeId)).then(function(a){
+          if(a) applyCartStoreBrand(a, storeId, fr);
+        }).catch(function(){});
+      }
+    }
+    if(!acc && (storeId === 'demo_store' || !storeId)){
+      acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك' };
+      if(!storeId) storeId = 'demo_store';
+    }
+    applyCartStoreBrand(acc || {}, storeId, fr);
   }catch(e){}
 })();
+
+function applyCartStoreBrand(acc, storeId, fr){
+  var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
+  var tag = (acc && (acc.tagline || acc.desc)) || (fr
+    ? 'Votre panier — identité du magasin comme la vitrine'
+    : 'سلة طلباتك — صورة المحل واسمه كما في الواجهة');
+  var luxName = document.getElementById('lux-store-name');
+  var luxTag = document.getElementById('lux-store-tag');
+  var luxLogo = document.getElementById('lux-store-logo');
+  var bcLink = document.getElementById('bc-store-link');
+  var bcProd = document.getElementById('bc-products-link');
+  var back = document.getElementById('lux-back-store');
+  var toProd = document.getElementById('lux-to-products');
+  if(luxName) luxName.textContent = name;
+  if(luxTag) luxTag.textContent = tag;
+  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, '🏪');
+  else if(luxLogo && acc && acc.thumb){
+    var t = String(acc.thumb).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    luxLogo.innerHTML = '<img src="'+t+'" alt=""/>';
+  }
+  var storeHref = storeId && storeId !== 'demo_store'
+    ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
+    : (storeId === 'demo_store' ? 'rizq_store.html?id=demo_store' : 'rizq_landing_v8.html#rzq-disc-store');
+  var productsHref = storeId
+    ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
+    : 'rizq_products.html';
+  if(bcLink){ bcLink.textContent = name; bcLink.href = storeHref; }
+  if(bcProd) bcProd.href = productsHref;
+  if(back) back.href = storeHref;
+  if(toProd) toProd.href = productsHref;
+  if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
+  window._rizqCartStoreName = name;
+}
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========
 function loadCart(){
@@ -702,32 +947,42 @@ function renderCart() {
   document.getElementById('nav-cart-count').textContent = totalQty;
 
   var __isAr = document.documentElement.lang !== 'fr';
-  var __storeName = __isAr ? 'متجر النور' : 'Boutique Al-Nour';
+  var __storeName = window._rizqCartStoreName || (__isAr ? 'متجر النور' : 'Boutique Al-Nour');
   var __lblDec = __isAr ? 'تقليل' : 'Diminuer';
   var __lblInc = __isAr ? 'زيادة' : 'Augmenter';
   var __lblDel = __isAr ? 'حذف' : 'Supprimer';
-  // إصلاح تسرب اللغة: عناصر السلة المضافة من rizq_products.html/rizq_store.html
-  // تُخزَّن بكامل الكائن (name عربي + nameF فرنسي) لكن هذا الملف كان يعرض
-  // item.name دائماً بغض النظر عن لغة الصفحة الحالية — فتظهر أسماء المنتجات
-  // بالعربية حتى في وضع الفرنسية. الحل: اختيار الاسم المناسب للغة الحالية،
-  // مع بقاء item.name كاحتياطي إذا لم يوجد nameF (منتجات قديمة أحادية اللغة).
+  var luxChip = document.getElementById('lux-count-chip');
+  if(luxChip) luxChip.textContent = totalQty + (__isAr ? ' في السلة' : ' dans le panier');
+  // إصلاح تسرب اللغة: اختيار الاسم المناسب للغة الحالية + صورة المنتج إن وُجدت
   list.innerHTML = cart.map(item => {
     var __itemName = __isAr ? (item.name || item.nameF) : (item.nameF || item.name);
+    var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
+      ? RizqStoreCommerce.imagesOf(item)
+      : (item.imgDataArr || (item.imgData ? [item.imgData] : []) || []);
+    var safeImg = imgs[0]
+      ? ((window.RizqStoreCommerce && typeof RizqStoreCommerce.safeMediaUrl === 'function')
+          ? RizqStoreCommerce.safeMediaUrl(imgs[0])
+          : (/^(https?:|data:image\/|\/|\.\/)/i.test(String(imgs[0])) && !/javascript:/i.test(String(imgs[0])) ? imgs[0] : ''))
+      : '';
+    var thumb = safeImg
+      ? ('<img src="'+sanitize(safeImg)+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
+      : sanitize(item.emoji || '📦');
+    var safeId = sanitize(String(item.id));
     return `
-    <div class="cart-item" id="cart-item-${item.id}">
-      <div class="cart-item-img">${item.emoji}</div>
+    <div class="cart-item" id="cart-item-${safeId}" data-cart-id="${safeId}">
+      <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${sanitize(__itemName)}</div>
-        <div class="cart-item-cat">${__storeName}</div>
-        <div class="cart-item-price">${item.price.toLocaleString()} MRU</div>
+        <div class="cart-item-cat">${sanitize(__storeName)}</div>
+        <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
         <div class="qty-controls">
-          <button class="qty-btn" onclick="changeQty(${item.id},-1)" aria-label="${__lblDec}">−</button>
-          <span class="qty-val" id="qty-${item.id}">${item.qty}</span>
-          <button class="qty-btn" onclick="changeQty(${item.id},1)" aria-label="${__lblInc}">+</button>
-          <span class="item-subtotal">= ${(item.price*item.qty).toLocaleString()} MRU</span>
+          <button type="button" class="qty-btn" data-qty-delta="-1" aria-label="${__lblDec}">−</button>
+          <span class="qty-val" id="qty-${safeId}">${item.qty}</span>
+          <button type="button" class="qty-btn" data-qty-delta="1" aria-label="${__lblInc}">+</button>
+          <span class="item-subtotal">= ${(Number(item.price||0)*item.qty).toLocaleString()} MRU</span>
         </div>
       </div>
-      <button class="cart-item-del" onclick="removeItem(${item.id})" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
+      <button type="button" class="cart-item-del" data-cart-remove="1" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
     </div>
   `;
   }).join('');
@@ -737,20 +992,40 @@ function renderCart() {
 }
 
 function changeQty(id, delta) {
-  const item = cart.find(c => c.id===id);
+  const item = cart.find(c => String(c.id) === String(id));
   if (!item) return;
-  item.qty = Math.max(1, Math.min(99, item.qty + delta));
+  item.qty = Math.max(1, Math.min(99, Number(item.qty || 1) + Number(delta || 0)));
   saveCart();
   renderCart();
 }
 
 function removeItem(id) {
   const isAr = document.documentElement.lang !== 'fr';
-  cart = cart.filter(c => c.id !== id);
+  cart = cart.filter(c => String(c.id) !== String(id));
   saveCart();
   renderCart();
   showToast(isAr ? '🗑 تم حذف المنتج' : '🗑 Produit supprimé');
 }
+
+/* تفويض أحداث الكمية/الحذف — يتجنب كسر onclick بسبب علامات التنصيص في المعرّف */
+(function bindCartItemActions(){
+  var list = document.getElementById('cart-items-list');
+  if (!list || list._rizqQtyBound) return;
+  list._rizqQtyBound = true;
+  list.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-qty-delta], [data-cart-remove]') : null;
+    if (!btn || !list.contains(btn)) return;
+    var row = btn.closest('[data-cart-id]');
+    if (!row) return;
+    var id = row.getAttribute('data-cart-id');
+    if (btn.hasAttribute('data-cart-remove')) {
+      removeItem(id);
+      return;
+    }
+    var delta = parseInt(btn.getAttribute('data-qty-delta') || '0', 10);
+    if (delta) changeQty(id, delta);
+  });
+})();
 
 function clearCart() {
   const isAr = document.documentElement.lang !== 'fr';
@@ -780,6 +1055,76 @@ function selectPayment(method) {
     document.getElementById('pay-'+m)?.classList.toggle('selected', m===method);
   });
   updateOrderTerms();
+  var box = document.getElementById('cart-seller-payments');
+  if(method === 'bank'){
+    openCartBankPicker();
+    if(box) box.style.display = '';
+  } else {
+    window._rizqCartSelectedChannel = null;
+    window._rizqCartSelectedPay = null;
+    if(box){
+      box.innerHTML = '';
+      box.style.display = 'none';
+    }
+  }
+}
+
+function _demoCartPayments(){
+  return [
+    { type:'bankily', bank:'Bankily', code:'44556677', phone:'+22244882212', account:'', note:'اذكر اسمك بعد التحويل' },
+    { type:'sedad', bank:'Sedad', code:'998877', phone:'+22233001122', account:'' },
+    { type:'bank', bank:'BCI', code:'', phone:'', account:'MR13 0001 2345 6789 0123 4567 890', note:'تحويل بنكي باسم المحل' }
+  ];
+}
+
+function openCartBankPicker(){
+  var isFr = document.documentElement.lang === 'fr';
+  var methods = window._rizqCartSellerPayments;
+  if(!methods || !methods.length){
+    var sid = _cartSellerId();
+    if(sid && window.RizqAccountPayments){
+      methods = RizqAccountPayments.getLocal(sid) || [];
+    }
+  }
+  if(!methods || !methods.length){
+    try{
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      var acc = accs.find(function(a){ return a && String(a.id) === String(_cartSellerId()); });
+      if(acc && Array.isArray(acc.paymentMethods)) methods = acc.paymentMethods;
+    }catch(e){}
+  }
+  if(!methods || !methods.length) methods = _demoCartPayments();
+  window._rizqCartSellerPayments = methods;
+  if(window.RizqAccountPayments && typeof RizqAccountPayments.openBuyerPicker === 'function'){
+    RizqAccountPayments.openBuyerPicker(methods, {
+      fr: isFr,
+      sellerName: window._rizqCartSellerName || (isFr ? 'Boutique Al-Nour' : 'متجر النور'),
+      onSelect: function(sel){
+        /* sel = { method, channelKey, channelValue, channelLabelAr/Fr, channelIcon } */
+        if (sel && sel.method && !sel.channelKey) {
+          /* توافق قديم: كائن وسيلة فقط */
+          sel = null;
+        }
+        window._rizqCartSelectedChannel = sel || null;
+        window._rizqCartSelectedPay = sel && sel.method ? sel.method : null;
+        var box = document.getElementById('cart-seller-payments');
+        if (box && sel && typeof RizqAccountPayments.renderSelectedChannel === 'function') {
+          RizqAccountPayments.renderSelectedChannel(box, sel, { fr: isFr });
+        } else if (box && sel && sel.method) {
+          RizqAccountPayments.renderPublic(box, [sel.method], { fr: isFr });
+          box.style.display = '';
+        }
+        var isAr = !isFr;
+        if (typeof showToast === 'function' && sel) {
+          var chLbl = isAr ? (sel.channelLabelAr || sel.channelKey) : (sel.channelLabelFr || sel.channelKey);
+          var bank = (sel.method && (sel.method.bank || sel.method.type)) || '';
+          showToast(isAr
+            ? ('✅ تم اختيار: ' + bank + ' — ' + chLbl)
+            : ('✅ Choix : ' + bank + ' — ' + chLbl));
+        }
+      }
+    });
+  }
 }
 
 const ORDER_TERMS_TEXT = {
@@ -871,30 +1216,51 @@ function _cartSellerId(){
 function loadCartSellerPayments(){
   var box = document.getElementById('cart-seller-payments');
   if(!box) return;
-  var storeId = _cartSellerId();
-  if(!storeId || !window.RIZQ_BACKEND_BASE){
-    box.style.display = 'none';
-    return;
+  box.style.display = 'none';
+  var storeId = _cartSellerId() || 'demo_store';
+  var isFr = document.documentElement.lang === 'fr';
+
+  function applyPayments(methods, name){
+    window._rizqCartSellerPayments = Array.isArray(methods) ? methods : [];
+    if(name) window._rizqCartSellerName = name;
+    var note = document.getElementById('cart-pay-trust-note');
+    if(note && window._rizqCartSellerName){
+      note.textContent = isFr
+        ? ('Le virement va directement à « ' + window._rizqCartSellerName + ' » — Rizq n’encaisse pas vos achats.')
+        : ('التحويل يصل مباشرة إلى « ' + window._rizqCartSellerName + ' » — رزق لا يستلم ثمن مشترياتك.');
+    }
   }
+
+  /* مصادر محلية أولاً (داشبورد المشترك) ثم API إن وُجد */
+  if(window.RizqAccountPayments){
+    var local = RizqAccountPayments.getLocal(storeId);
+    if(local && local.length) applyPayments(local, window._rizqCartSellerName || '');
+  }
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    var acc = accs.find(function(a){ return a && String(a.id) === String(storeId); });
+    if(acc){
+      if(Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) applyPayments(acc.paymentMethods, acc.name || '');
+      else if(acc.name) window._rizqCartSellerName = acc.name;
+    }
+  }catch(e){}
+  if((!window._rizqCartSellerPayments || !window._rizqCartSellerPayments.length) && (storeId === 'demo_store' || !storeId)){
+    applyPayments(_demoCartPayments(), isFr ? 'Boutique Al-Nour' : 'متجر النور');
+  }
+
+  if(!window.RIZQ_BACKEND_BASE) return;
   var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
   var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};
   fetch(base + '/api/accounts/public', { headers: headers })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
-      var acc = (data && data.accounts || []).find(function(a){ return a && a.id === storeId; });
-      window._rizqCartSellerPayments = (acc && Array.isArray(acc.paymentMethods)) ? acc.paymentMethods : [];
-      window._rizqCartSellerName = (acc && acc.name) || '';
-      var isFr = document.documentElement.lang === 'fr';
-      if(typeof RizqAccountPayments !== 'undefined'){
-        RizqAccountPayments.renderPublic(box, window._rizqCartSellerPayments, { fr: isFr });
+      var a = (data && data.accounts || []).find(function(x){ return x && String(x.id) === String(storeId); });
+      if(a && Array.isArray(a.paymentMethods) && a.paymentMethods.length){
+        applyPayments(a.paymentMethods, a.name || '');
+      } else if(a && a.name){
+        window._rizqCartSellerName = a.name;
       }
-      var note = document.getElementById('cart-pay-trust-note');
-      if(note && window._rizqCartSellerName){
-        note.textContent = isFr
-          ? ('Le virement va directement à « ' + window._rizqCartSellerName + ' » — Rizq n’encaisse pas vos achats.')
-          : ('التحويل يصل مباشرة إلى « ' + window._rizqCartSellerName + ' » — رزق لا يستلم ثمن مشترياتك.');
-      }
-    }).catch(function(){ box.style.display = 'none'; });
+    }).catch(function(){});
 }
 
 function issueCartPrefacture(){
@@ -903,24 +1269,87 @@ function issueCartPrefacture(){
   if (!window.RizqPrefacture) {
     showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
     var s = document.createElement('script');
-    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.src = 'rizq_prefacture_engine.js?v=28.4';
     s.onload = function(){ issueCartPrefacture(); };
     document.head.appendChild(s);
     return;
   }
+
+  var selectedPay = null;
+  if (paymentMethod === 'bank') {
+    var ch = window._rizqCartSelectedChannel;
+    if (!ch || !ch.channelKey || !ch.channelValue || !ch.method) {
+      showToast(isAr
+        ? 'اختر طريقة دفع واحدة (رمز أو هاتف أو حساب) قبل إصدار الفاتورة'
+        : 'Choisissez une seule façon de payer (code, téléphone ou compte) avant la facture');
+      openCartBankPicker();
+      return;
+    }
+    selectedPay = {
+      type: ch.method.type || 'bank',
+      bank: ch.method.bank || '',
+      note: ch.method.note || '',
+      channelKey: ch.channelKey,
+      channelValue: ch.channelValue,
+      channelLabelAr: ch.channelLabelAr || '',
+      channelLabelFr: ch.channelLabelFr || '',
+      channelIcon: ch.channelIcon || ''
+    };
+  } else {
+    /* نقداً: استلام من المحل أو توصيل */
+    selectedPay = {
+      type: deliveryType === 'pickup' ? 'instore' : 'cash',
+      bank: '',
+      note: '',
+      channelKey: deliveryType === 'pickup' ? 'instore' : 'cash',
+      channelValue: '',
+      channelLabelAr: deliveryType === 'pickup' ? 'الدفع عند الاستلام من المحل' : 'الدفع نقداً عند التوصيل',
+      channelLabelFr: deliveryType === 'pickup' ? 'Paiement au retrait en magasin' : 'Paiement en espèces à la livraison',
+      channelIcon: deliveryType === 'pickup' ? '🏪' : '💵'
+    };
+  }
+
+  if (deliveryType === 'delivery') {
+    if (!deliveryConfirmed) {
+      if (!validateDeliveryFields()) return;
+      showToast(isAr ? '⚠️ أكّد معلومات التوصيل أولاً' : '⚠️ Confirmez d\'abord les infos de livraison');
+      return;
+    }
+  } else {
+    var nPick = (document.getElementById('f-name') || {}).value || '';
+    var pPick = (document.getElementById('f-phone') || {}).value || '';
+    if (!nPick.trim() || !validatePhone(pPick)) {
+      var saved = _loadSavedDelivery() || _loadBuyerSession();
+      if (saved) {
+        if (!nPick.trim() && saved.name) document.getElementById('f-name').value = saved.name;
+        if ((!pPick || !validatePhone(pPick)) && (saved.phone || saved.whatsapp)) {
+          var ph = saved.phone || saved.whatsapp;
+          if (/^\d{8}$/.test(String(ph))) ph = '+222' + ph;
+          document.getElementById('f-phone').value = ph;
+        }
+      }
+    }
+  }
   var nameEl = document.getElementById('f-name');
   var phoneEl = document.getElementById('f-phone');
+  var addrEl = document.getElementById('f-address');
+  var cityEl = document.getElementById('f-city');
   var doc = RizqPrefacture.createFromCart({
     module: (cart[0] && cart[0].module) || 'store',
     sellerName: window._rizqCartSellerName || (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
     sellerAccountId: _cartSellerId(),
     buyerName: nameEl ? nameEl.value.trim() : '',
     buyerPhone: phoneEl ? phoneEl.value.trim() : '',
+    buyerAddress: addrEl ? addrEl.value.trim() : '',
+    buyerCity: cityEl ? cityEl.value.trim() : '',
     buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement',
-    paymentMethods: window._rizqCartSellerPayments || [],
+    selectedPayment: selectedPay,
+    paymentMethods: selectedPay ? [selectedPay] : [],
+    deliveryType: deliveryType,
+    deliveryFee: Number(deliveryFee) || 0,
     paymentTerms: isAr
-      ? 'الدفع مباشرة لحساب المحل عبر الطرق أدناه — رزق وسيط نشر فقط.'
-      : 'Paiement direct au magasin via les moyens ci-dessous — Rizq est uniquement un intermédiaire.'
+      ? 'حوّل المبلغ ثم اذكر اسمك.'
+      : 'Transférez le montant puis indiquez votre nom.'
   });
   if (!doc) { showToast(isAr ? '❌ تعذّر إنشاء فاتورة قبل' : '❌ Impossible de créer la préfacture'); return; }
   RizqPrefacture.openModal(doc.id);
@@ -931,24 +1360,14 @@ function submitOrder(e) {
   const isAr = document.documentElement.lang !== 'fr';
   if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
 
-  // Validate only if delivery (address needed)
+  // Validate + require confirm for delivery
   if (deliveryType === 'delivery') {
-    const name    = document.getElementById('f-name').value.trim();
-    const phone   = document.getElementById('f-phone').value.trim();
-    const address = document.getElementById('f-address').value.trim();
-    let valid = true;
-
-    document.getElementById('f-name-err').style.display = name ? 'none' : 'block';
-    if (!name) valid = false;
-
-    const phoneOk = validatePhone(phone);
-    document.getElementById('f-phone-err').style.display = phoneOk ? 'none' : 'block';
-    if (!phoneOk) valid = false;
-
-    document.getElementById('f-address-err').style.display = address ? 'none' : 'block';
-    if (!address) valid = false;
-
-    if (!valid) { showToast(isAr ? '❌ يرجى تعبئة جميع الحقول المطلوبة' : '❌ Veuillez remplir tous les champs requis'); return; }
+    if (!validateDeliveryFields()) return;
+    if (!deliveryConfirmed) {
+      showToast(isAr ? '⚠️ اضغط «تأكيد المعلومات» قبل إرسال الطلب' : '⚠️ Appuyez sur « Confirmer » avant d\'envoyer');
+      return;
+    }
+    _saveDeliveryInfo(readDeliveryForm());
   }
 
   // Generate order number (client-side only — not secure for production)
@@ -1001,6 +1420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('empty-cart').style.display = 'block';
     document.getElementById('cart-content').style.display = 'none';
   }
+  try { autofillDeliveryFromAccount(); } catch (eFill) {}
 });
 </script>
 

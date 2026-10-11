@@ -349,7 +349,10 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_account_payments.js"></script>
+<script src="rizq_store_topics.js?v=27.0"></script>
+<script src="rizq_store_commerce.js?v=28.5"></script>
+<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_account_payments.js?v=28.2"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
 
@@ -603,6 +606,31 @@ textarea.form-input{resize:vertical;min-height:90px}
     <!-- ══ PRODUCTS ══ -->
     <div class="panel" id="panel-products">
 
+      <!-- موضوعات المحل — فلاتر ديناميكية لصفحة المشتري -->
+      <div class="card" id="store-topics-card" style="margin-bottom:16px;border:1px solid rgba(201,168,76,.28);background:#fff">
+        <div class="card-header">
+          <div class="card-title" data-t="topics-title">🗂️ موضوعات المحل (فلاتر الصفحة العامة)</div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="saveStoreTopics()" data-t="topics-save">💾 حفظ الموضوعات</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;line-height:1.6" data-t="topics-hint">
+          عرّف موضوعات محلك بالعربية والفرنسية — تظهر كتبوبيات وفلاتر عند الزائر فقط إن وُجدت منتجات فيها.
+        </p>
+        <div id="store-topics-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+        <div class="form-grid" style="align-items:end">
+          <div class="form-group" style="margin:0">
+            <label class="form-label" data-t="topics-ar-label">اسم الموضوع (عربي)</label>
+            <input class="form-input" id="topic-name-ar" maxlength="80" placeholder="مثال: ملابس رجالية"/>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label" data-t="topics-fr-label">Nom (FR)</label>
+            <input class="form-input" id="topic-name-fr" maxlength="80" placeholder="Ex: Hommes"/>
+          </div>
+          <div class="form-group" style="margin:0">
+            <button type="button" class="btn btn-primary" style="width:100%" onclick="addStoreTopic()" data-t="topics-add">➕ إضافة موضوع</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Add product form — always visible at top -->
       <div class="card" id="add-product-form" style="border:2px dashed rgba(27,58,107,.15);background:#fafcff">
         <div class="card-header">
@@ -622,8 +650,11 @@ textarea.form-input{resize:vertical;min-height:90px}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" data-t="prod-cat-label">فئة المنتج (تظهر كتصنيف في صفحتك العامة)</label>
-            <input class="form-input" id="prod-cat" data-ph="prod-cat-ph" placeholder="مثال: ملابس، إلكترونيات، أثاث، مواد غذائية..."/>
+            <label class="form-label" data-t="prod-cat-label">موضوع المنتج (من قائمة محلك)</label>
+            <select class="form-input" id="prod-cat" aria-label="موضوع المنتج">
+              <option value="">— اختر موضوعاً —</option>
+            </select>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:6px" data-t="prod-cat-hint">إن لم تجد الموضوع المناسب، أضفه أعلاه أولاً ثم اختره هنا.</p>
           </div>
           <div class="form-group">
             <label class="form-label" data-t="prod-desc-label">الوصف</label>
@@ -743,12 +774,22 @@ textarea.form-input{resize:vertical;min-height:90px}
         <div class="form-group">
           <label class="form-label" data-t="p-desc-label">وصف المحل</label>
           <textarea class="form-input" id="p-desc" data-ph="p-desc-ph" placeholder="اكتب وصفاً مختصراً عن محلك ومنتجاتك..."></textarea>
-          <div style="margin-top:14px">
+          <div style="margin-top:14px" id="p-promo-video-wrap">
             <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px">
               <span data-t="p-promo-video-label">🎬 فيديو تعريفي للمحل</span> <span style="font-size:11px;background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:12px;font-weight:600" data-t="p-optional">اختياري</span>
             </label>
-            <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px"/>
-            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="p-promo-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً (يشتغل مباشرة) في صفحة محلك العامة. يُفضَّل مقطع قصير جداً (15-20 ثانية) — يوتيوب يوقف التشغيل تلقائياً عند 20 ثانية مهما كان طول الفيديو الأصلي</div>
+            <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px" oninput="previewDashPromoVideo()"/>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="p-promo-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً وواضحاً في صفحة محلك. يُفضَّل 15–20 ثانية.</div>
+            <div id="p-promo-video-preview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(27,58,107,.12);background:#0D1B2A"></div>
+          </div>
+          <div style="margin-top:14px;display:none" id="p-promo-video-extra-wrap">
+            <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span data-t="p-promo-video-extra-label">🎬 فيديو إضافي</span>
+              <span id="p-promo-video-extra-badge" style="font-size:11px;background:#fff7ed;color:#9a3412;padding:2px 8px;border-radius:12px;font-weight:600">حسب الباقة</span>
+            </label>
+            <input class="form-input" id="p-promo-video-extra" dir="ltr" placeholder="https://youtu.be/... — مقطع ثانٍ مختلف" style="font-family:monospace;font-size:12px" oninput="previewDashPromoVideoExtra()"/>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px" id="p-promo-video-extra-hint" data-t="p-promo-video-extra-hint">بعض الباقات تشمل فيديو تعريفي + فيديو إضافي (السنوية: إضافي مجاني). يظهران معاً في واجهة المحل كمقطعَين مختلفين.</div>
+            <div id="p-promo-video-extra-preview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(27,58,107,.12);background:#0D1B2A"></div>
           </div>
           <p class="form-hint" data-t="p-desc-hint">يظهر للزبائن في صفحة محلك — اجعله جذاباً</p>
         </div>
@@ -908,12 +949,21 @@ textarea.form-input{resize:vertical;min-height:90px}
             <div id="mypay-bank-fields">
               <div style="margin-bottom:10px">
                 <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / الخدمة</label>
-                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بيماه..."/>
+                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بنكيلي، سداد..."/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">🔢 رمز الدفع (إن وُجد)</label>
+                <input id="mypay-code" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" data-ph="mypay-code-ph" placeholder="مثال: 44556677" dir="ltr"/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-phone-label">📞 رقم الهاتف المرتبط بالدفع</label>
+                <input id="mypay-phone" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="+222 …" dir="ltr"/>
               </div>
               <div>
-                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">الرمز / رقم الحساب</label>
-                <input id="mypay-code" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" data-ph="mypay-code-ph" placeholder="مثال: 12345678" dir="ltr"/>
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-account-label">🏦 رقم الحساب البنكي</label>
+                <input id="mypay-account" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="رقم الحساب / IBAN" dir="ltr"/>
               </div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5">املأ ما ينطبق — الزبون يرى فقط الحقول التي تملؤها (رمز / هاتف / حساب).</div>
             </div>
             <div>
               <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-note-label">ملاحظة للزبون (اختياري)</label>
@@ -1043,6 +1093,11 @@ const DEMO_ACCOUNT = {
   type: "store",
   status: "approved",
   desc: "واجهة محل تجريبية للترويج فقط — ليست بيانات حقيقية",
+  plan: "سنوية",
+  planName: "سنوية",
+  /* نفس الروابط التي تظهر في واجهة المحل التجريبية — واضحة وقابلة للمعاينة هنا */
+  promo_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  promo_video_extra: "https://www.youtube.com/watch?v=eRsGyueVLvQ",
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب خدمة — محل النجمة',
@@ -1052,10 +1107,10 @@ const DEMO_ACCOUNT = {
 };
 
 const DEMO_PRODUCTS = [
-  { id:"DP1", name:"دراعة رجالية فاخرة", price:45000, cat:"أزياء", emoji:"👔", status:"available", stock:12, sold:48, unit:"قطعة", desc:"بيانات ترويجية فقط" },
-  { id:"DP2", name:"عطر شرقي 100مل", price:18000, cat:"عطور", emoji:"🧴", status:"available", stock:30, sold:120, unit:"قطعة", desc:"بيانات ترويجية فقط" },
-  { id:"DP3", name:"حذاء رياضي رجالي", price:22000, cat:"أحذية", emoji:"👟", status:"limited", stock:4, sold:65, unit:"زوج", desc:"بيانات ترويجية فقط" },
-  { id:"DP4", name:"ساعة كلاسيكية", price:35000, cat:"إكسسوارات", emoji:"⌚", status:"available", stock:8, sold:33, unit:"قطعة", desc:"بيانات ترويجية فقط" }
+  { id:"DP1", name:"دراعة رجالية فاخرة", price:45000, cat:"أزياء", emoji:"👔", status:"available", stock:12, sold:48, unit:"قطعة", desc:"" },
+  { id:"DP2", name:"عطر شرقي 100مل", price:18000, cat:"عطور", emoji:"🧴", status:"available", stock:30, sold:120, unit:"قطعة", desc:"" },
+  { id:"DP3", name:"حذاء رياضي رجالي", price:22000, cat:"أحذية", emoji:"👟", status:"limited", stock:4, sold:65, unit:"زوج", desc:"" },
+  { id:"DP4", name:"ساعة كلاسيكية", price:35000, cat:"إكسسوارات", emoji:"⌚", status:"available", stock:8, sold:33, unit:"قطعة", desc:"" }
 ];
 
 const DEMO_MESSAGES = [
@@ -1391,6 +1446,12 @@ function _initWithAccount(acc){
   var _wpb=document.getElementById('wb-plan-badge');if(_wpb)_wpb.textContent=_t2('💎 باقة ','💎 Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
   var _wsub=document.getElementById('wb-sub');if(_wsub)_wsub.textContent=(acc.activity||acc.type||_t2('متجر','Commerce'))+' · '+(acc.city||'موريتانيا');
   updateSubBadge();
+  try{
+    if(Array.isArray(acc.storeTopics)) STORE.storeTopics = acc.storeTopics;
+    else if(Array.isArray(STORE.storeTopics)) { /* keep */ }
+    else STORE.storeTopics = [];
+  }catch(eTop){ STORE.storeTopics = []; }
+  renderStoreTopicsUI();
 
   // Render initial panel
   showPanel('overview', document.querySelector('.sb-item'));
@@ -1463,7 +1524,7 @@ function showPanel(id, el){
     title.textContent = titleMap[id]||'';
   }
   if(id==='overview') renderOverview();
-  if(id==='products') renderProducts();
+  if(id==='products'){ renderStoreTopicsUI(); renderProducts(); }
   if(id==='messages') renderMessages();
   if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
   if(id==='photos') renderPhotos();
@@ -1960,7 +2021,8 @@ function openAddProduct(){
 }
 
 function clearProductForm(){
-  ['prod-name','prod-price','prod-cat','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['prod-name','prod-price','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  fillProductTopicSelect('');
   document.getElementById('prod-status').value='available';
   const zone = document.getElementById('prod-upload-zone');
   zone.style.display='';
@@ -2022,6 +2084,7 @@ function _rizqSyncCatalogItem(prod){
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
     var body = {
       accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
+      topicId: prod.topicId || '',
       desc: prod.desc, stock: prod.stock, variants: prod.variants, sku: prod.sku||'', unit: prod.unit||'', sold: prod.sold,
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
@@ -2064,7 +2127,7 @@ function _rizqMergeCatalogFromBackend(){
         var existingBackendIds = {};
         products.forEach(function(p){ if(p._backendId) existingBackendIds[p._backendId]=true; });
         var toAdd = data.items.filter(function(it){ return !existingBackendIds[it.id]; }).map(function(it){
-          return { id:'LP-'+it.id, _backendId: it.id, name: it.name, price: it.price, cat: it.cat, desc: it.desc,
+          return { id:'LP-'+it.id, _backendId: it.id, name: it.name, price: it.price, cat: it.cat, topicId: it.topicId||'', desc: it.desc,
             stock: it.stock, variants: it.variants, sku: it.sku||'', unit: it.unit||'', sold: it.sold||0, status: it.status, imgData: it.image||null,
             imgDataArr: Array.isArray(it.images) && it.images.length ? it.images : (it.image?[it.image]:[]),
             emoji: it.emoji||'📦', addedAt: it.createdAt };
@@ -2075,6 +2138,124 @@ function _rizqMergeCatalogFromBackend(){
         if(typeof renderProductsList === 'function') renderProductsList();
       }).catch(function(){});
   }catch(e){}
+}
+
+/* ══ موضوعات المحل (فلاتر ديناميكية) ══ */
+function _storeTopicsList(){
+  if(!STORE) STORE = {};
+  if(!Array.isArray(STORE.storeTopics)) STORE.storeTopics = [];
+  if(window.RizqStoreTopics) STORE.storeTopics = RizqStoreTopics.normalizeList(STORE.storeTopics);
+  return STORE.storeTopics;
+}
+function _ensureStoreTopicsSeeded(){
+  var list = _storeTopicsList();
+  if(list.length) return list;
+  if(window.RizqStoreTopics && products && products.length){
+    STORE.storeTopics = RizqStoreTopics.seedFromProducts(products);
+  }
+  return _storeTopicsList();
+}
+function renderStoreTopicsUI(){
+  var box = document.getElementById('store-topics-list');
+  if(!box) return;
+  var fr = _storeDashLang() === 'fr';
+  var list = _ensureStoreTopicsSeeded();
+  if(!list.length){
+    box.innerHTML = '<div style="padding:14px;border:1px dashed #d5deea;border-radius:10px;color:var(--text-muted);font-size:13px;text-align:center">'
+      + (fr ? 'Aucun thème — ajoutez vos catégories ci-dessous.' : 'لا موضوعات بعد — أضف تصنيفات محلك بالأسفل.')
+      + '</div>';
+  } else {
+    box.innerHTML = list.map(function(t, i){
+      return '<div class="hours-row" style="grid-template-columns:1fr 1fr auto auto auto;gap:8px;align-items:center;padding:8px;border:1px solid #e8edf5;border-radius:10px;background:#fafcff" data-topic-i="'+i+'">'
+        + '<input class="form-input" style="padding:7px 10px;font-size:12.5px" value="'+String(t.nameAr||'').replace(/"/g,'&quot;')+'" onchange="updateStoreTopicField('+i+',\'nameAr\',this.value)" placeholder="عربي"/>'
+        + '<input class="form-input" style="padding:7px 10px;font-size:12.5px" value="'+String(t.nameFr||'').replace(/"/g,'&quot;')+'" onchange="updateStoreTopicField('+i+',\'nameFr\',this.value)" placeholder="FR" dir="ltr"/>'
+        + '<label style="display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap;cursor:pointer">'
+        + '<input type="checkbox" '+(t.active?'checked':'')+' onchange="updateStoreTopicField('+i+',\'active\',this.checked)"/>'
+        + '<span>'+(fr?'Actif':'مفعّل')+'</span></label>'
+        + '<div style="display:flex;gap:4px">'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px" onclick="moveStoreTopic('+i+',-1)" title="↑">↑</button>'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px" onclick="moveStoreTopic('+i+',1)" title="↓">↓</button>'
+        + '</div>'
+        + '<button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px;color:#b91c1c" onclick="removeStoreTopic('+i+')" title="'+(fr?'Supprimer':'حذف')+'">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+  fillProductTopicSelect();
+}
+function updateStoreTopicField(i, key, val){
+  var list = _storeTopicsList();
+  if(!list[i]) return;
+  if(key === 'active') list[i].active = !!val;
+  else list[i][key] = String(val||'').trim().slice(0,80);
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  fillProductTopicSelect();
+}
+function addStoreTopic(){
+  var arEl = document.getElementById('topic-name-ar');
+  var frEl = document.getElementById('topic-name-fr');
+  var ar = (arEl && arEl.value || '').trim();
+  var fr = (frEl && frEl.value || '').trim();
+  if(!ar && !fr){ showToast(_t2('أدخل اسم الموضوع','Saisissez un nom de thème'),'error'); return; }
+  var list = _storeTopicsList();
+  if(list.length >= (window.RizqStoreTopics ? RizqStoreTopics.MAX : 30)){
+    showToast(_t2('وصلت للحد الأقصى من الموضوعات','Limite de thèmes atteinte'),'error'); return;
+  }
+  list.push({
+    id: window.RizqStoreTopics ? RizqStoreTopics.genId() : ('t_'+Date.now()),
+    nameAr: ar || fr, nameFr: fr || ar, order: list.length, active: true
+  });
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  if(arEl) arEl.value = '';
+  if(frEl) frEl.value = '';
+  renderStoreTopicsUI();
+}
+function removeStoreTopic(i){
+  var list = _storeTopicsList();
+  if(!list[i]) return;
+  if(!confirm(_t2('حذف هذا الموضوع؟ المنتجات المرتبطة تبقى لكن الفلتر يختفي إن لم يُستبدل.','Supprimer ce thème ? Les produits restent, mais le filtre disparaît s\'il n\'est pas remplacé.'))) return;
+  list.splice(i,1);
+  list.forEach(function(t,n){ t.order = n; });
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  renderStoreTopicsUI();
+}
+function moveStoreTopic(i, dir){
+  var list = _storeTopicsList();
+  var j = i + dir;
+  if(j < 0 || j >= list.length) return;
+  var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+  list.forEach(function(t,n){ t.order = n; });
+  STORE.storeTopics = list;
+  renderStoreTopicsUI();
+}
+function saveStoreTopics(){
+  var list = _storeTopicsList();
+  STORE.storeTopics = window.RizqStoreTopics ? RizqStoreTopics.normalizeList(list) : list;
+  try{
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+    var idx = accs.findIndex(function(a){ return a.id === SESSION_ID; });
+    if(idx !== -1){
+      accs[idx].storeTopics = STORE.storeTopics;
+      localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+      STORE = accs[idx];
+    }
+  }catch(e){}
+  _syncProfileToBackend(STORE);
+  renderStoreTopicsUI();
+  showToast(_t2('تم حفظ موضوعات المحل ✅','Thèmes de la boutique enregistrés ✅'),'success');
+}
+function fillProductTopicSelect(selectedId){
+  var sel = document.getElementById('prod-cat');
+  if(!sel) return;
+  var fr = _storeDashLang() === 'fr';
+  var list = _storeTopicsList().filter(function(t){ return t.active; });
+  var cur = selectedId != null ? String(selectedId) : String(sel.value || '');
+  var html = '<option value="">'+(fr?'— Choisir un thème —':'— اختر موضوعاً —')+'</option>';
+  list.forEach(function(t){
+    var lab = fr ? (t.nameFr||t.nameAr) : (t.nameAr||t.nameFr);
+    html += '<option value="'+String(t.id).replace(/"/g,'&quot;')+'"'+(cur===String(t.id)?' selected':'')+'>'+lab.replace(/</g,'&lt;')+'</option>';
+  });
+  sel.innerHTML = html;
+  if(cur) sel.value = cur;
 }
 
 function saveProduct(){
@@ -2113,6 +2294,16 @@ function saveProduct(){
   };
   function doSave(data){
     var _editing = window._editingIdx!=null ? products[window._editingIdx] : null;
+    var topicId = document.getElementById('prod-cat') ? document.getElementById('prod-cat').value.trim() : '';
+    var topic = (window.RizqStoreTopics && topicId)
+      ? RizqStoreTopics.findById(_storeTopicsList(), topicId)
+      : null;
+    var activeTopics = _storeTopicsList().filter(function(t){ return t.active; });
+    if(activeTopics.length && !topic){
+      showToast(_t2('اختر موضوعاً من قائمة محلك أو أضف موضوعاً أولاً','Choisissez un thème de votre boutique ou ajoutez-en un d\'abord'),'error');
+      return;
+    }
+    var catName = topic ? topic.nameAr : (_editing && _editing.cat ? _editing.cat : '');
     const prod = {
       // إصلاح جوهري 29/07/2026: معرّف ثابت لكل منتج (كان الاعتماد فقط على
       // ترتيب المصفوفة/index، هش وغير كافٍ للمزامنة مع الخادم الحقيقي) —
@@ -2121,7 +2312,8 @@ function saveProduct(){
       id: _editing ? (_editing.id || ('LP-'+Date.now())) : ('LP-'+Date.now()+'-'+Math.floor(Math.random()*10000)),
       _backendId: _editing ? (_editing._backendId||null) : null,
       name, price,
-      cat: document.getElementById('prod-cat') ? document.getElementById('prod-cat').value.trim() : '',
+      topicId: topic ? topic.id : (topicId || (_editing && _editing.topicId) || ''),
+      cat: catName || (topic ? topic.nameAr : ''),
       desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
       stock: document.getElementById('prod-stock') ? document.getElementById('prod-stock').value : '',
       variants: document.getElementById('prod-variants') ? document.getElementById('prod-variants').value.trim() : '',
@@ -2167,7 +2359,10 @@ function editProduct(i){
   window._editingIdx = i;
   document.getElementById('prod-name').value = p.name||'';
   document.getElementById('prod-price').value = p.price||'';
-  document.getElementById('prod-cat').value = p.cat||'';
+  var topicSel = (window.RizqStoreTopics)
+    ? (RizqStoreTopics.resolveProductTopic(_storeTopicsList(), p) || null)
+    : null;
+  fillProductTopicSelect(topicSel ? topicSel.id : (p.topicId || ''));
   document.getElementById('prod-desc').value = p.desc||'';
   document.getElementById('prod-stock').value = p.stock||'';
   document.getElementById('prod-variants').value = p.variants||'';
@@ -2205,6 +2400,69 @@ function renderStoreDashboardActivities(acc){
 function onStoreActivityChange(){
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
 }
+function _syncPromoVideoExtraUI(acc){
+  var wrap = document.getElementById('p-promo-video-extra-wrap');
+  var badge = document.getElementById('p-promo-video-extra-badge');
+  var hint = document.getElementById('p-promo-video-extra-hint');
+  if(!wrap) return;
+  acc = acc || STORE || {};
+  var slots = (window.RizqStoreCommerce && typeof RizqStoreCommerce.introVideoSlots === 'function')
+    ? RizqStoreCommerce.introVideoSlots(acc)
+    : null;
+  if(!slots){
+    var plan = String(acc.planName || acc.plan || acc.package || '');
+    var trial = /تجريب|trial|essai/i.test(plan);
+    var yearly = /سنو|year|annuel/i.test(plan);
+    slots = trial ? { max: 0, extraFree: 0 } : { max: 2, extraFree: yearly ? 1 : 0 };
+  }
+  var fr = _storeDashLang() === 'fr';
+  var show = (slots.max || 0) >= 2;
+  wrap.style.display = show ? '' : 'none';
+  if(badge){
+    badge.textContent = slots.extraFree
+      ? (fr ? 'Inclus (Annuel)' : 'مشمول مجاناً (سنوية)')
+      : (fr ? 'Supplément +500 MRU' : 'إضافي +500 أوقية');
+    badge.style.background = slots.extraFree ? '#f0fdf4' : '#fff7ed';
+    badge.style.color = slots.extraFree ? '#166534' : '#9a3412';
+  }
+  if(hint){
+    hint.textContent = slots.extraFree
+      ? (fr ? 'Votre forfait annuel inclut une 2ᵉ vidéo gratuite — elle apparaît à côté de la vidéo de présentation.' : 'باقتك السنوية تشمل فيديو إضافياً مجانياً — يظهر بجانب الفيديو التعريفي في واجهة المحل.')
+      : (fr ? 'Certaines formules incluent une vidéo supplémentaire (+500 MRU hors annuel). Deux URLs différentes = deux lecteurs sur la vitrine.' : 'بعض الباقات تسمح بفيديو إضافي (+500 أوقية خارج السنوية). رابطان مختلفان = مقطعان في واجهة المحل.');
+  }
+}
+function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
+  var host = document.getElementById(hostId);
+  if(!host) return;
+  var link = String(url || '').trim();
+  if(!link || !window.RizqIntroVideo){
+    host.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  var fr = _storeDashLang && _storeDashLang() === 'fr';
+  host.innerHTML = '';
+  var ok = RizqIntroVideo.mount(host, link, {
+    title: fr ? titleFr : titleAr,
+    linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
+    playLabel: fr ? 'Lire l’aperçu' : 'تشغيل المعاينة',
+    mutedLabel: fr ? 'Activer le son' : 'تفعيل الصوت',
+    unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+  });
+  host.style.display = ok ? 'block' : 'none';
+  if(!ok) host.innerHTML = '<div style="padding:12px;color:#fca5a5;font-size:12px;font-weight:700">'
+    + (fr ? 'Lien non pris en charge — utilisez YouTube ou Facebook.' : 'رابط غير مدعوم — استخدم YouTube أو Facebook.')
+    + '</div>';
+}
+function previewDashPromoVideo(){
+  var el = document.getElementById('p-promo-video');
+  _mountDashVideoPreview('p-promo-video-preview', el && el.value, '🎬 معاينة الفيديو التعريفي', '🎬 Aperçu vidéo de présentation');
+}
+function previewDashPromoVideoExtra(){
+  var el = document.getElementById('p-promo-video-extra');
+  _mountDashVideoPreview('p-promo-video-extra-preview', el && el.value, '🎬 معاينة الفيديو الإضافي', '🎬 Aperçu vidéo supplémentaire');
+}
+
 function fillProfileForm(){
   if(!STORE) return;
   renderStoreDashboardActivities(STORE);
@@ -2218,6 +2476,9 @@ function fillProfileForm(){
   document.getElementById('p-address').value = STORE.address||'';
   document.getElementById('p-desc').value = STORE.desc||'';
   var pvEl = document.getElementById('p-promo-video'); if(pvEl) pvEl.value = STORE.promo_video||'';
+  var pvEx = document.getElementById('p-promo-video-extra'); if(pvEx) pvEx.value = STORE.promo_video_extra||'';
+  try{ _syncPromoVideoExtraUI(STORE); }catch(ePv){}
+  try{ previewDashPromoVideo(); previewDashPromoVideoExtra(); }catch(ePrev){}
   document.getElementById('p-whatsapp').value = STORE.whatsapp||'';
   document.getElementById('p-facebook').value = STORE.facebook||'';
   var tlEl = document.getElementById('p-tagline'); if(tlEl){ tlEl.value = STORE.tagline||''; updateTaglineCount(); }
@@ -2280,6 +2541,9 @@ function saveProfile(){
   accs[idx].address = document.getElementById('p-address').value.trim();
   accs[idx].desc = document.getElementById('p-desc').value.trim();
   accs[idx].promo_video = (document.getElementById('p-promo-video')||{}).value?.trim()||'';
+  accs[idx].promo_video_extra = (document.getElementById('p-promo-video-extra')||{}).value?.trim()||'';
+  STORE.promo_video = accs[idx].promo_video;
+  STORE.promo_video_extra = accs[idx].promo_video_extra;
   accs[idx].whatsapp = document.getElementById('p-whatsapp').value.trim();
   accs[idx].facebook = document.getElementById('p-facebook').value.trim();
   accs[idx].tagline = (document.getElementById('p-tagline')||{}).value?.trim().slice(0,50) || '';
@@ -2305,8 +2569,9 @@ function _syncProfileToBackend(acc){
       name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
       category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
       address: acc.address||'', desc: acc.desc||'',
-      promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
-      tagline: acc.tagline||'', thumb: acc.thumb||''
+      promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
+      tagline: acc.tagline||'', thumb: acc.thumb||'',
+      storeTopics: Array.isArray(acc.storeTopics) ? acc.storeTopics : []
     })
   }).catch(function(){ /* فشل صامت — البيانات محفوظة محلياً على الأقل */ });
 }
@@ -3523,14 +3788,17 @@ function renderMyPayments(){
   el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' +
     methods.map(function(m,i){
       var lbl = typeLabels[m.type] || m.type;
-      var showCode = m.type==='bank'||m.type==='mobile'||m.type==='custom';
+      var bits = [];
+      if(m.code) bits.push('🔢 '+escapeHtml(m.code));
+      if(m.phone) bits.push('📞 '+escapeHtml(m.phone));
+      if(m.account) bits.push('🏦 '+escapeHtml(m.account));
       return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
         '<div style="flex:1">' +
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
             '<span style="font-size:13px;font-weight:700;color:#1B3A6B">'+escapeHtml(m.bank||lbl)+'</span>' +
             '<span style="background:#e0e8ff;color:#1B3A6B;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">'+lbl+'</span>' +
           '</div>' +
-          (showCode && m.code ? '<div style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e8f0fe;display:inline-block;padding:4px 10px;border-radius:7px;margin-bottom:4px">'+escapeHtml(m.code)+'</div>' : '') +
+          (bits.length ? '<div style="font-family:monospace;font-size:12.5px;font-weight:700;color:#0f2347;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">'+bits.map(function(b){return '<span style="background:#e8f0fe;padding:4px 10px;border-radius:7px">'+b+'</span>';}).join('')+'</div>' : '') +
           (m.note ? '<div style="font-size:11.5px;color:#2C3A4F">'+escapeHtml(m.note)+'</div>' : '') +
         '</div>' +
         '<div style="display:flex;gap:6px">' +
@@ -3545,6 +3813,8 @@ function showAddMyPayModal(){
   document.getElementById('my-pay-modal-title').textContent = _t2('إضافة طريقة دفع','Ajouter un moyen de paiement');
   document.getElementById('mypay-bank').value='';
   document.getElementById('mypay-code').value='';
+  var ph = document.getElementById('mypay-phone'); if(ph) ph.value='';
+  var ac = document.getElementById('mypay-account'); if(ac) ac.value='';
   document.getElementById('mypay-note').value='';
   document.getElementById('mypay-type').value='bank';
   document.getElementById('mypay-edit-idx').value='';
@@ -3566,6 +3836,8 @@ function editMyPayment(btn){
   document.getElementById('mypay-type').value = m.type||'bank';
   document.getElementById('mypay-bank').value = m.bank||'';
   document.getElementById('mypay-code').value = m.code||'';
+  var ph = document.getElementById('mypay-phone'); if(ph) ph.value = m.phone||'';
+  var ac = document.getElementById('mypay-account'); if(ac) ac.value = m.account||'';
   document.getElementById('mypay-note').value = m.note||'';
   document.getElementById('mypay-edit-idx').value = idx;
   document.getElementById('my-pay-modal').style.display='flex';
@@ -3586,9 +3858,15 @@ function saveMyPayment(){
   var type = document.getElementById('mypay-type').value;
   var bank = document.getElementById('mypay-bank').value.trim();
   var code = document.getElementById('mypay-code').value.trim();
+  var phone = (document.getElementById('mypay-phone')||{}).value?.trim()||'';
+  var account = (document.getElementById('mypay-account')||{}).value?.trim()||'';
   var note = document.getElementById('mypay-note').value.trim();
   if(!bank && type!=='cash' && type!=='instore'){ alert(_t2('يرجى إدخال اسم البنك/الخدمة','Veuillez saisir le nom de la banque / du service')); return; }
-  var entry = {type:type, bank:bank||type, code:code, note:note, addedAt: new Date().toISOString()};
+  if(type!=='cash' && type!=='instore' && !code && !phone && !account){
+    alert(_t2('أدخل على الأقل: رمز أو هاتف أو رقم حساب','Saisissez au moins : code, téléphone ou n° de compte'));
+    return;
+  }
+  var entry = {type:type, bank:bank||type, code:code, phone:phone, account:account, note:note, addedAt: new Date().toISOString()};
   var methods = getMyPayments();
   var editIdx = document.getElementById('mypay-edit-idx').value;
   if(editIdx!=='') methods[parseInt(editIdx)] = entry;
@@ -3680,10 +3958,10 @@ function saveMyPayment(){
   // ══ PREVIEW & SERVICES SHOWCASE ══
   function previewMyPage(){
     var acc=(typeof STORE!=='undefined'&&STORE)||{};
-    var id=acc.id||'demo';
+    var id=acc.id||'demo_store';
     var base=location.href.replace(/[^\/]+$/,'');
-    var url=base+'rizq_products.html?id='+id;
-    window.open(url,'_blank');
+    /* الواجهة العامة أولاً ثم الكتالوج — نفس ترتيب الزائر */
+    window.open(base+'rizq_store.html?id='+encodeURIComponent(id),'_blank');
   }
 
   function renderServicesShowcase(){

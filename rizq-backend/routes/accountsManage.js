@@ -42,6 +42,59 @@ function mountAccountsManageRoutes(app, deps) {
     ? requireAdminPermission('accounts')
     : requireAdminAuth;
 
+  /** موضوعات المحل — فلاتر ديناميكية للصفحة العامة (حتى 30) */
+  function sanitizePromoVideoUrl(raw) {
+    const s = String(raw || '').trim().slice(0, 500);
+    if (!s) return '';
+    if (/[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+    try {
+      const u = new URL(s);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      const host = String(u.hostname || '').toLowerCase();
+      const ok =
+        host === 'youtu.be' ||
+        host.endsWith('youtube.com') ||
+        host.endsWith('youtube-nocookie.com') ||
+        host.endsWith('facebook.com') ||
+        host.endsWith('fb.watch') ||
+        host === 'fb.watch';
+      return ok ? s : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function sanitizeStoreTopics(raw) {
+    const arr = Array.isArray(raw) ? raw : [];
+    const out = [];
+    const seen = Object.create(null);
+    arr.forEach((item, i) => {
+      if (!item || typeof item !== 'object') return;
+      const nameAr = String(item.nameAr || item.name || item.cat || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      const nameFr = String(item.nameFr || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      if (!nameAr && !nameFr) return;
+      let id = String(item.id || '').trim().slice(0, 48);
+      // معرّف آمن فقط — يمنع حقن onclick عبر id في واجهة المحل
+      if (!/^[a-zA-Z0-9_-]{1,48}$/.test(id)) {
+        id = 't_' + Date.now().toString(36) + '_' + i;
+      }
+      if (!id || seen[id]) id = 't_' + Date.now().toString(36) + '_' + i;
+      if (seen[id]) return;
+      seen[id] = true;
+      let order = Number(item.order);
+      if (!Number.isFinite(order)) order = i;
+      out.push({
+        id,
+        nameAr: nameAr || nameFr,
+        nameFr: nameFr || nameAr,
+        order: Math.max(0, Math.min(999, Math.floor(order))),
+        active: item.active !== false && item.active !== 0 && item.active !== '0',
+      });
+    });
+    out.sort((a, b) => a.order - b.order || a.nameAr.localeCompare(b.nameAr, 'ar'));
+    return out.slice(0, 30);
+  }
+
   /**
    * GET /api/accounts/public — عام، بلا سرّ — الحسابات الموافَق عليها فقط،
    * بحقول آمنة فقط. تستخدمه صفحات المحل/المكتب/الشركة العامة + شريط "آخر
@@ -120,7 +173,7 @@ function mountAccountsManageRoutes(app, deps) {
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.email !== undefined) {
       const nextEmail = String(b.email || '').trim().toLowerCase();
@@ -158,6 +211,16 @@ function mountAccountsManageRoutes(app, deps) {
           val = stripBidiControls(val).normalize('NFC');
         } catch (eSan) { /* ignore */ }
       }
+      if (k === 'promo_video' || k === 'promo_video_extra') {
+        acc[k] = sanitizePromoVideoUrl(val);
+        return;
+      }
+      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+        // اسمح فقط بمسارات نسبية أو data:image أو http(s) — لا javascript:
+        const t = String(val || '').trim();
+        if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
+        if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
+      }
       acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
@@ -189,6 +252,8 @@ function mountAccountsManageRoutes(app, deps) {
       if (b.calls_enabled !== undefined) acc.calls_enabled = !!b.calls_enabled;
     }
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
+    // موضوعات المحل (فلاتر ديناميكية للصفحة العامة) — مصفوفة كائنات لا نص
+    if (b.storeTopics !== undefined) acc.storeTopics = sanitizeStoreTopics(b.storeTopics);
     // إعدادات غرفة الطلبات (عنوان النموذج الاختياري + قناة الوثائق)
     if (b.serviceDesk !== undefined && b.serviceDesk && typeof b.serviceDesk === 'object') {
       const sd = b.serviceDesk;
@@ -225,7 +290,7 @@ function mountAccountsManageRoutes(app, deps) {
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
-    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.nni !== undefined) {
       const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
@@ -258,10 +323,20 @@ function mountAccountsManageRoutes(app, deps) {
           val = normalizeEmailSafe(val);
         } catch (eSan) { /* ignore */ }
       }
+      if (k === 'promo_video' || k === 'promo_video_extra') {
+        acc[k] = sanitizePromoVideoUrl(val);
+        return;
+      }
+      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+        const t = String(val || '').trim();
+        if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
+        if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
+      }
       acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
+    if (b.storeTopics !== undefined) acc.storeTopics = sanitizeStoreTopics(b.storeTopics);
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);
