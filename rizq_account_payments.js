@@ -113,15 +113,23 @@
     return map[type] || '💳';
   }
 
-  function channelsOf(m) {
-    var list = [];
-    if (m && m.code) list.push({ key: 'code', icon: '🔢', ar: 'عن طريق الرمز', fr: 'Par code', value: m.code });
-    if (m && m.phone) list.push({ key: 'phone', icon: '📞', ar: 'عن طريق رقم الهاتف', fr: 'Par téléphone', value: m.phone });
-    if (m && m.account) list.push({ key: 'account', icon: '🏦', ar: 'عن طريق التحويل البنكي', fr: 'Par virement bancaire', value: m.account });
-    /* توافق خلفي: إن وُجد code فقط لنوع bank اعتبره حساباً أيضاً في العرض */
-    if (!list.length && m && m.code && m.type === 'bank') {
-      list.push({ key: 'account', icon: '🏦', ar: 'عن طريق التحويل البنكي', fr: 'Par virement bancaire', value: m.code });
+  function channelsOf(m, opts) {
+    opts = opts || {};
+    /* دائماً ثلاث خانات للزبون: رمز / هاتف / حساب — حتى لو بعضها فارغ */
+    var code = (m && m.code) ? String(m.code).trim() : '';
+    var phone = (m && m.phone) ? String(m.phone).trim() : '';
+    var account = (m && m.account) ? String(m.account).trim() : '';
+    /* توافق: تحويل بنكي قديم خزّن رقم الحساب في حقل code فقط */
+    if (!account && code && m && m.type === 'bank') {
+      account = code;
+      code = '';
     }
+    var list = [
+      { key: 'code', icon: '🔢', ar: 'عن طريق الرمز', fr: 'Par code', value: code },
+      { key: 'phone', icon: '📞', ar: 'عن طريق رقم الهاتف', fr: 'Par téléphone', value: phone },
+      { key: 'account', icon: '🏦', ar: 'عن طريق التحويل البنكي', fr: 'Par virement bancaire', value: account }
+    ];
+    if (opts.always === false) list = list.filter(function (c) { return !!c.value; });
     return list;
   }
 
@@ -132,18 +140,23 @@
   }
 
   function detailRowsHtml(m, fr) {
-    var ch = channelsOf(m);
-    if (!ch.length) {
+    var ch = channelsOf(m, { always: true });
+    var any = ch.some(function (c) { return !!c.value; });
+    if (!any) {
       return '<div style="font-size:12.5px;color:#6a7a8a;line-height:1.6">'
-        + (fr ? 'Aucune coordonnée de paiement renseignée pour ce moyen.' : 'لم يُدخل المشترك بيانات دفع لهذا الوسيلة بعد.')
+        + (fr ? 'Aucune coordonnée de paiement renseignée pour ce moyen.' : 'لم يُدخل المحل بيانات دفع لهذه الوسيلة بعد.')
         + '</div>';
     }
     return ch.map(function (c) {
-      return '<div class="rzq-paych">'
+      var empty = !c.value;
+      var emptyLbl = fr ? 'Non renseigné par le magasin' : 'لم يُعيَّن من المحل';
+      return '<div class="rzq-paych' + (empty ? ' is-empty' : '') + '">'
         + '<div class="rzq-paych-label">' + c.icon + ' ' + esc(fr ? c.fr : c.ar) + '</div>'
         + '<div class="rzq-paych-row">'
-        + '<code class="rzq-paych-val" dir="ltr">' + esc(c.value) + '</code>'
-        + '<button type="button" class="rzq-paych-copy" data-copy="' + esc(c.value) + '">' + (fr ? '📋 Copier' : '📋 نسخ') + '</button>'
+        + (empty
+          ? '<span class="rzq-paych-val is-empty" dir="auto">' + esc(emptyLbl) + '</span>'
+          : '<code class="rzq-paych-val" dir="ltr">' + esc(c.value) + '</code>'
+            + '<button type="button" class="rzq-paych-copy" data-copy="' + esc(c.value) + '">' + (fr ? '📋 Copier' : '📋 نسخ') + '</button>')
         + '</div></div>';
     }).join('');
   }
@@ -171,9 +184,11 @@
       + '.rzq-pay-radio{width:18px;height:18px;border-radius:50%;border:2px solid #C9A84C;margin-inline-start:auto;flex-shrink:0;position:relative}'
       + '.rzq-pay-opt.selected .rzq-pay-radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:#1B3A6B}'
       + '.rzq-paych{padding:12px 13px;border-radius:12px;background:#f8faff;border:1px solid rgba(27,58,107,.1);margin-bottom:8px}'
+      + '.rzq-paych.is-empty{opacity:.72;background:#fafbfc}'
       + '.rzq-paych-label{font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:8px}'
       + '.rzq-paych-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}'
       + '.rzq-paych-val{flex:1;min-width:140px;font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:800;color:#0f2347;background:#fff;border:1px solid #d8e2f0;border-radius:9px;padding:9px 12px;letter-spacing:.4px}'
+      + '.rzq-paych-val.is-empty{font-family:inherit;font-size:12.5px;font-weight:600;color:#8a96a8;letter-spacing:0;border-style:dashed}'
       + '.rzq-paych-copy{border:none;border-radius:9px;padding:9px 12px;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;font-weight:800;font-size:12px;cursor:pointer;font-family:inherit}'
       + '.rzq-pay-back{border:1px solid rgba(27,58,107,.2);background:#fff;color:#1B3A6B;border-radius:10px;padding:9px 12px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:12px}'
       + '.rzq-pay-confirm{width:100%;margin-top:12px;border:none;border-radius:12px;padding:13px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit}'
@@ -332,7 +347,7 @@
       ? 'Payez directement le vendeur via l’un des moyens ci-dessous.'
       : 'ادفع مباشرة للبائع عبر إحدى الوسائل أدناه.';
     var cards = list.map(function (m) {
-      var ch = channelsOf(m);
+      var ch = channelsOf(m, { always: false });
       var chHtml = ch.map(function (c) {
         return '<div style="margin-top:6px"><span style="font-size:11px;color:#6a7a8a">' + esc(fr ? c.fr : c.ar) + '</span>'
           + ' <code style="font-family:monospace;font-size:12.5px;font-weight:800;color:#0f2347;background:#e8f0fe;padding:3px 8px;border-radius:6px;direction:ltr">' + esc(c.value) + '</code></div>';
