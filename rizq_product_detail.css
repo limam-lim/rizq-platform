@@ -15,10 +15,10 @@
   display:none;
   align-items:stretch;
   justify-content:flex-start;
-  /* مسافة تحت الشريط العلوي */
-  padding:calc(var(--rizq-header-h, 68px) + 14px) 14px 14px;
+  /* مسافة واضحة تحت الشريط العلوي حتى لا تختلط النافذة به */
+  padding:calc(var(--rizq-header-h, 68px) + 22px) 16px 16px;
   box-sizing:border-box;
-  background:rgba(6,17,28,.52);
+  background:rgba(6,17,28,.55);
   backdrop-filter:blur(8px);
 }
 .rzq-pd-root.open{display:flex}
