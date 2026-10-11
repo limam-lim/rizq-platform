@@ -301,14 +301,12 @@
   }
 
   function commerceToolbarHtml() {
-    if (isStorePage()) {
-      return '';
-    }
     var inner = '';
     if (!isCommercePage()) {
       inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
     } else {
       if (isStorePage()) {
+        // مفضلة منتجات المحل (لوحة wish-panel المحلية) — ليست مفضلة إعلانات المنصّة
         inner +=
           '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
           t2('مفضلة المحل', 'Favoris boutique') +
