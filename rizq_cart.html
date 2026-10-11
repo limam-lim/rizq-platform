@@ -398,7 +398,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_store_topics.js?v=27.0" defer></script>
   <script src="rizq_store_commerce.js?v=27.0" defer></script>
   <script src="rizq_stock.js" defer></script>
-  <script src="rizq_account_payments.js?v=27.0" defer></script>
+  <script src="rizq_account_payments.js?v=28.2" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
@@ -811,22 +811,22 @@ function renderCart() {
     var thumb = imgs[0]
       ? ('<img src="'+sanitize(imgs[0])+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
       : sanitize(item.emoji || '📦');
-    var idAttr = JSON.stringify(String(item.id));
+    var safeId = sanitize(String(item.id));
     return `
-    <div class="cart-item" id="cart-item-${sanitize(String(item.id))}">
+    <div class="cart-item" id="cart-item-${safeId}" data-cart-id="${safeId}">
       <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${sanitize(__itemName)}</div>
         <div class="cart-item-cat">${sanitize(__storeName)}</div>
         <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
         <div class="qty-controls">
-          <button class="qty-btn" onclick="changeQty(${idAttr},-1)" aria-label="${__lblDec}">−</button>
-          <span class="qty-val" id="qty-${sanitize(String(item.id))}">${item.qty}</span>
-          <button class="qty-btn" onclick="changeQty(${idAttr},1)" aria-label="${__lblInc}">+</button>
+          <button type="button" class="qty-btn" data-qty-delta="-1" aria-label="${__lblDec}">−</button>
+          <span class="qty-val" id="qty-${safeId}">${item.qty}</span>
+          <button type="button" class="qty-btn" data-qty-delta="1" aria-label="${__lblInc}">+</button>
           <span class="item-subtotal">= ${(Number(item.price||0)*item.qty).toLocaleString()} MRU</span>
         </div>
       </div>
-      <button class="cart-item-del" onclick="removeItem(${idAttr})" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
+      <button type="button" class="cart-item-del" data-cart-remove="1" title="${__lblDel}" aria-label="${__lblDel} ${sanitize(__itemName)}">×</button>
     </div>
   `;
   }).join('');
@@ -838,7 +838,7 @@ function renderCart() {
 function changeQty(id, delta) {
   const item = cart.find(c => String(c.id) === String(id));
   if (!item) return;
-  item.qty = Math.max(1, Math.min(99, item.qty + delta));
+  item.qty = Math.max(1, Math.min(99, Number(item.qty || 1) + Number(delta || 0)));
   saveCart();
   renderCart();
 }
@@ -850,6 +850,26 @@ function removeItem(id) {
   renderCart();
   showToast(isAr ? '🗑 تم حذف المنتج' : '🗑 Produit supprimé');
 }
+
+/* تفويض أحداث الكمية/الحذف — يتجنب كسر onclick بسبب علامات التنصيص في المعرّف */
+(function bindCartItemActions(){
+  var list = document.getElementById('cart-items-list');
+  if (!list || list._rizqQtyBound) return;
+  list._rizqQtyBound = true;
+  list.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-qty-delta], [data-cart-remove]') : null;
+    if (!btn || !list.contains(btn)) return;
+    var row = btn.closest('[data-cart-id]');
+    if (!row) return;
+    var id = row.getAttribute('data-cart-id');
+    if (btn.hasAttribute('data-cart-remove')) {
+      removeItem(id);
+      return;
+    }
+    var delta = parseInt(btn.getAttribute('data-qty-delta') || '0', 10);
+    if (delta) changeQty(id, delta);
+  });
+})();
 
 function clearCart() {
   const isAr = document.documentElement.lang !== 'fr';
@@ -883,8 +903,13 @@ function selectPayment(method) {
   if(method === 'bank'){
     openCartBankPicker();
     if(box) box.style.display = '';
-  } else if(box){
-    box.style.display = 'none';
+  } else {
+    window._rizqCartSelectedChannel = null;
+    window._rizqCartSelectedPay = null;
+    if(box){
+      box.innerHTML = '';
+      box.style.display = 'none';
+    }
   }
 }
 
@@ -918,18 +943,28 @@ function openCartBankPicker(){
     RizqAccountPayments.openBuyerPicker(methods, {
       fr: isFr,
       sellerName: window._rizqCartSellerName || (isFr ? 'Boutique Al-Nour' : 'متجر النور'),
-      onSelect: function(m){
-        window._rizqCartSelectedPay = m || null;
+      onSelect: function(sel){
+        /* sel = { method, channelKey, channelValue, channelLabelAr/Fr, channelIcon } */
+        if (sel && sel.method && !sel.channelKey) {
+          /* توافق قديم: كائن وسيلة فقط */
+          sel = null;
+        }
+        window._rizqCartSelectedChannel = sel || null;
+        window._rizqCartSelectedPay = sel && sel.method ? sel.method : null;
         var box = document.getElementById('cart-seller-payments');
-        if(box && m){
-          RizqAccountPayments.renderPublic(box, [m], { fr: isFr });
+        if (box && sel && typeof RizqAccountPayments.renderSelectedChannel === 'function') {
+          RizqAccountPayments.renderSelectedChannel(box, sel, { fr: isFr });
+        } else if (box && sel && sel.method) {
+          RizqAccountPayments.renderPublic(box, [sel.method], { fr: isFr });
           box.style.display = '';
         }
         var isAr = !isFr;
-        if(typeof showToast === 'function'){
+        if (typeof showToast === 'function' && sel) {
+          var chLbl = isAr ? (sel.channelLabelAr || sel.channelKey) : (sel.channelLabelFr || sel.channelKey);
+          var bank = (sel.method && (sel.method.bank || sel.method.type)) || '';
           showToast(isAr
-            ? ('✅ تم اختيار: ' + (m.bank || m.type))
-            : ('✅ Moyen choisi : ' + (m.bank || m.type)));
+            ? ('✅ تم اختيار: ' + bank + ' — ' + chLbl)
+            : ('✅ Choix : ' + bank + ' — ' + chLbl));
         }
       }
     });
@@ -1078,11 +1113,46 @@ function issueCartPrefacture(){
   if (!window.RizqPrefacture) {
     showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
     var s = document.createElement('script');
-    s.src = 'rizq_prefacture_engine.js?v=28.1';
+    s.src = 'rizq_prefacture_engine.js?v=28.2';
     s.onload = function(){ issueCartPrefacture(); };
     document.head.appendChild(s);
     return;
   }
+
+  var selectedPay = null;
+  if (paymentMethod === 'bank') {
+    var ch = window._rizqCartSelectedChannel;
+    if (!ch || !ch.channelKey || !ch.channelValue || !ch.method) {
+      showToast(isAr
+        ? 'اختر طريقة دفع واحدة (رمز أو هاتف أو حساب) قبل إصدار الفاتورة'
+        : 'Choisissez une seule façon de payer (code, téléphone ou compte) avant la facture');
+      openCartBankPicker();
+      return;
+    }
+    selectedPay = {
+      type: ch.method.type || 'bank',
+      bank: ch.method.bank || '',
+      note: ch.method.note || '',
+      channelKey: ch.channelKey,
+      channelValue: ch.channelValue,
+      channelLabelAr: ch.channelLabelAr || '',
+      channelLabelFr: ch.channelLabelFr || '',
+      channelIcon: ch.channelIcon || ''
+    };
+  } else {
+    /* نقداً: استلام من المحل أو توصيل */
+    selectedPay = {
+      type: deliveryType === 'pickup' ? 'instore' : 'cash',
+      bank: '',
+      note: '',
+      channelKey: deliveryType === 'pickup' ? 'instore' : 'cash',
+      channelValue: '',
+      channelLabelAr: deliveryType === 'pickup' ? 'الدفع عند الاستلام من المحل' : 'الدفع نقداً عند التوصيل',
+      channelLabelFr: deliveryType === 'pickup' ? 'Paiement au retrait en magasin' : 'Paiement en espèces à la livraison',
+      channelIcon: deliveryType === 'pickup' ? '🏪' : '💵'
+    };
+  }
+
   var nameEl = document.getElementById('f-name');
   var phoneEl = document.getElementById('f-phone');
   var doc = RizqPrefacture.createFromCart({
@@ -1092,10 +1162,13 @@ function issueCartPrefacture(){
     buyerName: nameEl ? nameEl.value.trim() : '',
     buyerPhone: phoneEl ? phoneEl.value.trim() : '',
     buyerNote: isAr ? 'صادرة من سلة التسوق قبل الدفع' : 'Émise depuis le panier avant paiement',
-    paymentMethods: window._rizqCartSellerPayments || [],
+    selectedPayment: selectedPay,
+    paymentMethods: selectedPay ? [selectedPay] : [],
+    deliveryType: deliveryType,
+    deliveryFee: Number(deliveryFee) || 0,
     paymentTerms: isAr
-      ? 'الدفع مباشرة لحساب المحل عبر الطرق أدناه — رزق وسيط نشر فقط.'
-      : 'Paiement direct au magasin via les moyens ci-dessous — Rizq est uniquement un intermédiaire.'
+      ? 'الدفع مباشرة لحساب المحل عبر القناة المختارة — رزق وسيط نشر فقط.'
+      : 'Paiement direct au magasin via le canal choisi — Rizq est uniquement un intermédiaire.'
   });
   if (!doc) { showToast(isAr ? '❌ تعذّر إنشاء فاتورة قبل' : '❌ Impossible de créer la préfacture'); return; }
   RizqPrefacture.openModal(doc.id);
