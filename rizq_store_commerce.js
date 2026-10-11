@@ -157,6 +157,49 @@
     }
   }
 
+  /**
+   * حصص فيديو المحل حسب الباقة:
+   * - تجريبية: 0
+   * - شهرية/ربعية/ماسية: فيديو تعريفي + إمكانية فيديو إضافي
+   * - سنوية: فيديو تعريفي + فيديو إضافي مجاني
+   */
+  function introVideoSlots(acc) {
+    var plan = String((acc && (acc.planName || acc.plan || acc.package || '')) || '').toLowerCase();
+    var trial = /تجريب|trial|essai/.test(plan) || plan === 'store_trial';
+    var yearly = /سنو|year|annuel|store_yearly/.test(plan);
+    var hasIntro = false;
+    try {
+      if (global.RizqSub && typeof RizqSub.hasFeature === 'function' && acc && acc.id) {
+        hasIntro = !!RizqSub.hasFeature(acc.id, 'intro_video');
+      }
+    } catch (e) {}
+    if (!hasIntro) {
+      hasIntro = !trial && (/شهر|ربع|ماس|diamond|month|quart|mensuel|mensuelle/.test(plan) || yearly
+        || !!(acc && (acc.promo_video || acc.promo_video_extra)));
+    }
+    if (trial && !acc.promo_video && !acc.promo_video_extra) {
+      return { max: 0, included: 0, extraFree: 0, labelAr: 'بدون فيديو', labelFr: 'Sans vidéo' };
+    }
+    if (!hasIntro && !acc.promo_video) {
+      return { max: 0, included: 0, extraFree: 0, labelAr: 'بدون فيديو', labelFr: 'Sans vidéo' };
+    }
+    return {
+      max: 2,
+      included: 1,
+      extraFree: yearly ? 1 : 0,
+      labelAr: yearly ? 'فيديو تعريفي + فيديو إضافي مجاني' : 'فيديو تعريفي + فيديو إضافي',
+      labelFr: yearly ? 'Vidéo + 1 supplémentaire offerte' : 'Vidéo + vidéo supplémentaire'
+    };
+  }
+
+  function promoVideosOf(acc) {
+    if (!acc) return [];
+    var list = [];
+    if (acc.promo_video) list.push({ url: String(acc.promo_video).trim(), kind: 'intro' });
+    if (acc.promo_video_extra) list.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
+    return list.filter(function (v) { return !!v.url; });
+  }
+
   /* ── لوحة تفاصيل منتج بهوية عرض الإعلان ── */
   var _pdState = { product: null, idx: 0, qty: 1, opts: null, similar: [] };
 
@@ -450,6 +493,8 @@
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
     setLogo: setLogo,
+    introVideoSlots: introVideoSlots,
+    promoVideosOf: promoVideosOf,
     openProductDetail: openProductDetail,
     closeProductDetail: closeProductDetail,
     setPhoto: setPhoto,

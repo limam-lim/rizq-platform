@@ -349,6 +349,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_store_commerce.js?v=26.8"></script>
 <script src="rizq_account_payments.js"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
@@ -743,12 +744,20 @@ textarea.form-input{resize:vertical;min-height:90px}
         <div class="form-group">
           <label class="form-label" data-t="p-desc-label">وصف المحل</label>
           <textarea class="form-input" id="p-desc" data-ph="p-desc-ph" placeholder="اكتب وصفاً مختصراً عن محلك ومنتجاتك..."></textarea>
-          <div style="margin-top:14px">
+          <div style="margin-top:14px" id="p-promo-video-wrap">
             <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px">
               <span data-t="p-promo-video-label">🎬 فيديو تعريفي للمحل</span> <span style="font-size:11px;background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:12px;font-weight:600" data-t="p-optional">اختياري</span>
             </label>
             <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px"/>
-            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="p-promo-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً (يشتغل مباشرة) في صفحة محلك العامة. يُفضَّل مقطع قصير جداً (15-20 ثانية) — يوتيوب يوقف التشغيل تلقائياً عند 20 ثانية مهما كان طول الفيديو الأصلي</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="p-promo-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً في صفحة محلك. يُفضَّل 15–20 ثانية.</div>
+          </div>
+          <div style="margin-top:14px;display:none" id="p-promo-video-extra-wrap">
+            <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span data-t="p-promo-video-extra-label">🎬 فيديو إضافي</span>
+              <span id="p-promo-video-extra-badge" style="font-size:11px;background:#fff7ed;color:#9a3412;padding:2px 8px;border-radius:12px;font-weight:600">حسب الباقة</span>
+            </label>
+            <input class="form-input" id="p-promo-video-extra" dir="ltr" placeholder="https://youtu.be/... — مقطع ثانٍ مختلف" style="font-family:monospace;font-size:12px"/>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px" id="p-promo-video-extra-hint" data-t="p-promo-video-extra-hint">بعض الباقات تشمل فيديو تعريفي + فيديو إضافي (السنوية: إضافي مجاني). يظهران معاً في واجهة المحل كمقطعَين مختلفين.</div>
           </div>
           <p class="form-hint" data-t="p-desc-hint">يظهر للزبائن في صفحة محلك — اجعله جذاباً</p>
         </div>
@@ -2205,6 +2214,37 @@ function renderStoreDashboardActivities(acc){
 function onStoreActivityChange(){
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
 }
+function _syncPromoVideoExtraUI(acc){
+  var wrap = document.getElementById('p-promo-video-extra-wrap');
+  var badge = document.getElementById('p-promo-video-extra-badge');
+  var hint = document.getElementById('p-promo-video-extra-hint');
+  if(!wrap) return;
+  acc = acc || STORE || {};
+  var slots = (window.RizqStoreCommerce && typeof RizqStoreCommerce.introVideoSlots === 'function')
+    ? RizqStoreCommerce.introVideoSlots(acc)
+    : null;
+  if(!slots){
+    var plan = String(acc.planName || acc.plan || acc.package || '');
+    var trial = /تجريب|trial|essai/i.test(plan);
+    var yearly = /سنو|year|annuel/i.test(plan);
+    slots = trial ? { max: 0, extraFree: 0 } : { max: 2, extraFree: yearly ? 1 : 0 };
+  }
+  var fr = _storeDashLang() === 'fr';
+  var show = (slots.max || 0) >= 2;
+  wrap.style.display = show ? '' : 'none';
+  if(badge){
+    badge.textContent = slots.extraFree
+      ? (fr ? 'Inclus (Annuel)' : 'مشمول مجاناً (سنوية)')
+      : (fr ? 'Supplément +500 MRU' : 'إضافي +500 أوقية');
+    badge.style.background = slots.extraFree ? '#f0fdf4' : '#fff7ed';
+    badge.style.color = slots.extraFree ? '#166534' : '#9a3412';
+  }
+  if(hint){
+    hint.textContent = slots.extraFree
+      ? (fr ? 'Votre forfait annuel inclut une 2ᵉ vidéo gratuite — elle apparaît à côté de la vidéo de présentation.' : 'باقتك السنوية تشمل فيديو إضافياً مجانياً — يظهر بجانب الفيديو التعريفي في واجهة المحل.')
+      : (fr ? 'Certaines formules incluent une vidéo supplémentaire (+500 MRU hors annuel). Deux URLs différentes = deux lecteurs sur la vitrine.' : 'بعض الباقات تسمح بفيديو إضافي (+500 أوقية خارج السنوية). رابطان مختلفان = مقطعان في واجهة المحل.');
+  }
+}
 function fillProfileForm(){
   if(!STORE) return;
   renderStoreDashboardActivities(STORE);
@@ -2218,6 +2258,8 @@ function fillProfileForm(){
   document.getElementById('p-address').value = STORE.address||'';
   document.getElementById('p-desc').value = STORE.desc||'';
   var pvEl = document.getElementById('p-promo-video'); if(pvEl) pvEl.value = STORE.promo_video||'';
+  var pvEx = document.getElementById('p-promo-video-extra'); if(pvEx) pvEx.value = STORE.promo_video_extra||'';
+  try{ _syncPromoVideoExtraUI(STORE); }catch(ePv){}
   document.getElementById('p-whatsapp').value = STORE.whatsapp||'';
   document.getElementById('p-facebook').value = STORE.facebook||'';
   var tlEl = document.getElementById('p-tagline'); if(tlEl){ tlEl.value = STORE.tagline||''; updateTaglineCount(); }
@@ -2280,6 +2322,9 @@ function saveProfile(){
   accs[idx].address = document.getElementById('p-address').value.trim();
   accs[idx].desc = document.getElementById('p-desc').value.trim();
   accs[idx].promo_video = (document.getElementById('p-promo-video')||{}).value?.trim()||'';
+  accs[idx].promo_video_extra = (document.getElementById('p-promo-video-extra')||{}).value?.trim()||'';
+  STORE.promo_video = accs[idx].promo_video;
+  STORE.promo_video_extra = accs[idx].promo_video_extra;
   accs[idx].whatsapp = document.getElementById('p-whatsapp').value.trim();
   accs[idx].facebook = document.getElementById('p-facebook').value.trim();
   accs[idx].tagline = (document.getElementById('p-tagline')||{}).value?.trim().slice(0,50) || '';
@@ -2305,7 +2350,7 @@ function _syncProfileToBackend(acc){
       name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
       category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
       address: acc.address||'', desc: acc.desc||'',
-      promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
+      promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
       tagline: acc.tagline||'', thumb: acc.thumb||''
     })
   }).catch(function(){ /* فشل صامت — البيانات محفوظة محلياً على الأقل */ });

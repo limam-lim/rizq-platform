@@ -116,19 +116,24 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   max-width:1280px;margin:14px auto 0;padding:0 16px;
 }
 .store-video-spotlight-inner{
-  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
   gap:16px;align-items:stretch;
   background:linear-gradient(135deg,#06111C,#0F2347 55%,#1B3A6B);
   border:1px solid rgba(201,168,76,.35);border-radius:18px;overflow:hidden;
   box-shadow:0 14px 34px rgba(15,35,71,.18);
 }
+.store-video-spotlight-inner.has-dual{
+  grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);
+}
 .store-video-copy{padding:22px 20px;color:#fff}
 .store-video-copy h2{margin:0 0 8px;font-size:clamp(18px,2.4vw,24px);font-weight:900}
 .store-video-copy h2 span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .store-video-copy p{margin:0;color:rgba(255,255,255,.72);font-size:13.5px;line-height:1.65}
-.store-video-frame{min-height:180px;background:#040a12}
-.store-video-frame #spotlight-intro-video-mount .rzq-iv-wrap{max-width:none;margin:0}
-.store-video-frame #spotlight-intro-video-mount .rzq-iv-frame{border-radius:0;aspect-ratio:16/9}
+.store-video-frames{display:grid;grid-template-columns:1fr;gap:10px;padding:10px;background:#040a12;min-height:180px}
+.store-video-spotlight-inner.has-dual .store-video-frames{grid-template-columns:1fr 1fr}
+.store-video-frame{min-height:160px;background:#040a12;border-radius:10px;overflow:hidden;border:1px solid rgba(201,168,76,.2)}
+.store-video-frame .rzq-iv-wrap{max-width:none;margin:0}
+.store-video-frame .rzq-iv-frame{border-radius:0;aspect-ratio:16/9}
 #products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:160px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
 .store-load-more{
@@ -137,8 +142,10 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   color:#E8C96A;font-weight:800;font-family:inherit;cursor:pointer;font-size:14px;
 }
 .store-load-more:hover{filter:brightness(1.06)}
-@media(max-width:800px){
-  .store-video-spotlight-inner{grid-template-columns:1fr}
+@media(max-width:900px){
+  .store-video-spotlight-inner,
+  .store-video-spotlight-inner.has-dual{grid-template-columns:1fr}
+  .store-video-spotlight-inner.has-dual .store-video-frames{grid-template-columns:1fr}
 }
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
@@ -829,7 +836,7 @@ footer{
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
-  <script src="rizq_store_commerce.js?v=26.7" defer></script>
+  <script src="rizq_store_commerce.js?v=26.8" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -936,14 +943,17 @@ footer{
   </div>
 </div>
 
-<!-- فيديو تعريفي بارز (متزامن مع داشبورد المحل) -->
-<section class="store-video-spotlight" id="store-video-spotlight" style="display:none" aria-label="فيديو تعريفي">
-  <div class="store-video-spotlight-inner">
+<!-- فيديوهات الباقة: تعريفي (+ إضافي إن وُجد في الباقة) -->
+<section class="store-video-spotlight" id="store-video-spotlight" style="display:none" aria-label="فيديوهات المحل">
+  <div class="store-video-spotlight-inner" id="store-video-spotlight-inner">
     <div class="store-video-copy">
-      <h2><span id="spotlight-store-name">المحّل</span> — فيديو تعريفي</h2>
-      <p id="spotlight-store-blurb">تعرّف على المحل ومنتجاته في أقل من 20 ثانية — نفس الفيديو المحفوظ من لوحة التحكم.</p>
+      <h2><span id="spotlight-store-name">المحّل</span> — <span id="spotlight-video-heading">فيديو تعريفي</span></h2>
+      <p id="spotlight-store-blurb">تعرّف على المحل ومنتجاته — الفيديوهات المحفوظة من لوحة التحكم حسب باقتك.</p>
     </div>
-    <div class="store-video-frame"><div id="spotlight-intro-video-mount"></div></div>
+    <div class="store-video-frames" id="store-video-frames">
+      <div class="store-video-frame" id="spotlight-intro-frame"><div id="spotlight-intro-video-mount"></div></div>
+      <div class="store-video-frame" id="spotlight-extra-frame" style="display:none"><div id="spotlight-extra-video-mount"></div></div>
+    </div>
   </div>
 </section>
 
@@ -1399,7 +1409,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js"></script>
+  <script src="rizq_intro_video.js?v=26.8"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1717,8 +1727,11 @@ function rizqShare(title, url) {
           { type: 'bankily', bank: 'Bankily', code: '44556677', note: fr ? 'Indiquez votre nom' : 'اذكر اسمك بعد التحويل' },
           { type: 'cash', bank: fr ? 'Paiement à la livraison' : 'الدفع عند التسليم', code: '', note: '' }
         ],
-        /* فيديو تعريفي تجريبي للمعاينة أمام الأساتذة */
-        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي (مقطعان مختلفان) */
+        plan: 'سنوية',
+        planName: 'سنوية',
+        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        promo_video_extra: 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: 'بيانات عرض' },
@@ -1769,16 +1782,49 @@ function rizqShare(title, url) {
     }
 
     function mountStorePromoVideo(acc){
-      /* موضع واحد فقط: الشريط البارز — لا تكرار في الشريط الجانبي ولا في صفحة المنتجات */
-      if(!acc || !acc.promo_video || !window.RizqIntroVideo) return;
+      /* شريط واحد: فيديو تعريفي + فيديو إضافي (لبعض الباقات) — بلا تكرار في أماكن أخرى */
+      if(!acc || !window.RizqIntroVideo) return;
+      var videos = (window.RizqStoreCommerce && RizqStoreCommerce.promoVideosOf)
+        ? RizqStoreCommerce.promoVideosOf(acc)
+        : (acc.promo_video ? [{ url: acc.promo_video, kind: 'intro' }] : []);
       var spot = document.getElementById('store-video-spotlight');
-      var spotMount = document.getElementById('spotlight-intro-video-mount');
+      var inner = document.getElementById('store-video-spotlight-inner');
+      var introMount = document.getElementById('spotlight-intro-video-mount');
+      var extraMount = document.getElementById('spotlight-extra-video-mount');
+      var extraFrame = document.getElementById('spotlight-extra-frame');
       var spotName = document.getElementById('spotlight-store-name');
+      var heading = document.getElementById('spotlight-video-heading');
+      var blurb = document.getElementById('spotlight-store-blurb');
       if(spotName && acc.name) spotName.textContent = acc.name;
-      if(spot && spotMount){
-        var okSpot = RizqIntroVideo.mount(spotMount, acc.promo_video, {title:'🎬 فيديو تعريفي', linkLabel:'شاهد على المصدر الأصلي ↗'});
-        spot.style.display = okSpot ? '' : 'none';
+      if(!spot || !introMount || !videos.length){
+        if(spot) spot.style.display = 'none';
+        return;
       }
+      var fr = isFr();
+      var intro = videos.find(function(v){ return v.kind === 'intro'; }) || videos[0];
+      var extra = videos.find(function(v){ return v.kind === 'extra'; });
+      var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
+        title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
+        linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗'
+      });
+      var okExtra = false;
+      if(extra && extraMount && extraFrame){
+        okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
+          title: fr ? '🎬 Vidéo supplémentaire' : '🎬 فيديو إضافي',
+          linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗'
+        });
+        extraFrame.style.display = okExtra ? '' : 'none';
+      } else if(extraFrame){
+        extraFrame.style.display = 'none';
+      }
+      if(inner) inner.classList.toggle('has-dual', !!(okIntro && okExtra));
+      if(heading) heading.textContent = (okIntro && okExtra)
+        ? (fr ? 'vidéos de la boutique' : 'فيديوهات المحل')
+        : (fr ? 'vidéo de présentation' : 'فيديو تعريفي');
+      if(blurb) blurb.textContent = (okIntro && okExtra)
+        ? (fr ? 'Vidéo de présentation + vidéo supplémentaire incluses dans votre forfait.' : 'فيديو تعريفي + فيديو إضافي حسب باقتك — مقطعان مختلفان من لوحة التحكم.')
+        : (fr ? 'Découvrez la boutique en moins de 20 secondes.' : 'تعرّف على المحل ومنتجاته في أقل من 20 ثانية.');
+      spot.style.display = okIntro ? '' : 'none';
     }
 
     function paintStoreProductsGrid(products, storeId){

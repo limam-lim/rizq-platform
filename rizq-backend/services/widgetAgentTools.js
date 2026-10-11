@@ -13,7 +13,7 @@ function readReviews() { return repos.reviews.asMap(); }
 function readAdBoosts() { return repos.adBoosts.asMap(); }
 
 const ACCOUNT_PUBLIC = [
-  'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'category',
+  'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
   'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 

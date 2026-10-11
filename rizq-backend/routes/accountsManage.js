@@ -120,7 +120,7 @@ function mountAccountsManageRoutes(app, deps) {
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.email !== undefined) {
       const nextEmail = String(b.email || '').trim().toLowerCase();
@@ -225,7 +225,7 @@ function mountAccountsManageRoutes(app, deps) {
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
-    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.nni !== undefined) {
       const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);

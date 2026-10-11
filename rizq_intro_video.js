@@ -89,23 +89,24 @@
     injectCSS();
 
     var muted = true;
+    /* معرّفات فريدة لكل تضمين — حتى يظهر فيديو تعريفي + فيديو إضافي معاً بدون تعارض */
+    var uid = 'rzq-iv-' + Math.random().toString(36).slice(2, 9);
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
-        '<div class="rzq-iv-frame" id="rzq-iv-frame">' +
+        '<div class="rzq-iv-frame" id="' + uid + '-frame">' +
           '<div class="rzq-iv-badge">' + esc(opts.title || '🎬 فيديو تعريفي') + '</div>' +
-          '<iframe id="rzq-iv-iframe" src="' + src + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="eager"></iframe>' +
-          '<button type="button" class="rzq-iv-sound" id="rzq-iv-sound-btn">🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت') + '</button>' +
+          '<iframe id="' + uid + '-iframe" src="' + src + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="eager"></iframe>' +
+          '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound">🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت') + '</button>' +
         '</div>' +
         '<a class="rzq-iv-src" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(opts.linkLabel || 'شاهد على المصدر الأصلي ↗') + '</a>' +
       '</div>';
 
-    var btn = hostEl.querySelector('#rzq-iv-sound-btn');
-    var frame = hostEl.querySelector('#rzq-iv-frame');
+    var btn = hostEl.querySelector('#' + uid + '-sound');
     if (btn) {
       btn.addEventListener('click', function () {
         muted = !muted;
         var newSrc = buildEmbedSrc(url, muted);
-        var iframe = hostEl.querySelector('#rzq-iv-iframe');
+        var iframe = hostEl.querySelector('#' + uid + '-iframe');
         if (iframe && newSrc) iframe.src = newSrc;
         btn.textContent = muted ? '🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت') : '🔊 ' + (opts.unmutedLabel || 'الصوت مفعّل');
       });
