@@ -257,9 +257,12 @@
     } else {
       mainInner = '<div class="rzq-pd-emoji-stage"><span class="rzq-pd-emoji-xl" aria-hidden="true">' + esc(emoji) + '</span></div>';
     }
+    var zoomHint = '<button type="button" class="rzq-pd-zoom-hint" onclick="event.stopPropagation();RizqStoreCommerce.openLightbox()">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>'
+      + '<span>' + (fr ? 'Agrandir' : 'تكبير') + '</span></button>';
     var nav = imgs.length > 1
-      ? '<button type="button" class="rzq-pd-gal-btn prev" onclick="RizqStoreCommerce.navPhoto(-1)" aria-label="' + (fr ? 'Précédente' : 'السابقة') + '">‹</button>'
-        + '<button type="button" class="rzq-pd-gal-btn next" onclick="RizqStoreCommerce.navPhoto(1)" aria-label="' + (fr ? 'Suivante' : 'التالية') + '">›</button>'
+      ? '<button type="button" class="rzq-pd-gal-btn prev" onclick="event.stopPropagation();RizqStoreCommerce.navPhoto(-1)" aria-label="' + (fr ? 'Précédente' : 'السابقة') + '">‹</button>'
+        + '<button type="button" class="rzq-pd-gal-btn next" onclick="event.stopPropagation();RizqStoreCommerce.navPhoto(1)" aria-label="' + (fr ? 'Suivante' : 'التالية') + '">›</button>'
         + '<span class="rzq-pd-counter" id="rzq-pd-counter">1 / ' + imgs.length + '</span>'
       : '';
     var thumbs = '';
@@ -298,7 +301,8 @@
       + '<div class="rzq-pd-body">'
       + '<div class="rzq-pd-hero">'
       + '<div class="rzq-pd-gallery">'
-      + '<div class="rzq-pd-main" id="rzq-pd-main" onclick="RizqStoreCommerce.openLightbox()" title="' + (fr ? 'Agrandir' : 'تكبير') + '">' + mainInner + nav + '</div>'
+      + '<div class="rzq-pd-main" id="rzq-pd-main" onclick="RizqStoreCommerce.openLightbox()" title="' + (fr ? 'Cliquer pour agrandir' : 'انقر للتكبير') + '">'
+      + mainInner + nav + zoomHint + '</div>'
       + thumbs
       + '</div>'
       + '<div class="rzq-pd-info">'
@@ -318,7 +322,7 @@
       + '<button type="button" onclick="RizqStoreCommerce.changeQty(-1)" aria-label="-">−</button>'
       + '<span id="rzq-pd-qty">' + qty + '</span>'
       + '<button type="button" onclick="RizqStoreCommerce.changeQty(1)" aria-label="+">+</button>'
-      + '<strong id="rzq-pd-total" style="color:#E8C96A;margin-inline-start:6px">' + (priceNum * qty).toLocaleString('en-US') + ' MRU</strong>'
+      + '<strong id="rzq-pd-total" class="rzq-pd-total" style="margin-inline-start:6px">' + (priceNum * qty).toLocaleString('en-US') + ' MRU</strong>'
       + '</div>'
       + '<div class="rzq-pd-actions">'
       + '<button type="button" class="rzq-pd-btn rzq-pd-btn-cart" onclick="RizqStoreCommerce.addFromDetail()">🛒 ' + (fr ? 'Ajouter au panier' : 'أضف للسلة') + '</button>'
