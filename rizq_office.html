@@ -693,7 +693,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.0" defer></script>
+  <script src="rizq_service_desk.js?v=1.1" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
@@ -1310,12 +1310,17 @@ function submitReq(){
     desk: desk,
   }).then(function(res){
     showToast(res.message || _t2('تم إرسال طلبك بنجاح ✅','✅ Demande envoyée'), 'success');
-    ['rf-name','rf-phone','rf-whatsapp','rf-email','rf-msg'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(el) el.value = '';
-    });
+    if (typeof RizqServiceDesk.clearRequestMessageFields === 'function') {
+      RizqServiceDesk.clearRequestMessageFields(document.getElementById('req-form'));
+    } else {
+      var msgEl = document.getElementById('rf-msg');
+      if (msgEl) msgEl.value = '';
+    }
     var sel = document.getElementById('rf-service');
     if(sel) sel.selectedIndex = 0;
+    if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
+      RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('req-form'), force: true });
+    }
     // أبقِ النموذج ظاهراً بعد الإرسال حتى يرى الزائر الحقول دائماً
   }).catch(function(err){
     showToast((err && err.message) || _t2('تعذّر إرسال الطلب','Échec de l\'envoi'), 'error');

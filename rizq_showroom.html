@@ -651,7 +651,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_auth_gate.js" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_account_payments.js" defer></script>
-<script src="rizq_service_desk.js?v=1.0" defer></script>
+  <script src="rizq_service_desk.js?v=1.1" defer></script>
 <script src="rizq_packages_config.js" defer></script>
 <script src="rizq_packages_ui.js?v=23.0" defer></script>
 <script src="rizq_i18n_data.js" defer></script>
@@ -1007,6 +1007,9 @@ function applyAccountData(){
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
   if(window.RizqServiceDesk){
     RizqServiceDesk.applyPublicLabels(document.getElementById('showroom-service-desk'), _acc.serviceDesk || {}, _acc.name || '');
+    if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
+      RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('sr-req-form') });
+    }
     var deskRoot = document.getElementById('showroom-service-desk');
     if(deskRoot) deskRoot.style.display = 'block';
   }
@@ -1149,9 +1152,16 @@ function submitShowroomServiceReq(){
     form: document.getElementById('sr-req-form')
   }).then(function(res){
     showToast(res.message || _t('✅ تم إرسال طلبك','✅ Demande envoyée'));
-    ['rf-name','rf-phone','rf-whatsapp','rf-email','rf-service','rf-msg'].forEach(function(id){
-      var el = document.getElementById(id); if(el) el.value = '';
-    });
+    if (typeof RizqServiceDesk.clearRequestMessageFields === 'function') {
+      RizqServiceDesk.clearRequestMessageFields(document.getElementById('sr-req-form'));
+    } else {
+      ['rf-service','rf-msg'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+    }
+    if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
+      RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('sr-req-form'), force: true });
+    }
   }).catch(function(err){
     showToast((err && err.message) || _t('تعذّر الإرسال','Échec'));
   });
