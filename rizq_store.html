@@ -837,7 +837,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=27.0" defer></script>
+  <script src="rizq_store_commerce.js?v=28.3" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1242,7 +1242,9 @@ function openQuickView(id, name, price, emoji, cat){
           adTitle: fr ? (p.nameF || p.name) : p.name,
           adId: storeId + '-p' + p.id,
           adEmoji: p.emoji || '📦',
-          category: p.cat || ''
+          category: p.cat || '',
+          context: 'store',
+          module: 'store'
         });
       }
     });
@@ -1737,24 +1739,24 @@ function rizqShare(title, url) {
         promo_video_extra: 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
       };
       var products = [
-        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: 'بيانات عرض' },
-        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, desc: 'بيانات عرض' },
-        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, desc: 'بيانات عرض' },
-        { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: 'بيانات عرض' },
-        { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: 'بيانات عرض' },
-        { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: 'بيانات عرض' },
-        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, desc: 'بيانات عرض' },
-        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, desc: 'بيانات عرض' },
-        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, desc: 'بيانات عرض' },
-        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, desc: 'بيانات عرض' },
-        { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: 'بيانات عرض' },
-        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, desc: 'بيانات عرض' },
-        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, desc: 'بيانات عرض' },
-        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, desc: 'بيانات عرض' },
-        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, desc: 'بيانات عرض' },
-        { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: 'بيانات عرض' },
-        { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: 'بيانات عرض' },
-        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, desc: 'بيانات عرض' }
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: '' },
+        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, desc: '' },
+        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, desc: '' },
+        { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: '' },
+        { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: '' },
+        { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: '' },
+        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, desc: '' },
+        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, desc: '' },
+        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, desc: '' },
+        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, desc: '' },
+        { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: '' },
+        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, desc: '' },
+        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, desc: '' },
+        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, desc: '' },
+        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, desc: '' },
+        { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: '' },
+        { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: '' },
+        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, desc: '' }
       ];
       var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
       var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };
@@ -2763,7 +2765,7 @@ if(typeof _t2 === 'undefined'){
 <!-- FIXED DISC PILL (left) -->
 <div class="fixed-disc-pill" id="fixed-disc-pill" onclick="openDisc()" title="&#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A; / Avis juridique">&#x2696;&#xFE0F; &#x625;&#x634;&#x639;&#x627;&#x631; &#x642;&#x627;&#x646;&#x648;&#x646;&#x64A;</div>
 
-  <script src="rizq_messenger.js?v=28.2"></script>
+  <script src="rizq_messenger.js?v=28.3"></script>
 
 <script>
 /* ── ربط زر المراسلة الآمنة بـ RizqMessenger ── */
@@ -2782,6 +2784,8 @@ if(typeof _t2 === 'undefined'){
       adTitle    : name,
       adId       : storeId,
       adEmoji    : '🏪',
+      context    : 'store',
+      module     : 'store'
     });
   };
 })();

@@ -434,7 +434,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=27.0" defer></script>
+  <script src="rizq_store_commerce.js?v=28.3" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -894,7 +894,9 @@ function openModal(id) {
             adTitle: ar ? prod.name : (prod.nameF || prod.name),
             adId: sid + '-p' + prod.id,
             adEmoji: prod.emoji || '📦',
-            category: prod.cat || ''
+            category: prod.cat || '',
+            context: 'store',
+            module: 'store'
           });
         }
       }
@@ -994,8 +996,8 @@ function _demoCatalog(fr){
     return {
       id: 'D'+(i+1), name: p.name, nameF: p.nameF, cat: p.cat, emoji: p.emoji,
       price: p.price, oldPrice: i % 4 === 0 ? Math.round(p.price * 1.18) : null,
-      discount: i % 4 === 0, isNew: i < 3, desc: fr ? 'Article démo' : 'منتج عرض',
-      descF: 'Article démo', imgDataArr: [], storeId: 'demo_store'
+      discount: i % 4 === 0, isNew: i < 3, desc: '',
+      descF: '', imgDataArr: [], storeId: 'demo_store'
     };
   });
 }
@@ -1114,7 +1116,7 @@ async function loadRealStoreProducts(){
   var mapped = (real || []).map(function(p, i){
     var m = (window.RizqStoreCommerce && RizqStoreCommerce.mapRawProduct)
       ? RizqStoreCommerce.mapRawProduct(p, i)
-      : { id: i+1, name: p.name||'', nameF: p.name||'', cat: p.cat||'عام', emoji: p.emoji||'📦', price: Number(p.price)||0, desc: p.desc||'', imgDataArr: [] };
+      : { id: i+1, name: p.name||'', nameF: p.name||'', cat: p.cat||'عام', emoji: p.emoji||'📦', price: Number(p.price)||0, desc: (window.RizqStoreCommerce && RizqStoreCommerce.cleanDesc) ? RizqStoreCommerce.cleanDesc(p.desc||'') : (p.desc||''), imgDataArr: [] };
     m.storeId = storeId;
     return m;
   });
@@ -1131,6 +1133,13 @@ window.isAr = (function(){ try{ return (localStorage.getItem('rizq_lang')||'ar')
 function bootProductsCatalog(){
   loadRealStoreProducts().catch(function(){
     var fr = !window.isAr;
+    var params = new URLSearchParams(location.search);
+    var storeId = params.get('id') || params.get('store') || '';
+    /* محل حقيقي: لا نستبدل منتجاته بكتالوج «منتج عرض» عند فشل التحميل */
+    if (storeId && storeId !== 'demo_store' && params.get('demo') !== '1') {
+      commitCatalog([], { name: storeId, type: 'store' }, storeId, fr);
+      return;
+    }
     commitCatalog(_demoCatalog(fr), { name: fr ? 'Boutique Al-Nour' : 'متجر النور' }, 'demo_store', fr);
   });
 }

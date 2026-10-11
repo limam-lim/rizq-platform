@@ -75,11 +75,32 @@
     }
   }
 
+  /** أوصاف عرض/تجريبية لا تُعرض للزبون في محل حقيقي */
+  function isPlaceholderDesc(s) {
+    var t = String(s || '').trim().toLowerCase();
+    if (!t) return true;
+    var placeholders = [
+      'منتج عرض', 'بيانات عرض', 'بيانات ترويجية فقط', 'بيانات ترويجية',
+      'article démo', 'article demo', 'produit démo', 'produit demo',
+      'demo product', 'sample product', 'lorem ipsum'
+    ];
+    for (var i = 0; i < placeholders.length; i++) {
+      if (t === placeholders[i]) return true;
+    }
+    return false;
+  }
+
+  function cleanDesc(s) {
+    return isPlaceholderDesc(s) ? '' : String(s || '').trim();
+  }
+
   function mapRawProduct(p, i) {
     var priceNum = parseFloat(String(p.price == null ? '0' : p.price).replace(/[^\d.]/g, '')) || 0;
     var isNew = false;
     try { isNew = p.addedAt && (Date.now() - new Date(p.addedAt).getTime()) < 3 * 86400000; } catch (e) {}
     var imgs = imagesOf(p);
+    var desc = cleanDesc(p.desc);
+    var descF = cleanDesc(p.descF || p.desc);
     return {
       id: p.id != null ? p.id : (i + 1),
       _idx: i + 1,
@@ -92,8 +113,8 @@
       oldPrice: p.oldPrice || null,
       discount: !!p.discount,
       isNew: isNew,
-      desc: p.desc || '',
-      descF: p.descF || p.desc || '',
+      desc: desc,
+      descF: descF,
       stock: p.stock,
       imgData: imgs[0] || p.imgData || '',
       imgDataArr: imgs,
@@ -244,7 +265,7 @@
     var imgs = imagesOf(p);
     var title = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
     var titleAlt = fr ? (p.name || '') : (p.nameF || '');
-    var desc = fr ? (p.descF || p.desc || '') : (p.desc || p.descF || '');
+    var desc = cleanDesc(fr ? (p.descF || p.desc || '') : (p.desc || p.descF || ''));
     var priceNum = Number(p.price) || 0;
     var priceTxt = priceNum.toLocaleString('en-US') + ' MRU';
     var oldTxt = p.oldPrice ? Number(p.oldPrice).toLocaleString('en-US') + ' MRU' : '';
@@ -492,6 +513,8 @@
     imagesOf: imagesOf,
     productMediaHtml: productMediaHtml,
     bindMedia: bindMedia,
+    cleanDesc: cleanDesc,
+    isPlaceholderDesc: isPlaceholderDesc,
     mapRawProduct: mapRawProduct,
     pageSlice: pageSlice,
     storeIdFromUrl: storeIdFromUrl,

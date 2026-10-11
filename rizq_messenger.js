@@ -442,7 +442,20 @@
 
     _setTxt('rzq-m-status', isFr ? 'Disponible · répond en quelques minutes' : 'متاح · يرد خلال دقائق');
     _setTxt('rzq-m-sub', isFr ? 'Rizq — Messagerie sécurisée' : 'رزق — مراسلة آمنة');
-    _setTxt('rzq-m-adnote', isFr ? 'Demande concernant cette annonce' : 'استفسار عن هذا الإعلان');
+    var ctx = (_state.context || 'ad');
+    var noteAr = 'استفسار عن هذا الإعلان';
+    var noteFr = 'Demande concernant cette annonce';
+    if (ctx === 'store' || ctx === 'shop') {
+      noteAr = 'استفسار عن هذا المنتج';
+      noteFr = 'Demande concernant ce produit';
+    } else if (ctx === 'showroom' || ctx === 'corp') {
+      noteAr = 'استفسار عن هذا العرض';
+      noteFr = 'Demande concernant cet article';
+    } else if (ctx === 'office') {
+      noteAr = 'استفسار عن هذه الخدمة';
+      noteFr = 'Demande concernant ce service';
+    }
+    _setTxt('rzq-m-adnote', isFr ? noteFr : noteAr);
     _setAttr('rzq-m-nameinp', 'placeholder', isFr ? 'Votre nom (facultatif)' : 'اسمك (اختياري)');
     _setAttr('rzq-m-phoneinp', 'placeholder', isFr ? 'Votre téléphone (pour que le vendeur réponde)' : 'رقم هاتفك (ليتمكن البائع من الرد عليك)');
     _setTxt('rzq-m-privnote', isFr ? '🔒 Votre numéro est visible uniquement par le vendeur pour vous répondre' : '🔒 رقمك يصل للبائع فقط لغرض الرد — لا يُنشر علناً');
@@ -673,6 +686,8 @@
       _state.adId            = String(opts.adId || 'g');
       _state.adEmoji         = opts.adEmoji     || '📦';
       _state.category        = opts.category    || ''; // فئة الإعلان — لاختيار أسئلة سريعة سياقية
+      /* store|showroom|office|ad — يحدد نص الشريط (منتج vs إعلان) */
+      _state.context         = String(opts.context || opts.module || 'ad').toLowerCase();
       _state.visitorId       = _getVisitorId();
       _state.visitorName     = '';
       _state.threadKey       = null;
