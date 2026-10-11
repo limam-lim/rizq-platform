@@ -225,24 +225,47 @@
   /* ── لوحة تفاصيل منتج بهوية عرض الإعلان ── */
   var _pdState = { product: null, idx: 0, qty: 1, opts: null, similar: [] };
 
+  function ensureLightboxHost() {
+    var box = document.getElementById('rzq-pd-lightbox');
+    var needsBuild = !box || !document.getElementById('rzq-pd-lightbox-content');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'rzq-pd-lightbox';
+      box.className = 'rzq-pd-lightbox';
+      box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+      box.addEventListener('click', function (e) {
+        if (e.target === box) closeLightbox();
+      });
+    }
+    if (needsBuild) {
+      box.className = 'rzq-pd-lightbox';
+      box.innerHTML =
+        '<button type="button" class="rzq-pd-lightbox-close" onclick="event.stopPropagation();RizqStoreCommerce.closeLightbox()" aria-label="✕">✕</button>'
+        + '<div class="rzq-pd-lightbox-content" id="rzq-pd-lightbox-content" onclick="event.stopPropagation()"></div>'
+        + '<div class="rzq-pd-lightbox-meta" id="rzq-pd-lightbox-meta"></div>';
+    }
+    if (box.parentElement !== document.body) document.body.appendChild(box);
+    return box;
+  }
+
   function ensureDetailHost() {
     var root = document.getElementById('rzq-pd-root');
-    if (root) return root;
+    if (root) {
+      ensureLightboxHost();
+      return root;
+    }
     root = document.createElement('div');
     root.id = 'rzq-pd-root';
     root.className = 'rzq-pd-root';
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-modal', 'true');
-    root.innerHTML =
-      '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>'
-      + '<div class="rzq-pd-lightbox" id="rzq-pd-lightbox" onclick="if(event.target===this)RizqStoreCommerce.closeLightbox()">'
-      + '<button type="button" class="rzq-pd-lightbox-close" onclick="RizqStoreCommerce.closeLightbox()">✕</button>'
-      + '<img id="rzq-pd-lightbox-img" alt=""/>'
-      + '</div>';
+    root.innerHTML = '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>';
     root.addEventListener('click', function (e) {
       if (e.target === root) closeProductDetail();
     });
     document.body.appendChild(root);
+    ensureLightboxHost();
     return root;
   }
 
@@ -275,7 +298,8 @@
 
     var mainInner;
     if (imgs.length) {
-      mainInner = '<img id="rzq-pd-main-img" src="' + esc(imgs[0]) + '" alt="' + esc(title) + '"/>';
+      mainInner = '<img id="rzq-pd-main-img" src="' + esc(imgs[0]) + '" alt="' + esc(title) + '"'
+        + ' onerror="RizqStoreCommerce.onMainImgError(this)"/>';
     } else {
       mainInner = '<div class="rzq-pd-emoji-stage"><span class="rzq-pd-emoji-xl" aria-hidden="true">' + esc(emoji) + '</span></div>';
     }
@@ -285,8 +309,10 @@
     var nav = imgs.length > 1
       ? '<button type="button" class="rzq-pd-gal-btn prev" onclick="event.stopPropagation();RizqStoreCommerce.navPhoto(-1)" aria-label="' + (fr ? 'Précédente' : 'السابقة') + '">‹</button>'
         + '<button type="button" class="rzq-pd-gal-btn next" onclick="event.stopPropagation();RizqStoreCommerce.navPhoto(1)" aria-label="' + (fr ? 'Suivante' : 'التالية') + '">›</button>'
-        + '<span class="rzq-pd-counter" id="rzq-pd-counter">1 / ' + imgs.length + '</span>'
-      : '';
+        + '<span class="rzq-pd-counter" id="rzq-pd-counter">1/' + imgs.length + '</span>'
+      : (imgs.length === 1
+        ? '<span class="rzq-pd-counter" id="rzq-pd-counter">1/1</span>'
+        : '');
     var thumbs = '';
     if (imgs.length > 1) {
       thumbs = '<div class="rzq-pd-thumbs">' + imgs.map(function (src, i) {
@@ -295,6 +321,9 @@
       }).join('') + '</div>';
     } else if (!imgs.length) {
       thumbs = '<div class="rzq-pd-thumbs"><div class="rzq-pd-thumb active"><span>' + esc(emoji) + '</span></div></div>';
+    } else {
+      thumbs = '<div class="rzq-pd-thumbs"><div class="rzq-pd-thumb active" data-i="0" onclick="RizqStoreCommerce.setPhoto(0)">'
+        + '<img src="' + esc(imgs[0]) + '" alt="" loading="lazy"/></div></div>';
     }
 
     var similar = (_pdState.similar || []).slice(0, 4);
@@ -323,8 +352,12 @@
       + '<div class="rzq-pd-body">'
       + '<div class="rzq-pd-hero">'
       + '<div class="rzq-pd-gallery">'
-      + '<div class="rzq-pd-main" id="rzq-pd-main" onclick="RizqStoreCommerce.openLightbox()" title="' + (fr ? 'Cliquer pour agrandir' : 'انقر للتكبير') + '">'
+      + '<div class="rzq-pd-gal-wrap">'
+      + '<div class="rzq-pd-main" id="rzq-pd-main" role="button" tabindex="0" data-emo="' + esc(emoji) + '"'
+      + ' onclick="RizqStoreCommerce.openLightbox()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();RizqStoreCommerce.openLightbox();}"'
+      + ' title="' + (fr ? 'Cliquer pour agrandir' : 'انقر للتكبير') + '">'
       + mainInner + nav + zoomHint + '</div>'
+      + '</div>'
       + thumbs
       + '</div>'
       + '<div class="rzq-pd-info">'
@@ -427,9 +460,12 @@
     if (!imgs.length) return;
     _pdState.idx = ((i % imgs.length) + imgs.length) % imgs.length;
     var img = document.getElementById('rzq-pd-main-img');
-    if (img) img.src = imgs[_pdState.idx];
+    if (img) {
+      img.src = imgs[_pdState.idx];
+      img.style.display = '';
+    }
     var c = document.getElementById('rzq-pd-counter');
-    if (c) c.textContent = (_pdState.idx + 1) + ' / ' + imgs.length;
+    if (c) c.textContent = (_pdState.idx + 1) + '/' + imgs.length;
     document.querySelectorAll('.rzq-pd-thumb').forEach(function (t, n) {
       t.classList.toggle('active', n === _pdState.idx);
     });
@@ -437,23 +473,101 @@
 
   function navPhoto(dir) { setPhoto((_pdState.idx || 0) + dir); }
 
-  function openLightbox() {
-    var imgs = imagesOf(_pdState.product);
-    var box = document.getElementById('rzq-pd-lightbox');
-    var img = document.getElementById('rzq-pd-lightbox-img');
-    if (!box || !img) return;
-    if (imgs.length) {
-      img.src = imgs[_pdState.idx || 0];
-      img.style.display = '';
-    } else {
-      img.style.display = 'none';
+  function onMainImgError(imgEl) {
+    try {
+      if (!imgEl || !_pdState.product) return;
+      imgEl.dataset.broken = '1';
+      var p = _pdState.product;
+      p.imgDataArr = [];
+      p.images = [];
+      p.imgData = '';
+      p.image = '';
+      p.thumb = '';
+      var box = document.getElementById('rzq-pd-main');
+      if (!box) return;
+      var fr = !!( _pdState.opts && _pdState.opts.fr );
+      var emoji = p.emoji || '📦';
+      var zoom = '<button type="button" class="rzq-pd-zoom-hint" onclick="event.stopPropagation();RizqStoreCommerce.openLightbox()">'
+        + '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>'
+        + '<span>' + (fr ? 'Agrandir' : 'تكبير') + '</span></button>';
+      box.innerHTML = '<div class="rzq-pd-emoji-stage"><span class="rzq-pd-emoji-xl" aria-hidden="true">'
+        + esc(emoji) + '</span></div>' + zoom;
+      var thumbs = box.parentElement && box.parentElement.parentElement
+        ? box.parentElement.parentElement.querySelector('.rzq-pd-thumbs')
+        : null;
+      if (thumbs) {
+        thumbs.innerHTML = '<div class="rzq-pd-thumb active"><span>' + esc(emoji) + '</span></div>';
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  function renderLightboxContent() {
+    var box = ensureLightboxHost();
+    var content = document.getElementById('rzq-pd-lightbox-content');
+    var meta = document.getElementById('rzq-pd-lightbox-meta');
+    if (!content) return box;
+    var p = _pdState.product || {};
+    var opts = _pdState.opts || {};
+    var fr = !!opts.fr;
+    var imgs = imagesOf(p);
+    var title = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
+    var tip = fr ? ' — Click outside to close' : ' — انقر خارج الصورة للإغلاق';
+
+    if (!imgs.length) {
+      var emoji = p.emoji || '📦';
+      content.innerHTML =
+        '<div class="rzq-pd-lb-emoji" onclick="event.stopPropagation()">'
+        + '<span class="rzq-pd-lb-emoji-xl" aria-hidden="true">' + esc(emoji) + '</span>'
+        + (title ? '<div class="rzq-pd-lb-emoji-title">' + esc(title) + '</div>' : '')
+        + '</div>';
+      if (meta) {
+        meta.innerHTML = '<span dir="auto">' + (fr ? 'Aperçu agrandi' : 'معاينة مكبّرة') + '</span>'
+          + '<span dir="auto">' + tip + '</span>';
+      }
+      return box;
     }
+
+    var idx = Math.max(0, Math.min(_pdState.idx || 0, imgs.length - 1));
+    _pdState.idx = idx;
+    content.innerHTML =
+      '<img src="' + esc(imgs[idx]) + '" alt="' + esc(title || (fr ? 'Photo' : 'صورة')) + '"'
+      + ' onclick="event.stopPropagation()"'
+      + ' onerror="RizqStoreCommerce.onLightboxImgError(this)"/>';
+    if (meta) {
+      meta.innerHTML = '<span dir="ltr">' + (idx + 1) + ' / ' + imgs.length + '</span>'
+        + '<span dir="auto">' + tip + '</span>';
+    }
+    return box;
+  }
+
+  function onLightboxImgError(imgEl) {
+    try {
+      if (!imgEl) return;
+      imgEl.onerror = null;
+      var p = _pdState.product || {};
+      var fr = !!( _pdState.opts && _pdState.opts.fr );
+      var content = document.getElementById('rzq-pd-lightbox-content');
+      if (!content) return;
+      content.innerHTML =
+        '<div class="rzq-pd-lb-emoji" onclick="event.stopPropagation()">'
+        + '<span class="rzq-pd-lb-emoji-xl" aria-hidden="true">' + esc(p.emoji || '📦') + '</span>'
+        + '<div class="rzq-pd-lb-emoji-title">' + (fr ? 'Image indisponible' : 'الصورة غير متاحة') + '</div>'
+        + '</div>';
+    } catch (e) { /* ignore */ }
+  }
+
+  function openLightbox() {
+    if (!_pdState.product) return;
+    var box = renderLightboxContent();
+    if (!box) return;
     box.classList.add('open');
+    document.body.classList.add('rizq-pd-lightbox-open');
   }
 
   function closeLightbox() {
     var box = document.getElementById('rzq-pd-lightbox');
     if (box) box.classList.remove('open');
+    document.body.classList.remove('rizq-pd-lightbox-open');
   }
 
   function changeQty(delta) {
@@ -529,6 +643,8 @@
     navPhoto: navPhoto,
     openLightbox: openLightbox,
     closeLightbox: closeLightbox,
+    onMainImgError: onMainImgError,
+    onLightboxImgError: onLightboxImgError,
     changeQty: changeQty,
     addFromDetail: addFromDetail,
     askFromDetail: askFromDetail,
