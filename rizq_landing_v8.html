@@ -8078,16 +8078,18 @@ function renderRelatedAds(current) {
   if (!entries.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
   wrap.style.display = 'block';
   const title = isAr ? '✨ قد يهمك أيضاً — استمر في التصفح' : '✨ Vous aimerez aussi';
-  wrap.innerHTML = `<div class="amd-related-title">${title}</div>
+  wrap.innerHTML = `<div class="amd-related-title">${escapeHtml(title)}</div>
     <div class="amd-related-grid">
       ${entries.map(({ad:x,sameSeller:ss})=>{
         const xd = trAd(x);
         const badge = ss ? (isAr?'🔥 نفس البائع':'🔥 Même vendeur') : (isAr?'📂 نفس الفئة':'📂 Même catégorie');
-        return `<div class="amd-rel-card" onclick="openAdById('${String(x.id).replace(/'/g,"\\'")}')">
-          <div class="amd-rel-img" style="background:${xd.bg}"><span>${xd.emoji}</span><span class="amd-rel-badge">${badge}</span></div>
+        const safeId = String(x.id == null ? '' : x.id).replace(/[^a-zA-Z0-9_-]/g, '');
+        const bg = String(xd.bg || '').replace(/[<>"']/g, '');
+        return `<div class="amd-rel-card" onclick="openAdById('${safeId}')">
+          <div class="amd-rel-img" style="background:${escapeHtml(bg)}"><span>${escapeHtml(xd.emoji||'')}</span><span class="amd-rel-badge">${escapeHtml(badge)}</span></div>
           <div class="amd-rel-body">
-            <div class="amd-rel-title">${xd.title}</div>
-            <div class="amd-rel-price">${xd.price}</div>
+            <div class="amd-rel-title">${escapeHtml(xd.title||'')}</div>
+            <div class="amd-rel-price">${escapeHtml(xd.price||'')}</div>
           </div>
         </div>`;
       }).join('')}
