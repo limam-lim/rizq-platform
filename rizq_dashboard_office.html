@@ -632,7 +632,19 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
       <!-- Rizq ADS — إعلان فيديو -->
       <div class="card" style="margin-top:18px">
         <div class="card-title" style="margin-bottom:6px" data-t="rads-title">🎬 Rizq ADS — إعلان فيديو في الرئيسية</div>
-        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:16px" data-t="rads-hint">أعلن بفيديو يظهر لكل زوار منصة رزق في الموضع المميز بالصفحة الرئيسية — اختر باقة، ادفع، وارفع رابط فيديوك، وسيتم تفعيله بعد مراجعة الإدارة.</p>
+        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:12px" data-t="rads-hint">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات. اختر الباقة المناسبة لموضعك، ادفع، وارفع رابط فيديوك ليظهر لكل زوار المنصة.</p>
+        <div class="rads-placements" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="border:1.5px solid rgba(201,168,76,.45);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,#fffdf6,#fff)">
+            <div style="font-size:11px;font-weight:800;color:#a07820;margin-bottom:4px" data-t="rads-place1-label">الموضع ١</div>
+            <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place1-h">الشاشة الكبيرة</div>
+            <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place1-p">فيديو عريض أعلى الصفحة الرئيسية — أول ما يراه الزائر.</div>
+          </div>
+          <div style="border:1.5px solid rgba(148,163,184,.5);border-radius:12px;padding:12px 14px;background:#f8fafc">
+            <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:4px" data-t="rads-place2-label">الموضع ٢</div>
+            <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place2-h">شريط البطاقات</div>
+            <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place2-p">بطاقات فيديو تحت الشاشة الكبيرة — باقاتك تحدد أي موضع يظهر فيه إعلانك.</div>
+          </div>
+        </div>
         <div id="rizq-ads-status-mount" style="margin-bottom:14px"></div>
         <div id="rizq-ads-packages-display"></div>
       </div>
@@ -2987,7 +2999,7 @@ window.addEventListener('load', function(){
       <div id="pay-video-url-wrap" style="display:none;margin-bottom:18px">
         <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:block;font-size:12.5px">🎬 <span data-t="pay-video-url-label">رابط الفيديو الإعلاني</span></label>
         <input class="form-input" id="pay-video-url" dir="ltr" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0e8ff;border-radius:10px"/>
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المميز بالصفحة الرئيسية لكل زوار المنصة بعد موافقة الإدارة</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المحدد بباقتك (الشاشة الكبيرة أو شريط البطاقات) على الصفحة الرئيسية</div>
       </div>
       <!-- Steps -->
       <div style="margin-bottom:16px">
