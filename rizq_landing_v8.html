@@ -1635,10 +1635,6 @@ body.rizq-lang-fr .hero-biz-nav{
   box-shadow:0 10px 28px rgba(201,168,76,.38),0 0 18px rgba(201,168,76,.16);
 }
 .hero-biz-btn:focus-visible,.hero-cta-primary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.hero-cta-micro{
-  margin:0;font-size:clamp(12px,1.5vw,13.5px);font-weight:800;
-  color:var(--text-main);letter-spacing:.2px;line-height:1.5;opacity:.95;
-}
 @keyframes heroCtaGlow{
   0%,100%{box-shadow:0 6px 22px rgba(201,168,76,.30),0 0 12px rgba(201,168,76,.10)}
   50%{box-shadow:0 8px 26px rgba(201,168,76,.38),0 0 16px rgba(201,168,76,.14)}
@@ -2776,7 +2772,6 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-biz-nav .hero-biz-btn:last-child:nth-child(odd){grid-column:1 / -1;max-width:70%;justify-self:center}
   .hero-cta-wrap{margin:0 auto;width:100%;max-width:none}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
-  .hero-cta-micro{text-align:center;max-width:100%;padding:0 4px}
   /* هاتف: الأشرطة من حافة الشاشة (بدون هامش سطح المكتب 1سم) + تصغير خفيف */
   :root{--rizq-strip-inset:0px}
   .hero > #hero-listings.hero-promo-strip{
@@ -4470,7 +4465,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <button type="button" class="hero-cta-primary" onclick="goToPost()">
           <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك مجاناً — خلال دقائق</span>
         </button>
-        <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ بدون بطاقة بنكية — سجّل حسابك في 30 ثانية</p>
       </div>
 
       <!-- Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
@@ -8977,7 +8971,6 @@ const LANG = {
     'hbiz-tender-badge': 'جديد',
     'hbiz-new': 'جديد',
     'hbiz-cta': 'انشر إعلانك أو افتح محلك مجاناً — خلال دقائق',
-    'hbiz-cta-micro': '⚡ بدون بطاقة بنكية — سجّل حسابك في 30 ثانية',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -9119,7 +9112,6 @@ const LANG = {
     'hbiz-tender-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Publiez une annonce ou ouvrez votre boutique gratuitement — en quelques minutes',
-    'hbiz-cta-micro': '⚡ Sans carte bancaire — créez votre compte en 30 secondes',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
