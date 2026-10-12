@@ -347,7 +347,7 @@
   // ════════════════════════════════════════
   //  ② STRIP — بطاقات فيديو عمودية (بديل الموضع الثاني)
   // ════════════════════════════════════════
-  var STRIP_TARGET = 8;
+  var STRIP_TARGET = 7;
 
   /** مسار نسبي حتى يعمل على GitHub Pages (/rizq-platform/) وليس فقط على الجذر */
   function resolvePromoUrl(url) {
@@ -364,7 +364,7 @@
   }
 
   function demoStripAds() {
-    /* 8 بطاقات — 6 ملفات mp4 شغّالة (+ بطاقتان بإعادة استخدام) */
+    /* 7 بطاقات أكبر — 6 ملفات mp4 شغّالة (+ واحدة بإعادة استخدام) */
     return [
       { advertiser: 'محلات رزق', title: 'واجهة محلك', loc: 'نوّاكشوط', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
       { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true },
@@ -372,14 +372,13 @@
       { advertiser: 'رزق', title: 'واجهات المنصة', loc: 'Rizq ADS', url: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'محلات رزق', title: 'متجرك بالفيديو', loc: 'عروض حيّة', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'مكاتب رزق', title: 'مكتب بالفيديو', loc: 'خدمات الأعمال', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true }
+      { advertiser: 'محلات رزق', title: 'متجرك بالفيديو', loc: 'عروض حيّة', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true }
     ].map(function (a) {
       return Object.assign({}, a, { url: resolvePromoUrl(a.url) });
     });
   }
 
-  /** دائماً املأ الشريط إلى 8 بطاقات — لا تترك إعلاناً واحداً من الإعدادات يستبدل كل الأمثلة */
+  /** دائماً املأ الشريط إلى 7 بطاقات — لا تترك إعلاناً واحداً من الإعدادات يستبدل كل الأمثلة */
   function buildStripPlaylist() {
     var live = (stripAds || []).filter(function (a) {
       return a && a.url && isDirectVideo(a.url);
@@ -466,7 +465,7 @@
     var nextBtn = document.getElementById('rizq-vid-strip-next');
     if (!root || !track) return false;
 
-    // دائماً 8 بطاقات ظاهرة: إعلانات حيّة أولاً ثم أمثلة شغّالة تملأ الباقي
+    // دائماً 7 بطاقات ظاهرة أكبر: إعلانات حيّة أولاً ثم أمثلة شغّالة تملأ الباقي
     var ads = buildStripPlaylist();
 
     var isFr = (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0
