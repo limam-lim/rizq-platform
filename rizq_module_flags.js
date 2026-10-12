@@ -13,6 +13,7 @@
     'rizq_office.html': 'office',
     'rizq_showroom.html': 'corp',
     'rizq_showroom_directory.html': 'corp',
+    'rizq_directory.html': 'corp',
     'rizq_corp.html': 'corp',
     'rizq_tenders.html': 'tenders',
     'rizq_investments.html': 'investments',
@@ -62,9 +63,18 @@
     var disc = href.match(/#rzq-disc-(store|corp|office|tenders|investments)\b/);
     if (disc) return disc[1];
     if (href.charAt(0) === '#') return null;
+    var qIdx = href.indexOf('?');
+    var query = qIdx !== -1 ? href.slice(qIdx + 1).split('#')[0] : '';
     var path = href.split('?')[0].split('#')[0];
     var file = path.split('/').pop().toLowerCase();
     if (!file) return null;
+    if (file === 'rizq_directory.html' || file === 'rizq_directory') {
+      try {
+        var tp = new URLSearchParams(query).get('type');
+        if (tp === 'store' || tp === 'office' || tp === 'corp') return tp;
+      } catch (e) {}
+      return 'corp';
+    }
     if (HREF_MODULE[file]) return HREF_MODULE[file];
     if (!/\.html$/.test(file)) return HREF_MODULE[file + '.html'] || null;
     return null;

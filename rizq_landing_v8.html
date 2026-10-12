@@ -4830,6 +4830,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المحلات المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
+      <div class="landing-ads-footer" style="margin-top:18px">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">📂 عرض كل المحلات ←</a>
+      </div>
       <div class="rizq-sub-cta" style="margin-top:24px">
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
         <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
@@ -4906,6 +4909,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
+      <div class="landing-ads-footer" style="margin-top:18px">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">📂 عرض كل المعارض ←</a>
+      </div>
       <div class="rizq-sub-cta" style="margin-top:24px">
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
            class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
@@ -5037,6 +5043,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
+      <div class="landing-ads-footer" style="margin-top:18px">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">📂 عرض كل المكاتب ←</a>
+      </div>
       <div class="rizq-sub-cta" style="margin-top:24px">
         <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
         <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
@@ -7680,7 +7689,7 @@ function buildShowroomModels(reshuffle){
     if(tileItems.length < 3) return; /* لا بطاقة ببلاطات جامدة */
     var href = primary && primary.id
       ? ('rizq_browse.html?id=' + encodeURIComponent(primary.id))
-      : ('rizq_showroom_directory.html?cat=' + encodeURIComponent(meta.dirCat));
+      : ('rizq_directory.html?type=corp&cat=' + encodeURIComponent(meta.dirCat));
     var tiles = '';
     for(var ti=0; ti<3; ti++){
       var adT = tileItems[ti];
@@ -9152,6 +9161,9 @@ const LANG = {
     's-lst-desc': 'فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن',
     'view-all': 'عرض الكل في نافذة ←',
     'browse-full': '📂 عرض كل الإعلانات ←',
+    'browse-stores': '📂 عرض كل المحلات ←',
+    'browse-showrooms': '📂 عرض كل المعارض ←',
+    'browse-offices': '📂 عرض كل المكاتب ←',
     'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'سوق موريتاني يثق به الناس — بيع، تسوّق، وأنمِ عملك بوضوح وطمأنينة',
@@ -9296,6 +9308,9 @@ const LANG = {
     's-lst-desc': 'Des opportunités choisies pour vous — découvrez le meilleur du marché maintenant',
     'view-all': 'Tout voir en fenêtre →',
     'browse-full': '📂 Voir toutes les annonces →',
+    'browse-stores': '📂 Voir toutes les boutiques →',
+    'browse-showrooms': '📂 Voir tous les showrooms →',
+    'browse-offices': '📂 Voir tous les bureaux →',
     'f-fashion': 'Mode',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Un marché mauritanien de confiance — vendez, achetez et développez votre activité en toute sérénité',

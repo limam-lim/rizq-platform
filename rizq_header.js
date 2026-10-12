@@ -686,6 +686,7 @@
     rizq_office: 'offices',
     rizq_showroom: 'showrooms',
     rizq_showroom_directory: 'showrooms',
+    rizq_directory: 'showrooms',
     rizq_corp: 'showrooms',
     rizq_tenders: 'tenders',
     rizq_investments: 'investments',
@@ -753,6 +754,16 @@
     if (isLanding()) {
       if (h && HASH_TO_NAV[h]) return HASH_TO_NAV[h];
       return 'home';
+    }
+    if (k === 'rizq_directory' || k === 'directory') {
+      try {
+        var tp = new URLSearchParams(location.search || '').get('type');
+        if (tp === 'store') return 'stores';
+        if (tp === 'office') return 'offices';
+        return 'showrooms';
+      } catch (e) {
+        return 'showrooms';
+      }
     }
     if (PAGE_TO_NAV[k]) return PAGE_TO_NAV[k];
     if (h && HASH_TO_NAV[h]) return HASH_TO_NAV[h];
