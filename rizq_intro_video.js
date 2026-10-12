@@ -344,6 +344,21 @@
     if (!embedReady) return false;
     injectCSS();
 
+    /* لا تُعد التركيب لنفس الرابط — يمنع حلقة MutationObserver ↔ applyLang في صفحات المعرض */
+    var prevUrl = hostEl.getAttribute('data-rzq-iv-url') || '';
+    var prevTitle = hostEl.getAttribute('data-rzq-iv-title') || '';
+    var nextTitle = String(opts.title || '🎬 فيديو تعريفي');
+    if (
+      !opts.forceRemount &&
+      prevUrl === String(url) &&
+      prevTitle === nextTitle &&
+      hostEl.querySelector('.rzq-iv-wrap')
+    ) {
+      return true;
+    }
+    hostEl.setAttribute('data-rzq-iv-url', String(url));
+    hostEl.setAttribute('data-rzq-iv-title', nextTitle);
+
     var muted = true;
     var uid = 'rzq-iv-' + Math.random().toString(36).slice(2, 9);
     var id = ytId(url);
@@ -469,11 +484,9 @@
       poster.style.background = 'linear-gradient(145deg,#0f1f3d,#1B3A6B)';
     }
 
-    /* MP4 محلي: تشغيل صامت تلقائياً حتى يظهر شرح الداشبورد فوراً */
+    /* MP4 محلي: تشغيل صامت فوري حتى يظهر شرح الداشبورد بلا تأخير */
     if (native && opts.autoplay !== false) {
-      setTimeout(function () {
-        try { loadPlayer(false); } catch (eAuto) {}
-      }, 60);
+      try { loadPlayer(false); } catch (eAuto) {}
     }
 
     return true;
