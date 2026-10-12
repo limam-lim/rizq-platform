@@ -1452,6 +1452,115 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   .hero-vid-cta-link{font-size:11px;padding:8px 14px}
 }
 
+/* ── الموضع الثاني: شريط بطاقات فيديو مباشرة تحت الشاشة الكبيرة ── */
+.rizq-vid-strip{
+  width:100%;max-width:min(780px,78vw);margin:8px auto 0;padding:12px 10px 10px;
+  background:#fff;border:1px solid rgba(13,27,42,.08);border-radius:16px;
+  box-shadow:0 8px 24px rgba(13,27,42,.06);position:relative;z-index:20;
+  box-sizing:border-box;
+}
+/* أزرار الحجز تحت الموضعين */
+.hero-after-promo-inner > .hero-vid-cta-bar{
+  width:100%;max-width:min(780px,78vw);margin:12px auto 0;
+}
+.rizq-vid-strip-head{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:4px;padding:0 4px;
+}
+.rizq-vid-strip-title{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:clamp(13.5px,1.7vw,15.5px);font-weight:800;color:#0D1B2A;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vid-strip-playico{
+  display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;
+  background:#e11d48;color:#fff;font-size:10px;flex-shrink:0;
+}
+.rizq-vid-strip-tier{
+  font-size:10.5px;font-weight:800;color:#1B3A6B;
+  background:#e8eef8;border:1px solid rgba(27,58,107,.16);
+  padding:3px 9px;border-radius:999px;
+}
+.rizq-vid-strip-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rizq-vid-strip-count{font-size:12.5px;font-weight:700;color:#5b6b85}
+.rizq-vid-strip-nav{display:flex;gap:6px}
+.rizq-vid-strip-btn{
+  border:1.5px solid rgba(13,27,42,.2);background:#fff;color:#0D1B2A;
+  border-radius:10px;padding:6px 12px;font:inherit;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:'Cairo','Segoe UI',sans-serif;
+  transition:border-color .2s,background .2s,opacity .2s;
+}
+.rizq-vid-strip-btn:hover:not(:disabled){border-color:#1B3A6B;background:#f7f9fc}
+.rizq-vid-strip-btn:disabled{opacity:.35;cursor:default}
+.rizq-vid-strip-hint{
+  margin:0 4px 10px;font-size:11.5px;font-weight:600;color:#7a879c;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vid-strip-track{
+  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  padding:2px 4px 8px;scrollbar-width:thin;
+}
+.rizq-vid-strip-track::-webkit-scrollbar{height:6px}
+.rizq-vid-strip-track::-webkit-scrollbar-thumb{background:rgba(27,58,107,.25);border-radius:6px}
+.rizq-vcard{
+  flex:0 0 min(152px,42vw);scroll-snap-align:start;min-width:0;
+  display:flex;flex-direction:column;gap:7px;cursor:pointer;
+}
+.rizq-vcard-thumb{
+  position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;
+  background:linear-gradient(160deg,#1B3A6B,#0D1B2A);
+  border:1px solid rgba(13,27,42,.12);
+  box-shadow:0 8px 18px rgba(13,27,42,.12);
+}
+.rizq-vcard-thumb video{
+  width:100%;height:100%;object-fit:cover;display:block;background:#0a1525;
+}
+.rizq-vcard-shade{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,rgba(0,0,0,.08),transparent 40%,rgba(0,0,0,.55));
+  transition:opacity .25s;
+}
+.rizq-vcard.is-playing .rizq-vcard-shade{opacity:.35}
+.rizq-vcard-tag{
+  position:absolute;top:8px;inset-inline-start:8px;z-index:2;
+  font-size:10px;font-weight:800;color:#0f2347;background:#E8C96A;
+  padding:3px 7px;border-radius:8px;font-family:'Cairo',sans-serif;
+}
+.rizq-vcard-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:40px;height:40px;border-radius:50%;border:none;pointer-events:none;
+  background:#e11d48;color:#fff;font-size:14px;
+  display:grid;place-items:center;box-shadow:0 6px 16px rgba(185,28,28,.4);
+  transition:opacity .2s,transform .2s;
+}
+.rizq-vcard.is-playing .rizq-vcard-play{opacity:0;transform:translate(-50%,-50%) scale(.8)}
+.rizq-vcard-cap{
+  position:absolute;inset-inline:8px;bottom:10px;z-index:2;color:#fff;
+  font-size:12px;font-weight:800;line-height:1.3;pointer-events:none;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);font-family:'Cairo',sans-serif;
+}
+.rizq-vcard-name{
+  font-size:13px;font-weight:800;color:#0D1B2A;line-height:1.3;padding-inline:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vcard-sub{
+  font-size:11.5px;font-weight:600;color:#5b6b85;padding-inline:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+@media(max-width:699px){
+  .rizq-vid-strip,
+  .hero-after-promo-inner > .hero-vid-cta-bar{
+    max-width:100%;width:100%;
+  }
+  .rizq-vid-strip{margin:6px auto 0;padding:10px 8px 8px;border-radius:14px}
+  .rizq-vid-strip-hint{display:none}
+  .rizq-vcard{flex-basis:min(138px,46vw)}
+  .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
+}
+
 /* ── SEARCH BAR (Amazon style) ── */
 .hero-search{max-width:780px;margin:0 auto 18px;position:relative;animation:fadeUp .8s .3s ease both;z-index:60;isolation:isolate}
 .search-bar{display:flex;align-items:center;background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(15,35,65,.14),0 0 0 1px rgba(201,168,76,.3);position:relative;z-index:2}
@@ -4501,14 +4610,35 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           </div>
           <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
-        <div class="hero-vid-cta-bar">
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
-          <span class="hero-vid-cta-sep">·</span>
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
-        </div>
       </div>
 
-      <!-- إحصائيات المنصة — مباشرة تحت إعلان الفيديو -->
+      <!-- الموضع الثاني فضي — مباشرة تحت الشاشة الكبيرة (ذهبي) -->
+      <section class="rizq-vid-strip" id="rizq-vid-strip" aria-label="إعلانات الفيديو — الموضع الثاني" data-rizq-ads-strip="1">
+        <div class="rizq-vid-strip-head">
+          <div class="rizq-vid-strip-title">
+            <span class="rizq-vid-strip-playico" aria-hidden="true">▶</span>
+            <span data-t="vstrip-title">اكتشف العروض الجديدة بالفيديو</span>
+            <span class="rizq-vid-strip-tier" data-t="vstrip-tier">فضي</span>
+          </div>
+          <div class="rizq-vid-strip-tools">
+            <span class="rizq-vid-strip-count" id="rizq-vid-strip-count" aria-live="polite"></span>
+            <div class="rizq-vid-strip-nav">
+              <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-prev" disabled aria-label="السابق">السابق</button>
+              <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-next" aria-label="التالي">التالي</button>
+            </div>
+          </div>
+        </div>
+        <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل · الزائر يختار</p>
+        <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
+      </section>
+
+      <div class="hero-vid-cta-bar">
+        <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
+        <span class="hero-vid-cta-sep">·</span>
+        <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
+      </div>
+
+      <!-- إحصائيات المنصة -->
       <div class="hero-stats-bar fade-in" id="platform-stats" aria-label="إحصائيات المنصة">
         <div class="h-stat h-stat-ads" data-stat="ads">
           <span class="h-stat-num" data-live="adsActive" data-target="0">0</span>
@@ -8972,6 +9102,9 @@ const LANG = {
     'hbiz-tender-badge': 'جديد',
     'hbiz-new': 'جديد',
     'hbiz-cta': 'ثم ابدأ مجاناً — انشر إعلانك أو افتح محلك خلال دقائق',
+    'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
+    'vstrip-tier': 'فضي',
+    'vstrip-hint': 'مرّر الماوس للتشغيل · الزائر يختار',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -9113,6 +9246,9 @@ const LANG = {
     'hbiz-tender-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Puis commencez gratuitement — publiez une annonce ou ouvrez votre boutique en quelques minutes',
+    'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
+    'vstrip-tier': 'Argent',
+    'vstrip-hint': 'Survolez pour lire · le visiteur choisit',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -13919,7 +14055,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo7"></script>
+<script src="rizq_video_ads.js?v=promo8"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
