@@ -27,17 +27,12 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#F7F9FC;color:#26303F;min-height:100vh}
 
-.topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
-.topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
-.rizq-promo-mark{width:38px;height:38px;background:#071020;border:2px solid rgba(201,168,76,.75);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
-.logo-ar{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:var(--gold);line-height:1;display:block;text-shadow:0 0 16px rgba(201,168,76,.4)}
-.logo-sub{font-size:8.5px;color:rgba(201,168,76,.65);letter-spacing:2.2px;text-transform:uppercase;font-style:italic;margin-top:2px;white-space:nowrap}
-.nav-home-link{padding:8px 16px;border-radius:9px;color:var(--text);font-size:13px;text-decoration:none;border:1px solid rgba(201,168,76,.3);transition:all .2s}
-.nav-home-link:hover{background:rgba(201,168,76,.1);color:var(--gold)}
-.nav-right{display:flex;align-items:center;gap:10px}
+/* الهيدر الموحّد يُحقن عبر rizq_header.js — أخفِ الشريط المحلي لتفادي هبوط الصفحة */
+.topnav{display:none!important}
+html.rizq-app-nav.has-rizq-desk-nav .dir-hero,
+html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:28px}
 
-.dir-hero{padding:44px 5% 30px;text-align:center;background:linear-gradient(135deg,#101d33,#1B3A6B 65%,#0d1b2a)}
+.dir-hero{padding:36px 5% 28px;text-align:center;background:linear-gradient(135deg,#101d33,#1B3A6B 65%,#0d1b2a)}
 .dir-hero h1{font-family:Georgia,'Amiri',serif;color:#fff;font-size:clamp(22px,3.6vw,32px);font-weight:700;margin-bottom:10px}
 .dir-hero h1 span{color:var(--gold)}
 .dir-hero p{color:rgba(255,255,255,.75);font-size:13.5px;max-width:560px;margin:0 auto}
@@ -180,7 +175,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#F7F9FC;c
 <script src="rizq_site_banner.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_merchant_activities.js?v=2"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_lang_guard.js?v=1.0"></script>
@@ -250,19 +245,35 @@ var WILAYA_FR = {
   'تيجيكجة':'Tidjikja','ألاك':'Aleg','نعمة':'Néma'
 };
 
-function _dirCatLabel(cat, fr){
-  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.legacyCategoryLabel === 'function'){
-    return RizqMerchantActivities.legacyCategoryLabel(cat, fr ? 'fr' : 'ar');
+function _dirSectorLabel(sectorId, fr){
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.directorySectorLabel === 'function'){
+    return RizqMerchantActivities.directorySectorLabel(sectorId, _type, fr ? 'fr' : 'ar');
   }
-  var lab = CAT_LABELS[cat];
-  return lab ? (fr ? lab.fr : lab.ar) : cat;
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.legacyCategoryLabel === 'function'){
+    return RizqMerchantActivities.legacyCategoryLabel(sectorId, fr ? 'fr' : 'ar');
+  }
+  var lab = CAT_LABELS[sectorId];
+  return lab ? (fr ? lab.fr : lab.ar) : sectorId;
 }
 
-function _dirCatOrder(){
-  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.listDirectoryFilterCategories === 'function'){
-    return RizqMerchantActivities.listDirectoryFilterCategories();
+function _dirSectors(){
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.listDirectorySectors === 'function'){
+    return RizqMerchantActivities.listDirectorySectors(_type, _rizqLang());
   }
-  return ['سيارات','إلكترونيات','أثاث','معدات','بناء','ذهب'];
+  // احتياطي قديم إن لم يُحمَّل الكتالوج
+  return [
+    {id:'automotive', name:'🚗 سيارات ومركبات'},
+    {id:'agriculture', name:'🐄 ماشية وزراعة'},
+    {id:'pro_retail', name:'🧰 مهن متخصصة بالتجزئة'},
+    {id:'electronics', name:'📱 إلكترونيات وتقنية'},
+    {id:'home', name:'🛋️ أثاث وديكور منزلي'},
+    {id:'construction', name:'🏗️ بناء ومواد'},
+    {id:'jewelry', name:'💎 ذهب ومجوهرات'},
+  ];
+}
+
+function _dirCatLabel(cat, fr){
+  return _dirSectorLabel(cat, fr);
 }
 
 var _params = new URLSearchParams(location.search);
@@ -277,11 +288,11 @@ function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'
 function _backendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
 
 function _setCatFilterFromParam(){
-  if(_type === 'office'){
-    _catFilter = _catRaw ? String(_catRaw) : '';
+  if(window.RizqMerchantActivities && typeof RizqMerchantActivities.normalizeDirectoryFilter === 'function'){
+    _catFilter = RizqMerchantActivities.normalizeDirectoryFilter(_catRaw, _type);
     return;
   }
-  _catFilter = _dirCatOrder().indexOf(_catRaw) !== -1 ? _catRaw : '';
+  _catFilter = _catRaw ? String(_catRaw) : '';
 }
 
 function typeHref(type, cat){
@@ -302,33 +313,13 @@ function renderTypeTabs(){
 function renderCatChips(){
   var fr = _rizqLang()==='fr';
   var wrap = document.getElementById('dir-cats');
-  if(_type === 'office'){
-    var acts = {};
-    _accounts.filter(function(a){ return a.type==='office'; }).forEach(function(a){
-      var act = (a.activity || '').trim();
-      if(act) acts[act] = true;
-    });
-    var keys = Object.keys(acts).sort();
-    var allChip = '<button type="button" class="dir-cat-chip'+(_catFilter===''?' active':'')+'" data-cat="">'+(fr?'📋 Tous':'📋 الكل')+'</button>';
-    wrap.innerHTML = allChip + keys.map(function(c){
-      return '<button type="button" class="dir-cat-chip'+(_catFilter===c?' active':'')+'" data-cat="'+escapeHtml(c)+'">'+escapeHtml(c)+'</button>';
-    }).join('');
-  } else {
-    var order = _dirCatOrder();
-    var allChip2 = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="'+typeHref(_type)+'">'+(fr?'📋 Toutes':'📋 الكل')+'</a>';
-    wrap.innerHTML = allChip2 + order.map(function(c){
-      return '<a class="dir-cat-chip'+(_catFilter===c?' active':'')+'" href="'+typeHref(_type,c)+'">'+escapeHtml(_dirCatLabel(c, fr))+'</a>';
-    }).join('');
-  }
-  wrap.querySelectorAll('[data-cat]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      _catFilter = btn.getAttribute('data-cat') || '';
-      var url = typeHref(_type, _catFilter || null);
-      history.replaceState(null, '', url);
-      renderCatChips();
-      renderDirectory();
-    });
-  });
+  var sectors = _dirSectors();
+  var allChip = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="'+typeHref(_type)+'">'+(fr?'📋 Tous':'📋 الكل')+'</a>';
+  wrap.innerHTML = allChip + sectors.map(function(s){
+    var id = s.id;
+    var label = s.name || s.label || _dirSectorLabel(id, fr);
+    return '<a class="dir-cat-chip'+(_catFilter===id?' active':'')+'" href="'+typeHref(_type,id)+'">'+escapeHtml(label)+'</a>';
+  }).join('');
 }
 
 function renderHero(){
@@ -364,17 +355,19 @@ function renderDirectory(){
   var wilaya = (document.getElementById('dir-wilaya').value || '').trim();
   var list = _accounts.filter(function(a){
     if(a.type !== _type) return false;
-    if(_type === 'office'){
-      if(_catFilter && String(a.activity||'') !== _catFilter) return false;
-    } else if(_catFilter && a.category !== _catFilter){
-      return false;
+    if(_catFilter){
+      if(window.RizqMerchantActivities && typeof RizqMerchantActivities.accountMatchesDirectoryFilter === 'function'){
+        if(!RizqMerchantActivities.accountMatchesDirectoryFilter(a, _catFilter)) return false;
+      } else if(a.category !== _catFilter && String(a.activity||'') !== _catFilter){
+        return false;
+      }
     }
     if(wilaya){
       var city = _cityOf(a);
       if(city.indexOf(wilaya) === -1 && wilaya.indexOf(city) === -1) return false;
     }
     if(q){
-      var hay = [a.name, a.activity, a.tagline, a.category, _cityOf(a)].join(' ').toLowerCase();
+      var hay = [a.name, a.activity, a.tagline, a.category, a.activityId, _cityOf(a)].join(' ').toLowerCase();
       if(hay.indexOf(q) === -1) return false;
     }
     return true;
@@ -407,7 +400,9 @@ function renderDirectory(){
       + (_badges.premium?'<span class="dir-badge dir-badge-premium">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
     var typeLine = m.icon + ' ' + (fr ? m.fr : m.ar);
     if(a.activity) typeLine += ' · ' + escapeHtml(a.activity);
-    else if(a.category) typeLine += ' · ' + escapeHtml(_dirCatLabel(a.category, fr));
+    else if(a.activityId && window.RizqMerchantActivities && typeof RizqMerchantActivities.displayName === 'function'){
+      typeLine += ' · ' + escapeHtml(RizqMerchantActivities.displayName(a.activityId, fr ? 'fr' : 'ar'));
+    } else if(a.category) typeLine += ' · ' + escapeHtml(_dirCatLabel(a.category, fr));
     var city = _cityOf(a);
     return '<a class="dir-card" href="'+m.page+'?id='+encodeURIComponent(a.id)+'">'
       + '<div class="dir-card-top"><div class="dir-thumb">'+thumb+'</div><div>'

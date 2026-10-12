@@ -431,6 +431,126 @@
     return out;
   }
 
+  /** أيقونات عرض لفلاتر الدليل حسب القطاع */
+  var SECTOR_DIR_ICONS = {
+    automotive: '🚗', electronics: '📱', home: '🛋️', construction: '🏗️',
+    jewelry: '💎', fashion: '👗', food: '🛒', equipment: '⚙️',
+    agriculture: '🐄', realty_retail: '🏠', pro_retail: '🧰', services_retail: '🏷️',
+    legal: '⚖️', admin: '🏛️', consular: '🛂', insurance: '🛡️',
+    engineering: '🔧', realestate: '🏠', consulting: '💡', health: '🩺',
+    education: '🎓', media: '🎬', travel: '🌍', it: '💻', general_office: '🛎️',
+    showroom: '🏬', industrial: '🏭', hospitality: '🏨', logistics: '🚚',
+    enterprise_services: '💼', import_export: '🌐',
+  };
+
+  /** تحويل فئة قديمة (عربية) إلى sectorId حسب نوع الحساب */
+  function sectorIdFromLegacyCategory(cat, accountType) {
+    var t = normType(accountType);
+    var mapStore = {
+      'سيارات': 'automotive',
+      'إلكترونيات': 'electronics',
+      'أثاث': 'home',
+      'بناء': 'construction',
+      'ذهب': 'jewelry',
+      'أزياء': 'fashion',
+      'أغذية': 'food',
+      'معدات': 'equipment',
+      'زراعة': 'agriculture',
+      'عقارات': 'realty_retail',
+      'مهن': 'pro_retail',
+      'خدمات': 'services_retail',
+    };
+    var mapCorp = {
+      'سيارات': 'showroom',
+      'إلكترونيات': 'showroom',
+      'أثاث': 'showroom',
+      'ذهب': 'showroom',
+      'بناء': 'showroom',
+      'معدات': 'industrial',
+      'عقارات': 'realestate',
+      'خدمات': 'enterprise_services',
+    };
+    if (t === 'corp') return mapCorp[cat] || null;
+    if (t === 'store') return mapStore[cat] || null;
+    return null;
+  }
+
+  /** فلاتر الدليل = قطاعات الاختصاص لنوع الحساب (محلات / معارض / مكاتب) */
+  function listDirectorySectors(accountType, lang) {
+    var t = normType(accountType);
+    return (SECTORS[t] || []).map(function (s) {
+      var icon = SECTOR_DIR_ICONS[s.id] || '🏷️';
+      var name = sectorLabel(s, lang);
+      return {
+        id: s.id,
+        name: icon + ' ' + name,
+        nameAr: icon + ' ' + s.nameAr,
+        nameFr: icon + ' ' + s.nameFr,
+        label: icon + ' ' + name,
+      };
+    });
+  }
+
+  function normalizeDirectoryFilter(raw, accountType) {
+    if (!raw) return '';
+    var t = normType(accountType);
+    var sectors = SECTORS[t] || [];
+    if (sectors.some(function (s) { return s.id === raw; })) return raw;
+    var fromLegacy = sectorIdFromLegacyCategory(raw, t);
+    if (fromLegacy) return fromLegacy;
+    var byAct = ACTIVITIES.find(function (a) {
+      return a.accountTypes.indexOf(t) !== -1
+        && (a.id === raw || a.nameAr === raw || a.nameFr === raw);
+    });
+    if (byAct) return byAct.sectorId;
+    return '';
+  }
+
+  function resolveAccountSectorId(acc) {
+    if (!acc) return null;
+    var t = normType(acc.type);
+    if (acc.activityId) {
+      var byId = findById(acc.activityId);
+      if (byId) return byId.sectorId;
+    }
+    var actName = String(acc.activity || '').trim();
+    if (actName) {
+      var byName = ACTIVITIES.find(function (a) {
+        return a.accountTypes.indexOf(t) !== -1
+          && (a.nameAr === actName || a.nameFr === actName);
+      });
+      if (byName) return byName.sectorId;
+    }
+    if (acc.category) {
+      return sectorIdFromLegacyCategory(acc.category, t);
+    }
+    return null;
+  }
+
+  function accountMatchesDirectoryFilter(acc, filterId) {
+    if (!filterId) return true;
+    if (!acc) return false;
+    var sectorId = normalizeDirectoryFilter(filterId, acc.type) || filterId;
+    var accSector = resolveAccountSectorId(acc);
+    if (accSector && accSector === sectorId) return true;
+    if (acc.category && (acc.category === filterId
+      || sectorIdFromLegacyCategory(acc.category, acc.type) === sectorId)) {
+      return true;
+    }
+    return false;
+  }
+
+  function directorySectorLabel(sectorId, accountType, lang) {
+    var t = normType(accountType);
+    var sectors = SECTORS[t] || [];
+    var s = sectors.find(function (x) { return x.id === sectorId; });
+    if (!s) {
+      return legacyCategoryLabel(sectorId, lang);
+    }
+    var icon = SECTOR_DIR_ICONS[s.id] || '🏷️';
+    return icon + ' ' + sectorLabel(s, lang);
+  }
+
   function legacyCategoryLabel(cat, lang) {
     var l = LEGACY_DIR_LABELS[cat];
     if (!l) {
@@ -533,6 +653,12 @@
     inventoryPresetForActivity: inventoryPresetForActivity,
     legacyCategoryLabel: legacyCategoryLabel,
     listDirectoryFilterCategories: listDirectoryFilterCategories,
+    listDirectorySectors: listDirectorySectors,
+    normalizeDirectoryFilter: normalizeDirectoryFilter,
+    resolveAccountSectorId: resolveAccountSectorId,
+    accountMatchesDirectoryFilter: accountMatchesDirectoryFilter,
+    directorySectorLabel: directorySectorLabel,
+    sectorIdFromLegacyCategory: sectorIdFromLegacyCategory,
     LEGACY_DIR_LABELS: LEGACY_DIR_LABELS,
     displayName: displayName,
     renderSelect: renderSelect,
