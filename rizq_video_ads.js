@@ -348,12 +348,16 @@
   //  ② STRIP — بطاقات فيديو عمودية (بديل الموضع الثاني)
   // ════════════════════════════════════════
   function demoStripAds() {
+    /* 8 بطاقات بنفس القياس — 6 ملفات فيديو شغّالة على الأقل (+ إعادة استخدام) */
     return [
       { advertiser: 'محلات رزق', title: 'واجهة محلك', loc: 'نوّاكشوط', url: '/rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
       { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: '/rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true },
       { advertiser: 'معارض رزق', title: 'معرضك الافتراضي', loc: 'كل الولايات', url: '/rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'واجهات المنصة', loc: 'Rizq ADS', url: '/rizq-assets/promo/rizq-public-interfaces-promo-light.mp4', active: true, demo: true },
-      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: '/rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true }
+      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: '/rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true },
+      { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: '/rizq-assets/promo/rizq-modules-promo-demo-light.mp4', active: true, demo: true },
+      { advertiser: 'محلات رزق', title: 'متجرك بالفيديو', loc: 'عروض حيّة', url: '/rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
+      { advertiser: 'مكاتب رزق', title: 'مكتب بالفيديو', loc: 'خدمات الأعمال', url: '/rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true }
     ];
   }
 

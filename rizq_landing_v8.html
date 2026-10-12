@@ -1453,18 +1453,24 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   .hero-vid-cta-link{font-size:11px;padding:8px 14px}
 }
 
-/* ── الموضع الثاني: شريط بطاقات فيديو مباشرة تحت الشاشة الكبيرة ── */
+/* ── الموضع الثاني: شريط بطاقات بعرض شبكة «أبرز العروض» (1200px) ── */
 .rizq-vid-strip{
-  width:100%;
-  max-width:min(780px,78vw)!important; /* يتغلّب على section{max-width:100%!important} */
+  width:min(1200px,calc(100vw - 32px))!important;
+  max-width:min(1200px,calc(100vw - 32px))!important;
   margin:0 auto;padding:8px 0 4px;
   background:transparent;border:none;border-radius:0;
   box-shadow:none;position:relative;z-index:20;
   box-sizing:border-box;align-self:center;
 }
+/* يخرج من عرض الأب 960px ليحاذي إعلانات listings */
+.hero-after-promo-inner > .rizq-vid-strip{
+  left:50%;transform:translateX(-50%);
+  width:min(1200px,calc(100vw - 32px))!important;
+  max-width:min(1200px,calc(100vw - 32px))!important;
+}
 /* لصق الشريط تحت الشاشة الكبيرة (يعوّض gap الأب) */
 .hero-after-promo-inner > #hero-vid-wrap + .rizq-vid-strip{margin-top:-14px}
-/* أزرار الحجز تحت الموضعين */
+/* أزرار الحجز تبقى بعرض الشاشة الذهبية */
 .hero-after-promo-inner > .hero-vid-cta-bar{
   width:100%;max-width:min(780px,78vw)!important;margin:4px auto 0;align-self:center;
 }
@@ -1594,8 +1600,9 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 @media(max-width:699px){
   .rizq-vid-strip,
+  .hero-after-promo-inner > .rizq-vid-strip,
   .hero-after-promo-inner > .hero-vid-cta-bar{
-    max-width:100%;width:100%;
+    width:100%!important;max-width:100%!important;left:auto;transform:none;
   }
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
@@ -14097,7 +14104,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo9"></script>
+<script src="rizq_video_ads.js?v=promo10"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
