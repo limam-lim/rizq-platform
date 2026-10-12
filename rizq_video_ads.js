@@ -32,6 +32,7 @@
   var popupAds = [];
   var stripAds = [];
   var _stripPlaying = null;
+  var _stripLightbox = null;
 
   function _loadLocalVideoAdsConfig() {
     try { return JSON.parse(localStorage.getItem('rizq_video_ads') || '{}'); }
@@ -425,6 +426,10 @@
 
   function stopStripVideo(card) {
     if (!card) return;
+    // لا توقف البطاقة أثناء نافذة التكبير
+    if (_stripLightbox && _stripLightbox.getAttribute('data-card-id') === card.getAttribute('data-strip-id')) {
+      return;
+    }
     var v = card.querySelector('video');
     if (v) {
       try { v.pause(); v.currentTime = 0; } catch (e) { /* ignore */ }
@@ -432,6 +437,104 @@
     card.classList.remove('is-playing');
     if (_stripPlaying === card) _stripPlaying = null;
     syncStripActionUi(card);
+  }
+
+  function closeStripLightbox() {
+    if (!_stripLightbox) return;
+    var vid = _stripLightbox.querySelector('video');
+    if (vid) {
+      try { vid.pause(); } catch (e) { /* ignore */ }
+    }
+    var cardId = _stripLightbox.getAttribute('data-card-id');
+    _stripLightbox.classList.remove('is-open');
+    _stripLightbox.setAttribute('aria-hidden', 'true');
+    _stripLightbox.removeAttribute('data-card-id');
+    document.body.classList.remove('rizq-vstrip-lb-on');
+    if (cardId) {
+      var card = document.querySelector('.rizq-vcard[data-strip-id="' + cardId + '"]');
+      if (card) stopStripVideo(card);
+    }
+  }
+
+  function openStripLightbox(card, ad, isFr) {
+    if (!card) return;
+    var srcVideo = card.querySelector('video');
+    if (!srcVideo || !srcVideo.currentSrc && !srcVideo.src) return;
+
+    if (!_stripLightbox) {
+      _stripLightbox = document.createElement('div');
+      _stripLightbox.id = 'rizq-vstrip-lightbox';
+      _stripLightbox.className = 'rizq-vstrip-lb';
+      _stripLightbox.setAttribute('role', 'dialog');
+      _stripLightbox.setAttribute('aria-modal', 'true');
+      _stripLightbox.innerHTML =
+        '<div class="rizq-vstrip-lb-panel">' +
+          '<button type="button" class="rizq-vstrip-lb-close" data-lb="close" aria-label="إغلاق">×</button>' +
+          '<video playsinline controls></video>' +
+          '<div class="rizq-vstrip-lb-cap" data-lb="cap"></div>' +
+          '<div class="rizq-vstrip-lb-tools">' +
+            '<button type="button" data-lb="mute" aria-label="صوت">🔇</button>' +
+            '<button type="button" data-lb="fs" aria-label="شاشة كاملة">⛶</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(_stripLightbox);
+      _stripLightbox.addEventListener('click', function (ev) {
+        if (ev.target === _stripLightbox) closeStripLightbox();
+      });
+      _stripLightbox.querySelector('[data-lb="close"]').addEventListener('click', function (ev) {
+        ev.preventDefault();
+        closeStripLightbox();
+      });
+      _stripLightbox.querySelector('[data-lb="mute"]').addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var v = _stripLightbox.querySelector('video');
+        if (!v) return;
+        v.muted = !v.muted;
+        ev.currentTarget.textContent = v.muted ? '🔇' : '🔊';
+      });
+      _stripLightbox.querySelector('[data-lb="fs"]').addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var panel = _stripLightbox.querySelector('.rizq-vstrip-lb-panel');
+        var v = _stripLightbox.querySelector('video');
+        var el = panel || v;
+        if (!el) return;
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          } else if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          else if (v && v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+        } catch (eFs) { /* ignore */ }
+      });
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && _stripLightbox && _stripLightbox.classList.contains('is-open')) {
+          closeStripLightbox();
+        }
+      });
+    }
+
+    var title = (ad && (ad.title || ad.advertiser)) || (isFr ? 'Offre Rizq' : 'عرض رزق');
+    var v = _stripLightbox.querySelector('video');
+    var cap = _stripLightbox.querySelector('[data-lb="cap"]');
+    var muteBtn = _stripLightbox.querySelector('[data-lb="mute"]');
+    var cardId = card.getAttribute('data-strip-id') || ('c' + Date.now());
+    card.setAttribute('data-strip-id', cardId);
+    _stripLightbox.setAttribute('data-card-id', cardId);
+    _stripLightbox.setAttribute('aria-label', isFr ? 'Agrandir la vidéo' : 'تكبير الفيديو');
+    if (cap) cap.textContent = title;
+    v.src = srcVideo.currentSrc || srcVideo.src;
+    v.muted = false;
+    v.loop = true;
+    v.currentTime = srcVideo.currentTime || 0;
+    if (muteBtn) muteBtn.textContent = '🔊';
+    _stripLightbox.classList.add('is-open');
+    _stripLightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('rizq-vstrip-lb-on');
+    playStripVideo(card);
+    var p = v.play();
+    if (p && typeof p.then === 'function') p.catch(function () { v.muted = true; v.play().catch(function () {}); });
+    if (ad && ad.accountId) trackEvent(ad.accountId, 'click');
   }
 
   function playStripVideo(card) {
@@ -491,10 +594,11 @@
     }
 
     track.innerHTML = '';
-    ads.forEach(function (ad) {
+    ads.forEach(function (ad, adIdx) {
       var card = document.createElement('article');
       card.className = 'rizq-vcard';
       card.tabIndex = 0;
+      card.setAttribute('data-strip-id', 'strip-' + adIdx);
       var title = ad.title || ad.advertiser || (isFr ? 'Offre Rizq' : 'عرض رزق');
       var sub = [ad.loc, ad.advertiser].filter(Boolean).join(' · ');
       card.innerHTML =
@@ -510,7 +614,7 @@
             '<button type="button" class="rizq-vcard-act" data-act="mute" aria-label="' + esc(lblMute) + '">' +
               '<span class="rizq-vcard-act-ico">🔇</span><span class="rizq-vcard-act-lbl">' + esc(lblMute) + '</span>' +
             '</button>' +
-            '<button type="button" class="rizq-vcard-act" data-act="fs" aria-label="' + esc(lblFs) + '">' +
+            '<button type="button" class="rizq-vcard-act rizq-vcard-act--fs" data-act="fs" aria-label="' + esc(lblFs) + '" title="' + esc(lblFs) + '">' +
               '<span class="rizq-vcard-act-ico">⛶</span><span class="rizq-vcard-act-lbl">' + esc(lblFs) + '</span>' +
             '</button>' +
             '<a class="rizq-vcard-act rizq-vcard-act--contact" data-act="contact" href="' + esc(contactHref(ad)) + '"' +
@@ -549,9 +653,13 @@
         }
       }
 
-      // سطح المكتب: hover = تشغيل صامت | مغادرة = توقف
+      // سطح المكتب: hover = تشغيل صامت | مغادرة = توقف (إلا أثناء التكبير)
       card.addEventListener('mouseenter', function () { playStripVideo(card); syncActionUi(); });
-      card.addEventListener('mouseleave', function () { stopStripVideo(card); syncActionUi(); });
+      card.addEventListener('mouseleave', function () {
+        if (_stripLightbox && _stripLightbox.classList.contains('is-open')) return;
+        stopStripVideo(card);
+        syncActionUi();
+      });
 
       if (btnPlay) {
         btnPlay.addEventListener('click', function (ev) {
@@ -578,17 +686,7 @@
       if (btnFs) {
         btnFs.addEventListener('click', function (ev) {
           ev.preventDefault(); ev.stopPropagation();
-          if (!video) return;
-          if (!card.classList.contains('is-playing')) playStripVideo(card);
-          try {
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-              if (document.exitFullscreen) document.exitFullscreen();
-              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            } else if (video.requestFullscreen) video.requestFullscreen();
-            else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
-            else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-          } catch (eFs) { /* ignore */ }
-          if (ad.accountId) trackEvent(ad.accountId, 'click');
+          openStripLightbox(card, ad, isFr);
         });
       }
       if (btnContact) {
