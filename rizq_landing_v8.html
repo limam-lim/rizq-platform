@@ -3092,6 +3092,36 @@ main, .page-content.active, .main-content, .results-area,
 .rizq-sub-cta{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:420px;margin:0 auto}
 .rizq-sub-cta .btn-primary{box-shadow:0 10px 28px rgba(201,168,76,.38)}
 .rizq-sub-cta-sub{margin:0;font-size:13.5px;font-weight:700;color:var(--royal,#1B3A6B);line-height:1.55;opacity:.92}
+/* زرّا التصفّح + امتلك واجهتك على نفس الخط */
+.rizq-dual-cta{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:stretch;
+  max-width:780px;margin:18px auto 0;padding:0 8px;box-sizing:border-box;
+}
+.rizq-dual-cta .landing-ads-browse-full,
+.rizq-dual-cta .rizq-dual-cta-own{
+  flex:1 1 260px;max-width:360px;min-width:min(100%,240px);
+  margin:0;text-align:center;box-sizing:border-box;
+  padding:14px 22px;border-radius:12px;font-size:14px;font-weight:800;
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  white-space:normal;line-height:1.35;
+}
+.rizq-dual-cta .rizq-dual-cta-own{
+  color:#0f2347!important;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border:1px solid rgba(201,168,76,.55);
+  box-shadow:0 8px 22px rgba(201,168,76,.32);
+  transition:transform .2s,box-shadow .2s;
+}
+.rizq-dual-cta .rizq-dual-cta-own:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(201,168,76,.4);
+  color:#0f2347!important;
+}
+.rizq-dual-cta + .rizq-sub-cta-sub{margin-top:12px;text-align:center}
+@media(max-width:560px){
+  .rizq-dual-cta .landing-ads-browse-full,
+  .rizq-dual-cta .rizq-dual-cta-own{flex:1 1 100%;max-width:100%}
+}
 .cat-card,.listing-card,.ad-card,.product-card,.price-card{
   border:1px solid rgba(226,232,240,0.8);
   box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
@@ -4830,13 +4860,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المحلات المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
-      <div class="landing-ads-footer" style="margin-top:18px">
+      <div class="rizq-dual-cta">
         <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">📂 عرض كل المحلات ←</a>
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="rizq-dual-cta-own" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
       </div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
-        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
-        <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
-      </div>
+      <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
     </div>
   </div>
 </section>
@@ -4909,14 +4937,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
-      <div class="landing-ads-footer" style="margin-top:18px">
+      <div class="rizq-dual-cta">
         <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">📂 عرض كل المعارض ←</a>
-      </div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
-           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
-        <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
+           class="rizq-dual-cta-own" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
       </div>
+      <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
     </div>
 
   </div>
@@ -5043,13 +5069,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
-      <div class="landing-ads-footer" style="margin-top:18px">
+      <div class="rizq-dual-cta">
         <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">📂 عرض كل المكاتب ←</a>
+        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="rizq-dual-cta-own" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
       </div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
-        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
-        <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
-      </div>
+      <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
     </div>
 
   </div>
