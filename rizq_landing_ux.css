@@ -778,18 +778,20 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
     var(--bg-section,#ffffff)!important;
 }
 #about .section-header{
-  margin-bottom:36px!important;
+  margin-bottom:16px!important;
 }
+/* تناسب البطاقة الثابتة 86px — وسم + عنوان + وصف بلا قصّ */
 #about .section-tag{
   color:var(--gold,#C9A84C)!important;
-  letter-spacing:2px;
+  letter-spacing:1.2px;
   font-weight:800!important;
-  font-size:12px!important;
+  font-size:9px!important;
+  margin:0 0 2px!important;
 }
 #about .section-title{
-  font-size:clamp(26px,4vw,40px)!important;
-  line-height:1.25!important;
-  margin-bottom:12px!important;
+  font-size:clamp(12px,1.5vw,15px)!important;
+  line-height:1.2!important;
+  margin:0 0 2px!important;
 }
 #about .section-title span{
   background:linear-gradient(90deg,#C9A84C,#e8c96a,#C9A84C);
@@ -798,12 +800,14 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
   -webkit-text-fill-color:transparent;
 }
 #about .section-desc{
-  max-width:560px;
+  max-width:440px;
   margin-left:auto;
   margin-right:auto;
   color:var(--text-on-navy-muted,rgba(255,255,255,.88))!important;
-  font-size:15px!important;
-  line-height:1.75!important;
+  font-size:11px!important;
+  line-height:1.3!important;
+  margin-top:0!important;
+  margin-bottom:0!important;
 }
 #about .why-grid{
   gap:12px!important;
