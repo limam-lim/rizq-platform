@@ -1454,14 +1454,18 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 
 /* ── الموضع الثاني: شريط بطاقات فيديو مباشرة تحت الشاشة الكبيرة ── */
 .rizq-vid-strip{
-  width:100%;max-width:min(780px,78vw);margin:8px auto 0;padding:12px 10px 10px;
+  width:100%;
+  max-width:min(780px,78vw)!important; /* يتغلّب على section{max-width:100%!important} */
+  margin:0 auto;padding:12px 10px 10px;
   background:#fff;border:1px solid rgba(13,27,42,.08);border-radius:16px;
   box-shadow:0 8px 24px rgba(13,27,42,.06);position:relative;z-index:20;
-  box-sizing:border-box;
+  box-sizing:border-box;align-self:center;
 }
+/* لصق الشريط تحت الشاشة الكبيرة (يعوّض gap الأب) */
+.hero-after-promo-inner > #hero-vid-wrap + .rizq-vid-strip{margin-top:-14px}
 /* أزرار الحجز تحت الموضعين */
 .hero-after-promo-inner > .hero-vid-cta-bar{
-  width:100%;max-width:min(780px,78vw);margin:12px auto 0;
+  width:100%;max-width:min(780px,78vw)!important;margin:4px auto 0;align-self:center;
 }
 .rizq-vid-strip-head{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
