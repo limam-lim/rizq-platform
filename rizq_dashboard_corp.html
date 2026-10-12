@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>(function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();</script>
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -281,6 +283,21 @@ textarea.form-input{min-height:80px;resize:vertical}
 .disc-close-btn{display:inline-block;margin-top:12px;padding:9px 24px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;color:#C9A84C;font-size:13px;cursor:pointer;font-weight:700;transition:background .2s}
 .disc-close-btn:hover{background:rgba(201,168,76,.28)}
 
+
+/* وضع التضمين داخل الفيديو التعريفي */
+html.rizq-dash-embed body{overflow:hidden!important}
+html.rizq-dash-embed .sidebar,
+html.rizq-dash-embed #sidebar,
+html.rizq-dash-embed .mobile-bar,
+html.rizq-dash-embed #mobile-bar,
+html.rizq-dash-embed .sb-overlay,
+html.rizq-dash-embed #sb-overlay,
+html.rizq-dash-embed #rizq-app-header,
+html.rizq-dash-embed .rizq-demo-ribbon,
+html.rizq-dash-embed [id*="demo-ribbon"]{display:none!important}
+html.rizq-dash-embed .main{margin:0!important;width:100%!important;max-width:none!important}
+html.rizq-dash-embed .topbar{padding:8px 14px!important}
+html.rizq-dash-embed .content{padding:10px 12px!important}
 </style>
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
@@ -304,7 +321,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
-<script src="rizq_intro_video.js?v=28.9"></script>
+<script src="rizq_intro_video.js?v=29.0"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>

@@ -32,21 +32,54 @@
   var DEMO_DASH_VIDEOS = {
     store: {
       video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
-      poster: 'rizq-assets/promo/rizq-dashboard-store-demo-poster.jpg'
+      poster: 'rizq-assets/promo/rizq-dashboard-store-demo-poster.jpg',
+      page: 'rizq_dashboard_store.html?demo=1&embed=1',
+      labelAr: 'داشبورد المحل',
+      labelFr: 'Tableau de bord boutique'
     },
     office: {
       video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
-      poster: 'rizq-assets/promo/rizq-dashboard-office-demo-poster.jpg'
+      poster: 'rizq-assets/promo/rizq-dashboard-office-demo-poster.jpg',
+      page: 'rizq_dashboard_office.html?demo=1&embed=1',
+      labelAr: 'داشبورد المكتب',
+      labelFr: 'Tableau de bord bureau'
     },
     corp: {
       video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
-      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg'
+      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg',
+      page: 'rizq_dashboard_corp.html?demo=1&embed=1',
+      labelAr: 'داشبورد المعرض',
+      labelFr: 'Tableau de bord showroom'
     },
     showroom: {
       video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
-      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg'
+      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg',
+      page: 'rizq_dashboard_corp.html?demo=1&embed=1',
+      labelAr: 'داشبورد المعرض',
+      labelFr: 'Tableau de bord showroom'
     }
   };
+
+  function demoPack(type) {
+    var key = normalizeAccountType(type) || 'store';
+    return DEMO_DASH_VIDEOS[key] || DEMO_DASH_VIDEOS.store;
+  }
+
+  function absAsset(path) {
+    var s = String(path || '');
+    if (!s) return '';
+    if (/^https?:\/\//i.test(s) || s.charAt(0) === '/') return s;
+    try {
+      return new URL(s, location.href).pathname.replace(/^\//, '') === s
+        ? s
+        : s;
+    } catch (e) {}
+    return s;
+  }
+
+  function demoDashboardPage(type) {
+    return demoPack(type).page;
+  }
 
   function normalizeAccountType(type) {
     var t = String(type || '').toLowerCase().trim();
@@ -60,24 +93,23 @@
 
   /** رابط فيديو داشبورد تجريبي حسب نوع الحساب */
   function demoDashboardVideo(type) {
-    var key = normalizeAccountType(type) || 'store';
-    var pack = DEMO_DASH_VIDEOS[key] || DEMO_DASH_VIDEOS.store;
-    return pack.video;
+    return absAsset(demoPack(type).video);
   }
 
   function demoDashboardPoster(type) {
-    var key = normalizeAccountType(type) || 'store';
-    var pack = DEMO_DASH_VIDEOS[key] || DEMO_DASH_VIDEOS.store;
-    return pack.poster;
+    return absAsset(demoPack(type).poster);
   }
 
-  /** إن كان الرابط يوتيوب تجريبي قديم (Big Buck / Rickroll) استبدله بداشبورد النوع */
-  function resolveDemoUrl(url, type) {
+  /** إن كان الرابط يوتيوب تجريبي قديم (Big Buck / Rickroll) أو فارغاً → داشبورد النوع */
+  function resolveDemoUrl(url, type, force) {
     var s = String(url || '').trim();
     var t = normalizeAccountType(type);
     if (!t) return s;
-    if (!s) return demoDashboardVideo(t);
-    if (/aqz-KE-bpKQ|eRsGyueVLvQ|dQw4w9WgXcQ/i.test(s)) return demoDashboardVideo(t);
+    /* لا تلمس روابط المشتركين الحقيقية — فقط الفراغ أو يوتيوب التجريبي القديم */
+    if (force || !s || /aqz-KE-bpKQ|eRsGyueVLvQ|dQw4w9WgXcQ/i.test(s)) {
+      return demoDashboardVideo(t);
+    }
+    if (/rizq-dashboard-(store|office|corp)-demo/i.test(s)) return absAsset(s);
     return s;
   }
 
@@ -173,18 +205,101 @@
       '.rzq-iv-src{display:block;text-align:center;margin-top:10px;font-size:11.5px;color:rgba(27,58,107,.55);text-decoration:none;transition:color .2s}' +
       '.rzq-iv-src:hover{color:#1B3A6B}' +
       '.store-video-frame .rzq-iv-wrap,.store-video-frame .rzq-iv-frame{max-width:none;width:100%;height:100%;min-height:220px}' +
-      '#p-promo-video-preview .rzq-iv-wrap,#p-promo-video-extra-preview .rzq-iv-wrap{max-width:none}';
+      '#p-promo-video-preview .rzq-iv-wrap,#p-promo-video-extra-preview .rzq-iv-wrap{max-width:none}' +
+      '.rzq-iv-frame.is-live-dash{background:#0a1220}' +
+      '.rzq-iv-dash-scale{position:absolute;inset:0;overflow:hidden;background:#f8faff}' +
+      '.rzq-iv-dash-scale iframe{position:absolute;top:0;right:0;width:180%;height:180%;border:0;' +
+        'transform:scale(.555);transform-origin:top right;background:#f8faff}' +
+      '.rzq-iv-dash-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:4;' +
+        'background:rgba(10,22,40,.82);color:#E8C96A;font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;' +
+        'border:1px solid rgba(201,168,76,.45);white-space:nowrap;pointer-events:none}';
     document.head.appendChild(s);
+  }
+
+  /**
+   * mountDashboardPreview — يعرض داشبورد حي (iframe) للمحل/المكتب/المعرض داخل خانة الفيديو التعريفي.
+   */
+  function mountDashboardPreview(hostEl, type, opts) {
+    if (!hostEl) return false;
+    opts = opts || {};
+    var pack = demoPack(type);
+    var fr = !!(opts.fr || opts.lang === 'fr');
+    injectCSS();
+    var uid = 'rzq-iv-d-' + Math.random().toString(36).slice(2, 9);
+    var title = opts.title || (fr ? ('🎬 ' + pack.labelFr) : ('🎬 ' + pack.labelAr));
+    var playLbl = opts.playLabel || (fr ? 'Afficher le tableau de bord' : 'عرض الداشبورد');
+    var hint = fr ? 'Aperçu live du tableau de bord' : 'معاينة حية للداشبورد';
+    var poster = absAsset(opts.poster || pack.poster);
+    var page = pack.page;
+    var openLbl = fr ? 'Ouvrir le tableau de bord ↗' : 'افتح الداشبورد الكامل ↗';
+
+    hostEl.innerHTML =
+      '<div class="rzq-iv-wrap">' +
+        '<div class="rzq-iv-frame is-live-dash" id="' + uid + '-frame">' +
+          '<div class="rzq-iv-badge">' + esc(title) + '</div>' +
+          '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="background-image:url(\'' + String(poster).replace(/'/g, '%27') + '\')" aria-label="' + esc(playLbl) + '">' +
+            '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
+            '<span class="rzq-iv-play-label">' + esc(playLbl) + '</span>' +
+          '</button>' +
+        '</div>' +
+        '<a class="rzq-iv-src" href="' + esc(page.replace('&embed=1', '').replace('?embed=1', '?demo=1')) + '" target="_blank" rel="noopener noreferrer">' +
+          esc(openLbl) +
+        '</a>' +
+      '</div>';
+
+    var frame = hostEl.querySelector('#' + uid + '-frame');
+    var posterBtn = hostEl.querySelector('#' + uid + '-poster');
+
+    function showLive() {
+      if (!frame) return;
+      if (posterBtn) posterBtn.remove();
+      var old = frame.querySelector('.rzq-iv-dash-scale');
+      if (old) old.remove();
+      var wrap = document.createElement('div');
+      wrap.className = 'rzq-iv-dash-scale';
+      var iframe = document.createElement('iframe');
+      iframe.src = page;
+      iframe.title = pack.labelAr;
+      iframe.setAttribute('loading', 'eager');
+      iframe.setAttribute('referrerpolicy', 'same-origin');
+      wrap.appendChild(iframe);
+      var hintEl = document.createElement('div');
+      hintEl.className = 'rzq-iv-dash-hint';
+      hintEl.textContent = hint;
+      frame.appendChild(wrap);
+      frame.appendChild(hintEl);
+    }
+
+    if (posterBtn) {
+      posterBtn.addEventListener('click', showLive);
+    }
+    /* عرض فوري: الزائر يرى الداشبورد مباشرة دون انتظار نقرة */
+    if (opts.autoLive !== false) {
+      try { showLive(); } catch (eLive) {}
+    }
+    return true;
   }
 
   /**
    * mount(hostEl, url, opts) — يبني الفيديو التعريفي داخل hostEl.
    * opts.accountType: store|office|corp|showroom — يستبدل روابط يوتيوب التجريبية بداشبورد النوع.
+   * opts.liveDashboard / opts.forceDashboard: يعرض داشبورد حي بدل يوتيوب/ملف.
    */
   function mount(hostEl, url, opts) {
-    if (!hostEl || !url) return false;
     opts = opts || {};
-    url = resolveDemoUrl(url, opts.accountType || opts.type);
+    var type = opts.accountType || opts.type || '';
+    if (opts.liveDashboard || opts.forceDashboard) {
+      return mountDashboardPreview(hostEl, type || 'store', opts);
+    }
+    if (!hostEl || !url) {
+      if (hostEl && type) return mountDashboardPreview(hostEl, type, opts);
+      return false;
+    }
+    url = resolveDemoUrl(url, type, !!opts.forceDashboard);
+    /* روابط الداشبورد التجريبية → معاينة حية أوضح من المقطع */
+    if (type && /rizq-dashboard-(store|office|corp)-demo/i.test(url)) {
+      return mountDashboardPreview(hostEl, type, opts);
+    }
     var native = isNativeVideo(url);
     var embedReady = native || !!buildEmbedSrc(url, true, MAX_SECONDS, true);
     if (!embedReady) return false;
@@ -381,6 +496,7 @@
 
   global.RizqIntroVideo = {
     mount: mount,
+    mountDashboardPreview: mountDashboardPreview,
     loadAndMountForAccount: loadAndMountForAccount,
     buildEmbedSrc: buildEmbedSrc,
     ytId: ytId,
@@ -389,6 +505,7 @@
     isNativeVideo: isNativeVideo,
     demoDashboardVideo: demoDashboardVideo,
     demoDashboardPoster: demoDashboardPoster,
+    demoDashboardPage: demoDashboardPage,
     resolveDemoUrl: resolveDemoUrl,
     MAX_SECONDS: MAX_SECONDS
   };

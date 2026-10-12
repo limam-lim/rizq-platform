@@ -1148,6 +1148,19 @@ function applyAccountData(){
 function mountShowroomIntroVideo(){
   if(!_showroomId || !window.RizqIntroVideo) return;
   var fr = _lang === 'fr';
+  var isDemo = !!(window._rizqShowroomIsDemo || _showroomId === 'demo_showroom' || /^demo/i.test(String(_showroomId||'')) || /^acc_promo_/.test(String(_showroomId||'')) || new URLSearchParams(location.search).get('demo') === '1');
+  var sec = document.getElementById('video-intro-section');
+  var mountEl = document.getElementById('intro-video-mount');
+  if (isDemo && mountEl && typeof RizqIntroVideo.mountDashboardPreview === 'function') {
+    var okLive = RizqIntroVideo.mountDashboardPreview(mountEl, 'corp', {
+      fr: fr,
+      title: fr ? '🎬 Tableau de bord showroom' : '🎬 داشبورد المعرض',
+      playLabel: fr ? 'Afficher le tableau de bord' : 'عرض داشبورد المعرض',
+      autoLive: true
+    });
+    if (sec && okLive) sec.style.display = '';
+    return;
+  }
   var opts = {
     mountOpts: {
       accountType: 'corp',
@@ -1669,7 +1682,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=28.9"></script>
+<script src="rizq_intro_video.js?v=29.0"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>

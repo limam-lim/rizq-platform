@@ -1587,7 +1587,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.9"></script>
+  <script src="rizq_intro_video.js?v=29.0"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -2026,13 +2026,24 @@ function rizqShare(title, url) {
       /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
-      var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
-        accountType: 'store',
-        poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
-        title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
-        linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
-        playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
-      });
+      var isDemoStore = !!(window._rizqStoreIsDemo || (acc && (acc.id === 'demo_store' || /^acc_promo_store/.test(acc.id))));
+      var okIntro;
+      if (isDemoStore && typeof RizqIntroVideo.mountDashboardPreview === 'function') {
+        okIntro = RizqIntroVideo.mountDashboardPreview(introMount, 'store', {
+          fr: fr,
+          title: fr ? '🎬 Tableau de bord boutique' : '🎬 داشبورد المحل',
+          playLabel: fr ? 'Afficher le tableau de bord' : 'عرض داشبورد المحل',
+          autoLive: true
+        });
+      } else {
+        okIntro = RizqIntroVideo.mount(introMount, intro.url, {
+          accountType: 'store',
+          poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
+          title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
+          linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
+          playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
+        });
+      }
       if(introFrame) introFrame.style.display = okIntro ? '' : 'none';
       var okExtra = false;
       if(extra && extraMount && extraFrame){

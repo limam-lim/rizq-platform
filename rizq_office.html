@@ -1439,7 +1439,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=28.9"></script>
+  <script src="rizq_intro_video.js?v=29.0"></script>
   <script>
   window.mountOfficeIntroVideo = function(url, officeId){
     try{
@@ -1449,6 +1449,19 @@ function openMaps(){
         || '';
       if(!id || !window.RizqIntroVideo) return;
       var fr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
+      var isDemo = !!(window._rizqOfficeIsDemo || id === 'demo_law' || /^demo/i.test(id) || /^acc_promo_/.test(id) || new URLSearchParams(location.search).get('demo') === '1');
+      var sec = document.getElementById('video-intro-section');
+      var mountEl = document.getElementById('intro-video-mount');
+      if (isDemo && mountEl && typeof RizqIntroVideo.mountDashboardPreview === 'function') {
+        var okLive = RizqIntroVideo.mountDashboardPreview(mountEl, 'office', {
+          fr: fr,
+          title: fr ? '🎬 Tableau de bord bureau' : '🎬 داشبورد المكتب',
+          playLabel: fr ? 'Afficher le tableau de bord' : 'عرض داشبورد المكتب',
+          autoLive: true
+        });
+        if (sec && okLive) sec.style.display = '';
+        return;
+      }
       var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('office')) || '';
       var opts = {
         mountOpts: {
@@ -1462,10 +1475,6 @@ function openMaps(){
         }
       };
       opts.url = url || dashUrl;
-      /* تجريبي بلا رابط محفوظ → داشبورد المكتب */
-      if(!url && (id === 'demo_law' || id.indexOf('demo') === 0 || /^acc_promo_/.test(id))) {
-        opts.url = dashUrl;
-      }
       RizqIntroVideo.loadAndMountForAccount(id, opts);
     }catch(e){}
   };
