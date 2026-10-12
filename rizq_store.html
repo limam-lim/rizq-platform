@@ -1587,7 +1587,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=29.1"></script>
+  <script src="rizq_intro_video.js?v=29.2"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -2037,7 +2037,6 @@ function rizqShare(title, url) {
       var okExtra = false;
       if(extra && extraMount && extraFrame){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
-          accountType: 'store',
           title: fr ? '🎬 Vidéo supplémentaire' : '🎬 فيديو إضافي',
           linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
           playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو الإضافي'

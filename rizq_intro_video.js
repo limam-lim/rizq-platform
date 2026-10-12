@@ -105,8 +105,8 @@
     var s = String(url || '').trim();
     var t = normalizeAccountType(type);
     if (!t) return s;
-    /* لا تلمس روابط المشتركين الحقيقية — فقط الفراغ أو يوتيوب التجريبي القديم */
-    if (force || !s || /aqz-KE-bpKQ|eRsGyueVLvQ|dQw4w9WgXcQ/i.test(s)) {
+    /* لا تلمس روابط المشتركين / الفيديو الإضافي — فقط الفراغ أو Big Buck / Rickroll القديم */
+    if (force || !s || /aqz-KE-bpKQ|dQw4w9WgXcQ/i.test(s)) {
       return demoDashboardVideo(t);
     }
     if (/rizq-dashboard-(store|office|corp)-demo/i.test(s)) return absAsset(s);
