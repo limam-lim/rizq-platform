@@ -175,7 +175,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:28px}
 <script src="rizq_site_banner.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_merchant_activities.js?v=3"></script>
+<script src="rizq_merchant_activities.js?v=4"></script>
 <script src="rizq_i18n_data.js"></script>
 <script src="rizq_i18n.js"></script>
 <script src="rizq_lang_guard.js?v=1.0"></script>
@@ -195,8 +195,8 @@ var TYPE_META = {
     icon: '🏪',
     ar: 'المحلات', fr: 'Boutiques',
     titleAr: 'دليل <span>المحلات</span>', titleFr: 'Annuaire des <span>boutiques</span>',
-    subAr: 'تصفّح كل المحلات على رزق حسب القسم أو الولاية، وادخل صفحة أي محل بضغطة.',
-    subFr: 'Parcourez toutes les boutiques Rizq par rubrique ou wilaya, puis ouvrez la page d\'une boutique.',
+    subAr: 'محلات التجزئة — إلكترونيات، أزياء، قطع غيار، بقالة… (بيع السيارات في دليل المعارض).',
+    subFr: 'Commerces de détail — électronique, mode, pièces auto, épicerie… (voitures dans les showrooms).',
     emptyAr: 'لا توجد محلات مطابقة بعد.', emptyFr: 'Aucune boutique correspondante pour le moment.',
     ctaAr: 'زيارة المحل ←', ctaFr: 'Voir la boutique →',
     reg: 'rizq_register.html?mode=seller&preBiz=store',
@@ -207,8 +207,8 @@ var TYPE_META = {
     icon: '🏬',
     ar: 'المعارض', fr: 'Showrooms',
     titleAr: 'دليل <span>المعارض</span>', titleFr: 'Annuaire des <span>showrooms</span>',
-    subAr: 'تصفّح كل المعارض على رزق حسب القسم أو الولاية، وادخل صفحة أي معرض بضغطة.',
-    subFr: 'Parcourez tous les showrooms Rizq par rubrique ou wilaya, puis ouvrez la page d\'un showroom.',
+    subAr: 'معارض البيع الكبرى — سيارات، أثاث، إلكترونيات ومعدات. مختلف عن محلات التجزئة.',
+    subFr: 'Grands showrooms — auto, meubles, électronique & équipements. Distinct des boutiques.',
     emptyAr: 'لا توجد معارض مطابقة بعد.', emptyFr: 'Aucun showroom correspondant pour le moment.',
     ctaAr: 'زيارة المعرض ←', ctaFr: 'Voir le showroom →',
     reg: 'rizq_register.html?mode=seller&preBiz=corp',
@@ -260,15 +260,15 @@ function _dirSectors(){
   if(window.RizqMerchantActivities && typeof RizqMerchantActivities.listDirectorySectors === 'function'){
     return RizqMerchantActivities.listDirectorySectors(_type, _rizqLang());
   }
-  // احتياطي قديم إن لم يُحمَّل الكتالوج
+  // احتياطي إن لم يُحمَّل الكتالوج — بدون بيع سيارات/ماشية في المحلات
   return [
-    {id:'automotive', name:'🚗 سيارات ومركبات'},
-    {id:'agriculture', name:'🐄 ماشية وزراعة'},
-    {id:'pro_retail', name:'🧰 مهن متخصصة بالتجزئة'},
+    {id:'auto_parts', name:'🔧 قطع غيار وإطارات'},
     {id:'electronics', name:'📱 إلكترونيات وتقنية'},
     {id:'home', name:'🛋️ أثاث وديكور منزلي'},
     {id:'construction', name:'🏗️ بناء ومواد'},
     {id:'jewelry', name:'💎 ذهب ومجوهرات'},
+    {id:'fashion', name:'👗 أزياء وموضة'},
+    {id:'food', name:'🛒 أغذية ومطاعم'},
   ];
 }
 
