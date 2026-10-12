@@ -431,6 +431,10 @@
         : '')
       + '<div class="rzq-pd-actions">'
       + (showCart ? '<button type="button" class="rzq-pd-btn rzq-pd-btn-cart" onclick="RizqStoreCommerce.addFromDetail()">🛒 ' + (fr ? 'Ajouter au panier' : 'أضف للسلة') + '</button>' : '')
+      + (typeof opts.onWish === 'function'
+        ? ('<button type="button" class="rzq-pd-btn rzq-pd-btn-ghost' + (opts.wishActive ? ' is-wish-on' : '') + '" id="rzq-pd-wish-btn" data-wish-id="' + esc(String(p.id == null ? '' : p.id)) + '" onclick="RizqStoreCommerce.wishFromDetail()">'
+          + (opts.wishActive ? '❤ ' : '♡ ') + (fr ? 'Favoris' : 'المفضلة') + '</button>')
+        : '')
       + (showAsk ? '<button type="button" class="rzq-pd-btn rzq-pd-btn-ask" onclick="RizqStoreCommerce.askFromDetail()">💬 ' + (fr ? 'Demander' : 'استفسر') + '</button>' : '')
       + '<button type="button" class="rzq-pd-btn rzq-pd-btn-ghost" onclick="RizqStoreCommerce.shareFromDetail()">↗ ' + (fr ? 'Partager' : 'مشاركة') + '</button>'
       + '</div>'
@@ -655,6 +659,19 @@
     else closeProductDetail();
   }
 
+  function wishFromDetail() {
+    var p = _pdState.product;
+    var opts = _pdState.opts || {};
+    if (!p || typeof opts.onWish !== 'function') return;
+    opts.onWish(p);
+    // _renderWishUI في صفحة المحل يحدّث الزر بعد نجاح الإضافة (أو بعد استئناف المصادقة)
+    setTimeout(function () {
+      try {
+        if (typeof global._renderWishUI === 'function') global._renderWishUI();
+      } catch (eWish) { /* ignore */ }
+    }, 0);
+  }
+
   function shareFromDetail() {
     var p = _pdState.product;
     var opts = _pdState.opts || {};
@@ -708,6 +725,7 @@
     changeQty: changeQty,
     addFromDetail: addFromDetail,
     askFromDetail: askFromDetail,
+    wishFromDetail: wishFromDetail,
     shareFromDetail: shareFromDetail
   };
 })(window);

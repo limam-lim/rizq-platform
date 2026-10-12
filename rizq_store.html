@@ -19,11 +19,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.7"/>
+<link rel="stylesheet" href="rizq_header.css?v=26.8"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
-<link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
+<link rel="preload" href="rizq_header.js?v=26.9" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -553,15 +553,17 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 .product-tag-hot{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0D1B2A}
 /* زر المفضّلة (خدمة جديدة للزائر — يعمل محلياً بلا حساب، بلا أي بيانات وهمية) */
 .wish-btn{
-  position:absolute;top:8px;right:8px;z-index:3;
+  position:absolute;top:8px;right:8px;z-index:8;
   width:30px;height:30px;border-radius:50%;
   background:rgba(255,255,255,.92);border:1px solid #e0e8f0;
   display:flex;align-items:center;justify-content:center;
   font-size:15px;cursor:pointer;transition:all .2s;color:#c0c8d4;
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
+  box-shadow:0 2px 8px rgba(0,0,0,.12);padding:0;line-height:1;
 }
 .wish-btn:hover{transform:scale(1.12)}
 .wish-btn.active{color:#e84040;background:#fff}
+html[dir="ltr"] .wish-btn{right:auto;left:8px}
+.rzq-pd-btn.is-wish-on{border-color:rgba(232,64,64,.45);color:#e84040}
 /* طبقة "عرض سريع" عند مرور الفأرة على الصورة */
 .product-quickview{
   position:absolute;inset:0;background:rgba(13,27,42,.45);
@@ -883,6 +885,8 @@ footer{
 /* ══ DISCLAIMER MODAL ══ */
 .disc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
 .disc-overlay.open{display:flex}
+/* فوق الهيدر الموحّد (z-index ~10000) حتى تُفتح لوحة المفضلة بوضوح */
+#wish-panel-overlay.disc-overlay{z-index:11050 !important}
 .disc-modal{
   background:linear-gradient(160deg,#0a1628,#122040);
   border:1.5px solid rgba(201,168,76,.45);
@@ -968,14 +972,14 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=28.8" defer></script>
+  <script src="rizq_store_commerce.js?v=28.9" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
 </head>
 <body data-t-ns="store">
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو -->
-<script src="rizq_header.js?v=26.6"></script>
+<script src="rizq_header.js?v=26.9"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- TOPNAV -->
@@ -1299,6 +1303,14 @@ footer{
    المتصفح (localStorage) بلا حساب وبلا أي خادم، بيانات حقيقية فقط (ما
    يضيفه الزائر فعلاً) — لا أرقام وهمية. ──
    شريط الإشعار العلوي: rizq_site_banner.js (من /api/site-config). ── */
+function _qvEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 function _wishKey(){
   var params = new URLSearchParams(location.search);
   var id = params.get('id') || params.get('store') || '';
@@ -1312,10 +1324,29 @@ function _saveWishList(list){
 }
 function toggleWish(id, name, price, emoji){
   var list = _getWishList();
-  var idx = list.findIndex(function(p){ return p.id === id; });
-  if(idx > -1){ list.splice(idx,1); } else { list.push({id:id,name:name,price:price,emoji:emoji}); }
+  var sid = String(id == null ? '' : id);
+  if(!sid) return false;
+  var idx = list.findIndex(function(p){ return String(p.id) === sid; });
+  var added;
+  if(idx > -1){ list.splice(idx,1); added = false; }
+  else { list.push({id:sid,name:name,price:price,emoji:emoji}); added = true; }
   _saveWishList(list);
   _renderWishUI();
+  if(typeof showToast === 'function'){
+    var fr = (localStorage.getItem('rizq_lang')||'ar')==='fr';
+    showToast(added
+      ? (fr ? '❤️ Ajouté aux favoris' : '❤️ تمت الإضافة للمفضلة')
+      : (fr ? '✕ Retiré des favoris' : '✕ تمت الإزالة من المفضلة'));
+  }
+  return added;
+}
+function _wishAuthToggle(id, name, price, emoji){
+  var run = function(){ toggleWish(id, name, price, emoji); };
+  if(typeof window.rizqRequireAuth === 'function'){
+    window.rizqRequireAuth(run, 'reasonFav');
+    return;
+  }
+  run();
 }
 // إصلاح أمني: p.name يأتي أصلاً من اسم منتج التاجر (بيانات خادم حقيقية) —
 // كان يُدرَج هنا خاماً في innerHTML وفي attribute السمة onclick بلا أي
@@ -1326,26 +1357,45 @@ function toggleWish(id, name, price, emoji){
 // خبيثاً. نستخدم _qvEsc المعرَّفة أدناه في نفس نطاق <script> (hoisting).
 function _renderWishUI(){
   var list = _getWishList();
-  var ids = list.map(function(p){ return p.id; });
+  var ids = list.map(function(p){ return String(p.id); });
   document.querySelectorAll('.wish-btn').forEach(function(btn){
-    var id = Number(btn.getAttribute('data-wish-id'));
+    var id = String(btn.getAttribute('data-wish-id') || '');
     var active = ids.indexOf(id) > -1;
     btn.classList.toggle('active', active);
     btn.textContent = active ? '❤' : '♡';
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
   var countEl = document.getElementById('nav-wish-count');
   if(countEl) countEl.textContent = list.length;
   if(window.RizqUx && typeof RizqUx.updateStoreWishBadge === 'function') RizqUx.updateStoreWishBadge(list.length);
+  var pdWish = document.getElementById('rzq-pd-wish-btn');
+  if(pdWish){
+    var pdId = pdWish.getAttribute('data-wish-id') || '';
+    if(!pdId){
+      try{
+        var host = document.getElementById('rzq-pd-root');
+        pdId = host && host.getAttribute('data-product-id') || '';
+      }catch(ePd){}
+    }
+    var frPd = (localStorage.getItem('rizq_lang')||'ar')==='fr';
+    var pdOn = pdId ? ids.indexOf(String(pdId)) > -1 : false;
+    pdWish.classList.toggle('is-wish-on', pdOn);
+    pdWish.textContent = (pdOn ? '❤ ' : '♡ ') + (frPd ? 'Favoris' : 'المفضلة');
+  }
   var panel = document.getElementById('wish-panel-list');
   if(panel){
     panel.innerHTML = list.length ? list.map(function(p){
       var safeName = _qvEsc(p.name);
       var safeEmoji = _qvEsc(p.emoji);
       var safePrice = _qvEsc(p.price);
+      var idJs = JSON.stringify(String(p.id));
+      var nameJs = JSON.stringify(String(p.name == null ? '' : p.name));
+      var priceJs = JSON.stringify(String(p.price == null ? '' : p.price));
+      var emojiJs = JSON.stringify(String(p.emoji == null ? '' : p.emoji));
       return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,.12)">'
         + '<div style="font-size:26px">'+safeEmoji+'</div>'
         + '<div style="flex:1"><div style="font-weight:700;color:#fff;font-size:13.5px">'+safeName+'</div><div style="color:#C9A84C;font-size:12.5px;font-weight:700">'+safePrice+'</div></div>'
-        + '<button onclick="toggleWish('+p.id+',\''+safeName.replace(/'/g,"\\'")+'\',\''+safePrice.replace(/'/g,"\\'")+'\',\''+safeEmoji.replace(/'/g,"\\'")+'\')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer">✕</button>'
+        + '<button type="button" onclick="toggleWish('+idJs+','+nameJs+','+priceJs+','+emojiJs+')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
         + '</div>';
     }).join('') : '<p style="color:rgba(255,255,255,.55);font-size:13px;text-align:center;padding:20px 0">'+(
       (localStorage.getItem('rizq_lang')||'ar')==='fr'
@@ -1355,8 +1405,14 @@ function _renderWishUI(){
   }
 }
 function toggleWishPanel(){
-  document.getElementById('wish-panel-overlay').classList.toggle('open');
+  var el = document.getElementById('wish-panel-overlay');
+  if(el) el.classList.toggle('open');
 }
+window.toggleWish = toggleWish;
+window._wishAuthToggle = _wishAuthToggle;
+window.toggleWishPanel = toggleWishPanel;
+window._getWishList = _getWishList;
+window._renderWishUI = _renderWishUI;
 document.addEventListener('DOMContentLoaded', _renderWishUI);
 
 /* ── تفاصيل منتج بهوية عرض الإعلان (لوحة فاخرة) ── */
@@ -1401,6 +1457,20 @@ function openQuickView(id, name, price, emoji, cat){
       onAdd: function(p, qty){
         for(var i=0;i<(qty||1);i++) addToCartStore(p.id);
       },
+      onWish: function(p){
+        var nm = fr ? (p.nameF || p.name) : (p.name || p.nameF || '');
+        var pr = (Number(p.price) || 0) > 0
+          ? ((Number(p.price) || 0).toLocaleString('en-US') + ' MRU')
+          : '';
+        if(typeof _wishAuthToggle === 'function'){
+          _wishAuthToggle(p.id, nm, pr, p.emoji || '📦');
+        }
+      },
+      wishActive: (function(){
+        try{
+          return _getWishList().some(function(x){ return String(x.id) === String(id); });
+        }catch(eW){ return false; }
+      })(),
       onAsk: function(p){
         RizqStoreCommerce.closeProductDetail();
         if(!window.RizqMessenger) return;
@@ -2101,8 +2171,17 @@ function rizqShare(title, url) {
         var displayName = (isFr() && p.nameF) ? p.nameF : (p.name || '');
         var safeName = esc(displayName).replace(/'/g, "\\'");
         var safeCat = esc(p.cat||'').replace(/'/g, "\\'");
+        var idJs = JSON.stringify(String(pid));
+        var nameJs = JSON.stringify(String(displayName || ''));
+        var priceJs = JSON.stringify(String(priceTxt || ''));
+        var emojiJs = JSON.stringify(String(p.emoji || '📦'));
+        var wishLbl = isFr() ? 'Favoris' : 'المفضلة';
         return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" data-topic="'+esc(topicKey)+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
-          + '<div class="product-img">'+media+tagHtml+'</div>'
+          + '<div class="product-img">'+media+tagHtml
+          + '<button type="button" class="wish-btn" data-wish-id="'+esc(pid)+'" title="'+esc(wishLbl)+'" aria-label="'+esc(wishLbl)+'" aria-pressed="false"'
+          // JSON.stringify يُنتج "..." — لذلك onclick بعلامات مفردة حتى لا يُقطع الـ attribute
+          + " onclick='event.stopPropagation();_wishAuthToggle("+idJs+","+nameJs+","+priceJs+","+emojiJs+")'>♡</button>"
+          + '</div>'
           + '<div class="product-info">'
           + '<div class="product-name">'+esc(displayName)+'</div>'
           + '<div class="product-price">'+priceTxt+'</div>'
@@ -2132,6 +2211,7 @@ function rizqShare(title, url) {
             : ('عرض ' + n + ' منتجاً التالية');
         }
         if(window.RizqStoreCommerce && RizqStoreCommerce.bindMedia) RizqStoreCommerce.bindMedia(grid);
+        if(typeof _renderWishUI === 'function') _renderWishUI();
         var tabsEl = document.getElementById('cat-tabs-el');
         if(tabsEl && typeof renderStoreCatTabs === 'function') renderStoreCatTabs(tabsEl, buyerTopics, isFr());
       }

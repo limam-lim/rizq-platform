@@ -4085,7 +4085,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <div id="rizq-ads-preview-banner" role="status" hidden>
   <div class="rzq-preview-inner">
     <span class="rzq-preview-dot" aria-hidden="true"></span>
-    <span id="rizq-ads-preview-text">معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · موضع واحد في الصفحة · يمكن الرجوع عبر Git</span>
+    <span id="rizq-ads-preview-text">معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · مساحة إعلانية واحدة في الصفحة · يمكن الرجوع عبر Git</span>
     <button type="button" id="rizq-ads-preview-dismiss" aria-label="إخفاء">✕</button>
   </div>
 </div>
@@ -4135,7 +4135,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   var fr=(document.documentElement.lang==='fr')||(localStorage.getItem('rizq_lang')==='fr');
   if(t) t.textContent=fr
     ? 'Aperçu Rizq ADS — Annonces classées séparées · 1 emplacement homepage · Annulable via Git'
-    : 'معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · موضع واحد في الصفحة · يمكن الرجوع عبر Git';
+    : 'معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · مساحة إعلانية واحدة في الصفحة · يمكن الرجوع عبر Git';
   b.hidden=false;
   if(d) d.addEventListener('click',function(){
     b.hidden=true;
@@ -4454,19 +4454,19 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             </span>
           </a>
         </nav>
-        <p class="hero-spaces-trust" data-t="hbiz-trust">وسيط نشر · تواصل مباشر · معاينة قبل الدفع</p>
+        <p class="hero-spaces-trust" data-t="hbiz-trust">رزق ينشر فقط · تتواصل مع البائع مباشرة · عاين قبل أن تدفع</p>
       </section>
       <!-- تحويل أساسي -->
       <div class="hero-cta-wrap">
         <button type="button" class="hero-cta-primary" onclick="goToPost()">
-          <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق</span>
+          <span data-t="hbiz-cta">انشر إعلانك أو افتح محلك مجاناً — خلال دقائق</span>
         </button>
-        <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية</p>
+        <p class="hero-cta-micro" data-t="hbiz-cta-micro">⚡ بدون بطاقة بنكية — سجّل حسابك في 30 ثانية</p>
       </div>
 
       <!-- Rizq ADS — عرض ترويجي بملء العرض + زر شاشة كاملة -->
       <div class="hero-vid-wrap" id="hero-vid-wrap" data-rizq-ads-preview="1">
-        <span class="hero-vid-badge">🎬 موضع واحد · Rizq ADS</span>
+        <span class="hero-vid-badge">🎬 مساحة إعلانية واحدة في الرئيسية · Rizq ADS</span>
         <div class="hero-vid-inner" id="hero-vid-inner">
           <video id="hero-featured-vid" autoplay muted loop playsinline></video>
           <div class="hero-vid-ph" id="hero-vid-ph">
@@ -4479,10 +4479,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             <div class="hero-vid-ph-scan"></div>
             <div class="hero-vid-ph-live"><div class="hero-vid-ph-live-dot"></div>LIVE · RIZQ ADS</div>
             <div class="hero-vid-ph-body">
-              <div class="hero-vid-ph-excl">⭐ موضع إعلاني حصري</div>
+              <div class="hero-vid-ph-excl">⭐ مساحة إعلانية حصرية</div>
               <div class="hero-vid-ph-h1">إعلانك هنا<em>أمام كل زائر</em></div>
               <div class="hero-vid-ph-sub">موريتانيا · Rizq ADS</div>
-              <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذا الموضع</a>
+              <a href="rizq_ads_info.html" class="hero-vid-ph-cta">📢 احجز هذه المساحة</a>
             </div>
           </div>
           <div class="hero-vid-ctrl">
@@ -4498,7 +4498,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
         <div class="hero-vid-cta-bar">
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز موضعك الإعلاني</a>
+          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
           <span class="hero-vid-cta-sep">·</span>
           <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
         </div>
@@ -8954,7 +8954,7 @@ const LANG = {
     'hero-tagline-lead': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي',
     'hero-one-place': ' — كل شيء في مكان واحد',
     'hbiz-pick-sub': 'من محلك إلى استثمارك — حضورك المهني يبدأ من هنا',
-    'hbiz-trust': 'وسيط نشر · تواصل مباشر · معاينة قبل الدفع',
+    'hbiz-trust': 'رزق ينشر فقط · تتواصل مع البائع مباشرة · عاين قبل أن تدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
     'promo-strip-sub': 'آخر الإعلانات على رزق — عروض تخطف الأنظار',
@@ -8967,8 +8967,8 @@ const LANG = {
     'hbiz-inv-badge': 'جديد',
     'hbiz-tender-badge': 'جديد',
     'hbiz-new': 'جديد',
-    'hbiz-cta': 'انشر إعلانك أو افتح محلك — مجاناً وخلال دقائق',
-    'hbiz-cta-micro': '⚡ لا يتطلب بطاقة إلكترونية — التسجيل في 30 ثانية',
+    'hbiz-cta': 'انشر إعلانك أو افتح محلك مجاناً — خلال دقائق',
+    'hbiz-cta-micro': '⚡ بدون بطاقة بنكية — سجّل حسابك في 30 ثانية',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -9096,7 +9096,7 @@ const LANG = {
     'hero-tagline-lead': 'Boutique virtuelle · Bureau pro · Pub institutionnelle',
     'hero-one-place': ' — tout en un seul endroit',
     'hbiz-pick-sub': 'De votre boutique à votre investissement — votre présence pro commence ici',
-    'hbiz-trust': 'Intermédiaire de publication · Contact direct · Vérifiez avant de payer',
+    'hbiz-trust': 'Rizq publie seulement · contactez le vendeur directement · vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
     'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
@@ -9109,8 +9109,8 @@ const LANG = {
     'hbiz-inv-badge': 'Nouveau',
     'hbiz-tender-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
-    'hbiz-cta': 'Publiez une annonce ou ouvrez votre boutique — gratuit, en quelques minutes',
-    'hbiz-cta-micro': '⚡ Aucune carte requise — inscription en 30 secondes',
+    'hbiz-cta': 'Publiez une annonce ou ouvrez votre boutique gratuitement — en quelques minutes',
+    'hbiz-cta-micro': '⚡ Sans carte bancaire — créez votre compte en 30 secondes',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -9524,26 +9524,26 @@ function applyLandingLang(toAr) {
 
   // Hero featured-video placeholder slot (shown when no admin video is configured)
   const vidBadge = document.querySelector('.hero-vid-badge');
-  if(vidBadge) vidBadge.textContent = isAr ? '🎬 موضع واحد · Rizq ADS' : '🎬 Emplacement unique · Rizq ADS';
+  if(vidBadge) vidBadge.textContent = isAr ? '🎬 مساحة إعلانية واحدة في الرئيسية · Rizq ADS' : '🎬 Un seul espace pub sur l’accueil · Rizq ADS';
   const vidPhLive = document.querySelector('.hero-vid-ph-live');
   if(vidPhLive) vidPhLive.innerHTML = '<div class="hero-vid-ph-live-dot"></div>' + (isAr ? 'LIVE · RIZQ ADS' : 'LIVE · RIZQ ADS');
   const vidPhExcl = document.querySelector('.hero-vid-ph-excl');
-  if(vidPhExcl) vidPhExcl.textContent = isAr ? '⭐ موضع إعلاني حصري' : '⭐ Emplacement publicitaire exclusif';
+  if(vidPhExcl) vidPhExcl.textContent = isAr ? '⭐ مساحة إعلانية حصرية' : '⭐ Espace publicitaire exclusif';
   const vidPhStatLbls = document.querySelectorAll('.hero-vid-ph-stat-lbl');
-  const statLblsAR = ['زائر / يوم','الموضع الأول','مشاهدة مضمونة'];
-  const statLblsFR = ['Visiteurs / jour','1ère position','Vue garantie'];
+  const statLblsAR = ['زائر / يوم','الخانة الأولى','مشاهدة مضمونة'];
+  const statLblsFR = ['Visiteurs / jour','1ʳᵉ place','Vue garantie'];
   vidPhStatLbls.forEach((el,i)=>{ el.textContent = isAr ? (statLblsAR[i]||el.textContent) : (statLblsFR[i]||el.textContent); });
   const vidPhH1 = document.querySelector('.hero-vid-ph-h1');
   if(vidPhH1) vidPhH1.innerHTML = isAr ? 'إعلانك هنا<em>أمام كل زائر</em>' : 'Votre annonce ici<em>devant chaque visiteur</em>';
   const vidPhSub = document.querySelector('.hero-vid-ph-sub');
   if(vidPhSub) vidPhSub.textContent = isAr ? 'موريتانيا · Rizq ADS' : 'Mauritanie · Rizq ADS';
   const vidPhCta = document.querySelector('.hero-vid-ph-cta');
-  if(vidPhCta) vidPhCta.textContent = isAr ? '📢 احجز هذا الموضع' : '📢 Réservez cet emplacement';
+  if(vidPhCta) vidPhCta.textContent = isAr ? '📢 احجز هذه المساحة' : '📢 Réservez cet espace';
   const vidPhUrgency = document.querySelector('.hero-vid-ph-urgency');
-  if(vidPhUrgency) vidPhUrgency.textContent = isAr ? '⚡ موضع واحد فقط · متاح الآن' : '⚡ Un seul emplacement disponible · Réservez maintenant';
+  if(vidPhUrgency) vidPhUrgency.textContent = isAr ? '⚡ مساحة واحدة فقط · متاحة الآن' : '⚡ Un seul espace disponible · Réservez maintenant';
   const vidCtaLinks = document.querySelectorAll('.hero-vid-cta-link');
-  const vidCtaLinksAR = ['📢 احجز موضعك الإعلاني','تعرف على Rizq ADS'];
-  const vidCtaLinksFR = ['📢 Réservez votre emplacement publicitaire','Découvrez Rizq ADS'];
+  const vidCtaLinksAR = ['📢 احجز مساحتك الإعلانية','تعرف على Rizq ADS'];
+  const vidCtaLinksFR = ['📢 Réservez votre espace publicitaire','Découvrez Rizq ADS'];
   vidCtaLinks.forEach((el,i)=>{ el.textContent = isAr ? (vidCtaLinksAR[i]||el.textContent) : (vidCtaLinksFR[i]||el.textContent); });
 
   // Search category dropdown
