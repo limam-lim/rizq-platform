@@ -1587,7 +1587,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.8"></script>
+  <script src="rizq_intro_video.js?v=28.9"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1920,8 +1920,9 @@ function rizqShare(title, url) {
         /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي واضحان (نفس حقل الداشبورد) */
         plan: 'سنوية',
         planName: 'سنوية',
-        promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
-        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
+        /* فيديو تعريفي = داشبورد المحل (تجريبي) بدل يوتيوب عام */
+        promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
+        promo_video_extra: ''
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: '' },
@@ -2026,6 +2027,8 @@ function rizqShare(title, url) {
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
+        accountType: 'store',
+        poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
         title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
         linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
         playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
@@ -2034,6 +2037,7 @@ function rizqShare(title, url) {
       var okExtra = false;
       if(extra && extraMount && extraFrame){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
+          accountType: 'store',
           title: fr ? '🎬 Vidéo supplémentaire' : '🎬 فيديو إضافي',
           linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
           playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو الإضافي'

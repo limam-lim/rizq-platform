@@ -253,7 +253,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_subscription_engine.js"></script>
   <script src="rizq_account_payments.js"></script>
   <script src="rizq_service_desk.js?v=1.1"></script>
-  <script src="rizq_intro_video.js?v=28.7"></script>
+  <script src="rizq_intro_video.js?v=28.9"></script>
   <script src="rizq_invoice_engine.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -740,6 +740,7 @@ const DEMO_ACC={id:'demo_law',token:'DEMO',status:'approved',type:'office',
   address:'تفرغ زينة — نواكشوط',
   ninea:'MR-DEMO-LAW',activity:'محاماة واستشارات قانونية',
   desc:'مكتب محاماة (بيانات تجريبية لمعاينة مشروع التخرج) — مساحة مهنية خاصة بغرفة طلبات باسم المكتب.',
+  promo_video:'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
   serviceDesk:{
     enabled:true,
     formTitle:'طلب استشارة — مكتب العدالة للمحاماة',
@@ -3051,6 +3052,8 @@ function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
   host.innerHTML = '';
   var ok = RizqIntroVideo.mount(host, link, {
+    accountType: 'office',
+    poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
     title: fr ? titleFr : titleAr,
     linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
     playLabel: fr ? "Lire l’aperçu" : 'تشغيل المعاينة',

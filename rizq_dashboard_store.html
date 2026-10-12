@@ -351,7 +351,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_store_topics.js?v=27.0"></script>
 <script src="rizq_store_commerce.js?v=28.5"></script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=28.9"></script>
 <script src="rizq_account_payments.js?v=28.2"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
@@ -1096,8 +1096,8 @@ const DEMO_ACCOUNT = {
   plan: "سنوية",
   planName: "سنوية",
   /* نفس الروابط التي تظهر في واجهة المحل التجريبية — واضحة وقابلة للمعاينة هنا */
-  promo_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-  promo_video_extra: "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+  promo_video: "rizq-assets/promo/rizq-dashboard-store-demo-light.mp4",
+  promo_video_extra: "",
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب خدمة — محل النجمة',
@@ -2443,6 +2443,8 @@ function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
   var fr = _storeDashLang && _storeDashLang() === 'fr';
   host.innerHTML = '';
   var ok = RizqIntroVideo.mount(host, link, {
+    accountType: 'store',
+    poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
     title: fr ? titleFr : titleAr,
     linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
     playLabel: fr ? 'Lire l’aperçu' : 'تشغيل المعاينة',

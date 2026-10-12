@@ -304,7 +304,7 @@ textarea.form-input{min-height:80px;resize:vertical}
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=28.9"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -1238,6 +1238,7 @@ var DEMO_ACC = {
   type: "corp",
   status: "approved",
   desc: "معرض تجريبي (معاينة مشروع تخرج) — كتالوج وسلة وغرفة طلبات ظاهرة وجاهزة.",
+  promo_video: "rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4",
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب من معرض بريستيج',
@@ -4110,6 +4111,8 @@ function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
   host.innerHTML = '';
   var ok = RizqIntroVideo.mount(host, link, {
+    accountType: 'corp',
+    poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
     title: fr ? titleFr : titleAr,
     linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
     playLabel: fr ? "Lire l’aperçu" : 'تشغيل المعاينة',

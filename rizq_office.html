@@ -1439,7 +1439,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=28.7"></script>
+  <script src="rizq_intro_video.js?v=28.9"></script>
   <script>
   window.mountOfficeIntroVideo = function(url, officeId){
     try{
@@ -1449,8 +1449,11 @@ function openMaps(){
         || '';
       if(!id || !window.RizqIntroVideo) return;
       var fr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
+      var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('office')) || '';
       var opts = {
         mountOpts: {
+          accountType: 'office',
+          poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
           title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
           linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
           playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
@@ -1458,7 +1461,11 @@ function openMaps(){
           unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
         }
       };
-      if(url) opts.url = url;
+      opts.url = url || dashUrl;
+      /* تجريبي بلا رابط محفوظ → داشبورد المكتب */
+      if(!url && (id === 'demo_law' || id.indexOf('demo') === 0 || /^acc_promo_/.test(id))) {
+        opts.url = dashUrl;
+      }
       RizqIntroVideo.loadAndMountForAccount(id, opts);
     }catch(e){}
   };
@@ -1783,7 +1790,8 @@ function openMaps(){
           { type: 'bank', bank: 'BCI', code: 'MR13 0001 2200 3344', note: isFr() ? 'Virement — honoraires' : 'تحويل — أتعاب المهنة' }
         ],
         /* فيديو تعريفي تجريبي — يظهر داخل قسم «عن المكتب» */
-        promo_video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        /* فيديو تعريفي = داشبورد المكتب (تجريبي) */
+        promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: isFr() ? '45 min' : '45 د' },
           { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: isFr() ? '3–5 jours' : '3–5 أيام' },

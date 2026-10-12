@@ -847,8 +847,8 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     /* فيديوهات تجريبية للمعاينة — تعريفي + إضافي */
     plan: 'سنوية',
     planName: 'سنوية',
-    promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
-    promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
+    promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
+    promo_video_extra: ''
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -1150,6 +1150,8 @@ function mountShowroomIntroVideo(){
   var fr = _lang === 'fr';
   var opts = {
     mountOpts: {
+      accountType: 'corp',
+      poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
       title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
       linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
       playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
@@ -1158,6 +1160,7 @@ function mountShowroomIntroVideo(){
     }
   };
   if(_acc && _acc.promo_video) opts.url = _acc.promo_video;
+  else if(RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
   RizqIntroVideo.loadAndMountForAccount(_showroomId, opts);
 }
 
@@ -1666,7 +1669,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=28.9"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>

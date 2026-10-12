@@ -1,8 +1,8 @@
 /**
- * rizq_intro_video.js — فيديو تعريفي مضمَّن (Embed) لصفحات المشتركين العامة
+ * rizq_intro_video.js — فيديو تعريفي مضمَّن لصفحات المشتركين العامة
  * ═══════════════════════════════════════════════════════════════════
- * يعرض غلاف يوتيوب واضحاً ثم يشغّل الـ embed بعد نقرة المستخدم
- * (يتفادى شاشة YouTube «Sign in to confirm you're not a bot» عند autoplay).
+ * YouTube / Facebook (embed بعد النقر) أو ملف MP4 محلي (داشبورد تجريبي).
+ * التجريبي حسب النوع: محل → داشبورد المحل، مكتب → داشبورد المكتب، شركة → داشبورد المعرض.
  * ═══════════════════════════════════════════════════════════════════
  */
 (function (global) {
@@ -16,15 +16,76 @@
   }
   function isFB(url) { return /facebook\.com|fb\.watch/.test(url || ''); }
 
+  /** فيديو محلي / MP4 (داشبورد تجريبي أو أصول رزق) */
+  function isNativeVideo(url) {
+    var s = String(url || '').trim();
+    if (!s) return false;
+    if (/^https?:\/\//i.test(s) && !/rizq-assets\//i.test(s)) {
+      return /\.(mp4|webm|ogg)(\?|#|$)/i.test(s);
+    }
+    return /\.(mp4|webm|ogg)(\?|#|$)/i.test(s) || /rizq-assets\/promo\//i.test(s);
+  }
+
   // MAX_SECONDS: الحد الأقصى لطول "الفيديو التعريفي" — 15-20 ثانية فقط
   var MAX_SECONDS = 20;
+
+  var DEMO_DASH_VIDEOS = {
+    store: {
+      video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
+      poster: 'rizq-assets/promo/rizq-dashboard-store-demo-poster.jpg'
+    },
+    office: {
+      video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
+      poster: 'rizq-assets/promo/rizq-dashboard-office-demo-poster.jpg'
+    },
+    corp: {
+      video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
+      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg'
+    },
+    showroom: {
+      video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
+      poster: 'rizq-assets/promo/rizq-dashboard-corp-demo-poster.jpg'
+    }
+  };
+
+  function normalizeAccountType(type) {
+    var t = String(type || '').toLowerCase().trim();
+    if (t === 'store' || t === 'shop' || t === 'محل') return 'store';
+    if (t === 'office' || t === 'bureau' || t === 'مكتب') return 'office';
+    if (t === 'corp' || t === 'company' || t === 'showroom' || t === 'معرض' || t === 'شركة') {
+      return t === 'showroom' || t === 'معرض' ? 'showroom' : 'corp';
+    }
+    return '';
+  }
+
+  /** رابط فيديو داشبورد تجريبي حسب نوع الحساب */
+  function demoDashboardVideo(type) {
+    var key = normalizeAccountType(type) || 'store';
+    var pack = DEMO_DASH_VIDEOS[key] || DEMO_DASH_VIDEOS.store;
+    return pack.video;
+  }
+
+  function demoDashboardPoster(type) {
+    var key = normalizeAccountType(type) || 'store';
+    var pack = DEMO_DASH_VIDEOS[key] || DEMO_DASH_VIDEOS.store;
+    return pack.poster;
+  }
+
+  /** إن كان الرابط يوتيوب تجريبي قديم (Big Buck / Rickroll) استبدله بداشبورد النوع */
+  function resolveDemoUrl(url, type) {
+    var s = String(url || '').trim();
+    var t = normalizeAccountType(type);
+    if (!t) return s;
+    if (!s) return demoDashboardVideo(t);
+    if (/aqz-KE-bpKQ|eRsGyueVLvQ|dQw4w9WgXcQ/i.test(s)) return demoDashboardVideo(t);
+    return s;
+  }
 
   function buildEmbedSrc(url, muted, maxSeconds, autoplay) {
     var cap = Number(maxSeconds) > 0 ? Number(maxSeconds) : MAX_SECONDS;
     var id = ytId(url);
     var ap = autoplay === false ? 0 : 1;
     if (id) {
-      // youtube-nocookie + origin يقلّلان حظر «confirm you're not a bot»
       var origin = '';
       try { origin = encodeURIComponent(location.origin || ''); } catch (e) {}
       return 'https://www.youtube-nocookie.com/embed/' + id +
@@ -49,6 +110,17 @@
     return 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
   }
 
+  function nativePosterFor(url, opts) {
+    if (opts && opts.poster) return String(opts.poster);
+    var s = String(url || '');
+    var m = s.match(/rizq-dashboard-(store|office|corp)-demo/i);
+    if (m) return 'rizq-assets/promo/rizq-dashboard-' + m[1].toLowerCase() + '-demo-poster.jpg';
+    if (/rizq-dashboard-store/i.test(s)) return DEMO_DASH_VIDEOS.store.poster;
+    if (/rizq-dashboard-office/i.test(s)) return DEMO_DASH_VIDEOS.office.poster;
+    if (/rizq-dashboard-corp/i.test(s)) return DEMO_DASH_VIDEOS.corp.poster;
+    return '';
+  }
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -59,10 +131,12 @@
   function safeExternalUrl(url) {
     var s = String(url || '').trim();
     if (!s || /[\s<>"']/.test(s) || /javascript:/i.test(s)) return '';
+    if (isNativeVideo(s) && !/^https?:\/\//i.test(s)) return '';
     try {
-      var p = new URL(s);
+      var p = new URL(s, location.href);
       if (p.protocol !== 'http:' && p.protocol !== 'https:') return '';
-      return s;
+      if (isNativeVideo(s)) return '';
+      return p.href;
     } catch (e) {
       return '';
     }
@@ -77,7 +151,7 @@
       '.rzq-iv-wrap{max-width:640px;margin:0 auto;width:100%;animation:rzqIvIn .55s cubic-bezier(.16,1,.3,1) both}' +
       '.rzq-iv-frame{position:relative;border-radius:12px;overflow:hidden;background:#0D1B2A;aspect-ratio:16/9;' +
         'box-shadow:0 0 0 1.5px rgba(201,168,76,.45),0 12px 36px rgba(15,35,71,.16)}' +
-      '.rzq-iv-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}' +
+      '.rzq-iv-frame iframe,.rzq-iv-frame video.rzq-iv-video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;object-fit:cover}' +
       '.rzq-iv-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
         'background-size:cover;background-position:center;cursor:pointer;border:none;padding:0;width:100%;height:100%}' +
       '.rzq-iv-poster::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,17,28,.15),rgba(6,17,28,.55))}' +
@@ -105,19 +179,22 @@
 
   /**
    * mount(hostEl, url, opts) — يبني الفيديو التعريفي داخل hostEl.
-   * يعرض غلاف يوتيوب فوراً، ويحمّل الـ iframe بعد النقر (أكثر موثوقية).
+   * opts.accountType: store|office|corp|showroom — يستبدل روابط يوتيوب التجريبية بداشبورد النوع.
    */
   function mount(hostEl, url, opts) {
     if (!hostEl || !url) return false;
-    var embedReady = !!buildEmbedSrc(url, true, MAX_SECONDS, true);
-    if (!embedReady) return false;
     opts = opts || {};
+    url = resolveDemoUrl(url, opts.accountType || opts.type);
+    var native = isNativeVideo(url);
+    var embedReady = native || !!buildEmbedSrc(url, true, MAX_SECONDS, true);
+    if (!embedReady) return false;
     injectCSS();
 
     var muted = true;
     var uid = 'rzq-iv-' + Math.random().toString(36).slice(2, 9);
     var id = ytId(url);
-    var thumb = ytThumb(url);
+    var thumb = native ? nativePosterFor(url, opts) : ytThumb(url);
+    if (!thumb && opts.accountType) thumb = demoDashboardPoster(opts.accountType);
     var playLbl = opts.playLabel || 'تشغيل الفيديو التعريفي';
     var posterBg = thumb
       ? ("background-image:url('" + String(thumb).replace(/'/g, '%27') + "')")
@@ -145,13 +222,53 @@
     var poster = hostEl.querySelector('#' + uid + '-poster');
     var soundBtn = hostEl.querySelector('#' + uid + '-sound');
 
-    function loadPlayer(withSound) {
+    function syncSoundLabel() {
+      if (!soundBtn) return;
+      soundBtn.classList.add('is-on');
+      soundBtn.textContent = muted
+        ? ('🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت'))
+        : ('🔊 ' + (opts.unmutedLabel || 'الصوت مفعّل'));
+    }
+
+    function loadNativePlayer(withSound) {
+      muted = !withSound;
+      if (!frame) return;
+      if (poster) poster.remove();
+      var oldV = frame.querySelector('video.rzq-iv-video');
+      if (oldV) oldV.remove();
+      var oldI = frame.querySelector('iframe');
+      if (oldI) oldI.remove();
+      var video = document.createElement('video');
+      video.className = 'rzq-iv-video';
+      video.id = uid + '-video';
+      video.src = url;
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.controls = true;
+      video.muted = muted;
+      video.autoplay = true;
+      if (thumb) video.poster = thumb;
+      var cap = MAX_SECONDS;
+      video.addEventListener('timeupdate', function () {
+        if (video.currentTime >= cap) {
+          try { video.pause(); video.currentTime = cap; } catch (e) {}
+        }
+      });
+      frame.appendChild(video);
+      var playP = video.play();
+      if (playP && typeof playP.catch === 'function') playP.catch(function () {});
+      syncSoundLabel();
+    }
+
+    function loadEmbedPlayer(withSound) {
       muted = !withSound;
       var src = buildEmbedSrc(url, muted, MAX_SECONDS, true);
       if (!src || !frame) return;
       if (poster) poster.remove();
       var old = frame.querySelector('iframe');
       if (old) old.remove();
+      var oldV = frame.querySelector('video.rzq-iv-video');
+      if (oldV) oldV.remove();
       var iframe = document.createElement('iframe');
       iframe.id = uid + '-iframe';
       iframe.src = src;
@@ -161,12 +278,12 @@
       iframe.setAttribute('loading', 'eager');
       iframe.title = opts.title || 'فيديو تعريفي';
       frame.appendChild(iframe);
-      if (soundBtn) {
-        soundBtn.classList.add('is-on');
-        soundBtn.textContent = muted
-          ? ('🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت'))
-          : ('🔊 ' + (opts.unmutedLabel || 'الصوت مفعّل'));
-      }
+      syncSoundLabel();
+    }
+
+    function loadPlayer(withSound) {
+      if (native) loadNativePlayer(withSound);
+      else loadEmbedPlayer(withSound);
     }
 
     if (poster) {
@@ -175,17 +292,26 @@
     if (soundBtn) {
       soundBtn.addEventListener('click', function () {
         muted = !muted;
+        if (native) {
+          var v = hostEl.querySelector('#' + uid + '-video');
+          if (v) {
+            v.muted = muted;
+            if (!muted) {
+              var p = v.play();
+              if (p && typeof p.catch === 'function') p.catch(function () {});
+            }
+          }
+          syncSoundLabel();
+          return;
+        }
         var iframe = hostEl.querySelector('#' + uid + '-iframe');
         var newSrc = buildEmbedSrc(url, muted, MAX_SECONDS, true);
         if (iframe && newSrc) iframe.src = newSrc;
-        soundBtn.textContent = muted
-          ? ('🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت'))
-          : ('🔊 ' + (opts.unmutedLabel || 'الصوت مفعّل'));
+        syncSoundLabel();
       });
     }
 
-    // إن لم تتوفر صورة غلاف (فيسبوك) نبقي زر التشغيل فوق خلفية كحلية
-    if (!id && poster && !thumb) {
+    if (!id && !native && poster && !thumb) {
       poster.style.background = 'linear-gradient(145deg,#0f1f3d,#1B3A6B)';
     }
 
@@ -207,7 +333,6 @@
       return ok;
     }
 
-    // رابط صريح من الصفحة (حساب محمّل مسبقاً) — يتجنّب سباق التخزين المحلي
     if (opts.url && tryShow(opts.url)) {
       return Promise.resolve(true);
     }
@@ -240,7 +365,6 @@
 
     return byId.then(function (ok) {
       if (ok) return true;
-      // احتياط: قائمة الحسابات العامة (نفس مصدر دليل المعارض/المكاتب)
       return fetch(base + '/api/accounts/public')
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
@@ -261,6 +385,11 @@
     buildEmbedSrc: buildEmbedSrc,
     ytId: ytId,
     ytThumb: ytThumb,
-    isFB: isFB
+    isFB: isFB,
+    isNativeVideo: isNativeVideo,
+    demoDashboardVideo: demoDashboardVideo,
+    demoDashboardPoster: demoDashboardPoster,
+    resolveDemoUrl: resolveDemoUrl,
+    MAX_SECONDS: MAX_SECONDS
   };
-})(typeof window !== 'undefined' ? window : this);
+})(window);
