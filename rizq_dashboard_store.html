@@ -922,7 +922,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
       <!-- Rizq ADS — إعلان فيديو -->
       <div class="card" style="margin-top:18px">
         <div class="card-title" style="margin-bottom:6px" data-t="rads-title">🎬 Rizq ADS — إعلان فيديو في الرئيسية</div>
-        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:12px" data-t="rads-hint">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات. اختر الباقة المناسبة لموضعك، ادفع، وارفع رابط فيديوك ليظهر لكل زوار المنصة.</p>
+        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:12px" data-t="rads-hint">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات. اختر الباقة وادفع ثم ألصق رابط فيديوك من لوحة حسابك — يفحصه المراقب الذكي ثم نوافق أو نرفض قبل النشر.</p>
         <div class="rads-placements" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
           <div style="border:1.5px solid rgba(201,168,76,.45);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,#fffdf6,#fff)">
             <div style="font-size:11px;font-weight:800;color:#a07820;margin-bottom:4px" data-t="rads-place1-label">الموضع ١</div>
@@ -3772,7 +3772,7 @@ function submitPayment(){
   }).then(function(){
     closePayModal();
     showToast(isVideo
-      ? _t2('✅ تم إرسال طلب Rizq ADS — سيتم مراجعته وتفعيل فيديوك في الرئيسية خلال 24 ساعة','✅ Votre demande Rizq ADS a été envoyée — elle sera examinée et votre vidéo activée en page d\'accueil sous 24h')
+      ? _t2('✅ تم إرسال طلب Rizq ADS — يُفحص المحتوى ثم نوافق أو نرفض قبل النشر في الرئيسية','✅ Votre demande Rizq ADS a été envoyée — le contenu sera contrôlé, puis approuvé ou refusé avant publication')
       : _t2('✅ تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','✅ Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'), 'success');
   }).catch(function(err){
     showToast((err && err.msg) || _t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'), 'error');
@@ -4072,7 +4072,7 @@ window.addEventListener('load', function(){
       <div id="pay-video-url-wrap" style="display:none;margin-bottom:18px">
         <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:block;font-size:12.5px">🎬 <span data-t="pay-video-url-label">رابط الفيديو الإعلاني</span></label>
         <input class="form-input" id="pay-video-url" dir="ltr" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0e8ff;border-radius:10px"/>
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المحدد بباقتك (الشاشة الكبيرة أو شريط البطاقات) على الصفحة الرئيسية</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">ألصق رابط يوتيوب أو فيسبوك — يُفحص المحتوى ثم نوافق أو نرفض قبل ظهوره في الموضع المحدد بباقتك (الشاشة الكبيرة أو شريط البطاقات)</div>
       </div>
       <!-- Steps -->
       <div style="margin-bottom:16px">
