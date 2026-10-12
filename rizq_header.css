@@ -1386,7 +1386,11 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #nav .nav-start .nav-fav-btn [data-rizq-fav-count][hidden],
   html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn [data-rizq-fav-count][hidden],
   html.rizq-app-nav #nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty,
-  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty{
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty,
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart .rizq-hdr-fav-count[hidden],
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart [data-rizq-cart-count][hidden],
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart .rizq-hdr-fav-count.is-empty,
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart [data-rizq-cart-count].is-empty{
     display:none !important;
   }
   html.rizq-app-nav #nav > .logo,
@@ -3513,7 +3517,11 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   html.rizq-app-nav #nav .nav-start .nav-fav-btn [data-rizq-fav-count][hidden],
   html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn [data-rizq-fav-count][hidden],
   html.rizq-app-nav #nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty,
-  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty{
+  html.rizq-app-nav #rizq-desk-nav .nav-start .nav-fav-btn .rizq-hdr-fav-count.is-empty,
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart .rizq-hdr-fav-count[hidden],
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart [data-rizq-cart-count][hidden],
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart .rizq-hdr-fav-count.is-empty,
+  html.rizq-app-nav #nav .nav-start .rizq-hdr-cart [data-rizq-cart-count].is-empty{
     display:none !important;
   }
   html.rizq-app-nav #nav #rizq-desk-more .rizq-hdr-lbl,
