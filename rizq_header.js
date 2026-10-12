@@ -145,7 +145,11 @@
   }
 
   function aboutHref() {
-    return 'rizq_landing_v8.html#about';
+    return 'rizq_platform.html#who';
+  }
+
+  function whyHref() {
+    return 'rizq_platform.html#why';
   }
 
   function desktopMoreMenuHtml() {
@@ -155,7 +159,8 @@
       '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">' + t2('الباقات', 'Forfaits') + '</strong></div></a>' +
       '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">' + t2('المواد القانونية', 'Mentions légales') + '</strong></div></a>' +
       '<a href="' + aboutHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-hdr="about">' + t2('من نحن', 'À propos') + '</strong></div></a>' +
-      '<a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-hdr="about">' + t2('الشركة المالكة', 'Société') + '</strong></div></a>';
+      '<a href="' + whyHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">❓</span><div><strong data-hdr="why">' + t2('لماذا رزق', 'Pourquoi Rizq') + '</strong></div></a>' +
+      '<a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-hdr="company">' + t2('الشركة المالكة', 'Société') + '</strong></div></a>';
   }
 
   function moduleHref(key) {
