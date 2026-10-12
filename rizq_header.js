@@ -301,13 +301,11 @@
   }
 
   function commerceToolbarHtml() {
-    if (isStorePage()) {
-      return '';
-    }
     var inner = '';
     if (!isCommercePage()) {
       inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
     } else {
+      // صفحات المحل: سلة (+ مفضلة المحل) — لا تُفرَّغ الأداة مبكراً
       if (isStorePage()) {
         inner +=
           '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
@@ -1008,6 +1006,14 @@
   }
 
   function deskFavHtml() {
+    // على المحل: أظهر السلة (ومفضلة المحل) بدل رابط مفضلة المنصة فقط
+    var commerce = commerceToolbarHtml();
+    if (commerce) {
+      return commerce.replace(
+        'class="rizq-toolbar-tools rizq-hdr-tools"',
+        'class="rizq-toolbar-tools rizq-hdr-tools nav-toolbar-tools"'
+      );
+    }
     return '<span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' +
       '<a href="rizq_landing_v8.html#wishlist-block" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
       t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +
