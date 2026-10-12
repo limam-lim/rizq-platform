@@ -2108,10 +2108,10 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   align-items:center;
   justify-content:center;
 }
-/* خط أوضح داخل نفس مساحة الخلفية (بدون زيادة ارتفاع/عرض البطاقة) */
-.section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;margin-bottom:2px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
-.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(14px,1.85vw,17px);font-weight:700;line-height:1.15;margin-bottom:2px;color:#fff}
-.section-header h2,.section-header .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(14px,1.85vw,17px)!important;font-weight:700;line-height:1.15;margin-bottom:2px;color:#fff!important}
+/* خطوط تناسب ارتفاع البطاقة الثابت 86px — وسم + عنوان + وصف بلا قصّ */
+.section-tag,.section-header .section-tag{display:inline-block;color:#fff!important;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin:0 0 2px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 1px 2px rgba(0,0,0,.28)}
+.section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(12px,1.5vw,15px);font-weight:700;line-height:1.2;margin:0 0 2px;color:#fff}
+.section-header h2,.section-header .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(12px,1.5vw,15px)!important;font-weight:700;line-height:1.2;margin:0 0 2px!important;color:#fff!important}
 /* عنوان القسم في سطر واحد على الشاشات المتوسطة+ */
 @media(min-width:700px){
   .section-header h2,.section-header .section-title{white-space:nowrap}
@@ -2121,9 +2121,9 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
     height:auto;min-height:0;max-height:none;padding:7px 10px;
     margin-bottom:10px;border-radius:9px;
   }
-  .section-header h2,.section-header .section-title{font-size:clamp(13px,3.4vw,15px)!important;white-space:normal;margin-bottom:2px!important}
-  .section-header .section-tag,.section-tag{font-size:10px;margin-bottom:2px;letter-spacing:1px}
-  .section-header .section-desc,.section-desc{font-size:11.5px;line-height:1.3}
+  .section-header h2,.section-header .section-title{font-size:clamp(11px,3vw,13px)!important;white-space:normal;margin:0 0 2px!important}
+  .section-header .section-tag,.section-tag{font-size:8px;margin:0 0 2px;letter-spacing:1px}
+  .section-header .section-desc,.section-desc{font-size:10px;line-height:1.3}
 }
 @media(max-width:480px){
   .rizq-feat-card{
@@ -2144,7 +2144,7 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
   color:var(--gold)!important;
 }
 .section-desc,.section-header>p:not(.section-tag):not(.landing-ads-count):not(.rizq-styles-tick):not(.rizq-srm-tick){
-  color:rgba(255,255,255,.92)!important;font-size:12.5px;max-width:440px;margin:0 auto;line-height:1.28;font-weight:600;
+  color:rgba(255,255,255,.92)!important;font-size:11px;max-width:440px;margin:0 auto;line-height:1.3;font-weight:600;
   text-shadow:0 1px 2px rgba(0,0,0,.25);
 }
 html[dir="rtl"] .section-header .section-title,
@@ -3709,14 +3709,14 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-styles .section-header,#rizq-showroom-models .section-header{text-align:center;margin-bottom:22px}
 #rizq-styles .section-title,#rizq-showroom-models .section-title{
   font-family:Georgia,'Noto Naskh Arabic',serif;
-  font-size:clamp(15px,1.95vw,18px)!important;font-weight:700;color:#fff;margin:0 0 2px;line-height:1.15
+  font-size:clamp(12px,1.5vw,15px)!important;font-weight:700;color:#fff;margin:0 0 2px;line-height:1.2
 }
 #rizq-styles .section-title span,#rizq-showroom-models .section-title span{
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
 #rizq-styles .section-desc,#rizq-showroom-models .section-desc{
-  color:rgba(255,255,255,.95);font-size:13px;font-weight:600;max-width:440px;margin:0 auto;line-height:1.28;
+  color:rgba(255,255,255,.95);font-size:11px;font-weight:600;max-width:440px;margin:0 auto;line-height:1.3;
   text-shadow:0 1px 2px rgba(0,0,0,.35)
 }
 .rizq-styles-toolbar{
@@ -3957,8 +3957,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 @media(max-width:640px){
   #rizq-styles,#rizq-showroom-models{padding:28px var(--rizq-strip-inset) 32px!important}
   #rizq-styles .section-header,#rizq-showroom-models .section-header{margin-bottom:16px}
-  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(13px,3.6vw,15px)!important;margin-bottom:2px}
-  #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:11.5px;line-height:1.3;max-width:100%}
+  #rizq-styles .section-title,#rizq-showroom-models .section-title{font-size:clamp(11px,3vw,13px)!important;margin:0 0 2px}
+  #rizq-styles .section-desc,#rizq-showroom-models .section-desc{font-size:10px;line-height:1.3;max-width:100%}
   .rizq-styles-reshuffle{margin-top:10px;padding:6px 12px;font-size:11px}
   .landing-ads-filters{gap:6px;margin-bottom:14px}
   .landing-ads-filter{padding:6px 12px;font-size:11.5px}
