@@ -37,16 +37,26 @@
     return { text: fr ? 'Disponible en stock' : 'موجود في الاستوك', level: 'in', qty: n };
   }
 
+  /** نص مختصر لبطاقات الشبكة — النص الطويل يغطي صورة المنتج على الهاتف */
+  function buyerBadgeShort(raw, fr) {
+    if (fr == null) fr = langIsFr();
+    var n = parseStock(raw);
+    if (n == null) return null;
+    if (n <= 0) return { text: fr ? 'Épuisé' : 'نفد', level: 'out', qty: 0 };
+    if (n <= LOW) return { text: fr ? ('×' + n) : ('متبقي ' + n), level: 'low', qty: n };
+    return { text: fr ? 'En stock' : 'متوفر', level: 'in', qty: n };
+  }
+
   /** شارة HTML مختصرة لبطاقات المنتجات */
   function buyerBadgeHtml(raw, fr) {
-    var info = buyerLabel(raw, fr);
+    var info = buyerBadgeShort(raw, fr);
     if (!info) return '';
     var bg = info.level === 'out'
       ? 'background:#9aa;color:#fff'
       : info.level === 'low'
         ? 'background:rgba(217,119,6,.92);color:#fff'
         : 'background:rgba(22,163,74,.9);color:#fff';
-    return '<span class="rizq-stock-badge product-tag" style="' + bg + ';font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px">'
+    return '<span class="rizq-stock-badge product-tag" data-stock-level="' + info.level + '" style="' + bg + '">'
       + (info.level === 'out' ? '❌ ' : info.level === 'low' ? '⚡ ' : '📦 ')
       + info.text
       + '</span>';
@@ -161,6 +171,7 @@
     LOW: LOW,
     parse: parseStock,
     buyerLabel: buyerLabel,
+    buyerBadgeShort: buyerBadgeShort,
     buyerBadgeHtml: buyerBadgeHtml,
     decrement: decrement,
     decrementCartItems: decrementCartItems

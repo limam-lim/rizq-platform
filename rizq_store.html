@@ -19,11 +19,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=26.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=27.0"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=26.7"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
-<link rel="preload" href="rizq_header.js?v=26.9" as="script"/>
+<link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
@@ -551,6 +551,14 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 .product-tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:6px;letter-spacing:.3px;z-index:2}
 .product-tag-new{background:var(--navy);color:#fff}
 .product-tag-hot{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0D1B2A}
+/* شارة المخزون: لا تغطي صورة المنتج — ركن صغير بنص مختصر */
+.product-img .rizq-stock-badge.product-tag{
+  top:auto;bottom:8px;left:8px;right:auto;
+  max-width:calc(100% - 16px);
+  font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;letter-spacing:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.2);line-height:1.2;
+}
 /* زر المفضّلة (خدمة جديدة للزائر — يعمل محلياً بلا حساب، بلا أي بيانات وهمية) */
 .wish-btn{
   position:absolute;top:8px;right:8px;z-index:8;
@@ -708,6 +716,11 @@ footer{
   .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .product-img{height:100px;font-size:32px}
   #products-grid .product-img .rzq-adx-media{min-height:100px}
+  .product-img .rizq-stock-badge.product-tag{
+    bottom:5px;left:5px;
+    font-size:9px;padding:2px 5px;border-radius:5px;
+    max-width:calc(100% - 10px);
+  }
   .products-header{padding:10px 12px;border-radius:10px}
   .section-title{font-size:14px}
   .view-all-btn{padding:5px 8px;font-size:11.5px}
@@ -979,7 +992,7 @@ footer{
 </head>
 <body data-t-ns="store">
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو -->
-<script src="rizq_header.js?v=26.9"></script>
+<script src="rizq_header.js?v=27.0"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
 <!-- TOPNAV -->
@@ -2219,9 +2232,23 @@ function rizqShare(title, url) {
       window._rizqStoreShowMoreProducts = renderMore;
       renderMore();
       if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
+      // الهيدر يُحقَن أحياناً بعد الرسم — أعد ربط السلة بمعرّف المحل
+      setTimeout(function(){
+        if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
+      }, 120);
     }
     window.mountStorePromoVideo = mountStorePromoVideo;
     window.paintStoreProductsGrid = paintStoreProductsGrid;
+    window._rizqWireStoreCartLinks = function(){
+      var sid = window._rizqStoreAccountId || '';
+      try {
+        if (!sid) {
+          var p = new URLSearchParams(location.search);
+          sid = p.get('id') || p.get('store') || '';
+        }
+      } catch (eW) {}
+      if (sid && window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(sid);
+    };
 
     function apply(){
       try{
@@ -2703,22 +2730,62 @@ function updateCartCount(){
   try{ document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); }catch(e){}
 }
 function addToCartStore(id){
-  var p = (window.STORE_FEATURED_PRODUCTS || STORE_FEATURED_PRODUCTS)[id];
-  if (!p) return;
+  id = String(id == null ? '' : id);
+  if (!id) return false;
+  var catalog = window.STORE_FEATURED_PRODUCTS || STORE_FEATURED_PRODUCTS || {};
+  var p = catalog[id];
+  if (!p) {
+    try {
+      Object.keys(catalog).forEach(function(k){
+        if (!p && String(k) === id) p = catalog[k];
+      });
+    } catch (eFind) {}
+  }
   var fr = (localStorage.getItem('rizq_lang') === 'fr');
+  if (!p) {
+    if (typeof showToast === 'function') {
+      showToast(fr ? '❌ Produit introuvable' : '❌ المنتج غير موجود', 'error');
+    }
+    return false;
+  }
   var cart = _storeLoadCart();
-  var ex = cart.find(function(c){ return c.id === 'store-prod-' + id; });
-  var sid = '';
-  try { sid = new URLSearchParams(location.search).get('id') || ''; } catch (e) {}
-  var sname = (document.getElementById('store-name') || {}).textContent || '';
-  if (ex) ex.qty++;
+  var lineId = 'store-prod-' + id;
+  var ex = cart.find(function(c){ return String(c.id) === lineId; });
+  var sid = window._rizqStoreAccountId || '';
+  try {
+    if (!sid) {
+      var params = new URLSearchParams(location.search);
+      sid = params.get('id') || params.get('store') || '';
+    }
+  } catch (e) {}
+  var nameEl = document.getElementById('store-name-el') || document.getElementById('store-name');
+  var sname = nameEl ? String(nameEl.textContent || '').trim() : '';
+  if (ex) ex.qty = (Number(ex.qty) || 0) + 1;
   // إصلاح تسرب اللغة: كنا نخزّن اسماً واحداً محسوماً وقت الإضافة فقط (name أو
   // nameF)، فإذا بدّل المستخدم اللغة لاحقاً في rizq_cart.html يبقى الاسم القديم
   // ظاهراً. الآن نخزّن كلا الاسمين ليختار cart.html الاسم الصحيح دائماً.
-  else cart.push({id:'store-prod-'+id, name:p.name, nameF:p.nameF, price:p.price, qty:1, emoji:p.emoji, storeId:sid, accountId:sid, storeName:sname});
+  else {
+    cart.push({
+      id: lineId,
+      name: p.name || p.nameF || '',
+      nameF: p.nameF || p.name || '',
+      price: Number(p.price) || 0,
+      qty: 1,
+      emoji: p.emoji || '📦',
+      storeId: sid,
+      accountId: sid,
+      storeName: sname
+    });
+  }
   _storeSaveCart(cart);
   updateCartCount();
-  showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + (fr?p.nameF:p.name));
+  var label = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
+  showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + label);
+  // اربط روابط السلة في الهيدر بمعرّف المحل بعد أول إضافة
+  if (sid && window.RizqStoreCommerce && typeof RizqStoreCommerce.wireStoreLinks === 'function') {
+    RizqStoreCommerce.wireStoreLinks(sid);
+  }
+  return true;
 }
 
 function submitStoreServiceReq(){

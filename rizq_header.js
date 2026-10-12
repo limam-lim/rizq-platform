@@ -305,6 +305,7 @@
     if (!isCommercePage()) {
       inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
     } else {
+      // صفحات المحل: سلة (+ مفضلة المحل) — لا تُفرَّغ الأداة مبكراً
       if (isStorePage()) {
         // مفضلة منتجات المحل (لوحة wish-panel المحلية) — ليست مفضلة إعلانات المنصّة
         inner +=
@@ -326,7 +327,13 @@
         t2('السلة', 'Panier') +
         '" title="' +
         t2('السلة', 'Panier') +
-        '">🛒<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
+        '">' +
+        '<span class="rizq-hdr-cart-ico" aria-hidden="true">' +
+        '<svg viewBox="0 0 24 24" width="18" height="18" focusable="false">' +
+        '<path fill="currentColor" d="M7.2 18.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9.6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM4.1 4h1.7c.5 0 .9.3 1 .8l.3 1.4h12.4c.6 0 1 .5.9 1.1l-1.1 6.2a1.8 1.8 0 0 1-1.8 1.5H8.6a1.8 1.8 0 0 1-1.8-1.5L5.4 5.6H4.1c-.5 0-.9-.4-.9-.9S3.6 4 4.1 4zm4.5 11.5h8.1l.9-5.1H7.5l1.1 5.1z"/>' +
+        '</svg></span>' +
+        '<span class="rizq-hdr-cart-lbl">' + t2('السلة', 'Panier') + '</span>' +
+        '<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
     }
     if (!inner) return '';
     return '<span class="rizq-toolbar-tools rizq-hdr-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' + inner + '</span>';
@@ -1006,8 +1013,7 @@
   }
 
   function deskFavHtml() {
-    // على المحل/المنتجات/السلة: نفس أدوات التجارة (مفضلة المحل أو المنصّة + السلة)
-    // كانت مفضلة المكتب تشير دائماً لـ landing#wishlist-block حتى من صفحة المحل
+    // على المحل/المنتجات/السلة: أدوات التجارة (مفضلة المحل + السلة)
     var commerce = commerceToolbarHtml();
     if (commerce) {
       return commerce.replace(
