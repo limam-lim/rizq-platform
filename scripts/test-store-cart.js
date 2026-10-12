@@ -13,6 +13,7 @@ assert(
   'header must not hide commerce tools on store pages'
 );
 assert(headerJs.includes('rizq-hdr-cart'), 'header must include cart control');
+assert(headerJs.includes('rizq-hdr-cart-lbl'), 'cart control must show visible السلة/Panier label');
 assert(headerJs.includes('commerceToolbarHtml()'), 'desk tools must reuse commerce toolbar');
 assert(storeHtml.includes('store-name-el'), 'addToCartStore must read store-name-el');
 assert(storeHtml.includes('_rizqWireStoreCartLinks'), 'store must rewire cart links after header inject');
