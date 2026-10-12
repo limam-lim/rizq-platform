@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1587,7 +1587,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=28.8"></script>
+  <script src="rizq_intro_video.js?v=29.5"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1826,7 +1826,13 @@ function rizqShare(title, url) {
         setHref('store-call-top', 'tel:' + String(phone).replace(/\s/g,''));
         setHref('hub-call-top', 'tel:' + String(phone).replace(/\s/g,''));
         var phoneEl2 = document.getElementById('info-value-phone-el');
-        if(phoneEl2){ phoneEl2.textContent = phone; phoneEl2.classList.remove('rzq-contact-masked'); phoneEl2.onclick = null; }
+        if(phoneEl2){
+          phoneEl2.textContent = (window.RizqNumbers && RizqNumbers.formatPhone) ? RizqNumbers.formatPhone(phone) : phone;
+          phoneEl2.setAttribute('dir','ltr');
+          phoneEl2.classList.add('rizq-phone-ltr');
+          phoneEl2.classList.remove('rzq-contact-masked');
+          phoneEl2.onclick = null;
+        }
       }
       if(email){
         setText('info-value-email-el', email);
@@ -1914,7 +1920,8 @@ function rizqShare(title, url) {
         /* باقة سنوية تجريبية: فيديو تعريفي + فيديو إضافي واضحان (نفس حقل الداشبورد) */
         plan: 'سنوية',
         planName: 'سنوية',
-        promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+        /* تعريفي: بضع ثوانٍ من داشبورد المحل · إضافي: كما كان (يوتيوب) */
+        promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
       };
       var products = [
@@ -2019,7 +2026,16 @@ function rizqShare(title, url) {
       /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
+      /* تجنّب إعادة التركيب المتكرر لنفس الروابط (يحافظ على موضع التشغيل) */
+      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar'].join('|');
+      if (spot.getAttribute('data-rzq-promo-sig') === promoSig && introMount.querySelector('.rzq-iv-wrap')) {
+        spot.style.display = '';
+        return;
+      }
+      spot.setAttribute('data-rzq-promo-sig', promoSig);
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
+        accountType: 'store',
+        poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
         title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
         linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
         playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'

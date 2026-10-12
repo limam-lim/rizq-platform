@@ -9,6 +9,23 @@
   --rizq-almazdi-bright:#E8C96A;
 }
 
+/* أرقام الهاتف والحسابات: لاتينية وLTR — علامة + دائماً من اليسار */
+a[href^="tel:"],
+a[href^="TEL:"],
+.phone-num,
+.phone-display,
+.contact-phone,
+.rizq-phone-ltr,
+.rzq-paych-val,
+[data-phone],
+input[type="tel"],
+input[type="number"]{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  text-align:left !important;
+  font-variant-numeric:lining-nums tabular-nums;
+}
+
 html.rizq-app-nav,
 html.rizq-app-nav body,
 html.rizq-app-nav *:not(.logo-ar):not(.logo-sub):not(.logo-text):not(.rizq-hdr-brand-ar):not(.rizq-hdr-brand-sub):not(.logo-mark):not(.logo-mark-img):not(.rizq-hdr-brand-mark):not(.rizq-splash-brand):not(.rn-logo-ar):not(.rn-logo-sub):not(.sb-logo-ar):not(.sb-logo-sub){

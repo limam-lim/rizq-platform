@@ -239,13 +239,26 @@
     <input class="inp" id="b-whatsapp" type="tel" dir="ltr"/>
     <div class="err" id="e-whatsapp"></div>
 
-    <label class="lbl" for="b-city" id="l-city">المدينة *</label>
+    <label class="lbl" for="b-city" id="l-city">الولاية *</label>
     <select class="inp" id="b-city" style="cursor:pointer">
       <option value="">—</option>
-      <option value="نواكشوط">نواكشوط / Nouakchott</option>
+      <option value="نواكشوط الغربية">نواكشوط الغربية / Nouakchott Ouest</option>
+      <option value="نواكشوط الشمالية">نواكشوط الشمالية / Nouakchott Nord</option>
+      <option value="نواكشوط الجنوبية">نواكشوط الجنوبية / Nouakchott Sud</option>
       <option value="نواذيبو">نواذيبو / Nouadhibou</option>
-      <option value="روصو">روصو / Rosso</option>
+      <option value="تيرس زمور">تيرس زمور / Tiris Zemmour</option>
+      <option value="أطار">أطار / Atar</option>
+      <option value="تيجيكجة">تيجيكجة / Tidjikja</option>
       <option value="كيفة">كيفة / Kiffa</option>
+      <option value="العيون">العيون / Aïoun el Atrouss</option>
+      <option value="نعمة">نعمة / Néma</option>
+      <option value="سيلبابي">سيلبابي / Sélibabi</option>
+      <option value="كيهيدي">كيهيدي / Kaédi</option>
+      <option value="ألاك">ألاك / Aleg</option>
+      <option value="براكنة">براكنة / Brakna</option>
+      <option value="روصو">روصو / Rosso</option>
+      <option value="ترارزة">ترارزة / Trarza</option>
+      <option value="أكجوجت">أكجوجت / Akjoujt</option>
       <option value="أخرى">أخرى / Autre</option>
     </select>
     <div class="err" id="e-city"></div>
@@ -394,9 +407,9 @@
       });
     }
     var lines = ['<div>' + t('مسجّل كمشتري', 'Connecté comme acheteur') + '</div>'];
-    if (s.phone) lines.push('<div>📱 +222 ' + esc(s.phone) + '</div>');
-    if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
-    if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
+    if (s.phone) lines.push('<div>📱 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">+222 ' + esc(s.phone) + '</span></div>');
+    if (s.phoneIntl) lines.push('<div>🌍 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">' + esc(s.phoneIntl) + '</span></div>');
+    if (s.whatsapp) lines.push('<div>💬 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">' + esc(s.whatsapp) + '</span></div>');
     lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
     if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
     if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');
@@ -780,7 +793,7 @@
     document.getElementById('t-phone-hint').textContent = t('رقم موريتاني أو دولي — واحد على الأقل.', 'Au moins un numéro.');
     document.getElementById('t-wa-same').textContent = t('نفس الرقم للواتساب', 'Même numéro WhatsApp');
     document.getElementById('l-whatsapp').textContent = t('واتساب *', 'WhatsApp *');
-    document.getElementById('l-city').textContent = t('المدينة *', 'Ville *');
+    document.getElementById('l-city').textContent = t('الولاية *', 'Wilaya *');
     document.getElementById('l-address').textContent = t('عنوان التوصيل / السكن *', 'Adresse de livraison / domicile *');
     document.getElementById('b-address').placeholder = t('الحي، الشارع، أقرب معلم', 'Quartier, rue, point de repère');
     document.getElementById('t-address-hint').textContent = t('يُستخدم لاحقاً للتوصيل والفاتورة وطلبات الخدمات دون إعادة كتابته', 'Réutilisée pour livraison, facture et services');

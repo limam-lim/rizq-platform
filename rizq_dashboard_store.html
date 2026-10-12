@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>(function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();</script>
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -341,6 +343,21 @@ textarea.form-input{resize:vertical;min-height:90px}
   border-color:rgba(201,168,76,.8);
   box-shadow:-4px 0 24px rgba(201,168,76,.2);
 }
+
+/* وضع التضمين داخل الفيديو التعريفي */
+html.rizq-dash-embed body{overflow:hidden!important}
+html.rizq-dash-embed .sidebar,
+html.rizq-dash-embed #sidebar,
+html.rizq-dash-embed .mobile-bar,
+html.rizq-dash-embed #mobile-bar,
+html.rizq-dash-embed .sb-overlay,
+html.rizq-dash-embed #sb-overlay,
+html.rizq-dash-embed #rizq-app-header,
+html.rizq-dash-embed .rizq-demo-ribbon,
+html.rizq-dash-embed [id*="demo-ribbon"]{display:none!important}
+html.rizq-dash-embed .main{margin:0!important;width:100%!important;max-width:none!important}
+html.rizq-dash-embed .topbar{padding:8px 14px!important}
+html.rizq-dash-embed .content{padding:10px 12px!important}
 </style>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
@@ -351,7 +368,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_store_topics.js?v=27.0"></script>
 <script src="rizq_store_commerce.js?v=28.5"></script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=29.5"></script>
 <script src="rizq_account_payments.js?v=28.2"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
@@ -1096,7 +1113,7 @@ const DEMO_ACCOUNT = {
   plan: "سنوية",
   planName: "سنوية",
   /* نفس الروابط التي تظهر في واجهة المحل التجريبية — واضحة وقابلة للمعاينة هنا */
-  promo_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  promo_video: "rizq-assets/promo/rizq-dashboard-store-demo-light.mp4",
   promo_video_extra: "https://www.youtube.com/watch?v=eRsGyueVLvQ",
   serviceDesk: {
     enabled: true,
@@ -2443,6 +2460,8 @@ function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
   var fr = _storeDashLang && _storeDashLang() === 'fr';
   host.innerHTML = '';
   var ok = RizqIntroVideo.mount(host, link, {
+    accountType: 'store',
+    poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
     title: fr ? titleFr : titleAr,
     linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
     playLabel: fr ? 'Lire l’aperçu' : 'تشغيل المعاينة',

@@ -578,12 +578,25 @@ main, .page-content.active, .main-content, .results-area,
               <div class="form-err" id="f-address-err" data-t-fr="L'adresse est requise">العنوان مطلوب</div>
             </div>
             <div class="form-group">
-              <label data-t-fr="Ville *">المدينة *</label>
+              <label data-t-fr="Wilaya *">الولاية *</label>
               <select id="f-city">
-                <option value="نواكشوط" data-t-fr="Nouakchott">نواكشوط</option>
+                <option value="نواكشوط الغربية" data-t-fr="Nouakchott Ouest">نواكشوط الغربية</option>
+                <option value="نواكشوط الشمالية" data-t-fr="Nouakchott Nord">نواكشوط الشمالية</option>
+                <option value="نواكشوط الجنوبية" data-t-fr="Nouakchott Sud">نواكشوط الجنوبية</option>
                 <option value="نواذيبو" data-t-fr="Nouadhibou">نواذيبو</option>
-                <option value="روصو" data-t-fr="Rosso">روصو</option>
+                <option value="تيرس زمور" data-t-fr="Tiris Zemmour">تيرس زمور</option>
+                <option value="أطار" data-t-fr="Atar">أطار</option>
+                <option value="تيجيكجة" data-t-fr="Tidjikja">تيجيكجة</option>
                 <option value="كيفة" data-t-fr="Kiffa">كيفة</option>
+                <option value="العيون" data-t-fr="Aïoun el Atrouss">العيون</option>
+                <option value="نعمة" data-t-fr="Néma">نعمة</option>
+                <option value="سيلبابي" data-t-fr="Sélibabi">سيلبابي</option>
+                <option value="كيهيدي" data-t-fr="Kaédi">كيهيدي</option>
+                <option value="ألاك" data-t-fr="Aleg">ألاك</option>
+                <option value="براكنة" data-t-fr="Brakna">براكنة</option>
+                <option value="روصو" data-t-fr="Rosso">روصو</option>
+                <option value="ترارزة" data-t-fr="Trarza">ترارزة</option>
+                <option value="أكجوجت" data-t-fr="Akjoujt">أكجوجت</option>
                 <option value="أخرى" data-t-fr="Autre">أخرى</option>
               </select>
             </div>
@@ -752,12 +765,23 @@ function paintDeliveryConfirmed(info) {
   if (!box || !section) return;
   var isAr = document.documentElement.lang !== 'fr';
   document.getElementById('dc-name').textContent = (isAr ? 'الاسم: ' : 'Nom : ') + (info.name || '—');
-  document.getElementById('dc-phone').textContent = (isAr ? 'الهاتف: ' : 'Tél. : ') + (info.phone || '—');
+  (function(){
+    var phoneLbl = isAr ? 'الهاتف: ' : 'Tél. : ';
+    var phoneVal = info.phone || '—';
+    if (window.RizqNumbers && typeof RizqNumbers.formatPhone === 'function' && phoneVal !== '—') {
+      phoneVal = RizqNumbers.formatPhone(phoneVal);
+    }
+    var dcPhone = document.getElementById('dc-phone');
+    if (dcPhone) {
+      dcPhone.innerHTML = phoneLbl + '<span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'
+        + String(phoneVal).replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>';
+    }
+  })();
   document.getElementById('dc-address').textContent = (isAr ? 'العنوان: ' : 'Adresse : ') + (info.address || '—');
   var cityLine = info.city || '';
   if (info.district) cityLine += (cityLine ? ' — ' : '') + info.district;
   document.getElementById('dc-city').textContent = cityLine
-    ? ((isAr ? 'المدينة: ' : 'Ville : ') + cityLine)
+    ? ((isAr ? 'الولاية: ' : 'Wilaya : ') + cityLine)
     : '';
   box.classList.add('is-on');
   section.classList.add('is-locked');

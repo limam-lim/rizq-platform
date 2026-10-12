@@ -11,6 +11,25 @@
     return 'rizq_my_payments_' + (accountId || 'demo');
   }
 
+  function westernDigits(value) {
+    if (global.RizqNumbers && typeof global.RizqNumbers.toWestern === 'function') {
+      return global.RizqNumbers.toWestern(value);
+    }
+    return String(value == null ? '' : value)
+      .replace(/[\u0660-\u0669]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x0660 + 48); })
+      .replace(/[\u06F0-\u06F9]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x06F0 + 48); });
+  }
+
+  function phoneLtrHtml(value, extraStyle) {
+    var v = westernDigits(value).trim();
+    if (v.charAt(v.length - 1) === '+' && v.indexOf('+') === v.length - 1) {
+      v = '+' + v.slice(0, -1).replace(/^\+/, '');
+    }
+    var style = 'direction:ltr;unicode-bidi:isolate;text-align:left;' + (extraStyle || '');
+    return '<code class="rzq-paych-val rizq-phone-ltr" dir="ltr" style="' + style + '">'
+      + esc(v) + '</code>';
+  }
+
   function normalizeMethods(arr) {
     if (!Array.isArray(arr)) return [];
     return arr.slice(0, 10).map(function (m) {
@@ -159,8 +178,8 @@
         + '<span class="rzq-pay-radio" aria-hidden="true"></span>'
         + '</div>'
         + '<div class="rzq-paych-row">'
-        + '<code class="rzq-paych-val" dir="ltr">' + esc(c.value) + '</code>'
-        + '<span class="rzq-paych-copy" data-copy="' + esc(c.value) + '" role="button">' + (fr ? '📋' : '📋') + '</span>'
+        + phoneLtrHtml(c.value)
+        + '<span class="rzq-paych-copy" data-copy="' + esc(westernDigits(c.value).trim()) + '" role="button">' + (fr ? '📋' : '📋') + '</span>'
         + '</div></button>';
     }).join('');
   }
@@ -195,7 +214,7 @@
       + '.rzq-paych-pick .rzq-pay-radio{margin:0}'
       + '.rzq-paych-pick.is-selected .rzq-pay-radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:#1B3A6B}'
       + '.rzq-paych-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}'
-      + '.rzq-paych-val{flex:1;min-width:140px;font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:800;color:#0f2347;background:#f8faff;border:1px solid #d8e2f0;border-radius:9px;padding:9px 12px;letter-spacing:.4px}'
+      + '.rzq-paych-val{flex:1;min-width:140px;font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:800;color:#0f2347;background:#f8faff;border:1px solid #d8e2f0;border-radius:9px;padding:9px 12px;letter-spacing:.4px;direction:ltr!important;unicode-bidi:isolate!important;text-align:left!important;display:inline-block}'
       + '.rzq-paych-copy{border:none;border-radius:9px;padding:9px 12px;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}'
       + '.rzq-pay-back{border:1px solid rgba(27,58,107,.2);background:#fff;color:#1B3A6B;border-radius:10px;padding:9px 12px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;margin-bottom:12px}'
       + '.rzq-pay-confirm{width:100%;margin-top:12px;border:none;border-radius:12px;padding:13px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit}'
@@ -401,7 +420,7 @@
       var ch = channelsOf(m, { always: false });
       var chHtml = ch.map(function (c) {
         return '<div style="margin-top:6px"><span style="font-size:11px;color:#6a7a8a">' + esc(fr ? c.fr : c.ar) + '</span>'
-          + ' <code style="font-family:monospace;font-size:12.5px;font-weight:800;color:#0f2347;background:#e8f0fe;padding:3px 8px;border-radius:6px;direction:ltr">' + esc(c.value) + '</code></div>';
+          + ' ' + phoneLtrHtml(c.value, 'font-family:monospace;font-size:12.5px;font-weight:800;color:#0f2347;background:#e8f0fe;padding:3px 8px;border-radius:6px;display:inline-block') + '</div>';
       }).join('');
       return '<div style="background:#fff;border:1.5px solid rgba(27,58,107,.12);border-radius:10px;padding:12px 14px;margin-bottom:8px">'
         + '<div style="font-size:13px;font-weight:800;color:#1B3A6B">' + esc(m.bank || typeLabel(m.type, fr)) + '</div>'
@@ -441,8 +460,8 @@
       + '<span style="font-size:11px;font-weight:800;color:#0d1b2a;background:linear-gradient(135deg,#C9A84C,#E8C96A);padding:4px 10px;border-radius:999px">'
       + esc(typeLabel(m.type, fr)) + '</span></div>'
       + '<div style="font-size:12px;font-weight:700;color:#6a7a8a;margin-bottom:6px">' + icon + ' ' + esc(chLabel) + '</div>'
-      + '<code dir="ltr" style="display:block;font-family:ui-monospace,Menlo,monospace;font-size:16px;font-weight:900;color:#0f2347;background:#fff;border:1px solid #d8e2f0;border-radius:10px;padding:11px 14px;letter-spacing:.5px">'
-      + esc(selection.channelValue) + '</code>'
+      + '<code class="rizq-phone-ltr" dir="ltr" style="display:block;font-family:ui-monospace,Menlo,monospace;font-size:16px;font-weight:900;color:#0f2347;background:#fff;border:1px solid #d8e2f0;border-radius:10px;padding:11px 14px;letter-spacing:.5px;direction:ltr;unicode-bidi:isolate;text-align:left">'
+      + esc(westernDigits(selection.channelValue).trim()) + '</code>'
       + (m.note ? '<div style="font-size:11px;color:#4a5568;margin-top:8px;line-height:1.5">📝 ' + esc(m.note) + '</div>' : '')
       + '<div style="font-size:11px;color:#6b7280;margin-top:10px;line-height:1.5">'
       + (fr

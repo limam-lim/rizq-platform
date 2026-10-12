@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1872,7 +1872,7 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=29.5"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
@@ -1886,11 +1886,23 @@ window.mountCorpIntroVideo = function(url){
       || new URLSearchParams(location.search).get('corp')
       || '';
     if(!corpId || !window.RizqIntroVideo) return;
-    var opts = { mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' } };
-    if(url) opts.url = url;
-    else if(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video){
-      opts.url = RIZQ_CORP_ACCOUNT.promo_video;
-    }
+    var isDemo = !!(corpId === 'demo-corp-001' || /^demo/i.test(corpId) || /^acc_promo_/.test(corpId) || new URLSearchParams(location.search).get('demo') === '1');
+    var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('corp')) || '';
+    var resolved = isDemo ? dashUrl : (url || (typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video) || dashUrl);
+    var lang = (localStorage.getItem('rizq_lang')||'ar') === 'fr' ? 'fr' : 'ar';
+    var sig = [corpId, resolved || '', lang].join('|');
+    var mountEl = document.getElementById('intro-video-mount');
+    if (window.__rzqCorpIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+    window.__rzqCorpIntroSig = sig;
+    var opts = {
+      mountOpts: {
+        accountType: 'corp',
+        poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
+        title: lang === 'fr' ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
+        linkLabel: lang === 'fr' ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗'
+      }
+    };
+    opts.url = resolved;
     RizqIntroVideo.loadAndMountForAccount(corpId, opts);
   }catch(e){}
 };

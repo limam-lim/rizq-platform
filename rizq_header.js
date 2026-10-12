@@ -1808,8 +1808,20 @@
     closeHelpDropdowns: closeHelpDropdowns
   };
 
-  if (document.body) inject();
-  else document.addEventListener('DOMContentLoaded', inject);
+  /** تحميل موحّد: أرقام لاتينية + هاتف LTR (+ يساراً) في كل صفحات الهيدر */
+  function ensureNumbersLtrScript() {
+    try {
+      if (window.RizqNumbers || window.RizqInputBidi) return;
+      if (document.querySelector('script[src*="rizq_input_bidi.js"]')) return;
+      var s = document.createElement('script');
+      s.src = 'rizq_input_bidi.js?v=23.4';
+      s.defer = true;
+      (document.head || document.documentElement).appendChild(s);
+    } catch (e) {}
+  }
+
+  if (document.body) { ensureNumbersLtrScript(); inject(); }
+  else document.addEventListener('DOMContentLoaded', function () { ensureNumbersLtrScript(); inject(); });
   window.addEventListener('load', function () {
     if (isMobileNav() && !document.getElementById('rizq-app-header') && document.body) inject();
   });

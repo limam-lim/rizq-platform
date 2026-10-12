@@ -117,6 +117,7 @@
     }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
+      appendScript('rizq_input_bidi.js?v=' + ASSET_V, { defer: true });
     }
     /* فوتر المنصة الموحّد — زوار + داشبوردات المشتركين */
     if (!document.querySelector('script[src*="rizq_site_footer.js"]')) {

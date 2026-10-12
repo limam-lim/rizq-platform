@@ -847,7 +847,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     /* فيديوهات تجريبية للمعاينة — تعريفي + إضافي */
     plan: 'سنوية',
     planName: 'سنوية',
-    promo_video: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+    promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
     promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
   };
   var items = [
@@ -1148,8 +1148,11 @@ function applyAccountData(){
 function mountShowroomIntroVideo(){
   if(!_showroomId || !window.RizqIntroVideo) return;
   var fr = _lang === 'fr';
+  var isDemo = !!(window._rizqShowroomIsDemo || _showroomId === 'demo_showroom' || /^demo/i.test(String(_showroomId||'')) || /^acc_promo_/.test(String(_showroomId||'')) || new URLSearchParams(location.search).get('demo') === '1');
   var opts = {
     mountOpts: {
+      accountType: 'corp',
+      poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
       title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
       linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
       playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
@@ -1157,7 +1160,13 @@ function mountShowroomIntroVideo(){
       unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
     }
   };
-  if(_acc && _acc.promo_video) opts.url = _acc.promo_video;
+  if (isDemo && RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
+  else if (_acc && _acc.promo_video) opts.url = _acc.promo_video;
+  else if (RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
+  var sig = [_showroomId, opts.url || '', fr ? 'fr' : 'ar'].join('|');
+  var mountEl = document.getElementById('intro-video-mount');
+  if (window.__rzqShowroomIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+  window.__rzqShowroomIntroSig = sig;
   RizqIntroVideo.loadAndMountForAccount(_showroomId, opts);
 }
 
@@ -1616,7 +1625,18 @@ function applyLang(){
   _setTxt('ft-tag-clear', 'شفافية', 'Transparence');
   var vidSec = document.getElementById('video-intro-section');
   if (vidSec) vidSec.setAttribute('aria-label', isFr ? 'Vidéo de présentation' : 'فيديو تعريفي');
-  try { mountShowroomIntroVideo(); } catch (eVid) {}
+  /* أعد تركيب الفيديو فقط عند تغيّر اللغة (عناوين اللاعب) — لا في كل applyLang */
+  try {
+    if (window.__rzqShowroomIntroLang !== _lang) {
+      window.__rzqShowroomIntroLang = _lang;
+      var mountEl = document.getElementById('intro-video-mount');
+      if (mountEl) {
+        mountEl.removeAttribute('data-rzq-iv-url');
+        mountEl.removeAttribute('data-rzq-iv-title');
+      }
+      mountShowroomIntroVideo();
+    }
+  } catch (eVid) {}
 }
 
 /* ══ INIT ══ */
@@ -1644,7 +1664,14 @@ document.addEventListener('DOMContentLoaded', function(){
     var _orig = Storage.prototype.setItem;
     Storage.prototype.setItem = function(k,v){
       _orig.call(this,k,v);
-      if(k==='rizq_lang'){ _lang=v==='fr'?'fr':'ar'; applyLang(); renderCatalog(); loadPackages(); }
+      if(k==='rizq_lang'){
+        var next = v==='fr'?'fr':'ar';
+        if(next === _lang) return; /* تجنب حلقة writeLang ↔ applyLang */
+        _lang = next;
+        applyLang();
+        renderCatalog();
+        loadPackages();
+      }
     };
   }catch(e){}
 });
@@ -1666,7 +1693,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=28.7"></script>
+<script src="rizq_intro_video.js?v=29.5"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>
