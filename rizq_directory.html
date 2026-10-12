@@ -203,18 +203,27 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:36px}
 }
 
 .dir-empty{
-  text-align:center;padding:56px 24px;background:linear-gradient(180deg,#fff,#f8fafc);
+  text-align:center;padding:40px 24px 28px;background:linear-gradient(180deg,#fff,#f8fafc);
   border-radius:20px;border:1.5px dashed rgba(201,168,76,.35);
-  box-shadow:0 10px 28px rgba(15,35,65,.04);
+  box-shadow:0 10px 28px rgba(15,35,65,.04);grid-column:1/-1;
 }
 .dir-empty .emo{font-size:44px;margin-bottom:14px}
-.dir-empty p{color:#5b6b85;font-size:15px;margin-bottom:20px;font-weight:600}
-.dir-empty a{
+.dir-empty p{color:#5b6b85;font-size:15px;margin-bottom:18px;font-weight:600;max-width:520px;margin-inline:auto;line-height:1.7}
+.dir-empty > a.dir-empty-cta{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:14px 28px;border-radius:14px;
   background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;
   font-weight:900;font-size:14.5px;text-decoration:none;
   box-shadow:0 6px 18px rgba(201,168,76,.35);
+}
+.dir-examples-label{
+  grid-column:1/-1;margin:8px 0 4px;text-align:center;
+  font-size:12.5px;font-weight:800;color:#1B3A6B;letter-spacing:.3px;
+}
+.dir-card.is-example{border-style:dashed;border-color:rgba(201,168,76,.45)}
+.dir-card .dir-example-badge{
+  display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:6px;
+  font-size:9.5px;font-weight:800;background:rgba(201,168,76,.18);color:#8a6a1a;
 }
 
 @keyframes dirFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -360,7 +369,8 @@ var TYPE_META = {
     titleAr: 'دليل <span>المحلات</span>', titleFr: 'Annuaire des <span>boutiques</span>',
     subAr: 'محلات التجزئة — إلكترونيات، أزياء، قطع غيار، بقالة… (بيع السيارات في دليل المعارض).',
     subFr: 'Commerces de détail — électronique, mode, pièces auto, épicerie… (voitures dans les showrooms).',
-    emptyAr: 'لا توجد محلات مطابقة بعد.', emptyFr: 'Aucune boutique correspondante pour le moment.',
+    emptyAr: 'عند فتح محلات على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المحل.',
+    emptyFr: 'Quand des boutiques s\'ouvrent sur Rizq, elles apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
     ctaAr: 'زيارة المحل ←', ctaFr: 'Voir la boutique →',
     reg: 'rizq_register.html?mode=seller&preBiz=store',
     regCtaAr: '🚀 افتح محلك الآن', regCtaFr: '🚀 Ouvrez votre boutique',
@@ -374,7 +384,8 @@ var TYPE_META = {
     titleAr: 'دليل <span>المعارض</span>', titleFr: 'Annuaire des <span>showrooms</span>',
     subAr: 'معارض البيع الكبرى — سيارات، أثاث، إلكترونيات ومعدات. مختلف عن محلات التجزئة.',
     subFr: 'Grands showrooms — auto, meubles, électronique & équipements. Distinct des boutiques.',
-    emptyAr: 'لا توجد معارض مطابقة بعد.', emptyFr: 'Aucun showroom correspondant pour le moment.',
+    emptyAr: 'عند تسجيل معارض على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المعرض.',
+    emptyFr: 'Quand des showrooms s\'inscrivent sur Rizq, ils apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
     ctaAr: 'زيارة المعرض ←', ctaFr: 'Voir le showroom →',
     reg: 'rizq_register.html?mode=seller&preBiz=corp',
     regCtaAr: '🚀 سجّل معرضك الآن', regCtaFr: '🚀 Inscrivez votre showroom',
@@ -388,12 +399,29 @@ var TYPE_META = {
     titleAr: 'دليل <span>المكاتب</span>', titleFr: 'Annuaire des <span>bureaux</span>',
     subAr: 'تصفّح المكاتب حسب الاختصاص — محامون، خدمات إدارية، وكالات عقارية والمزيد — أو حسب الولاية.',
     subFr: 'Parcourez les bureaux par spécialité — avocats, services administratifs, agences immobilières… — ou par wilaya.',
-    emptyAr: 'لا توجد مكاتب مطابقة بعد.', emptyFr: 'Aucun bureau correspondant pour le moment.',
+    emptyAr: 'عند إنشاء مكاتب على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المكتب.',
+    emptyFr: 'Quand des bureaux s\'ouvrent sur Rizq, ils apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
     ctaAr: 'زيارة المكتب ←', ctaFr: 'Voir le bureau →',
     reg: 'rizq_register.html?mode=seller&preBiz=office',
     regCtaAr: '🚀 أنشئ مكتبك الآن', regCtaFr: '🚀 Créez votre bureau',
     ownAr: '✨ امتلك واجهتك المهنية على رزق', ownFr: '✨ Possédez votre vitrine professionnelle'
   }
+};
+
+/** أمثلة معاينة — تُعرض عند فراغ الدليل لتوضيح الضغط → فتح الصفحة */
+var DIR_EXAMPLES = {
+  store: [
+    { href: 'rizq_store.html?demo=1', nameAr: 'محل نموذجي على رزق', nameFr: 'Boutique modèle Rizq', actAr: 'إلكترونيات وتقنية', actFr: 'Électronique & tech', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '🏪' },
+    { href: 'rizq_store.html?demo=1', nameAr: 'واجهة محل بالصور والاسم', nameFr: 'Vitrine boutique photo + nom', actAr: 'أزياء وموضة', actFr: 'Mode', cityAr: 'نواذيبو', cityFr: 'Nouadhibou', icon: '👗' }
+  ],
+  corp: [
+    { href: 'rizq_showroom.html?demo=1', nameAr: 'معرض نموذجي على رزق', nameFr: 'Showroom modèle Rizq', actAr: 'معارض سيارات وبيع', actFr: 'Showroom auto', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '🚗' },
+    { href: 'rizq_showroom.html?demo=1', nameAr: 'كتالوج معرض بالصور', nameFr: 'Catalogue showroom', actAr: 'أثاث وإلكترونيات', actFr: 'Meubles & tech', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '🏬' }
+  ],
+  office: [
+    { href: 'rizq_office.html?demo=1', nameAr: 'مكتب محاماة نموذجي', nameFr: 'Cabinet d\'avocats modèle', actAr: 'محامون وقانون', actFr: 'Avocats & droit', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '⚖️' },
+    { href: 'rizq_office.html?demo=1', nameAr: 'مكتب خدمات إدارية', nameFr: 'Bureau administratif', actAr: 'خدمات إدارية', actFr: 'Services admin.', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '🏛️' }
+  ]
 };
 
 var CAT_LABELS = (window.RizqMerchantActivities && RizqMerchantActivities.LEGACY_DIR_LABELS) ? RizqMerchantActivities.LEGACY_DIR_LABELS : {
@@ -571,14 +599,13 @@ function renderDirectory(){
     ? (list.length + (list.length===1?' résultat':' résultats'))
     : (list.length + ' نتيجة موجودة');
 
-  if(!list.length){
-    grid.innerHTML = '<div class="dir-empty" style="grid-column:1/-1"><div class="emo">'+m.icon+'</div><p>'+(fr?m.emptyFr:m.emptyAr)+'</p>'
-      + '<a href="'+m.reg+'">'+(fr?m.regCtaFr:m.regCtaAr)+'</a></div>';
-    return;
+  function _accountThumb(a){
+    var src = a.thumb || a.logo || a.cover || a.avatar || a.photo || '';
+    return src ? ('<img src="'+escapeHtml(src)+'" alt="">') : m.icon;
   }
 
-  grid.innerHTML = list.map(function(a){
-    var thumb = a.thumb ? ('<img src="'+escapeHtml(a.thumb)+'" alt="">') : m.icon;
+  function _cardHTML(a){
+    var thumb = _accountThumb(a);
     var _badges = (typeof RizqSub!=='undefined') ? RizqSub.getBadges(a.id) : {verified:false,premium:false};
     var badgeHTML = (_badges.verified?'<span class="dir-badge dir-badge-verified">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
       + (_badges.premium?'<span class="dir-badge dir-badge-premium">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
@@ -597,7 +624,36 @@ function renderDirectory(){
       + (a.tagline ? '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>' : '')
       + '<div class="dir-cta">'+(fr?m.ctaFr:m.ctaAr)+'</div>'
       + '</a>';
-  }).join('');
+  }
+
+  function _exampleCardsHTML(){
+    var samples = DIR_EXAMPLES[_type] || [];
+    var label = fr
+      ? 'Exemple — cliquez une carte pour ouvrir la page'
+      : 'مثال — اضغط على البطاقة لفتح الصفحة';
+    return '<p class="dir-examples-label">'+label+'</p>' + samples.map(function(ex){
+      return '<a class="dir-card is-example" href="'+escapeHtml(ex.href)+'">'
+        + '<div class="dir-card-top"><div class="dir-thumb">'+(ex.icon||m.icon)+'</div><div>'
+        + '<div class="dir-name">'+escapeHtml(fr?ex.nameFr:ex.nameAr)
+        + '<span class="dir-example-badge">'+(fr?'Démo':'مثال')+'</span></div>'
+        + '<div class="dir-type">'+m.icon+' '+(fr?m.fr:m.ar)+' · '+escapeHtml(fr?ex.actFr:ex.actAr)+'</div>'
+        + '</div></div>'
+        + '<div class="dir-city">📍 '+escapeHtml(fr?ex.cityFr:ex.cityAr)+'</div>'
+        + '<div class="dir-cta">'+(fr?m.ctaFr:m.ctaAr)+'</div>'
+        + '</a>';
+    }).join('');
+  }
+
+  if(!list.length){
+    var noneOfType = !_accounts.some(function(a){ return a.type === _type; });
+    var html = '<div class="dir-empty"><div class="emo">'+m.icon+'</div><p>'+(fr?m.emptyFr:m.emptyAr)+'</p>'
+      + '<a class="dir-empty-cta" href="'+m.reg+'">'+(fr?m.regCtaFr:m.regCtaAr)+'</a></div>';
+    if(noneOfType) html += _exampleCardsHTML();
+    grid.innerHTML = html;
+    return;
+  }
+
+  grid.innerHTML = list.map(_cardHTML).join('');
 }
 
 function loadAccounts(){
