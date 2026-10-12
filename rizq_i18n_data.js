@@ -100,6 +100,8 @@ window.RIZQ_I18N_AR = {
     "footer-l-post": "انشر إعلانك",
     "footer-l-prices": "الأسعار",
     "footer-l-about": "من نحن",
+    "footer-l-why": "لماذا رزق",
+    "footer-l-company": "الشركة المالكة",
     "footer-col-cats": "أبرز الأقسام",
     "footer-cat1": "🏠 منازل وعقارات",
     "footer-cat2": "🚗 سيارات وقطع غيار",
