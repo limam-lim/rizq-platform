@@ -469,6 +469,13 @@
       poster.style.background = 'linear-gradient(145deg,#0f1f3d,#1B3A6B)';
     }
 
+    /* MP4 محلي: تشغيل صامت تلقائياً حتى يظهر شرح الداشبورد فوراً */
+    if (native && opts.autoplay !== false) {
+      setTimeout(function () {
+        try { loadPlayer(false); } catch (eAuto) {}
+      }, 60);
+    }
+
     return true;
   }
 
