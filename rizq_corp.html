@@ -1872,7 +1872,7 @@ window._rizqProfile = (function() {
   }catch(e){}
 })();
 </script>
-<script src="rizq_intro_video.js?v=29.0"></script>
+<script src="rizq_intro_video.js?v=29.1"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
@@ -1887,17 +1887,6 @@ window.mountCorpIntroVideo = function(url){
       || '';
     if(!corpId || !window.RizqIntroVideo) return;
     var isDemo = !!(corpId === 'demo-corp-001' || /^demo/i.test(corpId) || /^acc_promo_/.test(corpId) || new URLSearchParams(location.search).get('demo') === '1');
-    var sec = document.getElementById('video-intro-section');
-    var mountEl = document.getElementById('intro-video-mount');
-    if (isDemo && mountEl && typeof RizqIntroVideo.mountDashboardPreview === 'function') {
-      var okLive = RizqIntroVideo.mountDashboardPreview(mountEl, 'corp', {
-        title: '🎬 داشبورد المعرض',
-        playLabel: 'عرض داشبورد المعرض',
-        autoLive: true
-      });
-      if (sec && okLive) sec.style.display = '';
-      return;
-    }
     var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('corp')) || '';
     var opts = {
       mountOpts: {
@@ -1907,8 +1896,9 @@ window.mountCorpIntroVideo = function(url){
         linkLabel: 'شاهد على المصدر الأصلي ↗'
       }
     };
-    if(url) opts.url = url;
-    else if(typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video){
+    if (isDemo) opts.url = dashUrl;
+    else if (url) opts.url = url;
+    else if (typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video) {
       opts.url = RIZQ_CORP_ACCOUNT.promo_video;
     } else {
       opts.url = dashUrl;

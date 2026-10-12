@@ -27,18 +27,18 @@ Open demos:
 - `rizq_dashboard_office.html?demo=1`
 - `rizq_tenders.html` / `rizq_investments.html` (seeded API demo rows)
 
-## Intro video = dashboard by account type (فيديو تعريفي)
-Clips cut from the modules promo for the public “intro video” player
-(`rizq_intro_video.js` / `RizqIntroVideo.demoDashboardVideo(type)`):
+## Intro video = short dashboard clip by account type (فيديو تعريفي)
+Demo pages keep the normal intro + extra video players. The **intro** slot
+uses a short (~8s) dashboard clip; the **extra** slot stays a normal YouTube
+demo (`eRsGyueVLvQ`). Real subscribers still paste their own YouTube/Facebook URL.
 
-| Type | Video | Poster |
-|------|-------|--------|
+| Type | Intro clip (dashboard) | Poster |
+|------|--------------------------|--------|
 | store (محل) | `rizq-dashboard-store-demo-light.mp4` | `rizq-dashboard-store-demo-poster.jpg` |
 | office (مكتب) | `rizq-dashboard-office-demo-light.mp4` | `rizq-dashboard-office-demo-poster.jpg` |
 | corp / showroom (معرض) | `rizq-dashboard-corp-demo-light.mp4` | `rizq-dashboard-corp-demo-poster.jpg` |
 
-Demo pages (`?demo=1`) use these instead of placeholder YouTube links.
-Real subscribers still paste their own YouTube/Facebook URL in the dashboard.
+Clips are cut from `rizq-modules-promo-demo-light.mp4` (dashboard UI segments only).
 
 ## Public interfaces promo (storefronts — not dashboards)
 - `rizq-public-interfaces-promo.mp4` — master (~100s, 1920×1080)

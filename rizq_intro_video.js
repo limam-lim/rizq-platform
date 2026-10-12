@@ -322,8 +322,8 @@
 
   /**
    * mount(hostEl, url, opts) — يبني الفيديو التعريفي داخل hostEl.
-   * opts.accountType: store|office|corp|showroom — يستبدل روابط يوتيوب التجريبية بداشبورد النوع.
-   * opts.liveDashboard / opts.forceDashboard: يعرض داشبورد حي بدل يوتيوب/ملف.
+   * opts.accountType: store|office|corp|showroom — يستبدل روابط يوتيوب التجريبية بمقطع داشبورد النوع.
+   * opts.liveDashboard: اختياري — معاينة حية (غير مستخدمة في الواجهة العامة افتراضياً).
    */
   function mount(hostEl, url, opts) {
     opts = opts || {};
@@ -332,14 +332,13 @@
       return mountDashboardPreview(hostEl, type || 'store', opts);
     }
     if (!hostEl || !url) {
-      if (hostEl && type) return mountDashboardPreview(hostEl, type, opts);
-      return false;
+      if (hostEl && type) {
+        url = demoDashboardVideo(type);
+      } else {
+        return false;
+      }
     }
     url = resolveDemoUrl(url, type, !!opts.forceDashboard);
-    /* روابط الداشبورد التجريبية → معاينة حية أوضح من المقطع */
-    if (type && /rizq-dashboard-(store|office|corp)-demo/i.test(url)) {
-      return mountDashboardPreview(hostEl, type, opts);
-    }
     var native = isNativeVideo(url);
     var embedReady = native || !!buildEmbedSrc(url, true, MAX_SECONDS, true);
     if (!embedReady) return false;

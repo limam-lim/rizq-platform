@@ -848,7 +848,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     plan: 'سنوية',
     planName: 'سنوية',
     promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
-    promo_video_extra: ''
+    promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -1149,18 +1149,6 @@ function mountShowroomIntroVideo(){
   if(!_showroomId || !window.RizqIntroVideo) return;
   var fr = _lang === 'fr';
   var isDemo = !!(window._rizqShowroomIsDemo || _showroomId === 'demo_showroom' || /^demo/i.test(String(_showroomId||'')) || /^acc_promo_/.test(String(_showroomId||'')) || new URLSearchParams(location.search).get('demo') === '1');
-  var sec = document.getElementById('video-intro-section');
-  var mountEl = document.getElementById('intro-video-mount');
-  if (isDemo && mountEl && typeof RizqIntroVideo.mountDashboardPreview === 'function') {
-    var okLive = RizqIntroVideo.mountDashboardPreview(mountEl, 'corp', {
-      fr: fr,
-      title: fr ? '🎬 Tableau de bord showroom' : '🎬 داشبورد المعرض',
-      playLabel: fr ? 'Afficher le tableau de bord' : 'عرض داشبورد المعرض',
-      autoLive: true
-    });
-    if (sec && okLive) sec.style.display = '';
-    return;
-  }
   var opts = {
     mountOpts: {
       accountType: 'corp',
@@ -1172,8 +1160,9 @@ function mountShowroomIntroVideo(){
       unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
     }
   };
-  if(_acc && _acc.promo_video) opts.url = _acc.promo_video;
-  else if(RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
+  if (isDemo && RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
+  else if (_acc && _acc.promo_video) opts.url = _acc.promo_video;
+  else if (RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
   RizqIntroVideo.loadAndMountForAccount(_showroomId, opts);
 }
 
@@ -1682,7 +1671,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=29.0"></script>
+<script src="rizq_intro_video.js?v=29.1"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>
