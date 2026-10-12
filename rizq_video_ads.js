@@ -402,15 +402,28 @@
       || document.body.classList.contains('rizq-lang-fr')
       || document.documentElement.getAttribute('dir') === 'ltr';
     var vidLbl = isFr ? 'Vidéo' : 'فيديو';
+    var lblPlay = isFr ? 'Lire' : 'تشغيل';
+    var lblMute = isFr ? 'Couper' : 'كتم';
+    var lblFs = isFr ? 'Agrandir' : 'تكبير';
+    var lblContact = isFr ? 'Contacter' : 'تواصل';
     var countTpl = isFr
       ? function (n) { return n + ' vidéo' + (n > 1 ? 's' : '') + ' disponible' + (n > 1 ? 's' : ''); }
       : function (n) { return n === 1 ? 'فيديو واحد متاح' : (n + ' فيديوهات متاحة'); };
+
+    function contactHref(ad) {
+      if (ad.whatsapp) {
+        var wa = String(ad.whatsapp).replace(/\D/g, '');
+        return 'https://wa.me/' + wa;
+      }
+      if (ad.contact) return ad.contact;
+      if (ad.link) return ad.link;
+      return 'rizq_ads_info.html';
+    }
 
     track.innerHTML = '';
     ads.forEach(function (ad) {
       var card = document.createElement('article');
       card.className = 'rizq-vcard';
-      card.setAttribute('role', 'button');
       card.tabIndex = 0;
       var title = ad.title || ad.advertiser || (isFr ? 'Offre Rizq' : 'عرض رزق');
       var sub = [ad.loc, ad.advertiser].filter(Boolean).join(' · ');
@@ -420,25 +433,111 @@
           '<div class="rizq-vcard-shade"></div>' +
           '<span class="rizq-vcard-tag">' + esc(vidLbl) + '</span>' +
           '<span class="rizq-vcard-play" aria-hidden="true">▶</span>' +
+          '<div class="rizq-vcard-actions" role="toolbar" aria-label="' + esc(isFr ? 'Actions vidéo' : 'أدوات الفيديو') + '">' +
+            '<button type="button" class="rizq-vcard-act" data-act="play" aria-label="' + esc(lblPlay) + '">' +
+              '<span class="rizq-vcard-act-ico">▶</span><span class="rizq-vcard-act-lbl">' + esc(lblPlay) + '</span>' +
+            '</button>' +
+            '<button type="button" class="rizq-vcard-act" data-act="mute" aria-label="' + esc(lblMute) + '">' +
+              '<span class="rizq-vcard-act-ico">🔇</span><span class="rizq-vcard-act-lbl">' + esc(lblMute) + '</span>' +
+            '</button>' +
+            '<button type="button" class="rizq-vcard-act" data-act="fs" aria-label="' + esc(lblFs) + '">' +
+              '<span class="rizq-vcard-act-ico">⛶</span><span class="rizq-vcard-act-lbl">' + esc(lblFs) + '</span>' +
+            '</button>' +
+            '<a class="rizq-vcard-act rizq-vcard-act--contact" data-act="contact" href="' + esc(contactHref(ad)) + '"' +
+              (contactHref(ad).indexOf('http') === 0 ? ' target="_blank" rel="noopener"' : '') +
+              ' aria-label="' + esc(lblContact) + '">' +
+              '<span class="rizq-vcard-act-ico">✉</span><span class="rizq-vcard-act-lbl">' + esc(lblContact) + '</span>' +
+            '</a>' +
+          '</div>' +
           '<div class="rizq-vcard-cap">' + esc(title) + '</div>' +
         '</div>' +
         '<div class="rizq-vcard-name">' + esc(title) + '</div>' +
         (sub ? '<div class="rizq-vcard-sub">' + esc(sub) + '</div>' : '');
 
+      var video = card.querySelector('video');
+      var btnPlay = card.querySelector('[data-act="play"]');
+      var btnMute = card.querySelector('[data-act="mute"]');
+      var btnFs = card.querySelector('[data-act="fs"]');
+      var btnContact = card.querySelector('[data-act="contact"]');
+
+      function syncActionUi() {
+        if (!video) return;
+        if (btnPlay) {
+          var playing = !video.paused && card.classList.contains('is-playing');
+          btnPlay.querySelector('.rizq-vcard-act-ico').textContent = playing ? '❚❚' : '▶';
+          btnPlay.querySelector('.rizq-vcard-act-lbl').textContent = playing
+            ? (isFr ? 'Pause' : 'إيقاف')
+            : lblPlay;
+          btnPlay.classList.toggle('is-on', playing);
+        }
+        if (btnMute) {
+          btnMute.querySelector('.rizq-vcard-act-ico').textContent = video.muted ? '🔇' : '🔊';
+          btnMute.querySelector('.rizq-vcard-act-lbl').textContent = video.muted
+            ? lblMute
+            : (isFr ? 'Son' : 'صوت');
+          btnMute.classList.toggle('is-on', !video.muted);
+        }
+      }
+
       // سطح المكتب: hover = تشغيل صامت | مغادرة = توقف
-      card.addEventListener('mouseenter', function () { playStripVideo(card); });
-      card.addEventListener('mouseleave', function () { stopStripVideo(card); });
-      // جوال / لوحة مفاتيح: لمس أو Enter للتبديل
-      card.addEventListener('click', function (ev) {
-        if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-          // على سطح المكتب النقر يفتح رابط الحجز إن وُجد
-          if (ad.link) { window.location.href = ad.link; return; }
+      card.addEventListener('mouseenter', function () { playStripVideo(card); syncActionUi(); });
+      card.addEventListener('mouseleave', function () { stopStripVideo(card); syncActionUi(); });
+
+      if (btnPlay) {
+        btnPlay.addEventListener('click', function (ev) {
+          ev.preventDefault(); ev.stopPropagation();
+          if (card.classList.contains('is-playing') && video && !video.paused) {
+            try { video.pause(); } catch (e) {}
+            card.classList.remove('is-playing');
+            if (_stripPlaying === card) _stripPlaying = null;
+          } else {
+            playStripVideo(card);
+          }
+          syncActionUi();
+        });
+      }
+      if (btnMute) {
+        btnMute.addEventListener('click', function (ev) {
+          ev.preventDefault(); ev.stopPropagation();
+          if (!video) return;
+          if (!card.classList.contains('is-playing')) playStripVideo(card);
+          video.muted = !video.muted;
+          syncActionUi();
+        });
+      }
+      if (btnFs) {
+        btnFs.addEventListener('click', function (ev) {
+          ev.preventDefault(); ev.stopPropagation();
+          if (!video) return;
+          if (!card.classList.contains('is-playing')) playStripVideo(card);
+          try {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+              if (document.exitFullscreen) document.exitFullscreen();
+              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            } else if (video.requestFullscreen) video.requestFullscreen();
+            else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+            else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+          } catch (eFs) { /* ignore */ }
           if (ad.accountId) trackEvent(ad.accountId, 'click');
-          return;
+        });
+      }
+      if (btnContact) {
+        btnContact.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          if (ad.accountId) trackEvent(ad.accountId, 'click');
+        });
+      }
+
+      // جوال: لمس البطاقة (خارج الأزرار) يشغّل/يوقف ويعرض الأدوات
+      card.addEventListener('click', function (ev) {
+        if (ev.target.closest && ev.target.closest('.rizq-vcard-actions')) return;
+        if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          return; // سطح المكتب يعتمد على hover
         }
         ev.preventDefault();
         if (card.classList.contains('is-playing')) stopStripVideo(card);
         else playStripVideo(card);
+        syncActionUi();
         if (ad.accountId) trackEvent(ad.accountId, 'click');
       });
       card.addEventListener('keydown', function (ev) {
@@ -446,6 +545,7 @@
           ev.preventDefault();
           if (card.classList.contains('is-playing')) stopStripVideo(card);
           else playStripVideo(card);
+          syncActionUi();
         }
       });
 
