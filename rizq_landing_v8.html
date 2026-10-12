@@ -742,9 +742,10 @@ body.rizq-lang-ar .hero-lead-row{
   .hero-spaces-kicker{
     white-space:normal!important;
     max-width:100%!important;
-    line-height:1.45!important;
-    padding:6px 12px!important;
-    font-size:clamp(9.5px,2.4vw,11.5px)!important;
+    line-height:1.35!important;
+    padding:7px 14px!important;
+    font-size:clamp(14px,3.6vw,18px)!important;
+    font-weight:900!important;
   }
   /* الفرنسية على الهاتف — تصغير الخط لإظهار الجملة كاملة تحت رزق / marché */
   html[lang="fr"] .hero-subtitle-primary,
@@ -949,10 +950,15 @@ body.rizq-lang-ar .hero-stage{
 .hero-spaces{position:relative;z-index:2}
 .hero-spaces-head{text-align:center;margin:0 auto 14px;max-width:34em}
 .hero-spaces-kicker{
-  display:inline-block;margin:0 0 8px;padding:5px 14px;border-radius:10px;
-  font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#8a6f2a;
-  background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);
+  display:inline-block;margin:0 0 10px;padding:6px 16px;border-radius:10px;
+  /* عنوان ترويجي بارز — خط أكبر داخل نفس شكل الشارة */
+  font-size:clamp(16px,2.2vw,20px);font-weight:900;letter-spacing:.02em;color:#6e5618;
+  background:rgba(201,168,76,.16);border:1px solid rgba(201,168,76,.42);
   font-family:'Cairo','Noto Naskh Arabic',sans-serif;
+  line-height:1.25;text-wrap:balance;
+}
+.hero-spaces-kicker [data-t="hbiz-kicker"]{
+  font-size:inherit;font-weight:inherit;color:inherit;
 }
 .hero-spaces-title{
   margin:0 0 6px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
