@@ -1457,23 +1457,20 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 .rizq-vid-strip{
   width:min(1200px,calc(100vw - 32px))!important;
   max-width:min(1200px,calc(100vw - 32px))!important;
-  margin:0 auto;padding:8px 0 4px;
+  margin:10px auto 8px;padding:8px 0 4px;
   background:transparent;border:none;border-radius:0;
   box-shadow:none;position:relative;z-index:20;
-  box-sizing:border-box;align-self:center;
+  box-sizing:border-box;
 }
-/* يخرج من عرض الأب 960px ليحاذي إعلانات listings */
-.hero-after-promo-inner > .rizq-vid-strip{
-  left:50%;transform:translateX(-50%);
-  width:min(1200px,calc(100vw - 32px))!important;
-  max-width:min(1200px,calc(100vw - 32px))!important;
+.hero-after-promo-tail{
+  width:100%;max-width:min(960px,86vw);margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;padding:4px 14px 8px;box-sizing:border-box;
 }
-/* لصق الشريط تحت الشاشة الكبيرة (يعوّض gap الأب) */
-.hero-after-promo-inner > #hero-vid-wrap + .rizq-vid-strip{margin-top:-14px}
-/* أزرار الحجز تبقى بعرض الشاشة الذهبية */
-.hero-after-promo-inner > .hero-vid-cta-bar{
-  width:100%;max-width:min(780px,78vw)!important;margin:4px auto 0;align-self:center;
+.hero-after-promo-tail > .hero-vid-cta-bar{
+  width:100%;max-width:min(780px,78vw);margin:0 auto;
 }
+.hero-after-promo-tail > .hero-stats-bar{width:100%}
 .rizq-vid-strip-head{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
   margin-bottom:4px;padding:0 4px;
@@ -1510,12 +1507,14 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 .rizq-vid-strip-track{
   display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-  padding:2px 4px 8px;scrollbar-width:thin;
+  padding:2px 0 8px;scrollbar-width:thin;
 }
 .rizq-vid-strip-track::-webkit-scrollbar{height:6px}
 .rizq-vid-strip-track::-webkit-scrollbar-thumb{background:rgba(27,58,107,.25);border-radius:6px}
+/* 7 بطاقات ظاهرة بعرض listings (1200px) — الثامنة بالتمرير */
 .rizq-vcard{
-  flex:0 0 min(176px,48vw);scroll-snap-align:start;min-width:0;
+  flex:0 0 calc((100% - 72px) / 7);scroll-snap-align:start;min-width:0;
+  max-width:176px;
   display:flex;flex-direction:column;gap:7px;cursor:pointer;
 }
 .rizq-vcard-thumb{
@@ -1600,13 +1599,13 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 @media(max-width:699px){
   .rizq-vid-strip,
-  .hero-after-promo-inner > .rizq-vid-strip,
-  .hero-after-promo-inner > .hero-vid-cta-bar{
-    width:100%!important;max-width:100%!important;left:auto;transform:none;
+  .hero-after-promo-tail,
+  .hero-after-promo-tail > .hero-vid-cta-bar{
+    width:100%!important;max-width:100%!important;
   }
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
-  .rizq-vcard{flex-basis:min(158px,52vw)}
+  .rizq-vcard{flex-basis:min(158px,52vw);max-width:none}
   .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
 }
 
@@ -4660,27 +4659,29 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
       </div>
+  </div><!-- /hero-after-promo-inner — الشريط بعرض listings خارج الحاوية الضيقة -->
 
-      <!-- الموضع الثاني فضي — مباشرة تحت الشاشة الكبيرة (ذهبي) -->
-      <section class="rizq-vid-strip" id="rizq-vid-strip" aria-label="إعلانات الفيديو — الموضع الثاني" data-rizq-ads-strip="1">
-        <div class="rizq-vid-strip-head">
-          <div class="rizq-vid-strip-title">
-            <span class="rizq-vid-strip-playico" aria-hidden="true">▶</span>
-            <span data-t="vstrip-title">اكتشف العروض الجديدة بالفيديو</span>
-            <span class="rizq-vid-strip-tier" data-t="vstrip-tier">فضي</span>
-          </div>
-          <div class="rizq-vid-strip-tools">
-            <span class="rizq-vid-strip-count" id="rizq-vid-strip-count" aria-live="polite"></span>
-            <div class="rizq-vid-strip-nav">
-              <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-prev" disabled aria-label="السابق">السابق</button>
-              <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-next" aria-label="التالي">التالي</button>
-            </div>
-          </div>
+  <!-- الموضع الثاني فضي — عرض 1200px بمحاذاة «أبرز العروض» -->
+  <section class="rizq-vid-strip" id="rizq-vid-strip" aria-label="إعلانات الفيديو — الموضع الثاني" data-rizq-ads-strip="1">
+    <div class="rizq-vid-strip-head">
+      <div class="rizq-vid-strip-title">
+        <span class="rizq-vid-strip-playico" aria-hidden="true">▶</span>
+        <span data-t="vstrip-title">اكتشف العروض الجديدة بالفيديو</span>
+        <span class="rizq-vid-strip-tier" data-t="vstrip-tier">فضي</span>
+      </div>
+      <div class="rizq-vid-strip-tools">
+        <span class="rizq-vid-strip-count" id="rizq-vid-strip-count" aria-live="polite"></span>
+        <div class="rizq-vid-strip-nav">
+          <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-prev" disabled aria-label="السابق">السابق</button>
+          <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-next" aria-label="التالي">التالي</button>
         </div>
-        <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
-        <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
-      </section>
+      </div>
+    </div>
+    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
+    <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
+  </section>
 
+  <div class="hero-after-promo-tail">
       <div class="hero-vid-cta-bar">
         <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
         <span class="hero-vid-cta-sep">·</span>
@@ -14104,7 +14105,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo10"></script>
+<script src="rizq_video_ads.js?v=promo11"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
