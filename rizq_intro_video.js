@@ -250,6 +250,33 @@
     var frame = hostEl.querySelector('#' + uid + '-frame');
     var posterBtn = hostEl.querySelector('#' + uid + '-poster');
 
+    function showClipFallback() {
+      if (!frame) return;
+      var old = frame.querySelector('.rzq-iv-dash-scale');
+      if (old) old.remove();
+      var oldV = frame.querySelector('video.rzq-iv-video');
+      if (oldV) oldV.remove();
+      var hintOld = frame.querySelector('.rzq-iv-dash-hint');
+      if (hintOld) hintOld.remove();
+      var video = document.createElement('video');
+      video.className = 'rzq-iv-video';
+      video.src = absAsset(pack.video);
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.muted = true;
+      video.autoplay = true;
+      video.controls = true;
+      video.loop = true;
+      if (poster) video.poster = poster;
+      frame.appendChild(video);
+      var playP = video.play();
+      if (playP && typeof playP.catch === 'function') playP.catch(function () {});
+      var hintEl = document.createElement('div');
+      hintEl.className = 'rzq-iv-dash-hint';
+      hintEl.textContent = fr ? pack.labelFr : pack.labelAr;
+      frame.appendChild(hintEl);
+    }
+
     function showLive() {
       if (!frame) return;
       if (posterBtn) posterBtn.remove();
@@ -262,6 +289,19 @@
       iframe.title = pack.labelAr;
       iframe.setAttribute('loading', 'eager');
       iframe.setAttribute('referrerpolicy', 'same-origin');
+      var loaded = false;
+      iframe.addEventListener('load', function () {
+        loaded = true;
+        try {
+          /* chrome-error / صفحة فارغة → مقطع داشبورد */
+          var href = '';
+          try { href = iframe.contentWindow && iframe.contentWindow.location && iframe.contentWindow.location.href; } catch (eH) { href = 'ok'; }
+          if (href && /chrome-error|about:blank/i.test(href)) showClipFallback();
+        } catch (eL) {}
+      });
+      setTimeout(function () {
+        if (!loaded) showClipFallback();
+      }, 2500);
       wrap.appendChild(iframe);
       var hintEl = document.createElement('div');
       hintEl.className = 'rzq-iv-dash-hint';
@@ -275,7 +315,7 @@
     }
     /* عرض فوري: الزائر يرى الداشبورد مباشرة دون انتظار نقرة */
     if (opts.autoLive !== false) {
-      try { showLive(); } catch (eLive) {}
+      try { showLive(); } catch (eLive) { try { showClipFallback(); } catch (e2) {} }
     }
     return true;
   }
