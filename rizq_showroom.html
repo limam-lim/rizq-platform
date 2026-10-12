@@ -1163,6 +1163,10 @@ function mountShowroomIntroVideo(){
   if (isDemo && RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
   else if (_acc && _acc.promo_video) opts.url = _acc.promo_video;
   else if (RizqIntroVideo.demoDashboardVideo) opts.url = RizqIntroVideo.demoDashboardVideo('corp');
+  var sig = [_showroomId, opts.url || '', fr ? 'fr' : 'ar'].join('|');
+  var mountEl = document.getElementById('intro-video-mount');
+  if (window.__rzqShowroomIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+  window.__rzqShowroomIntroSig = sig;
   RizqIntroVideo.loadAndMountForAccount(_showroomId, opts);
 }
 
@@ -1689,7 +1693,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=29.4"></script>
+<script src="rizq_intro_video.js?v=29.5"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>

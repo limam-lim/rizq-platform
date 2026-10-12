@@ -1587,7 +1587,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=29.4"></script>
+  <script src="rizq_intro_video.js?v=29.5"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -2026,6 +2026,13 @@ function rizqShare(title, url) {
       /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
+      /* تجنّب إعادة التركيب المتكرر لنفس الروابط (يحافظ على موضع التشغيل) */
+      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar'].join('|');
+      if (spot.getAttribute('data-rzq-promo-sig') === promoSig && introMount.querySelector('.rzq-iv-wrap')) {
+        spot.style.display = '';
+        return;
+      }
+      spot.setAttribute('data-rzq-promo-sig', promoSig);
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         accountType: 'store',
         poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',

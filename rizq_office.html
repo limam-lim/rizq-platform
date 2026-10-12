@@ -1439,7 +1439,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=29.4"></script>
+  <script src="rizq_intro_video.js?v=29.5"></script>
   <script>
   window.mountOfficeIntroVideo = function(url, officeId){
     try{
@@ -1451,6 +1451,11 @@ function openMaps(){
       var fr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
       var isDemo = !!(window._rizqOfficeIsDemo || id === 'demo_law' || /^demo/i.test(id) || /^acc_promo_/.test(id) || new URLSearchParams(location.search).get('demo') === '1');
       var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('office')) || '';
+      var resolved = isDemo ? dashUrl : (url || dashUrl);
+      var sig = [id, resolved || '', fr ? 'fr' : 'ar'].join('|');
+      var mountEl = document.getElementById('intro-video-mount');
+      if (window.__rzqOfficeIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+      window.__rzqOfficeIntroSig = sig;
       var opts = {
         mountOpts: {
           accountType: 'office',
@@ -1462,7 +1467,7 @@ function openMaps(){
           unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
         }
       };
-      opts.url = isDemo ? dashUrl : (url || dashUrl);
+      opts.url = resolved;
       RizqIntroVideo.loadAndMountForAccount(id, opts);
     }catch(e){}
   };
