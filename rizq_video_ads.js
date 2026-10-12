@@ -357,6 +357,32 @@
     ];
   }
 
+  function syncStripActionUi(card) {
+    if (!card) return;
+    var video = card.querySelector('video');
+    var btnPlay = card.querySelector('[data-act="play"]');
+    var btnMute = card.querySelector('[data-act="mute"]');
+    if (!video) return;
+    var isFr = (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0
+      || document.body.classList.contains('rizq-lang-fr')
+      || document.documentElement.getAttribute('dir') === 'ltr';
+    if (btnPlay) {
+      var playing = !video.paused && card.classList.contains('is-playing');
+      var ico = btnPlay.querySelector('.rizq-vcard-act-ico');
+      var lbl = btnPlay.querySelector('.rizq-vcard-act-lbl');
+      if (ico) ico.textContent = playing ? '⏸' : '▶';
+      if (lbl) lbl.textContent = playing ? (isFr ? 'Pause' : 'إيقاف') : (isFr ? 'Lire' : 'تشغيل');
+      btnPlay.classList.toggle('is-on', playing);
+    }
+    if (btnMute) {
+      var icoM = btnMute.querySelector('.rizq-vcard-act-ico');
+      var lblM = btnMute.querySelector('.rizq-vcard-act-lbl');
+      if (icoM) icoM.textContent = video.muted ? '🔇' : '🔊';
+      if (lblM) lblM.textContent = video.muted ? (isFr ? 'Couper' : 'كتم') : (isFr ? 'Son' : 'صوت');
+      btnMute.classList.toggle('is-on', !video.muted);
+    }
+  }
+
   function stopStripVideo(card) {
     if (!card) return;
     var v = card.querySelector('video');
@@ -365,10 +391,14 @@
     }
     card.classList.remove('is-playing');
     if (_stripPlaying === card) _stripPlaying = null;
+    syncStripActionUi(card);
   }
 
   function playStripVideo(card) {
-    if (!card || _stripPlaying === card) return;
+    if (!card || _stripPlaying === card) {
+      syncStripActionUi(card);
+      return;
+    }
     if (_stripPlaying) stopStripVideo(_stripPlaying);
     var v = card.querySelector('video');
     if (!v) return;
@@ -378,10 +408,12 @@
       p.then(function () {
         card.classList.add('is-playing');
         _stripPlaying = card;
+        syncStripActionUi(card);
       }).catch(function () { /* autoplay policies */ });
     } else {
       card.classList.add('is-playing');
       _stripPlaying = card;
+      syncStripActionUi(card);
     }
   }
 
