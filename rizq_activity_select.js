@@ -16,12 +16,23 @@
       .replace(/"/g, '&quot;');
   }
 
+  function isSectorOption(opt) {
+    if (!opt) return false;
+    if (opt.getAttribute && opt.getAttribute('data-sector-activity') === '1') return true;
+    return String(opt.value || '').indexOf('sec_') === 0;
+  }
+
   function optionBtn(opt) {
     var val = opt.value;
     var selected = opt.selected;
+    var sector = isSectorOption(opt);
     return (
-      '<button type="button" class="rizq-act-select-option' + (selected && val ? ' is-selected' : '') + '"'
+      '<button type="button" class="rizq-act-select-option'
+      + (selected && val ? ' is-selected' : '')
+      + (sector ? ' is-sector' : '')
+      + '"'
       + ' data-value="' + escapeHtml(val) + '" role="option"'
+      + (sector ? ' data-sector-activity="1"' : '')
       + (!val ? ' data-placeholder="1"' : '') + '>'
       + escapeHtml(opt.textContent)
       + '</button>'
@@ -32,8 +43,13 @@
     var html = '';
     Array.from(select.children).forEach(function (node) {
       if (node.tagName === 'OPTGROUP') {
-        html += '<div class="rizq-act-select-group" role="presentation">' + escapeHtml(node.label) + '</div>';
-        Array.from(node.children).forEach(function (opt) {
+        var opts = Array.from(node.children);
+        // إن وُجد خيار القسم كأول عنصر قابل للاختيار — لا نعرض تسمية غير قابلة للنقر
+        var firstSector = opts.length && isSectorOption(opts[0]);
+        if (!firstSector) {
+          html += '<div class="rizq-act-select-group" role="presentation">' + escapeHtml(node.label) + '</div>';
+        }
+        opts.forEach(function (opt) {
           html += optionBtn(opt);
         });
       } else if (node.tagName === 'OPTION') {

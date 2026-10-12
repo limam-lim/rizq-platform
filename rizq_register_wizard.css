@@ -508,6 +508,11 @@ html.rizq-reg-page      .rizq-act-select-option:hover,
 html.rizq-reg-page      .rizq-act-select-option.is-selected { background:#f8faff !important; }
 #modal.reg-wizard-mode .rizq-act-select-group,
 html.rizq-reg-page      .rizq-act-select-group { color:#a07820 !important; font-weight:800 !important; }
+#modal.reg-wizard-mode .rizq-act-select-option.is-sector,
+html.rizq-reg-page      .rizq-act-select-option.is-sector {
+  color:#a07820 !important;
+  font-weight:800 !important;
+}
 
 /* نوافذ الشروط وOTP */
 html.rizq-reg-page #rizq-terms-modal,
