@@ -33,12 +33,13 @@
       { id: 'services_retail', nameAr: 'خدمات تجارية', nameFr: 'Services commerciaux' },
     ],
     office: [
-      { id: 'legal', nameAr: 'قانون وعدالة', nameFr: 'Droit & justice' },
-      { id: 'admin', nameAr: 'إدارة وخدمات حكومية', nameFr: 'Administration & services publics' },
+      /* تسميات موجّهة للزائر في الدليل والتسجيل — محامون، إداري، وكلاء عقارات… */
+      { id: 'legal', nameAr: 'محامون وقانون', nameFr: 'Avocats & droit' },
+      { id: 'admin', nameAr: 'خدمات إدارية ومعاملات', nameFr: 'Services administratifs' },
+      { id: 'realestate', nameAr: 'وكالات ومكاتب عقارية', nameFr: 'Agences immobilières' },
       { id: 'consular', nameAr: 'خدمات قنصلية ووثائق', nameFr: 'Services consulaires & documents' },
       { id: 'insurance', nameAr: 'تأمين ومالية', nameFr: 'Assurance & finance' },
       { id: 'engineering', nameAr: 'هندسة وتقنية', nameFr: 'Ingénierie & technique' },
-      { id: 'realestate', nameAr: 'عقارات وتصميم', nameFr: 'Immobilier & design' },
       { id: 'consulting', nameAr: 'استشارات وإدارة', nameFr: 'Conseil & gestion' },
       { id: 'health', nameAr: 'صحة وطب', nameFr: 'Santé & médecine' },
       { id: 'education', nameAr: 'تعليم وتدريب', nameFr: 'Éducation & formation' },
