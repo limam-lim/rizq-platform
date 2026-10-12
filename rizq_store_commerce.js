@@ -174,10 +174,19 @@
     try {
       var u = new URL(href, location.href);
       u.searchParams.set('id', storeId);
-      return u.pathname.replace(/^\//, '') + u.search + u.hash;
+      // اسم الملف فقط — لا تُرجع pathname كاملاً (مثل rizq-platform/...) وإلا
+      // يُحلّ الرابط النسبي على GitHub Pages إلى مسار مزدوج → 404.
+      var parts = String(u.pathname || '').split('/').filter(Boolean);
+      var file = parts.length ? parts[parts.length - 1] : '';
+      if (!file) {
+        var raw = String(href || '').split('?')[0].split('#')[0];
+        file = raw.split('/').filter(Boolean).pop() || raw;
+      }
+      return file + u.search + u.hash;
     } catch (e2) {
       var base = String(href || '').split('?')[0].split('#')[0];
-      return base + '?id=' + encodeURIComponent(storeId);
+      var leaf = base.split('/').filter(Boolean).pop() || base;
+      return leaf + '?id=' + encodeURIComponent(storeId);
     }
   }
 
