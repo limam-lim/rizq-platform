@@ -243,6 +243,22 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .item-img{height:190px;background:linear-gradient(160deg,#faf6ec,#f3ecda);display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #ece3d1}
 .item-medallion{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f3ecda 70%);border:2px solid var(--gold);box-shadow:0 6px 18px rgba(201,168,76,.25),inset 0 0 0 4px #fff;display:flex;align-items:center;justify-content:center;font-size:44px}
 .item-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);font-size:10px;font-weight:800;padding:3px 9px;border-radius:3px;letter-spacing:.5px}
+/* شارة المخزون: ركن سفلي صغير — لا تغطي صورة المنتج */
+.item-img .rizq-stock-badge{
+  position:absolute;top:auto;bottom:8px;inset-inline-start:8px;inset-inline-end:auto;z-index:2;
+  max-width:calc(100% - 16px);
+  font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;letter-spacing:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.2);line-height:1.2;
+}
+@media(max-width:700px){
+  .item-img{height:120px}
+  .item-img .rizq-stock-badge{
+    bottom:5px;inset-inline-start:5px;
+    font-size:9px;padding:2px 5px;border-radius:5px;
+    max-width:calc(100% - 10px);
+  }
+}
 .item-info{padding:16px 16px 18px}
 .item-cat-label{font-size:9.5px;font-weight:800;color:var(--gold-dk,#a3822f);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;display:block}
 .item-name{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:700;color:#1a2a3a;margin-bottom:6px;line-height:1.3}
@@ -1002,7 +1018,7 @@ function renderCatalog(){
       +'<div class="item-img">'
       +(item.image ? '<img src="'+esc(item.image)+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">' : '<div class="item-medallion">'+esc(item.emoji||'📦')+'</div>')
       +(item.featured ? '<span class="item-badge">'+_t('مميز','Vedette')+'</span>' : '')
-      +(stockBadge ? '<span style="position:absolute;top:8px;inset-inline-start:8px;z-index:2">'+stockBadge+'</span>' : '')
+      +stockBadge
       +'</div>'
       +'<div class="item-info">'
       +'<span class="item-cat-label">'+esc(_srCatLabel(item.cat||''))+'</span>'
