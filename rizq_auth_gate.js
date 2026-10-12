@@ -1189,9 +1189,9 @@
     document.getElementById('rag-returning').classList.remove('show');
     document.getElementById('rag-acc-name').textContent = s.name || '—';
     var lines = ['<div>' + dict.loggedAs + '</div>'];
-    if (s.phone) lines.push('<div>📱 +222 ' + esc(s.phone) + '</div>');
-    if (s.phoneIntl) lines.push('<div>🌍 ' + esc(s.phoneIntl) + '</div>');
-    if (s.whatsapp) lines.push('<div>💬 ' + esc(s.whatsapp) + '</div>');
+    if (s.phone) lines.push('<div>📱 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">+222 ' + esc(s.phone) + '</span></div>');
+    if (s.phoneIntl) lines.push('<div>🌍 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">' + esc(s.phoneIntl) + '</span></div>');
+    if (s.whatsapp) lines.push('<div>💬 <span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">' + esc(s.whatsapp) + '</span></div>');
     lines.push('<div>✉️ ' + esc(s.email || '—') + '</div>');
     if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
     if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');

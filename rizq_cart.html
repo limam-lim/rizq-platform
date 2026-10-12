@@ -765,7 +765,18 @@ function paintDeliveryConfirmed(info) {
   if (!box || !section) return;
   var isAr = document.documentElement.lang !== 'fr';
   document.getElementById('dc-name').textContent = (isAr ? 'الاسم: ' : 'Nom : ') + (info.name || '—');
-  document.getElementById('dc-phone').textContent = (isAr ? 'الهاتف: ' : 'Tél. : ') + (info.phone || '—');
+  (function(){
+    var phoneLbl = isAr ? 'الهاتف: ' : 'Tél. : ';
+    var phoneVal = info.phone || '—';
+    if (window.RizqNumbers && typeof RizqNumbers.formatPhone === 'function' && phoneVal !== '—') {
+      phoneVal = RizqNumbers.formatPhone(phoneVal);
+    }
+    var dcPhone = document.getElementById('dc-phone');
+    if (dcPhone) {
+      dcPhone.innerHTML = phoneLbl + '<span class="rizq-phone-ltr" dir="ltr" style="direction:ltr;unicode-bidi:isolate">'
+        + String(phoneVal).replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>';
+    }
+  })();
   document.getElementById('dc-address').textContent = (isAr ? 'العنوان: ' : 'Adresse : ') + (info.address || '—');
   var cityLine = info.city || '';
   if (info.district) cityLine += (cityLine ? ' — ' : '') + info.district;

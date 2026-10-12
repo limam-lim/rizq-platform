@@ -1826,7 +1826,13 @@ function rizqShare(title, url) {
         setHref('store-call-top', 'tel:' + String(phone).replace(/\s/g,''));
         setHref('hub-call-top', 'tel:' + String(phone).replace(/\s/g,''));
         var phoneEl2 = document.getElementById('info-value-phone-el');
-        if(phoneEl2){ phoneEl2.textContent = phone; phoneEl2.classList.remove('rzq-contact-masked'); phoneEl2.onclick = null; }
+        if(phoneEl2){
+          phoneEl2.textContent = (window.RizqNumbers && RizqNumbers.formatPhone) ? RizqNumbers.formatPhone(phone) : phone;
+          phoneEl2.setAttribute('dir','ltr');
+          phoneEl2.classList.add('rizq-phone-ltr');
+          phoneEl2.classList.remove('rzq-contact-masked');
+          phoneEl2.onclick = null;
+        }
       }
       if(email){
         setText('info-value-email-el', email);
