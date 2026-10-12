@@ -1,11 +1,17 @@
 /**
- * rizq_register_wizard.css  v6.16
+ * rizq_register_wizard.css  v6.17
  * ─────────────────────────────────────────────────────────────
  * هاتف / تابلت / كمبيوتر: شريط علوي للتسجيل + فوتر المنصة الموحّد
+ * v6.17: إصلاح تغطية عناوين «حسابي» تحت الشريط الثابت — لا تستخدم
+ *   padding:0 على #modal بعد تعويض padding-top، واحفظ مساحة سفلية للفوتر
  * v6.16: الهاتف — إخفاء فوتر المنصة أثناء مسارات التسجيل/الدخول + تجاوز
  *   rizq_modal_viewport (max-height/overflow) حتى يتمرّر المستند كاملاً
  * ─────────────────────────────────────────────────────────────
  */
+:root {
+  --rizq-reg-chrome-h: 70px;
+  --rizq-reg-chrome-h-mobile: 56px;
+}
 
 /* ═══════════════════════════════════════════════════════════
    §0  افتراضات: إخفاء عناصر لا تظهر إلا عند الحاجة
@@ -617,7 +623,11 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     background:#f8faff !important;
     align-items:stretch !important;
     justify-content:flex-start !important;
-    padding:0 !important;
+    /* لا تستخدم padding:0 — تُلغي تعويض الشريط العلوي */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: calc(var(--rizq-reg-chrome-h-mobile) + env(safe-area-inset-top, 0px)) !important;
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
@@ -660,7 +670,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     background:#f8faff !important;
     align-items:stretch !important;
     justify-content:flex-start !important;
-    padding:0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: calc(var(--rizq-reg-chrome-h-mobile) + env(safe-area-inset-top, 0px)) !important;
     overflow: visible !important;
     position: relative !important;
     inset: auto !important;
@@ -711,8 +724,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   /* تعويض ارتفاع الشريط الثابت حتى لا يختبئ المحتوى تحته */
   body.rizq-reg-open #modal.reg-wizard-mode,
   #modal.reg-wizard-mode,
-  html.rizq-reg-page #modal.reg-wizard-mode {
-    padding-top: 56px !important;
+  html.rizq-reg-page #modal.reg-wizard-mode,
+  html.rizq-reg-page #modal.modal-overlay,
+  html.rizq-reg-page #modal {
+    padding-top: calc(var(--rizq-reg-chrome-h-mobile) + env(safe-area-inset-top, 0px)) !important;
   }
   /* هاتف — لا شريط أيقونات سفلي؛ الفوتر الموحّد في أسفل المستند */
   #modal.reg-wizard-mode > .rizq-reg-footer,
@@ -1026,7 +1041,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     background: #f8faff !important;
     backdrop-filter: none !important;
     display: block !important;
-    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: var(--rizq-reg-chrome-h) !important;
     z-index: 4 !important;
   }
 
@@ -1085,8 +1103,10 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   }
   body.rizq-reg-open #modal.reg-wizard-mode,
   #modal.reg-wizard-mode,
-  html.rizq-reg-page #modal.reg-wizard-mode {
-    padding-top: 70px !important;
+  html.rizq-reg-page #modal.reg-wizard-mode,
+  html.rizq-reg-page #modal.modal-overlay,
+  html.rizq-reg-page #modal {
+    padding-top: var(--rizq-reg-chrome-h) !important;
   }
 
   /* تابلت / شاشات متوسطة: نفس عناصر الكمبيوتر مع ضغط خفيف فقط */
@@ -1246,7 +1266,11 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
     height: auto !important;
     min-height: 100vh !important; min-height: 100dvh !important; max-height: none !important;
     background: #f8faff !important;
-    z-index: 1 !important; padding: 0 !important;
+    z-index: 1 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: var(--rizq-reg-chrome-h) !important;
     overflow: visible !important; pointer-events: auto !important;
     opacity: 1 !important; visibility: visible !important;
   }
@@ -1284,7 +1308,7 @@ body.rizq-lang-fr .rizq-reg-chrome-lang .lang-fr { color:#C9A84C !important; opa
   }
   html.rizq-reg-page #modal.reg-wizard-mode,
   html.rizq-reg-page #modal {
-    padding-top: 70px !important;
+    padding-top: var(--rizq-reg-chrome-h) !important;
   }
   html.rizq-reg-page #modal > .rizq-reg-footer {
     display: none !important;
@@ -1349,7 +1373,10 @@ body.rizq-reg-open #modal .modal-box {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: calc(var(--rizq-reg-chrome-h-mobile) + env(safe-area-inset-top, 0px)) !important;
     overflow: visible !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1366,4 +1393,53 @@ body.rizq-reg-open #modal .modal-box {
   #modal.reg-wizard-mode .modal-box > [id^="p-"] {
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   §10  ضمان نهائي — المحتوى دائماً تحت الشريط العلوي وفوق الفوتر
+       (بعد كل الوسائط حتى لا يُهزم من shorthand padding:0)
+═══════════════════════════════════════════════════════════ */
+html.rizq-reg-page #modal.modal-overlay,
+html.rizq-reg-page #modal.modal-overlay.open,
+html.rizq-reg-page #modal.reg-wizard-mode,
+html.rizq-reg-page #modal,
+body.rizq-reg-open #modal.modal-overlay,
+body.rizq-reg-open #modal.modal-overlay.open,
+body.rizq-reg-open #modal.reg-wizard-mode,
+#modal.reg-wizard-mode.modal-overlay,
+#modal.reg-wizard-mode.modal-overlay.open,
+#modal.reg-wizard-mode {
+  padding-top: var(--rizq-reg-chrome-h) !important;
+}
+@media (max-width: 768px) {
+  html.rizq-reg-page #modal.modal-overlay,
+  html.rizq-reg-page #modal.modal-overlay.open,
+  html.rizq-reg-page #modal.reg-wizard-mode,
+  html.rizq-reg-page #modal,
+  body.rizq-reg-open #modal.modal-overlay,
+  body.rizq-reg-open #modal.modal-overlay.open,
+  body.rizq-reg-open #modal.reg-wizard-mode,
+  #modal.reg-wizard-mode.modal-overlay,
+  #modal.reg-wizard-mode.modal-overlay.open,
+  #modal.reg-wizard-mode {
+    padding-top: calc(var(--rizq-reg-chrome-h-mobile) + env(safe-area-inset-top, 0px)) !important;
+  }
+}
+/* عناوين خطوات حسابي لا تلتصق بالشريط */
+html.rizq-reg-page #modal .modal-box > [id^="p-"],
+body.rizq-reg-open #modal .modal-box > [id^="p-"],
+#modal.reg-wizard-mode .modal-box > [id^="p-"] {
+  scroll-margin-top: calc(var(--rizq-reg-chrome-h) + 12px);
+}
+/* شاشة حسابي (rag): محتوى تحت الشريط الداخلي + مساحة سفلية */
+body.rizq-reg-open #rag-overlay.rag-overlay.open {
+  padding-top: 0 !important;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.rizq-reg-open #rag-overlay .rag-body,
+body.rizq-reg-open #rag-overlay .rag-title {
+  scroll-margin-top: 72px;
+}
+body.rizq-reg-open #rag-overlay .rag-modal {
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
 }
