@@ -229,6 +229,51 @@
     'cp-trial': null,
   };
 
+  /**
+   * أقسام رئيسية قابلة للاختيار كنشاط (فرع شامل) —
+   * مثال: «إلكترونيات وتقنية» لمحل يبيع هواتف ولابتوب معاً.
+   * المعرّف: sec_<accountType>_<sectorId>
+   */
+  function sectorActivityId(accountType, sectorId) {
+    return 'sec_' + accountType + '_' + sectorId;
+  }
+
+  function isSectorActivityId(id) {
+    return String(id || '').indexOf('sec_') === 0;
+  }
+
+  function buildSectorActivities() {
+    var out = [];
+    Object.keys(SECTORS).forEach(function (accountType) {
+      (SECTORS[accountType] || []).forEach(function (sector) {
+        var children = ACTIVITIES.filter(function (a) {
+          return a.sectorId === sector.id && a.accountTypes.indexOf(accountType) !== -1 && !a.isSector;
+        });
+        if (!children.length) return;
+        // قطاع له نشاط بنفس المعرّف أو بنفس الاسم — لا نكرّر
+        if (ACTIVITIES.some(function (a) {
+          return a.accountTypes.indexOf(accountType) !== -1
+            && (a.id === sector.id || a.nameAr === sector.nameAr);
+        })) return;
+        out.push({
+          id: sectorActivityId(accountType, sector.id),
+          sectorId: sector.id,
+          accountTypes: [accountType],
+          nameAr: sector.nameAr,
+          nameFr: sector.nameFr,
+          icon: children[0].icon || '📂',
+          isSector: true,
+        });
+      });
+    });
+    return out;
+  }
+
+  // احقن أنشطة الأقسام قبل أي دمج إضافي
+  buildSectorActivities().forEach(function (row) {
+    if (!ACTIVITIES.some(function (a) { return a.id === row.id; })) ACTIVITIES.push(row);
+  });
+
   function normType(t) {
     var x = String(t || '').toLowerCase();
     if (x === 'shop') return 'store';
@@ -256,21 +301,26 @@
     });
   }
 
+  function mapActivityRow(a, lang) {
+    return {
+      id: a.id,
+      key: a.id,
+      name: label(a, lang),
+      nameAr: a.nameAr,
+      nameFr: a.nameFr,
+      icon: a.icon || '',
+      sectorId: a.sectorId,
+      accountTypes: (a.accountTypes || []).slice(),
+      isSector: !!a.isSector || isSectorActivityId(a.id),
+    };
+  }
+
   function listForAccountType(accountType, lang) {
     var t = normType(accountType);
     return ACTIVITIES.filter(function (a) {
       return a.accountTypes.indexOf(t) !== -1;
     }).map(function (a) {
-      return {
-        id: a.id,
-        key: a.id,
-        name: label(a, lang),
-        nameAr: a.nameAr,
-        nameFr: a.nameFr,
-        icon: a.icon || '',
-        sectorId: a.sectorId,
-        accountTypes: a.accountTypes.slice(),
-      };
+      return mapActivityRow(a, lang);
     });
   }
 
@@ -295,15 +345,7 @@
       base = base.filter(function (a) { return allowed.indexOf(a.id) !== -1; });
     }
     return base.map(function (a) {
-      return {
-        id: a.id,
-        key: a.id,
-        name: label(a, lang),
-        nameAr: a.nameAr,
-        nameFr: a.nameFr,
-        icon: a.icon || '',
-        sectorId: a.sectorId,
-      };
+      return mapActivityRow(a, lang);
     });
   }
 
@@ -445,6 +487,15 @@
     return a ? label(a, lang) : String(activityId || '');
   }
 
+  function sortSectorFirst(list) {
+    return (list || []).slice().sort(function (a, b) {
+      var as = a.isSector || isSectorActivityId(a.id) ? 0 : 1;
+      var bs = b.isSector || isSectorActivityId(b.id) ? 0 : 1;
+      if (as !== bs) return as - bs;
+      return String(a.nameAr || a.name || '').localeCompare(String(b.nameAr || b.name || ''), 'ar');
+    });
+  }
+
   function groupActivities(activities, accountType, lang) {
     var t = normType(accountType);
     var sectors = SECTORS[t] || [];
@@ -457,7 +508,7 @@
       return {
         id: s.id,
         name: sectorLabel(s, lang),
-        activities: bySector[s.id],
+        activities: sortSectorFirst(bySector[s.id]),
       };
     });
   }
@@ -475,10 +526,11 @@
     var prev = opts.selected || selectEl.value || '';
     var html = '<option value="">' + (isFr ? '— Choisissez votre activité —' : '— اختر نشاطك التجاري —') + '</option>';
     groups.forEach(function (g) {
-      html += '<optgroup label="' + escapeHtml(g.name) + '">';
+      html += '<optgroup label="' + escapeHtml(g.name) + '" data-sector-id="' + escapeHtml(g.id) + '">';
       g.activities.forEach(function (a) {
         var text = (a.icon ? a.icon + ' ' : '') + a.name;
-        html += '<option value="' + escapeHtml(a.id) + '"' + (a.id === prev ? ' selected' : '') + '>' + escapeHtml(text) + '</option>';
+        var sectorAttr = (a.isSector || isSectorActivityId(a.id)) ? ' data-sector-activity="1"' : '';
+        html += '<option value="' + escapeHtml(a.id) + '"' + sectorAttr + (a.id === prev ? ' selected' : '') + '>' + escapeHtml(text) + '</option>';
       });
       html += '</optgroup>';
     });
@@ -538,5 +590,7 @@
     renderSelect: renderSelect,
     groupActivities: groupActivities,
     getSectors: getSectors,
+    sectorActivityId: sectorActivityId,
+    isSectorActivityId: isSectorActivityId,
   };
 });

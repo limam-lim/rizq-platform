@@ -214,6 +214,32 @@ body.rizq-dash {
   line-height: 1.35;
 }
 
+/* قسم رئيسي قابل للاختيار (فرع شامل مثل إلكترونيات وتقنية) */
+.rizq-act-select-option.is-sector {
+  color: rgba(232, 201, 106, 0.98);
+  font-weight: 800;
+  font-size: 12.5px;
+  padding-top: 11px;
+  padding-bottom: 8px;
+  border-top: 1px solid rgba(201, 168, 76, 0.18);
+}
+.rizq-act-select-option.is-sector:first-child,
+.rizq-act-select-menu > .rizq-act-select-option.is-sector:first-of-type {
+  border-top: none;
+}
+.rizq-act-select-option.is-sector:hover,
+.rizq-act-select-option.is-sector:focus {
+  background: rgba(201, 168, 76, 0.16);
+  color: #ffe279;
+}
+.rizq-act-select-option.is-sector.is-selected {
+  background: rgba(201, 168, 76, 0.22);
+  color: #ffe279;
+}
+.rizq-act-select-option:not(.is-sector):not([data-placeholder]) {
+  padding-inline-start: 22px;
+}
+
 .rizq-act-select-option:hover,
 .rizq-act-select-option:focus {
   background: rgba(201, 168, 76, 0.12);
