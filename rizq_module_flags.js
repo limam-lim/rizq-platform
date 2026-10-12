@@ -22,7 +22,7 @@
   var CS_SECTIONS = [
     { key: 'office', icon: '📒', ar: 'المكاتب', fr: 'Bureaux' },
     { key: 'corp', icon: '🏢', ar: 'الشركات والمعارض', fr: 'Entreprises & showrooms' },
-    { key: 'tenders', icon: '📋', ar: 'غرفة المناقصات', fr: 'Salle des appels d\'offres' },
+    { key: 'tenders', icon: '📑', ar: 'غرفة المناقصات', fr: 'Salle des appels d\'offres' },
     { key: 'investments', icon: '📈', ar: 'غرفة الاستثمارات', fr: 'Salle des investissements' },
     { key: 'videoAds', icon: '🎬', ar: 'فيديوهات Rizq ADS', fr: 'Vidéos Rizq ADS' }
   ];

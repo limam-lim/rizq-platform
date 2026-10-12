@@ -22,7 +22,7 @@
     stores: '🏪',
     offices: '🏢',
     showrooms: '🏬',
-    tenders: '📋',
+    tenders: '📑',
     investments: '📈',
     post: '➕',
     more: '⋯',
@@ -186,7 +186,7 @@
       item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض', 'Showrooms') +
       item(moduleHref('office'), 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
-      item(moduleHref('tenders'), 'tenders', '📋', 'المناقصات', 'A-doffres') +
+      item(moduleHref('tenders'), 'tenders', '📑', 'المناقصات', 'A-doffres') +
       item(moduleHref('investments'), 'investments', '📈', 'الاستثمارات', 'Investissements') +
       item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
       item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
