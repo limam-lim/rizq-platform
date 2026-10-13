@@ -3106,6 +3106,19 @@ main, .page-content.active, .main-content, .results-area,
   text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
   white-space:normal;line-height:1.35;
 }
+/* تصفّح الدليل = ثانوي | امتلك الواجهة = أساسي */
+.rizq-dual-cta .landing-ads-browse-full{
+  color:#0F2347!important;
+  background:#fff!important;
+  border:1.5px solid rgba(15,35,71,.18)!important;
+  box-shadow:0 4px 14px rgba(15,35,71,.06);
+}
+.rizq-dual-cta .landing-ads-browse-full:hover{
+  border-color:rgba(201,168,76,.55)!important;
+  background:#fffcf5!important;
+  box-shadow:0 8px 20px rgba(15,35,71,.1);
+  color:#0F2347!important;
+}
 .rizq-dual-cta .rizq-dual-cta-own{
   color:#0f2347!important;
   background:linear-gradient(135deg,var(--gold),var(--gold-light));
@@ -3923,12 +3936,27 @@ html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-name{font-size:13.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-disc-tag{font-size:11.5px;color:#5b6b85;margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:2px 9px;margin-top:6px}
-.rzq-disc-empty{direction:inherit;text-align:center;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.rzq-disc-empty{
+  direction:inherit;text-align:center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.16),transparent 55%),
+    linear-gradient(145deg,#0D1B2A 0%,#152a4a 48%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.35);border-radius:18px;
+  padding:28px 20px 22px;box-shadow:0 10px 32px rgba(13,27,42,.22)
+}
 html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
-.rzq-disc-empty-icon{font-size:34px;margin-bottom:10px}
-.rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
-.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9);max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600}
+.rzq-disc-empty-icon{font-size:30px;margin-bottom:8px;line-height:1;opacity:.95}
+.rzq-disc-empty-title{font-size:16px;font-weight:800;color:#fff;margin:0 0 8px;letter-spacing:.01em}
+.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.88);max-width:440px;margin:0 auto;line-height:1.7;font-weight:600}
+.rzq-disc-empty-examples{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:18px}
+.rzq-disc-empty-examples .rzq-disc-card{
+  width:min(200px,46vw);background:#fff;border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 8px 22px rgba(0,0,0,.18);text-decoration:none;color:inherit
+}
+.rzq-disc-empty-examples .rzq-disc-card:hover{transform:translateY(-2px)}
+.rzq-disc-empty-examples .rzq-disc-badge{background:rgba(15,35,71,.06);color:#0F2347;border-color:rgba(15,35,71,.12)}
+.rzq-disc-ex-label{width:100%;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.72);margin:0 0 2px}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — شريط إطلالات فاخر (هوية رزق كحلي/ذهبي) ── */
@@ -4956,8 +4984,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
       <div class="rizq-dual-cta">
-        <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">📂 عرض كل المحلات ←</a>
-        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="rizq-dual-cta-own" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">عرض كل المحلات ←</a>
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="rizq-dual-cta-own" data-t="vs-btn1">امتلك واجهة محلك الإلكترونية</a>
       </div>
       <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
     </div>
@@ -5035,9 +5063,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
       <div class="rizq-dual-cta">
-        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">📂 عرض كل المعارض ←</a>
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">عرض كل المعارض ←</a>
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
-           class="rizq-dual-cta-own" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
+           class="rizq-dual-cta-own" data-t="vsh-btn1">امتلك واجهة كتالوج معرضك الإلكتروني</a>
       </div>
       <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
     </div>
@@ -5169,8 +5197,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
       <div class="rizq-dual-cta">
-        <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">📂 عرض كل المكاتب ←</a>
-        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="rizq-dual-cta-own" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">عرض كل المكاتب ←</a>
+        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="rizq-dual-cta-own" data-t="vo-btn1">امتلك واجهتك المهنية الإلكترونية</a>
       </div>
       <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
     </div>
@@ -9365,7 +9393,7 @@ const LANG = {
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-why': 'لماذا رزق', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span>رزق</span>: كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات وإلكترونيات وأثاث ومعدات تصل لمشترين جادّين يبحثون الآن.',
-    'vsh-btn1': '✨ امتلك واجهة كتالوج معرضك الإلكتروني',
+    'vsh-btn1': 'امتلك واجهة كتالوج معرضك الإلكتروني',
     'vsh-btn1-sub': 'اشترك الآن. عرضك يصل حيث يبحث الجادّون.',
     'vsh-card1-title': 'عرض يبيع قبل الرسالة', 'vsh-card1-desc': 'صور وأسعار تُقنع المشتري من أول نظرة قبل أن يراسلك.',
     'vsh-card2-title': 'تواصل بثقة عبر رزق', 'vsh-card2-desc': 'مشترون جادّون يصلون إليك مع خصوصية محمية دائماً.',
@@ -9384,8 +9412,8 @@ const LANG = {
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
     'vs-title': 'افتح محلك على <span>رزق</span> بواجهة كاملة لعملائك',
     'vs-desc': 'واجهتك باسمك: منتجاتك وثقة زبائنك في مكان يليق بمحلك.',
-    'vs-btn1': '✨ امتلك واجهة محلك الإلكترونية',
-    'vs-btn1-sub': 'اشترك الآن. سوقك الإلكتروني يبدأ من هنا.',
+    'vs-btn1': 'امتلك واجهة محلك الإلكترونية',
+    'vs-btn1-sub': 'اشترك الآن — سوقك الإلكتروني يبدأ من هنا.',
     'vs-card1-title': 'واجهة احترافية لمحلك', 'vs-card1-desc': 'شعار واسم تجاري وموقع واضح يبني ثقة الزبون من أول زيارة.',
     'vs-card2-title': 'كتالوج منظم بالصور', 'vs-card2-desc': 'منتجات بأسعار وصور واضحة يتصفّحها الزبون بسهولة قبل التواصل.',
     'vs-card3-title': 'نمو يُرى كل يوم', 'vs-card3-desc': 'زبائن أكثر وطلبات أوضح. محلك يكبر بثقة على رزق.',
@@ -9400,8 +9428,8 @@ const LANG = {
     'vo-feat2-title': 'تواصل مباشر وسهل', 'vo-feat2-desc': 'واتساب وإيميل وهاتف: الزبون يصل إليك بنقرة واحدة.',
     'vo-feat3-title': 'شارة مكتب موثّق', 'vo-feat3-desc': 'شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك.',
     'vo-feat4-title': 'خدماتك معروضة بوضوح', 'vo-feat4-desc': 'قائمة مرتّبة بما تقدّمه. يختار الزبون ما يناسبه ويتواصل مباشرة.',
-    'vo-btn1': '✨ امتلك واجهتك المهنية الإلكترونية',
-    'vo-btn1-sub': 'اشترك الآن. حضورك المهني لا يتوقف.',
+    'vo-btn1': 'امتلك واجهتك المهنية الإلكترونية',
+    'vo-btn1-sub': 'اشترك الآن — حضورك المهني لا يتوقف.',
     'vt-title': 'غرفة المناقصات على <span>رزق</span>',
     'vi-title': 'غرفة الاستثمارات على <span>رزق</span>',
     'vt-btn': '✨ امتلك مقعدك في غرفة المناقصات',
@@ -9451,10 +9479,10 @@ const LANG = {
     's-lst-title': 'أبرز العروض على <span>رزق</span>',
     's-lst-desc': 'فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن',
     'view-all': 'عرض الكل في نافذة ←',
-    'browse-full': '📂 عرض كل الإعلانات ←',
-    'browse-stores': '📂 عرض كل المحلات ←',
-    'browse-showrooms': '📂 عرض كل المعارض ←',
-    'browse-offices': '📂 عرض كل المكاتب ←',
+    'browse-full': 'عرض كل الإعلانات ←',
+    'browse-stores': 'عرض كل المحلات ←',
+    'browse-showrooms': 'عرض كل المعارض ←',
+    'browse-offices': 'عرض كل المكاتب ←',
     'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'سوق موريتاني يثق به الناس — بيع، تسوّق، وأنمِ عملك بوضوح وطمأنينة',
@@ -9512,8 +9540,8 @@ const LANG = {
     'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-why': 'Pourquoi Rizq', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span>Rizq</span> : catalogue premium et acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements pour des acheteurs sérieux, dès maintenant.',
-    'vsh-btn1': '✨ Possédez la vitrine catalogue de votre showroom',
-    'vsh-btn1-sub': 'Abonnez-vous. Votre offre atteint les acheteurs sérieux.',
+    'vsh-btn1': 'Possédez la vitrine catalogue de votre showroom',
+    'vsh-btn1-sub': 'Abonnez-vous — votre offre atteint les acheteurs sérieux.',
     'vsh-card1-title': 'Une offre qui convainc avant le message', 'vsh-card1-desc': 'Photos et prix qui séduisent au premier regard, avant même qu\'on vous contacte.',
     'vsh-card2-title': 'Contactez en confiance via Rizq', 'vsh-card2-desc': 'Des acheteurs sérieux vous rejoignent, avec une confidentialité toujours protégée.',
     'vsh-card3-title': 'Badge Showroom vérifié', 'vsh-card3-desc': 'Un badge officiel sur Rizq visible sur vos offres pour renforcer la confiance.',
@@ -9531,8 +9559,8 @@ const LANG = {
     'cta-trust1': 'Confiance', 'cta-trust2': 'Sécurité', 'cta-trust3': 'Transparence',
     'vs-title': 'Ouvrez votre boutique sur <span>Rizq</span> avec une vitrine complète pour vos clients',
     'vs-desc': 'Votre vitrine à votre nom : produits et confiance clients dans un espace digne de votre boutique.',
-    'vs-btn1': '✨ Possédez la vitrine électronique de votre boutique',
-    'vs-btn1-sub': 'Abonnez-vous. Votre marché électronique commence ici.',
+    'vs-btn1': 'Possédez la vitrine électronique de votre boutique',
+    'vs-btn1-sub': 'Abonnez-vous — votre marché électronique commence ici.',
     'vs-card1-title': 'Une vitrine professionnelle', 'vs-card1-desc': 'Logo, nom commercial et emplacement clairs pour inspirer confiance dès la première visite.',
     'vs-card2-title': 'Catalogue photo organisé', 'vs-card2-desc': 'Produits avec prix et photos clairs que le client consulte facilement avant de vous contacter.',
     'vs-card3-title': 'Une croissance visible chaque jour', 'vs-card3-desc': 'Plus de clients et des demandes plus claires. Votre boutique grandit sur Rizq.',
@@ -9547,8 +9575,8 @@ const LANG = {
     'vo-feat2-title': 'Contact direct et simple', 'vo-feat2-desc': 'WhatsApp, e-mail et téléphone : le client vous joint en un clic.',
     'vo-feat3-title': 'Badge Bureau certifié', 'vo-feat3-desc': 'Un badge or sur Rizq qui inspire immédiatement confiance à vos clients.',
     'vo-feat4-title': 'Vos services bien présentés', 'vo-feat4-desc': 'Une liste claire de ce que vous offrez. Le client choisit et vous contacte directement.',
-    'vo-btn1': '✨ Possédez votre vitrine professionnelle en ligne',
-    'vo-btn1-sub': 'Abonnez-vous. Votre présence pro ne s\'arrête pas.',
+    'vo-btn1': 'Possédez votre vitrine professionnelle en ligne',
+    'vo-btn1-sub': 'Abonnez-vous — votre présence pro ne s\'arrête pas.',
     'vt-title': 'La salle des appels d\'offres sur <span>Rizq</span>',
     'vi-title': 'La salle des investissements sur <span>Rizq</span>',
     'vt-btn': '✨ Réservez votre place dans la salle des appels d\'offres',
@@ -9598,10 +9626,10 @@ const LANG = {
     's-lst-title': 'Les meilleures offres sur <span>Rizq</span>',
     's-lst-desc': 'Des opportunités choisies pour vous — découvrez le meilleur du marché maintenant',
     'view-all': 'Tout voir en fenêtre →',
-    'browse-full': '📂 Voir toutes les annonces →',
-    'browse-stores': '📂 Voir toutes les boutiques →',
-    'browse-showrooms': '📂 Voir tous les showrooms →',
-    'browse-offices': '📂 Voir tous les bureaux →',
+    'browse-full': 'Voir toutes les annonces →',
+    'browse-stores': 'Voir toutes les boutiques →',
+    'browse-showrooms': 'Voir tous les showrooms →',
+    'browse-offices': 'Voir tous les bureaux →',
     'f-fashion': 'Mode',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Un marché mauritanien de confiance — vendez, achetez et développez votre activité en toute sérénité',
@@ -14474,30 +14502,46 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 
     var TYPE_CFG = {
       store: { page:'rizq_store.html',   icon:'🏪', badge:{ar:'محل',fr:'Boutique'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح محله هنا',fr:'🌟 Soyez le premier à ouvrir votre boutique ici'},
+        emptyTitle:{ar:'كن أول من يفتح محله هنا',fr:'Soyez le premier à ouvrir votre boutique ici'},
         emptyDesc:{ar:'محلات رزق التجارية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les boutiques Rizq apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏪 افتح محلك الآن',fr:'🏪 Ouvrez votre boutique maintenant'},
+        emptyCta:{ar:'افتح محلك الآن',fr:'Ouvrez votre boutique maintenant'},
         bizType:'store' },
       office: { page:'rizq_office.html', icon:'🏢', badge:{ar:'مكتب',fr:'Bureau'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح مكتبه هنا',fr:'🌟 Soyez le premier à ouvrir votre bureau ici'},
+        emptyTitle:{ar:'كن أول من يفتح مكتبه هنا',fr:'Soyez le premier à ouvrir votre bureau ici'},
         emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏢 أنشئ مكتبك الآن',fr:'🏢 Créez votre bureau maintenant'},
+        emptyCta:{ar:'أنشئ مكتبك الآن',fr:'Créez votre bureau maintenant'},
         bizType:'office' },
       corp: { page:'rizq_showroom.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح معرضه هنا',fr:'🌟 Soyez le premier à ouvrir votre showroom ici'},
+        emptyTitle:{ar:'كن أول من يفتح معرضه هنا',fr:'Soyez le premier à ouvrir votre showroom ici'},
         emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏬 أنشئ معرضك الآن',fr:'🏬 Créez votre showroom maintenant'},
+        emptyCta:{ar:'أنشئ معرضك الآن',fr:'Créez votre showroom maintenant'},
         bizType:'corp' },
       tenders: { page:'rizq_tenders.html', icon:'📑', badge:{ar:'مناقصة',fr:'Appel d\'offres'},
-        emptyTitle:{ar:'🌟 كن أول من ينشر مناقصته هنا',fr:'🌟 Soyez le premier à publier un appel d\'offres'},
+        emptyTitle:{ar:'كن أول من ينشر مناقصته هنا',fr:'Soyez le premier à publier un appel d\'offres'},
         emptyDesc:{ar:'المناقصات المفتوحة ستظهر هنا فور نشرها — اشترك في الغرفة وابدأ.',fr:'Les appels d\'offres ouverts apparaîtront ici dès leur publication.'},
-        emptyCta:{ar:'📑 انشر مناقصة',fr:'📑 Publier un AO'},
+        emptyCta:{ar:'انشر مناقصة',fr:'Publier un AO'},
         bizType:'tenders' },
       investments: { page:'rizq_investments.html', icon:'📈', badge:{ar:'استثمار',fr:'Investissement'},
-        emptyTitle:{ar:'🌟 كن أول من ينشر فرصته الاستثمارية هنا',fr:'🌟 Soyez le premier à publier une opportunité'},
+        emptyTitle:{ar:'كن أول من ينشر فرصته الاستثمارية هنا',fr:'Soyez le premier à publier une opportunité'},
         emptyDesc:{ar:'فرص الاستثمار ستظهر هنا فور نشرها ومراجعتها — ادخل الغرفة وابدأ.',fr:'Les opportunités d\'investissement apparaîtront ici dès publication et revue.'},
-        emptyCta:{ar:'📈 انشر فرصة',fr:'📈 Publier une opportunité'},
+        emptyCta:{ar:'انشر فرصة',fr:'Publier une opportunité'},
         bizType:'investments' }
+    };
+
+    /** معاينات عند الفراغ — نفس فكرة دليل المحلات/المعارض/المكاتب */
+    var EMPTY_EXAMPLES = {
+      store: [
+        { href:'rizq_store.html?demo=1', nameAr:'محل نموذجي على رزق', nameFr:'Boutique modèle Rizq', tagAr:'إلكترونيات وتقنية', tagFr:'Électronique & tech', icon:'🏪' },
+        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗' }
+      ],
+      corp: [
+        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗' },
+        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬' }
+      ],
+      office: [
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️' },
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️' }
+      ]
     };
 
     var TENDER_CAT = {
@@ -14555,10 +14599,32 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     }
 
     function emptyHTML(cfg, fr){
+      var samples = EMPTY_EXAMPLES[cfg.bizType] || [];
+      var exLabel = fr
+        ? 'Aperçu — cliquez une carte pour ouvrir la page'
+        : 'معاينة — اضغط البطاقة لفتح الصفحة';
+      var examples = '';
+      if(samples.length){
+        examples = '<div class="rzq-disc-empty-examples">'
+          + '<p class="rzq-disc-ex-label">'+esc(exLabel)+'</p>'
+          + samples.map(function(ex){
+            var name = fr ? ex.nameFr : ex.nameAr;
+            var tag = fr ? ex.tagFr : ex.tagAr;
+            return '<a class="rzq-disc-card" href="'+esc(ex.href)+'">'
+              + '<div class="rzq-disc-img"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:linear-gradient(145deg,#eef2f7,#dfe7f2)">'+ex.icon+'</div></div>'
+              + '<div class="rzq-disc-body">'
+              +   '<div class="rzq-disc-name">'+esc(name)+'</div>'
+              +   (tag ? '<div class="rzq-disc-tag">'+esc(tag)+'</div>' : '')
+              +   '<span class="rzq-disc-badge">'+(fr?'Démo':'مثال')+'</span>'
+              + '</div></a>';
+          }).join('')
+          + '</div>';
+      }
       return '<div class="rzq-disc-empty">'
         + '<div class="rzq-disc-empty-icon">'+cfg.icon+'</div>'
         + '<div class="rzq-disc-empty-title">'+esc(cfg.emptyTitle[fr?'fr':'ar'])+'</div>'
         + '<div class="rzq-disc-empty-desc">'+esc(cfg.emptyDesc[fr?'fr':'ar'])+'</div>'
+        + examples
         + '</div>';
     }
 
