@@ -650,10 +650,11 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   font-size:12.5px;color:#6a7a8a;margin:0 0 12px;line-height:1.55;max-width:70ch
 }
 .store-desk-form{
-  display:grid;
+  display:grid!important;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:10px 12px;
   align-items:end;
+  width:100%;
 }
 .store-desk-field{display:flex;flex-direction:column;gap:5px;min-width:0}
 .store-desk-field label{
@@ -1442,7 +1443,7 @@ footer{
         <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
       </div>
     </div>
-    <div id="store-req-form" class="store-desk-form" style="display:block!important">
+    <div id="store-req-form" class="store-desk-form">
       <div class="store-desk-field">
         <label for="rf-name">الاسم الكامل *</label>
         <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
