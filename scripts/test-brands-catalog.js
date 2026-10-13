@@ -14,12 +14,17 @@ const B = sandbox.RizqBrands || sandbox.window.RizqBrands;
 assert(B, 'RizqBrands must export');
 
 const all = B.list();
-assert(all.length >= 20, 'expected a rich brand catalog');
+assert(all.length >= 70, 'expected a rich brand catalog, got ' + all.length);
 assert(B.getById('toyota'), 'toyota');
 assert(B.getById('mercedes'), 'mercedes');
+assert(B.getById('honda'), 'honda');
 assert(B.getById('nike'), 'nike');
 assert(B.getById('adidas'), 'adidas');
+assert(B.getById('mango'), 'mango');
 assert(B.getById('ray-ban'), 'ray-ban');
+assert(B.getById('huawei'), 'huawei');
+assert(B.getById('ikea'), 'ikea');
+assert(B.getById('rolex'), 'rolex');
 
 const cars = B.forCategory('سيارات');
 assert(cars.some((b) => b.id === 'toyota'));

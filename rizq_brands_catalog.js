@@ -133,6 +133,132 @@
         M('duster', 'داستر', 'Duster'), M('lodgy', 'لودجي', 'Lodgy')
       ]
     },
+    {
+      id: 'honda', nameAr: 'هوندا', nameFr: 'Honda', sector: 'auto',
+      categories: ['سيارات'], color: '#E40521', letter: 'H',
+      aliases: ['honda', 'هوندا'],
+      models: [
+        M('civic', 'سيفيك', 'Civic'), M('accord', 'أكورد', 'Accord'),
+        M('cr-v', 'CR-V', 'CR-V'), M('hr-v', 'HR-V', 'HR-V'), M('city', 'سيتي', 'City')
+      ]
+    },
+    {
+      id: 'mazda', nameAr: 'مازدا', nameFr: 'Mazda', sector: 'auto',
+      categories: ['سيارات'], color: '#910A2D', letter: 'MZ',
+      aliases: ['mazda', 'مازدا'],
+      models: [
+        M('mazda3', 'مازدا 3', 'Mazda3'), M('mazda6', 'مازدا 6', 'Mazda6'),
+        M('cx-5', 'CX-5', 'CX-5'), M('cx-30', 'CX-30', 'CX-30')
+      ]
+    },
+    {
+      id: 'mitsubishi', nameAr: 'ميتسوبيشي', nameFr: 'Mitsubishi', sector: 'auto',
+      categories: ['سيارات'], color: '#E60012', letter: 'M',
+      aliases: ['mitsubishi', 'ميتسوبيشي', 'ميتسبيشي'],
+      models: [
+        M('l200', 'L200', 'L200'), M('pajero', 'باجيرو', 'Pajero'),
+        M('outlander', 'أوتلاندر', 'Outlander'), M('asx', 'ASX', 'ASX')
+      ]
+    },
+    {
+      id: 'suzuki', nameAr: 'سوزوكي', nameFr: 'Suzuki', sector: 'auto',
+      categories: ['سيارات'], color: '#E30613', letter: 'SZ',
+      aliases: ['suzuki', 'سوزوكي'],
+      models: [
+        M('swift', 'سويفت', 'Swift'), M('vitara', 'فيتارا', 'Vitara'),
+        M('jimny', 'جيمني', 'Jimny'), M('dzire', 'ديزاير', 'Dzire')
+      ]
+    },
+    {
+      id: 'audi', nameAr: 'أودي', nameFr: 'Audi', sector: 'auto',
+      categories: ['سيارات'], color: '#BB0A30', letter: 'AU',
+      aliases: ['audi', 'أودي', 'اودي'],
+      models: [
+        M('a3', 'A3', 'A3'), M('a4', 'A4', 'A4'), M('a6', 'A6', 'A6'),
+        M('q3', 'Q3', 'Q3'), M('q5', 'Q5', 'Q5'), M('q7', 'Q7', 'Q7')
+      ]
+    },
+    {
+      id: 'land-rover', nameAr: 'لاند روفر', nameFr: 'Land Rover', sector: 'auto',
+      categories: ['سيارات'], color: '#005A2B', letter: 'LR',
+      aliases: ['land rover', 'landrover', 'لاند روفر', 'رنج روفر'],
+      models: [
+        M('defender', 'ديفندر', 'Defender'), M('discovery', 'ديسكفري', 'Discovery'),
+        M('range-rover', 'رنج روفر', 'Range Rover'), M('evoque', 'إيفوك', 'Evoque')
+      ]
+    },
+    {
+      id: 'jeep', nameAr: 'جيب', nameFr: 'Jeep', sector: 'auto',
+      categories: ['سيارات'], color: '#1C3F24', letter: 'JP',
+      aliases: ['jeep', 'جيب'],
+      models: [
+        M('wrangler', 'رانجلر', 'Wrangler'), M('cherokee', 'شيروكي', 'Cherokee'),
+        M('compass', 'كومباس', 'Compass'), M('grand-cherokee', 'جراند شيروكي', 'Grand Cherokee')
+      ]
+    },
+    {
+      id: 'volvo', nameAr: 'فولفو', nameFr: 'Volvo', sector: 'auto',
+      categories: ['سيارات'], color: '#003057', letter: 'VO',
+      aliases: ['volvo', 'فولفو'],
+      models: [
+        M('xc40', 'XC40', 'XC40'), M('xc60', 'XC60', 'XC60'),
+        M('xc90', 'XC90', 'XC90'), M('s60', 'S60', 'S60')
+      ]
+    },
+    {
+      id: 'skoda', nameAr: 'سكودا', nameFr: 'Škoda', sector: 'auto',
+      categories: ['سيارات'], color: '#4BA82E', letter: 'SK',
+      aliases: ['skoda', 'škoda', 'سكودا'],
+      models: [
+        M('octavia', 'أوكتافيا', 'Octavia'), M('superb', 'سوبيرب', 'Superb'),
+        M('kodiaq', 'كودياك', 'Kodiaq'), M('kamiq', 'كاميك', 'Kamiq')
+      ]
+    },
+    {
+      id: 'opel', nameAr: 'أوبل', nameFr: 'Opel', sector: 'auto',
+      categories: ['سيارات'], color: '#F7D117', letter: 'OP',
+      aliases: ['opel', 'أوبل', 'اوبل'],
+      models: [
+        M('corsa', 'كورسا', 'Corsa'), M('astra', 'أسترا', 'Astra'),
+        M('mokka', 'موكا', 'Mokka'), M('grandland', 'جراندلاند', 'Grandland')
+      ]
+    },
+    {
+      id: 'geely', nameAr: 'جيلي', nameFr: 'Geely', sector: 'auto',
+      categories: ['سيارات'], color: '#003DA5', letter: 'GE',
+      aliases: ['geely', 'جيلي'],
+      models: [
+        M('coolray', 'كولراي', 'Coolray'), M('azkarra', 'أزكارا', 'Azkarra'),
+        M('okavango', 'أوكافانجو', 'Okavango'), M('emgrand', 'إمجراند', 'Emgrand')
+      ]
+    },
+    {
+      id: 'chery', nameAr: 'شيري', nameFr: 'Chery', sector: 'auto',
+      categories: ['سيارات'], color: '#E31C23', letter: 'CH',
+      aliases: ['chery', 'شيري'],
+      models: [
+        M('tiggo-4', 'تيجو 4', 'Tiggo 4'), M('tiggo-7', 'تيجو 7', 'Tiggo 7'),
+        M('tiggo-8', 'تيجو 8', 'Tiggo 8'), M('arrizo', 'أريزو', 'Arrizo')
+      ]
+    },
+    {
+      id: 'byd', nameAr: 'بي واي دي', nameFr: 'BYD', sector: 'auto',
+      categories: ['سيارات'], color: '#FF3300', letter: 'BYD',
+      aliases: ['byd', 'بي واي دي'],
+      models: [
+        M('atto-3', 'أتو 3', 'Atto 3'), M('seal', 'سيل', 'Seal'),
+        M('dolphin', 'دولفين', 'Dolphin'), M('han', 'هان', 'Han')
+      ]
+    },
+    {
+      id: 'tesla', nameAr: 'تيسلا', nameFr: 'Tesla', sector: 'auto',
+      categories: ['سيارات'], color: '#CC0000', letter: 'TS',
+      aliases: ['tesla', 'تيسلا'],
+      models: [
+        M('model-3', 'موديل 3', 'Model 3'), M('model-y', 'موديل Y', 'Model Y'),
+        M('model-s', 'موديل S', 'Model S'), M('model-x', 'موديل X', 'Model X')
+      ]
+    },
 
     /* ── أزياء وملابس ── */
     {
@@ -209,6 +335,174 @@
         M('ready-to-wear', 'ملابس جاهزة', 'Prêt-à-porter'), M('accessories', 'إكسسوارات', 'Accessoires')
       ]
     },
+    {
+      id: 'mango', nameAr: 'مانجو', nameFr: 'Mango', sector: 'fashion',
+      categories: ['أزياء'], color: '#E87722', letter: 'MG',
+      aliases: ['mango', 'مانجو'],
+      models: [
+        M('femme', 'نسائي', 'Femme'), M('homme', 'رجالي', 'Homme'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'pull-bear', nameAr: 'بول آند بير', nameFr: 'Pull&Bear', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'PB',
+      aliases: ['pull&bear', 'pull and bear', 'بول اند بير', 'بول آند بير'],
+      models: [
+        M('homme', 'رجالي', 'Homme'), M('femme', 'نسائي', 'Femme')
+      ]
+    },
+    {
+      id: 'bershka', nameAr: 'بيرشكا', nameFr: 'Bershka', sector: 'fashion',
+      categories: ['أزياء'], color: '#00A0E3', letter: 'BK',
+      aliases: ['bershka', 'بيرشكا'],
+      models: [
+        M('femme', 'نسائي', 'Femme'), M('homme', 'رجالي', 'Homme')
+      ]
+    },
+    {
+      id: 'uniqlo', nameAr: 'يونيكلو', nameFr: 'Uniqlo', sector: 'fashion',
+      categories: ['أزياء'], color: '#FF0000', letter: 'UQ',
+      aliases: ['uniqlo', 'يونيكلو'],
+      models: [
+        M('ut', 'UT', 'UT'), M('airism', 'إيريزم', 'AIRism'), M('heattech', 'هيت تك', 'HEATTECH')
+      ]
+    },
+    {
+      id: 'guess', nameAr: 'جيس', nameFr: 'Guess', sector: 'fashion',
+      categories: ['أزياء'], color: '#C4A35A', letter: 'GU',
+      aliases: ['guess', 'جيس'],
+      models: [
+        M('jeans', 'جينز', 'Jeans'), M('bags', 'حقائب', 'Sacs'), M('watches', 'ساعات', 'Montres')
+      ]
+    },
+    {
+      id: 'calvin-klein', nameAr: 'كالفن كلاين', nameFr: 'Calvin Klein', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'CK',
+      aliases: ['calvin klein', 'ck', 'كالفن كلاين'],
+      models: [
+        M('underwear', 'داخلي', 'Underwear'), M('jeans', 'جينز', 'Jeans'), M('perfume', 'عطور', 'Parfum')
+      ]
+    },
+    {
+      id: 'tommy-hilfiger', nameAr: 'تومي هيلفيغر', nameFr: 'Tommy Hilfiger', sector: 'fashion',
+      categories: ['أزياء'], color: '#001F5B', letter: 'TH',
+      aliases: ['tommy', 'tommy hilfiger', 'تومي', 'تومي هيلفيغر'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('denim', 'دينيم', 'Denim'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'lacoste', nameAr: 'لاكوست', nameFr: 'Lacoste', sector: 'fashion',
+      categories: ['أزياء', 'رياضة'], color: '#004D28', letter: 'LA',
+      aliases: ['lacoste', 'لاكوست'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('sneakers', 'سنيكرز', 'Sneakers'), M('tennis', 'تنس', 'Tennis')
+      ]
+    },
+    {
+      id: 'levis', nameAr: 'ليفايز', nameFr: "Levi's", sector: 'fashion',
+      categories: ['أزياء'], color: '#C41230', letter: 'LV',
+      aliases: ['levis', "levi's", 'ليفايز', 'ليفي'],
+      models: [
+        M('501', '501', '501'), M('511', '511', '511'), M('trucker', 'تراكر', 'Trucker')
+      ]
+    },
+    {
+      id: 'ralph-lauren', nameAr: 'رالف لورين', nameFr: 'Ralph Lauren', sector: 'fashion',
+      categories: ['أزياء'], color: '#00205B', letter: 'RL',
+      aliases: ['ralph lauren', 'polo ralph', 'رالف لورين'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('oxford', 'أكسفورد', 'Oxford'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'chanel', nameAr: 'شانيل', nameFr: 'Chanel', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'CH',
+      aliases: ['chanel', 'شانيل'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('perfume', 'عطور', 'Parfum'), M('ready-to-wear', 'ملابس', 'Prêt-à-porter')
+      ]
+    },
+    {
+      id: 'louis-vuitton', nameAr: 'لويس فويتون', nameFr: 'Louis Vuitton', sector: 'fashion',
+      categories: ['أزياء'], color: '#8B5A2B', letter: 'LV',
+      aliases: ['louis vuitton', 'lv', 'لويس فويتون', 'لويس فيتون'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('sneakers', 'سنيكرز', 'Sneakers'), M('accessories', 'إكسسوارات', 'Accessoires')
+      ]
+    },
+    {
+      id: 'prada', nameAr: 'برادا', nameFr: 'Prada', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'PR',
+      aliases: ['prada', 'برادا'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('shoes', 'أحذية', 'Chaussures'), M('eyewear', 'نظارات', 'Lunettes')
+      ]
+    },
+    {
+      id: 'dior', nameAr: 'ديور', nameFr: 'Dior', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'DI',
+      aliases: ['dior', 'ديور'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('perfume', 'عطور', 'Parfum'), M('makeup', 'مكياج', 'Maquillage')
+      ]
+    },
+    {
+      id: 'new-balance', nameAr: 'نيو بالانس', nameFr: 'New Balance', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#CF0A2C', letter: 'NB',
+      aliases: ['new balance', 'nb', 'نيو بالانس'],
+      models: [
+        M('574', '574', '574'), M('550', '550', '550'), M('327', '327', '327'), M('990', '990', '990')
+      ]
+    },
+    {
+      id: 'under-armour', nameAr: 'أندر آرمر', nameFr: 'Under Armour', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#1D1D1D', letter: 'UA',
+      aliases: ['under armour', 'ua', 'أندر آرمر', 'اندر ارمر'],
+      models: [
+        M('hovr', 'هوفر', 'HOVR'), M('curry', 'كوري', 'Curry'), M('heatgear', 'هيت جير', 'HeatGear')
+      ]
+    },
+    {
+      id: 'reebok', nameAr: 'ريبوك', nameFr: 'Reebok', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#E31C23', letter: 'RB',
+      aliases: ['reebok', 'ريبوك'],
+      models: [
+        M('classic', 'كلاسيك', 'Classic'), M('nano', 'نانو', 'Nano'), M('club-c', 'كلوب C', 'Club C')
+      ]
+    },
+    {
+      id: 'converse', nameAr: 'كونفيرس', nameFr: 'Converse', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#111111', letter: 'CV',
+      aliases: ['converse', 'كونفيرس', 'كونفرس'],
+      models: [
+        M('chuck-70', 'تشاك 70', 'Chuck 70'), M('all-star', 'أول ستار', 'All Star'), M('run-star', 'ران ستار', 'Run Star')
+      ]
+    },
+    {
+      id: 'vans', nameAr: 'فانس', nameFr: 'Vans', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#C41E3A', letter: 'VN',
+      aliases: ['vans', 'فانس'],
+      models: [
+        M('old-skool', 'أولد سكول', 'Old Skool'), M('sk8-hi', 'SK8-Hi', 'SK8-Hi'), M('authentic', 'أوثنتيك', 'Authentic')
+      ]
+    },
+    {
+      id: 'asics', nameAr: 'أسيكس', nameFr: 'ASICS', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#001E62', letter: 'AS',
+      aliases: ['asics', 'أسيكس', 'اسيكس'],
+      models: [
+        M('gel-kayano', 'جيل كايانو', 'Gel-Kayano'), M('gel-nimbus', 'جيل نمبس', 'Gel-Nimbus'), M('gt-2000', 'GT-2000', 'GT-2000')
+      ]
+    },
+    {
+      id: 'skechers', nameAr: 'سكيتشرز', nameFr: 'Skechers', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#111111', letter: 'SK',
+      aliases: ['skechers', 'سكيتشرز'],
+      models: [
+        M('go-walk', 'جو ووك', 'Go Walk'), M('d-lites', 'دي لايتس', 'D-Lites'), M('arch-fit', 'آرتش فت', 'Arch Fit')
+      ]
+    },
 
     /* ── نظارات وإكسسوارات ── */
     {
@@ -246,11 +540,27 @@
         M('panamerika', 'باناميريكا', 'Panamerika')
       ]
     },
+    {
+      id: 'police', nameAr: 'بوليس', nameFr: 'Police', sector: 'eyewear',
+      categories: ['أزياء'], color: '#111111', letter: 'PL',
+      aliases: ['police', 'بوليس'],
+      models: [
+        M('origins', 'أوريجينز', 'Origins'), M('lifestyle', 'لايف ستايل', 'Lifestyle')
+      ]
+    },
+    {
+      id: 'tom-ford', nameAr: 'توم فورد', nameFr: 'Tom Ford', sector: 'eyewear',
+      categories: ['أزياء'], color: '#111111', letter: 'TF',
+      aliases: ['tom ford', 'توم فورد'],
+      models: [
+        M('ft', 'FT', 'FT'), M('private', 'برايفت', 'Private')
+      ]
+    },
 
     /* ── إلكترونيات شائعة (ماركة فقط + خطوط) ── */
     {
       id: 'apple', nameAr: 'آبل', nameFr: 'Apple', sector: 'electronics',
-      categories: ['إلكترونيات'], color: '#555555', letter: '',
+      categories: ['إلكترونيات'], color: '#555555', letter: 'AP',
       aliases: ['apple', 'آبل', 'ابل', 'آيفون'],
       models: [
         M('iphone-15', 'آيفون 15', 'iPhone 15'), M('iphone-14', 'آيفون 14', 'iPhone 14'),
@@ -276,6 +586,212 @@
       models: [
         M('redmi', 'ريدمي', 'Redmi'), M('poco', 'بوكو', 'POCO'),
         M('note', 'نوت', 'Note'), M('mi-tv', 'تلفزيون', 'Mi TV')
+      ]
+    },
+    {
+      id: 'huawei', nameAr: 'هواوي', nameFr: 'Huawei', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#CF0A2C', letter: 'HW',
+      aliases: ['huawei', 'هواوي'],
+      models: [
+        M('p-series', 'سلسلة P', 'P Series'), M('mate', 'ميت', 'Mate'),
+        M('nova', 'نوفا', 'Nova'), M('watch-gt', 'Watch GT', 'Watch GT')
+      ]
+    },
+    {
+      id: 'oppo', nameAr: 'أوبو', nameFr: 'OPPO', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#1BA784', letter: 'OP',
+      aliases: ['oppo', 'أوبو', 'اوبو'],
+      models: [
+        M('find-x', 'Find X', 'Find X'), M('reno', 'رينو', 'Reno'), M('a-series', 'سلسلة A', 'A Series')
+      ]
+    },
+    {
+      id: 'vivo', nameAr: 'فيفو', nameFr: 'vivo', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#415FFF', letter: 'VI',
+      aliases: ['vivo', 'فيفو'],
+      models: [
+        M('x-series', 'سلسلة X', 'X Series'), M('v-series', 'سلسلة V', 'V Series'), M('y-series', 'سلسلة Y', 'Y Series')
+      ]
+    },
+    {
+      id: 'realme', nameAr: 'ريلمي', nameFr: 'realme', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#FFC915', letter: 'RM',
+      aliases: ['realme', 'ريلمي'],
+      models: [
+        M('gt', 'GT', 'GT'), M('narzo', 'نارزو', 'Narzo'), M('c-series', 'سلسلة C', 'C Series')
+      ]
+    },
+    {
+      id: 'honor', nameAr: 'هونر', nameFr: 'Honor', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'HO',
+      aliases: ['honor', 'هونر'],
+      models: [
+        M('magic', 'ماجيك', 'Magic'), M('x-series', 'سلسلة X', 'X Series'), M('watch', 'ساعة', 'Watch')
+      ]
+    },
+    {
+      id: 'sony', nameAr: 'سوني', nameFr: 'Sony', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'SO',
+      aliases: ['sony', 'سوني'],
+      models: [
+        M('xperia', 'إكسبيريا', 'Xperia'), M('bravia', 'برافيا', 'Bravia'),
+        M('playstation', 'بلايستيشن', 'PlayStation'), M('wh1000', 'WH-1000', 'WH-1000')
+      ]
+    },
+    {
+      id: 'lg', nameAr: 'إل جي', nameFr: 'LG', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#A50034', letter: 'LG',
+      aliases: ['lg', 'إل جي', 'ال جي'],
+      models: [
+        M('oled', 'OLED', 'OLED'), M('gram', 'جرام', 'Gram'), M('soundbar', 'ساوند بار', 'Soundbar')
+      ]
+    },
+    {
+      id: 'lenovo', nameAr: 'لينوفو', nameFr: 'Lenovo', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#E2231A', letter: 'LE',
+      aliases: ['lenovo', 'لينوفو'],
+      models: [
+        M('thinkpad', 'ثينك باد', 'ThinkPad'), M('ideapad', 'آيديا باد', 'IdeaPad'), M('legion', 'ليجون', 'Legion')
+      ]
+    },
+    {
+      id: 'hp', nameAr: 'إتش بي', nameFr: 'HP', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#0096D6', letter: 'HP',
+      aliases: ['hp', 'hewlett', 'إتش بي', 'اتش بي'],
+      models: [
+        M('pavilion', 'بافيليون', 'Pavilion'), M('elitebook', 'إيليت بوك', 'EliteBook'), M('omen', 'أومن', 'OMEN')
+      ]
+    },
+    {
+      id: 'dell', nameAr: 'ديل', nameFr: 'Dell', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#007DB8', letter: 'DE',
+      aliases: ['dell', 'ديل'],
+      models: [
+        M('xps', 'XPS', 'XPS'), M('inspiron', 'إنسبايرون', 'Inspiron'), M('alienware', 'أليان وير', 'Alienware')
+      ]
+    },
+    {
+      id: 'asus', nameAr: 'أسوس', nameFr: 'ASUS', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#000000', letter: 'AS',
+      aliases: ['asus', 'أسوس', 'اسوس'],
+      models: [
+        M('zenbook', 'زين بوك', 'Zenbook'), M('vivobook', 'فيفو بوك', 'Vivobook'), M('rog', 'ROG', 'ROG')
+      ]
+    },
+    {
+      id: 'nokia', nameAr: 'نوكيا', nameFr: 'Nokia', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#124191', letter: 'NK',
+      aliases: ['nokia', 'نوكيا'],
+      models: [
+        M('g-series', 'سلسلة G', 'G Series'), M('x-series', 'سلسلة X', 'X Series'), M('c-series', 'سلسلة C', 'C Series')
+      ]
+    },
+    {
+      id: 'tecno', nameAr: 'تكنو', nameFr: 'TECNO', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#00AEEF', letter: 'TE',
+      aliases: ['tecno', 'تكنو'],
+      models: [
+        M('spark', 'سبارك', 'Spark'), M('camon', 'كامون', 'Camon'), M('phantom', 'فانتوم', 'Phantom')
+      ]
+    },
+    {
+      id: 'infinix', nameAr: 'إنفينيكس', nameFr: 'Infinix', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'IX',
+      aliases: ['infinix', 'إنفينيكس', 'انفينكس'],
+      models: [
+        M('note', 'نوت', 'Note'), M('hot', 'هوت', 'Hot'), M('zero', 'زيرو', 'Zero')
+      ]
+    },
+    {
+      id: 'itel', nameAr: 'ايتل', nameFr: 'itel', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#FF6A00', letter: 'IT',
+      aliases: ['itel', 'ايتل', 'أيتل'],
+      models: [
+        M('a-series', 'سلسلة A', 'A Series'), M('p-series', 'سلسلة P', 'P Series'), M('s-series', 'سلسلة S', 'S Series')
+      ]
+    },
+
+    /* ── أثاث ومعارض ── */
+    {
+      id: 'ikea', nameAr: 'إيكيا', nameFr: 'IKEA', sector: 'furniture',
+      categories: ['أثاث'], color: '#0051BA', letter: 'IK',
+      aliases: ['ikea', 'إيكيا', 'ايكيا'],
+      models: [
+        M('billy', 'بيلي', 'Billy'), M('malm', 'مالم', 'Malm'), M('kallax', 'كالاكس', 'Kallax')
+      ]
+    },
+    {
+      id: 'home-centre', nameAr: 'هوم سنتر', nameFr: 'Home Centre', sector: 'furniture',
+      categories: ['أثاث'], color: '#C8102E', letter: 'HC',
+      aliases: ['home centre', 'homecentre', 'هوم سنتر'],
+      models: [
+        M('living', 'معيشة', 'Living'), M('bedroom', 'غرف نوم', 'Bedroom'), M('dining', 'سفرة', 'Dining')
+      ]
+    },
+    {
+      id: 'pan-emirates', nameAr: 'بان إميريتس', nameFr: 'Pan Emirates', sector: 'furniture',
+      categories: ['أثاث'], color: '#8B0000', letter: 'PE',
+      aliases: ['pan emirates', 'بان إميريتس', 'بان امارات'],
+      models: [
+        M('sofa', 'كنب', 'Sofa'), M('dining', 'سفرة', 'Dining'), M('office', 'مكتب', 'Office')
+      ]
+    },
+    {
+      id: 'danube', nameAr: 'دانوب', nameFr: 'Danube', sector: 'furniture',
+      categories: ['أثاث'], color: '#003399', letter: 'DN',
+      aliases: ['danube', 'دانوب'],
+      models: [
+        M('home', 'منزلي', 'Home'), M('kitchen', 'مطبخ', 'Kitchen'), M('decor', 'ديكور', 'Décor')
+      ]
+    },
+
+    /* ── مجوهرات وساعات ── */
+    {
+      id: 'rolex', nameAr: 'رولكس', nameFr: 'Rolex', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#006039', letter: 'RX',
+      aliases: ['rolex', 'رولكس'],
+      models: [
+        M('submariner', 'سابمارينر', 'Submariner'), M('datejust', 'داتجست', 'Datejust'), M('daytona', 'دايتونا', 'Daytona')
+      ]
+    },
+    {
+      id: 'cartier', nameAr: 'كارتييه', nameFr: 'Cartier', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#C4A35A', letter: 'CA',
+      aliases: ['cartier', 'كارتييه', 'كارتيي'],
+      models: [
+        M('love', 'لوف', 'Love'), M('tank', 'تانك', 'Tank'), M('juste', 'جوست', 'Juste un Clou')
+      ]
+    },
+    {
+      id: 'swatch', nameAr: 'سواتش', nameFr: 'Swatch', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#E30613', letter: 'SW',
+      aliases: ['swatch', 'سواتش'],
+      models: [
+        M('originals', 'أوريجينال', 'Originals'), M('irony', 'آيروني', 'Irony'), M('sistem51', 'سيستم 51', 'Sistem51')
+      ]
+    },
+    {
+      id: 'casio', nameAr: 'كاسيو', nameFr: 'Casio', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء', 'إلكترونيات'], color: '#1A1A1A', letter: 'CS',
+      aliases: ['casio', 'كاسيو', 'g-shock', 'جي شوك'],
+      models: [
+        M('g-shock', 'جي شوك', 'G-Shock'), M('edifice', 'إيديفيس', 'Edifice'), M('sheen', 'شين', 'Sheen')
+      ]
+    },
+    {
+      id: 'tissot', nameAr: 'تيسو', nameFr: 'Tissot', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#C4A35A', letter: 'TI',
+      aliases: ['tissot', 'تيسو'],
+      models: [
+        M('prx', 'PRX', 'PRX'), M('seastar', 'سي ستار', 'Seastar'), M('tradition', 'تراديسيون', 'Tradition')
+      ]
+    },
+    {
+      id: 'pandora', nameAr: 'باندورا', nameFr: 'Pandora', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#6B2D5C', letter: 'PD',
+      aliases: ['pandora', 'باندورا'],
+      models: [
+        M('charm', 'تشارم', 'Charm'), M('bracelet', 'سوار', 'Bracelet'), M('ring', 'خاتم', 'Ring')
       ]
     }
   ];
@@ -465,6 +981,9 @@
     fillBrandSelect: fillBrandSelect,
     fillModelSelect: fillModelSelect,
     stripHtml: stripHtml,
-    sectors: { auto: 'auto', fashion: 'fashion', sports: 'sports', eyewear: 'eyewear', electronics: 'electronics' }
+    sectors: {
+      auto: 'auto', fashion: 'fashion', sports: 'sports', eyewear: 'eyewear',
+      electronics: 'electronics', furniture: 'furniture', jewelry: 'jewelry'
+    }
   };
 })(typeof window !== 'undefined' ? window : this);
