@@ -25,6 +25,7 @@ const sandbox = {
         },
         setAttribute: function (k, v) { this.attributes[k] = v; },
         getAttribute: function (k) { return this.attributes[k] || null; },
+        removeAttribute: function (k) { delete this.attributes[k]; if (k === 'style' && this.style) { this.style = {}; } },
         querySelector: function () { return null; },
         appendChild: function (c) { this.children.push(c); this._last = c; return c; },
         insertBefore: function (c) { this.children.unshift(c); this._photo = c; return c; },

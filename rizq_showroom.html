@@ -63,7 +63,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 
 /* ── HERO: واجهة درامية "افتتاح معرض" — قياسات موحّدة للمراكز ── */
 .showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
-.showroom-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.showroom-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#06111C center/cover no-repeat}
 .showroom-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06);animation:rzSrHeroKen 22s ease-in-out infinite alternate}
 @keyframes rzSrHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
 .showroom-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.88) 0%,rgba(15,35,71,.58) 42%,rgba(6,17,28,.8) 100%)}
@@ -456,7 +456,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   <div class="hero-cover">
     <div class="showroom-hero-stage">
       <div class="showroom-profile">
-        <div class="showroom-logo" id="showroom-logo">🏛️</div>
+        <div class="showroom-logo" id="showroom-logo" aria-hidden="true"></div>
         <div class="showroom-info">
           <span class="showroom-type-label" id="showroom-type-label">المعرض</span>
           <span class="showroom-eyebrow" id="showroom-eyebrow">✨ RIZQ SHOWROOMS</span>
@@ -1280,7 +1280,7 @@ function applyAccountData(){
     document.getElementById('showroom-logo').textContent = _acc.logo_emoji || '🏛️';
   }
   if(window.RizqStoreCommerce && typeof RizqStoreCommerce.setHeroPhoto === 'function'){
-    RizqStoreCommerce.setHeroPhoto(document.getElementById('showroom-hero'), _acc.cover || '');
+    RizqStoreCommerce.setHeroPhoto(document.getElementById('showroom-hero'), _acc.cover || _acc.thumb || '');
   }
   if(_acc.desc || _acc.about){
     var _atEl = document.getElementById('about-text');
