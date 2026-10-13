@@ -6600,9 +6600,13 @@ function _rzqEnsureMarqueeIo(){
   }, {root:null, rootMargin:'120px 0px', threshold:0});
   return _rzqMarqueeIo;
 }
+function _rzqMarqueeBoostWrap(el){
+  if(!el) return null;
+  return el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-track-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap, .rzq-disc-strip') || el.parentElement;
+}
 function _rzqBindMarqueePointerBoost(state){
   if(!state || !state.el || state._boostBound) return;
-  var wrap = state.el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || state.el.parentElement;
+  var wrap = _rzqMarqueeBoostWrap(state.el);
   if(!wrap) return;
   state._boostBound = true;
   state.basePx = state.pxPerSec;
@@ -6620,10 +6624,11 @@ function _rzqBindMarqueePointerBoost(state){
     state.pxPerSec = (state.basePx || 56) + boost;
     _rzqEnsureMarqueeLoop();
     if(decayTimer) clearTimeout(decayTimer);
-    decayTimer = setTimeout(resetBoost, 220);
+    decayTimer = setTimeout(resetBoost, 900);
   }
-  wrap.addEventListener('pointermove', function(ev){
-    if(state.paused || state.offscreen) return;
+  function onPointerSample(ev){
+    /* لا نمنع التسريع عند offscreen — إذا حرّك المستخدم المؤشر فوق الشريط فهو ظاهر له */
+    if(state.paused) return;
     var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if(lastX != null){
       var dx = ev.clientX - lastX;
@@ -6633,13 +6638,19 @@ function _rzqBindMarqueePointerBoost(state){
     }
     lastX = ev.clientX;
     lastT = t;
+  }
+  wrap.addEventListener('pointermove', onPointerSample, {passive:true});
+  wrap.addEventListener('touchmove', function(ev){
+    if(!ev.touches || !ev.touches[0]) return;
+    onPointerSample(ev.touches[0]);
   }, {passive:true});
   wrap.addEventListener('pointerleave', function(){
     lastX = null;
-    resetBoost();
   }, {passive:true});
+  wrap.addEventListener('pointerup', function(){ lastX = null; }, {passive:true});
+  wrap.addEventListener('touchend', function(){ lastX = null; }, {passive:true});
   wrap.addEventListener('wheel', function(ev){
-    if(state.paused || state.offscreen) return;
+    if(state.paused) return;
     var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
     if(!dx) return;
     applyBoost(Math.min(220, Math.abs(dx) * 2.4));
@@ -6714,7 +6725,7 @@ function bindRafMarquee(el, opts){
       if(_rzqMarqueeIo){
         try{ _rzqMarqueeIo.unobserve(el); }catch(eU){}
         try{
-          var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap');
+          var root = _rzqMarqueeBoostWrap(el);
           if(root) _rzqMarqueeIo.unobserve(root);
         }catch(eU2){}
       }
@@ -6727,7 +6738,7 @@ function bindRafMarquee(el, opts){
   var io = _rzqEnsureMarqueeIo();
   if(io){
     try{
-      var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || el.parentElement || el;
+      var root = _rzqMarqueeBoostWrap(el) || el.parentElement || el;
       io.observe(root);
     }catch(eIo){ try{ io.observe(el); }catch(e2){} }
   }
@@ -14851,16 +14862,64 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(!track) return;
       if(strip._rzqScrollBound) return;
       strip._rzqScrollBound = true;
-      var paused = false;
+      var dragging = false;
       var pos = 0; /* تراكم عشري — scrollLeft الصحيح يسبب رعدة عند += 0.45 */
-      var finePointer = false;
-      try { finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches; } catch(eM){}
-      if(finePointer){
-        strip.addEventListener('mouseenter', function(){ paused = true; });
-        strip.addEventListener('mouseleave', function(){ paused = false; });
+      var baseStep = 0.45;
+      var boostStep = 0; /* تسريع يدوي (سحب / عجلة) مثل أشرطة المباشر */
+      var decayTimer = 0;
+      var lastX = null;
+      var lastT = 0;
+      function applyBoost(raw){
+        /* raw ≈ px/sec من السحب — نحو وحدات خطوة الـ rAF */
+        var b = Math.max(0, Math.min(8.5, raw / 55));
+        boostStep = Math.max(boostStep * 0.35, b);
+        if(decayTimer) clearTimeout(decayTimer);
+        decayTimer = setTimeout(function(){ boostStep = 0; }, 900);
       }
-      strip.addEventListener('touchstart', function(){ paused = true; }, {passive:true});
-      strip.addEventListener('touchend', function(){ setTimeout(function(){ paused = false; }, 1600); }, {passive:true});
+      function samplePointer(clientX){
+        var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        if(lastX != null){
+          var dx = clientX - lastX;
+          var dt = Math.max(8, t - lastT);
+          applyBoost(Math.abs(dx) / dt * 1000);
+        }
+        lastX = clientX;
+        lastT = t;
+      }
+      strip.addEventListener('pointerdown', function(){ dragging = true; lastX = null; }, {passive:true});
+      strip.addEventListener('pointerup', function(){
+        dragging = false; lastX = null;
+        try{ pos = strip.scrollLeft; }catch(eP){}
+      }, {passive:true});
+      strip.addEventListener('pointercancel', function(){ dragging = false; lastX = null; }, {passive:true});
+      strip.addEventListener('pointermove', function(ev){
+        if(ev.pointerType === 'mouse' && ev.buttons === 0){
+          /* تحريك المؤشر فوق الشريط يسرّع دون إيقاف النقر على البطاقة */
+          samplePointer(ev.clientX);
+          return;
+        }
+        if(ev.buttons || ev.pointerType === 'touch' || ev.pointerType === 'pen'){
+          dragging = true;
+          samplePointer(ev.clientX);
+          try{ pos = strip.scrollLeft; }catch(eD){}
+        }
+      }, {passive:true});
+      strip.addEventListener('touchmove', function(ev){
+        if(!ev.touches || !ev.touches[0]) return;
+        dragging = true;
+        samplePointer(ev.touches[0].clientX);
+        try{ pos = strip.scrollLeft; }catch(eTm){}
+      }, {passive:true});
+      strip.addEventListener('touchend', function(){
+        dragging = false; lastX = null;
+        try{ pos = strip.scrollLeft; }catch(eTe){}
+      }, {passive:true});
+      strip.addEventListener('wheel', function(ev){
+        var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+        if(!dx) return;
+        applyBoost(Math.min(480, Math.abs(dx) * 2.4));
+        try{ pos = strip.scrollLeft; }catch(eW){}
+      }, {passive:true});
       /* عربي (dir=rtl): حركة يسار→يمين | فرنسي (dir=ltr): يمين→يسار */
       function flowSign(){
         return document.documentElement.getAttribute('dir') === 'ltr' ? 1 : -1;
@@ -14870,11 +14929,12 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         return track.scrollWidth / Math.max(2, n);
       }
       function step(){
-        if(!paused && track.scrollWidth > strip.clientWidth){
+        if(!dragging && track.scrollWidth > strip.clientWidth){
           var span = loopSpan();
           if(span > 1){
             var sign = flowSign();
-            pos += 0.45 * sign;
+            var spd = baseStep + boostStep;
+            pos += spd * sign;
             if(sign > 0){
               if(pos >= span) pos -= span;
             } else {
