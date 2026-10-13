@@ -117,26 +117,79 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .clear-cart-btn{background:none;border:1px solid #e0d0d0;color:var(--red);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .25s}
 .clear-cart-btn:hover{background:#fff0f0;border-color:var(--red)}
 
-/* Cart items */
-.cart-item{
-  background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;
-  padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .3s;
+/* Cart items — بطاقات مضغوطة حتى لا تطول الصفحة مع كثرة المنتجات */
+#cart-items-list{
+  display:flex;flex-direction:column;gap:6px;
+  margin-bottom:16px;
 }
-.cart-item:hover{border-color:#b0c8e0;box-shadow:var(--shadow)}
-.cart-item-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden}
-.cart-item-info{flex:1}
-.cart-item-name{font-size:15px;font-weight:700;color:#1a2a3a;margin-bottom:3px}
-.cart-item-cat{font-size:12px;color:#9aabbb;margin-bottom:10px}
-.cart-item-price{font-size:16px;font-weight:800;color:var(--navy)}
-.cart-item-price-old{font-size:11px;color:#9aa;text-decoration:line-through;margin-right:6px}
-.qty-controls{display:flex;align-items:center;gap:8px;margin-top:8px}
-.qty-btn{width:30px;height:30px;border-radius:7px;border:1px solid #d0d8e8;background:#f8f9fc;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .25s;line-height:1}
+#cart-items-list.cart-items-scroll{
+  max-height:min(48vh,380px);
+  overflow:auto;
+  padding-inline-end:4px;
+  scrollbar-width:thin;
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:12px;
+  background:rgba(248,250,252,.65);
+  padding:6px;
+}
+#cart-items-list.cart-items-scroll::-webkit-scrollbar{width:6px}
+#cart-items-list.cart-items-scroll::-webkit-scrollbar-thumb{background:#c5d0e0;border-radius:6px}
+.cart-item{
+  background:#fff;border-radius:10px;border:1px solid #e0e8f0;
+  padding:8px 10px;margin-bottom:0;display:flex;align-items:center;gap:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.03);transition:border-color .2s,box-shadow .2s;
+}
+.cart-item:hover{border-color:#b0c8e0;box-shadow:0 2px 8px rgba(27,58,107,.06)}
+.cart-item-img{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+.cart-item-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.cart-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-width:0}
+.cart-item-name{font-size:13px;font-weight:700;color:#1a2a3a;margin:0;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cart-item-cat{font-size:10.5px;color:#9aabbb;margin:0;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item-price{font-size:12.5px;font-weight:800;color:var(--navy);white-space:nowrap;flex-shrink:0}
+.cart-item-price-old{font-size:10px;color:#9aa;text-decoration:line-through;margin-inline-end:4px}
+.cart-item-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qty-controls{display:flex;align-items:center;gap:5px;margin-top:0}
+.qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid #d0d8e8;background:#f8f9fc;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s;line-height:1;padding:0}
 .qty-btn:hover{border-color:var(--navy);background:var(--navy);color:#fff}
-.qty-val{font-size:15px;font-weight:700;min-width:28px;text-align:center;color:#1a2a3a}
-.item-subtotal{font-size:13px;color:#6a7a8a;margin-right:8px}
-.cart-item-del{background:none;border:none;color:#c0c8d0;font-size:20px;cursor:pointer;padding:4px;border-radius:6px;transition:all .25s;flex-shrink:0;line-height:1}
+.qty-val{font-size:13px;font-weight:700;min-width:22px;text-align:center;color:#1a2a3a}
+.item-subtotal{font-size:11.5px;color:#6a7a8a;margin:0;white-space:nowrap}
+.cart-item-del{background:none;border:none;color:#c0c8d0;font-size:18px;cursor:pointer;padding:2px 4px;border-radius:6px;transition:all .2s;flex-shrink:0;line-height:1}
 .cart-item-del:hover{color:var(--red);background:#fff0f0}
+/* أكثر من ~12 منتجاً: بطاقات أصغر */
+#cart-items-list.cart-items-dense .cart-item{padding:6px 8px;gap:8px;border-radius:8px}
+#cart-items-list.cart-items-dense .cart-item-img{width:36px;height:36px;font-size:18px;border-radius:6px}
+#cart-items-list.cart-items-dense .cart-item-name{font-size:12px}
+#cart-items-list.cart-items-dense .cart-item-cat{display:none}
+#cart-items-list.cart-items-dense .cart-item-price{font-size:11.5px}
+#cart-items-list.cart-items-dense .qty-btn{width:24px;height:24px;font-size:13px}
+#cart-items-list.cart-items-dense .item-subtotal{font-size:11px}
+/* أكثر من 20: أقصى ضغط + تمرير أقصر */
+#cart-items-list.cart-items-xdense{
+  max-height:min(42vh,320px);
+  gap:4px;
+}
+#cart-items-list.cart-items-xdense .cart-item{padding:5px 7px;gap:7px}
+#cart-items-list.cart-items-xdense .cart-item-img{width:32px;height:32px;font-size:16px}
+#cart-items-list.cart-items-xdense .cart-item-name{font-size:11.5px}
+#cart-items-list.cart-items-xdense .cart-item-actions{gap:4px}
+#summary-items{
+  max-height:min(28vh,220px);
+  overflow:auto;
+  margin-bottom:10px;
+  padding-inline-end:2px;
+  scrollbar-width:thin;
+}
+#summary-items .summary-line{
+  display:flex;justify-content:space-between;gap:8px;
+  font-size:12px;padding:4px 0;border-bottom:1px solid #f0f3f8;
+}
+#summary-items .summary-line span:first-child{
+  color:#4a5a6a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#summary-items .summary-line span:last-child{font-weight:600;white-space:nowrap;flex-shrink:0}
+#summary-items.summary-items-dense .summary-line{font-size:11px;padding:3px 0}
 
 /* Delivery type */
 .delivery-section{background:#fff;border-radius:var(--radius);border:1px solid #e0e8f0;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
@@ -1027,6 +1080,10 @@ function renderCart() {
     empty.style.display = 'block';
     content.style.display = 'none';
     document.getElementById('nav-cart-count').textContent = '0';
+    if (list) {
+      list.innerHTML = '';
+      list.classList.remove('cart-items-scroll', 'cart-items-dense', 'cart-items-xdense');
+    }
     updateSummary();
     _refreshRepeatOrderBtn();
     return;
@@ -1063,13 +1120,19 @@ function renderCart() {
     <div class="cart-item" id="cart-item-${safeId}" data-cart-id="${safeId}">
       <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
-        <div class="cart-item-name">${sanitize(__itemName)}</div>
-        <div class="cart-item-cat">${sanitize(__lineSeller)}</div>
-        <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
-        <div class="qty-controls">
-          <button type="button" class="qty-btn" data-qty-delta="-1" aria-label="${__lblDec}">−</button>
-          <span class="qty-val" id="qty-${safeId}">${item.qty}</span>
-          <button type="button" class="qty-btn" data-qty-delta="1" aria-label="${__lblInc}">+</button>
+        <div class="cart-item-top">
+          <div style="min-width:0;flex:1">
+            <div class="cart-item-name" title="${sanitize(__itemName)}">${sanitize(__itemName)}</div>
+            <div class="cart-item-cat">${sanitize(__lineSeller)}</div>
+          </div>
+          <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
+        </div>
+        <div class="cart-item-actions">
+          <div class="qty-controls">
+            <button type="button" class="qty-btn" data-qty-delta="-1" aria-label="${__lblDec}">−</button>
+            <span class="qty-val" id="qty-${safeId}">${item.qty}</span>
+            <button type="button" class="qty-btn" data-qty-delta="1" aria-label="${__lblInc}">+</button>
+          </div>
           <span class="item-subtotal">= ${(Number(item.price||0)*item.qty).toLocaleString()} MRU</span>
         </div>
       </div>
@@ -1077,6 +1140,10 @@ function renderCart() {
     </div>
   `;
   }).join('');
+
+  list.classList.toggle('cart-items-scroll', view.length >= 6);
+  list.classList.toggle('cart-items-dense', view.length >= 12);
+  list.classList.toggle('cart-items-xdense', view.length >= 20);
 
   updateSummary();
   buildWALink();
@@ -1282,15 +1349,16 @@ function updateSummary() {
   document.getElementById('s-total').textContent = total.toLocaleString() + ' MRU';
 
   const summaryItems = document.getElementById('summary-items');
-  summaryItems.innerHTML = view.map(item => {
-    var __sName = isAr ? (item.name || item.nameF) : (item.nameF || item.name);
-    return `
-    <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f0f3f8">
-      <span style="color:#4a5a6a">${sanitize(__sName)} ×${item.qty}</span>
-      <span style="font-weight:600">${(item.price*item.qty).toLocaleString()} MRU</span>
-    </div>
-  `;
-  }).join('');
+  if (summaryItems) {
+    summaryItems.innerHTML = view.map(item => {
+      var __sName = isAr ? (item.name || item.nameF) : (item.nameF || item.name);
+      return '<div class="summary-line">'
+        + '<span title="'+sanitize(__sName)+'">'+sanitize(__sName)+' ×'+item.qty+'</span>'
+        + '<span>'+(item.price*item.qty).toLocaleString()+' MRU</span>'
+        + '</div>';
+    }).join('');
+    summaryItems.classList.toggle('summary-items-dense', view.length >= 12);
+  }
 }
 
 function buildWALink() {
