@@ -4023,6 +4023,28 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:#ffffff;border-color:rgba(138,58,92,.28)
 }
+/* شريط شعارات الماركات فوق أنماط الإطلالات / نماذج المعارض */
+.rzq-landing-brand-strip-wrap{margin:4px 0 14px}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip{
+  display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:6px 2px 10px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;width:74px;
+  padding:8px 4px;border:1.5px solid rgba(201,168,76,.28);border-radius:14px;background:#fff;
+  cursor:pointer;font-family:inherit;color:#0F2347;
+  transition:border-color .2s,box-shadow .2s,transform .15s;
+  box-shadow:0 2px 10px rgba(15,35,71,.06)
+}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn img{border-radius:50%;display:block}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn span{
+  font-size:10px;font-weight:700;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center
+}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn:hover,
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn.is-on{
+  border-color:var(--gold,#C9A84C);box-shadow:0 0 0 3px rgba(201,168,76,.18);transform:translateY(-1px)
+}
+
 /* شريط أنماط/نماذج — حركة مثل المباشر + مظهر فاخر */
 .rizq-styles-track-wrap{
   position:relative;
@@ -4887,6 +4909,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="boys" id="sty-tab-boys" onclick="setStyleGender('boys')">👦 <span data-t="sty-boys">أولاد</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="girls" id="sty-tab-girls" onclick="setStyleGender('girls')">👧 <span data-t="sty-girls">بنات</span></button>
     </div>
+    <!-- شعارات الماركات فوق صور أنماط الإطلالات — تشجيع البحث والشراء -->
+    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-styles-brand-strip" aria-label="ماركات الأزياء"></div>
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
     </div>
@@ -4968,6 +4992,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
     </div>
+    <!-- شعارات الماركات فوق صور أنماط المعارض (سيارات → تويوتا/مرسيدس، إلكترونيات → آبل/سامسونج…) -->
+    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-srm-brand-strip" aria-label="ماركات المعارض"></div>
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
     </div>
@@ -6216,6 +6242,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </div><!-- /#modal -->
 
 <script src="rizq_categories_config.js?v=23.0" defer></script>
+<script src="rizq_brands_catalog.js?v=1" defer></script>
 <script>
 var isAr = true;
 
@@ -7244,6 +7271,64 @@ function _styStartAutoRefresh(){
   } catch(e2){}
 }
 
+/* شريط شعارات الماركات فوق أنماط الأزياء / نماذج المعارض */
+function _landingBrandFr(){
+  try {
+    if(typeof isAr !== 'undefined') return !isAr;
+    return (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+  } catch(e){ return false; }
+}
+function _landingBrandCatForSrm(cat){
+  var meta = (typeof RIZQ_SRM_CATS !== 'undefined' && RIZQ_SRM_CATS[cat]) ? RIZQ_SRM_CATS[cat] : null;
+  if(meta && meta.dirCat) return meta.dirCat;
+  if(cat === 'cars') return 'سيارات';
+  if(cat === 'electronics') return 'إلكترونيات';
+  return '';
+}
+function _landingBrandBrowse(brandId, catKey){
+  if(!brandId) return;
+  var fr = _landingBrandFr();
+  var q = brandId;
+  try {
+    if(window.RizqBrands){
+      var b = RizqBrands.getById(brandId);
+      q = RizqBrands.displayName(b, fr) || brandId;
+    }
+  } catch(e){}
+  var params = new URLSearchParams();
+  if(catKey) params.set('cat', catKey);
+  if(q) params.set('q', q);
+  try { window.location.href = 'rizq_browse.html?' + params.toString(); } catch(e2){}
+}
+function _fillLandingBrandStrip(mountId, catKey, ariaAr, ariaFr){
+  var mount = document.getElementById(mountId);
+  if(!mount) return;
+  var fr = _landingBrandFr();
+  mount.setAttribute('aria-label', fr ? ariaFr : ariaAr);
+  if(!window.RizqBrands || typeof RizqBrands.stripHtml !== 'function'){
+    mount.innerHTML = '';
+    mount.style.display = 'none';
+    return;
+  }
+  var html = catKey ? RizqBrands.stripHtml(catKey, fr, {}) : '';
+  if(!html){
+    mount.innerHTML = '';
+    mount.style.display = 'none';
+    return;
+  }
+  mount.style.display = '';
+  mount.innerHTML = html;
+  mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _landingBrandBrowse(btn.getAttribute('data-brand-id')||'', catKey);
+    });
+  });
+}
+function refreshLandingBrandStrips(){
+  _fillLandingBrandStrip('rizq-styles-brand-strip', 'أزياء', 'ماركات الأزياء', 'Marques mode');
+  var srmCat = (typeof _rizqSrmCat !== 'undefined') ? _rizqSrmCat : 'cars';
+  _fillLandingBrandStrip('rizq-srm-brand-strip', _landingBrandCatForSrm(srmCat), 'ماركات المعارض', 'Marques showroom');
+}
 function setStyleGender(gender){
   if(!RIZQ_STYLE_GENDERS[gender]) gender = 'men';
   _rizqStyleGender = gender;
@@ -7255,6 +7340,7 @@ function setStyleGender(gender){
   var rail = document.getElementById('rizq-styles-rail');
   if(rail) rail.setAttribute('aria-labelledby', _styTabIdFor(gender));
   buildStyleIdeas(false);
+  try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
 function _styAdKind(a){
   if(!a) return '';
@@ -7677,6 +7763,7 @@ function setShowroomModelCat(cat){
   var rail = document.getElementById('rizq-srm-rail');
   if(rail) rail.setAttribute('aria-labelledby', _srmTabIdFor(cat));
   buildShowroomModels(false);
+  try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
 function buildShowroomModels(reshuffle){
   var rail = document.getElementById('rizq-srm-rail');
@@ -7801,6 +7888,14 @@ function buildShowroomModels(reshuffle){
 }
 try { buildShowroomModels(false); } catch(eSrm) {}
 try { _srmStartAutoRefresh(); } catch(eSrmAuto) {}
+try { refreshLandingBrandStrips(); } catch(eBrandBoot) {}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    try { refreshLandingBrandStrips(); } catch(e){}
+  });
+} else {
+  try { refreshLandingBrandStrips(); } catch(e){}
+}
 
 // ── QCAT PORTAL ──
 var QCAT_DATA = (typeof RizqCategories !== 'undefined') ? RizqCategories.qcatData() : {
@@ -8697,6 +8792,7 @@ function applyList(list){
     if(typeof buildLandingAds==='function') buildLandingAds(true);
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     if(typeof buildShowroomModels==='function') buildShowroomModels(false);
+    if(typeof refreshLandingBrandStrips==='function') refreshLandingBrandStrips();
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
     renderTickerFromAds();
@@ -9870,6 +9966,7 @@ function applyLandingLang(toAr) {
   if(typeof buildFeaturedCards==='function') buildFeaturedCards();
   if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
   if(typeof buildShowroomModels==='function') buildShowroomModels(false);
+  if(typeof refreshLandingBrandStrips==='function') refreshLandingBrandStrips();
   // إصلاح حقيقي: شريط أسعار السوق المتحرك (#price-ticker) كان يُترجم في لوحة الأسعار
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
