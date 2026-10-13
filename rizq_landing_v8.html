@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-rizq-strip="22.1">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -3948,9 +3948,10 @@ html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
 .rzq-disc-live-head .live-label-sub{
   font-size:12.5px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.4
 }
-.rzq-disc-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;direction:ltr}
-.rzq-disc-strip::-webkit-scrollbar{display:none}
-.rzq-disc-track{display:inline-flex;gap:16px;padding:2px;direction:ltr}
+/* overflow:hidden + تحريك transform — لا يعتمد على فيض العرض (محل واحد كان يتجمد على الهاتف) */
+.rzq-disc-strip{overflow:hidden;padding-bottom:4px;direction:ltr;touch-action:pan-y;cursor:grab}
+.rzq-disc-strip:active{cursor:grabbing}
+.rzq-disc-track{display:flex;flex-wrap:nowrap;gap:16px;padding:2px;direction:ltr;width:max-content;will-change:transform;backface-visibility:hidden}
 .rzq-disc-card{flex:0 0 auto;width:210px;background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:0 4px 18px rgba(27,58,107,.1);border:1px solid rgba(27,58,107,.08);transition:transform .25s,box-shadow .25s}
 .rzq-disc-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(27,58,107,.16)}
 .rzq-disc-img{position:relative;width:100%;height:132px;background:linear-gradient(145deg,#0D1B2A,#1B3A6B);overflow:hidden}
@@ -14913,98 +14914,104 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(!track) return;
       if(strip._rzqScrollBound) return;
       strip._rzqScrollBound = true;
+      /* إن لم تُكرَّر البطاقات (أشرطة أخرى) — انسخ الوحدة لدورة سلسة */
+      if(!track.getAttribute('data-loop-copies')){
+        var unit0 = track.innerHTML;
+        if(unit0){
+          track.innerHTML = unit0 + unit0;
+          track.setAttribute('data-loop-unit', unit0);
+          track.setAttribute('data-loop-copies', '2');
+        }
+      }
+      try{ strip.style.overflow = 'hidden'; }catch(eOv){}
       var dragging = false;
-      var pos = 0; /* تراكم عشري — scrollLeft الصحيح يسبب رعدة عند += 0.45 */
-      var baseStep = 0.45;
-      var boostStep = 0; /* تسريع يدوي (سحب / عجلة) مثل أشرطة المباشر */
+      var pos = 0;
+      var basePx = 42; /* بكسل/ثانية — يتحرك حتى لو بطاقة واحدة */
+      var boostPx = 0;
       var decayTimer = 0;
       var lastX = null;
       var lastT = 0;
-      function applyBoost(raw){
-        /* raw ≈ px/sec من السحب — نحو وحدات خطوة الـ rAF */
-        var b = Math.max(0, Math.min(8.5, raw / 55));
-        boostStep = Math.max(boostStep * 0.35, b);
-        if(decayTimer) clearTimeout(decayTimer);
-        decayTimer = setTimeout(function(){ boostStep = 0; }, 900);
+      var lastTs = 0;
+      function isRtl(){ return document.documentElement.getAttribute('dir') !== 'ltr'; }
+      function loopSpan(){
+        var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+        var w = track.scrollWidth / Math.max(2, n);
+        return w > 1 ? w : Math.max(1, track.scrollWidth / 2);
       }
-      function samplePointer(clientX){
+      function apply(){
+        var span = loopSpan();
+        if(span > 1){
+          if(pos >= span) pos = pos % span;
+          if(pos < 0) pos = (pos % span + span) % span;
+        }
+        /* نفس منطق أشرطة المباشر: عربي من -span نحو 0 */
+        var x = isRtl() ? (-span + pos) : (-pos);
+        track.style.transform = 'translate3d(' + x.toFixed(3) + 'px,0,0)';
+      }
+      function applyBoost(raw){
+        boostPx = Math.max(0, Math.min(220, raw));
+        if(decayTimer) clearTimeout(decayTimer);
+        decayTimer = setTimeout(function(){ boostPx = 0; }, 900);
+      }
+      function samplePointer(clientX, drag){
         var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
         if(lastX != null){
           var dx = clientX - lastX;
           var dt = Math.max(8, t - lastT);
-          applyBoost(Math.abs(dx) / dt * 1000);
+          applyBoost(Math.abs(dx) / dt * 1000 * 0.42);
+          if(drag){
+            /* سحب يدوي يزيح الشريط فوراً */
+            pos += isRtl() ? dx : -dx;
+            apply();
+          }
         }
         lastX = clientX;
         lastT = t;
       }
-      strip.addEventListener('pointerdown', function(){ dragging = true; lastX = null; }, {passive:true});
-      strip.addEventListener('pointerup', function(){
-        dragging = false; lastX = null;
-        try{ pos = strip.scrollLeft; }catch(eP){}
+      strip.addEventListener('pointerdown', function(ev){
+        dragging = true; lastX = ev.clientX; lastT = 0;
       }, {passive:true});
+      strip.addEventListener('pointerup', function(){ dragging = false; lastX = null; }, {passive:true});
       strip.addEventListener('pointercancel', function(){ dragging = false; lastX = null; }, {passive:true});
+      strip.addEventListener('pointerleave', function(){ if(!dragging) lastX = null; }, {passive:true});
       strip.addEventListener('pointermove', function(ev){
         if(ev.pointerType === 'mouse' && ev.buttons === 0){
-          /* تحريك المؤشر فوق الشريط يسرّع دون إيقاف النقر على البطاقة */
-          samplePointer(ev.clientX);
+          samplePointer(ev.clientX, false);
           return;
         }
         if(ev.buttons || ev.pointerType === 'touch' || ev.pointerType === 'pen'){
           dragging = true;
-          samplePointer(ev.clientX);
-          try{ pos = strip.scrollLeft; }catch(eD){}
+          samplePointer(ev.clientX, true);
         }
       }, {passive:true});
       strip.addEventListener('touchmove', function(ev){
         if(!ev.touches || !ev.touches[0]) return;
         dragging = true;
-        samplePointer(ev.touches[0].clientX);
-        try{ pos = strip.scrollLeft; }catch(eTm){}
+        samplePointer(ev.touches[0].clientX, true);
       }, {passive:true});
-      strip.addEventListener('touchend', function(){
-        dragging = false; lastX = null;
-        try{ pos = strip.scrollLeft; }catch(eTe){}
-      }, {passive:true});
+      strip.addEventListener('touchend', function(){ dragging = false; lastX = null; }, {passive:true});
       strip.addEventListener('wheel', function(ev){
         var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
         if(!dx) return;
-        applyBoost(Math.min(480, Math.abs(dx) * 2.4));
-        try{ pos = strip.scrollLeft; }catch(eW){}
+        applyBoost(Math.min(220, Math.abs(dx) * 2.4));
+        pos += isRtl() ? -dx * 0.35 : dx * 0.35;
+        apply();
       }, {passive:true});
-      /* عربي (dir=rtl): حركة يسار→يمين | فرنسي (dir=ltr): يمين→يسار */
-      function flowSign(){
-        return document.documentElement.getAttribute('dir') === 'ltr' ? 1 : -1;
-      }
-      function loopSpan(){
-        var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
-        return track.scrollWidth / Math.max(2, n);
-      }
-      function step(){
-        if(!dragging && track.scrollWidth > strip.clientWidth){
-          var span = loopSpan();
-          if(span > 1){
-            var sign = flowSign();
-            var spd = baseStep + boostStep;
-            pos += spd * sign;
-            if(sign > 0){
-              if(pos >= span) pos -= span;
-            } else {
-              if(pos <= 0) pos += span;
-            }
-            strip.scrollLeft = pos;
-          }
+      function step(ts){
+        if(!lastTs) lastTs = ts;
+        var dt = Math.min(48, ts - lastTs);
+        lastTs = ts;
+        var span = loopSpan();
+        if(!dragging && span > 1){
+          pos += (basePx + boostPx) * (dt / 1000);
+          if(pos >= span) pos -= span;
+          apply();
         }
         requestAnimationFrame(step);
       }
-      /* ابدأ من الطرف المناسب حتى يظهر أول بطاقة في جهة التدفق */
       try {
-        if(flowSign() < 0){
-          pos = Math.max(0, loopSpan() - strip.clientWidth);
-          strip.scrollLeft = pos;
-        } else {
-          pos = 0;
-          strip.scrollLeft = 0;
-        }
+        pos = 0;
+        apply();
       } catch (e0) {}
       requestAnimationFrame(step);
     }

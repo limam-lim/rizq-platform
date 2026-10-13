@@ -352,7 +352,8 @@
     try {
       caches.keys().then(function (keys) {
         keys.forEach(function (k) {
-          if (/^rizq-cache-v(1[0-3]|14\.)/.test(k)) caches.delete(k);
+          /* امسح كاشات قديمة كانت تجمّد شريط المحلات على الهاتف */
+          if (/^rizq-cache-v/.test(k) && k !== 'rizq-cache-v22.1') caches.delete(k);
         });
       });
     } catch (eCache) {}
@@ -368,7 +369,9 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=19.6').catch(function (err) {
+      navigator.serviceWorker.register('sw.js?v=22.1').then(function (reg) {
+        try { if (reg && reg.update) reg.update(); } catch (eUp) {}
+      }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });
     });
