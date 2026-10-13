@@ -382,17 +382,20 @@ body.rzq-storefront-lb-on{overflow:hidden}
 }
 .content-grid{
   display:grid;
-  /* يمين = الموقع والتواصل | يسار = المنتجات ثم شريط الطلبات/التقييمات (RTL) */
+  /* يمين = الموقع والتواصل | يسار = عمود المنتجات + شريط الطلبات/التقييمات (RTL) */
   grid-template-columns:minmax(300px,340px) minmax(0,1fr);
-  grid-template-areas:
-    "side main"
-    "side under";
+  grid-template-areas:"side main";
   gap:28px;
-  /* لا تمدّد عمود المنتجات لارتفاع الشريط — الشريط السفلي يملأ الفراغ */
   align-items:start;
 }
-.content-grid > main{
+.content-grid > .store-main-col{
   grid-area:main;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.content-grid > .store-main-col > main{
   min-width:0;
   display:flex;
   flex-direction:column;
@@ -402,11 +405,7 @@ body.rzq-storefront-lb-on{overflow:hidden}
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
-.content-grid > .store-under-band{
-  grid-area:under;
-  margin-top:0;
-}
-.content-grid > main .products-grid{
+.content-grid > .store-main-col > main .products-grid{
   flex:1 1 auto;
 }
 /* شريط ختامي مضغوط — لا يطغى على الواجهة */
@@ -910,7 +909,7 @@ footer{
 @media(max-width:1100px) and (min-width:801px){
   .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
   .main-wrap{padding:22px 16px 40px}
-  .content-grid > main{padding:16px}
+  .content-grid > .store-main-col > main{padding:16px}
   .store-name{font-size:26px}
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
@@ -918,15 +917,12 @@ footer{
 @media(max-width:800px){
   .content-grid{
     grid-template-columns:1fr;
-    /* على الهاتف: المنتجات ثم الطلبات/التقييمات ثم الموقع */
-    grid-template-areas:
-      "main"
-      "under"
-      "side";
+    /* على الهاتف: المنتجات+الشريط أولاً ثم الموقع */
+    grid-template-areas:"main" "side";
     gap:18px;
   }
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
-  .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  .content-grid > .store-main-col > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
   .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
@@ -1426,7 +1422,8 @@ footer{
       </div>
     </aside>
 
-    <!-- RIGHT: PRODUCTS -->
+    <!-- LEFT COL: PRODUCTS + desk/reviews under-band (fills void beside tall sidebar) -->
+    <div class="store-main-col">
     <main>
 <!-- Rizq Intermediary Notice -->
 
@@ -1519,6 +1516,7 @@ footer{
         </div>
       </section>
     </div>
+    </div><!-- /.store-main-col -->
   </div>
 </div>
 
