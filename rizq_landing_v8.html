@@ -124,7 +124,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-
 .logo-sub,.logo-text{font-family:Georgia,'Times New Roman',serif!important}
 
 /* ── GRAIN ── */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none!important;z-index:0;opacity:.5}
+/* حبة خفيفة جداً — تُلغى على الشاشات الضيقة لتسريع الرسم */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none!important;z-index:0;opacity:.35;contain:strict}
+@media(max-width:900px),(prefers-reduced-motion:reduce){body::after{display:none!important}}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px}
@@ -3916,6 +3918,11 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
 }
+/* تخفيف الرسم أسفل الطية — يبقى المحتوى قابلاً للتمرير دون كسر الظهور */
+#virtual-stores,#virtual-showrooms,#virtual-offices,#virtual-tenders,#virtual-investments,
+#rizq-styles,#rizq-showroom-models,#pricing,#about,.pricing-section{
+  content-visibility:auto;contain-intrinsic-size:1px 720px;
+}
 .cats-grid{display:grid!important;visibility:visible!important;opacity:1!important;z-index:1!important}
 .cat-card,.why-card,.listing-card,.section-header,.pricing-grid,.why-grid,.prices-board{
   visibility:visible!important;opacity:1!important;
@@ -6589,12 +6596,62 @@ function _rzqEnsureMarqueeIo(){
   }, {root:null, rootMargin:'120px 0px', threshold:0});
   return _rzqMarqueeIo;
 }
+function _rzqBindMarqueePointerBoost(state){
+  if(!state || !state.el || state._boostBound) return;
+  var wrap = state.el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || state.el.parentElement;
+  if(!wrap) return;
+  state._boostBound = true;
+  state.basePx = state.pxPerSec;
+  state.boost = 0;
+  var lastX = null;
+  var lastT = 0;
+  var decayTimer = 0;
+  function resetBoost(){
+    state.boost = 0;
+    state.pxPerSec = state.basePx || state.pxPerSec;
+  }
+  function applyBoost(raw){
+    var boost = Math.max(0, Math.min(220, raw));
+    state.boost = boost;
+    state.pxPerSec = (state.basePx || 56) + boost;
+    _rzqEnsureMarqueeLoop();
+    if(decayTimer) clearTimeout(decayTimer);
+    decayTimer = setTimeout(resetBoost, 220);
+  }
+  wrap.addEventListener('pointermove', function(ev){
+    if(state.paused || state.offscreen) return;
+    var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if(lastX != null){
+      var dx = ev.clientX - lastX;
+      var dt = Math.max(8, t - lastT);
+      var mousePxSec = Math.abs(dx) / dt * 1000;
+      applyBoost(mousePxSec * 0.42);
+    }
+    lastX = ev.clientX;
+    lastT = t;
+  }, {passive:true});
+  wrap.addEventListener('pointerleave', function(){
+    lastX = null;
+    resetBoost();
+  }, {passive:true});
+  wrap.addEventListener('wheel', function(ev){
+    if(state.paused || state.offscreen) return;
+    var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+    if(!dx) return;
+    applyBoost(Math.min(220, Math.abs(dx) * 2.4));
+  }, {passive:true});
+  try{ wrap.style.touchAction = wrap.style.touchAction || 'pan-y'; }catch(eT){}
+}
 function bindRafMarquee(el, opts){
   if(!el || el.classList.contains('is-empty')) return null;
   opts = opts || {};
   if(el._rzqMarquee){
-    if(opts.pxPerSec) el._rzqMarquee.pxPerSec = opts.pxPerSec;
+    if(opts.pxPerSec){
+      el._rzqMarquee.basePx = opts.pxPerSec;
+      el._rzqMarquee.pxPerSec = opts.pxPerSec + (el._rzqMarquee.boost || 0);
+    }
     el._rzqMarquee.remeasure();
+    _rzqBindMarqueePointerBoost(el._rzqMarquee);
     _rzqEnsureMarqueeLoop();
     return el._rzqMarquee;
   }
@@ -6605,6 +6662,8 @@ function bindRafMarquee(el, opts){
     paused: false,
     offscreen: false,
     pxPerSec: opts.pxPerSec || 56,
+    basePx: opts.pxPerSec || 56,
+    boost: 0,
     raf: 1,
     rtl: _rzqIsRtl(),
     applyPlayState: function(){
@@ -6668,6 +6727,7 @@ function bindRafMarquee(el, opts){
       io.observe(root);
     }catch(eIo){ try{ io.observe(el); }catch(e2){} }
   }
+  _rzqBindMarqueePointerBoost(state);
   state.remeasure();
   _rzqEnsureMarqueeLoop();
   return state;
