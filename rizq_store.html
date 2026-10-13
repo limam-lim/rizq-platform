@@ -382,14 +382,20 @@ body.rzq-storefront-lb-on{overflow:hidden}
 }
 .content-grid{
   display:grid;
-  /* يمين = الموقع والتواصل | يسار = المنتجات (RTL) */
+  /* يمين = الموقع والتواصل | يسار = المنتجات + شريط الطلبات/التقييمات (RTL) */
   grid-template-columns:minmax(300px,340px) minmax(0,1fr);
   grid-template-areas:"side main";
   gap:28px;
   align-items:start;
 }
-.content-grid > main{
+.content-grid > .store-main-col{
   grid-area:main;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.content-grid > .store-main-col > main{
   min-width:0;
   display:flex;
   flex-direction:column;
@@ -399,7 +405,7 @@ body.rzq-storefront-lb-on{overflow:hidden}
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
-.content-grid > main .products-grid{
+.content-grid > .store-main-col > main .products-grid{
   flex:1 1 auto;
 }
 /* طرق الدفع في الشريط — مضغوطة حتى لا تطيل العمود وتترك فراغاً */
@@ -527,7 +533,7 @@ html[dir="ltr"] .info-row{direction:ltr!important}
 /* ساعات العمل: اليوم والوقت ملتصقان يميناً */
 .hours-row{
   display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
-  gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
+  gap:12px!important;padding:4px 0;font-size:12.5px;border-bottom:1px solid #f0f3f8;
   text-align:start!important;direction:inherit!important;
 }
 html[dir="rtl"] .hours-row{direction:rtl!important}
@@ -640,17 +646,17 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات + التقييمات — شريط أفقي بعرض الواجهة كاملة تحت الشبكة */
+/* غرفة الطلبات + التقييمات — شريط أفقي تحت المنتجات يملأ فراغ العمود بتناسق الواجهة */
 .store-under-band{
   display:grid;
   grid-template-columns:1.08fr 0.92fr;
-  gap:16px;
-  margin:18px 0 0;
+  gap:12px;
+  margin:0;
   align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:14px;
+  padding:12px;
   border-radius:20px;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
@@ -835,7 +841,7 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
 
 /* ====== MAP PLACEHOLDER ====== */
 .map-placeholder{
-  height:148px;border-radius:12px;
+  height:110px;border-radius:12px;
   background:
     linear-gradient(145deg,rgba(27,58,107,.08),rgba(201,168,76,.1)),
     linear-gradient(135deg,#e8eef8,#dce6f2);
@@ -844,7 +850,7 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
   transition:all .3s;
 }
 .map-placeholder:hover{border-color:rgba(201,168,76,.45);transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,.1)}
-.map-placeholder .map-icon{font-size:34px}
+.map-placeholder .map-icon{font-size:28px}
 .map-placeholder .map-text{font-size:13px;font-weight:700;color:var(--navy)}
 .map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -918,7 +924,7 @@ footer{
 @media(max-width:1100px) and (min-width:801px){
   .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
   .main-wrap{padding:22px 16px 40px}
-  .content-grid > main{padding:16px}
+  .content-grid > .store-main-col > main{padding:16px}
   .store-name{font-size:26px}
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
@@ -931,7 +937,7 @@ footer{
     gap:18px;
   }
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
-  .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  .content-grid > .store-main-col > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
   .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
@@ -1431,7 +1437,8 @@ footer{
       </div>
     </aside>
 
-    <!-- PRODUCTS -->
+    <!-- عمود المنتجات: المنتجات ثم شريط غرفة الطلبات + التقييمات أفقياً لملء الفراغ -->
+    <div class="store-main-col">
     <main>
 <!-- Rizq Intermediary Notice -->
 
@@ -1469,61 +1476,62 @@ footer{
       </div>
       <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 8 منتجات التالية</button>
     </main>
-  </div>
 
-  <!-- غرفة الطلبات + التقييمات — أفقيان بعرض الواجهة كاملة تحت الشبكة -->
-  <div class="store-under-band" id="store-under-band">
-    <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
-      <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
-      <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
-      <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة.</p>
-      <div id="store-req-form" class="store-desk-form">
-        <div class="store-desk-field">
-          <label for="rf-name">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
-        </div>
-        <div class="store-desk-field">
-          <label for="rf-phone">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
-        </div>
-        <div class="store-desk-field">
-          <label for="rf-whatsapp">واتساب (إن اختلف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
-        </div>
-        <div class="store-desk-field">
-          <label for="rf-email">البريد (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
-        </div>
-        <div class="store-desk-field store-desk-span2">
-          <label for="rf-service">المنتج / الموضوع</label>
-          <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
-        </div>
-        <div class="store-desk-field store-desk-span2">
-          <label for="rf-msg">رسالتك للمحل</label>
-          <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
-        </div>
-        <div class="store-desk-actions">
-          <p class="store-desk-note">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="store-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
-      <div class="info-card-title" style="margin-bottom:8px" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-      <div class="store-reviews-inner">
-        <div class="store-reviews-summary">
-          <div class="store-reviews-score">
-            <div id="store-big-rating">—</div>
-            <div id="store-big-stars">☆☆☆☆☆</div>
-            <div id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+    <!-- غرفة الطلبات + التقييمات — أفقيان تحت المنتجات يملآن الفراغ بتناسق الواجهة -->
+    <div class="store-under-band" id="store-under-band">
+      <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
+        <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
+        <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة.</p>
+        <div id="store-req-form" class="store-desk-form">
+          <div class="store-desk-field">
+            <label for="rf-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
           </div>
-          <div id="store-rating-breakdown" style="flex:1;min-width:120px"></div>
+          <div class="store-desk-field">
+            <label for="rf-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-whatsapp">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
+          </div>
+          <div class="store-desk-field store-desk-span2">
+            <label for="rf-service">المنتج / الموضوع</label>
+            <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
+          </div>
+          <div class="store-desk-field store-desk-span2">
+            <label for="rf-msg">رسالتك للمحل</label>
+            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+          </div>
+          <div class="store-desk-actions">
+            <p class="store-desk-note">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
+          </div>
         </div>
-        <div id="reviews-list"></div>
-        <button class="view-all-btn" style="margin-top:8px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
-      </div>
-    </section>
+      </section>
+
+      <section class="store-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+        <div class="info-card-title" style="margin-bottom:8px" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+        <div class="store-reviews-inner">
+          <div class="store-reviews-summary">
+            <div class="store-reviews-score">
+              <div id="store-big-rating">—</div>
+              <div id="store-big-stars">☆☆☆☆☆</div>
+              <div id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+            </div>
+            <div id="store-rating-breakdown" style="flex:1;min-width:120px"></div>
+          </div>
+          <div id="reviews-list"></div>
+          <button class="view-all-btn" style="margin-top:8px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+        </div>
+      </section>
+    </div>
+    </div><!-- /.store-main-col -->
   </div>
 </div>
 
