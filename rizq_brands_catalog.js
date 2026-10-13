@@ -887,8 +887,7 @@
   }
 
   function siteIconUrl(domain) {
-    // أيقونة الموقع الرسمية (أفضل دقة من favicon جوجل المصغّر)
-    return 'https://icons.duckduckgo.com/ip3/' + encodeURIComponent(domain) + '.ico';
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=128';
   }
 
   /** رابط الشعار الحقيقي — بدون رسوم تقريبية مزيّفة */
