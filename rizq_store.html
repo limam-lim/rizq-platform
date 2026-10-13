@@ -136,7 +136,8 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-video-frame{min-height:220px;min-width:0;width:100%;max-width:100%;background:#040a12;border-radius:12px;overflow:hidden;border:1px solid rgba(201,168,76,.28);box-sizing:border-box}
 .store-video-frame .rzq-iv-wrap{max-width:100%;width:100%;margin:0;height:100%;box-sizing:border-box}
 .store-video-frame .rzq-iv-frame{border-radius:12px;aspect-ratio:16/9;min-height:220px;width:100%;max-width:100%;animation:none;box-shadow:0 0 0 1px rgba(201,168,76,.35);box-sizing:border-box}
-.store-video-frame .rzq-iv-badge{font-size:11px;padding:6px 12px}
+.store-video-frame .rzq-iv-badge,
+.store-video-frame .rzq-iv-play-label{display:none!important}
 .store-video-frame .rzq-iv-src{color:rgba(232,201,106,.75);margin-top:8px}
 #products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:150px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
@@ -173,10 +174,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
     object-fit:contain !important;background:#040a12 !important;
   }
   .store-video-frame .rzq-iv-poster{background-size:contain;background-repeat:no-repeat;background-color:#040a12}
-  .store-video-frame .rzq-iv-play{width:48px;height:48px;font-size:20px}
-  /* على الهاتف: زر ▶ يكفي — إخفاء شريط النص الطويل يقلّل الإحساس بالحجم الزائد */
-  .store-video-frame .rzq-iv-play-label{display:none}
-  .store-video-frame .rzq-iv-badge{font-size:10px;padding:4px 9px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis}
+  .store-video-frame .rzq-iv-play{width:40px;height:40px;font-size:16px;opacity:.28}
   .store-video-frame .rzq-iv-sound{
     font-size:11px;padding:6px 10px;max-width:calc(100% - 18px);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -185,9 +183,14 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
-.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#2a3a1f 0%,#1B3A6B 38%,#0D1B2A 100%);display:flex;flex-direction:column;justify-content:center}
+/* خلفية محايدة من الإطار الأول — لا وميض اللون الزيتوني القديم قبل الغلاف */
+.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#0D1B2A;display:flex;flex-direction:column;justify-content:center}
+.store-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#0D1B2A 100%)}
 .store-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#0D1B2A center/cover no-repeat}
-.store-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06);animation:rzHeroKen 22s ease-in-out infinite alternate}
+.store-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04);animation:rzHeroKen 28s ease-in-out infinite alternate}
+@media(max-width:900px),(prefers-reduced-motion:reduce){
+  .store-hero .hero-photo img{animation:none;transform:none}
+}
 @keyframes rzHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
 .store-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(13,27,42,.88) 0%,rgba(13,27,42,.62) 42%,rgba(13,27,42,.78) 100%)}
 .store-hero.has-hero-photo{background:#0D1B2A}
@@ -229,56 +232,30 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-video-card .rzq-iv-badge{display:none}
 .hero-video-card .rzq-iv-src{display:none}
 .hero-video-card .rzq-iv-play{
-  width:44px!important;height:44px!important;font-size:18px!important;
-  opacity:.28;background:rgba(201,168,76,.35)!important;color:rgba(13,27,42,.75)!important;
-  box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+  width:40px!important;height:40px!important;font-size:16px!important;
+  opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
+  border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
+  transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
+.hero-video-card .rzq-iv-badge,
 .hero-video-card .rzq-iv-play-label,
+.hero-video-caption{display:none!important}
 .hero-video-card .rzq-iv-sound,
 .hero-video-card .rzq-iv-dash-hint{
-  opacity:0!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important;
-  pointer-events:none!important
+  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important
 }
 .hero-video-card .rzq-iv-sound{
   font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
   border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
 .hero-video-card:hover .rzq-iv-sound.is-on,
-.hero-video-card:focus-within .rzq-iv-sound.is-on,
-.hero-video-card:hover .rzq-iv-dash-hint,
-.hero-video-card:focus-within .rzq-iv-dash-hint{
+.hero-video-card:focus-within .rzq-iv-sound.is-on{
   opacity:1!important;pointer-events:auto!important
 }
 .hero-video-card:hover .rzq-iv-play,
 .hero-video-card:focus-within .rzq-iv-play{
-  opacity:1;background:rgba(201,168,76,.92)!important;color:#0D1B2A!important
+  opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
 }
-@media (hover:none) and (pointer:coarse){
-  .hero-video-card .rzq-iv-sound.is-on,
-  .hero-video-card .rzq-iv-dash-hint,
-  .hero-video-card .rzq-iv-play{opacity:.95!important;pointer-events:auto!important}
-}
-/* تسمية صغيرة أعلى البطاقة — لا تغطي التشغيل ولا تسرق النقر */
-.hero-video-caption{
-  position:absolute;top:8px;left:50%;right:auto;bottom:auto;z-index:3;
-  display:inline-flex;align-items:center;justify-content:center;
-  width:auto;max-width:calc(100% - 16px);margin:0;padding:5px 10px;border-radius:999px;
-  border:1px solid rgba(232,201,106,.4);
-  background:rgba(6,17,28,.4);backdrop-filter:blur(6px);
-  color:rgba(255,255,255,.94);font:inherit;font-size:11px;font-weight:700;
-  letter-spacing:.01em;text-align:center;cursor:default;
-  opacity:0;transform:translate(-50%,-4px);
-  transition:opacity .22s ease,transform .22s ease,background .2s ease;
-  pointer-events:none!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.hero-video-card:hover .hero-video-caption,
-.hero-video-card:focus-within .hero-video-caption{
-  opacity:1;transform:translate(-50%,0)
-}
-@media (hover:none) and (pointer:coarse){
-  .hero-video-caption{opacity:.9;transform:translate(-50%,0);background:rgba(6,17,28,.5)}
-}
-.hero-video-card .rzq-iv-play-label{display:none!important}
 @media(max-width:900px){
   .store-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding-bottom:18px}
@@ -1223,7 +1200,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.3" defer></script>
+  <script src="rizq_store_commerce.js?v=29.4" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1273,6 +1250,41 @@ footer{
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <script>
+  /* غلاف مبكر من الكاش — يمنع وميض الخلفية القديمة قبل صورة الغلاف */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var id = q.get('id') || q.get('store') || '';
+      var hero = document.getElementById('store-hero');
+      if(!hero) return;
+      var cover = '';
+      if(id){
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        for(var i=0;i<accs.length;i++){
+          var a = accs[i];
+          if(a && a.id === id && a.type === 'store' && (a.cover || a.thumb)){
+            cover = String(a.cover || a.thumb || '');
+            break;
+          }
+        }
+      }
+      if(!cover){
+        try{ cover = String(sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
+      }
+      if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
+      if(!/^(https?:\/\/|\/|data:image\/)/i.test(cover)) return;
+      var slot = hero.querySelector('[data-hero-photo]');
+      if(!slot) return;
+      slot.hidden = false;
+      hero.classList.add('has-hero-photo');
+      slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+      slot.style.backgroundSize = 'cover';
+      slot.style.backgroundPosition = 'center';
+      try{ if(id) sessionStorage.setItem('rizq_store_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+    }catch(e){}
+  })();
+  </script>
   <div class="hero-cover">
     <div class="store-hero-stage">
       <div class="store-profile">
@@ -1301,11 +1313,9 @@ footer{
   <div class="hero-videos" id="store-hero-videos" aria-label="فيديوهات المحل">
     <div class="hero-video-card" id="hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="hero-intro-video-mount"></div>
-      <button type="button" class="hero-video-caption" id="hero-intro-caption">فيديو تعريفي</button>
     </div>
     <div class="hero-video-card" id="hero-extra-card" style="display:none">
       <div class="hero-video-mount" id="hero-extra-video-mount"></div>
-      <button type="button" class="hero-video-caption" id="hero-extra-caption">فيديو إضافي</button>
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
@@ -1942,7 +1952,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=29.6"></script>
+  <script src="rizq_intro_video.js?v=29.7"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -2387,8 +2397,6 @@ function rizqShare(title, url) {
       var extraCard = document.getElementById('hero-extra-card');
       var introMount = document.getElementById('hero-intro-video-mount');
       var extraMount = document.getElementById('hero-extra-video-mount');
-      var introCap = document.getElementById('hero-intro-caption');
-      var extraCap = document.getElementById('hero-extra-caption');
       var spot = document.getElementById('store-video-spotlight');
       if(spot) spot.style.display = 'none';
       if(!introMount || !videos.length){
@@ -2408,8 +2416,6 @@ function rizqShare(title, url) {
         return;
       }
       if(hero) hero.setAttribute('data-rzq-promo-sig', promoSig);
-      if(introCap) introCap.textContent = fr ? 'Présentation' : 'فيديو تعريفي';
-      if(extraCap) extraCap.textContent = fr ? 'Extra' : 'فيديو إضافي';
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         accountType: 'store',
         poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',

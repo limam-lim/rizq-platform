@@ -202,11 +202,14 @@ a{text-decoration:none;color:inherit}
 .office-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
 .office-hero .hero-video-card .rzq-iv-badge,.office-hero .hero-video-card .rzq-iv-src{display:none}
 .office-hero .hero-video-card .rzq-iv-play{
-  width:44px!important;height:44px!important;font-size:18px!important;
-  opacity:.28;background:rgba(103,232,249,.35)!important;color:rgba(6,17,28,.8)!important;
-  box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+  width:40px!important;height:40px!important;font-size:16px!important;
+  opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
+  border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
+  transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
-.office-hero .hero-video-card .rzq-iv-play-label{display:none!important}
+.office-hero .hero-video-card .rzq-iv-badge,
+.office-hero .hero-video-card .rzq-iv-play-label,
+.office-hero .hero-video-caption{display:none!important}
 .office-hero .hero-video-card .rzq-iv-sound,
 .office-hero .hero-video-card .rzq-iv-dash-hint{
   opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important;
@@ -214,28 +217,12 @@ a{text-decoration:none;color:inherit}
   border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
 .office-hero .hero-video-card:hover .rzq-iv-sound.is-on,
-.office-hero .hero-video-card:focus-within .rzq-iv-sound.is-on,
-.office-hero .hero-video-card:hover .rzq-iv-play,
-.office-hero .hero-video-card:focus-within .rzq-iv-play{
+.office-hero .hero-video-card:focus-within .rzq-iv-sound.is-on{
   opacity:1!important;pointer-events:auto!important
 }
 .office-hero .hero-video-card:hover .rzq-iv-play,
 .office-hero .hero-video-card:focus-within .rzq-iv-play{
-  background:rgba(103,232,249,.92)!important;color:#06111C!important
-}
-.office-hero .hero-video-caption{
-  position:absolute;top:8px;left:50%;z-index:3;display:inline-flex;align-items:center;justify-content:center;
-  max-width:calc(100% - 16px);padding:5px 10px;border-radius:999px;border:1px solid rgba(103,232,249,.4);
-  background:rgba(6,17,28,.4);color:rgba(255,255,255,.94);font:inherit;font-size:11px;font-weight:700;
-  opacity:0;transform:translate(-50%,-4px);transition:opacity .22s ease,transform .22s ease;pointer-events:none!important;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.office-hero .hero-video-card:hover .hero-video-caption,
-.office-hero .hero-video-card:focus-within .hero-video-caption{opacity:1;transform:translate(-50%,0)}
-@media (hover:none) and (pointer:coarse){
-  .office-hero .hero-video-caption{opacity:.9;transform:translate(-50%,0)}
-  .office-hero .hero-video-card .rzq-iv-sound.is-on,
-  .office-hero .hero-video-card .rzq-iv-play{opacity:.95!important;pointer-events:auto!important}
+  opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
 }
 @media(max-width:900px){
   .office-hero .hero-videos{
@@ -928,11 +915,9 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <div class="hero-videos" id="office-hero-videos" aria-label="فيديوهات المكتب">
     <div class="hero-video-card" id="office-hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="office-hero-intro-video-mount"></div>
-      <button type="button" class="hero-video-caption" id="office-hero-intro-caption">فيديو تعريفي</button>
     </div>
     <div class="hero-video-card" id="office-hero-extra-card" style="display:none">
       <div class="hero-video-mount" id="office-hero-extra-video-mount"></div>
-      <button type="button" class="hero-video-caption" id="office-hero-extra-caption">فيديو إضافي</button>
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
@@ -1623,7 +1608,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=29.6"></script>
+  <script src="rizq_intro_video.js?v=29.7"></script>
   <script>
   /* فيديو تعريفي + إضافي في ركن الهيرو — نفس موضع المحلات/المعارض */
   window.mountOfficeIntroVideo = function(url, officeId, accHint){
@@ -1644,8 +1629,6 @@ function openMaps(){
       var extraCard = document.getElementById('office-hero-extra-card');
       var introMount = document.getElementById('office-hero-intro-video-mount');
       var extraMount = document.getElementById('office-hero-extra-video-mount');
-      var introCap = document.getElementById('office-hero-intro-caption');
-      var extraCap = document.getElementById('office-hero-extra-caption');
       var aboutVid = document.getElementById('video-intro-section');
       if(aboutVid) aboutVid.style.display = 'none';
       if(!introMount || !introUrl){
@@ -1660,8 +1643,6 @@ function openMaps(){
         return;
       }
       window.__rzqOfficeIntroSig = sig;
-      if(introCap) introCap.textContent = fr ? 'Présentation' : 'فيديو تعريفي';
-      if(extraCap) extraCap.textContent = fr ? 'Extra' : 'فيديو إضافي';
       var okIntro = RizqIntroVideo.mount(introMount, introUrl, {
         accountType: 'office',
         poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
