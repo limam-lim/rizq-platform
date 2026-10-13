@@ -18,7 +18,10 @@ assert(headerJs.includes('rizq-hdr-cart-lbl'), 'cart control must show visible Ø
 assert(headerJs.includes('commerceToolbarHtml()'), 'desk tools must reuse commerce toolbar');
 assert(storeHtml.includes('store-name-el'), 'addToCartStore must read store-name-el');
 assert(storeHtml.includes('_rizqWireStoreCartLinks'), 'store must rewire cart links after header inject');
-assert(storeHtml.includes("lineId = 'store-prod-' + id") || storeHtml.includes("var lineId = 'store-prod-' + id"), 'cart line ids must stay store-prod-*');
+assert(
+  storeHtml.includes("baseId = 'store-prod-' + id") || storeHtml.includes("lineId = 'store-prod-' + id") || storeHtml.includes("var lineId = 'store-prod-' + id"),
+  'cart line ids must stay store-prod-*'
+);
 assert(
   commerceJs.includes("parts[parts.length - 1]") || commerceJs.includes('parts.length - 1'),
   'withStoreId must use filename leaf (not full pathname) for GitHub Pages'

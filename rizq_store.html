@@ -2190,8 +2190,15 @@ function rizqShare(title, url) {
         var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
           ? RizqStoreCommerce.imagesOf(p)
           : ((p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []));
-        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '' };
-        window._qvProductsMap[pid] = { images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock };
+        featured[pid] = {
+          name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0,
+          emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '',
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+        };
+        window._qvProductsMap[pid] = {
+          images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock,
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+        };
         var topic = null;
         if(window.RizqStoreTopics) topic = RizqStoreTopics.resolveProductTopic(storeTopics, p);
         var topicKey = topic ? topic.id : (p.topicId || p.cat || '');
