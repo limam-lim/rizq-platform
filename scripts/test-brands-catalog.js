@@ -45,12 +45,13 @@ assert.strictEqual(B.findByAlias('Nike').id, 'nike');
 
 const chip = B.chipHtml('adidas', { fr: false, modelId: 'ultraboost' });
 assert(chip.indexOf('أديداس') >= 0 || chip.indexOf('ألترابوست') >= 0);
-assert(chip.indexOf('data:image/svg+xml') >= 0, 'logo data uri');
+assert(chip.indexOf('https://') >= 0 || chip.indexOf('data:image/svg+xml') >= 0, 'chip has logo src');
+assert(chip.indexOf('data-fallback') >= 0 || chip.indexOf('data:image/svg+xml') >= 0, 'chip has fallback');
 
 const logoName = B.logoNameHtml('toyota', { fr: false, modelId: 'camry' });
 assert(logoName.indexOf('تويوتا') >= 0, 'logoName has brand name');
 assert(logoName.indexOf('rzq-brand-logo-name-img') >= 0, 'logoName has logo img');
-assert(logoName.indexOf('data:image/svg+xml') >= 0, 'logoName logo uri');
+assert(logoName.indexOf('carlogos.org') >= 0, 'toyota uses real carlogos asset');
 
 const strip = B.stripHtml('أزياء', false, { heading: 'تسوّق حسب الماركة' });
 assert(strip.indexOf('تسوّق حسب الماركة') >= 0, 'strip heading');
@@ -58,18 +59,22 @@ assert(strip.indexOf('rzq-brand-tile-logo') >= 0, 'strip logo tile');
 assert(strip.indexOf('rzq-brand-tile-name') >= 0 || strip.indexOf('rzq-brand-tile-abbr') >= 0, 'strip name under logo');
 assert(strip.indexOf('نايك') >= 0 || strip.indexOf('Nike') >= 0, 'strip shows brand name');
 assert(strip.indexOf('data-brand-id="nike"') >= 0, 'strip includes nike');
+assert(strip.indexOf('simple-icons') >= 0 || strip.indexOf('favicon') >= 0, 'fashion uses real remote logos');
 
 const fl = B.filterListHtml('سيارات', false, { activeId: 'toyota', letter: 'T' });
 assert(fl.indexOf('rzq-brand-tile') >= 0, 'filter brand tiles');
 assert(fl.indexOf('rzq-brand-letter-btn') >= 0, 'filter letter buttons');
 assert(fl.indexOf('تويوتا') >= 0 || fl.indexOf('data-brand-id="toyota"') >= 0, 'filter has toyota name/id');
 assert(fl.indexOf('rzq-brand-tile-logo') >= 0, 'filter tile logo');
+assert(fl.indexOf('carlogos.org') >= 0, 'filter uses real car logos');
 assert(fl.indexOf('الشعار فوق') < 0, 'no technical heading for visitors');
 
-const bmwLogo = B.logoSvg(B.getById('bmw'), 72);
-assert(bmwLogo.indexOf('<circle') >= 0, 'bmw symbol uses shapes');
-assert(!/>BMW</.test(bmwLogo), 'bmw logo is not letter text BMW');
-
+assert(String(B.logoUrl(B.getById('toyota'))).indexOf('carlogos.org') >= 0, 'logoUrl toyota');
+assert(String(B.logoUrl(B.getById('nike'))).indexOf('https://') === 0, 'logoUrl nike remote');
+assert(src.indexOf('function symbolInner') < 0, 'no fake lookalike symbolInner');
+const bmwFallback = B.logoSvg(B.getById('bmw'), 72);
+assert(bmwFallback.indexOf('<text') >= 0, 'fallback monogram uses letter text');
+assert(bmwFallback.indexOf('#1C69D4') >= 0 || bmwFallback.indexOf('B') >= 0, 'bmw monogram uses brand color/letter');
 const dynSrc = fs.readFileSync(path.join(__dirname, '..', 'rizq_dyn_filters.js'), 'utf8');
 assert(dynSrc.indexOf('سنة التصنيع') >= 0, 'dyn filters year');
 assert(dynSrc.indexOf('علبة التروس') >= 0, 'dyn filters gearbox');

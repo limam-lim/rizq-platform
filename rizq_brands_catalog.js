@@ -1,8 +1,8 @@
 /**
  * rizq_brands_catalog.js — كتالوج الماركات + الموديلات (إلهام Milanuncios / coche.net)
  * سيارات · أزياء · ملابس رياضية · نظارات وإكسسوارات
- * العرض: رمز الماركة (سيمبول) فوق + اسم الماركة تحته.
- * الرموز هندسية أصلية مستوحاة من هوية الماركة — ليست نسخاً لشعارات تجارية محمية.
+ * العرض: شعار الماركة الحقيقي فوق + اسم الماركة تحته.
+ * الشعارات من مصادر عامة (Carlogos / Simple Icons / أيقونة الموقع) مع مونوغرام احتياطي فقط.
  */
 (function (global) {
   'use strict';
@@ -832,117 +832,77 @@
     return abbrName(brand).slice(0, 3);
   }
 
-  /**
-   * رموز هندسية أصلية (سيمبول) — شكل مميّز لكل ماركة معروفة، لا حروف داخل الشعار.
-   * الماركات الأخرى: حرف واحد فقط كمونوغرام داخل شارة نظيفة.
-   */
-  function symbolInner(brand, size) {
-    var id = String((brand && brand.id) || '').toLowerCase();
-    var s = size;
-    var c = s / 2;
-    var stroke = Math.max(1.2, s * 0.045);
-    switch (id) {
-      case 'bmw':
-        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.46) + '" fill="#1C69D4"/>'
-          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.38) + '" fill="#fff"/>'
-          + '<path d="M' + c + ' ' + (c - s * 0.38) + ' A' + (s * 0.38) + ' ' + (s * 0.38) + ' 0 0 1 ' + c + ' ' + (c + s * 0.38) + ' Z" fill="#1C69D4"/>'
-          + '<path d="M' + (c - s * 0.38) + ' ' + c + ' A' + (s * 0.38) + ' ' + (s * 0.38) + ' 0 0 1 ' + (c + s * 0.38) + ' ' + c + ' Z" fill="#1C69D4" opacity=".35"/>'
-          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.38) + '" fill="none" stroke="#111" stroke-width="' + (stroke * 0.6) + '"/>';
-      case 'toyota':
-        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.42) + '" ry="' + (s * 0.28) + '" fill="none" stroke="#EB0A1E" stroke-width="' + stroke + '"/>'
-          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.18) + '" ry="' + (s * 0.42) + '" fill="none" stroke="#EB0A1E" stroke-width="' + stroke + '"/>'
-          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.42) + '" ry="' + (s * 0.42) + '" fill="none" stroke="#EB0A1E" stroke-width="' + (stroke * 0.85) + '"/>';
-      case 'mercedes':
-        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#111" stroke="#C9A84C" stroke-width="' + (stroke * 0.7) + '"/>'
-          + '<path d="M' + c + ' ' + (c - s * 0.32) + ' L' + (c + s * 0.28) + ' ' + (c + s * 0.2) + ' L' + (c - s * 0.28) + ' ' + (c + s * 0.2) + ' Z" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linejoin="round"/>'
-          + '<line x1="' + c + '" y1="' + c + '" x2="' + c + '" y2="' + (c - s * 0.32) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>'
-          + '<line x1="' + c + '" y1="' + c + '" x2="' + (c + s * 0.28) + '" y2="' + (c + s * 0.2) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>'
-          + '<line x1="' + c + '" y1="' + c + '" x2="' + (c - s * 0.28) + '" y2="' + (c + s * 0.2) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>';
-      case 'audi':
-        return '<g fill="none" stroke="#222" stroke-width="' + stroke + '">'
-          + '<circle cx="' + (c - s * 0.27) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
-          + '<circle cx="' + (c - s * 0.09) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
-          + '<circle cx="' + (c + s * 0.09) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
-          + '<circle cx="' + (c + s * 0.27) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
-          + '</g>';
-      case 'volkswagen':
-        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#001E50"/>'
-          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.36) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>'
-          + '<path d="M' + (c - s * 0.18) + ' ' + (c - s * 0.12) + ' L' + (c - s * 0.08) + ' ' + (c + s * 0.18) + ' L' + c + ' ' + (c - s * 0.06) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.18) + ' L' + (c + s * 0.18) + ' ' + (c - s * 0.12) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linejoin="round" stroke-linecap="round"/>';
-      case 'hyundai':
-        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.3) + '" fill="#002C5F"/>'
-          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.08) + ' Q' + c + ' ' + (c - s * 0.22) + ' ' + (c + s * 0.22) + ' ' + (c + s * 0.08) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.15) + '" stroke-linecap="round"/>';
-      case 'honda':
-        return '<rect x="' + (s * 0.12) + '" y="' + (s * 0.18) + '" width="' + (s * 0.76) + '" height="' + (s * 0.64) + '" rx="' + (s * 0.12) + '" fill="#E40521"/>'
-          + '<path d="M' + (c - s * 0.18) + ' ' + (c + s * 0.18) + ' V' + (c - s * 0.16) + ' Q' + c + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.16) + ' V' + (c + s * 0.18) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.2) + '" stroke-linecap="round"/>';
-      case 'nissan':
-        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#C3002F"/>'
-          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.3) + '" ry="' + (s * 0.14) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>'
-          + '<line x1="' + (c - s * 0.3) + '" y1="' + c + '" x2="' + (c + s * 0.3) + '" y2="' + c + '" stroke="#fff" stroke-width="' + (stroke * 0.7) + '"/>';
-      case 'ford':
-        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.46) + '" ry="' + (s * 0.3) + '" fill="#003478"/>'
-          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.06) + ' Q' + (c - s * 0.1) + ' ' + (c - s * 0.16) + ' ' + c + ' ' + (c + s * 0.02) + ' Q' + (c + s * 0.12) + ' ' + (c + s * 0.14) + ' ' + (c + s * 0.24) + ' ' + (c - s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.1) + '" stroke-linecap="round"/>';
-      case 'kia':
-        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.28) + '" fill="#05141F"/>'
-          + '<path d="M' + (c - s * 0.2) + ' ' + (c + s * 0.08) + ' L' + (c - s * 0.06) + ' ' + (c - s * 0.1) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.08) + ' M' + (c + s * 0.02) + ' ' + (c - s * 0.02) + ' L' + (c + s * 0.22) + ' ' + (c - s * 0.02) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'tesla':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#111"/>'
-          + '<path d="M' + (c - s * 0.28) + ' ' + (c - s * 0.08) + ' Q' + c + ' ' + (c - s * 0.32) + ' ' + (c + s * 0.28) + ' ' + (c - s * 0.08) + ' L' + c + ' ' + (c + s * 0.28) + ' Z" fill="#E31937"/>';
-      case 'apple':
-        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.2) + '" fill="#222"/>'
-          + '<path d="M' + (c + s * 0.06) + ' ' + (c - s * 0.28) + ' C' + (c + s * 0.18) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.22) + ' ' + (c - s * 0.12) + ' ' + (c + s * 0.1) + ' ' + (c - s * 0.08) + ' C' + (c - s * 0.02) + ' ' + (c - s * 0.22) + ' ' + (c - s * 0.06) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.06) + ' ' + (c - s * 0.28) + ' Z" fill="#fff"/>'
-          + '<path d="M' + (c + s * 0.02) + ' ' + (c - s * 0.04) + ' C' + (c + s * 0.28) + ' ' + (c - s * 0.04) + ' ' + (c + s * 0.3) + ' ' + (c + s * 0.32) + ' ' + (c + s * 0.08) + ' ' + (c + s * 0.32) + ' C' + (c - s * 0.02) + ' ' + (c + s * 0.32) + ' ' + (c - s * 0.08) + ' ' + (c + s * 0.22) + ' ' + (c - s * 0.16) + ' ' + (c + s * 0.32) + ' C' + (c - s * 0.3) + ' ' + (c + s * 0.2) + ' ' + (c - s * 0.28) + ' ' + (c - s * 0.06) + ' ' + (c - s * 0.08) + ' ' + (c - s * 0.06) + ' C' + (c + s * 0.02) + ' ' + (c - s * 0.18) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.16) + ' ' + (c + s * 0.02) + ' ' + (c - s * 0.04) + ' Z" fill="#fff"/>';
-      case 'samsung':
-        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.26) + '" fill="#1428A0"/>'
-          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.3) + '" ry="' + (s * 0.14) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>';
-      case 'xiaomi':
-        return '<rect x="' + (s * 0.1) + '" y="' + (s * 0.1) + '" width="' + (s * 0.8) + '" height="' + (s * 0.8) + '" rx="' + (s * 0.16) + '" fill="#FF6900"/>'
-          + '<rect x="' + (c - s * 0.16) + '" y="' + (c - s * 0.18) + '" width="' + (s * 0.32) + '" height="' + (s * 0.36) + '" rx="' + (s * 0.06) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.15) + '"/>'
-          + '<line x1="' + (c - s * 0.02) + '" y1="' + (c - s * 0.02) + '" x2="' + (c + s * 0.14) + '" y2="' + (c + s * 0.14) + '" stroke="#fff" stroke-width="' + stroke + '" stroke-linecap="round"/>';
-      case 'huawei':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.18) + '" fill="#CF0A2C"/>'
-          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.08) + ' Q' + (c - s * 0.18) + ' ' + (c - s * 0.22) + ' ' + c + ' ' + (c - s * 0.26) + ' Q' + (c + s * 0.18) + ' ' + (c - s * 0.22) + ' ' + (c + s * 0.22) + ' ' + (c + s * 0.08) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.1) + '" stroke-linecap="round"/>'
-          + '<path d="M' + (c - s * 0.14) + ' ' + (c + s * 0.04) + ' Q' + c + ' ' + (c - s * 0.12) + ' ' + (c + s * 0.14) + ' ' + (c + s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 0.85) + '" stroke-linecap="round"/>';
-      case 'oppo':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.2) + '" fill="#1BA784"/>'
-          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.26) + '" ry="' + (s * 0.18) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.2) + '"/>';
-      case 'vivo':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.2) + '" fill="#415FFF"/>'
-          + '<path d="M' + (c - s * 0.2) + ' ' + (c - s * 0.12) + ' L' + c + ' ' + (c + s * 0.2) + ' L' + (c + s * 0.2) + ' ' + (c - s * 0.12) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.25) + '" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'sony':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#111"/>'
-          + '<rect x="' + (c - s * 0.28) + '" y="' + (c - s * 0.1) + '" width="' + (s * 0.56) + '" height="' + (s * 0.2) + '" rx="' + (s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>';
-      case 'peugeot':
-        return '<rect x="' + (s * 0.12) + '" y="' + (s * 0.08) + '" width="' + (s * 0.76) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.08) + '" fill="#000"/>'
-          + '<path d="M' + c + ' ' + (c - s * 0.28) + ' L' + (c + s * 0.2) + ' ' + (c - s * 0.04) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.26) + ' L' + (c - s * 0.08) + ' ' + (c + s * 0.26) + ' L' + (c - s * 0.2) + ' ' + (c - s * 0.04) + ' Z" fill="none" stroke="#C9A84C" stroke-width="' + stroke + '"/>'
-          + '<line x1="' + c + '" y1="' + (c - s * 0.2) + '" x2="' + c + '" y2="' + (c + s * 0.18) + '" stroke="#C9A84C" stroke-width="' + (stroke * 0.8) + '"/>';
-      case 'renault':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.12) + '" fill="#FFCC33"/>'
-          + '<path d="M' + c + ' ' + (c - s * 0.28) + ' L' + (c + s * 0.22) + ' ' + c + ' L' + c + ' ' + (c + s * 0.28) + ' L' + (c - s * 0.22) + ' ' + c + ' Z" fill="none" stroke="#111" stroke-width="' + (stroke * 1.15) + '" stroke-linejoin="round"/>';
-      case 'chevrolet':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#D4A017"/>'
-          + '<path d="M' + (c - s * 0.28) + ' ' + (c - s * 0.06) + ' H' + (c + s * 0.28) + ' V' + (c + s * 0.06) + ' H' + (c - s * 0.28) + ' Z" fill="#fff"/>'
-          + '<path d="M' + (c - s * 0.08) + ' ' + (c - s * 0.22) + ' H' + (c + s * 0.08) + ' V' + (c + s * 0.22) + ' H' + (c - s * 0.08) + ' Z" fill="#fff"/>';
-      case 'nike':
-        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#111"/>'
-          + '<path d="M' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Q' + (c - s * 0.02) + ' ' + (c + s * 0.28) + ' ' + (c + s * 0.34) + ' ' + (c - s * 0.16) + ' Q' + (c + s * 0.06) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Z" fill="#fff"/>';
-      case 'adidas':
-        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#000"/>'
-          + '<path d="M' + (c - s * 0.28) + ' ' + (c + s * 0.22) + ' L' + (c - s * 0.1) + ' ' + (c - s * 0.22) + ' L' + (c - s * 0.02) + ' ' + (c - s * 0.08) + ' L' + (c - s * 0.18) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>'
-          + '<path d="M' + (c - s * 0.08) + ' ' + (c + s * 0.22) + ' L' + (c + s * 0.08) + ' ' + (c - s * 0.1) + ' L' + (c + s * 0.16) + ' ' + (c + s * 0.04) + ' L' + (c + s * 0.02) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>'
-          + '<path d="M' + (c + s * 0.1) + ' ' + (c + s * 0.22) + ' L' + (c + s * 0.24) + ' ' + (c + s * 0.02) + ' L' + (c + s * 0.32) + ' ' + (c + s * 0.14) + ' L' + (c + s * 0.2) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>';
-      case 'puma':
-        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#111"/>'
-          + '<path d="M' + (c - s * 0.3) + ' ' + (c + s * 0.18) + ' Q' + (c - s * 0.1) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.3) + ' ' + (c - s * 0.1) + ' Q' + (c + s * 0.05) + ' ' + (c + s * 0.05) + ' ' + (c - s * 0.3) + ' ' + (c + s * 0.18) + ' Z" fill="#fff"/>';
-      case 'ray-ban':
-        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.28) + '" width="' + (s * 0.84) + '" height="' + (s * 0.44) + '" rx="' + (s * 0.08) + '" fill="#111"/>'
-          + '<circle cx="' + (c - s * 0.18) + '" cy="' + c + '" r="' + (s * 0.14) + '" fill="#C9A84C"/>'
-          + '<circle cx="' + (c + s * 0.18) + '" cy="' + c + '" r="' + (s * 0.14) + '" fill="#C9A84C"/>';
-      default:
-        return null;
-    }
+  /** شعارات سيارات حقيقية (PNG عام من Carlogos) — slug الملف */
+  var AUTO_LOGO_SLUG = {
+    toyota: 'toyota', mercedes: 'mercedes-benz', bmw: 'bmw', hyundai: 'hyundai',
+    kia: 'kia', nissan: 'nissan', volkswagen: 'volkswagen', peugeot: 'peugeot',
+    renault: 'renault', ford: 'ford', chevrolet: 'chevrolet', dacia: 'dacia',
+    honda: 'honda', mazda: 'mazda', mitsubishi: 'mitsubishi', suzuki: 'suzuki',
+    audi: 'audi', 'land-rover': 'land-rover', jeep: 'jeep', volvo: 'volvo',
+    skoda: 'skoda', opel: 'opel', geely: 'geely', chery: 'chery', byd: 'byd',
+    tesla: 'tesla'
+  };
+
+  /** أيقونات Simple Icons (مسارات الماركة الرسمية المبسّطة) عند توفرها */
+  var SIMPLE_ICON_SLUG = {
+    nike: 'nike', adidas: 'adidas', puma: 'puma', zara: 'zara', uniqlo: 'uniqlo',
+    dior: 'dior', reebok: 'reebok', 'new-balance': 'newbalance',
+    'under-armour': 'underarmour', apple: 'apple', samsung: 'samsung',
+    xiaomi: 'xiaomi', huawei: 'huawei', oppo: 'oppo', vivo: 'vivo',
+    honor: 'honor', sony: 'sony', lg: 'lg', lenovo: 'lenovo', hp: 'hp',
+    dell: 'dell', asus: 'asus', nokia: 'nokia', ikea: 'ikea', pandora: 'pandora',
+    mercedes: 'mercedes', bmw: 'bmw'
+  };
+
+  /** نطاق الموقع الرسمي — أيقونة العلامة من الموقع عند غياب مصدر أفضل */
+  var BRAND_DOMAIN = {
+    nike: 'nike.com', adidas: 'adidas.com', puma: 'puma.com', zara: 'zara.com',
+    'h-m': 'hm.com', 'lc-waikiki': 'lcwaikiki.com', defacto: 'defacto.com.tr',
+    gucci: 'gucci.com', mango: 'mango.com', 'pull-bear': 'pullandbear.com',
+    bershka: 'bershka.com', uniqlo: 'uniqlo.com', guess: 'guess.com',
+    'calvin-klein': 'calvinklein.com', 'tommy-hilfiger': 'tommy.com',
+    lacoste: 'lacoste.com', levis: 'levi.com', 'ralph-lauren': 'ralphlauren.com',
+    chanel: 'chanel.com', 'louis-vuitton': 'louisvuitton.com', prada: 'prada.com',
+    dior: 'dior.com', 'new-balance': 'newbalance.com', 'under-armour': 'underarmour.com',
+    reebok: 'reebok.com', converse: 'converse.com', vans: 'vans.com',
+    asics: 'asics.com', skechers: 'skechers.com', 'ray-ban': 'ray-ban.com',
+    oakley: 'oakley.com', persol: 'persol.com', carrera: 'carreraworld.com',
+    police: 'policelifestyle.com', 'tom-ford': 'tomford.com',
+    apple: 'apple.com', samsung: 'samsung.com', xiaomi: 'mi.com',
+    huawei: 'huawei.com', oppo: 'oppo.com', vivo: 'vivo.com', realme: 'realme.com',
+    honor: 'honor.com', sony: 'sony.com', lg: 'lg.com', lenovo: 'lenovo.com',
+    hp: 'hp.com', dell: 'dell.com', asus: 'asus.com', nokia: 'nokia.com',
+    tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com', itel: 'itel-mobile.com',
+    ikea: 'ikea.com', 'home-centre': 'homecentre.com', 'pan-emirates': 'panemirates.com',
+    danube: 'danubeco.com', rolex: 'rolex.com', cartier: 'cartier.com',
+    swatch: 'swatch.com', casio: 'casio.com', tissot: 'tissot.com', pandora: 'pandora.net'
+  };
+
+  function carlogoUrl(slug) {
+    return 'https://www.carlogos.org/car-logos/' + slug + '-logo.png';
   }
 
+  function simpleIconUrl(slug) {
+    return 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/' + slug + '.svg';
+  }
+
+  function siteIconUrl(domain) {
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=128';
+  }
+
+  /** رابط الشعار الحقيقي — بدون رسوم تقريبية مزيّفة */
+  function logoUrl(brand) {
+    if (!brand) return '';
+    if (brand.logoUrl) return String(brand.logoUrl);
+    var id = String(brand.id || '').toLowerCase();
+    if (AUTO_LOGO_SLUG[id]) return carlogoUrl(AUTO_LOGO_SLUG[id]);
+    if (SIMPLE_ICON_SLUG[id]) return simpleIconUrl(SIMPLE_ICON_SLUG[id]);
+    var domain = brand.domain || BRAND_DOMAIN[id];
+    if (domain) return siteIconUrl(domain);
+    return '';
+  }
+
+  /** مونوغرام نظيف فقط كاحتياطي عند فشل التحميل — ليس تقليداً لشعار */
   function monogramMark(brand, size) {
     var fill = (brand && brand.color) || '#111111';
     var letter = String((brand && brand.nameFr) || (brand && brand.id) || '?').replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()
@@ -965,14 +925,12 @@
       + '<text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="' + fs + '">' + esc(letter) + '</text>';
   }
 
-  /** صورة الشعار فقط (سيمبول). اسم الماركة يُعرض تحتها في الواجهة. */
+  /** احتياطي SVG (مونوغرام فقط). اسم الماركة يُعرض تحت الشعار في الواجهة. */
   function logoSvg(brand, size) {
     size = size || 72;
     var label = (brand && (brand.nameFr || brand.nameAr)) || 'brand';
-    var inner = symbolInner(brand, size);
-    if (!inner) inner = monogramMark(brand, size);
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(label) + '">'
-      + inner
+      + monogramMark(brand, size)
       + '</svg>';
   }
 
@@ -984,7 +942,23 @@
     }
   }
 
-  /** بلاطة: سيمبول الماركة فوق + اسم الماركة تحت */
+  /** صورة شعار: رابط حقيقي أولاً، ثم مونوغرام عند فشل التحميل */
+  function logoImgHtml(brand, size, opts) {
+    opts = opts || {};
+    var name = displayName(brand, !!opts.fr) || (brand && (brand.nameFr || brand.nameAr)) || 'brand';
+    var fb = logoDataUri(brand, size * 2);
+    var url = logoUrl(brand);
+    var src = url || fb;
+    var cls = opts.className ? ' class="' + esc(opts.className) + '"' : '';
+    var style = opts.style ? ' style="' + esc(opts.style) + '"' : '';
+    var onerr = url
+      ? ' data-fallback="' + esc(fb) + '" onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback}"'
+      : '';
+    var loading = url ? ' loading="lazy" decoding="async" referrerpolicy="no-referrer"' : '';
+    return '<img' + cls + ' src="' + esc(src) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"' + style + onerr + loading + '/>';
+  }
+
+  /** بلاطة: شعار الماركة الحقيقي فوق + اسم الماركة تحت */
   function tileButtonHtml(brand, fr, opts) {
     opts = opts || {};
     var on = !!opts.active;
@@ -992,7 +966,7 @@
     var size = opts.imgSize || 72;
     return '<button type="button" class="rzq-brand-tile' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '" aria-pressed="' + (on ? 'true' : 'false') + '">'
       + '<span class="rzq-brand-tile-logo">'
-      +   '<img src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+      +   logoImgHtml(brand, size, { fr: fr })
       + '</span>'
       + '<span class="rzq-brand-tile-name rzq-brand-tile-abbr">' + esc(name) + '</span>'
       + '</button>';
@@ -1088,13 +1062,13 @@
     if (model) label += ' · ' + modelName(model, fr);
     var size = opts.size || 22;
     return '<span class="rzq-brand-chip" title="' + esc(label) + '" style="display:inline-flex;align-items:center;gap:6px;padding:3px 8px 3px 4px;border-radius:999px;background:rgba(15,35,71,.06);border:1px solid rgba(15,35,71,.1);font-size:11px;font-weight:700;color:#0F2347;max-width:100%">'
-      + '<img class="rzq-brand-chip-logo" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(displayName(brand, fr)) + '" width="' + size + '" height="' + size + '" style="border-radius:50%;flex-shrink:0"/>'
+      + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-chip-logo', style: 'border-radius:50%;flex-shrink:0;object-fit:contain;background:#fff' })
       + '<span class="rzq-brand-chip-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(label) + '</span>'
       + '</span>';
   }
 
   /**
-   * بطاقة مدمجة: سيمبول الماركة فوق + اسم الماركة تحت (أو صف أفقي إن opts.inline)
+   * بطاقة مدمجة: شعار الماركة فوق + اسم الماركة تحت (أو صف أفقي إن opts.inline)
    */
   function logoNameHtml(brandId, opts) {
     opts = opts || {};
@@ -1107,7 +1081,7 @@
     var sub = model ? modelName(model, fr) : '';
     if (opts.inline) {
       return '<div class="rzq-brand-logo-name is-inline" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
-        + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+        + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-logo-name-img' })
         + '<span class="rzq-brand-logo-name-text">'
         +   '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
         +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
@@ -1115,7 +1089,7 @@
         + '</div>';
     }
     return '<div class="rzq-brand-logo-name is-stack" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
-      + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+      + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-logo-name-img' })
       + '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
       + '</div>';
   }
@@ -1260,8 +1234,10 @@
     searchMatch: searchMatch,
     findByAlias: findByAlias,
     brandLetter: brandLetter,
+    logoUrl: logoUrl,
     logoSvg: logoSvg,
     logoDataUri: logoDataUri,
+    logoImgHtml: logoImgHtml,
     chipHtml: chipHtml,
     logoNameHtml: logoNameHtml,
     tileButtonHtml: tileButtonHtml,
