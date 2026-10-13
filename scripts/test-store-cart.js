@@ -18,7 +18,10 @@ assert(headerJs.includes('rizq-hdr-cart-lbl'), 'cart control must show visible �
 assert(headerJs.includes('commerceToolbarHtml()'), 'desk tools must reuse commerce toolbar');
 assert(storeHtml.includes('store-name-el'), 'addToCartStore must read store-name-el');
 assert(storeHtml.includes('_rizqWireStoreCartLinks'), 'store must rewire cart links after header inject');
-assert(storeHtml.includes("lineId = 'store-prod-' + id") || storeHtml.includes("var lineId = 'store-prod-' + id"), 'cart line ids must stay store-prod-*');
+assert(
+  storeHtml.includes("baseId = 'store-prod-' + id") || storeHtml.includes("lineId = 'store-prod-' + id") || storeHtml.includes("var lineId = 'store-prod-' + id"),
+  'cart line ids must stay store-prod-*'
+);
 assert(
   commerceJs.includes("parts[parts.length - 1]") || commerceJs.includes('parts.length - 1'),
   'withStoreId must use filename leaf (not full pathname) for GitHub Pages'
@@ -85,5 +88,36 @@ r = add(catalog, cart, 'P1', 'demo_store', 'محل النور');
 assert.strictEqual(cart[0].qty, 2);
 r = add(catalog, cart, 'NOPE', 'demo_store', 'محل النور');
 assert.strictEqual(r.ok, false);
+
+// Logic twin of RizqStoreCommerce.cartLinesForSeller / cartQtyForSeller
+function cartLinesForSeller(items, sellerId) {
+  const list = Array.isArray(items) ? items : [];
+  if (!sellerId) return list.slice();
+  const sid = String(sellerId);
+  return list.filter((c) => String((c && (c.storeId || c.accountId)) || '') === sid);
+}
+function cartQtyForSeller(items, sellerId) {
+  return cartLinesForSeller(items, sellerId).reduce((s, c) => s + (Number(c.qty) || 0), 0);
+}
+
+const mixed = [
+  { id: 'store-prod-1', storeId: 'demo_store', qty: 2, module: 'store' },
+  { id: 'showroom-car-9', storeId: 'demo-corp-001', accountId: 'demo-corp-001', qty: 1, module: 'showroom' },
+  { id: 'store-prod-2', storeId: 'other_store', qty: 3, module: 'store' }
+];
+assert.strictEqual(cartLinesForSeller(mixed, 'demo-corp-001').length, 1);
+assert.strictEqual(cartLinesForSeller(mixed, 'demo-corp-001')[0].id, 'showroom-car-9');
+assert.strictEqual(cartQtyForSeller(mixed, 'demo_store'), 2);
+assert.strictEqual(cartQtyForSeller(mixed, 'other_store'), 3);
+assert.strictEqual(cartLinesForSeller(mixed, '').length, 3, 'no seller id => general visitor cart');
+
+assert(commerceJs.includes('cartLinesForSeller'), 'commerce must export seller cart filter');
+assert(commerceJs.includes('cartQtyForSeller'), 'commerce must export seller cart qty');
+const cartHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_cart.html'), 'utf8');
+assert(cartHtml.includes('function activeCart'), 'cart page must scope visible lines');
+assert(cartHtml.includes('_cartScopeSellerId'), 'cart page must read seller scope from URL');
+const showroomHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_showroom.html'), 'utf8');
+assert(showroomHtml.includes('cartQtyForSeller') || showroomHtml.includes('cartLinesForSeller') || showroomHtml.includes("c.storeId || c.accountId"), 'showroom badge must count only its seller');
+assert(showroomHtml.includes('module=showroom'), 'showroom cart links must pass module=showroom');
 
 console.log('OK: store cart smoke tests passed');

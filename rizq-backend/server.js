@@ -226,6 +226,8 @@ const LOCAL_DEV_ORIGINS = [
   'http://127.0.0.1:5173',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
+  'http://localhost:8765',
+  'http://127.0.0.1:8765',
 ];
 /* أمان خارجي: أصول التطوير المحلية تُضاف فقط خارج الإنتاج */
 if (!isProdEnv()) {
@@ -1829,7 +1831,7 @@ function genDashToken() {
 const ACCOUNT_PUBLIC_FIELDS = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
   'activityId', 'activity', 'storeTopics',
-  'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 function toPublicAccount(acc) {
   const viewerId = null;
@@ -2022,7 +2024,18 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     promo_video_extra: String(b.promo_video_extra || '').slice(0, 500),
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
-    thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة
+    thumb: (function(){
+      const t = String(b.thumb || '').trim();
+      if (!t || /javascript:/i.test(t) || /[\s<>"']/.test(t)) return '';
+      if (!/^(https?:\/\/|\/|data:image\/)/i.test(t)) return '';
+      return t.slice(0, 2_000_000);
+    })(),
+    cover: (function(){
+      const t = String(b.cover || '').trim();
+      if (!t || /javascript:/i.test(t) || /[\s<>"']/.test(t)) return '';
+      if (!/^(https?:\/\/|\/|data:image\/)/i.test(t)) return '';
+      return t.slice(0, 2_000_000);
+    })(),
     tagline: stripBidiControls(String(b.tagline || '')).normalize('NFC').slice(0, 50),
     // إصلاح 13/08/2026: حقلا التوثيق (NNI + صورة بطاقة التعريف/جواز السفر)
     // كانا يُجمَعان في واجهة التسجيل (rizq_landing_v8.html) لكن لا يصلان

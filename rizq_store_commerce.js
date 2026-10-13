@@ -112,6 +112,11 @@
     if (p.oldPrice != null) p.oldPrice = parsePriceNum(p.oldPrice);
     if (!p.emoji) p.emoji = '📦';
     if (!Array.isArray(p.images) && p.image) p.images = [p.image];
+    if (p.variants != null && typeof p.variants !== 'string' && !Array.isArray(p.variants)) {
+      try { p.variants = String(p.variants); } catch (eV) { p.variants = ''; }
+    }
+    if (p.unit != null) p.unit = String(p.unit).slice(0, 40);
+    if (p.sku != null) p.sku = String(p.sku).slice(0, 64);
     return p;
   }
 
@@ -137,11 +142,189 @@
       desc: desc,
       descF: descF,
       stock: p.stock,
+      variants: p.variants || '',
+      unit: p.unit || '',
+      sku: p.sku || '',
       imgData: imgs[0] || p.imgData || '',
       imgDataArr: imgs,
       images: imgs,
       storeId: p.storeId || p.accountId || ''
     };
+  }
+
+  /** تقسيم خيارات المقاسات/الأوزان من نص البائع أو مصفوفة */
+  function splitVariantTokens(raw) {
+    if (Array.isArray(raw)) {
+      return raw.map(function (x) { return String(x == null ? '' : x).trim(); }).filter(Boolean);
+    }
+    var s = String(raw == null ? '' : raw).trim();
+    if (!s) return [];
+    return s.split(/[,،|/·•]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+
+  function inferVariantKind(product) {
+    var cat = String((product && product.cat) || '').toLowerCase();
+    var name = String((product && (product.name || product.nameF)) || '').toLowerCase();
+    var blob = cat + ' ' + name;
+    if (/حذاء|أحذية|صندل|basket|chaussure|shoe|sandal/.test(blob)) return 'shoe';
+    if (/أزياء|ملابس|قميص|فستان|تيشيرت|معطف|دراعة|robe|chemise|t-shirt|mode|clothing|apparel/.test(blob)) return 'apparel';
+    if (/كغ|كيلو|غرام|\bkg\b|\bg\b|وزن|weight|سمن|أرز|سكر|طحين|أغذية|تموين|aliment|food|épicerie/.test(blob)) return 'weight';
+    if (/مل|ml|لتر|litre|عطر|parfum|كريم/.test(blob)) return 'volume';
+    if (/gb|go|تخزين|phone|هاتف|إلكترون/.test(blob)) return 'storage';
+    return 'generic';
+  }
+
+  function defaultOptionsForKind(kind) {
+    if (kind === 'shoe') {
+      return ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(function (n) {
+        return { value: n, label: n + ' EU' };
+      });
+    }
+    if (kind === 'apparel') {
+      return ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(function (n) {
+        return { value: n, label: n };
+      });
+    }
+    if (kind === 'weight') {
+      return [
+        { value: '250g', label: '250 غ' },
+        { value: '500g', label: '500 غ' },
+        { value: '1kg', label: '1 كغ' },
+        { value: '5kg', label: '5 كغ' }
+      ];
+    }
+    if (kind === 'volume') {
+      return [
+        { value: '50ml', label: '50 مل' },
+        { value: '100ml', label: '100 مل' },
+        { value: '200ml', label: '200 مل' }
+      ];
+    }
+    if (kind === 'storage') {
+      return [
+        { value: '64GB', label: '64 GB' },
+        { value: '128GB', label: '128 GB' },
+        { value: '256GB', label: '256 GB' }
+      ];
+    }
+    return [];
+  }
+
+  function variantGroupMeta(kind, fr) {
+    var map = {
+      shoe: { key: 'size', ar: 'المقاس', fr: 'Taille' },
+      apparel: { key: 'size', ar: 'المقاس', fr: 'Taille' },
+      weight: { key: 'weight', ar: 'الوزن', fr: 'Poids' },
+      volume: { key: 'volume', ar: 'الحجم', fr: 'Volume' },
+      storage: { key: 'storage', ar: 'السعة', fr: 'Capacité' },
+      generic: { key: 'option', ar: 'الخيار', fr: 'Option' },
+      color: { key: 'color', ar: 'اللون', fr: 'Couleur' }
+    };
+    var m = map[kind] || map.generic;
+    return { key: m.key, label: fr ? m.fr : m.ar, labelAr: m.ar, labelFr: m.fr };
+  }
+
+  /**
+   * مجموعات خيارات ديناميكية للمنتج (مقاس / وزن / لون…) — من variants البائع أو استنتاج الفئة.
+   * الشكل: [{ key, label, options:[{value,label}] }]
+   */
+  function resolveVariantGroups(product, fr) {
+    fr = !!fr;
+    var p = product || {};
+    var groups = [];
+    var raw = p.variants;
+    var kind = inferVariantKind(p);
+
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      Object.keys(raw).forEach(function (k) {
+        var opts = splitVariantTokens(raw[k]).map(function (v) {
+          return { value: v, label: v };
+        });
+        if (!opts.length) return;
+        var lk = String(k).toLowerCase();
+        var meta = /لون|color|couleur/.test(lk)
+          ? variantGroupMeta('color', fr)
+          : (/وزن|weight|كغ|غرام/.test(lk)
+            ? variantGroupMeta('weight', fr)
+            : (/مقاس|size|taille|حذاء/.test(lk)
+              ? variantGroupMeta(kind === 'shoe' ? 'shoe' : 'apparel', fr)
+              : { key: 'opt_' + k, label: k, labelAr: k, labelFr: k }));
+        groups.push({
+          key: meta.key === 'option' ? ('opt_' + String(k).replace(/\s+/g, '_')) : meta.key,
+          label: meta.label || k,
+          options: opts
+        });
+      });
+    } else {
+      var text = String(raw == null ? '' : raw).trim();
+      if (text && /[:：]/.test(text)) {
+        text.split(/[·•|]+/).forEach(function (chunk) {
+          var parts = chunk.split(/[:：]/);
+          if (parts.length < 2) return;
+          var gName = parts[0].trim();
+          var opts = splitVariantTokens(parts.slice(1).join(':'));
+          if (!gName || !opts.length) return;
+          var lk = gName.toLowerCase();
+          var meta = /لون|color|couleur/.test(lk)
+            ? variantGroupMeta('color', fr)
+            : (/وزن|weight|poids|كغ|غ/.test(lk)
+              ? variantGroupMeta('weight', fr)
+              : (/مقاس|size|taille/.test(lk)
+                ? variantGroupMeta(kind === 'shoe' ? 'shoe' : 'apparel', fr)
+                : { key: 'opt_' + gName.replace(/\s+/g, '_'), label: gName }));
+          groups.push({
+            key: meta.key,
+            label: meta.label || gName,
+            options: opts.map(function (v) { return { value: v, label: v }; })
+          });
+        });
+      } else if (text) {
+        var tokens = splitVariantTokens(text);
+        if (tokens.length) {
+          var meta2 = variantGroupMeta(kind, fr);
+          groups.push({
+            key: meta2.key,
+            label: meta2.label,
+            options: tokens.map(function (v) { return { value: v, label: v }; })
+          });
+        }
+      }
+    }
+
+    if (!groups.length) {
+      var defaults = defaultOptionsForKind(kind);
+      if (defaults.length) {
+        var meta3 = variantGroupMeta(kind, fr);
+        groups.push({ key: meta3.key, label: meta3.label, options: defaults });
+      }
+    }
+    return groups;
+  }
+
+  function variantSelectionKey(selected) {
+    if (!selected || typeof selected !== 'object') return '';
+    return Object.keys(selected).sort().map(function (k) {
+      return k + '=' + String(selected[k] || '');
+    }).join('|');
+  }
+
+  function variantSelectionLabel(groups, selected, fr) {
+    if (!groups || !groups.length || !selected) return '';
+    return groups.map(function (g) {
+      var v = selected[g.key];
+      if (!v) return '';
+      var opt = (g.options || []).find(function (o) { return String(o.value) === String(v); });
+      var lab = opt ? opt.label : v;
+      return g.label + ': ' + lab;
+    }).filter(Boolean).join(' · ');
+  }
+
+  function cartLineIdForProduct(productId, selected) {
+    var base = String(productId == null ? '' : productId);
+    var vk = variantSelectionKey(selected);
+    if (!vk) return base;
+    var slug = vk.replace(/[^a-zA-Z0-9=_|-]+/g, '_').slice(0, 80);
+    return base + '__v_' + slug;
   }
 
   function pageSlice(list, page, size) {
@@ -163,10 +346,35 @@
   function storeIdFromUrl() {
     try {
       var params = new URLSearchParams(location.search);
-      return params.get('id') || params.get('store') || '';
+      return params.get('id') || params.get('store') || params.get('showroom') || params.get('corp') || '';
     } catch (e) {
       return '';
     }
+  }
+
+  /** معرّف البائع على سطر السلة (محل أو معرض) */
+  function cartLineSellerId(line) {
+    if (!line) return '';
+    return String(line.storeId || line.accountId || '');
+  }
+
+  /**
+   * سلة الزائر واحدة في localStorage، لكن واجهة كل محل/معرض تعرض فقط أسطره.
+   * بدون sellerId تُعاد كل الأسطر (السلة العامة).
+   */
+  function cartLinesForSeller(items, sellerId) {
+    var list = Array.isArray(items) ? items : [];
+    if (!sellerId) return list.slice();
+    var sid = String(sellerId);
+    return list.filter(function (c) {
+      return cartLineSellerId(c) === sid;
+    });
+  }
+
+  function cartQtyForSeller(items, sellerId) {
+    return cartLinesForSeller(items, sellerId).reduce(function (s, c) {
+      return s + (Number(c.qty) || 0);
+    }, 0);
   }
 
   function withStoreId(href, storeId) {
@@ -223,12 +431,174 @@
     if (!el) return;
     var safe = safeMediaUrl(thumb);
     if (safe) {
-      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" decoding="async" fetchpriority="high" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      var img = el.querySelector('img');
+      if (img && emoji) {
+        img.addEventListener('error', function () {
+          el.textContent = emoji;
+          el.classList.remove('is-storefront');
+        }, { once: true });
+      }
     } else if (emoji) {
       el.textContent = emoji;
     } else {
       el.textContent = '';
     }
+  }
+
+  function ensureStorefrontLightbox() {
+    var box = document.getElementById('rzq-storefront-lb');
+    if (box) return box;
+    box = document.createElement('div');
+    box.id = 'rzq-storefront-lb';
+    box.className = 'rzq-storefront-lb';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML =
+      '<div class="rzq-storefront-lb-panel">' +
+        '<button type="button" class="rzq-storefront-lb-close" aria-label="إغلاق">×</button>' +
+        '<figure class="rzq-storefront-lb-figure">' +
+          '<img class="rzq-storefront-lb-img" alt="" />' +
+          '<figcaption class="rzq-storefront-lb-cap"></figcaption>' +
+        '</figure>' +
+      '</div>';
+    document.body.appendChild(box);
+    function close() {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('rzq-storefront-lb-on');
+    }
+    box.addEventListener('click', function (e) {
+      if (e.target === box) close();
+    });
+    var closeBtn = box.querySelector('.rzq-storefront-lb-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) close();
+    });
+    box._rzqClose = close;
+    return box;
+  }
+
+  /**
+   * دائرة الشعار/واجهة المحل: تعرض صورة الواجهة، وبالضغط تنبثق صورة مهذبة.
+   * يُفضَّل cover (غلاف الواجهة)، ثم thumb.
+   */
+  function wireStorefrontLogo(el, opts) {
+    if (!el) return;
+    opts = opts || {};
+    var facade = safeMediaUrl(opts.cover) || safeMediaUrl(opts.thumb) || '';
+    var circle = safeMediaUrl(opts.cover) || safeMediaUrl(opts.thumb) || '';
+    var name = String(opts.name || '').trim();
+    var kind = String(opts.kind || 'store');
+    var fr = !!opts.fr;
+    var emoji = opts.emoji || (kind === 'corp' || kind === 'showroom' ? '🏛️' : '🏪');
+    setLogo(el, circle, emoji);
+    el.classList.toggle('is-storefront', !!facade);
+    el.setAttribute('role', facade ? 'button' : 'img');
+    el.tabIndex = facade ? 0 : -1;
+    var tip = fr
+      ? (kind === 'corp' || kind === 'showroom' ? 'Voir la vitrine du showroom' : 'Voir la façade de la boutique')
+      : (kind === 'corp' || kind === 'showroom' ? 'عرض واجهة المعرض' : 'عرض واجهة المحل');
+    if (facade) {
+      el.title = tip;
+      el.setAttribute('aria-label', tip + (name ? ' — ' + name : ''));
+    } else {
+      el.removeAttribute('title');
+      el.removeAttribute('aria-label');
+    }
+    el._rzqStorefront = { url: facade, name: name, kind: kind, fr: fr };
+    if (el._rzqStorefrontBound) return;
+    el._rzqStorefrontBound = true;
+    function open() {
+      var data = el._rzqStorefront || {};
+      if (!data.url) return;
+      var box = ensureStorefrontLightbox();
+      var img = box.querySelector('.rzq-storefront-lb-img');
+      var cap = box.querySelector('.rzq-storefront-lb-cap');
+      if (img) {
+        img.src = data.url;
+        img.alt = data.name || '';
+      }
+      if (cap) {
+        var label = data.fr
+          ? ((data.kind === 'corp' || data.kind === 'showroom') ? 'Vitrine du showroom' : 'Façade de la boutique')
+          : ((data.kind === 'corp' || data.kind === 'showroom') ? 'واجهة المعرض' : 'واجهة المحل');
+        cap.textContent = data.name ? (label + ' — ' + data.name) : label;
+      }
+      box.classList.add('is-open');
+      box.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('rzq-storefront-lb-on');
+    }
+    el.addEventListener('click', function (e) {
+      if (!(el._rzqStorefront && el._rzqStorefront.url)) return;
+      e.preventDefault();
+      open();
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (!(el._rzqStorefront && el._rzqStorefront.url)) return;
+        e.preventDefault();
+        open();
+      }
+    });
+  }
+
+  /**
+   * خلفية هيرو المحل/المعرض = غلاف مخصّص (cover) من الداشبورد.
+   * يُفضَّل cover؛ يمكن تمرير cover || thumb من الصفحة حتى لا يظهر الكحلي الفارغ.
+   */
+  function setHeroPhoto(heroEl, cover) {
+    if (!heroEl) return false;
+    var safe = safeMediaUrl(cover);
+    var slot = heroEl.querySelector('.hero-photo') || heroEl.querySelector('[data-hero-photo]');
+    if (!safe) {
+      heroEl.classList.remove('has-hero-photo');
+      if (slot) {
+        slot.innerHTML = '';
+        slot.hidden = true;
+        if (typeof slot.removeAttribute === 'function') slot.removeAttribute('style');
+        else if (slot.style) {
+          slot.style.backgroundImage = '';
+          slot.style.backgroundSize = '';
+          slot.style.backgroundPosition = '';
+        }
+      }
+      return false;
+    }
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.className = 'hero-photo';
+      slot.setAttribute('aria-hidden', 'true');
+      heroEl.insertBefore(slot, heroEl.firstChild);
+    }
+    slot.hidden = false;
+    /* أظهر الطبقة فوراً حتى قبل اكتمال تحميل الصورة — يمنع وميض الكحلي */
+    heroEl.classList.add('has-hero-photo');
+    slot.style.backgroundImage = 'url("' + String(safe).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '")';
+    slot.style.backgroundSize = 'cover';
+    slot.style.backgroundPosition = 'center';
+    var img = slot.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = '';
+      img.decoding = 'async';
+      img.setAttribute('fetchpriority', 'high');
+      slot.appendChild(img);
+    }
+    if (img.getAttribute('src') !== safe) img.src = safe;
+    try{
+      var sid = '';
+      try{
+        var q = new URLSearchParams(location.search);
+        sid = q.get('id') || q.get('store') || '';
+      }catch(eQ){}
+      if(sid && safe && safe.indexOf('data:') !== 0){
+        sessionStorage.setItem('rizq_store_cover_' + sid, String(safe).slice(0, 2000));
+      }
+    }catch(eCache){}
+    return true;
   }
 
   /**
@@ -275,7 +645,7 @@
   }
 
   /* ── لوحة تفاصيل منتج بهوية عرض الإعلان ── */
-  var _pdState = { product: null, idx: 0, qty: 1, opts: null, similar: [] };
+  var _pdState = { product: null, idx: 0, qty: 1, opts: null, similar: [], variantGroups: [], selected: {} };
 
   function ensureLightboxHost() {
     var box = document.getElementById('rzq-pd-lightbox');
@@ -351,6 +721,32 @@
     var qty = _pdState.qty || 1;
     var showCart = opts.showCart !== false;
     var showAsk = opts.showAsk !== false;
+    var groups = _pdState.variantGroups || [];
+    var selected = _pdState.selected || {};
+
+    var variantsHtml = '';
+    if (groups.length) {
+      variantsHtml = groups.map(function (g) {
+        var cur = selected[g.key] || '';
+        var curOpt = (g.options || []).find(function (o) { return String(o.value) === String(cur); });
+        var curLab = curOpt ? curOpt.label : cur;
+        return '<div class="rzq-pd-variant" data-vgroup="' + esc(g.key) + '">'
+          + '<div class="rzq-pd-variant-head">'
+          + '<span class="rzq-pd-variant-label">' + esc(g.label) + ': '
+          + '<strong id="rzq-pd-vsel-' + esc(g.key) + '">' + esc(curLab || (fr ? 'Choisir' : 'اختر')) + '</strong></span>'
+          + '</div>'
+          + '<div class="rzq-pd-variant-opts" role="listbox" aria-label="' + esc(g.label) + '">'
+          + (g.options || []).map(function (o) {
+            var on = String(o.value) === String(cur);
+            return '<button type="button" class="rzq-pd-vopt' + (on ? ' is-selected' : '') + '"'
+              + ' data-vgroup="' + esc(g.key) + '" data-vval="' + esc(o.value) + '"'
+              + ' aria-pressed="' + (on ? 'true' : 'false') + '"'
+              + ' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')">'
+              + esc(o.label) + '</button>';
+          }).join('')
+          + '</div></div>';
+      }).join('');
+    }
 
     var mainInner;
     if (imgs.length) {
@@ -429,6 +825,7 @@
       + '</div><div class="rzq-pd-period">' + esc(pricePeriod) + '</div></div>'
       + stockBadge(p, fr)
       + '</div>'
+      + variantsHtml
       + (showCart
         ? ('<div class="rzq-pd-qty"><span>' + (fr ? 'Quantité' : 'الكمية') + '</span>'
           + '<button type="button" onclick="RizqStoreCommerce.changeQty(-1)" aria-label="-">−</button>'
@@ -458,6 +855,10 @@
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">💰</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Prix' : 'السعر') + '</div><div class="rzq-pd-spec-val">' + esc(priceTxt) + '</div></div></div>'
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">🏪</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Magasin' : 'المحل') + '</div><div class="rzq-pd-spec-val">' + esc(storeName) + '</div></div></div>'
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📦</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Disponibilité' : 'التوفر') + '</div><div class="rzq-pd-spec-val">' + esc((global.RizqStock && RizqStock.buyerLabel) ? (RizqStock.buyerLabel(p.stock, fr) || {}).text || (fr ? 'En stock' : 'متوفر') : (fr ? 'En stock' : 'متوفر')) + '</div></div></div>'
+      + (p.unit ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">⚖</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Unité' : 'الوحدة') + '</div><div class="rzq-pd-spec-val">' + esc(p.unit) + '</div></div></div>' : '')
+      + (variantSelectionLabel(groups, selected, fr)
+        ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Choix' : 'اختيارك') + '</div><div class="rzq-pd-spec-val">' + esc(variantSelectionLabel(groups, selected, fr)) + '</div></div></div>'
+        : '')
       + '</div></div>'
       + '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '🏷 Étiquettes' : '🏷 الوسوم') + '</div>'
       + '<div class="rzq-pd-tags">'
@@ -497,7 +898,20 @@
     _pdState.product = p;
     _pdState.opts = opts;
     _pdState.idx = 0;
-    _pdState.qty = 1;
+    _pdState.qty = Math.max(1, Math.min(99, Number(opts.qty) || 1));
+    _pdState.variantGroups = resolveVariantGroups(p, !!opts.fr);
+    _pdState.selected = {};
+    if (opts.selected && typeof opts.selected === 'object') {
+      _pdState.selected = Object.assign({}, opts.selected);
+    } else if (opts.selectedVariant) {
+      var g0 = _pdState.variantGroups[0];
+      if (g0) _pdState.selected[g0.key] = String(opts.selectedVariant);
+    }
+    _pdState.variantGroups.forEach(function (g) {
+      if (!_pdState.selected[g.key] && g.options && g.options[0]) {
+        _pdState.selected[g.key] = String(g.options[0].value);
+      }
+    });
     _pdState.similar = catalog.filter(function (x) {
       return String(x.id) !== String(p.id) && (!p.cat || x.cat === p.cat);
     });
@@ -511,6 +925,27 @@
     root.classList.add('open');
     document.body.style.overflow = 'hidden';
     return true;
+  }
+
+  function selectVariant(groupKey, value) {
+    if (!_pdState.selected) _pdState.selected = {};
+    groupKey = String(groupKey);
+    value = String(value);
+    _pdState.selected[groupKey] = value;
+    var root = document.getElementById('rzq-pd-root');
+    if (!root) return;
+    root.querySelectorAll('.rzq-pd-vopt').forEach(function (btn) {
+      if (String(btn.getAttribute('data-vgroup')) !== groupKey) return;
+      var on = String(btn.getAttribute('data-vval')) === value;
+      btn.classList.toggle('is-selected', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var lab = document.getElementById('rzq-pd-vsel-' + groupKey);
+    if (lab) {
+      var g = (_pdState.variantGroups || []).find(function (x) { return x.key === groupKey; });
+      var opt = g && (g.options || []).find(function (o) { return String(o.value) === value; });
+      lab.textContent = opt ? opt.label : value;
+    }
   }
 
   function closeProductDetail() {
@@ -654,8 +1089,23 @@
     var p = _pdState.product;
     var opts = _pdState.opts || {};
     if (!p) return;
+    var groups = _pdState.variantGroups || [];
+    var selected = Object.assign({}, _pdState.selected || {});
+    for (var i = 0; i < groups.length; i++) {
+      if (!selected[groups[i].key]) {
+        var msg = opts.fr ? 'Choisissez ' + groups[i].label : 'اختر ' + groups[i].label;
+        if (typeof global.showToast === 'function') global.showToast('❌ ' + msg);
+        return;
+      }
+    }
+    var selection = {
+      selected: selected,
+      key: variantSelectionKey(selected),
+      label: variantSelectionLabel(groups, selected, !!opts.fr),
+      groups: groups
+    };
     if (typeof opts.onAdd === 'function') {
-      opts.onAdd(p, _pdState.qty || 1);
+      opts.onAdd(p, _pdState.qty || 1, selection);
     }
     closeProductDetail();
   }
@@ -718,9 +1168,14 @@
     mapRawProduct: mapRawProduct,
     pageSlice: pageSlice,
     storeIdFromUrl: storeIdFromUrl,
+    cartLineSellerId: cartLineSellerId,
+    cartLinesForSeller: cartLinesForSeller,
+    cartQtyForSeller: cartQtyForSeller,
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
     setLogo: setLogo,
+    wireStorefrontLogo: wireStorefrontLogo,
+    setHeroPhoto: setHeroPhoto,
     introVideoSlots: introVideoSlots,
     promoVideosOf: promoVideosOf,
     openProductDetail: openProductDetail,
@@ -732,6 +1187,11 @@
     onMainImgError: onMainImgError,
     onLightboxImgError: onLightboxImgError,
     changeQty: changeQty,
+    selectVariant: selectVariant,
+    resolveVariantGroups: resolveVariantGroups,
+    variantSelectionKey: variantSelectionKey,
+    variantSelectionLabel: variantSelectionLabel,
+    cartLineIdForProduct: cartLineIdForProduct,
     addFromDetail: addFromDetail,
     askFromDetail: askFromDetail,
     wishFromDetail: wishFromDetail,

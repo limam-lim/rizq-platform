@@ -136,9 +136,10 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-video-frame{min-height:220px;min-width:0;width:100%;max-width:100%;background:#040a12;border-radius:12px;overflow:hidden;border:1px solid rgba(201,168,76,.28);box-sizing:border-box}
 .store-video-frame .rzq-iv-wrap{max-width:100%;width:100%;margin:0;height:100%;box-sizing:border-box}
 .store-video-frame .rzq-iv-frame{border-radius:12px;aspect-ratio:16/9;min-height:220px;width:100%;max-width:100%;animation:none;box-shadow:0 0 0 1px rgba(201,168,76,.35);box-sizing:border-box}
-.store-video-frame .rzq-iv-badge{font-size:11px;padding:6px 12px}
+.store-video-frame .rzq-iv-badge,
+.store-video-frame .rzq-iv-play-label{display:none!important}
 .store-video-frame .rzq-iv-src{color:rgba(232,201,106,.75);margin-top:8px}
-#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:160px;aspect-ratio:1.1/1;border-radius:0}
+#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:150px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
 .store-load-more{
   display:none;width:100%;margin-top:14px;padding:12px 16px;border-radius:12px;
@@ -173,10 +174,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
     object-fit:contain !important;background:#040a12 !important;
   }
   .store-video-frame .rzq-iv-poster{background-size:contain;background-repeat:no-repeat;background-color:#040a12}
-  .store-video-frame .rzq-iv-play{width:48px;height:48px;font-size:20px}
-  /* على الهاتف: زر ▶ يكفي — إخفاء شريط النص الطويل يقلّل الإحساس بالحجم الزائد */
-  .store-video-frame .rzq-iv-play-label{display:none}
-  .store-video-frame .rzq-iv-badge{font-size:10px;padding:4px 9px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis}
+  .store-video-frame .rzq-iv-play{width:40px;height:40px;font-size:16px;opacity:.28}
   .store-video-frame .rzq-iv-sound{
     font-size:11px;padding:6px 10px;max-width:calc(100% - 18px);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -185,9 +183,23 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
-.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#2a3a1f 0%,#1B3A6B 38%,#0D1B2A 100%);display:flex;flex-direction:column;justify-content:center}
+/* خلفية محايدة من الإطار الأول — لا وميض اللون الزيتوني القديم قبل الغلاف */
+.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#0D1B2A;display:flex;flex-direction:column;justify-content:center}
+.store-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#0D1B2A 100%)}
+.store-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#0D1B2A center/cover no-repeat}
+.store-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04);animation:rzHeroKen 28s ease-in-out infinite alternate}
+@media(max-width:900px),(prefers-reduced-motion:reduce){
+  .store-hero .hero-photo img{animation:none;transform:none}
+}
+@keyframes rzHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
+.store-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(13,27,42,.88) 0%,rgba(13,27,42,.62) 42%,rgba(13,27,42,.78) 100%)}
+.store-hero.has-hero-photo{background:#0D1B2A}
+.store-hero.has-hero-photo .hero-beams,
+.store-hero.has-hero-photo .hero-floor,
+.store-hero.has-hero-photo .hero-glints{display:none}
+.store-hero.has-hero-photo .hero-pattern{opacity:.18}
 .store-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(201,168,76,.22) 8deg,transparent 20deg,transparent 340deg,rgba(232,201,106,.14) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
-.hero-pattern{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 18% 30%,rgba(201,168,76,.16) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(27,58,107,.35) 0%,transparent 45%)}
+.hero-pattern{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(circle at 18% 30%,rgba(201,168,76,.16) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(27,58,107,.35) 0%,transparent 45%)}
 .store-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#E8C96A;box-shadow:0 0 8px 2px rgba(232,201,106,.8);animation:rzStGlint 3.4s ease-in-out infinite}
 .store-hero .hero-glints span:nth-child(1){top:18%;left:12%;animation-delay:.2s}
 .store-hero .hero-glints span:nth-child(2){top:30%;left:82%;animation-delay:1.1s}
@@ -196,22 +208,95 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
 @keyframes rzStGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
 .store-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(201,168,76,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.16) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55;z-index:0}
-.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
-.store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:920px;width:auto;position:relative;z-index:1}
-.store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:inherit}
+.store-hero-stage{display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,36px);max-width:920px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
+.store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:720px;width:auto;position:relative;z-index:1;flex:1 1 280px}
+/* بطاقات الفيديو — ركن الهيرو بحجم أوضح (قريب من السابق) دون تجاوز شريط الأزرار */
+.hero-videos{
+  display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
+  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
+}
+.store-hero.has-hero-videos .hero-videos{display:flex}
+.store-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
+.hero-video-card{
+  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
+  background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
+  border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzHeroVidIn .7s ease both
+}
+.hero-video-card:nth-child(2){animation-delay:.12s}
+@keyframes rzHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero-video-card .hero-video-mount{min-height:0}
+.hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
+.hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
+.hero-video-card .rzq-iv-badge{display:none}
+.hero-video-card .rzq-iv-src{display:none}
+.hero-video-card .rzq-iv-play{
+  width:40px!important;height:40px!important;font-size:16px!important;
+  opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
+  border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
+  transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+}
+.hero-video-card .rzq-iv-badge,
+.hero-video-card .rzq-iv-play-label,
+.hero-video-caption{display:none!important}
+.hero-video-card .rzq-iv-sound,
+.hero-video-card .rzq-iv-dash-hint{
+  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important
+}
+.hero-video-card .rzq-iv-sound{
+  font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
+  border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.hero-video-card:hover .rzq-iv-sound.is-on,
+.hero-video-card:focus-within .rzq-iv-sound.is-on{
+  opacity:1!important;pointer-events:auto!important
+}
+.hero-video-card:hover .rzq-iv-play,
+.hero-video-card:focus-within .rzq-iv-play{
+  opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
+}
+@media(max-width:900px){
+  .store-hero-stage{flex-direction:column;gap:14px}
+  .hero-cover{padding-bottom:18px}
+  .hero-videos{
+    position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
+    justify-content:center;padding:0 10px 6px;gap:8px
+  }
+  .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
+}
+.store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite;position:relative}
+.store-logo-wrap.is-storefront{cursor:pointer}
+.store-logo-wrap.is-storefront::after{
+  content:'⌕';position:absolute;bottom:-2px;inset-inline-end:-2px;width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0D1B2A;font-size:12px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);line-height:1
+}
+.store-logo-wrap.is-storefront:hover{filter:brightness(1.06)}
 @keyframes rzStPulse{0%,100%{box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(201,168,76,.16),0 0 40px rgba(201,168,76,.55),0 8px 20px rgba(0,0,0,.5)}}
+/* انبثاق واجهة المحل */
+.rzq-storefront-lb{position:fixed;inset:0;z-index:12000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,17,28,.72);backdrop-filter:blur(8px)}
+.rzq-storefront-lb.is-open{display:flex}
+.rzq-storefront-lb-panel{position:relative;max-width:min(920px,96vw);width:100%;border-radius:18px;overflow:hidden;border:1px solid rgba(201,168,76,.45);background:#0D1B2A;box-shadow:0 24px 60px rgba(0,0,0,.45);animation:rzSfLbIn .28s ease}
+@keyframes rzSfLbIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.rzq-storefront-lb-close{position:absolute;top:10px;inset-inline-end:10px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.rzq-storefront-lb-close:hover{background:rgba(201,168,76,.9);color:#0D1B2A;border-color:transparent}
+.rzq-storefront-lb-figure{margin:0}
+.rzq-storefront-lb-img{display:block;width:100%;max-height:min(72vh,640px);object-fit:cover;background:#06111C}
+.rzq-storefront-lb-cap{margin:0;padding:12px 16px 14px;font-size:13.5px;font-weight:700;color:#E8C96A;text-align:center;background:linear-gradient(180deg,#0F2347,#0D1B2A)}
+body.rzq-storefront-lb-on{overflow:hidden}
 .store-info{flex:0 1 auto;min-width:0;text-align:start}
 .store-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#E8C96A;margin-bottom:8px;display:block}
 .store-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;margin-bottom:0;background:linear-gradient(100deg,#fff 30%,#F5DFA0 45%,#C9A84C 50%,#F5DFA0 55%,#fff 70%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rzStShimmer 5s linear infinite}
 @keyframes rzStShimmer{0%{background-position:0% center}100%{background-position:-220% center}}
-.store-tagline{font-size:14.5px;color:rgba(255,255,255,.68);margin-top:10px;padding-top:12px;border-top:1px solid rgba(201,168,76,.3);display:inline-block}
+.store-tagline{font-size:14.5px;color:rgba(255,255,255,.94);margin-top:10px;padding-top:12px;border-top:1px solid rgba(201,168,76,.45);display:inline-block;font-weight:600;text-shadow:0 1px 10px rgba(0,0,0,.55)}
 .store-meta{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
-.store-meta span{font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;background:transparent;padding:0;border-radius:0}
+.store-meta span{font-size:12.5px;color:rgba(255,255,255,.92);display:flex;align-items:center;gap:6px;background:transparent;padding:0;border-radius:0;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 .store-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.badge{padding:5px 13px;border-radius:10px;font-size:11px;font-weight:700;backdrop-filter:blur(6px);letter-spacing:0}
-.badge-open{background:rgba(46,204,113,.15);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
-.badge-delivery{background:rgba(201,168,76,.15);color:#C9A84C;border:1px solid rgba(201,168,76,.3)}
-.badge-pickup{background:rgba(27,58,107,.4);color:#7aa0e0;border:1px solid rgba(122,160,224,.35)}
+.badge{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;backdrop-filter:blur(8px);letter-spacing:0;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.badge-open{background:rgba(16,80,40,.55);color:#9dffc0;border:1px solid rgba(90,230,140,.65)}
+.badge-delivery{background:rgba(60,45,12,.55);color:#F5DFA0;border:1px solid rgba(232,201,106,.65)}
+.badge-pickup{background:rgba(15,35,71,.65);color:#c5d8ff;border:1px solid rgba(150,185,245,.55)}
 .store-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzStBounce 2s ease-in-out infinite}
 @keyframes rzStBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 @media(max-width:640px){
@@ -274,16 +359,21 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 .content-grid{
   display:grid;
-  /* يمين = الموقع والتواصل | يسار = المنتجات (RTL) */
+  /* يمين = الموقع والتواصل | يسار = المنتجات + شريط الطلبات/التقييمات (RTL) */
   grid-template-columns:minmax(300px,340px) minmax(0,1fr);
   grid-template-areas:"side main";
   gap:28px;
   align-items:start;
 }
-.content-grid > main{
+.content-grid > .store-main-col{
   grid-area:main;
   min-width:0;
-  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.content-grid > .store-main-col > main{
+  min-width:0;
   display:flex;
   flex-direction:column;
   background:#fff;
@@ -292,61 +382,71 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
-/* شريط ختامي — بعد معلومات المحل وساعات العمل (قبل الباقات) */
+.content-grid > .store-main-col > main .products-grid{
+  flex:1 1 auto;
+}
+/* طرق الدفع في الشريط — مضغوطة حتى لا تطيل العمود وتترك فراغاً */
+#store-payment-methods{
+  max-height:200px;
+  overflow:auto;
+  margin-top:6px;
+  padding-inline-end:2px;
+  scrollbar-width:thin;
+}
+#store-payment-methods > div:first-child{font-size:12px!important;margin-bottom:4px!important}
+#store-payment-methods > div:nth-child(2){font-size:11px!important;margin-bottom:6px!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#store-payment-methods > div[style*="border-radius:10px"]{
+  padding:8px 10px!important;margin-bottom:6px!important
+}
+/* شريط ختامي مضغوط — لا يطغى على الواجهة */
 .store-close-band{
   max-width:1280px;
   width:calc(100% - 24px);
-  margin:14px auto 0;
-  padding:16px 14px 14px;
-  border-radius:14px;
-  background:
-    radial-gradient(ellipse at 80% 0%, rgba(201,168,76,.18), transparent 55%),
-    linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
-  border:1px solid rgba(201,168,76,.32);
-  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 8px 22px rgba(13,27,42,.14);
+  margin:10px auto 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
+  border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 4px 14px rgba(13,27,42,.12);
   color:#fff;
   position:relative;
   overflow:hidden;
   box-sizing:border-box;
 }
-.store-close-band::before{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(120deg,transparent 40%,rgba(201,168,76,.06) 50%,transparent 60%);
-  pointer-events:none;
+.store-close-band::before{display:none}
+.store-close-inner{
+  position:relative;z-index:1;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px
 }
-.store-close-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px}
 .store-close-eyebrow{
-  margin:0;font-size:11px;letter-spacing:1.6px;font-weight:800;
-  color:rgba(232,201,106,.9);text-transform:uppercase;
+  margin:0;font-size:10px;letter-spacing:1.2px;font-weight:800;
+  color:rgba(232,201,106,.9);text-transform:uppercase;width:100%
 }
 .store-close-title{
-  margin:0;font-size:clamp(17px,2.2vw,21px);font-weight:900;line-height:1.35;
-  color:#fff;
+  margin:0;font-size:clamp(14px,1.6vw,16px);font-weight:900;line-height:1.3;
+  color:#fff;flex:1 1 180px
 }
 .store-close-title span{
   background:linear-gradient(90deg,#E8C96A,#C9A84C);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.store-close-desc{
-  margin:0;font-size:13px;line-height:1.7;color:rgba(255,255,255,.72);max-width:46ch;
-}
+.store-close-desc{display:none}
 .store-close-pillars{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px;
+  display:flex;flex-wrap:wrap;gap:6px;margin:0;flex:1 1 260px
 }
 .store-close-pillar{
-  padding:12px 10px;border-radius:12px;
+  padding:6px 8px;border-radius:8px;
   background:rgba(255,255,255,.05);
-  border:1px solid rgba(201,168,76,.22);
-  text-align:center;
+  border:1px solid rgba(201,168,76,.2);
+  text-align:center;flex:1 1 90px;min-width:88px
 }
-.store-close-pillar-ico{font-size:18px;line-height:1;margin-bottom:6px}
-.store-close-pillar-ttl{font-size:12.5px;font-weight:800;color:#E8C96A;margin-bottom:3px}
-.store-close-pillar-txt{font-size:11px;color:rgba(255,255,255,.62);line-height:1.45}
-.store-close-ctas{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.store-close-pillar-ico{font-size:14px;line-height:1;margin-bottom:2px}
+.store-close-pillar-ttl{font-size:11px;font-weight:800;color:#E8C96A;margin-bottom:0}
+.store-close-pillar-txt{display:none}
+.store-close-ctas{display:flex;flex-wrap:wrap;gap:6px;margin:0}
 .store-close-cta{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 14px;border-radius:10px;font:inherit;font-size:12.5px;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:7px 11px;border-radius:8px;font:inherit;font-size:11.5px;font-weight:800;
   cursor:pointer;text-decoration:none;border:none;transition:transform .15s,filter .15s,background .2s;
 }
 .store-close-cta:hover{transform:translateY(-1px);filter:brightness(1.04)}
@@ -355,13 +455,9 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   background:transparent;color:#E8C96A;border:1px solid rgba(201,168,76,.55);
 }
 @media(max-width:800px){
-  .store-close-band{margin:10px 12px 0;width:auto;padding:12px 12px 12px}
-  .store-close-title{font-size:15px!important}
-  .store-close-desc{font-size:11.5px!important;line-height:1.5}
-  .store-close-pillars{grid-template-columns:1fr;gap:6px}
-  .store-close-pillar{padding:8px 8px}
-  .store-close-pillar-ttl{font-size:11.5px}
-  .store-close-pillar-txt{font-size:10px}
+  .store-close-band{margin:8px 12px 0;width:auto;padding:10px}
+  .store-close-title{font-size:13px!important}
+  .store-close-pillars{flex:1 1 100%}
 }
 .content-grid > aside#info-section{
   grid-area:side;
@@ -414,7 +510,7 @@ html[dir="ltr"] .info-row{direction:ltr!important}
 /* ساعات العمل: اليوم والوقت ملتصقان يميناً */
 .hours-row{
   display:flex!important;justify-content:flex-start!important;align-items:baseline!important;
-  gap:12px!important;padding:7px 0;font-size:13px;border-bottom:1px solid #f0f3f8;
+  gap:12px!important;padding:4px 0;font-size:12.5px;border-bottom:1px solid #f0f3f8;
   text-align:start!important;direction:inherit!important;
 }
 html[dir="rtl"] .hours-row{direction:rtl!important}
@@ -496,10 +592,10 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   background:linear-gradient(135deg,var(--navy),#234d8f);color:#fff;
   box-shadow:0 4px 14px rgba(27,58,107,.25);
 }
-/* Products grid */
+/* Products grid — صور المنتجات تملأ عمود الواجهة */
 .products-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-  gap:16px;min-height:180px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:14px;min-height:280px;
 }
 .product-card{
   background:var(--white);border-radius:14px;
@@ -527,21 +623,120 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-#reviews-section > div{
-  background:linear-gradient(165deg,#fff,#fbfcfe)!important;
-  border:1px solid rgba(27,58,107,.08)!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 28px rgba(15,35,65,.05)!important;
+/* غرفة الطلبات + التقييمات — شريط أفقي تحت المنتجات يملأ فراغ العمود بتناسق الواجهة */
+.store-under-band{
+  display:grid;
+  grid-template-columns:1.08fr 0.92fr;
+  gap:12px;
+  margin:0;
+  align-items:stretch;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:12px;
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
+    linear-gradient(165deg,#ffffff 0%,#f7f9fc 100%);
+  border:1px solid rgba(27,58,107,.08);
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
+#store-service-desk.store-desk-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  border-radius:14px;
+  box-shadow:none;
+  border:1px solid rgba(27,58,107,.08);
+  background:#fff;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.store-desk-eyebrow{
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
+}
+.store-desk-hint{
+  font-size:11.5px;color:#6a7a8a;margin:0 0 8px;line-height:1.45
+}
+.store-desk-form{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:7px 8px;
+  width:100%;
+  flex:1 1 auto;
+  align-content:start;
+}
+.store-desk-field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.store-desk-field label{font-size:11px;font-weight:800;color:#0F2347}
+.store-desk-field .req-input,
+.store-desk-field input.req-input,
+.store-desk-field textarea.req-input{
+  display:block;width:100%;margin:0;padding:8px 10px;
+  border:1.5px solid #e2e8f5;border-radius:8px;font-size:12.5px;font-family:inherit;
+  box-sizing:border-box;min-height:36px;background:#fff;resize:vertical
+}
+.store-desk-span2{grid-column:1/-1}
+.store-desk-actions{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:2px
+}
+.store-desk-note{
+  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 160px;
+  padding:8px 10px;border-radius:8px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
+}
+#store-service-desk #store-req-submit,
+.store-desk-actions #store-req-submit{
+  flex:0 1 180px;width:auto;padding:10px 12px;border:none;border-radius:9px;
+  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
+  cursor:pointer;font-family:inherit;min-height:38px
+}
+#reviews-section.store-reviews-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  background:#fff;
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:14px;
+  box-shadow:none;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+#reviews-section .store-reviews-inner{
+  background:transparent!important;border:none!important;border-radius:0!important;
+  box-shadow:none!important;padding:0!important;flex:1 1 auto;
+  display:flex;flex-direction:column;
+}
+#reviews-section .store-reviews-summary{
+  display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap
+}
+#reviews-section .store-reviews-score{text-align:center;min-width:72px}
+#reviews-section #store-big-rating{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section #store-big-stars{color:#F5A623;font-size:14px;margin:3px 0}
+#reviews-section #store-big-count{font-size:11px;color:#6a7a8a}
+#reviews-section #reviews-list{flex:1 1 auto}
 #reviews-section .view-all-btn{
-  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;
+  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;margin-top:auto
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media(max-width:1100px) and (min-width:801px){
+  .store-under-band{gap:12px;padding:12px}
+}
+@media(max-width:800px){
+  .store-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  #store-service-desk.store-desk-hz,
+  #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  .store-desk-form{grid-template-columns:1fr}
+  .store-desk-span2{grid-column:auto}
+  .store-desk-actions #store-req-submit{flex:1 1 100%;width:100%}
+}
 .product-img{
-  height:160px;
+  height:150px;
   background:linear-gradient(135deg,#e8eef8,#f5f8ff);
   display:flex;align-items:center;justify-content:center;
-  font-size:56px;position:relative;overflow:hidden;
+  font-size:48px;position:relative;overflow:hidden;
   transition:transform .4s ease;
 }
 .product-img img{width:100%;height:100%;object-fit:cover;display:block}
@@ -623,7 +818,7 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
 
 /* ====== MAP PLACEHOLDER ====== */
 .map-placeholder{
-  height:148px;border-radius:12px;
+  height:110px;border-radius:12px;
   background:
     linear-gradient(145deg,rgba(27,58,107,.08),rgba(201,168,76,.1)),
     linear-gradient(135deg,#e8eef8,#dce6f2);
@@ -632,7 +827,7 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
   transition:all .3s;
 }
 .map-placeholder:hover{border-color:rgba(201,168,76,.45);transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,.1)}
-.map-placeholder .map-icon{font-size:34px}
+.map-placeholder .map-icon{font-size:28px}
 .map-placeholder .map-text{font-size:13px;font-weight:700;color:var(--navy)}
 .map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -706,7 +901,7 @@ footer{
 @media(max-width:1100px) and (min-width:801px){
   .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
   .main-wrap{padding:22px 16px 40px}
-  .content-grid > main{padding:16px}
+  .content-grid > .store-main-col > main{padding:16px}
   .store-name{font-size:26px}
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
@@ -719,7 +914,7 @@ footer{
     gap:18px;
   }
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
-  .content-grid > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  .content-grid > .store-main-col > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
   .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
@@ -1005,7 +1200,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.0" defer></script>
+  <script src="rizq_store_commerce.js?v=29.4" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1050,31 +1245,77 @@ footer{
 
 <!-- STORE HERO -->
 <div class="store-hero" id="store-hero">
+  <div class="hero-photo" data-hero-photo aria-hidden="true" hidden></div>
   <div class="hero-pattern"></div>
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <script>
+  /* غلاف مبكر من الكاش — يمنع وميض الخلفية القديمة قبل صورة الغلاف */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var id = q.get('id') || q.get('store') || '';
+      var hero = document.getElementById('store-hero');
+      if(!hero) return;
+      var cover = '';
+      if(id){
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        for(var i=0;i<accs.length;i++){
+          var a = accs[i];
+          if(a && a.id === id && a.type === 'store' && (a.cover || a.thumb)){
+            cover = String(a.cover || a.thumb || '');
+            break;
+          }
+        }
+      }
+      if(!cover){
+        try{ cover = String(sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
+      }
+      if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
+      if(!/^(https?:\/\/|\/|data:image\/)/i.test(cover)) return;
+      var slot = hero.querySelector('[data-hero-photo]');
+      if(!slot) return;
+      slot.hidden = false;
+      hero.classList.add('has-hero-photo');
+      slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+      slot.style.backgroundSize = 'cover';
+      slot.style.backgroundPosition = 'center';
+      try{ if(id) sessionStorage.setItem('rizq_store_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+    }catch(e){}
+  })();
+  </script>
   <div class="hero-cover">
-    <div class="store-profile">
-      <div class="store-logo-wrap" id="store-logo-wrap">🏪</div>
-      <div class="store-info">
-        <span class="store-eyebrow">✨ RIZQ STORES</span>
-        <div class="store-name" id="store-name-el">—</div>
-        <div class="store-tagline" id="store-tagline-el"></div>
-        <div class="store-meta">
-          <span id="meta-location-el">📍 —</span>
-          <span id="store-hero-rating-meta">⭐ —</span>
-          <span data-t="meta-delivery-badge">🚚 توصيل & استلام</span>
-        </div>
-        <div class="store-badges">
-          <span class="badge badge-open" data-t="badge-open" style="display:none">🟢 مفتوح الآن</span>
-          <span class="badge badge-delivery" data-t="badge-delivery" style="display:none">🚚 توصيل</span>
-          <span class="badge badge-pickup" data-t="badge-pickup" style="display:none">🏪 استلام من المحل</span>
-          <span class="badge" id="badge-verified-lbl" data-t="badge-verified" style="display:none;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#16a34a">✅ محل موثّق</span>
-          <span class="badge rizq-feat-badge" id="premium-badge-lbl" data-t="badge-premium" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none;font-weight:900;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏅 محل مميّز</span>
-          <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</span>
+    <div class="store-hero-stage">
+      <div class="store-profile">
+        <div class="store-logo-wrap" id="store-logo-wrap" aria-hidden="true"></div>
+        <div class="store-info">
+          <span class="store-eyebrow">✨ RIZQ STORES</span>
+          <div class="store-name" id="store-name-el">—</div>
+          <div class="store-tagline" id="store-tagline-el"></div>
+          <div class="store-meta">
+            <span id="meta-location-el">📍 —</span>
+            <span id="store-hero-rating-meta">⭐ —</span>
+            <span data-t="meta-delivery-badge">🚚 توصيل & استلام</span>
+          </div>
+          <div class="store-badges">
+            <span class="badge badge-open" data-t="badge-open" style="display:none">🟢 مفتوح الآن</span>
+            <span class="badge badge-delivery" data-t="badge-delivery" style="display:none">🚚 توصيل</span>
+            <span class="badge badge-pickup" data-t="badge-pickup" style="display:none">🏪 استلام من المحل</span>
+            <span class="badge" id="badge-verified-lbl" data-t="badge-verified" style="display:none;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#16a34a">✅ محل موثّق</span>
+            <span class="badge rizq-feat-badge" id="premium-badge-lbl" data-t="badge-premium" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none;font-weight:900;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏅 محل مميّز</span>
+            <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</span>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="hero-videos" id="store-hero-videos" aria-label="فيديوهات المحل">
+    <div class="hero-video-card" id="hero-intro-card" style="display:none">
+      <div class="hero-video-mount" id="hero-intro-video-mount"></div>
+    </div>
+    <div class="hero-video-card" id="hero-extra-card" style="display:none">
+      <div class="hero-video-mount" id="hero-extra-video-mount"></div>
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
@@ -1204,32 +1445,10 @@ footer{
         </div>
         <div id="store-payment-methods" style="display:none"></div>
       </div>
-
-      <!-- غرفة الطلبات — حقول ظاهرة دائماً -->
-      <div class="info-card" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important">
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
-        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:6px">📩 طلب من المحل</div>
-        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-        <div id="store-req-form" style="display:block!important">
-          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
-          <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمحل</label>
-          <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
-          <p style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمحل</button>
-        </div>
-      </div>
     </aside>
 
-    <!-- RIGHT: PRODUCTS + REVIEWS -->
+    <!-- عمود المنتجات: المنتجات ثم شريط غرفة الطلبات + التقييمات أفقياً لملء الفراغ -->
+    <div class="store-main-col">
     <main>
 <!-- Rizq Intermediary Notice -->
 
@@ -1265,25 +1484,64 @@ footer{
           لا توجد منتجات بعد
         </div>
       </div>
-      <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 15 منتجاً التالية</button>
+      <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 8 منتجات التالية</button>
+    </main>
 
-      <!-- Reviews -->
-      <div style="margin-top:20px" id="reviews-section">
-        <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-        <div style="padding:14px 12px">
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
-            <div style="text-align:center;min-width:90px">
-              <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
-              <div style="color:#F5A623;font-size:15px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
-              <div style="font-size:11px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+    <!-- غرفة الطلبات + التقييمات — أفقيان تحت المنتجات يملآن الفراغ بتناسق الواجهة -->
+    <div class="store-under-band" id="store-under-band">
+      <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
+        <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
+        <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة.</p>
+        <div id="store-req-form" class="store-desk-form">
+          <div class="store-desk-field">
+            <label for="rf-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-whatsapp">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
+          </div>
+          <div class="store-desk-field store-desk-span2">
+            <label for="rf-service">المنتج / الموضوع</label>
+            <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
+          </div>
+          <div class="store-desk-field store-desk-span2">
+            <label for="rf-msg">رسالتك للمحل</label>
+            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+          </div>
+          <div class="store-desk-actions">
+            <p class="store-desk-note">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="store-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+        <div class="info-card-title" style="margin-bottom:8px" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+        <div class="store-reviews-inner">
+          <div class="store-reviews-summary">
+            <div class="store-reviews-score">
+              <div id="store-big-rating">—</div>
+              <div id="store-big-stars">☆☆☆☆☆</div>
+              <div id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
             </div>
-            <div style="flex:1;min-width:140px" id="store-rating-breakdown"></div>
+            <div id="store-rating-breakdown" style="flex:1;min-width:120px"></div>
           </div>
           <div id="reviews-list"></div>
-          <button class="view-all-btn" style="margin-top:10px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+          <button class="view-all-btn" style="margin-top:8px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
+    </div><!-- /.store-main-col -->
   </div>
 </div>
 
@@ -1464,6 +1722,7 @@ function openQuickView(id, name, price, emoji, cat){
       catalog.push({
         id: k, name: f.name || '', nameF: f.nameF || f.name || '', price: f.price || 0,
         emoji: f.emoji || '📦', cat: f.cat || '',
+        variants: f.variants || ex.variants || '', unit: f.unit || ex.unit || '',
         images: ex.images || [], imgDataArr: ex.images || [],
         desc: ex.desc || '', descF: ex.descFr || '', stock: ex.stock
       });
@@ -1477,6 +1736,8 @@ function openQuickView(id, name, price, emoji, cat){
     price: parseFloat(String(price||'').replace(/[^\d.]/g,'')) || feat.price || 0,
     emoji: emoji || feat.emoji || '📦',
     cat: cat || feat.cat || '',
+    variants: feat.variants || extra.variants || '',
+    unit: feat.unit || extra.unit || '',
     images: images, imgDataArr: images,
     desc: extra.desc || '', descF: extra.descFr || '',
     stock: extra.stock
@@ -1487,8 +1748,8 @@ function openQuickView(id, name, price, emoji, cat){
       fr: fr,
       storeName: storeName,
       catalog: catalog,
-      onAdd: function(p, qty){
-        for(var i=0;i<(qty||1);i++) addToCartStore(p.id);
+      onAdd: function(p, qty, selection){
+        addToCartStore(p.id, qty || 1, selection);
       },
       onWish: function(p){
         var nm = fr ? (p.nameF || p.name) : (p.name || p.nameF || '');
@@ -1597,7 +1858,8 @@ function rizqShare(title, url) {
         <li><a href="rizq_browse.html" id="rzq-ft-l2">تصفّح الإعلانات</a></li>
         <li><a href="rizq_post.html" id="rzq-ft-l3">انشر إعلانك</a></li>
         <li><a href="rizq_landing_v8.html#pricing" id="rzq-ft-l4">الأسعار</a></li>
-        <li><a href="rizq_landing_v8.html#about" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#who" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#why" data-t-fr="Pourquoi Rizq">لماذا رزق</a></li>
       </ul>
     </div>
     <div>
@@ -1690,7 +1952,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=29.6"></script>
+  <script src="rizq_intro_video.js?v=29.7"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -1994,6 +2256,24 @@ function rizqShare(title, url) {
     function isFr(){ return (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }
     function setText(id, val){ if(val==null || val==='') return; var el=document.getElementById(id); if(el) el.textContent = val; }
     function setHref(id, val){ if(!val) return; var el=document.getElementById(id); if(el) el.setAttribute('href', val); }
+    /** غلاف الهيرو + صورة الواجهة — مباشرة من cover/thumb بلا وميض إيموجي/كحلي */
+    window._rizqApplyStoreVisualIdentity = function(acc){
+      if(!acc || !window.RizqStoreCommerce) return;
+      var cover = acc.cover || '';
+      var thumb = acc.thumb || '';
+      var logoEl = document.getElementById('store-logo-wrap');
+      if(typeof RizqStoreCommerce.wireStorefrontLogo === 'function'){
+        RizqStoreCommerce.wireStorefrontLogo(logoEl, {
+          cover: cover, thumb: thumb, name: acc.name, kind: 'store', fr: isFr(), emoji: '🏪'
+        });
+      } else if(typeof RizqStoreCommerce.setLogo === 'function'){
+        RizqStoreCommerce.setLogo(logoEl, cover || thumb, '🏪');
+      }
+      if(typeof RizqStoreCommerce.setHeroPhoto === 'function'){
+        /* cover أولاً؛ thumb احتياط حتى لا يبقى الهيرو كحلياً فارغاً */
+        RizqStoreCommerce.setHeroPhoto(document.getElementById('store-hero'), cover || thumb || '');
+      }
+    };
 
     function applyDemoStore(){
       var id = 'demo_store';
@@ -2025,27 +2305,30 @@ function rizqShare(title, url) {
         planName: 'سنوية',
         /* تعريفي: بضع ثوانٍ من داشبورد المحل · إضافي: كما كان (يوتيوب) */
         promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
-        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
+        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
+        /* غلاف هيرو + صورة واجهة — تظهر مباشرة عند فتح المحل */
+        cover: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
+        thumb: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80'
       };
       var products = [
-        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: '' },
-        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, desc: '' },
-        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, desc: '' },
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' },
+        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, variants: '50مل, 100مل, 200مل', unit: 'زجاجة', desc: '' },
+        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, variants: 'مقاس: 39, 40, 41, 42, 43, 44', unit: 'زوج', desc: '' },
         { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: '' },
         { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: '' },
         { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: '' },
-        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, desc: '' },
-        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, desc: '' },
-        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, desc: '' },
-        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, desc: '' },
+        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, variants: 'مقاس: S, M, L, XL · لون: أبيض, أزرق, أسود', unit: 'قطعة', desc: '' },
+        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, variants: 'S, M, L, XL', unit: 'قطعة', desc: '' },
+        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, variants: '38, 39, 40, 41, 42', unit: 'زوج', desc: '' },
+        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, variants: '50مل, 100مل', unit: 'زجاجة', desc: '' },
         { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: '' },
-        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, desc: '' },
-        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, desc: '' },
-        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, desc: '' },
-        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, desc: '' },
+        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, variants: '2-3 سنوات, 4-5 سنوات, 6-7 سنوات', unit: 'طقم', desc: '' },
+        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, variants: 'مقاس: 40, 41, 42, 43, 44, 45', unit: 'زوج', desc: '' },
+        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, variants: 'M, L, XL, XXL', unit: 'قطعة', desc: '' },
+        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, variants: '50مل, 100مل, 200مل', unit: 'علبة', desc: '' },
         { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: '' },
         { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: '' },
-        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, desc: '' }
+        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' }
       ];
       var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
       var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };
@@ -2098,7 +2381,7 @@ function rizqShare(title, url) {
     }
 
     function mountStorePromoVideo(acc){
-      /* شريط واحد: فيديو تعريفي + فيديو إضافي (لبعض الباقات) — بلا تكرار في أماكن أخرى */
+      /* بطاقات هادئة على الهيرو: تعريفي + إضافي — بلا شريط مكرر أسفل */
       if(!acc || !window.RizqIntroVideo) return;
       var videos;
       if(window.RizqStoreCommerce && typeof RizqStoreCommerce.promoVideosOf === 'function'){
@@ -2109,67 +2392,58 @@ function rizqShare(title, url) {
         if(acc.promo_video_extra) videos.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
         videos = videos.filter(function(v){ return !!v.url; });
       }
+      var hero = document.getElementById('store-hero');
+      var introCard = document.getElementById('hero-intro-card');
+      var extraCard = document.getElementById('hero-extra-card');
+      var introMount = document.getElementById('hero-intro-video-mount');
+      var extraMount = document.getElementById('hero-extra-video-mount');
       var spot = document.getElementById('store-video-spotlight');
-      var inner = document.getElementById('store-video-spotlight-inner');
-      var introMount = document.getElementById('spotlight-intro-video-mount');
-      var extraMount = document.getElementById('spotlight-extra-video-mount');
-      var introFrame = document.getElementById('spotlight-intro-frame');
-      var extraFrame = document.getElementById('spotlight-extra-frame');
-      var spotName = document.getElementById('spotlight-store-name');
-      var heading = document.getElementById('spotlight-video-heading');
-      var blurb = document.getElementById('spotlight-store-blurb');
-      if(spotName && (acc.name || acc.businessName)) spotName.textContent = acc.name || acc.businessName;
-      if(!spot || !introMount || !videos.length){
-        if(spot) spot.style.display = 'none';
+      if(spot) spot.style.display = 'none';
+      if(!introMount || !videos.length){
+        if(hero) hero.classList.remove('has-hero-videos');
+        if(introCard) introCard.style.display = 'none';
+        if(extraCard) extraCard.style.display = 'none';
         return;
       }
       var fr = isFr();
       var intro = videos.find(function(v){ return v.kind === 'intro'; });
       var extra = videos.find(function(v){ return v.kind === 'extra'; });
-      /* إن وُجد إضافي فقط: اعرضه في الإطار الرئيسي حتى لا يختفي الشريط */
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
-      /* تجنّب إعادة التركيب المتكرر لنفس الروابط (يحافظ على موضع التشغيل) */
-      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar'].join('|');
-      if (spot.getAttribute('data-rzq-promo-sig') === promoSig && introMount.querySelector('.rzq-iv-wrap')) {
-        spot.style.display = '';
+      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero'].join('|');
+      if (hero && hero.getAttribute('data-rzq-promo-sig') === promoSig && introMount.querySelector('.rzq-iv-wrap')) {
+        hero.classList.add('has-hero-videos');
         return;
       }
-      spot.setAttribute('data-rzq-promo-sig', promoSig);
+      if(hero) hero.setAttribute('data-rzq-promo-sig', promoSig);
       var okIntro = RizqIntroVideo.mount(introMount, intro.url, {
         accountType: 'store',
         poster: (window.RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('store')) || '',
-        title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
-        linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
-        playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي'
+        title: fr ? 'Vidéo de présentation' : 'فيديو تعريفي',
+        linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+        playLabel: fr ? 'Lire' : 'تشغيل'
       });
-      if(introFrame) introFrame.style.display = okIntro ? '' : 'none';
+      if(introCard) introCard.style.display = okIntro ? '' : 'none';
       var okExtra = false;
-      if(extra && extraMount && extraFrame){
+      if(extra && extraMount && extraCard){
         okExtra = RizqIntroVideo.mount(extraMount, extra.url, {
-          title: fr ? '🎬 Vidéo supplémentaire' : '🎬 فيديو إضافي',
-          linkLabel: fr ? 'Source ↗' : 'شاهد على المصدر الأصلي ↗',
-          playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو الإضافي'
+          title: fr ? 'Vidéo supplémentaire' : 'فيديو إضافي',
+          linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+          playLabel: fr ? 'Lire' : 'تشغيل'
         });
-        extraFrame.style.display = okExtra ? '' : 'none';
-      } else if(extraFrame){
-        extraFrame.style.display = 'none';
+        extraCard.style.display = okExtra ? '' : 'none';
+      } else if(extraCard){
+        extraCard.style.display = 'none';
         if(extraMount) extraMount.innerHTML = '';
       }
-      if(inner) inner.classList.toggle('has-dual', !!(okIntro && okExtra));
-      if(heading) heading.textContent = (okIntro && okExtra)
-        ? (fr ? 'vidéos de la boutique' : 'فيديوهات المحل')
-        : (fr ? 'vidéo de présentation' : 'فيديو تعريفي');
-      if(blurb) blurb.textContent = (okIntro && okExtra)
-        ? (fr ? 'Vidéo de présentation et vidéo supplémentaire de la boutique.' : 'فيديو تعريفي وفيديو إضافي من المحل.')
-        : (fr ? 'Découvrez la boutique en moins de 20 secondes.' : 'تعرّف على المحل ومنتجاته في أقل من 20 ثانية.');
-      spot.style.display = (okIntro || okExtra) ? '' : 'none';
+      if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
     }
 
     function paintStoreProductsGrid(products, storeId){
       var grid = document.getElementById('products-grid');
       var moreBtn = document.getElementById('store-load-more');
-      var pageSize = (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15;
+      /* دفعة أولى أخف — مختارات قصيرة ثم «عرض المزيد» */
+      var pageSize = Math.min(8, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 8);
       var list = Array.isArray(products) ? products.slice() : [];
       var shown = 0;
       var featured = {};
@@ -2187,8 +2461,15 @@ function rizqShare(title, url) {
         var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
           ? RizqStoreCommerce.imagesOf(p)
           : ((p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr : (p.imgData ? [p.imgData] : []));
-        featured[pid] = { name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0, emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '' };
-        window._qvProductsMap[pid] = { images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock };
+        featured[pid] = {
+          name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0,
+          emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '',
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+        };
+        window._qvProductsMap[pid] = {
+          images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock,
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+        };
         var topic = null;
         if(window.RizqStoreTopics) topic = RizqStoreTopics.resolveProductTopic(storeTopics, p);
         var topicKey = topic ? topic.id : (p.topicId || p.cat || '');
@@ -2316,12 +2597,7 @@ function rizqShare(title, url) {
         if(tagline) setText('store-tagline-el', tagline);
         if(acc.desc) setText('about-txt', acc.desc);
         if(acc.name) document.title = acc.name + (isFr() ? ' — Rizq' : ' — رزق');
-        if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(document.getElementById('store-logo-wrap'), acc.thumb, '🏪');
-        else if(acc.thumb){
-          var logoWrap0 = document.getElementById('store-logo-wrap');
-          var safeThumb0 = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl) ? RizqStoreCommerce.safeMediaUrl(acc.thumb) : '';
-          if(logoWrap0 && safeThumb0) logoWrap0.innerHTML = '<img src="'+esc(safeThumb0)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
-        }
+        if(typeof window._rizqApplyStoreVisualIdentity === 'function') window._rizqApplyStoreVisualIdentity(acc);
         mountStorePromoVideo(acc);
         if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(id);
         var pickB = document.querySelector('.badge-pickup'); if(pickB) pickB.style.display = '';
@@ -2455,9 +2731,14 @@ function rizqShare(title, url) {
                     if(acc.promo_video) localProf.promo_video = acc.promo_video;
                     if(acc.promo_video_extra) localProf.promo_video_extra = acc.promo_video_extra;
                   }
-                  if(acc.thumb && !localProf.thumb) localProf.thumb = acc.thumb;
+                  /* غلاف/واجهة من الخادم تُحدَّث دائماً عند التوفّر — وتُطبَّق على الهيرو فوراً */
+                  if(acc.cover) localProf.cover = acc.cover;
+                  if(acc.thumb) localProf.thumb = acc.thumb;
                   if(acc.tagline && !localProf.tagline) localProf.tagline = acc.tagline;
                   window._rizqStoreProfile = localProf;
+                  if(typeof window._rizqApplyStoreVisualIdentity === 'function'){
+                    window._rizqApplyStoreVisualIdentity(localProf);
+                  }
                   if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(localProf);
                 } else {
                 window._rizqStoreProfile = acc;
@@ -2476,14 +2757,7 @@ function rizqShare(title, url) {
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');
                 var addr = acc.address || acc.city || '';
                 if(addr){ setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr); }
-                if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(document.getElementById('store-logo-wrap'), acc.thumb, '🏪');
-                else if(acc.thumb){
-                  var logoWrap = document.getElementById('store-logo-wrap');
-                  if(logoWrap){
-                    var safeThumb = (window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl) ? RizqStoreCommerce.safeMediaUrl(acc.thumb) : '';
-                    if(safeThumb) logoWrap.innerHTML = '<img src="'+esc(safeThumb)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
-                  }
-                }
+                if(typeof window._rizqApplyStoreVisualIdentity === 'function') window._rizqApplyStoreVisualIdentity(acc);
                 if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(acc);
                 if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(id);
                 if(typeof RizqSub!=='undefined'){
@@ -2719,7 +2993,7 @@ html{background:#071020!important}
     <div style="font-size:40px;margin-bottom:12px">🏪</div>
     <div style="color:#C9A84C;font-size:20px;font-weight:700;margin-bottom:8px" data-t="promo-title">متجر على منصة رزق</div>
     <div style="color:rgba(255,255,255,.8);font-size:14px;line-height:1.7" data-t="promo-desc">هذا المتجر موثّق ومرخّص على منصة رزق — أكبر منصة إعلانات في موريتانيا.</div>
-    <a href="rizq_landing_v8.html#about" style="display:inline-block;margin-top:18px;padding:11px 28px;background:linear-gradient(90deg,#C9A84C,#e0c878);color:#0d1f3c;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px" data-t="promo-learn">اعرف المزيد عن رزق ←</a>
+    <a href="rizq_platform.html#who" style="display:inline-block;margin-top:18px;padding:11px 28px;background:linear-gradient(90deg,#C9A84C,#e0c878);color:#0d1f3c;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px" data-t="promo-learn">اعرف المزيد عن رزق ←</a>
   </div>
 </div>
 
@@ -2739,7 +3013,19 @@ function _storeSaveCart(cart){
 }
 function updateCartCount(){
   var cart = _storeLoadCart();
-  var t = cart.reduce(function(s,c){ return s + (c.qty||0); }, 0);
+  var sid = '';
+  try {
+    sid = window._rizqStoreAccountId
+      || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+      || new URLSearchParams(location.search).get('id')
+      || '';
+  } catch (eSid) {}
+  var t = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartQtyForSeller === 'function')
+    ? RizqStoreCommerce.cartQtyForSeller(cart, sid)
+    : cart.reduce(function(s,c){
+        if (sid && String(c.storeId || c.accountId || '') !== String(sid)) return s;
+        return s + (c.qty||0);
+      }, 0);
   var el = document.getElementById('nav-cart-count');
   if (el) el.textContent = t;
   if(window.RizqUx && typeof RizqUx.updateCartBadges === 'function') RizqUx.updateCartBadges();
@@ -2749,9 +3035,11 @@ function updateCartCount(){
   }
   try{ document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); }catch(e){}
 }
-function addToCartStore(id){
+function addToCartStore(id, qty, selection){
   id = String(id == null ? '' : id);
   if (!id) return false;
+  qty = Math.max(1, Math.min(99, Number(qty) || 1));
+  selection = selection || null;
   var catalog = window.STORE_FEATURED_PRODUCTS || STORE_FEATURED_PRODUCTS || {};
   var p = catalog[id];
   if (!p) {
@@ -2769,7 +3057,10 @@ function addToCartStore(id){
     return false;
   }
   var cart = _storeLoadCart();
-  var lineId = 'store-prod-' + id;
+  var baseId = 'store-prod-' + id;
+  var lineId = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+    ? RizqStoreCommerce.cartLineIdForProduct(baseId, selection && selection.selected)
+    : baseId;
   var ex = cart.find(function(c){ return String(c.id) === lineId; });
   var sid = window._rizqStoreAccountId || '';
   try {
@@ -2780,26 +3071,38 @@ function addToCartStore(id){
   } catch (e) {}
   var nameEl = document.getElementById('store-name-el') || document.getElementById('store-name');
   var sname = nameEl ? String(nameEl.textContent || '').trim() : '';
-  if (ex) ex.qty = (Number(ex.qty) || 0) + 1;
+  var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf) ? RizqStoreCommerce.imagesOf(p) : [];
+  if (ex) ex.qty = Math.min(99, (Number(ex.qty) || 0) + qty);
   // إصلاح تسرب اللغة: كنا نخزّن اسماً واحداً محسوماً وقت الإضافة فقط (name أو
   // nameF)، فإذا بدّل المستخدم اللغة لاحقاً في rizq_cart.html يبقى الاسم القديم
   // ظاهراً. الآن نخزّن كلا الاسمين ليختار cart.html الاسم الصحيح دائماً.
   else {
     cart.push({
       id: lineId,
+      productId: id,
       name: p.name || p.nameF || '',
       nameF: p.nameF || p.name || '',
       price: Number(p.price) || 0,
-      qty: 1,
+      qty: qty,
       emoji: p.emoji || '📦',
       storeId: sid,
       accountId: sid,
-      storeName: sname
+      storeName: sname,
+      module: 'store',
+      cat: p.cat || '',
+      variants: p.variants || '',
+      unit: p.unit || '',
+      images: imgs,
+      imgDataArr: imgs,
+      variantKey: (selection && selection.key) || '',
+      variantLabel: (selection && selection.label) || '',
+      selected: (selection && selection.selected) || null
     });
   }
   _storeSaveCart(cart);
   updateCartCount();
   var label = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
+  if (selection && selection.label) label += ' · ' + selection.label;
   showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + label);
   // اربط روابط السلة في الهيدر بمعرّف المحل بعد أول إضافة
   if (sid && window.RizqStoreCommerce && typeof RizqStoreCommerce.wireStoreLinks === 'function') {

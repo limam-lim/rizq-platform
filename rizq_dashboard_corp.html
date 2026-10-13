@@ -303,6 +303,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_brands_catalog.js?v=5"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -321,7 +322,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.1"></script>
-<script src="rizq_intro_video.js?v=29.6"></script>
+<script src="rizq_intro_video.js?v=29.7"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -584,6 +585,14 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             </div>
             <div class="form-group"><label class="form-label" data-t="pr-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="pr-emoji" placeholder="🚗" maxlength="4"/></div>
           </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label" data-t="pr-brand-label">الماركة</label>
+              <select class="form-input" id="pr-brand" onchange="onCorpBrandChange()"><option value="">— الماركة —</option></select>
+            </div>
+            <div class="form-group"><label class="form-label" data-t="pr-model-label">الموديل</label>
+              <select class="form-input" id="pr-model" disabled><option value="">— الموديل —</option></select>
+            </div>
+          </div>
           <div class="form-group"><label class="form-label" data-t="pr-desc-label">وصف المنتج</label><textarea class="form-input" id="pr-desc" placeholder="اكتب وصفاً مختصراً للمنتج..." data-ph="pr-desc-ph"></textarea></div>
           <!-- STOCK / VARIANTS / SOLD (للسيارات والمنتجات الكمية: مواد غذائية، أثاث، إلكترونيات...) -->
           <div class="form-grid">
@@ -726,6 +735,23 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
           </div>
         </div>
 
+        <!-- ══ غلاف صفحة المعرض (خلفية الهيرو) — منفصل عن صورة البطاقة/الشعار ══ -->
+        <div class="form-group" style="background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.14);border-radius:11px;padding:14px">
+          <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+            <span data-t="p-cover-label">🖼️ غلاف صفحة المعرض</span>
+          </label>
+          <p style="font-size:11px;color:#94a3b8;margin-bottom:8px" data-t="p-cover-hint">صورة عريضة تظهر كخلفية أعلى صفحتك العامة (خلف اسم المعرض). مستقلة عن صورة البطاقة في الرئيسية وعن صور المنتجات.</p>
+          <div id="p-cover-zone" onclick="document.getElementById('p-cover-input').click()" style="border:2px dashed rgba(27,58,107,.3);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:10px;min-height:96px" onmouseover="this.style.borderColor='rgba(27,58,107,.55)'" onmouseout="this.style.borderColor='rgba(27,58,107,.3)'">
+            <div id="p-cover-inner">
+              <div style="font-size:26px;margin-bottom:4px">🏞️</div>
+              <p style="font-size:12px;font-weight:600;color:var(--navy)" data-t="p-cover-cta">انقر لرفع غلاف المعرض</p>
+              <p style="font-size:10px;color:#94a3b8;margin-top:2px" data-t="p-cover-fmt">يفضّل صورة أفقية عريضة — JPG / PNG</p>
+            </div>
+            <input type="file" id="p-cover-input" accept="image/*" style="display:none" onchange="previewHeroCover(this)"/>
+          </div>
+          <button type="button" id="p-cover-clear" onclick="event.stopPropagation();clearHeroCover()" style="display:none;font-size:11px;color:#b91c1c;background:none;border:none;cursor:pointer;font-weight:600" data-t="p-cover-clear">إزالة الغلاف</button>
+        </div>
+
         <!-- ══ بطاقة الظهور في "آخر المعارض" على الصفحة الرئيسية ══ -->
         <div class="form-group" style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:11px;padding:14px">
           <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:flex;align-items:center;gap:8px">
@@ -752,7 +778,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
       <div class="ads-card">
         <div class="ads-badge">🎬 Rizq ADS</div>
         <h3 style="font-size:18px;font-weight:800;margin-bottom:8px"><span data-t="ads-hero-title-pre">أعلن لجميع زوار منصة</span> <span style="color:#e8c96a;font-weight:900">رزق</span></h3>
-        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;max-width:500px" data-t="ads-hero-desc">فيديوك الإعلاني يظهر لكل زائر على المنصة — مثل إعلان التلفزيون لكن للمشترين المهتمين فعلاً بالسوق الموريتاني.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;max-width:500px" data-t="ads-hero-desc">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات — فيديوك يصل لزوار رزق حيث يتسوقون فعلاً.</p>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px" id="ads-packages-grid"></div>
       <div class="card">
@@ -780,7 +806,19 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
       <!-- Rizq ADS — إعلان فيديو -->
       <div class="card" style="margin-top:18px">
         <div class="card-title" style="margin-bottom:6px" data-t="rads-title">🎬 Rizq ADS — إعلان فيديو في الرئيسية</div>
-        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:16px" data-t="rads-hint">أعلن بفيديو يظهر لكل زوار منصة رزق في الموضع المميز بالصفحة الرئيسية — اختر باقة، ادفع، وارفع رابط فيديوك، وسيتم تفعيله بعد مراجعة الإدارة.</p>
+        <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin-bottom:12px" data-t="rads-hint">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات. اختر الباقة وادفع ثم ألصق رابط فيديوك من لوحة حسابك — يفحصه المراقب الذكي ثم نوافق أو نرفض قبل النشر.</p>
+        <div class="rads-placements" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="border:1.5px solid rgba(201,168,76,.45);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,#fffdf6,#fff)">
+            <div style="font-size:11px;font-weight:800;color:#a07820;margin-bottom:4px" data-t="rads-place1-label">الموضع ١</div>
+            <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place1-h">الشاشة الكبيرة</div>
+            <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place1-p">فيديو عريض أعلى الصفحة الرئيسية — أول ما يراه الزائر.</div>
+          </div>
+          <div style="border:1.5px solid rgba(148,163,184,.5);border-radius:12px;padding:12px 14px;background:#f8fafc">
+            <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:4px" data-t="rads-place2-label">الموضع ٢</div>
+            <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place2-h">شريط البطاقات</div>
+            <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place2-p">بطاقات فيديو تحت الشاشة الكبيرة — باقاتك تحدد أي موضع يظهر فيه إعلانك.</div>
+          </div>
+        </div>
         <div id="rizq-ads-status-mount" style="margin-bottom:14px"></div>
         <div id="rizq-ads-packages-display"></div>
       </div>
@@ -2473,6 +2511,19 @@ function saveProduct(){
   var stock = document.getElementById('pr-stock') ? document.getElementById('pr-stock').value.trim() : '';
   var sold  = document.getElementById('pr-sold')  ? (parseInt(document.getElementById('pr-sold').value)||0) : 0;
   var variants = document.getElementById('pr-variants') ? document.getElementById('pr-variants').value.trim() : '';
+  var brandId = (document.getElementById('pr-brand')||{}).value || '';
+  var modelId = (document.getElementById('pr-model')||{}).value || '';
+  var brandName='', brandNameFr='', modelName='', modelNameFr='';
+  if(window.RizqBrands && brandId){
+    var _cb = RizqBrands.getById(brandId);
+    brandName = RizqBrands.displayName(_cb, false);
+    brandNameFr = RizqBrands.displayName(_cb, true);
+    if(modelId){
+      var _cm = RizqBrands.getModel(brandId, modelId);
+      modelName = RizqBrands.modelName(_cm, false);
+      modelNameFr = RizqBrands.modelName(_cm, true);
+    }
+  }
   if(!name || !price){ showToast(_t2('يرجى إدخال اسم المنتج والسعر','Veuillez saisir le nom du produit et le prix'),'error'); return; }
   if(video) video = video.replace(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,'https://www.youtube.com/embed/$1');
   var editIdx = (typeof window._editingProdIdx === 'number') ? window._editingProdIdx : null;
@@ -2483,6 +2534,8 @@ function saveProduct(){
     desc:     desc,
     price:    price,
     category: cat,
+    brandId: brandId, brandName: brandName, brandNameFr: brandNameFr,
+    modelId: modelId, modelName: modelName, modelNameFr: modelNameFr,
     images:   _pendingImgs.slice(),
     seller:   CORP_ACC ? CORP_ACC.name : _t2('شركة','Société'),
     seller_trust_score: 70,
@@ -2498,6 +2551,8 @@ function saveProduct(){
         id:old.id, _backendId: old._backendId||null, name:name, price:price, cat:cat, desc:desc,
         emoji:cat||'📦', images:(data.images&&data.images.length)?data.images:old.images, video:video,
         stock:stock, sold:sold, variants:variants,
+        brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
+        modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
         status:old.status, date:old.date
       };
       _savedProd = prods[editIdx];
@@ -2506,6 +2561,8 @@ function saveProduct(){
         id:data.id, _backendId:null, name:name, price:price, cat:cat, desc:desc,
         emoji:cat||'📦', images:data.images, video:video,
         stock:stock, sold:sold, variants:variants,
+        brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
+        modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
         status:status, date:new Date().toLocaleDateString('ar-MR-u-nu-latn')
       };
       prods.unshift(_savedProd);
@@ -2522,6 +2579,12 @@ function saveProduct(){
     ['pr-name','pr-price','pr-cat','pr-desc','pr-video','pr-stock','pr-sold','pr-variants'].forEach(function(id){
       var el=document.getElementById(id); if(el) el.value='';
     });
+    try{
+      if(window.RizqBrands){
+        RizqBrands.fillBrandSelect(document.getElementById('pr-brand'), '', false, '');
+        RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
+      }
+    }catch(eClrB){}
     window._editingProdIdx = null;
     var saveBtn = document.getElementById('prod-save-btn');
     if(saveBtn) saveBtn.textContent = _t2('💾 نشر المنتج','💾 Publier le produit');
@@ -2543,6 +2606,13 @@ function saveProduct(){
   }
 }
 
+function onCorpBrandChange(){
+  var brandId = (document.getElementById('pr-brand')||{}).value || '';
+  if(window.RizqBrands){
+    RizqBrands.fillModelSelect(document.getElementById('pr-model'), brandId, false, '');
+  }
+}
+
 function editProd(i){
   var prods = getProds();
   var p = prods[i]; if(!p) return;
@@ -2555,6 +2625,12 @@ function editProd(i){
   document.getElementById('pr-stock').value = p.stock||'';
   document.getElementById('pr-sold').value = p.sold||'';
   document.getElementById('pr-variants').value = p.variants||'';
+  try{
+    if(window.RizqBrands){
+      RizqBrands.fillBrandSelect(document.getElementById('pr-brand'), '', false, p.brandId||'');
+      RizqBrands.fillModelSelect(document.getElementById('pr-model'), p.brandId||'', false, p.modelId||'');
+    }
+  }catch(eEd){}
   _pendingImgs = (p.images||[]).slice();
   renderImgPreviews();
   if(!_prodFormOpen) toggleProdForm();
@@ -2564,6 +2640,14 @@ function editProd(i){
   var formCard = document.getElementById('prod-form-body');
   if(formCard && formCard.scrollIntoView) formCard.scrollIntoView({behavior:'smooth'});
 }
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    if(window.RizqBrands){
+      RizqBrands.fillBrandSelect(document.getElementById('pr-brand'), '', false, '');
+      RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
+    }
+  }catch(eInitB){}
+});
 
 function renderProducts(){
   var prods = getProds();
@@ -2840,7 +2924,7 @@ function submitPayment(){
   }).then(function(){
     closePayModal();
     showToast(isVideo
-      ? _t2('✅ تم إرسال طلب Rizq ADS — سيتم مراجعته وتفعيل فيديوك في الرئيسية خلال 24 ساعة','✅ Votre demande Rizq ADS a été envoyée — elle sera examinée et votre vidéo activée en page d\'accueil sous 24h')
+      ? _t2('✅ تم إرسال طلب Rizq ADS — يُفحص المحتوى ثم نوافق أو نرفض قبل النشر في الرئيسية','✅ Votre demande Rizq ADS a été envoyée — le contenu sera contrôlé, puis approuvé ou refusé avant publication')
       : _t2('✅ تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','✅ Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'), 'success');
   }).catch(function(err){
     showToast((err && err.msg) || _t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'), 'error');
@@ -3422,6 +3506,8 @@ function saveMyPayment(){
     if(idxT>-1){
       if(tlElC) accsT[idxT].tagline = tlElC.value.trim().slice(0,50);
       if(window._pThumbData) accsT[idxT].thumb = window._pThumbData;
+      if(window._pCoverData !== null && window._pCoverData !== undefined) accsT[idxT].cover = window._pCoverData || '';
+      if(window._pCoverData !== null && window._pCoverData !== undefined) acc.cover = window._pCoverData || '';
       localStorage.setItem('rizq_pending_accounts',JSON.stringify(accsT));
     }
     _syncCorpProfileToBackend(acc);
@@ -3443,7 +3529,8 @@ function saveMyPayment(){
         address: acc.address||'', desc: acc.desc||'',
         promo_video: (document.getElementById('p-promo-video')||{}).value||'',
         tagline: (document.getElementById('p-tagline')||{}).value||'',
-        thumb: window._pThumbData||''
+        thumb: window._pThumbData||'',
+        cover: (window._pCoverData !== null && window._pCoverData !== undefined) ? (window._pCoverData || '') : (acc.cover || '')
       })
     }).catch(function(){});
   }
@@ -3550,6 +3637,8 @@ function saveMyPayment(){
       var innerL=document.getElementById('p-thumb-inner');
       if(innerL) innerL.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
     }
+    window._pCoverData = (aL2 && aL2.cover) || (CORP_ACC && CORP_ACC.cover) || null;
+    paintHeroCoverPreview();
     applySbThumb();
   }
 
@@ -3581,6 +3670,45 @@ function saveMyPayment(){
       img.src=e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+  window._pCoverData = null;
+  function paintHeroCoverPreview(){
+    var inner = document.getElementById('p-cover-inner');
+    var clr = document.getElementById('p-cover-clear');
+    if(!inner) return;
+    if(window._pCoverData){
+      inner.innerHTML = '<img src="'+window._pCoverData+'" style="width:100%;max-height:140px;border-radius:8px;object-fit:cover;display:block"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('غلاف محفوظ — انقر للتغيير','Couverture enregistrée — cliquez pour changer')+'</p>';
+      if(clr) clr.style.display = '';
+    } else {
+      inner.innerHTML = '<div style="font-size:26px;margin-bottom:4px">🏞️</div><p style="font-size:12px;font-weight:600;color:var(--navy)">'+_t2('انقر لرفع غلاف المعرض','Cliquez pour ajouter la couverture')+'</p><p style="font-size:10px;color:#94a3b8;margin-top:2px">'+_t2('يفضّل صورة أفقية عريضة — JPG / PNG','Préférez une image horizontale — JPG / PNG')+'</p>';
+      if(clr) clr.style.display = 'none';
+    }
+  }
+  function previewHeroCover(input){
+    var file = input.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var maxW = 1400;
+        var scale = Math.min(1, maxW/img.width);
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width*scale);
+        canvas.height = Math.round(img.height*scale);
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        window._pCoverData = canvas.toDataURL('image/jpeg', 0.78);
+        paintHeroCoverPreview();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  function clearHeroCover(){
+    window._pCoverData = '';
+    var inp = document.getElementById('p-cover-input');
+    if(inp) inp.value = '';
+    paintHeroCoverPreview();
   }
 
 </script>
@@ -3630,7 +3758,7 @@ function saveMyPayment(){
       <div id="pay-video-url-wrap" style="display:none;margin-bottom:18px">
         <label class="form-label" style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:block;font-size:12.5px">🎬 <span data-t="pay-video-url-label">رابط الفيديو الإعلاني</span></label>
         <input class="form-input" id="pay-video-url" dir="ltr" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0e8ff;border-radius:10px"/>
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المميز بالصفحة الرئيسية لكل زوار المنصة بعد موافقة الإدارة</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">ألصق رابط يوتيوب أو فيسبوك — يُفحص المحتوى ثم نوافق أو نرفض قبل ظهوره في الموضع المحدد بباقتك (الشاشة الكبيرة أو شريط البطاقات)</div>
       </div>
       <!-- Steps -->
       <div style="margin-bottom:16px">

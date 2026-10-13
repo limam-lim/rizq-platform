@@ -187,16 +187,13 @@
       '.rzq-iv-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
         'background-size:cover;background-position:center;cursor:pointer;border:none;padding:0;width:100%;height:100%}' +
       '.rzq-iv-poster::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,17,28,.15),rgba(6,17,28,.55))}' +
-      '.rzq-iv-play{position:relative;z-index:2;width:68px;height:68px;border-radius:50%;' +
-        'background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;display:flex;align-items:center;justify-content:center;' +
-        'font-size:28px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .2s}' +
-      '.rzq-iv-poster:hover .rzq-iv-play{transform:scale(1.06)}' +
-      '.rzq-iv-play-label{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:2;' +
-        'background:rgba(10,22,40,.78);color:#E8C96A;font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;' +
-        'border:1px solid rgba(201,168,76,.4);white-space:nowrap;pointer-events:none}' +
-      '.rzq-iv-badge{position:absolute;top:10px;right:10px;z-index:3;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;' +
-        'font-size:10.5px;font-weight:900;padding:5px 12px;border-radius:10px;letter-spacing:.4px;' +
-        'box-shadow:0 4px 14px rgba(0,0,0,.28);pointer-events:none}' +
+      /* زر تشغيل شفاف يختفي — بلا نصوص تغطي الفيديو على أي شاشة */
+      '.rzq-iv-play{position:relative;z-index:2;width:56px;height:56px;border-radius:50%;' +
+        'background:rgba(255,255,255,.18);color:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;' +
+        'font-size:22px;box-shadow:none;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(4px);' +
+        'opacity:.35;transition:opacity .22s ease,transform .22s ease,background .2s ease}' +
+      '.rzq-iv-poster:hover .rzq-iv-play,.rzq-iv-frame:focus-within .rzq-iv-play{opacity:.95;transform:scale(1.04);background:rgba(255,255,255,.28)}' +
+      '.rzq-iv-play-label,.rzq-iv-badge,.rzq-iv-dash-hint{display:none!important}' +
       '.rzq-iv-sound{position:absolute;bottom:10px;left:10px;z-index:3;display:none;background:rgba(10,22,40,.75);' +
         'backdrop-filter:blur(6px);border:1px solid rgba(201,168,76,.5);color:#e8c96a;font-size:12px;font-weight:700;' +
         'padding:7px 14px;border-radius:10px;cursor:pointer;transition:background .2s}' +
@@ -241,10 +238,8 @@
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
         '<div class="rzq-iv-frame is-live-dash" id="' + uid + '-frame">' +
-          '<div class="rzq-iv-badge">' + esc(title) + '</div>' +
-          '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="background-image:url(\'' + String(poster).replace(/'/g, '%27') + '\')" aria-label="' + esc(playLbl) + '">' +
+          '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="background-image:url(\'' + String(poster).replace(/'/g, '%27') + '\')" aria-label="' + esc(playLbl) + '" title="' + esc(title) + '">' +
             '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
-            '<span class="rzq-iv-play-label">' + esc(playLbl) + '</span>' +
           '</button>' +
         '</div>' +
         '<a class="rzq-iv-src" href="' + esc(page.replace('&embed=1', '').replace('?embed=1', '?demo=1')) + '" target="_blank" rel="noopener noreferrer">' +
@@ -375,13 +370,12 @@
       : 'background:linear-gradient(145deg,#0f1f3d,#1B3A6B)';
 
     var safeHref = safeExternalUrl(url);
+    var a11yTitle = opts.title || '🎬 فيديو تعريفي';
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
         '<div class="rzq-iv-frame" id="' + uid + '-frame">' +
-          '<div class="rzq-iv-badge">' + esc(opts.title || '🎬 فيديو تعريفي') + '</div>' +
-          '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="' + posterBg + '" aria-label="' + esc(playLbl) + '">' +
+          '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="' + posterBg + '" aria-label="' + esc(playLbl) + '" title="' + esc(a11yTitle) + '">' +
             '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
-            '<span class="rzq-iv-play-label">' + esc(playLbl) + '</span>' +
           '</button>' +
           '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound">🔇 ' + esc(opts.mutedLabel || 'اضغط لتفعيل الصوت') + '</button>' +
         '</div>' +

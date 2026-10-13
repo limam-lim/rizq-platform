@@ -170,18 +170,67 @@ a{text-decoration:none;color:inherit}
 .office-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#67e8f9;margin-bottom:8px;display:block}
 .office-name{font-family:Georgia,'Times New Roman',serif;font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:.5px;background:linear-gradient(100deg,#fff 30%,#a5f3fc 45%,#67e8f9 50%,#E8C96A 58%,#fff 70%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rzOfShimmer 5s linear infinite}
 @keyframes rzOfShimmer{0%{background-position:0% center}100%{background-position:-220% center}}
-.office-tagline{font-size:14.5px;color:rgba(255,255,255,.68);margin-top:10px;padding-top:12px;border-top:1px solid rgba(14,116,144,.4);display:inline-block;max-width:100%}
-.office-spec{display:block;font-size:13px;color:#E8C96A;margin-top:6px;font-weight:700}
+.office-tagline{font-size:14.5px;color:rgba(255,255,255,.94);margin-top:10px;padding-top:12px;border-top:1px solid rgba(103,232,249,.4);display:inline-block;max-width:100%;font-weight:600;text-shadow:0 1px 10px rgba(0,0,0,.55)}
+.office-spec{display:block;font-size:13px;color:#F5DFA0;margin-top:6px;font-weight:800;text-shadow:0 1px 8px rgba(0,0,0,.45)}
 .office-meta{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
-.office-meta .meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.6)}
+.office-meta .meta-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(255,255,255,.92);font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 .office-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.office-badges .badge{padding:5px 13px;border-radius:10px;font-size:11px;font-weight:700;backdrop-filter:blur(6px)}
-.badge-office{background:rgba(14,116,144,.2);color:#67e8f9;border:1px solid rgba(8,145,178,.4)}
-.badge-verified{background:rgba(46,204,113,.15);color:#2ECC71;border:1px solid rgba(46,204,113,.3)}
-.badge-rated{background:rgba(255,193,7,.12);color:#F5A623;border:1px solid rgba(255,193,7,.25)}
+.office-badges .badge{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;backdrop-filter:blur(8px);text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.badge-office{background:rgba(8,60,80,.55);color:#9ef0ff;border:1px solid rgba(103,232,249,.6)}
+.badge-verified{background:rgba(16,80,40,.55);color:#9dffc0;border:1px solid rgba(90,230,140,.65)}
+.badge-rated{background:rgba(70,50,8,.5);color:#FFD666;border:1px solid rgba(255,193,7,.55)}
 .office-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(103,232,249,.55);font-size:20px;animation:rzOfBounce 2s ease-in-out infinite}
 @keyframes rzOfBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 .office-type-label{display:none}
+/* فيديوهات الهيرو — نفس موضع/حجم المحلات */
+.office-hero .hero-videos{
+  display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
+  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
+}
+.office-hero.has-hero-videos .hero-videos{display:flex}
+.office-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
+.office-hero .hero-video-card{
+  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
+  background:rgba(6,17,28,.55);border:1px solid rgba(103,232,249,.4);
+  border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzOfHeroVidIn .7s ease both
+}
+.office-hero .hero-video-card:nth-child(2){animation-delay:.12s}
+@keyframes rzOfHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.office-hero .hero-video-card .hero-video-mount{min-height:0}
+.office-hero .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
+.office-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
+.office-hero .hero-video-card .rzq-iv-badge,.office-hero .hero-video-card .rzq-iv-src{display:none}
+.office-hero .hero-video-card .rzq-iv-play{
+  width:40px!important;height:40px!important;font-size:16px!important;
+  opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
+  border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
+  transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+}
+.office-hero .hero-video-card .rzq-iv-badge,
+.office-hero .hero-video-card .rzq-iv-play-label,
+.office-hero .hero-video-caption{display:none!important}
+.office-hero .hero-video-card .rzq-iv-sound,
+.office-hero .hero-video-card .rzq-iv-dash-hint{
+  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important;
+  font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
+  border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.office-hero .hero-video-card:hover .rzq-iv-sound.is-on,
+.office-hero .hero-video-card:focus-within .rzq-iv-sound.is-on{
+  opacity:1!important;pointer-events:auto!important
+}
+.office-hero .hero-video-card:hover .rzq-iv-play,
+.office-hero .hero-video-card:focus-within .rzq-iv-play{
+  opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
+}
+@media(max-width:900px){
+  .office-hero .hero-videos{
+    position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
+    justify-content:center;padding:0 10px 6px;gap:8px
+  }
+  .office-hero .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
+}
 @media(max-width:640px){
   .office-hero{min-height:0!important;height:auto!important}
   .office-hero .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
@@ -289,12 +338,12 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .main-wrap{
   max-width:1140px;margin:0 auto;padding:36px 24px;
   display:grid;gap:26px;align-items:start;
-  /* يمين = الموقع/الساعات/التقييمات | يسار = الخدمات (RTL مثل المحلات) */
+  /* يمين = الموقع/الساعات | يسار = الخدمات + شريط الطلبات/التقييمات (RTL مثل المحلات) */
   grid-template-columns:minmax(300px,360px) minmax(0,1fr);
   grid-template-areas:"side main";
 }
 .main-wrap > aside#info-section{grid-area:side}
-.main-wrap > .office-main{grid-area:main;min-width:0}
+.main-wrap > .office-main{grid-area:main;min-width:0;display:flex;flex-direction:column;gap:0}
 
 /* ════════ SECTION ════════ */
 .section-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
@@ -333,9 +382,9 @@ body.rizq-empty-office .rating-inline{display:none!important}
 /* Request form — الحقول ظاهرة دائماً (لا طيّ) */
 .req-box{margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(14,116,144,.04),rgba(201,168,76,.04));border-radius:14px;border:1px solid rgba(14,116,144,.18)}
 .req-form{display:none;margin-top:14px}
-.req-form.open{display:block!important;visibility:visible!important}
+.req-form.open{display:grid!important;visibility:visible!important}
 #office-service-desk{
-  margin-top:18px;padding:22px 20px;
+  margin-top:0;padding:22px 20px;
   background:linear-gradient(145deg,rgba(15,35,71,.04),rgba(201,168,76,.1));
   border:1.5px solid rgba(201,168,76,.35);
   border-radius:16px;
@@ -348,6 +397,103 @@ body.rizq-empty-office .rating-inline{display:none!important}
 }
 #office-service-desk #req-title{font-size:16px;font-weight:900;color:#0F2347;margin-bottom:6px}
 #office-service-desk #req-sub{font-size:13px;color:#4a5568;line-height:1.55;margin-bottom:14px}
+
+/* غرفة الطلبات + التقييمات — شريط أفقي تحت الخدمات بنفس ترتيب المحل */
+.office-under-band{
+  display:grid;
+  grid-template-columns:1.08fr 0.92fr;
+  gap:12px;
+  margin:0 0 20px;
+  align-items:stretch;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:12px;
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.07), transparent 42%),
+    linear-gradient(165deg,#ffffff 0%,#f4fafc 100%);
+  border:1px solid rgba(14,116,144,.12);
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+#office-service-desk.office-desk-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  border-radius:14px;
+  box-shadow:none;
+  border:1px solid rgba(14,116,144,.14);
+  background:#fff;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.office-desk-eyebrow{
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
+}
+#office-service-desk.office-desk-hz #req-title{
+  font-size:14px;margin-bottom:4px
+}
+#office-service-desk.office-desk-hz #req-sub{
+  font-size:11.5px;margin:0 0 8px;line-height:1.45
+}
+#office-service-desk.office-desk-hz .desk-step{margin-bottom:8px}
+#office-service-desk.office-desk-hz #desk-wait-hint{
+  font-size:12px!important;padding:10px!important;margin-top:6px!important
+}
+#req-form.office-desk-form{
+  grid-template-columns:1fr 1fr;
+  gap:7px 8px;
+  width:100%;
+  flex:1 1 auto;
+  align-content:start;
+  margin-top:8px;
+}
+.office-desk-field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.office-desk-field .req-field-lbl{font-size:11px;margin:0}
+.office-desk-field .req-input{
+  margin-bottom:0;padding:8px 10px;border-radius:8px;font-size:12.5px;min-height:36px
+}
+.office-desk-span2{grid-column:1/-1}
+.office-desk-actions{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:2px
+}
+.office-desk-note{
+  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 140px;
+  padding:8px 10px;border-radius:8px;background:rgba(14,116,144,.04);border:1px solid rgba(14,116,144,.1)
+}
+#office-service-desk.office-desk-hz #req-submit-btn{
+  flex:0 1 180px;width:auto;padding:10px 12px;border-radius:9px;font-size:12.5px;min-height:38px
+}
+#office-service-desk.office-desk-hz #req-prf-btn{
+  flex:0 1 160px;width:auto;margin-top:0!important;padding:10px 12px;font-size:12px
+}
+#reviews-section.office-reviews-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  background:#fff;
+  border:1px solid rgba(14,116,144,.14);
+  border-radius:14px;
+  box-shadow:none;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+#reviews-section.office-reviews-hz .section-head{margin-bottom:10px}
+#reviews-section.office-reviews-hz .section-ttl{font-size:14px}
+#reviews-section #office-reviews-body{flex:1 1 auto;min-width:0}
+@media(max-width:800px){
+  .office-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  #office-service-desk.office-desk-hz,
+  #reviews-section.office-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  #req-form.office-desk-form{grid-template-columns:1fr}
+  .office-desk-span2{grid-column:auto}
+  #office-service-desk.office-desk-hz #req-submit-btn,
+  #office-service-desk.office-desk-hz #req-prf-btn{flex:1 1 100%;width:100%}
+}
 .desk-step{
   display:inline-flex;align-items:center;gap:6px;
   font-size:11px;font-weight:900;letter-spacing:.4px;
@@ -731,7 +877,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 </nav>
 
 <!-- ════ HERO — قياسات المعارض + هوية المكاتب ════ -->
-<div class="office-hero">
+<div class="office-hero" id="office-hero">
   <div class="hero-pattern"></div>
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
@@ -764,6 +910,14 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         <span id="hc-exp" hidden data-t="hc-exp">—</span>
         <span id="hero-status-txt" hidden data-t="hero-status-txt">—</span>
       </div>
+    </div>
+  </div>
+  <div class="hero-videos" id="office-hero-videos" aria-label="فيديوهات المكتب">
+    <div class="hero-video-card" id="office-hero-intro-card" style="display:none">
+      <div class="hero-video-mount" id="office-hero-intro-video-mount"></div>
+    </div>
+    <div class="hero-video-card" id="office-hero-extra-card" style="display:none">
+      <div class="hero-video-mount" id="office-hero-extra-video-mount"></div>
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
@@ -823,7 +977,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 <!-- ════ MAIN ════ -->
 <div class="main-wrap">
 
-  <!-- ── SIDEBAR يمين RTL: الموقع والساعات والتقييمات ── -->
+  <!-- ── SIDEBAR يمين RTL: الموقع والساعات والدفع (التقييمات تحت الخدمات مثل المحل) ── -->
   <aside class="sidebar-sticky" id="info-section">
     <div class="contact-card fade-in">
       <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
@@ -877,18 +1031,6 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       </div>
     </div>
 
-    <!-- REVIEWS -->
-    <div class="card fade-in" id="reviews-section">
-      <div class="section-head">
-        <div class="section-bar"></div>
-        <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
-        <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
-      </div>
-      <div id="office-reviews-body">
-        <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
-      </div>
-    </div>
-
     <!-- RIZQ PROMO CARD -->
     <div class="promo-card fade-in">
       <div style="font-size:20px;margin-bottom:8px">🚀</div>
@@ -939,36 +1081,63 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
+    </div>
 
-      <!-- الخطوة 2: بيانات الزبون (تُفتح بعد اختيار الخدمة) -->
-      <div class="req-box" id="office-service-desk">
+    <!-- غرفة الطلبات + التقييمات — أفقيان تحت الخدمات بنفس ترتيب المحل -->
+    <div class="office-under-band" id="office-under-band">
+      <section class="req-box office-desk-hz" id="office-service-desk" aria-label="غرفة الطلبات">
         <div class="desk-step" id="desk-step-lbl" data-t="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="office-desk-eyebrow" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
         <div id="req-sub" data-desk="hint" data-t="req-sub">بعد اختيار الخدمة أعلاه: أدخل اسمك ورقم هاتفك وسنتواصل معك</div>
         <div id="desk-wait-hint" data-t="desk-wait-hint" style="padding:14px 12px;border-radius:12px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.2);font-size:13px;color:#4a5568;line-height:1.55;margin-top:10px">
           ⬆️ اختر أولاً <strong>الخدمة</strong> و<strong>الخيار الأساسي/الموسّع</strong> في المقدّر أعلاه — ثم يفتح هنا حقول الاسم والهاتف والإيميل تلقائياً.
         </div>
-        <div class="req-form" id="req-form" style="margin-top:16px">
-          <label class="req-field-lbl" for="rf-name" data-t="rf-lbl-name">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name-ph"/>
-          <label class="req-field-lbl" for="rf-phone" data-t="rf-lbl-phone">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
-          <label class="req-field-lbl" for="rf-whatsapp" data-t="rf-lbl-whatsapp">واتساب (إن اختلف عن الهاتف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp-ph"/>
-          <label class="req-field-lbl" for="rf-email" data-t="rf-lbl-email">البريد الإلكتروني (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
-          <label class="req-field-lbl" for="rf-service" data-t="rf-lbl-service">الخدمة المطلوبة</label>
-          <select class="req-input" id="rf-service" name="service">
-            <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
-          </select>
-          <label class="req-field-lbl" for="rf-msg" data-t="rf-lbl-msg">تفاصيل الطلب</label>
-          <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." style="min-height:80px;resize:vertical" data-ph="rf-msg"></textarea>
-          <div id="rf-docs-hint" data-desk="docs-hint" data-t="rf-docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
-          <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
-          <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
+        <div class="req-form office-desk-form" id="req-form">
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-name" data-t="rf-lbl-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-phone" data-t="rf-lbl-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-whatsapp" data-t="rf-lbl-whatsapp">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-email" data-t="rf-lbl-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
+          </div>
+          <div class="office-desk-field office-desk-span2">
+            <label class="req-field-lbl" for="rf-service" data-t="rf-lbl-service">الخدمة المطلوبة</label>
+            <select class="req-input" id="rf-service" name="service">
+              <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
+            </select>
+          </div>
+          <div class="office-desk-field office-desk-span2">
+            <label class="req-field-lbl" for="rf-msg" data-t="rf-lbl-msg">تفاصيل الطلب</label>
+            <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." rows="2" style="resize:vertical" data-ph="rf-msg"></textarea>
+          </div>
+          <div class="office-desk-actions">
+            <div id="rf-docs-hint" class="office-desk-note" data-desk="docs-hint" data-t="rf-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
+            <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
+            <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section class="office-reviews-hz" id="reviews-section" aria-label="آراء الزبائن">
+        <div class="section-head">
+          <div class="section-bar"></div>
+          <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
+          <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
+        </div>
+        <div id="office-reviews-body">
+          <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
+        </div>
+      </section>
     </div>
 
     <!-- TRUST -->
@@ -1125,9 +1294,9 @@ function applyOfficePortalExtras(lang){
   try {
     if(typeof window.mountOfficeIntroVideo === 'function'){
       var oid = new URLSearchParams(location.search).get('id') || new URLSearchParams(location.search).get('office') || '';
-      var acc = null;
-      try { acc = JSON.parse(localStorage.getItem('rizq_account_' + oid) || 'null'); } catch(eA){}
-      window.mountOfficeIntroVideo((acc && acc.promo_video) || '', oid);
+      var acc = window._rizqOfficeProfile || null;
+      try { if(!acc) acc = JSON.parse(localStorage.getItem('rizq_account_' + oid) || 'null'); } catch(eA){}
+      window.mountOfficeIntroVideo((acc && acc.promo_video) || '', oid, acc || undefined);
     }
   } catch(eV){}
 }
@@ -1206,7 +1375,7 @@ function openBuyerFieldsStep(opts){
   if(wait) wait.style.display = 'none';
   if(form){
     form.classList.add('open');
-    form.style.display = 'block';
+    form.style.display = 'grid';
   }
   if(desk){
     desk.classList.add('is-active');
@@ -1439,36 +1608,64 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=29.6"></script>
+  <script src="rizq_intro_video.js?v=29.7"></script>
   <script>
-  window.mountOfficeIntroVideo = function(url, officeId){
+  /* فيديو تعريفي + إضافي في ركن الهيرو — نفس موضع المحلات/المعارض */
+  window.mountOfficeIntroVideo = function(url, officeId, accHint){
     try{
       var id = officeId
         || new URLSearchParams(location.search).get('id')
         || new URLSearchParams(location.search).get('office')
         || '';
-      if(!id || !window.RizqIntroVideo) return;
+      if(!window.RizqIntroVideo) return;
       var fr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
       var isDemo = !!(window._rizqOfficeIsDemo || id === 'demo_law' || /^demo/i.test(id) || /^acc_promo_/.test(id) || new URLSearchParams(location.search).get('demo') === '1');
+      var acc = accHint || window._rizqOfficeProfile || {};
       var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('office')) || '';
-      var resolved = isDemo ? dashUrl : (url || dashUrl);
-      var sig = [id, resolved || '', fr ? 'fr' : 'ar'].join('|');
-      var mountEl = document.getElementById('intro-video-mount');
-      if (window.__rzqOfficeIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+      var introUrl = String((isDemo ? (dashUrl || url || acc.promo_video) : (url || acc.promo_video || dashUrl)) || '').trim();
+      var extraUrl = String(acc.promo_video_extra || '').trim();
+      var hero = document.getElementById('office-hero');
+      var introCard = document.getElementById('office-hero-intro-card');
+      var extraCard = document.getElementById('office-hero-extra-card');
+      var introMount = document.getElementById('office-hero-intro-video-mount');
+      var extraMount = document.getElementById('office-hero-extra-video-mount');
+      var aboutVid = document.getElementById('video-intro-section');
+      if(aboutVid) aboutVid.style.display = 'none';
+      if(!introMount || !introUrl){
+        if(hero) hero.classList.remove('has-hero-videos');
+        if(introCard) introCard.style.display = 'none';
+        if(extraCard) extraCard.style.display = 'none';
+        return;
+      }
+      var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero'].join('|');
+      if (window.__rzqOfficeIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
+        if(hero) hero.classList.add('has-hero-videos');
+        return;
+      }
       window.__rzqOfficeIntroSig = sig;
-      var opts = {
-        mountOpts: {
-          accountType: 'office',
-          poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
-          title: fr ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
-          linkLabel: fr ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗',
-          playLabel: fr ? 'Lire la vidéo' : 'تشغيل الفيديو التعريفي',
-          mutedLabel: fr ? 'Activer le son' : 'اضغط لتفعيل الصوت',
-          unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
-        }
-      };
-      opts.url = resolved;
-      RizqIntroVideo.loadAndMountForAccount(id, opts);
+      var okIntro = RizqIntroVideo.mount(introMount, introUrl, {
+        accountType: 'office',
+        poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
+        title: fr ? 'Vidéo de présentation' : 'فيديو تعريفي',
+        linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+        playLabel: fr ? 'Lire' : 'تشغيل',
+        mutedLabel: fr ? 'Activer le son' : 'اضغط لتفعيل الصوت',
+        unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+      });
+      if(introCard) introCard.style.display = okIntro ? '' : 'none';
+      var okExtra = false;
+      if(extraUrl && extraMount && extraCard && extraUrl !== introUrl){
+        okExtra = RizqIntroVideo.mount(extraMount, extraUrl, {
+          title: fr ? 'Vidéo supplémentaire' : 'فيديو إضافي',
+          linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+          playLabel: fr ? 'Lire' : 'تشغيل'
+        });
+        extraCard.style.display = okExtra ? '' : 'none';
+      } else if(extraCard){
+        extraCard.style.display = 'none';
+        if(extraMount) extraMount.innerHTML = '';
+      }
+      if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
     }catch(e){}
   };
   window.mountOfficeIntroVideo();
@@ -1791,9 +1988,9 @@ function openMaps(){
           { type: 'bankily', bank: 'Bankily', code: '36112233', note: isFr() ? 'Mentionnez votre nom après virement' : 'اذكر اسمك بعد التحويل' },
           { type: 'bank', bank: 'BCI', code: 'MR13 0001 2200 3344', note: isFr() ? 'Virement — honoraires' : 'تحويل — أتعاب المهنة' }
         ],
-        /* فيديو تعريفي تجريبي — يظهر داخل قسم «عن المكتب» */
-        /* فيديو تعريفي = داشبورد المكتب (تجريبي) */
+        /* فيديو تعريفي + إضافي على الهيرو مثل المحلات */
         promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
+        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: isFr() ? '45 min' : '45 د' },
           { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: isFr() ? '3–5 jours' : '3–5 أيام' },
@@ -1819,6 +2016,7 @@ function openMaps(){
       window._rizqOfficeServiceDesk = acc.serviceDesk;
       window._rizqOfficePaymentMethods = acc.paymentMethods;
       window._rizqOfficeIsDemo = true;
+      window._rizqOfficeProfile = acc;
       try{
         localStorage.setItem('office_services_' + id, JSON.stringify(acc.services));
         localStorage.setItem('office_hours_' + id, JSON.stringify(acc.hours));
@@ -1832,19 +2030,14 @@ function openMaps(){
           phone: acc.phone, whatsapp: acc.whatsapp, email: acc.email,
           serviceDesk: acc.serviceDesk, paymentMethods: acc.paymentMethods,
           promo_video: acc.promo_video || '',
+          promo_video_extra: acc.promo_video_extra || '',
           _demo: true
         });
         localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }catch(e){}
-      // إظهار قسم الفيديو التعريفي بعد حقن الحساب التجريبي
       try{
         if(typeof window.mountOfficeIntroVideo === 'function'){
-          window.mountOfficeIntroVideo(acc.promo_video || '', id);
-        } else if(acc.promo_video && window.RizqIntroVideo){
-          RizqIntroVideo.loadAndMountForAccount(id, {
-            url: acc.promo_video,
-            mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
-          });
+          window.mountOfficeIntroVideo(acc.promo_video || '', id, acc);
         }
       }catch(eVid){}
       return acc;
@@ -1918,7 +2111,7 @@ function openMaps(){
               ? 'Ouvrez votre page depuis le tableau de bord (Partager / Voir la page) pour afficher votre formulaire personnalisé.'
               : 'افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
             var form = document.getElementById('req-form');
-            if(form){ form.style.display = 'block'; form.classList.add('open'); form.classList.remove('collapsed'); }
+            if(form){ form.style.display = 'grid'; form.classList.add('open'); form.classList.remove('collapsed'); }
           }
           var svcs = document.getElementById('svc-list');
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
@@ -2109,6 +2302,7 @@ function openMaps(){
         }catch(e){}
 
         window._rizqOfficeAccountId = id;
+        window._rizqOfficeProfile = acc;
         try{
           var localDesk = JSON.parse(localStorage.getItem('rizq_service_desk_' + id) || 'null');
           if(localDesk) window._rizqOfficeServiceDesk = localDesk;
@@ -2120,7 +2314,7 @@ function openMaps(){
           });
         }
         if(typeof window.mountOfficeIntroVideo === 'function'){
-          window.mountOfficeIntroVideo(acc.promo_video || '', id);
+          window.mountOfficeIntroVideo(acc.promo_video || '', id, acc);
         }
 
         if(window._rizqLoadOfficeContacts) window._rizqLoadOfficeContacts(id);
@@ -2226,8 +2420,9 @@ function openMaps(){
                     accountName: acc.name || ''
                   });
                 }
+                window._rizqOfficeProfile = acc;
                 if(typeof window.mountOfficeIntroVideo === 'function'){
-                  window.mountOfficeIntroVideo(acc.promo_video || '', id);
+                  window.mountOfficeIntroVideo(acc.promo_video || '', id, acc);
                 } else if(window.RizqIntroVideo){
                   RizqIntroVideo.loadAndMountForAccount(id, {
                     url: acc.promo_video || '',
@@ -2451,7 +2646,8 @@ window._rizqProfile = (function() {
         <li><a href="rizq_browse.html" id="rzq-ft-l2">تصفّح الإعلانات</a></li>
         <li><a href="rizq_post.html" id="rzq-ft-l3">انشر إعلانك</a></li>
         <li><a href="rizq_landing_v8.html#pricing" id="rzq-ft-l4">الأسعار</a></li>
-        <li><a href="rizq_landing_v8.html#about" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#who" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#why" data-t-fr="Pourquoi Rizq">لماذا رزق</a></li>
       </ul>
     </div>
     <div>

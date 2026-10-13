@@ -19,7 +19,8 @@
 
   var SECTORS = {
     store: [
-      { id: 'automotive', nameAr: 'سيارات ومركبات', nameFr: 'Automobile & véhicules' },
+      /* بيع السيارات الكامل → معارض (corp). المحلات: قطع غيار فقط */
+      { id: 'auto_parts', nameAr: 'قطع غيار وإطارات', nameFr: 'Pièces auto & pneus' },
       { id: 'electronics', nameAr: 'إلكترونيات وتقنية', nameFr: 'Électronique & tech' },
       { id: 'home', nameAr: 'أثاث وديكور منزلي', nameFr: 'Meubles & décoration' },
       { id: 'construction', nameAr: 'بناء ومواد', nameFr: 'Construction & matériaux' },
@@ -27,18 +28,19 @@
       { id: 'fashion', nameAr: 'أزياء وموضة', nameFr: 'Mode & vêtements' },
       { id: 'food', nameAr: 'أغذية ومطاعم', nameFr: 'Alimentation & restauration' },
       { id: 'equipment', nameAr: 'معدات وتجارة', nameFr: 'Équipements & commerce' },
-      { id: 'agriculture', nameAr: 'ماشية وزراعة', nameFr: 'Bétail & agriculture' },
-      { id: 'realty_retail', nameAr: 'عقارات وأراضي', nameFr: 'Immobilier & terrains' },
-      { id: 'pro_retail', nameAr: 'مهن متخصصة بالتجزئة', nameFr: 'Métiers spécialisés' },
+      /* ليس «ماشية» كمحل — فقط أعلاف ومستلزمات تُباع بالتجزئة */
+      { id: 'agriculture', nameAr: 'أعلاف ومستلزمات زراعية', nameFr: 'Aliments & fournitures agricoles' },
+      { id: 'pro_retail', nameAr: 'صيدليات ومهن تجزئة', nameFr: 'Pharmacies & commerces spécialisés' },
       { id: 'services_retail', nameAr: 'خدمات تجارية', nameFr: 'Services commerciaux' },
     ],
     office: [
-      { id: 'legal', nameAr: 'قانون وعدالة', nameFr: 'Droit & justice' },
-      { id: 'admin', nameAr: 'إدارة وخدمات حكومية', nameFr: 'Administration & services publics' },
+      /* تسميات موجّهة للزائر في الدليل والتسجيل — محامون، إداري، وكلاء عقارات… */
+      { id: 'legal', nameAr: 'محامون وقانون', nameFr: 'Avocats & droit' },
+      { id: 'admin', nameAr: 'خدمات إدارية ومعاملات', nameFr: 'Services administratifs' },
+      { id: 'realestate', nameAr: 'وكالات ومكاتب عقارية', nameFr: 'Agences immobilières' },
       { id: 'consular', nameAr: 'خدمات قنصلية ووثائق', nameFr: 'Services consulaires & documents' },
       { id: 'insurance', nameAr: 'تأمين ومالية', nameFr: 'Assurance & finance' },
       { id: 'engineering', nameAr: 'هندسة وتقنية', nameFr: 'Ingénierie & technique' },
-      { id: 'realestate', nameAr: 'عقارات وتصميم', nameFr: 'Immobilier & design' },
       { id: 'consulting', nameAr: 'استشارات وإدارة', nameFr: 'Conseil & gestion' },
       { id: 'health', nameAr: 'صحة وطب', nameFr: 'Santé & médecine' },
       { id: 'education', nameAr: 'تعليم وتدريب', nameFr: 'Éducation & formation' },
@@ -48,10 +50,11 @@
       { id: 'general_office', nameAr: 'استقبال وخدمات عامة', nameFr: 'Accueil & services généraux' },
     ],
     corp: [
-      { id: 'showroom', nameAr: 'معارض وبيع', nameFr: 'Showrooms & vente' },
+      /* فرق واضح عن المحلات: هنا بيع سيارات ومعارض كبيرة */
+      { id: 'showroom', nameAr: 'معارض سيارات وبيع', nameFr: 'Showrooms auto & vente' },
       { id: 'industrial', nameAr: 'صناعة وتجارة', nameFr: 'Industrie & commerce' },
       { id: 'hospitality', nameAr: 'ضيافة وفندقة', nameFr: 'Hôtellerie & hospitality' },
-      { id: 'logistics', nameAr: 'لوجistics ونقل', nameFr: 'Logistique & transport' },
+      { id: 'logistics', nameAr: 'لوجستيات ونقل', nameFr: 'Logistique & transport' },
       { id: 'enterprise_services', nameAr: 'خدمات مؤسسية', nameFr: 'Services entreprise' },
       { id: 'import_export', nameAr: 'استيراد وتصدير', nameFr: 'Import & export' },
       { id: 'realestate', nameAr: 'عقارات وتطوير', nameFr: 'Immobilier & promotion' },
@@ -71,11 +74,12 @@
   /** Expandable flat catalog — add entries without UI code changes */
   var ACTIVITIES = [
     // ── STORE / retail ──
-    { id: 'st_cars_new', sectorId: 'automotive', accountTypes: ['store', 'corp'], nameAr: 'بيع سيارات جديدة', nameFr: 'Vente de voitures neuves', icon: '🚗' },
-    { id: 'st_cars_used', sectorId: 'automotive', accountTypes: ['store', 'corp'], nameAr: 'بيع سيارات مستعملة', nameFr: 'Vente de voitures d\'occasion', icon: '🚙' },
-    { id: 'st_motorcycles', sectorId: 'automotive', accountTypes: ['store'], nameAr: 'دراجات نارية', nameFr: 'Motos & scooters', icon: '🏍️' },
-    { id: 'st_spare_parts', sectorId: 'automotive', accountTypes: ['store'], nameAr: 'قطع غيار سيارات', nameFr: 'Pièces détachées auto', icon: '🔧' },
-    { id: 'st_tires', sectorId: 'automotive', accountTypes: ['store'], nameAr: 'إطارات وبطاريات', nameFr: 'Pneus & batteries', icon: '🛞' },
+    /* بيع السيارات → المعارض فقط (showroom) */
+    { id: 'st_cars_new', sectorId: 'showroom', accountTypes: ['corp'], nameAr: 'بيع سيارات جديدة', nameFr: 'Vente de voitures neuves', icon: '🚗' },
+    { id: 'st_cars_used', sectorId: 'showroom', accountTypes: ['corp'], nameAr: 'بيع سيارات مستعملة', nameFr: 'Vente de voitures d\'occasion', icon: '🚙' },
+    { id: 'st_motorcycles', sectorId: 'auto_parts', accountTypes: ['store'], nameAr: 'دراجات نارية وقطعها', nameFr: 'Motos & pièces', icon: '🏍️' },
+    { id: 'st_spare_parts', sectorId: 'auto_parts', accountTypes: ['store'], nameAr: 'قطع غيار سيارات', nameFr: 'Pièces détachées auto', icon: '🔧' },
+    { id: 'st_tires', sectorId: 'auto_parts', accountTypes: ['store'], nameAr: 'إطارات وبطاريات', nameFr: 'Pneus & batteries', icon: '🛞' },
     { id: 'st_phones', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'هواتف ذكية', nameFr: 'Smartphones', icon: '📱' },
     { id: 'st_computers', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'حاسوب ولابتوب', nameFr: 'Ordinateurs & laptops', icon: '💻' },
     { id: 'st_tv_audio', sectorId: 'electronics', accountTypes: ['store'], nameAr: 'شاشات وصوتيات', nameFr: 'Écrans & audio', icon: '📺' },
@@ -110,11 +114,13 @@
     { id: 'st_machinery', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'معدات ومكائن', nameFr: 'Machines & équipements', icon: '⚙️' },
     { id: 'st_wholesale', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'بيع بالجملة', nameFr: 'Vente en gros', icon: '📦' },
     { id: 'st_retail_general', sectorId: 'equipment', accountTypes: ['store'], nameAr: 'تجزئة متعددة الأصناف', nameFr: 'Commerce de détail multi-rayons', icon: '🏪' },
-    { id: 'st_livestock', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'ماشية ودواجن', nameFr: 'Bétail & volaille', icon: '🐄' },
+    /* تجارة الماشية ليست «محلاً» في الدليل — للأفراد؛ المحل يبيع أعلافاً ومستلزمات */
+    { id: 'st_livestock', sectorId: 'ind_agri', accountTypes: ['individual'], nameAr: 'ماشية ودواجن', nameFr: 'Bétail & volaille', icon: '🐄' },
     { id: 'st_feed', sectorId: 'agriculture', accountTypes: ['store'], nameAr: 'أعلاف ومستلزمات زراعية', nameFr: 'Aliments & fournitures agricoles', icon: '🌾' },
-    { id: 'st_realty_sale', sectorId: 'realty_retail', accountTypes: ['store', 'corp'], nameAr: 'بيع عقارات وأراضي', nameFr: 'Vente immobilière & terrains', icon: '🏠' },
-    { id: 'st_realty_rent', sectorId: 'realty_retail', accountTypes: ['store'], nameAr: 'إيجار عقارات وسكن', nameFr: 'Location immobilière', icon: '🔑' },
-    { id: 'st_realty_land', sectorId: 'realty_retail', accountTypes: ['store'], nameAr: 'أراضي وقطع سكنية', nameFr: 'Terrains & lots', icon: '🗺️' },
+    /* الوكالات العقارية → مكاتب / معارض مؤسسية، ليس محلات تجزئة */
+    { id: 'st_realty_sale', sectorId: 'realestate', accountTypes: ['office', 'corp'], nameAr: 'بيع عقارات وأراضي', nameFr: 'Vente immobilière & terrains', icon: '🏠' },
+    { id: 'st_realty_rent', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'إيجار عقارات وسكن', nameFr: 'Location immobilière', icon: '🔑' },
+    { id: 'st_realty_land', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'أراضي وقطع سكنية', nameFr: 'Terrains & lots', icon: '🗺️' },
     { id: 'st_pharmacy', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'صيدلية', nameFr: 'Pharmacie', icon: '💊' },
     { id: 'st_optics', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'نظارات وسمعيات', nameFr: 'Optique & audiologie', icon: '👓' },
     { id: 'st_books', sectorId: 'pro_retail', accountTypes: ['store'], nameAr: 'مكتبة وقرطاسية', nameFr: 'Librairie & papeterie', icon: '📚' },
@@ -322,6 +328,7 @@
     if (!a) return 'أخرى';
     var map = {
       automotive: 'سيارات',
+      auto_parts: 'سيارات',
       electronics: 'إلكترونيات',
       home: 'أثاث',
       construction: 'بناء',
@@ -331,6 +338,7 @@
       equipment: 'معدات',
       agriculture: 'زراعة',
       realty_retail: 'عقارات',
+      realestate: 'عقارات',
       pro_retail: 'مهن',
       services_retail: 'خدمات',
       showroom: 'سيارات',
@@ -411,7 +419,7 @@
     'ذهب': { ar: '💎 ذهب ومجوهرات', fr: '💎 Or & bijoux' },
     'أزياء': { ar: '👗 أزياء وملابس', fr: '👗 Mode & vêtements' },
     'أغذية': { ar: '🛒 أغذية وتموين', fr: '🛒 Alimentation' },
-    'زراعة': { ar: '🐄 ماشية وزراعة', fr: '🐄 Bétail & agriculture' },
+    'زراعة': { ar: '🌾 أعلاف ومستلزمات زراعية', fr: '🌾 Aliments & fournitures agricoles' },
     'عقارات': { ar: '🏠 عقارات', fr: '🏠 Immobilier' },
     'مهن': { ar: '🧰 مهن متخصصة', fr: '🧰 Métiers spécialisés' },
     'خدمات': { ar: '🏷️ خدمات تجارية', fr: '🏷️ Services commerciaux' },
@@ -429,6 +437,126 @@
       if (out.indexOf(c) === -1) out.push(c);
     });
     return out;
+  }
+
+  /** أيقونات عرض لفلاتر الدليل حسب القطاع */
+  var SECTOR_DIR_ICONS = {
+    automotive: '🚗', auto_parts: '🔧', electronics: '📱', home: '🛋️', construction: '🏗️',
+    jewelry: '💎', fashion: '👗', food: '🛒', equipment: '⚙️',
+    agriculture: '🌾', realty_retail: '🏠', pro_retail: '💊', services_retail: '🏷️',
+    legal: '⚖️', admin: '🏛️', consular: '🛂', insurance: '🛡️',
+    engineering: '🔧', realestate: '🏠', consulting: '💡', health: '🩺',
+    education: '🎓', media: '🎬', travel: '🌍', it: '💻', general_office: '🛎️',
+    showroom: '🚗', industrial: '🏭', hospitality: '🏨', logistics: '🚚',
+    enterprise_services: '💼', import_export: '🌐',
+  };
+
+  /** تحويل فئة قديمة (عربية) إلى sectorId حسب نوع الحساب */
+  function sectorIdFromLegacyCategory(cat, accountType) {
+    var t = normType(accountType);
+    var mapStore = {
+      /* فئة سيارات القديمة على المحل → قطع غيار فقط (بيع السيارات للمعارض) */
+      'سيارات': 'auto_parts',
+      'إلكترونيات': 'electronics',
+      'أثاث': 'home',
+      'بناء': 'construction',
+      'ذهب': 'jewelry',
+      'أزياء': 'fashion',
+      'أغذية': 'food',
+      'معدات': 'equipment',
+      'زراعة': 'agriculture',
+      'مهن': 'pro_retail',
+      'خدمات': 'services_retail',
+    };
+    var mapCorp = {
+      'سيارات': 'showroom',
+      'إلكترونيات': 'showroom',
+      'أثاث': 'showroom',
+      'ذهب': 'showroom',
+      'بناء': 'showroom',
+      'معدات': 'industrial',
+      'عقارات': 'realestate',
+      'خدمات': 'enterprise_services',
+    };
+    if (t === 'corp') return mapCorp[cat] || null;
+    if (t === 'store') return mapStore[cat] || null;
+    return null;
+  }
+
+  /** فلاتر الدليل = قطاعات الاختصاص لنوع الحساب (محلات / معارض / مكاتب) */
+  function listDirectorySectors(accountType, lang) {
+    var t = normType(accountType);
+    return (SECTORS[t] || []).map(function (s) {
+      var icon = SECTOR_DIR_ICONS[s.id] || '🏷️';
+      var name = sectorLabel(s, lang);
+      return {
+        id: s.id,
+        name: icon + ' ' + name,
+        nameAr: icon + ' ' + s.nameAr,
+        nameFr: icon + ' ' + s.nameFr,
+        label: icon + ' ' + name,
+      };
+    });
+  }
+
+  function normalizeDirectoryFilter(raw, accountType) {
+    if (!raw) return '';
+    var t = normType(accountType);
+    var sectors = SECTORS[t] || [];
+    if (sectors.some(function (s) { return s.id === raw; })) return raw;
+    var fromLegacy = sectorIdFromLegacyCategory(raw, t);
+    if (fromLegacy) return fromLegacy;
+    var byAct = ACTIVITIES.find(function (a) {
+      return a.accountTypes.indexOf(t) !== -1
+        && (a.id === raw || a.nameAr === raw || a.nameFr === raw);
+    });
+    if (byAct) return byAct.sectorId;
+    return '';
+  }
+
+  function resolveAccountSectorId(acc) {
+    if (!acc) return null;
+    var t = normType(acc.type);
+    if (acc.activityId) {
+      var byId = findById(acc.activityId);
+      if (byId) return byId.sectorId;
+    }
+    var actName = String(acc.activity || '').trim();
+    if (actName) {
+      var byName = ACTIVITIES.find(function (a) {
+        return a.accountTypes.indexOf(t) !== -1
+          && (a.nameAr === actName || a.nameFr === actName);
+      });
+      if (byName) return byName.sectorId;
+    }
+    if (acc.category) {
+      return sectorIdFromLegacyCategory(acc.category, t);
+    }
+    return null;
+  }
+
+  function accountMatchesDirectoryFilter(acc, filterId) {
+    if (!filterId) return true;
+    if (!acc) return false;
+    var sectorId = normalizeDirectoryFilter(filterId, acc.type) || filterId;
+    var accSector = resolveAccountSectorId(acc);
+    if (accSector && accSector === sectorId) return true;
+    if (acc.category && (acc.category === filterId
+      || sectorIdFromLegacyCategory(acc.category, acc.type) === sectorId)) {
+      return true;
+    }
+    return false;
+  }
+
+  function directorySectorLabel(sectorId, accountType, lang) {
+    var t = normType(accountType);
+    var sectors = SECTORS[t] || [];
+    var s = sectors.find(function (x) { return x.id === sectorId; });
+    if (!s) {
+      return legacyCategoryLabel(sectorId, lang);
+    }
+    var icon = SECTOR_DIR_ICONS[s.id] || '🏷️';
+    return icon + ' ' + sectorLabel(s, lang);
   }
 
   function legacyCategoryLabel(cat, lang) {
@@ -533,6 +661,12 @@
     inventoryPresetForActivity: inventoryPresetForActivity,
     legacyCategoryLabel: legacyCategoryLabel,
     listDirectoryFilterCategories: listDirectoryFilterCategories,
+    listDirectorySectors: listDirectorySectors,
+    normalizeDirectoryFilter: normalizeDirectoryFilter,
+    resolveAccountSectorId: resolveAccountSectorId,
+    accountMatchesDirectoryFilter: accountMatchesDirectoryFilter,
+    directorySectorLabel: directorySectorLabel,
+    sectorIdFromLegacyCategory: sectorIdFromLegacyCategory,
     LEGACY_DIR_LABELS: LEGACY_DIR_LABELS,
     displayName: displayName,
     renderSelect: renderSelect,

@@ -979,7 +979,19 @@ function addToCart(id) {
 }
 
 function updateCartCount() {
-  const t = cart.reduce((s,c) => s+c.qty, 0);
+  var sid = '';
+  try {
+    sid = window._rizqProductsStoreId
+      || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+      || new URLSearchParams(location.search).get('id')
+      || '';
+  } catch (eSid) {}
+  const t = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartQtyForSeller === 'function')
+    ? RizqStoreCommerce.cartQtyForSeller(cart, sid)
+    : cart.reduce(function(s,c){
+        if (sid && String(c.storeId || c.accountId || '') !== String(sid)) return s;
+        return s + (Number(c.qty) || 0);
+      }, 0);
   const el = document.getElementById('nav-cart-count');
   if (el) el.textContent = t;
   const sideCart = document.getElementById('prod-cart-count');
@@ -1030,9 +1042,9 @@ function openModal(id) {
       fr: !ar,
       storeName: storeName.trim(),
       catalog: allProducts.slice(),
-      onAdd: function (prod, qty) {
+      onAdd: function (prod, qty, selection) {
         modalQty = qty || 1;
-        addModalToCart(prod.id);
+        addModalToCart(prod.id, selection);
       },
       onAsk: function (prod) {
         RizqStoreCommerce.closeProductDetail();
@@ -1064,16 +1076,32 @@ function changeQty(delta) {
   modalQty = Math.max(1, Math.min(99, (modalQty || 1) + delta));
 }
 
-function addModalToCart(id) {
+function addModalToCart(id, selection) {
   const p = _findProduct(id);
   if (!p) return;
-  const ex = cart.find(c => String(c.id) === String(id));
+  selection = selection || null;
+  var baseId = String(id);
+  var lineId = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+    ? RizqStoreCommerce.cartLineIdForProduct(baseId, selection && selection.selected)
+    : baseId;
+  const ex = cart.find(c => String(c.id) === String(lineId));
   if (ex) ex.qty += modalQty;
-  else cart.push(Object.assign({}, p, { qty: modalQty, storeId: p.storeId || (window._rizqProductsStoreId || '') }));
+  else {
+    cart.push(Object.assign({}, p, {
+      id: lineId,
+      productId: baseId,
+      qty: modalQty,
+      storeId: p.storeId || (window._rizqProductsStoreId || ''),
+      variantKey: (selection && selection.key) || '',
+      variantLabel: (selection && selection.label) || '',
+      selected: (selection && selection.selected) || null
+    }));
+  }
   saveCart();
   updateCartCount();
   const ar = window.isAr !== false;
-  showToast(ar ? `✅ ${modalQty}x ${p.name} أضيف للسلة` : `✅ ${modalQty}x ${p.nameF} ajouté au panier`);
+  var vlab = selection && selection.label ? (' · ' + selection.label) : '';
+  showToast(ar ? `✅ ${modalQty}x ${p.name}${vlab} أضيف للسلة` : `✅ ${modalQty}x ${p.nameF}${vlab} ajouté au panier`);
   closeModal();
 }
 
@@ -1124,31 +1152,31 @@ if (anchor && anchor.startsWith('#product-')) {
 
 function _demoCatalog(fr){
   var base = [
-    { name:'دراعة رجالية فاخرة', nameF:'Boubou homme premium', price:45000, cat:'أزياء', emoji:'👔' },
-    { name:'عطر شرقي 100مل', nameF:'Parfum oriental 100ml', price:18000, cat:'عطور', emoji:'🧴' },
-    { name:'حذاء رياضي', nameF:'Baskets sport', price:22000, cat:'أحذية', emoji:'👟' },
+    { name:'دراعة رجالية فاخرة', nameF:'Boubou homme premium', price:45000, cat:'أزياء', emoji:'👔', variants:'S, M, L, XL, XXL' },
+    { name:'عطر شرقي 100مل', nameF:'Parfum oriental 100ml', price:18000, cat:'عطور', emoji:'🧴', variants:'50مل, 100مل, 200مل' },
+    { name:'حذاء رياضي', nameF:'Baskets sport', price:22000, cat:'أحذية', emoji:'👟', variants:'مقاس: 39, 40, 41, 42, 43, 44' },
     { name:'ساعة كلاسيكية', nameF:'Montre classique', price:35000, cat:'إكسسوارات', emoji:'⌚' },
     { name:'حقيبة جلدية', nameF:'Sac en cuir', price:28000, cat:'إكسسوارات', emoji:'👜' },
     { name:'نظارة شمسية', nameF:'Lunettes de soleil', price:9000, cat:'إكسسوارات', emoji:'🕶️' },
-    { name:'قميص قطني', nameF:'Chemise coton', price:12000, cat:'أزياء', emoji:'👔' },
-    { name:'فستان سهرة', nameF:'Robe de soirée', price:55000, cat:'أزياء', emoji:'👗' },
-    { name:'صندل صيفي', nameF:'Sandales été', price:8000, cat:'أحذية', emoji:'🩴' },
-    { name:'عطر نسائي', nameF:'Parfum femme', price:21000, cat:'عطور', emoji:'🌸' },
+    { name:'قميص قطني', nameF:'Chemise coton', price:12000, cat:'أزياء', emoji:'👔', variants:'مقاس: S, M, L, XL · لون: أبيض, أزرق, أسود' },
+    { name:'فستان سهرة', nameF:'Robe de soirée', price:55000, cat:'أزياء', emoji:'👗', variants:'S, M, L, XL' },
+    { name:'صندل صيفي', nameF:'Sandales été', price:8000, cat:'أحذية', emoji:'🩴', variants:'38, 39, 40, 41, 42' },
+    { name:'عطر نسائي', nameF:'Parfum femme', price:21000, cat:'عطور', emoji:'🌸', variants:'50مل, 100مل' },
     { name:'سوار ذهب مظهر', nameF:'Bracelet doré', price:15000, cat:'إكسسوارات', emoji:'💍' },
-    { name:'طقم أطفال', nameF:'Ensemble enfant', price:11000, cat:'أطفال', emoji:'🧸' },
-    { name:'حذاء رسمي', nameF:'Chaussures formal', price:32000, cat:'أحذية', emoji:'👞' },
-    { name:'معطف خفيف', nameF:'Manteau léger', price:40000, cat:'أزياء', emoji:'🧥' },
-    { name:'كريم عناية', nameF:'Crème soin', price:7000, cat:'عطور', emoji:'🧴' },
+    { name:'طقم أطفال', nameF:'Ensemble enfant', price:11000, cat:'أطفال', emoji:'🧸', variants:'2-3 سنوات, 4-5 سنوات, 6-7 سنوات' },
+    { name:'حذاء رسمي', nameF:'Chaussures formal', price:32000, cat:'أحذية', emoji:'👞', variants:'مقاس: 40, 41, 42, 43, 44, 45' },
+    { name:'معطف خفيف', nameF:'Manteau léger', price:40000, cat:'أزياء', emoji:'🧥', variants:'M, L, XL, XXL' },
+    { name:'كريم عناية', nameF:'Crème soin', price:7000, cat:'عطور', emoji:'🧴', variants:'50مل, 100مل, 200مل' },
     { name:'لعبة تعليمية', nameF:'Jouet éducatif', price:6500, cat:'أطفال', emoji:'🧩' },
     { name:'قبعة أنيقة', nameF:'Casquette chic', price:4500, cat:'إكسسوارات', emoji:'🧢' },
-    { name:'تيشيرت قطن', nameF:'T-shirt coton', price:5000, cat:'أزياء', emoji:'👕' }
+    { name:'تيشيرت قطن', nameF:'T-shirt coton', price:5000, cat:'أزياء', emoji:'👕', variants:'S, M, L, XL, XXL' }
   ];
   return base.map(function(p, i){
     return {
       id: 'D'+(i+1), name: p.name, nameF: p.nameF, cat: p.cat, emoji: p.emoji,
       price: p.price, oldPrice: i % 4 === 0 ? Math.round(p.price * 1.18) : null,
       discount: i % 4 === 0, isNew: i < 3, desc: '',
-      descF: '', imgDataArr: [], storeId: 'demo_store'
+      descF: '', variants: p.variants || '', imgDataArr: [], storeId: 'demo_store'
     };
   });
 }
@@ -1373,7 +1401,8 @@ else bootProductsCatalog();
         <li><a href="rizq_browse.html" id="rzq-ft-l2">تصفّح الإعلانات</a></li>
         <li><a href="rizq_post.html" id="rzq-ft-l3">انشر إعلانك</a></li>
         <li><a href="rizq_landing_v8.html#pricing" id="rzq-ft-l4">الأسعار</a></li>
-        <li><a href="rizq_landing_v8.html#about" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#who" id="rzq-ft-l5">من نحن</a></li>
+        <li><a href="rizq_platform.html#why" data-t-fr="Pourquoi Rizq">لماذا رزق</a></li>
       </ul>
     </div>
     <div>
