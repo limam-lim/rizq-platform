@@ -769,15 +769,51 @@ function _dirBindInfinite(){
   _dirIO.observe(sentinel);
 }
 
+/** بذور عرض التخرج — تُستخدم إن فشل الـ API أو عاد فارغاً (فصل واضح عبر graduationDemo) */
+function _loadGraduationFixture(){
+  return fetch('rizq-backend/fixtures/graduation-demo.json')
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !Array.isArray(data.accounts)) return [];
+      var now = new Date().toISOString();
+      return data.accounts.map(function(a, idx){
+        return Object.assign({}, a, {
+          graduationDemo: true,
+          status: 'approved',
+          approvedAt: a.approvedAt || new Date(Date.now() - (idx + 1) * 3600000).toISOString(),
+          createdAt: a.createdAt || now
+        });
+      });
+    })
+    .catch(function(){ return []; });
+}
+
 function loadAccounts(){
   fetch(_backendBase().replace(/\/$/,'') + '/api/accounts/public')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      _accounts = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
+      var list = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
+      if(list.length){
+        _accounts = list;
+        _loaded = true;
+        renderDirectory();
+        return null;
+      }
+      return _loadGraduationFixture();
+    })
+    .then(function(fallback){
+      if(fallback == null) return;
+      _accounts = fallback;
       _loaded = true;
       renderDirectory();
     })
-    .catch(function(){ _accounts=[]; _loaded=true; renderDirectory(); });
+    .catch(function(){
+      _loadGraduationFixture().then(function(fallback){
+        _accounts = fallback || [];
+        _loaded = true;
+        renderDirectory();
+      });
+    });
 }
 
 document.addEventListener('rizq:langchange', function(){ renderDirectory(); });

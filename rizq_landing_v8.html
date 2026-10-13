@@ -14554,37 +14554,37 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       ]
     };
 
-    /** عيّنات عرض حيّة — تُملأ الشريط مباشرة بدل بانر الخلفية الفارغة */
+    /** احتياطي واجهة إن تعذّر الـ API — نفس أسماء بذور التخرج (acc_grad_*) */
     function showcaseAccounts(type){
       var now = Date.now();
-      var mk = function(id, name, tagline, city, offsetHrs){
+      var mk = function(id, name, tagline, city, thumb, offsetHrs){
         return {
-          id: id, type: type, status: 'approved',
-          name: name, tagline: tagline, city: city,
-          thumb: '', approvedAt: new Date(now - offsetHrs * 3600000).toISOString()
+          id: id, type: type, status: 'approved', graduationDemo: true,
+          name: name, tagline: tagline, city: city, thumb: thumb || '',
+          approvedAt: new Date(now - offsetHrs * 3600000).toISOString()
         };
       };
       if(type === 'store'){
         return [
-          mk('acc_showcase_store_1', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية — نواكشوط', 'نواكشوط', 2),
-          mk('acc_showcase_store_2', 'أناقة موريتانيا', 'أزياء ودراعة رجالية ونسائية', 'نواكشوط', 8),
-          mk('acc_showcase_store_3', 'سوق الأمل للأغذية', 'مواد غذائية وتموين يومي', 'نواذيبو', 14),
-          mk('acc_showcase_store_4', 'ذهبيات روصو', 'ذهب ومجوهرات بأسعار واضحة', 'روصو', 20),
-          mk('acc_showcase_store_5', 'بيت الديكور', 'أثاث ومفروشات منزلية', 'نواكشوط', 30)
+          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store01/480/360', 2),
+          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store02/480/360', 8),
+          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-store03/480/360', 14),
+          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://picsum.photos/seed/rizq-grad-store04/480/360', 20),
+          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store05/480/360', 30)
         ];
       }
       if(type === 'corp'){
         return [
-          mk('acc_showcase_corp_1', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة', 'نواكشوط', 3),
-          mk('acc_showcase_corp_2', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات', 'نواكشوط', 12),
-          mk('acc_showcase_corp_3', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب', 'نواذيبو', 22)
+          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp01/480/360', 3),
+          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp02/480/360', 12),
+          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-corp03/480/360', 22)
         ];
       }
       if(type === 'office'){
         return [
-          mk('acc_showcase_office_1', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية', 'نواكشوط', 5),
-          mk('acc_showcase_office_2', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 16),
-          mk('acc_showcase_office_3', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات', 'روصو', 28)
+          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office01/480/360', 5),
+          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office02/480/360', 16),
+          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://picsum.photos/seed/rizq-grad-office03/480/360', 28)
         ];
       }
       return [];
