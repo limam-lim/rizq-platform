@@ -3924,6 +3924,14 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 /* ── DISCOVERY STRIPS — "آخر المحلات/المكاتب/المعارض" (شريط اكتشاف حي) ── */
 /* المسار يبقى LTR لحساب scrollLeft؛ اتجاه الحركة يُقلَب في JS حسب اللغة */
 .rzq-disc-wrap{margin-top:44px;direction:ltr}
+.rzq-disc-live-head{
+  display:flex;align-items:center;justify-content:flex-start;gap:10px;
+  margin:0 0 12px;padding:0 2px;direction:rtl
+}
+html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
+.rzq-disc-live-head .live-label-sub{
+  font-size:13px;font-weight:700;color:#0F2347;line-height:1.35
+}
 .rzq-disc-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;direction:ltr}
 .rzq-disc-strip::-webkit-scrollbar{display:none}
 .rzq-disc-track{display:inline-flex;gap:16px;padding:2px;direction:ltr}
@@ -4736,7 +4744,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض مباشرة على رزق — تخطف الأنظار</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -6686,8 +6694,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Offres en direct sur Rizq — qui impressionnent</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض مباشرة على رزق — تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -9458,7 +9466,7 @@ const LANG = {
     'hbiz-trust': 'ثقتك أولاً: رزق ينشر فقط · تتواصل مع البائع مباشرة · عاين قبل أن تدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
-    'promo-strip-sub': 'آخر الإعلانات على رزق — عروض تخطف الأنظار',
+    'promo-strip-sub': 'عروض مباشرة على رزق — تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -9605,7 +9613,7 @@ const LANG = {
     'hbiz-trust': 'Votre confiance d\'abord : Rizq publie seulement · contact direct avec le vendeur · vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
-    'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
+    'promo-strip-sub': 'Offres en direct sur Rizq — qui impressionnent',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Vendez plus fort chaque jour',
     'hbiz-offices-hint': 'Des clients vous cherchent',
@@ -14490,11 +14498,13 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
        قواعد واحدة:
          1) عنصر جاهز للعرض فقط (حساب موافق + صورة + جملة، أو مناقصة/استثمار منشور)
          2) ترتيب بالأحدث أولاً
-         3) إن قلّ العدد عن MIN_READY (3) → حالة فارغة «كن أول من…»
-         4) وإلا شريط حتى MAX_CARDS (20) مع تمرير تلقائي ── -->
+         3) إن وُجد محل/معرض/مكتب واحد جاهز → شريط «مباشر» بلا خلفية فارغة
+         4) إن لم يوجد أي حساب حقيقي → عيّنات عرض حيّة (لا بانر «كن أول…»)
+         5) المناقصات/الاستثمارات تبقى بعتبة 3 للعناصر المنشورة ── -->
   <script>
   (function(){
-    var DISCOVERY_MIN_READY = 3;
+    var DISCOVERY_MIN_READY_ACCOUNTS = 1;
+    var DISCOVERY_MIN_READY_FEEDS = 3;
     var DISCOVERY_MAX_CARDS = 20;
 
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -14528,7 +14538,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         bizType:'investments' }
     };
 
-    /** معاينات عند الفراغ — نفس فكرة دليل المحلات/المعارض/المكاتب */
+    /** معاينات عند الفراغ التام فقط (لا حسابات جاهزة ولا عيّنات عرض) */
     var EMPTY_EXAMPLES = {
       store: [
         { href:'rizq_store.html?demo=1', nameAr:'محل نموذجي على رزق', nameFr:'Boutique modèle Rizq', tagAr:'إلكترونيات وتقنية', tagFr:'Électronique & tech', icon:'🏪' },
@@ -14543,6 +14553,57 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️' }
       ]
     };
+
+    /** عيّنات عرض حيّة — تُملأ الشريط مباشرة بدل بانر الخلفية الفارغة */
+    function showcaseAccounts(type){
+      var now = Date.now();
+      var mk = function(id, name, tagline, city, offsetHrs){
+        return {
+          id: id, type: type, status: 'approved',
+          name: name, tagline: tagline, city: city,
+          thumb: '', approvedAt: new Date(now - offsetHrs * 3600000).toISOString()
+        };
+      };
+      if(type === 'store'){
+        return [
+          mk('acc_showcase_store_1', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية — نواكشوط', 'نواكشوط', 2),
+          mk('acc_showcase_store_2', 'أناقة موريتانيا', 'أزياء ودراعة رجالية ونسائية', 'نواكشوط', 8),
+          mk('acc_showcase_store_3', 'سوق الأمل للأغذية', 'مواد غذائية وتموين يومي', 'نواذيبو', 14),
+          mk('acc_showcase_store_4', 'ذهبيات روصو', 'ذهب ومجوهرات بأسعار واضحة', 'روصو', 20),
+          mk('acc_showcase_store_5', 'بيت الديكور', 'أثاث ومفروشات منزلية', 'نواكشوط', 30)
+        ];
+      }
+      if(type === 'corp'){
+        return [
+          mk('acc_showcase_corp_1', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة', 'نواكشوط', 3),
+          mk('acc_showcase_corp_2', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات', 'نواكشوط', 12),
+          mk('acc_showcase_corp_3', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب', 'نواذيبو', 22)
+        ];
+      }
+      if(type === 'office'){
+        return [
+          mk('acc_showcase_office_1', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية', 'نواكشوط', 5),
+          mk('acc_showcase_office_2', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 16),
+          mk('acc_showcase_office_3', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات', 'روصو', 28)
+        ];
+      }
+      return [];
+    }
+
+    function liveHeadHTML(type, fr){
+      var sub = {
+        store: { ar: 'أحدث المحلات المفتوحة على رزق', fr: 'Dernières boutiques ouvertes sur Rizq' },
+        corp: { ar: 'أحدث المعارض المفتوحة على رزق', fr: 'Derniers showrooms ouverts sur Rizq' },
+        office: { ar: 'أحدث المكاتب المفتوحة على رزق', fr: 'Derniers bureaux ouverts sur Rizq' },
+        tenders: { ar: 'أحدث المناقصات على رزق', fr: 'Derniers appels d\'offres sur Rizq' },
+        investments: { ar: 'أحدث الفرص الاستثمارية على رزق', fr: 'Dernières opportunités sur Rizq' }
+      }[type] || { ar: 'مباشر على رزق', fr: 'En direct sur Rizq' };
+      var live = fr ? 'En direct' : 'مباشر';
+      return '<div class="rzq-disc-live-head">'
+        + '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">'+live+'</strong></span>'
+        + '<span class="live-label-sub">'+esc(fr ? sub.fr : sub.ar)+'</span>'
+        + '</div>';
+    }
 
     var TENDER_CAT = {
       'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
@@ -14628,12 +14689,16 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         + '</div>';
     }
 
-    function mountStrip(mount, cardsHTML, cfg, fr){
+    function mountStrip(mount, cardsHTML, cfg, fr, opts){
+      opts = opts || {};
       if(!cardsHTML){
         mount.innerHTML = emptyHTML(cfg, fr);
         return;
       }
-      mount.innerHTML = '<div class="rzq-disc-strip">'
+      /* عند وجود محلات/حسابات: لا خلفية فارغة ولا نص «كن أول…» — شريط مباشر فقط */
+      var head = opts.liveType ? liveHeadHTML(opts.liveType, fr) : '';
+      mount.innerHTML = head
+        + '<div class="rzq-disc-strip">'
         + '<div class="rzq-disc-track">' + cardsHTML + cardsHTML + '</div>'
         + '</div>';
       initAutoScroll(mount.querySelector('.rzq-disc-strip'));
@@ -14700,7 +14765,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       return _backendAccountsPromise;
     }
 
-    /** حسابات (محل/مكتب/معرض): موافَق + اسم + صورة + جملة — الأحدث موافقة أولاً */
+    /** حسابات (محل/مكتب/معرض): موافَق + اسم + جملة — الأحدث موافقة أولاً؛ شريط مباشر بلا بانر فارغ */
     function renderStrip(mountId, type){
       var mount = document.getElementById(mountId);
       if(!mount) return;
@@ -14715,20 +14780,26 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         remoteAccs.forEach(function(a){ if(a && a.id && !known[a.id]){ known[a.id]=true; merged.push(a); } });
         var list = merged.filter(function(a){
           if(!a || String(a.id||'').indexOf('acc_demo')===0) return false;
-          return a.status==='approved' && a.type===type && a.name && a.thumb && a.tagline;
+          if(String(a.id||'').indexOf('acc_showcase_')===0) return false;
+          /* صورة اختيارية: الاسم + الجملة يكفيان للظهور الحي */
+          return a.status==='approved' && a.type===type && a.name && a.tagline;
         });
         list.sort(function(a,b){ return new Date(b.approvedAt||0) - new Date(a.approvedAt||0); });
 
-        if(list.length < DISCOVERY_MIN_READY){
+        /* إن وُجدت محلات حقيقية → شريط مباشر فقط (تختفي الخلفية والنص الفارغ) */
+        if(list.length < DISCOVERY_MIN_READY_ACCOUNTS){
+          list = showcaseAccounts(type);
+        }
+        if(!list.length){
           mountStrip(mount, '', cfg, fr);
           return;
         }
         var cardsHTML = list.slice(0, DISCOVERY_MAX_CARDS).map(function(a){ return cardHTML(a, cfg, fr); }).join('');
-        mountStrip(mount, cardsHTML, cfg, fr);
+        mountStrip(mount, cardsHTML, cfg, fr, { liveType: type });
       });
     }
 
-    /** مناقصات / استثمارات: نفس العتبة والترتيب من public-stats */
+    /** مناقصات / استثمارات: عتبة أعلى للعناصر المنشورة */
     function renderFeedStrip(mountId, kind){
       var mount = document.getElementById(mountId);
       if(!mount) return;
@@ -14746,14 +14817,14 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         .then(function(data){
           var teasers = data && data.ok && Array.isArray(data.teasers) ? data.teasers : [];
           var count = data && data.ok ? Number(data.count||teasers.length) : 0;
-          if(count < DISCOVERY_MIN_READY || teasers.length < DISCOVERY_MIN_READY){
+          if(count < DISCOVERY_MIN_READY_FEEDS || teasers.length < DISCOVERY_MIN_READY_FEEDS){
             mountStrip(mount, '', cfg, fr);
             return;
           }
           var cardsHTML = teasers.slice(0, DISCOVERY_MAX_CARDS).map(function(row){
             return kind==='tenders' ? tenderCardHTML(row, fr) : investmentCardHTML(row, fr);
           }).join('');
-          mountStrip(mount, cardsHTML, cfg, fr);
+          mountStrip(mount, cardsHTML, cfg, fr, { liveType: kind });
         })
         .catch(function(){ mountStrip(mount, '', cfg, fr); });
     }
