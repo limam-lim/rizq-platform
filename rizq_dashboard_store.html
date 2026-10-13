@@ -362,6 +362,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=2"></script>
+<script src="rizq_brands_catalog.js?v=1"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -672,6 +673,20 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
               <option value="">— اختر موضوعاً —</option>
             </select>
             <p style="font-size:11px;color:var(--text-muted);margin-top:6px" data-t="prod-cat-hint">إن لم تجد الموضوع المناسب، أضفه أعلاه أولاً ثم اختره هنا.</p>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" data-t="prod-brand-label">الماركة</label>
+              <select class="form-input" id="prod-brand" onchange="onStoreBrandChange()">
+                <option value="">— الماركة —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-t="prod-model-label">الموديل</label>
+              <select class="form-input" id="prod-model" disabled>
+                <option value="">— الموديل —</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label" data-t="prod-desc-label">الوصف</label>
@@ -2051,6 +2066,12 @@ function openAddProduct(){
 
 function clearProductForm(){
   ['prod-name','prod-price','prod-desc','prod-stock','prod-variants','prod-sold','prod-sku','prod-unit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  try{
+    if(window.RizqBrands){
+      RizqBrands.fillBrandSelect(document.getElementById('prod-brand'), '', false, '');
+      RizqBrands.fillModelSelect(document.getElementById('prod-model'), '', false, '');
+    }
+  }catch(eBrandClr){}
   fillProductTopicSelect('');
   document.getElementById('prod-status').value='available';
   const zone = document.getElementById('prod-upload-zone');
@@ -2114,6 +2135,8 @@ function _rizqSyncCatalogItem(prod){
     var body = {
       accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
       topicId: prod.topicId || '',
+      brandId: prod.brandId || '', brandName: prod.brandName || '', brandNameFr: prod.brandNameFr || '',
+      modelId: prod.modelId || '', modelName: prod.modelName || '', modelNameFr: prod.modelNameFr || '',
       desc: prod.desc, stock: prod.stock, variants: prod.variants, sku: prod.sku||'', unit: prod.unit||'', sold: prod.sold,
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
@@ -2350,6 +2373,12 @@ function saveProduct(){
       unit: document.getElementById('prod-unit') ? document.getElementById('prod-unit').value.trim().slice(0,40) : '',
       sold: document.getElementById('prod-sold') ? (parseInt(document.getElementById('prod-sold').value)||0) : 0,
       status: data._status || (document.getElementById('prod-status') ? document.getElementById('prod-status').value : 'active'),
+      brandId: (document.getElementById('prod-brand')||{}).value || '',
+      modelId: (document.getElementById('prod-model')||{}).value || '',
+      brandName: '',
+      brandNameFr: '',
+      modelName: '',
+      modelNameFr: '',
       // imgDataArr: مصفوفة الصور (حتى 6) — imgData تبقى محدَّثة بالصورة
       // الأولى فقط لتوافق أي كود قديم ما زال يقرأ prod.imgData مباشرة.
       imgDataArr: (window._prodImages||[]).slice(),
@@ -2357,6 +2386,16 @@ function saveProduct(){
       emoji: '📦',
       addedAt: new Date().toISOString()
     };
+    if(window.RizqBrands && prod.brandId){
+      var _b = RizqBrands.getById(prod.brandId);
+      prod.brandName = RizqBrands.displayName(_b, false);
+      prod.brandNameFr = RizqBrands.displayName(_b, true);
+      if(prod.modelId){
+        var _m = RizqBrands.getModel(prod.brandId, prod.modelId);
+        prod.modelName = RizqBrands.modelName(_m, false);
+        prod.modelNameFr = RizqBrands.modelName(_m, true);
+      }
+    }
     if(window._editingIdx!=null){ products[window._editingIdx]=prod; }
     else {
       products.push(prod);
@@ -2383,6 +2422,13 @@ function saveProduct(){
   } else { doSave(adData); }
 }
 
+function onStoreBrandChange(){
+  var brandId = (document.getElementById('prod-brand')||{}).value || '';
+  if(window.RizqBrands){
+    RizqBrands.fillModelSelect(document.getElementById('prod-model'), brandId, false, '');
+  }
+}
+
 function editProduct(i){
   const p = products[i];
   window._editingIdx = i;
@@ -2399,6 +2445,12 @@ function editProduct(i){
   var unitEl = document.getElementById('prod-unit'); if(unitEl) unitEl.value = p.unit||'';
   document.getElementById('prod-sold').value = p.sold||'';
   document.getElementById('prod-status').value = p.status||'available';
+  try{
+    if(window.RizqBrands){
+      RizqBrands.fillBrandSelect(document.getElementById('prod-brand'), '', false, p.brandId||'');
+      RizqBrands.fillModelSelect(document.getElementById('prod-model'), p.brandId||'', false, p.modelId||'');
+    }
+  }catch(eEdBrand){}
   window._prodImgData = p.imgData||null;
   window._prodImages = (p.imgDataArr && p.imgDataArr.length) ? p.imgDataArr.slice() : (p.imgData ? [p.imgData] : []);
   renderProdImagesGrid();
