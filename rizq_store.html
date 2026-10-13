@@ -138,7 +138,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-video-frame .rzq-iv-frame{border-radius:12px;aspect-ratio:16/9;min-height:220px;width:100%;max-width:100%;animation:none;box-shadow:0 0 0 1px rgba(201,168,76,.35);box-sizing:border-box}
 .store-video-frame .rzq-iv-badge{font-size:11px;padding:6px 12px}
 .store-video-frame .rzq-iv-src{color:rgba(232,201,106,.75);margin-top:8px}
-#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:176px;aspect-ratio:1.1/1;border-radius:0}
+#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:150px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
 .store-load-more{
   display:none;width:100%;margin-top:14px;padding:12px 16px;border-radius:12px;
@@ -208,18 +208,18 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:inherit}
 .store-hero-stage{display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,36px);max-width:920px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
 .store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:720px;width:auto;position:relative;z-index:1;flex:1 1 280px}
-/* بطاقات الفيديو — صغيرة داخل فراغ ركن الهيرو، متناسقة مع أزرار التواصل ولا تتجاوز للأسفل */
+/* بطاقات الفيديو — ركن الهيرو بحجم أوضح (قريب من السابق) دون تجاوز شريط الأزرار */
 .hero-videos{
   display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
-  align-items:stretch;gap:8px;max-width:min(300px,46vw);width:auto;pointer-events:auto
+  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
 }
 .store-hero.has-hero-videos .hero-videos{display:flex}
 .store-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .hero-video-card{
-  position:relative;flex:0 1 142px;min-width:118px;max-width:146px;
+  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
   background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
-  border-radius:10px;overflow:hidden;backdrop-filter:blur(8px);
-  box-shadow:0 6px 16px rgba(0,0,0,.28);animation:rzHeroVidIn .7s ease both
+  border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzHeroVidIn .7s ease both
 }
 .hero-video-card:nth-child(2){animation-delay:.12s}
 @keyframes rzHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -229,7 +229,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-video-card .rzq-iv-badge{display:none}
 .hero-video-card .rzq-iv-src{display:none}
 .hero-video-card .rzq-iv-play{
-  width:34px!important;height:34px!important;font-size:14px!important;
+  width:44px!important;height:44px!important;font-size:18px!important;
   opacity:.28;background:rgba(201,168,76,.35)!important;color:rgba(13,27,42,.75)!important;
   box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
@@ -260,12 +260,12 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 /* تسمية صغيرة أعلى البطاقة — لا تغطي التشغيل ولا تسرق النقر */
 .hero-video-caption{
-  position:absolute;top:6px;left:50%;right:auto;bottom:auto;z-index:3;
+  position:absolute;top:8px;left:50%;right:auto;bottom:auto;z-index:3;
   display:inline-flex;align-items:center;justify-content:center;
-  width:auto;max-width:calc(100% - 12px);margin:0;padding:3px 8px;border-radius:999px;
-  border:1px solid rgba(232,201,106,.35);
+  width:auto;max-width:calc(100% - 16px);margin:0;padding:5px 10px;border-radius:999px;
+  border:1px solid rgba(232,201,106,.4);
   background:rgba(6,17,28,.4);backdrop-filter:blur(6px);
-  color:rgba(255,255,255,.94);font:inherit;font-size:9.5px;font-weight:700;
+  color:rgba(255,255,255,.94);font:inherit;font-size:11px;font-weight:700;
   letter-spacing:.01em;text-align:center;cursor:default;
   opacity:0;transform:translate(-50%,-4px);
   transition:opacity .22s ease,transform .22s ease,background .2s ease;
@@ -284,9 +284,9 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   .hero-cover{padding-bottom:18px}
   .hero-videos{
     position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
-    justify-content:center;padding:0 10px 6px;gap:6px
+    justify-content:center;padding:0 10px 6px;gap:8px
   }
-  .hero-video-card{flex:0 1 132px;min-width:110px;max-width:140px}
+  .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
 }
 .store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite;position:relative}
 .store-logo-wrap.is-storefront{cursor:pointer}
@@ -403,61 +403,55 @@ body.rzq-storefront-lb-on{overflow:hidden}
 .content-grid > main .products-grid{
   flex:1 1 auto;
 }
-/* شريط ختامي — بعد معلومات المحل وساعات العمل (قبل الباقات) */
+/* شريط ختامي مضغوط — لا يطغى على الواجهة */
 .store-close-band{
   max-width:1280px;
   width:calc(100% - 24px);
-  margin:14px auto 0;
-  padding:16px 14px 14px;
-  border-radius:14px;
-  background:
-    radial-gradient(ellipse at 80% 0%, rgba(201,168,76,.18), transparent 55%),
-    linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
-  border:1px solid rgba(201,168,76,.32);
-  box-shadow:inset 0 1px 0 rgba(255,248,220,.12), 0 8px 22px rgba(13,27,42,.14);
+  margin:10px auto 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:linear-gradient(155deg,#0D1B2A 0%,#1B3A6B 55%,#152a4d 100%);
+  border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 4px 14px rgba(13,27,42,.12);
   color:#fff;
   position:relative;
   overflow:hidden;
   box-sizing:border-box;
 }
-.store-close-band::before{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(120deg,transparent 40%,rgba(201,168,76,.06) 50%,transparent 60%);
-  pointer-events:none;
+.store-close-band::before{display:none}
+.store-close-inner{
+  position:relative;z-index:1;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px
 }
-.store-close-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px}
 .store-close-eyebrow{
-  margin:0;font-size:11px;letter-spacing:1.6px;font-weight:800;
-  color:rgba(232,201,106,.9);text-transform:uppercase;
+  margin:0;font-size:10px;letter-spacing:1.2px;font-weight:800;
+  color:rgba(232,201,106,.9);text-transform:uppercase;width:100%
 }
 .store-close-title{
-  margin:0;font-size:clamp(17px,2.2vw,21px);font-weight:900;line-height:1.35;
-  color:#fff;
+  margin:0;font-size:clamp(14px,1.6vw,16px);font-weight:900;line-height:1.3;
+  color:#fff;flex:1 1 180px
 }
 .store-close-title span{
   background:linear-gradient(90deg,#E8C96A,#C9A84C);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.store-close-desc{
-  margin:0;font-size:13px;line-height:1.7;color:rgba(255,255,255,.72);max-width:46ch;
-}
+.store-close-desc{display:none}
 .store-close-pillars{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px;
+  display:flex;flex-wrap:wrap;gap:6px;margin:0;flex:1 1 260px
 }
 .store-close-pillar{
-  padding:12px 10px;border-radius:12px;
+  padding:6px 8px;border-radius:8px;
   background:rgba(255,255,255,.05);
-  border:1px solid rgba(201,168,76,.22);
-  text-align:center;
+  border:1px solid rgba(201,168,76,.2);
+  text-align:center;flex:1 1 90px;min-width:88px
 }
-.store-close-pillar-ico{font-size:18px;line-height:1;margin-bottom:6px}
-.store-close-pillar-ttl{font-size:12.5px;font-weight:800;color:#E8C96A;margin-bottom:3px}
-.store-close-pillar-txt{font-size:11px;color:rgba(255,255,255,.62);line-height:1.45}
-.store-close-ctas{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.store-close-pillar-ico{font-size:14px;line-height:1;margin-bottom:2px}
+.store-close-pillar-ttl{font-size:11px;font-weight:800;color:#E8C96A;margin-bottom:0}
+.store-close-pillar-txt{display:none}
+.store-close-ctas{display:flex;flex-wrap:wrap;gap:6px;margin:0}
 .store-close-cta{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 14px;border-radius:10px;font:inherit;font-size:12.5px;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:7px 11px;border-radius:8px;font:inherit;font-size:11.5px;font-weight:800;
   cursor:pointer;text-decoration:none;border:none;transition:transform .15s,filter .15s,background .2s;
 }
 .store-close-cta:hover{transform:translateY(-1px);filter:brightness(1.04)}
@@ -466,17 +460,14 @@ body.rzq-storefront-lb-on{overflow:hidden}
   background:transparent;color:#E8C96A;border:1px solid rgba(201,168,76,.55);
 }
 @media(max-width:800px){
-  .store-close-band{margin:10px 12px 0;width:auto;padding:12px 12px 12px}
-  .store-close-title{font-size:15px!important}
-  .store-close-desc{font-size:11.5px!important;line-height:1.5}
-  .store-close-pillars{grid-template-columns:1fr;gap:6px}
-  .store-close-pillar{padding:8px 8px}
-  .store-close-pillar-ttl{font-size:11.5px}
-  .store-close-pillar-txt{font-size:10px}
+  .store-close-band{margin:8px 12px 0;width:auto;padding:10px}
+  .store-close-title{font-size:13px!important}
+  .store-close-pillars{flex:1 1 100%}
 }
 .content-grid > aside#info-section{
   grid-area:side;
-  position:sticky;top:calc(var(--rizq-header-h,72px) + 12px);
+  /* مع غرفة الطلبات والتقييمات في الشريط: لا تثبت — حتى يُملأ الفراغ بسلاسة */
+  position:static;
 }
 
 /* ====== SIDEBAR INFO ====== */
@@ -638,86 +629,57 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات — شريط أفقي بعرض كامل تحت المنتجات */
-#store-service-desk.store-desk-band{
-  margin-top:22px;
-  margin-bottom:0;
-  padding:18px 20px 16px;
-  border-radius:20px;
-  box-shadow:0 12px 40px rgba(15,35,65,.06);
+/* غرفة الطلبات + التقييمات — مضغوطة في فراغ الشريط الجانبي */
+#store-service-desk.store-desk-side{
+  padding:14px 14px 12px;margin-bottom:12px
 }
 .store-desk-eyebrow{
-  font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:4px
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
 }
 .store-desk-hint{
-  font-size:12.5px;color:#6a7a8a;margin:0 0 12px;line-height:1.55;max-width:70ch
+  font-size:11.5px;color:#6a7a8a;margin:0 0 10px;line-height:1.45
 }
 .store-desk-form{
   display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px 12px;
-  align-items:end;
+  grid-template-columns:1fr;
+  gap:8px;
   width:100%;
 }
-.store-desk-field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.store-desk-field label{
-  font-size:12px;font-weight:800;color:#0F2347
-}
+.store-desk-field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.store-desk-field label{font-size:11px;font-weight:800;color:#0F2347}
 .store-desk-field .req-input,
 .store-desk-field input.req-input,
 .store-desk-field textarea.req-input{
-  display:block;width:100%;margin:0;padding:11px 12px;
-  border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;
-  box-sizing:border-box;min-height:44px;background:#fff;resize:vertical
-}
-.store-desk-span2{grid-column:span 2}
-.store-desk-actions{
-  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:2px
+  display:block;width:100%;margin:0;padding:8px 10px;
+  border:1.5px solid #e2e8f5;border-radius:8px;font-size:12.5px;font-family:inherit;
+  box-sizing:border-box;min-height:38px;background:#fff;resize:vertical
 }
 .store-desk-note{
-  font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0;flex:1 1 220px;
-  padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
+  font-size:10.5px;color:#6a7a8a;line-height:1.45;margin:0;
+  padding:8px 10px;border-radius:8px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
 }
-.store-desk-actions #store-req-submit{
-  flex:0 1 260px;padding:13px 18px;border:none;border-radius:11px;
-  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;
-  cursor:pointer;font-family:inherit;min-height:46px
+#store-service-desk #store-req-submit{
+  width:100%;padding:10px 12px;border:none;border-radius:9px;
+  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:13px;
+  cursor:pointer;font-family:inherit;min-height:40px
 }
-@media(max-width:900px){
-  .store-desk-form{grid-template-columns:1fr 1fr}
-  .store-desk-span2{grid-column:span 2}
+#reviews-section.store-reviews-side{padding:14px 14px 12px;margin-bottom:0}
+#reviews-section .store-reviews-summary{
+  display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap
 }
-@media(max-width:600px){
-  #store-service-desk.store-desk-band{padding:14px 12px 12px;border-radius:16px;margin-top:14px}
-  .store-desk-form{grid-template-columns:1fr}
-  .store-desk-span2{grid-column:auto}
-  .store-desk-actions #store-req-submit{flex:1 1 100%;width:100%}
-}
-/* تقييمات بعرض كامل — تحت شبكة المنتجات والشريط الجانبي */
-#reviews-section.store-reviews-band{
-  margin-top:22px;
-  padding:20px 20px 18px;
-  background:linear-gradient(165deg,#fff,#fbfcfe);
-  border:1px solid rgba(27,58,107,.08);
-  border-radius:20px;
-  box-shadow:0 12px 40px rgba(15,35,65,.06);
-}
-#reviews-section .store-reviews-inner{
-  background:transparent!important;
-  border:none!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  padding:0!important;
-}
+#reviews-section .store-reviews-score{text-align:center;min-width:70px}
+#reviews-section #store-big-rating{font-size:24px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section #store-big-stars{color:#F5A623;font-size:13px;margin:3px 0}
+#reviews-section #store-big-count{font-size:10.5px;color:#6a7a8a}
 #reviews-section .view-all-btn{
-  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;
+  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12px;padding:8px 10px
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 .product-img{
-  height:176px;
+  height:150px;
   background:linear-gradient(135deg,#e8eef8,#f5f8ff);
   display:flex;align-items:center;justify-content:center;
-  font-size:56px;position:relative;overflow:hidden;
+  font-size:48px;position:relative;overflow:hidden;
   transition:transform .4s ease;
 }
 .product-img img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1395,9 +1357,60 @@ footer{
         <div id="store-payment-methods" style="display:none"></div>
       </div>
 
+      <!-- غرفة الطلبات — مضغوطة داخل فراغ الشريط الجانبي -->
+      <div class="info-card store-desk-side" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important" aria-label="غرفة الطلبات">
+        <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px">📩 طلب من المحل</div>
+        <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة.</p>
+        <div id="store-req-form" class="store-desk-form">
+          <div class="store-desk-field">
+            <label for="rf-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-whatsapp">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-service">المنتج / الموضوع</label>
+            <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
+          </div>
+          <div class="store-desk-field">
+            <label for="rf-msg">رسالتك للمحل</label>
+            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+          </div>
+          <p class="store-desk-note">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
+        </div>
+      </div>
+
+      <!-- تقييمات — مضغوطة في فراغ الشريط الجانبي -->
+      <div class="info-card store-reviews-side" id="reviews-section" aria-label="تقييمات الزبائن">
+        <div class="info-card-title" style="margin-bottom:8px" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+        <div class="store-reviews-inner">
+          <div class="store-reviews-summary">
+            <div class="store-reviews-score">
+              <div id="store-big-rating">—</div>
+              <div id="store-big-stars">☆☆☆☆☆</div>
+              <div id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+            </div>
+            <div id="store-rating-breakdown"></div>
+          </div>
+          <div id="reviews-list"></div>
+          <button class="view-all-btn" style="margin-top:8px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+        </div>
+      </div>
     </aside>
 
-    <!-- RIGHT: PRODUCTS + REVIEWS -->
+    <!-- RIGHT: PRODUCTS -->
     <main>
 <!-- Rizq Intermediary Notice -->
 
@@ -1433,67 +1446,9 @@ footer{
           لا توجد منتجات بعد
         </div>
       </div>
-      <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 15 منتجاً التالية</button>
+      <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 8 منتجات التالية</button>
     </main>
   </div>
-
-  <!-- غرفة الطلبات — شريط أفقي بعرض كامل تحت المنتجات (يملأ الفراغ بدل العمود الجانبي الطويل) -->
-  <section class="store-desk-band info-card" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important" aria-label="غرفة الطلبات">
-    <div class="store-desk-head">
-      <div>
-        <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
-        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
-        <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-      </div>
-    </div>
-    <div id="store-req-form" class="store-desk-form">
-      <div class="store-desk-field">
-        <label for="rf-name">الاسم الكامل *</label>
-        <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
-      </div>
-      <div class="store-desk-field">
-        <label for="rf-phone">رقم الهاتف *</label>
-        <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
-      </div>
-      <div class="store-desk-field">
-        <label for="rf-whatsapp">واتساب (إن اختلف)</label>
-        <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
-      </div>
-      <div class="store-desk-field">
-        <label for="rf-email">البريد الإلكتروني (اختياري)</label>
-        <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
-      </div>
-      <div class="store-desk-field store-desk-span2">
-        <label for="rf-service">المنتج / الموضوع</label>
-        <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
-      </div>
-      <div class="store-desk-field store-desk-span2">
-        <label for="rf-msg">رسالتك للمحل</label>
-        <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
-      </div>
-      <div class="store-desk-actions">
-        <p class="store-desk-note">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-        <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب للمحل</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- تقييمات الزبائن — بعرض كامل تحت المنتجات وغرفة الطلبات -->
-  <section class="store-reviews-band" id="reviews-section" aria-label="تقييمات الزبائن">
-    <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-    <div class="store-reviews-inner" style="padding:6px 0 0">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
-        <div style="text-align:center;min-width:90px">
-          <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
-          <div style="color:#F5A623;font-size:15px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
-          <div style="font-size:11px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
-        </div>
-        <div style="flex:1;min-width:140px" id="store-rating-breakdown"></div>
-      </div>
-      <div id="reviews-list"></div>
-      <button class="view-all-btn" style="margin-top:10px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
-    </div>
-  </section>
 </div>
 
 <!-- بطاقة الشراء الآمن — بعد معلومات المحل وساعات العمل (أسفل الواجهة قبل الباقات) -->
@@ -2394,8 +2349,8 @@ function rizqShare(title, url) {
     function paintStoreProductsGrid(products, storeId){
       var grid = document.getElementById('products-grid');
       var moreBtn = document.getElementById('store-load-more');
-      /* دفعة أولى أوفر لملء عمود الواجهة بصور المنتجات قبل «عرض المزيد» */
-      var pageSize = Math.max(24, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15);
+      /* دفعة أولى أخف — مختارات قصيرة ثم «عرض المزيد» */
+      var pageSize = Math.min(8, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 8);
       var list = Array.isArray(products) ? products.slice() : [];
       var shown = 0;
       var featured = {};

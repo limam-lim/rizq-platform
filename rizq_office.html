@@ -185,15 +185,15 @@ a{text-decoration:none;color:inherit}
 /* فيديوهات الهيرو — نفس موضع/حجم المحلات */
 .office-hero .hero-videos{
   display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
-  align-items:stretch;gap:8px;max-width:min(300px,46vw);width:auto;pointer-events:auto
+  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
 }
 .office-hero.has-hero-videos .hero-videos{display:flex}
 .office-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .office-hero .hero-video-card{
-  position:relative;flex:0 1 142px;min-width:118px;max-width:146px;
+  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
   background:rgba(6,17,28,.55);border:1px solid rgba(103,232,249,.4);
-  border-radius:10px;overflow:hidden;backdrop-filter:blur(8px);
-  box-shadow:0 6px 16px rgba(0,0,0,.28);animation:rzOfHeroVidIn .7s ease both
+  border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzOfHeroVidIn .7s ease both
 }
 .office-hero .hero-video-card:nth-child(2){animation-delay:.12s}
 @keyframes rzOfHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -202,7 +202,7 @@ a{text-decoration:none;color:inherit}
 .office-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
 .office-hero .hero-video-card .rzq-iv-badge,.office-hero .hero-video-card .rzq-iv-src{display:none}
 .office-hero .hero-video-card .rzq-iv-play{
-  width:34px!important;height:34px!important;font-size:14px!important;
+  width:44px!important;height:44px!important;font-size:18px!important;
   opacity:.28;background:rgba(103,232,249,.35)!important;color:rgba(6,17,28,.8)!important;
   box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
@@ -224,9 +224,9 @@ a{text-decoration:none;color:inherit}
   background:rgba(103,232,249,.92)!important;color:#06111C!important
 }
 .office-hero .hero-video-caption{
-  position:absolute;top:6px;left:50%;z-index:3;display:inline-flex;align-items:center;justify-content:center;
-  max-width:calc(100% - 12px);padding:3px 8px;border-radius:999px;border:1px solid rgba(103,232,249,.4);
-  background:rgba(6,17,28,.4);color:rgba(255,255,255,.94);font:inherit;font-size:9.5px;font-weight:700;
+  position:absolute;top:8px;left:50%;z-index:3;display:inline-flex;align-items:center;justify-content:center;
+  max-width:calc(100% - 16px);padding:5px 10px;border-radius:999px;border:1px solid rgba(103,232,249,.4);
+  background:rgba(6,17,28,.4);color:rgba(255,255,255,.94);font:inherit;font-size:11px;font-weight:700;
   opacity:0;transform:translate(-50%,-4px);transition:opacity .22s ease,transform .22s ease;pointer-events:none!important;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
@@ -240,9 +240,9 @@ a{text-decoration:none;color:inherit}
 @media(max-width:900px){
   .office-hero .hero-videos{
     position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
-    justify-content:center;padding:0 10px 6px;gap:6px
+    justify-content:center;padding:0 10px 6px;gap:8px
   }
-  .office-hero .hero-video-card{flex:0 1 132px;min-width:110px;max-width:140px}
+  .office-hero .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
 }
 @media(max-width:640px){
   .office-hero{min-height:0!important;height:auto!important}
