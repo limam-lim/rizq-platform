@@ -4744,7 +4744,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض مباشرة على رزق — تخطف الأنظار</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -5356,15 +5356,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0" data-t-fr="Vendeurs de confiance">بائعون موثوقون</h3>
       </div>
       <div id="top-sellers-mount"></div>
-    </div>
-
-    <!-- 🆕 وصل حديثاً (آخر الإعلانات المنشورة على المنصة) -->
-    <div id="new-arrivals-block" style="margin-top:40px;display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <span style="font-size:20px">🆕</span>
-        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0" data-t-fr="Nouvelles annonces">وصل حديثاً</h3>
-      </div>
-      <div id="new-arrivals-mount"></div>
     </div>
 
     <!-- 👀 تابع التصفح (إعلانات شاهدها هذا الزائر سابقاً) -->
@@ -6694,8 +6685,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Offres en direct sur Rizq — qui impressionnent</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">عروض مباشرة على رزق — تخطف الأنظار</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -9466,7 +9457,7 @@ const LANG = {
     'hbiz-trust': 'ثقتك أولاً: رزق ينشر فقط · تتواصل مع البائع مباشرة · عاين قبل أن تدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
-    'promo-strip-sub': 'عروض مباشرة على رزق — تخطف الأنظار',
+    'promo-strip-sub': 'أحدث الإعلانات على رزق — عروض تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -9613,7 +9604,7 @@ const LANG = {
     'hbiz-trust': 'Votre confiance d\'abord : Rizq publie seulement · contact direct avec le vendeur · vérifiez avant de payer',
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
-    'promo-strip-sub': 'Offres en direct sur Rizq — qui impressionnent',
+    'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Vendez plus fort chaque jour',
     'hbiz-offices-hint': 'Des clients vous cherchent',
@@ -14953,27 +14944,6 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         }).catch(function(){ return false; });
     }
 
-    // ── 🆕 "وصل حديثاً" — آخر الإعلانات النشطة على كامل المنصة (مهمة #261،
-    // طلب Limam: ميزات خفيفة على غرار أمازون/AliExpress). GET /api/ads يُرجع
-    // بيانات مُرتَّبة بالفعل تنازلياً حسب createdAt — لا حاجة لفرز إضافي. ──
-    function renderNewArrivals(){
-      var block = document.getElementById('new-arrivals-block');
-      var mount = document.getElementById('new-arrivals-mount');
-      if(!block || !mount || !window.RIZQ_BACKEND_BASE) return Promise.resolve(false);
-      var fr = isFr();
-      return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads?limit=10')
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(data){
-          var ads = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
-          if(ads.length < 3) return false; // نفس حد "لا يستحق شريطاً كاملاً" المعتمَد في بقية الأشرطة
-          var cardsHTML = ads.map(function(a){ return recentlyViewedCardHTML(a, fr); }).join('');
-          mount.innerHTML = '<div class="rzq-disc-strip"><div class="rzq-disc-track">' + cardsHTML + '</div></div>';
-          initAutoScroll(mount.querySelector('.rzq-disc-strip'));
-          block.style.display = '';
-          return true;
-        }).catch(function(){ return false; });
-    }
-
     // ── ❤️ "المفضلة لديك" — تقرأ localStorage['rizq_wishlist'] (مُصلَحة هذه
     // الجولة في browse/search/listing لتُخزَّن فعلياً بدل Set في الذاكرة كانت
     // تُفرَّغ مع كل تحميل صفحة) وتجلب بياناتها الحيّة دفعة واحدة عبر
@@ -15048,7 +15018,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     function renderLiveActivitySection(){
       var section = document.getElementById('rizq-live-activity');
       if(!section) return;
-      Promise.all([renderEndingSoon(), renderTopSellers(), renderNewArrivals(), renderRecentlyViewed(), renderWishlist()]).then(function(results){
+      Promise.all([renderEndingSoon(), renderTopSellers(), renderRecentlyViewed(), renderWishlist()]).then(function(results){
         section.style.display = results.some(Boolean) ? '' : 'none';
       });
     }
