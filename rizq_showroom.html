@@ -721,7 +721,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_auth_gate.js" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
 <script src="rizq_packages_config.js" defer></script>
 <script src="rizq_packages_ui.js?v=23.0" defer></script>
 <script src="rizq_i18n_data.js" defer></script>
@@ -1081,7 +1081,7 @@ function applyAccountData(){
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
   if(window.RizqServiceDesk){
-    RizqServiceDesk.applyPublicLabels(document.getElementById('showroom-service-desk'), _acc.serviceDesk || {}, _acc.name || '');
+    RizqServiceDesk.applyPublicLabels(document.getElementById('showroom-service-desk'), _acc.serviceDesk || {}, { accountName: _acc.name || '', accountType: 'corp' });
     if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
       RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('sr-req-form') });
     }
