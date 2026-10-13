@@ -2024,8 +2024,18 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     promo_video_extra: String(b.promo_video_extra || '').slice(0, 500),
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
-    thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة
-    cover: String(b.cover || '').slice(0, 2_000_000), // غلاف هيرو الصفحة العامة
+    thumb: (function(){
+      const t = String(b.thumb || '').trim();
+      if (!t || /javascript:/i.test(t) || /[\s<>"']/.test(t)) return '';
+      if (!/^(https?:\/\/|\/|data:image\/)/i.test(t)) return '';
+      return t.slice(0, 2_000_000);
+    })(),
+    cover: (function(){
+      const t = String(b.cover || '').trim();
+      if (!t || /javascript:/i.test(t) || /[\s<>"']/.test(t)) return '';
+      if (!/^(https?:\/\/|\/|data:image\/)/i.test(t)) return '';
+      return t.slice(0, 2_000_000);
+    })(),
     tagline: stripBidiControls(String(b.tagline || '')).normalize('NFC').slice(0, 50),
     // إصلاح 13/08/2026: حقلا التوثيق (NNI + صورة بطاقة التعريف/جواز السفر)
     // كانا يُجمَعان في واجهة التسجيل (rizq_landing_v8.html) لكن لا يصلان
