@@ -138,7 +138,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-video-frame .rzq-iv-frame{border-radius:12px;aspect-ratio:16/9;min-height:220px;width:100%;max-width:100%;animation:none;box-shadow:0 0 0 1px rgba(201,168,76,.35);box-sizing:border-box}
 .store-video-frame .rzq-iv-badge{font-size:11px;padding:6px 12px}
 .store-video-frame .rzq-iv-src{color:rgba(232,201,106,.75);margin-top:8px}
-#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:160px;aspect-ratio:1.1/1;border-radius:0}
+#products-grid .product-img .rzq-adx-media{width:100%;height:100%;min-height:176px;aspect-ratio:1.1/1;border-radius:0}
 #products-grid .product-img .rzq-adx-fav{display:none}
 .store-load-more{
   display:none;width:100%;margin-top:14px;padding:12px 16px;border-radius:12px;
@@ -383,12 +383,12 @@ body.rzq-storefront-lb-on{overflow:hidden}
   grid-template-columns:minmax(300px,340px) minmax(0,1fr);
   grid-template-areas:"side main";
   gap:28px;
+  /* لا تمدّد عمود المنتجات لارتفاع الشريط — يمنع فراغاً أبيض تحت المنتجات */
   align-items:start;
 }
 .content-grid > main{
   grid-area:main;
   min-width:0;
-  align-self:stretch;
   display:flex;
   flex-direction:column;
   background:#fff;
@@ -396,6 +396,9 @@ body.rzq-storefront-lb-on{overflow:hidden}
   border-radius:20px;
   padding:20px;
   box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+.content-grid > main .products-grid{
+  flex:1 1 auto;
 }
 /* شريط ختامي — بعد معلومات المحل وساعات العمل (قبل الباقات) */
 .store-close-band{
@@ -601,10 +604,10 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   background:linear-gradient(135deg,var(--navy),#234d8f);color:#fff;
   box-shadow:0 4px 14px rgba(27,58,107,.25);
 }
-/* Products grid */
+/* Products grid — صور المنتجات تملأ عمود الواجهة */
 .products-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-  gap:16px;min-height:180px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:14px;min-height:280px;
 }
 .product-card{
   background:var(--white);border-radius:14px;
@@ -632,18 +635,28 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-#reviews-section > div{
-  background:linear-gradient(165deg,#fff,#fbfcfe)!important;
-  border:1px solid rgba(27,58,107,.08)!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 28px rgba(15,35,65,.05)!important;
+/* تقييمات بعرض كامل — تحت شبكة المنتجات والشريط الجانبي */
+#reviews-section.store-reviews-band{
+  margin-top:22px;
+  padding:20px 20px 18px;
+  background:linear-gradient(165deg,#fff,#fbfcfe);
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:20px;
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+#reviews-section .store-reviews-inner{
+  background:transparent!important;
+  border:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0!important;
 }
 #reviews-section .view-all-btn{
   color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 .product-img{
-  height:160px;
+  height:176px;
   background:linear-gradient(135deg,#e8eef8,#f5f8ff);
   display:flex;align-items:center;justify-content:center;
   font-size:56px;position:relative;overflow:hidden;
@@ -838,6 +851,7 @@ footer{
   .store-badges{justify-content:center;gap:4px}
   .nav-links{display:none}
   .main-wrap{padding:10px 10px 72px;background:none}
+  #reviews-section.store-reviews-band{margin-top:14px;padding:14px 12px 12px;border-radius:16px}
   .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .product-img{height:100px;font-size:32px}
   #products-grid .product-img .rzq-adx-media{min-height:100px}
@@ -1384,25 +1398,25 @@ footer{
         </div>
       </div>
       <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 15 منتجاً التالية</button>
-
-      <!-- Reviews -->
-      <div style="margin-top:20px" id="reviews-section">
-        <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
-        <div style="padding:14px 12px">
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
-            <div style="text-align:center;min-width:90px">
-              <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
-              <div style="color:#F5A623;font-size:15px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
-              <div style="font-size:11px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
-            </div>
-            <div style="flex:1;min-width:140px" id="store-rating-breakdown"></div>
-          </div>
-          <div id="reviews-list"></div>
-          <button class="view-all-btn" style="margin-top:10px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
-        </div>
-      </div>
     </main>
   </div>
+
+  <!-- تقييمات الزبائن — بعرض كامل تحت المنتجات (لا تترك فراغاً داخل عمود الواجهة) -->
+  <section class="store-reviews-band" id="reviews-section" aria-label="تقييمات الزبائن">
+    <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
+    <div class="store-reviews-inner" style="padding:6px 0 0">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="text-align:center;min-width:90px">
+          <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1" id="store-big-rating">—</div>
+          <div style="color:#F5A623;font-size:15px;margin:4px 0" id="store-big-stars">☆☆☆☆☆</div>
+          <div style="font-size:11px;color:#6a7a8a" id="store-big-count" data-t="review-count-txt">لا يوجد تقييم</div>
+        </div>
+        <div style="flex:1;min-width:140px" id="store-rating-breakdown"></div>
+      </div>
+      <div id="reviews-list"></div>
+      <button class="view-all-btn" style="margin-top:10px;width:100%;text-align:center" onclick="showToast(_t2('⭐ التقييمات معروضة في الصفحة','⭐ Les avis sont affichés sur la page'))" data-t="view-all-reviews">عرض جميع التقييمات</button>
+    </div>
+  </section>
 </div>
 
 <!-- بطاقة الشراء الآمن — بعد معلومات المحل وساعات العمل (أسفل الواجهة قبل الباقات) -->
@@ -2284,7 +2298,8 @@ function rizqShare(title, url) {
     function paintStoreProductsGrid(products, storeId){
       var grid = document.getElementById('products-grid');
       var moreBtn = document.getElementById('store-load-more');
-      var pageSize = (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15;
+      /* دفعة أولى أوفر لملء عمود الواجهة بصور المنتجات قبل «عرض المزيد» */
+      var pageSize = Math.max(18, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15);
       var list = Array.isArray(products) ? products.slice() : [];
       var shown = 0;
       var featured = {};
