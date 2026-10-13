@@ -173,7 +173,7 @@ function mountAccountsManageRoutes(app, deps) {
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.email !== undefined) {
       const nextEmail = String(b.email || '').trim().toLowerCase();
@@ -215,13 +215,13 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
         // اسمح فقط بمسارات نسبية أو data:image أو http(s) — لا javascript:
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
     // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
@@ -290,7 +290,7 @@ function mountAccountsManageRoutes(app, deps) {
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
-    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'email', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
     if (b.nni !== undefined) {
       const nniCheck = assertNniAssignable(list, b.nni, acc.id, acc);
@@ -327,12 +327,12 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, k === 'thumb' ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);

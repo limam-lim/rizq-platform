@@ -278,7 +278,7 @@
     rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
     if (typeof serverAcc.suspended !== 'undefined') rec.suspended = !!serverAcc.suspended;
     delete rec.password;
-    ['phone', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category', 'whatsapp', 'facebook', 'thumb', 'tagline', 'package', 'package_price', 'plan', 'planName'].forEach(function (k) {
+    ['phone', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'package', 'package_price', 'plan', 'planName'].forEach(function (k) {
       if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
     });
     if (idx >= 0) accs[idx] = rec;
