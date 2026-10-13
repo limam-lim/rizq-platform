@@ -188,7 +188,7 @@ function toGatedContactPayload(acc, gate) {
 const ACCOUNT_PUBLIC_SAFE = [
   'id', 'type', 'name', 'city', 'address', 'promo_video', 'promo_video_extra', 'category',
   'activityId', 'activity', 'storeTopics',
-  'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 
 function toPublicAccountGated(acc, gate) {

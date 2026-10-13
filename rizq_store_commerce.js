@@ -257,6 +257,42 @@
   }
 
   /**
+   * خلفية هيرو المحل/المعرض = غلاف مخصّص (cover) من الداشبورد.
+   * منفصل عن thumb (بطاقة الشريط/الشعار). بدون غلاف يبقى التدرّج الافتراضي.
+   */
+  function setHeroPhoto(heroEl, cover) {
+    if (!heroEl) return false;
+    var safe = safeMediaUrl(cover);
+    var slot = heroEl.querySelector('.hero-photo') || heroEl.querySelector('[data-hero-photo]');
+    if (!safe) {
+      heroEl.classList.remove('has-hero-photo');
+      if (slot) {
+        slot.innerHTML = '';
+        slot.hidden = true;
+      }
+      return false;
+    }
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.className = 'hero-photo';
+      slot.setAttribute('aria-hidden', 'true');
+      heroEl.insertBefore(slot, heroEl.firstChild);
+    }
+    slot.hidden = false;
+    var img = slot.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = '';
+      img.decoding = 'async';
+      img.setAttribute('fetchpriority', 'high');
+      slot.appendChild(img);
+    }
+    if (img.getAttribute('src') !== safe) img.src = safe;
+    heroEl.classList.add('has-hero-photo');
+    return true;
+  }
+
+  /**
    * حصص فيديو المحل حسب الباقة:
    * - تجريبية: 0
    * - شهرية/ربعية/ماسية: فيديو تعريفي + إمكانية فيديو إضافي
@@ -749,6 +785,7 @@
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
     setLogo: setLogo,
+    setHeroPhoto: setHeroPhoto,
     introVideoSlots: introVideoSlots,
     promoVideosOf: promoVideosOf,
     openProductDetail: openProductDetail,
