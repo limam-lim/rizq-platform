@@ -1291,13 +1291,17 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_ad_cards.js?v=3.9"></script>
 <script src="rizq_categories_config.js?v=20"></script>
-<script src="rizq_brands_catalog.js?v=2"></script>
+<script src="rizq_brands_catalog.js?v=3"></script>
 <style>
+.rzq-brand-strip-panel{margin:0 0 8px}
+.rzq-brand-strip-head{margin:0 0 8px}
+.rzq-brand-strip-head-label{font-size:13px;font-weight:800;color:#0F2347}
 .rzq-brand-strip{display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:8px 2px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.rzq-brand-strip-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;padding:8px 4px;border:1.5px solid rgba(27,58,107,.12);border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;color:#0F2347;transition:border-color .2s,box-shadow .2s,transform .15s}
-.rzq-brand-strip-btn img{border-radius:50%;display:block}
-.rzq-brand-strip-btn span{font-size:10px;font-weight:700;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.rzq-brand-strip-btn:hover,.rzq-brand-strip-btn.is-on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.18);transform:translateY(-1px)}
+.rzq-brand-strip-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;width:80px;padding:8px 6px;border:1px solid rgba(27,58,107,.12);border-radius:12px;background:#fafbfc;cursor:pointer;font-family:inherit;color:#0F2347;transition:border-color .2s,box-shadow .2s,transform .15s}
+.rzq-brand-strip-logo{width:48px;height:48px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid rgba(15,35,71,.08)}
+.rzq-brand-strip-logo img{width:44px;height:44px;border-radius:50%;display:block;object-fit:cover}
+.rzq-brand-strip-name{font-size:11px;font-weight:800;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.rzq-brand-strip-btn:hover,.rzq-brand-strip-btn.is-on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2);transform:translateY(-1px);background:#fff}
 .rzq-brand-strip-btn.is-on{background:rgba(201,168,76,.08)}
 #brand-filter-section .wilaya-select{margin-bottom:8px}
 </style>
@@ -3526,7 +3530,7 @@ function _refreshBrandFilterUI(catKey){
     RizqBrands.fillModelSelect(modelSel, brandSel.value, fr, prevModel);
     if(modelSel && modelSel.options[0]) modelSel.options[0].textContent=fr?'Tous les modèles':'كل الموديلات';
     if(mount){
-      mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, { activeId: brandSel.value||'' });
+      mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, { activeId: brandSel.value||'', heading: fr?'Brands':'الماركات' });
       mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
         btn.addEventListener('click', function(){
           brandSel.value=btn.getAttribute('data-brand-id')||'';

@@ -47,6 +47,17 @@ const chip = B.chipHtml('adidas', { fr: false, modelId: 'ultraboost' });
 assert(chip.indexOf('أديداس') >= 0 || chip.indexOf('ألترابوست') >= 0);
 assert(chip.indexOf('data:image/svg+xml') >= 0, 'logo data uri');
 
+const logoName = B.logoNameHtml('toyota', { fr: false, modelId: 'camry' });
+assert(logoName.indexOf('تويوتا') >= 0, 'logoName has brand name');
+assert(logoName.indexOf('rzq-brand-logo-name-img') >= 0, 'logoName has logo img');
+assert(logoName.indexOf('data:image/svg+xml') >= 0, 'logoName logo uri');
+
+const strip = B.stripHtml('أزياء', false, { heading: 'تسوّق حسب الماركة' });
+assert(strip.indexOf('تسوّق حسب الماركة') >= 0, 'strip heading');
+assert(strip.indexOf('rzq-brand-strip-logo') >= 0, 'strip logo wrap');
+assert(strip.indexOf('rzq-brand-strip-name') >= 0, 'strip brand name');
+assert(strip.indexOf('data-brand-id="nike"') >= 0, 'strip includes nike');
+
 const postHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_post.html'), 'utf8');
 assert(postHtml.includes('rizq_brands_catalog.js'));
 assert(postHtml.includes('ad-brand') && postHtml.includes('ad-model'));

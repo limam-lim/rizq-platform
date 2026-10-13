@@ -902,7 +902,7 @@
     return null;
   }
 
-  /** شارة HTML صغيرة للبطاقات */
+  /** شارة HTML صغيرة للبطاقات — شعار + اسم معاً */
   function chipHtml(brandId, opts) {
     opts = opts || {};
     var brand = getById(brandId);
@@ -913,9 +913,30 @@
     if (model) label += ' · ' + modelName(model, fr);
     var size = opts.size || 22;
     return '<span class="rzq-brand-chip" title="' + esc(label) + '" style="display:inline-flex;align-items:center;gap:6px;padding:3px 8px 3px 4px;border-radius:999px;background:rgba(15,35,71,.06);border:1px solid rgba(15,35,71,.1);font-size:11px;font-weight:700;color:#0F2347;max-width:100%">'
-      + '<img src="' + esc(logoDataUri(brand, size * 2)) + '" alt="" width="' + size + '" height="' + size + '" style="border-radius:50%;flex-shrink:0"/>'
-      + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(label) + '</span>'
+      + '<img class="rzq-brand-chip-logo" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(displayName(brand, fr)) + '" width="' + size + '" height="' + size + '" style="border-radius:50%;flex-shrink:0"/>'
+      + '<span class="rzq-brand-chip-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(label) + '</span>'
       + '</span>';
+  }
+
+  /**
+   * صف واضح: شعار الماركة + اسمها (لبطاقات الإطلالات / المعارض — أسلوب أمازون)
+   */
+  function logoNameHtml(brandId, opts) {
+    opts = opts || {};
+    var brand = getById(brandId);
+    if (!brand) return '';
+    var fr = !!opts.fr;
+    var size = opts.size || 28;
+    var name = displayName(brand, fr);
+    var model = opts.modelId ? getModel(brandId, opts.modelId) : null;
+    var sub = model ? modelName(model, fr) : '';
+    return '<div class="rzq-brand-logo-name" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
+      + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+      + '<span class="rzq-brand-logo-name-text">'
+      +   '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
+      +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
+      + '</span>'
+      + '</div>';
   }
 
   /**
@@ -947,21 +968,32 @@
     return models.length;
   }
 
-  /** شريط شعارات أفقي (تصفح) */
+  /** شريط شعارات أفقي — كل زر: شعار + اسم واضحين */
   function stripHtml(catKey, fr, opts) {
     opts = opts || {};
     var brands = forCategory(catKey);
     if (!brands.length) return '';
     var active = opts.activeId || '';
-    return '<div class="rzq-brand-strip" role="list" aria-label="' + (fr ? 'Marques' : 'الماركات') + '">'
+    var head = opts.heading != null
+      ? opts.heading
+      : (fr ? 'Shop by Brand' : 'تسوّق حسب الماركة');
+    var headHtml = head
+      ? '<div class="rzq-brand-strip-head"><span class="rzq-brand-strip-head-label">' + esc(head) + '</span></div>'
+      : '';
+    return '<div class="rzq-brand-strip-panel">'
+      + headHtml
+      + '<div class="rzq-brand-strip" role="list" aria-label="' + esc(head || (fr ? 'Marques' : 'الماركات')) + '">'
       + brands.map(function (b) {
         var on = active && String(active) === String(b.id);
-        return '<button type="button" class="rzq-brand-strip-btn' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(b.id) + '" title="' + esc(displayName(b, fr)) + '" role="listitem">'
-          + '<img src="' + esc(logoDataUri(b, 72)) + '" alt="' + esc(displayName(b, fr)) + '" width="40" height="40"/>'
-          + '<span>' + esc(displayName(b, fr)) + '</span>'
+        var name = displayName(b, fr);
+        return '<button type="button" class="rzq-brand-strip-btn' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(b.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '">'
+          + '<span class="rzq-brand-strip-logo">'
+          +   '<img src="' + esc(logoDataUri(b, 96)) + '" alt="' + esc(name) + '" width="48" height="48"/>'
+          + '</span>'
+          + '<span class="rzq-brand-strip-name">' + esc(name) + '</span>'
           + '</button>';
       }).join('')
-      + '</div>';
+      + '</div></div>';
   }
 
   global.RizqBrands = {
@@ -978,6 +1010,7 @@
     logoSvg: logoSvg,
     logoDataUri: logoDataUri,
     chipHtml: chipHtml,
+    logoNameHtml: logoNameHtml,
     fillBrandSelect: fillBrandSelect,
     fillModelSelect: fillModelSelect,
     stripHtml: stripHtml,
