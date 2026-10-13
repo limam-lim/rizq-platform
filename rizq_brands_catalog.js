@@ -895,6 +895,34 @@
       case 'samsung':
         return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.26) + '" fill="#1428A0"/>'
           + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.3) + '" ry="' + (s * 0.14) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>';
+      case 'xiaomi':
+        return '<rect x="' + (s * 0.1) + '" y="' + (s * 0.1) + '" width="' + (s * 0.8) + '" height="' + (s * 0.8) + '" rx="' + (s * 0.16) + '" fill="#FF6900"/>'
+          + '<rect x="' + (c - s * 0.16) + '" y="' + (c - s * 0.18) + '" width="' + (s * 0.32) + '" height="' + (s * 0.36) + '" rx="' + (s * 0.06) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.15) + '"/>'
+          + '<line x1="' + (c - s * 0.02) + '" y1="' + (c - s * 0.02) + '" x2="' + (c + s * 0.14) + '" y2="' + (c + s * 0.14) + '" stroke="#fff" stroke-width="' + stroke + '" stroke-linecap="round"/>';
+      case 'huawei':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.18) + '" fill="#CF0A2C"/>'
+          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.08) + ' Q' + (c - s * 0.18) + ' ' + (c - s * 0.22) + ' ' + c + ' ' + (c - s * 0.26) + ' Q' + (c + s * 0.18) + ' ' + (c - s * 0.22) + ' ' + (c + s * 0.22) + ' ' + (c + s * 0.08) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.1) + '" stroke-linecap="round"/>'
+          + '<path d="M' + (c - s * 0.14) + ' ' + (c + s * 0.04) + ' Q' + c + ' ' + (c - s * 0.12) + ' ' + (c + s * 0.14) + ' ' + (c + s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 0.85) + '" stroke-linecap="round"/>';
+      case 'oppo':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.2) + '" fill="#1BA784"/>'
+          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.26) + '" ry="' + (s * 0.18) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.2) + '"/>';
+      case 'vivo':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.2) + '" fill="#415FFF"/>'
+          + '<path d="M' + (c - s * 0.2) + ' ' + (c - s * 0.12) + ' L' + c + ' ' + (c + s * 0.2) + ' L' + (c + s * 0.2) + ' ' + (c - s * 0.12) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.25) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'sony':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#111"/>'
+          + '<rect x="' + (c - s * 0.28) + '" y="' + (c - s * 0.1) + '" width="' + (s * 0.56) + '" height="' + (s * 0.2) + '" rx="' + (s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>';
+      case 'peugeot':
+        return '<rect x="' + (s * 0.12) + '" y="' + (s * 0.08) + '" width="' + (s * 0.76) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.08) + '" fill="#000"/>'
+          + '<path d="M' + c + ' ' + (c - s * 0.28) + ' L' + (c + s * 0.2) + ' ' + (c - s * 0.04) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.26) + ' L' + (c - s * 0.08) + ' ' + (c + s * 0.26) + ' L' + (c - s * 0.2) + ' ' + (c - s * 0.04) + ' Z" fill="none" stroke="#C9A84C" stroke-width="' + stroke + '"/>'
+          + '<line x1="' + c + '" y1="' + (c - s * 0.2) + '" x2="' + c + '" y2="' + (c + s * 0.18) + '" stroke="#C9A84C" stroke-width="' + (stroke * 0.8) + '"/>';
+      case 'renault':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.12) + '" fill="#FFCC33"/>'
+          + '<path d="M' + c + ' ' + (c - s * 0.28) + ' L' + (c + s * 0.22) + ' ' + c + ' L' + c + ' ' + (c + s * 0.28) + ' L' + (c - s * 0.22) + ' ' + c + ' Z" fill="none" stroke="#111" stroke-width="' + (stroke * 1.15) + '" stroke-linejoin="round"/>';
+      case 'chevrolet':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#D4A017"/>'
+          + '<path d="M' + (c - s * 0.28) + ' ' + (c - s * 0.06) + ' H' + (c + s * 0.28) + ' V' + (c + s * 0.06) + ' H' + (c - s * 0.28) + ' Z" fill="#fff"/>'
+          + '<path d="M' + (c - s * 0.08) + ' ' + (c - s * 0.22) + ' H' + (c + s * 0.08) + ' V' + (c + s * 0.22) + ' H' + (c - s * 0.08) + ' Z" fill="#fff"/>';
       case 'nike':
         return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#111"/>'
           + '<path d="M' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Q' + (c - s * 0.02) + ' ' + (c + s * 0.28) + ' ' + (c + s * 0.34) + ' ' + (c - s * 0.16) + ' Q' + (c + s * 0.06) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Z" fill="#fff"/>';
