@@ -252,30 +252,30 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   .hero-video-card .rzq-iv-dash-hint,
   .hero-video-card .rzq-iv-play{opacity:.95!important;pointer-events:auto!important}
 }
-/* تسمية شفافة فوق الفيديو — تظهر فقط عند مرور الماوس */
+/* تسمية شفافة أعلى البطاقة — لا تغطي زر التشغيل/الصوت في الأسفل */
 .hero-video-caption{
-  position:absolute;left:10px;right:10px;bottom:10px;z-index:3;
+  position:absolute;top:10px;left:50%;right:auto;bottom:auto;z-index:3;
   display:inline-flex;align-items:center;justify-content:center;
-  width:auto;margin:0;padding:8px 12px;border-radius:10px;
+  width:auto;max-width:calc(100% - 20px);margin:0;padding:6px 12px;border-radius:999px;
   border:1px solid rgba(232,201,106,.4);
-  background:rgba(6,17,28,.28);backdrop-filter:blur(7px);
-  color:rgba(255,255,255,.94);font:inherit;font-size:12px;font-weight:700;
-  letter-spacing:.02em;text-align:center;cursor:pointer;
-  opacity:0;transform:translateY(8px);
+  background:rgba(6,17,28,.32);backdrop-filter:blur(7px);
+  color:rgba(255,255,255,.94);font:inherit;font-size:11.5px;font-weight:700;
+  letter-spacing:.02em;text-align:center;cursor:default;
+  opacity:0;transform:translate(-50%,-6px);
   transition:opacity .22s ease,transform .22s ease,background .2s ease,border-color .2s ease;
-  pointer-events:none
+  /* زخرفية فقط — لا تسرق النقر من أزرار التشغيل */
+  pointer-events:none!important
 }
 .hero-video-card:hover .hero-video-caption,
 .hero-video-card:focus-within .hero-video-caption{
-  opacity:1;transform:none;pointer-events:auto
-}
-.hero-video-caption:hover{
-  background:rgba(6,17,28,.48);border-color:rgba(232,201,106,.7);color:#E8C96A
+  opacity:1;transform:translate(-50%,0)
 }
 /* أجهزة اللمس الحقيقية فقط — لا تُظهر دائماً في بيئات بلا مؤشر */
 @media (hover:none) and (pointer:coarse){
-  .hero-video-caption{opacity:.9;transform:none;pointer-events:auto;background:rgba(6,17,28,.4)}
+  .hero-video-caption{opacity:.9;transform:translate(-50%,0);background:rgba(6,17,28,.45)}
 }
+/* أخفِ تسمية المشغّل السفلية في بطاقة الهيرو — التسمية العلوية كافية وزر ▶ يبقى واضحاً */
+.hero-video-card .rzq-iv-play-label{display:none!important}
 @media(max-width:900px){
   .store-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding-bottom:18px}
@@ -634,6 +634,60 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 .rzq-empty::before{
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
+}
+/* غرفة الطلبات — شريط أفقي بعرض كامل تحت المنتجات */
+#store-service-desk.store-desk-band{
+  margin-top:22px;
+  margin-bottom:0;
+  padding:18px 20px 16px;
+  border-radius:20px;
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+.store-desk-eyebrow{
+  font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:4px
+}
+.store-desk-hint{
+  font-size:12.5px;color:#6a7a8a;margin:0 0 12px;line-height:1.55;max-width:70ch
+}
+.store-desk-form{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px 12px;
+  align-items:end;
+}
+.store-desk-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.store-desk-field label{
+  font-size:12px;font-weight:800;color:#0F2347
+}
+.store-desk-field .req-input,
+.store-desk-field input.req-input,
+.store-desk-field textarea.req-input{
+  display:block;width:100%;margin:0;padding:11px 12px;
+  border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;
+  box-sizing:border-box;min-height:44px;background:#fff;resize:vertical
+}
+.store-desk-span2{grid-column:span 2}
+.store-desk-actions{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:2px
+}
+.store-desk-note{
+  font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0;flex:1 1 220px;
+  padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
+}
+.store-desk-actions #store-req-submit{
+  flex:0 1 260px;padding:13px 18px;border:none;border-radius:11px;
+  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;
+  cursor:pointer;font-family:inherit;min-height:46px
+}
+@media(max-width:900px){
+  .store-desk-form{grid-template-columns:1fr 1fr}
+  .store-desk-span2{grid-column:span 2}
+}
+@media(max-width:600px){
+  #store-service-desk.store-desk-band{padding:14px 12px 12px;border-radius:16px;margin-top:14px}
+  .store-desk-form{grid-template-columns:1fr}
+  .store-desk-span2{grid-column:auto}
+  .store-desk-actions #store-req-submit{flex:1 1 100%;width:100%}
 }
 /* تقييمات بعرض كامل — تحت شبكة المنتجات والشريط الجانبي */
 #reviews-section.store-reviews-band{
@@ -1337,28 +1391,6 @@ footer{
         <div id="store-payment-methods" style="display:none"></div>
       </div>
 
-      <!-- غرفة الطلبات — حقول ظاهرة دائماً -->
-      <div class="info-card" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important">
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px">SERVICE DESK · غرفة الطلبات</div>
-        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:6px">📩 طلب من المحل</div>
-        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-        <div id="store-req-form" style="display:block!important">
-          <label for="rf-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-whatsapp" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-service" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
-          <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمحل</label>
-          <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
-          <p style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-          <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمحل</button>
-        </div>
-      </div>
     </aside>
 
     <!-- RIGHT: PRODUCTS + REVIEWS -->
@@ -1401,7 +1433,48 @@ footer{
     </main>
   </div>
 
-  <!-- تقييمات الزبائن — بعرض كامل تحت المنتجات (لا تترك فراغاً داخل عمود الواجهة) -->
+  <!-- غرفة الطلبات — شريط أفقي بعرض كامل تحت المنتجات (يملأ الفراغ بدل العمود الجانبي الطويل) -->
+  <section class="store-desk-band info-card" id="store-service-desk" style="border-top:3px solid var(--gold);display:block!important" aria-label="غرفة الطلبات">
+    <div class="store-desk-head">
+      <div>
+        <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
+        <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+      </div>
+    </div>
+    <div id="store-req-form" class="store-desk-form" style="display:block!important">
+      <div class="store-desk-field">
+        <label for="rf-name">الاسم الكامل *</label>
+        <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
+      </div>
+      <div class="store-desk-field">
+        <label for="rf-phone">رقم الهاتف *</label>
+        <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
+      </div>
+      <div class="store-desk-field">
+        <label for="rf-whatsapp">واتساب (إن اختلف)</label>
+        <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
+      </div>
+      <div class="store-desk-field">
+        <label for="rf-email">البريد الإلكتروني (اختياري)</label>
+        <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
+      </div>
+      <div class="store-desk-field store-desk-span2">
+        <label for="rf-service">المنتج / الموضوع</label>
+        <input class="req-input" id="rf-service" placeholder="مثال: طلب منتج أو عرض سعر"/>
+      </div>
+      <div class="store-desk-field store-desk-span2">
+        <label for="rf-msg">رسالتك للمحل</label>
+        <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+      </div>
+      <div class="store-desk-actions">
+        <p class="store-desk-note">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+        <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب للمحل</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- تقييمات الزبائن — بعرض كامل تحت المنتجات وغرفة الطلبات -->
   <section class="store-reviews-band" id="reviews-section" aria-label="تقييمات الزبائن">
     <div class="section-title" style="margin-bottom:10px;color:#1B3A6B" data-t="reviews-title">⭐ تقييمات الزبائن</div>
     <div class="store-reviews-inner" style="padding:6px 0 0">
@@ -2299,7 +2372,7 @@ function rizqShare(title, url) {
       var grid = document.getElementById('products-grid');
       var moreBtn = document.getElementById('store-load-more');
       /* دفعة أولى أوفر لملء عمود الواجهة بصور المنتجات قبل «عرض المزيد» */
-      var pageSize = Math.max(18, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15);
+      var pageSize = Math.max(24, (window.RizqStoreCommerce && RizqStoreCommerce.PAGE_SIZE) || 15);
       var list = Array.isArray(products) ? products.slice() : [];
       var shown = 0;
       var featured = {};
