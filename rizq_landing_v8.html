@@ -6600,9 +6600,13 @@ function _rzqEnsureMarqueeIo(){
   }, {root:null, rootMargin:'120px 0px', threshold:0});
   return _rzqMarqueeIo;
 }
+function _rzqMarqueeBoostWrap(el){
+  if(!el) return null;
+  return el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-track-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap, .rzq-disc-strip') || el.parentElement;
+}
 function _rzqBindMarqueePointerBoost(state){
   if(!state || !state.el || state._boostBound) return;
-  var wrap = state.el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || state.el.parentElement;
+  var wrap = _rzqMarqueeBoostWrap(state.el);
   if(!wrap) return;
   state._boostBound = true;
   state.basePx = state.pxPerSec;
@@ -6620,10 +6624,11 @@ function _rzqBindMarqueePointerBoost(state){
     state.pxPerSec = (state.basePx || 56) + boost;
     _rzqEnsureMarqueeLoop();
     if(decayTimer) clearTimeout(decayTimer);
-    decayTimer = setTimeout(resetBoost, 220);
+    decayTimer = setTimeout(resetBoost, 900);
   }
-  wrap.addEventListener('pointermove', function(ev){
-    if(state.paused || state.offscreen) return;
+  function onPointerSample(ev){
+    /* لا نمنع التسريع عند offscreen — إذا حرّك المستخدم المؤشر فوق الشريط فهو ظاهر له */
+    if(state.paused) return;
     var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if(lastX != null){
       var dx = ev.clientX - lastX;
@@ -6633,13 +6638,19 @@ function _rzqBindMarqueePointerBoost(state){
     }
     lastX = ev.clientX;
     lastT = t;
+  }
+  wrap.addEventListener('pointermove', onPointerSample, {passive:true});
+  wrap.addEventListener('touchmove', function(ev){
+    if(!ev.touches || !ev.touches[0]) return;
+    onPointerSample(ev.touches[0]);
   }, {passive:true});
   wrap.addEventListener('pointerleave', function(){
     lastX = null;
-    resetBoost();
   }, {passive:true});
+  wrap.addEventListener('pointerup', function(){ lastX = null; }, {passive:true});
+  wrap.addEventListener('touchend', function(){ lastX = null; }, {passive:true});
   wrap.addEventListener('wheel', function(ev){
-    if(state.paused || state.offscreen) return;
+    if(state.paused) return;
     var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
     if(!dx) return;
     applyBoost(Math.min(220, Math.abs(dx) * 2.4));
@@ -6714,7 +6725,7 @@ function bindRafMarquee(el, opts){
       if(_rzqMarqueeIo){
         try{ _rzqMarqueeIo.unobserve(el); }catch(eU){}
         try{
-          var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap');
+          var root = _rzqMarqueeBoostWrap(el);
           if(root) _rzqMarqueeIo.unobserve(root);
         }catch(eU2){}
       }
@@ -6727,7 +6738,7 @@ function bindRafMarquee(el, opts){
   var io = _rzqEnsureMarqueeIo();
   if(io){
     try{
-      var root = el.closest('.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap') || el.parentElement || el;
+      var root = _rzqMarqueeBoostWrap(el) || el.parentElement || el;
       io.observe(root);
     }catch(eIo){ try{ io.observe(el); }catch(e2){} }
   }
@@ -14570,6 +14581,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     var DISCOVERY_MIN_READY_ACCOUNTS = 1;
     var DISCOVERY_MIN_READY_FEEDS = 3;
     var DISCOVERY_MAX_CARDS = 20;
+    /* على الجوال بطاقتان لا تفيضان العرض فلا يتحرك الشريط — نضمن عدداً كافياً مثل المعارض/المكاتب */
+    var DISCOVERY_MIN_STRIP_CARDS = 5;
 
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
@@ -14810,6 +14823,34 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         + '</div>';
     }
 
+    /** يضمن أن الشريط أعرض من الشاشة — وإلا بطاقة/بطاقتان تتجمدان على الهاتف */
+    function ensureStripOverflow(strip){
+      if(!strip) return;
+      var track = strip.querySelector('.rzq-disc-track');
+      if(!track) return;
+      var unit = track.getAttribute('data-loop-unit') || '';
+      if(!unit){
+        /* استخرج نسخة واحدة من عدد النسخ الحالية */
+        var n0 = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+        var html = track.innerHTML;
+        if(n0 > 1 && html){
+          /* تقريب: لا نجزّئ HTML؛ نستخدم المحتوى كاملاً كوحدة إن لم تُحفظ */
+          unit = html;
+        } else {
+          unit = html;
+        }
+      }
+      if(!unit) return;
+      var copies = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+      var guard = 0;
+      while(track.scrollWidth <= strip.clientWidth + 12 && guard < 16){
+        track.insertAdjacentHTML('beforeend', unit);
+        copies += 1;
+        guard += 1;
+      }
+      track.setAttribute('data-loop-copies', String(Math.max(2, copies)));
+    }
+
     function mountStrip(mount, cardsHTML, cfg, fr, opts){
       opts = opts || {};
       if(!cardsHTML){
@@ -14818,11 +14859,53 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       }
       /* عند وجود محلات/حسابات: لا خلفية فارغة ولا نص «كن أول…» — شريط مباشر فقط */
       var head = opts.liveType ? liveHeadHTML(opts.liveType, fr) : '';
+      var cardCount = (cardsHTML.match(/class="rzq-disc-card"/g) || []).length;
+      /* بطاقة واحدة (~170px) على هاتف ~390px: نسختان فقط تملآن الشاشة وتتجمد — نكرّر حتى يفيض */
+      var copies = cardCount >= DISCOVERY_MIN_STRIP_CARDS
+        ? 2
+        : Math.max(6, Math.ceil(14 / Math.max(1, cardCount)));
+      var loopHTML = '';
+      for(var ci = 0; ci < copies; ci++) loopHTML += cardsHTML;
       mount.innerHTML = head
         + '<div class="rzq-disc-strip">'
-        + '<div class="rzq-disc-track">' + cardsHTML + cardsHTML + '</div>'
+        + '<div class="rzq-disc-track" data-loop-copies="'+copies+'">' + loopHTML + '</div>'
         + '</div>';
-      initAutoScroll(mount.querySelector('.rzq-disc-strip'));
+      var strip = mount.querySelector('.rzq-disc-strip');
+      var track = strip && strip.querySelector('.rzq-disc-track');
+      if(track){
+        try{ track.setAttribute('data-loop-unit', cardsHTML); }catch(eU){}
+      }
+      if(strip){
+        ensureStripOverflow(strip);
+        try{
+          requestAnimationFrame(function(){ ensureStripOverflow(strip); });
+        }catch(eR){}
+        initAutoScroll(strip);
+      }
+    }
+
+    function padDiscoveryList(list, type){
+      var out = Array.isArray(list) ? list.slice() : [];
+      if(out.length >= DISCOVERY_MIN_STRIP_CARDS) return out;
+      var known = {};
+      out.forEach(function(a){ if(a && a.id) known[a.id] = true; });
+      /* عيّنات التخرج أولاً — تنوّع بصري بدل تكرار نفس المحل مرتين */
+      showcaseAccounts(type).forEach(function(a){
+        if(out.length >= DISCOVERY_MIN_STRIP_CARDS) return;
+        if(!a || !a.id || known[a.id]) return;
+        known[a.id] = true;
+        out.push(a);
+      });
+      /* إن بقيت قليلة: كرّر الموجود بأسماء ظاهرة حتى يشتغل الشريط */
+      if(out.length && out.length < DISCOVERY_MIN_STRIP_CARDS){
+        var base = out.slice();
+        var i = 0;
+        while(out.length < DISCOVERY_MIN_STRIP_CARDS && i < 20){
+          out.push(base[i % base.length]);
+          i++;
+        }
+      }
+      return out;
     }
 
     function initAutoScroll(strip){
@@ -14830,30 +14913,83 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(!track) return;
       if(strip._rzqScrollBound) return;
       strip._rzqScrollBound = true;
-      var paused = false;
+      var dragging = false;
       var pos = 0; /* تراكم عشري — scrollLeft الصحيح يسبب رعدة عند += 0.45 */
-      var finePointer = false;
-      try { finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches; } catch(eM){}
-      if(finePointer){
-        strip.addEventListener('mouseenter', function(){ paused = true; });
-        strip.addEventListener('mouseleave', function(){ paused = false; });
+      var baseStep = 0.45;
+      var boostStep = 0; /* تسريع يدوي (سحب / عجلة) مثل أشرطة المباشر */
+      var decayTimer = 0;
+      var lastX = null;
+      var lastT = 0;
+      function applyBoost(raw){
+        /* raw ≈ px/sec من السحب — نحو وحدات خطوة الـ rAF */
+        var b = Math.max(0, Math.min(8.5, raw / 55));
+        boostStep = Math.max(boostStep * 0.35, b);
+        if(decayTimer) clearTimeout(decayTimer);
+        decayTimer = setTimeout(function(){ boostStep = 0; }, 900);
       }
-      strip.addEventListener('touchstart', function(){ paused = true; }, {passive:true});
-      strip.addEventListener('touchend', function(){ setTimeout(function(){ paused = false; }, 1600); }, {passive:true});
+      function samplePointer(clientX){
+        var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        if(lastX != null){
+          var dx = clientX - lastX;
+          var dt = Math.max(8, t - lastT);
+          applyBoost(Math.abs(dx) / dt * 1000);
+        }
+        lastX = clientX;
+        lastT = t;
+      }
+      strip.addEventListener('pointerdown', function(){ dragging = true; lastX = null; }, {passive:true});
+      strip.addEventListener('pointerup', function(){
+        dragging = false; lastX = null;
+        try{ pos = strip.scrollLeft; }catch(eP){}
+      }, {passive:true});
+      strip.addEventListener('pointercancel', function(){ dragging = false; lastX = null; }, {passive:true});
+      strip.addEventListener('pointermove', function(ev){
+        if(ev.pointerType === 'mouse' && ev.buttons === 0){
+          /* تحريك المؤشر فوق الشريط يسرّع دون إيقاف النقر على البطاقة */
+          samplePointer(ev.clientX);
+          return;
+        }
+        if(ev.buttons || ev.pointerType === 'touch' || ev.pointerType === 'pen'){
+          dragging = true;
+          samplePointer(ev.clientX);
+          try{ pos = strip.scrollLeft; }catch(eD){}
+        }
+      }, {passive:true});
+      strip.addEventListener('touchmove', function(ev){
+        if(!ev.touches || !ev.touches[0]) return;
+        dragging = true;
+        samplePointer(ev.touches[0].clientX);
+        try{ pos = strip.scrollLeft; }catch(eTm){}
+      }, {passive:true});
+      strip.addEventListener('touchend', function(){
+        dragging = false; lastX = null;
+        try{ pos = strip.scrollLeft; }catch(eTe){}
+      }, {passive:true});
+      strip.addEventListener('wheel', function(ev){
+        var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+        if(!dx) return;
+        applyBoost(Math.min(480, Math.abs(dx) * 2.4));
+        try{ pos = strip.scrollLeft; }catch(eW){}
+      }, {passive:true});
       /* عربي (dir=rtl): حركة يسار→يمين | فرنسي (dir=ltr): يمين→يسار */
       function flowSign(){
         return document.documentElement.getAttribute('dir') === 'ltr' ? 1 : -1;
       }
+      function loopSpan(){
+        var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+        return track.scrollWidth / Math.max(2, n);
+      }
       function step(){
-        if(!paused && track.scrollWidth > strip.clientWidth){
-          var half = track.scrollWidth / 2;
-          if(half > 1){
+        if(!dragging && track.scrollWidth > strip.clientWidth){
+          var span = loopSpan();
+          if(span > 1){
             var sign = flowSign();
-            pos += 0.45 * sign;
+            var spd = baseStep + boostStep;
+            pos += spd * sign;
             if(sign > 0){
-              if(pos >= half) pos -= half;
+              if(pos >= span) pos -= span;
             } else {
-              if(pos <= 0) pos += half;
+              if(pos <= 0) pos += span;
             }
             strip.scrollLeft = pos;
           }
@@ -14863,7 +14999,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       /* ابدأ من الطرف المناسب حتى يظهر أول بطاقة في جهة التدفق */
       try {
         if(flowSign() < 0){
-          pos = Math.max(0, track.scrollWidth / 2 - strip.clientWidth);
+          pos = Math.max(0, loopSpan() - strip.clientWidth);
           strip.scrollLeft = pos;
         } else {
           pos = 0;
@@ -14919,6 +15055,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
           /* حسابات بلا غلاف/صورة → عيّنات مصوّرة حتى لا تبقى بطاقات زرقاء فارغة */
           list = showcaseAccounts(type).concat(list);
         }
+        /* محلّان فقط على الهاتف لا يتحركان — نكمّل من العيّنات مثل المعارض/المكاتب */
+        list = padDiscoveryList(list, type);
         if(!list.length){
           mountStrip(mount, '', cfg, fr);
           return;
