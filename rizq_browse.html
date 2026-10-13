@@ -263,8 +263,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
   overflow-y:auto;flex:1;min-height:0;position:relative;z-index:1;
   display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;
   gap:12px;padding:12px clamp(12px,1.2vw,20px) 18px;align-content:start;align-items:stretch;
-  /* صفوف متساوية: ارتفاع الصف = أطول بطاقة؛ المحتوى الداخلي يملأ الفراغ */
-  grid-auto-rows:1fr;
+  /* min-content يحافظ على صورة+نص (تجنّب انهيار الصفوف)؛ تساوي الارتفاع عبر صف الماركة الثابت */
+  grid-auto-rows:min-content;
   background:
     radial-gradient(ellipse 80% 50% at 100% 0%,rgba(201,168,76,.08),transparent 55%),
     linear-gradient(180deg,#f5f8fd 0%,#eef3fa 100%);
