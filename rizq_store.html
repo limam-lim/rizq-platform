@@ -2739,7 +2739,19 @@ function _storeSaveCart(cart){
 }
 function updateCartCount(){
   var cart = _storeLoadCart();
-  var t = cart.reduce(function(s,c){ return s + (c.qty||0); }, 0);
+  var sid = '';
+  try {
+    sid = window._rizqStoreAccountId
+      || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+      || new URLSearchParams(location.search).get('id')
+      || '';
+  } catch (eSid) {}
+  var t = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartQtyForSeller === 'function')
+    ? RizqStoreCommerce.cartQtyForSeller(cart, sid)
+    : cart.reduce(function(s,c){
+        if (sid && String(c.storeId || c.accountId || '') !== String(sid)) return s;
+        return s + (c.qty||0);
+      }, 0);
   var el = document.getElementById('nav-cart-count');
   if (el) el.textContent = t;
   if(window.RizqUx && typeof RizqUx.updateCartBadges === 'function') RizqUx.updateCartBadges();
@@ -2794,7 +2806,8 @@ function addToCartStore(id){
       emoji: p.emoji || '📦',
       storeId: sid,
       accountId: sid,
-      storeName: sname
+      storeName: sname,
+      module: 'store'
     });
   }
   _storeSaveCart(cart);

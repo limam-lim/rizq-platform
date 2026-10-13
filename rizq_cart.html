@@ -840,7 +840,7 @@ function autofillDeliveryFromAccount() {
 (function bindStoreContext(){
   try{
     var params = new URLSearchParams(location.search);
-    var storeId = params.get('id') || params.get('store') || '';
+    var storeId = params.get('id') || params.get('store') || params.get('showroom') || params.get('corp') || '';
     if(!storeId){
       try{
         var c = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
@@ -850,7 +850,7 @@ function autofillDeliveryFromAccount() {
     var fr = false;
     try{ fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e2){}
     var acc = null;
-    if(storeId && storeId !== 'demo_store'){
+    if(storeId && storeId !== 'demo_store' && storeId !== 'demo_showroom' && storeId !== 'demo-corp-001'){
       try{
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
         acc = (accs || []).find(function(a){ return String(a.id) === String(storeId); }) || null;
@@ -861,19 +861,46 @@ function autofillDeliveryFromAccount() {
         }).catch(function(){});
       }
     }
-    if(!acc && (storeId === 'demo_store' || !storeId)){
-      acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك' };
-      if(!storeId) storeId = 'demo_store';
+    if(!acc && (storeId === 'demo_store' || storeId === 'demo_showroom' || storeId === 'demo-corp-001' || !storeId)){
+      var demoShowroom = storeId === 'demo_showroom' || storeId === 'demo-corp-001'
+        || (params.get('module') === 'showroom');
+      if(demoShowroom){
+        acc = { name: fr ? 'Showroom Al-Riyada' : 'معرض الريادة', tagline: fr ? 'Panier showroom' : 'سلة المعرض', type: 'corp' };
+        if(!storeId) storeId = 'demo-corp-001';
+      } else {
+        acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك', type: 'store' };
+        if(!storeId) storeId = 'demo_store';
+      }
     }
     applyCartStoreBrand(acc || {}, storeId, fr);
   }catch(e){}
 })();
 
+function _cartIsShowroomContext(acc, storeId){
+  try{
+    var m = new URLSearchParams(location.search).get('module');
+    if(m === 'showroom' || m === 'corp') return true;
+    if(m === 'store') return false;
+  }catch(e0){}
+  if(acc && (acc.type === 'corp' || acc.type === 'showroom')) return true;
+  try{
+    var lines = (window.RizqStoreCommerce && RizqStoreCommerce.cartLinesForSeller)
+      ? RizqStoreCommerce.cartLinesForSeller(JSON.parse(localStorage.getItem('rizq_cart') || '[]'), storeId)
+      : [];
+    if(lines.some(function(c){ return c && (c.module === 'showroom' || String(c.id||'').indexOf('showroom-') === 0); }))
+      return true;
+  }catch(e1){}
+  return false;
+}
+
 function applyCartStoreBrand(acc, storeId, fr){
-  var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
-  var tag = (acc && (acc.tagline || acc.desc)) || (fr
-    ? 'Votre panier — identité du magasin comme la vitrine'
-    : 'سلة طلباتك — صورة المحل واسمه كما في الواجهة');
+  var isShowroom = _cartIsShowroomContext(acc, storeId);
+  var name = (acc && acc.name) || (isShowroom
+    ? (fr ? 'Showroom Al-Riyada' : 'معرض الريادة')
+    : (fr ? 'Boutique Al-Nour' : 'متجر النور'));
+  var tag = (acc && (acc.tagline || acc.desc)) || (isShowroom
+    ? (fr ? 'Votre panier showroom — articles de ce showroom uniquement' : 'سلة المعرض — فقط ما أضفته من هذا المعرض')
+    : (fr ? 'Votre panier — articles de ce magasin uniquement' : 'سلة المحل — فقط ما أضفته من هذا المحل'));
   var luxName = document.getElementById('lux-store-name');
   var luxTag = document.getElementById('lux-store-tag');
   var luxLogo = document.getElementById('lux-store-logo');
@@ -883,31 +910,60 @@ function applyCartStoreBrand(acc, storeId, fr){
   var toProd = document.getElementById('lux-to-products');
   if(luxName) luxName.textContent = name;
   if(luxTag) luxTag.textContent = tag;
-  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, '🏪');
+  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, isShowroom ? '🏛️' : '🏪');
   else if(luxLogo && acc && acc.thumb){
     var t = String(acc.thumb).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
     luxLogo.innerHTML = '<img src="'+t+'" alt=""/>';
   }
-  var storeHref = storeId && storeId !== 'demo_store'
-    ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
-    : (storeId === 'demo_store' ? 'rizq_store.html?id=demo_store' : 'rizq_landing_v8.html#rzq-disc-store');
-  var productsHref = storeId
-    ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
-    : 'rizq_products.html';
+  var storeHref, productsHref;
+  if(isShowroom){
+    storeHref = storeId
+      ? ('rizq_showroom.html?id=' + encodeURIComponent(storeId))
+      : 'rizq_landing_v8.html#rzq-disc-corp';
+    productsHref = storeHref + '#catalog-section';
+    if(bcLink) bcLink.setAttribute('data-t-fr', 'Showroom');
+    if(back) back.textContent = fr ? '↩ Vitrine showroom' : '↩ واجهة المعرض';
+    if(toProd) toProd.textContent = fr ? '🛍 Catalogue' : '🛍 العروض';
+  } else {
+    storeHref = storeId && storeId !== 'demo_store'
+      ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
+      : (storeId === 'demo_store' ? 'rizq_store.html?id=demo_store' : 'rizq_landing_v8.html#rzq-disc-store');
+    productsHref = storeId
+      ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
+      : 'rizq_products.html';
+  }
   if(bcLink){ bcLink.textContent = name; bcLink.href = storeHref; }
   if(bcProd) bcProd.href = productsHref;
   if(back) back.href = storeHref;
   if(toProd) toProd.href = productsHref;
   if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
   window._rizqCartStoreName = name;
+  window._rizqCartIsShowroom = !!isShowroom;
 }
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========
+// مخزن واحد للزائر؛ عند ?id= تُعرض فقط أسطر ذلك المحل/المعرض.
 function loadCart(){
   try{ return JSON.parse(localStorage.getItem('rizq_cart') || '[]'); }catch(e){ return []; }
 }
 function saveCart(){
   try{ localStorage.setItem('rizq_cart', JSON.stringify(cart)); }catch(e){}
+}
+function _cartScopeSellerId(){
+  try{
+    var p = new URLSearchParams(location.search);
+    return p.get('id') || p.get('store') || p.get('showroom') || p.get('corp') || '';
+  }catch(e){ return ''; }
+}
+function activeCart(){
+  if(window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLinesForSeller === 'function'){
+    return RizqStoreCommerce.cartLinesForSeller(cart, _cartScopeSellerId());
+  }
+  var sid = _cartScopeSellerId();
+  if(!sid) return cart.slice();
+  return cart.filter(function(c){
+    return String((c && (c.storeId || c.accountId)) || '') === String(sid);
+  });
 }
 
 // ── "كرر آخر طلب" (إلهام أمازون/AliExpress "Buy again") — مهمة #267.
@@ -915,7 +971,7 @@ function saveCart(){
 // فقط نسخة من محتوى آخر سلة أُرسلت فعلياً، لإعادة تعبئتها بضغطة واحدة. ──
 function saveLastOrderSnapshot(){
   try{
-    localStorage.setItem('rizq_last_order', JSON.stringify({ items: cart, deliveryType: deliveryType, savedAt: new Date().toISOString() }));
+    localStorage.setItem('rizq_last_order', JSON.stringify({ items: activeCart(), deliveryType: deliveryType, savedAt: new Date().toISOString() }));
   }catch(e){}
 }
 function _refreshRepeatOrderBtn(){
@@ -939,7 +995,16 @@ function repeatLastOrder(){
     showToast(isAr ? '❌ لا يوجد طلب سابق محفوظ' : '❌ Aucune commande précédente enregistrée');
     return;
   }
-  cart = JSON.parse(JSON.stringify(snap.items));
+  var restored = JSON.parse(JSON.stringify(snap.items));
+  var scopeId = _cartScopeSellerId();
+  if(scopeId){
+    // أعد تعبئة سلة هذا البائع فقط — لا تمس أسطر المحلات/المعارض الأخرى
+    cart = cart.filter(function(c){
+      return String((c && (c.storeId || c.accountId)) || '') !== String(scopeId);
+    }).concat(restored);
+  } else {
+    cart = restored;
+  }
   if(snap.deliveryType) deliveryType = snap.deliveryType;
   saveCart();
   renderCart();
@@ -956,8 +1021,9 @@ function renderCart() {
   const list = document.getElementById('cart-items-list');
   const empty = document.getElementById('empty-cart');
   const content = document.getElementById('cart-content');
+  const view = activeCart();
 
-  if (!cart.length) {
+  if (!view.length) {
     empty.style.display = 'block';
     content.style.display = 'none';
     document.getElementById('nav-cart-count').textContent = '0';
@@ -967,7 +1033,7 @@ function renderCart() {
   }
   empty.style.display = 'none';
   content.style.display = 'block';
-  const totalQty = cart.reduce((s,c) => s+c.qty, 0);
+  const totalQty = view.reduce((s,c) => s+c.qty, 0);
   document.getElementById('nav-cart-count').textContent = totalQty;
 
   var __isAr = document.documentElement.lang !== 'fr';
@@ -978,8 +1044,9 @@ function renderCart() {
   var luxChip = document.getElementById('lux-count-chip');
   if(luxChip) luxChip.textContent = totalQty + (__isAr ? ' في السلة' : ' dans le panier');
   // إصلاح تسرب اللغة: اختيار الاسم المناسب للغة الحالية + صورة المنتج إن وُجدت
-  list.innerHTML = cart.map(item => {
+  list.innerHTML = view.map(item => {
     var __itemName = __isAr ? (item.name || item.nameF) : (item.nameF || item.name);
+    var __lineSeller = item.storeName || __storeName;
     var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
       ? RizqStoreCommerce.imagesOf(item)
       : (item.imgDataArr || (item.imgData ? [item.imgData] : []) || []);
@@ -997,7 +1064,7 @@ function renderCart() {
       <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${sanitize(__itemName)}</div>
-        <div class="cart-item-cat">${sanitize(__storeName)}</div>
+        <div class="cart-item-cat">${sanitize(__lineSeller)}</div>
         <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
         <div class="qty-controls">
           <button type="button" class="qty-btn" data-qty-delta="-1" aria-label="${__lblDec}">−</button>
@@ -1053,9 +1120,20 @@ function removeItem(id) {
 
 function clearCart() {
   const isAr = document.documentElement.lang !== 'fr';
-  if (!cart.length) return;
-  if (!confirm(isAr ? 'هل تريد مسح السلة بالكامل؟' : 'Voulez-vous vider complètement le panier ?')) return;
-  cart = [];
+  const view = activeCart();
+  if (!view.length) return;
+  var scopeId = _cartScopeSellerId();
+  var msg = scopeId
+    ? (isAr ? 'هل تريد مسح سلة هذا المحل/المعرض فقط؟' : 'Vider uniquement le panier de ce magasin/showroom ?')
+    : (isAr ? 'هل تريد مسح السلة بالكامل؟' : 'Voulez-vous vider complètement le panier ?');
+  if (!confirm(msg)) return;
+  if (scopeId) {
+    cart = cart.filter(function(c){
+      return String((c && (c.storeId || c.accountId)) || '') !== String(scopeId);
+    });
+  } else {
+    cart = [];
+  }
   saveCart();
   renderCart();
   showToast(isAr ? '🗑 تم مسح السلة' : '🗑 Panier vidé');
@@ -1193,7 +1271,8 @@ function applyPromo() {
 
 function updateSummary() {
   const isAr = document.documentElement.lang !== 'fr';
-  const subtotal = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  const view = activeCart();
+  const subtotal = view.reduce((s,c) => s + c.price*c.qty, 0);
   const discountAmt = Math.round(subtotal * promoDiscount / 100);
   const total = subtotal + deliveryFee - discountAmt;
 
@@ -1203,7 +1282,7 @@ function updateSummary() {
   document.getElementById('s-total').textContent = total.toLocaleString() + ' MRU';
 
   const summaryItems = document.getElementById('summary-items');
-  summaryItems.innerHTML = cart.map(item => {
+  summaryItems.innerHTML = view.map(item => {
     var __sName = isAr ? (item.name || item.nameF) : (item.nameF || item.name);
     return `
     <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f0f3f8">
@@ -1215,14 +1294,16 @@ function updateSummary() {
 }
 
 function buildWALink() {
-  if (!cart.length) return;
+  const view = activeCart();
+  if (!view.length) return;
   const isAr = document.documentElement.lang !== 'fr';
-  const items = cart.map(c => `- ${isAr ? (c.name||c.nameF) : (c.nameF||c.name)} ×${c.qty} = ${(c.price*c.qty).toLocaleString()} MRU`).join('\n');
-  const subtotal = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  const seller = window._rizqCartStoreName || (view[0] && view[0].storeName) || (isAr ? 'متجر النور' : 'Boutique Al-Nour');
+  const items = view.map(c => `- ${isAr ? (c.name||c.nameF) : (c.nameF||c.name)} ×${c.qty} = ${(c.price*c.qty).toLocaleString()} MRU`).join('\n');
+  const subtotal = view.reduce((s,c) => s + c.price*c.qty, 0);
   const total = subtotal + deliveryFee - Math.round(subtotal*promoDiscount/100);
   const msg = isAr
-    ? `🛒 طلب جديد من متجر النور عبر رزق\n\n${items}\n\n${deliveryType==='delivery'?'🚚 توصيل':'🏪 استلام من المحل'}\nالإجمالي: ${total.toLocaleString()} MRU\nالدفع: نقداً عند التسليم`
-    : `🛒 Nouvelle commande depuis Boutique Al-Nour via Rizq\n\n${items}\n\n${deliveryType==='delivery'?'🚚 Livraison':'🏪 Retrait en boutique'}\nTotal: ${total.toLocaleString()} MRU\nPaiement: à la livraison, en espèces`;
+    ? `🛒 طلب جديد من ${seller} عبر رزق\n\n${items}\n\n${deliveryType==='delivery'?'🚚 توصيل':'🏪 استلام من المحل'}\nالإجمالي: ${total.toLocaleString()} MRU\nالدفع: نقداً عند التسليم`
+    : `🛒 Nouvelle commande depuis ${seller} via Rizq\n\n${items}\n\n${deliveryType==='delivery'?'🚚 Livraison':'🏪 Retrait en boutique'}\nTotal: ${total.toLocaleString()} MRU\nPaiement: à la livraison, en espèces`;
   const el = document.getElementById('wa-order-btn');
   if (el) el.href = `https://wa.me/22244882212?text=${encodeURIComponent(msg)}`;
 }
@@ -1230,10 +1311,11 @@ function buildWALink() {
 function _cartSellerId(){
   try{
     var p = new URLSearchParams(location.search);
-    var sid = p.get('id') || p.get('store') || '';
+    var sid = p.get('id') || p.get('store') || p.get('showroom') || p.get('corp') || '';
     if(sid) return sid;
   }catch(e){}
-  if(cart[0]) return cart[0].storeId || cart[0].accountId || '';
+  var view = activeCart();
+  if(view[0]) return view[0].storeId || view[0].accountId || '';
   return '';
 }
 
@@ -1289,7 +1371,8 @@ function loadCartSellerPayments(){
 
 function issueCartPrefacture(){
   const isAr = document.documentElement.lang !== 'fr';
-  if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
+  const view = activeCart();
+  if (!view.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
   if (!window.RizqPrefacture) {
     showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
     var s = document.createElement('script');
@@ -1359,8 +1442,8 @@ function issueCartPrefacture(){
   var addrEl = document.getElementById('f-address');
   var cityEl = document.getElementById('f-city');
   var doc = RizqPrefacture.createFromCart({
-    module: (cart[0] && cart[0].module) || 'store',
-    sellerName: window._rizqCartSellerName || (cart[0] && cart[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
+    module: (view[0] && view[0].module) || (window._rizqCartIsShowroom ? 'showroom' : 'store'),
+    sellerName: window._rizqCartSellerName || (view[0] && view[0].storeName) || (isAr ? 'محل رزق' : 'Magasin Rizq'),
     sellerAccountId: _cartSellerId(),
     buyerName: nameEl ? nameEl.value.trim() : '',
     buyerPhone: phoneEl ? phoneEl.value.trim() : '',
@@ -1382,7 +1465,8 @@ function issueCartPrefacture(){
 function submitOrder(e) {
   e.preventDefault();
   const isAr = document.documentElement.lang !== 'fr';
-  if (!cart.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
+  const view = activeCart();
+  if (!view.length) { showToast(isAr ? '❌ السلة فارغة' : '❌ Le panier est vide'); return; }
 
   // Validate + require confirm for delivery
   if (deliveryType === 'delivery') {
@@ -1404,12 +1488,21 @@ function submitOrder(e) {
   // استقطاع المخزون: 20 → بيع 1 → يبقى 19 (محلياً + محاولة مزامنة الخادم)
   try {
     if (window.RizqStock && typeof RizqStock.decrementCartItems === 'function') {
-      RizqStock.decrementCartItems(cart.slice());
+      RizqStock.decrementCartItems(view.slice());
     }
   } catch (stockErr) {}
 
-  // Clear and show success
-  cart = [];
+  // امسح أسطر هذا البائع فقط — أبقِ سلات المحلات/المعارض الأخرى
+  var scopeId = _cartScopeSellerId() || (view[0] && (view[0].storeId || view[0].accountId)) || '';
+  var orderedIds = {};
+  view.forEach(function(c){ orderedIds[String(c.id)] = true; });
+  if (scopeId) {
+    cart = cart.filter(function(c){
+      return String((c && (c.storeId || c.accountId)) || '') !== String(scopeId);
+    });
+  } else {
+    cart = cart.filter(function(c){ return !orderedIds[String(c.id)]; });
+  }
   saveCart();
   document.getElementById('main-wrap').style.display = 'none';
   document.getElementById('empty-cart').style.display = 'none';
@@ -1440,7 +1533,7 @@ renderCart();
 
 // Handle empty cart on load
 document.addEventListener('DOMContentLoaded', () => {
-  if (!cart.length) {
+  if (!activeCart().length) {
     document.getElementById('empty-cart').style.display = 'block';
     document.getElementById('cart-content').style.display = 'none';
   }

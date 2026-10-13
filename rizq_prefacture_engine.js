@@ -436,6 +436,14 @@
     opts = opts || {};
     var cart = [];
     try { cart = JSON.parse(localStorage.getItem('rizq_cart') || '[]'); } catch (e) { cart = []; }
+    var sellerId = opts.sellerAccountId || '';
+    if (sellerId && typeof global !== 'undefined' && global.RizqStoreCommerce && typeof global.RizqStoreCommerce.cartLinesForSeller === 'function') {
+      cart = global.RizqStoreCommerce.cartLinesForSeller(cart, sellerId);
+    } else if (sellerId) {
+      cart = (cart || []).filter(function (it) {
+        return String((it && (it.storeId || it.accountId)) || '') === String(sellerId);
+      });
+    }
     if (!cart.length) return null;
     var lines = cart.map(function (it) {
       return {
