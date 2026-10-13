@@ -195,22 +195,13 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:16px}
   display:inline-flex;align-items:center;gap:5px;
 }
 
-.dir-empty{
-  text-align:center;padding:28px 20px 22px;background:linear-gradient(180deg,#fff,#f8fafc);
-  border-radius:16px;border:1.5px dashed rgba(201,168,76,.35);
-  box-shadow:0 6px 16px rgba(15,35,65,.04);grid-column:1/-1;
-}
-.dir-empty .emo{font-size:36px;margin-bottom:10px}
-.dir-empty p{color:#5b6b85;font-size:13.5px;margin-bottom:14px;font-weight:600;max-width:520px;margin-inline:auto;line-height:1.6}
-.dir-empty > a.dir-empty-cta{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:11px 22px;border-radius:12px;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f2347;
-  font-weight:900;font-size:13.5px;text-decoration:none;
-  box-shadow:0 4px 14px rgba(201,168,76,.3);
+/* ملاحظة قصيرة فقط — التسجيل من زر «امتلك واجهتك» في الهيدر */
+.dir-empty-note{
+  grid-column:1/-1;text-align:center;margin:0 0 8px;
+  font-size:12.5px;font-weight:700;color:#5b6b85;line-height:1.5;
 }
 .dir-examples-label{
-  grid-column:1/-1;margin:4px 0 2px;text-align:center;
+  grid-column:1/-1;margin:2px 0 4px;text-align:center;
   font-size:12px;font-weight:800;color:#1B3A6B;letter-spacing:.3px;
 }
 .dir-card.is-example{border-style:dashed;border-color:rgba(201,168,76,.45)}
@@ -365,8 +356,8 @@ var TYPE_META = {
     titleAr: 'دليل <span>المحلات</span>', titleFr: 'Annuaire des <span>boutiques</span>',
     subAr: 'محلات التجزئة — إلكترونيات، أزياء، قطع غيار، بقالة… (بيع السيارات في دليل المعارض).',
     subFr: 'Commerces de détail — électronique, mode, pièces auto, épicerie… (voitures dans les showrooms).',
-    emptyAr: 'عند فتح محلات على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المحل.',
-    emptyFr: 'Quand des boutiques s\'ouvrent sur Rizq, elles apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
+    emptyAr: 'لا محلات مطابقة للفلتر حالياً.',
+    emptyFr: 'Aucune boutique ne correspond aux filtres.',
     ctaAr: 'زيارة المحل ←', ctaFr: 'Voir la boutique →',
     reg: 'rizq_register.html?mode=seller&preBiz=store',
     regCtaAr: '🚀 افتح محلك الآن', regCtaFr: '🚀 Ouvrez votre boutique',
@@ -380,8 +371,8 @@ var TYPE_META = {
     titleAr: 'دليل <span>المعارض</span>', titleFr: 'Annuaire des <span>showrooms</span>',
     subAr: 'معارض البيع الكبرى — سيارات، أثاث، إلكترونيات ومعدات. مختلف عن محلات التجزئة.',
     subFr: 'Grands showrooms — auto, meubles, électronique & équipements. Distinct des boutiques.',
-    emptyAr: 'عند تسجيل معارض على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المعرض.',
-    emptyFr: 'Quand des showrooms s\'inscrivent sur Rizq, ils apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
+    emptyAr: 'لا معارض مطابقة للفلتر حالياً.',
+    emptyFr: 'Aucun showroom ne correspond aux filtres.',
     ctaAr: 'زيارة المعرض ←', ctaFr: 'Voir le showroom →',
     reg: 'rizq_register.html?mode=seller&preBiz=corp',
     regCtaAr: '🚀 سجّل معرضك الآن', regCtaFr: '🚀 Inscrivez votre showroom',
@@ -395,8 +386,8 @@ var TYPE_META = {
     titleAr: 'دليل <span>المكاتب</span>', titleFr: 'Annuaire des <span>bureaux</span>',
     subAr: 'تصفّح المكاتب حسب الاختصاص — محامون، خدمات إدارية، وكالات عقارية والمزيد — أو حسب الولاية.',
     subFr: 'Parcourez les bureaux par spécialité — avocats, services administratifs, agences immobilières… — ou par wilaya.',
-    emptyAr: 'عند إنشاء مكاتب على رزق تظهر هنا بصورة واسم — اضغط لزيارة صفحة المكتب.',
-    emptyFr: 'Quand des bureaux s\'ouvrent sur Rizq, ils apparaissent ici avec photo et nom — cliquez pour ouvrir la page.',
+    emptyAr: 'لا مكاتب مطابقة للفلتر حالياً.',
+    emptyFr: 'Aucun bureau ne correspond aux filtres.',
     ctaAr: 'زيارة المكتب ←', ctaFr: 'Voir le bureau →',
     reg: 'rizq_register.html?mode=seller&preBiz=office',
     regCtaAr: '🚀 أنشئ مكتبك الآن', regCtaFr: '🚀 Créez votre bureau',
@@ -586,8 +577,7 @@ function renderDirectory(){
 
   if(!_loaded){
     countEl.textContent = fr ? 'Chargement…' : 'جاري التحميل…';
-    grid.innerHTML = '<div class="dir-empty" style="grid-column:1/-1"><div class="emo">⏳</div><p>'
-      + (fr ? 'Chargement…' : 'جاري التحميل…') + '</p></div>';
+    grid.innerHTML = '<p class="dir-empty-note">'+(fr ? 'Chargement…' : 'جاري التحميل…')+'</p>';
     return;
   }
 
@@ -642,10 +632,24 @@ function renderDirectory(){
 
   if(!list.length){
     var noneOfType = !_accounts.some(function(a){ return a.type === _type; });
-    var html = '<div class="dir-empty"><div class="emo">'+m.icon+'</div><p>'+(fr?m.emptyFr:m.emptyAr)+'</p>'
-      + '<a class="dir-empty-cta" href="'+m.reg+'">'+(fr?m.regCtaFr:m.regCtaAr)+'</a></div>';
-    if(noneOfType) html += _exampleCardsHTML();
-    grid.innerHTML = html;
+    if(noneOfType){
+      /* لا حاجة لمربع فارغ كبير — التسجيل من الهيدر؛ هنا أمثلة توضح البطاقات */
+      var intro = fr
+        ? 'Les boutiques/showrooms/bureaux apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
+        : 'كل محل أو معرض أو مكتب سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
+      if(_type === 'store') intro = fr
+        ? 'Les boutiques apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
+        : 'كل محل سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
+      if(_type === 'corp') intro = fr
+        ? 'Les showrooms apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
+        : 'كل معرض سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
+      if(_type === 'office') intro = fr
+        ? 'Les bureaux apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
+        : 'كل مكتب سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
+      grid.innerHTML = '<p class="dir-empty-note">'+intro+'</p>' + _exampleCardsHTML();
+      return;
+    }
+    grid.innerHTML = '<p class="dir-empty-note">'+(fr?m.emptyFr:m.emptyAr)+'</p>';
     return;
   }
 
