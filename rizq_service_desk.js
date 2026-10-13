@@ -32,6 +32,86 @@
     return isFr() ? fr : ar;
   }
 
+  /** نوع الجهة لغرفة الطلبات: store | corp/showroom | office — بدون خلط المصطلحات */
+  function normalizeAccountType(accountType) {
+    var ty = String(accountType || '').toLowerCase().trim();
+    if (ty === 'store' || ty === 'shop') return 'store';
+    if (ty === 'corp' || ty === 'showroom' || ty === 'company' || ty === 'entreprise') return 'corp';
+    if (ty === 'office' || ty === 'bureau') return 'office';
+    return '';
+  }
+
+  function entityLabels(accountType) {
+    var ty = normalizeAccountType(accountType);
+    if (ty === 'store') {
+      return {
+        type: 'store',
+        nounAr: 'المحل',
+        nounFr: 'la boutique',
+        ofAr: 'من المحل',
+        ofFr: 'au magasin',
+        toAr: 'للمحل',
+        toFr: 'au magasin',
+        msgAr: 'رسالتك للمحل',
+        msgFr: 'Votre message au magasin',
+        sendAr: '📤 إرسال الطلب للمحل',
+        sendFr: '📤 Envoyer la demande au magasin',
+      };
+    }
+    if (ty === 'corp') {
+      return {
+        type: 'corp',
+        nounAr: 'المعرض',
+        nounFr: 'le showroom',
+        ofAr: 'من المعرض',
+        ofFr: 'au showroom',
+        toAr: 'للمعرض',
+        toFr: 'au showroom',
+        msgAr: 'رسالتك للمعرض',
+        msgFr: 'Votre message au showroom',
+        sendAr: '📤 إرسال الطلب للمعرض',
+        sendFr: '📤 Envoyer la demande au showroom',
+      };
+    }
+    // office (أو غير معروف على صفحة المكتب)
+    return {
+      type: ty || 'office',
+      nounAr: 'المكتب',
+      nounFr: 'le bureau',
+      ofAr: 'من المكتب',
+      ofFr: 'au bureau',
+      toAr: 'للمكتب',
+      toFr: 'au bureau',
+      msgAr: 'رسالتك للمكتب',
+      msgFr: 'Votre message au bureau',
+      sendAr: '📤 إرسال الطلب للمكتب',
+      sendFr: '📤 Envoyer la demande au bureau',
+    };
+  }
+
+  function defaultFormHint(accountType) {
+    var e = entityLabels(accountType);
+    return t(
+      'أدخل بياناتك وسنتواصل معك. الوثائق تُرسل عبر واتساب أو إيميل ' + e.nounAr + ' مباشرة.',
+      'Saisissez vos coordonnées. Les documents partent via WhatsApp ou e-mail de ' + e.nounFr + '.'
+    );
+  }
+
+  /** إن وُجدت تلميحة قديمة بمصطلح جهة خاطئ، استبدلها بالافتراضي الصحيح للنوع */
+  function coerceHintForType(hint, accountType) {
+    var h = String(hint || '').trim();
+    if (!h) return '';
+    var ty = normalizeAccountType(accountType);
+    if (!ty) return h;
+    var wrongOffice = /إيميل المكتب|e-mail du professionnel|e-mail du bureau/i.test(h);
+    var wrongStore = /إيميل المحل|e-mail de la boutique|chez le magasin/i.test(h);
+    var wrongCorp = /إيميل المعرض|e-mail du showroom|au showroom/i.test(h);
+    if (ty === 'store' && (wrongOffice || wrongCorp)) return defaultFormHint('store');
+    if (ty === 'corp' && (wrongOffice || wrongStore)) return defaultFormHint('corp');
+    if (ty === 'office' && (wrongStore || wrongCorp)) return defaultFormHint('office');
+    return h;
+  }
+
   function normalizeDesk(desk) {
     desk = desk || {};
     var ch = String(desk.docsChannel || 'whatsapp').toLowerCase();
@@ -43,23 +123,45 @@
     };
   }
 
-  function applyPublicLabels(root, desk, accountName) {
+  /**
+   * applyPublicLabels(root, desk, accountName, accountType)
+   * أو applyPublicLabels(root, desk, { accountName, accountType })
+   */
+  function applyPublicLabels(root, desk, accountName, accountType) {
     if (!root) return;
     desk = normalizeDesk(desk);
+    var opts = {};
+    if (accountName && typeof accountName === 'object') {
+      opts = accountName;
+      accountName = opts.accountName || opts.name || '';
+      accountType = opts.accountType || opts.type || accountType;
+    }
+    var labels = entityLabels(accountType);
     var title = desk.formTitle
       || t('طلب خدمة', 'Demande de service');
     if (accountName && !desk.formTitle) {
       title = t('طلب خدمة — ', 'Demande — ') + accountName;
     }
-    var hint = desk.formHint
-      || t(
-        'أدخل بياناتك وسنتواصل معك. الوثائق تُرسل عبر واتساب أو إيميل المكتب مباشرة.',
-        'Saisissez vos coordonnées. Les documents partent via WhatsApp ou e-mail du professionnel.'
-      );
+    var hint = coerceHintForType(desk.formHint, accountType) || defaultFormHint(accountType);
     var titleEl = root.querySelector('[data-desk="title"]') || root.querySelector('#req-title');
     var hintEl = root.querySelector('[data-desk="hint"]') || root.querySelector('#req-sub');
     if (titleEl) titleEl.textContent = '📩 ' + title;
     if (hintEl) hintEl.textContent = hint;
+
+    // عناوين الأزرار/الحقول الظاهرة إن وُجدت data-desk hooks
+    var msgLab = root.querySelector('[data-desk="msg-label"]') || root.querySelector('label[for="rf-msg"]');
+    if (msgLab && !msgLab.getAttribute('data-desk-lock')) {
+      msgLab.textContent = t(labels.msgAr, labels.msgFr);
+    }
+    var sendBtn = root.querySelector('[data-desk="submit"]')
+      || root.querySelector('#store-req-submit')
+      || root.querySelector('#sr-req-submit')
+      || root.querySelector('#corp-req-submit')
+      || root.querySelector('#req-submit-btn');
+    if (sendBtn && !sendBtn.getAttribute('data-desk-lock') && /إرسال الطلب|Envoyer la demande/i.test(sendBtn.textContent || '')) {
+      sendBtn.textContent = t(labels.sendAr, labels.sendFr);
+    }
+    root.setAttribute('data-desk-entity', labels.type || '');
   }
 
   function ensureExtraFields(form) {
@@ -407,7 +509,10 @@
     var form = document.getElementById('req-form');
     var box = form && form.closest('.req-box');
     ensureExtraFields(form);
-    applyPublicLabels(box || document, opts.desk, opts.accountName);
+    applyPublicLabels(box || document, opts.desk, {
+      accountName: opts.accountName,
+      accountType: opts.accountType || 'office'
+    });
     var nameEl = document.getElementById('rf-name');
     if (nameEl) nameEl.placeholder = t('الاسم الكامل *', 'Nom complet *');
     autofillBuyerFields({ root: form || document, force: !!opts.forceAutofill });
@@ -424,6 +529,9 @@
 
   global.RizqServiceDesk = {
     normalizeDesk: normalizeDesk,
+    normalizeAccountType: normalizeAccountType,
+    entityLabels: entityLabels,
+    defaultFormHint: defaultFormHint,
     enhanceOfficeForm: enhanceOfficeForm,
     applyPublicLabels: applyPublicLabels,
     autofillBuyerFields: autofillBuyerFields,

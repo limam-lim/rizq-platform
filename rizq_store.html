@@ -1000,7 +1000,7 @@ footer{
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_account_payments.js?v=28.2" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
@@ -1894,7 +1894,7 @@ function rizqShare(title, url) {
       if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
       if(window.RizqServiceDesk){
         var root = document.getElementById('store-service-desk');
-        RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, acc.name || '');
+        RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, { accountName: acc.name || '', accountType: 'store' });
         if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
           RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('store-req-form') || root });
         }
@@ -2499,7 +2499,7 @@ function rizqShare(title, url) {
                 if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
                 if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
                 if(window.RizqServiceDesk){
-                  RizqServiceDesk.applyPublicLabels(document.getElementById('store-service-desk'), acc.serviceDesk || {}, acc.name || '');
+                  RizqServiceDesk.applyPublicLabels(document.getElementById('store-service-desk'), acc.serviceDesk || {}, { accountName: acc.name || '', accountType: 'store' });
                   if (typeof RizqServiceDesk.autofillBuyerFields === 'function') {
                     RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('store-req-form') });
                   }
@@ -3146,7 +3146,10 @@ if(typeof _t2 === 'undefined'){
     var btn = document.getElementById('store-req-submit');
     if(btn) btn.textContent = isFr ? '📤 Envoyer la demande' : '📤 إرسال الطلب للمحل';
     if(window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function'){
-      RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
+      RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, {
+        accountName: (window._rizqProfile && window._rizqProfile.name) || '',
+        accountType: 'store'
+      });
     }
   }
 

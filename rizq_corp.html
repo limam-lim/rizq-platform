@@ -1344,7 +1344,7 @@ function rebuildCorpCatTabs(cats){
       }
       if(acc.serviceDesk) window._rizqCorpServiceDesk = acc.serviceDesk;
       if(window.RizqServiceDesk){
-        RizqServiceDesk.applyPublicLabels(document.getElementById('corp-service-desk'), acc.serviceDesk || {}, acc.name || '');
+        RizqServiceDesk.applyPublicLabels(document.getElementById('corp-service-desk'), acc.serviceDesk || {}, { accountName: acc.name || '', accountType: 'corp' });
         if(typeof RizqServiceDesk.autofillBuyerFields === 'function'){
           RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('corp-req-form') });
         }
@@ -1874,7 +1874,7 @@ window._rizqProfile = (function() {
 </script>
 <script src="rizq_intro_video.js?v=29.6"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
-<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_service_desk.js?v=1.2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script src="rizq_account_payments.js"></script>
 <script>
