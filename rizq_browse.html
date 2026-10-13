@@ -1291,6 +1291,16 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_ad_cards.js?v=3.9"></script>
 <script src="rizq_categories_config.js?v=20"></script>
+<script src="rizq_brands_catalog.js?v=1"></script>
+<style>
+.rzq-brand-strip{display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:8px 2px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.rzq-brand-strip-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;padding:8px 4px;border:1.5px solid rgba(27,58,107,.12);border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;color:#0F2347;transition:border-color .2s,box-shadow .2s,transform .15s}
+.rzq-brand-strip-btn img{border-radius:50%;display:block}
+.rzq-brand-strip-btn span{font-size:10px;font-weight:700;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.rzq-brand-strip-btn:hover,.rzq-brand-strip-btn.is-on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.18);transform:translateY(-1px)}
+.rzq-brand-strip-btn.is-on{background:rgba(201,168,76,.08)}
+#brand-filter-section .wilaya-select{margin-bottom:8px}
+</style>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
 (function(){
@@ -1364,6 +1374,18 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
             <label class="filter-option"><input type="radio" name="rcat" value="شقق للبيع" class="filter-cb"><span class="filter-label" data-t="sc-apts-sale">شقق للبيع</span></label>
             <label class="filter-option"><input type="radio" name="rcat" value="أراضي" class="filter-cb"><span class="filter-label" data-t="sc-land">أراضي</span></label>
           </div>
+        </div>
+
+        <!-- الماركة (سيارات / أزياء / إلكترونيات…) -->
+        <div class="filter-section" id="brand-filter-section">
+          <div class="filter-title"><span data-t="filter-brand">الماركة</span><button type="button" onclick="clearSection('brand')" data-t="btn-clear-mini">مسح</button></div>
+          <select class="wilaya-select" id="brand-select" onchange="onBrandFilterChange()">
+            <option value="" data-t="all-brands">كل الماركات</option>
+          </select>
+          <select class="wilaya-select" id="model-select" onchange="applyFilters()" disabled>
+            <option value="" data-t="all-models">كل الموديلات</option>
+          </select>
+          <div id="brand-strip-mount" aria-live="polite"></div>
         </div>
 
         <!-- الولاية -->
@@ -1753,13 +1775,17 @@ const DEMO_ADS = [
   {id:7,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة جديدة 3 غرف — حي السبخة',titleFr:'Appart. neuf 3 ch. — Quartier Sebkha',desc:'لم تُسكن من قبل، تشطيب ممتاز، بناء 2025',descFr:'Jamais habité, excellente finition, construction 2025',price:'120,000 MRU/شهر',priceNum:120000,rooms:3,verified:true,pin:false,emoji:'🏗️',loc:'📍 نواكشوط الغربية',seller:'مجموعة الإعمار',date:'منذ أسبوع'},
   {id:8,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط',title:'شقة 2 غرف — حي كيبه',titleFr:'Appart. 2 ch. — Quartier Kébé',desc:'سعر مناسب، قريبة من السوق، حراسة ليلية',descFr:'Prix raisonnable, proche du marché, gardiennage nocturne',price:'65,000 MRU/شهر',priceNum:65000,rooms:2,verified:false,pin:false,emoji:'🏠',loc:'📍 نواكشوط',seller:'محمد محمود',date:'منذ أسبوعين'},
   {id:9,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'بنتهاوس فاخر 5 غرف — أعلى برج',titleFr:'Penthouse luxueux 5 ch. — Plus haute tour',desc:'المنظر الأجمل في نواكشوط، مسبح خاص، جراج ثلاثي',descFr:'La plus belle vue de Nouakchott, piscine privée, garage triple',price:'650,000 MRU/شهر',priceNum:650000,rooms:5,verified:true,pin:true,emoji:'🌇',loc:'📍 نواكشوط الغربية',seller:'شركة الفخامة العقارية',date:'منذ 3 أسابيع'},
-  {id:10,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط الغربية',title:'تويوتا كامري 2021 — فل أوبشن',titleFr:'Toyota Camry 2021 — Full option',desc:'حالة الوكالة، صيانة دورية، فتحة سقف، جلد طبيعي',descFr:'État concessionnaire, entretien régulier, toit ouvrant, cuir naturel',price:'1,850,000 MRU',priceNum:1850000,rooms:0,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط الغربية',seller:'محمد سالم',date:'منذ 5 ساعات'},
-  {id:11,subcat:'سيارات للكراء',cat:'سيارات',wilaya:'نواكشوط',title:'هيونداي توسان 2022 — كراء يومي وأسبوعي',titleFr:'Hyundai Tucson 2022 — Location journalière & hebdomadaire',desc:'تكييف، نظيفة جداً، تسليم بالمدينة',descFr:'Climatisé, très propre, livraison en ville',price:'12,000 MRU/يوم',priceNum:12000,rooms:0,verified:true,pin:false,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة النجمة لتأجير السيارات',date:'منذ يوم'},
-  {id:12,subcat:'شاحنات للبيع',cat:'شاحنات',wilaya:'نواذيبو',title:'شاحنة مرسيدس أكتروس — حمولة 20 طن',titleFr:'Camion Mercedes Actros — Charge 20 tonnes',desc:'محرك بحالة ممتازة، فحص كامل متاح',descFr:'Moteur en excellent état, inspection complète disponible',price:'9,500,000 MRU',priceNum:9500000,rooms:0,verified:true,pin:false,emoji:'🚛',loc:'📍 نواذيبو',seller:'شركة النقل الثقيل',date:'منذ يومين'},
+  {id:10,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط الغربية',title:'تويوتا كامري 2021 — فل أوبشن',titleFr:'Toyota Camry 2021 — Full option',desc:'حالة الوكالة، صيانة دورية، فتحة سقف، جلد طبيعي',descFr:'État concessionnaire, entretien régulier, toit ouvrant, cuir naturel',price:'1,850,000 MRU',priceNum:1850000,rooms:0,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط الغربية',seller:'محمد سالم',date:'منذ 5 ساعات',brandId:'toyota',brandName:'تويوتا',brandNameFr:'Toyota',modelId:'camry',modelName:'كامري',modelNameFr:'Camry'},
+  {id:11,subcat:'سيارات للكراء',cat:'سيارات',wilaya:'نواكشوط',title:'هيونداي توسان 2022 — كراء يومي وأسبوعي',titleFr:'Hyundai Tucson 2022 — Location journalière & hebdomadaire',desc:'تكييف، نظيفة جداً، تسليم بالمدينة',descFr:'Climatisé, très propre, livraison en ville',price:'12,000 MRU/يوم',priceNum:12000,rooms:0,verified:true,pin:false,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة النجمة لتأجير السيارات',date:'منذ يوم',brandId:'hyundai',brandName:'هيونداي',brandNameFr:'Hyundai',modelId:'tucson',modelName:'توسان',modelNameFr:'Tucson'},
+  {id:10.5,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط',title:'مرسيدس C-Class 2019 — حالة ممتازة',titleFr:'Mercedes Classe C 2019 — Excellent état',desc:'مالك واحد، صيانة وكالة، جلد أسود',descFr:'Un seul propriétaire, entretien concessionnaire, cuir noir',price:'2,400,000 MRU',priceNum:2400000,rooms:0,verified:true,pin:false,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة السيارات الفاخرة',date:'منذ يومين',brandId:'mercedes',brandName:'مرسيدس-بنز',brandNameFr:'Mercedes-Benz',modelId:'c-class',modelName:'الفئة C',modelNameFr:'Classe C'},
+  {id:12,subcat:'شاحنات للبيع',cat:'شاحنات',wilaya:'نواذيبو',title:'شاحنة مرسيدس أكتروس — حمولة 20 طن',titleFr:'Camion Mercedes Actros — Charge 20 tonnes',desc:'محرك بحالة ممتازة، فحص كامل متاح',descFr:'Moteur en excellent état, inspection complète disponible',price:'9,500,000 MRU',priceNum:9500000,rooms:0,verified:true,pin:false,emoji:'🚛',loc:'📍 نواذيبو',seller:'شركة النقل الثقيل',date:'منذ يومين',brandId:'mercedes',brandName:'مرسيدس-بنز',brandNameFr:'Mercedes-Benz'},
   {id:13,subcat:'معدات بناء',cat:'شاحنات',wilaya:'نواكشوط',title:'حفارة كاتربيلر مستعملة — حالة جيدة',titleFr:'Excavatrice Caterpillar occasion — Bon état',desc:'جاهزة للعمل فوراً، صيانة موثقة',descFr:'Prête à travailler immédiatement, entretien documenté',price:'4,200,000 MRU',priceNum:4200000,rooms:0,verified:false,pin:false,emoji:'🏗️',loc:'📍 نواكشوط',seller:'معدات الإعمار',date:'منذ 3 أيام'},
-  {id:14,subcat:'هواتف ذكية',cat:'إلكترونيات',wilaya:'نواكشوط',title:'آيفون 15 برو ماكس — جديد بالكرتون',titleFr:'iPhone 15 Pro Max — Neuf en boîte',desc:'256GB، ضمان وكيل، لم يُستخدم',descFr:'256Go, garantie agréé, jamais utilisé',price:'620,000 MRU',priceNum:620000,rooms:0,verified:true,pin:true,emoji:'📱',loc:'📍 نواكشوط',seller:'متجر التقنية الحديثة',date:'منذ 3 ساعات'},
+  {id:14,subcat:'هواتف ذكية',cat:'إلكترونيات',wilaya:'نواكشوط',title:'آيفون 15 برو ماكس — جديد بالكرتون',titleFr:'iPhone 15 Pro Max — Neuf en boîte',desc:'256GB، ضمان وكيل، لم يُستخدم',descFr:'256Go, garantie agréé, jamais utilisé',price:'620,000 MRU',priceNum:620000,rooms:0,verified:true,pin:true,emoji:'📱',loc:'📍 نواكشوط',seller:'متجر التقنية الحديثة',date:'منذ 3 ساعات',brandId:'apple',brandName:'آبل',brandNameFr:'Apple',modelId:'iphone-15',modelName:'آيفون 15',modelNameFr:'iPhone 15'},
   {id:15,subcat:'لابتوب وحاسوب',cat:'إلكترونيات',wilaya:'نواكشوط الشمالية',title:'لابتوب Dell XPS 15 — استخدام خفيف',titleFr:'Laptop Dell XPS 15 — Légèrement utilisé',desc:'معالج i7، رام 16GB، شاشة 4K',descFr:'Processeur i7, RAM 16Go, écran 4K',price:'480,000 MRU',priceNum:480000,rooms:0,verified:false,pin:false,emoji:'💻',loc:'📍 نواكشوط الشمالية',seller:'سيدي محمد',date:'منذ 6 أيام'},
   {id:16,subcat:'دراعة رجالية',cat:'أزياء',wilaya:'نواكشوط',title:'دراعة موريتانية فاخرة — تطريز يدوي',titleFr:'Boubou mauritanien de luxe — Broderie artisanale',desc:'قماش فاخر، خياطة تقليدية أصلية',descFr:'Tissu de luxe, couture traditionnelle authentique',price:'45,000 MRU',priceNum:45000,rooms:0,verified:true,pin:false,emoji:'👗',loc:'📍 نواكشوط',seller:'بوتيك التراث',date:'منذ يوم'},
+  {id:16.5,subcat:'أحذية وحقائب',cat:'أزياء',wilaya:'نواكشوط',title:'نايك إير ماكس — مقاس 42',titleFr:'Nike Air Max — Pointure 42',desc:'أصلي، استعمال خفيف جداً',descFr:'Authentique, très peu porté',price:'28,000 MRU',priceNum:28000,rooms:0,verified:true,pin:false,emoji:'👟',loc:'📍 نواكشوط',seller:'متجر الرياضة',date:'منذ يوم',brandId:'nike',brandName:'نايك',brandNameFr:'Nike',modelId:'air-max',modelName:'إير ماكس',modelNameFr:'Air Max'},
+  {id:16.6,subcat:'أزياء رياضية',cat:'أزياء',wilaya:'نواكشوط الغربية',title:'أديداس ألترابوست — رجالي',titleFr:'Adidas Ultraboost — Homme',desc:'مريح للجري، لون أسود',descFr:'Confort running, noir',price:'32,000 MRU',priceNum:32000,rooms:0,verified:true,pin:true,emoji:'👟',loc:'📍 نواكشوط الغربية',seller:'سبورت زون',date:'منذ 3 ساعات',brandId:'adidas',brandName:'أديداس',brandNameFr:'Adidas',modelId:'ultraboost',modelName:'ألترابوست',modelNameFr:'Ultraboost'},
+  {id:16.7,subcat:'نظارات وعدسات',cat:'أزياء',wilaya:'نواكشوط',title:'راي بان أفياتور — أصلي',titleFr:'Ray-Ban Aviator — Authentique',desc:'علبة أصلية، عدسات حماية UV',descFr:'Boîte d\'origine, verres UV',price:'22,000 MRU',priceNum:22000,rooms:0,verified:true,pin:false,emoji:'🕶️',loc:'📍 نواكشوط',seller:'بصريات النور',date:'منذ يومين',brandId:'ray-ban',brandName:'راي بان',brandNameFr:'Ray-Ban',modelId:'aviator',modelName:'أفياتور',modelNameFr:'Aviator'},
   {id:17,subcat:'ملحفة نسائية',cat:'أزياء',wilaya:'نواكشوط الجنوبية',title:'ملحفة حرير صناعي — ألوان متعددة',titleFr:'Melhfa en soie artificielle — Plusieurs couleurs',desc:'خامة فاخرة، تشكيلة واسعة من الألوان',descFr:'Tissu luxueux, large gamme de couleurs',price:'18,000 MRU',priceNum:18000,rooms:0,verified:true,pin:true,emoji:'👗',loc:'📍 نواكشوط الجنوبية',seller:'خديجة منت إبراهيم',date:'منذ 4 أيام'},
   {id:18,subcat:'ذهب عيار 24',cat:'ذهب',wilaya:'نواكشوط',title:'سبيكة ذهب عيار 24 — 50 غرام',titleFr:'Lingot d\'or 24 carats — 50 grammes',desc:'مضمونة بشهادة وزن وعيار رسمية',descFr:'Certifié par attestation officielle de poids et pureté',price:'2,650,000 MRU',priceNum:2650000,rooms:0,verified:true,pin:true,emoji:'💰',loc:'📍 نواكشوط',seller:'صائغ الأمانة',date:'منذ ساعة'},
   {id:19,subcat:'أساور وخلاخيل',cat:'ذهب',wilaya:'نواكشوط الغربية',title:'طقم أساور ذهب تقليدي موريتاني',titleFr:'Parure bracelets en or mauritanienne',desc:'صناعة يدوية، عيار 21، تصميم أصيل',descFr:'Artisanat fait main, titre 21 carats, design authentique',price:'890,000 MRU',priceNum:890000,rooms:0,verified:true,pin:false,emoji:'💍',loc:'📍 نواكشوط الغربية',seller:'دار الذهب الموريتاني',date:'منذ يومين'},
@@ -2024,7 +2050,8 @@ function _langFallbackNoteHtml(sourceLang, asBlock){
 const TRANSLATIONS = {
   ar:{
     'nav-post':'➕ انشر إعلان','nav-account':'حسابي','nav-home':'الرئيسية','all-cats':'كل الأقسام',
-    'filter-title':'تصفية النتائج','filter-cat':'القسم','filter-wilaya':'الولاية','filter-price':'السعر (MRU)',
+    'filter-title':'تصفية النتائج','filter-cat':'القسم','filter-brand':'الماركة','filter-wilaya':'الولاية','filter-price':'السعر (MRU)',
+    'all-brands':'كل الماركات','all-models':'كل الموديلات',
     'filter-condition':'حالة المنتج','cond-new':'✨ جديد','cond-exc':'⭐ مستعمل — ممتاز','cond-good':'👍 مستعمل — جيد','cond-fix':'🔧 للتصليح',
     'filter-since':'تاريخ النشر','since-1d':'آخر 24 ساعة','since-7d':'آخر 7 أيام','since-30d':'آخر 30 يوماً',
     'filter-rooms':'عدد الغرف','filter-opts':'خيارات أخرى','btn-clear-mini':'مسح',
@@ -2039,7 +2066,7 @@ const TRANSLATIONS = {
     'chat-online':'● متصل الآن','cs1':'هل ما زال متاحاً؟','cs2':'ما هو أقل سعر؟','cs3':'هل يمكن الزيارة؟',
     'chat-ph':'اكتب رسالة...','chat-send':'إرسال','chat-continue-wa':'متابعة المحادثة على واتساب',
     'price-r1':'أقل من 500 ألف','price-r2':'500 ألف — 2.5 مليون','price-r3':'2.5 مليون — 10 مليون','price-r4':'أكثر من 10 مليون',
-    'save-ad':'♡ حفظ','share-ad':'↗ مشاركة','nav-search-ph':'ابحث في رزق...',
+    'save-ad':'♡ حفظ','share-ad':'↗ مشاركة','nav-search-ph':'ابحث في رزق… مثال: تويوتا، نايك',
     'dp-phone-hint':'👆 انقر لإظهار الرقم','dp-phone-shown':'📞 انقر للاتصال','dp-call':'📞 اتصال الآن',
     'dp-whatsapp':'واتساب','dp-msg':'✉️ مراسلة البائع','dp-save':'♡ حفظ','dp-share':'↗ مشاركة','dp-print':'🖨️ طباعة',
     'dp-report':'🚨 الإبلاغ عن هذا الإعلان','dp-safety':'⚠️ نصائح الأمان',
@@ -2063,7 +2090,8 @@ const TRANSLATIONS = {
   },
   fr:{
     'nav-post':'➕ Publier une annonce','nav-account':'Mon compte','nav-home':'Accueil','all-cats':'Toutes catégories',
-    'filter-title':'Filtrer les résultats','filter-cat':'Catégorie','filter-wilaya':'Wilaya','filter-price':'Prix (MRU)',
+    'filter-title':'Filtrer les résultats','filter-cat':'Catégorie','filter-brand':'Marque','filter-wilaya':'Wilaya','filter-price':'Prix (MRU)',
+    'all-brands':'Toutes les marques','all-models':'Tous les modèles',
     'filter-condition':'État','cond-new':'✨ Neuf','cond-exc':'⭐ Occasion — excellent','cond-good':'👍 Occasion — bon','cond-fix':'🔧 À réparer',
     'filter-since':'Date de publication','since-1d':'Dernières 24 h','since-7d':'7 derniers jours','since-30d':'30 derniers jours',
     'filter-rooms':'Nb. de chambres','filter-opts':'Autres options','btn-clear-mini':'Effacer',
@@ -2077,7 +2105,7 @@ const TRANSLATIONS = {
     'chat-online':'● En ligne','cs1':'Est-ce encore disponible?','cs2':'Quel est le prix minimum?','cs3':'Puis-je visiter?',
     'chat-ph':'Écrire un message...','chat-send':'Envoyer','chat-continue-wa':'Continuer sur WhatsApp',
     'price-r1':'Moins de 500 mille','price-r2':'500 mille — 2,5 millions','price-r3':'2,5 — 10 millions','price-r4':'Plus de 10 millions',
-    'save-ad':'♡ Sauvegarder','share-ad':'↗ Partager','nav-search-ph':'Rechercher sur Rizq...',
+    'save-ad':'♡ Sauvegarder','share-ad':'↗ Partager','nav-search-ph':'Rechercher sur Rizq… ex. Toyota, Nike',
     'dp-phone-hint':'👆 Cliquez pour afficher','dp-phone-shown':'📞 Cliquez pour appeler','dp-call':'📞 Appeler maintenant',
     'dp-whatsapp':'WhatsApp','dp-msg':'✉️ Messagerie Rizq','dp-save':'♡ Sauvegarder','dp-share':'↗ Partager','dp-print':'🖨️ Imprimer',
     'dp-report':'🚨 Signaler cette annonce','dp-safety':'⚠️ Conseils de sécurité',
@@ -2311,10 +2339,27 @@ function applyFilters(){
     return Number.isFinite(t)?t:0;
   }
 
+  const selBrand=(document.getElementById('brand-select')||{}).value||'';
+  const selModel=(document.getElementById('model-select')||{}).value||'';
+
   filtered=ALL_ADS.filter(a=>{
-    if(searchText){const q=searchText.toLowerCase();if(!(a.title+a.desc+a.loc+a.seller).toLowerCase().includes(q))return false;}
+    if(searchText){
+      const q=searchText.toLowerCase();
+      const brandBlob=[a.brandId,a.brandName,a.brandNameFr,a.modelId,a.modelName,a.modelNameFr].join(' ');
+      let brandHit=false;
+      if(window.RizqBrands){
+        if(a.brandId && RizqBrands.searchMatch(RizqBrands.getById(a.brandId), q)) brandHit=true;
+        else {
+          const hit=RizqBrands.findByAlias(q);
+          if(hit && a.brandId===hit.id) brandHit=true;
+        }
+      }
+      if(!(a.title+' '+a.desc+' '+a.loc+' '+a.seller+' '+brandBlob).toLowerCase().includes(q) && !brandHit) return false;
+    }
     if(navCat){const ok=a.cat.includes(navCat)||a.subcat.includes(navCat)||navCat.includes(a.cat);if(!ok)return false;}
     if(selCat&&a.subcat!==selCat&&!a.cat.includes(selCat))return false;
+    if(selBrand && String(a.brandId||'')!==String(selBrand)) return false;
+    if(selModel && String(a.modelId||'')!==String(selModel)) return false;
     if(selSeller&&a.seller!==selSeller)return false;
     if(selWilaya&&a.wilaya!==selWilaya)return false;
     if(selCond&&a.condition!==selCond)return false;
@@ -2325,6 +2370,7 @@ function applyFilters(){
     if(a.priceNum>0){if(a.priceNum<pMin||a.priceNum>pMax)return false;}
     return true;
   });
+  try{ _refreshBrandFilterUI(navCat||''); }catch(eBr){}
 
   if(sortBy==='price-asc')filtered.sort((a,b)=>a.priceNum-b.priceNum);
   else if(sortBy==='price-desc')filtered.sort((a,b)=>b.priceNum-a.priceNum);
@@ -2393,6 +2439,7 @@ function _adCardHtml(a, fr){
     <div class="rc-body">
       ${catLabel?`<div class="rc-cat">${catLabel}</div>`:''}
       <div class="rc-title">${escapeHtml(_title)}</div>
+      ${(a.brandId && window.RizqBrands)?`<div class="rc-brand" style="margin:4px 0 6px">${RizqBrands.chipHtml(a.brandId,{fr:!!fr,modelId:a.modelId,size:20})}</div>`:''}
       <div class="rc-meta">
         <span class="rc-loc">${escapeHtml(_loc)}</span>
         ${/* شارة مميّز على الصورة (rzq-adx-badge) — لا تُكرر بجانب أزرار الاتصال */''}
@@ -3436,8 +3483,63 @@ function clearSection(sec){
   }
   if(sec==='condition'){document.querySelectorAll('input[name="rcond"]').forEach(r=>r.checked=false);}
   if(sec==='since'){document.querySelectorAll('input[name="rsince"]').forEach(r=>r.checked=false);}
+  if(sec==='brand'){
+    const bs=document.getElementById('brand-select'); if(bs) bs.value='';
+    const ms=document.getElementById('model-select'); if(ms){ ms.value=''; ms.disabled=true; }
+  }
   applyFilters();
 }
+
+function onBrandFilterChange(){
+  const brandId=(document.getElementById('brand-select')||{}).value||'';
+  const modelSel=document.getElementById('model-select');
+  const fr=_rizqLang()==='fr';
+  if(window.RizqBrands && modelSel){
+    RizqBrands.fillModelSelect(modelSel, brandId, fr, '');
+  } else if(modelSel){
+    modelSel.innerHTML='<option value="">'+(fr?'Tous les modèles':'كل الموديلات')+'</option>';
+    modelSel.disabled=!brandId;
+  }
+  applyFilters();
+}
+
+function _refreshBrandFilterUI(catKey){
+  const brandSel=document.getElementById('brand-select');
+  const modelSel=document.getElementById('model-select');
+  const mount=document.getElementById('brand-strip-mount');
+  const section=document.getElementById('brand-filter-section');
+  if(!brandSel) return;
+  const fr=_rizqLang()==='fr';
+  const prevBrand=brandSel.value||'';
+  const prevModel=modelSel?modelSel.value:'';
+  let n=0;
+  if(window.RizqBrands){
+    // بدون قسم محدد: اعرض كل الماركات؛ مع قسم: ماركاته فقط
+    n=RizqBrands.fillBrandSelect(brandSel, catKey||'', fr, prevBrand);
+    // أعد خيار «الكل» بنص مترجم
+    if(brandSel.options[0]) brandSel.options[0].textContent=fr?'Toutes les marques':'كل الماركات';
+    if(prevBrand && ![].some.call(brandSel.options,function(o){return o.value===prevBrand;})){
+      brandSel.value='';
+    } else {
+      brandSel.value=prevBrand;
+    }
+    RizqBrands.fillModelSelect(modelSel, brandSel.value, fr, prevModel);
+    if(modelSel && modelSel.options[0]) modelSel.options[0].textContent=fr?'Tous les modèles':'كل الموديلات';
+    if(mount){
+      mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, { activeId: brandSel.value||'' });
+      mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          brandSel.value=btn.getAttribute('data-brand-id')||'';
+          onBrandFilterChange();
+        });
+      });
+    }
+  }
+  if(section) section.style.display = (n>0 || !catKey) ? '' : 'none';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  try{ _refreshBrandFilterUI((document.getElementById('nav-cat-select')||{}).value||''); }catch(e){}
+});
 function toggleRoomChip(el){
   el.classList.toggle('on');
   applyFilters();

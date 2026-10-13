@@ -406,6 +406,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_i18n.js?v=16.5"></script>
   <script src="rizq_locale_helpers.js"></script>
   <script src="rizq_categories_config.js?v=20"></script>
+  <script src="rizq_brands_catalog.js?v=1"></script>
   <!-- إصلاح جوهري 24/07/2026: هذا الملف كان الوحيد بين كل صفحات النشر (فردي/
        محل/مكتب/شركة) الذي لا يستدعي RizqSub.canPostNewAd/recordAdPost إطلاقاً
        — يعني حد "إعلان واحد نشط" (مجانية) أو "10 إعلانات" (باقة شهرية) لم يكن
@@ -457,6 +458,25 @@ main, .page-content.active, .main-content, .results-area,
     <div id="subcats-wrap" style="display:none">
       <p data-t-fr="Sous-catégorie :" style="font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:8px">الفرع:</p>
       <div class="subcats" id="subcats-list"></div>
+    </div>
+    <!-- ماركة + موديل (مثل Milanuncios / coche.net) -->
+    <div id="brands-wrap" style="display:none;margin-top:18px">
+      <p data-t-fr="Marque et modèle" style="font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:8px">الماركة والموديل</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="form-label" for="ad-brand" data-t-fr="Marque">الماركة</label>
+          <select class="form-input" id="ad-brand" style="cursor:pointer">
+            <option value="">— الماركة —</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="ad-model" data-t-fr="Modèle">الموديل</label>
+          <select class="form-input" id="ad-model" style="cursor:pointer" disabled>
+            <option value="">— الموديل —</option>
+          </select>
+        </div>
+      </div>
+      <div id="ad-brand-preview" style="margin-top:10px;min-height:28px"></div>
     </div>
     <div class="nav-btns">
       <button class="btn-next" id="btn-next-1" data-t-fr="Suivant — Détails ←" onclick="goStep(2)" disabled>التالي — التفاصيل ←</button>
@@ -772,9 +792,71 @@ main, .page-content.active, .main-content, .results-area,
 const SUBCATS = {};
 const SUBCATS_FR = {};
 let selCat='', selSubcat='', selCondition='جديد', selPlan='مجاني';
+let selBrand='', selModel='';
 let photosData=new Array(10).fill(null);
 const emojis=['📷','🛋️','🍳','🛁','🌇','🅿️','📸','🖼️','🏠','✨'];
 let currentStep=1;
+
+function _refreshBrandPicker(catKey){
+  var wrap = document.getElementById('brands-wrap');
+  var brandSel = document.getElementById('ad-brand');
+  var modelSel = document.getElementById('ad-model');
+  var preview = document.getElementById('ad-brand-preview');
+  if(!wrap || !brandSel || !modelSel) return;
+  var fr = _postLangFr();
+  var n = 0;
+  if(typeof RizqBrands !== 'undefined'){
+    n = RizqBrands.fillBrandSelect(brandSel, catKey, fr, selBrand);
+  } else {
+    brandSel.innerHTML = '<option value="">'+(fr?'— Marque —':'— الماركة —')+'</option>';
+  }
+  if(n > 0){
+    wrap.style.display = 'block';
+    if(typeof RizqBrands !== 'undefined') RizqBrands.fillModelSelect(modelSel, selBrand, fr, selModel);
+    _paintBrandPreview();
+  } else {
+    wrap.style.display = 'none';
+    selBrand = '';
+    selModel = '';
+    brandSel.value = '';
+    modelSel.innerHTML = '<option value="">'+(fr?'— Modèle —':'— الموديل —')+'</option>';
+    modelSel.disabled = true;
+    if(preview) preview.innerHTML = '';
+  }
+}
+function _paintBrandPreview(){
+  var preview = document.getElementById('ad-brand-preview');
+  if(!preview) return;
+  if(typeof RizqBrands === 'undefined' || !selBrand){
+    preview.innerHTML = '';
+    return;
+  }
+  preview.innerHTML = RizqBrands.chipHtml(selBrand, { fr: _postLangFr(), modelId: selModel, size: 26 });
+}
+function _bindBrandPickers(){
+  var brandSel = document.getElementById('ad-brand');
+  var modelSel = document.getElementById('ad-model');
+  if(brandSel && !brandSel._rizqBound){
+    brandSel._rizqBound = true;
+    brandSel.addEventListener('change', function(){
+      selBrand = brandSel.value || '';
+      selModel = '';
+      if(typeof RizqBrands !== 'undefined'){
+        RizqBrands.fillModelSelect(modelSel, selBrand, _postLangFr(), '');
+      }
+      _paintBrandPreview();
+    });
+  }
+  if(modelSel && !modelSel._rizqBound){
+    modelSel._rizqBound = true;
+    modelSel.addEventListener('change', function(){
+      selModel = modelSel.value || '';
+      _paintBrandPreview();
+    });
+  }
+}
+document.addEventListener('DOMContentLoaded', _bindBrandPickers);
+if(document.readyState !== 'loading') try{ _bindBrandPickers(); }catch(e){}
 
 function _postLangFr(){
   return (typeof isAr !== 'undefined' && !isAr) || localStorage.getItem('rizq_lang') === 'fr';
@@ -913,6 +995,9 @@ function selectCat(btn, cat){
     var qtyEl = document.getElementById('ad-stock-qty');
     if(qtyEl) qtyEl.value = '';
   }
+  selBrand = '';
+  selModel = '';
+  _refreshBrandPicker(catKey);
   document.getElementById('btn-next-1').disabled=false;
 }
 function _postToggleOn(id){
@@ -1377,7 +1462,12 @@ function updatePreview(){
   const cityLine=resolveCityField();
   var catMeta = (typeof RizqCategories !== 'undefined' && selCat) ? RizqCategories.getByKey(selCat) : null;
   var catLabel = catMeta ? (_frP ? catMeta.nameFr : catMeta.nameAr) : selCat;
-  document.getElementById('prev-cat').textContent=(catLabel?'📋 '+catLabel:'')+' '+(selSubcat?'› '+selSubcat:'');
+  var brandLbl='';
+  if(selBrand && typeof RizqBrands!=='undefined'){
+    brandLbl=' · '+RizqBrands.displayName(RizqBrands.getById(selBrand), _postLangFr());
+    if(selModel) brandLbl+=' / '+RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), _postLangFr());
+  }
+  document.getElementById('prev-cat').textContent=(catLabel?'📋 '+catLabel:'')+' '+(selSubcat?'› '+selSubcat:'')+brandLbl;
   document.getElementById('prev-title').textContent=title;
   document.getElementById('prev-desc').textContent=desc.substring(0,120)+(desc.length>120?'...':'');
   document.getElementById('prev-price').textContent=parseInt(price).toLocaleString()+' MRU';
@@ -1460,6 +1550,20 @@ function publishAd(){
     category: catKeyNorm,
     categoryLabel: categoryLabel,
     subcat:   selSubcat || '',
+    brandId:  selBrand || '',
+    brandName: (typeof RizqBrands !== 'undefined' && selBrand)
+      ? RizqBrands.displayName(RizqBrands.getById(selBrand), false)
+      : '',
+    brandNameFr: (typeof RizqBrands !== 'undefined' && selBrand)
+      ? RizqBrands.displayName(RizqBrands.getById(selBrand), true)
+      : '',
+    modelId:  selModel || '',
+    modelName: (typeof RizqBrands !== 'undefined' && selBrand && selModel)
+      ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), false)
+      : '',
+    modelNameFr: (typeof RizqBrands !== 'undefined' && selBrand && selModel)
+      ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), true)
+      : '',
     emoji:    catEmoji,
     wilaya:   wilaya,
     lat:      coords.lat,
@@ -1684,6 +1788,9 @@ var _editAdId = null;
         if(typeof setPostLocFromAd === 'function') setPostLocFromAd(ad);
         selCat = (typeof RizqCategories !== 'undefined') ? RizqCategories.normalize(ad.category || '') : (ad.category || selCat);
         selSubcat = ad.subcat || selSubcat;
+        selBrand = ad.brandId || '';
+        selModel = ad.modelId || '';
+        _refreshBrandPicker(selCat);
         if(typeof renderPostCategories === 'function') renderPostCategories();
 
         // صور حقيقية موجودة (روابط خادم فعلية /uploads/ads/...، لا base64) —
