@@ -48,6 +48,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(src, sandbox);
 const C = sandbox.RizqStoreCommerce;
 assert(C && typeof C.setHeroPhoto === 'function', 'setHeroPhoto export');
+assert(typeof C.wireStorefrontLogo === 'function', 'wireStorefrontLogo export');
 
 const hero = sandbox.document.createElement('div');
 hero.querySelector = function (sel) {
