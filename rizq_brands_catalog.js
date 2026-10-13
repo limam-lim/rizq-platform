@@ -996,6 +996,88 @@
       + '</div></div>';
   }
 
+  /** حرف أول لاسم الماركة (لاتيني أو عربي) لفلتر الأحرف */
+  function brandLetter(brand, fr) {
+    var latin = String((brand && brand.nameFr) || '').trim();
+    var ar = String((brand && brand.nameAr) || '').trim();
+    var prefer = fr ? (latin || ar) : (ar || latin);
+    if (!prefer) prefer = String((brand && brand.id) || '');
+    var ch = prefer.charAt(0);
+    if (!ch) return '#';
+    // لاتيني → uppercase؛ عربي يبقى كما هو
+    if (/[a-zA-Z]/.test(ch)) return ch.toUpperCase();
+    return ch;
+  }
+
+  /**
+   * قائمة فلتر الماركات (صفحة كل الإعلانات): أحرف + صف شعار مع الاسم
+   * opts: activeId, letter, query, heading
+   */
+  function filterListHtml(catKey, fr, opts) {
+    opts = opts || {};
+    var brands = forCategory(catKey);
+    if (!brands.length) return '';
+    var active = opts.activeId || '';
+    var letter = opts.letter || '';
+    var query = String(opts.query || '').trim().toLowerCase();
+    var head = opts.heading != null
+      ? opts.heading
+      : (fr ? 'Filter by brand' : 'فلتر حسب الماركة');
+
+    var lettersMap = {};
+    brands.forEach(function (b) {
+      lettersMap[brandLetter(b, fr)] = 1;
+    });
+    var letters = Object.keys(lettersMap).sort(function (a, b) {
+      var aLat = /[A-Z]/.test(a), bLat = /[A-Z]/.test(b);
+      if (aLat && bLat) return a.localeCompare(b);
+      if (aLat) return -1;
+      if (bLat) return 1;
+      return a.localeCompare(b, 'ar');
+    });
+
+    var filtered = brands.filter(function (b) {
+      if (letter && brandLetter(b, fr) !== letter) return false;
+      if (query) {
+        var blob = [b.id, b.nameAr, b.nameFr].concat(b.aliases || []).join(' ').toLowerCase();
+        if (blob.indexOf(query) < 0) return false;
+      }
+      return true;
+    });
+
+    var lettersHtml = '<div class="rzq-brand-letters" role="toolbar" aria-label="' + (fr ? 'Brand letters' : 'أحرف الماركات') + '">'
+      + '<button type="button" class="rzq-brand-letter-btn' + (!letter ? ' is-on' : '') + '" data-brand-letter="" title="' + (fr ? 'All' : 'الكل') + '">' + (fr ? 'All' : 'الكل') + '</button>'
+      + letters.map(function (L) {
+        var on = letter && String(letter) === String(L);
+        return '<button type="button" class="rzq-brand-letter-btn' + (on ? ' is-on' : '') + '" data-brand-letter="' + esc(L) + '" title="' + esc(L) + '">' + esc(L) + '</button>';
+      }).join('')
+      + '</div>';
+
+    var listHtml = '<div class="rzq-brand-filter-list" role="list" aria-label="' + esc(head) + '">'
+      + (filtered.length ? filtered.map(function (b) {
+        var on = active && String(active) === String(b.id);
+        var name = displayName(b, fr);
+        var L = brandLetter(b, fr);
+        return '<button type="button" class="rzq-brand-filter-row' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(b.id) + '" role="listitem" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + esc(name) + '">'
+          + '<span class="rzq-brand-filter-logo"><img src="' + esc(logoDataUri(b, 72)) + '" alt="' + esc(name) + '" width="32" height="32"/></span>'
+          + '<span class="rzq-brand-filter-meta">'
+          +   '<span class="rzq-brand-filter-name">' + esc(name) + '</span>'
+          +   '<span class="rzq-brand-filter-letter" aria-hidden="true">' + esc(L) + '</span>'
+          + '</span>'
+          + '</button>';
+      }).join('') : ('<div class="rzq-brand-filter-empty">' + (fr ? 'No brands for this letter' : 'لا ماركات لهذا الحرف') + '</div>'))
+      + '</div>';
+
+    return '<div class="rzq-brand-filter-panel">'
+      + (head ? '<div class="rzq-brand-filter-head">' + esc(head) + '</div>' : '')
+      + '<div class="rzq-brand-filter-search-wrap">'
+      +   '<input type="search" class="rzq-brand-filter-search" data-brand-search="1" placeholder="' + (fr ? 'Search brand…' : 'ابحث عن ماركة…') + '" value="' + esc(opts.query || '') + '"/>'
+      + '</div>'
+      + lettersHtml
+      + listHtml
+      + '</div>';
+  }
+
   global.RizqBrands = {
     list: listAll,
     getById: getById,
@@ -1007,6 +1089,7 @@
     modelName: modelName,
     searchMatch: searchMatch,
     findByAlias: findByAlias,
+    brandLetter: brandLetter,
     logoSvg: logoSvg,
     logoDataUri: logoDataUri,
     chipHtml: chipHtml,
@@ -1014,6 +1097,7 @@
     fillBrandSelect: fillBrandSelect,
     fillModelSelect: fillModelSelect,
     stripHtml: stripHtml,
+    filterListHtml: filterListHtml,
     sectors: {
       auto: 'auto', fashion: 'fashion', sports: 'sports', eyewear: 'eyewear',
       electronics: 'electronics', furniture: 'furniture', jewelry: 'jewelry'

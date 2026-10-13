@@ -1291,8 +1291,62 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_ad_cards.js?v=3.9"></script>
 <script src="rizq_categories_config.js?v=20"></script>
-<script src="rizq_brands_catalog.js?v=3"></script>
+<script src="rizq_brands_catalog.js?v=4"></script>
 <style>
+/* فلتر الماركة — شعار + اسم + أحرف (صفحة كل الإعلانات) */
+#brand-filter-section{background:rgba(201,168,76,.04)!important}
+#brand-filter-section .wilaya-select{margin-bottom:8px}
+.rzq-brand-filter-panel{margin:4px 0 0}
+.rzq-brand-filter-head{font-size:12px;font-weight:800;color:#0F2347;margin:0 0 8px}
+.rzq-brand-filter-search-wrap{margin:0 0 8px}
+.rzq-brand-filter-search{
+  width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(27,58,107,.16);
+  border-radius:8px;font:inherit;font-size:12px;font-weight:600;color:#0F2347;background:#fff
+}
+.rzq-brand-filter-search:focus{outline:2px solid rgba(201,168,76,.45);border-color:var(--gold,#C9A84C)}
+.rzq-brand-letters{
+  display:flex;flex-wrap:wrap;gap:4px;margin:0 0 8px;max-height:72px;overflow:auto;
+  -webkit-overflow-scrolling:touch
+}
+.rzq-brand-letter-btn{
+  flex:0 0 auto;min-width:28px;height:28px;padding:0 7px;border-radius:7px;
+  border:1px solid rgba(27,58,107,.14);background:#fff;color:#0F2347;
+  font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1
+}
+.rzq-brand-letter-btn:hover{border-color:var(--gold,#C9A84C)}
+.rzq-brand-letter-btn.is-on{
+  background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;border-color:transparent
+}
+.rzq-brand-filter-list{
+  display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;
+  padding:2px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
+.rzq-brand-filter-row{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:start;
+  padding:6px 8px;border:1px solid rgba(27,58,107,.1);border-radius:10px;
+  background:#fff;cursor:pointer;font-family:inherit;color:#0F2347;
+  transition:border-color .15s,box-shadow .15s,background .15s
+}
+.rzq-brand-filter-row:hover{border-color:rgba(201,168,76,.55);background:#fffcf5}
+.rzq-brand-filter-row.is-on{
+  border-color:var(--gold,#C9A84C);background:rgba(201,168,76,.12);
+  box-shadow:0 0 0 2px rgba(201,168,76,.15)
+}
+.rzq-brand-filter-logo{
+  width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  background:#f4f6fa;border:1px solid rgba(15,35,71,.08);display:flex;align-items:center;justify-content:center
+}
+.rzq-brand-filter-logo img{width:32px;height:32px;border-radius:50%;display:block;object-fit:cover}
+.rzq-brand-filter-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;flex:1}
+.rzq-brand-filter-name{
+  font-size:12px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0
+}
+.rzq-brand-filter-letter{
+  flex-shrink:0;font-size:10px;font-weight:800;color:#5b6b85;
+  background:rgba(27,58,107,.06);border-radius:6px;padding:2px 6px
+}
+.rzq-brand-filter-empty{font-size:11px;color:#5b6b85;padding:10px 4px;text-align:center}
+/* شريط أفقي احتياطي إن استُخدم stripHtml */
 .rzq-brand-strip-panel{margin:0 0 8px}
 .rzq-brand-strip-head{margin:0 0 8px}
 .rzq-brand-strip-head-label{font-size:13px;font-weight:800;color:#0F2347}
@@ -1303,7 +1357,6 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 .rzq-brand-strip-name{font-size:11px;font-weight:800;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .rzq-brand-strip-btn:hover,.rzq-brand-strip-btn.is-on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2);transform:translateY(-1px);background:#fff}
 .rzq-brand-strip-btn.is-on{background:rgba(201,168,76,.08)}
-#brand-filter-section .wilaya-select{margin-bottom:8px}
 </style>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
@@ -1380,16 +1433,16 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
           </div>
         </div>
 
-        <!-- الماركة (سيارات / أزياء / إلكترونيات…) -->
+        <!-- الماركة: شعار + اسم + أحرف (سيارات / أزياء / إلكترونيات…) -->
         <div class="filter-section" id="brand-filter-section">
           <div class="filter-title"><span data-t="filter-brand">الماركة</span><button type="button" onclick="clearSection('brand')" data-t="btn-clear-mini">مسح</button></div>
-          <select class="wilaya-select" id="brand-select" onchange="onBrandFilterChange()">
+          <div id="brand-strip-mount" aria-live="polite"></div>
+          <select class="wilaya-select" id="brand-select" onchange="onBrandFilterChange()" aria-label="الماركة">
             <option value="" data-t="all-brands">كل الماركات</option>
           </select>
-          <select class="wilaya-select" id="model-select" onchange="applyFilters()" disabled>
+          <select class="wilaya-select" id="model-select" onchange="applyFilters()" disabled aria-label="الموديل">
             <option value="" data-t="all-models">كل الموديلات</option>
           </select>
-          <div id="brand-strip-mount" aria-live="polite"></div>
         </div>
 
         <!-- الولاية -->
@@ -2362,7 +2415,18 @@ function applyFilters(){
     }
     if(navCat){const ok=a.cat.includes(navCat)||a.subcat.includes(navCat)||navCat.includes(a.cat);if(!ok)return false;}
     if(selCat&&a.subcat!==selCat&&!a.cat.includes(selCat))return false;
-    if(selBrand && String(a.brandId||'')!==String(selBrand)) return false;
+    if(selBrand){
+      let brandOk = String(a.brandId||'')===String(selBrand);
+      if(!brandOk && window.RizqBrands){
+        const b=RizqBrands.getById(selBrand);
+        if(b){
+          const blob=[a.title,a.titleFR,a.titleFr,a.desc,a.brandName,a.brandNameFr,a.modelName,a.modelNameFr].join(' ').toLowerCase();
+          const names=[b.id,b.nameAr,b.nameFr].concat(b.aliases||[]);
+          brandOk=names.some(function(n){ return n && blob.indexOf(String(n).toLowerCase())>=0; });
+        }
+      }
+      if(!brandOk) return false;
+    }
     if(selModel && String(a.modelId||'')!==String(selModel)) return false;
     if(selSeller&&a.seller!==selSeller)return false;
     if(selWilaya&&a.wilaya!==selWilaya)return false;
@@ -3490,9 +3554,15 @@ function clearSection(sec){
   if(sec==='brand'){
     const bs=document.getElementById('brand-select'); if(bs) bs.value='';
     const ms=document.getElementById('model-select'); if(ms){ ms.value=''; ms.disabled=true; }
+    _browseBrandLetter='';
+    _browseBrandQuery='';
   }
   applyFilters();
 }
+
+var _browseBrandLetter='';
+var _browseBrandQuery='';
+var _browseBrandSearchTimer=null;
 
 function onBrandFilterChange(){
   const brandId=(document.getElementById('brand-select')||{}).value||'';
@@ -3507,7 +3577,38 @@ function onBrandFilterChange(){
   applyFilters();
 }
 
-function _refreshBrandFilterUI(catKey){
+function _bindBrowseBrandFilterMount(mount, brandSel){
+  if(!mount || !brandSel) return;
+  mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id=btn.getAttribute('data-brand-id')||'';
+      // إعادة النقر تلغي الاختيار
+      brandSel.value = (brandSel.value === id) ? '' : id;
+      onBrandFilterChange();
+    });
+  });
+  mount.querySelectorAll('[data-brand-letter]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _browseBrandLetter = btn.getAttribute('data-brand-letter') || '';
+      var catKey=normalizeCat((document.getElementById('nav-cat-select')||{}).value||'')||urlCat||'';
+      _refreshBrandFilterUI(catKey, true);
+    });
+  });
+  var searchInp=mount.querySelector('[data-brand-search]');
+  if(searchInp){
+    searchInp.addEventListener('input', function(){
+      var val=searchInp.value||'';
+      clearTimeout(_browseBrandSearchTimer);
+      _browseBrandSearchTimer=setTimeout(function(){
+        _browseBrandQuery=val;
+        var catKey=normalizeCat((document.getElementById('nav-cat-select')||{}).value||'')||urlCat||'';
+        _refreshBrandFilterUI(catKey, true);
+      }, 160);
+    });
+  }
+}
+
+function _refreshBrandFilterUI(catKey, keepFocus){
   const brandSel=document.getElementById('brand-select');
   const modelSel=document.getElementById('model-select');
   const mount=document.getElementById('brand-strip-mount');
@@ -3516,6 +3617,9 @@ function _refreshBrandFilterUI(catKey){
   const fr=_rizqLang()==='fr';
   const prevBrand=brandSel.value||'';
   const prevModel=modelSel?modelSel.value:'';
+  const activeSearch=keepFocus ? document.activeElement : null;
+  const searchWasFocused = !!(activeSearch && activeSearch.getAttribute && activeSearch.getAttribute('data-brand-search'));
+  const searchCaret = searchWasFocused ? (activeSearch.selectionStart||0) : 0;
   let n=0;
   if(window.RizqBrands){
     // بدون قسم محدد: اعرض كل الماركات؛ مع قسم: ماركاته فقط
@@ -3530,15 +3634,30 @@ function _refreshBrandFilterUI(catKey){
     RizqBrands.fillModelSelect(modelSel, brandSel.value, fr, prevModel);
     if(modelSel && modelSel.options[0]) modelSel.options[0].textContent=fr?'Tous les modèles':'كل الموديلات';
     if(mount){
-      mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, { activeId: brandSel.value||'', heading: fr?'Brands':'الماركات' });
-      mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
-        btn.addEventListener('click', function(){
-          brandSel.value=btn.getAttribute('data-brand-id')||'';
-          onBrandFilterChange();
+      if(typeof RizqBrands.filterListHtml === 'function'){
+        mount.innerHTML=RizqBrands.filterListHtml(catKey||'', fr, {
+          activeId: brandSel.value||'',
+          letter: _browseBrandLetter||'',
+          query: _browseBrandQuery||'',
+          heading: fr ? 'Logo + brand name' : 'الشعار مع اسم الماركة'
         });
-      });
+      } else {
+        mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, {
+          activeId: brandSel.value||'',
+          heading: fr?'Brands':'الماركات'
+        });
+      }
+      _bindBrowseBrandFilterMount(mount, brandSel);
+      if(searchWasFocused){
+        var again=mount.querySelector('[data-brand-search]');
+        if(again){
+          again.focus();
+          try{ again.setSelectionRange(searchCaret, searchCaret); }catch(e){}
+        }
+      }
     }
   }
+  // أظهر قسم الماركة دائماً إن وُجدت ماركات للقسم أو عند «كل الأقسام»
   if(section) section.style.display = (n>0 || !catKey) ? '' : 'none';
 }
 document.addEventListener('DOMContentLoaded', function(){
@@ -3741,11 +3860,29 @@ document.addEventListener('DOMContentLoaded',()=>{
   const _pCond = _qp.get('condition');
   const _pSince = _qp.get('since');
   const _pSort = _qp.get('sort');
+  const _pBrand = _qp.get('brand') || _qp.get('brandId');
 
   if(_pQ){
     searchText = decodeURIComponent(_pQ);
     const sInp = document.getElementById('nav-search-input');
     if(sInp) sInp.value = searchText;
+  }
+  if(_pBrand){
+    try{
+      const brandVal=decodeURIComponent(_pBrand);
+      const bSel=document.getElementById('brand-select');
+      if(bSel){
+        // املأ القائمة أولاً ثم عيّن الماركة
+        try{ _refreshBrandFilterUI((_qp.get('cat')&&decodeURIComponent(_qp.get('cat')))||''); }catch(e0){}
+        if(window.RizqBrands){
+          const byId=RizqBrands.getById(brandVal);
+          const byAlias=byId||RizqBrands.findByAlias(brandVal);
+          bSel.value = byAlias ? byAlias.id : brandVal;
+        } else {
+          bSel.value=brandVal;
+        }
+      }
+    }catch(eBrandUrl){}
   }
 
   if(_pCat){
