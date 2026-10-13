@@ -14823,6 +14823,34 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         + '</div>';
     }
 
+    /** يضمن أن الشريط أعرض من الشاشة — وإلا بطاقة/بطاقتان تتجمدان على الهاتف */
+    function ensureStripOverflow(strip){
+      if(!strip) return;
+      var track = strip.querySelector('.rzq-disc-track');
+      if(!track) return;
+      var unit = track.getAttribute('data-loop-unit') || '';
+      if(!unit){
+        /* استخرج نسخة واحدة من عدد النسخ الحالية */
+        var n0 = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+        var html = track.innerHTML;
+        if(n0 > 1 && html){
+          /* تقريب: لا نجزّئ HTML؛ نستخدم المحتوى كاملاً كوحدة إن لم تُحفظ */
+          unit = html;
+        } else {
+          unit = html;
+        }
+      }
+      if(!unit) return;
+      var copies = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
+      var guard = 0;
+      while(track.scrollWidth <= strip.clientWidth + 12 && guard < 16){
+        track.insertAdjacentHTML('beforeend', unit);
+        copies += 1;
+        guard += 1;
+      }
+      track.setAttribute('data-loop-copies', String(Math.max(2, copies)));
+    }
+
     function mountStrip(mount, cardsHTML, cfg, fr, opts){
       opts = opts || {};
       if(!cardsHTML){
@@ -14832,15 +14860,28 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       /* عند وجود محلات/حسابات: لا خلفية فارغة ولا نص «كن أول…» — شريط مباشر فقط */
       var head = opts.liveType ? liveHeadHTML(opts.liveType, fr) : '';
       var cardCount = (cardsHTML.match(/class="rzq-disc-card"/g) || []).length;
-      /* بطاقات قليلة: نكرّر أكثر حتى يفيض العرض على الهاتف ويشتغل التحريك */
-      var copies = cardCount >= DISCOVERY_MIN_STRIP_CARDS ? 2 : Math.max(3, Math.ceil(10 / Math.max(1, cardCount)));
+      /* بطاقة واحدة (~170px) على هاتف ~390px: نسختان فقط تملآن الشاشة وتتجمد — نكرّر حتى يفيض */
+      var copies = cardCount >= DISCOVERY_MIN_STRIP_CARDS
+        ? 2
+        : Math.max(6, Math.ceil(14 / Math.max(1, cardCount)));
       var loopHTML = '';
       for(var ci = 0; ci < copies; ci++) loopHTML += cardsHTML;
       mount.innerHTML = head
         + '<div class="rzq-disc-strip">'
         + '<div class="rzq-disc-track" data-loop-copies="'+copies+'">' + loopHTML + '</div>'
         + '</div>';
-      initAutoScroll(mount.querySelector('.rzq-disc-strip'));
+      var strip = mount.querySelector('.rzq-disc-strip');
+      var track = strip && strip.querySelector('.rzq-disc-track');
+      if(track){
+        try{ track.setAttribute('data-loop-unit', cardsHTML); }catch(eU){}
+      }
+      if(strip){
+        ensureStripOverflow(strip);
+        try{
+          requestAnimationFrame(function(){ ensureStripOverflow(strip); });
+        }catch(eR){}
+        initAutoScroll(strip);
+      }
     }
 
     function padDiscoveryList(list, type){
@@ -14848,12 +14889,22 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(out.length >= DISCOVERY_MIN_STRIP_CARDS) return out;
       var known = {};
       out.forEach(function(a){ if(a && a.id) known[a.id] = true; });
+      /* عيّنات التخرج أولاً — تنوّع بصري بدل تكرار نفس المحل مرتين */
       showcaseAccounts(type).forEach(function(a){
         if(out.length >= DISCOVERY_MIN_STRIP_CARDS) return;
         if(!a || !a.id || known[a.id]) return;
         known[a.id] = true;
         out.push(a);
       });
+      /* إن بقيت قليلة: كرّر الموجود بأسماء ظاهرة حتى يشتغل الشريط */
+      if(out.length && out.length < DISCOVERY_MIN_STRIP_CARDS){
+        var base = out.slice();
+        var i = 0;
+        while(out.length < DISCOVERY_MIN_STRIP_CARDS && i < 20){
+          out.push(base[i % base.length]);
+          i++;
+        }
+      }
       return out;
     }
 
