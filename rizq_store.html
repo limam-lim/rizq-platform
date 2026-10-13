@@ -208,34 +208,41 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:inherit}
 .store-hero-stage{display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,36px);max-width:920px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
 .store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:720px;width:auto;position:relative;z-index:1;flex:1 1 280px}
-/* بطاقات الفيديو — ركن سفلي أكبر قليلاً */
+/* بطاقات الفيديو — صغيرة داخل فراغ ركن الهيرو، متناسقة مع أزرار التواصل ولا تتجاوز للأسفل */
 .hero-videos{
-  display:none;position:absolute;z-index:4;bottom:14px;inset-inline-end:14px;
-  align-items:stretch;gap:12px;max-width:min(560px,72vw);width:auto;pointer-events:auto
+  display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
+  align-items:stretch;gap:8px;max-width:min(300px,46vw);width:auto;pointer-events:auto
 }
 .store-hero.has-hero-videos .hero-videos{display:flex}
-.store-hero.has-hero-videos .hero-scroll-cue{bottom:10px;opacity:.45}
-.hero-video-card{position:relative;flex:1 1 220px;min-width:200px;max-width:270px;background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);border-radius:16px;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 12px 32px rgba(0,0,0,.35);animation:rzHeroVidIn .7s ease both}
+.store-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
+.hero-video-card{
+  position:relative;flex:0 1 142px;min-width:118px;max-width:146px;
+  background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
+  border-radius:10px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 6px 16px rgba(0,0,0,.28);animation:rzHeroVidIn .7s ease both
+}
 .hero-video-card:nth-child(2){animation-delay:.12s}
-@keyframes rzHeroVidIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes rzHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .hero-video-card .hero-video-mount{min-height:0}
 .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
 .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
 .hero-video-card .rzq-iv-badge{display:none}
 .hero-video-card .rzq-iv-src{display:none}
-/* نصوص المشغّل (تشغيل / تفعيل الصوت / تلميح) — شفافة وتظهر عند الهوفر فقط */
+.hero-video-card .rzq-iv-play{
+  width:34px!important;height:34px!important;font-size:14px!important;
+  opacity:.28;background:rgba(201,168,76,.35)!important;color:rgba(13,27,42,.75)!important;
+  box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+}
 .hero-video-card .rzq-iv-play-label,
 .hero-video-card .rzq-iv-sound,
 .hero-video-card .rzq-iv-dash-hint{
   opacity:0!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important;
   pointer-events:none!important
 }
-.hero-video-card .rzq-iv-play{
-  opacity:.28;background:rgba(201,168,76,.35)!important;color:rgba(13,27,42,.75)!important;
-  box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+.hero-video-card .rzq-iv-sound{
+  font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
+  border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
-.hero-video-card:hover .rzq-iv-play-label,
-.hero-video-card:focus-within .rzq-iv-play-label,
 .hero-video-card:hover .rzq-iv-sound.is-on,
 .hero-video-card:focus-within .rzq-iv-sound.is-on,
 .hero-video-card:hover .rzq-iv-dash-hint,
@@ -247,43 +254,39 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   opacity:1;background:rgba(201,168,76,.92)!important;color:#0D1B2A!important
 }
 @media (hover:none) and (pointer:coarse){
-  .hero-video-card .rzq-iv-play-label,
   .hero-video-card .rzq-iv-sound.is-on,
   .hero-video-card .rzq-iv-dash-hint,
   .hero-video-card .rzq-iv-play{opacity:.95!important;pointer-events:auto!important}
 }
-/* تسمية شفافة أعلى البطاقة — لا تغطي زر التشغيل/الصوت في الأسفل */
+/* تسمية صغيرة أعلى البطاقة — لا تغطي التشغيل ولا تسرق النقر */
 .hero-video-caption{
-  position:absolute;top:10px;left:50%;right:auto;bottom:auto;z-index:3;
+  position:absolute;top:6px;left:50%;right:auto;bottom:auto;z-index:3;
   display:inline-flex;align-items:center;justify-content:center;
-  width:auto;max-width:calc(100% - 20px);margin:0;padding:6px 12px;border-radius:999px;
-  border:1px solid rgba(232,201,106,.4);
-  background:rgba(6,17,28,.32);backdrop-filter:blur(7px);
-  color:rgba(255,255,255,.94);font:inherit;font-size:11.5px;font-weight:700;
-  letter-spacing:.02em;text-align:center;cursor:default;
-  opacity:0;transform:translate(-50%,-6px);
-  transition:opacity .22s ease,transform .22s ease,background .2s ease,border-color .2s ease;
-  /* زخرفية فقط — لا تسرق النقر من أزرار التشغيل */
-  pointer-events:none!important
+  width:auto;max-width:calc(100% - 12px);margin:0;padding:3px 8px;border-radius:999px;
+  border:1px solid rgba(232,201,106,.35);
+  background:rgba(6,17,28,.4);backdrop-filter:blur(6px);
+  color:rgba(255,255,255,.94);font:inherit;font-size:9.5px;font-weight:700;
+  letter-spacing:.01em;text-align:center;cursor:default;
+  opacity:0;transform:translate(-50%,-4px);
+  transition:opacity .22s ease,transform .22s ease,background .2s ease;
+  pointer-events:none!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
 .hero-video-card:hover .hero-video-caption,
 .hero-video-card:focus-within .hero-video-caption{
   opacity:1;transform:translate(-50%,0)
 }
-/* أجهزة اللمس الحقيقية فقط — لا تُظهر دائماً في بيئات بلا مؤشر */
 @media (hover:none) and (pointer:coarse){
-  .hero-video-caption{opacity:.9;transform:translate(-50%,0);background:rgba(6,17,28,.45)}
+  .hero-video-caption{opacity:.9;transform:translate(-50%,0);background:rgba(6,17,28,.5)}
 }
-/* أخفِ تسمية المشغّل السفلية في بطاقة الهيرو — التسمية العلوية كافية وزر ▶ يبقى واضحاً */
 .hero-video-card .rzq-iv-play-label{display:none!important}
 @media(max-width:900px){
   .store-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding-bottom:18px}
   .hero-videos{
-    position:relative;inset:auto;bottom:auto;margin:4px auto 0;max-width:100%;
-    justify-content:center;padding:0 10px 8px
+    position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
+    justify-content:center;padding:0 10px 6px;gap:6px
   }
-  .hero-video-card{flex:1 1 calc(50% - 8px);min-width:0;max-width:260px}
+  .hero-video-card{flex:0 1 132px;min-width:110px;max-width:140px}
 }
 .store-logo-wrap{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.4),rgba(27,58,107,.55) 70%);border:2px solid rgba(201,168,76,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.1),0 0 28px rgba(201,168,76,.4),0 8px 20px rgba(0,0,0,.5);animation:rzStPulse 3s ease-in-out infinite;position:relative}
 .store-logo-wrap.is-storefront{cursor:pointer}
